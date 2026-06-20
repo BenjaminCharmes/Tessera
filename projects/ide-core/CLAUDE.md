@@ -25,9 +25,9 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 
 ### Phase 3 — Qualité + UX : 🚧 EN COURS (tickets 011–015)
 
-11. Monaco branché sur le filesystem réel
-12. Tests frontend (Vitest + RTL, 80% couverture)
-13. CI GitHub Actions (3 jobs parallèles)
+11. ✅ Monaco branché sur le filesystem réel
+12. ✅ Tests frontend (Vitest + RTL, 80% couverture)
+13. ✅ CI GitHub Actions (3 jobs parallèles)
 14. UI création de projet depuis la sidebar
 15. SQLite persistence (historique des pipelines)
 
@@ -50,9 +50,8 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 
 ### Workflow selon la phase
 
-**Avant ticket-013 (CI)** : commit direct sur `main`. Les PRs sans CI n'apportent rien pour un projet solo.
-
-**Après ticket-013 (CI opérationnelle)** : une branche par ticket + PR obligatoire.
+**CI opérationnelle depuis ticket-013** : une branche par ticket + PR obligatoire.
+Merger avec `--squash --auto` une fois les checks verts.
 Je peux merger les PRs moi-même une fois les checks CI verts.
 ```bash
 git checkout -b ticket-XXX-description-courte
