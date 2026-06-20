@@ -48,21 +48,23 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 
 ## Workflow Git
 
-### Une branche par ticket
+### Workflow selon la phase
 
+**Avant ticket-013 (CI)** : commit direct sur `main`. Les PRs sans CI n'apportent rien pour un projet solo.
+
+**Après ticket-013 (CI opérationnelle)** : une branche par ticket + PR obligatoire.
 ```bash
-git checkout -b ticket-011-monaco-real-files
+git checkout -b ticket-XXX-description-courte
 # ... implémentation ...
-git push -u origin ticket-011-monaco-real-files
-GH_CONFIG_DIR=/Users/moi/.config/gh gh pr create --base main --title "feat: ticket-011 — Monaco real files"
+git push -u origin ticket-XXX-description-courte
+GH_CONFIG_DIR=/Users/moi/.config/gh gh pr create --base main --title "feat: ticket-XXX — ..."
+# Attendre CI verte avant de merger
 ```
 
 ### Règles absolues
 
 - **Jamais de `git push --force` sur `main`**
 - Messages de commit en anglais, format Conventional Commits : `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`
-- Une branche par ticket, nommée `ticket-XXX-description-courte`
-- Ne pas merger sans CI verte (dès que ticket-013 est en place)
 
 ---
 

@@ -22,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self' 'unsafe-inline' blob: data:; connect-src 'self' http://localhost:8000 ws://localhost:8000 https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; img-src 'self' data: blob:"
+      "csp": "default-src 'self' 'unsafe-inline' blob: data:; connect-src 'self' http://localhost:8000 ws://localhost:8000; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; img-src 'self' data: blob: asset: https://asset.localhost; worker-src blob:"
     }
   },
   "bundle": {
