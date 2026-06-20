@@ -3,7 +3,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 from vibe_ide.models.agent import AgentConfig
-from vibe_ide.models.ticket import Ticket
+from vibe_ide.models.ticket import Ticket, TicketDraft
 
 
 class Project(BaseModel):
@@ -30,3 +30,20 @@ class ProjectContext(BaseModel):
     agent_configs: list[AgentConfig]
     open_tickets: list[Ticket]
     recent_decisions: str
+
+
+class ConversationMessage(BaseModel):
+    role: str
+    content: str
+
+
+class CreateProjectRequest(BaseModel):
+    conversation: list[ConversationMessage]
+
+
+class CreateProjectResponse(BaseModel):
+    project: Project | None = None
+    suggested_tickets: list[TicketDraft] = Field(default_factory=list)
+    claude_md_generated: str = ""
+    agent_message: str = ""
+    done: bool = False

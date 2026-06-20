@@ -2,7 +2,7 @@
 id: ticket-004
 title: Agent Project Creator
 type: feat
-status: todo
+status: done
 priority: high
 agent: codeur
 depends_on: [ticket-003]

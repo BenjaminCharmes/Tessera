@@ -45,3 +45,13 @@ class Ticket(BaseModel):
 
 class TicketStatusUpdate(BaseModel):
     status: TicketStatus
+
+
+class TicketDraft(BaseModel):
+    """Suggestion de ticket générée par le Project Creator — pas encore persisté."""
+
+    title: str
+    type: TicketType
+    priority: TicketPriority
+    agent: str
+    description: str
