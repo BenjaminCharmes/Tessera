@@ -53,12 +53,14 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 **Avant ticket-013 (CI)** : commit direct sur `main`. Les PRs sans CI n'apportent rien pour un projet solo.
 
 **Après ticket-013 (CI opérationnelle)** : une branche par ticket + PR obligatoire.
+Je peux merger les PRs moi-même une fois les checks CI verts.
 ```bash
 git checkout -b ticket-XXX-description-courte
 # ... implémentation ...
 git push -u origin ticket-XXX-description-courte
 GH_CONFIG_DIR=/Users/moi/.config/gh gh pr create --base main --title "feat: ticket-XXX — ..."
-# Attendre CI verte avant de merger
+# Attendre CI verte, puis merger :
+GH_CONFIG_DIR=/Users/moi/.config/gh gh pr merge --squash --auto
 ```
 
 ### Règles absolues
