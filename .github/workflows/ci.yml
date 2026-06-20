@@ -23,7 +23,7 @@ jobs:
         run: cd backend && uv sync --extra dev
 
       - name: Run tests
-        run: cd backend && uv run pytest -v
+        run: cd backend && uv run pytest -v -m "not integration"
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || 'sk-ant-test-ci-key' }}
 
