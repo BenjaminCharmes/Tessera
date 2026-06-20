@@ -2,15 +2,18 @@ import { useState } from "react";
 import { useProjects } from "../../hooks/useProjects";
 import type { Project } from "../../types/api";
 import CreateProjectModal from "./CreateProjectModal";
+import SkeletonList from "../SkeletonList";
 
 interface ProjectNavProps {
   activeProject: Project | null;
   onSelectProject: (project: Project) => void;
+  onProjectCreated?: (project: Project) => void;
 }
 
 export default function ProjectNav({
   activeProject,
   onSelectProject,
+  onProjectCreated,
 }: ProjectNavProps) {
   const { projects, loading, error, refresh } = useProjects();
   const [showModal, setShowModal] = useState(false);
@@ -18,10 +21,10 @@ export default function ProjectNav({
   function handleCreated(project: Project) {
     refresh();
     setShowModal(false);
+    onProjectCreated?.(project);
     onSelectProject(project);
   }
 
-  if (loading) return <div className="p-4 text-zinc-500 text-xs">Loading…</div>;
   if (error) return <div className="p-4 text-red-400 text-xs">{error}</div>;
 
   return (
@@ -40,9 +43,18 @@ export default function ProjectNav({
             +
           </button>
         </div>
-        {projects.length === 0 && (
-          <div className="px-3 py-2 text-zinc-500 text-xs">
-            No projects found
+        {loading && <SkeletonList count={3} />}
+        {!loading && projects.length === 0 && (
+          <div className="px-3 py-4 flex flex-col items-center gap-2 text-center">
+            <p className="text-zinc-500 text-xs">
+              Aucun projet pour l&apos;instant
+            </p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="text-xs px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-200 transition-colors"
+            >
+              + Créer un projet
+            </button>
           </div>
         )}
         {projects.map((project) => (

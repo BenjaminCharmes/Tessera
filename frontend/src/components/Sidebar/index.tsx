@@ -69,6 +69,7 @@ interface SidebarProps {
   runningRound?: number;
   showKanban: boolean;
   onSelectProject: (project: Project) => void;
+  onProjectCreated?: (project: Project) => void;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onToggleKanban: () => void;
@@ -90,6 +91,7 @@ export default function Sidebar({
   runningRound,
   showKanban,
   onSelectProject,
+  onProjectCreated,
   onSelectTicket,
   onRunPipeline,
   onToggleKanban,
@@ -102,6 +104,7 @@ export default function Sidebar({
         <ProjectNav
           activeProject={activeProject}
           onSelectProject={onSelectProject}
+          onProjectCreated={onProjectCreated}
         />
       )}
       {panel === "tickets" && (

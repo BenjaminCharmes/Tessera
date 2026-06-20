@@ -1,6 +1,7 @@
 import { useState } from "react";
 import TicketCard from "./TicketCard";
 import CreateTicketModal from "./CreateTicketModal";
+import SkeletonList from "../SkeletonList";
 import type { Project, Ticket, TicketStatus } from "../../types/api";
 
 interface StatusGroup {
@@ -59,7 +60,16 @@ export default function TicketList({
   }
 
   if (loading) {
-    return <div className="p-4 text-zinc-500 text-xs">Loading tickets…</div>;
+    return (
+      <div className="flex flex-col h-full">
+        <div className="px-3 py-2 border-b border-zinc-700">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+            {project.name}
+          </span>
+        </div>
+        <SkeletonList count={5} />
+      </div>
+    );
   }
 
   if (error) {
