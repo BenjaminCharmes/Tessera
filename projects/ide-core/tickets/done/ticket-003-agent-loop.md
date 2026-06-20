@@ -2,7 +2,7 @@
 id: ticket-003
 title: Agent loop de base — appel Claude avec contexte projet
 type: feat
-status: todo
+status: done
 priority: critical
 agent: codeur
 depends_on: [ticket-002]

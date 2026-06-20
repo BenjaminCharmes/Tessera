@@ -32,6 +32,9 @@ packages = ["src/vibe_ide"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "integration: tests nécessitant une vraie ANTHROPIC_API_KEY (dés-activés en CI)",
+]
 
 [tool.mypy]
 strict = true

@@ -2,12 +2,15 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
+from vibe_ide.models.ticket import TicketStatus
+
 
 class AgentRole(str, Enum):
     orchestrateur = "orchestrateur"
     codeur = "codeur"
     reviewer = "reviewer"
     architect = "architect"
+    project_creator = "project-creator"
 
 
 class AgentConfig(BaseModel):
@@ -29,15 +32,16 @@ class AgentPipelineConfig(BaseModel):
     auto_merge_on_approve: bool = False
 
 
+class AgentResult(BaseModel):
+    role: AgentRole
+    ticket_id: str
+    content: str
+    suggested_status: TicketStatus
+    created_tickets: list[str] = Field(default_factory=list)
+    duration_ms: int
+
+
 class AgentRunRequest(BaseModel):
     project_id: str
     ticket_id: str
     role: AgentRole
-
-
-class AgentRunResult(BaseModel):
-    ticket_id: str
-    role: AgentRole
-    success: bool
-    output: str = ""
-    error: str = Field(default="")
