@@ -2,7 +2,7 @@
 id: ticket-002
 title: Project loader — charger un projet depuis son dossier
 type: feat
-status: todo
+status: done
 priority: critical
 agent: codeur
 depends_on: [ticket-001]

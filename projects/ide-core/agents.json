@@ -3,14 +3,14 @@
   "agents": [
     {
       "role": "orchestrateur",
-      "model": "claude-sonnet-4-5",
+      "model": "claude-sonnet-4-6",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/orchestrateur.md",
       "active": true
     },
     {
       "role": "codeur",
-      "model": "claude-sonnet-4-5",
+      "model": "claude-sonnet-4-6",
       "max_tokens": 8192,
       "prompt_file": "agents/prompts/codeur.md",
       "active": true,
@@ -18,14 +18,14 @@
     },
     {
       "role": "reviewer",
-      "model": "claude-sonnet-4-5",
+      "model": "claude-sonnet-4-6",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/reviewer.md",
       "active": true
     },
     {
       "role": "architect",
-      "model": "claude-sonnet-4-5",
+      "model": "claude-sonnet-4-6",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/architect.md",
       "active": true
