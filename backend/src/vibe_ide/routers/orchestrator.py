@@ -6,6 +6,7 @@ from anthropic import AsyncAnthropic
 from vibe_ide.config import settings
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
+from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.orchestrator import (
     Orchestrator,
     OrchestratorEvent,
@@ -82,14 +83,33 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
 @router.post("/run", response_model=PipelineResult)
 async def run_pipeline(request: RunRequest) -> PipelineResult:
     orchestrator = await _build_orchestrator(request.project_id)
+    run_id = await create_run(settings.ide_db_path, request.project_id, request.ticket_id)
 
-    async def noop(event: OrchestratorEvent) -> None:
-        pass
+    async def on_event(event: OrchestratorEvent) -> None:
+        await save_event(
+            settings.ide_db_path,
+            run_id,
+            event.type.value,
+            event.agent.value if event.agent else None,
+            event.data,
+            event.timestamp.isoformat(),
+        )
 
     try:
-        return await orchestrator.run_pipeline(request.project_id, request.ticket_id, noop)
+        result = await orchestrator.run_pipeline(
+            request.project_id, request.ticket_id, on_event
+        )
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    await finish_run(
+        settings.ide_db_path,
+        run_id,
+        result.rounds,
+        result.approved,
+        result.final_status.value,
+    )
+    return result
 
 
 @router.post("/run-autonomous", response_model=list[PipelineResult])
@@ -105,18 +125,38 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
         raw = await websocket.receive_json()
         orchestrator = await _build_orchestrator(project_id)
 
-        async def send_event(event: OrchestratorEvent) -> None:
-            await websocket.send_text(event.model_dump_json())
-
         ticket_id: str | None = raw.get("ticket_id")
         mode: str = raw.get("mode", "single")
 
         if mode == "autonomous":
+            async def send_event_autonomous(event: OrchestratorEvent) -> None:
+                await websocket.send_text(event.model_dump_json())
+
             max_tickets = int(raw.get("max_tickets", 5))
-            await orchestrator.run_autonomous(project_id, max_tickets, send_event)
+            await orchestrator.run_autonomous(project_id, max_tickets, send_event_autonomous)
         elif ticket_id:
+            run_id = await create_run(settings.ide_db_path, project_id, ticket_id)
+
+            async def send_event(event: OrchestratorEvent) -> None:
+                await websocket.send_text(event.model_dump_json())
+                await save_event(
+                    settings.ide_db_path,
+                    run_id,
+                    event.type.value,
+                    event.agent.value if event.agent else None,
+                    event.data,
+                    event.timestamp.isoformat(),
+                )
+
             try:
-                await orchestrator.run_pipeline(project_id, ticket_id, send_event)
+                result = await orchestrator.run_pipeline(project_id, ticket_id, send_event)
+                await finish_run(
+                    settings.ide_db_path,
+                    run_id,
+                    result.rounds,
+                    result.approved,
+                    result.final_status.value,
+                )
             except ValueError as exc:
                 await websocket.send_json({"error": str(exc)})
         else:

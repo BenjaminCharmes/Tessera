@@ -1,9 +1,21 @@
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from vibe_ide.config import settings
 from vibe_ide.routers import agents, orchestrator, projects, tickets
+from vibe_ide.services.database import init_db
 
-app = FastAPI(title="vibe-ide", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    await init_db(settings.ide_db_path)
+    yield
+
+
+app = FastAPI(title="vibe-ide", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

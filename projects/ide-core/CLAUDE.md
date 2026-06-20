@@ -28,7 +28,7 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 11. ✅ Monaco branché sur le filesystem réel
 12. ✅ Tests frontend (Vitest + RTL, 80% couverture)
 13. ✅ CI GitHub Actions (3 jobs parallèles)
-14. UI création de projet depuis la sidebar
+14. ✅ UI création de projet depuis la sidebar
 15. SQLite persistence (historique des pipelines)
 
 ---

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from vibe_ide.config import settings
 from vibe_ide.models.project import Project, ProjectContext, ProjectCreate
 from vibe_ide.models.ticket import TicketStatus
+from vibe_ide.services.database import PipelineRunSummary, list_runs
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.ticket_service import TicketService
 
@@ -32,7 +33,16 @@ async def create_project(body: ProjectCreate) -> Project:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 
 
-# Note : /context doit être défini avant /{project_id} pour éviter la collision
+# Note : les routes avec sous-chemin spécifique doivent être avant /{project_id}
+@router.get("/{project_id}/runs", response_model=list[PipelineRunSummary])
+async def list_project_runs(
+    project_id: str,
+    limit: int = Query(default=20, ge=1, le=100),
+) -> list[PipelineRunSummary]:
+    rows = await list_runs(settings.ide_db_path, project_id, limit)
+    return [PipelineRunSummary(**row) for row in rows]
+
+
 @router.get("/{project_id}/context", response_model=ProjectContext)
 async def get_project_context(project_id: str) -> ProjectContext:
     try:

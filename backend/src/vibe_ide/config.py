@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ide_prompts_dir: Path = Path("agents") / "prompts"
     github_token: str = ""
     github_repo: str = ""  # format "owner/repo"
+    ide_db_path: Path = Path("vibe_ide.db")
 
 
 settings = Settings()  # type: ignore[call-arg]

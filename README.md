@@ -37,7 +37,7 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | CI GitHub Actions (3 jobs parallèles) | ✅ |
 | Monaco branché sur le filesystem réel | ✅ |
 | Tests frontend (Vitest + RTL, 36 tests) | ✅ |
-| UI création de projet | 🔜 ticket-014 |
+| UI création de projet (bouton + + modal) | ✅ |
 | SQLite persistence (historique pipelines) | 🔜 ticket-015 |
 
 ---
