@@ -34,4 +34,5 @@ class Ticket(BaseModel):
     priority: TicketPriority
     agent: str
     depends_on: list[str] = Field(default_factory=list)
+    github_issue_url: str | None = Field(default=None, description="URL optionnelle de l'issue GitHub liée")
     body: str = Field(default="", description="Corps Markdown du ticket")

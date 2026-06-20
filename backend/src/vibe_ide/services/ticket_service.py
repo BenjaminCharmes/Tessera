@@ -1,3 +1,5 @@
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterator
 
@@ -80,6 +82,62 @@ def update_ticket_status(
     return _parse_ticket(dest_path)
 
 
+def archive_old_tickets(project_path: Path, days: int = 30) -> list[Ticket]:
+    """Déplace les tickets done/ plus anciens que `days` jours vers archive/done/YYYY-MM/."""
+    done_dir = _tickets_root(project_path) / "done"
+    if not done_dir.is_dir():
+        return []
+
+    cutoff = time.time() - days * 86400
+    archived: list[Ticket] = []
+
+    for ticket_file in sorted(done_dir.glob("ticket-*.md")):
+        if ticket_file.stat().st_mtime > cutoff:
+            continue
+        mtime = datetime.fromtimestamp(ticket_file.stat().st_mtime, tz=timezone.utc)
+        dest_dir = _tickets_root(project_path) / "archive" / "done" / mtime.strftime("%Y-%m")
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest_path = dest_dir / ticket_file.name
+        ticket_file.rename(dest_path)
+        try:
+            archived.append(_parse_ticket(dest_path))
+        except Exception:
+            pass
+
+    return archived
+
+
+def list_archived_tickets(project_path: Path) -> list[Ticket]:
+    """Retourne tous les tickets archivés."""
+    archive_root = _tickets_root(project_path) / "archive"
+    if not archive_root.is_dir():
+        return []
+
+    tickets: list[Ticket] = []
+    for ticket_file in sorted(archive_root.rglob("ticket-*.md")):
+        try:
+            tickets.append(_parse_ticket(ticket_file))
+        except Exception:
+            continue
+    return tickets
+
+
+_PIPELINE_LOG_MAX_LINES = 200
+
+
+def rotate_pipeline_log(project_path: Path) -> None:
+    """Tronque pipeline-log.md à _PIPELINE_LOG_MAX_LINES lignes (garde les plus récentes)."""
+    log_path = project_path / "pipeline-log.md"
+    if not log_path.exists():
+        return
+
+    lines = log_path.read_text(encoding="utf-8").splitlines(keepends=True)
+    if len(lines) <= _PIPELINE_LOG_MAX_LINES:
+        return
+
+    log_path.write_text("".join(lines[-_PIPELINE_LOG_MAX_LINES:]), encoding="utf-8")
+
+
 def _parse_ticket(path: Path) -> Ticket:
     post = frontmatter.load(str(path))
     meta = post.metadata
@@ -91,5 +149,6 @@ def _parse_ticket(path: Path) -> Ticket:
         priority=meta["priority"],
         agent=str(meta["agent"]),
         depends_on=list(meta.get("depends_on", [])),
+        github_issue_url=meta.get("github_issue_url") or None,
         body=str(post.content),
     )

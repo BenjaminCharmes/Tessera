@@ -49,6 +49,37 @@ Ne pas sauter d'étapes — chaque ticket pose les fondations du suivant.
 
 ---
 
+## Workflow Git
+
+### Tickets 000–003 : commits directs sur `main`
+
+```bash
+git add <fichiers>
+git commit -m "feat: description en Conventional Commits"
+git push origin main
+```
+
+Pas de branche, pas de PR. La CI tourne mais n'est pas bloquante.
+
+### À partir de ticket-004 : branche + PR
+
+```bash
+git checkout -b ticket-004-description-courte
+# ... implémentation ...
+git push -u origin ticket-004-description-courte
+gh pr create --base main --title "feat: ..." --body "..."
+# Attendre CI verte avant de merger
+```
+
+### Règles absolues
+
+- **Jamais de `git push --force` sur `main`**
+- Messages de commit en anglais, format Conventional Commits : `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`
+- Une branche par ticket (à partir de ticket-004), nommée `ticket-XXX-description-courte`
+- Ne pas merger sans CI verte (à partir de ticket-004)
+
+---
+
 ## Définition de "done" pour ce projet
 
 Un ticket est DONE quand :

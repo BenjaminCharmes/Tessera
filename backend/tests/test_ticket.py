@@ -38,3 +38,14 @@ def test_ticket_immutable_copy() -> None:
     updated = t.model_copy(update={"status": TicketStatus.done})
     assert t.status == TicketStatus.todo
     assert updated.status == TicketStatus.done
+
+
+def test_ticket_github_issue_url_optional() -> None:
+    t = _make_ticket()
+    assert t.github_issue_url is None
+
+
+def test_ticket_github_issue_url_set() -> None:
+    url = "https://github.com/org/repo/issues/42"
+    t = _make_ticket(github_issue_url=url)
+    assert t.github_issue_url == url
