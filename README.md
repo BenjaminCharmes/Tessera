@@ -5,7 +5,7 @@
 [![CI](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
-![Tests](https://img.shields.io/badge/tests-195%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-109%20frontend%20%2B%20140%20backend-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Tauri](https://img.shields.io/badge/Tauri-v2-orange)
 
@@ -34,11 +34,15 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | Agent Project Creator (nouveau projet via conversation) | ✅ |
 | Frontend React (ticket board, agent stream, Monaco) | ✅ |
 | Shell desktop Tauri v2 (fenêtre native macOS) | ✅ |
-| CI GitHub Actions (3 jobs parallèles) | ✅ |
+| CI GitHub Actions (4 jobs : backend + frontend + e2e + tauri) | ✅ |
 | Monaco branché sur le filesystem réel | ✅ |
-| Tests frontend (Vitest + RTL, 36 tests) | ✅ |
-| UI création de projet (bouton + + modal) | ✅ |
-| SQLite persistence (historique pipelines) | 🔜 ticket-015 |
+| Tests frontend (Vitest + RTL, 109 tests) | ✅ |
+| UI création de projet / ticket (modales + sidebar) | ✅ |
+| SQLite persistence (historique des pipelines) | ✅ |
+| Live ticket board (WS events → mise à jour temps réel) | ✅ |
+| Panneau historique des pipelines (sidebar) | ✅ |
+| UX polish (ErrorBoundary, toasts, skeletons, empty states) | ✅ |
+| E2E tests Playwright (5 flows critiques) | ✅ |
 
 ---
 
@@ -139,7 +143,7 @@ vibe-ide/
 │       ├── CLAUDE.md
 │       ├── agents.json
 │       ├── tickets/
-│       │   └── done/         ← Les 6 premiers tickets sont terminés ✅
+│       │   └── done/         ← 20 tickets terminés ✅ (Phases 1–4 complètes)
 │       └── memory/
 │           └── decisions.md  ← 11 ADRs documentés
 │
@@ -206,8 +210,9 @@ Tests frontend :
 
 ```bash
 cd frontend
-npm run test          # Vitest (36 tests)
+npm run test          # Vitest unit tests (109 tests)
 npm run test:coverage # Rapport de couverture
+npm run test:e2e      # Playwright E2E (5 flows, nécessite npm run dev)
 ```
 
 ---

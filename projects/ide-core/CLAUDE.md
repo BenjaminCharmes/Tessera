@@ -31,13 +31,13 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 14. ✅ UI création de projet depuis la sidebar
 15. ✅ SQLite persistence (historique des pipelines)
 
-### Phase 4 — IDE fonctionnel : 🔜 À VENIR (tickets 016–020)
+### Phase 4 — IDE fonctionnel : ✅ DONE (tickets 016–020)
 
-16. UI création de ticket depuis la sidebar
-17. Live ticket board (WS events → mise à jour temps réel)
-18. Panneau historique des pipelines (UI pour GET /runs)
-19. UX polish (ErrorBoundary, empty states, toasts)
-20. E2E tests Playwright (5 flows critiques)
+16. ✅ UI création de ticket depuis la sidebar
+17. ✅ Live ticket board (WS events → mise à jour temps réel)
+18. ✅ Panneau historique des pipelines (UI pour GET /runs)
+19. ✅ UX polish (ErrorBoundary, empty states, toasts)
+20. ✅ E2E tests Playwright (5 flows critiques)
 
 ---
 
