@@ -2,7 +2,7 @@
 id: ticket-005
 title: Orchestrateur — routing et pipeline codeur→reviewer
 type: feat
-status: todo
+status: done
 priority: high
 agent: architect
 depends_on: [ticket-003]

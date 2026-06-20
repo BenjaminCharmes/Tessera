@@ -1,12 +1,16 @@
+import time
+
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
 from anthropic import AsyncAnthropic
 
+from vibe_ide.agents.github_sync import GithubSyncAgent
 from vibe_ide.config import settings
-from vibe_ide.models.agent import AgentResult, AgentRunRequest
+from vibe_ide.models.agent import AgentResult, AgentRole, AgentRunRequest
 from vibe_ide.models.project import CreateProjectRequest, CreateProjectResponse, ProjectContext
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
+from vibe_ide.services.github_service import GitHubService
 from vibe_ide.services.project_creator import ProjectCreatorService
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.ticket_service import TicketService
@@ -73,6 +77,33 @@ def _format_context(ctx: ProjectContext) -> str:
     )
 
 
+async def _run_github_sync(project_id: str) -> AgentResult:
+    if not settings.github_token or not settings.github_repo:
+        raise HTTPException(
+            status_code=400,
+            detail="GITHUB_TOKEN et GITHUB_REPO doivent être configurés",
+        )
+    t0 = time.monotonic()
+    project_path = settings.ide_workspace_dir / project_id
+    ticket_svc = TicketService(project_path, project_id)
+    github_svc = GitHubService(token=settings.github_token, repo=settings.github_repo)
+    agent = GithubSyncAgent(github_svc=github_svc, ticket_svc=ticket_svc)
+    created = await agent.run()
+    duration_ms = int((time.monotonic() - t0) * 1000)
+
+    summary = f"github-sync: {len(created)} ticket(s) créé(s).\n" + "\n".join(
+        f"- {t.id}: {t.title}" for t in created
+    )
+    return AgentResult(
+        role=AgentRole.github_sync,
+        ticket_id="*",
+        content=summary,
+        suggested_status=TicketStatus.done,
+        created_tickets=[t.id for t in created],
+        duration_ms=duration_ms,
+    )
+
+
 @router.post("/create-project", response_model=CreateProjectResponse)
 async def create_project(request: CreateProjectRequest) -> CreateProjectResponse:
     try:
@@ -83,6 +114,9 @@ async def create_project(request: CreateProjectRequest) -> CreateProjectResponse
 
 @router.post("/run", response_model=AgentResult)
 async def run_agent(request: AgentRunRequest) -> AgentResult:
+    if request.role == AgentRole.github_sync:
+        return await _run_github_sync(request.project_id)
+
     ctx = await _build_context(request.project_id)
 
     ticket_svc = TicketService(

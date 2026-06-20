@@ -40,5 +40,8 @@ env/
 node_modules/
 frontend/dist/
 
-# Tauri (desktop shell, à venir)
-src-tauri/target/
+# Tauri (desktop shell)
+frontend/src-tauri/target/
+
+# GitHub Actions
+.github/workflows/*.log

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from vibe_ide.routers import agents, projects, tickets
+from vibe_ide.routers import agents, orchestrator, projects, tickets
 
 app = FastAPI(title="vibe-ide", version="0.1.0")
 
@@ -16,6 +16,7 @@ app.add_middleware(
 app.include_router(projects.router, prefix="/api/v1")
 app.include_router(tickets.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
+app.include_router(orchestrator.router, prefix="/api/v1")
 
 
 @app.get("/health")

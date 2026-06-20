@@ -5,16 +5,31 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 
 ---
 
-## Objectif de la v0
+## État de la v0
 
-Un orchestrateur Python capable de :
-1. Charger un projet (lire son CLAUDE.md)
-2. Lister et assigner des tickets à des agents
-3. Faire tourner un agent "Codeur" qui écrit du code réel
-4. Faire tourner un agent "Reviewer" qui valide le code
-5. Un agent "Project Creator" pour bootstrapper de nouveaux projets
+### Phase 1 — Backend : ✅ DONE (tickets 000–006)
 
-L'UI vient après — la v0 est pilotable en CLI.
+1. Structure de base et configuration
+2. Modèles Pydantic + TicketService
+3. ProjectLoader + API projets/tickets
+4. Agent loop avec streaming Claude
+5. Orchestrateur multi-agents (codeur→reviewer, max 3 tours)
+6. GitHub Sync (import issues → tickets)
+
+### Phase 2 — Frontend + Desktop : ✅ DONE (tickets 007–010)
+
+7. Scaffold React/Vite/Tailwind/Monaco
+8. Ticket board (liste + kanban)
+9. Agent stream panel (WebSocket)
+10. Tauri v2 shell (fenêtre native macOS)
+
+### Phase 3 — Qualité + UX : 🚧 EN COURS (tickets 011–015)
+
+11. Monaco branché sur le filesystem réel
+12. Tests frontend (Vitest + RTL, 80% couverture)
+13. CI GitHub Actions (3 jobs parallèles)
+14. UI création de projet depuis la sidebar
+15. SQLite persistence (historique des pipelines)
 
 ---
 
@@ -29,61 +44,45 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 - `reviewer` — valide le code produit par le codeur
 - `architect` — intervient sur les tickets de type `design`
 
-## Agents NON actifs (pas pertinents ici)
-
-- `redacteur` — pas de contenu éditorial sur ce projet
-- `planificateur` — pas de planning calendaire
-
----
-
-## Ordre d'implémentation recommandé
-
-```
-ticket-000 → ticket-001 → ticket-002 → ticket-003 → ticket-004
-     ↓
-Structure     Modèles      Orchestr.    Agent loop   Project
-de base       tickets      FastAPI      de base      Creator
-```
-
-Ne pas sauter d'étapes — chaque ticket pose les fondations du suivant.
-
 ---
 
 ## Workflow Git
 
-### Tickets 000–003 : commits directs sur `main`
+### Une branche par ticket
 
 ```bash
-git add <fichiers>
-git commit -m "feat: description en Conventional Commits"
-git push origin main
-```
-
-Pas de branche, pas de PR. La CI tourne mais n'est pas bloquante.
-
-### À partir de ticket-004 : branche + PR
-
-```bash
-git checkout -b ticket-004-description-courte
+git checkout -b ticket-011-monaco-real-files
 # ... implémentation ...
-git push -u origin ticket-004-description-courte
-gh pr create --base main --title "feat: ..." --body "..."
-# Attendre CI verte avant de merger
+git push -u origin ticket-011-monaco-real-files
+GH_CONFIG_DIR=/Users/moi/.config/gh gh pr create --base main --title "feat: ticket-011 — Monaco real files"
 ```
 
 ### Règles absolues
 
 - **Jamais de `git push --force` sur `main`**
 - Messages de commit en anglais, format Conventional Commits : `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`
-- Une branche par ticket (à partir de ticket-004), nommée `ticket-XXX-description-courte`
-- Ne pas merger sans CI verte (à partir de ticket-004)
+- Une branche par ticket, nommée `ticket-XXX-description-courte`
+- Ne pas merger sans CI verte (dès que ticket-013 est en place)
+
+---
+
+## Lancement du projet
+
+```bash
+# Depuis la racine vibe-ide/
+make dev              # Lance FastAPI sur http://localhost:8000
+make dev-frontend     # Lance Vite sur http://localhost:5173
+make tauri-dev        # Lance l'app desktop (nécessite make dev dans un autre terminal)
+make test             # Lance les tests Python
+make lint             # Type-check mypy
+```
 
 ---
 
 ## Définition de "done" pour ce projet
 
 Un ticket est DONE quand :
-- [ ] Le code est écrit et typé
-- [ ] Les tests passent (`uv run pytest`)
-- [ ] Le reviewer a validé (pas de commentaire bloquant)
+- [ ] Le code est écrit et typé (strict TypeScript / type hints Python)
+- [ ] Les tests passent (`uv run pytest` backend, `npm run test` frontend)
+- [ ] `npm run build` + `cargo check` passent sans erreur
 - [ ] La décision d'archi est documentée si pertinent

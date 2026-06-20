@@ -11,6 +11,7 @@ class AgentRole(str, Enum):
     reviewer = "reviewer"
     architect = "architect"
     project_creator = "project-creator"
+    github_sync = "github-sync"
 
 
 class AgentConfig(BaseModel):
@@ -43,5 +44,5 @@ class AgentResult(BaseModel):
 
 class AgentRunRequest(BaseModel):
     project_id: str
-    ticket_id: str
+    ticket_id: str = ""
     role: AgentRole

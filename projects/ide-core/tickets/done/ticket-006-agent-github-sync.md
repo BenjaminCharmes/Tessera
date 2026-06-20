@@ -2,7 +2,7 @@
 id: ticket-006
 title: "Agent github-sync — pont GitHub Issues ↔ tickets Markdown"
 type: feat
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on:

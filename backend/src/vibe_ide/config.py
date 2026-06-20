@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     # Chemin vers agents/prompts/ — à surcharger via IDE_PROMPTS_DIR si le serveur
     # ne tourne pas depuis la racine du repo vibe-ide.
     ide_prompts_dir: Path = Path("agents") / "prompts"
+    github_token: str = ""
+    github_repo: str = ""  # format "owner/repo"
 
 
 settings = Settings()  # type: ignore[call-arg]
