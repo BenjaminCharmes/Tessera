@@ -11,9 +11,19 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+async function post<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 export const api = {
   projects: {
     list: (): Promise<Project[]> => request("/projects"),
+    create: (name: string, description: string): Promise<Project> =>
+      post("/projects", { name, description }),
   },
   tickets: {
     list: (projectId: string): Promise<Ticket[]> =>

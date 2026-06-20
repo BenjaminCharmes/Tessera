@@ -59,6 +59,39 @@ describe("api.tickets.list", () => {
   });
 });
 
+describe("api.projects.create", () => {
+  it("sends POST with name and description", async () => {
+    const project = { id: "my-app", name: "my-app", description: "desc" };
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(project),
+    });
+
+    const result = await api.projects.create("my-app", "desc");
+
+    expect(result).toEqual(project);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/v1/projects",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ name: "my-app", description: "desc" }),
+      }),
+    );
+  });
+
+  it("throws on conflict", async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 409,
+      text: () => Promise.resolve("Project already exists"),
+    });
+
+    await expect(api.projects.create("existing", "")).rejects.toThrow(
+      "API 409",
+    );
+  });
+});
+
 describe("api.orchestrator.run", () => {
   it("sends POST with project_id and ticket_id", async () => {
     mockFetch.mockResolvedValue({
