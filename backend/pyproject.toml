@@ -1,0 +1,37 @@
+[project]
+name = "vibe-ide"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.30.0",
+    "anthropic>=0.28.0",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.3.0",
+    "aiosqlite>=0.20.0",
+    "python-frontmatter>=1.1.0",
+    "websockets>=12.0",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vibe_ide"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
