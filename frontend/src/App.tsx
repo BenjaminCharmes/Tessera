@@ -44,6 +44,11 @@ export default function App() {
     stream.clear();
   }
 
+  function handleTicketCreated(t: Parameters<typeof setTicket>[0]) {
+    tickets.refresh();
+    setTicket(t);
+  }
+
   function handleRunPipeline(ticketId: string) {
     stream.connect(ticketId);
   }
@@ -83,6 +88,7 @@ export default function App() {
           onSelectTicket={setTicket}
           onRunPipeline={handleRunPipeline}
           onToggleKanban={() => setShowKanban((v) => !v)}
+          onTicketCreated={handleTicketCreated}
         />
       </div>
 

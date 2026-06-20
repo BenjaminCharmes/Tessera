@@ -47,6 +47,17 @@ class TicketStatusUpdate(BaseModel):
     status: TicketStatus
 
 
+class TicketCreate(BaseModel):
+    """Payload minimal pour créer un ticket depuis l'UI."""
+
+    title: str
+    type: TicketType = TicketType.feat
+    priority: TicketPriority = TicketPriority.medium
+    agent: str = "codeur"
+    description: str = ""
+    depends_on: list[str] = Field(default_factory=list)
+
+
 class TicketDraft(BaseModel):
     """Suggestion de ticket générée par le Project Creator — pas encore persisté."""
 

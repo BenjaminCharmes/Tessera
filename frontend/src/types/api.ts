@@ -56,6 +56,14 @@ export interface OrchestratorEvent {
   timestamp: string;
 }
 
+export interface TicketCreate {
+  title: string;
+  type?: TicketType;
+  priority?: TicketPriority;
+  description?: string;
+  depends_on?: string[];
+}
+
 export interface PipelineResult {
   ticket_id: string;
   final_status: TicketStatus;

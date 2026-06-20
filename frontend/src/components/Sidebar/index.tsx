@@ -51,6 +51,7 @@ interface SidebarProps {
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onToggleKanban: () => void;
+  onTicketCreated?: (ticket: Ticket) => void;
 }
 
 export default function Sidebar({
@@ -66,6 +67,7 @@ export default function Sidebar({
   onSelectTicket,
   onRunPipeline,
   onToggleKanban,
+  onTicketCreated,
 }: SidebarProps) {
   return (
     <div className="h-full overflow-y-auto bg-zinc-900 text-zinc-200 text-sm">
@@ -87,6 +89,7 @@ export default function Sidebar({
           onSelectTicket={onSelectTicket}
           onRunPipeline={onRunPipeline}
           onToggleKanban={onToggleKanban}
+          onTicketCreated={onTicketCreated}
         />
       )}
     </div>

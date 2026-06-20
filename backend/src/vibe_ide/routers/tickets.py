@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from vibe_ide.config import settings
-from vibe_ide.models.ticket import Ticket, TicketStatusUpdate
+from vibe_ide.models.ticket import Ticket, TicketCreate, TicketStatus, TicketStatusUpdate
 from vibe_ide.services.ticket_service import TicketService
 
 router = APIRouter(tags=["tickets"])
@@ -22,7 +22,17 @@ async def list_tickets(
 
 
 @router.post("/{project_id}/tickets", response_model=Ticket, status_code=201)
-async def create_ticket(project_id: str, ticket: Ticket) -> Ticket:
+async def create_ticket(project_id: str, body: TicketCreate) -> Ticket:
+    ticket = Ticket(
+        id="",
+        title=body.title,
+        type=body.type,
+        status=TicketStatus.todo,
+        priority=body.priority,
+        agent=body.agent,
+        depends_on=body.depends_on,
+        body=body.description,
+    )
     return await _svc(project_id).create_ticket(ticket)
 
 

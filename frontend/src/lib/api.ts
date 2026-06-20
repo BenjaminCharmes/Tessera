@@ -1,4 +1,9 @@
-import type { PipelineResult, Project, Ticket } from "../types/api";
+import type {
+  PipelineResult,
+  Project,
+  Ticket,
+  TicketCreate,
+} from "../types/api";
 
 const BASE = "/api/v1";
 
@@ -28,6 +33,8 @@ export const api = {
   tickets: {
     list: (projectId: string): Promise<Ticket[]> =>
       request(`/projects/${projectId}/tickets`),
+    create: (projectId: string, data: TicketCreate): Promise<Ticket> =>
+      post(`/projects/${projectId}/tickets`, data),
   },
   orchestrator: {
     run: (projectId: string, ticketId: string): Promise<PipelineResult> =>
