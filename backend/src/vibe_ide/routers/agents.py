@@ -4,9 +4,10 @@ from anthropic import AsyncAnthropic
 
 from vibe_ide.config import settings
 from vibe_ide.models.agent import AgentResult, AgentRunRequest
-from vibe_ide.models.project import ProjectContext
+from vibe_ide.models.project import CreateProjectRequest, CreateProjectResponse, ProjectContext
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
+from vibe_ide.services.project_creator import ProjectCreatorService
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.ticket_service import TicketService
 
@@ -23,6 +24,11 @@ _OPEN_STATUSES = {
 def _make_runner() -> AgentRunner:
     client = AsyncAnthropic(api_key=settings.anthropic_api_key)
     return AgentRunner(client, settings.ide_prompts_dir)
+
+
+def _make_project_creator() -> ProjectCreatorService:
+    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    return ProjectCreatorService(client, settings.ide_prompts_dir, settings.ide_workspace_dir)
 
 
 async def _build_context(project_id: str) -> ProjectContext:
@@ -65,6 +71,14 @@ def _format_context(ctx: ProjectContext) -> str:
         f"## Tickets ouverts\n{tickets_summary}\n\n"
         f"## Décisions récentes\n{ctx.recent_decisions or '_Aucune décision._'}"
     )
+
+
+@router.post("/create-project", response_model=CreateProjectResponse)
+async def create_project(request: CreateProjectRequest) -> CreateProjectResponse:
+    try:
+        return await _make_project_creator().create_project(request.conversation)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
 
 @router.post("/run", response_model=AgentResult)
