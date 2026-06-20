@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useActiveProject } from "./hooks/useActiveProject";
 import { useTickets } from "./hooks/useTickets";
+import { useRuns } from "./hooks/useRuns";
 import { useOrchestratorStream } from "./hooks/useOrchestratorStream";
 import Sidebar, { IconBar } from "./components/Sidebar";
+import type { SidebarPanel } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
 import AgentPanel from "./components/AgentPanel";
 import BottomPanel from "./components/BottomPanel";
 import PipelineToast from "./components/PipelineToast";
-
-type SidebarPanel = "projects" | "tickets";
 
 export default function App() {
   const { project, ticket, setProject, setTicket } = useActiveProject();
@@ -22,6 +22,16 @@ export default function App() {
     stream.status === "running" || stream.status === "connecting",
     stream.events,
   );
+  const runs = useRuns(project?.id ?? null);
+
+  // Refresh run history when a pipeline completes
+  const prevLastResult = useRef(stream.lastResult);
+  useEffect(() => {
+    if (stream.lastResult && stream.lastResult !== prevLastResult.current) {
+      prevLastResult.current = stream.lastResult;
+      runs.refresh();
+    }
+  });
 
   const running = new Set<string>(
     stream.ticketId &&
@@ -44,6 +54,14 @@ export default function App() {
 
   function handleRunPipeline(ticketId: string) {
     stream.connect(ticketId);
+  }
+
+  function handleSelectTicketById(ticketId: string) {
+    const found = tickets.tickets.find((t) => t.id === ticketId);
+    if (found) {
+      setTicket(found);
+      setPanel("tickets");
+    }
   }
 
   return (
@@ -75,6 +93,9 @@ export default function App() {
           byStatus={tickets.byStatus}
           ticketsLoading={tickets.loading}
           ticketsError={tickets.error}
+          runs={runs.runs}
+          runsLoading={runs.loading}
+          runsError={runs.error}
           running={running}
           runningRound={stream.currentRound}
           showKanban={showKanban}
@@ -83,6 +104,7 @@ export default function App() {
           onRunPipeline={handleRunPipeline}
           onToggleKanban={() => setShowKanban((v) => !v)}
           onTicketCreated={handleTicketCreated}
+          onSelectTicketById={handleSelectTicketById}
         />
       </div>
 

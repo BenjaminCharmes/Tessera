@@ -1,8 +1,14 @@
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
-import type { Project, Ticket, TicketStatus } from "../../types/api";
+import RunHistory from "./RunHistory";
+import type {
+  PipelineRun,
+  Project,
+  Ticket,
+  TicketStatus,
+} from "../../types/api";
 
-type SidebarPanel = "projects" | "tickets";
+export type SidebarPanel = "projects" | "tickets" | "history";
 
 interface IconBarProps {
   activePanel: SidebarPanel;
@@ -34,6 +40,17 @@ export function IconBar({ activePanel, onChangePanel }: IconBarProps) {
       >
         ☰
       </button>
+      <button
+        onClick={() => onChangePanel("history")}
+        title="Historique"
+        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
+          activePanel === "history"
+            ? "bg-zinc-700 text-white"
+            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
+        }`}
+      >
+        ⏱
+      </button>
     </div>
   );
 }
@@ -45,6 +62,9 @@ interface SidebarProps {
   byStatus: Record<TicketStatus, Ticket[]>;
   ticketsLoading: boolean;
   ticketsError: string | null;
+  runs: PipelineRun[];
+  runsLoading: boolean;
+  runsError: string | null;
   running: Set<string>;
   runningRound?: number;
   showKanban: boolean;
@@ -53,6 +73,7 @@ interface SidebarProps {
   onRunPipeline: (ticketId: string) => void;
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
+  onSelectTicketById?: (ticketId: string) => void;
 }
 
 export default function Sidebar({
@@ -62,6 +83,9 @@ export default function Sidebar({
   byStatus,
   ticketsLoading,
   ticketsError,
+  runs,
+  runsLoading,
+  runsError,
   running,
   runningRound,
   showKanban,
@@ -70,6 +94,7 @@ export default function Sidebar({
   onRunPipeline,
   onToggleKanban,
   onTicketCreated,
+  onSelectTicketById,
 }: SidebarProps) {
   return (
     <div className="h-full overflow-y-auto bg-zinc-900 text-zinc-200 text-sm">
@@ -93,6 +118,14 @@ export default function Sidebar({
           onRunPipeline={onRunPipeline}
           onToggleKanban={onToggleKanban}
           onTicketCreated={onTicketCreated}
+        />
+      )}
+      {panel === "history" && (
+        <RunHistory
+          runs={runs}
+          loading={runsLoading}
+          error={runsError}
+          onSelectTicket={onSelectTicketById}
         />
       )}
     </div>

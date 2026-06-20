@@ -1,5 +1,6 @@
 import type {
   PipelineResult,
+  PipelineRun,
   Project,
   Ticket,
   TicketCreate,
@@ -43,5 +44,9 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ project_id: projectId, ticket_id: ticketId }),
       }),
+  },
+  runs: {
+    list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>
+      request(`/projects/${projectId}/runs?limit=${limit}`),
   },
 };

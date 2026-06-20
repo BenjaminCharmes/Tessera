@@ -70,3 +70,13 @@ export interface PipelineResult {
   rounds: number;
   approved: boolean;
 }
+
+export interface PipelineRun {
+  id: string;
+  ticket_id: string;
+  started_at: string;
+  finished_at: string | null;
+  rounds: number | null;
+  approved: boolean | null;
+  final_status: string | null;
+}
