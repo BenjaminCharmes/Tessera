@@ -1,6 +1,8 @@
+import json
 import re
 from pathlib import Path
 
+from vibe_ide.models.agent import AgentConfig, AgentPipelineConfig
 from vibe_ide.models.project import Project, ProjectCreate
 
 
@@ -40,6 +42,30 @@ def list_projects(workspace: Path) -> list[Project]:
     ]
 
 
+def load_agents_config(project_path: Path) -> list[AgentConfig]:
+    """Lit agents.json et retourne la liste des AgentConfig actifs."""
+    agents_json = project_path / "agents.json"
+    if not agents_json.exists():
+        return []
+    try:
+        data = json.loads(agents_json.read_text(encoding="utf-8"))
+        return [AgentConfig(**a) for a in data.get("agents", [])]
+    except Exception:
+        return []
+
+
+def load_pipeline_config(project_path: Path) -> AgentPipelineConfig:
+    """Lit la section pipeline de agents.json."""
+    agents_json = project_path / "agents.json"
+    if not agents_json.exists():
+        return AgentPipelineConfig()
+    try:
+        data = json.loads(agents_json.read_text(encoding="utf-8"))
+        return AgentPipelineConfig(**data.get("pipeline", {}))
+    except Exception:
+        return AgentPipelineConfig()
+
+
 # ------------------------------------------------------------------
 # ProjectLoader — API async pour l'orchestrateur
 # ------------------------------------------------------------------
@@ -64,8 +90,7 @@ class ProjectLoader:
         return projects
 
     async def load_project(self, project_id: str) -> Project:
-        project_path = self._workspace / project_id
-        return load_project(project_path)  # raises ValueError si absent
+        return load_project(self._workspace / project_id)
 
     async def create_project(self, body: ProjectCreate) -> Project:
         project_path = self._workspace / body.project_id
@@ -86,16 +111,20 @@ class ProjectLoader:
             body.project_id, body.name, body.active_agents
         )
         (project_path / "CLAUDE.md").write_text(content, encoding="utf-8")
+
+        if body.active_agents:
+            agents_json = _default_agents_json(body.project_id, body.active_agents)
+            (project_path / "agents.json").write_text(agents_json, encoding="utf-8")
+
         return load_project(project_path)
 
 
 # ------------------------------------------------------------------
-# Parsers internes
+# Parsers et templates internes
 # ------------------------------------------------------------------
 
 
 def _parse_name(content: str, fallback: str) -> str:
-    """Extrait le titre de la première ligne H1 du CLAUDE.md."""
     for line in content.splitlines():
         m = re.match(r"^#\s+(.+)", line)
         if m:
@@ -104,7 +133,6 @@ def _parse_name(content: str, fallback: str) -> str:
 
 
 def _parse_description(content: str) -> str:
-    """Première ligne non vide non-titre."""
     skip_heading = True
     for line in content.splitlines():
         stripped = line.strip()
@@ -166,3 +194,28 @@ Projet créé via vibe-ide.
 
 À définir.
 """
+
+
+def _default_agents_json(project_id: str, active_agents: list[str]) -> str:
+    agents = [
+        {
+            "role": role,
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 8192 if role == "codeur" else 4096,
+            "prompt_file": f"agents/prompts/{role}.md",
+            "active": True,
+            **({"max_instances": 2} if role == "codeur" else {}),
+        }
+        for role in active_agents
+    ]
+    pipeline_default = active_agents[:2] if len(active_agents) >= 2 else active_agents
+    data = {
+        "project_id": project_id,
+        "agents": agents,
+        "pipeline": {
+            "default": pipeline_default,
+            "max_review_rounds": 3,
+            "auto_merge_on_approve": True,
+        },
+    }
+    return json.dumps(data, indent=2, ensure_ascii=False) + "\n"

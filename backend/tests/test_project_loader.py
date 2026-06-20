@@ -1,11 +1,15 @@
 from pathlib import Path
 
+import json
+
 import pytest
 
 from vibe_ide.models.project import ProjectCreate
 from vibe_ide.services.project_loader import (
     ProjectLoader,
     list_projects,
+    load_agents_config,
+    load_pipeline_config,
     load_project,
 )
 
@@ -192,3 +196,101 @@ async def test_create_project_conflict(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="Projet déjà existant"):
         await ProjectLoader(tmp_path).create_project(body)
+
+
+async def test_create_project_scaffolds_agents_json(tmp_path: Path) -> None:
+    body = ProjectCreate(
+        project_id="proj-with-agents",
+        name="Proj",
+        active_agents=["codeur", "reviewer"],
+    )
+
+    await ProjectLoader(tmp_path).create_project(body)
+
+    agents_json = tmp_path / "proj-with-agents" / "agents.json"
+    assert agents_json.exists()
+    data = json.loads(agents_json.read_text())
+    roles = [a["role"] for a in data["agents"]]
+    assert roles == ["codeur", "reviewer"]
+    assert data["agents"][0]["model"] == "claude-sonnet-4-6"
+    assert data["pipeline"]["default"] == ["codeur", "reviewer"]
+
+
+async def test_create_project_no_agents_json_when_no_agents(tmp_path: Path) -> None:
+    body = ProjectCreate(project_id="bare-proj", name="Sans agents")
+
+    await ProjectLoader(tmp_path).create_project(body)
+
+    assert not (tmp_path / "bare-proj" / "agents.json").exists()
+
+
+# ------------------------------------------------------------------
+# load_agents_config / load_pipeline_config
+# ------------------------------------------------------------------
+
+
+def _write_agents_json(project_dir: Path, agents: list[dict], pipeline: dict | None = None) -> None:
+    data: dict = {"project_id": project_dir.name, "agents": agents}
+    if pipeline:
+        data["pipeline"] = pipeline
+    (project_dir / "agents.json").write_text(json.dumps(data), encoding="utf-8")
+
+
+def test_load_agents_config_no_file(tmp_path: Path) -> None:
+    assert load_agents_config(tmp_path) == []
+
+
+def test_load_agents_config_returns_all(tmp_path: Path) -> None:
+    _write_agents_json(tmp_path, [
+        {"role": "codeur", "model": "claude-sonnet-4-6", "max_tokens": 8192,
+         "prompt_file": "agents/prompts/codeur.md", "active": True},
+        {"role": "reviewer", "model": "claude-sonnet-4-6", "max_tokens": 4096,
+         "prompt_file": "agents/prompts/reviewer.md", "active": True},
+    ])
+
+    configs = load_agents_config(tmp_path)
+
+    assert len(configs) == 2
+    assert configs[0].role == "codeur"
+    assert configs[0].model == "claude-sonnet-4-6"
+    assert configs[0].max_tokens == 8192
+    assert configs[1].role == "reviewer"
+
+
+def test_load_agents_config_defaults(tmp_path: Path) -> None:
+    _write_agents_json(tmp_path, [
+        {"role": "architect", "model": "claude-sonnet-4-6", "max_tokens": 4096,
+         "prompt_file": "agents/prompts/architect.md"},
+    ])
+
+    config = load_agents_config(tmp_path)[0]
+
+    assert config.active is True
+    assert config.max_instances == 1
+
+
+def test_load_agents_config_malformed_json(tmp_path: Path) -> None:
+    (tmp_path / "agents.json").write_text("not valid json", encoding="utf-8")
+
+    assert load_agents_config(tmp_path) == []
+
+
+def test_load_pipeline_config_no_file(tmp_path: Path) -> None:
+    pipeline = load_pipeline_config(tmp_path)
+    assert pipeline.max_review_rounds == 3
+    assert pipeline.auto_merge_on_approve is False
+    assert pipeline.default == []
+
+
+def test_load_pipeline_config_reads_file(tmp_path: Path) -> None:
+    _write_agents_json(tmp_path, [], pipeline={
+        "default": ["codeur", "reviewer"],
+        "max_review_rounds": 5,
+        "auto_merge_on_approve": True,
+    })
+
+    pipeline = load_pipeline_config(tmp_path)
+
+    assert pipeline.default == ["codeur", "reviewer"]
+    assert pipeline.max_review_rounds == 5
+    assert pipeline.auto_merge_on_approve is True

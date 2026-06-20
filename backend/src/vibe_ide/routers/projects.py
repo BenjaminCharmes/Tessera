@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from vibe_ide.config import settings
 from vibe_ide.models.project import Project, ProjectContext, ProjectCreate
 from vibe_ide.models.ticket import TicketStatus
-from vibe_ide.services.project_loader import ProjectLoader
+from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.ticket_service import TicketService
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -40,10 +40,11 @@ async def get_project_context(project_id: str) -> ProjectContext:
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
+    project_path = settings.ide_workspace_dir / project_id
     all_tickets = await _ticket_svc(project_id).list_tickets()
     open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
 
-    decisions_path = settings.ide_workspace_dir / project_id / "memory" / "decisions.md"
+    decisions_path = project_path / "memory" / "decisions.md"
     recent_decisions = (
         decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
     )
@@ -52,6 +53,7 @@ async def get_project_context(project_id: str) -> ProjectContext:
         project_id=project_id,
         claude_md=project.raw_claude_md,
         active_agents=project.active_agents,
+        agent_configs=load_agents_config(project_path),
         open_tickets=open_tickets,
         recent_decisions=recent_decisions,
     )

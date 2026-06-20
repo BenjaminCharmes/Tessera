@@ -2,6 +2,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from vibe_ide.models.agent import AgentConfig
 from vibe_ide.models.ticket import Ticket
 
 
@@ -26,5 +27,6 @@ class ProjectContext(BaseModel):
     project_id: str
     claude_md: str
     active_agents: list[str]
+    agent_configs: list[AgentConfig]
     open_tickets: list[Ticket]
     recent_decisions: str
