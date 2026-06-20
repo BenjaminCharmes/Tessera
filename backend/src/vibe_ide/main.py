@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 app.include_router(projects.router, prefix="/api/v1")
-app.include_router(tickets.router, prefix="/api/v1")
+app.include_router(tickets.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
 
 

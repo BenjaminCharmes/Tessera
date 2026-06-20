@@ -9,3 +9,5 @@ class Project(BaseModel):
     path: Path
     description: str = ""
     active_agents: list[str] = Field(default_factory=list)
+    stack: str | None = None
+    raw_claude_md: str = ""

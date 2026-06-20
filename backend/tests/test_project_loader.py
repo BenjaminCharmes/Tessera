@@ -1,4 +1,3 @@
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -9,7 +8,13 @@ from vibe_ide.services.project_loader import list_projects, load_project
 def test_load_project_with_claude_md(tmp_path: Path) -> None:
     project_dir = tmp_path / "my-project"
     project_dir.mkdir()
-    (project_dir / "CLAUDE.md").write_text("# my-project\n\nDescription du projet.")
+    (project_dir / "CLAUDE.md").write_text(
+        "# my-project\n\nDescription du projet.\n\n"
+        "## Agents actifs sur ce projet\n\n"
+        "- `codeur` — fait le code\n"
+        "- `reviewer` — valide\n\n"
+        "## Stack spécifique\n\nPython + FastAPI\n"
+    )
 
     project = load_project(project_dir)
 
@@ -17,6 +22,9 @@ def test_load_project_with_claude_md(tmp_path: Path) -> None:
     assert project.name == "my-project"
     assert project.path == project_dir
     assert "my-project" in project.description
+    assert project.active_agents == ["codeur", "reviewer"]
+    assert project.stack is not None and "Python" in project.stack
+    assert "## Agents actifs" in project.raw_claude_md
 
 
 def test_load_project_without_claude_md(tmp_path: Path) -> None:
@@ -27,6 +35,9 @@ def test_load_project_without_claude_md(tmp_path: Path) -> None:
 
     assert project.id == "bare-project"
     assert project.description == ""
+    assert project.active_agents == []
+    assert project.stack is None
+    assert project.raw_claude_md == ""
 
 
 def test_load_project_invalid_path(tmp_path: Path) -> None:

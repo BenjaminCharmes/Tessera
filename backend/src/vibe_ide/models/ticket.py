@@ -7,7 +7,9 @@ from pydantic import BaseModel, Field
 class TicketStatus(str, Enum):
     todo = "todo"
     in_progress = "in-progress"
+    in_review = "in-review"
     done = "done"
+    blocked = "blocked"
     cancelled = "cancelled"
 
 
@@ -34,5 +36,12 @@ class Ticket(BaseModel):
     priority: TicketPriority
     agent: str
     depends_on: list[str] = Field(default_factory=list)
-    github_issue_url: str | None = Field(default=None, description="URL optionnelle de l'issue GitHub liée")
-    body: str = Field(default="", description="Corps Markdown du ticket")
+    created: str = ""
+    github_issue_url: str | None = Field(default=None)
+    body: str = Field(default="")
+    project_id: str = ""
+    file_path: str = Field(default="", description="Chemin absolu du fichier sur disque")
+
+
+class TicketStatusUpdate(BaseModel):
+    status: TicketStatus

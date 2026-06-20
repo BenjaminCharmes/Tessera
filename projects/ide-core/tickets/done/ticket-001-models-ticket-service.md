@@ -2,7 +2,7 @@
 id: ticket-001
 title: Modèles Pydantic et service de tickets
 type: feat
-status: todo
+status: done
 priority: critical
 agent: codeur
 depends_on: [ticket-000]
@@ -22,7 +22,7 @@ Exemple de ticket sur disque :
 id: ticket-042
 title: Ajouter la validation des emails
 type: feat
-status: todo
+status: done
 priority: high
 agent: codeur
 depends_on: [ticket-038]

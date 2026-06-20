@@ -1,0 +1,291 @@
+import os
+import time
+from pathlib import Path
+
+import frontmatter  # type: ignore[import-untyped]
+import pytest
+
+from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from vibe_ide.services.ticket_service import TicketService
+
+
+def _svc(project_path: Path) -> TicketService:
+    return TicketService(project_path, "test-project")
+
+
+def _write_ticket(
+    path: Path,
+    ticket_id: str,
+    status: str = "todo",
+    title: str = "Test ticket",
+    **extra: object,
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    post = frontmatter.Post(
+        content="Corps du ticket.",
+        id=ticket_id,
+        title=title,
+        type="chore",
+        status=status,
+        priority="medium",
+        agent="codeur",
+        created="2025-06-01",
+        **extra,
+    )
+    path.write_text(frontmatter.dumps(post), encoding="utf-8")
+
+
+# ------------------------------------------------------------------
+# list_tickets
+# ------------------------------------------------------------------
+
+
+async def test_list_tickets_empty(tmp_path: Path) -> None:
+    result = await _svc(tmp_path).list_tickets()
+    assert result == []
+
+
+async def test_list_tickets_returns_all(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
+    _write_ticket(tmp_path / "tickets/done/ticket-002-b.md", "ticket-002", status="done")
+
+    result = await _svc(tmp_path).list_tickets()
+
+    assert len(result) == 2
+    assert result[0].id == "ticket-001"
+    assert result[1].id == "ticket-002"
+
+
+async def test_list_tickets_filter_by_status(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
+    _write_ticket(tmp_path / "tickets/done/ticket-002-b.md", "ticket-002", status="done")
+
+    result = await _svc(tmp_path).list_tickets(TicketStatus.todo)
+
+    assert len(result) == 1
+    assert result[0].status == TicketStatus.todo
+
+
+async def test_list_tickets_sets_project_id(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
+
+    result = await _svc(tmp_path).list_tickets()
+
+    assert result[0].project_id == "test-project"
+    assert result[0].file_path != ""
+
+
+async def test_list_tickets_skips_archive(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
+    _write_ticket(
+        tmp_path / "tickets/archive/done/2025-01/ticket-002-old.md",
+        "ticket-002",
+        status="done",
+    )
+
+    result = await _svc(tmp_path).list_tickets()
+
+    assert len(result) == 1
+
+
+# ------------------------------------------------------------------
+# get_ticket
+# ------------------------------------------------------------------
+
+
+async def test_get_ticket_found(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/todo/ticket-042-foo.md", "ticket-042")
+
+    result = await _svc(tmp_path).get_ticket("ticket-042")
+
+    assert result is not None
+    assert result.id == "ticket-042"
+
+
+async def test_get_ticket_not_found(tmp_path: Path) -> None:
+    result = await _svc(tmp_path).get_ticket("ticket-999")
+    assert result is None
+
+
+# ------------------------------------------------------------------
+# update_status
+# ------------------------------------------------------------------
+
+
+async def test_update_status_moves_file(tmp_path: Path) -> None:
+    src = tmp_path / "tickets/todo/ticket-001-a.md"
+    _write_ticket(src, "ticket-001")
+
+    ticket = await _svc(tmp_path).update_status("ticket-001", TicketStatus.done)
+
+    assert ticket.status == TicketStatus.done
+    assert not src.exists()
+    assert (tmp_path / "tickets/done/ticket-001-a.md").exists()
+
+
+async def test_update_status_not_found(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="Ticket introuvable"):
+        await _svc(tmp_path).update_status("ticket-999", TicketStatus.done)
+
+
+async def test_update_status_same_dir(tmp_path: Path) -> None:
+    src = tmp_path / "tickets/todo/ticket-001-a.md"
+    _write_ticket(src, "ticket-001")
+
+    ticket = await _svc(tmp_path).update_status("ticket-001", TicketStatus.todo)
+
+    assert ticket.status == TicketStatus.todo
+    assert src.exists()
+
+
+# ------------------------------------------------------------------
+# create_ticket
+# ------------------------------------------------------------------
+
+
+async def test_create_ticket_writes_file(tmp_path: Path) -> None:
+    ticket = Ticket(
+        id="",
+        title="Ma nouvelle feature",
+        type=TicketType.feat,
+        status=TicketStatus.todo,
+        priority=TicketPriority.high,
+        agent="codeur",
+    )
+
+    result = await _svc(tmp_path).create_ticket(ticket)
+
+    assert result.id.startswith("ticket-")
+    assert result.project_id == "test-project"
+    assert result.file_path != ""
+    assert Path(result.file_path).exists()
+
+
+async def test_create_ticket_with_explicit_id(tmp_path: Path) -> None:
+    ticket = Ticket(
+        id="ticket-042",
+        title="Ticket avec id fourni",
+        type=TicketType.chore,
+        status=TicketStatus.todo,
+        priority=TicketPriority.low,
+        agent="codeur",
+    )
+
+    result = await _svc(tmp_path).create_ticket(ticket)
+
+    assert result.id == "ticket-042"
+
+
+async def test_create_ticket_next_id_auto_increments(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/todo/ticket-005-x.md", "ticket-005")
+
+    ticket = Ticket(
+        id="",
+        title="Auto increment",
+        type=TicketType.feat,
+        status=TicketStatus.todo,
+        priority=TicketPriority.medium,
+        agent="codeur",
+    )
+
+    result = await _svc(tmp_path).create_ticket(ticket)
+
+    assert result.id == "ticket-006"
+
+
+async def test_create_ticket_sets_created_date(tmp_path: Path) -> None:
+    ticket = Ticket(
+        id="ticket-010",
+        title="Date auto",
+        type=TicketType.chore,
+        status=TicketStatus.todo,
+        priority=TicketPriority.low,
+        agent="codeur",
+    )
+
+    result = await _svc(tmp_path).create_ticket(ticket)
+
+    assert result.created != ""
+
+
+# ------------------------------------------------------------------
+# archive_old_tickets
+# ------------------------------------------------------------------
+
+
+def _age_file(path: Path, seconds: int) -> None:
+    ts = time.time() - seconds
+    os.utime(path, (ts, ts))
+
+
+async def test_archive_old_tickets_moves_old(tmp_path: Path) -> None:
+    ticket_path = tmp_path / "tickets/done/ticket-001-old.md"
+    _write_ticket(ticket_path, "ticket-001", status="done")
+    _age_file(ticket_path, 31 * 86400)
+
+    archived = await _svc(tmp_path).archive_old_tickets(days=30)
+
+    assert len(archived) == 1
+    assert not ticket_path.exists()
+    assert any((tmp_path / "tickets/archive").rglob("ticket-001-old.md"))
+
+
+async def test_archive_old_tickets_keeps_recent(tmp_path: Path) -> None:
+    ticket_path = tmp_path / "tickets/done/ticket-002-new.md"
+    _write_ticket(ticket_path, "ticket-002", status="done")
+
+    archived = await _svc(tmp_path).archive_old_tickets(days=30)
+
+    assert archived == []
+    assert ticket_path.exists()
+
+
+# ------------------------------------------------------------------
+# list_archived_tickets
+# ------------------------------------------------------------------
+
+
+async def test_list_archived_tickets_empty(tmp_path: Path) -> None:
+    assert await _svc(tmp_path).list_archived_tickets() == []
+
+
+async def test_list_archived_tickets_returns_archived(tmp_path: Path) -> None:
+    path = tmp_path / "tickets/archive/done/2025-01/ticket-005-x.md"
+    _write_ticket(path, "ticket-005", status="done")
+
+    result = await _svc(tmp_path).list_archived_tickets()
+
+    assert len(result) == 1
+    assert result[0].id == "ticket-005"
+
+
+# ------------------------------------------------------------------
+# rotate_pipeline_log
+# ------------------------------------------------------------------
+
+
+async def test_rotate_pipeline_log_no_file(tmp_path: Path) -> None:
+    await _svc(tmp_path).rotate_pipeline_log()  # no exception
+
+
+async def test_rotate_pipeline_log_short_file(tmp_path: Path) -> None:
+    log = tmp_path / "pipeline-log.md"
+    log.write_text("\n".join(f"line {i}" for i in range(50)))
+    original = log.read_text()
+
+    await _svc(tmp_path).rotate_pipeline_log()
+
+    assert log.read_text() == original
+
+
+async def test_rotate_pipeline_log_truncates(tmp_path: Path) -> None:
+    log = tmp_path / "pipeline-log.md"
+    lines = [f"line {i}\n" for i in range(300)]
+    log.write_text("".join(lines))
+
+    await _svc(tmp_path).rotate_pipeline_log()
+
+    result = log.read_text().splitlines()
+    assert len(result) == 200
+    assert result[0] == "line 100"
+    assert result[-1] == "line 299"
