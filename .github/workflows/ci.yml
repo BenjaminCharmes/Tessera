@@ -7,36 +7,61 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
 
+  backend:
+    name: Backend (pytest)
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v3
         with:
-          version: "latest"
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
 
       - name: Install dependencies
-        run: uv sync --extra dev
-        env:
-          ANTHROPIC_API_KEY: dummy
+        run: cd backend && uv sync --extra dev
 
       - name: Run tests
-        run: uv run pytest
+        run: cd backend && uv run pytest -v
         env:
-          ANTHROPIC_API_KEY: dummy
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || 'sk-ant-test-ci-key' }}
 
-      - name: Type check (warn only)
-        run: uv run mypy src/ || true
-        env:
-          ANTHROPIC_API_KEY: dummy
+      - name: Type check
+        run: cd backend && uv run mypy src/ || true
+
+  frontend:
+    name: Frontend (tsc + vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: cd frontend && npm ci
+
+      - name: Type check
+        run: cd frontend && npx tsc --noEmit
+
+      - name: Unit tests
+        run: cd frontend && npm run test
+
+  tauri:
+    name: Tauri (cargo check)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "frontend/src-tauri -> target"
+
+      - name: Cargo check
+        run: cd frontend/src-tauri && cargo check

@@ -2,10 +2,12 @@
 
 > IDE multi-projets avec orchestration d'agents IA — se construit lui-même.
 
-[![CI](https://github.com/BenjaminCharmes/vibe-ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe-ide/actions/workflows/ci.yml)
+[![CI](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-green)
-![Tests](https://img.shields.io/badge/tests-140%20passing-brightgreen)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
+![Tests](https://img.shields.io/badge/tests-176%20passing-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
+![Tauri](https://img.shields.io/badge/Tauri-v2-orange)
 
 ---
 
@@ -18,7 +20,7 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 
 ---
 
-## Fonctionnalités (v0 — backend complet)
+## Fonctionnalités (v0)
 
 | Feature | Status |
 |---------|--------|
@@ -30,8 +32,13 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | Mode autonome (traite les tickets en séquence) | ✅ |
 | Agent GitHub Sync (Issues → tickets Markdown) | ✅ |
 | Agent Project Creator (nouveau projet via conversation) | ✅ |
-| Frontend React (ticket board, agent stream) | 🔜 ticket-007 |
-| Shell desktop Tauri | 🔜 futur |
+| Frontend React (ticket board, agent stream, Monaco) | ✅ |
+| Shell desktop Tauri v2 (fenêtre native macOS) | ✅ |
+| CI GitHub Actions (3 jobs parallèles) | ✅ |
+| Monaco branché sur le filesystem réel | ✅ |
+| Tests frontend (Vitest + RTL, 36 tests) | ✅ |
+| UI création de projet | 🔜 ticket-014 |
+| SQLite persistence (historique pipelines) | 🔜 ticket-015 |
 
 ---
 
@@ -39,8 +46,9 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 
 ### Prérequis
 
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- Python 3.11+ et [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- Node.js 24 LTS (`nvm install --lts`)
+- Rust stable (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
 - Une clef API Anthropic ([console.anthropic.com](https://console.anthropic.com/))
 
 ### Installation
@@ -182,12 +190,23 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 ## Commandes de développement
 
 ```bash
-make setup        # Initialisation complète (première fois)
-make dev          # Lance le serveur en mode reload
-make test         # Suite de tests complète (140 tests)
-make test-fast    # Tests rapides (sortie minimaliste)
-make lint         # Type-check mypy
-make clean        # Supprime les caches
+make setup         # Initialisation complète (première fois)
+make dev           # Lance FastAPI sur http://localhost:8000
+make dev-frontend  # Lance Vite sur http://localhost:5173
+make tauri-dev     # Lance l'app desktop Tauri (nécessite make dev)
+make tauri-build   # Build production (.app distributable)
+make test          # Tests Python (pytest)
+make test-fast     # Tests Python rapides
+make lint          # Type-check mypy
+make clean         # Supprime les caches
+```
+
+Tests frontend :
+
+```bash
+cd frontend
+npm run test          # Vitest (36 tests)
+npm run test:coverage # Rapport de couverture
 ```
 
 ---
@@ -196,10 +215,13 @@ make clean        # Supprime les caches
 
 ```
 ┌─────────────────────────────────────┐
-│     Frontend (ticket-007 — 🔜)      │
-│   React 18 · TypeScript · Tailwind  │
-│   Monaco Editor · Ticket Board      │
-└──────────────┬──────────────────────┘
+│      ✅ Tauri v2 Shell (Rust)       │
+│  ┌─────────────────────────────┐    │
+│  │  ✅ React UI (TypeScript)   │    │
+│  │  Monaco · Ticket Board      │    │
+│  │  Agent Stream · Kanban      │    │
+│  └──────────────┬──────────────┘    │
+└─────────────────┼───────────────────┘
                │ HTTP / WebSocket
 ┌──────────────▼──────────────────────┐
 │     Orchestrateur (FastAPI)         │
