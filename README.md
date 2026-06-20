@@ -5,7 +5,7 @@
 [![CI](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
-![Tests](https://img.shields.io/badge/tests-176%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-195%20passing-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Tauri](https://img.shields.io/badge/Tauri-v2-orange)
 
@@ -160,6 +160,7 @@ vibe-ide/
 | `GET` | `/api/v1/projects` | Liste tous les projets |
 | `POST` | `/api/v1/projects` | Crée un projet (structure filesystem) |
 | `GET` | `/api/v1/projects/:id` | Détail d'un projet |
+| `GET` | `/api/v1/projects/:id/runs` | Historique des pipelines (SQLite) |
 | `GET` | `/api/v1/projects/:id/tickets` | Liste les tickets (filtre par status) |
 | `GET` | `/api/v1/projects/:id/tickets/:tid` | Détail d'un ticket |
 | `PATCH` | `/api/v1/projects/:id/tickets/:tid/status` | Change le status |

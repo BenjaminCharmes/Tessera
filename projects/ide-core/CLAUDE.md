@@ -23,13 +23,21 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 9. Agent stream panel (WebSocket)
 10. Tauri v2 shell (fenêtre native macOS)
 
-### Phase 3 — Qualité + UX : 🚧 EN COURS (tickets 011–015)
+### Phase 3 — Qualité + UX : ✅ DONE (tickets 011–015)
 
 11. ✅ Monaco branché sur le filesystem réel
 12. ✅ Tests frontend (Vitest + RTL, 80% couverture)
 13. ✅ CI GitHub Actions (3 jobs parallèles)
 14. ✅ UI création de projet depuis la sidebar
-15. SQLite persistence (historique des pipelines)
+15. ✅ SQLite persistence (historique des pipelines)
+
+### Phase 4 — IDE fonctionnel : 🔜 À VENIR (tickets 016–020)
+
+16. UI création de ticket depuis la sidebar
+17. Live ticket board (WS events → mise à jour temps réel)
+18. Panneau historique des pipelines (UI pour GET /runs)
+19. UX polish (ErrorBoundary, empty states, toasts)
+20. E2E tests Playwright (5 flows critiques)
 
 ---
 
