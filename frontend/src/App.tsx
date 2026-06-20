@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useActiveProject } from "./hooks/useActiveProject";
 import { useTickets } from "./hooks/useTickets";
 import { useOrchestratorStream } from "./hooks/useOrchestratorStream";
@@ -7,6 +7,7 @@ import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
 import AgentPanel from "./components/AgentPanel";
 import BottomPanel from "./components/BottomPanel";
+import PipelineToast from "./components/PipelineToast";
 
 type SidebarPanel = "projects" | "tickets";
 
@@ -19,16 +20,8 @@ export default function App() {
   const tickets = useTickets(
     project?.id ?? null,
     stream.status === "running" || stream.status === "connecting",
+    stream.events,
   );
-
-  // Refresh ticket list when a pipeline completes
-  const prevLastResult = useRef(stream.lastResult);
-  useEffect(() => {
-    if (stream.lastResult && stream.lastResult !== prevLastResult.current) {
-      prevLastResult.current = stream.lastResult;
-      tickets.refresh();
-    }
-  });
 
   const running = new Set<string>(
     stream.ticketId &&
@@ -83,6 +76,7 @@ export default function App() {
           ticketsLoading={tickets.loading}
           ticketsError={tickets.error}
           running={running}
+          runningRound={stream.currentRound}
           showKanban={showKanban}
           onSelectProject={handleSelectProject}
           onSelectTicket={setTicket}
@@ -125,6 +119,8 @@ export default function App() {
       >
         <BottomPanel events={stream.events} />
       </div>
+
+      <PipelineToast result={stream.lastResult} />
     </div>
   );
 }

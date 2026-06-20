@@ -25,6 +25,7 @@ interface TicketListProps {
   error: string | null;
   activeTicket: Ticket | null;
   running: Set<string>;
+  runningRound?: number;
   showKanban: boolean;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
@@ -39,6 +40,7 @@ export default function TicketList({
   error,
   activeTicket,
   running,
+  runningRound,
   showKanban,
   onSelectTicket,
   onRunPipeline,
@@ -136,6 +138,9 @@ export default function TicketList({
                       ticket={ticket}
                       isActive={activeTicket?.id === ticket.id}
                       isRunning={running.has(ticket.id)}
+                      runningRound={
+                        running.has(ticket.id) ? runningRound : undefined
+                      }
                       onSelect={onSelectTicket}
                       onRun={onRunPipeline}
                     />

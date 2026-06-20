@@ -46,6 +46,7 @@ interface SidebarProps {
   ticketsLoading: boolean;
   ticketsError: string | null;
   running: Set<string>;
+  runningRound?: number;
   showKanban: boolean;
   onSelectProject: (project: Project) => void;
   onSelectTicket: (ticket: Ticket) => void;
@@ -62,6 +63,7 @@ export default function Sidebar({
   ticketsLoading,
   ticketsError,
   running,
+  runningRound,
   showKanban,
   onSelectProject,
   onSelectTicket,
@@ -85,6 +87,7 @@ export default function Sidebar({
           error={ticketsError}
           activeTicket={activeTicket}
           running={running}
+          runningRound={runningRound}
           showKanban={showKanban}
           onSelectTicket={onSelectTicket}
           onRunPipeline={onRunPipeline}

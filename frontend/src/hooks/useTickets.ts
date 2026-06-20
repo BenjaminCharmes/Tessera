@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
-import type { Ticket, TicketStatus } from "../types/api";
+import { groupByStatus, moveTicket, EMPTY_BY_STATUS } from "../lib/ticketBoard";
+import type { ByStatus } from "../lib/ticketBoard";
+import type { OrchestratorEvent, Ticket, TicketStatus } from "../types/api";
 
-type ByStatus = Record<TicketStatus, Ticket[]>;
+export type { ByStatus };
 
 export interface UseTicketsResult {
   tickets: Ticket[];
@@ -12,42 +14,21 @@ export interface UseTicketsResult {
   refresh: () => void;
 }
 
-const EMPTY_BY_STATUS: ByStatus = {
-  todo: [],
-  "in-progress": [],
-  "in-review": [],
-  done: [],
-  blocked: [],
-  cancelled: [],
-};
-
-function groupByStatus(tickets: Ticket[]): ByStatus {
-  const result: ByStatus = {
-    todo: [],
-    "in-progress": [],
-    "in-review": [],
-    done: [],
-    blocked: [],
-    cancelled: [],
-  };
-  for (const ticket of tickets) {
-    result[ticket.status].push(ticket);
-  }
-  return result;
-}
-
 export function useTickets(
   projectId: string | null,
   isPipelineActive: boolean = false,
+  events: OrchestratorEvent[] = [],
 ): UseTicketsResult {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [revision, setRevision] = useState(0);
+  const processedEventsRef = useRef(0);
 
   useEffect(() => {
     if (!projectId) {
       setTickets([]);
+      processedEventsRef.current = 0;
       return;
     }
     let cancelled = false;
@@ -56,7 +37,10 @@ export function useTickets(
     api.tickets
       .list(projectId)
       .then((data) => {
-        if (!cancelled) setTickets(data);
+        if (!cancelled) {
+          setTickets(data);
+          processedEventsRef.current = events.length;
+        }
       })
       .catch((err: unknown) => {
         if (!cancelled)
@@ -68,18 +52,43 @@ export function useTickets(
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, revision]);
 
+  // Polling fallback (slower when pipeline active)
   useEffect(() => {
     if (!projectId) return;
-    const delay = isPipelineActive ? 5_000 : 30_000;
+    const delay = isPipelineActive ? 30_000 : 60_000;
     const timer = setInterval(() => setRevision((r) => r + 1), delay);
     return () => clearInterval(timer);
   }, [projectId, isPipelineActive]);
 
+  // React to real-time WS events
+  useEffect(() => {
+    const newEvents = events.slice(processedEventsRef.current);
+    if (newEvents.length === 0) return;
+    processedEventsRef.current = events.length;
+
+    for (const event of newEvents) {
+      if (
+        event.type === "ticket_status_changed" &&
+        typeof event.data["status"] === "string"
+      ) {
+        const newStatus = event.data["status"] as TicketStatus;
+        setTickets((prev) =>
+          prev.map((t) =>
+            t.id === event.ticket_id ? { ...t, status: newStatus } : t,
+          ),
+        );
+      }
+    }
+  }, [events]);
+
+  const byStatus = tickets.length ? groupByStatus(tickets) : EMPTY_BY_STATUS;
+
   return {
     tickets,
-    byStatus: tickets.length ? groupByStatus(tickets) : EMPTY_BY_STATUS,
+    byStatus,
     loading,
     error,
     refresh: () => setRevision((r) => r + 1),

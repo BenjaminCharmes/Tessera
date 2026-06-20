@@ -20,6 +20,7 @@ interface TicketCardProps {
   ticket: Ticket;
   isActive: boolean;
   isRunning: boolean;
+  runningRound?: number;
   onSelect: (ticket: Ticket) => void;
   onRun: (ticketId: string) => void;
 }
@@ -28,6 +29,7 @@ export default function TicketCard({
   ticket,
   isActive,
   isRunning,
+  runningRound,
   onSelect,
   onRun,
 }: TicketCardProps) {
@@ -57,6 +59,11 @@ export default function TicketCard({
             >
               {ticket.priority}
             </span>
+            {isRunning && runningRound != null && runningRound > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-blue-900 text-blue-300 animate-pulse">
+                tour {runningRound}/3
+              </span>
+            )}
           </div>
         </div>
 
