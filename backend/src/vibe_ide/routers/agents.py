@@ -1,14 +1,16 @@
 import time
 
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel
 
 from anthropic import AsyncAnthropic
 
 from vibe_ide.agents.github_sync import GithubSyncAgent
 from vibe_ide.config import settings
-from vibe_ide.models.agent import AgentResult, AgentRole, AgentRunRequest
-from vibe_ide.models.project import CreateProjectRequest, CreateProjectResponse, ProjectContext
+from vibe_ide.models.agent import AgentResult, AgentRole, AgentRunRequest, CreateAgentConversationResponse
+from vibe_ide.models.project import ConversationMessage, CreateProjectRequest, CreateProjectResponse, ProjectContext
 from vibe_ide.models.ticket import TicketStatus
+from vibe_ide.services.agent_creator import AgentCreatorService
 from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.github_service import GitHubService
@@ -35,6 +37,15 @@ def _make_runner() -> AgentRunner:
 def _make_project_creator() -> ProjectCreatorService:
     client = AsyncAnthropic(api_key=settings.anthropic_api_key)
     return ProjectCreatorService(client, settings.ide_prompts_dir, settings.ide_workspace_dir)
+
+
+def _make_agent_creator() -> AgentCreatorService:
+    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    return AgentCreatorService(client, settings.ide_prompts_dir)
+
+
+class CreateAgentRequest(BaseModel):
+    conversation: list[ConversationMessage]
 
 
 async def _build_context(project_id: str) -> ProjectContext:
@@ -112,6 +123,11 @@ async def create_project(request: CreateProjectRequest) -> CreateProjectResponse
         return await _make_project_creator().create_project(request.conversation)
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@router.post("/create-agent", response_model=CreateAgentConversationResponse)
+async def create_agent(request: CreateAgentRequest) -> CreateAgentConversationResponse:
+    return await _make_agent_creator().create_agent(request.conversation)
 
 
 @router.post("/run", response_model=AgentResult)

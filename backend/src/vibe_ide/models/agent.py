@@ -5,6 +5,17 @@ from pydantic import BaseModel, Field
 from vibe_ide.models.ticket import TicketStatus
 
 
+class AgentCreatedInfo(BaseModel):
+    role: str
+    description: str | None = None
+
+
+class CreateAgentConversationResponse(BaseModel):
+    agent: AgentCreatedInfo | None = None
+    message: str = ""
+    created: bool = False
+
+
 class AgentRole(str, Enum):
     orchestrateur = "orchestrateur"
     codeur = "codeur"
