@@ -5,14 +5,16 @@ import type { ConversationMessage } from "../../types/api";
 interface AgentCreatorModalProps {
   onClose: () => void;
   onCreated: (role: string) => void;
+  initialInput?: string;
 }
 
 export default function AgentCreatorModal({
   onClose,
   onCreated,
+  initialInput = "",
 }: AgentCreatorModalProps) {
   const [conversation, setConversation] = useState<ConversationMessage[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(initialInput);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

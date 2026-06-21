@@ -1,7 +1,10 @@
 import type {
   AgentInfo,
+  AnalysisResult,
   ConversationMessage,
   CreateAgentResponse,
+  ImportProjectRequest,
+  ImportProjectResponse,
   PipelineResult,
   PipelineRun,
   Project,
@@ -41,6 +44,10 @@ export const api = {
     list: (): Promise<Project[]> => request("/projects"),
     create: (name: string, description: string): Promise<Project> =>
       post("/projects", { name, description }),
+    import: (req: ImportProjectRequest): Promise<ImportProjectResponse> =>
+      post("/projects/import", req),
+    analyze: (projectId: string, overwrite = false): Promise<AnalysisResult> =>
+      post(`/projects/${projectId}/analyze`, { overwrite }),
   },
   tickets: {
     list: (projectId: string): Promise<Ticket[]> =>

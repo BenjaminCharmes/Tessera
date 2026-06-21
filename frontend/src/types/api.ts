@@ -103,3 +103,20 @@ export interface CreateAgentResponse {
   message: string;
   created: boolean;
 }
+
+export interface ImportProjectRequest {
+  source_path: string;
+  mode: "copy" | "symlink";
+  project_id?: string;
+}
+
+export interface ImportProjectResponse {
+  project: Project;
+}
+
+export interface AnalysisResult {
+  claude_md: string;
+  detected_stack: string[];
+  suggested_agents: string[];
+  claude_md_written: boolean;
+}

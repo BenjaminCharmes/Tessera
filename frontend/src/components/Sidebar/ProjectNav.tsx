@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useProjects } from "../../hooks/useProjects";
 import type { Project } from "../../types/api";
 import CreateProjectModal from "./CreateProjectModal";
+import ImportProjectModal from "./ImportProjectModal";
 import SkeletonList from "../SkeletonList";
 
 interface ProjectNavProps {
@@ -16,11 +17,19 @@ export default function ProjectNav({
   onProjectCreated,
 }: ProjectNavProps) {
   const { projects, loading, error, refresh } = useProjects();
-  const [showModal, setShowModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   function handleCreated(project: Project) {
     refresh();
-    setShowModal(false);
+    setShowCreateModal(false);
+    onProjectCreated?.(project);
+    onSelectProject(project);
+  }
+
+  function handleImported(project: Project) {
+    refresh();
+    setShowImportModal(false);
     onProjectCreated?.(project);
     onSelectProject(project);
   }
@@ -34,14 +43,24 @@ export default function ProjectNav({
           <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
             Projects
           </span>
-          <button
-            onClick={() => setShowModal(true)}
-            className="w-5 h-5 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors text-base leading-none"
-            title="Nouveau projet"
-            aria-label="Créer un projet"
-          >
-            +
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="w-5 h-5 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors text-xs leading-none"
+              title="Importer un projet"
+              aria-label="Importer un projet"
+            >
+              ↓
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="w-5 h-5 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors text-base leading-none"
+              title="Nouveau projet"
+              aria-label="Créer un projet"
+            >
+              +
+            </button>
+          </div>
         </div>
         {loading && <SkeletonList count={3} />}
         {!loading && projects.length === 0 && (
@@ -50,10 +69,16 @@ export default function ProjectNav({
               Aucun projet pour l&apos;instant
             </p>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => setShowCreateModal(true)}
               className="text-xs px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-200 transition-colors"
             >
               + Créer un projet
+            </button>
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
+            >
+              ↓ Importer un projet
             </button>
           </div>
         )}
@@ -72,10 +97,16 @@ export default function ProjectNav({
           </button>
         ))}
       </div>
-      {showModal && (
+      {showCreateModal && (
         <CreateProjectModal
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowCreateModal(false)}
           onCreated={handleCreated}
+        />
+      )}
+      {showImportModal && (
+        <ImportProjectModal
+          onClose={() => setShowImportModal(false)}
+          onProjectCreated={handleImported}
         />
       )}
     </>
