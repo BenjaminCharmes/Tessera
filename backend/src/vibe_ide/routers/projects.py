@@ -1,9 +1,20 @@
 from fastapi import APIRouter, HTTPException, Query
 
+from anthropic import AsyncAnthropic
+
 from vibe_ide.config import settings
-from vibe_ide.models.project import Project, ProjectContext, ProjectCreate, ProjectImport, ProjectImportResponse
+from vibe_ide.models.project import (
+    AnalysisResult,
+    AnalyzeProjectRequest,
+    Project,
+    ProjectContext,
+    ProjectCreate,
+    ProjectImport,
+    ProjectImportResponse,
+)
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.database import PipelineRunSummary, list_runs
+from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 from vibe_ide.services.project_importer import ImportError, ProjectImporter
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.ticket_service import TicketService
@@ -84,6 +95,19 @@ async def get_project_context(project_id: str) -> ProjectContext:
         open_tickets=open_tickets,
         recent_decisions=recent_decisions,
     )
+
+
+@router.post("/{project_id}/analyze", response_model=AnalysisResult)
+async def analyze_project(project_id: str, body: AnalyzeProjectRequest) -> AnalysisResult:
+    project_path = settings.ide_workspace_dir / project_id
+    if not project_path.is_dir():
+        raise HTTPException(status_code=404, detail=f"Projet '{project_id}' introuvable.")
+    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    svc = ProjectAnalyzerService(client, settings.ide_prompts_dir)
+    try:
+        return await svc.analyze(project_path, overwrite=body.overwrite)
+    except ValueError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
 @router.get("/{project_id}", response_model=Project)

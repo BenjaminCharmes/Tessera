@@ -58,3 +58,14 @@ class ProjectImport(BaseModel):
 
 class ProjectImportResponse(BaseModel):
     project: Project
+
+
+class AnalyzeProjectRequest(BaseModel):
+    overwrite: bool = False
+
+
+class AnalysisResult(BaseModel):
+    claude_md: str
+    detected_stack: list[str]
+    suggested_agents: list[str]
+    claude_md_written: bool
