@@ -77,6 +77,10 @@ export default function App() {
     stream.connect(ticketId);
   }
 
+  function handleAgentCreated(role: string) {
+    addToast(`Agent \`${role}\` créé`, "success");
+  }
+
   function handleSelectTicketById(ticketId: string) {
     const found = tickets.tickets.find((t) => t.id === ticketId);
     if (found) {
@@ -128,6 +132,7 @@ export default function App() {
             onToggleKanban={() => setShowKanban((v) => !v)}
             onTicketCreated={handleTicketCreated}
             onSelectTicketById={handleSelectTicketById}
+            onAgentCreated={handleAgentCreated}
           />
         </ErrorBoundary>
       </div>

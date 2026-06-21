@@ -1,4 +1,7 @@
 import type {
+  AgentInfo,
+  ConversationMessage,
+  CreateAgentResponse,
   PipelineResult,
   PipelineRun,
   Project,
@@ -25,6 +28,14 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   });
 }
 
+async function del(path: string): Promise<void> {
+  const res = await fetch(`${BASE}${path}`, { method: "DELETE" });
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`API ${res.status}: ${text}`);
+  }
+}
+
 export const api = {
   projects: {
     list: (): Promise<Project[]> => request("/projects"),
@@ -48,5 +59,16 @@ export const api = {
   runs: {
     list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>
       request(`/projects/${projectId}/runs?limit=${limit}`),
+  },
+  agents: {
+    list: (): Promise<AgentInfo[]> =>
+      request<{ agents: AgentInfo[] }>("/agents/registry").then(
+        (r) => r.agents,
+      ),
+    remove: (role: string): Promise<void> => del(`/agents/registry/${role}`),
+    createConversational: (
+      conversation: ConversationMessage[],
+    ): Promise<CreateAgentResponse> =>
+      post("/agents/create-agent", { conversation }),
   },
 };

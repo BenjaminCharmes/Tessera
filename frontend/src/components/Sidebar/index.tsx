@@ -1,6 +1,7 @@
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
 import RunHistory from "./RunHistory";
+import AgentList from "./AgentList";
 import type {
   PipelineRun,
   Project,
@@ -8,7 +9,7 @@ import type {
   TicketStatus,
 } from "../../types/api";
 
-export type SidebarPanel = "projects" | "tickets" | "history";
+export type SidebarPanel = "projects" | "tickets" | "history" | "agents";
 
 interface IconBarProps {
   activePanel: SidebarPanel;
@@ -51,6 +52,17 @@ export function IconBar({ activePanel, onChangePanel }: IconBarProps) {
       >
         ⏱
       </button>
+      <button
+        onClick={() => onChangePanel("agents")}
+        title="Agents"
+        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
+          activePanel === "agents"
+            ? "bg-zinc-700 text-white"
+            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
+        }`}
+      >
+        ⚙
+      </button>
     </div>
   );
 }
@@ -75,6 +87,7 @@ interface SidebarProps {
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onSelectTicketById?: (ticketId: string) => void;
+  onAgentCreated?: (role: string) => void;
 }
 
 export default function Sidebar({
@@ -97,6 +110,7 @@ export default function Sidebar({
   onToggleKanban,
   onTicketCreated,
   onSelectTicketById,
+  onAgentCreated,
 }: SidebarProps) {
   return (
     <div className="h-full overflow-y-auto bg-zinc-900 text-zinc-200 text-sm">
@@ -130,6 +144,9 @@ export default function Sidebar({
           error={runsError}
           onSelectTicket={onSelectTicketById}
         />
+      )}
+      {panel === "agents" && (
+        <AgentList onAgentCreated={onAgentCreated ?? (() => {})} />
       )}
     </div>
   );

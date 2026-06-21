@@ -8,42 +8,73 @@ agent: codeur
 depends_on:
   - ticket-022
   - ticket-023
-estimated_days: 1.5
 created: 2026-06-21
 ---
 
 # ticket-024 — UI gestion des agents
 
-## Objectif
-
-Exposer la gestion des agents dans la sidebar avec un panneau dédié et une modale conversationnelle pour créer de nouveaux agents. L'utilisateur peut voir, supprimer et créer des agents sans quitter l'IDE.
-
 ## Contexte
 
-Avec tickets 021-023, le backend est complet. Ce ticket crée l'interface frontend : panneau agents dans la sidebar, liste avec badges built-in/custom, et modale conversationnelle multi-tour qui appelle `/agents/create-agent`.
+Exposer la gestion des agents dans la sidebar avec un panneau dédié et une
+modale conversationnelle pour créer de nouveaux agents.
 
-## Solution implémentée
+## Composants à créer
 
-- **`frontend/src/hooks/useAgents.ts`** — hook global (pattern `useRuns`, sans projectId)
-- **`frontend/src/components/Sidebar/AgentList.tsx`** — liste avec badges, suppression au survol
-- **`frontend/src/components/Sidebar/AgentCreatorModal.tsx`** — modale conversationnelle multi-tour
-- **`frontend/src/components/Sidebar/index.tsx`** — `SidebarPanel` étendu à `"agents"`, icône ⚙
-- **`frontend/src/types/api.ts`** — `AgentInfo`, `ConversationMessage`, `CreateAgentResponse`
-- **`frontend/src/lib/api.ts`** — helper `del()` + namespace `agents.*`
+### `frontend/src/components/Sidebar/AgentList.tsx`
 
-## Critères d'acceptation
+Liste tous les agents retournés par `GET /agents/registry` :
+- Badge "built-in" (bleu) vs "custom" (vert)
+- Bouton de suppression pour les custom uniquement
+- Preview du system prompt au survol
 
-- [x] La sidebar affiche un panneau agents avec l'icône ⚙
-- [x] Chaque agent affiche un badge "built-in" (bleu) ou "custom" (vert)
-- [x] Seuls les agents custom ont un bouton de suppression (au survol)
-- [x] La modale conversationnelle s'adapte selon la réponse du backend (`created: true/false`)
-- [x] Un toast "Agent `{role}` créé" apparaît après création réussie
+### `frontend/src/components/Sidebar/AgentCreatorModal.tsx`
 
-## Dépendances
+Calqué sur `CreateProjectModal.tsx` — interface conversationnelle :
+- Textarea pour décrire l'agent voulu
+- Appelle `POST /agents/create-agent` avec `{ conversation: [...] }`
+- Si `created: false` → affiche la question de clarification, l'utilisateur répond
+- Si `created: true` → ferme la modale + toast "Agent `{role}` créé"
 
-- **ticket-022** — `GET/DELETE /agents/registry` pour liste et suppression.
-- **ticket-023** — `POST /agents/create-agent` pour la modale conversationnelle.
+### Étendre `frontend/src/components/Sidebar/index.tsx`
 
-## Estimation
+```typescript
+export type SidebarPanel = "projects" | "tickets" | "history" | "agents";
+```
 
-**1.5j** (réalisé)
+Ajouter l'icône ⚙ dans `IconBar` → ouvre le panneau `agents`.
+
+## Types et API client
+
+`frontend/src/types/api.ts` :
+```typescript
+export interface AgentInfo {
+  role: string;
+  description: string | null;
+  is_builtin: boolean;
+  prompt_preview: string;
+}
+```
+
+`frontend/src/lib/api.ts` :
+```typescript
+agents: {
+  list: (): Promise<AgentInfo[]> => request("/agents/registry"),
+  remove: (role: string): Promise<void> => request(`/agents/registry/${role}`, { method: "DELETE" }),
+  createConversational: (conversation: ConversationMessage[]) =>
+    request("/agents/create-agent", { method: "POST", body: { conversation } }),
+},
+```
+
+## Hook
+
+`frontend/src/hooks/useAgents.ts` — même pattern que `useRuns.ts`.
+
+## Critères de done
+
+- [ ] `AgentList.tsx` avec badge built-in/custom + suppression custom
+- [ ] `AgentCreatorModal.tsx` conversationnelle (multi-tour)
+- [ ] Panneau sidebar `"agents"` avec icône dans `IconBar`
+- [ ] `useAgents` hook
+- [ ] Types dans `api.ts`, appels dans `lib/api.ts`
+- [ ] Tests Vitest/RTL : `AgentList` (renders, delete), `AgentCreatorModal` (submit)
+- [ ] `npm run build` passe

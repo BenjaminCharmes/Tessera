@@ -80,3 +80,26 @@ export interface PipelineRun {
   approved: boolean | null;
   final_status: string | null;
 }
+
+export interface AgentInfo {
+  role: string;
+  description: string | null;
+  is_builtin: boolean;
+  prompt_preview: string;
+}
+
+export interface ConversationMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface AgentCreatedInfo {
+  role: string;
+  description: string | null;
+}
+
+export interface CreateAgentResponse {
+  agent: AgentCreatedInfo | null;
+  message: string;
+  created: boolean;
+}
