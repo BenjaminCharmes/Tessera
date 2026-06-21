@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from vibe_ide.config import settings
-from vibe_ide.routers import agents, orchestrator, projects, tickets
+from vibe_ide.routers import agent_admin, agents, orchestrator, projects, tickets
 from vibe_ide.services.database import init_db
 
 
@@ -29,6 +29,7 @@ app.include_router(projects.router, prefix="/api/v1")
 app.include_router(tickets.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
 app.include_router(orchestrator.router, prefix="/api/v1")
+app.include_router(agent_admin.router, prefix="/api/v1")
 
 
 @app.get("/health")
