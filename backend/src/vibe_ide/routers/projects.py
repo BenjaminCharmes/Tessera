@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, Query
 
 from vibe_ide.config import settings
-from vibe_ide.models.project import Project, ProjectContext, ProjectCreate
+from vibe_ide.models.project import Project, ProjectContext, ProjectCreate, ProjectImport, ProjectImportResponse
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.database import PipelineRunSummary, list_runs
+from vibe_ide.services.project_importer import ImportError, ProjectImporter
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.ticket_service import TicketService
 
@@ -31,6 +32,22 @@ async def create_project(body: ProjectCreate) -> Project:
         return await _loader().create_project(body)
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@router.post("/import", response_model=ProjectImportResponse, status_code=201)
+async def import_project(body: ProjectImport) -> ProjectImportResponse:
+    importer = ProjectImporter(settings.ide_workspace_dir)
+    try:
+        project = await importer.import_project(
+            source_path=body.source_path,
+            mode=body.mode,
+            project_id=body.project_id,
+        )
+    except ImportError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return ProjectImportResponse(project=project)
 
 
 # Note : les routes avec sous-chemin spécifique doivent être avant /{project_id}

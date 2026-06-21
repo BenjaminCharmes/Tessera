@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -47,3 +48,13 @@ class CreateProjectResponse(BaseModel):
     claude_md_generated: str = ""
     agent_message: str = ""
     done: bool = False
+
+
+class ProjectImport(BaseModel):
+    source_path: Path = Field(description="Chemin absolu vers le dossier à importer")
+    mode: Literal["copy", "symlink"] = Field(default="symlink")
+    project_id: str | None = Field(default=None, description="ID désiré (déduit du nom du dossier si absent)")
+
+
+class ProjectImportResponse(BaseModel):
+    project: Project
