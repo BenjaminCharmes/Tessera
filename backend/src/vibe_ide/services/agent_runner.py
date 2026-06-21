@@ -1,12 +1,12 @@
 import re
 import time
 from collections.abc import Awaitable, Callable
-from pathlib import Path
 
 from anthropic import AsyncAnthropic
 
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketStatus
+from vibe_ide.services.agent_registry import AgentNotFoundError, AgentRegistryService
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -14,42 +14,43 @@ _logger = get_logger(__name__)
 _DEFAULT_MODEL = "claude-sonnet-4-6"
 _DEFAULT_MAX_TOKENS = 8192
 
-_INSTRUCTIONS: dict[AgentRole, str] = {
-    AgentRole.codeur: (
+_INSTRUCTIONS: dict[str, str] = {
+    AgentRole.codeur.value: (
         "Implémente le ticket selon les critères d'acceptation. "
         "Fournis le code complet et les tests."
     ),
-    AgentRole.reviewer: (
+    AgentRole.reviewer.value: (
         "Relis le code produit. Indique CHANGES_REQUESTED ou APPROVED avec justification."
     ),
-    AgentRole.orchestrateur: (
+    AgentRole.orchestrateur.value: (
         "Décompose ce ticket en sous-tickets si nécessaire. Assigne les rôles appropriés."
     ),
-    AgentRole.architect: (
+    AgentRole.architect.value: (
         "Analyse les implications architecturales et propose une solution détaillée."
     ),
-    AgentRole.project_creator: (
+    AgentRole.project_creator.value: (
         "Crée la structure complète du projet demandé avec ses fichiers de base."
     ),
 }
 
 
 class AgentRunner:
-    def __init__(self, client: AsyncAnthropic, prompts_dir: Path) -> None:
+    def __init__(self, client: AsyncAnthropic, registry: AgentRegistryService) -> None:
         self._client = client
-        self._prompts_dir = prompts_dir
+        self._registry = registry
 
     async def run(
         self,
-        role: AgentRole,
+        role: str,
         ticket: Ticket,
         project_context: str,
         agent_config: AgentConfig | None = None,
         stream_callback: Callable[[str], Awaitable[None]] | None = None,
     ) -> AgentResult:
+        role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
-        system_prompt = self._load_system_prompt(role)
-        user_prompt = self._build_user_prompt(ticket, role, project_context)
+        system_prompt = self._load_system_prompt(role_str)
+        user_prompt = self._build_user_prompt(ticket, role_str, project_context)
 
         model = agent_config.model if agent_config else _DEFAULT_MODEL
         max_tokens = agent_config.max_tokens if agent_config else _DEFAULT_MAX_TOKENS
@@ -68,7 +69,7 @@ class AgentRunner:
         _logger.info(
             "agent_call",
             extra={
-                "role": role.value,
+                "role": role_str,
                 "ticket_id": ticket.id,
                 "input_tokens": getattr(usage, "input_tokens", 0),
                 "output_tokens": getattr(usage, "output_tokens", 0),
@@ -78,23 +79,21 @@ class AgentRunner:
         )
 
         return AgentResult(
-            role=role,
+            role=role_str,
             ticket_id=ticket.id,
             content=content,
             suggested_status=_parse_suggested_status(content),
             duration_ms=duration_ms,
         )
 
-    def _load_system_prompt(self, role: AgentRole) -> str:
-        prompt_file = self._prompts_dir / f"{role.value}.md"
-        if prompt_file.exists():
-            return prompt_file.read_text(encoding="utf-8")
-        _logger.warning("prompt_file_missing", extra={"path": str(prompt_file)})
-        return f"Tu es un agent {role.value} de vibe-ide. Aide à implémenter le ticket assigné."
+    def _load_system_prompt(self, role: str) -> str:
+        try:
+            return self._registry.get_prompt(role)
+        except AgentNotFoundError:
+            _logger.warning("prompt_file_missing", extra={"role": role})
+            return f"Tu es un agent {role} de vibe-ide. Aide à implémenter le ticket assigné."
 
-    def _build_user_prompt(
-        self, ticket: Ticket, role: AgentRole, project_context: str
-    ) -> str:
+    def _build_user_prompt(self, ticket: Ticket, role: str, project_context: str) -> str:
         instruction = _INSTRUCTIONS.get(role, "Traite le ticket assigné.")
         return (
             f"## Contexte projet\n{project_context}\n\n"
@@ -143,7 +142,7 @@ class AgentRunner:
 
 
 def _parse_suggested_status(content: str) -> TicketStatus:
-    """Extrait le statut suggéré depuis la section dédiée de la réponse agent."""
+    """Extracts the suggested status from the agent's dedicated response section."""
     in_section = False
     for line in content.splitlines():
         if re.search(r"statut\s+sugg[eé]r[eé]", line, re.IGNORECASE):
@@ -160,4 +159,4 @@ def _parse_suggested_status(content: str) -> TicketStatus:
             if "TODO" in upper:
                 return TicketStatus.todo
             break
-    return TicketStatus.in_review  # défaut : passer en review
+    return TicketStatus.in_review

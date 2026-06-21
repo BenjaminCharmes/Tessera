@@ -6,6 +6,7 @@ import pytest
 
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner, _parse_suggested_status
 
 
@@ -43,7 +44,8 @@ def _mock_complete_client(response_text: str) -> MagicMock:
 
 
 def _runner(tmp_path: Path, client: MagicMock | None = None) -> AgentRunner:
-    return AgentRunner(client or MagicMock(), tmp_path / "prompts")
+    registry = AgentRegistryService(tmp_path / "prompts")
+    return AgentRunner(client or MagicMock(), registry)
 
 
 # ------------------------------------------------------------------
@@ -91,13 +93,14 @@ def test_load_system_prompt_reads_file(tmp_path: Path) -> None:
     prompts.mkdir()
     (prompts / "codeur.md").write_text("Tu es le codeur.", encoding="utf-8")
 
-    runner = AgentRunner(MagicMock(), prompts)
-    assert runner._load_system_prompt(AgentRole.codeur) == "Tu es le codeur."
+    registry = AgentRegistryService(prompts)
+    runner = AgentRunner(MagicMock(), registry)
+    assert runner._load_system_prompt("codeur") == "Tu es le codeur."
 
 
 def test_load_system_prompt_fallback_when_missing(tmp_path: Path) -> None:
     runner = _runner(tmp_path)  # prompts dir doesn't exist
-    prompt = runner._load_system_prompt(AgentRole.codeur)
+    prompt = runner._load_system_prompt("codeur")
     assert "codeur" in prompt.lower()
     assert len(prompt) > 10
 
@@ -111,7 +114,7 @@ def test_build_user_prompt_contains_ticket_body(tmp_path: Path) -> None:
     runner = _runner(tmp_path)
     ticket = _make_ticket(body="Corps du ticket précis.")
 
-    prompt = runner._build_user_prompt(ticket, AgentRole.codeur, "contexte projet")
+    prompt = runner._build_user_prompt(ticket, "codeur", "contexte projet")
 
     assert "Corps du ticket précis." in prompt
     assert "contexte projet" in prompt
@@ -119,7 +122,7 @@ def test_build_user_prompt_contains_ticket_body(tmp_path: Path) -> None:
 
 def test_build_user_prompt_has_required_sections(tmp_path: Path) -> None:
     runner = _runner(tmp_path)
-    prompt = runner._build_user_prompt(_make_ticket(), AgentRole.codeur, "ctx")
+    prompt = runner._build_user_prompt(_make_ticket(), "codeur", "ctx")
 
     assert "## Contexte projet" in prompt
     assert "## Ticket assigné" in prompt
@@ -130,8 +133,8 @@ def test_build_user_prompt_instruction_varies_by_role(tmp_path: Path) -> None:
     runner = _runner(tmp_path)
     ticket = _make_ticket()
 
-    codeur_prompt = runner._build_user_prompt(ticket, AgentRole.codeur, "ctx")
-    reviewer_prompt = runner._build_user_prompt(ticket, AgentRole.reviewer, "ctx")
+    codeur_prompt = runner._build_user_prompt(ticket, "codeur", "ctx")
+    reviewer_prompt = runner._build_user_prompt(ticket, "reviewer", "ctx")
 
     assert codeur_prompt != reviewer_prompt
 
@@ -144,7 +147,7 @@ def test_build_user_prompt_instruction_varies_by_role(tmp_path: Path) -> None:
 async def test_run_returns_agent_result(tmp_path: Path) -> None:
     response = "## Analyse\nOK.\n\n## Statut suggéré\nIN_REVIEW"
     client = _mock_complete_client(response)
-    runner = AgentRunner(client, tmp_path / "prompts")
+    runner = _runner(tmp_path, client)
 
     result = await runner.run(
         role=AgentRole.codeur,
@@ -154,15 +157,29 @@ async def test_run_returns_agent_result(tmp_path: Path) -> None:
 
     assert isinstance(result, AgentResult)
     assert result.ticket_id == "ticket-001"
-    assert result.role == AgentRole.codeur
+    assert result.role == "codeur"
     assert result.suggested_status == TicketStatus.in_review
     assert result.duration_ms >= 0
     assert result.content == response
 
 
+async def test_run_accepts_str_role(tmp_path: Path) -> None:
+    response = "## Statut suggéré\nIN_REVIEW"
+    client = _mock_complete_client(response)
+    runner = _runner(tmp_path, client)
+
+    result = await runner.run(
+        role="redacteur",
+        ticket=_make_ticket(),
+        project_context="ctx",
+    )
+
+    assert result.role == "redacteur"
+
+
 async def test_run_calls_anthropic_create(tmp_path: Path) -> None:
     client = _mock_complete_client("## Statut suggéré\nIN_REVIEW")
-    runner = AgentRunner(client, tmp_path / "prompts")
+    runner = _runner(tmp_path, client)
 
     await runner.run(
         role=AgentRole.codeur,
@@ -178,7 +195,7 @@ async def test_run_calls_anthropic_create(tmp_path: Path) -> None:
 
 async def test_run_uses_agent_config_model(tmp_path: Path) -> None:
     client = _mock_complete_client("## Statut suggéré\nIN_REVIEW")
-    runner = AgentRunner(client, tmp_path / "prompts")
+    runner = _runner(tmp_path, client)
     cfg = AgentConfig(
         role="codeur",
         model="claude-opus-4-8",
@@ -200,7 +217,7 @@ async def test_run_uses_agent_config_model(tmp_path: Path) -> None:
 
 async def test_run_enables_prompt_caching(tmp_path: Path) -> None:
     client = _mock_complete_client("## Statut suggéré\nIN_REVIEW")
-    runner = AgentRunner(client, tmp_path / "prompts")
+    runner = _runner(tmp_path, client)
 
     await runner.run(
         role=AgentRole.codeur,
@@ -227,7 +244,6 @@ async def test_run_calls_stream_callback(tmp_path: Path) -> None:
     async def capture(token: str) -> None:
         tokens.append(token)
 
-    # Construire un mock de context manager async pour stream()
     mock_stream = MagicMock()
 
     async def _text_stream():  # type: ignore[return]
@@ -252,7 +268,7 @@ async def test_run_calls_stream_callback(tmp_path: Path) -> None:
     client = MagicMock()
     client.messages.stream = MagicMock(return_value=mock_ctx)
 
-    runner = AgentRunner(client, tmp_path / "prompts")
+    runner = _runner(tmp_path, client)
     result = await runner.run(
         role=AgentRole.codeur,
         ticket=_make_ticket(),
@@ -284,8 +300,11 @@ async def test_run_real_api(tmp_path: Path) -> None:
         "Tu es un agent de test. Réponds en 30 mots maximum.", encoding="utf-8"
     )
 
+    from anthropic import AsyncAnthropic
+
     client = AsyncAnthropic(api_key=api_key)
-    runner = AgentRunner(client, prompts)
+    registry = AgentRegistryService(prompts)
+    runner = AgentRunner(client, registry)
     ticket = _make_ticket(body="Dis bonjour en Python avec print().")
 
     result = await runner.run(

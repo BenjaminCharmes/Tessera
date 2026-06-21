@@ -1,6 +1,4 @@
 """Service Project Creator — ticket-004."""
-import json
-import re
 import time
 from pathlib import Path
 
@@ -13,6 +11,7 @@ from vibe_ide.models.project import (
 )
 from vibe_ide.models.ticket import TicketDraft, TicketPriority, TicketType
 from vibe_ide.services.project_loader import ProjectLoader
+from vibe_ide.utils.json_extract import extract_json
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -62,7 +61,7 @@ class ProjectCreatorService:
             },
         )
 
-        project_data = _extract_json(content)
+        project_data = extract_json(content)
         if project_data is None:
             return CreateProjectResponse(agent_message=content, done=False)
 
@@ -115,31 +114,3 @@ class ProjectCreatorService:
         log_path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def _extract_json(text: str) -> dict | None:
-    """Extrait le premier objet JSON valide depuis la réponse Claude."""
-    # Chercher un bloc ```json ... ```
-    match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group(1))
-        except json.JSONDecodeError:
-            pass
-
-    # Chercher un objet JSON brut dans le texte
-    brace_start = text.find("{")
-    if brace_start == -1:
-        return None
-
-    depth = 0
-    for i, ch in enumerate(text[brace_start:], start=brace_start):
-        if ch == "{":
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0:
-                try:
-                    return json.loads(text[brace_start : i + 1])
-                except json.JSONDecodeError:
-                    return None
-
-    return None

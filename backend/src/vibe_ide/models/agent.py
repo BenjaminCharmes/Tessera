@@ -34,7 +34,7 @@ class AgentPipelineConfig(BaseModel):
 
 
 class AgentResult(BaseModel):
-    role: AgentRole
+    role: str
     ticket_id: str
     content: str
     suggested_status: TicketStatus
@@ -45,4 +45,4 @@ class AgentResult(BaseModel):
 class AgentRunRequest(BaseModel):
     project_id: str
     ticket_id: str = ""
-    role: AgentRole
+    role: str

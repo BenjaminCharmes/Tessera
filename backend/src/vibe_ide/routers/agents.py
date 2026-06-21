@@ -9,6 +9,7 @@ from vibe_ide.config import settings
 from vibe_ide.models.agent import AgentResult, AgentRole, AgentRunRequest
 from vibe_ide.models.project import CreateProjectRequest, CreateProjectResponse, ProjectContext
 from vibe_ide.models.ticket import TicketStatus
+from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.github_service import GitHubService
 from vibe_ide.services.project_creator import ProjectCreatorService
@@ -27,7 +28,8 @@ _OPEN_STATUSES = {
 
 def _make_runner() -> AgentRunner:
     client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    return AgentRunner(client, settings.ide_prompts_dir)
+    registry = AgentRegistryService(settings.ide_prompts_dir)
+    return AgentRunner(client, registry)
 
 
 def _make_project_creator() -> ProjectCreatorService:
@@ -129,7 +131,7 @@ async def run_agent(request: AgentRunRequest) -> AgentResult:
         )
 
     agent_cfg = next(
-        (c for c in ctx.agent_configs if c.role == request.role.value), None
+        (c for c in ctx.agent_configs if c.role == request.role), None
     )
 
     return await _make_runner().run(
@@ -160,7 +162,7 @@ async def stream_agent(websocket: WebSocket) -> None:
             return
 
         agent_cfg = next(
-            (c for c in ctx.agent_configs if c.role == request.role.value), None
+            (c for c in ctx.agent_configs if c.role == request.role), None
         )
 
         async def send_token(token: str) -> None:
