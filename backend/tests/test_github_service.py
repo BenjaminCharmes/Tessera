@@ -2,7 +2,7 @@ import httpx
 import pytest
 import respx
 
-from vibe_ide.services.github_service import GitHubIssue, GitHubService
+from vibe_ide.services.github_service import GitHubIssue, GitHubService, PRStatus
 
 
 _TOKEN = "ghp_test_token"
@@ -176,3 +176,284 @@ async def test_remove_label_raises_on_other_error() -> None:
     svc = _make_service()
     with pytest.raises(httpx.HTTPStatusError):
         await svc.remove_label(7, "agent-ready")
+
+
+# ------------------------------------------------------------------
+# create_issue
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_create_issue_returns_issue_number() -> None:
+    respx.post(f"{_BASE}/repos/{_REPO}/issues").mock(
+        return_value=httpx.Response(201, json={"number": 99, "html_url": "https://github.com/owner/my-repo/issues/99"})
+    )
+    svc = _make_service()
+    number = await svc.create_issue("New feature", "Description", ["enhancement"])
+    assert number == 99
+
+
+@respx.mock
+async def test_create_issue_sends_correct_payload() -> None:
+    route = respx.post(f"{_BASE}/repos/{_REPO}/issues").mock(
+        return_value=httpx.Response(201, json={"number": 1, "html_url": "https://github.com/owner/my-repo/issues/1"})
+    )
+    svc = _make_service()
+    await svc.create_issue("Title", "Body text", ["bug", "enhancement"])
+
+    import json as _json
+    body = _json.loads(route.calls[0].request.content)
+    assert body["title"] == "Title"
+    assert body["body"] == "Body text"
+    assert body["labels"] == ["bug", "enhancement"]
+
+
+@respx.mock
+async def test_create_issue_raises_on_error() -> None:
+    respx.post(f"{_BASE}/repos/{_REPO}/issues").mock(
+        return_value=httpx.Response(422, json={"message": "Validation Failed"})
+    )
+    svc = _make_service()
+    with pytest.raises(httpx.HTTPStatusError):
+        await svc.create_issue("Bad", "Body", [])
+
+
+# ------------------------------------------------------------------
+# update_issue
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_update_issue_sends_patch_with_title_and_body() -> None:
+    route = respx.patch(f"{_BASE}/repos/{_REPO}/issues/42").mock(
+        return_value=httpx.Response(200, json={"number": 42})
+    )
+    svc = _make_service()
+    await svc.update_issue(42, "New title", "New body")
+
+    import json as _json
+    body = _json.loads(route.calls[0].request.content)
+    assert body["title"] == "New title"
+    assert body["body"] == "New body"
+
+
+@respx.mock
+async def test_update_issue_raises_on_error() -> None:
+    respx.patch(f"{_BASE}/repos/{_REPO}/issues/42").mock(
+        return_value=httpx.Response(404, json={"message": "Not Found"})
+    )
+    svc = _make_service()
+    with pytest.raises(httpx.HTTPStatusError):
+        await svc.update_issue(42, "Title", "Body")
+
+
+# ------------------------------------------------------------------
+# close_issue
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_close_issue_sends_state_closed() -> None:
+    route = respx.patch(f"{_BASE}/repos/{_REPO}/issues/7").mock(
+        return_value=httpx.Response(200, json={"number": 7, "state": "closed"})
+    )
+    svc = _make_service()
+    await svc.close_issue(7)
+
+    import json as _json
+    body = _json.loads(route.calls[0].request.content)
+    assert body["state"] == "closed"
+
+
+@respx.mock
+async def test_close_issue_raises_on_error() -> None:
+    respx.patch(f"{_BASE}/repos/{_REPO}/issues/7").mock(
+        return_value=httpx.Response(500, json={"message": "Server error"})
+    )
+    svc = _make_service()
+    with pytest.raises(httpx.HTTPStatusError):
+        await svc.close_issue(7)
+
+
+# ------------------------------------------------------------------
+# create_pull_request
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_create_pull_request_returns_number_and_url() -> None:
+    respx.post(f"{_BASE}/repos/{_REPO}/pulls").mock(
+        return_value=httpx.Response(
+            201,
+            json={"number": 15, "html_url": "https://github.com/owner/my-repo/pull/15"},
+        )
+    )
+    svc = _make_service()
+    number, url = await svc.create_pull_request("Fix bug", "Description", "my-branch")
+    assert number == 15
+    assert url == "https://github.com/owner/my-repo/pull/15"
+
+
+@respx.mock
+async def test_create_pull_request_sends_correct_payload() -> None:
+    route = respx.post(f"{_BASE}/repos/{_REPO}/pulls").mock(
+        return_value=httpx.Response(
+            201,
+            json={"number": 7, "html_url": "https://github.com/owner/my-repo/pull/7"},
+        )
+    )
+    svc = _make_service()
+    await svc.create_pull_request("My title", "My body", "feature-branch", base="develop")
+
+    import json as _json
+    body = _json.loads(route.calls[0].request.content)
+    assert body["title"] == "My title"
+    assert body["body"] == "My body"
+    assert body["head"] == "feature-branch"
+    assert body["base"] == "develop"
+
+
+@respx.mock
+async def test_create_pull_request_raises_on_error() -> None:
+    respx.post(f"{_BASE}/repos/{_REPO}/pulls").mock(
+        return_value=httpx.Response(422, json={"message": "Validation Failed"})
+    )
+    svc = _make_service()
+    with pytest.raises(httpx.HTTPStatusError):
+        await svc.create_pull_request("Title", "Body", "branch")
+
+
+# ------------------------------------------------------------------
+# get_pull_request_status
+# ------------------------------------------------------------------
+
+
+def _pr_payload(
+    number: int = 15,
+    state: str = "open",
+    merged: bool = False,
+    html_url: str = "https://github.com/owner/my-repo/pull/15",
+    head_sha: str = "abc123",
+) -> dict:
+    return {
+        "number": number,
+        "state": state,
+        "merged": merged,
+        "html_url": html_url,
+        "head": {"sha": head_sha},
+    }
+
+
+def _check_runs_payload(
+    conclusions: list[str | None],
+) -> dict:
+    return {
+        "check_runs": [
+            {"conclusion": c, "name": f"check-{i}"}
+            for i, c in enumerate(conclusions)
+        ]
+    }
+
+
+@respx.mock
+async def test_get_pr_status_open_ci_passing() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json=_check_runs_payload(["success", "success"]))
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.state == "open"
+    assert status.ci_status == "passing"
+    assert status.pr_url == "https://github.com/owner/my-repo/pull/15"
+    assert status.pr_number == 15
+
+
+@respx.mock
+async def test_get_pr_status_merged() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload(state="closed", merged=True))
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json=_check_runs_payload(["success"]))
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.state == "merged"
+
+
+@respx.mock
+async def test_get_pr_status_closed_not_merged() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload(state="closed", merged=False))
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json=_check_runs_payload([]))
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.state == "closed"
+
+
+@respx.mock
+async def test_get_pr_status_ci_pending_when_running() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json=_check_runs_payload([None, "success"]))
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.ci_status == "pending"
+
+
+@respx.mock
+async def test_get_pr_status_ci_failing() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json=_check_runs_payload(["success", "failure"]))
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.ci_status == "failing"
+
+
+@respx.mock
+async def test_get_pr_status_ci_none_when_no_checks() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json={"check_runs": []})
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.ci_status == "none"
+
+
+@respx.mock
+async def test_get_pr_status_ci_none_when_checks_endpoint_fails() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(404, json={"message": "Not Found"})
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.ci_status == "none"
+
+
+@respx.mock
+async def test_get_pr_status_raises_on_pr_not_found() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(404, json={"message": "Not Found"})
+    )
+    svc = _make_service()
+    with pytest.raises(httpx.HTTPStatusError):
+        await svc.get_pull_request_status(15)

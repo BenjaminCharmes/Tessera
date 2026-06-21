@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
-import { groupByStatus, moveTicket, EMPTY_BY_STATUS } from "../lib/ticketBoard";
+import { groupByStatus, EMPTY_BY_STATUS } from "../lib/ticketBoard";
 import type { ByStatus } from "../lib/ticketBoard";
 import type { OrchestratorEvent, Ticket, TicketStatus } from "../types/api";
 

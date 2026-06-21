@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from vibe_ide.models.agent import AgentConfig
-from vibe_ide.models.ticket import Ticket, TicketDraft
+from vibe_ide.models.ticket import Ticket, TicketDraft, TicketDraftPlan
 
 
 class Project(BaseModel):
@@ -15,6 +15,7 @@ class Project(BaseModel):
     active_agents: list[str] = Field(default_factory=list)
     stack: str | None = None
     raw_claude_md: str = ""
+    github_remote: str | None = None
 
 
 class ProjectCreate(BaseModel):
@@ -60,6 +61,15 @@ class ProjectImportResponse(BaseModel):
     project: Project
 
 
+class PlanRequest(BaseModel):
+    description: str = Field(description="Description de l'évolution en langage naturel")
+
+
+class PlanResult(BaseModel):
+    drafts: list[TicketDraftPlan]
+    summary: str
+
+
 class AnalyzeProjectRequest(BaseModel):
     overwrite: bool = False
 
@@ -69,3 +79,24 @@ class AnalysisResult(BaseModel):
     detected_stack: list[str]
     suggested_agents: list[str]
     claude_md_written: bool
+
+
+class CloneProjectRequest(BaseModel):
+    repo_url: str = Field(description="URL HTTPS du repo GitHub, ex: https://github.com/owner/repo")
+    project_id: str | None = Field(default=None, description="ID désiré (déduit du nom du repo si absent)")
+
+
+class CloneProjectResponse(BaseModel):
+    project: Project
+    claude_md_generated: bool
+    detected_stack: list[str]
+
+
+class GithubSyncRequest(BaseModel):
+    direction: Literal["pull", "push", "both"] = "pull"
+
+
+class GithubSyncResult(BaseModel):
+    pulled: int
+    pushed: int
+    skipped: int

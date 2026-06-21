@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Literal
+
 import httpx
 from pydantic import BaseModel
 
@@ -12,6 +15,14 @@ class GitHubIssue(BaseModel):
     labels: list[str]
 
 
+@dataclass
+class PRStatus:
+    state: Literal["open", "closed", "merged"]
+    ci_status: Literal["pending", "passing", "failing", "none"]
+    pr_url: str
+    pr_number: int
+
+
 class GitHubService:
     def __init__(self, token: str, repo: str) -> None:
         self._repo = repo
@@ -23,7 +34,7 @@ class GitHubService:
 
     async def list_agent_ready_issues(self) -> list[GitHubIssue]:
         url = f"{_BASE}/repos/{self._repo}/issues"
-        params = {"labels": "agent-ready", "state": "open", "per_page": 50}
+        params: dict[str, str | int] = {"labels": "agent-ready", "state": "open", "per_page": 50}
         async with httpx.AsyncClient() as client:
             resp = await client.get(url, headers=self._headers, params=params)
             resp.raise_for_status()
@@ -50,3 +61,93 @@ class GitHubService:
             resp = await client.delete(url, headers=self._headers)
             if resp.status_code != 404:
                 resp.raise_for_status()
+
+    async def create_issue(self, title: str, body: str, labels: list[str]) -> int:
+        """Crée une issue et retourne son numéro."""
+        url = f"{_BASE}/repos/{self._repo}/issues"
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                url, headers=self._headers, json={"title": title, "body": body, "labels": labels}
+            )
+            resp.raise_for_status()
+        return int(resp.json()["number"])
+
+    async def update_issue(self, number: int, title: str, body: str) -> None:
+        """Met à jour le titre et le body d'une issue."""
+        url = f"{_BASE}/repos/{self._repo}/issues/{number}"
+        async with httpx.AsyncClient() as client:
+            resp = await client.patch(
+                url, headers=self._headers, json={"title": title, "body": body}
+            )
+            resp.raise_for_status()
+
+    async def close_issue(self, number: int) -> None:
+        """Ferme une issue."""
+        url = f"{_BASE}/repos/{self._repo}/issues/{number}"
+        async with httpx.AsyncClient() as client:
+            resp = await client.patch(
+                url, headers=self._headers, json={"state": "closed"}
+            )
+            resp.raise_for_status()
+
+    async def create_pull_request(
+        self,
+        title: str,
+        body: str,
+        head: str,
+        base: str = "main",
+    ) -> tuple[int, str]:
+        """Crée une PR et retourne (pr_number, pr_url)."""
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                url,
+                headers=self._headers,
+                json={"title": title, "body": body, "head": head, "base": base},
+            )
+            resp.raise_for_status()
+        data = resp.json()
+        return int(data["number"]), str(data["html_url"])
+
+    async def get_pull_request_status(self, pr_number: int) -> PRStatus:
+        """Retourne le statut d'une PR avec son état CI agrégé."""
+        url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._headers)
+            resp.raise_for_status()
+        pr_data = resp.json()
+
+        if pr_data.get("merged"):
+            state: Literal["open", "closed", "merged"] = "merged"
+        elif pr_data["state"] == "closed":
+            state = "closed"
+        else:
+            state = "open"
+
+        head_sha: str = pr_data["head"]["sha"]
+        ci_status = await self._get_ci_status(head_sha)
+
+        return PRStatus(
+            state=state,
+            ci_status=ci_status,
+            pr_url=str(pr_data["html_url"]),
+            pr_number=pr_number,
+        )
+
+    async def _get_ci_status(
+        self, sha: str
+    ) -> Literal["pending", "passing", "failing", "none"]:
+        url = f"{_BASE}/repos/{self._repo}/commits/{sha}/check-runs"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._headers)
+            if resp.status_code != 200:
+                return "none"
+        runs: list[dict] = resp.json().get("check_runs", [])
+        if not runs:
+            return "none"
+        conclusions = [r.get("conclusion") for r in runs]
+        if any(c in (None, "action_required") for c in conclusions):
+            return "pending"
+        if any(c in ("failure", "timed_out", "cancelled") for c in conclusions):
+            return "failing"
+        return "passing"

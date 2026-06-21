@@ -1,6 +1,7 @@
 import { useState } from "react";
 import TicketCard from "./TicketCard";
 import CreateTicketModal from "./CreateTicketModal";
+import PlanEvolutionModal from "./PlanEvolutionModal";
 import SkeletonList from "../SkeletonList";
 import type { Project, Ticket, TicketStatus } from "../../types/api";
 
@@ -32,6 +33,7 @@ interface TicketListProps {
   onRunPipeline: (ticketId: string) => void;
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
+  onBatchCreated?: (tickets: Ticket[]) => void;
 }
 
 export default function TicketList({
@@ -47,11 +49,13 @@ export default function TicketList({
   onRunPipeline,
   onToggleKanban,
   onTicketCreated,
+  onBatchCreated,
 }: TicketListProps) {
   const [collapsed, setCollapsed] = useState<Set<TicketStatus>>(
     new Set(["done", "cancelled"]),
   );
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
 
   if (!project) {
     return (
@@ -93,6 +97,14 @@ export default function TicketList({
             {project.name}
           </span>
           <div className="flex items-center gap-1 shrink-0 ml-2">
+            <button
+              onClick={() => setShowPlanModal(true)}
+              title="Planifier une évolution"
+              aria-label="Planifier une évolution"
+              className="w-6 h-6 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-sm leading-none"
+            >
+              ⚡
+            </button>
             <button
               onClick={() => setShowCreateModal(true)}
               title="Nouveau ticket"
@@ -168,6 +180,17 @@ export default function TicketList({
           onCreated={(ticket) => {
             setShowCreateModal(false);
             onTicketCreated?.(ticket);
+          }}
+        />
+      )}
+
+      {showPlanModal && (
+        <PlanEvolutionModal
+          projectId={project.id}
+          onClose={() => setShowPlanModal(false)}
+          onBatchCreated={(tickets) => {
+            setShowPlanModal(false);
+            onBatchCreated?.(tickets);
           }}
         />
       )}

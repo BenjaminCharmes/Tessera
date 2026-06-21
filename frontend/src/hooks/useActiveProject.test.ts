@@ -10,6 +10,7 @@ const mockProject: Project = {
   active_agents: ["codeur"],
   stack: null,
   raw_claude_md: "# IDE Core",
+  github_remote: null,
 };
 
 const mockTicket: Ticket = {
@@ -22,6 +23,7 @@ const mockTicket: Ticket = {
   depends_on: [],
   created: "2026-06-20",
   github_issue_url: null,
+  pr_number: null,
   body: "Body content",
   project_id: "ide-core",
   file_path: "/path/to/ticket.md",

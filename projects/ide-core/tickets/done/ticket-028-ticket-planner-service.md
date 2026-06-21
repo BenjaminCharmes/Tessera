@@ -2,7 +2,7 @@
 id: ticket-028
 title: "Agent planificateur — tickets depuis une description NL (backend)"
 type: feat
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on:

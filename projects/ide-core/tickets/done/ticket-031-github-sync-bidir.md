@@ -2,7 +2,7 @@
 id: ticket-031
 title: "Synchronisation bidirectionnelle tickets ↔ GitHub Issues"
 type: feat
-status: todo
+status: done
 priority: low
 agent: codeur
 depends_on:

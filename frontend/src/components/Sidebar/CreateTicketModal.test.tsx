@@ -24,6 +24,7 @@ const mockTicket = {
   depends_on: [],
   created: "2026-06-20",
   github_issue_url: null,
+  pr_number: null,
   body: "",
   project_id: "ide-core",
   file_path: "/tmp/ticket-016-ma-feature.md",

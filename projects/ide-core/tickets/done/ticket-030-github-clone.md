@@ -2,7 +2,7 @@
 id: ticket-030
 title: "Clone de repo GitHub dans le workspace"
 type: feat
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on:

@@ -86,6 +86,7 @@ interface SidebarProps {
   onRunPipeline: (ticketId: string) => void;
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
+  onBatchCreated?: (tickets: Ticket[]) => void;
   onSelectTicketById?: (ticketId: string) => void;
   onAgentCreated?: (role: string) => void;
 }
@@ -109,6 +110,7 @@ export default function Sidebar({
   onRunPipeline,
   onToggleKanban,
   onTicketCreated,
+  onBatchCreated,
   onSelectTicketById,
   onAgentCreated,
 }: SidebarProps) {
@@ -135,6 +137,7 @@ export default function Sidebar({
           onRunPipeline={onRunPipeline}
           onToggleKanban={onToggleKanban}
           onTicketCreated={onTicketCreated}
+          onBatchCreated={onBatchCreated}
         />
       )}
       {panel === "history" && (

@@ -31,6 +31,7 @@ export interface Project {
   active_agents: string[];
   stack: string | null;
   raw_claude_md: string;
+  github_remote: string | null;
 }
 
 export interface Ticket {
@@ -43,9 +44,22 @@ export interface Ticket {
   depends_on: string[];
   created: string;
   github_issue_url: string | null;
+  pr_number: number | null;
   body: string;
   project_id: string;
   file_path: string;
+}
+
+export interface PRStatus {
+  state: "open" | "closed" | "merged";
+  ci_status: "pending" | "passing" | "failing" | "none";
+  pr_url: string;
+  pr_number: number;
+}
+
+export interface CreatePrResponse {
+  pr_number: number;
+  pr_url: string;
 }
 
 export interface OrchestratorEvent {
@@ -119,4 +133,34 @@ export interface AnalysisResult {
   detected_stack: string[];
   suggested_agents: string[];
   claude_md_written: boolean;
+}
+
+export interface TicketDraft {
+  title: string;
+  type: string;
+  priority: string;
+  agent: string;
+  description: string;
+  acceptance_criteria: string[];
+  depends_on_index: number[];
+}
+
+export interface PlanResult {
+  drafts: TicketDraft[];
+  summary: string;
+}
+
+export interface TicketBatchResponse {
+  created: Ticket[];
+}
+
+export interface CloneProjectRequest {
+  repo_url: string;
+  project_id?: string;
+}
+
+export interface CloneProjectResponse {
+  project: Project;
+  claude_md_generated: boolean;
+  detected_stack: string[];
 }

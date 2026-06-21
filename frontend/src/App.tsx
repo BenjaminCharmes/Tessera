@@ -73,6 +73,14 @@ export default function App() {
     addToast(`Ticket « ${t.title} » créé`, "success");
   }
 
+  function handleBatchCreated(created: Ticket[]) {
+    tickets.refresh();
+    addToast(
+      `${created.length} ticket${created.length !== 1 ? "s" : ""} créé${created.length !== 1 ? "s" : ""}`,
+      "success",
+    );
+  }
+
   function handleRunPipeline(ticketId: string) {
     stream.connect(ticketId);
   }
@@ -131,6 +139,7 @@ export default function App() {
             onRunPipeline={handleRunPipeline}
             onToggleKanban={() => setShowKanban((v) => !v)}
             onTicketCreated={handleTicketCreated}
+            onBatchCreated={handleBatchCreated}
             onSelectTicketById={handleSelectTicketById}
             onAgentCreated={handleAgentCreated}
           />

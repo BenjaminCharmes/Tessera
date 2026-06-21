@@ -14,6 +14,7 @@ const TICKET_TODO: Ticket = {
   depends_on: [],
   created: "2026-06-20",
   github_issue_url: null,
+  pr_number: null,
   body: "",
   project_id: "proj-1",
   file_path: "/tmp/ticket-001.md",
@@ -79,7 +80,7 @@ describe("useTickets", () => {
     const { result, rerender } = renderHook(
       ({ events }: { events: OrchestratorEvent[] }) =>
         useTickets("proj-1", false, events),
-      { initialProps: { events: [] } },
+      { initialProps: { events: [] as OrchestratorEvent[] } },
     );
 
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -104,7 +105,7 @@ describe("useTickets", () => {
     const { result, rerender } = renderHook(
       ({ events }: { events: OrchestratorEvent[] }) =>
         useTickets("proj-1", false, events),
-      { initialProps: { events: [] } },
+      { initialProps: { events: [] as OrchestratorEvent[] } },
     );
 
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -134,7 +135,7 @@ describe("useTickets", () => {
     const { result, rerender } = renderHook(
       ({ events }: { events: OrchestratorEvent[] }) =>
         useTickets("proj-1", false, events),
-      { initialProps: { events: [] } },
+      { initialProps: { events: [] as OrchestratorEvent[] } },
     );
 
     await waitFor(() => expect(result.current.loading).toBe(false));

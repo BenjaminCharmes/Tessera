@@ -16,6 +16,7 @@ from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.github_service import GitHubService
 from vibe_ide.services.project_creator import ProjectCreatorService
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
+from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.ticket_service import TicketService
 
 router = APIRouter(prefix="/agents", tags=["agents"])
@@ -100,19 +101,23 @@ async def _run_github_sync(project_id: str) -> AgentResult:
     project_path = settings.ide_workspace_dir / project_id
     ticket_svc = TicketService(project_path, project_id)
     github_svc = GitHubService(token=settings.github_token, repo=settings.github_repo)
-    agent = GithubSyncAgent(github_svc=github_svc, ticket_svc=ticket_svc)
-    created = await agent.run()
+    sync_map_svc = SyncMapService()
+    agent = GithubSyncAgent(
+        github_svc=github_svc,
+        ticket_svc=ticket_svc,
+        sync_map_svc=sync_map_svc,
+        project_path=project_path,
+    )
+    result = await agent.run("pull")
     duration_ms = int((time.monotonic() - t0) * 1000)
 
-    summary = f"github-sync: {len(created)} ticket(s) créé(s).\n" + "\n".join(
-        f"- {t.id}: {t.title}" for t in created
-    )
+    summary = f"github-sync: {result.pulled} ticket(s) créé(s), {result.skipped} ignoré(s)."
     return AgentResult(
         role=AgentRole.github_sync,
         ticket_id="*",
         content=summary,
         suggested_status=TicketStatus.done,
-        created_tickets=[t.id for t in created],
+        created_tickets=[],
         duration_ms=duration_ms,
     )
 

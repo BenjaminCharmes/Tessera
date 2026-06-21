@@ -21,6 +21,7 @@ const mockProject = {
   active_agents: [],
   stack: null,
   raw_claude_md: "",
+  github_remote: null,
 };
 
 describe("CreateProjectModal", () => {

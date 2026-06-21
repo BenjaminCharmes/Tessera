@@ -38,6 +38,7 @@ class Ticket(BaseModel):
     depends_on: list[str] = Field(default_factory=list)
     created: str = ""
     github_issue_url: str | None = Field(default=None)
+    pr_number: int | None = Field(default=None)
     body: str = Field(default="")
     project_id: str = ""
     file_path: str = Field(default="", description="Chemin absolu du fichier sur disque")
@@ -66,3 +67,27 @@ class TicketDraft(BaseModel):
     priority: TicketPriority
     agent: str
     description: str
+
+
+class TicketDraftPlan(BaseModel):
+    """Draft généré par le planificateur — pas encore persisté."""
+
+    title: str
+    type: str
+    priority: str
+    agent: str
+    description: str
+    acceptance_criteria: list[str] = Field(default_factory=list)
+    depends_on_index: list[int] = Field(default_factory=list)
+
+
+class TicketBatchCreate(BaseModel):
+    """Payload pour créer plusieurs tickets en une requête."""
+
+    tickets: list[TicketDraftPlan]
+
+
+class TicketBatchResponse(BaseModel):
+    """Réponse après création batch."""
+
+    created: list[Ticket]

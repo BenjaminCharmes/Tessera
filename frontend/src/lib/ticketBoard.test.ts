@@ -14,6 +14,7 @@ function makeTicket(id: string, status: Ticket["status"]): Ticket {
     depends_on: [],
     created: "2026-06-20",
     github_issue_url: null,
+    pr_number: null,
     body: "",
     project_id: "test",
     file_path: `/tmp/${id}.md`,

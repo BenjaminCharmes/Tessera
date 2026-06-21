@@ -6,6 +6,12 @@ from vibe_ide.config import settings
 from vibe_ide.models.project import (
     AnalysisResult,
     AnalyzeProjectRequest,
+    CloneProjectRequest,
+    CloneProjectResponse,
+    GithubSyncRequest,
+    GithubSyncResult,
+    PlanRequest,
+    PlanResult,
     Project,
     ProjectContext,
     ProjectCreate,
@@ -14,9 +20,14 @@ from vibe_ide.models.project import (
 )
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.database import PipelineRunSummary, list_runs
+from vibe_ide.agents.github_sync import GithubSyncAgent
+from vibe_ide.services.git_clone import CloneError, GitCloneService
+from vibe_ide.services.github_service import GitHubService
+from vibe_ide.services.planner import PlannerService
 from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 from vibe_ide.services.project_importer import ImportError, ProjectImporter
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
+from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.ticket_service import TicketService
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -61,6 +72,20 @@ async def import_project(body: ProjectImport) -> ProjectImportResponse:
     return ProjectImportResponse(project=project)
 
 
+@router.post("/clone", response_model=CloneProjectResponse, status_code=201)
+async def clone_project(body: CloneProjectRequest) -> CloneProjectResponse:
+    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    analyzer = ProjectAnalyzerService(client, settings.ide_prompts_dir)
+    svc = GitCloneService(settings.ide_workspace_dir, analyzer)
+    try:
+        return await svc.clone(
+            repo_url=body.repo_url,
+            project_id=body.project_id,
+        )
+    except CloneError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 # Note : les routes avec sous-chemin spécifique doivent être avant /{project_id}
 @router.get("/{project_id}/runs", response_model=list[PipelineRunSummary])
 async def list_project_runs(
@@ -97,6 +122,19 @@ async def get_project_context(project_id: str) -> ProjectContext:
     )
 
 
+@router.post("/{project_id}/plan", response_model=PlanResult)
+async def plan_project(project_id: str, body: PlanRequest) -> PlanResult:
+    project_path = settings.ide_workspace_dir / project_id
+    if not project_path.is_dir():
+        raise HTTPException(status_code=404, detail=f"Projet '{project_id}' introuvable.")
+    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    svc = PlannerService(client, settings.ide_prompts_dir, settings.ide_workspace_dir)
+    try:
+        return await svc.plan(project_id, body.description)
+    except ValueError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
 @router.post("/{project_id}/analyze", response_model=AnalysisResult)
 async def analyze_project(project_id: str, body: AnalyzeProjectRequest) -> AnalysisResult:
     project_path = settings.ide_workspace_dir / project_id
@@ -108,6 +146,54 @@ async def analyze_project(project_id: str, body: AnalyzeProjectRequest) -> Analy
         return await svc.analyze(project_path, overwrite=body.overwrite)
     except ValueError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@router.post("/{project_id}/github/sync", response_model=GithubSyncResult)
+async def github_sync(project_id: str, body: GithubSyncRequest) -> GithubSyncResult:
+    project_path = settings.ide_workspace_dir / project_id
+    if not project_path.is_dir():
+        raise HTTPException(status_code=404, detail=f"Projet '{project_id}' introuvable.")
+
+    project = await _loader().load_project(project_id)
+    if not project.github_remote:
+        raise HTTPException(
+            status_code=422,
+            detail="Ce projet n'a pas de github_remote configuré dans agents.json.",
+        )
+    if not settings.github_token:
+        raise HTTPException(
+            status_code=422,
+            detail="GITHUB_TOKEN non configuré dans les settings.",
+        )
+
+    import json as _json
+    agents_json_path = project_path / "agents.json"
+    label_map: dict[str, str] = {}
+    if agents_json_path.exists():
+        try:
+            data = _json.loads(agents_json_path.read_text(encoding="utf-8"))
+            label_map = data.get("github_sync", {}).get("label_map", {})
+        except Exception:
+            pass
+
+    github_svc = GitHubService(token=settings.github_token, repo=project.github_remote)
+    ticket_svc = _ticket_svc(project_id)
+    sync_map_svc = SyncMapService()
+
+    agent = GithubSyncAgent(
+        github_svc=github_svc,
+        ticket_svc=ticket_svc,
+        sync_map_svc=sync_map_svc,
+        project_path=project_path,
+        label_map=label_map,
+    )
+
+    sync_result = await agent.run(direction=body.direction)
+    return GithubSyncResult(
+        pulled=sync_result.pulled,
+        pushed=sync_result.pushed,
+        skipped=sync_result.skipped,
+    )
 
 
 @router.get("/{project_id}", response_model=Project)

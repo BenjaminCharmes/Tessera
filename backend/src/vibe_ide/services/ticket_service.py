@@ -6,7 +6,7 @@ from typing import Iterator
 
 import frontmatter  # type: ignore[import-untyped]
 
-from vibe_ide.models.ticket import Ticket, TicketStatus
+from vibe_ide.models.ticket import Ticket, TicketDraftPlan, TicketStatus
 
 
 _STATUS_DIRS: dict[TicketStatus, str] = {
@@ -101,6 +101,32 @@ class TicketService:
         dest.write_text(frontmatter.dumps(post), encoding="utf-8")
         return self._parse(dest)
 
+    async def create_tickets_batch(self, drafts: list[TicketDraftPlan]) -> list[Ticket]:
+        if not drafts:
+            return []
+        base_n = self._next_n()
+        ids = [f"ticket-{base_n + i:03d}" for i in range(len(drafts))]
+
+        created: list[Ticket] = []
+        for i, draft in enumerate(drafts):
+            depends_on = [
+                ids[dep_idx]
+                for dep_idx in draft.depends_on_index
+                if 0 <= dep_idx < len(ids)
+            ]
+            ticket = Ticket(
+                id=ids[i],
+                title=draft.title,
+                type=draft.type,
+                status=TicketStatus.todo,
+                priority=draft.priority,
+                agent=draft.agent,
+                depends_on=depends_on,
+                body=draft.description,
+            )
+            created.append(await self.create_ticket(ticket))
+        return created
+
     async def archive_old_tickets(self, days: int = 30) -> list[Ticket]:
         done_dir = self._tickets_root() / "done"
         if not done_dir.is_dir():
@@ -143,6 +169,15 @@ class TicketService:
                 continue
         return tickets
 
+    async def set_pr_number(self, ticket_id: str, pr_number: int) -> Ticket:
+        source = self._find_file(ticket_id)
+        if source is None:
+            raise ValueError(f"Ticket introuvable : {ticket_id}")
+        post = frontmatter.load(str(source))
+        post["pr_number"] = pr_number
+        source.write_text(frontmatter.dumps(post), encoding="utf-8")
+        return self._parse(source)
+
     async def rotate_pipeline_log(self) -> None:
         log_path = self._root / "pipeline-log.md"
         if not log_path.exists():
@@ -175,7 +210,7 @@ class TicketService:
                 return path
         return None
 
-    def _next_id(self) -> str:
+    def _next_n(self) -> int:
         max_n = 0
         root = self._tickets_root()
         if root.is_dir():
@@ -183,7 +218,10 @@ class TicketService:
                 parts = path.stem.split("-")
                 if len(parts) >= 2 and parts[1].isdigit():
                     max_n = max(max_n, int(parts[1]))
-        return f"ticket-{max_n + 1:03d}"
+        return max_n + 1
+
+    def _next_id(self) -> str:
+        return f"ticket-{self._next_n():03d}"
 
     def _parse(self, path: Path) -> Ticket:
         post = frontmatter.load(str(path))
@@ -198,6 +236,7 @@ class TicketService:
             depends_on=list(meta.get("depends_on", [])),
             created=str(meta.get("created", "")),
             github_issue_url=meta.get("github_issue_url") or None,
+            pr_number=int(meta["pr_number"]) if isinstance(meta.get("pr_number"), int) else None,
             body=str(post.content),
             project_id=self._project_id,
             file_path=str(path),

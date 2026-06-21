@@ -2,7 +2,7 @@
 id: ticket-027
 title: "UI import de projet existant"
 type: feat
-status: todo
+status: done
 priority: high
 agent: codeur
 depends_on:
@@ -95,11 +95,11 @@ projects: {
 
 ## Critères d'acceptation
 
-- [ ] L'utilisateur peut importer un dossier local en 3 étapes depuis la sidebar
-- [ ] Le `CLAUDE.md` généré est affiché et modifiable avant validation
-- [ ] Les agents absents du registre sont clairement signalés avec un lien vers `AgentCreatorModal`
-- [ ] Un import échoué affiche un message d'erreur actionnable (chemin invalide, déjà importé…)
-- [ ] Après validation, le projet apparaît immédiatement dans la liste et la sidebar passe sur ses tickets
+- [x] L'utilisateur peut importer un dossier local en 3 étapes depuis la sidebar
+- [x] Le `CLAUDE.md` généré est affiché et modifiable avant validation
+- [x] Les agents absents du registre sont clairement signalés avec un lien vers `AgentCreatorModal`
+- [x] Un import échoué affiche un message d'erreur actionnable (chemin invalide, déjà importé…)
+- [x] Après validation, le projet apparaît immédiatement dans la liste et la sidebar passe sur ses tickets
 
 ## Spécifications techniques
 

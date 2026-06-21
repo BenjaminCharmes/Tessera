@@ -93,7 +93,20 @@ export default function ProjectNav({
             }`}
           >
             <span className="text-zinc-500 text-xs">◈</span>
-            <span className="truncate">{project.name}</span>
+            <span className="truncate flex-1">{project.name}</span>
+            {project.github_remote && (
+              <a
+                href={project.github_remote}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-zinc-500 hover:text-zinc-200 transition-colors text-xs leading-none shrink-0"
+                title={project.github_remote}
+                aria-label={`Ouvrir le repo GitHub de ${project.name}`}
+              >
+                GH
+              </a>
+            )}
           </button>
         ))}
       </div>

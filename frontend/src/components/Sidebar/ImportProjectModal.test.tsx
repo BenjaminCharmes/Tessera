@@ -8,6 +8,7 @@ vi.mock("../../lib/api", () => ({
   api: {
     projects: {
       import: vi.fn(),
+      clone: vi.fn(),
       analyze: vi.fn(),
     },
     agents: {
@@ -17,6 +18,7 @@ vi.mock("../../lib/api", () => ({
 }));
 
 const mockImport = vi.mocked(api.projects.import);
+const mockClone = vi.mocked(api.projects.clone);
 const mockAnalyze = vi.mocked(api.projects.analyze);
 const mockAgentsList = vi.mocked(api.agents.list);
 
@@ -27,6 +29,14 @@ const mockProject = {
   active_agents: [],
   stack: null,
   raw_claude_md: "",
+  github_remote: null,
+};
+
+const mockGithubProject = {
+  ...mockProject,
+  id: "my-repo",
+  name: "my-repo",
+  github_remote: "https://github.com/owner/my-repo",
 };
 
 const mockAnalysis = {
@@ -58,6 +68,65 @@ describe("ImportProjectModal", () => {
     ]);
   });
 
+  // ------------------------------------------------------------------
+  // Source type toggle
+  // ------------------------------------------------------------------
+
+  it("renders source type toggle with local selected by default", () => {
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: /dossier local/i }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("switches to GitHub URL input when clicking 'Cloner depuis GitHub'", async () => {
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+
+    expect(screen.getByLabelText(/url du repo github/i)).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/chemin du dossier/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows Cloner button label when GitHub source is selected", async () => {
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+
+    expect(
+      screen.getByRole("button", { name: /cloner →/i }),
+    ).toBeInTheDocument();
+  });
+
+  // ------------------------------------------------------------------
+  // Local import (existing behaviour preserved)
+  // ------------------------------------------------------------------
+
   it("renders step 1 with path input, mode selector, and action buttons", () => {
     render(
       <ImportProjectModal
@@ -77,7 +146,7 @@ describe("ImportProjectModal", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows validation error when path is empty", async () => {
+  it("shows validation error when local path is empty", async () => {
     render(
       <ImportProjectModal
         onClose={onClose}
@@ -93,7 +162,7 @@ describe("ImportProjectModal", () => {
     expect(mockImport).not.toHaveBeenCalled();
   });
 
-  it("calls api.projects.import then api.projects.analyze on valid submit", async () => {
+  it("calls api.projects.import then api.projects.analyze on valid local submit", async () => {
     mockImport.mockResolvedValue({ project: mockProject });
     mockAnalyze.mockResolvedValue(mockAnalysis);
 
@@ -121,7 +190,7 @@ describe("ImportProjectModal", () => {
     });
   });
 
-  it("shows review step with CLAUDE.md and agents after success", async () => {
+  it("shows review step with CLAUDE.md and agents after local import success", async () => {
     mockImport.mockResolvedValue({ project: mockProject });
     mockAnalyze.mockResolvedValue(mockAnalysis);
 
@@ -164,9 +233,7 @@ describe("ImportProjectModal", () => {
       expect(screen.getByText(/mon-projet importé/i)).toBeInTheDocument(),
     );
 
-    // codeur and reviewer are registered → check badge
     expect(screen.getAllByText("✅").length).toBeGreaterThanOrEqual(2);
-    // testeur is absent → warning + create button
     expect(
       screen.getByRole("button", { name: /créer.*testeur/i }),
     ).toBeInTheDocument();
@@ -297,5 +364,166 @@ describe("ImportProjectModal", () => {
         mode: "copy",
       });
     });
+  });
+
+  // ------------------------------------------------------------------
+  // GitHub clone flow
+  // ------------------------------------------------------------------
+
+  it("shows URL validation error when GitHub URL is empty", async () => {
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/url.*requise/i);
+    expect(mockClone).not.toHaveBeenCalled();
+  });
+
+  it("shows URL validation error for non-github.com URL", async () => {
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+    await userEvent.type(
+      screen.getByLabelText(/url du repo github/i),
+      "https://gitlab.com/owner/repo",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /format invalide/i,
+    );
+    expect(mockClone).not.toHaveBeenCalled();
+  });
+
+  it("calls api.projects.clone with valid GitHub URL then analyze", async () => {
+    mockClone.mockResolvedValue({
+      project: mockGithubProject,
+      claude_md_generated: true,
+      detected_stack: ["Python"],
+    });
+    mockAnalyze.mockResolvedValue({
+      ...mockAnalysis,
+      claude_md: "# CLAUDE.md — my-repo",
+    });
+
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+    await userEvent.type(
+      screen.getByLabelText(/url du repo github/i),
+      "https://github.com/owner/my-repo",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+
+    await waitFor(() => {
+      expect(mockClone).toHaveBeenCalledWith({
+        repo_url: "https://github.com/owner/my-repo",
+      });
+    });
+    await waitFor(() => {
+      expect(mockAnalyze).toHaveBeenCalledWith("my-repo", false);
+    });
+  });
+
+  it("shows review step after successful GitHub clone", async () => {
+    mockClone.mockResolvedValue({
+      project: mockGithubProject,
+      claude_md_generated: true,
+      detected_stack: ["Python", "FastAPI"],
+    });
+    mockAnalyze.mockResolvedValue({
+      ...mockAnalysis,
+      claude_md: "# CLAUDE.md — my-repo",
+      detected_stack: ["Python", "FastAPI"],
+    });
+
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+    await userEvent.type(
+      screen.getByLabelText(/url du repo github/i),
+      "https://github.com/owner/my-repo",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/my-repo importé/i)).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Stack détectée/i)).toBeInTheDocument();
+  });
+
+  it("shows error on clone failure", async () => {
+    mockClone.mockRejectedValue(new Error("API 422: git clone a échoué"));
+
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+    await userEvent.type(
+      screen.getByLabelText(/url du repo github/i),
+      "https://github.com/owner/my-repo",
+    );
+    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "API 422: git clone a échoué",
+      );
+    });
+  });
+
+  it("clears URL validation error when switching back to local", async () => {
+    render(
+      <ImportProjectModal
+        onClose={onClose}
+        onProjectCreated={onProjectCreated}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /cloner depuis github/i }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /dossier local/i }),
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

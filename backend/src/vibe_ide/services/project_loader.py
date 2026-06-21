@@ -28,6 +28,7 @@ def load_project(project_path: Path) -> Project:
         active_agents=_parse_active_agents(raw),
         stack=_parse_stack(raw),
         raw_claude_md=raw,
+        github_remote=_load_github_remote(project_path),
     )
 
 
@@ -40,6 +41,18 @@ def list_projects(workspace: Path) -> list[Project]:
         for p in sorted(workspace.iterdir())
         if p.is_dir() and not p.name.startswith(".")
     ]
+
+
+def _load_github_remote(project_path: Path) -> str | None:
+    agents_json = project_path / "agents.json"
+    if not agents_json.exists():
+        return None
+    try:
+        data = json.loads(agents_json.read_text(encoding="utf-8"))
+        value = data.get("github_remote")
+        return str(value) if value else None
+    except Exception:
+        return None
 
 
 def load_agents_config(project_path: Path) -> list[AgentConfig]:
