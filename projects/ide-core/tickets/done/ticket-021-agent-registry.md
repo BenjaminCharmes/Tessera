@@ -6,74 +6,44 @@ status: done
 priority: high
 agent: codeur
 depends_on: []
+estimated_days: 1
 created: 2026-06-21
 ---
 
 # ticket-021 — Registre d'agents dynamiques
 
+## Objectif
+
+Permettre la création et l'utilisation d'agents personnalisés sans avoir à modifier le code source. Aujourd'hui, ajouter un rôle (`redacteur`, `data-analyst`) provoque un crash Pydantic. Ce ticket pose la fondation qui rend le système extensible.
+
 ## Contexte
 
-Aujourd'hui les agents sont définis par un enum fermé `AgentRole` dans
-`backend/src/vibe_ide/models/agent.py`. Si `project-creator` suggère un agent
-absent de l'enum (ex. `redacteur`), le pipeline plante à la validation Pydantic.
+Les agents étaient définis par un enum fermé `AgentRole` dans `models/agent.py`. Si `project-creator` suggérait un agent absent de cet enum, le pipeline plantait à la validation Pydantic — aucun moyen d'étendre dynamiquement la liste.
 
-Ce ticket crée l'infrastructure qui permet des agents dynamiques définis par
-un fichier `.md` dans `agents/prompts/`, sans casser les 6 agents built-in.
+Architecture cible : chaque agent = un fichier `agents/prompts/{role}.md`. Un `AgentRegistryService` scanne ce dossier et expose le CRUD. Les 6 agents built-in conservent leur prompt existant ; les agents custom sont créés/supprimés à la volée.
 
-## Changements
+## Solution implémentée
 
-### 1. `backend/src/vibe_ide/services/agent_registry.py` (nouveau)
+1. **`backend/src/vibe_ide/services/agent_registry.py`** — `AgentRegistryService` avec CRUD + `AgentNotFoundError`
+2. **`models/agent.py`** — `AgentResult.role` et `AgentRunRequest.role` : `AgentRole` → `str`
+3. **`services/agent_runner.py`** — injection du registre, résolution via `registry.get_prompt(role)`
+4. **`utils/json_extract.py`** — utilitaire partagé extrait depuis `project_creator.py`
 
-```python
-class AgentRegistryService:
-    BUILTIN_ROLES = {"codeur", "reviewer", "orchestrateur", "architect",
-                     "project-creator", "project-analyzer"}
+## Critères d'acceptation
 
-    def __init__(self, prompts_dir: Path) -> None: ...
+- [x] Un agent créé via fichier `.md` est utilisable dans un pipeline sans modifier le code
+- [x] Un rôle inconnu déclenche `AgentNotFoundError` et non un crash Pydantic
+- [x] Les 6 agents built-in continuent de fonctionner exactement comme avant
+- [x] Les tests existants (`test_orchestrator.py`, `test_github_service.py`) restent verts
 
-    def list_agents(self) -> list[AgentInfo]:
-        """Retourne tous les agents (built-in + custom)."""
+## Dépendances
 
-    def get_prompt(self, role: str) -> str:
-        """Lit le fichier {role}.md. Lève AgentNotFoundError si absent."""
+Aucune. Pré-requis de tous les tickets agents (022, 023, 026, 028, 034-037).
 
-    def create_agent(self, role: str, prompt: str) -> None:
-        """Écrit {role}.md. Valide le nom (^[a-z][a-z0-9-]*$)."""
+## Estimation
 
-    def delete_agent(self, role: str) -> None:
-        """Supprime {role}.md. Refuse les built-in."""
+**1j** (réalisé)
 
-    def is_builtin(self, role: str) -> bool: ...
-```
+## Risques
 
-### 2. `backend/src/vibe_ide/models/agent.py`
-
-- `AgentRole` reste un enum pour les 6 built-in (rétrocompatibilité)
-- `AgentResult.role` et `AgentRunRequest.role` passent de `AgentRole` à `str`
-- Valider via `AgentRegistryService.get_prompt()` au moment de l'exécution,
-  pas au niveau Pydantic
-
-### 3. `backend/src/vibe_ide/services/agent_runner.py`
-
-- Remplacer `_load_system_prompt(role: AgentRole)` par une résolution via
-  `AgentRegistryService.get_prompt(role)`
-- Injecter `AgentRegistryService` dans `AgentRunner.__init__`
-
-### 4. `backend/src/vibe_ide/utils/json_extract.py` (nouveau)
-
-Extraire `_extract_json()` depuis `project_creator.py` dans un utilitaire partagé
-pour réutilisation par les tickets 023, 028.
-
-## Critères de done
-
-- [ ] `AgentRegistryService` avec tests unitaires (CRUD, refus built-in, anti-traversal)
-- [ ] `AgentResult.role` accepte n'importe quel `str` sans planter Pydantic
-- [ ] `AgentRunner` résout le prompt via le registre
-- [ ] `_extract_json` dans `utils/json_extract.py`, importé depuis `project_creator.py`
-- [ ] Tests existants (`test_orchestrator.py`, `test_github_service.py`) toujours verts
-- [ ] `uv run pytest` passe
-
-## Risque
-
-**Medium** — toucher à `AgentRole` impacte orchestrator + routers. Couvrir de
-tests de non-régression avant le refactor.
+**Moyen** — Résolu : tests de non-régression écrits avant le refactor.

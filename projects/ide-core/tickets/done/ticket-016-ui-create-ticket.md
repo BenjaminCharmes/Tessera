@@ -2,7 +2,7 @@
 id: ticket-016
 title: "UI — Création de ticket depuis la sidebar"
 type: feat
-status: todo
+status: done
 priority: high
 agent: codeur
 depends_on:

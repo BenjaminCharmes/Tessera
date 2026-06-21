@@ -19,65 +19,30 @@ Exposer le registre d'agents (ticket-021) via une API REST, afin que l'UI et des
 
 ## Contexte
 
-Après ticket-021, `AgentRegistryService` existe mais n'est accessible que via le code Python. Pour que le frontend (ticket-024) et d'autres services puissent gérer les agents, il faut une API REST sécurisée. La sécurité est critique : les roles passent dans les chemins de fichiers, toute injection = path traversal.
+Après ticket-021, `AgentRegistryService` existait mais n'était accessible que via le code Python. Ce ticket a créé l'API REST sécurisée.
 
-## Solution proposée
+## Solution implémentée
 
-Nouveau router `backend/src/vibe_ide/routers/agent_admin.py` monté sur `/api/v1/agents/registry`.
+Router `backend/src/vibe_ide/routers/agent_admin.py` monté sur `/api/v1/agents/registry`.
 
-### Endpoints
-
-| Méthode | Path | Description |
+| Méthode | Path | Status |
 |---|---|---|
-| `GET` | `/agents/registry` | Liste tous les agents (built-in + custom) |
-| `GET` | `/agents/registry/{role}` | Contenu complet du system prompt |
-| `POST` | `/agents/registry` | Créer/mettre à jour un agent custom |
-| `DELETE` | `/agents/registry/{role}` | Supprimer un agent (built-in refusé) |
-
-### Modèles Pydantic
-
-```python
-class AgentInfo(BaseModel):
-    role: str
-    description: str | None
-    is_builtin: bool
-    prompt_preview: str   # 200 premiers caractères
-
-class CreateAgentRequest(BaseModel):
-    role: str             # validé : ^[a-z][a-z0-9-]*$
-    system_prompt: str    # non vide
-
-class AgentRegistryResponse(BaseModel):
-    agents: list[AgentInfo]
-```
+| `GET` | `/agents/registry` | ✅ |
+| `GET` | `/agents/registry/{role}` | ✅ |
+| `POST` | `/agents/registry` | ✅ |
+| `DELETE` | `/agents/registry/{role}` | ✅ 403 sur built-in |
 
 ## Critères d'acceptation
 
-- [ ] `GET /agents/registry` retourne la liste complète avec badge built-in/custom
-- [ ] `POST /agents/registry` crée un fichier prompt et retourne `201`
-- [ ] `DELETE /agents/registry/{role}` sur un built-in retourne `403` avec message explicite
-- [ ] Un `role` malformé (`../secrets`, `foo bar`) retourne `422` avant toute opération filesystem
-
-## Spécifications techniques
-
-**Sécurité critique :**
-- Valider `role` avec `^[a-z][a-z0-9-]*$` dès la réception (avant toute I/O)
-- Ne jamais concaténer l'input brut dans un chemin (Path traversal)
-- `DELETE` sur un built-in → 403, sur un inexistant → 404
-
-**Montage dans `main.py` :**
-```python
-app.include_router(agent_admin.router, prefix="/api/v1")
-```
+- [x] `GET /agents/registry` retourne la liste complète avec badge built-in/custom
+- [x] `POST /agents/registry` crée un fichier prompt et retourne `201`
+- [x] `DELETE /agents/registry/{role}` sur un built-in retourne `403`
+- [x] Un `role` malformé (`../secrets`, `foo bar`) retourne `422` avant toute I/O
 
 ## Dépendances
 
-- **ticket-021** — Nécessite `AgentRegistryService` pour les opérations CRUD.
+- **ticket-021** — `AgentRegistryService` pour les opérations CRUD.
 
 ## Estimation
 
-**0.5j** — Router CRUD standard, logique dans le service existant.
-
-## Risques
-
-- **Faible** — API isolée, pas d'impact sur le pipeline existant.
+**0.5j** (réalisé)
