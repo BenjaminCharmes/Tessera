@@ -39,6 +39,22 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 19. ✅ UX polish (ErrorBoundary, empty states, toasts)
 20. ✅ E2E tests Playwright (5 flows critiques)
 
+### Phase 5 — Agents dynamiques + intégration GitHub : ✅ DONE (tickets 021–033)
+
+21. ✅ Registre d'agents dynamiques (AgentRegistryService)
+22. ✅ API CRUD agents (GET/POST/DELETE /api/v1/agents/registry)
+23. ✅ Agent conversationnel agent-creator (création agent via chat)
+24. ✅ UI gestion des agents (sidebar panel ⚙ + modale conversationnelle)
+25. ✅ Import projet local existant (modes symlink & copy)
+26. ✅ Agent project-analyzer (génération CLAUDE.md depuis le code)
+27. ✅ UI import de projet (3 étapes : source → analyse → validation)
+28. ✅ Agent planificateur (description NL → batch de tickets)
+29. ✅ UI « Planifier une évolution » + persistance batch
+30. ✅ Clone de repo GitHub dans le workspace
+31. ✅ Synchronisation bidirectionnelle tickets ↔ GitHub Issues
+32. ✅ Intégration GitHub Pull Requests (création + statut CI)
+33. ✅ Création automatique des agents manquants à la création de projet
+
 ---
 
 ## Stack spécifique à ce projet
