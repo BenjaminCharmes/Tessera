@@ -234,9 +234,7 @@ describe("ImportProjectModal", () => {
     );
 
     expect(screen.getAllByText("✅").length).toBeGreaterThanOrEqual(2);
-    expect(
-      screen.getByRole("button", { name: /créer.*testeur/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/sera créé automatiquement/i)).toBeInTheDocument();
   });
 
   it("calls onProjectCreated and closes on Valider", async () => {

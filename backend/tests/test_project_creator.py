@@ -1,7 +1,7 @@
-"""Tests TDD pour ProjectCreatorService — ticket-004."""
+"""Tests TDD pour ProjectCreatorService — ticket-004 + ticket-033."""
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -45,16 +45,33 @@ _QUESTION_RESPONSE = (
     "Un plan de plantation, un journal de suivi, ou autre chose ?"
 )
 
+_BOOTSTRAP_PROMPT = "Tu es un agent dédié à ce projet."
+
 
 def _make_client(response_text: str) -> MagicMock:
     mock = MagicMock()
     mock_resp = MagicMock()
     mock_resp.content = [MagicMock(text=response_text)]
     mock_resp.usage = MagicMock(
-        input_tokens=100, output_tokens=50,
-        cache_creation_input_tokens=0, cache_read_input_tokens=0,
+        input_tokens=100,
+        output_tokens=50,
+        cache_creation_input_tokens=0,
+        cache_read_input_tokens=0,
     )
     mock.messages.create = AsyncMock(return_value=mock_resp)
+    return mock
+
+
+def _make_client_multi(responses: list[str]) -> MagicMock:
+    """Client whose responses cycle through the given list."""
+    mock = MagicMock()
+    side_effects = []
+    for text in responses:
+        resp = MagicMock()
+        resp.content = [MagicMock(text=text)]
+        resp.usage = MagicMock(input_tokens=10, output_tokens=10)
+        side_effects.append(resp)
+    mock.messages.create = AsyncMock(side_effect=side_effects)
     return mock
 
 
@@ -64,6 +81,26 @@ def _make_service(tmp_path: Path, response_text: str) -> ProjectCreatorService:
     (prompts_dir / "project-creator.md").write_text(
         "Tu es le Project Creator.", encoding="utf-8"
     )
+    workspace = tmp_path / "projects"
+    workspace.mkdir()
+    return ProjectCreatorService(
+        client=_make_client(response_text),
+        prompts_dir=prompts_dir,
+        workspace_dir=workspace,
+    )
+
+
+def _make_service_with_existing_agents(
+    tmp_path: Path, response_text: str, existing_agents: list[str]
+) -> ProjectCreatorService:
+    """Service where specified agents already have prompt files."""
+    prompts_dir = tmp_path / "prompts"
+    prompts_dir.mkdir()
+    (prompts_dir / "project-creator.md").write_text(
+        "Tu es le Project Creator.", encoding="utf-8"
+    )
+    for role in existing_agents:
+        (prompts_dir / f"{role}.md").write_text(f"Prompt {role}.", encoding="utf-8")
     workspace = tmp_path / "projects"
     workspace.mkdir()
     return ProjectCreatorService(
@@ -218,7 +255,7 @@ async def test_json_in_markdown_code_block(tmp_path: Path) -> None:
 
 
 # ------------------------------------------------------------------
-# Appel Anthropic : vérification des paramètres
+# Appel Anthropic : vérification des paramètres (premier appel)
 # ------------------------------------------------------------------
 
 
@@ -226,9 +263,9 @@ async def test_calls_anthropic_with_system_prompt(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     await svc.create_project([_user_message("Projet test")])
 
-    svc._client.messages.create.assert_called_once()
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert kwargs["system"][0]["text"] == "Tu es le Project Creator."
+    # Premier appel = création du projet (avec system prompt)
+    first_call_kwargs = svc._client.messages.create.call_args_list[0].kwargs
+    assert first_call_kwargs["system"][0]["text"] == "Tu es le Project Creator."
 
 
 async def test_calls_anthropic_with_full_conversation(tmp_path: Path) -> None:
@@ -240,11 +277,11 @@ async def test_calls_anthropic_with_full_conversation(tmp_path: Path) -> None:
     ]
     await svc.create_project(conversation)
 
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert len(kwargs["messages"]) == 3
-    assert kwargs["messages"][0]["role"] == "user"
-    assert kwargs["messages"][1]["role"] == "assistant"
-    assert kwargs["messages"][2]["role"] == "user"
+    first_call_kwargs = svc._client.messages.create.call_args_list[0].kwargs
+    assert len(first_call_kwargs["messages"]) == 3
+    assert first_call_kwargs["messages"][0]["role"] == "user"
+    assert first_call_kwargs["messages"][1]["role"] == "assistant"
+    assert first_call_kwargs["messages"][2]["role"] == "user"
 
 
 # ------------------------------------------------------------------
@@ -258,3 +295,108 @@ async def test_duplicate_project_raises(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="déjà existant"):
         await svc.create_project([_user_message("Je veux un potager méditerranéen")])
+
+
+# ------------------------------------------------------------------
+# ticket-033 — Auto-création des agents manquants
+# ------------------------------------------------------------------
+
+
+async def test_missing_agents_are_auto_created(tmp_path: Path) -> None:
+    """Les agents absents du registre sont créés automatiquement."""
+    svc = _make_service(tmp_path, _VALID_AGENT_JSON)
+    result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
+
+    prompts_dir = tmp_path / "prompts"
+    # redacteur et planificateur ne sont pas builtins → doivent être créés
+    assert (prompts_dir / "redacteur.md").exists()
+    assert (prompts_dir / "planificateur.md").exists()
+    assert result.agents_created == ["redacteur", "planificateur"]
+
+
+async def test_existing_agents_not_recreated(tmp_path: Path) -> None:
+    """Les agents déjà présents dans le registre ne sont pas recréés."""
+    svc = _make_service_with_existing_agents(
+        tmp_path, _VALID_AGENT_JSON, existing_agents=["redacteur", "planificateur"]
+    )
+    original_content = (tmp_path / "prompts" / "redacteur.md").read_text()
+
+    result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
+
+    # Contenu inchangé
+    assert (tmp_path / "prompts" / "redacteur.md").read_text() == original_content
+    assert result.agents_created == []
+
+
+async def test_builtin_agents_not_bootstrapped(tmp_path: Path) -> None:
+    """Les agents builtins (orchestrateur) ne déclenchent pas de bootstrap."""
+    svc = _make_service_with_existing_agents(
+        tmp_path, _VALID_AGENT_JSON, existing_agents=["redacteur", "planificateur"]
+    )
+    result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
+
+    # orchestrateur est builtin → pas dans agents_created
+    assert "orchestrateur" not in result.agents_created
+
+
+async def test_agents_created_empty_when_all_exist(tmp_path: Path) -> None:
+    """agents_created est vide si tous les agents existent déjà."""
+    svc = _make_service_with_existing_agents(
+        tmp_path,
+        _VALID_AGENT_JSON,
+        existing_agents=["redacteur", "planificateur"],
+    )
+    result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
+
+    assert result.agents_created == []
+
+
+async def test_bootstrap_uses_haiku_model(tmp_path: Path) -> None:
+    """_bootstrap_agent utilise le modèle Haiku (coût faible)."""
+    svc = _make_service(tmp_path, _VALID_AGENT_JSON)
+    await svc.create_project([_user_message("Je veux un potager méditerranéen")])
+
+    # Les appels de bootstrap (index 1 et 2) doivent utiliser Haiku
+    from vibe_ide.services.project_creator import _BOOTSTRAP_MODEL
+
+    bootstrap_calls = svc._client.messages.create.call_args_list[1:]
+    for call in bootstrap_calls:
+        assert call.kwargs["model"] == _BOOTSTRAP_MODEL
+
+
+async def test_bootstrap_failure_does_not_block_creation(tmp_path: Path) -> None:
+    """Un échec de bootstrap ne bloque pas la création du projet."""
+    prompts_dir = tmp_path / "prompts"
+    prompts_dir.mkdir()
+    (prompts_dir / "project-creator.md").write_text("Tu es le Project Creator.")
+    workspace = tmp_path / "projects"
+    workspace.mkdir()
+
+    # Premier appel réussit, les suivants (bootstrap) lèvent une exception
+    mock_client = MagicMock()
+    success_resp = MagicMock()
+    success_resp.content = [MagicMock(text=_VALID_AGENT_JSON)]
+    success_resp.usage = MagicMock(input_tokens=10, output_tokens=10)
+    mock_client.messages.create = AsyncMock(
+        side_effect=[success_resp, RuntimeError("LLM down"), RuntimeError("LLM down")]
+    )
+
+    svc = ProjectCreatorService(
+        client=mock_client, prompts_dir=prompts_dir, workspace_dir=workspace
+    )
+    result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
+
+    assert result.done is True
+    assert result.project is not None
+    assert result.agents_created == []
+
+
+async def test_conversation_with_no_active_agents_has_empty_agents_created(
+    tmp_path: Path,
+) -> None:
+    """Quand done=False (conversation en cours), agents_created est vide."""
+    svc = _make_service(tmp_path, _QUESTION_RESPONSE)
+    result = await svc.create_project([_user_message("Projet jardinage")])
+
+    assert result.done is False
+    assert result.agents_created == []

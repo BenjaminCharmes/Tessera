@@ -15,6 +15,7 @@ from vibe_ide.models.project import (
     Project,
     ProjectContext,
     ProjectCreate,
+    ProjectCreationResult,
     ProjectImport,
     ProjectImportResponse,
 )
@@ -26,6 +27,7 @@ from vibe_ide.services.github_service import GitHubService
 from vibe_ide.services.planner import PlannerService
 from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 from vibe_ide.services.project_importer import ImportError, ProjectImporter
+from vibe_ide.services.project_creator import ProjectCreatorService
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.ticket_service import TicketService
@@ -48,12 +50,20 @@ async def list_projects() -> list[Project]:
     return await _loader().list_projects()
 
 
-@router.post("", response_model=Project, status_code=201)
-async def create_project(body: ProjectCreate) -> Project:
+@router.post("", response_model=ProjectCreationResult, status_code=201)
+async def create_project(body: ProjectCreate) -> ProjectCreationResult:
     try:
-        return await _loader().create_project(body)
+        project = await _loader().create_project(body)
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    svc = ProjectCreatorService(client, settings.ide_prompts_dir, settings.ide_workspace_dir)
+    agents_created = await svc._auto_create_missing_agents(
+        roles=body.active_agents,
+        project_name=project.name,
+        project_description=project.description,
+    )
+    return ProjectCreationResult(project=project, agents_created=agents_created)
 
 
 @router.post("/import", response_model=ProjectImportResponse, status_code=201)

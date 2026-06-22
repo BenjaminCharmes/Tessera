@@ -60,21 +60,26 @@ describe("api.tickets.list", () => {
 });
 
 describe("api.projects.create", () => {
-  it("sends POST with name and description", async () => {
+  it("sends POST with name, project_id and description", async () => {
     const project = { id: "my-app", name: "my-app", description: "desc" };
+    const creationResult = { project, agents_created: [] };
     mockFetch.mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(project),
+      json: () => Promise.resolve(creationResult),
     });
 
     const result = await api.projects.create("my-app", "desc");
 
-    expect(result).toEqual(project);
+    expect(result).toEqual(creationResult);
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/v1/projects",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ name: "my-app", description: "desc" }),
+        body: JSON.stringify({
+          project_id: "my-app",
+          name: "my-app",
+          description: "desc",
+        }),
       }),
     );
   });

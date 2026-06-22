@@ -23,6 +23,8 @@ export default function CreateProjectModal({
   const [nameError, setNameError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [createdProject, setCreatedProject] = useState<Project | null>(null);
+  const [agentsCreated, setAgentsCreated] = useState<string[]>([]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,8 +37,9 @@ export default function CreateProjectModal({
     setApiError(null);
     setLoading(true);
     try {
-      const project = await api.projects.create(name, description);
-      onCreated(project);
+      const result = await api.projects.create(name, description);
+      setCreatedProject(result.project);
+      setAgentsCreated(result.agents_created);
     } catch (err: unknown) {
       setApiError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
@@ -45,11 +48,62 @@ export default function CreateProjectModal({
   }
 
   function handleOverlayClick(e: React.MouseEvent) {
-    if (e.target === e.currentTarget) onClose();
+    if (e.target === e.currentTarget) {
+      if (createdProject) {
+        onCreated(createdProject);
+      } else {
+        onClose();
+      }
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") onClose();
+    if (e.key === "Escape") {
+      if (createdProject) {
+        onCreated(createdProject);
+      } else {
+        onClose();
+      }
+    }
+  }
+
+  if (createdProject) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+        onClick={handleOverlayClick}
+        onKeyDown={handleKeyDown}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Projet créé"
+      >
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
+          <p className="text-green-400 text-sm font-medium mb-1">
+            ✓ Projet &ldquo;{createdProject.name}&rdquo; créé
+          </p>
+          {agentsCreated.length > 0 && (
+            <p className="text-zinc-400 text-xs mt-1">
+              {agentsCreated.length} agent
+              {agentsCreated.length > 1 ? "s" : ""} créé
+              {agentsCreated.length > 1 ? "s" : ""} automatiquement :{" "}
+              <span className="font-mono text-zinc-300">
+                {agentsCreated.join(", ")}
+              </span>
+            </p>
+          )}
+          <div className="flex justify-end mt-4">
+            <button
+              type="button"
+              onClick={() => onCreated(createdProject)}
+              className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
+              autoFocus
+            >
+              Continuer
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

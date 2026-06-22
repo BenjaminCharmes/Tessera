@@ -24,6 +24,12 @@ const mockProject = {
   github_remote: null,
 };
 
+const mockResult = { project: mockProject, agents_created: [] };
+const mockResultWithAgents = {
+  project: mockProject,
+  agents_created: ["redacteur", "planificateur"],
+};
+
 describe("CreateProjectModal", () => {
   const onClose = vi.fn();
   const onCreated = vi.fn();
@@ -65,7 +71,7 @@ describe("CreateProjectModal", () => {
   });
 
   it("calls api.projects.create with name and description on valid submit", async () => {
-    mockCreate.mockResolvedValue(mockProject);
+    mockCreate.mockResolvedValue(mockResult);
 
     render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
 
@@ -78,21 +84,66 @@ describe("CreateProjectModal", () => {
     });
   });
 
-  it("calls onCreated with the new project after successful creation", async () => {
-    mockCreate.mockResolvedValue(mockProject);
+  it("shows success message after project creation", async () => {
+    mockCreate.mockResolvedValue(mockResult);
 
     render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
 
     await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
     fireEvent.click(screen.getByRole("button", { name: /créer/i }));
 
-    await waitFor(() => {
-      expect(onCreated).toHaveBeenCalledWith(mockProject);
-    });
+    expect(
+      await screen.findByText(/Projet.*mon-projet.*créé/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /continuer/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not show agents section when agents_created is empty", async () => {
+    mockCreate.mockResolvedValue(mockResult);
+
+    render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+
+    await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+    fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+    await screen.findByText(/Projet.*mon-projet.*créé/i);
+    expect(
+      screen.queryByText(/agent.*créé.*automatiquement/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows auto-created agents in success message", async () => {
+    mockCreate.mockResolvedValue(mockResultWithAgents);
+
+    render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+
+    await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+    fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+    expect(
+      await screen.findByText(/2 agents créés automatiquement/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/redacteur, planificateur/i)).toBeInTheDocument();
+  });
+
+  it("calls onCreated with the project when Continuer is clicked", async () => {
+    mockCreate.mockResolvedValue(mockResult);
+
+    render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+
+    await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+    fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+    await screen.findByRole("button", { name: /continuer/i });
+    fireEvent.click(screen.getByRole("button", { name: /continuer/i }));
+
+    expect(onCreated).toHaveBeenCalledWith(mockProject);
   });
 
   it("disables the submit button while loading", async () => {
-    let resolve!: (p: typeof mockProject) => void;
+    let resolve!: (r: typeof mockResult) => void;
     mockCreate.mockReturnValue(
       new Promise((r) => {
         resolve = r;
@@ -106,8 +157,12 @@ describe("CreateProjectModal", () => {
 
     expect(screen.getByRole("button", { name: /créer/i })).toBeDisabled();
 
-    resolve(mockProject);
-    await waitFor(() => expect(onCreated).toHaveBeenCalled());
+    resolve(mockResult);
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /continuer/i }),
+      ).toBeInTheDocument(),
+    );
   });
 
   it("displays API error when creation fails", async () => {
@@ -132,7 +187,7 @@ describe("CreateProjectModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onClose when clicking the overlay backdrop", () => {
+  it("calls onClose when clicking the overlay backdrop before creation", () => {
     render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
 
     fireEvent.click(screen.getByRole("dialog"));
@@ -140,7 +195,21 @@ describe("CreateProjectModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onClose when pressing Escape", () => {
+  it("calls onCreated when clicking overlay backdrop after success", async () => {
+    mockCreate.mockResolvedValue(mockResult);
+
+    render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+
+    await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+    fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+    await screen.findByRole("button", { name: /continuer/i });
+    fireEvent.click(screen.getByRole("dialog"));
+
+    expect(onCreated).toHaveBeenCalledWith(mockProject);
+  });
+
+  it("calls onClose when pressing Escape before creation", () => {
     render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
 
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });

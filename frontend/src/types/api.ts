@@ -118,6 +118,11 @@ export interface CreateAgentResponse {
   created: boolean;
 }
 
+export interface ProjectCreationResult {
+  project: Project;
+  agents_created: string[];
+}
+
 export interface ImportProjectRequest {
   source_path: string;
   mode: "copy" | "symlink";

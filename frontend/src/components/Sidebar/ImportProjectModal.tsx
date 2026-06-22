@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import type { AnalysisResult, Project } from "../../types/api";
-import AgentCreatorModal from "./AgentCreatorModal";
 
 type SourceType = "local" | "github";
 type ImportStep = "idle" | "importing" | "analyzing" | "review" | "error";
@@ -60,8 +59,6 @@ export default function ImportProjectModal({
   const [registeredAgents, setRegisteredAgents] = useState<Set<string>>(
     new Set(),
   );
-  const [agentToCreate, setAgentToCreate] = useState<string | null>(null);
-
   useEffect(() => {
     api.agents
       .list()
@@ -136,14 +133,6 @@ export default function ImportProjectModal({
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Escape") onClose();
-  }
-
-  function handleAgentCreated() {
-    setAgentToCreate(null);
-    api.agents
-      .list()
-      .then((agents) => setRegisteredAgents(new Set(agents.map((a) => a.role))))
-      .catch(() => {});
   }
 
   const isLoading = step === "importing" || step === "analyzing";
@@ -383,17 +372,13 @@ export default function ImportProjectModal({
                         className="flex items-center justify-between"
                       >
                         <span className="text-sm text-zinc-300">
-                          {present ? "✅" : "⚠"}{" "}
+                          {present ? "✅" : "⚙"}{" "}
                           <span className="font-mono">{agent}</span>
                         </span>
                         {!present && (
-                          <button
-                            onClick={() => setAgentToCreate(agent)}
-                            className="text-xs px-2 py-0.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-200 transition-colors"
-                            aria-label={`Créer l'agent ${agent}`}
-                          >
-                            → Créer l&apos;agent {agent}
-                          </button>
+                          <span className="text-xs text-zinc-500 italic">
+                            sera créé automatiquement
+                          </span>
                         )}
                       </div>
                     );
@@ -419,14 +404,6 @@ export default function ImportProjectModal({
           )}
         </div>
       </div>
-
-      {agentToCreate && (
-        <AgentCreatorModal
-          onClose={() => setAgentToCreate(null)}
-          onCreated={handleAgentCreated}
-          initialInput={`Crée un agent "${agentToCreate}" pour ce projet`}
-        />
-      )}
     </>
   );
 }

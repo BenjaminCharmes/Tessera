@@ -10,6 +10,7 @@ import type {
   ImportProjectResponse,
   PRStatus,
   PipelineResult,
+  ProjectCreationResult,
   PipelineRun,
   PlanResult,
   Project,
@@ -49,8 +50,15 @@ async function del(path: string): Promise<void> {
 export const api = {
   projects: {
     list: (): Promise<Project[]> => request("/projects"),
-    create: (name: string, description: string): Promise<Project> =>
-      post("/projects", { name, description }),
+    create: (
+      name: string,
+      description: string,
+    ): Promise<ProjectCreationResult> =>
+      post("/projects", {
+        project_id: name.toLowerCase().replace(/\s+/g, "-"),
+        name,
+        description,
+      }),
     import: (req: ImportProjectRequest): Promise<ImportProjectResponse> =>
       post("/projects/import", req),
     clone: (req: CloneProjectRequest): Promise<CloneProjectResponse> =>

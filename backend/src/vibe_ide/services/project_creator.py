@@ -10,6 +10,7 @@ from vibe_ide.models.project import (
     ProjectCreate,
 )
 from vibe_ide.models.ticket import TicketDraft, TicketPriority, TicketType
+from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.project_loader import ProjectLoader
 from vibe_ide.utils.json_extract import extract_json
 from vibe_ide.utils.logger import get_logger
@@ -17,7 +18,9 @@ from vibe_ide.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 _DEFAULT_MODEL = "claude-sonnet-4-6"
+_BOOTSTRAP_MODEL = "claude-haiku-4-5-20251001"
 _DEFAULT_MAX_TOKENS = 4096
+_BOOTSTRAP_MAX_TOKENS = 1024
 
 
 class ProjectCreatorService:
@@ -27,6 +30,7 @@ class ProjectCreatorService:
         self._client = client
         self._prompts_dir = prompts_dir
         self._workspace_dir = workspace_dir
+        self._registry = AgentRegistryService(prompts_dir)
 
     async def create_project(
         self, conversation: list[ConversationMessage]
@@ -77,6 +81,12 @@ class ProjectCreatorService:
 
         await self._save_conversation_log(project_data["project_id"], conversation, content)
 
+        agents_created = await self._auto_create_missing_agents(
+            roles=project_data.get("active_agents", []),
+            project_name=project_data["name"],
+            project_description=project_data.get("description", ""),
+        )
+
         suggested_tickets = [
             TicketDraft(
                 title=t["title"],
@@ -93,6 +103,44 @@ class ProjectCreatorService:
             suggested_tickets=suggested_tickets,
             claude_md_generated=project_data.get("claude_md", ""),
             done=True,
+            agents_created=agents_created,
+        )
+
+    async def _auto_create_missing_agents(
+        self, roles: list[str], project_name: str, project_description: str
+    ) -> list[str]:
+        created: list[str] = []
+        existing = {a.role for a in self._registry.list_agents()}
+        for role in roles:
+            if role in existing:
+                continue
+            try:
+                prompt = await self._bootstrap_agent(role, project_name, project_description)
+                self._registry.create_agent(role, prompt)
+                created.append(role)
+                _logger.info("agent_auto_created", extra={"role": role})
+            except Exception as exc:
+                _logger.warning(
+                    "agent_auto_create_failed",
+                    extra={"role": role, "error": str(exc)},
+                )
+        return created
+
+    async def _bootstrap_agent(
+        self, role: str, project_name: str, project_description: str
+    ) -> str:
+        prompt = (
+            f'Génère le system prompt d\'un agent nommé "{role}" pour le projet "{project_name}".\n'
+            f"Description du projet : {project_description}\n"
+            "Réponds uniquement avec le system prompt (minimum 50 mots), sans JSON ni balises."
+        )
+        response = await self._client.messages.create(
+            model=_BOOTSTRAP_MODEL,
+            max_tokens=_BOOTSTRAP_MAX_TOKENS,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return "".join(
+            block.text for block in response.content if hasattr(block, "text")
         )
 
     def _load_system_prompt(self) -> str:
@@ -112,5 +160,3 @@ class ProjectCreatorService:
             lines.append(f"{prefix}: {msg.content}\n")
         lines.append(f"\n**Assistant (réponse finale)**: {final_response}\n")
         log_path.write_text("\n".join(lines), encoding="utf-8")
-
-

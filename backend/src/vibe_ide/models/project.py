@@ -49,6 +49,12 @@ class CreateProjectResponse(BaseModel):
     claude_md_generated: str = ""
     agent_message: str = ""
     done: bool = False
+    agents_created: list[str] = Field(default_factory=list)
+
+
+class ProjectCreationResult(BaseModel):
+    project: Project
+    agents_created: list[str] = Field(default_factory=list)
 
 
 class ProjectImport(BaseModel):

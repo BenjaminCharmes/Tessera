@@ -2,7 +2,7 @@
 id: ticket-033
 title: "Création automatique des agents manquants à la création de projet"
 type: feat
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on:
