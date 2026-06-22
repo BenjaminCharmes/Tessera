@@ -41,7 +41,10 @@ test.describe("Flow 3 — Création d'un projet", () => {
       .getByRole("button", { name: "Créer", exact: true })
       .click();
 
-    // Modal closes; new project is auto-selected and shown in the tickets panel header
+    // Modal shows success screen — click "Continuer" to close it
+    await mockedPage.getByRole("button", { name: /continuer/i }).click();
+
+    // Modal closed; the "Créer" submit button is gone
     await expect(
       mockedPage.getByRole("button", { name: "Créer", exact: true }),
     ).not.toBeVisible();

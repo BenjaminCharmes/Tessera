@@ -78,9 +78,12 @@ async function setupApiMocks(page: Page) {
       };
       await route.fulfill({
         json: {
-          ...NEW_PROJECT,
-          name: body.name,
-          description: body.description,
+          project: {
+            ...NEW_PROJECT,
+            name: body.name,
+            description: body.description,
+          },
+          agents_created: [],
         },
         status: 201,
       });
