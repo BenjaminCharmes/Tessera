@@ -8,6 +8,7 @@ from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.doc_updater import DocUpdaterService
+from vibe_ide.services.security_auditor import SecurityAuditorService
 from vibe_ide.services.test_runner import TestRunnerService
 from vibe_ide.services.validator import ValidatorService
 from vibe_ide.services.orchestrator import (
@@ -79,6 +80,11 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         else None
     )
     test_runner = TestRunnerService() if pipeline_cfg.testeur_enabled else None
+    security_auditor = (
+        SecurityAuditorService(client, settings.ide_prompts_dir)
+        if pipeline_cfg.securite_enabled
+        else None
+    )
     validator = (
         ValidatorService(client, settings.ide_prompts_dir)
         if pipeline_cfg.validateur_enabled
@@ -95,6 +101,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         doc_updater=doc_updater,
         test_runner=test_runner,
         test_command=pipeline_cfg.test_command,
+        security_auditor=security_auditor,
         validator=validator,
         project_path=project_path,
     )

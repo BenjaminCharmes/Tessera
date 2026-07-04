@@ -206,6 +206,7 @@ class Orchestrator:
 
             # --- testeur (optional) ---
             test_context_block = ""
+            security_context_block = ""
             test_result = None
             if self._test_runner and self._project_path:
                 try:
@@ -246,11 +247,75 @@ class Orchestrator:
                 except Exception as exc:
                     _logger.warning("test_runner_failed", extra={"error": str(exc)})
 
+            # --- securite (optional) ---
+            security_context_block = ""
+            if self._security_auditor and self._project_path:
+                await on_event(
+                    OrchestratorEvent(
+                        type=EventType.SECURITY_AUDIT_STARTED,
+                        ticket_id=ticket_id,
+                        data={"round": round_num},
+                    )
+                )
+                try:
+                    audit = await self._security_auditor.audit(
+                        code_diff=codeur_result.content,
+                        project_path=self._project_path,
+                    )
+                    await on_event(
+                        OrchestratorEvent(
+                            type=EventType.SECURITY_AUDIT_DONE,
+                            ticket_id=ticket_id,
+                            data={
+                                "verdict": audit.verdict,
+                                "issues_count": len(audit.issues),
+                                "has_critical": audit.has_critical,
+                                "has_high": audit.has_high,
+                                "summary": audit.summary,
+                            },
+                        )
+                    )
+                    self._log(
+                        f"[{ticket_id}] securite: {audit.verdict} — {audit.summary[:80]}"
+                    )
+                    if audit.verdict == "BLOCK":
+                        await self._ticket_svc.update_status(ticket_id, TicketStatus.blocked)
+                        await on_event(
+                            OrchestratorEvent(
+                                type=EventType.TICKET_STATUS_CHANGED,
+                                ticket_id=ticket_id,
+                                data={"status": TicketStatus.blocked.value},
+                            )
+                        )
+                        await on_event(
+                            OrchestratorEvent(
+                                type=EventType.PIPELINE_DONE,
+                                ticket_id=ticket_id,
+                                data={"approved": False, "rounds": round_num, "reason": "security_block"},
+                            )
+                        )
+                        return PipelineResult(
+                            ticket_id=ticket_id,
+                            final_status=TicketStatus.blocked,
+                            rounds=round_num,
+                            approved=False,
+                        )
+                    # PASS — include audit context for reviewer (MEDIUM/LOW as warnings)
+                    if audit.issues:
+                        warnings = "\n".join(
+                            f"- [{i.severity}] {i.type} @ {i.location}: {i.description}"
+                            for i in audit.issues
+                        )
+                        security_context_block = f"\n\n## Audit sécurité (avertissements)\n{warnings}"
+                except Exception as exc:
+                    _logger.warning("security_auditor_failed", extra={"error": str(exc)})
+
             # --- reviewer ---
             review_context = (
                 context
                 + f"\n\n## Code produit par le codeur (tour {round_num})\n{codeur_result.content}"
                 + test_context_block
+                + security_context_block
             )
 
             await on_event(
