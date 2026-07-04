@@ -60,6 +60,25 @@ class PipelineResult(BaseModel):
 EventCallback = Callable[[OrchestratorEvent], Awaitable[None]]
 
 
+def _extract_criteria(ticket_body: str) -> list[str]:
+    """Extracts acceptance criteria checkboxes from ticket markdown body."""
+    import re
+
+    criteria: list[str] = []
+    in_criteria_section = False
+    for line in ticket_body.splitlines():
+        if re.search(r"##\s*(critères|acceptance criteria)", line, re.IGNORECASE):
+            in_criteria_section = True
+            continue
+        if in_criteria_section:
+            if line.startswith("##"):
+                break
+            m = re.match(r"\s*-\s*\[[ xX]?\]\s*(.+)", line)
+            if m:
+                criteria.append(m.group(1).strip())
+    return criteria
+
+
 def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
     """Returns (approved, reason). CHANGES_REQUESTED takes priority over APPROVED."""
     for line in content.splitlines():
@@ -187,6 +206,7 @@ class Orchestrator:
 
             # --- testeur (optional) ---
             test_context_block = ""
+            test_result = None
             if self._test_runner and self._project_path:
                 try:
                     from vibe_ide.services.test_runner import TestCommandNotFound
@@ -262,6 +282,40 @@ class Orchestrator:
             )
 
             approved, reason = _parse_reviewer_verdict(reviewer_result.content)
+
+            if approved:
+                # --- validateur (optional) — peut court-circuiter l'approbation ---
+                if self._validator:
+                    try:
+                        criteria = _extract_criteria(ticket.body)
+                        validation = await self._validator.validate(
+                            criteria=criteria,
+                            code_produced=codeur_result.content,
+                            test_result=test_result,
+                        )
+                        await on_event(
+                            OrchestratorEvent(
+                                type=EventType.VALIDATION_DONE,
+                                ticket_id=ticket_id,
+                                data={
+                                    "verdict": validation.verdict,
+                                    "all_passed": validation.all_passed,
+                                    "feedback": validation.feedback,
+                                    "criteria": [
+                                        {"criterion": c.criterion, "passed": c.passed, "note": c.note}
+                                        for c in validation.criteria
+                                    ],
+                                },
+                            )
+                        )
+                        self._log(
+                            f"[{ticket_id}] validateur: {validation.verdict} — {validation.feedback[:80]}"
+                        )
+                        if validation.verdict == "CHANGES_REQUESTED":
+                            approved = False
+                            reason = validation.feedback
+                    except Exception as exc:
+                        _logger.warning("validator_failed", extra={"error": str(exc)})
 
             if approved:
                 # --- doc-updater (optional) ---
