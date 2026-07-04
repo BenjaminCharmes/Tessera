@@ -82,6 +82,7 @@ class Orchestrator:
         max_review_rounds: int = 3,
         doc_updater: Optional["DocUpdaterService"] = None,
         test_runner: Optional["TestRunnerService"] = None,
+        test_command: Optional[str] = None,
         security_auditor: Optional["SecurityAuditorService"] = None,
         validator: Optional["ValidatorService"] = None,
         project_path: Optional[Path] = None,
@@ -94,6 +95,7 @@ class Orchestrator:
         self._max_review_rounds = max_review_rounds
         self._doc_updater = doc_updater
         self._test_runner = test_runner
+        self._test_command = test_command
         self._security_auditor = security_auditor
         self._validator = validator
         self._project_path = project_path
@@ -183,10 +185,52 @@ class Orchestrator:
                 )
             )
 
+            # --- testeur (optional) ---
+            test_context_block = ""
+            if self._test_runner and self._project_path:
+                try:
+                    from vibe_ide.services.test_runner import TestCommandNotFound
+
+                    test_result = await self._test_runner.run_tests(
+                        self._project_path,
+                        test_command=self._test_command,
+                    )
+                    await on_event(
+                        OrchestratorEvent(
+                            type=EventType.TEST_RESULT,
+                            ticket_id=ticket_id,
+                            data={
+                                "passed": test_result.passed,
+                                "total": test_result.total,
+                                "failed": test_result.failed,
+                                "output_summary": test_result.output_summary,
+                                "duration_ms": test_result.duration_ms,
+                            },
+                        )
+                    )
+                    badge = "✅" if test_result.passed else "❌"
+                    test_context_block = (
+                        f"\n\n## Résultats des tests {badge}\n"
+                        f"{test_result.output_summary}\n"
+                        + (
+                            "\nErreurs:\n" + "\n".join(test_result.errors)
+                            if test_result.errors
+                            else ""
+                        )
+                    )
+                    self._log(
+                        f"[{ticket_id}] testeur: {test_result.output_summary}"
+                    )
+                except TestCommandNotFound:
+                    self._log(f"[{ticket_id}] testeur: commande non détectée, ignoré")
+                except Exception as exc:
+                    _logger.warning("test_runner_failed", extra={"error": str(exc)})
+
             # --- reviewer ---
             review_context = (
                 context
                 + f"\n\n## Code produit par le codeur (tour {round_num})\n{codeur_result.content}"
+                + test_context_block
             )
 
             await on_event(
