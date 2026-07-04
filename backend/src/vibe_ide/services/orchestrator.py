@@ -2,7 +2,7 @@ from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel, Field
 
@@ -11,6 +11,12 @@ from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.ticket_service import TicketService
 from vibe_ide.utils.logger import get_logger
+
+if TYPE_CHECKING:
+    from vibe_ide.services.doc_updater import DocUpdaterService
+    from vibe_ide.services.security_auditor import SecurityAuditorService
+    from vibe_ide.services.test_runner import TestRunnerService
+    from vibe_ide.services.validator import ValidatorService
 
 _logger = get_logger(__name__)
 
@@ -29,6 +35,11 @@ class EventType(str, Enum):
     TICKET_STATUS_CHANGED = "ticket_status_changed"
     PIPELINE_DONE = "pipeline_done"
     ERROR = "error"
+    TEST_RESULT = "test_result"
+    SECURITY_AUDIT_STARTED = "security_audit_started"
+    SECURITY_AUDIT_DONE = "security_audit_done"
+    VALIDATION_DONE = "validation_done"
+    DOC_UPDATED = "doc_updated"
 
 
 class OrchestratorEvent(BaseModel):
@@ -69,6 +80,11 @@ class Orchestrator:
         agent_configs: list[AgentConfig],
         pipeline_log_path: Path,
         max_review_rounds: int = 3,
+        doc_updater: Optional["DocUpdaterService"] = None,
+        test_runner: Optional["TestRunnerService"] = None,
+        security_auditor: Optional["SecurityAuditorService"] = None,
+        validator: Optional["ValidatorService"] = None,
+        project_path: Optional[Path] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -76,6 +92,11 @@ class Orchestrator:
         self._agent_configs = agent_configs
         self._log_path = pipeline_log_path
         self._max_review_rounds = max_review_rounds
+        self._doc_updater = doc_updater
+        self._test_runner = test_runner
+        self._security_auditor = security_auditor
+        self._validator = validator
+        self._project_path = project_path
 
     async def run_pipeline(
         self,
@@ -199,6 +220,30 @@ class Orchestrator:
             approved, reason = _parse_reviewer_verdict(reviewer_result.content)
 
             if approved:
+                # --- doc-updater (optional) ---
+                if self._doc_updater and self._project_path:
+                    try:
+                        doc_result = await self._doc_updater.update_docs(
+                            self._project_path,
+                            diff=codeur_result.content,
+                            ticket_title=f"{ticket.type.value}: {ticket.title}",
+                        )
+                        await on_event(
+                            OrchestratorEvent(
+                                type=EventType.DOC_UPDATED,
+                                ticket_id=ticket_id,
+                                data={
+                                    "files_updated": doc_result.files_updated,
+                                    "no_changes": doc_result.no_changes,
+                                },
+                            )
+                        )
+                        self._log(
+                            f"[{ticket_id}] doc-updater: {doc_result.files_updated or 'no changes'}"
+                        )
+                    except Exception as exc:
+                        _logger.warning("doc_updater_failed", extra={"error": str(exc)})
+
                 await self._ticket_svc.update_status(ticket_id, TicketStatus.done)
                 await on_event(
                     OrchestratorEvent(

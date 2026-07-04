@@ -7,6 +7,7 @@ from vibe_ide.config import settings
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.database import create_run, finish_run, save_event
+from vibe_ide.services.doc_updater import DocUpdaterService
 from vibe_ide.services.orchestrator import (
     Orchestrator,
     OrchestratorEvent,
@@ -70,6 +71,12 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     agent_configs = load_agents_config(project_path)
     pipeline_cfg = load_pipeline_config(project_path)
 
+    doc_updater = (
+        DocUpdaterService(client, settings.ide_prompts_dir)
+        if pipeline_cfg.doc_updater_enabled
+        else None
+    )
+
     return Orchestrator(
         runner=runner,
         ticket_service=ticket_svc,
@@ -77,6 +84,8 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         agent_configs=agent_configs,
         pipeline_log_path=project_path / "memory" / "pipeline-log.md",
         max_review_rounds=pipeline_cfg.max_review_rounds,
+        doc_updater=doc_updater,
+        project_path=project_path,
     )
 
 

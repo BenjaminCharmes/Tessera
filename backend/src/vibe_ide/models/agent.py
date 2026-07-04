@@ -42,6 +42,11 @@ class AgentPipelineConfig(BaseModel):
     default: list[str] = Field(default_factory=list)
     max_review_rounds: int = 3
     auto_merge_on_approve: bool = False
+    doc_updater_enabled: bool = False
+    testeur_enabled: bool = False
+    test_command: str | None = None
+    securite_enabled: bool = False
+    validateur_enabled: bool = False
 
 
 class AgentResult(BaseModel):
