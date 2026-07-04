@@ -2,7 +2,8 @@
 id: ticket-035
 title: "Agent testeur — exécution automatique des tests dans le pipeline"
 type: feat
-status: todo
+status: done
+pr_number: 46
 priority: medium
 agent: codeur
 depends_on:

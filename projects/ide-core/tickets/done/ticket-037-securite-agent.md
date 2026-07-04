@@ -2,7 +2,8 @@
 id: ticket-037
 title: "Agent sécurité — audit automatique des vulnérabilités OWASP"
 type: feat
-status: todo
+status: done
+pr_number: 48
 priority: medium
 agent: codeur
 depends_on:

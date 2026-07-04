@@ -41,6 +41,14 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 
 ### Phase 5 — Agents dynamiques + intégration GitHub : ✅ DONE (tickets 021–033)
 
+### Phase 6 — Pipeline enrichi + qualité : ✅ DONE (tickets 034–037)
+
+34. ✅ Agent doc-updater (mise à jour auto README/docs/CLAUDE.md après approbation)
+35. ✅ Agent testeur (exécution auto des tests dans le pipeline — pytest/npm/cargo)
+36. ✅ Agent validateur (vérification critère par critère des ACs)
+37. ✅ Agent sécurité (audit OWASP — BLOCK si CRITICAL/HIGH, sinon PASS)
+- Coverage tooling : pytest-cov backend (74%, seuil 70%) + vitest v8 frontend
+
 21. ✅ Registre d'agents dynamiques (AgentRegistryService)
 22. ✅ API CRUD agents (GET/POST/DELETE /api/v1/agents/registry)
 23. ✅ Agent conversationnel agent-creator (création agent via chat)

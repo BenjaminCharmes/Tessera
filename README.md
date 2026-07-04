@@ -5,7 +5,8 @@
 [![CI](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
-![Tests](https://img.shields.io/badge/tests-184%20frontend%20%2B%20365%20backend-brightgreen)
+![Tests](https://img.shields.io/badge/tests-184%20frontend%20%2B%20429%20backend-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-74%25%20backend-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Tauri](https://img.shields.io/badge/Tauri-v2-orange)
 
@@ -62,6 +63,16 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | Synchronisation bidirectionnelle tickets ↔ GitHub Issues | ✅ |
 | Intégration GitHub Pull Requests (création + statut CI) | ✅ |
 | Création automatique des agents manquants à la création de projet | ✅ |
+
+### Phase 6 — Pipeline enrichi + qualité ✅
+
+| Feature | Status |
+|---------|--------|
+| Agent doc-updater — mise à jour auto de la documentation post-pipeline | ✅ |
+| Agent testeur — exécution des tests dans le pipeline (pytest/npm/cargo) | ✅ |
+| Agent validateur — vérification critère par critère des ACs du ticket | ✅ |
+| Agent sécurité — audit OWASP automatique avant le reviewer | ✅ |
+| Coverage tooling — pytest-cov backend + v8 frontend (74% backend) | ✅ |
 
 ---
 
@@ -150,19 +161,23 @@ vibe-ide/
 │   │   │   ├── agent_runner.py     ← Appels Anthropic (streaming + complet)
 │   │   │   ├── agent_registry.py   ← Registre agents (lecture/écriture prompts)
 │   │   │   ├── agent_creator.py    ← Création agent via conversation
-│   │   │   ├── orchestrator.py     ← Pipeline codeur→reviewer
+│   │   │   ├── orchestrator.py     ← Pipeline enrichi (testeur→securite→reviewer→validateur→doc-updater)
 │   │   │   ├── ticket_service.py   ← CRUD tickets sur filesystem
 │   │   │   ├── project_loader.py   ← Chargement CLAUDE.md + agents.json
 │   │   │   ├── project_creator.py  ← Création projet + auto-agents
 │   │   │   ├── project_importer.py ← Import local (symlink/copy)
 │   │   │   ├── project_analyzer.py ← Génération CLAUDE.md depuis code
+│   │   │   ├── test_runner.py      ← Exécution tests (pytest/npm/cargo), timeout 120s
+│   │   │   ├── security_auditor.py ← Audit OWASP (BLOCK si CRITICAL/HIGH)
+│   │   │   ├── validator.py        ← Validation critères d'acceptation
+│   │   │   ├── doc_updater.py      ← Mise à jour docs post-approbation
 │   │   │   ├── planner.py          ← Description NL → batch de tickets
 │   │   │   ├── git_clone.py        ← Clone repo GitHub
 │   │   │   ├── github_service.py   ← Client httpx pour GitHub API
 │   │   │   └── sync_map.py         ← Correspondances ticket ↔ issue
 │   │   └── agents/
 │   │       └── github_sync.py      ← Sync bidirectionnelle tickets ↔ issues
-│   └── tests/                ← 365 tests (pytest + respx)
+│   └── tests/                ← 429 tests (pytest + respx) — couverture 74%
 │
 ├── agents/
 │   └── prompts/              ← System prompts de chaque agent (Markdown)
@@ -172,15 +187,18 @@ vibe-ide/
 │       ├── architect.md
 │       ├── project-creator.md
 │       ├── project-analyzer.md
-│       └── planificateur.md
+│       ├── planificateur.md
+│       ├── doc-updater.md
+│       ├── testeur.md
+│       ├── validateur.md
+│       └── securite.md
 │
 ├── projects/
 │   └── ide-core/             ← Projet bootstrap (l'IDE se construit lui-même)
 │       ├── CLAUDE.md
 │       ├── agents.json
 │       ├── tickets/
-│       │   ├── done/         ← 34 tickets terminés ✅ (Phases 1–5 complètes)
-│       │   └── todo/         ← 4 tickets phase 6 en attente
+│       │   └── done/         ← 38 tickets terminés ✅ (Phases 1–6 complètes)
 │       └── memory/
 │           └── decisions.md  ← ADRs documentés
 │
@@ -252,6 +270,7 @@ make tauri-dev     # Lance l'app desktop Tauri (nécessite make dev)
 make tauri-build   # Build production (.app distributable)
 make test          # Tests Python (pytest)
 make test-fast     # Tests Python rapides
+make test-coverage # Rapport de couverture backend + frontend
 make lint          # Type-check mypy
 make clean         # Supprime les caches
 ```

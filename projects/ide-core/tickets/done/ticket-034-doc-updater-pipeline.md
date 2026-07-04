@@ -2,7 +2,8 @@
 id: ticket-034
 title: "Agent doc-updater — mise à jour automatique de la documentation"
 type: feat
-status: todo
+status: done
+pr_number: 45
 priority: medium
 agent: codeur
 depends_on:

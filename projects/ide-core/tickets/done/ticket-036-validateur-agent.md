@@ -2,7 +2,8 @@
 id: ticket-036
 title: "Agent validateur — vérification des critères d'acceptation"
 type: feat
-status: todo
+status: done
+pr_number: 47
 priority: medium
 agent: codeur
 depends_on:
