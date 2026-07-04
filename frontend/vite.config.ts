@@ -19,8 +19,10 @@ export default defineConfig({
     exclude: ["**/node_modules/**", "**/e2e/**"],
     coverage: {
       provider: "v8",
-      include: ["src/lib/**", "src/hooks/**"],
-      thresholds: { lines: 80, branches: 70 },
+      include: ["src/lib/**", "src/hooks/**", "src/components/**"],
+      exclude: ["src/**/*.test.*", "src/test/**"],
+      thresholds: { lines: 70, branches: 60, functions: 70 },
+      reporter: ["text", "html", "lcov"],
     },
   },
 });

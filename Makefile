@@ -49,6 +49,12 @@ test:
 test-fast:
 	cd backend && uv run pytest -q
 
+test-coverage:
+	@echo "→ Backend coverage"
+	cd backend && uv run pytest -q -m "not integration" --cov=vibe_ide --cov-report=term-missing --cov-report=html:htmlcov
+	@echo "→ Frontend coverage"
+	cd frontend && npm run test:coverage
+
 lint:
 	cd backend && uv run mypy src/
 
