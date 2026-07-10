@@ -25,7 +25,7 @@ Avant toute action, lis `projects/ide-core/CLAUDE.md` pour le contexte technique
 
 ### Frontend (UI de l'IDE)
 - **TypeScript strict**
-- **React 18** avec hooks uniquement (pas de class components)
+- **React 19** avec hooks uniquement (pas de class components)
 - **Tailwind CSS v3**
 - **Monaco Editor** pour l'éditeur de code embarqué
 - **Vite** comme bundler
@@ -97,9 +97,12 @@ vibe-ide/
 
 ---
 
-## Ce qui N'existe pas encore (ne pas halluciner)
+## État actuel (Phases 1-6 terminées)
 
-- Pas de base de données configurée — SQLite sera initialisé par le ticket-003
-- Pas d'auth — hors scope pour l'instant
-- Pas de déploiement cloud — local only pour la v0
-- Le frontend n'existe pas encore — commencer par le backend
+- Backend, frontend et persistance SQLite sont en place et fonctionnels
+- Pipeline codeur → reviewer opérationnel, orchestration WebSocket, intégration GitHub
+  (issues/PRs/clone), registre d'agents dynamique, agents planificateur/testeur/validateur/
+  doc-updater/sécurité — voir le tableau de fonctionnalités dans `README.md` pour le détail
+- Tous les tickets de `projects/ide-core/` sont dans `tickets/done/` (aucun `todo/` ni
+  `in-progress/` en cours) : le scope initial est complet, les prochains tickets sont à définir
+- Toujours pas d'auth et pas de déploiement cloud — hors scope pour l'instant
