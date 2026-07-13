@@ -14,6 +14,7 @@ import type {
   PipelineRun,
   PlanResult,
   Project,
+  ProjectUsage,
   Ticket,
   TicketBatchResponse,
   TicketCreate,
@@ -90,6 +91,10 @@ export const api = {
   runs: {
     list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>
       request(`/projects/${projectId}/runs?limit=${limit}`),
+  },
+  usage: {
+    get: (projectId: string): Promise<ProjectUsage> =>
+      request(`/projects/${projectId}/usage`),
   },
   github: {
     createPr: (

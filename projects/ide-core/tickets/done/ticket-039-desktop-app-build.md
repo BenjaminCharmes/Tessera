@@ -2,7 +2,7 @@
 id: ticket-039
 title: "Packaging desktop — build Tauri utilisable au quotidien"
 type: chore
-status: done
+status: todo
 pr_number: null
 priority: low
 agent: codeur

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useActiveProject } from "./hooks/useActiveProject";
 import { useTickets } from "./hooks/useTickets";
 import { useRuns } from "./hooks/useRuns";
+import { useUsage } from "./hooks/useUsage";
 import { useToast } from "./hooks/useToast";
 import { useOrchestratorStream } from "./hooks/useOrchestratorStream";
 import Sidebar, { IconBar } from "./components/Sidebar";
@@ -28,6 +29,7 @@ export default function App() {
     stream.events,
   );
   const runs = useRuns(project?.id ?? null);
+  const usageData = useUsage(project?.id ?? null);
 
   // Refresh run history and show toast when a pipeline completes
   const prevLastResult = useRef(stream.lastResult);
@@ -35,6 +37,7 @@ export default function App() {
     if (stream.lastResult && stream.lastResult !== prevLastResult.current) {
       prevLastResult.current = stream.lastResult;
       runs.refresh();
+      usageData.refresh();
       if (stream.lastResult.approved) {
         addToast(
           `${stream.lastResult.ticket_id} approuvé en ${stream.lastResult.rounds} tour${stream.lastResult.rounds > 1 ? "s" : ""}`,
@@ -130,6 +133,10 @@ export default function App() {
             runs={runs.runs}
             runsLoading={runs.loading}
             runsError={runs.error}
+            usage={usageData.usage}
+            usageLoading={usageData.loading}
+            usageError={usageData.error}
+            onRefreshUsage={usageData.refresh}
             running={running}
             runningRound={stream.currentRound}
             showKanban={showKanban}

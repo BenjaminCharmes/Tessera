@@ -2,14 +2,17 @@ import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
 import RunHistory from "./RunHistory";
 import AgentList from "./AgentList";
+import UsageDashboard from "./UsageDashboard";
 import type {
   PipelineRun,
   Project,
+  ProjectUsage,
   Ticket,
   TicketStatus,
 } from "../../types/api";
 
-export type SidebarPanel = "projects" | "tickets" | "history" | "agents";
+export type SidebarPanel =
+  "projects" | "tickets" | "history" | "agents" | "usage";
 
 interface IconBarProps {
   activePanel: SidebarPanel;
@@ -63,6 +66,17 @@ export function IconBar({ activePanel, onChangePanel }: IconBarProps) {
       >
         ⚙
       </button>
+      <button
+        onClick={() => onChangePanel("usage")}
+        title="Usage & Coût"
+        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
+          activePanel === "usage"
+            ? "bg-zinc-700 text-white"
+            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
+        }`}
+      >
+        $
+      </button>
     </div>
   );
 }
@@ -77,6 +91,10 @@ interface SidebarProps {
   runs: PipelineRun[];
   runsLoading: boolean;
   runsError: string | null;
+  usage: ProjectUsage | null;
+  usageLoading: boolean;
+  usageError: string | null;
+  onRefreshUsage: () => void;
   running: Set<string>;
   runningRound?: number;
   showKanban: boolean;
@@ -101,6 +119,10 @@ export default function Sidebar({
   runs,
   runsLoading,
   runsError,
+  usage,
+  usageLoading,
+  usageError,
+  onRefreshUsage,
   running,
   runningRound,
   showKanban,
@@ -150,6 +172,14 @@ export default function Sidebar({
       )}
       {panel === "agents" && (
         <AgentList onAgentCreated={onAgentCreated ?? (() => {})} />
+      )}
+      {panel === "usage" && (
+        <UsageDashboard
+          usage={usage}
+          loading={usageLoading}
+          error={usageError}
+          onRefresh={onRefreshUsage}
+        />
       )}
     </div>
   );
