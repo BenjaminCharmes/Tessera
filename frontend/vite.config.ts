@@ -21,7 +21,7 @@ export default defineConfig({
       provider: "v8",
       include: ["src/lib/**", "src/hooks/**", "src/components/**"],
       exclude: ["src/**/*.test.*", "src/test/**"],
-      thresholds: { lines: 60, branches: 50, functions: 50 },
+      thresholds: { lines: 78, branches: 65, functions: 70 },
       reporter: ["text", "html", "lcov"],
     },
   },
