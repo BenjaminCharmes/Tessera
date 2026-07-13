@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     github_token: str = ""
     github_repo: str = ""  # format "owner/repo"
     ide_db_path: Path = Path("vibe_ide.db")
+    static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
 
 
 settings = Settings()  # type: ignore[call-arg]

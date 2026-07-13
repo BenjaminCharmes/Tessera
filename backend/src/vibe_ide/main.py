@@ -1,8 +1,13 @@
+from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 from vibe_ide.config import settings
 from vibe_ide.routers import agent_admin, agents, orchestrator, projects, tickets
@@ -15,6 +20,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
 
 
+class StaticTokenMiddleware(BaseHTTPMiddleware):
+    """Verifies Authorization: Bearer <token> when STATIC_TOKEN is configured."""
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
+        if request.url.path == "/health":
+            return await call_next(request)
+        auth = request.headers.get("Authorization", "")
+        if auth != f"Bearer {settings.static_token}":
+            return JSONResponse({"detail": "Unauthorized"}, status_code=401)
+        return await call_next(request)
+
+
 app = FastAPI(title="vibe-ide", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
@@ -24,6 +45,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if settings.static_token:
+    app.add_middleware(StaticTokenMiddleware)
 
 app.include_router(projects.router, prefix="/api/v1")
 app.include_router(tickets.router, prefix="/api/v1/projects")

@@ -5,8 +5,8 @@
 [![CI](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
-![Tests](https://img.shields.io/badge/tests-184%20frontend%20%2B%20429%20backend-brightgreen)
-![Coverage](https://img.shields.io/badge/coverage-74%25%20backend-green)
+![Tests](https://img.shields.io/badge/tests-260%20frontend%20%2B%20416%20backend-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-74%25%20backend%20%7C%2080%25%20frontend-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Tauri](https://img.shields.io/badge/Tauri-v2-orange)
 
@@ -77,6 +77,41 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 ---
 
 ## Démarrage rapide
+
+### Lancement via Docker (recommandé)
+
+Seul prérequis : [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+git clone https://github.com/BenjaminCharmes/vibe_ide.git
+cd vibe_ide
+
+# 1. Crée le fichier .env avec ta clef API
+cp .env.example .env
+# Édite .env et renseigne ANTHROPIC_API_KEY=sk-ant-...
+
+# 2. Lance tout en une commande
+docker compose up --build
+```
+
+- **Frontend** : http://localhost:5173
+- **Backend API** : http://localhost:8000/docs
+
+Les données persistentes (workspace + SQLite) survivent à `docker compose down` via le volume nommé `vibe-data` et le bind-mount `./projects/`.
+
+**Protection optionnelle par token** : ajoute `STATIC_TOKEN=mon-secret` dans `.env` pour exiger `Authorization: Bearer mon-secret` sur tous les appels API (utile si l'IDE est exposé sur un serveur distant).
+
+```bash
+# Arrêter
+docker compose down
+
+# Arrêter et supprimer les volumes (RESET total)
+docker compose down -v
+```
+
+---
+
+### Lancement local (développement)
 
 ### Prérequis
 
