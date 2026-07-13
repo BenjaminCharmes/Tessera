@@ -1,12 +1,15 @@
 import re
 import time
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 
 from anthropic import AsyncAnthropic
 
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketStatus
 from vibe_ide.services.agent_registry import AgentNotFoundError, AgentRegistryService
+from vibe_ide.services.cost_calculator import calculate_cost
+from vibe_ide.services.database import save_agent_call
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -35,9 +38,15 @@ _INSTRUCTIONS: dict[str, str] = {
 
 
 class AgentRunner:
-    def __init__(self, client: AsyncAnthropic, registry: AgentRegistryService) -> None:
+    def __init__(
+        self,
+        client: AsyncAnthropic,
+        registry: AgentRegistryService,
+        db_path: Path | str | None = None,
+    ) -> None:
         self._client = client
         self._registry = registry
+        self._db_path = db_path
 
     async def run(
         self,
@@ -46,6 +55,7 @@ class AgentRunner:
         project_context: str,
         agent_config: AgentConfig | None = None,
         stream_callback: Callable[[str], Awaitable[None]] | None = None,
+        run_id: str | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
@@ -66,17 +76,39 @@ class AgentRunner:
 
         duration_ms = int((time.monotonic() - t0) * 1000)
 
+        input_tokens = getattr(usage, "input_tokens", 0)
+        output_tokens = getattr(usage, "output_tokens", 0)
+        cache_read_tokens = getattr(usage, "cache_read_input_tokens", 0)
+
         _logger.info(
             "agent_call",
             extra={
                 "role": role_str,
                 "ticket_id": ticket.id,
-                "input_tokens": getattr(usage, "input_tokens", 0),
-                "output_tokens": getattr(usage, "output_tokens", 0),
-                "cache_read_tokens": getattr(usage, "cache_read_input_tokens", 0),
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "cache_read_tokens": cache_read_tokens,
                 "duration_ms": duration_ms,
             },
         )
+
+        if run_id and self._db_path:
+            cost_usd = calculate_cost(model, input_tokens, output_tokens, cache_read_tokens)
+            try:
+                await save_agent_call(
+                    self._db_path,
+                    run_id,
+                    ticket.id,
+                    role_str,
+                    model,
+                    input_tokens,
+                    output_tokens,
+                    cache_read_tokens,
+                    cost_usd,
+                    duration_ms,
+                )
+            except Exception as exc:
+                _logger.warning("agent_call_save_failed", extra={"error": str(exc)})
 
         return AgentResult(
             role=role_str,

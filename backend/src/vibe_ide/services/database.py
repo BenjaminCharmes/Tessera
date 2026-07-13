@@ -29,6 +29,20 @@ CREATE TABLE IF NOT EXISTS agent_events (
     data_json  TEXT,
     ts         TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS agent_calls (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id            TEXT NOT NULL REFERENCES pipeline_runs(id),
+    ticket_id         TEXT NOT NULL,
+    role              TEXT NOT NULL,
+    model             TEXT NOT NULL,
+    input_tokens      INTEGER NOT NULL DEFAULT 0,
+    output_tokens     INTEGER NOT NULL DEFAULT 0,
+    cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+    cost_usd          REAL NOT NULL DEFAULT 0.0,
+    duration_ms       INTEGER NOT NULL DEFAULT 0,
+    created_at        TEXT NOT NULL
+);
 """
 
 
@@ -40,6 +54,23 @@ class PipelineRunSummary(BaseModel):
     rounds: int | None = None
     approved: bool | None = None
     final_status: str | None = None
+    total_cost_usd: float = 0.0
+
+
+class TicketUsage(BaseModel):
+    ticket_id: str
+    total_cost_usd: float
+    input_tokens: int
+    output_tokens: int
+    cache_read_tokens: int
+    call_count: int
+
+
+class ProjectUsage(BaseModel):
+    total_cost_usd: float
+    total_tokens: int
+    total_runs: int
+    per_ticket: list[TicketUsage]
 
 
 async def init_db(db_path: Path | str) -> None:
@@ -95,6 +126,31 @@ async def save_event(
         await db.commit()
 
 
+async def save_agent_call(
+    db_path: Path | str,
+    run_id: str,
+    ticket_id: str,
+    role: str,
+    model: str,
+    input_tokens: int,
+    output_tokens: int,
+    cache_read_tokens: int,
+    cost_usd: float,
+    duration_ms: int,
+) -> None:
+    created_at = datetime.now(timezone.utc).isoformat()
+    async with aiosqlite.connect(str(db_path)) as db:
+        await db.execute(
+            """INSERT INTO agent_calls
+               (run_id, ticket_id, role, model, input_tokens, output_tokens,
+                cache_read_tokens, cost_usd, duration_ms, created_at)
+               VALUES (?,?,?,?,?,?,?,?,?,?)""",
+            (run_id, ticket_id, role, model, input_tokens, output_tokens,
+             cache_read_tokens, cost_usd, duration_ms, created_at),
+        )
+        await db.commit()
+
+
 async def list_runs(
     db_path: Path | str,
     project_id: str,
@@ -103,10 +159,14 @@ async def list_runs(
     async with aiosqlite.connect(str(db_path)) as db:
         db.row_factory = aiosqlite.Row
         async with db.execute(
-            """SELECT id, ticket_id, started_at, finished_at, rounds, approved, final_status
-               FROM pipeline_runs
-               WHERE project_id=?
-               ORDER BY started_at DESC
+            """SELECT pr.id, pr.ticket_id, pr.started_at, pr.finished_at,
+                      pr.rounds, pr.approved, pr.final_status,
+                      COALESCE(SUM(ac.cost_usd), 0.0) as total_cost_usd
+               FROM pipeline_runs pr
+               LEFT JOIN agent_calls ac ON ac.run_id = pr.id
+               WHERE pr.project_id=?
+               GROUP BY pr.id
+               ORDER BY pr.started_at DESC
                LIMIT ?""",
             (project_id, limit),
         ) as cursor:
@@ -120,6 +180,62 @@ async def list_runs(
             "rounds": row["rounds"],
             "approved": bool(row["approved"]) if row["approved"] is not None else None,
             "final_status": row["final_status"],
+            "total_cost_usd": float(row["total_cost_usd"]),
         }
         for row in rows
     ]
+
+
+async def get_project_usage(
+    db_path: Path | str,
+    project_id: str,
+) -> dict[str, Any]:
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+
+        async with db.execute(
+            """SELECT COUNT(DISTINCT pr.id) as total_runs,
+                      COALESCE(SUM(ac.cost_usd), 0.0) as total_cost_usd,
+                      COALESCE(SUM(ac.input_tokens + ac.output_tokens + ac.cache_read_tokens), 0) as total_tokens
+               FROM pipeline_runs pr
+               LEFT JOIN agent_calls ac ON ac.run_id = pr.id
+               WHERE pr.project_id=?""",
+            (project_id,),
+        ) as cursor:
+            summary = await cursor.fetchone()
+
+        async with db.execute(
+            """SELECT ac.ticket_id,
+                      COALESCE(SUM(ac.cost_usd), 0.0) as total_cost_usd,
+                      COALESCE(SUM(ac.input_tokens), 0) as input_tokens,
+                      COALESCE(SUM(ac.output_tokens), 0) as output_tokens,
+                      COALESCE(SUM(ac.cache_read_tokens), 0) as cache_read_tokens,
+                      COUNT(*) as call_count
+               FROM agent_calls ac
+               JOIN pipeline_runs pr ON ac.run_id = pr.id
+               WHERE pr.project_id=?
+               GROUP BY ac.ticket_id
+               ORDER BY total_cost_usd DESC""",
+            (project_id,),
+        ) as cursor:
+            ticket_rows = await cursor.fetchall()
+
+    total_cost_usd = float(summary["total_cost_usd"]) if summary else 0.0
+    total_tokens = int(summary["total_tokens"]) if summary else 0
+    total_runs = int(summary["total_runs"]) if summary else 0
+    return {
+        "total_cost_usd": total_cost_usd,
+        "total_tokens": total_tokens,
+        "total_runs": total_runs,
+        "per_ticket": [
+            {
+                "ticket_id": row["ticket_id"],
+                "total_cost_usd": float(row["total_cost_usd"]),
+                "input_tokens": int(row["input_tokens"]),
+                "output_tokens": int(row["output_tokens"]),
+                "cache_read_tokens": int(row["cache_read_tokens"]),
+                "call_count": int(row["call_count"]),
+            }
+            for row in ticket_rows
+        ],
+    }

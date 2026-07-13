@@ -20,7 +20,7 @@ from vibe_ide.models.project import (
     ProjectImportResponse,
 )
 from vibe_ide.models.ticket import TicketStatus
-from vibe_ide.services.database import PipelineRunSummary, list_runs
+from vibe_ide.services.database import PipelineRunSummary, ProjectUsage, get_project_usage, list_runs
 from vibe_ide.agents.github_sync import GithubSyncAgent
 from vibe_ide.services.git_clone import CloneError, GitCloneService
 from vibe_ide.services.github_service import GitHubService
@@ -97,6 +97,12 @@ async def clone_project(body: CloneProjectRequest) -> CloneProjectResponse:
 
 
 # Note : les routes avec sous-chemin spécifique doivent être avant /{project_id}
+@router.get("/{project_id}/usage", response_model=ProjectUsage)
+async def get_usage(project_id: str) -> ProjectUsage:
+    data = await get_project_usage(settings.ide_db_path, project_id)
+    return ProjectUsage(**data)
+
+
 @router.get("/{project_id}/runs", response_model=list[PipelineRunSummary])
 async def list_project_runs(
     project_id: str,

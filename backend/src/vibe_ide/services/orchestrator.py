@@ -124,6 +124,7 @@ class Orchestrator:
         project_id: str,
         ticket_id: str,
         on_event: EventCallback,
+        run_id: str | None = None,
     ) -> PipelineResult:
         ticket = await self._ticket_svc.get_ticket(ticket_id)
         if ticket is None:
@@ -182,6 +183,7 @@ class Orchestrator:
                 project_context=context,
                 agent_config=codeur_cfg,
                 stream_callback=_emit_token,
+                run_id=run_id,
             )
             await on_event(
                 OrchestratorEvent(
@@ -333,6 +335,7 @@ class Orchestrator:
                 ticket=ticket,
                 project_context=review_context,
                 agent_config=reviewer_cfg,
+                run_id=run_id,
             )
             await on_event(
                 OrchestratorEvent(

@@ -1,10 +1,5 @@
 export type TicketStatus =
-  | "todo"
-  | "in-progress"
-  | "in-review"
-  | "done"
-  | "blocked"
-  | "cancelled";
+  "todo" | "in-progress" | "in-review" | "done" | "blocked" | "cancelled";
 
 export type TicketType = "feat" | "fix" | "chore" | "design" | "docs";
 export type TicketPriority = "critical" | "high" | "medium" | "low";
@@ -93,6 +88,23 @@ export interface PipelineRun {
   rounds: number | null;
   approved: boolean | null;
   final_status: string | null;
+  total_cost_usd: number;
+}
+
+export interface TicketUsage {
+  ticket_id: string;
+  total_cost_usd: number;
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_tokens: number;
+  call_count: number;
+}
+
+export interface ProjectUsage {
+  total_cost_usd: number;
+  total_tokens: number;
+  total_runs: number;
+  per_ticket: TicketUsage[];
 }
 
 export interface AgentInfo {

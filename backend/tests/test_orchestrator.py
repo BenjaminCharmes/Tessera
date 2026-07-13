@@ -420,6 +420,7 @@ async def test_run_pipeline_feedback_included_in_second_round_context(tmp_path: 
         project_context: str,
         agent_config: AgentConfig | None = None,
         stream_callback: object = None,
+        run_id: str | None = None,
     ) -> AgentResult:
         if role == AgentRole.codeur:
             captured_contexts.append(project_context)

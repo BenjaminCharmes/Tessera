@@ -5,6 +5,7 @@ from anthropic import AsyncAnthropic
 
 from vibe_ide.config import settings
 from vibe_ide.models.ticket import TicketStatus
+from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.doc_updater import DocUpdaterService
@@ -41,7 +42,8 @@ class RunAutonomousRequest(BaseModel):
 
 async def _build_orchestrator(project_id: str) -> Orchestrator:
     client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    runner = AgentRunner(client, settings.ide_prompts_dir)
+    registry = AgentRegistryService(settings.ide_prompts_dir)
+    runner = AgentRunner(client, registry, db_path=settings.ide_db_path)
 
     loader = ProjectLoader(settings.ide_workspace_dir)
     try:
@@ -124,7 +126,7 @@ async def run_pipeline(request: RunRequest) -> PipelineResult:
 
     try:
         result = await orchestrator.run_pipeline(
-            request.project_id, request.ticket_id, on_event
+            request.project_id, request.ticket_id, on_event, run_id=run_id
         )
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -176,7 +178,7 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
                 )
 
             try:
-                result = await orchestrator.run_pipeline(project_id, ticket_id, send_event)
+                result = await orchestrator.run_pipeline(project_id, ticket_id, send_event, run_id=run_id)
                 await finish_run(
                     settings.ide_db_path,
                     run_id,

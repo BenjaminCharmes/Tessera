@@ -6,8 +6,10 @@ import aiosqlite
 from vibe_ide.services.database import (
     create_run,
     finish_run,
+    get_project_usage,
     init_db,
     list_runs,
+    save_agent_call,
     save_event,
 )
 
@@ -119,3 +121,99 @@ async def test_save_event_persists(db_path: Path) -> None:
     assert len(rows) == 1
     assert rows[0][0] == "agent_started"
     assert rows[0][1] == "codeur"
+
+
+async def test_init_db_creates_agent_calls_table(db_path: Path) -> None:
+    await init_db(db_path)
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ) as cursor:
+            tables = {row[0] for row in await cursor.fetchall()}
+
+    assert "agent_calls" in tables
+
+
+async def test_save_agent_call_persists(db_path: Path) -> None:
+    await init_db(db_path)
+
+    run_id = await create_run(db_path, "project-1", "ticket-001")
+    await save_agent_call(
+        db_path,
+        run_id=run_id,
+        ticket_id="ticket-001",
+        role="codeur",
+        model="claude-sonnet-4-6",
+        input_tokens=1000,
+        output_tokens=500,
+        cache_read_tokens=200,
+        cost_usd=0.003,
+        duration_ms=1500,
+    )
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT role, model, input_tokens, output_tokens, cost_usd FROM agent_calls WHERE run_id=?",
+            (run_id,),
+        ) as cursor:
+            rows = await cursor.fetchall()
+
+    assert len(rows) == 1
+    assert rows[0][0] == "codeur"
+    assert rows[0][1] == "claude-sonnet-4-6"
+    assert rows[0][2] == 1000
+    assert rows[0][4] == pytest.approx(0.003)
+
+
+async def test_list_runs_includes_total_cost(db_path: Path) -> None:
+    await init_db(db_path)
+
+    run_id = await create_run(db_path, "project-1", "ticket-001")
+    await finish_run(db_path, run_id, rounds=1, approved=True, final_status="done")
+    await save_agent_call(
+        db_path, run_id, "ticket-001", "codeur", "claude-sonnet-4-6",
+        1000, 500, 0, 0.01, 1000,
+    )
+    await save_agent_call(
+        db_path, run_id, "ticket-001", "reviewer", "claude-sonnet-4-6",
+        800, 300, 0, 0.005, 800,
+    )
+
+    runs = await list_runs(db_path, "project-1")
+    assert len(runs) == 1
+    assert runs[0]["total_cost_usd"] == pytest.approx(0.015)
+
+
+async def test_get_project_usage_empty(db_path: Path) -> None:
+    await init_db(db_path)
+    usage = await get_project_usage(db_path, "project-empty")
+    assert usage["total_cost_usd"] == 0.0
+    assert usage["total_tokens"] == 0
+    assert usage["total_runs"] == 0
+    assert usage["per_ticket"] == []
+
+
+async def test_get_project_usage_aggregates(db_path: Path) -> None:
+    await init_db(db_path)
+
+    run_id = await create_run(db_path, "project-1", "ticket-001")
+    await save_agent_call(
+        db_path, run_id, "ticket-001", "codeur", "claude-sonnet-4-6",
+        1000, 500, 200, 0.01, 1000,
+    )
+    run_id2 = await create_run(db_path, "project-1", "ticket-002")
+    await save_agent_call(
+        db_path, run_id2, "ticket-002", "codeur", "claude-haiku-4-5",
+        2000, 1000, 0, 0.005, 800,
+    )
+
+    usage = await get_project_usage(db_path, "project-1")
+
+    assert usage["total_runs"] == 2
+    assert usage["total_cost_usd"] == pytest.approx(0.015)
+    assert usage["total_tokens"] == 1000 + 500 + 200 + 2000 + 1000
+    assert len(usage["per_ticket"]) == 2
+    # sorted by cost desc
+    assert usage["per_ticket"][0]["ticket_id"] == "ticket-001"
+    assert usage["per_ticket"][0]["total_cost_usd"] == pytest.approx(0.01)

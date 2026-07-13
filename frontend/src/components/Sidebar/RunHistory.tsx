@@ -91,6 +91,14 @@ function RunRow({ run, onSelectTicket }: RunRowProps) {
               {run.approved ? "Oui" : "Non"}
             </div>
           )}
+          {run.total_cost_usd > 0 && (
+            <div className="text-[10px] text-zinc-500">
+              <span className="text-zinc-400">Coût :</span>{" "}
+              <span className="text-amber-400 font-mono">
+                ${run.total_cost_usd.toFixed(4)}
+              </span>
+            </div>
+          )}
           {onSelectTicket && (
             <button
               onClick={(e) => {
