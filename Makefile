@@ -1,4 +1,4 @@
-.PHONY: help setup dev dev-frontend tauri-dev tauri-build test lint clean
+.PHONY: help setup dev dev-frontend tauri-dev tauri-build run test lint clean
 
 # ─────────────────────────────────────────────────────────────────────────────
 # vibe-ide — Makefile
@@ -7,10 +7,11 @@
 help:
 	@echo ""
 	@echo "  make setup        — Initialise l'environnement (copie .env.example, installe deps)"
-	@echo "  make dev          — Lance le serveur FastAPI en mode reload (port 8000)"
-	@echo "  make dev-frontend — Lance Vite en mode dev (port 5173)"
+	@echo "  make run          — Lance backend + frontend en parallèle (Ctrl+C pour tout arrêter)"
+	@echo "  make dev          — Lance uniquement le serveur FastAPI en mode reload (port 8000)"
+	@echo "  make dev-frontend — Lance uniquement Vite en mode dev (port 5173)"
 	@echo "  make tauri-dev    — Lance l'app Tauri (desktop) — nécessite 'make dev' dans un autre terminal"
-	@echo "  make tauri-build  — Bundle de production Tauri"
+	@echo "  make tauri-build  — Bundle de production Tauri (backend auto-démarré par l'app)"
 	@echo "  make test         — Lance la suite de tests"
 	@echo "  make lint         — Type-check avec mypy"
 	@echo "  make clean        — Supprime les artefacts de build et cache"
@@ -21,6 +22,14 @@ setup:
 	@echo "→ .env créé. Ouvre-le et ajoute ta ANTHROPIC_API_KEY."
 	cd backend && uv sync --extra dev
 	cd frontend && npm install
+
+run:
+	@echo "→ Lancement vibe-ide : backend (port 8000) + frontend (port 5173)"
+	@echo "→ Ctrl+C pour arrêter les deux processus"
+	@trap 'kill 0' SIGINT SIGTERM; \
+	 (cd backend && uv run uvicorn vibe_ide.main:app --reload --host 0.0.0.0 --port 8000 --env-file ../.env) & \
+	 (cd frontend && npm run dev) & \
+	 wait
 
 dev:
 	@echo "→ Serveur démarré sur http://localhost:8000"

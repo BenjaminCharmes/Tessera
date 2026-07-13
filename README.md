@@ -97,12 +97,36 @@ make setup
 # 2. Ouvre .env et colle ta clef API
 #    ANTHROPIC_API_KEY=sk-ant-...
 
-# 3. Lance le serveur
-make dev
+# 3. Lance backend + frontend en un seul terminal
+make run
 ```
 
-Le serveur démarre sur **http://localhost:8000**.
+Le backend démarre sur **http://localhost:8000** et le frontend sur **http://localhost:5173**.
 La documentation interactive (Swagger) est disponible sur **http://localhost:8000/docs**.
+
+> **Développement avancé** : `make dev` lance uniquement le backend, `make dev-frontend` lance uniquement le frontend.
+
+### Lancement desktop (app Tauri)
+
+#### Mode dev
+
+```bash
+make dev          # terminal 1 — backend FastAPI sur :8000
+make tauri-dev    # terminal 2 — app desktop avec hot-reload frontend
+```
+
+#### Build de production (app packagée)
+
+```bash
+make tauri-build
+```
+
+Le bundle produit se trouve dans `frontend/src-tauri/target/release/bundle/` :
+- **macOS** : `macos/vibe-ide.app` (double-clic pour lancer)
+
+Le bundle **démarre automatiquement le backend** au lancement de l'app — aucun terminal supplémentaire requis.  
+Prérequis : `uv` doit être dans le `PATH` de l'environnement qui exécute l'app.  
+Le backend se coupe automatiquement à la fermeture de la fenêtre.
 
 ### Tester l'API manuellement
 
