@@ -2,8 +2,6 @@
 import time
 from pathlib import Path
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.models.project import (
     ConversationMessage,
     CreateProjectResponse,
@@ -12,6 +10,8 @@ from vibe_ide.models.project import (
 from vibe_ide.models.ticket import TicketDraft, TicketPriority, TicketType
 from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.project_loader import ProjectLoader
+from vibe_ide.services.providers.base import LLMProvider
+from vibe_ide.utils.conversation import format_conversation
 from vibe_ide.utils.json_extract import extract_json
 from vibe_ide.utils.logger import get_logger
 
@@ -25,9 +25,9 @@ _BOOTSTRAP_MAX_TOKENS = 1024
 
 class ProjectCreatorService:
     def __init__(
-        self, client: AsyncAnthropic, prompts_dir: Path, workspace_dir: Path
+        self, provider: LLMProvider, prompts_dir: Path, workspace_dir: Path
     ) -> None:
-        self._client = client
+        self._provider = provider
         self._prompts_dir = prompts_dir
         self._workspace_dir = workspace_dir
         self._registry = AgentRegistryService(prompts_dir)
@@ -39,28 +39,20 @@ class ProjectCreatorService:
         system_prompt = self._load_system_prompt()
         messages = [{"role": m.role, "content": m.content} for m in conversation]
 
-        response = await self._client.messages.create(
+        result = await self._provider.complete(
+            system=system_prompt,
+            user=format_conversation(messages),
             model=_DEFAULT_MODEL,
             max_tokens=_DEFAULT_MAX_TOKENS,
-            system=[
-                {
-                    "type": "text",
-                    "text": system_prompt,
-                    "cache_control": {"type": "ephemeral"},
-                }
-            ],
-            messages=messages,
         )
 
-        content = "".join(
-            block.text for block in response.content if hasattr(block, "text")
-        )
+        content = result.content
 
         _logger.info(
             "project_creator_call",
             extra={
-                "input_tokens": getattr(response.usage, "input_tokens", 0),
-                "output_tokens": getattr(response.usage, "output_tokens", 0),
+                "input_tokens": result.input_tokens,
+                "output_tokens": result.output_tokens,
                 "duration_ms": int((time.monotonic() - t0) * 1000),
             },
         )
@@ -134,14 +126,13 @@ class ProjectCreatorService:
             f"Description du projet : {project_description}\n"
             "Réponds uniquement avec le system prompt (minimum 50 mots), sans JSON ni balises."
         )
-        response = await self._client.messages.create(
+        result = await self._provider.complete(
+            system="",
+            user=prompt,
             model=_BOOTSTRAP_MODEL,
             max_tokens=_BOOTSTRAP_MAX_TOKENS,
-            messages=[{"role": "user", "content": prompt}],
         )
-        return "".join(
-            block.text for block in response.content if hasattr(block, "text")
-        )
+        return result.content
 
     def _load_system_prompt(self) -> str:
         prompt_file = self._prompts_dir / "project-creator.md"

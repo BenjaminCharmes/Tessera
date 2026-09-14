@@ -2,7 +2,7 @@ from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -31,6 +31,7 @@ _PRIORITY_ORDER: dict[TicketPriority, int] = {
 class EventType(str, Enum):
     AGENT_STARTED = "agent_started"
     AGENT_TOKEN = "agent_token"
+    AGENT_TOOL_USE = "agent_tool_use"
     AGENT_DONE = "agent_done"
     TICKET_STATUS_CHANGED = "ticket_status_changed"
     PIPELINE_DONE = "pipeline_done"
@@ -177,12 +178,23 @@ class Orchestrator:
                     )
                 )
 
+            async def _emit_tool(name: str, payload: dict[str, Any], tid: str = ticket_id) -> None:
+                await on_event(
+                    OrchestratorEvent(
+                        type=EventType.AGENT_TOOL_USE,
+                        agent=AgentRole.codeur,
+                        ticket_id=tid,
+                        data={"tool": name, "input": payload},
+                    )
+                )
+
             codeur_result = await self._runner.run(
                 role=AgentRole.codeur,
                 ticket=ticket,
                 project_context=context,
                 agent_config=codeur_cfg,
                 stream_callback=_emit_token,
+                tool_callback=_emit_tool,
                 run_id=run_id,
             )
             await on_event(

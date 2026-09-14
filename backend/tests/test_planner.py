@@ -1,10 +1,10 @@
-"""Tests TDD pour PlannerService — ticket-028."""
+"""TDD tests for PlannerService — ticket-028."""
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from tests.test_providers_base import FakeProvider
 from vibe_ide.models.project import PlanResult
 from vibe_ide.models.ticket import TicketDraftPlan
 from vibe_ide.services.planner import PlannerService
@@ -41,15 +41,6 @@ _VALID_RESPONSE = json.dumps(
 )
 
 
-def _make_mock_client(response_text: str) -> MagicMock:
-    mock = MagicMock()
-    mock_resp = MagicMock()
-    mock_resp.content = [MagicMock(text=response_text)]
-    mock_resp.usage = MagicMock(input_tokens=100, output_tokens=200)
-    mock.messages.create = AsyncMock(return_value=mock_resp)
-    return mock
-
-
 def _make_service(tmp_path: Path, response_text: str) -> PlannerService:
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
@@ -59,14 +50,14 @@ def _make_service(tmp_path: Path, response_text: str) -> PlannerService:
     workspace_dir = tmp_path / "workspace"
     workspace_dir.mkdir()
     return PlannerService(
-        client=_make_mock_client(response_text),
+        provider=FakeProvider(content=response_text),
         prompts_dir=prompts_dir,
         workspace_dir=workspace_dir,
     )
 
 
 def _make_service_with_project(tmp_path: Path, response_text: str) -> tuple[PlannerService, str]:
-    """Retourne (service, project_id) avec un projet qui a un CLAUDE.md."""
+    """Returns (service, project_id) for a project that has a CLAUDE.md."""
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     (prompts_dir / "planificateur.md").write_text(
@@ -81,7 +72,7 @@ def _make_service_with_project(tmp_path: Path, response_text: str) -> tuple[Plan
         "# My Project\n\n## Stack\n- Python, FastAPI\n", encoding="utf-8"
     )
     svc = PlannerService(
-        client=_make_mock_client(response_text),
+        provider=FakeProvider(content=response_text),
         prompts_dir=prompts_dir,
         workspace_dir=workspace_dir,
     )
@@ -143,16 +134,14 @@ async def test_plan_first_draft_has_no_dependency(tmp_path: Path) -> None:
 async def test_plan_includes_claude_md_in_user_message(tmp_path: Path) -> None:
     svc, project_id = _make_service_with_project(tmp_path, _VALID_RESPONSE)
     await svc.plan(project_id, "Ajouter OAuth Google")
-    kwargs = svc._client.messages.create.call_args.kwargs
-    user_content = kwargs["messages"][0]["content"]
+    user_content = svc._provider.calls[0]["user"]
     assert "Python, FastAPI" in user_content
 
 
 async def test_plan_includes_description_in_user_message(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_RESPONSE)
     await svc.plan("proj", "Ajouter OAuth Google")
-    kwargs = svc._client.messages.create.call_args.kwargs
-    user_content = kwargs["messages"][0]["content"]
+    user_content = svc._provider.calls[0]["user"]
     assert "Ajouter OAuth Google" in user_content
 
 
@@ -170,15 +159,13 @@ async def test_plan_works_without_claude_md(tmp_path: Path) -> None:
 async def test_plan_calls_anthropic_with_system_prompt(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_RESPONSE)
     await svc.plan("proj", "Ajouter OAuth Google")
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert "Tu es un expert en découpage de features." in kwargs["system"]
+    assert "Tu es un expert en découpage de features." in svc._provider.calls[0]["system"]
 
 
 async def test_plan_calls_anthropic_with_user_role(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_RESPONSE)
     await svc.plan("proj", "Ajouter OAuth Google")
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert kwargs["messages"][0]["role"] == "user"
+    assert svc._provider.calls[0]["mode"] == "complete"
 
 
 # ------------------------------------------------------------------
@@ -192,7 +179,7 @@ async def test_fallback_when_no_prompt_file(tmp_path: Path) -> None:
     workspace_dir = tmp_path / "workspace"
     workspace_dir.mkdir()
     svc = PlannerService(
-        client=_make_mock_client(_VALID_RESPONSE),
+        provider=FakeProvider(content=_VALID_RESPONSE),
         prompts_dir=prompts_dir,
         workspace_dir=workspace_dir,
     )

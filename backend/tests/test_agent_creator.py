@@ -1,10 +1,10 @@
-"""Tests TDD pour AgentCreatorService — ticket-023."""
+"""TDD tests for AgentCreatorService — ticket-023."""
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from tests.test_providers_base import FakeProvider
 from vibe_ide.models.agent import CreateAgentConversationResponse
 from vibe_ide.models.project import ConversationMessage
 from vibe_ide.services.agent_creator import AgentCreatorService
@@ -29,13 +29,8 @@ _QUESTION_RESPONSE = (
 )
 
 
-def _make_mock_client(response_text: str) -> MagicMock:
-    mock = MagicMock()
-    mock_resp = MagicMock()
-    mock_resp.content = [MagicMock(text=response_text)]
-    mock_resp.usage = MagicMock(input_tokens=50, output_tokens=30)
-    mock.messages.create = AsyncMock(return_value=mock_resp)
-    return mock
+def _make_provider(response_text: str) -> FakeProvider:
+    return FakeProvider(content=response_text)
 
 
 def _make_service(tmp_path: Path, response_text: str) -> AgentCreatorService:
@@ -45,7 +40,7 @@ def _make_service(tmp_path: Path, response_text: str) -> AgentCreatorService:
         "Tu es un expert en prompt engineering.", encoding="utf-8"
     )
     return AgentCreatorService(
-        client=_make_mock_client(response_text),
+        provider=_make_provider(response_text),
         prompts_dir=prompts_dir,
     )
 
@@ -83,7 +78,7 @@ async def test_create_agent_persists_prompt_file(tmp_path: Path) -> None:
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     (prompts_dir / "agent-creator.md").write_text("prompt", encoding="utf-8")
-    svc = AgentCreatorService(client=_make_mock_client(_VALID_AGENT_JSON), prompts_dir=prompts_dir)
+    svc = AgentCreatorService(provider=_make_provider(_VALID_AGENT_JSON), prompts_dir=prompts_dir)
     await svc.create_agent([_user("Je veux un agent rédacteur")])
     assert (prompts_dir / "redacteur.md").exists()
 
@@ -92,7 +87,7 @@ async def test_create_agent_prompt_file_content(tmp_path: Path) -> None:
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     (prompts_dir / "agent-creator.md").write_text("prompt", encoding="utf-8")
-    svc = AgentCreatorService(client=_make_mock_client(_VALID_AGENT_JSON), prompts_dir=prompts_dir)
+    svc = AgentCreatorService(provider=_make_provider(_VALID_AGENT_JSON), prompts_dir=prompts_dir)
     await svc.create_agent([_user("Je veux un agent rédacteur")])
     content = (prompts_dir / "redacteur.md").read_text(encoding="utf-8")
     assert "rédacteur professionnel" in content
@@ -125,7 +120,7 @@ async def test_clarification_does_not_persist_file(tmp_path: Path) -> None:
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     (prompts_dir / "agent-creator.md").write_text("prompt", encoding="utf-8")
-    svc = AgentCreatorService(client=_make_mock_client(_QUESTION_RESPONSE), prompts_dir=prompts_dir)
+    svc = AgentCreatorService(provider=_make_provider(_QUESTION_RESPONSE), prompts_dir=prompts_dir)
     await svc.create_agent([_user("Un agent vague")])
     md_files = [f for f in prompts_dir.glob("*.md") if f.name != "agent-creator.md"]
     assert len(md_files) == 0
@@ -165,19 +160,19 @@ async def test_json_wrapped_in_markdown_code_block(tmp_path: Path) -> None:
 
 
 # ------------------------------------------------------------------
-# Appel Anthropic
+# Appel au provider
 # ------------------------------------------------------------------
 
 
-async def test_calls_anthropic_with_system_prompt(tmp_path: Path) -> None:
+async def test_calls_provider_with_system_prompt(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     await svc.create_agent([_user("Un rédacteur")])
-    svc._client.messages.create.assert_called_once()
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert kwargs["system"][0]["text"] == "Tu es un expert en prompt engineering."
+    provider = svc._provider
+    assert len(provider.calls) == 1
+    assert provider.calls[0]["system"] == "Tu es un expert en prompt engineering."
 
 
-async def test_calls_anthropic_with_full_conversation(tmp_path: Path) -> None:
+async def test_calls_provider_with_full_conversation(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     conversation = [
         _user("Je veux un rédacteur"),
@@ -185,11 +180,10 @@ async def test_calls_anthropic_with_full_conversation(tmp_path: Path) -> None:
         _user("Des articles de blog."),
     ]
     await svc.create_agent(conversation)
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert len(kwargs["messages"]) == 3
-    assert kwargs["messages"][0]["role"] == "user"
-    assert kwargs["messages"][1]["role"] == "assistant"
-    assert kwargs["messages"][2]["role"] == "user"
+    provider = svc._provider
+    flattened = provider.calls[0]["user"]
+    assert flattened.index("Je veux un rédacteur") < flattened.index("Quel type de contenu ?")
+    assert flattened.index("Quel type de contenu ?") < flattened.index("Des articles de blog.")
 
 
 # ------------------------------------------------------------------
@@ -200,7 +194,7 @@ async def test_calls_anthropic_with_full_conversation(tmp_path: Path) -> None:
 async def test_missing_system_prompt_uses_fallback(tmp_path: Path) -> None:
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
-    svc = AgentCreatorService(client=_make_mock_client(_VALID_AGENT_JSON), prompts_dir=prompts_dir)
+    svc = AgentCreatorService(provider=_make_provider(_VALID_AGENT_JSON), prompts_dir=prompts_dir)
     result = await svc.create_agent([_user("Un rédacteur")])
     assert result.created is True
 

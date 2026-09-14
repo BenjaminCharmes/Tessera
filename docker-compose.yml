@@ -4,6 +4,14 @@ services:
     ports:
       - "8000:8000"
     env_file: .env
+    environment:
+      # claude-agent-sdk vendors its own CLI, but the container has no
+      # authenticated Claude subscription session: subscription auth needs an
+      # interactive login a container cannot perform, so it cannot use the
+      # subscription-backed "agent_sdk" provider (the default). Force the
+      # API-credits provider here; this overrides LLM_PROVIDER even if .env
+      # sets (or omits) it.
+      - LLM_PROVIDER=anthropic_api
     volumes:
       - ./projects:/app/projects
       - ./agents/prompts:/app/prompts

@@ -65,6 +65,17 @@ async def _noop(event: OrchestratorEvent) -> None:
 
 
 # ------------------------------------------------------------------
+# EventType
+# ------------------------------------------------------------------
+
+
+def test_agent_tool_use_event_existe() -> None:
+    from vibe_ide.services.orchestrator import EventType
+
+    assert EventType.AGENT_TOOL_USE.value == "agent_tool_use"
+
+
+# ------------------------------------------------------------------
 # _parse_reviewer_verdict
 # ------------------------------------------------------------------
 
@@ -373,6 +384,48 @@ async def test_run_pipeline_emits_agent_started_for_both_roles(tmp_path: Path) -
     assert AgentRole.reviewer in started_agents
 
 
+async def test_run_pipeline_emits_agent_tool_use_event(tmp_path: Path) -> None:
+    ticket = _make_ticket()
+    svc = AsyncMock()
+    svc.get_ticket.return_value = ticket
+    svc.update_status.return_value = ticket
+
+    async def fake_run(
+        role: AgentRole,
+        ticket: Ticket,
+        project_context: str,
+        agent_config: AgentConfig | None = None,
+        stream_callback: object = None,
+        tool_callback: object = None,
+        run_id: str | None = None,
+    ) -> AgentResult:
+        # Mime le comportement de ClaudeAgentSDKProvider : le tool_callback
+        # est réellement awaité pendant l'exécution du codeur.
+        if role == AgentRole.codeur and tool_callback is not None:
+            await tool_callback("Write", {"file_path": "src/foo.py"})  # type: ignore[operator]
+        if role == AgentRole.reviewer:
+            return _make_agent_result("APPROVED", AgentRole.reviewer)
+        return _make_agent_result("code", AgentRole.codeur)
+
+    runner = MagicMock()
+    runner.run = fake_run
+
+    events: list[OrchestratorEvent] = []
+
+    async def capture(e: OrchestratorEvent) -> None:
+        events.append(e)
+
+    orc = _make_orchestrator(tmp_path, runner=runner, ticket_service=svc)
+    await orc.run_pipeline("proj", "ticket-001", capture)
+
+    tool_events = [e for e in events if e.type == EventType.AGENT_TOOL_USE]
+    assert len(tool_events) == 1
+    tool_event = tool_events[0]
+    assert tool_event.agent == AgentRole.codeur
+    assert tool_event.ticket_id == "ticket-001"
+    assert tool_event.data == {"tool": "Write", "input": {"file_path": "src/foo.py"}}
+
+
 async def test_run_pipeline_ticket_status_progression(tmp_path: Path) -> None:
     ticket = _make_ticket()
     svc = AsyncMock()
@@ -420,6 +473,7 @@ async def test_run_pipeline_feedback_included_in_second_round_context(tmp_path: 
         project_context: str,
         agent_config: AgentConfig | None = None,
         stream_callback: object = None,
+        tool_callback: object = None,
         run_id: str | None = None,
     ) -> AgentResult:
         if role == AgentRole.codeur:

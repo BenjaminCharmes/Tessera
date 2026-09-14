@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from anthropic import AsyncAnthropic
-
+from vibe_ide.services.providers.base import LLMProvider
 from vibe_ide.utils.json_extract import extract_json
 from vibe_ide.utils.logger import get_logger
 
@@ -21,8 +20,8 @@ class DocUpdateResult:
 
 
 class DocUpdaterService:
-    def __init__(self, client: AsyncAnthropic, prompts_dir: Path) -> None:
-        self._client = client
+    def __init__(self, provider: LLMProvider, prompts_dir: Path) -> None:
+        self._provider = provider
         self._prompts_dir = prompts_dir
 
     async def update_docs(
@@ -41,17 +40,17 @@ class DocUpdaterService:
         )
 
         try:
-            response = await self._client.messages.create(
+            result = await self._provider.complete(
+                system=system_prompt,
+                user=user_message,
                 model=_MODEL,
                 max_tokens=_MAX_TOKENS,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_message}],
             )
         except Exception as exc:
             _logger.warning("doc_updater_llm_failed", extra={"error": str(exc)})
             return DocUpdateResult(no_changes=True)
 
-        raw = response.content[0].text
+        raw = result.content
         parsed = extract_json(raw)
 
         if not parsed or parsed.get("no_changes"):

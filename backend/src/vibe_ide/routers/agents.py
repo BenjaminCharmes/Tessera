@@ -3,8 +3,6 @@ import time
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.agents.github_sync import GithubSyncAgent
 from vibe_ide.config import settings
 from vibe_ide.models.agent import AgentResult, AgentRole, AgentRunRequest, CreateAgentConversationResponse
@@ -15,6 +13,7 @@ from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.github_service import GitHubService
 from vibe_ide.services.project_creator import ProjectCreatorService
+from vibe_ide.services.providers import get_provider
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.ticket_service import TicketService
@@ -29,20 +28,36 @@ _OPEN_STATUSES = {
 }
 
 
-def _make_runner() -> AgentRunner:
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+def _make_runner(project_id: str) -> AgentRunner:
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+    )
     registry = AgentRegistryService(settings.ide_prompts_dir)
-    return AgentRunner(client, registry)
+    project_path = settings.ide_workspace_dir / project_id
+    return AgentRunner(provider, registry, project_path=project_path)
 
 
 def _make_project_creator() -> ProjectCreatorService:
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    return ProjectCreatorService(client, settings.ide_prompts_dir, settings.ide_workspace_dir)
+    # Pure text-in/JSON-out: ProjectCreatorService writes files itself via
+    # ProjectLoader, never through an SDK tool, and no cwd is threaded to it
+    # here (ticket-044 merge-gate review, finding 2).
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        allow_tools=False,
+    )
+    return ProjectCreatorService(provider, settings.ide_prompts_dir, settings.ide_workspace_dir)
 
 
 def _make_agent_creator() -> AgentCreatorService:
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    return AgentCreatorService(client, settings.ide_prompts_dir)
+    # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        allow_tools=False,
+    )
+    return AgentCreatorService(provider, settings.ide_prompts_dir)
 
 
 class CreateAgentRequest(BaseModel):
@@ -50,7 +65,7 @@ class CreateAgentRequest(BaseModel):
 
 
 async def _build_context(project_id: str) -> ProjectContext:
-    """Charge le contexte complet d'un projet pour les agents."""
+    """Loads the full context of a project for agents."""
     loader = ProjectLoader(settings.ide_workspace_dir)
     try:
         project = await loader.load_project(project_id)
@@ -155,7 +170,7 @@ async def run_agent(request: AgentRunRequest) -> AgentResult:
         (c for c in ctx.agent_configs if c.role == request.role), None
     )
 
-    return await _make_runner().run(
+    return await _make_runner(request.project_id).run(
         role=request.role,
         ticket=ticket,
         project_context=_format_context(ctx),
@@ -189,7 +204,7 @@ async def stream_agent(websocket: WebSocket) -> None:
         async def send_token(token: str) -> None:
             await websocket.send_text(token)
 
-        result = await _make_runner().run(
+        result = await _make_runner(request.project_id).run(
             role=request.role,
             ticket=ticket,
             project_context=_format_context(ctx),

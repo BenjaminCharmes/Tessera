@@ -1,7 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.config import settings
 from vibe_ide.models.project import (
     AnalysisResult,
@@ -29,6 +27,7 @@ from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 from vibe_ide.services.project_importer import ImportError, ProjectImporter
 from vibe_ide.services.project_creator import ProjectCreatorService
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
+from vibe_ide.services.providers import get_provider
 from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.ticket_service import TicketService
 
@@ -56,8 +55,15 @@ async def create_project(body: ProjectCreate) -> ProjectCreationResult:
         project = await _loader().create_project(body)
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    svc = ProjectCreatorService(client, settings.ide_prompts_dir, settings.ide_workspace_dir)
+    # Pure text-in/JSON-out: ProjectCreatorService writes files itself via
+    # ProjectLoader, never through an SDK tool, and no cwd is threaded to it
+    # here (ticket-044 merge-gate review, finding 2).
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        allow_tools=False,
+    )
+    svc = ProjectCreatorService(provider, settings.ide_prompts_dir, settings.ide_workspace_dir)
     agents_created = await svc._auto_create_missing_agents(
         roles=body.active_agents,
         project_name=project.name,
@@ -84,8 +90,13 @@ async def import_project(body: ProjectImport) -> ProjectImportResponse:
 
 @router.post("/clone", response_model=CloneProjectResponse, status_code=201)
 async def clone_project(body: CloneProjectRequest) -> CloneProjectResponse:
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    analyzer = ProjectAnalyzerService(client, settings.ide_prompts_dir)
+    # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        allow_tools=False,
+    )
+    analyzer = ProjectAnalyzerService(provider, settings.ide_prompts_dir)
     svc = GitCloneService(settings.ide_workspace_dir, analyzer)
     try:
         return await svc.clone(
@@ -143,8 +154,13 @@ async def plan_project(project_id: str, body: PlanRequest) -> PlanResult:
     project_path = settings.ide_workspace_dir / project_id
     if not project_path.is_dir():
         raise HTTPException(status_code=404, detail=f"Projet '{project_id}' introuvable.")
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    svc = PlannerService(client, settings.ide_prompts_dir, settings.ide_workspace_dir)
+    # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        allow_tools=False,
+    )
+    svc = PlannerService(provider, settings.ide_prompts_dir, settings.ide_workspace_dir)
     try:
         return await svc.plan(project_id, body.description)
     except ValueError as exc:
@@ -156,8 +172,13 @@ async def analyze_project(project_id: str, body: AnalyzeProjectRequest) -> Analy
     project_path = settings.ide_workspace_dir / project_id
     if not project_path.is_dir():
         raise HTTPException(status_code=404, detail=f"Projet '{project_id}' introuvable.")
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
-    svc = ProjectAnalyzerService(client, settings.ide_prompts_dir)
+    # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        allow_tools=False,
+    )
+    svc = ProjectAnalyzerService(provider, settings.ide_prompts_dir)
     try:
         return await svc.analyze(project_path, overwrite=body.overwrite)
     except ValueError as exc:

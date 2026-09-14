@@ -2,10 +2,10 @@
 
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from tests.test_providers_base import FakeProvider
 from vibe_ide.services.security_auditor import (
     SecurityAuditResult,
     SecurityAuditorService,
@@ -14,25 +14,25 @@ from vibe_ide.services.security_auditor import (
 
 
 @pytest.fixture
-def service() -> SecurityAuditorService:
-    mock_client = MagicMock()
-    return SecurityAuditorService(mock_client, Path("agents/prompts"))
+def provider() -> FakeProvider:
+    return FakeProvider()
 
 
-def _make_llm_response(data: dict) -> MagicMock:
-    mock_msg = MagicMock()
-    mock_msg.content = [MagicMock(text=json.dumps(data))]
-    return mock_msg
+@pytest.fixture
+def service(provider: FakeProvider) -> SecurityAuditorService:
+    return SecurityAuditorService(provider, Path("agents/prompts"))
+
+
+def _set_response(provider: FakeProvider, data: dict) -> None:
+    provider.set_content(json.dumps(data))
 
 
 class TestSecurityAuditorService:
     async def test_pass_verdict_on_clean_code(
-        self, service: SecurityAuditorService, tmp_path: Path
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        service._client.messages.create = AsyncMock(
-            return_value=_make_llm_response(
-                {"issues": [], "verdict": "PASS", "summary": "No issues."}
-            )
+        _set_response(
+            provider, {"issues": [], "verdict": "PASS", "summary": "No issues."}
         )
 
         result = await service.audit("def safe(): return 42", tmp_path)
@@ -43,24 +43,23 @@ class TestSecurityAuditorService:
         assert result.has_high is False
 
     async def test_block_verdict_on_critical_issue(
-        self, service: SecurityAuditorService, tmp_path: Path
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        service._client.messages.create = AsyncMock(
-            return_value=_make_llm_response(
-                {
-                    "issues": [
-                        {
-                            "severity": "CRITICAL",
-                            "type": "SQL Injection",
-                            "location": "db.py:10",
-                            "description": "Unsafe query",
-                            "fix": "Use parameterized queries",
-                        }
-                    ],
-                    "verdict": "BLOCK",
-                    "summary": "SQL injection found.",
-                }
-            )
+        _set_response(
+            provider,
+            {
+                "issues": [
+                    {
+                        "severity": "CRITICAL",
+                        "type": "SQL Injection",
+                        "location": "db.py:10",
+                        "description": "Unsafe query",
+                        "fix": "Use parameterized queries",
+                    }
+                ],
+                "verdict": "BLOCK",
+                "summary": "SQL injection found.",
+            },
         )
 
         result = await service.audit("query = f'SELECT * FROM users WHERE id={id}'", tmp_path)
@@ -71,24 +70,23 @@ class TestSecurityAuditorService:
         assert result.issues[0].severity == "CRITICAL"
 
     async def test_block_verdict_on_high_severity(
-        self, service: SecurityAuditorService, tmp_path: Path
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        service._client.messages.create = AsyncMock(
-            return_value=_make_llm_response(
-                {
-                    "issues": [
-                        {
-                            "severity": "HIGH",
-                            "type": "Hardcoded Secret",
-                            "location": "config.py:3",
-                            "description": "API key in source",
-                            "fix": "Use environment variable",
-                        }
-                    ],
-                    "verdict": "BLOCK",
-                    "summary": "Hardcoded secret found.",
-                }
-            )
+        _set_response(
+            provider,
+            {
+                "issues": [
+                    {
+                        "severity": "HIGH",
+                        "type": "Hardcoded Secret",
+                        "location": "config.py:3",
+                        "description": "API key in source",
+                        "fix": "Use environment variable",
+                    }
+                ],
+                "verdict": "BLOCK",
+                "summary": "Hardcoded secret found.",
+            },
         )
 
         result = await service.audit("API_KEY = 'sk-abc123'", tmp_path)
@@ -97,24 +95,23 @@ class TestSecurityAuditorService:
         assert result.has_high is True
 
     async def test_pass_verdict_on_medium_only(
-        self, service: SecurityAuditorService, tmp_path: Path
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        service._client.messages.create = AsyncMock(
-            return_value=_make_llm_response(
-                {
-                    "issues": [
-                        {
-                            "severity": "MEDIUM",
-                            "type": "Missing rate limit",
-                            "location": "api.py:20",
-                            "description": "No rate limiting",
-                            "fix": "Add rate limiting middleware",
-                        }
-                    ],
-                    "verdict": "PASS",
-                    "summary": "Medium issues only.",
-                }
-            )
+        _set_response(
+            provider,
+            {
+                "issues": [
+                    {
+                        "severity": "MEDIUM",
+                        "type": "Missing rate limit",
+                        "location": "api.py:20",
+                        "description": "No rate limiting",
+                        "fix": "Add rate limiting middleware",
+                    }
+                ],
+                "verdict": "PASS",
+                "summary": "Medium issues only.",
+            },
         )
 
         result = await service.audit("@app.route('/api')", tmp_path)
@@ -125,11 +122,9 @@ class TestSecurityAuditorService:
         assert len(result.issues) == 1
 
     async def test_pass_on_invalid_json_response(
-        self, service: SecurityAuditorService, tmp_path: Path
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        service._client.messages.create = AsyncMock(
-            return_value=_make_llm_response({})
-        )
+        _set_response(provider, {})
 
         result = await service.audit("code", tmp_path)
 
@@ -138,26 +133,29 @@ class TestSecurityAuditorService:
     async def test_pass_on_llm_failure(
         self, service: SecurityAuditorService, tmp_path: Path
     ) -> None:
-        service._client.messages.create = AsyncMock(side_effect=Exception("Network error"))
+        class _FailingProvider(FakeProvider):
+            async def complete(self, **kwargs):  # type: ignore[override]
+                raise Exception("Network error")
 
-        result = await service.audit("code", tmp_path)
+        service_with_failure = SecurityAuditorService(_FailingProvider(), Path("agents/prompts"))
+
+        result = await service_with_failure.audit("code", tmp_path)
 
         assert result.verdict == "PASS"
 
     async def test_audit_result_properties(
-        self, service: SecurityAuditorService, tmp_path: Path
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        service._client.messages.create = AsyncMock(
-            return_value=_make_llm_response(
-                {
-                    "issues": [
-                        {"severity": "CRITICAL", "type": "x", "location": "y", "description": "z", "fix": ""},
-                        {"severity": "LOW", "type": "a", "location": "b", "description": "c", "fix": ""},
-                    ],
-                    "verdict": "BLOCK",
-                    "summary": "Critical found.",
-                }
-            )
+        _set_response(
+            provider,
+            {
+                "issues": [
+                    {"severity": "CRITICAL", "type": "x", "location": "y", "description": "z", "fix": ""},
+                    {"severity": "LOW", "type": "a", "location": "b", "description": "c", "fix": ""},
+                ],
+                "verdict": "BLOCK",
+                "summary": "Critical found.",
+            },
         )
 
         result = await service.audit("code", tmp_path)
@@ -165,6 +163,20 @@ class TestSecurityAuditorService:
         assert result.has_critical is True
         assert result.has_high is False
         assert len(result.issues) == 2
+
+    async def test_calls_provider_with_expected_shape(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        _set_response(provider, {"issues": [], "verdict": "PASS", "summary": "ok"})
+
+        await service.audit("some code diff", tmp_path)
+
+        assert len(provider.calls) == 1
+        call = provider.calls[0]
+        assert call["mode"] == "complete"
+        assert "some code diff" in call["user"]
+        assert isinstance(call["system"], str)
+        assert call["max_tokens"] > 0
 
 
 class TestSecurityIssue:

@@ -6,7 +6,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    anthropic_api_key: str
+    # Optionnel : vide lorsque le provider est `agent_sdk` (auth par abonnement).
+    anthropic_api_key: str = ""
+    # Provider LLM par défaut : "agent_sdk" (abonnement) ou "anthropic_api" (crédits).
+    llm_provider: str = "agent_sdk"
+    # Garde-fous ClaudeAgentSDKProvider — bornent une boucle d'agent qui dérape.
+    # max_turns borne le nombre d'allers-retours outil ; max_budget_usd borne
+    # la dépense réelle d'un seul appel agent (le garde-fou qui protège le
+    # quota de l'abonnement). Voir memory/decisions.md pour le choix de 1.0 USD.
+    llm_max_turns: int = 30
+    llm_max_budget_usd: float = 1.0
     ide_workspace_dir: Path = Path.home() / "vibe-ide-workspace"
     ide_log_level: str = "INFO"
     # Chemin vers agents/prompts/ — à surcharger via IDE_PROMPTS_DIR si le serveur
@@ -18,4 +27,4 @@ class Settings(BaseSettings):
     static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
 
 
-settings = Settings()  # type: ignore[call-arg]
+settings = Settings()

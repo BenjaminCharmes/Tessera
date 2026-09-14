@@ -3,13 +3,16 @@ import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketStatus
 from vibe_ide.services.agent_registry import AgentNotFoundError, AgentRegistryService
 from vibe_ide.services.cost_calculator import calculate_cost
 from vibe_ide.services.database import save_agent_call
+from vibe_ide.services.providers.base import (
+    LLMProvider,
+    ProviderResult,
+    ToolEventCallback,
+)
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -40,13 +43,15 @@ _INSTRUCTIONS: dict[str, str] = {
 class AgentRunner:
     def __init__(
         self,
-        client: AsyncAnthropic,
+        provider: LLMProvider,
         registry: AgentRegistryService,
         db_path: Path | str | None = None,
+        project_path: Path | None = None,
     ) -> None:
-        self._client = client
+        self._provider = provider
         self._registry = registry
         self._db_path = db_path
+        self._project_path = project_path
 
     async def run(
         self,
@@ -55,6 +60,7 @@ class AgentRunner:
         project_context: str,
         agent_config: AgentConfig | None = None,
         stream_callback: Callable[[str], Awaitable[None]] | None = None,
+        tool_callback: ToolEventCallback | None = None,
         run_id: str | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
@@ -64,21 +70,36 @@ class AgentRunner:
 
         model = agent_config.model if agent_config else _DEFAULT_MODEL
         max_tokens = agent_config.max_tokens if agent_config else _DEFAULT_MAX_TOKENS
+        # Chemin long obligatoire : un chemin court Windows fait refuser les
+        # écritures côté SDK (cf. spike ticket-044).
+        cwd = self._project_path.resolve() if self._project_path else None
 
+        provider_result: ProviderResult
         if stream_callback is not None:
-            content, usage = await self._stream(
-                system_prompt, user_prompt, model, max_tokens, stream_callback
+            provider_result = await self._provider.stream(
+                system=system_prompt,
+                user=user_prompt,
+                model=model,
+                max_tokens=max_tokens,
+                cwd=cwd,
+                on_token=stream_callback,
+                on_tool_use=tool_callback,
             )
         else:
-            content, usage = await self._complete(
-                system_prompt, user_prompt, model, max_tokens
+            provider_result = await self._provider.complete(
+                system=system_prompt,
+                user=user_prompt,
+                model=model,
+                max_tokens=max_tokens,
+                cwd=cwd,
             )
 
+        content = provider_result.content
         duration_ms = int((time.monotonic() - t0) * 1000)
 
-        input_tokens = getattr(usage, "input_tokens", 0)
-        output_tokens = getattr(usage, "output_tokens", 0)
-        cache_read_tokens = getattr(usage, "cache_read_input_tokens", 0)
+        input_tokens = provider_result.input_tokens
+        output_tokens = provider_result.output_tokens
+        cache_read_tokens = provider_result.cache_read_tokens
 
         _logger.info(
             "agent_call",
@@ -93,7 +114,11 @@ class AgentRunner:
         )
 
         if run_id and self._db_path:
-            cost_usd = calculate_cost(model, input_tokens, output_tokens, cache_read_tokens)
+            cost_usd = (
+                provider_result.cost_usd
+                if provider_result.cost_usd is not None
+                else calculate_cost(model, input_tokens, output_tokens, cache_read_tokens)
+            )
             try:
                 await save_agent_call(
                     self._db_path,
@@ -132,45 +157,6 @@ class AgentRunner:
             f"## Ticket assigné\n{ticket.body}\n\n"
             f"## Ta mission\n{instruction}"
         )
-
-    async def _complete(
-        self, system: str, user: str, model: str, max_tokens: int
-    ) -> tuple[str, object]:
-        response = await self._client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=[
-                {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
-            ],
-            messages=[{"role": "user", "content": user}],
-        )
-        content = "".join(
-            block.text for block in response.content if hasattr(block, "text")
-        )
-        return content, response.usage
-
-    async def _stream(
-        self,
-        system: str,
-        user: str,
-        model: str,
-        max_tokens: int,
-        callback: Callable[[str], Awaitable[None]],
-    ) -> tuple[str, object]:
-        chunks: list[str] = []
-        async with self._client.messages.stream(
-            model=model,
-            max_tokens=max_tokens,
-            system=[
-                {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
-            ],
-            messages=[{"role": "user", "content": user}],
-        ) as stream:
-            async for text in stream.text_stream:
-                chunks.append(text)
-                await callback(text)
-            message = await stream.get_final_message()
-        return "".join(chunks), message.usage
 
 
 def _parse_suggested_status(content: str) -> TicketStatus:

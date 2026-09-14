@@ -1,10 +1,10 @@
-"""Tests TDD pour ProjectAnalyzerService — ticket-026."""
+"""TDD tests for ProjectAnalyzerService — ticket-026."""
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from tests.test_providers_base import FakeProvider
 from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 
 
@@ -29,13 +29,8 @@ _VALID_REACT_RESPONSE = json.dumps(
 )
 
 
-def _make_mock_client(response_text: str) -> MagicMock:
-    mock = MagicMock()
-    mock_resp = MagicMock()
-    mock_resp.content = [MagicMock(text=response_text)]
-    mock_resp.usage = MagicMock(input_tokens=100, output_tokens=200)
-    mock.messages.create = AsyncMock(return_value=mock_resp)
-    return mock
+def _make_provider(response_text: str) -> FakeProvider:
+    return FakeProvider(content=response_text, tokens=100)
 
 
 def _make_service(tmp_path: Path, response_text: str) -> ProjectAnalyzerService:
@@ -45,7 +40,7 @@ def _make_service(tmp_path: Path, response_text: str) -> ProjectAnalyzerService:
         "Tu es un expert en analyse de projets.", encoding="utf-8"
     )
     return ProjectAnalyzerService(
-        client=_make_mock_client(response_text),
+        provider=_make_provider(response_text),
         prompts_dir=prompts_dir,
     )
 
@@ -150,7 +145,7 @@ async def test_analyze_overwrites_when_flag_set(tmp_path: Path) -> None:
 def _make_svc_no_client(tmp_path: Path) -> ProjectAnalyzerService:
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir(exist_ok=True)
-    return ProjectAnalyzerService(client=MagicMock(), prompts_dir=prompts_dir)
+    return ProjectAnalyzerService(provider=FakeProvider(), prompts_dir=prompts_dir)
 
 
 def test_is_sensitive_env_file(tmp_path: Path) -> None:
@@ -203,14 +198,13 @@ def test_sensitive_files_excluded_from_collection(tmp_path: Path) -> None:
 async def test_env_content_not_sent_to_claude(tmp_path: Path) -> None:
     project = _make_python_project(tmp_path)
     (project / ".env").write_text("SECRET_KEY=super-secret", encoding="utf-8")
-    mock_client = _make_mock_client(_VALID_RESPONSE)
+    provider = _make_provider(_VALID_RESPONSE)
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     (prompts_dir / "project-analyzer.md").write_text("system", encoding="utf-8")
-    svc = ProjectAnalyzerService(client=mock_client, prompts_dir=prompts_dir)
+    svc = ProjectAnalyzerService(provider=provider, prompts_dir=prompts_dir)
     await svc.analyze(project)
-    call_kwargs = mock_client.messages.create.call_args.kwargs
-    user_content = call_kwargs["messages"][0]["content"]
+    user_content = provider.calls[0]["user"]
     assert "super-secret" not in user_content
 
 
@@ -343,26 +337,25 @@ def test_file_tree_excludes_sensitive(tmp_path: Path) -> None:
 
 
 # ------------------------------------------------------------------
-# Appel Anthropic
+# Appel au provider
 # ------------------------------------------------------------------
 
 
-async def test_calls_anthropic_with_system_prompt(tmp_path: Path) -> None:
+async def test_calls_provider_with_system_prompt(tmp_path: Path) -> None:
     project = _make_python_project(tmp_path)
     svc = _make_service(tmp_path, _VALID_RESPONSE)
     await svc.analyze(project)
-    svc._client.messages.create.assert_called_once()
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert "Tu es un expert en analyse de projets." in kwargs["system"]
+    provider = svc._provider
+    assert len(provider.calls) == 1
+    assert "Tu es un expert en analyse de projets." in provider.calls[0]["system"]
 
 
-async def test_calls_anthropic_with_user_message(tmp_path: Path) -> None:
+async def test_calls_provider_with_user_message(tmp_path: Path) -> None:
     project = _make_python_project(tmp_path)
     svc = _make_service(tmp_path, _VALID_RESPONSE)
     await svc.analyze(project)
-    kwargs = svc._client.messages.create.call_args.kwargs
-    assert kwargs["messages"][0]["role"] == "user"
-    assert "Arbre de fichiers" in kwargs["messages"][0]["content"]
+    provider = svc._provider
+    assert "Arbre de fichiers" in provider.calls[0]["user"]
 
 
 # ------------------------------------------------------------------
@@ -374,7 +367,7 @@ async def test_fallback_when_no_prompt_file(tmp_path: Path) -> None:
     project = _make_python_project(tmp_path)
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
-    svc = ProjectAnalyzerService(client=_make_mock_client(_VALID_RESPONSE), prompts_dir=prompts_dir)
+    svc = ProjectAnalyzerService(provider=_make_provider(_VALID_RESPONSE), prompts_dir=prompts_dir)
     result = await svc.analyze(project)
     assert result.detected_stack == ["Python", "FastAPI"]
 

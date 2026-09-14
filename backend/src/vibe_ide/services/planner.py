@@ -2,10 +2,9 @@
 import time
 from pathlib import Path
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.models.project import PlanResult
 from vibe_ide.models.ticket import TicketDraftPlan
+from vibe_ide.services.providers.base import LLMProvider
 from vibe_ide.utils.json_extract import extract_json
 from vibe_ide.utils.logger import get_logger
 
@@ -16,8 +15,8 @@ _DEFAULT_MAX_TOKENS = 4096
 
 
 class PlannerService:
-    def __init__(self, client: AsyncAnthropic, prompts_dir: Path, workspace_dir: Path) -> None:
-        self._client = client
+    def __init__(self, provider: LLMProvider, prompts_dir: Path, workspace_dir: Path) -> None:
+        self._provider = provider
         self._prompts_dir = prompts_dir
         self._workspace_dir = workspace_dir
 
@@ -27,21 +26,21 @@ class PlannerService:
         user_message = self._build_user_message(description, claude_md)
 
         t0 = time.monotonic()
-        response = await self._client.messages.create(
+        result = await self._provider.complete(
+            system=system_prompt,
+            user=user_message,
             model=_DEFAULT_MODEL,
             max_tokens=_DEFAULT_MAX_TOKENS,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_message}],
         )
 
-        raw = "".join(block.text for block in response.content if hasattr(block, "text"))
+        raw = result.content
 
         _logger.info(
             "planner_call",
             extra={
                 "project": project_id,
-                "input_tokens": getattr(response.usage, "input_tokens", 0),
-                "output_tokens": getattr(response.usage, "output_tokens", 0),
+                "input_tokens": result.input_tokens,
+                "output_tokens": result.output_tokens,
                 "duration_ms": int((time.monotonic() - t0) * 1000),
             },
         )

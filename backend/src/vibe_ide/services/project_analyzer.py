@@ -3,9 +3,8 @@ import fnmatch
 import time
 from pathlib import Path
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.models.project import AnalysisResult
+from vibe_ide.services.providers.base import LLMProvider
 from vibe_ide.utils.json_extract import extract_json
 from vibe_ide.utils.logger import get_logger
 
@@ -46,8 +45,8 @@ class ProjectAnalyzerService:
         }
     )
 
-    def __init__(self, client: AsyncAnthropic, prompts_dir: Path) -> None:
-        self._client = client
+    def __init__(self, provider: LLMProvider, prompts_dir: Path) -> None:
+        self._provider = provider
         self._prompts_dir = prompts_dir
 
     async def analyze(self, project_path: Path, overwrite: bool = False) -> AnalysisResult:
@@ -58,21 +57,21 @@ class ProjectAnalyzerService:
         user_message = self._build_user_message(file_tree, file_contents)
 
         t0 = time.monotonic()
-        response = await self._client.messages.create(
+        result = await self._provider.complete(
+            system=system_prompt,
+            user=user_message,
             model=_DEFAULT_MODEL,
             max_tokens=_DEFAULT_MAX_TOKENS,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_message}],
         )
 
-        raw = "".join(block.text for block in response.content if hasattr(block, "text"))
+        raw = result.content
 
         _logger.info(
             "project_analyzer_call",
             extra={
                 "project": project_path.name,
-                "input_tokens": getattr(response.usage, "input_tokens", 0),
-                "output_tokens": getattr(response.usage, "output_tokens", 0),
+                "input_tokens": result.input_tokens,
+                "output_tokens": result.output_tokens,
                 "duration_ms": int((time.monotonic() - t0) * 1000),
             },
         )

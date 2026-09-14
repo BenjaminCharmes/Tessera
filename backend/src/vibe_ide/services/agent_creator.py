@@ -2,11 +2,11 @@
 import time
 from pathlib import Path
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.models.agent import AgentCreatedInfo, CreateAgentConversationResponse
 from vibe_ide.models.project import ConversationMessage
 from vibe_ide.services.agent_registry import AgentRegistryService
+from vibe_ide.services.providers.base import LLMProvider
+from vibe_ide.utils.conversation import format_conversation
 from vibe_ide.utils.json_extract import extract_json
 from vibe_ide.utils.logger import get_logger
 
@@ -17,8 +17,8 @@ _DEFAULT_MAX_TOKENS = 2048
 
 
 class AgentCreatorService:
-    def __init__(self, client: AsyncAnthropic, prompts_dir: Path) -> None:
-        self._client = client
+    def __init__(self, provider: LLMProvider, prompts_dir: Path) -> None:
+        self._provider = provider
         self._prompts_dir = prompts_dir
         self._registry = AgentRegistryService(prompts_dir)
 
@@ -30,28 +30,20 @@ class AgentCreatorService:
         system_prompt = self._load_system_prompt()
         messages = [{"role": m.role, "content": m.content} for m in conversation]
 
-        response = await self._client.messages.create(
+        result = await self._provider.complete(
+            system=system_prompt,
+            user=format_conversation(messages),
             model=_DEFAULT_MODEL,
             max_tokens=_DEFAULT_MAX_TOKENS,
-            system=[
-                {
-                    "type": "text",
-                    "text": system_prompt,
-                    "cache_control": {"type": "ephemeral"},
-                }
-            ],
-            messages=messages,
         )
 
-        content = "".join(
-            block.text for block in response.content if hasattr(block, "text")
-        )
+        content = result.content
 
         _logger.info(
             "agent_creator_call",
             extra={
-                "input_tokens": getattr(response.usage, "input_tokens", 0),
-                "output_tokens": getattr(response.usage, "output_tokens", 0),
+                "input_tokens": result.input_tokens,
+                "output_tokens": result.output_tokens,
                 "duration_ms": int((time.monotonic() - t0) * 1000),
             },
         )

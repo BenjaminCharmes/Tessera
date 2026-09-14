@@ -1,14 +1,13 @@
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-from anthropic import AsyncAnthropic
-
 from vibe_ide.config import settings
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.doc_updater import DocUpdaterService
+from vibe_ide.services.providers import get_provider
 from vibe_ide.services.security_auditor import SecurityAuditorService
 from vibe_ide.services.test_runner import TestRunnerService
 from vibe_ide.services.validator import ValidatorService
@@ -41,9 +40,25 @@ class RunAutonomousRequest(BaseModel):
 
 
 async def _build_orchestrator(project_id: str) -> Orchestrator:
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+    )
+    # Pure text-in/JSON-out services (security_auditor, validator,
+    # doc_updater) have no use for file/shell tools — doc_updater writes
+    # files itself via `_write_files`, never through an SDK tool, and no cwd
+    # is threaded to it. Give them all a tool-less provider (ticket-044
+    # review, finding 4; doc_updater moved here per merge-gate finding 2).
+    tool_less_provider = get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        allow_tools=False,
+    )
     registry = AgentRegistryService(settings.ide_prompts_dir)
-    runner = AgentRunner(client, registry, db_path=settings.ide_db_path)
+    project_path = settings.ide_workspace_dir / project_id
+    runner = AgentRunner(
+        provider, registry, db_path=settings.ide_db_path, project_path=project_path
+    )
 
     loader = ProjectLoader(settings.ide_workspace_dir)
     try:
@@ -51,7 +66,6 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    project_path = settings.ide_workspace_dir / project_id
     ticket_svc = TicketService(project_path, project_id)
     all_tickets = await ticket_svc.list_tickets()
     open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
@@ -77,18 +91,18 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     pipeline_cfg = load_pipeline_config(project_path)
 
     doc_updater = (
-        DocUpdaterService(client, settings.ide_prompts_dir)
+        DocUpdaterService(tool_less_provider, settings.ide_prompts_dir)
         if pipeline_cfg.doc_updater_enabled
         else None
     )
     test_runner = TestRunnerService() if pipeline_cfg.testeur_enabled else None
     security_auditor = (
-        SecurityAuditorService(client, settings.ide_prompts_dir)
+        SecurityAuditorService(tool_less_provider, settings.ide_prompts_dir)
         if pipeline_cfg.securite_enabled
         else None
     )
     validator = (
-        ValidatorService(client, settings.ide_prompts_dir)
+        ValidatorService(tool_less_provider, settings.ide_prompts_dir)
         if pipeline_cfg.validateur_enabled
         else None
     )

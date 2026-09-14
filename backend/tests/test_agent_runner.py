@@ -1,13 +1,22 @@
 import os
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock
+from typing import Any
 
+import aiosqlite
 import pytest
 
+from tests.test_providers_base import FakeProvider
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from vibe_ide.services.agent_registry import AgentRegistryService
-from vibe_ide.services.agent_runner import AgentRunner, _parse_suggested_status
+from vibe_ide.services.agent_runner import (
+    _DEFAULT_MAX_TOKENS,
+    _DEFAULT_MODEL,
+    AgentRunner,
+    _parse_suggested_status,
+)
+from vibe_ide.services.cost_calculator import calculate_cost
+from vibe_ide.services.database import create_run, init_db
 
 
 # ------------------------------------------------------------------
@@ -28,24 +37,17 @@ def _make_ticket(**kwargs: object) -> Ticket:
     return Ticket(**(defaults | kwargs))
 
 
-def _mock_complete_client(response_text: str) -> MagicMock:
-    """Client Anthropic mocké pour les appels non-streaming."""
-    mock = MagicMock()
-    mock_resp = MagicMock()
-    mock_resp.content = [MagicMock(text=response_text)]
-    mock_resp.usage = MagicMock(
-        input_tokens=120,
-        output_tokens=80,
-        cache_creation_input_tokens=120,
-        cache_read_input_tokens=0,
-    )
-    mock.messages.create = AsyncMock(return_value=mock_resp)
-    return mock
-
-
-def _runner(tmp_path: Path, client: MagicMock | None = None) -> AgentRunner:
+def _runner(
+    tmp_path: Path,
+    provider: FakeProvider | None = None,
+    project_path: Path | None = None,
+) -> AgentRunner:
     registry = AgentRegistryService(tmp_path / "prompts")
-    return AgentRunner(client or MagicMock(), registry)
+    return AgentRunner(
+        provider or FakeProvider(),
+        registry,
+        project_path=project_path,
+    )
 
 
 # ------------------------------------------------------------------
@@ -94,7 +96,7 @@ def test_load_system_prompt_reads_file(tmp_path: Path) -> None:
     (prompts / "codeur.md").write_text("Tu es le codeur.", encoding="utf-8")
 
     registry = AgentRegistryService(prompts)
-    runner = AgentRunner(MagicMock(), registry)
+    runner = AgentRunner(FakeProvider(), registry)
     assert runner._load_system_prompt("codeur") == "Tu es le codeur."
 
 
@@ -140,14 +142,14 @@ def test_build_user_prompt_instruction_varies_by_role(tmp_path: Path) -> None:
 
 
 # ------------------------------------------------------------------
-# AgentRunner.run — non-streaming (mocked client)
+# AgentRunner.run — délégation au provider
 # ------------------------------------------------------------------
 
 
 async def test_run_returns_agent_result(tmp_path: Path) -> None:
     response = "## Analyse\nOK.\n\n## Statut suggéré\nIN_REVIEW"
-    client = _mock_complete_client(response)
-    runner = _runner(tmp_path, client)
+    provider = FakeProvider(content=response)
+    runner = _runner(tmp_path, provider)
 
     result = await runner.run(
         role=AgentRole.codeur,
@@ -165,8 +167,8 @@ async def test_run_returns_agent_result(tmp_path: Path) -> None:
 
 async def test_run_accepts_str_role(tmp_path: Path) -> None:
     response = "## Statut suggéré\nIN_REVIEW"
-    client = _mock_complete_client(response)
-    runner = _runner(tmp_path, client)
+    provider = FakeProvider(content=response)
+    runner = _runner(tmp_path, provider)
 
     result = await runner.run(
         role="redacteur",
@@ -177,107 +179,131 @@ async def test_run_accepts_str_role(tmp_path: Path) -> None:
     assert result.role == "redacteur"
 
 
-async def test_run_calls_anthropic_create(tmp_path: Path) -> None:
-    client = _mock_complete_client("## Statut suggéré\nIN_REVIEW")
-    runner = _runner(tmp_path, client)
+async def test_run_delegue_au_provider(tmp_path: Path) -> None:
+    provider = FakeProvider(content="## Statut suggéré\nIN_REVIEW")
+    runner = _runner(tmp_path, provider)
+    result = await runner.run(
+        role=AgentRole.codeur,
+        ticket=_make_ticket(),
+        project_context="contexte",
+    )
+    assert len(provider.calls) == 1
+    assert provider.calls[0]["mode"] == "complete"
+    assert provider.calls[0]["model"] == _DEFAULT_MODEL
+    assert provider.calls[0]["max_tokens"] == _DEFAULT_MAX_TOKENS
+    assert result.content == "## Statut suggéré\nIN_REVIEW"
+    assert result.suggested_status == TicketStatus.in_review
 
+
+async def test_run_utilise_le_modele_de_l_agent_config(tmp_path: Path) -> None:
+    provider = FakeProvider()
+    runner = _runner(tmp_path, provider)
     await runner.run(
         role=AgentRole.codeur,
         ticket=_make_ticket(),
-        project_context="ctx",
+        project_context="contexte",
+        agent_config=AgentConfig(
+            role="codeur", model="claude-opus-4-8", max_tokens=4096,
+            prompt_file="codeur.md",
+        ),
     )
-
-    client.messages.create.assert_called_once()
-    kwargs = client.messages.create.call_args.kwargs
-    assert kwargs["model"] == "claude-sonnet-4-6"
-    assert kwargs["max_tokens"] == 8192
+    assert provider.calls[0]["model"] == "claude-opus-4-8"
+    assert provider.calls[0]["max_tokens"] == 4096
 
 
-async def test_run_uses_agent_config_model(tmp_path: Path) -> None:
-    client = _mock_complete_client("## Statut suggéré\nIN_REVIEW")
-    runner = _runner(tmp_path, client)
-    cfg = AgentConfig(
-        role="codeur",
-        model="claude-opus-4-8",
-        max_tokens=16000,
-        prompt_file="agents/prompts/codeur.md",
-    )
-
+async def test_run_transmet_le_project_path_en_cwd(tmp_path: Path) -> None:
+    provider = FakeProvider()
+    projet = tmp_path / "mon-projet"
+    projet.mkdir()
+    runner = _runner(tmp_path, provider, project_path=projet)
     await runner.run(
-        role=AgentRole.codeur,
-        ticket=_make_ticket(),
-        project_context="ctx",
-        agent_config=cfg,
+        role=AgentRole.codeur, ticket=_make_ticket(), project_context="ctx"
     )
-
-    kwargs = client.messages.create.call_args.kwargs
-    assert kwargs["model"] == "claude-opus-4-8"
-    assert kwargs["max_tokens"] == 16000
-
-
-async def test_run_enables_prompt_caching(tmp_path: Path) -> None:
-    client = _mock_complete_client("## Statut suggéré\nIN_REVIEW")
-    runner = _runner(tmp_path, client)
-
-    await runner.run(
-        role=AgentRole.codeur,
-        ticket=_make_ticket(),
-        project_context="ctx",
-    )
-
-    kwargs = client.messages.create.call_args.kwargs
-    system = kwargs["system"]
-    assert any(
-        block.get("cache_control", {}).get("type") == "ephemeral"
-        for block in system
-    )
+    assert provider.calls[0]["cwd"] == projet.resolve()
 
 
 # ------------------------------------------------------------------
-# AgentRunner.run — streaming (mocked client)
+# AgentRunner.run — streaming (via provider)
 # ------------------------------------------------------------------
 
 
-async def test_run_calls_stream_callback(tmp_path: Path) -> None:
-    tokens: list[str] = []
+async def test_run_en_streaming_utilise_stream(tmp_path: Path) -> None:
+    provider = FakeProvider(content="un deux")
+    runner = _runner(tmp_path, provider)
+    recus: list[str] = []
 
-    async def capture(token: str) -> None:
-        tokens.append(token)
+    async def cb(token: str) -> None:
+        recus.append(token)
 
-    mock_stream = MagicMock()
-
-    async def _text_stream():  # type: ignore[return]
-        for t in ["Bonjour", " monde"]:
-            yield t
-
-    mock_stream.text_stream = _text_stream()
-
-    full_text = "Bonjour monde\n\n## Statut suggéré\nIN_REVIEW"
-    final_msg = MagicMock()
-    final_msg.content = [MagicMock(text=full_text)]
-    final_msg.usage = MagicMock(
-        input_tokens=10, output_tokens=5,
-        cache_creation_input_tokens=0, cache_read_input_tokens=0,
-    )
-    mock_stream.get_final_message = AsyncMock(return_value=final_msg)
-
-    mock_ctx = AsyncMock()
-    mock_ctx.__aenter__ = AsyncMock(return_value=mock_stream)
-    mock_ctx.__aexit__ = AsyncMock(return_value=None)
-
-    client = MagicMock()
-    client.messages.stream = MagicMock(return_value=mock_ctx)
-
-    runner = _runner(tmp_path, client)
     result = await runner.run(
         role=AgentRole.codeur,
         ticket=_make_ticket(),
         project_context="ctx",
-        stream_callback=capture,
+        stream_callback=cb,
+    )
+    assert provider.calls[0]["mode"] == "stream"
+    assert "".join(recus).strip() == "un deux"
+    assert result.content == "un deux"
+
+
+# ------------------------------------------------------------------
+# AgentRunner.run — coût persisté (provider vs. calcul de repli)
+# ------------------------------------------------------------------
+
+
+async def test_run_persiste_le_cout_rapporte_par_le_provider(tmp_path: Path) -> None:
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+    run_id = await create_run(db_path, "project-1", "ticket-001")
+
+    provider = FakeProvider(tokens=100, cost_usd=0.042)
+    registry = AgentRegistryService(tmp_path / "prompts")
+    runner = AgentRunner(provider, registry, db_path=db_path)
+
+    await runner.run(
+        role=AgentRole.codeur,
+        ticket=_make_ticket(),
+        project_context="ctx",
+        run_id=run_id,
     )
 
-    assert tokens == ["Bonjour", " monde"]
-    assert "Bonjour monde" in result.content
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT cost_usd FROM agent_calls WHERE run_id=?", (run_id,)
+        ) as cursor:
+            rows = await cursor.fetchall()
+
+    assert len(rows) == 1
+    assert rows[0][0] == pytest.approx(0.042)
+
+
+async def test_run_calcule_le_cout_quand_le_provider_ne_le_rapporte_pas(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+    run_id = await create_run(db_path, "project-1", "ticket-001")
+
+    provider = FakeProvider(tokens=100)  # cost_usd=None par défaut
+    registry = AgentRegistryService(tmp_path / "prompts")
+    runner = AgentRunner(provider, registry, db_path=db_path)
+
+    await runner.run(
+        role=AgentRole.codeur,
+        ticket=_make_ticket(),
+        project_context="ctx",
+        run_id=run_id,
+    )
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT cost_usd FROM agent_calls WHERE run_id=?", (run_id,)
+        ) as cursor:
+            rows = await cursor.fetchall()
+
+    expected_cost = calculate_cost(_DEFAULT_MODEL, 100, 100, 0)
+    assert len(rows) == 1
+    assert rows[0][0] == pytest.approx(expected_cost)
 
 
 # ------------------------------------------------------------------
@@ -285,11 +311,38 @@ async def test_run_calls_stream_callback(tmp_path: Path) -> None:
 # ------------------------------------------------------------------
 
 
+@pytest.mark.asyncio
+async def test_run_transmet_le_tool_callback_au_provider(tmp_path: Path) -> None:
+    class ToolProvider(FakeProvider):
+        async def stream(self, **kwargs: object) -> object:
+            on_tool_use = kwargs.get("on_tool_use")
+            if on_tool_use is not None:
+                await on_tool_use("Write", {"file_path": "src/foo.py"})
+            return await super().stream(**kwargs)  # type: ignore[arg-type]
+
+    provider = ToolProvider(content="fait")
+    runner = _runner(tmp_path, provider)
+    outils: list[tuple[str, dict[str, Any]]] = []
+
+    async def on_tool(name: str, payload: dict[str, Any]) -> None:
+        outils.append((name, payload))
+
+    async def on_token(_: str) -> None:
+        return None
+
+    await runner.run(
+        role=AgentRole.codeur,
+        ticket=_make_ticket(),
+        project_context="ctx",
+        stream_callback=on_token,
+        tool_callback=on_tool,
+    )
+    assert outils == [("Write", {"file_path": "src/foo.py"})]
+
+
 @pytest.mark.integration
 async def test_run_real_api(tmp_path: Path) -> None:
-    """Nécessite une vraie ANTHROPIC_API_KEY (pas 'dummy')."""
-    from anthropic import AsyncAnthropic
-
+    """Requires a real ANTHROPIC_API_KEY (not 'dummy')."""
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not api_key or api_key == "dummy":
         pytest.skip("ANTHROPIC_API_KEY non disponible pour le test d'intégration")
@@ -302,9 +355,11 @@ async def test_run_real_api(tmp_path: Path) -> None:
 
     from anthropic import AsyncAnthropic
 
-    client = AsyncAnthropic(api_key=api_key)
+    from vibe_ide.services.providers.anthropic_api import AnthropicApiProvider
+
+    provider = AnthropicApiProvider(AsyncAnthropic(api_key=api_key))
     registry = AgentRegistryService(prompts)
-    runner = AgentRunner(client, registry)
+    runner = AgentRunner(provider, registry)
     ticket = _make_ticket(body="Dis bonjour en Python avec print().")
 
     result = await runner.run(

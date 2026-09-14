@@ -12,6 +12,7 @@ dependencies = [
     "python-frontmatter>=1.1.0",
     "websockets>=12.0",
     "httpx>=0.27.0",
+    "claude-agent-sdk>=0.2.152",
 ]
 
 [project.optional-dependencies]
@@ -34,8 +35,9 @@ packages = ["src/vibe_ide"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "-m 'not integration'"
 markers = [
-    "integration: tests nécessitant une vraie ANTHROPIC_API_KEY (dés-activés en CI)",
+    "integration: tests nécessitant une session Claude Code authentifiée et qui facturent l'abonnement Claude (dés-activés en CI) — pas une ANTHROPIC_API_KEY",
 ]
 
 [tool.coverage.run]
@@ -50,4 +52,5 @@ fail_under = 70
 [tool.mypy]
 strict = true
 python_version = "3.11"
+
 

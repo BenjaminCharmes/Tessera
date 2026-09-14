@@ -1,10 +1,10 @@
-"""Tests TDD pour ProjectCreatorService — ticket-004 + ticket-033."""
+"""TDD tests for ProjectCreatorService — ticket-004 + ticket-033."""
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from tests.test_providers_base import FakeProvider
 from vibe_ide.models.project import ConversationMessage, CreateProjectResponse
 from vibe_ide.models.ticket import TicketDraft, TicketPriority, TicketType
 from vibe_ide.services.project_creator import ProjectCreatorService
@@ -48,31 +48,20 @@ _QUESTION_RESPONSE = (
 _BOOTSTRAP_PROMPT = "Tu es un agent dédié à ce projet."
 
 
-def _make_client(response_text: str) -> MagicMock:
-    mock = MagicMock()
-    mock_resp = MagicMock()
-    mock_resp.content = [MagicMock(text=response_text)]
-    mock_resp.usage = MagicMock(
-        input_tokens=100,
-        output_tokens=50,
-        cache_creation_input_tokens=0,
-        cache_read_input_tokens=0,
-    )
-    mock.messages.create = AsyncMock(return_value=mock_resp)
-    return mock
+class _FailingAfterFirstProvider(FakeProvider):
+    """Provider whose first call succeeds, subsequent ones fail."""
+
+    async def complete(self, **kwargs):  # type: ignore[override]
+        self.calls.append({"mode": "complete", **kwargs})
+        if len(self.calls) > 1:
+            raise RuntimeError("LLM down")
+        from vibe_ide.services.providers.base import ProviderResult
+
+        return ProviderResult(content=self._content, input_tokens=10, output_tokens=10)
 
 
-def _make_client_multi(responses: list[str]) -> MagicMock:
-    """Client whose responses cycle through the given list."""
-    mock = MagicMock()
-    side_effects = []
-    for text in responses:
-        resp = MagicMock()
-        resp.content = [MagicMock(text=text)]
-        resp.usage = MagicMock(input_tokens=10, output_tokens=10)
-        side_effects.append(resp)
-    mock.messages.create = AsyncMock(side_effect=side_effects)
-    return mock
+def _make_provider(response_text: str) -> FakeProvider:
+    return FakeProvider(content=response_text)
 
 
 def _make_service(tmp_path: Path, response_text: str) -> ProjectCreatorService:
@@ -84,7 +73,7 @@ def _make_service(tmp_path: Path, response_text: str) -> ProjectCreatorService:
     workspace = tmp_path / "projects"
     workspace.mkdir()
     return ProjectCreatorService(
-        client=_make_client(response_text),
+        provider=_make_provider(response_text),
         prompts_dir=prompts_dir,
         workspace_dir=workspace,
     )
@@ -104,7 +93,7 @@ def _make_service_with_existing_agents(
     workspace = tmp_path / "projects"
     workspace.mkdir()
     return ProjectCreatorService(
-        client=_make_client(response_text),
+        provider=_make_provider(response_text),
         prompts_dir=prompts_dir,
         workspace_dir=workspace,
     )
@@ -176,7 +165,7 @@ async def test_one_shot_project_exists_on_disk(tmp_path: Path) -> None:
 
 
 async def test_one_shot_uses_non_technical_agents(tmp_path: Path) -> None:
-    """Un projet jardinage doit avoir des agents non-techniques (pas codeur)."""
+    """A gardening project must have non-technical agents (not codeur)."""
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
 
@@ -255,20 +244,20 @@ async def test_json_in_markdown_code_block(tmp_path: Path) -> None:
 
 
 # ------------------------------------------------------------------
-# Appel Anthropic : vérification des paramètres (premier appel)
+# Appel au provider : vérification des paramètres (premier appel)
 # ------------------------------------------------------------------
 
 
-async def test_calls_anthropic_with_system_prompt(tmp_path: Path) -> None:
+async def test_calls_provider_with_system_prompt(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     await svc.create_project([_user_message("Projet test")])
 
     # Premier appel = création du projet (avec system prompt)
-    first_call_kwargs = svc._client.messages.create.call_args_list[0].kwargs
-    assert first_call_kwargs["system"][0]["text"] == "Tu es le Project Creator."
+    provider = svc._provider
+    assert provider.calls[0]["system"] == "Tu es le Project Creator."
 
 
-async def test_calls_anthropic_with_full_conversation(tmp_path: Path) -> None:
+async def test_calls_provider_with_full_conversation(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     conversation = [
         _user_message("Projet jardinage"),
@@ -277,11 +266,10 @@ async def test_calls_anthropic_with_full_conversation(tmp_path: Path) -> None:
     ]
     await svc.create_project(conversation)
 
-    first_call_kwargs = svc._client.messages.create.call_args_list[0].kwargs
-    assert len(first_call_kwargs["messages"]) == 3
-    assert first_call_kwargs["messages"][0]["role"] == "user"
-    assert first_call_kwargs["messages"][1]["role"] == "assistant"
-    assert first_call_kwargs["messages"][2]["role"] == "user"
+    provider = svc._provider
+    flattened = provider.calls[0]["user"]
+    assert flattened.index("Projet jardinage") < flattened.index("Quel type de projet ?")
+    assert flattened.index("Quel type de projet ?") < flattened.index("Un plan de plantation.")
 
 
 # ------------------------------------------------------------------
@@ -303,7 +291,7 @@ async def test_duplicate_project_raises(tmp_path: Path) -> None:
 
 
 async def test_missing_agents_are_auto_created(tmp_path: Path) -> None:
-    """Les agents absents du registre sont créés automatiquement."""
+    """Agents missing from the registry are created automatically."""
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
 
@@ -315,7 +303,7 @@ async def test_missing_agents_are_auto_created(tmp_path: Path) -> None:
 
 
 async def test_existing_agents_not_recreated(tmp_path: Path) -> None:
-    """Les agents déjà présents dans le registre ne sont pas recréés."""
+    """Agents already present in the registry are not recreated."""
     svc = _make_service_with_existing_agents(
         tmp_path, _VALID_AGENT_JSON, existing_agents=["redacteur", "planificateur"]
     )
@@ -329,7 +317,7 @@ async def test_existing_agents_not_recreated(tmp_path: Path) -> None:
 
 
 async def test_builtin_agents_not_bootstrapped(tmp_path: Path) -> None:
-    """Les agents builtins (orchestrateur) ne déclenchent pas de bootstrap."""
+    """Builtin agents (orchestrateur) do not trigger a bootstrap."""
     svc = _make_service_with_existing_agents(
         tmp_path, _VALID_AGENT_JSON, existing_agents=["redacteur", "planificateur"]
     )
@@ -340,7 +328,7 @@ async def test_builtin_agents_not_bootstrapped(tmp_path: Path) -> None:
 
 
 async def test_agents_created_empty_when_all_exist(tmp_path: Path) -> None:
-    """agents_created est vide si tous les agents existent déjà."""
+    """agents_created is empty when all agents already exist."""
     svc = _make_service_with_existing_agents(
         tmp_path,
         _VALID_AGENT_JSON,
@@ -352,20 +340,22 @@ async def test_agents_created_empty_when_all_exist(tmp_path: Path) -> None:
 
 
 async def test_bootstrap_uses_haiku_model(tmp_path: Path) -> None:
-    """_bootstrap_agent utilise le modèle Haiku (coût faible)."""
+    """_bootstrap_agent uses the Haiku model (low cost)."""
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     await svc.create_project([_user_message("Je veux un potager méditerranéen")])
 
     # Les appels de bootstrap (index 1 et 2) doivent utiliser Haiku
     from vibe_ide.services.project_creator import _BOOTSTRAP_MODEL
 
-    bootstrap_calls = svc._client.messages.create.call_args_list[1:]
+    provider = svc._provider
+    bootstrap_calls = provider.calls[1:]
+    assert len(bootstrap_calls) == 2
     for call in bootstrap_calls:
-        assert call.kwargs["model"] == _BOOTSTRAP_MODEL
+        assert call["model"] == _BOOTSTRAP_MODEL
 
 
 async def test_bootstrap_failure_does_not_block_creation(tmp_path: Path) -> None:
-    """Un échec de bootstrap ne bloque pas la création du projet."""
+    """A bootstrap failure does not block project creation."""
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     (prompts_dir / "project-creator.md").write_text("Tu es le Project Creator.")
@@ -373,16 +363,10 @@ async def test_bootstrap_failure_does_not_block_creation(tmp_path: Path) -> None
     workspace.mkdir()
 
     # Premier appel réussit, les suivants (bootstrap) lèvent une exception
-    mock_client = MagicMock()
-    success_resp = MagicMock()
-    success_resp.content = [MagicMock(text=_VALID_AGENT_JSON)]
-    success_resp.usage = MagicMock(input_tokens=10, output_tokens=10)
-    mock_client.messages.create = AsyncMock(
-        side_effect=[success_resp, RuntimeError("LLM down"), RuntimeError("LLM down")]
-    )
+    provider = _FailingAfterFirstProvider(content=_VALID_AGENT_JSON)
 
     svc = ProjectCreatorService(
-        client=mock_client, prompts_dir=prompts_dir, workspace_dir=workspace
+        provider=provider, prompts_dir=prompts_dir, workspace_dir=workspace
     )
     result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
 
@@ -394,7 +378,7 @@ async def test_bootstrap_failure_does_not_block_creation(tmp_path: Path) -> None
 async def test_conversation_with_no_active_agents_has_empty_agents_created(
     tmp_path: Path,
 ) -> None:
-    """Quand done=False (conversation en cours), agents_created est vide."""
+    """When done=False (conversation in progress), agents_created is empty."""
     svc = _make_service(tmp_path, _QUESTION_RESPONSE)
     result = await svc.create_project([_user_message("Projet jardinage")])
 
