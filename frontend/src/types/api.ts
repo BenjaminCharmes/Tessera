@@ -259,3 +259,12 @@ export interface GitStatus {
   /** Renseigné quand le projet vit dans un dépôt qui n'est pas le sien. */
   nested_in: string | null;
 }
+
+/** ticket-062 — les artefacts vibe-ide partent dans le dépôt, ou restent locaux. */
+export type ArtifactMode = "tracked" | "local";
+
+export interface ArtifactModeState {
+  mode: ArtifactMode;
+  /** Artefacts déjà dans l'index git : l'exclusion ne les en sort pas. */
+  already_tracked: string[];
+}

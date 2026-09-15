@@ -3,6 +3,8 @@ import type {
   AnalysisResult,
   CloneProjectRequest,
   CloneProjectResponse,
+  ArtifactMode,
+  ArtifactModeState,
   ChatHistory,
   GitStatus,
   ConversationMessage,
@@ -38,6 +40,14 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 async function post<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+async function put<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -127,6 +137,13 @@ export const api = {
         repo_url: repoUrl,
         confirmed,
       }),
+    artifacts: (projectId: string): Promise<ArtifactModeState> =>
+      request(`/projects/${projectId}/artifacts`),
+    setArtifacts: (
+      projectId: string,
+      mode: ArtifactMode,
+    ): Promise<ArtifactModeState> =>
+      put(`/projects/${projectId}/artifacts`, { mode }),
   },
   chat: {
     history: (

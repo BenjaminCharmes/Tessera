@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { api } from "../../lib/api";
 import { useGitStatus } from "../../hooks/useGitStatus";
-import type { Project } from "../../types/api";
+import type { ArtifactMode, ArtifactModeState, Project } from "../../types/api";
 
 interface GitLinkPanelProps {
   project: Project | null;
@@ -16,6 +17,35 @@ interface GitLinkPanelProps {
 export default function GitLinkPanel({ project }: GitLinkPanelProps) {
   const git = useGitStatus(project?.id ?? null);
   const [repoUrl, setRepoUrl] = useState("");
+  const [artifacts, setArtifacts] = useState<ArtifactModeState | null>(null);
+
+  const projectId = project?.id ?? null;
+
+  useEffect(() => {
+    if (!projectId) {
+      setArtifacts(null);
+      return;
+    }
+    let cancelled = false;
+    api.git
+      .artifacts(projectId)
+      .then((state) => !cancelled && setArtifacts(state))
+      .catch(() => !cancelled && setArtifacts(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, git.status]);
+
+  const changeMode = useCallback(
+    (mode: ArtifactMode) => {
+      if (!projectId) return;
+      void api.git
+        .setArtifacts(projectId, mode)
+        .then(setArtifacts)
+        .catch(() => undefined);
+    },
+    [projectId],
+  );
 
   if (!project) return null;
 
@@ -83,6 +113,44 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
         <p className="break-all text-emerald-400">
           Lié à <code>{status?.remote_url}</code>
         </p>
+      )}
+
+      {artifacts && (
+        <div className="mt-2 border-t border-zinc-800 pt-2">
+          <p className="mb-1 text-zinc-500">
+            Tickets, mémoire et ADR de ce projet
+          </p>
+          <div className="flex gap-1">
+            {(["tracked", "local"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => changeMode(mode)}
+                aria-pressed={artifacts.mode === mode}
+                className={`rounded px-2 py-0.5 ${
+                  artifacts.mode === mode
+                    ? "bg-zinc-600 text-zinc-100"
+                    : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                {mode === "tracked" ? "dans le dépôt" : "locaux"}
+              </button>
+            ))}
+          </div>
+          {artifacts.mode === "local" && (
+            <p className="mt-1 text-zinc-600">
+              Exclus via <code>.git/info/exclude</code>, jamais via{" "}
+              <code>.gitignore</code> — rien n'apparaît dans un diff.
+            </p>
+          )}
+          {artifacts.mode === "local" && artifacts.already_tracked.length > 0 && (
+            <p className="mt-1 text-amber-400">
+              {artifacts.already_tracked.length} fichier(s) déjà suivi(s) par
+              git : l'exclusion ne les en sort pas. Utilise{" "}
+              <code>git rm --cached</code> si tu veux les retirer.
+            </p>
+          )}
+        </div>
       )}
 
       {git.errorMessage && (

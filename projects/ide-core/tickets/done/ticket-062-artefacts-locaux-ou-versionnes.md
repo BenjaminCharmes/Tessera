@@ -2,7 +2,7 @@
 id: ticket-062
 title: "Artefacts vibe-ide : versionnés ou locaux, au choix du projet"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -70,14 +70,14 @@ ne peut pas défaire un push.
 
 ## Critères d'acceptation
 
-- [ ] `agents.json` porte `vibe_artifacts`, avec les défauts ci-dessus
-- [ ] En mode `local`, les chemins sont dans `.git/info/exclude`
-- [ ] **`.gitignore` du projet n'est jamais modifié**
-- [ ] Le mode se change dans les deux sens depuis l'UI
-- [ ] Passer à `local` sur des fichiers déjà suivis propose un `git rm --cached`
+- [x] `agents.json` porte `vibe_artifacts`, avec les défauts ci-dessus
+- [x] En mode `local`, les chemins sont dans `.git/info/exclude`
+- [x] **`.gitignore` du projet n'est jamais modifié**
+- [x] Le mode se change dans les deux sens depuis l'UI
+- [x] Passer à `local` sur des fichiers déjà suivis propose un `git rm --cached`
       et ne l'applique pas seul
-- [ ] En mode `local`, un run de pipeline se termine normalement
-- [ ] Le mode est visible dans l'UI
+- [x] En mode `local`, un run de pipeline se termine normalement
+- [x] Le mode est visible dans l'UI
 
 ## Dépendances
 
@@ -92,3 +92,20 @@ Aucune.
 - **Moyen** — toucher à l'exclusion git d'un dépôt client. Mitigation :
   `.git/info/exclude` uniquement, jamais `.gitignore`, et aucun `git rm` sans
   action explicite de l'utilisateur.
+
+## Livré
+
+`services/vibe_artifacts.py` — mode par projet, exclusion entre marqueurs dans
+`.git/info/exclude`, détection des artefacts déjà suivis. Endpoints
+`GET/PUT /projects/{id}/artifacts`. Sélecteur dans `GitLinkPanel`.
+
+Le clone applique `local` à la création. **ADR-021** consigne le choix du
+mécanisme.
+
+### Ce que les tests verrouillent
+
+- `.gitignore` du projet **n'est jamais modifié**, même s'il existe déjà
+- Le bloc ajouté à `.git/info/exclude` préserve ce que l'utilisateur y avait
+  écrit, dans les deux sens
+- Les artefacts **déjà dans l'index** sont signalés, jamais retirés : un
+  `git rm --cached` modifie l'historique à venir du dépôt de l'utilisateur

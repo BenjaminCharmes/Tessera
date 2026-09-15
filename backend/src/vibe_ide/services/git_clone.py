@@ -8,6 +8,10 @@ from pathlib import Path
 from vibe_ide.models.project import CloneProjectResponse, Project
 from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 from vibe_ide.services.project_importer import _scaffold_vibe_dirs
+from vibe_ide.services.vibe_artifacts import (
+    apply_artifact_mode,
+    default_mode_for,
+)
 from vibe_ide.services.project_loader import load_project
 from vibe_ide.utils.logger import get_logger
 
@@ -73,6 +77,10 @@ class GitCloneService:
 
         _scaffold_vibe_dirs(dest)
         self._store_github_remote(dest, repo_url)
+        # Le dépôt appartient déjà à quelqu'un d'autre : les artefacts
+        # vibe-ide restent locaux par défaut (ticket-062). L'utilisateur
+        # peut toujours choisir de les partager ensuite.
+        await apply_artifact_mode(dest, default_mode_for("clone"))
 
         analysis = await self._analyzer.analyze(dest)
 

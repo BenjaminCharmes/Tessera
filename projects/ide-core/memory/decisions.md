@@ -187,3 +187,13 @@ Format : ADR léger (Architecture Decision Record).
 **Alternative rejetée** : Déduire le quota de la dépense estimée (les deux ne sont pas proportionnels) ; traiter l'absence d'événement comme un quota nul (un fournisseur muet deviendrait indiscernable d'un quota épuisé, et l'IDE refuserait de travailler sans raison).
 **Invariant** : la vérification se fait **entre** deux tickets, jamais au milieu d'un — s'arrêter en cours de ticket laisserait son travail non commité, ce qu'ADR-018 interdit.
 **Détail** : voir `tickets/done/ticket-054-quota-abonnement.md`.
+
+---
+
+## ADR-021 — Les artefacts vibe-ide s'excluent par `.git/info/exclude`, jamais par `.gitignore`
+
+**Date** : 2026-09-15
+**Décision** : Un projet déclare dans `agents.json` si ses `tickets/`, `memory/`, `CLAUDE.md` et `agents.json` partent dans son dépôt (`tracked`) ou restent sur la machine (`local`). En mode `local`, l'exclusion est écrite dans `.git/info/exclude`, entre marqueurs, et **jamais** dans `.gitignore`. Défaut : `tracked` pour un projet créé ou importé, `local` pour un projet cloné.
+**Raison** : `.gitignore` est lui-même versionné. Le modifier sur un dépôt client produit un diff visible qui annonce exactement ce qu'on voulait garder hors du dépôt. `.git/info/exclude` a la même sémantique, reste local au clone et n'apparaît ni dans l'historique ni dans un diff. Le défaut diffère selon l'origine parce qu'un dépôt cloné appartient déjà à quelqu'un d'autre : on peut toujours choisir de partager ensuite, on ne peut pas défaire un push.
+**Alternative rejetée** : Un réglage global (le bon choix dépend du projet, pas de la machine) ; `.gitignore` (versionné, donc contre-productif) ; retirer automatiquement de l'index les artefacts déjà suivis (`git rm --cached` modifie l'historique à venir du dépôt de l'utilisateur : ça se propose, ça ne se fait pas en silence).
+**Détail** : voir `tickets/done/ticket-062-artefacts-locaux-ou-versionnes.md`.

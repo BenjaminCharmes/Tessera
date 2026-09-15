@@ -363,3 +363,62 @@ def test_un_depot_distant_non_vide_demande_confirmation(
 
     assert resp.status_code == 409
     assert "n'est pas vide" in resp.json()["detail"]
+
+
+# ------------------------------------------------------------------
+# Artefacts vibe-ide — ticket-062
+# ------------------------------------------------------------------
+
+
+def test_mode_des_artefacts_par_defaut(workspace: Path) -> None:
+    body = _client().get("/api/v1/projects/mon-projet/artifacts").json()
+
+    assert body["mode"] == "tracked"
+    assert body["already_tracked"] == []
+
+
+def test_passer_les_artefacts_en_local(workspace: Path) -> None:
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    resp = _client().put(
+        "/api/v1/projects/mon-projet/artifacts", json={"mode": "local"}
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["mode"] == "local"
+
+    exclude = (workspace / "mon-projet" / ".git" / "info" / "exclude").read_text(
+        encoding="utf-8"
+    )
+    assert "tickets/" in exclude
+
+
+def test_le_gitignore_du_projet_n_est_jamais_touche(workspace: Path) -> None:
+    # Le point central : `.gitignore` est versionné, donc le modifier
+    # annoncerait dans un diff ce qu'on voulait garder hors du dépôt.
+    project = workspace / "mon-projet"
+    (project / ".gitignore").write_text("dist/\n", encoding="utf-8")
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    _client().put("/api/v1/projects/mon-projet/artifacts", json={"mode": "local"})
+
+    assert (project / ".gitignore").read_text(encoding="utf-8") == "dist/\n"
+
+
+def test_les_artefacts_deja_suivis_sont_remontes(workspace: Path) -> None:
+    # Ils ne sont pas retirés : les sortir de l'index est un `git rm --cached`,
+    # qui se décide.
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    body = _client().put(
+        "/api/v1/projects/mon-projet/artifacts", json={"mode": "local"}
+    ).json()
+
+    assert "CLAUDE.md" in body["already_tracked"]
+
+
+def test_un_mode_inconnu_est_refuse(workspace: Path) -> None:
+    resp = _client().put(
+        "/api/v1/projects/mon-projet/artifacts", json={"mode": "n-importe-quoi"}
+    )
+    assert resp.status_code == 422

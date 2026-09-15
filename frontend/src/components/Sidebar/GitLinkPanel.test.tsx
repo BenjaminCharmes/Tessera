@@ -127,3 +127,76 @@ describe("GitLinkPanel", () => {
     );
   });
 });
+
+describe("GitLinkPanel — artefacts vibe-ide (ticket-062)", () => {
+  beforeEach(() => {
+    vi.spyOn(api.git, "status").mockResolvedValue({
+      is_repository: true,
+      has_commits: true,
+      remote_url: "https://github.com/client/projet.git",
+      nested_in: null,
+    });
+  });
+
+  it("montre le mode courant des artefacts", async () => {
+    vi.spyOn(api.git, "artifacts").mockResolvedValue({
+      mode: "local",
+      already_tracked: [],
+    });
+
+    render(<GitLinkPanel project={project} />);
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "locaux" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      ),
+    );
+  });
+
+  it("explique que l'exclusion ne passe pas par .gitignore", async () => {
+    // Le point qui compte sur un dépôt client : rien ne doit apparaître dans
+    // un diff.
+    vi.spyOn(api.git, "artifacts").mockResolvedValue({
+      mode: "local",
+      already_tracked: [],
+    });
+
+    render(<GitLinkPanel project={project} />);
+
+    await waitFor(() =>
+      expect(screen.getByText(/.git\/info\/exclude/)).toBeInTheDocument(),
+    );
+  });
+
+  it("change le mode au clic", async () => {
+    vi.spyOn(api.git, "artifacts").mockResolvedValue({
+      mode: "tracked",
+      already_tracked: [],
+    });
+    const setArtifacts = vi.spyOn(api.git, "setArtifacts").mockResolvedValue({
+      mode: "local",
+      already_tracked: [],
+    });
+
+    const user = userEvent.setup();
+    render(<GitLinkPanel project={project} />);
+
+    await user.click(await screen.findByRole("button", { name: "locaux" }));
+
+    expect(setArtifacts).toHaveBeenCalledWith("mon-projet", "local");
+  });
+
+  it("avertit que les fichiers déjà suivis ne sortent pas de l'index", async () => {
+    vi.spyOn(api.git, "artifacts").mockResolvedValue({
+      mode: "local",
+      already_tracked: ["CLAUDE.md", "memory/decisions.md"],
+    });
+
+    render(<GitLinkPanel project={project} />);
+
+    await waitFor(() =>
+      expect(screen.getByText(/git rm --cached/)).toBeInTheDocument(),
+    );
+  });
+});
