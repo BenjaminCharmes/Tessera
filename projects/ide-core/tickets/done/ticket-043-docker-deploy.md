@@ -2,7 +2,7 @@
 id: ticket-043
 title: "Docker Compose + déploiement cloud"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur

@@ -33,6 +33,27 @@ def _slugify(text: str, max_len: int = 40) -> str:
     return slug[:max_len].rstrip("-")
 
 
+def _status_from_folder(path: Path, meta: dict[str, Any]) -> TicketStatus:
+    """Le dossier fait foi ; le frontmatter n'est qu'un repli.
+
+    C'est le service qui place les fichiers dans `_STATUS_DIRS` : le dossier ne
+    peut pas mentir sur ce qu'il a fait. Le champ frontmatter, lui, dérive dès
+    qu'un fichier est écrit sans être mis à jour — douze tickets de `ide-core`
+    étaient dans `done/` en annonçant `status: todo`, et l'UI les affichait
+    comme à faire (ticket-059).
+
+    Le champ reste écrit dans le fichier pour qu'il se lise seul, hors de
+    l'IDE : il est dérivé, pas autoritaire.
+    """
+    by_dir = {directory: status for status, directory in _STATUS_DIRS.items()}
+    folder_status = by_dir.get(path.parent.name)
+    if folder_status is not None:
+        return folder_status
+    # Dossier non reconnu (archive, arborescence inattendue) : on retombe sur
+    # ce que le fichier déclare plutôt que d'échouer.
+    return TicketStatus(meta["status"])
+
+
 class TicketService:
     def __init__(self, project_path: Path, project_id: str) -> None:
         self._root = project_path
@@ -244,7 +265,7 @@ class TicketService:
             id=str(meta["id"]),
             title=str(meta["title"]),
             type=TicketType(meta["type"]),
-            status=TicketStatus(meta["status"]),
+            status=_status_from_folder(path, meta),
             priority=TicketPriority(meta["priority"]),
             agent=str(meta["agent"]),
             depends_on=[str(dep) for dep in raw_depends_on],

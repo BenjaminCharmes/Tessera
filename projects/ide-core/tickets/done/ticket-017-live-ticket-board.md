@@ -2,7 +2,7 @@
 id: ticket-017
 title: "Live ticket board — mise à jour temps réel via WebSocket"
 type: feat
-status: todo
+status: done
 priority: high
 agent: codeur
 depends_on:

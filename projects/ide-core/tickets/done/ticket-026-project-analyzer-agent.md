@@ -2,7 +2,7 @@
 id: ticket-026
 title: "Agent project-analyzer — génération CLAUDE.md depuis le code"
 type: feat
-status: todo
+status: done
 priority: high
 agent: codeur
 depends_on:

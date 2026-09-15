@@ -2,7 +2,7 @@
 id: ticket-042
 title: "Coverage frontend — monter à 80 % sur les composants clés"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur

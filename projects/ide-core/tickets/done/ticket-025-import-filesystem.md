@@ -2,7 +2,7 @@
 id: ticket-025
 title: "Import d'un projet local existant (backend)"
 type: feat
-status: todo
+status: done
 priority: high
 agent: codeur
 depends_on: []

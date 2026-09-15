@@ -2,7 +2,7 @@
 id: ticket-018
 title: "UI — Panneau historique des pipelines"
 type: feat
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on:

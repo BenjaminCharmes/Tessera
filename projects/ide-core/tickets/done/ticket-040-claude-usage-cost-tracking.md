@@ -2,7 +2,7 @@
 id: ticket-040
 title: "Suivi du coût et de l'usage des appels Claude"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur

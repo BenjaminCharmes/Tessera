@@ -2,7 +2,7 @@
 id: ticket-038
 title: "CI — rapport de coverage automatique sur les PRs"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur

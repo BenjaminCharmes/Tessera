@@ -2,7 +2,7 @@
 id: ticket-020
 title: "E2E tests — Playwright (5 flows critiques)"
 type: chore
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on:

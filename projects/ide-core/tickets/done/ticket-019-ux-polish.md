@@ -2,7 +2,7 @@
 id: ticket-019
 title: "UX polish — ErrorBoundary, empty states, toasts"
 type: chore
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on:

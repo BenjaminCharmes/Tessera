@@ -299,3 +299,33 @@ async def test_ticket_type_couvre_les_types_conventional_commits(tmp_path: Path)
 
     values = {t.value for t in TicketType}
     assert {"feat", "fix", "chore", "docs", "refactor", "test"} <= values
+
+
+async def test_le_dossier_fait_foi_sur_le_statut(tmp_path: Path) -> None:
+    # Cas réel : douze tickets de ide-core étaient dans `done/` avec
+    # `status: todo` dans leur frontmatter, et l'UI les affichait comme à
+    # faire. Le dossier ne peut pas mentir — c'est le service qui y place les
+    # fichiers ; le champ, lui, dérive (ticket-059).
+    for status in ("todo", "in-progress", "in-review", "done", "blocked"):
+        (tmp_path / "tickets" / status).mkdir(parents=True)
+
+    (tmp_path / "tickets" / "done" / "ticket-017.md").write_text(
+        "---\n"
+        "id: ticket-017\n"
+        'title: "Terminé il y a longtemps"\n'
+        "type: feat\n"
+        "status: todo\n"
+        "priority: medium\n"
+        "agent: codeur\n"
+        "---\n\n# ticket-017\n",
+        encoding="utf-8",
+    )
+
+    svc = TicketService(tmp_path, "projet")
+
+    ticket = await svc.get_ticket("ticket-017")
+    assert ticket is not None
+    assert ticket.status == TicketStatus.done
+
+    assert await svc.list_tickets(TicketStatus.todo) == []
+    assert [t.id for t in await svc.list_tickets(TicketStatus.done)] == ["ticket-017"]
