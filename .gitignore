@@ -63,3 +63,8 @@ projects/*
 # Claude Code : la config partagée (skills, settings.json) est versionnée,
 # les préférences personnelles ne le sont pas.
 .claude/settings.local.json
+
+# Artefacts de couverture (générés par pytest-cov / vitest)
+.coverage
+coverage.xml
+htmlcov/
