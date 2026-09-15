@@ -268,3 +268,12 @@ export interface ArtifactModeState {
   /** Artefacts déjà dans l'index git : l'exclusion ne les en sort pas. */
   already_tracked: string[];
 }
+
+/** ticket-063 — ce qu'un retrait toucherait, à montrer avant de décider. */
+export interface RemovalPlan {
+  project_id: string;
+  /** Chemin réellement visé, liens résolus. */
+  real_path: string;
+  is_symlink: boolean;
+  unpushed_commits: number;
+}

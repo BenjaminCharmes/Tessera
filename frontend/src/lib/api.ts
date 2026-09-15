@@ -7,6 +7,7 @@ import type {
   ArtifactModeState,
   ChatHistory,
   GitStatus,
+  RemovalPlan,
   ConversationMessage,
   CreateAgentResponse,
   CreatePrResponse,
@@ -137,6 +138,12 @@ export const api = {
         repo_url: repoUrl,
         confirmed,
       }),
+    removalPlan: (projectId: string): Promise<RemovalPlan> =>
+      request(`/projects/${projectId}/removal-plan`),
+    detach: (projectId: string): Promise<{ detached: boolean; moved_to: string }> =>
+      post(`/projects/${projectId}/detach`, {}),
+    remove: (projectId: string): Promise<void> =>
+      del(`/projects/${projectId}?confirmed=true`),
     artifacts: (projectId: string): Promise<ArtifactModeState> =>
       request(`/projects/${projectId}/artifacts`),
     setArtifacts: (

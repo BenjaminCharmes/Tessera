@@ -422,3 +422,72 @@ def test_un_mode_inconnu_est_refuse(workspace: Path) -> None:
         "/api/v1/projects/mon-projet/artifacts", json={"mode": "n-importe-quoi"}
     )
     assert resp.status_code == 422
+
+
+# ------------------------------------------------------------------
+# Retrait d'un projet — ticket-063
+# ------------------------------------------------------------------
+
+
+def test_le_plan_de_retrait_nomme_le_chemin_reel(workspace: Path) -> None:
+    body = _client().get("/api/v1/projects/mon-projet/removal-plan").json()
+
+    assert body["project_id"] == "mon-projet"
+    assert body["real_path"].endswith("mon-projet")
+    assert body["is_symlink"] is False
+
+
+def test_le_plan_compte_les_commits_non_pousses(workspace: Path) -> None:
+    # C'est ce que l'utilisateur perdrait : la confirmation doit le nommer.
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    body = _client().get("/api/v1/projects/mon-projet/removal-plan").json()
+
+    assert body["unpushed_commits"] >= 1
+
+
+def test_detacher_un_projet_deplace_les_fichiers_sans_les_perdre(
+    workspace: Path,
+) -> None:
+    resp = _client().post("/api/v1/projects/mon-projet/detach")
+
+    assert resp.status_code == 200
+    moved_to = Path(resp.json()["moved_to"])
+    assert moved_to.is_dir()
+    assert (moved_to / "CLAUDE.md").exists()
+    assert not (workspace / "mon-projet").exists()
+
+
+def test_supprimer_sans_confirmation_est_refuse(workspace: Path) -> None:
+    resp = _client().delete("/api/v1/projects/mon-projet")
+
+    assert resp.status_code == 409
+    assert (workspace / "mon-projet").is_dir()
+
+
+def test_supprimer_avec_confirmation_efface(workspace: Path) -> None:
+    resp = _client().delete("/api/v1/projects/mon-projet?confirmed=true")
+
+    assert resp.status_code == 204
+    assert not (workspace / "mon-projet").exists()
+
+
+def test_supprimer_un_projet_lie_ne_touche_jamais_la_cible(
+    workspace: Path, tmp_path: Path
+) -> None:
+    # Le garde-fou qui compte : `projects/fluentdb` EST `Desktop/fluentdb`.
+    source = tmp_path / "vrai-dossier"
+    source.mkdir()
+    (source / "important.py").write_text("ne pas perdre\n", encoding="utf-8")
+    link = workspace / "projet-lie"
+    try:
+        link.symlink_to(source, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks indisponibles sur cette machine")
+
+    resp = _client().delete("/api/v1/projects/projet-lie?confirmed=true")
+
+    assert resp.status_code == 204
+    assert not link.exists()
+    assert source.is_dir()
+    assert (source / "important.py").read_text(encoding="utf-8") == "ne pas perdre\n"

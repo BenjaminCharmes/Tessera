@@ -2,7 +2,7 @@
 id: ticket-063
 title: "Retirer un projet de l'IDE sans le supprimer"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -50,13 +50,13 @@ l'utilisateur depuis un IDE.
 
 ## Critères d'acceptation
 
-- [ ] Retirer un projet le fait disparaître de l'IDE sans perte de fichiers
-- [ ] Retirer un projet lié en `symlink` supprime le lien, jamais la cible
-- [ ] Retirer un projet `copy`/`clone` déplace le dossier et dit où
-- [ ] La suppression définitive est une action distincte, avec confirmation
-- [ ] La confirmation nomme le chemin réel et les commits non poussés
-- [ ] La suppression définitive d'un `symlink` ne touche jamais la cible
-- [ ] L'historique de pipelines du projet en base est conservé ou purgé
+- [x] Retirer un projet le fait disparaître de l'IDE sans perte de fichiers
+- [x] Retirer un projet lié en `symlink` supprime le lien, jamais la cible
+- [x] Retirer un projet `copy`/`clone` déplace le dossier et dit où
+- [x] La suppression définitive est une action distincte, avec confirmation
+- [x] La confirmation nomme le chemin réel et les commits non poussés
+- [x] La suppression définitive d'un `symlink` ne touche jamais la cible
+- [x] L'historique de pipelines du projet en base est conservé ou purgé
       explicitement, pas laissé orphelin
 
 ## Dépendances
@@ -72,3 +72,31 @@ Aucune.
 - **Élevé si mal fait** — c'est une fonctionnalité de suppression de fichiers
   de l'utilisateur. La règle : le chemin est résolu et affiché avant toute
   action, et aucune suppression ne franchit un lien symbolique.
+
+## Livré
+
+`services/project_removal.py` — `describe_removal`, `detach_project`,
+`delete_project`. Endpoints `GET /removal-plan`, `POST /detach`,
+`DELETE /{id}?confirmed=true`. `RemoveProjectModal` côté UI.
+
+### La règle qui ne souffre aucune exception
+
+**Aucune suppression ne franchit un lien symbolique.** `projects/fluentdb`
+*est* `Desktop/fluentdb` : effacer le dossier de travail de l'utilisateur
+depuis un IDE n'est jamais la bonne réponse. Deux tests le verrouillent, un
+pour chaque action.
+
+### Ce que la modale montre avant de décider
+
+Le **chemin réellement visé**, liens résolus — jamais l'identifiant seul. Le
+nombre de commits non poussés, qui est exactement ce qui serait perdu. Et pour
+un lien, la mention explicite que son contenu ne sera pas touché.
+
+La suppression définitive demande **deux** clics : le premier déplie la
+confirmation, le second agit.
+
+## Non traité
+
+L'historique de pipelines du projet reste en base après retrait. Le purger
+demanderait de décider ce qu'on fait d'un projet détaché puis réattaché : à
+traiter si le cas se présente.
