@@ -13,6 +13,7 @@ from vibe_ide.services.providers.base import (
     ProviderResult,
     ToolEventCallback,
 )
+from vibe_ide.services.prompt_loader import MissingPromptError
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -145,10 +146,18 @@ class AgentRunner:
 
     def _load_system_prompt(self, role: str) -> str:
         try:
-            return self._registry.get_prompt(role)
-        except AgentNotFoundError:
-            _logger.warning("prompt_file_missing", extra={"role": role})
-            return f"Tu es un agent {role} de vibe-ide. Aide à implémenter le ticket assigné."
+            prompt = self._registry.get_prompt(role)
+        except AgentNotFoundError as exc:
+            raise MissingPromptError(
+                self._registry.prompts_dir, f"{role}.md", "rôle absent du registre"
+            ) from exc
+        # Le registre peut renvoyer un fichier vide : aussi inexploitable
+        # qu'un fichier absent, et plus trompeur puisqu'il existe.
+        if not prompt.strip():
+            raise MissingPromptError(
+                self._registry.prompts_dir, f"{role}.md", "fichier vide"
+            )
+        return prompt
 
     def _build_user_prompt(self, ticket: Ticket, role: str, project_context: str) -> str:
         instruction = _INSTRUCTIONS.get(role, "Traite le ticket assigné.")

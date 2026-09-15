@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from vibe_ide.services.prompt_loader import MissingPromptError
+
 from tests.test_providers_base import FakeProvider
 from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 
@@ -363,13 +365,20 @@ async def test_calls_provider_with_user_message(tmp_path: Path) -> None:
 # ------------------------------------------------------------------
 
 
-async def test_fallback_when_no_prompt_file(tmp_path: Path) -> None:
+async def test_prompt_manquant_echoue_au_lieu_de_degrader(tmp_path: Path) -> None:
+    # Sans son prompt, l'analyseur générait un CLAUDE.md à partir d'un repli
+    # générique — un document plausible et faux, que tous les agents du projet
+    # liraient ensuite (ticket-051).
     project = _make_python_project(tmp_path)
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     svc = ProjectAnalyzerService(provider=_make_provider(_VALID_RESPONSE), prompts_dir=prompts_dir)
-    result = await svc.analyze(project)
-    assert result.detected_stack == ["Python", "FastAPI"]
+
+    with pytest.raises(MissingPromptError) as exc:
+        await svc.analyze(project)
+
+    assert "project-analyzer.md" in str(exc.value)
+    assert "IDE_PROMPTS_DIR" in str(exc.value)
 
 
 # ------------------------------------------------------------------

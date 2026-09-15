@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from vibe_ide.services.prompt_loader import MissingPromptError
+
 from tests.test_providers_base import FakeProvider
 from vibe_ide.models.project import PlanResult
 from vibe_ide.models.ticket import TicketDraftPlan
@@ -173,7 +175,10 @@ async def test_plan_calls_anthropic_with_user_role(tmp_path: Path) -> None:
 # ------------------------------------------------------------------
 
 
-async def test_fallback_when_no_prompt_file(tmp_path: Path) -> None:
+async def test_prompt_manquant_echoue_au_lieu_de_degrader(tmp_path: Path) -> None:
+    # Le planificateur se repliait sur un prompt générique d'une ligne et
+    # produisait des tickets hors sujet, sans autre signal qu'un WARNING
+    # (ticket-051). Il doit désormais refuser net.
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     workspace_dir = tmp_path / "workspace"
@@ -183,8 +188,12 @@ async def test_fallback_when_no_prompt_file(tmp_path: Path) -> None:
         prompts_dir=prompts_dir,
         workspace_dir=workspace_dir,
     )
-    result = await svc.plan("proj", "description")
-    assert len(result.drafts) == 2
+
+    with pytest.raises(MissingPromptError) as exc:
+        await svc.plan("proj", "description")
+
+    assert "planificateur.md" in str(exc.value)
+    assert "IDE_PROMPTS_DIR" in str(exc.value)
 
 
 # ------------------------------------------------------------------

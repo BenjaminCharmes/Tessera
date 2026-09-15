@@ -13,6 +13,7 @@ from vibe_ide.services.project_loader import ProjectLoader
 from vibe_ide.services.providers.base import LLMProvider
 from vibe_ide.utils.conversation import format_conversation
 from vibe_ide.utils.json_extract import extract_json
+from vibe_ide.services.prompt_loader import load_system_prompt
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -135,11 +136,7 @@ class ProjectCreatorService:
         return result.content
 
     def _load_system_prompt(self) -> str:
-        prompt_file = self._prompts_dir / "project-creator.md"
-        if prompt_file.exists():
-            return prompt_file.read_text(encoding="utf-8")
-        _logger.warning("prompt_file_missing", extra={"path": str(prompt_file)})
-        return "Tu es le Project Creator de vibe-ide. Aide l'utilisateur à créer un projet."
+        return load_system_prompt(self._prompts_dir, "project-creator.md")
 
     async def _save_conversation_log(
         self, project_id: str, conversation: list[ConversationMessage], final_response: str

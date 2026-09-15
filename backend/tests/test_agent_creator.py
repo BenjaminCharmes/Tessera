@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from vibe_ide.services.prompt_loader import MissingPromptError
+
 from tests.test_providers_base import FakeProvider
 from vibe_ide.models.agent import CreateAgentConversationResponse
 from vibe_ide.models.project import ConversationMessage
@@ -191,12 +193,18 @@ async def test_calls_provider_with_full_conversation(tmp_path: Path) -> None:
 # ------------------------------------------------------------------
 
 
-async def test_missing_system_prompt_uses_fallback(tmp_path: Path) -> None:
+async def test_prompt_manquant_echoue_au_lieu_de_degrader(tmp_path: Path) -> None:
+    # Créer un agent sans le prompt de l'agent-creator produisait un agent
+    # au prompt bancal, réutilisé ensuite à chaque run (ticket-051).
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
     svc = AgentCreatorService(provider=_make_provider(_VALID_AGENT_JSON), prompts_dir=prompts_dir)
-    result = await svc.create_agent([_user("Un rédacteur")])
-    assert result.created is True
+
+    with pytest.raises(MissingPromptError) as exc:
+        await svc.create_agent([_user("Un rédacteur")])
+
+    assert "agent-creator.md" in str(exc.value)
+    assert "IDE_PROMPTS_DIR" in str(exc.value)
 
 
 # ------------------------------------------------------------------

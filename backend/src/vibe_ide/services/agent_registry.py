@@ -31,6 +31,11 @@ class AgentRegistryService:
     def __init__(self, prompts_dir: Path) -> None:
         self._prompts_dir = prompts_dir
 
+    @property
+    def prompts_dir(self) -> Path:
+        """Directory the prompts are read from — surfaced in error messages."""
+        return self._prompts_dir
+
     def list_agents(self) -> list[AgentInfo]:
         agents: dict[str, AgentInfo] = {}
 

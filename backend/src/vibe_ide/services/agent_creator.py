@@ -8,6 +8,7 @@ from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.providers.base import LLMProvider
 from vibe_ide.utils.conversation import format_conversation
 from vibe_ide.utils.json_extract import extract_json
+from vibe_ide.services.prompt_loader import load_system_prompt
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -68,11 +69,4 @@ class AgentCreatorService:
         )
 
     def _load_system_prompt(self) -> str:
-        prompt_file = self._prompts_dir / "agent-creator.md"
-        if prompt_file.exists():
-            return prompt_file.read_text(encoding="utf-8")
-        _logger.warning("prompt_file_missing", extra={"path": str(prompt_file)})
-        return (
-            "Tu es un expert en prompt engineering. "
-            "Crée le system prompt de l'agent demandé."
-        )
+        return load_system_prompt(self._prompts_dir, "agent-creator.md")

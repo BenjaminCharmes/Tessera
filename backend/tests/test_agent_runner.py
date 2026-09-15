@@ -9,6 +9,7 @@ from tests.test_providers_base import FakeProvider
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from vibe_ide.services.agent_registry import AgentRegistryService
+from vibe_ide.services.prompt_loader import MissingPromptError
 from vibe_ide.services.agent_runner import (
     _DEFAULT_MAX_TOKENS,
     _DEFAULT_MODEL,
@@ -42,7 +43,17 @@ def _runner(
     provider: FakeProvider | None = None,
     project_path: Path | None = None,
 ) -> AgentRunner:
-    registry = AgentRegistryService(tmp_path / "prompts")
+    # Les prompts sont désormais obligatoires (ticket-051) : un runner de test
+    # doit disposer de vrais fichiers, sinon il échoue sur MissingPromptError
+    # avant même d'atteindre ce qu'on veut vérifier.
+    prompts = tmp_path / "prompts"
+    prompts.mkdir(exist_ok=True)
+    for role in ("codeur", "reviewer", "architect", "testeur", "redacteur"):
+        prompt_file = prompts / f"{role}.md"
+        if not prompt_file.exists():
+            prompt_file.write_text(f"Tu es le {role}.", encoding="utf-8")
+
+    registry = AgentRegistryService(prompts)
     return AgentRunner(
         provider or FakeProvider(),
         registry,
@@ -100,11 +111,26 @@ def test_load_system_prompt_reads_file(tmp_path: Path) -> None:
     assert runner._load_system_prompt("codeur") == "Tu es le codeur."
 
 
-def test_load_system_prompt_fallback_when_missing(tmp_path: Path) -> None:
-    runner = _runner(tmp_path)  # prompts dir doesn't exist
-    prompt = runner._load_system_prompt("codeur")
-    assert "codeur" in prompt.lower()
-    assert len(prompt) > 10
+def test_load_system_prompt_echoue_quand_le_role_est_absent(tmp_path: Path) -> None:
+    # Un agent privé de son system prompt ne s'arrête pas : il produit du
+    # travail hors sujet mais plausible. Échouer net coûte moins cher
+    # (ticket-051).
+    runner = _runner(tmp_path)
+
+    with pytest.raises(MissingPromptError) as exc:
+        runner._load_system_prompt("role-inexistant")
+
+    message = str(exc.value)
+    assert "role-inexistant.md" in message
+    assert "IDE_PROMPTS_DIR" in message
+
+
+def test_load_system_prompt_echoue_quand_le_prompt_est_vide(tmp_path: Path) -> None:
+    runner = _runner(tmp_path)
+    (tmp_path / "prompts" / "vide.md").write_text("  \n", encoding="utf-8")
+
+    with pytest.raises(MissingPromptError):
+        runner._load_system_prompt("vide")
 
 
 # ------------------------------------------------------------------
@@ -257,7 +283,10 @@ async def test_run_persiste_le_cout_rapporte_par_le_provider(tmp_path: Path) -> 
     run_id = await create_run(db_path, "project-1", "ticket-001")
 
     provider = FakeProvider(tokens=100, cost_usd=0.042)
-    registry = AgentRegistryService(tmp_path / "prompts")
+    prompts = tmp_path / "prompts"
+    prompts.mkdir(exist_ok=True)
+    (prompts / "codeur.md").write_text("Tu es le codeur.", encoding="utf-8")
+    registry = AgentRegistryService(prompts)
     runner = AgentRunner(provider, registry, db_path=db_path)
 
     await runner.run(
@@ -285,7 +314,10 @@ async def test_run_calcule_le_cout_quand_le_provider_ne_le_rapporte_pas(
     run_id = await create_run(db_path, "project-1", "ticket-001")
 
     provider = FakeProvider(tokens=100)  # cost_usd=None par défaut
-    registry = AgentRegistryService(tmp_path / "prompts")
+    prompts = tmp_path / "prompts"
+    prompts.mkdir(exist_ok=True)
+    (prompts / "codeur.md").write_text("Tu es le codeur.", encoding="utf-8")
+    registry = AgentRegistryService(prompts)
     runner = AgentRunner(provider, registry, db_path=db_path)
 
     await runner.run(

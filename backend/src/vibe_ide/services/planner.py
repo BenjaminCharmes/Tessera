@@ -7,6 +7,7 @@ from vibe_ide.models.project import PlanResult
 from vibe_ide.models.ticket import TicketDraftPlan
 from vibe_ide.services.providers.base import LLMProvider
 from vibe_ide.utils.json_extract import extract_json
+from vibe_ide.services.prompt_loader import load_system_prompt
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -122,14 +123,7 @@ class PlannerService:
         return path.read_text(encoding="utf-8") if path.exists() else ""
 
     def _load_system_prompt(self) -> str:
-        prompt_file = self._prompts_dir / "planificateur.md"
-        if prompt_file.exists():
-            return prompt_file.read_text(encoding="utf-8")
-        _logger.warning("prompt_file_missing", extra={"path": str(prompt_file)})
-        return (
-            "Tu es un expert en découpage de features en tickets de développement. "
-            'Réponds uniquement avec ce JSON : {"tickets": [...], "summary": "..."}'
-        )
+        return load_system_prompt(self._prompts_dir, "planificateur.md")
 
     def _build_user_message(self, description: str, claude_md: str) -> str:
         parts = [f"## Description de l'évolution\n\n{description}\n"]

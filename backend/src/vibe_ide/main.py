@@ -12,6 +12,10 @@ from starlette.responses import Response
 from vibe_ide.config import settings
 from vibe_ide.routers import agent_admin, agents, orchestrator, projects, tickets
 from vibe_ide.services.database import init_db
+from vibe_ide.services.prompt_loader import MissingPromptError
+from vibe_ide.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 
 @asynccontextmanager
@@ -37,6 +41,21 @@ class StaticTokenMiddleware(BaseHTTPMiddleware):
 
 
 app = FastAPI(title="vibe-ide", version="0.1.0", lifespan=lifespan)
+
+
+async def _missing_prompt_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Surface a missing agent prompt as an actionable message, not a 500 blob.
+
+    `MissingPromptError` already carries the file, the directory searched and
+    the setting that overrides it. Left unhandled it reaches the UI as
+    "Internal Server Error", which is exactly the opacity ticket-051 exists to
+    remove.
+    """
+    _logger.error("missing_prompt", extra={"error": str(exc)})
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
+
+
+app.add_exception_handler(MissingPromptError, _missing_prompt_handler)
 
 app.add_middleware(
     CORSMiddleware,
