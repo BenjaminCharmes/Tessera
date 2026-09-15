@@ -31,3 +31,17 @@ def test_settings_llm_max_turns_surchargeable(monkeypatch: pytest.MonkeyPatch) -
 def test_settings_llm_max_budget_usd_surchargeable(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LLM_MAX_BUDGET_USD", "2.5")
     assert Settings(_env_file=None).llm_max_budget_usd == 2.5
+
+
+def test_ide_prompts_dir_par_defaut_pointe_sur_des_prompts_existants() -> None:
+    # Le défaut était `Path("agents") / "prompts"`, relatif au cwd du process.
+    # `make dev` lance depuis `backend/`, où `agents/` n'existe pas : tous les
+    # agents tournaient sans leur system prompt, en dégradant silencieusement
+    # (un simple WARNING `prompt_file_missing`). Le défaut doit être ancré sur
+    # la racine du dépôt, pas sur le répertoire de lancement.
+    prompts_dir = Settings(_env_file=None).ide_prompts_dir
+
+    assert prompts_dir.is_absolute()
+    assert prompts_dir.is_dir(), f"{prompts_dir} n'existe pas"
+    assert (prompts_dir / "codeur.md").is_file()
+    assert (prompts_dir / "planificateur.md").is_file()

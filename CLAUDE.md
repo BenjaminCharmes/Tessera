@@ -106,9 +106,16 @@ dépôt — à ne pas confondre avec `agents/prompts/`, qui contient les prompts
 
 ```
 .claude/
-  skills/<nom>/SKILL.md   ← workflows, chargés à la demande
+  skills/<nom>/SKILL.md   ← workflows, chargés à la demande par Claude
+  commands/<nom>.md       ← slash commands, tapées par l'utilisateur
   settings.local.json     ← préférences personnelles (gitignoré)
 ```
+
+**Skills et slash commands sont deux choses différentes.** Un skill est chargé
+par Claude quand sa `description` correspond à la tâche — il ne se tape pas.
+Une slash command est une invite que l'utilisateur déclenche à la main
+(`/run-vibe-ide`), et qui peut s'appuyer sur un skill. Les skills ajoutés
+pendant une session ne sont visibles qu'au démarrage de la suivante.
 
 Skills disponibles : `brainstorming`, `writing-plans`,
 `test-driven-development`, `code-review`, `verification-before-completion`,

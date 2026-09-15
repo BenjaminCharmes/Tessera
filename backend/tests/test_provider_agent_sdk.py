@@ -415,3 +415,25 @@ async def test_stream_sans_result_message_leve_runtime_error(
         await provider.stream(
             system="sys", user="user", model="claude-sonnet-4-6", max_tokens=100
         )
+
+
+def test_build_options_neutralise_anthropic_api_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # En mode abonnement, une ANTHROPIC_API_KEY présente dans l'environnement
+    # est prioritaire sur la session Claude : le CLI tente de s'authentifier
+    # avec elle et échoue en 401. Le placeholder `sk-ant-...` de .env.example
+    # suffit à casser tous les appels agent, avec un message qui ne pointe
+    # jamais vers .env.
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-placeholder")
+
+    options = _build_options(
+        system="tu es un agent",
+        model="claude-sonnet-5",
+        max_turns=30,
+        max_budget_usd=1.0,
+        cwd=None,
+    )
+
+    assert options.env is not None
+    assert options.env.get("ANTHROPIC_API_KEY") == ""

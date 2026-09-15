@@ -2,6 +2,9 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Racine du dépôt : backend/src/vibe_ide/config.py -> remonter de 4 niveaux.
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
@@ -18,9 +21,12 @@ class Settings(BaseSettings):
     llm_max_budget_usd: float = 1.0
     ide_workspace_dir: Path = Path.home() / "vibe-ide-workspace"
     ide_log_level: str = "INFO"
-    # Chemin vers agents/prompts/ — à surcharger via IDE_PROMPTS_DIR si le serveur
-    # ne tourne pas depuis la racine du repo vibe-ide.
-    ide_prompts_dir: Path = Path("agents") / "prompts"
+    # Chemin vers agents/prompts/, ancré sur la racine du dépôt et non sur le
+    # répertoire de lancement : `make dev` démarre depuis `backend/`, où
+    # `agents/` n'existe pas. Un défaut relatif ne résolvait donc jamais, et
+    # tous les agents tournaient sans leur system prompt en se contentant d'un
+    # WARNING `prompt_file_missing`. Surchargeable via IDE_PROMPTS_DIR.
+    ide_prompts_dir: Path = _REPO_ROOT / "agents" / "prompts"
     github_token: str = ""
     github_repo: str = ""  # format "owner/repo"
     # Cible par défaut des PR de ticket. Le flux est

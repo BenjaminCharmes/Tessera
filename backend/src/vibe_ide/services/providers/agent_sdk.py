@@ -40,7 +40,20 @@ def _build_options(
     # merely withholding auto-approval, and no configuration path can end up
     # with an implicit toolset (ticket-044 merge-gate review, finding 1).
     effective_tools = allowed_tools if allowed_tools is not None else _ALLOWED_TOOLS
+
+    # Une ANTHROPIC_API_KEY présente dans l'environnement est PRIORITAIRE sur
+    # la session Claude Code dans le CLI. En mode abonnement — le défaut — elle
+    # ne sert donc à rien et casse tout : le CLI tente de s'authentifier avec
+    # elle et remonte `401 API key is invalid`. Le placeholder `sk-ant-...`
+    # livré dans `.env.example` suffit à faire échouer *tous* les appels
+    # agent, avec un message d'erreur qui ne pointe jamais vers `.env`.
+    # On la neutralise explicitement pour le sous-process du SDK ; la clef
+    # reste disponible pour `AnthropicApiProvider`, qui est le seul à devoir
+    # l'utiliser.
+    env = {"ANTHROPIC_API_KEY": ""}
+
     return ClaudeAgentOptions(
+        env=env,
         # Chemin long obligatoire : un chemin court Windows 8.3 fait refuser
         # les écritures.
         cwd=str(cwd.resolve()) if cwd is not None else None,
