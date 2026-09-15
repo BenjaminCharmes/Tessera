@@ -457,3 +457,21 @@ async def test_get_pr_status_raises_on_pr_not_found() -> None:
     svc = _make_service()
     with pytest.raises(httpx.HTTPStatusError):
         await svc.get_pull_request_status(15)
+
+
+@respx.mock
+async def test_create_pull_request_cible_develop_par_defaut() -> None:
+    # Le flux du dépôt est ticket -> develop -> main (ticket-049) : une PR de
+    # ticket qui ne précise pas sa base doit viser l'intégration, jamais main.
+    route = respx.post(f"{_BASE}/repos/{_REPO}/pulls").mock(
+        return_value=httpx.Response(
+            201,
+            json={"number": 42, "html_url": "https://github.com/owner/my-repo/pull/42"},
+        )
+    )
+    svc = _make_service()
+    await svc.create_pull_request("Titre", "Corps", "ticket-050-slug")
+
+    import json as _json
+
+    assert _json.loads(route.calls[0].request.content)["base"] == "develop"

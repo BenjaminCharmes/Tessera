@@ -251,7 +251,7 @@ async def test_pull_writes_sync_log(tmp_path: Path) -> None:
     agent = _make_agent(github_svc, ticket_svc, project_path=tmp_path)
     await agent.run("pull")
 
-    log = (tmp_path / "memory" / "github-sync-log.md").read_text()
+    log = (tmp_path / "memory" / "github-sync-log.md").read_text(encoding="utf-8")
     assert "PULLED" in log
     assert "ticket-001" in log
     assert "#3" in log
@@ -414,7 +414,7 @@ async def test_push_writes_sync_log(tmp_path: Path) -> None:
     agent = _make_agent(github_svc, ticket_svc, sync_map_svc=sync_map, project_path=tmp_path)
     await agent.run("push")
 
-    log = (tmp_path / "memory" / "github-sync-log.md").read_text()
+    log = (tmp_path / "memory" / "github-sync-log.md").read_text(encoding="utf-8")
     assert "CLOSED" in log
     assert "#3" in log
 

@@ -5,7 +5,7 @@
 [![CI](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
-![Tests](https://img.shields.io/badge/tests-260%20frontend%20%2B%20416%20backend-brightgreen)
+![Tests](https://img.shields.io/badge/tests-260%20frontend%20%2B%20566%20backend-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-74%25%20backend%20%7C%2080%25%20frontend-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Tauri](https://img.shields.io/badge/Tauri-v2-orange)
@@ -15,7 +15,11 @@
 ## Qu'est-ce que c'est ?
 
 vibe-ide est un orchestrateur d'agents IA qui gère des projets logiciels sous forme de tickets Markdown.
-Il implémente un pipeline **codeur → reviewer** alimenté par Claude (Anthropic), avec un support GitHub intégré (Issues, PRs, clone).
+Il implémente un pipeline **codeur → testeur → sécurité → reviewer → validateur → doc-updater** alimenté par Claude,
+avec un support GitHub intégré (Issues, PRs, clone).
+
+Les agents **écrivent réellement les fichiers** et chaque run de pipeline s'exécute sur sa **propre branche git**,
+qu'il termine par un commit — ce qui est relu, audité et validé, c'est le diff réel, pas la prose de l'agent.
 
 Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les tickets qui ont servi à construire l'IDE lui-même.
 
@@ -74,6 +78,29 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | Agent sécurité — audit OWASP automatique avant le reviewer | ✅ |
 | Coverage tooling — pytest-cov backend + v8 frontend (74% backend) | ✅ |
 
+### Phase 7 — Exécution réelle ✅
+
+| Feature | Status |
+|---------|--------|
+| Provider Claude Agent SDK — fonctionne sur l'abonnement, sans crédits API | ✅ |
+| Provider Anthropic API en fallback (Docker, CI, sessions non interactives) | ✅ |
+| Les agents écrivent réellement les fichiers (outils fichier du SDK) | ✅ |
+| Une branche git par run de pipeline, forkée d'une ref de base stable | ✅ |
+| Le pipeline relit le **diff git réel**, plus la prose du codeur | ✅ |
+| Commit automatique à chaque run (typé si approuvé, `chore:` sinon) | ✅ |
+| Un ticket approuvé devient la base du ticket suivant (mode autonome) | ✅ |
+
+---
+
+## Documentation
+
+| Document | Pour qui |
+|----------|----------|
+| [Guide utilisateur](docs/guide-utilisateur.md) | Tu **utilises** vibe-ide sur tes projets |
+| [Architecture](docs/architecture.md) | Tu veux comprendre comment il est construit |
+| [Stratégie de tickets](docs/ticket-strategy.md) | Tu découpes un backlog |
+| [ADR](projects/ide-core/memory/decisions.md) | Les décisions d'architecture et leur pourquoi |
+
 ---
 
 ## Démarrage rapide
@@ -118,7 +145,10 @@ docker compose down -v
 - Python 3.11+ et [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - Node.js 24 LTS (`nvm install --lts`)
 - Rust stable (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
-- Une clef API Anthropic ([console.anthropic.com](https://console.anthropic.com/))
+- **Soit** un abonnement Claude avec une session Claude Code authentifiée (mode par
+  défaut, `LLM_PROVIDER=agent_sdk` — aucune clef API nécessaire),
+  **soit** une clef API Anthropic ([console.anthropic.com](https://console.anthropic.com/))
+  si tu passes en `LLM_PROVIDER=anthropic_api`
 
 ### Installation
 
@@ -310,7 +340,10 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 
 | Variable | Requis | Default | Description |
 |----------|--------|---------|-------------|
-| `ANTHROPIC_API_KEY` | ✅ | — | Clef API Anthropic |
+| `LLM_PROVIDER` | | `agent_sdk` | `agent_sdk` (abonnement Claude) ou `anthropic_api` (crédits API) |
+| `ANTHROPIC_API_KEY` | si `anthropic_api` | — | Clef API Anthropic — inutile en mode `agent_sdk` |
+| `LLM_MAX_TURNS` | | `30` | Plafond d'allers-retours outil pour un agent |
+| `LLM_MAX_BUDGET_USD` | | `1.0` | Plafond de dépense d'un seul appel agent |
 | `IDE_WORKSPACE_DIR` | | `~/vibe-ide-workspace` | Dossier des projets |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
@@ -338,7 +371,7 @@ Tests frontend :
 
 ```bash
 cd frontend
-npm run test          # Vitest unit tests (184 tests)
+npm run test          # Vitest unit tests (260 tests)
 npm run test:coverage # Rapport de couverture
 npm run test:e2e      # Playwright E2E (5 flows, nécessite npm run dev)
 ```
@@ -385,14 +418,32 @@ npm run test:e2e      # Playwright E2E (5 flows, nécessite npm run dev)
 ```
 POST /orchestrator/run { project_id, ticket_id }
         │
+        ├─ git checkout -b ticket-XXX-slug   (forkée de la ref de base)
+        │
         ├─ Codeur (Claude) ──streaming──▶ WS /orchestrator/stream
-        │       ↓ code produit
+        │       ↓ écrit réellement les fichiers
+        ├─ git diff  →  c'est CE diff que relisent les agents suivants
+        │
+        ├─ Testeur            → exécute la suite de tests du projet
+        ├─ Sécurité (OWASP)   → BLOCK si CRITICAL/HIGH  →  ticket → blocked/
         ├─ Reviewer (Claude)
-        │       ↓ APPROVED  →  ticket → done/ + PR optionnelle
         │       ↓ CHANGES_REQUESTED  →  retour Codeur (max 3 tours)
-        │       ↓ 3 tours sans approbation  →  ticket → blocked/
-        └─ PipelineResult { approved, rounds, final_status }
+        │       ↓ APPROVED
+        ├─ Validateur         → vérifie les critères d'acceptation un par un
+        ├─ Doc-updater        → met à jour README / docs / CLAUDE.md
+        │
+        ├─ git commit
+        │       ↓ approuvé      →  "<type>: ticket-XXX — <titre>"  + ref de base avancée
+        │       ↓ non approuvé  →  "chore: ticket-XXX — unapproved work (<raison>)"
+        │
+        └─ PipelineResult { approved, rounds, final_status, branch, commit_sha }
 ```
+
+> Quel que soit le verdict, le travail du codeur est commité sur la branche du
+> ticket : rien n'est perdu, et l'arbre de travail reste propre pour le ticket
+> suivant. Seul un ticket **approuvé** fait avancer la ref de base, de sorte
+> qu'un plan de tickets séquentiels s'empile correctement sans jamais hériter
+> du travail rejeté d'un ticket précédent.
 
 ---
 

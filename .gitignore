@@ -45,3 +45,21 @@ frontend/src-tauri/target/
 
 # GitHub Actions
 .github/workflows/*.log
+
+# Workspace vibe-ide : les projets importés, clonés ou créés via l'IDE
+# atterrissent dans projects/. Seul `ide-core` (le projet bootstrap) est
+# versionné avec le dépôt — les autres appartiennent à l'utilisateur et ne
+# doivent jamais être committés ici. C'est aussi ce qui empêche le
+# `git add -A` de GitWorkspaceService de les balayer dans un commit de ticket.
+projects/*
+!projects/ide-core/
+
+# Scratch des agents (plans, diffs de revue, rapports intermédiaires)
+.superpowers/
+
+# Logs de lancement locaux
+*.log
+
+# Claude Code : la config partagée (skills, settings.json) est versionnée,
+# les préférences personnelles ne le sont pas.
+.claude/settings.local.json

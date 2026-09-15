@@ -7,6 +7,7 @@ from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.doc_updater import DocUpdaterService
+from vibe_ide.services.git_workspace import GitWorkspaceService
 from vibe_ide.services.providers import get_provider
 from vibe_ide.services.security_auditor import SecurityAuditorService
 from vibe_ide.services.test_runner import TestRunnerService
@@ -39,6 +40,53 @@ class RunAutonomousRequest(BaseModel):
     max_tickets: int = 5
 
 
+async def _build_project_context(project_id: str) -> str:
+    """Assemble the textual context injected into every agent's prompt.
+
+    Contains the project's ``CLAUDE.md`` (conditionally — see below), its
+    active agents, its open tickets and its recent architecture decisions.
+    """
+    project_path = settings.ide_workspace_dir / project_id
+    loader = ProjectLoader(settings.ide_workspace_dir)
+    try:
+        project = await loader.load_project(project_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    ticket_svc = TicketService(project_path, project_id)
+    all_tickets = await ticket_svc.list_tickets()
+    open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
+
+    decisions_path = project_path / "memory" / "decisions.md"
+    recent_decisions = (
+        decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
+    )
+
+    tickets_summary = (
+        "\n".join(f"- [{t.id}] {t.title} ({t.status.value})" for t in open_tickets)
+        or "_Aucun ticket ouvert._"
+    )
+
+    # Le provider SDK exécute avec `cwd` pointé sur le dossier du projet et
+    # charge donc déjà le CLAUDE.md nativement : le réinjecter ici ferait
+    # payer le même contenu deux fois, à chaque appel, pour chacun des six
+    # agents du pipeline sur jusqu'à trois rounds de revue. Seule l'API
+    # Messages (`anthropic_api`), qui n'a pas de `cwd`, en a encore besoin.
+    claude_md_section = (
+        f"## CLAUDE.md\n{project.raw_claude_md}\n\n"
+        if settings.llm_provider != "agent_sdk"
+        else ""
+    )
+
+    return (
+        f"# {project_id}\n\n"
+        f"{claude_md_section}"
+        f"## Agents actifs\n{', '.join(project.active_agents)}\n\n"
+        f"## Tickets ouverts\n{tickets_summary}\n\n"
+        f"## Décisions récentes\n{recent_decisions or '_Aucune décision._'}"
+    )
+
+
 async def _build_orchestrator(project_id: str) -> Orchestrator:
     provider = get_provider(
         settings.llm_provider, settings.anthropic_api_key,
@@ -60,32 +108,8 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         provider, registry, db_path=settings.ide_db_path, project_path=project_path
     )
 
-    loader = ProjectLoader(settings.ide_workspace_dir)
-    try:
-        project = await loader.load_project(project_id)
-    except ValueError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-
+    project_context = await _build_project_context(project_id)
     ticket_svc = TicketService(project_path, project_id)
-    all_tickets = await ticket_svc.list_tickets()
-    open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
-
-    decisions_path = project_path / "memory" / "decisions.md"
-    recent_decisions = (
-        decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
-    )
-
-    tickets_summary = (
-        "\n".join(f"- [{t.id}] {t.title} ({t.status.value})" for t in open_tickets)
-        or "_Aucun ticket ouvert._"
-    )
-    project_context = (
-        f"# {project_id}\n\n"
-        f"## CLAUDE.md\n{project.raw_claude_md}\n\n"
-        f"## Agents actifs\n{', '.join(project.active_agents)}\n\n"
-        f"## Tickets ouverts\n{tickets_summary}\n\n"
-        f"## Décisions récentes\n{recent_decisions or '_Aucune décision._'}"
-    )
 
     agent_configs = load_agents_config(project_path)
     pipeline_cfg = load_pipeline_config(project_path)
@@ -107,6 +131,8 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         else None
     )
 
+    git_workspace = GitWorkspaceService(project_path)
+
     return Orchestrator(
         runner=runner,
         ticket_service=ticket_svc,
@@ -120,6 +146,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         security_auditor=security_auditor,
         validator=validator,
         project_path=project_path,
+        git_workspace=git_workspace,
     )
 
 

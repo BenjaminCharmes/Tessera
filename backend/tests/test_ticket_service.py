@@ -270,22 +270,32 @@ async def test_rotate_pipeline_log_no_file(tmp_path: Path) -> None:
 
 async def test_rotate_pipeline_log_short_file(tmp_path: Path) -> None:
     log = tmp_path / "pipeline-log.md"
-    log.write_text("\n".join(f"line {i}" for i in range(50)))
-    original = log.read_text()
+    log.write_text("\n".join(f"line {i}" for i in range(50)), encoding="utf-8")
+    original = log.read_text(encoding="utf-8")
 
     await _svc(tmp_path).rotate_pipeline_log()
 
-    assert log.read_text() == original
+    assert log.read_text(encoding="utf-8") == original
 
 
 async def test_rotate_pipeline_log_truncates(tmp_path: Path) -> None:
     log = tmp_path / "pipeline-log.md"
     lines = [f"line {i}\n" for i in range(300)]
-    log.write_text("".join(lines))
+    log.write_text("".join(lines), encoding="utf-8")
 
     await _svc(tmp_path).rotate_pipeline_log()
 
-    result = log.read_text().splitlines()
+    result = log.read_text(encoding="utf-8").splitlines()
     assert len(result) == 200
     assert result[0] == "line 100"
     assert result[-1] == "line 299"
+
+
+async def test_ticket_type_couvre_les_types_conventional_commits(tmp_path: Path) -> None:
+    # CLAUDE.md impose Conventional Commits, et des tickets existants utilisent
+    # déjà `refactor`. Un type manquant de l'enum fait échouer le parsing du
+    # fichier — et donc tout endpoint qui liste les tickets du projet.
+    from vibe_ide.models.ticket import TicketType
+
+    values = {t.value for t in TicketType}
+    assert {"feat", "fix", "chore", "docs", "refactor", "test"} <= values

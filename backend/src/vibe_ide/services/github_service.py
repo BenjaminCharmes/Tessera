@@ -1,7 +1,9 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Literal
 
 import httpx
+
+from vibe_ide.config import settings
 from pydantic import BaseModel
 
 _BASE = "https://api.github.com"
@@ -95,9 +97,14 @@ class GitHubService:
         title: str,
         body: str,
         head: str,
-        base: str = "main",
+        base: str | None = None,
     ) -> tuple[int, str]:
-        """Crée une PR et retourne (pr_number, pr_url)."""
+        """Crée une PR et retourne (pr_number, pr_url).
+
+        `base` non fourni retombe sur `settings.github_base_branch`
+        (`develop`) : une PR de ticket vise l'intégration, jamais `main`.
+        """
+        base = base or settings.github_base_branch
         url = f"{_BASE}/repos/{self._repo}/pulls"
         async with httpx.AsyncClient() as client:
             resp = await client.post(
@@ -142,7 +149,7 @@ class GitHubService:
             resp = await client.get(url, headers=self._headers)
             if resp.status_code != 200:
                 return "none"
-        runs: list[dict] = resp.json().get("check_runs", [])
+        runs: list[dict[str, Any]] = resp.json().get("check_runs", [])
         if not runs:
             return "none"
         conclusions = [r.get("conclusion") for r in runs]

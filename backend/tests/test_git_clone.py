@@ -159,7 +159,7 @@ async def test_clone_stores_github_remote_in_agents_json(tmp_path: Path) -> None
 
     agents_json = ws / "my-repo" / "agents.json"
     assert agents_json.exists()
-    data = json.loads(agents_json.read_text())
+    data = json.loads(agents_json.read_text(encoding="utf-8"))
     assert data["github_remote"] == "https://github.com/owner/my-repo"
 
 
@@ -240,7 +240,7 @@ async def test_clone_preserves_existing_agents_json_fields(tmp_path: Path) -> No
     with patch.object(svc, "_run_clone", new=AsyncMock(side_effect=_make_dest_with_agents)):
         await svc.clone("https://github.com/owner/my-repo")
 
-    data = json.loads((ws / "my-repo" / "agents.json").read_text())
+    data = json.loads((ws / "my-repo" / "agents.json").read_text(encoding="utf-8"))
     assert data["project_id"] == "my-repo"
     assert data["github_remote"] == "https://github.com/owner/my-repo"
 

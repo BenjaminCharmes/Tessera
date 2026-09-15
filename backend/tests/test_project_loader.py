@@ -37,7 +37,7 @@ Python + FastAPI
 def test_load_project_with_claude_md(tmp_path: Path) -> None:
     project_dir = tmp_path / "my-project"
     project_dir.mkdir()
-    (project_dir / "CLAUDE.md").write_text(_CLAUDE_MD)
+    (project_dir / "CLAUDE.md").write_text(_CLAUDE_MD, encoding="utf-8")
 
     project = load_project(project_dir)
 
@@ -52,7 +52,7 @@ def test_load_project_with_claude_md(tmp_path: Path) -> None:
 def test_load_project_description_skips_heading(tmp_path: Path) -> None:
     project_dir = tmp_path / "p"
     project_dir.mkdir()
-    (project_dir / "CLAUDE.md").write_text("# Titre\n\nDescription ici.\n")
+    (project_dir / "CLAUDE.md").write_text("# Titre\n\nDescription ici.\n", encoding="utf-8")
 
     project = load_project(project_dir)
 
@@ -113,7 +113,7 @@ def test_list_projects_skips_hidden_dirs(tmp_path: Path) -> None:
 
 async def test_project_loader_list_filters_claude_md(tmp_path: Path) -> None:
     (tmp_path / "with-claude").mkdir()
-    (tmp_path / "with-claude" / "CLAUDE.md").write_text("# avec\n")
+    (tmp_path / "with-claude" / "CLAUDE.md").write_text("# avec\n", encoding="utf-8")
     (tmp_path / "without-claude").mkdir()
 
     projects = await ProjectLoader(tmp_path).list_projects()
@@ -132,7 +132,7 @@ async def test_project_loader_list_missing_workspace(tmp_path: Path) -> None:
 
 async def test_project_loader_load_project(tmp_path: Path) -> None:
     (tmp_path / "my-proj").mkdir()
-    (tmp_path / "my-proj" / "CLAUDE.md").write_text("# My Project\n\nDesc.\n")
+    (tmp_path / "my-proj" / "CLAUDE.md").write_text("# My Project\n\nDesc.\n", encoding="utf-8")
 
     project = await ProjectLoader(tmp_path).load_project("my-proj")
 
@@ -209,7 +209,7 @@ async def test_create_project_scaffolds_agents_json(tmp_path: Path) -> None:
 
     agents_json = tmp_path / "proj-with-agents" / "agents.json"
     assert agents_json.exists()
-    data = json.loads(agents_json.read_text())
+    data = json.loads(agents_json.read_text(encoding="utf-8"))
     roles = [a["role"] for a in data["agents"]]
     assert roles == ["codeur", "reviewer"]
     assert data["agents"][0]["model"] == "claude-sonnet-4-6"

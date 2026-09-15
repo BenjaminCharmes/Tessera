@@ -307,12 +307,12 @@ async def test_existing_agents_not_recreated(tmp_path: Path) -> None:
     svc = _make_service_with_existing_agents(
         tmp_path, _VALID_AGENT_JSON, existing_agents=["redacteur", "planificateur"]
     )
-    original_content = (tmp_path / "prompts" / "redacteur.md").read_text()
+    original_content = (tmp_path / "prompts" / "redacteur.md").read_text(encoding="utf-8")
 
     result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
 
     # Contenu inchangé
-    assert (tmp_path / "prompts" / "redacteur.md").read_text() == original_content
+    assert (tmp_path / "prompts" / "redacteur.md").read_text(encoding="utf-8") == original_content
     assert result.agents_created == []
 
 
@@ -358,7 +358,7 @@ async def test_bootstrap_failure_does_not_block_creation(tmp_path: Path) -> None
     """A bootstrap failure does not block project creation."""
     prompts_dir = tmp_path / "prompts"
     prompts_dir.mkdir()
-    (prompts_dir / "project-creator.md").write_text("Tu es le Project Creator.")
+    (prompts_dir / "project-creator.md").write_text("Tu es le Project Creator.", encoding="utf-8")
     workspace = tmp_path / "projects"
     workspace.mkdir()
 

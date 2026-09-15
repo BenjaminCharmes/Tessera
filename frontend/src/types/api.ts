@@ -1,7 +1,17 @@
 export type TicketStatus =
   "todo" | "in-progress" | "in-review" | "done" | "blocked" | "cancelled";
 
-export type TicketType = "feat" | "fix" | "chore" | "design" | "docs";
+// Doit rester aligné sur TicketType côté backend
+// (backend/src/vibe_ide/models/ticket.py) : types Conventional Commits
+// + `design`, propre à vibe-ide.
+export type TicketType =
+  | "feat"
+  | "fix"
+  | "chore"
+  | "docs"
+  | "refactor"
+  | "test"
+  | "design";
 export type TicketPriority = "critical" | "high" | "medium" | "low";
 export type AgentRole =
   | "orchestrateur"

@@ -12,11 +12,17 @@ _DEFAULT_TIMEOUT = 120
 
 
 class TestCommandNotFound(Exception):
-    pass
+    # Not a pytest test class despite the "Test" prefix — see TestResult.
+    __test__ = False
 
 
 @dataclass
 class TestResult:
+    # Tells pytest not to try collecting this as a test class just because
+    # its name starts with "Test" (it is a result dataclass, and pytest
+    # warns on every run otherwise).
+    __test__ = False
+
     passed: bool
     total: int
     failed: int

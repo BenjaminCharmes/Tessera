@@ -1,6 +1,7 @@
 """Service PlannerService — ticket-028."""
 import time
 from pathlib import Path
+from typing import Any
 
 from vibe_ide.models.project import PlanResult
 from vibe_ide.models.ticket import TicketDraftPlan
@@ -60,7 +61,9 @@ class PlannerService:
     # Parsing
     # ------------------------------------------------------------------
 
-    def _parse_drafts(self, raw_tickets: list[dict]) -> list[TicketDraftPlan]:
+    def _parse_drafts(
+        self, raw_tickets: list[dict[str, Any]]
+    ) -> list[TicketDraftPlan]:
         return [
             TicketDraftPlan(
                 title=item.get("title", ""),

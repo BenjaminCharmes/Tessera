@@ -1,15 +1,19 @@
 import json
 import re
+from typing import Any
 
 
-def extract_json(text: str) -> dict | None:
+def extract_json(text: str) -> dict[str, Any] | None:
     """Extracts the first valid JSON object from a Claude response."""
     match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
     if match:
         try:
-            return json.loads(match.group(1))
+            parsed = json.loads(match.group(1))
         except json.JSONDecodeError:
             pass
+        else:
+            if isinstance(parsed, dict):
+                return parsed
 
     brace_start = text.find("{")
     if brace_start == -1:
@@ -23,8 +27,9 @@ def extract_json(text: str) -> dict | None:
             depth -= 1
             if depth == 0:
                 try:
-                    return json.loads(text[brace_start : i + 1])
+                    parsed = json.loads(text[brace_start : i + 1])
                 except json.JSONDecodeError:
                     return None
+                return parsed if isinstance(parsed, dict) else None
 
     return None

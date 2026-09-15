@@ -81,7 +81,7 @@ async def update_ticket_status(
 
 class CreatePrRequest(BaseModel):
     head_branch: str
-    base: str = "main"
+    base: str | None = None  # None -> settings.github_base_branch (develop)
 
 
 class CreatePrResponse(BaseModel):

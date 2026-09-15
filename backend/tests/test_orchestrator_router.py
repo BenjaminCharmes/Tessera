@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from vibe_ide.config import settings
-from vibe_ide.routers.orchestrator import _build_orchestrator
+from vibe_ide.routers.orchestrator import _build_orchestrator, _build_project_context
 
 
 @pytest.fixture(autouse=True)
@@ -99,3 +99,37 @@ async def test_build_orchestrator_doc_updater_sans_outils(tmp_path: Path) -> Non
     assert orchestrator._runner._provider._allowed_tools == [
         "Read", "Write", "Edit", "Bash", "Glob", "Grep",
     ]
+
+
+def _make_project_with_claude_md_marker(workspace: Path, project_id: str) -> None:
+    project_dir = workspace / project_id
+    project_dir.mkdir(parents=True)
+    (project_dir / "CLAUDE.md").write_text(
+        "MARQUEUR_CLAUDE_MD_UNIQUE\n", encoding="utf-8"
+    )
+
+
+async def test_project_context_ne_duplique_pas_claude_md_sur_le_provider_sdk(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """With the SDK provider, CLAUDE.md is read via cwd — do not re-inject it."""
+    monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
+    monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
+    _make_project_with_claude_md_marker(tmp_path, "mon-projet")
+
+    context = await _build_project_context("mon-projet")
+
+    assert "MARQUEUR_CLAUDE_MD_UNIQUE" not in context
+
+
+async def test_project_context_conserve_claude_md_sur_le_provider_api(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """On the Messages API there is no cwd: the injection is still needed."""
+    monkeypatch.setattr(settings, "llm_provider", "anthropic_api")
+    monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
+    _make_project_with_claude_md_marker(tmp_path, "mon-projet")
+
+    context = await _build_project_context("mon-projet")
+
+    assert "MARQUEUR_CLAUDE_MD_UNIQUE" in context

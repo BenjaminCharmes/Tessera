@@ -149,14 +149,30 @@ Format : ADR léger (Architecture Decision Record).
 
 ---
 
-## ADR-017 — ticket-044 : migration vers le Claude Agent SDK, abonnement par défaut
+## ADR-017 — Abstraction `LLMProvider`, abonnement Claude par défaut
 
-**Date** : 2026-09  
-**Décision** : Introduction d'une abstraction `LLMProvider` (protocole `complete`/`stream`) avec deux implémentations : `ClaudeAgentSDKProvider` (défaut, `llm_provider="agent_sdk"`), backé par le Claude Agent SDK et facturé sur l'abonnement Claude, et `AnthropicApiProvider` (fallback, `llm_provider="anthropic_api"`), qui appelle directement la Messages API sur des crédits API. `get_provider()` construit l'un ou l'autre selon `settings.llm_provider`.  
-**Raison** : L'abonnement Claude est gratuit à l'usage (dans la limite du quota) alors que la Messages API est facturée au token — l'abonnement est donc le mode par défaut pour un usage quotidien de l'IDE. Le provider `anthropic_api` reste nécessaire pour les environnements sans session interactive (conteneurs Docker, CI) où l'abonnement ne peut pas s'authentifier.  
-**Garde-fous issus du spike ticket-044** (ces deux points sont des invariants, pas des détails d'implémentation) :
-1. **`cwd` toujours résolu explicitement** (`Path.resolve()`) avant d'être transmis à `ClaudeAgentOptions.cwd`. Un chemin relatif ou `None` fait tourner le SDK dans le cwd du process backend au lieu du dossier du projet ciblé — mauvais `CLAUDE.md` chargé (`setting_sources=["project"]`), écritures au mauvais endroit.
-2. **Configuration des outils toujours explicite**, jamais implicite. Le SDK a deux champs distincts : `tools` (quels outils built-in existent) et `allowed_tools` (lesquels sont auto-approuvés). `allowed_tools=[]` seul ne désactive rien — le transport CLI n'émet `--allowedTools` que si la liste est non vide, donc une liste vide fait retomber sur le jeu d'outils complet par défaut. `_build_options` fixe donc toujours `tools` ET `allowed_tools` à la même liste résolue (jeu complet ou `[]`), qu'importe le chemin de configuration (revue merge-gate, finding 1).
-3. **Variante sans outils pour les services non-agentiques** : `get_provider(..., allow_tools=False)` fournit un provider dont `tools=[]` — utilisé par tous les services purement texte-en/JSON-en-sortie qui écrivent eux-mêmes leurs fichiers en Python (validateur, auditeur sécurité, planificateur, project-analyzer, agent-creator, project-creator, doc-updater). Aucun de ces services ne reçoit de `cwd` résolu ; combiner outils complets + `permission_mode="acceptEdits"` + `cwd` implicite aurait autorisé des écritures auto-approuvées dans l'arborescence du process backend (revue merge-gate, finding 2).  
-**Défauts de quota** : `llm_max_turns=30` borne le nombre d'allers-retours outil d'un agent qui dérape. `llm_max_budget_usd=1.0` (1 USD) borne la dépense d'un seul appel agent — c'est le garde-fou qui protège le quota de l'abonnement contre une boucle d'agent qui consommerait le budget entier en un seul run ; 1 USD a été choisi comme un plafond largement supérieur au coût d'un ticket normal (quelques dizaines de tours max_turns=30 sur des modèles Sonnet/Haiku) tout en bornant sérieusement le pire cas.  
-**Alternative rejetée** : Un seul provider Messages API pour tout (perd l'usage gratuit de l'abonnement) ; laisser `allowed_tools` seul piloter la désactivation des outils (finding 1 montre que ça ne marche pas) ; donner le jeu d'outils complet aux services non-agentiques par simplicité (surface d'attaque et de dérapage inutile pour du texte-en/JSON-en-sortie).
+**Date** : 2026-09
+**Décision** : Les services passent par un protocole `LLMProvider` (`complete`/`stream`), jamais par le SDK directement. Deux implémentations : `ClaudeAgentSDKProvider` (défaut, abonnement, outils fichier) et `AnthropicApiProvider` (crédits API). `get_provider(allow_tools=False)` sert une variante sans outils aux services purement texte→JSON.
+**Raison** : L'abonnement est gratuit à l'usage, la Messages API est facturée au token — l'abonnement est donc le mode quotidien. Le provider API reste nécessaire là où aucune session interactive n'existe (Docker, CI).
+**Alternative rejetée** : Un seul provider Messages API (perd l'usage gratuit) ; donner le jeu d'outils complet aux services non-agentiques (surface de dérapage inutile).
+**Détail** : voir `tickets/done/ticket-044-agent-sdk-migration.md`. Les invariants (`cwd` résolu, `tools` **et** `allowed_tools` toujours explicites) sont documentés là où ils s'appliquent, dans `services/providers/agent_sdk.py`.
+
+---
+
+## ADR-018 — Une branche et un commit par run de pipeline
+
+**Date** : 2026-09-15
+**Décision** : Chaque run s'exécute sur sa propre branche, relit le **diff git réel** plutôt que la prose du codeur, et se termine toujours par un commit — typé du ticket si approuvé, `chore: … — unapproved work (…)` sinon. Seul un run approuvé avance la ref de base.
+**Raison** : Depuis ADR-017 les agents écrivent vraiment sur disque ; relire leur prose validait une intention, pas une implémentation. Committer à tous les coups garde l'arbre propre pour le ticket suivant sans perdre le travail rejeté. N'avancer la base que sur approbation donne l'isolation **et** l'empilement d'un plan séquentiel.
+**Alternative rejetée** : Laisser l'arbre sale pour inspection (bloque le ticket suivant) ; `wip:` comme préfixe (pas un type Conventional Commits, et ces messages vont dans le dépôt de l'utilisateur).
+**Conséquence assumée** : du code bloqué par l'audit sécurité entre dans l'historique git, confiné à la branche du ticket et jamais sur `main`.
+**Détail** : voir `tickets/in-progress/ticket-045-pipeline-diff-reel.md`.
+
+---
+
+## ADR-019 — Le chat de l'IDE commite comme un run de pipeline
+
+**Date** : 2026-09-15
+**Décision** : Le chat conversationnel (ticket-048) écrit sur une branche `chat/<horodatage>` et commite son travail, exactement comme un run de pipeline le fait sur sa branche de ticket. Il ne laisse jamais l'arbre de travail sale.
+**Raison** : ADR-018 fait reposer l'enchaînement des tickets sur un arbre propre au démarrage de chaque run. Un chat qui écrit sans committer enverrait le ticket suivant en `blocked` sans qu'aucun agent n'ait tourné. Traiter le chat comme un producteur de travail de première classe évite d'inventer un second régime d'écriture à côté de celui du pipeline.
+**Alternative rejetée** : Limiter le chat aux fichiers hors arbre suivi et proposer un diff (sûr, mais fait du chat un outil de seconde classe) ; poser un verrou qui empêche le pipeline de démarrer (simple, mais sérialise chat et pipeline alors qu'ils travaillent sur des branches distinctes). Une branche `chat/*` de trop se supprime ; un arbre cassé bloque la file.

@@ -1,19 +1,29 @@
-from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
-from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
-
-from pydantic import BaseModel, Field
 
 from vibe_ide.models.agent import AgentConfig, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
+from vibe_ide.services.git_workspace import GitWorkspaceError
+from vibe_ide.services.pipeline_events import (
+    EventCallback,
+    EventType,
+    OrchestratorEvent,
+    PipelineResult,
+)
+from vibe_ide.services.pipeline_text import (
+    _extract_criteria,
+    _parse_reviewer_verdict,
+    _single_line,
+    _unapproved_commit_message,
+)
 from vibe_ide.services.ticket_service import TicketService
 from vibe_ide.utils.logger import get_logger
 
 if TYPE_CHECKING:
     from vibe_ide.services.doc_updater import DocUpdaterService
+    from vibe_ide.services.git_workspace import GitWorkspaceService
     from vibe_ide.services.security_auditor import SecurityAuditorService
     from vibe_ide.services.test_runner import TestRunnerService
     from vibe_ide.services.validator import ValidatorService
@@ -26,69 +36,6 @@ _PRIORITY_ORDER: dict[TicketPriority, int] = {
     TicketPriority.medium: 2,
     TicketPriority.low: 3,
 }
-
-
-class EventType(str, Enum):
-    AGENT_STARTED = "agent_started"
-    AGENT_TOKEN = "agent_token"
-    AGENT_TOOL_USE = "agent_tool_use"
-    AGENT_DONE = "agent_done"
-    TICKET_STATUS_CHANGED = "ticket_status_changed"
-    PIPELINE_DONE = "pipeline_done"
-    ERROR = "error"
-    TEST_RESULT = "test_result"
-    SECURITY_AUDIT_STARTED = "security_audit_started"
-    SECURITY_AUDIT_DONE = "security_audit_done"
-    VALIDATION_DONE = "validation_done"
-    DOC_UPDATED = "doc_updated"
-
-
-class OrchestratorEvent(BaseModel):
-    type: EventType
-    agent: Optional[AgentRole] = None
-    ticket_id: str
-    data: dict = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-class PipelineResult(BaseModel):
-    ticket_id: str
-    final_status: TicketStatus
-    rounds: int
-    approved: bool
-
-
-EventCallback = Callable[[OrchestratorEvent], Awaitable[None]]
-
-
-def _extract_criteria(ticket_body: str) -> list[str]:
-    """Extracts acceptance criteria checkboxes from ticket markdown body."""
-    import re
-
-    criteria: list[str] = []
-    in_criteria_section = False
-    for line in ticket_body.splitlines():
-        if re.search(r"##\s*(critères|acceptance criteria)", line, re.IGNORECASE):
-            in_criteria_section = True
-            continue
-        if in_criteria_section:
-            if line.startswith("##"):
-                break
-            m = re.match(r"\s*-\s*\[[ xX]?\]\s*(.+)", line)
-            if m:
-                criteria.append(m.group(1).strip())
-    return criteria
-
-
-def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
-    """Returns (approved, reason). CHANGES_REQUESTED takes priority over APPROVED."""
-    for line in content.splitlines():
-        if "CHANGES_REQUESTED" in line.upper():
-            reason = line.split(":", 1)[-1].strip() if ":" in line else ""
-            return False, reason
-    if "APPROVED" in content.upper():
-        return True, ""
-    return False, content[:200]
 
 
 class Orchestrator:
@@ -106,6 +53,7 @@ class Orchestrator:
         security_auditor: Optional["SecurityAuditorService"] = None,
         validator: Optional["ValidatorService"] = None,
         project_path: Optional[Path] = None,
+        git_workspace: Optional["GitWorkspaceService"] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -119,6 +67,7 @@ class Orchestrator:
         self._security_auditor = security_auditor
         self._validator = validator
         self._project_path = project_path
+        self._git_workspace = git_workspace
 
     async def run_pipeline(
         self,
@@ -138,6 +87,47 @@ class Orchestrator:
             (c for c in self._agent_configs if c.role == AgentRole.reviewer.value), None
         )
 
+        # Every pipeline run now commits its own work — approved or not — on
+        # its own branch, so a dirty tree at the start of a run is no longer
+        # the routine way a rejected run hands off to inspection: it means
+        # something *outside* vibe-ide touched the tree between runs. This
+        # guard is therefore a safety net, not the isolation mechanism (that
+        # job belongs to per-run branches), and should trip rarely. When it
+        # does, the ticket must not be left in `todo` — that would make
+        # `pick_next_ticket` hand back this exact ticket on every remaining
+        # slot of an autonomous run, burning them all on zero progress.
+        # Setting it to `blocked` (excluded from `pick_next_ticket`'s
+        # `todo`-only selection) lets the queue advance instead.
+        if self._git_workspace is not None:
+            try:
+                if not await self._git_workspace.is_clean():
+                    _logger.warning(
+                        "dirty_working_tree_refused", extra={"ticket_id": ticket_id}
+                    )
+                    await self._ticket_svc.update_status(ticket_id, TicketStatus.blocked)
+                    await on_event(
+                        OrchestratorEvent(
+                            type=EventType.TICKET_STATUS_CHANGED,
+                            ticket_id=ticket_id,
+                            data={"status": TicketStatus.blocked.value},
+                        )
+                    )
+                    await on_event(
+                        OrchestratorEvent(
+                            type=EventType.ERROR,
+                            ticket_id=ticket_id,
+                            data={"reason": "dirty_working_tree"},
+                        )
+                    )
+                    return PipelineResult(
+                        ticket_id=ticket_id,
+                        final_status=TicketStatus.blocked,
+                        rounds=0,
+                        approved=False,
+                    )
+            except GitWorkspaceError as exc:
+                _logger.warning("dirty_check_failed", extra={"error": str(exc)})
+
         await self._ticket_svc.update_status(ticket_id, TicketStatus.in_progress)
         await on_event(
             OrchestratorEvent(
@@ -146,6 +136,26 @@ class Orchestrator:
                 data={"status": TicketStatus.in_progress.value},
             )
         )
+
+        branch: str | None = None
+        if self._git_workspace is not None:
+            try:
+                branch = await self._git_workspace.create_branch(ticket_id, ticket.title)
+                await on_event(
+                    OrchestratorEvent(
+                        type=EventType.BRANCH_CREATED,
+                        ticket_id=ticket_id,
+                        data={"branch": branch},
+                    )
+                )
+                self._log(f"[{ticket_id}] branche {branch}")
+            except GitWorkspaceError as exc:
+                # Un projet sans dépôt git reste utilisable : on continue sans
+                # garde-fou de branche plutôt que d'interrompre le pipeline.
+                # Volontairement restreint à GitWorkspaceError : une erreur de
+                # programmation doit remonter, pas finir en avertissement.
+
+                _logger.warning("branch_creation_failed", extra={"error": str(exc)})
 
         review_feedback: list[str] = []
 
@@ -208,6 +218,24 @@ class Orchestrator:
             self._log(
                 f"[{ticket_id}] tour {round_num} — codeur terminé ({codeur_result.duration_ms}ms)"
             )
+
+            # Le codeur écrit réellement sur disque : ce qui doit être relu,
+            # audité et validé, c'est le diff, pas la prose de l'agent.
+            reviewed_code = codeur_result.content
+            if self._git_workspace is not None:
+                try:
+                    diff = await self._git_workspace.current_diff()
+                    if diff.strip():
+                        reviewed_code = diff
+                    else:
+                        _logger.info(
+                            "diff_empty_fallback_to_prose", extra={"ticket_id": ticket_id}
+                        )
+                except GitWorkspaceError as exc:
+                    _logger.warning("diff_failed", extra={"error": str(exc)})
+                    _logger.info(
+                        "diff_empty_fallback_to_prose", extra={"ticket_id": ticket_id}
+                    )
 
             await self._ticket_svc.update_status(ticket_id, TicketStatus.in_review)
             await on_event(
@@ -273,7 +301,7 @@ class Orchestrator:
                 )
                 try:
                     audit = await self._security_auditor.audit(
-                        code_diff=codeur_result.content,
+                        code_diff=reviewed_code,
                         project_path=self._project_path,
                     )
                     await on_event(
@@ -301,6 +329,15 @@ class Orchestrator:
                                 data={"status": TicketStatus.blocked.value},
                             )
                         )
+                        commit_sha = await self._commit_work(
+                            ticket_id,
+                            branch,
+                            _unapproved_commit_message(
+                                ticket_id,
+                                f"security block: {_single_line(audit.summary)[:80]}",
+                            ),
+                            on_event,
+                        )
                         await on_event(
                             OrchestratorEvent(
                                 type=EventType.PIPELINE_DONE,
@@ -313,6 +350,8 @@ class Orchestrator:
                             final_status=TicketStatus.blocked,
                             rounds=round_num,
                             approved=False,
+                            branch=branch,
+                            commit_sha=commit_sha,
                         )
                     # PASS — include audit context for reviewer (MEDIUM/LOW as warnings)
                     if audit.issues:
@@ -327,7 +366,7 @@ class Orchestrator:
             # --- reviewer ---
             review_context = (
                 context
-                + f"\n\n## Code produit par le codeur (tour {round_num})\n{codeur_result.content}"
+                + f"\n\n## Code produit par le codeur (tour {round_num})\n{reviewed_code}"
                 + test_context_block
                 + security_context_block
             )
@@ -370,7 +409,7 @@ class Orchestrator:
                         criteria = _extract_criteria(ticket.body)
                         validation = await self._validator.validate(
                             criteria=criteria,
-                            code_produced=codeur_result.content,
+                            code_produced=reviewed_code,
                             test_result=test_result,
                         )
                         await on_event(
@@ -403,7 +442,7 @@ class Orchestrator:
                     try:
                         doc_result = await self._doc_updater.update_docs(
                             self._project_path,
-                            diff=codeur_result.content,
+                            diff=reviewed_code,
                             ticket_title=f"{ticket.type.value}: {ticket.title}",
                         )
                         await on_event(
@@ -438,11 +477,41 @@ class Orchestrator:
                     )
                 )
                 self._log(f"[{ticket_id}] APPROVED après {round_num} tour(s)")
+
+                # This message is written into the *user's* project
+                # repository, so it must follow that project's own commit
+                # convention — Conventional Commits — using the ticket's own
+                # type rather than a hardcoded "feat:", which mislabelled
+                # fix/chore/docs tickets. `_commit_work` gates on `branch`
+                # too, not just on git_workspace being configured: if
+                # create_branch failed above, branch stays None and we must
+                # not commit onto whatever ref happened to be checked out.
+                commit_sha = await self._commit_work(
+                    ticket_id,
+                    branch,
+                    f"{ticket.type.value}: {ticket_id} — {ticket.title}",
+                    on_event,
+                )
+                # Only an *approved* ticket moves the base ref forward.
+                # Isolation-by-branch keeps a rejected ticket's work out of
+                # the next ticket; it must not also hide an approved
+                # ticket's work from the tickets that follow, or every step
+                # of a sequential plan would run against a stale base.
+                if commit_sha is not None and self._git_workspace is not None:
+                    try:
+                        await self._git_workspace.advance_base_ref()
+                    except GitWorkspaceError as exc:
+                        _logger.warning(
+                            "advance_base_ref_failed", extra={"error": str(exc)}
+                        )
+
                 return PipelineResult(
                     ticket_id=ticket_id,
                     final_status=TicketStatus.done,
                     rounds=round_num,
                     approved=True,
+                    branch=branch,
+                    commit_sha=commit_sha,
                 )
 
             review_feedback.append(reason or reviewer_result.content[:500])
@@ -459,6 +528,16 @@ class Orchestrator:
                 data={"status": TicketStatus.blocked.value},
             )
         )
+        commit_sha = await self._commit_work(
+            ticket_id,
+            branch,
+            _unapproved_commit_message(
+                ticket_id,
+                "changes requested — rounds exhausted after "
+                f"{self._max_review_rounds} round(s)",
+            ),
+            on_event,
+        )
         await on_event(
             OrchestratorEvent(
                 type=EventType.PIPELINE_DONE,
@@ -474,7 +553,41 @@ class Orchestrator:
             final_status=TicketStatus.blocked,
             rounds=self._max_review_rounds,
             approved=False,
+            branch=branch,
+            commit_sha=commit_sha,
         )
+
+    async def _commit_work(
+        self,
+        ticket_id: str,
+        branch: str | None,
+        message: str,
+        on_event: EventCallback,
+    ) -> str | None:
+        """Commit whatever the coder produced under `message`; emit COMMIT_CREATED.
+
+        Gated on both `git_workspace` being configured and `branch` being
+        not None — a failed branch creation must never result in a commit
+        onto whatever ref happened to be checked out. Applies on every exit
+        path (approved or not): isolation-by-branch relies on each run
+        leaving the tree clean for the next one.
+        """
+        if self._git_workspace is None or branch is None:
+            return None
+        try:
+            commit_sha = await self._git_workspace.commit_all(message)
+        except GitWorkspaceError as exc:
+            _logger.warning("commit_failed", extra={"error": str(exc)})
+            return None
+        if commit_sha is not None:
+            await on_event(
+                OrchestratorEvent(
+                    type=EventType.COMMIT_CREATED,
+                    ticket_id=ticket_id,
+                    data={"sha": commit_sha, "branch": branch},
+                )
+            )
+        return commit_sha
 
     async def pick_next_ticket(self, project_id: str) -> Optional[Ticket]:
         todos = await self._ticket_svc.list_tickets(status=TicketStatus.todo)
@@ -516,3 +629,12 @@ class Orchestrator:
                 f.write(line)
         except Exception as exc:
             _logger.warning("pipeline_log_write_failed", extra={"error": str(exc)})
+
+
+__all__ = [
+    "EventCallback",
+    "EventType",
+    "Orchestrator",
+    "OrchestratorEvent",
+    "PipelineResult",
+]

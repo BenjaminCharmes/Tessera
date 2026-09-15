@@ -2,48 +2,65 @@
 
 ## Workflows actifs
 
-| Fichier     | Déclencheur                              | Rôle                     |
-|-------------|------------------------------------------|--------------------------|
-| `ci.yml`    | push toutes branches + PR vers `main`    | Tests + type check       |
+| Fichier  | Déclencheur                                      | Rôle             |
+|----------|--------------------------------------------------|------------------|
+| `ci.yml` | push sur toutes branches + PR vers `main` / `develop` | Tests + type check |
 
-## Stratégie par phase de tickets
+Jobs : `Backend (pytest)`, `Frontend (tsc + vitest)`, `E2E (Playwright)`,
+`Tauri (cargo check)` — en parallèle (ADR-015).
 
-### Tickets 000–002 : commits directs sur `main`
-
-La base du projet n'est pas encore stable. Commits directs autorisés avec
-message Conventional Commits (`feat:`, `fix:`, `chore:`…). La CI tourne mais
-n'est pas bloquante en l'absence de PR.
-
-### Tickets 003+ : branches + Pull Requests
-
-À partir de ticket-003, chaque ticket est développé sur une branche dédiée :
+## Flux de branches
 
 ```
-git checkout -b ticket-003-agent-loop
-# … travail …
-gh pr create --base main
+ticket-XXX-slug  ──PR──▶  develop  ──PR──▶  main
+       │                     │                │
+   CI par PR          CI d'intégration     release
 ```
 
-La PR n'est mergée que quand :
-1. **CI verte** (job `test` passe)
-2. **Reviewer agent approuve** (commentaire `LGTM` ou `approved` dans la PR)
+- **`main`** — état publiable. Ne reçoit que des merges depuis `develop`.
+- **`develop`** — intégration continue. Cible par défaut de toutes les PR de
+  ticket. C'est le seul endroit où les tickets sont testés **fusionnés entre
+  eux** : chaque PR est verte isolément, rien ne garantit leur combinaison.
+- **`ticket-XXX-…`** — une branche par ticket, part de `develop`, y retourne.
 
-Le merge peut être automatisé via GitHub Actions ou Claude Code.
+Pas de commit direct sur `main` ni sur `develop`.
 
-## Fichiers protégés — jamais auto-mergés
+## Procédure
 
-Les fichiers suivants ne peuvent être modifiés que par un commit humain explicite,
-même si la CI est verte et le reviewer agent a approuvé :
+```bash
+git checkout develop && git pull
+git checkout -b ticket-XXX-description-courte
+# ... implémentation ...
+git push -u origin ticket-XXX-description-courte
+gh pr create --base develop --title "feat: ticket-XXX — …"
+gh pr merge --squash --auto          # une fois la CI verte
+```
 
-- `CLAUDE.md` (racine et tous les sous-projets)
-- `agents.json` (tous les projets)
-- `agents/prompts/**` (tous les system prompts)
+### Release : `develop` vers `main`
 
-Toute PR touchant ces fichiers doit être reviewée et mergée manuellement.
+```bash
+gh pr create --base main --head develop --title "release: ..."
+gh pr merge --merge                  # merge commit, JAMAIS --squash
+```
 
-## Règles globales
+Un squash réécrit les SHA : squasher `develop` dans `main` ferait diverger les
+deux branches définitivement, avec des conflits répétés sur du code déjà
+fusionné, et priverait `main` de l'historique par ticket — donc de la
+possibilité de revert un ticket précis.
 
-- **Jamais de force-push sur `main`**
-- Pas de merge sans CI verte (à partir de ticket-003)
-- Les stubs (`return []`) sont acceptés sur `main` pendant la phase de construction
-- `mypy` est non-bloquant pendant les tickets 000–004 (warn only)
+`main` reste la branche par défaut du dépôt. `develop` n'est jamais supprimée.
+
+## Vérifier la CI sur le bon commit
+
+`gh pr checks` peut afficher une exécution antérieure. Comparer au `HEAD`
+local :
+
+```bash
+gh run list --branch <branche> --limit 2 --json headSha,status,conclusion
+git rev-parse --short HEAD
+```
+
+## Note
+
+Le service de création de PR cible `develop` par défaut
+(`settings.github_base_branch`), et la base reste paramétrable par requête.

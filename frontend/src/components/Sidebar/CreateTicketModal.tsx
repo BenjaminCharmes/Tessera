@@ -12,8 +12,10 @@ const TYPES: { value: TicketType; label: string }[] = [
   { value: "feat", label: "feat — nouvelle fonctionnalité" },
   { value: "fix", label: "fix — correction de bug" },
   { value: "chore", label: "chore — maintenance / CI" },
-  { value: "design", label: "design — architecture" },
   { value: "docs", label: "docs — documentation" },
+  { value: "refactor", label: "refactor — restructuration sans changement de comportement" },
+  { value: "test", label: "test — ajout ou correction de tests" },
+  { value: "design", label: "design — architecture" },
 ];
 
 const PRIORITIES: { value: TicketPriority; label: string }[] = [

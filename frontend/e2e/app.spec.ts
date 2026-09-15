@@ -72,9 +72,13 @@ test.describe("Flow 4 — Création d'un ticket", () => {
       .getByRole("button", { name: "Créer", exact: true })
       .click();
 
-    // Modal closes, new ticket appears
+    // Modal closes, new ticket appears.
+    // `exact: true` est indispensable ici : sans lui, "Créer" matche aussi
+    // "Créer un ticket" — le bouton + de la sidebar, qui reste visible après
+    // la fermeture de la modale. L'assertion devient alors instable, et
+    // échoue selon l'instant où le re-render la surprend.
     await expect(
-      mockedPage.getByRole("button", { name: "Créer" }),
+      mockedPage.getByRole("button", { name: "Créer", exact: true }),
     ).not.toBeVisible();
     await expect(mockedPage.getByText("Ma feature")).toBeVisible();
   });

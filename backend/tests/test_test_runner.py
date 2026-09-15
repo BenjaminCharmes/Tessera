@@ -15,19 +15,19 @@ from vibe_ide.services.test_runner import (
 
 @pytest.fixture
 def python_project(tmp_path: Path) -> Path:
-    (tmp_path / "pyproject.toml").write_text("[project]\nname = 'test'\n")
+    (tmp_path / "pyproject.toml").write_text("[project]\nname = 'test'\n", encoding="utf-8")
     return tmp_path
 
 
 @pytest.fixture
 def node_project(tmp_path: Path) -> Path:
-    (tmp_path / "package.json").write_text('{"name": "test", "scripts": {"test": "vitest run"}}')
+    (tmp_path / "package.json").write_text('{"name": "test", "scripts": {"test": "vitest run"}}', encoding="utf-8")
     return tmp_path
 
 
 @pytest.fixture
 def rust_project(tmp_path: Path) -> Path:
-    (tmp_path / "Cargo.toml").write_text("[package]\nname = 'test'\n")
+    (tmp_path / "Cargo.toml").write_text("[package]\nname = 'test'\n", encoding="utf-8")
     return tmp_path
 
 

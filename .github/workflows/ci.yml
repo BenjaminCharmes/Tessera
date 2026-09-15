@@ -4,7 +4,9 @@ on:
   push:
     branches: ["**"]
   pull_request:
-    branches: [main]
+    # `develop` est la cible par défaut des PR de ticket (ADR — ticket-049) :
+    # sans elle ici, une PR vers develop ne déclenche aucun check.
+    branches: [main, develop]
 
 permissions:
   contents: read

@@ -2,11 +2,17 @@ import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterator
+from typing import Any, Iterator
 
-import frontmatter  # type: ignore[import-untyped]
+import frontmatter
 
-from vibe_ide.models.ticket import Ticket, TicketDraftPlan, TicketStatus
+from vibe_ide.models.ticket import (
+    Ticket,
+    TicketDraftPlan,
+    TicketPriority,
+    TicketStatus,
+    TicketType,
+)
 
 
 _STATUS_DIRS: dict[TicketStatus, str] = {
@@ -117,9 +123,12 @@ class TicketService:
             ticket = Ticket(
                 id=ids[i],
                 title=draft.title,
-                type=draft.type,
+                # `TicketDraftPlan` carries the planner's raw strings; the
+                # enums are the persisted contract, so coerce here rather
+                # than letting an invalid value reach the ticket file.
+                type=TicketType(draft.type),
                 status=TicketStatus.todo,
-                priority=draft.priority,
+                priority=TicketPriority(draft.priority),
                 agent=draft.agent,
                 depends_on=depends_on,
                 body=draft.description,
@@ -225,18 +234,25 @@ class TicketService:
 
     def _parse(self, path: Path) -> Ticket:
         post = frontmatter.load(str(path))
-        meta = post.metadata
+        # Frontmatter metadata is arbitrary YAML: every field is coerced to
+        # the model's own type here, at the parsing boundary, so an invalid
+        # ticket file fails loudly instead of producing a half-typed Ticket.
+        meta: dict[str, Any] = dict(post.metadata)
+        raw_pr_number = meta.get("pr_number")
+        raw_depends_on = meta.get("depends_on") or []
         return Ticket(
             id=str(meta["id"]),
             title=str(meta["title"]),
-            type=meta["type"],
-            status=meta["status"],
-            priority=meta["priority"],
+            type=TicketType(meta["type"]),
+            status=TicketStatus(meta["status"]),
+            priority=TicketPriority(meta["priority"]),
             agent=str(meta["agent"]),
-            depends_on=list(meta.get("depends_on", [])),
+            depends_on=[str(dep) for dep in raw_depends_on],
             created=str(meta.get("created", "")),
-            github_issue_url=meta.get("github_issue_url") or None,
-            pr_number=int(meta["pr_number"]) if isinstance(meta.get("pr_number"), int) else None,
+            github_issue_url=str(meta["github_issue_url"])
+            if meta.get("github_issue_url")
+            else None,
+            pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
             body=str(post.content),
             project_id=self._project_id,
             file_path=str(path),

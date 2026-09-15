@@ -14,11 +14,17 @@ class TicketStatus(str, Enum):
 
 
 class TicketType(str, Enum):
+    # Aligné sur les types Conventional Commits imposés par CLAUDE.md : le type
+    # du ticket est repris tel quel comme préfixe du message de commit produit
+    # par le pipeline. `design` est un type propre à vibe-ide (tickets confiés à
+    # l'agent architect).
     feat = "feat"
     fix = "fix"
     chore = "chore"
-    design = "design"
     docs = "docs"
+    refactor = "refactor"
+    test = "test"
+    design = "design"
 
 
 class TicketPriority(str, Enum):

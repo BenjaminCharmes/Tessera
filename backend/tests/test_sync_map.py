@@ -74,7 +74,7 @@ def test_load_skips_unknown_value_types(tmp_project: Path) -> None:
 def test_save_creates_file(tmp_path: Path) -> None:
     mapping = {"ticket-001": SyncEntry(issue=5, pr=None)}
     _svc().save(tmp_path, mapping)
-    written = json.loads((tmp_path / "memory" / "github-sync-map.json").read_text())
+    written = json.loads((tmp_path / "memory" / "github-sync-map.json").read_text(encoding="utf-8"))
     assert written == {"ticket-001": {"issue": 5, "pr": None}}
 
 
@@ -86,7 +86,7 @@ def test_save_creates_memory_dir_if_missing(tmp_path: Path) -> None:
 def test_save_stores_pr_number(tmp_path: Path) -> None:
     mapping = {"ticket-001": SyncEntry(issue=5, pr=15)}
     _svc().save(tmp_path, mapping)
-    written = json.loads((tmp_path / "memory" / "github-sync-map.json").read_text())
+    written = json.loads((tmp_path / "memory" / "github-sync-map.json").read_text(encoding="utf-8"))
     assert written["ticket-001"]["pr"] == 15
 
 
@@ -94,7 +94,7 @@ def test_save_overwrites_existing(tmp_project: Path) -> None:
     svc = _svc()
     svc.save(tmp_project, {"ticket-001": SyncEntry(issue=1)})
     svc.save(tmp_project, {"ticket-002": SyncEntry(issue=2)})
-    result = json.loads((tmp_project / "memory" / "github-sync-map.json").read_text())
+    result = json.loads((tmp_project / "memory" / "github-sync-map.json").read_text(encoding="utf-8"))
     assert list(result.keys()) == ["ticket-002"]
 
 

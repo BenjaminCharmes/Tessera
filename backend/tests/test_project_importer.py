@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.conftest import requires_symlinks
+
 from vibe_ide.services.project_importer import ImportError, ProjectImporter, _sanitize_id
 
 
@@ -66,7 +68,7 @@ async def test_import_rejects_nonexistent_source(tmp_path: Path) -> None:
 async def test_import_rejects_file_as_source(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     file_path = tmp_path / "file.txt"
-    file_path.write_text("x")
+    file_path.write_text("x", encoding="utf-8")
     importer = ProjectImporter(ws)
 
     with pytest.raises(ImportError, match="dossier"):
@@ -104,6 +106,7 @@ async def test_import_rejects_parent_of_workspace(tmp_path: Path) -> None:
 # ------------------------------------------------------------------
 
 
+@requires_symlinks
 async def test_import_symlink_creates_link(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
@@ -117,6 +120,7 @@ async def test_import_symlink_creates_link(tmp_path: Path) -> None:
     assert project.id == "mon-projet"
 
 
+@requires_symlinks
 async def test_import_symlink_source_files_accessible(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
@@ -124,9 +128,10 @@ async def test_import_symlink_source_files_accessible(tmp_path: Path) -> None:
 
     await importer.import_project(src, mode="symlink")
 
-    assert (ws / "mon-projet" / "main.py").read_text() == "print('hello')"
+    assert (ws / "mon-projet" / "main.py").read_text(encoding="utf-8") == "print('hello')"
 
 
+@requires_symlinks
 async def test_import_symlink_with_explicit_project_id(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
@@ -138,6 +143,7 @@ async def test_import_symlink_with_explicit_project_id(tmp_path: Path) -> None:
     assert (ws / "custom-id").is_symlink()
 
 
+@requires_symlinks
 async def test_import_symlink_scaffolds_vibe_dirs(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
@@ -152,6 +158,7 @@ async def test_import_symlink_scaffolds_vibe_dirs(tmp_path: Path) -> None:
     assert (dest / "workspace").is_dir()
 
 
+@requires_symlinks
 async def test_import_symlink_creates_claude_md_if_missing(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
@@ -161,9 +168,10 @@ async def test_import_symlink_creates_claude_md_if_missing(tmp_path: Path) -> No
 
     claude_md = ws / "mon-projet" / "CLAUDE.md"
     assert claude_md.exists()
-    assert "mon-projet" in claude_md.read_text()
+    assert "mon-projet" in claude_md.read_text(encoding="utf-8")
 
 
+@requires_symlinks
 async def test_import_symlink_preserves_existing_claude_md(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
@@ -173,9 +181,10 @@ async def test_import_symlink_preserves_existing_claude_md(tmp_path: Path) -> No
 
     await importer.import_project(src, mode="symlink")
 
-    assert (ws / "mon-projet" / "CLAUDE.md").read_text() == existing_content
+    assert (ws / "mon-projet" / "CLAUDE.md").read_text(encoding="utf-8") == existing_content
 
 
+@requires_symlinks
 async def test_import_symlink_duplicate_raises(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
@@ -201,7 +210,7 @@ async def test_import_copy_copies_files(tmp_path: Path) -> None:
 
     dest = ws / "mon-projet"
     assert dest.is_dir() and not dest.is_symlink()
-    assert (dest / "main.py").read_text() == "print('hello')"
+    assert (dest / "main.py").read_text(encoding="utf-8") == "print('hello')"
     assert project.id == "mon-projet"
 
 
@@ -209,7 +218,7 @@ async def test_import_copy_excludes_dot_git(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
     (src / ".git").mkdir()
-    (src / ".git" / "config").write_text("[core]\n")
+    (src / ".git" / "config").write_text("[core]\n", encoding="utf-8")
     importer = ProjectImporter(ws)
 
     await importer.import_project(src, mode="copy")
@@ -243,8 +252,8 @@ async def test_import_copy_excludes_venv(tmp_path: Path) -> None:
 async def test_import_copy_excludes_env_files(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
-    (src / ".env").write_text("SECRET=abc123")
-    (src / ".env.local").write_text("SECRET=local")
+    (src / ".env").write_text("SECRET=abc123", encoding="utf-8")
+    (src / ".env.local").write_text("SECRET=local", encoding="utf-8")
     importer = ProjectImporter(ws)
 
     await importer.import_project(src, mode="copy")
@@ -292,7 +301,7 @@ async def test_import_copy_preserves_existing_tickets(tmp_path: Path) -> None:
     src = _make_source(tmp_path)
     (src / "tickets").mkdir()
     (src / "tickets" / "todo").mkdir()
-    (src / "tickets" / "todo" / "ticket-001.md").write_text("---\nid: ticket-001\n---\n")
+    (src / "tickets" / "todo" / "ticket-001.md").write_text("---\nid: ticket-001\n---\n", encoding="utf-8")
     importer = ProjectImporter(ws)
 
     await importer.import_project(src, mode="copy")
@@ -312,8 +321,63 @@ async def test_import_returns_project_model(tmp_path: Path) -> None:
     (src / "CLAUDE.md").write_text("# Super Projet\n\nDescription.\n", encoding="utf-8")
     importer = ProjectImporter(ws)
 
-    project = await importer.import_project(src, mode="symlink")
+    # copy mode, not symlink: this test asserts the returned Project model,
+    # which is identical either way — and creating a symlink needs
+    # privileges this process may not have (Windows without Developer Mode).
+    project = await importer.import_project(src, mode="copy")
 
     assert project.id == "mon-projet"
     assert project.name == "Super Projet"
     assert project.description == "Description."
+
+
+async def test_import_symlink_erreur_os_donne_un_message_exploitable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Creating a directory symlink needs Developer Mode or elevation on
+    # Windows; without them the raw OSError (WinError 1314) reaches the API
+    # as a 500 with an opaque message. Surface it as a business error that
+    # says what to do instead.
+    ws = _make_workspace(tmp_path)
+    src = _make_source(tmp_path)
+
+    def _refuse(self: Path, target: Path, target_is_directory: bool = False) -> None:
+        raise OSError(1314, "Le client ne dispose pas d'un privilège nécessaire")
+
+    monkeypatch.setattr(Path, "symlink_to", _refuse)
+    importer = ProjectImporter(ws)
+
+    with pytest.raises(ImportError) as exc:
+        await importer.import_project(src, mode="symlink")
+
+    message = str(exc.value)
+    assert "symlink" in message.lower()
+    assert "copy" in message.lower()
+
+
+async def test_import_retire_les_guillemets_autour_du_chemin(tmp_path: Path) -> None:
+    # Copying a path out of Windows Explorer ("Copy as path") wraps it in
+    # double quotes. Left in place they make the path look relative, so it
+    # gets resolved against the backend's own cwd and the import fails with
+    # a nonsensical "source does not exist: backend/"C:\..."".
+    ws = _make_workspace(tmp_path)
+    src = _make_source(tmp_path)
+    importer = ProjectImporter(ws)
+
+    project = await importer.import_project(Path(f'"{src}"'), mode="copy")
+
+    assert project.id == "mon-projet"
+
+
+async def test_import_refuse_un_chemin_relatif_avec_un_message_clair(
+    tmp_path: Path,
+) -> None:
+    # A relative path would silently resolve against the backend process's
+    # cwd — never what the user meant when typing a project location.
+    ws = _make_workspace(tmp_path)
+    importer = ProjectImporter(ws)
+
+    with pytest.raises(ImportError) as exc:
+        await importer.import_project(Path("mon-projet"), mode="copy")
+
+    assert "absolu" in str(exc.value).lower()

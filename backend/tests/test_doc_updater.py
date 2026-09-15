@@ -12,10 +12,10 @@ from vibe_ide.services.doc_updater import DocUpdateResult, DocUpdaterService
 @pytest.fixture
 def project_path(tmp_path: Path) -> Path:
     readme = tmp_path / "README.md"
-    readme.write_text("# My Project\n\n## API\n\nGET /health\n")
+    readme.write_text("# My Project\n\n## API\n\nGET /health\n", encoding="utf-8")
     (tmp_path / "docs").mkdir()
-    (tmp_path / "docs" / "architecture.md").write_text("# Architecture\n")
-    (tmp_path / "CLAUDE.md").write_text("# CLAUDE.md\n\nStack: Python\n")
+    (tmp_path / "docs" / "architecture.md").write_text("# Architecture\n", encoding="utf-8")
+    (tmp_path / "CLAUDE.md").write_text("# CLAUDE.md\n\nStack: Python\n", encoding="utf-8")
     return tmp_path
 
 
@@ -47,7 +47,7 @@ class TestDocUpdaterService:
 
         assert result.no_changes is False
         assert "README.md" in result.files_updated
-        assert (project_path / "README.md").read_text() == new_content
+        assert (project_path / "README.md").read_text(encoding="utf-8") == new_content
 
     async def test_updates_multiple_files(
         self, service: DocUpdaterService, project_path: Path
@@ -88,7 +88,7 @@ class TestDocUpdaterService:
         self, service: DocUpdaterService, project_path: Path
     ) -> None:
         big_readme = "x" * 20_000
-        (project_path / "README.md").write_text(big_readme)
+        (project_path / "README.md").write_text(big_readme, encoding="utf-8")
         service._provider = FakeProvider(content='{"no_changes": true}')
 
         await service.update_docs(project_path, diff="y", ticket_title="feat: y")

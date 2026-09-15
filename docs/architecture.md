@@ -25,15 +25,40 @@
 │                    ├─ ProjectCreator    │
 │                    ├─ GitHubService     │
 │                    ├─ GithubSyncAgent   │
+│                    ├─ GitWorkspaceSvc   │
 │                    └─ DatabaseService   │
 │                           │             │
-│                    Anthropic SDK        │
+│              LLMProvider (ADR-017)      │
+│      ┌────────────────┴──────────────┐  │
+│  ClaudeAgentSDKProvider     AnthropicApi│
+│  (défaut — abonnement,      Provider    │
+│   outils fichier)           (fallback)  │
 └─────────────────────────────────────────┘
                   │
        Filesystem (tickets Markdown + mémoire)
                   │
+       git (une branche + un commit par run — ADR-018)
+                  │
        SQLite  vibe_ide.db  (historique pipelines)
 ```
+
+### Couche LLM (ADR-017)
+
+Les services n'appellent jamais Claude directement : ils passent par le protocole
+`LLMProvider` (`complete` / `stream`). Deux implémentations coexistent —
+`ClaudeAgentSDKProvider` (défaut, facturé sur l'**abonnement**, dispose des outils
+fichier) et `AnthropicApiProvider` (fallback sur crédits API, pour les
+environnements sans session interactive : Docker, CI).
+
+`get_provider(allow_tools=False)` retourne une variante **sans outils**, utilisée
+par tous les services purement texte→JSON (validateur, auditeur sécurité,
+planificateur, project-analyzer, agent-creator, project-creator, doc-updater) qui
+écrivent eux-mêmes leurs fichiers en Python.
+
+### Couche git (ADR-018)
+
+`GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
+**jamais** au dépôt de vibe-ide lui-même — uniquement au projet ciblé.
 
 ## Endpoints implémentés
 
@@ -71,21 +96,45 @@
 ## Flux d'un ticket
 
 ```
-1. Ticket en todo/ → POST /orchestrator/run { project_id, ticket_id }
-2. DB : create_run(project_id, ticket_id) → run_id
-3. Orchestrateur: ticket → in-progress/
-4. Codeur (Claude) → produit le code
-   └─ tokens streamés via WS → UI en temps réel
-   └─ chaque event → save_event(run_id, ...)
-5. Ticket → in-review/
-6. Reviewer (Claude) → lit le code produit
-   ├─ "APPROVED" → ticket → done/ ; pipeline terminé
-   └─ "CHANGES_REQUESTED: {raison}" → retour au Codeur avec feedback
-        (max 3 tours ; sinon ticket → blocked/)
-7. DB : finish_run(run_id, rounds, approved, final_status)
-8. PipelineResult { ticket_id, final_status, rounds, approved }
-9. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
+ 1. Ticket en todo/ → POST /orchestrator/run { project_id, ticket_id }
+ 2. DB : create_run(project_id, ticket_id) → run_id
+ 3. Garde-fou : arbre de travail sale ? → ticket → blocked/, run terminé
+ 4. Orchestrateur: ticket → in-progress/
+ 5. git checkout -b ticket-XXX-slug  (forkée de la ref de base, pas du ticket
+    précédent) → OrchestratorEvent.BRANCH_CREATED
+ 6. Codeur (Claude) → ÉCRIT RÉELLEMENT les fichiers (outils fichier du SDK)
+    └─ tokens streamés via WS → UI en temps réel
+    └─ chaque event → save_event(run_id, ...)
+ 7. git diff → c'est CE diff qui alimente toutes les étapes suivantes
+    (repli sur la prose du codeur si le diff est vide)
+ 8. Testeur → exécute la suite de tests du projet → TEST_RESULT
+ 9. Auditeur sécurité (OWASP) → BLOCK si CRITICAL/HIGH → ticket → blocked/
+10. Ticket → in-review/
+11. Reviewer (Claude) → relit le diff
+    ├─ "APPROVED" → étape 12
+    └─ "CHANGES_REQUESTED: {raison}" → retour au Codeur avec feedback
+         (max 3 tours ; sinon ticket → blocked/)
+12. Validateur → vérifie les critères d'acceptation un par un
+13. Doc-updater → met à jour README / docs / CLAUDE.md du projet
+14. git commit — sur TOUS les chemins de sortie :
+    ├─ approuvé      → "<type>: ticket-XXX — <titre>" puis advance_base_ref()
+    └─ non approuvé  → "chore: ticket-XXX — unapproved work (<raison>)"
+    (+ un second commit séparé pour la comptabilité vibe-ide :
+     statuts de tickets et pipeline-log, jamais sous le message du ticket)
+15. DB : finish_run(run_id, rounds, approved, final_status)
+16. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
+17. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
 ```
+
+**Invariants** (voir ADR-018) :
+
+- Le commit est conditionné à la **réussite** de la création de branche : si le
+  projet n'est pas un dépôt git, le pipeline continue sans committer plutôt que de
+  committer sur une branche arbitraire.
+- Seul un ticket **approuvé** fait avancer la ref de base. Le travail rejeté reste
+  sur sa branche et ne contamine jamais le ticket suivant.
+- Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
+  commit du ticket : il ne vient pas du codeur.
 
 ## Couche SQLite (ticket-015)
 
@@ -152,8 +201,11 @@ Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
 
 ```json
 {
-  "type": "agent_started | agent_token | agent_done | ticket_status_changed | pipeline_done | error",
-  "agent": "codeur | reviewer | null",
+  "type": "agent_started | agent_token | agent_tool_use | agent_done | branch_created |
+           ticket_status_changed | test_result | security_audit_started |
+           security_audit_done | validation_done | doc_updated | commit_created |
+           pipeline_done | error",
+  "agent": "codeur | reviewer | testeur | securite | validateur | doc-updater | null",
   "ticket_id": "ticket-007",
   "data": { "round": 1, "token": "def foo", "status": "in-progress", "approved": true },
   "timestamp": "2026-06-20T14:30:00Z"

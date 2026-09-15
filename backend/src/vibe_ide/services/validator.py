@@ -119,7 +119,7 @@ class ValidatorService:
         verdict: Verdict = "APPROVED" if all_passed else "CHANGES_REQUESTED"
         raw_verdict = parsed.get("verdict", "")
         if raw_verdict in ("APPROVED", "CHANGES_REQUESTED"):
-            verdict = raw_verdict  # type: ignore[assignment]
+            verdict = raw_verdict
 
         criteria = [
             CriterionResult(

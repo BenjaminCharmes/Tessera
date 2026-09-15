@@ -30,6 +30,31 @@ class ImportError(Exception):
     """Erreur métier lors de l'import d'un projet."""
 
 
+def _normalize_source(source_path: Path) -> Path:
+    """Clean up a user-supplied project path and require it to be absolute.
+
+    Windows Explorer's "Copy as path" wraps the path in double quotes and
+    users paste it verbatim. Those quotes make the path look relative, so
+    `resolve()` silently joins it to the backend process's own working
+    directory — the import then fails with a nonsensical "le dossier source
+    n'existe pas : .../backend/<quoted path>". Strip the quoting, then
+    refuse a genuinely relative path outright rather than resolving it
+    somewhere the user never meant.
+    """
+    cleaned = str(source_path).strip().strip(chr(34)).strip("'").strip()
+    if not cleaned:
+        raise ImportError("Le chemin du dossier source est vide.")
+
+    candidate = Path(cleaned)
+    if not candidate.is_absolute():
+        raise ImportError(
+            f"Le chemin du dossier source doit être absolu : {cleaned!r}. "
+            "Indique le chemin complet du projet, par exemple "
+            r"C:\Users\moi\Desktop\mon-projet ou /home/moi/mon-projet."
+        )
+    return candidate.resolve()
+
+
 class ProjectImporter:
     def __init__(self, workspace: Path) -> None:
         self._workspace = workspace.resolve()
@@ -40,7 +65,7 @@ class ProjectImporter:
         mode: Literal["copy", "symlink"],
         project_id: str | None = None,
     ) -> Project:
-        resolved = source_path.resolve()
+        resolved = _normalize_source(source_path)
         self._validate_source(resolved)
 
         safe_id = project_id or _sanitize_id(resolved.name)
@@ -50,7 +75,18 @@ class ProjectImporter:
             raise ImportError(f"Un projet avec l'id '{safe_id}' existe déjà dans le workspace.")
 
         if mode == "symlink":
-            dest.symlink_to(resolved, target_is_directory=True)
+            try:
+                dest.symlink_to(resolved, target_is_directory=True)
+            except (OSError, NotImplementedError) as exc:
+                # Creating a directory symlink needs Developer Mode or an
+                # elevated process on Windows (WinError 1314). Left raw, that
+                # surfaces as an opaque 500; say what the user can do instead.
+                raise ImportError(
+                    "Impossible de créer le lien symbolique vers "
+                    f"'{resolved}' : {exc}. Active le mode développeur "
+                    "Windows (ou lance le backend en administrateur), ou "
+                    "réimporte le projet en mode 'copy'."
+                ) from exc
         else:
             _copy_project(resolved, dest)
 

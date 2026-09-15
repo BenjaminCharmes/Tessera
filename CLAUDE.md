@@ -80,9 +80,47 @@ vibe-ide/
 - Pas de `console.log` en production (utiliser le logger structuré)
 
 ### Git
-- Commits en anglais, format Conventional Commits : `feat:`, `fix:`, `chore:`, `docs:`
+- Commits en anglais, format Conventional Commits : `feat:`, `fix:`, `chore:`,
+  `docs:`, `refactor:`, `test:`
 - Une branche par ticket : `ticket-XXX-description-courte`
-- Pas de commit direct sur `main`
+- **Flux** : `ticket-XXX` → PR vers `develop` → PR de `develop` vers `main`
+  - `main` — état publiable et branche par défaut du dépôt ; ne reçoit que des
+    merges depuis `develop`
+  - `develop` — intégration, cible par défaut de toutes les PR de ticket
+  - Pas de commit direct sur `main` ni sur `develop`
+  - `ticket → develop` : squash. **`develop → main` : merge commit, jamais
+    squash** — un squash réécrit les SHA, ferait diverger les deux branches et
+    priverait `main` de l'historique par ticket
+- Stager les fichiers nommément, **jamais `git add -A`** (balaie les projets
+  importés dans `projects/`)
+
+Le détail opératoire est dans le skill `ticket-workflow`.
+
+---
+
+## Configuration Claude Code (`.claude/`)
+
+`.claude/` contient la configuration **de Claude Code**, versionnée avec le
+dépôt — à ne pas confondre avec `agents/prompts/`, qui contient les prompts
+**du produit**, chargés par FastAPI.
+
+```
+.claude/
+  skills/<nom>/SKILL.md   ← workflows, chargés à la demande
+  settings.local.json     ← préférences personnelles (gitignoré)
+```
+
+Skills disponibles : `brainstorming`, `writing-plans`,
+`test-driven-development`, `code-review`, `verification-before-completion`,
+`new-ticket`, `ticket-workflow`, `write-adr`, `run-vibe-ide`.
+
+**Chargement à la demande, jamais par `@`-import.** Un `@`-import dans ce
+fichier est payé à chaque session ; un skill ne coûte que lorsqu'il sert. La
+`description` du frontmatter est ce qui décide du déclenchement : elle dit
+*quand* utiliser le skill, pas ce qu'il contient.
+
+Les skills des plugins installés restent une source d'inspiration, pas une
+dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
 
 ---
 
@@ -97,12 +135,15 @@ vibe-ide/
 
 ---
 
-## État actuel (Phases 1-6 terminées)
+## État actuel (Phase 7 en cours)
 
 - Backend, frontend et persistance SQLite sont en place et fonctionnels
-- Pipeline codeur → reviewer opérationnel, orchestration WebSocket, intégration GitHub
-  (issues/PRs/clone), registre d'agents dynamique, agents planificateur/testeur/validateur/
-  doc-updater/sécurité — voir le tableau de fonctionnalités dans `README.md` pour le détail
-- Tous les tickets de `projects/ide-core/` sont dans `tickets/done/` (aucun `todo/` ni
-  `in-progress/` en cours) : le scope initial est complet, les prochains tickets sont à définir
+- Pipeline complet codeur → testeur → sécurité → reviewer → validateur →
+  doc-updater, orchestration WebSocket, intégration GitHub (issues/PRs/clone),
+  registre d'agents dynamique — voir le tableau de fonctionnalités du `README.md`
+- Les agents écrivent réellement sur disque (ADR-017) et chaque run de pipeline
+  s'isole sur sa propre branche git, sur le diff réel (ADR-018)
+- **Tickets ouverts** : `ticket-046` (décomposition de `run_pipeline`) et
+  `ticket-048` (chat conversationnel) en `todo/`. Les tickets 045, 047 et 049
+  sont livrés.
 - Toujours pas d'auth et pas de déploiement cloud — hors scope pour l'instant

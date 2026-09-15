@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     ide_prompts_dir: Path = Path("agents") / "prompts"
     github_token: str = ""
     github_repo: str = ""  # format "owner/repo"
+    # Cible par défaut des PR de ticket. Le flux est
+    # ticket-XXX -> develop -> main : une PR de ticket ne vise jamais
+    # `main` directement, sinon rien ne teste les tickets fusionnés
+    # entre eux avant qu'ils n'atteignent l'état publiable.
+    github_base_branch: str = "develop"
     ide_db_path: Path = Path("vibe_ide.db")
     static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
 
