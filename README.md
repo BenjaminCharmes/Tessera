@@ -153,19 +153,44 @@ docker compose down -v
 
 ### Installation
 
+#### Linux / macOS
+
 ```bash
 git clone https://github.com/BenjaminCharmes/vibe_ide.git
 cd vibe_ide
 
-# 1. Initialise l'environnement (.env + dépendances)
-make setup
-
-# 2. Ouvre .env et colle ta clef API
-#    ANTHROPIC_API_KEY=sk-ant-...
-
-# 3. Lance backend + frontend en un seul terminal
-make run
+make setup      # .env + dépendances
+make doctor     # vérifie les prérequis AVANT de lancer
+make run        # backend + frontend
+make stop       # arrête tout
 ```
+
+#### Windows
+
+`make` n'est pas installé par défaut sous Windows, et `make run` repose sur
+`trap`/`wait`, sémantiques POSIX. Utilise le script équivalent :
+
+```powershell
+git clone https://github.com/BenjaminCharmes/vibe_ide.git
+cd vibe_ide
+
+.\scriptsibe.ps1 setup
+.\scriptsibe.ps1 doctor
+.\scriptsibe.ps1 run
+.\scriptsibe.ps1 stop
+```
+
+> **Lance `doctor` en premier.** Il vérifie Python, `.env`, le workspace, les
+> prompts des agents, l'authentification du provider, les symlinks et les
+> ports. Les deux pannes qui ont coûté une session de débogage — une
+> `ANTHROPIC_API_KEY` parasite et un chemin de prompts qui ne résolvait jamais
+> — étaient l'une et l'autre détectables par ce contrôle.
+
+> **Le piège du worker orphelin** : ne lance pas uvicorn avec `--reload` si tu
+> enchaînes des modifications. Tuer le parent laisse l'enfant vivant, qui garde
+> le port 8000 et sert le code de son dernier rechargement — d'où des `500`
+> inexplicables et un port qu'aucun `Stop-Process` ne libère.
+> `vibe.ps1 stop` et `make stop` le ciblent par sa ligne de commande.
 
 Le backend démarre sur **http://localhost:8000** et le frontend sur **http://localhost:5173**.
 La documentation interactive (Swagger) est disponible sur **http://localhost:8000/docs**.

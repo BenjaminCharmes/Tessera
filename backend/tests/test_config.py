@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from vibe_ide.config import Settings
@@ -45,3 +47,18 @@ def test_ide_prompts_dir_par_defaut_pointe_sur_des_prompts_existants() -> None:
     assert prompts_dir.is_dir(), f"{prompts_dir} n'existe pas"
     assert (prompts_dir / "codeur.md").is_file()
     assert (prompts_dir / "planificateur.md").is_file()
+
+
+def test_le_fichier_env_est_trouve_quel_que_soit_le_repertoire_de_lancement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # `env_file=".env"` est relatif au cwd : lancé depuis `backend/`, un
+    # réglage pourtant présent dans `.env` était silencieusement ignoré et le
+    # défaut s'appliquait — même classe de bug que ticket-050.
+    from vibe_ide.config import _ENV_FILE
+
+    monkeypatch.chdir(tmp_path)
+
+    assert Path(_ENV_FILE).is_absolute()
+    assert Path(_ENV_FILE).name == ".env"
+    assert Path(_ENV_FILE).parent.name == "project" or (Path(_ENV_FILE).parent / "CLAUDE.md").exists()

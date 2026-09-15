@@ -55,10 +55,25 @@ docker compose up --build
 
 Prérequis : Python 3.11+ avec [uv](https://docs.astral.sh/uv/), Node.js 24 LTS.
 
+**Linux / macOS**
+
 ```bash
 make setup    # dépendances + création du .env
-make run      # backend + frontend dans un seul terminal
+make doctor   # vérifie les prérequis
+make run      # backend + frontend
 ```
+
+**Windows** — `make` n'y est pas installé par défaut :
+
+```powershell
+.\scripts\vibe.ps1 setup
+.\scripts\vibe.ps1 doctor
+.\scripts\vibe.ps1 run
+```
+
+> `doctor` vérifie Python, `.env`, le workspace, les prompts des agents,
+> l'authentification, les symlinks et les ports — et dit quoi corriger.
+> Lance-le avant de te demander pourquoi rien ne marche.
 
 Une fois lancé :
 
@@ -428,6 +443,20 @@ annule ces changements, puis repasse le ticket en `todo`.
 ### Le pipeline tourne mais rien ne change dans les fichiers
 
 Vérifie `LLM_PROVIDER`. Seul le mode `agent_sdk` donne les outils fichier au codeur.
+
+### Des `500` inexplicables, et un port 8000 impossible à libérer
+
+C'est le **worker `uvicorn --reload` orphelin**. Tuer le processus parent laisse
+son enfant vivant : il garde le port et continue de servir le code tel qu'il
+était à son dernier rechargement. Le symptôme distinctif : le port est tenu par
+un PID que `Get-Process` ne trouve pas.
+
+```powershell
+.\scripts\vibe.ps1 stop              # le cible par sa ligne de commande
+taskkill /F /PID <pid>  # en dernier recours
+```
+
+Ne lance pas `--reload` si tu enchaînes des modifications de fichiers.
 
 ### Les agents ignorent mes conventions
 

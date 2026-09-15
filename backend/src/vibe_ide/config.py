@@ -5,9 +5,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Racine du dépôt : backend/src/vibe_ide/config.py -> remonter de 4 niveaux.
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 
+# Ancré sur la racine du dépôt, pas sur le répertoire de lancement :
+# `env_file=".env"` est relatif au cwd, et `make dev` démarre depuis
+# `backend/`. Un réglage pourtant présent dans `.env` était donc
+# silencieusement ignoré — même classe de bug que ticket-050.
+_ENV_FILE = str(_REPO_ROOT / ".env")
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=_ENV_FILE, env_file_encoding="utf-8")
 
     # Optionnel : vide lorsque le provider est `agent_sdk` (auth par abonnement).
     anthropic_api_key: str = ""

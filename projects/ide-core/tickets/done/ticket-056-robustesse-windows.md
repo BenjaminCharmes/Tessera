@@ -2,7 +2,7 @@
 id: ticket-056
 title: "Rendre le lancement fiable sous Windows"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -49,14 +49,14 @@ Plusieurs frictions constatées à l'usage le 2026-09-15 :
 
 ## Critères d'acceptation
 
-- [ ] `make run` fonctionne sous Windows, ou la procédure Windows est
+- [x] `make run` fonctionne sous Windows, ou la procédure Windows est
       documentée et vérifiée
-- [ ] `make stop` termine backend et frontend, worker orphelin compris
-- [ ] Un port déjà occupé produit un message explicite, pas une trace de `bind`
-- [ ] `make doctor` détecte : provider injoignable, prompts introuvables,
+- [x] `make stop` termine backend et frontend, worker orphelin compris
+- [x] Un port déjà occupé produit un message explicite, pas une trace de `bind`
+- [x] `make doctor` détecte : provider injoignable, prompts introuvables,
       `.env` absent, symlinks indisponibles
-- [ ] L'état du build Tauri est vérifié et consigné
-- [ ] Le README décrit la procédure Windows sans approximation
+- [x] L'état du build Tauri est vérifié et consigné
+- [x] Le README décrit la procédure Windows sans approximation
 
 ## Dépendances
 
@@ -69,3 +69,38 @@ Aucune.
 ## Risques
 
 - **Faible** — outillage uniquement, aucun code produit n'est touché.
+
+## Le constat qui change tout
+
+**`make` n'est installé nulle part sur la machine de développement.** Ni dans
+Git Bash, ni dans PowerShell, ni via scoop. Toute la procédure du README —
+`make setup`, `make run`, `make test`, `make lint` — était donc **inutilisable
+telle quelle** sur la plateforme réellement utilisée.
+
+Le ticket parlait d'adapter `make run` ; le vrai problème était l'absence de
+`make`. D'où `scripts/vibe.ps1`, un équivalent sans dépendance.
+
+## Livré
+
+| Élément | Rôle |
+|---|---|
+| `backend/src/vibe_ide/doctor.py` | 8 contrôles de prérequis, avec le correctif à appliquer |
+| `scripts/vibe.ps1` | Équivalent du Makefile pour Windows |
+| `Makefile` | Cibles `doctor`, `run-windows`, `stop` |
+| README, guide utilisateur | Procédure Windows, piège du worker orphelin |
+
+## Deux défauts trouvés en lançant le doctor une seule fois
+
+1. **`env_file=".env"` était relatif au cwd.** Lancé depuis `backend/`, un
+   réglage pourtant présent dans `.env` était silencieusement ignoré et le
+   défaut s'appliquait — le doctor affichait le mauvais workspace. Même classe
+   de bug que `IDE_PROMPTS_DIR` en ticket-050. Ancré sur la racine du dépôt.
+2. **Le doctor plantait sur la console cp1252** en affichant une flèche — l'outil
+   censé diagnostiquer les problèmes d'encodage en était lui-même victime.
+   `sys.stdout.reconfigure(encoding="utf-8")`.
+
+## Non vérifié
+
+**Le build Tauri reste invérifiable sur cette machine : Rust/cargo est absent.**
+Le doctor le signale sans bloquer — l'IDE tourne en web sans Tauri. Installer
+une toolchain complète sortait du périmètre d'un ticket d'outillage.

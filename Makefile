@@ -1,4 +1,4 @@
-.PHONY: help setup dev dev-frontend tauri-dev tauri-build run test lint clean
+.PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run run-windows stop test lint clean
 
 # ─────────────────────────────────────────────────────────────────────────────
 # vibe-ide — Makefile
@@ -7,7 +7,10 @@
 help:
 	@echo ""
 	@echo "  make setup        — Initialise l'environnement (copie .env.example, installe deps)"
+	@echo "  make doctor       — Vérifie les prérequis avant de lancer (à faire en premier)"
 	@echo "  make run          — Lance backend + frontend en parallèle (Ctrl+C pour tout arrêter)"
+	@echo "  make run-windows  — Idem, mais adapté à Windows (make run utilise trap/wait POSIX)"
+	@echo "  make stop         — Arrête backend et frontend, worker --reload orphelin compris"
 	@echo "  make dev          — Lance uniquement le serveur FastAPI en mode reload (port 8000)"
 	@echo "  make dev-frontend — Lance uniquement Vite en mode dev (port 5173)"
 	@echo "  make tauri-dev    — Lance l'app Tauri (desktop) — nécessite 'make dev' dans un autre terminal"
@@ -23,7 +26,13 @@ setup:
 	cd backend && uv sync --extra dev
 	cd frontend && npm install
 
-run:
+doctor:
+	cd backend && uv run python -m vibe_ide.doctor
+
+# `run` repose sur `trap`/`wait`, sémantiques POSIX : sous Windows, voir
+# `run-windows`. Les deux vérifient d'abord les prérequis — les deux pannes de
+# ticket-050 étaient détectables avant le lancement.
+run: doctor
 	@echo "→ Lancement vibe-ide : backend (port 8000) + frontend (port 5173)"
 	@echo "→ Ctrl+C pour arrêter les deux processus"
 	@trap 'kill 0' SIGINT SIGTERM; \
@@ -42,6 +51,26 @@ dev:
 
 dev-frontend:
 	cd frontend && npm run dev
+
+# Windows : pas de `trap 'kill 0'`, et surtout pas de `--reload`. Tuer le
+# parent d'un uvicorn rechargeable laisse son worker vivant, qui garde le port
+# 8000 et sert le code de son dernier rechargement — d'où des 500 inexplicables
+# et un port impossible à libérer (ticket-056).
+run-windows: doctor
+	@echo "→ Lancement vibe-ide sous Windows (deux fenêtres, sans --reload)"
+	@powershell -NoProfile -Command "Start-Process -FilePath 'cmd' -ArgumentList '/c','cd backend && uv run uvicorn vibe_ide.main:app --host 127.0.0.1 --port 8000'"
+	@powershell -NoProfile -Command "Start-Process -FilePath 'cmd' -ArgumentList '/c','cd frontend && npm run dev'"
+	@echo "→ Backend : http://localhost:8000/docs"
+	@echo "→ Frontend : http://localhost:5173"
+	@echo "→ Pour arrêter : make stop"
+
+stop:
+	@echo "→ Arrêt de vibe-ide"
+	-@powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $$_.CommandLine -like '*uvicorn*' } | ForEach-Object { Stop-Process -Id $$_.ProcessId -Force }" 2>/dev/null || true
+	-@powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $$_.CommandLine -like '*vite*' } | ForEach-Object { Stop-Process -Id $$_.ProcessId -Force }" 2>/dev/null || true
+	-@pkill -f 'uvicorn vibe_ide' 2>/dev/null || true
+	-@pkill -f 'vite' 2>/dev/null || true
+	@echo "→ Arrêté. Vérifie avec make doctor que les ports sont libres."
 
 tauri-dev:
 	@echo "→ Lancement de vibe-ide en mode desktop (Tauri)"
