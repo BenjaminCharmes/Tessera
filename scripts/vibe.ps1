@@ -83,12 +83,23 @@ function Stop-VibeIde {
 
 function Start-Backend {
     # Pas de `--reload` : c'est lui qui engendre les workers orphelins.
-    Start-Process -FilePath 'cmd.exe' -ArgumentList '/c', `
-        "cd /d `"$Root\backend`" && uv run uvicorn vibe_ide.main:app --host 127.0.0.1 --port 8000"
+    # Deux pieges constates en verifiant reellement (ticket-056) :
+    #  1. `cmd /c "cd ... && ..."` ne marche pas : Start-Process re-quote la
+    #     liste d'arguments et la chaine `&&` y est perdue. D'ou
+    #     `-WorkingDirectory`, qui fait le travail sans intermediaire.
+    #  2. Depuis une session NON interactive (un agent, un pipeline CI), la
+    #     nouvelle console ne demarre pas. `-NoNewWindow` la ferait demarrer
+    #     mais bloquerait le terminal appelant : ce lanceur est prevu pour un
+    #     PowerShell interactif. En session non interactive, lancer les deux
+    #     commandes directement (voir README).
+    Start-Process -FilePath 'uv' `
+        -ArgumentList 'run', 'uvicorn', 'vibe_ide.main:app', '--host', '127.0.0.1', '--port', '8000' `
+        -WorkingDirectory (Join-Path $Root 'backend')
 }
 
 function Start-Frontend {
-    Start-Process -FilePath 'cmd.exe' -ArgumentList '/c', "cd /d `"$Root\frontend`" && npm run dev"
+    Start-Process -FilePath 'npm.cmd' -ArgumentList 'run', 'dev' `
+        -WorkingDirectory (Join-Path $Root 'frontend')
 }
 
 switch ($Task) {
