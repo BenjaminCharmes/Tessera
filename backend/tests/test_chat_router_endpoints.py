@@ -234,3 +234,99 @@ async def test_service_du_chat_sur_un_projet_inexistant_renvoie_404() -> None:
         await _build_service("jamais-vu")
 
     assert exc.value.status_code == 404
+
+
+# ------------------------------------------------------------------
+# Lancement de pipeline depuis le chat — ticket-055
+# ------------------------------------------------------------------
+
+
+def test_la_suggestion_remonte_dans_la_trame_done(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_service(
+        monkeypatch,
+        _FakeChatService(
+            ChatReply(content="C'est prêt.", cost_usd=0.01, suggested_ticket_id="ticket-042")
+        ),
+    )
+
+    with _client().websocket_connect("/api/v1/projects/mon-projet/chat") as ws:
+        ws.send_json({"conversation_id": "c1", "message": "Crée un ticket"})
+        ws.receive_json()  # start
+        ws.receive_json()  # token
+        done = ws.receive_json()
+
+    assert done["suggested_ticket_id"] == "ticket-042"
+    assert done["run_in_progress"] is False
+
+
+def test_le_lancement_transmet_la_discussion_au_codeur(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Sans ce contexte, le codeur reçoit le ticket nu et tout le raisonnement
+    # de la conversation est perdu.
+    import asyncio
+
+    from vibe_ide.services.database import save_chat_message
+
+    asyncio.run(
+        save_chat_message(
+            settings.ide_db_path, "mon-projet", "c1", "user", "Il faut un endpoint /health", 0.0
+        )
+    )
+
+    captured: dict[str, object] = {}
+
+    class _FakeOrchestrator:
+        def __init__(self) -> None:
+            self._project_context = "contexte projet"
+
+        async def run_pipeline(self, project_id: str, ticket_id: str, on_event: object) -> object:
+            captured["context"] = self._project_context
+            captured["ticket_id"] = ticket_id
+            from vibe_ide.models.ticket import TicketStatus
+            from vibe_ide.services.pipeline_events import PipelineResult
+
+            return PipelineResult(
+                ticket_id=ticket_id,
+                final_status=TicketStatus.done,
+                rounds=1,
+                approved=True,
+            )
+
+    async def _build(project_id: str) -> _FakeOrchestrator:
+        return _FakeOrchestrator()
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/chat/run",
+        json={"conversation_id": "c1", "ticket_id": "ticket-042"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["approved"] is True
+    assert "endpoint /health" in str(captured["context"])
+    assert "Discussion ayant mené à ce ticket" in str(captured["context"])
+
+
+def test_un_lancement_concurrent_est_refuse_avec_409(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Deux pipelines sur le même dépôt violeraient l'isolation par branche.
+    from vibe_ide.routers.chat import _RUN_LOCK
+
+    async def _build(project_id: str) -> object:
+        raise AssertionError("ne doit pas être atteint")
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr(_RUN_LOCK, "_running", {"mon-projet"})
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/chat/run",
+        json={"conversation_id": "c1", "ticket_id": "ticket-042"},
+    )
+
+    assert resp.status_code == 409
+    assert "tourne déjà" in resp.json()["detail"]

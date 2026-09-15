@@ -165,3 +165,29 @@ async def test_le_chat_fonctionne_sans_depot_git(tmp_path: Path) -> None:
 
     assert reply.content == "Voici ma réponse."
     assert reply.commit_sha is None
+
+
+# ------------------------------------------------------------------
+# Suggestion de pipeline — ticket-055
+# ------------------------------------------------------------------
+
+
+async def test_la_suggestion_est_extraite_et_le_marqueur_retire(tmp_path: Path) -> None:
+    provider = _FakeProvider(
+        content="J'ai créé le ticket.\n\nSUGGESTION_PIPELINE: ticket-042"
+    )
+    svc = _service(tmp_path, provider=provider)
+
+    reply = await svc.send(history=[], message="Crée un ticket")
+
+    assert reply.suggested_ticket_id == "ticket-042"
+    assert "SUGGESTION_PIPELINE" not in reply.content
+    assert reply.content == "J'ai créé le ticket."
+
+
+async def test_sans_marqueur_aucune_suggestion(tmp_path: Path) -> None:
+    svc = _service(tmp_path, provider=_FakeProvider(content="Voici l'explication."))
+    reply = await svc.send(history=[], message="Explique")
+
+    assert reply.suggested_ticket_id is None
+    assert reply.content == "Voici l'explication."

@@ -94,3 +94,94 @@ describe("ChatPanel", () => {
     );
   });
 });
+
+describe("ChatPanel — lancement de pipeline (ticket-055)", () => {
+  it("propose un bouton quand l'agent suggère un lancement", async () => {
+    render(<ChatPanel project={project} />);
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    act(() => MockWebSocket.instance!.triggerOpen());
+
+    act(() =>
+      MockWebSocket.instance!.triggerMessage({
+        type: "done",
+        content: "Le ticket est prêt.",
+        cost_usd: 0.01,
+        spent_usd: 0.01,
+        max_usd: 2,
+        suggested_ticket_id: "ticket-042",
+      }),
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Lancer le pipeline" }),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.getByText("ticket-042")).toBeInTheDocument();
+  });
+
+  it("n'affiche aucun bouton sans suggestion", async () => {
+    render(<ChatPanel project={project} />);
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    act(() => MockWebSocket.instance!.triggerOpen());
+
+    act(() =>
+      MockWebSocket.instance!.triggerMessage({
+        type: "done",
+        content: "Voici l'explication.",
+        cost_usd: 0.01,
+        spent_usd: 0.01,
+        max_usd: 2,
+        suggested_ticket_id: null,
+      }),
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Lancer le pipeline" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("lance le pipeline au clic et retire la suggestion", async () => {
+    const user = userEvent.setup();
+    const runPipeline = vi
+      .spyOn(api.chat, "runPipeline")
+      .mockResolvedValue({
+        ticket_id: "ticket-042",
+        approved: true,
+        rounds: 1,
+        final_status: "done",
+        branch: "ticket-042-slug",
+        commit_sha: "abc1234",
+      });
+
+    render(<ChatPanel project={project} />);
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    act(() => MockWebSocket.instance!.triggerOpen());
+    act(() =>
+      MockWebSocket.instance!.triggerMessage({
+        type: "done",
+        content: "Prêt.",
+        cost_usd: 0.01,
+        spent_usd: 0.01,
+        max_usd: 2,
+        suggested_ticket_id: "ticket-042",
+      }),
+    );
+
+    await user.click(
+      await screen.findByRole("button", { name: "Lancer le pipeline" }),
+    );
+
+    expect(runPipeline).toHaveBeenCalledWith("ide-core", "default", "ticket-042");
+    // La suggestion disparaît : la laisser inviterait à relancer un pipeline
+    // déjà en cours.
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("button", { name: "Lancer le pipeline" }),
+      ).not.toBeInTheDocument(),
+    );
+    await waitFor(() =>
+      expect(screen.getByText(/approuvé après 1 tour/)).toBeInTheDocument(),
+    );
+  });
+});

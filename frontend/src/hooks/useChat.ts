@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 import { createWebSocket, wsUrl, type WsMessage } from "../lib/ws";
-import type { ChatMessage, ChatToolUse } from "../types/api";
+import type { ChatMessage, ChatToolUse, RunFromChatResponse } from "../types/api";
 
 type ChatStatus = "idle" | "connecting" | "ready" | "thinking" | "error";
 
@@ -15,11 +15,18 @@ interface ChatState {
   maxUsd: number;
   errorMessage: string | null;
   lastBranch: string | null;
+  /** Ticket que l'agent propose de lancer. L'agent suggère, l'utilisateur décide. */
+  suggestedTicketId: string | null;
+  /** Un pipeline lancé depuis cette conversation est en cours. */
+  runningTicketId: string | null;
+  lastRun: RunFromChatResponse | null;
 }
 
 export interface UseChatResult extends ChatState {
   send: (message: string) => void;
   clearError: () => void;
+  /** Accepte la suggestion de l'agent et lance le pipeline. */
+  runSuggested: () => void;
 }
 
 const INITIAL: ChatState = {
@@ -31,6 +38,9 @@ const INITIAL: ChatState = {
   maxUsd: 0,
   errorMessage: null,
   lastBranch: null,
+  suggestedTicketId: null,
+  runningTicketId: null,
+  lastRun: null,
 };
 
 function nowIso(): string {
@@ -142,7 +152,34 @@ export function useChat(
     setState((s) => ({ ...s, errorMessage: null }));
   }, []);
 
-  return { ...state, send, clearError };
+  const runSuggested = useCallback(() => {
+    const ticketId = state.suggestedTicketId;
+    if (!projectId || !ticketId || state.runningTicketId) return;
+
+    // La suggestion disparaît dès le clic : la laisser inviterait à relancer
+    // un pipeline déjà en cours, que le backend refuserait de toute façon.
+    setState((s) => ({
+      ...s,
+      runningTicketId: ticketId,
+      suggestedTicketId: null,
+      errorMessage: null,
+    }));
+
+    api.chat
+      .runPipeline(projectId, conversationId, ticketId)
+      .then((run) => {
+        setState((s) => ({ ...s, runningTicketId: null, lastRun: run }));
+      })
+      .catch((err: unknown) => {
+        setState((s) => ({
+          ...s,
+          runningTicketId: null,
+          errorMessage: err instanceof Error ? err.message : String(err),
+        }));
+      });
+  }, [projectId, conversationId, state.suggestedTicketId, state.runningTicketId]);
+
+  return { ...state, send, clearError, runSuggested };
 }
 
 function applyFrame(s: ChatState, frame: WsMessage): ChatState {
@@ -182,6 +219,8 @@ function applyFrame(s: ChatState, frame: WsMessage): ChatState {
         spentUsd: Number(frame["spent_usd"] ?? s.spentUsd),
         maxUsd: Number(frame["max_usd"] ?? s.maxUsd),
         lastBranch: (frame["branch"] as string | null) ?? null,
+        suggestedTicketId:
+          (frame["suggested_ticket_id"] as string | null) ?? null,
       };
 
     case "budget_exceeded":

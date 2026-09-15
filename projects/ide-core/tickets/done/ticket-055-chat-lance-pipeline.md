@@ -2,7 +2,7 @@
 id: ticket-055
 title: "Lancer un pipeline depuis la conversation"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -46,14 +46,14 @@ raisonnement de la conversation est perdu**. Le codeur reçoit le ticket nu.
 
 ## Critères d'acceptation
 
-- [ ] L'agent peut suggérer un lancement ; il ne peut pas le déclencher
-- [ ] La suggestion apparaît comme une action explicite dans l'UI
-- [ ] Le résumé de conversation atteint le codeur, borné en taille
-- [ ] L'avancement du run est visible dans le fil de la conversation
-- [ ] Un second lancement concurrent sur le même projet est refusé, avec un
+- [x] L'agent peut suggérer un lancement ; il ne peut pas le déclencher
+- [x] La suggestion apparaît comme une action explicite dans l'UI
+- [x] Le résumé de conversation atteint le codeur, borné en taille
+- [x] L'avancement du run est visible dans le fil de la conversation
+- [x] Un second lancement concurrent sur le même projet est refusé, avec un
       message qui dit pourquoi
-- [ ] Aucun nouvel outil d'écriture n'est donné à l'agent du chat
-- [ ] `uv run pytest -q`, `uv run mypy src/`, `npx tsc --noEmit` verts
+- [x] Aucun nouvel outil d'écriture n'est donné à l'agent du chat
+- [x] `uv run pytest -q`, `uv run mypy src/`, `npx tsc --noEmit` verts
 
 ## Dépendances
 
@@ -68,3 +68,31 @@ raisonnement de la conversation est perdu**. Le codeur reçoit le ticket nu.
 - **Moyen** — le couplage chat ↔ pipeline touche deux flux WebSocket distincts.
   Mitigation : le chat s'abonne au flux existant de l'orchestrateur plutôt que
   d'en créer un second.
+
+## Livré
+
+| Couche | Contenu |
+|---|---|
+| `chat_suggestion.py` | Marqueur, résumé borné, verrou par projet |
+| `chat_service.py` | Extrait la suggestion, retire le marqueur du texte affiché |
+| `routers/chat.py` | `POST /projects/{id}/chat/run` |
+| `agents/prompts/chat.md` | Le protocole de suggestion |
+| Frontend | Bouton, suivi du run, résultat dans le fil |
+
+### Le protocole
+
+L'agent termine sa réponse par `SUGGESTION_PIPELINE: ticket-XXX`. C'est un
+protocole entre l'agent et l'UI, retiré du texte affiché — l'utilisateur voit
+un bouton. L'identifiant est **validé** contre `^ticket-[a-z0-9-]{1,40}$` : le
+marqueur vient d'un agent et ne doit pas pouvoir injecter un chemin relatif.
+
+### Défaut trouvé par les tests
+
+Le verrou était pris **après** la construction de l'orchestrateur : un refus
+coûtait le chargement complet du projet et des providers pour rien. Il est
+désormais pris en premier.
+
+### Le résumé tronque par le début
+
+Les décisions qui comptent sont celles auxquelles la conversation a abouti, pas
+celles par lesquelles elle a commencé.

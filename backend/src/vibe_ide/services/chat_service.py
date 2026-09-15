@@ -20,6 +20,10 @@ from typing import Optional, Protocol
 
 from pydantic import BaseModel
 
+from vibe_ide.services.chat_suggestion import (
+    parse_pipeline_suggestion,
+    strip_suggestion_marker,
+)
 from vibe_ide.services.database import ChatMessageRow
 from vibe_ide.services.git_workspace import GitWorkspaceError
 from vibe_ide.services.prompt_loader import load_system_prompt
@@ -58,6 +62,9 @@ class ChatReply(BaseModel):
     cost_usd: float = 0.0
     branch: str | None = None
     commit_sha: str | None = None
+    # Lancement proposé par l'agent (ticket-055). L'agent suggère, il ne
+    # déclenche jamais : c'est l'utilisateur qui accepte, depuis l'UI.
+    suggested_ticket_id: str | None = None
 
 
 class _TokenCallback(Protocol):
@@ -112,11 +119,17 @@ class ChatService:
 
         branch, commit_sha = await self._commit_if_written(message)
 
+        # Le marqueur est un protocole entre l'agent et l'UI : il est retiré du
+        # texte affiché, et seul son contenu validé ressort.
+        suggestion = parse_pipeline_suggestion(result.content)
+        content = strip_suggestion_marker(result.content).strip()
+
         return ChatReply(
-            content=result.content,
+            content=content,
             cost_usd=result.cost_usd or 0.0,
             branch=branch,
             commit_sha=commit_sha,
+            suggested_ticket_id=suggestion.ticket_id if suggestion else None,
         )
 
     def _build_user_message(self, history: list[ChatMessageRow], message: str) -> str:

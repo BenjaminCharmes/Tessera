@@ -10,6 +10,11 @@ from pydantic import BaseModel
 
 from vibe_ide.config import settings
 from vibe_ide.services.chat_service import ChatBudgetExceeded, ChatService
+from vibe_ide.services.chat_suggestion import (
+    RunAlreadyInProgress,
+    RunLock,
+    summarize_conversation,
+)
 from vibe_ide.services.database import (
     ChatMessageRow,
     conversation_cost_usd,
@@ -31,6 +36,10 @@ router = APIRouter(tags=["chat"])
 # arbitraires dans son dépôt, est une surface d'attaque que ce ticket refuse
 # d'ouvrir (ticket-048, hors périmètre explicite).
 _CHAT_TOOLS = ["Read", "Write", "Edit", "Glob", "Grep"]
+
+# Un seul pipeline à la fois par projet : deux exécutions concurrentes
+# se marcheraient dessus dans le même arbre de travail (ADR-018).
+_RUN_LOCK = RunLock()
 
 
 class ChatHistory(BaseModel):
@@ -172,5 +181,85 @@ async def _handle_turn(
             "max_usd": settings.chat_max_conversation_usd,
             "branch": reply.branch,
             "commit_sha": reply.commit_sha,
+            # L'agent suggère, l'utilisateur décide : l'UI en fait un bouton
+            # (ticket-055).
+            "suggested_ticket_id": reply.suggested_ticket_id,
+            "run_in_progress": _RUN_LOCK.is_running(project_id),
         }
+    )
+
+
+class RunFromChatRequest(BaseModel):
+    """Le lancement accepté par l'utilisateur, pas déclenché par l'agent."""
+
+    conversation_id: str = "default"
+    ticket_id: str
+
+
+class RunFromChatResponse(BaseModel):
+    ticket_id: str
+    approved: bool
+    rounds: int
+    final_status: str
+    branch: str | None = None
+    commit_sha: str | None = None
+
+
+def _with_conversation(project_context: str, summary: str) -> str:
+    """Append the discussion that led to the ticket, for the coder's prompt.
+
+    Sans ce contexte, le codeur reçoit le ticket nu et tout ce qui a été
+    décidé dans la conversation est perdu — c'est le manque que
+    ticket-055 comble.
+    """
+    heading = "## Discussion ayant mené à ce ticket"
+    return f"{project_context}\n\n{heading}\n{summary}"
+
+
+@router.post("/{project_id}/chat/run", response_model=RunFromChatResponse)
+async def run_pipeline_from_chat(
+    project_id: str, body: RunFromChatRequest
+) -> RunFromChatResponse:
+    """Lance le pipeline en lui transmettant le raisonnement de la discussion.
+
+    Sans ce contexte, le codeur reçoit le ticket nu et tout ce qui a été
+    décidé dans la conversation est perdu — c'est le manque que ce ticket
+    comble.
+    """
+    _project_path(project_id)
+
+    async def _noop(event: object) -> None:
+        return None
+
+    # Le verrou est pris AVANT de construire l'orchestrateur : celui-ci charge
+    # le projet et instancie les providers, travail entièrement perdu si un
+    # run tourne déjà. Un refus doit être immédiat et bon marché.
+    try:
+        async with _RUN_LOCK.acquire(project_id):
+            history = await list_chat_messages(
+                settings.ide_db_path, project_id, body.conversation_id
+            )
+            summary = summarize_conversation(history)
+
+            from vibe_ide.routers.orchestrator import _build_orchestrator
+
+            orchestrator = await _build_orchestrator(project_id)
+            if summary:
+                orchestrator._project_context = _with_conversation(
+                    orchestrator._project_context, summary
+                )
+
+            result = await orchestrator.run_pipeline(project_id, body.ticket_id, _noop)
+    except RunAlreadyInProgress as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    return RunFromChatResponse(
+        ticket_id=result.ticket_id,
+        approved=result.approved,
+        rounds=result.rounds,
+        final_status=result.final_status.value,
+        branch=result.branch,
+        commit_sha=result.commit_sha,
     )

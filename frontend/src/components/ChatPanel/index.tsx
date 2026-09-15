@@ -92,6 +92,41 @@ export default function ChatPanel({ project }: ChatPanelProps) {
           </p>
         )}
 
+        {chat.suggestedTicketId && !chat.runningTicketId && (
+          <div className="rounded border border-zinc-700 bg-zinc-800/60 p-2">
+            <p className="mb-1.5 text-[11px] text-zinc-400">
+              L'agent propose de lancer le pipeline sur{" "}
+              <code className="text-zinc-200">{chat.suggestedTicketId}</code>.
+            </p>
+            <button
+              type="button"
+              onClick={chat.runSuggested}
+              className="rounded bg-emerald-800 px-2.5 py-1 text-xs text-emerald-50 hover:bg-emerald-700"
+            >
+              Lancer le pipeline
+            </button>
+          </div>
+        )}
+
+        {chat.runningTicketId && (
+          <p className="text-[11px] text-zinc-400">
+            Pipeline en cours sur <code>{chat.runningTicketId}</code>…
+          </p>
+        )}
+
+        {chat.lastRun && (
+          <p
+            className={`text-[11px] ${
+              chat.lastRun.approved ? "text-emerald-400" : "text-amber-400"
+            }`}
+          >
+            {chat.lastRun.ticket_id} —{" "}
+            {chat.lastRun.approved ? "approuvé" : "non approuvé"} après{" "}
+            {chat.lastRun.rounds} tour(s)
+            {chat.lastRun.branch ? ` sur ${chat.lastRun.branch}` : ""}
+          </p>
+        )}
+
         <div ref={endRef} />
       </div>
 

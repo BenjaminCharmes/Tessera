@@ -233,6 +233,16 @@ export interface ChatHistory {
   max_usd: number;
 }
 
+/** Résultat d'un pipeline lancé depuis la conversation (ticket-055). */
+export interface RunFromChatResponse {
+  ticket_id: string;
+  approved: boolean;
+  rounds: number;
+  final_status: string;
+  branch: string | null;
+  commit_sha: string | null;
+}
+
 /** Appel d'outil rendu dans le fil, replié par défaut. */
 export interface ChatToolUse {
   tool: string;

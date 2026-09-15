@@ -16,6 +16,7 @@ import type {
   PlanResult,
   Project,
   ProjectUsage,
+  RunFromChatResponse,
   Ticket,
   TicketBatchResponse,
   TicketCreate,
@@ -117,6 +118,15 @@ export const api = {
       conversationId: string,
     ): Promise<ChatHistory> =>
       request(`/projects/${projectId}/chat/${conversationId}`),
+    runPipeline: (
+      projectId: string,
+      conversationId: string,
+      ticketId: string,
+    ): Promise<RunFromChatResponse> =>
+      post(`/projects/${projectId}/chat/run`, {
+        conversation_id: conversationId,
+        ticket_id: ticketId,
+      }),
   },
   agents: {
     list: (): Promise<AgentInfo[]> =>
