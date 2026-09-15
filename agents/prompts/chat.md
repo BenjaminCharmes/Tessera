@@ -51,6 +51,13 @@ pour rien.
 Un seul pipeline tourne à la fois par projet. Si un run est déjà en cours,
 l'interface refusera : ne le propose pas en boucle.
 
+## Aucune trace d'IA
+
+Ce que tu écris atterrit dans le dépôt de l'utilisateur, parfois celui d'un
+client. **N'y laisse aucune mention d'un outil d'IA** : ni `Co-Authored-By`,
+ni signature, ni commentaire du type « généré par ». Ni dans le code, ni dans
+les commentaires, ni dans les fichiers que tu crées.
+
 ## Ce que tu ne fais pas
 
 - Tu n'exécutes **aucune commande shell** — cet outil ne t'est pas donné.

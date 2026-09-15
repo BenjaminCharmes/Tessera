@@ -109,6 +109,8 @@ vibe-ide/
     priverait `main` de l'historique par ticket
 - Stager les fichiers nommément, **jamais `git add -A`** (balaie les projets
   importés dans `projects/`)
+- **Aucune attribution à un outil d'IA** : ni `Co-Authored-By`, ni mention
+  d'assistant dans un message de commit, un titre ou une description de PR
 
 Le détail opératoire est dans le skill `ticket-workflow`.
 
@@ -158,6 +160,10 @@ dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
 5. **Ne jamais modifier** `CLAUDE.md` sans ticket explicite pour le faire
 6. **Préférer des petits fichiers** (<200 lignes) à de gros fichiers monolithiques
 7. **Un test par fonction publique** au minimum
+8. **Ne jamais laisser de trace d'écriture par IA** dans ce qui est produit —
+   commits, PR, commentaires, docstrings, fichiers générés. Ce que l'IDE écrit
+   atterrit dans le dépôt de l'utilisateur, parfois celui d'un client : la
+   provenance du code n'y a pas sa place
 
 ---
 
@@ -175,5 +181,10 @@ dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
 - **Phase 8 terminée** — couverture des routers (86 → 93,5 %), quota réel de
   l'abonnement, lancement de pipeline depuis le chat, outillage Windows
   (`doctor`, `scripts/vibe.ps1`), ADR chargés automatiquement
-- Aucun ticket ouvert — les prochains sont à définir
+- **Phase 9 en cours** — recentrage sur les fonctionnalités de base :
+  `ticket-061` (lier un projet à GitHub), `ticket-062` (artefacts versionnés ou
+  locaux), `ticket-063` (retirer un projet), `ticket-064` (suivi par ticket et
+  agent de workflow GitHub)
+- **Workflow allégé** : plus de PR ni d'attente de CI pendant cette phase, les
+  commits vont directement sur `develop`. `main` reste le point de retour
 - Toujours pas d'auth et pas de déploiement cloud — hors scope pour l'instant

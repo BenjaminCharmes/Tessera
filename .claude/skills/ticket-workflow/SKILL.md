@@ -36,9 +36,13 @@ fix: keep ticket branches isolated without stranding sequential work
 
 Le corps explique le *pourquoi*, pas le *quoi* — le diff dit déjà quoi.
 Nommer la contrainte réelle qui a forcé le choix.
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ```
+
+**Aucune attribution à un outil d'IA.** Ni `Co-Authored-By`, ni mention
+d'assistant dans un message de commit, une description de PR, un commentaire
+de code ou un fichier généré. Ces messages partent dans le dépôt de
+l'utilisateur, parfois celui d'un client : la provenance du code n'y a pas sa
+place.
 
 Préférer plusieurs commits à frontières nettes (un par préoccupation) à un
 commit fourre-tout.
