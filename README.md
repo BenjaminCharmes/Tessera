@@ -89,6 +89,7 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | Le pipeline relit le **diff git réel**, plus la prose du codeur | ✅ |
 | Commit automatique à chaque run (typé si approuvé, `chore:` sinon) | ✅ |
 | Un ticket approuvé devient la base du ticket suivant (mode autonome) | ✅ |
+| **Chat conversationnel** avec outils fichier, streaming et coût visible | ✅ |
 
 ---
 

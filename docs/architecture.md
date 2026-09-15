@@ -195,6 +195,33 @@ github_issue_url: https://github.com/...  # optionnel
 Corps du ticket en Markdown...
 ```
 
+## Chat conversationnel (ticket-048)
+
+Une conversation libre sur un projet, distincte du pipeline : l'agent a le
+contexte projet, lit et écrit les fichiers, et streame sa réponse.
+
+| Méthode | Route | Rôle |
+|---------|-------|------|
+| `GET` | `/api/v1/projects/{id}/chat/{conversation_id}` | Historique + coût cumulé |
+| `WS` | `/api/v1/projects/{id}/chat` | Un tour de conversation, streamé |
+
+Trames WebSocket : `start`, `token`, `tool_use`, `done`, `budget_exceeded`,
+`error`.
+
+**Outils** : `Read`, `Write`, `Edit`, `Glob`, `Grep`. **Aucun outil shell** —
+un agent conversationnel exécutant des commandes arbitraires dans le dépôt de
+l'utilisateur est une surface d'attaque refusée par le ticket.
+
+**Cohabitation git (ADR-019)** : les écritures du chat sont commitées sur une
+branche `chat-<horodatage>`, exactement comme un run de pipeline sur la branche
+de son ticket. Sans ça, l'arbre resterait sale et le ticket suivant partirait
+en `blocked` sans qu'aucun agent n'ait tourné (ADR-018). Un tour purement
+conversationnel ne crée ni branche ni commit.
+
+**Coût** : `llm_max_budget_usd` borne *un appel*. Une conversation a son propre
+plafond, `chat_max_conversation_usd` (défaut 2 USD), et son total cumulé est
+affiché dans l'UI.
+
 ## OrchestratorEvents (WebSocket)
 
 Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :

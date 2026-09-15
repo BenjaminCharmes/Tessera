@@ -43,7 +43,29 @@ CREATE TABLE IF NOT EXISTS agent_calls (
     duration_ms       INTEGER NOT NULL DEFAULT 0,
     created_at        TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id    TEXT NOT NULL,
+    conversation_id TEXT NOT NULL,
+    role          TEXT NOT NULL,
+    content       TEXT NOT NULL,
+    cost_usd      REAL NOT NULL DEFAULT 0.0,
+    ts            TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_chat_messages_conversation
+    ON chat_messages (project_id, conversation_id, id);
 """
+
+
+class ChatMessageRow(BaseModel):
+    """One persisted chat turn — ticket-048."""
+
+    role: str
+    content: str
+    cost_usd: float = 0.0
+    ts: str
 
 
 class PipelineRunSummary(BaseModel):
@@ -239,3 +261,76 @@ async def get_project_usage(
             for row in ticket_rows
         ],
     }
+
+
+# ------------------------------------------------------------------
+# Chat (ticket-048)
+# ------------------------------------------------------------------
+
+
+async def save_chat_message(
+    db_path: Path | str,
+    project_id: str,
+    conversation_id: str,
+    role: str,
+    content: str,
+    cost_usd: float = 0.0,
+) -> None:
+    """Append one turn to a conversation, so it survives a page reload."""
+    async with aiosqlite.connect(str(db_path)) as db:
+        await db.execute(
+            "INSERT INTO chat_messages "
+            "(project_id, conversation_id, role, content, cost_usd, ts) "
+            "VALUES (?,?,?,?,?,?)",
+            (
+                project_id,
+                conversation_id,
+                role,
+                content,
+                cost_usd,
+                datetime.now(timezone.utc).isoformat(),
+            ),
+        )
+        await db.commit()
+
+
+async def list_chat_messages(
+    db_path: Path | str, project_id: str, conversation_id: str
+) -> list[ChatMessageRow]:
+    """Every turn of one conversation, oldest first."""
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            "SELECT role, content, cost_usd, ts FROM chat_messages "
+            "WHERE project_id = ? AND conversation_id = ? ORDER BY id",
+            (project_id, conversation_id),
+        )
+        rows = await cursor.fetchall()
+    return [
+        ChatMessageRow(
+            role=str(r["role"]),
+            content=str(r["content"]),
+            cost_usd=float(r["cost_usd"]),
+            ts=str(r["ts"]),
+        )
+        for r in rows
+    ]
+
+
+async def conversation_cost_usd(
+    db_path: Path | str, project_id: str, conversation_id: str
+) -> float:
+    """Total spent on one conversation.
+
+    `llm_max_budget_usd` bounds a single call, not a conversation: without a
+    running total, a long discussion burns the subscription quota with nothing
+    surfacing it.
+    """
+    async with aiosqlite.connect(str(db_path)) as db:
+        cursor = await db.execute(
+            "SELECT COALESCE(SUM(cost_usd), 0.0) FROM chat_messages "
+            "WHERE project_id = ? AND conversation_id = ?",
+            (project_id, conversation_id),
+        )
+        row = await cursor.fetchone()
+    return round(float(row[0]) if row else 0.0, 10)

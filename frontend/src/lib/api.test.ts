@@ -220,7 +220,7 @@ describe("api.github.createPr", () => {
       "/api/v1/projects/ide-core/tickets/ticket-001/create-pr",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ head_branch: "ticket-001-fix", base: "main" }),
+        body: JSON.stringify({ head_branch: "ticket-001-fix", base: "develop" }),
       }),
     );
   });

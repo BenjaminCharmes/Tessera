@@ -191,3 +191,27 @@ export interface CloneProjectResponse {
   claude_md_generated: boolean;
   detected_stack: string[];
 }
+
+// ---------------------------------------------------------------- chat ----
+// ticket-048 — chat conversationnel avec outils.
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+  cost_usd: number;
+  ts: string;
+}
+
+export interface ChatHistory {
+  project_id: string;
+  conversation_id: string;
+  messages: ChatMessage[];
+  spent_usd: number;
+  max_usd: number;
+}
+
+/** Appel d'outil rendu dans le fil, replié par défaut. */
+export interface ChatToolUse {
+  tool: string;
+  input: Record<string, unknown>;
+}

@@ -10,7 +10,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from vibe_ide.config import settings
-from vibe_ide.routers import agent_admin, agents, orchestrator, projects, tickets
+from vibe_ide.routers import agent_admin, agents, chat, orchestrator, projects, tickets
 from vibe_ide.services.database import init_db
 from vibe_ide.services.prompt_loader import MissingPromptError
 from vibe_ide.utils.logger import get_logger
@@ -70,6 +70,7 @@ if settings.static_token:
 
 app.include_router(projects.router, prefix="/api/v1")
 app.include_router(tickets.router, prefix="/api/v1/projects")
+app.include_router(chat.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
 app.include_router(orchestrator.router, prefix="/api/v1")
 app.include_router(agent_admin.router, prefix="/api/v1")

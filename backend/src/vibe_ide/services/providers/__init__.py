@@ -27,6 +27,7 @@ def get_provider(
     max_turns: int | None = None,
     max_budget_usd: float | None = None,
     allow_tools: bool = True,
+    tools: list[str] | None = None,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -43,6 +44,10 @@ def get_provider(
     fields are set to the same empty list, since ``allowed_tools`` alone
     cannot disable the CLI's default toolset (ticket-044 merge-gate review,
     finding 1). Ignored by ``anthropic_api``, which never grants tools.
+
+    ``tools`` names an explicit subset, for callers that need *some* tools but
+    not all of them — the chat of ticket-048 takes the file tools and no shell
+    one. It wins over ``allow_tools``, which is all-or-nothing.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -51,7 +56,9 @@ def get_provider(
             kwargs["max_turns"] = max_turns
         if max_budget_usd is not None:
             kwargs["max_budget_usd"] = max_budget_usd
-        if not allow_tools:
+        if tools is not None:
+            kwargs["allowed_tools"] = list(tools)
+        elif not allow_tools:
             kwargs["allowed_tools"] = []
         return ClaudeAgentSDKProvider(**kwargs)  # type: ignore[arg-type]
     if resolved == "anthropic_api":

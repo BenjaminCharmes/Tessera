@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     # quota de l'abonnement). Voir memory/decisions.md pour le choix de 1.0 USD.
     llm_max_turns: int = 30
     llm_max_budget_usd: float = 1.0
+    # Plafond de dépense d'une CONVERSATION du chat (ticket-048).
+    # `llm_max_budget_usd` borne un appel ; sans ce second plafond, une
+    # longue discussion épuiserait le quota de l'abonnement sans que
+    # rien ne le fasse remonter.
+    chat_max_conversation_usd: float = 2.0
     ide_workspace_dir: Path = Path.home() / "vibe-ide-workspace"
     ide_log_level: str = "INFO"
     # Chemin vers agents/prompts/, ancré sur la racine du dépôt et non sur le

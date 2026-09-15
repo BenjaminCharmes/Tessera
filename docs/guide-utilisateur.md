@@ -18,10 +18,11 @@ est construit, va voir [`architecture.md`](architecture.md).
 5. [Lire ce qui se passe](#5-lire-ce-qui-se-passe)
 6. [Récupérer le travail des agents](#6-récupérer-le-travail-des-agents)
 7. [Le mode autonome](#7-le-mode-autonome)
-8. [Les agents disponibles](#8-les-agents-disponibles)
-9. [Intégration GitHub](#9-intégration-github)
-10. [Configuration](#10-configuration)
-11. [Problèmes fréquents](#11-problèmes-fréquents)
+8. [Discuter avec l'agent](#8-discuter-avec-lagent)
+9. [Les agents disponibles](#9-les-agents-disponibles)
+10. [Intégration GitHub](#10-intégration-github)
+11. [Configuration](#11-configuration)
+12. [Problèmes fréquents](#12-problèmes-fréquents)
 
 ---
 
@@ -290,7 +291,53 @@ tes tickets.
 
 ---
 
-## 8. Les agents disponibles
+## 8. Discuter avec l'agent
+
+Le panneau de droite a deux onglets : **Agents**, qui observe un run de
+pipeline, et **Chat**, où tu discutes librement du projet.
+
+Le chat n'est pas un pipeline. Il sert à décider **quoi** ticketiser, à
+comprendre un bout de code, à faire une modification ponctuelle — sans passer
+par le cycle complet codeur → reviewer → validateur.
+
+### Ce que l'agent peut faire
+
+- Lire n'importe quel fichier du projet, chercher dedans
+- Écrire et modifier des fichiers, y compris créer des tickets
+- Lire le `CLAUDE.md`, les tickets ouverts et les ADR du projet
+
+### Ce qu'il ne peut pas faire
+
+- **Exécuter des commandes** — aucun outil shell ne lui est donné
+- Lancer un pipeline lui-même : il peut le suggérer, tu décides
+
+### Ses écritures sont commitées, pas laissées en vrac
+
+Quand l'agent modifie des fichiers, son travail est **commité automatiquement**
+sur une branche `chat-<horodatage>`, jamais sur ta branche courante. Deux
+raisons :
+
+1. Tu peux inspecter, récupérer ou jeter son travail sans rien risquer :
+   `git show chat-20260915-143000`
+2. L'arbre de travail reste propre. Sinon, le prochain ticket que tu lances
+   partirait en `blocked` sans qu'aucun agent n'ait tourné.
+
+Un échange purement conversationnel ne crée ni branche ni commit.
+
+### Le coût est affiché
+
+En haut du panneau : `0.250 / 2.00 $`. C'est le cumul de **cette
+conversation**, et son plafond. Atteint, la conversation refuse de continuer —
+ouvre-en une nouvelle, ou relève `CHAT_MAX_CONVERSATION_USD`.
+
+> Le garde-fou `LLM_MAX_BUDGET_USD` borne **un appel**. Sans ce second plafond,
+> une longue discussion épuiserait ton quota sans que rien ne le montre.
+
+La conversation survit à un rechargement de la page.
+
+---
+
+## 9. Les agents disponibles
 
 | Agent | Rôle |
 |-------|------|
@@ -300,6 +347,7 @@ tes tickets.
 | `securite` | Audit OWASP du diff — bloque sur CRITICAL/HIGH |
 | `validateur` | Vérifie les critères d'acceptation un par un |
 | `doc-updater` | Met à jour README, docs et `CLAUDE.md` après approbation |
+| `chat` | Discute du projet, lit et écrit ses fichiers (onglet Chat) |
 | `planificateur` | Découpe une évolution décrite en langage naturel en tickets |
 | `architect` | Intervient sur les tickets de type `design` |
 | `project-creator` | Crée un projet de zéro par conversation |
@@ -317,7 +365,7 @@ et de régler `max_review_rounds`.
 
 ---
 
-## 9. Intégration GitHub
+## 10. Intégration GitHub
 
 Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
 
@@ -328,7 +376,7 @@ Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
 
 ---
 
-## 10. Configuration
+## 11. Configuration
 
 Tout est dans `.env` (copié depuis `.env.example`) :
 
@@ -338,6 +386,7 @@ Tout est dans `.env` (copié depuis `.env.example`) :
 | `ANTHROPIC_API_KEY` | — | Requis **uniquement** en mode `anthropic_api` |
 | `LLM_MAX_TURNS` | `30` | Plafond d'allers-retours outil pour un agent |
 | `LLM_MAX_BUDGET_USD` | `1.0` | Plafond de dépense d'un **seul** appel agent |
+| `CHAT_MAX_CONVERSATION_USD` | `2.0` | Plafond de dépense d'une **conversation** du chat |
 | `IDE_WORKSPACE_DIR` | `~/vibe-ide-workspace` | Où vivent tes projets |
 | `IDE_PROMPTS_DIR` | `agents/prompts/` | Où vivent les prompts des agents |
 | `IDE_LOG_LEVEL` | `INFO` | Verbosité des logs |
@@ -353,7 +402,7 @@ en boucle. Ne les augmente qu'en connaissance de cause.
 
 ---
 
-## 11. Problèmes fréquents
+## 12. Problèmes fréquents
 
 ### « Le dossier source n'existe pas : ...\backend\"C:\..." »
 

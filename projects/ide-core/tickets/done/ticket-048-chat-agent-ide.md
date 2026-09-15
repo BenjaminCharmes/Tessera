@@ -2,7 +2,7 @@
 id: ticket-048
 title: "Chat conversationnel avec outils dans l'IDE"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -72,7 +72,9 @@ son travail sur la branche du ticket. Un chat qui écrit dans l'arbre de travail
 casse cette garantie : au run suivant, `is_clean()` échoue et le ticket part en
 `blocked` sans qu'aucun agent n'ait tourné.
 
-Trois pistes, à arbitrer dans un ADR-019 :
+**Tranché par ADR-019 : piste 1.** Le chat commite sur `chat-<horodatage>`, exactement comme un run de pipeline sur la branche de son ticket. Une branche `chat-*` de trop se supprime ; un arbre cassé bloque la file.
+
+Les trois pistes envisagées :
 
 1. **Le chat commite lui-même** sur une branche `chat/<horodatage>`, comme un
    run. Cohérent avec ADR-018, mais multiplie les branches.
@@ -90,17 +92,17 @@ quota sans que personne ne le voie.
 
 ## Critères d'acceptation
 
-- [ ] Un panneau de chat est accessible depuis un projet ouvert
-- [ ] Les réponses sont streamées token par token via WebSocket
-- [ ] Les appels d'outil sont visibles dans le fil, repliés par défaut
-- [ ] L'agent lit et écrit réellement des fichiers du projet
-- [ ] L'agent peut créer un ticket valide au regard des enums du modèle
-- [ ] La conversation survit à un rechargement de la page
-- [ ] **Une écriture par le chat ne fait pas passer le ticket suivant en
+- [x] Un panneau de chat est accessible depuis un projet ouvert
+- [x] Les réponses sont streamées token par token via WebSocket
+- [x] Les appels d'outil sont visibles dans le fil, repliés par défaut
+- [x] L'agent lit et écrit réellement des fichiers du projet
+- [x] L'agent peut créer un ticket valide au regard des enums du modèle
+- [x] La conversation survit à un rechargement de la page
+- [x] **Une écriture par le chat ne fait pas passer le ticket suivant en
       `blocked`** (la piste retenue en ADR-019 est implémentée et testée)
-- [ ] Le coût cumulé de la conversation est visible dans l'UI
-- [ ] Aucun outil shell n'est exposé
-- [ ] ADR-019 documente l'arbitrage de cohabitation git
+- [x] Le coût cumulé de la conversation est visible dans l'UI
+- [x] Aucun outil shell n'est exposé
+- [x] ADR-019 documente l'arbitrage de cohabitation git
 
 ## Dépendances
 
@@ -119,3 +121,19 @@ couche d'événements.
   non-régression *avant* d'exposer le moindre outil d'écriture.
 - **Moyen sur le coût** — une conversation longue est un multiplicateur de
   tokens silencieux. Mitigation : plafond par conversation, visible.
+
+## Livré
+
+| Couche | Contenu |
+|---|---|
+| Persistance | Table `chat_messages`, historique et coût cumulé par conversation |
+| `ChatService` | Un tour de conversation, historique reconstruit dans le prompt (le provider est sans état), plafond de conversation, commit `chat-…` |
+| API | `GET /projects/{id}/chat/{conv}` et `WS /projects/{id}/chat` |
+| Prompt | `agents/prompts/chat.md` |
+| Frontend | `useChat`, `ChatPanel`, `ChatMessageView`, `ToolUseList`, onglets Agents / Chat |
+
+**Outils exposés** : `Read`, `Write`, `Edit`, `Glob`, `Grep`. `get_provider`
+gagne un paramètre `tools` pour ça : `allow_tools` était tout-ou-rien, et le
+jeu par défaut inclut `Bash` — qui reste hors périmètre.
+
+**Non livré (v2)** : le lancement d'un pipeline depuis le chat.

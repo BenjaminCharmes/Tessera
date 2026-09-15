@@ -150,7 +150,8 @@ dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
   registre d'agents dynamique — voir le tableau de fonctionnalités du `README.md`
 - Les agents écrivent réellement sur disque (ADR-017) et chaque run de pipeline
   s'isole sur sa propre branche git, sur le diff réel (ADR-018)
-- **Tickets ouverts** : `ticket-046` (décomposition de `run_pipeline`) et
-  `ticket-048` (chat conversationnel) en `todo/`. Les tickets 045, 047 et 049
-  sont livrés.
+- **Tickets 045 à 051 livrés** : pipeline sur diff réel, décomposition de
+  `run_pipeline`, skills locaux, chat conversationnel, flux git `develop`,
+  échecs bruyants sur prompt manquant. Aucun ticket ouvert — les prochains
+  sont à définir.
 - Toujours pas d'auth et pas de déploiement cloud — hors scope pour l'instant

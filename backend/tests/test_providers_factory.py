@@ -96,3 +96,12 @@ def test_get_provider_allow_tools_false_est_sans_effet_sur_anthropic_api() -> No
     it must not raise or otherwise change the provider it returns."""
     provider = get_provider("anthropic_api", api_key="sk-test", allow_tools=False)
     assert isinstance(provider, AnthropicApiProvider)
+
+
+def test_get_provider_accepte_un_jeu_d_outils_explicite() -> None:
+    # Le chat (ticket-048) n'expose aucun outil shell : `allow_tools` est
+    # tout-ou-rien, il faut pouvoir demander un sous-ensemble précis.
+    provider = get_provider(tools=["Read", "Write", "Edit", "Glob", "Grep"])
+
+    assert provider._allowed_tools == ["Read", "Write", "Edit", "Glob", "Grep"]
+    assert "Bash" not in provider._allowed_tools

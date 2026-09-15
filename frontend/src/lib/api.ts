@@ -3,6 +3,7 @@ import type {
   AnalysisResult,
   CloneProjectRequest,
   CloneProjectResponse,
+  ChatHistory,
   ConversationMessage,
   CreateAgentResponse,
   CreatePrResponse,
@@ -101,7 +102,7 @@ export const api = {
       projectId: string,
       ticketId: string,
       headBranch: string,
-      base = "main",
+      base = "develop",
     ): Promise<CreatePrResponse> =>
       post(`/projects/${projectId}/tickets/${ticketId}/create-pr`, {
         head_branch: headBranch,
@@ -109,6 +110,13 @@ export const api = {
       }),
     getPrStatus: (projectId: string, ticketId: string): Promise<PRStatus> =>
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
+  },
+  chat: {
+    history: (
+      projectId: string,
+      conversationId: string,
+    ): Promise<ChatHistory> =>
+      request(`/projects/${projectId}/chat/${conversationId}`),
   },
   agents: {
     list: (): Promise<AgentInfo[]> =>

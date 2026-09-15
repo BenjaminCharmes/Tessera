@@ -11,6 +11,7 @@ import type { SidebarPanel } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
 import AgentPanel from "./components/AgentPanel";
+import ChatPanel from "./components/ChatPanel";
 import BottomPanel from "./components/BottomPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
@@ -20,6 +21,8 @@ export default function App() {
   const { project, ticket, setProject, setTicket } = useActiveProject();
   const [panel, setPanel] = useState<SidebarPanel>("projects");
   const [showKanban, setShowKanban] = useState(false);
+  // Colonne de droite : observer un run, ou discuter (ticket-048).
+  const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
   const { toasts, addToast, removeToast } = useToast();
 
   const stream = useOrchestratorStream(project?.id ?? null);
@@ -173,14 +176,52 @@ export default function App() {
         </ErrorBoundary>
       </div>
 
-      {/* Agent Panel — col 4, rows 1-2 */}
+      {/* Agent Panel / Chat — col 4, rows 1-2.
+          Deux vues du même espace : l'une observe un run de pipeline,
+          l'autre discute (ticket-048). Le chat ne remplace pas le stream. */}
       <div
-        className="overflow-hidden"
+        className="overflow-hidden flex flex-col"
         style={{ gridColumn: "4", gridRow: "1 / 3" }}
       >
-        <ErrorBoundary>
-          <AgentPanel project={project} stream={stream} />
-        </ErrorBoundary>
+        <div
+          role="tablist"
+          aria-label="Panneau latéral"
+          className="flex border-b border-zinc-800 bg-zinc-900"
+        >
+          {(["agents", "chat"] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              role="tab"
+              id={`side-tab-${tab}`}
+              aria-selected={sidePanel === tab}
+              aria-controls={`side-panel-${tab}`}
+              onClick={() => setSidePanel(tab)}
+              className={`px-3 py-1.5 text-xs transition-colors ${
+                sidePanel === tab
+                  ? "text-zinc-100 border-b-2 border-zinc-400"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {tab === "agents" ? "Agents" : "Chat"}
+            </button>
+          ))}
+        </div>
+
+        <div
+          id={`side-panel-${sidePanel}`}
+          role="tabpanel"
+          aria-labelledby={`side-tab-${sidePanel}`}
+          className="flex-1 overflow-hidden"
+        >
+          <ErrorBoundary>
+            {sidePanel === "agents" ? (
+              <AgentPanel project={project} stream={stream} />
+            ) : (
+              <ChatPanel project={project} />
+            )}
+          </ErrorBoundary>
+        </div>
       </div>
 
       {/* Bottom Panel — col 3, row 2 */}
