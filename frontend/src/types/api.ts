@@ -248,3 +248,14 @@ export interface ChatToolUse {
   tool: string;
   input: Record<string, unknown>;
 }
+
+// ---------------------------------------------------------- liaison git ----
+// ticket-061 — un projet créé de zéro ou importé en `copy` n'a aucun dépôt.
+
+export interface GitStatus {
+  is_repository: boolean;
+  has_commits: boolean;
+  remote_url: string | null;
+  /** Renseigné quand le projet vit dans un dépôt qui n'est pas le sien. */
+  nested_in: string | null;
+}

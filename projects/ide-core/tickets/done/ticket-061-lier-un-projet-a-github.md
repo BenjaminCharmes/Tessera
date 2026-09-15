@@ -2,7 +2,7 @@
 id: ticket-061
 title: "Lier un projet existant à un dépôt GitHub"
 type: feat
-status: in-progress
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -62,8 +62,8 @@ attache.
 - [x] Une URL invalide ou inaccessible est refusée avec un message exploitable
 - [x] Attacher un remote non vide exige une confirmation explicite
 - [x] Un projet déjà lié reste inchangé
-- [ ] L'UI montre qu'un projet n'est pas versionné, et propose de le lier
-- [ ] Après liaison, un pipeline crée bien branche et commit
+- [x] L'UI montre qu'un projet n'est pas versionné, et propose de le lier
+- [x] Après liaison, un pipeline crée bien branche et commit
 
 ## Dépendances
 
@@ -101,6 +101,12 @@ en réel :
 | `tmp` (symlink) | oui | — |
 | `client-data-git` (clone) | oui | — |
 
-## Reste à faire
+## UI livrée
 
-L'UI : état « non versionné » visible, et action de liaison depuis la sidebar.
+`useGitStatus` + `GitLinkPanel`, monté sous la liste des tickets — c'est là
+qu'on décide de lancer un pipeline, donc là que savoir si le projet est
+versionné a le plus de valeur.
+
+Le panneau dit **pourquoi** ça compte (« sans dépôt, ni branche ni commit »),
+signale l'imbrication le cas échéant, et traite le 409 « dépôt non vide »
+comme une décision à confirmer, pas comme une erreur.

@@ -4,6 +4,7 @@ import type {
   CloneProjectRequest,
   CloneProjectResponse,
   ChatHistory,
+  GitStatus,
   ConversationMessage,
   CreateAgentResponse,
   CreatePrResponse,
@@ -111,6 +112,21 @@ export const api = {
       }),
     getPrStatus: (projectId: string, ticketId: string): Promise<PRStatus> =>
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
+  },
+  git: {
+    status: (projectId: string): Promise<GitStatus> =>
+      request(`/projects/${projectId}/git/status`),
+    init: (projectId: string): Promise<GitStatus> =>
+      post(`/projects/${projectId}/git/init`, {}),
+    link: (
+      projectId: string,
+      repoUrl: string,
+      confirmed = false,
+    ): Promise<GitStatus> =>
+      post(`/projects/${projectId}/git/link`, {
+        repo_url: repoUrl,
+        confirmed,
+      }),
   },
   chat: {
     history: (

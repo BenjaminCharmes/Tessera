@@ -1,5 +1,6 @@
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
+import GitLinkPanel from "./GitLinkPanel";
 import RunHistory from "./RunHistory";
 import AgentList from "./AgentList";
 import UsageDashboard from "./UsageDashboard";
@@ -162,6 +163,10 @@ export default function Sidebar({
           onBatchCreated={onBatchCreated}
         />
       )}
+      {/* L'état git se lit sous la liste des tickets : c'est là qu'on décide
+          de lancer un pipeline, et c'est là que savoir si le projet est
+          versionné a le plus de valeur (ticket-061). */}
+      {panel === "tickets" && <GitLinkPanel project={activeProject} />}
       {panel === "history" && (
         <RunHistory
           runs={runs}
