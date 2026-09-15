@@ -286,6 +286,10 @@ Ce qu'il faut savoir avant de le lancer :
 - **Un ticket bloqué ne gèle pas la file.** Il passe en `blocked` et l'orchestrateur
   passe au suivant.
 
+Le run s'arrête aussi de lui-même s'il atteint `RUN_MAX_BUDGET_USD` (5 $ par
+défaut) : le plafond est vérifié **entre** deux tickets, jamais au milieu d'un,
+pour qu'aucun travail ne reste non commité.
+
 Commence par des lots courts (`max_tickets: 3`) le temps de calibrer la qualité de
 tes tickets.
 
@@ -386,6 +390,7 @@ Tout est dans `.env` (copié depuis `.env.example`) :
 | `ANTHROPIC_API_KEY` | — | Requis **uniquement** en mode `anthropic_api` |
 | `LLM_MAX_TURNS` | `30` | Plafond d'allers-retours outil pour un agent |
 | `LLM_MAX_BUDGET_USD` | `1.0` | Plafond de dépense d'un **seul** appel agent |
+| `RUN_MAX_BUDGET_USD` | `5.0` | Plafond cumulé d'un **run autonome** (`0` = aucun) |
 | `CHAT_MAX_CONVERSATION_USD` | `2.0` | Plafond de dépense d'une **conversation** du chat |
 | `IDE_WORKSPACE_DIR` | `~/vibe-ide-workspace` | Où vivent tes projets |
 | `IDE_PROMPTS_DIR` | `agents/prompts/` | Où vivent les prompts des agents |

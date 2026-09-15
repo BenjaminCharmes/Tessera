@@ -345,6 +345,8 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `ANTHROPIC_API_KEY` | si `anthropic_api` | — | Clef API Anthropic — inutile en mode `agent_sdk` |
 | `LLM_MAX_TURNS` | | `30` | Plafond d'allers-retours outil pour un agent |
 | `LLM_MAX_BUDGET_USD` | | `1.0` | Plafond de dépense d'un seul appel agent |
+| `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond cumulé d'un run autonome (`0` = aucun) |
+| `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `IDE_WORKSPACE_DIR` | | `~/vibe-ide-workspace` | Dossier des projets |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |

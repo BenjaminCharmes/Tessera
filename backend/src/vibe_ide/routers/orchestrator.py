@@ -147,6 +147,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         validator=validator,
         project_path=project_path,
         git_workspace=git_workspace,
+        run_max_budget_usd=settings.run_max_budget_usd,
     )
 
 

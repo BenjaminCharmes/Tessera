@@ -114,12 +114,15 @@ class AgentRunner:
             },
         )
 
+        # Calculé dans tous les cas : l'orchestrateur en a besoin pour
+        # borner la dépense d'un run, même sans `run_id` (mode autonome).
+        cost_usd = (
+            provider_result.cost_usd
+            if provider_result.cost_usd is not None
+            else calculate_cost(model, input_tokens, output_tokens, cache_read_tokens)
+        )
+
         if run_id and self._db_path:
-            cost_usd = (
-                provider_result.cost_usd
-                if provider_result.cost_usd is not None
-                else calculate_cost(model, input_tokens, output_tokens, cache_read_tokens)
-            )
             try:
                 await save_agent_call(
                     self._db_path,
@@ -142,6 +145,7 @@ class AgentRunner:
             content=content,
             suggested_status=_parse_suggested_status(content),
             duration_ms=duration_ms,
+            cost_usd=cost_usd,
         )
 
     def _load_system_prompt(self, role: str) -> str:

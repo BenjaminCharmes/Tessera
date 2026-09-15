@@ -56,6 +56,10 @@ class AgentResult(BaseModel):
     suggested_status: TicketStatus
     created_tickets: list[str] = Field(default_factory=list)
     duration_ms: int
+    # Coût réel de l'appel, pour que l'orchestrateur puisse agréger la dépense
+    # d'un run entier (issue #61). Il n'existait auparavant que dans la branche
+    # qui écrit en base, donc seulement quand un `run_id` était fourni.
+    cost_usd: float = 0.0
 
 
 class AgentRunRequest(BaseModel):

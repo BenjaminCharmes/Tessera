@@ -58,6 +58,7 @@ class Orchestrator:
         validator: Optional["ValidatorService"] = None,
         project_path: Optional[Path] = None,
         git_workspace: Optional["GitWorkspaceService"] = None,
+        run_max_budget_usd: float = 0.0,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -72,6 +73,23 @@ class Orchestrator:
         self._validator = validator
         self._project_path = project_path
         self._git_workspace = git_workspace
+        self._run_max_budget_usd = run_max_budget_usd
+        self._spent_usd = 0.0
+
+    @property
+    def spent_usd(self) -> float:
+        """Cumulative spend since this orchestrator was built."""
+        return round(self._spent_usd, 10)
+
+    def record_spend(self, cost_usd: float) -> None:
+        """Add one agent call's cost to the run's running total."""
+        self._spent_usd += cost_usd or 0.0
+
+    def budget_exhausted(self) -> bool:
+        """True once the run has spent its ceiling. `0` means no ceiling."""
+        if self._run_max_budget_usd <= 0:
+            return False
+        return self._spent_usd >= self._run_max_budget_usd
 
     def _config_for(self, role: AgentRole) -> Optional[AgentConfig]:
         return next((c for c in self._agent_configs if c.role == role.value), None)
@@ -149,6 +167,23 @@ class Orchestrator:
         results: list[PipelineResult] = []
 
         for _ in range(max_tickets):
+            # Le plafond est vérifié *entre* les tickets : interrompre un
+            # ticket en cours laisserait son travail non commité, ce que
+            # l'isolation par branche interdit (ADR-018).
+            if self.budget_exhausted():
+                _logger.warning(
+                    "run_budget_exhausted",
+                    extra={
+                        "spent_usd": self.spent_usd,
+                        "max_usd": self._run_max_budget_usd,
+                    },
+                )
+                self._log(
+                    f"[{project_id}] run interrompu : {self.spent_usd:.2f} USD "
+                    f"dépensés sur {self._run_max_budget_usd:.2f} autorisés"
+                )
+                break
+
             ticket = await self.pick_next_ticket(project_id)
             if ticket is None:
                 break

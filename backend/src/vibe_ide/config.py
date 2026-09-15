@@ -24,6 +24,12 @@ class Settings(BaseSettings):
     # longue discussion épuiserait le quota de l'abonnement sans que
     # rien ne le fasse remonter.
     chat_max_conversation_usd: float = 2.0
+    # Plafond de dépense cumulée d'un RUN autonome (issue #61).
+    # `llm_max_budget_usd` borne un appel `query()` ; un clic sur « mode
+    # autonome » enchaîne jusqu'à 5 tickets, chacun sur plusieurs tours et
+    # plusieurs agents — le plafond effectif se chiffrait en dizaines de
+    # dollars de quota sans garde-fou agrégé. 0 désactive la borne.
+    run_max_budget_usd: float = 5.0
     ide_workspace_dir: Path = Path.home() / "vibe-ide-workspace"
     ide_log_level: str = "INFO"
     # Chemin vers agents/prompts/, ancré sur la racine du dépôt et non sur le

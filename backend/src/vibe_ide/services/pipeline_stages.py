@@ -146,6 +146,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
         tool_callback=_emit_tool,
         run_id=run.run_id,
     )
+    orch.record_spend(codeur_result.cost_usd)
     await run.on_event(
         OrchestratorEvent(
             type=EventType.AGENT_DONE,
@@ -301,6 +302,7 @@ async def run_review(
         agent_config=reviewer_cfg,
         run_id=run.run_id,
     )
+    orch.record_spend(reviewer_result.cost_usd)
     await run.on_event(
         OrchestratorEvent(
             type=EventType.AGENT_DONE,

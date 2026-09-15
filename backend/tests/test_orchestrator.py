@@ -70,7 +70,11 @@ def _make_orchestrator(
     validator: object | None = None,
     doc_updater: object | None = None,
     project_path: Path | None = None,
+    tickets: list[Ticket] | None = None,
+    run_max_budget_usd: float = 0.0,
 ) -> Orchestrator:
+    if tickets is not None and ticket_service is None:
+        ticket_service = _make_ticket_service_for(tickets)
     return Orchestrator(
         runner=runner or MagicMock(),
         ticket_service=ticket_service or _make_default_ticket_service(),
@@ -83,7 +87,42 @@ def _make_orchestrator(
         doc_updater=doc_updater,
         project_path=project_path,
         git_workspace=git_workspace,
+        run_max_budget_usd=run_max_budget_usd,
     )
+
+
+def _make_ticket_service_for(tickets: list[Ticket]) -> AsyncMock:
+    """Ticket service double serving a queue of todo tickets, one at a time."""
+    remaining = list(tickets)
+    by_id = {t.id: t for t in tickets}
+    done: list[Ticket] = []
+
+    svc = AsyncMock()
+
+    async def _list_tickets(status: TicketStatus | None = None) -> list[Ticket]:
+        if status == TicketStatus.todo:
+            return list(remaining)
+        if status == TicketStatus.done:
+            return list(done)
+        return list(tickets)
+
+    async def _get_ticket(ticket_id: str) -> Ticket | None:
+        return by_id.get(ticket_id)
+
+    async def _update_status(ticket_id: str, status: TicketStatus) -> Ticket | None:
+        ticket = by_id.get(ticket_id)
+        if ticket is None:
+            return None
+        if status in (TicketStatus.done, TicketStatus.blocked):
+            remaining[:] = [t for t in remaining if t.id != ticket_id]
+            if status == TicketStatus.done:
+                done.append(ticket)
+        return ticket
+
+    svc.list_tickets.side_effect = _list_tickets
+    svc.get_ticket.side_effect = _get_ticket
+    svc.update_status.side_effect = _update_status
+    return svc
 
 
 async def _noop(event: OrchestratorEvent) -> None:
