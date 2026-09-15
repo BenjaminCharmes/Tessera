@@ -475,3 +475,50 @@ async def test_create_pull_request_cible_develop_par_defaut() -> None:
     import json as _json
 
     assert _json.loads(route.calls[0].request.content)["base"] == "develop"
+
+
+# ------------------------------------------------------------------
+# Inspection d'un dépôt avant liaison — ticket-061
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_repository_info_signale_un_depot_vide() -> None:
+    # Un dépôt fraîchement créé sur GitHub n'a aucun commit : on peut y
+    # attacher un projet local sans risque de conflit.
+    respx.get(f"{_BASE}/repos/{_REPO}").mock(
+        return_value=httpx.Response(200, json={"size": 0, "default_branch": "main"})
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits").mock(return_value=httpx.Response(409))
+
+    info = await _make_service().get_repository_info()
+
+    assert info.exists is True
+    assert info.is_empty is True
+
+
+@respx.mock
+async def test_repository_info_signale_un_depot_avec_historique() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}").mock(
+        return_value=httpx.Response(200, json={"size": 120, "default_branch": "main"})
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits").mock(
+        return_value=httpx.Response(200, json=[{"sha": "abc"}])
+    )
+
+    info = await _make_service().get_repository_info()
+
+    assert info.exists is True
+    assert info.is_empty is False
+    assert info.default_branch == "main"
+
+
+@respx.mock
+async def test_repository_info_signale_un_depot_inaccessible() -> None:
+    # Dépôt inexistant, ou token sans accès : les deux se présentent en 404,
+    # et l'utilisateur doit pouvoir distinguer ça d'un dépôt vide.
+    respx.get(f"{_BASE}/repos/{_REPO}").mock(return_value=httpx.Response(404))
+
+    info = await _make_service().get_repository_info()
+
+    assert info.exists is False

@@ -25,6 +25,15 @@ class PRStatus:
     pr_number: int
 
 
+@dataclass
+class RepositoryInfo:
+    """Ce qu'il faut savoir d'un dépôt distant avant d'y attacher un projet."""
+
+    exists: bool
+    is_empty: bool = False
+    default_branch: str = "main"
+
+
 class GitHubService:
     def __init__(self, token: str, repo: str) -> None:
         self._repo = repo
@@ -158,3 +167,33 @@ class GitHubService:
         if any(c in ("failure", "timed_out", "cancelled") for c in conclusions):
             return "failing"
         return "passing"
+
+    async def get_repository_info(self) -> RepositoryInfo:
+        """Inspecte le dépôt distant : existe-t-il, et a-t-il un historique ?
+
+        Un dépôt inexistant et un dépôt sans droits se présentent tous deux en
+        404 : l'appelant doit pouvoir distinguer ce cas d'un dépôt simplement
+        vide, sur lequel une liaison est sans danger.
+        """
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(f"{_BASE}/repos/{self._repo}", headers=self._headers)
+            if resp.status_code != 200:
+                return RepositoryInfo(exists=False)
+            data = resp.json()
+
+            # `size` vaut 0 sur un dépôt vide, mais aussi sur un dépôt dont les
+            # objets ne sont pas encore comptés : la liste des commits tranche.
+            commits = await client.get(
+                f"{_BASE}/repos/{self._repo}/commits",
+                headers=self._headers,
+                params={"per_page": 1},
+            )
+            is_empty = commits.status_code == 409 or (
+                commits.status_code == 200 and not commits.json()
+            )
+
+        return RepositoryInfo(
+            exists=True,
+            is_empty=is_empty,
+            default_branch=str(data.get("default_branch") or "main"),
+        )

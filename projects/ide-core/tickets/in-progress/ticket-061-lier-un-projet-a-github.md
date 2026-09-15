@@ -2,7 +2,7 @@
 id: ticket-061
 title: "Lier un projet existant à un dépôt GitHub"
 type: feat
-status: todo
+status: in-progress
 pr_number: null
 priority: high
 agent: codeur
@@ -56,12 +56,12 @@ attache.
 
 ## Critères d'acceptation
 
-- [ ] Un projet sans dépôt peut être initialisé depuis l'IDE
-- [ ] Un remote `origin` peut être attaché à un projet existant
-- [ ] `agents.json` porte le `github_remote` après liaison
-- [ ] Une URL invalide ou inaccessible est refusée avec un message exploitable
-- [ ] Attacher un remote non vide exige une confirmation explicite
-- [ ] Un projet déjà lié reste inchangé
+- [x] Un projet sans dépôt peut être initialisé depuis l'IDE
+- [x] Un remote `origin` peut être attaché à un projet existant
+- [x] `agents.json` porte le `github_remote` après liaison
+- [x] Une URL invalide ou inaccessible est refusée avec un message exploitable
+- [x] Attacher un remote non vide exige une confirmation explicite
+- [x] Un projet déjà lié reste inchangé
 - [ ] L'UI montre qu'un projet n'est pas versionné, et propose de le lier
 - [ ] Après liaison, un pipeline crée bien branche et commit
 
@@ -78,3 +78,29 @@ Aucune.
 - **Moyen** — `git init` puis `git remote add` sur un dossier de l'utilisateur
   touche à ses données. Aucune opération destructive : on n'initialise que si
   `.git` est absent, on n'écrase jamais un remote existant sans confirmation.
+
+## Backend livré
+
+`services/git_link.py` — `git_status`, `init_repository`, `link_remote`.
+`GitHubService.get_repository_info` inspecte le dépôt distant avant liaison.
+Endpoints : `GET/POST /projects/{id}/git/status|init|link`.
+
+### Un cas que l'implémentation a révélé
+
+`git_status` répondait « dépôt = oui, remote = vibe_ide.git » pour `ide-core`
+— parce qu'un projet **imbriqué** dans un autre dépôt fait remonter git au
+parent. Trompeur et dangereux : `init` aurait été sans effet, et le pipeline
+aurait commité dans le dépôt englobant plutôt que dans le projet.
+
+`GitStatus` distingue désormais `is_own_repository` de `is_nested_in`. Vérifié
+en réel :
+
+| Projet | Dépôt propre | Imbriqué dans |
+|---|---|---|
+| `ide-core` | non | `Desktop/project` |
+| `tmp` (symlink) | oui | — |
+| `client-data-git` (clone) | oui | — |
+
+## Reste à faire
+
+L'UI : état « non versionné » visible, et action de liaison depuis la sidebar.

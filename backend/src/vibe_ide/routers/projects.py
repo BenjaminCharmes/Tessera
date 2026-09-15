@@ -1,4 +1,8 @@
+import re
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel
 
 from vibe_ide.config import settings
 from vibe_ide.models.project import (
@@ -26,6 +30,13 @@ from vibe_ide.services.planner import PlannerService
 from vibe_ide.services.project_analyzer import ProjectAnalyzerService
 from vibe_ide.services.project_importer import ImportError, ProjectImporter
 from vibe_ide.services.project_creator import ProjectCreatorService
+from vibe_ide.services.git_link import (
+    GitLinkError,
+    RemoteNotEmpty,
+    git_status,
+    init_repository,
+    link_remote,
+)
 from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
 from vibe_ide.services.providers import get_provider
 from vibe_ide.services.sync_map import SyncMapService
@@ -239,3 +250,105 @@ async def get_project(project_id: str) -> Project:
         return await _loader().load_project(project_id)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+# ------------------------------------------------------------------
+# Liaison git — ticket-061
+# ------------------------------------------------------------------
+
+
+class GitStatusResponse(BaseModel):
+    is_repository: bool
+    has_commits: bool
+    remote_url: str | None = None
+    # Renseigné quand le projet vit dans un dépôt qui n'est pas le sien :
+    # `init` créera alors bien son propre dépôt (ticket-061).
+    nested_in: str | None = None
+
+
+class LinkRemoteRequest(BaseModel):
+    repo_url: str
+    # L'utilisateur confirme les deux cas qu'il est seul à pouvoir trancher :
+    # un dépôt distant non vide, et un `origin` déjà configuré.
+    confirmed: bool = False
+
+
+def _require_project_path(project_id: str) -> Path:
+    project_path = settings.ide_workspace_dir / project_id
+    if not project_path.is_dir():
+        raise HTTPException(status_code=404, detail=f"Projet introuvable : {project_id}")
+    return project_path
+
+
+def _repo_slug(repo_url: str) -> str | None:
+    """Extrait `owner/repo` d'une URL GitHub, pour interroger l'API."""
+    match = re.search(r"github\.com[:/]([\w.\-]+/[\w.\-]+?)(?:\.git)?/?$", repo_url.strip())
+    return match.group(1) if match else None
+
+
+@router.get("/{project_id}/git/status", response_model=GitStatusResponse)
+async def get_git_status(project_id: str) -> GitStatusResponse:
+    status = await git_status(_require_project_path(project_id))
+    return GitStatusResponse(
+        is_repository=status.is_own_repository,
+        has_commits=status.has_commits,
+        remote_url=status.remote_url,
+        nested_in=status.is_nested_in,
+    )
+
+
+@router.post("/{project_id}/git/init", response_model=GitStatusResponse)
+async def init_git(project_id: str) -> GitStatusResponse:
+    """Initialise un dépôt dans le projet. Sans effet s'il en a déjà un."""
+    try:
+        status = await init_repository(_require_project_path(project_id))
+    except GitLinkError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return GitStatusResponse(
+        is_repository=status.is_own_repository,
+        has_commits=status.has_commits,
+        remote_url=status.remote_url,
+        nested_in=status.is_nested_in,
+    )
+
+
+@router.post("/{project_id}/git/link", response_model=GitStatusResponse)
+async def link_git_remote(project_id: str, body: LinkRemoteRequest) -> GitStatusResponse:
+    """Attache un remote GitHub au projet, après vérification du dépôt distant."""
+    project_path = _require_project_path(project_id)
+
+    # Le dépôt distant n'est interrogé que si un token le permet. Sans token,
+    # on ne peut rien affirmer : on exige alors une confirmation explicite
+    # plutôt que de supposer le dépôt vide.
+    remote_is_empty = body.confirmed
+    slug = _repo_slug(body.repo_url)
+    if settings.github_token and slug:
+        info = await GitHubService(token=settings.github_token, repo=slug).get_repository_info()
+        if not info.exists:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Le dépôt '{slug}' est introuvable, ou le GITHUB_TOKEN "
+                    "configuré n'y a pas accès."
+                ),
+            )
+        remote_is_empty = info.is_empty
+
+    try:
+        status = await link_remote(
+            project_path,
+            body.repo_url,
+            remote_is_empty=remote_is_empty,
+            confirmed=body.confirmed,
+        )
+    except RemoteNotEmpty as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except GitLinkError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    return GitStatusResponse(
+        is_repository=status.is_own_repository,
+        has_commits=status.has_commits,
+        remote_url=status.remote_url,
+        nested_in=status.is_nested_in,
+    )

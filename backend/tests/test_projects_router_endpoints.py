@@ -258,3 +258,108 @@ def test_analyse_d_un_projet_inexistant_renvoie_404() -> None:
         "/api/v1/projects/jamais-vu/analyze", json={"project_id": "jamais-vu"}
     )
     assert resp.status_code == 404
+
+
+# ------------------------------------------------------------------
+# Liaison git — ticket-061
+# ------------------------------------------------------------------
+
+
+def test_statut_git_d_un_projet_sans_depot(workspace: Path) -> None:
+    body = _client().get("/api/v1/projects/mon-projet/git/status").json()
+
+    assert body["is_repository"] is False
+    assert body["remote_url"] is None
+
+
+def test_init_puis_statut_montre_un_depot_avec_commit(workspace: Path) -> None:
+    resp = _client().post("/api/v1/projects/mon-projet/git/init")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["is_repository"] is True
+    assert body["has_commits"] is True
+
+
+def test_lier_sans_depot_est_refuse(workspace: Path) -> None:
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/git/link",
+        json={"repo_url": "https://github.com/moi/repo.git", "confirmed": True},
+    )
+
+    assert resp.status_code == 422
+    assert "dépôt" in resp.json()["detail"].lower()
+
+
+def test_lier_un_remote_apres_init(workspace: Path) -> None:
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/git/link",
+        json={"repo_url": "https://github.com/moi/repo.git", "confirmed": True},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["remote_url"] == "https://github.com/moi/repo.git"
+
+
+def test_lier_une_url_invalide_est_refuse(workspace: Path) -> None:
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/git/link",
+        json={"repo_url": "pas-une-url", "confirmed": True},
+    )
+
+    assert resp.status_code == 422
+    assert "URL" in resp.json()["detail"]
+
+
+def test_lier_un_depot_distant_inaccessible_est_refuse(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Dépôt inexistant ou token sans droits : l'utilisateur doit savoir que le
+    # problème est côté GitHub, pas côté projet.
+    from vibe_ide.services.github_service import RepositoryInfo
+
+    monkeypatch.setattr(settings, "github_token", "ghp_test")
+
+    async def _absent(self: object) -> RepositoryInfo:
+        return RepositoryInfo(exists=False)
+
+    monkeypatch.setattr(
+        "vibe_ide.services.github_service.GitHubService.get_repository_info", _absent
+    )
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/git/link",
+        json={"repo_url": "https://github.com/moi/repo.git"},
+    )
+
+    assert resp.status_code == 422
+    assert "introuvable" in resp.json()["detail"]
+
+
+def test_un_depot_distant_non_vide_demande_confirmation(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from vibe_ide.services.github_service import RepositoryInfo
+
+    monkeypatch.setattr(settings, "github_token", "ghp_test")
+
+    async def _non_vide(self: object) -> RepositoryInfo:
+        return RepositoryInfo(exists=True, is_empty=False)
+
+    monkeypatch.setattr(
+        "vibe_ide.services.github_service.GitHubService.get_repository_info", _non_vide
+    )
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/git/link",
+        json={"repo_url": "https://github.com/moi/repo.git"},
+    )
+
+    assert resp.status_code == 409
+    assert "n'est pas vide" in resp.json()["detail"]
