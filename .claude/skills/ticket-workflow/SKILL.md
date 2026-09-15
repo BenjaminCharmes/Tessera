@@ -41,8 +41,25 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ```
 
 Préférer plusieurs commits à frontières nettes (un par préoccupation) à un
-commit fourre-tout. Stager explicitement les fichiers — **jamais `git add -A`**,
-qui balaie les projets importés dans `projects/` et les artefacts de travail.
+commit fourre-tout.
+
+### Stager nommément — la commande, pas seulement l'interdiction
+
+```bash
+git status --short          # voir exactement ce qui va partir
+git add chemin/un.py chemin/deux.py
+git diff --cached --stat    # relire ce qui est stagé AVANT de committer
+```
+
+**`git add -A` est interdit, y compris restreint à des chemins**
+(`git add -A -- backend/`). La forme restreinte paraît sûre et ne l'est pas :
+elle emporte tout fichier non suivi sous ces chemins — artefact de couverture,
+fichier temporaire, projet importé par l'utilisateur — sans que rien ne le
+signale. Le `git diff --cached --stat` ci-dessus est ce qui attrape l'erreur ;
+il ne coûte rien, et c'est précisément l'étape qu'on saute.
+
+Si lister les fichiers devient pénible, c'est le signe que le commit couvre
+trop de préoccupations : le découper.
 
 ## Pousser et ouvrir la PR
 
@@ -99,8 +116,9 @@ dépôt.
 
 ## Pièges connus
 
-- **`git add -A`** balaie `projects/*` (projets importés par l'utilisateur) et
-  les logs locaux. Stager nommément.
+- **`git add -A`**, même restreint par `-- <chemins>`, balaie `projects/*`
+  (projets importés par l'utilisateur), les artefacts de couverture et les logs
+  locaux. Stager nommément, puis relire `git diff --cached --stat`.
 - **Réécrire l'historique** d'une branche déjà poussée : ne pas le faire sans
   décision explicite, même pour corriger un message.
 - **Une PR ouverte vers `main`** alors que le flux cible `develop` : retarger,

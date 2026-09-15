@@ -11,7 +11,23 @@ Ce projet suit le pattern "self-hosting" : l'IDE est son propre premier projet.
 Le dossier `projects/ide-core/` contient les tickets, la mémoire et les décisions
 qui guident la construction de l'IDE lui-même.
 
-Avant toute action, lis `projects/ide-core/CLAUDE.md` pour le contexte technique complet.
+## Contexte toujours chargé
+
+@projects/ide-core/CLAUDE.md
+@projects/ide-core/memory/decisions.md
+
+Ces deux fichiers sont importés, pas seulement recommandés à la lecture. Un
+`@`-import coûte ~2000 tokens **une fois par session** — négligeable au regard
+d'une décision d'architecture violée faute de la connaître.
+
+À ne pas confondre avec le coût côté produit : `decisions.md` est aussi injecté
+par le backend dans **chaque appel d'agent**, jusqu'à 18 par ticket. C'est là
+que la longueur d'un ADR compte, et c'est pourquoi le skill `write-adr` impose
+un budget. Les deux budgets sont distincts.
+
+Les **skills** restent chargés à la demande : ils décrivent *comment* faire une
+tâche donnée, alors que les ADR sont des contraintes qui doivent tenir en
+permanence. C'est ce qui justifie l'import ici et pas là.
 
 ---
 
@@ -135,10 +151,13 @@ dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
 
 1. **Toujours lire le ticket complet** avant de commencer à coder
 2. **Mettre à jour le statut du ticket** (todo → in-progress → done) dès que l'état change
-3. **Écrire dans `memory/decisions.md`** toute décision d'architecture non triviale
-4. **Ne jamais modifier** `CLAUDE.md` sans ticket explicite pour le faire
-5. **Préférer des petits fichiers** (<200 lignes) à de gros fichiers monolithiques
-6. **Un test par fonction publique** au minimum
+3. **Consulter les ADR avant toute décision d'architecture** — ce sont des
+   contraintes en vigueur, pas des archives. Ils sont importés plus haut, donc
+   déjà en contexte : les ignorer est un choix, pas un oubli
+4. **Écrire dans `memory/decisions.md`** toute décision d'architecture non triviale
+5. **Ne jamais modifier** `CLAUDE.md` sans ticket explicite pour le faire
+6. **Préférer des petits fichiers** (<200 lignes) à de gros fichiers monolithiques
+7. **Un test par fonction publique** au minimum
 
 ---
 
