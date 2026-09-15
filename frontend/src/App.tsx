@@ -216,7 +216,11 @@ export default function App() {
         >
           <ErrorBoundary>
             {sidePanel === "agents" ? (
-              <AgentPanel project={project} stream={stream} />
+              <AgentPanel
+                project={project}
+                stream={stream}
+                activeTicket={ticket}
+              />
             ) : (
               <ChatPanel project={project} />
             )}

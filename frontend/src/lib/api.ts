@@ -19,9 +19,11 @@ import type {
   PipelineRun,
   PlanResult,
   Project,
+  OpenPrResponse,
   ProjectUsage,
   RunFromChatResponse,
   Ticket,
+  TicketActivity,
   TicketBatchResponse,
   TicketCreate,
   TicketDraft,
@@ -84,6 +86,14 @@ export const api = {
       post(`/projects/${projectId}/plan`, { description }),
   },
   tickets: {
+    activity: (projectId: string, ticketId: string): Promise<TicketActivity> =>
+      request(`/projects/${projectId}/tickets/${ticketId}/activity`),
+    openPr: (
+      projectId: string,
+      ticketId: string,
+      branch: string,
+    ): Promise<OpenPrResponse> =>
+      post(`/projects/${projectId}/tickets/${ticketId}/open-pr`, { branch }),
     list: (projectId: string): Promise<Ticket[]> =>
       request(`/projects/${projectId}/tickets`),
     create: (projectId: string, data: TicketCreate): Promise<Ticket> =>

@@ -197,3 +197,14 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : `.gitignore` est lui-même versionné. Le modifier sur un dépôt client produit un diff visible qui annonce exactement ce qu'on voulait garder hors du dépôt. `.git/info/exclude` a la même sémantique, reste local au clone et n'apparaît ni dans l'historique ni dans un diff. Le défaut diffère selon l'origine parce qu'un dépôt cloné appartient déjà à quelqu'un d'autre : on peut toujours choisir de partager ensuite, on ne peut pas défaire un push.
 **Alternative rejetée** : Un réglage global (le bon choix dépend du projet, pas de la machine) ; `.gitignore` (versionné, donc contre-productif) ; retirer automatiquement de l'index les artefacts déjà suivis (`git rm --cached` modifie l'historique à venir du dépôt de l'utilisateur : ça se propose, ça ne se fait pas en silence).
 **Détail** : voir `tickets/done/ticket-062-artefacts-locaux-ou-versionnes.md`.
+
+---
+
+## ADR-022 — L'agent de workflow pousse et ouvre la PR, il ne merge jamais
+
+**Date** : 2026-09-15
+**Décision** : `GitHubWorkflowService` pousse la branche du ticket puis ouvre sa PR. Aucune méthode publique, aucun appel, ne merge — deux tests le verrouillent, dont un qui inspecte le code source du module.
+**Raison** : merger, c'est décider qu'un travail est bon. C'est le seul point du pipeline où un humain tranche, et c'est précisément ce qui rend acceptable tout le reste de l'automatisation : un agent qui mergerait rendrait la relecture facultative.
+**Corollaire** : le push n'est **jamais** forcé. Cette branche part dans le dépôt de l'utilisateur, parfois celui d'un client ; écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
+**Alternative rejetée** : merger automatiquement quand la CI est verte (une CI verte dit que le code passe, pas qu'il est bon) ; pousser en `--force` pour éviter les rejets (le rejet est l'information).
+**Détail** : voir `tickets/done/ticket-064-agent-workflow-github.md`.

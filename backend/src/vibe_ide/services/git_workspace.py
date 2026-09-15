@@ -152,6 +152,20 @@ class GitWorkspaceService:
         listing = await self._run("ls-files", "--others", "--exclude-standard")
         return tuple(path for path in listing.splitlines() if path)
 
+    async def push_branch(self, branch_name: str) -> None:
+        """Pousse `branch_name` sur `origin`, en suivi de branche.
+
+        C'était le maillon manquant : `create-pr` demandait à GitHub une
+        branche `head` que rien n'avait jamais poussée, et GitHub refusait une
+        référence qu'il ne connaissait pas.
+
+        **Jamais de push forcé.** Cette branche part dans le dépôt de
+        l'utilisateur, parfois celui d'un client : écraser une référence
+        distante peut détruire du travail qui n'est pas le nôtre. Si le push
+        est refusé, c'est à l'utilisateur de trancher.
+        """
+        await self._run("push", "--set-upstream", "origin", branch_name)
+
     async def current_diff(self) -> str:
         """Return the diff of the working tree against HEAD, staged or not.
 

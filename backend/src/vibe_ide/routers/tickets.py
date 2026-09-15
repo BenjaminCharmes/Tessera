@@ -6,6 +6,10 @@ from pydantic import BaseModel
 from vibe_ide.config import settings
 from vibe_ide.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketStatus, TicketStatusUpdate
 from vibe_ide.services.github_service import GitHubService, PRStatus
+from vibe_ide.services.database import list_runs
+from vibe_ide.services.git_workspace import GitWorkspaceError, GitWorkspaceService
+from vibe_ide.services.github_workflow import GitHubWorkflowService, WorkflowError
+from vibe_ide.services.project_loader import load_project
 from vibe_ide.services.project_loader import ProjectLoader
 from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.ticket_service import TicketService
@@ -196,4 +200,128 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
         ci_status=status.ci_status,
         pr_url=status.pr_url,
         pr_number=status.pr_number,
+    )
+
+
+# ------------------------------------------------------------------
+# Suivi d'un ticket et ouverture de PR — ticket-064
+# ------------------------------------------------------------------
+
+
+class TicketRunSummary(BaseModel):
+    id: str
+    started_at: str
+    finished_at: str | None = None
+    rounds: int | None = None
+    approved: bool | None = None
+    final_status: str | None = None
+    total_cost_usd: float = 0.0
+
+
+class TicketActivity(BaseModel):
+    """Ce qu'un ticket a produit, rassemblé en un endroit.
+
+    L'information existait, éparpillée entre la base, le ticket et GitHub : il
+    fallait sortir de l'IDE et lire `git log` pour savoir ce qu'un ticket
+    avait réellement changé.
+    """
+
+    ticket_id: str
+    runs: list[TicketRunSummary] = []
+    pr_number: int | None = None
+    github_remote: str | None = None
+
+
+class OpenPrRequest(BaseModel):
+    branch: str
+
+
+class OpenPrResponse(BaseModel):
+    pr_number: int
+    pr_url: str
+    branch: str
+
+
+@router.get("/{project_id}/tickets/{ticket_id}/activity", response_model=TicketActivity)
+async def get_ticket_activity(project_id: str, ticket_id: str) -> TicketActivity:
+    ticket = await _svc(project_id).get_ticket(ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail=f"Ticket {ticket_id} introuvable")
+
+    project_path = settings.ide_workspace_dir / project_id
+    rows = await list_runs(settings.ide_db_path, project_id, limit=50)
+    runs = [
+        TicketRunSummary(
+            id=str(row["id"]),
+            started_at=str(row["started_at"]),
+            finished_at=row.get("finished_at"),
+            rounds=row.get("rounds"),
+            approved=bool(row["approved"]) if row.get("approved") is not None else None,
+            final_status=row.get("final_status"),
+            total_cost_usd=float(row.get("total_cost_usd") or 0.0),
+        )
+        for row in rows
+        if row.get("ticket_id") == ticket_id
+    ]
+
+    project = None
+    try:
+        project = load_project(project_path)
+    except Exception:  # noqa: BLE001 — un projet illisible ne doit pas casser le suivi
+        project = None
+
+    return TicketActivity(
+        ticket_id=ticket_id,
+        runs=runs,
+        pr_number=ticket.pr_number,
+        github_remote=getattr(project, "github_remote", None),
+    )
+
+
+@router.post("/{project_id}/tickets/{ticket_id}/open-pr", response_model=OpenPrResponse)
+async def open_pull_request_for_ticket(
+    project_id: str, ticket_id: str, body: OpenPrRequest
+) -> OpenPrResponse:
+    """Pousse la branche du ticket **puis** ouvre sa PR.
+
+    L'ordre est le correctif : `create-pr` demandait jusqu'ici à GitHub une
+    branche `head` que rien n'avait jamais poussée.
+
+    Aucun merge : c'est le seul point où un humain tranche.
+    """
+    ticket_svc = _svc(project_id)
+    ticket = await ticket_svc.get_ticket(ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail=f"Ticket {ticket_id} introuvable")
+
+    project_path = settings.ide_workspace_dir / project_id
+    project = load_project(project_path)
+    github = None
+    if project.github_remote and settings.github_token:
+        github = GitHubService(token=settings.github_token, repo=project.github_remote)
+
+    service = GitHubWorkflowService(
+        git_workspace=GitWorkspaceService(project_path),
+        github=github,
+        base_branch=settings.github_base_branch,
+    )
+
+    try:
+        result = await service.open_pull_request(
+            branch=body.branch,
+            ticket_id=ticket_id,
+            ticket_title=ticket.title,
+            ticket_body=ticket.body or "",
+        )
+    except WorkflowError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except GitWorkspaceError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Le push de la branche a échoué : {exc}",
+        ) from exc
+
+    await ticket_svc.set_pr_number(ticket_id, result.pr_number)
+    return OpenPrResponse(
+        pr_number=result.pr_number, pr_url=result.pr_url, branch=result.branch
     )

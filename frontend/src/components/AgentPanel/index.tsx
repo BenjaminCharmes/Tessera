@@ -1,16 +1,23 @@
 import RoundBadge from "./RoundBadge";
 import QuotaBadge from "./QuotaBadge";
+import TicketActivity from "./TicketActivity";
 import AgentBlock from "./AgentBlock";
 import PipelineSummary from "./PipelineSummary";
-import type { Project } from "../../types/api";
+import type { Project, Ticket } from "../../types/api";
 import type { UseOrchestratorStreamResult } from "../../hooks/useOrchestratorStream";
 
 interface AgentPanelProps {
   project: Project | null;
   stream: UseOrchestratorStreamResult;
+  /** Ticket sélectionné, pour afficher ce qu'il a produit (ticket-064). */
+  activeTicket?: Ticket | null;
 }
 
-export default function AgentPanel({ project, stream }: AgentPanelProps) {
+export default function AgentPanel({
+  project,
+  stream,
+  activeTicket = null,
+}: AgentPanelProps) {
   const {
     status,
     ticketId,
@@ -140,6 +147,13 @@ export default function AgentPanel({ project, stream }: AgentPanelProps) {
           </button>
         </div>
       )}
+
+      {/* Ce que le ticket a produit : runs, branche, PR (ticket-064). */}
+      <TicketActivity
+        projectId={project?.id ?? null}
+        ticket={activeTicket}
+        branch={lastResult?.branch ?? null}
+      />
     </div>
   );
 }

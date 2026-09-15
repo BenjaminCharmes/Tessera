@@ -277,3 +277,29 @@ export interface RemovalPlan {
   is_symlink: boolean;
   unpushed_commits: number;
 }
+
+// ------------------------------------------------- suivi par ticket --------
+// ticket-064 — ce qu'un ticket a produit, rassemblé en un endroit.
+
+export interface TicketRunSummary {
+  id: string;
+  started_at: string;
+  finished_at: string | null;
+  rounds: number | null;
+  approved: boolean | null;
+  final_status: string | null;
+  total_cost_usd: number;
+}
+
+export interface TicketActivity {
+  ticket_id: string;
+  runs: TicketRunSummary[];
+  pr_number: number | null;
+  github_remote: string | null;
+}
+
+export interface OpenPrResponse {
+  pr_number: number;
+  pr_url: string;
+  branch: string;
+}

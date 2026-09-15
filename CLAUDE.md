@@ -181,10 +181,10 @@ dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
 - **Phase 8 terminée** — couverture des routers (86 → 93,5 %), quota réel de
   l'abonnement, lancement de pipeline depuis le chat, outillage Windows
   (`doctor`, `scripts/vibe.ps1`), ADR chargés automatiquement
-- **Phase 9 en cours** — recentrage sur les fonctionnalités de base :
-  `ticket-061` (lier un projet à GitHub), `ticket-062` (artefacts versionnés ou
-  locaux), `ticket-063` (retirer un projet), `ticket-064` (suivi par ticket et
-  agent de workflow GitHub)
+- **Phase 9 terminée** — liaison d'un projet à GitHub, artefacts versionnés ou
+  locaux par projet (`.git/info/exclude`, ADR-021), retrait d'un projet sans
+  perte de fichiers, suivi par ticket et ouverture de PR (ADR-022 : jamais de
+  merge). Aucun ticket ouvert
 - **Workflow allégé** : plus de PR ni d'attente de CI pendant cette phase, les
   commits vont directement sur `develop`. `main` reste le point de retour
 - Toujours pas d'auth et pas de déploiement cloud — hors scope pour l'instant
