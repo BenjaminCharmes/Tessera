@@ -27,6 +27,7 @@ from vibe_ide.services.pipeline_run import PipelineRun, set_status
 
 if TYPE_CHECKING:
     from vibe_ide.services.doc_updater import DocUpdaterService
+    from vibe_ide.services.quota_tracker import QuotaTracker
     from vibe_ide.services.git_workspace import GitWorkspaceService
     from vibe_ide.services.security_auditor import SecurityAuditorService
     from vibe_ide.services.test_runner import TestRunnerService
@@ -59,6 +60,7 @@ class Orchestrator:
         project_path: Optional[Path] = None,
         git_workspace: Optional["GitWorkspaceService"] = None,
         run_max_budget_usd: float = 0.0,
+        quota_tracker: Optional["QuotaTracker"] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -75,6 +77,13 @@ class Orchestrator:
         self._git_workspace = git_workspace
         self._run_max_budget_usd = run_max_budget_usd
         self._spent_usd = 0.0
+        # Le quota d'abonnement est la ressource réellement finie en mode
+        # `agent_sdk` : la dépense estimée de ticket-052 ne la mesure pas.
+        self._quota_tracker = quota_tracker
+
+    @property
+    def quota(self) -> Optional["QuotaTracker"]:
+        return self._quota_tracker
 
     @property
     def spent_usd(self) -> float:
@@ -181,6 +190,31 @@ class Orchestrator:
                 self._log(
                     f"[{project_id}] run interrompu : {self.spent_usd:.2f} USD "
                     f"dépensés sur {self._run_max_budget_usd:.2f} autorisés"
+                )
+                break
+
+            # Seconde condition d'arrêt : le quota réel de l'abonnement. Un
+            # quota inconnu ne bloque pas — un provider muet doit rester
+            # indiscernable d'un quota confortable (ticket-054).
+            if self._quota_tracker is not None and self._quota_tracker.is_low():
+                snapshot = self._quota_tracker.snapshot
+                _logger.warning(
+                    "run_quota_low",
+                    extra={"utilization": snapshot.utilization if snapshot else None},
+                )
+                self._log(
+                    f"[{project_id}] run interrompu : quota d'abonnement à "
+                    f"{(snapshot.utilization * 100) if snapshot else 0:.0f} %"
+                )
+                await callback(
+                    OrchestratorEvent(
+                        type=EventType.QUOTA_UPDATED,
+                        ticket_id="",
+                        data={
+                            **self._quota_tracker.as_event_data(),
+                            "run_interrupted": True,
+                        },
+                    )
                 )
                 break
 

@@ -176,3 +176,14 @@ Format : ADR léger (Architecture Decision Record).
 **Décision** : Le chat conversationnel (ticket-048) écrit sur une branche `chat/<horodatage>` et commite son travail, exactement comme un run de pipeline le fait sur sa branche de ticket. Il ne laisse jamais l'arbre de travail sale.
 **Raison** : ADR-018 fait reposer l'enchaînement des tickets sur un arbre propre au démarrage de chaque run. Un chat qui écrit sans committer enverrait le ticket suivant en `blocked` sans qu'aucun agent n'ait tourné. Traiter le chat comme un producteur de travail de première classe évite d'inventer un second régime d'écriture à côté de celui du pipeline.
 **Alternative rejetée** : Limiter le chat aux fichiers hors arbre suivi et proposer un diff (sûr, mais fait du chat un outil de seconde classe) ; poser un verrou qui empêche le pipeline de démarrer (simple, mais sérialise chat et pipeline alors qu'ils travaillent sur des branches distinctes). Une branche `chat/*` de trop se supprime ; un arbre cassé bloque la file.
+
+---
+
+## ADR-020 — Deux plafonds distincts : dépense estimée et quota réel
+
+**Date** : 2026-09-15
+**Décision** : Un run autonome s'arrête sur **deux** conditions indépendantes, vérifiées entre deux tickets : la dépense cumulée estimée (`RUN_MAX_BUDGET_USD`, ticket-052) et le quota d'abonnement réel remonté par le fournisseur (`QuotaTracker`, ticket-054). Un quota **inconnu** ne bloque jamais.
+**Raison** : Les deux mesurent des choses différentes. La dépense estimée se calcule à partir des tokens et d'une grille tarifaire ; le quota est une fenêtre glissante imposée par le fournisseur, qui peut couper un run alors qu'aucun plafond local n'a bougé. Ne suivre que l'un des deux laisse l'autre panne intacte.
+**Alternative rejetée** : Déduire le quota de la dépense estimée (les deux ne sont pas proportionnels) ; traiter l'absence d'événement comme un quota nul (un fournisseur muet deviendrait indiscernable d'un quota épuisé, et l'IDE refuserait de travailler sans raison).
+**Invariant** : la vérification se fait **entre** deux tickets, jamais au milieu d'un — s'arrêter en cours de ticket laisserait son travail non commité, ce qu'ADR-018 interdit.
+**Détail** : voir `tickets/done/ticket-054-quota-abonnement.md`.

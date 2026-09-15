@@ -1,4 +1,5 @@
 import RoundBadge from "./RoundBadge";
+import QuotaBadge from "./QuotaBadge";
 import AgentBlock from "./AgentBlock";
 import PipelineSummary from "./PipelineSummary";
 import type { Project } from "../../types/api";
@@ -19,6 +20,7 @@ export default function AgentPanel({ project, stream }: AgentPanelProps) {
     lastResult,
     errorMessage,
     events,
+    quota,
     clear,
   } = stream;
 
@@ -60,6 +62,7 @@ export default function AgentPanel({ project, stream }: AgentPanelProps) {
           )}
         </span>
         <div className="flex items-center gap-2">
+          <QuotaBadge quota={quota} />
           {project && !ticketId && (
             <span className="text-xs text-zinc-600">{project.name}</span>
           )}

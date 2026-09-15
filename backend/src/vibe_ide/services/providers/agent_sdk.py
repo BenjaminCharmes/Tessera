@@ -4,6 +4,7 @@ from typing import Any
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
+    RateLimitEvent,
     ResultMessage,
     StreamEvent,
     TextBlock,
@@ -16,6 +17,7 @@ from vibe_ide.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from vibe_ide.services.quota_tracker import QuotaTracker
 
 _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 
@@ -118,6 +120,9 @@ class ClaudeAgentSDKProvider:
     ) -> None:
         self._max_turns = max_turns
         self._max_budget_usd = max_budget_usd
+        # Le provider est le seul endroit qui voit les messages du SDK : c'est
+        # donc ici que le quota se capte, et sa forme s'arrête ici (ticket-054).
+        self.quota = QuotaTracker()
         self._allowed_tools = list(allowed_tools) if allowed_tools is not None else list(_ALLOWED_TOOLS)
 
     async def complete(
@@ -170,7 +175,12 @@ class ClaudeAgentSDKProvider:
         result: ResultMessage | None = None
 
         async for message in query(prompt=user, options=options):
-            if isinstance(message, ResultMessage):
+            if isinstance(message, RateLimitEvent):
+                # L'état du quota d'abonnement : la seule mesure de la
+                # ressource réellement finie en mode abonnement. Un provider
+                # qui n'en émet pas laisse le tracker vide, et rien ne casse.
+                self.quota.observe(getattr(message, "rate_limit_info", None))
+            elif isinstance(message, ResultMessage):
                 result = message
             elif isinstance(message, StreamEvent):
                 # Forwarded live for display only — the authoritative record

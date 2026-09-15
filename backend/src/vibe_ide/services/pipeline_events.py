@@ -29,6 +29,7 @@ class EventType(str, Enum):
     VALIDATION_DONE = "validation_done"
     DOC_UPDATED = "doc_updated"
     COMMIT_CREATED = "commit_created"
+    QUOTA_UPDATED = "quota_updated"
 
 
 class OrchestratorEvent(BaseModel):

@@ -4,6 +4,7 @@ import type {
   AgentRole,
   OrchestratorEvent,
   PipelineResult,
+  QuotaState,
   TicketStatus,
 } from "../types/api";
 
@@ -18,6 +19,8 @@ interface StreamState {
   currentTokens: string;
   lastResult: PipelineResult | null;
   errorMessage: string | null;
+  /** Dernier état connu du quota d'abonnement, ou null tant que rien n'est remonté. */
+  quota: QuotaState | null;
 }
 
 export interface UseOrchestratorStreamResult extends StreamState {
@@ -35,6 +38,7 @@ const INITIAL: StreamState = {
   currentTokens: "",
   lastResult: null,
   errorMessage: null,
+  quota: null,
 };
 
 function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
@@ -84,6 +88,11 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
             ? ev.data["message"]
             : "Pipeline error",
       };
+    case "quota_updated":
+      // Le quota d'abonnement est la ressource réellement finie : l'afficher
+      // évite d'être coupé sans comprendre pourquoi (ticket-054).
+      return { ...s, events, quota: ev.data as unknown as QuotaState };
+
     default:
       return { ...s, events };
   }

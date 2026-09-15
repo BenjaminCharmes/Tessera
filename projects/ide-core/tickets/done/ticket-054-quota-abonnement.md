@@ -2,7 +2,7 @@
 id: ticket-054
 title: "Suivre le quota réel de l'abonnement, pas seulement la dépense estimée"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -51,13 +51,13 @@ Ce manque est explicitement noté en fin de ticket-052 et dans l'issue #61.
 
 ## Critères d'acceptation
 
-- [ ] Les événements de limite du SDK sont captés et normalisés
-- [ ] `QuotaTracker` expose la proportion consommée et l'heure de réinit
-- [ ] L'état du quota est diffusé via WebSocket et visible dans l'UI
-- [ ] Le mode autonome s'arrête **entre deux tickets** quand le quota est bas
-- [ ] Un provider muet laisse le tracker vide, sans rien casser
-- [ ] Le mode `anthropic_api` n'affiche pas de quota d'abonnement
-- [ ] `uv run pytest -q` et `uv run mypy src/` verts
+- [x] Les événements de limite du SDK sont captés et normalisés
+- [x] `QuotaTracker` expose la proportion consommée et l'heure de réinit
+- [x] L'état du quota est diffusé via WebSocket et visible dans l'UI
+- [x] Le mode autonome s'arrête **entre deux tickets** quand le quota est bas
+- [x] Un provider muet laisse le tracker vide, sans rien casser
+- [x] Le mode `anthropic_api` n'affiche pas de quota d'abonnement
+- [x] `uv run pytest -q` et `uv run mypy src/` verts
 
 ## Dépendances
 
@@ -73,3 +73,25 @@ ajoute une seconde condition.
 - **Moyen** — la forme des événements dépend de la version du SDK. Mitigation :
   la normaliser derrière un modèle interne dès la capture, et traiter l'absence
   d'événement comme le cas nominal plutôt que comme une erreur.
+
+## Livré
+
+| Couche | Contenu |
+|---|---|
+| `quota_tracker.py` | `QuotaSnapshot`, `QuotaTracker`, normalisation depuis le SDK |
+| `providers/agent_sdk.py` | Capture des `RateLimitEvent` dans la boucle de messages |
+| `orchestrator.py` | Seconde condition d'arrêt, entre deux tickets (ADR-020) |
+| `pipeline_events.py` | Événement `quota_updated` |
+| Frontend | `QuotaBadge`, quota suivi dans `useOrchestratorStream` |
+
+Le SDK expose `RateLimitInfo` avec `status`, `utilization`, `resets_at` et
+`rate_limit_type` — exactement ce qu'il fallait. La forme du SDK est normalisée
+dès la capture et ne va pas plus loin.
+
+## Effet de bord corrigé
+
+L'union `EventType` du frontend était restée à **six** valeurs alors que le
+pipeline en émet **quinze** : les neuf manquantes traversaient l'UI sans type,
+donc sans traitement possible, et rien ne le signalait.
+`test_event_types_alignment.py` garde désormais les deux côtés alignés, dans
+les deux sens.

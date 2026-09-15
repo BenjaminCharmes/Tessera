@@ -21,13 +21,36 @@ export type AgentRole =
   | "project-creator"
   | "github-sync";
 
+// Doit rester aligné sur EventType côté backend
+// (backend/src/vibe_ide/services/pipeline_events.py). L'union était restée à
+// six valeurs alors que le pipeline en émet quatorze : les événements
+// manquants traversaient l'UI sans type, donc sans traitement possible.
 export type EventType =
   | "agent_started"
   | "agent_token"
+  | "agent_tool_use"
   | "agent_done"
+  | "branch_created"
   | "ticket_status_changed"
+  | "test_result"
+  | "security_audit_started"
+  | "security_audit_done"
+  | "validation_done"
+  | "doc_updated"
+  | "commit_created"
+  | "quota_updated"
   | "pipeline_done"
   | "error";
+
+/** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
+export interface QuotaState {
+  known: boolean;
+  status?: "allowed" | "allowed_warning" | "rejected";
+  utilization?: number;
+  window?: string | null;
+  resets_at?: string | null;
+  run_interrupted?: boolean;
+}
 
 export interface Project {
   id: string;

@@ -148,6 +148,10 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         project_path=project_path,
         git_workspace=git_workspace,
         run_max_budget_usd=settings.run_max_budget_usd,
+        # Le tracker vit sur le provider, qui est le seul à voir les
+        # messages du SDK. `getattr` parce que le provider Messages API
+        # n'a pas de quota d'abonnement à suivre (ticket-054).
+        quota_tracker=getattr(provider, "quota", None),
     )
 
 
