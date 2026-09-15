@@ -36,6 +36,16 @@ packages = ["src/vibe_ide"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 addopts = "-m 'not integration'"
+filterwarnings = [
+    # Course connue entre le thread interne d'aiosqlite et le portail de
+    # `TestClient` : le cycle de vie de l'application ouvre une connexion sur
+    # la boucle du portail, dont le thread n'est pas toujours joint avant la
+    # fermeture de cette boucle. Se produit uniquement sous Windows, sur les
+    # tests WebSocket, et ne concerne que le harnais de test — aucun chemin
+    # de production n'est en cause. Filtré pour que le reste de la sortie
+    # reste significatif (ticket-053).
+    "ignore::pytest.PytestUnhandledThreadExceptionWarning",
+]
 markers = [
     "integration: tests nécessitant une session Claude Code authentifiée et qui facturent l'abonnement Claude (dés-activés en CI) — pas une ANTHROPIC_API_KEY",
 ]
@@ -47,7 +57,7 @@ omit = ["*/tests/*", "*/__pycache__/*"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
-fail_under = 70
+fail_under = 85
 
 [tool.mypy]
 strict = true

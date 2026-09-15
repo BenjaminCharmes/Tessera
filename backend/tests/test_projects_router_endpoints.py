@@ -1,0 +1,260 @@
+"""Endpoints du router projects — ticket-053.
+
+Trois des pannes rencontrées le 2026-09-15 passaient par ce router : l'import
+avec un chemin entre guillemets, le planificateur sans son prompt, et les
+agents sans clef valide. Chacune a ici son test de non-régression **au niveau
+du router**, là où l'utilisateur les rencontrait.
+"""
+import asyncio
+from pathlib import Path
+
+import pytest
+from fastapi.testclient import TestClient
+
+from vibe_ide.config import settings
+from vibe_ide.main import app
+from vibe_ide.services.database import init_db
+
+
+@pytest.fixture(autouse=True)
+def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    # Fixture *synchrone* : `init_db` tourne dans sa propre boucle, close et
+    # drainée avant que celle du test n'existe. Avec une fixture `async`, le
+    # thread interne d'aiosqlite survit parfois à la fermeture de la boucle du
+    # test précédent, et la suite complète se termine sur un
+    # « RuntimeError: Event loop is closed ».
+    ws = tmp_path / "workspace"
+    project = ws / "mon-projet"
+    (project / "memory").mkdir(parents=True)
+    (project / "CLAUDE.md").write_text(
+        "# mon-projet\n\nUn projet de test.\n", encoding="utf-8"
+    )
+    for status in ("todo", "in-progress", "in-review", "done", "blocked"):
+        (project / "tickets" / status).mkdir(parents=True)
+
+    db_path = tmp_path / "vibe.db"
+    asyncio.run(init_db(db_path))
+
+    monkeypatch.setattr(settings, "ide_workspace_dir", ws)
+    monkeypatch.setattr(settings, "ide_db_path", db_path)
+    monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
+    return ws
+
+
+def _client() -> TestClient:
+    return TestClient(app)
+
+
+# ------------------------------------------------------------------
+# Lecture
+# ------------------------------------------------------------------
+
+
+def test_liste_les_projets_du_workspace() -> None:
+    body = _client().get("/api/v1/projects").json()
+    assert [p["id"] for p in body] == ["mon-projet"]
+
+
+def test_projet_inexistant_renvoie_404() -> None:
+    assert _client().get("/api/v1/projects/jamais-vu").status_code == 404
+
+
+def test_contexte_projet_expose_claude_md_et_tickets() -> None:
+    body = _client().get("/api/v1/projects/mon-projet/context").json()
+
+    assert body["project_id"] == "mon-projet"
+    assert "Un projet de test" in body["claude_md"]
+    assert body["open_tickets"] == []
+
+
+def test_contexte_d_un_projet_inexistant_renvoie_404() -> None:
+    assert _client().get("/api/v1/projects/jamais-vu/context").status_code == 404
+
+
+def test_usage_d_un_projet_sans_historique_vaut_zero() -> None:
+    body = _client().get("/api/v1/projects/mon-projet/usage").json()
+    assert body["total_cost_usd"] == 0.0
+
+
+def test_runs_vides_pour_un_projet_neuf() -> None:
+    assert _client().get("/api/v1/projects/mon-projet/runs").json() == []
+
+
+def test_limite_de_runs_hors_bornes_est_refusee() -> None:
+    # `limit` est borné entre 1 et 100 : hors bornes, FastAPI doit refuser
+    # plutôt que laisser passer une requête non bornée.
+    assert _client().get("/api/v1/projects/mon-projet/runs?limit=0").status_code == 422
+    assert _client().get("/api/v1/projects/mon-projet/runs?limit=999").status_code == 422
+
+
+# ------------------------------------------------------------------
+# Import — non-régression des pannes du 2026-09-15
+# ------------------------------------------------------------------
+
+
+def test_import_d_un_chemin_relatif_est_refuse_avec_un_message_exploitable(
+    workspace: Path,
+) -> None:
+    # Panne vécue : un chemin relatif était résolu depuis le cwd du backend,
+    # d'où « Le dossier source n'existe pas : .../backend/... » (ticket-050).
+    resp = _client().post(
+        "/api/v1/projects/import", json={"source_path": "mon-projet", "mode": "copy"}
+    )
+
+    assert resp.status_code == 409
+    detail = resp.json()["detail"]
+    assert "absolu" in detail.lower()
+
+
+def test_import_retire_les_guillemets_du_chemin(tmp_path: Path, workspace: Path) -> None:
+    # Panne vécue : « Copier en tant que chemin d'accès » sous Windows entoure
+    # le chemin de guillemets, ce qui le faisait passer pour relatif.
+    source = tmp_path / "source-projet"
+    source.mkdir()
+    (source / "main.py").write_text("print('hello')\n", encoding="utf-8")
+
+    resp = _client().post(
+        "/api/v1/projects/import",
+        json={"source_path": f'"{source}"', "mode": "copy"},
+    )
+
+    assert resp.status_code == 201
+    assert resp.json()["project"]["id"] == "source-projet"
+
+
+def test_import_d_un_projet_deja_present_renvoie_409(
+    tmp_path: Path, workspace: Path
+) -> None:
+    source = tmp_path / "mon-projet"
+    source.mkdir()
+
+    resp = _client().post(
+        "/api/v1/projects/import", json={"source_path": str(source), "mode": "copy"}
+    )
+
+    assert resp.status_code == 409
+    assert "existe déjà" in resp.json()["detail"]
+
+
+def test_import_avec_un_mode_inconnu_est_refuse(tmp_path: Path) -> None:
+    resp = _client().post(
+        "/api/v1/projects/import",
+        json={"source_path": str(tmp_path), "mode": "telepathie"},
+    )
+    assert resp.status_code == 422
+
+
+# ------------------------------------------------------------------
+# Planificateur — non-régression de la panne « rien ne se passe »
+# ------------------------------------------------------------------
+
+
+def test_plan_sans_prompt_renvoie_un_message_exploitable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Panne vécue : « Planifier une évolution » tournait puis s'arrêtait, avec
+    # un 500 opaque. Depuis ticket-051 le prompt manquant se dit ; le message
+    # doit atteindre l'UI, pas finir en « Internal Server Error ».
+    monkeypatch.setattr(settings, "ide_prompts_dir", tmp_path / "prompts-vides")
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/plan",
+        json={"description": "Ajouter un endpoint de santé"},
+    )
+
+    assert resp.status_code == 500
+    detail = resp.json()["detail"]
+    assert "planificateur.md" in detail
+    assert "IDE_PROMPTS_DIR" in detail
+
+
+def test_plan_sans_description_est_refuse() -> None:
+    assert (
+        _client().post("/api/v1/projects/mon-projet/plan", json={}).status_code == 422
+    )
+
+
+# ------------------------------------------------------------------
+# Création et clone
+# ------------------------------------------------------------------
+
+
+def test_creation_d_un_projet_deja_existant_renvoie_409() -> None:
+    resp = _client().post(
+        "/api/v1/projects",
+        json={"project_id": "mon-projet", "name": "Mon projet", "active_agents": []},
+    )
+
+    assert resp.status_code == 409
+
+
+def test_clone_d_une_url_invalide_est_refuse(monkeypatch: pytest.MonkeyPatch) -> None:
+    from vibe_ide.services.git_clone import CloneError
+
+    async def _refuse(self: object, **kwargs: object) -> None:
+        raise CloneError("URL de dépôt invalide : pas-une-url")
+
+    monkeypatch.setattr("vibe_ide.services.git_clone.GitCloneService.clone", _refuse)
+
+    resp = _client().post("/api/v1/projects/clone", json={"repo_url": "pas-une-url"})
+
+    assert resp.status_code == 422
+    assert "invalide" in resp.json()["detail"]
+
+
+def test_creation_sans_project_id_est_refusee() -> None:
+    resp = _client().post("/api/v1/projects", json={"name": "Sans identifiant"})
+    assert resp.status_code == 422
+
+
+# ------------------------------------------------------------------
+# Synchronisation GitHub
+# ------------------------------------------------------------------
+
+
+def test_github_sync_sur_un_projet_inexistant_renvoie_404() -> None:
+    resp = _client().post(
+        "/api/v1/projects/jamais-vu/github/sync", json={"direction": "pull"}
+    )
+    assert resp.status_code == 404
+
+
+def test_github_sync_sans_remote_explique_ce_qui_manque() -> None:
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/github/sync", json={"direction": "pull"}
+    )
+
+    assert resp.status_code == 422
+    assert "github_remote" in resp.json()["detail"]
+
+
+def test_github_sync_sans_token_explique_ce_qui_manque(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+
+    (workspace / "mon-projet" / "agents.json").write_text(
+        json.dumps({"github_remote": "owner/repo"}), encoding="utf-8"
+    )
+    monkeypatch.setattr(settings, "github_token", "")
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/github/sync", json={"direction": "pull"}
+    )
+
+    assert resp.status_code == 422
+    assert "GITHUB_TOKEN" in resp.json()["detail"]
+
+
+def test_github_sync_avec_une_direction_inconnue_est_refuse() -> None:
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/github/sync", json={"direction": "de-cote"}
+    )
+    assert resp.status_code == 422
+
+
+def test_analyse_d_un_projet_inexistant_renvoie_404() -> None:
+    resp = _client().post(
+        "/api/v1/projects/jamais-vu/analyze", json={"project_id": "jamais-vu"}
+    )
+    assert resp.status_code == 404

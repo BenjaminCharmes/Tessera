@@ -21,10 +21,28 @@ def _svc(project_id: str) -> TicketService:
 async def list_tickets(
     project_id: str, status: str | None = None
 ) -> list[Ticket]:
-    from vibe_ide.models.ticket import TicketStatus
-
-    filter_status = TicketStatus(status) if status else None
+    filter_status = _parse_status_filter(status)
     return await _svc(project_id).list_tickets(filter_status)
+
+
+def _parse_status_filter(status: str | None) -> TicketStatus | None:
+    """Traduit le paramètre `status` en enum, ou refuse lisiblement.
+
+    `TicketStatus(status)` lève un `ValueError` non capturé sur une valeur
+    inconnue : l'utilisateur recevait un 500 opaque là où une faute de frappe
+    dans l'URL devrait produire un refus qui nomme les valeurs acceptées
+    (ticket-053).
+    """
+    if not status:
+        return None
+    try:
+        return TicketStatus(status)
+    except ValueError as exc:
+        valid = ", ".join(s.value for s in TicketStatus)
+        raise HTTPException(
+            status_code=422,
+            detail=f"Statut inconnu : '{status}'. Valeurs acceptées : {valid}.",
+        ) from exc
 
 
 @router.post("/{project_id}/tickets", response_model=Ticket, status_code=201)
