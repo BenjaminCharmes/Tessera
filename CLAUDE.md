@@ -172,7 +172,8 @@ dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
 - **Tickets 045 à 052 livrés** : pipeline sur diff réel, décomposition de
   `run_pipeline`, skills locaux, chat conversationnel, flux git `develop`,
   échecs bruyants sur prompt manquant, plafond de dépense par run
-- **Phase 8 en cours** — `ticket-053` (couverture des routers),
-  `ticket-054` (quota réel de l'abonnement), `ticket-055` (lancer un pipeline
-  depuis le chat), `ticket-056` (robustesse Windows)
+- **Phase 8 terminée** — couverture des routers (86 → 93,5 %), quota réel de
+  l'abonnement, lancement de pipeline depuis le chat, outillage Windows
+  (`doctor`, `scripts/vibe.ps1`), ADR chargés automatiquement
+- Aucun ticket ouvert — les prochains sont à définir
 - Toujours pas d'auth et pas de déploiement cloud — hors scope pour l'instant
