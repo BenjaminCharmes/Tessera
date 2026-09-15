@@ -10,8 +10,11 @@ from vibe_ide.services.orchestrator import (
     Orchestrator,
     OrchestratorEvent,
     PipelineResult,
-    _parse_reviewer_verdict,
 )
+
+# Le parsing du verdict vit dans pipeline_text depuis ticket-045, et les étapes
+# du pipeline dans pipeline_stages depuis ticket-046.
+from vibe_ide.services.pipeline_text import _parse_reviewer_verdict
 from vibe_ide.services.git_workspace import GitWorkspaceError
 from vibe_ide.services.doc_updater import DocUpdateResult
 from vibe_ide.services.security_auditor import SecurityAuditResult, SecurityIssue
