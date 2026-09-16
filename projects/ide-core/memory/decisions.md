@@ -219,3 +219,13 @@ Format : ADR léger (Architecture Decision Record).
 **Alternative rejetée** : garder `tracked` par compatibilité (fait reposer la confidentialité sur un fichier qui peut manquer) ; avertir sans changer le défaut (l'avertissement arrive après le push).
 **Limite connue** : `.git/info/exclude` n'agit que sur les fichiers **non suivis**. Un dépôt qui versionne déjà un `CLAUDE.md` continuera d'en committer les modifications — c'est ce que `tracked_artifact_paths()` remonte à l'UI.
 
+---
+
+## ADR-024 — Un projet doit être la racine de son propre dépôt
+
+**Date** : 2026-09-16
+**Décision** : `GitWorkspaceService` vérifie, avant toute création de branche, que `git rev-parse --show-toplevel` renvoie exactement le dossier du projet. Sinon il lève `NotAGitRepository` et le run s'arrête.
+**Raison** : `--is-inside-work-tree` réussit aussi quand le dépôt trouvé est un **ancêtre**. Un dossier client posé dans `projects/` sans dépôt à sa racine faisait remonter git jusqu'au dépôt de vibe-ide : le run créait sa branche et son commit dans l'IDE, au nom du projet du client. La classe promettait « never on vibe-ide itself » sans rien qui le garantisse.
+**Conséquence** : un dossier qui regroupe plusieurs dépôts n'est pas un projet. Chaque dépôt doit être déclaré comme son propre projet.
+**Alternative rejetée** : `git init` automatique à la racine (crée un dépôt non désiré au-dessus de ceux du client) ; descendre chercher le premier sous-dépôt (choix arbitraire dès qu'il y en a plusieurs).
+

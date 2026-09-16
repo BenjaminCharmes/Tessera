@@ -307,7 +307,7 @@ async def test_not_a_git_repository_ignore_le_texte_de_stderr(
     """The repo-detection mechanism must not rely on parsing stderr text.
 
     We cannot easily force git itself to speak French in this environment,
-    so instead we prove the *mechanism*: force `_is_inside_work_tree` to
+    so instead we prove the *mechanism*: force `_is_own_repository` to
     report "not a repo", and make git fail for an unrelated reason whose
     stderr contains no "not a git repository"-like phrase in any language
     (an unknown flag). NotAGitRepository must still be raised, showing the
@@ -315,10 +315,10 @@ async def test_not_a_git_repository_ignore_le_texte_de_stderr(
     """
     service = GitWorkspaceService(repo)
 
-    async def fake_not_inside_work_tree() -> bool:
+    async def fake_not_own_repository() -> bool:
         return False
 
-    monkeypatch.setattr(service, "_is_inside_work_tree", fake_not_inside_work_tree)
+    monkeypatch.setattr(service, "_is_own_repository", fake_not_own_repository)
 
     with pytest.raises(NotAGitRepository):
         await service._run("--this-flag-does-not-exist")
@@ -384,3 +384,30 @@ async def test_create_branch_part_de_la_branche_courante_pas_de_main(
 
     log = await service._run("log", "--format=%s")
     assert "chore: travail integre sur develop" in log
+
+
+async def test_un_projet_sans_depot_propre_ne_touche_pas_au_depot_parent(
+    tmp_path: Path,
+) -> None:
+    # Panne vecue : les projets clients poses dans `projects/` sont des
+    # dossiers de documents contenant N depots en sous-dossiers, sans depot a
+    # leur racine. `git` remontait alors l'arborescence et trouvait le depot
+    # de vibe-ide lui-meme : un run sur le projet du client creait sa branche
+    # et son commit dans le depot de l'IDE.
+    parent = tmp_path / "vibe-ide"
+    parent.mkdir()
+    await _git(parent, "init", "-q")
+    await _git(parent, "config", "user.email", "t@t.local")
+    await _git(parent, "config", "user.name", "t")
+    (parent / "README.md").write_text("# ide", encoding="utf-8")
+    await _git(parent, "add", "README.md")
+    await _git(parent, "commit", "-qm", "init")
+
+    projet = parent / "projects" / "client"
+    projet.mkdir(parents=True)
+    (projet / "notes.md").write_text("# notes", encoding="utf-8")
+
+    svc = GitWorkspaceService(projet)
+
+    with pytest.raises(NotAGitRepository):
+        await svc.create_branch("ticket-001", "essai")

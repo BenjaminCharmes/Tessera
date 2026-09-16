@@ -122,6 +122,7 @@ class GitWorkspaceService:
         that is what keeps consecutive tickets in an autonomous run isolated
         from each other.
         """
+        await self._ensure_own_repository()
         if self._base_ref is None:
             self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
         self._preexisting_untracked = await self._untracked_files()
@@ -275,19 +276,48 @@ class GitWorkspaceService:
         await proc.communicate()
         return proc.returncode == 0
 
-    async def _is_inside_work_tree(self) -> bool:
-        # Locale-independent repository check: relies solely on the exit
-        # code of `git rev-parse --is-inside-work-tree`, never on stderr
-        # text, so it behaves the same whether git speaks English, French
-        # or anything else.
+    async def _is_own_repository(self) -> bool:
+        """True only if the project directory is itself the root of a repository.
+
+        `--is-inside-work-tree` is not enough, and the difference is what let
+        this class break its own promise never to touch vibe-ide. A project
+        folder with no repository of its own makes git walk *up* the tree; in
+        `projects/<client>/`, the repository it finds is vibe-ide's own. Every
+        subsequent command then succeeds — against the wrong repository.
+
+        Comparing the toplevel to the project path is the check that holds.
+        Locale-independent: it reads a path, never stderr text.
+        """
         proc = await asyncio.create_subprocess_exec(
-            "git", "rev-parse", "--is-inside-work-tree",
+            "git", "rev-parse", "--show-toplevel",
             cwd=str(self._project_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
-        await proc.communicate()
-        return proc.returncode == 0
+        stdout, _ = await proc.communicate()
+        if proc.returncode != 0:
+            return False
+        toplevel = stdout.decode("utf-8", errors="replace").strip()
+        if not toplevel:
+            return False
+        try:
+            return Path(toplevel).resolve() == self._project_path.resolve()
+        except OSError:
+            return False
+
+    async def _ensure_own_repository(self) -> None:
+        """Refuse to act at all when the project has no repository of its own."""
+        if await self._is_own_repository():
+            return
+        raise NotAGitRepository(
+            command=["git", "rev-parse", "--show-toplevel"],
+            returncode=0,
+            stderr=(
+                f"{self._project_path} n'est pas la racine d'un dépôt git. "
+                "vibe-ide refuse d'agir sur le dépôt parent : un projet qui "
+                "contient plusieurs dépôts doit être déclaré par sous-dossier."
+            ),
+        )
 
     async def _run(self, *args: str) -> str:
         command = ["git", *args]
@@ -305,7 +335,7 @@ class GitWorkspaceService:
             # `communicate()` has awaited the process, so returncode is set;
             # the `or 0` is only there to satisfy its `int | None` type.
             returncode = proc.returncode or 0
-            if not await self._is_inside_work_tree():
+            if not await self._is_own_repository():
                 raise NotAGitRepository(
                     command=command, returncode=returncode, stderr=stderr_text
                 )
