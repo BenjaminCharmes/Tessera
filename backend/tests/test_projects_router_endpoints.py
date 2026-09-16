@@ -15,6 +15,8 @@ from vibe_ide.config import settings
 from vibe_ide.main import app
 from vibe_ide.services.database import init_db
 
+from .conftest import requires_symlinks
+
 
 @pytest.fixture(autouse=True)
 def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
@@ -120,6 +122,49 @@ def test_import_retire_les_guillemets_du_chemin(tmp_path: Path, workspace: Path)
 
     assert resp.status_code == 201
     assert resp.json()["project"]["id"] == "source-projet"
+
+
+@requires_symlinks
+def test_un_projet_importe_en_symlink_exclut_ses_artefacts_du_depot(
+    tmp_path: Path, workspace: Path
+) -> None:
+    # Panne latente : `default_mode_for` existait depuis ticket-062 mais
+    # n'etait cable que sur le clone. Un depot pro lie en symlink repartait
+    # donc en `tracked`, et le premier commit de ticket y poussait
+    # `tickets/` et `memory/` — sans que rien ne le signale.
+    source = tmp_path / "depot-client"
+    (source / ".git" / "info").mkdir(parents=True)
+    (source / "main.py").write_text("x = 1", encoding="utf-8")
+
+    resp = _client().post(
+        "/api/v1/projects/import",
+        json={"source_path": str(source), "mode": "symlink"},
+    )
+    assert resp.status_code == 201
+
+    assert _client().get("/api/v1/projects/depot-client/artifacts").json()["mode"] == "local"
+
+    exclude = source / ".git" / "info" / "exclude"
+    assert exclude.is_file(), "l'exclusion doit etre ecrite a l'import"
+    assert "tickets/" in exclude.read_text(encoding="utf-8")
+
+
+def test_un_projet_importe_en_copie_consigne_le_mode_local(
+    tmp_path: Path, workspace: Path
+) -> None:
+    # En mode copie, `.git` n'est deliberement pas copie : il n'y a rien a
+    # exclure, mais le mode doit quand meme etre consigne pour que le depot
+    # cree plus tard herite du bon choix.
+    source = tmp_path / "projet-copie"
+    source.mkdir()
+    (source / "main.py").write_text("x = 1", encoding="utf-8")
+
+    resp = _client().post(
+        "/api/v1/projects/import",
+        json={"source_path": str(source), "mode": "copy"},
+    )
+    assert resp.status_code == 201
+    assert _client().get("/api/v1/projects/projet-copie/artifacts").json()["mode"] == "local"
 
 
 def test_import_d_un_projet_deja_present_renvoie_409(
@@ -371,9 +416,11 @@ def test_un_depot_distant_non_vide_demande_confirmation(
 
 
 def test_mode_des_artefacts_par_defaut(workspace: Path) -> None:
+    # Fallback ferme : un projet qui ne declare rien garde ses artefacts chez
+    # lui. Le defaut inverse poussait tickets/ et memory/ dans le depot.
     body = _client().get("/api/v1/projects/mon-projet/artifacts").json()
 
-    assert body["mode"] == "tracked"
+    assert body["mode"] == "local"
     assert body["already_tracked"] == []
 
 

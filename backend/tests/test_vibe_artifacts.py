@@ -43,10 +43,17 @@ async def repo(tmp_path: Path) -> Path:
 # ------------------------------------------------------------------
 
 
-def test_un_projet_cree_ou_importe_est_versionne_par_defaut() -> None:
-    # Projets personnels : les ADR ont de la valeur, on les garde.
+def test_un_projet_cree_est_versionne_par_defaut() -> None:
+    # Un projet créé par l'IDE part d'un dossier vide qui n'appartient qu'à
+    # l'utilisateur : ses ADR ont de la valeur, on les garde.
     assert default_mode_for("create") == "tracked"
-    assert default_mode_for("import") == "tracked"
+
+
+def test_un_projet_importe_est_local_par_defaut() -> None:
+    # Importer, c'est désigner un dépôt qui existait avant vibe-ide — souvent
+    # celui d'un client. Le défaut `tracked` y poussait tickets/ et memory/
+    # au premier commit de ticket, sans que rien ne le signale.
+    assert default_mode_for("import") == "local"
 
 
 def test_un_projet_clone_est_local_par_defaut() -> None:
@@ -69,9 +76,17 @@ async def test_le_mode_se_lit_dans_agents_json(repo: Path) -> None:
     assert read_artifact_mode(repo) == "local"
 
 
-async def test_sans_agents_json_le_mode_est_versionne(repo: Path) -> None:
-    # Le comportement historique : les artefacts étaient commités.
-    assert read_artifact_mode(repo) == "tracked"
+async def test_sans_agents_json_le_mode_est_local(repo: Path) -> None:
+    # Fallback fermé. Les deux erreurs ne se valent pas : des artefacts non
+    # versionnés se rattrapent d'un clic, un push dans le dépôt d'un client
+    # ne se défait pas.
+    assert read_artifact_mode(repo) == "local"
+
+
+async def test_un_agents_json_sans_la_cle_est_local(repo: Path) -> None:
+    # Cas réel : un agents.json écrit avant ticket-062 n'a pas la clé.
+    (repo / "agents.json").write_text(json.dumps({"project_id": "x"}), encoding="utf-8")
+    assert read_artifact_mode(repo) == "local"
 
 
 # ------------------------------------------------------------------

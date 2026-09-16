@@ -93,6 +93,11 @@ async def create_project(body: ProjectCreate) -> ProjectCreationResult:
         project_name=project.name,
         project_description=project.description,
     )
+    # Consigné explicitement : depuis que le défaut de lecture est `local`,
+    # un projet créé qui ne déclare rien ne verserait plus ses ADR au dépôt.
+    await apply_artifact_mode(
+        settings.ide_workspace_dir / project.id, default_mode_for("create")
+    )
     return ProjectCreationResult(project=project, agents_created=agents_created)
 
 
@@ -109,6 +114,11 @@ async def import_project(body: ProjectImport) -> ProjectImportResponse:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    # Un dépôt importé existait avant vibe-ide : ses artefacts restent locaux
+    # tant que l'utilisateur n'a pas choisi de les partager (ADR-021).
+    await apply_artifact_mode(
+        settings.ide_workspace_dir / project.id, default_mode_for("import")
+    )
     return ProjectImportResponse(project=project)
 
 

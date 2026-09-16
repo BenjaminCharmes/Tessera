@@ -45,28 +45,39 @@ _END = "# --- fin vibe-ide ---"
 def default_mode_for(origin: str) -> ArtifactMode:
     """Le défaut selon la façon dont le projet est arrivé.
 
-    Un projet cloné appartient déjà à quelqu'un d'autre : ses artefacts restent
-    locaux. On peut toujours choisir de les partager ensuite ; on ne peut pas
-    défaire un push.
+    Seul un projet **créé** par l'IDE part d'un dossier vide qui n'appartient
+    qu'à l'utilisateur : ses artefacts sont versionnés.
+
+    Un projet cloné ou **importé** existait avant vibe-ide, et souvent avant
+    l'utilisateur — c'est régulièrement le dépôt d'un client. Ses artefacts
+    restent locaux. On peut toujours choisir de les partager ensuite ; on ne
+    peut pas défaire un push.
     """
-    return "tracked" if origin in ("create", "import") else "local"
+    return "tracked" if origin == "create" else "local"
 
 
 def read_artifact_mode(project_path: Path) -> ArtifactMode:
-    """Le mode déclaré dans `agents.json`, `tracked` à défaut.
+    """Le mode déclaré dans `agents.json`, `local` à défaut.
 
-    `tracked` est le comportement historique : avant ce ticket, les artefacts
-    étaient commités avec le reste.
+    Le défaut est **fermé**, et il a changé : `tracked` était le comportement
+    historique, mais il fait reposer la confidentialité sur une déclaration
+    que rien ne garantit — un `agents.json` antérieur à ticket-062, illisible,
+    ou simplement absent, suffisait à pousser `tickets/` et `memory/` dans le
+    dépôt de quelqu'un d'autre.
+
+    Les deux erreurs ne se valent pas : des artefacts non versionnés se
+    rattrapent d'un clic, un push ne se défait pas. Un projet qui veut
+    partager ses artefacts le déclare explicitement.
     """
     agents_json = project_path / "agents.json"
     if not agents_json.is_file():
-        return "tracked"
+        return "local"
     try:
         data = json.loads(agents_json.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         _logger.warning("agents_json_illisible", extra={"path": str(agents_json)})
-        return "tracked"
-    return "local" if data.get("vibe_artifacts") == "local" else "tracked"
+        return "local"
+    return "tracked" if data.get("vibe_artifacts") == "tracked" else "local"
 
 
 async def apply_artifact_mode(project_path: Path, mode: ArtifactMode) -> None:

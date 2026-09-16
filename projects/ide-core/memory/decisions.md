@@ -208,3 +208,14 @@ Format : ADR léger (Architecture Decision Record).
 **Corollaire** : le push n'est **jamais** forcé. Cette branche part dans le dépôt de l'utilisateur, parfois celui d'un client ; écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
 **Alternative rejetée** : merger automatiquement quand la CI est verte (une CI verte dit que le code passe, pas qu'il est bon) ; pousser en `--force` pour éviter les rejets (le rejet est l'information).
 **Détail** : voir `tickets/done/ticket-064-agent-workflow-github.md`.
+
+---
+
+## ADR-023 — Le mode des artefacts échoue fermé
+
+**Date** : 2026-09-16
+**Décision** : `local` est le défaut de lecture quand `agents.json` ne déclare rien, est illisible, ou est absent ; et le défaut d'origine de tout projet **sauf** un projet créé par l'IDE. Seul `create` donne `tracked`, parce qu'il part d'un dossier vide qui n'appartient qu'à l'utilisateur. Les projets importés rejoignent les projets clonés.
+**Raison** : ADR-021 posait le mécanisme mais le faisait dépendre d'une déclaration ; `default_mode_for` n'était câblé que sur le clone, et un dépôt importé repartait en `tracked`. Les deux erreurs ne sont pas symétriques : des artefacts non versionnés se rattrapent d'un clic, un push dans le dépôt d'un client ne se défait pas. Le défaut doit donc protéger, et le partage se déclarer.
+**Alternative rejetée** : garder `tracked` par compatibilité (fait reposer la confidentialité sur un fichier qui peut manquer) ; avertir sans changer le défaut (l'avertissement arrive après le push).
+**Limite connue** : `.git/info/exclude` n'agit que sur les fichiers **non suivis**. Un dépôt qui versionne déjà un `CLAUDE.md` continuera d'en committer les modifications — c'est ce que `tracked_artifact_paths()` remonte à l'UI.
+

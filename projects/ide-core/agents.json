@@ -1,5 +1,6 @@
 {
   "project_id": "ide-core",
+  "vibe_artifacts": "tracked",
   "agents": [
     {
       "role": "orchestrateur",
@@ -32,7 +33,10 @@
     }
   ],
   "pipeline": {
-    "default": ["codeur", "reviewer"],
+    "default": [
+      "codeur",
+      "reviewer"
+    ],
     "max_review_rounds": 3,
     "auto_merge_on_approve": true
   }
