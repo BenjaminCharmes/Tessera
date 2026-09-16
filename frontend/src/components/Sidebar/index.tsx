@@ -12,75 +12,8 @@ import type {
   TicketStatus,
 } from "../../types/api";
 
-export type SidebarPanel =
-  "projects" | "tickets" | "history" | "agents" | "usage";
-
-interface IconBarProps {
-  activePanel: SidebarPanel;
-  onChangePanel: (panel: SidebarPanel) => void;
-}
-
-export function IconBar({ activePanel, onChangePanel }: IconBarProps) {
-  return (
-    <div className="flex flex-col items-center gap-1 py-3 px-1 h-full bg-zinc-900">
-      <button
-        onClick={() => onChangePanel("projects")}
-        title="Projects"
-        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
-          activePanel === "projects"
-            ? "bg-zinc-700 text-white"
-            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
-        }`}
-      >
-        ◈
-      </button>
-      <button
-        onClick={() => onChangePanel("tickets")}
-        title="Tickets"
-        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
-          activePanel === "tickets"
-            ? "bg-zinc-700 text-white"
-            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
-        }`}
-      >
-        ☰
-      </button>
-      <button
-        onClick={() => onChangePanel("history")}
-        title="Historique"
-        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
-          activePanel === "history"
-            ? "bg-zinc-700 text-white"
-            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
-        }`}
-      >
-        ⏱
-      </button>
-      <button
-        onClick={() => onChangePanel("agents")}
-        title="Agents"
-        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
-          activePanel === "agents"
-            ? "bg-zinc-700 text-white"
-            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
-        }`}
-      >
-        ⚙
-      </button>
-      <button
-        onClick={() => onChangePanel("usage")}
-        title="Usage & Coût"
-        className={`w-9 h-9 flex items-center justify-center rounded text-base transition-colors ${
-          activePanel === "usage"
-            ? "bg-zinc-700 text-white"
-            : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
-        }`}
-      >
-        $
-      </button>
-    </div>
-  );
-}
+export type { SidebarPanel } from "./panels";
+import type { SidebarPanel } from "./panels";
 
 interface SidebarProps {
   panel: SidebarPanel;

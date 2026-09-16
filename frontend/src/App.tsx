@@ -6,7 +6,8 @@ import { useRuns } from "./hooks/useRuns";
 import { useUsage } from "./hooks/useUsage";
 import { useToast } from "./hooks/useToast";
 import { useOrchestratorStream } from "./hooks/useOrchestratorStream";
-import Sidebar, { IconBar } from "./components/Sidebar";
+import Sidebar from "./components/Sidebar";
+import NavRail from "./components/Sidebar/NavRail";
 import type { SidebarPanel } from "./components/Sidebar";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
@@ -108,7 +109,7 @@ export default function App() {
       className="h-screen overflow-hidden bg-zinc-900 text-zinc-100"
       style={{
         display: "grid",
-        gridTemplateColumns: "48px 280px 1fr 320px",
+        gridTemplateColumns: "72px 280px 1fr 320px",
         gridTemplateRows: "1fr 180px",
       }}
     >
@@ -117,7 +118,7 @@ export default function App() {
         className="border-r border-zinc-700"
         style={{ gridColumn: "1", gridRow: "1 / 3" }}
       >
-        <IconBar activePanel={panel} onChangePanel={setPanel} />
+        <NavRail activePanel={panel} onChangePanel={setPanel} />
       </div>
 
       {/* Sidebar — col 2, rows 1-2 */}

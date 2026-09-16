@@ -2,7 +2,7 @@
 id: ticket-065
 title: "Pivot cockpit — l'IDE cesse d'imiter un éditeur et devient la console de la flotte"
 type: refactor
-status: todo
+status: in-progress
 pr_number: null
 priority: high
 agent: codeur
