@@ -188,7 +188,11 @@ async def list_runs(
                LEFT JOIN agent_calls ac ON ac.run_id = pr.id
                WHERE pr.project_id=?
                GROUP BY pr.id
-               ORDER BY pr.started_at DESC
+               -- `rowid` départage à égalité d'horodatage. Deux runs créés
+               -- dans la même milliseconde laissaient SQLite trancher seul :
+               -- l'historique s'affichait alors dans un ordre variable, et le
+               -- test d'ordre échouait une fois sur quelques dizaines.
+               ORDER BY pr.started_at DESC, pr.rowid DESC
                LIMIT ?""",
             (project_id, limit),
         ) as cursor:

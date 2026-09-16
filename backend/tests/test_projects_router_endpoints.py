@@ -318,6 +318,11 @@ def test_statut_git_d_un_projet_sans_depot(workspace: Path) -> None:
 
 
 def test_init_puis_statut_montre_un_depot_avec_commit(workspace: Path) -> None:
+    # Du contenu de projet, pas seulement des artefacts vibe-ide : ces derniers
+    # sont exclus dès l'init, et un dépôt qui ne contient qu'eux n'a rien à
+    # committer.
+    (workspace / "mon-projet" / "main.py").write_text("x = 1", encoding="utf-8")
+
     resp = _client().post("/api/v1/projects/mon-projet/git/init")
 
     assert resp.status_code == 200
@@ -455,6 +460,13 @@ def test_le_gitignore_du_projet_n_est_jamais_touche(workspace: Path) -> None:
 def test_les_artefacts_deja_suivis_sont_remontes(workspace: Path) -> None:
     # Ils ne sont pas retirés : les sortir de l'index est un `git rm --cached`,
     # qui se décide.
+    #
+    # Le projet déclare `tracked` **avant** l'init : depuis que l'init applique
+    # le mode déclaré, un projet qui ne déclare rien n'a plus aucun artefact
+    # suivi — et ce test n'aurait plus rien à observer.
+    (workspace / "mon-projet" / "agents.json").write_text(
+        '{"vibe_artifacts": "tracked"}', encoding="utf-8"
+    )
     _client().post("/api/v1/projects/mon-projet/git/init")
 
     body = _client().put(
@@ -486,6 +498,11 @@ def test_le_plan_de_retrait_nomme_le_chemin_reel(workspace: Path) -> None:
 
 def test_le_plan_compte_les_commits_non_pousses(workspace: Path) -> None:
     # C'est ce que l'utilisateur perdrait : la confirmation doit le nommer.
+    #
+    # Il faut du contenu de projet, pas seulement des artefacts vibe-ide :
+    # ceux-ci sont désormais exclus dès l'init, et un dépôt qui ne contient
+    # qu'eux n'a aucun commit.
+    (workspace / "mon-projet" / "main.py").write_text("x = 1", encoding="utf-8")
     _client().post("/api/v1/projects/mon-projet/git/init")
 
     body = _client().get("/api/v1/projects/mon-projet/removal-plan").json()

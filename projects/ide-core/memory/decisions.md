@@ -214,10 +214,10 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-023 — Le mode des artefacts échoue fermé
 
 **Date** : 2026-09-16
-**Décision** : `local` est le défaut de lecture quand `agents.json` ne déclare rien, est illisible, ou est absent ; et le défaut d'origine de tout projet **sauf** un projet créé par l'IDE. Seul `create` donne `tracked`, parce qu'il part d'un dossier vide qui n'appartient qu'à l'utilisateur. Les projets importés rejoignent les projets clonés.
-**Raison** : ADR-021 posait le mécanisme mais le faisait dépendre d'une déclaration ; `default_mode_for` n'était câblé que sur le clone, et un dépôt importé repartait en `tracked`. Les deux erreurs ne sont pas symétriques : des artefacts non versionnés se rattrapent d'un clic, un push dans le dépôt d'un client ne se défait pas. Le défaut doit donc protéger, et le partage se déclarer.
-**Alternative rejetée** : garder `tracked` par compatibilité (fait reposer la confidentialité sur un fichier qui peut manquer) ; avertir sans changer le défaut (l'avertissement arrive après le push).
-**Limite connue** : `.git/info/exclude` n'agit que sur les fichiers **non suivis**. Un dépôt qui versionne déjà un `CLAUDE.md` continuera d'en committer les modifications — c'est ce que `tracked_artifact_paths()` remonte à l'UI.
+**Décision** : `local` est le défaut quand `agents.json` ne déclare rien, est illisible ou absent, et le défaut d'origine de tout projet **sauf** un projet créé par l'IDE. Les projets importés rejoignent les clonés. `init_repository` applique le mode déclaré avant son `git add -A`.
+**Raison** : ADR-021 posait le mécanisme mais le faisait dépendre d'une déclaration, et `default_mode_for` n'était câblé que sur le clone. Les deux erreurs ne sont pas symétriques : des artefacts non versionnés se rattrapent d'un clic, un push dans le dépôt d'un client ne se défait pas. Le défaut protège, le partage se déclare.
+**Alternative rejetée** : garder `tracked` (fait reposer la confidentialité sur un fichier qui peut manquer) ; avertir sans changer le défaut (l'avertissement arrive après le push).
+**Limite** : `.git/info/exclude` n'agit que sur le non-suivi. Un dépôt qui versionne déjà un `CLAUDE.md` en commitera les modifications — c'est ce que `tracked_artifact_paths()` remonte.
 
 ---
 
@@ -234,9 +234,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-025 — Une question sans réponse reprend sur une hypothèse énoncée
 
 **Date** : 2026-09-16
-**Décision** : Un agent peut suspendre son tour pour poser une question (`DialogueChannel.ask`). Passé `dialogue_timeout_s`, il reprend seul : on lui répond qu'aucun humain n'est disponible et qu'il doit **choisir et énoncer son hypothèse**. En mode autonome, le délai ne démarre même pas — la question se résout immédiatement.
-**Raison** : ADR-018 fait dépendre toute la file des tickets d'un arbre propre, et un run suspendu tient du travail non commité. Une question laissée sans réponse pendant un déjeuner bloquerait la file entière. Une hypothèse explicite, qui part dans le rapport du run, est relisible ; une hypothèse silencieuse — ce qui se passait avant — ne l'est pas.
-**Corollaire** : les messages spontanés de l'utilisateur transitent par une **file distincte**, vidée entre deux tours dans `build_context`. Un « au fait, pense aux tests » envoyé pendant qu'une question est posée ne doit jamais être pris pour la réponse à cette question.
-**Alternative rejetée** : attendre indéfiniment (bloque la file, et l'agent tient du travail non commité) ; ne jamais suspendre et laisser l'agent trancher seul (c'est l'état d'avant, dont le défaut est précisément l'hypothèse invisible) ; déduire la réponse d'un message spontané (confond deux intentions et fait écrire du mauvais code sur un malentendu).
-**Détail** : voir `tickets/in-progress/ticket-066-dialogue-agent.md`.
-
+**Décision** : Un agent peut suspendre son tour pour poser une question. Passé `dialogue_timeout_s`, il reprend seul : on lui répond qu'aucun humain n'est disponible et qu'il doit **choisir et énoncer son hypothèse**. En mode autonome, le délai ne démarre pas.
+**Raison** : ADR-018 fait dépendre la file des tickets d'un arbre propre, et un run suspendu tient du travail non commité : une question sans réponse le temps d'un déjeuner bloquerait la file. Une hypothèse explicite, qui part dans le rapport du run, est relisible ; une hypothèse silencieuse — l'état d'avant — ne l'est pas.
+**Corollaire** : les messages spontanés ont une file **distincte**, vidée entre deux tours dans `build_context` : un « pense aux tests » ne doit jamais valoir réponse à « on casse l'API ? ».
+**Alternative rejetée** : attendre indéfiniment (bloque la file) ; laisser l'agent trancher seul en silence (le défaut d'origine) ; déduire la réponse d'un message spontané.

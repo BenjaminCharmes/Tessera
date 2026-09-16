@@ -217,3 +217,16 @@ async def test_get_project_usage_aggregates(db_path: Path) -> None:
     # sorted by cost desc
     assert usage["per_ticket"][0]["ticket_id"] == "ticket-001"
     assert usage["per_ticket"][0]["total_cost_usd"] == pytest.approx(0.01)
+
+
+async def test_list_runs_departage_a_egalite_d_horodatage(db_path: Path) -> None:
+    # Instabilite vecue : deux runs crees dans la meme milliseconde ont le meme
+    # `started_at`, et SQLite tranchait seul. La suite echouait une fois sur
+    # quelques dizaines, sur un test qui n'avait pas change.
+    await init_db(db_path)
+
+    ids = [await create_run(db_path, "project-1", f"ticket-{i:03d}") for i in range(6)]
+
+    runs = await list_runs(db_path, "project-1", limit=10)
+
+    assert [r["id"] for r in runs] == list(reversed(ids))

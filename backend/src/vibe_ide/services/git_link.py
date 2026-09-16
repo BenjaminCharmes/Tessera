@@ -17,6 +17,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from vibe_ide.services.vibe_artifacts import apply_artifact_mode, read_artifact_mode
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -126,6 +127,14 @@ async def init_repository(project_path: Path) -> GitStatus:
     if (await _run(project_path, "config", "user.email"))[0] != 0:
         await _run(project_path, "config", "user.email", "vibe-ide@localhost")
         await _run(project_path, "config", "user.name", "vibe-ide")
+
+    # Le mode des artefacts s'applique **ici**, pas plus tôt : `.git/info/`
+    # n'existe pas avant `git init`, donc un projet importé a pu déclarer
+    # `local` dans son `agents.json` sans qu'aucune exclusion n'ait pu être
+    # écrite. Sans ce rattrapage, le `git add -A` qui suit emporte `tickets/`
+    # et `memory/` dans le tout premier commit — et au premier push, dans le
+    # dépôt du client (ADR-021).
+    await apply_artifact_mode(project_path, read_artifact_mode(project_path))
 
     await _run(project_path, "add", "-A", "--", ".")
     code, _, err = await _run(project_path, "commit", "-q", "-m", _INITIAL_COMMIT_MESSAGE)

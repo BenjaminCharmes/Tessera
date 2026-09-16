@@ -1,4 +1,5 @@
 """Liaison d'un projet à un dépôt GitHub — ticket-061."""
+import json
 import asyncio
 from pathlib import Path
 
@@ -203,3 +204,30 @@ async def test_init_sur_un_projet_imbrique_cree_bien_son_propre_depot(
     status = await git_status(nested)
     assert status.is_own_repository is True
     assert (nested / ".git").exists()
+
+
+async def test_init_applique_le_mode_des_artefacts_avant_le_premier_commit(
+    tmp_path: Path,
+) -> None:
+    # Panne : `apply_artifact_mode` ne peut rien ecrire tant qu'il n'y a pas de
+    # `.git`. Un projet importe en mode copie declare donc `local` dans son
+    # agents.json, mais sans exclusion effective. `init_repository` faisait
+    # ensuite `git add -A` : tickets/ et memory/ partaient dans le tout premier
+    # commit, puis dans le depot du client au premier push.
+    projet = tmp_path / "depot-client"
+    (projet / "tickets" / "todo").mkdir(parents=True)
+    (projet / "memory").mkdir()
+    (projet / "tickets" / "todo" / "ticket-001.md").write_text("x", encoding="utf-8")
+    (projet / "memory" / "decisions.md").write_text("y", encoding="utf-8")
+    (projet / "main.py").write_text("z", encoding="utf-8")
+    (projet / "agents.json").write_text(
+        json.dumps({"vibe_artifacts": "local"}), encoding="utf-8"
+    )
+
+    await init_repository(projet)
+
+    fichiers = (await _git(projet, "ls-files")).split()
+    assert "main.py" in fichiers, "le code du projet doit bien etre commite"
+    assert not [f for f in fichiers if f.startswith("tickets/")], fichiers
+    assert not [f for f in fichiers if f.startswith("memory/")], fichiers
+    assert "agents.json" not in fichiers, fichiers
