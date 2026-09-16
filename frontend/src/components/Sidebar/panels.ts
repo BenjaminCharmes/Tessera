@@ -8,6 +8,7 @@
 export type SidebarPanel =
   | "projects"
   | "tickets"
+  | "files"
   | "history"
   | "agents"
   | "usage";

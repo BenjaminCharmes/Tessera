@@ -25,6 +25,7 @@ const mockAgentsList = vi.mocked(api.agents.list);
 const mockProject = {
   id: "mon-projet",
   name: "mon-projet",
+  path: "/ws/mon-projet",
   description: "",
   active_agents: [],
   stack: null,
@@ -36,6 +37,7 @@ const mockGithubProject = {
   ...mockProject,
   id: "my-repo",
   name: "my-repo",
+  path: "/ws/my-repo",
   github_remote: "https://github.com/owner/my-repo",
 };
 

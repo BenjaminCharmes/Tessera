@@ -6,6 +6,7 @@ import type { Project, Ticket } from "../types/api";
 const mockProject: Project = {
   id: "ide-core",
   name: "IDE Core",
+  path: "/ws/IDE Core",
   description: "Bootstrap project",
   active_agents: ["codeur"],
   stack: null,

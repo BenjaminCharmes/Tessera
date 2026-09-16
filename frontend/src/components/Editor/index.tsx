@@ -1,26 +1,42 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import { detectLanguage } from "./useMonaco";
-import { readFile, writeFile } from "../../lib/fs";
+import { readFile } from "../../lib/fs";
 import type { Ticket } from "../../types/api";
 
 interface EditorProps {
   ticket: Ticket | null;
+  /** Fichier ouvert depuis l'arbre ; prioritaire sur celui du ticket. */
+  openFilePath?: string | null;
 }
+
+/**
+ * Lecteur de fichier (ticket-065).
+ *
+ * L'éditeur est **en lecture seule** depuis le pivot cockpit : vibe-ide
+ * orchestre, VSCode édite. Monaco reste parce qu'il coloriera un diff mieux
+ * qu'un `<pre>`, pas parce qu'on prétend remplacer un éditeur — il n'y a ici
+ * ni LSP, ni recherche multi-fichiers, ni debugger, et il n'y en aura pas.
+ *
+ * L'écriture passait par un `PUT /fs/write` débouncé : un fichier modifié ici
+ * pendant qu'un agent travaille sur la même branche produisait un conflit que
+ * personne n'arbitrait. Le bouton « Ouvrir dans VSCode » de l'en-tête de projet
+ * remplace ce chemin.
+ */
 
 const WELCOME =
   "# vibe-ide\n\nSélectionne un projet puis un ticket dans la sidebar.\n";
 const DEBOUNCE_MS = 500;
 
-export default function Editor({ ticket }: EditorProps) {
+export default function Editor({ ticket, openFilePath = null }: EditorProps) {
   const [content, setContent] = useState<string>(WELCOME);
   const [filePath, setFilePath] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!ticket) {
+    const cible = openFilePath ?? ticket?.file_path ?? null;
+    if (!cible) {
       setContent(WELCOME);
       setFilePath(null);
       setError(null);
@@ -30,10 +46,10 @@ export default function Editor({ ticket }: EditorProps) {
     setLoading(true);
     setError(null);
 
-    readFile(ticket.file_path)
+    readFile(cible)
       .then((text) => {
         setContent(text);
-        setFilePath(ticket.file_path);
+        setFilePath(cible);
       })
       .catch((err: unknown) => {
         setError(`Impossible de lire le fichier : ${String(err)}`);
@@ -41,21 +57,9 @@ export default function Editor({ ticket }: EditorProps) {
         setFilePath(null);
       })
       .finally(() => setLoading(false));
-  }, [ticket?.file_path]);
+  }, [openFilePath, ticket?.file_path]);
 
-  function handleChange(value: string | undefined) {
-    if (value === undefined || !filePath) return;
-    setContent(value);
-
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      writeFile(filePath, value).catch((err: unknown) => {
-        console.error("Erreur sauvegarde:", err);
-      });
-    }, DEBOUNCE_MS);
-  }
-
-  const language = detectLanguage(filePath ?? ticket?.file_path ?? null);
+  const language = detectLanguage(filePath ?? openFilePath ?? ticket?.file_path ?? null);
 
   return (
     <div className="flex h-full flex-col">
@@ -83,14 +87,13 @@ export default function Editor({ ticket }: EditorProps) {
           theme="vs-dark"
           language={language}
           value={content}
-          onChange={handleChange}
           options={{
             minimap: { enabled: false },
             wordWrap: "on",
             fontSize: 14,
             lineNumbers: "on",
             scrollBeyondLastLine: false,
-            readOnly: loading,
+            readOnly: true,
             padding: { top: 16 },
           }}
         />

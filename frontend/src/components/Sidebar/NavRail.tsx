@@ -61,6 +61,15 @@ const DESTINATIONS: Destination[] = [
     ),
   },
   {
+    panel: "files",
+    label: "Fichiers",
+    icon: (
+      <svg {...ICON}>
+        <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4l2 2.5h7A1.5 1.5 0 0 1 19 9v8.5A1.5 1.5 0 0 1 17.5 19h-13A1.5 1.5 0 0 1 3 17.5z" />
+      </svg>
+    ),
+  },
+  {
     panel: "history",
     label: "Historique",
     icon: (

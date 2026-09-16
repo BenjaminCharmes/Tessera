@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProjectHeader from "./ProjectHeader";
+import FileTree from "../FileTree";
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
 import GitLinkPanel from "./GitLinkPanel";
@@ -43,6 +44,8 @@ interface SidebarProps {
   onBatchCreated?: (tickets: Ticket[]) => void;
   onSelectTicketById?: (ticketId: string) => void;
   onAgentCreated?: (role: string) => void;
+  openFilePath?: string | null;
+  onOpenFile?: (path: string) => void;
 }
 
 export default function Sidebar({
@@ -71,6 +74,8 @@ export default function Sidebar({
   onBatchCreated,
   onSelectTicketById,
   onAgentCreated,
+  openFilePath,
+  onOpenFile,
 }: SidebarProps) {
   // L'état git est replié par défaut : il occupe de la place, et on ne le
   // consulte qu'au moment de lier un dépôt ou de retirer le projet. Ce qui
@@ -116,6 +121,18 @@ export default function Sidebar({
           onBatchCreated={onBatchCreated}
         />
       )}
+      {panel === "files" &&
+        (activeProject ? (
+          <FileTree
+            racine={activeProject.path}
+            fichierActif={openFilePath ?? null}
+            onSelectFile={onOpenFile ?? (() => {})}
+          />
+        ) : (
+          <p className="px-3 py-3 text-xs text-zinc-500">
+            Sélectionne un projet pour parcourir ses fichiers.
+          </p>
+        ))}
       {panel === "history" && (
         <RunHistory
           runs={runs}

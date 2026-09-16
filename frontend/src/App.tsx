@@ -21,7 +21,11 @@ import type { Project, Ticket } from "./types/api";
 export default function App() {
   const { project, ticket, setProject, setTicket } = useActiveProject();
   const [panel, setPanel] = useState<SidebarPanel>("projects");
-  const [showKanban, setShowKanban] = useState(false);
+  // Le centre montre le tableau des tickets par défaut, pas un fichier : le
+  // cockpit sert à suivre la flotte, et l'édition est partie dans VSCode
+  // (ticket-065).
+  const [showKanban, setShowKanban] = useState(true);
+  const [openFilePath, setOpenFilePath] = useState<string | null>(null);
   // Colonne de droite : observer un run, ou discuter (ticket-048).
   const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
   const { toasts, addToast, removeToast } = useToast();
@@ -66,7 +70,8 @@ export default function App() {
   function handleSelectProject(p: typeof project) {
     setProject(p);
     setPanel("tickets");
-    setShowKanban(false);
+    setShowKanban(true);
+    setOpenFilePath(null);
     stream.clear();
   }
 
@@ -153,6 +158,11 @@ export default function App() {
             onBatchCreated={handleBatchCreated}
             onSelectTicketById={handleSelectTicketById}
             onAgentCreated={handleAgentCreated}
+            openFilePath={openFilePath}
+            onOpenFile={(path) => {
+              setOpenFilePath(path);
+              setShowKanban(false);
+            }}
           />
         </ErrorBoundary>
       </div>
@@ -163,7 +173,7 @@ export default function App() {
         style={{ gridColumn: "3", gridRow: "1" }}
       >
         <ErrorBoundary>
-          {showKanban ? (
+          {showKanban && !openFilePath ? (
             <KanbanView
               byStatus={tickets.byStatus}
               activeTicket={ticket}
@@ -172,7 +182,7 @@ export default function App() {
               onRunPipeline={handleRunPipeline}
             />
           ) : (
-            <Editor ticket={ticket} />
+            <Editor ticket={ticket} openFilePath={openFilePath} />
           )}
         </ErrorBoundary>
       </div>

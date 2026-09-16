@@ -39,3 +39,25 @@ export async function listDir(path: string): Promise<string[]> {
   if (!res.ok) throw new Error(`Failed to list ${path}: ${res.statusText}`);
   return res.json() as Promise<string[]>;
 }
+
+/** Une entrée de dossier telle que la renvoie `GET /api/v1/fs/list`. */
+export interface DirEntry {
+  name: string;
+  path: string;
+  is_dir: boolean;
+}
+
+/**
+ * Liste un dossier, avec le type de chaque entrée (ticket-065).
+ *
+ * Passe toujours par le backend, **y compris sous Tauri** : la commande Rust
+ * `list_dir` ne renvoie que des noms, sans dire lesquels sont des dossiers, et
+ * un arbre a besoin de le savoir. Le backend tourne de toute façon — tout le
+ * reste de l'application l'interroge déjà en HTTP — donc s'en remettre à lui
+ * ici évite de faire diverger deux implémentations pour un seul appel.
+ */
+export async function listEntries(path: string): Promise<DirEntry[]> {
+  const res = await fetch(`/api/v1/fs/list?path=${encodeURIComponent(path)}`);
+  if (!res.ok) throw new Error(`Failed to list ${path}: ${res.statusText}`);
+  return res.json() as Promise<DirEntry[]>;
+}
