@@ -17,6 +17,7 @@ const mockCreate = vi.mocked(api.projects.create);
 const mockProject = {
   id: "mon-projet",
   name: "mon-projet",
+  path: "/ws/projet",
   description: "Un projet",
   active_agents: [],
   stack: null,

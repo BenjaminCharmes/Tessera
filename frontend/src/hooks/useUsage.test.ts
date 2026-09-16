@@ -86,7 +86,10 @@ describe("useUsage", () => {
   it("clears usage when projectId changes to null", async () => {
     const { result, rerender } = renderHook(
       ({ id }: { id: string | null }) => useUsage(id),
-      { initialProps: { id: "proj-1" } },
+      // Annoté : sans cela le type de Props est déduit comme `{ id: string }`,
+      // et le rerender à null que ce test existe précisément pour couvrir ne
+      // compile pas.
+      { initialProps: { id: "proj-1" } as { id: string | null } },
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.usage).toEqual(USAGE);

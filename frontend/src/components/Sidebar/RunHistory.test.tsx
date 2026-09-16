@@ -12,6 +12,7 @@ const RUN_DONE: PipelineRun = {
   rounds: 2,
   approved: true,
   final_status: "done",
+  total_cost_usd: 0,
 };
 
 const RUN_BLOCKED: PipelineRun = {
@@ -22,6 +23,7 @@ const RUN_BLOCKED: PipelineRun = {
   rounds: 3,
   approved: false,
   final_status: "blocked",
+  total_cost_usd: 0,
 };
 
 const RUN_IN_PROGRESS: PipelineRun = {
@@ -32,6 +34,7 @@ const RUN_IN_PROGRESS: PipelineRun = {
   rounds: null,
   approved: null,
   final_status: null,
+  total_cost_usd: 0,
 };
 
 describe("RunHistory", () => {

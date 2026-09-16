@@ -5,8 +5,26 @@ import * as apiModule from "../lib/api";
 import type { Project } from "../types/api";
 
 const PROJECTS: Project[] = [
-  { id: "proj-1", name: "Project 1", description: "First" },
-  { id: "proj-2", name: "Project 2", description: "Second" },
+  {
+    id: "proj-1",
+    name: "Project 1",
+    path: "/ws/proj-1",
+    description: "First",
+    active_agents: [],
+    stack: null,
+    raw_claude_md: "",
+    github_remote: null,
+  },
+  {
+    id: "proj-2",
+    name: "Project 2",
+    path: "/ws/proj-2",
+    description: "Second",
+    active_agents: [],
+    stack: null,
+    raw_claude_md: "",
+    github_remote: null,
+  },
 ];
 
 vi.mock("../lib/api", () => ({

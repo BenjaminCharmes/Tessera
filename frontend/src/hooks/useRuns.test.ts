@@ -12,6 +12,7 @@ const RUN_1: PipelineRun = {
   rounds: 2,
   approved: true,
   final_status: "done",
+  total_cost_usd: 0,
 };
 
 const RUN_2: PipelineRun = {
@@ -22,6 +23,7 @@ const RUN_2: PipelineRun = {
   rounds: null,
   approved: null,
   final_status: null,
+  total_cost_usd: 0,
 };
 
 vi.mock("../lib/api", () => ({

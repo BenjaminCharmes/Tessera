@@ -269,7 +269,7 @@ describe("api.projects.import", () => {
       ok: true,
       json: () => Promise.resolve(response),
     });
-    const result = await api.projects.import({ path: "/local/project" });
+    const result = await api.projects.import({ source_path: "/local/project", mode: "copy" });
     expect(result).toEqual(response);
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/v1/projects/import",
@@ -286,7 +286,15 @@ describe("api.tickets.batch", () => {
       json: () => Promise.resolve(response),
     });
     const result = await api.tickets.batch("ide-core", [
-      { title: "T1", description: "" },
+      {
+        title: "T1",
+        type: "feat",
+        priority: "medium",
+        agent: "codeur",
+        description: "",
+        acceptance_criteria: [],
+        depends_on_index: [],
+      },
     ]);
     expect(result).toEqual(response);
     expect(mockFetch).toHaveBeenCalledWith(

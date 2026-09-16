@@ -26,7 +26,6 @@ interface EditorProps {
 
 const WELCOME =
   "# vibe-ide\n\nSélectionne un projet puis un ticket dans la sidebar.\n";
-const DEBOUNCE_MS = 500;
 
 export default function Editor({ ticket, openFilePath = null }: EditorProps) {
   const [content, setContent] = useState<string>(WELCOME);

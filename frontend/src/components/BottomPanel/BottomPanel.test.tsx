@@ -40,9 +40,9 @@ describe("BottomPanel", () => {
   });
 
   it("renders agent_started event", () => {
-    const ev = makeEvent("agent_started", { round: 2 }, { agent: "coder" });
+    const ev = makeEvent("agent_started", { round: 2 }, { agent: "codeur" });
     render(<BottomPanel events={[ev]} />);
-    expect(screen.getByText(/coder/)).toBeTruthy();
+    expect(screen.getByText(/codeur/)).toBeTruthy();
     expect(screen.getByText(/tour 2/)).toBeTruthy();
   });
 
@@ -87,12 +87,12 @@ describe("BottomPanel", () => {
 
   it("renders multiple events in order", () => {
     const events = [
-      makeEvent("agent_started", { round: 1 }, { agent: "coder" }),
-      makeEvent("agent_done", {}, { agent: "coder" }),
+      makeEvent("agent_started", { round: 1 }, { agent: "codeur" }),
+      makeEvent("agent_done", {}, { agent: "codeur" }),
     ];
     render(<BottomPanel events={events} />);
-    expect(screen.getByText(/coder.*démarré/)).toBeTruthy();
-    expect(screen.getByText(/coder.*terminé/)).toBeTruthy();
+    expect(screen.getByText(/codeur.*démarré/)).toBeTruthy();
+    expect(screen.getByText(/codeur.*terminé/)).toBeTruthy();
   });
 
   it("handles agent_started with missing agent and round", () => {

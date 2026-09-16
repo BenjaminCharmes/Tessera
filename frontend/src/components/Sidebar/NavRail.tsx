@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import type { SidebarPanel } from "./panels";
 
 /**
@@ -21,7 +22,7 @@ interface NavRailProps {
 interface Destination {
   panel: SidebarPanel;
   label: string;
-  icon: JSX.Element;
+  icon: ReactElement;
 }
 
 // Toutes les icônes partagent viewBox, trait et jointures : c'est ce qui fait

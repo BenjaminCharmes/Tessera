@@ -114,6 +114,9 @@ export interface PipelineResult {
   final_status: TicketStatus;
   rounds: number;
   approved: boolean;
+  /** Branche du run et commit produit — absents tant que le run n'a rien commité. */
+  branch?: string | null;
+  commit_sha?: string | null;
 }
 
 export interface PipelineRun {

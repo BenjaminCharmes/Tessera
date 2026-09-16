@@ -7,24 +7,32 @@ const T1: Ticket = {
   id: "ticket-001",
   title: "Fix login",
   status: "todo",
-  description: "",
   type: "feat",
   priority: "high",
   depends_on: [],
-  created_at: "2026-07-13T10:00:00Z",
-  updated_at: "2026-07-13T10:00:00Z",
+  created: "2026-07-13T10:00:00Z",
+  agent: "codeur",
+  github_issue_url: null,
+  pr_number: null,
+  body: "",
+  project_id: "ide-core",
+  file_path: "tickets/todo/ticket-001.md",
 };
 
 const T2: Ticket = {
   id: "ticket-002",
   title: "Add tests",
   status: "in-progress",
-  description: "",
   type: "test",
   priority: "medium",
   depends_on: [],
-  created_at: "2026-07-13T10:00:00Z",
-  updated_at: "2026-07-13T10:00:00Z",
+  created: "2026-07-13T10:00:00Z",
+  agent: "codeur",
+  github_issue_url: null,
+  pr_number: null,
+  body: "",
+  project_id: "ide-core",
+  file_path: "tickets/todo/ticket-002.md",
 };
 
 describe("KanbanColumn", () => {
