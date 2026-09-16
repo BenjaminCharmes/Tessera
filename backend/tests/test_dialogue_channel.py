@@ -93,3 +93,30 @@ async def test_un_message_spontane_ne_repond_pas_a_la_question() -> None:
 
     assert await question == NO_HUMAN_ANSWER
     assert canal.drain() == ["au fait, pense aux tests"]
+
+
+async def test_la_question_est_annoncee_a_l_exterieur() -> None:
+    # Le canal ne connait pas le transport, mais quelqu'un doit prevenir l'UI :
+    # une question posee sans evenement ressemble, cote utilisateur, a un run
+    # qui s'est fige tout seul.
+    annoncees: list[str] = []
+
+    async def _annoncer(question: str) -> None:
+        annoncees.append(question)
+
+    canal = DialogueChannel(timeout_s=0.01, interactive=True, on_question=_annoncer)
+    await canal.ask("On casse l'API ?")
+
+    assert annoncees == ["On casse l'API ?"]
+
+
+async def test_en_mode_autonome_rien_n_est_annonce() -> None:
+    annoncees: list[str] = []
+
+    async def _annoncer(question: str) -> None:
+        annoncees.append(question)
+
+    canal = DialogueChannel(timeout_s=5.0, interactive=False, on_question=_annoncer)
+    await canal.ask("On casse l'API ?")
+
+    assert annoncees == []

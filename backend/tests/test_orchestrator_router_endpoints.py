@@ -68,7 +68,12 @@ class _FakeOrchestrator:
         self.calls: list[tuple[str, str]] = []
 
     async def run_pipeline(
-        self, project_id: str, ticket_id: str, on_event: object, run_id: str | None = None
+        self,
+        project_id: str,
+        ticket_id: str,
+        on_event: object,
+        run_id: str | None = None,
+        dialogue: object = None,
     ) -> PipelineResult:
         self.calls.append((project_id, ticket_id))
         await on_event(  # type: ignore[operator]
@@ -203,3 +208,83 @@ def test_stream_en_mode_autonome(monkeypatch: pytest.MonkeyPatch) -> None:
         assert ws.receive_json()["type"] == "pipeline_done"
 
     assert fake.calls == [("mon-projet", "autonomous:2")]
+
+
+# ------------------------------------------------------------------
+# Dialogue pendant un run — ticket-066
+# ------------------------------------------------------------------
+
+
+class _OrchestrateurQuiDemande:
+    """Orchestrateur double : pose une question, puis rend ce qu'on lui repond."""
+
+    def __init__(self) -> None:
+        self.reponse: str | None = None
+        self.contexte_utilisateur: list[str] = []
+
+    async def run_pipeline(
+        self,
+        project_id: str,
+        ticket_id: str,
+        on_event: object,
+        run_id: str | None = None,
+        dialogue: object = None,
+    ) -> PipelineResult:
+        assert dialogue is not None, "le run doit recevoir un canal de dialogue"
+        self.reponse = await dialogue.ask("On casse l'API ?")  # type: ignore[attr-defined]
+        self.contexte_utilisateur = dialogue.drain()  # type: ignore[attr-defined]
+        await on_event(  # type: ignore[operator]
+            OrchestratorEvent(type=EventType.PIPELINE_DONE, ticket_id=ticket_id,
+                              data={"approved": True, "rounds": 1})
+        )
+        return _approved(ticket_id)
+
+
+def test_le_stream_transmet_la_reponse_de_l_utilisateur_a_l_agent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Panne de conception : la socket ne lisait qu'un seul message entrant, la
+    # commande de demarrage, puis n'emettait plus. Impossible de repondre a un
+    # agent qui bloque.
+    fake = _OrchestrateurQuiDemande()
+
+    async def _build(project_id: str) -> _OrchestrateurQuiDemande:
+        return fake
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+
+    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
+        ws.send_json({"ticket_id": "ticket-001"})
+
+        question = ws.receive_json()
+        assert question["type"] == "agent_question"
+        assert question["data"]["question"] == "On casse l'API ?"
+
+        ws.send_json({"type": "answer", "text": "non, on ajoute un champ"})
+        assert ws.receive_json()["type"] == "pipeline_done"
+
+    assert fake.reponse == "non, on ajoute un champ"
+
+
+def test_le_stream_transmet_un_message_spontane(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Un message spontane ne doit pas etre pris pour la reponse a la question
+    # en cours : il attend le tour d'agent suivant.
+    fake = _OrchestrateurQuiDemande()
+
+    async def _build(project_id: str) -> _OrchestrateurQuiDemande:
+        return fake
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+
+    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
+        ws.send_json({"ticket_id": "ticket-001"})
+        assert ws.receive_json()["type"] == "agent_question"
+
+        ws.send_json({"type": "interject", "text": "pense aux tests"})
+        ws.send_json({"type": "answer", "text": "non"})
+        assert ws.receive_json()["type"] == "pipeline_done"
+
+    assert fake.reponse == "non"
+    assert fake.contexte_utilisateur == ["pense aux tests"]

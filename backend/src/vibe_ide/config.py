@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     # quota de l'abonnement). Voir memory/decisions.md pour le choix de 1.0 USD.
     llm_max_turns: int = 30
     llm_max_budget_usd: float = 1.0
+
+    # Au-delà, un agent qui a posé une question reprend seul en énonçant son
+    # hypothèse (ticket-066). Le délai existe parce qu'un run suspendu tient
+    # du travail non commité, et bloque la file des tickets suivants
+    # (ADR-018) : attendre indéfiniment une réponse coûte plus cher qu'une
+    # hypothèse explicite et relisible.
+    dialogue_timeout_s: float = 300.0
     # Plafond de dépense d'une CONVERSATION du chat (ticket-048).
     # `llm_max_budget_usd` borne un appel ; sans ce second plafond, une
     # longue discussion épuiserait le quota de l'abonnement sans que

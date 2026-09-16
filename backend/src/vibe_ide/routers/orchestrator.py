@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
@@ -5,6 +6,8 @@ from vibe_ide.config import settings
 from vibe_ide.models.ticket import TicketStatus
 from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.agent_runner import AgentRunner
+from vibe_ide.services.dialogue import DialogueChannel
+from vibe_ide.services.pipeline_events import EventType
 from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.doc_updater import DocUpdaterService
 from vibe_ide.services.git_workspace import GitWorkspaceService
@@ -223,8 +226,39 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
                     event.timestamp.isoformat(),
                 )
 
+            async def announce_question(question: str, tid: str = ticket_id) -> None:
+                await send_event(
+                    OrchestratorEvent(
+                        type=EventType.AGENT_QUESTION,
+                        ticket_id=tid,
+                        data={"question": question},
+                    )
+                )
+
+            dialogue = DialogueChannel(
+                timeout_s=settings.dialogue_timeout_s,
+                interactive=True,
+                on_question=announce_question,
+            )
+
+            # La socket ne lisait qu'un seul message entrant — la commande de
+            # démarrage — puis n'émettait plus : répondre à un agent bloqué
+            # était impossible. La lecture tourne maintenant en parallèle de
+            # l'émission, pour toute la durée du run.
+            async def read_inbound() -> None:
+                while True:
+                    message = await websocket.receive_json()
+                    texte = str(message.get("text", ""))
+                    if message.get("type") == "answer":
+                        dialogue.answer(texte)
+                    elif message.get("type") == "interject":
+                        dialogue.interject(texte)
+
+            reader = asyncio.create_task(read_inbound())
             try:
-                result = await orchestrator.run_pipeline(project_id, ticket_id, send_event, run_id=run_id)
+                result = await orchestrator.run_pipeline(
+                    project_id, ticket_id, send_event, run_id=run_id, dialogue=dialogue
+                )
                 await finish_run(
                     settings.ide_db_path,
                     run_id,
@@ -234,6 +268,10 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
                 )
             except ValueError as exc:
                 await websocket.send_json({"error": str(exc)})
+            finally:
+                # Le lecteur attend indéfiniment un message : sans annulation,
+                # la connexion ne se fermerait jamais après la fin du run.
+                reader.cancel()
         else:
             await websocket.send_json({"error": "ticket_id ou mode=autonomous requis"})
 

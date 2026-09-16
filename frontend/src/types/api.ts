@@ -30,6 +30,7 @@ export type EventType =
   | "agent_token"
   | "agent_tool_use"
   | "agent_done"
+  | "agent_question"
   | "branch_created"
   | "ticket_status_changed"
   | "test_result"

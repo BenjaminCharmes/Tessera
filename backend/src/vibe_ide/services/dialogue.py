@@ -29,6 +29,8 @@ clock: it resolves at once. Waiting an hour per question would otherwise burn a
 whole overnight run on questions no one could ever answer.
 """
 import asyncio
+from collections.abc import Awaitable, Callable
+from typing import Optional
 
 from vibe_ide.utils.logger import get_logger
 
@@ -52,9 +54,18 @@ class DialogueChannel:
     reprise sur délai et le mode autonome testables sans lancer un run.
     """
 
-    def __init__(self, timeout_s: float = 300.0, interactive: bool = True) -> None:
+    def __init__(
+        self,
+        timeout_s: float = 300.0,
+        interactive: bool = True,
+        on_question: Optional[Callable[[str], Awaitable[None]]] = None,
+    ) -> None:
         self._timeout_s = timeout_s
         self._interactive = interactive
+        # Le canal ignore tout du transport, mais quelqu'un doit prévenir
+        # l'extérieur : une question posée sans événement ressemble, côté
+        # utilisateur, à un run qui s'est figé de lui-même.
+        self._on_question = on_question
         self._pending_question: str | None = None
         self._answer: asyncio.Future[str] | None = None
         # Signalé dès qu'une question est posée : l'UI (et les tests) doivent
@@ -73,6 +84,8 @@ class DialogueChannel:
         self._answer = loop.create_future()
         self._pending_question = question
         self._question_posed.set()
+        if self._on_question is not None:
+            await self._on_question(question)
         try:
             return await asyncio.wait_for(self._answer, timeout=self._timeout_s)
         except asyncio.TimeoutError:

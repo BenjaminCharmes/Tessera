@@ -20,6 +20,7 @@ class EventType(str, Enum):
     AGENT_TOOL_USE = "agent_tool_use"
     BRANCH_CREATED = "branch_created"
     AGENT_DONE = "agent_done"
+    AGENT_QUESTION = "agent_question"
     TICKET_STATUS_CHANGED = "ticket_status_changed"
     PIPELINE_DONE = "pipeline_done"
     ERROR = "error"

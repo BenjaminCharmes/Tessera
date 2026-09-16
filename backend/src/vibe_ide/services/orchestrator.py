@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Optional
 from vibe_ide.models.agent import AgentConfig, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
+from vibe_ide.services.dialogue import DialogueChannel
 from vibe_ide.services.pipeline_events import (
     EventCallback,
     EventType,
@@ -109,13 +110,21 @@ class Orchestrator:
         ticket_id: str,
         on_event: EventCallback,
         run_id: str | None = None,
+        dialogue: DialogueChannel | None = None,
     ) -> PipelineResult:
         ticket = await self._ticket_svc.get_ticket(ticket_id)
         if ticket is None:
             raise ValueError(f"Ticket introuvable : {ticket_id}")
 
+        # Sans canal branché — appel programmatique, test, run autonome — le
+        # run reste non interactif : il ne doit jamais se suspendre en
+        # attendant une réponse que personne ne viendra donner (ticket-066).
         run = PipelineRun(
-            project_id=project_id, ticket=ticket, on_event=on_event, run_id=run_id
+            project_id=project_id,
+            ticket=ticket,
+            on_event=on_event,
+            run_id=run_id,
+            dialogue=dialogue or DialogueChannel(interactive=False),
         )
 
         refused = await stages.ensure_clean_tree(self, run)
