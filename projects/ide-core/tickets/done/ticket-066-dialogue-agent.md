@@ -2,7 +2,7 @@
 id: ticket-066
 title: "Dialogue avec l'agent pendant un run — l'agent demande, l'utilisateur intervient"
 type: feat
-status: in-progress
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -48,21 +48,46 @@ personne ne regarde, `ask_user` répond immédiatement sans attendre.
 
 ## Critères d'acceptation
 
-- [ ] Le WebSocket lit les messages entrants **en continu**, en parallèle de
+- [x] Le WebSocket lit les messages entrants **en continu**, en parallèle de
       l'émission des événements
-- [ ] Un agent peut appeler `ask_user` ; le run se suspend et l'UI affiche la
+- [x] Un agent peut appeler `ask_user` ; le run se suspend et l'UI affiche la
       question
-- [ ] La réponse de l'utilisateur reprend le run là où il s'était arrêté
-- [ ] Un message spontané est injecté au tour d'agent suivant, pas plus tard
-- [ ] Au-delà du délai configuré, l'agent reprend sur une hypothèse **énoncée
+- [x] La réponse de l'utilisateur reprend le run là où il s'était arrêté
+- [x] Un message spontané est injecté au tour d'agent suivant, pas plus tard
+- [x] Au-delà du délai configuré, l'agent reprend sur une hypothèse **énoncée
       et consignée** dans le résultat du run
-- [ ] En mode autonome, `ask_user` ne bloque jamais
-- [ ] Un run qui se termine, question posée ou non, commite toujours (ADR-018)
-- [ ] Tests : suspension, reprise sur réponse, reprise sur délai, injection
+- [x] En mode autonome, `ask_user` ne bloque jamais
+- [x] Un run qui se termine, question posée ou non, commite toujours (ADR-018)
+- [x] Tests : suspension, reprise sur réponse, reprise sur délai, injection
       spontanée, mode autonome — sans appel LLM réel
-- [ ] ADR rédigé sur la reprise sur hypothèse
+- [x] ADR rédigé sur la reprise sur hypothèse
 
 ## Hors scope
 
 - Interruption en plein tour d'agent
 - Dialogue avec plusieurs runs simultanés depuis un même panneau
+
+## Livré
+
+- `DialogueChannel` : les deux sens, sans rien savoir du transport (`1599e2f`)
+- WebSocket lu en continu pendant tout le run (`f6e27b5`)
+- Outil `ask_user` exposé au codeur via un serveur MCP in-process (`7609f94`)
+- Panneau de dialogue : question en attente, réponse, consigne (`ef07c3a`)
+- ADR-025 sur la reprise sur hypothèse
+
+## Portée assumée
+
+`ask_user` n'est offert **qu'au codeur**. C'est le seul agent qui écrit du code
+sur une hypothèse ; les autres jugent ce qui existe déjà, et un reviewer bloqué
+dispose déjà de `CHANGES_REQUESTED` pour rendre la main. L'étendre plus tard
+n'est qu'un `asker_for(run)` de plus au bon endroit.
+
+L'interjection, elle, atteint **tous** les agents : elle transite par
+`build_context`, où chaque tour construit son contexte.
+
+## Non vérifié
+
+Le trajet complet — un vrai agent décidant d'appeler `ask_user` pendant un run
+réel — n'a pas été exercé : il demande un appel LLM facturé. Tout ce qui
+l'entoure l'est : l'outil, son intégration dans les options du SDK, le canal,
+le WebSocket et l'UI.
