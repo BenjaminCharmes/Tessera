@@ -51,4 +51,20 @@ describe("ProjectHeader", () => {
     expect(screen.getByText(/Aucun projet/i)).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /VSCode/i })).not.toBeInTheDocument();
   });
+
+  it("survit a un projet sans chemin au lieu d'emporter la sidebar", () => {
+    // Panne vecue (E2E flow 4 et 5) : `lienVSCode(undefined)` levait une
+    // TypeError, que l'ErrorBoundary transformait en « Une erreur inattendue
+    // s'est produite » a la place de toute la colonne. Un champ absent ne doit
+    // couter que le bouton qui en depend.
+    const sansChemin = { ...projet, path: undefined as unknown as string };
+
+    render(
+      <ProjectHeader project={sansChemin} gitOuvert={false} onBasculerGit={() => {}} />,
+    );
+
+    expect(screen.getByText("Lyra")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /VSCode/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Git & artefacts/i })).toBeInTheDocument();
+  });
 });

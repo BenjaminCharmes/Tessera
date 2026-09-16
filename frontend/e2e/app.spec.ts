@@ -9,6 +9,13 @@ test.describe("Flow 1 — Affichage des projets", () => {
   });
 });
 
+// Depuis le pivot cockpit (ticket-065), le tableau des tickets occupe le
+// centre : les mêmes titres apparaissent dans la liste latérale et dans le
+// tableau. Une assertion qui ne dit pas de quelle région elle parle en trouve
+// deux, et échoue en mode strict. Les régions sont nommées pour cela.
+const lateral = (page: { getByRole: Function }) =>
+  page.getByRole("complementary", { name: "Panneau latéral" });
+
 test.describe("Flow 2 — Sélection d'un projet → liste de tickets", () => {
   test("cliquer sur un projet affiche ses tickets dans le panel Tickets", async ({
     mockedPage,
@@ -20,7 +27,7 @@ test.describe("Flow 2 — Sélection d'un projet → liste de tickets", () => {
 
     // Only check the "todo" ticket — "done" tickets are collapsed by default
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;
-    await expect(mockedPage.getByText(todoTicket.title)).toBeVisible();
+    await expect(lateral(mockedPage).getByText(todoTicket.title)).toBeVisible();
   });
 });
 
@@ -49,7 +56,7 @@ test.describe("Flow 3 — Création d'un projet", () => {
       mockedPage.getByRole("button", { name: "Créer", exact: true }),
     ).not.toBeVisible();
     // The TicketList header shows the selected project name
-    await expect(mockedPage.getByText("test-e2e").first()).toBeVisible();
+    await expect(lateral(mockedPage).getByText("test-e2e").first()).toBeVisible();
   });
 });
 
@@ -61,9 +68,8 @@ test.describe("Flow 4 — Création d'un ticket", () => {
     await mockedPage.getByText("ide-core").click();
 
     // Open create ticket modal via the + button in the Tickets panel header
-    await mockedPage
+    await lateral(mockedPage)
       .getByRole("button", { name: "Créer un ticket" })
-      .first()
       .click();
 
     // Use id selector for the title input (label is "Titre *")
@@ -80,7 +86,13 @@ test.describe("Flow 4 — Création d'un ticket", () => {
     await expect(
       mockedPage.getByRole("button", { name: "Créer", exact: true }),
     ).not.toBeVisible();
-    await expect(mockedPage.getByText("Ma feature")).toBeVisible();
+    // C'est le toast qui confirme la création, pas la liste : l'API est
+    // doublée et renvoie toujours la même fixture, donc un rafraîchissement
+    // ne fera jamais apparaître « Ma feature » dans la sidebar. L'assertion
+    // d'origine n'était pas cadrée et tombait déjà sur ce toast sans le dire.
+    await expect(
+      mockedPage.getByText(/Ticket .*Ma feature.* créé/),
+    ).toBeVisible();
   });
 });
 
@@ -95,7 +107,7 @@ test.describe("Flow 5 — Ouverture de l'éditeur Monaco", () => {
 
     // Click on the todo ticket
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;
-    await mockedPage.getByText(todoTicket.title).click();
+    await lateral(mockedPage).getByText(todoTicket.title).click();
 
     // Monaco editor should be visible
     const editor = mockedPage.locator(".monaco-editor");

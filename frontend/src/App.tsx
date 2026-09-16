@@ -79,6 +79,14 @@ export default function App() {
     addToast(`Projet « ${p.name} » créé`, "success");
   }
 
+  // Le tableau est la vue *par défaut* ; choisir un ticket est explicite et
+  // doit montrer ce ticket, sinon le clic ne produit rien de visible.
+  function handleSelectTicket(t: Ticket) {
+    setTicket(t);
+    setOpenFilePath(null);
+    setShowKanban(false);
+  }
+
   function handleTicketCreated(t: Ticket) {
     tickets.refresh();
     setTicket(t);
@@ -126,8 +134,12 @@ export default function App() {
         <NavRail activePanel={panel} onChangePanel={setPanel} />
       </div>
 
-      {/* Sidebar — col 2, rows 1-2 */}
-      <div
+      {/* Sidebar — col 2, rows 1-2.
+          Nommée : depuis que le tableau des tickets occupe le centre, les
+          mêmes titres apparaissent des deux côtés. Une assertion qui ne dit
+          pas de quelle région elle parle en trouve deux. */}
+      <aside
+        aria-label="Panneau latéral"
         className="border-r border-zinc-700 overflow-hidden"
         style={{ gridColumn: "2", gridRow: "1 / 3" }}
       >
@@ -151,7 +163,7 @@ export default function App() {
             showKanban={showKanban}
             onSelectProject={handleSelectProject}
             onProjectCreated={handleProjectCreated}
-            onSelectTicket={setTicket}
+            onSelectTicket={handleSelectTicket}
             onRunPipeline={handleRunPipeline}
             onToggleKanban={() => setShowKanban((v) => !v)}
             onTicketCreated={handleTicketCreated}
@@ -165,10 +177,12 @@ export default function App() {
             }}
           />
         </ErrorBoundary>
-      </div>
+      </aside>
 
-      {/* Center — col 3, row 1: Monaco or Kanban */}
-      <div
+      {/* Center — col 3, row 1 : le tableau des tickets, ou un fichier en
+          lecture seule quand on en a ouvert un (ticket-065). */}
+      <main
+        aria-label="Vue principale"
         className="overflow-hidden"
         style={{ gridColumn: "3", gridRow: "1" }}
       >
@@ -178,14 +192,14 @@ export default function App() {
               byStatus={tickets.byStatus}
               activeTicket={ticket}
               running={running}
-              onSelectTicket={setTicket}
+              onSelectTicket={handleSelectTicket}
               onRunPipeline={handleRunPipeline}
             />
           ) : (
             <Editor ticket={ticket} openFilePath={openFilePath} />
           )}
         </ErrorBoundary>
-      </div>
+      </main>
 
       {/* Agent Panel / Chat — col 4, rows 1-2.
           Deux vues du même espace : l'une observe un run de pipeline,

@@ -5,6 +5,7 @@ export const PROJECTS = [
   {
     id: "ide-core",
     name: "ide-core",
+    path: "/workspace/ide-core",
     description: "L'IDE lui-même",
     active_agents: ["codeur"],
     stack: "Python/FastAPI + React",
