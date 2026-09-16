@@ -208,3 +208,16 @@ def test_un_message_spontane_n_est_injecte_qu_une_fois() -> None:
 
 def test_build_context_sans_message_spontane_est_inchange() -> None:
     assert stages.build_context(_Orch(), _run()) == "contexte projet"
+
+
+def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
+    # Offrir `ask_user` a un run non interactif promettrait a l'agent une
+    # reponse que personne ne peut donner : il attendrait le delai complet a
+    # chaque question, pour rien (ADR-025).
+    from vibe_ide.services.dialogue import DialogueChannel
+
+    run = _run()
+    assert stages.asker_for(run) is None
+
+    run.dialogue = DialogueChannel(interactive=True)
+    assert stages.asker_for(run) == run.dialogue.ask

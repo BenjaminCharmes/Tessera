@@ -1,3 +1,4 @@
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from anthropic import AsyncAnthropic
@@ -39,6 +40,7 @@ class AnthropicApiProvider:
         model: str,
         max_tokens: int,
         cwd: Path | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> ProviderResult:
         response = await self._client.messages.create(
             model=model,
@@ -59,6 +61,7 @@ class AnthropicApiProvider:
         cwd: Path | None = None,
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> ProviderResult:
         chunks: list[str] = []
         async with self._client.messages.stream(

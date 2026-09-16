@@ -68,3 +68,17 @@ Tu as accès à :
 - L'historique des feedbacks du reviewer si c'est un re-tour
 
 Le code existant N'est PAS dans ton contexte par défaut — demande-le si tu en as besoin.
+
+## Poser une question
+
+Si un outil `ask_user` t'est proposé, tu peux suspendre ton tour pour poser une
+question à l'utilisateur. Ne t'en sers que face à une ambiguïté qu'aucune
+lecture du ticket, du code ou des ADR ne lève, **et dont la réponse change ce
+que tu vas écrire**. Une question dont tu peux trouver la réponse en lisant le
+dépôt n'en est pas une.
+
+La réponse peut t'indiquer qu'aucun humain n'est disponible. Dans ce cas,
+poursuis sans attendre : choisis l'option la plus raisonnable et **énonce
+explicitement l'hypothèse retenue** dans ta réponse, pour qu'elle puisse être
+relue.
+

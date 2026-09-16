@@ -2,6 +2,7 @@ import re
 import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
+from typing import Any
 
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketStatus
@@ -63,6 +64,7 @@ class AgentRunner:
         stream_callback: Callable[[str], Awaitable[None]] | None = None,
         tool_callback: ToolEventCallback | None = None,
         run_id: str | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
@@ -75,6 +77,12 @@ class AgentRunner:
         # écritures côté SDK (cf. spike ticket-044).
         cwd = self._project_path.resolve() if self._project_path else None
 
+        # `ask_user` n'est transmis que s'il existe : un provider doublé dans
+        # un test n'a aucune raison de connaître un paramètre qui ne le
+        # concerne pas, et le lui passer à vide casserait chaque double
+        # (ticket-066).
+        extra: dict[str, Any] = {"ask_user": ask_user} if ask_user is not None else {}
+
         provider_result: ProviderResult
         if stream_callback is not None:
             provider_result = await self._provider.stream(
@@ -85,6 +93,7 @@ class AgentRunner:
                 cwd=cwd,
                 on_token=stream_callback,
                 on_tool_use=tool_callback,
+                **extra,
             )
         else:
             provider_result = await self._provider.complete(
@@ -93,6 +102,7 @@ class AgentRunner:
                 model=model,
                 max_tokens=max_tokens,
                 cwd=cwd,
+                **extra,
             )
 
         content = provider_result.content

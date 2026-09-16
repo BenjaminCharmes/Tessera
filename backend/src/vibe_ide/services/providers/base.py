@@ -36,8 +36,13 @@ class LLMProvider(Protocol):
         model: str,
         max_tokens: int,
         cwd: Path | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> ProviderResult:
         """Runs a single call and returns the full response.
+
+        ``ask_user`` is only honoured by providers that can expose tools. It is
+        passed only when a dialogue channel is attached to the run, so a
+        provider that ignores it simply never lets an agent ask (ticket-066).
 
         ``max_tokens`` is best-effort: it is honoured only by providers whose
         backend exposes an actual output-length cap. ``AnthropicApiProvider``
@@ -59,6 +64,7 @@ class LLMProvider(Protocol):
         cwd: Path | None = None,
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> ProviderResult:
         """Runs a single call, forwarding incremental output to the callbacks.
 

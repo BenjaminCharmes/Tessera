@@ -12,6 +12,7 @@ visible instead of hiding it behind a mixin.
 A stage that can end the run returns a `PipelineResult`; returning `None`
 means "carry on".
 """
+from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any, Optional
 
 from vibe_ide.models.agent import AgentRole
@@ -118,6 +119,16 @@ def build_context(orch: "Orchestrator", run: PipelineRun) -> str:
     return "".join(parts)
 
 
+def asker_for(run: PipelineRun) -> Optional[Callable[[str], Awaitable[str]]]:
+    """L'outil `ask_user` à donner à l'agent, ou rien (ticket-066).
+
+    Un run non interactif — appel programmatique, test, run autonome — ne doit
+    pas recevoir l'outil : l'agent y attendrait le délai complet d'ADR-025 à
+    chaque question, sans que personne ne puisse jamais y répondre.
+    """
+    return run.dialogue.ask if run.dialogue.interactive else None
+
+
 # ------------------------------------------------------------------
 # Codeur
 # ------------------------------------------------------------------
@@ -158,6 +169,12 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
             )
         )
 
+    # Comme au niveau du provider : le paramètre n'est transmis que s'il y a
+    # quelque chose à transmettre. Un run non interactif appelle donc le
+    # runner exactement comme avant ce ticket.
+    asker = asker_for(run)
+    extra: dict[str, Any] = {"ask_user": asker} if asker is not None else {}
+
     codeur_result = await orch._runner.run(
         role=AgentRole.codeur,
         ticket=run.ticket,
@@ -166,6 +183,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
         stream_callback=_emit_token,
         tool_callback=_emit_tool,
         run_id=run.run_id,
+        **extra,
     )
     orch.record_spend(codeur_result.cost_usd)
     await run.on_event(

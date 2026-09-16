@@ -1,3 +1,4 @@
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +13,11 @@ from claude_agent_sdk import (
     query,
 )
 
+from vibe_ide.services.providers.ask_user import (
+    ASK_USER_SERVER_NAME,
+    ASK_USER_TOOL_NAME,
+    build_ask_user_server,
+)
 from vibe_ide.services.providers.base import (
     ProviderResult,
     StreamCallback,
@@ -30,6 +36,7 @@ def _build_options(
     max_budget_usd: float | None,
     cwd: Path | None,
     allowed_tools: list[str] | None = None,
+    ask_user: Callable[[str], Awaitable[str]] | None = None,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike."""
     # ``allowed_tools`` only controls auto-approval — the SDK CLI's
@@ -42,6 +49,14 @@ def _build_options(
     # merely withholding auto-approval, and no configuration path can end up
     # with an implicit toolset (ticket-044 merge-gate review, finding 1).
     effective_tools = allowed_tools if allowed_tools is not None else _ALLOWED_TOOLS
+
+    # L'outil `ask_user` n'existe que si un canal de dialogue est branché sur
+    # ce run (ticket-066). Le donner sans canal reviendrait à promettre à
+    # l'agent une réponse que personne ne pourrait lui apporter.
+    mcp_servers: dict[str, Any] = {}
+    if ask_user is not None:
+        mcp_servers[ASK_USER_SERVER_NAME] = build_ask_user_server(ask_user)
+        effective_tools = [*effective_tools, ASK_USER_TOOL_NAME]
 
     # Une ANTHROPIC_API_KEY présente dans l'environnement est PRIORITAIRE sur
     # la session Claude Code dans le CLI. En mode abonnement — le défaut — elle
@@ -69,6 +84,7 @@ def _build_options(
         include_partial_messages=True,
         max_turns=max_turns,
         max_budget_usd=max_budget_usd,
+        mcp_servers=mcp_servers,
     )
 
 
@@ -133,11 +149,14 @@ class ClaudeAgentSDKProvider:
         model: str,
         max_tokens: int,
         cwd: Path | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> ProviderResult:
         # NB : max_tokens est reçu pour satisfaire le protocole LLMProvider mais
         # ClaudeAgentOptions n'expose aucun champ équivalent — il est ignoré ici.
         # Voir LLMProvider.complete pour la portée exacte de cette limitation.
-        return await self._run(system=system, user=user, model=model, cwd=cwd)
+        return await self._run(
+            system=system, user=user, model=model, cwd=cwd, ask_user=ask_user
+        )
 
     async def stream(
         self,
@@ -149,11 +168,12 @@ class ClaudeAgentSDKProvider:
         cwd: Path | None = None,
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> ProviderResult:
         # NB : max_tokens est ignoré — voir la note dans complete() ci-dessus.
         return await self._run(
             system=system, user=user, model=model, cwd=cwd,
-            on_token=on_token, on_tool_use=on_tool_use,
+            on_token=on_token, on_tool_use=on_tool_use, ask_user=ask_user,
         )
 
     async def _run(
@@ -165,11 +185,12 @@ class ClaudeAgentSDKProvider:
         cwd: Path | None,
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
+        ask_user: Callable[[str], Awaitable[str]] | None = None,
     ) -> ProviderResult:
         options = _build_options(
             system=system, model=model, max_turns=self._max_turns,
             max_budget_usd=self._max_budget_usd, cwd=cwd,
-            allowed_tools=self._allowed_tools,
+            allowed_tools=self._allowed_tools, ask_user=ask_user,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None
