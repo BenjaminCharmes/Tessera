@@ -2,7 +2,7 @@
 id: ticket-066
 title: "Dialogue avec l'agent pendant un run — l'agent demande, l'utilisateur intervient"
 type: feat
-status: todo
+status: in-progress
 pr_number: null
 priority: high
 agent: codeur

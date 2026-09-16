@@ -174,3 +174,37 @@ def test_start_round_remet_a_zero_l_etat_du_tour() -> None:
     assert run.test_context == ""
     assert run.security_context == ""
     assert run.review_feedback == ["à garder entre les tours"]
+
+
+# ------------------------------------------------------------------
+# Messages spontanes de l'utilisateur — ticket-066
+# ------------------------------------------------------------------
+
+
+def test_build_context_injecte_les_messages_spontanes() -> None:
+    # Le pipeline etait un tuyau ferme : une consigne donnee pendant un run
+    # n'arrivait jamais a l'agent. Elle est desormais lue au tour suivant.
+    run = _run()
+    run.dialogue.interject("utilise pathlib, pas os.path")
+
+    contexte = stages.build_context(_Orch(), run)
+
+    assert "utilise pathlib, pas os.path" in contexte
+    assert "contexte projet" in contexte
+
+
+def test_un_message_spontane_n_est_injecte_qu_une_fois() -> None:
+    # Sinon la consigne se repeterait a chaque tour, en gonflant le contexte
+    # a chaque fois un peu plus.
+    run = _run()
+    run.dialogue.interject("pense aux tests")
+
+    premier = stages.build_context(_Orch(), run)
+    second = stages.build_context(_Orch(), run)
+
+    assert "pense aux tests" in premier
+    assert "pense aux tests" not in second
+
+
+def test_build_context_sans_message_spontane_est_inchange() -> None:
+    assert stages.build_context(_Orch(), _run()) == "contexte projet"

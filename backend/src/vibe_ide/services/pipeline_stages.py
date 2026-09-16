@@ -88,13 +88,34 @@ async def create_branch(orch: "Orchestrator", run: PipelineRun) -> None:
 
 
 def build_context(orch: "Orchestrator", run: PipelineRun) -> str:
-    """Project context, plus the reviewer feedback accumulated so far."""
-    if not run.review_feedback:
-        return orch._project_context
-    feedback_block = "\n\n## Retours reviewer précédents\n" + "\n---\n".join(
-        f"Tour {i + 1}: {fb}" for i, fb in enumerate(run.review_feedback)
-    )
-    return orch._project_context + feedback_block
+    """Project context, reviewer feedback so far, and anything the user said.
+
+    This is where the user's in-flight messages enter the run (ticket-066).
+    Every stage builds its context here, so draining the mailbox at this one
+    point is what makes an interjection reach *the next agent to speak*, no
+    matter which one it is.
+
+    The mailbox is drained, not read: a message injected twice would be
+    repeated at every round, and the context would grow a little more each
+    time.
+    """
+    parts = [orch._project_context]
+
+    if run.review_feedback:
+        parts.append(
+            "\n\n## Retours reviewer précédents\n"
+            + "\n---\n".join(
+                f"Tour {i + 1}: {fb}" for i, fb in enumerate(run.review_feedback)
+            )
+        )
+
+    if messages := run.dialogue.drain():
+        parts.append(
+            "\n\n## Consignes de l'utilisateur, en cours de run\n"
+            + "\n".join(f"- {m}" for m in messages)
+        )
+
+    return "".join(parts)
 
 
 # ------------------------------------------------------------------

@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from vibe_ide.models.ticket import Ticket, TicketStatus
+from vibe_ide.services.dialogue import DialogueChannel
 from vibe_ide.services.pipeline_events import (
     EventCallback,
     EventType,
@@ -34,6 +35,14 @@ class PipelineRun:
 
     branch: str | None = None
     review_feedback: list[str] = field(default_factory=list)
+
+    # Le dialogue avec l'utilisateur pendant le run (ticket-066). Par défaut
+    # non interactif : un run lancé sans canal branché — un test, un appel
+    # programmatique — ne doit jamais se suspendre en attendant une réponse
+    # que personne ne viendra donner.
+    dialogue: DialogueChannel = field(
+        default_factory=lambda: DialogueChannel(interactive=False)
+    )
 
     # --- remis à zéro à chaque tour ---
     round_num: int = 0
