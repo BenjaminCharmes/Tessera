@@ -55,6 +55,8 @@ export interface QuotaState {
 export interface Project {
   id: string;
   name: string;
+  /** Chemin absolu du projet sur le disque — sert à l'ouvrir dans VSCode. */
+  path: string;
   description: string;
   active_agents: string[];
   stack: string | null;

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import ProjectHeader from "./ProjectHeader";
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
 import GitLinkPanel from "./GitLinkPanel";
@@ -70,8 +72,26 @@ export default function Sidebar({
   onSelectTicketById,
   onAgentCreated,
 }: SidebarProps) {
+  // L'état git est replié par défaut : il occupe de la place, et on ne le
+  // consulte qu'au moment de lier un dépôt ou de retirer le projet. Ce qui
+  // compte, c'est qu'il soit à un clic et non à un écran de défilement.
+  const [gitOuvert, setGitOuvert] = useState(false);
+
   return (
-    <div className="h-full overflow-y-auto bg-zinc-900 text-zinc-200 text-sm">
+    <div className="flex h-full flex-col bg-zinc-900 text-sm text-zinc-200">
+      <ProjectHeader
+        project={activeProject}
+        gitOuvert={gitOuvert}
+        onBasculerGit={() => setGitOuvert((v) => !v)}
+      />
+
+      {gitOuvert && activeProject && (
+        <div className="max-h-64 overflow-y-auto border-b border-zinc-800">
+          <GitLinkPanel project={activeProject} />
+        </div>
+      )}
+
+      <div className="flex-1 overflow-y-auto">
       {panel === "projects" && (
         <ProjectNav
           activeProject={activeProject}
@@ -96,10 +116,6 @@ export default function Sidebar({
           onBatchCreated={onBatchCreated}
         />
       )}
-      {/* L'état git se lit sous la liste des tickets : c'est là qu'on décide
-          de lancer un pipeline, et c'est là que savoir si le projet est
-          versionné a le plus de valeur (ticket-061). */}
-      {panel === "tickets" && <GitLinkPanel project={activeProject} />}
       {panel === "history" && (
         <RunHistory
           runs={runs}
@@ -119,6 +135,7 @@ export default function Sidebar({
           onRefresh={onRefreshUsage}
         />
       )}
+      </div>
     </div>
   );
 }
