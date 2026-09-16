@@ -229,3 +229,14 @@ Format : ADR léger (Architecture Decision Record).
 **Conséquence** : un dossier qui regroupe plusieurs dépôts n'est pas un projet. Chaque dépôt doit être déclaré comme son propre projet.
 **Alternative rejetée** : `git init` automatique à la racine (crée un dépôt non désiré au-dessus de ceux du client) ; descendre chercher le premier sous-dépôt (choix arbitraire dès qu'il y en a plusieurs).
 
+---
+
+## ADR-025 — Une question sans réponse reprend sur une hypothèse énoncée
+
+**Date** : 2026-09-16
+**Décision** : Un agent peut suspendre son tour pour poser une question (`DialogueChannel.ask`). Passé `dialogue_timeout_s`, il reprend seul : on lui répond qu'aucun humain n'est disponible et qu'il doit **choisir et énoncer son hypothèse**. En mode autonome, le délai ne démarre même pas — la question se résout immédiatement.
+**Raison** : ADR-018 fait dépendre toute la file des tickets d'un arbre propre, et un run suspendu tient du travail non commité. Une question laissée sans réponse pendant un déjeuner bloquerait la file entière. Une hypothèse explicite, qui part dans le rapport du run, est relisible ; une hypothèse silencieuse — ce qui se passait avant — ne l'est pas.
+**Corollaire** : les messages spontanés de l'utilisateur transitent par une **file distincte**, vidée entre deux tours dans `build_context`. Un « au fait, pense aux tests » envoyé pendant qu'une question est posée ne doit jamais être pris pour la réponse à cette question.
+**Alternative rejetée** : attendre indéfiniment (bloque la file, et l'agent tient du travail non commité) ; ne jamais suspendre et laisser l'agent trancher seul (c'est l'état d'avant, dont le défaut est précisément l'hypothèse invisible) ; déduire la réponse d'un message spontané (confond deux intentions et fait écrire du mauvais code sur un malentendu).
+**Détail** : voir `tickets/in-progress/ticket-066-dialogue-agent.md`.
+
