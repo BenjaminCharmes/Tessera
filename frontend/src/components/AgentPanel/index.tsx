@@ -1,5 +1,6 @@
 import RoundBadge from "./RoundBadge";
 import QuotaBadge from "./QuotaBadge";
+import AgentDialogue from "./AgentDialogue";
 import TicketActivity from "./TicketActivity";
 import AgentBlock from "./AgentBlock";
 import PipelineSummary from "./PipelineSummary";
@@ -28,6 +29,9 @@ export default function AgentPanel({
     errorMessage,
     events,
     quota,
+    pendingQuestion,
+    answer,
+    interject,
     clear,
   } = stream;
 
@@ -147,6 +151,14 @@ export default function AgentPanel({
           </button>
         </div>
       )}
+
+      {/* Parler à l'agent pendant qu'il travaille (ticket-066). */}
+      <AgentDialogue
+        pendingQuestion={pendingQuestion}
+        enCours={status === "running" || status === "connecting"}
+        onAnswer={answer}
+        onInterject={interject}
+      />
 
       {/* Ce que le ticket a produit : runs, branche, PR (ticket-064). */}
       <TicketActivity

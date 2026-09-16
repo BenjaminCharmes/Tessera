@@ -21,12 +21,18 @@ interface StreamState {
   errorMessage: string | null;
   /** Dernier état connu du quota d'abonnement, ou null tant que rien n'est remonté. */
   quota: QuotaState | null;
+  /** Question posée par l'agent en cours, tant qu'on n'y a pas répondu (ticket-066). */
+  pendingQuestion: string | null;
 }
 
 export interface UseOrchestratorStreamResult extends StreamState {
   connect: (ticketId: string) => void;
   disconnect: () => void;
   clear: () => void;
+  /** Répond à la question en cours et laisse le run reprendre. */
+  answer: (text: string) => void;
+  /** Dépose une consigne, lue par le prochain agent à parler. */
+  interject: (text: string) => void;
 }
 
 const INITIAL: StreamState = {
@@ -39,6 +45,7 @@ const INITIAL: StreamState = {
   lastResult: null,
   errorMessage: null,
   quota: null,
+  pendingQuestion: null,
 };
 
 function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
@@ -76,7 +83,13 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         rounds: typeof ev.data["rounds"] === "number" ? ev.data["rounds"] : 0,
         approved: ev.data["approved"] === true,
       };
-      return { ...s, events, status: "done", lastResult: result };
+      return {
+        ...s,
+        events,
+        status: "done",
+        lastResult: result,
+        pendingQuestion: null,
+      };
     }
     case "error":
       return {
@@ -87,6 +100,13 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
           typeof ev.data["message"] === "string"
             ? ev.data["message"]
             : "Pipeline error",
+      };
+    case "agent_question":
+      return {
+        ...s,
+        events,
+        pendingQuestion:
+          typeof ev.data["question"] === "string" ? ev.data["question"] : null,
       };
     case "quota_updated":
       // Le quota d'abonnement est la ressource réellement finie : l'afficher
@@ -176,6 +196,25 @@ export function useOrchestratorStream(
     };
   }
 
+  function send(payload: Record<string, string>) {
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(payload));
+    }
+  }
+
+  function answer(text: string) {
+    send({ type: "answer", text });
+    // La question disparaît dès l'envoi : le backend ne réémet rien, et
+    // laisser le formulaire à l'écran donnerait à croire que la réponse
+    // n'est pas partie.
+    setState((s) => ({ ...s, pendingQuestion: null }));
+  }
+
+  function interject(text: string) {
+    send({ type: "interject", text });
+  }
+
   function connect(ticketId: string) {
     clearTimers();
     retryCountRef.current = 0;
@@ -202,5 +241,5 @@ export function useOrchestratorStream(
     setState(INITIAL);
   }
 
-  return { ...state, connect, disconnect, clear };
+  return { ...state, connect, disconnect, clear, answer, interject };
 }
