@@ -1,5 +1,6 @@
 import { BAND } from "../../design/layout";
 import { useEffect, useState } from "react";
+import MarkdownView from "./MarkdownView";
 import MonacoEditor from "@monaco-editor/react";
 import { detectLanguage } from "./useMonaco";
 import { readFile } from "../../lib/fs";
@@ -60,6 +61,10 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
   }, [openFilePath, ticket?.file_path]);
 
   const language = detectLanguage(filePath ?? openFilePath ?? ticket?.file_path ?? null);
+  const estMarkdown = (filePath ?? "").toLowerCase().endsWith(".md");
+  // Le rendu est le défaut sur un Markdown : tickets, ADR et notes se lisent
+  // comme des documents, pas comme du source (ticket-078).
+  const [vueRendue, setVueRendue] = useState(true);
 
   return (
     <div className="flex h-full flex-col">
@@ -71,6 +76,29 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
           <span className="italic">Aucun fichier ouvert</span>
         )}
         {loading && <span className="ml-auto text-zinc-500">chargement…</span>}
+        {estMarkdown && !loading && (
+          <div className="ml-auto flex items-center gap-0.5" role="tablist" aria-label="Affichage du fichier">
+            {[
+              { cle: true, libelle: "Rendu" },
+              { cle: false, libelle: "Source" },
+            ].map(({ cle, libelle }) => (
+              <button
+                key={libelle}
+                type="button"
+                role="tab"
+                aria-selected={vueRendue === cle}
+                onClick={() => setVueRendue(cle)}
+                className={`rounded px-1.5 py-0.5 text-micro transition-colors ${
+                  vueRendue === cle
+                    ? "bg-violet-500/15 text-violet-200"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                {libelle}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Erreur */}
@@ -80,7 +108,9 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
         </div>
       )}
 
-      {/* Éditeur Monaco */}
+      {estMarkdown && vueRendue && !error ? (
+        <MarkdownView source={content} />
+      ) : (
       <div className="min-h-0 flex-1">
         <MonacoEditor
           height="100%"
@@ -98,6 +128,7 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
           }}
         />
       </div>
+      )}
     </div>
   );
 }

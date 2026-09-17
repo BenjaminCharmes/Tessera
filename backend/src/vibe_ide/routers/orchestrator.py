@@ -259,7 +259,15 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
             run_id = await create_run(settings.ide_db_path, project_id, ticket_id)
 
             async def send_event(event: OrchestratorEvent) -> None:
-                await websocket.send_text(event.model_dump_json())
+                # Émettre vers une socket morte ne doit pas tuer le run : le
+                # pipeline continue côté serveur, et l'utilisateur en est
+                # averti. Faire remonter l'erreur ici laissait le run ouvert en
+                # base, donc « en cours » à jamais dans l'historique
+                # (ticket-079).
+                try:
+                    await websocket.send_text(event.model_dump_json())
+                except Exception:  # noqa: BLE001 — socket fermée, on continue
+                    pass
                 await save_event(
                     settings.ide_db_path,
                     run_id,
@@ -300,23 +308,33 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
                         dialogue.request_stop()
 
             reader = asyncio.create_task(read_inbound())
+            result = None
+            echec: str | None = None
             try:
                 result = await orchestrator.run_pipeline(
                     project_id, ticket_id, send_event, run_id=run_id, dialogue=dialogue
                 )
-                await finish_run(
-                    settings.ide_db_path,
-                    run_id,
-                    result.rounds,
-                    result.approved,
-                    result.final_status.value,
-                )
             except ValueError as exc:
-                await websocket.send_json({"error": str(exc)})
+                echec = str(exc)
             finally:
                 # Le lecteur attend indéfiniment un message : sans annulation,
                 # la connexion ne se fermerait jamais après la fin du run.
                 reader.cancel()
+
+            # Clore le run **avant** toute écriture réseau. Placé après, cet
+            # appel disparaissait dès que la socket mourait : la tâche était
+            # annulée et l'`await` ne se terminait jamais, laissant la ligne
+            # ouverte et l'historique bloqué sur « en cours » (ticket-079).
+            await finish_run(
+                settings.ide_db_path,
+                run_id,
+                result.rounds if result else 0,
+                result.approved if result else False,
+                result.final_status.value if result else "interrupted",
+            )
+
+            if echec is not None:
+                await websocket.send_json({"error": echec})
         else:
             await websocket.send_json({"error": "ticket_id ou mode=autonomous requis"})
 

@@ -1,5 +1,6 @@
 """Endpoints du router orchestrateur — ticket-053."""
 import asyncio
+import time
 from pathlib import Path
 
 import pytest
@@ -288,3 +289,48 @@ def test_le_stream_transmet_un_message_spontane(
 
     assert fake.reponse == "non"
     assert fake.contexte_utilisateur == ["pense aux tests"]
+
+
+def test_un_run_interrompu_est_clos_en_base(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Panne vecue : `finish_run` n'etait appele que sur le chemin nominal. Une
+    # socket fermee ou une exception laissait la ligne ouverte, et l'historique
+    # affichait « en cours » pour toujours (ticket-079).
+    class _OrchestrateurQuiEchoue:
+        async def run_pipeline(
+            self, project_id, ticket_id, on_event, run_id=None, dialogue=None,
+        ):
+            raise ValueError("panne pendant le run")
+
+    async def _build(project_id: str) -> _OrchestrateurQuiEchoue:
+        return _OrchestrateurQuiEchoue()
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+
+    try:
+        with _client().websocket_connect(
+            "/api/v1/orchestrator/stream/mon-projet"
+        ) as ws:
+            ws.send_json({"ticket_id": "ticket-001"})
+            ws.receive_json()
+    except Exception:  # la socket se ferme apres l'erreur, c'est attendu
+        pass
+
+    # Le serveur finit d'écrire après la fermeture de la socket : on laisse
+    # à `finish_run` le temps d'atterrir plutôt que de courir contre lui.
+    for _ in range(50):
+        if asyncio.run(_runs_ouverts()) == 0:
+            break
+        time.sleep(0.05)
+
+    assert asyncio.run(_runs_ouverts()) == 0, "aucun run ne doit rester ouvert"
+
+
+async def _runs_ouverts() -> int:
+    import aiosqlite
+
+    async with aiosqlite.connect(str(settings.ide_db_path)) as db:
+        async with db.execute(
+            "SELECT COUNT(*) FROM pipeline_runs WHERE finished_at IS NULL"
+        ) as cursor:
+            row = await cursor.fetchone()
+    return int(row[0]) if row else 0

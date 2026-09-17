@@ -338,3 +338,61 @@ async def conversation_cost_usd(
         )
         row = await cursor.fetchone()
     return round(float(row[0]) if row else 0.0, 10)
+
+
+async def get_usage_breakdown(
+    db_path: Path | str,
+    project_id: str | None = None,
+) -> dict[str, Any]:
+    """La dépense ventilée par agent et par modèle — ticket-077.
+
+    `get_project_usage` donne le total et le détail par ticket. Il manquait la
+    ventilation qui permet d'agir : **par agent**, parce qu'elle dit qui
+    consomme — un codeur qui mange 70 % du budget, ou un reviewer plus cher que
+    prévu parce qu'il relit tout le diff à chaque tour — et **par modèle**, pour
+    préparer l'arbitrage du jour où l'on descend un agent en Haiku.
+
+    `project_id` à `None` couvre **tous** les projets : la question « combien me
+    coûte vibe-ide ce mois-ci » n'avait aucune réponse, chaque endpoint étant
+    borné à un projet.
+    """
+    filtre = "WHERE pr.project_id = ?" if project_id is not None else ""
+    params: tuple[Any, ...] = (project_id,) if project_id is not None else ()
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+
+        async def _agrege(colonne: str) -> list[dict[str, Any]]:
+            async with db.execute(
+                f"""SELECT ac.{colonne} AS cle,
+                           COALESCE(SUM(ac.cost_usd), 0.0) AS total_cost_usd,
+                           COALESCE(SUM(ac.input_tokens + ac.output_tokens
+                                        + ac.cache_read_tokens), 0) AS total_tokens,
+                           COUNT(*) AS call_count
+                    FROM agent_calls ac
+                    JOIN pipeline_runs pr ON pr.id = ac.run_id
+                    {filtre}
+                    GROUP BY ac.{colonne}
+                    ORDER BY total_cost_usd DESC""",
+                params,
+            ) as cursor:
+                lignes = await cursor.fetchall()
+            return [
+                {
+                    colonne: row["cle"],
+                    "total_cost_usd": float(row["total_cost_usd"]),
+                    "total_tokens": int(row["total_tokens"]),
+                    "call_count": int(row["call_count"]),
+                }
+                for row in lignes
+            ]
+
+        per_agent = await _agrege("role")
+        per_model = await _agrege("model")
+
+    return {
+        "project_id": project_id,
+        "total_cost_usd": round(sum(a["total_cost_usd"] for a in per_agent), 10),
+        "per_agent": per_agent,
+        "per_model": per_model,
+    }

@@ -1,0 +1,29 @@
+
+/* Mise en forme du Markdown rendu — ticket-078.
+   Tailwind remet à zéro les styles par défaut des balises ; un document rendu
+   sans ces règles est un mur de texte indifférencié, ce qui annulerait tout
+   l'intérêt de la vue. */
+.markdown-rendu h1 { font-size: 1.35rem; font-weight: 600; color: #e4e4e7; margin: 1.2rem 0 .6rem; }
+.markdown-rendu h2 { font-size: 1.1rem; font-weight: 600; color: #d4d4d8; margin: 1.1rem 0 .5rem; }
+.markdown-rendu h3 { font-size: .95rem; font-weight: 600; color: #d4d4d8; margin: 1rem 0 .4rem; }
+.markdown-rendu h1:first-child, .markdown-rendu h2:first-child { margin-top: 0; }
+.markdown-rendu p { margin: .6rem 0; }
+.markdown-rendu strong { color: #f4f4f5; font-weight: 600; }
+.markdown-rendu em { color: #d4d4d8; }
+.markdown-rendu a { color: #c4b5fd; text-decoration: underline; }
+.markdown-rendu ul, .markdown-rendu ol { margin: .6rem 0; padding-left: 1.3rem; }
+.markdown-rendu ul { list-style: disc; }
+.markdown-rendu ol { list-style: decimal; }
+.markdown-rendu li { margin: .25rem 0; }
+.markdown-rendu code { background: #18181b; border-radius: 3px; padding: .1rem .3rem;
+  font-family: ui-monospace, monospace; font-size: .85em; color: #e4e4e7; }
+.markdown-rendu pre { background: #09090b; border: 1px solid #27272a; border-radius: 4px;
+  padding: .75rem; overflow-x: auto; margin: .8rem 0; }
+.markdown-rendu pre code { background: none; padding: 0; }
+.markdown-rendu blockquote { border-left: 2px solid #a78bfa; padding-left: .8rem;
+  color: #a1a1aa; margin: .8rem 0; }
+.markdown-rendu hr { border: 0; border-top: 1px solid #27272a; margin: 1.2rem 0; }
+.markdown-rendu table { border-collapse: collapse; margin: .8rem 0; display: block; overflow-x: auto; }
+.markdown-rendu th, .markdown-rendu td { border: 1px solid #27272a; padding: .35rem .6rem; text-align: left; }
+.markdown-rendu th { background: #18181b; color: #d4d4d8; font-weight: 600; }
+.markdown-rendu input[type="checkbox"] { margin-right: .4rem; }

@@ -70,12 +70,15 @@ describe("AgentList", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("calls api.agents.remove and refreshes on delete", async () => {
+  it("supprime et rafraichit, une fois la confirmation donnee", async () => {
     vi.mocked(apiModule.api.agents.remove).mockResolvedValue(undefined);
     render(<AgentList onAgentCreated={onAgentCreated} />);
 
     await userEvent.click(
       screen.getByRole("button", { name: /supprimer securite/i }),
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Supprimer définitivement" }),
     );
 
     await waitFor(() => {
@@ -92,6 +95,9 @@ describe("AgentList", () => {
 
     await userEvent.click(
       screen.getByRole("button", { name: /supprimer securite/i }),
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Supprimer définitivement" }),
     );
 
     await waitFor(() => {
@@ -125,5 +131,59 @@ describe("AgentList", () => {
     render(<AgentList onAgentCreated={onAgentCreated} />);
     await userEvent.click(screen.getByRole("button", { name: /nouveau/i }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+});
+
+describe("AgentList — suppression", () => {
+  const onAgentCreated = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseAgents.mockReturnValue({
+      agents: [AGENT_BUILTIN, AGENT_CUSTOM],
+      loading: false,
+      error: null,
+      refresh: vi.fn(),
+    });
+  });
+
+  it("demande confirmation avant de supprimer", async () => {
+    // Panne vecue : un clic sur la croix supprimait le prompt sans rien
+    // demander. L'agent disparaissait, et avec lui sa definition — la seule
+    // chose qui determine son comportement (ticket-080).
+    render(<AgentList onAgentCreated={onAgentCreated} />);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /supprimer securite/i }),
+    );
+
+    expect(apiModule.api.agents.remove).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("ne supprime qu'apres confirmation explicite", async () => {
+    vi.mocked(apiModule.api.agents.remove).mockResolvedValue(undefined);
+    render(<AgentList onAgentCreated={onAgentCreated} />);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /supprimer securite/i }),
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Supprimer définitivement" }),
+    );
+
+    expect(apiModule.api.agents.remove).toHaveBeenCalledWith("securite");
+  });
+
+  it("renonce sans rien supprimer", async () => {
+    render(<AgentList onAgentCreated={onAgentCreated} />);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /supprimer securite/i }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Annuler" }));
+
+    expect(apiModule.api.agents.remove).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).toBeNull();
   });
 });

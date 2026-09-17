@@ -50,6 +50,8 @@ interface SidebarProps {
   onBatchCreated?: (tickets: Ticket[]) => void;
   onSelectTicketById?: (ticketId: string) => void;
   onAgentCreated?: (role: string) => void;
+  agentSelectionne?: string | null;
+  onSelectAgent?: (role: string) => void;
   openFilePath?: string | null;
   onOpenFile?: (path: string) => void;
 }
@@ -86,6 +88,8 @@ export default function Sidebar({
   onBatchCreated,
   onSelectTicketById,
   onAgentCreated,
+  agentSelectionne,
+  onSelectAgent,
   openFilePath,
   onOpenFile,
 }: SidebarProps) {
@@ -160,7 +164,11 @@ export default function Sidebar({
         />
       )}
       {panel === "agents" && (
-        <AgentList onAgentCreated={onAgentCreated ?? (() => {})} />
+        <AgentList
+          onAgentCreated={onAgentCreated ?? (() => {})}
+          onSelect={onSelectAgent}
+          selectionne={agentSelectionne ?? null}
+        />
       )}
       {panel === "usage" && (
         <UsageDashboard

@@ -325,3 +325,24 @@ export interface PlanDeNettoyage {
   /** [branche, raison] — la raison est destinée à être lue. */
   conservees: [string, string][];
 }
+
+/** Un agent et sa définition complète — son prompt système (ticket-076). */
+export interface AgentDetail {
+  role: string;
+  is_builtin: boolean;
+  system_prompt: string;
+}
+
+/** Une ligne de ventilation de la dépense (ticket-077). */
+export interface LigneDeCout {
+  total_cost_usd: number;
+  total_tokens: number;
+  call_count: number;
+}
+
+export interface VentilationDesCouts {
+  project_id: string | null;
+  total_cost_usd: number;
+  per_agent: (LigneDeCout & { role: string })[];
+  per_model: (LigneDeCout & { model: string })[];
+}

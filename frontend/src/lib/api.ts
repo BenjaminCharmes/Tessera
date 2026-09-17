@@ -1,4 +1,6 @@
 import type {
+  AgentDetail,
+  VentilationDesCouts,
   AgentInfo,
   AnalysisResult,
   CloneProjectRequest,
@@ -123,6 +125,8 @@ export const api = {
   usage: {
     get: (projectId: string): Promise<ProjectUsage> =>
       request(`/projects/${projectId}/usage`),
+    breakdown: (projectId: string): Promise<VentilationDesCouts> =>
+      request(`/projects/${projectId}/usage/breakdown`),
   },
   github: {
     createPr: (
@@ -194,6 +198,8 @@ export const api = {
       request<{ agents: AgentInfo[] }>("/agents/registry").then(
         (r) => r.agents,
       ),
+    detail: (role: string): Promise<AgentDetail> =>
+      request(`/agents/registry/${role}`),
     remove: (role: string): Promise<void> => del(`/agents/registry/${role}`),
     createConversational: (
       conversation: ConversationMessage[],

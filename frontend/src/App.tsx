@@ -11,6 +11,8 @@ import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
 import type { SidebarPanel } from "./components/Sidebar";
 import DiffView from "./components/DiffView";
+import AgentDetail from "./components/AgentDetail";
+import CostView from "./components/CostView";
 import RunView from "./components/RunView";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
@@ -35,6 +37,7 @@ export default function App() {
   // lot du planificateur a des dépendances, et c'est à l'utilisateur de les
   // ordonner (ticket-074).
   const [selection, setSelection] = useState<string[]>([]);
+  const [agentSelectionne, setAgentSelectionne] = useState<string | null>(null);
   // Colonne de droite : observer un run, ou discuter (ticket-048).
   const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
   const { toasts, addToast, removeToast } = useToast();
@@ -193,6 +196,8 @@ export default function App() {
             onBatchCreated={handleBatchCreated}
             onSelectTicketById={handleSelectTicketById}
             onAgentCreated={handleAgentCreated}
+            agentSelectionne={agentSelectionne}
+            onSelectAgent={setAgentSelectionne}
             selection={selection}
             queueEnCours={
               stream.status === "running" || stream.status === "connecting"
@@ -223,14 +228,20 @@ export default function App() {
         style={{ gridColumn: "3", gridRow: "1" }}
       >
         <ErrorBoundary>
+          {/* L'onglet Agents donne enfin un détail au centre : le rail dit
+              *quel* agent, le centre montre *ce qu'il est* (ticket-076). */}
           {/* Pendant un run, le centre montre le run. C'est le moment où l'on
               a le plus besoin de place, et où il en occupait le moins : le
               tableau des tickets, ou « ce ticket n'a jamais été lancé »
               (ticket-075). Un fichier ou un diff ouvert explicitement garde la
               priorité : c'est une demande de l'utilisateur. */}
-          {(stream.status === "running" || stream.status === "connecting") &&
-          !openFilePath &&
-          !showDiff ? (
+          {panel === "agents" ? (
+            <AgentDetail role={agentSelectionne} />
+          ) : panel === "usage" && project ? (
+            <CostView projectId={project.id} />
+          ) : (stream.status === "running" || stream.status === "connecting") &&
+            !openFilePath &&
+            !showDiff ? (
             <RunView stream={stream} />
           ) : showDiff && project && ticket ? (
             <DiffView projectId={project.id} ticketId={ticket.id} />

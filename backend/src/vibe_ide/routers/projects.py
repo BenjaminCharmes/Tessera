@@ -22,7 +22,7 @@ from vibe_ide.models.project import (
     ProjectImportResponse,
 )
 from vibe_ide.models.ticket import TicketStatus
-from vibe_ide.services.database import PipelineRunSummary, ProjectUsage, get_project_usage, list_runs
+from vibe_ide.services.database import get_usage_breakdown, PipelineRunSummary, ProjectUsage, get_project_usage, list_runs
 from vibe_ide.agents.github_sync import GithubSyncAgent
 from vibe_ide.services.git_clone import CloneError, GitCloneService
 from vibe_ide.services.github_service import GitHubService
@@ -398,6 +398,12 @@ class CleanupRequest(BaseModel):
     """Les branches que l'utilisateur a choisi de supprimer, parmi le plan."""
 
     branches: list[str]
+
+
+@router.get("/{project_id}/usage/breakdown")
+async def get_usage_breakdown_for_project(project_id: str) -> dict[str, object]:
+    """La dépense de ce projet, ventilée par agent et par modèle."""
+    return await get_usage_breakdown(settings.ide_db_path, project_id)
 
 
 @router.get("/{project_id}/branches/cleanup", response_model=PlanDeNettoyage)
