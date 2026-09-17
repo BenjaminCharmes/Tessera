@@ -121,7 +121,7 @@ describe("ImportProjectModal", () => {
     );
 
     expect(
-      screen.getByRole("button", { name: /cloner →/i }),
+      screen.getByRole("button", { name: "Cloner" }),
     ).toBeInTheDocument();
   });
 
@@ -141,7 +141,7 @@ describe("ImportProjectModal", () => {
     expect(screen.getByRole("radio", { name: /symlink/i })).toBeChecked();
     expect(screen.getByRole("radio", { name: /copie/i })).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /importer/i }),
+      screen.getByRole("button", { name: "Importer" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /annuler/i }),
@@ -156,7 +156,7 @@ describe("ImportProjectModal", () => {
       />,
     );
 
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /chemin.*requis/i,
@@ -179,7 +179,7 @@ describe("ImportProjectModal", () => {
       screen.getByLabelText(/chemin du dossier/i),
       "/Users/moi/Desktop/mon-projet",
     );
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     await waitFor(() => {
       expect(mockImport).toHaveBeenCalledWith({
@@ -207,7 +207,7 @@ describe("ImportProjectModal", () => {
       screen.getByLabelText(/chemin du dossier/i),
       "/Users/moi/Desktop/mon-projet",
     );
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     await waitFor(() => {
       expect(screen.getByText(/mon-projet importé/i)).toBeInTheDocument();
@@ -229,13 +229,13 @@ describe("ImportProjectModal", () => {
     );
 
     await userEvent.type(screen.getByLabelText(/chemin du dossier/i), "/path");
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     await waitFor(() =>
       expect(screen.getByText(/mon-projet importé/i)).toBeInTheDocument(),
     );
 
-    expect(screen.getAllByText("✅").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByLabelText("agent enregistré").length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText(/sera créé automatiquement/i)).toBeInTheDocument();
   });
 
@@ -251,7 +251,7 @@ describe("ImportProjectModal", () => {
     );
 
     await userEvent.type(screen.getByLabelText(/chemin du dossier/i), "/path");
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     await waitFor(() =>
       expect(screen.getByText(/mon-projet importé/i)).toBeInTheDocument(),
@@ -276,7 +276,7 @@ describe("ImportProjectModal", () => {
     );
 
     await userEvent.type(screen.getByLabelText(/chemin du dossier/i), "/path");
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(
@@ -297,7 +297,7 @@ describe("ImportProjectModal", () => {
     );
 
     await userEvent.type(screen.getByLabelText(/chemin du dossier/i), "/path");
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent("API 502: LLM error");
@@ -356,7 +356,7 @@ describe("ImportProjectModal", () => {
 
     await userEvent.click(screen.getByRole("radio", { name: /copie/i }));
     await userEvent.type(screen.getByLabelText(/chemin du dossier/i), "/path");
-    await userEvent.click(screen.getByRole("button", { name: /importer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Importer" }));
 
     await waitFor(() => {
       expect(mockImport).toHaveBeenCalledWith({
@@ -381,7 +381,7 @@ describe("ImportProjectModal", () => {
     await userEvent.click(
       screen.getByRole("button", { name: /cloner depuis github/i }),
     );
-    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Cloner" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/url.*requise/i);
     expect(mockClone).not.toHaveBeenCalled();
@@ -402,7 +402,7 @@ describe("ImportProjectModal", () => {
       screen.getByLabelText(/url du repo github/i),
       "https://gitlab.com/owner/repo",
     );
-    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Cloner" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /format invalide/i,
@@ -435,7 +435,7 @@ describe("ImportProjectModal", () => {
       screen.getByLabelText(/url du repo github/i),
       "https://github.com/owner/my-repo",
     );
-    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Cloner" }));
 
     await waitFor(() => {
       expect(mockClone).toHaveBeenCalledWith({
@@ -473,7 +473,7 @@ describe("ImportProjectModal", () => {
       screen.getByLabelText(/url du repo github/i),
       "https://github.com/owner/my-repo",
     );
-    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Cloner" }));
 
     await waitFor(() => {
       expect(screen.getByText(/my-repo importé/i)).toBeInTheDocument();
@@ -498,7 +498,7 @@ describe("ImportProjectModal", () => {
       screen.getByLabelText(/url du repo github/i),
       "https://github.com/owner/my-repo",
     );
-    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Cloner" }));
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(
@@ -518,7 +518,7 @@ describe("ImportProjectModal", () => {
     await userEvent.click(
       screen.getByRole("button", { name: /cloner depuis github/i }),
     );
-    await userEvent.click(screen.getByRole("button", { name: /cloner →/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Cloner" }));
     expect(await screen.findByRole("alert")).toBeInTheDocument();
 
     await userEvent.click(

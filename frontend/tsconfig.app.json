@@ -5,7 +5,9 @@
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "strict": true,
     "module": "esnext",
-    "types": ["vite/client", "vitest/globals"],
+    // `node` : `src/design/coherence.test.ts` lit les sources sur le disque
+    // pour mesurer la dérive visuelle (ticket-067).
+    "types": ["vite/client", "vitest/globals", "node"],
     "skipLibCheck": true,
 
     /* Bundler mode */

@@ -1,3 +1,4 @@
+import { IconChevronDown, IconChevronRight } from "../../design/icons";
 import { useState } from "react";
 import type { ChatToolUse } from "../../types/api";
 
@@ -20,16 +21,16 @@ export default function ToolUseList({ toolUses }: ToolUseListProps) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center gap-1.5 px-2 py-1 text-left text-[11px] text-zinc-500 hover:text-zinc-300"
+        className="flex w-full items-center gap-1.5 px-2 py-1 text-left text-mini text-zinc-500 hover:text-zinc-300"
       >
-        <span aria-hidden="true">{open ? "▾" : "▸"}</span>
+        {open ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />}
         {toolUses.length} appel{toolUses.length > 1 ? "s" : ""} d'outil
       </button>
 
       {open && (
         <ul className="space-y-1 px-2 pb-1.5">
           {toolUses.map((use, i) => (
-            <li key={i} className="font-mono text-[11px] text-zinc-400">
+            <li key={i} className="font-mono text-mini text-zinc-400">
               <span className="text-zinc-300">{use.tool}</span>
               <span className="text-zinc-600">
                 {" "}

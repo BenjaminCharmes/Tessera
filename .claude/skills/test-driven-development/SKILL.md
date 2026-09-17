@@ -81,4 +81,4 @@ La suite doit finir sans warning. Un `PytestCollectionWarning` ou un
 - [ ] Chaque test a été vu échouer, pour la bonne raison
 - [ ] `uv run pytest -q` est vert, sans warning
 - [ ] `uv run mypy src/` est vert
-- [ ] Côté frontend : `npx tsc --noEmit` et `npm run test -- --run`
+- [ ] Côté frontend : `npm run typecheck` et `npm run test -- --run`

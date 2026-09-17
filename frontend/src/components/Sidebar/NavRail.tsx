@@ -128,7 +128,7 @@ export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
             }`}
           >
             {icon}
-            <span className="text-[10px] leading-none tracking-tight">
+            <span className="text-micro leading-none tracking-tight">
               {label}
             </span>
           </button>

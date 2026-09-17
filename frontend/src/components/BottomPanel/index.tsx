@@ -17,13 +17,13 @@ function eventToLine(ev: OrchestratorEvent): string | null {
   const t = formatTime(ev.timestamp);
   switch (ev.type) {
     case "ticket_status_changed":
-      return `[${t}] ${ev.ticket_id} → ${String(ev.data["status"] ?? "")}`;
+      return `[${t}] ${ev.ticket_id} : ${String(ev.data["status"] ?? "")}`;
     case "agent_started":
       return `[${t}] ${ev.agent ?? "?"} démarré (tour ${String(ev.data["round"] ?? "?")})`;
     case "agent_done":
       return `[${t}] ${ev.agent ?? "?"} terminé`;
     case "pipeline_done":
-      return `[${t}] Pipeline terminé — ${ev.data["approved"] ? "APPROVED" : "CHANGES_REQUESTED"} → ${String(ev.data["final_status"] ?? "")}`;
+      return `[${t}] Pipeline terminé — ${ev.data["approved"] ? "APPROVED" : "CHANGES_REQUESTED"} : ${String(ev.data["final_status"] ?? "")}`;
     case "error":
       return `[${t}] Erreur: ${String(ev.data["message"] ?? "unknown")}`;
     default:

@@ -83,7 +83,7 @@ tests passent »).
 
 ```bash
 cd backend && uv run pytest -q && uv run mypy src/
-cd frontend && npx tsc --noEmit && npm run test -- --run
+cd frontend && npm run typecheck && npm run test -- --run
 gh pr checks <n>
 ```
 

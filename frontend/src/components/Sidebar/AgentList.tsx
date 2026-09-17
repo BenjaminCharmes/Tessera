@@ -1,3 +1,4 @@
+import { IconCross } from "../../design/icons";
 import { useState } from "react";
 import { api } from "../../lib/api";
 import { useAgents } from "../../hooks/useAgents";
@@ -14,13 +15,13 @@ function AgentRow({ agent, deleting, onDelete }: AgentRowProps) {
   return (
     <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800 hover:bg-zinc-800 transition-colors group">
       <span
-        className="flex-1 min-w-0 text-[11px] font-mono text-zinc-200 truncate"
+        className="flex-1 min-w-0 text-mini font-mono text-zinc-200 truncate"
         title={agent.prompt_preview || undefined}
       >
         {agent.role}
       </span>
       <span
-        className={`shrink-0 text-[9px] font-medium px-1.5 py-0.5 rounded ${
+        className={`shrink-0 text-micro font-medium px-1.5 py-0.5 rounded ${
           agent.is_builtin
             ? "bg-blue-900 text-blue-300"
             : "bg-green-900 text-green-300"
@@ -36,7 +37,7 @@ function AgentRow({ agent, deleting, onDelete }: AgentRowProps) {
           className="shrink-0 text-zinc-600 hover:text-red-400 transition-colors disabled:opacity-40 text-xs opacity-0 group-hover:opacity-100"
           aria-label={`Supprimer ${agent.role}`}
         >
-          ✕
+          <IconCross size={14} />
         </button>
       )}
     </div>

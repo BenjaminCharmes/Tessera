@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { IconChevronDown, IconChevronRight } from "../../design/icons";
 import { listEntries, type DirEntry } from "../../lib/fs";
 
 /**
@@ -108,8 +109,14 @@ function Dossier({
               }`}
               style={{ paddingLeft: `${8 + profondeur * 12}px` }}
             >
-              <span className="w-3 shrink-0 text-center text-[10px] text-zinc-600">
-                {entree.is_dir ? (ouvert ? "▾" : "▸") : ""}
+              <span className="flex w-3 shrink-0 justify-center text-zinc-600">
+                {entree.is_dir ? (
+                  ouvert ? (
+                    <IconChevronDown size={12} />
+                  ) : (
+                    <IconChevronRight size={12} />
+                  )
+                ) : null}
               </span>
               <span className="truncate">{entree.name}</span>
             </button>

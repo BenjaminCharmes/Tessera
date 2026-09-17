@@ -1,4 +1,5 @@
 import type { PipelineResult } from "../../types/api";
+import { IconCheck, IconCross } from "../../design/icons";
 
 interface PipelineSummaryProps {
   result: PipelineResult;
@@ -20,7 +21,15 @@ export default function PipelineSummary({
       }`}
     >
       <div className="font-semibold">
-        {result.approved ? "✅ Pipeline terminé" : "❌ Non approuvé"}
+        {result.approved ? (
+          <>
+            <IconCheck size={14} /> Pipeline terminé
+          </>
+        ) : (
+          <>
+            <IconCross size={14} /> Non approuvé
+          </>
+        )}
       </div>
       <div className="mt-1.5 space-y-0.5 text-zinc-400">
         <div>

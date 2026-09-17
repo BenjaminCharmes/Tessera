@@ -30,7 +30,7 @@ export default function QuotaBadge({ quota }: QuotaBadgeProps) {
 
   return (
     <span
-      className={`text-[11px] tabular-nums ${tone}`}
+      className={`text-mini tabular-nums ${tone}`}
       title={
         quota.status === "rejected"
           ? "Quota épuisé — le fournisseur refuse les appels"

@@ -30,10 +30,10 @@ export default function KanbanColumn({
   return (
     <div className="flex flex-col flex-1 min-w-[200px] border-r border-zinc-700 last:border-r-0">
       <div className="px-3 py-2 border-b border-zinc-700 shrink-0">
-        <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+        <span className="text-mini font-semibold text-zinc-500 uppercase tracking-wider">
           {STATUS_LABEL[status]}
         </span>
-        <span className="ml-2 text-[11px] text-zinc-600">
+        <span className="ml-2 text-mini text-zinc-600">
           ({tickets.length})
         </span>
       </div>

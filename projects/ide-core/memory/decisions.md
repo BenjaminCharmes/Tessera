@@ -238,3 +238,14 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : ADR-018 fait dépendre la file des tickets d'un arbre propre, et un run suspendu tient du travail non commité : une question sans réponse le temps d'un déjeuner bloquerait la file. Une hypothèse explicite, qui part dans le rapport du run, est relisible ; une hypothèse silencieuse — l'état d'avant — ne l'est pas.
 **Corollaire** : les messages spontanés ont une file **distincte**, vidée entre deux tours dans `build_context` : un « pense aux tests » ne doit jamais valoir réponse à « on casse l'API ? ».
 **Alternative rejetée** : attendre indéfiniment (bloque la file) ; laisser l'agent trancher seul en silence (le défaut d'origine) ; déduire la réponse d'un message spontané.
+
+---
+
+## ADR-026 — Cinq familles de couleurs, une par rôle
+
+**Date** : 2026-09-17
+**Décision** : L'UI n'utilise que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès) et `blue` (activité). Les tailles de texte sont nommées, jamais arbitraires, et les affordances viennent de `design/icons.tsx`, sur une grille unique. Un test (`design/coherence.test.ts`) verrouille les trois règles.
+**Raison** : l'UI avait dérivé vers huit familles — `green` et `emerald` disaient la même chose, `amber`, `orange` et `yellow` aussi — trois tailles en dur et des glyphes de jeux différents. Personne n'avait choisi huit couleurs : chaque ticket prenait la sienne. Sans mesure, la dérive ne se voit qu'une fois qu'elle saute aux yeux.
+**Conséquence** : une priorité moyenne ou basse n'est pas une alerte ; elle descend en neutre et se distingue par l'intensité, pas par la teinte. Les badges GitHub sont des métadonnées, donc neutres.
+**Alternative rejetée** : une couche d'alias sémantiques (`text-success`) — elle ajoute une indirection sans rien changer à l'écran ; documenter les rôles sans les vérifier (c'est ce qui n'a pas tenu).
+

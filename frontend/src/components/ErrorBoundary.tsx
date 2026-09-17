@@ -1,5 +1,6 @@
 import { Component } from "react";
 import type { ReactNode } from "react";
+import { IconAlert } from "../design/icons";
 
 interface Props {
   children: ReactNode;
@@ -26,7 +27,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         this.props.fallback ?? (
           <div className="flex flex-col items-center justify-center h-full p-6 text-center gap-3">
-            <span className="text-2xl">⚠</span>
+            <IconAlert size={28} className="text-amber-400" />
             <p className="text-sm text-zinc-300 font-medium">
               Une erreur inattendue s&apos;est produite
             </p>

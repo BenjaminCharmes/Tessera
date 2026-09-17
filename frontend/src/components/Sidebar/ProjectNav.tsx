@@ -1,3 +1,4 @@
+import { IconDownload, IconProject } from "../../design/icons";
 import { useState } from "react";
 import { useProjects } from "../../hooks/useProjects";
 import type { Project } from "../../types/api";
@@ -50,7 +51,7 @@ export default function ProjectNav({
               title="Importer un projet"
               aria-label="Importer un projet"
             >
-              ↓
+              <IconDownload size={14} />
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -78,7 +79,7 @@ export default function ProjectNav({
               onClick={() => setShowImportModal(true)}
               className="text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
             >
-              ↓ Importer un projet
+              <IconDownload size={12} /> Importer un projet
             </button>
           </div>
         )}
@@ -92,7 +93,7 @@ export default function ProjectNav({
                 : "hover:bg-zinc-800 text-zinc-300"
             }`}
           >
-            <span className="text-zinc-500 text-xs">◈</span>
+            <IconProject size={12} className="shrink-0 text-zinc-500" />
             <span className="truncate flex-1">{project.name}</span>
             {project.github_remote && (
               <a

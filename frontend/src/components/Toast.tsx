@@ -1,4 +1,6 @@
+import type { ReactElement } from "react";
 import type { Toast as ToastItem } from "../hooks/useToast";
+import { IconCheck, IconCross, IconInfo } from "../design/icons";
 
 const TYPE_STYLE: Record<ToastItem["type"], string> = {
   success: "bg-green-800 text-green-100",
@@ -6,10 +8,10 @@ const TYPE_STYLE: Record<ToastItem["type"], string> = {
   info: "bg-zinc-700 text-zinc-100",
 };
 
-const TYPE_ICON: Record<ToastItem["type"], string> = {
-  success: "✓",
-  error: "✗",
-  info: "ℹ",
+const TYPE_ICON: Record<ToastItem["type"], ReactElement> = {
+  success: <IconCheck size={14} />,
+  error: <IconCross size={14} />,
+  info: <IconInfo size={14} />,
 };
 
 interface ToastItemProps {
@@ -32,7 +34,7 @@ function ToastRow({ toast, onDismiss }: ToastItemProps) {
         aria-label="Fermer"
         className="ml-2 opacity-70 hover:opacity-100 transition-opacity"
       >
-        ×
+        <IconCross size={12} />
       </button>
     </div>
   );

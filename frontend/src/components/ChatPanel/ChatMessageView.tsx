@@ -18,7 +18,7 @@ export default function ChatMessageView({ message }: ChatMessageViewProps) {
         }
       >
         {!isUser && (
-          <span className="mb-0.5 block text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <span className="mb-0.5 block text-mini font-medium uppercase tracking-wide text-zinc-500">
             Agent
           </span>
         )}

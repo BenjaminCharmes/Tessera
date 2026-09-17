@@ -112,7 +112,7 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
       )}
 
       {linked && (
-        <p className="break-all text-emerald-400">
+        <p className="break-all text-green-400">
           Lié à <code>{status?.remote_url}</code>
         </p>
       )}

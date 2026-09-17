@@ -1,3 +1,4 @@
+import { IconRefresh } from "../../design/icons";
 import type { ProjectUsage, TicketUsage } from "../../types/api";
 
 function formatTokens(n: number): string {
@@ -18,7 +19,7 @@ interface SummaryCardProps {
 function SummaryCard({ label, value }: SummaryCardProps) {
   return (
     <div className="flex flex-col gap-0.5 px-3 py-2 bg-zinc-800 rounded">
-      <span className="text-[10px] text-zinc-500 uppercase tracking-wider">
+      <span className="text-micro text-zinc-500 uppercase tracking-wider">
         {label}
       </span>
       <span className="text-sm font-mono text-zinc-200">{value}</span>
@@ -36,10 +37,10 @@ function TicketRow({ ticket, maxCost }: TicketRowProps) {
   return (
     <div className="py-1.5 border-b border-zinc-800 last:border-0">
       <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="text-[11px] font-mono text-zinc-300 truncate flex-1">
+        <span className="text-mini font-mono text-zinc-300 truncate flex-1">
           {ticket.ticket_id}
         </span>
-        <span className="shrink-0 text-[11px] font-mono text-amber-400">
+        <span className="shrink-0 text-mini font-mono text-amber-400">
           {formatCost(ticket.total_cost_usd)}
         </span>
       </div>
@@ -49,7 +50,7 @@ function TicketRow({ ticket, maxCost }: TicketRowProps) {
           style={{ width: `${pct}%` }}
         />
       </div>
-      <div className="flex gap-3 mt-1 text-[10px] text-zinc-600">
+      <div className="flex gap-3 mt-1 text-micro text-zinc-600">
         <span>{formatTokens(ticket.input_tokens)} in</span>
         <span>{formatTokens(ticket.output_tokens)} out</span>
         <span>
@@ -96,10 +97,11 @@ export default function UsageDashboard({
         </span>
         <button
           onClick={onRefresh}
-          className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="text-micro text-zinc-500 hover:text-zinc-300 transition-colors"
           title="Rafraîchir"
+          aria-label="Rafraîchir"
         >
-          ↺
+          <IconRefresh size={14} />
         </button>
       </div>
 
@@ -134,7 +136,7 @@ export default function UsageDashboard({
             {/* Per-ticket breakdown */}
             {usage.per_ticket.length > 0 && (
               <div>
-                <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">
+                <div className="text-micro text-zinc-500 uppercase tracking-wider mb-2">
                   Par ticket
                 </div>
                 <div>

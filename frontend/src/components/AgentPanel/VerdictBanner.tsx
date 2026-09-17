@@ -1,3 +1,5 @@
+import { IconAlert, IconCheck } from "../../design/icons";
+
 interface VerdictBannerProps {
   content: string;
 }
@@ -22,13 +24,21 @@ export default function VerdictBanner({ content }: VerdictBannerProps) {
       className={`rounded p-3 text-xs ${
         approved
           ? "bg-green-900/40 border border-green-700/50 text-green-300"
-          : "bg-orange-900/40 border border-orange-700/50 text-orange-300"
+          : "bg-amber-900/40 border border-amber-700/50 text-amber-300"
       }`}
     >
       <div className="font-semibold mb-1">
-        {approved ? "✅ APPROVED" : "⚠️ CHANGES_REQUESTED"}
+        {approved ? (
+          <>
+            <IconCheck size={14} /> APPROVED
+          </>
+        ) : (
+          <>
+            <IconAlert size={14} /> CHANGES_REQUESTED
+          </>
+        )}
       </div>
-      {summary && <div className="text-zinc-400 text-[11px]">{summary}</div>}
+      {summary && <div className="text-zinc-400 text-mini">{summary}</div>}
     </div>
   );
 }

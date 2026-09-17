@@ -67,8 +67,10 @@ describe("TokenStream", () => {
   });
 
   it("shows cursor when active", () => {
-    render(<TokenStream tokens="typing…" isActive={true} />);
-    expect(screen.getByText("█")).toBeTruthy();
+    // Le curseur est un bloc dessiné depuis ticket-067 : il n'a plus de
+    // contenu textuel, donc on l'observe par sa classe d'animation.
+    const { container } = render(<TokenStream tokens="typing…" isActive={true} />);
+    expect(container.querySelector(".animate-pulse")).toBeTruthy();
   });
 
   it("hides cursor when inactive", () => {
@@ -127,6 +129,6 @@ describe("AgentBlock", () => {
         isDone={false}
       />,
     );
-    expect(screen.getByText("testeur")).toBeTruthy();
+    expect(screen.getByText("TESTEUR")).toBeTruthy();
   });
 });

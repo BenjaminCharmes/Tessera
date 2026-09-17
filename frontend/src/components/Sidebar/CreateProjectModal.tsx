@@ -1,3 +1,4 @@
+import { IconCheck } from "../../design/icons";
 import { useState } from "react";
 import type { Project } from "../../types/api";
 import { api } from "../../lib/api";
@@ -79,7 +80,7 @@ export default function CreateProjectModal({
       >
         <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
           <p className="text-green-400 text-sm font-medium mb-1">
-            ✓ Projet &ldquo;{createdProject.name}&rdquo; créé
+            <IconCheck size={14} /> Projet &ldquo;{createdProject.name}&rdquo; créé
           </p>
           {agentsCreated.length > 0 && (
             <p className="text-zinc-400 text-xs mt-1">

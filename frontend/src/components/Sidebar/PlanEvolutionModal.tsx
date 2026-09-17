@@ -12,9 +12,11 @@ interface PlanEvolutionModalProps {
 
 const PRIORITY_BADGE: Record<string, string> = {
   critical: "text-red-400",
-  high: "text-orange-400",
-  medium: "text-yellow-400",
-  low: "text-zinc-400",
+  high: "text-amber-400",
+  // Moyenne et basse ne sont pas des alertes : elles descendent en neutre,
+  // et se distinguent par l'intensite, pas par la teinte.
+  medium: "text-zinc-300",
+  low: "text-zinc-500",
 };
 
 function buildSelectedDrafts(
@@ -164,7 +166,7 @@ export default function PlanEvolutionModal({
                 {state === "planning" && (
                   <span className="inline-block w-3 h-3 border-2 border-zinc-400 border-t-white rounded-full animate-spin" />
                 )}
-                Planifier →
+                Planifier
               </button>
             </div>
           </>
@@ -200,11 +202,11 @@ export default function PlanEvolutionModal({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span
-                        className={`text-[10px] font-mono uppercase ${PRIORITY_BADGE[draft.priority] ?? "text-zinc-400"}`}
+                        className={`text-micro font-mono uppercase ${PRIORITY_BADGE[draft.priority] ?? "text-zinc-400"}`}
                       >
                         [{draft.priority}]
                       </span>
-                      <span className="text-[10px] text-zinc-500 font-mono">
+                      <span className="text-micro text-zinc-500 font-mono">
                         {draft.type}
                       </span>
                       <span className="text-sm text-zinc-100 font-medium">
@@ -217,7 +219,7 @@ export default function PlanEvolutionModal({
                       </p>
                     )}
                     {draft.depends_on_index.length > 0 && (
-                      <p className="text-[10px] text-zinc-500 mt-1">
+                      <p className="text-micro text-zinc-500 mt-1">
                         Dépend de :{" "}
                         {draft.depends_on_index
                           .map((dep) => `ticket #${dep + 1}`)
@@ -236,7 +238,7 @@ export default function PlanEvolutionModal({
                 disabled={state === "creating"}
                 className="px-3 py-2 text-sm text-zinc-400 hover:text-zinc-200 transition-colors disabled:opacity-50"
               >
-                ← Retour
+                Retour
               </button>
               <button
                 type="button"

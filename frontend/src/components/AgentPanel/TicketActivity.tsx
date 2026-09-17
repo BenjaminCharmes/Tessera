@@ -74,7 +74,7 @@ export default function TicketActivity({
             <li key={run.id} className="flex items-baseline justify-between gap-2">
               <span
                 className={
-                  run.approved ? "text-emerald-400" : "text-amber-400"
+                  run.approved ? "text-green-400" : "text-amber-400"
                 }
               >
                 {run.approved ? "approuvé" : (run.final_status ?? "en cours")}
@@ -95,7 +95,7 @@ export default function TicketActivity({
 
       <div className="mt-2">
         {activity.pr_number ? (
-          <p className="text-emerald-400">PR #{activity.pr_number} ouverte</p>
+          <p className="text-green-400">PR #{activity.pr_number} ouverte</p>
         ) : (
           <>
             <button

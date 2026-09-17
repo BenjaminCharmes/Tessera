@@ -53,7 +53,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
         </span>
         {chat.maxUsd > 0 && (
           <span
-            className={`text-[11px] tabular-nums ${
+            className={`text-mini tabular-nums ${
               budgetRatio >= 0.9 ? "text-amber-400" : "text-zinc-500"
             }`}
             title="Coût cumulé de cette conversation"
@@ -87,21 +87,21 @@ export default function ChatPanel({ project }: ChatPanelProps) {
         )}
 
         {chat.lastBranch && (
-          <p className="text-[11px] text-emerald-400">
+          <p className="text-mini text-green-400">
             Travail commité sur <code>{chat.lastBranch}</code>
           </p>
         )}
 
         {chat.suggestedTicketId && !chat.runningTicketId && (
           <div className="rounded border border-zinc-700 bg-zinc-800/60 p-2">
-            <p className="mb-1.5 text-[11px] text-zinc-400">
+            <p className="mb-1.5 text-mini text-zinc-400">
               L'agent propose de lancer le pipeline sur{" "}
               <code className="text-zinc-200">{chat.suggestedTicketId}</code>.
             </p>
             <button
               type="button"
               onClick={chat.runSuggested}
-              className="rounded bg-emerald-800 px-2.5 py-1 text-xs text-emerald-50 hover:bg-emerald-700"
+              className="rounded bg-green-800 px-2.5 py-1 text-xs text-green-50 hover:bg-green-700"
             >
               Lancer le pipeline
             </button>
@@ -109,15 +109,15 @@ export default function ChatPanel({ project }: ChatPanelProps) {
         )}
 
         {chat.runningTicketId && (
-          <p className="text-[11px] text-zinc-400">
+          <p className="text-mini text-zinc-400">
             Pipeline en cours sur <code>{chat.runningTicketId}</code>…
           </p>
         )}
 
         {chat.lastRun && (
           <p
-            className={`text-[11px] ${
-              chat.lastRun.approved ? "text-emerald-400" : "text-amber-400"
+            className={`text-mini ${
+              chat.lastRun.approved ? "text-green-400" : "text-amber-400"
             }`}
           >
             {chat.lastRun.ticket_id} —{" "}

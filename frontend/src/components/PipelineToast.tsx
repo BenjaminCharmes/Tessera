@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { PipelineResult } from "../types/api";
+import { IconCheck, IconCross } from "../design/icons";
 
 interface PipelineToastProps {
   result: PipelineResult | null;
@@ -35,7 +36,7 @@ export default function PipelineToast({ result }: PipelineToastProps) {
         success ? "bg-green-800 text-green-100" : "bg-red-800 text-red-100"
       }`}
     >
-      <span>{success ? "✓" : "✗"}</span>
+      <span>{success ? <IconCheck size={14} /> : <IconCross size={14} />}</span>
       <span>
         {success
           ? `Ticket ${shown.ticket_id} terminé en ${shown.rounds} tour${shown.rounds > 1 ? "s" : ""}`

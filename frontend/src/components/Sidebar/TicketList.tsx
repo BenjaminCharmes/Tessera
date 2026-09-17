@@ -1,3 +1,4 @@
+import { IconBolt, IconChevronDown, IconChevronRight } from "../../design/icons";
 import { useState } from "react";
 import TicketCard from "./TicketCard";
 import CreateTicketModal from "./CreateTicketModal";
@@ -103,7 +104,7 @@ export default function TicketList({
               aria-label="Planifier une évolution"
               className="w-6 h-6 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-sm leading-none"
             >
-              ⚡
+              <IconBolt size={14} />
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -136,15 +137,15 @@ export default function TicketList({
               <div key={status} className="mb-0.5">
                 <button
                   onClick={() => collapsible && toggleGroup(status)}
-                  className={`w-full flex items-center gap-1 px-3 py-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider ${
+                  className={`w-full flex items-center gap-1 px-3 py-1 text-mini font-semibold text-zinc-500 uppercase tracking-wider ${
                     collapsible
                       ? "hover:text-zinc-300 cursor-pointer"
                       : "cursor-default"
                   }`}
                 >
                   {collapsible && (
-                    <span className="text-[9px] w-2">
-                      {isCollapsed ? "▶" : "▼"}
+                    <span className="text-micro w-2">
+                      {isCollapsed ? <IconChevronRight size={12} /> : <IconChevronDown size={12} />}
                     </span>
                   )}
                   {label}

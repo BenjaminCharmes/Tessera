@@ -1,3 +1,4 @@
+import { IconCheck, IconSettings } from "../../design/icons";
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import type { AnalysisResult, Project } from "../../types/api";
@@ -303,7 +304,7 @@ export default function ImportProjectModal({
                     type="submit"
                     className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors flex items-center gap-2"
                   >
-                    {sourceType === "local" ? "Importer →" : "Cloner →"}
+                    {sourceType === "local" ? "Importer" : "Cloner"}
                   </button>
                 </div>
               </form>
@@ -326,7 +327,7 @@ export default function ImportProjectModal({
           {step === "review" && analysis && project && (
             <>
               <h2 className="text-zinc-100 text-base font-semibold">
-                ✅ {project.name} importé
+                <IconCheck size={14} /> {project.name} importé
               </h2>
 
               <div>
@@ -372,7 +373,19 @@ export default function ImportProjectModal({
                         className="flex items-center justify-between"
                       >
                         <span className="text-sm text-zinc-300">
-                          {present ? "✅" : "⚙"}{" "}
+                          <span
+                            role="img"
+                            aria-label={
+                              present ? "agent enregistré" : "agent à créer"
+                            }
+                            className="inline-flex align-middle"
+                          >
+                            {present ? (
+                              <IconCheck size={12} />
+                            ) : (
+                              <IconSettings size={12} />
+                            )}
+                          </span>{" "}
                           <span className="font-mono">{agent}</span>
                         </span>
                         {!present && (

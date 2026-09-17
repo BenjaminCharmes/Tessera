@@ -15,7 +15,11 @@ export default function TokenStream({ tokens, isActive }: TokenStreamProps) {
   return (
     <div className="overflow-y-auto max-h-64 bg-zinc-950 rounded p-3 font-mono text-xs text-zinc-300 leading-relaxed">
       <pre className="whitespace-pre-wrap break-words">{tokens}</pre>
-      {isActive && <span className="text-blue-400 animate-pulse">█</span>}
+      {/* Curseur de frappe : un bloc dessiné, pas le caractère `█`, dont la
+          largeur dépend de la police du système. */}
+      {isActive && (
+        <span className="ml-0.5 inline-block h-3 w-1.5 animate-pulse bg-blue-400 align-text-bottom" />
+      )}
       <div ref={bottomRef} />
     </div>
   );

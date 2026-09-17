@@ -1,3 +1,4 @@
+import { IconCross } from "../../design/icons";
 import RoundBadge from "./RoundBadge";
 import QuotaBadge from "./QuotaBadge";
 import AgentDialogue from "./AgentDialogue";
@@ -80,10 +81,11 @@ export default function AgentPanel({
           {(status === "done" || status === "error") && (
             <button
               onClick={clear}
-              title="Clear"
+              title="Effacer le run"
+              aria-label="Effacer le run"
               className="text-zinc-600 hover:text-zinc-300 transition-colors text-sm"
             >
-              ✕
+              <IconCross size={14} />
             </button>
           )}
         </div>
@@ -147,7 +149,7 @@ export default function AgentPanel({
             onClick={clear}
             className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
           >
-            ✕ Fermer
+            <IconCross size={12} /> Fermer
           </button>
         </div>
       )}

@@ -64,7 +64,7 @@ describe("TicketCard", () => {
     expect(onSelect).toHaveBeenCalledWith(base);
   });
 
-  it("calls onRun with ticket id when ▶ button clicked", () => {
+  it("calls onRun with ticket id when run button clicked", () => {
     const onRun = vi.fn();
     render(
       <TicketCard
@@ -75,11 +75,11 @@ describe("TicketCard", () => {
         onRun={onRun}
       />,
     );
-    fireEvent.click(screen.getByTitle("Run pipeline"));
+    fireEvent.click(screen.getByRole("button", { name: "Lancer le pipeline" }));
     expect(onRun).toHaveBeenCalledWith("ticket-001");
   });
 
-  it("▶ click does not bubble to onSelect", () => {
+  it("run click does not bubble to onSelect", () => {
     const onSelect = vi.fn();
     const onRun = vi.fn();
     render(
@@ -91,7 +91,7 @@ describe("TicketCard", () => {
         onRun={onRun}
       />,
     );
-    fireEvent.click(screen.getByTitle("Run pipeline"));
+    fireEvent.click(screen.getByRole("button", { name: "Lancer le pipeline" }));
     expect(onSelect).not.toHaveBeenCalled();
   });
 
@@ -105,7 +105,7 @@ describe("TicketCard", () => {
         onRun={vi.fn()}
       />,
     );
-    const pulse = screen.getByText("●");
+    const pulse = document.querySelector(".animate-pulse")!;
     expect(pulse).toHaveClass("animate-pulse");
   });
 
@@ -119,7 +119,7 @@ describe("TicketCard", () => {
         onRun={vi.fn()}
       />,
     );
-    expect(screen.getByTitle("Run pipeline")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Lancer le pipeline" })).toBeDisabled();
   });
 
   it("no run button for done tickets", () => {
@@ -264,7 +264,7 @@ describe("TicketCard", () => {
       />,
     );
     fireEvent.click(screen.getByTitle("Ouvrir une PR"));
-    fireEvent.click(screen.getByText("✕"));
+    fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
     expect(
       screen.queryByPlaceholderText("branch name"),
     ).not.toBeInTheDocument();
@@ -362,7 +362,7 @@ describe("TicketCard", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("✅ CI")).toBeInTheDocument();
+      expect(screen.getByText("CI verte")).toBeInTheDocument();
     });
   });
 });

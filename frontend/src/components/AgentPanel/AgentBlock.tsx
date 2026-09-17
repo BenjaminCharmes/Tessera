@@ -2,11 +2,9 @@ import TokenStream from "./TokenStream";
 import VerdictBanner from "./VerdictBanner";
 import type { AgentRole } from "../../types/api";
 
-const AGENT_LABEL: Partial<Record<AgentRole, string>> = {
-  codeur: "🤖 CODEUR",
-  reviewer: "🔍 REVIEWER",
-  architect: "🏗️ ARCHITECT",
-};
+// Le nom du rôle suffit. La carte précédente n'associait une émoji qu'à trois
+// rôles sur treize : les dix autres s'affichaient sans, et l'en-tête du panneau
+// changeait de forme selon l'agent qui parlait (ticket-067).
 
 interface AgentBlockProps {
   agent: AgentRole;
@@ -26,7 +24,7 @@ export default function AgentBlock({
   return (
     <div className="mx-3 mb-3 rounded border border-zinc-700 overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800 text-xs font-semibold text-zinc-300">
-        <span>{AGENT_LABEL[agent] ?? agent}</span>
+        <span>{agent.toUpperCase()}</span>
         {isActive && (
           <span className="ml-auto flex gap-0.5">
             {[0, 150, 300].map((delay) => (

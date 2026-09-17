@@ -18,7 +18,14 @@ uv run pytest -q          # attendu : "N passed", aucun failed
 uv run mypy src/          # attendu : "Success: no issues found"
 
 cd ../frontend
-npx tsc --noEmit          # attendu : aucune sortie
+npm run typecheck         # attendu : aucune sortie
+
+# `npx tsc --noEmit` ne vérifie RIEN dans ce dépôt, et c'est silencieux :
+# `tsconfig.json` est un fichier « solution » (`"files": []` + `references`),
+# donc tsc y trouve zéro fichier à analyser et sort sans rien dire. C'est ce
+# qui a laissé 36 erreurs de types s'accumuler sans que personne les voie
+# (ticket-067). `npm run typecheck` lance `tsc -b --noEmit`, qui suit les
+# références.
 npm run test -- --run     # attendu : "N passed"
 ```
 

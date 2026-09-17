@@ -52,7 +52,7 @@ export default function AgentDialogue({
     <div className="border-t border-zinc-800 bg-zinc-900 px-3 py-2.5">
       {pendingQuestion ? (
         <div className="mb-3">
-          <p className="mb-1 text-[10px] uppercase tracking-wide text-amber-500">
+          <p className="mb-1 text-micro uppercase tracking-wide text-amber-500">
             L'agent attend votre réponse
           </p>
           <p className="mb-2 rounded border border-amber-900/60 bg-amber-950/30 px-2 py-1.5 text-xs text-amber-100">
@@ -60,7 +60,7 @@ export default function AgentDialogue({
           </p>
           <label
             htmlFor="dialogue-reponse"
-            className="mb-1 block text-[11px] text-zinc-400"
+            className="mb-1 block text-mini text-zinc-400"
           >
             Votre réponse
           </label>
@@ -85,7 +85,7 @@ export default function AgentDialogue({
 
       <label
         htmlFor="dialogue-consigne"
-        className="mb-1 block text-[11px] text-zinc-500"
+        className="mb-1 block text-mini text-zinc-500"
       >
         Consigne pour le prochain tour
       </label>
