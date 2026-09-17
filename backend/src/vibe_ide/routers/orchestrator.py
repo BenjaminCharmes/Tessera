@@ -204,6 +204,7 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
         orchestrator = await _build_orchestrator(project_id)
 
         ticket_id: str | None = raw.get("ticket_id")
+        ticket_ids: list[str] = list(raw.get("ticket_ids") or [])
         mode: str = raw.get("mode", "single")
 
         if mode == "autonomous":
@@ -212,6 +213,48 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
 
             max_tickets = int(raw.get("max_tickets", 5))
             await orchestrator.run_autonomous(project_id, max_tickets, send_event_autonomous)
+        elif ticket_ids:
+            # Une file : l'utilisateur a désigné un lot et son ordre. Le canal
+            # de dialogue est partagé par tous les runs, pour qu'un seul arrêt
+            # vide la file entière (ticket-074).
+            async def send_queue_event(event: OrchestratorEvent) -> None:
+                await websocket.send_text(event.model_dump_json())
+
+            async def announce_queue_question(question: str) -> None:
+                await send_queue_event(
+                    OrchestratorEvent(
+                        type=EventType.AGENT_QUESTION,
+                        ticket_id="",
+                        data={"question": question},
+                    )
+                )
+
+            queue_dialogue = DialogueChannel(
+                timeout_s=settings.dialogue_timeout_s,
+                interactive=True,
+                on_question=announce_queue_question,
+            )
+
+            async def read_queue_inbound() -> None:
+                while True:
+                    message = await websocket.receive_json()
+                    texte = str(message.get("text", ""))
+                    if message.get("type") == "answer":
+                        queue_dialogue.answer(texte)
+                    elif message.get("type") == "interject":
+                        queue_dialogue.interject(texte)
+                    elif message.get("type") == "stop":
+                        queue_dialogue.request_stop()
+
+            queue_reader = asyncio.create_task(read_queue_inbound())
+            try:
+                await orchestrator.run_queue(
+                    project_id, ticket_ids, send_queue_event, queue_dialogue
+                )
+            except ValueError as exc:
+                await websocket.send_json({"error": str(exc)})
+            finally:
+                queue_reader.cancel()
         elif ticket_id:
             run_id = await create_run(settings.ide_db_path, project_id, ticket_id)
 

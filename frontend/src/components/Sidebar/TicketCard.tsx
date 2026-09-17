@@ -1,4 +1,11 @@
-import { IconCross, IconDiff, IconDot, IconExternal, IconPlay } from "../../design/icons";
+import {
+  IconCross,
+  IconDiff,
+  IconDot,
+  IconExternal,
+  IconPlay,
+  IconQueue,
+} from "../../design/icons";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
 import type {
@@ -58,6 +65,8 @@ interface TicketCardProps {
   onSelect: (ticket: Ticket) => void;
   onRun: (ticketId: string) => void;
   onShowDiff?: (ticketId: string) => void;
+  onToggleQueue?: (ticketId: string) => void;
+  dansLaFile?: boolean;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
 }
 
@@ -70,6 +79,8 @@ export default function TicketCard({
   onSelect,
   onRun,
   onShowDiff,
+  onToggleQueue,
+  dansLaFile = false,
   onPrCreated,
 }: TicketCardProps) {
   const canRun = ticket.status !== "done" && ticket.status !== "cancelled";
@@ -228,6 +239,23 @@ export default function TicketCard({
               ) : (
                 <IconPlay size={12} />
               )}
+            </button>
+          )}
+          {onToggleQueue && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleQueue(ticket.id);
+              }}
+              title={dansLaFile ? "Retirer de la file" : "Ajouter à la file"}
+              aria-label={dansLaFile ? "Retirer de la file" : "Ajouter à la file"}
+              className={`flex h-6 w-6 items-center justify-center rounded transition-colors ${
+                dansLaFile
+                  ? "bg-violet-500/20 text-violet-300"
+                  : "text-zinc-500 hover:bg-zinc-600 hover:text-zinc-300"
+              }`}
+            >
+              <IconQueue size={12} />
             </button>
           )}
           {/* Relire ce que le run a produit : c'est ce qui manquait pour

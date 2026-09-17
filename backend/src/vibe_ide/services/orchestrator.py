@@ -185,6 +185,63 @@ class Orchestrator:
             return None
         return min(eligible, key=lambda t: _PRIORITY_ORDER.get(t.priority, 99))
 
+    async def run_queue(
+        self,
+        project_id: str,
+        ticket_ids: list[str],
+        on_event: EventCallback | None = None,
+        dialogue: "DialogueChannel | None" = None,
+    ) -> list[PipelineResult]:
+        """Enchaîne une sélection de tickets, dans l'ordre demandé.
+
+        Distinct de `run_autonomous`, qui choisit lui-même le prochain ticket :
+        ici l'utilisateur a désigné un lot et son ordre.
+
+        **Un ticket non approuvé arrête la file.** Les tickets d'un lot
+        dépendent presque toujours les uns des autres — c'est le découpage que
+        produit le planificateur — et enchaîner sur une base que personne n'a
+        validée ferait travailler le suivant sur un état douteux. Mieux vaut
+        s'arrêter net et laisser décider.
+        """
+
+        async def _noop(event: OrchestratorEvent) -> None:
+            pass
+
+        callback = on_event or _noop
+        results: list[PipelineResult] = []
+
+        for index, ticket_id in enumerate(ticket_ids, start=1):
+            # Comme pour le budget et le quota, on vérifie **entre** deux
+            # tickets : s'arrêter au milieu de l'un laisserait son travail non
+            # commité (ADR-018, ADR-020).
+            if dialogue is not None and dialogue.stop_requested:
+                self._log(f"[{project_id}] file interrompue : arrêt demandé")
+                break
+            if self.budget_exhausted():
+                self._log(f"[{project_id}] file interrompue : plafond de dépense")
+                break
+
+            await callback(
+                OrchestratorEvent(
+                    type=EventType.QUEUE_PROGRESS,
+                    ticket_id=ticket_id,
+                    data={"index": index, "total": len(ticket_ids)},
+                )
+            )
+
+            result = await self.run_pipeline(
+                project_id, ticket_id, callback, dialogue=dialogue
+            )
+            results.append(result)
+
+            if not result.approved:
+                self._log(
+                    f"[{project_id}] file interrompue : {ticket_id} non approuvé"
+                )
+                break
+
+        return results
+
     async def run_autonomous(
         self,
         project_id: str,

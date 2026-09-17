@@ -31,6 +31,7 @@ class EventType(str, Enum):
     DOC_UPDATED = "doc_updated"
     COMMIT_CREATED = "commit_created"
     QUOTA_UPDATED = "quota_updated"
+    QUEUE_PROGRESS = "queue_progress"
 
 
 class OrchestratorEvent(BaseModel):

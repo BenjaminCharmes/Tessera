@@ -1,13 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import DiffView from "./index";
 
 vi.mock("../../lib/api");
 import { api } from "../../lib/api";
-
-vi.mock("@monaco-editor/react", () => ({
-  default: ({ value }: { value: string }) => <pre data-testid="monaco">{value}</pre>,
-}));
 
 const diff = vi.mocked(api.tickets.diff);
 
@@ -16,20 +13,54 @@ describe("DiffView", () => {
     diff.mockReset();
   });
 
-  it("montre le diff produit par le run", async () => {
+  it("montre le diff, un fichier a la fois, avec ses compteurs", async () => {
     diff.mockResolvedValue({
       ticket_id: "ticket-001",
       branch: "ticket-001-x",
-      diff: "-x = 1\n+x = 2",
+      diff: [
+        "diff --git a/app.py b/app.py",
+        "@@ -1 +1 @@",
+        "-x = 1",
+        "+x = 2",
+      ].join("\n"),
       files: ["app.py"],
     });
 
     render(<DiffView projectId="p" ticketId="ticket-001" />);
 
-    expect(await screen.findByTestId("monaco")).toHaveTextContent("+x = 2");
-    expect(screen.getByText("app.py")).toBeInTheDocument();
+    expect(await screen.findByText("app.py")).toBeInTheDocument();
+    expect(screen.getByText("+1")).toBeInTheDocument();
+    expect(screen.getByText("-1")).toBeInTheDocument();
+    expect(screen.getByText("+x = 2")).toBeInTheDocument();
   });
 
+  it("permet de passer d'un fichier a l'autre", async () => {
+    // Panne d'usage : tout etait concatene dans un seul tampon, sans
+    // navigation ni couleur. Sur cinq fichiers dont deux longs Markdown, on ne
+    // lisait rien (ticket-075).
+    diff.mockResolvedValue({
+      ticket_id: "ticket-001",
+      branch: "ticket-001-x",
+      diff: [
+        "diff --git a/app.py b/app.py",
+        "@@ -1 +1 @@",
+        "+depuis app",
+        "diff --git a/README.md b/README.md",
+        "@@ -1 +1 @@",
+        "+depuis readme",
+      ].join("\n"),
+      files: ["app.py", "README.md"],
+    });
+
+    render(<DiffView projectId="p" ticketId="ticket-001" />);
+
+    expect(await screen.findByText("+depuis app")).toBeInTheDocument();
+    expect(screen.queryByText("+depuis readme")).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: /README/ }));
+
+    expect(screen.getByText("+depuis readme")).toBeInTheDocument();
+  });
   it("dit qu'un ticket jamais lance n'a pas de branche", async () => {
     diff.mockResolvedValue({
       ticket_id: "ticket-002", branch: null, diff: "", files: [],

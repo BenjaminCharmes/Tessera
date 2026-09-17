@@ -1,3 +1,4 @@
+import QueueBar from "./QueueBar";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import {
@@ -41,6 +42,11 @@ interface TicketListProps {
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onShowDiff?: (ticketId: string) => void;
+  selection?: string[];
+  onToggleQueue?: (ticketId: string) => void;
+  onRunQueue?: () => void;
+  onClearQueue?: () => void;
+  queueEnCours?: boolean;
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
@@ -58,6 +64,11 @@ export default function TicketList({
   onSelectTicket,
   onRunPipeline,
   onShowDiff,
+  selection = [],
+  onToggleQueue,
+  onRunQueue,
+  onClearQueue,
+  queueEnCours = false,
   onToggleKanban,
   onTicketCreated,
   onBatchCreated,
@@ -123,6 +134,13 @@ export default function TicketList({
           </div>
         </div>
 
+        <QueueBar
+          selection={selection}
+          onRun={onRunQueue ?? (() => {})}
+          onClear={onClearQueue ?? (() => {})}
+          enCours={queueEnCours}
+        />
+
         <div className="flex-1 overflow-y-auto py-1">
           {/* Le chargement et l'erreur remplacent la **liste**, pas le
               composant. Un retour anticipé ici démontait tout le sous-arbre —
@@ -173,6 +191,8 @@ export default function TicketList({
                       onSelect={onSelectTicket}
                       onRun={onRunPipeline}
                       onShowDiff={onShowDiff}
+                      onToggleQueue={onToggleQueue}
+                      dansLaFile={selection.includes(ticket.id)}
                     />
                   ))}
               </div>

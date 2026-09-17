@@ -23,10 +23,14 @@ interface StreamState {
   quota: QuotaState | null;
   /** Question posée par l'agent en cours, tant qu'on n'y a pas répondu (ticket-066). */
   pendingQuestion: string | null;
+  /** Avancement d'une file de tickets, ou null hors file (ticket-074). */
+  queue: { index: number; total: number } | null;
 }
 
 export interface UseOrchestratorStreamResult extends StreamState {
   connect: (ticketId: string) => void;
+  /** Lance une sélection de tickets, dans l'ordre donné. */
+  connectQueue: (ticketIds: string[]) => void;
   disconnect: () => void;
   clear: () => void;
   /** Répond à la question en cours et laisse le run reprendre. */
@@ -48,6 +52,7 @@ const INITIAL: StreamState = {
   errorMessage: null,
   quota: null,
   pendingQuestion: null,
+  queue: null,
 };
 
 function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
@@ -119,6 +124,16 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         pendingQuestion:
           typeof ev.data["question"] === "string" ? ev.data["question"] : null,
       };
+    case "queue_progress":
+      return {
+        ...s,
+        events,
+        ticketId: ev.ticket_id || s.ticketId,
+        queue: {
+          index: Number(ev.data["index"] ?? 0),
+          total: Number(ev.data["total"] ?? 0),
+        },
+      };
     case "quota_updated":
       // Le quota d'abonnement est la ressource réellement finie : l'afficher
       // évite d'être coupé sans comprendre pourquoi (ticket-054).
@@ -135,6 +150,7 @@ export function useOrchestratorStream(
   const [state, setState] = useState<StreamState>(INITIAL);
   const wsRef = useRef<WebSocket | null>(null);
   const ticketIdRef = useRef<string | null>(null);
+  const queueRef = useRef<string[] | null>(null);
   const isDoneRef = useRef(false);
 
   function closeWs() {
@@ -166,7 +182,11 @@ export function useOrchestratorStream(
     wsRef.current = ws;
 
     ws.onopen = () => {
-      ws.send(JSON.stringify({ ticket_id: ticketId }));
+      ws.send(
+        queueRef.current
+          ? JSON.stringify({ ticket_ids: queueRef.current })
+          : JSON.stringify({ ticket_id: ticketId }),
+      );
     };
 
     ws.onmessage = (event: MessageEvent) => {
@@ -221,8 +241,18 @@ export function useOrchestratorStream(
     send({ type: "stop", text: "" });
   }
 
+  function connectQueue(ticketIds: string[]) {
+    if (ticketIds.length === 0) return;
+    ticketIdRef.current = ticketIds[0] ?? null;
+    queueRef.current = ticketIds;
+    isDoneRef.current = false;
+    setState({ ...INITIAL, ticketId: ticketIds[0] ?? null });
+    openSocket(ticketIds[0] ?? "");
+  }
+
   function connect(ticketId: string) {
     ticketIdRef.current = ticketId;
+    queueRef.current = null;
     isDoneRef.current = false;
     setState({ ...INITIAL, ticketId });
     openSocket(ticketId);
@@ -237,9 +267,19 @@ export function useOrchestratorStream(
   function clear() {
     isDoneRef.current = true;
     ticketIdRef.current = null;
+    queueRef.current = null;
     closeWs();
     setState(INITIAL);
   }
 
-  return { ...state, connect, disconnect, clear, answer, interject, stop };
+  return {
+    ...state,
+    connect,
+    connectQueue,
+    disconnect,
+    clear,
+    answer,
+    interject,
+    stop,
+  };
 }

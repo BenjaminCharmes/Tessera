@@ -186,3 +186,10 @@ export const IconDiff = (p: IconProps) => (
     <path d="M4 20 20 4" />
   </Icon>
 );
+
+export const IconQueue = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 6.5h10M4 12h10M4 17.5h10" />
+    <path d="M18.5 9v6M15.5 12h6" />
+  </Icon>
+);

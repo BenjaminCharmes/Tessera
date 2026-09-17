@@ -40,6 +40,7 @@ export type EventType =
   | "doc_updated"
   | "commit_created"
   | "quota_updated"
+  | "queue_progress"
   | "pipeline_done"
   | "error";
 

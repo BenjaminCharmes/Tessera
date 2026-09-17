@@ -11,6 +11,7 @@ import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
 import type { SidebarPanel } from "./components/Sidebar";
 import DiffView from "./components/DiffView";
+import RunView from "./components/RunView";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
 import AgentPanel from "./components/AgentPanel";
@@ -30,6 +31,10 @@ export default function App() {
   const [openFilePath, setOpenFilePath] = useState<string | null>(null);
   // Relire ce qu'un run a produit sans quitter l'IDE (ticket-069).
   const [showDiff, setShowDiff] = useState(false);
+  // L'ordre de la file est celui de la sélection, pas celui de la liste : un
+  // lot du planificateur a des dépendances, et c'est à l'utilisateur de les
+  // ordonner (ticket-074).
+  const [selection, setSelection] = useState<string[]>([]);
   // Colonne de droite : observer un run, ou discuter (ticket-048).
   const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
   const { toasts, addToast, removeToast } = useToast();
@@ -127,7 +132,7 @@ export default function App() {
       className="h-screen overflow-hidden bg-zinc-900 text-zinc-100"
       style={{
         display: "grid",
-        gridTemplateColumns: "84px 280px 1fr 320px",
+        gridTemplateColumns: "100px 280px 1fr 320px",
         gridTemplateRows: "1fr 180px",
       }}
     >
@@ -188,6 +193,19 @@ export default function App() {
             onBatchCreated={handleBatchCreated}
             onSelectTicketById={handleSelectTicketById}
             onAgentCreated={handleAgentCreated}
+            selection={selection}
+            queueEnCours={
+              stream.status === "running" || stream.status === "connecting"
+            }
+            onToggleQueue={(ticketId) =>
+              setSelection((prec) =>
+                prec.includes(ticketId)
+                  ? prec.filter((t) => t !== ticketId)
+                  : [...prec, ticketId],
+              )
+            }
+            onRunQueue={() => stream.connectQueue(selection)}
+            onClearQueue={() => setSelection([])}
             openFilePath={openFilePath}
             onOpenFile={(path) => {
               setOpenFilePath(path);
@@ -205,7 +223,16 @@ export default function App() {
         style={{ gridColumn: "3", gridRow: "1" }}
       >
         <ErrorBoundary>
-          {showDiff && project && ticket ? (
+          {/* Pendant un run, le centre montre le run. C'est le moment où l'on
+              a le plus besoin de place, et où il en occupait le moins : le
+              tableau des tickets, ou « ce ticket n'a jamais été lancé »
+              (ticket-075). Un fichier ou un diff ouvert explicitement garde la
+              priorité : c'est une demande de l'utilisateur. */}
+          {(stream.status === "running" || stream.status === "connecting") &&
+          !openFilePath &&
+          !showDiff ? (
+            <RunView stream={stream} />
+          ) : showDiff && project && ticket ? (
             <DiffView projectId={project.id} ticketId={ticket.id} />
           ) : showKanban && !openFilePath ? (
             <KanbanView
