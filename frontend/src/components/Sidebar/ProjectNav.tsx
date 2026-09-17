@@ -1,3 +1,4 @@
+import RegionTitle from "../../design/RegionTitle";
 import { IconDownload, IconProject } from "../../design/icons";
 import { useState } from "react";
 import { useProjects } from "../../hooks/useProjects";
@@ -41,9 +42,9 @@ export default function ProjectNav({
     <>
       <div>
         <div className="px-3 py-2 flex items-center justify-between">
-          <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          <RegionTitle>
             Projects
-          </span>
+          </RegionTitle>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setShowImportModal(true)}

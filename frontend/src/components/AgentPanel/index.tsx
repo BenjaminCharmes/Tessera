@@ -1,3 +1,4 @@
+import RegionTitle from "../../design/RegionTitle";
 import { IconCross } from "../../design/icons";
 import RoundBadge from "./RoundBadge";
 import QuotaBadge from "./QuotaBadge";
@@ -65,14 +66,14 @@ export default function AgentPanel({
     <div className="h-full flex flex-col bg-zinc-900 border-l border-zinc-700">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-700 shrink-0">
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+        <RegionTitle>
           Agents
           {ticketId && (
-            <span className="ml-2 text-zinc-600 normal-case font-normal">
+            <span className="ml-2 font-normal normal-case text-zinc-600">
               — {ticketId}
             </span>
           )}
-        </span>
+        </RegionTitle>
         <div className="flex items-center gap-2">
           <QuotaBadge quota={quota} />
           {project && !ticketId && (

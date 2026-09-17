@@ -43,7 +43,7 @@ export default function ProjectHeader({
   return (
     <header className="border-b border-zinc-800 px-3 py-2.5">
       <h2
-        className="truncate text-sm font-medium text-zinc-100"
+        className="truncate text-sm font-medium text-violet-100"
         title={project.path ?? project.id}
       >
         {project.name}

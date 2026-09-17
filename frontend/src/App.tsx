@@ -122,7 +122,7 @@ export default function App() {
       className="h-screen overflow-hidden bg-zinc-900 text-zinc-100"
       style={{
         display: "grid",
-        gridTemplateColumns: "72px 280px 1fr 320px",
+        gridTemplateColumns: "84px 280px 1fr 320px",
         gridTemplateRows: "1fr 180px",
       }}
     >

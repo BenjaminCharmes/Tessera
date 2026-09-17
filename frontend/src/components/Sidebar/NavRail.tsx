@@ -110,7 +110,7 @@ export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
       role="tablist"
       aria-orientation="vertical"
       aria-label="Navigation principale"
-      className="flex h-full flex-col items-stretch gap-0.5 bg-zinc-900 px-1.5 py-3"
+      className="flex h-full flex-col items-stretch gap-0.5 bg-zinc-900 px-2 py-3"
     >
       {DESTINATIONS.map(({ panel, label, icon }) => {
         const actif = activePanel === panel;
@@ -121,14 +121,20 @@ export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
             role="tab"
             aria-selected={actif}
             onClick={() => onChangePanel(panel)}
-            className={`flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
+            className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
               actif
-                ? "bg-zinc-800 text-zinc-100"
+                ? "bg-zinc-800 text-violet-200"
                 : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
             }`}
           >
+            {actif && (
+              <span
+                aria-hidden="true"
+                className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r-full bg-violet-400"
+              />
+            )}
             {icon}
-            <span className="text-micro leading-none tracking-tight">
+            <span className="text-micro leading-none">
               {label}
             </span>
           </button>

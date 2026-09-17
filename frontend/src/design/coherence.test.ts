@@ -31,9 +31,13 @@ const FICHIERS = sourcesTsx(RACINE).map((chemin) => ({
 
 describe("cohérence visuelle", () => {
   it("n'utilise que les cinq familles de couleurs qui ont un rôle", () => {
-    // zinc (neutre), red (échec), amber (attente), green (succès),
-    // blue (activité). emerald doublait green ; orange et yellow doublaient
-    // amber ; purple servait des métadonnées, qui sont neutres.
+    // Cinq familles d'état — zinc (neutre), red (échec), amber (attente),
+    // green (succès), blue (activité) — plus `violet`, réservé à l'identité
+    // et au repérage : titre de région, élément actif du rail, nom du projet.
+    // Jamais un état, sinon la lecture des cinq autres se brouille.
+    //
+    // emerald doublait green ; orange et yellow doublaient amber ; purple
+    // servait des métadonnées, qui sont neutres.
     const bannies = ["emerald", "purple", "orange", "yellow"];
     const fautifs = FICHIERS.flatMap(({ chemin, contenu }) =>
       bannies

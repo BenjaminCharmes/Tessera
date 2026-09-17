@@ -71,7 +71,7 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
           </p>
           {status.nested_in && (
             <p className="text-zinc-500">
-              Il se trouve dans le dépôt <code>{status.nested_in}</code>, qui
+              Il se trouve dans le dépôt <code className="break-all">{status.nested_in}</code>, qui
               n'est pas le sien.
             </p>
           )}

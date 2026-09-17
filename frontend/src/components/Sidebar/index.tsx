@@ -91,7 +91,7 @@ export default function Sidebar({
       />
 
       {gitOuvert && activeProject && (
-        <div className="max-h-64 overflow-y-auto border-b border-zinc-800">
+        <div className="max-h-64 overflow-y-auto overflow-x-hidden border-b border-zinc-800">
           <GitLinkPanel project={activeProject} />
         </div>
       )}

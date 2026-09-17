@@ -1,3 +1,4 @@
+import RegionTitle from "../../design/RegionTitle";
 import { IconCross } from "../../design/icons";
 import { useState } from "react";
 import { api } from "../../lib/api";
@@ -88,9 +89,9 @@ export default function AgentList({ onAgentCreated }: AgentListProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700 shrink-0">
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+        <RegionTitle>
           Agents
-        </span>
+        </RegionTitle>
         <button
           onClick={() => setShowModal(true)}
           title="Créer un agent"

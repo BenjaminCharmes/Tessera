@@ -1,3 +1,4 @@
+import RegionTitle from "../../design/RegionTitle";
 import { IconBolt, IconChevronDown, IconChevronRight } from "../../design/icons";
 import { useState } from "react";
 import TicketCard from "./TicketCard";
@@ -68,9 +69,9 @@ export default function TicketList({
     return (
       <div className="flex flex-col h-full">
         <div className="px-3 py-2 border-b border-zinc-700">
-          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+          <RegionTitle>
             {project.name}
-          </span>
+          </RegionTitle>
         </div>
         <SkeletonList count={5} />
       </div>
@@ -96,9 +97,9 @@ export default function TicketList({
         <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700 shrink-0">
           {/* Pas le nom du projet : `ProjectHeader` le porte juste au-dessus,
               et il apparaissait deux fois à quarante pixels d'intervalle. */}
-          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+          <RegionTitle>
             Tickets
-          </span>
+          </RegionTitle>
           <div className="flex items-center gap-1 shrink-0 ml-2">
             <button
               onClick={() => setShowPlanModal(true)}
