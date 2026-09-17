@@ -390,9 +390,36 @@ async def get_usage_breakdown(
         per_agent = await _agrege("role")
         per_model = await _agrege("model")
 
+        # Ventiler par projet quand on en regarde un seul n'apprendrait rien :
+        # cette clé ne se remplit que sur la vue d'ensemble (ticket-082).
+        per_project: list[dict[str, Any]] = []
+        if project_id is None:
+            async with db.execute(
+                """SELECT pr.project_id AS cle,
+                          COALESCE(SUM(ac.cost_usd), 0.0) AS total_cost_usd,
+                          COALESCE(SUM(ac.input_tokens + ac.output_tokens
+                                       + ac.cache_read_tokens), 0) AS total_tokens,
+                          COUNT(ac.id) AS call_count
+                   FROM pipeline_runs pr
+                   JOIN agent_calls ac ON ac.run_id = pr.id
+                   GROUP BY pr.project_id
+                   ORDER BY total_cost_usd DESC"""
+            ) as cursor:
+                lignes = await cursor.fetchall()
+            per_project = [
+                {
+                    "project_id": row["cle"],
+                    "total_cost_usd": float(row["total_cost_usd"]),
+                    "total_tokens": int(row["total_tokens"]),
+                    "call_count": int(row["call_count"]),
+                }
+                for row in lignes
+            ]
+
     return {
         "project_id": project_id,
         "total_cost_usd": round(sum(a["total_cost_usd"] for a in per_agent), 10),
         "per_agent": per_agent,
         "per_model": per_model,
+        "per_project": per_project,
     }

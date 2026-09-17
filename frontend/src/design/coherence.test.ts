@@ -30,6 +30,26 @@ const FICHIERS = sourcesTsx(RACINE).map((chemin) => ({
 }));
 
 describe("cohérence visuelle", () => {
+  it("n'a aucune feuille de style que personne n'importe", () => {
+    // Panne vécue : les règles du Markdown rendu avaient atterri dans un
+    // `styles.css` que rien n'importait. Le build passait, les tests aussi, et
+    // la vue « Rendu » s'affichait sans aucun style — un mur de texte
+    // indifférencié (ticket-078).
+    const feuilles = readdirSync(RACINE).filter((n) => n.endsWith(".css"));
+    const sources = sourcesTsx(RACINE)
+      .concat(
+        readdirSync(RACINE)
+          .filter((n) => n.endsWith(".tsx") || n.endsWith(".ts"))
+          .map((n) => join(RACINE, n)),
+      )
+      .map((c) => readFileSync(c, "utf-8"))
+      .join("");
+
+    const orphelines = feuilles.filter((f) => !sources.includes(f));
+
+    expect(orphelines).toEqual([]);
+  });
+
   it("n'utilise que les cinq familles de couleurs qui ont un rôle", () => {
     // Cinq familles d'état — zinc (neutre), red (échec), amber (attente),
     // green (succès), blue (activité) — plus `violet`, réservé à l'identité

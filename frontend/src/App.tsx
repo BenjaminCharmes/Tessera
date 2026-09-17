@@ -237,8 +237,10 @@ export default function App() {
               priorité : c'est une demande de l'utilisateur. */}
           {panel === "agents" ? (
             <AgentDetail role={agentSelectionne} />
-          ) : panel === "usage" && project ? (
-            <CostView projectId={project.id} />
+          ) : panel === "usage" ? (
+            // Sans projet sélectionné, la vue d'ensemble : « combien me coûte
+            // vibe-ide, et sur quel projet » n'avait aucune réponse.
+            <CostView projectId={project?.id ?? null} />
           ) : (stream.status === "running" || stream.status === "connecting") &&
             !openFilePath &&
             !showDiff ? (

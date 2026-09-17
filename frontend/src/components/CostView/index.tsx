@@ -18,7 +18,8 @@ import type { VentilationDesCouts } from "../../types/api";
  * part se lit tout de suite.
  */
 interface CostViewProps {
-  projectId: string;
+  /** `null` : la vue d'ensemble, tous projets confondus (ticket-082). */
+  projectId: string | null;
 }
 
 function formatCout(usd: number): string {
@@ -61,7 +62,9 @@ export default function CostView({ projectId }: CostViewProps) {
     setData(null);
     void (async () => {
       try {
-        const d = await api.usage.breakdown(projectId);
+        const d = projectId
+          ? await api.usage.breakdown(projectId)
+          : await api.usage.breakdownGlobal();
         if (!annule) setData(d);
       } catch {
         if (!annule) setData(null);
@@ -73,12 +76,17 @@ export default function CostView({ projectId }: CostViewProps) {
   }, [projectId]);
 
   const vide =
-    data !== null && data.per_agent.length === 0 && data.per_model.length === 0;
+    data !== null &&
+    data.per_agent.length === 0 &&
+    data.per_model.length === 0 &&
+    data.per_project.length === 0;
 
   return (
     <div className="flex h-full flex-col bg-zinc-900">
       <div className={`${BAND} justify-between gap-3 border-b border-zinc-700 px-4`}>
-        <RegionTitle>Où part la dépense</RegionTitle>
+        <RegionTitle>
+          {projectId ? "Où part la dépense" : "Dépense, tous projets"}
+        </RegionTitle>
         {data && (
           <span className="text-mini text-zinc-400">
             {formatCout(data.total_cost_usd)} au total
@@ -94,7 +102,26 @@ export default function CostView({ projectId }: CostViewProps) {
 
       {data && !vide && (
         <div className="min-h-0 flex-1 overflow-y-auto py-2">
-          <p className="px-4 pb-1 text-mini uppercase tracking-wider text-zinc-500">
+          {data.per_project.length > 0 && (
+            <>
+              <p className="px-4 pb-1 text-mini uppercase tracking-wider text-zinc-500">
+                Par projet
+              </p>
+              <ul>
+                {data.per_project.map((p) => (
+                  <Ligne
+                    key={p.project_id}
+                    nom={p.project_id}
+                    cout={p.total_cost_usd}
+                    total={data.total_cost_usd}
+                    appels={p.call_count}
+                  />
+                ))}
+              </ul>
+            </>
+          )}
+
+          <p className="px-4 pb-1 pt-3 text-mini uppercase tracking-wider text-zinc-500">
             Par agent
           </p>
           <ul>

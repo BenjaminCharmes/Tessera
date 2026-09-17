@@ -5,6 +5,7 @@ pipeline on a dedicated branch: create/resume a branch, read the current
 diff (including untracked files) and commit the work.
 """
 import asyncio
+import json
 import re
 from pathlib import Path
 
@@ -220,7 +221,10 @@ class GitWorkspaceService:
         as if it were.
         """
         await self._run("add", "-A", "-N")
-        pathspec = (".", *await self._exclude_pathspecs())
+        pathspec = (
+            ":/" if self._travaille_dans_le_parent() else ".",
+            *await self._exclude_pathspecs(),
+        )
         if await self._has_head():
             return await self._run("diff", "HEAD", "--", *pathspec)
         return await self._run("diff", _EMPTY_TREE_SHA, "--", *pathspec)
@@ -255,11 +259,16 @@ class GitWorkspaceService:
         outside bookkeeping changed (a bookkeeping-only commit may still be
         created even when this returns None).
         """
+        # `.` borne l'ajout au dossier du projet. C'est ce qu'on veut d'un
+        # projet ordinaire — il *est* la racine de son dépôt — mais pas du
+        # projet bootstrap, dont le travail est dans `backend/` et `frontend/`,
+        # au-dessus de lui. `:/` désigne la racine du dépôt (ticket-081).
+        racine = ":/" if self._travaille_dans_le_parent() else "."
         await self._run(
             "add",
             "-A",
             "--",
-            ".",
+            racine,
             *await self._exclude_pathspecs(),
             *(f":(exclude){path}" for path in self._preexisting_untracked),
         )
@@ -317,6 +326,28 @@ class GitWorkspaceService:
         await proc.communicate()
         return proc.returncode == 0
 
+    def _travaille_dans_le_parent(self) -> bool:
+        """True si le projet déclare travailler dans le dépôt qui le contient.
+
+        ADR-024 refuse par défaut qu'un projet agisse sur un dépôt ancêtre :
+        un dossier client posé dans `projects/` faisait sinon remonter git
+        jusqu'à celui de vibe-ide, où le run créait sa branche et son commit.
+
+        Mais c'est exactement ce que fait le projet bootstrap d'ADR-001 : il
+        construit l'IDE, donc il travaille **volontairement** dans le dépôt qui
+        le contient. L'exception se déclare donc, fichier par fichier, comme le
+        mode des artefacts — le défaut protège, le cas particulier s'énonce
+        (ticket-081).
+        """
+        agents_json = self._project_path / "agents.json"
+        if not agents_json.is_file():
+            return False
+        try:
+            data = json.loads(agents_json.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return False
+        return bool(data.get("git_root") == "ancestor")
+
     async def _is_own_repository(self) -> bool:
         """True only if the project directory is itself the root of a repository.
 
@@ -329,6 +360,9 @@ class GitWorkspaceService:
         Comparing the toplevel to the project path is the check that holds.
         Locale-independent: it reads a path, never stderr text.
         """
+        if self._travaille_dans_le_parent():
+            return await self._is_inside_any_work_tree()
+
         proc = await asyncio.create_subprocess_exec(
             "git", "rev-parse", "--show-toplevel",
             cwd=str(self._project_path),
@@ -345,6 +379,17 @@ class GitWorkspaceService:
             return Path(toplevel).resolve() == self._project_path.resolve()
         except OSError:
             return False
+
+    async def _is_inside_any_work_tree(self) -> bool:
+        """True si un dépôt existe, ici ou au-dessus — pour le cas déclaré."""
+        proc = await asyncio.create_subprocess_exec(
+            "git", "rev-parse", "--is-inside-work-tree",
+            cwd=str(self._project_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        await proc.communicate()
+        return proc.returncode == 0
 
     async def _ensure_own_repository(self) -> None:
         """Refuse to act at all when the project has no repository of its own."""

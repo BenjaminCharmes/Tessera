@@ -80,3 +80,29 @@ async def test_sans_projet_la_ventilation_couvre_tout(base: Path) -> None:
     par_agent = {a["role"]: a["total_cost_usd"] for a in ventilation["per_agent"]}
     assert par_agent["codeur"] == pytest.approx(0.95)
     assert ventilation["total_cost_usd"] == pytest.approx(1.05)
+
+
+async def test_la_ventilation_globale_dit_aussi_par_projet(base: Path) -> None:
+    # « Combien me coute vibe-ide, et sur quel projet » n'avait aucune reponse :
+    # chaque endpoint etait borne a un projet (ticket-082).
+    ventilation = await get_usage_breakdown(base, None)
+
+    par_projet = {p["project_id"]: p["total_cost_usd"] for p in ventilation["per_project"]}
+    assert par_projet["projet-a"] == pytest.approx(1.0)
+    assert par_projet["projet-b"] == pytest.approx(0.05)
+
+
+async def test_le_projet_le_plus_couteux_vient_en_premier(base: Path) -> None:
+    ventilation = await get_usage_breakdown(base, None)
+
+    assert [p["project_id"] for p in ventilation["per_project"]] == [
+        "projet-a",
+        "projet-b",
+    ]
+
+
+async def test_borne_a_un_projet_la_ventilation_par_projet_est_vide(base: Path) -> None:
+    # Ventiler par projet quand on en regarde un seul n'apprendrait rien.
+    ventilation = await get_usage_breakdown(base, "projet-a")
+
+    assert ventilation["per_project"] == []

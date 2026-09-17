@@ -1,6 +1,7 @@
 {
   "project_id": "ide-core",
   "vibe_artifacts": "tracked",
+  "git_root": "ancestor",
   "agents": [
     {
       "role": "orchestrateur",

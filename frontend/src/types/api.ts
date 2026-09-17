@@ -345,4 +345,6 @@ export interface VentilationDesCouts {
   total_cost_usd: number;
   per_agent: (LigneDeCout & { role: string })[];
   per_model: (LigneDeCout & { model: string })[];
+  /** Rempli seulement sur la vue d'ensemble, tous projets confondus. */
+  per_project: (LigneDeCout & { project_id: string })[];
 }

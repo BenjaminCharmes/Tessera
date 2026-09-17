@@ -400,6 +400,12 @@ class CleanupRequest(BaseModel):
     branches: list[str]
 
 
+@router.get("/usage/breakdown")
+async def get_usage_breakdown_global() -> dict[str, object]:
+    """La dépense de **tous** les projets, ventilée par projet, agent et modèle."""
+    return await get_usage_breakdown(settings.ide_db_path, None)
+
+
 @router.get("/{project_id}/usage/breakdown")
 async def get_usage_breakdown_for_project(project_id: str) -> dict[str, object]:
     """La dépense de ce projet, ventilée par agent et par modèle."""

@@ -260,3 +260,13 @@ Format : ADR léger (Architecture Decision Record).
 **Alternative rejetée** : l'interdire dans le prompt (une consigne décrit une intention, un refus produit un fait) ; retirer `Bash` au codeur (il en a besoin pour lancer des tests et inspecter le projet).
 **Détail** : voir `tickets/done/ticket-068-integrite-des-runs.md`.
 
+---
+
+## ADR-028 — Travailler dans le dépôt parent se déclare
+
+**Date** : 2026-09-17
+**Décision** : ADR-024 refuse par défaut qu'un projet agisse sur un dépôt **ancêtre**. Un projet peut lever ce refus en déclarant `"git_root": "ancestor"` dans son `agents.json` ; il stage alors depuis la racine du dépôt (`:/`) et non depuis son propre dossier. Seule cette valeur exacte ouvre l'exception.
+**Raison** : ADR-024 est né d'un dossier client posé dans `projects/`, dont le dépôt ancêtre était vibe-ide — un accident. Mais c'est exactement ce que fait le projet bootstrap d'ADR-001 : il construit l'IDE, donc il travaille volontairement dans le dépôt qui le contient, et son travail est dans `backend/` et `frontend/`, au-dessus de lui. Traiter les deux cas pareil supprimait l'auto-hébergement, c'est-à-dire le principe fondateur.
+**Forme** : la même que pour le mode des artefacts (ADR-021, ADR-023) — le défaut protège, le cas particulier s'énonce dans le fichier du projet. Une valeur inconnue ne désarme rien.
+**Détail** : voir `tickets/done/ticket-077-auto-hebergement.md`.
+

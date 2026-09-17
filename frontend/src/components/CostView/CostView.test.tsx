@@ -21,6 +21,7 @@ describe("CostView", () => {
       per_model: [
         { model: "sonnet", total_cost_usd: 0.9, total_tokens: 2200, call_count: 2 },
       ],
+      per_project: [],
     });
 
     render(<CostView projectId="p" />);
@@ -40,6 +41,7 @@ describe("CostView", () => {
       per_model: [
         { model: "sonnet", total_cost_usd: 0.9, total_tokens: 2200, call_count: 2 },
       ],
+      per_project: [],
     });
 
     render(<CostView projectId="p" />);
@@ -49,11 +51,38 @@ describe("CostView", () => {
 
   it("dit qu'il n'y a rien a ventiler plutot que d'afficher des zeros", async () => {
     ventilation.mockResolvedValue({
-      project_id: "p", total_cost_usd: 0, per_agent: [], per_model: [],
+      project_id: "p",
+      total_cost_usd: 0,
+      per_agent: [],
+      per_model: [],
+      per_project: [],
     });
 
     render(<CostView projectId="p" />);
 
     expect(await screen.findByText(/Aucun appel/i)).toBeInTheDocument();
+  });
+});
+
+describe("CostView — vue d'ensemble", () => {
+  it("ventile par projet quand aucun n'est sélectionné", async () => {
+    // « Combien me coûte vibe-ide, et sur quel projet » n'avait aucune réponse :
+    // chaque endpoint était borné à un projet (ticket-082).
+    vi.mocked(api.usage.breakdownGlobal).mockResolvedValue({
+      project_id: null,
+      total_cost_usd: 1.05,
+      per_agent: [],
+      per_model: [],
+      per_project: [
+        { project_id: "tmp", total_cost_usd: 1.0, total_tokens: 10, call_count: 3 },
+        { project_id: "fluentdb", total_cost_usd: 0.05, total_tokens: 1, call_count: 1 },
+      ],
+    });
+
+    render(<CostView projectId={null} />);
+
+    expect(await screen.findByText("tmp")).toBeInTheDocument();
+    expect(screen.getByText("fluentdb")).toBeInTheDocument();
+    expect(screen.getByText(/Dépense, tous projets/)).toBeInTheDocument();
   });
 });

@@ -127,6 +127,8 @@ export const api = {
       request(`/projects/${projectId}/usage`),
     breakdown: (projectId: string): Promise<VentilationDesCouts> =>
       request(`/projects/${projectId}/usage/breakdown`),
+    breakdownGlobal: (): Promise<VentilationDesCouts> =>
+      request("/projects/usage/breakdown"),
   },
   github: {
     createPr: (
