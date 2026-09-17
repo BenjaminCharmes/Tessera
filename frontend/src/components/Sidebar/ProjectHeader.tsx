@@ -50,13 +50,13 @@ export default function ProjectHeader({
       </h2>
       <p className="truncate text-mini text-zinc-500">{project.id}</p>
 
-      <div className="mt-2 flex items-center gap-1.5">
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {/* Un projet sans chemin ne coûte que ce bouton : le faire planter
             emportait toute la colonne derrière l'ErrorBoundary. */}
         {project.path ? (
           <a
             href={lienVSCode(project.path)}
-            className="rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
+            className="whitespace-nowrap rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
           >
             Ouvrir dans VSCode
           </a>
@@ -65,13 +65,13 @@ export default function ProjectHeader({
           type="button"
           onClick={onBasculerGit}
           aria-expanded={gitOuvert}
-          className={`rounded border px-2 py-1 text-mini transition-colors ${
+          className={`whitespace-nowrap rounded border px-2 py-1 text-mini transition-colors ${
             gitOuvert
               ? "border-zinc-500 bg-zinc-800 text-zinc-100"
               : "border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-zinc-100"
           }`}
         >
-          Git &amp; artefacts
+          Git
         </button>
       </div>
     </header>

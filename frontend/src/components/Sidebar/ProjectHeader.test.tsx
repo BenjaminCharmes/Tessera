@@ -24,7 +24,7 @@ describe("ProjectHeader", () => {
 
     expect(screen.getByText("Lyra")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /VSCode/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Git & artefacts/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Git" })).toBeInTheDocument();
   });
 
   it("ouvre le projet dans VSCode par son chemin sur le disque", () => {
@@ -40,7 +40,7 @@ describe("ProjectHeader", () => {
     const onBasculerGit = vi.fn();
     render(<ProjectHeader project={projet} gitOuvert={false} onBasculerGit={onBasculerGit} />);
 
-    await userEvent.click(screen.getByRole("button", { name: /Git & artefacts/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Git" }));
 
     expect(onBasculerGit).toHaveBeenCalled();
   });
@@ -65,6 +65,6 @@ describe("ProjectHeader", () => {
 
     expect(screen.getByText("Lyra")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /VSCode/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Git & artefacts/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Git" })).toBeInTheDocument();
   });
 });

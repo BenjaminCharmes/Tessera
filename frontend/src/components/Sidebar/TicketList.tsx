@@ -94,8 +94,10 @@ export default function TicketList({
     <>
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700 shrink-0">
-          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider truncate">
-            {project.name}
+          {/* Pas le nom du projet : `ProjectHeader` le porte juste au-dessus,
+              et il apparaissait deux fois à quarante pixels d'intervalle. */}
+          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            Tickets
           </span>
           <div className="flex items-center gap-1 shrink-0 ml-2">
             <button
