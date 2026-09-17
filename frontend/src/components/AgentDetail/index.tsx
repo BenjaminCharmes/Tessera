@@ -26,10 +26,13 @@ export default function AgentDetail({ role }: AgentDetailProps) {
   // Les prompts natifs sont des fichiers Markdown ; les lire avec leurs `##`
   // et leurs `**` demande un effort que le contenu ne justifie pas
   // (ticket-078).
-  const [vueRendue, setVueRendue] = useState(true);
+  const [vue, setVue] = useState<"rendu" | "source" | "edition">("rendu");
+  const [brouillon, setBrouillon] = useState("");
+  const [enregistrement, setEnregistrement] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!role) {
+  if (!role) {
       setDetail(null);
       setErreur(null);
       return;
@@ -37,10 +40,15 @@ export default function AgentDetail({ role }: AgentDetailProps) {
     let annule = false;
     setDetail(null);
     setErreur(null);
+    setVue("rendu");
+    setMessage(null);
     void (async () => {
       try {
         const d = await api.agents.detail(role);
-        if (!annule) setDetail(d);
+        if (!annule) {
+          setDetail(d);
+          setBrouillon(d.system_prompt);
+        }
       } catch (err: unknown) {
         if (!annule) setErreur(err instanceof Error ? err.message : String(err));
       }
@@ -49,6 +57,24 @@ export default function AgentDetail({ role }: AgentDetailProps) {
       annule = true;
     };
   }, [role]);
+
+  async function enregistrer() {
+    if (!role || !brouillon.trim()) {
+      setMessage("Un prompt vide priverait l'agent de toute définition.");
+      return;
+    }
+    setEnregistrement(true);
+    setMessage(null);
+    try {
+      const d = await api.agents.updatePrompt(role, brouillon);
+      setDetail(d);
+      setMessage("Enregistré. Il s'applique au prochain appel de cet agent.");
+    } catch (err: unknown) {
+      setMessage(err instanceof Error ? err.message : String(err));
+    } finally {
+      setEnregistrement(false);
+    }
+  }
 
   if (!role) {
     return (
@@ -74,23 +100,20 @@ export default function AgentDetail({ role }: AgentDetailProps) {
               role="tablist"
               aria-label="Affichage du prompt"
             >
-              {[
-                { cle: true, libelle: "Rendu" },
-                { cle: false, libelle: "Source" },
-              ].map(({ cle, libelle }) => (
+              {(["rendu", "source", "edition"] as const).map((cle) => (
                 <button
-                  key={libelle}
+                  key={cle}
                   type="button"
                   role="tab"
-                  aria-selected={vueRendue === cle}
-                  onClick={() => setVueRendue(cle)}
-                  className={`rounded px-1.5 py-0.5 text-micro transition-colors ${
-                    vueRendue === cle
+                  aria-selected={vue === cle}
+                  onClick={() => setVue(cle)}
+                  className={`rounded px-1.5 py-0.5 text-micro capitalize transition-colors ${
+                    vue === cle
                       ? "bg-violet-500/15 text-violet-200"
                       : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
-                  {libelle}
+                  {cle === "edition" ? "Modifier" : cle}
                 </button>
               ))}
             </div>
@@ -119,14 +142,38 @@ export default function AgentDetail({ role }: AgentDetailProps) {
             Ce texte est envoyé en tête de chaque appel de cet agent. Il décide
             de tout ce qu'il fait.
           </p>
-          {vueRendue ? (
+          {vue === "rendu" && (
             <div className="min-h-0 flex-1 overflow-auto">
               <MarkdownView source={detail.system_prompt} />
             </div>
-          ) : (
+          )}
+          {vue === "source" && (
             <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words px-4 py-3 font-mono text-micro leading-relaxed text-zinc-300">
               {detail.system_prompt}
             </pre>
+          )}
+          {vue === "edition" && (
+            <div className="flex min-h-0 flex-1 flex-col gap-2 p-4">
+              <textarea
+                value={brouillon}
+                onChange={(e) => setBrouillon(e.target.value)}
+                spellCheck={false}
+                className="min-h-0 flex-1 resize-none rounded border border-zinc-700 bg-zinc-950 p-3 font-mono text-micro leading-relaxed text-zinc-200 outline-none focus:border-zinc-500"
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void enregistrer()}
+                  disabled={enregistrement}
+                  className="rounded border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
+                >
+                  {enregistrement ? "Enregistrement…" : "Enregistrer"}
+                </button>
+                {message && (
+                  <span className="text-mini text-zinc-400">{message}</span>
+                )}
+              </div>
+            </div>
           )}
         </>
       )}

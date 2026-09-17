@@ -69,6 +69,25 @@ class AgentRegistryService:
         self._prompts_dir.mkdir(parents=True, exist_ok=True)
         (self._prompts_dir / f"{role}.md").write_text(prompt, encoding="utf-8")
 
+    def update_prompt(self, role: str, prompt: str) -> None:
+        """Réécrit le prompt d'un agent existant — natif compris (ticket-079).
+
+        Un agent natif s'ajuste : c'est le premier levier de réglage de l'IDE,
+        et le refuser obligerait à éditer le fichier dans VSCode juste après
+        l'avoir lu à l'écran. La suppression, elle, reste interdite sur un
+        natif : régler n'est pas effacer.
+        """
+        prompt_file = self._prompts_dir / f"{role}.md"
+        if not prompt_file.is_file():
+            raise AgentNotFoundError(
+                f"Agent '{role}' introuvable dans {self._prompts_dir}"
+            )
+        if not prompt.strip():
+            raise ValueError(
+                "Un prompt vide priverait l'agent de toute définition."
+            )
+        prompt_file.write_text(prompt, encoding="utf-8")
+
     def delete_agent(self, role: str) -> None:
         """Delete {role}.md. Refuses built-in agents."""
         if self.is_builtin(role):

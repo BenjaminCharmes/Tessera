@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AgentDetail from "./index";
 
 vi.mock("../../lib/api");
@@ -52,5 +53,53 @@ describe("AgentDetail", () => {
     render(<AgentDetail role="fantome" />);
 
     expect(await screen.findByText(/Impossible de lire/i)).toBeInTheDocument();
+  });
+});
+
+describe("AgentDetail — édition du prompt", () => {
+  beforeEach(() => {
+    detail.mockReset();
+    vi.mocked(api.agents.updatePrompt).mockReset();
+  });
+
+  it("permet de modifier le prompt et de l'enregistrer", async () => {
+    // Le prompt décide de tout ce que fait un agent. Le régler demandait
+    // d'ouvrir le fichier dans VSCode juste après l'avoir lu à l'écran
+    // (ticket-079).
+    detail.mockResolvedValue({
+      role: "codeur", is_builtin: true, system_prompt: "Tu implémentes.",
+    });
+    vi.mocked(api.agents.updatePrompt).mockResolvedValue({
+      role: "codeur", is_builtin: true, system_prompt: "Tu testes d'abord.",
+    });
+
+    render(<AgentDetail role="codeur" />);
+    await screen.findByText(/Tu implémentes/);
+
+    await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
+    const champ = screen.getByRole("textbox");
+    await userEvent.clear(champ);
+    await userEvent.type(champ, "Tu testes d'abord.");
+    await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
+
+    expect(api.agents.updatePrompt).toHaveBeenCalledWith(
+      "codeur",
+      "Tu testes d'abord.",
+    );
+  });
+
+  it("n'enregistre pas un prompt vide", async () => {
+    detail.mockResolvedValue({
+      role: "codeur", is_builtin: true, system_prompt: "Tu implémentes.",
+    });
+
+    render(<AgentDetail role="codeur" />);
+    await screen.findByText(/Tu implémentes/);
+
+    await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
+    await userEvent.clear(screen.getByRole("textbox"));
+    await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
+
+    expect(api.agents.updatePrompt).not.toHaveBeenCalled();
   });
 });

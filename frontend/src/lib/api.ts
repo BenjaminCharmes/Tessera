@@ -202,6 +202,8 @@ export const api = {
       ),
     detail: (role: string): Promise<AgentDetail> =>
       request(`/agents/registry/${role}`),
+    updatePrompt: (role: string, systemPrompt: string): Promise<AgentDetail> =>
+      put(`/agents/registry/${role}`, { system_prompt: systemPrompt }),
     remove: (role: string): Promise<void> => del(`/agents/registry/${role}`),
     createConversational: (
       conversation: ConversationMessage[],

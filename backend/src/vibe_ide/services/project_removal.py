@@ -110,10 +110,29 @@ async def detach_project(project_path: Path) -> str:
 
 
 def _detached_destination(project_path: Path) -> Path:
-    """Un emplacement hors du workspace, horodaté pour ne rien écraser."""
+    """Un emplacement hors du dépôt de l'IDE, horodaté pour ne rien écraser.
+
+    `projects/../..` désignait la racine du dépôt de vibe-ide : un projet
+    détaché y restait, non suivi. Depuis qu'un projet peut travailler dans le
+    dépôt parent (ADR-028), un `git add -A` lancé depuis cette racine pouvait
+    l'y committer en entier — et « détaché de l'IDE » n'a jamais voulu dire
+    « déposé dans le dépôt de l'IDE » (ticket-078).
+    """
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    root = project_path.parent.parent / _DETACHED_DIRNAME
-    return root / f"{project_path.name}-{stamp}"
+    racine = _hors_du_depot(project_path.parent.parent)
+    return racine / _DETACHED_DIRNAME / f"{project_path.name}-{stamp}"
+
+
+def _hors_du_depot(depart: Path) -> Path:
+    """Le premier dossier, en remontant, qui ne soit pas dans un dépôt git.
+
+    On ne remonte que tant qu'on voit un `.git` : sur un workspace ordinaire,
+    sans dépôt au-dessus, le comportement ne change pas.
+    """
+    courant = depart
+    while (courant / ".git").exists() and courant.parent != courant:
+        courant = courant.parent
+    return courant
 
 
 async def delete_project(

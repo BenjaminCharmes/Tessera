@@ -68,3 +68,9 @@ projects/*
 .coverage
 coverage.xml
 htmlcov/
+
+# Projets détachés de l'IDE. La destination est désormais hors du dépôt
+# (ticket-078), mais un dossier créé avant ce correctif peut traîner ici : il
+# ne doit en aucun cas partir dans un commit.
+vibe-ide-detaches/
+

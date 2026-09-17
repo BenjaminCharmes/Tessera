@@ -173,3 +173,32 @@ async def test_supprimer_hors_du_workspace_est_refuse(
         await delete_project(outside, confirmed=True, workspace=workspace)
 
     assert outside.is_dir()
+
+
+def test_un_projet_detache_atterrit_hors_du_depot_de_l_ide(tmp_path: Path) -> None:
+    # Panne latente : `projects/../..` designe la racine du depot de vibe-ide.
+    # Le projet detache y restait, non suivi — et depuis qu'un projet peut
+    # travailler dans le depot parent (ADR-028), un `git add -A` depuis la
+    # racine pouvait l'y committer en entier (ticket-078).
+    from vibe_ide.services.project_removal import _detached_destination
+
+    depot = tmp_path / "vibe-ide"
+    (depot / ".git").mkdir(parents=True)
+    projet = depot / "projects" / "mon-projet"
+    projet.mkdir(parents=True)
+
+    destination = _detached_destination(projet)
+
+    assert depot not in destination.parents, destination
+    assert destination.parent.name == "vibe-ide-detaches"
+
+
+def test_sans_depot_au_dessus_le_comportement_ne_change_pas(tmp_path: Path) -> None:
+    from vibe_ide.services.project_removal import _detached_destination
+
+    projet = tmp_path / "workspace" / "projects" / "mon-projet"
+    projet.mkdir(parents=True)
+
+    destination = _detached_destination(projet)
+
+    assert destination.parent.name == "vibe-ide-detaches"

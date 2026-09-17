@@ -111,6 +111,32 @@ async def get_agent(
     )
 
 
+class UpdateAgentRequest(BaseModel):
+    system_prompt: str
+
+
+@router.put("/{role}", response_model=AgentDetailResponse)
+async def update_agent(
+    role: str,
+    body: UpdateAgentRequest,
+    registry: AgentRegistryService = Depends(get_registry),
+) -> AgentDetailResponse:
+    """Réécrit le prompt d'un agent, natif compris (ticket-079)."""
+    if not _ROLE_RE.match(role):
+        raise HTTPException(status_code=422, detail=f"Nom d'agent invalide : '{role}'")
+    try:
+        registry.update_prompt(role, body.system_prompt)
+    except AgentNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return AgentDetailResponse(
+        role=role,
+        is_builtin=registry.is_builtin(role),
+        system_prompt=body.system_prompt,
+    )
+
+
 @router.post("", response_model=AgentInfo, status_code=201)
 async def create_agent(
     body: CreateAgentRequest,
