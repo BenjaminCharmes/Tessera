@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconDownload, IconProject } from "../../design/icons";
 import { useState } from "react";
@@ -41,7 +42,7 @@ export default function ProjectNav({
   return (
     <>
       <div>
-        <div className="px-3 py-2 flex items-center justify-between">
+        <div className={`${BAND} justify-between px-3`}>
           <RegionTitle>
             Projects
           </RegionTitle>

@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import TicketCard from "../Sidebar/TicketCard";
 import type { Ticket, TicketStatus } from "../../types/api";
@@ -30,7 +31,7 @@ export default function KanbanColumn({
 }: KanbanColumnProps) {
   return (
     <div className="flex flex-col flex-1 min-w-[200px] border-r border-zinc-700 last:border-r-0">
-      <div className="px-3 py-2 border-b border-zinc-700 shrink-0">
+      <div className={`${BAND} border-b border-zinc-700 px-3`}>
         <RegionTitle taille="sm">
           {STATUS_LABEL[status]}
         </RegionTitle>

@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import KanbanColumn from "./KanbanColumn";
 import type { Ticket, TicketStatus } from "../../types/api";
@@ -27,7 +28,7 @@ export default function KanbanView({
 }: KanbanViewProps) {
   return (
     <div className="h-full flex flex-col bg-zinc-900">
-      <div className="px-4 py-2 border-b border-zinc-700 shrink-0">
+      <div className={`${BAND} border-b border-zinc-700 px-4`}>
         <RegionTitle>
           Kanban Board
         </RegionTitle>

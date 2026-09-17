@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconCross } from "../../design/icons";
 import RoundBadge from "./RoundBadge";
@@ -65,7 +66,7 @@ export default function AgentPanel({
   return (
     <div className="h-full flex flex-col bg-zinc-900 border-l border-zinc-700">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-700 shrink-0">
+      <div className={`${BAND} justify-between border-b border-zinc-700 px-4`}>
         <RegionTitle>
           Agents
           {ticketId && (

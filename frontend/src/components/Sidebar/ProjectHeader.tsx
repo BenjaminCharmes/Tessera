@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import type { Project } from "../../types/api";
 
 /**
@@ -32,25 +33,27 @@ export default function ProjectHeader({
 }: ProjectHeaderProps) {
   if (!project) {
     return (
-      <header className="border-b border-zinc-800 px-3 py-2.5">
-        <p className="text-xs text-zinc-500">
-          Aucun projet sélectionné
-        </p>
+      <header className={`${BAND} border-b border-zinc-800 px-3`}>
+        <p className="text-xs text-zinc-500">Aucun projet sélectionné</p>
       </header>
     );
   }
 
   return (
-    <header className="border-b border-zinc-800 px-3 py-2.5">
+    <header
+      className={`${BAND} justify-between gap-2 border-b border-zinc-800 px-3`}
+    >
+      {/* Une seule ligne : l'en-tête doit tenir dans la bande commune pour
+          s'aligner avec celles du centre et de la colonne de droite. Le
+          chemin complet passe en infobulle plutôt qu'en seconde ligne. */}
       <h2
         className="truncate text-sm font-medium text-violet-100"
-        title={project.path ?? project.id}
+        title={`${project.id} — ${project.path ?? ""}`}
       >
         {project.name}
       </h2>
-      <p className="truncate text-mini text-zinc-500">{project.id}</p>
 
-      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1.5">
         {/* Un projet sans chemin ne coûte que ce bouton : le faire planter
             emportait toute la colonne derrière l'ErrorBoundary. */}
         {project.path ? (
@@ -58,7 +61,7 @@ export default function ProjectHeader({
             href={lienVSCode(project.path)}
             className="whitespace-nowrap rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
           >
-            Ouvrir dans VSCode
+            VSCode
           </a>
         ) : null}
         <button

@@ -6,6 +6,7 @@ import { useRuns } from "./hooks/useRuns";
 import { useUsage } from "./hooks/useUsage";
 import { useToast } from "./hooks/useToast";
 import { useOrchestratorStream } from "./hooks/useOrchestratorStream";
+import { BAND } from "./design/layout";
 import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
 import type { SidebarPanel } from "./components/Sidebar";
@@ -211,7 +212,7 @@ export default function App() {
         <div
           role="tablist"
           aria-label="Panneau latéral"
-          className="flex border-b border-zinc-800 bg-zinc-900"
+          className={`${BAND} border-b border-zinc-800 bg-zinc-900`}
         >
           {(["agents", "chat"] as const).map((tab) => (
             <button
@@ -222,7 +223,7 @@ export default function App() {
               aria-selected={sidePanel === tab}
               aria-controls={`side-panel-${tab}`}
               onClick={() => setSidePanel(tab)}
-              className={`px-3 py-1.5 text-xs transition-colors ${
+              className={`h-full px-3 text-xs transition-colors ${
                 sidePanel === tab
                   ? "text-zinc-100 border-b-2 border-zinc-400"
                   : "text-zinc-500 hover:text-zinc-300"

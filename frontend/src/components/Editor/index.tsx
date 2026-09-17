@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import { useEffect, useState } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import { detectLanguage } from "./useMonaco";
@@ -63,7 +64,7 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
   return (
     <div className="flex h-full flex-col">
       {/* Header : chemin du fichier actif */}
-      <div className="flex items-center gap-2 border-b border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs text-zinc-400">
+      <div className={`${BAND} gap-2 border-b border-zinc-700 bg-zinc-800 px-3 text-xs text-zinc-400`}>
         {filePath ? (
           <span className="truncate font-mono">{filePath}</span>
         ) : (

@@ -110,7 +110,7 @@ export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
       role="tablist"
       aria-orientation="vertical"
       aria-label="Navigation principale"
-      className="flex h-full flex-col items-stretch gap-0.5 bg-zinc-900 px-2 py-3"
+      className="flex h-full flex-col items-stretch gap-0.5 bg-zinc-900 px-2 pb-3 pt-2"
     >
       {DESTINATIONS.map(({ panel, label, icon }) => {
         const actif = activePanel === panel;

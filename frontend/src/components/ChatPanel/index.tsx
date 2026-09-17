@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "../../types/api";
 import { useChat } from "../../hooks/useChat";
@@ -47,7 +48,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
 
   return (
     <div className="h-full flex flex-col bg-zinc-900">
-      <header className="flex items-center justify-between gap-2 px-3 py-2 border-b border-zinc-800">
+      <header className={`${BAND} justify-between gap-2 border-b border-zinc-800 px-3`}>
         <span className="text-xs font-medium text-zinc-300">
           Chat — {project.id}
         </span>

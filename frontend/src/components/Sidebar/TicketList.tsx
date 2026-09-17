@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconBolt, IconChevronDown, IconChevronRight } from "../../design/icons";
 import { useState } from "react";
@@ -68,7 +69,7 @@ export default function TicketList({
   if (loading) {
     return (
       <div className="flex flex-col h-full">
-        <div className="px-3 py-2 border-b border-zinc-700">
+        <div className={`${BAND} border-b border-zinc-700 px-3`}>
           <RegionTitle>
             {project.name}
           </RegionTitle>
@@ -94,7 +95,7 @@ export default function TicketList({
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700 shrink-0">
+        <div className={`${BAND} justify-between border-b border-zinc-700 px-3`}>
           {/* Pas le nom du projet : `ProjectHeader` le porte juste au-dessus,
               et il apparaissait deux fois à quarante pixels d'intervalle. */}
           <RegionTitle>

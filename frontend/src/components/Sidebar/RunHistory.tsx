@@ -1,3 +1,4 @@
+import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconBlocked, IconCheck, IconDot } from "../../design/icons";
 import { useState } from "react";
@@ -144,7 +145,7 @@ export default function RunHistory({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700 shrink-0">
+      <div className={`${BAND} justify-between border-b border-zinc-700 px-3`}>
         <RegionTitle>
           Historique
         </RegionTitle>
