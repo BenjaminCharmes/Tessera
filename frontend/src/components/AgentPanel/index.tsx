@@ -64,7 +64,7 @@ export default function AgentPanel({
       : undefined;
 
   return (
-    <div className="h-full flex flex-col bg-zinc-900 border-l border-zinc-700">
+    <div className="flex h-full flex-col bg-zinc-900">
       {/* Header */}
       <div className={`${BAND} justify-between border-b border-zinc-700 px-4`}>
         <RegionTitle>

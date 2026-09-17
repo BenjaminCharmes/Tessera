@@ -206,7 +206,7 @@ export default function App() {
           Deux vues du même espace : l'une observe un run de pipeline,
           l'autre discute (ticket-048). Le chat ne remplace pas le stream. */}
       <div
-        className="overflow-hidden flex flex-col"
+        className="flex flex-col overflow-hidden border-l border-zinc-700"
         style={{ gridColumn: "4", gridRow: "1 / 3" }}
       >
         <div
