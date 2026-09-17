@@ -92,18 +92,18 @@ describe("AgentBlock", () => {
     expect(screen.getByText(/CODEUR/)).toBeTruthy();
   });
 
-  it("shows done when isDone and not active", () => {
+  it("marque un agent termine, en vert plutot qu en gris", () => {
     render(
       <AgentBlock agent="codeur" tokens="" isActive={false} isDone={true} />,
     );
-    expect(screen.getByText("done")).toBeTruthy();
+    expect(screen.getByText("terminé")).toBeTruthy();
   });
 
-  it("shows generating placeholder when active with no tokens", () => {
+  it("montre un texte d attente quand l agent n a rien produit", () => {
     render(
       <AgentBlock agent="codeur" tokens="" isActive={true} isDone={false} />,
     );
-    expect(screen.getByText(/Generating/i)).toBeTruthy();
+    expect(screen.getByText(/Génération/i)).toBeTruthy();
   });
 
   it("renders reviewer label and verdict", () => {

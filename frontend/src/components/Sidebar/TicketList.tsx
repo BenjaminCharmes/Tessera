@@ -21,10 +21,10 @@ interface StatusGroup {
 }
 
 const STATUS_GROUPS: StatusGroup[] = [
-  { status: "todo", label: "TODO", collapsible: false },
-  { status: "in-progress", label: "IN PROGRESS", collapsible: false },
-  { status: "in-review", label: "IN REVIEW", collapsible: false },
-  { status: "blocked", label: "BLOCKED", collapsible: false },
+  { status: "todo", label: "TODO", collapsible: true },
+  { status: "in-progress", label: "IN PROGRESS", collapsible: true },
+  { status: "in-review", label: "IN REVIEW", collapsible: true },
+  { status: "blocked", label: "BLOCKED", collapsible: true },
   { status: "done", label: "DONE", collapsible: true },
   { status: "cancelled", label: "CANCELLED", collapsible: true },
 ];
@@ -70,7 +70,7 @@ export default function TicketList({
 
   if (!project) {
     return (
-      <div className="p-4 text-zinc-500 text-xs">Select a project first</div>
+      <div className="p-4 text-zinc-500 text-xs">Sélectionne d'abord un projet</div>
     );
   }
 
@@ -111,7 +111,7 @@ export default function TicketList({
             </button>
             <button
               onClick={onToggleKanban}
-              title={showKanban ? "List view" : "Kanban view"}
+              title={showKanban ? "Vue liste" : "Vue tableau"}
               className={`w-6 h-6 flex items-center justify-center rounded text-sm transition-colors ${
                 showKanban
                   ? "bg-zinc-600 text-white"

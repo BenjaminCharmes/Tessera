@@ -65,6 +65,15 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
             : s.currentRound,
         currentTokens: "",
       };
+    case "agent_done":
+      // Sans cela `currentAgent` restait figé sur le dernier agent démarré :
+      // ses points de chargement continuaient de rebondir alors qu'il avait
+      // rendu son verdict (ticket-073).
+      return {
+        ...s,
+        events,
+        currentAgent: s.currentAgent === ev.agent ? null : s.currentAgent,
+      };
     case "agent_token":
       return {
         ...s,

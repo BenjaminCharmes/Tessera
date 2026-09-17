@@ -176,7 +176,14 @@ export default function App() {
               setOpenFilePath(null);
               setShowDiff(true);
             }}
-            onToggleKanban={() => setShowKanban((v) => !v)}
+            onToggleKanban={() => {
+              // Un fichier ouvert gardait la main sur le centre : basculer la
+              // vue ne produisait rien tant qu'on ne l'avait pas refermé
+              // (ticket-073).
+              setOpenFilePath(null);
+              setShowDiff(false);
+              setShowKanban((v) => !v);
+            }}
             onTicketCreated={handleTicketCreated}
             onBatchCreated={handleBatchCreated}
             onSelectTicketById={handleSelectTicketById}

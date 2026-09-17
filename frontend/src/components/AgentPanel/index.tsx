@@ -98,13 +98,13 @@ export default function AgentPanel({
       <div className="flex-1 overflow-y-auto">
         {status === "idle" && (
           <div className="flex items-center justify-center h-full text-zinc-700 text-xs italic">
-            {project ? "Run a ticket to start" : "Select a project"}
+            {project ? "Lance un ticket pour commencer" : "Select a project"}
           </div>
         )}
 
         {status === "connecting" && (
           <div className="flex items-center justify-center h-full text-zinc-500 text-xs">
-            <span className="animate-pulse">Connecting…</span>
+            <span className="animate-pulse">Connexion…</span>
           </div>
         )}
 

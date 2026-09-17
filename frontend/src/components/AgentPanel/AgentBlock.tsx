@@ -1,3 +1,4 @@
+import { IconCheck } from "../../design/icons";
 import TokenStream from "./TokenStream";
 import VerdictBanner from "./VerdictBanner";
 import type { AgentRole } from "../../types/api";
@@ -37,7 +38,9 @@ export default function AgentBlock({
           </span>
         )}
         {isDone && !isActive && (
-          <span className="ml-auto text-zinc-600 font-normal">done</span>
+          <span className="ml-auto flex items-center gap-1 font-normal text-green-400">
+            <IconCheck size={12} /> terminé
+          </span>
         )}
       </div>
 
@@ -49,7 +52,7 @@ export default function AgentBlock({
           <VerdictBanner content={reviewContent} />
         )}
         {isActive && !tokens && !reviewContent && (
-          <div className="text-zinc-600 text-xs italic">Generating…</div>
+          <div className="text-zinc-600 text-xs italic">Génération…</div>
         )}
       </div>
     </div>

@@ -121,18 +121,12 @@ export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
             role="tab"
             aria-selected={actif}
             onClick={() => onChangePanel(panel)}
-            className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
+            className={`flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
               actif
-                ? "bg-zinc-800 text-violet-200"
+                ? "bg-violet-500/15 text-violet-200 ring-1 ring-inset ring-violet-500/40"
                 : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
             }`}
           >
-            {actif && (
-              <span
-                aria-hidden="true"
-                className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r-full bg-violet-400"
-              />
-            )}
             {icon}
             <span className="text-micro leading-none">
               {label}
