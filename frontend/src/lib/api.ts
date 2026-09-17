@@ -25,6 +25,7 @@ import type {
   Ticket,
   TicketActivity,
   TicketDiff,
+  PlanDeNettoyage,
   TicketBatchResponse,
   TicketCreate,
   TicketDraft,
@@ -157,6 +158,13 @@ export const api = {
       post(`/projects/${projectId}/detach`, {}),
     remove: (projectId: string): Promise<void> =>
       del(`/projects/${projectId}?confirmed=true`),
+    cleanupPlan: (projectId: string): Promise<PlanDeNettoyage> =>
+      request(`/projects/${projectId}/branches/cleanup`),
+    cleanup: (projectId: string, branches: string[]): Promise<string[]> =>
+      request(`/projects/${projectId}/branches/cleanup`, {
+        method: "POST",
+        body: JSON.stringify({ branches }),
+      }),
     artifacts: (projectId: string): Promise<ArtifactModeState> =>
       request(`/projects/${projectId}/artifacts`),
     setArtifacts: (

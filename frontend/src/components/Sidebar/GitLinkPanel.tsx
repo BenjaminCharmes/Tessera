@@ -1,3 +1,4 @@
+import BranchCleanup from "./BranchCleanup";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import { useGitStatus } from "../../hooks/useGitStatus";
@@ -196,7 +197,8 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
           >
             Masquer
           </button>
-        </div>
+          <BranchCleanup projectId={project.id} />
+    </div>
       )}
     </section>
   );

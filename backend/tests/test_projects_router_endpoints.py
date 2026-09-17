@@ -555,3 +555,29 @@ def test_supprimer_un_projet_lie_ne_touche_jamais_la_cible(
     assert not link.exists()
     assert source.is_dir()
     assert (source / "important.py").read_text(encoding="utf-8") == "ne pas perdre\n"
+
+
+def test_le_plan_de_nettoyage_est_lisible_avant_d_agir(workspace: Path) -> None:
+    # Supprimer une branche est irreversible : l'utilisateur doit pouvoir lire
+    # ce qui partira, et pourquoi le reste demeure.
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    resp = _client().get("/api/v1/projects/mon-projet/branches/cleanup")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert "nettoyables" in body and "conservees" in body
+
+
+def test_une_branche_hors_plan_n_est_pas_supprimee(workspace: Path) -> None:
+    # Le plan est recalcule cote serveur : se fier a la liste envoyee par
+    # l'interface reviendrait a supprimer sur la foi d'un etat perime.
+    _client().post("/api/v1/projects/mon-projet/git/init")
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/branches/cleanup",
+        json={"branches": ["main", "une-branche-qui-n-existe-pas"]},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json() == []

@@ -317,3 +317,10 @@ export interface TicketDiff {
   diff: string;
   files: string[];
 }
+
+/** Ce que le nettoyage peut retirer, et pourquoi le reste demeure (ticket-070). */
+export interface PlanDeNettoyage {
+  nettoyables: string[];
+  /** [branche, raison] — la raison est destinée à être lue. */
+  conservees: [string, string][];
+}
