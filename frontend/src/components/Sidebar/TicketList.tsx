@@ -1,6 +1,12 @@
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
-import { IconBolt, IconChevronDown, IconChevronRight } from "../../design/icons";
+import {
+  IconBoard,
+  IconBolt,
+  IconChevronDown,
+  IconChevronRight,
+  IconPlus,
+} from "../../design/icons";
 import { useState } from "react";
 import TicketCard from "./TicketCard";
 import CreateTicketModal from "./CreateTicketModal";
@@ -68,23 +74,6 @@ export default function TicketList({
     );
   }
 
-  if (loading) {
-    return (
-      <div className="flex flex-col h-full">
-        <div className={`${BAND} border-b border-zinc-700 px-3`}>
-          <RegionTitle>
-            {project.name}
-          </RegionTitle>
-        </div>
-        <SkeletonList count={5} />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="p-4 text-red-400 text-xs">{error}</div>;
-  }
-
   function toggleGroup(status: TicketStatus) {
     setCollapsed((prev) => {
       const next = new Set(prev);
@@ -118,7 +107,7 @@ export default function TicketList({
               aria-label="Créer un ticket"
               className="w-6 h-6 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-base leading-none"
             >
-              +
+              <IconPlus size={14} />
             </button>
             <button
               onClick={onToggleKanban}
@@ -129,13 +118,24 @@ export default function TicketList({
                   : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700"
               }`}
             >
-              ≡
+              <IconBoard size={14} />
             </button>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto py-1">
-          {STATUS_GROUPS.map(({ status, label, collapsible }) => {
+          {/* Le chargement et l'erreur remplacent la **liste**, pas le
+              composant. Un retour anticipé ici démontait tout le sous-arbre —
+              modales comprises — et un rafraîchissement des tickets suffisait
+              à effacer le résultat du planificateur, qui est un appel facturé
+              (ticket-071). */}
+          {loading && <SkeletonList count={5} />}
+          {error && !loading && (
+            <p className="p-4 text-xs text-red-400">{error}</p>
+          )}
+          {!loading &&
+            !error &&
+            STATUS_GROUPS.map(({ status, label, collapsible }) => {
             const tickets = byStatus[status];
             const isCollapsed = collapsed.has(status);
 

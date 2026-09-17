@@ -90,12 +90,18 @@ export default function PlanEvolutionModal({
     });
   }
 
+  // Le résultat du planificateur est un appel LLM facturé : tant qu'il est en
+  // cours ou à l'écran, un clic à côté ne doit pas le jeter. On ne ferme que
+  // depuis un état où il n'y a rien à perdre (ticket-071).
+  const perteEnCours =
+    state === "planning" || state === "creating" || drafts.length > 0;
+
   function handleOverlayClick(e: React.MouseEvent) {
-    if (e.target === e.currentTarget) onClose();
+    if (e.target === e.currentTarget && !perteEnCours) onClose();
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") onClose();
+    if (e.key === "Escape" && !perteEnCours) onClose();
   }
 
   const isLoading = state === "planning" || state === "creating";

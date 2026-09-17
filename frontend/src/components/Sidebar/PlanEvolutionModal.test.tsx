@@ -353,3 +353,42 @@ describe("PlanEvolutionModal", () => {
     expect(onBatchCreated).not.toHaveBeenCalled();
   });
 });
+
+describe("PlanEvolutionModal — ne pas perdre un appel payé", () => {
+  it("ne se ferme pas au clic exterieur pendant la planification", async () => {
+    const onClose = vi.fn();
+    vi.mocked(api.projects.plan).mockReturnValue(new Promise(() => {}));
+
+    render(<PlanEvolutionModal projectId="p" onClose={onClose} onBatchCreated={() => {}} />);
+    await userEvent.type(screen.getByLabelText(/description/i), "une évolution");
+    await userEvent.click(screen.getByRole("button", { name: /planifier/i }));
+
+    await userEvent.click(screen.getByRole("dialog"));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("ne se ferme pas au clic exterieur quand les brouillons sont a l'ecran", async () => {
+    // Panne vecue : l'appel au planificateur est facture, et un clic a cote
+    // jetait son resultat sans rien demander.
+    const onClose = vi.fn();
+    vi.mocked(api.projects.plan).mockResolvedValue({
+      summary: "s",
+      drafts: [
+        {
+          title: "T1", type: "feat", priority: "high", agent: "codeur",
+          description: "d", acceptance_criteria: [], depends_on_index: [],
+        },
+      ],
+    });
+
+    render(<PlanEvolutionModal projectId="p" onClose={onClose} onBatchCreated={() => {}} />);
+    await userEvent.type(screen.getByLabelText(/description/i), "une évolution");
+    await userEvent.click(screen.getByRole("button", { name: /planifier/i }));
+    await screen.findByText("T1");
+
+    await userEvent.click(screen.getByRole("dialog"));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+});

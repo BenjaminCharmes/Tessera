@@ -66,7 +66,7 @@ describe("cohérence visuelle", () => {
     // Un glyphe collé dans du JSX ne se contrôle ni en taille, ni en trait, ni
     // en alignement, et son rendu dépend de la police du système.
     const glyphes = new RegExp(
-      "[\\u2190-\\u21FF\\u2460-\\u27BF\\u2B00-\\u2BFF\\u2588\\u25A0-\\u25FF]|[\\u{1F000}-\\u{1FAFF}]",
+      "[\\u2190-\\u21FF\\u2460-\\u27BF\\u2B00-\\u2BFF\\u2588\\u25A0-\\u25FF\\u2200-\\u22FF]|[\\u{1F000}-\\u{1FAFF}]",
       "u",
     );
     const fautifs = FICHIERS.filter(({ chemin, contenu }) => {
