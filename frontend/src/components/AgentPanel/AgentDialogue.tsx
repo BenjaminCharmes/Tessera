@@ -91,9 +91,10 @@ export default function AgentDialogue({
       <button
         type="button"
         onClick={onStop}
-        className="mb-3 w-full rounded border border-red-900 px-2 py-1 text-mini text-red-300 transition-colors hover:border-red-700 hover:text-red-200"
+        title="Le run commitera ce qu'il a déjà produit"
+        className="mb-3 rounded border border-red-900/70 px-2 py-0.5 text-micro text-red-400 transition-colors hover:border-red-700 hover:text-red-300"
       >
-        Arrêter le run — il commitera ce qu'il a produit
+        Arrêter le run
       </button>
 
       <label

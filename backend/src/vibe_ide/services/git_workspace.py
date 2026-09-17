@@ -148,6 +148,36 @@ class GitWorkspaceService:
         """
         self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
 
+    async def _exclude_pathspecs(self) -> tuple[str, ...]:
+        """Les `:(exclude)` à poser, sans ceux que le dépôt ignore déjà.
+
+        Nommer un chemin **déjà ignoré** dans un pathspec fait sortir
+        `git add` en code 1 (« The following paths are ignored… »), alors que
+        la même commande sans ce pathspec réussit et saute le chemin en
+        silence. Sur un projet en mode artefacts `local` (ADR-021), où
+        `tickets/` et `memory/` sont dans `.git/info/exclude`, ces exclusions
+        n'étaient donc pas seulement inutiles : elles faisaient échouer le
+        commit de fin de run, et donc le run entier (ticket-072).
+        """
+        # Boucle explicite : une compréhension contenant un `await` produit un
+        # générateur asynchrone, pas un tuple.
+        pathspecs: list[str] = []
+        for chemin in _ORCHESTRATOR_ARTIFACT_PATHS:
+            if not await self._is_ignored(chemin):
+                pathspecs.append(f":(exclude){chemin}")
+        return tuple(pathspecs)
+
+    async def _is_ignored(self, path: str) -> bool:
+        """True si le dépôt ignore ce chemin (`.gitignore` ou `.git/info/exclude`)."""
+        proc = await asyncio.create_subprocess_exec(
+            "git", "check-ignore", "-q", "--", path,
+            cwd=str(self._project_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        await proc.communicate()
+        return proc.returncode == 0
+
     async def _untracked_files(self) -> tuple[str, ...]:
         """Paths git reports as untracked (respecting .gitignore), as a tuple."""
         listing = await self._run("ls-files", "--others", "--exclude-standard")
@@ -190,7 +220,7 @@ class GitWorkspaceService:
         as if it were.
         """
         await self._run("add", "-A", "-N")
-        pathspec = (".", *_ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS)
+        pathspec = (".", *await self._exclude_pathspecs())
         if await self._has_head():
             return await self._run("diff", "HEAD", "--", *pathspec)
         return await self._run("diff", _EMPTY_TREE_SHA, "--", *pathspec)
@@ -230,7 +260,7 @@ class GitWorkspaceService:
             "-A",
             "--",
             ".",
-            *_ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS,
+            *await self._exclude_pathspecs(),
             *(f":(exclude){path}" for path in self._preexisting_untracked),
         )
         staged = await self._run("diff", "--cached", "--name-only")
@@ -243,11 +273,22 @@ class GitWorkspaceService:
         # yet (e.g. a git_workspace used outside the ticket pipeline, or a
         # fresh repository) must not fail `git add` on a pathspec matching
         # nothing — only add whichever bookkeeping paths actually exist.
+        # Un chemin que le dépôt ignore est hors du dépôt **par décision** :
+        # c'est le mode `local` d'ADR-021, qui écrit `tickets/` et `memory/`
+        # dans `.git/info/exclude`. Tenter de le stager fait sortir git en
+        # code 1 — et faisait donc échouer tout le commit de fin de run, donc
+        # tout le run (ticket-072). Depuis ticket-068 cet échec est bruyant,
+        # ce qui est précisément ce qui l'a rendu visible.
         existing_bookkeeping_paths = [
             p
             for p in _ORCHESTRATOR_ARTIFACT_PATHS
             if (self._project_path / p.rstrip("/")).exists()
         ]
+        conservees: list[str] = []
+        for chemin in existing_bookkeeping_paths:
+            if not await self._is_ignored(chemin):
+                conservees.append(chemin)
+        existing_bookkeeping_paths = conservees
         if existing_bookkeeping_paths:
             await self._run("add", "-A", "--", *existing_bookkeeping_paths)
             staged_bookkeeping = await self._run("diff", "--cached", "--name-only")

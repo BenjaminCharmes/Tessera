@@ -1,10 +1,21 @@
-import { IconAlert, IconCheck } from "../../design/icons";
+import { useState } from "react";
+import { IconAlert, IconCheck, IconChevronDown, IconChevronRight } from "../../design/icons";
 
 interface VerdictBannerProps {
   content: string;
 }
 
-function parseVerdict(content: string): { approved: boolean; summary: string } {
+/**
+ * Le bandeau ne gardait que `lines[0]` : le reviewer annonçait « voici ma
+ * review » et l'utilisateur ne voyait rien de plus. Or le détail est la seule
+ * chose qui permette de juger — c'est pour ça qu'on paie un reviewer
+ * (ticket-072).
+ */
+function parseVerdict(content: string): {
+  approved: boolean;
+  summary: string;
+  detail: string;
+} {
   const approved =
     content.includes("APPROVED") && !content.includes("CHANGES_REQUESTED");
   const lines = content
@@ -13,11 +24,16 @@ function parseVerdict(content: string): { approved: boolean; summary: string } {
     .filter(
       (l) => l && !l.includes("APPROVED") && !l.includes("CHANGES_REQUESTED"),
     );
-  return { approved, summary: lines[0] ?? "" };
+  return {
+    approved,
+    summary: lines[0] ?? "",
+    detail: lines.slice(1).join("\n").trim(),
+  };
 }
 
 export default function VerdictBanner({ content }: VerdictBannerProps) {
-  const { approved, summary } = parseVerdict(content);
+  const { approved, summary, detail } = parseVerdict(content);
+  const [ouvert, setOuvert] = useState(false);
 
   return (
     <div
@@ -38,7 +54,30 @@ export default function VerdictBanner({ content }: VerdictBannerProps) {
           </>
         )}
       </div>
-      {summary && <div className="text-zinc-400 text-mini">{summary}</div>}
+      {summary && <div className="text-mini text-zinc-400">{summary}</div>}
+
+      {detail && (
+        <>
+          <button
+            type="button"
+            onClick={() => setOuvert((v) => !v)}
+            aria-expanded={ouvert}
+            className="mt-1.5 flex items-center gap-1 text-mini text-zinc-400 transition-colors hover:text-zinc-200"
+          >
+            {ouvert ? (
+              <IconChevronDown size={12} />
+            ) : (
+              <IconChevronRight size={12} />
+            )}
+            {ouvert ? "Masquer le détail" : "Voir le détail de la revue"}
+          </button>
+          {ouvert && (
+            <pre className="mt-1.5 max-h-64 overflow-auto whitespace-pre-wrap break-words rounded bg-zinc-950/60 p-2 font-mono text-mini text-zinc-300">
+              {detail}
+            </pre>
+          )}
+        </>
+      )}
     </div>
   );
 }
