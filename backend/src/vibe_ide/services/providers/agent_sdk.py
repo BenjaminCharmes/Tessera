@@ -5,6 +5,7 @@ from typing import Any
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
+    HookMatcher,
     RateLimitEvent,
     ResultMessage,
     StreamEvent,
@@ -13,6 +14,7 @@ from claude_agent_sdk import (
     query,
 )
 
+from vibe_ide.services.providers.git_guard import hook_refus_git
 from vibe_ide.services.providers.ask_user import (
     ASK_USER_SERVER_NAME,
     ASK_USER_TOOL_NAME,
@@ -85,6 +87,12 @@ def _build_options(
         max_turns=max_turns,
         max_budget_usd=max_budget_usd,
         mcp_servers=mcp_servers,
+        # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
+        # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
+        # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
+        # `allowed_tools` couvrant `Bash` l'auto-approuverait avant tout
+        # callback de permission — le garde serait inerte (ticket-068).
+        hooks={"PreToolUse": [HookMatcher(matcher="Bash", hooks=[hook_refus_git])]},
     )
 
 

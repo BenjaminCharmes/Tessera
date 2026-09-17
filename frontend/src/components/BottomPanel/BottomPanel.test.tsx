@@ -71,6 +71,22 @@ describe("BottomPanel", () => {
     expect(screen.getByText(/CHANGES_REQUESTED/)).toBeTruthy();
   });
 
+  it("montre la raison d'un refus, pas « unknown »", () => {
+    // Panne vecue le 2026-09-17 : le backend emettait
+    // `reason="dirty_working_tree"`, le formateur lisait `message`, et
+    // l'utilisateur a vu « Erreur: unknown » pendant dix minutes alors que la
+    // raison exacte etait dans l'evenement.
+    const ev = makeEvent("error", { reason: "dirty_working_tree" });
+    render(<BottomPanel events={[ev]} />);
+    expect(screen.getByText(/arbre de travail/i)).toBeTruthy();
+  });
+
+  it("montre une raison inconnue telle quelle plutot que de l'effacer", () => {
+    const ev = makeEvent("error", { reason: "quelque_chose_de_nouveau" });
+    render(<BottomPanel events={[ev]} />);
+    expect(screen.getByText(/quelque_chose_de_nouveau/)).toBeTruthy();
+  });
+
   it("renders error event", () => {
     const ev = makeEvent("error", { message: "Something went wrong" });
     render(<BottomPanel events={[ev]} />);

@@ -123,17 +123,8 @@ export function useOrchestratorStream(
 ): UseOrchestratorStreamResult {
   const [state, setState] = useState<StreamState>(INITIAL);
   const wsRef = useRef<WebSocket | null>(null);
-  const retryCountRef = useRef(0);
-  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ticketIdRef = useRef<string | null>(null);
   const isDoneRef = useRef(false);
-
-  function clearTimers() {
-    if (retryTimerRef.current) {
-      clearTimeout(retryTimerRef.current);
-      retryTimerRef.current = null;
-    }
-  }
 
   function closeWs() {
     if (wsRef.current) {
@@ -180,19 +171,19 @@ export function useOrchestratorStream(
     ws.onclose = () => {
       if (isDoneRef.current) return;
 
-      if (retryCountRef.current < 3) {
-        const delay = 1000 * Math.pow(2, retryCountRef.current);
-        retryCountRef.current += 1;
-        retryTimerRef.current = setTimeout(() => {
-          if (ticketIdRef.current) openSocket(ticketIdRef.current);
-        }, delay);
-      } else {
-        setState((s) => ({
-          ...s,
-          status: "error",
-          errorMessage: "Connection lost after 3 retries",
-        }));
-      }
+      // On ne se reconnecte pas. Rouvrir la socket renvoyait la commande de
+      // démarrage, donc lançait un **nouveau** run : le 2026-09-17, trois runs
+      // sont partis sur un ticket qui échouait vite, sans que personne n'ait
+      // recliqué. Tant qu'il n'existe pas de protocole pour se rattacher à un
+      // run en cours, perdre l'affichage coûte moins cher que relancer le
+      // travail (ticket-068).
+      setState((s) => ({
+        ...s,
+        status: "error",
+        errorMessage:
+          "Connexion au pipeline perdue. Le run continue peut-être côté serveur : " +
+          "vérifie l'historique avant de relancer le ticket.",
+      }));
     };
   }
 
@@ -216,8 +207,6 @@ export function useOrchestratorStream(
   }
 
   function connect(ticketId: string) {
-    clearTimers();
-    retryCountRef.current = 0;
     ticketIdRef.current = ticketId;
     isDoneRef.current = false;
     setState({ ...INITIAL, ticketId });
@@ -225,16 +214,12 @@ export function useOrchestratorStream(
   }
 
   function disconnect() {
-    clearTimers();
-    retryCountRef.current = 0;
     isDoneRef.current = true;
     closeWs();
     setState((s) => ({ ...s, status: "idle" }));
   }
 
   function clear() {
-    clearTimers();
-    retryCountRef.current = 0;
     isDoneRef.current = true;
     ticketIdRef.current = null;
     closeWs();

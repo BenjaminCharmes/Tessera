@@ -20,6 +20,10 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
+class CommitFailed(Exception):
+    """Le commit de fin de run a échoué — le run ne peut pas s'annoncer réussi."""
+
+
 async def finish_security_block(
     orch: "Orchestrator", run: PipelineRun, summary: str
 ) -> PipelineResult:
@@ -65,25 +69,50 @@ async def commit_work(
     try:
         commit_sha = await orch._git_workspace.commit_all(message)
     except GitWorkspaceError as exc:
+        # Cet échec était un simple `warning` : il partait dans les logs du
+        # serveur et le run annonçait quand même APPROVED. Le travail restait
+        # alors dans l'arbre, le ticket suivant le trouvait sale et se
+        # bloquait, et rien à l'écran ne reliait les deux (ticket-068).
         _logger.warning("commit_failed", extra={"error": str(exc)})
-        return None
+        await emit(run, EventType.ERROR, reason="commit_failed", message=str(exc))
+        raise CommitFailed(str(exc)) from exc
     if commit_sha is not None:
         await emit(run, EventType.COMMIT_CREATED, sha=commit_sha, branch=run.branch)
     return commit_sha
 
 
 async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineResult:
-    """Mark the ticket done, commit under its own type, advance the base ref."""
-    await set_status(orch, run, TicketStatus.done)
-    await emit(run, EventType.PIPELINE_DONE, approved=True, rounds=run.round_num)
+    """Mark the ticket done, commit under its own type, advance the base ref.
+
+    L'approbation n'est prononcée qu'une fois le commit passé : un run qui a
+    produit du travail mais n'a pas su l'enregistrer n'a pas fini son travail,
+    quoi qu'en pense le reviewer.
+    """
     orch._log(f"[{run.ticket_id}] APPROVED après {run.round_num} tour(s)")
 
     # Ce message est écrit dans le dépôt *de l'utilisateur* : il suit donc la
     # convention de ce dépôt — Conventional Commits — avec le type du ticket
     # plutôt qu'un "feat:" codé en dur, qui mal-étiquetait les fix/chore/docs.
-    commit_sha = await commit_work(
-        orch, run, f"{run.ticket.type.value}: {run.ticket_id} — {run.ticket.title}"
-    )
+    try:
+        commit_sha = await commit_work(
+            orch, run, f"{run.ticket.type.value}: {run.ticket_id} — {run.ticket.title}"
+        )
+    except CommitFailed:
+        # « Rien à committer » (commit_sha None) reste un succès : le travail
+        # existait déjà. Un commit *raté* est autre chose, et le ticket ne peut
+        # pas passer `done` dessus.
+        await set_status(orch, run, TicketStatus.blocked)
+        await emit(run, EventType.PIPELINE_DONE, approved=False, rounds=run.round_num)
+        return PipelineResult(
+            ticket_id=run.ticket_id,
+            final_status=TicketStatus.blocked,
+            rounds=run.round_num,
+            approved=False,
+            branch=run.branch,
+        )
+
+    await set_status(orch, run, TicketStatus.done)
+    await emit(run, EventType.PIPELINE_DONE, approved=True, rounds=run.round_num)
 
     # Seul un ticket *approuvé* avance la ref de base. L'isolation par branche
     # garde le travail rejeté hors du ticket suivant ; elle ne doit pas aussi

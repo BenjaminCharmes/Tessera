@@ -249,3 +249,14 @@ Format : ADR léger (Architecture Decision Record).
 **Conséquence** : l'accent d'identité est une barre, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus. Une priorité moyenne ou basse n'est pas une alerte ; elle descend en neutre et se distingue par l'intensité, pas par la teinte. Les badges GitHub sont des métadonnées, donc neutres.
 **Alternative rejetée** : une couche d'alias sémantiques (`text-success`) — elle ajoute une indirection sans rien changer à l'écran ; documenter les rôles sans les vérifier (c'est ce qui n'a pas tenu).
 
+---
+
+## ADR-027 — Les agents ne touchent pas à l'historique git
+
+**Date** : 2026-09-17
+**Décision** : Un hook `PreToolUse` refuse à tout agent les commandes git qui écrivent — `commit`, `merge`, `push`, `checkout`, `branch`, `reset`, `rebase`, `add`, `remote`… Le git en lecture reste permis. Et un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket passe `blocked`, avec la raison émise.
+**Raison** : au premier usage réel, des agents ont commité avec leurs propres messages, mergé la branche de ticket dans `main` et poussé sur GitHub — pendant deux runs où l'utilisateur n'avait cliqué que sur « lancer ». ADR-018 et ADR-022 ne contraignaient que `GitWorkspaceService` ; le codeur a `Bash` et pouvait faire du git sans passer par elle. Une règle contournable en tapant une autre commande n'est pas une règle.
+**Pourquoi un hook et pas `can_use_tool`** : une entrée d'`allowed_tools` couvrant un outil entier — le cas de `Bash` — l'auto-approuve *avant* le callback de permission. Le garde y serait inerte, avec l'apparence d'une protection.
+**Alternative rejetée** : l'interdire dans le prompt (une consigne décrit une intention, un refus produit un fait) ; retirer `Bash` au codeur (il en a besoin pour lancer des tests et inspecter le projet).
+**Détail** : voir `tickets/done/ticket-068-integrite-des-runs.md`.
+

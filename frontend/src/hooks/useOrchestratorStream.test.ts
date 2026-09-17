@@ -148,3 +148,27 @@ describe("useOrchestratorStream", () => {
     expect(MockWebSocket.instance).toBeNull();
   });
 });
+
+describe("reconnexion", () => {
+  it("ne relance pas le pipeline quand la connexion tombe", () => {
+    // Panne vecue le 2026-09-17 : a la fermeture de la socket, le hook
+    // rouvrait et renvoyait la commande de demarrage — ce qui lancait un
+    // *nouveau* run. Trois runs sont partis sans que l'utilisateur ait
+    // reclique, sur un ticket qui echouait vite.
+    const { result } = renderHook(() => useOrchestratorStream("proj-1"));
+
+    act(() => {
+      result.current.connect("ticket-001");
+    });
+    const premiere = MockWebSocket.instance;
+
+    act(() => {
+      premiere?.onclose?.(new CloseEvent("close"));
+      vi.advanceTimersByTime(10_000);
+    });
+
+    expect(MockWebSocket.instance).toBe(premiere);
+    expect(result.current.status).toBe("error");
+    expect(result.current.errorMessage).toMatch(/connexion/i);
+  });
+});
