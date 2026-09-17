@@ -34,6 +34,7 @@ interface TicketListProps {
   showKanban: boolean;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
+  onShowDiff?: (ticketId: string) => void;
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
@@ -50,6 +51,7 @@ export default function TicketList({
   showKanban,
   onSelectTicket,
   onRunPipeline,
+  onShowDiff,
   onToggleKanban,
   onTicketCreated,
   onBatchCreated,
@@ -170,6 +172,7 @@ export default function TicketList({
                       }
                       onSelect={onSelectTicket}
                       onRun={onRunPipeline}
+                      onShowDiff={onShowDiff}
                     />
                   ))}
               </div>

@@ -253,6 +253,8 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
                         dialogue.answer(texte)
                     elif message.get("type") == "interject":
                         dialogue.interject(texte)
+                    elif message.get("type") == "stop":
+                        dialogue.request_stop()
 
             reader = asyncio.create_task(read_inbound())
             try:

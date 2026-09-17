@@ -24,6 +24,7 @@ import type {
   RunFromChatResponse,
   Ticket,
   TicketActivity,
+  TicketDiff,
   TicketBatchResponse,
   TicketCreate,
   TicketDraft,
@@ -88,6 +89,8 @@ export const api = {
   tickets: {
     activity: (projectId: string, ticketId: string): Promise<TicketActivity> =>
       request(`/projects/${projectId}/tickets/${ticketId}/activity`),
+    diff: (projectId: string, ticketId: string): Promise<TicketDiff> =>
+      request(`/projects/${projectId}/tickets/${ticketId}/diff`),
     openPr: (
       projectId: string,
       ticketId: string,

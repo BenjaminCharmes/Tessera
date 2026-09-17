@@ -39,6 +39,11 @@ _logger = get_logger(__name__)
 #: Ce que l'agent reçoit quand aucun humain n'a répondu — délai dépassé, ou
 #: run autonome. Le texte est une consigne, pas un constat : il doit conduire
 #: l'agent à décider *et à le dire*, pas à réessayer ni à abandonner.
+STOP_ANSWER = (
+    "Arrêt demandé par l'utilisateur. N'écris plus rien et termine ton tour "
+    "immédiatement, en résumant en une phrase où tu en étais."
+)
+
 NO_HUMAN_ANSWER = (
     "Aucune réponse humaine n'est disponible. Poursuis sans attendre : "
     "choisis l'option la plus raisonnable, et énonce explicitement "
@@ -72,11 +77,19 @@ class DialogueChannel:
         # pouvoir attendre la question plutôt que de scruter l'attribut.
         self._question_posed = asyncio.Event()
         self._mailbox: list[str] = []
+        # L'arrêt passe par ce canal, qui est déjà le chemin par lequel
+        # l'utilisateur parle à un run en cours : inventer un second transport
+        # pour un seul booléen n'apporterait rien (ticket-069).
+        self._stop_requested = False
 
     # -- côté agent ------------------------------------------------
 
     async def ask(self, question: str) -> str:
         """Pose une question et attend la réponse, sans jamais bloquer pour de bon."""
+        if self._stop_requested:
+            # Attendre ici retiendrait le run jusqu'au délai d'ADR-025 alors
+            # qu'on vient justement de demander qu'il s'arrête.
+            return STOP_ANSWER
         if not self._interactive:
             return NO_HUMAN_ANSWER
 
@@ -110,6 +123,12 @@ class DialogueChannel:
             return
         self._answer.set_result(text)
 
+    def request_stop(self) -> None:
+        """Demande l'arrêt du run. Débloque aussi une question en attente."""
+        self._stop_requested = True
+        if self._answer is not None and not self._answer.done():
+            self._answer.set_result(STOP_ANSWER)
+
     def interject(self, text: str) -> None:
         """Dépose un message spontané, lu au prochain tour d'agent."""
         self._mailbox.append(text)
@@ -119,6 +138,10 @@ class DialogueChannel:
     @property
     def pending_question(self) -> str | None:
         return self._pending_question
+
+    @property
+    def stop_requested(self) -> bool:
+        return self._stop_requested
 
     @property
     def interactive(self) -> bool:

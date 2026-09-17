@@ -1,4 +1,4 @@
-import { IconCross, IconDot, IconExternal, IconPlay } from "../../design/icons";
+import { IconCross, IconDiff, IconDot, IconExternal, IconPlay } from "../../design/icons";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
 import type {
@@ -57,6 +57,7 @@ interface TicketCardProps {
   githubRemote?: string | null;
   onSelect: (ticket: Ticket) => void;
   onRun: (ticketId: string) => void;
+  onShowDiff?: (ticketId: string) => void;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
 }
 
@@ -68,6 +69,7 @@ export default function TicketCard({
   githubRemote,
   onSelect,
   onRun,
+  onShowDiff,
   onPrCreated,
 }: TicketCardProps) {
   const canRun = ticket.status !== "done" && ticket.status !== "cancelled";
@@ -226,6 +228,21 @@ export default function TicketCard({
               ) : (
                 <IconPlay size={12} />
               )}
+            </button>
+          )}
+          {/* Relire ce que le run a produit : c'est ce qui manquait pour
+              juger un ticket sans ouvrir VSCode (ticket-069). */}
+          {onShowDiff && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onShowDiff(ticket.id);
+              }}
+              title="Voir le diff"
+              aria-label="Voir le diff"
+              className="w-6 h-6 flex items-center justify-center rounded transition-colors text-zinc-500 hover:text-zinc-300 hover:bg-zinc-600"
+            >
+              <IconDiff size={12} />
             </button>
           )}
           {canOpenPr && !showPrForm && (

@@ -10,6 +10,7 @@ import { BAND } from "./design/layout";
 import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
 import type { SidebarPanel } from "./components/Sidebar";
+import DiffView from "./components/DiffView";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
 import AgentPanel from "./components/AgentPanel";
@@ -27,6 +28,8 @@ export default function App() {
   // (ticket-065).
   const [showKanban, setShowKanban] = useState(true);
   const [openFilePath, setOpenFilePath] = useState<string | null>(null);
+  // Relire ce qu'un run a produit sans quitter l'IDE (ticket-069).
+  const [showDiff, setShowDiff] = useState(false);
   // Colonne de droite : observer un run, ou discuter (ticket-048).
   const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
   const { toasts, addToast, removeToast } = useToast();
@@ -86,6 +89,7 @@ export default function App() {
     setTicket(t);
     setOpenFilePath(null);
     setShowKanban(false);
+    setShowDiff(false);
   }
 
   function handleTicketCreated(t: Ticket) {
@@ -166,6 +170,12 @@ export default function App() {
             onProjectCreated={handleProjectCreated}
             onSelectTicket={handleSelectTicket}
             onRunPipeline={handleRunPipeline}
+            onShowDiff={(ticketId) => {
+              const found = tickets.tickets.find((t) => t.id === ticketId);
+              if (found) setTicket(found);
+              setOpenFilePath(null);
+              setShowDiff(true);
+            }}
             onToggleKanban={() => setShowKanban((v) => !v)}
             onTicketCreated={handleTicketCreated}
             onBatchCreated={handleBatchCreated}
@@ -188,7 +198,9 @@ export default function App() {
         style={{ gridColumn: "3", gridRow: "1" }}
       >
         <ErrorBoundary>
-          {showKanban && !openFilePath ? (
+          {showDiff && project && ticket ? (
+            <DiffView projectId={project.id} ticketId={ticket.id} />
+          ) : showKanban && !openFilePath ? (
             <KanbanView
               byStatus={tickets.byStatus}
               activeTicket={ticket}

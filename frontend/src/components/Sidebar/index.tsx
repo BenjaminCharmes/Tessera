@@ -39,6 +39,7 @@ interface SidebarProps {
   onProjectCreated?: (project: Project) => void;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
+  onShowDiff?: (ticketId: string) => void;
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
@@ -69,6 +70,7 @@ export default function Sidebar({
   onProjectCreated,
   onSelectTicket,
   onRunPipeline,
+  onShowDiff,
   onToggleKanban,
   onTicketCreated,
   onBatchCreated,
@@ -116,6 +118,7 @@ export default function Sidebar({
           showKanban={showKanban}
           onSelectTicket={onSelectTicket}
           onRunPipeline={onRunPipeline}
+          onShowDiff={onShowDiff}
           onToggleKanban={onToggleKanban}
           onTicketCreated={onTicketCreated}
           onBatchCreated={onBatchCreated}

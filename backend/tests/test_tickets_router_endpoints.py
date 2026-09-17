@@ -301,3 +301,21 @@ def test_pr_status_renvoie_l_etat_et_le_statut_ci(
     assert body["state"] == "open"
     assert body["ci_status"] == "passing"
     assert body["pr_number"] == 12
+
+
+def test_le_diff_d_un_ticket_inexistant_renvoie_404(workspace: Path) -> None:
+    resp = _client().get("/api/v1/projects/mon-projet/tickets/ticket-404/diff")
+
+    assert resp.status_code == 404
+
+
+def test_le_diff_d_un_ticket_sans_branche_est_vide(workspace: Path) -> None:
+    # Un ticket jamais lance n'a pas de branche : l'ecran doit le dire plutot
+    # que d'echouer.
+    resp = _client().get("/api/v1/projects/mon-projet/tickets/ticket-001/diff")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["branch"] is None
+    assert body["diff"] == ""
+    assert body["files"] == []

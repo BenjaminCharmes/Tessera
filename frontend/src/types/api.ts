@@ -309,3 +309,11 @@ export interface OpenPrResponse {
   pr_url: string;
   branch: string;
 }
+
+/** Ce qu'un run a produit, tel que le dépôt le montre (ticket-069). */
+export interface TicketDiff {
+  ticket_id: string;
+  branch: string | null;
+  diff: string;
+  files: string[];
+}

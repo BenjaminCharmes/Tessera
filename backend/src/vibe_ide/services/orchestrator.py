@@ -138,12 +138,25 @@ class Orchestrator:
             run.start_round(round_num)
             context = stages.build_context(self, run)
 
+            # L'arrêt est vérifié **entre** les étapes, jamais au milieu de
+            # l'une : couper un agent en plein tour jetterait un travail déjà
+            # payé, et laisserait le diff dans un état que personne n'a relu.
+            if run.stop_requested:
+                return await outcomes.finish_stopped(self, run)
+
             await stages.run_coder(self, run, context)
+
+            if run.stop_requested:
+                return await outcomes.finish_stopped(self, run)
+
             await stages.run_tests(self, run)
 
             blocked = await stages.run_security_audit(self, run)
             if blocked is not None:
                 return blocked
+
+            if run.stop_requested:
+                return await outcomes.finish_stopped(self, run)
 
             approved, reason, raw_verdict = await stages.run_review(self, run, context)
 

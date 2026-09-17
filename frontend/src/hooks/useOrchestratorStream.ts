@@ -33,6 +33,8 @@ export interface UseOrchestratorStreamResult extends StreamState {
   answer: (text: string) => void;
   /** Dépose une consigne, lue par le prochain agent à parler. */
   interject: (text: string) => void;
+  /** Demande l'arrêt du run ; il commitera ce qu'il a déjà produit. */
+  stop: () => void;
 }
 
 const INITIAL: StreamState = {
@@ -206,6 +208,10 @@ export function useOrchestratorStream(
     send({ type: "interject", text });
   }
 
+  function stop() {
+    send({ type: "stop", text: "" });
+  }
+
   function connect(ticketId: string) {
     ticketIdRef.current = ticketId;
     isDoneRef.current = false;
@@ -226,5 +232,5 @@ export function useOrchestratorStream(
     setState(INITIAL);
   }
 
-  return { ...state, connect, disconnect, clear, answer, interject };
+  return { ...state, connect, disconnect, clear, answer, interject, stop };
 }

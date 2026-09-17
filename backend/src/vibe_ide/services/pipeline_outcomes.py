@@ -134,6 +134,34 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
     )
 
 
+async def finish_stopped(orch: "Orchestrator", run: PipelineRun) -> PipelineResult:
+    """Termine un run que l'utilisateur a interrompu, en commitant son travail.
+
+    Le travail est commité comme sur toute autre sortie : ADR-018 fait dépendre
+    le ticket suivant d'un arbre propre, et un arrêt qui laisserait le travail
+    en plan bloquerait la file — exactement la panne qu'on a corrigée ailleurs.
+
+    Le ticket passe `blocked` et non `todo` : en mode autonome, un ticket
+    laissé `todo` serait repris au tour suivant, et un arrêt demandé par
+    l'utilisateur serait sans effet.
+    """
+    await set_status(orch, run, TicketStatus.blocked)
+    await emit(run, EventType.ERROR, reason="stopped_by_user")
+    commit_sha = await commit_work(
+        orch, run, _unapproved_commit_message(run.ticket_id, "arrêt demandé")
+    )
+    await emit(run, EventType.PIPELINE_DONE, approved=False, rounds=run.round_num)
+    orch._log(f"[{run.ticket_id}] ARRÊTÉ par l'utilisateur au tour {run.round_num}")
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.blocked,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+    )
+
+
 async def finish_rounds_exhausted(
     orch: "Orchestrator", run: PipelineRun
 ) -> PipelineResult:

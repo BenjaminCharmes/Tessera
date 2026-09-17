@@ -35,6 +35,7 @@ export default function AgentPanel({
     pendingQuestion,
     answer,
     interject,
+    stop,
     clear,
   } = stream;
 
@@ -162,6 +163,7 @@ export default function AgentPanel({
         enCours={status === "running" || status === "connecting"}
         onAnswer={answer}
         onInterject={interject}
+        onStop={stop}
       />
 
       {/* Ce que le ticket a produit : runs, branche, PR (ticket-064). */}

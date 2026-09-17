@@ -11,6 +11,7 @@ describe("AgentDialogue", () => {
         enCours
         onAnswer={() => {}}
         onInterject={() => {}}
+        onStop={() => {}}
       />,
     );
 
@@ -25,6 +26,7 @@ describe("AgentDialogue", () => {
         enCours
         onAnswer={onAnswer}
         onInterject={() => {}}
+        onStop={() => {}}
       />,
     );
 
@@ -44,6 +46,7 @@ describe("AgentDialogue", () => {
         enCours
         onAnswer={onAnswer}
         onInterject={() => {}}
+        onStop={() => {}}
       />,
     );
 
@@ -60,6 +63,7 @@ describe("AgentDialogue", () => {
         enCours
         onAnswer={() => {}}
         onInterject={onInterject}
+        onStop={() => {}}
       />,
     );
 
@@ -78,6 +82,7 @@ describe("AgentDialogue", () => {
         enCours={false}
         onAnswer={() => {}}
         onInterject={() => {}}
+        onStop={() => {}}
       />,
     );
 

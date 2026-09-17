@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from vibe_ide.config import settings
+from vibe_ide.services.ticket_diff import TicketDiff, diff_du_ticket
 from vibe_ide.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketStatus, TicketStatusUpdate
 from vibe_ide.services.github_service import GitHubService, PRStatus
 from vibe_ide.services.database import list_runs
@@ -240,6 +241,20 @@ class OpenPrResponse(BaseModel):
     pr_number: int
     pr_url: str
     branch: str
+
+
+@router.get("/{project_id}/tickets/{ticket_id}/diff", response_model=TicketDiff)
+async def get_ticket_diff(project_id: str, ticket_id: str) -> TicketDiff:
+    """Le diff produit par le run de ce ticket, tel qu'il est dans le dépôt.
+
+    Sans cet endpoint, juger un run demandait d'ouvrir VSCode : le pipeline
+    relit le diff réel depuis ADR-018, mais rien ne l'exposait (ticket-069).
+    """
+    ticket = await _svc(project_id).get_ticket(ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail=f"Ticket {ticket_id} introuvable")
+
+    return await diff_du_ticket(settings.ide_workspace_dir / project_id, ticket_id)
 
 
 @router.get("/{project_id}/tickets/{ticket_id}/activity", response_model=TicketActivity)

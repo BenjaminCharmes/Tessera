@@ -21,6 +21,7 @@ interface AgentDialogueProps {
   enCours: boolean;
   onAnswer: (text: string) => void;
   onInterject: (text: string) => void;
+  onStop: () => void;
 }
 
 export default function AgentDialogue({
@@ -28,6 +29,7 @@ export default function AgentDialogue({
   enCours,
   onAnswer,
   onInterject,
+  onStop,
 }: AgentDialogueProps) {
   const [reponse, setReponse] = useState("");
   const [consigne, setConsigne] = useState("");
@@ -82,6 +84,17 @@ export default function AgentDialogue({
           </div>
         </div>
       ) : null}
+
+      {/* L'arrêt est une sortie, pas une annulation : le run commite ce qu'il
+          a déjà produit, parce que le ticket suivant dépend d'un arbre propre
+          (ADR-018). */}
+      <button
+        type="button"
+        onClick={onStop}
+        className="mb-3 w-full rounded border border-red-900 px-2 py-1 text-mini text-red-300 transition-colors hover:border-red-700 hover:text-red-200"
+      >
+        Arrêter le run — il commitera ce qu'il a produit
+      </button>
 
       <label
         htmlFor="dialogue-consigne"

@@ -52,6 +52,11 @@ class PipelineRun:
     security_context: str = ""
 
     @property
+    def stop_requested(self) -> bool:
+        """True dès que l'utilisateur a demandé l'arrêt de ce run."""
+        return self.dialogue.stop_requested
+
+    @property
     def ticket_id(self) -> str:
         return self.ticket.id
 
