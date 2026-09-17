@@ -37,7 +37,7 @@ describe("AgentDetail", () => {
 
     render(<AgentDetail role="mon-agent" />);
 
-    expect(await screen.findByText(/personnalisé/i)).toBeInTheDocument();
+    expect(await screen.findByText("perso")).toBeInTheDocument();
   });
 
   it("invite a choisir un agent quand aucun n'est selectionne", () => {

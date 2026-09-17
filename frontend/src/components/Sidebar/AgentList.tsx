@@ -1,3 +1,4 @@
+import AgentBadge from "../../design/AgentBadge";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconCross } from "../../design/icons";
@@ -41,15 +42,7 @@ function AgentRow({
       >
         {agent.role}
       </button>
-      <span
-        className={`shrink-0 text-micro font-medium px-1.5 py-0.5 rounded ${
-          agent.is_builtin
-            ? "bg-blue-900 text-blue-300"
-            : "bg-green-900 text-green-300"
-        }`}
-      >
-        {agent.is_builtin ? "built-in" : "custom"}
-      </span>
+      <AgentBadge natif={agent.is_builtin} />
       {!agent.is_builtin && (
         <button
           onClick={() => onDelete(agent.role)}

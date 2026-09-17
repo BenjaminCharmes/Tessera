@@ -103,6 +103,9 @@ class ProjectCreatorService:
         self, roles: list[str], project_name: str, project_description: str
     ) -> list[str]:
         created: list[str] = []
+        # Les rôles déclarés natifs comptent comme existants même si leur
+        # prompt n'est pas encore sur le disque : ils sont livrés avec le
+        # dépôt, et en fabriquer un à la volée écraserait celui du produit.
         existing = {a.role for a in self._registry.list_agents()}
         for role in roles:
             if role in existing:

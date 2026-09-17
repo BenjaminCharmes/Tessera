@@ -296,10 +296,12 @@ async def test_missing_agents_are_auto_created(tmp_path: Path) -> None:
     result = await svc.create_project([_user_message("Je veux un potager méditerranéen")])
 
     prompts_dir = tmp_path / "prompts"
-    # redacteur et planificateur ne sont pas builtins → doivent être créés
+    # Seul `redacteur` est inconnu du dépôt. `planificateur` en fait partie
+    # depuis ticket-079 : le fabriquer à la volée écraserait le prompt du
+    # produit par un texte généré.
     assert (prompts_dir / "redacteur.md").exists()
-    assert (prompts_dir / "planificateur.md").exists()
-    assert result.agents_created == ["redacteur", "planificateur"]
+    assert not (prompts_dir / "planificateur.md").exists()
+    assert result.agents_created == ["redacteur"]
 
 
 async def test_existing_agents_not_recreated(tmp_path: Path) -> None:
@@ -344,12 +346,14 @@ async def test_bootstrap_uses_haiku_model(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, _VALID_AGENT_JSON)
     await svc.create_project([_user_message("Je veux un potager méditerranéen")])
 
-    # Les appels de bootstrap (index 1 et 2) doivent utiliser Haiku
+    # Les appels de bootstrap doivent utiliser Haiku. Seul `redacteur` en
+    # déclenche un : `orchestrateur` et `planificateur` sont livrés avec le
+    # dépôt, donc natifs (ticket-079).
     from vibe_ide.services.project_creator import _BOOTSTRAP_MODEL
 
     provider = svc._provider
     bootstrap_calls = provider.calls[1:]
-    assert len(bootstrap_calls) == 2
+    assert len(bootstrap_calls) == 1
     for call in bootstrap_calls:
         assert call["model"] == _BOOTSTRAP_MODEL
 

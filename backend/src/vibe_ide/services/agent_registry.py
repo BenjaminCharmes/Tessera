@@ -17,14 +17,34 @@ class AgentInfo:
 
 
 class AgentRegistryService:
+    #: Les agents livrés **avec le dépôt**. Ils ne se suppriment pas depuis
+    #: l'IDE : leur prompt fait partie du produit, pas des créations de
+    #: l'utilisateur.
+    #:
+    #: Cette liste était restée à six rôles alors que le dépôt en livre treize.
+    #: Sept agents du pipeline — dont `securite`, `testeur`, `validateur` et
+    #: `agent-creator` — passaient donc pour des créations de l'utilisateur et
+    #: se supprimaient d'un clic. `agent-creator` a effectivement disparu le
+    #: 2026-09-17 (ticket-079).
+    #:
+    #: `test_agents_livres.py` refuse tout prompt livré qui n'apparaîtrait pas
+    #: ici : ajouter un agent au dépôt sans le déclarer fait échouer la suite.
     BUILTIN_ROLES: frozenset[str] = frozenset(
         {
-            "codeur",
-            "reviewer",
-            "orchestrateur",
+            "agent-creator",
             "architect",
-            "project-creator",
+            "chat",
+            "codeur",
+            "doc-updater",
+            "orchestrateur",
+            "planificateur",
             "project-analyzer",
+            "project-creator",
+            "reviewer",
+            "reviewer",
+            "securite",
+            "testeur",
+            "validateur",
         }
     )
 

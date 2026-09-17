@@ -51,12 +51,12 @@ describe("AgentList", () => {
     });
   });
 
-  it("renders agents with built-in and custom badges", () => {
+  it("distingue d'un mot les agents livres et ceux qu'on a crees", () => {
     render(<AgentList onAgentCreated={onAgentCreated} />);
     expect(screen.getByText("codeur")).toBeInTheDocument();
     expect(screen.getByText("securite")).toBeInTheDocument();
-    expect(screen.getByText("built-in")).toBeInTheDocument();
-    expect(screen.getByText("custom")).toBeInTheDocument();
+    expect(screen.getByText("natif")).toBeInTheDocument();
+    expect(screen.getByText("perso")).toBeInTheDocument();
   });
 
   it("shows delete button only for custom agents", () => {

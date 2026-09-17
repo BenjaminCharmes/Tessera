@@ -1,3 +1,4 @@
+import AgentBadge from "../../design/AgentBadge";
 import { useEffect, useState } from "react";
 import MarkdownView from "../Editor/MarkdownView";
 import { api } from "../../lib/api";
@@ -117,15 +118,7 @@ export default function AgentDetail({ role }: AgentDetailProps) {
                 </button>
               ))}
             </div>
-            <span
-            className={`rounded px-1.5 py-0.5 text-micro ${
-              detail.is_builtin
-                ? "bg-zinc-800 text-zinc-400"
-                : "bg-violet-500/15 text-violet-200"
-            }`}
-          >
-            {detail.is_builtin ? "natif" : "personnalisé"}
-            </span>
+            <AgentBadge natif={detail.is_builtin} />
           </div>
         )}
       </div>
