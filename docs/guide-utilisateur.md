@@ -16,11 +16,13 @@ est construit, va voir [`architecture.md`](architecture.md).
 3. [Écrire des tickets](#3-écrire-des-tickets)
 4. [Lancer un agent sur un ticket](#4-lancer-un-agent-sur-un-ticket)
 5. [Lire ce qui se passe](#5-lire-ce-qui-se-passe)
+5 bis. [Se repérer dans l'écran](#5-bis-se-repérer-dans-lécran)
 6. [Récupérer le travail des agents](#6-récupérer-le-travail-des-agents)
 7. [Le mode autonome](#7-le-mode-autonome)
-8. [Discuter avec l'agent](#8-discuter-avec-lagent)
+8. [Discuter avec l'agent, pendant qu'il travaille](#8-discuter-avec-lagent-pendant-quil-travaille)
 9. [Les agents disponibles](#9-les-agents-disponibles)
 10. [Intégration GitHub](#10-intégration-github)
+10 bis. [Ce qui reste chez toi, ce qui part dans le dépôt](#10-bis-ce-qui-reste-chez-toi-ce-qui-part-dans-le-dépôt)
 11. [Configuration](#11-configuration)
 12. [Problèmes fréquents](#12-problèmes-fréquents)
 
@@ -253,6 +255,31 @@ Les statuts que tu verras passer :
 
 ---
 
+## 5 bis. Se repérer dans l'écran
+
+vibe-ide n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
+travailler : il n'a ni LSP, ni debugger, ni recherche multi-fichiers, et il n'en
+aura pas. L'édition se fait dans VSCode, qu'on ouvre d'un clic depuis l'en-tête
+du projet.
+
+L'écran se lit en quatre colonnes :
+
+| Colonne | Ce qu'on y fait |
+|---|---|
+| **Le rail** | changer de vue : Projets, Tickets, Fichiers, Historique, Agents, Coûts |
+| **La colonne de projet** | le projet actif, ses actions, et la vue choisie |
+| **Le centre** | le tableau des tickets par défaut ; un fichier si tu en ouvres un |
+| **La droite** | suivre un run (Agents) ou discuter (Chat) |
+
+Les actions d'un projet — ouvrir dans VSCode, lier un dépôt, choisir le mode des
+artefacts, retirer le projet — sont dans l'en-tête, qui ne défile jamais.
+
+**Coûts** donne la dépense par ticket et l'état du quota d'abonnement. C'est le
+panneau à regarder après tes premiers runs : il donne l'échelle réelle, qui est
+rarement celle qu'on imagine.
+
+---
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
@@ -310,10 +337,36 @@ tes tickets.
 
 ---
 
-## 8. Discuter avec l'agent
+## 8. Discuter avec l'agent, pendant qu'il travaille
 
 Le panneau de droite a deux onglets : **Agents**, qui observe un run de
 pipeline, et **Chat**, où tu discutes librement du projet.
+
+### Pendant un run : l'agent demande, tu interviens
+
+Sous l'onglet **Agents**, tant qu'un run tourne, deux champs distincts
+apparaissent — et la distinction compte.
+
+**La question de l'agent.** Un agent qui bute sur une ambiguïté que ni le
+ticket, ni le code, ni les ADR ne lèvent peut suspendre son tour et te
+demander. La question s'affiche en attente ; ta réponse relance le run là où il
+s'était arrêté.
+
+Il ne t'attendra pas indéfiniment. Passé quelques minutes, il **reprend seul en
+énonçant l'hypothèse qu'il retient**, et cette hypothèse part dans le rapport du
+run — donc elle est relisible. C'est délibéré : un run suspendu tient du travail
+non commité, et bloquerait tous les tickets qui suivent. En mode autonome, où
+personne ne regarde, la question ne t'attend même pas.
+
+**La consigne pour le prochain tour.** Elle n'attend rien et sera lue par le
+prochain agent à parler, quel qu'il soit. « Pense aux tests », « utilise
+pathlib » : ça infléchit la suite sans interrompre ce qui est en cours.
+
+Les deux ne se confondent jamais. Une consigne envoyée pendant qu'une question
+est posée ne vaut pas réponse à cette question — sinon un « au fait, pense aux
+tests » deviendrait la réponse à « on casse l'API ? ».
+
+### Le chat, hors pipeline
 
 Le chat n'est pas un pipeline. Il sert à décider **quoi** ticketiser, à
 comprendre un bout de code, à faire une modification ponctuelle — sans passer
@@ -392,6 +445,33 @@ Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
 - **Synchronisation bidirectionnelle** tickets ↔ issues
 - **Création de PR** depuis un ticket terminé
 - **Statut CI** de la PR remonté dans l'UI
+
+---
+
+## 10 bis. Ce qui reste chez toi, ce qui part dans le dépôt
+
+vibe-ide ajoute quatre choses à un projet : `tickets/`, `memory/`, `CLAUDE.md`
+et `agents.json`. Elles n'ont pas leur place dans tous les dépôts.
+
+Chaque projet déclare son mode, dans le panneau **Git & artefacts** :
+
+- **local** — les artefacts restent sur ta machine. L'exclusion est écrite dans
+  `.git/info/exclude`, jamais dans `.gitignore` : ce dernier est lui-même
+  versionné, donc le modifier annoncerait dans un diff exactement ce qu'on
+  voulait garder hors du dépôt.
+- **versionné** — ils partent avec le projet. C'est ce qu'on veut d'un projet
+  personnel : les décisions sont tracées et survivent à la machine.
+
+**Le défaut protège** : seul un projet *créé* par l'IDE est versionné. Un projet
+importé ou cloné existait avant vibe-ide — souvent chez quelqu'un d'autre — et
+reste local. On peut toujours choisir de partager ensuite ; on ne peut pas
+défaire un push.
+
+Une limite à connaître : `.git/info/exclude` n'agit que sur les fichiers **non
+suivis**. Si un dépôt versionne déjà un `CLAUDE.md`, tes modifications
+continueront d'y partir. L'IDE te le signale.
+
+Le code produit par les agents, lui, n'est jamais exclu : c'est ce que tu livres.
 
 ---
 

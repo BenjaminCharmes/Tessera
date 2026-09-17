@@ -55,10 +55,57 @@ par tous les services purement texte→JSON (validateur, auditeur sécurité,
 planificateur, project-analyzer, agent-creator, project-creator, doc-updater) qui
 écrivent eux-mêmes leurs fichiers en Python.
 
-### Couche git (ADR-018)
+### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de vibe-ide lui-même — uniquement au projet ciblé.
+
+Cette promesse a demandé deux correctifs, tous deux nés d'un usage réel :
+
+- **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
+  --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
+  un dossier posé dans `projects/` sans dépôt propre faisait remonter git
+  jusqu'à celui de vibe-ide, où le run créait sa branche et son commit. La
+  vérification compare désormais `--show-toplevel` au dossier du projet.
+- **Les agents ne font pas de git** (ADR-027). Contraindre cette classe ne
+  contraignait qu'elle : le codeur a `Bash` et pouvait lancer `git commit`,
+  `git merge`, `git push` sans passer par elle — ce qu'il a fait, jusqu'à
+  pousser sur `main`. Un hook `PreToolUse` refuse maintenant toute
+  sous-commande git qui écrit. Le git en lecture reste permis.
+
+Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
+passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
+s'en distingue.
+
+### Dialogue pendant un run (ADR-025)
+
+`DialogueChannel` porte les deux sens du dialogue sans rien savoir du
+transport — ni WebSocket, ni SDK, ni LLM — ce qui rend la suspension, la reprise
+et le mode autonome testables sans lancer un run.
+
+- **L'agent demande** : l'outil `ask_user`, servi par un serveur MCP in-process,
+  suspend le tour et attend. Une question est un appel d'outil structuré, pas un
+  mot-clé cherché dans la prose (contrairement au verdict du reviewer, ADR-009,
+  où rien de mieux n'existait).
+- **L'utilisateur intervient** : les messages spontanés attendent dans une file
+  distincte, vidée entre deux tours dans `build_context`. Les deux canaux ne se
+  confondent jamais : un « pense aux tests » ne doit pas valoir réponse à « on
+  casse l'API ? ».
+
+Passé `dialogue_timeout_s`, l'agent reprend seul en **énonçant son hypothèse** :
+un run suspendu tient du travail non commité, et bloquerait la file des tickets.
+
+### Système visuel du frontend (ADR-026)
+
+`frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :
+`icons.tsx` (un seul jeu, une grille de 24), `layout.ts` (la hauteur unique des
+bandes d'en-tête), `RegionTitle.tsx`. Cinq familles de couleurs ont chacune un
+rôle d'état — neutre, échec, attente, succès, activité — et `violet` sert
+uniquement au repérage.
+
+`coherence.test.ts` verrouille les trois règles : il lit les sources et échoue
+à la première réintroduction d'une couleur bannie, d'une taille de texte
+arbitraire ou d'un glyphe utilisé comme affordance.
 
 ## Endpoints implémentés
 

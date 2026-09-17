@@ -91,6 +91,38 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | Un ticket approuvé devient la base du ticket suivant (mode autonome) | ✅ |
 | **Chat conversationnel** avec outils fichier, streaming et coût visible | ✅ |
 
+### Phase 8 — Couverture et outillage ✅
+
+| Feature | Status |
+|---------|--------|
+| Couverture des routers portée à 93,5 % | ✅ |
+| Quota d'abonnement réel remonté par le fournisseur (ADR-020) | ✅ |
+| Lancement d'un pipeline depuis le chat | ✅ |
+| Outillage Windows (`doctor`, `scripts/vibe.ps1`) | ✅ |
+
+### Phase 9 — Le projet appartient à l'utilisateur ✅
+
+| Feature | Status |
+|---------|--------|
+| Lier un projet à un dépôt, ou en initialiser un | ✅ |
+| Artefacts vibe-ide versionnés ou locaux, **par projet** (ADR-021, ADR-023) | ✅ |
+| Le défaut échoue fermé : un projet importé garde ses artefacts chez lui | ✅ |
+| Retirer un projet de l'IDE sans perdre ses fichiers | ✅ |
+| Suivi par ticket, push et ouverture de PR — **jamais de merge** (ADR-022) | ✅ |
+| Un projet doit être la racine de son propre dépôt (ADR-024) | ✅ |
+
+### Phase 10 — Cockpit, dialogue et intégrité ✅
+
+| Feature | Status |
+|---------|--------|
+| **Pivot cockpit** : l'IDE pilote la flotte, VSCode édite (ticket-065) | ✅ |
+| Arbre de fichiers et éditeur en lecture seule | ✅ |
+| **Dialogue pendant un run** : l'agent demande, l'utilisateur intervient | ✅ |
+| Reprise sur hypothèse énoncée si personne ne répond (ADR-025) | ✅ |
+| Cohérence visuelle : cinq familles de couleurs à rôle (ADR-026) | ✅ |
+| **Les agents ne touchent pas à l'historique git** (ADR-027) | ✅ |
+| Un run qui échoue à committer ne peut pas se dire approuvé | ✅ |
+
 ---
 
 ## Documentation
