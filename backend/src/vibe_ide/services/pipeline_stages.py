@@ -392,25 +392,3 @@ async def run_validation(
         return False, validation.feedback
     return True, reason
 
-
-async def run_doc_update(orch: "Orchestrator", run: PipelineRun) -> None:
-    """Update the project's own documentation from the approved diff."""
-    if not (orch._doc_updater and orch._project_path):
-        return
-    try:
-        doc_result = await orch._doc_updater.update_docs(
-            orch._project_path,
-            diff=run.reviewed_code,
-            ticket_title=f"{run.ticket.type.value}: {run.ticket.title}",
-        )
-        await emit(
-            run,
-            EventType.DOC_UPDATED,
-            files_updated=doc_result.files_updated,
-            no_changes=doc_result.no_changes,
-        )
-        orch._log(
-            f"[{run.ticket_id}] doc-updater: {doc_result.files_updated or 'no changes'}"
-        )
-    except Exception as exc:
-        _logger.warning("doc_updater_failed", extra={"error": str(exc)})

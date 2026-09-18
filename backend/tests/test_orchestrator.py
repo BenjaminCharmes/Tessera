@@ -16,7 +16,6 @@ from vibe_ide.services.orchestrator import (
 # du pipeline dans pipeline_stages depuis ticket-046.
 from vibe_ide.services.pipeline_text import _parse_reviewer_verdict
 from vibe_ide.services.git_workspace import GitWorkspaceError
-from vibe_ide.services.doc_updater import DocUpdateResult
 from vibe_ide.services.security_auditor import SecurityAuditResult, SecurityIssue
 from vibe_ide.services.validator import ValidationResult
 
@@ -68,7 +67,6 @@ def _make_orchestrator(
     git_workspace: object | None = None,
     security_auditor: object | None = None,
     validator: object | None = None,
-    doc_updater: object | None = None,
     project_path: Path | None = None,
     tickets: list[Ticket] | None = None,
     run_max_budget_usd: float = 0.0,
@@ -85,7 +83,6 @@ def _make_orchestrator(
         max_review_rounds=max_review_rounds,
         security_auditor=security_auditor,
         validator=validator,
-        doc_updater=doc_updater,
         project_path=project_path,
         git_workspace=git_workspace,
         run_max_budget_usd=run_max_budget_usd,
@@ -918,62 +915,6 @@ async def test_diff_vide_retombe_sur_la_prose_du_codeur(tmp_path: Path) -> None:
 
     reviewer_calls = [c for c in runner.calls if c["role"] == AgentRole.reviewer]
     assert "prose du codeur" in str(reviewer_calls[0]["project_context"])
-
-
-async def test_le_doc_updater_recoit_le_diff_reel(tmp_path: Path) -> None:
-    """The doc-updater must document what actually changed on disk, not the
-    coder's prose summary of it."""
-    updated: list[str] = []
-
-    class _FakeDocUpdater:
-        async def update_docs(
-            self, project_path: Path, diff: str, ticket_title: str
-        ) -> DocUpdateResult:
-            updated.append(diff)
-            return DocUpdateResult(no_changes=False, files_updated=["README.md"])
-
-    orchestrator = _make_orchestrator(
-        tmp_path,
-        runner=_RecordingRunner(),
-        git_workspace=_FakeGit(),
-        doc_updater=_FakeDocUpdater(),
-        project_path=tmp_path,
-    )
-    await orchestrator.run_pipeline("projet", "ticket-001", _noop)
-
-    assert updated, "le doc-updater n'a pas été appelé"
-    assert "SECRET = 'hunter2'" in updated[0]
-    assert "prose du codeur" not in updated[0]
-
-
-async def test_doc_updater_sans_git_workspace_retombe_sur_la_prose_du_codeur(
-    tmp_path: Path,
-) -> None:
-    """Historical behaviour preserved when no git repository is available."""
-    updated: list[str] = []
-
-    class _FakeDocUpdater:
-        async def update_docs(
-            self, project_path: Path, diff: str, ticket_title: str
-        ) -> DocUpdateResult:
-            updated.append(diff)
-            return DocUpdateResult(no_changes=False, files_updated=["README.md"])
-
-    orchestrator = _make_orchestrator(
-        tmp_path,
-        runner=_RecordingRunner(),
-        git_workspace=None,
-        doc_updater=_FakeDocUpdater(),
-        project_path=tmp_path,
-    )
-    await orchestrator.run_pipeline("projet", "ticket-001", _noop)
-
-    assert updated, "le doc-updater n'a pas été appelé"
-
-
-# ------------------------------------------------------------------
-# Commit sur verdict APPROVED
-# ------------------------------------------------------------------
 
 
 async def test_commit_sur_verdict_approuve(tmp_path: Path) -> None:

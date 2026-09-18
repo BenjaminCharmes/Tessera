@@ -60,8 +60,26 @@ relit — et le projet dit quel **prompt** chaque étape tient.
 - [x] `carriere/agents.json` branche l'analyste sur l'étape du codeur
 - [x] Le piège du serveur Vite obsolète est documenté
 
-## Ce que ça ne fait pas
+## Le badge est-il dynamique ?
 
-Les quatre prompts jamais appelés ne sont **pas supprimés**. Le badge le dit
-maintenant ; c'est une décision à prendre en les voyant, pas à la place de
-celui qui les lit.
+Par moitié, et c'est la question qui a fermé le dernier trou.
+
+- La moitié **projet** est recalculée à chaque lecture : brancher un prompt
+  dans un `agents.json` le fait basculer en `pipeline` tout seul.
+- La moitié **code** est une liste. Brancher `architect` demain sans la mettre
+  à jour laisserait le badge afficher « jamais appelé » sur un agent qui parle.
+
+Un test confronte donc la liste au code, comme ticket-094 le fait pour la
+protection. Il a immédiatement attrapé `doc-updater` : le code le chargeait
+encore alors qu'il ne servait plus nulle part depuis ticket-092.
+
+## Ce que ça a entraîné
+
+`doc_updater` est **supprimé** — service, étape de pipeline, prompt, réglage
+`doc_updater_enabled`, tests. C'est le nettoyage reporté par ticket-092 : il
+n'avait aucun gain de comportement, mais il rendait le badge ambigu, et un
+badge ambigu ne sert à rien.
+
+Restent trois prompts jamais appelés — `architect`, `orchestrateur`,
+`testeur` — qui ne sont **pas supprimés**. Le badge le dit maintenant ; c'est
+une décision à prendre en les voyant, pas à la place de celui qui les lit.

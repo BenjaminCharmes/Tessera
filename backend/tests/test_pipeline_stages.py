@@ -40,7 +40,6 @@ class _Orch:
         self._test_command = None
         self._security_auditor = None
         self._validator = None
-        self._doc_updater = None
         self.logs: list[str] = []
         for k, v in attrs.items():
             setattr(self, k, v)

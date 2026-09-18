@@ -84,3 +84,34 @@ def test_un_projet_qui_le_branche_change_son_moment(tmp_path: Path) -> None:
     moments = {a.role: a.moment for a in agents}
 
     assert moments["expert-sql"] is MomentAgent.pipeline
+
+
+def test_tout_prompt_charge_par_le_code_a_un_moment_declare() -> None:
+    # La moitié « projet » du badge est recalculée à chaque lecture : brancher
+    # un prompt dans un `agents.json` le fait basculer tout seul.
+    #
+    # La moitié « code » ne l'est pas : `ROLES_PIPELINE` et `ROLES_A_LA_DEMANDE`
+    # sont des listes. Brancher `architect` dans le code demain sans les mettre
+    # à jour laisserait le badge afficher « jamais appelé » sur un agent qui
+    # parle — la dérive exacte qui avait supprimé `agent-creator` (ticket-079),
+    # par une troisième porte.
+    import re
+
+    sources = Path(__file__).resolve().parents[1] / "src"
+    charges: set[str] = set()
+    for fichier in sources.rglob("*.py"):
+        for nom in re.findall(
+            r"[\"']([a-z][a-z0-9-]*)\.md[\"']", fichier.read_text(encoding="utf-8")
+        ):
+            charges.add(nom)
+    charges &= {f.stem for f in _PROMPTS.glob("*.md")}
+
+    classes = (
+        AgentRegistryService.ROLES_PIPELINE | AgentRegistryService.ROLES_A_LA_DEMANDE
+    )
+    oublies = sorted(charges - classes)
+
+    assert oublies == [], (
+        "le code charge ces prompts, mais le badge les dira « jamais "
+        f"appelé » : {oublies}"
+    )

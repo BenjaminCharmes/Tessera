@@ -71,36 +71,6 @@ async def test_build_orchestrator_validator_et_security_auditor_sans_outils(
     ]
 
 
-def _make_project_with_doc_updater(workspace: Path, project_id: str) -> None:
-    project_dir = workspace / project_id
-    project_dir.mkdir(parents=True)
-    (project_dir / "CLAUDE.md").write_text("# Projet de test\n", encoding="utf-8")
-    (project_dir / "memory").mkdir()
-    (project_dir / "agents.json").write_text(
-        '{"agents": [], "pipeline": {"doc_updater_enabled": true}}',
-        encoding="utf-8",
-    )
-
-
-async def test_build_orchestrator_doc_updater_sans_outils(tmp_path: Path) -> None:
-    """Regression — ticket-044 merge-gate finding 2 (critical): doc_updater
-    is pure text-in/JSON-out (it writes files itself in Python via
-    ``_write_files``, never through an SDK tool). Wiring it to the full-tool
-    provider combines auto-approved Write/Edit/Bash with ``cwd=None``
-    (nothing calls ``DocUpdaterService`` with a resolved cwd), which would
-    let the model write anywhere under the backend process's own cwd."""
-    _make_project_with_doc_updater(tmp_path, "mon-projet")
-
-    orchestrator = await _build_orchestrator("mon-projet")
-
-    assert orchestrator._doc_updater is not None
-    assert orchestrator._doc_updater._provider._allowed_tools == []
-    # The coder/reviewer runner keeps the full toolset.
-    assert orchestrator._runner._provider._allowed_tools == [
-        "Read", "Write", "Edit", "Bash", "Glob", "Grep",
-    ]
-
-
 def _make_project_with_claude_md_marker(workspace: Path, project_id: str) -> None:
     project_dir = workspace / project_id
     project_dir.mkdir(parents=True)

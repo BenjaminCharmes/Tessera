@@ -14,7 +14,6 @@ from vibe_ide.services.dialogue import DialogueChannel
 from vibe_ide.services.documentation import DocumentationService
 from vibe_ide.services.pipeline_events import EventType
 from vibe_ide.services.database import create_run, finish_run, save_event
-from vibe_ide.services.doc_updater import DocUpdaterService
 from vibe_ide.services.git_workspace import GitWorkspaceService
 from vibe_ide.services.github_service import GitHubService
 from vibe_ide.services.github_workflow import GitHubWorkflowService
@@ -117,10 +116,10 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
     )
     # Pure text-in/JSON-out services (security_auditor, validator,
-    # doc_updater) have no use for file/shell tools — doc_updater writes
+    # documentation) have no use for file/shell tools — they write
     # files itself via `_write_files`, never through an SDK tool, and no cwd
     # is threaded to it. Give them all a tool-less provider (ticket-044
-    # review, finding 4; doc_updater moved here per merge-gate finding 2).
+    # review, finding 4).
     tool_less_provider = get_provider(
         settings.llm_provider, settings.anthropic_api_key,
         max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
@@ -138,11 +137,6 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     agent_configs = load_agents_config(project_path)
     pipeline_cfg = load_pipeline_config(project_path)
 
-    doc_updater = (
-        DocUpdaterService(tool_less_provider, settings.ide_prompts_dir)
-        if pipeline_cfg.doc_updater_enabled
-        else None
-    )
     test_runner = TestRunnerService() if pipeline_cfg.testeur_enabled else None
     security_auditor = (
         SecurityAuditorService(tool_less_provider, settings.ide_prompts_dir)
@@ -164,7 +158,6 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         agent_configs=agent_configs,
         pipeline_log_path=project_path / "memory" / "pipeline-log.md",
         max_review_rounds=pipeline_cfg.max_review_rounds,
-        doc_updater=doc_updater,
         test_runner=test_runner,
         test_command=pipeline_cfg.test_command,
         security_auditor=security_auditor,

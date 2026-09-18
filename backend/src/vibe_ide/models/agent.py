@@ -49,7 +49,6 @@ class AgentPipelineConfig(BaseModel):
     """
 
     max_review_rounds: int = 3
-    doc_updater_enabled: bool = False
     testeur_enabled: bool = False
     test_command: str | None = None
     securite_enabled: bool = False

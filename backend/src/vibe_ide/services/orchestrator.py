@@ -29,7 +29,6 @@ from vibe_ide.services import pipeline_stages as stages
 from vibe_ide.services.pipeline_run import PipelineRun, set_status
 
 if TYPE_CHECKING:
-    from vibe_ide.services.doc_updater import DocUpdaterService
     from vibe_ide.services.quota_tracker import QuotaTracker
     from vibe_ide.services.git_workspace import GitWorkspaceService
     from vibe_ide.services.security_auditor import SecurityAuditorService
@@ -55,7 +54,6 @@ class Orchestrator:
         agent_configs: list[AgentConfig],
         pipeline_log_path: Path,
         max_review_rounds: int = 3,
-        doc_updater: Optional["DocUpdaterService"] = None,
         test_runner: Optional["TestRunnerService"] = None,
         test_command: Optional[str] = None,
         security_auditor: Optional["SecurityAuditorService"] = None,
@@ -73,7 +71,6 @@ class Orchestrator:
         self._agent_configs = agent_configs
         self._log_path = pipeline_log_path
         self._max_review_rounds = max_review_rounds
-        self._doc_updater = doc_updater
         self._test_runner = test_runner
         self._test_command = test_command
         self._security_auditor = security_auditor
@@ -211,7 +208,6 @@ class Orchestrator:
                 approved, reason = await stages.run_validation(self, run, reason)
 
             if approved:
-                await stages.run_doc_update(self, run)
                 return await outcomes.finish_approved(self, run)
 
             run.review_feedback.append(reason or raw_verdict[:500])

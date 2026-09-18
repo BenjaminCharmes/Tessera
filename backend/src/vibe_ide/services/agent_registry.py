@@ -67,7 +67,6 @@ class AgentRegistryService:
             "codeur",
             "doc-fonctionnelle",
             "doc-technique",
-            "doc-updater",
             "orchestrateur",
             "planificateur",
             "project-analyzer",
