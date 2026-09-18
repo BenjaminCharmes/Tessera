@@ -1,5 +1,6 @@
 import type {
   AgentDetail,
+  ProjectAgents,
   VentilationDesCouts,
   AgentInfo,
   AnalysisResult,
@@ -164,6 +165,14 @@ export const api = {
       post(`/projects/${projectId}/detach`, {}),
     remove: (projectId: string): Promise<void> =>
       del(`/projects/${projectId}?confirmed=true`),
+    agents: (projectId: string): Promise<ProjectAgents> =>
+      request(`/projects/${projectId}/agents`),
+    setAgentModel: (
+      projectId: string,
+      role: string,
+      model: string,
+    ): Promise<ProjectAgents> =>
+      put(`/projects/${projectId}/agents/${role}`, { model }),
     cleanupPlan: (projectId: string): Promise<PlanDeNettoyage> =>
       request(`/projects/${projectId}/branches/cleanup`),
     cleanup: (projectId: string, branches: string[]): Promise<string[]> =>

@@ -51,7 +51,14 @@ from vibe_ide.services.git_link import (
     init_repository,
     link_remote,
 )
-from vibe_ide.services.project_loader import ProjectLoader, load_agents_config
+from vibe_ide.services.cost_calculator import modeles_connus
+from vibe_ide.services.project_loader import (
+    AgentAbsentDuProjet,
+    ModeleInconnu,
+    ProjectLoader,
+    load_agents_config,
+    set_agent_model,
+)
 from vibe_ide.services.providers import get_provider
 from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.ticket_service import TicketService
@@ -398,6 +405,52 @@ class CleanupRequest(BaseModel):
     """Les branches que l'utilisateur a choisi de supprimer, parmi le plan."""
 
     branches: list[str]
+
+
+class ProjectAgentConfig(BaseModel):
+    role: str
+    model: str
+    max_tokens: int
+    active: bool = True
+
+
+class ProjectAgentsResponse(BaseModel):
+    agents: list[ProjectAgentConfig]
+    #: Les seuls modèles proposables : ceux dont l'app sait calculer le coût.
+    known_models: list[str]
+
+
+class SetModelRequest(BaseModel):
+    model: str
+
+
+@router.get("/{project_id}/agents", response_model=ProjectAgentsResponse)
+async def get_project_agents(project_id: str) -> ProjectAgentsResponse:
+    """Les agents déclarés par ce projet, et le modèle que chacun utilise."""
+    configs = load_agents_config(settings.ide_workspace_dir / project_id)
+    return ProjectAgentsResponse(
+        agents=[
+            ProjectAgentConfig(
+                role=c.role, model=c.model, max_tokens=c.max_tokens, active=c.active
+            )
+            for c in configs
+        ],
+        known_models=modeles_connus(),
+    )
+
+
+@router.put("/{project_id}/agents/{role}", response_model=ProjectAgentsResponse)
+async def set_project_agent_model(
+    project_id: str, role: str, body: SetModelRequest
+) -> ProjectAgentsResponse:
+    """Change le modèle d'un agent pour **ce projet** (ticket-080)."""
+    try:
+        set_agent_model(settings.ide_workspace_dir / project_id, role, body.model)
+    except ModeleInconnu as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except AgentAbsentDuProjet as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return await get_project_agents(project_id)
 
 
 @router.get("/usage/breakdown")

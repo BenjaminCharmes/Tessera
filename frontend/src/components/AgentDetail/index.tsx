@@ -1,6 +1,7 @@
 import AgentBadge from "../../design/AgentBadge";
 import { useEffect, useState } from "react";
 import MarkdownView from "../Editor/MarkdownView";
+import ModelPicker from "./ModelPicker";
 import { api } from "../../lib/api";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
@@ -19,9 +20,14 @@ import type { AgentDetail as AgentDetailData } from "../../types/api";
  */
 interface AgentDetailProps {
   role: string | null;
+  /** Le projet actif : le modèle se règle projet par projet (ticket-080). */
+  projectId?: string | null;
 }
 
-export default function AgentDetail({ role }: AgentDetailProps) {
+export default function AgentDetail({
+  role,
+  projectId = null,
+}: AgentDetailProps) {
   const [detail, setDetail] = useState<AgentDetailData | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
   // Les prompts natifs sont des fichiers Markdown ; les lire avec leurs `##`
@@ -131,6 +137,8 @@ export default function AgentDetail({ role }: AgentDetailProps) {
 
       {detail && (
         <>
+          {projectId && role && <ModelPicker projectId={projectId} role={role} />}
+
           <p className="border-b border-zinc-800 px-4 py-2 text-micro text-zinc-500">
             Ce texte est envoyé en tête de chaque appel de cet agent. Il décide
             de tout ce qu'il fait.

@@ -232,3 +232,50 @@ def _default_agents_json(project_id: str, active_agents: list[str]) -> str:
         },
     }
     return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+
+
+class ModeleInconnu(ValueError):
+    """Le modèle demandé n'est pas dans la grille tarifaire."""
+
+
+class AgentAbsentDuProjet(LookupError):
+    """Ce projet ne déclare pas cet agent."""
+
+
+def set_agent_model(project_path: Path, role: str, model: str) -> None:
+    """Change le modèle d'un agent dans le `agents.json` **de ce projet**.
+
+    Le modèle est une propriété du projet, pas de l'agent : le même `codeur`
+    mérite un modèle lourd sur un backend métier et un modèle léger sur un
+    script personnel. C'est pour cela que ce réglage vit ici et non dans le
+    registre d'agents, qui est global (ticket-080).
+
+    Le fichier est réécrit en préservant tout ce qu'il contient d'autre : il
+    porte aussi le mode des artefacts, la racine git et la configuration du
+    pipeline.
+    """
+    from vibe_ide.services.cost_calculator import modeles_connus
+
+    if model not in modeles_connus():
+        raise ModeleInconnu(
+            f"Modèle inconnu : {model}. L'application ne saurait pas en "
+            "calculer le coût."
+        )
+
+    agents_json = project_path / "agents.json"
+    if not agents_json.is_file():
+        raise AgentAbsentDuProjet(f"{project_path.name} ne déclare aucun agent")
+
+    data = json.loads(agents_json.read_text(encoding="utf-8"))
+    agents = data.get("agents", [])
+    for agent in agents:
+        if agent.get("role") == role:
+            agent["model"] = model
+            break
+    else:
+        raise AgentAbsentDuProjet(f"L'agent '{role}' n'est pas déclaré ici")
+
+    agents_json.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )

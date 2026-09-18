@@ -3,6 +3,10 @@
 Mettre à jour ce dict si les tarifs changent sur https://www.anthropic.com/pricing
 """
 
+#: Les modèles que l'application sait tarifer. C'est la liste proposée à
+#: l'utilisateur : choisir un modèle hors grille fausserait la ventilation des
+#: coûts, qui est justement ce sur quoi on s'appuie pour descendre en gamme
+#: (ticket-080).
 _PRICING: dict[str, dict[str, float]] = {
     "claude-sonnet-4-6": {"input": 3.00, "output": 15.00, "cache_read": 0.30},
     "claude-haiku-4-5": {"input": 0.80, "output": 4.00, "cache_read": 0.08},
@@ -29,3 +33,8 @@ def calculate_cost(
         + (cache_read_tokens / 1_000_000) * pricing["cache_read"]
     )
     return round(cost, 6)
+
+
+def modeles_connus() -> list[str]:
+    """Les identifiants de modèles dont le coût est calculable."""
+    return sorted(_PRICING)

@@ -348,3 +348,17 @@ export interface VentilationDesCouts {
   /** Rempli seulement sur la vue d'ensemble, tous projets confondus. */
   per_project: (LigneDeCout & { project_id: string })[];
 }
+
+/** Un agent tel que ce projet le configure (ticket-080). */
+export interface ProjectAgentConfig {
+  role: string;
+  model: string;
+  max_tokens: number;
+  active: boolean;
+}
+
+export interface ProjectAgents {
+  agents: ProjectAgentConfig[];
+  /** Les seuls modèles proposables : ceux dont l'app sait calculer le coût. */
+  known_models: string[];
+}

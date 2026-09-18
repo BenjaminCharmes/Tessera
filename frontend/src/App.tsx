@@ -236,7 +236,7 @@ export default function App() {
               (ticket-075). Un fichier ou un diff ouvert explicitement garde la
               priorité : c'est une demande de l'utilisateur. */}
           {panel === "agents" ? (
-            <AgentDetail role={agentSelectionne} />
+            <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />
           ) : panel === "usage" ? (
             // Sans projet sélectionné, la vue d'ensemble : « combien me coûte
             // vibe-ide, et sur quel projet » n'avait aucune réponse.
