@@ -124,7 +124,7 @@ export default function AgentDetail({
                 </button>
               ))}
             </div>
-            <AgentBadge natif={detail.is_builtin} />
+            <AgentBadge moment={detail.moment ?? "jamais"} />
           </div>
         )}
       </div>

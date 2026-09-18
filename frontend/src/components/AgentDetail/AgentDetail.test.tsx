@@ -28,16 +28,19 @@ describe("AgentDetail", () => {
     expect(await screen.findByText(/Tu ne commites jamais/)).toBeInTheDocument();
   });
 
-  it("distingue un agent requis par le produit d'un agent ajoute", async () => {
+  it("prévient qu'un prompt n'est jamais chargé", async () => {
+    // Le cas qui manquait : quatre prompts sur dix-sept ne sont appelés par
+    // rien. Les modifier ne change rien, et le badge le disait « requis ».
     detail.mockResolvedValue({
       role: "mon-agent",
       is_builtin: false,
       system_prompt: "x",
+      moment: "jamais",
     });
 
     render(<AgentDetail role="mon-agent" />);
 
-    expect(await screen.findByText("ajouté")).toBeInTheDocument();
+    expect(await screen.findByText("jamais appelé")).toBeInTheDocument();
   });
 
   it("invite a choisir un agent quand aucun n'est selectionne", () => {

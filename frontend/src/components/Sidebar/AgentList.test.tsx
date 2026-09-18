@@ -10,6 +10,7 @@ const AGENT_BUILTIN: AgentInfo = {
   description: null,
   is_builtin: true,
   prompt_preview: "Tu es un codeur expert…",
+  moment: "pipeline",
 };
 
 const AGENT_CUSTOM: AgentInfo = {
@@ -17,6 +18,7 @@ const AGENT_CUSTOM: AgentInfo = {
   description: "Audit sécurité",
   is_builtin: false,
   prompt_preview: "Tu audites la sécurité…",
+  moment: "jamais",
 };
 
 vi.mock("../../lib/api", () => ({
@@ -51,14 +53,15 @@ describe("AgentList", () => {
     });
   });
 
-  it("distingue d'un mot les agents livres et ceux qu'on a crees", () => {
+  it("dit quand chaque agent parle", () => {
+    // « qui a écrit le prompt » n'apprend rien : c'est toujours un agent. Ce
+    // qu'on veut savoir devant dix-sept prompts, c'est lequel agit et quand —
+    // et surtout lequel n'agit jamais (ticket-097).
     render(<AgentList onAgentCreated={onAgentCreated} />);
     expect(screen.getByText("codeur")).toBeInTheDocument();
     expect(screen.getByText("securite")).toBeInTheDocument();
-    // Le badge dit la conséquence, pas l'origine : « qui a écrit le prompt »
-    // n'apprend rien, puisque c'est toujours un agent (ticket-094).
-    expect(screen.getByText("requis")).toBeInTheDocument();
-    expect(screen.getByText("ajouté")).toBeInTheDocument();
+    expect(screen.getByText("pipeline")).toBeInTheDocument();
+    expect(screen.getByText("jamais appelé")).toBeInTheDocument();
   });
 
   it("shows delete button only for custom agents", () => {

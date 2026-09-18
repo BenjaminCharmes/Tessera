@@ -69,7 +69,7 @@ class AgentRunner:
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
-        system_prompt = self._load_system_prompt(role_str)
+        system_prompt = self._load_system_prompt(role_str, agent_config)
         user_prompt = self._build_user_prompt(ticket, role_str, project_context)
 
         model = agent_config.model if agent_config else _DEFAULT_MODEL
@@ -159,10 +159,27 @@ class AgentRunner:
             cost_usd=cost_usd,
         )
 
-    def _load_system_prompt(self, role: str) -> str:
+    def _load_system_prompt(
+        self, role: str, agent_config: AgentConfig | None = None
+    ) -> str:
+        """Le prompt système du rôle, ou celui que le projet lui substitue.
+
+        Le pipeline appelle toujours les mêmes rôles : `codeur` est l'étape
+        « quelqu'un écrit », `reviewer` l'étape « quelqu'un relit ». Ce que ces
+        étapes doivent produire, lui, dépend du projet — du code ici, une
+        analyse de contrat ailleurs. `prompt_file` est ce qui permet de le dire
+        (ticket-097). Il existait dans le modèle et n'était lu nulle part :
+        chaque `agents.json` en déclarait un pour rien.
+        """
+        nom = _nom_de_prompt(agent_config) or role
         try:
-            prompt = self._registry.get_prompt(role)
+            prompt = self._registry.get_prompt(nom)
         except AgentNotFoundError as exc:
+            if nom != role:
+                # Un prompt déclaré mais absent ne retombe pas sur le rôle : le
+                # run produirait du code là où on attendait une analyse, sans
+                # que rien ne le signale.
+                raise
             raise MissingPromptError(
                 self._registry.prompts_dir, f"{role}.md", "rôle absent du registre"
             ) from exc
@@ -170,7 +187,7 @@ class AgentRunner:
         # qu'un fichier absent, et plus trompeur puisqu'il existe.
         if not prompt.strip():
             raise MissingPromptError(
-                self._registry.prompts_dir, f"{role}.md", "fichier vide"
+                self._registry.prompts_dir, f"{nom}.md", "fichier vide"
             )
         return prompt
 
@@ -202,3 +219,15 @@ def _parse_suggested_status(content: str) -> TicketStatus:
                 return TicketStatus.todo
             break
     return TicketStatus.in_review
+
+
+def _nom_de_prompt(agent_config: "AgentConfig | None") -> str | None:
+    """Le nom du prompt déclaré par le projet, sans son dossier ni son suffixe.
+
+    `agents/prompts/analyste-carriere.md`, `prompts/analyste-carriere.md` et
+    `analyste-carriere.md` désignent la même chose : le dossier des prompts est
+    déjà connu du registre, le préfixe n'est qu'une commodité d'écriture.
+    """
+    if agent_config is None or not agent_config.prompt_file:
+        return None
+    return Path(agent_config.prompt_file).stem or None

@@ -1,34 +1,52 @@
 /**
- * Ce que le badge dit d'un agent — ticket-079, reformulé par ticket-094.
+ * Quand cet agent parle — ticket-079, ticket-094, puis refait par ticket-097.
  *
- * Il disait « natif » / « perso », c'est-à-dire **qui a écrit le prompt**. Ça
- * n'apprend rien : l'agent qui écrit un prompt depuis l'IDE est le même que
- * celui qui en livre un avec le dépôt, et ce sera toujours le cas.
+ * Il a d'abord dit « natif » / « perso », puis « requis » / « ajouté » : dans
+ * les deux cas, **qui avait écrit le prompt**. Ça n'apprend rien — c'est
+ * toujours un agent, et ce sera toujours le cas.
  *
- * Ce qui compte est la conséquence : **qu'est-ce qui casse s'il disparaît ?**
- * Le produit charge `codeur.md` par son nom, et un projet du dépôt déclare
- * `analyste-carriere.md` dans son `agents.json` — les deux manquent à
- * quelqu'un. Un `expert-sql.md` que rien ne nomme peut disparaître sans rien
- * casser. Le badge dit ça, et c'est aussi ce que la suppression refuse.
+ * Pire : il annonçait « requis » pour quatre prompts sur dix-sept que **rien
+ * n'appelle jamais**. `testeur`, dont l'étape lance un sous-processus sans
+ * agent. `architect`, que `ide-core` déclare et que personne ne charge.
+ * Le badge occupait la seule place disponible avec le fait le moins utile,
+ * et cachait celui-là.
+ *
+ * La question qu'on a devant une liste de dix-sept prompts est « lequel agit,
+ * et quand ? ». C'est ce qu'il répond maintenant.
  */
+export type MomentAgent = "pipeline" | "demande" | "jamais";
+
+const LIBELLES: Record<MomentAgent, { texte: string; infobulle: string; classe: string }> = {
+  pipeline: {
+    texte: "pipeline",
+    infobulle: "Appelé automatiquement pendant un run, sans que tu le demandes.",
+    classe: "bg-violet-500/20 text-violet-200",
+  },
+  demande: {
+    texte: "à la demande",
+    infobulle: "Appelé quand tu déclenches l'action correspondante.",
+    classe: "bg-blue-900 text-blue-300",
+  },
+  jamais: {
+    texte: "jamais appelé",
+    infobulle:
+      "Rien ne charge ce prompt : ni le pipeline, ni une action, ni le agents.json d'un projet. Le modifier ne changera rien.",
+    classe: "bg-zinc-800 text-zinc-500",
+  },
+};
+
 interface AgentBadgeProps {
-  /** Quelque chose dépend de ce prompt par son nom : il ne peut pas disparaître. */
-  natif: boolean;
+  moment: MomentAgent;
 }
 
-export default function AgentBadge({ natif }: AgentBadgeProps) {
+export default function AgentBadge({ moment }: AgentBadgeProps) {
+  const libelle = LIBELLES[moment] ?? LIBELLES.jamais;
   return (
     <span
-      title={
-        natif
-          ? "Le produit ou un projet déclare ce prompt par son nom. Tu peux le modifier — le supprimer casserait leurs runs."
-          : "Rien ne le déclare par son nom. Tu peux le modifier et le supprimer."
-      }
-      className={`shrink-0 rounded px-1.5 py-0.5 text-micro font-medium ${
-        natif ? "bg-blue-900 text-blue-300" : "bg-violet-500/20 text-violet-200"
-      }`}
+      title={libelle.infobulle}
+      className={`shrink-0 rounded px-1.5 py-0.5 text-micro font-medium ${libelle.classe}`}
     >
-      {natif ? "requis" : "ajouté"}
+      {libelle.texte}
     </span>
   );
 }

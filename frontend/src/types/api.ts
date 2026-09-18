@@ -1,3 +1,5 @@
+import type { MomentAgent } from "../design/AgentBadge";
+
 export type TicketStatus =
   "todo" | "in-progress" | "in-review" | "done" | "blocked" | "cancelled";
 
@@ -153,6 +155,8 @@ export interface AgentInfo {
   description: string | null;
   is_builtin: boolean;
   prompt_preview: string;
+  /** Quand cet agent parle : pendant un run, sur une action, ou jamais. */
+  moment?: MomentAgent;
 }
 
 export interface ConversationMessage {
@@ -346,6 +350,7 @@ export interface PlanDeNettoyage {
 export interface AgentDetail {
   role: string;
   is_builtin: boolean;
+  moment?: MomentAgent;
   system_prompt: string;
 }
 

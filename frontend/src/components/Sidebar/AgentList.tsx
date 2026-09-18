@@ -42,7 +42,7 @@ function AgentRow({
       >
         {agent.role}
       </button>
-      <AgentBadge natif={agent.is_builtin} />
+      <AgentBadge moment={agent.moment ?? "jamais"} />
       {!agent.is_builtin && (
         <button
           onClick={() => onDelete(agent.role)}

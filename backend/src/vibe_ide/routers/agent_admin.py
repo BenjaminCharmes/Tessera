@@ -21,12 +21,15 @@ class AgentInfo(BaseModel):
     description: str | None = None
     is_builtin: bool
     prompt_preview: str
+    #: Quand cet agent parle : `pipeline`, `demande`, ou `jamais` (ticket-097).
+    moment: str = "jamais"
 
 
 class AgentDetailResponse(BaseModel):
     role: str
     is_builtin: bool
     system_prompt: str
+    moment: str = "jamais"
 
 
 class CreateAgentRequest(BaseModel):
@@ -60,7 +63,11 @@ class AgentRegistryResponse(BaseModel):
 
 
 def get_registry() -> AgentRegistryService:
-    return AgentRegistryService(settings.ide_prompts_dir)
+    # Le dossier des projets sert à savoir quels prompts un `agents.json`
+    # branche sur une étape du pipeline (ticket-097).
+    return AgentRegistryService(
+        settings.ide_prompts_dir, projects_dir=settings.ide_workspace_dir
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -88,6 +95,7 @@ async def list_agents(
                 description=None,
                 is_builtin=info.is_builtin,
                 prompt_preview=preview,
+                moment=info.moment.value,
             )
         )
     return AgentRegistryResponse(agents=agents)
@@ -104,10 +112,14 @@ async def get_agent(
         prompt = registry.get_prompt(role)
     except AgentNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    moment = next(
+        (a.moment.value for a in registry.list_agents() if a.role == role), "jamais"
+    )
     return AgentDetailResponse(
         role=role,
         is_builtin=registry.is_builtin(role),
         system_prompt=prompt,
+        moment=moment,
     )
 
 

@@ -22,6 +22,21 @@ qui avalait ses erreurs. Deux des quatre contrôles étaient du théâtre.
 Seul `cargo check` reste hors de portée en local sans Rust installé. Il ne
 tourne en CI que si `frontend/src-tauri/` a changé.
 
+### Piège : le serveur Vite obsolète
+
+Playwright réutilise un serveur de dev déjà lancé (`reuseExistingServer`). Si
+l'arbre de travail a changé sous lui — un `git stash`, un changement de
+branche — il continue de servir l'ancien code, et l'E2E échoue sur des
+`getByText` introuvables qui ressemblent à une vraie régression.
+
+Le symptôme : l'échec disparaît après avoir tué le serveur.
+
+```powershell
+.\scriptsibe.ps1 stop      # puis relancer verify
+```
+
+Avant de chercher la régression, vérifier ça. Deux fois de suite, c'était ça.
+
 **Une affirmation de complétude sans sortie de commande est une supposition.**
 
 « Les tests passent », « c'est corrigé », « la CI est verte » se prouvent. Une
