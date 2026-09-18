@@ -178,3 +178,22 @@ def test_chaque_adr_porte_une_date_et_une_decision() -> None:
     ]
 
     assert incomplets == [], f"format incomplet : {incomplets}"
+
+
+def test_une_derogation_est_datee_et_porte_sa_condition_de_retrait() -> None:
+    # Une exception écrite comme une règle devient une règle. Celle de
+    # ticket-095 — merger sans CI parce que les minutes sont épuisées — doit
+    # rester lisible comme temporaire, sinon dans trois semaines elle se lira
+    # comme la façon de faire de ce dépôt.
+    incompletes = []
+    for consigne in _CONSIGNES:
+        texte = _lire(consigne)
+        for bloc in re.findall(
+            r"Dérogation temporaire.*?(?=\n\n[^>]|\Z)", texte, re.DOTALL
+        ):
+            if not re.search(r"\d{4}-\d{2}-\d{2}", bloc):
+                incompletes.append(f"{consigne} : sans date")
+            if "À supprimer" not in bloc:
+                incompletes.append(f"{consigne} : sans condition de retrait")
+
+    assert incompletes == [], incompletes
