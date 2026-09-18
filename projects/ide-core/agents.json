@@ -4,13 +4,6 @@
   "git_root": "ancestor",
   "agents": [
     {
-      "role": "orchestrateur",
-      "model": "claude-sonnet-4-6",
-      "max_tokens": 4096,
-      "prompt_file": "agents/prompts/orchestrateur.md",
-      "active": true
-    },
-    {
       "role": "codeur",
       "model": "claude-sonnet-4-6",
       "max_tokens": 8192,

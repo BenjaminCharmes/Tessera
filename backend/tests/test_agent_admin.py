@@ -59,7 +59,7 @@ def test_list_contains_builtins(client: TestClient) -> None:
     roles = {a["role"] for a in data["agents"]}
     assert "codeur" in roles
     assert "reviewer" in roles
-    assert "orchestrateur" in roles
+    assert "architect" in roles
 
 
 def test_list_marks_builtins(client: TestClient) -> None:

@@ -16,7 +16,7 @@ from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any, Optional
 
 from vibe_ide.models.agent import AgentRole
-from vibe_ide.models.ticket import TicketStatus
+from vibe_ide.models.ticket import TicketStatus, TicketType
 from vibe_ide.services.git_workspace import GitWorkspaceError
 from vibe_ide.services.pipeline_events import (
     EventType,
@@ -136,7 +136,7 @@ def asker_for(run: PipelineRun) -> Optional[Callable[[str], Awaitable[str]]]:
 
 async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> None:
     """Run the coder, then capture what it actually wrote to disk."""
-    codeur_cfg = orch._config_for(AgentRole.codeur)
+    codeur_cfg = orch._config_for(_role_qui_produit(run.ticket.type))
     ticket_id = run.ticket_id
 
     await run.on_event(
@@ -175,8 +175,14 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     asker = asker_for(run)
     extra: dict[str, Any] = {"ask_user": asker} if asker is not None else {}
 
+    # Un ticket `design` ne demande pas du code mais une décision, et
+    # `ide-core/CLAUDE.md` promettait l'architecte dessus depuis le premier
+    # commit sans que rien ne route par type (ticket-098). L'étape reste la
+    # même — quelqu'un produit le travail — seul le rôle change.
+    role = _role_qui_produit(run.ticket.type)
+
     codeur_result = await orch._runner.run(
-        role=AgentRole.codeur,
+        role=role,
         ticket=run.ticket,
         project_context=context,
         agent_config=codeur_cfg,
@@ -189,13 +195,14 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     await run.on_event(
         OrchestratorEvent(
             type=EventType.AGENT_DONE,
-            agent=AgentRole.codeur,
+            agent=role,
             ticket_id=ticket_id,
             data={"content": codeur_result.content},
         )
     )
     orch._log(
-        f"[{ticket_id}] tour {run.round_num} — codeur terminé ({codeur_result.duration_ms}ms)"
+        f"[{ticket_id}] tour {run.round_num} — {role.value} terminé "
+        f"({codeur_result.duration_ms}ms)"
     )
 
     run.reviewed_code = await _capture_diff(orch, run, codeur_result.content)
@@ -222,15 +229,36 @@ async def _capture_diff(orch: "Orchestrator", run: PipelineRun, prose: str) -> s
     return prose
 
 
+def _role_qui_produit(type_de_ticket: "TicketType") -> AgentRole:
+    """Qui tient l'étape « quelqu'un produit le travail », selon le ticket.
+
+    Un ticket `design` appelle une décision d'architecture, pas du code. Le
+    reste du pipeline est inchangé : le même reviewer relit, le même commit
+    conclut.
+    """
+    if type_de_ticket is TicketType.design:
+        return AgentRole.architect
+    return AgentRole.codeur
+
+
 # ------------------------------------------------------------------
 # Testeur
 # ------------------------------------------------------------------
 
 
-async def run_tests(orch: "Orchestrator", run: PipelineRun) -> None:
-    """Run the project's own test suite and stash its summary for the reviewer."""
+async def run_tests(orch: "Orchestrator", run: PipelineRun) -> bool:
+    """Lance la suite de tests du projet. Rend `False` si elle est rouge.
+
+    Le résultat n'était qu'ajouté au contexte du reviewer : un ticket dont les
+    tests cassent pouvait donc être approuvé par un reviewer qui n'avait pas
+    regardé la ligne rouge. Le rendre ici permet à l'orchestrateur de renvoyer
+    au codeur sans passer par la revue (ticket-098).
+
+    Rend `True` quand il n'y a pas de testeur, ou pas de commande détectée :
+    l'absence de test n'est pas un échec de test.
+    """
     if not (orch._test_runner and orch._project_path):
-        return
+        return True
 
     from vibe_ide.services.test_runner import TestCommandNotFound
 
@@ -254,10 +282,14 @@ async def run_tests(orch: "Orchestrator", run: PipelineRun) -> None:
             f"\n\n## Résultats des tests {badge}\n{result.output_summary}\n{errors}"
         )
         orch._log(f"[{run.ticket_id}] testeur: {result.output_summary}")
+        return bool(result.passed)
     except TestCommandNotFound:
         orch._log(f"[{run.ticket_id}] testeur: commande non détectée, ignoré")
     except Exception as exc:
+        # Le lanceur lui-même a échoué : on ne transforme pas sa panne en
+        # échec du ticket, sinon une commande mal configurée bloquerait tout.
         _logger.warning("test_runner_failed", extra={"error": str(exc)})
+    return True
 
 
 # ------------------------------------------------------------------

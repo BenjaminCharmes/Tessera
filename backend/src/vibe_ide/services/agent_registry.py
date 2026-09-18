@@ -67,14 +67,12 @@ class AgentRegistryService:
             "codeur",
             "doc-fonctionnelle",
             "doc-technique",
-            "orchestrateur",
             "planificateur",
             "project-analyzer",
             "project-creator",
             "resolveur-conflit",
             "reviewer",
             "securite",
-            "testeur",
             "validateur",
         }
     )
@@ -82,6 +80,7 @@ class AgentRegistryService:
     #: Les rôles que le pipeline appelle de lui-même pendant un run.
     ROLES_PIPELINE: frozenset[str] = frozenset(
         {
+            "architect",
             "codeur",
             "reviewer",
             "securite",

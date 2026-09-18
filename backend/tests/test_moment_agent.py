@@ -26,15 +26,23 @@ def test_le_chat_parle_quand_on_le_demande() -> None:
     assert moments["planificateur"] is MomentAgent.demande
 
 
-def test_un_prompt_que_rien_n_appelle_le_dit() -> None:
-    # `testeur.md` existe et n'est chargé nulle part : l'étape de test lance un
-    # sous-processus, elle n'appelle aucun agent. `architect.md` est déclaré
-    # par `ide-core` et n'est lu par rien. Quatre prompts sur dix-sept ne
-    # parlaient jamais, et le badge les annonçait comme « requis ».
+def test_l_architecte_tient_l_etape_des_tickets_design() -> None:
+    # Il était déclaré depuis le premier commit et n'était appelé nulle part ;
+    # ticket-098 route les tickets `design` vers lui.
     moments = {a.role: a.moment for a in _registre().list_agents()}
 
-    assert moments["testeur"] is MomentAgent.jamais
-    assert moments["architect"] is MomentAgent.jamais
+    assert moments["architect"] is MomentAgent.pipeline
+
+
+def test_les_prompts_que_rien_n_appelait_ont_disparu() -> None:
+    # `testeur.md` décrivait une analyse de sortie de tests que le code fait
+    # par expression régulière ; `orchestrateur.md` décrivait ce que
+    # `pick_next_ticket()` fait en huit lignes. Les garder promettait des
+    # agents qui ne parlaient jamais.
+    roles = {a.role for a in _registre().list_agents()}
+
+    assert "testeur" not in roles
+    assert "orchestrateur" not in roles
 
 
 def test_un_prompt_branche_par_un_projet_parle_dans_le_pipeline() -> None:

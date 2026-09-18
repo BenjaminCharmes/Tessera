@@ -39,10 +39,9 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 
 ## Agents actifs sur ce projet
 
-- `orchestrateur` — route les tickets, gère les dépendances
 - `codeur` — implémente les tickets de type `feat` et `chore`
 - `reviewer` — valide le code produit par le codeur
-- `architect` — intervient sur les tickets de type `design`
+- `architect` — tient l'étape de production sur les tickets de type `design`
 
 ---
 

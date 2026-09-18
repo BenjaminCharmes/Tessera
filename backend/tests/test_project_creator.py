@@ -19,7 +19,7 @@ _VALID_AGENT_JSON = json.dumps(
         "project_id": "jardin-med",
         "name": "Potager Méditerranéen",
         "claude_md": "# Potager Méditerranéen\n\nProjet de planification de jardin.\n\n## Agents actifs\n\n- `orchestrateur`\n- `redacteur`\n- `planificateur`\n\n## Objectif\n\nPlanifier et suivre un potager méditerranéen.\n",
-        "active_agents": ["orchestrateur", "redacteur", "planificateur"],
+        "active_agents": ["codeur", "redacteur", "planificateur"],
         "suggested_tickets": [
             {
                 "title": "Définir la structure du jardin",

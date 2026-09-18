@@ -192,7 +192,13 @@ class Orchestrator:
             if run.stop_requested:
                 return await outcomes.finish_stopped(self, run)
 
-            await stages.run_tests(self, run)
+            # Une suite rouge renvoie au codeur sans passer par la revue :
+            # un reviewer n'a pas à arbitrer un fait déjà établi, et l'appel
+            # est économisé (ticket-098).
+            if not await stages.run_tests(self, run):
+                run.review_feedback.append(_echec_de_tests(run))
+                self._log(f"[{ticket_id}] tests rouges au tour {round_num}")
+                continue
 
             blocked = await stages.run_security_audit(self, run)
             if blocked is not None:
@@ -381,3 +387,19 @@ __all__ = [
     "OrchestratorEvent",
     "PipelineResult",
 ]
+
+
+def _echec_de_tests(run: "PipelineRun") -> str:
+    """Ce que le codeur lit au tour suivant : le fait, puis les erreurs.
+
+    Sans les erreurs, le second tour recommence à l'aveugle et produit
+    souvent la même chose.
+    """
+    resultat = run.test_result
+    if resultat is None:
+        return "Les tests du projet ont échoué. Corrige-les avant toute chose."
+    erreurs = "\n".join(resultat.errors[:10])
+    return (
+        "Les tests du projet échouent — corrige-les avant toute autre chose.\n"
+        f"{resultat.output_summary}\n{erreurs}"
+    )

@@ -85,9 +85,14 @@ async def test_create_project_utilise_un_provider_sans_outils(
         return provider
 
     monkeypatch.setattr(projects_router, "get_provider", spy)
+    # Sans ces deux lignes, `_auto_create_missing_agents` écrivait dans le
+    # **vrai** dossier `agents/prompts/` du dépôt : la suite y recréait des
+    # prompts livrés et en écrasait le contenu (ticket-098).
+    monkeypatch.setattr(settings, "ide_prompts_dir", tmp_path / "prompts")
+    monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path / "workspace")
 
     await create_project(
-        ProjectCreate(project_id="mon-projet", name="Mon Projet", active_agents=["orchestrateur"])
+        ProjectCreate(project_id="mon-projet", name="Mon Projet", active_agents=["redacteur"])
     )
 
     assert captured["allow_tools"] is False
