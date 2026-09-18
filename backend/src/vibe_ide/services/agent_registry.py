@@ -17,9 +17,17 @@ class AgentInfo:
 
 
 class AgentRegistryService:
-    #: Les agents livrés **avec le dépôt**. Ils ne se suppriment pas depuis
-    #: l'IDE : leur prompt fait partie du produit, pas des créations de
-    #: l'utilisateur.
+    #: Les agents que le dépôt livre et dont quelque chose dépend. Ils ne se
+    #: suppriment pas depuis l'IDE.
+    #:
+    #: Deux motifs, et un seul suffit (ticket-094, ticket-096) :
+    #:   - le **code** charge ce prompt par son nom — supprimer `codeur.md`
+    #:     casse le pipeline au prochain run ;
+    #:   - un **projet du dépôt** le déclare dans son `agents.json` —
+    #:     supprimer `analyste-carriere.md` casse le projet `carriere`.
+    #:
+    #: Ce n'est pas « qui a écrit le prompt » : c'est toujours un agent, livré
+    #: ou créé depuis le chat. C'est « qu'est-ce qui casse s'il disparaît ».
     #:
     #: Cette liste était restée à six rôles alors que le dépôt en livre treize.
     #: Sept agents du pipeline — dont `securite`, `testeur`, `validateur` et
@@ -32,6 +40,7 @@ class AgentRegistryService:
     BUILTIN_ROLES: frozenset[str] = frozenset(
         {
             "agent-creator",
+            "analyste-carriere",
             "architect",
             "chat",
             "codeur",

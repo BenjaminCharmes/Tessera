@@ -1,4 +1,5 @@
 """Ce que le dépôt livre ne se supprime pas depuis l'IDE — ticket-079."""
+import json
 import re
 from pathlib import Path
 
@@ -69,4 +70,33 @@ def test_tout_prompt_charge_par_le_code_est_protege() -> None:
     assert non_proteges == [], (
         "le code charge ces prompts par leur nom, mais ils sont supprimables "
         f"d'un clic depuis l'IDE : {non_proteges}"
+    )
+
+
+def _roles_declares_par_les_projets() -> set[str]:
+    """Les prompts qu'un projet livré avec le dépôt déclare dans agents.json."""
+    racine = _PROMPTS.parent.parent / "projects"
+    declares: set[str] = set()
+    for agents_json in racine.glob("*/agents.json"):
+        try:
+            data = json.loads(agents_json.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        for agent in data.get("agents", []):
+            if (role := agent.get("role")):
+                declares.add(str(role))
+    return declares & {f.stem for f in _PROMPTS.glob("*.md")}
+
+
+def test_tout_prompt_declare_par_un_projet_est_protege() -> None:
+    # Même dérive que ticket-079, par l'autre porte : un agent ajouté pour un
+    # projet du dépôt est aussi supprimable d'un clic que les autres, et son
+    # projet cesse alors de tourner.
+    non_proteges = sorted(
+        _roles_declares_par_les_projets() - AgentRegistryService.BUILTIN_ROLES
+    )
+
+    assert non_proteges == [], (
+        f"des projets du dépôt déclarent ces agents, qui restent supprimables : "
+        f"{non_proteges}"
     )
