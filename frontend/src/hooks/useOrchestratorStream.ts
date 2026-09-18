@@ -31,6 +31,12 @@ export interface UseOrchestratorStreamResult extends StreamState {
   connect: (ticketId: string) => void;
   /** Lance une sélection de tickets, dans l'ordre donné. */
   connectQueue: (ticketIds: string[]) => void;
+  /**
+   * Laisse l'IDE choisir lui-même les tickets, par priorité et dépendances.
+   * `depuisGithub` tire d'abord les issues `agent-ready` du dépôt — jamais
+   * par défaut : un appel réseau vers le dépôt d'un client ne part pas seul.
+   */
+  connectAutonome: (options: { depuisGithub: boolean }) => void;
   disconnect: () => void;
   clear: () => void;
   /** Répond à la question en cours et laisse le run reprendre. */
@@ -151,6 +157,9 @@ export function useOrchestratorStream(
   const wsRef = useRef<WebSocket | null>(null);
   const ticketIdRef = useRef<string | null>(null);
   const queueRef = useRef<string[] | null>(null);
+  // Le mode autonome : l'IDE choisit lui-même le prochain ticket, par
+  // priorité et dépendances (ticket-089). `null` quand on ne l'utilise pas.
+  const autonomeRef = useRef<{ depuisGithub: boolean } | null>(null);
   const isDoneRef = useRef(false);
 
   function closeWs() {
@@ -183,9 +192,14 @@ export function useOrchestratorStream(
 
     ws.onopen = () => {
       ws.send(
-        queueRef.current
-          ? JSON.stringify({ ticket_ids: queueRef.current })
-          : JSON.stringify({ ticket_id: ticketId }),
+        autonomeRef.current
+          ? JSON.stringify({
+              mode: "autonomous",
+              depuis_github: autonomeRef.current.depuisGithub,
+            })
+          : queueRef.current
+            ? JSON.stringify({ ticket_ids: queueRef.current })
+            : JSON.stringify({ ticket_id: ticketId }),
       );
     };
 
@@ -241,10 +255,20 @@ export function useOrchestratorStream(
     send({ type: "stop", text: "" });
   }
 
+  function connectAutonome(options: { depuisGithub: boolean }) {
+    ticketIdRef.current = null;
+    queueRef.current = null;
+    autonomeRef.current = options;
+    isDoneRef.current = false;
+    setState({ ...INITIAL, status: "connecting" });
+    openSocket("");
+  }
+
   function connectQueue(ticketIds: string[]) {
     if (ticketIds.length === 0) return;
     ticketIdRef.current = ticketIds[0] ?? null;
     queueRef.current = ticketIds;
+    autonomeRef.current = null;
     isDoneRef.current = false;
     setState({ ...INITIAL, ticketId: ticketIds[0] ?? null });
     openSocket(ticketIds[0] ?? "");
@@ -253,6 +277,7 @@ export function useOrchestratorStream(
   function connect(ticketId: string) {
     ticketIdRef.current = ticketId;
     queueRef.current = null;
+    autonomeRef.current = null;
     isDoneRef.current = false;
     setState({ ...INITIAL, ticketId });
     openSocket(ticketId);
@@ -268,6 +293,7 @@ export function useOrchestratorStream(
     isDoneRef.current = true;
     ticketIdRef.current = null;
     queueRef.current = null;
+    autonomeRef.current = null;
     closeWs();
     setState(INITIAL);
   }
@@ -276,6 +302,7 @@ export function useOrchestratorStream(
     ...state,
     connect,
     connectQueue,
+    connectAutonome,
     disconnect,
     clear,
     answer,

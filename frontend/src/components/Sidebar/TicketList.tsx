@@ -1,3 +1,4 @@
+import BandeAutonome from "./BandeAutonome";
 import QueueBar from "./QueueBar";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
@@ -46,6 +47,7 @@ interface TicketListProps {
   onToggleQueue?: (ticketId: string) => void;
   onRunQueue?: () => void;
   onClearQueue?: () => void;
+  onRunAutonome?: (options: { depuisGithub: boolean }) => void;
   queueEnCours?: boolean;
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
@@ -68,6 +70,7 @@ export default function TicketList({
   onToggleQueue,
   onRunQueue,
   onClearQueue,
+  onRunAutonome,
   queueEnCours = false,
   onToggleKanban,
   onTicketCreated,
@@ -140,6 +143,15 @@ export default function TicketList({
           onClear={onClearQueue ?? (() => {})}
           enCours={queueEnCours}
         />
+
+        {onRunAutonome && (
+          <BandeAutonome
+            selectionVide={selection.length === 0}
+            githubLie={Boolean(project.github_remote)}
+            enCours={queueEnCours}
+            onLancer={onRunAutonome}
+          />
+        )}
 
         <div className="flex-1 overflow-y-auto py-1">
           {/* Le chargement et l'erreur remplacent la **liste**, pas le

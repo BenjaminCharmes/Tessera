@@ -172,3 +172,41 @@ describe("reconnexion", () => {
     expect(result.current.errorMessage).toMatch(/connexion/i);
   });
 });
+
+describe("useOrchestratorStream — mode autonome (ticket-089)", () => {
+  it("annonce le mode autonome à l'ouverture", () => {
+    const { result } = renderHook(() => useOrchestratorStream("mon-projet"));
+
+    act(() => {
+      result.current.connectAutonome({ depuisGithub: true });
+    });
+    act(() => {
+      MockWebSocket.instance!.triggerOpen();
+    });
+
+    const envoye = JSON.parse(MockWebSocket.instance!.sent[0] ?? "{}") as Record<
+      string,
+      unknown
+    >;
+    expect(envoye["mode"]).toBe("autonomous");
+    expect(envoye["depuis_github"]).toBe(true);
+  });
+
+  it("ne tire pas les issues sans qu'on le demande", () => {
+    // Un appel réseau vers le dépôt d'un client ne part pas de lui-même.
+    const { result } = renderHook(() => useOrchestratorStream("mon-projet"));
+
+    act(() => {
+      result.current.connectAutonome({ depuisGithub: false });
+    });
+    act(() => {
+      MockWebSocket.instance!.triggerOpen();
+    });
+
+    const envoye = JSON.parse(MockWebSocket.instance!.sent[0] ?? "{}") as Record<
+      string,
+      unknown
+    >;
+    expect(envoye["depuis_github"]).toBe(false);
+  });
+});

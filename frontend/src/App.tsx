@@ -210,6 +210,7 @@ export default function App() {
               )
             }
             onRunQueue={() => stream.connectQueue(selection)}
+            onRunAutonome={(options) => stream.connectAutonome(options)}
             onClearQueue={() => setSelection([])}
             openFilePath={openFilePath}
             onOpenFile={(path) => {

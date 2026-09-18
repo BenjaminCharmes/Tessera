@@ -43,6 +43,7 @@ interface SidebarProps {
   selection?: string[];
   onToggleQueue?: (ticketId: string) => void;
   onRunQueue?: () => void;
+  onRunAutonome?: (options: { depuisGithub: boolean }) => void;
   onClearQueue?: () => void;
   queueEnCours?: boolean;
   onToggleKanban: () => void;
@@ -81,6 +82,7 @@ export default function Sidebar({
   selection,
   onToggleQueue,
   onRunQueue,
+  onRunAutonome,
   onClearQueue,
   queueEnCours,
   onToggleKanban,
@@ -136,6 +138,7 @@ export default function Sidebar({
           selection={selection}
           onToggleQueue={onToggleQueue}
           onRunQueue={onRunQueue}
+          onRunAutonome={onRunAutonome}
           onClearQueue={onClearQueue}
           queueEnCours={queueEnCours}
           onToggleKanban={onToggleKanban}
