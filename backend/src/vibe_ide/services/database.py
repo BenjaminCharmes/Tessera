@@ -9,6 +9,10 @@ from typing import Any
 import aiosqlite
 from pydantic import BaseModel
 
+from vibe_ide.utils.logger import get_logger
+
+_logger = get_logger(__name__)
+
 _CREATE_TABLES = """
 CREATE TABLE IF NOT EXISTS pipeline_runs (
     id           TEXT PRIMARY KEY,
@@ -95,9 +99,53 @@ class ProjectUsage(BaseModel):
     per_ticket: list[TicketUsage]
 
 
+#: Les évolutions du schéma, dans l'ordre, une entrée par changement
+#: (ticket-086). L'index d'une migration + 1 est le `user_version` qu'elle
+#: fait atteindre ; `PRAGMA user_version` dit donc lesquelles ont déjà tourné.
+#:
+#: **`_CREATE_TABLES` ne bouge plus.** Il décrit le schéma d'origine ; toute
+#: évolution s'ajoute ici. Le modifier ferait diverger une base neuve d'une
+#: base migrée, et l'écart ne se verrait qu'à l'usage, sur la base de
+#: quelqu'un. Un test compare les deux.
+_MIGRATIONS: list[str] = []
+
+
+def version_du_schema() -> int:
+    """Le numéro de version que le code attend de la base."""
+    return len(_MIGRATIONS)
+
+
 async def init_db(db_path: Path | str) -> None:
+    """Crée le schéma s'il manque, puis applique les migrations en retard.
+
+    Sans numéro de version, `CREATE TABLE IF NOT EXISTS` créait ce qui
+    manquait et ignorait tout le reste : une colonne ajoutée un jour n'aurait
+    jamais atteint une base existante, en silence. L'historique des runs et
+    des coûts n'est pas reconstructible — il ne se recrée pas, il se migre.
+    """
     async with aiosqlite.connect(str(db_path)) as db:
         await db.executescript(_CREATE_TABLES)
+
+        curseur = await db.execute("PRAGMA user_version")
+        ligne = await curseur.fetchone()
+        version = int(ligne[0]) if ligne else 0
+
+        for numero, migration in enumerate(_MIGRATIONS[version:], start=version + 1):
+            await db.executescript(migration)
+            # `user_version` n'accepte pas de paramètre lié ; `numero` est un
+            # entier issu d'`enumerate`, jamais d'une entrée utilisateur.
+            await db.execute(f"PRAGMA user_version = {numero}")
+            _logger.info("migration_appliquee", extra={"version": numero})
+
+        if version > len(_MIGRATIONS):
+            # Base écrite par une version plus récente de l'application — le
+            # cas d'un aller-retour entre deux machines. Ne rien faire vaut
+            # mieux que réécrire un schéma qu'on ne connaît pas.
+            _logger.warning(
+                "base_plus_recente_que_le_code",
+                extra={"base": version, "code": len(_MIGRATIONS)},
+            )
+
         await db.execute("PRAGMA journal_mode=WAL")
         await db.commit()
 
