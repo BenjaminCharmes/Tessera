@@ -40,5 +40,6 @@
     ],
     "max_review_rounds": 3,
     "auto_merge_on_approve": true
-  }
+  },
+  "autonomy": "merge"
 }

@@ -8,6 +8,7 @@ from vibe_ide.services.github_workflow import forge_supportee, nom_de_la_forge
 from vibe_ide.services.ticket_diff import TicketDiff, diff_du_ticket
 from vibe_ide.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketStatus, TicketStatusUpdate
 from vibe_ide.services.github_service import GitHubService, PRStatus
+from vibe_ide.services.autonomie import lire_niveau
 from vibe_ide.services.database import list_runs
 from vibe_ide.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from vibe_ide.services.github_workflow import GitHubWorkflowService, WorkflowError
@@ -237,6 +238,15 @@ class TicketActivity(BaseModel):
     forge: str | None = None
     pr_number: int | None = None
     github_remote: str | None = None
+    #: Jusqu'où ce projet laisse l'IDE aller seul : `commit`, `pr` ou `merge`
+    #: (ticket-082). Sans cela, rien à l'écran n'explique pourquoi l'IDE
+    #: s'arrête après le commit ici et va jusqu'au merge ailleurs.
+    autonomy: str = "commit"
+
+
+class MergeResponse(BaseModel):
+    pr_number: int
+    merged: bool
 
 
 class OpenPrRequest(BaseModel):
@@ -299,6 +309,7 @@ async def get_ticket_activity(project_id: str, ticket_id: str) -> TicketActivity
         forge=nom_de_la_forge(remote),
         pr_number=ticket.pr_number,
         github_remote=remote,
+        autonomy=lire_niveau(project_path).value,
     )
 
 
@@ -328,6 +339,7 @@ async def open_pull_request_for_ticket(
         git_workspace=GitWorkspaceService(project_path),
         github=github,
         base_branch=settings.github_base_branch,
+        project_path=project_path,
     )
 
     try:
@@ -336,6 +348,9 @@ async def open_pull_request_for_ticket(
             ticket_id=ticket_id,
             ticket_title=ticket.title,
             ticket_body=ticket.body or "",
+            # C'est l'utilisateur qui vient de cliquer. Le niveau d'autonomie
+            # borne ce que l'IDE fait seul, pas ce qu'on peut lui demander.
+            autonome=False,
         )
     except WorkflowError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -349,3 +364,46 @@ async def open_pull_request_for_ticket(
     return OpenPrResponse(
         pr_number=result.pr_number, pr_url=result.pr_url, branch=result.branch
     )
+
+
+@router.post("/{project_id}/tickets/{ticket_id}/merge-pr", response_model=MergeResponse)
+async def merge_pull_request_for_ticket(
+    project_id: str, ticket_id: str
+) -> MergeResponse:
+    """Merge la PR du ticket, **si** le projet l'a déclaré et si la CI est verte.
+
+    Les deux conditions se vérifient au moment d'agir (ADR-029). Un refus n'est
+    pas une panne : c'est le cas normal partout où l'utilisateur garde la main.
+    """
+    ticket_svc = _svc(project_id)
+    ticket = await ticket_svc.get_ticket(ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail=f"Ticket {ticket_id} introuvable")
+    if ticket.pr_number is None:
+        raise HTTPException(
+            status_code=422, detail="Ce ticket n'a pas de pull request ouverte."
+        )
+
+    project_path = settings.ide_workspace_dir / project_id
+    project = load_project(project_path)
+    github = None
+    if project.github_remote and settings.github_token:
+        github = GitHubService(token=settings.github_token, repo=project.github_remote)
+
+    service = GitHubWorkflowService(
+        git_workspace=GitWorkspaceService(project_path),
+        github=github,
+        base_branch=settings.github_base_branch,
+        project_path=project_path,
+    )
+
+    merge = await service.merge_si_la_ci_est_verte(ticket.pr_number)
+    if not merge:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Merge refusé : il faut que ce projet déclare "
+                '`"autonomy": "merge"` et que la CI de la PR soit verte.'
+            ),
+        )
+    return MergeResponse(pr_number=ticket.pr_number, merged=True)

@@ -135,3 +135,66 @@ def test_ouvrir_une_pr_pousse_puis_cree(
     assert resp.status_code == 200
     assert resp.json()["pr_number"] == 7
     assert calls == ["push:ticket-042-slug", "create-pr"]
+
+
+# ------------------------------------------------------------------
+# Jusqu'où le projet laisse l'IDE aller — ticket-082
+# ------------------------------------------------------------------
+
+
+def test_l_activite_dit_le_niveau_d_autonomie(workspace: Path) -> None:
+    # Sans le dire à l'écran, l'utilisateur ne peut pas savoir pourquoi l'IDE
+    # s'arrête après le commit sur un projet et va jusqu'au merge sur un autre.
+    import json
+
+    (workspace / "mon-projet" / "agents.json").write_text(
+        json.dumps({"autonomy": "merge"}), encoding="utf-8"
+    )
+
+    body = _client().get(
+        "/api/v1/projects/mon-projet/tickets/ticket-042/activity"
+    ).json()
+
+    assert body["autonomy"] == "merge"
+
+
+def test_sans_declaration_l_activite_annonce_commit(workspace: Path) -> None:
+    body = _client().get(
+        "/api/v1/projects/mon-projet/tickets/ticket-042/activity"
+    ).json()
+
+    assert body["autonomy"] == "commit"
+
+
+def test_merger_est_refuse_sans_declaration(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Le défaut protège : un projet qui n'a rien déclaré ne merge pas, même
+    # avec une CI verte.
+    import json
+
+    (workspace / "mon-projet" / "tickets" / "todo" / "ticket-044.md").write_text(
+        _TICKET.format(id="ticket-044", extra="pr_number: 9\n"), encoding="utf-8"
+    )
+    (workspace / "mon-projet" / "agents.json").write_text(
+        json.dumps({"github_remote": "owner/repo"}), encoding="utf-8"
+    )
+    monkeypatch.setattr(settings, "github_token", "ghp_test")
+
+    merges: list[int] = []
+
+    async def _merge(self: object, pr_number: int) -> None:
+        merges.append(pr_number)
+
+    monkeypatch.setattr(
+        "vibe_ide.services.github_service.GitHubService.merge_pull_request",
+        _merge,
+        raising=False,
+    )
+
+    resp = _client().post(
+        "/api/v1/projects/mon-projet/tickets/ticket-044/merge-pr"
+    )
+
+    assert resp.status_code == 422
+    assert merges == []

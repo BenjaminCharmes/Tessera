@@ -307,6 +307,17 @@ export interface TicketActivity {
   pr_supported?: boolean;
   /** Le nom de l'hébergeur, pour le dire à l'utilisateur. */
   forge?: string | null;
+  /**
+   * Jusqu'où ce projet laisse l'IDE aller seul (ticket-082). Sans l'afficher,
+   * rien n'explique pourquoi l'IDE s'arrête après le commit ici et va jusqu'au
+   * merge ailleurs.
+   */
+  autonomy?: "commit" | "pr" | "merge";
+}
+
+export interface MergeResponse {
+  pr_number: number;
+  merged: boolean;
 }
 
 export interface OpenPrResponse {

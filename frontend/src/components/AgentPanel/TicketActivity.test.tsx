@@ -182,3 +182,64 @@ describe("TicketActivity — forge non supportée", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("TicketActivity — jusqu'où le projet laisse aller (ticket-082)", () => {
+  it("dit que le merge reste manuel là où rien n'est déclaré", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [],
+      pr_number: 7,
+      github_remote: "owner/repo",
+      autonomy: "commit",
+    });
+
+    render(<TicketActivity projectId="p" ticket={ticket} branch="b" />);
+
+    expect(await screen.findByText(/merge reste manuel/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Merger/ })).toBeNull();
+  });
+
+  it("propose le merge là où le projet l'a déclaré", async () => {
+    // L'utilisateur veut que vibe-ide et ses projets perso aillent jusqu'au
+    // bout ; ses dépôts clients, non. La différence se déclare, elle ne se
+    // devine pas.
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [],
+      pr_number: 7,
+      github_remote: "owner/repo",
+      autonomy: "merge",
+    });
+    const merge = vi
+      .spyOn(api.tickets, "mergePr")
+      .mockResolvedValue({ pr_number: 7, merged: true });
+
+    const user = userEvent.setup();
+    render(<TicketActivity projectId="p" ticket={ticket} branch="b" />);
+
+    await user.click(await screen.findByRole("button", { name: /Merger/ }));
+
+    expect(merge).toHaveBeenCalledWith("p", "ticket-042");
+    expect(screen.queryByText(/merge reste manuel/)).toBeNull();
+  });
+
+  it("explique un refus de merge sans faire croire à une panne", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [],
+      pr_number: 7,
+      github_remote: "owner/repo",
+      autonomy: "merge",
+    });
+    vi.spyOn(api.tickets, "mergePr").mockRejectedValue(
+      new Error("Merge refusé : la CI de la PR doit être verte."),
+    );
+
+    const user = userEvent.setup();
+    render(<TicketActivity projectId="p" ticket={ticket} branch="b" />);
+
+    await user.click(await screen.findByRole("button", { name: /Merger/ }));
+
+    expect(await screen.findByText(/CI de la PR doit être verte/)).toBeInTheDocument();
+  });
+});

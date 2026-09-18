@@ -21,8 +21,9 @@ import type {
   ProjectCreationResult,
   PipelineRun,
   PlanResult,
-  Project,
+  MergeResponse,
   OpenPrResponse,
+  Project,
   ProjectUsage,
   RunFromChatResponse,
   Ticket,
@@ -101,6 +102,8 @@ export const api = {
       branch: string,
     ): Promise<OpenPrResponse> =>
       post(`/projects/${projectId}/tickets/${ticketId}/open-pr`, { branch }),
+    mergePr: (projectId: string, ticketId: string): Promise<MergeResponse> =>
+      post(`/projects/${projectId}/tickets/${ticketId}/merge-pr`, {}),
     list: (projectId: string): Promise<Ticket[]> =>
       request(`/projects/${projectId}/tickets`),
     create: (projectId: string, data: TicketCreate): Promise<Ticket> =>

@@ -1,20 +1,30 @@
-"""Workflow GitHub d'un ticket : pousser, ouvrir la PR, suivre la CI — ticket-064.
+"""Workflow GitHub d'un ticket : pousser, ouvrir la PR, merger — ticket-064.
 
-Ce service couvre la mécanique qui entoure une PR, et **jamais le merge**.
+Merger, c'est décider qu'un travail est bon. Sur le dépôt d'un client, c'est le
+seul point du pipeline où un humain tranche, et c'est ce qui rend acceptable
+tout le reste de l'automatisation. Sur un dépôt personnel doté d'une CI, exiger
+ce clic ne protège personne.
 
-Merger, c'est décider qu'un travail est bon. C'est le seul point du pipeline
-où un humain tranche, et c'est précisément ce qui rend acceptable tout le
-reste de l'automatisation. Un agent qui mergerait rendrait la relecture
-facultative.
+Ce module ne choisit donc pas : il obéit à ce que le projet déclare dans son
+`agents.json` (ADR-029). Le défaut, lui, protège — sans déclaration, rien ne
+part sur le distant.
 
-Le maillon que ce module ajoute est le push. `create-pr` demandait à GitHub une
-branche `head` que rien n'avait jamais poussée : la fonctionnalité n'avait
-jamais pu aboutir.
+Le maillon que ce module avait ajouté est le push. `create-pr` demandait à
+GitHub une branche `head` que rien n'avait jamais poussée : la fonctionnalité
+n'avait jamais pu aboutir.
 """
 import re
 from dataclasses import dataclass
-from typing import Optional, Protocol
+from typing import Any, Optional, Protocol
 
+from pathlib import Path
+
+from vibe_ide.services.autonomie import (
+    NiveauAutonomie,
+    lire_niveau,
+    peut_merger,
+    peut_pousser,
+)
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -44,6 +54,10 @@ class _GitHub(Protocol):
         head: str,
         base: str | None = None,
     ) -> tuple[int, str]: ...
+
+    async def get_pull_request_status(self, pr_number: int) -> Any: ...
+
+    async def merge_pull_request(self, pr_number: int) -> None: ...
 
 
 def _section(ticket_body: str, heading: str) -> str:
@@ -76,17 +90,25 @@ def build_pr_body(ticket_id: str, ticket_title: str, ticket_body: str) -> str:
 
 
 class GitHubWorkflowService:
-    """Pousse une branche et ouvre sa PR. N'expose aucune action de merge."""
+    """Pousse une branche, ouvre sa PR, et merge si le projet l'a déclaré.
+
+    Jusqu'ou le service va depend du projet (ticket-082), pas du service :
+    `project_path` designe le dossier dont `agents.json` porte la declaration.
+    Sans lui, le service se comporte comme avant ADR-029 — il n'est autorise a
+    rien de plus que pousser et ouvrir.
+    """
 
     def __init__(
         self,
         git_workspace: Optional[_GitWorkspace],
         github: Optional[_GitHub],
         base_branch: str,
+        project_path: Path | None = None,
     ) -> None:
         self._git = git_workspace
         self._github = github
         self._base_branch = base_branch
+        self._project_path = project_path
 
     async def open_pull_request(
         self,
@@ -95,12 +117,27 @@ class GitHubWorkflowService:
         ticket_id: str,
         ticket_title: str,
         ticket_body: str,
+        autonome: bool = True,
     ) -> PullRequestResult:
         """Pousse la branche **puis** ouvre la PR.
 
         L'ordre est le correctif : GitHub refuse une `head` qu'il ne connaît
         pas, et rien ne poussait jusqu'ici.
+
+        `autonome` distingue les deux appelants. Un run qui avance seul est
+        soumis a la declaration du projet : sur un depot client, l'utilisateur
+        pousse lui-meme parce que les acces y sont souvent specifiques, et un
+        push parti tout seul serait une decision prise a sa place. Le meme
+        geste demande explicitement depuis l'IDE (`autonome=False`) est la
+        decision de l'utilisateur, et ne se lui refuse pas.
         """
+        if autonome and self._project_path is not None:
+            if not peut_pousser(self._project_path):
+                raise WorkflowError(
+                    "Ce projet ne laisse pas l'IDE pousser tout seul. Le travail "
+                    "est commité sur sa branche ; à toi de pousser. Pour changer "
+                    'cela, déclare `"autonomy": "pr"` dans son agents.json.'
+                )
         if self._git is None:
             raise WorkflowError("Ce projet n'a pas de dépôt git utilisable.")
         if branch is None:
@@ -126,6 +163,43 @@ class GitHubWorkflowService:
             extra={"ticket_id": ticket_id, "pr_number": pr_number, "branch": branch},
         )
         return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
+
+
+    async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool:
+        """Merge la PR **si** le projet l'autorise et **si** la CI est verte.
+
+        ADR-022 interdisait tout merge. Elle devient conditionnelle (ADR-029) :
+        la declaration du projet dit que l'utilisateur renonce a sa relecture
+        sur ce depot-la, et la CI verte est le seul signal objectif dont l'IDE
+        dispose pour savoir que le code passe.
+
+        Les deux conditions se verifient **ici**, au moment d'agir. Un plan
+        calcule plus tot aurait pu l'etre sur une CI qui depuis est passee au
+        rouge.
+
+        Rend `False` sans rien faire des qu'une condition manque : c'est le cas
+        normal sur la grande majorite des projets, pas une erreur.
+        """
+        if self._github is None or self._project_path is None:
+            return False
+        # La declaration se lit avant l'appel reseau : sur la grande majorite
+        # des projets elle suffit a repondre, et interroger GitHub pour un
+        # merge qui ne se fera de toute facon pas est du bruit.
+        if lire_niveau(self._project_path) is not NiveauAutonomie.merge:
+            return False
+
+        statut = await self._github.get_pull_request_status(pr_number)
+        ci = str(getattr(statut, "ci_status", "none"))
+        if not peut_merger(self._project_path, ci_status=ci):
+            _logger.info(
+                "merge_refuse",
+                extra={"pr": pr_number, "ci": ci, "projet": str(self._project_path)},
+            )
+            return False
+
+        await self._github.merge_pull_request(pr_number)
+        _logger.info("merge_effectue", extra={"pr": pr_number, "ci": ci})
+        return True
 
 
 #: Les hébergeurs reconnus, pour nommer celui qu'on a devant soi.

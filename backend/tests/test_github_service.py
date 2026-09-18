@@ -522,3 +522,37 @@ async def test_repository_info_signale_un_depot_inaccessible() -> None:
     info = await _make_service().get_repository_info()
 
     assert info.exists is False
+
+
+# ------------------------------------------------------------------
+# merge_pull_request — ticket-082
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_merge_pull_request_demande_un_merge_commit() -> None:
+    # `develop → main` doit rester un merge commit : un squash réécrit les SHA
+    # et ferait diverger les deux branches (CLAUDE.md, section Git).
+    route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True, "sha": "abc"})
+    )
+
+    await _make_service().merge_pull_request(7)
+
+    assert route.called
+    import json as _json
+
+    envoye = _json.loads(route.calls[0].request.content)
+    assert envoye["merge_method"] == "merge"
+
+
+@respx.mock
+async def test_un_merge_refuse_par_github_remonte() -> None:
+    # 405 = la PR n'est pas mergeable (conflit, branche protégée). Avaler
+    # l'erreur ferait croire le ticket terminé alors que rien n'a bougé.
+    respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(405, json={"message": "Pull Request is not mergeable"})
+    )
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await _make_service().merge_pull_request(7)

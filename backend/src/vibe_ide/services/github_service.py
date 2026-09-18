@@ -150,6 +150,24 @@ class GitHubService:
             pr_number=pr_number,
         )
 
+    async def merge_pull_request(self, pr_number: int) -> None:
+        """Merge la PR, en merge commit — ticket-082.
+
+        La methode compte : `develop → main` doit garder l'historique par
+        ticket, et un squash reecrirait les SHA, faisant diverger les deux
+        branches.
+
+        L'erreur remonte telle quelle. Un 405 veut dire que GitHub refuse le
+        merge — conflit, branche protegee, revue manquante — et l'avaler
+        ferait passer le ticket pour termine alors que rien n'a bouge.
+        """
+        url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}/merge"
+        async with httpx.AsyncClient() as client:
+            resp = await client.put(
+                url, headers=self._headers, json={"merge_method": "merge"}
+            )
+            resp.raise_for_status()
+
     async def _get_ci_status(
         self, sha: str
     ) -> Literal["pending", "passing", "failing", "none"]:

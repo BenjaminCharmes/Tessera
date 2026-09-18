@@ -269,3 +269,11 @@ Format : ADR léger (Architecture Decision Record).
 **Forme** : la même que pour le mode des artefacts (ADR-021, ADR-023) — le défaut protège, le cas particulier s'énonce dans le fichier du projet. Une valeur inconnue ne désarme rien.
 **Détail** : voir `tickets/done/ticket-077-auto-hebergement.md`.
 
+---
+
+## ADR-029 — Jusqu'où l'agent va se déclare par projet
+
+**Date** : 2026-09-18
+**Décision** : ADR-022 devient conditionnelle. `agents.json` porte un champ `autonomy` : `commit` (défaut — le travail reste sur sa branche), `pr` (pousse et ouvre la PR), `merge` (merge aussi, **si et seulement si** la CI est verte). Valeur absente ou inconnue : `commit`. Le niveau borne ce que l'IDE fait **seul** ; le même geste demandé depuis l'IDE reste la décision de l'utilisateur.
+**Raison** : le raisonnement d'ADR-022 — merger, c'est décider qu'un travail est bon — tient sur le dépôt d'un client, où les accès sont spécifiques et où l'utilisateur pousse lui-même. Il ne vaut pas sur un dépôt personnel doté d'une CI : y refuser le merge ne protège personne, ça ajoute un clic.
+**Alternative rejetée** : un réglage global (le bon niveau dépend du dépôt) ; merger sur une CI absente ou en cours — l'absence de signal n'est pas un signal favorable. Troisième usage du patron d'ADR-021 et ADR-028 : le défaut protège, l'exception s'énonce.

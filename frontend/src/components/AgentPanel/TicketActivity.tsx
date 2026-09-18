@@ -17,8 +17,11 @@ interface TicketActivityProps {
  * réellement changé.
  *
  * L'ouverture de PR pousse la branche d'abord — GitHub refuse une `head`
- * qu'il ne connaît pas. **Aucun merge** : c'est le seul point où un humain
- * tranche.
+ * qu'il ne connaît pas.
+ *
+ * Le merge, lui, dépend de ce que le projet déclare (ticket-082). Par défaut
+ * il reste manuel : sur le dépôt d'un client, c'est le seul point où un humain
+ * tranche, et c'est ce qui rend acceptable tout le reste de l'automatisation.
  */
 export default function TicketActivity({
   projectId,
@@ -43,6 +46,20 @@ export default function TicketActivity({
   }, [projectId, ticketId]);
 
   useEffect(refresh, [refresh]);
+
+  async function mergePr() {
+    if (!projectId || !ticketId) return;
+    setBusy(true);
+    setErrorMessage(null);
+    try {
+      await api.tickets.mergePr(projectId, ticketId);
+      refresh();
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function openPr() {
     if (!projectId || !ticketId || !branch) return;
@@ -95,7 +112,19 @@ export default function TicketActivity({
 
       <div className="mt-2">
         {activity.pr_number ? (
-          <p className="text-green-400">PR #{activity.pr_number} ouverte</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-green-400">PR #{activity.pr_number} ouverte</p>
+            {activity.autonomy === "merge" && (
+              <button
+                type="button"
+                onClick={() => void mergePr()}
+                disabled={busy}
+                className="rounded bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
+              >
+                {busy ? "…" : "Merger si la CI est verte"}
+              </button>
+            )}
+          </div>
         ) : (
           <>
             {/* Le bouton poussait la branche **puis** appelait l'API GitHub :
@@ -126,10 +155,18 @@ export default function TicketActivity({
             )}
           </>
         )}
-        <p className="mt-1 text-zinc-600">
-          Le merge reste manuel — c'est la seule décision qui n'est pas
-          automatisée.
-        </p>
+        {activity.autonomy === "merge" ? (
+          <p className="mt-1 text-zinc-600">
+            Ce projet déclare `autonomy: merge` : l'IDE peut merger lui-même,
+            mais seulement sur une CI verte.
+          </p>
+        ) : (
+          <p className="mt-1 text-zinc-600">
+            Le merge reste manuel — c'est la seule décision qui n'est pas
+            automatisée. Un projet peut en décider autrement dans son
+            agents.json.
+          </p>
+        )}
       </div>
 
       {errorMessage && (

@@ -1,4 +1,5 @@
 """Agent de workflow GitHub — ticket-064."""
+import json
 from pathlib import Path
 
 import pytest
@@ -24,14 +25,42 @@ class _FakeGit:
         return "diff --git a/x.py b/x.py\n+x = 1\n"
 
 
+class _FakeStatut:
+    def __init__(self, ci_status: str) -> None:
+        self.ci_status = ci_status
+
+
 class _FakeGitHub:
-    def __init__(self, pr: tuple[int, str] = (7, "https://github.com/o/r/pull/7")) -> None:
+    def __init__(
+        self,
+        pr: tuple[int, str] = (7, "https://github.com/o/r/pull/7"),
+        ci_status: str = "passing",
+    ) -> None:
         self.pr = pr
         self.created: list[dict[str, object]] = []
+        self.merged: list[int] = []
+        self._ci_status = ci_status
 
     async def create_pull_request(self, **kwargs: object) -> tuple[int, str]:
         self.created.append(kwargs)
         return self.pr
+
+    async def get_pull_request_status(self, pr_number: int) -> _FakeStatut:
+        return _FakeStatut(self._ci_status)
+
+    async def merge_pull_request(self, pr_number: int) -> None:
+        self.merged.append(pr_number)
+
+
+def _projet(tmp_path: Path, niveau: str | None) -> Path:
+    """Un dossier de projet qui declare (ou non) son niveau d'autonomie."""
+    racine = tmp_path / (niveau or "sans-declaration")
+    racine.mkdir(parents=True, exist_ok=True)
+    if niveau is not None:
+        (racine / "agents.json").write_text(
+            json.dumps({"autonomy": niveau}), encoding="utf-8"
+        )
+    return racine
 
 
 def _ticket_body() -> str:
@@ -122,26 +151,160 @@ async def test_sans_github_configure_l_ouverture_est_refusee() -> None:
 # ------------------------------------------------------------------
 
 
-def test_le_service_n_expose_aucun_merge() -> None:
-    # Merger, c'est décider qu'un travail est bon. C'est le seul point où un
-    # humain tranche, et c'est ce qui rend le reste de l'automatisation
-    # acceptable.
-    public = [n for n in dir(GitHubWorkflowService) if not n.startswith("_")]
+def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
+    """Le merge existe, mais aucun chemin n'y mène sans les deux conditions.
 
-    assert not any("merge" in n.lower() for n in public), public
-
-
-def test_aucun_appel_de_merge_dans_le_code() -> None:
+    ADR-022 ne tombe pas : elle devient conditionnelle (ADR-029). Le verrou
+    n'est plus « aucun merge dans le code » mais « aucun merge qui ne passe
+    pas par `peut_merger` », c'est-à-dire par une déclaration du projet **et**
+    une CI verte.
+    """
     import inspect
 
     from vibe_ide.services import github_workflow
 
-    source = inspect.getsource(github_workflow).lower()
-    # Les mentions en commentaire sont attendues ; les appels ne le sont pas.
-    code_lines = [
-        line for line in source.splitlines()
-        if line.strip() and not line.strip().startswith("#")
+    source = inspect.getsource(github_workflow)
+    lignes = [
+        l for l in source.splitlines()
+        if l.strip() and not l.strip().lstrip("#").strip().startswith(("#",))
+        and not l.strip().startswith("#")
     ]
-    for line in code_lines:
-        assert "merge(" not in line, line
-        assert '"merge"' not in line, line
+    appels = [l for l in lignes if "merge_pull_request" in l and "def " not in l]
+
+    assert appels, "le merge doit exister pour être testable"
+    for ligne in appels:
+        assert "peut_merger" in source, "le merge doit être gardé par peut_merger"
+
+
+def test_un_projet_sans_declaration_ne_merge_jamais(tmp_path: Path) -> None:
+    from vibe_ide.services.autonomie import peut_merger
+
+    projet = tmp_path / "sans-declaration"
+    projet.mkdir()
+
+    assert peut_merger(projet, ci_status="passing") is False
+
+
+# ------------------------------------------------------------------
+# Jusqu'où le service va, projet par projet — ticket-082
+# ------------------------------------------------------------------
+
+
+async def test_un_projet_en_commit_refuse_de_pousser(tmp_path: Path) -> None:
+    # Le cas des depots clients : l'utilisateur pousse lui-meme, parce que les
+    # acces sont souvent specifiques. Un push parti tout seul n'est pas une
+    # commodite, c'est une decision prise a sa place.
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "commit"),
+    )
+
+    with pytest.raises(WorkflowError) as exc:
+        await svc.open_pull_request(
+            branch="b", ticket_id="ticket-042", ticket_title="T", ticket_body=""
+        )
+
+    assert git.pushed == []
+    assert github.created == []
+    assert "autonomy" in str(exc.value)
+
+
+async def test_le_meme_projet_pousse_quand_l_humain_le_demande(
+    tmp_path: Path,
+) -> None:
+    # Le reglage borne ce que l'IDE fait seul, pas ce que l'utilisateur peut
+    # demander. Le bouton de l'IDE **est** sa decision.
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "commit"),
+    )
+
+    await svc.open_pull_request(
+        branch="b",
+        ticket_id="ticket-042",
+        ticket_title="T",
+        ticket_body="",
+        autonome=False,
+    )
+
+    assert git.pushed == ["b"]
+
+
+async def test_un_projet_en_pr_pousse_et_ouvre(tmp_path: Path) -> None:
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    result = await svc.open_pull_request(
+        branch="b", ticket_id="ticket-042", ticket_title="T", ticket_body=""
+    )
+
+    assert git.pushed == ["b"]
+    assert result.pr_number == 7
+
+
+async def test_le_merge_attend_une_ci_verte(tmp_path: Path) -> None:
+    # Merger sur une CI rouge casserait la base de tous les tickets suivants,
+    # et l'IDE perdrait le seul fait objectif sur lequel il s'appuie.
+    github = _FakeGitHub(ci_status="failing")
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "merge"),
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is False
+    assert github.merged == []
+
+
+async def test_le_merge_a_lieu_quand_les_deux_conditions_tiennent(
+    tmp_path: Path,
+) -> None:
+    github = _FakeGitHub(ci_status="passing")
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "merge"),
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert github.merged == [7]
+
+
+async def test_un_projet_en_pr_ne_merge_pas_meme_avec_une_ci_verte(
+    tmp_path: Path,
+) -> None:
+    github = _FakeGitHub(ci_status="passing")
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is False
+    assert github.merged == []
+
+
+async def test_sans_projet_declare_rien_ne_merge(tmp_path: Path) -> None:
+    # `project_path=None` est le cas des appels historiques : ils gardent le
+    # comportement d'ADR-022, jamais de merge.
+    github = _FakeGitHub(ci_status="passing")
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(), github=github, base_branch="develop"
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is False
+    assert github.merged == []
