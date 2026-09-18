@@ -5,6 +5,23 @@ description: Use when about to claim work is done, fixed, passing or ready to me
 
 # Vérifier avant d'affirmer
 
+## Une seule commande
+
+```powershell
+.\scripts\vibe.ps1 verify      # Windows
+make verify                      # ailleurs
+```
+
+Elle enchaîne exactement ce que la CI vérifie, dans le même ordre, et s'arrête
+à la première étape rouge.
+
+**C'est plus sûr que la CI ne l'était.** Jusqu'à ticket-095, elle lançait
+`npx tsc --noEmit` — qui ne vérifiait **aucun** fichier — et `mypy || true`,
+qui avalait ses erreurs. Deux des quatre contrôles étaient du théâtre.
+
+Seul `cargo check` reste hors de portée en local sans Rust installé. Il ne
+tourne en CI que si `frontend/src-tauri/` a changé.
+
 **Une affirmation de complétude sans sortie de commande est une supposition.**
 
 « Les tests passent », « c'est corrigé », « la CI est verte » se prouvent. Une

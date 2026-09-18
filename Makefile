@@ -12,6 +12,7 @@ help:
 	@echo "  make run-windows  — Idem, mais adapté à Windows (make run utilise trap/wait POSIX)"
 	@echo "  make stop         — Arrête backend et frontend, worker --reload orphelin compris"
 	@echo "  make dev          — Lance uniquement le serveur FastAPI en mode reload (port 8000)"
+	@echo "  make verify       — Tout ce que la CI vérifie, en local (à faire avant de merger)"
 	@echo "  make dev-frontend — Lance uniquement Vite en mode dev (port 5173)"
 	@echo "  make tauri-dev    — Lance l'app Tauri (desktop) — nécessite 'make dev' dans un autre terminal"
 	@echo "  make tauri-build  — Bundle de production Tauri (backend auto-démarré par l'app)"
@@ -80,6 +81,19 @@ tauri-dev:
 tauri-build:
 	@echo "→ Build production Tauri"
 	cd frontend && npm run tauri-build
+
+verify:
+	@echo "→ 1/4 Backend — pytest"
+	cd backend && uv run pytest -q -m "not integration"
+	@echo "→ 2/4 Backend — mypy"
+	cd backend && uv run mypy src/
+	@echo "→ 3/4 Frontend — typecheck + vitest"
+	cd frontend && npm run typecheck && npm run test -- --run
+	@echo "→ 4/4 E2E — playwright"
+	cd frontend && npm run test:e2e
+	@echo ""
+	@echo "Vert. Reste hors de portée ici : cargo check (Rust absent de ce poste)."
+	@echo "Il ne tourne en CI que si frontend/src-tauri/ a changé."
 
 test:
 	cd backend && uv run pytest -v

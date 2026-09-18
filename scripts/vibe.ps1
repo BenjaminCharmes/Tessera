@@ -17,7 +17,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint')]
+    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify')]
     [string]$Task = 'help'
 )
 
@@ -121,6 +121,33 @@ switch ($Task) {
     'test' {
         Push-Location (Join-Path $Root 'backend')
         try { & uv run pytest -q } finally { Pop-Location }
+    }
+    'verify' {
+        # Les memes verifications que la CI, dans le meme ordre. Utile quand
+        # les minutes GitHub Actions sont epuisees, et de toute facon plus
+        # sur : la CI lancait `npx tsc --noEmit`, qui ne verifiait aucun
+        # fichier, et `mypy || true`, qui avalait ses erreurs (ticket-095).
+        $etapes = @(
+            @{ Titre = '1/4 Backend - pytest';   Dossier = 'backend';  Commande = { & uv run pytest -q -m 'not integration' } },
+            @{ Titre = '2/4 Backend - mypy';     Dossier = 'backend';  Commande = { & uv run mypy src/ } },
+            @{ Titre = '3/4 Frontend - types';   Dossier = 'frontend'; Commande = { & npm run typecheck; if ($LASTEXITCODE -eq 0) { & npm run test -- --run } } },
+            @{ Titre = '4/4 E2E - playwright';   Dossier = 'frontend'; Commande = { & npm run test:e2e } }
+        )
+        foreach ($etape in $etapes) {
+            Write-Host ''
+            Write-Host "-> $($etape.Titre)"
+            Push-Location (Join-Path $Root $etape.Dossier)
+            try { & $etape.Commande } finally { Pop-Location }
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host ''
+                Write-Host "ECHEC : $($etape.Titre)" -ForegroundColor Red
+                exit 1
+            }
+        }
+        Write-Host ''
+        Write-Host 'Vert.' -ForegroundColor Green
+        Write-Host 'Hors de portee ici : cargo check (Rust absent de ce poste).'
+        Write-Host 'Il ne tourne en CI que si frontend/src-tauri/ a change.'
     }
     'lint' {
         Push-Location (Join-Path $Root 'backend')
