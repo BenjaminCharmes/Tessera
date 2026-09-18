@@ -6,6 +6,7 @@ from typing import Any
 
 from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketStatus
+from vibe_ide.services.adr import adr_pertinents
 from vibe_ide.services.agent_registry import AgentNotFoundError, AgentRegistryService
 from vibe_ide.services.cost_calculator import calculate_cost
 from vibe_ide.services.database import save_agent_call
@@ -176,7 +177,7 @@ class AgentRunner:
     def _build_user_prompt(self, ticket: Ticket, role: str, project_context: str) -> str:
         instruction = _INSTRUCTIONS.get(role, "Traite le ticket assigné.")
         return (
-            f"## Contexte projet\n{project_context}\n\n"
+            f"## Contexte projet\n{adr_pertinents(project_context, role)}\n\n"
             f"## Ticket assigné\n{ticket.body}\n\n"
             f"## Ta mission\n{instruction}"
         )

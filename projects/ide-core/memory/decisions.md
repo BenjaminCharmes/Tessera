@@ -17,6 +17,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-002 — Pas de framework agent externe
 
 **Date** : 2025-06  
+**Portée** : architect  
 **Décision** : On implémente notre propre agent loop (pas LangChain, CrewAI, etc.)  
 **Raison** : Ces frameworks changent d'API tous les 6 mois. On veut contrôler le protocole de communication entre agents (JSON-RPC), la gestion des tickets, et la mémoire.  
 **Alternative rejetée** : LangGraph (trop couplé à l'écosystème LangChain).
@@ -35,6 +36,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-004 — Tauri plutôt qu'Electron
 
 **Date** : 2025-06  
+**Portée** : architect  
 **Décision** : Shell desktop en Tauri v2  
 **Raison** : Bundle 10x plus léger, accès filesystem natif sécurisé, Rust pour les parties critiques. Microsoft lui-même cherche à sortir d'Electron sur VS Code.  
 **Alternative rejetée** : Electron (trop lourd), app web pure (pas d'accès filesystem).
@@ -44,6 +46,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-005 — uv comme gestionnaire Python
 
 **Date** : 2025-06  
+**Portée** : architect  
 **Décision** : `uv` pour toute la gestion des dépendances Python  
 **Raison** : 10-100x plus rapide que pip, résolution de dépendances déterministe, remplace pip + venv + poetry en un seul outil.  
 **Alternative rejetée** : Poetry (lent), pip (pas de lock file natif).
@@ -53,6 +56,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-006 — ProjectLoader filtre sur CLAUDE.md
 
 **Date** : 2026-06  
+**Portée** : architect, codeur, reviewer  
 **Décision** : `ProjectLoader.list_projects()` ne liste que les dossiers contenant un `CLAUDE.md`, tandis que `list_projects()` (module-level) liste tous les dossiers.  
 **Raison** : L'orchestrateur ne doit travailler que sur des projets structurés. La fonction module-level reste disponible comme utilitaire bas niveau pour les tests et scripts.  
 **Alternative rejetée** : Filtrer aussi dans la fonction module-level (casserait les tests existants sans apport réel).
@@ -62,6 +66,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-007 — Modèle de projet : `name` parsé depuis le H1 du CLAUDE.md
 
 **Date** : 2026-06  
+**Portée** : architect, codeur, reviewer  
 **Décision** : Le champ `name` d'un `Project` est extrait de la première ligne `# Titre` du CLAUDE.md, avec fallback sur le nom du dossier.  
 **Raison** : Le nom du dossier est un identifiant technique (`ide-core`) ; le titre H1 est le nom lisible (`CLAUDE.md — projet ide-core`). Les deux coexistent.  
 **Alternative rejetée** : Utiliser uniquement le nom du dossier comme `name` (perd l'intention du CLAUDE.md).
@@ -71,6 +76,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-008 — Orchestrateur sans état interne (stateless)
 
 **Date** : 2026-06  
+**Portée** : architect, codeur, reviewer  
 **Décision** : `Orchestrator` est instancié à chaque requête HTTP (pas de singleton). Il reçoit `AgentRunner`, `TicketService` et `project_context` en injection de dépendances.  
 **Raison** : Deux pipelines sur des projets différents peuvent tourner en parallèle sans partage d'état. La concurrence est naturelle car `asyncio` + instances séparées = zéro lock à gérer.  
 **Alternative rejetée** : Singleton avec un dictionnaire de verrous par ticket — trop complexe pour la v0.
@@ -80,6 +86,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-009 — Verdict reviewer parsé par mot-clé structuré
 
 **Date** : 2026-06  
+**Portée** : architect, codeur, reviewer  
 **Décision** : L'orchestrateur parse la sortie du reviewer en cherchant `CHANGES_REQUESTED` (prioritaire) puis `APPROVED`. Absence des deux = rejet.  
 **Raison** : Le reviewer est prompté pour répondre dans ce format. La priorité de `CHANGES_REQUESTED` évite les faux positifs si les deux mots apparaissent ("sinon APPROVED").  
 **Alternative rejetée** : Parser un JSON structuré — trop contraignant pour un LLM qui génère aussi du texte libre.
@@ -89,6 +96,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-010 — github-sync intégré dans POST /agents/run (pas d'endpoint dédié)
 
 **Date** : 2026-06  
+**Portée** : architect, codeur, reviewer  
 **Décision** : `role: github-sync` est géré dans `POST /api/v1/agents/run` avec court-circuit avant le lookup ticket. Retourne un `AgentResult` synthétique.  
 **Raison** : Cohérence du contrat API — un seul endpoint pour tous les rôles. `AgentResult.created_tickets` porte déjà le payload utile. `ticket_id` est rendu optionnel (default `""`) pour accommoder les rôles sans ticket cible.  
 **Alternative rejetée** : Endpoint dédié `/agents/github-sync` — fragmentation de l'API sans bénéfice pour la v0.
@@ -98,6 +106,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-012 — Monaco bundlé localement (pas CDN)
 
 **Date** : 2026-06-20
+**Portée** : architect, codeur  
 **Décision** : Monaco Editor chargé depuis le package npm `monaco-editor`, bundlé via Vite. Pas de CDN jsdelivr.
 **Raison** : Les builds Tauri packagés n'ont pas d'accès internet (app distribuée offline). Le CDN fonctionnerait en dev mais casserait en production desktop.
 **Alternative rejetée** : CDN uniquement (acceptable en web, inutilisable en desktop packagé).
@@ -107,6 +116,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-013 — Hooks React sans gestionnaire d'état global
 
 **Date** : 2026-06-20
+**Portée** : architect, codeur, reviewer  
 **Décision** : Pas de Zustand/Jotai pour la v0. L'état partagé (projet actif, ticket actif) tient dans `useActiveProject`. Les autres hooks sont autonomes.
 **Raison** : Le graphe d'état de la v0 est simple — 2 entités partagées. Ajouter un store serait du surengineering prématuré.
 **Alternative rejetée** : Zustand (à réévaluer si on dépasse 5 états globaux partagés entre composants non-parents).
@@ -116,6 +126,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-014 — Vitest + React Testing Library pour les tests frontend
 
 **Date** : 2026-06-20
+**Portée** : architect, codeur, testeur  
 **Décision** : Vitest pour l'exécution + RTL pour les assertions composants.
 **Raison** : Vitest partage la config Vite (transforms, aliases, ESM) sans configuration séparée. RTL encourage les tests par comportement utilisateur, pas par implémentation.
 **Alternative rejetée** : Jest (configuration babel séparée, pas d'ESM natif, overhead de setup).
@@ -125,6 +136,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-015 — CI : 3 jobs parallèles GitHub Actions
 
 **Date** : 2026-06-20
+**Portée** : architect  
 **Décision** : `backend` (ubuntu, pytest), `frontend` (ubuntu, tsc+vitest), `tauri` (macos, cargo check) en parallèle.
 **Raison** : Séparation des responsabilités + exécution parallèle = feedback rapide. `macos-latest` pour Tauri (headers WKWebView disponibles). `cargo check` et non `cargo build` pour éviter 10+ min de compilation complète.
 **Alternative rejetée** : Job unique séquentiel (lent), `cargo build` complet en CI (coûteux).
@@ -134,6 +146,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-016 — Scope filesystem Tauri : $HOME pour la v0
 
 **Date** : 2026-06-20
+**Portée** : architect  
 **Décision** : Le plugin `tauri-plugin-fs` a accès à `$HOME/**` en v0.
 **Raison** : Les projets vibe-ide seront dans `~/` (dossier utilisateur). Scope plus restrictif nécessiterait de connaître le chemin exact au build time.
 **Alternative rejetée** : Scope filesystem complet `/` (trop large, rejeté par App Store), scope fixe `~/vibe-ide-workspace/` (impose un emplacement).
@@ -143,6 +156,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-011 — httpx natif plutôt que PyGitHub pour l'API GitHub
 
 **Date** : 2026-06  
+**Portée** : architect  
 **Décision** : `GitHubService` utilise `httpx` async directement (déjà dépendance du projet).  
 **Raison** : PyGitHub est synchrone et ajoute une abstraction lourde. On n'utilise que 3 endpoints (list issues, add label, remove label). httpx + respx donne des mocks propres en tests.  
 **Alternative rejetée** : PyGitHub (blocking I/O), gidgethub (trop orienté webhooks).
@@ -244,6 +258,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-026 — Cinq familles de couleurs, une par rôle
 
 **Date** : 2026-09-17
+**Portée** : codeur, reviewer  
 **Décision** : Les bandes d'en-tête partagent une hauteur unique. Les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** — titre de région, élément actif, nom du projet. Tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
 **Raison** : l'UI avait dérivé vers huit familles, trois tailles en dur et des glyphes de jeux différents. Personne n'avait choisi huit couleurs : chaque ticket prenait la sienne, et sans mesure la dérive ne se voit qu'une fois qu'elle saute aux yeux.
 **Conséquence** : l'accent d'identité est une **barre**, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus. Une priorité moyenne ou basse n'est pas une alerte : elle descend en neutre et se distingue par l'intensité.
@@ -297,3 +312,13 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Six dépôts clients voisins dans `projects/`, et un codeur qui se trompe de dossier écrit chez un autre client — exactement la fuite qu'ADR-021 et ADR-023 cherchent à empêcher, par l'autre bout. Lire ne laisse rien dans le dépôt de personne ; écrire, si.
 **Forme** : celle d'ADR-027. Un hook, parce qu'une entrée d'`allowed_tools` couvrant `Write` l'auto-approuve *avant* tout callback de permission ; au niveau du SDK, parce qu'une consigne de prompt décrit une intention quand un refus produit un fait.
 **Limite assumée** : `Bash` n'est pas couvert — une redirection shell y échappe. La traquer demanderait d'analyser toutes les formes d'écriture d'une ligne de shell, l'arms race que `git_guard` refuse déjà.
+
+---
+
+## ADR-032 — Un ADR déclare qui il contraint
+
+**Date** : 2026-09-18
+**Décision** : Un ADR peut porter `**Portée** : rôle, rôle` ; `services/adr.py` réduit alors la section « Décisions récentes » du prompt aux ADR qui concernent le rôle appelé. **Sans portée, l'ADR part à tous.** Elle ne s'écrit que sur un ADR qui enregistre un choix passé, jamais sur une contrainte de comportement — un test le verrouille.
+**Raison** : le fichier part dans chaque appel d'agent, jusqu'à dix-huit par ticket, et grossit à chaque décision. Le coût compte, la dilution davantage : un codeur recevait la palette de couleurs et le choix du gestionnaire de paquets Python au milieu des règles qu'il doit tenir.
+**Ce qui rend la règle sûre** : un agent que l'utilisateur vient de créer n'est nommé nulle part, et reçoit malgré tout tout le tronc commun — donc toutes les contraintes.
+**Alternative rejetée** : rogner les ADR au budget (gain ponctuel, la dérive revient) ; déduire la pertinence par mots-clés — une contrainte ratée serait silencieuse.
