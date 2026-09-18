@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 
 from vibe_ide.models.agent import AgentRole
 from vibe_ide.models.ticket import TicketStatus
+from vibe_ide.services.livraison import Livraison
 
 
 class EventType(str, Enum):
@@ -32,6 +33,8 @@ class EventType(str, Enum):
     COMMIT_CREATED = "commit_created"
     QUOTA_UPDATED = "quota_updated"
     QUEUE_PROGRESS = "queue_progress"
+    #: Ce que la livraison a fait du commit du run (ticket-083).
+    LIVRAISON_DONE = "livraison_done"
 
 
 class OrchestratorEvent(BaseModel):
@@ -49,6 +52,9 @@ class PipelineResult(BaseModel):
     approved: bool
     branch: str | None = None
     commit_sha: str | None = None
+    #: Ce que la livraison a fait du commit, et où elle s'est arrêtée
+    #: (ticket-083). `None` quand aucune livraison n'a été tentée.
+    livraison: Livraison | None = None
 
 
 EventCallback = Callable[[OrchestratorEvent], Awaitable[None]]

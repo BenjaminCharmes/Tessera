@@ -411,3 +411,57 @@ async def test_un_projet_sans_depot_propre_ne_touche_pas_au_depot_parent(
 
     with pytest.raises(NotAGitRepository):
         await svc.create_branch("ticket-001", "essai")
+
+
+# ------------------------------------------------------------------
+# Rejouer la branche sur une base qui a bougé — ticket-083
+# ------------------------------------------------------------------
+
+
+async def test_le_rebase_rejoue_la_branche_sur_la_base(repo: Path) -> None:
+    # Sans cela, la PR part sur une base périmée : GitHub la déclare non
+    # mergeable, et l'attente de CI tourne pour rien.
+    service = GitWorkspaceService(repo)
+    base = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    branche = await service.create_branch("ticket-001", "ma-feature")
+    (repo / "feature.py").write_text("x = 1\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-001 — feature")
+
+    await _git(repo, "checkout", "-q", base)
+    (repo / "autre.py").write_text("y = 2\n", encoding="utf-8")
+    await _git(repo, "add", "autre.py")
+    await _git(repo, "commit", "-q", "-m", "chore: autre")
+    await _git(repo, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base)
+
+    assert conflits == ()
+    assert (repo / "autre.py").exists()
+    assert (repo / "feature.py").exists()
+
+
+async def test_un_conflit_est_nomme_et_la_branche_reste_intacte(repo: Path) -> None:
+    # Un rebase laissé à mi-chemin bloque tout ce qui suit : le ticket suivant
+    # démarre sur un arbre en conflit, et l'utilisateur hérite d'un dépôt dans
+    # un état qu'il n'a pas choisi.
+    service = GitWorkspaceService(repo)
+    base = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    branche = await service.create_branch("ticket-001", "ma-feature")
+    (repo / "partage.py").write_text("version = 'branche'\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-001 — feature")
+
+    await _git(repo, "checkout", "-q", base)
+    (repo / "partage.py").write_text("version = 'base'\n", encoding="utf-8")
+    await _git(repo, "add", "partage.py")
+    await _git(repo, "commit", "-q", "-m", "chore: base")
+    await _git(repo, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base)
+
+    assert "partage.py" in conflits
+    assert await service.is_clean()
+    contenu = (repo / "partage.py").read_text(encoding="utf-8")
+    assert "<<<<<<<" not in contenu
+    assert contenu == "version = 'branche'\n"

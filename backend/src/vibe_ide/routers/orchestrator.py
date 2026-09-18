@@ -11,6 +11,9 @@ from vibe_ide.services.pipeline_events import EventType
 from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.doc_updater import DocUpdaterService
 from vibe_ide.services.git_workspace import GitWorkspaceService
+from vibe_ide.services.github_service import GitHubService
+from vibe_ide.services.github_workflow import GitHubWorkflowService
+from vibe_ide.services.livraison import Livraison, LivraisonService
 from vibe_ide.services.providers import get_provider
 from vibe_ide.services.security_auditor import SecurityAuditorService
 from vibe_ide.services.test_runner import TestRunnerService
@@ -20,8 +23,16 @@ from vibe_ide.services.orchestrator import (
     OrchestratorEvent,
     PipelineResult,
 )
-from vibe_ide.services.project_loader import ProjectLoader, load_agents_config, load_pipeline_config
+from vibe_ide.services.project_loader import (
+    ProjectLoader,
+    load_agents_config,
+    load_pipeline_config,
+    load_project,
+)
 from vibe_ide.services.ticket_service import TicketService
+from vibe_ide.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
 
@@ -158,6 +169,47 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     )
 
 
+async def _livrer(project_id: str, result: PipelineResult) -> PipelineResult:
+    """Porte le travail du run aussi loin que le projet le déclare (ticket-083).
+
+    Une livraison qui échoue ne fait **pas** échouer le run : le travail est
+    commité, et perdre la réponse du pipeline parce que GitHub est injoignable
+    ferait croire que c'est le pipeline qui a échoué. Le motif remonte dans
+    `livraison.arret`, là où l'utilisateur le lira.
+    """
+    project_path = settings.ide_workspace_dir / project_id
+    project = load_project(project_path)
+    github = None
+    if project.github_remote and settings.github_token:
+        github = GitHubService(token=settings.github_token, repo=project.github_remote)
+
+    service = LivraisonService(
+        git_workspace=GitWorkspaceService(project_path),
+        workflow=GitHubWorkflowService(
+            git_workspace=GitWorkspaceService(project_path),
+            github=github,
+            base_branch=settings.github_base_branch,
+            project_path=project_path,
+        ),
+        project_path=project_path,
+        base_branch=settings.github_base_branch,
+    )
+
+    try:
+        livraison = await service.livrer(
+            ticket_id=result.ticket_id,
+            ticket_title=result.ticket_id,
+            ticket_body="",
+            branch=result.branch,
+            approuve=result.approved,
+        )
+    except Exception as exc:  # noqa: BLE001 — voir la docstring
+        _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
+        livraison = Livraison(arret=f"Livraison interrompue : {exc}")
+
+    return result.model_copy(update={"livraison": livraison})
+
+
 @router.post("/run", response_model=PipelineResult)
 async def run_pipeline(request: RunRequest) -> PipelineResult:
     orchestrator = await _build_orchestrator(request.project_id)
@@ -187,7 +239,7 @@ async def run_pipeline(request: RunRequest) -> PipelineResult:
         result.approved,
         result.final_status.value,
     )
-    return result
+    return await _livrer(request.project_id, result)
 
 
 @router.post("/run-autonomous", response_model=list[PipelineResult])
@@ -332,6 +384,17 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
                 result.approved if result else False,
                 result.final_status.value if result else "interrupted",
             )
+
+            if result is not None:
+                result = await _livrer(project_id, result)
+                if result.livraison is not None:
+                    await send_event(
+                        OrchestratorEvent(
+                            type=EventType.LIVRAISON_DONE,
+                            ticket_id=ticket_id,
+                            data=result.livraison.__dict__,
+                        )
+                    )
 
             if echec is not None:
                 await websocket.send_json({"error": echec})

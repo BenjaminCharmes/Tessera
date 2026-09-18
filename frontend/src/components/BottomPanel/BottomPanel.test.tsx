@@ -117,3 +117,42 @@ describe("BottomPanel", () => {
     expect(screen.getByText(/\?.*démarré.*tour \?/)).toBeTruthy();
   });
 });
+
+describe("BottomPanel — la livraison (ticket-083)", () => {
+  it("dit jusqu'où le travail est allé", () => {
+    const ev = makeEvent(
+      "livraison_done",
+      { etapes: ["rebase sur develop", "PR #7 ouverte"], pr_number: 7, merged: true },
+      { ticket_id: "ticket-001" },
+    );
+    render(<BottomPanel events={[ev]} />);
+    expect(screen.getByText(/PR #7 mergée/)).toBeTruthy();
+  });
+
+  it("dit pourquoi il s'est arrêté là", () => {
+    // Un arrêt silencieux se lit comme une panne. La raison est la moitié
+    // utile de l'information.
+    const ev = makeEvent(
+      "livraison_done",
+      {
+        etapes: [],
+        merged: false,
+        arret: "Conflit avec develop sur : src/app.py",
+        conflits: ["src/app.py"],
+      },
+      { ticket_id: "ticket-001" },
+    );
+    render(<BottomPanel events={[ev]} />);
+    expect(screen.getByText(/Conflit avec develop sur : src\/app\.py/)).toBeTruthy();
+  });
+
+  it("annonce une PR ouverte sans merge", () => {
+    const ev = makeEvent(
+      "livraison_done",
+      { etapes: [], pr_number: 12, merged: false },
+      { ticket_id: "ticket-001" },
+    );
+    render(<BottomPanel events={[ev]} />);
+    expect(screen.getByText(/PR #12 ouverte/)).toBeTruthy();
+  });
+});

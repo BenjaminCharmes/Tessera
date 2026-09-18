@@ -43,6 +43,22 @@ function formatTime(iso: string): string {
   });
 }
 
+/**
+ * Ce que la livraison a fait du commit, en une ligne (ticket-083).
+ *
+ * L'arrêt compte autant que la réussite : un run qui s'arrête sans le dire se
+ * lit comme une panne, alors que la plupart des arrêts sont le comportement
+ * voulu — le projet n'a simplement pas déclaré d'aller plus loin.
+ */
+function livraisonLisible(ev: OrchestratorEvent): string {
+  const pr = ev.data["pr_number"];
+  const arret = ev.data["arret"];
+  if (ev.data["merged"]) return `PR #${String(pr)} mergée`;
+  if (arret) return String(arret);
+  if (pr) return `PR #${String(pr)} ouverte`;
+  return "Livraison terminée";
+}
+
 function eventToLine(ev: OrchestratorEvent): string | null {
   const t = formatTime(ev.timestamp);
   switch (ev.type) {
@@ -54,6 +70,8 @@ function eventToLine(ev: OrchestratorEvent): string | null {
       return `[${t}] ${ev.agent ?? "?"} terminé`;
     case "pipeline_done":
       return `[${t}] Pipeline terminé — ${ev.data["approved"] ? "APPROVED" : "CHANGES_REQUESTED"} : ${String(ev.data["final_status"] ?? "")}`;
+    case "livraison_done":
+      return `[${t}] ${livraisonLisible(ev)}`;
     case "error":
       return `[${t}] Erreur : ${raisonLisible(ev)}`;
     default:

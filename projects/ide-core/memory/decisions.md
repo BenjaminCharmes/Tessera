@@ -277,3 +277,13 @@ Format : ADR léger (Architecture Decision Record).
 **Décision** : ADR-022 devient conditionnelle. `agents.json` porte un champ `autonomy` : `commit` (défaut — le travail reste sur sa branche), `pr` (pousse et ouvre la PR), `merge` (merge aussi, **si et seulement si** la CI est verte). Valeur absente ou inconnue : `commit`. Le niveau borne ce que l'IDE fait **seul** ; le même geste demandé depuis l'IDE reste la décision de l'utilisateur.
 **Raison** : le raisonnement d'ADR-022 — merger, c'est décider qu'un travail est bon — tient sur le dépôt d'un client, où les accès sont spécifiques et où l'utilisateur pousse lui-même. Il ne vaut pas sur un dépôt personnel doté d'une CI : y refuser le merge ne protège personne, ça ajoute un clic.
 **Alternative rejetée** : un réglage global (le bon niveau dépend du dépôt) ; merger sur une CI absente ou en cours — l'absence de signal n'est pas un signal favorable. Troisième usage du patron d'ADR-021 et ADR-028 : le défaut protège, l'exception s'énonce.
+
+---
+
+## ADR-030 — La livraison est une étape à part, et elle ne fait jamais échouer le run
+
+**Date** : 2026-09-18
+**Décision** : Après un run **approuvé**, `LivraisonService` enchaîne seul : rebase sur la base, PR, attente de CI bornée, merge — chaque maillon soumis au niveau d'ADR-029. Une exception y est capturée et rendue dans `Livraison.arret` ; le run garde son résultat.
+**Raison** : les maillons existaient tous, rien ne les enchaînait, et chaque étape demandait un clic. Mais le travail est déjà commité quand la livraison commence : faire échouer le run parce que GitHub est injoignable ferait croire que le pipeline a échoué. L'arrêt est une information, pas une panne — la plupart des arrêts sont le comportement voulu.
+**Invariants** : un run non approuvé ne se livre jamais (son commit porte du travail refusé, ADR-018) ; un conflit **annule** le rebase et nomme les fichiers, au lieu de laisser l'arbre à mi-chemin, ce qui bloquerait le ticket suivant ; l'attente de CI est bornée, pour la même raison.
+**Alternative rejetée** : résoudre les conflits automatiquement (choisir à la place de l'utilisateur, dans son dépôt) ; attendre la CI sans borne.

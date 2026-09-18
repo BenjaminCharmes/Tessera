@@ -334,3 +334,117 @@ async def _runs_ouverts() -> int:
         ) as cursor:
             row = await cursor.fetchone()
     return int(row[0]) if row else 0
+
+
+# ------------------------------------------------------------------
+# La livraison suit le run — ticket-083
+# ------------------------------------------------------------------
+
+
+def test_un_run_approuve_declenche_la_livraison(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Les maillons existaient tous ; rien ne les enchaînait, et chaque étape
+    # demandait un clic. C'est l'enchaînement qui manquait.
+    import json
+
+    from vibe_ide.services.livraison import Livraison
+
+    (workspace / "mon-projet" / "agents.json").write_text(
+        json.dumps({"autonomy": "merge"}), encoding="utf-8"
+    )
+
+    fake = _FakeOrchestrator()
+
+    async def _build(project_id: str) -> _FakeOrchestrator:
+        return fake
+
+    appels: list[dict[str, object]] = []
+
+    async def _livrer(self: object, **kwargs: object) -> Livraison:
+        appels.append(kwargs)
+        return Livraison(etapes=("PR #7 ouverte",), pr_number=7, merged=True)
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr(
+        "vibe_ide.services.livraison.LivraisonService.livrer", _livrer
+    )
+
+    body = _client().post(
+        "/api/v1/orchestrator/run",
+        json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
+    ).json()
+
+    assert len(appels) == 1
+    assert appels[0]["branch"] == "ticket-001-slug"
+    assert appels[0]["approuve"] is True
+    assert body["livraison"]["merged"] is True
+    assert body["livraison"]["pr_number"] == 7
+
+
+def test_une_livraison_qui_echoue_ne_fait_pas_echouer_le_run(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Le travail est commité : perdre la réponse du run parce que GitHub est
+    # injoignable ferait croire que le pipeline lui-même a échoué.
+    fake = _FakeOrchestrator()
+
+    async def _build(project_id: str) -> _FakeOrchestrator:
+        return fake
+
+    async def _livrer(self: object, **kwargs: object) -> object:
+        raise RuntimeError("GitHub injoignable")
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr(
+        "vibe_ide.services.livraison.LivraisonService.livrer", _livrer
+    )
+
+    resp = _client().post(
+        "/api/v1/orchestrator/run",
+        json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["approved"] is True
+    assert "injoignable" in resp.json()["livraison"]["arret"]
+
+
+def test_le_stream_annonce_la_livraison(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Sans événement, l'utilisateur voit le run se terminer et n'apprend nulle
+    # part que sa PR est partie — ni pourquoi elle ne l'est pas.
+    from vibe_ide.services.livraison import Livraison
+
+    fake = _FakeOrchestrator()
+
+    async def _build(project_id: str) -> _FakeOrchestrator:
+        return fake
+
+    async def _livrer(self: object, **kwargs: object) -> Livraison:
+        return Livraison(
+            etapes=("rebase sur develop", "PR #7 ouverte"), pr_number=7, merged=True
+        )
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr(
+        "vibe_ide.services.livraison.LivraisonService.livrer", _livrer
+    )
+
+    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
+        ws.send_json({"ticket_id": "ticket-001"})
+        types: list[str] = []
+        recu: dict[str, object] | None = None
+        for _ in range(12):
+            message = ws.receive_json()
+            if "type" not in message:
+                continue
+            types.append(str(message["type"]))
+            if message["type"] == "livraison_done":
+                recu = message
+                break
+
+    assert recu is not None, types
+    assert recu["data"]["pr_number"] == 7
+    assert recu["data"]["merged"] is True

@@ -165,6 +165,17 @@ class GitHubWorkflowService:
         return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
 
 
+    async def etat_ci(self, pr_number: int) -> str:
+        """L'état agrégé de la CI de la PR : passing, failing, pending, none.
+
+        Sans GitHub configuré, `none` : aucune CI n'est observable, et
+        l'absence de signal n'est pas un signal favorable.
+        """
+        if self._github is None:
+            return "none"
+        statut = await self._github.get_pull_request_status(pr_number)
+        return str(getattr(statut, "ci_status", "none"))
+
     async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool:
         """Merge la PR **si** le projet l'autorise et **si** la CI est verte.
 

@@ -198,6 +198,31 @@ class GitWorkspaceService:
         """
         await self._run("push", "--set-upstream", "origin", branch_name)
 
+    async def rejouer_sur(self, base: str) -> tuple[str, ...]:
+        """Rejoue la branche courante sur `base`. Rend les fichiers en conflit.
+
+        Une branche partie d'une base qui a depuis avance produit une PR que
+        GitHub declare non mergeable : attendre sa CI ne menerait nulle part.
+
+        Un conflit **annule** le rebase et laisse la branche exactement comme
+        elle etait. Un rebase laisse a mi-chemin bloquerait le ticket suivant,
+        et l'utilisateur heriterait d'un depot dans un etat qu'il n'a pas
+        choisi. Les fichiers en conflit sont nommes : c'est ce qu'il lui faut
+        pour trancher.
+        """
+        await self._ensure_own_repository()
+        try:
+            await self._run("rebase", base)
+        except GitCommandError:
+            conflits = await self._fichiers_en_conflit()
+            await self._run("rebase", "--abort")
+            return conflits
+        return ()
+
+    async def _fichiers_en_conflit(self) -> tuple[str, ...]:
+        sortie = await self._run("diff", "--name-only", "--diff-filter=U")
+        return tuple(ligne.strip() for ligne in sortie.splitlines() if ligne.strip())
+
     async def current_diff(self) -> str:
         """Return the diff of the working tree against HEAD, staged or not.
 
