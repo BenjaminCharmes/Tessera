@@ -308,3 +308,43 @@ async def test_sans_projet_declare_rien_ne_merge(tmp_path: Path) -> None:
 
     assert await svc.merge_si_la_ci_est_verte(7) is False
     assert github.merged == []
+
+
+# ------------------------------------------------------------------
+# Refermer l'issue d'où vient le ticket — ticket-084
+# ------------------------------------------------------------------
+
+
+def test_le_corps_de_pr_referme_l_issue_d_origine() -> None:
+    # Sans ce mot-clé, la boucle ne se referme pas : la PR est mergée et
+    # l'issue reste ouverte, à refermer à la main.
+    body = build_pr_body("ticket-042", "Endpoint de santé", _ticket_body(), issue=12)
+
+    assert "Closes #12" in body
+
+
+def test_sans_issue_le_corps_de_pr_ne_referme_rien() -> None:
+    body = build_pr_body("ticket-042", "Endpoint de santé", _ticket_body())
+
+    assert "Closes" not in body
+
+
+async def test_la_pr_referme_l_issue_du_ticket(tmp_path: Path) -> None:
+    from vibe_ide.services.sync_map import SyncEntry, SyncMapService
+
+    projet = _projet(tmp_path, "pr")
+    SyncMapService().save(projet, {"ticket-042": SyncEntry(issue=12)})
+
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+    )
+
+    await svc.open_pull_request(
+        branch="b", ticket_id="ticket-042", ticket_title="T", ticket_body=""
+    )
+
+    assert "Closes #12" in str(github.created[0]["body"])

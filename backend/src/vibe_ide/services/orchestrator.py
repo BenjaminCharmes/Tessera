@@ -7,12 +7,14 @@ hard to get right.
 """
 from datetime import datetime, timezone
 from pathlib import Path
+from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Optional
 
 from vibe_ide.models.agent import AgentConfig, AgentRole
 from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.dialogue import DialogueChannel
+from vibe_ide.services.livraison import Livraison
 from vibe_ide.services.pipeline_events import (
     EventCallback,
     EventType,
@@ -62,6 +64,7 @@ class Orchestrator:
         git_workspace: Optional["GitWorkspaceService"] = None,
         run_max_budget_usd: float = 0.0,
         quota_tracker: Optional["QuotaTracker"] = None,
+        livrer: Optional[Callable[[PipelineResult], Awaitable["Livraison"]]] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -81,6 +84,11 @@ class Orchestrator:
         # Le quota d'abonnement est la ressource réellement finie en mode
         # `agent_sdk` : la dépense estimée de ticket-052 ne la mesure pas.
         self._quota_tracker = quota_tracker
+        # Ce que devient le commit d'un run approuvé — poussé, mis en PR,
+        # mergé. L'orchestrateur ne sait pas ce que ça veut dire : il appelle,
+        # le routeur décide. C'est ce qui le garde ignorant de GitHub, et ce
+        # qui met la livraison sur **tous** les modes de run (ticket-084).
+        self._livrer = livrer
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -105,6 +113,37 @@ class Orchestrator:
         return next((c for c in self._agent_configs if c.role == role.value), None)
 
     async def run_pipeline(
+        self,
+        project_id: str,
+        ticket_id: str,
+        on_event: EventCallback,
+        run_id: str | None = None,
+        dialogue: DialogueChannel | None = None,
+    ) -> PipelineResult:
+        """Mène le ticket, puis livre son travail si le projet le permet.
+
+        La livraison est ici, et non chez l'appelant, parce que `run_queue` et
+        `run_autonomous` passent tous deux par cette méthode : la brancher
+        ailleurs la réserverait au run unique, alors que c'est en file que
+        l'absence de clic compte le plus.
+        """
+        resultat = await self._run_pipeline(
+            project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
+        )
+        if self._livrer is None or not resultat.approved:
+            return resultat
+
+        livraison = await self._livrer(resultat)
+        await on_event(
+            OrchestratorEvent(
+                type=EventType.LIVRAISON_DONE,
+                ticket_id=ticket_id,
+                data=livraison.__dict__,
+            )
+        )
+        return resultat.model_copy(update={"livraison": livraison})
+
+    async def _run_pipeline(
         self,
         project_id: str,
         ticket_id: str,

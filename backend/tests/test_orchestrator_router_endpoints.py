@@ -337,114 +337,119 @@ async def _runs_ouverts() -> int:
 
 
 # ------------------------------------------------------------------
-# La livraison suit le run — ticket-083
+# La livraison suit le run — ticket-083, ticket-084
 # ------------------------------------------------------------------
+#
+# Le routeur **fabrique** la livraison ; c'est l'orchestrateur qui l'appelle,
+# après chaque run approuvé et quel que soit le mode (voir
+# `test_orchestrator_livraison.py`). Ce qui se teste ici est donc la fabrique :
+# ce qu'elle passe au service, et ce qu'elle fait d'une panne.
 
 
-def test_un_run_approuve_declenche_la_livraison(
+def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # Les maillons existaient tous ; rien ne les enchaînait, et chaque étape
-    # demandait un clic. C'est l'enchaînement qui manquait.
-    import json
-
+    # Le corps de la PR se rédige depuis le ticket : passer son identifiant en
+    # guise de titre donnait une PR nommée « ticket-001 — ticket-001 ».
+    from vibe_ide.routers.orchestrator import _livreur
     from vibe_ide.services.livraison import Livraison
 
-    (workspace / "mon-projet" / "agents.json").write_text(
-        json.dumps({"autonomy": "merge"}), encoding="utf-8"
-    )
-
-    fake = _FakeOrchestrator()
-
-    async def _build(project_id: str) -> _FakeOrchestrator:
-        return fake
-
-    appels: list[dict[str, object]] = []
+    recu: dict[str, object] = {}
 
     async def _livrer(self: object, **kwargs: object) -> Livraison:
-        appels.append(kwargs)
-        return Livraison(etapes=("PR #7 ouverte",), pr_number=7, merged=True)
+        recu.update(kwargs)
+        return Livraison(pr_number=7)
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
-    monkeypatch.setattr(
-        "vibe_ide.services.livraison.LivraisonService.livrer", _livrer
-    )
+    monkeypatch.setattr("vibe_ide.services.livraison.LivraisonService.livrer", _livrer)
 
-    body = _client().post(
-        "/api/v1/orchestrator/run",
-        json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
-    ).json()
+    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
 
-    assert len(appels) == 1
-    assert appels[0]["branch"] == "ticket-001-slug"
-    assert appels[0]["approuve"] is True
-    assert body["livraison"]["merged"] is True
-    assert body["livraison"]["pr_number"] == 7
+    assert livraison.pr_number == 7
+    assert recu["ticket_title"] == "Un ticket"
+    assert recu["branch"] == "ticket-001-slug"
+    assert recu["approuve"] is True
 
 
-def test_une_livraison_qui_echoue_ne_fait_pas_echouer_le_run(
+def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     # Le travail est commité : perdre la réponse du run parce que GitHub est
     # injoignable ferait croire que le pipeline lui-même a échoué.
-    fake = _FakeOrchestrator()
-
-    async def _build(project_id: str) -> _FakeOrchestrator:
-        return fake
+    from vibe_ide.routers.orchestrator import _livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise RuntimeError("GitHub injoignable")
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
-    monkeypatch.setattr(
-        "vibe_ide.services.livraison.LivraisonService.livrer", _livrer
-    )
+    monkeypatch.setattr("vibe_ide.services.livraison.LivraisonService.livrer", _livrer)
 
-    resp = _client().post(
-        "/api/v1/orchestrator/run",
-        json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
-    )
+    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
 
-    assert resp.status_code == 200
-    assert resp.json()["approved"] is True
-    assert "injoignable" in resp.json()["livraison"]["arret"]
+    assert livraison.merged is False
+    assert "injoignable" in (livraison.arret or "")
 
 
-def test_le_stream_annonce_la_livraison(
+def test_un_run_autonome_peut_partir_des_issues_github(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # Sans événement, l'utilisateur voit le run se terminer et n'apprend nulle
-    # part que sa PR est partie — ni pourquoi elle ne l'est pas.
-    from vibe_ide.services.livraison import Livraison
+    # Le dernier maillon : écrire une issue sur GitHub et ne plus toucher à
+    # l'IDE. Le pull existait, mais restait un bouton à part.
+    import json
+
+    (workspace / "mon-projet" / "agents.json").write_text(
+        json.dumps({"github_remote": "owner/repo"}), encoding="utf-8"
+    )
+    monkeypatch.setattr(settings, "github_token", "ghp_test")
 
     fake = _FakeOrchestrator()
 
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    async def _livrer(self: object, **kwargs: object) -> Livraison:
-        return Livraison(
-            etapes=("rebase sur develop", "PR #7 ouverte"), pr_number=7, merged=True
-        )
+    tires: list[str] = []
+
+    async def _run(self: object, direction: str = "pull") -> object:
+        tires.append(direction)
+
+        class _R:
+            pulled, pushed, skipped = 2, 0, 0
+
+        return _R()
 
     monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
-    monkeypatch.setattr(
-        "vibe_ide.services.livraison.LivraisonService.livrer", _livrer
+    monkeypatch.setattr("vibe_ide.agents.github_sync.GithubSyncAgent.run", _run)
+
+    resp = _client().post(
+        "/api/v1/orchestrator/run-autonomous",
+        json={"project_id": "mon-projet", "depuis_github": True},
     )
 
-    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
-        types: list[str] = []
-        recu: dict[str, object] | None = None
-        for _ in range(12):
-            message = ws.receive_json()
-            if "type" not in message:
-                continue
-            types.append(str(message["type"]))
-            if message["type"] == "livraison_done":
-                recu = message
-                break
+    assert resp.status_code == 200
+    assert tires == ["pull"]
+    assert ("mon-projet", "autonomous:5") in fake.calls
 
-    assert recu is not None, types
-    assert recu["data"]["pr_number"] == 7
-    assert recu["data"]["merged"] is True
+
+def test_un_run_autonome_ne_touche_pas_a_github_sans_le_demander(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Un appel réseau qui part sans qu'on l'ait demandé, sur le dépôt d'un
+    # client, n'est pas une commodité.
+    fake = _FakeOrchestrator()
+
+    async def _build(project_id: str) -> _FakeOrchestrator:
+        return fake
+
+    tires: list[str] = []
+
+    async def _run(self: object, direction: str = "pull") -> object:
+        tires.append(direction)
+        raise AssertionError("github-sync ne doit pas tourner ici")
+
+    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("vibe_ide.agents.github_sync.GithubSyncAgent.run", _run)
+
+    resp = _client().post(
+        "/api/v1/orchestrator/run-autonomous", json={"project_id": "mon-projet"}
+    )
+
+    assert resp.status_code == 200
+    assert tires == []

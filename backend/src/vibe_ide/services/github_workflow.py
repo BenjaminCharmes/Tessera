@@ -25,6 +25,7 @@ from vibe_ide.services.autonomie import (
     peut_merger,
     peut_pousser,
 )
+from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -70,11 +71,17 @@ def _section(ticket_body: str, heading: str) -> str:
     return match.group(1).strip() if match else ""
 
 
-def build_pr_body(ticket_id: str, ticket_title: str, ticket_body: str) -> str:
+def build_pr_body(
+    ticket_id: str, ticket_title: str, ticket_body: str, issue: int | None = None
+) -> str:
     """Rédige le corps de la PR depuis le ticket.
 
     Aucune mention d'outil d'IA (ticket-060) : ce texte part dans le dépôt de
     l'utilisateur, parfois celui d'un client.
+
+    `Closes #N` referme l'issue d'origine au merge (ticket-084). Sans lui la
+    boucle ne se referme pas : la PR part, elle est mergée, et l'issue reste
+    ouverte à refermer à la main.
     """
     parts = [f"Ticket **{ticket_id}** — {ticket_title}"]
 
@@ -85,6 +92,9 @@ def build_pr_body(ticket_id: str, ticket_title: str, ticket_body: str) -> str:
     criteres = _section(ticket_body, "Critères d'acceptation")
     if criteres:
         parts.append(f"## Critères d'acceptation\n\n{criteres}")
+
+    if issue is not None:
+        parts.append(f"Closes #{issue}")
 
     return "\n\n".join(parts) + "\n"
 
@@ -154,7 +164,9 @@ class GitHubWorkflowService:
 
         pr_number, pr_url = await self._github.create_pull_request(
             title=f"{ticket_id} — {ticket_title}",
-            body=build_pr_body(ticket_id, ticket_title, ticket_body),
+            body=build_pr_body(
+                ticket_id, ticket_title, ticket_body, issue=self._issue_de(ticket_id)
+            ),
             head=branch,
             base=self._base_branch,
         )
@@ -164,6 +176,17 @@ class GitHubWorkflowService:
         )
         return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
 
+
+    def _issue_de(self, ticket_id: str) -> int | None:
+        """Le numéro d'issue GitHub dont ce ticket est né, s'il en vient d'une.
+
+        La carte de synchronisation est la source : c'est elle que
+        `github-sync` écrit en créant le ticket.
+        """
+        if self._project_path is None:
+            return None
+        entree = SyncMapService().load(self._project_path).get(ticket_id)
+        return entree.issue if entree else None
 
     async def etat_ci(self, pr_number: int) -> str:
         """L'état agrégé de la CI de la PR : passing, failing, pending, none.

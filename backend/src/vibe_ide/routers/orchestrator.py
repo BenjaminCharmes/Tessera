@@ -1,10 +1,14 @@
 import asyncio
+from collections.abc import Awaitable, Callable
+
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 from vibe_ide.config import settings
 from vibe_ide.models.ticket import TicketStatus
+from vibe_ide.agents.github_sync import GithubSyncAgent
 from vibe_ide.services.agent_registry import AgentRegistryService
+from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.dialogue import DialogueChannel
 from vibe_ide.services.pipeline_events import EventType
@@ -52,6 +56,10 @@ class RunRequest(BaseModel):
 class RunAutonomousRequest(BaseModel):
     project_id: str
     max_tickets: int = 5
+    #: Tirer d'abord les issues `agent-ready` de GitHub, pour partir d'elles
+    #: (ticket-084). Faux par défaut : un appel réseau vers le dépôt d'un
+    #: client ne part pas sans qu'on l'ait demandé.
+    depuis_github: bool = False
 
 
 async def _build_project_context(project_id: str) -> str:
@@ -166,11 +174,17 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
+        livrer=_livreur(project_id),
     )
 
 
-async def _livrer(project_id: str, result: PipelineResult) -> PipelineResult:
-    """Porte le travail du run aussi loin que le projet le déclare (ticket-083).
+def _livreur(project_id: str) -> Callable[[PipelineResult], Awaitable[Livraison]]:
+    """Fabrique la livraison d'un projet, telle que l'orchestrateur l'appelle.
+
+    Branchée sur l'orchestrateur plutôt qu'appelée par chaque endpoint : les
+    trois modes de run — unique, file, autonome — passent par `run_pipeline`,
+    et n'en brancher qu'un réservait la livraison au cas où l'utilisateur est
+    déjà devant son écran (ticket-084).
 
     Une livraison qui échoue ne fait **pas** échouer le run : le travail est
     commité, et perdre la réponse du pipeline parce que GitHub est injoignable
@@ -195,19 +209,23 @@ async def _livrer(project_id: str, result: PipelineResult) -> PipelineResult:
         base_branch=settings.github_base_branch,
     )
 
-    try:
-        livraison = await service.livrer(
-            ticket_id=result.ticket_id,
-            ticket_title=result.ticket_id,
-            ticket_body="",
-            branch=result.branch,
-            approuve=result.approved,
-        )
-    except Exception as exc:  # noqa: BLE001 — voir la docstring
-        _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
-        livraison = Livraison(arret=f"Livraison interrompue : {exc}")
+    ticket_svc = TicketService(project_path, project_id)
 
-    return result.model_copy(update={"livraison": livraison})
+    async def livrer(result: PipelineResult) -> Livraison:
+        ticket = await ticket_svc.get_ticket(result.ticket_id)
+        try:
+            return await service.livrer(
+                ticket_id=result.ticket_id,
+                ticket_title=ticket.title if ticket else result.ticket_id,
+                ticket_body=ticket.body if ticket else "",
+                branch=result.branch,
+                approuve=result.approved,
+            )
+        except Exception as exc:  # noqa: BLE001 — voir la docstring
+            _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
+            return Livraison(arret=f"Livraison interrompue : {exc}")
+
+    return livrer
 
 
 @router.post("/run", response_model=PipelineResult)
@@ -239,11 +257,42 @@ async def run_pipeline(request: RunRequest) -> PipelineResult:
         result.approved,
         result.final_status.value,
     )
-    return await _livrer(request.project_id, result)
+    return result
+
+
+async def _tirer_les_issues(project_id: str) -> int:
+    """Crée les tickets manquants depuis les issues `agent-ready` du dépôt.
+
+    Le dernier maillon de la boucle : une issue écrite sur GitHub devient un
+    ticket, que le run autonome prend ensuite comme les autres. Le pull
+    existait déjà — il n'était qu'un bouton à part (ticket-084).
+
+    Un échec n'empêche pas le run : les tickets déjà là méritent de tourner.
+    """
+    project_path = settings.ide_workspace_dir / project_id
+    project = load_project(project_path)
+    if not project.github_remote or not settings.github_token:
+        return 0
+    agent = GithubSyncAgent(
+        github_svc=GitHubService(
+            token=settings.github_token, repo=project.github_remote
+        ),
+        ticket_svc=TicketService(project_path, project_id),
+        sync_map_svc=SyncMapService(),
+        project_path=project_path,
+    )
+    try:
+        resultat = await agent.run("pull")
+    except Exception as exc:  # noqa: BLE001 — voir la docstring
+        _logger.warning("pull_des_issues_echoue", extra={"erreur": str(exc)})
+        return 0
+    return int(resultat.pulled)
 
 
 @router.post("/run-autonomous", response_model=list[PipelineResult])
 async def run_autonomous(request: RunAutonomousRequest) -> list[PipelineResult]:
+    if request.depuis_github:
+        await _tirer_les_issues(request.project_id)
     orchestrator = await _build_orchestrator(request.project_id)
     return await orchestrator.run_autonomous(request.project_id, request.max_tickets)
 
@@ -263,6 +312,8 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
             async def send_event_autonomous(event: OrchestratorEvent) -> None:
                 await websocket.send_text(event.model_dump_json())
 
+            if raw.get("depuis_github"):
+                await _tirer_les_issues(project_id)
             max_tickets = int(raw.get("max_tickets", 5))
             await orchestrator.run_autonomous(project_id, max_tickets, send_event_autonomous)
         elif ticket_ids:
@@ -384,17 +435,6 @@ async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
                 result.approved if result else False,
                 result.final_status.value if result else "interrupted",
             )
-
-            if result is not None:
-                result = await _livrer(project_id, result)
-                if result.livraison is not None:
-                    await send_event(
-                        OrchestratorEvent(
-                            type=EventType.LIVRAISON_DONE,
-                            ticket_id=ticket_id,
-                            data=result.livraison.__dict__,
-                        )
-                    )
 
             if echec is not None:
                 await websocket.send_json({"error": echec})
