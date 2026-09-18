@@ -98,6 +98,18 @@ export default function TicketActivity({
           <p className="text-green-400">PR #{activity.pr_number} ouverte</p>
         ) : (
           <>
+            {/* Le bouton poussait la branche **puis** appelait l'API GitHub :
+                sur un dépôt GitLab ou Azure, il poussait donc sans rien
+                demander avant d'échouer. Sur le dépôt d'un client, pousser est
+                précisément la décision qui ne se prend pas par mégarde
+                (ticket-081). */}
+            {activity.pr_supported === false ? (
+              <p className="text-zinc-500">
+                Dépôt hébergé sur {activity.forge ?? "une autre forge"} :
+                l'ouverture de pull request n'est pas automatisée ici. La
+                branche du ticket est prête, à pousser quand tu le décides.
+              </p>
+            ) : (
             <button
               type="button"
               onClick={() => void openPr()}
@@ -106,6 +118,7 @@ export default function TicketActivity({
             >
               {busy ? "…" : "Pousser et ouvrir la PR"}
             </button>
+            )}
             {!branch && (
               <p className="mt-1 text-zinc-600">
                 Lance d'abord le pipeline : il n'y a pas encore de branche.

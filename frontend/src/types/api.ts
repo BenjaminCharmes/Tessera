@@ -303,6 +303,10 @@ export interface TicketActivity {
   runs: TicketRunSummary[];
   pr_number: number | null;
   github_remote: string | null;
+  /** L'IDE sait-il ouvrir une PR sur ce dépôt ? Faux hors GitHub (ticket-081). */
+  pr_supported?: boolean;
+  /** Le nom de l'hébergeur, pour le dire à l'utilisateur. */
+  forge?: string | null;
 }
 
 export interface OpenPrResponse {

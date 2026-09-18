@@ -138,3 +138,47 @@ describe("TicketActivity", () => {
     );
   });
 });
+
+describe("TicketActivity — forge non supportée", () => {
+  it("ne propose pas d'ouvrir une PR hors GitHub, et dit où est le dépôt", async () => {
+    // Le bouton poussait la branche puis appelait api.github.com : sur GitLab
+    // ou Azure il poussait donc sans rien demander avant d'echouer. Sur un
+    // depot client, pousser est la decision qui ne se prend pas par megarde.
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-001",
+      runs: [],
+      pr_number: null,
+      github_remote: "https://dev.azure.com/org/p/_git/p",
+      pr_supported: false,
+      forge: "Azure DevOps",
+    });
+
+    render(
+      <TicketActivity projectId="p" ticket={ticket} branch="ticket-001-x" />,
+    );
+
+    expect(await screen.findByText(/Azure DevOps/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Pousser et ouvrir la PR/ }),
+    ).toBeNull();
+  });
+
+  it("propose la PR sur un dépôt GitHub", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-001",
+      runs: [],
+      pr_number: null,
+      github_remote: "https://github.com/moi/repo.git",
+      pr_supported: true,
+      forge: "GitHub",
+    });
+
+    render(
+      <TicketActivity projectId="p" ticket={ticket} branch="ticket-001-x" />,
+    );
+
+    expect(
+      await screen.findByRole("button", { name: /Pousser et ouvrir la PR/ }),
+    ).toBeInTheDocument();
+  });
+});

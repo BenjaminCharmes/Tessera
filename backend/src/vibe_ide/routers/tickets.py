@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from vibe_ide.config import settings
+from vibe_ide.services.github_workflow import forge_supportee, nom_de_la_forge
 from vibe_ide.services.ticket_diff import TicketDiff, diff_du_ticket
 from vibe_ide.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketStatus, TicketStatusUpdate
 from vibe_ide.services.github_service import GitHubService, PRStatus
@@ -229,6 +230,11 @@ class TicketActivity(BaseModel):
 
     ticket_id: str
     runs: list[TicketRunSummary] = []
+    #: L'IDE sait-il ouvrir une PR sur ce dépôt ? Faux ailleurs que sur GitHub
+    #: — et le bouton poussait la branche avant d'échouer (ticket-081).
+    pr_supported: bool = False
+    #: Le nom de l'hébergeur, pour le dire à l'utilisateur.
+    forge: str | None = None
     pr_number: int | None = None
     github_remote: str | None = None
 
@@ -285,11 +291,14 @@ async def get_ticket_activity(project_id: str, ticket_id: str) -> TicketActivity
     except Exception:  # noqa: BLE001 — un projet illisible ne doit pas casser le suivi
         project = None
 
+    remote = getattr(project, "github_remote", None)
     return TicketActivity(
         ticket_id=ticket_id,
         runs=runs,
+        pr_supported=forge_supportee(remote),
+        forge=nom_de_la_forge(remote),
         pr_number=ticket.pr_number,
-        github_remote=getattr(project, "github_remote", None),
+        github_remote=remote,
     )
 
 

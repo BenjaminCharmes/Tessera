@@ -126,3 +126,43 @@ class GitHubWorkflowService:
             extra={"ticket_id": ticket_id, "pr_number": pr_number, "branch": branch},
         )
         return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
+
+
+#: Les hébergeurs reconnus, pour nommer celui qu'on a devant soi.
+_FORGES = {
+    "github.com": "GitHub",
+    "dev.azure.com": "Azure DevOps",
+    "bitbucket.org": None,  # nommé par son hôte, faute de mieux
+}
+
+
+def nom_de_la_forge(remote: str | None) -> str | None:
+    """Le nom lisible de l'hébergeur d'un dépôt, ou son hôte à défaut.
+
+    Dire « ce dépôt n'est pas sur GitHub » sans dire où il est n'aide personne
+    à décider quoi faire.
+    """
+    if not remote:
+        return None
+    # Deux formes coexistent : `https://[identifiant@]hote/chemin` et
+    # `git@hote:chemin`. Retirer le schéma d'abord, sinon « https » passe pour
+    # l'hôte.
+    sans_schema = remote.split("://", 1)[-1]
+    hote = sans_schema.split("/")[0].split("@")[-1].split(":")[0].lower()
+    for cle, nom in _FORGES.items():
+        if hote == cle or hote.endswith("." + cle):
+            return nom or hote
+    if "gitlab" in hote:
+        return "GitLab"
+    return hote
+
+
+def forge_supportee(remote: str | None) -> bool:
+    """True si l'IDE sait ouvrir une pull request sur ce dépôt.
+
+    Seul GitHub l'est : `GitHubService` tape sur `api.github.com`. Ailleurs, le
+    bouton poussait la branche **puis** échouait sur l'appel d'API — donc il
+    poussait sans rien demander. Sur le dépôt d'un client, pousser est
+    précisément la décision qui ne se prend pas par mégarde (ticket-081).
+    """
+    return nom_de_la_forge(remote) == "GitHub"
