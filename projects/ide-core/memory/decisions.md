@@ -244,21 +244,20 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-026 — Cinq familles de couleurs, une par rôle
 
 **Date** : 2026-09-17
-**Décision** : Toutes les bandes d'en-tête de premier niveau partagent une hauteur unique (`design/layout.ts`). L'UI n'utilise que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès) et `blue` (activité) pour les **états**, plus `violet` pour l'**identité et le repérage** — barre devant un titre de région, élément actif du rail, nom du projet. Les tailles de texte sont nommées, jamais arbitraires, et les affordances viennent de `design/icons.tsx`, sur une grille unique. Un test (`design/coherence.test.ts`) verrouille les trois règles.
-**Raison** : l'UI avait dérivé vers huit familles — `green` et `emerald` disaient la même chose, `amber`, `orange` et `yellow` aussi — trois tailles en dur et des glyphes de jeux différents. Personne n'avait choisi huit couleurs : chaque ticket prenait la sienne. Sans mesure, la dérive ne se voit qu'une fois qu'elle saute aux yeux.
-**Conséquence** : l'accent d'identité est une barre, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus. Une priorité moyenne ou basse n'est pas une alerte ; elle descend en neutre et se distingue par l'intensité, pas par la teinte. Les badges GitHub sont des métadonnées, donc neutres.
-**Alternative rejetée** : une couche d'alias sémantiques (`text-success`) — elle ajoute une indirection sans rien changer à l'écran ; documenter les rôles sans les vérifier (c'est ce qui n'a pas tenu).
+**Décision** : Les bandes d'en-tête partagent une hauteur unique. Les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** — titre de région, élément actif, nom du projet. Tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
+**Raison** : l'UI avait dérivé vers huit familles, trois tailles en dur et des glyphes de jeux différents. Personne n'avait choisi huit couleurs : chaque ticket prenait la sienne, et sans mesure la dérive ne se voit qu'une fois qu'elle saute aux yeux.
+**Conséquence** : l'accent d'identité est une **barre**, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus. Une priorité moyenne ou basse n'est pas une alerte : elle descend en neutre et se distingue par l'intensité.
+**Alternative rejetée** : une couche d'alias sémantiques (indirection sans effet visible) ; documenter les rôles sans les vérifier — c'est ce qui n'avait pas tenu.
 
 ---
 
 ## ADR-027 — Les agents ne touchent pas à l'historique git
 
 **Date** : 2026-09-17
-**Décision** : Un hook `PreToolUse` refuse à tout agent les commandes git qui écrivent — `commit`, `merge`, `push`, `checkout`, `branch`, `reset`, `rebase`, `add`, `remote`… Le git en lecture reste permis. Et un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket passe `blocked`, avec la raison émise.
-**Raison** : au premier usage réel, des agents ont commité avec leurs propres messages, mergé la branche de ticket dans `main` et poussé sur GitHub — pendant deux runs où l'utilisateur n'avait cliqué que sur « lancer ». ADR-018 et ADR-022 ne contraignaient que `GitWorkspaceService` ; le codeur a `Bash` et pouvait faire du git sans passer par elle. Une règle contournable en tapant une autre commande n'est pas une règle.
-**Pourquoi un hook et pas `can_use_tool`** : une entrée d'`allowed_tools` couvrant un outil entier — le cas de `Bash` — l'auto-approuve *avant* le callback de permission. Le garde y serait inerte, avec l'apparence d'une protection.
-**Alternative rejetée** : l'interdire dans le prompt (une consigne décrit une intention, un refus produit un fait) ; retirer `Bash` au codeur (il en a besoin pour lancer des tests et inspecter le projet).
-**Détail** : voir `tickets/done/ticket-068-integrite-des-runs.md`.
+**Décision** : Un hook `PreToolUse` refuse à tout agent les commandes git qui écrivent — `commit`, `merge`, `push`, `checkout`, `branch`, `reset`, `add`… Le git en lecture reste permis. Et un run dont le commit **échoue** ne s'annonce pas approuvé : le ticket passe `blocked`, la raison est émise.
+**Raison** : au premier usage réel, des agents ont commité, mergé dans `main` et poussé sur GitHub pendant deux runs où l'utilisateur n'avait cliqué que sur « lancer ». ADR-018 et ADR-022 ne contraignaient que `GitWorkspaceService`, et le codeur a `Bash`. Une règle contournable en tapant une autre commande n'est pas une règle.
+**Pourquoi un hook** : une entrée d'`allowed_tools` couvrant un outil entier l'auto-approuve *avant* le callback de permission. Un garde posé là serait inerte, avec l'apparence d'une protection.
+**Alternative rejetée** : l'interdire dans le prompt — une consigne décrit une intention, un refus produit un fait.
 
 ---
 
