@@ -185,4 +185,74 @@ def test_les_options_portent_le_garde_d_ecriture(tmp_path: Path) -> None:
     matchers = options.hooks["PreToolUse"]
     couverts = {m.matcher for m in matchers}
     assert "Bash" in couverts
-    assert "Write|Edit|NotebookEdit" in couverts
+    assert "Write|Edit|NotebookEdit|Bash" in couverts
+
+
+# ------------------------------------------------------------------
+# Les redirections shell évidentes — ticket-088
+# ------------------------------------------------------------------
+
+
+def test_une_redirection_hors_perimetre_est_vue(tmp_path: Path) -> None:
+    from vibe_ide.services.providers.perimetre import cibles_ecrites
+
+    projet = _projet(tmp_path, "client")
+
+    assert cibles_ecrites("echo x > ../voisin/app.py") == ["../voisin/app.py"]
+    assert cibles_ecrites("cat a >> /etc/hosts") == ["/etc/hosts"]
+    assert cibles_ecrites("make | tee ../ailleurs/log.txt") == ["../ailleurs/log.txt"]
+    assert projet.exists()
+
+
+def test_une_commande_sans_ecriture_ne_donne_aucune_cible() -> None:
+    from vibe_ide.services.providers.perimetre import cibles_ecrites
+
+    assert cibles_ecrites("uv run pytest -q") == []
+    assert cibles_ecrites("grep -r 'x > y' src/") == []
+
+
+def test_une_redirection_de_flux_n_est_pas_un_fichier() -> None:
+    # `2>&1` et `> /dev/null` sont partout dans les commandes de test.
+    from vibe_ide.services.providers.perimetre import cibles_ecrites
+
+    assert cibles_ecrites("pytest 2>&1") == []
+    assert cibles_ecrites("pytest > /dev/null") == []
+
+
+async def test_le_hook_refuse_un_bash_qui_ecrit_dehors(tmp_path: Path) -> None:
+    projet = _projet(tmp_path, "client")
+    _projet(tmp_path, "voisin")
+    hook = hook_refus_hors_perimetre(projet)
+
+    sortie = await hook(
+        {"tool_name": "Bash", "tool_input": {"command": "echo x > ../voisin/app.py"}},
+        None,
+        None,
+    )
+
+    assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
+async def test_le_hook_laisse_passer_un_bash_qui_ecrit_dedans(tmp_path: Path) -> None:
+    projet = _projet(tmp_path, "client")
+    hook = hook_refus_hors_perimetre(projet)
+
+    sortie = await hook(
+        {"tool_name": "Bash", "tool_input": {"command": "uv run pytest -q > out.txt"}},
+        None,
+        None,
+    )
+
+    assert sortie == {}
+
+
+async def test_le_hook_laisse_passer_une_commande_de_test(tmp_path: Path) -> None:
+    # Le coût d'un faux refus est élevé : l'agent perd son moyen de vérifier
+    # son propre travail, et le ticket part en revue sans avoir tourné.
+    projet = _projet(tmp_path, "client")
+    hook = hook_refus_hors_perimetre(projet)
+
+    for commande in ("uv run pytest -q", "npm test 2>&1", "npx tsc --noEmit"):
+        assert await hook(
+            {"tool_name": "Bash", "tool_input": {"command": commande}}, None, None
+        ) == {}, commande

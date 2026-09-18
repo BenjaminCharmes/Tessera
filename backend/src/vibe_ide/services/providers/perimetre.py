@@ -13,12 +13,16 @@ produit un fait, là où une consigne de prompt ne décrit qu'une intention.
 **Lire hors du projet reste permis.** Comprendre ce qui existe fait partie du
 travail, et lire ne laisse rien dans le dépôt de personne.
 
-**Limite assumée** : `Bash` n'est pas couvert ici. Une redirection shell
-(`echo x > ../y`) échappe à ce contrôle. La traquer demanderait d'analyser une
-ligne de shell pour y trouver toutes les formes d'écriture — l'arms race que
-`git_guard` refuse déjà, et qu'on perd en ratant une forme.
+`Bash` est couvert **pour les formes simples** : `> fichier`, `>> fichier`,
+`tee fichier`. C'est ce qui attrape une erreur — un agent qui se trompe de
+projet — et ce n'est pas une frontière contre quelqu'un qui cherche à passer :
+`python -c "open('../x','w')"` passe, et le prétendre reviendrait à mentir sur
+ce que ce module garantit. Ce qui ne se lit pas avec certitude passe, plutôt
+que de refuser une commande légitime : un faux refus coûte à l'agent son moyen
+de vérifier son travail.
 """
 import json
+import shlex
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
@@ -96,6 +100,43 @@ def hors_perimetre(chemin: str, project_path: Path) -> bool:
         return True
 
 
+#: `/dev/null`, `2>&1` : des flux, pas des fichiers du projet.
+_NON_FICHIERS = frozenset({"/dev/null", "/dev/stdout", "/dev/stderr"})
+
+
+def cibles_ecrites(commande: str) -> list[str]:
+    """Les fichiers qu'une ligne de shell écrit, pour les formes simples.
+
+    `>`, `>>` et `tee`. La ligne est **tokenisée**, jamais découpée à la main :
+    `grep -r 'x > y' src/` ne redirige rien, et une comparaison de caractères
+    le prendrait pour une écriture — un faux refus qui priverait l'agent d'une
+    commande parfaitement légitime.
+
+    Volontairement incomplet : ce qui ne se lit pas avec certitude n'est pas
+    rendu, et passera donc.
+    """
+    try:
+        jetons = shlex.split(commande, posix=True)
+    except ValueError:
+        # Guillemet non fermé : on ne sait pas lire cette ligne, donc on
+        # n'invente pas de cible.
+        return []
+
+    cibles: list[str] = []
+    for index, jeton in enumerate(jetons):
+        suivant = jetons[index + 1] if index + 1 < len(jetons) else None
+        cible: str | None = None
+        if jeton in (">", ">>"):
+            cible = suivant
+        elif jeton.startswith(">") and len(jeton) > 1:
+            cible = jeton.lstrip(">")
+        elif jeton == "tee" and suivant and not suivant.startswith("-"):
+            cible = suivant
+        if cible and cible not in _NON_FICHIERS and not cible.startswith("&"):
+            cibles.append(cible)
+    return cibles
+
+
 def hook_refus_hors_perimetre(
     project_path: Path | None,
 ) -> Callable[[HookInput, str | None, HookContext], Awaitable[HookJSONOutput]]:
@@ -111,11 +152,22 @@ def hook_refus_hors_perimetre(
         if project_path is None:
             return {}
         donnees: dict[str, Any] = dict(entree)
-        if donnees.get("tool_name") not in _OUTILS_QUI_ECRIVENT:
-            return {}
+        outil = donnees.get("tool_name")
+        entrees: dict[str, Any] = donnees.get("tool_input", {})
 
-        chemin = str(donnees.get("tool_input", {}).get("file_path", ""))
-        if not chemin or not hors_perimetre(chemin, project_path):
+        if outil == "Bash":
+            commande = str(entrees.get("command", ""))
+            fautifs = [
+                c for c in cibles_ecrites(commande) if hors_perimetre(c, project_path)
+            ]
+            if not fautifs:
+                return {}
+            chemin = fautifs[0]
+        elif outil in _OUTILS_QUI_ECRIVENT:
+            chemin = str(entrees.get("file_path", ""))
+            if not chemin or not hors_perimetre(chemin, project_path):
+                return {}
+        else:
             return {}
 
         _logger.warning(

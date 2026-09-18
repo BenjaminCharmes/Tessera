@@ -100,7 +100,7 @@ def _build_options(
                 # rien n'empêchait un `Write` vers le dépôt du client d'à côté
                 # (ticket-085).
                 HookMatcher(
-                    matcher="Write|Edit|NotebookEdit",
+                    matcher="Write|Edit|NotebookEdit|Bash",
                     hooks=[hook_refus_hors_perimetre(cwd)],
                 ),
             ]

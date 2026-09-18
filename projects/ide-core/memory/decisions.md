@@ -308,12 +308,10 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-031 — Un agent n'écrit que sous la racine de son projet
 
 **Date** : 2026-09-18
-**Décision** : Un hook `PreToolUse` refuse `Write`, `Edit` et `NotebookEdit` dont le chemin sort de la racine du projet. Cette racine est le dossier du projet, ou le dépôt qui le contient quand il déclare `git_root: ancestor` (ADR-028). Les deux chemins sont résolus, liens symboliques compris. **Lire hors du projet reste permis.**
-**Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Six dépôts clients voisins dans `projects/`, et un codeur qui se trompe de dossier écrit chez un autre client — exactement la fuite qu'ADR-021 et ADR-023 cherchent à empêcher, par l'autre bout. Lire ne laisse rien dans le dépôt de personne ; écrire, si.
-**Forme** : celle d'ADR-027. Un hook, parce qu'une entrée d'`allowed_tools` couvrant `Write` l'auto-approuve *avant* tout callback de permission ; au niveau du SDK, parce qu'une consigne de prompt décrit une intention quand un refus produit un fait.
-**Limite assumée** : `Bash` n'est pas couvert — une redirection shell y échappe. La traquer demanderait d'analyser toutes les formes d'écriture d'une ligne de shell, l'arms race que `git_guard` refuse déjà.
-
----
+**Décision** : Un hook `PreToolUse` refuse `Write`, `Edit`, `NotebookEdit` et les redirections `Bash` simples (`>`, `>>`, `tee`) dont le chemin sort de la racine du projet — son dossier, ou le dépôt qui le contient s'il déclare `git_root: ancestor`. Les deux côtés sont résolus, symlinks compris. **Lire hors du projet reste permis.**
+**Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Six dépôts clients voisins dans `projects/`, et un agent qui se trompe de dossier écrit chez un autre client — la fuite qu'ADR-021 et ADR-023 empêchent, prise par l'autre bout. Lire ne laisse rien chez personne ; écrire, si.
+**Forme** : celle d'ADR-027. Un hook, parce qu'`allowed_tools` auto-approuve avant tout callback de permission ; au niveau du SDK, parce qu'un refus produit un fait quand une consigne décrit une intention.
+**Ce que ça ne garantit pas** : le contrôle sur `Bash` attrape une erreur, pas une évasion — `python -c "open('../x','w')"` passe. Ce qui ne se lit pas avec certitude passe aussi : un faux refus priverait l'agent de son moyen de vérifier son travail.
 
 ## ADR-032 — Un ADR déclare qui il contraint
 
