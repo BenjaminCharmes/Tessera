@@ -40,7 +40,7 @@ class AgentRegistryService:
             "planificateur",
             "project-analyzer",
             "project-creator",
-            "reviewer",
+            "resolveur-conflit",
             "reviewer",
             "securite",
             "testeur",

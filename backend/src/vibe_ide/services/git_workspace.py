@@ -7,7 +7,10 @@ diff (including untracked files) and commit the work.
 import asyncio
 import json
 import re
+from collections.abc import Awaitable, Callable
 from pathlib import Path
+
+from vibe_ide.utils.logger import get_logger
 
 _MAX_BRANCH_LENGTH = 60
 
@@ -96,6 +99,12 @@ def _branch_name(ticket_id: str, slug: str) -> str:
     if len(name) > _MAX_BRANCH_LENGTH:
         name = name[:_MAX_BRANCH_LENGTH].rstrip("-")
     return name
+
+
+_logger = get_logger(__name__)
+
+#: Le marqueur que git laisse dans un fichier non résolu.
+_MARQUEUR_CONFLIT = "<" * 7
 
 
 class GitWorkspaceService:
@@ -198,26 +207,79 @@ class GitWorkspaceService:
         """
         await self._run("push", "--set-upstream", "origin", branch_name)
 
-    async def rejouer_sur(self, base: str) -> tuple[str, ...]:
+    async def rejouer_sur(
+        self,
+        base: str,
+        resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
+    ) -> tuple[str, ...]:
         """Rejoue la branche courante sur `base`. Rend les fichiers en conflit.
 
-        Une branche partie d'une base qui a depuis avance produit une PR que
-        GitHub declare non mergeable : attendre sa CI ne menerait nulle part.
+        Une branche partie d'une base qui a depuis avancé produit une PR que
+        GitHub déclare non mergeable : attendre sa CI ne mènerait nulle part.
 
-        Un conflit **annule** le rebase et laisse la branche exactement comme
-        elle etait. Un rebase laisse a mi-chemin bloquerait le ticket suivant,
-        et l'utilisateur heriterait d'un depot dans un etat qu'il n'a pas
-        choisi. Les fichiers en conflit sont nommes : c'est ce qu'il lui faut
-        pour trancher.
+        Sans `resolveur`, un conflit **annule** le rebase et laisse la branche
+        exactement comme elle était. Avec, le résolveur est appelé pendant le
+        rebase et peut réécrire les fichiers ; s'il aboutit, le rebase se
+        termine. Sinon — il lève, il laisse des marqueurs, il oublie un
+        fichier — tout est annulé.
+
+        **L'arbre ne reste jamais à mi-rebase.** Le ticket suivant démarrerait
+        dessus, et l'utilisateur hériterait d'un dépôt qu'il n'a pas choisi.
         """
         await self._ensure_own_repository()
         try:
             await self._run("rebase", base)
         except GitCommandError:
-            conflits = await self._fichiers_en_conflit()
+            pass
+        else:
+            return ()
+
+        conflits = await self._fichiers_en_conflit()
+        if resolveur is None or not conflits:
+            await self._run("rebase", "--abort")
+            return conflits
+
+        if not await self._faire_resoudre(conflits, resolveur):
             await self._run("rebase", "--abort")
             return conflits
         return ()
+
+    async def _faire_resoudre(
+        self,
+        conflits: tuple[str, ...],
+        resolveur: Callable[[tuple[str, ...]], Awaitable[None]],
+    ) -> bool:
+        """Laisse le résolveur réécrire les fichiers, puis poursuit le rebase.
+
+        Rend `False` dès que quoi que ce soit ne va pas. L'appelant annule :
+        aucun état intermédiaire n'a besoin d'être compris ici.
+        """
+        try:
+            await resolveur(conflits)
+        except Exception:  # noqa: BLE001 — un résolveur qui échoue fait annuler
+            _logger.warning("resolveur_en_echec", extra={"fichiers": conflits})
+            return False
+
+        for chemin in conflits:
+            fichier = self._project_path / chemin
+            if not fichier.is_file():
+                return False
+            # Un fichier qui garde ses marqueurs compile rarement et se relit
+            # encore moins : le committer serait pire que ne rien faire.
+            if _MARQUEUR_CONFLIT in fichier.read_text(encoding="utf-8", errors="replace"):
+                _logger.warning("marqueurs_restants", extra={"fichier": chemin})
+                return False
+
+        try:
+            await self._run("add", "--", *conflits)
+            if await self._fichiers_en_conflit():
+                return False
+            await self._run(
+                "-c", "core.editor=true", "rebase", "--continue"
+            )
+        except GitCommandError:
+            return False
+        return True
 
     async def _fichiers_en_conflit(self) -> tuple[str, ...]:
         sortie = await self._run("diff", "--name-only", "--diff-filter=U")

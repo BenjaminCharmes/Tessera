@@ -320,3 +320,13 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : le fichier part dans chaque appel d'agent, jusqu'à dix-huit par ticket, et grossit à chaque décision. Le coût compte, la dilution davantage : un codeur recevait la palette de couleurs et le choix du gestionnaire de paquets Python au milieu des règles qu'il doit tenir.
 **Ce qui rend la règle sûre** : un agent que l'utilisateur vient de créer n'est nommé nulle part, et reçoit malgré tout tout le tronc commun — donc toutes les contraintes.
 **Alternative rejetée** : rogner les ADR au budget (gain ponctuel, la dérive revient) ; déduire la pertinence par mots-clés — une contrainte ratée serait silencieuse.
+
+---
+
+## ADR-033 — Un conflit se tente, et se relit toujours
+
+**Date** : 2026-09-18
+**Décision** : Sur un conflit de rebase, un agent `resolveur-conflit` réécrit les fichiers. `GitWorkspaceService` vérifie ensuite l'arbre et **annule tout** au moindre doute : résolveur qui lève, marqueur restant, fichier manquant. Une résolution qui aboutit ouvre sa PR, et **ne se merge jamais seule** — même sur un projet qui déclare `merge` (ADR-029).
+**Raison** : détecter et rendre la main était honnête, mais s'arrêtait sur un travail de cinq minutes. Le tenter vaut la peine ; le merger, non. Un conflit est par définition l'endroit où deux intentions divergent : le pire endroit pour deviner, et celui où une erreur ne se voit pas dans un diff vert.
+**Invariants** : l'arbre ne reste jamais à mi-rebase — le ticket suivant démarrerait dessus ; l'agent ne touche à aucune commande git, le rebase est en cours et il n'en voit qu'une partie ; sans résolveur branché, le comportement d'ADR-030 est inchangé.
+**Alternative rejetée** : merger une résolution sur CI verte — une CI verte dit que le code passe, pas qu'on a gardé la bonne intention.

@@ -39,7 +39,11 @@ class Livraison:
 
 
 class _Git(Protocol):
-    async def rejouer_sur(self, base: str) -> tuple[str, ...]: ...
+    async def rejouer_sur(
+        self,
+        base: str,
+        resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
+    ) -> tuple[str, ...]: ...
 
 
 class _Workflow(Protocol):
@@ -65,6 +69,7 @@ class LivraisonService:
         attente_ci_max_s: float = _ATTENTE_CI_MAX_S,
         intervalle_ci_s: float = _INTERVALLE_CI_S,
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
+        resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
     ) -> None:
         self._git = git_workspace
         self._workflow = workflow
@@ -73,6 +78,7 @@ class LivraisonService:
         self._attente_ci_max_s = attente_ci_max_s
         self._intervalle_ci_s = intervalle_ci_s
         self._dormir = dormir
+        self._resolveur = resolveur
 
     async def livrer(
         self,
@@ -106,7 +112,19 @@ class LivraisonService:
                 )
             )
 
-        conflits = await self._git.rejouer_sur(self._base_branch)
+        resolus: list[str] = []
+
+        async def resoudre(fichiers: tuple[str, ...]) -> None:
+            # Le résolveur ne dit pas s'il a réussi : c'est `rejouer_sur` qui
+            # tranche, en vérifiant l'arbre. On note seulement qu'il a tourné.
+            resolus.extend(fichiers)
+            if self._resolveur is not None:
+                await self._resolveur(fichiers)
+
+        conflits = await self._git.rejouer_sur(
+            self._base_branch,
+            resolveur=resoudre if self._resolveur is not None else None,
+        )
         if conflits:
             return Livraison(
                 etapes=tuple(etapes),
@@ -118,6 +136,8 @@ class LivraisonService:
                 ),
             )
         etapes.append(f"rebase sur {self._base_branch}")
+        if resolus:
+            etapes.append("conflit résolu : " + ", ".join(resolus))
 
         resultat = await self._workflow.open_pull_request(
             branch=branch,
@@ -127,6 +147,21 @@ class LivraisonService:
         )
         pr_number = int(resultat.pr_number)
         etapes.append(f"PR #{pr_number} ouverte")
+
+        if resolus:
+            # Un conflit est l'endroit où deux intentions divergent : le pire
+            # endroit pour deviner. Le projet a beau déclarer `merge`, il n'a
+            # pas déclaré ça — et personne n'a relu la résolution.
+            return Livraison(
+                etapes=tuple(etapes),
+                pr_number=pr_number,
+                conflits=tuple(resolus),
+                arret=(
+                    f"Conflit résolu sur {', '.join(resolus)} : la PR "
+                    f"#{pr_number} est ouverte, à relire. Une résolution de "
+                    "conflit ne se merge jamais toute seule."
+                ),
+            )
 
         if niveau is not NiveauAutonomie.merge:
             return Livraison(

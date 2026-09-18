@@ -19,6 +19,7 @@ from vibe_ide.services.github_service import GitHubService
 from vibe_ide.services.github_workflow import GitHubWorkflowService
 from vibe_ide.services.livraison import Livraison, LivraisonService
 from vibe_ide.services.providers import get_provider
+from vibe_ide.services.resolveur_conflit import ResolveurConflitService
 from vibe_ide.services.security_auditor import SecurityAuditorService
 from vibe_ide.services.test_runner import TestRunnerService
 from vibe_ide.services.validator import ValidatorService
@@ -174,11 +175,13 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
-        livrer=_livreur(project_id),
+        livrer=_livreur(project_id, runner),
     )
 
 
-def _livreur(project_id: str) -> Callable[[PipelineResult], Awaitable[Livraison]]:
+def _livreur(
+    project_id: str, runner: AgentRunner | None = None
+) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison d'un projet, telle que l'orchestrateur l'appelle.
 
     Branchée sur l'orchestrateur plutôt qu'appelée par chaque endpoint : les
@@ -207,6 +210,13 @@ def _livreur(project_id: str) -> Callable[[PipelineResult], Awaitable[Livraison]
         ),
         project_path=project_path,
         base_branch=settings.github_base_branch,
+        # Sans runner — appel programmatique, test — pas de résolveur : le
+        # conflit annule le rebase et remonte, comme avant ticket-090.
+        resolveur=(
+            ResolveurConflitService(runner, project_path).resoudre
+            if runner is not None
+            else None
+        ),
     )
 
     ticket_svc = TicketService(project_path, project_id)

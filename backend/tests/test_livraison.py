@@ -6,12 +6,18 @@ from vibe_ide.services.livraison import LivraisonService, Livraison
 
 
 class _FauxGit:
-    def __init__(self, conflits: tuple[str, ...] = ()) -> None:
+    def __init__(
+        self, conflits: tuple[str, ...] = (), resolvables: bool = False
+    ) -> None:
         self._conflits = conflits
+        self._resolvables = resolvables
         self.rejoue: list[str] = []
 
-    async def rejouer_sur(self, base: str) -> tuple[str, ...]:
+    async def rejouer_sur(self, base, resolveur=None):  # type: ignore[no-untyped-def]
         self.rejoue.append(base)
+        if self._conflits and resolveur is not None and self._resolvables:
+            await resolveur(self._conflits)
+            return ()
         return self._conflits
 
 
@@ -55,6 +61,7 @@ def _service(
     niveau: str | None,
     git: _FauxGit | None = None,
     workflow: _FauxWorkflow | None = None,
+    resolveur: object | None = None,
 ) -> tuple[LivraisonService, _FauxGit, _FauxWorkflow]:
     g = git or _FauxGit()
     w = workflow or _FauxWorkflow()
@@ -65,6 +72,7 @@ def _service(
         base_branch="develop",
         attente_ci_max_s=0,
         dormir=_ne_dort_pas,
+        resolveur=resolveur,  # type: ignore[arg-type]
     )
     return svc, g, w
 
@@ -197,3 +205,81 @@ async def test_les_etapes_racontent_ce_qui_a_ete_fait(tmp_path: Path) -> None:
 
     assert "rebase" in " ".join(livraison.etapes).lower()
     assert any("7" in e for e in livraison.etapes)
+
+
+# ------------------------------------------------------------------
+# Un conflit résolu se relit toujours — ticket-090
+# ------------------------------------------------------------------
+
+
+async def test_un_conflit_resolu_laisse_la_livraison_continuer(
+    tmp_path: Path,
+) -> None:
+    appels: list[tuple[str, ...]] = []
+
+    async def resoudre(fichiers: tuple[str, ...]) -> None:
+        appels.append(fichiers)
+
+    svc, _git, workflow = _service(
+        tmp_path,
+        "merge",
+        git=_FauxGit(conflits=("src/app.py",), resolvables=True),
+        resolveur=resoudre,
+    )
+
+    livraison = await _livrer(svc)
+
+    assert appels == [("src/app.py",)]
+    assert livraison.pr_number == 7
+    assert livraison.conflits == ("src/app.py",)
+
+
+async def test_un_conflit_resolu_n_est_jamais_merge_seul(tmp_path: Path) -> None:
+    # Un conflit est par définition l'endroit où deux intentions divergent.
+    # C'est le pire endroit pour deviner — et le projet a beau déclarer
+    # `merge`, il n'a pas déclaré ça.
+    async def resoudre(fichiers: tuple[str, ...]) -> None:
+        return None
+
+    svc, _git, workflow = _service(
+        tmp_path,
+        "merge",
+        git=_FauxGit(conflits=("src/app.py",), resolvables=True),
+        resolveur=resoudre,
+    )
+
+    livraison = await _livrer(svc)
+
+    assert workflow.merges == []
+    assert livraison.merged is False
+    assert "conflit" in (livraison.arret or "").lower()
+    assert "relire" in (livraison.arret or "").lower()
+
+
+async def test_sans_conflit_le_resolveur_ne_change_rien(tmp_path: Path) -> None:
+    async def resoudre(fichiers: tuple[str, ...]) -> None:
+        raise AssertionError("ne doit pas être appelé")
+
+    svc, _git, workflow = _service(tmp_path, "merge", resolveur=resoudre)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is True
+    assert livraison.conflits == ()
+
+
+async def test_un_conflit_non_resolu_arrete_toujours_tout(tmp_path: Path) -> None:
+    async def resoudre(fichiers: tuple[str, ...]) -> None:
+        return None
+
+    svc, _git, workflow = _service(
+        tmp_path,
+        "merge",
+        git=_FauxGit(conflits=("src/app.py",), resolvables=False),
+        resolveur=resoudre,
+    )
+
+    livraison = await _livrer(svc)
+
+    assert workflow.ouvertures == []
+    assert livraison.conflits == ("src/app.py",)

@@ -465,3 +465,86 @@ async def test_un_conflit_est_nomme_et_la_branche_reste_intacte(repo: Path) -> N
     contenu = (repo / "partage.py").read_text(encoding="utf-8")
     assert "<<<<<<<" not in contenu
     assert contenu == "version = 'branche'\n"
+
+
+# ------------------------------------------------------------------
+# Faire résoudre un conflit, sans jamais laisser l'arbre à mi-chemin — t.090
+# ------------------------------------------------------------------
+
+
+async def _branche_en_conflit(repo: Path, service: GitWorkspaceService) -> str:
+    """Prépare une branche dont le rebase sur la base entre en conflit."""
+    base = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+    branche = await service.create_branch("ticket-001", "ma-feature")
+    (repo / "partage.py").write_text("version = 'branche'\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-001 — feature")
+    await _git(repo, "checkout", "-q", base)
+    (repo / "partage.py").write_text("version = 'base'\n", encoding="utf-8")
+    await _git(repo, "add", "partage.py")
+    await _git(repo, "commit", "-q", "-m", "chore: base")
+    await _git(repo, "checkout", "-q", branche)
+    return base
+
+
+async def test_un_resolveur_qui_reussit_termine_le_rebase(repo: Path) -> None:
+    service = GitWorkspaceService(repo)
+    base = await _branche_en_conflit(repo, service)
+
+    async def resoudre(fichiers: tuple[str, ...]) -> None:
+        assert fichiers == ("partage.py",)
+        (repo / "partage.py").write_text("version = 'les deux'\n", encoding="utf-8")
+
+    conflits = await service.rejouer_sur(base, resolveur=resoudre)
+
+    assert conflits == ()
+    assert await service.is_clean()
+    assert (repo / "partage.py").read_text(encoding="utf-8") == "version = 'les deux'\n"
+    journal = await service._run("log", "--oneline")
+    assert "base" in journal and "feature" in journal
+
+
+async def test_un_resolveur_qui_laisse_des_marqueurs_fait_tout_annuler(
+    repo: Path,
+) -> None:
+    # Un fichier qui garde ses `<<<<<<<` compile rarement et se relit encore
+    # moins. Le committer serait pire que ne rien faire.
+    service = GitWorkspaceService(repo)
+    base = await _branche_en_conflit(repo, service)
+
+    async def resoudre(fichiers: tuple[str, ...]) -> None:
+        (repo / "partage.py").write_text(
+            "<<<<<<< HEAD\nversion = 'base'\n=======\nversion = 'branche'\n>>>>>>>\n",
+            encoding="utf-8",
+        )
+
+    conflits = await service.rejouer_sur(base, resolveur=resoudre)
+
+    assert conflits == ("partage.py",)
+    assert await service.is_clean()
+    assert (repo / "partage.py").read_text(encoding="utf-8") == "version = 'branche'\n"
+
+
+async def test_un_resolveur_qui_leve_fait_tout_annuler(repo: Path) -> None:
+    # L'arbre ne doit jamais rester à mi-rebase : le ticket suivant démarrerait
+    # dessus, et l'utilisateur hériterait d'un dépôt qu'il n'a pas choisi.
+    service = GitWorkspaceService(repo)
+    base = await _branche_en_conflit(repo, service)
+
+    async def resoudre(fichiers: tuple[str, ...]) -> None:
+        raise RuntimeError("l'agent a abandonné")
+
+    conflits = await service.rejouer_sur(base, resolveur=resoudre)
+
+    assert conflits == ("partage.py",)
+    assert await service.is_clean()
+    assert (repo / "partage.py").read_text(encoding="utf-8") == "version = 'branche'\n"
+
+
+async def test_sans_resolveur_le_comportement_ne_change_pas(repo: Path) -> None:
+    service = GitWorkspaceService(repo)
+    base = await _branche_en_conflit(repo, service)
+
+    conflits = await service.rejouer_sur(base)
+
+    assert conflits == ("partage.py",)
+    assert await service.is_clean()
