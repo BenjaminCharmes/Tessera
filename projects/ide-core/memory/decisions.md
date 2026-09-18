@@ -307,5 +307,5 @@ Format : ADR léger (Architecture Decision Record).
 
 **Date** : 2026-09-18
 **Décision** : à la fin d'une file ou d'un run autonome — jamais par ticket — `doc-technique` et `doc-fonctionnelle` reçoivent les tickets livrés depuis le dernier marqueur. Ils rendent des **modifications** : un ancien texte exact, un nouveau. Un ancien absent, ambigu, ou qui amputerait le fichier de moitié rejette tout le lot sans rien écrire.
-**Raison** : `doc-updater` réécrivait le fichier **entier** depuis une vue tronquée à 8 000 caractères, avec 2 048 tokens de sortie. Sur un `README.md` de 24 000 caractères, l'activer en aurait effacé les deux tiers sans erreur — le contrat ne lui laissait pas le choix. Et documenter par ticket réécrit trois fois le même fichier pour une même feature.
-**Pourquoi deux agents** : un seul, à qui on demande les deux, écrit un guide utilisateur plein de noms de classes — c'est ce qu'il vient de lire.
+**Raison** : `doc-updater` réécrivait le fichier **entier** depuis une vue tronquée à 8 000 caractères, avec 2 048 tokens de sortie. Sur un `README.md` de 24 000 caractères, l'activer en aurait effacé les deux tiers sans erreur — le contrat ne lui laissait pas le choix. Et documenter par ticket réécrit le même fichier trois fois pour une même feature.
+**Pourquoi deux agents** : un seul écrit un guide utilisateur plein de noms de classes — c'est ce qu'il vient de lire.
