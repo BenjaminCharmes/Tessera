@@ -15,6 +15,7 @@ from claude_agent_sdk import (
 )
 
 from vibe_ide.services.providers.git_guard import hook_refus_git
+from vibe_ide.services.providers.perimetre import hook_refus_hors_perimetre
 from vibe_ide.services.providers.ask_user import (
     ASK_USER_SERVER_NAME,
     ASK_USER_TOOL_NAME,
@@ -92,7 +93,18 @@ def _build_options(
         # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
         # `allowed_tools` couvrant `Bash` l'auto-approuverait avant tout
         # callback de permission — le garde serait inerte (ticket-068).
-        hooks={"PreToolUse": [HookMatcher(matcher="Bash", hooks=[hook_refus_git])]},
+        hooks={
+            "PreToolUse": [
+                HookMatcher(matcher="Bash", hooks=[hook_refus_git]),
+                # `cwd` place l'agent dans le projet, il ne l'y enferme pas :
+                # rien n'empêchait un `Write` vers le dépôt du client d'à côté
+                # (ticket-085).
+                HookMatcher(
+                    matcher="Write|Edit|NotebookEdit",
+                    hooks=[hook_refus_hors_perimetre(cwd)],
+                ),
+            ]
+        },
     )
 
 

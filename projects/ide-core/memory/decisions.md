@@ -287,3 +287,13 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : les maillons existaient tous, rien ne les enchaînait, et chaque étape demandait un clic. Mais le travail est déjà commité quand la livraison commence : faire échouer le run parce que GitHub est injoignable ferait croire que le pipeline a échoué. L'arrêt est une information, pas une panne.
 **Invariants** : un run non approuvé ne se livre jamais (son commit porte du travail refusé, ADR-018) ; un conflit **annule** le rebase et nomme les fichiers, au lieu de laisser l'arbre à mi-chemin, ce qui bloquerait le ticket suivant ; l'attente de CI est bornée, pour la même raison.
 **Alternative rejetée** : résoudre les conflits automatiquement (choisir à la place de l'utilisateur, dans son dépôt) ; attendre la CI sans borne.
+
+---
+
+## ADR-031 — Un agent n'écrit que sous la racine de son projet
+
+**Date** : 2026-09-18
+**Décision** : Un hook `PreToolUse` refuse `Write`, `Edit` et `NotebookEdit` dont le chemin sort de la racine du projet. Cette racine est le dossier du projet, ou le dépôt qui le contient quand il déclare `git_root: ancestor` (ADR-028). Les deux chemins sont résolus, liens symboliques compris. **Lire hors du projet reste permis.**
+**Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Six dépôts clients voisins dans `projects/`, et un codeur qui se trompe de dossier écrit chez un autre client — exactement la fuite qu'ADR-021 et ADR-023 cherchent à empêcher, par l'autre bout. Lire ne laisse rien dans le dépôt de personne ; écrire, si.
+**Forme** : celle d'ADR-027. Un hook, parce qu'une entrée d'`allowed_tools` couvrant `Write` l'auto-approuve *avant* tout callback de permission ; au niveau du SDK, parce qu'une consigne de prompt décrit une intention quand un refus produit un fait.
+**Limite assumée** : `Bash` n'est pas couvert — une redirection shell y échappe. La traquer demanderait d'analyser toutes les formes d'écriture d'une ligne de shell, l'arms race que `git_guard` refuse déjà.
