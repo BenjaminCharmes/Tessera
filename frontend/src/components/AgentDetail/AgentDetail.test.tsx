@@ -28,7 +28,7 @@ describe("AgentDetail", () => {
     expect(await screen.findByText(/Tu ne commites jamais/)).toBeInTheDocument();
   });
 
-  it("distingue un agent natif d'un agent cree", async () => {
+  it("distingue un agent requis par le produit d'un agent ajoute", async () => {
     detail.mockResolvedValue({
       role: "mon-agent",
       is_builtin: false,
@@ -37,7 +37,7 @@ describe("AgentDetail", () => {
 
     render(<AgentDetail role="mon-agent" />);
 
-    expect(await screen.findByText("perso")).toBeInTheDocument();
+    expect(await screen.findByText("ajouté")).toBeInTheDocument();
   });
 
   it("invite a choisir un agent quand aucun n'est selectionne", () => {

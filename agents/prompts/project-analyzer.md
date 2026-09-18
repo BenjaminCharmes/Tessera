@@ -24,7 +24,7 @@ Réponds UNIQUEMENT avec ce JSON (pas de texte avant ou après) :
 
 ```json
 {
-  "claude_md": "# CLAUDE.md — NomDuProjet\n\nDescription...\n\n## Stack\n\n...\n\n## Agents actifs\n\n- `codeur` — ...\n\n## Conventions\n\n...\n\n## Structure\n\n...",
+  "claude_md": "# NomDuProjet\n\nDescription...\n\n## Stack\n\n...\n\n## Agents actifs\n\n- `codeur` — ...\n\n## Conventions\n\n...\n\n## Structure\n\n...",
   "detected_stack": ["Python", "FastAPI"],
   "suggested_agents": ["codeur", "reviewer"]
 }

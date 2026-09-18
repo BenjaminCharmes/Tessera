@@ -1,4 +1,4 @@
-# CLAUDE.md — projet ide-core
+# ide-core
 
 Projet bootstrap : ce projet **est** l'IDE lui-même.
 Les tickets ici décrivent les features à construire pour rendre l'IDE opérationnel.

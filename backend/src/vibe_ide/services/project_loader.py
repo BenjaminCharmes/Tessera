@@ -137,11 +137,32 @@ class ProjectLoader:
 # ------------------------------------------------------------------
 
 
+#: `CLAUDE.md` accolé au titre, avant ou après un tiret. Les prompts qui
+#: génèrent ces fichiers écrivent « # CLAUDE.md — NomDuProjet », ce qui est un
+#: bon en-tête de fichier et un mauvais nom de projet.
+_DECORATION = re.compile(
+    r"^\s*CLAUDE\.md\s*$"                       # le titre n'est que le fichier
+    r"|^\s*CLAUDE\.md\s*[—:–-]\s*(?:projet\s+)?"  # « CLAUDE.md — projet X »
+    r"|\s*[—:–-]\s*CLAUDE\.md\s*$",              # « X — CLAUDE.md »
+    re.IGNORECASE,
+)
+
+
 def _parse_name(content: str, fallback: str) -> str:
+    """Le nom lisible du projet, tiré du premier titre du CLAUDE.md (ADR-007).
+
+    Le titre sert deux choses à la fois : il annonce le fichier et il nomme le
+    projet. Les deux ne veulent pas la même chose — la barre latérale affichait
+    « Lyra — CLAUDE.md » et « CLAUDE.md — projet ide-core ». Le nom du
+    fichier est retiré ici, parce que c'est ici qu'on lit un **nom de projet**
+    (ticket-093).
+    """
     for line in content.splitlines():
         m = re.match(r"^#\s+(.+)", line)
-        if m:
-            return m.group(1).strip()
+        if not m:
+            continue
+        titre = _DECORATION.sub("", m.group(1).strip()).strip()
+        return titre or fallback
     return fallback
 
 

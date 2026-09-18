@@ -307,3 +307,41 @@ def test_un_reglage_disparu_ne_casse_pas_un_projet_existant(tmp_path: Path) -> N
     pipeline = load_pipeline_config(tmp_path)
 
     assert pipeline.max_review_rounds == 4
+
+
+# ------------------------------------------------------------------
+# Le nom d'un projet n'est pas le nom d'un fichier — ticket-093
+# ------------------------------------------------------------------
+
+
+def test_le_nom_de_fichier_ne_devient_pas_le_nom_du_projet(tmp_path: Path) -> None:
+    # Vu à l'écran : « Lyra — CLAUDE.md », « CLAUDE.md — projet ide-core ».
+    # Le H1 était écrit comme un en-tête de fichier, puis relu comme le nom du
+    # projet (ADR-007). Deux usages, une seule chaîne.
+    (tmp_path / "CLAUDE.md").write_text("# Lyra — CLAUDE.md\n", encoding="utf-8")
+
+    assert load_project(tmp_path).name == "Lyra"
+
+
+def test_la_decoration_en_tete_est_retiree_aussi(tmp_path: Path) -> None:
+    (tmp_path / "CLAUDE.md").write_text(
+        "# CLAUDE.md — projet ide-core\n", encoding="utf-8"
+    )
+
+    assert load_project(tmp_path).name == "ide-core"
+
+
+def test_un_titre_propre_est_laisse_intact(tmp_path: Path) -> None:
+    (tmp_path / "CLAUDE.md").write_text("# Orion Analytics\n", encoding="utf-8")
+
+    assert load_project(tmp_path).name == "Orion Analytics"
+
+
+def test_un_titre_qui_ne_serait_que_la_decoration_retombe_sur_le_dossier(
+    tmp_path: Path,
+) -> None:
+    projet = tmp_path / "mon-projet"
+    projet.mkdir()
+    (projet / "CLAUDE.md").write_text("# CLAUDE.md\n", encoding="utf-8")
+
+    assert load_project(projet).name == "mon-projet"

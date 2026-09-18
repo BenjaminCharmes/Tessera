@@ -55,8 +55,10 @@ describe("AgentList", () => {
     render(<AgentList onAgentCreated={onAgentCreated} />);
     expect(screen.getByText("codeur")).toBeInTheDocument();
     expect(screen.getByText("securite")).toBeInTheDocument();
-    expect(screen.getByText("natif")).toBeInTheDocument();
-    expect(screen.getByText("perso")).toBeInTheDocument();
+    // Le badge dit la conséquence, pas l'origine : « qui a écrit le prompt »
+    // n'apprend rien, puisque c'est toujours un agent (ticket-094).
+    expect(screen.getByText("requis")).toBeInTheDocument();
+    expect(screen.getByText("ajouté")).toBeInTheDocument();
   });
 
   it("shows delete button only for custom agents", () => {
