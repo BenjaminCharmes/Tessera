@@ -300,3 +300,12 @@ Format : ADR léger (Architecture Decision Record).
 **Décision** : une règle a **une** description ; les fichiers de consigne renvoient à elle au lieu de la reformuler. `test_consignes_coherentes.py` vérifie qu'ils ne se contredisent pas sur git, ne codent en dur aucun chemin de machine, ne décrivent rien d'absent, et qu'aucun ADR ne dépasse son budget.
 **Raison** : `projects/ide-core/CLAUDE.md` portait sa propre version du flux git — PR de ticket sur `main`, merge en `--squash` — l'exact inverse de la règle. Il est `@`-importé dans chaque session quand le skill juste se charge à la demande : la consigne fausse était toujours en contexte, la bonne seulement parfois.
 **Corollaire** : un budget que rien ne mesure est un souhait. Douze ADR sur trente et un dépassaient le leur, dont trois écrits le jour où ce budget était rappelé.
+
+---
+
+## ADR-035 — La documentation se met à jour par lot, en modifications ciblées
+
+**Date** : 2026-09-18
+**Décision** : à la fin d'une file ou d'un run autonome — jamais par ticket — `doc-technique` et `doc-fonctionnelle` reçoivent les tickets livrés depuis le dernier marqueur. Ils rendent des **modifications** : un ancien texte exact, un nouveau. Un ancien absent, ambigu, ou qui amputerait le fichier de moitié rejette tout le lot sans rien écrire.
+**Raison** : `doc-updater` réécrivait le fichier **entier** depuis une vue tronquée à 8 000 caractères, avec 2 048 tokens de sortie. Sur un `README.md` de 24 000 caractères, l'activer en aurait effacé les deux tiers sans erreur — le contrat ne lui laissait pas le choix. Et documenter par ticket réécrit trois fois le même fichier pour une même feature.
+**Pourquoi deux agents** : un seul, à qui on demande les deux, écrit un guide utilisateur plein de noms de classes — c'est ce qu'il vient de lire.

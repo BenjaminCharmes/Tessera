@@ -11,6 +11,7 @@ from vibe_ide.services.agent_registry import AgentRegistryService
 from vibe_ide.services.sync_map import SyncMapService
 from vibe_ide.services.agent_runner import AgentRunner
 from vibe_ide.services.dialogue import DialogueChannel
+from vibe_ide.services.documentation import DocumentationService
 from vibe_ide.services.pipeline_events import EventType
 from vibe_ide.services.database import create_run, finish_run, save_event
 from vibe_ide.services.doc_updater import DocUpdaterService
@@ -176,7 +177,36 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
         livrer=_livreur(project_id, runner),
+        documenter=_documenteur(project_id),
     )
+
+
+def _documenteur(project_id: str) -> Callable[[], Awaitable[None]]:
+    """Fabrique la mise à jour de documentation d'un projet (ticket-092).
+
+    Appelée **une fois par lot**, pas par ticket : la documentation décrit le
+    produit, pas un changement. Sans outils — elle lit des tickets et rend du
+    JSON, elle n'a aucune raison d'écrire elle-même sur le disque.
+    """
+    project_path = settings.ide_workspace_dir / project_id
+    service = DocumentationService(
+        get_provider(
+            settings.llm_provider, settings.anthropic_api_key, allow_tools=False
+        ),
+        settings.ide_prompts_dir,
+    )
+
+    async def documenter() -> None:
+        resultat = await service.mettre_a_jour(project_path)
+        if resultat.fichiers_modifies:
+            _logger.info(
+                "documentation_mise_a_jour",
+                extra={"fichiers": resultat.fichiers_modifies},
+            )
+        for refus in resultat.refus:
+            _logger.warning("documentation_refusee", extra={"motif": refus})
+
+    return documenter
 
 
 def _livreur(

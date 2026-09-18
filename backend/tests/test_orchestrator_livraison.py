@@ -121,3 +121,57 @@ async def test_sans_livreur_le_run_est_rendu_tel_quel(tmp_path: Path) -> None:
 
 async def _rien(event: OrchestratorEvent) -> None:
     return None
+
+
+# ------------------------------------------------------------------
+# La documentation se met à jour une fois par lot — ticket-092
+# ------------------------------------------------------------------
+
+
+async def test_la_doc_se_met_a_jour_une_fois_apres_la_file(tmp_path: Path) -> None:
+    # Le cœur du ticket : dix tickets ne déclenchent pas dix mises à jour.
+    # La documentation décrit le produit, pas un changement.
+    appels: list[int] = []
+
+    async def _documenter() -> None:
+        appels.append(1)
+
+    orch = _construire(
+        tmp_path,
+        [_resultat(f"ticket-{n:03d}") for n in range(1, 4)],
+        None,
+    )
+    orch._documenter = _documenter  # type: ignore[assignment]
+
+    await orch.run_queue("p", ["ticket-001", "ticket-002", "ticket-003"])
+
+    assert appels == [1]
+
+
+async def test_un_run_unique_ne_declenche_pas_la_doc(tmp_path: Path) -> None:
+    # Un ticket lancé seul, c'est un aller-retour rapide pendant qu'on
+    # travaille : y ajouter un appel de documentation le ralentit sans que
+    # personne l'ait demandé.
+    appels: list[int] = []
+
+    async def _documenter() -> None:
+        appels.append(1)
+
+    orch = _construire(tmp_path, [_resultat("ticket-001")], None)
+    orch._documenter = _documenter  # type: ignore[assignment]
+
+    await orch.run_pipeline("p", "ticket-001", _rien)
+
+    assert appels == []
+
+
+async def test_une_doc_qui_echoue_ne_casse_pas_la_file(tmp_path: Path) -> None:
+    async def _documenter() -> None:
+        raise RuntimeError("provider injoignable")
+
+    orch = _construire(tmp_path, [_resultat("ticket-001")], None)
+    orch._documenter = _documenter  # type: ignore[assignment]
+
+    resultats = await orch.run_queue("p", ["ticket-001"])
+
+    assert len(resultats) == 1

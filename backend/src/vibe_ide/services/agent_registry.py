@@ -35,6 +35,8 @@ class AgentRegistryService:
             "architect",
             "chat",
             "codeur",
+            "doc-fonctionnelle",
+            "doc-technique",
             "doc-updater",
             "orchestrateur",
             "planificateur",

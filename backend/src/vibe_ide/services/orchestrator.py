@@ -65,6 +65,7 @@ class Orchestrator:
         run_max_budget_usd: float = 0.0,
         quota_tracker: Optional["QuotaTracker"] = None,
         livrer: Optional[Callable[[PipelineResult], Awaitable["Livraison"]]] = None,
+        documenter: Optional[Callable[[], Awaitable[None]]] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -89,6 +90,12 @@ class Orchestrator:
         # le routeur décide. C'est ce qui le garde ignorant de GitHub, et ce
         # qui met la livraison sur **tous** les modes de run (ticket-084).
         self._livrer = livrer
+        # La documentation se met à jour **une fois par lot**, à la fin d'une
+        # file ou d'un run autonome — jamais par ticket. Elle décrit le
+        # produit, pas un changement : trois tickets sur une même feature
+        # produiraient trois réécritures partielles du même fichier
+        # (ticket-092).
+        self._documenter = documenter
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -279,6 +286,7 @@ class Orchestrator:
                 )
                 break
 
+        await self._documenter_le_lot()
         return results
 
     async def run_autonomous(
@@ -342,7 +350,22 @@ class Orchestrator:
             result = await self.run_pipeline(project_id, ticket.id, callback)
             results.append(result)
 
+        await self._documenter_le_lot()
         return results
+
+    async def _documenter_le_lot(self) -> None:
+        """Met à jour la documentation, une fois, à la fin du lot.
+
+        Un échec ne casse pas la file : le travail des tickets est commité, et
+        perdre leurs résultats parce que la documentation n'a pas pu se mettre
+        à jour serait disproportionné.
+        """
+        if self._documenter is None:
+            return
+        try:
+            await self._documenter()
+        except Exception as exc:  # noqa: BLE001 — voir la docstring
+            _logger.warning("documentation_echouee", extra={"erreur": str(exc)})
 
     def _log(self, message: str) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")

@@ -23,6 +23,10 @@ class _OrchestrateurFile:
         self._run_max_budget_usd = 0.0
         self._spent_usd = 0.0
         self.run_queue = Orchestrator.run_queue.__get__(self)  # type: ignore[attr-defined]
+        # La documentation se met à jour à la fin du lot (ticket-092) ; ce
+        # double n'en a pas, et `run_queue` doit s'en passer.
+        self._documenter = None
+        self._documenter_le_lot = Orchestrator._documenter_le_lot.__get__(self)  # type: ignore[attr-defined]
         self.budget_exhausted = lambda: False
         self._log = lambda m: None
 
