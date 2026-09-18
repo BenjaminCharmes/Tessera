@@ -5,65 +5,33 @@ Les tickets ici décrivent les features à construire pour rendre l'IDE opérati
 
 ---
 
-## État de la v0
+## Ce qu'il faut savoir avant d'ouvrir un ticket
 
-### Phase 1 — Backend : ✅ DONE (tickets 000–006)
+Les phases 1 à 10 sont livrées — quatre-vingt-dix tickets. Le détail est dans
+`tickets/done/`, un fichier par ticket, et il n'a pas sa place ici : ce fichier
+est `@`-importé dans **chaque** session, et une liste de travail terminé s'y
+paye à chaque fois sans rien apprendre à personne.
 
-1. Structure de base et configuration
-2. Modèles Pydantic + TicketService
-3. ProjectLoader + API projets/tickets
-4. Agent loop avec streaming Claude
-5. Orchestrateur multi-agents (codeur→reviewer, max 3 tours)
-6. GitHub Sync (import issues → tickets)
+Ce qui sert vraiment avant d'écrire du code :
 
-### Phase 2 — Frontend + Desktop : ✅ DONE (tickets 007–010)
+- **`memory/decisions.md`** — les contraintes en vigueur. Importé lui aussi,
+  donc déjà en contexte : les ignorer est un choix, pas un oubli.
+- **`tickets/done/ticket-0XX-*.md`** — chacun porte une section « Ce que ça ne
+  fait pas ». C'est là que sont les limites connues, et c'est ce qui évite de
+  reconstruire ce qui a été écarté exprès.
 
-7. Scaffold React/Vite/Tailwind/Monaco
-8. Ticket board (liste + kanban)
-9. Agent stream panel (WebSocket)
-10. Tauri v2 shell (fenêtre native macOS)
+## Ce qui tourne réellement sur ce projet
 
-### Phase 3 — Qualité + UX : ✅ DONE (tickets 011–015)
+`agents.json` déclare `codeur` et `reviewer` dans le pipeline. Le testeur, la
+sécurité, le validateur et le doc-updater sont **désactivés** ici — leurs
+`*_enabled` sont absents, donc faux.
 
-11. ✅ Monaco branché sur le filesystem réel
-12. ✅ Tests frontend (Vitest + RTL, 80% couverture)
-13. ✅ CI GitHub Actions (3 jobs parallèles)
-14. ✅ UI création de projet depuis la sidebar
-15. ✅ SQLite persistence (historique des pipelines)
-
-### Phase 4 — IDE fonctionnel : ✅ DONE (tickets 016–020)
-
-16. ✅ UI création de ticket depuis la sidebar
-17. ✅ Live ticket board (WS events → mise à jour temps réel)
-18. ✅ Panneau historique des pipelines (UI pour GET /runs)
-19. ✅ UX polish (ErrorBoundary, empty states, toasts)
-20. ✅ E2E tests Playwright (5 flows critiques)
-
-### Phase 5 — Agents dynamiques + intégration GitHub : ✅ DONE (tickets 021–033)
-
-### Phase 6 — Pipeline enrichi + qualité : ✅ DONE (tickets 034–037)
-
-34. ✅ Agent doc-updater (mise à jour auto README/docs/CLAUDE.md après approbation)
-35. ✅ Agent testeur (exécution auto des tests dans le pipeline — pytest/npm/cargo)
-36. ✅ Agent validateur (vérification critère par critère des ACs)
-37. ✅ Agent sécurité (audit OWASP — BLOCK si CRITICAL/HIGH, sinon PASS)
-- Coverage tooling : pytest-cov backend (74%, seuil 70%) + vitest v8 frontend
-
-21. ✅ Registre d'agents dynamiques (AgentRegistryService)
-22. ✅ API CRUD agents (GET/POST/DELETE /api/v1/agents/registry)
-23. ✅ Agent conversationnel agent-creator (création agent via chat)
-24. ✅ UI gestion des agents (sidebar panel ⚙ + modale conversationnelle)
-25. ✅ Import projet local existant (modes symlink & copy)
-26. ✅ Agent project-analyzer (génération CLAUDE.md depuis le code)
-27. ✅ UI import de projet (3 étapes : source → analyse → validation)
-28. ✅ Agent planificateur (description NL → batch de tickets)
-29. ✅ UI « Planifier une évolution » + persistance batch
-30. ✅ Clone de repo GitHub dans le workspace
-31. ✅ Synchronisation bidirectionnelle tickets ↔ GitHub Issues
-32. ✅ Intégration GitHub Pull Requests (création + statut CI)
-33. ✅ Création automatique des agents manquants à la création de projet
-
----
+Ce n'est pas un oubli à corriger à la légère : les tests de ce dépôt vivent
+dans `backend/` et `frontend/`, au-dessus du dossier du projet, et
+`TestRunnerService` lance sa commande depuis le dossier du projet sans passer
+par un shell. Activer `testeur_enabled` demande donc un `test_command` qui
+atteigne `../../backend` par lui-même. Tant que ce n'est pas fait, le dire vaut
+mieux que laisser croire le contraire.
 
 ## Stack spécifique à ce projet
 
@@ -80,24 +48,18 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 
 ## Workflow Git
 
-### Workflow selon la phase
+**Il n'est pas décrit ici.** Le flux — `ticket-XXX` → `develop` (squash) →
+`main` (merge commit) — est dans `CLAUDE.md` à la racine, et le détail
+opératoire dans le skill `ticket-workflow`.
 
-**CI opérationnelle depuis ticket-013** : une branche par ticket + PR obligatoire.
-Merger avec `--squash --auto` une fois les checks verts.
-Je peux merger les PRs moi-même une fois les checks CI verts.
-```bash
-git checkout -b ticket-XXX-description-courte
-# ... implémentation ...
-git push -u origin ticket-XXX-description-courte
-GH_CONFIG_DIR=/Users/moi/.config/gh gh pr create --base main --title "feat: ticket-XXX — ..."
-# Attendre CI verte, puis merger :
-GH_CONFIG_DIR=/Users/moi/.config/gh gh pr merge --squash --auto
-```
+Ce fichier a longtemps porté sa propre version, qui disait d'ouvrir les PR de
+ticket sur `main` et de les merger en `--squash`. L'inverse du flux réel. Et
+comme il est `@`-importé dans chaque session alors que le skill se charge à la
+demande, la consigne fausse était toujours en contexte et la bonne seulement
+parfois. Deux descriptions d'une même règle finissent toujours par diverger :
+il n'en reste qu'une.
 
-### Règles absolues
-
-- **Jamais de `git push --force` sur `main`**
-- Messages de commit en anglais, format Conventional Commits : `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`
+`test_consignes_coherentes.py` le vérifie.
 
 ---
 

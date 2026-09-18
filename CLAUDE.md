@@ -67,8 +67,7 @@ permanence. C'est ce qui justifie l'import ici et pas là.
 vibe-ide/
   CLAUDE.md              ← ce fichier (constitution globale)
   CLAUDE.local.md        ← overrides locaux (gitignore)
-  .claude/               ← config Claude Code
-    settings.json
+  .claude/               ← config Claude Code (skills, commands)
   projects/              ← tous les projets gérés par l'IDE
     ide-core/            ← projet bootstrap (l'IDE se construit lui-même)
   agents/                ← définitions et prompts des agents
@@ -129,6 +128,8 @@ dépôt — à ne pas confondre avec `agents/prompts/`, qui contient les prompts
   settings.local.json     ← préférences personnelles (gitignoré)
 ```
 
+Slash commands : `/new-ticket`, `/run-vibe-ide`, `/ship`.
+
 **Skills et slash commands sont deux choses différentes.** Un skill est chargé
 par Claude quand sa `description` correspond à la tâche — il ne se tape pas.
 Une slash command est une invite que l'utilisateur déclenche à la main
@@ -167,24 +168,36 @@ dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
 
 ---
 
-## État actuel (Phase 7 en cours)
+## Où en est le produit
 
-- Backend, frontend et persistance SQLite sont en place et fonctionnels
-- Pipeline complet codeur → testeur → sécurité → reviewer → validateur →
-  doc-updater, orchestration WebSocket, intégration GitHub (issues/PRs/clone),
-  registre d'agents dynamique — voir le tableau de fonctionnalités du `README.md`
-- Les agents écrivent réellement sur disque (ADR-017) et chaque run de pipeline
-  s'isole sur sa propre branche git, sur le diff réel (ADR-018)
-- **Tickets 045 à 052 livrés** : pipeline sur diff réel, décomposition de
-  `run_pipeline`, skills locaux, chat conversationnel, flux git `develop`,
-  échecs bruyants sur prompt manquant, plafond de dépense par run
-- **Phase 8 terminée** — couverture des routers (86 → 93,5 %), quota réel de
-  l'abonnement, lancement de pipeline depuis le chat, outillage Windows
-  (`doctor`, `scripts/vibe.ps1`), ADR chargés automatiquement
-- **Phase 9 terminée** — liaison d'un projet à GitHub, artefacts versionnés ou
-  locaux par projet (`.git/info/exclude`, ADR-021), retrait d'un projet sans
-  perte de fichiers, suivi par ticket et ouverture de PR (ADR-022 : jamais de
-  merge). Aucun ticket ouvert
-- **Workflow allégé** : plus de PR ni d'attente de CI pendant cette phase, les
-  commits vont directement sur `develop`. `main` reste le point de retour
-- Toujours pas d'auth et pas de déploiement cloud — hors scope pour l'instant
+Le détail par ticket est dans `projects/ide-core/tickets/done/`, et les
+contraintes en vigueur dans `memory/decisions.md`. Ce qui suit ne dit que ce
+qu'un agent doit savoir pour ne pas reconstruire ce qui existe.
+
+### Ce qui marche
+
+- Pipeline codeur → testeur → sécurité → reviewer → validateur → doc-updater,
+  sur le **diff git réel**, une branche et un commit par run (ADR-018)
+- Trois modes de run : un ticket, une file choisie, autonome
+- Après un run approuvé, la **livraison** enchaîne seule jusqu'où le projet
+  l'autorise : rebase, PR, attente de CI, merge (ADR-029, ADR-030)
+- Un conflit de rebase est tenté par un agent, et la résolution est toujours
+  relue (ADR-033)
+- Les artefacts vibe-ide restent hors des dépôts clients par défaut (ADR-021,
+  ADR-023) ; les agents ne touchent pas à git (ADR-027) et n'écrivent pas hors
+  de leur projet (ADR-031)
+- Registre d'agents, modèle par projet, coûts par projet/ticket/agent/modèle,
+  quota d'abonnement réel
+
+### Ce qui n'existe pas
+
+- Pas d'authentification, pas de déploiement cloud — hors scope
+- Pas de résolution de conflit sans relecture, et ce n'est pas un manque
+- Le contrôle d'écriture sur `Bash` attrape une erreur, pas une évasion
+  (ADR-031)
+
+### Le flux de travail courant
+
+Branche par ticket, PR vers `develop`, puis `develop` vers `main`. Plus de
+raccourci « commits directs sur develop » : la CI tourne sur chaque PR et la
+livraison automatique s'appuie dessus.

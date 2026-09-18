@@ -23,10 +23,15 @@ toute contrainte de comportement — continue de partir dans les 18 appels.
 | | Mots |
 |---|---|
 | ADR-001 à ADR-016 (référence) | 46 – 72 |
-| Décision structurante, avec conséquence assumée | ≤ 160 |
-| **Jamais** | > 200 |
+| Décision structurante, avec conséquence assumée | **≤ 160** |
 
 Si tu dépasses, tu écris une spec, pas un ADR. La spec va dans le ticket.
+
+**Le budget est mesuré.** `backend/tests/test_consignes_coherentes.py` refuse
+tout ADR au-dessus de 160 mots, et vérifie que chacun porte sa `**Date**` et
+sa `**Décision**`. Douze ADR sur trente et un le dépassaient avant qu'il
+existe, dont trois écrits le jour même où ce fichier le rappelait : un budget
+que rien ne mesure n'est pas un budget, c'est un souhait.
 
 ## Format
 

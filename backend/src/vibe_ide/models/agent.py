@@ -37,11 +37,18 @@ class AgentConfig(BaseModel):
 
 
 class AgentPipelineConfig(BaseModel):
-    """Section pipeline de agents.json."""
+    """Section pipeline de agents.json.
 
-    default: list[str] = Field(default_factory=list)
+    Chaque champ ici est lu quelque part — `test_consignes_coherentes.py` le
+    vérifie. `default` et `auto_merge_on_approve` en ont été retirés
+    (ticket-091) : rien ne les lisait, et le second était écrit à `true` dans
+    chaque projet créé. Dans un produit dont toute la question est de savoir
+    qui a le droit de merger, un réglage nommé « merge automatique » qui ne
+    fait rien est pire qu'absent — on le lit, et on le croit. Qui merge est
+    décidé par `autonomy` (ADR-029).
+    """
+
     max_review_rounds: int = 3
-    auto_merge_on_approve: bool = False
     doc_updater_enabled: bool = False
     testeur_enabled: bool = False
     test_command: str | None = None

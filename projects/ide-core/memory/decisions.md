@@ -176,64 +176,47 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-018 — Une branche et un commit par run de pipeline
 
 **Date** : 2026-09-15
-**Décision** : Chaque run s'exécute sur sa propre branche, relit le **diff git réel** plutôt que la prose du codeur, et se termine toujours par un commit — typé du ticket si approuvé, `chore: … — unapproved work (…)` sinon. Seul un run approuvé avance la ref de base.
-**Raison** : Depuis ADR-017 les agents écrivent vraiment sur disque ; relire leur prose validait une intention, pas une implémentation. Committer à tous les coups garde l'arbre propre pour le ticket suivant sans perdre le travail rejeté. N'avancer la base que sur approbation donne l'isolation **et** l'empilement d'un plan séquentiel.
-**Alternative rejetée** : Laisser l'arbre sale pour inspection (bloque le ticket suivant) ; `wip:` comme préfixe (pas un type Conventional Commits, et ces messages vont dans le dépôt de l'utilisateur).
-**Conséquence assumée** : du code bloqué par l'audit sécurité entre dans l'historique git, confiné à la branche du ticket et jamais sur `main`.
-**Détail** : voir `tickets/in-progress/ticket-045-pipeline-diff-reel.md`.
-
----
+**Décision** : chaque run s'exécute sur sa propre branche, relit le **diff git réel** plutôt que la prose du codeur, et finit toujours par un commit — typé du ticket si approuvé, `chore: … — unapproved work (…)` sinon. Seul un run approuvé avance la ref de base.
+**Raison** : depuis ADR-017 les agents écrivent vraiment sur disque ; relire leur prose validait une intention, pas une implémentation. Committer à tous les coups garde l'arbre propre pour le ticket suivant sans perdre le travail rejeté. N'avancer la base que sur approbation donne l'isolation **et** l'empilement d'un plan séquentiel.
+**Alternative rejetée** : laisser l'arbre sale pour inspection — bloque le ticket suivant ; `wip:` en préfixe — pas un type Conventional Commits.
+**Conséquence assumée** : du code bloqué par l'audit sécurité entre dans l'historique, confiné à la branche du ticket, jamais sur `main`.
 
 ## ADR-019 — Le chat de l'IDE commite comme un run de pipeline
 
 **Date** : 2026-09-15
-**Décision** : Le chat conversationnel (ticket-048) écrit sur une branche `chat/<horodatage>` et commite son travail, exactement comme un run de pipeline le fait sur sa branche de ticket. Il ne laisse jamais l'arbre de travail sale.
-**Raison** : ADR-018 fait reposer l'enchaînement des tickets sur un arbre propre au démarrage de chaque run. Un chat qui écrit sans committer enverrait le ticket suivant en `blocked` sans qu'aucun agent n'ait tourné. Traiter le chat comme un producteur de travail de première classe évite d'inventer un second régime d'écriture à côté de celui du pipeline.
-**Alternative rejetée** : Limiter le chat aux fichiers hors arbre suivi et proposer un diff (sûr, mais fait du chat un outil de seconde classe) ; poser un verrou qui empêche le pipeline de démarrer (simple, mais sérialise chat et pipeline alors qu'ils travaillent sur des branches distinctes). Une branche `chat/*` de trop se supprime ; un arbre cassé bloque la file.
-
----
+**Décision** : le chat conversationnel écrit sur une branche `chat/<horodatage>` et commite son travail, comme un run le fait sur sa branche de ticket. Il ne laisse jamais l'arbre sale.
+**Raison** : ADR-018 fait reposer l'enchaînement des tickets sur un arbre propre au démarrage. Un chat qui écrit sans committer enverrait le ticket suivant en `blocked` sans qu'aucun agent n'ait tourné. Traiter le chat comme un producteur de travail de première classe évite d'inventer un second régime d'écriture à côté de celui du pipeline.
+**Alternative rejetée** : limiter le chat aux fichiers hors arbre suivi — sûr, mais en fait un outil de seconde classe ; poser un verrou qui empêche le pipeline de démarrer — sérialise deux choses qui travaillent sur des branches distinctes. Une branche `chat/*` de trop se supprime ; un arbre cassé bloque la file.
 
 ## ADR-020 — Deux plafonds distincts : dépense estimée et quota réel
 
 **Date** : 2026-09-15
-**Décision** : Un run autonome s'arrête sur **deux** conditions indépendantes, vérifiées entre deux tickets : la dépense cumulée estimée (`RUN_MAX_BUDGET_USD`, ticket-052) et le quota d'abonnement réel remonté par le fournisseur (`QuotaTracker`, ticket-054). Un quota **inconnu** ne bloque jamais.
-**Raison** : Les deux mesurent des choses différentes. La dépense estimée se calcule à partir des tokens et d'une grille tarifaire ; le quota est une fenêtre glissante imposée par le fournisseur, qui peut couper un run alors qu'aucun plafond local n'a bougé. Ne suivre que l'un des deux laisse l'autre panne intacte.
-**Alternative rejetée** : Déduire le quota de la dépense estimée (les deux ne sont pas proportionnels) ; traiter l'absence d'événement comme un quota nul (un fournisseur muet deviendrait indiscernable d'un quota épuisé, et l'IDE refuserait de travailler sans raison).
-**Invariant** : la vérification se fait **entre** deux tickets, jamais au milieu d'un — s'arrêter en cours de ticket laisserait son travail non commité, ce qu'ADR-018 interdit.
-**Détail** : voir `tickets/done/ticket-054-quota-abonnement.md`.
-
----
+**Décision** : un run autonome s'arrête sur **deux** conditions indépendantes, vérifiées entre deux tickets : la dépense cumulée estimée (`RUN_MAX_BUDGET_USD`) et le quota d'abonnement réel remonté par le fournisseur (`QuotaTracker`). Un quota **inconnu** ne bloque jamais.
+**Raison** : les deux mesurent des choses différentes. La dépense se calcule depuis les tokens et une grille tarifaire ; le quota est une fenêtre glissante imposée par le fournisseur, qui peut couper un run alors qu'aucun plafond local n'a bougé. Ne suivre que l'un laisse l'autre panne intacte.
+**Alternative rejetée** : déduire le quota de la dépense — les deux ne sont pas proportionnels ; traiter l'absence d'événement comme un quota nul — un fournisseur muet deviendrait indiscernable d'un quota épuisé.
+**Invariant** : la vérification se fait **entre** deux tickets. S'arrêter au milieu de l'un laisserait son travail non commité, ce qu'ADR-018 interdit.
 
 ## ADR-021 — Les artefacts vibe-ide s'excluent par `.git/info/exclude`, jamais par `.gitignore`
 
 **Date** : 2026-09-15
-**Décision** : Un projet déclare dans `agents.json` si ses `tickets/`, `memory/`, `CLAUDE.md` et `agents.json` partent dans son dépôt (`tracked`) ou restent sur la machine (`local`). En mode `local`, l'exclusion est écrite dans `.git/info/exclude`, entre marqueurs, et **jamais** dans `.gitignore`. Défaut : `tracked` pour un projet créé ou importé, `local` pour un projet cloné.
-**Raison** : `.gitignore` est lui-même versionné. Le modifier sur un dépôt client produit un diff visible qui annonce exactement ce qu'on voulait garder hors du dépôt. `.git/info/exclude` a la même sémantique, reste local au clone et n'apparaît ni dans l'historique ni dans un diff. Le défaut diffère selon l'origine parce qu'un dépôt cloné appartient déjà à quelqu'un d'autre : on peut toujours choisir de partager ensuite, on ne peut pas défaire un push.
-**Alternative rejetée** : Un réglage global (le bon choix dépend du projet, pas de la machine) ; `.gitignore` (versionné, donc contre-productif) ; retirer automatiquement de l'index les artefacts déjà suivis (`git rm --cached` modifie l'historique à venir du dépôt de l'utilisateur : ça se propose, ça ne se fait pas en silence).
-**Détail** : voir `tickets/done/ticket-062-artefacts-locaux-ou-versionnes.md`.
+**Décision** : un projet déclare dans `agents.json` si ses `tickets/`, `memory/`, `CLAUDE.md` et `agents.json` partent dans son dépôt (`tracked`) ou restent sur la machine (`local`). En mode `local`, l'exclusion s'écrit dans `.git/info/exclude`, entre marqueurs, et **jamais** dans `.gitignore`.
+**Raison** : `.gitignore` est lui-même versionné. Le modifier sur un dépôt client produit un diff visible qui annonce exactement ce qu'on voulait garder hors du dépôt. `.git/info/exclude` a la même sémantique, reste local au clone, et n'apparaît ni dans l'historique ni dans un diff.
+**Alternative rejetée** : un réglage global — le bon choix dépend du projet, pas de la machine ; retirer de l'index les artefacts déjà suivis, car `git rm --cached` modifie l'historique à venir du dépôt de l'utilisateur : ça se propose, ça ne se fait pas en silence.
 
----
+## ADR-022 — L'agent de workflow pousse et ouvre la PR
 
-## ADR-022 — L'agent de workflow pousse et ouvre la PR, il ne merge jamais
-
-**Date** : 2026-09-15
-**Décision** : `GitHubWorkflowService` pousse la branche du ticket puis ouvre sa PR. Aucune méthode publique, aucun appel, ne merge — deux tests le verrouillent, dont un qui inspecte le code source du module.
-**Raison** : merger, c'est décider qu'un travail est bon. C'est le seul point du pipeline où un humain tranche, et c'est précisément ce qui rend acceptable tout le reste de l'automatisation : un agent qui mergerait rendrait la relecture facultative.
-**Corollaire** : le push n'est **jamais** forcé. Cette branche part dans le dépôt de l'utilisateur, parfois celui d'un client ; écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
-**Alternative rejetée** : merger automatiquement quand la CI est verte (une CI verte dit que le code passe, pas qu'il est bon) ; pousser en `--force` pour éviter les rejets (le rejet est l'information).
-**Détail** : voir `tickets/done/ticket-064-agent-workflow-github.md`.
-
----
+**Date** : 2026-09-15 · **Amendée par ADR-029** : le merge n'est plus interdit partout, il se déclare par projet.
+**Décision** : `GitHubWorkflowService` pousse la branche du ticket puis ouvre sa PR. Le push n'est **jamais** forcé.
+**Raison** : merger, c'est décider qu'un travail est bon — sur le dépôt d'un client, le seul point où un humain tranche, et ce qui rend acceptable tout le reste de l'automatisation. Quant au push : cette branche part chez l'utilisateur, parfois chez son client, et écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
+**Alternative rejetée** : pousser en `--force` pour éviter les rejets — le rejet **est** l'information.
 
 ## ADR-023 — Le mode des artefacts échoue fermé
 
 **Date** : 2026-09-16
-**Décision** : `local` est le défaut quand `agents.json` ne déclare rien, est illisible ou absent, et le défaut d'origine de tout projet **sauf** un projet créé par l'IDE. Les projets importés rejoignent les clonés. `init_repository` applique le mode déclaré avant son `git add -A`.
-**Raison** : ADR-021 posait le mécanisme mais le faisait dépendre d'une déclaration, et `default_mode_for` n'était câblé que sur le clone. Les deux erreurs ne sont pas symétriques : des artefacts non versionnés se rattrapent d'un clic, un push dans le dépôt d'un client ne se défait pas. Le défaut protège, le partage se déclare.
-**Alternative rejetée** : garder `tracked` (fait reposer la confidentialité sur un fichier qui peut manquer) ; avertir sans changer le défaut (l'avertissement arrive après le push).
-**Limite** : `.git/info/exclude` n'agit que sur le non-suivi. Un dépôt qui versionne déjà un `CLAUDE.md` en commitera les modifications — c'est ce que `tracked_artifact_paths()` remonte.
-
----
+**Décision** : `local` est le défaut quand `agents.json` ne déclare rien, est illisible ou absent, et le défaut d'origine de tout projet **sauf** un projet créé par l'IDE.
+**Raison** : ADR-021 posait le mécanisme mais le faisait dépendre d'une déclaration. Les deux erreurs ne sont pas symétriques : des artefacts non versionnés se rattrapent d'un clic, un push dans le dépôt d'un client ne se défait pas. Le défaut protège, le partage se déclare.
+**Alternative rejetée** : garder `tracked` — fait reposer la confidentialité sur un fichier qui peut manquer ; avertir sans changer le défaut — l'avertissement arrive après le push.
+**Limite** : `.git/info/exclude` n'agit que sur le non-suivi. Un dépôt qui versionne déjà un `CLAUDE.md` en commitera les modifications ; c'est ce que `tracked_artifact_paths()` remonte.
 
 ## ADR-024 — Un projet doit être la racine de son propre dépôt
 
@@ -248,85 +231,72 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-025 — Une question sans réponse reprend sur une hypothèse énoncée
 
 **Date** : 2026-09-16
-**Décision** : Un agent peut suspendre son tour pour poser une question. Passé `dialogue_timeout_s`, il reprend seul : on lui répond qu'aucun humain n'est disponible et qu'il doit **choisir et énoncer son hypothèse**. En mode autonome, le délai ne démarre pas.
-**Raison** : ADR-018 fait dépendre la file des tickets d'un arbre propre, et un run suspendu tient du travail non commité : une question sans réponse le temps d'un déjeuner bloquerait la file. Une hypothèse explicite, qui part dans le rapport du run, est relisible ; une hypothèse silencieuse — l'état d'avant — ne l'est pas.
-**Corollaire** : les messages spontanés ont une file **distincte**, vidée entre deux tours dans `build_context` : un « pense aux tests » ne doit jamais valoir réponse à « on casse l'API ? ».
-**Alternative rejetée** : attendre indéfiniment (bloque la file) ; laisser l'agent trancher seul en silence (le défaut d'origine) ; déduire la réponse d'un message spontané.
-
----
+**Décision** : un agent peut suspendre son tour pour poser une question. Passé `dialogue_timeout_s`, il reprend seul : on lui répond qu'aucun humain n'est disponible et qu'il doit **choisir et énoncer son hypothèse**. En mode autonome, le délai ne démarre pas.
+**Raison** : ADR-018 fait dépendre la file d'un arbre propre, et un run suspendu tient du travail non commité : une question laissée le temps d'un déjeuner bloquerait la file. Une hypothèse explicite, qui part dans le rapport du run, est relisible ; une hypothèse silencieuse — l'état d'avant — ne l'est pas.
+**Corollaire** : les messages spontanés ont une file **distincte**, vidée entre deux tours. Un « pense aux tests » ne doit jamais valoir réponse à « on casse l'API ? ».
 
 ## ADR-026 — Cinq familles de couleurs, une par rôle
 
 **Date** : 2026-09-17
-**Portée** : codeur, reviewer  
-**Décision** : Les bandes d'en-tête partagent une hauteur unique. Les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** — titre de région, élément actif, nom du projet. Tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
+**Portée** : codeur, reviewer
+**Décision** : les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** — titre de région, élément actif, nom du projet. Bandes d'en-tête de hauteur unique, tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
 **Raison** : l'UI avait dérivé vers huit familles, trois tailles en dur et des glyphes de jeux différents. Personne n'avait choisi huit couleurs : chaque ticket prenait la sienne, et sans mesure la dérive ne se voit qu'une fois qu'elle saute aux yeux.
-**Conséquence** : l'accent d'identité est une **barre**, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus. Une priorité moyenne ou basse n'est pas une alerte : elle descend en neutre et se distingue par l'intensité.
-**Alternative rejetée** : une couche d'alias sémantiques (indirection sans effet visible) ; documenter les rôles sans les vérifier — c'est ce qui n'avait pas tenu.
-
----
+**Conséquence** : l'accent d'identité est une **barre**, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus.
 
 ## ADR-027 — Les agents ne touchent pas à l'historique git
 
 **Date** : 2026-09-17
-**Décision** : Un hook `PreToolUse` refuse à tout agent les commandes git qui écrivent — `commit`, `merge`, `push`, `checkout`, `branch`, `reset`, `add`… Le git en lecture reste permis. Et un run dont le commit **échoue** ne s'annonce pas approuvé : le ticket passe `blocked`, la raison est émise.
-**Raison** : au premier usage réel, des agents ont commité, mergé dans `main` et poussé sur GitHub pendant deux runs où l'utilisateur n'avait cliqué que sur « lancer ». ADR-018 et ADR-022 ne contraignaient que `GitWorkspaceService`, et le codeur a `Bash`. Une règle contournable en tapant une autre commande n'est pas une règle.
+**Décision** : un hook `PreToolUse` refuse à tout agent les commandes git qui écrivent — `commit`, `merge`, `push`, `checkout`, `branch`, `reset`, `add`… Le git en lecture reste permis. Et un run dont le commit **échoue** ne s'annonce pas approuvé.
+**Raison** : au premier usage réel, des agents ont commité, mergé dans `main` et poussé sur GitHub pendant deux runs où l'utilisateur n'avait cliqué que sur « lancer ». ADR-018 et ADR-022 ne contraignaient que `GitWorkspaceService`, or le codeur a `Bash` : une règle contournable en tapant une autre commande n'est pas une règle.
 **Pourquoi un hook** : une entrée d'`allowed_tools` couvrant un outil entier l'auto-approuve *avant* le callback de permission. Un garde posé là serait inerte, avec l'apparence d'une protection.
-**Alternative rejetée** : l'interdire dans le prompt — une consigne décrit une intention, un refus produit un fait.
-
----
 
 ## ADR-028 — Travailler dans le dépôt parent se déclare
 
 **Date** : 2026-09-17
-**Décision** : ADR-024 refuse par défaut qu'un projet agisse sur un dépôt **ancêtre**. Un projet peut lever ce refus en déclarant `"git_root": "ancestor"` dans son `agents.json` ; il stage alors depuis la racine du dépôt (`:/`) et non depuis son propre dossier. Seule cette valeur exacte ouvre l'exception.
+**Décision** : ADR-024 refuse par défaut qu'un projet agisse sur un dépôt **ancêtre**. Un projet lève ce refus en déclarant `"git_root": "ancestor"` dans son `agents.json` ; il stage alors depuis la racine du dépôt (`:/`). Seule cette valeur exacte ouvre l'exception.
 **Raison** : ADR-024 est né d'un dossier client posé dans `projects/`, dont le dépôt ancêtre était vibe-ide — un accident. Mais c'est exactement ce que fait le projet bootstrap d'ADR-001 : il construit l'IDE, donc il travaille volontairement dans le dépôt qui le contient, et son travail est dans `backend/` et `frontend/`, au-dessus de lui. Traiter les deux cas pareil supprimait l'auto-hébergement, c'est-à-dire le principe fondateur.
-**Forme** : la même que pour le mode des artefacts (ADR-021, ADR-023) — le défaut protège, le cas particulier s'énonce dans le fichier du projet. Une valeur inconnue ne désarme rien.
-**Détail** : voir `tickets/done/ticket-077-auto-hebergement.md`.
-
----
+**Forme** : celle d'ADR-021 et ADR-023 — le défaut protège, le cas particulier s'énonce. Une valeur inconnue ne désarme rien.
 
 ## ADR-029 — Jusqu'où l'agent va se déclare par projet
 
 **Date** : 2026-09-18
-**Décision** : ADR-022 devient conditionnelle. `agents.json` porte un champ `autonomy` : `commit` (défaut — le travail reste sur sa branche), `pr` (pousse et ouvre la PR), `merge` (merge aussi, **si et seulement si** la CI est verte). Valeur absente ou inconnue : `commit`. Le niveau borne ce que l'IDE fait **seul** ; le même geste demandé depuis l'IDE reste la décision de l'utilisateur.
+**Décision** : `agents.json` porte un champ `autonomy` : `commit` (défaut — le travail reste sur sa branche), `pr` (pousse et ouvre la PR), `merge` (merge aussi, **si et seulement si** la CI est verte). Valeur absente ou inconnue : `commit`. Le niveau borne ce que l'IDE fait **seul** ; le même geste demandé depuis l'IDE reste la décision de l'utilisateur.
 **Raison** : le raisonnement d'ADR-022 — merger, c'est décider qu'un travail est bon — tient sur le dépôt d'un client, où les accès sont spécifiques et où l'utilisateur pousse lui-même. Il ne vaut pas sur un dépôt personnel doté d'une CI : y refuser le merge ne protège personne, ça ajoute un clic.
-**Alternative rejetée** : un réglage global (le bon niveau dépend du dépôt) ; merger sur une CI absente ou en cours — l'absence de signal n'est pas un signal favorable. Troisième usage du patron d'ADR-021 et ADR-028 : le défaut protège, l'exception s'énonce.
-
----
+**Alternative rejetée** : un réglage global — le bon niveau dépend du dépôt ; merger sur une CI absente ou en cours — l'absence de signal n'est pas un signal favorable.
 
 ## ADR-030 — La livraison est une étape à part, et elle ne fait jamais échouer le run
 
 **Date** : 2026-09-18
-**Décision** : Après un run **approuvé**, `LivraisonService` enchaîne seul : rebase sur la base, PR (qui referme son issue par `Closes #N`), attente de CI bornée, merge — chaque maillon soumis au niveau d'ADR-029. L'appel est branché dans `run_pipeline`, donc sur les trois modes : unique, file, autonome. Une exception y est capturée et rendue dans `Livraison.arret` ; le run garde son résultat.
-**Raison** : les maillons existaient tous, rien ne les enchaînait, et chaque étape demandait un clic. Mais le travail est déjà commité quand la livraison commence : faire échouer le run parce que GitHub est injoignable ferait croire que le pipeline a échoué. L'arrêt est une information, pas une panne.
-**Invariants** : un run non approuvé ne se livre jamais (son commit porte du travail refusé, ADR-018) ; un conflit **annule** le rebase et nomme les fichiers, au lieu de laisser l'arbre à mi-chemin, ce qui bloquerait le ticket suivant ; l'attente de CI est bornée, pour la même raison.
-**Alternative rejetée** : résoudre les conflits automatiquement (choisir à la place de l'utilisateur, dans son dépôt) ; attendre la CI sans borne.
-
----
+**Décision** : après un run **approuvé**, `LivraisonService` enchaîne seul : rebase sur la base, PR (qui referme son issue par `Closes #N`), attente de CI bornée, merge — chaque maillon soumis au niveau d'ADR-029. L'appel est branché dans `run_pipeline`, donc sur les trois modes. Une exception y est capturée et rendue dans `Livraison.arret` ; le run garde son résultat.
+**Raison** : les maillons existaient tous, rien ne les enchaînait, et chaque étape demandait un clic. Mais le travail est déjà commité quand la livraison commence : faire échouer le run parce que GitHub est injoignable ferait croire que le pipeline a échoué.
+**Invariants** : un run non approuvé ne se livre jamais ; un conflit annule le rebase au lieu de laisser l'arbre à mi-chemin ; l'attente de CI est bornée — sinon la file se bloque.
 
 ## ADR-031 — Un agent n'écrit que sous la racine de son projet
 
 **Date** : 2026-09-18
-**Décision** : Un hook `PreToolUse` refuse `Write`, `Edit`, `NotebookEdit` et les redirections `Bash` simples (`>`, `>>`, `tee`) dont le chemin sort de la racine du projet — son dossier, ou le dépôt qui le contient s'il déclare `git_root: ancestor`. Les deux côtés sont résolus, symlinks compris. **Lire hors du projet reste permis.**
-**Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Six dépôts clients voisins dans `projects/`, et un agent qui se trompe de dossier écrit chez un autre client — la fuite qu'ADR-021 et ADR-023 empêchent, prise par l'autre bout. Lire ne laisse rien chez personne ; écrire, si.
-**Forme** : celle d'ADR-027. Un hook, parce qu'`allowed_tools` auto-approuve avant tout callback de permission ; au niveau du SDK, parce qu'un refus produit un fait quand une consigne décrit une intention.
+**Décision** : un hook `PreToolUse` refuse `Write`, `Edit`, `NotebookEdit` et les redirections `Bash` simples (`>`, `>>`, `tee`) dont le chemin sort de la racine du projet — son dossier, ou le dépôt qui le contient s'il déclare `git_root: ancestor`. Les deux côtés sont résolus, symlinks compris. **Lire hors du projet reste permis.**
+**Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Six dépôts clients voisins dans `projects/`, et un agent qui se trompe de dossier écrit chez un autre client — la fuite qu'ADR-021 et ADR-023 empêchent, prise par l'autre bout.
 **Ce que ça ne garantit pas** : le contrôle sur `Bash` attrape une erreur, pas une évasion — `python -c "open('../x','w')"` passe. Ce qui ne se lit pas avec certitude passe aussi : un faux refus priverait l'agent de son moyen de vérifier son travail.
 
 ## ADR-032 — Un ADR déclare qui il contraint
 
 **Date** : 2026-09-18
-**Décision** : Un ADR peut porter `**Portée** : rôle, rôle` ; `services/adr.py` réduit alors la section « Décisions récentes » du prompt aux ADR qui concernent le rôle appelé. **Sans portée, l'ADR part à tous.** Elle ne s'écrit que sur un ADR qui enregistre un choix passé, jamais sur une contrainte de comportement — un test le verrouille.
-**Raison** : le fichier part dans chaque appel d'agent, jusqu'à dix-huit par ticket, et grossit à chaque décision. Le coût compte, la dilution davantage : un codeur recevait la palette de couleurs et le choix du gestionnaire de paquets Python au milieu des règles qu'il doit tenir.
+**Décision** : un ADR peut porter `**Portée** : rôle, rôle` ; `services/adr.py` réduit alors la section « Décisions récentes » du prompt aux ADR qui concernent le rôle appelé. **Sans portée, l'ADR part à tous.** Elle ne s'écrit que sur un ADR qui enregistre un choix passé, jamais sur une contrainte de comportement — un test le verrouille.
+**Raison** : le fichier part dans chaque appel d'agent, jusqu'à dix-huit par ticket. Le coût compte, la dilution davantage : un codeur recevait la palette de couleurs et le choix du gestionnaire de paquets Python au milieu des règles qu'il doit tenir.
 **Ce qui rend la règle sûre** : un agent que l'utilisateur vient de créer n'est nommé nulle part, et reçoit malgré tout tout le tronc commun — donc toutes les contraintes.
-**Alternative rejetée** : rogner les ADR au budget (gain ponctuel, la dérive revient) ; déduire la pertinence par mots-clés — une contrainte ratée serait silencieuse.
-
----
 
 ## ADR-033 — Un conflit se tente, et se relit toujours
 
 **Date** : 2026-09-18
-**Décision** : Sur un conflit de rebase, un agent `resolveur-conflit` réécrit les fichiers. `GitWorkspaceService` vérifie ensuite l'arbre et **annule tout** au moindre doute : résolveur qui lève, marqueur restant, fichier manquant. Une résolution qui aboutit ouvre sa PR, et **ne se merge jamais seule** — même sur un projet qui déclare `merge` (ADR-029).
+**Décision** : sur un conflit de rebase, un agent `resolveur-conflit` réécrit les fichiers. `GitWorkspaceService` vérifie ensuite l'arbre et **annule tout** au moindre doute : résolveur qui lève, marqueur restant, fichier manquant. Une résolution qui aboutit ouvre sa PR et **ne se merge jamais seule**, même sur un projet en `merge`.
 **Raison** : détecter et rendre la main était honnête, mais s'arrêtait sur un travail de cinq minutes. Le tenter vaut la peine ; le merger, non. Un conflit est par définition l'endroit où deux intentions divergent : le pire endroit pour deviner, et celui où une erreur ne se voit pas dans un diff vert.
-**Invariants** : l'arbre ne reste jamais à mi-rebase — le ticket suivant démarrerait dessus ; l'agent ne touche à aucune commande git, le rebase est en cours et il n'en voit qu'une partie ; sans résolveur branché, le comportement d'ADR-030 est inchangé.
-**Alternative rejetée** : merger une résolution sur CI verte — une CI verte dit que le code passe, pas qu'on a gardé la bonne intention.
+**Invariants** : l'arbre ne reste jamais à mi-rebase ; l'agent ne touche à aucune commande git, le rebase est en cours et il n'en voit qu'une partie.
+
+---
+
+## ADR-034 — Une règle n'est décrite qu'à un endroit, et ce qui compte est mesuré
+
+**Date** : 2026-09-18
+**Décision** : une règle a **une** description ; les fichiers de consigne renvoient à elle au lieu de la reformuler. `test_consignes_coherentes.py` vérifie qu'ils ne se contredisent pas sur git, ne codent en dur aucun chemin de machine, ne décrivent rien d'absent, et qu'aucun ADR ne dépasse son budget.
+**Raison** : `projects/ide-core/CLAUDE.md` portait sa propre version du flux git — PR de ticket sur `main`, merge en `--squash` — l'exact inverse de la règle. Il est `@`-importé dans chaque session quand le skill juste se charge à la demande : la consigne fausse était toujours en contexte, la bonne seulement parfois.
+**Corollaire** : un budget que rien ne mesure est un souhait. Douze ADR sur trente et un dépassaient le leur, dont trois écrits le jour où ce budget était rappelé.

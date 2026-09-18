@@ -221,15 +221,10 @@ def _default_agents_json(project_id: str, active_agents: list[str]) -> str:
         }
         for role in active_agents
     ]
-    pipeline_default = active_agents[:2] if len(active_agents) >= 2 else active_agents
     data = {
         "project_id": project_id,
         "agents": agents,
-        "pipeline": {
-            "default": pipeline_default,
-            "max_review_rounds": 3,
-            "auto_merge_on_approve": True,
-        },
+        "pipeline": {"max_review_rounds": 3},
     }
     return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
 

@@ -213,7 +213,9 @@ async def test_create_project_scaffolds_agents_json(tmp_path: Path) -> None:
     roles = [a["role"] for a in data["agents"]]
     assert roles == ["codeur", "reviewer"]
     assert data["agents"][0]["model"] == "claude-sonnet-4-6"
-    assert data["pipeline"]["default"] == ["codeur", "reviewer"]
+    # Pas de `auto_merge_on_approve` : il était écrit à `true` et ne faisait
+    # rien. Qui merge est décidé par `autonomy` (ADR-029, ticket-091).
+    assert "auto_merge_on_approve" not in data["pipeline"]
 
 
 async def test_create_project_no_agents_json_when_no_agents(tmp_path: Path) -> None:
@@ -278,19 +280,30 @@ def test_load_agents_config_malformed_json(tmp_path: Path) -> None:
 def test_load_pipeline_config_no_file(tmp_path: Path) -> None:
     pipeline = load_pipeline_config(tmp_path)
     assert pipeline.max_review_rounds == 3
-    assert pipeline.auto_merge_on_approve is False
-    assert pipeline.default == []
+    assert pipeline.testeur_enabled is False
 
 
 def test_load_pipeline_config_reads_file(tmp_path: Path) -> None:
     _write_agents_json(tmp_path, [], pipeline={
-        "default": ["codeur", "reviewer"],
         "max_review_rounds": 5,
-        "auto_merge_on_approve": True,
+        "testeur_enabled": True,
     })
 
     pipeline = load_pipeline_config(tmp_path)
 
-    assert pipeline.default == ["codeur", "reviewer"]
     assert pipeline.max_review_rounds == 5
-    assert pipeline.auto_merge_on_approve is True
+    assert pipeline.testeur_enabled is True
+
+
+def test_un_reglage_disparu_ne_casse_pas_un_projet_existant(tmp_path: Path) -> None:
+    # `default` et `auto_merge_on_approve` traînent encore dans les agents.json
+    # déjà écrits. Les ignorer vaut mieux que refuser de charger le projet.
+    _write_agents_json(tmp_path, [], pipeline={
+        "default": ["codeur"],
+        "auto_merge_on_approve": True,
+        "max_review_rounds": 4,
+    })
+
+    pipeline = load_pipeline_config(tmp_path)
+
+    assert pipeline.max_review_rounds == 4

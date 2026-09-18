@@ -135,3 +135,18 @@ dépôt.
 - [ ] Les commits sont en anglais, Conventional Commits
 - [ ] La branche est **poussée** et la PR **ouverte**, base `develop`
 - [ ] La CI est verte sur le SHA de `HEAD`
+
+---
+
+## À ne pas confondre avec la livraison du produit
+
+Ce skill décrit ce que **tu** fais à la main sur ce dépôt.
+
+Le produit, lui, a son propre chemin : après un run approuvé,
+`LivraisonService` rebase, ouvre la PR, attend la CI et merge — jusqu'où le
+`agents.json` du projet le déclare, via `autonomy` (ADR-029, ADR-030). Ce sont
+deux flux distincts qui aboutissent au même endroit.
+
+Les confondre mène à deux erreurs symétriques : croire qu'un ticket lancé
+depuis l'IDE demande encore tes commandes, ou attendre de la livraison
+automatique qu'elle s'occupe d'un travail que tu as fait à la main.
