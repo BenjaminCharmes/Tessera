@@ -4,12 +4,16 @@
 
 | Fichier  | Déclencheur                                | Rôle               |
 |----------|--------------------------------------------|--------------------|
-| `ci.yml` | push sur `main` + PR vers `main` / `develop` | Tests + type check |
+| `ci.yml` | PR vers `main` ou `develop` | Tests + type check |
 
-Le `push` ne garde que `main`, qui ne reçoit pas de PR de sa propre branche ;
-tout le reste est couvert par `pull_request`. Une PR déclenchait autrefois
-**deux** runs — celui du `push` et celui de la `pull_request` — et tout était
-facturé en double (ticket-095).
+`pull_request` seul. Une PR déclenchait autrefois **deux** runs — celui du
+`push` sur la branche et celui de la `pull_request` — et tout était facturé en
+double (ticket-095). Il restait ensuite un doublon sur les releases :
+`push: [main]` rejouait, après le merge, ce que la PR venait de vérifier
+(ticket-111).
+
+Rien n'entre dans `main` autrement que par une PR : les commits directs y sont
+interdits.
 
 Jobs : `Backend (pytest)`, `Frontend (tsc + vitest)`, `E2E (Playwright)`,
 `Ce qui a changé`, `Tauri (cargo check)` — en parallèle (ADR-015). `Ce qui a

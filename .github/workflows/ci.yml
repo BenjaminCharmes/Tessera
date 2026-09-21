@@ -1,12 +1,15 @@
 name: CI
 
-# Chaque PR déclenchait **deux** runs : celui du `push` sur la branche, et
-# celui de la `pull_request`. Tout était donc facturé en double (ticket-095).
-# `push` ne garde que `main`, qui ne reçoit pas de PR de sa propre branche ;
-# tout le reste est couvert par `pull_request`.
+# `pull_request` seul. Chaque PR déclenchait autrefois **deux** runs — celui du
+# `push` sur la branche et celui de la `pull_request` — et tout était facturé en
+# double (ticket-095). Il restait un doublon : `push: [main]` rejouait, après le
+# merge, la release que sa propre PR venait de vérifier. Le commentaire d'alors
+# le justifiait en disant que `main` ne reçoit pas de PR, ce qui est faux —
+# elle reçoit celles de `develop` (ticket-111).
+#
+# Rien n'entre dans `main` autrement que par une PR : les commits directs y sont
+# interdits, et `pull_request` couvre donc tout.
 on:
-  push:
-    branches: [main]
   pull_request:
     # `develop` est la cible par défaut des PR de ticket (ADR — ticket-049) :
     # sans elle ici, une PR vers develop ne déclenche aucun check.

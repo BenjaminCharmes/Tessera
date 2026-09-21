@@ -8,6 +8,7 @@ updates:
     directory: "/backend"
     schedule:
       interval: "monthly"
+    open-pull-requests-limit: 3
     groups:
       backend:
         patterns: ["*"]
@@ -16,6 +17,7 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "monthly"
+    open-pull-requests-limit: 3
     groups:
       frontend:
         patterns: ["*"]
@@ -24,6 +26,7 @@ updates:
     directory: "/frontend/src-tauri"
     schedule:
       interval: "monthly"
+    open-pull-requests-limit: 3
     groups:
       tauri:
         patterns: ["*"]
@@ -32,3 +35,4 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    open-pull-requests-limit: 3
