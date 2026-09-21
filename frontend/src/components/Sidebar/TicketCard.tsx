@@ -241,7 +241,10 @@ export default function TicketCard({
               )}
             </button>
           )}
-          {onToggleQueue && (
+          {/* Même condition que le bouton « Lancer » : les deux mènent au
+              même endroit, ils obéissent à la même règle. La file acceptait
+              un ticket terminé et le relançait pour de bon (ticket-115). */}
+          {onToggleQueue && canRun && (
             <button
               onClick={(e) => {
                 e.stopPropagation();

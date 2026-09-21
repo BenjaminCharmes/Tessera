@@ -365,4 +365,48 @@ describe("TicketCard", () => {
       expect(screen.getByText("CI verte")).toBeInTheDocument();
     });
   });
+
+  it("n'offre pas la file sur un ticket deja termine", () => {
+    // ticket-115 : le bouton « Lancer » etait bien cache sur un `done`, pas
+    // celui de la file — et run_queue ne regardait pas le statut. Le ticket
+    // etait donc reellement repris : nouvelle branche, nouveaux appels
+    // d'agents, quota depense, pour refaire un travail livre.
+    for (const status of ["done", "cancelled"] as const) {
+      const { unmount } = render(
+        <TicketCard
+          ticket={{ ...base, status }}
+          isActive={false}
+          isRunning={false}
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+          onToggleQueue={vi.fn()}
+        />,
+      );
+
+      expect(
+        screen.queryByRole("button", { name: /file/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Lancer le pipeline" }),
+      ).not.toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  it("offre la file sur un ticket en cours", () => {
+    render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+        onToggleQueue={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Ajouter à la file" }),
+    ).toBeInTheDocument();
+  });
 });

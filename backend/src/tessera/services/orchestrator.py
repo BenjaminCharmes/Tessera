@@ -246,6 +246,17 @@ class Orchestrator:
             return None
         return min(eligible, key=lambda t: _PRIORITY_ORDER.get(t.priority, 99))
 
+    async def _est_termine(self, ticket_id: str) -> bool:
+        """Le ticket est-il déjà `done` ou `cancelled` ?
+
+        Un ticket introuvable n'est pas « terminé » : le laisser passer rend
+        l'erreur au bon endroit, dans `_run_pipeline`, qui sait la nommer.
+        """
+        ticket = await self._ticket_svc.get_ticket(ticket_id)
+        if ticket is None:
+            return False
+        return ticket.status in (TicketStatus.done, TicketStatus.cancelled)
+
     async def run_queue(
         self,
         project_id: str,
@@ -281,6 +292,18 @@ class Orchestrator:
             if self.budget_exhausted():
                 self._log(f"[{project_id}] file interrompue : plafond de dépense")
                 break
+
+            # Un ticket déjà terminé se **saute**, il ne s'exécute pas : le
+            # relancer refait un travail livré, sur une branche neuve et aux
+            # frais du quota. L'UI cachait déjà le bouton « Lancer » sur un
+            # `done`, mais pas celui de la file, et rien ne rattrapait ici —
+            # or cet endpoint est appelable directement (ticket-115).
+            #
+            # Sauter plutôt qu'arrêter : une file où un ticket terminé s'est
+            # glissé doit traiter les autres.
+            if await self._est_termine(ticket_id):
+                self._log(f"[{project_id}] {ticket_id} sauté : déjà terminé")
+                continue
 
             await callback(
                 OrchestratorEvent(
