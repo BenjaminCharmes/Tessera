@@ -346,3 +346,43 @@ def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
 
     mortes = sorted(c for c in clefs if c not in ailleurs)
     assert mortes == [], f"clefs écrites dans agents.json mais jamais lues : {mortes}"
+
+
+# ------------------------------------------------------------------
+# Le dossier et le champ disent la même chose — ticket-113
+# ------------------------------------------------------------------
+
+
+def test_le_dossier_d_un_ticket_correspond_a_son_champ_status() -> None:
+    """Chaque ticket est rangé dans le dossier que son frontmatter annonce.
+
+    La règle existe depuis le début — « changer de statut = déplacer le
+    fichier **et** mettre à jour le champ, les deux, sinon l'UI et le fichier
+    divergent » — et rien ne la mesurait. Elle reposait sur la discipline de
+    celui qui range, et cette discipline a lâché trois fois sur douze tickets
+    au cours d'une seule session : le travail fini, la PR ouverte, le
+    déplacement oublié.
+
+    ADR-034 : un budget que rien ne mesure est un souhait. Une règle non plus.
+    """
+    tickets = _RACINE / "projects" / "ide-core" / "tickets"
+    divergents: list[str] = []
+
+    for dossier in sorted(p for p in tickets.iterdir() if p.is_dir()):
+        for fichier in sorted(dossier.glob("ticket-*.md")):
+            entete = fichier.read_text(encoding="utf-8").split("---")[1]
+            declare = next(
+                (
+                    l.split(":", 1)[1].strip()
+                    for l in entete.splitlines()
+                    if l.startswith("status:")
+                ),
+                None,
+            )
+            if declare != dossier.name:
+                divergents.append(
+                    f"{fichier.name} est dans {dossier.name}/ "
+                    f"mais déclare status: {declare}"
+                )
+
+    assert divergents == [], "\n".join(divergents)
