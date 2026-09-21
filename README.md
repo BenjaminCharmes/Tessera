@@ -579,3 +579,24 @@ POST /orchestrator/run { project_id, ticket_id }
 - **Agents découplés** : chaque agent a un system prompt, l'orchestrateur gère le routing
 - **Pas de framework agent** : on contrôle le protocole (pas LangChain/CrewAI)
 - **Immutabilité** : les données ne sont jamais mutées en place, toujours copiées
+
+---
+
+## Licence
+
+**PolyForm Noncommercial 1.0.0** — le texte intégral est dans
+[LICENSE.md](LICENSE.md).
+
+En une phrase : le code est lisible, vous pouvez l'utiliser, le modifier et le
+partager **à des fins non commerciales**, mais pas le vendre ni le faire
+tourner dans un produit ou un service commercial. Les usages personnels,
+l'apprentissage, la recherche et les organisations à but non lucratif sont
+couverts ; une entreprise qui s'en sert pour son activité ne l'est pas.
+
+Un dépôt public n'est pas un dépôt libre de droits : ce qui n'est pas accordé
+ici reste réservé. Pour un usage commercial, écrivez-moi.
+
+## Sécurité
+
+Une faille se signale en privé, jamais par une issue publique :
+voir [SECURITY.md](SECURITY.md).
