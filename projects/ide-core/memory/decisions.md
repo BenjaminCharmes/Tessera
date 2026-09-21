@@ -319,3 +319,13 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : huit manifestes la déclaraient déjà sur disque, dont des dépôts clients que ce dépôt ne versionne pas. Une clef inconnue tombe sur le défaut fermé d'ADR-023 : un projet en `tracked` serait repassé en `local` sans demande et sans message. Le renommage aurait donc changé un comportement qu'il prétendait préserver.
 **Alternative rejetée** : migrer les manifestes d'office — écrire dans le dépôt d'un client pour une question cosmétique ; garder les deux clefs en écriture — elles divergeraient.
 **Conséquence assumée** : le nom d'origine survit dans une constante et ses tests. C'est le prix d'une donnée déjà écrite ailleurs.
+
+---
+
+## ADR-037 — Une panne de production ne fait pas perdre le travail
+
+**Date** : 2026-09-21
+**Décision** : une exception levée pendant la production termine le run en `blocked`, commite le travail écrit sous `chore: … — unapproved work (…)` et rend la cause dans `PipelineResult.arret`. Jamais une erreur serveur.
+**Raison** : le premier run coupé par le plafond du fournisseur a remonté son exception jusqu'à FastAPI : aucun commit, arbre sale, run jamais clos. ADR-020 vérifie ses plafonds **entre** deux tickets pour ne pas laisser de travail non commité ; celui-là coupe au milieu d'un tour. Or ADR-018 fait dépendre le ticket suivant d'un arbre propre.
+**Alternative rejetée** : propager — l'état d'avant, qui bloque la file ; jeter le travail — déjà payé, et le relire coûte moins que le refaire.
+**Conséquence assumée** : un commit peut figer du code à moitié écrit. Le message nomme la panne, sans quoi il se relit comme un abandon.

@@ -453,3 +453,58 @@ def test_un_run_autonome_ne_touche_pas_a_github_sans_le_demander(
 
     assert resp.status_code == 200
     assert tires == []
+
+
+def test_run_interrompu_clot_le_run_et_ne_renvoie_pas_500(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An interrupted run answers 200 with a non-approved result, and its DB
+    record is closed.
+
+    Reproduces the ticket-101 run: the pipeline raised mid-turn, the exception
+    reached FastAPI, and `finish_run` was never called — the run stayed
+    `finished_at` null and showed as forever in progress. The pipeline now
+    returns a result, so the endpoint closes the record like any other run.
+    """
+
+    class _InterruptedOrchestrator:
+        async def run_pipeline(
+            self, project_id: str, ticket_id: str, on_event: object, **kwargs: object
+        ) -> PipelineResult:
+            return PipelineResult(
+                ticket_id=ticket_id,
+                final_status=TicketStatus.blocked,
+                rounds=1,
+                approved=False,
+                branch="ticket-001-slug",
+                commit_sha="abc1234",
+                arret="RuntimeError: Reached maximum budget ($1)",
+            )
+
+    async def _build(project_id: str) -> _InterruptedOrchestrator:
+        return _InterruptedOrchestrator()
+
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+
+    resp = _client().post(
+        "/api/v1/orchestrator/run",
+        json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["approved"] is False
+    # La cause doit être lisible dans la réponse : dans les logs du backend,
+    # l'utilisateur de l'IDE ne va pas la chercher.
+    assert "budget" in body["arret"]
+
+    runs = asyncio.run(_lister_runs())
+    assert len(runs) == 1
+    assert runs[0]["finished_at"] is not None
+    assert runs[0]["approved"] is False
+
+
+async def _lister_runs() -> list[dict[str, object]]:
+    from tessera.services.database import list_runs
+
+    return await list_runs(settings.ide_db_path, "mon-projet")

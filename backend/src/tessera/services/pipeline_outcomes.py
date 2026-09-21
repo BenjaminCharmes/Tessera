@@ -190,3 +190,46 @@ async def finish_rounds_exhausted(
         branch=run.branch,
         commit_sha=commit_sha,
     )
+
+
+async def finish_interrupted(
+    orch: "Orchestrator", run: PipelineRun, cause: BaseException
+) -> PipelineResult:
+    """Termine un run qu'une panne de production a interrompu, sans perdre son travail.
+
+    Le premier run réel du ticket-101 s'est arrêté sur un plafond du SDK
+    (`Reached maximum budget ($1)`) atteint au milieu du tour du codeur.
+    L'exception est remontée jusqu'à FastAPI : aucun commit, arbre laissé
+    sale, et un run resté `finished_at` nul en base.
+
+    Rendre un résultat plutôt que propager règle les trois d'un coup — le
+    travail est commité, l'arbre redevient propre pour le ticket suivant
+    (ADR-018), et l'appelant clôt l'enregistrement du run comme sur n'importe
+    quelle autre sortie.
+
+    C'est le raisonnement d'ADR-030, appliqué à la production : une panne
+    d'infrastructure ne doit pas faire perdre ce qui a déjà été écrit.
+    """
+    await set_status(orch, run, TicketStatus.blocked)
+    raison = f"{type(cause).__name__}: {_single_line(str(cause))[:120]}"
+    await emit(run, EventType.ERROR, reason="interrupted", detail=raison)
+    commit_sha = await commit_work(
+        orch, run, _unapproved_commit_message(run.ticket_id, raison)
+    )
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="interrupted",
+    )
+    orch._log(f"[{run.ticket_id}] INTERROMPU au tour {run.round_num} — {raison}")
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.blocked,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=raison,
+    )

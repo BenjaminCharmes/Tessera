@@ -1273,3 +1273,35 @@ async def test_base_ref_n_avance_pas_sur_un_travail_non_approuve(
 
     assert result.approved is False
     assert git.base_ref_advances == 0
+
+
+async def test_commit_chore_quand_un_agent_leve(tmp_path: Path) -> None:
+    """A production failure still commits the work already written.
+
+    Reproduces the ticket-101 run: the SDK raised `Reached maximum budget ($1)`
+    mid-turn, the exception travelled up to FastAPI, and nothing committed —
+    the tree stayed dirty and blocked the next ticket, which is precisely the
+    state ADR-018 exists to prevent. ADR-030 already settled the symmetric
+    question for delivery; production had never been given the same treatment.
+    """
+    git = _FakeGit()
+
+    class _RaisingRunner(_RecordingRunner):
+        async def run(self, **kwargs: object) -> AgentResult:
+            self.calls.append(kwargs)
+            raise RuntimeError("Reached maximum budget ($1)")
+
+    orchestrator = _make_orchestrator(
+        tmp_path, runner=_RaisingRunner(), git_workspace=git, project_path=tmp_path
+    )
+
+    result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
+
+    assert not result.approved
+    assert result.final_status == TicketStatus.blocked
+    assert len(git.commits) == 1
+    assert git.commits[0].startswith("chore: ticket-001")
+    assert "unapproved work" in git.commits[0]
+    # La cause part dans le message : un commit qui ne dit pas pourquoi il
+    # existe se relit comme un travail abandonné sans raison.
+    assert "budget" in git.commits[0]

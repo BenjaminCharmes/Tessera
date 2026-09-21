@@ -21,8 +21,15 @@ def test_settings_llm_max_turns_par_defaut() -> None:
 
 def test_settings_llm_max_budget_usd_par_defaut_non_none() -> None:
     """Regression — ticket-044 review, finding 1: the budget guardrail must
-    have a real, non-None default in production, not just be configurable."""
-    assert Settings(_env_file=None).llm_max_budget_usd == 1.0
+    have a real, non-None default in production, not just be configurable.
+
+    Raised to 2.0 by ticket-102: the first real run of this repository hit the
+    ceiling mid-turn on an ordinary ticket. What matters here is that a
+    guardrail exists and is positive, not its exact value.
+    """
+    budget = Settings(_env_file=None).llm_max_budget_usd
+    assert budget == 2.0
+    assert budget > 0
 
 
 def test_settings_llm_max_turns_surchargeable(monkeypatch: pytest.MonkeyPatch) -> None:

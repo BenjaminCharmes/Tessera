@@ -24,7 +24,12 @@ class Settings(BaseSettings):
     # la dépense réelle d'un seul appel agent (le garde-fou qui protège le
     # quota de l'abonnement). Voir memory/decisions.md pour le choix de 1.0 USD.
     llm_max_turns: int = 30
-    llm_max_budget_usd: float = 1.0
+    # Relevé de 1.0 à 2.0 (ticket-102) : le premier run réel de ce dépôt a
+    # atteint le plafond au milieu du tour d'un codeur, sur un ticket de taille
+    # ordinaire. Un garde-fou qu'une tâche normale déclenche ne borne pas un
+    # dérapage, il empêche le travail. Le dépassement est désormais rattrapé
+    # (ADR-037), donc l'atteindre coûte un run bloqué, plus un arbre sale.
+    llm_max_budget_usd: float = 2.0
 
     # Au-delà, un agent qui a posé une question reprend seul en énonçant son
     # hypothèse (ticket-066). Le délai existe parce qu'un run suspendu tient

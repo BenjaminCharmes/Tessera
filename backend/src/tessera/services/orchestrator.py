@@ -177,6 +177,19 @@ class Orchestrator:
         await set_status(self, run, TicketStatus.in_progress)
         await stages.create_branch(self, run)
 
+        # À partir d'ici une branche existe et les agents écrivent sur disque :
+        # une panne qui remonterait laisserait leur travail non commité, donc
+        # l'arbre sale et la file bloquée (ADR-018). C'est ce qui est arrivé au
+        # premier run réel du ticket-101, coupé par un plafond du SDK au milieu
+        # d'un tour. On rend un run non approuvé, jamais une erreur serveur —
+        # le raisonnement d'ADR-030 pour la livraison, appliqué à la production.
+        try:
+            return await self._run_rounds(run, ticket_id)
+        except Exception as exc:  # noqa: BLE001 — la cause part dans le résultat
+            return await outcomes.finish_interrupted(self, run, exc)
+
+    async def _run_rounds(self, run: PipelineRun, ticket_id: str) -> PipelineResult:
+        """Enchaîne les tours de revue jusqu'à approbation, blocage ou épuisement."""
         for round_num in range(1, self._max_review_rounds + 1):
             run.start_round(round_num)
             context = stages.build_context(self, run)

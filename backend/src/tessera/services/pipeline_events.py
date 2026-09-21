@@ -55,6 +55,11 @@ class PipelineResult(BaseModel):
     #: Ce que la livraison a fait du commit, et où elle s'est arrêtée
     #: (ticket-083). `None` quand aucune livraison n'a été tentée.
     livraison: Livraison | None = None
+    #: La panne qui a interrompu la production, quand il y en a eu une
+    #: (ticket-102). Le run rend un résultat non approuvé plutôt qu'une
+    #: erreur serveur : sans ce champ, la cause ne serait lisible que dans
+    #: les logs du backend, là où l'utilisateur de l'IDE ne va pas.
+    arret: str | None = None
 
 
 EventCallback = Callable[[OrchestratorEvent], Awaitable[None]]
