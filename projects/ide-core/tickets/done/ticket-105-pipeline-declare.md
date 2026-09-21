@@ -2,8 +2,8 @@
 id: ticket-105
 title: "Un projet créé déclare son pipeline"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 104
 priority: high
 agent: codeur
 depends_on: ["ticket-104"]
