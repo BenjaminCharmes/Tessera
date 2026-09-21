@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Tessera">
+  <title>Tessera</title>
+
+  <!--
+    Source du jeu d'icônes desktop, régénéré par `npx tauri icon`.
+
+    Le favicon (public/favicon.svg) s'adapte au thème du navigateur ; une icône
+    d'application ne le peut pas — elle est rasterisée une fois et posée sur un
+    dock dont on ignore la couleur. Elle porte donc son propre fond, et le
+    violet d'ADR-026 passe du trait au fond pour que les tesselles en retrait
+    restent lisibles partout.
+  -->
+  <rect width="1024" height="1024" rx="228" fill="#7c3aed"/>
+
+  <!--
+    Le jour autour de la tesselle en cours. Sans lui, la pièce déborde sur ses
+    voisines et se lit comme un trou dans le pavement au lieu d'une pièce
+    posée devant — vérifié au rendu 128×128, pas supposé.
+  -->
+  <mask id="jour">
+    <rect width="1024" height="1024" fill="#fff"/>
+    <rect x="320" y="320" width="448" height="448" rx="80" fill="#000"/>
+  </mask>
+
+  <!-- Le pavement : huit tesselles posées, la neuvième place laissée libre. -->
+  <g fill="#ffffff" fill-opacity="0.34" mask="url(#jour)">
+    <rect x="128" y="128" width="256" height="256" rx="32"/>
+    <rect x="416" y="128" width="256" height="256" rx="32"/>
+    <rect x="704" y="128" width="256" height="256" rx="32"/>
+    <rect x="128" y="416" width="256" height="256" rx="32"/>
+    <rect x="704" y="416" width="256" height="256" rx="32"/>
+    <rect x="128" y="704" width="256" height="256" rx="32"/>
+    <rect x="416" y="704" width="256" height="256" rx="32"/>
+    <rect x="704" y="704" width="256" height="256" rx="32"/>
+  </g>
+
+  <!-- La tesselle en cours : sortie de la grille, devant les autres. -->
+  <rect x="368" y="368" width="352" height="352" rx="48" fill="#ffffff"/>
+</svg>
