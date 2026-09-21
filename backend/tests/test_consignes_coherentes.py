@@ -105,13 +105,55 @@ def test_les_skills_annonces_existent() -> None:
 def test_l_arborescence_decrite_existe() -> None:
     # `CLAUDE.md` décrit `.claude/` : ce qu'il montre doit exister, sinon il
     # décrit un dépôt imaginaire.
-    decrit = re.findall(r"^\s{2,4}([a-z_.]+\.json|[a-z-]+/)", _lire("CLAUDE.md"), re.MULTILINE)
-    manquants = [
-        d for d in set(decrit)
-        if d.endswith(".json") and not (_RACINE / ".claude" / d).exists()
-    ]
+    #
+    # Sauf ce qu'il annonce lui-même comme gitignoré. Ce test exigeait la
+    # présence de `settings.local.json`, que le dépôt s'interdit de versionner :
+    # il passait sur le poste de son auteur et échouait sur tout clone neuf,
+    # CI comprise (ticket-109). Le marqueur est déjà dans le texte, il suffit
+    # de le lire.
+    manquants = _json_decrits_manquants(_lire("CLAUDE.md"), _RACINE / ".claude")
 
     assert manquants == [], f"décrits dans .claude/ mais absents : {manquants}"
+
+
+def _json_decrits_manquants(texte: str, racine: Path) -> list[str]:
+    """Les `.json` que le texte décrit, qui n'existent pas et qu'il n'excuse pas."""
+    decrit = set(re.findall(r"^\s{2,4}([a-z_.]+\.json|[a-z-]+/)", texte, re.MULTILINE))
+    ignores = {
+        nom
+        for ligne in texte.splitlines()
+        if "gitignor" in ligne.lower()
+        for nom in re.findall(r"([a-z_.]+\.json)", ligne)
+    }
+    return sorted(
+        d for d in decrit - ignores
+        if d.endswith(".json") and not (racine / d).exists()
+    )
+
+
+def test_l_exemption_de_gitignore_ne_couvre_que_ce_qui_est_annonce(
+    tmp_path: Path,
+) -> None:
+    """L'exemption se prouve sur un texte factice, pas sur `CLAUDE.md`.
+
+    Aujourd'hui le seul `.json` que `CLAUDE.md` décrit est celui qu'il annonce
+    gitignoré : le test ci-dessus ne verrouille donc plus rien tant que c'est
+    le cas. Sans ce test-ci, l'exemption ajoutée par ticket-109 aurait vidé le
+    verrou en silence.
+    """
+    texte = (
+        "```\n"
+        "  .claude/\n"
+        "    settings.local.json   ← préférences personnelles (gitignoré)\n"
+        "    registre.json         ← versionné, doit exister\n"
+        "```\n"
+    )
+
+    # Les deux sont absents, mais un seul est excusé.
+    assert _json_decrits_manquants(texte, tmp_path) == ["registre.json"]
+
+    (tmp_path / "registre.json").write_text("{}", encoding="utf-8")
+    assert _json_decrits_manquants(texte, tmp_path) == []
 
 
 # ------------------------------------------------------------------
