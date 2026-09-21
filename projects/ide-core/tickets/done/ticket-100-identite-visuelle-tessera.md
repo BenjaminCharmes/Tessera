@@ -2,7 +2,7 @@
 id: ticket-100
 title: "L'application porte enfin son nom et sa marque"
 type: feat
-status: in-review
+status: done
 pr_number: 92
 priority: medium
 agent: codeur
