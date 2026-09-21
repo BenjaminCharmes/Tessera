@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.git_workspace import GitCommandError, GitWorkspaceService
+from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
 
 
 async def _git(cwd: Path, *args: str) -> str:

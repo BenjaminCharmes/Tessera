@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.sync_map import SyncEntry, SyncMapService
+from tessera.services.sync_map import SyncEntry, SyncMapService
 
 
 @pytest.fixture

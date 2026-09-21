@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from vibe_ide.services.security_auditor import (
+from tessera.services.security_auditor import (
     SecurityAuditResult,
     SecurityAuditorService,
     SecurityIssue,

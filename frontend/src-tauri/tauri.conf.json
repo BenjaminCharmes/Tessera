@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "vibe-ide",
+  "productName": "Tessera",
   "version": "0.1.0",
-  "identifier": "com.vibe-ide.app",
+  "identifier": "com.tessera.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "vibe-ide",
+        "title": "Tessera",
         "width": 1400,
         "height": 900,
         "minWidth": 900,

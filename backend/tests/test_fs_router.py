@@ -9,9 +9,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.services.database import init_db
+from tessera.config import settings
+from tessera.main import app
+from tessera.services.database import init_db
 
 
 @pytest.fixture(autouse=True)
@@ -27,7 +27,7 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     # Un secret hors workspace : c'est ce qu'un endpoint non confiné lirait.
     (tmp_path / "secret.txt").write_text("clef-privee", encoding="utf-8")
 
-    db_path = tmp_path / "vibe.db"
+    db_path = tmp_path / "tessera.db"
     asyncio.run(init_db(db_path))
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
     monkeypatch.setattr(settings, "ide_db_path", db_path)
@@ -84,7 +84,7 @@ def test_un_fichier_trop_volumineux_est_refuse(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     # Mieux vaut refuser que saturer la mémoire du backend.
-    from vibe_ide.routers import fs as fs_router
+    from tessera.routers import fs as fs_router
 
     monkeypatch.setattr(fs_router, "_MAX_READ_BYTES", 10)
     big = workspace / "mon-projet" / "gros.md"

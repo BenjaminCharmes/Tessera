@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from vibe_ide.services.test_runner import (
+from tessera.services.test_runner import (
     TestCommandNotFound,
     TestResult,
     TestRunnerService,

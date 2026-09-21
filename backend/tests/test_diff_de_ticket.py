@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.ticket_diff import TicketDiff, diff_du_ticket
+from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 
 
 async def _git(cwd: Path, *args: str) -> str:
@@ -67,7 +67,7 @@ async def test_une_branche_sans_commit_ne_montre_rien(depot: Path) -> None:
     assert resultat.files == []
 
 
-async def test_le_diff_ignore_les_artefacts_de_vibe_ide(depot: Path) -> None:
+async def test_le_diff_ignore_les_artefacts_de_tessera(depot: Path) -> None:
     # Ce que l'utilisateur relit, c'est le travail du codeur — pas le ticket
     # que l'orchestrateur vient de reecrire.
     await _git(depot, "checkout", "-q", "-b", "ticket-003-x")

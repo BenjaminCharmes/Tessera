@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-from vibe_ide.services.agent_registry import AgentRegistryService
+from tessera.services.agent_registry import AgentRegistryService
 
 #: Le dossier des prompts livrés avec le dépôt.
 _PROMPTS = Path(__file__).resolve().parents[2] / "agents" / "prompts"

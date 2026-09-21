@@ -200,7 +200,7 @@ describe("TicketActivity — jusqu'où le projet laisse aller (ticket-082)", () 
   });
 
   it("propose le merge là où le projet l'a déclaré", async () => {
-    // L'utilisateur veut que vibe-ide et ses projets perso aillent jusqu'au
+    // L'utilisateur veut que Tessera et ses projets perso aillent jusqu'au
     // bout ; ses dépôts clients, non. La différence se déclare, elle ne se
     // devine pas.
     vi.spyOn(api.tickets, "activity").mockResolvedValue({

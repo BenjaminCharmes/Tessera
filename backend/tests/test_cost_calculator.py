@@ -1,6 +1,6 @@
 import pytest
 
-from vibe_ide.services.cost_calculator import calculate_cost
+from tessera.services.cost_calculator import calculate_cost
 
 
 def test_sonnet_cost() -> None:

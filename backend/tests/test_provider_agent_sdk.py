@@ -13,9 +13,9 @@ from claude_agent_sdk import (
     ToolUseBlock,
 )
 
-import vibe_ide.services.providers.agent_sdk as agent_sdk_module
+import tessera.services.providers.agent_sdk as agent_sdk_module
 from claude_agent_sdk import StreamEvent
-from vibe_ide.services.providers.agent_sdk import (
+from tessera.services.providers.agent_sdk import (
     ClaudeAgentSDKProvider,
     _build_options,
     _extract_stream_delta,

@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.models.ticket import TicketDraftPlan, TicketStatus
-from vibe_ide.services.ticket_service import TicketService
+from tessera.models.ticket import TicketDraftPlan, TicketStatus
+from tessera.services.ticket_service import TicketService
 
 
 # ------------------------------------------------------------------

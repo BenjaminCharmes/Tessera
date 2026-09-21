@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.documentation import (
+from tessera.services.documentation import (
     EditionRefusee,
     appliquer_editions,
     tickets_a_documenter,
@@ -202,7 +202,7 @@ class _FauxProvider:
 
 
 def _service(tmp_path: Path, reponses: list[str]):  # type: ignore[no-untyped-def]
-    from vibe_ide.services.documentation import DocumentationService
+    from tessera.services.documentation import DocumentationService
 
     prompts = tmp_path / "prompts"
     prompts.mkdir(exist_ok=True)

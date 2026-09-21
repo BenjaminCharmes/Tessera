@@ -38,7 +38,7 @@ npm run tauri dev          # lancer l'app desktop
 
 ```bash
 ANTHROPIC_API_KEY=sk-ant-...     # obligatoire
-IDE_DATA_DIR=~/.vibe-ide/data    # dossier de données (défaut: ~/.vibe-ide/data)
+IDE_DATA_DIR=~/.tessera/data    # dossier de données (défaut: ~/.tessera/data)
 IDE_LOG_LEVEL=INFO               # DEBUG | INFO | WARNING | ERROR
 ```
 

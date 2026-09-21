@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from vibe_ide.models.project import ProjectCreate
-from vibe_ide.services.project_loader import (
+from tessera.models.project import ProjectCreate
+from tessera.services.project_loader import (
     ProjectLoader,
     list_projects,
     load_agents_config,

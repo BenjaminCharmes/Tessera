@@ -4,12 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.prompt_loader import MissingPromptError
+from tessera.services.prompt_loader import MissingPromptError
 
 from tests.test_providers_base import FakeProvider
-from vibe_ide.models.agent import CreateAgentConversationResponse
-from vibe_ide.models.project import ConversationMessage
-from vibe_ide.services.agent_creator import AgentCreatorService
+from tessera.models.agent import CreateAgentConversationResponse
+from tessera.models.project import ConversationMessage
+from tessera.services.agent_creator import AgentCreatorService
 
 
 # ------------------------------------------------------------------

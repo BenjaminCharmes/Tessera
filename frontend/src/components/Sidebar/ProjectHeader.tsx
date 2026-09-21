@@ -12,7 +12,7 @@ import type { Project } from "../../types/api";
  * jamais.
  *
  * L'ouverture dans VSCode est un simple lien `vscode://` : c'est le geste
- * central du pivot cockpit — vibe-ide pilote, VSCode édite — et il ne coûte
+ * central du pivot cockpit — Tessera pilote, VSCode édite — et il ne coûte
  * aucun aller-retour avec le backend.
  */
 interface ProjectHeaderProps {

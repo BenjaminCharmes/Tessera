@@ -15,7 +15,7 @@ interface EditorProps {
 /**
  * Lecteur de fichier (ticket-065).
  *
- * L'éditeur est **en lecture seule** depuis le pivot cockpit : vibe-ide
+ * L'éditeur est **en lecture seule** depuis le pivot cockpit : Tessera
  * orchestre, VSCode édite. Monaco reste parce qu'il coloriera un diff mieux
  * qu'un `<pre>`, pas parce qu'on prétend remplacer un éditeur — il n'y a ici
  * ni LSP, ni recherche multi-fichiers, ni debugger, et il n'y en aura pas.
@@ -27,7 +27,7 @@ interface EditorProps {
  */
 
 const WELCOME =
-  "# vibe-ide\n\nSélectionne un projet puis un ticket dans la sidebar.\n";
+  "# Tessera\n\nSélectionne un projet puis un ticket dans la sidebar.\n";
 
 export default function Editor({ ticket, openFilePath = null }: EditorProps) {
   const [content, setContent] = useState<string>(WELCOME);

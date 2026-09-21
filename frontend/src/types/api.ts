@@ -4,8 +4,8 @@ export type TicketStatus =
   "todo" | "in-progress" | "in-review" | "done" | "blocked" | "cancelled";
 
 // Doit rester aligné sur TicketType côté backend
-// (backend/src/vibe_ide/models/ticket.py) : types Conventional Commits
-// + `design`, propre à vibe-ide.
+// (backend/src/tessera/models/ticket.py) : types Conventional Commits
+// + `design`, propre à Tessera.
 export type TicketType =
   | "feat"
   | "fix"
@@ -24,7 +24,7 @@ export type AgentRole =
   | "github-sync";
 
 // Doit rester aligné sur EventType côté backend
-// (backend/src/vibe_ide/services/pipeline_events.py). L'union était restée à
+// (backend/src/tessera/services/pipeline_events.py). L'union était restée à
 // six valeurs alors que le pipeline en émet quatorze : les événements
 // manquants traversaient l'UI sans type, donc sans traitement possible.
 export type EventType =
@@ -272,7 +272,7 @@ export interface GitStatus {
   nested_in: string | null;
 }
 
-/** ticket-062 — les artefacts vibe-ide partent dans le dépôt, ou restent locaux. */
+/** ticket-062 — les artefacts Tessera partent dans le dépôt, ou restent locaux. */
 export type ArtifactMode = "tracked" | "local";
 
 export interface ArtifactModeState {

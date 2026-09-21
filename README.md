@@ -1,8 +1,8 @@
-# vibe-ide
+# Tessera
 
 > IDE multi-projets avec orchestration d'agents IA — se construit lui-même.
 
-[![CI](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/vibe_ide/actions/workflows/ci.yml)
+[![CI](https://github.com/BenjaminCharmes/tessera/actions/workflows/ci.yml/badge.svg)](https://github.com/BenjaminCharmes/tessera/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
 ![Tests](https://img.shields.io/badge/tests-260%20frontend%20%2B%20566%20backend-brightgreen)
@@ -14,7 +14,7 @@
 
 ## Qu'est-ce que c'est ?
 
-vibe-ide est un orchestrateur d'agents IA qui gère des projets logiciels sous forme de tickets Markdown.
+Tessera est un orchestrateur d'agents IA qui gère des projets logiciels sous forme de tickets Markdown.
 Il implémente un pipeline **codeur → testeur → sécurité → reviewer → validateur → doc-updater** alimenté par Claude,
 avec un support GitHub intégré (Issues, PRs, clone).
 
@@ -98,14 +98,14 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 | Couverture des routers portée à 93,5 % | ✅ |
 | Quota d'abonnement réel remonté par le fournisseur (ADR-020) | ✅ |
 | Lancement d'un pipeline depuis le chat | ✅ |
-| Outillage Windows (`doctor`, `scripts/vibe.ps1`) | ✅ |
+| Outillage Windows (`doctor`, `scripts/tessera.ps1`) | ✅ |
 
 ### Phase 9 — Le projet appartient à l'utilisateur ✅
 
 | Feature | Status |
 |---------|--------|
 | Lier un projet à un dépôt, ou en initialiser un | ✅ |
-| Artefacts vibe-ide versionnés ou locaux, **par projet** (ADR-021, ADR-023) | ✅ |
+| Artefacts Tessera versionnés ou locaux, **par projet** (ADR-021, ADR-023) | ✅ |
 | Le défaut échoue fermé : un projet importé garde ses artefacts chez lui | ✅ |
 | Retirer un projet de l'IDE sans perdre ses fichiers | ✅ |
 | Suivi par ticket, push et ouverture de PR — **jamais de merge** (ADR-022) | ✅ |
@@ -129,7 +129,7 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 
 | Document | Pour qui |
 |----------|----------|
-| [Guide utilisateur](docs/guide-utilisateur.md) | Tu **utilises** vibe-ide sur tes projets |
+| [Guide utilisateur](docs/guide-utilisateur.md) | Tu **utilises** Tessera sur tes projets |
 | [Architecture](docs/architecture.md) | Tu veux comprendre comment il est construit |
 | [Stratégie de tickets](docs/ticket-strategy.md) | Tu découpes un backlog |
 | [ADR](projects/ide-core/memory/decisions.md) | Les décisions d'architecture et leur pourquoi |
@@ -143,8 +143,8 @@ Le projet suit le pattern **self-hosting** : `projects/ide-core/` contient les t
 Seul prérequis : [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```bash
-git clone https://github.com/BenjaminCharmes/vibe_ide.git
-cd vibe_ide
+git clone https://github.com/BenjaminCharmes/tessera.git
+cd tessera
 
 # 1. Crée le fichier .env avec ta clef API
 cp .env.example .env
@@ -157,7 +157,7 @@ docker compose up --build
 - **Frontend** : http://localhost:5173
 - **Backend API** : http://localhost:8000/docs
 
-Les données persistentes (workspace + SQLite) survivent à `docker compose down` via le volume nommé `vibe-data` et le bind-mount `./projects/`.
+Les données persistentes (workspace + SQLite) survivent à `docker compose down` via le volume nommé `tessera-data` et le bind-mount `./projects/`.
 
 **Protection optionnelle par token** : ajoute `STATIC_TOKEN=mon-secret` dans `.env` pour exiger `Authorization: Bearer mon-secret` sur tous les appels API (utile si l'IDE est exposé sur un serveur distant).
 
@@ -188,8 +188,8 @@ docker compose down -v
 #### Linux / macOS
 
 ```bash
-git clone https://github.com/BenjaminCharmes/vibe_ide.git
-cd vibe_ide
+git clone https://github.com/BenjaminCharmes/tessera.git
+cd tessera
 
 make setup      # .env + dépendances
 make doctor     # vérifie les prérequis AVANT de lancer
@@ -203,8 +203,8 @@ make stop       # arrête tout
 `trap`/`wait`, sémantiques POSIX. Utilise le script équivalent :
 
 ```powershell
-git clone https://github.com/BenjaminCharmes/vibe_ide.git
-cd vibe_ide
+git clone https://github.com/BenjaminCharmes/tessera.git
+cd tessera
 
 .\scriptsibe.ps1 setup
 .\scriptsibe.ps1 doctor
@@ -222,7 +222,7 @@ cd vibe_ide
 > enchaînes des modifications. Tuer le parent laisse l'enfant vivant, qui garde
 > le port 8000 et sert le code de son dernier rechargement — d'où des `500`
 > inexplicables et un port qu'aucun `Stop-Process` ne libère.
-> `vibe.ps1 stop` et `make stop` le ciblent par sa ligne de commande.
+> `tessera.ps1 stop` et `make stop` le ciblent par sa ligne de commande.
 
 Le backend démarre sur **http://localhost:8000** et le frontend sur **http://localhost:5173**.
 La documentation interactive (Swagger) est disponible sur **http://localhost:8000/docs**.
@@ -245,7 +245,7 @@ make tauri-build
 ```
 
 Le bundle produit se trouve dans `frontend/src-tauri/target/release/bundle/` :
-- **macOS** : `macos/vibe-ide.app` (double-clic pour lancer)
+- **macOS** : `macos/Tessera.app` (double-clic pour lancer)
 
 Le bundle **démarre automatiquement le backend** au lancement de l'app — aucun terminal supplémentaire requis.  
 Prérequis : `uv` doit être dans le `PATH` de l'environnement qui exécute l'app.  
@@ -287,14 +287,14 @@ wscat -c ws://localhost:8000/api/v1/orchestrator/stream/ide-core
 ## Structure du monorepo
 
 ```
-vibe-ide/
+Tessera/
 ├── .env.example              ← Template de configuration (copier en .env)
 ├── Makefile                  ← Commandes de lancement (make dev, make test...)
 ├── CLAUDE.md                 ← Constitution du projet pour les agents IA
 │
 ├── backend/                  ← Orchestrateur Python/FastAPI
 │   ├── pyproject.toml
-│   ├── src/vibe_ide/
+│   ├── src/tessera/
 │   │   ├── main.py           ← Point d'entrée FastAPI
 │   │   ├── config.py         ← Settings (pydantic-settings, lit .env)
 │   │   ├── models/           ← Pydantic models (Ticket, Agent, Project)
@@ -404,7 +404,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_MAX_BUDGET_USD` | | `1.0` | Plafond de dépense d'un seul appel agent |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond cumulé d'un run autonome (`0` = aucun) |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
-| `IDE_WORKSPACE_DIR` | | `~/vibe-ide-workspace` | Dossier des projets |
+| `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |

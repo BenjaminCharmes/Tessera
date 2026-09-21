@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services import pipeline_stages as stages
-from vibe_ide.services.git_workspace import GitCommandError
-from vibe_ide.services.pipeline_events import EventType, OrchestratorEvent
-from vibe_ide.services.pipeline_run import PipelineRun
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services import pipeline_stages as stages
+from tessera.services.git_workspace import GitCommandError
+from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline_run import PipelineRun
 
 
 def _ticket(**kwargs: object) -> Ticket:
@@ -213,7 +213,7 @@ def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
     # Offrir `ask_user` a un run non interactif promettrait a l'agent une
     # reponse que personne ne peut donner : il attendrait le delai complet a
     # chaque question, pour rien (ADR-025).
-    from vibe_ide.services.dialogue import DialogueChannel
+    from tessera.services.dialogue import DialogueChannel
 
     run = _run()
     assert stages.asker_for(run) is None

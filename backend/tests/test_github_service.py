@@ -2,7 +2,7 @@ import httpx
 import pytest
 import respx
 
-from vibe_ide.services.github_service import GitHubIssue, GitHubService, PRStatus
+from tessera.services.github_service import GitHubIssue, GitHubService, PRStatus
 
 
 _TOKEN = "ghp_test_token"

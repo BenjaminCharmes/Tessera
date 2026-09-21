@@ -5,8 +5,8 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from vibe_ide.routers.agent_admin import get_registry, router
-from vibe_ide.services.agent_registry import AgentRegistryService
+from tessera.routers.agent_admin import get_registry, router
+from tessera.services.agent_registry import AgentRegistryService
 
 BASE = "/api/v1/agents/registry"
 

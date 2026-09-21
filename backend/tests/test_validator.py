@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from vibe_ide.services.test_runner import TestResult
-from vibe_ide.services.validator import (
+from tessera.services.test_runner import TestResult
+from tessera.services.validator import (
     CriterionResult,
     ValidationResult,
     ValidatorService,

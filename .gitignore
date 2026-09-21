@@ -46,7 +46,7 @@ frontend/src-tauri/target/
 # GitHub Actions
 .github/workflows/*.log
 
-# Workspace vibe-ide : les projets importés, clonés ou créés via l'IDE
+# Workspace Tessera : les projets importés, clonés ou créés via l'IDE
 # atterrissent dans projects/. Seul `ide-core` (le projet bootstrap) est
 # versionné avec le dépôt — les autres appartiennent à l'utilisateur et ne
 # doivent jamais être committés ici. C'est aussi ce qui empêche le
@@ -72,5 +72,5 @@ htmlcov/
 # Projets détachés de l'IDE. La destination est désormais hors du dépôt
 # (ticket-078), mais un dossier créé avant ce correctif peut traîner ici : il
 # ne doit en aucun cas partir dans un commit.
-vibe-ide-detaches/
+tessera-detaches/
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.config import Settings
+from tessera.config import Settings
 
 
 def test_settings_boot_sans_cle_api(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -55,7 +55,7 @@ def test_le_fichier_env_est_trouve_quel_que_soit_le_repertoire_de_lancement(
     # `env_file=".env"` est relatif au cwd : lancé depuis `backend/`, un
     # réglage pourtant présent dans `.env` était silencieusement ignoré et le
     # défaut s'appliquait — même classe de bug que ticket-050.
-    from vibe_ide.config import _ENV_FILE
+    from tessera.config import _ENV_FILE
 
     monkeypatch.chdir(tmp_path)
 

@@ -2,14 +2,14 @@
 from pathlib import Path
 from typing import Any
 
-from vibe_ide.services.livraison import Livraison
-from vibe_ide.services.orchestrator import Orchestrator
-from vibe_ide.services.pipeline_events import (
+from tessera.services.livraison import Livraison
+from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
     PipelineResult,
 )
-from vibe_ide.models.ticket import TicketStatus
+from tessera.models.ticket import TicketStatus
 
 
 def _resultat(ticket_id: str, approuve: bool = True) -> PipelineResult:

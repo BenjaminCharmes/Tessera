@@ -1,7 +1,7 @@
 """Interdiction du git qui modifie l'historique, cote agent — ticket-068."""
 import pytest
 
-from vibe_ide.services.providers.git_guard import (
+from tessera.services.providers.git_guard import (
     GIT_REFUS,
     commande_git_interdite,
 )
@@ -94,7 +94,7 @@ async def test_le_hook_refuse_un_git_qui_ecrit() -> None:
     # avertit qu'une entree de `allowed_tools` couvrant un outil entier
     # l'auto-approuve *avant* que le callback ne soit consulte. Un garde pose
     # la serait inerte — exactement le genre de panne silencieuse qu'on corrige.
-    from vibe_ide.services.providers.git_guard import hook_refus_git
+    from tessera.services.providers.git_guard import hook_refus_git
 
     sortie = await hook_refus_git(
         {"tool_name": "Bash", "tool_input": {"command": "git push origin main"}},
@@ -108,7 +108,7 @@ async def test_le_hook_refuse_un_git_qui_ecrit() -> None:
 
 
 async def test_le_hook_laisse_passer_le_reste() -> None:
-    from vibe_ide.services.providers.git_guard import hook_refus_git
+    from tessera.services.providers.git_guard import hook_refus_git
 
     for commande in ["git status", "npm test", "pytest -q"]:
         sortie = await hook_refus_git(
@@ -118,7 +118,7 @@ async def test_le_hook_laisse_passer_le_reste() -> None:
 
 
 async def test_le_hook_ignore_les_autres_outils() -> None:
-    from vibe_ide.services.providers.git_guard import hook_refus_git
+    from tessera.services.providers.git_guard import hook_refus_git
 
     sortie = await hook_refus_git(
         {"tool_name": "Write", "tool_input": {"file_path": "git_notes.md"}}, None, None
@@ -130,7 +130,7 @@ async def test_le_hook_ignore_les_autres_outils() -> None:
 def test_le_hook_est_installe_sur_chaque_appel_d_agent() -> None:
     # Le garde ne vaut que s'il est branche : un hook ecrit mais jamais pose
     # est pire que pas de hook, parce qu'il donne l'apparence d'une protection.
-    from vibe_ide.services.providers.agent_sdk import _build_options
+    from tessera.services.providers.agent_sdk import _build_options
 
     options = _build_options(
         system="s", model="m", max_turns=3, max_budget_usd=1.0, cwd=None,

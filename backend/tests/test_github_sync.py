@@ -3,10 +3,10 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from vibe_ide.agents.github_sync import GithubSyncAgent, SyncResult, _extract_type
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services.github_service import GitHubIssue
-from vibe_ide.services.sync_map import SyncEntry, SyncMapService
+from tessera.agents.github_sync import GithubSyncAgent, SyncResult, _extract_type
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.github_service import GitHubIssue
+from tessera.services.sync_map import SyncEntry, SyncMapService
 
 
 # ------------------------------------------------------------------

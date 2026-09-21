@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.autonomie import (
+from tessera.services.autonomie import (
     NiveauAutonomie,
     lire_niveau,
     peut_merger,

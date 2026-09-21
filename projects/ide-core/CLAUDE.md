@@ -65,7 +65,7 @@ il n'en reste qu'une.
 ## Lancement du projet
 
 ```bash
-# Depuis la racine vibe-ide/
+# Depuis la racine Tessera/
 make dev              # Lance FastAPI sur http://localhost:8000
 make dev-frontend     # Lance Vite sur http://localhost:5173
 make tauri-dev        # Lance l'app desktop (nécessite make dev dans un autre terminal)

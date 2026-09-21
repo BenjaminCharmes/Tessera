@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from vibe_ide.services.providers.anthropic_api import AnthropicApiProvider
+from tessera.services.providers.anthropic_api import AnthropicApiProvider
 
 
 def _mock_client(text: str = "réponse") -> MagicMock:

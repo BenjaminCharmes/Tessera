@@ -8,7 +8,7 @@ description: Use when about to claim work is done, fixed, passing or ready to me
 ## Une seule commande
 
 ```powershell
-.\scripts\vibe.ps1 verify      # Windows
+.\scripts\tessera.ps1 verify      # Windows
 make verify                      # ailleurs
 ```
 
@@ -32,7 +32,7 @@ branche — il continue de servir l'ancien code, et l'E2E échoue sur des
 Le symptôme : l'échec disparaît après avoir tué le serveur.
 
 ```powershell
-.\scriptsibe.ps1 stop      # puis relancer verify
+.\scripts\tessera.ps1 stop      # puis relancer verify
 ```
 
 Avant de chercher la régression, vérifier ça. Deux fois de suite, c'était ça.
@@ -96,7 +96,7 @@ curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/api/v1/projects/i
 ```
 
 Et identifier le **processus** qui répond — un worker `--reload` orphelin
-répond parfaitement en servant du code obsolète (→ `run-vibe-ide`).
+répond parfaitement en servant du code obsolète (→ `run-tessera`).
 
 ## Rapporter honnêtement
 

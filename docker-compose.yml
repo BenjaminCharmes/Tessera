@@ -15,7 +15,7 @@ services:
     volumes:
       - ./projects:/app/projects
       - ./agents/prompts:/app/prompts
-      - vibe-data:/app/data
+      - tessera-data:/app/data
     restart: unless-stopped
 
   frontend:
@@ -27,4 +27,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  vibe-data:
+  tessera-data:

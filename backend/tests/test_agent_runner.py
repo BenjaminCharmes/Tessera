@@ -6,18 +6,18 @@ import aiosqlite
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services.agent_registry import AgentRegistryService
-from vibe_ide.services.prompt_loader import MissingPromptError
-from vibe_ide.services.agent_runner import (
+from tessera.models.agent import AgentConfig, AgentResult, AgentRole
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.agent_registry import AgentRegistryService
+from tessera.services.prompt_loader import MissingPromptError
+from tessera.services.agent_runner import (
     _DEFAULT_MAX_TOKENS,
     _DEFAULT_MODEL,
     AgentRunner,
     _parse_suggested_status,
 )
-from vibe_ide.services.cost_calculator import calculate_cost
-from vibe_ide.services.database import create_run, init_db
+from tessera.services.cost_calculator import calculate_cost
+from tessera.services.database import create_run, init_db
 
 
 # ------------------------------------------------------------------
@@ -387,7 +387,7 @@ async def test_run_real_api(tmp_path: Path) -> None:
 
     from anthropic import AsyncAnthropic
 
-    from vibe_ide.services.providers.anthropic_api import AnthropicApiProvider
+    from tessera.services.providers.anthropic_api import AnthropicApiProvider
 
     provider = AnthropicApiProvider(AsyncAnthropic(api_key=api_key))
     registry = AgentRegistryService(prompts)

@@ -6,11 +6,11 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.models.ticket import TicketStatus
-from vibe_ide.services.database import init_db
-from vibe_ide.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.config import settings
+from tessera.main import app
+from tessera.models.ticket import TicketStatus
+from tessera.services.database import init_db
+from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
 @pytest.fixture(autouse=True)
@@ -38,7 +38,7 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         encoding="utf-8",
     )
 
-    db_path = tmp_path / "vibe.db"
+    db_path = tmp_path / "tessera.db"
     asyncio.run(init_db(db_path))
 
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
@@ -126,7 +126,7 @@ def test_run_renvoie_le_resultat_du_pipeline(monkeypatch: pytest.MonkeyPatch) ->
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     resp = _client().post(
         "/api/v1/orchestrator/run",
@@ -152,7 +152,7 @@ def test_run_autonome_transmet_max_tickets(monkeypatch: pytest.MonkeyPatch) -> N
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     resp = _client().post(
         "/api/v1/orchestrator/run-autonomous",
@@ -183,7 +183,7 @@ def test_stream_diffuse_les_evenements_du_pipeline(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
         ws.send_json({"ticket_id": "ticket-001"})
@@ -202,7 +202,7 @@ def test_stream_en_mode_autonome(monkeypatch: pytest.MonkeyPatch) -> None:
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
         ws.send_json({"mode": "autonomous", "max_tickets": 2})
@@ -252,7 +252,7 @@ def test_le_stream_transmet_la_reponse_de_l_utilisateur_a_l_agent(
     async def _build(project_id: str) -> _OrchestrateurQuiDemande:
         return fake
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
         ws.send_json({"ticket_id": "ticket-001"})
@@ -277,7 +277,7 @@ def test_le_stream_transmet_un_message_spontane(
     async def _build(project_id: str) -> _OrchestrateurQuiDemande:
         return fake
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
         ws.send_json({"ticket_id": "ticket-001"})
@@ -304,7 +304,7 @@ def test_un_run_interrompu_est_clos_en_base(monkeypatch: pytest.MonkeyPatch) -> 
     async def _build(project_id: str) -> _OrchestrateurQuiEchoue:
         return _OrchestrateurQuiEchoue()
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     try:
         with _client().websocket_connect(
@@ -351,8 +351,8 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
 ) -> None:
     # Le corps de la PR se rédige depuis le ticket : passer son identifiant en
     # guise de titre donnait une PR nommée « ticket-001 — ticket-001 ».
-    from vibe_ide.routers.orchestrator import _livreur
-    from vibe_ide.services.livraison import Livraison
+    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livraison import Livraison
 
     recu: dict[str, object] = {}
 
@@ -360,7 +360,7 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
         recu.update(kwargs)
         return Livraison(pr_number=7)
 
-    monkeypatch.setattr("vibe_ide.services.livraison.LivraisonService.livrer", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer", _livrer)
 
     livraison = asyncio.run(_livreur("mon-projet")(_approved()))
 
@@ -375,12 +375,12 @@ def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
 ) -> None:
     # Le travail est commité : perdre la réponse du run parce que GitHub est
     # injoignable ferait croire que le pipeline lui-même a échoué.
-    from vibe_ide.routers.orchestrator import _livreur
+    from tessera.routers.orchestrator import _livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise RuntimeError("GitHub injoignable")
 
-    monkeypatch.setattr("vibe_ide.services.livraison.LivraisonService.livrer", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer", _livrer)
 
     livraison = asyncio.run(_livreur("mon-projet")(_approved()))
 
@@ -415,8 +415,8 @@ def test_un_run_autonome_peut_partir_des_issues_github(
 
         return _R()
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
-    monkeypatch.setattr("vibe_ide.agents.github_sync.GithubSyncAgent.run", _run)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
 
     resp = _client().post(
         "/api/v1/orchestrator/run-autonomous",
@@ -444,8 +444,8 @@ def test_un_run_autonome_ne_touche_pas_a_github_sans_le_demander(
         tires.append(direction)
         raise AssertionError("github-sync ne doit pas tourner ici")
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
-    monkeypatch.setattr("vibe_ide.agents.github_sync.GithubSyncAgent.run", _run)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
 
     resp = _client().post(
         "/api/v1/orchestrator/run-autonomous", json={"project_id": "mon-projet"}

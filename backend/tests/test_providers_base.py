@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from vibe_ide.services.providers.base import (
+from tessera.services.providers.base import (
     LLMProvider,
     ProviderResult,
     StreamCallback,

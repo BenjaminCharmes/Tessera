@@ -1,10 +1,10 @@
-# Guide utilisateur — vibe-ide
+# Guide utilisateur — Tessera
 
-vibe-ide est un IDE qui fait travailler des **agents IA** sur tes projets. Tu décris
+Tessera est un IDE qui fait travailler des **agents IA** sur tes projets. Tu décris
 ce que tu veux sous forme de **tickets**, et une chaîne d'agents écrit le code, le
 teste, l'audite, le relit, le valide et le committe — pendant que tu regardes.
 
-Ce guide s'adresse à quelqu'un qui **utilise** vibe-ide. Pour comprendre comment il
+Ce guide s'adresse à quelqu'un qui **utilise** Tessera. Pour comprendre comment il
 est construit, va voir [`architecture.md`](architecture.md).
 
 ---
@@ -32,7 +32,7 @@ est construit, va voir [`architecture.md`](architecture.md).
 
 ### Ce qu'il te faut
 
-vibe-ide parle à Claude de deux façons — choisis-en une :
+Tessera parle à Claude de deux façons — choisis-en une :
 
 | Mode | Quand l'utiliser | Coût |
 |------|------------------|------|
@@ -68,9 +68,9 @@ make run      # backend + frontend
 **Windows** — `make` n'y est pas installé par défaut :
 
 ```powershell
-.\scripts\vibe.ps1 setup
-.\scripts\vibe.ps1 doctor
-.\scripts\vibe.ps1 run
+.\scripts\tessera.ps1 setup
+.\scripts\tessera.ps1 doctor
+.\scripts\tessera.ps1 run
 ```
 
 > `doctor` vérifie Python, `.env`, le workspace, les prompts des agents,
@@ -108,9 +108,9 @@ Sidebar → **Nouveau projet**. Tu décris ton idée en langage naturel, l'agent
 
 Sidebar → **Importer un projet**. Deux modes :
 
-- **copy** — vibe-ide copie le dossier dans son workspace. Ton original n'est jamais
+- **copy** — Tessera copie le dossier dans son workspace. Ton original n'est jamais
   touché. **C'est le mode recommandé.**
-- **symlink** — vibe-ide crée un lien vers ton dossier. Les agents modifient
+- **symlink** — Tessera crée un lien vers ton dossier. Les agents modifient
   directement tes fichiers. Sous Windows, ce mode exige le **mode développeur** ou
   un lancement en administrateur.
 
@@ -125,7 +125,7 @@ Sidebar → **Importer un projet**. Deux modes :
 
 ### Cloner un dépôt GitHub
 
-Sidebar → **Cloner un repo**. Colle l'URL, vibe-ide clone dans le workspace.
+Sidebar → **Cloner un repo**. Colle l'URL, Tessera clone dans le workspace.
 
 ### Analyser un projet sans `CLAUDE.md`
 
@@ -257,7 +257,7 @@ Les statuts que tu verras passer :
 
 ## 5 bis. Se repérer dans l'écran
 
-vibe-ide n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
+Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
 travailler : il n'a ni LSP, ni debugger, ni recherche multi-fichiers, et il n'en
 aura pas. L'édition se fait dans VSCode, qu'on ouvre d'un clic depuis l'en-tête
 du projet.
@@ -308,9 +308,9 @@ Pour récupérer un travail approuvé :
 git merge ticket-007-ajouter-un-endpoint-de-sante
 ```
 
-> **La comptabilité de vibe-ide fait l'objet d'un commit séparé.** Les changements de
+> **La comptabilité de Tessera fait l'objet d'un commit séparé.** Les changements de
 > statut de tickets et le journal de pipeline arrivent dans un commit
-> `chore: vibe-ide pipeline bookkeeping`, jamais mélangés au travail du codeur.
+> `chore: Tessera pipeline bookkeeping`, jamais mélangés au travail du codeur.
 
 ---
 
@@ -450,7 +450,7 @@ Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
 
 ## 10 bis. Ce qui reste chez toi, ce qui part dans le dépôt
 
-vibe-ide ajoute quatre choses à un projet : `tickets/`, `memory/`, `CLAUDE.md`
+Tessera ajoute quatre choses à un projet : `tickets/`, `memory/`, `CLAUDE.md`
 et `agents.json`. Elles n'ont pas leur place dans tous les dépôts.
 
 Chaque projet déclare son mode, dans le panneau **Git & artefacts** :
@@ -463,7 +463,7 @@ Chaque projet déclare son mode, dans le panneau **Git & artefacts** :
   personnel : les décisions sont tracées et survivent à la machine.
 
 **Le défaut protège** : seul un projet *créé* par l'IDE est versionné. Un projet
-importé ou cloné existait avant vibe-ide — souvent chez quelqu'un d'autre — et
+importé ou cloné existait avant Tessera — souvent chez quelqu'un d'autre — et
 reste local. On peut toujours choisir de partager ensuite ; on ne peut pas
 défaire un push.
 
@@ -487,7 +487,7 @@ Tout est dans `.env` (copié depuis `.env.example`) :
 | `LLM_MAX_BUDGET_USD` | `1.0` | Plafond de dépense d'un **seul** appel agent |
 | `RUN_MAX_BUDGET_USD` | `5.0` | Plafond cumulé d'un **run autonome** (`0` = aucun) |
 | `CHAT_MAX_CONVERSATION_USD` | `2.0` | Plafond de dépense d'une **conversation** du chat |
-| `IDE_WORKSPACE_DIR` | `~/vibe-ide-workspace` | Où vivent tes projets |
+| `IDE_WORKSPACE_DIR` | `~/tessera-workspace` | Où vivent tes projets |
 | `IDE_PROMPTS_DIR` | `agents/prompts/` | Où vivent les prompts des agents |
 | `IDE_LOG_LEVEL` | `INFO` | Verbosité des logs |
 | `GITHUB_TOKEN` | — | Token GitHub |
@@ -497,7 +497,7 @@ Tout est dans `.env` (copié depuis `.env.example`) :
 `LLM_MAX_TURNS` et `LLM_MAX_BUDGET_USD` sont tes garde-fous contre un agent qui part
 en boucle. Ne les augmente qu'en connaissance de cause.
 
-> **Si tu exposes vibe-ide sur un réseau**, définis `STATIC_TOKEN`. Sans lui l'API
+> **Si tu exposes Tessera sur un réseau**, définis `STATIC_TOKEN`. Sans lui l'API
 > est ouverte — c'est acceptable en local, pas ailleurs.
 
 ---
@@ -517,7 +517,7 @@ administrateur. Le plus simple : réimporte en mode **copy**.
 ### Un ticket passe en `blocked` sans qu'aucun agent n'ait tourné
 
 L'arbre de travail du projet était sale au démarrage. C'est un filet de sécurité :
-quelque chose a modifié des fichiers **suivis** en dehors de vibe-ide. Committe ou
+quelque chose a modifié des fichiers **suivis** en dehors de Tessera. Committe ou
 annule ces changements, puis repasse le ticket en `todo`.
 
 ### Le pipeline tourne mais rien ne change dans les fichiers
@@ -532,7 +532,7 @@ son enfant vivant : il garde le port et continue de servir le code tel qu'il
 un PID que `Get-Process` ne trouve pas.
 
 ```powershell
-.\scripts\vibe.ps1 stop              # le cible par sa ligne de commande
+.\scripts\tessera.ps1 stop              # le cible par sa ligne de commande
 taskkill /F /PID <pid>  # en dernier recours
 ```
 
@@ -557,7 +557,7 @@ du projet, avec un timeout de 120 s.
 
 ## Pour aller plus loin
 
-- [`architecture.md`](architecture.md) — comment vibe-ide est construit
+- [`architecture.md`](architecture.md) — comment Tessera est construit
 - [`ticket-strategy.md`](ticket-strategy.md) — comment découper un backlog
 - `projects/ide-core/memory/decisions.md` — les ADR, dont **ADR-017** (couche LLM) et
   **ADR-018** (isolation git du pipeline)

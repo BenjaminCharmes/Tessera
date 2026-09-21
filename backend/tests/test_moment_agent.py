@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-from vibe_ide.services.agent_registry import AgentRegistryService, MomentAgent
+from tessera.services.agent_registry import AgentRegistryService, MomentAgent
 
 _PROMPTS = Path(__file__).resolve().parents[2] / "agents" / "prompts"
 _PROJETS = Path(__file__).resolve().parents[2] / "projects"

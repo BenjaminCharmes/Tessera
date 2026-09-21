@@ -66,7 +66,7 @@ describe("CostView", () => {
 
 describe("CostView — vue d'ensemble", () => {
   it("ventile par projet quand aucun n'est sélectionné", async () => {
-    // « Combien me coûte vibe-ide, et sur quel projet » n'avait aucune réponse :
+    // « Combien me coûte Tessera, et sur quel projet » n'avait aucune réponse :
     // chaque endpoint était borné à un projet (ticket-082).
     vi.mocked(api.usage.breakdownGlobal).mockResolvedValue({
       project_id: null,

@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.config import settings
-from vibe_ide.routers.orchestrator import _build_orchestrator, _build_project_context
+from tessera.config import settings
+from tessera.routers.orchestrator import _build_orchestrator, _build_project_context
 
 
 @pytest.fixture(autouse=True)

@@ -1,4 +1,4 @@
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
 
 def _make_ticket(**kwargs: object) -> Ticket:

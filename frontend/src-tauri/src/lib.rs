@@ -31,7 +31,7 @@ fn list_dir(path: String) -> Result<Vec<String>, String> {
 fn spawn_backend() -> Option<Child> {
     std::process::Command::new("sh")
         .arg("-c")
-        .arg("uv run uvicorn vibe_ide.main:app --host 0.0.0.0 --port 8000 --env-file ../.env")
+        .arg("uv run uvicorn tessera.main:app --host 0.0.0.0 --port 8000 --env-file ../.env")
         .current_dir(BACKEND_DIR)
         .spawn()
         .ok()

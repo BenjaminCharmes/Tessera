@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services import database
-from vibe_ide.services.database import init_db, version_du_schema
+from tessera.services import database
+from tessera.services.database import init_db, version_du_schema
 
 
 def _version(db_path: Path) -> int:
@@ -17,7 +17,7 @@ def _version(db_path: Path) -> int:
 
 
 async def test_une_base_neuve_est_a_la_derniere_version(tmp_path: Path) -> None:
-    db = tmp_path / "vibe.db"
+    db = tmp_path / "tessera.db"
 
     await init_db(db)
 
@@ -30,7 +30,7 @@ async def test_une_base_existante_est_migree(
     # Le cas qui compte : la base de l'utilisateur, créée avant l'existence
     # des migrations. Sans numéro de version, une colonne ajoutée un jour ne
     # serait jamais vue — silencieusement.
-    db = tmp_path / "vibe.db"
+    db = tmp_path / "tessera.db"
     await init_db(db)
 
     monkeypatch.setattr(
@@ -54,7 +54,7 @@ async def test_une_migration_ne_s_applique_pas_deux_fois(
 ) -> None:
     # `ALTER TABLE ADD COLUMN` échoue si la colonne existe : rejouer une
     # migration déjà passée casserait le démarrage de l'application.
-    db = tmp_path / "vibe.db"
+    db = tmp_path / "tessera.db"
     await init_db(db)
     monkeypatch.setattr(
         database,
@@ -71,7 +71,7 @@ async def test_une_migration_ne_s_applique_pas_deux_fois(
 async def test_les_donnees_survivent_a_une_migration(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    db = tmp_path / "vibe.db"
+    db = tmp_path / "tessera.db"
     await init_db(db)
     run_id = await database.create_run(db, "p", "ticket-001")
 

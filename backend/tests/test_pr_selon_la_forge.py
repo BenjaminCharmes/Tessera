@@ -1,7 +1,7 @@
 """L'ouverture de PR n'est proposee que la ou elle marche — ticket-081."""
 import pytest
 
-from vibe_ide.services.github_workflow import forge_supportee, nom_de_la_forge
+from tessera.services.github_workflow import forge_supportee, nom_de_la_forge
 
 
 @pytest.mark.parametrize(

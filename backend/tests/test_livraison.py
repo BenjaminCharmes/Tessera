@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-from vibe_ide.services.livraison import LivraisonService, Livraison
+from tessera.services.livraison import LivraisonService, Livraison
 
 
 class _FauxGit:

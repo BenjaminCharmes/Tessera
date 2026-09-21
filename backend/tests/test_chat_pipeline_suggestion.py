@@ -1,14 +1,14 @@
 """Suggestion de lancement de pipeline depuis le chat — ticket-055."""
 import pytest
 
-from vibe_ide.services.chat_suggestion import (
+from tessera.services.chat_suggestion import (
     PipelineSuggestion,
     RunLock,
     RunAlreadyInProgress,
     parse_pipeline_suggestion,
     summarize_conversation,
 )
-from vibe_ide.services.database import ChatMessageRow
+from tessera.services.database import ChatMessageRow
 
 
 # ------------------------------------------------------------------
@@ -34,7 +34,7 @@ def test_une_reponse_sans_marqueur_ne_suggere_rien() -> None:
 def test_le_marqueur_est_retire_du_texte_affiche() -> None:
     # Le marqueur est un protocole, pas du contenu : l'utilisateur voit un
     # bouton, pas une ligne technique.
-    from vibe_ide.services.chat_suggestion import strip_suggestion_marker
+    from tessera.services.chat_suggestion import strip_suggestion_marker
 
     content = "C'est prêt.\n\nSUGGESTION_PIPELINE: ticket-042"
     assert strip_suggestion_marker(content).strip() == "C'est prêt."

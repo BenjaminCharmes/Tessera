@@ -1,7 +1,7 @@
 """Suivi du quota d'abonnement — ticket-054."""
 from datetime import datetime, timezone
 
-from vibe_ide.services.quota_tracker import (
+from tessera.services.quota_tracker import (
     QuotaSnapshot,
     QuotaTracker,
     snapshot_from_rate_limit,
@@ -127,7 +127,7 @@ def test_le_tracker_expose_un_etat_serialisable() -> None:
 def test_le_provider_expose_le_dernier_quota_observe() -> None:
     # La capture se fait dans le provider : c'est le seul endroit qui voit les
     # messages du SDK, et la forme du SDK ne doit pas aller plus loin.
-    from vibe_ide.services.providers.agent_sdk import ClaudeAgentSDKProvider
+    from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 
     provider = ClaudeAgentSDKProvider()
     assert provider.quota.snapshot is None

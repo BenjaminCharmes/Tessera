@@ -3,14 +3,14 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
-from vibe_ide.models.ticket import (
+from tessera.models.ticket import (
     Ticket,
     TicketPriority,
     TicketStatus,
     TicketType,
 )
-from vibe_ide.services.orchestrator import Orchestrator
-from vibe_ide.services.pipeline_events import OrchestratorEvent
+from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_events import OrchestratorEvent
 
 
 def _ticket(type_: TicketType) -> Ticket:
@@ -63,7 +63,7 @@ async def _lance(tmp_path: Path, monkeypatch: Any, type_: TicketType) -> list[st
     git.current_diff.return_value = "diff --git a/x b/x\n+x\n"
     git.commit_all.return_value = "abc"
 
-    from vibe_ide.services import pipeline_stages as stages
+    from tessera.services import pipeline_stages as stages
 
     async def _revue(orch: Any, run: Any, contexte: Any) -> tuple[bool, str, str]:
         return True, "", "APPROVED"

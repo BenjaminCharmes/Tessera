@@ -1,11 +1,11 @@
 """Un run ne peut pas se dire approuve sans avoir commite — ticket-068."""
 from pathlib import Path
 
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services import pipeline_outcomes as outcomes
-from vibe_ide.services.git_workspace import GitCommandError
-from vibe_ide.services.pipeline_events import EventType, OrchestratorEvent
-from vibe_ide.services.pipeline_run import PipelineRun
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services import pipeline_outcomes as outcomes
+from tessera.services.git_workspace import GitCommandError
+from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline_run import PipelineRun
 
 
 def _ticket() -> Ticket:

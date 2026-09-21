@@ -3,9 +3,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from vibe_ide.models.agent import AgentConfig, AgentResult, AgentRole
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services.orchestrator import (
+from tessera.models.agent import AgentConfig, AgentResult, AgentRole
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.orchestrator import (
     EventType,
     Orchestrator,
     OrchestratorEvent,
@@ -14,10 +14,10 @@ from vibe_ide.services.orchestrator import (
 
 # Le parsing du verdict vit dans pipeline_text depuis ticket-045, et les étapes
 # du pipeline dans pipeline_stages depuis ticket-046.
-from vibe_ide.services.pipeline_text import _parse_reviewer_verdict
-from vibe_ide.services.git_workspace import GitWorkspaceError
-from vibe_ide.services.security_auditor import SecurityAuditResult, SecurityIssue
-from vibe_ide.services.validator import ValidationResult
+from tessera.services.pipeline_text import _parse_reviewer_verdict
+from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.security_auditor import SecurityAuditResult, SecurityIssue
+from tessera.services.validator import ValidationResult
 
 
 # ------------------------------------------------------------------
@@ -177,7 +177,7 @@ class _RecordingRunner:
 
 
 def test_agent_tool_use_event_existe() -> None:
-    from vibe_ide.services.orchestrator import EventType
+    from tessera.services.orchestrator import EventType
 
     assert EventType.AGENT_TOOL_USE.value == "agent_tool_use"
 

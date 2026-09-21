@@ -1,6 +1,6 @@
-# CLAUDE.md — vibe-ide
+# CLAUDE.md — Tessera
 
-Tu travailles sur **vibe-ide** : un IDE multi-projets avec orchestration d'agents IA,
+Tu travailles sur **Tessera** : un IDE multi-projets avec orchestration d'agents IA,
 construit de façon incrémentale et auto-hébergé (l'IDE se construit lui-même).
 
 ---
@@ -64,7 +64,7 @@ permanence. C'est ce qui justifie l'import ici et pas là.
 ## Structure du monorepo
 
 ```
-vibe-ide/
+tessera/
   CLAUDE.md              ← ce fichier (constitution globale)
   CLAUDE.local.md        ← overrides locaux (gitignore)
   .claude/               ← config Claude Code (skills, commands)
@@ -128,17 +128,17 @@ dépôt — à ne pas confondre avec `agents/prompts/`, qui contient les prompts
   settings.local.json     ← préférences personnelles (gitignoré)
 ```
 
-Slash commands : `/new-ticket`, `/run-vibe-ide`, `/ship`.
+Slash commands : `/new-ticket`, `/run-tessera`, `/ship`.
 
 **Skills et slash commands sont deux choses différentes.** Un skill est chargé
 par Claude quand sa `description` correspond à la tâche — il ne se tape pas.
 Une slash command est une invite que l'utilisateur déclenche à la main
-(`/run-vibe-ide`), et qui peut s'appuyer sur un skill. Les skills ajoutés
+(`/run-tessera`), et qui peut s'appuyer sur un skill. Les skills ajoutés
 pendant une session ne sont visibles qu'au démarrage de la suivante.
 
 Skills disponibles : `brainstorming`, `writing-plans`,
 `test-driven-development`, `code-review`, `verification-before-completion`,
-`new-ticket`, `ticket-workflow`, `write-adr`, `run-vibe-ide`.
+`new-ticket`, `ticket-workflow`, `write-adr`, `run-tessera`.
 
 **Chargement à la demande, jamais par `@`-import.** Un `@`-import dans ce
 fichier est payé à chaque session ; un skill ne coûte que lorsqu'il sert. La
@@ -183,7 +183,7 @@ qu'un agent doit savoir pour ne pas reconstruire ce qui existe.
   l'autorise : rebase, PR, attente de CI, merge (ADR-029, ADR-030)
 - Un conflit de rebase est tenté par un agent, et la résolution est toujours
   relue (ADR-033)
-- Les artefacts vibe-ide restent hors des dépôts clients par défaut (ADR-021,
+- Les artefacts Tessera restent hors des dépôts clients par défaut (ADR-021,
   ADR-023) ; les agents ne touchent pas à git (ADR-027) et n'écrivent pas hors
   de leur projet (ADR-031)
 - Registre d'agents, modèle par projet, coûts par projet/ticket/agent/modèle,

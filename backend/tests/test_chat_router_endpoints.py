@@ -10,10 +10,10 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.services.chat_service import ChatBudgetExceeded, ChatReply
-from vibe_ide.services.database import init_db, list_chat_messages
+from tessera.config import settings
+from tessera.main import app
+from tessera.services.chat_service import ChatBudgetExceeded, ChatReply
+from tessera.services.database import init_db, list_chat_messages
 
 
 @pytest.fixture(autouse=True)
@@ -30,7 +30,7 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     for status in ("todo", "in-progress", "in-review", "done", "blocked"):
         (project / "tickets" / status).mkdir(parents=True)
 
-    db_path = tmp_path / "vibe.db"
+    db_path = tmp_path / "tessera.db"
     asyncio.run(init_db(db_path))
 
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
@@ -65,7 +65,7 @@ def _patch_service(monkeypatch: pytest.MonkeyPatch, service: _FakeChatService) -
     async def _build(project_id: str) -> _FakeChatService:
         return service
 
-    monkeypatch.setattr("vibe_ide.routers.chat._build_service", _build)
+    monkeypatch.setattr("tessera.routers.chat._build_service", _build)
 
 
 # ------------------------------------------------------------------
@@ -195,7 +195,7 @@ async def test_le_contexte_du_chat_reprend_claude_md_tickets_et_adr(
 ) -> None:
     # L'agent du chat doit recevoir le même contexte que ceux du pipeline :
     # sans lui, il répond sur un projet qu'il ne connaît pas.
-    from vibe_ide.routers.chat import _build_context
+    from tessera.routers.chat import _build_context
 
     project = workspace / "mon-projet"
     (project / "memory" / "decisions.md").write_text(
@@ -217,7 +217,7 @@ async def test_le_contexte_du_chat_reprend_claude_md_tickets_et_adr(
 async def test_le_service_du_chat_n_expose_aucun_outil_shell(workspace: Path) -> None:
     # Critère de ticket-048 : un agent conversationnel exécutant des commandes
     # arbitraires dans le dépôt de l'utilisateur est hors périmètre.
-    from vibe_ide.routers.chat import _CHAT_TOOLS, _build_service
+    from tessera.routers.chat import _CHAT_TOOLS, _build_service
 
     assert "Bash" not in _CHAT_TOOLS
 
@@ -228,7 +228,7 @@ async def test_le_service_du_chat_n_expose_aucun_outil_shell(workspace: Path) ->
 async def test_service_du_chat_sur_un_projet_inexistant_renvoie_404() -> None:
     from fastapi import HTTPException
 
-    from vibe_ide.routers.chat import _build_service
+    from tessera.routers.chat import _build_service
 
     with pytest.raises(HTTPException) as exc:
         await _build_service("jamais-vu")
@@ -268,7 +268,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
     # de la conversation est perdu.
     import asyncio
 
-    from vibe_ide.services.database import save_chat_message
+    from tessera.services.database import save_chat_message
 
     asyncio.run(
         save_chat_message(
@@ -285,8 +285,8 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
         async def run_pipeline(self, project_id: str, ticket_id: str, on_event: object) -> object:
             captured["context"] = self._project_context
             captured["ticket_id"] = ticket_id
-            from vibe_ide.models.ticket import TicketStatus
-            from vibe_ide.services.pipeline_events import PipelineResult
+            from tessera.models.ticket import TicketStatus
+            from tessera.services.pipeline_events import PipelineResult
 
             return PipelineResult(
                 ticket_id=ticket_id,
@@ -298,7 +298,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return _FakeOrchestrator()
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
     resp = _client().post(
         "/api/v1/projects/mon-projet/chat/run",
@@ -315,12 +315,12 @@ def test_un_lancement_concurrent_est_refuse_avec_409(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Deux pipelines sur le même dépôt violeraient l'isolation par branche.
-    from vibe_ide.routers.chat import _RUN_LOCK
+    from tessera.routers.chat import _RUN_LOCK
 
     async def _build(project_id: str) -> object:
         raise AssertionError("ne doit pas être atteint")
 
-    monkeypatch.setattr("vibe_ide.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
     monkeypatch.setattr(_RUN_LOCK, "_running", {"mon-projet"})
 
     resp = _client().post(

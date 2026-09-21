@@ -1,7 +1,7 @@
 """L'agent qui résout un conflit de rebase — ticket-090."""
 from pathlib import Path
 
-from vibe_ide.services.resolveur_conflit import ResolveurConflitService
+from tessera.services.resolveur_conflit import ResolveurConflitService
 
 
 class _FauxRunner:

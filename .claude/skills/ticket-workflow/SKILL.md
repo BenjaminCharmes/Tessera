@@ -102,7 +102,7 @@ Une fois la CI verte et la revue passée :
 > ### ⚠ Dérogation temporaire — depuis le 2026-09-18
 >
 > Les minutes GitHub Actions du compte sont épuisées : **aucun job ne démarre**.
-> La vérification se fait donc en local, par `.\scriptsibe.ps1 verify`, et
+> La vérification se fait donc en local, par `.\scripts\tessera.ps1 verify`, et
 > c'est sur elle qu'on merge.
 >
 > **La règle ne change pas.** On merge sur une CI verte ; on s'en passe
@@ -116,7 +116,7 @@ Une fois la CI verte et la revue passée :
 > run démarre à nouveau, puis retirer ce bloc.
 >
 > Ceci ne concerne **pas** le produit : `peut_merger` exige toujours
-> `ci_status == "passing"` (ADR-029), donc vibe-ide ne merge rien tout seul
+> `ci_status == "passing"` (ADR-029), donc Tessera ne merge rien tout seul
 > pendant ce temps. C'est voulu.
 
 ```bash

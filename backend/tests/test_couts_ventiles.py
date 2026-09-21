@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.database import (
+from tessera.services.database import (
     create_run,
     get_usage_breakdown,
     init_db,
@@ -13,7 +13,7 @@ from vibe_ide.services.database import (
 
 @pytest.fixture
 async def base(tmp_path: Path) -> Path:
-    chemin = tmp_path / "vibe.db"
+    chemin = tmp_path / "tessera.db"
     await init_db(chemin)
     run = await create_run(chemin, "projet-a", "ticket-001")
     await save_agent_call(
@@ -73,7 +73,7 @@ async def test_un_projet_ne_voit_que_ses_propres_appels(base: Path) -> None:
 
 
 async def test_sans_projet_la_ventilation_couvre_tout(base: Path) -> None:
-    # « Combien me coute vibe-ide ce mois-ci » n'avait aucune reponse : chaque
+    # « Combien me coute Tessera ce mois-ci » n'avait aucune reponse : chaque
     # endpoint etait borne a un projet.
     ventilation = await get_usage_breakdown(base, None)
 
@@ -83,7 +83,7 @@ async def test_sans_projet_la_ventilation_couvre_tout(base: Path) -> None:
 
 
 async def test_la_ventilation_globale_dit_aussi_par_projet(base: Path) -> None:
-    # « Combien me coute vibe-ide, et sur quel projet » n'avait aucune reponse :
+    # « Combien me coute Tessera, et sur quel projet » n'avait aucune reponse :
     # chaque endpoint etait borne a un projet (ticket-082).
     ventilation = await get_usage_breakdown(base, None)
 

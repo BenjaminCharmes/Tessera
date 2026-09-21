@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.github_workflow import (
+from tessera.services.github_workflow import (
     GitHubWorkflowService,
     WorkflowError,
     build_pr_body,
@@ -161,7 +161,7 @@ def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
     """
     import inspect
 
-    from vibe_ide.services import github_workflow
+    from tessera.services import github_workflow
 
     source = inspect.getsource(github_workflow)
     lignes = [
@@ -177,7 +177,7 @@ def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
 
 
 def test_un_projet_sans_declaration_ne_merge_jamais(tmp_path: Path) -> None:
-    from vibe_ide.services.autonomie import peut_merger
+    from tessera.services.autonomie import peut_merger
 
     projet = tmp_path / "sans-declaration"
     projet.mkdir()
@@ -330,7 +330,7 @@ def test_sans_issue_le_corps_de_pr_ne_referme_rien() -> None:
 
 
 async def test_la_pr_referme_l_issue_du_ticket(tmp_path: Path) -> None:
-    from vibe_ide.services.sync_map import SyncEntry, SyncMapService
+    from tessera.services.sync_map import SyncEntry, SyncMapService
 
     projet = _projet(tmp_path, "pr")
     SyncMapService().save(projet, {"ticket-042": SyncEntry(issue=12)})

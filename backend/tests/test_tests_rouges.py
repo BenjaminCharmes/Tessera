@@ -3,15 +3,15 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
-from vibe_ide.models.ticket import (
+from tessera.models.ticket import (
     Ticket,
     TicketPriority,
     TicketStatus,
     TicketType,
 )
-from vibe_ide.services.orchestrator import Orchestrator
-from vibe_ide.services.pipeline_events import OrchestratorEvent
-from vibe_ide.services.test_runner import TestResult
+from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.test_runner import TestResult
 
 
 class _FauxTestRunner:
@@ -89,7 +89,7 @@ async def test_une_suite_rouge_n_appelle_pas_le_reviewer(
     async def _codeur(orch: Any, run: Any, contexte: Any) -> None:
         return None
 
-    from vibe_ide.services import pipeline_stages as stages
+    from tessera.services import pipeline_stages as stages
 
     monkeypatch.setattr(stages, "run_review", _revue)
     monkeypatch.setattr(stages, "run_coder", _codeur)
@@ -116,7 +116,7 @@ async def test_le_codeur_recoit_la_raison_de_l_echec(
     async def _revue(orch: Any, run: Any, contexte: Any) -> tuple[bool, str, str]:
         return True, "", "APPROVED"
 
-    from vibe_ide.services import pipeline_stages as stages
+    from tessera.services import pipeline_stages as stages
 
     monkeypatch.setattr(stages, "run_coder", _codeur)
     monkeypatch.setattr(stages, "run_review", _revue)
@@ -141,7 +141,7 @@ async def test_une_suite_verte_laisse_le_pipeline_suivre_son_cours(
     async def _codeur(orch: Any, run: Any, contexte: Any) -> None:
         return None
 
-    from vibe_ide.services import pipeline_stages as stages
+    from tessera.services import pipeline_stages as stages
 
     monkeypatch.setattr(stages, "run_review", _revue)
     monkeypatch.setattr(stages, "run_coder", _codeur)
@@ -166,7 +166,7 @@ async def test_sans_testeur_rien_ne_change(tmp_path: Path, monkeypatch: Any) -> 
     async def _codeur(orch: Any, run: Any, contexte: Any) -> None:
         return None
 
-    from vibe_ide.services import pipeline_stages as stages
+    from tessera.services import pipeline_stages as stages
 
     monkeypatch.setattr(stages, "run_review", _revue)
     monkeypatch.setattr(stages, "run_coder", _codeur)

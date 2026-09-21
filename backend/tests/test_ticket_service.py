@@ -5,8 +5,8 @@ from pathlib import Path
 import frontmatter  # type: ignore[import-untyped]
 import pytest
 
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services.ticket_service import TicketService
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.ticket_service import TicketService
 
 
 def _svc(project_path: Path) -> TicketService:
@@ -295,7 +295,7 @@ async def test_ticket_type_couvre_les_types_conventional_commits(tmp_path: Path)
     # CLAUDE.md impose Conventional Commits, et des tickets existants utilisent
     # déjà `refactor`. Un type manquant de l'enum fait échouer le parsing du
     # fichier — et donc tout endpoint qui liste les tickets du projet.
-    from vibe_ide.models.ticket import TicketType
+    from tessera.models.ticket import TicketType
 
     values = {t.value for t in TicketType}
     assert {"feat", "fix", "chore", "docs", "refactor", "test"} <= values

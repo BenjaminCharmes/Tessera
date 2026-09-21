@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.services.github_service import PRStatus
+from tessera.config import settings
+from tessera.main import app
+from tessera.services.github_service import PRStatus
 
 _TICKET_MD = """---
 id: {id}
@@ -250,7 +250,7 @@ def test_create_pr_cible_develop_quand_la_base_n_est_pas_precisee(
         return 7, "https://github.com/owner/repo/pull/7"
 
     monkeypatch.setattr(
-        "vibe_ide.services.github_service.GitHubService.create_pull_request",
+        "tessera.services.github_service.GitHubService.create_pull_request",
         lambda self, **kw: _fake_create(**kw),
     )
 
@@ -292,7 +292,7 @@ def test_pr_status_renvoie_l_etat_et_le_statut_ci(
         )
 
     monkeypatch.setattr(
-        "vibe_ide.services.github_service.GitHubService.get_pull_request_status",
+        "tessera.services.github_service.GitHubService.get_pull_request_status",
         _fake_status,
     )
 

@@ -1,4 +1,4 @@
-# Architecture — vibe-ide
+# Architecture — Tessera
 
 ## Vue d'ensemble
 
@@ -39,7 +39,7 @@
                   │
        git (une branche + un commit par run — ADR-018)
                   │
-       SQLite  vibe_ide.db  (historique pipelines)
+       SQLite  tessera.db  (historique pipelines)
 ```
 
 ### Couche LLM (ADR-017)
@@ -58,14 +58,14 @@ planificateur, project-analyzer, agent-creator, project-creator, doc-updater) qu
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
-**jamais** au dépôt de vibe-ide lui-même — uniquement au projet ciblé.
+**jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
 Cette promesse a demandé deux correctifs, tous deux nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
   un dossier posé dans `projects/` sans dépôt propre faisait remonter git
-  jusqu'à celui de vibe-ide, où le run créait sa branche et son commit. La
+  jusqu'à celui de Tessera, où le run créait sa branche et son commit. La
   vérification compare désormais `--show-toplevel` au dossier du projet.
 - **Les agents ne font pas de git** (ADR-027). Contraindre cette classe ne
   contraignait qu'elle : le codeur a `Bash` et pouvait lancer `git commit`,
@@ -166,7 +166,7 @@ arbitraire ou d'un glyphe utilisé comme affordance.
 14. git commit — sur TOUS les chemins de sortie :
     ├─ approuvé      → "<type>: ticket-XXX — <titre>" puis advance_base_ref()
     └─ non approuvé  → "chore: ticket-XXX — unapproved work (<raison>)"
-    (+ un second commit séparé pour la comptabilité vibe-ide :
+    (+ un second commit séparé pour la comptabilité Tessera :
      statuts de tickets et pipeline-log, jamais sous le message du ticket)
 15. DB : finish_run(run_id, rounds, approved, final_status)
 16. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
@@ -212,7 +212,7 @@ CREATE TABLE agent_events (
 ```
 
 WAL mode activé pour éviter les locks en écriture concurrente.
-`vibe_ide.db` configurable via `IDE_DB_PATH` (default: `vibe_ide.db` à la racine du projet).
+`tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
 
 ## Structure des fichiers de tickets
 

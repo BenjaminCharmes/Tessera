@@ -1,8 +1,8 @@
 """Plafond de dépense cumulée d'un run autonome — issue #61, ticket-052."""
 from pathlib import Path
 
-from vibe_ide.models.agent import AgentResult, AgentRole
-from vibe_ide.models.ticket import TicketStatus
+from tessera.models.agent import AgentResult, AgentRole
+from tessera.models.ticket import TicketStatus
 from tests.test_orchestrator import (  # réutilise les doubles existants
     _FakeGit,
     _make_agent_result,
@@ -82,7 +82,7 @@ async def test_le_run_autonome_s_arrete_quand_le_quota_est_bas(tmp_path: Path) -
     # autre ressource : un run peut être coupé en plein vol sans qu'aucun
     # plafond local n'ait bougé. On s'arrête entre deux tickets plutôt que
     # d'être coupé au milieu d'un (ADR-018).
-    from vibe_ide.services.quota_tracker import QuotaSnapshot, QuotaTracker
+    from tessera.services.quota_tracker import QuotaSnapshot, QuotaTracker
 
     tracker = QuotaTracker(low_threshold=0.90)
     tickets = [_make_ticket(id=f"ticket-00{i}") for i in range(1, 4)]
@@ -111,7 +111,7 @@ async def test_le_run_autonome_s_arrete_quand_le_quota_est_bas(tmp_path: Path) -
 async def test_un_quota_inconnu_ne_bloque_pas_le_run(tmp_path: Path) -> None:
     # Un provider muet doit être indiscernable d'un quota confortable :
     # refuser de travailler faute d'information serait pire que l'ignorer.
-    from vibe_ide.services.quota_tracker import QuotaTracker
+    from tessera.services.quota_tracker import QuotaTracker
 
     tickets = [_make_ticket(id="ticket-001")]
     orchestrator = _make_orchestrator(

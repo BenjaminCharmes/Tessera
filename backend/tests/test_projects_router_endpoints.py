@@ -11,9 +11,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.services.database import init_db
+from tessera.config import settings
+from tessera.main import app
+from tessera.services.database import init_db
 
 from .conftest import requires_symlinks
 
@@ -34,7 +34,7 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     for status in ("todo", "in-progress", "in-review", "done", "blocked"):
         (project / "tickets" / status).mkdir(parents=True)
 
-    db_path = tmp_path / "vibe.db"
+    db_path = tmp_path / "tessera.db"
     asyncio.run(init_db(db_path))
 
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
@@ -234,12 +234,12 @@ def test_creation_d_un_projet_deja_existant_renvoie_409() -> None:
 
 
 def test_clone_d_une_url_invalide_est_refuse(monkeypatch: pytest.MonkeyPatch) -> None:
-    from vibe_ide.services.git_clone import CloneError
+    from tessera.services.git_clone import CloneError
 
     async def _refuse(self: object, **kwargs: object) -> None:
         raise CloneError("URL de dépôt invalide : pas-une-url")
 
-    monkeypatch.setattr("vibe_ide.services.git_clone.GitCloneService.clone", _refuse)
+    monkeypatch.setattr("tessera.services.git_clone.GitCloneService.clone", _refuse)
 
     resp = _client().post("/api/v1/projects/clone", json={"repo_url": "pas-une-url"})
 
@@ -318,7 +318,7 @@ def test_statut_git_d_un_projet_sans_depot(workspace: Path) -> None:
 
 
 def test_init_puis_statut_montre_un_depot_avec_commit(workspace: Path) -> None:
-    # Du contenu de projet, pas seulement des artefacts vibe-ide : ces derniers
+    # Du contenu de projet, pas seulement des artefacts Tessera : ces derniers
     # sont exclus dès l'init, et un dépôt qui ne contient qu'eux n'a rien à
     # committer.
     (workspace / "mon-projet" / "main.py").write_text("x = 1", encoding="utf-8")
@@ -370,7 +370,7 @@ def test_lier_un_depot_distant_inaccessible_est_refuse(
 ) -> None:
     # Dépôt inexistant ou token sans droits : l'utilisateur doit savoir que le
     # problème est côté GitHub, pas côté projet.
-    from vibe_ide.services.github_service import RepositoryInfo
+    from tessera.services.github_service import RepositoryInfo
 
     monkeypatch.setattr(settings, "github_token", "ghp_test")
 
@@ -378,7 +378,7 @@ def test_lier_un_depot_distant_inaccessible_est_refuse(
         return RepositoryInfo(exists=False)
 
     monkeypatch.setattr(
-        "vibe_ide.services.github_service.GitHubService.get_repository_info", _absent
+        "tessera.services.github_service.GitHubService.get_repository_info", _absent
     )
     _client().post("/api/v1/projects/mon-projet/git/init")
 
@@ -394,7 +394,7 @@ def test_lier_un_depot_distant_inaccessible_est_refuse(
 def test_un_depot_distant_non_vide_demande_confirmation(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from vibe_ide.services.github_service import RepositoryInfo
+    from tessera.services.github_service import RepositoryInfo
 
     monkeypatch.setattr(settings, "github_token", "ghp_test")
 
@@ -402,7 +402,7 @@ def test_un_depot_distant_non_vide_demande_confirmation(
         return RepositoryInfo(exists=True, is_empty=False)
 
     monkeypatch.setattr(
-        "vibe_ide.services.github_service.GitHubService.get_repository_info", _non_vide
+        "tessera.services.github_service.GitHubService.get_repository_info", _non_vide
     )
     _client().post("/api/v1/projects/mon-projet/git/init")
 
@@ -416,7 +416,7 @@ def test_un_depot_distant_non_vide_demande_confirmation(
 
 
 # ------------------------------------------------------------------
-# Artefacts vibe-ide — ticket-062
+# Artefacts Tessera — ticket-062
 # ------------------------------------------------------------------
 
 
@@ -465,7 +465,7 @@ def test_les_artefacts_deja_suivis_sont_remontes(workspace: Path) -> None:
     # le mode déclaré, un projet qui ne déclare rien n'a plus aucun artefact
     # suivi — et ce test n'aurait plus rien à observer.
     (workspace / "mon-projet" / "agents.json").write_text(
-        '{"vibe_artifacts": "tracked"}', encoding="utf-8"
+        '{"artifacts": "tracked"}', encoding="utf-8"
     )
     _client().post("/api/v1/projects/mon-projet/git/init")
 
@@ -499,7 +499,7 @@ def test_le_plan_de_retrait_nomme_le_chemin_reel(workspace: Path) -> None:
 def test_le_plan_compte_les_commits_non_pousses(workspace: Path) -> None:
     # C'est ce que l'utilisateur perdrait : la confirmation doit le nommer.
     #
-    # Il faut du contenu de projet, pas seulement des artefacts vibe-ide :
+    # Il faut du contenu de projet, pas seulement des artefacts Tessera :
     # ceux-ci sont désormais exclus dès l'init, et un dépôt qui ne contient
     # qu'eux n'a aucun commit.
     (workspace / "mon-projet" / "main.py").write_text("x = 1", encoding="utf-8")

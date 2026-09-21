@@ -1,7 +1,7 @@
 """Enchainer une selection de tickets — ticket-074."""
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services.dialogue import DialogueChannel
-from vibe_ide.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.dialogue import DialogueChannel
+from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
 def _ticket(tid: str) -> Ticket:
@@ -15,7 +15,7 @@ class _OrchestrateurFile:
     """Le vrai `run_queue`, avec `run_pipeline` double."""
 
     def __init__(self, echecs: set[str] | None = None) -> None:
-        from vibe_ide.services.orchestrator import Orchestrator
+        from tessera.services.orchestrator import Orchestrator
 
         self.lances: list[str] = []
         self._echecs = echecs or set()

@@ -1,7 +1,7 @@
 """Persistance des conversations du chat — ticket-048."""
 from pathlib import Path
 
-from vibe_ide.services.database import (
+from tessera.services.database import (
     ChatMessageRow,
     conversation_cost_usd,
     init_db,
@@ -11,7 +11,7 @@ from vibe_ide.services.database import (
 
 
 async def _db(tmp_path: Path) -> Path:
-    db_path = tmp_path / "vibe.db"
+    db_path = tmp_path / "tessera.db"
     await init_db(db_path)
     return db_path
 

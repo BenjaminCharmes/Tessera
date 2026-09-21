@@ -11,10 +11,10 @@ from pathlib import Path
 
 import pytest
 
-import vibe_ide.routers.projects as projects_router
-from vibe_ide.config import settings
-from vibe_ide.models.project import AnalyzeProjectRequest, PlanRequest, ProjectCreate
-from vibe_ide.routers.projects import analyze_project, create_project, plan_project
+import tessera.routers.projects as projects_router
+from tessera.config import settings
+from tessera.models.project import AnalyzeProjectRequest, PlanRequest, ProjectCreate
+from tessera.routers.projects import analyze_project, create_project, plan_project
 
 
 @pytest.fixture(autouse=True)

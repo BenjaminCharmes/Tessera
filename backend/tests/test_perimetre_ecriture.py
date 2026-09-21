@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-from vibe_ide.services.providers.perimetre import (
+from tessera.services.providers.perimetre import (
     ECRITURE_REFUS,
     hors_perimetre,
     hook_refus_hors_perimetre,
@@ -82,7 +82,7 @@ def test_le_projet_voisin_est_refuse(tmp_path: Path) -> None:
     assert hors_perimetre(str(voisin / "app.py"), projet) is True
 
 
-def test_le_depot_de_vibe_ide_est_refuse(tmp_path: Path) -> None:
+def test_le_depot_de_tessera_est_refuse(tmp_path: Path) -> None:
     projet = _projet(tmp_path, "client")
 
     assert hors_perimetre(str(tmp_path / "backend" / "main.py"), projet) is True
@@ -176,7 +176,7 @@ async def test_sans_projet_le_hook_ne_contraint_rien(tmp_path: Path) -> None:
 def test_les_options_portent_le_garde_d_ecriture(tmp_path: Path) -> None:
     # Un garde écrit mais jamais branché donne l'apparence d'une protection
     # sans en être une — c'est exactement ce qu'ADR-027 évitait avec les hooks.
-    from vibe_ide.services.providers.agent_sdk import _build_options
+    from tessera.services.providers.agent_sdk import _build_options
 
     options = _build_options(
         system="s", model="m", max_turns=1, max_budget_usd=None, cwd=tmp_path
@@ -194,7 +194,7 @@ def test_les_options_portent_le_garde_d_ecriture(tmp_path: Path) -> None:
 
 
 def test_une_redirection_hors_perimetre_est_vue(tmp_path: Path) -> None:
-    from vibe_ide.services.providers.perimetre import cibles_ecrites
+    from tessera.services.providers.perimetre import cibles_ecrites
 
     projet = _projet(tmp_path, "client")
 
@@ -205,7 +205,7 @@ def test_une_redirection_hors_perimetre_est_vue(tmp_path: Path) -> None:
 
 
 def test_une_commande_sans_ecriture_ne_donne_aucune_cible() -> None:
-    from vibe_ide.services.providers.perimetre import cibles_ecrites
+    from tessera.services.providers.perimetre import cibles_ecrites
 
     assert cibles_ecrites("uv run pytest -q") == []
     assert cibles_ecrites("grep -r 'x > y' src/") == []
@@ -213,7 +213,7 @@ def test_une_commande_sans_ecriture_ne_donne_aucune_cible() -> None:
 
 def test_une_redirection_de_flux_n_est_pas_un_fichier() -> None:
     # `2>&1` et `> /dev/null` sont partout dans les commandes de test.
-    from vibe_ide.services.providers.perimetre import cibles_ecrites
+    from tessera.services.providers.perimetre import cibles_ecrites
 
     assert cibles_ecrites("pytest 2>&1") == []
     assert cibles_ecrites("pytest > /dev/null") == []

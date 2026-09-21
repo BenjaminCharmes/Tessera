@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
+from tessera.config import settings
+from tessera.main import app
 
 
 @pytest.fixture(autouse=True)

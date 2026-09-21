@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.git_workspace import (
+from tessera.services.git_workspace import (
     GitCommandError,
     GitWorkspaceService,
     InvalidSlugError,
@@ -29,8 +29,8 @@ async def repo(tmp_path: Path) -> Path:
     root = tmp_path / "projet"
     root.mkdir()
     await _git(root, "init", "-q")
-    await _git(root, "config", "user.email", "test@vibe-ide.local")
-    await _git(root, "config", "user.name", "vibe-ide test")
+    await _git(root, "config", "user.email", "test@Tessera.local")
+    await _git(root, "config", "user.name", "Tessera test")
     (root / "README.md").write_text("# projet\n", encoding="utf-8")
     await _git(root, "add", "README.md")
     await _git(root, "commit", "-q", "-m", "init")
@@ -148,8 +148,8 @@ async def test_current_diff_sur_depot_sans_commit(tmp_path: Path) -> None:
     root = tmp_path / "projet-vierge"
     root.mkdir()
     await _git(root, "init", "-q")
-    await _git(root, "config", "user.email", "test@vibe-ide.local")
-    await _git(root, "config", "user.name", "vibe-ide test")
+    await _git(root, "config", "user.email", "test@Tessera.local")
+    await _git(root, "config", "user.name", "Tessera test")
     (root / "nouveau.py").write_text("x = 1\n", encoding="utf-8")
 
     service = GitWorkspaceService(root)
@@ -186,7 +186,7 @@ async def test_slug_vide_leve_invalid_slug_error(repo: Path) -> None:
 
 
 async def test_current_diff_exclut_les_tickets_et_le_journal_pipeline(repo: Path) -> None:
-    # tickets/ and memory/pipeline-log.md are vibe-ide's own bookkeeping,
+    # tickets/ and memory/pipeline-log.md are Tessera's own bookkeeping,
     # not code produced by the coder agent: they must never show up in the
     # diff handed to the reviewer/auditor/validator/doc-updater.
     service = GitWorkspaceService(repo)
@@ -251,7 +251,7 @@ async def test_commit_all_ne_committe_pas_les_tickets_sous_le_message_du_ticket(
     log = await service._run("log", "--format=%s")
     subjects = log.splitlines()
     # Most recent first: the bookkeeping commit lands after the ticket commit.
-    assert subjects[0] == "chore: vibe-ide pipeline bookkeeping"
+    assert subjects[0] == "chore: tessera pipeline bookkeeping"
     assert subjects[1] == "feat: ticket-013 — some feature"
 
     ticket_commit_files = await service._run(
@@ -392,9 +392,9 @@ async def test_un_projet_sans_depot_propre_ne_touche_pas_au_depot_parent(
     # Panne vecue : les projets clients poses dans `projects/` sont des
     # dossiers de documents contenant N depots en sous-dossiers, sans depot a
     # leur racine. `git` remontait alors l'arborescence et trouvait le depot
-    # de vibe-ide lui-meme : un run sur le projet du client creait sa branche
+    # de Tessera lui-meme : un run sur le projet du client creait sa branche
     # et son commit dans le depot de l'IDE.
-    parent = tmp_path / "vibe-ide"
+    parent = tmp_path / "Tessera"
     parent.mkdir()
     await _git(parent, "init", "-q")
     await _git(parent, "config", "user.email", "t@t.local")

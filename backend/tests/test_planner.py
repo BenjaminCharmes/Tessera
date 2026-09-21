@@ -4,12 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.prompt_loader import MissingPromptError
+from tessera.services.prompt_loader import MissingPromptError
 
 from tests.test_providers_base import FakeProvider
-from vibe_ide.models.project import PlanResult
-from vibe_ide.models.ticket import TicketDraftPlan
-from vibe_ide.services.planner import PlannerService
+from tessera.models.project import PlanResult
+from tessera.models.ticket import TicketDraftPlan
+from tessera.services.planner import PlannerService
 
 
 # ------------------------------------------------------------------

@@ -6,7 +6,7 @@ import pytest
 
 from tests.conftest import requires_symlinks
 
-from vibe_ide.services.project_importer import ImportError, ProjectImporter, _sanitize_id
+from tessera.services.project_importer import ImportError, ProjectImporter, _sanitize_id
 
 
 # ------------------------------------------------------------------
@@ -144,7 +144,7 @@ async def test_import_symlink_with_explicit_project_id(tmp_path: Path) -> None:
 
 
 @requires_symlinks
-async def test_import_symlink_scaffolds_vibe_dirs(tmp_path: Path) -> None:
+async def test_import_symlink_scaffolds_artifact_dirs(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
     importer = ProjectImporter(ws)
@@ -273,7 +273,7 @@ async def test_import_copy_excludes_pyc(tmp_path: Path) -> None:
     assert not (ws / "mon-projet" / "app.pyc").exists()
 
 
-async def test_import_copy_scaffolds_vibe_dirs(tmp_path: Path) -> None:
+async def test_import_copy_scaffolds_artifact_dirs(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     src = _make_source(tmp_path)
     importer = ProjectImporter(ws)

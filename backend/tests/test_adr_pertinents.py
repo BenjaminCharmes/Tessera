@@ -1,7 +1,7 @@
 """Chaque agent ne reçoit que les ADR qui le contraignent — ticket-087."""
 from pathlib import Path
 
-from vibe_ide.services.adr import (
+from tessera.services.adr import (
     adr_pour,
     decouper,
     portee_de,
@@ -153,7 +153,7 @@ def test_le_prompt_du_codeur_ne_porte_pas_les_adr_de_l_architecte(
 ) -> None:
     # Un filtre écrit mais jamais branché ne filtre rien : c'est exactement
     # l'erreur que le test des hooks d'ADR-027 empêchait déjà ailleurs.
-    from vibe_ide.services.agent_runner import AgentRunner
+    from tessera.services.agent_runner import AgentRunner
 
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contexte = f"# projet\n\n## Décisions récentes\n{_FICHIER}"
@@ -169,7 +169,7 @@ def test_le_prompt_du_codeur_ne_porte_pas_les_adr_de_l_architecte(
 def test_un_contexte_sans_section_de_decisions_traverse_intact(
     tmp_path: Path,
 ) -> None:
-    from vibe_ide.services.agent_runner import AgentRunner
+    from tessera.services.agent_runner import AgentRunner
 
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
 
@@ -179,7 +179,7 @@ def test_un_contexte_sans_section_de_decisions_traverse_intact(
 
 
 def _ticket():  # type: ignore[no-untyped-def]
-    from vibe_ide.models.ticket import (
+    from tessera.models.ticket import (
         Ticket,
         TicketPriority,
         TicketStatus,

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.git_workspace import GitWorkspaceService, NotAGitRepository
+from tessera.services.git_workspace import GitWorkspaceService, NotAGitRepository
 
 
 async def _git(cwd: Path, *args: str) -> None:
@@ -20,7 +20,7 @@ async def _git(cwd: Path, *args: str) -> None:
 @pytest.fixture
 async def depot_parent(tmp_path: Path) -> Path:
     """Un depot, et dedans un dossier de projet sans depot propre."""
-    parent = tmp_path / "vibe-ide"
+    parent = tmp_path / "Tessera"
     parent.mkdir()
     await _git(parent, "init", "-q", "-b", "main")
     await _git(parent, "config", "user.email", "t@t.local")
@@ -35,7 +35,7 @@ async def depot_parent(tmp_path: Path) -> Path:
 
 async def test_par_defaut_un_projet_sans_depot_est_refuse(depot_parent: Path) -> None:
     # ADR-024 : un dossier client pose dans `projects/` faisait remonter git
-    # jusqu'au depot de vibe-ide, ou le run creait branche et commit.
+    # jusqu'au depot de Tessera, ou le run creait branche et commit.
     svc = GitWorkspaceService(depot_parent / "projects" / "ide-core")
 
     with pytest.raises(NotAGitRepository):

@@ -3,7 +3,7 @@ import { api } from "../../lib/api";
 import type { PlanDeNettoyage } from "../../types/api";
 
 /**
- * Retirer les branches que vibe-ide a laissées derrière lui (ticket-070).
+ * Retirer les branches que Tessera a laissées derrière lui (ticket-070).
  *
  * Chaque run crée une branche, chaque session de chat aussi, et rien ne les
  * retirait. Après une seule session d'usage réel, un projet en portait déjà
@@ -61,7 +61,7 @@ export default function BranchCleanup({ projectId }: BranchCleanupProps) {
   return (
     <section className="border-t border-zinc-800 px-3 py-2.5">
       <p className="mb-1.5 text-mini uppercase tracking-wider text-zinc-500">
-        Branches laissées par vibe-ide
+        Branches laissées par Tessera
       </p>
 
       {plan.nettoyables.length > 0 && (

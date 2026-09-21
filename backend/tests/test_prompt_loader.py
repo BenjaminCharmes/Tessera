@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.prompt_loader import MissingPromptError, load_system_prompt
+from tessera.services.prompt_loader import MissingPromptError, load_system_prompt
 
 
 def test_charge_le_prompt_quand_il_existe(tmp_path: Path) -> None:
@@ -41,7 +41,7 @@ def test_l_api_renvoie_le_message_et_non_internal_server_error() -> None:
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
-    from vibe_ide.main import _missing_prompt_handler
+    from tessera.main import _missing_prompt_handler
 
     app = FastAPI()
     app.add_exception_handler(MissingPromptError, _missing_prompt_handler)

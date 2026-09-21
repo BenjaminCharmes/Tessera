@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.models.agent import AgentResult
-from vibe_ide.models.ticket import TicketStatus
+from tessera.config import settings
+from tessera.main import app
+from tessera.models.agent import AgentResult
+from tessera.models.ticket import TicketStatus
 
 
 @pytest.fixture(autouse=True)
@@ -98,7 +98,7 @@ def test_run_delegue_au_runner_et_renvoie_son_resultat(
             )
 
     monkeypatch.setattr(
-        "vibe_ide.routers.agents._make_runner", lambda project_id: _FakeRunner()
+        "tessera.routers.agents._make_runner", lambda project_id: _FakeRunner()
     )
 
     resp = _client().post(
@@ -143,7 +143,7 @@ def test_create_project_traduit_un_conflit_metier_en_409(
             raise ValueError("Un projet 'mon-projet' existe déjà")
 
     monkeypatch.setattr(
-        "vibe_ide.routers.agents._make_project_creator", lambda: _RefusingCreator()
+        "tessera.routers.agents._make_project_creator", lambda: _RefusingCreator()
     )
 
     resp = _client().post(
@@ -191,7 +191,7 @@ def test_stream_streame_les_tokens_puis_le_resultat(
             )
 
     monkeypatch.setattr(
-        "vibe_ide.routers.agents._make_runner", lambda project_id: _StreamingRunner()
+        "tessera.routers.agents._make_runner", lambda project_id: _StreamingRunner()
     )
 
     with _client().websocket_connect("/api/v1/agents/stream") as ws:

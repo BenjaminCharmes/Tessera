@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from vibe_ide.models.project import ConversationMessage, CreateProjectResponse
-from vibe_ide.models.ticket import TicketDraft, TicketPriority, TicketType
-from vibe_ide.services.project_creator import ProjectCreatorService
+from tessera.models.project import ConversationMessage, CreateProjectResponse
+from tessera.models.ticket import TicketDraft, TicketPriority, TicketType
+from tessera.services.project_creator import ProjectCreatorService
 
 
 # ------------------------------------------------------------------
@@ -55,7 +55,7 @@ class _FailingAfterFirstProvider(FakeProvider):
         self.calls.append({"mode": "complete", **kwargs})
         if len(self.calls) > 1:
             raise RuntimeError("LLM down")
-        from vibe_ide.services.providers.base import ProviderResult
+        from tessera.services.providers.base import ProviderResult
 
         return ProviderResult(content=self._content, input_tokens=10, output_tokens=10)
 
@@ -349,7 +349,7 @@ async def test_bootstrap_uses_haiku_model(tmp_path: Path) -> None:
     # Les appels de bootstrap doivent utiliser Haiku. Seul `redacteur` en
     # déclenche un : `orchestrateur` et `planificateur` sont livrés avec le
     # dépôt, donc natifs (ticket-079).
-    from vibe_ide.services.project_creator import _BOOTSTRAP_MODEL
+    from tessera.services.project_creator import _BOOTSTRAP_MODEL
 
     provider = svc._provider
     bootstrap_calls = provider.calls[1:]

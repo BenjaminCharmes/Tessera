@@ -3,7 +3,7 @@ import asyncio
 
 import pytest
 
-from vibe_ide.services.dialogue import DialogueChannel, NO_HUMAN_ANSWER
+from tessera.services.dialogue import DialogueChannel, NO_HUMAN_ANSWER
 
 
 # ------------------------------------------------------------------

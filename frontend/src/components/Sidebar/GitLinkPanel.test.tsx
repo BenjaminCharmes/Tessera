@@ -128,7 +128,7 @@ describe("GitLinkPanel", () => {
   });
 });
 
-describe("GitLinkPanel — artefacts vibe-ide (ticket-062)", () => {
+describe("GitLinkPanel — artefacts Tessera (ticket-062)", () => {
   beforeEach(() => {
     vi.spyOn(api.git, "status").mockResolvedValue({
       is_repository: true,

@@ -1,5 +1,5 @@
 """TDD tests for format_conversation — ticket-044 (Task 10)."""
-from vibe_ide.utils.conversation import format_conversation
+from tessera.utils.conversation import format_conversation
 
 
 def test_empty_conversation_returns_empty_string() -> None:

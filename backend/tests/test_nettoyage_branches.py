@@ -1,10 +1,10 @@
-"""Nettoyage des branches creees par vibe-ide — ticket-070."""
+"""Nettoyage des branches creees par Tessera — ticket-070."""
 import asyncio
 from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.branch_cleanup import plan_de_nettoyage, supprimer_branches
+from tessera.services.branch_cleanup import plan_de_nettoyage, supprimer_branches
 
 
 async def _git(cwd: Path, *args: str) -> str:
@@ -63,7 +63,7 @@ async def test_la_branche_courante_n_est_jamais_nettoyee(depot: Path) -> None:
     assert "ticket-003-courante" not in plan.nettoyables
 
 
-async def test_les_branches_hors_vibe_ide_ne_sont_pas_touchees(depot: Path) -> None:
+async def test_les_branches_hors_tessera_ne_sont_pas_touchees(depot: Path) -> None:
     # On ne nettoie que ce qu'on a cree. Le reste appartient a l'utilisateur.
     await _git(depot, "branch", "ma-feature-perso")
     await _git(depot, "branch", "ticket-004-rien")

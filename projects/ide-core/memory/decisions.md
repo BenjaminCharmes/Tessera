@@ -148,8 +148,8 @@ Format : ADR léger (Architecture Decision Record).
 **Date** : 2026-06-20
 **Portée** : architect  
 **Décision** : Le plugin `tauri-plugin-fs` a accès à `$HOME/**` en v0.
-**Raison** : Les projets vibe-ide seront dans `~/` (dossier utilisateur). Scope plus restrictif nécessiterait de connaître le chemin exact au build time.
-**Alternative rejetée** : Scope filesystem complet `/` (trop large, rejeté par App Store), scope fixe `~/vibe-ide-workspace/` (impose un emplacement).
+**Raison** : Les projets Tessera seront dans `~/` (dossier utilisateur). Scope plus restrictif nécessiterait de connaître le chemin exact au build time.
+**Alternative rejetée** : Scope filesystem complet `/` (trop large, rejeté par App Store), scope fixe `~/tessera-workspace/` (impose un emplacement).
 
 ---
 
@@ -196,7 +196,7 @@ Format : ADR léger (Architecture Decision Record).
 **Alternative rejetée** : déduire le quota de la dépense — les deux ne sont pas proportionnels ; traiter l'absence d'événement comme un quota nul — un fournisseur muet deviendrait indiscernable d'un quota épuisé.
 **Invariant** : la vérification se fait **entre** deux tickets. S'arrêter au milieu de l'un laisserait son travail non commité, ce qu'ADR-018 interdit.
 
-## ADR-021 — Les artefacts vibe-ide s'excluent par `.git/info/exclude`, jamais par `.gitignore`
+## ADR-021 — Les artefacts Tessera s'excluent par `.git/info/exclude`, jamais par `.gitignore`
 
 **Date** : 2026-09-15
 **Décision** : un projet déclare dans `agents.json` si ses `tickets/`, `memory/`, `CLAUDE.md` et `agents.json` partent dans son dépôt (`tracked`) ou restent sur la machine (`local`). En mode `local`, l'exclusion s'écrit dans `.git/info/exclude`, entre marqueurs, et **jamais** dans `.gitignore`.
@@ -222,7 +222,7 @@ Format : ADR léger (Architecture Decision Record).
 
 **Date** : 2026-09-16
 **Décision** : `GitWorkspaceService` vérifie, avant toute création de branche, que `git rev-parse --show-toplevel` renvoie exactement le dossier du projet. Sinon il lève `NotAGitRepository` et le run s'arrête.
-**Raison** : `--is-inside-work-tree` réussit aussi quand le dépôt trouvé est un **ancêtre**. Un dossier client posé dans `projects/` sans dépôt à sa racine faisait remonter git jusqu'au dépôt de vibe-ide : le run créait sa branche et son commit dans l'IDE, au nom du projet du client. La classe promettait « never on vibe-ide itself » sans rien qui le garantisse.
+**Raison** : `--is-inside-work-tree` réussit aussi quand le dépôt trouvé est un **ancêtre**. Un dossier client posé dans `projects/` sans dépôt à sa racine faisait remonter git jusqu'au dépôt de Tessera : le run créait sa branche et son commit dans l'IDE, au nom du projet du client. La classe promettait « never on Tessera itself » sans rien qui le garantisse.
 **Conséquence** : un dossier qui regroupe plusieurs dépôts n'est pas un projet. Chaque dépôt doit être déclaré comme son propre projet.
 **Alternative rejetée** : `git init` automatique à la racine (crée un dépôt non désiré au-dessus de ceux du client) ; descendre chercher le premier sous-dépôt (choix arbitraire dès qu'il y en a plusieurs).
 
@@ -254,7 +254,7 @@ Format : ADR léger (Architecture Decision Record).
 
 **Date** : 2026-09-17
 **Décision** : ADR-024 refuse par défaut qu'un projet agisse sur un dépôt **ancêtre**. Un projet lève ce refus en déclarant `"git_root": "ancestor"` dans son `agents.json` ; il stage alors depuis la racine du dépôt (`:/`). Seule cette valeur exacte ouvre l'exception.
-**Raison** : ADR-024 est né d'un dossier client posé dans `projects/`, dont le dépôt ancêtre était vibe-ide — un accident. Mais c'est exactement ce que fait le projet bootstrap d'ADR-001 : il construit l'IDE, donc il travaille volontairement dans le dépôt qui le contient, et son travail est dans `backend/` et `frontend/`, au-dessus de lui. Traiter les deux cas pareil supprimait l'auto-hébergement, c'est-à-dire le principe fondateur.
+**Raison** : ADR-024 est né d'un dossier client posé dans `projects/`, dont le dépôt ancêtre était Tessera — un accident. Mais c'est exactement ce que fait le projet bootstrap d'ADR-001 : il construit l'IDE, donc il travaille volontairement dans le dépôt qui le contient, et son travail est dans `backend/` et `frontend/`, au-dessus de lui. Traiter les deux cas pareil supprimait l'auto-hébergement, c'est-à-dire le principe fondateur.
 **Forme** : celle d'ADR-021 et ADR-023 — le défaut protège, le cas particulier s'énonce. Une valeur inconnue ne désarme rien.
 
 ## ADR-029 — Jusqu'où l'agent va se déclare par projet
@@ -309,3 +309,13 @@ Format : ADR léger (Architecture Decision Record).
 **Décision** : à la fin d'une file ou d'un run autonome — jamais par ticket — `doc-technique` et `doc-fonctionnelle` reçoivent les tickets livrés depuis le dernier marqueur. Ils rendent des **modifications** : un ancien texte exact, un nouveau. Un ancien absent, ambigu, ou qui amputerait le fichier de moitié rejette tout le lot sans rien écrire.
 **Raison** : `doc-updater` réécrivait le fichier **entier** depuis une vue tronquée à 8 000 caractères, avec 2 048 tokens de sortie. Sur un `README.md` de 24 000 caractères, l'activer en aurait effacé les deux tiers sans erreur — le contrat ne lui laissait pas le choix. Et documenter par ticket réécrit le même fichier trois fois pour une même feature.
 **Pourquoi deux agents** : un seul écrit un guide utilisateur plein de noms de classes — c'est ce qu'il vient de lire.
+
+---
+
+## ADR-036 — Une clef de manifeste se renomme en gardant la lecture de l'ancienne
+
+**Date** : 2026-09-21
+**Décision** : le produit s'appelle Tessera. Les identifiants portant l'ancien nom sont réécrits, **sauf** `vibe_artifacts` dans `agents.json` : la clef devient `artifacts`, l'ancienne reste lue, jamais réécrite.
+**Raison** : huit manifestes la déclaraient déjà sur disque, dont des dépôts clients que ce dépôt ne versionne pas. Une clef inconnue tombe sur le défaut fermé d'ADR-023 : un projet en `tracked` serait repassé en `local` sans demande et sans message. Le renommage aurait donc changé un comportement qu'il prétendait préserver.
+**Alternative rejetée** : migrer les manifestes d'office — écrire dans le dépôt d'un client pour une question cosmétique ; garder les deux clefs en écriture — elles divergeraient.
+**Conséquence assumée** : le nom d'origine survit dans une constante et ses tests. C'est le prix d'une donnée déjà écrite ailleurs.

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import aiosqlite
 
-from vibe_ide.services.database import (
+from tessera.services.database import (
     create_run,
     finish_run,
     get_project_usage,

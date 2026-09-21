@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.config import settings
-from vibe_ide.doctor import (
+from tessera.config import settings
+from tessera.doctor import (
     check_prompts_dir,
     check_provider_auth,
     check_workspace,
@@ -73,7 +73,7 @@ def test_un_workspace_absent_est_signale(
 def test_les_symlinks_ne_sont_jamais_bloquants() -> None:
     # Le mode `copy` fonctionne partout : une absence de symlink est une
     # information, pas un échec.
-    from vibe_ide.doctor import check_symlinks
+    from tessera.doctor import check_symlinks
 
     assert check_symlinks().ok is True
 
@@ -95,6 +95,6 @@ def test_le_rapport_couvre_tous_les_controles() -> None:
 def test_rust_absent_n_est_jamais_bloquant() -> None:
     # L'IDE tourne en web sans Tauri : une toolchain absente est une
     # information, pas un échec.
-    from vibe_ide.doctor import check_rust
+    from tessera.doctor import check_rust
 
     assert check_rust().ok is True

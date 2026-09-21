@@ -1,7 +1,7 @@
 .PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run run-windows stop test lint clean
 
 # ─────────────────────────────────────────────────────────────────────────────
-# vibe-ide — Makefile
+# Tessera — Makefile
 # ─────────────────────────────────────────────────────────────────────────────
 
 help:
@@ -28,23 +28,23 @@ setup:
 	cd frontend && npm install
 
 doctor:
-	cd backend && uv run python -m vibe_ide.doctor
+	cd backend && uv run python -m tessera.doctor
 
 # `run` repose sur `trap`/`wait`, sémantiques POSIX : sous Windows, voir
 # `run-windows`. Les deux vérifient d'abord les prérequis — les deux pannes de
 # ticket-050 étaient détectables avant le lancement.
 run: doctor
-	@echo "→ Lancement vibe-ide : backend (port 8000) + frontend (port 5173)"
+	@echo "→ Lancement Tessera : backend (port 8000) + frontend (port 5173)"
 	@echo "→ Ctrl+C pour arrêter les deux processus"
 	@trap 'kill 0' SIGINT SIGTERM; \
-	 (cd backend && uv run uvicorn vibe_ide.main:app --reload --host 0.0.0.0 --port 8000 --env-file ../.env) & \
+	 (cd backend && uv run uvicorn tessera.main:app --reload --host 0.0.0.0 --port 8000 --env-file ../.env) & \
 	 (cd frontend && npm run dev) & \
 	 wait
 
 dev:
 	@echo "→ Serveur démarré sur http://localhost:8000"
 	@echo "→ Swagger UI : http://localhost:8000/docs"
-	cd backend && uv run uvicorn vibe_ide.main:app \
+	cd backend && uv run uvicorn tessera.main:app \
 		--reload \
 		--host 0.0.0.0 \
 		--port 8000 \
@@ -58,23 +58,23 @@ dev-frontend:
 # 8000 et sert le code de son dernier rechargement — d'où des 500 inexplicables
 # et un port impossible à libérer (ticket-056).
 run-windows: doctor
-	@echo "→ Lancement vibe-ide sous Windows (deux fenêtres, sans --reload)"
-	@powershell -NoProfile -Command "Start-Process -FilePath 'cmd' -ArgumentList '/c','cd backend && uv run uvicorn vibe_ide.main:app --host 127.0.0.1 --port 8000'"
+	@echo "→ Lancement Tessera sous Windows (deux fenêtres, sans --reload)"
+	@powershell -NoProfile -Command "Start-Process -FilePath 'cmd' -ArgumentList '/c','cd backend && uv run uvicorn tessera.main:app --host 127.0.0.1 --port 8000'"
 	@powershell -NoProfile -Command "Start-Process -FilePath 'cmd' -ArgumentList '/c','cd frontend && npm run dev'"
 	@echo "→ Backend : http://localhost:8000/docs"
 	@echo "→ Frontend : http://localhost:5173"
 	@echo "→ Pour arrêter : make stop"
 
 stop:
-	@echo "→ Arrêt de vibe-ide"
+	@echo "→ Arrêt de Tessera"
 	-@powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $$_.CommandLine -like '*uvicorn*' } | ForEach-Object { Stop-Process -Id $$_.ProcessId -Force }" 2>/dev/null || true
 	-@powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $$_.CommandLine -like '*vite*' } | ForEach-Object { Stop-Process -Id $$_.ProcessId -Force }" 2>/dev/null || true
-	-@pkill -f 'uvicorn vibe_ide' 2>/dev/null || true
+	-@pkill -f 'uvicorn tessera' 2>/dev/null || true
 	-@pkill -f 'vite' 2>/dev/null || true
 	@echo "→ Arrêté. Vérifie avec make doctor que les ports sont libres."
 
 tauri-dev:
-	@echo "→ Lancement de vibe-ide en mode desktop (Tauri)"
+	@echo "→ Lancement de Tessera en mode desktop (Tauri)"
 	@echo "→ Assure-toi que 'make dev' tourne dans un autre terminal (FastAPI sur :8000)"
 	cd frontend && npm run tauri-dev
 
@@ -103,7 +103,7 @@ test-fast:
 
 test-coverage:
 	@echo "→ Backend coverage"
-	cd backend && uv run pytest -q -m "not integration" --cov=vibe_ide --cov-report=term-missing --cov-report=html:htmlcov
+	cd backend && uv run pytest -q -m "not integration" --cov=tessera --cov-report=term-missing --cov-report=html:htmlcov
 	@echo "→ Frontend coverage"
 	cd frontend && npm run test:coverage
 

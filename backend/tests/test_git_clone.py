@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from vibe_ide.models.project import AnalysisResult
-from vibe_ide.services.git_clone import (
+from tessera.models.project import AnalysisResult
+from tessera.services.git_clone import (
     CloneError,
     GitCloneService,
     _build_clone_url,
@@ -200,7 +200,7 @@ async def test_clone_uses_explicit_project_id(tmp_path: Path) -> None:
     assert (ws / "custom-id").is_dir()
 
 
-async def test_clone_scaffolds_vibe_dirs(tmp_path: Path) -> None:
+async def test_clone_scaffolds_artifact_dirs(tmp_path: Path) -> None:
     ws = _make_workspace(tmp_path)
     analyzer = _make_analyzer_mock()
     svc = GitCloneService(ws, analyzer)

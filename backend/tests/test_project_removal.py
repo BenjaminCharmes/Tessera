@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.project_removal import (
+from tessera.services.project_removal import (
     RemovalError,
     RemovalPlan,
     delete_project,
@@ -176,13 +176,13 @@ async def test_supprimer_hors_du_workspace_est_refuse(
 
 
 def test_un_projet_detache_atterrit_hors_du_depot_de_l_ide(tmp_path: Path) -> None:
-    # Panne latente : `projects/../..` designe la racine du depot de vibe-ide.
+    # Panne latente : `projects/../..` designe la racine du depot de Tessera.
     # Le projet detache y restait, non suivi — et depuis qu'un projet peut
     # travailler dans le depot parent (ADR-028), un `git add -A` depuis la
     # racine pouvait l'y committer en entier (ticket-078).
-    from vibe_ide.services.project_removal import _detached_destination
+    from tessera.services.project_removal import _detached_destination
 
-    depot = tmp_path / "vibe-ide"
+    depot = tmp_path / "Tessera"
     (depot / ".git").mkdir(parents=True)
     projet = depot / "projects" / "mon-projet"
     projet.mkdir(parents=True)
@@ -190,15 +190,15 @@ def test_un_projet_detache_atterrit_hors_du_depot_de_l_ide(tmp_path: Path) -> No
     destination = _detached_destination(projet)
 
     assert depot not in destination.parents, destination
-    assert destination.parent.name == "vibe-ide-detaches"
+    assert destination.parent.name == "tessera-detaches"
 
 
 def test_sans_depot_au_dessus_le_comportement_ne_change_pas(tmp_path: Path) -> None:
-    from vibe_ide.services.project_removal import _detached_destination
+    from tessera.services.project_removal import _detached_destination
 
     projet = tmp_path / "workspace" / "projects" / "mon-projet"
     projet.mkdir(parents=True)
 
     destination = _detached_destination(projet)
 
-    assert destination.parent.name == "vibe-ide-detaches"
+    assert destination.parent.name == "tessera-detaches"

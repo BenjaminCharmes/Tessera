@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.services.database import create_run, finish_run, init_db
+from tessera.config import settings
+from tessera.main import app
+from tessera.services.database import create_run, finish_run, init_db
 
 _TICKET = """---
 id: {id}
@@ -38,7 +38,7 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         _TICKET.format(id="ticket-042", extra=""), encoding="utf-8"
     )
 
-    db_path = tmp_path / "vibe.db"
+    db_path = tmp_path / "tessera.db"
     asyncio.run(init_db(db_path))
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
     monkeypatch.setattr(settings, "ide_db_path", db_path)
@@ -121,10 +121,10 @@ def test_ouvrir_une_pr_pousse_puis_cree(
         return 7, "https://github.com/owner/repo/pull/7"
 
     monkeypatch.setattr(
-        "vibe_ide.services.git_workspace.GitWorkspaceService.push_branch", _push
+        "tessera.services.git_workspace.GitWorkspaceService.push_branch", _push
     )
     monkeypatch.setattr(
-        "vibe_ide.services.github_service.GitHubService.create_pull_request", _create
+        "tessera.services.github_service.GitHubService.create_pull_request", _create
     )
 
     resp = _client().post(
@@ -187,7 +187,7 @@ def test_merger_est_refuse_sans_declaration(
         merges.append(pr_number)
 
     monkeypatch.setattr(
-        "vibe_ide.services.github_service.GitHubService.merge_pull_request",
+        "tessera.services.github_service.GitHubService.merge_pull_request",
         _merge,
         raising=False,
     )

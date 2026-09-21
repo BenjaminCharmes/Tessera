@@ -39,7 +39,7 @@ jobs:
         run: cd backend && uv sync --extra dev
 
       - name: Run tests with coverage
-        run: cd backend && uv run pytest -v -m "not integration" --cov=vibe_ide --cov-report=term-missing --cov-report=xml
+        run: cd backend && uv run pytest -v -m "not integration" --cov=tessera --cov-report=term-missing --cov-report=xml
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || 'sk-ant-test-ci-key' }}
 

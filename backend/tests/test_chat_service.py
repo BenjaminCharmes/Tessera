@@ -3,13 +3,13 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.chat_service import (
+from tessera.services.chat_service import (
     ChatBudgetExceeded,
     ChatReply,
     ChatService,
 )
-from vibe_ide.services.database import ChatMessageRow
-from vibe_ide.services.providers.base import ProviderResult
+from tessera.services.database import ChatMessageRow
+from tessera.services.providers.base import ProviderResult
 
 
 class _FakeProvider:
@@ -55,7 +55,7 @@ class _FakeGit:
 def _prompts(tmp_path: Path) -> Path:
     prompts = tmp_path / "prompts"
     prompts.mkdir()
-    (prompts / "chat.md").write_text("Tu es l'assistant de vibe-ide.", encoding="utf-8")
+    (prompts / "chat.md").write_text("Tu es l'assistant de Tessera.", encoding="utf-8")
     return prompts
 
 

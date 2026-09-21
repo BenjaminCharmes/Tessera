@@ -240,7 +240,7 @@ export default function App() {
             <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />
           ) : panel === "usage" ? (
             // Sans projet sélectionné, la vue d'ensemble : « combien me coûte
-            // vibe-ide, et sur quel projet » n'avait aucune réponse.
+            // Tessera, et sur quel projet » n'avait aucune réponse.
             <CostView projectId={project?.id ?? null} />
           ) : (stream.status === "running" || stream.status === "connecting") &&
             !openFilePath &&

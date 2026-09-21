@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from vibe_ide.config import settings
-from vibe_ide.main import app
-from vibe_ide.services.database import init_db, save_chat_message
+from tessera.config import settings
+from tessera.main import app
+from tessera.services.database import init_db, save_chat_message
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ async def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     project = ws / "ide-core"
     (project / "memory").mkdir(parents=True)
     (project / "CLAUDE.md").write_text("# ide-core\n\nProjet test.\n", encoding="utf-8")
-    db_path = tmp_path / "vibe.db"
+    db_path = tmp_path / "tessera.db"
     await init_db(db_path)
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
     monkeypatch.setattr(settings, "ide_db_path", db_path)

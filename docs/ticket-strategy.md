@@ -2,7 +2,7 @@
 
 ## Principe
 
-vibe-ide utilise une architecture **hybride** qui sépare les canaux humain et agent
+Tessera utilise une architecture **hybride** qui sépare les canaux humain et agent
 tout en maintenant une synchronisation optionnelle entre eux.
 
 ---

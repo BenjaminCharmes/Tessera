@@ -1,8 +1,8 @@
 """Arreter un run en cours — ticket-069."""
-from vibe_ide.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from vibe_ide.services.dialogue import DialogueChannel
-from vibe_ide.services.pipeline_events import EventType, OrchestratorEvent
-from vibe_ide.services.pipeline_run import PipelineRun
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.dialogue import DialogueChannel
+from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline_run import PipelineRun
 
 
 def _run() -> PipelineRun:
@@ -96,7 +96,7 @@ async def test_un_run_arrete_commite_son_travail() -> None:
     # ADR-018 : chaque run laisse l'arbre propre pour le suivant. Un arret qui
     # abandonnerait le travail dans l'arbre bloquerait le ticket suivant, ce
     # qu'on vient justement de corriger ailleurs.
-    from vibe_ide.services import pipeline_outcomes as outcomes
+    from tessera.services import pipeline_outcomes as outcomes
 
     git = _Git()
     orch = _Orch(git)
@@ -113,7 +113,7 @@ async def test_un_run_arrete_commite_son_travail() -> None:
 
 
 async def test_un_run_arrete_annonce_la_raison() -> None:
-    from vibe_ide.services import pipeline_outcomes as outcomes
+    from tessera.services import pipeline_outcomes as outcomes
 
     events: list[OrchestratorEvent] = []
 

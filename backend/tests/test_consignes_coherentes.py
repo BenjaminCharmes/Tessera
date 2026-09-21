@@ -10,6 +10,7 @@ Il portait aussi `GH_CONFIG_DIR=/Users/moi/.config/gh`, un chemin d'une autre
 machine, dans un dépôt utilisé sur deux postes.
 """
 import re
+import subprocess
 from pathlib import Path
 
 _RACINE = Path(__file__).resolve().parents[2]
@@ -126,9 +127,9 @@ def test_aucun_reglage_de_pipeline_n_est_mort() -> None:
     # on le croit.
     import inspect
 
-    from vibe_ide.models.agent import AgentPipelineConfig
-    from vibe_ide.services import orchestrator as orch_service
-    from vibe_ide.routers import orchestrator as orch_router
+    from tessera.models.agent import AgentPipelineConfig
+    from tessera.services import orchestrator as orch_service
+    from tessera.routers import orchestrator as orch_router
 
     sources = inspect.getsource(orch_service) + inspect.getsource(orch_router)
     morts = [
@@ -197,3 +198,66 @@ def test_une_derogation_est_datee_et_porte_sa_condition_de_retrait() -> None:
                 incompletes.append(f"{consigne} : sans condition de retrait")
 
     assert incompletes == [], incompletes
+
+
+# ------------------------------------------------------------------
+# L'ancien nom ne revient pas — ticket-099
+# ------------------------------------------------------------------
+
+#: Le seul jeton qui survit au renommage : la clef que huit manifestes
+#: portaient déjà sur disque, dont des dépôts clients. Elle reste lue pour ne
+#: pas les faire basculer en silence sur le défaut fermé d'ADR-023 (ADR-036).
+#: On la retire du texte avant de chercher, plutôt que d'exempter des fichiers
+#: entiers — sinon la garde ne couvrirait plus rien de ce qu'ils contiennent.
+_CLEF_HISTORIQUE = "vibe_artifacts"
+
+#: Les fichiers qui enregistrent un état passé, et ce test qui nomme
+#: forcément ce qu'il interdit.
+_ANCIEN_NOM_TOLERE = {
+    "docs/superpowers",
+    "backend/tests/test_consignes_coherentes.py",
+    "projects/ide-core/tickets",
+}
+
+def _fichiers_du_depot() -> list[str]:
+    """Les fichiers suivis par git, et eux seuls.
+
+    Balayer le disque attrapait `.env`, les caches de pytest et les artefacts
+    detaches : des fichiers locaux, souvent porteurs de secrets, qu'aucun
+    renommage de ce depot ne doit pretendre corriger.
+    """
+    sortie = subprocess.run(
+        ["git", "ls-files"],
+        cwd=_RACINE,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return [c for c in sortie.stdout.splitlines() if c]
+
+
+def test_l_ancien_nom_ne_reapparait_pas() -> None:
+    # Un renommage qui n'est pas mesuré se défait ticket par ticket : il
+    # suffit d'un import copié depuis un fichier ancien pour que les deux
+    # noms coexistent, et plus personne ne sait lequel fait foi.
+    fautifs = []
+    for relatif in _fichiers_du_depot():
+        fichier = _RACINE / relatif
+        # `projects/` porte les projets de l'utilisateur : leurs manifestes
+        # et leurs tickets ne sont pas à nous, sauf ceux d'ide-core.
+        if relatif.startswith("projects/") and not relatif.startswith("projects/ide-core/"):
+            continue
+        if any(relatif.startswith(t) for t in _ANCIEN_NOM_TOLERE):
+            continue
+        try:
+            texte = fichier.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        if re.search(r"vibe", texte.replace(_CLEF_HISTORIQUE, ""), re.IGNORECASE):
+            fautifs.append(relatif)
+
+    assert not fautifs, (
+        "L'ancien nom est revenu dans : "
+        + ", ".join(sorted(fautifs))
+        + ". Le produit s'appelle Tessera (ADR-036)."
+    )

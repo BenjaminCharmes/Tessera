@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.git_link import (
+from tessera.services.git_link import (
     GitLinkError,
     RemoteNotEmpty,
     git_status,
@@ -160,7 +160,7 @@ async def test_link_remplace_un_remote_existant_seulement_si_confirme(
 async def test_un_projet_imbrique_dans_un_autre_depot_est_signale(
     tmp_path: Path,
 ) -> None:
-    # Cas réel : `projects/ide-core` est à l'intérieur du dépôt vibe-ide. Git
+    # Cas réel : `projects/ide-core` est à l'intérieur du dépôt Tessera. Git
     # remonte au parent, et `git_status` répondait « dépôt = oui » avec le
     # remote du parent. Trompeur : `init` serait sans effet, et le pipeline
     # commiterait dans le dépôt englobant, pas dans le projet.
@@ -221,7 +221,7 @@ async def test_init_applique_le_mode_des_artefacts_avant_le_premier_commit(
     (projet / "memory" / "decisions.md").write_text("y", encoding="utf-8")
     (projet / "main.py").write_text("z", encoding="utf-8")
     (projet / "agents.json").write_text(
-        json.dumps({"vibe_artifacts": "local"}), encoding="utf-8"
+        json.dumps({"artifacts": "local"}), encoding="utf-8"
     )
 
     await init_repository(projet)

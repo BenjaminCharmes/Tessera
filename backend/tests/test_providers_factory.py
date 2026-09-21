@@ -1,8 +1,8 @@
 import pytest
 
-from vibe_ide.services.providers import get_provider
-from vibe_ide.services.providers.agent_sdk import ClaudeAgentSDKProvider
-from vibe_ide.services.providers.anthropic_api import AnthropicApiProvider
+from tessera.services.providers import get_provider
+from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
+from tessera.services.providers.anthropic_api import AnthropicApiProvider
 
 
 def test_get_provider_agent_sdk() -> None:
@@ -62,7 +62,7 @@ async def test_get_provider_allow_tools_false_desactive_reellement_les_outils(
     from collections.abc import AsyncIterator
     from typing import Any
 
-    import vibe_ide.services.providers.agent_sdk as agent_sdk_module
+    import tessera.services.providers.agent_sdk as agent_sdk_module
     from claude_agent_sdk import ResultMessage
 
     captured: dict[str, object] = {}

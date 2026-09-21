@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.services.providers.agent_sdk import ClaudeAgentSDKProvider
+from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 
 pytestmark = pytest.mark.integration
 
@@ -17,7 +17,7 @@ async def test_agent_ecrit_un_fichier_reel(tmp_path: Path) -> None:
     projet = tmp_path / "projet"
     projet.mkdir()
     (projet / "CLAUDE.md").write_text(
-        "Tout fichier Python commence par le commentaire `# vibe-ide`.\n",
+        "Tout fichier Python commence par le commentaire `# Tessera`.\n",
         encoding="utf-8",
     )
 
@@ -39,7 +39,7 @@ async def test_agent_ecrit_un_fichier_reel(tmp_path: Path) -> None:
 
     cree = projet / "hello.py"
     assert cree.exists(), f"fichier non écrit ; outils appelés : {outils}"
-    assert cree.read_text(encoding="utf-8").startswith("# vibe-ide")
+    assert cree.read_text(encoding="utf-8").startswith("# Tessera")
     assert "Write" in outils
     assert result.output_tokens > 0
     assert result.cost_usd is not None

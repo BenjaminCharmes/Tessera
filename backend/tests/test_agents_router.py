@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from vibe_ide.config import settings
-from vibe_ide.routers.agents import _make_agent_creator, _make_project_creator, _make_runner
+from tessera.config import settings
+from tessera.routers.agents import _make_agent_creator, _make_project_creator, _make_runner
 
 
 @pytest.fixture(autouse=True)
