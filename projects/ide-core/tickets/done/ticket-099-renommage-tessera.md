@@ -2,7 +2,7 @@
 id: ticket-099
 title: "Renommer vibe-ide en Tessera, dépôt GitHub compris"
 type: chore
-status: in-review
+status: done
 pr_number: 90
 priority: medium
 agent: codeur
