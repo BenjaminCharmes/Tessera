@@ -16,7 +16,10 @@ dossier de travail de l'utilisateur depuis un IDE n'est jamais la bonne
 réponse.
 """
 import asyncio
+import os
 import shutil
+import stat
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -163,5 +166,27 @@ async def delete_project(
         _logger.info("project_symlink_deleted", extra={"path": str(project_path)})
         return
 
-    shutil.rmtree(project_path)
+    shutil.rmtree(project_path, onerror=_reessayer_sans_lecture_seule)
     _logger.info("project_deleted", extra={"path": str(project_path)})
+
+
+def _reessayer_sans_lecture_seule(
+    fonction: Callable[[str], object], chemin: str, _info: object
+) -> None:
+    """Retire l'attribut lecture seule, puis réessaie une fois.
+
+    Git marque ses objets en lecture seule. Sous Windows, `unlink` refuse un
+    fichier portant cet attribut, là où POSIX ne regarde que les droits du
+    dossier parent : supprimer un projet échouait donc sur `.git/objects/…`
+    dès que le projet portait un dépôt — c'est-à-dire, depuis ticket-104, sur
+    tout projet créé par l'IDE (ticket-112).
+
+    Seul ce cas est rattrapé. Une autre erreur — un fichier verrouillé par un
+    autre processus, par exemple — remonte : une suppression qui se déclare
+    réussie en laissant des fichiers serait pire que l'échec.
+    """
+    if not os.access(chemin, os.W_OK):
+        os.chmod(chemin, stat.S_IWRITE)
+        fonction(chemin)
+        return
+    raise  # noqa: PLE0704 — on est dans le contexte d'exception de rmtree
