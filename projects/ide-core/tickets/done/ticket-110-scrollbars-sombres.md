@@ -2,8 +2,8 @@
 id: ticket-110
 title: "Les widgets natifs du navigateur suivent le thème sombre"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 124
 priority: low
 agent: codeur
 depends_on: []
