@@ -1,38 +1,54 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Tessera">
   <title>Tessera</title>
   <style>
-    /* ADR-026 : le violet porte l'identité, jamais un état. */
-    .pose { fill: #ddd6f6; }
-    .tenue { fill: #7c3aed; }
+    /*
+      ADR-026 : le violet porte l'identité, jamais un état.
+
+      Les couleurs sont choisies contre les quatre fonds où le favicon est
+      réellement posé — barres d'onglets et pages, claires et sombres — et non
+      contre le seul fond de la page. C'était l'erreur du premier dessin : son
+      pavement tombait à 1.00:1 contre la barre d'onglets de Chrome, et à
+      1.07:1 contre la barre claire.
+
+      Chaque jeu tient le seuil seul. `prefers-color-scheme` suit le thème de
+      l'OS et non celui du navigateur : il ne distingue que deux des quatre
+      combinaisons possibles, et un Windows clair sous Chrome sombre reçoit le
+      jeu clair sur un fond sombre. La media query raffine, elle ne protège pas.
+
+      Une seule couleur par jeu, et non deux : pavement et tuile ne peuvent
+      s'écarter que de 1.47:1 tant que les deux doivent rester lisibles sur les
+      quatre fonds — imperceptible à 16px. Ce qui détache la tuile est le jour,
+      un vide géométrique, qui se lit sur n'importe quel fond.
+    */
+    .tesselle { fill: #9a64d8; }
     @media (prefers-color-scheme: dark) {
-      .pose { fill: #3a3348; }
-      .tenue { fill: #a78bfa; }
+      .tesselle { fill: #a374de; }
     }
   </style>
 
   <!--
-    Le jour autour de la tesselle en cours. Sans lui, la pièce déborde sur ses
-    voisines et se lit comme un trou dans le pavement au lieu d'une pièce
-    posée devant — vérifié au rendu, pas supposé. Un masque plutôt qu'un fond
-    plein : le favicon doit rester transparent.
+    Le jour autour de la tesselle en cours. Un masque plutôt qu'un fond plein :
+    le favicon reste transparent, la barre d'onglets passant derrière.
   -->
   <mask id="jour">
     <rect width="64" height="64" fill="#fff"/>
-    <rect x="20" y="20" width="28" height="28" rx="5" fill="#000"/>
+    <rect x="15" y="15" width="34" height="34" rx="7" fill="#000"/>
   </mask>
 
-  <!-- Le pavement : huit tesselles posées, la neuvième place laissée libre. -->
-  <g class="pose" mask="url(#jour)">
-    <rect x="8" y="8" width="16" height="16" rx="2"/>
-    <rect x="26" y="8" width="16" height="16" rx="2"/>
-    <rect x="44" y="8" width="16" height="16" rx="2"/>
-    <rect x="8" y="26" width="16" height="16" rx="2"/>
-    <rect x="44" y="26" width="16" height="16" rx="2"/>
-    <rect x="8" y="44" width="16" height="16" rx="2"/>
-    <rect x="26" y="44" width="16" height="16" rx="2"/>
-    <rect x="44" y="44" width="16" height="16" rx="2"/>
-  </g>
+  <g class="tesselle">
+    <!-- Le pavement : huit tesselles posées, la neuvième place laissée libre. -->
+    <g mask="url(#jour)">
+      <rect x="2" y="2" width="18" height="18" rx="3"/>
+      <rect x="23" y="2" width="18" height="18" rx="3"/>
+      <rect x="44" y="2" width="18" height="18" rx="3"/>
+      <rect x="2" y="23" width="18" height="18" rx="3"/>
+      <rect x="44" y="23" width="18" height="18" rx="3"/>
+      <rect x="2" y="44" width="18" height="18" rx="3"/>
+      <rect x="23" y="44" width="18" height="18" rx="3"/>
+      <rect x="44" y="44" width="18" height="18" rx="3"/>
+    </g>
 
-  <!-- La tesselle en cours : sortie de la grille, devant les autres. -->
-  <rect class="tenue" x="23" y="23" width="22" height="22" rx="3"/>
+    <!-- La tesselle en cours : sortie de la grille, posée devant les autres. -->
+    <rect x="19" y="19" width="26" height="26" rx="4"/>
+  </g>
 </svg>

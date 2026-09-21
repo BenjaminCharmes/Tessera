@@ -1,14 +1,15 @@
 ---
+agent: codeur
+created: 2026-09-21
+depends_on:
+- ticket-100
+estimated_days: 1
 id: ticket-101
-title: "La marque se lit là où elle est posée"
-type: feat
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-100"]
-estimated_days: 1
-created: 2026-09-21
+status: in-review
+title: La marque se lit là où elle est posée
+type: feat
 ---
 
 # ticket-101 — La marque se lit là où elle est posée
@@ -69,7 +70,8 @@ tous.
 ## Solution proposée
 
 1. **Simplifier `frontend/public/favicon.svg`** : la tuile détachée et son
-   jour restent le sujet ; le pavement est allégé ou supprimé, la tuile
+   jour restent le sujet ; le pavement est allégé — **jamais supprimé** : sans
+   lui il ne reste qu'un carré, et la marque ne dit plus rien —, la tuile
    occupant la place gagnée. Le dessin doit se lire à 16px.
 2. **Choisir les couleurs contre les quatre fonds**, pas contre la page. Le
    plafond mathématique d'une couleur unique servant à la fois le blanc et le
@@ -104,7 +106,7 @@ ni aux icônes desktop.
 - [ ] Le `NavRail` rend le texte « Tessera », vérifié par un test RTL
 - [ ] Le nom rendu ne porte aucune classe `text-violet-*`, vérifié par un test
       (ADR-026 : l'accent d'identité est une barre, pas un mot coloré)
-- [ ] Le `NavRail` rend toujours ses cinq destinations, aucune régression
+- [ ] Le `NavRail` rend toujours ses six destinations, aucune régression
 - [ ] `.\scripts\tessera.ps1 verify` est vert de bout en bout
 
 ## Dépendances

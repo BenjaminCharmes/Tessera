@@ -112,6 +112,20 @@ export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
       aria-label="Navigation principale"
       className="flex h-full flex-col items-stretch gap-0.5 bg-zinc-900 px-1.5 pb-3 pt-2"
     >
+      {/*
+        Zone d'identité — ticket-101.
+        ADR-026 : l'accent d'identité est une barre, jamais la couleur d'un
+        mot. Le violet porte la marque (SVG), le nom se rend en neutre (zinc).
+      */}
+      <div className="mb-1 flex h-10 shrink-0 flex-col items-center justify-center gap-0.5 border-b border-zinc-800">
+        {/*
+          La marque vient du favicon plutôt que d'un SVG recopié ici : deux
+          dessins d'une même marque finissent toujours par diverger, et c'est
+          celui qu'on ne regarde pas qui dérive.
+        */}
+        <img src="/favicon.svg" width={18} height={18} alt="" aria-hidden />
+        <span className="text-micro leading-none text-zinc-400">Tessera</span>
+      </div>
       {DESTINATIONS.map(({ panel, label, icon }) => {
         const actif = activePanel === panel;
         return (

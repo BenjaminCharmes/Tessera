@@ -5,6 +5,25 @@ import NavRail from "./NavRail";
 import type { SidebarPanel } from "./panels";
 
 describe("NavRail", () => {
+  it("affiche le nom du produit dans la zone d'identite", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    expect(screen.getByText("Tessera")).toBeInTheDocument();
+  });
+
+  it("le nom du produit ne porte aucune classe text-violet-", () => {
+    // ADR-026 : l'accent d'identité est une barre, jamais la couleur d'un mot.
+    // Du violet sur du texte se lirait comme un état de plus.
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const nom = screen.getByText("Tessera");
+    expect(nom.className).not.toMatch(/text-violet-/);
+  });
+
+  it("rend toujours les six destinations sans regression", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs).toHaveLength(6);
+  });
+
   it("affiche un libelle visible pour chaque destination", () => {
     // La barre precedente n'avait que des glyphes (des familles differentes :
     // geometrique, trigramme, horloge, engrenage, dollar) et une infobulle au
