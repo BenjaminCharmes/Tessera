@@ -4,6 +4,7 @@ from pathlib import Path
 
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
+from tessera.services.artifacts import default_mode_for
 
 
 # ------------------------------------------------------------------
@@ -125,9 +126,14 @@ class ProjectLoader:
         )
         (project_path / "CLAUDE.md").write_text(content, encoding="utf-8")
 
-        if body.active_agents:
-            agents_json = _default_agents_json(body.project_id, body.active_agents)
-            (project_path / "agents.json").write_text(agents_json, encoding="utf-8")
+        # Le manifeste est écrit **toujours**, y compris sans `active_agents` :
+        # la modale de création n'en envoie aucun, si bien qu'un projet né de
+        # l'UI n'en avait pas du tout, et retombait en silence sur un pipeline
+        # codeur → reviewer (ticket-105).
+        agents_json = _default_agents_json(
+            body.project_id, body.active_agents, default_mode_for("create")
+        )
+        (project_path / "agents.json").write_text(agents_json, encoding="utf-8")
 
         return load_project(project_path)
 
@@ -230,7 +236,28 @@ Projet créé via Tessera.
 """
 
 
-def _default_agents_json(project_id: str, active_agents: list[str]) -> str:
+#: Les rôles posés quand la création n'en demande aucun. La modale n'envoie que
+#: l'identifiant, le nom et la description : sans ce défaut, le projet naissait
+#: sans manifeste du tout.
+_ROLES_PAR_DEFAUT = ["codeur", "reviewer"]
+
+
+def _default_agents_json(
+    project_id: str, active_agents: list[str], artifacts: str
+) -> str:
+    """Le manifeste d'un projet neuf, écrit en entier plutôt que deviné.
+
+    Sans manifeste, `load_pipeline_config` rend un `AgentPipelineConfig()` où
+    la sécurité et le validateur sont éteints — alors que les deux services
+    sont déjà câblés. Ils l'étaient par absence de déclaration, pas par choix,
+    et rien ne le disait.
+
+    `max_instances` n'est plus écrit : rien ne le lit, le backend ne contient
+    aucun `asyncio.gather` et le pipeline est strictement séquentiel. C'est le
+    défaut que ticket-091 a nettoyé sur `auto_merge_on_approve` — un réglage
+    qu'on lit et qu'on croit.
+    """
+    roles = active_agents or _ROLES_PAR_DEFAUT
     agents = [
         {
             "role": role,
@@ -238,14 +265,30 @@ def _default_agents_json(project_id: str, active_agents: list[str]) -> str:
             "max_tokens": 8192 if role == "codeur" else 4096,
             "prompt_file": f"agents/prompts/{role}.md",
             "active": True,
-            **({"max_instances": 2} if role == "codeur" else {}),
         }
-        for role in active_agents
+        for role in roles
     ]
     data = {
         "project_id": project_id,
+        # Explicite plutôt que dépendant du défaut de lecture d'ADR-023, qui
+        # échoue fermé : un manifeste muet et un manifeste qui a choisi `local`
+        # se lisent pareil, et seul le second l'a décidé.
+        "artifacts": artifacts,
+        # ADR-029 : le défaut protège. On n'écrit jamais `merge` dans un
+        # fichier généré — merger, c'est décider qu'un travail est bon.
+        "autonomy": "commit",
         "agents": agents,
-        "pipeline": {"max_review_rounds": 3},
+        "pipeline": {
+            "max_review_rounds": 3,
+            # Un flag à vrai sans commande valide est pire qu'un flag à faux :
+            # le lanceur avale l'erreur et rend `True`, si bien que l'absence
+            # de tests se lirait comme des tests verts. Un projet neuf n'a pas
+            # de stack, donc aucune commande ne se devine ici.
+            "testeur_enabled": False,
+            "test_command": None,
+            "securite_enabled": True,
+            "validateur_enabled": True,
+        },
     }
     return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
 

@@ -261,3 +261,46 @@ def test_l_ancien_nom_ne_reapparait_pas() -> None:
         + ", ".join(sorted(fautifs))
         + ". Le produit s'appelle Tessera (ADR-036)."
     )
+
+
+def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
+    """Chaque clef écrite dans un `agents.json` généré est lue quelque part.
+
+    `max_instances` y était écrit à 2 pour le codeur et lu nulle part : le
+    backend ne contient aucun `asyncio.gather`, le pipeline est strictement
+    séquentiel. C'est le défaut que ticket-091 a nettoyé sur
+    `auto_merge_on_approve` — un réglage qu'on lit et qu'on croit.
+
+    Le test balaie les sources plutôt que d'énumérer une liste : une clef
+    ajoutée au générateur sans lecteur tombe ici, sans qu'on ait pensé à elle.
+    """
+    import json
+
+    from tessera.services.project_loader import _default_agents_json
+
+    manifeste = json.loads(_default_agents_json("p", [], "tracked"))
+
+    clefs = set(manifeste) - {"project_id"}
+    clefs |= set(manifeste["pipeline"])
+    for agent in manifeste["agents"]:
+        clefs |= set(agent)
+
+    sources = ""
+    for chemin in (_RACINE / "backend" / "src").rglob("*.py"):
+        sources += chemin.read_text(encoding="utf-8")
+
+    # Une clef est « lue » si elle est **consommée** quelque part. Déclarer un
+    # champ de modèle ne compte pas : `max_instances` était un champ d'
+    # `AgentConfig`, ce qui suffisait à le faire passer pour lu alors que rien
+    # ne s'en servait. Le générateur et les déclarations de modèles sont donc
+    # retirés des sources avant la recherche.
+    exclus = [
+        _RACINE / "backend" / "src" / "tessera" / "services" / "project_loader.py",
+        _RACINE / "backend" / "src" / "tessera" / "models" / "agent.py",
+    ]
+    ailleurs = sources
+    for chemin in exclus:
+        ailleurs = ailleurs.replace(chemin.read_text(encoding="utf-8"), "")
+
+    mortes = sorted(c for c in clefs if c not in ailleurs)
+    assert mortes == [], f"clefs écrites dans agents.json mais jamais lues : {mortes}"

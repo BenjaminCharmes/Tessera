@@ -218,12 +218,25 @@ async def test_create_project_scaffolds_agents_json(tmp_path: Path) -> None:
     assert "auto_merge_on_approve" not in data["pipeline"]
 
 
-async def test_create_project_no_agents_json_when_no_agents(tmp_path: Path) -> None:
+async def test_create_project_ecrit_un_manifeste_meme_sans_agents(
+    tmp_path: Path,
+) -> None:
+    """Le manifeste est écrit même sans `active_agents` (ticket-105).
+
+    Ce test verrouillait l'inverse. La modale de création n'envoie aucun rôle,
+    si bien qu'un projet né de l'UI n'avait aucun `agents.json` : le pipeline
+    retombait en silence sur `codeur → reviewer`, la sécurité et le validateur
+    éteints alors que les deux services sont déjà câblés.
+    """
     body = ProjectCreate(project_id="bare-proj", name="Sans agents")
 
     await ProjectLoader(tmp_path).create_project(body)
 
-    assert not (tmp_path / "bare-proj" / "agents.json").exists()
+    manifeste = tmp_path / "bare-proj" / "agents.json"
+    assert manifeste.exists()
+
+    data = json.loads(manifeste.read_text(encoding="utf-8"))
+    assert {a["role"] for a in data["agents"]} == {"codeur", "reviewer"}
 
 
 # ------------------------------------------------------------------
