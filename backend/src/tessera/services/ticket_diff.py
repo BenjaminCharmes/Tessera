@@ -29,6 +29,10 @@ class TicketDiff(BaseModel):
 
     ticket_id: str
     branch: str | None = None
+    #: Le commit retrouvé quand la branche n'existe plus (ticket-116).
+    #: Supprimer la branche après le merge est la pratique normale ; sans ce
+    #: repli, le diff disparaissait pour tout ticket proprement terminé.
+    commit: str | None = None
     diff: str = ""
     files: list[str] = Field(default_factory=list)
 
@@ -61,7 +65,7 @@ async def diff_du_ticket(project_path: Path, ticket_id: str) -> TicketDiff:
     """
     branche = await _branche_du_ticket(project_path, ticket_id)
     if branche is None:
-        return TicketDiff(ticket_id=ticket_id)
+        return await _diff_par_commit(project_path, ticket_id)
 
     code, base = await _git(project_path, "symbolic-ref", "--short", "HEAD")
     reference = base.strip() if code == 0 and base.strip() != branche else "main"
@@ -82,3 +86,43 @@ async def diff_du_ticket(project_path: Path, ticket_id: str) -> TicketDiff:
     return TicketDiff(
         ticket_id=ticket_id, branch=branche, diff=diff.strip(), files=fichiers
     )
+
+
+async def _diff_par_commit(project_path: Path, ticket_id: str) -> TicketDiff:
+    """Le diff retrouvé par le message de commit, faute de branche.
+
+    Supprimer la branche après le merge est la pratique normale — c'est ce que
+    fait `gh pr merge --delete-branch`. Chercher uniquement `git branch --list`
+    faisait donc disparaître le diff de **tout ticket proprement terminé**, et
+    l'écran annonçait « jamais lancé », ce qui était faux (ticket-116).
+
+    Les messages portent tous l'identifiant du ticket — `CLAUDE.md` l'impose et
+    le pipeline l'applique — y compris après un squash.
+
+    Plusieurs commits peuvent le mentionner : celui du travail, puis celui de
+    clôture. Le second ne touche que `tickets/`, que `_ARTEFACTS` exclut déjà,
+    donc son diff est **vide** une fois filtré. On descend du plus récent au
+    plus ancien et on rend le premier diff non vide.
+    """
+    code, sortie = await _git(
+        project_path, "log", "--all", f"--grep={ticket_id}", "--format=%H", "-n", "20"
+    )
+    if code != 0:
+        return TicketDiff(ticket_id=ticket_id)
+
+    for sha in (l.strip() for l in sortie.splitlines() if l.strip()):
+        code, diff = await _git(
+            project_path, "show", sha, "--format=", "--", ".", *_ARTEFACTS
+        )
+        if code != 0 or not diff.strip():
+            continue
+
+        code, noms = await _git(
+            project_path, "show", sha, "--format=", "--name-only", "--", ".", *_ARTEFACTS
+        )
+        fichiers = [n.strip() for n in noms.splitlines() if n.strip()] if code == 0 else []
+        return TicketDiff(
+            ticket_id=ticket_id, commit=sha[:12], diff=diff.strip(), files=fichiers
+        )
+
+    return TicketDiff(ticket_id=ticket_id)

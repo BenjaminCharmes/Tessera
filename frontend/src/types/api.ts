@@ -341,6 +341,12 @@ export interface OpenPrResponse {
 export interface TicketDiff {
   ticket_id: string;
   branch: string | null;
+  /**
+   * Le commit retrouvé quand la branche n'existe plus (ticket-116).
+   * Supprimer la branche après le merge est la pratique normale : sans ce
+   * repli, le diff disparaissait pour tout ticket proprement terminé.
+   */
+  commit: string | null;
   diff: string;
   files: string[];
 }

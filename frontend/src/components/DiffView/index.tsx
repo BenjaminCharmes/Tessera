@@ -61,9 +61,9 @@ export default function DiffView({ projectId, ticketId }: DiffViewProps) {
     <div className="flex h-full flex-col bg-zinc-900">
       <div className={`${BAND} justify-between gap-2 border-b border-zinc-700 px-4`}>
         <RegionTitle>Diff du ticket</RegionTitle>
-        {resultat?.branch && (
+        {(resultat?.branch || resultat?.commit) && (
           <span className="truncate font-mono text-mini text-zinc-500">
-            {resultat.branch}
+            {resultat.branch ?? `commit ${resultat.commit}`}
           </span>
         )}
       </div>
@@ -74,13 +74,18 @@ export default function DiffView({ projectId, ticketId }: DiffViewProps) {
         </p>
       )}
 
-      {resultat && !erreur && resultat.branch === null && (
+      {/* « Jamais lancé » ne vaut que si **ni** branche **ni** commit :
+          une branche supprimée après merge ne veut pas dire que le ticket
+          n'a pas tourné, seulement que son travail est dans l'historique
+          (ticket-116). */}
+      {resultat && !erreur && resultat.branch === null && resultat.commit === null && (
         <p className="px-4 py-3 text-xs text-zinc-500">
-          Ce ticket n'a jamais été lancé — aucune branche ne lui correspond.
+          Ce ticket n'a jamais été lancé — aucune branche ni commit ne lui
+          correspond.
         </p>
       )}
 
-      {resultat && !erreur && resultat.branch !== null && !resultat.diff && (
+      {resultat && !erreur && (resultat.branch !== null || resultat.commit !== null) && !resultat.diff && (
         <p className="px-4 py-3 text-xs text-amber-300">
           La branche existe mais n'a rien produit : le run n'a rien commité.
         </p>
