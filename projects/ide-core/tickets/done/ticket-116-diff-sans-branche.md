@@ -2,8 +2,8 @@
 id: ticket-116
 title: "Relire le diff d'un ticket dont la branche a été supprimée"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 133
 priority: high
 agent: codeur
 depends_on: []
