@@ -2,8 +2,8 @@
 id: ticket-106
 title: "Le dépôt peut être public sans être repris"
 type: docs
-status: in-review
-pr_number: null
+status: done
+pr_number: 107
 priority: high
 agent: codeur
 depends_on: ["ticket-103"]
