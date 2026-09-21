@@ -4,8 +4,13 @@
 # qu'on ignore ne protège de rien.
 version: 2
 updates:
+  # Toutes les PR ciblent `develop`, comme celles de ticket : rien n'entre dans
+  # `main` autrement que par une PR de release. Sans cette clef, Dependabot vise
+  # la branche par défaut du dépôt — donc `main` — et ses PR arrivent à
+  # contre-courant du flux (ticket-114).
   - package-ecosystem: "pip"
     directory: "/backend"
+    target-branch: "develop"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 3
@@ -15,6 +20,7 @@ updates:
 
   - package-ecosystem: "npm"
     directory: "/frontend"
+    target-branch: "develop"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 3
@@ -24,6 +30,7 @@ updates:
 
   - package-ecosystem: "cargo"
     directory: "/frontend/src-tauri"
+    target-branch: "develop"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 3
@@ -33,6 +40,7 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 3
