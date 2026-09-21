@@ -53,9 +53,11 @@ Trois règles qui feront refuser la PR si elles ne sont pas tenues :
 .\scripts\tessera.ps1 verify     # pytest, mypy, types + tests frontend, Playwright
 ```
 
-**La CI GitHub ne se prononce pas** tant que les minutes Actions du mois sont
-épuisées : c'est la vérification locale qui en tient lieu, et c'est sur elle
-qu'on merge. Une PR qui n'annonce pas ses compteurs sera relue plus lentement.
+La CI tourne sur chaque PR et c'est elle qui tranche. Lancer `verify` avant de
+pousser vous évite un aller-retour, sans la remplacer : il tourne sur un seul
+OS, et le premier run qui a suivi la réouverture de la CI a trouvé en
+trente-cinq secondes deux tests qui ne passaient que sur le poste de leur
+auteur.
 
 Le détail des conventions de code — TypeScript strict sans `any`, type hints
 Python partout, fichiers sous 200 lignes, un test par fonction publique — est

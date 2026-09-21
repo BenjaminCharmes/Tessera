@@ -10,8 +10,6 @@ Les commandes réellement lancées et leur sortie, avec les compteurs —
 
     .\scripts\tessera.ps1 verify
 
-La CI GitHub ne se prononce pas tant que les minutes Actions du mois sont
-épuisées : la vérification locale en tient lieu.
 -->
 
 ## Points d'attention

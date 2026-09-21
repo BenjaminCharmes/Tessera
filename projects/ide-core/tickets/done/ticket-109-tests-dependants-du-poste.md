@@ -2,8 +2,8 @@
 id: ticket-109
 title: "Deux tests ne passaient que sur le poste de leur auteur"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 122
 priority: high
 agent: codeur
 depends_on: []

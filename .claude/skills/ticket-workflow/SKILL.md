@@ -99,25 +99,15 @@ git rev-parse --short HEAD
 
 Une fois la CI verte et la revue passée :
 
-> ### ⚠ Dérogation temporaire — depuis le 2026-09-18
->
-> Les minutes GitHub Actions du compte sont épuisées : **aucun job ne démarre**.
-> La vérification se fait donc en local, par `.\scripts\tessera.ps1 verify`, et
-> c'est sur elle qu'on merge.
->
-> **La règle ne change pas.** On merge sur une CI verte ; on s'en passe
-> aujourd'hui parce qu'on ne peut pas faire autrement, pas parce que c'est
-> devenu acceptable. Une vérification locale tourne sur un seul OS, sur un
-> arbre de travail qui n'est pas forcément celui du dépôt, et ne prouve rien
-> à personne d'autre que celui qui l'a lancée.
->
-> **À supprimer** dès que les minutes sont revenues — remise à zéro mensuelle,
-> dépôt passé en public, ou plafond relevé. Vérifier avec `gh run list` qu'un
-> run démarre à nouveau, puis retirer ce bloc.
->
-> Ceci ne concerne **pas** le produit : `peut_merger` exige toujours
-> `ci_status == "passing"` (ADR-029), donc Tessera ne merge rien tout seul
-> pendant ce temps. C'est voulu.
+La CI tourne sur chaque PR depuis que le dépôt est public : les minutes
+Actions y sont illimitées sur les runners standard. C'est elle qui tranche.
+
+`.\scripts\tessera.ps1 verify` reste utile **avant** de pousser — il évite
+un aller-retour — mais il ne remplace pas la CI : il tourne sur un seul OS,
+sur un arbre qui n'est pas forcément celui du dépôt, et ne prouve rien à
+personne d'autre que celui qui l'a lancé. Le premier run après la
+réouverture a trouvé en trente-cinq secondes deux tests qui ne passaient que
+sur le poste de leur auteur (ticket-109).
 
 ```bash
 gh pr merge --squash --auto        # ticket -> develop : squash
