@@ -2,8 +2,8 @@
 id: ticket-108
 title: "Le dépôt accueille correctement ceux qui arrivent"
 type: docs
-status: in-review
-pr_number: null
+status: done
+pr_number: 111
 priority: medium
 agent: codeur
 depends_on: ["ticket-106"]
