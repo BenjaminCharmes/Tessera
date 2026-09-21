@@ -29,7 +29,7 @@ commit** vers `main`. Le skill `ticket-workflow` était juste, mais il se charge
 à la demande : **la consigne fausse était toujours en contexte, la bonne
 seulement parfois.**
 
-Il portait aussi `GH_CONFIG_DIR=/Users/moi/.config/gh`, un chemin d'une autre
+Il portait aussi `GH_CONFIG_DIR=/Users/<moi>/.config/gh`, un chemin d'une autre
 machine, dans un dépôt utilisé sur deux postes.
 
 ### 2. Deux réglages de pipeline ne réglaient rien

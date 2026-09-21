@@ -16,7 +16,7 @@ created: 2026-09-18
 ## Pourquoi
 
 Décision prise à l'usage : **pas de couche forge**. Sur les dépôts pro — GitLab
-auto-hébergé chez Client-A, Azure DevOps chez Client-B — les accès sont
+auto-hébergé chez l'un, Azure DevOps chez l'autre — les accès sont
 spécifiques, et le push se fait à la main une fois le travail terminé.
 
 Or le bouton « Pousser et ouvrir la PR » s'affichait sur **tout** ticket ayant

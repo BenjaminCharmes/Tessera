@@ -18,7 +18,7 @@ created: 2026-09-18
 `cwd` place l'agent dans le dossier du projet. Il ne l'y enferme pas : rien
 n'empêchait un `Write` vers `../autre-client/src/app.py`, ni vers `backend/`.
 
-Six dépôts clients voisins dans `projects/` — Client-A, Client-B — plus le
+Six dépôts clients voisins dans `projects/` — plus le
 dépôt de vibe-ide au-dessus. C'est la même fuite qu'ADR-021 et ADR-023
 cherchent à empêcher, prise par l'autre bout : on avait verrouillé ce qui
 **part** dans un dépôt client, pas ce qui **y entre**.

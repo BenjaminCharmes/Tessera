@@ -99,7 +99,7 @@ en réel :
 |---|---|---|
 | `ide-core` | non | `Desktop/project` |
 | `tmp` (symlink) | oui | — |
-| `client-data-git` (clone) | oui | — |
+| `client-git` (clone) | oui | — |
 
 ## UI livrée
 

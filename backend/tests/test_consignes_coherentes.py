@@ -6,7 +6,7 @@ c'est-à-dire l'exact inverse du flux du dépôt. Le skill `ticket-workflow`, lu
 était juste — mais il ne se charge qu'à la demande. La consigne fausse était
 donc toujours en contexte, la bonne seulement parfois.
 
-Il portait aussi `GH_CONFIG_DIR=/Users/moi/.config/gh`, un chemin d'une autre
+Il portait aussi `GH_CONFIG_DIR=/Users/<moi>/.config/gh`, un chemin d'une autre
 machine, dans un dépôt utilisé sur deux postes.
 """
 import re

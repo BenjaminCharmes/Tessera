@@ -7,7 +7,7 @@ import type { Project } from "../../types/api";
 const projet: Project = {
   id: "lyra",
   name: "Lyra",
-  path: "C:\\Users\\ben\\Desktop\\Client-B\\Lyra",
+  path: "C:\\Users\\moi\\Desktop\\projets\\Lyra",
   description: "",
   active_agents: [],
   stack: null,
@@ -32,7 +32,7 @@ describe("ProjectHeader", () => {
 
     expect(screen.getByRole("link", { name: /VSCode/i })).toHaveAttribute(
       "href",
-      "vscode://file/C:/Users/moi/Desktop/Client-B/Lyra",
+      "vscode://file/C:/Users/moi/Desktop/projets/Lyra",
     );
   });
 

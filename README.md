@@ -360,35 +360,96 @@ Tessera/
 
 ## Référence API
 
+Table générée depuis `openapi.json` — la source fait foi, et `/docs` la sert
+en interactif quand le backend tourne.
+
+### Santé
+
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| `GET` | `/health` | Health check |
-| `GET` | `/api/v1/projects` | Liste tous les projets |
-| `POST` | `/api/v1/projects` | Crée un projet → `ProjectCreationResult` |
-| `POST` | `/api/v1/projects/import` | Importe un projet local (symlink/copy) |
-| `POST` | `/api/v1/projects/clone` | Clone un repo GitHub |
-| `GET` | `/api/v1/projects/:id` | Détail d'un projet |
-| `GET` | `/api/v1/projects/:id/runs` | Historique des pipelines (SQLite) |
-| `POST` | `/api/v1/projects/:id/analyze` | Génère CLAUDE.md depuis le code |
-| `POST` | `/api/v1/projects/:id/plan` | Description NL → batch de tickets |
-| `POST` | `/api/v1/projects/:id/github/sync` | Sync tickets ↔ GitHub Issues |
-| `GET` | `/api/v1/projects/:id/tickets` | Liste les tickets |
-| `POST` | `/api/v1/projects/:id/tickets` | Crée un ticket |
-| `POST` | `/api/v1/projects/:id/tickets/batch` | Crée plusieurs tickets d'un coup |
-| `PATCH` | `/api/v1/projects/:id/tickets/:tid/status` | Change le statut |
-| `POST` | `/api/v1/projects/:id/tickets/:tid/create-pr` | Ouvre une PR GitHub |
-| `GET` | `/api/v1/projects/:id/tickets/:tid/pr-status` | Statut CI de la PR |
-| `GET` | `/api/v1/agents/registry` | Liste les agents (builtins + custom) |
-| `GET` | `/api/v1/agents/registry/:role` | Prompt d'un agent |
-| `POST` | `/api/v1/agents/registry` | Crée / met à jour un agent |
-| `DELETE` | `/api/v1/agents/registry/:role` | Supprime un agent custom |
-| `POST` | `/api/v1/agents/create-project` | Crée un projet via conversation |
-| `POST` | `/api/v1/agents/create-agent` | Crée un agent via conversation |
-| `POST` | `/api/v1/agents/run` | Exécute un agent sur un ticket |
-| `WS` | `/api/v1/agents/stream` | Stream de tokens d'un agent |
-| `POST` | `/api/v1/orchestrator/run` | Lance le pipeline codeur→reviewer |
-| `POST` | `/api/v1/orchestrator/run-autonomous` | Mode autonome (N tickets) |
-| `WS` | `/api/v1/orchestrator/stream/:project_id` | Stream des OrchestratorEvents |
+| `GET` | `/health` | Health |
+
+### Projets
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/api/v1/projects` | List Projects |
+| `POST` | `/api/v1/projects` | Create Project |
+| `POST` | `/api/v1/projects/clone` | Clone Project |
+| `POST` | `/api/v1/projects/import` | Import Project |
+| `GET` | `/api/v1/projects/usage/breakdown` | Get Usage Breakdown Global |
+| `GET` | `/api/v1/projects/{project_id}` | Get Project |
+| `DELETE` | `/api/v1/projects/{project_id}` | Delete |
+| `GET` | `/api/v1/projects/{project_id}/agents` | Get Project Agents |
+| `PUT` | `/api/v1/projects/{project_id}/agents/{role}` | Set Project Agent Model |
+| `POST` | `/api/v1/projects/{project_id}/analyze` | Analyze Project |
+| `GET` | `/api/v1/projects/{project_id}/artifacts` | Get Artifact Mode |
+| `PUT` | `/api/v1/projects/{project_id}/artifacts` | Set Artifact Mode |
+| `GET` | `/api/v1/projects/{project_id}/branches/cleanup` | Get Cleanup Plan |
+| `POST` | `/api/v1/projects/{project_id}/branches/cleanup` | Run Cleanup |
+| `GET` | `/api/v1/projects/{project_id}/context` | Get Project Context |
+| `POST` | `/api/v1/projects/{project_id}/detach` | Detach |
+| `POST` | `/api/v1/projects/{project_id}/git/init` | Init Git |
+| `POST` | `/api/v1/projects/{project_id}/git/link` | Link Git Remote |
+| `GET` | `/api/v1/projects/{project_id}/git/status` | Get Git Status |
+| `POST` | `/api/v1/projects/{project_id}/github/sync` | Github Sync |
+| `POST` | `/api/v1/projects/{project_id}/plan` | Plan Project |
+| `GET` | `/api/v1/projects/{project_id}/removal-plan` | Get Removal Plan |
+| `GET` | `/api/v1/projects/{project_id}/runs` | List Project Runs |
+| `GET` | `/api/v1/projects/{project_id}/usage` | Get Usage |
+| `GET` | `/api/v1/projects/{project_id}/usage/breakdown` | Get Usage Breakdown For Project |
+
+### Tickets
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/api/v1/projects/{project_id}/tickets` | List Tickets |
+| `POST` | `/api/v1/projects/{project_id}/tickets` | Create Ticket |
+| `GET` | `/api/v1/projects/{project_id}/tickets/archive` | List Archived Tickets |
+| `POST` | `/api/v1/projects/{project_id}/tickets/batch` | Create Tickets Batch |
+| `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Get Ticket |
+| `PATCH` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Update Ticket Status |
+| `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/activity` | Get Ticket Activity |
+| `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/create-pr` | Create Pull Request |
+| `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/diff` | Get Ticket Diff |
+| `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/merge-pr` | Merge Pull Request For Ticket |
+| `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/open-pr` | Open Pull Request For Ticket |
+| `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/pr-status` | Get Pr Status |
+
+### Chat
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `POST` | `/api/v1/projects/{project_id}/chat/run` | Run Pipeline From Chat |
+| `GET` | `/api/v1/projects/{project_id}/chat/{conversation_id}` | Get Chat History |
+
+### Agents
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `POST` | `/api/v1/agents/create-agent` | Create Agent |
+| `POST` | `/api/v1/agents/create-project` | Create Project |
+| `GET` | `/api/v1/agents/registry` | List Agents |
+| `POST` | `/api/v1/agents/registry` | Create Agent |
+| `GET` | `/api/v1/agents/registry/{role}` | Get Agent |
+| `PUT` | `/api/v1/agents/registry/{role}` | Update Agent |
+| `DELETE` | `/api/v1/agents/registry/{role}` | Delete Agent |
+| `POST` | `/api/v1/agents/run` | Run Agent |
+
+### Orchestrateur
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `POST` | `/api/v1/orchestrator/run` | Run Pipeline |
+| `POST` | `/api/v1/orchestrator/run-autonomous` | Run Autonomous |
+
+### Fichiers
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/api/v1/fs/list` | List Dir |
+| `GET` | `/api/v1/fs/read` | Read File |
+| `PUT` | `/api/v1/fs/write` | Write File |
 
 ---
 
@@ -401,7 +462,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_PROVIDER` | | `agent_sdk` | `agent_sdk` (abonnement Claude) ou `anthropic_api` (crédits API) |
 | `ANTHROPIC_API_KEY` | si `anthropic_api` | — | Clef API Anthropic — inutile en mode `agent_sdk` |
 | `LLM_MAX_TURNS` | | `30` | Plafond d'allers-retours outil pour un agent |
-| `LLM_MAX_BUDGET_USD` | | `1.0` | Plafond de dépense d'un seul appel agent |
+| `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond cumulé d'un run autonome (`0` = aucun) |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
@@ -409,6 +470,10 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |
 | `GITHUB_REPO` | | `""` | Repo cible `owner/repo` |
+| `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
+| `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
+| `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
+| `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes API exigent `Authorization: Bearer <token>`. Vide, l'API est ouverte : ne l'exposer que sur une interface de confiance |
 
 ---
 
@@ -431,7 +496,7 @@ Tests frontend :
 
 ```bash
 cd frontend
-npm run test          # Vitest unit tests (260 tests)
+npm run test          # Vitest unit tests
 npm run test:coverage # Rapport de couverture
 npm run test:e2e      # Playwright E2E (5 flows, nécessite npm run dev)
 ```

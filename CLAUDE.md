@@ -191,7 +191,10 @@ qu'un agent doit savoir pour ne pas reconstruire ce qui existe.
 
 ### Ce qui n'existe pas
 
-- Pas d'authentification, pas de déploiement cloud — hors scope
+- Pas de comptes ni de multi-utilisateur, pas de déploiement cloud — hors
+  scope. `STATIC_TOKEN` existe malgré tout : renseignée, elle exige un
+  `Authorization: Bearer` sur **toutes** les requêtes. Vide — le défaut —
+  l'API est ouverte, donc à ne servir que sur une interface de confiance
 - Pas de résolution de conflit sans relecture, et ce n'est pas un manque
 - Le contrôle d'écriture sur `Bash` attrape une erreur, pas une évasion
   (ADR-031)

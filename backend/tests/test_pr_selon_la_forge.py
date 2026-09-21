@@ -18,7 +18,7 @@ def test_github_est_supporte(remote: str) -> None:
 @pytest.mark.parametrize(
     "remote",
     [
-        "https://gitlab.interne.exemple-forge.net/gitlab/groupe/equipe/orion.git",
+        "https://ci.interne.cloud.exemple-forge.net/gitlab/groupe/equipe/orion.git",
         "https://exemple-org@dev.azure.com/exemple-org/Lyra/_git/Lyra",
         "git@bitbucket.org:moi/repo.git",
     ],

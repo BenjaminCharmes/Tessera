@@ -2,12 +2,19 @@
 
 ## Workflows actifs
 
-| Fichier  | Déclencheur                                      | Rôle             |
-|----------|--------------------------------------------------|------------------|
-| `ci.yml` | push sur toutes branches + PR vers `main` / `develop` | Tests + type check |
+| Fichier  | Déclencheur                                | Rôle               |
+|----------|--------------------------------------------|--------------------|
+| `ci.yml` | push sur `main` + PR vers `main` / `develop` | Tests + type check |
+
+Le `push` ne garde que `main`, qui ne reçoit pas de PR de sa propre branche ;
+tout le reste est couvert par `pull_request`. Une PR déclenchait autrefois
+**deux** runs — celui du `push` et celui de la `pull_request` — et tout était
+facturé en double (ticket-095).
 
 Jobs : `Backend (pytest)`, `Frontend (tsc + vitest)`, `E2E (Playwright)`,
-`Tauri (cargo check)` — en parallèle (ADR-015).
+`Ce qui a changé`, `Tauri (cargo check)` — en parallèle (ADR-015). `Ce qui a
+changé` décide si le Rust a bougé : `Tauri` ne tourne que dans ce cas, une
+minute de macOS étant facturée dix fois une minute d'ubuntu.
 
 ## Flux de branches
 
