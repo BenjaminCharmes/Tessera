@@ -178,6 +178,12 @@ export interface CreateAgentResponse {
 export interface ProjectCreationResult {
   project: Project;
   agents_created: string[];
+  /**
+   * Le projet est-il la racine d'un dépôt git utilisable (ticket-104) ?
+   * Faux si l'initialisation a échoué : le projet existe alors sur disque,
+   * mais aucun run n'y démarrera tant qu'on n'aura pas rattrapé à la main.
+   */
+  repository_ready: boolean;
 }
 
 export interface ImportProjectRequest {

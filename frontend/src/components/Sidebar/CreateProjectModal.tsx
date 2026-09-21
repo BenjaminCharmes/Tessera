@@ -26,6 +26,7 @@ export default function CreateProjectModal({
   const [loading, setLoading] = useState(false);
   const [createdProject, setCreatedProject] = useState<Project | null>(null);
   const [agentsCreated, setAgentsCreated] = useState<string[]>([]);
+  const [depotPret, setDepotPret] = useState(true);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,6 +42,7 @@ export default function CreateProjectModal({
       const result = await api.projects.create(name, description);
       setCreatedProject(result.project);
       setAgentsCreated(result.agents_created);
+      setDepotPret(result.repository_ready);
     } catch (err: unknown) {
       setApiError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
@@ -90,6 +92,22 @@ export default function CreateProjectModal({
               <span className="font-mono text-zinc-300">
                 {agentsCreated.join(", ")}
               </span>
+            </p>
+          )}
+          {/*
+            Sans dépôt à sa racine, un projet est inerte pour le pipeline :
+            GitWorkspaceService lève NotAGitRepository et le run s'arrête
+            avant la première branche (ADR-024). Le dire ici plutôt qu'au
+            premier run, où le message ne dirait pas quoi faire.
+          */}
+          {depotPret ? (
+            <p className="text-zinc-400 text-xs mt-1">Dépôt git initialisé</p>
+          ) : (
+            <p className="text-amber-400 text-xs mt-1">
+              Le dépôt git n&rsquo;a pas pu être initialisé. Le projet est créé,
+              mais aucun run ne démarrera tant qu&rsquo;il n&rsquo;aura pas de
+              dépôt à sa racine&nbsp;: rattrapez-le depuis la section Git de la
+              barre latérale.
             </p>
           )}
           <div className="flex justify-end mt-4">

@@ -60,6 +60,9 @@ from tessera.services.project_loader import (
     set_agent_model,
 )
 from tessera.services.providers import get_provider
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 from tessera.services.sync_map import SyncMapService
 from tessera.services.ticket_service import TicketService
 
@@ -106,7 +109,30 @@ async def create_project(body: ProjectCreate) -> ProjectCreationResult:
     await apply_artifact_mode(
         settings.ide_workspace_dir / project.id, default_mode_for("create")
     )
-    return ProjectCreationResult(project=project, agents_created=agents_created)
+    # Le dépôt vient **après** le mode des artefacts, jamais avant : le commit
+    # initial d'`init_repository` stage avec `git add -A`, donc ce qui n'est
+    # pas encore exclu y entre — et, sur un dépôt client, part au premier push
+    # (ADR-021, ADR-023).
+    #
+    # Sans dépôt à sa racine, un projet est inutilisable par le pipeline :
+    # `GitWorkspaceService` lève `NotAGitRepository` et le run s'arrête avant
+    # la première branche (ADR-024). Mais un git indisponible ne doit pas faire
+    # échouer la création — le projet existe déjà sur disque, et lever ici
+    # laisserait l'utilisateur avec un projet créé et un message d'échec.
+    repository_ready = False
+    try:
+        await init_repository(settings.ide_workspace_dir / project.id)
+        repository_ready = True
+    except Exception as exc:  # noqa: BLE001 — l'état part dans la réponse
+        _logger.warning(
+            "project_git_init_failed",
+            extra={"project_id": project.id, "error": str(exc)},
+        )
+    return ProjectCreationResult(
+        project=project,
+        agents_created=agents_created,
+        repository_ready=repository_ready,
+    )
 
 
 @router.post("/import", response_model=ProjectImportResponse, status_code=201)

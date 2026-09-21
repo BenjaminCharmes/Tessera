@@ -55,6 +55,13 @@ class CreateProjectResponse(BaseModel):
 class ProjectCreationResult(BaseModel):
     project: Project
     agents_created: list[str] = Field(default_factory=list)
+    #: Le projet est-il la racine d'un dépôt git utilisable (ticket-104) ?
+    #: Faux quand l'initialisation a échoué — le projet existe alors sur
+    #: disque, mais aucun run de pipeline n'y démarrera tant qu'on n'aura pas
+    #: rattrapé à la main, `GitWorkspaceService` exigeant un dépôt à la racine
+    #: (ADR-024). L'information est rendue plutôt que levée : le projet est
+    #: déjà créé, échouer laisserait l'utilisateur avec les deux.
+    repository_ready: bool = False
 
 
 class ProjectImport(BaseModel):

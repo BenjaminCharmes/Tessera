@@ -25,10 +25,15 @@ const mockProject = {
   github_remote: null,
 };
 
-const mockResult = { project: mockProject, agents_created: [] };
+const mockResult = {
+  project: mockProject,
+  agents_created: [],
+  repository_ready: true,
+};
 const mockResultWithAgents = {
   project: mockProject,
   agents_created: ["redacteur", "planificateur"],
+  repository_ready: true,
 };
 
 describe("CreateProjectModal", () => {
@@ -208,6 +213,39 @@ describe("CreateProjectModal", () => {
     fireEvent.click(screen.getByRole("dialog"));
 
     expect(onCreated).toHaveBeenCalledWith(mockProject);
+  });
+
+  it("annonce que le depot git est pret", async () => {
+    // ticket-104 : sans depot a sa racine, un projet cree est inutilisable
+    // par le pipeline — GitWorkspaceService leve NotAGitRepository et le run
+    // s'arrete avant la premiere branche (ADR-024). L'utilisateur doit le
+    // savoir a la creation, pas au premier run.
+    vi.mocked(api.projects.create).mockResolvedValue(mockResult);
+
+    render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+
+    await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+    fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+    await screen.findByRole("button", { name: /continuer/i });
+    expect(screen.getByText(/dépôt git initialisé/i)).toBeInTheDocument();
+  });
+
+  it("dit quoi faire quand l'initialisation du depot a echoue", async () => {
+    vi.mocked(api.projects.create).mockResolvedValue({
+      ...mockResult,
+      repository_ready: false,
+    });
+
+    render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+
+    await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+    fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+    await screen.findByRole("button", { name: /continuer/i });
+    // Un echec qui ne dit pas quoi faire laisse l'utilisateur devant un projet
+    // cree mais inerte : la section Git de la barre laterale est le rattrapage.
+    expect(screen.getByText(/section git/i)).toBeInTheDocument();
   });
 
   it("calls onClose when pressing Escape before creation", () => {
