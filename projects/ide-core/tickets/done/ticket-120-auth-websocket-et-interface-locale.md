@@ -2,8 +2,8 @@
 id: ticket-120
 title: "Protéger les WebSockets par STATIC_TOKEN et servir en local par défaut"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 139
 priority: critical
 agent: codeur
 depends_on: []

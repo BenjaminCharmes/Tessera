@@ -2,8 +2,8 @@
 id: ticket-124
 title: "Rendre l'app Tauri packagée fonctionnelle sans réouvrir le filesystem"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 142
 priority: high
 agent: codeur
 depends_on: []
