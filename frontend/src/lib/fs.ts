@@ -1,4 +1,6 @@
 // Dual-mode file access: Tauri invoke when running as desktop app, REST API fallback for web
+import { authorized } from "./auth";
+
 const isTauri =
   typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
@@ -14,7 +16,10 @@ export async function readFile(path: string): Promise<string> {
   if (isTauri) {
     return tauriInvoke<string>("read_file", { path });
   }
-  const res = await fetch(`/api/v1/fs/read?path=${encodeURIComponent(path)}`);
+  const res = await fetch(
+    `/api/v1/fs/read?path=${encodeURIComponent(path)}`,
+    authorized(),
+  );
   if (!res.ok) throw new Error(`Failed to read ${path}: ${res.statusText}`);
   return res.text();
 }
@@ -23,11 +28,14 @@ export async function writeFile(path: string, content: string): Promise<void> {
   if (isTauri) {
     return tauriInvoke<void>("write_file", { path, content });
   }
-  const res = await fetch("/api/v1/fs/write", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ path, content }),
-  });
+  const res = await fetch(
+    "/api/v1/fs/write",
+    authorized({
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path, content }),
+    }),
+  );
   if (!res.ok) throw new Error(`Failed to write ${path}: ${res.statusText}`);
 }
 
@@ -35,7 +43,10 @@ export async function listDir(path: string): Promise<string[]> {
   if (isTauri) {
     return tauriInvoke<string[]>("list_dir", { path });
   }
-  const res = await fetch(`/api/v1/fs/list?path=${encodeURIComponent(path)}`);
+  const res = await fetch(
+    `/api/v1/fs/list?path=${encodeURIComponent(path)}`,
+    authorized(),
+  );
   if (!res.ok) throw new Error(`Failed to list ${path}: ${res.statusText}`);
   return res.json() as Promise<string[]>;
 }
@@ -57,7 +68,10 @@ export interface DirEntry {
  * ici évite de faire diverger deux implémentations pour un seul appel.
  */
 export async function listEntries(path: string): Promise<DirEntry[]> {
-  const res = await fetch(`/api/v1/fs/list?path=${encodeURIComponent(path)}`);
+  const res = await fetch(
+    `/api/v1/fs/list?path=${encodeURIComponent(path)}`,
+    authorized(),
+  );
   if (!res.ok) throw new Error(`Failed to list ${path}: ${res.statusText}`);
   return res.json() as Promise<DirEntry[]>;
 }

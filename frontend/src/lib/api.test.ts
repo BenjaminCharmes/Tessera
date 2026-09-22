@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { api } from "./api";
 
 const mockFetch = vi.fn();
@@ -6,6 +6,10 @@ vi.stubGlobal("fetch", mockFetch);
 
 beforeEach(() => {
   mockFetch.mockReset();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("api.projects.list", () => {
@@ -301,5 +305,54 @@ describe("api.tickets.batch", () => {
       "/api/v1/projects/ide-core/tickets/batch",
       expect.objectContaining({ method: "POST" }),
     );
+  });
+});
+
+// ticket-120 : renseigner STATIC_TOKEN côté backend mettait toute l'UI en 401,
+// parce que rien ici ne posait le Bearer. Le token se lit à l'appel, pas au
+// chargement du module, pour que les deux cas soient testables côte à côte.
+describe("api et STATIC_TOKEN", () => {
+  it("pose Authorization: Bearer quand VITE_STATIC_TOKEN est défini", async () => {
+    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve([]) });
+
+    await api.projects.list();
+
+    const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("/api/v1/projects");
+    expect(new Headers(init.headers).get("Authorization")).toBe("Bearer s3cret");
+  });
+
+  it("garde les en-têtes existants en ajoutant le Bearer", async () => {
+    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
+
+    await api.projects.create("app", "desc");
+
+    const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+    const headers = new Headers(init.headers);
+    expect(headers.get("Authorization")).toBe("Bearer s3cret");
+    expect(headers.get("Content-Type")).toBe("application/json");
+    expect(init.method).toBe("POST");
+  });
+
+  it("n'envoie aucun Authorization sans token", async () => {
+    vi.stubEnv("VITE_STATIC_TOKEN", "");
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve([]) });
+
+    await api.projects.list();
+
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/projects", undefined);
+  });
+
+  it("pose le Bearer aussi sur DELETE", async () => {
+    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    mockFetch.mockResolvedValue({ ok: true });
+
+    await api.agents.remove("coder");
+
+    const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(new Headers(init.headers).get("Authorization")).toBe("Bearer s3cret");
+    expect(init.method).toBe("DELETE");
   });
 });

@@ -18,7 +18,30 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
-| `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes API exigent `Authorization: Bearer <token>`. Vide, l'API est ouverte : ne l'exposer que sur une interface de confiance |
+| `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
+
+## `STATIC_TOKEN`
+
+Renseigné, le token protège chaque route, `OPTIONS` (préflight CORS) et
+`/health` exceptés :
+
+- **HTTP** : en-tête `Authorization: Bearer <token>`, sinon `401` ;
+- **WebSocket** : le même en-tête, ou `?token=<token>` dans l'URL — un
+  navigateur ne peut pas poser d'en-tête sur `new WebSocket(url)`. Sans
+  token valide, la connexion est fermée avec le code `4401`.
+
+Le frontend lit la même valeur dans `frontend/.env.local` :
+
+```bash
+VITE_STATIC_TOKEN=<token>
+```
+
+Sans elle, une UI face à un backend protégé ne reçoit que des `401`.
+
+**À savoir** : passé en `?token=`, le token apparaît dans les logs d'accès
+uvicorn et dans tout proxy sur le chemin. Le Bearer HTTP n'y apparaît pas.
+`VITE_STATIC_TOKEN` est inliné dans le bundle : c'est un secret partagé
+entre le poste et son backend, pas un mécanisme de comptes.
 
 ## Commandes de développement
 

@@ -37,7 +37,7 @@ run: doctor
 	@echo "→ Lancement Tessera : backend (port 8000) + frontend (port 5173)"
 	@echo "→ Ctrl+C pour arrêter les deux processus"
 	@trap 'kill 0' SIGINT SIGTERM; \
-	 (cd backend && uv run uvicorn tessera.main:app --reload --host 0.0.0.0 --port 8000 --env-file ../.env) & \
+	 (cd backend && uv run uvicorn tessera.main:app --reload --host 127.0.0.1 --port 8000 --env-file ../.env) & \
 	 (cd frontend && npm run dev) & \
 	 wait
 
@@ -46,7 +46,7 @@ dev:
 	@echo "→ Swagger UI : http://localhost:8000/docs"
 	cd backend && uv run uvicorn tessera.main:app \
 		--reload \
-		--host 0.0.0.0 \
+		--host 127.0.0.1 \
 		--port 8000 \
 		--env-file ../.env
 

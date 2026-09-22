@@ -1,12 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // jsdom has no __TAURI_INTERNALS__ by default → isTauri is false → web mode
-import { readFile, writeFile, listDir } from "./fs";
+import { readFile, writeFile, listDir, listEntries } from "./fs";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
 
 beforeEach(() => {
   mockFetch.mockReset();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("readFile (web mode)", () => {
@@ -19,6 +23,7 @@ describe("readFile (web mode)", () => {
     expect(content).toBe("file content");
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/v1/fs/read?path=%2Fsome%2Fpath.md",
+      undefined,
     );
   });
 
@@ -68,6 +73,7 @@ describe("listDir (web mode)", () => {
     expect(result).toEqual(files);
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/v1/fs/list?path=%2Fsome%2Fdir",
+      undefined,
     );
   });
 
@@ -79,5 +85,56 @@ describe("listDir (web mode)", () => {
     await expect(listDir("/bad/dir")).rejects.toThrow(
       "Failed to list /bad/dir",
     );
+  });
+});
+
+// ticket-120 : le mode web de fs.ts parle au même backend que api.ts, avec le
+// même 401 si le Bearer manque.
+describe("fs et STATIC_TOKEN (web mode)", () => {
+  function authorizationOf(call: number): string | null {
+    const [, init] = mockFetch.mock.calls[call] as [string, RequestInit];
+    return new Headers(init.headers).get("Authorization");
+  }
+
+  it("pose le Bearer sur readFile, listDir et listEntries", async () => {
+    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    mockFetch.mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve(""),
+      json: () => Promise.resolve([]),
+    });
+
+    await readFile("/a.md");
+    await listDir("/d");
+    await listEntries("/d");
+
+    expect(authorizationOf(0)).toBe("Bearer s3cret");
+    expect(authorizationOf(1)).toBe("Bearer s3cret");
+    expect(authorizationOf(2)).toBe("Bearer s3cret");
+  });
+
+  it("garde Content-Type et le corps sur writeFile", async () => {
+    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    mockFetch.mockResolvedValue({ ok: true });
+
+    await writeFile("/a.md", "x");
+
+    const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("/api/v1/fs/write");
+    expect(init.method).toBe("POST");
+    expect(init.body).toBe(JSON.stringify({ path: "/a.md", content: "x" }));
+    const headers = new Headers(init.headers);
+    expect(headers.get("Content-Type")).toBe("application/json");
+    expect(headers.get("Authorization")).toBe("Bearer s3cret");
+  });
+
+  it("n'envoie aucun Authorization sans token", async () => {
+    vi.stubEnv("VITE_STATIC_TOKEN", "");
+    mockFetch.mockResolvedValue({ ok: true, text: () => Promise.resolve("") });
+
+    await readFile("/a.md");
+
+    const [, init] = mockFetch.mock.calls[0] as [string, RequestInit | undefined];
+    expect(init).toBeUndefined();
   });
 });

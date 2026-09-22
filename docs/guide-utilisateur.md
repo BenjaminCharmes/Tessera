@@ -492,7 +492,7 @@ Tout est dans `.env` (copié depuis `.env.example`) :
 | `IDE_LOG_LEVEL` | `INFO` | Verbosité des logs |
 | `GITHUB_TOKEN` | — | Token GitHub |
 | `GITHUB_REPO` | — | Dépôt cible, format `owner/repo` |
-| `STATIC_TOKEN` | — | Si défini, l'API exige `Authorization: Bearer <token>` |
+| `STATIC_TOKEN` | — | Si défini, l'API exige `Authorization: Bearer <token>` — WebSockets comprises, via `?token=`. Côté UI : `VITE_STATIC_TOKEN` dans `frontend/.env.local` |
 
 `LLM_MAX_TURNS` et `LLM_MAX_BUDGET_USD` sont tes garde-fous contre un agent qui part
 en boucle. Ne les augmente qu'en connaissance de cause.

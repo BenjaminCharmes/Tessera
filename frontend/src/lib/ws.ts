@@ -1,3 +1,5 @@
+import { withTokenQuery } from "./auth";
+
 export type WsMessage = Record<string, unknown>;
 
 export interface WsOptions {
@@ -26,5 +28,5 @@ export function createWebSocket(url: string, options: WsOptions): WebSocket {
 
 export function wsUrl(path: string): string {
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
-  return `${proto}//${location.host}${path}`;
+  return withTokenQuery(`${proto}//${location.host}${path}`);
 }
