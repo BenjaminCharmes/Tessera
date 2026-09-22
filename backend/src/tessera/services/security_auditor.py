@@ -14,6 +14,9 @@ _PROMPT_FILE = "securite.md"
 _CODE_MAX_CHARS = 16_000
 
 Severity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+_SEVERITIES: dict[str, Severity] = {
+    "CRITICAL": "CRITICAL", "HIGH": "HIGH", "MEDIUM": "MEDIUM", "LOW": "LOW", "INFO": "INFO",
+}
 AuditVerdict = Literal["PASS", "BLOCK"]
 
 
@@ -31,6 +34,10 @@ class SecurityAuditResult:
     issues: list[SecurityIssue]
     verdict: AuditVerdict
     summary: str
+    # Pourquoi l'audit bloque quand ce n'est pas le LLM qui l'a décidé :
+    # provider en panne, réponse illisible, faille HIGH ignorée. Vide sur un
+    # verdict rendu normalement. Part dans l'événement, donc à l'écran.
+    reason: str = ""
 
     @property
     def has_critical(self) -> bool:
@@ -62,12 +69,11 @@ class SecurityAuditorService:
                 max_tokens=_MAX_TOKENS,
             )
         except Exception as exc:
+            # Échoue fermé : un audit qui n'a pas eu lieu n'a rien approuvé.
+            # Le run se bloque quand le provider tombe, c'est voulu ; le
+            # `reason` doit le dire à l'écran (ticket-122).
             _logger.warning("security_auditor_llm_failed", extra={"error": str(exc)})
-            return SecurityAuditResult(
-                issues=[],
-                verdict="PASS",
-                summary="Audit LLM indisponible — PASS par défaut.",
-            )
+            return _blocked(f"Audit sécurité indisponible : {exc}")
 
         return self._parse_response(result.content)
 
@@ -81,7 +87,7 @@ class SecurityAuditorService:
         parsed = extract_json(raw)
         if not parsed:
             _logger.warning("security_auditor_invalid_json", extra={"raw": raw[:200]})
-            return SecurityAuditResult(issues=[], verdict="PASS", summary="")
+            return _blocked("Réponse de l'auditeur sécurité illisible (JSON attendu).")
 
         raw_verdict = parsed.get("verdict", "PASS")
         verdict: AuditVerdict = "BLOCK" if raw_verdict == "BLOCK" else "PASS"
@@ -90,12 +96,10 @@ class SecurityAuditorService:
         for entry in parsed.get("issues", []):
             if not isinstance(entry, dict):
                 continue
-            severity = str(entry.get("severity", "INFO"))
-            if severity not in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"):
-                severity = "INFO"
+            severity = _SEVERITIES.get(str(entry.get("severity", "INFO")), "INFO")
             issues.append(
                 SecurityIssue(
-                    severity=severity,  # type: ignore[arg-type]
+                    severity=severity,
                     type=str(entry.get("type", "")),
                     location=str(entry.get("location", "")),
                     description=str(entry.get("description", "")),
@@ -103,8 +107,21 @@ class SecurityAuditorService:
                 )
             )
 
-        return SecurityAuditResult(
+        result = SecurityAuditResult(
             issues=issues,
             verdict=verdict,
             summary=str(parsed.get("summary", "")),
         )
+        # La docstring du prompt promet qu'une faille CRITICAL ou HIGH bloque ;
+        # seul le verdict du LLM était lu, et il pouvait lister la faille puis
+        # conclure PASS (ticket-122).
+        if verdict == "PASS" and (result.has_critical or result.has_high):
+            worst = "CRITICAL" if result.has_critical else "HIGH"
+            result.verdict = "BLOCK"
+            result.reason = f"Faille {worst} relevée malgré un verdict PASS."
+            result.summary = f"{result.reason} {result.summary}".strip()
+        return result
+
+
+def _blocked(reason: str) -> SecurityAuditResult:
+    return SecurityAuditResult(issues=[], verdict="BLOCK", summary=reason, reason=reason)

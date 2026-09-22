@@ -77,10 +77,8 @@ class TicketService:
         return sorted(tickets, key=lambda t: t.id)
 
     async def get_ticket(self, ticket_id: str) -> Ticket | None:
-        for path in self._iter_active_files():
-            if path.stem.startswith(ticket_id):
-                return self._parse(path)
-        return None
+        path = self._find_file(ticket_id)
+        return self._parse(path) if path is not None else None
 
     async def update_status(
         self, ticket_id: str, new_status: TicketStatus
@@ -208,8 +206,16 @@ class TicketService:
         source.write_text(frontmatter.dumps(post), encoding="utf-8")
         return self._parse(source)
 
-    async def rotate_pipeline_log(self) -> None:
-        log_path = self._root / "pipeline-log.md"
+    async def rotate_pipeline_log(self, log_path: Path | None = None) -> None:
+        """Keep the pipeline log to its last `_PIPELINE_LOG_MAX_LINES` lines.
+
+        Le défaut est le fichier que l'orchestrateur écrit réellement,
+        `memory/pipeline-log.md` ; la rotation lisait `<projet>/pipeline-log.md`
+        et ne tournait donc jamais (ticket-122). L'appelant qui connaît le
+        chemin peut le transmettre.
+        """
+        if log_path is None:
+            log_path = self._root / "memory" / "pipeline-log.md"
         if not log_path.exists():
             return
         lines = log_path.read_text(encoding="utf-8").splitlines(keepends=True)
@@ -235,8 +241,11 @@ class TicketService:
             yield from sorted(status_dir.glob("ticket-*.md"))
 
     def _find_file(self, ticket_id: str) -> Path | None:
+        # `stem.startswith(ticket_id)` faisait trouver `ticket-100` à partir de
+        # `ticket-1` (ticket-122). Le nom est l'identifiant seul, ou
+        # l'identifiant suivi d'un tiret et d'un slug.
         for path in self._iter_active_files():
-            if path.stem.startswith(ticket_id):
+            if path.stem == ticket_id or path.stem.startswith(ticket_id + "-"):
                 return path
         return None
 

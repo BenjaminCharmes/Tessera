@@ -338,3 +338,13 @@ Format : ADR léger (Architecture Decision Record).
 **Décision** : un verrou en mémoire, partagé par tous les points d'entrée — run unique, file, autonome, chat — refuse un second run sur un projet occupé (409, en nommant le ticket en cours). Deux projets tournent en parallèle. Chaque sortie du pipeline commite ; un commit raté rend `blocked` avec `arret`, jamais une exception. Un émetteur d'événements qui lève n'interrompt pas le run.
 **Raison** : ADR-008 rend l'orchestrateur stateless — deux runs sur le **même** arbre passaient `ensure_clean_tree` avant que le second déplace la branche sous le premier. Et `CommitFailed` n'était attrapé que sur le chemin approuvé : ailleurs, l'exception remontait jusqu'à FastAPI, arbre sale, run jamais clos.
 **Alternative rejetée** : une file d'attente — qui clique deux fois veut savoir, pas attendre ; un verrou en base — un backend local n'a pas de second process à protéger.
+
+---
+
+## ADR-039 — Une porte du pipeline qui n'a pas pu juger refuse
+
+**Date** : 2026-09-22
+**Décision** : l'audit sécurité et la validation **échouent fermés** : provider indisponible, réponse illisible ou exception dans l'étape rendent `BLOCK` / `CHANGES_REQUESTED`, jamais un passage. Une faille `CRITICAL` ou `HIGH` bloque quel que soit le verdict énoncé par le LLM. La cause part dans l'événement (`reason`), lisible à l'écran.
+**Raison** : ces étapes existent pour arrêter du code. Une panne qui les fait passer retire la protection là où elle se voit le moins : rien à l'écran ne distingue un audit propre d'un audit qui n'a pas eu lieu. Le validateur refusait déjà un JSON illisible mais approuvait sur un provider en panne.
+**Alternative rejetée** : sauter l'étape et prévenir — l'avertissement part dans un log pendant qu'un `done` s'affiche.
+**Conséquence assumée** : une panne du fournisseur bloque les runs qui activent ces étapes ; c'est voulu, le `reason` le dit.

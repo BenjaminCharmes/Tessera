@@ -26,6 +26,7 @@ from tessera.services.pipeline_events import (
 from tessera.services.pipeline_outcomes import finish_security_block
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
+from tessera.services.security_auditor import SecurityAuditResult
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -136,13 +137,20 @@ def asker_for(run: PipelineRun) -> Optional[Callable[[str], Awaitable[str]]]:
 
 async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> None:
     """Run the coder, then capture what it actually wrote to disk."""
-    codeur_cfg = orch._config_for(_role_qui_produit(run.ticket.type))
+    # Un ticket `design` ne demande pas du code mais une décision, et
+    # `ide-core/CLAUDE.md` promettait l'architecte dessus depuis le premier
+    # commit sans que rien ne route par type (ticket-098). L'étape reste la
+    # même — quelqu'un produit le travail — seul le rôle change. Les
+    # événements portent ce rôle, pas `codeur` en dur : l'UI montrait un
+    # codeur au travail quand l'architecte produisait (ticket-122).
+    role = _role_qui_produit(run.ticket.type)
+    codeur_cfg = orch._config_for(role)
     ticket_id = run.ticket_id
 
     await run.on_event(
         OrchestratorEvent(
             type=EventType.AGENT_STARTED,
-            agent=AgentRole.codeur,
+            agent=role,
             ticket_id=ticket_id,
             data={"round": run.round_num},
         )
@@ -153,7 +161,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
         await run.on_event(
             OrchestratorEvent(
                 type=EventType.AGENT_TOKEN,
-                agent=AgentRole.codeur,
+                agent=role,
                 ticket_id=tid,
                 data={"token": token},
             )
@@ -163,7 +171,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
         await run.on_event(
             OrchestratorEvent(
                 type=EventType.AGENT_TOOL_USE,
-                agent=AgentRole.codeur,
+                agent=role,
                 ticket_id=tid,
                 data={"tool": name, "input": payload},
             )
@@ -174,12 +182,6 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     # runner exactement comme avant ce ticket.
     asker = asker_for(run)
     extra: dict[str, Any] = {"ask_user": asker} if asker is not None else {}
-
-    # Un ticket `design` ne demande pas du code mais une décision, et
-    # `ide-core/CLAUDE.md` promettait l'architecte dessus depuis le premier
-    # commit sans que rien ne route par type (ticket-098). L'étape reste la
-    # même — quelqu'un produit le travail — seul le rôle change.
-    role = _role_qui_produit(run.ticket.type)
 
     codeur_result = await orch._runner.run(
         role=role,
@@ -300,7 +302,11 @@ async def run_tests(orch: "Orchestrator", run: PipelineRun) -> bool:
 async def run_security_audit(
     orch: "Orchestrator", run: PipelineRun
 ) -> Optional[PipelineResult]:
-    """Audit the diff. A CRITICAL/HIGH verdict ends the run before the reviewer."""
+    """Audit the diff. A CRITICAL/HIGH verdict ends the run before the reviewer.
+
+    Échoue fermé : une exception de l'auditeur sautait l'audit et le diff
+    arrivait au reviewer comme s'il était propre (ticket-122).
+    """
     if not (orch._security_auditor and orch._project_path):
         return None
 
@@ -311,7 +317,10 @@ async def run_security_audit(
         )
     except Exception as exc:
         _logger.warning("security_auditor_failed", extra={"error": str(exc)})
-        return None
+        reason = f"Audit sécurité en panne : {exc}"
+        audit = SecurityAuditResult(
+            issues=[], verdict="BLOCK", summary=reason, reason=reason
+        )
 
     await emit(
         run,
@@ -321,6 +330,7 @@ async def run_security_audit(
         has_critical=audit.has_critical,
         has_high=audit.has_high,
         summary=audit.summary,
+        reason=audit.reason,
     )
     orch._log(f"[{run.ticket_id}] securite: {audit.verdict} — {audit.summary[:80]}")
 
@@ -403,8 +413,10 @@ async def run_validation(
             test_result=run.test_result,
         )
     except Exception as exc:
+        # Échoue fermé, comme l'audit : une validation qui n'a pas eu lieu
+        # n'approuve rien (ticket-122).
         _logger.warning("validator_failed", extra={"error": str(exc)})
-        return True, reason
+        return False, f"Validation en panne : {exc}"
 
     await emit(
         run,

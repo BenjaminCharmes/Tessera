@@ -118,7 +118,7 @@ class TestValidatorService:
         assert len(provider.calls) == 1
         assert "5 passed" in provider.calls[0]["user"]
 
-    async def test_approved_on_invalid_json_response(
+    async def test_changes_requested_on_invalid_json_response(
         self, service: ValidatorService, provider: FakeProvider
     ) -> None:
         _set_response(provider, {})
@@ -128,8 +128,7 @@ class TestValidatorService:
             code_produced="code",
             test_result=None,
         )
-        # graceful degradation: treat as approved if JSON malformed
-        assert result.verdict in ("APPROVED", "CHANGES_REQUESTED")
+        assert result.verdict == "CHANGES_REQUESTED"
 
     async def test_multiple_criteria_all_pass(
         self, service: ValidatorService, provider: FakeProvider
@@ -183,7 +182,13 @@ class TestValidatorService:
         assert "def get(): return 200" in call["user"]
         assert call["max_tokens"] > 0
 
-    async def test_approved_on_llm_failure(self, service: ValidatorService) -> None:
+    async def test_changes_requested_quand_le_provider_est_indisponible(
+        self, service: ValidatorService
+    ) -> None:
+        # Le validateur rendait CHANGES_REQUESTED sur un JSON illisible mais
+        # APPROVED sur un provider en panne : deux pannes, deux verdicts
+        # opposés. Une validation qui n'a pas eu lieu n'approuve rien
+        # (ticket-122).
         class _FailingProvider(FakeProvider):
             async def complete(self, **kwargs):  # type: ignore[override]
                 raise Exception("Network error")
@@ -196,8 +201,9 @@ class TestValidatorService:
             test_result=None,
         )
 
-        assert result.verdict == "APPROVED"
-        assert result.all_passed is True
+        assert result.verdict == "CHANGES_REQUESTED"
+        assert result.all_passed is False
+        assert "Network error" in result.feedback
 
 
 class TestValidationResult:

@@ -102,6 +102,27 @@ async def test_get_ticket_found(tmp_path: Path) -> None:
     assert result.id == "ticket-042"
 
 
+async def test_get_ticket_ne_confond_pas_un_prefixe_d_identifiant(tmp_path: Path) -> None:
+    # `stem.startswith(ticket_id)` : `ticket-1` trouvait `ticket-100`, et
+    # `update_status("ticket-1")` déplaçait le mauvais fichier (ticket-122).
+    _write_ticket(tmp_path / "tickets" / "todo" / "ticket-100-cent.md", "ticket-100")
+
+    assert await _svc(tmp_path).get_ticket("ticket-1") is None
+    with pytest.raises(ValueError):
+        await _svc(tmp_path).update_status("ticket-1", TicketStatus.in_progress)
+
+
+async def test_get_ticket_accepte_l_identifiant_seul_ou_suivi_d_un_slug(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets" / "todo" / "ticket-001.md", "ticket-001")
+    _write_ticket(tmp_path / "tickets" / "todo" / "ticket-002-slug.md", "ticket-002")
+
+    premier = await _svc(tmp_path).get_ticket("ticket-001")
+    second = await _svc(tmp_path).get_ticket("ticket-002")
+
+    assert premier is not None and premier.id == "ticket-001"
+    assert second is not None and second.id == "ticket-002"
+
+
 async def test_get_ticket_not_found(tmp_path: Path) -> None:
     result = await _svc(tmp_path).get_ticket("ticket-999")
     assert result is None
@@ -269,7 +290,8 @@ async def test_rotate_pipeline_log_no_file(tmp_path: Path) -> None:
 
 
 async def test_rotate_pipeline_log_short_file(tmp_path: Path) -> None:
-    log = tmp_path / "pipeline-log.md"
+    log = tmp_path / "memory" / "pipeline-log.md"
+    log.parent.mkdir()
     log.write_text("\n".join(f"line {i}" for i in range(50)), encoding="utf-8")
     original = log.read_text(encoding="utf-8")
 
@@ -278,8 +300,12 @@ async def test_rotate_pipeline_log_short_file(tmp_path: Path) -> None:
     assert log.read_text(encoding="utf-8") == original
 
 
-async def test_rotate_pipeline_log_truncates(tmp_path: Path) -> None:
-    log = tmp_path / "pipeline-log.md"
+async def test_rotate_pipeline_log_agit_sur_memory_pipeline_log(tmp_path: Path) -> None:
+    # La rotation lisait `<projet>/pipeline-log.md` alors que l'orchestrateur
+    # écrit `<projet>/memory/pipeline-log.md` : elle ne tournait jamais sur le
+    # vrai fichier, qui grossissait sans borne (ticket-122).
+    log = tmp_path / "memory" / "pipeline-log.md"
+    log.parent.mkdir()
     lines = [f"line {i}\n" for i in range(300)]
     log.write_text("".join(lines), encoding="utf-8")
 
@@ -289,6 +315,22 @@ async def test_rotate_pipeline_log_truncates(tmp_path: Path) -> None:
     assert len(result) == 200
     assert result[0] == "line 100"
     assert result[-1] == "line 299"
+
+
+async def test_rotate_pipeline_log_accepte_le_chemin_reel(tmp_path: Path) -> None:
+    # L'orchestrateur connaît le chemin qu'il ecrit : il peut le transmettre.
+    log = tmp_path / "ailleurs" / "journal.md"
+    log.parent.mkdir()
+    log.write_text("".join(f"line {i}\n" for i in range(300)), encoding="utf-8")
+
+    await _svc(tmp_path).rotate_pipeline_log(log)
+
+    assert len(log.read_text(encoding="utf-8").splitlines()) == 200
+
+
+# ------------------------------------------------------------------
+# Le dossier fait foi (ticket-059)
+# ------------------------------------------------------------------
 
 
 async def test_ticket_type_couvre_les_types_conventional_commits(tmp_path: Path) -> None:

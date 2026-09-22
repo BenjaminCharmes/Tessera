@@ -10,6 +10,11 @@ _logger = get_logger(__name__)
 
 _DEFAULT_TIMEOUT = 120
 
+# pytest sort 5 quand il n'a collecté aucun test. Ce n'est pas un test rouge :
+# lu comme tel, un projet neuf renvoyait le codeur corriger des tests qui
+# n'existent pas (ticket-122).
+_PYTEST_NO_TESTS_COLLECTED = 5
+
 
 class TestCommandNotFound(Exception):
     # Not a pytest test class despite the "Test" prefix — see TestResult.
@@ -70,8 +75,11 @@ class TestRunnerService:
                 proc.communicate(), timeout=float(timeout)
             )
         except asyncio.TimeoutError:
+            # `kill()` sans `wait()` laisse un zombie et un transport que
+            # asyncio ferme en se plaignant (ticket-122).
             try:
                 proc.kill()
+                await proc.wait()
             except Exception:
                 pass
             duration_ms = int((time.monotonic() - start) * 1000)
@@ -105,6 +113,15 @@ class TestRunnerService:
 
 
 def _parse_output(returncode: int, output: str, duration_ms: int) -> TestResult:
+    if returncode == _PYTEST_NO_TESTS_COLLECTED and "no tests ran" in output.lower():
+        _logger.warning("test_runner_no_tests_collected")
+        return TestResult(
+            passed=True,
+            total=0,
+            failed=0,
+            output_summary="Aucun test collecté (exit 5) — rien à exécuter.",
+            duration_ms=duration_ms,
+        )
     passed = returncode == 0
     total, failed = _extract_counts(output)
     summary = _extract_summary_line(output) or (

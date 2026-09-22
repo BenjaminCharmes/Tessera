@@ -63,12 +63,14 @@ class ValidatorService:
                 max_tokens=_MAX_TOKENS,
             )
         except Exception as exc:
+            # Même régime que le JSON illisible : une validation qui n'a pas
+            # eu lieu n'approuve rien (ticket-122).
             _logger.warning("validator_llm_failed", extra={"error": str(exc)})
             return ValidationResult(
-                all_passed=True,
+                all_passed=False,
                 criteria=[],
-                verdict="APPROVED",
-                feedback="Validation LLM indisponible — approbation par défaut.",
+                verdict="CHANGES_REQUESTED",
+                feedback=f"Validation indisponible : {exc}",
             )
 
         return self._parse_response(result.content)

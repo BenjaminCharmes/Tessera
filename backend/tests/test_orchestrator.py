@@ -193,9 +193,28 @@ def test_parse_verdict_approved() -> None:
     assert reason == ""
 
 
-def test_parse_verdict_approved_case_insensitive() -> None:
+def test_parse_verdict_approved_en_minuscules_n_approuve_pas() -> None:
+    # Le reviewer est prompté pour répondre `APPROVED` en majuscules (ADR-009).
+    # Une correspondance insensible à la casse lisait une phrase de prose
+    # comme un verdict (ticket-122).
     approved, _ = _parse_reviewer_verdict("approved — looks great")
+    assert approved is False
+
+
+def test_parse_verdict_approved_dans_un_mot_n_approuve_pas() -> None:
+    # `"APPROVED" in content.upper()` acceptait « this should not be
+    # approved » — la négation était perdue, et le run passait `done` sur un
+    # refus (ticket-122). Un verdict est un mot entier, en majuscules.
+    approved, _ = _parse_reviewer_verdict("This should not be approved.")
+    assert approved is False
+    approved, _ = _parse_reviewer_verdict("UNAPPROVED")
+    assert approved is False
+
+
+def test_parse_verdict_approved_seul_approuve() -> None:
+    approved, reason = _parse_reviewer_verdict("APPROVED")
     assert approved is True
+    assert reason == ""
 
 
 def test_parse_verdict_changes_requested_with_reason() -> None:

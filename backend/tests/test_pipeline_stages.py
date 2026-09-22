@@ -211,7 +211,7 @@ def test_build_context_sans_message_spontane_est_inchange() -> None:
 
 def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
     # Offrir `ask_user` a un run non interactif promettrait a l'agent une
-    # reponse que personne ne peut donner : il attendrait le delai complet a
+    # réponse que personne ne peut donner : il attendrait le delai complet a
     # chaque question, pour rien (ADR-025).
     from tessera.services.dialogue import DialogueChannel
 
@@ -220,3 +220,60 @@ def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
 
     run.dialogue = DialogueChannel(interactive=True)
     assert stages.asker_for(run) == run.dialogue.ask
+
+
+# ------------------------------------------------------------------
+# Sécurité et validation échouent fermé — ticket-122
+# ------------------------------------------------------------------
+
+
+class _Tickets:
+    def __init__(self) -> None:
+        self.statuts: list[TicketStatus] = []
+
+    async def update_status(self, ticket_id: str, status: TicketStatus) -> None:
+        self.statuts.append(status)
+
+
+class _AuditeurEnPanne:
+    async def audit(self, code_diff: str, project_path: Path) -> object:
+        raise RuntimeError("provider down")
+
+
+class _ValidateurEnPanne:
+    async def validate(self, **kwargs: object) -> object:
+        raise RuntimeError("provider down")
+
+
+async def test_une_panne_de_l_auditeur_bloque_le_run() -> None:
+    # L'exception était avalée et l'audit sauté : un diff non audité arrivait
+    # au reviewer comme s'il était propre. Une panne n'est pas un PASS.
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    run.reviewed_code = "diff"
+    orch = _Orch(
+        _security_auditor=_AuditeurEnPanne(),
+        _project_path=Path("."),
+        _ticket_svc=_Tickets(),
+    )
+
+    result = await stages.run_security_audit(orch, run)
+
+    assert result is not None
+    assert result.final_status is TicketStatus.blocked
+    done = [e for e in events if e.type == EventType.SECURITY_AUDIT_DONE]
+    assert done and done[0].data["verdict"] == "BLOCK"
+    assert "provider down" in done[0].data["reason"]
+    assert [e.type for e in events][-1] is EventType.PIPELINE_DONE
+
+
+async def test_une_panne_du_validateur_demande_des_changements() -> None:
+    # Même raisonnement : l'exception valait approbation.
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    orch = _Orch(_validator=_ValidateurEnPanne())
+
+    approved, reason = await stages.run_validation(orch, run, "")
+
+    assert approved is False
+    assert "provider down" in reason

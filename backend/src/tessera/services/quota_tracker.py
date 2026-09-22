@@ -22,6 +22,9 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 QuotaStatus = Literal["allowed", "allowed_warning", "rejected"]
+_STATUSES: dict[str, QuotaStatus] = {
+    "allowed": "allowed", "allowed_warning": "allowed_warning", "rejected": "rejected",
+}
 
 # Au-delà de cette proportion consommée, le mode autonome s'arrête entre deux
 # tickets. Se faire couper au milieu d'un ticket laisserait son travail non
@@ -50,9 +53,7 @@ def snapshot_from_rate_limit(info: Any) -> Optional[QuotaSnapshot]:
     if not isinstance(utilization, (int, float)):
         return None
 
-    status = getattr(info, "status", "allowed")
-    if status not in ("allowed", "allowed_warning", "rejected"):
-        status = "allowed"
+    status = _STATUSES.get(str(getattr(info, "status", "allowed")), "allowed")
 
     resets_at_raw = getattr(info, "resets_at", None)
     resets_at: datetime | None = None
@@ -64,7 +65,7 @@ def snapshot_from_rate_limit(info: Any) -> Optional[QuotaSnapshot]:
 
     window = getattr(info, "rate_limit_type", None)
     return QuotaSnapshot(
-        status=status,  # type: ignore[arg-type]
+        status=status,
         utilization=float(utilization),
         window=str(window) if window else None,
         resets_at=resets_at,

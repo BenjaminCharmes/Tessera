@@ -114,7 +114,9 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
     # convention de ce dépôt — Conventional Commits — avec le type du ticket
     # plutôt qu'un "feat:" codé en dur, qui mal-étiquetait les fix/chore/docs.
     commit_sha, arret = await commit_ou_bloquer(
-        orch, run, f"{run.ticket.type.value}: {run.ticket_id} — {run.ticket.title}"
+        orch,
+        run,
+        f"{run.ticket.type.value}: {run.ticket_id} — {_single_line(run.ticket.title)}",
     )
     if arret is not None:
         # « Rien à committer » (commit_sha None) reste un succès : le travail

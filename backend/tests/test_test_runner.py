@@ -111,6 +111,42 @@ class TestRunTests:
         assert result.passed is False
         assert "timeout" in result.output_summary.lower()
 
+    async def test_le_processus_tue_est_attendu(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        # Après `proc.kill()` sans `await proc.wait()`, asyncio se plaignait
+        # d'un transport fermé sur un processus encore vivant, et le zombie
+        # restait jusqu'à la fin du serveur (ticket-122).
+        mock_proc = MagicMock()
+        mock_proc.kill = MagicMock()
+        mock_proc.wait = AsyncMock()
+        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            await service.run_tests(python_project, test_command="uv run pytest", timeout=1)
+
+        mock_proc.kill.assert_called_once()
+        mock_proc.wait.assert_awaited_once()
+
+    async def test_aucun_test_collecte_n_est_pas_un_echec(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        # pytest sort 5 quand il n'a rien collecté. Lu comme rouge, un projet
+        # neuf sans test renvoyait le codeur corriger des tests inexistants.
+        mock_proc = MagicMock()
+        mock_proc.returncode = 5
+        mock_proc.communicate = AsyncMock(
+            return_value=(b"no tests ran in 0.01s", b"")
+        )
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            result = await service.run_tests(python_project, test_command="uv run pytest")
+
+        assert result.passed is True
+        assert result.total == 0
+        assert result.failed == 0
+        assert "aucun test" in result.output_summary.lower()
+
     async def test_raises_when_no_command_detectable(
         self, service: TestRunnerService, tmp_path: Path
     ) -> None:

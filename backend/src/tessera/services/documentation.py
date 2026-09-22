@@ -22,6 +22,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -211,7 +212,7 @@ class DocumentationService:
     pour une même feature.
     """
 
-    def __init__(self, provider: object, prompts_dir: Path) -> None:
+    def __init__(self, provider: LLMProvider, prompts_dir: Path) -> None:
         self._provider = provider
         self._prompts_dir = prompts_dir
 
@@ -228,7 +229,7 @@ class DocumentationService:
 
         for role in _ROLES:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
-            reponse = await self._provider.complete(  # type: ignore[attr-defined]
+            reponse = await self._provider.complete(
                 system=systeme,
                 user=brief,
                 model=_MODELE,
