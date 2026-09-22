@@ -245,10 +245,10 @@ Format : ADR léger (Architecture Decision Record).
 
 ## ADR-027 — Les agents ne touchent pas à l'historique git
 
-**Date** : 2026-09-17
-**Décision** : un hook `PreToolUse` refuse à tout agent les commandes git qui écrivent — `commit`, `merge`, `push`, `checkout`, `branch`, `reset`, `add`… Le git en lecture reste permis. Et un run dont le commit **échoue** ne s'annonce pas approuvé.
-**Raison** : au premier usage réel, des agents ont commité, mergé dans `main` et poussé sur GitHub pendant deux runs où l'utilisateur n'avait cliqué que sur « lancer ». ADR-018 et ADR-022 ne contraignaient que `GitWorkspaceService`, or le codeur a `Bash` : une règle contournable en tapant une autre commande n'est pas une règle.
-**Pourquoi un hook** : une entrée d'`allowed_tools` couvrant un outil entier l'auto-approuve *avant* le callback de permission. Un garde posé là serait inerte, avec l'apparence d'une protection.
+**Date** : 2026-09-17 · **Amendée 2026-09-22** (ticket-119).
+**Décision** : un hook `PreToolUse` refuse à tout agent le git et le `gh` qui écrivent, quelle que soit la tournure — chemin, casse, enveloppe, alias. Le git en lecture reste permis. Les fichiers qui portent la politique du run — `agents.json`, `.git/`, `.claude/settings*.json`, `.github/workflows/` — se refusent en écriture ; la politique se lit une fois, avant le premier agent ; l'orchestrateur n'exécute jamais les hooks du dépôt. Un commit qui **échoue** n'approuve pas le run.
+**Raison** : au premier usage réel, des agents ont commité, mergé et poussé sur un simple « lancer ». Le codeur a `Bash` : une règle contournable en tapant une autre commande n'en est pas une. Un hook, parce qu'`allowed_tools` auto-approuve *avant* le callback de permission.
+**Limite** : il attrape une erreur et les tournures triviales, pas une évasion — `python -c` passe (ADR-031).
 
 ## ADR-028 — Travailler dans le dépôt parent se déclare
 

@@ -16,6 +16,7 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers import get_provider
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.run_lock import RUN_LOCK, RunAlreadyInProgress
@@ -115,9 +116,16 @@ async def _build_project_context(project_id: str) -> str:
 
 
 async def _build_orchestrator(project_id: str) -> Orchestrator:
+    project_path = settings.ide_workspace_dir / project_id
+    # La politique du run — autonomie, racine git, artefacts, commande de
+    # tests — se lit **ici**, une fois, avant le premier agent, et voyage vers
+    # chaque service qui en dépend. Relue au moment d'agir, elle obéirait à ce
+    # qu'un codeur aurait écrit dans `agents.json` pendant le run (ticket-119).
+    politique = PolitiqueRun.lire(project_path)
     provider = get_provider(
         settings.llm_provider, settings.anthropic_api_key,
         max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        racine_ecriture=politique.racine_ecriture(project_path),
     )
     # Pure text-in/JSON-out services (security_auditor, validator,
     # documentation) have no use for file/shell tools — they write
@@ -130,7 +138,6 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         allow_tools=False,
     )
     registry = AgentRegistryService(settings.ide_prompts_dir)
-    project_path = settings.ide_workspace_dir / project_id
     runner = AgentRunner(
         provider, registry, db_path=settings.ide_db_path, project_path=project_path
     )
@@ -153,7 +160,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         else None
     )
 
-    git_workspace = GitWorkspaceService(project_path)
+    git_workspace = GitWorkspaceService(project_path, politique=politique)
 
     return Orchestrator(
         runner=runner,
@@ -163,7 +170,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         pipeline_log_path=project_path / "memory" / "pipeline-log.md",
         max_review_rounds=pipeline_cfg.max_review_rounds,
         test_runner=test_runner,
-        test_command=pipeline_cfg.test_command,
+        test_command=politique.test_command,
         security_auditor=security_auditor,
         validator=validator,
         project_path=project_path,
@@ -173,7 +180,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
-        livrer=_livreur(project_id, runner),
+        livrer=_livreur(project_id, runner, politique),
         documenter=_documenteur(project_id),
         run_recorder=RunRecorder(settings.ide_db_path),
     )
@@ -208,7 +215,9 @@ def _documenteur(project_id: str) -> Callable[[], Awaitable[None]]:
 
 
 def _livreur(
-    project_id: str, runner: AgentRunner | None = None
+    project_id: str,
+    runner: AgentRunner | None = None,
+    politique: PolitiqueRun | None = None,
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison d'un projet, telle que l'orchestrateur l'appelle.
 
@@ -229,15 +238,17 @@ def _livreur(
         github = GitHubService(token=settings.github_token, repo=project.github_remote)
 
     service = LivraisonService(
-        git_workspace=GitWorkspaceService(project_path),
+        git_workspace=GitWorkspaceService(project_path, politique=politique),
         workflow=GitHubWorkflowService(
-            git_workspace=GitWorkspaceService(project_path),
+            git_workspace=GitWorkspaceService(project_path, politique=politique),
             github=github,
             base_branch=settings.github_base_branch,
             project_path=project_path,
+            politique=politique,
         ),
         project_path=project_path,
         base_branch=settings.github_base_branch,
+        politique=politique,
         # Sans runner — appel programmatique, test — pas de résolveur : le
         # conflit annule le rebase et remonte, comme avant ticket-090.
         resolveur=(

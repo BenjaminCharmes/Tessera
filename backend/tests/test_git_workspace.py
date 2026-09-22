@@ -548,3 +548,33 @@ async def test_sans_resolveur_le_comportement_ne_change_pas(repo: Path) -> None:
 
     assert conflits == ("partage.py",)
     assert await service.is_clean()
+
+
+# ------------------------------------------------------------------
+# Un hook déposé par l'agent ne s'exécute pas — ticket-119
+# ------------------------------------------------------------------
+
+
+async def test_un_pre_commit_depose_dans_le_depot_n_est_pas_execute(repo: Path) -> None:
+    # `commit_all` lance `git commit` dans le process de l'orchestrateur, sous
+    # l'identité de l'utilisateur. Un `pre-commit` écrit par un agent pendant
+    # le run s'exécutait donc à la fin du run, sans qu'une seule commande git
+    # ait transité par `Bash` : ADR-027 contourné par un fichier.
+    marqueur = repo.parent / "le-hook-a-tourne"
+    hooks = repo / ".git" / "hooks"
+    hooks.mkdir(exist_ok=True)
+    chemin_marqueur = marqueur.as_posix()
+    (hooks / "pre-commit").write_text(
+        f"#!/bin/sh\necho pwned > '{chemin_marqueur}'\nexit 0\n", encoding="utf-8"
+    )
+    (hooks / "pre-commit").chmod(0o755)
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-119", "hooks")
+    # Écrit après `create_branch` : un fichier déjà là au départ compte comme
+    # non-suivi préexistant, donc pas comme le travail du run.
+    (repo / "travail.py").write_text("x = 1\n", encoding="utf-8")
+    sha = await service.commit_all("feat: travail")
+
+    assert sha is not None
+    assert not marqueur.exists(), "le hook du dépôt a été exécuté par l'orchestrateur"

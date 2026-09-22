@@ -20,6 +20,7 @@ from typing import Any
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
+from tessera.services.providers import git_guard_lexique as lexique
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -44,40 +45,34 @@ GIT_REFUS = (
 #: Options globales de git qui précèdent la sous-commande.
 _OPTIONS_GLOBALES_AVEC_VALEUR = frozenset({"-C", "-c", "--git-dir", "--work-tree"})
 
-#: Ce qui sépare deux commandes dans une ligne de shell.
-_SEPARATEURS = (";", "&&", "||", "|", "&")
+#: Les sous-commandes `gh` qui écrivent sur GitHub : ouvrir ou merger une PR,
+#: appeler l'API, toucher au dépôt, à une release, déclencher un workflow.
+#: `gh pr view` tombe aussi — la lecture GitHub n'est pas ce qui manque à un
+#: agent, et distinguer `view` de `merge` sous-commande par sous-commande
+#: multiplierait les formes à connaître (ticket-119).
+_SOUS_COMMANDES_GH_INTERDITES = frozenset({"pr", "api", "repo", "release", "workflow"})
 
 
-def _segments(commande: str) -> list[str]:
-    """Découpe la ligne en commandes élémentaires.
+def _sous_commande_git(arguments: list[str]) -> str | None:
+    """La sous-commande d'un `git …`, ou `None` s'il n'y en a pas.
 
-    `cd frontend && git push` est la forme la plus naturelle pour contourner un
-    contrôle qui ne regarderait que le début de la ligne.
+    Lève le drapeau `alias` si un `-c alias.x=…` précède : `git -c
+    alias.p=push p` est un push sous un autre nom.
     """
-    morceaux = [commande]
-    for separateur in _SEPARATEURS:
-        suivants: list[str] = []
-        for morceau in morceaux:
-            suivants.extend(morceau.split(separateur))
-        morceaux = suivants
-    return morceaux
-
-
-def _sous_commande(segment: str) -> str | None:
-    """La sous-commande git d'un segment, ou None si ce n'est pas un git."""
-    jetons = segment.split()
-    if not jetons or jetons[0] != "git":
-        return None
-
-    i = 1
-    while i < len(jetons):
-        jeton = jetons[i]
+    i = 0
+    while i < len(arguments):
+        jeton = arguments[i]
         if jeton.startswith("--") and "=" in jeton:
             i += 1  # --git-dir=.git : la valeur est collée
             continue
         if jeton in _OPTIONS_GLOBALES_AVEC_VALEUR:
+            valeur = arguments[i + 1] if i + 1 < len(arguments) else ""
+            if jeton == "-c" and valeur.lower().startswith("alias."):
+                return "alias"
             i += 2  # -C /chemin : la valeur est le jeton suivant
             continue
+        if jeton.startswith("-c") and len(jeton) > 2 and jeton[2:].lower().startswith("alias."):
+            return "alias"
         if jeton.startswith("-"):
             i += 1
             continue
@@ -85,18 +80,38 @@ def _sous_commande(segment: str) -> str | None:
     return None
 
 
+def _segment_interdit(jetons_: list[str]) -> bool:
+    """True si ce segment, une fois déballé, est un git ou un gh qui écrit."""
+    while jetons_:
+        nom = lexique.nom_de_commande(jetons_[0])
+        if nom in lexique.SHELLS:
+            ligne = lexique.ligne_derriere_c(jetons_)
+            return ligne is not None and commande_git_interdite(ligne)
+        if nom == "eval":
+            return commande_git_interdite(" ".join(jetons_[1:]))
+        if nom in lexique.ENVELOPPES:
+            jetons_ = lexique.sans_enveloppe(jetons_)
+            continue
+        if nom == "git":
+            sous = _sous_commande_git(jetons_[1:])
+            return sous == "alias" or sous in _SOUS_COMMANDES_INTERDITES
+        if nom == "gh":
+            premier = next((j.lower() for j in jetons_[1:] if not j.startswith("-")), None)
+            return premier in _SOUS_COMMANDES_GH_INTERDITES
+        return False
+    return False
+
+
 def commande_git_interdite(commande: str) -> bool:
-    """True si `commande` contient un git qui modifie l'historique.
+    """True si `commande` contient un git — ou un gh — qui écrit.
 
     Tokenise plutôt que de chercher un motif : une expression régulière sur une
     ligne de shell rate toujours une forme, et ici rater une forme veut dire
-    laisser un agent pousser sur le dépôt d'un client.
+    laisser un agent pousser sur le dépôt d'un client. Chaque segment est
+    déballé de ses enveloppes (`env`, `sudo`, `sh -c`…) avant d'être lu ; les
+    formes qui passaient avant ticket-119 sont dans `test_git_guard.py`.
     """
-    for segment in _segments(commande):
-        sous_commande = _sous_commande(segment.strip())
-        if sous_commande is not None and sous_commande in _SOUS_COMMANDES_INTERDITES:
-            return True
-    return False
+    return any(_segment_interdit(lexique.jetons(s)) for s in lexique.segments(commande))
 
 
 async def hook_refus_git(

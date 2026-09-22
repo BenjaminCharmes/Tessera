@@ -141,3 +141,65 @@ def test_le_hook_est_installe_sur_chaque_appel_d_agent() -> None:
     assert matchers, "aucun hook PreToolUse installe"
     callbacks = [cb for m in matchers for cb in m.hooks]
     assert any(cb.__name__ == "hook_refus_git" for cb in callbacks), callbacks
+
+
+# ------------------------------------------------------------------
+# Les tournures triviales — ticket-119
+# ------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "ls\ngit push",
+        "ls\r\ngit push",
+        "env git push",
+        "sh -c 'git push'",
+        "bash -c \"cd src && git commit -m x\"",
+        "git -c alias.p=push p",
+        "/usr/bin/git push",
+        "git.exe push",
+        "GIT push",
+        "gh pr merge 12",
+        "gh api -X PUT repos/o/r/pulls/12/merge",
+        "gh repo delete o/r",
+        "command git push",
+        "exec git push",
+        "eval 'git push'",
+        "echo x | xargs git commit -m",
+        "time git push",
+        "nohup git push &",
+        "timeout 30 git push",
+        "sudo git push",
+        "echo $(git push)",
+        r'"C:\Program Files\Git\bin\git.exe" push',
+        "(cd src && git push)",
+        "env FOO=bar git push",
+    ],
+)
+def test_les_tournures_triviales_sont_refusees(commande: str) -> None:
+    # Vérifié en exécution avant ticket-119 : chacune de ces formes passait le
+    # garde. Un garde qu'un retour à la ligne ou un `env` suffit à contourner
+    # n'est pas un garde — il donne l'apparence d'une protection (ADR-027).
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "git status",
+        "git log",
+        "git diff",
+        "echo git push",
+        "git -c color.ui=false log --oneline",
+        "sh -c 'git status'",
+        "gh auth status",
+        "grep -r 'git push' docs/",
+        "cat notes.md\ngit diff --stat",
+    ],
+)
+def test_le_durcissement_ne_refuse_pas_la_lecture(commande: str) -> None:
+    # Un faux refus prive l'agent de son moyen de vérifier son travail. Le
+    # durcissement porte sur la *forme* d'appel, pas sur ce que git a le droit
+    # de faire : lire reste lire, même derrière un `sh -c`.
+    assert commande_git_interdite(commande) is False

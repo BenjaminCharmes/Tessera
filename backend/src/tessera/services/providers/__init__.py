@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from anthropic import AsyncAnthropic
 
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
@@ -28,6 +30,7 @@ def get_provider(
     max_budget_usd: float | None = None,
     allow_tools: bool = True,
     tools: list[str] | None = None,
+    racine_ecriture: Path | None = None,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -48,10 +51,16 @@ def get_provider(
     ``tools`` names an explicit subset, for callers that need *some* tools but
     not all of them — the chat of ticket-048 takes the file tools and no shell
     one. It wins over ``allow_tools``, which is all-or-nothing.
+
+    ``racine_ecriture`` is the write root a pipeline run froze before its
+    first agent (ticket-119); only the SDK provider has a perimeter hook to
+    hand it to.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
         kwargs: dict[str, object] = {}
+        if racine_ecriture is not None:
+            kwargs["racine_ecriture"] = racine_ecriture
         if max_turns is not None:
             kwargs["max_turns"] = max_turns
         if max_budget_usd is not None:

@@ -22,9 +22,9 @@ from pathlib import Path
 from tessera.services.autonomie import (
     NiveauAutonomie,
     lire_niveau,
-    peut_merger,
-    peut_pousser,
+    niveau_peut_merger,
 )
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.sync_map import SyncMapService
 from tessera.utils.logger import get_logger
 
@@ -114,11 +114,22 @@ class GitHubWorkflowService:
         github: Optional[_GitHub],
         base_branch: str,
         project_path: Path | None = None,
+        politique: PolitiqueRun | None = None,
     ) -> None:
         self._git = git_workspace
         self._github = github
         self._base_branch = base_branch
         self._project_path = project_path
+        # Figée par l'orchestrateur avant le premier agent (ticket-119). Sans
+        # elle — geste demandé depuis l'IDE — le fichier fait foi, comme avant.
+        self._politique = politique
+
+    def _niveau(self) -> NiveauAutonomie:
+        """Le niveau qui vaut pour cet appel : figé s'il l'a été, lu sinon."""
+        if self._politique is not None:
+            return self._politique.autonomy
+        assert self._project_path is not None
+        return lire_niveau(self._project_path)
 
     async def open_pull_request(
         self,
@@ -142,7 +153,7 @@ class GitHubWorkflowService:
         decision de l'utilisateur, et ne se lui refuse pas.
         """
         if autonome and self._project_path is not None:
-            if not peut_pousser(self._project_path):
+            if self._niveau() not in (NiveauAutonomie.pr, NiveauAutonomie.merge):
                 raise WorkflowError(
                     "Ce projet ne laisse pas l'IDE pousser tout seul. Le travail "
                     "est commité sur sa branche ; à toi de pousser. Pour changer "
@@ -219,12 +230,12 @@ class GitHubWorkflowService:
         # La declaration se lit avant l'appel reseau : sur la grande majorite
         # des projets elle suffit a repondre, et interroger GitHub pour un
         # merge qui ne se fera de toute facon pas est du bruit.
-        if lire_niveau(self._project_path) is not NiveauAutonomie.merge:
+        if self._niveau() is not NiveauAutonomie.merge:
             return False
 
         statut = await self._github.get_pull_request_status(pr_number)
         ci = str(getattr(statut, "ci_status", "none"))
-        if not peut_merger(self._project_path, ci_status=ci):
+        if not niveau_peut_merger(self._niveau(), ci_status=ci):
             _logger.info(
                 "merge_refuse",
                 extra={"pr": pr_number, "ci": ci, "projet": str(self._project_path)},

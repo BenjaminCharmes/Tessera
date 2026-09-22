@@ -7,10 +7,15 @@ diff (including untracked files) and commit the work.
 import asyncio
 import json
 import re
+import tempfile
 from collections.abc import Awaitable, Callable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tessera.utils.logger import get_logger
+
+if TYPE_CHECKING:
+    from tessera.services.politique_run import PolitiqueRun
 
 _MAX_BRANCH_LENGTH = 60
 
@@ -107,11 +112,32 @@ _logger = get_logger(__name__)
 _MARQUEUR_CONFLIT = "<" * 7
 
 
+def _dossier_sans_hooks() -> Path:
+    """Un dossier vide, hors de tout projet, à donner comme `core.hooksPath`.
+
+    Un chemin inexistant ferait aussi l'affaire pour git, mais un dossier qui
+    existe et qu'on contrôle ne laisse aucune place à l'interprétation. Créé à
+    la demande : `tempfile.gettempdir()` n'est pas connu au chargement du
+    module sur toutes les plateformes.
+    """
+    dossier = Path(tempfile.gettempdir()) / "tessera-sans-hooks"
+    dossier.mkdir(parents=True, exist_ok=True)
+    return dossier
+
+
 class GitWorkspaceService:
     """Drives git on a single workspace project, never on Tessera itself."""
 
-    def __init__(self, project_path: Path) -> None:
+    def __init__(
+        self, project_path: Path, politique: "PolitiqueRun | None" = None
+    ) -> None:
         self._project_path = project_path
+        # `git_root` décide d'où l'on stage (`.` ou `:/`). Figé par
+        # l'orchestrateur avant le premier agent : lu au moment de committer,
+        # il obéirait à ce qu'un codeur aurait écrit dans `agents.json` pendant
+        # le run (ticket-119). Sans politique — chat, endpoints — on lit le
+        # fichier, comme avant.
+        self._politique = politique
         # The ref checked out the first time this service touches the repo.
         # Every subsequent ticket branch forks from this ref, never from the
         # previously created ticket branch — otherwise ticket N would carry
@@ -426,6 +452,8 @@ class GitWorkspaceService:
         mode des artefacts — le défaut protège, le cas particulier s'énonce
         (ticket-081).
         """
+        if self._politique is not None:
+            return self._politique.dans_le_depot_parent
         agents_json = self._project_path / "agents.json"
         if not agents_json.is_file():
             return False
@@ -493,7 +521,16 @@ class GitWorkspaceService:
         )
 
     async def _run(self, *args: str) -> str:
-        command = ["git", *args]
+        # Les hooks du dépôt ne tournent jamais depuis l'orchestrateur. Ils
+        # vivent sous la racine du projet, donc à portée d'un agent : un
+        # `pre-commit` déposé pendant le run s'exécutait au commit de fin de
+        # run, sous l'identité de l'utilisateur, sans qu'une seule commande
+        # git ait transité par `Bash` (ticket-119). Le hook de périmètre
+        # refuse désormais `.git/`, mais un fichier arrivé par un autre chemin
+        # — `python -c`, un clone déjà piégé — ne doit pas tourner non plus.
+        # `-c` prime sur `.git/config`, donc sur un `core.hooksPath` qu'un
+        # agent y aurait écrit.
+        command = ["git", "-c", f"core.hooksPath={_dossier_sans_hooks()}", *args]
         proc = await asyncio.create_subprocess_exec(
             *command,
             cwd=str(self._project_path),
