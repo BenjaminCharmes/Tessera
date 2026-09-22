@@ -28,6 +28,16 @@ vi.mock("../lib/api", () => ({
   },
 }));
 
+
+/** Une promesse qu'on résout à la main, pour ordonner les réponses. */
+function differee<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
 describe("useUsage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -81,6 +91,37 @@ describe("useUsage", () => {
     const { result } = renderHook(() => useUsage("proj-1"));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe("Unknown error");
+  });
+
+  it("garde l'usage du second projet si la réponse du premier arrive après (ticket-123)", async () => {
+    // Même panne que pour les runs : sans annulation, la dépense affichée sous
+    // un projet pouvait être celle du projet précédent.
+    const lente = differee<ProjectUsage>();
+    const rapide = differee<ProjectUsage>();
+    vi.mocked(apiModule.api.usage.get)
+      .mockImplementationOnce(() => lente.promise)
+      .mockImplementationOnce(() => rapide.promise);
+    const usageP2: ProjectUsage = { ...USAGE, total_runs: 99 };
+
+    const { result, rerender } = renderHook(
+      ({ id }: { id: string }) => useUsage(id),
+      { initialProps: { id: "proj-1" } },
+    );
+    act(() => {
+      rerender({ id: "proj-2" });
+    });
+
+    await act(async () => {
+      rapide.resolve(usageP2);
+      await rapide.promise;
+    });
+    await act(async () => {
+      lente.resolve(USAGE);
+      await lente.promise;
+    });
+
+    expect(result.current.usage).toEqual(usageP2);
+    expect(result.current.loading).toBe(false);
   });
 
   it("clears usage when projectId changes to null", async () => {

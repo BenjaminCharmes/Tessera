@@ -64,6 +64,68 @@ describe("TicketCard", () => {
     expect(onSelect).toHaveBeenCalledWith(base);
   });
 
+  it("s'ouvre à la touche Entrée et à Espace (ticket-123)", () => {
+    // La carte était un `div onClick` : invisible au clavier.
+    const onSelect = vi.fn();
+    render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning={false}
+        onSelect={onSelect}
+        onRun={vi.fn()}
+      />,
+    );
+    const carte = screen.getByRole("button", { name: /Add authentication module/ });
+    expect(carte).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(carte, { key: "Enter" });
+    fireEvent.keyDown(carte, { key: " " });
+    expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("une touche dans un bouton interne n'ouvre pas la carte", () => {
+    const onSelect = vi.fn();
+    render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning={false}
+        onSelect={onSelect}
+        onRun={vi.fn()}
+      />,
+    );
+    fireEvent.keyDown(screen.getByRole("button", { name: "Lancer le pipeline" }), {
+      key: "Enter",
+    });
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("compte les tours seulement quand le maximum est connu (ticket-123)", () => {
+    const { rerender } = render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning
+        runningRound={2}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("tour 2")).toBeInTheDocument();
+    rerender(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning
+        runningRound={2}
+        maxRounds={3}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("tour 2/3")).toBeInTheDocument();
+  });
+
   it("calls onRun with ticket id when run button clicked", () => {
     const onRun = vi.fn();
     render(

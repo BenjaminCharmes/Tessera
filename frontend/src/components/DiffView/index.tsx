@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
+import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
 import { decouperDiff } from "./parse";
@@ -29,33 +30,27 @@ interface DiffViewProps {
 }
 
 export default function DiffView({ projectId, ticketId }: DiffViewProps) {
-  const [resultat, setResultat] = useState<TicketDiff | null>(null);
-  const [erreur, setErreur] = useState<string | null>(null);
-  const [actif, setActif] = useState(0);
+  const fetcher = useMemo(
+    () => () => api.tickets.diff(projectId, ticketId),
+    [projectId, ticketId],
+  );
+  const { data: resultat, error: erreur } = useResource<TicketDiff | null>(
+    fetcher,
+    null,
+  );
+  // Le fichier choisi est clé par ticket : changer de ticket revient au
+  // premier fichier sans qu'un effet ait à le remettre à zéro (ticket-123).
+  const cle = `${projectId}/${ticketId}`;
+  const [choix, setChoix] = useState<{ cle: string; index: number } | null>(
+    null,
+  );
+  const actif = choix?.cle === cle ? choix.index : 0;
 
   const fichiers = useMemo(
     () => decouperDiff(resultat?.diff ?? ""),
     [resultat?.diff],
   );
   const fichier = fichiers[actif];
-
-  useEffect(() => {
-    let annule = false;
-    setResultat(null);
-    setErreur(null);
-    setActif(0);
-    void (async () => {
-      try {
-        const d = await api.tickets.diff(projectId, ticketId);
-        if (!annule) setResultat(d);
-      } catch (err: unknown) {
-        if (!annule) setErreur(err instanceof Error ? err.message : String(err));
-      }
-    })();
-    return () => {
-      annule = true;
-    };
-  }, [projectId, ticketId]);
 
   return (
     <div className="flex h-full flex-col bg-zinc-900">
@@ -97,7 +92,7 @@ export default function DiffView({ projectId, ticketId }: DiffViewProps) {
             <li key={f.chemin}>
               <button
                 type="button"
-                onClick={() => setActif(i)}
+                onClick={() => setChoix({ cle, index: i })}
                 className={`flex items-center gap-1.5 rounded px-2 py-1 font-mono text-micro transition-colors ${
                   i === actif
                     ? "bg-violet-500/15 text-violet-200 ring-1 ring-inset ring-violet-500/40"

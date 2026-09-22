@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
+import { useResource } from "../../hooks/useResource";
 import type { ProjectAgents } from "../../types/api";
 
 /**
@@ -23,36 +24,38 @@ interface ModelPickerProps {
 }
 
 export default function ModelPicker({ projectId, role }: ModelPickerProps) {
-  const [data, setData] = useState<ProjectAgents | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  // La lecture est par projet, pas par agent : changer d'agent ne relit rien.
+  const fetcher = useMemo(() => () => api.git.agents(projectId), [projectId]);
+  const charge = useResource<ProjectAgents | null>(fetcher, null);
+  // Ce que le dernier enregistrement a rendu, s'il porte sur ce projet ; le
+  // message est clé de la même façon pour disparaître au changement d'agent
+  // sans `setState` dans un effet (ticket-123).
+  const cle = `${projectId}/${role}`;
+  const [modifie, setModifie] = useState<{
+    projectId: string;
+    data: ProjectAgents;
+  } | null>(null);
+  const [message, setMessage] = useState<{ cle: string; texte: string } | null>(
+    null,
+  );
 
-  useEffect(() => {
-    let annule = false;
-    setData(null);
-    setMessage(null);
-    void (async () => {
-      try {
-        const d = await api.git.agents(projectId);
-        if (!annule) setData(d);
-      } catch {
-        if (!annule) setData(null);
-      }
-    })();
-    return () => {
-      annule = true;
-    };
-  }, [projectId, role]);
-
+  const data = modifie?.projectId === projectId ? modifie.data : charge.data;
   const config = data?.agents.find((a) => a.role === role);
   if (!data || !config) return null;
 
   async function changer(model: string) {
     setMessage(null);
     try {
-      setData(await api.git.setAgentModel(projectId, role, model));
-      setMessage("Enregistré. Il s'applique au prochain appel.");
+      setModifie({
+        projectId,
+        data: await api.git.setAgentModel(projectId, role, model),
+      });
+      setMessage({ cle, texte: "Enregistré. Il s'applique au prochain appel." });
     } catch (err: unknown) {
-      setMessage(err instanceof Error ? err.message : String(err));
+      setMessage({
+        cle,
+        texte: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 
@@ -73,7 +76,9 @@ export default function ModelPicker({ projectId, role }: ModelPickerProps) {
           </option>
         ))}
       </select>
-      {message && <span className="text-micro text-zinc-500">{message}</span>}
+      {message?.cle === cle && (
+        <span className="text-micro text-zinc-500">{message.texte}</span>
+      )}
     </div>
   );
 }

@@ -82,6 +82,9 @@ jobs:
       - name: Type check
         run: cd frontend && npm run typecheck
 
+      - name: Lint
+        run: cd frontend && npm run lint
+
       - name: Unit tests with coverage
         run: cd frontend && npm run test:coverage
 

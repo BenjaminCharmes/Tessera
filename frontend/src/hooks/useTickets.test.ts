@@ -130,6 +130,41 @@ describe("useTickets", () => {
     expect(apiModule.api.tickets.list).toHaveBeenCalledTimes(1);
   });
 
+  it("traite un ticket_status_changed reçu après que le flux a été vidé (ticket-123)", async () => {
+    // `processedEventsRef` n'était remis à jour que si de nouveaux événements
+    // arrivaient : après `stream.clear()` (events = []), il gardait l'ancien
+    // compte, et les premiers événements du run suivant étaient ignorés
+    // parce que `events.slice(ancien)` rendait un tableau vide.
+    const premier = makeEvent("ticket_status_changed", { status: "in-progress" });
+    const second = makeEvent("ticket_status_changed", { status: "in-review" });
+
+    const { result, rerender } = renderHook(
+      ({ events }: { events: OrchestratorEvent[] }) =>
+        useTickets("proj-1", false, events),
+      { initialProps: { events: [] as OrchestratorEvent[] } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      rerender({ events: [premier, premier, premier] });
+    });
+    expect(
+      result.current.tickets.find((t) => t.id === "ticket-001")?.status,
+    ).toBe("in-progress");
+
+    // clear() : le flux repart de zéro.
+    act(() => {
+      rerender({ events: [] });
+    });
+    act(() => {
+      rerender({ events: [second] });
+    });
+
+    expect(
+      result.current.tickets.find((t) => t.id === "ticket-001")?.status,
+    ).toBe("in-review");
+  });
+
   it("ignores events with unknown type", async () => {
     const event = makeEvent("agent_started", { round: 1 });
     const { result, rerender } = renderHook(

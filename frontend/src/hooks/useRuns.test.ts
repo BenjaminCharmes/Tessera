@@ -34,6 +34,16 @@ vi.mock("../lib/api", () => ({
   },
 }));
 
+
+/** Une promesse qu'on résout à la main, pour ordonner les réponses. */
+function differee<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
 describe("useRuns", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -79,6 +89,37 @@ describe("useRuns", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe("Network error");
     expect(result.current.runs).toHaveLength(0);
+  });
+
+  it("garde les runs du second projet si la réponse du premier arrive après (ticket-123)", async () => {
+    // Le hook n'annulait rien au changement de projet : la réponse lente du
+    // projet quitté écrasait celle du projet courant, et l'historique affiché
+    // sous « proj-2 » était celui de « proj-1 ».
+    const lente = differee<PipelineRun[]>();
+    const rapide = differee<PipelineRun[]>();
+    vi.mocked(apiModule.api.runs.list)
+      .mockImplementationOnce(() => lente.promise)
+      .mockImplementationOnce(() => rapide.promise);
+
+    const { result, rerender } = renderHook(
+      ({ id }: { id: string }) => useRuns(id),
+      { initialProps: { id: "proj-1" } },
+    );
+    act(() => {
+      rerender({ id: "proj-2" });
+    });
+
+    await act(async () => {
+      rapide.resolve([RUN_2]);
+      await rapide.promise;
+    });
+    await act(async () => {
+      lente.resolve([RUN_1]);
+      await lente.promise;
+    });
+
+    expect(result.current.runs).toEqual([RUN_2]);
+    expect(result.current.loading).toBe(false);
   });
 
   it("re-fetches when projectId changes", async () => {

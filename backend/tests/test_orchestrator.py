@@ -415,6 +415,54 @@ async def test_run_pipeline_cree_une_branche_et_emet_l_event(tmp_path: Path) -> 
     assert result.branch == branch_events[0].data["branch"]
 
 
+async def test_pipeline_done_porte_la_branche_du_run(tmp_path: Path) -> None:
+    """`pipeline_done` carries the run branch, so the UI can open the PR from it."""
+    # Sans ce champ, l'UI reconstruisait `PipelineResult` sans branche et
+    # affichait « Lance d'abord le pipeline » après un run approuvé, bouton PR
+    # grisé — alors que la branche existait bel et bien (ticket-123).
+    events: list[OrchestratorEvent] = []
+
+    class FakeGit:
+        async def create_branch(self, ticket_id: str, slug: str) -> str:
+            return f"{ticket_id}-{slug}"
+
+        async def current_diff(self) -> str:
+            return ""
+
+        async def is_clean(self) -> bool:
+            return True
+
+        async def commit_all(self, message: str) -> str | None:
+            return None
+
+    ticket = _make_ticket()
+    svc = AsyncMock()
+    svc.get_ticket.return_value = ticket
+    svc.update_status.return_value = ticket
+
+    runner = MagicMock()
+    runner.run = AsyncMock(
+        side_effect=[
+            _make_agent_result("def foo(): pass", AgentRole.codeur),
+            _make_agent_result("APPROVED", AgentRole.reviewer),
+        ]
+    )
+
+    orchestrator = _make_orchestrator(
+        tmp_path, runner=runner, ticket_service=svc, git_workspace=FakeGit()
+    )
+
+    async def on_event(event: OrchestratorEvent) -> None:
+        events.append(event)
+
+    result = await orchestrator.run_pipeline("projet", "ticket-001", on_event)
+
+    done = [e for e in events if e.type == EventType.PIPELINE_DONE]
+    assert len(done) == 1
+    assert done[0].data["branch"] == result.branch
+    assert result.branch is not None
+
+
 async def test_run_pipeline_sans_git_workspace_reste_fonctionnel(tmp_path: Path) -> None:
     """git_workspace is optional: without it the pipeline runs as before."""
     events: list[OrchestratorEvent] = []

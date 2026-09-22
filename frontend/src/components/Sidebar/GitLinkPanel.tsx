@@ -1,7 +1,8 @@
 import BranchCleanup from "./BranchCleanup";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { api } from "../../lib/api";
 import { useGitStatus } from "../../hooks/useGitStatus";
+import { useResource } from "../../hooks/useResource";
 import RemoveProjectModal from "./RemoveProjectModal";
 import type { ArtifactMode, ArtifactModeState, Project } from "../../types/api";
 
@@ -19,35 +20,42 @@ interface GitLinkPanelProps {
 export default function GitLinkPanel({ project }: GitLinkPanelProps) {
   const git = useGitStatus(project?.id ?? null);
   const [repoUrl, setRepoUrl] = useState("");
-  const [artifacts, setArtifacts] = useState<ArtifactModeState | null>(null);
   const [removing, setRemoving] = useState(false);
 
   const projectId = project?.id ?? null;
 
-  useEffect(() => {
-    if (!projectId) {
-      setArtifacts(null);
-      return;
-    }
-    let cancelled = false;
-    api.git
-      .artifacts(projectId)
-      .then((state) => !cancelled && setArtifacts(state))
-      .catch(() => !cancelled && setArtifacts(null));
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId, git.status]);
+  // Le mode des artefacts se relit avec le statut git : un `init` ou un lien
+  // change ce que l'exclusion peut faire. Le statut fait donc partie de la clé
+  // de la requête, même si la requête ne le lit pas (ticket-123).
+  const statut = git.status;
+  const fetcher = useMemo(
+    () =>
+      projectId
+        ? () => {
+            void statut;
+            return api.git.artifacts(projectId);
+          }
+        : null,
+    [projectId, statut],
+  );
+  const charge = useResource<ArtifactModeState | null>(fetcher, null);
+  /** Ce que le dernier changement de mode a rendu, prioritaire sur la lecture. */
+  const [modifie, setModifie] = useState<{
+    fetcher: () => Promise<ArtifactModeState>;
+    state: ArtifactModeState;
+  } | null>(null);
+  const artifacts =
+    fetcher && modifie?.fetcher === fetcher ? modifie.state : charge.data;
 
   const changeMode = useCallback(
     (mode: ArtifactMode) => {
-      if (!projectId) return;
+      if (!projectId || !fetcher) return;
       void api.git
         .setArtifacts(projectId, mode)
-        .then(setArtifacts)
+        .then((state) => setModifie({ fetcher, state }))
         .catch(() => undefined);
     },
-    [projectId],
+    [projectId, fetcher],
   );
 
   if (!project) return null;

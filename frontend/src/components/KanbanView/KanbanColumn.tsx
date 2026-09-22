@@ -17,8 +17,10 @@ interface KanbanColumnProps {
   tickets: Ticket[];
   activeTicket: Ticket | null;
   running: Set<string>;
+  githubRemote?: string | null;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
+  onPrCreated?: (ticketId: string, prNumber: number) => void;
 }
 
 export default function KanbanColumn({
@@ -26,8 +28,10 @@ export default function KanbanColumn({
   tickets,
   activeTicket,
   running,
+  githubRemote,
   onSelectTicket,
   onRunPipeline,
+  onPrCreated,
 }: KanbanColumnProps) {
   return (
     <div className="flex flex-col flex-1 min-w-[200px] border-r border-zinc-700 last:border-r-0">
@@ -49,6 +53,8 @@ export default function KanbanColumn({
               ticket={ticket}
               isActive={activeTicket?.id === ticket.id}
               isRunning={running.has(ticket.id)}
+              githubRemote={githubRemote}
+              onPrCreated={onPrCreated}
               onSelect={onSelectTicket}
               onRun={onRunPipeline}
             />

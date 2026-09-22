@@ -85,32 +85,39 @@ export default function ProjectNav({
             </button>
           </div>
         )}
+        {/* Le lien GitHub est un voisin du bouton, pas son enfant : un `<a>`
+            dans un `<button>` est du HTML invalide, et deux cibles imbriquées
+            se disputent le clic et le focus (ticket-123). */}
         {projects.map((project) => (
-          <button
+          <div
             key={project.id}
-            onClick={() => onSelectProject(project)}
-            className={`w-full text-left px-3 py-2 flex items-center gap-2 transition-colors ${
+            className={`flex items-center transition-colors ${
               activeProject?.id === project.id
                 ? "bg-zinc-700 text-white"
                 : "hover:bg-zinc-800 text-zinc-300"
             }`}
           >
-            <IconProject size={12} className="shrink-0 text-zinc-500" />
-            <span className="truncate flex-1">{project.name}</span>
+            <button
+              type="button"
+              onClick={() => onSelectProject(project)}
+              className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left"
+            >
+              <IconProject size={12} className="shrink-0 text-zinc-500" />
+              <span className="truncate flex-1">{project.name}</span>
+            </button>
             {project.github_remote && (
               <a
                 href={project.github_remote}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="text-zinc-500 hover:text-zinc-200 transition-colors text-xs leading-none shrink-0"
+                className="shrink-0 px-3 py-2 text-xs leading-none text-zinc-500 transition-colors hover:text-zinc-200"
                 title={project.github_remote}
                 aria-label={`Ouvrir le repo GitHub de ${project.name}`}
               >
                 GH
               </a>
             )}
-          </button>
+          </div>
         ))}
       </div>
       {showCreateModal && (

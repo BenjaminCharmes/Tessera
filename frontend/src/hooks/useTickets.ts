@@ -14,40 +14,57 @@ export interface UseTicketsResult {
   refresh: () => void;
 }
 
+/**
+ * Dernière liste chargée, avec ce qui l'a produite.
+ *
+ * L'état est **clé** par projet et révision plutôt que remis à zéro dans
+ * l'effet : `loading`, `error` et la liste vide d'un projet absent se
+ * déduisent en comparant la clé courante à celle du chargement, sans aucun
+ * `setState` synchrone dans un effet (ticket-123).
+ */
+interface Chargement {
+  projectId: string;
+  revision: number;
+  tickets: Ticket[];
+  error: string | null;
+}
+
+const AUCUN: Ticket[] = [];
+
 export function useTickets(
   projectId: string | null,
   isPipelineActive: boolean = false,
   events: OrchestratorEvent[] = [],
 ): UseTicketsResult {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [charge, setCharge] = useState<Chargement | null>(null);
   const [revision, setRevision] = useState(0);
   const processedEventsRef = useRef(0);
 
+  const memeProjet = charge !== null && charge.projectId === projectId;
+  const aJour = memeProjet && charge.revision === revision;
+
   useEffect(() => {
     if (!projectId) {
-      setTickets([]);
       processedEventsRef.current = 0;
       return;
     }
     let cancelled = false;
-    setLoading(true);
-    setError(null);
     api.tickets
       .list(projectId)
       .then((data) => {
-        if (!cancelled) {
-          setTickets(data);
-          processedEventsRef.current = events.length;
-        }
+        if (cancelled) return;
+        processedEventsRef.current = events.length;
+        setCharge({ projectId, revision, tickets: data, error: null });
       })
       .catch((err: unknown) => {
-        if (!cancelled)
-          setError(err instanceof Error ? err.message : "Unknown error");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (cancelled) return;
+        setCharge((prev) => ({
+          projectId,
+          revision,
+          tickets:
+            prev && prev.projectId === projectId ? prev.tickets : AUCUN,
+          error: err instanceof Error ? err.message : "Unknown error",
+        }));
       });
     return () => {
       cancelled = true;
@@ -65,6 +82,12 @@ export function useTickets(
 
   // React to real-time WS events
   useEffect(() => {
+    // Le flux repart de zéro à chaque `clear()` ou nouveau run : un compte
+    // resté à l'ancienne longueur faisait ignorer les premiers événements du
+    // run suivant (ticket-123).
+    if (events.length < processedEventsRef.current) {
+      processedEventsRef.current = events.length;
+    }
     const newEvents = events.slice(processedEventsRef.current);
     if (newEvents.length === 0) return;
     processedEventsRef.current = events.length;
@@ -75,22 +98,28 @@ export function useTickets(
         typeof event.data["status"] === "string"
       ) {
         const newStatus = event.data["status"] as TicketStatus;
-        setTickets((prev) =>
-          prev.map((t) =>
-            t.id === event.ticket_id ? { ...t, status: newStatus } : t,
-          ),
+        setCharge((prev) =>
+          prev === null
+            ? prev
+            : {
+                ...prev,
+                tickets: prev.tickets.map((t) =>
+                  t.id === event.ticket_id ? { ...t, status: newStatus } : t,
+                ),
+              },
         );
       }
     }
   }, [events]);
 
+  const tickets = memeProjet ? charge.tickets : AUCUN;
   const byStatus = tickets.length ? groupByStatus(tickets) : EMPTY_BY_STATUS;
 
   return {
     tickets,
     byStatus,
-    loading,
-    error,
+    loading: projectId !== null && !aJour,
+    error: aJour ? charge.error : null,
     refresh: () => setRevision((r) => r + 1),
   };
 }

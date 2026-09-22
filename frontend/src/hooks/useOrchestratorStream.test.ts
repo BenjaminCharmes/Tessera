@@ -108,6 +108,72 @@ describe("useOrchestratorStream", () => {
     });
   });
 
+  it("remonte la branche du run dans lastResult (ticket-123)", () => {
+    // `TicketActivity` affichait « Lance d'abord le pipeline » après un run
+    // approuvé : le hook reconstruisait `PipelineResult` sans `branch`, et le
+    // bouton PR restait grisé alors que la branche existait.
+    const { result } = renderHook(() => useOrchestratorStream("ide-core"));
+    act(() => {
+      result.current.connect("ticket-001");
+      MockWebSocket.instance!.triggerOpen();
+      MockWebSocket.instance!.triggerMessage({
+        type: "pipeline_done",
+        agent: null,
+        ticket_id: "ticket-001",
+        data: {
+          approved: true,
+          rounds: 1,
+          branch: "ticket-001-slug",
+        },
+        timestamp: "2026-06-20T00:00:00Z",
+      });
+    });
+    expect(result.current.lastResult?.branch).toBe("ticket-001-slug");
+  });
+
+  it("retient branch_created quand pipeline_done ne porte pas la branche", () => {
+    // Un backend plus ancien n'envoie pas `branch` dans `pipeline_done` ;
+    // `branch_created` l'a pourtant annoncée au début du run.
+    const { result } = renderHook(() => useOrchestratorStream("ide-core"));
+    act(() => {
+      result.current.connect("ticket-001");
+      MockWebSocket.instance!.triggerOpen();
+      MockWebSocket.instance!.triggerMessage({
+        type: "branch_created",
+        agent: null,
+        ticket_id: "ticket-001",
+        data: { branch: "ticket-001-slug" },
+        timestamp: "2026-06-20T00:00:00Z",
+      });
+      MockWebSocket.instance!.triggerMessage({
+        type: "pipeline_done",
+        agent: null,
+        ticket_id: "ticket-001",
+        data: { approved: false, rounds: 3 },
+        timestamp: "2026-06-20T00:00:00Z",
+      });
+    });
+    expect(result.current.branch).toBe("ticket-001-slug");
+    expect(result.current.lastResult?.branch).toBe("ticket-001-slug");
+  });
+
+  it("lit le nombre maximal de tours depuis agent_started", () => {
+    // `TicketCard` affichait « tour N/3 » en dur ; la valeur vient du run.
+    const { result } = renderHook(() => useOrchestratorStream("ide-core"));
+    act(() => {
+      result.current.connect("ticket-001");
+      MockWebSocket.instance!.triggerOpen();
+      MockWebSocket.instance!.triggerMessage({
+        type: "agent_started",
+        agent: "codeur",
+        ticket_id: "ticket-001",
+        data: { round: 1, max_rounds: 5 },
+        timestamp: "2026-06-20T00:00:00Z",
+      });
+    });
+    expect(result.current.maxRounds).toBe(5);
+  });
+
   it("sets status error on error event", () => {
     const { result } = renderHook(() => useOrchestratorStream("ide-core"));
     act(() => {

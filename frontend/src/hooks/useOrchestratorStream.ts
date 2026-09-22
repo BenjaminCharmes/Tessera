@@ -25,6 +25,14 @@ interface StreamState {
   pendingQuestion: string | null;
   /** Avancement d'une file de tickets, ou null hors file (ticket-074). */
   queue: { index: number; total: number } | null;
+  /**
+   * Branche du run en cours, annoncée par `branch_created` puis confirmée par
+   * `pipeline_done`. Sans elle, `TicketActivity` proposait de « lancer
+   * d'abord le pipeline » après un run approuvé (ticket-123).
+   */
+  branch: string | null;
+  /** Nombre de tours du run, quand le backend le dit ; null sinon. */
+  maxRounds: number | null;
 }
 
 export interface UseOrchestratorStreamResult extends StreamState {
@@ -59,6 +67,8 @@ const INITIAL: StreamState = {
   quota: null,
   pendingQuestion: null,
   queue: null,
+  branch: null,
+  maxRounds: null,
 };
 
 function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
@@ -74,7 +84,18 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
           typeof ev.data["round"] === "number"
             ? ev.data["round"]
             : s.currentRound,
+        maxRounds:
+          typeof ev.data["max_rounds"] === "number"
+            ? ev.data["max_rounds"]
+            : s.maxRounds,
         currentTokens: "",
+      };
+    case "branch_created":
+      return {
+        ...s,
+        events,
+        branch:
+          typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch,
       };
     case "agent_done":
       // Sans cela `currentAgent` restait figé sur le dernier agent démarré :
@@ -96,6 +117,8 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
             : s.currentTokens,
       };
     case "pipeline_done": {
+      const branch =
+        typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch;
       const result: PipelineResult = {
         ticket_id:
           typeof ev.data["ticket_id"] === "string"
@@ -104,6 +127,7 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         final_status: (ev.data["final_status"] as TicketStatus) ?? "done",
         rounds: typeof ev.data["rounds"] === "number" ? ev.data["rounds"] : 0,
         approved: ev.data["approved"] === true,
+        branch,
       };
       return {
         ...s,
@@ -111,6 +135,7 @@ function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         status: "done",
         lastResult: result,
         pendingQuestion: null,
+        branch,
       };
     }
     case "error":

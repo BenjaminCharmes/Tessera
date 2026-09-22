@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { api } from "../../lib/api";
+import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
 import type { VentilationDesCouts } from "../../types/api";
@@ -55,25 +56,13 @@ function Ligne({
 }
 
 export default function CostView({ projectId }: CostViewProps) {
-  const [data, setData] = useState<VentilationDesCouts | null>(null);
-
-  useEffect(() => {
-    let annule = false;
-    setData(null);
-    void (async () => {
-      try {
-        const d = projectId
-          ? await api.usage.breakdown(projectId)
-          : await api.usage.breakdownGlobal();
-        if (!annule) setData(d);
-      } catch {
-        if (!annule) setData(null);
-      }
-    })();
-    return () => {
-      annule = true;
-    };
-  }, [projectId]);
+  const fetcher = useMemo(
+    () => () =>
+      projectId ? api.usage.breakdown(projectId) : api.usage.breakdownGlobal(),
+    [projectId],
+  );
+  // Une lecture qui échoue vaut « pas de donnée » : la vue reste vide.
+  const { data } = useResource<VentilationDesCouts | null>(fetcher, null);
 
   const vide =
     data !== null &&

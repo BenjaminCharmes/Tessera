@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { test } from "./fixtures";
 
 /**
@@ -11,7 +12,7 @@ import { test } from "./fixtures";
  * Elles ne sont pas un test : rien n'échoue ici. C'est un outil, gardé parce
  * qu'il resservira à la prochaine migration d'un moteur de style.
  */
-const lateral = (page: { getByRole: Function }) =>
+const lateral = (page: Pick<Page, "getByRole">) =>
   page.getByRole("complementary", { name: "Panneau latéral" });
 
 test.describe("Captures", () => {

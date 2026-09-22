@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
+import { useResource } from "../../hooks/useResource";
 import type { PlanDeNettoyage } from "../../types/api";
 
 /**
@@ -22,21 +23,13 @@ interface BranchCleanupProps {
 }
 
 export default function BranchCleanup({ projectId }: BranchCleanupProps) {
-  const [plan, setPlan] = useState<PlanDeNettoyage | null>(null);
+  // Le plan se relit par `useResource` : une erreur rend `null`, comme avant,
+  // et la suppression le rafraîchit au lieu de le recharger à la main
+  // (ticket-123).
+  const fetcher = useMemo(() => () => api.git.cleanupPlan(projectId), [projectId]);
+  const { data: plan, refresh } = useResource<PlanDeNettoyage | null>(fetcher, null);
   const [message, setMessage] = useState<string | null>(null);
   const [enCours, setEnCours] = useState(false);
-
-  const charger = useCallback(async () => {
-    try {
-      setPlan(await api.git.cleanupPlan(projectId));
-    } catch {
-      setPlan(null);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    void charger();
-  }, [charger]);
 
   async function supprimer() {
     if (!plan?.nettoyables.length) return;
@@ -48,7 +41,7 @@ export default function BranchCleanup({ projectId }: BranchCleanupProps) {
           supprimees.length > 1 ? "s" : ""
         }`,
       );
-      await charger();
+      refresh();
     } catch (err: unknown) {
       setMessage(err instanceof Error ? err.message : String(err));
     } finally {

@@ -39,6 +39,7 @@ interface TicketListProps {
   activeTicket: Ticket | null;
   running: Set<string>;
   runningRound?: number;
+  maxRounds?: number | null;
   showKanban: boolean;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
@@ -52,6 +53,7 @@ interface TicketListProps {
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
+  onPrCreated?: (ticketId: string, prNumber: number) => void;
 }
 
 export default function TicketList({
@@ -62,6 +64,7 @@ export default function TicketList({
   activeTicket,
   running,
   runningRound,
+  maxRounds,
   showKanban,
   onSelectTicket,
   onRunPipeline,
@@ -75,6 +78,7 @@ export default function TicketList({
   onToggleKanban,
   onTicketCreated,
   onBatchCreated,
+  onPrCreated,
 }: TicketListProps) {
   const [collapsed, setCollapsed] = useState<Set<TicketStatus>>(
     new Set(["done", "cancelled"]),
@@ -200,6 +204,9 @@ export default function TicketList({
                       runningRound={
                         running.has(ticket.id) ? runningRound : undefined
                       }
+                      maxRounds={maxRounds}
+                      githubRemote={project.github_remote}
+                      onPrCreated={onPrCreated}
                       onSelect={onSelectTicket}
                       onRun={onRunPipeline}
                       onShowDiff={onShowDiff}

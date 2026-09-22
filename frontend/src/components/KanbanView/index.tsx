@@ -15,16 +15,21 @@ interface KanbanViewProps {
   byStatus: Record<TicketStatus, Ticket[]>;
   activeTicket: Ticket | null;
   running: Set<string>;
+  /** Dépôt distant du projet : sans lui, aucune carte ne propose de PR (ticket-123). */
+  githubRemote?: string | null;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
+  onPrCreated?: (ticketId: string, prNumber: number) => void;
 }
 
 export default function KanbanView({
   byStatus,
   activeTicket,
   running,
+  githubRemote,
   onSelectTicket,
   onRunPipeline,
+  onPrCreated,
 }: KanbanViewProps) {
   return (
     <div className="h-full flex flex-col bg-zinc-900">
@@ -41,8 +46,10 @@ export default function KanbanView({
             tickets={byStatus[status]}
             activeTicket={activeTicket}
             running={running}
+            githubRemote={githubRemote}
             onSelectTicket={onSelectTicket}
             onRunPipeline={onRunPipeline}
+            onPrCreated={onPrCreated}
           />
         ))}
       </div>

@@ -1,8 +1,9 @@
 import AgentBadge from "../../design/AgentBadge";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import MarkdownView from "../Editor/MarkdownView";
 import ModelPicker from "./ModelPicker";
 import { api } from "../../lib/api";
+import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
 import type { AgentDetail as AgentDetailData } from "../../types/api";
@@ -28,61 +29,6 @@ export default function AgentDetail({
   role,
   projectId = null,
 }: AgentDetailProps) {
-  const [detail, setDetail] = useState<AgentDetailData | null>(null);
-  const [erreur, setErreur] = useState<string | null>(null);
-  // Les prompts natifs sont des fichiers Markdown ; les lire avec leurs `##`
-  // et leurs `**` demande un effort que le contenu ne justifie pas
-  // (ticket-078).
-  const [vue, setVue] = useState<"rendu" | "source" | "edition">("rendu");
-  const [brouillon, setBrouillon] = useState("");
-  const [enregistrement, setEnregistrement] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-  if (!role) {
-      setDetail(null);
-      setErreur(null);
-      return;
-    }
-    let annule = false;
-    setDetail(null);
-    setErreur(null);
-    setVue("rendu");
-    setMessage(null);
-    void (async () => {
-      try {
-        const d = await api.agents.detail(role);
-        if (!annule) {
-          setDetail(d);
-          setBrouillon(d.system_prompt);
-        }
-      } catch (err: unknown) {
-        if (!annule) setErreur(err instanceof Error ? err.message : String(err));
-      }
-    })();
-    return () => {
-      annule = true;
-    };
-  }, [role]);
-
-  async function enregistrer() {
-    if (!role || !brouillon.trim()) {
-      setMessage("Un prompt vide priverait l'agent de toute définition.");
-      return;
-    }
-    setEnregistrement(true);
-    setMessage(null);
-    try {
-      const d = await api.agents.updatePrompt(role, brouillon);
-      setDetail(d);
-      setMessage("Enregistré. Il s'applique au prochain appel de cet agent.");
-    } catch (err: unknown) {
-      setMessage(err instanceof Error ? err.message : String(err));
-    } finally {
-      setEnregistrement(false);
-    }
-  }
-
   if (!role) {
     return (
       <div className="flex h-full flex-col bg-zinc-900">
@@ -94,6 +40,51 @@ export default function AgentDetail({
         </p>
       </div>
     );
+  }
+
+  // `key` : la vue, le brouillon et le message repartent de zéro avec l'agent
+  // sans qu'un effet ait à les remettre à zéro (ticket-123).
+  return <Definition key={role} role={role} projectId={projectId} />;
+}
+
+function Definition({
+  role,
+  projectId,
+}: {
+  role: string;
+  projectId: string | null;
+}) {
+  const fetcher = useMemo(() => () => api.agents.detail(role), [role]);
+  const charge = useResource<AgentDetailData | null>(fetcher, null);
+  /** Ce que le dernier enregistrement a rendu, prioritaire sur la lecture. */
+  const [enregistre, setEnregistre] = useState<AgentDetailData | null>(null);
+  const detail = enregistre ?? charge.data;
+  const erreur = charge.error;
+
+  // Les prompts natifs sont des fichiers Markdown ; les lire avec leurs `##`
+  // et leurs `**` demande un effort que le contenu ne justifie pas
+  // (ticket-078).
+  const [vue, setVue] = useState<"rendu" | "source" | "edition">("rendu");
+  const [brouillonEdite, setBrouillon] = useState<string | null>(null);
+  const brouillon = brouillonEdite ?? detail?.system_prompt ?? "";
+  const [enregistrement, setEnregistrement] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function enregistrer() {
+    if (!brouillon.trim()) {
+      setMessage("Un prompt vide priverait l'agent de toute définition.");
+      return;
+    }
+    setEnregistrement(true);
+    setMessage(null);
+    try {
+      setEnregistre(await api.agents.updatePrompt(role, brouillon));
+      setMessage("Enregistré. Il s'applique au prochain appel de cet agent.");
+    } catch (err: unknown) {
+      setMessage(err instanceof Error ? err.message : String(err));
+    } finally {
+      setEnregistrement(false);
+    }
   }
 
   return (
@@ -137,7 +128,7 @@ export default function AgentDetail({
 
       {detail && (
         <>
-          {projectId && role && <ModelPicker projectId={projectId} role={role} />}
+          {projectId && <ModelPicker projectId={projectId} role={role} />}
 
           <p className="border-b border-zinc-800 px-4 py-2 text-micro text-zinc-500">
             Ce texte est envoyé en tête de chaque appel de cet agent. Il décide

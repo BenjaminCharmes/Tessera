@@ -61,6 +61,8 @@ interface TicketCardProps {
   isActive: boolean;
   isRunning: boolean;
   runningRound?: number;
+  /** Nombre de tours du run quand le backend le dit ; sinon le badge ne compte pas (ticket-123). */
+  maxRounds?: number | null;
   githubRemote?: string | null;
   onSelect: (ticket: Ticket) => void;
   onRun: (ticketId: string) => void;
@@ -75,6 +77,7 @@ export default function TicketCard({
   isActive,
   isRunning,
   runningRound,
+  maxRounds,
   githubRemote,
   onSelect,
   onRun,
@@ -135,10 +138,26 @@ export default function TicketCard({
     }
   }
 
+  // La carte est un `div` cliquable : sans rôle ni focus, elle n'existait pas
+  // au clavier. Seule la carte elle-même réagit à Entrée et Espace — la
+  // saisie du formulaire PR et les boutons internes ont leurs propres touches
+  // (ticket-123).
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSelect(ticket);
+    }
+  }
+
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-pressed={isActive}
       onClick={() => onSelect(ticket)}
-      className={`relative mx-2 mb-1 p-2 rounded cursor-pointer transition-colors ${
+      onKeyDown={handleKeyDown}
+      className={`relative mx-2 mb-1 p-2 rounded cursor-pointer transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-zinc-400 ${
         isActive ? "bg-zinc-700" : "hover:bg-zinc-800"
       }`}
     >
@@ -161,7 +180,8 @@ export default function TicketCard({
             </span>
             {isRunning && runningRound != null && runningRound > 0 && (
               <span className="text-micro px-1.5 py-0.5 rounded-sm font-medium bg-blue-900 text-blue-300 animate-pulse">
-                tour {runningRound}/3
+                tour {runningRound}
+                {maxRounds != null && maxRounds > 0 ? `/${maxRounds}` : ""}
               </span>
             )}
             {ticket.pr_number !== null && (

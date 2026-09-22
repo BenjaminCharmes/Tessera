@@ -106,6 +106,14 @@ export default function App() {
     addToast(`Ticket « ${t.title} » créé`, "success");
   }
 
+  // Le ticket porte désormais un `pr_number` : la liste se relit pour le
+  // montrer. `TicketCard` attendait ce rappel sans que rien ne le fournisse
+  // (ticket-123).
+  function handlePrCreated(_ticketId: string, prNumber: number) {
+    tickets.refresh();
+    addToast(`PR #${prNumber} ouverte`, "success");
+  }
+
   function handleBatchCreated(created: Ticket[]) {
     tickets.refresh();
     addToast(
@@ -173,6 +181,7 @@ export default function App() {
             onRefreshUsage={usageData.refresh}
             running={running}
             runningRound={stream.currentRound}
+            maxRounds={stream.maxRounds}
             showKanban={showKanban}
             onSelectProject={handleSelectProject}
             onProjectCreated={handleProjectCreated}
@@ -253,8 +262,10 @@ export default function App() {
               byStatus={tickets.byStatus}
               activeTicket={ticket}
               running={running}
+              githubRemote={project?.github_remote ?? null}
               onSelectTicket={handleSelectTicket}
               onRunPipeline={handleRunPipeline}
+              onPrCreated={handlePrCreated}
             />
           ) : (
             <Editor ticket={ticket} openFilePath={openFilePath} />

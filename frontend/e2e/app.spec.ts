@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { test, expect, TICKETS } from "./fixtures";
 
 test.describe("Flow 1 — Affichage des projets", () => {
@@ -13,7 +14,7 @@ test.describe("Flow 1 — Affichage des projets", () => {
 // centre : les mêmes titres apparaissent dans la liste latérale et dans le
 // tableau. Une assertion qui ne dit pas de quelle région elle parle en trouve
 // deux, et échoue en mode strict. Les régions sont nommées pour cela.
-const lateral = (page: { getByRole: Function }) =>
+const lateral = (page: Pick<Page, "getByRole">) =>
   page.getByRole("complementary", { name: "Panneau latéral" });
 
 test.describe("Flow 2 — Sélection d'un projet → liste de tickets", () => {

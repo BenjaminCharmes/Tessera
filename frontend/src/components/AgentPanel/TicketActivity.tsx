@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
+import { useResource } from "../../hooks/useResource";
 import type { TicketActivity as Activity, Ticket } from "../../types/api";
 
 interface TicketActivityProps {
@@ -28,24 +29,23 @@ export default function TicketActivity({
   ticket,
   branch,
 }: TicketActivityProps) {
-  const [activity, setActivity] = useState<Activity | null>(null);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const ticketId = ticket?.id ?? null;
 
-  const refresh = useCallback(() => {
-    if (!projectId || !ticketId) {
-      setActivity(null);
-      return;
-    }
-    api.tickets
-      .activity(projectId, ticketId)
-      .then(setActivity)
-      .catch(() => setActivity(null));
-  }, [projectId, ticketId]);
-
-  useEffect(refresh, [refresh]);
+  // Une lecture qui échoue vaut « pas d'activité » : la section se tait.
+  const fetcher = useMemo(
+    () =>
+      projectId && ticketId
+        ? () => api.tickets.activity(projectId, ticketId)
+        : null,
+    [projectId, ticketId],
+  );
+  const { data: activity, refresh } = useResource<Activity | null>(
+    fetcher,
+    null,
+  );
 
   async function mergePr() {
     if (!projectId || !ticketId) return;

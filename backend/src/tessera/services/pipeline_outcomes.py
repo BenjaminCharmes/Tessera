@@ -41,6 +41,7 @@ async def finish_security_block(
         approved=False,
         rounds=run.round_num,
         reason="security_block",
+        branch=run.branch,
     )
     return PipelineResult(
         ticket_id=run.ticket_id,
@@ -123,7 +124,13 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
         # existait déjà. Un commit *raté* est autre chose, et le ticket ne peut
         # pas passer `done` dessus.
         await set_status(orch, run, TicketStatus.blocked)
-        await emit(run, EventType.PIPELINE_DONE, approved=False, rounds=run.round_num)
+        await emit(
+            run,
+            EventType.PIPELINE_DONE,
+            approved=False,
+            rounds=run.round_num,
+            branch=run.branch,
+        )
         return PipelineResult(
             ticket_id=run.ticket_id,
             final_status=TicketStatus.blocked,
@@ -134,7 +141,12 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
         )
 
     await set_status(orch, run, TicketStatus.done)
-    await emit(run, EventType.PIPELINE_DONE, approved=True, rounds=run.round_num)
+    # `branch` sur chaque sortie : l'UI reconstruit son résultat depuis cet
+    # événement, et sans la branche elle proposait de « lancer d'abord le
+    # pipeline » après un run approuvé (ticket-123).
+    await emit(
+        run, EventType.PIPELINE_DONE, approved=True, rounds=run.round_num, branch=run.branch
+    )
 
     # Seul un ticket *approuvé* avance la ref de base. L'isolation par branche
     # garde le travail rejeté hors du ticket suivant ; elle ne doit pas aussi
@@ -172,7 +184,9 @@ async def finish_stopped(orch: "Orchestrator", run: PipelineRun) -> PipelineResu
     commit_sha, arret = await commit_ou_bloquer(
         orch, run, _unapproved_commit_message(run.ticket_id, "arrêt demandé")
     )
-    await emit(run, EventType.PIPELINE_DONE, approved=False, rounds=run.round_num)
+    await emit(
+        run, EventType.PIPELINE_DONE, approved=False, rounds=run.round_num, branch=run.branch
+    )
     orch._log(f"[{run.ticket_id}] ARRÊTÉ par l'utilisateur au tour {run.round_num}")
     return PipelineResult(
         ticket_id=run.ticket_id,
@@ -200,7 +214,11 @@ async def finish_rounds_exhausted(
         ),
     )
     await emit(
-        run, EventType.PIPELINE_DONE, approved=False, rounds=orch._max_review_rounds
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=orch._max_review_rounds,
+        branch=run.branch,
     )
     orch._log(
         f"[{run.ticket_id}] BLOCKED après {orch._max_review_rounds} tour(s) sans approbation"
@@ -250,6 +268,7 @@ async def finish_interrupted(
         approved=False,
         rounds=run.round_num,
         reason="interrupted",
+        branch=run.branch,
     )
     orch._log(f"[{run.ticket_id}] INTERROMPU au tour {run.round_num} — {raison}")
     return PipelineResult(

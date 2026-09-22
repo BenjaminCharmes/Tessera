@@ -34,6 +34,7 @@ interface SidebarProps {
   onRefreshUsage: () => void;
   running: Set<string>;
   runningRound?: number;
+  maxRounds?: number | null;
   showKanban: boolean;
   onSelectProject: (project: Project) => void;
   onProjectCreated?: (project: Project) => void;
@@ -49,6 +50,7 @@ interface SidebarProps {
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
+  onPrCreated?: (ticketId: string, prNumber: number) => void;
   onSelectTicketById?: (ticketId: string) => void;
   onAgentCreated?: (role: string) => void;
   agentSelectionne?: string | null;
@@ -73,6 +75,7 @@ export default function Sidebar({
   onRefreshUsage,
   running,
   runningRound,
+  maxRounds,
   showKanban,
   onSelectProject,
   onProjectCreated,
@@ -88,6 +91,7 @@ export default function Sidebar({
   onToggleKanban,
   onTicketCreated,
   onBatchCreated,
+  onPrCreated,
   onSelectTicketById,
   onAgentCreated,
   agentSelectionne,
@@ -131,6 +135,7 @@ export default function Sidebar({
           activeTicket={activeTicket}
           running={running}
           runningRound={runningRound}
+          maxRounds={maxRounds}
           showKanban={showKanban}
           onSelectTicket={onSelectTicket}
           onRunPipeline={onRunPipeline}
@@ -144,6 +149,7 @@ export default function Sidebar({
           onToggleKanban={onToggleKanban}
           onTicketCreated={onTicketCreated}
           onBatchCreated={onBatchCreated}
+          onPrCreated={onPrCreated}
         />
       )}
       {panel === "files" &&

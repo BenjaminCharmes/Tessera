@@ -73,6 +73,28 @@ describe("ChatPanel", () => {
     expect(MockWebSocket.instance!.sent).toHaveLength(1);
   });
 
+  it("dit que la connexion est fermée et laisse envoyer pour la rouvrir (ticket-123)", async () => {
+    // Après une fermeture propre, le panneau exigeait `ready` : textarea
+    // active, bouton grisé, et rien pour expliquer ni pour repartir.
+    const user = userEvent.setup();
+    render(<ChatPanel project={project} />);
+
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    const premiere = MockWebSocket.instance!;
+    act(() => premiere.triggerOpen());
+    act(() => premiere.triggerClose());
+
+    expect(screen.getByText(/Connexion au chat fermée/)).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("Message"), "Toujours là ?");
+    const bouton = screen.getByRole("button", { name: "Envoyer" });
+    expect(bouton).toBeEnabled();
+    await user.click(bouton);
+
+    expect(MockWebSocket.instance).not.toBe(premiere);
+    expect(screen.getByText("Toujours là ?")).toBeInTheDocument();
+  });
+
   it("signale la branche sur laquelle le travail a été commité", async () => {
     render(<ChatPanel project={project} />);
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());

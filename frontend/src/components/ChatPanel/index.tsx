@@ -34,8 +34,11 @@ export default function ChatPanel({ project }: ChatPanelProps) {
   }
 
   const thinking = chat.status === "thinking";
+  const disconnected = chat.status === "disconnected";
+  // Une socket fermée proprement n'empêche pas d'écrire : c'est l'envoi qui
+  // la rouvre (ticket-123).
   const canSend =
-    chat.status === "ready" && draft.trim().length > 0;
+    (chat.status === "ready" || disconnected) && draft.trim().length > 0;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -143,6 +146,12 @@ export default function ChatPanel({ project }: ChatPanelProps) {
             ×
           </button>
         </div>
+      )}
+
+      {disconnected && (
+        <p className="border-t border-amber-900/50 bg-amber-950/40 px-3 py-2 text-xs text-amber-300">
+          Connexion au chat fermée. Le prochain envoi la rouvre.
+        </p>
       )}
 
       <form onSubmit={submit} className="border-t border-zinc-800 p-2">
