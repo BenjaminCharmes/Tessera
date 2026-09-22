@@ -57,7 +57,7 @@ export default function AgentDialogue({
           <p className="mb-1 text-micro uppercase tracking-wide text-amber-500">
             L'agent attend votre réponse
           </p>
-          <p className="mb-2 rounded border border-amber-900/60 bg-amber-950/30 px-2 py-1.5 text-xs text-amber-100">
+          <p className="mb-2 rounded-sm border border-amber-900/60 bg-amber-950/30 px-2 py-1.5 text-xs text-amber-100">
             {pendingQuestion}
           </p>
           <label
@@ -72,12 +72,12 @@ export default function AgentDialogue({
               value={reponse}
               onChange={(e) => setReponse(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && envoyerReponse()}
-              className="min-w-0 flex-1 rounded border border-zinc-700 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 outline-none focus:border-zinc-500"
+              className="min-w-0 flex-1 rounded-sm border border-zinc-700 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 outline-hidden focus:border-zinc-500"
             />
             <button
               type="button"
               onClick={envoyerReponse}
-              className="rounded bg-amber-700 px-2 py-1 text-xs text-amber-50 transition-colors hover:bg-amber-600"
+              className="rounded-sm bg-amber-700 px-2 py-1 text-xs text-amber-50 transition-colors hover:bg-amber-600"
             >
               Répondre
             </button>
@@ -92,7 +92,7 @@ export default function AgentDialogue({
         type="button"
         onClick={onStop}
         title="Le run commitera ce qu'il a déjà produit"
-        className="mb-3 rounded border border-red-900/70 px-2 py-0.5 text-micro text-red-400 transition-colors hover:border-red-700 hover:text-red-300"
+        className="mb-3 rounded-sm border border-red-900/70 px-2 py-0.5 text-micro text-red-400 transition-colors hover:border-red-700 hover:text-red-300"
       >
         Arrêter le run
       </button>
@@ -110,12 +110,12 @@ export default function AgentDialogue({
           onChange={(e) => setConsigne(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && envoyerConsigne()}
           placeholder="lue par le prochain agent à parler"
-          className="min-w-0 flex-1 rounded border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-zinc-600"
+          className="min-w-0 flex-1 rounded-sm border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-200 outline-hidden placeholder:text-zinc-600 focus:border-zinc-600"
         />
         <button
           type="button"
           onClick={envoyerConsigne}
-          className="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
+          className="rounded-sm border border-zinc-700 px-2 py-1 text-xs text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
         >
           Envoyer
         </button>

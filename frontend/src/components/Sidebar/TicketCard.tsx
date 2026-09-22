@@ -150,17 +150,17 @@ export default function TicketCard({
           </div>
           <div className="flex items-center gap-1 mt-1 flex-wrap">
             <span
-              className={`text-micro px-1.5 py-0.5 rounded font-medium ${STATUS_STYLE[ticket.status]}`}
+              className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${STATUS_STYLE[ticket.status]}`}
             >
               {ticket.status}
             </span>
             <span
-              className={`text-micro px-1.5 py-0.5 rounded font-medium ${PRIORITY_STYLE[ticket.priority]}`}
+              className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${PRIORITY_STYLE[ticket.priority]}`}
             >
               {ticket.priority}
             </span>
             {isRunning && runningRound != null && runningRound > 0 && (
-              <span className="text-micro px-1.5 py-0.5 rounded font-medium bg-blue-900 text-blue-300 animate-pulse">
+              <span className="text-micro px-1.5 py-0.5 rounded-sm font-medium bg-blue-900 text-blue-300 animate-pulse">
                 tour {runningRound}/3
               </span>
             )}
@@ -175,14 +175,14 @@ export default function TicketCard({
                     ? PR_STATE_LABEL[prStatus.state]
                     : `PR #${ticket.pr_number}`
                 }
-                className="text-micro px-1.5 py-0.5 rounded font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
+                className="text-micro px-1.5 py-0.5 rounded-sm font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
               >
                 PR #{ticket.pr_number}
               </a>
             )}
             {prStatus && (
               <span
-                className={`text-micro px-1.5 py-0.5 rounded font-medium ${CI_STYLE[prStatus.ci_status]}`}
+                className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${CI_STYLE[prStatus.ci_status]}`}
               >
                 {CI_LABEL[prStatus.ci_status]}
               </span>
@@ -200,12 +200,12 @@ export default function TicketCard({
                 value={headBranch}
                 onChange={(e) => setHeadBranch(e.target.value)}
                 placeholder="branch name"
-                className="flex-1 min-w-0 text-micro bg-zinc-800 border border-zinc-600 rounded px-1.5 py-0.5 text-zinc-200 focus:outline-none focus:border-zinc-400"
+                className="flex-1 min-w-0 text-micro bg-zinc-800 border border-zinc-600 rounded-sm px-1.5 py-0.5 text-zinc-200 focus:outline-hidden focus:border-zinc-400"
               />
               <button
                 type="submit"
                 disabled={isCreatingPr || !headBranch.trim()}
-                className="text-micro px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-200 hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="text-micro px-1.5 py-0.5 rounded-sm bg-zinc-700 text-zinc-200 hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isCreatingPr ? "…" : "OK"}
               </button>
@@ -214,7 +214,7 @@ export default function TicketCard({
                 onClick={() => setShowPrForm(false)}
                 title="Annuler"
                 aria-label="Annuler"
-                className="text-micro px-1 py-0.5 rounded text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="text-micro px-1 py-0.5 rounded-sm text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 <IconCross size={14} />
               </button>
@@ -232,7 +232,7 @@ export default function TicketCard({
               disabled={isRunning}
               title="Lancer le pipeline"
               aria-label="Lancer le pipeline"
-              className="w-6 h-6 flex items-center justify-center rounded transition-colors text-zinc-500 hover:text-zinc-200 hover:bg-zinc-600 disabled:cursor-not-allowed"
+              className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors text-zinc-500 hover:text-zinc-200 hover:bg-zinc-600 disabled:cursor-not-allowed"
             >
               {isRunning ? (
                 <IconDot size={8} className="animate-pulse text-blue-400" />
@@ -271,7 +271,7 @@ export default function TicketCard({
               }}
               title="Voir le diff"
               aria-label="Voir le diff"
-              className="w-6 h-6 flex items-center justify-center rounded transition-colors text-zinc-500 hover:text-zinc-300 hover:bg-zinc-600"
+              className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors text-zinc-500 hover:text-zinc-300 hover:bg-zinc-600"
             >
               <IconDiff size={12} />
             </button>
@@ -284,7 +284,7 @@ export default function TicketCard({
               }}
               title="Ouvrir une PR"
               aria-label="Ouvrir une PR"
-              className="w-6 h-6 flex items-center justify-center rounded transition-colors text-zinc-500 hover:text-zinc-300 hover:bg-zinc-600"
+              className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors text-zinc-500 hover:text-zinc-300 hover:bg-zinc-600"
             >
               <IconExternal size={12} />
             </button>

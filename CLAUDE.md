@@ -42,7 +42,8 @@ permanence. C'est ce qui justifie l'import ici et pas là.
 ### Frontend (UI de l'IDE)
 - **TypeScript strict**
 - **React 19** avec hooks uniquement (pas de class components)
-- **Tailwind CSS v3**
+- **Tailwind CSS v4** — configuration dans le CSS (`@theme` de `index.css`),
+  il n'y a plus de `tailwind.config.ts`
 - **Monaco Editor** pour l'éditeur de code embarqué
 - **Vite** comme bundler
 

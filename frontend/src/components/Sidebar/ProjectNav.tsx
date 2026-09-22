@@ -49,7 +49,7 @@ export default function ProjectNav({
           <div className="flex items-center gap-1">
             <button
               onClick={() => setShowImportModal(true)}
-              className="w-5 h-5 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors text-xs leading-none"
+              className="w-5 h-5 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors text-xs leading-none"
               title="Importer un projet"
               aria-label="Importer un projet"
             >
@@ -57,7 +57,7 @@ export default function ProjectNav({
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="w-5 h-5 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors text-base leading-none"
+              className="w-5 h-5 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors text-base leading-none"
               title="Nouveau projet"
               aria-label="Créer un projet"
             >
@@ -73,13 +73,13 @@ export default function ProjectNav({
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="text-xs px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-200 transition-colors"
+              className="text-xs px-3 py-1.5 rounded-sm bg-zinc-700 hover:bg-zinc-600 text-zinc-200 transition-colors"
             >
               + Créer un projet
             </button>
             <button
               onClick={() => setShowImportModal(true)}
-              className="text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
+              className="text-xs px-3 py-1.5 rounded-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
             >
               <IconDownload size={12} /> Importer un projet
             </button>

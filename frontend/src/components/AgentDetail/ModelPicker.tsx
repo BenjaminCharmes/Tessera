@@ -65,7 +65,7 @@ export default function ModelPicker({ projectId, role }: ModelPickerProps) {
         id="modele-agent"
         value={config.model}
         onChange={(e) => void changer(e.target.value)}
-        className="rounded border border-zinc-700 bg-zinc-950 px-2 py-1 text-mini text-zinc-200 outline-none focus:border-zinc-500"
+        className="rounded-sm border border-zinc-700 bg-zinc-950 px-2 py-1 text-mini text-zinc-200 outline-hidden focus:border-zinc-500"
       >
         {data.known_models.map((m) => (
           <option key={m} value={m}>

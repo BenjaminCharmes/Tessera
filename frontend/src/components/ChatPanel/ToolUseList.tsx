@@ -16,7 +16,7 @@ export default function ToolUseList({ toolUses }: ToolUseListProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded border border-zinc-800 bg-zinc-950/50">
+    <div className="rounded-sm border border-zinc-800 bg-zinc-950/50">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

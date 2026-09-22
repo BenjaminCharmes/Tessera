@@ -119,7 +119,7 @@ export default function TicketActivity({
                 type="button"
                 onClick={() => void mergePr()}
                 disabled={busy}
-                className="rounded bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
+                className="rounded-sm bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
               >
                 {busy ? "…" : "Merger si la CI est verte"}
               </button>
@@ -143,7 +143,7 @@ export default function TicketActivity({
               type="button"
               onClick={() => void openPr()}
               disabled={busy || !branch}
-              className="rounded bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
+              className="rounded-sm bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
             >
               {busy ? "…" : "Pousser et ouvrir la PR"}
             </button>
@@ -170,7 +170,7 @@ export default function TicketActivity({
       </div>
 
       {errorMessage && (
-        <p className="mt-1.5 break-words text-amber-300">{errorMessage}</p>
+        <p className="mt-1.5 wrap-break-word text-amber-300">{errorMessage}</p>
       )}
     </section>
   );

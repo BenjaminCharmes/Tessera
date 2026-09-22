@@ -44,7 +44,7 @@ export default function AgentBadge({ moment }: AgentBadgeProps) {
   return (
     <span
       title={libelle.infobulle}
-      className={`shrink-0 rounded px-1.5 py-0.5 text-micro font-medium ${libelle.classe}`}
+      className={`shrink-0 rounded-sm px-1.5 py-0.5 text-micro font-medium ${libelle.classe}`}
     >
       {libelle.texte}
     </span>

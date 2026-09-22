@@ -3,7 +3,7 @@ interface SkeletonListProps {
 }
 
 function SkeletonItem() {
-  return <div className="h-8 mx-3 my-1 rounded bg-zinc-800 animate-pulse" />;
+  return <div className="h-8 mx-3 my-1 rounded-sm bg-zinc-800 animate-pulse" />;
 }
 
 export default function SkeletonList({ count = 3 }: SkeletonListProps) {

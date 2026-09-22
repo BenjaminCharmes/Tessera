@@ -94,7 +94,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
         )}
 
         {chat.suggestedTicketId && !chat.runningTicketId && (
-          <div className="rounded border border-zinc-700 bg-zinc-800/60 p-2">
+          <div className="rounded-sm border border-zinc-700 bg-zinc-800/60 p-2">
             <p className="mb-1.5 text-mini text-zinc-400">
               L'agent propose de lancer le pipeline sur{" "}
               <code className="text-zinc-200">{chat.suggestedTicketId}</code>.
@@ -102,7 +102,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
             <button
               type="button"
               onClick={chat.runSuggested}
-              className="rounded bg-green-800 px-2.5 py-1 text-xs text-green-50 hover:bg-green-700"
+              className="rounded-sm bg-green-800 px-2.5 py-1 text-xs text-green-50 hover:bg-green-700"
             >
               Lancer le pipeline
             </button>
@@ -163,13 +163,13 @@ export default function ChatPanel({ project }: ChatPanelProps) {
               : "Écris ton message (Entrée pour envoyer)"
           }
           disabled={chat.status === "connecting"}
-          className="w-full resize-none rounded bg-zinc-800 px-2 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 outline-none focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
+          className="w-full resize-none rounded-sm bg-zinc-800 px-2 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 outline-hidden focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
         />
         <div className="mt-1.5 flex justify-end">
           <button
             type="submit"
             disabled={!canSend}
-            className="rounded bg-zinc-700 px-3 py-1 text-xs text-zinc-100 hover:bg-zinc-600 disabled:opacity-40 disabled:hover:bg-zinc-700"
+            className="rounded-sm bg-zinc-700 px-3 py-1 text-xs text-zinc-100 hover:bg-zinc-600 disabled:opacity-40 disabled:hover:bg-zinc-700"
           >
             {thinking ? "…" : "Envoyer"}
           </button>

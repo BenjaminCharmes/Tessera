@@ -13,8 +13,8 @@ export default function TokenStream({ tokens, isActive }: TokenStreamProps) {
   }, [tokens]);
 
   return (
-    <div className="overflow-y-auto max-h-64 bg-zinc-950 rounded p-3 font-mono text-xs text-zinc-300 leading-relaxed">
-      <pre className="whitespace-pre-wrap break-words">{tokens}</pre>
+    <div className="overflow-y-auto max-h-64 bg-zinc-950 rounded-sm p-3 font-mono text-xs text-zinc-300 leading-relaxed">
+      <pre className="whitespace-pre-wrap wrap-break-word">{tokens}</pre>
       {/* Curseur de frappe : un bloc dessiné, pas le caractère `█`, dont la
           largeur dépend de la police du système. */}
       {isActive && (

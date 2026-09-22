@@ -149,7 +149,7 @@ export default function AgentDetail({
             </div>
           )}
           {vue === "source" && (
-            <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words px-4 py-3 font-mono text-micro leading-relaxed text-zinc-300">
+            <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap wrap-break-word px-4 py-3 font-mono text-micro leading-relaxed text-zinc-300">
               {detail.system_prompt}
             </pre>
           )}
@@ -159,14 +159,14 @@ export default function AgentDetail({
                 value={brouillon}
                 onChange={(e) => setBrouillon(e.target.value)}
                 spellCheck={false}
-                className="min-h-0 flex-1 resize-none rounded border border-zinc-700 bg-zinc-950 p-3 font-mono text-micro leading-relaxed text-zinc-200 outline-none focus:border-zinc-500"
+                className="min-h-0 flex-1 resize-none rounded-sm border border-zinc-700 bg-zinc-950 p-3 font-mono text-micro leading-relaxed text-zinc-200 outline-hidden focus:border-zinc-500"
               />
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => void enregistrer()}
                   disabled={enregistrement}
-                  className="rounded border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
+                  className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
                 >
                   {enregistrement ? "Enregistrement…" : "Enregistrer"}
                 </button>

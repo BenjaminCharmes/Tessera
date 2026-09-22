@@ -18,7 +18,7 @@ interface SummaryCardProps {
 
 function SummaryCard({ label, value }: SummaryCardProps) {
   return (
-    <div className="flex flex-col gap-0.5 px-3 py-2 bg-zinc-800 rounded">
+    <div className="flex flex-col gap-0.5 px-3 py-2 bg-zinc-800 rounded-sm">
       <span className="text-micro text-zinc-500 uppercase tracking-wider">
         {label}
       </span>

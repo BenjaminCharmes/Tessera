@@ -57,7 +57,7 @@ export default function RemoveProjectModal({
       <div
         role="dialog"
         aria-label={`Retirer ${project.id}`}
-        className="w-full max-w-md rounded border border-zinc-700 bg-zinc-900 p-4 text-sm text-zinc-200"
+        className="w-full max-w-md rounded-sm border border-zinc-700 bg-zinc-900 p-4 text-sm text-zinc-200"
       >
         <h2 className="mb-2 text-base font-medium">Retirer « {project.id} »</h2>
 
@@ -86,7 +86,7 @@ export default function RemoveProjectModal({
             type="button"
             onClick={() => void run("detach")}
             disabled={busy}
-            className="w-full rounded bg-zinc-700 px-3 py-1.5 text-left hover:bg-zinc-600 disabled:opacity-40"
+            className="w-full rounded-sm bg-zinc-700 px-3 py-1.5 text-left hover:bg-zinc-600 disabled:opacity-40"
           >
             Retirer de l'IDE
             <span className="block text-xs text-zinc-400">
@@ -101,7 +101,7 @@ export default function RemoveProjectModal({
               type="button"
               onClick={() => setConfirmDelete(true)}
               disabled={busy}
-              className="w-full rounded border border-red-900 px-3 py-1.5 text-left text-red-300 hover:bg-red-950/40 disabled:opacity-40"
+              className="w-full rounded-sm border border-red-900 px-3 py-1.5 text-left text-red-300 hover:bg-red-950/40 disabled:opacity-40"
             >
               Supprimer définitivement
               <span className="block text-xs text-red-400/80">
@@ -111,7 +111,7 @@ export default function RemoveProjectModal({
               </span>
             </button>
           ) : (
-            <div className="rounded border border-red-900 bg-red-950/40 p-2">
+            <div className="rounded-sm border border-red-900 bg-red-950/40 p-2">
               <p className="mb-2 text-xs text-red-300">
                 {plan?.is_symlink
                   ? `Le lien sera supprimé. ${plan.real_path} ne sera pas touché.`
@@ -121,7 +121,7 @@ export default function RemoveProjectModal({
                 type="button"
                 onClick={() => void run("remove")}
                 disabled={busy}
-                className="rounded bg-red-800 px-3 py-1 text-red-50 hover:bg-red-700 disabled:opacity-40"
+                className="rounded-sm bg-red-800 px-3 py-1 text-red-50 hover:bg-red-700 disabled:opacity-40"
               >
                 Confirmer la suppression
               </button>
@@ -130,7 +130,7 @@ export default function RemoveProjectModal({
         </div>
 
         {errorMessage && (
-          <p className="mt-2 break-words text-xs text-amber-300">{errorMessage}</p>
+          <p className="mt-2 wrap-break-word text-xs text-amber-300">{errorMessage}</p>
         )}
 
         <button

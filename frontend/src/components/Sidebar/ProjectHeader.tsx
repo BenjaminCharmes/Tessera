@@ -59,7 +59,7 @@ export default function ProjectHeader({
         {project.path ? (
           <a
             href={lienVSCode(project.path)}
-            className="whitespace-nowrap rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
+            className="whitespace-nowrap rounded-sm border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
           >
             VSCode
           </a>

@@ -138,7 +138,7 @@ export default function AgentPanel({
         )}
 
         {status === "error" && (
-          <div className="m-3 rounded p-3 bg-red-900/30 border border-red-700/50 text-red-400 text-xs">
+          <div className="m-3 rounded-sm p-3 bg-red-900/30 border border-red-700/50 text-red-400 text-xs">
             <div className="font-semibold mb-1">Erreur</div>
             <div>{errorMessage ?? "Unknown error"}</div>
           </div>

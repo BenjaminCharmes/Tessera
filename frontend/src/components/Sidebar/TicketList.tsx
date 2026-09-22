@@ -111,7 +111,7 @@ export default function TicketList({
               onClick={() => setShowPlanModal(true)}
               title="Planifier une évolution"
               aria-label="Planifier une évolution"
-              className="w-6 h-6 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-sm leading-none"
+              className="w-6 h-6 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-sm leading-none"
             >
               <IconBolt size={14} />
             </button>
@@ -119,7 +119,7 @@ export default function TicketList({
               onClick={() => setShowCreateModal(true)}
               title="Nouveau ticket"
               aria-label="Créer un ticket"
-              className="w-6 h-6 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-base leading-none"
+              className="w-6 h-6 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-base leading-none"
             >
               <IconPlus size={14} />
             </button>

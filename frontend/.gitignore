@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 playwright-report/
 test-results/
+
+# Captures de comparaison visuelle (ticket-117) — outil local, pas un livrable.
+captures/

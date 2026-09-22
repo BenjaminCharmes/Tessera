@@ -72,7 +72,7 @@ export default function VerdictBanner({ content }: VerdictBannerProps) {
             {ouvert ? "Masquer le détail" : "Voir le détail de la revue"}
           </button>
           {ouvert && (
-            <pre className="mt-1.5 max-h-64 overflow-auto whitespace-pre-wrap break-words rounded bg-zinc-950/60 p-2 font-mono text-mini text-zinc-300">
+            <pre className="mt-1.5 max-h-64 overflow-auto whitespace-pre-wrap wrap-break-word rounded-sm bg-zinc-950/60 p-2 font-mono text-mini text-zinc-300">
               {detail}
             </pre>
           )}

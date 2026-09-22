@@ -47,7 +47,7 @@ function Ligne({
           {appels > 1 ? "s" : ""}
         </span>
       </div>
-      <div className="h-1 overflow-hidden rounded bg-zinc-800">
+      <div className="h-1 overflow-hidden rounded-sm bg-zinc-800">
         <div className="h-full bg-violet-400" style={{ width: `${part}%` }} />
       </div>
     </li>
