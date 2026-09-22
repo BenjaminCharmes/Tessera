@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-// jsdom has no __TAURI_INTERNALS__ by default → isTauri is false → web mode
+// Every access goes through the backend: the desktop shell has no file
+// commands of its own (ticket-124).
 import { readFile, writeFile, listDir, listEntries } from "./fs";
 
 const mockFetch = vi.fn();
@@ -38,7 +39,7 @@ describe("readFile (web mode)", () => {
   });
 });
 
-describe("writeFile (web mode)", () => {
+describe("writeFile", () => {
   it("posts content to the write endpoint", async () => {
     mockFetch.mockResolvedValue({ ok: true });
     await writeFile("/some/path.md", "hello");
@@ -62,7 +63,7 @@ describe("writeFile (web mode)", () => {
   });
 });
 
-describe("listDir (web mode)", () => {
+describe("listDir", () => {
   it("returns list of paths", async () => {
     const files = ["a.md", "b.md"];
     mockFetch.mockResolvedValue({

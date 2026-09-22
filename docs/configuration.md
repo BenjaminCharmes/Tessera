@@ -43,6 +43,20 @@ uvicorn et dans tout proxy sur le chemin. Le Bearer HTTP n'y apparaît pas.
 `VITE_STATIC_TOKEN` est inliné dans le bundle : c'est un secret partagé
 entre le poste et son backend, pas un mécanisme de comptes.
 
+## Application desktop (Tauri)
+
+Le frontend packagé est servi depuis `tauri://localhost`, où rien ne répond
+sur `/api/v1` : l'origine du backend est figée **au build** par Vite.
+
+| Variable | Où | Default | Description |
+|----------|----|---------|-------------|
+| `VITE_API_URL` | `frontend/.env.production` | `http://127.0.0.1:8000` | Origine du backend pour les appels REST, WebSocket et fichiers. Vide en dev : les URL restent relatives et le proxy Vite les résout |
+| `TESSERA_BACKEND_DIR` | environnement de l'app | `../../backend` (résolu à la compilation) | Dossier depuis lequel l'app release lance `uv run uvicorn … --host 127.0.0.1`. À renseigner dès que l'app ne vit plus à côté de ses sources |
+
+Le shell desktop n'a aucune commande fichier à lui : tout accès disque passe
+par `routers/fs.py`, qui refuse les chemins hors workspace (ADR-040). Le
+backend Python n'est pas embarqué dans le bundle : la machine doit avoir `uv`.
+
 ## Commandes de développement
 
 ```bash

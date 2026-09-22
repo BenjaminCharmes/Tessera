@@ -348,3 +348,15 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : ces étapes existent pour arrêter du code. Une panne qui les fait passer retire la protection là où elle se voit le moins : rien à l'écran ne distingue un audit propre d'un audit qui n'a pas eu lieu. Le validateur refusait déjà un JSON illisible mais approuvait sur un provider en panne.
 **Alternative rejetée** : sauter l'étape et prévenir — l'avertissement part dans un log pendant qu'un `done` s'affiche.
 **Conséquence assumée** : une panne du fournisseur bloque les runs qui activent ces étapes ; c'est voulu, le `reason` le dit.
+
+---
+
+---
+
+## ADR-040 — Le shell desktop n'ouvre aucune porte vers le disque
+
+**Date** : 2026-09-22
+**Décision** : l'app Tauri n'expose ni commande fichier ni permission `fs:*` / `shell:*` ; le frontend passe toujours par `routers/fs.py`, packagé compris. L'origine du backend vient de `VITE_API_URL` au build, et le backend lancé par le shell n'écoute que sur `127.0.0.1`. ADR-016 n'a plus d'objet.
+**Raison** : `read_file` / `write_file` / `list_dir` acceptaient n'importe quel chemin, quand l'API refuse tout ce qui sort du workspace. Le trou `?path=~/.ssh/id_rsa` rebouché d'un côté restait ouvert de l'autre : entre deux portes, c'est la moins gardée qui compte.
+**Alternative rejetée** : porter le contrôle de chemin en Rust — deux implémentations d'une même règle divergent (ADR-034) ; garder `fs:*` « au cas où » — une permission que rien n'utilise est une surface sans bénéfice.
+**Conséquence assumée** : le backend n'est pas embarqué ; l'app packagée exige `uv` et `TESSERA_BACKEND_DIR`.

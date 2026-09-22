@@ -91,6 +91,12 @@ make dev          # terminal 1 — le backend
 make tauri-dev    # terminal 2 — la fenêtre native
 ```
 
+`make tauri-build` produit l'app packagée. Elle lance elle-même le backend
+avec `uv`, depuis `TESSERA_BACKEND_DIR`, et lui parle sur l'origine posée dans
+`frontend/.env.production` — voir [configuration](configuration.md). Le
+backend n'est pas embarqué : `uv` et le dossier `backend/` doivent exister sur
+la machine.
+
 ---
 
 ## 2. Ajouter un projet

@@ -35,8 +35,9 @@ import type {
   TicketDraft,
 } from "../types/api";
 import { authorized } from "./auth";
+import { API_ORIGIN } from "./config";
 
-const BASE = "/api/v1";
+const BASE = `${API_ORIGIN}/api/v1`;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, authorized(options));
