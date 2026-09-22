@@ -29,6 +29,7 @@ Produis toujours un JSON structuré :
 {
   "project_id": "mon-projet-slug",
   "name": "Nom lisible du projet",
+  "description": "Ce que fait le projet, en une ou deux phrases",
   "claude_md": "# CLAUDE.md complet...",
   "active_agents": ["codeur", "reviewer"],
   "suggested_tickets": [
@@ -62,7 +63,8 @@ l'enchaînement des agents est fait par Tessera, pas par un agent. Et
 « Planifier une évolution », que l'utilisateur déclenche lui-même.
 
 Tout nom absent du registre est **créé à la volée**, avec un prompt généré
-à partir de ta description du projet. Ne suggère donc un rôle sur mesure
+à partir du champ `description` de ton JSON — vide, l'agent créé ne sait pas
+sur quel projet il travaille. Ne suggère donc un rôle sur mesure
 que s'il a un vrai travail à faire, et nomme-le pour ce travail.
 
 | Type de projet | Agents suggérés |

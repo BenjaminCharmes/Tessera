@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 _MODEL = "claude-sonnet-4-6"
-_MAX_TOKENS = 1024
+_MAX_TOKENS = 2048
 _PROMPT_FILE = "validateur.md"
 
 Verdict = Literal["APPROVED", "CHANGES_REQUESTED"]

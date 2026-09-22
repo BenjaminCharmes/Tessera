@@ -99,14 +99,40 @@ def test_aucune_contrainte_de_comportement_n_est_annotee() -> None:
     reel = Path(__file__).parent.parent.parent / "projects/ide-core/memory/decisions.md"
     contenu = reel.read_text(encoding="utf-8")
 
-    interdits = {
-        "ADR-017", "ADR-018", "ADR-019", "ADR-020", "ADR-021", "ADR-022",
-        "ADR-023", "ADR-024", "ADR-025", "ADR-027", "ADR-028", "ADR-029",
-        "ADR-030", "ADR-031",
-    }
     annotes = {b.numero for b in decouper(contenu) if portee_de(b) is not None}
 
-    assert not (annotes & interdits), sorted(annotes & interdits)
+    assert not (annotes & _CONTRAINTES), sorted(annotes & _CONTRAINTES)
+
+
+#: Les ADR qui énoncent une contrainte de comportement : git, artefacts,
+#: périmètre d'écriture, plafonds, verrou de run, portes qui échouent fermées.
+#: Une portée posée dessus la retirerait à la plupart des agents. La liste
+#: s'allonge à chaque ADR de ce genre : elle s'arrêtait à ADR-031 quand
+#: ADR-033 et ADR-037 à 040 existaient déjà (ticket-126).
+_CONTRAINTES = {
+    "ADR-017", "ADR-018", "ADR-019", "ADR-020", "ADR-021", "ADR-022",
+    "ADR-023", "ADR-024", "ADR-025", "ADR-027", "ADR-028", "ADR-029",
+    "ADR-030", "ADR-031", "ADR-033", "ADR-037", "ADR-038", "ADR-039",
+    "ADR-040",
+}
+
+#: Les ADR qui n'enregistrent qu'un choix passé ou une méta-règle sur les
+#: ADR eux-mêmes : seul l'architecte a à les rediscuter. Sans portée, ils
+#: partiraient dans chaque appel de codeur sans rien lui apprendre.
+_CHOIX_PASSES = {"ADR-001", "ADR-003", "ADR-032", "ADR-034", "ADR-035", "ADR-036"}
+
+
+def test_les_choix_passes_portent_une_portee() -> None:
+    reel = Path(__file__).parent.parent.parent / "projects/ide-core/memory/decisions.md"
+    contenu = reel.read_text(encoding="utf-8")
+
+    annotes = {b.numero for b in decouper(contenu) if portee_de(b) is not None}
+
+    assert _CHOIX_PASSES <= annotes, sorted(_CHOIX_PASSES - annotes)
+
+
+def test_aucun_adr_n_est_a_la_fois_contrainte_et_choix_passe() -> None:
+    assert not (_CONTRAINTES & _CHOIX_PASSES)
 
 
 def test_le_preambule_est_conserve() -> None:

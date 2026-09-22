@@ -22,19 +22,19 @@ conclure** — voir le piège du worker orphelin plus bas.
 
 Depuis la racine du dépôt, jamais depuis `backend/` :
 
+```powershell
+.\scripts\tessera.ps1 run       # Windows : backend (8000) + frontend (5173)
+.\scripts\tessera.ps1 stop      # arrête tout, worker orphelin compris
+```
+
 ```bash
-make run      # backend (8000) + frontend (5173) dans un seul terminal
-make dev      # backend seul
+make run          # ailleurs : les deux dans un seul terminal
+make dev          # backend seul
 make dev-frontend
 ```
 
-Sous Windows, `make run` s'appuie sur `trap`/`wait` et se comporte mal. Lancer
-les deux séparément, en arrière-plan :
-
-```bash
-cd backend && uv run uvicorn tessera.main:app --host 127.0.0.1 --port 8000 --env-file ../.env
-cd frontend && npm run dev
-```
+`make run` s'appuie sur `trap`/`wait` et se comporte mal sous Windows : c'est
+ce que `tessera.ps1 run` remplace. Ne pas relancer les deux serveurs à la main.
 
 ## Vérifier que ça sert vraiment
 
@@ -79,11 +79,12 @@ précisément ce qui crée ces états incohérents.
 
 ## Arrêter proprement
 
-```bash
-powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { \$_.CommandLine -like '*uvicorn*' } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force }"
+```powershell
+.\scripts\tessera.ps1 stop
 ```
 
-Vérifier ensuite que le port est libre — sinon chercher l'orphelin.
+Il arrête les deux serveurs **et** cherche le worker orphelin. Vérifier
+ensuite que le port 8000 est libre — sinon l'identifier comme ci-dessus.
 
 ## Provider LLM
 

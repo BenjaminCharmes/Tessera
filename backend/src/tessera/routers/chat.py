@@ -9,6 +9,7 @@ from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 from tessera.config import settings
+from tessera.services.adr import adr_pertinents
 from tessera.services.chat_service import ChatBudgetExceeded, ChatService
 from tessera.services.chat_suggestion import summarize_conversation
 from tessera.services.run_lock import RUN_LOCK, RunAlreadyInProgress
@@ -33,6 +34,10 @@ router = APIRouter(tags=["chat"])
 # arbitraires dans son dépôt, est une surface d'attaque que ce ticket refuse
 # d'ouvrir (ticket-048, hors périmètre explicite).
 _CHAT_TOOLS = ["Read", "Write", "Edit", "Glob", "Grep"]
+
+#: Le rôle sous lequel le chat lit les ADR : aucun ADR ne le nomme, il ne
+#: reçoit donc que le tronc commun — toutes les contraintes, aucun choix passé.
+_ROLE_CHAT = "chat"
 
 # Un seul pipeline à la fois par projet : deux exécutions concurrentes
 # se marcheraient dessus dans le même arbre de travail (ADR-018). L'instance
@@ -71,12 +76,16 @@ async def _build_context(project_id: str, project_path: Path) -> str:
     decisions = (
         decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
     )
-    return (
+    # Le même titre que le pipeline : c'est lui que `adr_pertinents` reconnaît.
+    # Sous un autre titre, le chat recevait le fichier entier, choix de stack
+    # compris, quand chaque agent du pipeline est filtré (ticket-126).
+    contexte = (
         f"# {project_id}\n\n"
         f"## CLAUDE.md\n{project.raw_claude_md}\n\n"
         f"## Tickets ouverts\n{tickets_summary}\n\n"
-        f"## Décisions d'architecture\n{decisions or '_Aucune décision._'}"
+        f"## Décisions récentes\n{decisions or '_Aucune décision._'}"
     )
+    return adr_pertinents(contexte, _ROLE_CHAT)
 
 
 async def _build_service(project_id: str) -> ChatService:

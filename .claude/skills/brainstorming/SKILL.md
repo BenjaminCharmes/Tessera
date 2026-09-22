@@ -14,8 +14,9 @@ beaucoup plus cher que la construire mal.
 - Toute feature, tout composant, tout changement de comportement
 - Un refactor où plusieurs approches se défendent
 
-**Ne s'applique pas** à un bug au comportement attendu non ambigu (→
-`systematic-debugging`), ni à une tâche mécanique dont la forme est déjà fixée.
+**Ne s'applique pas** à un bug au comportement attendu non ambigu — là, on
+reproduit puis on écrit le test qui échoue (→ `test-driven-development`) — ni
+à une tâche mécanique dont la forme est déjà fixée.
 
 ## La séquence
 
@@ -32,7 +33,8 @@ qu'est-ce qui ne va pas aujourd'hui ? Qui le subit ? À quelle fréquence ?
 Les plus coûteuses à découvrir tard sont celles qui existent déjà :
 
 - Un invariant posé par un ADR (`memory/decisions.md`)
-- Un chemin en dur dans le backend (`memory/decisions.md`, `agents/prompts/`)
+- Un fichier que le backend charge par son nom (`memory/decisions.md`,
+  `agents/prompts/<rôle>.md`) : le renommer casse le produit, pas un test
 - Un coût par appel d'agent (tout ce qui entre dans le contexte projet)
 - Une garantie dont dépend autre chose (l'arbre propre d'ADR-018)
 
@@ -50,8 +52,9 @@ L'écrire explicitement. Un périmètre non borné se rediscute à chaque revue.
 
 ### 5. À quoi on reconnaîtra que c'est fini
 
-Des critères tranchables par oui/non. Ils deviendront les critères
-d'acceptation du ticket (→ `new-ticket`).
+Des critères tranchables par oui/non. Ils deviennent les critères
+d'acceptation du ticket (→ `new-ticket`), qui s'écrit **maintenant** : aucun
+plan ni code ne démarre sans lui.
 
 ## Poser les questions qui changent le travail
 
@@ -73,5 +76,5 @@ Pas du code. Un cadrage qui tient en quelques lignes :
 - Le hors-périmètre
 - Les critères de fin
 
-Ensuite seulement : `writing-plans` si le travail est long, `new-ticket` pour le
-tracer, `test-driven-development` pour l'écrire.
+Ensuite seulement : `new-ticket` pour le tracer, `writing-plans` si le travail
+est long, `test-driven-development` pour l'écrire.

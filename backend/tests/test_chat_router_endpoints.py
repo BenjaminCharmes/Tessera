@@ -214,6 +214,29 @@ async def test_le_contexte_du_chat_reprend_claude_md_tickets_et_adr(
     assert "ADR-001" in context
 
 
+async def test_le_contexte_du_chat_ne_garde_que_les_adr_qui_le_concernent(
+    workspace: Path,
+) -> None:
+    # Le chat titrait sa section « Décisions d'architecture », que
+    # `services/adr.py` ne reconnaît pas : il recevait le fichier entier,
+    # choix de stack compris, quand chaque agent du pipeline est filtré.
+    from tessera.routers.chat import _build_context
+
+    project = workspace / "mon-projet"
+    (project / "memory" / "decisions.md").write_text(
+        "## ADR-001 — Un choix de stack\n\n**Portée** : architect\n"
+        "**Décision** : uv.\n\n---\n\n"
+        "## ADR-002 — Une contrainte\n\n**Décision** : pas de git.\n",
+        encoding="utf-8",
+    )
+
+    context = await _build_context("mon-projet", project)
+
+    assert "## Décisions récentes" in context
+    assert "ADR-002" in context
+    assert "ADR-001" not in context
+
+
 async def test_le_service_du_chat_n_expose_aucun_outil_shell(workspace: Path) -> None:
     # Critère de ticket-048 : un agent conversationnel exécutant des commandes
     # arbitraires dans le dépôt de l'utilisateur est hors périmètre.

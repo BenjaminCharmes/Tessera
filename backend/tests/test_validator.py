@@ -180,7 +180,10 @@ class TestValidatorService:
         assert isinstance(call["system"], str)
         assert "Returns 200" in call["user"]
         assert "def get(): return 200" in call["user"]
-        assert call["max_tokens"] > 0
+        # Dix critères avec une `note` chacun tiennent mal dans 1 024 tokens :
+        # le JSON était tronqué, donc « non parseable », donc CHANGES_REQUESTED
+        # pour une raison qui n'avait rien à voir avec le code (ticket-126).
+        assert call["max_tokens"] >= 2048
 
     async def test_changes_requested_quand_le_provider_est_indisponible(
         self, service: ValidatorService

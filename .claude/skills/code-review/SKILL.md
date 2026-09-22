@@ -33,7 +33,7 @@ Les violations les plus coûteuses portent sur des garanties déjà posées :
 |---|---|---|
 | L'arbre est propre au démarrage d'un run | ADR-018 | Écrire sans committer |
 | Le commit est conditionné à la branche créée | ADR-018 | Committer quand `branch is None` |
-| `memory/decisions.md` est injecté à chaque appel | `routers/agents.py` | Un ADR de 500 mots |
+| `memory/decisions.md` part dans chaque appel d'agent, filtré par portée | `routers/orchestrator.py`, `routers/agents.py`, `routers/chat.py` → `services/adr.py` | Un ADR de 500 mots ; une portée sur une contrainte |
 | `tools` **et** `allowed_tools` toujours explicites | ADR-017 | Ne fixer que `allowed_tools` |
 | Les prompts du produit ne sont pas de la config Claude Code | ticket-047 | Déplacer `agents/prompts/` |
 

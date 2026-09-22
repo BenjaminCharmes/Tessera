@@ -18,6 +18,7 @@ from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers import get_provider
+from tessera.services.providers.base import LLMProvider
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.run_lock import RUN_LOCK, RunAlreadyInProgress
 from tessera.services.run_recorder import RunRecorder
@@ -138,8 +139,18 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         allow_tools=False,
     )
     registry = AgentRegistryService(settings.ide_prompts_dir)
+
+    def _provider_limite(outils: list[str]) -> LLMProvider:
+        # Le reviewer relit : il reçoit le même provider, réduit à la lecture.
+        return get_provider(
+            settings.llm_provider, settings.anthropic_api_key,
+            max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+            tools=outils,
+        )
+
     runner = AgentRunner(
-        provider, registry, db_path=settings.ide_db_path, project_path=project_path
+        provider, registry, db_path=settings.ide_db_path, project_path=project_path,
+        fabrique_provider=_provider_limite,
     )
 
     project_context = await _build_project_context(project_id)

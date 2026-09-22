@@ -36,6 +36,14 @@ fichier entier.
 }
 ```
 
+Pour ajouter un passage là où rien n'existe encore, `apres_section` remplace
+`ancien` : le texte s'insère à la fin de la section dont tu donnes le titre
+exact, comme dans la doc technique.
+
+```json
+{ "fichier": "docs/guide-utilisateur.md", "apres_section": "## Lancer un ticket", "texte": "…" }
+```
+
 Si rien ne change pour l'utilisateur : `{"editions": []}`. C'est une réponse
 fréquente et parfaitement valable — beaucoup de tickets ne changent rien de
 visible.

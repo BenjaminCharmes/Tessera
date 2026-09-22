@@ -16,9 +16,10 @@ class MomentAgent(str, Enum):
 
     Le badge disait « natif » / « ajouté », c'est-à-dire qui avait écrit le
     prompt. Ça n'apprenait rien : c'est toujours un agent. Pire, il annonçait
-    « requis » pour quatre prompts que **rien n'appelle jamais** — `testeur`,
-    dont l'étape lance un sous-processus sans agent, et `architect`, que
-    `ide-core` déclare et que personne ne charge (ticket-097).
+    « requis » pour des prompts que **rien n'appelle jamais** — `testeur`,
+    dont l'étape lance un sous-processus sans agent (ticket-097). `architect`
+    a depuis trouvé sa place : il tient l'étape de production des tickets
+    `design` (ticket-098).
     """
 
     #: Appelé automatiquement pendant un run de pipeline.

@@ -1,13 +1,15 @@
 # Décisions d'architecture
 
-Ce fichier trace les décisions importantes et leur justification.
-Format : ADR léger (Architecture Decision Record).
+Ce fichier trace les décisions importantes et leur justification, dans
+l'ordre où elles ont été prises — pas par sujet. Un ADR **sans `Portée`** est
+une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
 ## ADR-001 — Self-hosting comme premier projet
 
 **Date** : 2025-06  
+**Portée** : architect  
 **Décision** : L'IDE se construit lui-même via le projet `ide-core`  
 **Raison** : Évite de maintenir deux systèmes séparés. L'IDE mange sa propre cuisine dès le départ, ce qui force à le rendre utilisable rapidement.  
 **Alternative rejetée** : Écrire l'IDE "à la main" puis le brancher après.
@@ -27,6 +29,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-003 — Tickets comme fichiers Markdown
 
 **Date** : 2025-06  
+**Portée** : architect  
 **Décision** : Les tickets sont des fichiers `.md` avec frontmatter YAML, pas une DB  
 **Raison** : Lisibles sans l'IDE, versionnables avec git, diffables. La DB vient en couche de cache au-dessus, pas comme source de vérité.  
 **Alternative rejetée** : SQLite comme source de vérité pour les tickets.
@@ -79,6 +82,7 @@ Format : ADR léger (Architecture Decision Record).
 **Portée** : architect, codeur, reviewer  
 **Décision** : `Orchestrator` est instancié à chaque requête HTTP (pas de singleton). Il reçoit `AgentRunner`, `TicketService` et `project_context` en injection de dépendances.  
 **Raison** : Deux pipelines sur des projets différents peuvent tourner en parallèle sans partage d'état. La concurrence est naturelle car `asyncio` + instances séparées = zéro lock à gérer.  
+**Amendée 2026-09-22** : « zéro lock » ne tient que **entre** projets ; sur un même arbre, `RunLock` refuse le second run (ADR-038).  
 **Alternative rejetée** : Singleton avec un dictionnaire de verrous par ticket — trop complexe pour la v0.
 
 ---
@@ -126,7 +130,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-014 — Vitest + React Testing Library pour les tests frontend
 
 **Date** : 2026-06-20
-**Portée** : architect, codeur, testeur  
+**Portée** : architect, codeur  
 **Décision** : Vitest pour l'exécution + RTL pour les assertions composants.
 **Raison** : Vitest partage la config Vite (transforms, aliases, ESM) sans configuration séparée. RTL encourage les tests par comportement utilisateur, pas par implémentation.
 **Alternative rejetée** : Jest (configuration babel séparée, pas d'ESM natif, overhead de setup).
@@ -282,6 +286,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-032 — Un ADR déclare qui il contraint
 
 **Date** : 2026-09-18
+**Portée** : architect
 **Décision** : un ADR peut porter `**Portée** : rôle, rôle` ; `services/adr.py` réduit alors la section « Décisions récentes » du prompt aux ADR qui concernent le rôle appelé. **Sans portée, l'ADR part à tous.** Elle ne s'écrit que sur un ADR qui enregistre un choix passé, jamais sur une contrainte de comportement — un test le verrouille.
 **Raison** : le fichier part dans chaque appel d'agent, jusqu'à dix-huit par ticket. Le coût compte, la dilution davantage : un codeur recevait la palette de couleurs et le choix du gestionnaire de paquets Python au milieu des règles qu'il doit tenir.
 **Ce qui rend la règle sûre** : un agent que l'utilisateur vient de créer n'est nommé nulle part, et reçoit malgré tout tout le tronc commun — donc toutes les contraintes.
@@ -298,6 +303,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-034 — Une règle n'est décrite qu'à un endroit, et ce qui compte est mesuré
 
 **Date** : 2026-09-18
+**Portée** : architect
 **Décision** : une règle a **une** description ; les fichiers de consigne renvoient à elle au lieu de la reformuler. `test_consignes_coherentes.py` vérifie qu'ils ne se contredisent pas sur git, ne codent en dur aucun chemin de machine, ne décrivent rien d'absent, et qu'aucun ADR ne dépasse son budget.
 **Raison** : `projects/ide-core/CLAUDE.md` portait sa propre version du flux git — PR de ticket sur `main`, merge en `--squash` — l'exact inverse de la règle. Il est `@`-importé dans chaque session quand le skill juste se charge à la demande : la consigne fausse était toujours en contexte, la bonne seulement parfois.
 **Corollaire** : un budget que rien ne mesure est un souhait. Douze ADR sur trente et un dépassaient le leur, dont trois écrits le jour où ce budget était rappelé.
@@ -307,6 +313,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-035 — La documentation se met à jour par lot, en modifications ciblées
 
 **Date** : 2026-09-18
+**Portée** : architect
 **Décision** : à la fin d'une file ou d'un run autonome — jamais par ticket — `doc-technique` et `doc-fonctionnelle` reçoivent les tickets livrés depuis le dernier marqueur. Ils rendent des **modifications** : un ancien texte exact, un nouveau. Un ancien absent, ambigu, ou qui amputerait le fichier de moitié rejette tout le lot sans rien écrire.
 **Raison** : `doc-updater` réécrivait le fichier **entier** depuis une vue tronquée à 8 000 caractères, avec 2 048 tokens de sortie. Sur un `README.md` de 24 000 caractères, l'activer en aurait effacé les deux tiers sans erreur — le contrat ne lui laissait pas le choix. Et documenter par ticket réécrit le même fichier trois fois pour une même feature.
 **Pourquoi deux agents** : un seul écrit un guide utilisateur plein de noms de classes — c'est ce qu'il vient de lire.
@@ -316,6 +323,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-036 — Une clef de manifeste se renomme en gardant la lecture de l'ancienne
 
 **Date** : 2026-09-21
+**Portée** : architect
 **Décision** : le produit s'appelle Tessera. Les identifiants portant l'ancien nom sont réécrits, **sauf** `vibe_artifacts` dans `agents.json` : la clef devient `artifacts`, l'ancienne reste lue, jamais réécrite.
 **Raison** : huit manifestes la déclaraient déjà sur disque, dont des dépôts clients que ce dépôt ne versionne pas. Une clef inconnue tombe sur le défaut fermé d'ADR-023 : un projet en `tracked` serait repassé en `local` sans demande et sans message. Le renommage aurait donc changé un comportement qu'il prétendait préserver.
 **Alternative rejetée** : migrer les manifestes d'office — écrire dans le dépôt d'un client pour une question cosmétique ; garder les deux clefs en écriture — elles divergeraient.

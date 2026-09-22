@@ -7,8 +7,8 @@ description: Use when recording a non-trivial architecture decision in memory/de
 
 ## Le coût caché — lire ceci en premier
 
-`routers/orchestrator.py` et `routers/agents.py` injectent `memory/decisions.md`
-dans le contexte projet de **chaque** appel d'agent. Sur un ticket qui va au
+`routers/orchestrator.py`, `routers/agents.py` et `routers/chat.py` injectent
+`memory/decisions.md` dans le contexte projet de **chaque** appel d'agent. Sur un ticket qui va au
 bout, c'est jusqu'à 18 appels. Un ADR de 500 mots coûte donc ~650 tokens × 18,
 à chaque ticket, pour toujours.
 
@@ -69,7 +69,10 @@ Dans le doute, **pas de portée**. Un ADR de trop dans un prompt coûte des
 tokens ; un ADR manquant coûte un comportement.
 
 `test_adr_pertinents.py` refuse une portée posée sur une contrainte de
-comportement : la liste y est explicite.
+comportement, et exige une portée sur les choix passés. Les deux listes y sont
+**explicites** et ne se mettent pas à jour seules : un ADR nouveau s'ajoute à
+l'une ou à l'autre le jour où il est écrit — elles se sont arrêtées à ADR-031
+pendant que cinq contraintes s'écrivaient sans protection.
 
 ## Ce qui n'a rien à faire dans un ADR
 

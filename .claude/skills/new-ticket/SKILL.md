@@ -99,4 +99,4 @@ deux sujets sans rapport, ce sont deux tickets. Le symptôme classique :
 - [ ] Chaque critère d'acceptation se tranche par oui/non
 - [ ] `depends_on` contient des ids existants
 - [ ] Si le ticket doit toucher `CLAUDE.md`, il le dit **explicitement**
-      (règle 4 : aucune modification sans ticket qui l'autorise)
+      (règle 5 : aucune modification sans ticket qui l'autorise)

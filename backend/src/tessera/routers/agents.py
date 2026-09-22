@@ -14,6 +14,7 @@ from tessera.services.agent_runner import AgentRunner
 from tessera.services.github_service import GitHubService
 from tessera.services.project_creator import ProjectCreatorService
 from tessera.services.providers import get_provider
+from tessera.services.providers.base import LLMProvider
 from tessera.services.project_loader import ProjectLoader, load_agents_config
 from tessera.services.sync_map import SyncMapService
 from tessera.services.ticket_service import TicketService
@@ -35,7 +36,18 @@ def _make_runner(project_id: str) -> AgentRunner:
     )
     registry = AgentRegistryService(settings.ide_prompts_dir)
     project_path = settings.ide_workspace_dir / project_id
-    return AgentRunner(provider, registry, project_path=project_path)
+    return AgentRunner(
+        provider, registry, project_path=project_path, fabrique_provider=_provider_limite
+    )
+
+
+def _provider_limite(outils: list[str]) -> LLMProvider:
+    """Le même provider, réduit aux outils nommés — le reviewer ne lit que."""
+    return get_provider(
+        settings.llm_provider, settings.anthropic_api_key,
+        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        tools=outils,
+    )
 
 
 def _make_project_creator() -> ProjectCreatorService:

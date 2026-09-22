@@ -54,19 +54,11 @@ class ResolveurConflitService:
 
         Le contenu marqué part dans le prompt plutôt que d'être laissé à lire
         à l'agent : c'est un tour d'outil de moins, et une occasion de moins de
-        se tromper de fichier.
+        se tromper de fichier. Rien d'autre : les règles — réécrire sans
+        marqueur, garder la branche du ticket, aucune commande git — sont dans
+        `resolveur-conflit.md`, et une règle n'a qu'une description (ADR-034).
         """
-        morceaux: list[str] = [
-            "Un rebase a laissé des conflits. Réécris chaque fichier ci-dessous "
-            "dans son état final, sans marqueur de conflit.",
-            "",
-            "Garde les deux intentions quand elles sont compatibles. Quand elles "
-            "ne le sont pas, garde celle de la branche du ticket et signale-le.",
-            "",
-            "N'utilise aucune commande git : le rebase est en cours et c'est "
-            "l'IDE qui le termine.",
-            "",
-        ]
+        morceaux: list[str] = []
         for chemin in fichiers:
             fichier = self._project_path / chemin
             contenu = (
