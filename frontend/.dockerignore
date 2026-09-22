@@ -1,0 +1,12 @@
+# Ce que le build Docker ne doit pas emporter : `COPY . .` prendrait sinon
+# le node_modules local (un lien symbolique sur ce poste), la coquille Rust
+# et les sorties de tests — des centaines de Mo pour un build qui refait
+# `npm ci` lui-meme.
+node_modules
+dist
+coverage
+playwright-report
+test-results
+src-tauri/target
+.vite
+Dockerfile

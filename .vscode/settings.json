@@ -1,5 +1,7 @@
 {
-  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  // Le dossier du venv, pas son interpréteur : `bin/python` n'existe que sur
+  // POSIX, `Scripts/python.exe` que sous Windows, et le dépôt sert sur les deux.
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv",
   "python.terminal.activateEnvironment": true,
   "[python]": {
     "editor.formatOnSave": true,

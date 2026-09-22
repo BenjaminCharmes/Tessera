@@ -1,6 +1,6 @@
 """Nettoyage des branches créées par Tessera — ticket-070.
 
-Chaque run crée `ticket-XXX-…`, chaque session de chat `chat/<horodatage>`, et
+Chaque run crée `ticket-XXX-…`, chaque session de chat `chat-<horodatage>`, et
 rien ne les retirait jamais. Après une seule session d'usage réel, `tmp` en
 portait déjà deux, mortes, identiques à `main`. Sur un dépôt client, cette
 accumulation devient visible.
@@ -9,7 +9,7 @@ Supprimer une branche est irréversible, et sur le dépôt de quelqu'un d'autre
 c'est le genre d'automatisme qu'on regrette. D'où quatre garde-fous, et un plan
 qu'on peut lire avant d'agir :
 
-1. **Seulement ce que Tessera a créé** — `ticket-*` et `chat/*`. Le reste
+1. **Seulement ce que Tessera a créé** — `ticket-*` et `chat-*`. Le reste
    appartient à l'utilisateur.
 2. **Jamais la branche courante.**
 3. **Jamais une branche poussée** : elle existe ailleurs, et la retirer ici
@@ -31,8 +31,11 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-#: Ce que Tessera crée, et donc ce qu'il peut retirer.
-_PREFIXES = ("ticket-", "chat/")
+#: Ce que Tessera crée, et donc ce qu'il peut retirer. Les deux passent par
+#: `GitWorkspaceService._branch_name`, qui joint par un tiret et retire tout
+#: caractère hors alphanumérique : un préfixe à barre oblique n'a jamais
+#: existé sur disque, et le nettoyage ne reconnaissait aucune branche de chat.
+_PREFIXES = ("ticket-", "chat-")
 
 
 class PlanDeNettoyage(BaseModel):

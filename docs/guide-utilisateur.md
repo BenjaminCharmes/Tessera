@@ -424,7 +424,8 @@ La conversation survit à un rechargement de la page.
 | `testeur` | Lance la suite de tests du projet (pytest / npm / cargo) |
 | `securite` | Audit OWASP du diff — bloque sur CRITICAL/HIGH |
 | `validateur` | Vérifie les critères d'acceptation un par un |
-| `doc-updater` | Met à jour README, docs et `CLAUDE.md` après approbation |
+| `doc-technique` | Met à jour la documentation technique par lot, en fin de file, par modifications ciblées (ADR-035) |
+| `doc-fonctionnelle` | Idem pour le guide utilisateur, sans noms de classes |
 | `chat` | Discute du projet, lit et écrit ses fichiers (onglet Chat) |
 | `planificateur` | Découpe une évolution décrite en langage naturel en tickets |
 | `architect` | Intervient sur les tickets de type `design` |
@@ -438,8 +439,9 @@ modifier, et en ajouter — via **Sidebar → ⚙ Agents**, ou en déposant un f
 ### Activer ou désactiver des étapes
 
 Toutes les étapes ne sont pas obligatoires. La configuration du pipeline de chaque
-projet permet de désactiver le testeur, la sécurité, le validateur ou le doc-updater,
-et de régler `max_review_rounds`.
+projet permet de désactiver le testeur, la sécurité ou le validateur, et de
+régler `max_review_rounds`. La documentation ne se règle pas par ticket : elle
+se met à jour à la fin d'une file ou d'un run autonome (ADR-035).
 
 ---
 

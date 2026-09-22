@@ -28,7 +28,7 @@ _EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 # coder agent produced. `TicketService.update_status` rewrites the ticket's
 # Markdown file twice per run (in-progress, then in-review), and `_log`
 # appends to the pipeline log at every step. If these show up in the diff
-# fed to the reviewer/security-auditor/validator/doc-updater, those agents
+# fed to the reviewer/security-auditor/validator/documentation agents, they
 # mistake the orchestrator's own bookkeeping for the coder's work, and an
 # approved run would commit it under the ticket's message. Excluded from
 # both the reviewed diff and the ticket's own commit via git's magic
@@ -330,8 +330,8 @@ class GitWorkspaceService:
         Tessera's own bookkeeping (`_ORCHESTRATOR_ARTIFACT_PATHS`) is
         excluded via pathspec: it is the orchestrator rewriting ticket
         status and the pipeline log, not code the coder agent produced, and
-        must never be presented to the reviewer/auditor/validator/doc-updater
-        as if it were.
+        must never be presented to the reviewer/auditor/validator/documentation
+        agents as if it were.
         """
         await self._run("add", "-A", "-N")
         pathspec = (

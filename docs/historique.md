@@ -48,7 +48,7 @@ Cette page résume les grandes étapes.
 
 | Feature | Status |
 |---------|--------|
-| Agent doc-updater — mise à jour auto de la documentation post-pipeline | ✅ |
+| Mise à jour automatique de la documentation après pipeline (remplacée par lot, ADR-035) | ✅ |
 | Agent testeur — exécution des tests dans le pipeline (pytest/npm/cargo) | ✅ |
 | Agent validateur — vérification critère par critère des ACs du ticket | ✅ |
 | Agent sécurité — audit OWASP automatique avant le reviewer | ✅ |
@@ -97,15 +97,13 @@ Cette page résume les grandes étapes.
 | Reprise sur hypothèse énoncée si personne ne répond (ADR-025) | ✅ |
 | Cohérence visuelle : cinq familles de couleurs à rôle (ADR-026) | ✅ |
 | **Les agents ne touchent pas à l'historique git** (ADR-027) | ✅ |
-| Un run qui échoue à committer ne peut pas se dire approuvé | ✅ |
-
-## Structure du monorepo
+| Un run qui échoue à committer ne peut pas se dire## Structure du monorepo
 
 ```
 Tessera/
 ├── .env.example              ← Template de configuration (copier en .env)
 ├── Makefile                  ← Commandes de lancement (make dev, make test...)
-├── CLAUDE.md                 ← Constitution du projet pour les agents IA
+├── CLAUDE.md                 ← Constitution du projet pour les agents
 │
 ├── backend/                  ← Orchestrateur Python/FastAPI
 │   ├── pyproject.toml
@@ -114,58 +112,42 @@ Tessera/
 │   │   ├── config.py         ← Settings (pydantic-settings, lit .env)
 │   │   ├── models/           ← Pydantic models (Ticket, Agent, Project)
 │   │   ├── routers/          ← Endpoints HTTP + WebSocket
-│   │   │   ├── projects.py   ← CRUD projets + clone + analyze + plan
-│   │   │   ├── tickets.py    ← CRUD tickets + batch + PR
-│   │   │   ├── agents.py     ← run/stream + create-project/agent
-│   │   │   ├── agent_admin.py← CRUD registre agents dynamiques
-│   │   │   └── orchestrator.py ← pipeline run/autonomous + WS stream
-│   │   ├── services/
-│   │   │   ├── agent_runner.py     ← Appels Anthropic (streaming + complet)
-│   │   │   ├── agent_registry.py   ← Registre agents (lecture/écriture prompts)
-│   │   │   ├── agent_creator.py    ← Création agent via conversation
-│   │   │   ├── orchestrator.py     ← Pipeline enrichi (testeur→securite→reviewer→validateur→doc-updater)
-│   │   │   ├── ticket_service.py   ← CRUD tickets sur filesystem
-│   │   │   ├── project_loader.py   ← Chargement CLAUDE.md + agents.json
-│   │   │   ├── project_creator.py  ← Création projet + auto-agents
-│   │   │   ├── project_importer.py ← Import local (symlink/copy)
-│   │   │   ├── project_analyzer.py ← Génération CLAUDE.md depuis code
-│   │   │   ├── test_runner.py      ← Exécution tests (pytest/npm/cargo), timeout 120s
-│   │   │   ├── security_auditor.py ← Audit OWASP (BLOCK si CRITICAL/HIGH)
-│   │   │   ├── validator.py        ← Validation critères d'acceptation
-│   │   │   ├── doc_updater.py      ← Mise à jour docs post-approbation
-│   │   │   ├── planner.py          ← Description NL → batch de tickets
-│   │   │   ├── git_clone.py        ← Clone repo GitHub
-│   │   │   ├── github_service.py   ← Client httpx pour GitHub API
-│   │   │   └── sync_map.py         ← Correspondances ticket ↔ issue
+│   │   ├── services/         ← Pipeline, git, livraison, documentation, GitHub…
+│   │   │                        (le détail est dans docs/architecture.md)
 │   │   └── agents/
 │   │       └── github_sync.py      ← Sync bidirectionnelle tickets ↔ issues
-│   └── tests/                ← 429 tests (pytest + respx) — couverture 74%
+│   └── tests/                ← pytest + respx
 │
 ├── agents/
 │   └── prompts/              ← System prompts de chaque agent (Markdown)
 │       ├── codeur.md
 │       ├── reviewer.md
-│       ├── orchestrateur.md
+│       ├── securite.md
+│       ├── validateur.md
+│       ├── doc-technique.md
+│       ├── doc-fonctionnelle.md
+│       ├── resolveur-conflit.md
 │       ├── architect.md
+│       ├── chat.md
+│       ├── planificateur.md
 │       ├── project-creator.md
 │       ├── project-analyzer.md
-│       ├── planificateur.md
-│       ├── doc-updater.md
-│       ├── testeur.md
-│       ├── validateur.md
-│       └── securite.md
+│       └── agent-creator.md
 │
 ├── projects/
 │   └── ide-core/             ← Projet bootstrap (l'IDE se construit lui-même)
 │       ├── CLAUDE.md
 │       ├── agents.json
 │       ├── tickets/
-│       │   └── done/         ← 38 tickets terminés ✅ (Phases 1–6 complètes)
+│       │   └── done/         ← 117 tickets terminés ✅ (Phases 1–10 complètes)
 │       └── memory/
 │           └── decisions.md  ← ADRs documentés
 │
 ├── docs/
 │   ├── architecture.md       ← Vue d'ensemble technique
+│   ├── guide-utilisateur.md  ← Mode d'emploi
+│   ├── configuration.md      ← Variables d'environnement
+│   ├── api.md                ← Référence des endpoints
 │   └── ticket-strategy.md    ← Stratégie hybride GitHub ↔ Markdown
 │
 └── frontend/                 ← React + TypeScript + Tailwind + Vite

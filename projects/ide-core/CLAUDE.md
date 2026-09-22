@@ -23,8 +23,9 @@ Ce qui sert vraiment avant d'écrire du code :
 ## Ce qui tourne réellement sur ce projet
 
 `agents.json` déclare `codeur` et `reviewer` dans le pipeline. Le testeur, la
-sécurité, le validateur et le doc-updater sont **désactivés** ici — leurs
-`*_enabled` sont absents, donc faux.
+sécurité et le validateur sont **désactivés** ici — leurs `*_enabled` sont
+absents, donc faux. La documentation, elle, se met à jour par lot en fin de
+file (ADR-035), jamais par ticket.
 
 Ce n'est pas un oubli à corriger à la légère : les tests de ce dépôt vivent
 dans `backend/` et `frontend/`, au-dessus du dossier du projet, et

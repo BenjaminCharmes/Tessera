@@ -138,6 +138,7 @@ Format : ADR léger (Architecture Decision Record).
 **Date** : 2026-06-20
 **Portée** : architect  
 **Décision** : `backend` (ubuntu, pytest), `frontend` (ubuntu, tsc+vitest), `tauri` (macos, cargo check) en parallèle.
+**Amendée 2026-09-22** : cinq jobs — `e2e` (Playwright) suit `frontend`, et `tauri` ne tourne que si `detecter` voit `frontend/src-tauri/` changer : une minute macOS vaut dix minutes ubuntu, pour dix-huit secondes de `cargo check`.
 **Raison** : Séparation des responsabilités + exécution parallèle = feedback rapide. `macos-latest` pour Tauri (headers WKWebView disponibles). `cargo check` et non `cargo build` pour éviter 10+ min de compilation complète.
 **Alternative rejetée** : Job unique séquentiel (lent), `cargo build` complet en CI (coûteux).
 
@@ -184,7 +185,7 @@ Format : ADR léger (Architecture Decision Record).
 ## ADR-019 — Le chat de l'IDE commite comme un run de pipeline
 
 **Date** : 2026-09-15
-**Décision** : le chat conversationnel écrit sur une branche `chat/<horodatage>` et commite son travail, comme un run le fait sur sa branche de ticket. Il ne laisse jamais l'arbre sale.
+**Décision** : le chat conversationnel écrit sur une branche `chat-<horodatage>` et commite son travail, comme un run le fait sur sa branche de ticket. Il ne laisse jamais l'arbre sale.
 **Raison** : ADR-018 fait reposer l'enchaînement des tickets sur un arbre propre au démarrage. Un chat qui écrit sans committer enverrait le ticket suivant en `blocked` sans qu'aucun agent n'ait tourné. Traiter le chat comme un producteur de travail de première classe évite d'inventer un second régime d'écriture à côté de celui du pipeline.
 **Alternative rejetée** : limiter le chat aux fichiers hors arbre suivi — sûr, mais en fait un outil de seconde classe ; poser un verrou qui empêche le pipeline de démarrer — sérialise deux choses qui travaillent sur des branches distinctes. Une branche `chat/*` de trop se supprime ; un arbre cassé bloque la file.
 

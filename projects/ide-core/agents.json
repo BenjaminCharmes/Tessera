@@ -8,8 +8,7 @@
       "model": "claude-sonnet-4-6",
       "max_tokens": 8192,
       "prompt_file": "agents/prompts/codeur.md",
-      "active": true,
-      "max_instances": 2
+      "active": true
     },
     {
       "role": "reviewer",
@@ -31,8 +30,7 @@
       "codeur",
       "reviewer"
     ],
-    "max_review_rounds": 3,
-    "auto_merge_on_approve": true
+    "max_review_rounds": 3
   },
   "autonomy": "merge"
 }

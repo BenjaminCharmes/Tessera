@@ -39,7 +39,7 @@ jobs:
           cache-dependency-glob: "backend/uv.lock"
 
       - name: Install dependencies
-        run: cd backend && uv sync --extra dev
+        run: cd backend && uv sync --locked --extra dev
 
       - name: Run tests with coverage
         run: cd backend && uv run pytest -v -m "not integration" --cov=tessera --cov-report=term-missing --cov-report=xml
@@ -53,7 +53,9 @@ jobs:
           path: backend/coverage.xml
 
       - name: Coverage report on PR (backend)
-        if: github.event_name == 'pull_request'
+        # Sur une PR venue d'un fork, GITHUB_TOKEN est en lecture seule : le
+        # commentaire échouerait et ferait passer la CI au rouge pour rien.
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: orgoro/coverage@v3.3
         with:
           coverageFile: backend/coverage.xml
@@ -90,7 +92,7 @@ jobs:
           path: frontend/coverage/
 
       - name: Coverage report on PR (frontend)
-        if: github.event_name == 'pull_request'
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: romeovs/lcov-reporter-action@v0.4.0
         with:
           lcov-file: frontend/coverage/lcov.info

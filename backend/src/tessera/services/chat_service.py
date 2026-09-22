@@ -9,7 +9,7 @@ Two constraints shape it, and both come from elsewhere in the system:
 - **ADR-019** — a chat that writes into the working tree breaks the clean-tree
   guarantee `ADR-018` relies on, and the next ticket would go straight to
   `blocked` without any agent running. So the chat commits its work on a
-  `chat/<timestamp>` branch, exactly as a pipeline run does on the ticket's.
+  `chat-<timestamp>` branch, exactly as a pipeline run does on the ticket's.
 - **Cost** — `llm_max_budget_usd` bounds a single call, not a conversation. A
   long discussion would burn the subscription quota with nothing surfacing it,
   so the conversation carries its own ceiling.
@@ -158,7 +158,7 @@ class ChatService:
         return "\n\n".join(parts)
 
     async def _commit_if_written(self, message: str) -> tuple[str | None, str | None]:
-        """Commit on a `chat/…` branch, but only if the agent actually wrote.
+        """Commit on a `chat-…` branch, but only if the agent actually wrote.
 
         A purely conversational turn must not create a branch, or every
         question would leave a dead one behind. When the agent *did* write,

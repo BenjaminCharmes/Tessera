@@ -1,7 +1,7 @@
 """The individual stages of a pipeline run — ticket-046.
 
 `run_pipeline` used to hold all of this inline: some 490 lines chaining
-coder → tests → security → reviewer → validator → doc-updater → commit,
+coder → tests → security → reviewer → validator → documentation → commit,
 over shared local state and event-emitting closures. Each stage now lives in
 its own function, so it can be read and tested on its own.
 

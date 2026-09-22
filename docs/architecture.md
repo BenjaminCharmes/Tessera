@@ -52,7 +52,8 @@ environnements sans session interactive : Docker, CI).
 
 `get_provider(allow_tools=False)` retourne une variante **sans outils**, utilisée
 par tous les services purement texte→JSON (validateur, auditeur sécurité,
-planificateur, project-analyzer, agent-creator, project-creator, doc-updater) qui
+planificateur, project-analyzer, agent-creator, project-creator, doc-technique,
+doc-fonctionnelle) qui
 écrivent eux-mêmes leurs fichiers en Python.
 
 ### Couche git (ADR-018, ADR-024, ADR-027)
@@ -279,7 +280,7 @@ Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
            ticket_status_changed | test_result | security_audit_started |
            security_audit_done | validation_done | doc_updated | commit_created |
            pipeline_done | error",
-  "agent": "codeur | reviewer | testeur | securite | validateur | doc-updater | null",
+  "agent": "codeur | reviewer | testeur | securite | validateur | doc-technique | doc-fonctionnelle | null",
   "ticket_id": "ticket-007",
   "data": { "round": 1, "token": "def foo", "status": "in-progress", "approved": true },
   "timestamp": "2026-06-20T14:30:00Z"

@@ -1,7 +1,5 @@
 # Référence API
 
-Le backend sert aussi `/docs` en interactif quand il tourne.
-
 Table générée depuis `openapi.json` — la source fait foi, et `/docs` la sert
 en interactif quand le backend tourne.
 

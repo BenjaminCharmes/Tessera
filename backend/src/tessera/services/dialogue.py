@@ -1,7 +1,7 @@
 """Dialogue between the user and a pipeline run in progress — ticket-066.
 
 Until now a run was a closed pipe: once started it went from the coder to the
-doc-updater without ever handing back control. An agent that hit an ambiguity
+last stage without ever handing back control. An agent that hit an ambiguity
 decided alone, and its assumption only surfaced at commit time — usually after
 it had written the wrong code.
 

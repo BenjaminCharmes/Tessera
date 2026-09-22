@@ -2,7 +2,8 @@
 
 Deux défauts corrigés d'un coup.
 
-**Le premier était une mine.** `doc-updater` tournait à chaque run approuvé, ne
+**Le premier était une mine.** L'agent de documentation d'origine tournait à
+chaque run approuvé, ne
 voyait la documentation que tronquée à 8 000 caractères, ne pouvait en émettre
 que ~8 000 (2048 tokens), et réécrivait le fichier **entier** avec ce qu'il
 avait produit. Sur un `README.md` de 24 000 caractères, le premier run activé

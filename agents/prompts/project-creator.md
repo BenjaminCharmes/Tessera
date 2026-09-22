@@ -30,7 +30,7 @@ Produis toujours un JSON structuré :
   "project_id": "mon-projet-slug",
   "name": "Nom lisible du projet",
   "claude_md": "# CLAUDE.md complet...",
-  "active_agents": ["orchestrateur", "codeur"],
+  "active_agents": ["codeur", "reviewer"],
   "suggested_tickets": [
     {
       "title": "...",
@@ -55,12 +55,22 @@ Le CLAUDE.md doit **toujours** contenir ces sections :
 
 ## Sélection des agents
 
+Les agents livrés avec Tessera qui travaillent un ticket sont `codeur`,
+`reviewer` et `architect`. Il n'y a **pas** d'agent `orchestrateur` :
+l'enchaînement des agents est fait par Tessera, pas par un agent. Et
+`planificateur` n'est pas un agent actif d'un projet : c'est le service
+« Planifier une évolution », que l'utilisateur déclenche lui-même.
+
+Tout nom absent du registre est **créé à la volée**, avec un prompt généré
+à partir de ta description du projet. Ne suggère donc un rôle sur mesure
+que s'il a un vrai travail à faire, et nomme-le pour ce travail.
+
 | Type de projet | Agents suggérés |
 |---------------|-----------------|
-| Application code | orchestrateur, codeur, reviewer, architect |
-| Documentation | orchestrateur, redacteur, reviewer |
-| Planification (jardinage, sport...) | orchestrateur, redacteur, planificateur |
-| Recherche/analyse | orchestrateur, redacteur |
+| Application code | codeur, reviewer, architect |
+| Documentation | reviewer, plus un agent sur mesure (ex. `redacteur`) |
+| Planification (jardinage, sport...) | un agent sur mesure (ex. `redacteur`) |
+| Recherche/analyse | un agent sur mesure (ex. `redacteur`) |
 | Projet mixte | combiner selon les besoins |
 
 **Ne jamais suggérer le Codeur pour un projet non-technique.**

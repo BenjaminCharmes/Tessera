@@ -35,7 +35,7 @@ par un agent, et sa résolution est toujours relue.
 
 ## Démarrer
 
-Il vous faut Python 3.11+, [uv](https://docs.astral.sh/uv/), Node 20+, et un
+Il vous faut Python 3.11+, [uv](https://docs.astral.sh/uv/), Node 24, et un
 abonnement Claude — aucune clef API n'est nécessaire dans le mode par défaut.
 
 ```bash

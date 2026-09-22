@@ -322,10 +322,20 @@ def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
 
     manifeste = json.loads(_default_agents_json("p", [], "tracked"))
 
+    mortes = _clefs_mortes(manifeste)
+    assert mortes == [], f"clefs écrites dans agents.json mais jamais lues : {mortes}"
+
+
+def _clefs_mortes(manifeste: dict[str, object]) -> list[str]:
+    """Les clefs d'un `agents.json` qu'aucun code ne consomme."""
     clefs = set(manifeste) - {"project_id"}
-    clefs |= set(manifeste["pipeline"])
-    for agent in manifeste["agents"]:
-        clefs |= set(agent)
+    pipeline = manifeste.get("pipeline")
+    if isinstance(pipeline, dict):
+        clefs |= set(pipeline)
+    agents = manifeste.get("agents")
+    if isinstance(agents, list):
+        for agent in agents:
+            clefs |= set(agent)
 
     sources = ""
     for chemin in (_RACINE / "backend" / "src").rglob("*.py"):
@@ -344,8 +354,25 @@ def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
     for chemin in exclus:
         ailleurs = ailleurs.replace(chemin.read_text(encoding="utf-8"), "")
 
-    mortes = sorted(c for c in clefs if c not in ailleurs)
-    assert mortes == [], f"clefs écrites dans agents.json mais jamais lues : {mortes}"
+    return sorted(c for c in clefs if c not in ailleurs)
+
+
+def test_le_manifeste_d_ide_core_ne_porte_aucune_clef_morte() -> None:
+    """Le manifeste du projet bootstrap est tenu au même contrat que ceux générés.
+
+    Le test précédent verrouille ce que `_default_agents_json` écrit, pas ce
+    qui est déjà sur disque : `projects/ide-core/agents.json` portait encore
+    `auto_merge_on_approve` — retiré du modèle au ticket-091 — et
+    `max_instances`, jamais lu. Le projet qui construit l'IDE est celui qu'on
+    ouvre en premier pour comprendre un `agents.json` ; un réglage mort y
+    enseigne une fausse règle à qui le lit.
+    """
+    import json
+
+    manifeste = json.loads(_lire("projects/ide-core/agents.json"))
+
+    mortes = _clefs_mortes(manifeste)
+    assert mortes == [], f"clefs mortes dans projects/ide-core/agents.json : {mortes}"
 
 
 # ------------------------------------------------------------------
