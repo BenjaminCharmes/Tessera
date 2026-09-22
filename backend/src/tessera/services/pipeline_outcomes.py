@@ -28,7 +28,7 @@ async def finish_security_block(
     orch: "Orchestrator", run: PipelineRun, summary: str
 ) -> PipelineResult:
     await set_status(orch, run, TicketStatus.blocked)
-    commit_sha = await commit_work(
+    commit_sha, arret = await commit_ou_bloquer(
         orch,
         run,
         _unapproved_commit_message(
@@ -49,6 +49,7 @@ async def finish_security_block(
         approved=False,
         branch=run.branch,
         commit_sha=commit_sha,
+        arret=arret,
     )
 
 
@@ -81,6 +82,25 @@ async def commit_work(
     return commit_sha
 
 
+async def commit_ou_bloquer(
+    orch: "Orchestrator", run: PipelineRun, message: str
+) -> tuple[str | None, str | None]:
+    """Commit the work; on failure, return the cause instead of raising.
+
+    Le point de sortie unique de tous les `finish_*` (ticket-121). Avant,
+    seul `finish_approved` attrapait `CommitFailed` : sur un blocage
+    sécurité, un arrêt ou un épuisement des tours, l'exception remontait à
+    `_run_pipeline`, qui appelait `finish_interrupted`, qui rappelait
+    `commit_work`, qui relevait — 500 FastAPI, arbre sale, run jamais clos.
+    Un commit raté est une sortie du run comme une autre : il se nomme dans
+    `arret`, il ne se propage pas.
+    """
+    try:
+        return await commit_work(orch, run, message), None
+    except CommitFailed as exc:
+        return None, f"commit_failed: {_single_line(str(exc))[:200]}"
+
+
 async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineResult:
     """Mark the ticket done, commit under its own type, advance the base ref.
 
@@ -93,11 +113,10 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
     # Ce message est écrit dans le dépôt *de l'utilisateur* : il suit donc la
     # convention de ce dépôt — Conventional Commits — avec le type du ticket
     # plutôt qu'un "feat:" codé en dur, qui mal-étiquetait les fix/chore/docs.
-    try:
-        commit_sha = await commit_work(
-            orch, run, f"{run.ticket.type.value}: {run.ticket_id} — {run.ticket.title}"
-        )
-    except CommitFailed:
+    commit_sha, arret = await commit_ou_bloquer(
+        orch, run, f"{run.ticket.type.value}: {run.ticket_id} — {run.ticket.title}"
+    )
+    if arret is not None:
         # « Rien à committer » (commit_sha None) reste un succès : le travail
         # existait déjà. Un commit *raté* est autre chose, et le ticket ne peut
         # pas passer `done` dessus.
@@ -109,6 +128,7 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
             rounds=run.round_num,
             approved=False,
             branch=run.branch,
+            arret=arret,
         )
 
     await set_status(orch, run, TicketStatus.done)
@@ -147,7 +167,7 @@ async def finish_stopped(orch: "Orchestrator", run: PipelineRun) -> PipelineResu
     """
     await set_status(orch, run, TicketStatus.blocked)
     await emit(run, EventType.ERROR, reason="stopped_by_user")
-    commit_sha = await commit_work(
+    commit_sha, arret = await commit_ou_bloquer(
         orch, run, _unapproved_commit_message(run.ticket_id, "arrêt demandé")
     )
     await emit(run, EventType.PIPELINE_DONE, approved=False, rounds=run.round_num)
@@ -159,6 +179,7 @@ async def finish_stopped(orch: "Orchestrator", run: PipelineRun) -> PipelineResu
         approved=False,
         branch=run.branch,
         commit_sha=commit_sha,
+        arret=arret,
     )
 
 
@@ -167,7 +188,7 @@ async def finish_rounds_exhausted(
 ) -> PipelineResult:
     """Block the ticket after the last round, committing the work all the same."""
     await set_status(orch, run, TicketStatus.blocked)
-    commit_sha = await commit_work(
+    commit_sha, arret = await commit_ou_bloquer(
         orch,
         run,
         _unapproved_commit_message(
@@ -189,6 +210,7 @@ async def finish_rounds_exhausted(
         approved=False,
         branch=run.branch,
         commit_sha=commit_sha,
+        arret=arret,
     )
 
 
@@ -213,9 +235,13 @@ async def finish_interrupted(
     await set_status(orch, run, TicketStatus.blocked)
     raison = f"{type(cause).__name__}: {_single_line(str(cause))[:120]}"
     await emit(run, EventType.ERROR, reason="interrupted", detail=raison)
-    commit_sha = await commit_work(
+    commit_sha, echec_commit = await commit_ou_bloquer(
         orch, run, _unapproved_commit_message(run.ticket_id, raison)
     )
+    # Dernier filet de `_run_pipeline` : si le commit échoue ici aussi, la
+    # panne d'origine ne doit pas disparaître derrière l'échec du commit.
+    if echec_commit is not None:
+        raison = f"{echec_commit} (après {raison})"
     await emit(
         run,
         EventType.PIPELINE_DONE,

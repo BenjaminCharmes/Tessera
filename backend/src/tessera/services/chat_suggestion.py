@@ -14,11 +14,10 @@ Trois pièces, chacune répondant à une contrainte posée par le ticket :
   branche d'ADR-018.
 """
 import re
-from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from typing import AsyncIterator
 
 from tessera.services.database import ChatMessageRow
+from tessera.services.run_lock import RunAlreadyInProgress, RunLock
 
 # Le marqueur que le prompt du chat demande à l'agent d'émettre. C'est un
 # protocole entre l'agent et l'UI, jamais du contenu destiné à l'utilisateur.
@@ -80,41 +79,6 @@ def summarize_conversation(
     return notice + truncated[len(notice):]
 
 
-class RunAlreadyInProgress(Exception):
-    """A pipeline is already running on this project."""
-
-    def __init__(self, project_id: str) -> None:
-        self.project_id = project_id
-        super().__init__(
-            f"Un pipeline tourne déjà sur le projet '{project_id}'. "
-            "Deux exécutions simultanées se marcheraient dessus dans le même "
-            "arbre de travail : attends la fin de celle en cours."
-        )
-
-
-class RunLock:
-    """One pipeline at a time per project.
-
-    Deliberately not a real mutex: a second attempt must *fail loudly* rather
-    than queue silently. Someone who clicks twice wants to know the first is
-    still running, not to have a second run start ten minutes later.
-    """
-
-    def __init__(self) -> None:
-        self._running: set[str] = set()
-
-    def is_running(self, project_id: str) -> bool:
-        return project_id in self._running
-
-    @asynccontextmanager
-    async def acquire(self, project_id: str) -> AsyncIterator[None]:
-        if project_id in self._running:
-            raise RunAlreadyInProgress(project_id)
-        self._running.add(project_id)
-        try:
-            yield
-        finally:
-            # `finally` et non le chemin nominal : un pipeline qui échoue doit
-            # laisser le projet utilisable, pas verrouillé jusqu'au
-            # redémarrage du backend.
-            self._running.discard(project_id)
+# Le verrou a déménagé dans `run_lock.py` quand il a cessé d'être propre au
+# chat (ticket-121). Les noms restent importables d'ici.
+__all__ = ["RunAlreadyInProgress", "RunLock", "summarize_conversation"]

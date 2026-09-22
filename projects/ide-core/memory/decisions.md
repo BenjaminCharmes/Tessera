@@ -329,3 +329,12 @@ Format : ADR léger (Architecture Decision Record).
 **Raison** : le premier run coupé par le plafond du fournisseur a remonté son exception jusqu'à FastAPI : aucun commit, arbre sale, run jamais clos. ADR-020 vérifie ses plafonds **entre** deux tickets pour ne pas laisser de travail non commité ; celui-là coupe au milieu d'un tour. Or ADR-018 fait dépendre le ticket suivant d'un arbre propre.
 **Alternative rejetée** : propager — l'état d'avant, qui bloque la file ; jeter le travail — déjà payé, et le relire coûte moins que le refaire.
 **Conséquence assumée** : un commit peut figer du code à moitié écrit. Le message nomme la panne, sans quoi il se relit comme un abandon.
+
+---
+
+## ADR-038 — Un projet ne porte qu'un run à la fois, et chaque sortie commite
+
+**Date** : 2026-09-22
+**Décision** : un verrou en mémoire, partagé par tous les points d'entrée — run unique, file, autonome, chat — refuse un second run sur un projet occupé (409, en nommant le ticket en cours). Deux projets tournent en parallèle. Chaque sortie du pipeline commite ; un commit raté rend `blocked` avec `arret`, jamais une exception. Un émetteur d'événements qui lève n'interrompt pas le run.
+**Raison** : ADR-008 rend l'orchestrateur stateless — deux runs sur le **même** arbre passaient `ensure_clean_tree` avant que le second déplace la branche sous le premier. Et `CommitFailed` n'était attrapé que sur le chemin approuvé : ailleurs, l'exception remontait jusqu'à FastAPI, arbre sale, run jamais clos.
+**Alternative rejetée** : une file d'attente — qui clique deux fois veut savoir, pas attendre ; un verrou en base — un backend local n'a pas de second process à protéger.

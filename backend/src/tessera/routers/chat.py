@@ -10,11 +10,8 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.services.chat_service import ChatBudgetExceeded, ChatService
-from tessera.services.chat_suggestion import (
-    RunAlreadyInProgress,
-    RunLock,
-    summarize_conversation,
-)
+from tessera.services.chat_suggestion import summarize_conversation
+from tessera.services.run_lock import RUN_LOCK, RunAlreadyInProgress
 from tessera.services.database import (
     ChatMessageRow,
     conversation_cost_usd,
@@ -38,8 +35,10 @@ router = APIRouter(tags=["chat"])
 _CHAT_TOOLS = ["Read", "Write", "Edit", "Glob", "Grep"]
 
 # Un seul pipeline à la fois par projet : deux exécutions concurrentes
-# se marcheraient dessus dans le même arbre de travail (ADR-018).
-_RUN_LOCK = RunLock()
+# se marcheraient dessus dans le même arbre de travail (ADR-018). L'instance
+# est celle de l'orchestrateur : un run lancé depuis le tableau doit refuser
+# celui du chat, et réciproquement (ticket-121).
+_RUN_LOCK = RUN_LOCK
 
 
 class ChatHistory(BaseModel):
@@ -235,7 +234,7 @@ async def run_pipeline_from_chat(
     # le projet et instancie les providers, travail entièrement perdu si un
     # run tourne déjà. Un refus doit être immédiat et bon marché.
     try:
-        async with _RUN_LOCK.acquire(project_id):
+        async with _RUN_LOCK.acquire(project_id, body.ticket_id):
             history = await list_chat_messages(
                 settings.ide_db_path, project_id, body.conversation_id
             )

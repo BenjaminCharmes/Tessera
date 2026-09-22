@@ -321,7 +321,7 @@ def test_un_lancement_concurrent_est_refuse_avec_409(
         raise AssertionError("ne doit pas être atteint")
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
-    monkeypatch.setattr(_RUN_LOCK, "_running", {"mon-projet"})
+    monkeypatch.setattr(_RUN_LOCK, "_running", {"mon-projet": "ticket-001"})
 
     resp = _client().post(
         "/api/v1/projects/mon-projet/chat/run",

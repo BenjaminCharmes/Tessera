@@ -14,9 +14,12 @@ from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
 )
+from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
     from tessera.services.orchestrator import Orchestrator
+
+_logger = get_logger(__name__)
 
 
 @dataclass
@@ -85,3 +88,36 @@ async def set_status(
     """
     await orch._ticket_svc.update_status(run.ticket_id, status)
     await emit(run, EventType.TICKET_STATUS_CHANGED, status=status.value)
+
+
+_MARQUE_TOLERANT = "_tessera_tolerant"
+
+
+def tolerant(on_event: EventCallback) -> EventCallback:
+    """Wrap `on_event` so that an emitter failure is logged, never raised.
+
+    L'émetteur est le plus souvent une socket vers l'onglet de l'IDE. Fermer
+    cet onglet en plein tour faisait remonter l'erreur dans le run, qui
+    s'arrêtait **avant** son commit : arbre sale, file bloquée (ADR-018). En
+    mode single le routeur avalait déjà l'erreur, pas en mode file ni
+    autonome. Le garde vit ici pour que les trois modes — et le chat — le
+    tiennent sans dépendre de ce que chaque appelant a pensé à faire
+    (ticket-121).
+
+    Une vraie coroutine plutôt qu'un objet appelable : les appelants
+    existants la reconnaissent avec `inspect.iscoroutinefunction`.
+    """
+    if getattr(on_event, _MARQUE_TOLERANT, False):
+        return on_event
+
+    async def envoyer(event: OrchestratorEvent) -> None:
+        try:
+            await on_event(event)
+        except Exception as exc:  # noqa: BLE001 — l'émetteur ne tue jamais le run
+            _logger.warning(
+                "event_emit_failed",
+                extra={"event": event.type.value, "error": str(exc)},
+            )
+
+    setattr(envoyer, _MARQUE_TOLERANT, True)
+    return envoyer
