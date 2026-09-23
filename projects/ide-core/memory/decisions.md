@@ -378,3 +378,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : les projets décrivent leur démarrage dans des sections aux noms différents, mêlé aux commandes de test : y choisir, c'est deviner. Confier `Bash` à un agent rouvrirait ce qu'ADR-027 et ADR-031 ferment mal — leur contrôle attrape une erreur, pas une évasion.
 **Alternative rejetée** : détacher le processus, ou s'en remettre au seul arrêt propre — un backend tué n'exécute rien, et laissait vingt-deux orphelins.
 **Conséquence assumée** : l'IDE ne prépare rien ; `npm ci` reste à la main. Hors Windows, seul l'arrêt propre tue les services.
+
+---
+
+## ADR-043 — Rien de professionnel n'entre dans un dépôt personnel
+
+**Date** : 2026-09-23
+**Décision** : un dépôt personnel ne reçoit aucune donnée professionnelle — nom de client, adresse e-mail d'employeur ou de client, identifiant, jeton, hostname interne. La règle porte sur le contenu **et** sur les métadonnées git : auteur, committer, trailers `Co-authored-by`. L'identité git se déclare par dossier (`includeIf`), jamais globalement.
+**Raison** : le service sécurité d'un client a signalé un dépôt personnel passé public ; 162 commits y portaient l'adresse professionnelle. Le contenu était propre, mais un `user.email` global écrit sur tous les dépôts d'une machine sans jamais se rappeler à l'attention, et personne ne relit les métadonnées.
+**Alternative rejetée** : nettoyer après coup — un dépôt public est moissonné avant d'être corrigé, et un force-push laisse les objets joignables par leur SHA.
+**Conséquence assumée** : réparer coûte la réécriture de l'histoire et la perte des PR.
