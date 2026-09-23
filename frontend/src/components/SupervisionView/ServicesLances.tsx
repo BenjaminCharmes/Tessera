@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { adresseDansLaSortie } from "./adresse";
+import { adressesDansLaSortie } from "./adresse";
 import { classeDeLEtat, etatDuService } from "../../design/etatDuService";
 import type { ServiceActif } from "../../types/api";
 
@@ -10,8 +10,10 @@ import type { ServiceActif } from "../../types/api";
  * termine pas tout seul. Déplier l'un d'eux montre ses dernières lignes,
  * comme sélectionner un run montre ses tokens.
  *
- * L'adresse vient de la sortie elle-même — Vite et uvicorn l'y annoncent.
- * Sans elle, on lance un serveur sans savoir où il écoute.
+ * Les adresses viennent de la sortie elle-même — Vite et uvicorn les y
+ * annoncent. Sans elles, on lance un serveur sans savoir où il écoute. Il y
+ * en a souvent **deux** : une commande `concurrently` lance un back et un
+ * front, et une seule adresse ne peut pas représenter les deux (ticket-154).
  */
 interface ServicesLancesProps {
   services: ServiceActif[];
@@ -60,7 +62,9 @@ export default function ServicesLances({
           const lignes = lignesDe(service, sortieDe);
           // Pas d'adresse pour un service arrêté : elle mènerait vers un
           // serveur qui n'écoute plus.
-          const adresse = service.en_cours ? adresseDansLaSortie(lignes) : null;
+          const adresses = service.en_cours
+            ? adressesDansLaSortie(lignes, window.location.origin)
+            : [];
           const echoue = etatDuService(service) === "echoue";
           return (
             <span key={cle(service)} className="flex items-center gap-1">
@@ -74,16 +78,18 @@ export default function ServicesLances({
                 {service.nom}
                 {echoue ? ` · code ${service.code_de_sortie}` : ""}
               </button>
-              {adresse ? (
+              {adresses.map(({ url, etiquette }) => (
                 <a
-                  href={adresse}
+                  key={url}
+                  href={url}
                   target="_blank"
                   rel="noreferrer"
+                  title={etiquette ? `${etiquette} · ${url}` : url}
                   className="text-micro text-zinc-400 underline decoration-dotted hover:text-zinc-200"
                 >
-                  {adresse}
+                  {etiquette ? `${etiquette} ${url}` : url}
                 </a>
-              ) : null}
+              ))}
             </span>
           );
         })}

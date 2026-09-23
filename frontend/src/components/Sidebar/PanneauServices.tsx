@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { adresseDansLaSortie } from "../SupervisionView/adresse";
+import { adressesDansLaSortie } from "../SupervisionView/adresse";
 import { classeDeLEtat, libelleDeLEtat } from "../../design/etatDuService";
 import type { UseServicesResult } from "../../hooks/useServices";
 import type { ServiceActif } from "../../types/api";
@@ -106,7 +106,9 @@ function LigneDeService({
 }) {
   // Pas d'adresse pour un service arrêté : elle mènerait vers un serveur qui
   // n'écoute plus.
-  const adresse = service.en_cours ? adresseDansLaSortie(lignes) : null;
+  const adresses = service.en_cours
+    ? adressesDansLaSortie(lignes, window.location.origin)
+    : [];
 
   return (
     <div className="rounded-sm border border-zinc-800">
@@ -124,16 +126,18 @@ function LigneDeService({
         </span>
       </button>
 
-      {adresse ? (
+      {adresses.map(({ url, etiquette }) => (
         <a
-          href={adresse}
+          key={url}
+          href={url}
           target="_blank"
           rel="noreferrer"
+          title={etiquette ? `${etiquette} · ${url}` : url}
           className="block truncate px-2 pb-1.5 text-micro text-zinc-400 underline decoration-dotted hover:text-zinc-200"
         >
-          {adresse}
+          {etiquette ? `${etiquette} — ${url}` : url}
         </a>
-      ) : null}
+      ))}
 
       {ouvert ? (
         <pre
@@ -157,17 +161,16 @@ function LigneDeService({
  * voie cet écran. Il vaut mieux dire ce qu'il est.
  */
 function CestLIde({ projectId }: { projectId: string }) {
+  // Une ligne, pas quatre : dire qu'il n'y a rien à faire ne mérite pas le
+  // quart du panneau. Le détail reste au survol (ticket-154).
   return (
-    <div className="space-y-2 p-3" aria-label="Services du projet">
-      <p className="text-xs text-zinc-400">
-        {`« ${projectId} » fait tourner l'IDE que tu utilises en ce moment.`}
-      </p>
-      <p className="text-micro text-zinc-500">
-        Il n'y a rien à lancer : ses serveurs sont déjà là, démarrés hors de
-        l'IDE. Pour les arrêter ou lire leurs journaux, passe par le terminal
-        qui les a lancés.
-      </p>
-    </div>
+    <p
+      className="p-3 text-micro text-zinc-500"
+      aria-label="Services du projet"
+      title={`« ${projectId} » fait tourner l'IDE que tu utilises en ce moment. Il n'y a rien à lancer : ses serveurs sont déjà là, démarrés hors de l'IDE. Pour les arrêter ou lire leurs journaux, passe par le terminal qui les a lancés.`}
+    >
+      {`« ${projectId} » fait tourner l'IDE.`}
+    </p>
   );
 }
 

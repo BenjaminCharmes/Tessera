@@ -263,6 +263,13 @@ describe("PanneauServices — le projet qui fait tourner l'IDE (ticket-152)", ()
     );
 
     expect(screen.queryByLabelText(/Sortie de/)).not.toBeInTheDocument();
-    expect(screen.getByText(/passe par le terminal/)).toBeInTheDocument();
+    // Une ligne visible, le détail au survol : le panneau est étroit et ce
+    // message dit qu'il n'y a rien à faire (ticket-154).
+    const ligne = screen.getByText(/fait tourner l'IDE\./);
+    expect(ligne).toBeInTheDocument();
+    expect(ligne).toHaveAttribute(
+      "title",
+      expect.stringContaining("passe par le terminal"),
+    );
   });
 });
