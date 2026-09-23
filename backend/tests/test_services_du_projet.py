@@ -339,3 +339,67 @@ def test_npm_se_lance_sans_ecrire_cmd_dans_le_manifeste(
     resp = client.post("/api/v1/projects/mon-projet/services/start")
 
     assert resp.status_code == 200, resp.text
+
+
+# --------------------------------------------------------------------------
+# Un service mort reste visible — ticket-144
+# --------------------------------------------------------------------------
+
+_QUI_MEURT = f'"{sys.executable}" -c "import sys; sys.exit(3)"'
+
+
+def _attendre_la_fin(client: TestClient, nom: str, limite: int = 60) -> dict:
+    """Relit jusqu'à ce que le service ne soit plus en cours."""
+    import time
+
+    for _ in range(limite):
+        listing = client.get("/api/v1/projects/mon-projet/services").json()
+        trouve = [s for s in listing if s["nom"] == nom]
+        if trouve and not trouve[0]["en_cours"]:
+            return trouve[0]
+        time.sleep(0.1)
+    raise AssertionError(f"« {nom} » toujours en cours, ou disparu : {listing}")
+
+
+def test_un_service_mort_seul_reste_dans_la_liste(
+    client: TestClient, workspace: Path
+) -> None:
+    # Trouvé au premier essai réel : le backend d'ide-core mourait sur un port
+    # déjà pris et **disparaissait** au lieu de s'afficher en échec. Vu de
+    # l'IDE, le lancement paraissait à moitié réussi, sans rien dire du reste.
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _QUI_MEURT}])
+    _demarrer(client, "mon-projet")
+
+    mort = _attendre_la_fin(client, "api")
+
+    assert mort["en_cours"] is False
+    assert mort["code_de_sortie"] == 3
+
+
+def test_relancer_apres_un_echec_ne_laisse_qu_une_entree(
+    client: TestClient, workspace: Path
+) -> None:
+    # Garder les morts ne doit pas faire grossir la liste à chaque clic.
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _QUI_MEURT}])
+    _demarrer(client, "mon-projet")
+    _attendre_la_fin(client, "api")
+
+    _demarrer(client, "mon-projet")
+    listing = client.get("/api/v1/projects/mon-projet/services").json()
+
+    assert len([s for s in listing if s["nom"] == "api"]) == 1
+
+
+def test_un_service_arrete_a_la_main_n_est_pas_un_echec(
+    client: TestClient, workspace: Path
+) -> None:
+    # `terminate()` produit un code non nul sur certaines plateformes :
+    # afficher un échec là où l'utilisateur vient de cliquer « Arrêter »
+    # enverrait chercher des logs qui ne disent rien.
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _DORMEUR}])
+    _demarrer(client, "mon-projet")
+
+    client.post("/api/v1/projects/mon-projet/services/stop")
+    listing = client.get("/api/v1/projects/mon-projet/services").json()
+
+    assert listing == []

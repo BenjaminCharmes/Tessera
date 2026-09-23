@@ -138,14 +138,21 @@ class ProcessRegistry:
         self._services: dict[str, list[Service]] = {}
 
     def services_de(self, project_id: str) -> list[Service]:
-        return [s for s in self._services.get(project_id, []) if s.en_cours]
+        """Tous les services enregistrés, **y compris ceux qui sont morts**.
+
+        Filtrer sur `en_cours` les faisait disparaître : au premier essai
+        réel, le backend d'`ide-core` mourait sur un port déjà pris et sortait
+        de la liste, si bien que le lancement paraissait à moitié réussi sans
+        rien dire du reste (ticket-144). `en_cours` et `code_de_sortie` disent
+        lequel est lequel — c'est ce que l'affichage attend.
+        """
+        return list(self._services.get(project_id, []))
 
     def instantane(self) -> list[dict[str, Any]]:
         return [
             service.en_dict()
             for services in self._services.values()
             for service in services
-            if service.en_cours
         ]
 
     async def demarrer(
@@ -168,7 +175,15 @@ class ProcessRegistry:
         service = Service(
             nom=nom, project_id=project_id, pid=processus.pid, processus=processus
         )
-        self._services.setdefault(project_id, []).append(service)
+        # Purger l'entrée terminée du même nom : garder les morts ne doit pas
+        # faire grossir la liste à chaque clic sur « Relancer ».
+        restants = [
+            s
+            for s in self._services.get(project_id, [])
+            if s.nom != nom or s.en_cours
+        ]
+        restants.append(service)
+        self._services[project_id] = restants
 
         if sur_ligne is not None:
             # La lecture tourne à côté : sans elle, le tube se remplit et le
