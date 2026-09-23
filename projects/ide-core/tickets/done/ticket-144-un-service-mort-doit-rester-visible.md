@@ -2,8 +2,8 @@
 id: ticket-144
 title: "Un service mort de lui-même doit rester visible"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 163
 priority: high
 agent: codeur
 depends_on: ["ticket-138"]

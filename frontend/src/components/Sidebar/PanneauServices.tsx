@@ -21,6 +21,8 @@ interface PanneauServicesProps {
   projectId: string;
   /** Pour proposer d'ouvrir `agents.json` là où il est réellement. */
   cheminDuProjet: string | null;
+  /** Ce projet exécute l'IDE : il n'y a rien à lancer (ticket-152). */
+  faitTournerLIde?: boolean;
 }
 
 const EXEMPLE = `"services": [
@@ -32,11 +34,16 @@ export default function PanneauServices({
   sortieDe,
   projectId,
   cheminDuProjet,
+  faitTournerLIde = false,
 }: PanneauServicesProps) {
   // Un ensemble, pas un seul nom : un projet qui lance un backend **et** un
   // frontend veut voir les deux sorties en même temps. L'accordéon fermait
   // l'une en ouvrant l'autre (ticket-148).
   const [ouverts, setOuverts] = useState<ReadonlySet<string>>(new Set());
+
+  if (faitTournerLIde) {
+    return <CestLIde projectId={projectId} />;
+  }
 
   if (!services.declare) {
     return <RienDeclare projectId={projectId} chemin={cheminDuProjet} />;
@@ -138,6 +145,28 @@ function LigneDeService({
             : "Ce service n'a encore rien écrit."}
         </pre>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Le projet bootstrap, qui exécute l'IDE — ticket-152.
+ *
+ * Lui proposer « Lancer » démarrerait un second backend sur un port déjà
+ * pris, et le cas utile n'existe pas : il faut que l'IDE tourne pour qu'on
+ * voie cet écran. Il vaut mieux dire ce qu'il est.
+ */
+function CestLIde({ projectId }: { projectId: string }) {
+  return (
+    <div className="space-y-2 p-3" aria-label="Services du projet">
+      <p className="text-xs text-zinc-400">
+        {`« ${projectId} » fait tourner l'IDE que tu utilises en ce moment.`}
+      </p>
+      <p className="text-micro text-zinc-500">
+        Il n'y a rien à lancer : ses serveurs sont déjà là, démarrés hors de
+        l'IDE. Pour les arrêter ou lire leurs journaux, passe par le terminal
+        qui les a lancés.
+      </p>
     </div>
   );
 }

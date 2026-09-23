@@ -2,8 +2,8 @@
 id: ticket-147
 title: "Un panneau services dans le projet : état, adresse, logs, et quoi faire s'il n'y en a pas"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 166
 priority: high
 agent: codeur
 depends_on: ["ticket-146"]

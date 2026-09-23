@@ -2,8 +2,8 @@
 id: ticket-146
 title: "Savoir avant le clic si un projet déclare des services"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 165
 priority: high
 agent: codeur
 depends_on: ["ticket-145"]

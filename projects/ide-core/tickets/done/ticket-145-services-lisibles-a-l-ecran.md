@@ -2,8 +2,8 @@
 id: ticket-145
 title: "Rendre les services lisibles : état à jour, sortie visible, adresse cliquable"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 164
 priority: high
 agent: codeur
 depends_on: ["ticket-144"]
@@ -90,3 +90,14 @@ Un rafraîchissement périodique trop court fait battre l'interface pour rien ;
 trop long, il ne sert à rien. Si le choix se porte sur le canal plutôt que sur
 un intervalle, la question disparaît — mais il faut alors que le backend
 annonce la fin d'un service, ce qu'il ne fait pas aujourd'hui.
+
+## Comment ce ticket a été livré
+
+Sa PR (#164) a été **close, pas fusionnée**. Les tickets 147 à 151 ont touché
+les mêmes fichiers et ont réimplémenté l'état, la sortie et l'adresse des
+services en allant plus loin — `design/etatDuService.ts`, la distinction
+« arrêté à la main » et la capture de l'URL sans codes ANSI n'existaient pas
+ici. La branche était restée en arrière : la fusionner aurait retiré 942
+lignes de `develop`.
+
+Le travail est livré, la PR ne l'est pas. Les deux se disent.

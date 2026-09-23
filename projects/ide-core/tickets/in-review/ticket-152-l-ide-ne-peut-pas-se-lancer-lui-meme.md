@@ -2,7 +2,7 @@
 id: ticket-152
 title: "L'IDE ne peut pas se lancer lui-même, et doit le dire"
 type: feat
-status: todo
+status: in-review
 pr_number: null
 priority: medium
 agent: codeur

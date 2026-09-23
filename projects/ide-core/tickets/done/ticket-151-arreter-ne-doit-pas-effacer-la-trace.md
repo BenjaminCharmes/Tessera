@@ -2,8 +2,8 @@
 id: ticket-151
 title: "Arrêter un service ne doit pas effacer sa trace, et l'IDE doit se reconnaître"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 170
 priority: high
 agent: codeur
 depends_on: ["ticket-150"]

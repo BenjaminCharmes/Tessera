@@ -69,7 +69,11 @@ export interface Project {
   active_agents: string[];
   stack: string | null;
   raw_claude_md: string;
-  github_remote: string | null;
+  github_remote: string | null;  /**
+   * Ce projet execute l'IDE en ce moment (ticket-152). Lui proposer
+   * « Lancer » demarrerait un second backend sur un port deja pris.
+   */
+  fait_tourner_l_ide?: boolean;
 }
 
 export interface Ticket {

@@ -65,7 +65,7 @@ export default function ProjectHeader({
       </h2>
 
       <div className="flex shrink-0 items-center gap-1.5">
-        {services ? (
+        {services && !project.fait_tourner_l_ide ? (
           <BoutonServices
             services={services}
             libelleDuProjet={project.name}

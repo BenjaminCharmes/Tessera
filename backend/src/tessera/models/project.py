@@ -16,6 +16,11 @@ class Project(BaseModel):
     stack: str | None = None
     raw_claude_md: str = ""
     github_remote: str | None = None
+    #: Ce projet exécute l'IDE en ce moment — le bootstrap d'ADR-001. Lui
+    #: proposer « Lancer » démarrerait un second backend sur un port pris, et
+    #: le cas utile n'existe pas : il faut que l'IDE tourne pour qu'on voie le
+    #: bouton (ticket-152).
+    fait_tourner_l_ide: bool = False
 
 
 class ProjectCreate(BaseModel):

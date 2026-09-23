@@ -229,3 +229,40 @@ describe("PanneauServices — plusieurs services (ticket-148)", () => {
     expect(screen.getByLabelText("Sortie de frontend")).toBeInTheDocument();
   });
 });
+
+describe("PanneauServices — le projet qui fait tourner l'IDE (ticket-152)", () => {
+  it("dit ce qu'il est, au lieu de proposer un lancement", () => {
+    // Cliquer « Lancer » sur ide-core demarrait un second backend sur un port
+    // deja pris. Le cas utile n'existe pas : il faut que l'IDE tourne pour
+    // qu'on voie l'ecran.
+    render(
+      <PanneauServices
+        services={etat()}
+        sortieDe={() => []}
+        projectId="ide-core"
+        cheminDuProjet="C:/p/tessera"
+        faitTournerLIde
+      />,
+    );
+
+    expect(screen.getByText(/fait tourner l'IDE/)).toBeInTheDocument();
+    expect(screen.queryByText(/ne déclare aucun service/)).not.toBeInTheDocument();
+  });
+
+  it("ne propose ni logs ni arret pour ces serveurs", () => {
+    // Ils n'ont pas ete lances par l'IDE : leur sortie ne passe pas par un
+    // tube qu'il controle, et les tuer serait une decision d'un autre ordre.
+    render(
+      <PanneauServices
+        services={etat()}
+        sortieDe={() => ["des lignes"]}
+        projectId="ide-core"
+        cheminDuProjet={null}
+        faitTournerLIde
+      />,
+    );
+
+    expect(screen.queryByLabelText(/Sortie de/)).not.toBeInTheDocument();
+    expect(screen.getByText(/passe par le terminal/)).toBeInTheDocument();
+  });
+});
