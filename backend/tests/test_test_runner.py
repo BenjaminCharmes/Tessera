@@ -1,6 +1,8 @@
 """Tests for TestRunnerService (ticket-035)."""
 
 import asyncio
+import os
+import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -201,3 +203,64 @@ class TestTestResult:
         )
         assert result.passed is True
         assert result.errors == []
+
+
+# ---------------------------------------------------------------------------
+# Lancer une commande qui est un script Windows — ticket-157
+# ---------------------------------------------------------------------------
+
+
+class TestCommandeNonDemarree:
+    """The runner must tell a command that never started from failing tests."""
+
+    async def test_npm_se_resout_en_npm_cmd_sous_windows(self) -> None:
+        # Le premier ticket du projet démineur a été rendu `blocked` avec
+        # « changes requested » alors que le code produit était juste : le
+        # testeur lance sans shell, et `npm` n'existe pas sous Windows — c'est
+        # `npm.cmd`. La reprise existait dans `ProcessRegistry` depuis le
+        # ticket-149 et n'avait pas été portée ici (ticket-157).
+        from tessera.services.lancement import essais_de_commande
+
+        essais = essais_de_commande(["npm", "run", "test"])
+
+        assert essais[0] == ["npm", "run", "test"]
+        if os.name == "nt":
+            assert ["npm.cmd", "run", "test"] in essais
+        else:
+            assert essais == [["npm", "run", "test"]]
+
+    async def test_une_commande_deja_suffixee_n_est_pas_redoublee(self) -> None:
+        from tessera.services.lancement import essais_de_commande
+
+        assert essais_de_commande(["npm.cmd", "test"]) == [["npm.cmd", "test"]]
+
+    async def test_une_commande_introuvable_n_est_pas_un_test_rouge(
+        self, tmp_path: Path
+    ) -> None:
+        # Deux tours de revue ont été dépensés à corriger du code qui n'était
+        # pas en cause, parce que rien ne distinguait « la commande n'a pas
+        # démarré » de « les tests ont échoué ».
+        runner = TestRunnerService()
+
+        result = await runner.run_tests(
+            tmp_path, test_command="cette-commande-nexiste-pas --run"
+        )
+
+        assert result.passed is False
+        assert result.demarree is False
+        assert "cette-commande-nexiste-pas" in result.output_summary
+
+    async def test_des_tests_qui_echouent_restent_demarres(
+        self, tmp_path: Path
+    ) -> None:
+        # Le pendant du test précédent : `demarree` ne doit pas devenir un
+        # synonyme de `passed`, sinon il ne distingue plus rien.
+        runner = TestRunnerService()
+
+        result = await runner.run_tests(
+            tmp_path,
+            test_command=f'"{sys.executable}" -c "import sys; sys.exit(1)"',
+        )
+
+        assert result.passed is False
+        assert result.demarree is True

@@ -26,6 +26,7 @@ from tessera.services.groupe_de_processus import (
     tuer_l_arbre,
 )
 from tessera.services.providers.perimetre import racine_autorisee
+from tessera.services.lancement import essais_de_commande
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -282,17 +283,12 @@ class ProcessRegistry:
     async def _lancer(self, args: list[str], dossier: Path) -> Any:
         """Lance les arguments, en essayant l'équivalent Windows au besoin.
 
-        `npm`, `npx` et `yarn` sont des scripts sous Windows : sans shell,
-        seul `npm.cmd` se résout. Écrire `npm.cmd` dans un `agents.json`
-        marcherait ici et nulle part ailleurs — or ce fichier est versionné et
-        part sur d'autres machines. Le manifeste reste donc portable, et c'est
-        le lancement qui s'adapte (ticket-143).
+        La règle de résolution vit dans `services/lancement.py`, appelée
+        aussi par `TestRunnerService` : elle n'existait ici que sous forme
+        d'une copie, et le testeur, qui ne l'avait pas, rendait `blocked` des
+        tickets dont le code était juste (ticket-143, ticket-157).
         """
-        essais = [args]
-        if os.name == "nt" and not args[0].lower().endswith(
-            (".cmd", ".bat", ".exe")
-        ):
-            essais.append([args[0] + ".cmd", *args[1:]])
+        essais = essais_de_commande(args)
 
         derniere: FileNotFoundError | None = None
         for tentative in essais:

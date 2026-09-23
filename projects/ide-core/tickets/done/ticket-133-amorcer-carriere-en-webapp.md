@@ -172,3 +172,26 @@ Une seule chose : **est-ce que même les données de CV** — compétences,
 missions, formations — te vont sur un GitHub privé ? Elles sont déjà sur ton
 CV, donc déjà partagées. Je l'ai supposé acceptable ; si non, `carriere-app`
 reste local lui aussi et perd la synchronisation, sans rien changer d'autre.
+
+---
+
+## Amendement — 2026-09-23, décision de l'utilisateur
+
+> « tout ce qu'on peut va partir sur un github privé pour pouvoir y accéder
+> depuis ailleurs également »
+
+La question laissée ouverte est tranchée : **oui**, les données structurées de
+carrière — compétences, missions, formations — partent sur le GitHub privé de
+`carriere-app`. Elles figurent déjà sur un CV, donc déjà partagées, et
+l'accès depuis un second poste est le besoin qui a motivé le projet.
+
+**Ce que ça ne change pas.** Le partage vaut pour « tout ce qu'on peut », et
+`sources/` n'en fait pas partie : le contrat de travail signé, les sept
+bulletins de paie et l'argumentaire de reclassification restent sur la
+machine. Cette limite-là a été confirmée, pas levée.
+
+La règle tient en une ligne : **ce qui figure déjà sur un CV peut partir ; ce
+qui documente une rémunération, un contrat ou un différend, non.**
+
+Elle vaut aussi pour le projet freelance (ticket-134), dont les données —
+clients, montants, factures — tombent du mauvais côté de cette ligne.

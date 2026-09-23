@@ -1,9 +1,11 @@
 import asyncio
 import shlex
+from typing import Any
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tessera.services.lancement import essais_de_commande
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -34,6 +36,11 @@ class TestResult:
     output_summary: str
     errors: list[str] = field(default_factory=list)
     duration_ms: int = 0
+    #: La commande a-t-elle seulement démarré ? Faux quand l'exécutable est
+    #: introuvable — ce qui n'est pas la même chose que des tests rouges, et
+    #: ne demande pas la même chose au codeur. Deux tours de revue ont été
+    #: dépensés à corriger du code qui n'était pas en cause (ticket-157).
+    demarree: bool = True
 
 
 class TestRunnerService:
@@ -54,6 +61,27 @@ class TestRunnerService:
             f"Impossible de détecter la commande de test dans {project_path}"
         )
 
+    async def _lancer(self, args: list[str], dossier: Path) -> Any:
+        """Launch the command, trying its Windows form when needed.
+
+        La règle de résolution est dans `services/lancement.py`, partagée avec
+        `ProcessRegistry` : deux copies de cette logique ont divergé une fois,
+        et c'est ce qui a rendu `blocked` un ticket dont le code était juste
+        (ticket-157).
+        """
+        derniere: FileNotFoundError | None = None
+        for tentative in essais_de_commande(args):
+            try:
+                return await asyncio.create_subprocess_exec(
+                    *tentative,
+                    cwd=dossier,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+            except FileNotFoundError as exc:
+                derniere = exc
+        raise derniere if derniere else FileNotFoundError(args[0] if args else "")
+
     async def run_tests(
         self,
         project_path: Path,
@@ -65,12 +93,7 @@ class TestRunnerService:
 
         start = time.monotonic()
         try:
-            proc = await asyncio.create_subprocess_exec(
-                *args,
-                cwd=project_path,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
+            proc = await self._lancer(args, project_path)
             stdout_bytes, stderr_bytes = await asyncio.wait_for(
                 proc.communicate(), timeout=float(timeout)
             )
@@ -90,6 +113,27 @@ class TestRunnerService:
                 failed=0,
                 output_summary=f"Timeout après {timeout}s — {cmd}",
                 errors=[f"Timeout après {timeout}s"],
+                duration_ms=duration_ms,
+            )
+        except FileNotFoundError as exc:
+            # Pas un test rouge : la commande n'a pas démarré. Le dire
+            # explicitement évite au codeur de corriger du code qui n'est pas
+            # en cause (ticket-157).
+            duration_ms = int((time.monotonic() - start) * 1000)
+            _logger.warning(
+                "test_runner_commande_introuvable",
+                extra={"cmd": cmd, "error": str(exc)},
+            )
+            return TestResult(
+                passed=False,
+                demarree=False,
+                total=0,
+                failed=0,
+                output_summary=(
+                    f"La commande de test n'a pas démarré : « {cmd} » — "
+                    "exécutable introuvable. Ce n'est pas un test en échec."
+                ),
+                errors=[str(exc)],
                 duration_ms=duration_ms,
             )
         except Exception as exc:
