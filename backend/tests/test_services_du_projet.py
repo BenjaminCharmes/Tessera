@@ -10,6 +10,7 @@ Un serveur ne se termine jamais : c'est ce qui sépare ces tests de ceux de
 `TestRunnerService`, qui attend la fin de sa commande.
 """
 import asyncio
+import os
 import json
 import sys
 from collections.abc import Iterator
@@ -584,3 +585,99 @@ def test_un_start_apres_un_stop_ne_laisse_qu_une_entree(
 
     assert len([s for s in listing if s["nom"] == "api"]) == 1
     assert listing[0]["en_cours"] is True
+
+
+# --------------------------------------------------------------------------
+# L'arbre de processus, et le double lancement — ticket-153
+# --------------------------------------------------------------------------
+
+#: Un service qui engendre un enfant, comme `npm run dev` lance `concurrently`
+#: qui lance deux serveurs. C'est le petit-enfant qui survivait à l'arrêt.
+_AVEC_ENFANT = (
+    f'"{sys.executable}" -c '
+    '"import subprocess,sys,time; '
+    "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)']); "
+    'time.sleep(120)"'
+)
+
+
+def test_arreter_ne_laisse_aucun_descendant(
+    client: TestClient, workspace: Path
+) -> None:
+    # `stop` répondait « 2 arrêtés » pendant que douze processus tournaient
+    # encore : `terminate()` frappe le premier maillon, et `concurrently` et
+    # ses serveurs survivaient avec leurs ports (ticket-153).
+    import time
+
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _AVEC_ENFANT}])
+    _demarrer(client, "mon-projet")
+    time.sleep(2)
+    parent = PROCESS_REGISTRY.services_de("mon-projet")[0].pid
+    assert parent is not None
+    enfants = _descendants(parent)
+    assert enfants, "le service n'a pas engendré d'enfant : test sans objet"
+
+    client.post("/api/v1/projects/mon-projet/services/stop")
+    time.sleep(2)
+
+    survivants = [pid for pid in enfants if _pid_vivant(pid)]
+    assert survivants == [], f"descendants survivants : {survivants}"
+
+
+def test_relancer_un_service_en_cours_est_refuse(
+    client: TestClient, workspace: Path
+) -> None:
+    # Deux lancements de suite laissaient douze processus là où trois
+    # suffisent, et la liste n'en montrait qu'un : elle indexait par nom.
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _DORMEUR}])
+    premier = _demarrer(client, "mon-projet")
+
+    refus = client.post("/api/v1/projects/mon-projet/services/start")
+
+    assert refus.status_code == 409
+    assert "api" in refus.json()["detail"]
+    listing = client.get("/api/v1/projects/mon-projet/services").json()
+    assert len(listing) == 1
+    assert listing[0]["pid"] == premier["services"][0]["pid"]
+
+
+def _pid_vivant(pid: int) -> bool:
+    import subprocess as sp
+
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return False
+        return True
+    sortie = sp.run(
+        ["tasklist", "/FI", f"PID eq {pid}", "/NH"], capture_output=True, text=True
+    ).stdout
+    return str(pid) in sortie
+
+
+def _descendants(pid: int) -> list[int]:
+    import subprocess as sp
+
+    if os.name != "nt":
+        # `ps --ppid` et non un simple `[]` : rendre la liste vide faisait
+        # passer le test pour un succès alors qu'il n'observait rien. Sous
+        # Linux l'arbre se tue par `killpg`, donc le cas est réel ici aussi.
+        sortie = sp.run(
+            ["ps", "-o", "pid=", "--ppid", str(pid)],
+            capture_output=True,
+            text=True,
+        ).stdout
+        return [int(l) for l in sortie.split() if l.strip().isdigit()]
+    sortie = sp.run(
+        [
+            "powershell",
+            "-NoProfile",
+            "-Command",
+            f"Get-CimInstance Win32_Process -Filter \"ParentProcessId={pid}\" | "
+            "Select-Object -ExpandProperty ProcessId",
+        ],
+        capture_output=True,
+        text=True,
+    ).stdout
+    return [int(l) for l in sortie.split() if l.strip().isdigit()]

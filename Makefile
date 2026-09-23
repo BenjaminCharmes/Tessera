@@ -73,8 +73,8 @@ tauri-build:
 verify:
 	@echo "→ 1/4 Backend — pytest"
 	cd backend && uv run pytest -q -m "not integration"
-	@echo "→ 2/4 Backend — mypy"
-	cd backend && uv run mypy src/
+	@echo "→ 2/4 Backend — mypy (cette plateforme, puis linux comme la CI)"
+	cd backend && uv run mypy src/ && uv run mypy --platform linux src/
 	@echo "→ 3/4 Frontend — typecheck + vitest"
 	cd frontend && npm run typecheck && npm run test -- --run
 	@echo "→ 4/4 E2E — playwright"
@@ -96,7 +96,7 @@ test-coverage:
 	cd frontend && npm run test:coverage
 
 lint:
-	cd backend && uv run mypy src/
+	cd backend && uv run mypy src/ && uv run mypy --platform linux src/
 
 clean:
 	find . -type d -name "__pycache__" -not -path "*/.venv/*" -exec rm -rf {} + 2>/dev/null || true

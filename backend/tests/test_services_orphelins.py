@@ -59,6 +59,14 @@ def _vivant(pid: int) -> bool:
     return True
 
 
+@pytest.mark.skipif(
+    os.name != "nt",
+    reason=(
+        "Le filet est un job object Windows. Hors Windows, ADR-042 ne promet "
+        "que l'arrêt propre : le vérifier ici échouerait sur une garantie que "
+        "personne ne donne."
+    ),
+)
 def test_un_backend_tue_brutalement_ne_laisse_pas_son_service(
     tmp_path: Path,
 ) -> None:

@@ -18,7 +18,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from tessera.services.groupe_de_processus import rattacher
+from tessera.services.groupe_de_processus import (
+    creer_groupe,
+    fermer_le_groupe,
+    rattacher,
+    rattacher_au_groupe,
+    tuer_l_arbre,
+)
 from tessera.services.providers.perimetre import racine_autorisee
 from tessera.utils.logger import get_logger
 
@@ -58,6 +64,19 @@ class CommandeInvalide(Exception):
     """La commande déclarée ne peut pas être lancée telle quelle."""
 
 
+class ServiceDejaEnCours(Exception):
+    """Ce service tourne déjà — le relancer en ferait un second."""
+
+    def __init__(self, nom: str, pid: int | None) -> None:
+        self.nom = nom
+        self.pid = pid
+        super().__init__(
+            f"Le service « {nom} » tourne déjà (pid {pid}). Arrête-le avant de "
+            "le relancer : un second lancement laisserait le premier derrière, "
+            "avec son port et sans rien pour l'arrêter."
+        )
+
+
 @dataclass
 class Service:
     """Un processus lancé pour un projet."""
@@ -77,6 +96,10 @@ class Service:
     #: service qu'on vient d'arrêter s'afficherait comme ayant échoué, et
     #: enverrait chercher des logs qui ne disent rien (ticket-151).
     arrete_a_la_main: bool = False
+    #: Le groupe système qui contient ce service et toute sa descendance.
+    #: Le fermer les tue tous, ce que `taskkill /T` ne sait pas faire quand
+    #: un maillon intermédiaire a disparu (ticket-153).
+    groupe: Any = None
 
     def noter(self, ligne: str) -> None:
         """Retient une ligne, en ne gardant que les plus récentes."""
@@ -203,7 +226,20 @@ class ProcessRegistry:
         sur_ligne: Any = None,
         sur_fin: Any = None,
     ) -> Service:
-        """Lance une commande déclarée, sans shell, sous la racine du projet."""
+        """Lance une commande déclarée, sans shell, sous la racine du projet.
+
+        Refuse si ce service tourne déjà : deux lancements de suite laissaient
+        douze processus là où trois suffisent, et la liste n'en montrait qu'un
+        (ticket-153). L'interface l'empêchait en affichant « Arrêter », mais
+        une protection qui ne vit que dans l'affichage n'en est pas une.
+        """
+        deja = next(
+            (s for s in self.services_de(project_id) if s.nom == nom and s.en_cours),
+            None,
+        )
+        if deja is not None:
+            raise ServiceDejaEnCours(nom, deja.pid)
+
         args = verifier_la_commande(commande)
         dossier = resoudre_le_cwd(racine, cwd)
 
@@ -211,12 +247,20 @@ class ProcessRegistry:
             processus = await self._lancer(args, dossier)
         except FileNotFoundError as exc:
             raise CommandeInvalide(introuvable(args[0])) from exc
-        # Rattacher tout de suite : entre le lancement et cet appel, un
-        # backend tué laisserait déjà l'enfant derrière lui (ticket-150).
+        # Deux filets, pour deux pannes différentes : le groupe global tue
+        # tout si le backend meurt (ticket-150) ; le groupe du service permet
+        # de tuer son seul arbre à l'arrêt (ticket-153).
         rattacher(processus.pid)
+        groupe = creer_groupe()
+        if groupe is not None:
+            rattacher_au_groupe(groupe, processus.pid)
 
         service = Service(
-            nom=nom, project_id=project_id, pid=processus.pid, processus=processus
+            nom=nom,
+            project_id=project_id,
+            pid=processus.pid,
+            processus=processus,
+            groupe=groupe,
         )
         # Purger l'entrée terminée du même nom : garder les morts ne doit pas
         # faire grossir la liste à chaque clic sur « Relancer ».
@@ -258,6 +302,11 @@ class ProcessRegistry:
                     cwd=str(dossier),
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.STDOUT,
+                    # Son propre groupe, hors Windows : c'est ce qui rend
+                    # `killpg` sûr à l'arrêt. Sans lui, le service hérite du
+                    # groupe du backend, et l'arrêter emporterait le backend
+                    # (ticket-153).
+                    start_new_session=os.name != "nt",
                 )
             except FileNotFoundError as exc:
                 derniere = exc
@@ -329,6 +378,17 @@ class ProcessRegistry:
         if processus is None or processus.returncode is not None:
             return
         try:
+            # L'arbre entier, pas le seul parent : `npm run dev` lance
+            # `concurrently`, qui lance deux serveurs. `terminate()` frappait
+            # le premier maillon et laissait les descendants avec leurs ports
+            # — « 2 arrêtés » pendant que douze processus tournaient
+            # (ticket-153).
+            # Le groupe d'abord : il emporte la descendance que `taskkill`
+            # ne retrouve plus quand un maillon a disparu.
+            if service.groupe is not None:
+                fermer_le_groupe(service.groupe)
+                service.groupe = None
+            await tuer_l_arbre(processus.pid)
             processus.terminate()
             await asyncio.wait_for(processus.wait(), timeout=DELAI_D_ARRET_S)
         except asyncio.TimeoutError:

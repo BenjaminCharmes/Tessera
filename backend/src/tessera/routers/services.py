@@ -15,6 +15,7 @@ from tessera.services.process_registry import (
     PROCESS_REGISTRY,
     CommandeInvalide,
     Service,
+    ServiceDejaEnCours,
 )
 from tessera.services.project_loader import load_services_config
 from tessera.utils.logger import get_logger
@@ -87,6 +88,9 @@ async def demarrer(project_id: str) -> dict[str, object]:
                 sur_fin=_publier_la_fin,
             )
             demarres.append(service.en_dict())
+    except ServiceDejaEnCours as exc:
+        # Pas de purge ici : ce qui tourne doit continuer de tourner.
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     except CommandeInvalide as exc:
         # Ce qui a déjà démarré s'arrête : un lancement à moitié fait laisse
         # un serveur seul, sans le reste dont il dépend.
