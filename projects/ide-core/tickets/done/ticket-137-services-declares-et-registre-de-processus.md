@@ -2,8 +2,8 @@
 id: ticket-137
 title: "Déclarer les services d'un projet et les lancer depuis le backend"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 159
 priority: medium
 agent: codeur
 depends_on: ["ticket-132"]

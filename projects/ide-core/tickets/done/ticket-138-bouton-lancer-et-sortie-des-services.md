@@ -2,8 +2,8 @@
 id: ticket-138
 title: "Bouton Lancer le projet, et sa sortie dans la Supervision"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 161
 priority: medium
 agent: codeur
 depends_on: ["ticket-137"]
