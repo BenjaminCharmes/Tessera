@@ -11,9 +11,11 @@ import type { ServiceActif } from "../../types/api";
  * juste en dessous. La sortie existait déjà, mais dans la vue Supervision et
  * après un clic de plus : l'information était là et restait introuvable.
  *
- * Quand rien n'est déclaré, ce panneau ne disparaît pas — il dit quoi écrire.
- * Masquer la fonctionnalité répondait au symptôme sans répondre au besoin :
- * quelqu'un qui veut lancer son projet n'apprenait même pas qu'il pouvait.
+ * `RienDeclare` **n'est atteint par personne aujourd'hui** : le seul geste
+ * qui ouvre ce panneau est le bouton de lancement, et celui-ci ne s'affiche
+ * pas quand rien n'est déclaré. La docstring affirmait l'inverse — voir
+ * ticket-156, qui tranchera entre rendre l'explication accessible et
+ * supprimer le code que rien n'atteint.
  */
 interface PanneauServicesProps {
   services: UseServicesResult;

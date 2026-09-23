@@ -34,7 +34,13 @@ export default function PanneauxDuProjet({
       {/* Le projet qui fait tourner l'IDE n'a pas de bouton : sans
           ouverture d'office, rien n'expliquerait cette absence
           (ticket-152). */}
-      {(servicesOuverts || project.fait_tourner_l_ide) &&
+      {/* Ouvert aussi dès qu'un service vit ou vient de mourir : après un
+          rechargement, `servicesOuverts` repart à faux et le seul clic qui
+          rouvrait le panneau arrêtait le service (ticket-155). */}
+      {(servicesOuverts ||
+        project.fait_tourner_l_ide ||
+        services?.enCours ||
+        services?.enEchec) &&
       services &&
       sortieDeService ? (
         <div className="max-h-72 overflow-y-auto overflow-x-hidden border-b border-zinc-800">

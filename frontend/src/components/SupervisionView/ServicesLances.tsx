@@ -55,29 +55,35 @@ export default function ServicesLances({
   return (
     <section
       aria-label="Services lancés"
-      className="border-b border-zinc-800 px-3 py-2"
+      className="space-y-1.5 border-b border-zinc-800 px-3 py-2"
     >
-      <div className="flex flex-wrap items-center gap-2">
-        {services.map((service) => {
-          const lignes = lignesDe(service, sortieDe);
-          // Pas d'adresse pour un service arrêté : elle mènerait vers un
-          // serveur qui n'écoute plus.
-          const adresses = service.en_cours
-            ? adressesDansLaSortie(lignes, window.location.origin)
-            : [];
-          const echoue = etatDuService(service) === "echoue";
-          return (
-            <span key={cle(service)} className="flex items-center gap-1">
+      {services.map((service) => {
+        const lignes = lignesDe(service, sortieDe);
+        // Pas d'adresse pour un service arrêté : elle mènerait vers un
+        // serveur qui n'écoute plus.
+        const adresses = service.en_cours
+          ? adressesDansLaSortie(lignes, window.location.origin)
+          : [];
+        const echoue = etatDuService(service) === "echoue";
+        const ouvert = ouverts.has(cle(service));
+
+        // Un bloc par service, sa sortie dedans : les blocs dépliés étaient
+        // rendus après toutes les puces, donc loin du service auquel ils
+        // appartenaient (ticket-155).
+        return (
+          <div key={cle(service)} className="rounded-sm bg-zinc-900/40">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 p-1">
               <button
                 type="button"
                 onClick={() => basculer(cle(service))}
-                aria-pressed={ouverts.has(cle(service))}
+                aria-pressed={ouvert}
                 title={`${service.project_id} · pid ${service.pid ?? "—"}`}
                 className={`rounded-sm px-2 py-0.5 text-micro transition-colors hover:brightness-125 ${classeDeLEtat(service)}`}
               >
                 {service.nom}
                 {echoue ? ` · code ${service.code_de_sortie}` : ""}
               </button>
+
               {adresses.map(({ url, etiquette }) => (
                 <a
                   key={url}
@@ -85,34 +91,35 @@ export default function ServicesLances({
                   target="_blank"
                   rel="noreferrer"
                   title={etiquette ? `${etiquette} · ${url}` : url}
-                  className="text-micro text-zinc-400 underline decoration-dotted hover:text-zinc-200"
+                  className="inline-flex items-center gap-1.5 rounded-sm border border-zinc-700 px-1.5 py-0.5 text-micro text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200"
                 >
-                  {etiquette ? `${etiquette} ${url}` : url}
+                  {etiquette ? (
+                    <span className="text-zinc-500">{etiquette}</span>
+                  ) : null}
+                  <span>{url}</span>
                 </a>
               ))}
-            </span>
-          );
-        })}
-      </div>
+            </div>
 
-      {services
-        .filter((service) => ouverts.has(cle(service)))
-        .map((service) => (
-          <div key={cle(service)} className="mt-2">
-            {/* Le nom au-dessus du bloc : deux sorties dépliées côte à côte
-                ne se distinguaient pas à l'œil (ticket-149). */}
-            <p className="px-1 text-micro text-zinc-500">
-              {`${service.project_id} · ${service.nom}`}
-            </p>
-            <pre
-              aria-label={`Sortie de ${service.nom}`}
-              className="max-h-40 overflow-auto whitespace-pre-wrap rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400"
-            >
-              {lignesDe(service, sortieDe).join("\n") ||
-                "Ce service n'a encore rien écrit."}
-            </pre>
+            {ouvert ? (
+              <div className="px-1 pb-1">
+                {/* Le nom au-dessus du bloc : la supervision montre tous les
+                    projets, donc deux services peuvent porter le même nom
+                    (ticket-149). */}
+                <p className="px-1 text-micro text-zinc-500">
+                  {`${service.project_id} · ${service.nom}`}
+                </p>
+                <pre
+                  aria-label={`Sortie de ${service.nom}`}
+                  className="max-h-40 overflow-auto whitespace-pre-wrap rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400"
+                >
+                  {lignes.join("\n") || "Ce service n'a encore rien écrit."}
+                </pre>
+              </div>
+            ) : null}
           </div>
-        ))}
+        );
+      })}
     </section>
   );
 }

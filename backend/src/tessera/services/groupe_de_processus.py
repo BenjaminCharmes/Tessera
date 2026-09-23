@@ -131,7 +131,6 @@ def rattacher_au_groupe(groupe: Any, pid: int) -> bool:
     if groupe is None:
         return False
     try:
-
         kernel32 = _kernel32()
         poignee = kernel32.OpenProcess(0x1F0FFF, False, pid)
         if not poignee:
@@ -152,7 +151,6 @@ def fermer_le_groupe(groupe: Any) -> bool:
     if groupe is None:
         return False
     try:
-
         return bool(_kernel32().CloseHandle(groupe))
     except Exception as exc:  # noqa: BLE001
         _logger.warning("groupe_non_ferme", extra={"erreur": str(exc)})
@@ -176,7 +174,6 @@ def rattacher(pid: int) -> bool:
     if not groupe_disponible():
         return False
     try:
-
         if _job is None:
             _job = _construire_le_job()
         kernel32 = _kernel32()
