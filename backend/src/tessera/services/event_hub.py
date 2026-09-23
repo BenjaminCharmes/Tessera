@@ -24,7 +24,11 @@ from tessera.services.pipeline_events import EventType, OrchestratorEvent
 #: Les seuls types qu'une file saturée a le droit de jeter. Tout le reste
 #: décrit un changement d'état, et se perdrait silencieusement.
 JETABLES: frozenset[EventType] = frozenset(
-    {EventType.AGENT_TOKEN, EventType.AGENT_TOOL_USE}
+    {
+        EventType.AGENT_TOKEN,
+        EventType.AGENT_TOOL_USE,
+        EventType.SERVICE_OUTPUT,
+    }
 )
 
 #: Assez pour absorber une rafale de tokens sans garder en mémoire le flux

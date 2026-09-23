@@ -2,7 +2,7 @@
 id: ticket-137
 title: "Déclarer les services d'un projet et les lancer depuis le backend"
 type: feat
-status: todo
+status: in-review
 pr_number: null
 priority: medium
 agent: codeur

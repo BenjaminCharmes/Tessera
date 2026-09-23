@@ -46,6 +46,7 @@ export type EventType =
   | "livraison_done"
   | "pipeline_done"
   | "run_closed"
+  | "service_output"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
@@ -121,6 +122,16 @@ export interface RunRequest {
   mode?: "single" | "queue" | "autonomous";
   max_tickets?: number;
   depuis_github?: boolean;
+}
+
+/** Un service lance pour un projet (ticket-137). */
+export interface ServiceActif {
+  nom: string;
+  project_id: string;
+  pid: number;
+  demarre_a: string;
+  en_cours: boolean;
+  code_de_sortie: number | null;
 }
 
 /** L'instantane des runs vivants, envoye a la connexion sur `/observe`. */

@@ -68,6 +68,34 @@ def load_agents_config(project_path: Path) -> list[AgentConfig]:
         return []
 
 
+def load_services_config(project_path: Path) -> list[dict[str, str]]:
+    """Les services déclarés dans `agents.json`, ou rien — ticket-137.
+
+    ADR-042 : la commande se déclare, elle ne se devine pas. Une liste vide
+    n'est donc pas un manque à combler par une heuristique, c'est la réponse
+    « ce projet ne se lance pas depuis l'IDE ».
+    """
+    agents_json = project_path / "agents.json"
+    if not agents_json.exists():
+        return []
+    try:
+        data = json.loads(agents_json.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+    services = data.get("services") or []
+    if not isinstance(services, list):
+        return []
+    return [
+        {
+            "nom": str(s.get("nom", "")),
+            "commande": str(s.get("commande", "")),
+            "cwd": str(s.get("cwd", "") or ""),
+        }
+        for s in services
+        if isinstance(s, dict) and s.get("nom") and s.get("commande")
+    ]
+
+
 def load_pipeline_config(project_path: Path) -> AgentPipelineConfig:
     """Lit la section pipeline de agents.json."""
     agents_json = project_path / "agents.json"

@@ -8,6 +8,7 @@ from starlette.requests import Request
 
 from tessera.auth import StaticTokenMiddleware
 from tessera.config import settings
+from tessera.services.process_registry import PROCESS_REGISTRY
 from tessera.routers import (
     agent_admin,
     agents,
@@ -16,6 +17,7 @@ from tessera.routers import (
     observation,
     orchestrator,
     projects,
+    services as services_router,
     tickets,
 )
 from tessera.services.database import init_db
@@ -29,6 +31,13 @@ _logger = get_logger(__name__)
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await init_db(settings.ide_db_path)
     yield
+    # Les services lancés pour un projet sont des enfants de ce process et
+    # s'arrêtent avec lui (ADR-042). Les terminer explicitement rend l'arrêt
+    # propre plutôt que brutal : l'alternative — les détacher — laisserait un
+    # serveur derrière soi, avec son port et rien pour l'arrêter.
+    arretes = await PROCESS_REGISTRY.tout_arreter()
+    if arretes:
+        _logger.info("services_arretes", extra={"nombre": arretes})
 
 
 app = FastAPI(title="Tessera", version="0.1.0", lifespan=lifespan)
@@ -67,6 +76,7 @@ app.include_router(chat.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
 app.include_router(orchestrator.router, prefix="/api/v1")
 app.include_router(observation.router, prefix="/api/v1")
+app.include_router(services_router.router, prefix="/api/v1")
 app.include_router(agent_admin.router, prefix="/api/v1")
 app.include_router(fs.router, prefix="/api/v1")
 

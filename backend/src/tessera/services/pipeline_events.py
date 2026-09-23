@@ -41,6 +41,10 @@ class EventType(str, Enum):
     #: ne porte plus le résultat, c'est aussi ici que `arret` devient lisible
     #: (ADR-037).
     RUN_CLOSED = "run_closed"
+    #: Une ligne écrite par un service lancé pour un projet (ticket-137).
+    #: Jetable comme un token : un serveur bavard ne doit pas noyer les
+    #: transitions d'un run dans la file d'un observateur lent.
+    SERVICE_OUTPUT = "service_output"
 
 
 class OrchestratorEvent(BaseModel):
