@@ -170,7 +170,9 @@ def test_un_cwd_hors_du_projet_est_refuse(
     resp = client.post("/api/v1/projects/mon-projet/services/start")
 
     assert resp.status_code == 422
-    assert "racine" in resp.json()["detail"].lower()
+    # « périmètre » et non « racine » : depuis ticket-143 la frontière peut
+    # être le dépôt qui contient le projet, quand celui-ci le déclare.
+    assert "périmètre" in resp.json()["detail"].lower()
 
 
 # --------------------------------------------------------------------------
@@ -246,3 +248,94 @@ def test_un_operateur_isole_reste_refuse() -> None:
     for ligne in ("npm run dev && npm run api", "uvicorn app:app | tee log"):
         with pytest.raises(CommandeInvalide):
             verifier_la_commande(ligne)
+
+
+# --------------------------------------------------------------------------
+# Le dépôt ancêtre — ticket-143
+# --------------------------------------------------------------------------
+
+
+def _racine_et_projet(tmp_path: Path, git_root: str | None) -> tuple[Path, Path]:
+    """Un dépôt qui contient un projet, comme Tessera contient `ide-core`."""
+    depot = tmp_path / "depot"
+    (depot / ".git").mkdir(parents=True)
+    (depot / "backend").mkdir()
+    projet = depot / "projects" / "mon-projet"
+    projet.mkdir(parents=True)
+    manifeste: dict[str, object] = {"project_id": "mon-projet"}
+    if git_root is not None:
+        manifeste["git_root"] = git_root
+    projet.joinpath("agents.json").write_text(
+        json.dumps(manifeste), encoding="utf-8"
+    )
+    return depot, projet
+
+
+def test_sans_declaration_le_cwd_reste_enferme(tmp_path: Path) -> None:
+    # Le défaut protège : six dépôts clients côte à côte, et un `cwd` mal
+    # écrit démarre un serveur chez le voisin.
+    from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
+
+    _, projet = _racine_et_projet(tmp_path, git_root=None)
+
+    with pytest.raises(CommandeInvalide):
+        resoudre_le_cwd(projet, "../../backend")
+
+
+def test_git_root_ancestor_ouvre_le_depot_qui_contient(tmp_path: Path) -> None:
+    # ADR-028 : le projet bootstrap construit l'IDE, donc il travaille
+    # volontairement au-dessus de lui, dans `backend/` et `frontend/`. Sans
+    # cette exception, `ide-core` ne pourrait pas lancer ses propres services.
+    from tessera.services.process_registry import resoudre_le_cwd
+
+    depot, projet = _racine_et_projet(tmp_path, git_root="ancestor")
+
+    assert resoudre_le_cwd(projet, "../../backend") == (depot / "backend").resolve()
+
+
+def test_une_valeur_inconnue_de_git_root_ne_desarme_rien(tmp_path: Path) -> None:
+    # Élargir un périmètre est le geste qui se relit le moins bien : seule la
+    # valeur exacte compte, comme pour ADR-021 et ADR-023.
+    from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
+
+    _, projet = _racine_et_projet(tmp_path, git_root="parent")
+
+    with pytest.raises(CommandeInvalide):
+        resoudre_le_cwd(projet, "../../backend")
+
+
+def test_un_executable_introuvable_dit_quoi_essayer() -> None:
+    # Sans shell, `npm` n'existe pas sous Windows — c'est `npm.cmd`. L'erreur
+    # brute « fichier introuvable » n'aide personne à le deviner, et c'est le
+    # prix assumé de ne pas passer par un shell (ADR-042).
+    import os
+
+    from tessera.services.process_registry import introuvable
+
+    message = introuvable("npm")
+
+    assert "npm" in message
+    if os.name == "nt":
+        assert "npm.cmd" in message
+    # Un programme déjà nommé complètement n'a pas besoin du conseil.
+    assert ".cmd" not in introuvable("npm.cmd").replace("npm.cmd", "", 1)
+
+
+def test_npm_se_lance_sans_ecrire_cmd_dans_le_manifeste(
+    client: TestClient, workspace: Path
+) -> None:
+    # `agents.json` est versionné et part sur d'autres machines : y écrire
+    # « npm.cmd » ferait un manifeste qui ne marche que sous Windows. C'est
+    # le lancement qui s'adapte, pas le fichier partagé.
+    import shutil
+
+    if shutil.which("npm") is None and shutil.which("npm.cmd") is None:
+        pytest.skip("npm absent de cette machine")
+
+    _manifeste(
+        workspace / "mon-projet", [{"nom": "front", "commande": "npm --version"}]
+    )
+
+    resp = client.post("/api/v1/projects/mon-projet/services/start")
+
+    assert resp.status_code == 200, resp.text

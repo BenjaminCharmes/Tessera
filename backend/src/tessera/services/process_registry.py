@@ -10,12 +10,14 @@ Ce registre est en mémoire du process, comme `RunLock` et `RunRegistry`
 tout seul, un serveur non. Rien ici n'attend la fin de quoi que ce soit.
 """
 import asyncio
+import os
 import shlex
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from tessera.services.providers.perimetre import racine_autorisee
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -89,19 +91,44 @@ def verifier_la_commande(commande: str) -> list[str]:
 
 
 def resoudre_le_cwd(racine: Path, cwd: Optional[str]) -> Path:
-    """Le dossier de travail, refusé s'il sort de la racine du projet.
+    """Le dossier de travail, refusé s'il sort du périmètre du projet.
 
     Même frontière qu'ADR-031 : ce que l'IDE lance ne travaille pas chez le
     voisin. Six dépôts clients côte à côte, et un `cwd` mal écrit démarre un
     serveur dans le mauvais.
+
+    Le périmètre vient de `racine_autorisee`, qui porte déjà l'exception
+    d'ADR-028 : un projet déclarant `git_root: ancestor` travaille dans le
+    dépôt qui le contient — c'est ce que fait le projet bootstrap, dont le
+    code est dans `backend/` et `frontend/`, au-dessus de lui. Réécrire cette
+    résolution ici donnerait deux contrôles de périmètre, et c'est celui qu'on
+    regarde le moins qui laisserait passer (ADR-034, ticket-143).
     """
-    racine_reelle = racine.resolve()
-    cible = (racine_reelle / (cwd or ".")).resolve()
-    if cible != racine_reelle and racine_reelle not in cible.parents:
+    permise = racine_autorisee(racine)
+    depart = racine.resolve()
+    cible = (depart / (cwd or ".")).resolve()
+    if cible != permise and permise not in cible.parents:
         raise CommandeInvalide(
-            f"`cwd` sort de la racine du projet : {cwd!r}"
+            f"`cwd` sort du périmètre du projet : {cwd!r}"
         )
     return cible
+
+
+def introuvable(programme: str) -> str:
+    """Le message d'un exécutable qui ne se résout pas.
+
+    Sans shell, `npm` n'existe pas sous Windows : c'est `npm.cmd`, et l'erreur
+    brute — « fichier introuvable » — n'aide personne à le deviner. Le prix de
+    ne pas passer par un shell (ADR-042) est de devoir nommer le programme
+    exactement ; autant le dire.
+    """
+    message = f"« {programme} » est introuvable."
+    if os.name == "nt" and not programme.lower().endswith((".cmd", ".bat", ".exe")):
+        message += (
+            f" Sous Windows et sans shell, essaie « {programme}.cmd » : "
+            "npm, npx et yarn y sont des scripts, pas des exécutables."
+        )
+    return message
 
 
 class ProcessRegistry:
@@ -134,12 +161,10 @@ class ProcessRegistry:
         args = verifier_la_commande(commande)
         dossier = resoudre_le_cwd(racine, cwd)
 
-        processus = await asyncio.create_subprocess_exec(
-            *args,
-            cwd=str(dossier),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,
-        )
+        try:
+            processus = await self._lancer(args, dossier)
+        except FileNotFoundError as exc:
+            raise CommandeInvalide(introuvable(args[0])) from exc
         service = Service(
             nom=nom, project_id=project_id, pid=processus.pid, processus=processus
         )
@@ -151,6 +176,34 @@ class ProcessRegistry:
             # kilo-octets.
             asyncio.create_task(self._lire(service, sur_ligne))
         return service
+
+    async def _lancer(self, args: list[str], dossier: Path) -> Any:
+        """Lance les arguments, en essayant l'équivalent Windows au besoin.
+
+        `npm`, `npx` et `yarn` sont des scripts sous Windows : sans shell,
+        seul `npm.cmd` se résout. Écrire `npm.cmd` dans un `agents.json`
+        marcherait ici et nulle part ailleurs — or ce fichier est versionné et
+        part sur d'autres machines. Le manifeste reste donc portable, et c'est
+        le lancement qui s'adapte (ticket-143).
+        """
+        essais = [args]
+        if os.name == "nt" and not args[0].lower().endswith(
+            (".cmd", ".bat", ".exe")
+        ):
+            essais.append([args[0] + ".cmd", *args[1:]])
+
+        derniere: FileNotFoundError | None = None
+        for tentative in essais:
+            try:
+                return await asyncio.create_subprocess_exec(
+                    *tentative,
+                    cwd=str(dossier),
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.STDOUT,
+                )
+            except FileNotFoundError as exc:
+                derniere = exc
+        raise derniere if derniere else FileNotFoundError(args[0])
 
     async def _lire(self, service: Service, sur_ligne: Any) -> None:
         flux = service.processus.stdout if service.processus else None
