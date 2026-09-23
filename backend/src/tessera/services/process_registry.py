@@ -11,6 +11,7 @@ tout seul, un serveur non. Rien ici n'attend la fin de quoi que ce soit.
 """
 import asyncio
 import os
+import re
 import shlex
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -31,6 +32,26 @@ OPERATEURS_DE_SHELL = frozenset({"&&", "||", "|", ";", ">", ">>", "<", "&"})
 #: Combien de temps on laisse un service s'arrêter poliment avant de le tuer.
 DELAI_D_ARRET_S = 5.0
 
+#: Les séquences de couleur d'un terminal. Vite, entre autres, colore sa
+#: sortie — et les codes tombent **au milieu** de l'URL qu'il annonce :
+#: `http://localhost:[1m5175[22m/`. L'adresse en sortait corrompue,
+#: et le `<pre>` du panneau affichait « [32m » un peu partout, faute
+#: d'interpréter quoi que ce soit (ticket-148).
+_COULEURS = re.compile(r"\[[0-9;?]*[ -/]*[@-~]")
+
+
+def sans_couleurs(ligne: str) -> str:
+    """La ligne telle qu'elle se lit, sans les codes d'échappement."""
+    return _COULEURS.sub("", ligne)
+
+
+#: Combien de lignes un service garde de sa propre sortie — ticket-148.
+#: `EventHub` ne rejoue pas l'historique (choix assumé pour la supervision),
+#: or un service écrit ses lignes utiles, **dont son adresse**, dans ses deux
+#: premières secondes : qui n'écoutait pas à cet instant ne les verrait
+#: jamais. La borne est ce qui empêche le registre de grossir sans fin.
+LIGNES_CONSERVEES = 200
+
 
 class CommandeInvalide(Exception):
     """La commande déclarée ne peut pas être lancée telle quelle."""
@@ -49,6 +70,13 @@ class Service:
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+    sortie: list[str] = field(default_factory=list)
+
+    def noter(self, ligne: str) -> None:
+        """Retient une ligne, en ne gardant que les plus récentes."""
+        self.sortie.append(ligne)
+        if len(self.sortie) > LIGNES_CONSERVEES:
+            del self.sortie[: len(self.sortie) - LIGNES_CONSERVEES]
 
     @property
     def en_cours(self) -> bool:
@@ -64,6 +92,7 @@ class Service:
             "code_de_sortie": (
                 self.processus.returncode if self.processus is not None else None
             ),
+            "sortie": list(self.sortie),
         }
 
 
@@ -238,10 +267,10 @@ class ProcessRegistry:
                 ligne = await flux.readline()
                 if not ligne:
                     break
+                texte = sans_couleurs(ligne.decode("utf-8", "replace")).rstrip()
+                service.noter(texte)
                 if sur_ligne is not None:
-                    await sur_ligne(
-                        service, ligne.decode("utf-8", "replace").rstrip()
-                    )
+                    await sur_ligne(service, texte)
         except Exception as exc:  # noqa: BLE001 — lire ne doit rien casser
             _logger.warning("lecture_service_interrompue", extra={"erreur": str(exc)})
 

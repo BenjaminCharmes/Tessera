@@ -473,3 +473,66 @@ def test_un_service_lance_garde_son_pid_dans_la_liste(
     assert len(listing) == 1
     assert listing[0]["en_cours"] is True
     assert isinstance(listing[0]["pid"], int)
+
+
+# --------------------------------------------------------------------------
+# La sortie survit à qui n'écoutait pas — ticket-148
+# --------------------------------------------------------------------------
+
+
+def test_la_sortie_est_conservee_pour_qui_arrive_apres(
+    client: TestClient, workspace: Path
+) -> None:
+    # Le hub ne rejoue pas l'historique : un service écrit son adresse dans
+    # ses deux premières secondes, et qui n'écoutait pas ne la voit jamais.
+    # Le panneau affichait « n'a encore rien écrit » pour un service qui
+    # tournait depuis dix minutes (ticket-148).
+    import time
+
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _BAVARD}])
+    _demarrer(client, "mon-projet")
+
+    for _ in range(40):
+        listing = client.get("/api/v1/projects/mon-projet/services").json()
+        if listing and listing[0].get("sortie"):
+            break
+        time.sleep(0.1)
+
+    assert listing[0]["sortie"], listing
+    assert any("je suis la" in ligne for ligne in listing[0]["sortie"])
+
+
+def test_la_sortie_conservee_est_bornee(workspace: Path) -> None:
+    # Garder les lignes fait grossir le registre : la borne est ce qui
+    # l'empêche, et elle garde les plus récentes.
+    from tessera.services.process_registry import LIGNES_CONSERVEES, Service
+
+    service = Service(nom="api", project_id="mon-projet")
+    for i in range(LIGNES_CONSERVEES + 50):
+        service.noter(f"ligne {i}")
+
+    assert len(service.sortie) == LIGNES_CONSERVEES
+    assert service.sortie[-1] == f"ligne {LIGNES_CONSERVEES + 49}"
+
+
+def test_les_couleurs_ansi_sont_retirees_de_la_sortie() -> None:
+    # Vite colore sa sortie, et les codes tombent **au milieu** de l'URL :
+    #   http://localhost:\x1b[1m5175\x1b[22m/\x1b[39m
+    # L'adresse était donc extraite corrompue, et le `<pre>` du panneau
+    # affichait « [32m » un peu partout (ticket-148).
+    from tessera.services.process_registry import sans_couleurs
+
+    brut = "  \x1b[32m➜\x1b[39m  \x1b[1mLocal\x1b[22m:   \x1b[36mhttp://localhost:\x1b[1m5175\x1b[22m/\x1b[39m"
+
+    propre = sans_couleurs(brut)
+
+    assert "\x1b" not in propre
+    assert "http://localhost:5175/" in propre
+
+
+def test_une_ligne_sans_couleur_n_est_pas_modifiee() -> None:
+    from tessera.services.process_registry import sans_couleurs
+
+    assert sans_couleurs("INFO: Uvicorn running on http://127.0.0.1:8000") == (
+        "INFO: Uvicorn running on http://127.0.0.1:8000"
+    )

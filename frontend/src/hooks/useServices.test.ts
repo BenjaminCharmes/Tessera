@@ -123,4 +123,43 @@ describe("useServices", () => {
     expect(arreter).toHaveBeenCalledWith("ide-core");
     expect(result.current.enCours).toBe(false);
   });
+
+  it("garde le bouton apres un arret : declare ne dit pas « rien ne tourne »", async () => {
+    // La regression de ticket-148 : `arreter()` vidait la liste, et depuis
+    // ticket-146 `declare` valait `services.length > 0`. Une liste vide
+    // *parce qu'on vient d'arreter* se lisait comme « ce projet ne declare
+    // aucun service » — le bouton disparaissait et le mode d'emploi
+    // s'affichait.
+    const lister = vi
+      .spyOn(api.services, "list")
+      .mockResolvedValue([service()]);
+    vi.spyOn(api.services, "stop").mockResolvedValue({ arretes: 1 });
+
+    const { result } = renderHook(() => useServices("fluentdb"));
+    await waitFor(() => expect(result.current.enCours).toBe(true));
+
+    lister.mockResolvedValue([service({ en_cours: false, pid: null })]);
+    await act(async () => {
+      await result.current.arreter();
+    });
+
+    expect(result.current.declare).toBe(true);
+    await waitFor(() => expect(result.current.enCours).toBe(false));
+  });
+
+  it("n'exige qu'un seul clic pour arreter", async () => {
+    const arreter = vi
+      .spyOn(api.services, "stop")
+      .mockResolvedValue({ arretes: 1 });
+    vi.spyOn(api.services, "list").mockResolvedValue([service()]);
+
+    const { result } = renderHook(() => useServices("fluentdb"));
+    await waitFor(() => expect(result.current.enCours).toBe(true));
+
+    await act(async () => {
+      await result.current.arreter();
+    });
+
+    expect(arreter).toHaveBeenCalledTimes(1);
+  });
 });

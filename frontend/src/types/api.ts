@@ -134,6 +134,12 @@ export interface ServiceActif {
   demarre_a: string;
   en_cours: boolean;
   code_de_sortie: number | null;
+  /**
+   * Les dernieres lignes que le service a ecrites, gardees par le backend
+   * (ticket-148). Le canal ne rejoue pas l'historique : sans elles, qui ouvre
+   * l'IDE apres le demarrage ne verrait jamais l'adresse annoncee.
+   */
+  sortie?: string[];
 }
 
 /** L'instantane des runs vivants, envoye a la connexion sur `/observe`. */

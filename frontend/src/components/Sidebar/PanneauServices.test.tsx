@@ -120,4 +120,112 @@ describe("PanneauServices", () => {
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(screen.getByText(/ne déclare aucun service/)).toBeInTheDocument();
   });
+
+  it("affiche la sortie gardee par le backend, sans avoir ecoute le canal", async () => {
+    // Le cas vecu : un service lance avant l'ouverture de l'IDE affichait
+    // « n'a encore rien ecrit », alors qu'il tournait depuis dix minutes.
+    render(
+      <PanneauServices
+        services={etat({
+          services: [service({ sortie: ["Local: http://localhost:5175/"] })],
+        })}
+        sortieDe={() => []}
+        projectId="fluentdb"
+        cheminDuProjet={null}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /dev/ }));
+
+    expect(screen.getByLabelText("Sortie de dev").textContent).toContain(
+      "localhost:5175",
+    );
+  });
+
+  it("retrouve l'adresse depuis la sortie gardee", () => {
+    // C'est elle qui portait l'URL, et elle etait perdue au rechargement.
+    render(
+      <PanneauServices
+        services={etat({
+          services: [service({ sortie: ["  ➜  Local:   http://localhost:5175/"] })],
+        })}
+        sortieDe={() => []}
+        projectId="fluentdb"
+        cheminDuProjet={null}
+      />,
+    );
+
+    expect(
+      screen.getByRole("link", { name: /localhost:5175/ }).getAttribute("href"),
+    ).toBe("http://localhost:5175/");
+  });
+
+  it("prefere le direct quand il est plus complet", () => {
+    // Le canal reste la source vivante : la memoire du backend ne sert qu'au
+    // rattrapage.
+    render(
+      <PanneauServices
+        services={etat({ services: [service({ sortie: ["vieille ligne"] })] })}
+        sortieDe={() => ["ligne une", "ligne deux", "ligne trois"]}
+        projectId="fluentdb"
+        cheminDuProjet={null}
+      />,
+    );
+
+    void userEvent.click(screen.getByRole("button", { name: /dev/ }));
+    return vi.waitFor(() =>
+      expect(screen.getByLabelText("Sortie de dev").textContent).toContain(
+        "ligne trois",
+      ),
+    );
+  });
+});
+
+describe("PanneauServices — plusieurs services (ticket-148)", () => {
+  it("garde deux sorties ouvertes en meme temps", async () => {
+    // Un projet qui lance un backend **et** un frontend veut voir les deux :
+    // l'accordeon fermait l'une en ouvrant l'autre.
+    render(
+      <PanneauServices
+        services={etat({
+          services: [
+            service({ nom: "backend", sortie: ["api prete"] }),
+            service({ nom: "frontend", sortie: ["vite pret"] }),
+          ],
+        })}
+        sortieDe={() => []}
+        projectId="mon-projet"
+        cheminDuProjet={null}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /backend/ }));
+    await userEvent.click(screen.getByRole("button", { name: /frontend/ }));
+
+    expect(screen.getByLabelText("Sortie de backend")).toBeInTheDocument();
+    expect(screen.getByLabelText("Sortie de frontend")).toBeInTheDocument();
+  });
+
+  it("referme celle qu'on rouvre, sans toucher a l'autre", async () => {
+    render(
+      <PanneauServices
+        services={etat({
+          services: [
+            service({ nom: "backend", sortie: ["api prete"] }),
+            service({ nom: "frontend", sortie: ["vite pret"] }),
+          ],
+        })}
+        sortieDe={() => []}
+        projectId="mon-projet"
+        cheminDuProjet={null}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /backend/ }));
+    await userEvent.click(screen.getByRole("button", { name: /frontend/ }));
+    await userEvent.click(screen.getByRole("button", { name: /backend/ }));
+
+    expect(screen.queryByLabelText("Sortie de backend")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Sortie de frontend")).toBeInTheDocument();
+  });
 });

@@ -116,7 +116,18 @@ export function useServices(
     if (!projectId) return;
     try {
       await api.services.stop(projectId);
-      setApresAction({ projectId, signal, liste: AUCUN, erreur: null, declare: true });
+      // Surtout pas `liste: AUCUN` : une liste vide *parce qu'on vient
+      // d'arrêter* se lisait comme « ce projet ne déclare aucun service »,
+      // et le bouton disparaissait au profit du mode d'emploi (ticket-148).
+      // « Rien de déclaré » et « rien qui tourne » sont deux choses
+      // différentes ; seule la relecture sait laquelle est vraie.
+      setApresAction({
+        projectId,
+        signal,
+        liste: null,
+        erreur: null,
+        declare: true,
+      });
       refresh();
     } catch (exc: unknown) {
       setApresAction({

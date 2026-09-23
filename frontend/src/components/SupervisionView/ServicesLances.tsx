@@ -7,7 +7,7 @@ import type { ServiceActif } from "../../types/api";
  * Les services lancés, leur adresse et leur sortie — ticket-145.
  *
  * Séparés des runs : un service n'a ni ticket, ni tours, ni verdict, et ne se
- * termine pas tout seul. Sélectionner l'un d'eux montre ses dernières lignes,
+ * termine pas tout seul. Déplier l'un d'eux montre ses dernières lignes,
  * comme sélectionner un run montre ses tokens.
  *
  * L'adresse vient de la sortie elle-même — Vite et uvicorn l'y annoncent.
@@ -18,16 +18,37 @@ interface ServicesLancesProps {
   sortieDe: (projectId: string, nom: string) => string[];
 }
 
+/**
+ * Ce que le service a écrit : le direct s'il est arrivé, sinon ce que le
+ * backend a gardé — ticket-148. Le canal ne rejoue pas l'historique, et un
+ * service annonce son adresse dans ses deux premières secondes.
+ */
+function lignesDe(
+  service: ServiceActif,
+  sortieDe: (projectId: string, nom: string) => string[],
+): string[] {
+  const direct = sortieDe(service.project_id, service.nom);
+  const gardees = service.sortie ?? [];
+  return direct.length >= gardees.length ? direct : gardees;
+}
+
 export default function ServicesLances({
   services,
   sortieDe,
 }: ServicesLancesProps) {
-  const [ouvert, setOuvert] = useState<string | null>(null);
-  const cle = (s: ServiceActif) => `${s.project_id}:${s.nom}`;
-  const selectionne = services.find((s) => cle(s) === ouvert) ?? null;
-  const lignes = selectionne
-    ? sortieDe(selectionne.project_id, selectionne.nom)
-    : [];
+  // Un ensemble, pas un seul nom : un projet qui lance un backend **et** un
+  // frontend veut voir les deux sorties en même temps. L'accordéon fermait
+  // l'une en ouvrant l'autre (ticket-148).
+  const [ouverts, setOuverts] = useState<ReadonlySet<string>>(new Set());
+  const cle = (service: ServiceActif) => `${service.project_id}:${service.nom}`;
+
+  function basculer(nom: string) {
+    setOuverts((prec) => {
+      const suivant = new Set(prec);
+      if (!suivant.delete(nom)) suivant.add(nom);
+      return suivant;
+    });
+  }
 
   return (
     <section
@@ -36,22 +57,18 @@ export default function ServicesLances({
     >
       <div className="flex flex-wrap items-center gap-2">
         {services.map((service) => {
-          const sortie = sortieDe(service.project_id, service.nom);
-          const adresse = service.en_cours
-            ? adresseDansLaSortie(sortie)
-            : null;
-          // Même lecture d'état que le panneau du projet : deux mises en
-          // forme pour une même donnée divergeraient (ADR-034).
+          const lignes = lignesDe(service, sortieDe);
+          // Pas d'adresse pour un service arrêté : elle mènerait vers un
+          // serveur qui n'écoute plus.
+          const adresse = service.en_cours ? adresseDansLaSortie(lignes) : null;
           const echoue = etatDuService(service) === "echoue";
           return (
             <span key={cle(service)} className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() =>
-                  setOuvert((prec) => (prec === cle(service) ? null : cle(service)))
-                }
-                aria-pressed={ouvert === cle(service)}
-                title={`${service.project_id} · pid ${service.pid}`}
+                onClick={() => basculer(cle(service))}
+                aria-pressed={ouverts.has(cle(service))}
+                title={`${service.project_id} · pid ${service.pid ?? "—"}`}
                 className={`rounded-sm px-2 py-0.5 text-micro transition-colors hover:brightness-125 ${classeDeLEtat(service)}`}
               >
                 {service.nom}
@@ -72,16 +89,18 @@ export default function ServicesLances({
         })}
       </div>
 
-      {selectionne ? (
-        <pre
-          aria-label={`Sortie de ${selectionne.nom}`}
-          className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400"
-        >
-          {lignes.length > 0
-            ? lignes.join("\n")
-            : "Ce service n'a encore rien écrit."}
-        </pre>
-      ) : null}
+      {services
+        .filter((service) => ouverts.has(cle(service)))
+        .map((service) => (
+          <pre
+            key={cle(service)}
+            aria-label={`Sortie de ${service.nom}`}
+            className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400"
+          >
+            {lignesDe(service, sortieDe).join("\n") ||
+              "Ce service n'a encore rien écrit."}
+          </pre>
+        ))}
     </section>
   );
 }

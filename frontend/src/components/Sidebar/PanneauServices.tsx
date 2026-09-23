@@ -33,7 +33,10 @@ export default function PanneauServices({
   projectId,
   cheminDuProjet,
 }: PanneauServicesProps) {
-  const [ouvert, setOuvert] = useState<string | null>(null);
+  // Un ensemble, pas un seul nom : un projet qui lance un backend **et** un
+  // frontend veut voir les deux sorties en même temps. L'accordéon fermait
+  // l'une en ouvrant l'autre (ticket-148).
+  const [ouverts, setOuverts] = useState<ReadonlySet<string>>(new Set());
 
   if (!services.declare) {
     return <RienDeclare projectId={projectId} chemin={cheminDuProjet} />;
@@ -51,15 +54,36 @@ export default function PanneauServices({
         <LigneDeService
           key={service.nom}
           service={service}
-          lignes={sortieDe(service.project_id, service.nom)}
-          ouvert={ouvert === service.nom}
+          lignes={lignesDe(service, sortieDe)}
+          ouvert={ouverts.has(service.nom)}
           onBasculer={() =>
-            setOuvert((prec) => (prec === service.nom ? null : service.nom))
+            setOuverts((prec) => {
+              const suivant = new Set(prec);
+              if (!suivant.delete(service.nom)) suivant.add(service.nom);
+              return suivant;
+            })
           }
         />
       ))}
     </div>
   );
+}
+
+/**
+ * Ce que le service a écrit : le direct s'il est arrivé, sinon ce que le
+ * backend a gardé — ticket-148.
+ *
+ * Le canal ne rejoue pas l'historique, et un service annonce son adresse dans
+ * ses deux premières secondes. Ouvrir l'IDE ensuite affichait « n'a encore
+ * rien écrit » pour un service parti depuis dix minutes.
+ */
+function lignesDe(
+  service: ServiceActif,
+  sortieDe: (projectId: string, nom: string) => string[],
+): string[] {
+  const direct = sortieDe(service.project_id, service.nom);
+  const gardees = service.sortie ?? [];
+  return direct.length >= gardees.length ? direct : gardees;
 }
 
 function LigneDeService({
