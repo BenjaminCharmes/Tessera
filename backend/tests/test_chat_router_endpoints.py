@@ -338,13 +338,21 @@ def test_un_lancement_concurrent_est_refuse_avec_409(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Deux pipelines sur le même dépôt violeraient l'isolation par branche.
-    from tessera.routers.chat import _RUN_LOCK
+    from tessera.services.run_registry import RUN_REGISTRY, RunActif
 
     async def _build(project_id: str) -> object:
         raise AssertionError("ne doit pas être atteint")
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
-    monkeypatch.setattr(_RUN_LOCK, "_running", {"mon-projet": "ticket-001"})
+    # Depuis ticket-127 le verrou n'a plus de dictionnaire à lui : c'est le
+    # registre qui dit ce qui tourne, et c'est donc lui qu'on occupe.
+    monkeypatch.setitem(
+        RUN_REGISTRY._runs,
+        "run-en-cours",
+        RunActif(
+            run_id="run-en-cours", project_id="mon-projet", ticket_id="ticket-001"
+        ),
+    )
 
     resp = _client().post(
         "/api/v1/projects/mon-projet/chat/run",

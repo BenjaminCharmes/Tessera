@@ -1,27 +1,28 @@
-"""One pipeline at a time per project — ticket-055, extended by ticket-121.
+"""One pipeline at a time per project — ticket-055, ticket-121, ticket-127.
 
 Born in `chat_suggestion.py` for `/chat/run` alone. Two `POST
 /orchestrator/run` on the same project both passed `ensure_clean_tree`, then
 the second `create_branch` switched the tree under the first coder. The lock
 now guards every entry point, so it lives in its own module with a single
 process-wide instance that the routers share.
+
+Depuis ticket-127 il ne tient plus son propre dictionnaire : il est une
+**façade** sur `RunRegistry`, qui sait déjà ce qui tourne et depuis quand.
+Deux structures décrivant « ce projet est-il occupé ? » divergeraient, et
+c'est la supervision qui afficherait le faux (ADR-034).
 """
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+from tessera.services.run_registry import (
+    RUN_REGISTRY,
+    RunAlreadyInProgress,
+    RunRegistry,
+)
 
-class RunAlreadyInProgress(Exception):
-    """A pipeline is already running on this project."""
-
-    def __init__(self, project_id: str, ticket_id: str | None = None) -> None:
-        self.project_id = project_id
-        self.ticket_id = ticket_id
-        en_cours = f" ({ticket_id})" if ticket_id else ""
-        super().__init__(
-            f"Un pipeline tourne déjà sur le projet '{project_id}'{en_cours}. "
-            "Deux exécutions simultanées se marcheraient dessus dans le même "
-            "arbre de travail : attends la fin de celle en cours."
-        )
+#: Ré-exportée : l'exception est levée par le registre, mais tout le code
+#: appelant l'importe d'ici depuis ticket-055.
+__all__ = ["RUN_LOCK", "RunAlreadyInProgress", "RunLock"]
 
 
 class RunLock:
@@ -36,32 +37,24 @@ class RunLock:
     périmètre).
     """
 
-    def __init__(self) -> None:
-        self._running: dict[str, str | None] = {}
+    def __init__(self, registry: RunRegistry | None = None) -> None:
+        self._registry = registry if registry is not None else RUN_REGISTRY
 
     def is_running(self, project_id: str) -> bool:
-        return project_id in self._running
+        return self._registry.projet_occupe(project_id)
 
     def ticket_en_cours(self, project_id: str) -> str | None:
         """The ticket running on `project_id`, or None when the project is free."""
-        return self._running.get(project_id)
+        return self._registry.ticket_du_projet(project_id)
 
     @asynccontextmanager
     async def acquire(
         self, project_id: str, ticket_id: str | None = None
     ) -> AsyncIterator[None]:
-        if project_id in self._running:
-            raise RunAlreadyInProgress(project_id, self._running[project_id])
-        self._running[project_id] = ticket_id
-        try:
+        async with self._registry.acquire(project_id, ticket_id):
             yield
-        finally:
-            # `finally` et non le chemin nominal : un pipeline qui échoue doit
-            # laisser le projet utilisable, pas verrouillé jusqu'au
-            # redémarrage du backend.
-            self._running.pop(project_id, None)
 
 
 #: L'instance que tous les routeurs partagent. Deux instances seraient deux
 #: verrous, et le chat ne verrait pas le run lancé depuis le tableau.
-RUN_LOCK = RunLock()
+RUN_LOCK = RunLock(RUN_REGISTRY)

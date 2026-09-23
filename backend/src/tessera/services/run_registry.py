@@ -1,0 +1,148 @@
+"""What is running right now, on every project — ticket-127.
+
+`RunLock` already held the answer to « ce projet est-il occupé ? » in a
+`dict[str, str | None]`, but nothing exposed it and nobody could say *since
+when*, *at which stage*, or *for how many tokens*. The registry holds that
+state; `RunLock` becomes a façade over it, so that two structures describing
+the same thing cannot drift apart (ADR-034).
+
+En mémoire du process, comme le verrou dont il reprend le rôle : un backend
+local n'a pas de second process à protéger (ADR-038).
+"""
+import uuid
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Any, Optional
+
+
+class RunAlreadyInProgress(Exception):
+    """A pipeline is already running on this project."""
+
+    def __init__(self, project_id: str, ticket_id: str | None = None) -> None:
+        self.project_id = project_id
+        self.ticket_id = ticket_id
+        en_cours = f" ({ticket_id})" if ticket_id else ""
+        super().__init__(
+            f"Un pipeline tourne déjà sur le projet '{project_id}'{en_cours}. "
+            "Deux exécutions simultanées se marcheraient dessus dans le même "
+            "arbre de travail : attends la fin de celle en cours."
+        )
+
+
+@dataclass
+class RunActif:
+    """Un run en cours, tel que la supervision l'affiche."""
+
+    run_id: str
+    project_id: str
+    mode: str = "single"
+    ticket_id: str | None = None
+    etape: str | None = None
+    agent: str | None = None
+    tour: int = 0
+    tokens_entree: int = 0
+    tokens_sortie: int = 0
+    cout_usd: float = 0.0
+    verdict: str | None = None
+    #: Le `DialogueChannel` du run. C'est ce qui permet à n'importe quel
+    #: observateur de répondre à un agent qui pose une question (ADR-025),
+    #: au lieu du seul onglet qui a lancé le run.
+    dialogue: Any = None
+    demarre_a: datetime = field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+
+    def en_dict(self) -> dict[str, Any]:
+        """Serialisable view — the dialogue channel is deliberately left out."""
+        return {
+            "run_id": self.run_id,
+            "project_id": self.project_id,
+            "mode": self.mode,
+            "ticket_id": self.ticket_id,
+            "etape": self.etape,
+            "agent": self.agent,
+            "tour": self.tour,
+            "tokens_entree": self.tokens_entree,
+            "tokens_sortie": self.tokens_sortie,
+            "cout_usd": self.cout_usd,
+            "verdict": self.verdict,
+            "demarre_a": self.demarre_a.isoformat(),
+        }
+
+
+class RunRegistry:
+    """Les runs vivants, indexés par `run_id`, un seul par projet."""
+
+    def __init__(self) -> None:
+        self._runs: dict[str, RunActif] = {}
+
+    # -- lecture ---------------------------------------------------------
+
+    def projet_occupe(self, project_id: str) -> bool:
+        return any(run.project_id == project_id for run in self._runs.values())
+
+    def ticket_du_projet(self, project_id: str) -> str | None:
+        for run in self._runs.values():
+            if run.project_id == project_id:
+                return run.ticket_id
+        return None
+
+    def run_du_projet(self, project_id: str) -> RunActif | None:
+        for run in self._runs.values():
+            if run.project_id == project_id:
+                return run
+        return None
+
+    def get(self, run_id: str) -> RunActif | None:
+        return self._runs.get(run_id)
+
+    def instantane(self) -> list[dict[str, Any]]:
+        """Every live run, as the supervision view receives it on connect."""
+        return [run.en_dict() for run in self._runs.values()]
+
+    # -- écriture --------------------------------------------------------
+
+    def mettre_a_jour(self, run_id: str, **champs: Any) -> RunActif | None:
+        run = self._runs.get(run_id)
+        if run is None:
+            return None
+        for nom, valeur in champs.items():
+            if hasattr(run, nom):
+                setattr(run, nom, valeur)
+        return run
+
+    @asynccontextmanager
+    async def acquire(
+        self,
+        project_id: str,
+        ticket_id: str | None = None,
+        *,
+        mode: str = "single",
+        run_id: Optional[str] = None,
+        dialogue: Any = None,
+    ) -> AsyncIterator[RunActif]:
+        """Open a run on `project_id`, refusing a second one on that project."""
+        if self.projet_occupe(project_id):
+            raise RunAlreadyInProgress(project_id, self.ticket_du_projet(project_id))
+
+        run = RunActif(
+            run_id=run_id or uuid.uuid4().hex,
+            project_id=project_id,
+            mode=mode,
+            ticket_id=ticket_id,
+            dialogue=dialogue,
+        )
+        self._runs[run.run_id] = run
+        try:
+            yield run
+        finally:
+            # `finally` et non le chemin nominal : un pipeline qui échoue doit
+            # laisser le projet utilisable, pas verrouillé jusqu'au
+            # redémarrage du backend.
+            self._runs.pop(run.run_id, None)
+
+
+#: Le registre que les routeurs partagent, et sur lequel `RUN_LOCK` s'appuie.
+RUN_REGISTRY = RunRegistry()
