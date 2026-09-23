@@ -413,3 +413,61 @@ def test_le_dossier_d_un_ticket_correspond_a_son_champ_status() -> None:
                 )
 
     assert divergents == [], "\n".join(divergents)
+
+
+# ------------------------------------------------------------------
+# Un numéro d'ADR cité doit exister quelque part — ticket-131
+# ------------------------------------------------------------------
+
+
+def _numeros_declares() -> set[str]:
+    """Les ADR en vigueur, plus ceux qu'on a archivés."""
+    numeros: set[str] = set()
+    for nom in ("decisions.md", "decisions-archive.md"):
+        chemin = _RACINE / "projects" / "ide-core" / "memory" / nom
+        if chemin.exists():
+            numeros |= set(
+                re.findall(r"^## (ADR-\d{3})", chemin.read_text(encoding="utf-8"), re.M)
+            )
+    return numeros
+
+
+def test_tout_adr_cite_existe_encore() -> None:
+    # Le risque de l'archivage n'est pas d'archiver trop peu, c'est d'archiver
+    # une contrainte encore appliquée : elle disparaîtrait du prompt sans que
+    # rien n'échoue, et un agent la violerait des semaines plus tard sans
+    # qu'on sache pourquoi.
+    declares = _numeros_declares()
+    assert declares, "aucun ADR trouvé — le chemin du fichier a bougé"
+
+    cites: dict[str, set[str]] = {}
+    for dossier, motifs in (
+        ("backend/src", ("*.py",)),
+        ("agents/prompts", ("*.md",)),
+        (".claude/skills", ("*.md",)),
+        ("frontend/src", ("*.ts", "*.tsx")),
+    ):
+        racine = _RACINE / dossier
+        if not racine.is_dir():
+            continue
+        for motif in motifs:
+            for fichier in racine.rglob(motif):
+                texte = fichier.read_text(encoding="utf-8", errors="ignore")
+                for numero in re.findall(r"ADR-\d{3}", texte):
+                    cites.setdefault(numero, set()).add(
+                        str(fichier.relative_to(_RACINE))
+                    )
+
+    inconnus = {n: sorted(f) for n, f in cites.items() if n not in declares}
+    assert inconnus == {}, f"ADR cités mais introuvables : {inconnus}"
+
+
+def test_l_archive_n_est_importee_nulle_part() -> None:
+    # Elle existe pour *sortir* du prompt : l'importer annulerait le ticket.
+    for claude_md in _RACINE.rglob("CLAUDE.md"):
+        if ".venv" in claude_md.parts or "node_modules" in claude_md.parts:
+            continue
+        texte = claude_md.read_text(encoding="utf-8", errors="ignore")
+        assert "decisions-archive" not in texte, (
+            f"{claude_md} importe l'archive : elle repartirait dans chaque appel"
+        )

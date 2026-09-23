@@ -80,9 +80,8 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-06  
 **Portée** : architect, codeur, reviewer  
-**Décision** : `Orchestrator` est instancié à chaque requête HTTP (pas de singleton). Il reçoit `AgentRunner`, `TicketService` et `project_context` en injection de dépendances.  
-**Raison** : Deux pipelines sur des projets différents peuvent tourner en parallèle sans partage d'état. La concurrence est naturelle car `asyncio` + instances séparées = zéro lock à gérer.  
-**Amendée 2026-09-22** : « zéro lock » ne tient que **entre** projets ; sur un même arbre, `RunLock` refuse le second run (ADR-038).  
+**Décision** : `Orchestrator` est instancié à chaque requête HTTP (pas de singleton). Il reçoit `AgentRunner`, `TicketService` et `project_context` en injection de dépendances. Ce qui survit à une requête vit **hors** de lui : `RunLock` et `RunRegistry`, en mémoire du process.  
+**Raison** : deux pipelines sur des projets différents tournent en parallèle sans rien partager. Mais « zéro lock » ne vaut qu'**entre** projets : sur un même arbre, `RunLock` refuse le second run (ADR-038).  
 **Alternative rejetée** : Singleton avec un dictionnaire de verrous par ticket — trop complexe pour la v0.
 
 ---
@@ -137,24 +136,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-015 — CI : 3 jobs parallèles GitHub Actions
+## ADR-015 — CI : des jobs parallèles, et macOS seulement si Tauri change
 
 **Date** : 2026-06-20
 **Portée** : architect  
-**Décision** : `backend` (ubuntu, pytest), `frontend` (ubuntu, tsc+vitest), `tauri` (macos, cargo check) en parallèle.
-**Amendée 2026-09-22** : cinq jobs — `e2e` (Playwright) suit `frontend`, et `tauri` ne tourne que si `detecter` voit `frontend/src-tauri/` changer : une minute macOS vaut dix minutes ubuntu, pour dix-huit secondes de `cargo check`.
-**Raison** : Séparation des responsabilités + exécution parallèle = feedback rapide. `macos-latest` pour Tauri (headers WKWebView disponibles). `cargo check` et non `cargo build` pour éviter 10+ min de compilation complète.
-**Alternative rejetée** : Job unique séquentiel (lent), `cargo build` complet en CI (coûteux).
-
----
-
-## ADR-016 — Scope filesystem Tauri : $HOME pour la v0
-
-**Date** : 2026-06-20
-**Portée** : architect  
-**Décision** : Le plugin `tauri-plugin-fs` a accès à `$HOME/**` en v0.
-**Raison** : Les projets Tessera seront dans `~/` (dossier utilisateur). Scope plus restrictif nécessiterait de connaître le chemin exact au build time.
-**Alternative rejetée** : Scope filesystem complet `/` (trop large, rejeté par App Store), scope fixe `~/tessera-workspace/` (impose un emplacement).
+**Décision** : cinq jobs — `detecter`, `backend` (ubuntu, pytest), `frontend` (ubuntu, tsc+vitest), `e2e` (Playwright) après `frontend`, et `tauri` (macos, `cargo check`) qui ne tourne que si `detecter` voit `frontend/src-tauri/` changer.
+**Raison** : responsabilités séparées et exécution parallèle donnent un retour rapide. `macos-latest` est requis par Tauri (headers WKWebView) mais une minute y vaut dix minutes d'ubuntu — pour dix-huit secondes de `cargo check`, le conditionner paie. `cargo check` et non `cargo build` : dix minutes de compilation évitées.
+**Alternative rejetée** : job unique séquentiel (lent) ; `cargo build` complet (coûteux) ; `tauri` inconditionnel — facturé à chaque PR sans rien apprendre.
 
 ---
 
@@ -210,9 +198,9 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ## ADR-022 — L'agent de workflow pousse et ouvre la PR
 
-**Date** : 2026-09-15 · **Amendée par ADR-029** : le merge n'est plus interdit partout, il se déclare par projet.
-**Décision** : `GitHubWorkflowService` pousse la branche du ticket puis ouvre sa PR. Le push n'est **jamais** forcé.
-**Raison** : merger, c'est décider qu'un travail est bon — sur le dépôt d'un client, le seul point où un humain tranche, et ce qui rend acceptable tout le reste de l'automatisation. Quant au push : cette branche part chez l'utilisateur, parfois chez son client, et écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
+**Date** : 2026-09-15
+**Décision** : `GitHubWorkflowService` pousse la branche du ticket puis ouvre sa PR. Le push n'est **jamais** forcé. Le merge, lui, ne s'interdit plus partout : il se déclare par projet (ADR-029).
+**Raison** : merger, c'est décider qu'un travail est bon — sur le dépôt d'un client, le point où un humain tranche, et ce qui rend acceptable tout le reste de l'automatisation. Quant au push : cette branche part chez l'utilisateur, parfois chez son client, et écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
 **Alternative rejetée** : pousser en `--force` pour éviter les rejets — le rejet **est** l'information.
 
 ## ADR-023 — Le mode des artefacts échoue fermé
@@ -250,7 +238,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ## ADR-027 — Les agents ne touchent pas à l'historique git
 
-**Date** : 2026-09-17 · **Amendée 2026-09-22** (ticket-119).
+**Date** : 2026-09-17
 **Décision** : un hook `PreToolUse` refuse à tout agent le git et le `gh` qui écrivent, quelle que soit la tournure — chemin, casse, enveloppe, alias. Le git en lecture reste permis. Les fichiers qui portent la politique du run — `agents.json`, `.git/`, `.claude/settings*.json`, `.github/workflows/` — se refusent en écriture ; la politique se lit une fois, avant le premier agent ; l'orchestrateur n'exécute jamais les hooks du dépôt. Un commit qui **échoue** n'approuve pas le run.
 **Raison** : au premier usage réel, des agents ont commité, mergé et poussé sur un simple « lancer ». Le codeur a `Bash` : une règle contournable en tapant une autre commande n'en est pas une. Un hook, parce qu'`allowed_tools` auto-approuve *avant* le callback de permission.
 **Limite** : il attrape une erreur et les tournures triviales, pas une évasion — `python -c` passe (ADR-031).

@@ -22,7 +22,7 @@ toute contrainte de comportement — continue de partir dans les 18 appels.
 
 | | Mots |
 |---|---|
-| ADR-001 à ADR-016 (référence) | 46 – 72 |
+| ADR-001 à ADR-015 (référence) | 46 – 72 |
 | Décision structurante, avec conséquence assumée | **≤ 160** |
 
 Si tu dépasses, tu écris une spec, pas un ADR. La spec va dans le ticket.
@@ -86,8 +86,10 @@ pendant que cinq contraintes s'écrivaient sans protection.
 ## Numérotation
 
 Prendre le numéro suivant le plus élevé du fichier. Les ADR ne sont pas
-réordonnés ni renumérotés — ADR-011 apparaît après ADR-016 dans le fichier,
-c'est l'ordre d'écriture, il n'a pas d'importance.
+réordonnés ni renumérotés — ADR-011 apparaît après ADR-015 dans le fichier,
+c'est l'ordre d'écriture, il n'a pas d'importance. Un numéro archivé
+(`memory/decisions-archive.md`) n'est jamais réattribué : le prochain ADR
+prend le suivant, pas le trou.
 
 ## Avant de valider
 
