@@ -140,6 +140,12 @@ export interface ServiceActif {
    * l'IDE apres le demarrage ne verrait jamais l'adresse annoncee.
    */
   sortie?: string[];
+  /**
+   * Vrai quand c'est l'utilisateur qui a demande l'arret (ticket-151).
+   * `terminate()` laisse un code non nul sur certaines plateformes : sans ce
+   * drapeau, un service qu'on vient d'arreter s'afficherait en echec.
+   */
+  arrete_a_la_main?: boolean;
 }
 
 /** L'instantane des runs vivants, envoye a la connexion sur `/observe`. */

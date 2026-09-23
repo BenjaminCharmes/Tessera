@@ -133,10 +133,11 @@ def test_arreter_termine_le_processus_et_le_retire(
 
     # Le service reste **déclaré**, donc listé, mais plus lancé : c'est ce
     # qui permet au bouton de rester en place et de proposer « Lancer »
-    # (ticket-146). Une liste vide le ferait disparaître.
+    # (ticket-146). Il garde son pid depuis ticket-151 : l'effacer faisait
+    # afficher « pas lancé par l'IDE » pour un service qu'on venait d'arrêter.
     assert [s["nom"] for s in listing] == ["api"]
     assert listing[0]["en_cours"] is False
-    assert listing[0]["pid"] is None
+    assert listing[0]["pid"] is not None
 
 
 # --------------------------------------------------------------------------
@@ -407,9 +408,11 @@ def test_un_service_arrete_a_la_main_n_est_pas_un_echec(
     client.post("/api/v1/projects/mon-projet/services/stop")
     listing = client.get("/api/v1/projects/mon-projet/services").json()
 
-    # Arrêté à la main : ni « en cours », ni en échec. Il n'a pas échoué.
+    # Arrêté à la main : ni « en cours », ni en échec. `terminate()` laisse
+    # pourtant un code non nul, donc c'est un drapeau explicite qui porte
+    # l'information — pas une déduction sur le code (ticket-151).
     assert listing[0]["en_cours"] is False
-    assert listing[0]["code_de_sortie"] is None
+    assert listing[0]["arrete_a_la_main"] is True
 
 
 def test_la_fin_d_un_service_est_annoncee(
@@ -536,3 +539,48 @@ def test_une_ligne_sans_couleur_n_est_pas_modifiee() -> None:
     assert sans_couleurs("INFO: Uvicorn running on http://127.0.0.1:8000") == (
         "INFO: Uvicorn running on http://127.0.0.1:8000"
     )
+
+
+# --------------------------------------------------------------------------
+# Arrêter ne doit pas effacer la trace — ticket-151
+# --------------------------------------------------------------------------
+
+
+def test_un_service_arrete_garde_son_pid_et_sa_sortie(
+    client: TestClient, workspace: Path
+) -> None:
+    # `arreter()` faisait `pop()` : toute trace disparaissait, et le service
+    # déclaré se reconstruisait sans pid — d'où « pas lancé par l'IDE » pour
+    # un service qu'on venait d'arrêter soi-même (ticket-151).
+    import time
+
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _BAVARD}])
+    _demarrer(client, "mon-projet")
+    for _ in range(40):
+        listing = client.get("/api/v1/projects/mon-projet/services").json()
+        if listing and listing[0].get("sortie"):
+            break
+        time.sleep(0.1)
+
+    client.post("/api/v1/projects/mon-projet/services/stop")
+    apres = client.get("/api/v1/projects/mon-projet/services").json()
+
+    assert [s["nom"] for s in apres] == ["api"]
+    assert apres[0]["en_cours"] is False
+    assert apres[0]["pid"] is not None, "le pid a disparu : trace effacée"
+    assert apres[0]["sortie"], "la sortie a disparu avec l'arrêt"
+
+
+def test_un_start_apres_un_stop_ne_laisse_qu_une_entree(
+    client: TestClient, workspace: Path
+) -> None:
+    # Garder la trace ne doit pas faire grossir la liste à chaque cycle.
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _DORMEUR}])
+    _demarrer(client, "mon-projet")
+    client.post("/api/v1/projects/mon-projet/services/stop")
+    _demarrer(client, "mon-projet")
+
+    listing = client.get("/api/v1/projects/mon-projet/services").json()
+
+    assert len([s for s in listing if s["nom"] == "api"]) == 1
+    assert listing[0]["en_cours"] is True

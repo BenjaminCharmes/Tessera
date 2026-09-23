@@ -72,6 +72,11 @@ class Service:
         default_factory=lambda: datetime.now(timezone.utc)
     )
     sortie: list[str] = field(default_factory=list)
+    #: Vrai quand c'est l'utilisateur qui a demandé l'arrêt. `terminate()`
+    #: produit un code non nul sur certaines plateformes : sans ce drapeau, un
+    #: service qu'on vient d'arrêter s'afficherait comme ayant échoué, et
+    #: enverrait chercher des logs qui ne disent rien (ticket-151).
+    arrete_a_la_main: bool = False
 
     def noter(self, ligne: str) -> None:
         """Retient une ligne, en ne gardant que les plus récentes."""
@@ -94,6 +99,7 @@ class Service:
                 self.processus.returncode if self.processus is not None else None
             ),
             "sortie": list(self.sortie),
+            "arrete_a_la_main": self.arrete_a_la_main,
         }
 
 
@@ -288,17 +294,34 @@ class ProcessRegistry:
             _logger.warning("fin_service_non_annoncee", extra={"erreur": str(exc)})
 
     async def arreter(self, project_id: str) -> int:
-        """Arrête les services d'un projet, et les retire."""
-        services = self._services.pop(project_id, [])
-        for service in services:
+        """Arrête les services d'un projet, **en gardant leur trace**.
+
+        Les retirer effaçait tout — pid, code de sortie, sortie conservée — et
+        `GET /services` reconstruisait alors le service déclaré de zéro, sans
+        pid : l'écran affichait « pas lancé par l'IDE » pour un service qu'on
+        venait d'arrêter soi-même (ticket-151).
+
+        ticket-144 avait posé qu'un service mort reste visible. La règle valait
+        pour celui qui meurt seul ; les deux chemins la suivent maintenant.
+        """
+        services = self._services.get(project_id, [])
+        vivants = [service for service in services if service.en_cours]
+        for service in vivants:
+            service.arrete_a_la_main = True
             await self._terminer(service)
-        return len(services)
+        return len(vivants)
 
     async def tout_arreter(self) -> int:
-        """Arrête tout ce qui tourne — appelé quand le backend s'éteint."""
+        """Arrête tout et **oublie tout** — le backend s'éteint.
+
+        Distinct d'`arreter()`, qui garde la trace pour l'afficher : ici il
+        n'y aura personne pour la lire, et le registre suivant repartira de
+        zéro de toute façon (ticket-151).
+        """
         total = 0
         for project_id in list(self._services):
             total += await self.arreter(project_id)
+        self._services.clear()
         return total
 
     async def _terminer(self, service: Service) -> None:

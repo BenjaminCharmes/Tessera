@@ -15,8 +15,11 @@ export type EtatDuService = "en-cours" | "echoue" | "arrete" | "jamais-lance";
 
 export function etatDuService(service: ServiceActif): EtatDuService {
   if (service.en_cours) return "en-cours";
-  // Un service arrêté à la main n'a pas de code : il n'a pas échoué, on l'a
-  // arrêté. Les confondre enverrait chercher des logs qui ne disent rien.
+  // L'arrêt demandé se **déclare**, il ne se déduit pas : `terminate()` laisse
+  // un code non nul sur certaines plateformes, et déduire l'échec du code
+  // afficherait une erreur là où l'utilisateur vient de cliquer « Arrêter »
+  // (ticket-151).
+  if (service.arrete_a_la_main) return "arrete";
   if ((service.code_de_sortie ?? 0) !== 0) return "echoue";
   // Jamais de `pid` : l'IDE ne l'a pas démarré. « À l'arrêt » se lisait comme
   // « je l'ai arrêté », alors que les serveurs qui font tourner l'IDE ont pu

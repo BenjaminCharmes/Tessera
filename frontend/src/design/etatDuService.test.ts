@@ -69,3 +69,31 @@ describe("etatDuService — jamais lancé (ticket-149)", () => {
     expect(etatDuService(echoue)).toBe("echoue");
   });
 });
+
+describe("etatDuService — l'arrêt demandé (ticket-151)", () => {
+  it("ne prend pas un arret demande pour un echec", () => {
+    // `terminate()` laisse un code non nul sur certaines plateformes :
+    // deduire l'echec du code afficherait une erreur la ou l'utilisateur
+    // vient de cliquer « Arreter ».
+    const arreteParNous = service({
+      en_cours: false,
+      pid: 42,
+      code_de_sortie: 1,
+      arrete_a_la_main: true,
+    });
+
+    expect(etatDuService(arreteParNous)).toBe("arrete");
+    expect(libelleDeLEtat(arreteParNous)).toBe("à l'arrêt");
+  });
+
+  it("un service mort seul avec le meme code reste un echec", () => {
+    const mortSeul = service({
+      en_cours: false,
+      pid: 42,
+      code_de_sortie: 1,
+      arrete_a_la_main: false,
+    });
+
+    expect(etatDuService(mortSeul)).toBe("echoue");
+  });
+});
