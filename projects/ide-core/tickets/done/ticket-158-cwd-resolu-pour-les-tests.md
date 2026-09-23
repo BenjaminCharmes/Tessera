@@ -2,8 +2,8 @@
 id: ticket-158
 title: "Le testeur lance sur le lien symbolique et pas sur le vrai dossier"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 180
 priority: critical
 agent: codeur
 depends_on: ["ticket-157"]
