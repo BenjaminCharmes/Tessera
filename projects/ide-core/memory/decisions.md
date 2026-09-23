@@ -374,7 +374,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 ## ADR-042 — Un projet se lance par une commande déclarée, jamais devinée
 
 **Date** : 2026-09-23
-**Décision** : un projet déclare dans `agents.json` une liste `services` de `{nom, commande}`. L'IDE les lance — sans shell, sans agent — en enfants du backend, qui meurent avec lui. Leur sortie part sur le canal d'ADR-041, à l'abonnement. Rien de déclaré : pas de bouton.
-**Raison** : six projets décrivent leur démarrage dans des sections aux noms différents, mêlé aux commandes de test et d'installation : y choisir, c'est deviner. Confier `Bash` à un agent rouvrirait ce qu'ADR-027 et ADR-031 ferment mal — leur contrôle attrape une erreur, pas une évasion.
-**Alternative rejetée** : détacher le processus — il survivrait à l'IDE en gardant son port, sans rien pour l'arrêter ; déduire la commande du `CLAUDE.md` — une heuristique fausse lance n'importe quoi.
-**Conséquence assumée** : l'IDE ne prépare rien — `npm ci` et `conda env create` restent à la main.
+**Décision** : un projet déclare dans `agents.json` une liste `services` de `{nom, commande}`. L'IDE les lance — sans shell, sans agent — dans un groupe que le système tue avec le backend, même tué brutalement. Leur sortie part sur le canal d'ADR-041. Rien de déclaré : pas de bouton.
+**Raison** : les projets décrivent leur démarrage dans des sections aux noms différents, mêlé aux commandes de test : y choisir, c'est deviner. Confier `Bash` à un agent rouvrirait ce qu'ADR-027 et ADR-031 ferment mal — leur contrôle attrape une erreur, pas une évasion.
+**Alternative rejetée** : détacher le processus, ou s'en remettre au seul arrêt propre — un backend tué n'exécute rien, et laissait vingt-deux orphelins.
+**Conséquence assumée** : l'IDE ne prépare rien ; `npm ci` reste à la main. Hors Windows, seul l'arrêt propre tue les services.

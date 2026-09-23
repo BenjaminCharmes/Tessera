@@ -2,7 +2,7 @@
 id: ticket-150
 title: "Un backend tué brutalement laisse ses services derrière lui"
 type: fix
-status: todo
+status: in-review
 pr_number: null
 priority: high
 agent: codeur

@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from tessera.services.groupe_de_processus import rattacher
 from tessera.services.providers.perimetre import racine_autorisee
 from tessera.utils.logger import get_logger
 
@@ -204,6 +205,10 @@ class ProcessRegistry:
             processus = await self._lancer(args, dossier)
         except FileNotFoundError as exc:
             raise CommandeInvalide(introuvable(args[0])) from exc
+        # Rattacher tout de suite : entre le lancement et cet appel, un
+        # backend tué laisserait déjà l'enfant derrière lui (ticket-150).
+        rattacher(processus.pid)
+
         service = Service(
             nom=nom, project_id=project_id, pid=processus.pid, processus=processus
         )
