@@ -68,3 +68,16 @@ ticket-136.
 Un projet qui mesure du matériel absent risque de mesurer surtout son propre
 simulateur. L'exigence sur l'interface est ce qui le rend utile quand même :
 le jour où le NAS arrive, seule la sonde change.
+
+---
+
+## Décision d'ordonnancement — 2026-09-23
+
+Ce projet **attend** que l'exercice du démineur (ticket-136) ait produit sa
+mesure. Le cadrer maintenant produirait des décisions que cet exercice peut
+invalider, et deux projets d'essai lancés ensemble ne se comparent plus.
+
+Sa place dans la file est fixée : **quatrième, et conditionné** — le matériel n'existe pas encore. Le lancer sur des sondes simulées reste possible, mais mesurerait l'orchestration sur une interface inventée plutôt que sur un besoin réel.
+
+Le cadrage reste à faire, et c'est à ce moment-là que les questions ouvertes
+de ce ticket se tranchent.

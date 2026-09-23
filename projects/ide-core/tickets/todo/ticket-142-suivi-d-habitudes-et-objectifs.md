@@ -76,3 +76,16 @@ ticket-136.
 Le recouvrement avec Carrière est le vrai risque : deux applications qui
 suivent « mes objectifs » finiraient par se contredire, et c'est celle qu'on
 consulte le moins qui dériverait.
+
+---
+
+## Décision d'ordonnancement — 2026-09-23
+
+Ce projet **attend** que l'exercice du démineur (ticket-136) ait produit sa
+mesure. Le cadrer maintenant produirait des décisions que cet exercice peut
+invalider, et deux projets d'essai lancés ensemble ne se comparent plus.
+
+Sa place dans la file est fixée : **deuxième** — il ajoute le backend et la base, sur exactement la stack de Tessera. Après un démineur purement frontend, c'est la dimension suivante, et la seule.
+
+Le cadrage reste à faire, et c'est à ce moment-là que les questions ouvertes
+de ce ticket se tranchent.

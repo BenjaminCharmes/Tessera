@@ -66,3 +66,16 @@ ticket-136, qui fixe ce qu'on observe pendant l'exercice.
 Dépendre d'une API externe brouille la mesure : un run qui échoue parce que
 GitHub a répondu 403 ne dit rien sur la qualité de l'orchestration. D'où la
 question 5 du cadrage — ce qui se teste sans réseau doit être majoritaire.
+
+---
+
+## Décision d'ordonnancement — 2026-09-23
+
+Ce projet **attend** que l'exercice du démineur (ticket-136) ait produit sa
+mesure. Le cadrer maintenant produirait des décisions que cet exercice peut
+invalider, et deux projets d'essai lancés ensemble ne se comparent plus.
+
+Sa place dans la file est fixée : **troisième** — après le démineur et le suivi d'habitudes. Il ajoute les appels d'API externes et leur mocking, une dimension de plus qu'on ne veut pas mélanger à l'arrivée du backend.
+
+Le cadrage reste à faire, et c'est à ce moment-là que les questions ouvertes
+de ce ticket se tranchent.

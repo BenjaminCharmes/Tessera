@@ -2,7 +2,7 @@
 id: ticket-136
 title: "Choisir et lancer un projet from-scratch entièrement piloté par Tessera"
 type: design
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: architect
@@ -102,3 +102,81 @@ ticket-129.
 
 Le risque n'est pas que ça échoue — un échec est un résultat. C'est de ne pas
 savoir dire pourquoi, faute d'avoir décidé à l'avance ce qu'on regardait.
+
+---
+
+## Décision — 2026-09-23
+
+**Le projet retenu est un démineur**, et non un Wordle. Wordle dépend d'un
+dictionnaire français : un actif externe à trouver, à licencier et à valider,
+qui mesurerait la qualité d'une liste de mots autant que l'orchestration. Le
+démineur ne dépend d'aucune donnée, et sa logique est plus riche à éprouver —
+placement des mines, comptage des voisines, révélation en cascade, conditions
+de victoire. Le testeur et le validateur y ont vraiment prise.
+
+### Les quatre propriétés, vérifiées
+
+| Propriété | Comment elle tient |
+|---|---|
+| Petit | 20 tickets, écrits et posés dans le dépôt |
+| Vérifiable | Logique pure, déterministe, testable sans rendu |
+| Sans enjeu | Aucune donnée, aucun client, un dépôt jetable |
+| Stack connue | React 19, TypeScript strict, Vite, Vitest — celle de Tessera |
+
+### Ce qui a été monté
+
+Dépôt `BenjaminCharmes/demineur`, **privé**, relié dans `projects/demineur`
+par lien symbolique comme les autres projets. Il contient un squelette qui
+tourne — Vite, React, TS strict, Vitest, un test trivial qui passe, un
+workflow CI — et **aucune règle du jeu**.
+
+Cette séparation est le point méthodologique du ticket : ce qu'on mesure doit
+être la construction du jeu, pas la capacité à lancer `npm create vite`. Le
+squelette existe uniquement pour que le testeur ait quelque chose à exécuter
+dès le premier ticket.
+
+### Étapes du pipeline activées
+
+Les cinq : codeur, **testeur**, **sécurité**, reviewer, **validateur**. La
+contrainte qui les désactive sur `ide-core` — `test_command` qui n'atteint pas
+`../../backend` — n'existe pas ici : les tests vivent à la racine du projet et
+`npm run test -- --run` s'exécute depuis son dossier. C'est le pipeline
+complet qu'on veut éprouver, donc il est complet.
+
+### Niveau d'autonomie : `pr`, et pourquoi pas `merge`
+
+`merge` était le choix de départ : sur un dépôt jetable doté d'une CI, refuser
+le merge n'aurait protégé personne. Mais GitHub facture les minutes d'Actions
+sur les dépôts **privés**, et la facturation de ce compte est en défaut : la
+CI ne démarre pas du tout. Or `merge` exige une CI verte (ADR-029), et
+l'absence de signal n'est pas un signal favorable — attendre vingt fois une CI
+qui ne tournera jamais coûterait vingt attentes pour rien.
+
+Deux façons d'y revenir, qui ne m'appartiennent pas :
+
+1. **Rendre le dépôt public.** Les Actions y sont gratuites. Mais un dépôt
+   public annonce aussi comment il est construit, et c'est exactement le choix
+   de communication que le ticket-135 dit de faire exprès, pas par effet de
+   bord d'un problème de facturation.
+2. **Régler la facturation Actions** sur le compte.
+
+### Ce qu'on observe
+
+Écrit **avant** le premier run, dans `memory/mesures.md` du projet démineur.
+L'indicateur principal est le nombre de tickets terminés **sans aucune
+intervention humaine** : c'est la réponse à « est-ce utilisable par quelqu'un
+d'autre ? ». Le protocole dit aussi ce qui invaliderait la mesure — corriger à
+la main sans le consigner, ou réécrire un ticket que l'agent a mal compris,
+alors que cette incompréhension **est** le résultat.
+
+### L'ordre des projets suivants
+
+Chacun ajoute **une** dimension et une seule, sans quoi un échec ne
+s'expliquerait plus :
+
+1. **démineur** — frontend pur, logique déterministe *(en cours)*
+2. **ticket-142** — habitudes : ajoute le backend et la base, en terrain connu
+3. **ticket-140** — santé des dépôts : ajoute les appels d'API externes
+4. **ticket-141** — moniteur du lab : attend que le matériel existe
+
+Jamais ensemble : des runs simultanés ne se comparent pas.
