@@ -3,10 +3,13 @@
 import asyncio
 import os
 import sys
+from typing import Any
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
+from tests.conftest import requires_symlinks
 
 from tessera.services.test_runner import (
     TestCommandNotFound,
@@ -264,3 +267,32 @@ class TestCommandeNonDemarree:
 
         assert result.passed is False
         assert result.demarree is True
+
+
+class TestCheminSymlinke:
+    """A project reached through a symlink must still run its tests."""
+
+    @requires_symlinks
+    async def test_le_cwd_est_resolu_avant_de_lancer(self, tmp_path: Path) -> None:
+        # `projects/` ne contient que des liens symboliques vers les vrais
+        # dépôts. Lancer avec le chemin du lien fait résoudre à Vite une
+        # racine réelle qu'il ne retrouve plus : les tests échouaient sous le
+        # pipeline et passaient à la main, au même instant et au même endroit
+        # (ticket-158). ADR-017 pose déjà « cwd résolu » — pas ici.
+        reel = tmp_path / "projet-reel"
+        reel.mkdir()
+        (reel / "temoin.txt").write_text("ici", encoding="utf-8")
+        lien = tmp_path / "lien-vers-projet"
+        lien.symlink_to(reel, target_is_directory=True)
+
+        runner = TestRunnerService()
+        vus: list[str] = []
+
+        async def faux_lancer(args: list[str], dossier: Path) -> Any:
+            vus.append(str(dossier))
+            raise FileNotFoundError(args[0])
+
+        runner._lancer = faux_lancer  # type: ignore[method-assign]
+        await runner.run_tests(lien, test_command="peu-importe")
+
+        assert vus == [str(reel)], f"cwd non résolu : {vus}"

@@ -88,6 +88,13 @@ class TestRunnerService:
         test_command: str | None = None,
         timeout: int = _DEFAULT_TIMEOUT,
     ) -> TestResult:
+        # Résolu, et pas seulement absolu : `projects/` ne contient que des
+        # liens symboliques vers les vrais dépôts. Lancé sur le chemin du
+        # lien, Vite résout une racine réelle qu'il ne retrouve plus, et les
+        # tests échouaient sous le pipeline en passant à la main, au même
+        # instant et au même endroit. ADR-017 pose déjà l'invariant pour le
+        # provider ; il vaut partout où l'on lance un processus (ticket-158).
+        project_path = project_path.resolve()
         cmd = self.detect_test_command(project_path, override=test_command)
         args = shlex.split(cmd)
 
