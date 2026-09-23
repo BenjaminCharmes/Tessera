@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
+import { api } from "../lib/api";
 import { INITIAL } from "./streamState";
-import { demarrerUnRun } from "./useSupervision";
 import type { StreamState, UseRunActifResult } from "./streamState";
 import type { UseSupervisionResult } from "./useSupervision";
 import type { RunRequest } from "../types/api";
@@ -125,4 +125,18 @@ export function useRunActif(
     interject: (text: string) => envoyer({ type: "interject", text }),
     stop: () => envoyer({ type: "stop", text: "" }),
   };
+}
+
+
+/** Démarre un run et rend son identifiant, ou null si le lancement est refusé. */
+export async function demarrerUnRun(
+  corps: RunRequest,
+): Promise<{ run_id: string } | { erreur: string }> {
+  try {
+    return await api.orchestrator.run(corps);
+  } catch (erreur: unknown) {
+    return {
+      erreur: erreur instanceof Error ? erreur.message : "Lancement refusé",
+    };
+  }
 }

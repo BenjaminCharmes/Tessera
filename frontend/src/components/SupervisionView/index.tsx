@@ -1,6 +1,7 @@
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import RunCard from "./RunCard";
+import ServicesLances from "./ServicesLances";
 import AgentPanel from "../AgentPanel";
 import { INITIAL } from "../../hooks/streamState";
 import type { UseRunActifResult } from "../../hooks/streamState";
@@ -47,7 +48,12 @@ export default function SupervisionView({
         </span>
       </div>
 
-      {services.length > 0 ? <BandeDesServices services={services} /> : null}
+      {services.length > 0 ? (
+        <ServicesLances
+          services={services}
+          sortieDe={supervision.sortieDuService}
+        />
+      ) : null}
 
       {runs.length === 0 ? (
         <VueVide connecte={supervision.connecte} avecServices={services.length > 0} />
@@ -84,34 +90,6 @@ export default function SupervisionView({
 function etiquette(nombre: number): string {
   if (nombre === 0) return "rien en cours";
   return `${nombre} run${nombre > 1 ? "s" : ""}`;
-}
-
-function BandeDesServices({ services }: { services: ServiceActif[] }) {
-  return (
-    <section
-      aria-label="Services lancés"
-      className="flex flex-wrap gap-2 border-b border-zinc-800 px-3 py-2"
-    >
-      {services.map((service) => (
-        <span
-          key={`${service.project_id}-${service.nom}`}
-          className={`rounded-sm px-2 py-0.5 text-micro ${
-            service.en_cours
-              ? "bg-blue-500/20 text-blue-200"
-              : (service.code_de_sortie ?? 0) !== 0
-                ? "bg-red-500/20 text-red-200"
-                : "bg-zinc-800 text-zinc-400"
-          }`}
-          title={`${service.project_id} · pid ${service.pid}`}
-        >
-          {service.nom}
-          {!service.en_cours && (service.code_de_sortie ?? 0) !== 0
-            ? ` · code ${service.code_de_sortie}`
-            : ""}
-        </span>
-      ))}
-    </section>
-  );
 }
 
 function VueVide({

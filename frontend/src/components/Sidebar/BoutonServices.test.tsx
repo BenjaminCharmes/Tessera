@@ -110,4 +110,18 @@ describe("BoutonServices", () => {
       "services",
     );
   });
+
+  it("porte les memes tailles et bordure que ses voisins", () => {
+    // Dans une rangee de trois boutons, l'alignement est ce qui se voit en
+    // premier : « Lancer » etait plus petit et plus plat que « VSCode » et
+    // « Git » (ticket-145).
+    render(
+      <BoutonServices services={etat()} libelleDuProjet="ide-core" />,
+    );
+
+    const classe = screen.getByRole("button").className;
+    for (const attendu of ["border", "px-2", "py-1", "text-mini"]) {
+      expect(classe).toContain(attendu);
+    }
+  });
 });

@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "../lib/api";
 import { wsUrl } from "../lib/ws";
 import { INITIAL, applyEvent } from "./streamState";
 import type { StreamState } from "./streamState";
-import type { OrchestratorEvent, RunActif, RunRequest } from "../types/api";
+import {
+  LIGNES_GARDEES,
+  cleDuService,
+  majDesRuns,
+} from "./supervisionEvents";
+import type { OrchestratorEvent, RunActif } from "../types/api";
 
 /**
  * Tous les runs de la machine, sur une seule socket — ticket-129.
@@ -36,6 +40,15 @@ export interface UseSupervisionResult {
   envoyer: (runId: string, payload: Record<string, string>) => void;
   /** Enregistre un run qu'on vient de lancer, avant son premier evenement. */
   suivre: (run: RunActif) => void;
+  /** Les dernières lignes écrites par un service lancé (ticket-145). */
+  sortieDuService: (projectId: string, nom: string) => string[];
+  /**
+   * Combien d'évènements de service ont été reçus. `useServices` s'en sert
+   * pour relire la liste : sans ce signal, rien ne lui dirait qu'un service
+   * vient de mourir, et le bouton proposerait « Arrêter » pour un processus
+   * disparu.
+   */
+  signalServices: number;
 }
 
 const VIDE: StreamState = INITIAL;
@@ -45,6 +58,8 @@ export function useSupervision(): UseSupervisionResult {
   const [etats, setEtats] = useState<Record<string, StreamState>>({});
   const [selection, setSelection] = useState<string | null>(null);
   const [connecte, setConnecte] = useState(false);
+  const [sorties, setSorties] = useState<Record<string, string[]>>({});
+  const [signalServices, setSignalServices] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
   const abonnementRef = useRef<string | null>(null);
 
@@ -69,6 +84,26 @@ export function useSupervision(): UseSupervisionResult {
 
         if ((brut.type as string) === "snapshot") {
           setRuns(brut.runs ?? []);
+          return;
+        }
+
+        // Les évènements de service n'ont pas de `run_id` : les laisser
+        // tomber dans le test ci-dessous jetait leur sortie avant même
+        // qu'on ait écrit de quoi l'afficher (ticket-145).
+        const type = brut.type as string;
+        if (type === "service_output" || type === "service_closed") {
+          const nom = String(
+            (brut.data as Record<string, unknown>)?.["service"] ?? "",
+          );
+          const ligne = (brut.data as Record<string, unknown>)?.["ligne"];
+          if (brut.project_id && nom && typeof ligne === "string") {
+            const cle = cleDuService(brut.project_id, nom);
+            setSorties((prec) => ({
+              ...prec,
+              [cle]: [...(prec[cle] ?? []), ligne].slice(-LIGNES_GARDEES),
+            }));
+          }
+          setSignalServices((n) => n + 1);
           return;
         }
 
@@ -131,6 +166,12 @@ export function useSupervision(): UseSupervisionResult {
     [],
   );
 
+  const sortieDuService = useCallback(
+    (projectId: string, nom: string): string[] =>
+      sorties[cleDuService(projectId, nom)] ?? [],
+    [sorties],
+  );
+
   const suivre = useCallback((run: RunActif) => {
     // Le POST repond avant le premier evenement du run : sans cette entree,
     // la carte n'apparaitrait qu'au premier `agent_started`, et le bouton
@@ -140,60 +181,15 @@ export function useSupervision(): UseSupervisionResult {
     );
   }, []);
 
-  return { runs, selection, selectionner, etatDe, connecte, envoyer, suivre };
-}
-
-/** Garde la carte d'un run en phase avec ce qu'il annonce. */
-function majDesRuns(
-  prec: RunActif[],
-  ev: OrchestratorEvent,
-  runId: string,
-): RunActif[] {
-  const connu = prec.some((r) => r.run_id === runId);
-  if (!connu) {
-    // Un run lancé pendant qu'on regarde : l'instantané ne l'avait pas, et
-    // attendre le prochain rechargement pour l'afficher serait absurde.
-    return [
-      ...prec,
-      {
-        run_id: runId,
-        project_id: ev.project_id ?? "",
-        mode: "single",
-        ticket_id: ev.ticket_id || null,
-        etape: null,
-        agent: ev.agent,
-        tour: 0,
-        tokens_entree: 0,
-        tokens_sortie: 0,
-        cout_usd: 0,
-        verdict: null,
-        demarre_a: ev.timestamp,
-      },
-    ];
-  }
-  return prec.map((r) =>
-    r.run_id === runId
-      ? {
-          ...r,
-          agent: ev.agent ?? r.agent,
-          ticket_id: ev.ticket_id || r.ticket_id,
-          etape: ev.type === "agent_started" ? ev.type : r.etape,
-          tour:
-            typeof ev.data["round"] === "number" ? ev.data["round"] : r.tour,
-        }
-      : r,
-  );
-}
-
-/** Démarre un run et rend son identifiant, ou null si le lancement est refusé. */
-export async function demarrerUnRun(
-  corps: RunRequest,
-): Promise<{ run_id: string } | { erreur: string }> {
-  try {
-    return await api.orchestrator.run(corps);
-  } catch (erreur: unknown) {
-    return {
-      erreur: erreur instanceof Error ? erreur.message : "Lancement refusé",
-    };
-  }
+  return {
+    runs,
+    selection,
+    selectionner,
+    etatDe,
+    connecte,
+    envoyer,
+    suivre,
+    sortieDuService,
+    signalServices,
+  };
 }

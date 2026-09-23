@@ -47,6 +47,7 @@ export type EventType =
   | "pipeline_done"
   | "run_closed"
   | "service_output"
+  | "service_closed"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
@@ -128,7 +129,8 @@ export interface RunRequest {
 export interface ServiceActif {
   nom: string;
   project_id: string;
-  pid: number;
+  /** `null` pour un service declare mais pas lance (ticket-146). */
+  pid: number | null;
   demarre_a: string;
   en_cours: boolean;
   code_de_sortie: number | null;

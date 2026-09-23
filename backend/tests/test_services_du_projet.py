@@ -131,7 +131,12 @@ def test_arreter_termine_le_processus_et_le_retire(
     client.post("/api/v1/projects/mon-projet/services/stop")
     listing = client.get("/api/v1/projects/mon-projet/services").json()
 
-    assert listing == []
+    # Le service reste **déclaré**, donc listé, mais plus lancé : c'est ce
+    # qui permet au bouton de rester en place et de proposer « Lancer »
+    # (ticket-146). Une liste vide le ferait disparaître.
+    assert [s["nom"] for s in listing] == ["api"]
+    assert listing[0]["en_cours"] is False
+    assert listing[0]["pid"] is None
 
 
 # --------------------------------------------------------------------------
@@ -402,4 +407,69 @@ def test_un_service_arrete_a_la_main_n_est_pas_un_echec(
     client.post("/api/v1/projects/mon-projet/services/stop")
     listing = client.get("/api/v1/projects/mon-projet/services").json()
 
-    assert listing == []
+    # Arrêté à la main : ni « en cours », ni en échec. Il n'a pas échoué.
+    assert listing[0]["en_cours"] is False
+    assert listing[0]["code_de_sortie"] is None
+
+
+def test_la_fin_d_un_service_est_annoncee(
+    client: TestClient, workspace: Path
+) -> None:
+    # Sans annonce, l'écran ne peut apprendre la mort d'un service qu'en
+    # sondant en boucle : il afficherait « en cours » pour un processus qui
+    # n'existe plus (ticket-145).
+    from tessera.services.event_hub import EVENT_HUB
+    from tessera.services.pipeline_events import EventType
+
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _QUI_MEURT}])
+    abonne = EVENT_HUB.subscribe()
+    try:
+        _demarrer(client, "mon-projet")
+        _attendre_la_fin(client, "api")
+        recus = abonne.vider()
+    finally:
+        abonne.fermer()
+
+    fins = [e for e in recus if e.type is EventType.SERVICE_CLOSED]
+    assert fins, [e.type for e in recus]
+    assert fins[0].data["service"] == "api"
+    assert fins[0].data["code_de_sortie"] == 3
+    assert fins[0].project_id == "mon-projet"
+
+
+# --------------------------------------------------------------------------
+# Connaître les services déclarés avant le clic — ticket-146
+# --------------------------------------------------------------------------
+
+
+def test_les_services_declares_sont_listes_avant_tout_lancement(
+    client: TestClient, workspace: Path
+) -> None:
+    # Sans ça, l'IDE ne peut pas savoir si un projet est lançable : il affiche
+    # le bouton partout, et l'apprend en échouant — le bouton disparaissait
+    # alors sous le curseur, sans rien expliquer (ticket-146).
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _DORMEUR}])
+
+    listing = client.get("/api/v1/projects/mon-projet/services").json()
+
+    assert [s["nom"] for s in listing] == ["api"]
+    assert listing[0]["en_cours"] is False
+    assert listing[0]["pid"] is None
+
+
+def test_un_projet_sans_declaration_liste_vide(client: TestClient) -> None:
+    # C'est ce qui fait qu'aucun bouton ne s'affiche, dès le premier rendu.
+    assert client.get("/api/v1/projects/sans-services/services").json() == []
+
+
+def test_un_service_lance_garde_son_pid_dans_la_liste(
+    client: TestClient, workspace: Path
+) -> None:
+    _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _DORMEUR}])
+    _demarrer(client, "mon-projet")
+
+    listing = client.get("/api/v1/projects/mon-projet/services").json()
+
+    assert len(listing) == 1
+    assert listing[0]["en_cours"] is True
+    assert isinstance(listing[0]["pid"], int)

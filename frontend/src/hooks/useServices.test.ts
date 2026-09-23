@@ -58,20 +58,37 @@ describe("useServices", () => {
     expect(result.current.enCours).toBe(true);
   });
 
-  it("remonte le refus d'un projet qui ne déclare rien", async () => {
-    // Le 409 d'ADR-042 dit quoi écrire dans `agents.json` : le perdre
-    // renverrait lire le code.
+  it("sait sans cliquer qu'un projet ne déclare rien", async () => {
+    // Le défaut de ticket-146 : on ne l'apprenait qu'en échouant, et le
+    // bouton disparaissait sous le curseur. La liste le dit dès le départ.
     vi.spyOn(api.services, "list").mockResolvedValue([]);
+    const demarrer = vi.spyOn(api.services, "start");
+
+    const { result } = renderHook(() => useServices("fluentdb"));
+
+    await waitFor(() => expect(result.current.declare).toBe(false));
+    expect(demarrer).not.toHaveBeenCalled();
+  });
+
+  it("garde le bouton en place quand le lancement échoue", async () => {
+    // Un service déclaré mais qui refuse de démarrer doit laisser de quoi
+    // réessayer, et dire pourquoi.
+    vi.spyOn(api.services, "list").mockResolvedValue([
+      service({ en_cours: false, pid: null }),
+    ]);
     vi.spyOn(api.services, "start").mockRejectedValue(
-      new Error("ne déclare aucun service"),
+      new Error("`cwd` sort du périmètre du projet"),
     );
 
     const { result } = renderHook(() => useServices("ide-core"));
+    await waitFor(() => expect(result.current.declare).toBe(true));
+
     await act(async () => {
       await result.current.demarrer();
     });
 
-    expect(result.current.erreur).toContain("déclare aucun service");
+    expect(result.current.declare).toBe(true);
+    expect(result.current.erreur).toContain("périmètre");
   });
 
   it("signale un service mort de lui-même avec un code non nul", async () => {

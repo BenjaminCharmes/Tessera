@@ -42,11 +42,13 @@ class Service:
 
     nom: str
     project_id: str
-    pid: int
+    #: `None` pour un service **déclaré mais pas lancé** : l'IDE doit savoir
+    #: qu'il existe avant d'avoir cliqué (ticket-146).
+    pid: int | None = None
+    processus: Any = None
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
-    processus: Any = None
 
     @property
     def en_cours(self) -> bool:
@@ -163,6 +165,7 @@ class ProcessRegistry:
         racine: Path,
         cwd: Optional[str] = None,
         sur_ligne: Any = None,
+        sur_fin: Any = None,
     ) -> Service:
         """Lance une commande déclarée, sans shell, sous la racine du projet."""
         args = verifier_la_commande(commande)
@@ -185,11 +188,11 @@ class ProcessRegistry:
         restants.append(service)
         self._services[project_id] = restants
 
-        if sur_ligne is not None:
+        if sur_ligne is not None or sur_fin is not None:
             # La lecture tourne à côté : sans elle, le tube se remplit et le
             # service se bloque sur son propre `print` au bout de quelques
             # kilo-octets.
-            asyncio.create_task(self._lire(service, sur_ligne))
+            asyncio.create_task(self._suivre(service, sur_ligne, sur_fin))
         return service
 
     async def _lancer(self, args: list[str], dossier: Path) -> Any:
@@ -220,18 +223,35 @@ class ProcessRegistry:
                 derniere = exc
         raise derniere if derniere else FileNotFoundError(args[0])
 
-    async def _lire(self, service: Service, sur_ligne: Any) -> None:
+    async def _suivre(
+        self, service: Service, sur_ligne: Any, sur_fin: Any
+    ) -> None:
+        """Relaie la sortie, puis annonce la fin.
+
+        Le flux qui se ferme dit que le processus n'écrit plus, pas qu'il est
+        terminé : `wait()` derrière donne le code de sortie, et c'est lui qui
+        distingue « arrêté » de « mort tout seul » à l'écran (ticket-145).
+        """
         flux = service.processus.stdout if service.processus else None
-        if flux is None:
-            return
         try:
-            while True:
+            while flux is not None:
                 ligne = await flux.readline()
                 if not ligne:
                     break
-                await sur_ligne(service, ligne.decode("utf-8", "replace").rstrip())
+                if sur_ligne is not None:
+                    await sur_ligne(
+                        service, ligne.decode("utf-8", "replace").rstrip()
+                    )
         except Exception as exc:  # noqa: BLE001 — lire ne doit rien casser
             _logger.warning("lecture_service_interrompue", extra={"erreur": str(exc)})
+
+        try:
+            if service.processus is not None:
+                await service.processus.wait()
+            if sur_fin is not None:
+                await sur_fin(service)
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("fin_service_non_annoncee", extra={"erreur": str(exc)})
 
     async def arreter(self, project_id: str) -> int:
         """Arrête les services d'un projet, et les retire."""

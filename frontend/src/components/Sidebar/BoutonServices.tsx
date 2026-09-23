@@ -21,11 +21,15 @@ export default function BoutonServices({
   if (!services.declare) return null;
 
   const { enCours, enEchec, erreur } = services;
+  // Mêmes tailles et même bordure que « VSCode » et « Git », dans une rangée
+  // où l'alignement est ce qui se voit en premier (ticket-145). Seules les
+  // couleurs changent, et elles restent dans les cinq familles d'état
+  // d'ADR-026 : le violet est réservé à l'identité, jamais à un état.
   const classe = enEchec
-    ? "bg-red-500/20 text-red-200 hover:bg-red-500/30"
+    ? "border-red-500/40 bg-red-500/15 text-red-200 hover:border-red-500/60"
     : enCours
-      ? "bg-blue-500/20 text-blue-200 hover:bg-blue-500/30"
-      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700";
+      ? "border-blue-500/40 bg-blue-500/15 text-blue-200 hover:border-blue-500/60"
+      : "border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-zinc-100";
 
   return (
     <button
@@ -37,7 +41,7 @@ export default function BoutonServices({
           ? `Arrêter les services de ${libelleDuProjet}`
           : `Lancer les services de ${libelleDuProjet}`
       }
-      className={`shrink-0 rounded-sm px-2 py-0.5 text-micro font-medium transition-colors ${classe}`}
+      className={`shrink-0 whitespace-nowrap rounded border px-2 py-1 text-mini transition-colors ${classe}`}
     >
       {enCours ? "Arrêter" : enEchec ? "Relancer" : "Lancer"}
     </button>

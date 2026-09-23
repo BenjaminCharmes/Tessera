@@ -52,7 +52,10 @@ export default function App() {
   const supervision = useSupervision();
   const stream = useRunActif(supervision, project?.id ?? null);
   const { projects: projets } = useProjects();
-  const services = useServices(project?.id ?? null);
+  const services = useServices(
+    project?.id ?? null,
+    supervision.signalServices,
+  );
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
   // bloque un humain, un run bloqué demande une décision. L'activité est le

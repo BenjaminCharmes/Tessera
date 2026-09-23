@@ -166,3 +166,71 @@ describe("useSupervision", () => {
     ).toContainEqual({ type: "answer", text: "oui", run_id: "run-2" });
   });
 });
+
+describe("useSupervision — les services (ticket-145)", () => {
+  function evenementService(over: Record<string, unknown> = {}) {
+    return {
+      type: "service_output",
+      agent: null,
+      ticket_id: "frontend",
+      data: { ligne: "VITE ready", service: "frontend" },
+      timestamp: new Date().toISOString(),
+      run_id: null,
+      project_id: "ide-core",
+      ...over,
+    };
+  }
+
+  it("garde la sortie d'un service, qui n'a pas de run_id", () => {
+    // `if (!runId) return` jetait ces trames : la sortie n'arrivait jamais,
+    // même une fois l'affichage écrit.
+    const { result } = renderHook(() => useSupervision());
+
+    act(() => {
+      MockWebSocket.instance!.triggerMessage(evenementService());
+    });
+
+    expect(result.current.sortieDuService("ide-core", "frontend")).toEqual([
+      "VITE ready",
+    ]);
+  });
+
+  it("sépare les sorties de deux services", () => {
+    const { result } = renderHook(() => useSupervision());
+
+    act(() => {
+      MockWebSocket.instance!.triggerMessage(evenementService());
+      MockWebSocket.instance!.triggerMessage(
+        evenementService({
+          ticket_id: "backend",
+          data: { ligne: "address in use", service: "backend" },
+        }),
+      );
+    });
+
+    expect(result.current.sortieDuService("ide-core", "backend")).toEqual([
+      "address in use",
+    ]);
+    expect(result.current.sortieDuService("ide-core", "frontend")).toEqual([
+      "VITE ready",
+    ]);
+  });
+
+  it("compte les évènements de service, pour déclencher une relecture", () => {
+    // Sans ce signal, rien ne dit à `useServices` qu'un service vient de
+    // mourir : le bouton proposerait « Arrêter » pour un processus disparu.
+    const { result } = renderHook(() => useSupervision());
+    const avant = result.current.signalServices;
+
+    act(() => {
+      MockWebSocket.instance!.triggerMessage(
+        evenementService({
+          type: "service_closed",
+          data: { service: "backend", code_de_sortie: 1 },
+        }),
+      );
+    });
+
+    expect(result.current.signalServices).toBeGreaterThan(avant);
+  });
+});

@@ -37,6 +37,8 @@ function supervision(
     connecte: true,
     envoyer: vi.fn(),
     suivre: vi.fn(),
+    sortieDuService: () => [],
+    signalServices: 0,
     ...over,
   };
 }

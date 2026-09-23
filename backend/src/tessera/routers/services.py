@@ -42,6 +42,24 @@ async def _publier(service: Service, ligne: str) -> None:
     )
 
 
+async def _publier_la_fin(service: Service) -> None:
+    await EVENT_HUB.publish(
+        OrchestratorEvent(
+            type=EventType.SERVICE_CLOSED,
+            ticket_id=service.nom,
+            data={
+                "service": service.nom,
+                "code_de_sortie": (
+                    service.processus.returncode
+                    if service.processus is not None
+                    else None
+                ),
+            },
+            project_id=service.project_id,
+        )
+    )
+
+
 @router.post("/{project_id}/services/start")
 async def demarrer(project_id: str) -> dict[str, object]:
     racine = _racine(project_id)
@@ -66,6 +84,7 @@ async def demarrer(project_id: str) -> dict[str, object]:
                 racine,
                 cwd=declare.get("cwd") or None,
                 sur_ligne=_publier,
+                sur_fin=_publier_la_fin,
             )
             demarres.append(service.en_dict())
     except CommandeInvalide as exc:
@@ -90,5 +109,24 @@ async def arreter(project_id: str) -> dict[str, int]:
 
 @router.get("/{project_id}/services")
 async def lister(project_id: str) -> list[dict[str, object]]:
-    _racine(project_id)
-    return [service.en_dict() for service in PROCESS_REGISTRY.services_de(project_id)]
+    """Les services **déclarés**, chacun avec son état courant.
+
+    Ne lister que ceux qui tournent empêchait l'IDE de savoir, au chargement,
+    si un projet est lançable : il affichait le bouton partout et ne
+    l'apprenait qu'en échouant, moment où le bouton disparaissait sous le
+    curseur sans rien expliquer (ticket-146).
+    """
+    racine = _racine(project_id)
+    lances = {s.nom: s for s in PROCESS_REGISTRY.services_de(project_id)}
+    etats: list[dict[str, object]] = []
+    for declare in load_services_config(racine):
+        lance = lances.pop(declare["nom"], None)
+        etats.append(
+            lance.en_dict()
+            if lance is not None
+            else Service(nom=declare["nom"], project_id=project_id).en_dict()
+        )
+    # Un service lancé puis retiré du manifeste tourne encore : le cacher
+    # laisserait un processus vivant que plus rien ne permet d'arrêter.
+    etats.extend(reste.en_dict() for reste in lances.values())
+    return etats

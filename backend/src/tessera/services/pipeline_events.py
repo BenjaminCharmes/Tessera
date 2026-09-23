@@ -45,6 +45,9 @@ class EventType(str, Enum):
     #: Jetable comme un token : un serveur bavard ne doit pas noyer les
     #: transitions d'un run dans la file d'un observateur lent.
     SERVICE_OUTPUT = "service_output"
+    #: Un service s'est terminé, avec son code de sortie (ticket-145). Sans
+    #: lui, l'écran ne pourrait apprendre sa mort qu'en sondant en boucle.
+    SERVICE_CLOSED = "service_closed"
 
 
 class OrchestratorEvent(BaseModel):
