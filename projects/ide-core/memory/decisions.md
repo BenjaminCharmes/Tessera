@@ -368,3 +368,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : la socket qui lançait le run en était l'unique destinataire. Fermer l'onglet rendait aveugle, rien ne montrait le parallélisme entre projets (ADR-038), et seul cet onglet pouvait répondre à un agent (ADR-025). Se reconnecter relançait le travail — trois runs en double le 2026-09-17.
 **Alternative rejetée** : diffuser une copie sans découpler — le run resterait lié à son lanceur ; tout pousser à tous — le navigateur lâche avant le backend.
 **Conséquence assumée** : ADR-025 change de transport, pas de sémantique. `run_closed` dit la fin **et** la libération du projet.
+
+---
+
+## ADR-042 — Un projet se lance par une commande déclarée, jamais devinée
+
+**Date** : 2026-09-23
+**Décision** : un projet déclare dans `agents.json` une liste `services` de `{nom, commande}`. L'IDE les lance — sans shell, sans agent — en enfants du backend, qui meurent avec lui. Leur sortie part sur le canal d'ADR-041, à l'abonnement. Rien de déclaré : pas de bouton.
+**Raison** : six projets décrivent leur démarrage dans des sections aux noms différents, mêlé aux commandes de test et d'installation : y choisir, c'est deviner. Confier `Bash` à un agent rouvrirait ce qu'ADR-027 et ADR-031 ferment mal — leur contrôle attrape une erreur, pas une évasion.
+**Alternative rejetée** : détacher le processus — il survivrait à l'IDE en gardant son port, sans rien pour l'arrêter ; déduire la commande du `CLAUDE.md` — une heuristique fausse lance n'importe quoi.
+**Conséquence assumée** : l'IDE ne prépare rien — `npm ci` et `conda env create` restent à la main.

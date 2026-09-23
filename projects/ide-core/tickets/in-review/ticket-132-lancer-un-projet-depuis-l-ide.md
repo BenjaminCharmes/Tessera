@@ -2,7 +2,7 @@
 id: ticket-132
 title: "Lancer un projet depuis l'IDE : back, front et base quand il en faut"
 type: design
-status: todo
+status: in-review
 pr_number: null
 priority: medium
 agent: architect
