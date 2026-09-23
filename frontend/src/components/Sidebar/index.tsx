@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProjectHeader from "./ProjectHeader";
+import type { UseServicesResult } from "../../hooks/useServices";
 import FileTree from "../FileTree";
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
@@ -20,6 +21,8 @@ import type { SidebarPanel } from "./panels";
 
 interface SidebarProps {
   panel: SidebarPanel;
+  /** Les services du projet actif, pour le bouton « Lancer » (ticket-138). */
+  services?: UseServicesResult;
   activeProject: Project | null;
   activeTicket: Ticket | null;
   byStatus: Record<TicketStatus, Ticket[]>;
@@ -61,6 +64,7 @@ interface SidebarProps {
 
 export default function Sidebar({
   panel,
+  services,
   activeProject,
   activeTicket,
   byStatus,
@@ -110,6 +114,7 @@ export default function Sidebar({
         project={activeProject}
         gitOuvert={gitOuvert}
         onBasculerGit={() => setGitOuvert((v) => !v)}
+        services={services}
       />
 
       {gitOuvert && activeProject && (

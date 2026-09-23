@@ -6,6 +6,7 @@ import { useRuns } from "./hooks/useRuns";
 import { useUsage } from "./hooks/useUsage";
 import { useToast } from "./hooks/useToast";
 import { useProjects } from "./hooks/useProjects";
+import { useServices } from "./hooks/useServices";
 import { useSupervision } from "./hooks/useSupervision";
 import { useRunActif } from "./hooks/useRunActif";
 import { BAND } from "./design/layout";
@@ -51,6 +52,7 @@ export default function App() {
   const supervision = useSupervision();
   const stream = useRunActif(supervision, project?.id ?? null);
   const { projects: projets } = useProjects();
+  const services = useServices(project?.id ?? null);
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
   // bloque un humain, un run bloqué demande une décision. L'activité est le
@@ -190,6 +192,7 @@ export default function App() {
         <ErrorBoundary>
           <Sidebar
             panel={panel}
+            services={services}
             activeProject={project}
             activeTicket={ticket}
             byStatus={tickets.byStatus}
@@ -271,7 +274,11 @@ export default function App() {
           {panel === "supervision" ? (
             // Vue globale : elle ne dépend d'aucun projet actif, comme les
             // coûts. C'est ce qui lui permet de montrer les autres.
-            <SupervisionView supervision={supervision} projects={projets} />
+            <SupervisionView
+              supervision={supervision}
+              projects={projets}
+              services={services.services}
+            />
           ) : panel === "agents" ? (
             <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />
           ) : panel === "usage" ? (

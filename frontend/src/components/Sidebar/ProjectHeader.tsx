@@ -1,3 +1,5 @@
+import BoutonServices from "./BoutonServices";
+import type { UseServicesResult } from "../../hooks/useServices";
 import { BAND } from "../../design/layout";
 import type { Project } from "../../types/api";
 
@@ -19,6 +21,11 @@ interface ProjectHeaderProps {
   project: Project | null;
   gitOuvert: boolean;
   onBasculerGit: () => void;
+  /**
+   * Les services du projet (ticket-138). Absent : aucun bouton — c'est le cas
+   * des vues qui n'ont pas de projet à lancer.
+   */
+  services?: UseServicesResult;
 }
 
 /** `vscode://file/` attend des séparateurs POSIX, y compris sous Windows. */
@@ -30,6 +37,7 @@ export default function ProjectHeader({
   project,
   gitOuvert,
   onBasculerGit,
+  services,
 }: ProjectHeaderProps) {
   if (!project) {
     return (
@@ -54,6 +62,12 @@ export default function ProjectHeader({
       </h2>
 
       <div className="flex shrink-0 items-center gap-1.5">
+        {services ? (
+          <BoutonServices
+            services={services}
+            libelleDuProjet={project.name}
+          />
+        ) : null}
         {/* Un projet sans chemin ne coûte que ce bouton : le faire planter
             emportait toute la colonne derrière l'ErrorBoundary. */}
         {project.path ? (

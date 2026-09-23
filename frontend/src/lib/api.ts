@@ -18,6 +18,7 @@ import type {
   ImportProjectResponse,
   PRStatus,
   RunRequest,
+  ServiceActif,
   ProjectCreationResult,
   PipelineRun,
   PlanResult,
@@ -128,6 +129,18 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       }),
+  },
+  services: {
+    /**
+     * Les services d'un projet — ticket-137. Rien de declare dans son
+     * `agents.json`, et `start` repond 409 en disant quoi ecrire.
+     */
+    list: (projectId: string): Promise<ServiceActif[]> =>
+      request(`/projects/${projectId}/services`),
+    start: (projectId: string): Promise<{ services: ServiceActif[] }> =>
+      post(`/projects/${projectId}/services/start`, {}),
+    stop: (projectId: string): Promise<{ arretes: number }> =>
+      post(`/projects/${projectId}/services/stop`, {}),
   },
   runs: {
     list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>

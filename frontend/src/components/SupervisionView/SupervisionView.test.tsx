@@ -176,4 +176,76 @@ describe("SupervisionView", () => {
     });
     expect(sup.runs).toHaveLength(2);
   });
+
+  it("liste les services separement des runs", () => {
+    // Un service n'a ni ticket, ni tours, ni verdict, et ne se termine pas
+    // tout seul : le meler aux runs donnerait un chrono qui monte
+    // indefiniment a cote de pipelines qui finissent.
+    render(
+      <SupervisionView
+        supervision={supervision({ runs: [run()] })}
+        projects={PROJETS}
+        services={[
+          {
+            nom: "backend",
+            project_id: "ide-core",
+            pid: 1,
+            demarre_a: new Date().toISOString(),
+            en_cours: true,
+            code_de_sortie: null,
+          },
+        ]}
+      />,
+    );
+
+    const bande = screen.getByLabelText("Services lancés");
+    expect(bande).toBeInTheDocument();
+    expect(bande.textContent).toContain("backend");
+  });
+
+  it("montre en rouge un service mort de lui-meme", () => {
+    render(
+      <SupervisionView
+        supervision={supervision()}
+        projects={PROJETS}
+        services={[
+          {
+            nom: "backend",
+            project_id: "ide-core",
+            pid: 1,
+            demarre_a: new Date().toISOString(),
+            en_cours: false,
+            code_de_sortie: 1,
+          },
+        ]}
+      />,
+    );
+
+    const etiquette = screen.getByTitle(/ide-core/);
+    expect(etiquette.className).toMatch(/red/);
+    expect(etiquette.textContent).toContain("code 1");
+  });
+
+  it("ne dit pas « rien en cours » quand des services tournent", () => {
+    // « Aucun run en cours » tout court laisserait croire que l'IDE ne fait
+    // rien, alors qu'un serveur qu'il a lance ecoute un port.
+    render(
+      <SupervisionView
+        supervision={supervision()}
+        projects={PROJETS}
+        services={[
+          {
+            nom: "backend",
+            project_id: "ide-core",
+            pid: 1,
+            demarre_a: new Date().toISOString(),
+            en_cours: true,
+            code_de_sortie: null,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText(/des services tournent/)).toBeInTheDocument();
+  });
 });

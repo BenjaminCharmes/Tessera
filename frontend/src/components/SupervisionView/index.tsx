@@ -5,7 +5,7 @@ import AgentPanel from "../AgentPanel";
 import { INITIAL } from "../../hooks/streamState";
 import type { UseRunActifResult } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
-import type { Project } from "../../types/api";
+import type { Project, ServiceActif } from "../../types/api";
 
 /**
  * Ce que l'IDE est en train de faire, sur tous les projets — ticket-129.
@@ -21,11 +21,19 @@ import type { Project } from "../../types/api";
 interface SupervisionViewProps {
   supervision: UseSupervisionResult;
   projects: Project[];
+  /**
+   * Les services lancés, listés à part des runs (ticket-138) : un service
+   * n'a ni ticket, ni tours, ni verdict, et ne se termine pas tout seul.
+   * Les mêler aux runs donnerait un chrono qui monte indéfiniment à côté de
+   * pipelines qui finissent.
+   */
+  services?: ServiceActif[];
 }
 
 export default function SupervisionView({
   supervision,
   projects,
+  services = [],
 }: SupervisionViewProps) {
   const { runs, selection, selectionner, etatDe } = supervision;
   const selectionne = runs.find((r) => r.run_id === selection) ?? runs[0];
@@ -39,8 +47,10 @@ export default function SupervisionView({
         </span>
       </div>
 
+      {services.length > 0 ? <BandeDesServices services={services} /> : null}
+
       {runs.length === 0 ? (
-        <VueVide connecte={supervision.connecte} />
+        <VueVide connecte={supervision.connecte} avecServices={services.length > 0} />
       ) : (
         <div className="grid min-h-0 flex-1 grid-cols-[minmax(240px,340px)_1fr] overflow-hidden">
           <div className="flex flex-col gap-2 overflow-y-auto border-r border-zinc-800 p-3">
@@ -76,13 +86,49 @@ function etiquette(nombre: number): string {
   return `${nombre} run${nombre > 1 ? "s" : ""}`;
 }
 
-function VueVide({ connecte }: { connecte: boolean }) {
+function BandeDesServices({ services }: { services: ServiceActif[] }) {
+  return (
+    <section
+      aria-label="Services lancés"
+      className="flex flex-wrap gap-2 border-b border-zinc-800 px-3 py-2"
+    >
+      {services.map((service) => (
+        <span
+          key={`${service.project_id}-${service.nom}`}
+          className={`rounded-sm px-2 py-0.5 text-micro ${
+            service.en_cours
+              ? "bg-blue-500/20 text-blue-200"
+              : (service.code_de_sortie ?? 0) !== 0
+                ? "bg-red-500/20 text-red-200"
+                : "bg-zinc-800 text-zinc-400"
+          }`}
+          title={`${service.project_id} · pid ${service.pid}`}
+        >
+          {service.nom}
+          {!service.en_cours && (service.code_de_sortie ?? 0) !== 0
+            ? ` · code ${service.code_de_sortie}`
+            : ""}
+        </span>
+      ))}
+    </section>
+  );
+}
+
+function VueVide({
+  connecte,
+  avecServices,
+}: {
+  connecte: boolean;
+  avecServices: boolean;
+}) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
       <p className="text-sm text-zinc-400">
-        {connecte
-          ? "Aucun run en cours."
-          : "En attente du canal d'observation…"}
+        {!connecte
+          ? "En attente du canal d'observation…"
+          : avecServices
+            ? "Aucun run en cours — mais des services tournent."
+            : "Aucun run en cours."}
       </p>
       <p className="max-w-sm text-xs text-zinc-600">
         Lance un ticket depuis le tableau : il apparaîtra ici, quel que soit le
