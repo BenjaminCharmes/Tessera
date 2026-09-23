@@ -2,8 +2,8 @@
 id: ticket-129
 title: "Vue Supervision de tous les runs, et badge permanent dans le NavRail"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 151
 priority: high
 agent: codeur
 depends_on: ["ticket-128"]
