@@ -2,8 +2,8 @@
 id: ticket-155
 title: "Les services restent visibles après un rechargement, et se lisent proprement en supervision"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 174
 priority: high
 agent: codeur
 depends_on: ["ticket-154"]

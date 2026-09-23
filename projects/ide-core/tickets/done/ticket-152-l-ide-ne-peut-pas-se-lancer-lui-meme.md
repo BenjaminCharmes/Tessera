@@ -2,8 +2,8 @@
 id: ticket-152
 title: "L'IDE ne peut pas se lancer lui-même, et doit le dire"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 172
 priority: medium
 agent: codeur
 depends_on: ["ticket-151"]
