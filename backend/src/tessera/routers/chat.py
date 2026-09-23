@@ -125,7 +125,19 @@ async def chat_stream(websocket: WebSocket, project_id: str) -> None:
                 await websocket.send_json({"type": "error", "detail": "message vide"})
                 continue
 
-            await _handle_turn(websocket, project_id, conversation_id, message)
+            # Le verrou, pour toute la durée du tour — ticket-139. Un tour
+            # de chat n'est pas un « run », mais il écrit : `_commit_if_written`
+            # crée une branche dès que l'arbre n'est pas propre (ADR-019), et
+            # ce checkout déplacerait l'arbre sous le codeur d'un run en cours.
+            # ADR-038 annonçait déjà couvrir le chat ; seul `/chat/run` l'était.
+            try:
+                async with _RUN_LOCK.acquire(project_id, _LIBELLE_DU_CHAT):
+                    await _handle_turn(
+                        websocket, project_id, conversation_id, message
+                    )
+            except RunAlreadyInProgress as exc:
+                await websocket.send_json({"type": "error", "detail": str(exc)})
+                continue
     except WebSocketDisconnect:
         return
     except Exception as exc:  # noqa: BLE001 — la socket ne doit jamais tuer le serveur
@@ -134,6 +146,23 @@ async def chat_stream(websocket: WebSocket, project_id: str) -> None:
             await websocket.send_json({"type": "error", "detail": str(exc)})
         except Exception:
             pass
+
+
+#: Ce que le tour de chat inscrit dans le verrou (ticket-139).
+_LIBELLE_DU_CHAT = "chat"
+
+
+def _un_run_occupe(project_id: str) -> bool:
+    """Un *run* tourne — le tour de chat en cours ne compte pas.
+
+    Depuis ticket-139 le tour de chat tient lui-même le verrou : interroger
+    `is_running` depuis l'intérieur du tour répondrait toujours oui, et l'UI
+    cacherait le bouton « lancer » pour une occupation qui est la sienne.
+    Le champ dit « un pipeline tourne », et un tour de chat n'en est pas un.
+    """
+    if not _RUN_LOCK.is_running(project_id):
+        return False
+    return _RUN_LOCK.ticket_en_cours(project_id) != _LIBELLE_DU_CHAT
 
 
 async def _handle_turn(
@@ -192,7 +221,7 @@ async def _handle_turn(
             # L'agent suggère, l'utilisateur décide : l'UI en fait un bouton
             # (ticket-055).
             "suggested_ticket_id": reply.suggested_ticket_id,
-            "run_in_progress": _RUN_LOCK.is_running(project_id),
+            "run_in_progress": _un_run_occupe(project_id),
         }
     )
 
