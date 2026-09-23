@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { adresseDansLaSortie } from "./adresse";
+import { classeDeLEtat, etatDuService } from "../../design/etatDuService";
 import type { ServiceActif } from "../../types/api";
 
 /**
@@ -39,7 +40,9 @@ export default function ServicesLances({
           const adresse = service.en_cours
             ? adresseDansLaSortie(sortie)
             : null;
-          const echoue = !service.en_cours && (service.code_de_sortie ?? 0) !== 0;
+          // Même lecture d'état que le panneau du projet : deux mises en
+          // forme pour une même donnée divergeraient (ADR-034).
+          const echoue = etatDuService(service) === "echoue";
           return (
             <span key={cle(service)} className="flex items-center gap-1">
               <button
@@ -49,13 +52,7 @@ export default function ServicesLances({
                 }
                 aria-pressed={ouvert === cle(service)}
                 title={`${service.project_id} · pid ${service.pid}`}
-                className={`rounded-sm px-2 py-0.5 text-micro transition-colors ${
-                  service.en_cours
-                    ? "bg-blue-500/20 text-blue-200 hover:bg-blue-500/30"
-                    : echoue
-                      ? "bg-red-500/20 text-red-200 hover:bg-red-500/30"
-                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                }`}
+                className={`rounded-sm px-2 py-0.5 text-micro transition-colors hover:brightness-125 ${classeDeLEtat(service)}`}
               >
                 {service.nom}
                 {echoue ? ` · code ${service.code_de_sortie}` : ""}

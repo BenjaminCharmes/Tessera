@@ -196,6 +196,7 @@ export default function App() {
           <Sidebar
             panel={panel}
             services={services}
+            sortieDeService={supervision.sortieDuService}
             activeProject={project}
             activeTicket={ticket}
             byStatus={tickets.byStatus}

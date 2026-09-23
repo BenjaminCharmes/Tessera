@@ -4,7 +4,7 @@ import type { UseServicesResult } from "../../hooks/useServices";
 import FileTree from "../FileTree";
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
-import GitLinkPanel from "./GitLinkPanel";
+import PanneauxDuProjet from "./PanneauxDuProjet";
 import RunHistory from "./RunHistory";
 import AgentList from "./AgentList";
 import UsageDashboard from "./UsageDashboard";
@@ -23,6 +23,8 @@ interface SidebarProps {
   panel: SidebarPanel;
   /** Les services du projet actif, pour le bouton « Lancer » (ticket-138). */
   services?: UseServicesResult;
+  /** La sortie d'un service, pour le panneau du projet (ticket-147). */
+  sortieDeService?: (projectId: string, nom: string) => string[];
   activeProject: Project | null;
   activeTicket: Ticket | null;
   byStatus: Record<TicketStatus, Ticket[]>;
@@ -65,6 +67,7 @@ interface SidebarProps {
 export default function Sidebar({
   panel,
   services,
+  sortieDeService,
   activeProject,
   activeTicket,
   byStatus,
@@ -107,6 +110,7 @@ export default function Sidebar({
   // consulte qu'au moment de lier un dépôt ou de retirer le projet. Ce qui
   // compte, c'est qu'il soit à un clic et non à un écran de défilement.
   const [gitOuvert, setGitOuvert] = useState(false);
+  const [servicesOuverts, setServicesOuverts] = useState(false);
 
   return (
     <div className="flex h-full flex-col bg-zinc-900 text-sm text-zinc-200">
@@ -115,13 +119,16 @@ export default function Sidebar({
         gitOuvert={gitOuvert}
         onBasculerGit={() => setGitOuvert((v) => !v)}
         services={services}
+        onOuvrirLesServices={() => setServicesOuverts(true)}
       />
 
-      {gitOuvert && activeProject && (
-        <div className="max-h-64 overflow-y-auto overflow-x-hidden border-b border-zinc-800">
-          <GitLinkPanel project={activeProject} />
-        </div>
-      )}
+      <PanneauxDuProjet
+        project={activeProject}
+        gitOuvert={gitOuvert}
+        servicesOuverts={servicesOuverts}
+        services={services}
+        sortieDeService={sortieDeService}
+      />
 
       <div className="flex-1 overflow-y-auto">
       {panel === "projects" && (

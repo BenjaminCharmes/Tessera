@@ -2,7 +2,7 @@
 id: ticket-147
 title: "Un panneau services dans le projet : état, adresse, logs, et quoi faire s'il n'y en a pas"
 type: feat
-status: todo
+status: in-review
 pr_number: null
 priority: high
 agent: codeur

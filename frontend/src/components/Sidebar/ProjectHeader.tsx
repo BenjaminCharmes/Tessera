@@ -26,6 +26,8 @@ interface ProjectHeaderProps {
    * des vues qui n'ont pas de projet à lancer.
    */
   services?: UseServicesResult;
+  /** Ouvre le panneau des services, pour que le clic ait un effet visible. */
+  onOuvrirLesServices?: () => void;
 }
 
 /** `vscode://file/` attend des séparateurs POSIX, y compris sous Windows. */
@@ -38,6 +40,7 @@ export default function ProjectHeader({
   gitOuvert,
   onBasculerGit,
   services,
+  onOuvrirLesServices,
 }: ProjectHeaderProps) {
   if (!project) {
     return (
@@ -66,6 +69,7 @@ export default function ProjectHeader({
           <BoutonServices
             services={services}
             libelleDuProjet={project.name}
+            onOuvrirLePanneau={onOuvrirLesServices}
           />
         ) : null}
         {/* Un projet sans chemin ne coûte que ce bouton : le faire planter

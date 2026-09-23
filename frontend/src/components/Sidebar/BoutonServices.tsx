@@ -14,9 +14,16 @@ import type { UseServicesResult } from "../../hooks/useServices";
 export default function BoutonServices({
   services,
   libelleDuProjet,
+  onOuvrirLePanneau,
 }: {
   services: UseServicesResult;
   libelleDuProjet: string;
+  /**
+   * Ouvre le panneau des services (ticket-147). Un clic doit produire un
+   * effet visible tout de suite, avant même la première ligne de sortie :
+   * sans ça, l'utilisateur ne sait pas s'il s'est passé quoi que ce soit.
+   */
+  onOuvrirLePanneau?: () => void;
 }) {
   if (!services.declare) return null;
 
@@ -34,7 +41,10 @@ export default function BoutonServices({
   return (
     <button
       type="button"
-      onClick={() => void (enCours ? services.arreter() : services.demarrer())}
+      onClick={() => {
+        onOuvrirLePanneau?.();
+        void (enCours ? services.arreter() : services.demarrer());
+      }}
       title={erreur ?? undefined}
       aria-label={
         enCours

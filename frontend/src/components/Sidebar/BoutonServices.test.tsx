@@ -124,4 +124,23 @@ describe("BoutonServices", () => {
       expect(classe).toContain(attendu);
     }
   });
+
+  it("ouvre le panneau en meme temps qu'il lance", async () => {
+    // Un clic doit produire un effet visible tout de suite, avant meme la
+    // premiere ligne de sortie (ticket-147).
+    const ouvrir = vi.fn();
+    const demarrer = vi.fn();
+    render(
+      <BoutonServices
+        services={etat({ demarrer })}
+        libelleDuProjet="fluentdb"
+        onOuvrirLePanneau={ouvrir}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button"));
+
+    expect(ouvrir).toHaveBeenCalled();
+    expect(demarrer).toHaveBeenCalled();
+  });
 });
