@@ -17,7 +17,7 @@ import type {
   ImportProjectRequest,
   ImportProjectResponse,
   PRStatus,
-  PipelineResult,
+  RunRequest,
   ProjectCreationResult,
   PipelineRun,
   PlanResult,
@@ -117,11 +117,16 @@ export const api = {
       post(`/projects/${projectId}/tickets/batch`, { tickets }),
   },
   orchestrator: {
-    run: (projectId: string, ticketId: string): Promise<PipelineResult> =>
+    /**
+     * Demarre un run et rend son identifiant, sans attendre la fin
+     * (ticket-128). Le deroule s'observe sur `/orchestrator/observe`, ou
+     * tous les runs de la machine passent.
+     */
+    run: (body: RunRequest): Promise<{ run_id: string }> =>
       request("/orchestrator/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project_id: projectId, ticket_id: ticketId }),
+        body: JSON.stringify(body),
       }),
   },
   runs: {

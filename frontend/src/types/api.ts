@@ -45,6 +45,7 @@ export type EventType =
   | "queue_progress"
   | "livraison_done"
   | "pipeline_done"
+  | "run_closed"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
@@ -103,6 +104,39 @@ export interface OrchestratorEvent {
   ticket_id: string;
   data: Record<string, unknown>;
   timestamp: string;
+  /**
+   * De quel run vient l'evenement, et sur quel projet (ticket-128). Le canal
+   * d'observation porte tous les runs de la machine : sans ces deux champs,
+   * un client ne saurait pas a quoi rattacher ce qu'il recoit.
+   */
+  run_id?: string | null;
+  project_id?: string | null;
+}
+
+/** Ce que `POST /orchestrator/run` accepte — les trois modes (ticket-128). */
+export interface RunRequest {
+  project_id: string;
+  ticket_id?: string | null;
+  ticket_ids?: string[];
+  mode?: "single" | "queue" | "autonomous";
+  max_tickets?: number;
+  depuis_github?: boolean;
+}
+
+/** L'instantane des runs vivants, envoye a la connexion sur `/observe`. */
+export interface RunActif {
+  run_id: string;
+  project_id: string;
+  mode: string;
+  ticket_id: string | null;
+  etape: string | null;
+  agent: AgentRole | null;
+  tour: number;
+  tokens_entree: number;
+  tokens_sortie: number;
+  cout_usd: number;
+  verdict: string | null;
+  demarre_a: string;
 }
 
 export interface TicketCreate {

@@ -180,11 +180,13 @@ async def _runs_ouverts(db_path: Path) -> int:
     return int(row[0]) if row else 0
 
 
-def test_une_panne_inattendue_dans_le_stream_clot_le_run_en_base(
+def test_une_panne_inattendue_clot_le_run_en_base(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     # Le stream n'attrapait que `ValueError` : toute autre exception sautait
     # `finish_run`, et l'historique affichait « en cours » pour toujours.
+    # Depuis ticket-128 c'est l'executeur qui porte cette garantie, dans son
+    # `finally` — la tache n'a plus d'appelant pour rattraper quoi que ce soit.
     class _OrchestrateurQuiCasse:
         async def run_pipeline(
             self,
@@ -201,9 +203,21 @@ def test_une_panne_inattendue_dans_le_stream_clot_le_run_en_base(
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    with TestClient(app).websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
-        assert "panne inattendue" in ws.receive_json()["error"]
+    with TestClient(app) as client:
+        with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+            resp = client.post(
+                "/api/v1/orchestrator/run",
+                json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
+            )
+            assert resp.status_code == 202
+            vu = None
+            for _ in range(60):
+                message = ws.receive_json()
+                if message.get("type") == "error":
+                    vu = message
+                if message.get("type") == "run_closed":
+                    break
+            assert vu is not None and "panne inattendue" in vu["data"]["error"]
 
     for _ in range(50):
         if asyncio.run(_runs_ouverts(settings.ide_db_path)) == 0:

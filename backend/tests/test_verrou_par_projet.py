@@ -3,8 +3,14 @@
 `RunLock` n'existait que pour `/chat/run`. Deux `POST /orchestrator/run` sur
 le meme projet passaient `ensure_clean_tree`, puis le second `create_branch`
 faisait un checkout sous le premier codeur.
+
+Depuis ticket-128 le lancement se fait par POST et l'observation sur
+`/orchestrator/observe` : ce fichier garde ce qui lui est propre — le verrou
+lui-meme et son partage entre points d'entree. Le comportement du canal est
+couvert par `test_canal_d_observation.py`.
 """
 import asyncio
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -36,13 +42,23 @@ async def test_le_refus_nomme_le_ticket_en_cours() -> None:
     assert lock.ticket_en_cours("mon-projet") is None
 
 
+async def test_un_verrou_construit_a_la_main_est_independant() -> None:
+    # Depuis ticket-127 le verrou délègue à un registre. S'il retombait sur
+    # le registre partagé, deux verrous censés être indépendants auraient le
+    # même état : un run ouvert ailleurs bloquerait celui-ci sans raison.
+    premier = RunLock()
+    second = RunLock()
+    async with premier.acquire("mon-projet", "ticket-007"):
+        assert second.is_running("mon-projet") is False
+
+
 async def test_le_verrou_est_partage_entre_les_routeurs() -> None:
     # Un verrou par module serait deux verrous : le chat et l'orchestrateur
     # doivent voir le meme etat.
     from tessera.routers import chat, orchestrator
 
     assert chat._RUN_LOCK is RUN_LOCK
-    assert orchestrator._RUN_LOCK is RUN_LOCK
+    assert orchestrator.RUN_REGISTRY is RUN_LOCK._registry
 
 
 # ------------------------------------------------------------------
@@ -64,7 +80,16 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
     monkeypatch.setattr(settings, "ide_db_path", db_path)
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
+    monkeypatch.setattr(settings, "dialogue_timeout_s", 10.0)
     return ws
+
+
+@pytest.fixture
+def client() -> Iterator[TestClient]:
+    # Le portail doit survivre a la requete : c'est une tache asyncio qui
+    # porte le run depuis ticket-128.
+    with TestClient(app) as c:
+        yield c
 
 
 def _approved(ticket_id: str) -> PipelineResult:
@@ -105,73 +130,42 @@ def _brancher(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
 
-def test_un_second_run_sur_le_meme_projet_recoit_409(
-    monkeypatch: pytest.MonkeyPatch,
+def _attendre(ws: object, type_attendu: str, limite: int = 40) -> dict:
+    for _ in range(limite):
+        message = ws.receive_json()  # type: ignore[attr-defined]
+        if message.get("type") == type_attendu:
+            return dict(message)
+    raise AssertionError(f"« {type_attendu} » jamais recu")
+
+
+def test_le_chat_refuse_de_lancer_sur_un_projet_deja_occupe(
+    monkeypatch: pytest.MonkeyPatch, client: TestClient
 ) -> None:
+    # La valeur propre de ce fichier : deux **points d'entree differents**
+    # partagent le verrou. Un run lance depuis le tableau doit bloquer le
+    # chat, et pas seulement un second clic au meme endroit.
     _brancher(monkeypatch)
-    client = TestClient(app)
 
-    with client.websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
-        assert ws.receive_json()["type"] == "agent_question"
-
-        resp = client.post(
+    with client.websocket_connect("/api/v1/orchestrator/observe") as observateur:
+        demarrage = client.post(
             "/api/v1/orchestrator/run",
-            json={"project_id": "mon-projet", "ticket_id": "ticket-002"},
+            json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
         )
-        assert resp.status_code == 409
-        assert "ticket-001" in resp.json()["detail"]
+        assert demarrage.status_code == 202
+        run_id = demarrage.json()["run_id"]
+        _attendre(observateur, "agent_question")
 
-        resp = client.post(
-            "/api/v1/orchestrator/run-autonomous",
-            json={"project_id": "mon-projet", "max_tickets": 1},
+        refus = client.post(
+            "/api/v1/projects/mon-projet/chat/run",
+            json={"conversation_id": "c1", "ticket_id": "ticket-042"},
         )
-        assert resp.status_code == 409
+        assert refus.status_code == 409
+        assert "ticket-001" in refus.json()["detail"]
 
-        ws.send_json({"type": "answer", "text": "oui"})
-        assert ws.receive_json()["type"] == "pipeline_done"
+        observateur.send_json({"type": "answer", "run_id": run_id, "text": "oui"})
+        _attendre(observateur, "pipeline_done")
 
-    # Le run fini, le projet est de nouveau libre.
-    assert RUN_LOCK.ticket_en_cours("mon-projet") is None
-
-
-def test_deux_projets_differents_tournent_ensemble(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _brancher(monkeypatch)
-    client = TestClient(app)
-
-    with client.websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
-        assert ws.receive_json()["type"] == "agent_question"
-
-        resp = client.post(
-            "/api/v1/orchestrator/run",
-            json={"project_id": "autre-projet", "ticket_id": "ticket-009"},
-        )
-        assert resp.status_code == 200
-        assert resp.json()["ticket_id"] == "ticket-009"
-
-        ws.send_json({"type": "answer", "text": "oui"})
-        assert ws.receive_json()["type"] == "pipeline_done"
-
-
-def test_un_second_stream_sur_le_meme_projet_recoit_une_erreur(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    # La WebSocket est le chemin que l'UI emprunte : c'est la qu'un double
-    # clic arrive vraiment.
-    _brancher(monkeypatch)
-    client = TestClient(app)
-
-    with client.websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
-        assert ws.receive_json()["type"] == "agent_question"
-
-        with client.websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws2:
-            ws2.send_json({"ticket_id": "ticket-002"})
-            refus = ws2.receive_json()
-        assert "ticket-001" in refus["error"]
-
-        ws.send_json({"type": "answer", "text": "oui"})
-        assert ws.receive_json()["type"] == "pipeline_done"
+    # Pas d'assertion sur la liberation ici : `pipeline_done` est publie par
+    # l'orchestrateur, donc avant que l'executeur ne ferme l'entree. La
+    # liberation elle-meme est verifiee sans course par
+    # `test_un_run_termine_sort_de_l_instantane`.

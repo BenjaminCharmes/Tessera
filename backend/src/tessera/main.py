@@ -8,7 +8,16 @@ from starlette.requests import Request
 
 from tessera.auth import StaticTokenMiddleware
 from tessera.config import settings
-from tessera.routers import agent_admin, agents, chat, fs, orchestrator, projects, tickets
+from tessera.routers import (
+    agent_admin,
+    agents,
+    chat,
+    fs,
+    observation,
+    orchestrator,
+    projects,
+    tickets,
+)
 from tessera.services.database import init_db
 from tessera.services.prompt_loader import MissingPromptError
 from tessera.utils.logger import get_logger
@@ -57,6 +66,7 @@ app.include_router(tickets.router, prefix="/api/v1/projects")
 app.include_router(chat.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
 app.include_router(orchestrator.router, prefix="/api/v1")
+app.include_router(observation.router, prefix="/api/v1")
 app.include_router(agent_admin.router, prefix="/api/v1")
 app.include_router(fs.router, prefix="/api/v1")
 

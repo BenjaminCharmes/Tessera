@@ -369,3 +369,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : `read_file` / `write_file` / `list_dir` acceptaient n'importe quel chemin, quand l'API refuse tout ce qui sort du workspace. Le trou `?path=~/.ssh/id_rsa` rebouché d'un côté restait ouvert de l'autre : entre deux portes, c'est la moins gardée qui compte.
 **Alternative rejetée** : porter le contrôle de chemin en Rust — deux implémentations d'une même règle divergent (ADR-034) ; garder `fs:*` « au cas où » — une permission que rien n'utilise est une surface sans bénéfice.
 **Conséquence assumée** : le backend n'est pas embarqué ; l'app packagée exige `uv` et `TESSERA_BACKEND_DIR`.
+
+---
+
+## ADR-041 — Un run est observé, pas possédé
+
+**Date** : 2026-09-23
+**Portée** : architect, codeur, reviewer
+**Décision** : un run démarre par `POST /orchestrator/run` et s'observe sur `WS /orchestrator/observe`, canal unique, tous projets confondus. `RunRegistry` tient les runs vivants et leur canal de dialogue ; `EventHub` diffuse, jetant le texte plutôt qu'une transition quand un client décroche. La WebSocket de lancement disparaît.
+**Raison** : la socket qui lançait le run en était l'unique destinataire. Fermer l'onglet rendait aveugle, rien ne montrait le parallélisme entre projets (ADR-038), et seul cet onglet pouvait répondre à un agent (ADR-025). Se reconnecter relançait le travail — trois runs en double le 2026-09-17.
+**Alternative rejetée** : diffuser une copie sans découpler — le run resterait lié à son lanceur ; tout pousser à tous — le navigateur lâche avant le backend.
+**Conséquence assumée** : ADR-025 change de transport, pas de sémantique. `run_closed` dit la fin **et** la libération du projet.

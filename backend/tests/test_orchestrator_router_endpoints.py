@@ -1,6 +1,7 @@
 """Endpoints du router orchestrateur — ticket-053."""
 import asyncio
 import time
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -49,6 +50,31 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 def _client() -> TestClient:
     return TestClient(app)
+
+
+@pytest.fixture
+def client() -> Iterator[TestClient]:
+    """A client whose loop outlives each request — ticket-128.
+
+    Le run est porte par une tache asyncio : sans portail persistant, elle
+    est tuee des que le POST repond, et le run n'existe jamais.
+    """
+    with TestClient(app) as c:
+        yield c
+
+
+def _demarrer(client: TestClient, corps: dict) -> str:
+    resp = client.post("/api/v1/orchestrator/run", json=corps)
+    assert resp.status_code == 202, resp.text
+    return str(resp.json()["run_id"])
+
+
+def _attendre(ws: object, type_attendu: str, limite: int = 60) -> dict:
+    for _ in range(limite):
+        message = ws.receive_json()  # type: ignore[attr-defined]
+        if message.get("type") == type_attendu:
+            return dict(message)
+    raise AssertionError(f"« {type_attendu} » jamais recu")
 
 
 def _approved(ticket_id: str = "ticket-001") -> PipelineResult:
@@ -120,7 +146,12 @@ def test_run_sans_ticket_id_est_refuse() -> None:
     assert resp.status_code == 422
 
 
-def test_run_renvoie_le_resultat_du_pipeline(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_run_demarre_le_pipeline_et_rend_son_resultat_sur_le_canal(
+    monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    # Depuis ticket-128 le POST ne porte plus le resultat : il demarre le run
+    # et rend son identifiant. Le resultat arrive sur `/observe`, dans
+    # `run_closed` — le seul evenement publie apres la liberation du projet.
     fake = _FakeOrchestrator()
 
     async def _build(project_id: str) -> _FakeOrchestrator:
@@ -128,16 +159,16 @@ def test_run_renvoie_le_resultat_du_pipeline(monkeypatch: pytest.MonkeyPatch) ->
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    resp = _client().post(
-        "/api/v1/orchestrator/run",
-        json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
-    )
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        run_id = _demarrer(
+            client, {"project_id": "mon-projet", "ticket_id": "ticket-001"}
+        )
+        fin = _attendre(ws, "run_closed")
 
-    assert resp.status_code == 200
-    body = resp.json()
-    assert body["approved"] is True
-    assert body["branch"] == "ticket-001-slug"
-    assert body["commit_sha"] == "abc1234"
+    assert fin["run_id"] == run_id
+    assert fin["data"]["approved"] is True
+    assert fin["data"]["branch"] == "ticket-001-slug"
+    assert fin["data"]["commit_sha"] == "abc1234"
     assert fake.calls == [("mon-projet", "ticket-001")]
 
 
@@ -146,7 +177,11 @@ def test_run_renvoie_le_resultat_du_pipeline(monkeypatch: pytest.MonkeyPatch) ->
 # ------------------------------------------------------------------
 
 
-def test_run_autonome_transmet_max_tickets(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_run_autonome_transmet_max_tickets(
+    monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    # `/run-autonomous` a disparu : les trois modes passent par `/run`, sinon
+    # il y aurait deux facons de lancer un run (ADR-034).
     fake = _FakeOrchestrator()
 
     async def _build(project_id: str) -> _FakeOrchestrator:
@@ -154,29 +189,23 @@ def test_run_autonome_transmet_max_tickets(monkeypatch: pytest.MonkeyPatch) -> N
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    resp = _client().post(
-        "/api/v1/orchestrator/run-autonomous",
-        json={"project_id": "mon-projet", "max_tickets": 3},
-    )
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        _demarrer(
+            client,
+            {"project_id": "mon-projet", "mode": "autonomous", "max_tickets": 3},
+        )
+        _attendre(ws, "run_closed")
 
-    assert resp.status_code == 200
-    assert len(resp.json()) == 1
     assert fake.calls == [("mon-projet", "autonomous:3")]
 
 
 # ------------------------------------------------------------------
-# WS /orchestrator/stream/{project_id}
+# WS /orchestrator/observe — ticket-128
 # ------------------------------------------------------------------
 
 
-def test_stream_sans_ticket_ni_mode_renvoie_une_erreur_explicite() -> None:
-    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({})
-        assert "ticket_id" in ws.receive_json()["error"]
-
-
-def test_stream_diffuse_les_evenements_du_pipeline(
-    monkeypatch: pytest.MonkeyPatch,
+def test_le_canal_diffuse_les_evenements_du_pipeline(
+    monkeypatch: pytest.MonkeyPatch, client: TestClient
 ) -> None:
     fake = _FakeOrchestrator()
 
@@ -185,18 +214,19 @@ def test_stream_diffuse_les_evenements_du_pipeline(
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        assert ws.receive_json()["type"] == "snapshot"
+        _demarrer(client, {"project_id": "mon-projet", "ticket_id": "ticket-001"})
 
-        first = ws.receive_json()
-        second = ws.receive_json()
+        assert _attendre(ws, "branch_created")["project_id"] == "mon-projet"
+        fin = _attendre(ws, "pipeline_done")
 
-    assert first["type"] == "branch_created"
-    assert second["type"] == "pipeline_done"
-    assert second["data"]["approved"] is True
+    assert fin["data"]["approved"] is True
 
 
-def test_stream_en_mode_autonome(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_le_canal_couvre_le_mode_autonome(
+    monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
     fake = _FakeOrchestrator()
 
     async def _build(project_id: str) -> _FakeOrchestrator:
@@ -204,9 +234,12 @@ def test_stream_en_mode_autonome(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"mode": "autonomous", "max_tickets": 2})
-        assert ws.receive_json()["type"] == "pipeline_done"
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        _demarrer(
+            client,
+            {"project_id": "mon-projet", "mode": "autonomous", "max_tickets": 2},
+        )
+        _attendre(ws, "run_closed")
 
     assert fake.calls == [("mon-projet", "autonomous:2")]
 
@@ -241,8 +274,8 @@ class _OrchestrateurQuiDemande:
         return _approved(ticket_id)
 
 
-def test_le_stream_transmet_la_reponse_de_l_utilisateur_a_l_agent(
-    monkeypatch: pytest.MonkeyPatch,
+def test_le_canal_transmet_la_reponse_de_l_utilisateur_a_l_agent(
+    monkeypatch: pytest.MonkeyPatch, client: TestClient
 ) -> None:
     # Panne de conception : la socket ne lisait qu'un seul message entrant, la
     # commande de demarrage, puis n'emettait plus. Impossible de repondre a un
@@ -254,21 +287,24 @@ def test_le_stream_transmet_la_reponse_de_l_utilisateur_a_l_agent(
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        run_id = _demarrer(
+            client, {"project_id": "mon-projet", "ticket_id": "ticket-001"}
+        )
 
-        question = ws.receive_json()
-        assert question["type"] == "agent_question"
+        question = _attendre(ws, "agent_question")
         assert question["data"]["question"] == "On casse l'API ?"
 
-        ws.send_json({"type": "answer", "text": "non, on ajoute un champ"})
-        assert ws.receive_json()["type"] == "pipeline_done"
+        ws.send_json(
+            {"type": "answer", "run_id": run_id, "text": "non, on ajoute un champ"}
+        )
+        _attendre(ws, "pipeline_done")
 
     assert fake.reponse == "non, on ajoute un champ"
 
 
-def test_le_stream_transmet_un_message_spontane(
-    monkeypatch: pytest.MonkeyPatch,
+def test_le_canal_transmet_un_message_spontane(
+    monkeypatch: pytest.MonkeyPatch, client: TestClient
 ) -> None:
     # Un message spontane ne doit pas etre pris pour la reponse a la question
     # en cours : il attend le tour d'agent suivant.
@@ -279,16 +315,24 @@ def test_le_stream_transmet_un_message_spontane(
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    with _client().websocket_connect("/api/v1/orchestrator/stream/mon-projet") as ws:
-        ws.send_json({"ticket_id": "ticket-001"})
-        assert ws.receive_json()["type"] == "agent_question"
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        run_id = _demarrer(
+            client, {"project_id": "mon-projet", "ticket_id": "ticket-001"}
+        )
+        _attendre(ws, "agent_question")
 
-        ws.send_json({"type": "interject", "text": "pense aux tests"})
-        ws.send_json({"type": "answer", "text": "non"})
-        assert ws.receive_json()["type"] == "pipeline_done"
+        ws.send_json(
+            {"type": "interject", "run_id": run_id, "text": "pense aux tests"}
+        )
+        ws.send_json({"type": "answer", "run_id": run_id, "text": "non"})
+        _attendre(ws, "pipeline_done")
 
     assert fake.reponse == "non"
     assert fake.contexte_utilisateur == ["pense aux tests"]
+
+
+def _client_persistant() -> TestClient:
+    return TestClient(app)
 
 
 def test_un_run_interrompu_est_clos_en_base(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -306,14 +350,10 @@ def test_un_run_interrompu_est_clos_en_base(monkeypatch: pytest.MonkeyPatch) -> 
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    try:
-        with _client().websocket_connect(
-            "/api/v1/orchestrator/stream/mon-projet"
-        ) as ws:
-            ws.send_json({"ticket_id": "ticket-001"})
-            ws.receive_json()
-    except Exception:  # la socket se ferme apres l'erreur, c'est attendu
-        pass
+    with _client_persistant() as client:
+        with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+            _demarrer(client, {"project_id": "mon-projet", "ticket_id": "ticket-001"})
+            _attendre(ws, "run_closed")
 
     # Le serveur finit d'écrire après la fermeture de la socket : on laisse
     # à `finish_run` le temps d'atterrir plutôt que de courir contre lui.
@@ -418,12 +458,18 @@ def test_un_run_autonome_peut_partir_des_issues_github(
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
     monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
 
-    resp = _client().post(
-        "/api/v1/orchestrator/run-autonomous",
-        json={"project_id": "mon-projet", "depuis_github": True},
-    )
+    with _client_persistant() as client:
+        with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+            _demarrer(
+                client,
+                {
+                    "project_id": "mon-projet",
+                    "mode": "autonomous",
+                    "depuis_github": True,
+                },
+            )
+            _attendre(ws, "run_closed")
 
-    assert resp.status_code == 200
     assert tires == ["pull"]
     assert ("mon-projet", "autonomous:5") in fake.calls
 
@@ -447,11 +493,13 @@ def test_un_run_autonome_ne_touche_pas_a_github_sans_le_demander(
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
     monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
 
-    resp = _client().post(
-        "/api/v1/orchestrator/run-autonomous", json={"project_id": "mon-projet"}
-    )
+    with _client_persistant() as client:
+        with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+            _demarrer(
+                client, {"project_id": "mon-projet", "mode": "autonomous"}
+            )
+            _attendre(ws, "run_closed")
 
-    assert resp.status_code == 200
     assert tires == []
 
 
@@ -486,17 +534,18 @@ def test_run_interrompu_clot_le_run_et_ne_renvoie_pas_500(
 
     monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
 
-    resp = _client().post(
-        "/api/v1/orchestrator/run",
-        json={"project_id": "mon-projet", "ticket_id": "ticket-001"},
-    )
+    with _client_persistant() as client:
+        with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+            _demarrer(
+                client, {"project_id": "mon-projet", "ticket_id": "ticket-001"}
+            )
+            fin = _attendre(ws, "run_closed")
 
-    assert resp.status_code == 200
-    body = resp.json()
-    assert body["approved"] is False
-    # La cause doit être lisible dans la réponse : dans les logs du backend,
-    # l'utilisateur de l'IDE ne va pas la chercher.
-    assert "budget" in body["arret"]
+    assert fin["data"]["approved"] is False
+    # La cause doit rester lisible : dans les logs du backend, l'utilisateur
+    # de l'IDE ne va pas la chercher. Depuis ticket-128 le POST ne rend plus
+    # le resultat, c'est `run_closed` qui la porte (ADR-037).
+    assert "budget" in fin["data"]["arret"]
 
     runs = asyncio.run(_lister_runs())
     assert len(runs) == 1

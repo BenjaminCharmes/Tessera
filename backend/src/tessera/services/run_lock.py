@@ -38,7 +38,13 @@ class RunLock:
     """
 
     def __init__(self, registry: RunRegistry | None = None) -> None:
-        self._registry = registry if registry is not None else RUN_REGISTRY
+        # Un registre **propre** par défaut, et non `RUN_REGISTRY` : avant
+        # ticket-127, un `RunLock()` construit à la main avait son propre
+        # dictionnaire. Le faire retomber sur le registre partagé donnait à
+        # deux verrous censés être indépendants le même état — invisible en
+        # production, et en test un run laissé par le voisin fait échouer le
+        # suivant. Le partage se déclare, il ne s'hérite pas.
+        self._registry = registry if registry is not None else RunRegistry()
 
     def is_running(self, project_id: str) -> bool:
         return self._registry.projet_occupe(project_id)

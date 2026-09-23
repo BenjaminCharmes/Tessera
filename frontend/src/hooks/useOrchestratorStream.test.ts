@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { MockWebSocket } from "../test/mockWebSocket";
+import { api } from "../lib/api";
 import { useOrchestratorStream } from "./useOrchestratorStream";
 
 vi.stubGlobal("WebSocket", MockWebSocket);
@@ -240,39 +241,42 @@ describe("reconnexion", () => {
 });
 
 describe("useOrchestratorStream — mode autonome (ticket-089)", () => {
-  it("annonce le mode autonome à l'ouverture", () => {
+  // Depuis ticket-128 le mode ne part plus sur la socket — elle ne fait
+  // qu'observer — mais dans le POST qui démarre le run.
+  it("annonce le mode autonome dans la requête de lancement", () => {
+    const lancer = vi
+      .spyOn(api.orchestrator, "run")
+      .mockResolvedValue({ run_id: "run-1" });
     const { result } = renderHook(() => useOrchestratorStream("mon-projet"));
 
     act(() => {
       result.current.connectAutonome({ depuisGithub: true });
     });
-    act(() => {
-      MockWebSocket.instance!.triggerOpen();
-    });
 
-    const envoye = JSON.parse(MockWebSocket.instance!.sent[0] ?? "{}") as Record<
-      string,
-      unknown
-    >;
-    expect(envoye["mode"]).toBe("autonomous");
-    expect(envoye["depuis_github"]).toBe(true);
+    expect(lancer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        project_id: "mon-projet",
+        mode: "autonomous",
+        depuis_github: true,
+      }),
+    );
+    lancer.mockRestore();
   });
 
   it("ne tire pas les issues sans qu'on le demande", () => {
     // Un appel réseau vers le dépôt d'un client ne part pas de lui-même.
+    const lancer = vi
+      .spyOn(api.orchestrator, "run")
+      .mockResolvedValue({ run_id: "run-1" });
     const { result } = renderHook(() => useOrchestratorStream("mon-projet"));
 
     act(() => {
       result.current.connectAutonome({ depuisGithub: false });
     });
-    act(() => {
-      MockWebSocket.instance!.triggerOpen();
-    });
 
-    const envoye = JSON.parse(MockWebSocket.instance!.sent[0] ?? "{}") as Record<
-      string,
-      unknown
-    >;
-    expect(envoye["depuis_github"]).toBe(false);
+    expect(lancer).toHaveBeenCalledWith(
+      expect.objectContaining({ depuis_github: false }),
+    );
+    lancer.mockRestore();
   });
 });

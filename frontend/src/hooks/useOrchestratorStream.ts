@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
+import { api } from "../lib/api";
 import { wsUrl } from "../lib/ws";
 import type {
   AgentRole,
   OrchestratorEvent,
+  RunRequest,
   PipelineResult,
   QuotaState,
   TicketStatus,
@@ -186,6 +188,9 @@ export function useOrchestratorStream(
   // priorité et dépendances (ticket-089). `null` quand on ne l'utilise pas.
   const autonomeRef = useRef<{ depuisGithub: boolean } | null>(null);
   const isDoneRef = useRef(false);
+  // L'identifiant du run observé : toute réponse au dialogue le nomme, parce
+  // que le canal en porte plusieurs (ticket-128).
+  const runIdRef = useRef<string | null>(null);
 
   function closeWs() {
     if (wsRef.current) {
@@ -198,10 +203,54 @@ export function useOrchestratorStream(
     }
   }
 
-  function openSocket(ticketId: string) {
+  /**
+   * Ouvre le canal d'observation, sans rien lancer.
+   *
+   * La socket ne porte plus le run depuis ticket-128 : elle ne fait que
+   * regarder. C'est ce qui rend la reconnexion sûre — rouvrir renvoyait
+   * autrefois la commande de démarrage, donc lançait un **nouveau** run. Le
+   * 2026-09-17, trois runs sont partis sur un ticket qui échouait vite, sans
+   * que personne n'ait recliqué (ticket-068).
+   */
+  function ouvrirObservation() {
     if (!projectId) return;
     closeWs();
 
+    const ws = new WebSocket(wsUrl("/api/v1/orchestrator/observe"));
+    wsRef.current = ws;
+
+    ws.onmessage = (event: MessageEvent) => {
+      try {
+        const brut = JSON.parse(event.data as string) as OrchestratorEvent & {
+          runs?: unknown;
+        };
+        // L'instantané d'ouverture n'est pas un événement de run.
+        if (brut.type === ("snapshot" as never)) return;
+        // Le canal porte tous les projets : ne garder que le nôtre.
+        if (brut.project_id && brut.project_id !== projectId) return;
+        if (brut.run_id) runIdRef.current = brut.run_id;
+        if (brut.type === "run_closed") isDoneRef.current = true;
+        setState((s) => applyEvent(s, brut));
+      } catch {
+        // ignore malformed frames
+      }
+    };
+
+    ws.onclose = () => {
+      if (isDoneRef.current) return;
+      // Se rattacher ne relance rien : on peut le dire sans alarmer.
+      setState((s) => ({
+        ...s,
+        status: "error",
+        errorMessage:
+          "Connexion au canal d'observation perdue. Le run continue côté " +
+          "serveur : rouvre la vue pour le retrouver.",
+      }));
+    };
+  }
+
+  function demarrer(corps: RunRequest, ticketId: string) {
+    if (!projectId) return;
     setState((s) => ({
       ...s,
       status: "connecting",
@@ -211,56 +260,27 @@ export function useOrchestratorStream(
       currentRound: 0,
       errorMessage: null,
     }));
-
-    const ws = new WebSocket(wsUrl(`/api/v1/orchestrator/stream/${projectId}`));
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      ws.send(
-        autonomeRef.current
-          ? JSON.stringify({
-              mode: "autonomous",
-              depuis_github: autonomeRef.current.depuisGithub,
-            })
-          : queueRef.current
-            ? JSON.stringify({ ticket_ids: queueRef.current })
-            : JSON.stringify({ ticket_id: ticketId }),
-      );
-    };
-
-    ws.onmessage = (event: MessageEvent) => {
-      try {
-        const ev = JSON.parse(event.data as string) as OrchestratorEvent;
-        if (ev.type === "pipeline_done") isDoneRef.current = true;
-        setState((s) => applyEvent(s, ev));
-      } catch {
-        // ignore malformed frames
-      }
-    };
-
-    ws.onclose = () => {
-      if (isDoneRef.current) return;
-
-      // On ne se reconnecte pas. Rouvrir la socket renvoyait la commande de
-      // démarrage, donc lançait un **nouveau** run : le 2026-09-17, trois runs
-      // sont partis sur un ticket qui échouait vite, sans que personne n'ait
-      // recliqué. Tant qu'il n'existe pas de protocole pour se rattacher à un
-      // run en cours, perdre l'affichage coûte moins cher que relancer le
-      // travail (ticket-068).
-      setState((s) => ({
-        ...s,
-        status: "error",
-        errorMessage:
-          "Connexion au pipeline perdue. Le run continue peut-être côté serveur : " +
-          "vérifie l'historique avant de relancer le ticket.",
-      }));
-    };
+    ouvrirObservation();
+    void api.orchestrator
+      .run(corps)
+      .then(({ run_id }) => {
+        runIdRef.current = run_id;
+      })
+      .catch((erreur: unknown) => {
+        isDoneRef.current = true;
+        setState((s) => ({
+          ...s,
+          status: "error",
+          errorMessage:
+            erreur instanceof Error ? erreur.message : "Lancement refusé",
+        }));
+      });
   }
 
   function send(payload: Record<string, string>) {
     const ws = wsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(payload));
+    if (ws && ws.readyState === WebSocket.OPEN && runIdRef.current) {
+      ws.send(JSON.stringify({ ...payload, run_id: runIdRef.current }));
     }
   }
 
@@ -286,7 +306,14 @@ export function useOrchestratorStream(
     autonomeRef.current = options;
     isDoneRef.current = false;
     setState({ ...INITIAL, status: "connecting" });
-    openSocket("");
+    demarrer(
+      {
+        project_id: projectId ?? "",
+        mode: "autonomous",
+        depuis_github: options.depuisGithub,
+      },
+      "",
+    );
   }
 
   function connectQueue(ticketIds: string[]) {
@@ -296,7 +323,10 @@ export function useOrchestratorStream(
     autonomeRef.current = null;
     isDoneRef.current = false;
     setState({ ...INITIAL, ticketId: ticketIds[0] ?? null });
-    openSocket(ticketIds[0] ?? "");
+    demarrer(
+      { project_id: projectId ?? "", mode: "queue", ticket_ids: ticketIds },
+      ticketIds[0] ?? "",
+    );
   }
 
   function connect(ticketId: string) {
@@ -305,7 +335,10 @@ export function useOrchestratorStream(
     autonomeRef.current = null;
     isDoneRef.current = false;
     setState({ ...INITIAL, ticketId });
-    openSocket(ticketId);
+    demarrer(
+      { project_id: projectId ?? "", mode: "single", ticket_id: ticketId },
+      ticketId,
+    );
   }
 
   function disconnect() {

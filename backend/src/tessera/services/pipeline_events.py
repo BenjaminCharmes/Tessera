@@ -35,6 +35,12 @@ class EventType(str, Enum):
     QUEUE_PROGRESS = "queue_progress"
     #: Ce que la livraison a fait du commit du run (ticket-083).
     LIVRAISON_DONE = "livraison_done"
+    #: Le run est fini **et** le projet est libre (ticket-128). Distinct de
+    #: `pipeline_done`, que l'orchestrateur publie avant de rendre la main :
+    #: entre les deux, le projet est encore marqué occupé. Depuis que le POST
+    #: ne porte plus le résultat, c'est aussi ici que `arret` devient lisible
+    #: (ADR-037).
+    RUN_CLOSED = "run_closed"
 
 
 class OrchestratorEvent(BaseModel):
@@ -43,6 +49,13 @@ class OrchestratorEvent(BaseModel):
     ticket_id: str
     data: dict[str, Any] = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    #: De quel run vient l'événement, et sur quel projet (ticket-128). Le
+    #: canal d'observation porte tous les runs à la fois : sans ces deux
+    #: champs, un client ne saurait pas à quelle carte rattacher ce qu'il
+    #: reçoit. Optionnels, parce que l'orchestrateur les ignore — c'est le
+    #: routeur qui les renseigne au moment de publier.
+    run_id: Optional[str] = None
+    project_id: Optional[str] = None
 
 
 class PipelineResult(BaseModel):

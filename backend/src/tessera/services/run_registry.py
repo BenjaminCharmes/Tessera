@@ -113,8 +113,7 @@ class RunRegistry:
                 setattr(run, nom, valeur)
         return run
 
-    @asynccontextmanager
-    async def acquire(
+    def ouvrir(
         self,
         project_id: str,
         ticket_id: str | None = None,
@@ -122,8 +121,14 @@ class RunRegistry:
         mode: str = "single",
         run_id: Optional[str] = None,
         dialogue: Any = None,
-    ) -> AsyncIterator[RunActif]:
-        """Open a run on `project_id`, refusing a second one on that project."""
+    ) -> RunActif:
+        """Reserve `project_id`, refusing a second run on it.
+
+        Séparé d'`acquire` parce que le lancement par POST (ticket-128) doit
+        réserver **avant** de rendre la main : la tâche qui exécute le run
+        démarre après la réponse, et deux POST rapprochés passeraient tous
+        les deux si la réservation avait lieu dans la tâche.
+        """
         if self.projet_occupe(project_id):
             raise RunAlreadyInProgress(project_id, self.ticket_du_projet(project_id))
 
@@ -135,13 +140,32 @@ class RunRegistry:
             dialogue=dialogue,
         )
         self._runs[run.run_id] = run
+        return run
+
+    def fermer(self, run_id: str) -> None:
+        self._runs.pop(run_id, None)
+
+    @asynccontextmanager
+    async def acquire(
+        self,
+        project_id: str,
+        ticket_id: str | None = None,
+        *,
+        mode: str = "single",
+        run_id: Optional[str] = None,
+        dialogue: Any = None,
+    ) -> AsyncIterator[RunActif]:
+        """Open a run on `project_id`, refusing a second one on that project."""
+        run = self.ouvrir(
+            project_id, ticket_id, mode=mode, run_id=run_id, dialogue=dialogue
+        )
         try:
             yield run
         finally:
             # `finally` et non le chemin nominal : un pipeline qui échoue doit
             # laisser le projet utilisable, pas verrouillé jusqu'au
             # redémarrage du backend.
-            self._runs.pop(run.run_id, None)
+            self.fermer(run.run_id)
 
 
 #: Le registre que les routeurs partagent, et sur lequel `RUN_LOCK` s'appuie.

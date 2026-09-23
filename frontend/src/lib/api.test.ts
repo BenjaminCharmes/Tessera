@@ -102,21 +102,21 @@ describe("api.projects.create", () => {
 });
 
 describe("api.orchestrator.run", () => {
-  it("sends POST with project_id and ticket_id", async () => {
+  it("rend le run_id sans attendre la fin du run", async () => {
+    // Depuis ticket-128 le POST demarre le run et rend son identifiant : le
+    // resultat arrive sur le canal d'observation, pas dans cette reponse.
     mockFetch.mockResolvedValue({
       ok: true,
-      json: () =>
-        Promise.resolve({
-          ticket_id: "ticket-001",
-          final_status: "done",
-          rounds: 1,
-          approved: true,
-        }),
+      json: () => Promise.resolve({ run_id: "run-42" }),
     });
 
-    const result = await api.orchestrator.run("ide-core", "ticket-001");
+    const result = await api.orchestrator.run({
+      project_id: "ide-core",
+      ticket_id: "ticket-001",
+      mode: "single",
+    });
 
-    expect(result.approved).toBe(true);
+    expect(result.run_id).toBe("run-42");
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/v1/orchestrator/run",
       expect.objectContaining({
@@ -124,6 +124,7 @@ describe("api.orchestrator.run", () => {
         body: JSON.stringify({
           project_id: "ide-core",
           ticket_id: "ticket-001",
+          mode: "single",
         }),
       }),
     );

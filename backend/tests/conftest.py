@@ -69,3 +69,21 @@ def _prompts_du_depot_intacts() -> Iterator[None]:
             f"ajoutés {ajoutes}, retirés {retires}, modifiés {modifies}. "
             "Rediriger `settings.ide_prompts_dir` vers `tmp_path`."
         )
+
+
+@pytest.fixture(autouse=True)
+def _singletons_propres() -> Iterator[None]:
+    """Reset the process-wide registry and hub between tests — ticket-128.
+
+    `RUN_REGISTRY` et `EVENT_HUB` vivent le temps du process, comme le verrou
+    dont ils reprennent le rôle (ADR-038). En test, ce process porte toute la
+    suite : un run qu'un test laisse ouvert occupe le projet du suivant, et
+    un abonnement jamais fermé reçoit les événements des tests d'après. Les
+    deux symptômes se lisent comme un échec du code testé.
+    """
+    from tessera.services.event_hub import EVENT_HUB
+    from tessera.services.run_registry import RUN_REGISTRY
+
+    yield
+    RUN_REGISTRY._runs.clear()
+    EVENT_HUB._abonnes.clear()

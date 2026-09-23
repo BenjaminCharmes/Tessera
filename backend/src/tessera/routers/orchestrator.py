@@ -1,7 +1,8 @@
+import asyncio
 from collections.abc import Awaitable, Callable
 
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
@@ -10,8 +11,7 @@ from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.sync_map import SyncMapService
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.documentation import DocumentationService
-from tessera.routers.pipeline_stream import libelle_du_run, stream_verrouille
-from tessera.services.database import create_run, finish_run, save_event
+from tessera.services.event_hub import EVENT_HUB
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
@@ -20,7 +20,9 @@ from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers import get_provider
 from tessera.services.providers.base import LLMProvider
 from tessera.services.resolveur_conflit import ResolveurConflitService
-from tessera.services.run_lock import RUN_LOCK, RunAlreadyInProgress
+from tessera.services.run_executor import executer
+from tessera.services.run_lock import RUN_LOCK
+from tessera.services.run_registry import RUN_REGISTRY, RunAlreadyInProgress
 from tessera.services.run_recorder import RunRecorder
 from tessera.services.security_auditor import SecurityAuditorService
 from tessera.services.test_runner import TestRunnerService
@@ -57,7 +59,19 @@ _OPEN_STATUSES = {
 
 class RunRequest(BaseModel):
     project_id: str
-    ticket_id: str
+    #: Optionnel depuis ticket-128 : une file porte `ticket_ids`, un run
+    #: autonome ne porte ni l'un ni l'autre.
+    ticket_id: str | None = None
+    ticket_ids: list[str] = Field(default_factory=list)
+    mode: str = "single"
+    max_tickets: int = 5
+    depuis_github: bool = False
+
+
+class RunStarted(BaseModel):
+    """What POST /run answers: the run started, here is how to watch it."""
+
+    run_id: str
 
 
 class RunAutonomousRequest(BaseModel):
@@ -288,48 +302,68 @@ def _livreur(
     return livrer
 
 
-@router.post("/run", response_model=PipelineResult)
-async def run_pipeline(request: RunRequest) -> PipelineResult:
-    # Le verrou est pris AVANT de construire l'orchestrateur : un refus doit
-    # être immédiat et bon marché. Deux runs sur le même projet passaient
-    # tous deux `ensure_clean_tree`, puis le second `create_branch` faisait un
-    # checkout sous le premier codeur (ticket-121).
+#: Les tâches de run en vol. Sans référence forte, asyncio peut collecter
+#: une tâche en cours de route : le run s'arrêterait au milieu, sans commit,
+#: ce qu'ADR-018 interdit.
+_TACHES: set[asyncio.Task[None]] = set()
+
+
+def _libelle(request: RunRequest) -> str:
+    """What the registry shows as running: the ticket, the queue, or the mode."""
+    if request.ticket_id:
+        return request.ticket_id
+    if request.ticket_ids:
+        return ", ".join(request.ticket_ids)
+    return request.mode
+
+
+@router.post("/run", status_code=202, response_model=RunStarted)
+async def run_pipeline(request: RunRequest) -> RunStarted:
+    """Start a run, and answer with its id without waiting for it to end.
+
+    Le run était porté par sa WebSocket avant ticket-128 : il n'était donc
+    observable que depuis l'onglet qui l'avait ouverte. Il est maintenant une
+    tâche que personne ne possède, et que `/orchestrator/observe` regarde.
+
+    La réservation se fait **ici** et non dans la tâche : deux POST
+    rapprochés passeraient tous les deux si le projet n'était marqué occupé
+    qu'une fois la réponse partie (ADR-038).
+    """
+    if request.mode == "single" and not request.ticket_id:
+        raise HTTPException(status_code=422, detail="ticket_id requis en mode single")
+
     try:
-        async with _RUN_LOCK.acquire(request.project_id, request.ticket_id):
-            return await _run_un_ticket(request)
+        run = RUN_REGISTRY.ouvrir(
+            request.project_id, _libelle(request), mode=request.mode
+        )
     except RunAlreadyInProgress as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 
-
-async def _run_un_ticket(request: RunRequest) -> PipelineResult:
-    orchestrator = await _build_orchestrator(request.project_id)
-    run_id = await create_run(settings.ide_db_path, request.project_id, request.ticket_id)
-
-    async def on_event(event: OrchestratorEvent) -> None:
-        await save_event(
-            settings.ide_db_path,
-            run_id,
-            event.type.value,
-            event.agent.value if event.agent else None,
-            event.data,
-            event.timestamp.isoformat(),
-        )
-
     try:
-        result = await orchestrator.run_pipeline(
-            request.project_id, request.ticket_id, on_event, run_id=run_id
-        )
-    except ValueError as exc:
+        orchestrator = await _build_orchestrator(request.project_id)
+        if request.mode == "autonomous" and request.depuis_github:
+            await _tirer_les_issues(request.project_id)
+    except Exception as exc:
+        # Rien n'a démarré : libérer le projet, sinon il resterait occupé par
+        # un run qui n'existe pas.
+        RUN_REGISTRY.fermer(run.run_id)
+        if isinstance(exc, HTTPException):
+            raise
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    await finish_run(
-        settings.ide_db_path,
-        run_id,
-        result.rounds,
-        result.approved,
-        result.final_status.value,
+    tache = asyncio.create_task(
+        executer(
+            run,
+            orchestrator,
+            EVENT_HUB,
+            RUN_REGISTRY,
+            ticket_ids=request.ticket_ids,
+            max_tickets=request.max_tickets,
+        )
     )
-    return result
+    _TACHES.add(tache)
+    tache.add_done_callback(_TACHES.discard)
+    return RunStarted(run_id=run.run_id)
 
 
 async def _tirer_les_issues(project_id: str) -> int:
@@ -359,50 +393,3 @@ async def _tirer_les_issues(project_id: str) -> int:
         _logger.warning("pull_des_issues_echoue", extra={"erreur": str(exc)})
         return 0
     return int(resultat.pulled)
-
-
-@router.post("/run-autonomous", response_model=list[PipelineResult])
-async def run_autonomous(request: RunAutonomousRequest) -> list[PipelineResult]:
-    try:
-        async with _RUN_LOCK.acquire(request.project_id, "run autonome"):
-            if request.depuis_github:
-                await _tirer_les_issues(request.project_id)
-            orchestrator = await _build_orchestrator(request.project_id)
-            return await orchestrator.run_autonomous(
-                request.project_id, request.max_tickets
-            )
-    except RunAlreadyInProgress as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
-
-
-@router.websocket("/stream/{project_id}")
-async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
-    await websocket.accept()
-    try:
-        raw = await websocket.receive_json()
-        async with _RUN_LOCK.acquire(project_id, libelle_du_run(raw)):
-            await stream_verrouille(
-                websocket,
-                project_id,
-                raw,
-                construire=_build_orchestrator,
-                tirer_les_issues=_tirer_les_issues,
-            )
-    except WebSocketDisconnect:
-        pass
-    except (HTTPException, RunAlreadyInProgress) as exc:
-        try:
-            detail = exc.detail if isinstance(exc, HTTPException) else str(exc)
-            await websocket.send_json({"error": detail})
-        except Exception:
-            pass
-    except Exception as exc:
-        try:
-            await websocket.send_json({"error": str(exc)})
-        except Exception:
-            pass
-    finally:
-        try:
-            await websocket.close()
-        except Exception:
-            pass

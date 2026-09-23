@@ -2,7 +2,7 @@
 id: ticket-127
 title: "Registre des runs actifs et hub de diffusion des événements"
 type: feat
-status: in-progress
+status: in-review
 pr_number: null
 priority: high
 agent: codeur

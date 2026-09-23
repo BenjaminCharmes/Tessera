@@ -1,0 +1,226 @@
+"""Running a pipeline as a task nobody owns — ticket-128.
+
+Le run était porté par la WebSocket qui l'avait lancé : son émetteur écrivait
+sur cette socket, son `DialogueChannel` n'écoutait que ses messages, et
+fermer l'onglet coupait le seul chemin de réponse. Ici le run est une tâche
+`asyncio` ordinaire : il publie sur `EventHub`, son canal de dialogue vit
+dans `RunRegistry`, et les observateurs vont et viennent sans qu'il s'en
+aperçoive.
+
+`finish_run` est appelé dans un `finally`, avant toute autre écriture : placé
+après, il disparaissait dès que le transport mourait, et l'historique restait
+bloqué sur « en cours » (ticket-079, ticket-121).
+"""
+from typing import Any, Optional, Protocol
+
+from tessera.config import settings
+from tessera.services.database import create_run, finish_run, save_event
+from tessera.services.dialogue import DialogueChannel
+from tessera.services.event_hub import EventHub
+from tessera.services.pipeline_events import (
+    EventCallback,
+    EventType,
+    OrchestratorEvent,
+    PipelineResult,
+)
+from tessera.services.run_registry import RunActif, RunRegistry
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
+
+
+class Orchestrateur(Protocol):
+    """Ce que l'exécuteur attend, sans importer le moteur lui-même."""
+
+    async def run_pipeline(
+        self,
+        project_id: str,
+        ticket_id: str,
+        on_event: Any,
+        run_id: str | None = ...,
+        dialogue: Any = ...,
+    ) -> PipelineResult: ...
+
+
+def emetteur(
+    hub: EventHub, run: RunActif, run_id_en_base: Optional[str]
+) -> EventCallback:
+    """Publish on the hub, then persist — in that order.
+
+    La persistance vient **après** la publication pour la même raison qu'avant
+    ticket-128 : un défaut d'écriture ne doit pas priver les observateurs de
+    l'événement. L'inverse ferait dépendre l'affichage de SQLite.
+    """
+
+    async def envoyer(event: OrchestratorEvent) -> None:
+        event.run_id = run.run_id
+        event.project_id = run.project_id
+        _suivre(run, event)
+        await hub.publish(event)
+        if run_id_en_base is None:
+            return
+        try:
+            await save_event(
+                settings.ide_db_path,
+                run_id_en_base,
+                event.type.value,
+                event.agent.value if event.agent else None,
+                event.data,
+                event.timestamp.isoformat(),
+            )
+        except Exception as exc:  # noqa: BLE001
+            # Un événement non persisté dégrade l'historique ; le faire
+            # remonter interromprait le run avant son commit (ADR-037).
+            _logger.warning("event_non_persiste", extra={"erreur": str(exc)})
+
+    return envoyer
+
+
+def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
+    """Keep the registry entry in step with what the run announces."""
+    if event.type is EventType.AGENT_STARTED:
+        run.etape = str(event.data.get("stage") or event.type.value)
+        run.agent = event.agent.value if event.agent else None
+    elif event.type is EventType.TICKET_STATUS_CHANGED:
+        run.ticket_id = event.ticket_id or run.ticket_id
+    elif event.type in (EventType.VALIDATION_DONE, EventType.SECURITY_AUDIT_DONE):
+        verdict = event.data.get("verdict")
+        if verdict:
+            run.verdict = str(verdict)
+    tour = event.data.get("round")
+    if isinstance(tour, int):
+        run.tour = tour
+
+
+def dialogue_du_run(envoyer: EventCallback, run: RunActif) -> DialogueChannel:
+    """The run's dialogue channel, which the registry then holds."""
+
+    async def annoncer(question: str) -> None:
+        await envoyer(
+            OrchestratorEvent(
+                type=EventType.AGENT_QUESTION,
+                ticket_id=run.ticket_id or "",
+                data={"question": question},
+            )
+        )
+
+    # `interactive` reste vrai même sans observateur connecté : ADR-025 fait
+    # reprendre l'agent sur une hypothèse énoncée passé le délai, et c'est ce
+    # comportement-là qu'on veut, pas une réponse immédiate.
+    return DialogueChannel(
+        timeout_s=settings.dialogue_timeout_s,
+        interactive=run.mode != "autonomous",
+        on_question=annoncer,
+    )
+
+
+async def executer(
+    run: RunActif,
+    orchestrator: Any,
+    hub: EventHub,
+    registry: RunRegistry,
+    *,
+    ticket_ids: Optional[list[str]] = None,
+    max_tickets: int = 5,
+) -> None:
+    """Run the pipeline to its end, then free the project.
+
+    Ne lève jamais : la tâche n'a pas d'appelant pour rattraper son
+    exception, et un run qui meurt sans fermer son entrée laisserait le
+    projet verrouillé jusqu'au redémarrage du backend.
+    """
+    run_id_en_base: str | None = None
+    try:
+        run_id_en_base = await create_run(
+            settings.ide_db_path, run.project_id, run.ticket_id or run.mode
+        )
+    except Exception as exc:  # noqa: BLE001
+        _logger.warning("run_non_persiste", extra={"erreur": str(exc)})
+
+    envoyer = emetteur(hub, run, run_id_en_base)
+    run.dialogue = dialogue_du_run(envoyer, run)
+
+    resultats: list[PipelineResult] = []
+    echec: str | None = None
+    try:
+        if run.mode == "autonomous":
+            resultats = await orchestrator.run_autonomous(
+                run.project_id, max_tickets, envoyer
+            )
+        elif run.mode == "queue":
+            resultats = await orchestrator.run_queue(
+                run.project_id, ticket_ids or [], envoyer, run.dialogue
+            )
+        else:
+            resultats = [
+                await orchestrator.run_pipeline(
+                    run.project_id,
+                    run.ticket_id or "",
+                    envoyer,
+                    run_id=run_id_en_base,
+                    dialogue=run.dialogue,
+                )
+            ]
+    except Exception as exc:  # noqa: BLE001 — voir la docstring
+        echec = str(exc)
+        _logger.warning("run_interrompu", extra={"erreur": echec})
+    finally:
+        # Libérer le projet **avant** d'écrire en base : le pipeline a rendu
+        # la main, et quelqu'un qui relance au signal de fin ne doit pas
+        # prendre un 409 le temps d'un aller-retour SQLite. La fenêtre ne
+        # disparaît pas tout à fait — `pipeline_done` est publié par
+        # l'orchestrateur, donc avant ce `finally` — mais elle tombe de
+        # plusieurs millisecondes à presque rien.
+        registry.fermer(run.run_id)
+        await _clore(run, run_id_en_base, resultats, echec, envoyer)
+
+
+async def _clore(
+    run: RunActif,
+    run_id_en_base: str | None,
+    resultats: list[PipelineResult],
+    echec: str | None,
+    envoyer: EventCallback,
+) -> None:
+    dernier = resultats[-1] if resultats else None
+    if run_id_en_base is not None:
+        try:
+            await finish_run(
+                settings.ide_db_path,
+                run_id_en_base,
+                dernier.rounds if dernier else 0,
+                dernier.approved if dernier else False,
+                dernier.final_status.value if dernier else "interrupted",
+            )
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("run_non_clos", extra={"erreur": str(exc)})
+
+    if echec is not None:
+        await envoyer(
+            OrchestratorEvent(
+                type=EventType.ERROR,
+                ticket_id=run.ticket_id or "",
+                data={"error": echec},
+            )
+        )
+
+    # Toujours, et en dernier : c'est le seul événement dont un client peut
+    # déduire que le projet est de nouveau libre, et le seul qui porte encore
+    # `arret` depuis que le POST ne rend plus le résultat (ADR-037).
+    await envoyer(
+        OrchestratorEvent(
+            type=EventType.RUN_CLOSED,
+            ticket_id=dernier.ticket_id if dernier else (run.ticket_id or ""),
+            data={
+                "approved": dernier.approved if dernier else False,
+                "rounds": dernier.rounds if dernier else 0,
+                "final_status": (
+                    dernier.final_status.value if dernier else "interrupted"
+                ),
+                "branch": dernier.branch if dernier else None,
+                "commit_sha": dernier.commit_sha if dernier else None,
+                "arret": (dernier.arret if dernier else None) or echec,
+                "resultats": len(resultats),
+            },
+        )
+    )
