@@ -2,7 +2,7 @@
 id: ticket-159
 title: "La livraison échoue sur un arbre que le pipeline vient lui-même de salir"
 type: fix
-status: todo
+status: in-review
 pr_number: null
 priority: high
 agent: codeur
