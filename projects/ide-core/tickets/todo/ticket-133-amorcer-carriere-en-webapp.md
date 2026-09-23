@@ -42,11 +42,21 @@ Trancher, dans l'ordre :
    `carriere-app` (le code), ou un seul avec deux jeux d'agents.
 2. Ce que l'application affiche : les analyses existantes rendues lisibles, ou
    des données saisies dans l'app — ce n'est pas la même chose à construire.
-3. Où elle tourne : purement locale, ou hébergée pour être accessible depuis
-   un autre poste — et dans le second cas, ce qui y monte.
+3. ~~Où elle tourne~~ — **tranché : local uniquement.** L'application tourne
+   sur la machine ; le dépôt GitHub privé sert de synchronisation entre les
+   deux postes, pas d'hébergement. Rien de ce que contient ce projet ne monte
+   chez un tiers pour être servi.
 4. Ce qui part sur GitHub privé et ce qui reste local, sachant qu'ADR-021 et
    ADR-023 ont un défaut fermé et qu'il existe une clause d'exclusivité
    documentée dans le projet.
+
+## Un onglet identifié
+
+**Générer un CV depuis des données structurées.** Étudié comme projet
+autonome, puis rattaché ici : le parcours, les compétences et les missions
+vivent déjà dans ce projet, et deux endroits qui décrivent la même carrière
+finiraient par diverger. Entrée déterministe, sortie déterministe — c'est
+aussi l'onglet le plus facile à tester.
 
 ## Critères d'acceptation
 

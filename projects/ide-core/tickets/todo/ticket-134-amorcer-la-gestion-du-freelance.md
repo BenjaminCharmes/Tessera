@@ -42,16 +42,18 @@ ticket :
 1. **Gestion** — quelles entités (mission, client, facture, échéance), quelle
    persistance, quelles vues. Accessible depuis plusieurs postes, donc même
    question d'hébergement que ticket-133.
-2. **Prospection** — poser ce qu'un agent aurait le droit de faire : préparer
-   une liste, rédiger un message, ou l'envoyer. Ces trois niveaux n'ont rien à
-   voir. Par défaut, l'agent prépare et l'humain envoie.
+2. **Prospection** — **tranché : l'agent prépare, et rien de plus.** Il
+   constitue des listes et documente les cibles ; la rédaction et l'envoi
+   restent à la main. C'est la forme d'ADR-022 appliquée ici : le point où un
+   humain tranche est ce qui rend acceptable tout le reste de
+   l'automatisation.
 
 ## Critères d'acceptation
 
 - [ ] Les entités du volet gestion sont listées, avec leurs relations
 - [ ] La décision dit où vivent les données et ce qui part sur GitHub privé
-- [ ] La décision arrête explicitement le niveau d'autonomie sur la
-      prospection : préparer, rédiger, ou envoyer
+- [ ] La décision rappelle que l'agent prépare seulement, et que ni la
+      rédaction ni l'envoi ne lui reviennent
 - [ ] Le lien avec la clause d'exclusivité documentée dans `carriere` est
       tranché : ce projet suppose-t-il l'autorisation obtenue ?
 - [ ] Les tickets d'implémentation sont créés dans le projet concerné

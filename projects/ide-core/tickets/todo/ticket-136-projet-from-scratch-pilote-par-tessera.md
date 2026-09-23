@@ -52,6 +52,33 @@ validateur sont désactivés parce que `test_command` n'atteint pas
 n'empêche de les activer — et le pipeline complet est justement ce qu'on veut
 éprouver.
 
+## Le projet retenu pour le premier exercice
+
+**Un jeu de logique** — Wordle ou démineur. C'est celui qui tient le mieux les
+quatre critères, et surtout le seul dont rien d'utile ne dépend : aucune
+tentation de reprendre la main quand l'IDE se trompe, ce qui est précisément
+ce qu'on veut observer. Sa logique est intégralement déterministe, donc le
+testeur et le validateur ont vraiment quelque chose à juger.
+
+Sa limite, assumée : purement frontend, il n'exerce ni le backend ni la base.
+
+Trois autres projets sont retenus pour la suite, cadrés séparément, chacun
+pour ce qu'il exerce de différent :
+
+| | Ce qu'il met à l'épreuve |
+|---|---|
+| **ticket-140** — santé des dépôts | les appels d'API externes et leur mocking |
+| **ticket-141** — moniteur du lab | une infra réelle, et des sondes simulées en attendant |
+| **ticket-142** — habitudes et objectifs | la stack exacte de Tessera, en terrain connu |
+
+Ils se lancent **au fur et à mesure**, jamais ensemble : l'intérêt de
+l'exercice est de comparer, et des runs simultanés ne se comparent pas.
+
+**Écartés** : un générateur de CV depuis un JSON — c'est un onglet du cockpit
+Carrière (ticket-133), pas un projet, et deux endroits décrivant la même
+carrière divergeraient ; un pastebin — un exercice-type sans usage réel, qui
+n'apprendrait rien sur l'orchestration.
+
 ## Critères d'acceptation
 
 - [ ] Le projet est choisi et tient en un paragraphe
