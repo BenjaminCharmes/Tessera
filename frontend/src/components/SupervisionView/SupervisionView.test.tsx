@@ -139,4 +139,41 @@ describe("SupervisionView", () => {
     );
     expect(screen.getByText("bloqué")).toBeInTheDocument();
   });
+
+  it("distingue une session de chat d'un run de pipeline", () => {
+    // Un tour de chat ecrit et commite comme un run (ADR-019), mais il n'a ni
+    // ticket, ni tours de revue, ni verdict : afficher les etiquettes d'un
+    // pipeline donnerait a lire des cases vides comme une information.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run(),
+              run({
+                run_id: "run-chat",
+                project_id: "portfolio",
+                mode: "chat",
+                ticket_id: "chat",
+              }),
+            ],
+          },
+          { "run-chat": { currentRound: 3 } },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    expect(screen.getByText("chat")).toBeInTheDocument();
+    expect(screen.getByText("conversation")).toBeInTheDocument();
+    expect(screen.queryByText("tour 3")).not.toBeInTheDocument();
+  });
+
+  it("compte le chat parmi ce qui tourne", () => {
+    // Le badge doit dire ce que l'IDE fait, pas seulement ses pipelines.
+    const sup = supervision({
+      runs: [run(), run({ run_id: "run-chat", mode: "chat" })],
+    });
+    expect(sup.runs).toHaveLength(2);
+  });
 });

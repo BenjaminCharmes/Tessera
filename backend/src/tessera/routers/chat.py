@@ -12,7 +12,11 @@ from tessera.config import settings
 from tessera.services.adr import adr_pertinents
 from tessera.services.chat_service import ChatBudgetExceeded, ChatService
 from tessera.services.chat_suggestion import summarize_conversation
-from tessera.services.run_lock import RUN_LOCK, RunAlreadyInProgress
+from tessera.services.event_hub import EVENT_HUB
+from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.run_executor import emetteur
+from tessera.services.run_lock import RUN_LOCK
+from tessera.services.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
 from tessera.services.database import (
     ChatMessageRow,
     conversation_cost_usd,
@@ -130,14 +134,29 @@ async def chat_stream(websocket: WebSocket, project_id: str) -> None:
             # crée une branche dès que l'arbre n'est pas propre (ADR-019), et
             # ce checkout déplacerait l'arbre sous le codeur d'un run en cours.
             # ADR-038 annonçait déjà couvrir le chat ; seul `/chat/run` l'était.
+            tour: RunActif | None = None
             try:
-                async with _RUN_LOCK.acquire(project_id, _LIBELLE_DU_CHAT):
+                # `RUN_REGISTRY` directement plutôt que `_RUN_LOCK` : c'est le
+                # même registre, mais il accepte un `mode`. Sans lui, le tour
+                # s'affiche dans la supervision comme un run de ticket
+                # « chat », avec un chrono, des tours et un verdict — pour
+                # quelque chose qui n'en a aucun (ticket-130).
+                async with RUN_REGISTRY.acquire(
+                    project_id, _LIBELLE_DU_CHAT, mode="chat"
+                ) as run:
+                    tour = run
                     await _handle_turn(
-                        websocket, project_id, conversation_id, message
+                        websocket, project_id, conversation_id, message, run
                     )
             except RunAlreadyInProgress as exc:
                 await websocket.send_json({"type": "error", "detail": str(exc)})
                 continue
+            finally:
+                # Après la sortie du registre, jamais avant : `run_closed` dit
+                # la fin **et** la libération du projet (ADR-041). Le publier
+                # à l'intérieur ferait croire le projet encore occupé.
+                if tour is not None:
+                    await _clore_le_tour(tour, conversation_id)
     except WebSocketDisconnect:
         return
     except Exception as exc:  # noqa: BLE001 — la socket ne doit jamais tuer le serveur
@@ -165,16 +184,46 @@ def _un_run_occupe(project_id: str) -> bool:
     return _RUN_LOCK.ticket_en_cours(project_id) != _LIBELLE_DU_CHAT
 
 
+async def _clore_le_tour(run: RunActif, conversation_id: str) -> None:
+    await emetteur(EVENT_HUB, run, None)(
+        OrchestratorEvent(
+            type=EventType.RUN_CLOSED,
+            ticket_id=conversation_id,
+            data={"mode": "chat"},
+        )
+    )
+
+
 async def _handle_turn(
-    websocket: WebSocket, project_id: str, conversation_id: str, message: str
+    websocket: WebSocket,
+    project_id: str,
+    conversation_id: str,
+    message: str,
+    run: RunActif,
 ) -> None:
     db_path = settings.ide_db_path
+    # Publier sur le hub en plus de la socket du chat : le canal
+    # d'observation porte « ce que l'IDE est en train de faire », et un chat
+    # qui écrit dans un dépôt sans y apparaître serait le seul producteur de
+    # travail invisible (ADR-019, ADR-041). `run_id_en_base=None` : un tour de
+    # chat a déjà son historique de conversation, il n'ouvre pas de ligne de
+    # run.
+    publier = emetteur(EVENT_HUB, run, None)
+
+    async def _evenement(type_: EventType, data: dict[str, object]) -> None:
+        await publier(
+            OrchestratorEvent(type=type_, ticket_id=conversation_id, data=data)
+        )
 
     async def _on_token(token: str) -> None:
         await websocket.send_json({"type": "token", "token": token})
+        await _evenement(EventType.AGENT_TOKEN, {"token": token})
 
     async def _on_tool_use(name: str, payload: dict[str, object]) -> None:
         await websocket.send_json({"type": "tool_use", "tool": name, "input": payload})
+        await _evenement(EventType.AGENT_TOOL_USE, {"tool": name})
+
+    await _evenement(EventType.AGENT_STARTED, {"mode": "chat"})
 
     history = await list_chat_messages(db_path, project_id, conversation_id)
     spent = await conversation_cost_usd(db_path, project_id, conversation_id)

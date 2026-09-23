@@ -21,6 +21,7 @@ const LIBELLE_DU_MODE: Record<string, string> = {
   single: "ticket",
   queue: "file",
   autonomous: "autonome",
+  chat: "chat",
 };
 
 export default function RunCard({
@@ -31,6 +32,10 @@ export default function RunCard({
 }: RunCardProps) {
   const attend = etat.pendingQuestion !== null;
   const echoue = etat.status === "error";
+  // Un tour de chat écrit et commite comme un run (ADR-019), mais il n'a ni
+  // ticket, ni tours de revue, ni verdict. Lui afficher les étiquettes d'un
+  // pipeline donnerait à lire des cases vides comme une information.
+  const estUnChat = run.mode === "chat";
 
   return (
     <button
@@ -63,7 +68,7 @@ export default function RunCard({
 
         <span className="mt-1 flex items-baseline justify-between gap-2">
           <span className="truncate text-xs text-zinc-400">
-            {run.ticket_id ?? "—"}
+            {estUnChat ? "conversation" : (run.ticket_id ?? "—")}
           </span>
           <span className="shrink-0 text-micro tabular-nums text-zinc-500">
             <Chrono depuis={run.demarre_a} />
@@ -82,7 +87,7 @@ export default function RunCard({
               {etat.currentAgent ?? "en cours"}
             </Etiquette>
           )}
-          {etat.currentRound > 0 ? (
+          {etat.currentRound > 0 && !estUnChat ? (
             <Etiquette classe="bg-zinc-800 text-zinc-400">
               tour {etat.currentRound}
             </Etiquette>
