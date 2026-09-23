@@ -11,13 +11,17 @@ import type { ServiceActif } from "../types/api";
  * ADR-026 : `blue` pour l'activité, `red` pour un échec, `zinc` au repos. Le
  * violet est réservé à l'identité — un service n'en est pas.
  */
-export type EtatDuService = "en-cours" | "echoue" | "arrete";
+export type EtatDuService = "en-cours" | "echoue" | "arrete" | "jamais-lance";
 
 export function etatDuService(service: ServiceActif): EtatDuService {
   if (service.en_cours) return "en-cours";
   // Un service arrêté à la main n'a pas de code : il n'a pas échoué, on l'a
   // arrêté. Les confondre enverrait chercher des logs qui ne disent rien.
-  return (service.code_de_sortie ?? 0) !== 0 ? "echoue" : "arrete";
+  if ((service.code_de_sortie ?? 0) !== 0) return "echoue";
+  // Jamais de `pid` : l'IDE ne l'a pas démarré. « À l'arrêt » se lisait comme
+  // « je l'ai arrêté », alors que les serveurs qui font tourner l'IDE ont pu
+  // être lancés à la main, hors de son registre (ticket-149).
+  return service.pid === null ? "jamais-lance" : "arrete";
 }
 
 export function libelleDeLEtat(service: ServiceActif): string {
@@ -26,6 +30,8 @@ export function libelleDeLEtat(service: ServiceActif): string {
       return "en cours";
     case "echoue":
       return `arrêté — code ${service.code_de_sortie}`;
+    case "jamais-lance":
+      return "pas lancé par l'IDE";
     default:
       return "à l'arrêt";
   }

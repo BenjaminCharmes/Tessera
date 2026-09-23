@@ -49,3 +49,23 @@ describe("etatDuService", () => {
     expect(classes[2]).toMatch(/zinc/);
   });
 });
+
+describe("etatDuService — jamais lancé (ticket-149)", () => {
+  it("distingue « jamais lancé » de « arrêté »", () => {
+    // Les serveurs qui font tourner l'IDE ont pu être démarrés à la main :
+    // le registre ne les connaît pas, et « à l'arrêt » se lisait comme
+    // « je l'ai arrêté ».
+    const jamais = service({ en_cours: false, pid: null, code_de_sortie: null });
+    const arrete = service({ en_cours: false, pid: 42, code_de_sortie: null });
+
+    expect(etatDuService(jamais)).toBe("jamais-lance");
+    expect(etatDuService(arrete)).toBe("arrete");
+    expect(libelleDeLEtat(jamais)).toBe("pas lancé par l'IDE");
+    expect(libelleDeLEtat(arrete)).toBe("à l'arrêt");
+  });
+
+  it("un echec reste un echec, meme sans pid", () => {
+    const echoue = service({ en_cours: false, pid: null, code_de_sortie: 1 });
+    expect(etatDuService(echoue)).toBe("echoue");
+  });
+});

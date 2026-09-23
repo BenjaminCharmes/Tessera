@@ -41,8 +41,10 @@ describe("useServices", () => {
     expect(result.current.enCours).toBe(true);
   });
 
-  it("démarre puis bascule sur « en cours »", async () => {
-    vi.spyOn(api.services, "list").mockResolvedValue([]);
+  it("démarre puis bascule sur « en cours », d'après la relecture", async () => {
+    // Depuis ticket-149 l'état vient du serveur, pas de la réponse de
+    // `start` : celle-ci décrit l'instant du démarrage, pas la suite.
+    const lister = vi.spyOn(api.services, "list").mockResolvedValue([]);
     const demarrer = vi
       .spyOn(api.services, "start")
       .mockResolvedValue({ services: [service()] });
@@ -50,12 +52,13 @@ describe("useServices", () => {
     const { result } = renderHook(() => useServices("ide-core"));
     await waitFor(() => expect(result.current.services).toEqual([]));
 
+    lister.mockResolvedValue([service()]);
     await act(async () => {
       await result.current.demarrer();
     });
 
     expect(demarrer).toHaveBeenCalledWith("ide-core");
-    expect(result.current.enCours).toBe(true);
+    await waitFor(() => expect(result.current.enCours).toBe(true));
   });
 
   it("sait sans cliquer qu'un projet ne déclare rien", async () => {
@@ -162,4 +165,62 @@ describe("useServices", () => {
 
     expect(arreter).toHaveBeenCalledTimes(1);
   });
+});
+
+describe("useServices — la relecture (ticket-149)", () => {
+  it("relit apres un lancement, au lieu de figer la reponse de start", async () => {
+    // `start` rend l'etat a la milliseconde du demarrage, ou rien n'a encore
+    // ete ecrit. Le figer laissait « n'a encore rien ecrit » indefiniment.
+    const lister = vi.spyOn(api.services, "list").mockResolvedValue([]);
+    vi.spyOn(api.services, "start").mockResolvedValue({
+      services: [service({ sortie: [] })],
+    });
+
+    const { result } = renderHook(() => useServices("fluentdb"));
+    await waitFor(() => expect(lister).toHaveBeenCalled());
+
+    lister.mockResolvedValue([service({ sortie: ["VITE ready"] })]);
+    await act(async () => {
+      await result.current.demarrer();
+    });
+
+    await waitFor(() =>
+      expect(result.current.services[0]?.sortie).toEqual(["VITE ready"]),
+    );
+  });
+
+  it("relit periodiquement tant qu'un service tourne", async () => {
+    const lister = vi
+      .spyOn(api.services, "list")
+      .mockResolvedValue([service()]);
+
+    const { result } = renderHook(() => useServices("fluentdb"));
+    // Le minuteur n'est posé qu'une fois `enCours` vrai : avancer avant ce
+    // rendu ne testerait rien.
+    await waitFor(() => expect(result.current.enCours).toBe(true));
+    const avant = lister.mock.calls.length;
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5200));
+    });
+
+    expect(lister.mock.calls.length).toBeGreaterThan(avant);
+  }, 15000);
+
+  it("ne relit pas quand rien ne tourne", async () => {
+    // Un minuteur qui bat dans le vide fait travailler l'interface pour rien.
+    const lister = vi
+      .spyOn(api.services, "list")
+      .mockResolvedValue([service({ en_cours: false, pid: null })]);
+
+    const { result } = renderHook(() => useServices("fluentdb"));
+    await waitFor(() => expect(result.current.declare).toBe(true));
+    const avant = lister.mock.calls.length;
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5200));
+    });
+
+    expect(lister.mock.calls.length).toBe(avant);
+  }, 15000);
 });

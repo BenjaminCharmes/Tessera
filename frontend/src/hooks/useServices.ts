@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import { useResource } from "./useResource";
 import type { ServiceActif } from "../types/api";
@@ -41,6 +41,17 @@ export interface UseServicesResult {
 }
 
 const AUCUN: ServiceActif[] = [];
+
+/**
+ * À quelle cadence on relit tant qu'un service tourne — ticket-149.
+ *
+ * ticket-145 avait écarté le minuteur au profit du canal, et l'argument
+ * tenait. Mais il fait dépendre l'affichage d'un canal dont aucun test ne
+ * peut prouver le bon fonctionnement, et à l'usage la sortie n'apparaissait
+ * pas. Le minuteur ne bat **que** lorsqu'un service est en cours ; le canal
+ * reste la voie rapide.
+ */
+const CADENCE_MS = 5000;
 
 export function useServices(
   projectId: string | null,
@@ -93,8 +104,19 @@ export function useServices(
   const demarrer = useCallback(async () => {
     if (!projectId) return;
     try {
-      const { services: liste } = await api.services.start(projectId);
-      setApresAction({ projectId, signal, liste, erreur: null, declare: true });
+      await api.services.start(projectId);
+      // Surtout pas figer cette réponse : elle décrit l'état à la
+      // milliseconde du démarrage, où rien n'a encore été écrit. La garder
+      // laissait « n'a encore rien écrit » indéfiniment (ticket-149). Seul le
+      // serveur sait ce qui tourne ; on relit.
+      setApresAction({
+        projectId,
+        signal,
+        liste: null,
+        erreur: null,
+        declare: true,
+      });
+      refresh();
     } catch (exc: unknown) {
       const message =
         exc instanceof Error ? exc.message : "Lancement impossible";
@@ -110,7 +132,7 @@ export function useServices(
         declare: true,
       });
     }
-  }, [projectId, signal]);
+  }, [projectId, signal, refresh]);
 
   const arreter = useCallback(async () => {
     if (!projectId) return;
@@ -141,10 +163,19 @@ export function useServices(
   }, [projectId, signal, refresh]);
 
   const services = local.liste ?? lus;
+  const enCours = services.some((service) => service.en_cours);
+
+  useEffect(() => {
+    // Rien en cours : pas de minuteur. Un battement dans le vide ferait
+    // travailler l'interface pour rien.
+    if (!projectId || !enCours) return;
+    const minuteur = setInterval(refresh, CADENCE_MS);
+    return () => clearInterval(minuteur);
+  }, [projectId, enCours, refresh]);
 
   return {
     services,
-    enCours: services.some((s) => s.en_cours),
+    enCours,
     enEchec: services.some(
       (s) => !s.en_cours && (s.code_de_sortie ?? 0) !== 0,
     ),

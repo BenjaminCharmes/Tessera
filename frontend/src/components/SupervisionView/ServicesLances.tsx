@@ -92,14 +92,20 @@ export default function ServicesLances({
       {services
         .filter((service) => ouverts.has(cle(service)))
         .map((service) => (
-          <pre
-            key={cle(service)}
-            aria-label={`Sortie de ${service.nom}`}
-            className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400"
-          >
-            {lignesDe(service, sortieDe).join("\n") ||
-              "Ce service n'a encore rien écrit."}
-          </pre>
+          <div key={cle(service)} className="mt-2">
+            {/* Le nom au-dessus du bloc : deux sorties dépliées côte à côte
+                ne se distinguaient pas à l'œil (ticket-149). */}
+            <p className="px-1 text-micro text-zinc-500">
+              {`${service.project_id} · ${service.nom}`}
+            </p>
+            <pre
+              aria-label={`Sortie de ${service.nom}`}
+              className="max-h-40 overflow-auto whitespace-pre-wrap rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400"
+            >
+              {lignesDe(service, sortieDe).join("\n") ||
+                "Ce service n'a encore rien écrit."}
+            </pre>
+          </div>
         ))}
     </section>
   );

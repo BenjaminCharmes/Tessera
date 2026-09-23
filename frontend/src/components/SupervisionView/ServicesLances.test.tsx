@@ -82,3 +82,30 @@ describe("ServicesLances", () => {
     );
   });
 });
+
+describe("ServicesLances — plusieurs sorties (ticket-149)", () => {
+  it("nomme chaque bloc de sortie", async () => {
+    // Deux sorties depliees cote a cote ne se distinguaient pas a l'oeil.
+    render(
+      <ServicesLances
+        services={[
+          service({ nom: "backend", sortie: ["api"] }),
+          service({ nom: "frontend", sortie: ["vite"] }),
+        ]}
+        sortieDe={() => []}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "backend" }));
+    await userEvent.click(screen.getByRole("button", { name: "frontend" }));
+
+    // Matcher par fonction : le separateur est un caractere unicode, et une
+    // regex ecrite a la main s'y casse les dents pour rien.
+    const titre = (nom: string) => (contenu: string) =>
+      contenu.includes("ide-core") && contenu.includes(nom);
+    expect(screen.getByText(titre("backend"))).toBeInTheDocument();
+    expect(screen.getByText(titre("frontend"))).toBeInTheDocument();
+    expect(screen.getByLabelText("Sortie de backend")).toBeInTheDocument();
+    expect(screen.getByLabelText("Sortie de frontend")).toBeInTheDocument();
+  });
+});
