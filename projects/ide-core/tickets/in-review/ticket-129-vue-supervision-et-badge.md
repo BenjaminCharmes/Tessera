@@ -2,7 +2,7 @@
 id: ticket-129
 title: "Vue Supervision de tous les runs, et badge permanent dans le NavRail"
 type: feat
-status: todo
+status: in-review
 pr_number: null
 priority: high
 agent: codeur

@@ -8,11 +8,11 @@ import TicketActivity from "./TicketActivity";
 import AgentBlock from "./AgentBlock";
 import PipelineSummary from "./PipelineSummary";
 import type { Project, Ticket } from "../../types/api";
-import type { UseOrchestratorStreamResult } from "../../hooks/useOrchestratorStream";
+import type { UseRunActifResult } from "../../hooks/streamState";
 
 interface AgentPanelProps {
   project: Project | null;
-  stream: UseOrchestratorStreamResult;
+  stream: UseRunActifResult;
   /** Ticket sélectionné, pour afficher ce qu'il a produit (ticket-064). */
   activeTicket?: Ticket | null;
 }

@@ -5,7 +5,9 @@ import { useTickets } from "./hooks/useTickets";
 import { useRuns } from "./hooks/useRuns";
 import { useUsage } from "./hooks/useUsage";
 import { useToast } from "./hooks/useToast";
-import { useOrchestratorStream } from "./hooks/useOrchestratorStream";
+import { useProjects } from "./hooks/useProjects";
+import { useSupervision } from "./hooks/useSupervision";
+import { useRunActif } from "./hooks/useRunActif";
 import { BAND } from "./design/layout";
 import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
@@ -13,6 +15,7 @@ import type { SidebarPanel } from "./components/Sidebar";
 import DiffView from "./components/DiffView";
 import AgentDetail from "./components/AgentDetail";
 import CostView from "./components/CostView";
+import SupervisionView from "./components/SupervisionView";
 import RunView from "./components/RunView";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
@@ -42,7 +45,22 @@ export default function App() {
   const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
   const { toasts, addToast, removeToast } = useToast();
 
-  const stream = useOrchestratorStream(project?.id ?? null);
+  // Une seule socket pour toute la machine (ticket-129) : `supervision`
+  // porte tous les runs, `stream` n'en projette qu'un — celui du projet
+  // regarde — pour les composants qui n'en attendaient qu'un.
+  const supervision = useSupervision();
+  const stream = useRunActif(supervision, project?.id ?? null);
+  const { projects: projets } = useProjects();
+
+  // Ce que la pastille doit dire avant tout le reste : un agent qui attend
+  // bloque un humain, un run bloqué demande une décision. L'activité est le
+  // cas nominal, donc le dernier à mériter la couleur.
+  const etatsDesRuns = supervision.runs.map((r) => supervision.etatDe(r.run_id));
+  const alerteDeSupervision = etatsDesRuns.some((e) => e.status === "error")
+    ? ("bloque" as const)
+    : etatsDesRuns.some((e) => e.pendingQuestion !== null)
+      ? ("attente" as const)
+      : null;
   const tickets = useTickets(
     project?.id ?? null,
     stream.status === "running" || stream.status === "connecting",
@@ -152,7 +170,12 @@ export default function App() {
         className="border-r border-zinc-700"
         style={{ gridColumn: "1", gridRow: "1 / 3" }}
       >
-        <NavRail activePanel={panel} onChangePanel={setPanel} />
+        <NavRail
+          activePanel={panel}
+          onChangePanel={setPanel}
+          runsActifs={supervision.runs.length}
+          alerte={alerteDeSupervision}
+        />
       </div>
 
       {/* Sidebar — col 2, rows 1-2.
@@ -245,7 +268,11 @@ export default function App() {
               tableau des tickets, ou « ce ticket n'a jamais été lancé »
               (ticket-075). Un fichier ou un diff ouvert explicitement garde la
               priorité : c'est une demande de l'utilisateur. */}
-          {panel === "agents" ? (
+          {panel === "supervision" ? (
+            // Vue globale : elle ne dépend d'aucun projet actif, comme les
+            // coûts. C'est ce qui lui permet de montrer les autres.
+            <SupervisionView supervision={supervision} projects={projets} />
+          ) : panel === "agents" ? (
             <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />
           ) : panel === "usage" ? (
             // Sans projet sélectionné, la vue d'ensemble : « combien me coûte

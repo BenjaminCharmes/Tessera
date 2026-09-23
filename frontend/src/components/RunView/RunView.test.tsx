@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import RunView from "./index";
 import type { OrchestratorEvent } from "../../types/api";
-import type { UseOrchestratorStreamResult } from "../../hooks/useOrchestratorStream";
+import type { UseRunActifResult } from "../../hooks/streamState";
 
 function evenement(
   type: OrchestratorEvent["type"],
@@ -18,7 +18,7 @@ function evenement(
   };
 }
 
-function flux(over: Partial<UseOrchestratorStreamResult> = {}) {
+function flux(over: Partial<UseRunActifResult> = {}) {
   return {
     status: "running",
     ticketId: "ticket-001",
@@ -39,7 +39,7 @@ function flux(over: Partial<UseOrchestratorStreamResult> = {}) {
     interject: () => {},
     stop: () => {},
     ...over,
-  } as UseOrchestratorStreamResult;
+  } as UseRunActifResult;
 }
 
 describe("RunView", () => {

@@ -11,4 +11,13 @@ export type SidebarPanel =
   | "files"
   | "history"
   | "agents"
-  | "usage";
+  | "usage"
+  | "supervision";
+
+/**
+ * Ce qui, dans la supervision, merite d'etre vu avant le reste — ticket-129.
+ *
+ * `null` est le cas nominal : des runs tournent, et c'est tout. ADR-026 :
+ * l'ambre pour une attente, le rouge pour un echec, le bleu pour l'activite.
+ */
+export type AlerteDeSupervision = "attente" | "bloque" | null;
