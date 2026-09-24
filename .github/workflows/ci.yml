@@ -21,6 +21,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# `runs-on` se choisit par la variable de depot `CI_RUNNER`. Les minutes
+# Actions incluses pour un depot prive sont epuisees depuis que ce depot est
+# repasse en prive (ticket-160) : plus aucune PR ne declenchait de run. Un
+# runner self-hosted n'en consomme aucune. La variable vide rend la CI aux
+# runners GitHub sans toucher a ce fichier, donc sans PR (ticket-161).
 permissions:
   contents: read
   pull-requests: write
@@ -29,7 +34,7 @@ jobs:
 
   backend:
     name: Backend (pytest)
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
 
@@ -55,7 +60,9 @@ jobs:
       - name: Coverage report on PR (backend)
         # Sur une PR venue d'un fork, GITHUB_TOKEN est en lecture seule : le
         # commentaire échouerait et ferait passer la CI au rouge pour rien.
-        if: github.event.pull_request.head.repo.full_name == github.repository
+        # Linux seulement : ces actions ne sont pas garanties ailleurs, et un
+        # commentaire de couverture ne vaut pas un run rouge (ticket-161).
+        if: runner.os == 'Linux' && github.event.pull_request.head.repo.full_name == github.repository
         uses: orgoro/coverage@v3.3
         with:
           coverageFile: backend/coverage.xml
@@ -66,7 +73,7 @@ jobs:
 
   frontend:
     name: Frontend (tsc + vitest)
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
 
@@ -95,7 +102,7 @@ jobs:
           path: frontend/coverage/
 
       - name: Coverage report on PR (frontend)
-        if: github.event.pull_request.head.repo.full_name == github.repository
+        if: runner.os == 'Linux' && github.event.pull_request.head.repo.full_name == github.repository
         uses: romeovs/lcov-reporter-action@v0.4.0
         with:
           lcov-file: frontend/coverage/lcov.info
@@ -105,7 +112,7 @@ jobs:
 
   e2e:
     name: E2E (Playwright)
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     needs: [frontend]
     steps:
       - uses: actions/checkout@v7
@@ -119,8 +126,15 @@ jobs:
       - name: Install dependencies
         run: cd frontend && npm ci
 
-      - name: Install Playwright browsers
+      # `--with-deps` installe des paquets systeme par `apt` : il n'existe
+      # que sur Linux, et le passer ailleurs fait echouer l'etape.
+      - name: Install Playwright browsers (Linux)
+        if: runner.os == 'Linux'
         run: cd frontend && npx playwright install --with-deps chromium
+
+      - name: Install Playwright browsers
+        if: runner.os != 'Linux'
+        run: cd frontend && npx playwright install chromium
 
       - name: Run E2E tests
         run: cd frontend && npm run test:e2e
@@ -137,7 +151,7 @@ jobs:
   # check`. Il ne tourne donc plus que quand le Rust change (ticket-095).
   detecter:
     name: Ce qui a changé
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     outputs:
       tauri: ${{ steps.filtre.outputs.tauri }}
     steps:
@@ -146,6 +160,9 @@ jobs:
           fetch-depth: 0
       - id: filtre
         name: Le Rust a-t-il bougé ?
+        # Ce script est du POSIX ; un runner Windows ouvrirait `pwsh`, où il
+        # n'est même pas analysable.
+        shell: bash
         run: |
           base="${{ github.event.pull_request.base.sha || github.event.before }}"
           if [ -z "$base" ] || ! git cat-file -e "$base" 2>/dev/null; then
