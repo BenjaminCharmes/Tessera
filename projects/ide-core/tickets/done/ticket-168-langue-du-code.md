@@ -2,8 +2,8 @@
 id: ticket-168
 title: "La règle de langue n'existe qu'à moitié, et la pratique a dérivé"
 type: docs
-status: in-review
-pr_number: null
+status: done
+pr_number: 19
 priority: high
 agent: codeur
 depends_on: []

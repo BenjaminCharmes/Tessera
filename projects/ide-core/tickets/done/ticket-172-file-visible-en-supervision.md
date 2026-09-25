@@ -2,8 +2,8 @@
 id: ticket-172
 title: "La Supervision ne dit pas où en est une file"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 21
 priority: medium
 agent: codeur
 depends_on: ["ticket-163"]

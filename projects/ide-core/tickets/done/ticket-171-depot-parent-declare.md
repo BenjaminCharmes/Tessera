@@ -2,8 +2,8 @@
 id: ticket-171
 title: "Le panneau Git propose d'imbriquer un dépôt dans celui de Tessera"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 20
 priority: high
 agent: codeur
 depends_on: []
