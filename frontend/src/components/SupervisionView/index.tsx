@@ -7,6 +7,7 @@ import { INITIAL } from "../../hooks/streamState";
 import type { UseRunActifResult } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { Project, ServiceActif } from "../../types/api";
+import { projetDuRun } from "./projetDuRun";
 
 /**
  * Ce que l'IDE est en train de faire, sur tous les projets — ticket-129.
@@ -56,7 +57,10 @@ export default function SupervisionView({
       ) : null}
 
       {runs.length === 0 ? (
-        <VueVide connecte={supervision.connecte} avecServices={services.length > 0} />
+        <VueVide
+          connecte={supervision.connecte}
+          avecServices={services.length > 0}
+        />
       ) : (
         <div className="grid min-h-0 flex-1 grid-cols-[minmax(240px,340px)_1fr] overflow-hidden">
           <div className="flex flex-col gap-2 overflow-y-auto border-r border-zinc-800 p-3">
@@ -74,9 +78,7 @@ export default function SupervisionView({
           <div className="min-h-0 overflow-hidden">
             {selectionne ? (
               <AgentPanel
-                project={
-                  projects.find((p) => p.id === selectionne.project_id) ?? null
-                }
+                project={projetDuRun(projects, selectionne)}
                 stream={projeter(supervision, selectionne.run_id)}
               />
             ) : null}
@@ -135,7 +137,8 @@ function projeter(
     connectAutonome: rien,
     disconnect: rien,
     clear: rien,
-    answer: (text: string) => supervision.envoyer(runId, { type: "answer", text }),
+    answer: (text: string) =>
+      supervision.envoyer(runId, { type: "answer", text }),
     interject: (text: string) =>
       supervision.envoyer(runId, { type: "interject", text }),
     stop: () => supervision.envoyer(runId, { type: "stop", text: "" }),

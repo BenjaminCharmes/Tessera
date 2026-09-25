@@ -46,6 +46,12 @@ class RunActif:
     tokens_sortie: int = 0
     cout_usd: float = 0.0
     verdict: str | None = None
+    #: La question qu'un agent attend de voir répondue, s'il y en a une.
+    #: Elle vit ici et pas seulement dans le flux d'événements : un
+    #: observateur qui se connecte après coup ne reverra jamais
+    #: `agent_question`, et resterait devant un run muet alors qu'ADR-025
+    #: suppose qu'un humain peut répondre (ticket-163).
+    question: str | None = None
     #: Le `DialogueChannel` du run. C'est ce qui permet à n'importe quel
     #: observateur de répondre à un agent qui pose une question (ADR-025),
     #: au lieu du seul onglet qui a lancé le run.
@@ -68,6 +74,7 @@ class RunActif:
             "tokens_sortie": self.tokens_sortie,
             "cout_usd": self.cout_usd,
             "verdict": self.verdict,
+            "question": self.question,
             "demarre_a": self.demarre_a.isoformat(),
         }
 

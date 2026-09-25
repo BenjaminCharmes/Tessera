@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { wsUrl } from "../lib/ws";
-import { INITIAL, applyEvent } from "./streamState";
+import { INITIAL, applyEvent, etatDepuisRun } from "./streamState";
 import type { StreamState } from "./streamState";
-import {
-  LIGNES_GARDEES,
-  cleDuService,
-  majDesRuns,
-} from "./supervisionEvents";
+import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
 import type { OrchestratorEvent, RunActif } from "../types/api";
 
 /**
@@ -64,72 +60,114 @@ export function useSupervision(): UseSupervisionResult {
   const abonnementRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(wsUrl("/api/v1/orchestrator/observe"));
-    wsRef.current = ws;
+    // La socket se rouvre : un redémarrage du backend suffisait à rendre
+    // l'onglet aveugle définitivement, et le seul signe était une étiquette
+    // « hors ligne » (ticket-163). Le délai croît puis plafonne, pour ne pas
+    // marteler un backend éteint.
+    let vivant = true;
+    let essais = 0;
+    let minuteur: ReturnType<typeof setTimeout> | null = null;
+    let ws: WebSocket;
 
-    ws.onopen = () => {
-      setConnecte(true);
-      // Se rattacher ne relance rien depuis ticket-128 : la socket observe,
-      // elle ne commande pas. C'est ce qui rend la reconnexion sûre.
-      if (abonnementRef.current) {
-        ws.send(JSON.stringify({ subscribe: abonnementRef.current }));
-      }
+    const ouvrir = () => {
+      ws = new WebSocket(wsUrl("/api/v1/orchestrator/observe"));
+      wsRef.current = ws;
+      brancher(ws);
     };
 
-    ws.onmessage = (message: MessageEvent) => {
-      try {
-        const brut = JSON.parse(message.data as string) as OrchestratorEvent & {
-          runs?: RunActif[];
-        };
+    const replanifier = () => {
+      if (!vivant) return;
+      const delai = Math.min(500 * 2 ** essais, 15_000);
+      essais += 1;
+      minuteur = setTimeout(ouvrir, delai);
+    };
 
-        if ((brut.type as string) === "snapshot") {
-          setRuns(brut.runs ?? []);
-          return;
+    const brancher = (ws: WebSocket) => {
+      ws.onopen = () => {
+        essais = 0;
+        setConnecte(true);
+        // Se rattacher ne relance rien depuis ticket-128 : la socket observe,
+        // elle ne commande pas. C'est ce qui rend la reconnexion sûre.
+        if (abonnementRef.current) {
+          ws.send(JSON.stringify({ subscribe: abonnementRef.current }));
         }
+      };
 
-        // Les évènements de service n'ont pas de `run_id` : les laisser
-        // tomber dans le test ci-dessous jetait leur sortie avant même
-        // qu'on ait écrit de quoi l'afficher (ticket-145).
-        const type = brut.type as string;
-        if (type === "service_output" || type === "service_closed") {
-          const nom = String(
-            (brut.data as Record<string, unknown>)?.["service"] ?? "",
-          );
-          const ligne = (brut.data as Record<string, unknown>)?.["ligne"];
-          if (brut.project_id && nom && typeof ligne === "string") {
-            const cle = cleDuService(brut.project_id, nom);
-            setSorties((prec) => ({
-              ...prec,
-              [cle]: [...(prec[cle] ?? []), ligne].slice(-LIGNES_GARDEES),
-            }));
+      ws.onmessage = (message: MessageEvent) => {
+        try {
+          const brut = JSON.parse(
+            message.data as string,
+          ) as OrchestratorEvent & {
+            runs?: RunActif[];
+          };
+
+          if ((brut.type as string) === "snapshot") {
+            const recus = brut.runs ?? [];
+            setRuns(recus);
+            // Semer l'état : `agent_started` ne repassera pas, et sans lui le
+            // panneau resterait au repos pour toute la durée du run — sans
+            // agents, et sans la question en attente (ticket-163).
+            setEtats((prec) => {
+              const suite = { ...prec };
+              for (const r of recus) {
+                if (!suite[r.run_id]) suite[r.run_id] = etatDepuisRun(r);
+              }
+              return suite;
+            });
+            return;
           }
-          setSignalServices((n) => n + 1);
-          return;
+
+          // Les évènements de service n'ont pas de `run_id` : les laisser
+          // tomber dans le test ci-dessous jetait leur sortie avant même
+          // qu'on ait écrit de quoi l'afficher (ticket-145).
+          const type = brut.type as string;
+          if (type === "service_output" || type === "service_closed") {
+            const nom = String(
+              (brut.data as Record<string, unknown>)?.["service"] ?? "",
+            );
+            const ligne = (brut.data as Record<string, unknown>)?.["ligne"];
+            if (brut.project_id && nom && typeof ligne === "string") {
+              const cle = cleDuService(brut.project_id, nom);
+              setSorties((prec) => ({
+                ...prec,
+                [cle]: [...(prec[cle] ?? []), ligne].slice(-LIGNES_GARDEES),
+              }));
+            }
+            setSignalServices((n) => n + 1);
+            return;
+          }
+
+          const runId = brut.run_id;
+          if (!runId) return;
+
+          setEtats((prec) => ({
+            ...prec,
+            [runId]: applyEvent(prec[runId] ?? INITIAL, brut),
+          }));
+
+          // `run_closed` est le seul événement publié après la libération du
+          // projet : c'est lui, et pas `pipeline_done`, qui retire la carte.
+          if (brut.type === "run_closed") {
+            setRuns((prec) => prec.filter((r) => r.run_id !== runId));
+            return;
+          }
+          setRuns((prec) => majDesRuns(prec, brut, runId));
+        } catch {
+          // trame malformée : l'ignorer vaut mieux que casser l'affichage
         }
+      };
 
-        const runId = brut.run_id;
-        if (!runId) return;
-
-        setEtats((prec) => ({
-          ...prec,
-          [runId]: applyEvent(prec[runId] ?? INITIAL, brut),
-        }));
-
-        // `run_closed` est le seul événement publié après la libération du
-        // projet : c'est lui, et pas `pipeline_done`, qui retire la carte.
-        if (brut.type === "run_closed") {
-          setRuns((prec) => prec.filter((r) => r.run_id !== runId));
-          return;
-        }
-        setRuns((prec) => majDesRuns(prec, brut, runId));
-      } catch {
-        // trame malformée : l'ignorer vaut mieux que casser l'affichage
-      }
+      ws.onclose = () => {
+        setConnecte(false);
+        replanifier();
+      };
     };
 
-    ws.onclose = () => setConnecte(false);
+    ouvrir();
 
     return () => {
+      vivant = false;
+      if (minuteur !== null) clearTimeout(minuteur);
       ws.onopen = null;
       ws.onmessage = null;
       ws.onclose = null;
