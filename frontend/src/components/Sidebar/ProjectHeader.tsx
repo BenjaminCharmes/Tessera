@@ -1,4 +1,5 @@
 import BoutonServices from "./BoutonServices";
+import SelecteurDeProjet from "./SelecteurDeProjet";
 import type { UseServicesResult } from "../../hooks/useServices";
 import { BAND } from "../../design/layout";
 import type { Project } from "../../types/api";
@@ -28,6 +29,8 @@ interface ProjectHeaderProps {
   services?: UseServicesResult;
   /** Ouvre le panneau des services, pour que le clic ait un effet visible. */
   onOuvrirLesServices?: () => void;
+  /** Change de projet depuis l'en-tête (ticket-174). Absent : le nom reste un titre. */
+  onSelectProject?: (project: Project) => void;
 }
 
 /** `vscode://file/` attend des séparateurs POSIX, y compris sous Windows. */
@@ -41,6 +44,7 @@ export default function ProjectHeader({
   onBasculerGit,
   services,
   onOuvrirLesServices,
+  onSelectProject,
 }: ProjectHeaderProps) {
   if (!project) {
     return (
@@ -57,12 +61,23 @@ export default function ProjectHeader({
       {/* Une seule ligne : l'en-tête doit tenir dans la bande commune pour
           s'aligner avec celles du centre et de la colonne de droite. Le
           chemin complet passe en infobulle plutôt qu'en seconde ligne. */}
-      <h2
-        className="truncate text-sm font-medium text-violet-100"
-        title={`${project.id} — ${project.path ?? ""}`}
-      >
-        {project.name}
-      </h2>
+      {/* Le nom est le déclencheur : changer de projet n'ajoute aucun bouton
+          à une rangée qui porte déjà « Lancer », « VSCode » et « Git »
+          (ticket-174). Sans `onSelectProject` — les vues qui n'en ont pas —
+          il reste un titre. */}
+      {onSelectProject ? (
+        <SelecteurDeProjet
+          project={project}
+          onSelectProject={onSelectProject}
+        />
+      ) : (
+        <h2
+          className="truncate text-sm font-medium text-violet-100"
+          title={`${project.id} — ${project.path ?? ""}`}
+        >
+          {project.name}
+        </h2>
+      )}
 
       <div className="flex shrink-0 items-center gap-1.5">
         {services && !project.fait_tourner_l_ide ? (
