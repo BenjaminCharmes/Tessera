@@ -28,10 +28,18 @@ _DOMAINES_CONNUS = {
     "gitlab.com",
     "bitbucket.org",
     "dev.azure.com",
-    "anthropic.com",
     "example.com",
     "exemple.com",
 }
+
+#: `CLAUDE.md`, regle 8 et conventions Git : aucune attribution a un outil
+#: d'IA, nulle part. Trente et un commits en portaient une, produites par les
+#: reglages par defaut de l'outil. Nommer l'outil ici ne coute rien — ce n'est
+#: pas un client —, et sans ca la regle resterait un souhait.
+_ATTRIBUTION = re.compile(
+    rb"co-authored-by:.*(claude|anthropic)|generated with.*claude",
+    re.IGNORECASE,
+)
 
 #: Un TLD alphabetique d'au moins deux lettres : sans ca, `coverage@v3.3` dans
 #: un `uses:` de workflow se lit comme une adresse.
@@ -120,3 +128,16 @@ def test_aucun_message_de_commit_ne_porte_d_adresse_inconnue() -> None:
     assert not _domaines(messages.encode("utf-8")), (
         f"messages portant un domaine inconnu : {sorted(_domaines(messages.encode('utf-8')))}"
     )
+
+
+def test_aucun_commit_n_attribue_le_travail_a_un_outil_d_ia() -> None:
+    """`CLAUDE.md` regle 8 : pas de trace d'ecriture par IA dans ce qui est produit.
+
+    Les trailers `Co-authored-by` viennent des reglages par defaut de l'outil,
+    pas d'une decision : rien ne les arretait, et ils se sont accumules sur
+    trente et un commits avant qu'on les voie.
+    """
+    messages = _git("log", "--all", "--format=%B").encode("utf-8")
+    trouves = {m[0].decode("utf-8", errors="replace") for m in _ATTRIBUTION.findall(messages)}
+
+    assert not trouves, f"attribution a un outil d'IA : {sorted(trouves)[:5]}"

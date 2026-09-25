@@ -65,6 +65,18 @@ C'est la même erreur que celle qui vaut ce ticket, d'un cran plus bas : on
 vérifie là où on a cherché. Les deux passes sont nécessaires, et une
 vérification qui ne regarde qu'un des deux côtés ne prouve rien sur l'autre.
 
+## Trouvé en vérifiant : l'attribution à un outil d'IA
+
+Le contrôle des messages côté GitHub a remonté 31 commits portant un trailer
+`Co-authored-by: Claude …`. C'est une violation directe de `CLAUDE.md` —
+règle 8 et conventions Git, « aucune attribution à un outil d'IA, nulle part ».
+
+Elle ne vient d'aucune décision : c'est le réglage par défaut de l'outil, et
+rien ne l'arrêtait. Retirée par la même mécanique, et la garde la couvre
+désormais — `anthropic.com` sort de la liste blanche, et un motif dédié attrape
+les trois formes rencontrées sans toucher aux trailers de dependabot, qui sont
+de vrais co-auteurs.
+
 ## Critères d'acceptation
 
 - [ ] Aucun nom de projet client ne subsiste, sur **toute** l'histoire et
@@ -74,6 +86,8 @@ vérification qui ne regarde qu'un des deux côtés ne prouve rien sur l'autre.
 - [ ] Un test échoue sur une adresse dont le domaine n'est pas dans la liste
       blanche, dans un fichier suivi comme dans un message de commit
 - [ ] La liste blanche ne contient aucun nom de client
+- [ ] Aucun message de commit n'attribue le travail à un outil d'IA, et un test
+      échoue si l'un le refait
 - [ ] `uv run pytest` et `npx vitest run` passent — les remplacements sont
       cohérents entre fixtures et assertions
 
