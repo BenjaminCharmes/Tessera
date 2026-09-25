@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { INITIAL } from "./streamState";
 import type { StreamState, UseRunActifResult } from "./streamState";
@@ -41,6 +41,15 @@ export function useRunActif(
         );
 
   const etat: StreamState = run ? supervision.etatDe(run.run_id) : INITIAL;
+
+  // Déclarer le run qu'on affiche : ADR-041 ne pousse son texte qu'aux clients
+  // abonnés, et seul un lancement ou un clic dans Supervision abonnait. Une
+  // page rechargée montrait donc un agent figé (ticket-183).
+  const { observerLeTexte } = supervision;
+  const runId = run?.run_id ?? null;
+  useEffect(() => {
+    observerLeTexte(runId);
+  }, [observerLeTexte, runId]);
 
   const lancer = useCallback(
     (corps: RunRequest, ticketId: string | null) => {

@@ -3,6 +3,8 @@ import { wsUrl } from "../lib/ws";
 import { INITIAL, applyEvent, etatDepuisRun } from "./streamState";
 import type { StreamState } from "./streamState";
 import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
+import { abonnementsVoulus, diffDesAbonnements } from "./abonnements";
+import type { SlotsDAbonnement } from "./abonnements";
 import type { OrchestratorEvent, RunActif } from "../types/api";
 
 /**
@@ -36,6 +38,14 @@ export interface UseSupervisionResult {
   envoyer: (runId: string, payload: Record<string, string>) => void;
   /** Enregistre un run qu'on vient de lancer, avant son premier evenement. */
   suivre: (run: RunActif) => void;
+  /**
+   * Déclare le run dont une vue affiche le texte (ticket-183).
+   *
+   * Sans elle, seul un lancement ou un clic dans Supervision abonnait la
+   * socket : une page rechargée voyait les transitions d'un run et jamais son
+   * travail.
+   */
+  observerLeTexte: (runId: string | null) => void;
   /** Les dernières lignes écrites par un service lancé (ticket-145). */
   sortieDuService: (projectId: string, nom: string) => string[];
   /**
@@ -57,7 +67,22 @@ export function useSupervision(): UseSupervisionResult {
   const [sorties, setSorties] = useState<Record<string, string[]>>({});
   const [signalServices, setSignalServices] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
-  const abonnementRef = useRef<string | null>(null);
+  // Qui demande quoi, et ce que la socket porte déjà. Deux slots, parce que
+  // deux vues veulent du texte : l'onglet Supervision et le panneau du projet
+  // actif (ticket-183).
+  const slotsRef = useRef<SlotsDAbonnement>({ selection: null, panneau: null });
+  const abonnesRef = useRef<Set<string>>(new Set());
+
+  /** Met la socket à jour sur ce que les slots demandent. */
+  const majDesAbonnements = useCallback(() => {
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const voulus = abonnementsVoulus(slotsRef.current);
+    const { ajouts, retraits } = diffDesAbonnements(abonnesRef.current, voulus);
+    for (const run of retraits) ws.send(JSON.stringify({ unsubscribe: run }));
+    for (const run of ajouts) ws.send(JSON.stringify({ subscribe: run }));
+    abonnesRef.current = voulus;
+  }, []);
 
   useEffect(() => {
     // La socket se rouvre : un redémarrage du backend suffisait à rendre
@@ -87,10 +112,10 @@ export function useSupervision(): UseSupervisionResult {
         essais = 0;
         setConnecte(true);
         // Se rattacher ne relance rien depuis ticket-128 : la socket observe,
-        // elle ne commande pas. C'est ce qui rend la reconnexion sûre.
-        if (abonnementRef.current) {
-          ws.send(JSON.stringify({ subscribe: abonnementRef.current }));
-        }
+        // elle ne commande pas. C'est ce qui rend la reconnexion sûre. La
+        // nouvelle socket repart vierge côté serveur : tout se redemande.
+        abonnesRef.current = new Set();
+        majDesAbonnements();
       };
 
       ws.onmessage = (message: MessageEvent) => {
@@ -174,20 +199,31 @@ export function useSupervision(): UseSupervisionResult {
       ws.close();
       wsRef.current = null;
     };
-  }, []);
+    // `majDesAbonnements` ne change jamais d'identité : la socket ne se rouvre
+    // pas pour autant.
+  }, [majDesAbonnements]);
 
-  const selectionner = useCallback((runId: string | null) => {
-    const ws = wsRef.current;
-    const precedent = abonnementRef.current;
-    abonnementRef.current = runId;
-    setSelection(runId);
-    if (!ws || ws.readyState !== WebSocket.OPEN) return;
-    // Se désabonner du précédent : sans cela, le flux de tokens de tous les
-    // runs déjà regardés continuerait d'arriver, ce que l'abonnement existe
-    // précisément pour éviter.
-    if (precedent) ws.send(JSON.stringify({ unsubscribe: precedent }));
-    if (runId) ws.send(JSON.stringify({ subscribe: runId }));
-  }, []);
+  const selectionner = useCallback(
+    (runId: string | null) => {
+      slotsRef.current = { ...slotsRef.current, selection: runId };
+      setSelection(runId);
+      // Le désabonnement du run précédent se déduit des slots : sans cela le
+      // flux de tokens de tous les runs déjà regardés continuerait d'arriver,
+      // ce que l'abonnement existe précisément pour éviter — mais le lâcher
+      // pendant que le panneau le regarde encore le rendrait muet.
+      majDesAbonnements();
+    },
+    [majDesAbonnements],
+  );
+
+  const observerLeTexte = useCallback(
+    (runId: string | null) => {
+      if (slotsRef.current.panneau === runId) return;
+      slotsRef.current = { ...slotsRef.current, panneau: runId };
+      majDesAbonnements();
+    },
+    [majDesAbonnements],
+  );
 
   const etatDe = useCallback(
     (runId: string): StreamState => etats[runId] ?? VIDE,
@@ -227,6 +263,7 @@ export function useSupervision(): UseSupervisionResult {
     connecte,
     envoyer,
     suivre,
+    observerLeTexte,
     sortieDuService,
     signalServices,
   };
