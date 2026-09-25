@@ -2,8 +2,8 @@
 id: ticket-166
 title: "La branche de base est globale, et le projet n'a que main"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 10
 priority: critical
 agent: codeur
 depends_on: ["ticket-159"]
