@@ -2,8 +2,8 @@
 id: ticket-178
 title: "Un run en cours confisque le centre, et « Vue liste » n'a plus d'effet"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 31
 priority: high
 agent: codeur
 depends_on: []

@@ -2,8 +2,8 @@
 id: ticket-179
 title: "Une file ne montre que son ticket courant, pas ceux qui l'ont précédé"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 32
 priority: medium
 agent: codeur
 depends_on: ["ticket-172"]
