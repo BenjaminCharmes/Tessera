@@ -2,8 +2,8 @@
 id: ticket-181
 title: "La carte d'un run n'apprend jamais l'avancement d'une file"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 39
 priority: high
 agent: codeur
 depends_on: ["ticket-172", "ticket-179"]
