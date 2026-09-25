@@ -2,8 +2,8 @@
 id: ticket-164
 title: "« Select a project » s'affiche en anglais, sur un projet déjà sélectionné"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 12
 priority: medium
 agent: codeur
 depends_on: []

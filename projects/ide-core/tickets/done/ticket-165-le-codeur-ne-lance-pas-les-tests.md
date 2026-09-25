@@ -2,8 +2,8 @@
 id: ticket-165
 title: "Le codeur promet une commande de test qu'il ne peut pas lancer"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 13
 priority: high
 agent: codeur
 depends_on: []

@@ -2,8 +2,8 @@
 id: ticket-163
 title: "L'observation d'un run ne survit ni à une déconnexion ni à une arrivée tardive"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 11
 priority: critical
 agent: codeur
 depends_on: []
