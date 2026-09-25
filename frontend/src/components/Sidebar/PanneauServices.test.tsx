@@ -273,3 +273,22 @@ describe("PanneauServices — le projet qui fait tourner l'IDE (ticket-152)", ()
     );
   });
 });
+
+describe("PanneauServices — ce que coute un projet qui ne declare rien", () => {
+  it("tient sur une ligne repliee, l'explication se deplie (ticket-156)", () => {
+    // Le panneau s'ouvre desormais d'office sur ces projets : ce qu'il montre
+    // par defaut se paie donc sur chaque projet qui n'a pas vocation a etre
+    // lance. Une ligne, et le detail sur demande.
+    rendre({ declare: false, services: [] });
+
+    const resume = screen.getByText(/ne déclare aucun service/);
+    expect(resume.closest("summary")).not.toBeNull();
+    expect(resume.closest("details")?.hasAttribute("open")).toBe(false);
+  });
+
+  it("n'offre aucun geste de lancement quand rien n'est declare (ADR-042)", () => {
+    rendre({ declare: false, services: [] });
+
+    expect(screen.queryByRole("button", { name: /Lancer/ })).toBeNull();
+  });
+});

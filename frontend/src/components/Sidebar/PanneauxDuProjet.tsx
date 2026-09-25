@@ -37,8 +37,12 @@ export default function PanneauxDuProjet({
       {/* Ouvert aussi dès qu'un service vit ou vient de mourir : après un
           rechargement, `servicesOuverts` repart à faux et le seul clic qui
           rouvrait le panneau arrêtait le service (ticket-155). */}
+      {/* Ouvert aussi quand rien n'est déclaré : `RienDeclare` n'était
+          atteignable par personne, le seul geste qui ouvrait ce panneau étant
+          le bouton de lancement — que ces projets n'ont pas (ticket-156). */}
       {(servicesOuverts ||
         project.fait_tourner_l_ide ||
+        services?.declare === false ||
         services?.enCours ||
         services?.enEchec) &&
       services &&

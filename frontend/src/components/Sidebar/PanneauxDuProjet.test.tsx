@@ -90,3 +90,16 @@ describe("PanneauxDuProjet — ce qui rouvre le panneau (ticket-155)", () => {
     expect(screen.getByLabelText("Services du projet")).toBeInTheDocument();
   });
 });
+
+describe("PanneauxDuProjet — un projet qui ne declare rien (ticket-156)", () => {
+  it("rend l'explication atteignable sans bouton de lancement", () => {
+    // `RienDeclare` existait depuis ticket-147 sans que personne puisse
+    // l'atteindre : le seul geste qui ouvrait le panneau etait le bouton de
+    // lancement, et celui-ci ne s'affiche pas quand rien n'est declare.
+    // Meme forme que ticket-152 pour le projet qui fait tourner l'IDE : une
+    // absence de bouton s'explique en ouvrant le panneau d'office.
+    rendre(false, { declare: false, services: [], enCours: false });
+
+    expect(screen.getByLabelText("Services du projet")).toBeInTheDocument();
+  });
+});

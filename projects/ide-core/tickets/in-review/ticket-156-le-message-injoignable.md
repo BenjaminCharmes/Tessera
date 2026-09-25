@@ -2,7 +2,7 @@
 id: ticket-156
 title: "Le message « ajoute une liste services » ne s'affiche jamais"
 type: fix
-status: todo
+status: in-review
 pr_number: null
 priority: medium
 agent: codeur

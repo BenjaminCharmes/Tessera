@@ -11,11 +11,16 @@ import type { ServiceActif } from "../../types/api";
  * juste en dessous. La sortie existait déjà, mais dans la vue Supervision et
  * après un clic de plus : l'information était là et restait introuvable.
  *
- * `RienDeclare` **n'est atteint par personne aujourd'hui** : le seul geste
- * qui ouvre ce panneau est le bouton de lancement, et celui-ci ne s'affiche
- * pas quand rien n'est déclaré. La docstring affirmait l'inverse — voir
- * ticket-156, qui tranchera entre rendre l'explication accessible et
- * supprimer le code que rien n'atteint.
+ * `RienDeclare` est atteignable depuis ticket-156 : `PanneauxDuProjet` ouvre
+ * ce panneau d'office quand rien n'est déclaré, comme il le fait déjà pour le
+ * projet qui fait tourner l'IDE. Une absence de bouton s'explique là où le
+ * bouton manquerait, pas ailleurs.
+ *
+ * Replié par défaut, et sans le moindre geste de lancement : ADR-042 pose que
+ * ne rien déclarer **est** la réponse « ce projet ne se lance pas depuis
+ * l'IDE ». Beaucoup de projets sont dans ce cas pour de bon — des scripts — et
+ * ce qu'on leur montre par défaut se paie sur chacun d'eux. D'où une ligne,
+ * et le détail seulement si on le demande.
  */
 interface PanneauServicesProps {
   services: UseServicesResult;
@@ -184,27 +189,36 @@ function RienDeclare({
   chemin: string | null;
 }) {
   return (
-    <div className="space-y-2 p-3" aria-label="Services du projet">
-      <p className="text-xs text-zinc-400">
-        « {projectId} » ne déclare aucun service. Ajoute une liste{" "}
-        <code className="text-zinc-300">services</code> dans son{" "}
-        <code className="text-zinc-300">agents.json</code> :
-      </p>
-      <pre className="overflow-x-auto rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400">
-        {EXEMPLE}
-      </pre>
-      <p className="text-micro text-zinc-500">
-        La commande est lancée telle quelle, sans shell : une commande par
-        service, et pas de <code>&amp;&amp;</code>.
-      </p>
-      {chemin ? (
-        <a
-          href={`vscode://file/${chemin.replace(/\\/g, "/")}/agents.json`}
-          className="inline-block rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 hover:border-zinc-500 hover:text-zinc-100"
-        >
-          Ouvrir agents.json
-        </a>
-      ) : null}
+    <div className="p-3" aria-label="Services du projet">
+      <details className="group">
+        <summary className="cursor-pointer list-none text-micro text-zinc-500 transition-colors hover:text-zinc-300">
+          « {projectId} » ne déclare aucun service.{" "}
+          <span className="text-zinc-600 group-open:hidden">
+            Comment en déclarer un ?
+          </span>
+        </summary>
+        <div className="space-y-2 pt-2">
+          <p className="text-xs text-zinc-400">
+            Ajoute une liste <code className="text-zinc-300">services</code>{" "}
+            dans son <code className="text-zinc-300">agents.json</code> :
+          </p>
+          <pre className="overflow-x-auto rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400">
+            {EXEMPLE}
+          </pre>
+          <p className="text-micro text-zinc-500">
+            La commande est lancée telle quelle, sans shell : une commande par
+            service, et pas de <code>&amp;&amp;</code>.
+          </p>
+          {chemin ? (
+            <a
+              href={`vscode://file/${chemin.replace(/\\/g, "/")}/agents.json`}
+              className="inline-block rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 hover:border-zinc-500 hover:text-zinc-100"
+            >
+              Ouvrir agents.json
+            </a>
+          ) : null}
+        </div>
+      </details>
     </div>
   );
 }
