@@ -26,10 +26,11 @@ from tessera.utils.logger import get_logger
 
 from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
-from tessera.services.pipeline_run import PipelineRun, set_status
+from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 
 if TYPE_CHECKING:
     from tessera.services.quota_tracker import QuotaTracker
+    from tessera.services.run_recorder import RunRecorder
     from tessera.services.git_workspace import GitWorkspaceService
     from tessera.services.security_auditor import SecurityAuditorService
     from tessera.services.test_runner import TestRunnerService
@@ -64,6 +65,7 @@ class Orchestrator:
         quota_tracker: Optional["QuotaTracker"] = None,
         livrer: Optional[Callable[[PipelineResult], Awaitable["Livraison"]]] = None,
         documenter: Optional[Callable[[], Awaitable[None]]] = None,
+        run_recorder: Optional["RunRecorder"] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -93,6 +95,10 @@ class Orchestrator:
         # produiraient trois réécritures partielles du même fichier
         # (ticket-092).
         self._documenter = documenter
+        # Ouvre et clôt la ligne d'un run en base quand l'appelant n'en a pas
+        # fourni : la file, le run autonome et le chat ne persistaient ni
+        # leurs runs ni les coûts de leurs appels (ticket-121).
+        self._run_recorder = run_recorder
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -131,7 +137,8 @@ class Orchestrator:
         ailleurs la réserverait au run unique, alors que c'est en file que
         l'absence de clic compte le plus.
         """
-        resultat = await self._run_pipeline(
+        on_event = tolerant(on_event)
+        resultat = await self._run_enregistre(
             project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
         )
         if self._livrer is None or not resultat.approved:
@@ -146,6 +153,36 @@ class Orchestrator:
             )
         )
         return resultat.model_copy(update={"livraison": livraison})
+
+    async def _run_enregistre(
+        self,
+        project_id: str,
+        ticket_id: str,
+        on_event: EventCallback,
+        run_id: str | None,
+        dialogue: DialogueChannel | None,
+    ) -> PipelineResult:
+        """Run the pipeline inside a database record, when nobody opened one.
+
+        Clore appartient à celui qui a ouvert : un `run_id` fourni par
+        l'appelant — `/orchestrator/run`, le stream single — est le sien, il
+        y rattache ses événements et le clôt lui-même. La ligne se ferme
+        aussi quand le run lève : c'est ce qu'ADR-037 demande au routeur, et
+        la file n'a pas de routeur par ticket pour le faire.
+        """
+        if run_id is not None or self._run_recorder is None:
+            return await self._run_pipeline(
+                project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
+            )
+        run_id = await self._run_recorder.ouvrir(project_id, ticket_id)
+        resultat: PipelineResult | None = None
+        try:
+            resultat = await self._run_pipeline(
+                project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
+            )
+            return resultat
+        finally:
+            await self._run_recorder.clore(run_id, resultat)
 
     async def _run_pipeline(
         self,
@@ -246,6 +283,17 @@ class Orchestrator:
             return None
         return min(eligible, key=lambda t: _PRIORITY_ORDER.get(t.priority, 99))
 
+    async def _est_termine(self, ticket_id: str) -> bool:
+        """Le ticket est-il déjà `done` ou `cancelled` ?
+
+        Un ticket introuvable n'est pas « terminé » : le laisser passer rend
+        l'erreur au bon endroit, dans `_run_pipeline`, qui sait la nommer.
+        """
+        ticket = await self._ticket_svc.get_ticket(ticket_id)
+        if ticket is None:
+            return False
+        return ticket.status in (TicketStatus.done, TicketStatus.cancelled)
+
     async def run_queue(
         self,
         project_id: str,
@@ -268,7 +316,7 @@ class Orchestrator:
         async def _noop(event: OrchestratorEvent) -> None:
             pass
 
-        callback = on_event or _noop
+        callback = tolerant(on_event or _noop)
         results: list[PipelineResult] = []
 
         for index, ticket_id in enumerate(ticket_ids, start=1):
@@ -281,6 +329,18 @@ class Orchestrator:
             if self.budget_exhausted():
                 self._log(f"[{project_id}] file interrompue : plafond de dépense")
                 break
+
+            # Un ticket déjà terminé se **saute**, il ne s'exécute pas : le
+            # relancer refait un travail livré, sur une branche neuve et aux
+            # frais du quota. L'UI cachait déjà le bouton « Lancer » sur un
+            # `done`, mais pas celui de la file, et rien ne rattrapait ici —
+            # or cet endpoint est appelable directement (ticket-115).
+            #
+            # Sauter plutôt qu'arrêter : une file où un ticket terminé s'est
+            # glissé doit traiter les autres.
+            if await self._est_termine(ticket_id):
+                self._log(f"[{project_id}] {ticket_id} sauté : déjà terminé")
+                continue
 
             await callback(
                 OrchestratorEvent(
@@ -313,7 +373,7 @@ class Orchestrator:
         async def _noop(event: OrchestratorEvent) -> None:
             pass
 
-        callback = on_event or _noop
+        callback = tolerant(on_event or _noop)
         results: list[PipelineResult] = []
 
         for _ in range(max_tickets):

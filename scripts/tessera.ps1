@@ -128,10 +128,14 @@ switch ($Task) {
         # sur : la CI lancait `npx tsc --noEmit`, qui ne verifiait aucun
         # fichier, et `mypy || true`, qui avalait ses erreurs (ticket-095).
         $etapes = @(
-            @{ Titre = '1/4 Backend - pytest';   Dossier = 'backend';  Commande = { & uv run pytest -q -m 'not integration' } },
-            @{ Titre = '2/4 Backend - mypy';     Dossier = 'backend';  Commande = { & uv run mypy src/ } },
-            @{ Titre = '3/4 Frontend - types';   Dossier = 'frontend'; Commande = { & npm run typecheck; if ($LASTEXITCODE -eq 0) { & npm run test -- --run } } },
-            @{ Titre = '4/4 E2E - playwright';   Dossier = 'frontend'; Commande = { & npm run test:e2e } }
+            @{ Titre = '1/5 Backend - pytest';   Dossier = 'backend';  Commande = { & uv run pytest -q -m 'not integration' } },
+            # Deux passes : mypy n'analyse qu'une plateforme a la fois, celle
+            # sur laquelle il tourne. Du code Windows-only typait ici et
+            # cassait la CI Linux, que rien en local ne pouvait voir (ticket-153).
+            @{ Titre = '2/5 Backend - mypy';     Dossier = 'backend';  Commande = { & uv run mypy src/; if ($LASTEXITCODE -eq 0) { & uv run mypy --platform linux src/ } } },
+            @{ Titre = '3/5 Frontend - lint';    Dossier = 'frontend'; Commande = { & npm run lint } },
+            @{ Titre = '4/5 Frontend - types';   Dossier = 'frontend'; Commande = { & npm run typecheck; if ($LASTEXITCODE -eq 0) { & npm run test -- --run } } },
+            @{ Titre = '5/5 E2E - playwright';   Dossier = 'frontend'; Commande = { & npm run test:e2e } }
         )
         foreach ($etape in $etapes) {
             Write-Host ''
@@ -151,6 +155,9 @@ switch ($Task) {
     }
     'lint' {
         Push-Location (Join-Path $Root 'backend')
-        try { & uv run mypy src/ } finally { Pop-Location }
+        try {
+            & uv run mypy src/
+            if ($LASTEXITCODE -eq 0) { & uv run mypy --platform linux src/ }
+        } finally { Pop-Location }
     }
 }

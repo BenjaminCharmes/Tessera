@@ -23,7 +23,7 @@ export default function AgentBlock({
   reviewContent,
 }: AgentBlockProps) {
   return (
-    <div className="mx-3 mb-3 rounded border border-zinc-700 overflow-hidden">
+    <div className="mx-3 mb-3 rounded-sm border border-zinc-700 overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800 text-xs font-semibold text-zinc-300">
         <span>{agent.toUpperCase()}</span>
         {isActive && (

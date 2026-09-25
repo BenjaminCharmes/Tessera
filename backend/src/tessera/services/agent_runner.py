@@ -23,6 +23,16 @@ _logger = get_logger(__name__)
 _DEFAULT_MODEL = "claude-sonnet-4-6"
 _DEFAULT_MAX_TOKENS = 8192
 
+#: Ce que le reviewer peut faire : lire. Son prompt dit « tu ne modifies
+#: rien » ; il recevait pourtant les outils du codeur, et la règle tenait à
+#: sa bonne volonté. Comme pour ADR-027, ce qui n'est pas retiré n'est pas
+#: interdit.
+OUTILS_DE_RELECTURE: list[str] = ["Read", "Glob", "Grep"]
+
+#: Construit un provider limité aux outils nommés — `get_provider(tools=…)`
+#: chez le produit, un double dans les tests.
+FabriqueProvider = Callable[[list[str]], LLMProvider]
+
 _INSTRUCTIONS: dict[str, str] = {
     AgentRole.codeur.value: (
         "Implémente le ticket selon les critères d'acceptation. "
@@ -50,11 +60,14 @@ class AgentRunner:
         registry: AgentRegistryService,
         db_path: Path | str | None = None,
         project_path: Path | None = None,
+        fabrique_provider: FabriqueProvider | None = None,
     ) -> None:
         self._provider = provider
         self._registry = registry
         self._db_path = db_path
         self._project_path = project_path
+        self._fabrique_provider = fabrique_provider
+        self._provider_relecture: LLMProvider | None = None
 
     async def run(
         self,
@@ -84,9 +97,10 @@ class AgentRunner:
         # (ticket-066).
         extra: dict[str, Any] = {"ask_user": ask_user} if ask_user is not None else {}
 
+        provider = self._provider_pour(role_str)
         provider_result: ProviderResult
         if stream_callback is not None:
-            provider_result = await self._provider.stream(
+            provider_result = await provider.stream(
                 system=system_prompt,
                 user=user_prompt,
                 model=model,
@@ -97,7 +111,7 @@ class AgentRunner:
                 **extra,
             )
         else:
-            provider_result = await self._provider.complete(
+            provider_result = await provider.complete(
                 system=system_prompt,
                 user=user_prompt,
                 model=model,
@@ -158,6 +172,19 @@ class AgentRunner:
             duration_ms=duration_ms,
             cost_usd=cost_usd,
         )
+
+    def _provider_pour(self, role: str) -> LLMProvider:
+        """Le provider commun, sauf pour le reviewer qui n'a que la lecture.
+
+        Sans fabrique — les tests, les doubles — tout le monde partage le
+        provider reçu : le produit distingue deux jeux d'outils, pas deux
+        façons de construire un runner.
+        """
+        if role != AgentRole.reviewer.value or self._fabrique_provider is None:
+            return self._provider
+        if self._provider_relecture is None:
+            self._provider_relecture = self._fabrique_provider(list(OUTILS_DE_RELECTURE))
+        return self._provider_relecture
 
     def _load_system_prompt(
         self, role: str, agent_config: AgentConfig | None = None

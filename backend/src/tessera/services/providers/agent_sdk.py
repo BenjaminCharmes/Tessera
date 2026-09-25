@@ -40,8 +40,14 @@ def _build_options(
     cwd: Path | None,
     allowed_tools: list[str] | None = None,
     ask_user: Callable[[str], Awaitable[str]] | None = None,
+    racine_ecriture: Path | None = None,
 ) -> ClaudeAgentOptions:
-    """Builds SDK options with the guardrails established by the ticket-044 spike."""
+    """Builds SDK options with the guardrails established by the ticket-044 spike.
+
+    ``racine_ecriture`` is the write root the run froze before its first agent
+    (ticket-119); left ``None``, the perimeter hook reads it from the project's
+    ``agents.json`` as before.
+    """
     # ``allowed_tools`` only controls auto-approval — the SDK CLI's
     # subprocess transport reads ``if effective_allowed_tools:`` and omits
     # ``--allowedTools`` entirely when the list is empty, leaving the CLI's
@@ -101,7 +107,7 @@ def _build_options(
                 # (ticket-085).
                 HookMatcher(
                     matcher="Write|Edit|NotebookEdit|Bash",
-                    hooks=[hook_refus_hors_perimetre(cwd)],
+                    hooks=[hook_refus_hors_perimetre(cwd, racine=racine_ecriture)],
                 ),
             ]
         },
@@ -153,9 +159,14 @@ class ClaudeAgentSDKProvider:
         max_turns: int = 30,
         max_budget_usd: float | None = None,
         allowed_tools: list[str] | None = None,
+        racine_ecriture: Path | None = None,
     ) -> None:
         self._max_turns = max_turns
         self._max_budget_usd = max_budget_usd
+        # La racine d'écriture figée pour tout le run (ticket-119). Les options
+        # sont reconstruites à chaque appel d'agent : sans elle, chaque agent
+        # du pipeline relirait `agents.json` — donc ce que le codeur y a écrit.
+        self.racine_ecriture = racine_ecriture
         # Le provider est le seul endroit qui voit les messages du SDK : c'est
         # donc ici que le quota se capte, et sa forme s'arrête ici (ticket-054).
         self.quota = QuotaTracker()
@@ -211,6 +222,7 @@ class ClaudeAgentSDKProvider:
             system=system, model=model, max_turns=self._max_turns,
             max_budget_usd=self._max_budget_usd, cwd=cwd,
             allowed_tools=self._allowed_tools, ask_user=ask_user,
+            racine_ecriture=self.racine_ecriture,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None

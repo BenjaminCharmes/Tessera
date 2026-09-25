@@ -45,6 +45,22 @@ async def test_le_prompt_nomme_les_fichiers_et_leur_contenu(tmp_path: Path) -> N
     assert "a = 1" in prompt and "a = 2" in prompt
 
 
+async def test_le_ticket_ne_recopie_pas_les_regles_du_prompt(tmp_path: Path) -> None:
+    # Les trois règles — réécrire sans marqueur, garder la branche du ticket,
+    # aucune commande git — sont dans `resolveur-conflit.md`. Les répéter dans
+    # le ticket, c'est deux descriptions d'une même règle (ADR-034).
+    (tmp_path / "app.py").write_text("x", encoding="utf-8")
+    runner = _FauxRunner()
+    svc = ResolveurConflitService(runner, tmp_path)  # type: ignore[arg-type]
+
+    await svc.resoudre(("app.py",))
+
+    prompt = str(runner.appels[0]["ticket"].body)  # type: ignore[union-attr]
+    assert "Réécris" not in prompt
+    assert "commande git" not in prompt
+    assert prompt.lstrip().startswith("## app.py")
+
+
 async def test_un_fichier_disparu_ne_casse_pas_la_resolution(tmp_path: Path) -> None:
     runner = _FauxRunner()
     svc = ResolveurConflitService(runner, tmp_path)  # type: ignore[arg-type]

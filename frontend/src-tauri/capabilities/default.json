@@ -6,12 +6,6 @@
     "main"
   ],
   "permissions": [
-    "core:default",
-    "shell:allow-open",
-    "fs:allow-read-text-file",
-    "fs:allow-write-text-file",
-    "fs:allow-read-dir",
-    "fs:allow-mkdir",
-    "fs:scope-home-recursive"
+    "core:default"
   ]
 }

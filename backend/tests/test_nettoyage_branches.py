@@ -74,11 +74,26 @@ async def test_les_branches_hors_tessera_ne_sont_pas_touchees(depot: Path) -> No
 
 
 async def test_les_branches_de_chat_sont_nettoyables(depot: Path) -> None:
-    await _git(depot, "branch", "chat/20260917-1100")
+    # `GitWorkspaceService._branch_name` joint l'identifiant et le slug par un
+    # tiret et retire tout ce qui n'est pas alphanumerique : une session de
+    # chat vit donc sur `chat-<horodatage>`, jamais sur `chat/…`. Le nettoyage
+    # cherchait `chat/` et ne reconnaissait aucune branche de chat reelle.
+    await _git(depot, "branch", "chat-20260922-120000")
 
     plan = await plan_de_nettoyage(depot)
 
-    assert plan.nettoyables == ["chat/20260917-1100"]
+    assert plan.nettoyables == ["chat-20260922-120000"]
+
+
+async def test_une_branche_chat_slash_n_est_pas_a_tessera(depot: Path) -> None:
+    # Tessera n'a jamais pu creer `chat/…` : une telle branche est a
+    # l'utilisateur, et le nettoyage ne la touche pas.
+    await _git(depot, "branch", "chat/perso")
+
+    plan = await plan_de_nettoyage(depot)
+
+    assert plan.nettoyables == []
+    assert plan.conservees == []
 
 
 async def test_la_suppression_ne_touche_que_le_plan(depot: Path) -> None:

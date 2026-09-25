@@ -1,9 +1,10 @@
 import { BAND } from "../../design/layout";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import MarkdownView from "./MarkdownView";
 import MonacoEditor from "@monaco-editor/react";
 import { detectLanguage } from "./useMonaco";
 import { readFile } from "../../lib/fs";
+import { useResource } from "../../hooks/useResource";
 import type { Ticket } from "../../types/api";
 
 interface EditorProps {
@@ -24,43 +25,31 @@ interface EditorProps {
  * pendant qu'un agent travaille sur la même branche produisait un conflit que
  * personne n'arbitrait. Le bouton « Ouvrir dans VSCode » de l'en-tête de projet
  * remplace ce chemin.
+ *
+ * La lecture passe par `useResource` : deux clics rapides dans l'arbre
+ * faisaient arriver la lecture du premier fichier après celle du second, et
+ * son contenu s'affichait sous l'en-tête de l'autre (ticket-123).
  */
 
 const WELCOME =
   "# Tessera\n\nSélectionne un projet puis un ticket dans la sidebar.\n";
 
 export default function Editor({ ticket, openFilePath = null }: EditorProps) {
-  const [content, setContent] = useState<string>(WELCOME);
-  const [filePath, setFilePath] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const cible = openFilePath ?? ticket?.file_path ?? null;
+  const fetcher = useMemo(
+    () => (cible ? () => readFile(cible) : null),
+    [cible],
+  );
+  const lecture = useResource<string | null>(fetcher, null);
 
-  useEffect(() => {
-    const cible = openFilePath ?? ticket?.file_path ?? null;
-    if (!cible) {
-      setContent(WELCOME);
-      setFilePath(null);
-      setError(null);
-      return;
-    }
+  const filePath = cible;
+  const loading = lecture.loading;
+  const error = lecture.error
+    ? `Impossible de lire le fichier : ${lecture.error}`
+    : null;
+  const content = cible === null ? WELCOME : (lecture.data ?? "");
 
-    setLoading(true);
-    setError(null);
-
-    readFile(cible)
-      .then((text) => {
-        setContent(text);
-        setFilePath(cible);
-      })
-      .catch((err: unknown) => {
-        setError(`Impossible de lire le fichier : ${String(err)}`);
-        setContent("");
-        setFilePath(null);
-      })
-      .finally(() => setLoading(false));
-  }, [openFilePath, ticket?.file_path]);
-
-  const language = detectLanguage(filePath ?? openFilePath ?? ticket?.file_path ?? null);
+  const language = detectLanguage(filePath);
   const estMarkdown = (filePath ?? "").toLowerCase().endsWith(".md");
   // Le rendu est le défaut sur un Markdown : tickets, ADR et notes se lisent
   // comme des documents, pas comme du source (ticket-078).

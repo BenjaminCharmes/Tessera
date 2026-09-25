@@ -105,7 +105,7 @@ export default function CreateTicketModal({
               }}
               placeholder="Implémenter la fonctionnalité X"
               maxLength={100}
-              className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400"
+              className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400"
               disabled={loading}
               autoFocus
             />
@@ -128,7 +128,7 @@ export default function CreateTicketModal({
                 id="ticket-type"
                 value={type}
                 onChange={(e) => setType(e.target.value as TicketType)}
-                className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-400"
+                className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 focus:outline-hidden focus:border-zinc-400"
                 disabled={loading}
               >
                 {TYPES.map((t) => (
@@ -149,7 +149,7 @@ export default function CreateTicketModal({
                 id="ticket-priority"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as TicketPriority)}
-                className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-400"
+                className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 focus:outline-hidden focus:border-zinc-400"
                 disabled={loading}
               >
                 {PRIORITIES.map((p) => (
@@ -176,7 +176,7 @@ export default function CreateTicketModal({
               placeholder="## Contexte&#10;&#10;## Tâches&#10;&#10;## Critères d'acceptation"
               maxLength={2000}
               rows={5}
-              className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 resize-none font-mono"
+              className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400 resize-none font-mono"
               disabled={loading}
             />
           </div>
@@ -199,7 +199,7 @@ export default function CreateTicketModal({
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded-sm transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {loading && (
                 <span className="inline-block w-3 h-3 border-2 border-zinc-400 border-t-white rounded-full animate-spin" />

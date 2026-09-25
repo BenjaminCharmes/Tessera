@@ -121,18 +121,24 @@ class TestSecurityAuditorService:
         assert result.has_high is False
         assert len(result.issues) == 1
 
-    async def test_pass_on_invalid_json_response(
+    async def test_bloque_sur_json_illisible(
         self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
+        # Un JSON illisible valait PASS : l'audit échouait ouvert, et un diff
+        # dangereux passait parce que l'auditeur avait mal répondu (ticket-122).
         _set_response(provider, {})
 
         result = await service.audit("code", tmp_path)
 
-        assert result.verdict == "PASS"
+        assert result.verdict == "BLOCK"
+        assert result.reason
+        assert result.reason in result.summary
 
-    async def test_pass_on_llm_failure(
+    async def test_bloque_quand_le_provider_est_indisponible(
         self, service: SecurityAuditorService, tmp_path: Path
     ) -> None:
+        # Provider en panne valait PASS par défaut. Un audit qui n'a pas eu
+        # lieu ne peut pas approuver ; le `reason` doit dire pourquoi à l'écran.
         class _FailingProvider(FakeProvider):
             async def complete(self, **kwargs):  # type: ignore[override]
                 raise Exception("Network error")
@@ -141,7 +147,31 @@ class TestSecurityAuditorService:
 
         result = await service_with_failure.audit("code", tmp_path)
 
-        assert result.verdict == "PASS"
+        assert result.verdict == "BLOCK"
+        assert "Network error" in result.reason
+        assert result.reason in result.summary
+
+    async def test_un_issue_high_bloque_malgre_un_verdict_pass(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # `has_high` était calculé mais ne gatait rien : le LLM pouvait lister
+        # une faille HIGH et conclure PASS, et le pipeline suivait le PASS.
+        _set_response(
+            provider,
+            {
+                "verdict": "PASS",
+                "summary": "ok",
+                "issues": [
+                    {"severity": "HIGH", "type": "xss", "location": "a.py:1",
+                     "description": "d", "fix": "f"}
+                ],
+            },
+        )
+
+        result = await service.audit("code", tmp_path)
+
+        assert result.verdict == "BLOCK"
+        assert "HIGH" in result.reason
 
     async def test_audit_result_properties(
         self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path

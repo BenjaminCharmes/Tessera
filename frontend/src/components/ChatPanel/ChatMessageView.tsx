@@ -13,7 +13,7 @@ export default function ChatMessageView({ message }: ChatMessageViewProps) {
       <div
         className={
           isUser
-            ? "max-w-[85%] rounded bg-zinc-700 px-2.5 py-1.5 text-sm text-zinc-100 whitespace-pre-wrap"
+            ? "max-w-[85%] rounded-sm bg-zinc-700 px-2.5 py-1.5 text-sm text-zinc-100 whitespace-pre-wrap"
             : "text-sm text-zinc-300 whitespace-pre-wrap"
         }
       >

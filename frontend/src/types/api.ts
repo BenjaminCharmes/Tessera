@@ -45,6 +45,9 @@ export type EventType =
   | "queue_progress"
   | "livraison_done"
   | "pipeline_done"
+  | "run_closed"
+  | "service_output"
+  | "service_closed"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
@@ -66,7 +69,11 @@ export interface Project {
   active_agents: string[];
   stack: string | null;
   raw_claude_md: string;
-  github_remote: string | null;
+  github_remote: string | null;  /**
+   * Ce projet execute l'IDE en ce moment (ticket-152). Lui proposer
+   * « Lancer » demarrerait un second backend sur un port deja pris.
+   */
+  fait_tourner_l_ide?: boolean;
 }
 
 export interface Ticket {
@@ -103,6 +110,62 @@ export interface OrchestratorEvent {
   ticket_id: string;
   data: Record<string, unknown>;
   timestamp: string;
+  /**
+   * De quel run vient l'evenement, et sur quel projet (ticket-128). Le canal
+   * d'observation porte tous les runs de la machine : sans ces deux champs,
+   * un client ne saurait pas a quoi rattacher ce qu'il recoit.
+   */
+  run_id?: string | null;
+  project_id?: string | null;
+}
+
+/** Ce que `POST /orchestrator/run` accepte — les trois modes (ticket-128). */
+export interface RunRequest {
+  project_id: string;
+  ticket_id?: string | null;
+  ticket_ids?: string[];
+  mode?: "single" | "queue" | "autonomous";
+  max_tickets?: number;
+  depuis_github?: boolean;
+}
+
+/** Un service lance pour un projet (ticket-137). */
+export interface ServiceActif {
+  nom: string;
+  project_id: string;
+  /** `null` pour un service declare mais pas lance (ticket-146). */
+  pid: number | null;
+  demarre_a: string;
+  en_cours: boolean;
+  code_de_sortie: number | null;
+  /**
+   * Les dernieres lignes que le service a ecrites, gardees par le backend
+   * (ticket-148). Le canal ne rejoue pas l'historique : sans elles, qui ouvre
+   * l'IDE apres le demarrage ne verrait jamais l'adresse annoncee.
+   */
+  sortie?: string[];
+  /**
+   * Vrai quand c'est l'utilisateur qui a demande l'arret (ticket-151).
+   * `terminate()` laisse un code non nul sur certaines plateformes : sans ce
+   * drapeau, un service qu'on vient d'arreter s'afficherait en echec.
+   */
+  arrete_a_la_main?: boolean;
+}
+
+/** L'instantane des runs vivants, envoye a la connexion sur `/observe`. */
+export interface RunActif {
+  run_id: string;
+  project_id: string;
+  mode: string;
+  ticket_id: string | null;
+  etape: string | null;
+  agent: AgentRole | null;
+  tour: number;
+  tokens_entree: number;
+  tokens_sortie: number;
+  cout_usd: number;
+  verdict: string | null;
+  demarre_a: string;
 }
 
 export interface TicketCreate {
@@ -341,6 +404,12 @@ export interface OpenPrResponse {
 export interface TicketDiff {
   ticket_id: string;
   branch: string | null;
+  /**
+   * Le commit retrouvé quand la branche n'existe plus (ticket-116).
+   * Supprimer la branche après le merge est la pratique normale : sans ce
+   * repli, le diff disparaissait pour tout ticket proprement terminé.
+   */
+  commit: string | null;
   diff: string;
   files: string[];
 }

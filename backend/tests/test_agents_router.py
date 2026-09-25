@@ -60,3 +60,11 @@ def test_make_project_creator_n_a_aucun_outil() -> None:
     Write/Edit/Bash rooted in the backend process's own cwd."""
     creator = _make_project_creator()
     assert creator._provider._allowed_tools == []
+
+
+def test_make_runner_donne_au_reviewer_des_outils_en_lecture_seule() -> None:
+    # Un filtre écrit dans `AgentRunner` mais jamais branché par le routeur
+    # ne filtre rien : c'est ici que le produit construit ses runners.
+    runner = _make_runner("mon-projet")
+    assert runner._provider_pour("reviewer")._allowed_tools == ["Read", "Glob", "Grep"]
+    assert runner._provider_pour("codeur") is runner._provider

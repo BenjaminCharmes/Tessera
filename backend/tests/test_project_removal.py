@@ -1,5 +1,7 @@
 """Retirer un projet de l'IDE — ticket-063."""
 import asyncio
+import shutil
+import stat
 from pathlib import Path
 
 import pytest
@@ -202,3 +204,46 @@ def test_sans_depot_au_dessus_le_comportement_ne_change_pas(tmp_path: Path) -> N
     destination = _detached_destination(projet)
 
     assert destination.parent.name == "tessera-detaches"
+
+
+async def test_supprimer_un_projet_qui_porte_un_depot_git(workspace: Path) -> None:
+    """Deleting a project whose .git holds read-only objects must succeed.
+
+    Reproduces the failure found on a real project: git marks its objects
+    read-only, and on Windows `shutil.rmtree` refuses to unlink a file
+    carrying that attribute — POSIX only checks the parent directory. The
+    endpoint answered 500 on `.git/objects/00/07d9…`.
+
+    It is a direct consequence of ticket-104: before it, a created project had
+    no `.git` at all, so deletion worked. Giving every project a repository
+    broke the opposite operation.
+    """
+    project = _make_copy(workspace)
+    objets = project / ".git" / "objects" / "00"
+    objets.mkdir(parents=True)
+    objet = objets / "07d9e3246b0bdfb0a9dcebd8056df271077a65"
+    objet.write_bytes(b"contenu d'un objet git")
+    objet.chmod(stat.S_IREAD)
+
+    await delete_project(project, confirmed=True)
+
+    assert not project.exists()
+
+
+async def test_une_erreur_qui_n_est_pas_un_droit_remonte(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The read-only retry must not swallow other failures.
+
+    A deletion that reports success while leaving files behind is worse than
+    one that fails: the project disappears from the UI and stays on disk.
+    """
+    project = _make_copy(workspace)
+
+    def _verrouille(*_args: object, **_kwargs: object) -> None:
+        raise OSError("fichier verrouillé par un autre processus")
+
+    monkeypatch.setattr(shutil, "rmtree", _verrouille)
+
+    with pytest.raises(OSError):
+        await delete_project(project, confirmed=True)

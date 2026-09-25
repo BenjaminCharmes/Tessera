@@ -3,7 +3,7 @@ import { BAND } from "../../design/layout";
 import AgentBlock from "../AgentPanel/AgentBlock";
 import PipelineSummary from "../AgentPanel/PipelineSummary";
 import type { AgentRole, OrchestratorEvent } from "../../types/api";
-import type { UseOrchestratorStreamResult } from "../../hooks/useOrchestratorStream";
+import type { UseRunActifResult } from "../../hooks/streamState";
 
 /**
  * Ce que le run est en train de faire, au centre de l'écran (ticket-075).
@@ -19,7 +19,7 @@ import type { UseOrchestratorStreamResult } from "../../hooks/useOrchestratorStr
  * ce qui sert à agir — répondre, infléchir, arrêter.
  */
 interface RunViewProps {
-  stream: UseOrchestratorStreamResult;
+  stream: UseRunActifResult;
 }
 
 function aFini(events: OrchestratorEvent[], agent: AgentRole): boolean {

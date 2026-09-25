@@ -70,4 +70,14 @@ def peut_merger(project_path: Path, ci_status: str) -> bool:
     Une CI absente (`none`) ou en cours (`pending`) ne suffit pas : l'absence de
     signal n'est pas un signal favorable.
     """
-    return lire_niveau(project_path) is NiveauAutonomie.merge and ci_status == "passing"
+    return niveau_peut_merger(lire_niveau(project_path), ci_status)
+
+
+def niveau_peut_merger(niveau: NiveauAutonomie, ci_status: str) -> bool:
+    """La même règle, sur un niveau déjà lu.
+
+    C'est la forme qu'emploie le pipeline : sa politique est figée avant le
+    premier agent (ticket-119), et relire le fichier ici obéirait à ce qu'un
+    codeur y aurait écrit pendant le run.
+    """
+    return niveau is NiveauAutonomie.merge and ci_status == "passing"

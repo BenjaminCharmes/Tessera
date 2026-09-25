@@ -7,10 +7,15 @@ diff (including untracked files) and commit the work.
 import asyncio
 import json
 import re
+import tempfile
 from collections.abc import Awaitable, Callable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tessera.utils.logger import get_logger
+
+if TYPE_CHECKING:
+    from tessera.services.politique_run import PolitiqueRun
 
 _MAX_BRANCH_LENGTH = 60
 
@@ -23,7 +28,7 @@ _EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 # coder agent produced. `TicketService.update_status` rewrites the ticket's
 # Markdown file twice per run (in-progress, then in-review), and `_log`
 # appends to the pipeline log at every step. If these show up in the diff
-# fed to the reviewer/security-auditor/validator/doc-updater, those agents
+# fed to the reviewer/security-auditor/validator/documentation agents, they
 # mistake the orchestrator's own bookkeeping for the coder's work, and an
 # approved run would commit it under the ticket's message. Excluded from
 # both the reviewed diff and the ticket's own commit via git's magic
@@ -107,11 +112,32 @@ _logger = get_logger(__name__)
 _MARQUEUR_CONFLIT = "<" * 7
 
 
+def _dossier_sans_hooks() -> Path:
+    """Un dossier vide, hors de tout projet, à donner comme `core.hooksPath`.
+
+    Un chemin inexistant ferait aussi l'affaire pour git, mais un dossier qui
+    existe et qu'on contrôle ne laisse aucune place à l'interprétation. Créé à
+    la demande : `tempfile.gettempdir()` n'est pas connu au chargement du
+    module sur toutes les plateformes.
+    """
+    dossier = Path(tempfile.gettempdir()) / "tessera-sans-hooks"
+    dossier.mkdir(parents=True, exist_ok=True)
+    return dossier
+
+
 class GitWorkspaceService:
     """Drives git on a single workspace project, never on Tessera itself."""
 
-    def __init__(self, project_path: Path) -> None:
+    def __init__(
+        self, project_path: Path, politique: "PolitiqueRun | None" = None
+    ) -> None:
         self._project_path = project_path
+        # `git_root` décide d'où l'on stage (`.` ou `:/`). Figé par
+        # l'orchestrateur avant le premier agent : lu au moment de committer,
+        # il obéirait à ce qu'un codeur aurait écrit dans `agents.json` pendant
+        # le run (ticket-119). Sans politique — chat, endpoints — on lit le
+        # fichier, comme avant.
+        self._politique = politique
         # The ref checked out the first time this service touches the repo.
         # Every subsequent ticket branch forks from this ref, never from the
         # previously created ticket branch — otherwise ticket N would carry
@@ -229,20 +255,44 @@ class GitWorkspaceService:
         await self._ensure_own_repository()
         try:
             await self._run("rebase", base)
-        except GitCommandError:
-            pass
+        except GitCommandError as echec:
+            refus = echec
         else:
             return ()
 
         conflits = await self._fichiers_en_conflit()
-        if resolveur is None or not conflits:
-            await self._run("rebase", "--abort")
-            return conflits
+        if not conflits:
+            # Un rebase refusé **sans conflit** n'a rien laissé en cours : la
+            # commande s'est arrêtée avant de commencer — arbre sale, base
+            # inconnue. `--abort` levait alors à son tour, et son « no rebase
+            # in progress » remontait à la place de la vraie cause : la
+            # livraison du premier run approuvé s'est plainte de l'annulation,
+            # jamais de l'arbre que le pipeline venait de salir (ticket-159).
+            await self._annuler_si_en_cours()
+            raise refus
 
-        if not await self._faire_resoudre(conflits, resolveur):
+        if resolveur is None or not await self._faire_resoudre(conflits, resolveur):
             await self._run("rebase", "--abort")
             return conflits
         return ()
+
+    async def _annuler_si_en_cours(self) -> None:
+        """Annule le rebase s'il y en a un, sans jamais masquer l'erreur d'origine."""
+        if await self._rebase_en_cours():
+            try:
+                await self._run("rebase", "--abort")
+            except GitCommandError as exc:
+                _logger.warning("rebase_abort_failed", extra={"error": str(exc)})
+
+    async def _rebase_en_cours(self) -> bool:
+        """Git a-t-il un rebase à moitié appliqué sous la main ?"""
+        try:
+            git_dir = Path((await self._run("rev-parse", "--git-dir")).strip())
+        except GitCommandError:
+            return False
+        if not git_dir.is_absolute():
+            git_dir = self._project_path / git_dir
+        return (git_dir / "rebase-merge").exists() or (git_dir / "rebase-apply").exists()
 
     async def _faire_resoudre(
         self,
@@ -304,8 +354,8 @@ class GitWorkspaceService:
         Tessera's own bookkeeping (`_ORCHESTRATOR_ARTIFACT_PATHS`) is
         excluded via pathspec: it is the orchestrator rewriting ticket
         status and the pipeline log, not code the coder agent produced, and
-        must never be presented to the reviewer/auditor/validator/doc-updater
-        as if it were.
+        must never be presented to the reviewer/auditor/validator/documentation
+        agents as if it were.
         """
         await self._run("add", "-A", "-N")
         pathspec = (
@@ -426,6 +476,8 @@ class GitWorkspaceService:
         mode des artefacts — le défaut protège, le cas particulier s'énonce
         (ticket-081).
         """
+        if self._politique is not None:
+            return self._politique.dans_le_depot_parent
         agents_json = self._project_path / "agents.json"
         if not agents_json.is_file():
             return False
@@ -493,7 +545,16 @@ class GitWorkspaceService:
         )
 
     async def _run(self, *args: str) -> str:
-        command = ["git", *args]
+        # Les hooks du dépôt ne tournent jamais depuis l'orchestrateur. Ils
+        # vivent sous la racine du projet, donc à portée d'un agent : un
+        # `pre-commit` déposé pendant le run s'exécutait au commit de fin de
+        # run, sous l'identité de l'utilisateur, sans qu'une seule commande
+        # git ait transité par `Bash` (ticket-119). Le hook de périmètre
+        # refuse désormais `.git/`, mais un fichier arrivé par un autre chemin
+        # — `python -c`, un clone déjà piégé — ne doit pas tourner non plus.
+        # `-c` prime sur `.git/config`, donc sur un `core.hooksPath` qu'un
+        # agent y aurait écrit.
+        command = ["git", "-c", f"core.hooksPath={_dossier_sans_hooks()}", *args]
         proc = await asyncio.create_subprocess_exec(
             *command,
             cwd=str(self._project_path),

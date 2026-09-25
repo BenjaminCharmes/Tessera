@@ -1,0 +1,58 @@
+name: Bug
+description: Quelque chose ne fait pas ce qui est annoncé
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Une **faille de sécurité** ne se signale pas ici : une issue est
+        publique, et le rapport serait lisible avant qu'un correctif existe.
+        Passez par [SECURITY.md](../blob/main/SECURITY.md).
+
+  - type: textarea
+    id: attendu-obtenu
+    attributes:
+      label: Ce que vous attendiez, ce que vous avez obtenu
+      description: Les deux, même si l'écart vous paraît évident.
+      placeholder: |
+        Attendu : le run crée une branche et commite.
+        Obtenu  : 500, et l'arbre reste sale.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Comment le reproduire
+      description: >
+        La partie qui décide si le bug sera corrigé. Sans elle, il faut
+        deviner — et on devine mal.
+      placeholder: |
+        1. Créer un projet depuis la modale
+        2. Lancer le pipeline sur son premier ticket
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Trace ou message d'erreur
+      description: >
+        La sortie du backend, ou la console du navigateur. **Relisez-la avant
+        de la coller** : elle peut contenir des chemins ou des noms internes.
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Version ou commit
+      placeholder: "le SHA de `git rev-parse --short HEAD`"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Système
+      options: [Windows, macOS, Linux]
+    validations:
+      required: true

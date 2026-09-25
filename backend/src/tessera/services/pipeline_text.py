@@ -48,12 +48,21 @@ def _extract_criteria(ticket_body: str) -> list[str]:
     return criteria
 
 
+_APPROVED_WORD = re.compile(r"\bAPPROVED\b")
+
+
 def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
-    """Returns (approved, reason). CHANGES_REQUESTED takes priority over APPROVED."""
+    """Returns (approved, reason). CHANGES_REQUESTED takes priority over APPROVED.
+
+    Le verdict est un mot entier, en majuscules, sur une ligne qui ne porte pas
+    `CHANGES_REQUESTED` : le reviewer est prompté pour répondre ainsi
+    (ADR-009). `"APPROVED" in content.upper()` lisait « this should not be
+    approved » comme une approbation (ticket-122).
+    """
     for line in content.splitlines():
         if "CHANGES_REQUESTED" in line.upper():
             reason = line.split(":", 1)[-1].strip() if ":" in line else ""
             return False, reason
-    if "APPROVED" in content.upper():
+    if any(_APPROVED_WORD.search(line) for line in content.splitlines()):
         return True, ""
     return False, content[:200]

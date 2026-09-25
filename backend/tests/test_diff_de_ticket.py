@@ -81,3 +81,61 @@ async def test_le_diff_ignore_les_artefacts_de_tessera(depot: Path) -> None:
     resultat = await diff_du_ticket(depot, "ticket-003")
 
     assert resultat.files == ["app.py"]
+
+
+async def test_le_diff_survit_a_la_suppression_de_la_branche(depot: Path) -> None:
+    """Deleting the branch after merging is the normal practice — it is what
+    `gh pr merge --delete-branch` does, and what `ticket-workflow` prescribes.
+
+    The diff was looked up by `git branch --list`, so it vanished for every
+    properly finished ticket, and the screen claimed the ticket had "never
+    been run". It had: only its branch was gone, the work still in history.
+    """
+    await _git(depot, "checkout", "-q", "-b", "ticket-002-ajout")
+    (depot / "app.py").write_text("x = 42\n", encoding="utf-8")
+    await _git(depot, "commit", "-qam", "feat: ticket-002 — la reponse")
+    await _git(depot, "checkout", "-q", "main")
+    await _git(depot, "merge", "-q", "--squash", "ticket-002-ajout")
+    await _git(depot, "commit", "-qm", "feat: ticket-002 — la reponse (#42)")
+    await _git(depot, "branch", "-qD", "ticket-002-ajout")
+
+    resultat = await diff_du_ticket(depot, "ticket-002")
+
+    assert resultat.branch is None
+    assert resultat.commit is not None, "le commit du ticket n'a pas ete retrouve"
+    assert "x = 42" in resultat.diff
+    assert "app.py" in resultat.files
+
+
+async def test_un_commit_de_cloture_n_est_pas_pris_pour_le_travail(
+    depot: Path,
+) -> None:
+    """The closing commit touches only `tickets/`, which `_ARTEFACTS` already
+    excludes — so its diff is empty once filtered. Walking from the most
+    recent commit down, the first non-empty diff is the real work.
+    """
+    await _git(depot, "checkout", "-q", "-b", "ticket-003-travail")
+    (depot / "app.py").write_text("x = 3\n", encoding="utf-8")
+    await _git(depot, "commit", "-qam", "feat: ticket-003 — le travail")
+    await _git(depot, "checkout", "-q", "main")
+    await _git(depot, "merge", "-q", "--squash", "ticket-003-travail")
+    await _git(depot, "commit", "-qm", "feat: ticket-003 — le travail (#43)")
+    await _git(depot, "branch", "-qD", "ticket-003-travail")
+
+    # Puis la cloture, plus recente, qui ne touche qu'un artefact.
+    (depot / "tickets").mkdir(exist_ok=True)
+    (depot / "tickets" / "ticket-003.md").write_text("status: done\n", encoding="utf-8")
+    await _git(depot, "add", "tickets/ticket-003.md")
+    await _git(depot, "commit", "-qm", "chore: ticket-003 — close (#44)")
+
+    resultat = await diff_du_ticket(depot, "ticket-003")
+
+    assert "x = 3" in resultat.diff, "le diff rendu est celui de la cloture"
+
+
+async def test_un_ticket_jamais_lance_n_a_ni_branche_ni_commit(depot: Path) -> None:
+    resultat = await diff_du_ticket(depot, "ticket-999")
+
+    assert resultat.branch is None
+    assert resultat.commit is None
+    assert resultat.diff == ""

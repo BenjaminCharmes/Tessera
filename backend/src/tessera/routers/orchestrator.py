@@ -1,8 +1,8 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
@@ -10,16 +10,20 @@ from tessera.agents.github_sync import GithubSyncAgent
 from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.sync_map import SyncMapService
 from tessera.services.agent_runner import AgentRunner
-from tessera.services.dialogue import DialogueChannel
 from tessera.services.documentation import DocumentationService
-from tessera.services.pipeline_events import EventType
-from tessera.services.database import create_run, finish_run, save_event
+from tessera.services.event_hub import EVENT_HUB
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers import get_provider
+from tessera.services.providers.base import LLMProvider
 from tessera.services.resolveur_conflit import ResolveurConflitService
+from tessera.services.run_executor import executer
+from tessera.services.run_lock import RUN_LOCK
+from tessera.services.run_registry import RUN_REGISTRY, RunAlreadyInProgress
+from tessera.services.run_recorder import RunRecorder
 from tessera.services.security_auditor import SecurityAuditorService
 from tessera.services.test_runner import TestRunnerService
 from tessera.services.validator import ValidatorService
@@ -41,6 +45,10 @@ _logger = get_logger(__name__)
 
 router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
 
+# Un run à la fois par projet, sur tous les points d'entrée — le même
+# verrou que `/chat/run` (ticket-121).
+_RUN_LOCK = RUN_LOCK
+
 _OPEN_STATUSES = {
     TicketStatus.todo,
     TicketStatus.in_progress,
@@ -51,7 +59,19 @@ _OPEN_STATUSES = {
 
 class RunRequest(BaseModel):
     project_id: str
-    ticket_id: str
+    #: Optionnel depuis ticket-128 : une file porte `ticket_ids`, un run
+    #: autonome ne porte ni l'un ni l'autre.
+    ticket_id: str | None = None
+    ticket_ids: list[str] = Field(default_factory=list)
+    mode: str = "single"
+    max_tickets: int = 5
+    depuis_github: bool = False
+
+
+class RunStarted(BaseModel):
+    """What POST /run answers: the run started, here is how to watch it."""
+
+    run_id: str
 
 
 class RunAutonomousRequest(BaseModel):
@@ -111,9 +131,16 @@ async def _build_project_context(project_id: str) -> str:
 
 
 async def _build_orchestrator(project_id: str) -> Orchestrator:
+    project_path = settings.ide_workspace_dir / project_id
+    # La politique du run — autonomie, racine git, artefacts, commande de
+    # tests — se lit **ici**, une fois, avant le premier agent, et voyage vers
+    # chaque service qui en dépend. Relue au moment d'agir, elle obéirait à ce
+    # qu'un codeur aurait écrit dans `agents.json` pendant le run (ticket-119).
+    politique = PolitiqueRun.lire(project_path)
     provider = get_provider(
         settings.llm_provider, settings.anthropic_api_key,
         max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        racine_ecriture=politique.racine_ecriture(project_path),
     )
     # Pure text-in/JSON-out services (security_auditor, validator,
     # documentation) have no use for file/shell tools — they write
@@ -126,9 +153,18 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         allow_tools=False,
     )
     registry = AgentRegistryService(settings.ide_prompts_dir)
-    project_path = settings.ide_workspace_dir / project_id
+
+    def _provider_limite(outils: list[str]) -> LLMProvider:
+        # Le reviewer relit : il reçoit le même provider, réduit à la lecture.
+        return get_provider(
+            settings.llm_provider, settings.anthropic_api_key,
+            max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+            tools=outils,
+        )
+
     runner = AgentRunner(
-        provider, registry, db_path=settings.ide_db_path, project_path=project_path
+        provider, registry, db_path=settings.ide_db_path, project_path=project_path,
+        fabrique_provider=_provider_limite,
     )
 
     project_context = await _build_project_context(project_id)
@@ -149,7 +185,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         else None
     )
 
-    git_workspace = GitWorkspaceService(project_path)
+    git_workspace = GitWorkspaceService(project_path, politique=politique)
 
     return Orchestrator(
         runner=runner,
@@ -159,7 +195,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         pipeline_log_path=project_path / "memory" / "pipeline-log.md",
         max_review_rounds=pipeline_cfg.max_review_rounds,
         test_runner=test_runner,
-        test_command=pipeline_cfg.test_command,
+        test_command=politique.test_command,
         security_auditor=security_auditor,
         validator=validator,
         project_path=project_path,
@@ -169,8 +205,9 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
-        livrer=_livreur(project_id, runner),
+        livrer=_livreur(project_id, runner, politique),
         documenter=_documenteur(project_id),
+        run_recorder=RunRecorder(settings.ide_db_path),
     )
 
 
@@ -203,7 +240,9 @@ def _documenteur(project_id: str) -> Callable[[], Awaitable[None]]:
 
 
 def _livreur(
-    project_id: str, runner: AgentRunner | None = None
+    project_id: str,
+    runner: AgentRunner | None = None,
+    politique: PolitiqueRun | None = None,
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison d'un projet, telle que l'orchestrateur l'appelle.
 
@@ -224,15 +263,17 @@ def _livreur(
         github = GitHubService(token=settings.github_token, repo=project.github_remote)
 
     service = LivraisonService(
-        git_workspace=GitWorkspaceService(project_path),
+        git_workspace=GitWorkspaceService(project_path, politique=politique),
         workflow=GitHubWorkflowService(
-            git_workspace=GitWorkspaceService(project_path),
+            git_workspace=GitWorkspaceService(project_path, politique=politique),
             github=github,
             base_branch=settings.github_base_branch,
             project_path=project_path,
+            politique=politique,
         ),
         project_path=project_path,
         base_branch=settings.github_base_branch,
+        politique=politique,
         # Sans runner — appel programmatique, test — pas de résolveur : le
         # conflit annule le rebase et remonte, comme avant ticket-090.
         resolveur=(
@@ -261,36 +302,68 @@ def _livreur(
     return livrer
 
 
-@router.post("/run", response_model=PipelineResult)
-async def run_pipeline(request: RunRequest) -> PipelineResult:
-    orchestrator = await _build_orchestrator(request.project_id)
-    run_id = await create_run(settings.ide_db_path, request.project_id, request.ticket_id)
+#: Les tâches de run en vol. Sans référence forte, asyncio peut collecter
+#: une tâche en cours de route : le run s'arrêterait au milieu, sans commit,
+#: ce qu'ADR-018 interdit.
+_TACHES: set[asyncio.Task[None]] = set()
 
-    async def on_event(event: OrchestratorEvent) -> None:
-        await save_event(
-            settings.ide_db_path,
-            run_id,
-            event.type.value,
-            event.agent.value if event.agent else None,
-            event.data,
-            event.timestamp.isoformat(),
-        )
+
+def _libelle(request: RunRequest) -> str:
+    """What the registry shows as running: the ticket, the queue, or the mode."""
+    if request.ticket_id:
+        return request.ticket_id
+    if request.ticket_ids:
+        return ", ".join(request.ticket_ids)
+    return request.mode
+
+
+@router.post("/run", status_code=202, response_model=RunStarted)
+async def run_pipeline(request: RunRequest) -> RunStarted:
+    """Start a run, and answer with its id without waiting for it to end.
+
+    Le run était porté par sa WebSocket avant ticket-128 : il n'était donc
+    observable que depuis l'onglet qui l'avait ouverte. Il est maintenant une
+    tâche que personne ne possède, et que `/orchestrator/observe` regarde.
+
+    La réservation se fait **ici** et non dans la tâche : deux POST
+    rapprochés passeraient tous les deux si le projet n'était marqué occupé
+    qu'une fois la réponse partie (ADR-038).
+    """
+    if request.mode == "single" and not request.ticket_id:
+        raise HTTPException(status_code=422, detail="ticket_id requis en mode single")
 
     try:
-        result = await orchestrator.run_pipeline(
-            request.project_id, request.ticket_id, on_event, run_id=run_id
+        run = RUN_REGISTRY.ouvrir(
+            request.project_id, _libelle(request), mode=request.mode
         )
-    except ValueError as exc:
+    except RunAlreadyInProgress as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    try:
+        orchestrator = await _build_orchestrator(request.project_id)
+        if request.mode == "autonomous" and request.depuis_github:
+            await _tirer_les_issues(request.project_id)
+    except Exception as exc:
+        # Rien n'a démarré : libérer le projet, sinon il resterait occupé par
+        # un run qui n'existe pas.
+        RUN_REGISTRY.fermer(run.run_id)
+        if isinstance(exc, HTTPException):
+            raise
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    await finish_run(
-        settings.ide_db_path,
-        run_id,
-        result.rounds,
-        result.approved,
-        result.final_status.value,
+    tache = asyncio.create_task(
+        executer(
+            run,
+            orchestrator,
+            EVENT_HUB,
+            RUN_REGISTRY,
+            ticket_ids=request.ticket_ids,
+            max_tickets=request.max_tickets,
+        )
     )
-    return result
+    _TACHES.add(tache)
+    tache.add_done_callback(_TACHES.discard)
+    return RunStarted(run_id=run.run_id)
 
 
 async def _tirer_les_issues(project_id: str) -> int:
@@ -320,174 +393,3 @@ async def _tirer_les_issues(project_id: str) -> int:
         _logger.warning("pull_des_issues_echoue", extra={"erreur": str(exc)})
         return 0
     return int(resultat.pulled)
-
-
-@router.post("/run-autonomous", response_model=list[PipelineResult])
-async def run_autonomous(request: RunAutonomousRequest) -> list[PipelineResult]:
-    if request.depuis_github:
-        await _tirer_les_issues(request.project_id)
-    orchestrator = await _build_orchestrator(request.project_id)
-    return await orchestrator.run_autonomous(request.project_id, request.max_tickets)
-
-
-@router.websocket("/stream/{project_id}")
-async def stream_pipeline(websocket: WebSocket, project_id: str) -> None:
-    await websocket.accept()
-    try:
-        raw = await websocket.receive_json()
-        orchestrator = await _build_orchestrator(project_id)
-
-        ticket_id: str | None = raw.get("ticket_id")
-        ticket_ids: list[str] = list(raw.get("ticket_ids") or [])
-        mode: str = raw.get("mode", "single")
-
-        if mode == "autonomous":
-            async def send_event_autonomous(event: OrchestratorEvent) -> None:
-                await websocket.send_text(event.model_dump_json())
-
-            if raw.get("depuis_github"):
-                await _tirer_les_issues(project_id)
-            max_tickets = int(raw.get("max_tickets", 5))
-            await orchestrator.run_autonomous(project_id, max_tickets, send_event_autonomous)
-        elif ticket_ids:
-            # Une file : l'utilisateur a désigné un lot et son ordre. Le canal
-            # de dialogue est partagé par tous les runs, pour qu'un seul arrêt
-            # vide la file entière (ticket-074).
-            async def send_queue_event(event: OrchestratorEvent) -> None:
-                await websocket.send_text(event.model_dump_json())
-
-            async def announce_queue_question(question: str) -> None:
-                await send_queue_event(
-                    OrchestratorEvent(
-                        type=EventType.AGENT_QUESTION,
-                        ticket_id="",
-                        data={"question": question},
-                    )
-                )
-
-            queue_dialogue = DialogueChannel(
-                timeout_s=settings.dialogue_timeout_s,
-                interactive=True,
-                on_question=announce_queue_question,
-            )
-
-            async def read_queue_inbound() -> None:
-                while True:
-                    message = await websocket.receive_json()
-                    texte = str(message.get("text", ""))
-                    if message.get("type") == "answer":
-                        queue_dialogue.answer(texte)
-                    elif message.get("type") == "interject":
-                        queue_dialogue.interject(texte)
-                    elif message.get("type") == "stop":
-                        queue_dialogue.request_stop()
-
-            queue_reader = asyncio.create_task(read_queue_inbound())
-            try:
-                await orchestrator.run_queue(
-                    project_id, ticket_ids, send_queue_event, queue_dialogue
-                )
-            except ValueError as exc:
-                await websocket.send_json({"error": str(exc)})
-            finally:
-                queue_reader.cancel()
-        elif ticket_id:
-            run_id = await create_run(settings.ide_db_path, project_id, ticket_id)
-
-            async def send_event(event: OrchestratorEvent) -> None:
-                # Émettre vers une socket morte ne doit pas tuer le run : le
-                # pipeline continue côté serveur, et l'utilisateur en est
-                # averti. Faire remonter l'erreur ici laissait le run ouvert en
-                # base, donc « en cours » à jamais dans l'historique
-                # (ticket-079).
-                try:
-                    await websocket.send_text(event.model_dump_json())
-                except Exception:  # noqa: BLE001 — socket fermée, on continue
-                    pass
-                await save_event(
-                    settings.ide_db_path,
-                    run_id,
-                    event.type.value,
-                    event.agent.value if event.agent else None,
-                    event.data,
-                    event.timestamp.isoformat(),
-                )
-
-            async def announce_question(question: str, tid: str = ticket_id) -> None:
-                await send_event(
-                    OrchestratorEvent(
-                        type=EventType.AGENT_QUESTION,
-                        ticket_id=tid,
-                        data={"question": question},
-                    )
-                )
-
-            dialogue = DialogueChannel(
-                timeout_s=settings.dialogue_timeout_s,
-                interactive=True,
-                on_question=announce_question,
-            )
-
-            # La socket ne lisait qu'un seul message entrant — la commande de
-            # démarrage — puis n'émettait plus : répondre à un agent bloqué
-            # était impossible. La lecture tourne maintenant en parallèle de
-            # l'émission, pour toute la durée du run.
-            async def read_inbound() -> None:
-                while True:
-                    message = await websocket.receive_json()
-                    texte = str(message.get("text", ""))
-                    if message.get("type") == "answer":
-                        dialogue.answer(texte)
-                    elif message.get("type") == "interject":
-                        dialogue.interject(texte)
-                    elif message.get("type") == "stop":
-                        dialogue.request_stop()
-
-            reader = asyncio.create_task(read_inbound())
-            result = None
-            echec: str | None = None
-            try:
-                result = await orchestrator.run_pipeline(
-                    project_id, ticket_id, send_event, run_id=run_id, dialogue=dialogue
-                )
-            except ValueError as exc:
-                echec = str(exc)
-            finally:
-                # Le lecteur attend indéfiniment un message : sans annulation,
-                # la connexion ne se fermerait jamais après la fin du run.
-                reader.cancel()
-
-            # Clore le run **avant** toute écriture réseau. Placé après, cet
-            # appel disparaissait dès que la socket mourait : la tâche était
-            # annulée et l'`await` ne se terminait jamais, laissant la ligne
-            # ouverte et l'historique bloqué sur « en cours » (ticket-079).
-            await finish_run(
-                settings.ide_db_path,
-                run_id,
-                result.rounds if result else 0,
-                result.approved if result else False,
-                result.final_status.value if result else "interrupted",
-            )
-
-            if echec is not None:
-                await websocket.send_json({"error": echec})
-        else:
-            await websocket.send_json({"error": "ticket_id ou mode=autonomous requis"})
-
-    except WebSocketDisconnect:
-        pass
-    except HTTPException as exc:
-        try:
-            await websocket.send_json({"error": exc.detail})
-        except Exception:
-            pass
-    except Exception as exc:
-        try:
-            await websocket.send_json({"error": str(exc)})
-        except Exception:
-            pass
-    finally:
-        try:
-            await websocket.close()
-        except Exception:
-            pass

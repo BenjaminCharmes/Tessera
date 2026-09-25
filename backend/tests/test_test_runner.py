@@ -1,10 +1,15 @@
 """Tests for TestRunnerService (ticket-035)."""
 
 import asyncio
+import os
+import sys
+from typing import Any
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
+from tests.conftest import requires_symlinks
 
 from tessera.services.test_runner import (
     TestCommandNotFound,
@@ -111,6 +116,42 @@ class TestRunTests:
         assert result.passed is False
         assert "timeout" in result.output_summary.lower()
 
+    async def test_le_processus_tue_est_attendu(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        # Après `proc.kill()` sans `await proc.wait()`, asyncio se plaignait
+        # d'un transport fermé sur un processus encore vivant, et le zombie
+        # restait jusqu'à la fin du serveur (ticket-122).
+        mock_proc = MagicMock()
+        mock_proc.kill = MagicMock()
+        mock_proc.wait = AsyncMock()
+        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            await service.run_tests(python_project, test_command="uv run pytest", timeout=1)
+
+        mock_proc.kill.assert_called_once()
+        mock_proc.wait.assert_awaited_once()
+
+    async def test_aucun_test_collecte_n_est_pas_un_echec(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        # pytest sort 5 quand il n'a rien collecté. Lu comme rouge, un projet
+        # neuf sans test renvoyait le codeur corriger des tests inexistants.
+        mock_proc = MagicMock()
+        mock_proc.returncode = 5
+        mock_proc.communicate = AsyncMock(
+            return_value=(b"no tests ran in 0.01s", b"")
+        )
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            result = await service.run_tests(python_project, test_command="uv run pytest")
+
+        assert result.passed is True
+        assert result.total == 0
+        assert result.failed == 0
+        assert "aucun test" in result.output_summary.lower()
+
     async def test_raises_when_no_command_detectable(
         self, service: TestRunnerService, tmp_path: Path
     ) -> None:
@@ -165,3 +206,93 @@ class TestTestResult:
         )
         assert result.passed is True
         assert result.errors == []
+
+
+# ---------------------------------------------------------------------------
+# Lancer une commande qui est un script Windows — ticket-157
+# ---------------------------------------------------------------------------
+
+
+class TestCommandeNonDemarree:
+    """The runner must tell a command that never started from failing tests."""
+
+    async def test_npm_se_resout_en_npm_cmd_sous_windows(self) -> None:
+        # Le premier ticket du projet démineur a été rendu `blocked` avec
+        # « changes requested » alors que le code produit était juste : le
+        # testeur lance sans shell, et `npm` n'existe pas sous Windows — c'est
+        # `npm.cmd`. La reprise existait dans `ProcessRegistry` depuis le
+        # ticket-149 et n'avait pas été portée ici (ticket-157).
+        from tessera.services.lancement import essais_de_commande
+
+        essais = essais_de_commande(["npm", "run", "test"])
+
+        assert essais[0] == ["npm", "run", "test"]
+        if os.name == "nt":
+            assert ["npm.cmd", "run", "test"] in essais
+        else:
+            assert essais == [["npm", "run", "test"]]
+
+    async def test_une_commande_deja_suffixee_n_est_pas_redoublee(self) -> None:
+        from tessera.services.lancement import essais_de_commande
+
+        assert essais_de_commande(["npm.cmd", "test"]) == [["npm.cmd", "test"]]
+
+    async def test_une_commande_introuvable_n_est_pas_un_test_rouge(
+        self, tmp_path: Path
+    ) -> None:
+        # Deux tours de revue ont été dépensés à corriger du code qui n'était
+        # pas en cause, parce que rien ne distinguait « la commande n'a pas
+        # démarré » de « les tests ont échoué ».
+        runner = TestRunnerService()
+
+        result = await runner.run_tests(
+            tmp_path, test_command="cette-commande-nexiste-pas --run"
+        )
+
+        assert result.passed is False
+        assert result.demarree is False
+        assert "cette-commande-nexiste-pas" in result.output_summary
+
+    async def test_des_tests_qui_echouent_restent_demarres(
+        self, tmp_path: Path
+    ) -> None:
+        # Le pendant du test précédent : `demarree` ne doit pas devenir un
+        # synonyme de `passed`, sinon il ne distingue plus rien.
+        runner = TestRunnerService()
+
+        result = await runner.run_tests(
+            tmp_path,
+            test_command=f'"{sys.executable}" -c "import sys; sys.exit(1)"',
+        )
+
+        assert result.passed is False
+        assert result.demarree is True
+
+
+class TestCheminSymlinke:
+    """A project reached through a symlink must still run its tests."""
+
+    @requires_symlinks
+    async def test_le_cwd_est_resolu_avant_de_lancer(self, tmp_path: Path) -> None:
+        # `projects/` ne contient que des liens symboliques vers les vrais
+        # dépôts. Lancer avec le chemin du lien fait résoudre à Vite une
+        # racine réelle qu'il ne retrouve plus : les tests échouaient sous le
+        # pipeline et passaient à la main, au même instant et au même endroit
+        # (ticket-158). ADR-017 pose déjà « cwd résolu » — pas ici.
+        reel = tmp_path / "projet-reel"
+        reel.mkdir()
+        (reel / "temoin.txt").write_text("ici", encoding="utf-8")
+        lien = tmp_path / "lien-vers-projet"
+        lien.symlink_to(reel, target_is_directory=True)
+
+        runner = TestRunnerService()
+        vus: list[str] = []
+
+        async def faux_lancer(args: list[str], dossier: Path) -> Any:
+            vus.append(str(dossier))
+            raise FileNotFoundError(args[0])
+
+        runner._lancer = faux_lancer  # type: ignore[method-assign]
+        await runner.run_tests(lien, test_command="peu-importe")
+
+        assert vus == [str(reel)], f"cwd non résolu : {vus}"

@@ -114,7 +114,7 @@ export default function CreateProjectModal({
             <button
               type="button"
               onClick={() => onCreated(createdProject)}
-              className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
+              className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded-sm transition-colors"
               autoFocus
             >
               Continuer
@@ -156,7 +156,7 @@ export default function CreateProjectModal({
               }}
               placeholder="mon-projet"
               maxLength={50}
-              className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400"
+              className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400"
               disabled={loading}
               autoFocus
             />
@@ -180,7 +180,7 @@ export default function CreateProjectModal({
               placeholder="Description optionnelle…"
               maxLength={200}
               rows={3}
-              className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 resize-none"
+              className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400 resize-none"
               disabled={loading}
             />
           </div>
@@ -201,7 +201,7 @@ export default function CreateProjectModal({
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded-sm transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {loading && (
                 <span className="inline-block w-3 h-3 border-2 border-zinc-400 border-t-white rounded-full animate-spin" />

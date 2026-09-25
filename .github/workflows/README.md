@@ -4,17 +4,40 @@
 
 | Fichier  | Déclencheur                                | Rôle               |
 |----------|--------------------------------------------|--------------------|
-| `ci.yml` | push sur `main` + PR vers `main` / `develop` | Tests + type check |
+| `ci.yml` | PR vers `main` ou `develop` | Tests + type check |
 
-Le `push` ne garde que `main`, qui ne reçoit pas de PR de sa propre branche ;
-tout le reste est couvert par `pull_request`. Une PR déclenchait autrefois
-**deux** runs — celui du `push` et celui de la `pull_request` — et tout était
-facturé en double (ticket-095).
+`pull_request` seul. Une PR déclenchait autrefois **deux** runs — celui du
+`push` sur la branche et celui de la `pull_request` — et tout était facturé en
+double (ticket-095). Il restait ensuite un doublon sur les releases :
+`push: [main]` rejouait, après le merge, ce que la PR venait de vérifier
+(ticket-111).
+
+Rien n'entre dans `main` autrement que par une PR : les commits directs y sont
+interdits.
 
 Jobs : `Backend (pytest)`, `Frontend (tsc + vitest)`, `E2E (Playwright)`,
 `Ce qui a changé`, `Tauri (cargo check)` — en parallèle (ADR-015). `Ce qui a
 changé` décide si le Rust a bougé : `Tauri` ne tourne que dans ce cas, une
 minute de macOS étant facturée dix fois une minute d'ubuntu.
+
+## Où tourne la CI
+
+`runs-on` lit la variable de dépôt `CI_RUNNER`, et retombe sur `ubuntu-latest`
+quand elle est vide. Les quatre jobs non-macOS la suivent ; `Tauri` reste sur
+`macos-latest`, `cargo check` ayant besoin d'une chaîne Rust.
+
+Elle existe parce que le passage du dépôt en privé (ticket-160) l'a mis face au
+quota de minutes Actions des dépôts privés : plus aucune PR ne déclenchait de
+run. Un runner self-hosted n'en consomme aucune.
+
+```bash
+gh variable set CI_RUNNER --body self-hosted   # basculer sur le runner local
+gh variable delete CI_RUNNER                   # revenir aux runners GitHub
+```
+
+Un runner hors ligne met les jobs en file d'attente **sans fin** au lieu de les
+faire échouer : si une PR reste en attente sans rien afficher, c'est la
+première chose à regarder.
 
 ## Flux de branches
 

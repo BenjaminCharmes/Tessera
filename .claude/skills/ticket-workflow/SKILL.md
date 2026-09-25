@@ -38,11 +38,9 @@ Le corps explique le *pourquoi*, pas le *quoi* — le diff dit déjà quoi.
 Nommer la contrainte réelle qui a forcé le choix.
 ```
 
-**Aucune attribution à un outil d'IA.** Ni `Co-Authored-By`, ni mention
-d'assistant dans un message de commit, une description de PR, un commentaire
-de code ou un fichier généré. Ces messages partent dans le dépôt de
-l'utilisateur, parfois celui d'un client : la provenance du code n'y a pas sa
-place.
+La règle d'attribution — aucune mention d'un outil d'IA, nulle part — est
+dans `CLAUDE.md` (Conventions de code, Git). Elle s'applique au message de
+commit et au corps de la PR comme au code.
 
 Préférer plusieurs commits à frontières nettes (un par préoccupation) à un
 commit fourre-tout.
@@ -58,9 +56,9 @@ git diff --cached --stat    # relire ce qui est stagé AVANT de committer
 **`git add -A` est interdit, y compris restreint à des chemins**
 (`git add -A -- backend/`). La forme restreinte paraît sûre et ne l'est pas :
 elle emporte tout fichier non suivi sous ces chemins — artefact de couverture,
-fichier temporaire, projet importé par l'utilisateur — sans que rien ne le
-signale. Le `git diff --cached --stat` ci-dessus est ce qui attrape l'erreur ;
-il ne coûte rien, et c'est précisément l'étape qu'on saute.
+fichier temporaire, projet importé par l'utilisateur dans `projects/` — sans
+que rien ne le signale. Le `git diff --cached --stat` ci-dessus est ce qui
+attrape l'erreur ; il ne coûte rien, et c'est précisément l'étape qu'on saute.
 
 Si lister les fichiers devient pénible, c'est le signe que le commit couvre
 trop de préoccupations : le découper.
@@ -81,43 +79,15 @@ tests passent »).
 
 ## Avant d'annoncer que c'est fini
 
-```bash
-cd backend && uv run pytest -q && uv run mypy src/
-cd frontend && npm run typecheck && npm run test -- --run
-gh pr checks <n>
-```
-
-Vérifier que la CI a tourné **sur le dernier commit poussé**, pas sur un
-ancien :
-
-```bash
-gh run list --branch ticket-XXX-… --limit 2 --json headSha,conclusion
-git rev-parse --short HEAD
-```
+Les commandes et leurs pièges sont dans `verification-before-completion` :
+`verify` avant de pousser, puis la CI **sur le SHA de `HEAD`**, pas sur un
+ancien commit. `verify` évite un aller-retour, mais c'est la CI qui tranche :
+elle tourne sur un OS qui n'est pas le tien et sur l'arbre du dépôt, pas sur
+le tien.
 
 ## Fusionner
 
 Une fois la CI verte et la revue passée :
-
-> ### ⚠ Dérogation temporaire — depuis le 2026-09-18
->
-> Les minutes GitHub Actions du compte sont épuisées : **aucun job ne démarre**.
-> La vérification se fait donc en local, par `.\scripts\tessera.ps1 verify`, et
-> c'est sur elle qu'on merge.
->
-> **La règle ne change pas.** On merge sur une CI verte ; on s'en passe
-> aujourd'hui parce qu'on ne peut pas faire autrement, pas parce que c'est
-> devenu acceptable. Une vérification locale tourne sur un seul OS, sur un
-> arbre de travail qui n'est pas forcément celui du dépôt, et ne prouve rien
-> à personne d'autre que celui qui l'a lancée.
->
-> **À supprimer** dès que les minutes sont revenues — remise à zéro mensuelle,
-> dépôt passé en public, ou plafond relevé. Vérifier avec `gh run list` qu'un
-> run démarre à nouveau, puis retirer ce bloc.
->
-> Ceci ne concerne **pas** le produit : `peut_merger` exige toujours
-> `ci_status == "passing"` (ADR-029), donc Tessera ne merge rien tout seul
-> pendant ce temps. C'est voulu.
 
 ```bash
 gh pr merge --squash --auto        # ticket -> develop : squash
@@ -140,9 +110,6 @@ dépôt.
 
 ## Pièges connus
 
-- **`git add -A`**, même restreint par `-- <chemins>`, balaie `projects/*`
-  (projets importés par l'utilisateur), les artefacts de couverture et les logs
-  locaux. Stager nommément, puis relire `git diff --cached --stat`.
 - **Réécrire l'historique** d'une branche déjà poussée : ne pas le faire sans
   décision explicite, même pour corriger un message.
 - **Une PR ouverte vers `main`** alors que le flux cible `develop` : retarger,

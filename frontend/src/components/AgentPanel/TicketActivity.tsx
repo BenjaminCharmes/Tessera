@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
+import { useResource } from "../../hooks/useResource";
 import type { TicketActivity as Activity, Ticket } from "../../types/api";
 
 interface TicketActivityProps {
@@ -28,24 +29,23 @@ export default function TicketActivity({
   ticket,
   branch,
 }: TicketActivityProps) {
-  const [activity, setActivity] = useState<Activity | null>(null);
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const ticketId = ticket?.id ?? null;
 
-  const refresh = useCallback(() => {
-    if (!projectId || !ticketId) {
-      setActivity(null);
-      return;
-    }
-    api.tickets
-      .activity(projectId, ticketId)
-      .then(setActivity)
-      .catch(() => setActivity(null));
-  }, [projectId, ticketId]);
-
-  useEffect(refresh, [refresh]);
+  // Une lecture qui échoue vaut « pas d'activité » : la section se tait.
+  const fetcher = useMemo(
+    () =>
+      projectId && ticketId
+        ? () => api.tickets.activity(projectId, ticketId)
+        : null,
+    [projectId, ticketId],
+  );
+  const { data: activity, refresh } = useResource<Activity | null>(
+    fetcher,
+    null,
+  );
 
   async function mergePr() {
     if (!projectId || !ticketId) return;
@@ -119,7 +119,7 @@ export default function TicketActivity({
                 type="button"
                 onClick={() => void mergePr()}
                 disabled={busy}
-                className="rounded bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
+                className="rounded-sm bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
               >
                 {busy ? "…" : "Merger si la CI est verte"}
               </button>
@@ -143,7 +143,7 @@ export default function TicketActivity({
               type="button"
               onClick={() => void openPr()}
               disabled={busy || !branch}
-              className="rounded bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
+              className="rounded-sm bg-zinc-700 px-2 py-1 text-zinc-100 hover:bg-zinc-600 disabled:opacity-40"
             >
               {busy ? "…" : "Pousser et ouvrir la PR"}
             </button>
@@ -170,7 +170,7 @@ export default function TicketActivity({
       </div>
 
       {errorMessage && (
-        <p className="mt-1.5 break-words text-amber-300">{errorMessage}</p>
+        <p className="mt-1.5 wrap-break-word text-amber-300">{errorMessage}</p>
       )}
     </section>
   );

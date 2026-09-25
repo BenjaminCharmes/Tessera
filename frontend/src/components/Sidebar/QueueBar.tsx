@@ -39,14 +39,14 @@ export default function QueueBar({
           type="button"
           onClick={onRun}
           disabled={enCours}
-          className="rounded border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
+          className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
         >
           Lancer la file
         </button>
         <button
           type="button"
           onClick={onClear}
-          className="rounded px-2 py-1 text-mini text-zinc-500 transition-colors hover:text-zinc-300"
+          className="rounded-sm px-2 py-1 text-mini text-zinc-500 transition-colors hover:text-zinc-300"
         >
           Vider
         </button>

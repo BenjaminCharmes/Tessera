@@ -9,7 +9,7 @@ Two constraints shape it, and both come from elsewhere in the system:
 - **ADR-019** — a chat that writes into the working tree breaks the clean-tree
   guarantee `ADR-018` relies on, and the next ticket would go straight to
   `blocked` without any agent running. So the chat commits its work on a
-  `chat/<timestamp>` branch, exactly as a pipeline run does on the ticket's.
+  `chat-<timestamp>` branch, exactly as a pipeline run does on the ticket's.
 - **Cost** — `llm_max_budget_usd` bounds a single call, not a conversation. A
   long discussion would burn the subscription quota with nothing surfacing it,
   so the conversation carries its own ceiling.
@@ -25,8 +25,9 @@ from tessera.services.chat_suggestion import (
     strip_suggestion_marker,
 )
 from tessera.services.database import ChatMessageRow
-from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.prompt_loader import load_system_prompt
+from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -78,11 +79,11 @@ class _ToolCallback(Protocol):
 class ChatService:
     def __init__(
         self,
-        provider: object,
+        provider: LLMProvider,
         prompts_dir: Path,
         project_path: Path,
         project_context: str,
-        git_workspace: object | None = None,
+        git_workspace: GitWorkspaceService | None = None,
         max_conversation_usd: float = 1.0,
     ) -> None:
         self._provider = provider
@@ -107,7 +108,7 @@ class ChatService:
         system = load_system_prompt(self._prompts_dir, _PROMPT_FILE)
         user = self._build_user_message(history, message)
 
-        result = await self._provider.stream(  # type: ignore[attr-defined]
+        result = await self._provider.stream(
             system=system,
             user=user,
             model=_DEFAULT_MODEL,
@@ -157,7 +158,7 @@ class ChatService:
         return "\n\n".join(parts)
 
     async def _commit_if_written(self, message: str) -> tuple[str | None, str | None]:
-        """Commit on a `chat/…` branch, but only if the agent actually wrote.
+        """Commit on a `chat-…` branch, but only if the agent actually wrote.
 
         A purely conversational turn must not create a branch, or every
         question would leave a dead one behind. When the agent *did* write,
@@ -168,13 +169,13 @@ class ChatService:
             return None, None
 
         try:
-            if await self._git_workspace.is_clean():  # type: ignore[attr-defined]
+            if await self._git_workspace.is_clean():
                 return None, None
 
             stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-            branch = await self._git_workspace.create_branch("chat", stamp)  # type: ignore[attr-defined]
+            branch = await self._git_workspace.create_branch("chat", stamp)
             summary = " ".join(message.split())[:60]
-            commit_sha = await self._git_workspace.commit_all(  # type: ignore[attr-defined]
+            commit_sha = await self._git_workspace.commit_all(
                 f"chore: chat — {summary}"
             )
             return branch, commit_sha

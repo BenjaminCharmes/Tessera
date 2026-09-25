@@ -1,0 +1,27 @@
+name: Idée
+description: Une fonctionnalité, un changement de comportement
+labels: ["idée"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Les idées sont bienvenues. Sachez seulement que ce projet avance par
+        tickets et que sa feuille de route est personnelle : une idée peut
+        être juste et rester longtemps non traitée.
+
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Le problème, pas la solution
+      description: >
+        Qu'est-ce qui ne va pas aujourd'hui ? Que faites-vous à la place ?
+        Une demande arrive souvent déjà habillée en solution, et c'est le
+        problème derrière qui décide de la bonne forme.
+    validations:
+      required: true
+
+  - type: textarea
+    id: piste
+    attributes:
+      label: Votre piste, si vous en avez une
+      description: Et ce qui vous fait douter, le cas échéant.

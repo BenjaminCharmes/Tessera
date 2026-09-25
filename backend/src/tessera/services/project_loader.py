@@ -30,6 +30,7 @@ def load_project(project_path: Path) -> Project:
         stack=_parse_stack(raw),
         raw_claude_md=raw,
         github_remote=_load_github_remote(project_path),
+        fait_tourner_l_ide=fait_tourner_l_ide(project_path),
     )
 
 
@@ -66,6 +67,62 @@ def load_agents_config(project_path: Path) -> list[AgentConfig]:
         return [AgentConfig(**a) for a in data.get("agents", [])]
     except Exception:
         return []
+
+
+def fait_tourner_l_ide(
+    project_path: Path, racine_de_l_ide: Path | None = None
+) -> bool:
+    """Ce projet est-il celui qui exécute l'IDE en ce moment ? — ticket-152.
+
+    C'est le cas du projet bootstrap d'ADR-001 : il construit l'IDE, donc il
+    travaille dans le dépôt qui le contient — celui-là même dont le backend
+    est issu. Lui proposer « Lancer » démarrerait un second backend sur un
+    port déjà pris, et le cas utile n'existe pas : il faut que l'IDE tourne
+    pour qu'on voie le bouton.
+
+    La reconnaissance passe par `racine_autorisee` (ADR-028), pas par le nom
+    du projet : un projet peut s'appeler autrement, et un projet client qui
+    déclare `git_root: ancestor` pointe vers **son** dépôt, pas celui-ci.
+
+    Les deux côtés sont résolus, liens symboliques compris — un projet
+    importé par symlink serait sinon reconnu à tort.
+    """
+    from tessera.config import _REPO_ROOT
+    from tessera.services.providers.perimetre import racine_autorisee
+
+    racine = (racine_de_l_ide or _REPO_ROOT).resolve()
+    try:
+        return racine_autorisee(project_path).resolve() == racine
+    except OSError:
+        return False
+
+
+def load_services_config(project_path: Path) -> list[dict[str, str]]:
+    """Les services déclarés dans `agents.json`, ou rien — ticket-137.
+
+    ADR-042 : la commande se déclare, elle ne se devine pas. Une liste vide
+    n'est donc pas un manque à combler par une heuristique, c'est la réponse
+    « ce projet ne se lance pas depuis l'IDE ».
+    """
+    agents_json = project_path / "agents.json"
+    if not agents_json.exists():
+        return []
+    try:
+        data = json.loads(agents_json.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+    services = data.get("services") or []
+    if not isinstance(services, list):
+        return []
+    return [
+        {
+            "nom": str(s.get("nom", "")),
+            "commande": str(s.get("commande", "")),
+            "cwd": str(s.get("cwd", "") or ""),
+        }
+        for s in services
+        if isinstance(s, dict) and s.get("nom") and s.get("commande")
+    ]
 
 
 def load_pipeline_config(project_path: Path) -> AgentPipelineConfig:

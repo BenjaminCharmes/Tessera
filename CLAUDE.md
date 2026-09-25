@@ -42,7 +42,8 @@ permanence. C'est ce qui justifie l'import ici et pas là.
 ### Frontend (UI de l'IDE)
 - **TypeScript strict**
 - **React 19** avec hooks uniquement (pas de class components)
-- **Tailwind CSS v3**
+- **Tailwind CSS v4** — configuration dans le CSS (`@theme` de `index.css`),
+  il n'y a plus de `tailwind.config.ts`
 - **Monaco Editor** pour l'éditeur de code embarqué
 - **Vite** comme bundler
 
@@ -176,8 +177,10 @@ qu'un agent doit savoir pour ne pas reconstruire ce qui existe.
 
 ### Ce qui marche
 
-- Pipeline codeur → testeur → sécurité → reviewer → validateur → doc-updater,
-  sur le **diff git réel**, une branche et un commit par run (ADR-018)
+- Pipeline codeur → testeur → sécurité → reviewer → validateur, sur le
+  **diff git réel**, une branche et un commit par run (ADR-018) ; la
+  documentation est mise à jour par lot en fin de file, par `doc-technique`
+  et `doc-fonctionnelle` (ADR-035)
 - Trois modes de run : un ticket, une file choisie, autonome
 - Après un run approuvé, la **livraison** enchaîne seule jusqu'où le projet
   l'autorise : rebase, PR, attente de CI, merge (ADR-029, ADR-030)

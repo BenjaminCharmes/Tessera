@@ -193,9 +193,28 @@ def test_parse_verdict_approved() -> None:
     assert reason == ""
 
 
-def test_parse_verdict_approved_case_insensitive() -> None:
+def test_parse_verdict_approved_en_minuscules_n_approuve_pas() -> None:
+    # Le reviewer est prompté pour répondre `APPROVED` en majuscules (ADR-009).
+    # Une correspondance insensible à la casse lisait une phrase de prose
+    # comme un verdict (ticket-122).
     approved, _ = _parse_reviewer_verdict("approved — looks great")
+    assert approved is False
+
+
+def test_parse_verdict_approved_dans_un_mot_n_approuve_pas() -> None:
+    # `"APPROVED" in content.upper()` acceptait « this should not be
+    # approved » — la négation était perdue, et le run passait `done` sur un
+    # refus (ticket-122). Un verdict est un mot entier, en majuscules.
+    approved, _ = _parse_reviewer_verdict("This should not be approved.")
+    assert approved is False
+    approved, _ = _parse_reviewer_verdict("UNAPPROVED")
+    assert approved is False
+
+
+def test_parse_verdict_approved_seul_approuve() -> None:
+    approved, reason = _parse_reviewer_verdict("APPROVED")
     assert approved is True
+    assert reason == ""
 
 
 def test_parse_verdict_changes_requested_with_reason() -> None:
@@ -394,6 +413,54 @@ async def test_run_pipeline_cree_une_branche_et_emet_l_event(tmp_path: Path) -> 
     assert len(branch_events) == 1
     assert branch_events[0].data["branch"] == git.created[0][0] + "-" + git.created[0][1]
     assert result.branch == branch_events[0].data["branch"]
+
+
+async def test_pipeline_done_porte_la_branche_du_run(tmp_path: Path) -> None:
+    """`pipeline_done` carries the run branch, so the UI can open the PR from it."""
+    # Sans ce champ, l'UI reconstruisait `PipelineResult` sans branche et
+    # affichait « Lance d'abord le pipeline » après un run approuvé, bouton PR
+    # grisé — alors que la branche existait bel et bien (ticket-123).
+    events: list[OrchestratorEvent] = []
+
+    class FakeGit:
+        async def create_branch(self, ticket_id: str, slug: str) -> str:
+            return f"{ticket_id}-{slug}"
+
+        async def current_diff(self) -> str:
+            return ""
+
+        async def is_clean(self) -> bool:
+            return True
+
+        async def commit_all(self, message: str) -> str | None:
+            return None
+
+    ticket = _make_ticket()
+    svc = AsyncMock()
+    svc.get_ticket.return_value = ticket
+    svc.update_status.return_value = ticket
+
+    runner = MagicMock()
+    runner.run = AsyncMock(
+        side_effect=[
+            _make_agent_result("def foo(): pass", AgentRole.codeur),
+            _make_agent_result("APPROVED", AgentRole.reviewer),
+        ]
+    )
+
+    orchestrator = _make_orchestrator(
+        tmp_path, runner=runner, ticket_service=svc, git_workspace=FakeGit()
+    )
+
+    async def on_event(event: OrchestratorEvent) -> None:
+        events.append(event)
+
+    result = await orchestrator.run_pipeline("projet", "ticket-001", on_event)
+
+    done = [e for e in events if e.type == EventType.PIPELINE_DONE]
+    assert len(done) == 1
+    assert done[0].data["branch"] == result.branch
+    assert result.branch is not None
 
 
 async def test_run_pipeline_sans_git_workspace_reste_fonctionnel(tmp_path: Path) -> None:

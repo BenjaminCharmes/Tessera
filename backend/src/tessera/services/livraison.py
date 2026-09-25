@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
 
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.politique_run import PolitiqueRun
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -70,6 +71,7 @@ class LivraisonService:
         intervalle_ci_s: float = _INTERVALLE_CI_S,
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
         resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
+        politique: PolitiqueRun | None = None,
     ) -> None:
         self._git = git_workspace
         self._workflow = workflow
@@ -79,6 +81,11 @@ class LivraisonService:
         self._intervalle_ci_s = intervalle_ci_s
         self._dormir = dormir
         self._resolveur = resolveur
+        # Le niveau se fige **avant** le premier agent, jamais au moment de
+        # livrer : `agents.json` est sous la racine du projet, et un codeur
+        # pouvait y écrire `merge` pendant le run (ticket-119). Sans politique
+        # — appel hors pipeline — on lit le fichier, comme avant.
+        self._politique = politique
 
     async def livrer(
         self,
@@ -102,7 +109,11 @@ class LivraisonService:
         if branch is None:
             return Livraison(arret="Aucune branche : rien à livrer.")
 
-        niveau = lire_niveau(self._project_path)
+        niveau = (
+            self._politique.autonomy
+            if self._politique is not None
+            else lire_niveau(self._project_path)
+        )
         if niveau is NiveauAutonomie.commit:
             return Livraison(
                 arret=(

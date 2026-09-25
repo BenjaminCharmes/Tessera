@@ -45,10 +45,46 @@ def test_les_prompts_que_rien_n_appelait_ont_disparu() -> None:
     assert "orchestrateur" not in roles
 
 
-def test_un_prompt_branche_par_un_projet_parle_dans_le_pipeline() -> None:
-    # `analyste-carriere` n'est chargé par aucun code : c'est le `agents.json`
-    # du projet carrière qui le substitue au prompt du codeur.
-    moments = {a.role: a.moment for a in _registre().list_agents()}
+def test_un_prompt_branche_par_un_projet_parle_dans_le_pipeline(
+    tmp_path: Path,
+) -> None:
+    """Un prompt qu'aucun code ne charge parle quand un projet le branche.
+
+    Ce test lisait le `projects/` du dépôt et constatait que le projet
+    carrière branchait `analyste-carriere`. Or ce projet n'est pas versionné :
+    ailleurs — un clone neuf, la CI — aucun projet ne branche l'agent, son
+    moment vaut `jamais`, et le test échouait (ticket-109).
+
+    Il construit désormais son propre projet, donc il vérifie le **mécanisme**
+    de substitution au lieu de constater une configuration locale.
+    """
+    projets = tmp_path / "projects"
+    (projets / "un-projet").mkdir(parents=True)
+    (projets / "un-projet" / "agents.json").write_text(
+        json.dumps(
+            {
+                "project_id": "un-projet",
+                # La substitution se déclare ainsi : un rôle **du pipeline**
+                # porte le prompt d'un autre. C'est le `prompt_file` qui est
+                # branché, pas le rôle — déclarer `role: analyste-carriere`
+                # ne brancherait rien, le registre ne regardant que les rôles
+                # du pipeline.
+                "agents": [
+                    {
+                        "role": "codeur",
+                        "model": "claude-sonnet-4-6",
+                        "max_tokens": 8192,
+                        "prompt_file": "agents/prompts/analyste-carriere.md",
+                        "active": True,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    registre = AgentRegistryService(_PROMPTS, projects_dir=projets)
+    moments = {a.role: a.moment for a in registre.list_agents()}
 
     assert moments["analyste-carriere"] is MomentAgent.pipeline
 

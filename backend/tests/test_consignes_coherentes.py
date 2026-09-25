@@ -105,13 +105,55 @@ def test_les_skills_annonces_existent() -> None:
 def test_l_arborescence_decrite_existe() -> None:
     # `CLAUDE.md` décrit `.claude/` : ce qu'il montre doit exister, sinon il
     # décrit un dépôt imaginaire.
-    decrit = re.findall(r"^\s{2,4}([a-z_.]+\.json|[a-z-]+/)", _lire("CLAUDE.md"), re.MULTILINE)
-    manquants = [
-        d for d in set(decrit)
-        if d.endswith(".json") and not (_RACINE / ".claude" / d).exists()
-    ]
+    #
+    # Sauf ce qu'il annonce lui-même comme gitignoré. Ce test exigeait la
+    # présence de `settings.local.json`, que le dépôt s'interdit de versionner :
+    # il passait sur le poste de son auteur et échouait sur tout clone neuf,
+    # CI comprise (ticket-109). Le marqueur est déjà dans le texte, il suffit
+    # de le lire.
+    manquants = _json_decrits_manquants(_lire("CLAUDE.md"), _RACINE / ".claude")
 
     assert manquants == [], f"décrits dans .claude/ mais absents : {manquants}"
+
+
+def _json_decrits_manquants(texte: str, racine: Path) -> list[str]:
+    """Les `.json` que le texte décrit, qui n'existent pas et qu'il n'excuse pas."""
+    decrit = set(re.findall(r"^\s{2,4}([a-z_.]+\.json|[a-z-]+/)", texte, re.MULTILINE))
+    ignores = {
+        nom
+        for ligne in texte.splitlines()
+        if "gitignor" in ligne.lower()
+        for nom in re.findall(r"([a-z_.]+\.json)", ligne)
+    }
+    return sorted(
+        d for d in decrit - ignores
+        if d.endswith(".json") and not (racine / d).exists()
+    )
+
+
+def test_l_exemption_de_gitignore_ne_couvre_que_ce_qui_est_annonce(
+    tmp_path: Path,
+) -> None:
+    """L'exemption se prouve sur un texte factice, pas sur `CLAUDE.md`.
+
+    Aujourd'hui le seul `.json` que `CLAUDE.md` décrit est celui qu'il annonce
+    gitignoré : le test ci-dessus ne verrouille donc plus rien tant que c'est
+    le cas. Sans ce test-ci, l'exemption ajoutée par ticket-109 aurait vidé le
+    verrou en silence.
+    """
+    texte = (
+        "```\n"
+        "  .claude/\n"
+        "    settings.local.json   ← préférences personnelles (gitignoré)\n"
+        "    registre.json         ← versionné, doit exister\n"
+        "```\n"
+    )
+
+    # Les deux sont absents, mais un seul est excusé.
+    assert _json_decrits_manquants(texte, tmp_path) == ["registre.json"]
+
+    (tmp_path / "registre.json").write_text("{}", encoding="utf-8")
+    assert _json_decrits_manquants(texte, tmp_path) == []
 
 
 # ------------------------------------------------------------------
@@ -280,10 +322,20 @@ def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
 
     manifeste = json.loads(_default_agents_json("p", [], "tracked"))
 
+    mortes = _clefs_mortes(manifeste)
+    assert mortes == [], f"clefs écrites dans agents.json mais jamais lues : {mortes}"
+
+
+def _clefs_mortes(manifeste: dict[str, object]) -> list[str]:
+    """Les clefs d'un `agents.json` qu'aucun code ne consomme."""
     clefs = set(manifeste) - {"project_id"}
-    clefs |= set(manifeste["pipeline"])
-    for agent in manifeste["agents"]:
-        clefs |= set(agent)
+    pipeline = manifeste.get("pipeline")
+    if isinstance(pipeline, dict):
+        clefs |= set(pipeline)
+    agents = manifeste.get("agents")
+    if isinstance(agents, list):
+        for agent in agents:
+            clefs |= set(agent)
 
     sources = ""
     for chemin in (_RACINE / "backend" / "src").rglob("*.py"):
@@ -302,5 +354,120 @@ def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
     for chemin in exclus:
         ailleurs = ailleurs.replace(chemin.read_text(encoding="utf-8"), "")
 
-    mortes = sorted(c for c in clefs if c not in ailleurs)
-    assert mortes == [], f"clefs écrites dans agents.json mais jamais lues : {mortes}"
+    return sorted(c for c in clefs if c not in ailleurs)
+
+
+def test_le_manifeste_d_ide_core_ne_porte_aucune_clef_morte() -> None:
+    """Le manifeste du projet bootstrap est tenu au même contrat que ceux générés.
+
+    Le test précédent verrouille ce que `_default_agents_json` écrit, pas ce
+    qui est déjà sur disque : `projects/ide-core/agents.json` portait encore
+    `auto_merge_on_approve` — retiré du modèle au ticket-091 — et
+    `max_instances`, jamais lu. Le projet qui construit l'IDE est celui qu'on
+    ouvre en premier pour comprendre un `agents.json` ; un réglage mort y
+    enseigne une fausse règle à qui le lit.
+    """
+    import json
+
+    manifeste = json.loads(_lire("projects/ide-core/agents.json"))
+
+    mortes = _clefs_mortes(manifeste)
+    assert mortes == [], f"clefs mortes dans projects/ide-core/agents.json : {mortes}"
+
+
+# ------------------------------------------------------------------
+# Le dossier et le champ disent la même chose — ticket-113
+# ------------------------------------------------------------------
+
+
+def test_le_dossier_d_un_ticket_correspond_a_son_champ_status() -> None:
+    """Chaque ticket est rangé dans le dossier que son frontmatter annonce.
+
+    La règle existe depuis le début — « changer de statut = déplacer le
+    fichier **et** mettre à jour le champ, les deux, sinon l'UI et le fichier
+    divergent » — et rien ne la mesurait. Elle reposait sur la discipline de
+    celui qui range, et cette discipline a lâché trois fois sur douze tickets
+    au cours d'une seule session : le travail fini, la PR ouverte, le
+    déplacement oublié.
+
+    ADR-034 : un budget que rien ne mesure est un souhait. Une règle non plus.
+    """
+    tickets = _RACINE / "projects" / "ide-core" / "tickets"
+    divergents: list[str] = []
+
+    for dossier in sorted(p for p in tickets.iterdir() if p.is_dir()):
+        for fichier in sorted(dossier.glob("ticket-*.md")):
+            entete = fichier.read_text(encoding="utf-8").split("---")[1]
+            declare = next(
+                (
+                    l.split(":", 1)[1].strip()
+                    for l in entete.splitlines()
+                    if l.startswith("status:")
+                ),
+                None,
+            )
+            if declare != dossier.name:
+                divergents.append(
+                    f"{fichier.name} est dans {dossier.name}/ "
+                    f"mais déclare status: {declare}"
+                )
+
+    assert divergents == [], "\n".join(divergents)
+
+
+# ------------------------------------------------------------------
+# Un numéro d'ADR cité doit exister quelque part — ticket-131
+# ------------------------------------------------------------------
+
+
+def _numeros_declares() -> set[str]:
+    """Les ADR en vigueur, plus ceux qu'on a archivés."""
+    numeros: set[str] = set()
+    for nom in ("decisions.md", "decisions-archive.md"):
+        chemin = _RACINE / "projects" / "ide-core" / "memory" / nom
+        if chemin.exists():
+            numeros |= set(
+                re.findall(r"^## (ADR-\d{3})", chemin.read_text(encoding="utf-8"), re.M)
+            )
+    return numeros
+
+
+def test_tout_adr_cite_existe_encore() -> None:
+    # Le risque de l'archivage n'est pas d'archiver trop peu, c'est d'archiver
+    # une contrainte encore appliquée : elle disparaîtrait du prompt sans que
+    # rien n'échoue, et un agent la violerait des semaines plus tard sans
+    # qu'on sache pourquoi.
+    declares = _numeros_declares()
+    assert declares, "aucun ADR trouvé — le chemin du fichier a bougé"
+
+    cites: dict[str, set[str]] = {}
+    for dossier, motifs in (
+        ("backend/src", ("*.py",)),
+        ("agents/prompts", ("*.md",)),
+        (".claude/skills", ("*.md",)),
+        ("frontend/src", ("*.ts", "*.tsx")),
+    ):
+        racine = _RACINE / dossier
+        if not racine.is_dir():
+            continue
+        for motif in motifs:
+            for fichier in racine.rglob(motif):
+                texte = fichier.read_text(encoding="utf-8", errors="ignore")
+                for numero in re.findall(r"ADR-\d{3}", texte):
+                    cites.setdefault(numero, set()).add(
+                        str(fichier.relative_to(_RACINE))
+                    )
+
+    inconnus = {n: sorted(f) for n, f in cites.items() if n not in declares}
+    assert inconnus == {}, f"ADR cités mais introuvables : {inconnus}"
+
+
+def test_l_archive_n_est_importee_nulle_part() -> None:
+    # Elle existe pour *sortir* du prompt : l'importer annulerait le ticket.
+    for claude_md in _RACINE.rglob("CLAUDE.md"):
+        if ".venv" in claude_md.parts or "node_modules" in claude_md.parts:
+            continue
+        texte = claude_md.read_text(encoding="utf-8", errors="ignore")
+        assert "decisions-archive" not in texte, (
+            f"{claude_md} importe l'archive : elle repartirait dans chaque appel"
+        )

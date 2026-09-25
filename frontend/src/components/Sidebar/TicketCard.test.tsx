@@ -64,6 +64,68 @@ describe("TicketCard", () => {
     expect(onSelect).toHaveBeenCalledWith(base);
   });
 
+  it("s'ouvre à la touche Entrée et à Espace (ticket-123)", () => {
+    // La carte était un `div onClick` : invisible au clavier.
+    const onSelect = vi.fn();
+    render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning={false}
+        onSelect={onSelect}
+        onRun={vi.fn()}
+      />,
+    );
+    const carte = screen.getByRole("button", { name: /Add authentication module/ });
+    expect(carte).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(carte, { key: "Enter" });
+    fireEvent.keyDown(carte, { key: " " });
+    expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("une touche dans un bouton interne n'ouvre pas la carte", () => {
+    const onSelect = vi.fn();
+    render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning={false}
+        onSelect={onSelect}
+        onRun={vi.fn()}
+      />,
+    );
+    fireEvent.keyDown(screen.getByRole("button", { name: "Lancer le pipeline" }), {
+      key: "Enter",
+    });
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("compte les tours seulement quand le maximum est connu (ticket-123)", () => {
+    const { rerender } = render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning
+        runningRound={2}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("tour 2")).toBeInTheDocument();
+    rerender(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning
+        runningRound={2}
+        maxRounds={3}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("tour 2/3")).toBeInTheDocument();
+  });
+
   it("calls onRun with ticket id when run button clicked", () => {
     const onRun = vi.fn();
     render(
@@ -364,5 +426,49 @@ describe("TicketCard", () => {
     await waitFor(() => {
       expect(screen.getByText("CI verte")).toBeInTheDocument();
     });
+  });
+
+  it("n'offre pas la file sur un ticket deja termine", () => {
+    // ticket-115 : le bouton « Lancer » etait bien cache sur un `done`, pas
+    // celui de la file — et run_queue ne regardait pas le statut. Le ticket
+    // etait donc reellement repris : nouvelle branche, nouveaux appels
+    // d'agents, quota depense, pour refaire un travail livre.
+    for (const status of ["done", "cancelled"] as const) {
+      const { unmount } = render(
+        <TicketCard
+          ticket={{ ...base, status }}
+          isActive={false}
+          isRunning={false}
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+          onToggleQueue={vi.fn()}
+        />,
+      );
+
+      expect(
+        screen.queryByRole("button", { name: /file/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Lancer le pipeline" }),
+      ).not.toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  it("offre la file sur un ticket en cours", () => {
+    render(
+      <TicketCard
+        ticket={base}
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+        onToggleQueue={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Ajouter à la file" }),
+    ).toBeInTheDocument();
   });
 });

@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
+from tessera.models.agent import AgentRole
 from tessera.models.ticket import (
     Ticket,
     TicketPriority,
@@ -10,7 +11,7 @@ from tessera.models.ticket import (
     TicketType,
 )
 from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline_events import EventType, OrchestratorEvent
 
 
 def _ticket(type_: TicketType) -> Ticket:
@@ -32,15 +33,30 @@ async def _rien(event: OrchestratorEvent) -> None:
     return None
 
 
-async def _lance(tmp_path: Path, monkeypatch: Any, type_: TicketType) -> list[str]:
+async def _lance(
+    tmp_path: Path,
+    monkeypatch: Any,
+    type_: TicketType,
+    events: list[OrchestratorEvent] | None = None,
+) -> list[str]:
     """Rend les rôles que le pipeline a réellement appelés."""
     roles: list[str] = []
+    collected = events if events is not None else []
+
+    async def _collect(event: OrchestratorEvent) -> None:
+        collected.append(event)
 
     runner = MagicMock()
 
     async def _run(**kwargs: Any) -> Any:
         role = kwargs.get("role")
         roles.append(getattr(role, "value", str(role)))
+        stream = kwargs.get("stream_callback")
+        if stream is not None:
+            await stream("jeton")
+        tool = kwargs.get("tool_callback")
+        if tool is not None:
+            await tool("Write", {"path": "x"})
 
         class _R:
             content = "fait"
@@ -79,7 +95,7 @@ async def _lance(tmp_path: Path, monkeypatch: Any, type_: TicketType) -> list[st
         project_path=tmp_path,
         git_workspace=git,
     )
-    await orch.run_pipeline("p", "ticket-001", _rien)
+    await orch.run_pipeline("p", "ticket-001", _collect)
     return roles
 
 
@@ -108,3 +124,26 @@ async def test_un_ticket_fix_va_au_codeur(tmp_path: Path, monkeypatch: Any) -> N
     roles = await _lance(tmp_path, monkeypatch, TicketType.fix)
 
     assert "codeur" in roles
+
+
+async def test_les_evenements_de_l_architecte_portent_son_nom(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # `agent=codeur` était codé en dur sur AGENT_STARTED, AGENT_TOKEN et
+    # AGENT_TOOL_USE : sur un ticket `design`, l'UI montrait un codeur au
+    # travail alors que l'architecte produisait (ticket-122).
+    events: list[OrchestratorEvent] = []
+    await _lance(tmp_path, monkeypatch, TicketType.design, events)
+
+    producteur = [
+        e for e in events
+        if e.type in (
+            EventType.AGENT_STARTED, EventType.AGENT_TOKEN,
+            EventType.AGENT_TOOL_USE, EventType.AGENT_DONE,
+        )
+    ]
+    assert {e.type for e in producteur} == {
+        EventType.AGENT_STARTED, EventType.AGENT_TOKEN,
+        EventType.AGENT_TOOL_USE, EventType.AGENT_DONE,
+    }
+    assert {e.agent for e in producteur} == {AgentRole.architect}

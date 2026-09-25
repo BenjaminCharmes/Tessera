@@ -52,7 +52,8 @@ environnements sans session interactive : Docker, CI).
 
 `get_provider(allow_tools=False)` retourne une variante **sans outils**, utilisée
 par tous les services purement texte→JSON (validateur, auditeur sécurité,
-planificateur, project-analyzer, agent-creator, project-creator, doc-updater) qui
+planificateur, project-analyzer, agent-creator, project-creator, doc-technique,
+doc-fonctionnelle) qui
 écrivent eux-mêmes leurs fichiers en Python.
 
 ### Couche git (ADR-018, ADR-024, ADR-027)
@@ -279,7 +280,7 @@ Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
            ticket_status_changed | test_result | security_audit_started |
            security_audit_done | validation_done | doc_updated | commit_created |
            pipeline_done | error",
-  "agent": "codeur | reviewer | testeur | securite | validateur | doc-updater | null",
+  "agent": "codeur | reviewer | testeur | securite | validateur | doc-technique | doc-fonctionnelle | null",
   "ticket_id": "ticket-007",
   "data": { "round": 1, "token": "def foo", "status": "in-progress", "approved": true },
   "timestamp": "2026-06-20T14:30:00Z"
@@ -324,3 +325,72 @@ projects/{project_id}/memory/
 4. Si pipeline custom : modifier `Orchestrator.run_pipeline()`
 
 Pas besoin de modifier le reste du code.
+
+---
+
+## Schéma d'ensemble
+
+```
+┌─────────────────────────────────────┐
+│      ✅ Tauri v2 Shell (Rust)       │
+│  ┌─────────────────────────────┐    │
+│  │  ✅ React UI (TypeScript)   │    │
+│  │  Monaco · Ticket Board      │    │
+│  │  Agent Stream · Sidebar     │    │
+│  └──────────────┬──────────────┘    │
+└─────────────────┼───────────────────┘
+               │ HTTP / WebSocket
+┌──────────────▼──────────────────────┐
+│     Orchestrateur (FastAPI)         │
+│                                     │
+│  ┌─────────────┐  ┌───────────────┐ │
+│  │  Routers    │  │   Services    │ │
+│  │  projects   │  │  AgentRunner  │ │
+│  │  tickets    │  │  Orchestrator │ │
+│  │  agents     │  │  AgentRegistry│ │
+│  │  agent_adm  │  │  Planner      │ │
+│  │  orchestr.  │  │  GitClone     │ │
+│  └─────────────┘  └───────┬───────┘ │
+└──────────────────────────-┼─────────┘
+                            │ Anthropic SDK
+                    ┌───────▼───────┐
+                    │  Claude API   │
+                    │ (Sonnet 4.6 / │
+                    │  Haiku 4.5)   │
+                    └───────────────┘
+                            │
+               Filesystem (tickets/memory/)
+               GitHub API (issues/PRs/clone)
+```
+
+### Flux d'un ticket
+
+```
+POST /orchestrator/run { project_id, ticket_id }
+        │
+        ├─ git checkout -b ticket-XXX-slug   (forkée de la ref de base)
+        │
+        ├─ Codeur (Claude) ──streaming──▶ WS /orchestrator/stream
+        │       ↓ écrit réellement les fichiers
+        ├─ git diff  →  c'est CE diff que relisent les agents suivants
+        │
+        ├─ Testeur            → exécute la suite de tests du projet
+        ├─ Sécurité (OWASP)   → BLOCK si CRITICAL/HIGH  →  ticket → blocked/
+        ├─ Reviewer (Claude)
+        │       ↓ CHANGES_REQUESTED  →  retour Codeur (max 3 tours)
+        │       ↓ APPROVED
+        ├─ Validateur         → vérifie les critères d'acceptation un par un
+        ├─ Doc-updater        → met à jour README / docs / CLAUDE.md
+        │
+        ├─ git commit
+        │       ↓ approuvé      →  "<type>: ticket-XXX — <titre>"  + ref de base avancée
+        │       ↓ non approuvé  →  "chore: ticket-XXX — unapproved work (<raison>)"
+        │
+        └─ PipelineResult { approved, rounds, final_status, branch, commit_sha }
+```
+
+> Quel que soit le verdict, le travail du codeur est commité sur la branche du
+> ticket : rien n'est perdu, et l'arbre de travail reste propre pour le ticket
+> suivant. Seul un ticket **approuvé** fait avancer la ref de base, de sorte
+> qu'un plan de tickets séquentiels s'empile correctement sans jamais hériter
+> du travail rejeté d'un ticket précédent.

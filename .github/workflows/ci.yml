@@ -1,12 +1,15 @@
 name: CI
 
-# Chaque PR déclenchait **deux** runs : celui du `push` sur la branche, et
-# celui de la `pull_request`. Tout était donc facturé en double (ticket-095).
-# `push` ne garde que `main`, qui ne reçoit pas de PR de sa propre branche ;
-# tout le reste est couvert par `pull_request`.
+# `pull_request` seul. Chaque PR déclenchait autrefois **deux** runs — celui du
+# `push` sur la branche et celui de la `pull_request` — et tout était facturé en
+# double (ticket-095). Il restait un doublon : `push: [main]` rejouait, après le
+# merge, la release que sa propre PR venait de vérifier. Le commentaire d'alors
+# le justifiait en disant que `main` ne reçoit pas de PR, ce qui est faux —
+# elle reçoit celles de `develop` (ticket-111).
+#
+# Rien n'entre dans `main` autrement que par une PR : les commits directs y sont
+# interdits, et `pull_request` couvre donc tout.
 on:
-  push:
-    branches: [main]
   pull_request:
     # `develop` est la cible par défaut des PR de ticket (ADR — ticket-049) :
     # sans elle ici, une PR vers develop ne déclenche aucun check.
@@ -18,6 +21,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# `runs-on` se choisit par la variable de depot `CI_RUNNER`. Les minutes
+# Actions incluses pour un depot prive sont epuisees depuis que ce depot est
+# repasse en prive (ticket-160) : plus aucune PR ne declenchait de run. Un
+# runner self-hosted n'en consomme aucune. La variable vide rend la CI aux
+# runners GitHub sans toucher a ce fichier, donc sans PR (ticket-161).
 permissions:
   contents: read
   pull-requests: write
@@ -26,32 +34,36 @@ jobs:
 
   backend:
     name: Backend (pytest)
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: "backend/uv.lock"
 
       - name: Install dependencies
-        run: cd backend && uv sync --extra dev
+        run: cd backend && uv sync --locked --extra dev
 
       - name: Run tests with coverage
         run: cd backend && uv run pytest -v -m "not integration" --cov=tessera --cov-report=term-missing --cov-report=xml
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || 'sk-ant-test-ci-key' }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: backend-coverage
           path: backend/coverage.xml
 
       - name: Coverage report on PR (backend)
-        if: github.event_name == 'pull_request'
-        uses: orgoro/coverage@v3.2
+        # Sur une PR venue d'un fork, GITHUB_TOKEN est en lecture seule : le
+        # commentaire échouerait et ferait passer la CI au rouge pour rien.
+        # Linux seulement : ces actions ne sont pas garanties ailleurs, et un
+        # commentaire de couverture ne vaut pas un run rouge (ticket-161).
+        if: runner.os == 'Linux' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: orgoro/coverage@v3.3
         with:
           coverageFile: backend/coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -61,11 +73,11 @@ jobs:
 
   frontend:
     name: Frontend (tsc + vitest)
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: "npm"
@@ -77,17 +89,20 @@ jobs:
       - name: Type check
         run: cd frontend && npm run typecheck
 
+      - name: Lint
+        run: cd frontend && npm run lint
+
       - name: Unit tests with coverage
         run: cd frontend && npm run test:coverage
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: frontend-coverage
           path: frontend/coverage/
 
       - name: Coverage report on PR (frontend)
-        if: github.event_name == 'pull_request'
+        if: runner.os == 'Linux' && github.event.pull_request.head.repo.full_name == github.repository
         uses: romeovs/lcov-reporter-action@v0.4.0
         with:
           lcov-file: frontend/coverage/lcov.info
@@ -97,12 +112,12 @@ jobs:
 
   e2e:
     name: E2E (Playwright)
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     needs: [frontend]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: "npm"
@@ -111,13 +126,20 @@ jobs:
       - name: Install dependencies
         run: cd frontend && npm ci
 
-      - name: Install Playwright browsers
+      # `--with-deps` installe des paquets systeme par `apt` : il n'existe
+      # que sur Linux, et le passer ailleurs fait echouer l'etape.
+      - name: Install Playwright browsers (Linux)
+        if: runner.os == 'Linux'
         run: cd frontend && npx playwright install --with-deps chromium
+
+      - name: Install Playwright browsers
+        if: runner.os != 'Linux'
+        run: cd frontend && npx playwright install chromium
 
       - name: Run E2E tests
         run: cd frontend && npm run test:e2e
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -129,15 +151,18 @@ jobs:
   # check`. Il ne tourne donc plus que quand le Rust change (ticket-095).
   detecter:
     name: Ce qui a changé
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     outputs:
       tauri: ${{ steps.filtre.outputs.tauri }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: filtre
         name: Le Rust a-t-il bougé ?
+        # Ce script est du POSIX ; un runner Windows ouvrirait `pwsh`, où il
+        # n'est même pas analysable.
+        shell: bash
         run: |
           base="${{ github.event.pull_request.base.sha || github.event.before }}"
           if [ -z "$base" ] || ! git cat-file -e "$base" 2>/dev/null; then
@@ -156,7 +181,7 @@ jobs:
     if: needs.detecter.outputs.tauri == 'true'
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
 

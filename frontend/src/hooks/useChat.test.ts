@@ -128,6 +128,47 @@ describe("useChat", () => {
     expect(result.current.status).toBe("ready");
   });
 
+  it("passe à « disconnected » quand la socket se ferme proprement (ticket-123)", async () => {
+    // Une fermeture propre ramenait à `idle`, l'état d'avant tout projet :
+    // le panneau gardait la zone de saisie active et le bouton grisé, sans
+    // message ni moyen de repartir.
+    const { result } = renderHook(() => useChat("ide-core"));
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    act(() => MockWebSocket.instance!.triggerOpen());
+    expect(result.current.status).toBe("ready");
+
+    act(() => MockWebSocket.instance!.triggerClose());
+
+    expect(result.current.status).toBe("disconnected");
+  });
+
+  it("rouvre la socket au prochain envoi et y fait partir le message", async () => {
+    const { result } = renderHook(() => useChat("ide-core"));
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    const premiere = MockWebSocket.instance!;
+    act(() => premiere.triggerOpen());
+    act(() => premiere.triggerClose());
+    expect(result.current.status).toBe("disconnected");
+
+    act(() => result.current.send("Encore là ?"));
+
+    const seconde = MockWebSocket.instance!;
+    expect(seconde).not.toBe(premiere);
+    expect(result.current.status).toBe("connecting");
+    expect(result.current.messages.at(-1)).toMatchObject({
+      role: "user",
+      content: "Encore là ?",
+    });
+
+    act(() => seconde.triggerOpen());
+
+    expect(seconde.sent).toHaveLength(1);
+    expect(JSON.parse(seconde.sent[0] ?? "{}")).toMatchObject({
+      message: "Encore là ?",
+    });
+    expect(result.current.status).toBe("thinking");
+  });
+
   it("n'envoie rien si la socket n'est pas ouverte", async () => {
     const { result } = renderHook(() => useChat("ide-core"));
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());

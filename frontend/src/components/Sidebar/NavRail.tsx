@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
-import type { SidebarPanel } from "./panels";
+import type { AlerteDeSupervision, SidebarPanel } from "./panels";
+import Pastille from "./Pastille";
 
 /**
  * Barre de navigation principale du cockpit (ticket-065).
@@ -17,6 +18,15 @@ import type { SidebarPanel } from "./panels";
 interface NavRailProps {
   activePanel: SidebarPanel;
   onChangePanel: (panel: SidebarPanel) => void;
+  /**
+   * Combien de **runs** tournent, tous projets confondus — pas combien
+   * d'agents (ticket-129). Un pipeline Tessera est séquentiel : il n'y a
+   * jamais deux agents simultanés dans un même run, et annoncer « 12 agents »
+   * serait faux.
+   */
+  runsActifs?: number;
+  /** Ce qui mérite d'être vu avant le reste, quand c'est le cas. */
+  alerte?: AlerteDeSupervision;
 }
 
 interface Destination {
@@ -94,6 +104,17 @@ const DESTINATIONS: Destination[] = [
     ),
   },
   {
+    panel: "supervision",
+    label: "Supervision",
+    icon: (
+      <svg {...ICON}>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+        <path d="M5.6 5.6 7.8 7.8M16.2 16.2l2.2 2.2M18.4 5.6 16.2 7.8M7.8 16.2l-2.2 2.2" />
+      </svg>
+    ),
+  },
+  {
     panel: "usage",
     label: "Coûts",
     icon: (
@@ -104,7 +125,12 @@ const DESTINATIONS: Destination[] = [
   },
 ];
 
-export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
+export default function NavRail({
+  activePanel,
+  onChangePanel,
+  runsActifs = 0,
+  alerte = null,
+}: NavRailProps) {
   return (
     <nav
       role="tablist"
@@ -135,12 +161,15 @@ export default function NavRail({ activePanel, onChangePanel }: NavRailProps) {
             role="tab"
             aria-selected={actif}
             onClick={() => onChangePanel(panel)}
-            className={`flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
+            className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
               actif
                 ? "bg-violet-500/15 text-violet-200 ring-1 ring-inset ring-violet-500/40"
                 : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
             }`}
           >
+            {panel === "supervision" ? (
+              <Pastille nombre={runsActifs} alerte={alerte} />
+            ) : null}
             {icon}
             <span className="w-full text-center text-micro leading-none">
               {label}

@@ -19,4 +19,12 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // La fixture Playwright s'appelle `use` : la règle y voit un hook React
+    // appelé hors composant. Il n'y a pas de React dans e2e/ (ticket-123).
+    files: ['e2e/**'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
 ])

@@ -1,4 +1,4 @@
-.PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run run-windows stop test lint clean
+.PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run stop verify test test-fast test-coverage lint clean
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Tessera — Makefile
@@ -9,7 +9,6 @@ help:
 	@echo "  make setup        — Initialise l'environnement (copie .env.example, installe deps)"
 	@echo "  make doctor       — Vérifie les prérequis avant de lancer (à faire en premier)"
 	@echo "  make run          — Lance backend + frontend en parallèle (Ctrl+C pour tout arrêter)"
-	@echo "  make run-windows  — Idem, mais adapté à Windows (make run utilise trap/wait POSIX)"
 	@echo "  make stop         — Arrête backend et frontend, worker --reload orphelin compris"
 	@echo "  make dev          — Lance uniquement le serveur FastAPI en mode reload (port 8000)"
 	@echo "  make verify       — Tout ce que la CI vérifie, en local (à faire avant de merger)"
@@ -30,14 +29,15 @@ setup:
 doctor:
 	cd backend && uv run python -m tessera.doctor
 
-# `run` repose sur `trap`/`wait`, sémantiques POSIX : sous Windows, voir
-# `run-windows`. Les deux vérifient d'abord les prérequis — les deux pannes de
-# ticket-050 étaient détectables avant le lancement.
+# `run` repose sur `trap`/`wait`, sémantiques POSIX : sous Windows, c'est
+# `scripts/tessera.ps1 run` qui fait ce travail. Les deux vérifient d'abord
+# les prérequis — les deux pannes de ticket-050 étaient détectables avant le
+# lancement.
 run: doctor
 	@echo "→ Lancement Tessera : backend (port 8000) + frontend (port 5173)"
 	@echo "→ Ctrl+C pour arrêter les deux processus"
 	@trap 'kill 0' SIGINT SIGTERM; \
-	 (cd backend && uv run uvicorn tessera.main:app --reload --host 0.0.0.0 --port 8000 --env-file ../.env) & \
+	 (cd backend && uv run uvicorn tessera.main:app --reload --host 127.0.0.1 --port 8000 --env-file ../.env) & \
 	 (cd frontend && npm run dev) & \
 	 wait
 
@@ -46,24 +46,12 @@ dev:
 	@echo "→ Swagger UI : http://localhost:8000/docs"
 	cd backend && uv run uvicorn tessera.main:app \
 		--reload \
-		--host 0.0.0.0 \
+		--host 127.0.0.1 \
 		--port 8000 \
 		--env-file ../.env
 
 dev-frontend:
 	cd frontend && npm run dev
-
-# Windows : pas de `trap 'kill 0'`, et surtout pas de `--reload`. Tuer le
-# parent d'un uvicorn rechargeable laisse son worker vivant, qui garde le port
-# 8000 et sert le code de son dernier rechargement — d'où des 500 inexplicables
-# et un port impossible à libérer (ticket-056).
-run-windows: doctor
-	@echo "→ Lancement Tessera sous Windows (deux fenêtres, sans --reload)"
-	@powershell -NoProfile -Command "Start-Process -FilePath 'cmd' -ArgumentList '/c','cd backend && uv run uvicorn tessera.main:app --host 127.0.0.1 --port 8000'"
-	@powershell -NoProfile -Command "Start-Process -FilePath 'cmd' -ArgumentList '/c','cd frontend && npm run dev'"
-	@echo "→ Backend : http://localhost:8000/docs"
-	@echo "→ Frontend : http://localhost:5173"
-	@echo "→ Pour arrêter : make stop"
 
 stop:
 	@echo "→ Arrêt de Tessera"
@@ -83,13 +71,15 @@ tauri-build:
 	cd frontend && npm run tauri-build
 
 verify:
-	@echo "→ 1/4 Backend — pytest"
+	@echo "→ 1/5 Backend — pytest"
 	cd backend && uv run pytest -q -m "not integration"
-	@echo "→ 2/4 Backend — mypy"
-	cd backend && uv run mypy src/
-	@echo "→ 3/4 Frontend — typecheck + vitest"
-	cd frontend && npm run typecheck && npm run test -- --run
-	@echo "→ 4/4 E2E — playwright"
+	@echo "→ 2/5 Backend — mypy (cette plateforme, puis linux comme la CI)"
+	cd backend && uv run mypy src/ && uv run mypy --platform linux src/
+	@echo "→ 3/5 Frontend — typecheck"
+	cd frontend && npm run typecheck
+	@echo "→ 4/5 Frontend — lint + vitest"
+	cd frontend && npm run lint && npm run test -- --run
+	@echo "→ 5/5 E2E — playwright"
 	cd frontend && npm run test:e2e
 	@echo ""
 	@echo "Vert. Reste hors de portée ici : cargo check (Rust absent de ce poste)."
@@ -108,7 +98,7 @@ test-coverage:
 	cd frontend && npm run test:coverage
 
 lint:
-	cd backend && uv run mypy src/
+	cd backend && uv run mypy src/ && uv run mypy --platform linux src/
 
 clean:
 	find . -type d -name "__pycache__" -not -path "*/.venv/*" -exec rm -rf {} + 2>/dev/null || true

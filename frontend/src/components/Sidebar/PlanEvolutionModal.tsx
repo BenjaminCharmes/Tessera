@@ -142,7 +142,7 @@ export default function PlanEvolutionModal({
                 placeholder="Je veux ajouter l'authentification OAuth Google…"
                 rows={4}
                 maxLength={2000}
-                className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400 resize-none"
+                className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400 resize-none"
                 disabled={isLoading}
                 autoFocus
               />
@@ -167,7 +167,7 @@ export default function PlanEvolutionModal({
                 type="button"
                 onClick={handlePlan}
                 disabled={isLoading || !description.trim()}
-                className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded-sm transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {state === "planning" && (
                   <span className="inline-block w-3 h-3 border-2 border-zinc-400 border-t-white rounded-full animate-spin" />
@@ -250,7 +250,7 @@ export default function PlanEvolutionModal({
                 type="button"
                 onClick={handleCreate}
                 disabled={state === "creating" || selectedCount === 0}
-                className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded-sm transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {state === "creating" && (
                   <span className="inline-block w-3 h-3 border-2 border-zinc-400 border-t-white rounded-full animate-spin" />

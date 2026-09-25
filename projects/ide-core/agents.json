@@ -2,14 +2,25 @@
   "project_id": "ide-core",
   "artifacts": "tracked",
   "git_root": "ancestor",
+  "services": [
+    {
+      "nom": "backend",
+      "commande": "uv run uvicorn tessera.main:app --host 127.0.0.1 --port 8000",
+      "cwd": "../../backend"
+    },
+    {
+      "nom": "frontend",
+      "commande": "npm run dev",
+      "cwd": "../../frontend"
+    }
+  ],
   "agents": [
     {
       "role": "codeur",
       "model": "claude-sonnet-4-6",
       "max_tokens": 8192,
       "prompt_file": "agents/prompts/codeur.md",
-      "active": true,
-      "max_instances": 2
+      "active": true
     },
     {
       "role": "reviewer",
@@ -31,8 +42,7 @@
       "codeur",
       "reviewer"
     ],
-    "max_review_rounds": 3,
-    "auto_merge_on_approve": true
+    "max_review_rounds": 3
   },
   "autonomy": "merge"
 }

@@ -52,7 +52,7 @@ export default function BandeAutonome({
         type="button"
         onClick={() => onLancer({ depuisGithub })}
         disabled={enCours}
-        className="rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 disabled:opacity-50"
+        className="rounded-sm border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 disabled:opacity-50"
       >
         Laisser l'IDE enchaîner
       </button>

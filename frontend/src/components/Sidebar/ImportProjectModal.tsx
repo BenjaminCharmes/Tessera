@@ -157,7 +157,7 @@ export default function ImportProjectModal({
               </h2>
 
               {/* Source type toggle */}
-              <div className="flex rounded overflow-hidden border border-zinc-700">
+              <div className="flex rounded-sm overflow-hidden border border-zinc-700">
                 <button
                   type="button"
                   onClick={() => {
@@ -214,7 +214,7 @@ export default function ImportProjectModal({
                           setInputError(null);
                         }}
                         placeholder="/Users/vous/Desktop/mon-projet"
-                        className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400"
+                        className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400"
                         autoFocus
                       />
                       {inputError && (
@@ -271,7 +271,7 @@ export default function ImportProjectModal({
                         setInputError(null);
                       }}
                       placeholder="https://github.com/owner/mon-repo"
-                      className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-400"
+                      className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400"
                       autoFocus
                     />
                     {inputError && (
@@ -302,7 +302,7 @@ export default function ImportProjectModal({
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors flex items-center gap-2"
+                    className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded-sm transition-colors flex items-center gap-2"
                   >
                     {sourceType === "local" ? "Importer" : "Cloner"}
                   </button>
@@ -347,10 +347,10 @@ export default function ImportProjectModal({
                     value={claudeMdDraft}
                     onChange={(e) => setClaudeMdDraft(e.target.value)}
                     rows={8}
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-500 resize-none"
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-sm px-3 py-2 text-xs text-zinc-200 font-mono focus:outline-hidden focus:border-zinc-500 resize-none"
                   />
                 ) : (
-                  <pre className="bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-300 font-mono whitespace-pre-wrap max-h-40 overflow-y-auto">
+                  <pre className="bg-zinc-800 border border-zinc-700 rounded-sm px-3 py-2 text-xs text-zinc-300 font-mono whitespace-pre-wrap max-h-40 overflow-y-auto">
                     {claudeMdDraft}
                   </pre>
                 )}
@@ -408,7 +408,7 @@ export default function ImportProjectModal({
                 </button>
                 <button
                   onClick={handleValidate}
-                  className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
+                  className="px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 text-white rounded-sm transition-colors"
                 >
                   Valider et ouvrir
                 </button>

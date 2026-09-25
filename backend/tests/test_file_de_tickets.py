@@ -29,6 +29,10 @@ class _OrchestrateurFile:
         self._documenter_le_lot = Orchestrator._documenter_le_lot.__get__(self)  # type: ignore[attr-defined]
         self.budget_exhausted = lambda: False
         self._log = lambda m: None
+        # Par défaut aucun ticket n'est terminé : les tests qui veulent
+        # l'inverse posent leur propre service (ticket-115).
+        self._ticket_svc = _ServiceTickets({})
+        self._est_termine = Orchestrator._est_termine.__get__(self)  # type: ignore[attr-defined]
 
     async def run_pipeline(
         self, project_id, ticket_id, on_event, run_id=None, dialogue=None,
@@ -96,3 +100,38 @@ async def test_la_file_annonce_sa_progression() -> None:
     progression = [e for e in collectes if e.type is EventType.QUEUE_PROGRESS]
     assert [e.data["index"] for e in progression] == [1, 2]
     assert progression[0].data["total"] == 2
+
+
+class _ServiceTickets:
+    """Rend les tickets demandés, avec le statut qu'on lui a donné."""
+
+    def __init__(self, statuts: dict[str, TicketStatus]) -> None:
+        self._statuts = statuts
+
+    async def get_ticket(self, ticket_id: str) -> Ticket | None:
+        ticket = _ticket(ticket_id)
+        return ticket.model_copy(
+            update={"status": self._statuts.get(ticket_id, TicketStatus.todo)}
+        )
+
+
+async def test_la_file_saute_un_ticket_deja_termine() -> None:
+    """A finished ticket put in the queue must not be run again.
+
+    The UI hid the Run button on a done ticket but not the queue button, and
+    `run_queue` never looked at the status: the ticket was really picked up
+    again — new branch, new agent calls, subscription quota spent, to redo
+    work already delivered.
+
+    Skipping rather than stopping: a queue where one finished ticket slipped
+    in must still process the others.
+    """
+    orch = _OrchestrateurFile()
+    orch._ticket_svc = _ServiceTickets(  # type: ignore[attr-defined]
+        {"ticket-002": TicketStatus.done, "ticket-003": TicketStatus.cancelled}
+    )
+    evenements, on_event = await _events()
+
+    await orch.run_queue("projet", ["ticket-001", "ticket-002", "ticket-003", "ticket-004"], on_event)
+
+    assert orch.lances == ["ticket-001", "ticket-004"]

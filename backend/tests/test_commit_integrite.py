@@ -102,3 +102,26 @@ async def test_un_commit_reussi_avance_la_ref_de_base() -> None:
     assert resultat.approved is True
     assert resultat.commit_sha == "abc1234"
     assert git.base_avancee is True
+
+
+async def test_un_titre_sur_deux_lignes_donne_un_sujet_sur_une_ligne() -> None:
+    # Un `title: >` YAML replié rend un titre avec un saut de ligne. Interpolé
+    # tel quel dans le sujet du commit, il coupait le message en sujet + corps
+    # et `git log --oneline` montrait un sujet tronqué (ticket-122).
+    git = _Git()
+    orch = _Orch(git)
+    messages: list[str] = []
+
+    async def _commit_all(message: str) -> str | None:
+        messages.append(message)
+        return "abc1234"
+
+    git.commit_all = _commit_all  # type: ignore[method-assign]
+    run = _run([])
+    run.ticket.title = "Première ligne\ndeuxième ligne"
+
+    await outcomes.finish_approved(orch, run)  # type: ignore[arg-type]
+
+    assert len(messages) == 1
+    assert "\n" not in messages[0]
+    assert messages[0] == "feat: ticket-001 — Première ligne deuxième ligne"

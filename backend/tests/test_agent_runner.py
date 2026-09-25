@@ -403,3 +403,75 @@ async def test_run_real_api(tmp_path: Path) -> None:
     assert result.content
     assert result.duration_ms > 0
     assert isinstance(result.suggested_status, TicketStatus)
+
+
+# ------------------------------------------------------------------
+# Le reviewer relit, il n'écrit pas — ticket-126
+# ------------------------------------------------------------------
+
+
+class _Fabrique:
+    """Double de `get_provider(tools=...)` : note ce qu'on lui demande."""
+
+    def __init__(self) -> None:
+        self.outils_demandes: list[list[str]] = []
+        self.provider = FakeProvider(content="APPROVED")
+
+    def __call__(self, outils: list[str]) -> FakeProvider:
+        self.outils_demandes.append(list(outils))
+        return self.provider
+
+
+def _runner_avec_fabrique(tmp_path: Path, fabrique: _Fabrique) -> tuple[AgentRunner, FakeProvider]:
+    commun = FakeProvider()
+    registry = _runner(tmp_path)._registry
+    runner = AgentRunner(commun, registry, fabrique_provider=fabrique)
+    return runner, commun
+
+
+async def test_le_reviewer_recoit_un_provider_en_lecture_seule(tmp_path: Path) -> None:
+    # Son prompt dit « tu ne modifies rien » ; il recevait pourtant `Write`,
+    # `Edit` et `Bash` comme le codeur. Une règle qui tient à la bonne volonté
+    # de l'agent n'est pas une règle (ADR-027, même raisonnement).
+    from tessera.services.agent_runner import OUTILS_DE_RELECTURE
+
+    fabrique = _Fabrique()
+    runner, commun = _runner_avec_fabrique(tmp_path, fabrique)
+
+    await runner.run("reviewer", _make_ticket(), "")
+
+    assert fabrique.outils_demandes == [["Read", "Glob", "Grep"]]
+    assert OUTILS_DE_RELECTURE == ["Read", "Glob", "Grep"]
+    assert len(fabrique.provider.calls) == 1
+    assert commun.calls == []
+
+
+async def test_le_provider_du_reviewer_n_est_construit_qu_une_fois(tmp_path: Path) -> None:
+    fabrique = _Fabrique()
+    runner, _ = _runner_avec_fabrique(tmp_path, fabrique)
+
+    await runner.run("reviewer", _make_ticket(), "")
+    await runner.run("reviewer", _make_ticket(), "")
+
+    assert len(fabrique.outils_demandes) == 1
+
+
+async def test_le_codeur_garde_le_provider_complet(tmp_path: Path) -> None:
+    fabrique = _Fabrique()
+    runner, commun = _runner_avec_fabrique(tmp_path, fabrique)
+
+    await runner.run("codeur", _make_ticket(), "")
+
+    assert fabrique.outils_demandes == []
+    assert len(commun.calls) == 1
+
+
+async def test_sans_fabrique_le_reviewer_garde_le_provider_commun(tmp_path: Path) -> None:
+    # Les tests et les doubles construisent un runner avec un seul provider :
+    # ils ne doivent pas casser parce que le produit en distingue deux.
+    commun = FakeProvider()
+    runner = _runner(tmp_path, provider=commun)
+
+    await runner.run("reviewer", _make_ticket(), "")
+
+    assert len(commun.calls) == 1

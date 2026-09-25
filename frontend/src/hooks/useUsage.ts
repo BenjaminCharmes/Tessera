@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { api } from "../lib/api";
+import { useResource } from "./useResource";
 import type { ProjectUsage } from "../types/api";
 
 export interface UseUsageResult {
@@ -10,33 +11,13 @@ export interface UseUsageResult {
 }
 
 export function useUsage(projectId: string | null): UseUsageResult {
-  const [usage, setUsage] = useState<ProjectUsage | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const refresh = useCallback(() => {
-    if (!projectId) {
-      setUsage(null);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    api.usage
-      .get(projectId)
-      .then((data) => {
-        setUsage(data);
-      })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [projectId]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { usage, loading, error, refresh };
+  const fetcher = useMemo(
+    () => (projectId ? () => api.usage.get(projectId) : null),
+    [projectId],
+  );
+  const { data, loading, error, refresh } = useResource<ProjectUsage | null>(
+    fetcher,
+    null,
+  );
+  return { usage: data, loading, error, refresh };
 }

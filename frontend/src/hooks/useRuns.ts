@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { api } from "../lib/api";
+import { useResource } from "./useResource";
 import type { PipelineRun } from "../types/api";
 
 export interface UseRunsResult {
@@ -9,34 +10,15 @@ export interface UseRunsResult {
   refresh: () => void;
 }
 
+const AUCUN: PipelineRun[] = [];
+
 export function useRuns(projectId: string | null): UseRunsResult {
-  const [runs, setRuns] = useState<PipelineRun[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const refresh = useCallback(() => {
-    if (!projectId) {
-      setRuns([]);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    api.runs
-      .list(projectId)
-      .then((data) => {
-        setRuns(data);
-      })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [projectId]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { runs, loading, error, refresh };
+  // Le fetcher change avec le projet : c'est ce qui invalide la réponse en
+  // vol du projet quitté (ticket-123).
+  const fetcher = useMemo(
+    () => (projectId ? () => api.runs.list(projectId) : null),
+    [projectId],
+  );
+  const { data, loading, error, refresh } = useResource(fetcher, AUCUN);
+  return { runs: data, loading, error, refresh };
 }

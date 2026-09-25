@@ -17,7 +17,8 @@ import type {
   ImportProjectRequest,
   ImportProjectResponse,
   PRStatus,
-  PipelineResult,
+  RunRequest,
+  ServiceActif,
   ProjectCreationResult,
   PipelineRun,
   PlanResult,
@@ -34,11 +35,13 @@ import type {
   TicketCreate,
   TicketDraft,
 } from "../types/api";
+import { authorized } from "./auth";
+import { API_ORIGIN } from "./config";
 
-const BASE = "/api/v1";
+const BASE = `${API_ORIGIN}/api/v1`;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, options);
+  const res = await fetch(`${BASE}${path}`, authorized(options));
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(`API ${res.status}: ${text}`);
@@ -63,7 +66,7 @@ async function put<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function del(path: string): Promise<void> {
-  const res = await fetch(`${BASE}${path}`, { method: "DELETE" });
+  const res = await fetch(`${BASE}${path}`, authorized({ method: "DELETE" }));
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(`API ${res.status}: ${text}`);
@@ -115,12 +118,29 @@ export const api = {
       post(`/projects/${projectId}/tickets/batch`, { tickets }),
   },
   orchestrator: {
-    run: (projectId: string, ticketId: string): Promise<PipelineResult> =>
+    /**
+     * Demarre un run et rend son identifiant, sans attendre la fin
+     * (ticket-128). Le deroule s'observe sur `/orchestrator/observe`, ou
+     * tous les runs de la machine passent.
+     */
+    run: (body: RunRequest): Promise<{ run_id: string }> =>
       request("/orchestrator/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project_id: projectId, ticket_id: ticketId }),
+        body: JSON.stringify(body),
       }),
+  },
+  services: {
+    /**
+     * Les services d'un projet — ticket-137. Rien de declare dans son
+     * `agents.json`, et `start` repond 409 en disant quoi ecrire.
+     */
+    list: (projectId: string): Promise<ServiceActif[]> =>
+      request(`/projects/${projectId}/services`),
+    start: (projectId: string): Promise<{ services: ServiceActif[] }> =>
+      post(`/projects/${projectId}/services/start`, {}),
+    stop: (projectId: string): Promise<{ arretes: number }> =>
+      post(`/projects/${projectId}/services/stop`, {}),
   },
   runs: {
     list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>

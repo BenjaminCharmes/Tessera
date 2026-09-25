@@ -8,11 +8,11 @@ import TicketActivity from "./TicketActivity";
 import AgentBlock from "./AgentBlock";
 import PipelineSummary from "./PipelineSummary";
 import type { Project, Ticket } from "../../types/api";
-import type { UseOrchestratorStreamResult } from "../../hooks/useOrchestratorStream";
+import type { UseRunActifResult } from "../../hooks/streamState";
 
 interface AgentPanelProps {
   project: Project | null;
-  stream: UseOrchestratorStreamResult;
+  stream: UseRunActifResult;
   /** Ticket sélectionné, pour afficher ce qu'il a produit (ticket-064). */
   activeTicket?: Ticket | null;
 }
@@ -138,7 +138,7 @@ export default function AgentPanel({
         )}
 
         {status === "error" && (
-          <div className="m-3 rounded p-3 bg-red-900/30 border border-red-700/50 text-red-400 text-xs">
+          <div className="m-3 rounded-sm p-3 bg-red-900/30 border border-red-700/50 text-red-400 text-xs">
             <div className="font-semibold mb-1">Erreur</div>
             <div>{errorMessage ?? "Unknown error"}</div>
           </div>
