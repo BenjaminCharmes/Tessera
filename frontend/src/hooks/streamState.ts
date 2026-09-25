@@ -182,9 +182,21 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
           typeof ev.data["question"] === "string" ? ev.data["question"] : null,
       };
     case "queue_progress":
+      // Un nouveau ticket commence. Une file est **un** run (ADR-041), donc un
+      // seul état accumulé : sans remise à zéro, les drapeaux dérivés de
+      // `events` restaient vrais depuis le ticket d'avant, et le bloc reviewer
+      // du précédent s'affichait sous le codeur du suivant — verdict
+      // `APPROVED` compris, sur un ticket que personne n'avait encore relu
+      // (ticket-180).
+      //
+      // Ce qui appartient au **run** survit : l'avancement de la file, le
+      // quota, la branche. Ce qui appartient au **ticket** repart de zéro.
       return {
-        ...s,
-        events,
+        ...INITIAL,
+        status: "running",
+        quota: s.quota,
+        branch: s.branch,
+        maxRounds: s.maxRounds,
         ticketId: ev.ticket_id || s.ticketId,
         queue: {
           index: Number(ev.data["index"] ?? 0),
