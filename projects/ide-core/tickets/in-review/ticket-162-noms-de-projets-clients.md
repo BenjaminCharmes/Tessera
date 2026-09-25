@@ -50,10 +50,25 @@ fois, ce qui manquait n'était pas la vigilance mais la mesure.
 La garde ne nomme aucun client, et c'est délibéré : un test qui les énumérerait
 les réintroduirait dans le dépôt qu'il protège.
 
+## Le piège de l'outil
+
+`git filter-repo --replace-text` ne réécrit **que le contenu des fichiers**.
+Les messages de commit sont un autre flag, `--replace-message`, et ils prennent
+le même fichier d'expressions.
+
+La première passe n'a donc rien changé à trois messages qui nommaient un projet
+client — deux d'entre eux le citaient précisément parce qu'ils racontaient un
+comportement observé sur de vrais projets. Le dépôt est passé vert à toutes les
+vérifications de contenu, et la fuite était dans les messages.
+
+C'est la même erreur que celle qui vaut ce ticket, d'un cran plus bas : on
+vérifie là où on a cherché. Les deux passes sont nécessaires, et une
+vérification qui ne regarde qu'un des deux côtés ne prouve rien sur l'autre.
+
 ## Critères d'acceptation
 
 - [ ] Aucun nom de projet client ne subsiste, sur **toute** l'histoire et
-      toutes les branches
+      toutes les branches — contenu des fichiers **et** messages de commit
 - [ ] Les URL de test gardent leur forme — sous-domaines profonds, chemin de
       groupe, compte dans l'URL Azure — sans reproduire celle d'une forge réelle
 - [ ] Un test échoue sur une adresse dont le domaine n'est pas dans la liste
