@@ -61,8 +61,13 @@ export default function RunCard({
           <span className="truncate text-sm text-zinc-200">
             {run.project_id}
           </span>
-          <span className="shrink-0 text-micro text-zinc-500">
+          <span className="shrink-0 text-micro tabular-nums text-zinc-500">
             {LIBELLE_DU_MODE[run.mode] ?? run.mode}
+            {/* Une file est *un* run, donc une carte : sans l'avancement, rien
+                ne disait qu'il en restait deux derrière (ticket-172). */}
+            {(run.file_total ?? 0) > 0
+              ? ` ${run.file_index}/${run.file_total}`
+              : ""}
           </span>
         </span>
 
@@ -74,6 +79,14 @@ export default function RunCard({
             <Chrono depuis={run.demarre_a} />
           </span>
         </span>
+
+        {/* Lu depuis le réseau : un backend plus ancien n'envoie pas encore
+            ces champs, et une carte ne doit pas disparaître pour ça. */}
+        {(run.file_restants ?? []).length > 0 ? (
+          <span className="mt-1 block truncate text-micro text-zinc-600">
+            ensuite : {(run.file_restants ?? []).join(", ")}
+          </span>
+        ) : null}
 
         <span className="mt-2 flex flex-wrap items-center gap-1.5">
           {echoue ? (

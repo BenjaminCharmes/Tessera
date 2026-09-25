@@ -161,6 +161,10 @@ export interface RunActif {
   verdict: string | null;
   /** La question qu'un agent attend de voir répondue (ticket-163). */
   question: string | null;
+  /** Où en est la file, et ce qu'il lui reste — vides hors file (ticket-172). */
+  file_index: number;
+  file_total: number;
+  file_restants: string[];
   demarre_a: string;
 }
 
