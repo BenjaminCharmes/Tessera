@@ -4,6 +4,7 @@ import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import {
   IconBoard,
+  IconPlay,
   IconBolt,
   IconChevronDown,
   IconChevronRight,
@@ -41,6 +42,9 @@ interface TicketListProps {
   runningRound?: number;
   maxRounds?: number | null;
   showKanban: boolean;
+  /** Un run tourne, mais le centre montre autre chose (ticket-178). */
+  runCache?: boolean;
+  onVoirLeRun?: () => void;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onShowDiff?: (ticketId: string) => void;
@@ -66,6 +70,8 @@ export default function TicketList({
   runningRound,
   maxRounds,
   showKanban,
+  runCache,
+  onVoirLeRun,
   onSelectTicket,
   onRunPipeline,
   onShowDiff,
@@ -88,7 +94,9 @@ export default function TicketList({
 
   if (!project) {
     return (
-      <div className="p-4 text-zinc-500 text-xs">Sélectionne d'abord un projet</div>
+      <div className="p-4 text-zinc-500 text-xs">
+        Sélectionne d'abord un projet
+      </div>
     );
   }
 
@@ -104,12 +112,12 @@ export default function TicketList({
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className={`${BAND} justify-between border-b border-zinc-700 px-3`}>
+        <div
+          className={`${BAND} justify-between border-b border-zinc-700 px-3`}
+        >
           {/* Pas le nom du projet : `ProjectHeader` le porte juste au-dessus,
               et il apparaissait deux fois à quarante pixels d'intervalle. */}
-          <RegionTitle>
-            Tickets
-          </RegionTitle>
+          <RegionTitle>Tickets</RegionTitle>
           <div className="flex items-center gap-1 shrink-0 ml-2">
             <button
               onClick={() => setShowPlanModal(true)}
@@ -127,6 +135,18 @@ export default function TicketList({
             >
               <IconPlus size={14} />
             </button>
+            {/* Sans ce retour, quitter la vue du run la rendait injoignable
+                depuis cet onglet jusqu'à la fin du run (ticket-178). */}
+            {runCache && onVoirLeRun ? (
+              <button
+                onClick={onVoirLeRun}
+                title="Revenir au run en cours"
+                aria-label="Revenir au run en cours"
+                className="flex h-6 w-6 items-center justify-center rounded-sm text-blue-300 transition-colors hover:bg-zinc-700"
+              >
+                <IconPlay size={14} />
+              </button>
+            ) : null}
             <button
               onClick={onToggleKanban}
               title={showKanban ? "Vue liste" : "Vue tableau"}
@@ -170,53 +190,57 @@ export default function TicketList({
           {!loading &&
             !error &&
             STATUS_GROUPS.map(({ status, label, collapsible }) => {
-            const tickets = byStatus[status];
-            const isCollapsed = collapsed.has(status);
+              const tickets = byStatus[status];
+              const isCollapsed = collapsed.has(status);
 
-            return (
-              <div key={status} className="mb-0.5">
-                <button
-                  onClick={() => collapsible && toggleGroup(status)}
-                  className={`w-full flex items-center gap-1 px-3 py-1 text-mini font-semibold text-zinc-500 uppercase tracking-wider ${
-                    collapsible
-                      ? "hover:text-zinc-300 cursor-pointer"
-                      : "cursor-default"
-                  }`}
-                >
-                  {collapsible && (
-                    <span className="text-micro w-2">
-                      {isCollapsed ? <IconChevronRight size={12} /> : <IconChevronDown size={12} />}
+              return (
+                <div key={status} className="mb-0.5">
+                  <button
+                    onClick={() => collapsible && toggleGroup(status)}
+                    className={`w-full flex items-center gap-1 px-3 py-1 text-mini font-semibold text-zinc-500 uppercase tracking-wider ${
+                      collapsible
+                        ? "hover:text-zinc-300 cursor-pointer"
+                        : "cursor-default"
+                    }`}
+                  >
+                    {collapsible && (
+                      <span className="text-micro w-2">
+                        {isCollapsed ? (
+                          <IconChevronRight size={12} />
+                        ) : (
+                          <IconChevronDown size={12} />
+                        )}
+                      </span>
+                    )}
+                    {label}
+                    <span className="ml-1 font-normal text-zinc-600 normal-case">
+                      ({tickets.length})
                     </span>
-                  )}
-                  {label}
-                  <span className="ml-1 font-normal text-zinc-600 normal-case">
-                    ({tickets.length})
-                  </span>
-                </button>
+                  </button>
 
-                {!isCollapsed &&
-                  tickets.map((ticket) => (
-                    <TicketCard
-                      key={ticket.id}
-                      ticket={ticket}
-                      isActive={activeTicket?.id === ticket.id}
-                      isRunning={running.has(ticket.id)}
-                      runningRound={
-                        running.has(ticket.id) ? runningRound : undefined
-                      }
-                      maxRounds={maxRounds}
-                      githubRemote={project.github_remote}
-                      onPrCreated={onPrCreated}
-                      onSelect={onSelectTicket}
-                      onRun={onRunPipeline}
-                      onShowDiff={onShowDiff}
-                      onToggleQueue={onToggleQueue}
-                      dansLaFile={selection.includes(ticket.id)}
-                    />
-                  ))}
-              </div>
-            );
-          })}
+                  {!isCollapsed &&
+                    tickets.map((ticket) => (
+                      <TicketCard
+                        key={ticket.id}
+                        ticket={ticket}
+                        isActive={activeTicket?.id === ticket.id}
+                        isRunning={running.has(ticket.id)}
+                        runningRound={
+                          running.has(ticket.id) ? runningRound : undefined
+                        }
+                        maxRounds={maxRounds}
+                        githubRemote={project.github_remote}
+                        onPrCreated={onPrCreated}
+                        onSelect={onSelectTicket}
+                        onRun={onRunPipeline}
+                        onShowDiff={onShowDiff}
+                        onToggleQueue={onToggleQueue}
+                        dansLaFile={selection.includes(ticket.id)}
+                      />
+                    ))}
+                </div>
+              );
+            })}
         </div>
       </div>
 

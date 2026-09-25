@@ -26,6 +26,7 @@ import BottomPanel from "./components/BottomPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
 import type { Project, Ticket } from "./types/api";
+import { vueDuCentre } from "./vueDuCentre";
 
 export default function App() {
   const { project, ticket, setProject, setTicket } = useActiveProject();
@@ -34,9 +35,14 @@ export default function App() {
   // cockpit sert à suivre la flotte, et l'édition est partie dans VSCode
   // (ticket-065).
   const [showKanban, setShowKanban] = useState(true);
+  // Le run passe devant quand il démarre — c'est ce qu'on veut voir — mais
+  // tout geste explicite le lui reprend. Sans cet état, « Vue liste » n'avait
+  // aucun effet tant qu'un run tournait (ticket-178).
+  const [runAuPremierPlan, setRunAuPremierPlan] = useState(true);
   const [openFilePath, setOpenFilePath] = useState<string | null>(null);
   // Relire ce qu'un run a produit sans quitter l'IDE (ticket-069).
   const [showDiff, setShowDiff] = useState(false);
+
   // L'ordre de la file est celui de la sélection, pas celui de la liste : un
   // lot du planificateur a des dépendances, et c'est à l'utilisateur de les
   // ordonner (ticket-074).
@@ -51,16 +57,25 @@ export default function App() {
   // regarde — pour les composants qui n'en attendaient qu'un.
   const supervision = useSupervision();
   const stream = useRunActif(supervision, project?.id ?? null);
+
+  const runEnCours =
+    stream.status === "running" || stream.status === "connecting";
+  const vueCentre = vueDuCentre({
+    runEnCours,
+    runAuPremierPlan,
+    openFilePath,
+    showDiff,
+    showKanban,
+  });
   const { projects: projets } = useProjects();
-  const services = useServices(
-    project?.id ?? null,
-    supervision.signalServices,
-  );
+  const services = useServices(project?.id ?? null, supervision.signalServices);
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
   // bloque un humain, un run bloqué demande une décision. L'activité est le
   // cas nominal, donc le dernier à mériter la couleur.
-  const etatsDesRuns = supervision.runs.map((r) => supervision.etatDe(r.run_id));
+  const etatsDesRuns = supervision.runs.map((r) =>
+    supervision.etatDe(r.run_id),
+  );
   const alerteDeSupervision = etatsDesRuns.some((e) => e.status === "error")
     ? ("bloque" as const)
     : etatsDesRuns.some((e) => e.pendingQuestion !== null)
@@ -145,7 +160,12 @@ export default function App() {
     );
   }
 
+  // Lancer un run ramène sa vue devant : c'est le seul moment où l'IDE décide
+  // à la place de l'utilisateur, et il vient précisément de le demander. Le
+  // décider ici plutôt qu'en observant `status` évite un `setState` dans un
+  // effet, et dit mieux ce qui se passe (ticket-178).
   function handleRunPipeline(ticketId: string) {
+    setRunAuPremierPlan(true);
     stream.connect(ticketId);
   }
 
@@ -213,6 +233,12 @@ export default function App() {
             runningRound={stream.currentRound}
             maxRounds={stream.maxRounds}
             showKanban={showKanban}
+            runCache={runEnCours && !runAuPremierPlan}
+            onVoirLeRun={() => {
+              setOpenFilePath(null);
+              setShowDiff(false);
+              setRunAuPremierPlan(true);
+            }}
             onSelectProject={handleSelectProject}
             onProjectCreated={handleProjectCreated}
             onSelectTicket={handleSelectTicket}
@@ -229,6 +255,7 @@ export default function App() {
               // (ticket-073).
               setOpenFilePath(null);
               setShowDiff(false);
+              setRunAuPremierPlan(false);
               setShowKanban((v) => !v);
             }}
             onTicketCreated={handleTicketCreated}
@@ -248,8 +275,14 @@ export default function App() {
                   : [...prec, ticketId],
               )
             }
-            onRunQueue={() => stream.connectQueue(selection)}
-            onRunAutonome={(options) => stream.connectAutonome(options)}
+            onRunQueue={() => {
+              setRunAuPremierPlan(true);
+              stream.connectQueue(selection);
+            }}
+            onRunAutonome={(options) => {
+              setRunAuPremierPlan(true);
+              stream.connectAutonome(options);
+            }}
             onClearQueue={() => setSelection([])}
             openFilePath={openFilePath}
             onOpenFile={(path) => {
@@ -269,7 +302,7 @@ export default function App() {
       >
         <ErrorBoundary>
           {/* L'onglet Agents donne enfin un détail au centre : le rail dit
-              *quel* agent, le centre montre *ce qu'il est* (ticket-076). */}
+           *quel* agent, le centre montre *ce qu'il est* (ticket-076). */}
           {/* Pendant un run, le centre montre le run. C'est le moment où l'on
               a le plus besoin de place, et où il en occupait le moins : le
               tableau des tickets, ou « ce ticket n'a jamais été lancé »
@@ -284,18 +317,19 @@ export default function App() {
               services={services.services}
             />
           ) : panel === "agents" ? (
-            <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />
+            <AgentDetail
+              role={agentSelectionne}
+              projectId={project?.id ?? null}
+            />
           ) : panel === "usage" ? (
             // Sans projet sélectionné, la vue d'ensemble : « combien me coûte
             // Tessera, et sur quel projet » n'avait aucune réponse.
             <CostView projectId={project?.id ?? null} />
-          ) : (stream.status === "running" || stream.status === "connecting") &&
-            !openFilePath &&
-            !showDiff ? (
+          ) : vueCentre === "run" ? (
             <RunView stream={stream} />
-          ) : showDiff && project && ticket ? (
+          ) : vueCentre === "diff" && project && ticket ? (
             <DiffView projectId={project.id} ticketId={ticket.id} />
-          ) : showKanban && !openFilePath ? (
+          ) : vueCentre === "kanban" ? (
             <KanbanView
               byStatus={tickets.byStatus}
               activeTicket={ticket}
