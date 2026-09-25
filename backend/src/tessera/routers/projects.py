@@ -52,6 +52,7 @@ from tessera.services.git_link import (
     link_remote,
 )
 from tessera.services.cost_calculator import modeles_connus
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.project_loader import (
     AgentAbsentDuProjet,
     ModeleInconnu,
@@ -321,6 +322,11 @@ class GitStatusResponse(BaseModel):
     # Renseigné quand le projet vit dans un dépôt qui n'est pas le sien :
     # `init` créera alors bien son propre dépôt (ticket-061).
     nested_in: str | None = None
+    # Le projet déclare `git_root: ancestor` : travailler dans le dépôt qui le
+    # contient est son mode normal (ADR-028), pas une anomalie à corriger.
+    # Sans ce champ, l'écran annonçait « ce projet n'est pas versionné » et
+    # proposait d'imbriquer un dépôt dans celui de Tessera (ticket-171).
+    uses_parent_repository: bool = False
 
 
 class LinkRemoteRequest(BaseModel):
@@ -345,20 +351,39 @@ def _repo_slug(repo_url: str) -> str | None:
 
 @router.get("/{project_id}/git/status", response_model=GitStatusResponse)
 async def get_git_status(project_id: str) -> GitStatusResponse:
-    status = await git_status(_require_project_path(project_id))
+    chemin = _require_project_path(project_id)
+    status = await git_status(chemin)
     return GitStatusResponse(
         is_repository=status.is_own_repository,
         has_commits=status.has_commits,
         remote_url=status.remote_url,
         nested_in=status.is_nested_in,
+        uses_parent_repository=PolitiqueRun.lire(chemin).dans_le_depot_parent,
     )
 
 
 @router.post("/{project_id}/git/init", response_model=GitStatusResponse)
 async def init_git(project_id: str) -> GitStatusResponse:
-    """Initialise un dépôt dans le projet. Sans effet s'il en a déjà un."""
+    """Initialise un dépôt dans le projet. Sans effet s'il en a déjà un.
+
+    Refusé sur un projet en `git_root: ancestor` : il travaille dans le dépôt
+    qui le contient (ADR-028), et l'initialiser en imbriquerait un second —
+    ce qu'ADR-024 existe pour empêcher. Le refus est ici et pas seulement à
+    l'écran : une garde qui dépend de l'interface n'en est pas une (ADR-027).
+    """
+    chemin = _require_project_path(project_id)
+    if PolitiqueRun.lire(chemin).dans_le_depot_parent:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Ce projet déclare `git_root: ancestor` : il travaille dans le "
+                "dépôt qui le contient. Initialiser un dépôt ici en imbriquerait "
+                "un second. Retire `git_root` de son agents.json pour lui en "
+                "donner un propre."
+            ),
+        )
     try:
-        status = await init_repository(_require_project_path(project_id))
+        status = await init_repository(chemin)
     except GitLinkError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return GitStatusResponse(
