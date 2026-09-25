@@ -2,8 +2,8 @@
 id: ticket-184
 title: "Le dépôt GitHub d'un projet s'ouvre d'un clic"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 46
 priority: medium
 agent: codeur
 depends_on: []
