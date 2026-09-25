@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { adressesDansLaSortie } from "../SupervisionView/adresse";
+import AdresseDuService from "../SupervisionView/AdresseDuService";
 import { classeDeLEtat, libelleDeLEtat } from "../../design/etatDuService";
 import type { UseServicesResult } from "../../hooks/useServices";
 import type { ServiceActif } from "../../types/api";
@@ -133,18 +134,13 @@ function LigneDeService({
         </span>
       </button>
 
-      {adresses.map(({ url, etiquette }) => (
-        <a
-          key={url}
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          title={etiquette ? `${etiquette} · ${url}` : url}
-          className="block truncate px-2 pb-1.5 text-micro text-zinc-400 underline decoration-dotted hover:text-zinc-200"
-        >
-          {etiquette ? `${etiquette} — ${url}` : url}
-        </a>
-      ))}
+      {adresses.length > 0 ? (
+        <span className="flex flex-wrap gap-1 px-2 pb-1.5">
+          {adresses.map((adresse) => (
+            <AdresseDuService key={adresse.url} {...adresse} />
+          ))}
+        </span>
+      ) : null}
 
       {ouvert ? (
         <pre
