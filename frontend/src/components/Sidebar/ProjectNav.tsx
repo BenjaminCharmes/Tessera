@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useProjects } from "../../hooks/useProjects";
 import type { Project } from "../../types/api";
 import CreateProjectModal from "./CreateProjectModal";
+import { grouperParCategorie } from "./grouperParCategorie";
 import ImportProjectModal from "./ImportProjectModal";
 import SkeletonList from "../SkeletonList";
 
@@ -43,9 +44,7 @@ export default function ProjectNav({
     <>
       <div>
         <div className={`${BAND} justify-between px-3`}>
-          <RegionTitle>
-            Projects
-          </RegionTitle>
+          <RegionTitle>Projects</RegionTitle>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setShowImportModal(true)}
@@ -88,35 +87,44 @@ export default function ProjectNav({
         {/* Le lien GitHub est un voisin du bouton, pas son enfant : un `<a>`
             dans un `<button>` est du HTML invalide, et deux cibles imbriquées
             se disputent le clic et le focus (ticket-123). */}
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            className={`flex items-center transition-colors ${
-              activeProject?.id === project.id
-                ? "bg-zinc-700 text-white"
-                : "hover:bg-zinc-800 text-zinc-300"
-            }`}
-          >
-            <button
-              type="button"
-              onClick={() => onSelectProject(project)}
-              className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left"
-            >
-              <IconProject size={12} className="shrink-0 text-zinc-500" />
-              <span className="truncate flex-1">{project.name}</span>
-            </button>
-            {project.github_remote && (
-              <a
-                href={project.github_remote}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 px-3 py-2 text-xs leading-none text-zinc-500 transition-colors hover:text-zinc-200"
-                title={project.github_remote}
-                aria-label={`Ouvrir le repo GitHub de ${project.name}`}
+        {grouperParCategorie(projects).map((groupe) => (
+          <div key={groupe.categorie ?? "__sans__"}>
+            {/* Un intitulé de groupe est un titre de région : ADR-026 lui donne
+                le neutre, et réserve le violet à l'identité. */}
+            <p className="px-3 pb-1 pt-3 text-micro uppercase tracking-wide text-zinc-600">
+              {groupe.categorie ?? "Sans catégorie"}
+            </p>
+            {groupe.projets.map((project) => (
+              <div
+                key={project.id}
+                className={`flex items-center transition-colors ${
+                  activeProject?.id === project.id
+                    ? "bg-zinc-700 text-white"
+                    : "hover:bg-zinc-800 text-zinc-300"
+                }`}
               >
-                GH
-              </a>
-            )}
+                <button
+                  type="button"
+                  onClick={() => onSelectProject(project)}
+                  className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left"
+                >
+                  <IconProject size={12} className="shrink-0 text-zinc-500" />
+                  <span className="truncate flex-1">{project.name}</span>
+                </button>
+                {project.github_remote && (
+                  <a
+                    href={project.github_remote}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 px-3 py-2 text-xs leading-none text-zinc-500 transition-colors hover:text-zinc-200"
+                    title={project.github_remote}
+                    aria-label={`Ouvrir le repo GitHub de ${project.name}`}
+                  >
+                    GH
+                  </a>
+                )}
+              </div>
+            ))}
           </div>
         ))}
       </div>

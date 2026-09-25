@@ -2,7 +2,7 @@
 id: ticket-175
 title: "Neuf projets dans une liste plate, sans moyen de les ranger"
 type: feat
-status: todo
+status: in-review
 pr_number: null
 priority: medium
 agent: codeur
