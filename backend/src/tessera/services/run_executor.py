@@ -11,6 +11,7 @@ aperçoive.
 après, il disparaissait dès que le transport mourait, et l'historique restait
 bloqué sur « en cours » (ticket-079, ticket-121).
 """
+from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Protocol
 
 from tessera.config import settings
@@ -99,11 +100,14 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
     elif event.type is EventType.AGENT_QUESTION:
         question = event.data.get("question")
         run.question = str(question) if question else None
+        expire = event.data.get("expire_a")
+        run.question_expire_a = str(expire) if expire else None
     elif event.type in (EventType.AGENT_TOKEN, EventType.AGENT_TOOL_USE):
         # L'agent a repris — sur réponse ou sur l'hypothèse d'ADR-025. Garder
         # la question afficherait une attente qui n'existe plus, et on
         # répondrait à un agent qui n'écoute pas.
         run.question = None
+        run.question_expire_a = None
     elif event.type in (EventType.VALIDATION_DONE, EventType.SECURITY_AUDIT_DONE):
         verdict = event.data.get("verdict")
         if verdict:
@@ -117,11 +121,21 @@ def dialogue_du_run(envoyer: EventCallback, run: RunActif) -> DialogueChannel:
     """The run's dialogue channel, which the registry then holds."""
 
     async def annoncer(question: str) -> None:
+        # L'échéance part avec la question : cinq minutes de silence se lisent
+        # comme une panne tant que rien ne dit que l'attente est bornée
+        # (ticket-186). Absolue plutôt qu'une durée, pour qu'un client arrivé
+        # en cours de route sache combien il reste, et non combien il restait.
+        expire_a = datetime.now(timezone.utc) + timedelta(
+            seconds=settings.dialogue_timeout_s
+        )
         await envoyer(
             OrchestratorEvent(
                 type=EventType.AGENT_QUESTION,
                 ticket_id=run.ticket_id or "",
-                data={"question": question},
+                data={
+                    "question": question,
+                    "expire_a": expire_a.isoformat(),
+                },
             )
         )
 

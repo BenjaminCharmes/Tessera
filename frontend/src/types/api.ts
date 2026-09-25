@@ -163,6 +163,8 @@ export interface RunActif {
   verdict: string | null;
   /** La question qu'un agent attend de voir répondue (ticket-163). */
   question?: string | null;
+  /** Quand l'agent repartira seul sur une hypothèse énoncée (ticket-186). */
+  question_expire_a?: string | null;
   /** Où en est la file, et ce qu'il lui reste — vides hors file (ticket-172).
    *  Optionnels : ils viennent du réseau, et un backend plus ancien ne les
    *  envoie pas. Les lire défensivement vaut mieux qu'une carte qui disparaît. */

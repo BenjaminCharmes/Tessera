@@ -27,6 +27,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
 import type { Project, Ticket } from "./types/api";
 import { vueDuCentre } from "./vueDuCentre";
+import { projetsEnAttente } from "./components/Sidebar/projetsEnAttente";
 
 export default function App() {
   const { project, ticket, setProject, setTicket } = useActiveProject();
@@ -57,6 +58,12 @@ export default function App() {
   // regarde — pour les composants qui n'en attendaient qu'un.
   const supervision = useSupervision();
   const stream = useRunActif(supervision, project?.id ?? null);
+  // Une question ne se voyait que dans le panneau du projet sélectionné : la
+  // sidebar la signale depuis n'importe quel onglet (ticket-186).
+  const enAttente = projetsEnAttente(
+    supervision.runs,
+    (runId) => supervision.etatDe(runId).pendingQuestion,
+  );
 
   const runEnCours =
     stream.status === "running" || stream.status === "connecting";
@@ -215,6 +222,7 @@ export default function App() {
         <ErrorBoundary>
           <Sidebar
             panel={panel}
+            projetsEnAttente={enAttente}
             services={services}
             sortieDeService={supervision.sortieDuService}
             activeProject={project}

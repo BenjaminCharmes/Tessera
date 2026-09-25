@@ -11,6 +11,8 @@ import SkeletonList from "../SkeletonList";
 import { lienDuDepot } from "../../lib/lienDuDepot";
 
 interface ProjectNavProps {
+  /** Les projets dont un run attend une réponse (ticket-186). */
+  enAttente?: ReadonlySet<string>;
   activeProject: Project | null;
   onSelectProject: (project: Project) => void;
   onProjectCreated?: (project: Project) => void;
@@ -20,6 +22,7 @@ export default function ProjectNav({
   activeProject,
   onSelectProject,
   onProjectCreated,
+  enAttente,
 }: ProjectNavProps) {
   const { projects, loading, error, refresh } = useProjects();
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -111,6 +114,16 @@ export default function ProjectNav({
                 >
                   <IconProject size={12} className="shrink-0 text-zinc-500" />
                   <span className="truncate flex-1">{project.name}</span>
+                  {/* Ambre : une attente, au sens d'ADR-026. Visible depuis
+                      n'importe quel onglet, ce que ni le panneau ni la carte
+                      de Supervision ne permettaient (ticket-186). */}
+                  {enAttente?.has(project.id) && (
+                    <span
+                      className="size-1.5 shrink-0 rounded-full bg-amber-400"
+                      title="Un agent attend une réponse"
+                      aria-label="Un agent attend une réponse"
+                    />
+                  )}
                 </button>
                 <LienDuDepot project={project} />
               </div>
