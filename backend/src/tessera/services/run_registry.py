@@ -52,6 +52,10 @@ class RunActif:
     #: `agent_question`, et resterait devant un run muet alors qu'ADR-025
     #: suppose qu'un humain peut répondre (ticket-163).
     question: str | None = None
+    #: Quand l'agent repartira seul sur une hypothèse énoncée (ADR-025).
+    #: Sans elle, l'attente se lit comme une panne : rien à l'écran ne
+    #: distingue un run qui attend d'un run qui ne répond plus (ticket-186).
+    question_expire_a: str | None = None
     #: Où en est la file, et ce qu'il lui reste. Une file est *un* run
     #: (ADR-041), donc une carte : sans ces champs, la Supervision ne pouvait
     #: pas dire s'il restait deux tickets derrière celui qui tourne
@@ -86,6 +90,7 @@ class RunActif:
             "cout_usd": self.cout_usd,
             "verdict": self.verdict,
             "question": self.question,
+            "question_expire_a": self.question_expire_a,
             "file_index": self.file_index,
             "file_total": self.file_total,
             "file_restants": list(self.file_restants),

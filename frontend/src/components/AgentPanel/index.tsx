@@ -34,6 +34,7 @@ export default function AgentPanel({
     events,
     quota,
     pendingQuestion,
+    questionExpireA,
     answer,
     interject,
     stop,
@@ -161,6 +162,7 @@ export default function AgentPanel({
       {/* Parler à l'agent pendant qu'il travaille (ticket-066). */}
       <AgentDialogue
         pendingQuestion={pendingQuestion}
+        questionExpireA={questionExpireA}
         enCours={status === "running" || status === "connecting"}
         onAnswer={answer}
         onInterject={interject}

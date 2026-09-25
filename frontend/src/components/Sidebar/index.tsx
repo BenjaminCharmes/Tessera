@@ -21,6 +21,8 @@ import type { SidebarPanel } from "./panels";
 
 interface SidebarProps {
   panel: SidebarPanel;
+  /** Les projets dont un run attend une réponse (ticket-186). */
+  projetsEnAttente?: ReadonlySet<string>;
   /** Les services du projet actif, pour le bouton « Lancer » (ticket-138). */
   services?: UseServicesResult;
   /** La sortie d'un service, pour le panneau du projet (ticket-147). */
@@ -70,6 +72,7 @@ interface SidebarProps {
 
 export default function Sidebar({
   panel,
+  projetsEnAttente,
   services,
   sortieDeService,
   activeProject,
@@ -143,6 +146,7 @@ export default function Sidebar({
             activeProject={activeProject}
             onSelectProject={onSelectProject}
             onProjectCreated={onProjectCreated}
+            enAttente={projetsEnAttente}
           />
         )}
         {panel === "tickets" && (

@@ -1,4 +1,5 @@
 import Chrono from "./Chrono";
+import CompteARebours from "../AgentPanel/CompteARebours";
 import type { StreamState } from "../../hooks/streamState";
 import type { RunActif } from "../../types/api";
 
@@ -111,6 +112,18 @@ export default function RunCard({
                 ))}
               </span>
             </details>
+          </span>
+        ) : null}
+
+        {/* La question elle-même, et jusqu'à quand elle vaut : l'étiquette
+            seule disait qu'on attendait, sans dire quoi ni combien de temps
+            (ticket-186). */}
+        {attend ? (
+          <span className="mt-2 block">
+            <span className="block rounded-sm border border-amber-900/60 bg-amber-950/30 px-2 py-1.5 text-mini text-amber-100">
+              {etat.pendingQuestion}
+            </span>
+            <CompteARebours expireA={etat.questionExpireA} />
           </span>
         ) : null}
 
