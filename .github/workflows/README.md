@@ -20,6 +20,25 @@ Jobs : `Backend (pytest)`, `Frontend (tsc + vitest)`, `E2E (Playwright)`,
 changé` décide si le Rust a bougé : `Tauri` ne tourne que dans ce cas, une
 minute de macOS étant facturée dix fois une minute d'ubuntu.
 
+## Où tourne la CI
+
+`runs-on` lit la variable de dépôt `CI_RUNNER`, et retombe sur `ubuntu-latest`
+quand elle est vide. Les quatre jobs non-macOS la suivent ; `Tauri` reste sur
+`macos-latest`, `cargo check` ayant besoin d'une chaîne Rust.
+
+Elle existe parce que le passage du dépôt en privé (ticket-160) l'a mis face au
+quota de minutes Actions des dépôts privés : plus aucune PR ne déclenchait de
+run. Un runner self-hosted n'en consomme aucune.
+
+```bash
+gh variable set CI_RUNNER --body self-hosted   # basculer sur le runner local
+gh variable delete CI_RUNNER                   # revenir aux runners GitHub
+```
+
+Un runner hors ligne met les jobs en file d'attente **sans fin** au lieu de les
+faire échouer : si une PR reste en attente sans rien afficher, c'est la
+première chose à regarder.
+
 ## Flux de branches
 
 ```

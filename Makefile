@@ -71,13 +71,15 @@ tauri-build:
 	cd frontend && npm run tauri-build
 
 verify:
-	@echo "→ 1/4 Backend — pytest"
+	@echo "→ 1/5 Backend — pytest"
 	cd backend && uv run pytest -q -m "not integration"
-	@echo "→ 2/4 Backend — mypy (cette plateforme, puis linux comme la CI)"
+	@echo "→ 2/5 Backend — mypy (cette plateforme, puis linux comme la CI)"
 	cd backend && uv run mypy src/ && uv run mypy --platform linux src/
-	@echo "→ 3/4 Frontend — typecheck + vitest"
-	cd frontend && npm run typecheck && npm run test -- --run
-	@echo "→ 4/4 E2E — playwright"
+	@echo "→ 3/5 Frontend — typecheck"
+	cd frontend && npm run typecheck
+	@echo "→ 4/5 Frontend — lint + vitest"
+	cd frontend && npm run lint && npm run test -- --run
+	@echo "→ 5/5 E2E — playwright"
 	cd frontend && npm run test:e2e
 	@echo ""
 	@echo "Vert. Reste hors de portée ici : cargo check (Rust absent de ce poste)."
