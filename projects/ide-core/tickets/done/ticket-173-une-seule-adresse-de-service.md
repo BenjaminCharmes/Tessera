@@ -2,8 +2,8 @@
 id: ticket-173
 title: "L'adresse d'un service se rend de deux façons différentes"
 type: refactor
-status: in-review
-pr_number: null
+status: done
+pr_number: 25
 priority: medium
 agent: codeur
 depends_on: []
