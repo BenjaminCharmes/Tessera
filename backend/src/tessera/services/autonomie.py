@@ -73,11 +73,23 @@ def peut_merger(project_path: Path, ci_status: str) -> bool:
     return niveau_peut_merger(lire_niveau(project_path), ci_status)
 
 
-def niveau_peut_merger(niveau: NiveauAutonomie, ci_status: str) -> bool:
+def niveau_peut_merger(
+    niveau: NiveauAutonomie, ci_status: str, *, sans_ci: bool = False
+) -> bool:
     """La même règle, sur un niveau déjà lu.
 
     C'est la forme qu'emploie le pipeline : sa politique est figée avant le
     premier agent (ticket-119), et relire le fichier ici obéirait à ce qu'un
     codeur y aurait écrit pendant le run.
+
+    `sans_ci` est la déclaration d'ADR-045 : le projet dit n'avoir pas de CI,
+    et accepte le verdict du pipeline comme signal. Elle lève **une** condition
+    du merge, elle n'élève aucun niveau — et elle ne vaut que face à une
+    absence de verdict. Une CI qui répond `failing` ou `pending` refuse
+    toujours : « ce dépôt n'a pas de CI » ne veut pas dire « ignore la CI ».
     """
-    return niveau is NiveauAutonomie.merge and ci_status == "passing"
+    if niveau is not NiveauAutonomie.merge:
+        return False
+    if ci_status == "passing":
+        return True
+    return sans_ci and ci_status == "none"

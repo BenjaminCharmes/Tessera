@@ -39,6 +39,10 @@ class PolitiqueRun:
     #: global ici empêcherait de distinguer « non déclaré » de « déclaré
     #: develop » (ticket-166).
     base_branch: str | None = None
+    #: Le projet déclare n'avoir pas de CI, et accepte que le verdict du
+    #: pipeline suffise à merger (ADR-045). Faux par défaut : le défaut
+    #: protège, l'exception s'énonce.
+    merge_without_ci: bool = False
 
     @classmethod
     def lire(cls, project_path: Path) -> "PolitiqueRun":
@@ -53,6 +57,7 @@ class PolitiqueRun:
             artifacts=read_artifact_mode(project_path),
             test_command=load_pipeline_config(project_path).test_command,
             base_branch=_lire_chaine(project_path, "base_branch"),
+            merge_without_ci=_lire_booleen(project_path, "merge_without_ci"),
         )
 
     @property
@@ -78,6 +83,22 @@ class PolitiqueRun:
 
 def _lire_git_root(project_path: Path) -> str | None:
     return _lire_chaine(project_path, "git_root")
+
+
+def _lire_booleen(project_path: Path, clef: str) -> bool:
+    """Un booléen du manifeste. Tout ce qui n'est pas `True` ne désarme rien.
+
+    Une chaîne « oui », un entier, une clef absente : le défaut fermé d'ADR-023
+    vaut ici aussi — une valeur qu'on ne comprend pas ne lève pas une garde.
+    """
+    agents_json = project_path / "agents.json"
+    if not agents_json.is_file():
+        return False
+    try:
+        data = json.loads(agents_json.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return False
+    return data.get(clef) is True
 
 
 def _lire_chaine(project_path: Path, clef: str) -> str | None:

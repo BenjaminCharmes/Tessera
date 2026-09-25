@@ -179,6 +179,14 @@ class LivraisonService:
                 etapes=tuple(etapes), pr_number=pr_number, arret=None
             )
 
+        # Attendre une CI que le projet déclare absente, c'est payer le délai
+        # complet pour un verdict qui ne viendra pas (ADR-045). Le refus sur
+        # une CI rouge, lui, reste dans `niveau_peut_merger` : la déclaration
+        # dit « pas de CI », pas « ignore la CI ».
+        if self._politique is not None and self._politique.merge_without_ci:
+            etapes.append("CI : non attendue, déclarée absente")
+            return await self._merger(pr_number, etapes, ticket_id)
+
         ci = await self._attendre_la_ci(pr_number)
         etapes.append(f"CI : {ci}")
         if ci == "pending":
@@ -198,6 +206,12 @@ class LivraisonService:
                 arret=f"CI {ci} : la PR #{pr_number} reste ouverte.",
             )
 
+        return await self._merger(pr_number, etapes, ticket_id)
+
+    async def _merger(
+        self, pr_number: int, etapes: list[str], ticket_id: str
+    ) -> Livraison:
+        """Le dernier maillon, commun aux deux chemins de décision."""
         merged = await self._workflow.merge_si_la_ci_est_verte(pr_number)
         if not merged:
             return Livraison(
