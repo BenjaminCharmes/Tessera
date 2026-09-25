@@ -120,6 +120,7 @@ export default function Sidebar({
         onBasculerGit={() => setGitOuvert((v) => !v)}
         services={services}
         onOuvrirLesServices={() => setServicesOuverts(true)}
+        onSelectProject={onSelectProject}
       />
 
       <PanneauxDuProjet
@@ -131,74 +132,74 @@ export default function Sidebar({
       />
 
       <div className="flex-1 overflow-y-auto">
-      {panel === "projects" && (
-        <ProjectNav
-          activeProject={activeProject}
-          onSelectProject={onSelectProject}
-          onProjectCreated={onProjectCreated}
-        />
-      )}
-      {panel === "tickets" && (
-        <TicketList
-          project={activeProject}
-          byStatus={byStatus}
-          loading={ticketsLoading}
-          error={ticketsError}
-          activeTicket={activeTicket}
-          running={running}
-          runningRound={runningRound}
-          maxRounds={maxRounds}
-          showKanban={showKanban}
-          onSelectTicket={onSelectTicket}
-          onRunPipeline={onRunPipeline}
-          onShowDiff={onShowDiff}
-          selection={selection}
-          onToggleQueue={onToggleQueue}
-          onRunQueue={onRunQueue}
-          onRunAutonome={onRunAutonome}
-          onClearQueue={onClearQueue}
-          queueEnCours={queueEnCours}
-          onToggleKanban={onToggleKanban}
-          onTicketCreated={onTicketCreated}
-          onBatchCreated={onBatchCreated}
-          onPrCreated={onPrCreated}
-        />
-      )}
-      {panel === "files" &&
-        (activeProject ? (
-          <FileTree
-            racine={activeProject.path}
-            fichierActif={openFilePath ?? null}
-            onSelectFile={onOpenFile ?? (() => {})}
+        {panel === "projects" && (
+          <ProjectNav
+            activeProject={activeProject}
+            onSelectProject={onSelectProject}
+            onProjectCreated={onProjectCreated}
           />
-        ) : (
-          <p className="px-3 py-3 text-xs text-zinc-500">
-            Sélectionne un projet pour parcourir ses fichiers.
-          </p>
-        ))}
-      {panel === "history" && (
-        <RunHistory
-          runs={runs}
-          loading={runsLoading}
-          error={runsError}
-          onSelectTicket={onSelectTicketById}
-        />
-      )}
-      {panel === "agents" && (
-        <AgentList
-          onAgentCreated={onAgentCreated ?? (() => {})}
-          onSelect={onSelectAgent}
-          selectionne={agentSelectionne ?? null}
-        />
-      )}
-      {panel === "usage" && (
-        <UsageDashboard
-          usage={usage}
-          loading={usageLoading}
-          error={usageError}
-          onRefresh={onRefreshUsage}
-        />
-      )}
+        )}
+        {panel === "tickets" && (
+          <TicketList
+            project={activeProject}
+            byStatus={byStatus}
+            loading={ticketsLoading}
+            error={ticketsError}
+            activeTicket={activeTicket}
+            running={running}
+            runningRound={runningRound}
+            maxRounds={maxRounds}
+            showKanban={showKanban}
+            onSelectTicket={onSelectTicket}
+            onRunPipeline={onRunPipeline}
+            onShowDiff={onShowDiff}
+            selection={selection}
+            onToggleQueue={onToggleQueue}
+            onRunQueue={onRunQueue}
+            onRunAutonome={onRunAutonome}
+            onClearQueue={onClearQueue}
+            queueEnCours={queueEnCours}
+            onToggleKanban={onToggleKanban}
+            onTicketCreated={onTicketCreated}
+            onBatchCreated={onBatchCreated}
+            onPrCreated={onPrCreated}
+          />
+        )}
+        {panel === "files" &&
+          (activeProject ? (
+            <FileTree
+              racine={activeProject.path}
+              fichierActif={openFilePath ?? null}
+              onSelectFile={onOpenFile ?? (() => {})}
+            />
+          ) : (
+            <p className="px-3 py-3 text-xs text-zinc-500">
+              Sélectionne un projet pour parcourir ses fichiers.
+            </p>
+          ))}
+        {panel === "history" && (
+          <RunHistory
+            runs={runs}
+            loading={runsLoading}
+            error={runsError}
+            onSelectTicket={onSelectTicketById}
+          />
+        )}
+        {panel === "agents" && (
+          <AgentList
+            onAgentCreated={onAgentCreated ?? (() => {})}
+            onSelect={onSelectAgent}
+            selectionne={agentSelectionne ?? null}
+          />
+        )}
+        {panel === "usage" && (
+          <UsageDashboard
+            usage={usage}
+            loading={usageLoading}
+            error={usageError}
+            onRefresh={onRefreshUsage}
+          />
+        )}
       </div>
     </div>
   );

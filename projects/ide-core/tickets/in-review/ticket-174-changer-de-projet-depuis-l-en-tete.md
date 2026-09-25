@@ -2,7 +2,7 @@
 id: ticket-174
 title: "Changer de projet oblige à repasser par l'onglet Projets"
 type: feat
-status: todo
+status: in-review
 pr_number: null
 priority: high
 agent: codeur
