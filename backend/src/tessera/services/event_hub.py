@@ -19,6 +19,7 @@ from typing import Optional
 
 import asyncio
 
+from tessera.services.journal_du_texte import JOURNAL_DU_TEXTE
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 
 #: Les seuls types qu'une file saturée a le droit de jeter. Tout le reste
@@ -119,6 +120,10 @@ class EventHub:
         `EventCallback` pour que le hub se branche là où le pipeline attend
         un émetteur.
         """
+        # Retenir ici, et non dans la file d'un observateur : une file saturée
+        # jette le texte, et le journal perdrait ce qu'il existe pour garder
+        # (ticket-185).
+        JOURNAL_DU_TEXTE.retenir(event)
         for abonnement in list(self._abonnes):
             abonnement.deposer(event)
 
