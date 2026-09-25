@@ -30,6 +30,12 @@ export interface StreamState {
   quota: QuotaState | null;
   /** Question posée par l'agent en cours, tant qu'on n'y a pas répondu (ticket-066). */
   pendingQuestion: string | null;
+  /**
+   * Quand l'agent reprendra seul (ADR-025), en ISO. Affiché en compte à
+   * rebours : cinq minutes de silence se lisent comme une panne tant que
+   * rien ne dit que l'attente est bornée (ticket-186).
+   */
+  questionExpireA: string | null;
   /** Avancement d'une file de tickets, ou null hors file (ticket-074). */
   queue: { index: number; total: number } | null;
   /**
@@ -73,6 +79,7 @@ export const INITIAL: StreamState = {
   errorMessage: null,
   quota: null,
   pendingQuestion: null,
+  questionExpireA: null,
   queue: null,
   branch: null,
   maxRounds: null,
@@ -94,6 +101,7 @@ export function etatDepuisRun(run: RunActif): StreamState {
     currentAgent: run.agent,
     currentRound: run.tour || INITIAL.currentRound,
     pendingQuestion: run.question ?? null,
+    questionExpireA: run.question_expire_a ?? null,
   };
 }
 
@@ -133,9 +141,16 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         currentAgent: s.currentAgent === ev.agent ? null : s.currentAgent,
       };
     case "agent_token":
+    case "agent_tool_use":
       return {
         ...s,
         events,
+        // L'agent a repris — sur réponse, ou seul passé le délai (ADR-025).
+        // Garder la question ferait répondre à un agent qui n'écoute plus ;
+        // le registre l'efface déjà, un client en direct ne le faisait pas
+        // (ticket-186).
+        pendingQuestion: null,
+        questionExpireA: null,
         currentTokens:
           ev.agent === "codeur"
             ? s.currentTokens +
@@ -161,6 +176,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         status: "done",
         lastResult: result,
         pendingQuestion: null,
+        questionExpireA: null,
         branch,
       };
     }
@@ -180,6 +196,8 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         events,
         pendingQuestion:
           typeof ev.data["question"] === "string" ? ev.data["question"] : null,
+        questionExpireA:
+          typeof ev.data["expire_a"] === "string" ? ev.data["expire_a"] : null,
       };
     case "queue_progress":
       // Un nouveau ticket commence. Une file est **un** run (ADR-041), donc un

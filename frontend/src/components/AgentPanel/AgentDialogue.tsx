@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CompteARebours from "./CompteARebours";
 
 /**
  * Parler à l'agent pendant qu'il travaille (ticket-066).
@@ -18,6 +19,8 @@ import { useState } from "react";
  */
 interface AgentDialogueProps {
   pendingQuestion: string | null;
+  /** Quand l'agent reprendra seul, s'il l'a annoncé (ticket-186). */
+  questionExpireA?: string | null;
   enCours: boolean;
   onAnswer: (text: string) => void;
   onInterject: (text: string) => void;
@@ -26,6 +29,7 @@ interface AgentDialogueProps {
 
 export default function AgentDialogue({
   pendingQuestion,
+  questionExpireA = null,
   enCours,
   onAnswer,
   onInterject,
@@ -57,9 +61,12 @@ export default function AgentDialogue({
           <p className="mb-1 text-micro uppercase tracking-wide text-amber-500">
             L'agent attend votre réponse
           </p>
-          <p className="mb-2 rounded-sm border border-amber-900/60 bg-amber-950/30 px-2 py-1.5 text-xs text-amber-100">
+          <p className="rounded-sm border border-amber-900/60 bg-amber-950/30 px-2 py-1.5 text-xs text-amber-100">
             {pendingQuestion}
           </p>
+          <div className="mb-2">
+            <CompteARebours expireA={questionExpireA} />
+          </div>
           <label
             htmlFor="dialogue-reponse"
             className="mb-1 block text-mini text-zinc-400"
