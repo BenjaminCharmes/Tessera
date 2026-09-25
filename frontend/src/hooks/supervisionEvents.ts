@@ -14,6 +14,26 @@ export function cleDuService(projectId: string, nom: string): string {
   return `${projectId}:${nom}`;
 }
 
+/** L'avancement que `queue_progress` annonce, ou rien pour tout autre événement.
+ *
+ * Une carte se remplit par deux chemins : l'instantané, qui porte le `RunActif`
+ * complet, et les événements. La réservation d'un run précède son premier
+ * `queue_progress`, donc un onglet déjà ouvert reçoit un instantané à zéro puis
+ * l'avancement en événement — et ce chemin-là l'ignorait (ticket-181).
+ */
+function avancementDeLaFile(ev: OrchestratorEvent): Partial<RunActif> {
+  if (ev.type !== "queue_progress") return {};
+  const restants = ev.data["restants"];
+  const faits = ev.data["faits"];
+  return {
+    mode: "queue",
+    file_index: Number(ev.data["index"] ?? 0),
+    file_total: Number(ev.data["total"] ?? 0),
+    ...(Array.isArray(restants) ? { file_restants: restants.map(String) } : {}),
+    ...(Array.isArray(faits) ? { file_faits: faits.map(String) } : {}),
+  };
+}
+
 /** Garde la carte d'un run en phase avec ce qu'il annonce. */
 export function majDesRuns(
   prec: RunActif[],
@@ -39,6 +59,7 @@ export function majDesRuns(
         cout_usd: 0,
         verdict: null,
         demarre_a: ev.timestamp,
+        ...avancementDeLaFile(ev),
       },
     ];
   }
@@ -51,6 +72,7 @@ export function majDesRuns(
           etape: ev.type === "agent_started" ? ev.type : r.etape,
           tour:
             typeof ev.data["round"] === "number" ? ev.data["round"] : r.tour,
+          ...avancementDeLaFile(ev),
         }
       : r,
   );
