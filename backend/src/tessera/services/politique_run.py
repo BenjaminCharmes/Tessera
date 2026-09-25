@@ -1,7 +1,8 @@
 """Ce qu'un run a le droit de faire, figé avant le premier agent — ticket-119.
 
-`autonomy`, `git_root`, `artifacts` et `test_command` bornent le run : jusqu'où
-il livre, où il stage, ce qui reste hors du dépôt, ce qui rend la suite verte.
+`autonomy`, `git_root`, `artifacts`, `test_command` et `base_branch` bornent le
+run : jusqu'où il livre, où il stage, ce qui reste hors du dépôt, ce qui rend la
+suite verte, et sur quelle branche il rejoue.
 Chaque service les relisait dans `agents.json` **au moment d'agir** — donc
 après le passage du codeur. Or `agents.json` est sous la racine du projet, et
 un agent a `Edit` : un ticket pouvait déclarer `merge` + `ancestor` au milieu
@@ -27,12 +28,17 @@ _GIT_ROOT_ANCESTOR = "ancestor"
 
 @dataclass(frozen=True)
 class PolitiqueRun:
-    """Les quatre réglages d'`agents.json` qui bornent un run."""
+    """Les réglages d'`agents.json` qui bornent un run."""
 
     autonomy: NiveauAutonomie = NiveauAutonomie.commit
     git_root: str | None = None
     artifacts: ArtifactMode = "local"
     test_command: str | None = None
+    #: La branche sur laquelle la livraison rejoue. `None` — le projet ne
+    #: déclare rien — laisse l'appelant choisir son repli : rendre le défaut
+    #: global ici empêcherait de distinguer « non déclaré » de « déclaré
+    #: develop » (ticket-166).
+    base_branch: str | None = None
 
     @classmethod
     def lire(cls, project_path: Path) -> "PolitiqueRun":
@@ -46,6 +52,7 @@ class PolitiqueRun:
             git_root=_lire_git_root(project_path),
             artifacts=read_artifact_mode(project_path),
             test_command=load_pipeline_config(project_path).test_command,
+            base_branch=_lire_chaine(project_path, "base_branch"),
         )
 
     @property
@@ -70,6 +77,16 @@ class PolitiqueRun:
 
 
 def _lire_git_root(project_path: Path) -> str | None:
+    return _lire_chaine(project_path, "git_root")
+
+
+def _lire_chaine(project_path: Path, clef: str) -> str | None:
+    """Une chaîne du manifeste, `None` si absente, illisible ou mal typée.
+
+    Un seul lecteur pour les clefs de cette forme : `git_root` en avait le
+    sien, et `base_branch` aurait été le deuxième à répéter les mêmes quatre
+    gardes.
+    """
     agents_json = project_path / "agents.json"
     if not agents_json.is_file():
         return None
@@ -77,5 +94,5 @@ def _lire_git_root(project_path: Path) -> str | None:
         data = json.loads(agents_json.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return None
-    valeur = data.get("git_root")
+    valeur = data.get(clef)
     return valeur if isinstance(valeur, str) else None

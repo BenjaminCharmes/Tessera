@@ -63,6 +63,21 @@ class GitCommandError(GitWorkspaceError):
         )
 
 
+class BaseIntrouvable(GitWorkspaceError):
+    """La branche de base du rejeu n'existe pas dans ce dépôt — ticket-166.
+
+    `git rebase` répond `fatal: invalid upstream 'develop'`, qui ne dit ni que
+    la branche vient d'un réglage, ni lequel, ni où le corriger.
+    """
+
+    def __init__(self, base: str) -> None:
+        super().__init__(
+            f"La branche de base « {base} » n'existe pas dans ce dépôt. "
+            f"Déclare `base_branch` dans son agents.json, ou crée la branche."
+        )
+        self.base = base
+
+
 class NotAGitRepository(GitCommandError):
     """The target directory is not (or no longer) a git repository."""
 
@@ -253,6 +268,8 @@ class GitWorkspaceService:
         dessus, et l'utilisateur hériterait d'un dépôt qu'il n'a pas choisi.
         """
         await self._ensure_own_repository()
+        if not await self._ref_existe(base):
+            raise BaseIntrouvable(base)
         try:
             await self._run("rebase", base)
         except GitCommandError as echec:
@@ -275,6 +292,18 @@ class GitWorkspaceService:
             await self._run("rebase", "--abort")
             return conflits
         return ()
+
+    async def _ref_existe(self, ref: str) -> bool:
+        """La ref est-elle résolvable ici ?
+
+        Vérifié **avant** de rejouer : sinon la cause remonte dans les mots de
+        git, et la vraie information — un réglage à écrire — se perd.
+        """
+        try:
+            await self._run("rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")
+        except GitCommandError:
+            return False
+        return True
 
     async def _annuler_si_en_cours(self) -> None:
         """Annule le rebase s'il y en a un, sans jamais masquer l'erreur d'origine."""
