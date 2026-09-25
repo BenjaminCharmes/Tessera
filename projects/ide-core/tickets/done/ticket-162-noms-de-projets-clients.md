@@ -2,8 +2,8 @@
 id: ticket-162
 title: "L'anonymisation cherchait des noms d'entreprises, pas des noms de projets"
 type: chore
-status: in-review
-pr_number: null
+status: done
+pr_number: 6
 priority: critical
 agent: codeur
 depends_on: ["ticket-160"]

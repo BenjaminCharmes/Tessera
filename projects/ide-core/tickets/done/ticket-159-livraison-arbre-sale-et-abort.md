@@ -2,8 +2,8 @@
 id: ticket-159
 title: "La livraison échoue sur un arbre que le pipeline vient lui-même de salir"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 3
 priority: high
 agent: codeur
 depends_on: ["ticket-158"]
