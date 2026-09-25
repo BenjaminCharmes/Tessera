@@ -262,17 +262,24 @@ def _livreur(
     if project.github_remote and settings.github_token:
         github = GitHubService(token=settings.github_token, repo=project.github_remote)
 
+    # La branche de base dépend du dépôt, pas de la machine — même raison
+    # qu'ADR-029 pour l'autonomie. Le réglage global reste le repli des
+    # projets qui ne déclarent rien (ticket-166).
+    base_branch = (
+        politique.base_branch if politique else None
+    ) or settings.github_base_branch
+
     service = LivraisonService(
         git_workspace=GitWorkspaceService(project_path, politique=politique),
         workflow=GitHubWorkflowService(
             git_workspace=GitWorkspaceService(project_path, politique=politique),
             github=github,
-            base_branch=settings.github_base_branch,
+            base_branch=base_branch,
             project_path=project_path,
             politique=politique,
         ),
         project_path=project_path,
-        base_branch=settings.github_base_branch,
+        base_branch=base_branch,
         politique=politique,
         # Sans runner — appel programmatique, test — pas de résolveur : le
         # conflit annule le rebase et remonte, comme avant ticket-090.
