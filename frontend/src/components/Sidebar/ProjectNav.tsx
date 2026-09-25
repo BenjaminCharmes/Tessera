@@ -8,6 +8,7 @@ import CreateProjectModal from "./CreateProjectModal";
 import { grouperParCategorie } from "./grouperParCategorie";
 import ImportProjectModal from "./ImportProjectModal";
 import SkeletonList from "../SkeletonList";
+import { lienDuDepot } from "../../lib/lienDuDepot";
 
 interface ProjectNavProps {
   activeProject: Project | null;
@@ -111,18 +112,7 @@ export default function ProjectNav({
                   <IconProject size={12} className="shrink-0 text-zinc-500" />
                   <span className="truncate flex-1">{project.name}</span>
                 </button>
-                {project.github_remote && (
-                  <a
-                    href={project.github_remote}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 px-3 py-2 text-xs leading-none text-zinc-500 transition-colors hover:text-zinc-200"
-                    title={project.github_remote}
-                    aria-label={`Ouvrir le repo GitHub de ${project.name}`}
-                  >
-                    GH
-                  </a>
-                )}
+                <LienDuDepot project={project} />
               </div>
             ))}
           </div>
@@ -141,5 +131,29 @@ export default function ProjectNav({
         />
       )}
     </>
+  );
+}
+
+/**
+ * Le raccourci vers le dépôt d'un projet, quand il en a un d'ouvrable.
+ *
+ * `github_remote` vaut `owner/repo` : posée telle quelle en `href`, elle se
+ * résolvait contre l'origine de l'app et le lien menait à une page de l'IDE
+ * (ticket-184).
+ */
+function LienDuDepot({ project }: { project: Project }) {
+  const lien = lienDuDepot(project.github_remote);
+  if (!lien) return null;
+  return (
+    <a
+      href={lien}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="shrink-0 px-3 py-2 text-xs leading-none text-zinc-500 transition-colors hover:text-zinc-200"
+      title={lien}
+      aria-label={`Ouvrir le repo GitHub de ${project.name}`}
+    >
+      GH
+    </a>
   );
 }
