@@ -11,6 +11,7 @@ import type {
   OrchestratorEvent,
   PipelineResult,
   QuotaState,
+  RunActif,
   TicketStatus,
 } from "../types/api";
 
@@ -76,6 +77,25 @@ export const INITIAL: StreamState = {
   branch: null,
   maxRounds: null,
 };
+
+/**
+ * L'état d'un run tel que l'instantané permet de le reconstruire — ticket-163.
+ *
+ * `applyEvent` ne fabrique un état `running` que sur `agent_started`, émis une
+ * seule fois au démarrage. Un observateur arrivé après — onglet ouvert en
+ * retard, socket rouverte — restait donc `idle` pour toute la durée du run,
+ * sans agents et, plus grave, sans la question en attente.
+ */
+export function etatDepuisRun(run: RunActif): StreamState {
+  return {
+    ...INITIAL,
+    status: "running",
+    ticketId: run.ticket_id,
+    currentAgent: run.agent,
+    currentRound: run.tour || INITIAL.currentRound,
+    pendingQuestion: run.question ?? null,
+  };
+}
 
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
   const events = [...s.events, ev];
