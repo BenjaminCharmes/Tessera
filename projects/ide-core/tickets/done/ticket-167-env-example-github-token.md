@@ -2,8 +2,8 @@
 id: ticket-167
 title: "`.env.example` dit que GITHUB_TOKEN ne sert qu'à github-sync"
 type: docs
-status: in-review
-pr_number: null
+status: done
+pr_number: 16
 priority: medium
 agent: codeur
 depends_on: []

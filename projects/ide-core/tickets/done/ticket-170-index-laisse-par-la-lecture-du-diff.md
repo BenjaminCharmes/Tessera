@@ -2,8 +2,8 @@
 id: ticket-170
 title: "Lire le diff laisse l'index modifié, et la livraison refuse de rejouer"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 18
 priority: critical
 agent: codeur
 depends_on: ["ticket-159", "ticket-166"]
