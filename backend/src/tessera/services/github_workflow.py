@@ -235,7 +235,8 @@ class GitHubWorkflowService:
 
         statut = await self._github.get_pull_request_status(pr_number)
         ci = str(getattr(statut, "ci_status", "none"))
-        if not niveau_peut_merger(self._niveau(), ci_status=ci):
+        sans_ci = self._politique is not None and self._politique.merge_without_ci
+        if not niveau_peut_merger(self._niveau(), ci_status=ci, sans_ci=sans_ci):
             _logger.info(
                 "merge_refuse",
                 extra={"pr": pr_number, "ci": ci, "projet": str(self._project_path)},
