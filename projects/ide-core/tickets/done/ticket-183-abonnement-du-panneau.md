@@ -2,8 +2,8 @@
 id: ticket-183
 title: "Un panneau qui montre un run ne s'abonne jamais à son texte"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 44
 priority: high
 agent: codeur
 depends_on: ["ticket-182"]
