@@ -386,14 +386,39 @@ class GitWorkspaceService:
         must never be presented to the reviewer/auditor/validator/documentation
         agents as if it were.
         """
+        # Relevé **avant** l'ajout : `-N` inscrit tout le non-suivi dans
+        # l'index, et ce qui n'est pas commité ensuite y reste. Une entrée
+        # *intent-to-add* suffit à faire refuser `git rebase` et à faire voir
+        # l'arbre sale au ticket suivant — une file de trois n'en livrait
+        # qu'un (ticket-170). Lire ne doit rien laisser derrière soi.
+        non_suivis = await self._untracked_files()
         await self._run("add", "-A", "-N")
         pathspec = (
             ":/" if self._travaille_dans_le_parent() else ".",
             *await self._exclude_pathspecs(),
         )
-        if await self._has_head():
-            return await self._run("diff", "HEAD", "--", *pathspec)
-        return await self._run("diff", _EMPTY_TREE_SHA, "--", *pathspec)
+        try:
+            if await self._has_head():
+                return await self._run("diff", "HEAD", "--", *pathspec)
+            return await self._run("diff", _EMPTY_TREE_SHA, "--", *pathspec)
+        finally:
+            await self._oublier_dans_l_index(non_suivis)
+
+    async def _oublier_dans_l_index(self, chemins: tuple[str, ...]) -> None:
+        """Retire de l'index des chemins qui n'y étaient pas avant.
+
+        Bornée aux fichiers **non suivis** au moment du relevé : le codeur ne
+        peut pas les avoir stagés lui-même, donc les rendre à leur état ne
+        perd rien. Sans `HEAD` — dépôt sans commit — `git reset` n'a rien à
+        quoi se référer et sort en erreur ; il n'y a alors rien à défaire non
+        plus, puisque tout l'index est neuf.
+        """
+        if not chemins or not await self._has_head():
+            return
+        try:
+            await self._run("reset", "-q", "--", *chemins)
+        except GitCommandError as exc:
+            _logger.warning("index_non_restaure", extra={"erreur": str(exc)})
 
     async def is_clean(self) -> bool:
         """Return True when tracked files have no staged or unstaged changes.
