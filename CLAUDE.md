@@ -88,6 +88,7 @@ tessera/
 - `async/await` partout dans FastAPI
 - Nommage : `snake_case` pour tout
 - Docstrings en anglais, commentaires en français si besoin de contexte métier
+  (la règle de langue complète est ADR-044)
 
 ### TypeScript
 - `strict: true` dans tsconfig, jamais de `any`
@@ -96,8 +97,8 @@ tessera/
 - Pas de `console.log` en production (utiliser le logger structuré)
 
 ### Git
-- Commits en anglais, format Conventional Commits : `feat:`, `fix:`, `chore:`,
-  `docs:`, `refactor:`, `test:`
+- Commits **et titres de PR** en anglais, format Conventional Commits :
+  `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:` (ADR-044)
 - Une branche par ticket : `ticket-XXX-description-courte`
 - **Flux** : `ticket-XXX` → PR vers `develop` → PR de `develop` vers `main`
   - `main` — état publiable et branche par défaut du dépôt ; ne reçoit que des
