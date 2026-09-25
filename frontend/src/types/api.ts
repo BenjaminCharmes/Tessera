@@ -169,6 +169,8 @@ export interface RunActif {
   file_index?: number;
   file_total?: number;
   file_restants?: string[];
+  /** Les tickets que la file a déjà traités (ticket-179). */
+  file_faits?: string[];
   demarre_a: string;
 }
 

@@ -59,6 +59,10 @@ class RunActif:
     file_index: int = 0
     file_total: int = 0
     file_restants: tuple[str, ...] = ()
+    #: Les tickets que la file a déjà traités. Une file s'arrête au premier
+    #: ticket non approuvé : savoir qu'un blocage est passé change ce qu'on
+    #: fait de la suite (ticket-179).
+    file_faits: tuple[str, ...] = ()
     #: Le `DialogueChannel` du run. C'est ce qui permet à n'importe quel
     #: observateur de répondre à un agent qui pose une question (ADR-025),
     #: au lieu du seul onglet qui a lancé le run.
@@ -85,6 +89,7 @@ class RunActif:
             "file_index": self.file_index,
             "file_total": self.file_total,
             "file_restants": list(self.file_restants),
+            "file_faits": list(self.file_faits),
             "demarre_a": self.demarre_a.isoformat(),
         }
 

@@ -68,3 +68,42 @@ def test_un_progres_plus_recent_remplace_le_precedent() -> None:
 
     assert run.file_index == 2
     assert run.file_restants == ("ticket-006",)
+
+
+def _progres_complet(
+    index: int, total: int, faits: list[str], restants: list[str]
+) -> OrchestratorEvent:
+    return OrchestratorEvent(
+        type=EventType.QUEUE_PROGRESS,
+        ticket_id="ticket-004",
+        agent=AgentRole.codeur,
+        data={"index": index, "total": total, "faits": faits, "restants": restants},
+    )
+
+
+def test_les_tickets_deja_traites_sont_retenus() -> None:
+    """Une file s'arrete au premier non approuve : voir passer un blocage compte."""
+    run = _run()
+
+    _suivre(run, _progres_complet(3, 4, ["ticket-001", "ticket-002"], ["ticket-004"]))
+
+    assert run.file_faits == ("ticket-001", "ticket-002")
+
+
+def test_les_tickets_faits_partent_dans_l_instantane() -> None:
+    run = _run()
+    _suivre(run, _progres_complet(2, 3, ["ticket-001"], ["ticket-003"]))
+
+    assert run.en_dict()["file_faits"] == ["ticket-001"]
+
+
+def test_un_run_unique_n_a_aucun_ticket_fait() -> None:
+    assert _run(mode="single").en_dict()["file_faits"] == []
+
+
+def test_le_premier_ticket_d_une_file_n_a_rien_derriere_lui() -> None:
+    run = _run()
+
+    _suivre(run, _progres_complet(1, 3, [], ["ticket-002", "ticket-003"]))
+
+    assert run.file_faits == ()

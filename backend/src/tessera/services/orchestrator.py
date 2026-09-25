@@ -354,6 +354,7 @@ class Orchestrator:
                         "index": index,
                         "total": len(ticket_ids),
                         "restants": list(ticket_ids[index:]),
+                        "faits": list(ticket_ids[: index - 1]),
                     },
                 )
             )
