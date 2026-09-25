@@ -335,6 +335,9 @@ export interface GitStatus {
   remote_url: string | null;
   /** Renseigné quand le projet vit dans un dépôt qui n'est pas le sien. */
   nested_in: string | null;
+  /** Le projet déclare `git_root: ancestor` et travaille dans le dépôt qui le
+   *  contient — ce n'est pas une anomalie à corriger (ticket-171). */
+  uses_parent_repository: boolean;
 }
 
 /** ticket-062 — les artefacts Tessera partent dans le dépôt, ou restent locaux. */
