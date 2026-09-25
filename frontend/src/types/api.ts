@@ -7,13 +7,7 @@ export type TicketStatus =
 // (backend/src/tessera/models/ticket.py) : types Conventional Commits
 // + `design`, propre à Tessera.
 export type TicketType =
-  | "feat"
-  | "fix"
-  | "chore"
-  | "docs"
-  | "refactor"
-  | "test"
-  | "design";
+  "feat" | "fix" | "chore" | "docs" | "refactor" | "test" | "design";
 export type TicketPriority = "critical" | "high" | "medium" | "low";
 export type AgentRole =
   | "orchestrateur"
@@ -69,7 +63,7 @@ export interface Project {
   active_agents: string[];
   stack: string | null;
   raw_claude_md: string;
-  github_remote: string | null;  /**
+  github_remote: string | null; /**
    * Ce projet execute l'IDE en ce moment (ticket-152). Lui proposer
    * « Lancer » demarrerait un second backend sur un port deja pris.
    */
@@ -165,6 +159,8 @@ export interface RunActif {
   tokens_sortie: number;
   cout_usd: number;
   verdict: string | null;
+  /** La question qu'un agent attend de voir répondue (ticket-163). */
+  question: string | null;
   demarre_a: string;
 }
 
