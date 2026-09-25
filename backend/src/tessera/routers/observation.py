@@ -21,6 +21,7 @@ from typing import Any
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from tessera.services.event_hub import EVENT_HUB, JETABLES
+from tessera.services.journal_du_texte import JOURNAL_DU_TEXTE
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
 
@@ -41,7 +42,13 @@ async def _lire_les_messages(websocket: WebSocket, abonnements: set[str]) -> Non
 
         cible = message.get("subscribe")
         if isinstance(cible, str):
+            # Relire **et** s'abonner sans `await` entre les deux : le texte
+            # publié pendant l'envoi qui suit part par la file de l'abonnement,
+            # donc après le rejeu et sans doublon (ticket-185).
+            retenus = JOURNAL_DU_TEXTE.relire(cible)
             abonnements.add(cible)
+            for event in retenus:
+                await websocket.send_text(event.model_dump_json())
             continue
 
         retire = message.get("unsubscribe")
