@@ -2,6 +2,7 @@ import BranchCleanup from "./BranchCleanup";
 import { useCallback, useMemo, useState } from "react";
 import { api } from "../../lib/api";
 import { useGitStatus } from "../../hooks/useGitStatus";
+import { lienDuDepot } from "../../lib/lienDuDepot";
 import { useResource } from "../../hooks/useResource";
 import RemoveProjectModal from "./RemoveProjectModal";
 import type { ArtifactMode, ArtifactModeState, Project } from "../../types/api";
@@ -62,6 +63,9 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
 
   const status = git.status;
   const linked = status?.is_repository && status.remote_url;
+  // Une adresse SSH ou un chemin local n'ouvre rien : le texte reste alors
+  // du texte, plutôt qu'un lien qui mènerait ailleurs (ticket-184).
+  const lien = lienDuDepot(status?.remote_url);
 
   return (
     <section className="border-t border-zinc-800 px-3 py-2.5 text-xs">
@@ -136,7 +140,20 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
 
       {linked && (
         <p className="break-all text-green-400">
-          Lié à <code>{status?.remote_url}</code>
+          Lié à{" "}
+          {lien ? (
+            <a
+              href={lien}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-green-300"
+              title="Ouvrir le dépôt"
+            >
+              <code>{status?.remote_url}</code>
+            </a>
+          ) : (
+            <code>{status?.remote_url}</code>
+          )}
         </p>
       )}
 
