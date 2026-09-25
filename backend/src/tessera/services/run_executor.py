@@ -83,6 +83,16 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
         run.agent = event.agent.value if event.agent else None
     elif event.type is EventType.TICKET_STATUS_CHANGED:
         run.ticket_id = event.ticket_id or run.ticket_id
+    elif event.type is EventType.QUEUE_PROGRESS:
+        index = event.data.get("index")
+        total = event.data.get("total")
+        if isinstance(index, int):
+            run.file_index = index
+        if isinstance(total, int):
+            run.file_total = total
+        restants = event.data.get("restants")
+        if isinstance(restants, list):
+            run.file_restants = tuple(str(t) for t in restants)
     elif event.type is EventType.AGENT_QUESTION:
         question = event.data.get("question")
         run.question = str(question) if question else None

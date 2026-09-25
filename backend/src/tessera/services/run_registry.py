@@ -52,6 +52,13 @@ class RunActif:
     #: `agent_question`, et resterait devant un run muet alors qu'ADR-025
     #: suppose qu'un humain peut répondre (ticket-163).
     question: str | None = None
+    #: Où en est la file, et ce qu'il lui reste. Une file est *un* run
+    #: (ADR-041), donc une carte : sans ces champs, la Supervision ne pouvait
+    #: pas dire s'il restait deux tickets derrière celui qui tourne
+    #: (ticket-172). Vides hors file.
+    file_index: int = 0
+    file_total: int = 0
+    file_restants: tuple[str, ...] = ()
     #: Le `DialogueChannel` du run. C'est ce qui permet à n'importe quel
     #: observateur de répondre à un agent qui pose une question (ADR-025),
     #: au lieu du seul onglet qui a lancé le run.
@@ -75,6 +82,9 @@ class RunActif:
             "cout_usd": self.cout_usd,
             "verdict": self.verdict,
             "question": self.question,
+            "file_index": self.file_index,
+            "file_total": self.file_total,
+            "file_restants": list(self.file_restants),
             "demarre_a": self.demarre_a.isoformat(),
         }
 
