@@ -111,6 +111,15 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
     """
     orch._log(f"[{run.ticket_id}] APPROVED après {run.round_num} tour(s)")
 
+    # Le ticket change de statut **avant** le commit, comme sur toutes les
+    # autres sorties. `finish_approved` était le seul à faire l'inverse : le
+    # déplacement du fichier de `in-review/` vers `done/` arrivait après le
+    # dernier commit et restait dans l'arbre. ADR-018 veut un arbre propre à
+    # la sortie, et ici ce n'est pas le ticket suivant qui trinquait mais la
+    # livraison du ticket courant, immédiate : `git rebase` refuse de démarrer
+    # sur des modifications non commitées (ticket-159).
+    await set_status(orch, run, TicketStatus.done)
+
     # Ce message est écrit dans le dépôt *de l'utilisateur* : il suit donc la
     # convention de ce dépôt — Conventional Commits — avec le type du ticket
     # plutôt qu'un "feat:" codé en dur, qui mal-étiquetait les fix/chore/docs.
@@ -140,7 +149,6 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
             arret=arret,
         )
 
-    await set_status(orch, run, TicketStatus.done)
     # `branch` sur chaque sortie : l'UI reconstruit son résultat depuis cet
     # événement, et sans la branche elle proposait de « lancer d'abord le
     # pipeline » après un run approuvé (ticket-123).

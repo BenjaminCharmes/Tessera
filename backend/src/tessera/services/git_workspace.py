@@ -255,20 +255,44 @@ class GitWorkspaceService:
         await self._ensure_own_repository()
         try:
             await self._run("rebase", base)
-        except GitCommandError:
-            pass
+        except GitCommandError as echec:
+            refus = echec
         else:
             return ()
 
         conflits = await self._fichiers_en_conflit()
-        if resolveur is None or not conflits:
-            await self._run("rebase", "--abort")
-            return conflits
+        if not conflits:
+            # Un rebase refusé **sans conflit** n'a rien laissé en cours : la
+            # commande s'est arrêtée avant de commencer — arbre sale, base
+            # inconnue. `--abort` levait alors à son tour, et son « no rebase
+            # in progress » remontait à la place de la vraie cause : la
+            # livraison du premier run approuvé s'est plainte de l'annulation,
+            # jamais de l'arbre que le pipeline venait de salir (ticket-159).
+            await self._annuler_si_en_cours()
+            raise refus
 
-        if not await self._faire_resoudre(conflits, resolveur):
+        if resolveur is None or not await self._faire_resoudre(conflits, resolveur):
             await self._run("rebase", "--abort")
             return conflits
         return ()
+
+    async def _annuler_si_en_cours(self) -> None:
+        """Annule le rebase s'il y en a un, sans jamais masquer l'erreur d'origine."""
+        if await self._rebase_en_cours():
+            try:
+                await self._run("rebase", "--abort")
+            except GitCommandError as exc:
+                _logger.warning("rebase_abort_failed", extra={"error": str(exc)})
+
+    async def _rebase_en_cours(self) -> bool:
+        """Git a-t-il un rebase à moitié appliqué sous la main ?"""
+        try:
+            git_dir = Path((await self._run("rev-parse", "--git-dir")).strip())
+        except GitCommandError:
+            return False
+        if not git_dir.is_absolute():
+            git_dir = self._project_path / git_dir
+        return (git_dir / "rebase-merge").exists() or (git_dir / "rebase-apply").exists()
 
     async def _faire_resoudre(
         self,
