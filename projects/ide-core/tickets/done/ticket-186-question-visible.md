@@ -2,8 +2,8 @@
 id: ticket-186
 title: "Une question en attente se voit, et son délai se lit"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 50
 priority: high
 agent: codeur
 depends_on: ["ticket-183"]
