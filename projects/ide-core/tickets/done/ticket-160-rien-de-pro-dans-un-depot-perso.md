@@ -2,8 +2,8 @@
 id: ticket-160
 title: "Rien de professionnel n'entre dans un dépôt personnel"
 type: docs
-status: in-review
-pr_number: null
+status: done
+pr_number: 2
 priority: high
 agent: codeur
 depends_on: []

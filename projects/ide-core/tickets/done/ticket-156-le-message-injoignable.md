@@ -2,8 +2,8 @@
 id: ticket-156
 title: "Le message « ajoute une liste services » ne s'affiche jamais"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 4
 priority: medium
 agent: codeur
 depends_on: ["ticket-155"]

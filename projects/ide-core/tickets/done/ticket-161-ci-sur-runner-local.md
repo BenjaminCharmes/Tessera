@@ -2,8 +2,8 @@
 id: ticket-161
 title: "La CI ne tourne plus : la faire tourner sur un runner local"
 type: chore
-status: in-review
-pr_number: null
+status: done
+pr_number: 5
 priority: high
 agent: codeur
 depends_on: []
