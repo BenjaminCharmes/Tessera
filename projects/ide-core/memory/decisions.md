@@ -399,3 +399,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Alternative rejetée** : tout traduire, ADR et prompts compris : ceux-là partent dans chaque appel d'agent, les traduire changerait le comportement du produit et non sa lisibilité. Ne rien normaliser : une base à moitié anglaise ne donne aucune règle sur laquelle s'appuyer.
 **Conséquence assumée** : trois modules et cinq cents noms de tests restent à renommer. Sans CI, ce renommage se paierait en silence : il attend son retour.
 
+---
+
+## ADR-045 — Un dépôt sans CI merge sur le verdict du pipeline
+
+**Date** : 2026-09-25
+**Décision** : un projet déclare `merge_without_ci: true` dans `agents.json`. À `autonomy: merge`, la livraison n'attend alors aucune CI et merge sur le seul verdict du pipeline. Une CI qui répond `failing` ou `pending` refuse toujours.
+**Raison** : ADR-029 lie le merge à une CI verte, jugeant le clic humain inutile sur un dépôt personnel **doté** d'une CI. Le cas sans CI n'était pas prévu : la pull request sert l'historique et les tests, pas à faire cliquer, et quatre agents ont déjà jugé — dont deux portes qui échouent fermées (ADR-039).
+**Alternative rejetée** : ignorer une CI qui existe — merger par-dessus un rouge reste faux ; un réglage global — le bon choix dépend du dépôt, comme l'autonomie.
+**Conséquence assumée** : sur un dépôt déclaré, plus rien d'humain ne s'interpose entre l'approbation et `main`.
+

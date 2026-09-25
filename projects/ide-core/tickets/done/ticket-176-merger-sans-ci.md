@@ -1,11 +1,11 @@
 ---
 id: ticket-176
 title: "Un dépôt personnel sans CI n'a aucun chemin vers le merge automatique"
-type: design
-status: todo
-pr_number: null
+type: feat
+status: done
+pr_number: 36
 priority: high
-agent: architect
+agent: codeur
 depends_on: []
 estimated_days: 1
 created: 2026-09-25
@@ -62,12 +62,36 @@ Trois réponses possibles :
    qui en a un et se tait est un vrai *pending*. Ne débloquerait pas ce dépôt,
    qui **a** un workflow que la facturation empêche de tourner.
 
+## La décision prise
+
+**Réponse 2.** Un projet déclare `merge_without_ci: true` dans son
+`agents.json` ; à `autonomy: merge`, la livraison n'attend alors aucune CI et
+merge sur le seul verdict du pipeline.
+
+Ce qui l'a emporté : les pull requests servent l'historique et l'exécution des
+tests, pas à faire cliquer. Sur un dépôt personnel sans CI, la relecture
+humaine au merge n'ajoute aucune vérification — quatre agents ont déjà jugé,
+et deux portes échouent fermées (ADR-039) — mais coûte un aller-retour par
+ticket.
+
+**Ce que la déclaration n'ouvre pas** : une CI qui répond `failing` ou
+`pending` refuse toujours le merge. La déclaration dit « ce dépôt n'a pas de
+CI », pas « ignore la CI ». Merger par-dessus un rouge resterait faux quelle
+que soit la déclaration.
+
 ## Critères d'acceptation
 
-- [ ] La décision est prise et écrite dans un ADR
-- [ ] Si elle ouvre le merge sans CI, la déclaration est par projet et son
-      absence garde le comportement actuel
-- [ ] ADR-029 est amendé ou explicitement confirmé, pas laissé ambigu
+- [ ] ADR-045 amende ADR-029, sans le contredire en silence
+- [ ] `PolitiqueRun` lit `merge_without_ci`, `False` à défaut
+- [ ] Sans déclaration, le comportement d'avant est inchangé
+- [ ] Déclaré, à `autonomy: merge` et sans CI observable, la PR est mergée
+- [ ] Déclaré, une CI `failing` **refuse** toujours le merge
+- [ ] Déclaré, une CI `pending` refuse aussi : la déclaration dit « pas de
+      CI », pas « ignore la CI »
+- [ ] Déclaré à un niveau inférieur à `merge`, il ne se passe rien
+- [ ] La livraison n'attend plus la CI quand elle est déclarée absente
+- [ ] Une résolution de conflit ne se merge toujours jamais seule (ADR-033)
+- [ ] `uv run pytest` et `uv run mypy src/` passent
 
 ## Dépendances
 
