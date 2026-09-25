@@ -93,6 +93,9 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
         restants = event.data.get("restants")
         if isinstance(restants, list):
             run.file_restants = tuple(str(t) for t in restants)
+        faits = event.data.get("faits")
+        if isinstance(faits, list):
+            run.file_faits = tuple(str(t) for t in faits)
     elif event.type is EventType.AGENT_QUESTION:
         question = event.data.get("question")
         run.question = str(question) if question else None
