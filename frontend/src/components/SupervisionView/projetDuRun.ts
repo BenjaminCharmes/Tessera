@@ -21,7 +21,7 @@ export function projetDuRun(
   return {
     id: run.project_id,
     name: run.project_id,
-    path: null,
+    path: "",
     description: "",
     active_agents: [],
     stack: null,

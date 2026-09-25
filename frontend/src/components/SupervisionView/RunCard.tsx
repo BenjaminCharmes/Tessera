@@ -81,10 +81,36 @@ export default function RunCard({
         </span>
 
         {/* Lu depuis le réseau : un backend plus ancien n'envoie pas encore
-            ces champs, et une carte ne doit pas disparaître pour ça. */}
-        {(run.file_restants ?? []).length > 0 ? (
-          <span className="mt-1 block truncate text-micro text-zinc-600">
-            ensuite : {(run.file_restants ?? []).join(", ")}
+            ces champs, et une carte ne doit pas disparaître pour ça.
+            Replié par défaut : ce qu'une carte montre sans qu'on l'ouvre se
+            paie sur chacune d'elles (ticket-179). */}
+        {(run.file_faits ?? []).length > 0 ||
+        (run.file_restants ?? []).length > 0 ? (
+          <span
+            className="mt-1 block"
+            onClick={(e) => e.stopPropagation()}
+            role="presentation"
+          >
+            <details className="text-micro">
+              <summary className="cursor-pointer text-zinc-600 hover:text-zinc-400">
+                la file
+              </summary>
+              <span className="mt-1 block space-y-0.5">
+                {(run.file_faits ?? []).map((t) => (
+                  <span key={t} className="block truncate text-zinc-600">
+                    fait · {t}
+                  </span>
+                ))}
+                <span className="block truncate text-zinc-300">
+                  en cours · {run.ticket_id ?? "—"}
+                </span>
+                {(run.file_restants ?? []).map((t) => (
+                  <span key={t} className="block truncate text-zinc-500">
+                    ensuite · {t}
+                  </span>
+                ))}
+              </span>
+            </details>
           </span>
         ) : null}
 

@@ -55,3 +55,34 @@ describe("RunCard — où en est une file (ticket-172)", () => {
     expect(screen.queryByText(/\d+\s*\/\s*\d+/)).toBeNull();
   });
 });
+
+describe("RunCard — la file se déplie (ticket-179)", () => {
+  it("montre les tickets faits quand on déplie", async () => {
+    const { default: userEvent } = await import("@testing-library/user-event");
+    rendre(
+      run({
+        file_faits: ["ticket-001", "ticket-002"],
+        file_restants: ["ticket-005"],
+      }),
+    );
+
+    await userEvent.click(screen.getByText("la file"));
+
+    expect(screen.getByText(/fait · ticket-001/)).toBeInTheDocument();
+    expect(screen.getByText(/ensuite · ticket-005/)).toBeInTheDocument();
+  });
+
+  it("est repliée par défaut", () => {
+    rendre(run({ file_faits: ["ticket-001"] }));
+
+    expect(screen.getByText("la file").closest("details")?.open).toBe(false);
+  });
+
+  it("un run unique n'affiche aucune file", () => {
+    rendre(
+      run({ mode: "single", file_total: 0, file_restants: [], file_faits: [] }),
+    );
+
+    expect(screen.queryByText("la file")).toBeNull();
+  });
+});

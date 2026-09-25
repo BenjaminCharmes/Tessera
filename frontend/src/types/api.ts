@@ -162,11 +162,15 @@ export interface RunActif {
   cout_usd: number;
   verdict: string | null;
   /** La question qu'un agent attend de voir répondue (ticket-163). */
-  question: string | null;
-  /** Où en est la file, et ce qu'il lui reste — vides hors file (ticket-172). */
-  file_index: number;
-  file_total: number;
-  file_restants: string[];
+  question?: string | null;
+  /** Où en est la file, et ce qu'il lui reste — vides hors file (ticket-172).
+   *  Optionnels : ils viennent du réseau, et un backend plus ancien ne les
+   *  envoie pas. Les lire défensivement vaut mieux qu'une carte qui disparaît. */
+  file_index?: number;
+  file_total?: number;
+  file_restants?: string[];
+  /** Les tickets que la file a déjà traités (ticket-179). */
+  file_faits?: string[];
   demarre_a: string;
 }
 

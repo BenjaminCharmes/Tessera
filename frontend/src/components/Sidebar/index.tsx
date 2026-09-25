@@ -41,6 +41,10 @@ interface SidebarProps {
   runningRound?: number;
   maxRounds?: number | null;
   showKanban: boolean;
+  /** Un run tourne mais le centre montre autre chose (ticket-178). */
+  runCache?: boolean;
+  /** Ramène la vue du run au centre. */
+  onVoirLeRun?: () => void;
   onSelectProject: (project: Project) => void;
   onProjectCreated?: (project: Project) => void;
   onSelectTicket: (ticket: Ticket) => void;
@@ -84,6 +88,8 @@ export default function Sidebar({
   runningRound,
   maxRounds,
   showKanban,
+  runCache,
+  onVoirLeRun,
   onSelectProject,
   onProjectCreated,
   onSelectTicket,
@@ -150,6 +156,8 @@ export default function Sidebar({
             runningRound={runningRound}
             maxRounds={maxRounds}
             showKanban={showKanban}
+            runCache={runCache}
+            onVoirLeRun={onVoirLeRun}
             onSelectTicket={onSelectTicket}
             onRunPipeline={onRunPipeline}
             onShowDiff={onShowDiff}

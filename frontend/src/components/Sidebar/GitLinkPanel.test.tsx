@@ -30,6 +30,7 @@ describe("GitLinkPanel", () => {
       has_commits: false,
       remote_url: null,
       nested_in: null,
+      uses_parent_repository: false,
     });
 
     render(<GitLinkPanel project={project} />);
@@ -46,12 +47,15 @@ describe("GitLinkPanel", () => {
       has_commits: false,
       remote_url: null,
       nested_in: "C:/Users/moi/Desktop/project",
+      uses_parent_repository: false,
     });
 
     render(<GitLinkPanel project={project} />);
 
     await waitFor(() =>
-      expect(screen.getByText("C:/Users/moi/Desktop/project")).toBeInTheDocument(),
+      expect(
+        screen.getByText("C:/Users/moi/Desktop/project"),
+      ).toBeInTheDocument(),
     );
   });
 
@@ -61,12 +65,14 @@ describe("GitLinkPanel", () => {
       has_commits: true,
       remote_url: null,
       nested_in: null,
+      uses_parent_repository: false,
     });
     const link = vi.spyOn(api.git, "link").mockResolvedValue({
       is_repository: true,
       has_commits: true,
       remote_url: "https://github.com/moi/repo.git",
       nested_in: null,
+      uses_parent_repository: false,
     });
 
     const user = userEvent.setup();
@@ -91,12 +97,15 @@ describe("GitLinkPanel", () => {
       has_commits: true,
       remote_url: "https://github.com/moi/repo.git",
       nested_in: null,
+      uses_parent_repository: false,
     });
 
     render(<GitLinkPanel project={project} />);
 
     await waitFor(() =>
-      expect(screen.getByText("https://github.com/moi/repo.git")).toBeInTheDocument(),
+      expect(
+        screen.getByText("https://github.com/moi/repo.git"),
+      ).toBeInTheDocument(),
     );
   });
 
@@ -108,6 +117,7 @@ describe("GitLinkPanel", () => {
       has_commits: true,
       remote_url: null,
       nested_in: null,
+      uses_parent_repository: false,
     });
     vi.spyOn(api.git, "link").mockRejectedValue(
       new Error("API 409: le dépôt n'est pas vide"),
@@ -135,6 +145,7 @@ describe("GitLinkPanel — artefacts Tessera (ticket-062)", () => {
       has_commits: true,
       remote_url: "https://github.com/client/projet.git",
       nested_in: null,
+      uses_parent_repository: false,
     });
   });
 
