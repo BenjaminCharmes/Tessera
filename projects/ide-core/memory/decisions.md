@@ -388,3 +388,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : le service sécurité d'un client a signalé un dépôt personnel passé public ; 162 commits y portaient l'adresse professionnelle. Le contenu était propre, mais un `user.email` global écrit sur tous les dépôts d'une machine sans jamais se rappeler à l'attention, et personne ne relit les métadonnées.
 **Alternative rejetée** : nettoyer après coup — un dépôt public est moissonné avant d'être corrigé, et un force-push laisse les objets joignables par leur SHA.
 **Conséquence assumée** : réparer coûte la réécriture de l'histoire et la perte des PR.
+
+---
+
+## ADR-044 — Ce qu'une machine lit s'écrit en anglais
+
+**Date** : 2026-09-25
+**Décision** : identifiants, docstrings, noms de tests, messages de commit et titres de pull request s'écrivent en **anglais** — ici comme dans les projets que l'IDE construit. Commentaires, ADR, tickets et prompts restent en français.
+**Raison** : ce dépôt s'adresse à des lecteurs inconnus, qu'un identifiant français arrête d'emblée. La règle existait à moitié — « docstrings en anglais » — et la pratique avait dérivé jusqu'aux titres de PR.
+**Alternative rejetée** : tout traduire, ADR et prompts compris : ceux-là partent dans chaque appel d'agent, les traduire changerait le comportement du produit et non sa lisibilité. Ne rien normaliser : une base à moitié anglaise ne donne aucune règle sur laquelle s'appuyer.
+**Conséquence assumée** : trois modules et cinq cents noms de tests restent à renommer. Sans CI, ce renommage se paierait en silence : il attend son retour.
+

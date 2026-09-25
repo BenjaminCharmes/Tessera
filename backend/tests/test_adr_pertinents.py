@@ -113,7 +113,7 @@ _CONTRAINTES = {
     "ADR-017", "ADR-018", "ADR-019", "ADR-020", "ADR-021", "ADR-022",
     "ADR-023", "ADR-024", "ADR-025", "ADR-027", "ADR-028", "ADR-029",
     "ADR-030", "ADR-031", "ADR-033", "ADR-037", "ADR-038", "ADR-039",
-    "ADR-040", "ADR-042", "ADR-043",
+    "ADR-040", "ADR-042", "ADR-043", "ADR-044",
 }
 
 #: Les ADR qui n'enregistrent qu'un choix passé ou une méta-règle sur les

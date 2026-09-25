@@ -71,7 +71,20 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
 
       {git.loading && !status && <p className="text-zinc-600">Vérification…</p>}
 
-      {status && !status.is_repository && (
+      {/* Travailler dans le dépôt qui le contient est le mode normal d'un
+          projet en `git_root: ancestor` (ADR-028), pas une anomalie. L'écran
+          l'annonçait comme non versionné et proposait d'imbriquer un dépôt
+          dans celui de Tessera — ce qu'ADR-024 existe pour empêcher
+          (ticket-171). */}
+      {status?.uses_parent_repository && (
+        <p className="text-zinc-400">
+          Ce projet travaille dans le dépôt qui le contient,{" "}
+          <code className="break-all">{status.nested_in}</code> — c'est ce que
+          déclare son <code>git_root</code>.
+        </p>
+      )}
+
+      {status && !status.is_repository && !status.uses_parent_repository && (
         <div className="space-y-1.5">
           <p className="text-amber-400">Ce projet n'est pas versionné.</p>
           <p className="text-zinc-500">
@@ -80,8 +93,9 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
           </p>
           {status.nested_in && (
             <p className="text-zinc-500">
-              Il se trouve dans le dépôt <code className="break-all">{status.nested_in}</code>, qui
-              n'est pas le sien.
+              Il se trouve dans le dépôt{" "}
+              <code className="break-all">{status.nested_in}</code>, qui n'est
+              pas le sien.
             </p>
           )}
           <button
@@ -154,13 +168,14 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
               <code>.gitignore</code> — rien n'apparaît dans un diff.
             </p>
           )}
-          {artifacts.mode === "local" && artifacts.already_tracked.length > 0 && (
-            <p className="mt-1 text-amber-400">
-              {artifacts.already_tracked.length} fichier(s) déjà suivi(s) par
-              git : l'exclusion ne les en sort pas. Utilise{" "}
-              <code>git rm --cached</code> si tu veux les retirer.
-            </p>
-          )}
+          {artifacts.mode === "local" &&
+            artifacts.already_tracked.length > 0 && (
+              <p className="mt-1 text-amber-400">
+                {artifacts.already_tracked.length} fichier(s) déjà suivi(s) par
+                git : l'exclusion ne les en sort pas. Utilise{" "}
+                <code>git rm --cached</code> si tu veux les retirer.
+              </p>
+            )}
         </div>
       )}
 
@@ -206,7 +221,7 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
             Masquer
           </button>
           <BranchCleanup projectId={project.id} />
-    </div>
+        </div>
       )}
     </section>
   );

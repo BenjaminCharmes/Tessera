@@ -346,7 +346,15 @@ class Orchestrator:
                 OrchestratorEvent(
                     type=EventType.QUEUE_PROGRESS,
                     ticket_id=ticket_id,
-                    data={"index": index, "total": len(ticket_ids)},
+                    # `restants` et pas seulement l'index : savoir qu'on est
+                    # au deuxième de trois ne dit pas lesquels attendent, ce
+                    # qui est l'information utile quand on envisage
+                    # d'interrompre la file (ticket-172).
+                    data={
+                        "index": index,
+                        "total": len(ticket_ids),
+                        "restants": list(ticket_ids[index:]),
+                    },
                 )
             )
 

@@ -40,6 +40,11 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
     monkeypatch.setattr(settings, "ide_db_path", db_path)
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
+    # Sans ça, la suite dépend de la machine : `link_git_remote` n'interroge le
+    # dépôt distant que si un token existe, donc le même test passait en CI —
+    # qui n'en a pas — et échouait chez qui avait renseigné le sien
+    # (ticket-169). Les tests qui veulent un token le posent après.
+    monkeypatch.setattr(settings, "github_token", "")
     return ws
 
 
