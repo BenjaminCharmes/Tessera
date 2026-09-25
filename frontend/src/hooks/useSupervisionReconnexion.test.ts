@@ -29,6 +29,9 @@ function run(over: Record<string, unknown> = {}) {
     cout_usd: 0,
     verdict: null,
     question: null,
+    file_index: 0,
+    file_total: 0,
+    file_restants: [],
     demarre_a: new Date().toISOString(),
     ...over,
   };

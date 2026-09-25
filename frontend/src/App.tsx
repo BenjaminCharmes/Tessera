@@ -39,23 +39,10 @@ export default function App() {
   // tout geste explicite le lui reprend. Sans cet état, « Vue liste » n'avait
   // aucun effet tant qu'un run tournait (ticket-178).
   const [runAuPremierPlan, setRunAuPremierPlan] = useState(true);
-  const runEnCours =
-    stream.status === "running" || stream.status === "connecting";
-  const vueCentre = vueDuCentre({
-    runEnCours,
-    runAuPremierPlan,
-    openFilePath,
-    showDiff,
-    showKanban,
-  });
-  // Un run qui démarre ramène sa vue devant : c'est ce qu'on veut voir, et
-  // c'est le seul moment où l'IDE décide à la place de l'utilisateur.
-  useEffect(() => {
-    if (runEnCours) setRunAuPremierPlan(true);
-  }, [runEnCours]);
   const [openFilePath, setOpenFilePath] = useState<string | null>(null);
   // Relire ce qu'un run a produit sans quitter l'IDE (ticket-069).
   const [showDiff, setShowDiff] = useState(false);
+
   // L'ordre de la file est celui de la sélection, pas celui de la liste : un
   // lot du planificateur a des dépendances, et c'est à l'utilisateur de les
   // ordonner (ticket-074).
@@ -70,6 +57,16 @@ export default function App() {
   // regarde — pour les composants qui n'en attendaient qu'un.
   const supervision = useSupervision();
   const stream = useRunActif(supervision, project?.id ?? null);
+
+  const runEnCours =
+    stream.status === "running" || stream.status === "connecting";
+  const vueCentre = vueDuCentre({
+    runEnCours,
+    runAuPremierPlan,
+    openFilePath,
+    showDiff,
+    showKanban,
+  });
   const { projects: projets } = useProjects();
   const services = useServices(project?.id ?? null, supervision.signalServices);
 
@@ -163,7 +160,12 @@ export default function App() {
     );
   }
 
+  // Lancer un run ramène sa vue devant : c'est le seul moment où l'IDE décide
+  // à la place de l'utilisateur, et il vient précisément de le demander. Le
+  // décider ici plutôt qu'en observant `status` évite un `setState` dans un
+  // effet, et dit mieux ce qui se passe (ticket-178).
   function handleRunPipeline(ticketId: string) {
+    setRunAuPremierPlan(true);
     stream.connect(ticketId);
   }
 
@@ -273,8 +275,14 @@ export default function App() {
                   : [...prec, ticketId],
               )
             }
-            onRunQueue={() => stream.connectQueue(selection)}
-            onRunAutonome={(options) => stream.connectAutonome(options)}
+            onRunQueue={() => {
+              setRunAuPremierPlan(true);
+              stream.connectQueue(selection);
+            }}
+            onRunAutonome={(options) => {
+              setRunAuPremierPlan(true);
+              stream.connectAutonome(options);
+            }}
             onClearQueue={() => setSelection([])}
             openFilePath={openFilePath}
             onOpenFile={(path) => {
