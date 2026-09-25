@@ -2,8 +2,8 @@
 id: ticket-185
 title: "Le texte d'un run survit à un rechargement de page"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 48
 priority: medium
 agent: codeur
 depends_on: ["ticket-183"]
