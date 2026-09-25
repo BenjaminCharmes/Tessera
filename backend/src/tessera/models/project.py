@@ -16,6 +16,12 @@ class Project(BaseModel):
     stack: str | None = None
     raw_claude_md: str = ""
     github_remote: str | None = None
+    #: Le rangement déclaré dans `agents.json`. Une catégorie se déclare, elle
+    #: ne se devine pas : ni le nom du dossier ni l'URL du dépôt ne disent à
+    #: quoi sert un projet — c'est le raisonnement d'ADR-042 pour les commandes
+    #: de lancement. Sans déclaration, le projet reste visible, rangé à part
+    #: (ticket-175).
+    category: str | None = None
     #: Ce projet exécute l'IDE en ce moment — le bootstrap d'ADR-001. Lui
     #: proposer « Lancer » démarrerait un second backend sur un port pris, et
     #: le cas utile n'existe pas : il faut que l'IDE tourne pour qu'on voie le

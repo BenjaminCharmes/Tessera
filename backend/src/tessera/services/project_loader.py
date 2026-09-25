@@ -30,6 +30,7 @@ def load_project(project_path: Path) -> Project:
         stack=_parse_stack(raw),
         raw_claude_md=raw,
         github_remote=_load_github_remote(project_path),
+        category=_load_category(project_path),
         fait_tourner_l_ide=fait_tourner_l_ide(project_path),
     )
 
@@ -43,6 +44,25 @@ def list_projects(workspace: Path) -> list[Project]:
         for p in sorted(workspace.iterdir())
         if p.is_dir() and not p.name.startswith(".")
     ]
+
+
+def _load_category(project_path: Path) -> str | None:
+    """La catégorie déclarée, `None` si absente, illisible, mal typée ou vide.
+
+    Une catégorie vide vaudrait un groupe sans nom à l'écran ; mieux vaut
+    ranger le projet avec ceux qui ne déclarent rien.
+    """
+    agents_json = project_path / "agents.json"
+    if not agents_json.exists():
+        return None
+    try:
+        data = json.loads(agents_json.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    valeur = data.get("category")
+    if not isinstance(valeur, str) or not valeur.strip():
+        return None
+    return valeur.strip()
 
 
 def _load_github_remote(project_path: Path) -> str | None:

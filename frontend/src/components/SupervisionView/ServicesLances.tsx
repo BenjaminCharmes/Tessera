@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { adressesDansLaSortie } from "./adresse";
+import AdresseDuService from "./AdresseDuService";
 import { classeDeLEtat, etatDuService } from "../../design/etatDuService";
 import type { ServiceActif } from "../../types/api";
 
@@ -84,20 +85,8 @@ export default function ServicesLances({
                 {echoue ? ` · code ${service.code_de_sortie}` : ""}
               </button>
 
-              {adresses.map(({ url, etiquette }) => (
-                <a
-                  key={url}
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer"
-                  title={etiquette ? `${etiquette} · ${url}` : url}
-                  className="inline-flex items-center gap-1.5 rounded-sm border border-zinc-700 px-1.5 py-0.5 text-micro text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200"
-                >
-                  {etiquette ? (
-                    <span className="text-zinc-500">{etiquette}</span>
-                  ) : null}
-                  <span>{url}</span>
-                </a>
+              {adresses.map((adresse) => (
+                <AdresseDuService key={adresse.url} {...adresse} />
               ))}
             </div>
 
