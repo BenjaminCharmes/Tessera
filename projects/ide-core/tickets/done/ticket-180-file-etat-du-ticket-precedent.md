@@ -2,8 +2,8 @@
 id: ticket-180
 title: "Le reviewer du ticket précédent reste affiché sous le codeur du suivant"
 type: fix
-status: in-review
-pr_number: null
+status: done
+pr_number: 35
 priority: high
 agent: codeur
 depends_on: []
