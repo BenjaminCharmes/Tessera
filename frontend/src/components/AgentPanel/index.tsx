@@ -6,6 +6,7 @@ import QuotaBadge from "./QuotaBadge";
 import AgentDialogue from "./AgentDialogue";
 import TicketActivity from "./TicketActivity";
 import AgentBlock from "./AgentBlock";
+import { blocsDuPanneau } from "./blocsDuPanneau";
 import PipelineSummary from "./PipelineSummary";
 import type { Project, Ticket } from "../../types/api";
 import type { UseRunActifResult } from "../../hooks/streamState";
@@ -39,14 +40,12 @@ export default function AgentPanel({
     clear,
   } = stream;
 
-  const coderStarted = events.some(
-    (e) => e.type === "agent_started" && e.agent === "codeur",
-  );
-  const reviewerStarted = events.some(
-    (e) => e.type === "agent_started" && e.agent === "reviewer",
-  );
-  const coderDone = events.some(
-    (e) => e.type === "agent_done" && e.agent === "codeur",
+  // L'état décide, les événements enrichissent : un observateur arrivé après
+  // le début n'a aucun événement, et le panneau restait vide pendant qu'un run
+  // travaillait (ticket-182).
+  const { coderStarted, coderDone, reviewerStarted } = blocsDuPanneau(
+    events,
+    currentAgent,
   );
 
   const reviewerContent =
