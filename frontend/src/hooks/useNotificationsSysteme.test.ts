@@ -79,3 +79,40 @@ describe("useNotificationsSysteme", () => {
     expect(creees).toHaveLength(0);
   });
 });
+
+vi.mock("@tauri-apps/api/core", () => ({ isTauri: vi.fn(() => false) }));
+vi.mock("@tauri-apps/plugin-notification", () => ({
+  isPermissionGranted: vi.fn(async () => true),
+  requestPermission: vi.fn(async () => "granted"),
+  sendNotification: vi.fn(),
+}));
+
+import { isTauri } from "@tauri-apps/api/core";
+import { sendNotification } from "@tauri-apps/plugin-notification";
+
+describe("useNotificationsSysteme — dans l'app desktop (ticket-200)", () => {
+  beforeEach(() => {
+    creees.length = 0;
+    window.localStorage.clear();
+    vi.stubGlobal("Notification", FausseNotification);
+    Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
+    vi.mocked(isTauri).mockReturnValue(true);
+    vi.mocked(sendNotification).mockClear();
+  });
+  afterEach(() => {
+    vi.mocked(isTauri).mockReturnValue(false);
+    vi.unstubAllGlobals();
+  });
+
+  it("passe par le plugin et pas par window.Notification", async () => {
+    const { rerender } = renderHook(
+      ({ etat }: { etat: StreamState }) => useNotificationsSysteme(supervision(etat), "ide-core", vi.fn()),
+      { initialProps: { etat: { ...INITIAL, status: "running" } } },
+    );
+    rerender({ etat: { ...INITIAL, status: "running", pendingQuestion: "On casse l'API ?" } });
+
+    await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(sendNotification).mock.calls[0][0]).toMatchObject({ body: "On casse l'API ?" });
+    expect(creees).toHaveLength(0);
+  });
+});
