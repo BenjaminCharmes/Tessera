@@ -228,6 +228,13 @@ class Orchestrator:
     async def _run_rounds(self, run: PipelineRun, ticket_id: str) -> PipelineResult:
         """Enchaîne les tours de revue jusqu'à approbation, blocage ou épuisement."""
         for round_num in range(1, self._max_review_rounds + 1):
+            # Le plafond du run se vérifiait entre deux tickets seulement : un
+            # ticket seul pouvait le dépasser de plus du double sur trois tours
+            # (ticket-191). Un tour 1 démarre toujours — refuser un ticket est
+            # le rôle de la vérification entre tickets, pas de celle-ci.
+            if round_num > 1 and self.budget_exhausted():
+                return await outcomes.finish_budget_exhausted(self, run)
+
             run.start_round(round_num)
             context = stages.build_context(self, run)
 
