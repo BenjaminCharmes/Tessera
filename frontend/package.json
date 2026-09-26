@@ -20,6 +20,7 @@
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-notification": "^2.4.0",
     "dompurify": "^3.4.16",
     "marked": "^18.0.14",
     "monaco-editor": "^0.56.0",

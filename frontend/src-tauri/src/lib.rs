@@ -51,6 +51,9 @@ pub fn run() {
     });
 
     let app = tauri::Builder::default()
+        // System notifications when a run needs someone (ticket-200). Its only
+        // capability is `notification:default`; nothing reaches the disk.
+        .plugin(tauri_plugin_notification::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(

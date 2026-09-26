@@ -20,3 +20,6 @@ serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
 tauri = { version = "2.11.3" }
 tauri-plugin-log = "2"
+# Les notifications systeme de l'app desktop (ticket-200). La seule
+# permission ouverte est `notification:default` : ADR-040 tient.
+tauri-plugin-notification = "2"

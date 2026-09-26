@@ -1,41 +1,75 @@
 import { useEffect, useRef } from "react";
-import { notificationsPour, type Instantane } from "../lib/notifications";
+import { isTauri } from "@tauri-apps/api/core";
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from "@tauri-apps/plugin-notification";
+import { notificationsPour, type Instantane, type Notif } from "../lib/notifications";
 import { useEtatPersistant } from "./useEtatPersistant";
 import type { UseSupervisionResult } from "./useSupervision";
 
 /**
  * Une notification système quand un run a besoin de vous, ou finit — ticket-192.
  *
- * Par l'API `Notification` du web : elle sert dans le navigateur, et dans la
- * WebView quand elle la porte. La permission se demande au premier run
- * lancé (`demanderPermissionNotifications`), jamais au chargement.
+ * Dans l'app desktop, par le plugin Tauri (ticket-200) ; ailleurs, par l'API
+ * `Notification` du web. La permission se demande au premier run lancé
+ * (`demanderPermissionNotifications`), jamais au chargement.
  *
  * Le réglage est mémorisé par onglet (ticket-193). Une permission refusée
  * par le navigateur ne se redemande plus : `etat` le dit pour que l'écran
- * distingue « coupé » de « bloqué ».
+ * distingue « coupé » de « bloqué ». Le plugin, lui, n'a pas de clic : la
+ * fenêtre ne se ramène pas au premier plan depuis une notification desktop.
  */
 export type EtatDesNotifications = "actives" | "coupees" | "bloquees" | "indisponibles";
 
 export const CLE_REGLAGE = "notifications";
 
+function dansTauri(): boolean {
+  try {
+    return isTauri();
+  } catch {
+    return false;
+  }
+}
+
 export function supportees(): boolean {
-  return typeof window !== "undefined" && "Notification" in window;
+  return dansTauri() || (typeof window !== "undefined" && "Notification" in window);
 }
 
 export async function demanderPermissionNotifications(): Promise<void> {
-  if (!supportees() || Notification.permission !== "default") return;
   try {
+    if (dansTauri()) {
+      if (!(await isPermissionGranted())) await requestPermission();
+      return;
+    }
+    if (!supportees() || Notification.permission !== "default") return;
     await Notification.requestPermission();
   } catch {
-    // Un navigateur qui refuse la demande n'empêche pas de lancer le run.
+    // Un système qui refuse la demande n'empêche pas de lancer le run.
   }
 }
 
 export function etatDesNotifications(active: boolean): EtatDesNotifications {
   if (!supportees()) return "indisponibles";
   if (!active) return "coupees";
-  if (Notification.permission === "denied") return "bloquees";
+  if (!dansTauri() && Notification.permission === "denied") return "bloquees";
   return "actives";
+}
+
+async function envoyer(n: Notif, ouvrir: (projectId: string) => void): Promise<void> {
+  if (dansTauri()) {
+    if (!(await isPermissionGranted())) return;
+    sendNotification({ title: n.titre, body: n.corps });
+    return;
+  }
+  if (Notification.permission !== "granted") return;
+  const notif = new Notification(n.titre, { body: n.corps, tag: n.titre });
+  notif.onclick = () => {
+    window.focus();
+    ouvrir(n.projectId);
+    notif.close();
+  };
 }
 
 export function useNotificationsSysteme(
@@ -58,19 +92,11 @@ export function useNotificationsSysteme(
     const avant = precedent.current;
     precedent.current = courant;
 
-    if (!active || !supportees() || Notification.permission !== "granted") return;
+    if (!active || !supportees()) return;
     const vue = { projetActif, visible: document.visibilityState === "visible" };
     for (const n of notificationsPour(avant, courant, vue)) {
-      try {
-        const notif = new Notification(n.titre, { body: n.corps, tag: n.titre });
-        notif.onclick = () => {
-          window.focus();
-          ouvrir(n.projectId);
-          notif.close();
-        };
-      } catch {
-        // Une notification qui ne part pas ne casse rien.
-      }
+      // Une notification qui ne part pas ne casse rien.
+      void envoyer(n, ouvrir).catch(() => undefined);
     }
   }, [runs, etatDe, active, projetActif, ouvrir]);
 
