@@ -20,6 +20,10 @@ class ProviderResult:
     # Laissé à None par ceux dont le coût se calcule à partir des tokens.
     cost_usd: float | None = None
     provider_name: str = ""
+    # L'identifiant de la conversation, pour la reprendre au tour suivant
+    # (ticket-187). Seul le SDK en rend un ; un provider muet laisse None, et
+    # le tour suivant repart alors à froid, comme avant.
+    session_id: str | None = None
 
 
 @runtime_checkable
@@ -37,12 +41,19 @@ class LLMProvider(Protocol):
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> ProviderResult:
         """Runs a single call and returns the full response.
 
         ``ask_user`` is only honoured by providers that can expose tools. It is
         passed only when a dialogue channel is attached to the run, so a
         provider that ignores it simply never lets an agent ask (ticket-066).
+
+        ``session`` resumes a previous conversation of this provider, identified
+        by the ``session_id`` of an earlier result (ticket-187). Like
+        ``ask_user`` it is only passed when there is one, so providers and test
+        doubles that cannot resume never see it. A provider that cannot resume
+        a given session falls back to a fresh call rather than failing.
 
         ``max_tokens`` is best-effort: it is honoured only by providers whose
         backend exposes an actual output-length cap. ``AnthropicApiProvider``
@@ -65,6 +76,7 @@ class LLMProvider(Protocol):
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> ProviderResult:
         """Runs a single call, forwarding incremental output to the callbacks.
 

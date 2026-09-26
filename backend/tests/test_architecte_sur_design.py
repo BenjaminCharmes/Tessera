@@ -65,6 +65,7 @@ async def _lance(
             duration_ms = 0
             model = "m"
             suggested_status = None
+            session_id = None
 
         return _R()
 

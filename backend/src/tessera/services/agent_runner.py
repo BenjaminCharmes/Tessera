@@ -79,11 +79,18 @@ class AgentRunner:
         tool_callback: ToolEventCallback | None = None,
         run_id: str | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
         system_prompt = self._load_system_prompt(role_str, agent_config)
-        user_prompt = self._build_user_prompt(ticket, role_str, project_context)
+        # En reprise de session, `project_context` ne porte que ce que le
+        # tour ajoute — le reste est déjà dans la conversation (ticket-187).
+        user_prompt = (
+            self._build_user_prompt(ticket, role_str, project_context)
+            if session is None
+            else self._build_reprise_prompt(project_context)
+        )
 
         model = agent_config.model if agent_config else _DEFAULT_MODEL
         max_tokens = agent_config.max_tokens if agent_config else _DEFAULT_MAX_TOKENS
@@ -96,6 +103,8 @@ class AgentRunner:
         # concerne pas, et le lui passer à vide casserait chaque double
         # (ticket-066).
         extra: dict[str, Any] = {"ask_user": ask_user} if ask_user is not None else {}
+        if session is not None:
+            extra["session"] = session
 
         provider = self._provider_pour(role_str)
         provider_result: ProviderResult
@@ -171,6 +180,7 @@ class AgentRunner:
             suggested_status=_parse_suggested_status(content),
             duration_ms=duration_ms,
             cost_usd=cost_usd,
+            session_id=provider_result.session_id,
         )
 
     def _provider_pour(self, role: str) -> LLMProvider:
@@ -224,6 +234,21 @@ class AgentRunner:
             f"## Contexte projet\n{adr_pertinents(project_context, role)}\n\n"
             f"## Ticket assigné\n{ticket.body}\n\n"
             f"## Ta mission\n{instruction}"
+        )
+
+    def _build_reprise_prompt(self, complements: str) -> str:
+        """The prompt of a resumed round: only what this round adds (ticket-187).
+
+        The ticket, the project's decisions and the files the agent read are
+        already in the resumed conversation. Repeating them would pay twice
+        for what resuming exists to pay once.
+        """
+        return (
+            f"## Retours à traiter\n{complements or '_Aucun retour._'}\n\n"
+            "## Ta mission\n"
+            "Reprends ton travail du tour précédent, sur cette même branche, "
+            "et corrige-le selon ces retours. Ne recommence pas depuis zéro : "
+            "ce que tu as déjà lu et écrit est toujours là."
         )
 
 
