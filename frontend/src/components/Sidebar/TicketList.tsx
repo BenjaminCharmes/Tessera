@@ -16,6 +16,8 @@ import CreateTicketModal from "./CreateTicketModal";
 import PlanEvolutionModal from "./PlanEvolutionModal";
 import SkeletonList from "../SkeletonList";
 import type { Project, Ticket, TicketStatus } from "../../types/api";
+import BarreDeFiltres from "./BarreDeFiltres";
+import type { FiltresTickets } from "../../lib/filtresTickets";
 
 interface StatusGroup {
   status: TicketStatus;
@@ -59,6 +61,12 @@ interface TicketListProps {
   onBatchCreated?: (tickets: Ticket[]) => void;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
+  /** Filtres partagés avec le Kanban (ticket-195) ; absents, pas de barre. */
+  filtres?: FiltresTickets;
+  onChangeFiltres?: (f: FiltresTickets) => void;
+  /** Ce que les filtres cachent : `byStatus` est déjà filtré. */
+  totalTickets?: number;
+  agents?: string[];
 }
 
 export default function TicketList({
@@ -87,7 +95,12 @@ export default function TicketList({
   onBatchCreated,
   onPrCreated,
   onChangeStatus,
+  filtres,
+  onChangeFiltres,
+  totalTickets,
+  agents = [],
 }: TicketListProps) {
+  const retenus = Object.values(byStatus).reduce((n, l) => n + l.length, 0);
   const [collapsed, setCollapsed] = useState<Set<TicketStatus>>(
     new Set(["done", "cancelled"]),
   );
@@ -162,6 +175,16 @@ export default function TicketList({
             </button>
           </div>
         </div>
+
+        {filtres && onChangeFiltres && (
+          <BarreDeFiltres
+            filtres={filtres}
+            onChange={onChangeFiltres}
+            retenus={retenus}
+            total={totalTickets ?? retenus}
+            agents={agents}
+          />
+        )}
 
         <QueueBar
           selection={selection}
