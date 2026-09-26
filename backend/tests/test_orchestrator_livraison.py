@@ -128,9 +128,10 @@ async def _rien(event: OrchestratorEvent) -> None:
 # ------------------------------------------------------------------
 
 
-async def test_la_doc_se_met_a_jour_une_fois_apres_la_file(tmp_path: Path) -> None:
-    # Le cœur du ticket : dix tickets ne déclenchent pas dix mises à jour.
-    # La documentation décrit le produit, pas un changement.
+async def test_la_doc_se_met_a_jour_apres_chaque_ticket_approuve_de_la_file(tmp_path: Path) -> None:
+    # Depuis ticket-198 : la documentation part sur la branche de chaque run
+    # approuvé, pour sa PR. En fin de file, elle restait sur le disque sans
+    # commit, et le run suivant refusait l'arbre sale.
     appels: list[int] = []
 
     async def _documenter() -> None:
@@ -145,13 +146,12 @@ async def test_la_doc_se_met_a_jour_une_fois_apres_la_file(tmp_path: Path) -> No
 
     await orch.run_queue("p", ["ticket-001", "ticket-002", "ticket-003"])
 
-    assert appels == [1]
+    assert appels == [1, 1, 1]
 
 
-async def test_un_run_unique_ne_declenche_pas_la_doc(tmp_path: Path) -> None:
-    # Un ticket lancé seul, c'est un aller-retour rapide pendant qu'on
-    # travaille : y ajouter un appel de documentation le ralentit sans que
-    # personne l'ait demandé.
+async def test_un_run_unique_approuve_declenche_la_doc(tmp_path: Path) -> None:
+    # Le mode le plus utilisé depuis l'IDE ne documentait jamais : les tickets
+    # s'accumulaient derrière le marqueur jusqu'à la fin d'une file (ticket-198).
     appels: list[int] = []
 
     async def _documenter() -> None:
@@ -162,7 +162,7 @@ async def test_un_run_unique_ne_declenche_pas_la_doc(tmp_path: Path) -> None:
 
     await orch.run_pipeline("p", "ticket-001", _rien)
 
-    assert appels == []
+    assert appels == [1]
 
 
 async def test_une_doc_qui_echoue_ne_casse_pas_la_file(tmp_path: Path) -> None:

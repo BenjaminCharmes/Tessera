@@ -71,3 +71,11 @@ def test_make_runner_donne_au_reviewer_des_outils_en_lecture_seule() -> None:
     # Depuis ticket-188 chaque rôle a son provider : le codeur n'est plus
     # l'instance commune, mais il garde le jeu d'outils complet.
     assert runner._provider_pour("codeur")._allowed_tools == ClaudeAgentSDKProvider.ALLOWED_TOOLS
+
+
+def test_le_reviewer_relit_en_dix_tours_le_codeur_garde_les_siens() -> None:
+    # Le diff est dans son prompt : trente tours pour le relire, c'est un
+    # budget de codeur donné à un lecteur (ticket-199).
+    runner = _make_runner("mon-projet")
+    assert runner._provider_pour("reviewer")._max_turns == settings.llm_max_turns_reviewer
+    assert runner._provider_pour("codeur")._max_turns == settings.llm_max_turns
