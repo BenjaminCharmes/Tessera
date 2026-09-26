@@ -2,8 +2,8 @@
 id: ticket-200
 title: "Les notifications passent par le plugin Tauri dans l'app desktop"
 type: chore
-status: in-progress
-pr_number: null
+status: done
+pr_number: 72
 priority: medium
 agent: codeur
 depends_on: ["ticket-192"]
