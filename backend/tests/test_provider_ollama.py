@@ -233,10 +233,9 @@ async def test_ollama_injoignable_l_audit_passe_par_le_repli_et_le_dit(
 def test_les_manifestes_du_depot_declarent_les_roles_locaux() -> None:
     racine = Path(__file__).resolve().parents[2] / "projects"
     attendus = {"securite", "validateur", "doc-technique", "doc-fonctionnelle", "project-analyzer"}
-    # `demineur` est un dépôt à part, absent d'un clone neuf de Tessera.
-    for nom in ("ide-core", "demineur"):
-        if nom != "ide-core" and not (racine / nom / "agents.json").is_file():
-            continue
+    # Seul `ide-core` est versionné ici ; `demineur` est un dépôt à part, et
+    # son manifeste se met à jour dans ce dépôt-là.
+    for nom in ("ide-core",):
         configs = {c.role: c for c in load_agents_config(racine / nom)}
         assert attendus <= set(configs), nom
         for role in attendus:
