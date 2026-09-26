@@ -11,6 +11,8 @@ import { useSupervision } from "./hooks/useSupervision";
 import { useRunActif } from "./hooks/useRunActif";
 import { parmi, useEtatPersistant } from "./hooks/useEtatPersistant";
 import { useProjetMemorise } from "./hooks/useProjetMemorise";
+import { useFiltresTickets } from "./hooks/useFiltresTickets";
+import { filtrerParStatut } from "./lib/filtresTickets";
 import { PANNEAUX } from "./components/Sidebar/panels";
 import { BAND } from "./design/layout";
 import Sidebar from "./components/Sidebar";
@@ -115,6 +117,10 @@ export default function App() {
     stream.events,
   );
   const runs = useRuns(project?.id ?? null);
+  // Une seule source de filtres pour la liste et le Kanban (ticket-195).
+  const { filtres, setFiltres } = useFiltresTickets(project?.id ?? null);
+  const filtrage = filtrerParStatut(tickets.tickets, filtres);
+  const agentsDesTickets = Array.from(new Set(tickets.tickets.map((t) => t.agent))).sort();
   const usageData = useUsage(project?.id ?? null);
 
   // Refresh run history and show toast when a pipeline completes
@@ -260,7 +266,11 @@ export default function App() {
             sortieDeService={supervision.sortieDuService}
             activeProject={project}
             activeTicket={ticket}
-            byStatus={tickets.byStatus}
+            byStatus={filtrage.byStatus}
+            filtres={filtres}
+            onChangeFiltres={setFiltres}
+            totalTickets={filtrage.total}
+            agentsDesTickets={agentsDesTickets}
             ticketsLoading={tickets.loading}
             ticketsError={tickets.error}
             runs={runs.runs}
@@ -373,7 +383,7 @@ export default function App() {
             <DiffView projectId={project.id} ticketId={ticket.id} />
           ) : vueCentre === "kanban" ? (
             <KanbanView
-              byStatus={tickets.byStatus}
+              byStatus={filtrage.byStatus}
               activeTicket={ticket}
               running={running}
               githubRemote={project?.github_remote ?? null}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ProjectHeader from "./ProjectHeader";
 import type { UseServicesResult } from "../../hooks/useServices";
+import type { FiltresTickets } from "../../lib/filtresTickets";
 import FileTree from "../FileTree";
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
@@ -63,6 +64,10 @@ interface SidebarProps {
   onBatchCreated?: (tickets: Ticket[]) => void;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
+  filtres?: FiltresTickets;
+  onChangeFiltres?: (f: FiltresTickets) => void;
+  totalTickets?: number;
+  agentsDesTickets?: string[];
   onSelectTicketById?: (ticketId: string) => void;
   onAgentCreated?: (role: string) => void;
   agentSelectionne?: string | null;
@@ -110,6 +115,10 @@ export default function Sidebar({
   onBatchCreated,
   onPrCreated,
   onChangeStatus,
+  filtres,
+  onChangeFiltres,
+  totalTickets,
+  agentsDesTickets,
   onSelectTicketById,
   onAgentCreated,
   agentSelectionne,
@@ -178,6 +187,10 @@ export default function Sidebar({
             onBatchCreated={onBatchCreated}
             onPrCreated={onPrCreated}
             onChangeStatus={onChangeStatus}
+            filtres={filtres}
+            onChangeFiltres={onChangeFiltres}
+            totalTickets={totalTickets}
+            agents={agentsDesTickets}
           />
         )}
         {panel === "files" &&
