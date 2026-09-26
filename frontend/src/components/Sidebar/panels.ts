@@ -5,14 +5,17 @@
  * la sidebar complète — et donc sans tirer tout l'arbre des panneaux dans le
  * test de la barre.
  */
-export type SidebarPanel =
-  | "projects"
-  | "tickets"
-  | "files"
-  | "history"
-  | "agents"
-  | "usage"
-  | "supervision";
+export const PANNEAUX = [
+  "projects",
+  "tickets",
+  "files",
+  "history",
+  "agents",
+  "usage",
+  "supervision",
+] as const;
+
+export type SidebarPanel = (typeof PANNEAUX)[number];
 
 /**
  * Ce qui, dans la supervision, merite d'etre vu avant le reste — ticket-129.
