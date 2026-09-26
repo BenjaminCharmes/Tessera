@@ -161,6 +161,9 @@ export interface RunActif {
   tokens_entree: number;
   tokens_sortie: number;
   cout_usd: number;
+  /** Appels d'agent finis, et appels d'outils de l'agent en cours (ticket-197). */
+  appels?: number;
+  outils?: number;
   verdict: string | null;
   /** La question qu'un agent attend de voir répondue (ticket-163). */
   question?: string | null;
@@ -458,6 +461,12 @@ export interface VentilationDesCouts {
 }
 
 /** Un agent tel que ce projet le configure (ticket-080). */
+/** Les plafonds de dépense du backend (ticket-197). 0 = aucune borne. */
+export interface Limites {
+  run_max_budget_usd: number;
+  llm_max_budget_usd: number;
+}
+
 /** Sur quoi retomber quand le provider d'un rôle ne répond pas (ticket-188). */
 export interface FallbackConfig {
   provider: string;

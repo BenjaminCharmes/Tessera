@@ -45,6 +45,12 @@ class RunActif:
     tokens_entree: int = 0
     tokens_sortie: int = 0
     cout_usd: float = 0.0
+    #: Ce que le run a déjà coûté se lit pendant qu'il tourne (ticket-197) :
+    #: le nombre d'appels d'agent finis, et les appels d'outils de l'agent en
+    #: cours — remis à zéro à chaque `agent_started`. C'est le compteur qui
+    #: bouge en temps réel, et celui qui dit qu'un agent tourne en rond.
+    appels: int = 0
+    outils: int = 0
     verdict: str | None = None
     #: La question qu'un agent attend de voir répondue, s'il y en a une.
     #: Elle vit ici et pas seulement dans le flux d'événements : un
@@ -88,6 +94,8 @@ class RunActif:
             "tokens_entree": self.tokens_entree,
             "tokens_sortie": self.tokens_sortie,
             "cout_usd": self.cout_usd,
+            "appels": self.appels,
+            "outils": self.outils,
             "verdict": self.verdict,
             "question": self.question,
             "question_expire_a": self.question_expire_a,

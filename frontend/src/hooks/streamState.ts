@@ -44,6 +44,10 @@ export interface StreamState {
    * d'abord le pipeline » après un run approuvé (ticket-123).
    */
   branch: string | null;
+  /** Ce que le run a coûté jusqu'ici, et ce que l'agent en cours a consommé (ticket-197). */
+  coutUsd: number;
+  appels: number;
+  outils: number;
   /** Nombre de tours du run, quand le backend le dit ; null sinon. */
   maxRounds: number | null;
 }
@@ -83,6 +87,9 @@ export const INITIAL: StreamState = {
   queue: null,
   branch: null,
   maxRounds: null,
+  coutUsd: 0,
+  appels: 0,
+  outils: 0,
 };
 
 /**
@@ -102,6 +109,10 @@ export function etatDepuisRun(run: RunActif): StreamState {
     currentRound: run.tour || INITIAL.currentRound,
     pendingQuestion: run.question ?? null,
     questionExpireA: run.question_expire_a ?? null,
+    // Un F5 retrouve le cumul depuis l'instantané (ticket-197).
+    coutUsd: run.cout_usd,
+    appels: run.appels ?? 0,
+    outils: run.outils ?? 0,
   };
 }
 
@@ -123,6 +134,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
             ? ev.data["max_rounds"]
             : s.maxRounds,
         currentTokens: "",
+        outils: 0,
       };
     case "branch_created":
       return {
@@ -139,6 +151,10 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         ...s,
         events,
         currentAgent: s.currentAgent === ev.agent ? null : s.currentAgent,
+        coutUsd:
+          s.coutUsd +
+          (typeof ev.data["cost_usd"] === "number" ? ev.data["cost_usd"] : 0),
+        appels: s.appels + 1,
       };
     case "agent_token":
     case "agent_tool_use":
@@ -151,6 +167,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         // (ticket-186).
         pendingQuestion: null,
         questionExpireA: null,
+        outils: ev.type === "agent_tool_use" ? s.outils + 1 : s.outils,
         currentTokens:
           ev.agent === "codeur"
             ? s.currentTokens +
