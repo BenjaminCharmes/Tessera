@@ -32,6 +32,10 @@ class EventType(str, Enum):
     DOC_UPDATED = "doc_updated"
     COMMIT_CREATED = "commit_created"
     QUOTA_UPDATED = "quota_updated"
+    #: Un provider n'a pas répondu et son repli a servi (ticket-188). Sans
+    #: cet événement, rien à l'écran ne distingue un audit sur le modèle
+    #: prévu d'un audit sur son remplaçant.
+    PROVIDER_FALLBACK = "provider_fallback"
     QUEUE_PROGRESS = "queue_progress"
     #: Ce que la livraison a fait du commit du run (ticket-083).
     LIVRAISON_DONE = "livraison_done"

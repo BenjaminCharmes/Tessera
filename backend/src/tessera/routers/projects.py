@@ -53,14 +53,17 @@ from tessera.services.git_link import (
 )
 from tessera.services.cost_calculator import modeles_connus
 from tessera.services.politique_run import PolitiqueRun
+from tessera.models.agent import FallbackConfig
 from tessera.services.project_loader import (
     AgentAbsentDuProjet,
     ModeleInconnu,
     ProjectLoader,
     load_agents_config,
     set_agent_model,
+    set_agent_provider,
 )
-from tessera.services.providers import get_provider
+from tessera.services.providers.noms import PROVIDERS_ANTHROPIC, PROVIDERS_CONNUS, ProviderInconnu
+from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -94,11 +97,7 @@ async def create_project(body: ProjectCreate) -> ProjectCreationResult:
     # Pure text-in/JSON-out: ProjectCreatorService writes files itself via
     # ProjectLoader, never through an SDK tool, and no cwd is threaded to it
     # here (ticket-044 merge-gate review, finding 2).
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=False,
-    )
+    provider = provider_pour_role(None, "project-creator", allow_tools=False)
     svc = ProjectCreatorService(provider, settings.ide_prompts_dir, settings.ide_workspace_dir)
     agents_created = await svc._auto_create_missing_agents(
         roles=body.active_agents,
@@ -160,11 +159,7 @@ async def import_project(body: ProjectImport) -> ProjectImportResponse:
 @router.post("/clone", response_model=CloneProjectResponse, status_code=201)
 async def clone_project(body: CloneProjectRequest) -> CloneProjectResponse:
     # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=False,
-    )
+    provider = provider_pour_role(None, "project-analyzer", allow_tools=False)
     analyzer = ProjectAnalyzerService(provider, settings.ide_prompts_dir)
     svc = GitCloneService(settings.ide_workspace_dir, analyzer)
     try:
@@ -224,12 +219,13 @@ async def plan_project(project_id: str, body: PlanRequest) -> PlanResult:
     if not project_path.is_dir():
         raise HTTPException(status_code=404, detail=f"Projet '{project_id}' introuvable.")
     # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=False,
+    provider = provider_pour_role(
+        project_path, "planificateur", allow_tools=False, project_id=project_id
     )
-    svc = PlannerService(provider, settings.ide_prompts_dir, settings.ide_workspace_dir)
+    svc = PlannerService(
+        provider, settings.ide_prompts_dir, settings.ide_workspace_dir,
+        model=modele_du_role(project_path, "planificateur"),
+    )
     try:
         return await svc.plan(project_id, body.description)
     except ValueError as exc:
@@ -242,12 +238,13 @@ async def analyze_project(project_id: str, body: AnalyzeProjectRequest) -> Analy
     if not project_path.is_dir():
         raise HTTPException(status_code=404, detail=f"Projet '{project_id}' introuvable.")
     # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=False,
+    provider = provider_pour_role(
+        project_path, "project-analyzer", allow_tools=False, project_id=project_id
     )
-    svc = ProjectAnalyzerService(provider, settings.ide_prompts_dir)
+    svc = ProjectAnalyzerService(
+        provider, settings.ide_prompts_dir,
+        model=modele_du_role(project_path, "project-analyzer"),
+    )
     try:
         return await svc.analyze(project_path, overwrite=body.overwrite)
     except ValueError as exc:
@@ -463,30 +460,52 @@ class ProjectAgentConfig(BaseModel):
     model: str
     max_tokens: int
     active: bool = True
+    provider: str = "agent_sdk"
+    fallback: FallbackConfig | None = None
 
 
 class ProjectAgentsResponse(BaseModel):
     agents: list[ProjectAgentConfig]
-    #: Les seuls modèles proposables : ceux dont l'app sait calculer le coût.
+    #: Les seuls modèles proposables sur un provider Anthropic : ceux dont
+    #: l'app sait calculer le coût.
     known_models: list[str]
+    #: Les providers qu'un rôle peut déclarer (ticket-188).
+    known_providers: list[str]
+    #: Par provider, la liste proposable — vide quand le nom est libre.
+    known_models_by_provider: dict[str, list[str]]
 
 
 class SetModelRequest(BaseModel):
     model: str
+    provider: str | None = None
+    fallback: FallbackConfig | None = None
+
+
+def _modeles_par_provider() -> dict[str, list[str]]:
+    return {
+        nom: modeles_connus() if nom in PROVIDERS_ANTHROPIC else []
+        for nom in PROVIDERS_CONNUS
+    }
 
 
 @router.get("/{project_id}/agents", response_model=ProjectAgentsResponse)
 async def get_project_agents(project_id: str) -> ProjectAgentsResponse:
     """Les agents déclarés par ce projet, et le modèle que chacun utilise."""
-    configs = load_agents_config(settings.ide_workspace_dir / project_id)
+    try:
+        configs = load_agents_config(settings.ide_workspace_dir / project_id)
+    except ProviderInconnu as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     return ProjectAgentsResponse(
         agents=[
             ProjectAgentConfig(
-                role=c.role, model=c.model, max_tokens=c.max_tokens, active=c.active
+                role=c.role, model=c.model, max_tokens=c.max_tokens, active=c.active,
+                provider=c.provider, fallback=c.fallback,
             )
             for c in configs
         ],
         known_models=modeles_connus(),
+        known_providers=list(PROVIDERS_CONNUS),
+        known_models_by_provider=_modeles_par_provider(),
     )
 
 
@@ -494,10 +513,25 @@ async def get_project_agents(project_id: str) -> ProjectAgentsResponse:
 async def set_project_agent_model(
     project_id: str, role: str, body: SetModelRequest
 ) -> ProjectAgentsResponse:
-    """Change le modèle d'un agent pour **ce projet** (ticket-080)."""
+    """Change le modèle d'un agent pour **ce projet** (ticket-080), et depuis
+    ticket-188 son provider et son repli. `fallback` omis : le repli ne bouge
+    pas ; `fallback: null` : il est retiré."""
+    project_path = settings.ide_workspace_dir / project_id
     try:
-        set_agent_model(settings.ide_workspace_dir / project_id, role, body.model)
-    except ModeleInconnu as exc:
+        if body.provider is not None or "fallback" in body.model_fields_set:
+            actuel = next(
+                (c for c in load_agents_config(project_path) if c.role == role), None
+            )
+            if actuel is None:
+                raise AgentAbsentDuProjet(f"L'agent '{role}' n'est pas déclaré ici")
+            repli = (
+                body.fallback.model_dump() if body.fallback is not None else None
+            ) if "fallback" in body.model_fields_set else (
+                actuel.fallback.model_dump() if actuel.fallback is not None else None
+            )
+            set_agent_provider(project_path, role, body.provider or actuel.provider, repli)
+        set_agent_model(project_path, role, body.model)
+    except (ModeleInconnu, ProviderInconnu) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except AgentAbsentDuProjet as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc

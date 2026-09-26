@@ -17,10 +17,19 @@ _DEFAULT_MAX_TOKENS = 4096
 
 
 class PlannerService:
-    def __init__(self, provider: LLMProvider, prompts_dir: Path, workspace_dir: Path) -> None:
+    def __init__(
+        self,
+        provider: LLMProvider,
+        prompts_dir: Path,
+        workspace_dir: Path,
+        model: str | None = None,
+    ) -> None:
         self._provider = provider
         self._prompts_dir = prompts_dir
         self._workspace_dir = workspace_dir
+        # Le modèle vient du manifeste du projet quand il déclare ce rôle
+        # (ticket-188) ; sinon le défaut d'avant, rien ne change.
+        self._model = model or _DEFAULT_MODEL
 
     async def plan(self, project_id: str, description: str) -> PlanResult:
         claude_md = self._load_claude_md(project_id)
@@ -31,7 +40,7 @@ class PlannerService:
         result = await self._provider.complete(
             system=system_prompt,
             user=user_message,
-            model=_DEFAULT_MODEL,
+            model=self._model,
             max_tokens=_DEFAULT_MAX_TOKENS,
         )
 

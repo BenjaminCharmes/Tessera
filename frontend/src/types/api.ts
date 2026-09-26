@@ -36,6 +36,7 @@ export type EventType =
   | "doc_updated"
   | "commit_created"
   | "quota_updated"
+  | "provider_fallback"
   | "queue_progress"
   | "livraison_done"
   | "pipeline_done"
@@ -457,15 +458,34 @@ export interface VentilationDesCouts {
 }
 
 /** Un agent tel que ce projet le configure (ticket-080). */
+/** Sur quoi retomber quand le provider d'un rôle ne répond pas (ticket-188). */
+export interface FallbackConfig {
+  provider: string;
+  model: string;
+}
+
 export interface ProjectAgentConfig {
   role: string;
   model: string;
   max_tokens: number;
   active: boolean;
+  provider: string;
+  fallback: FallbackConfig | null;
 }
 
 export interface ProjectAgents {
   agents: ProjectAgentConfig[];
-  /** Les seuls modèles proposables : ceux dont l'app sait calculer le coût. */
+  /** Les seuls modèles proposables sur un provider Anthropic : ceux dont l'app sait calculer le coût. */
   known_models: string[];
+  /** Les providers qu'un rôle peut déclarer (ticket-188). */
+  known_providers: string[];
+  /** Par provider, la liste proposable — vide quand le nom est libre. */
+  known_models_by_provider: Record<string, string[]>;
+}
+
+/** Ce qu'on change sur un agent d'un projet. `fallback` omis : le repli ne bouge pas ; `null` : retiré. */
+export interface AgentSettingsPatch {
+  model: string;
+  provider?: string;
+  fallback?: FallbackConfig | null;
 }

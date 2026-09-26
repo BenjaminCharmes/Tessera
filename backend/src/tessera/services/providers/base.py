@@ -24,6 +24,9 @@ class ProviderResult:
     # (ticket-187). Seul le SDK en rend un ; un provider muet laisse None, et
     # le tour suivant repart alors à froid, comme avant.
     session_id: str | None = None
+    # Le modèle qui a réellement répondu, quand ce n'est pas celui demandé —
+    # un repli (ticket-188). Vide sinon : l'appelant garde le sien.
+    model: str = ""
 
 
 @runtime_checkable

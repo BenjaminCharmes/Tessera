@@ -18,8 +18,10 @@ from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.politique_run import PolitiqueRun
-from tessera.services.providers import get_provider
+from tessera.services.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.providers.base import LLMProvider
+from tessera.services.providers.noms import ProviderInconnu
+from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.run_executor import executer
 from tessera.services.run_lock import RUN_LOCK
@@ -138,50 +140,55 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # chaque service qui en dépend. Relue au moment d'agir, elle obéirait à ce
     # qu'un codeur aurait écrit dans `agents.json` pendant le run (ticket-119).
     politique = PolitiqueRun.lire(project_path)
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        racine_ecriture=politique.racine_ecriture(project_path),
-    )
-    # Pure text-in/JSON-out services (security_auditor, validator,
-    # documentation) have no use for file/shell tools — they write
-    # files itself via `_write_files`, never through an SDK tool, and no cwd
-    # is threaded to it. Give them all a tool-less provider (ticket-044
-    # review, finding 4).
-    tool_less_provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=False,
-    )
-    registry = AgentRegistryService(settings.ide_prompts_dir)
+    racine_ecriture = politique.racine_ecriture(project_path)
 
-    def _provider_limite(outils: list[str]) -> LLMProvider:
-        # Le reviewer relit : il reçoit le même provider, réduit à la lecture.
-        return get_provider(
-            settings.llm_provider, settings.anthropic_api_key,
-            max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-            tools=outils,
+    # Chaque rôle a son provider, déclaré dans le manifeste avec son repli
+    # (ticket-188). Le reviewer relit : le sien est réduit à la lecture. Les
+    # services texte→JSON n'ont aucun usage des outils fichier (ticket-044
+    # review, finding 4).
+    def _par_role(role: str) -> LLMProvider:
+        outils = OUTILS_DE_RELECTURE if role == "reviewer" else None
+        return provider_pour_role(
+            project_path, role, tools=outils, racine_ecriture=racine_ecriture,
+            project_id=project_id,
         )
+
+    def _sans_outils(role: str) -> LLMProvider:
+        return provider_pour_role(
+            project_path, role, allow_tools=False, project_id=project_id
+        )
+
+    try:
+        agent_configs = load_agents_config(project_path)
+        provider = _par_role("codeur")
+    except ProviderInconnu as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    registry = AgentRegistryService(settings.ide_prompts_dir)
 
     runner = AgentRunner(
         provider, registry, db_path=settings.ide_db_path, project_path=project_path,
-        fabrique_provider=_provider_limite,
+        provider_par_role=_par_role,
     )
 
     project_context = await _build_project_context(project_id)
     ticket_svc = TicketService(project_path, project_id)
 
-    agent_configs = load_agents_config(project_path)
     pipeline_cfg = load_pipeline_config(project_path)
 
     test_runner = TestRunnerService() if pipeline_cfg.testeur_enabled else None
     security_auditor = (
-        SecurityAuditorService(tool_less_provider, settings.ide_prompts_dir)
+        SecurityAuditorService(
+            _sans_outils("securite"), settings.ide_prompts_dir,
+            model=modele_du_role(project_path, "securite"),
+        )
         if pipeline_cfg.securite_enabled
         else None
     )
     validator = (
-        ValidatorService(tool_less_provider, settings.ide_prompts_dir)
+        ValidatorService(
+            _sans_outils("validateur"), settings.ide_prompts_dir,
+            model=modele_du_role(project_path, "validateur"),
+        )
         if pipeline_cfg.validateur_enabled
         else None
     )
@@ -224,11 +231,16 @@ def _documenteur(project_id: str) -> Callable[[], Awaitable[None]]:
     JSON, elle n'a aucune raison d'écrire elle-même sur le disque.
     """
     project_path = settings.ide_workspace_dir / project_id
+
+    def _fournisseur(role: str) -> tuple[LLMProvider, str | None]:
+        # Deux rôles, chacun son provider et son modèle (ticket-188).
+        return (
+            provider_pour_role(project_path, role, allow_tools=False, project_id=project_id),
+            modele_du_role(project_path, role),
+        )
+
     service = DocumentationService(
-        get_provider(
-            settings.llm_provider, settings.anthropic_api_key, allow_tools=False
-        ),
-        settings.ide_prompts_dir,
+        _fournisseur("doc-technique")[0], settings.ide_prompts_dir, fournisseur=_fournisseur
     )
 
     async def documenter() -> None:

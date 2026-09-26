@@ -25,7 +25,7 @@ from tessera.services.database import (
 )
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.project_loader import load_project
-from tessera.services.providers import get_provider
+from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
@@ -95,7 +95,11 @@ async def _build_context(project_id: str, project_path: Path) -> str:
 async def _build_service(project_id: str) -> ChatService:
     project_path = _project_path(project_id)
     return ChatService(
-        provider=get_provider(tools=_CHAT_TOOLS),
+        # Par la fabrique, comme tout le monde : le chat ignorait jusqu'ici
+        # le provider réglé, et tournait toujours sur le SDK (ticket-188).
+        provider=provider_pour_role(
+            project_path, "chat", tools=_CHAT_TOOLS, project_id=project_id
+        ),
         prompts_dir=settings.ide_prompts_dir,
         project_path=project_path,
         project_context=await _build_context(project_id, project_path),

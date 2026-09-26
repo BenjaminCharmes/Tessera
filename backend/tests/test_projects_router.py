@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 import tessera.routers.projects as projects_router
+from tessera.services.providers import par_role
 from tessera.config import settings
 from tessera.models.project import AnalyzeProjectRequest, PlanRequest, ProjectCreate
 from tessera.routers.projects import analyze_project, create_project, plan_project
@@ -34,7 +35,7 @@ async def test_plan_project_utilise_un_provider_sans_outils(
 ) -> None:
     _make_project(tmp_path, "mon-projet")
     captured: dict[str, object] = {}
-    real_get_provider = projects_router.get_provider
+    real_get_provider = par_role.get_provider
 
     from unittest.mock import AsyncMock, MagicMock
 
@@ -51,7 +52,7 @@ async def test_plan_project_utilise_un_provider_sans_outils(
         provider._client.messages.create = AsyncMock(return_value=fake_response)  # type: ignore[attr-defined]
         return provider
 
-    monkeypatch.setattr(projects_router, "get_provider", spy)
+    monkeypatch.setattr(par_role, "get_provider", spy)
 
     await plan_project("mon-projet", PlanRequest(description="ajoute une feature"))
 
@@ -67,7 +68,7 @@ async def test_create_project_utilise_un_provider_sans_outils(
     wires it a resolved ``cwd``. It must get the tool-less provider like the
     other pure text-in/JSON-out call sites in this router."""
     captured: dict[str, object] = {}
-    real_get_provider = projects_router.get_provider
+    real_get_provider = par_role.get_provider
 
     from unittest.mock import AsyncMock, MagicMock
 
@@ -84,7 +85,7 @@ async def test_create_project_utilise_un_provider_sans_outils(
         provider._client.messages.create = AsyncMock(return_value=fake_response)  # type: ignore[attr-defined]
         return provider
 
-    monkeypatch.setattr(projects_router, "get_provider", spy)
+    monkeypatch.setattr(par_role, "get_provider", spy)
     # Sans ces deux lignes, `_auto_create_missing_agents` écrivait dans le
     # **vrai** dossier `agents/prompts/` du dépôt : la suite y recréait des
     # prompts livrés et en écrasait le contenu (ticket-098).
@@ -103,7 +104,7 @@ async def test_analyze_project_utilise_un_provider_sans_outils(
 ) -> None:
     _make_project(tmp_path, "mon-projet")
     captured: dict[str, object] = {}
-    real_get_provider = projects_router.get_provider
+    real_get_provider = par_role.get_provider
 
     from unittest.mock import AsyncMock, MagicMock
 
@@ -122,7 +123,7 @@ async def test_analyze_project_utilise_un_provider_sans_outils(
         provider._client.messages.create = AsyncMock(return_value=fake_response)  # type: ignore[attr-defined]
         return provider
 
-    monkeypatch.setattr(projects_router, "get_provider", spy)
+    monkeypatch.setattr(par_role, "get_provider", spy)
 
     await analyze_project("mon-projet", AnalyzeProjectRequest())
 

@@ -409,3 +409,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Alternative rejetée** : ignorer une CI qui existe — merger par-dessus un rouge reste faux ; un réglage global — le bon choix dépend du dépôt, comme l'autonomie.
 **Conséquence assumée** : sur un dépôt déclaré, plus rien d'humain ne s'interpose entre l'approbation et `main`.
 
+
+---
+
+## ADR-046 — Le provider se déclare par rôle, et un repli se voit
+
+**Date** : 2026-09-26
+**Décision** : chaque rôle déclare dans `agents.json` son `provider`, son `model`, et un `fallback` explicite (`provider` + `model`). Toute construction de provider passe par `provider_pour_role` ; un routeur n'appelle jamais `get_provider`. Seule une **indisponibilité** — connexion refusée, délai, modèle absent — déclenche le repli, qui émet `provider_fallback` sur le canal d'ADR-041. Une réponse illisible n'en déclenche aucun.
+**Raison** : le provider était global et cinq services avaient leur modèle codé en dur : brancher un modèle local aurait basculé le codeur avec. Un repli silencieux masquerait un modèle qui ne tient pas ; ADR-039 exige que ce qui n'a pas pu juger refuse, pas qu'un autre juge à sa place sans le dire.
+**Alternative rejetée** : router selon la charge ou la taille du ticket — deviné, donc invérifiable ; un réglage global de repli — le bon repli dépend du rôle.

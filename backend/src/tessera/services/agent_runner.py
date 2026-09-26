@@ -61,6 +61,7 @@ class AgentRunner:
         db_path: Path | str | None = None,
         project_path: Path | None = None,
         fabrique_provider: FabriqueProvider | None = None,
+        provider_par_role: Callable[[str], LLMProvider] | None = None,
     ) -> None:
         self._provider = provider
         self._registry = registry
@@ -68,6 +69,10 @@ class AgentRunner:
         self._project_path = project_path
         self._fabrique_provider = fabrique_provider
         self._provider_relecture: LLMProvider | None = None
+        # Le provider se déclare par rôle dans le manifeste (ticket-188) : la
+        # fabrique le construit, le runner le garde pour la durée du run.
+        self._provider_par_role = provider_par_role
+        self._providers: dict[str, LLMProvider] = {}
 
     async def run(
         self,
@@ -156,6 +161,10 @@ class AgentRunner:
             else calculate_cost(model, input_tokens, output_tokens, cache_read_tokens)
         )
 
+        # Ce qui a réellement tourné : un repli répond avec un autre modèle
+        # que celui demandé (ticket-188).
+        modele_utilise = provider_result.model or model
+
         if run_id and self._db_path:
             try:
                 await save_agent_call(
@@ -163,12 +172,13 @@ class AgentRunner:
                     run_id,
                     ticket.id,
                     role_str,
-                    model,
+                    modele_utilise,
                     input_tokens,
                     output_tokens,
                     cache_read_tokens,
                     cost_usd,
                     duration_ms,
+                    provider=provider_result.provider_name,
                 )
             except Exception as exc:
                 _logger.warning("agent_call_save_failed", extra={"error": str(exc)})
@@ -190,6 +200,10 @@ class AgentRunner:
         provider reçu : le produit distingue deux jeux d'outils, pas deux
         façons de construire un runner.
         """
+        if self._provider_par_role is not None:
+            if role not in self._providers:
+                self._providers[role] = self._provider_par_role(role)
+            return self._providers[role]
         if role != AgentRole.reviewer.value or self._fabrique_provider is None:
             return self._provider
         if self._provider_relecture is None:
