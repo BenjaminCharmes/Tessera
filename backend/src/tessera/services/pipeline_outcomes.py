@@ -242,6 +242,43 @@ async def finish_rounds_exhausted(
     )
 
 
+async def finish_budget_exhausted(
+    orch: "Orchestrator", run: PipelineRun
+) -> PipelineResult:
+    """Block the ticket when the run's spending cap is reached between two
+    rounds, committing the work all the same (ticket-191).
+
+    Une frontière de tour a la propriété qu'ADR-020 exige d'une frontière de
+    ticket : le codeur a fini d'écrire, et rien n'est à mi-chemin.
+    """
+    await set_status(orch, run, TicketStatus.blocked)
+    raison = (
+        f"run budget exhausted: {orch.spent_usd:.2f} USD spent "
+        f"of {orch._run_max_budget_usd:.2f} allowed"
+    )
+    commit_sha, arret = await commit_ou_bloquer(
+        orch, run, _unapproved_commit_message(run.ticket_id, raison)
+    )
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="run_budget_exhausted",
+        branch=run.branch,
+    )
+    orch._log(f"[{run.ticket_id}] BLOCKED après le tour {run.round_num} — {raison}")
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.blocked,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=arret or raison,
+    )
+
+
 async def finish_interrupted(
     orch: "Orchestrator", run: PipelineRun, cause: BaseException
 ) -> PipelineResult:

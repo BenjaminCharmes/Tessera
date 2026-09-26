@@ -61,6 +61,7 @@ class AgentRunner:
         db_path: Path | str | None = None,
         project_path: Path | None = None,
         fabrique_provider: FabriqueProvider | None = None,
+        provider_par_role: Callable[[str], LLMProvider] | None = None,
     ) -> None:
         self._provider = provider
         self._registry = registry
@@ -68,6 +69,10 @@ class AgentRunner:
         self._project_path = project_path
         self._fabrique_provider = fabrique_provider
         self._provider_relecture: LLMProvider | None = None
+        # Le provider se déclare par rôle dans le manifeste (ticket-188) : la
+        # fabrique le construit, le runner le garde pour la durée du run.
+        self._provider_par_role = provider_par_role
+        self._providers: dict[str, LLMProvider] = {}
 
     async def run(
         self,
@@ -79,11 +84,18 @@ class AgentRunner:
         tool_callback: ToolEventCallback | None = None,
         run_id: str | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
         system_prompt = self._load_system_prompt(role_str, agent_config)
-        user_prompt = self._build_user_prompt(ticket, role_str, project_context)
+        # En reprise de session, `project_context` ne porte que ce que le
+        # tour ajoute — le reste est déjà dans la conversation (ticket-187).
+        user_prompt = (
+            self._build_user_prompt(ticket, role_str, project_context)
+            if session is None
+            else self._build_reprise_prompt(project_context)
+        )
 
         model = agent_config.model if agent_config else _DEFAULT_MODEL
         max_tokens = agent_config.max_tokens if agent_config else _DEFAULT_MAX_TOKENS
@@ -96,6 +108,8 @@ class AgentRunner:
         # concerne pas, et le lui passer à vide casserait chaque double
         # (ticket-066).
         extra: dict[str, Any] = {"ask_user": ask_user} if ask_user is not None else {}
+        if session is not None:
+            extra["session"] = session
 
         provider = self._provider_pour(role_str)
         provider_result: ProviderResult
@@ -147,6 +161,10 @@ class AgentRunner:
             else calculate_cost(model, input_tokens, output_tokens, cache_read_tokens)
         )
 
+        # Ce qui a réellement tourné : un repli répond avec un autre modèle
+        # que celui demandé (ticket-188).
+        modele_utilise = provider_result.model or model
+
         if run_id and self._db_path:
             try:
                 await save_agent_call(
@@ -154,12 +172,13 @@ class AgentRunner:
                     run_id,
                     ticket.id,
                     role_str,
-                    model,
+                    modele_utilise,
                     input_tokens,
                     output_tokens,
                     cache_read_tokens,
                     cost_usd,
                     duration_ms,
+                    provider=provider_result.provider_name,
                 )
             except Exception as exc:
                 _logger.warning("agent_call_save_failed", extra={"error": str(exc)})
@@ -171,6 +190,7 @@ class AgentRunner:
             suggested_status=_parse_suggested_status(content),
             duration_ms=duration_ms,
             cost_usd=cost_usd,
+            session_id=provider_result.session_id,
         )
 
     def _provider_pour(self, role: str) -> LLMProvider:
@@ -180,6 +200,10 @@ class AgentRunner:
         provider reçu : le produit distingue deux jeux d'outils, pas deux
         façons de construire un runner.
         """
+        if self._provider_par_role is not None:
+            if role not in self._providers:
+                self._providers[role] = self._provider_par_role(role)
+            return self._providers[role]
         if role != AgentRole.reviewer.value or self._fabrique_provider is None:
             return self._provider
         if self._provider_relecture is None:
@@ -224,6 +248,21 @@ class AgentRunner:
             f"## Contexte projet\n{adr_pertinents(project_context, role)}\n\n"
             f"## Ticket assigné\n{ticket.body}\n\n"
             f"## Ta mission\n{instruction}"
+        )
+
+    def _build_reprise_prompt(self, complements: str) -> str:
+        """The prompt of a resumed round: only what this round adds (ticket-187).
+
+        The ticket, the project's decisions and the files the agent read are
+        already in the resumed conversation. Repeating them would pay twice
+        for what resuming exists to pay once.
+        """
+        return (
+            f"## Retours à traiter\n{complements or '_Aucun retour._'}\n\n"
+            "## Ta mission\n"
+            "Reprends ton travail du tour précédent, sur cette même branche, "
+            "et corrige-le selon ces retours. Ne recommence pas depuis zéro : "
+            "ce que tu as déjà lu et écrit est toujours là."
         )
 
 

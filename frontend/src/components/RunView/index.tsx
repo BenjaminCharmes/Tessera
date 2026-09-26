@@ -1,6 +1,7 @@
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
 import AgentBlock from "../AgentPanel/AgentBlock";
+import { resumeDuCout } from "../../lib/budget";
 import PipelineSummary from "../AgentPanel/PipelineSummary";
 import type { AgentRole, OrchestratorEvent } from "../../types/api";
 import type { UseRunActifResult } from "../../hooks/streamState";
@@ -74,6 +75,11 @@ export default function RunView({ stream }: RunViewProps) {
             <span className="font-mono text-zinc-500">{stream.ticketId}</span>
           )}
           {currentRound > 0 && <span>Tour {currentRound}</span>}
+          {(stream.coutUsd > 0 || stream.outils > 0) && (
+            <span data-testid="cout-du-run">
+              {resumeDuCout(stream.coutUsd, stream.appels, stream.outils)}
+            </span>
+          )}
           {currentAgent && (
             <span className="text-blue-300">{currentAgent.toUpperCase()}</span>
           )}

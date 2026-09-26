@@ -117,6 +117,10 @@ def build_context(orch: "Orchestrator", run: PipelineRun) -> str:
             + "\n".join(f"- {m}" for m in messages)
         )
 
+    # Gardé à part pour le codeur qui reprend sa session (ticket-187) : la
+    # boîte aux lettres est vidée ici, une seconde construction ne retrouverait
+    # plus les consignes.
+    run.contexte_du_tour = "".join(parts[1:]).strip()
     return "".join(parts)
 
 
@@ -183,6 +187,24 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     asker = asker_for(run)
     extra: dict[str, Any] = {"ask_user": asker} if asker is not None else {}
 
+    # Au tour suivant, le codeur reprend sa conversation et ne reçoit que ce
+    # que le tour ajoute : le ticket, les ADR et le dépôt, il les a déjà lus
+    # (ticket-187). Sans session — premier tour, provider muet — l'appel
+    # reste complet.
+    if run.session_codeur is not None:
+        extra["session"] = run.session_codeur
+        context = run.contexte_du_tour
+    elif run.carte_du_depot:
+        # La carte précède le contexte : `adr_pertinents` découpe tout ce qui
+        # suit « Décisions récentes » en ADR, et une carte placée après serait
+        # avalée par le dernier d'entre eux (ticket-190). Le reviewer ne la
+        # reçoit pas : il part du diff.
+        context = (
+            "## Fichiers du projet\n"
+            "Lis ce dont tu as besoin ; ne relis pas cette carte.\n\n"
+            f"{run.carte_du_depot}\n\n{context}"
+        )
+
     codeur_result = await orch._runner.run(
         role=role,
         ticket=run.ticket,
@@ -193,13 +215,21 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
         run_id=run.run_id,
         **extra,
     )
+    if codeur_result.session_id is not None:
+        run.session_codeur = codeur_result.session_id
     orch.record_spend(codeur_result.cost_usd)
     await run.on_event(
         OrchestratorEvent(
             type=EventType.AGENT_DONE,
             agent=role,
             ticket_id=ticket_id,
-            data={"content": codeur_result.content},
+            # Le coût part avec la fin de l'appel : c'est pendant le run
+            # qu'on décide de l'arrêter (ticket-197).
+            data={
+                "content": codeur_result.content,
+                "cost_usd": codeur_result.cost_usd,
+                "duration_ms": codeur_result.duration_ms,
+            },
         )
     )
     orch._log(
@@ -389,7 +419,11 @@ async def run_review(
             type=EventType.AGENT_DONE,
             agent=AgentRole.reviewer,
             ticket_id=ticket_id,
-            data={"content": reviewer_result.content},
+            data={
+                "content": reviewer_result.content,
+                "cost_usd": reviewer_result.cost_usd,
+                "duration_ms": reviewer_result.duration_ms,
+            },
         )
     )
     orch._log(

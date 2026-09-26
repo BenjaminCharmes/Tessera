@@ -1,6 +1,8 @@
 import { useState } from "react";
 import ProjectHeader from "./ProjectHeader";
 import type { UseServicesResult } from "../../hooks/useServices";
+import type { FiltresTickets } from "../../lib/filtresTickets";
+import type { ReglageDesNotifications } from "./PanneauxDuProjet";
 import FileTree from "../FileTree";
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
@@ -62,6 +64,13 @@ interface SidebarProps {
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
+  onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
+  /** Le réglage des notifications système (ticket-192). */
+  notifications?: ReglageDesNotifications;
+  filtres?: FiltresTickets;
+  onChangeFiltres?: (f: FiltresTickets) => void;
+  totalTickets?: number;
+  agentsDesTickets?: string[];
   onSelectTicketById?: (ticketId: string) => void;
   onAgentCreated?: (role: string) => void;
   agentSelectionne?: string | null;
@@ -108,6 +117,12 @@ export default function Sidebar({
   onTicketCreated,
   onBatchCreated,
   onPrCreated,
+  onChangeStatus,
+  notifications,
+  filtres,
+  onChangeFiltres,
+  totalTickets,
+  agentsDesTickets,
   onSelectTicketById,
   onAgentCreated,
   agentSelectionne,
@@ -138,6 +153,8 @@ export default function Sidebar({
         servicesOuverts={servicesOuverts}
         services={services}
         sortieDeService={sortieDeService}
+        runEnCours={running.size > 0}
+        notifications={notifications}
       />
 
       <div className="flex-1 overflow-y-auto">
@@ -175,6 +192,11 @@ export default function Sidebar({
             onTicketCreated={onTicketCreated}
             onBatchCreated={onBatchCreated}
             onPrCreated={onPrCreated}
+            onChangeStatus={onChangeStatus}
+            filtres={filtres}
+            onChangeFiltres={onChangeFiltres}
+            totalTickets={totalTickets}
+            agents={agentsDesTickets}
           />
         )}
         {panel === "files" &&

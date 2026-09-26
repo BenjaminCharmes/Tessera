@@ -1,5 +1,6 @@
 import Chrono from "./Chrono";
 import CompteARebours from "../AgentPanel/CompteARebours";
+import { CLASSES_DE_BUDGET, couleurDuBudget, resumeDuCout } from "../../lib/budget";
 import type { StreamState } from "../../hooks/streamState";
 import type { RunActif } from "../../types/api";
 
@@ -16,6 +17,8 @@ interface RunCardProps {
   etat: StreamState;
   selectionne: boolean;
   onSelect: () => void;
+  /** Le plafond du run, pour situer son coût (ticket-197). */
+  plafondUsd?: number | null;
 }
 
 const LIBELLE_DU_MODE: Record<string, string> = {
@@ -30,6 +33,7 @@ export default function RunCard({
   etat,
   selectionne,
   onSelect,
+  plafondUsd = null,
 }: RunCardProps) {
   const attend = etat.pendingQuestion !== null;
   const echoue = etat.status === "error";
@@ -144,9 +148,9 @@ export default function RunCard({
               tour {etat.currentRound}
             </Etiquette>
           ) : null}
-          {run.cout_usd > 0 ? (
-            <Etiquette classe="bg-zinc-800 text-zinc-400">
-              ${run.cout_usd.toFixed(2)}
+          {run.cout_usd > 0 || (run.outils ?? 0) > 0 ? (
+            <Etiquette classe={CLASSES_DE_BUDGET[couleurDuBudget(run.cout_usd, plafondUsd)]}>
+              {resumeDuCout(run.cout_usd, run.appels ?? 0, run.outils ?? 0, plafondUsd)}
             </Etiquette>
           ) : null}
         </span>

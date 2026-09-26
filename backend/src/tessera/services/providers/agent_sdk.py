@@ -27,6 +27,9 @@ from tessera.services.providers.base import (
     ToolEventCallback,
 )
 from tessera.services.quota_tracker import QuotaTracker
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 
@@ -41,12 +44,16 @@ def _build_options(
     allowed_tools: list[str] | None = None,
     ask_user: Callable[[str], Awaitable[str]] | None = None,
     racine_ecriture: Path | None = None,
+    resume: str | None = None,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
 
     ``racine_ecriture`` is the write root the run froze before its first agent
     (ticket-119); left ``None``, the perimeter hook reads it from the project's
     ``agents.json`` as before.
+
+    ``resume`` names a session of a previous call to pick up from (ticket-187).
+    The CLI finds it on disk by ``cwd``, so both must match between the calls.
     """
     # ``allowed_tools`` only controls auto-approval — the SDK CLI's
     # subprocess transport reads ``if effective_allowed_tools:`` and omits
@@ -94,6 +101,7 @@ def _build_options(
         max_turns=max_turns,
         max_budget_usd=max_budget_usd,
         mcp_servers=mcp_servers,
+        resume=resume,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
         # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
@@ -181,12 +189,14 @@ class ClaudeAgentSDKProvider:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> ProviderResult:
         # NB : max_tokens est reçu pour satisfaire le protocole LLMProvider mais
         # ClaudeAgentOptions n'expose aucun champ équivalent — il est ignoré ici.
         # Voir LLMProvider.complete pour la portée exacte de cette limitation.
-        return await self._run(
-            system=system, user=user, model=model, cwd=cwd, ask_user=ask_user
+        return await self._run_ou_reprendre(
+            system=system, user=user, model=model, cwd=cwd, ask_user=ask_user,
+            session=session,
         )
 
     async def stream(
@@ -200,12 +210,35 @@ class ClaudeAgentSDKProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> ProviderResult:
         # NB : max_tokens est ignoré — voir la note dans complete() ci-dessus.
-        return await self._run(
+        return await self._run_ou_reprendre(
             system=system, user=user, model=model, cwd=cwd,
             on_token=on_token, on_tool_use=on_tool_use, ask_user=ask_user,
+            session=session,
         )
+
+    async def _run_ou_reprendre(
+        self, *, session: str | None, **kwargs: Any
+    ) -> ProviderResult:
+        """Resumes ``session`` when given, and falls back to a fresh call if
+        that resume fails (ticket-187).
+
+        Le CLI retrouve une session sur le disque, par `cwd` : une session
+        introuvable ne doit coûter que l'économie espérée, jamais le run. Un
+        appel neuf qui échoue, lui, remonte tel quel — le rejouer aurait le
+        même résultat et coûterait deux fois.
+        """
+        if session is None:
+            return await self._run(**kwargs)
+        try:
+            return await self._run(resume=session, **kwargs)
+        except Exception as exc:  # noqa: BLE001 — le repli est le comportement d'avant
+            _logger.warning(
+                "session_resume_failed", extra={"session": session, "error": str(exc)}
+            )
+            return await self._run(**kwargs)
 
     async def _run(
         self,
@@ -217,12 +250,13 @@ class ClaudeAgentSDKProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        resume: str | None = None,
     ) -> ProviderResult:
         options = _build_options(
             system=system, model=model, max_turns=self._max_turns,
             max_budget_usd=self._max_budget_usd, cwd=cwd,
             allowed_tools=self._allowed_tools, ask_user=ask_user,
-            racine_ecriture=self.racine_ecriture,
+            racine_ecriture=self.racine_ecriture, resume=resume,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None
@@ -264,4 +298,5 @@ class ClaudeAgentSDKProvider:
             cache_creation_tokens=cache_creation,
             cost_usd=result.total_cost_usd,
             provider_name=self.name,
+            session_id=getattr(result, "session_id", None) or None,
         )

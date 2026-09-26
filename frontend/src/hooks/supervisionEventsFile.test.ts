@@ -82,3 +82,27 @@ describe("majDesRuns — l'avancement arrive aussi par événement (ticket-181)"
     expect(carte?.file_total ?? 0).toBe(0);
   });
 });
+
+describe("majDesRuns — coût en direct (ticket-197)", () => {
+  const base: RunActif = {
+    run_id: "r1", project_id: "p", mode: "single", ticket_id: "ticket-001",
+    etape: null, agent: null, tour: 0, tokens_entree: 0, tokens_sortie: 0,
+    cout_usd: 0, verdict: null, demarre_a: "2026-09-26T08:00:00Z",
+  };
+
+  it("cumule le coût des agent_done", () => {
+    // Un run créé côté client restait à 0 $ jusqu'au prochain instantané.
+    let runs = majDesRuns([base], ev({ type: "agent_done", agent: "codeur", data: { cost_usd: 0.4 } }), "r1");
+    runs = majDesRuns(runs, ev({ type: "agent_done", agent: "reviewer", data: { cost_usd: 0.2 } }), "r1");
+    expect(runs[0].cout_usd).toBeCloseTo(0.6);
+    expect(runs[0].appels).toBe(2);
+  });
+
+  it("remet le compteur d'outils à zéro quand un agent démarre", () => {
+    let runs = majDesRuns([base], ev({ type: "agent_tool_use", agent: "codeur", data: { tool: "Read" } }), "r1");
+    runs = majDesRuns(runs, ev({ type: "agent_tool_use", agent: "codeur", data: { tool: "Read" } }), "r1");
+    expect(runs[0].outils).toBe(2);
+    runs = majDesRuns(runs, ev({ type: "agent_started", agent: "reviewer", data: {} }), "r1");
+    expect(runs[0].outils).toBe(0);
+  });
+});

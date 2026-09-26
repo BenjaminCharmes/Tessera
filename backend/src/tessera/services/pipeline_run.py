@@ -47,12 +47,27 @@ class PipelineRun:
         default_factory=lambda: DialogueChannel(interactive=False)
     )
 
+    # La conversation du codeur, reprise d'un tour à l'autre (ticket-187).
+    # Elle appartient au run — donc à la branche — et jamais au ticket : un
+    # nouveau run repart à vide. Un provider qui n'en rend pas la laisse à
+    # None, et chaque tour reste l'appel complet.
+    session_codeur: str | None = None
+
+    # La liste des fichiers suivis, calculée une fois avant le premier agent
+    # (ticket-190) : le codeur ne doit pas y voir ses propres fichiers du
+    # tour précédent. Vide quand git n'a rien à dire.
+    carte_du_depot: str = ""
+
     # --- remis à zéro à chaque tour ---
     round_num: int = 0
     reviewed_code: str = ""
     test_result: Any = None
     test_context: str = ""
     security_context: str = ""
+    # Ce que le tour ajoute au contexte projet — retours du reviewer,
+    # consignes de l'utilisateur. C'est tout ce qu'un codeur qui reprend sa
+    # session a besoin de recevoir : le reste, il l'a déjà (ticket-187).
+    contexte_du_tour: str = ""
 
     @property
     def stop_requested(self) -> bool:
@@ -69,6 +84,7 @@ class PipelineRun:
         self.test_result = None
         self.test_context = ""
         self.security_context = ""
+        self.contexte_du_tour = ""
 
 
 async def emit(run: PipelineRun, event_type: EventType, **data: Any) -> None:

@@ -62,3 +62,39 @@ describe("TicketList", () => {
       .toBeInTheDocument();
   });
 });
+
+describe("TicketList — filtres (ticket-195)", () => {
+  it("dit combien les filtres cachent", () => {
+    // Une liste vide sans explication se lit comme un projet sans tickets.
+    render(
+      <TicketList
+        {...props(false)}
+        filtres={{ texte: "introuvable", type: "", priorite: "", agent: "", tri: "numero" }}
+        onChangeFiltres={() => {}}
+        totalTickets={12}
+      />,
+    );
+    expect(screen.getByText("0 sur 12")).toBeInTheDocument();
+  });
+
+  it("n'affiche pas de barre sans filtres", () => {
+    render(<TicketList {...props(false)} />);
+    expect(screen.queryByLabelText("Chercher un ticket")).not.toBeInTheDocument();
+  });
+
+  it("propage une recherche", async () => {
+    const onChangeFiltres = vi.fn();
+    render(
+      <TicketList
+        {...props(false)}
+        filtres={{ texte: "", type: "", priorite: "", agent: "", tri: "numero" }}
+        onChangeFiltres={onChangeFiltres}
+        totalTickets={0}
+      />,
+    );
+    await userEvent.type(screen.getByLabelText("Chercher un ticket"), "c");
+    expect(onChangeFiltres).toHaveBeenCalledWith(
+      expect.objectContaining({ texte: "c" }),
+    );
+  });
+});

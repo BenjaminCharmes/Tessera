@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useState } from "react";
 import { useActiveProject } from "./hooks/useActiveProject";
 import { useTickets } from "./hooks/useTickets";
@@ -9,6 +9,15 @@ import { useProjects } from "./hooks/useProjects";
 import { useServices } from "./hooks/useServices";
 import { useSupervision } from "./hooks/useSupervision";
 import { useRunActif } from "./hooks/useRunActif";
+import { parmi, useEtatPersistant } from "./hooks/useEtatPersistant";
+import { useProjetMemorise } from "./hooks/useProjetMemorise";
+import { useFiltresTickets } from "./hooks/useFiltresTickets";
+import {
+  demanderPermissionNotifications,
+  useNotificationsSysteme,
+} from "./hooks/useNotificationsSysteme";
+import { filtrerParStatut } from "./lib/filtresTickets";
+import { PANNEAUX } from "./components/Sidebar/panels";
 import { BAND } from "./design/layout";
 import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
@@ -25,17 +34,28 @@ import ChatPanel from "./components/ChatPanel";
 import BottomPanel from "./components/BottomPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
-import type { Project, Ticket } from "./types/api";
+import type { Project, Ticket, TicketStatus } from "./types/api";
+import { api } from "./lib/api";
 import { vueDuCentre } from "./vueDuCentre";
 import { projetsEnAttente } from "./components/Sidebar/projetsEnAttente";
 
 export default function App() {
   const { project, ticket, setProject, setTicket } = useActiveProject();
-  const [panel, setPanel] = useState<SidebarPanel>("projects");
+  // Le panneau, la vue et l'onglet de droite survivent au rechargement
+  // (ticket-193) ; le projet actif aussi, via `useProjetMemorise` plus bas.
+  const [panel, setPanel] = useEtatPersistant<SidebarPanel>(
+    "panneau",
+    "projects",
+    parmi(PANNEAUX),
+  );
   // Le centre montre le tableau des tickets par défaut, pas un fichier : le
   // cockpit sert à suivre la flotte, et l'édition est partie dans VSCode
   // (ticket-065).
-  const [showKanban, setShowKanban] = useState(true);
+  const [showKanban, setShowKanban] = useEtatPersistant<boolean>(
+    "kanban",
+    true,
+    (v): v is boolean => typeof v === "boolean",
+  );
   // Le run passe devant quand il démarre — c'est ce qu'on veut voir — mais
   // tout geste explicite le lui reprend. Sans cet état, « Vue liste » n'avait
   // aucun effet tant qu'un run tournait (ticket-178).
@@ -50,7 +70,11 @@ export default function App() {
   const [selection, setSelection] = useState<string[]>([]);
   const [agentSelectionne, setAgentSelectionne] = useState<string | null>(null);
   // Colonne de droite : observer un run, ou discuter (ticket-048).
-  const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
+  const [sidePanel, setSidePanel] = useEtatPersistant<"agents" | "chat">(
+    "onglet-droit",
+    "agents",
+    parmi(["agents", "chat"] as const),
+  );
   const { toasts, addToast, removeToast } = useToast();
 
   // Une seule socket pour toute la machine (ticket-129) : `supervision`
@@ -75,6 +99,19 @@ export default function App() {
     showKanban,
   });
   const { projects: projets } = useProjects();
+  // Sans passer par `handleSelectProject` : la restauration ne doit pas
+  // écraser le panneau et la vue, eux aussi restaurés.
+  const { memoriser } = useProjetMemorise(projets, project, setProject);
+  // Une notification ramène au projet concerné (ticket-192).
+  const ouvrirProjet = useCallback(
+    (id: string) => {
+      const p = projets.find((x) => x.id === id);
+      if (p) handleSelectProject(p);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [projets],
+  );
+  const notifications = useNotificationsSysteme(supervision, project?.id ?? null, ouvrirProjet);
   const services = useServices(project?.id ?? null, supervision.signalServices);
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
@@ -94,6 +131,10 @@ export default function App() {
     stream.events,
   );
   const runs = useRuns(project?.id ?? null);
+  // Une seule source de filtres pour la liste et le Kanban (ticket-195).
+  const { filtres, setFiltres } = useFiltresTickets(project?.id ?? null);
+  const filtrage = filtrerParStatut(tickets.tickets, filtres);
+  const agentsDesTickets = Array.from(new Set(tickets.tickets.map((t) => t.agent))).sort();
   const usageData = useUsage(project?.id ?? null);
 
   // Refresh run history and show toast when a pipeline completes
@@ -126,6 +167,7 @@ export default function App() {
 
   function handleSelectProject(p: typeof project) {
     setProject(p);
+    memoriser(p?.id ?? null);
     setPanel("tickets");
     setShowKanban(true);
     setOpenFilePath(null);
@@ -154,6 +196,17 @@ export default function App() {
   // Le ticket porte désormais un `pr_number` : la liste se relit pour le
   // montrer. `TicketCard` attendait ce rappel sans que rien ne le fournisse
   // (ticket-123).
+  // Un statut posé à la main (ticket-194) : le backend déplace le fichier
+  // et publie l'événement ; on relit la liste sans attendre le sondage.
+  async function handleChangeStatus(ticketId: string, status: TicketStatus) {
+    try {
+      await api.tickets.setStatus(ticketId, status, project?.id ?? "");
+      tickets.refresh();
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : String(err), "error");
+    }
+  }
+
   function handlePrCreated(_ticketId: string, prNumber: number) {
     tickets.refresh();
     addToast(`PR #${prNumber} ouverte`, "success");
@@ -173,6 +226,8 @@ export default function App() {
   // effet, et dit mieux ce qui se passe (ticket-178).
   function handleRunPipeline(ticketId: string) {
     setRunAuPremierPlan(true);
+    // La permission se demande au premier run lancé, jamais au chargement.
+    void demanderPermissionNotifications();
     stream.connect(ticketId);
   }
 
@@ -227,7 +282,11 @@ export default function App() {
             sortieDeService={supervision.sortieDuService}
             activeProject={project}
             activeTicket={ticket}
-            byStatus={tickets.byStatus}
+            byStatus={filtrage.byStatus}
+            filtres={filtres}
+            onChangeFiltres={setFiltres}
+            totalTickets={filtrage.total}
+            agentsDesTickets={agentsDesTickets}
             ticketsLoading={tickets.loading}
             ticketsError={tickets.error}
             runs={runs.runs}
@@ -248,6 +307,12 @@ export default function App() {
               setRunAuPremierPlan(true);
             }}
             onSelectProject={handleSelectProject}
+            onChangeStatus={handleChangeStatus}
+            notifications={{
+              active: notifications.active,
+              etat: notifications.etat,
+              onChange: notifications.setActive,
+            }}
             onProjectCreated={handleProjectCreated}
             onSelectTicket={handleSelectTicket}
             onRunPipeline={handleRunPipeline}
@@ -285,10 +350,12 @@ export default function App() {
             }
             onRunQueue={() => {
               setRunAuPremierPlan(true);
+              void demanderPermissionNotifications();
               stream.connectQueue(selection);
             }}
             onRunAutonome={(options) => {
               setRunAuPremierPlan(true);
+              void demanderPermissionNotifications();
               stream.connectAutonome(options);
             }}
             onClearQueue={() => setSelection([])}
@@ -339,13 +406,14 @@ export default function App() {
             <DiffView projectId={project.id} ticketId={ticket.id} />
           ) : vueCentre === "kanban" ? (
             <KanbanView
-              byStatus={tickets.byStatus}
+              byStatus={filtrage.byStatus}
               activeTicket={ticket}
               running={running}
               githubRemote={project?.github_remote ?? null}
               onSelectTicket={handleSelectTicket}
               onRunPipeline={handleRunPipeline}
               onPrCreated={handlePrCreated}
+              onChangeStatus={handleChangeStatus}
             />
           ) : (
             <Editor ticket={ticket} openFilePath={openFilePath} />

@@ -46,9 +46,14 @@ class ProjectAnalyzerService:
         }
     )
 
-    def __init__(self, provider: LLMProvider, prompts_dir: Path) -> None:
+    def __init__(
+        self, provider: LLMProvider, prompts_dir: Path, model: str | None = None
+    ) -> None:
         self._provider = provider
         self._prompts_dir = prompts_dir
+        # Le modèle vient du manifeste du projet quand il déclare ce rôle
+        # (ticket-188) ; sinon le défaut d'avant, rien ne change.
+        self._model = model or _DEFAULT_MODEL
 
     async def analyze(self, project_path: Path, overwrite: bool = False) -> AnalysisResult:
         file_tree = self._build_file_tree(project_path)
@@ -61,7 +66,7 @@ class ProjectAnalyzerService:
         result = await self._provider.complete(
             system=system_prompt,
             user=user_message,
-            model=_DEFAULT_MODEL,
+            model=self._model,
             max_tokens=_DEFAULT_MAX_TOKENS,
         )
 

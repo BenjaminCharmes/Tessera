@@ -1,5 +1,15 @@
 import GitLinkPanel from "./GitLinkPanel";
 import PanneauServices from "./PanneauServices";
+import PanneauPipeline from "./PanneauPipeline";
+import ReglageNotifications from "./ReglageNotifications";
+import type { EtatDesNotifications } from "../../hooks/useNotificationsSysteme";
+
+export interface ReglageDesNotifications {
+  active: boolean;
+  etat: EtatDesNotifications;
+  onChange: (v: boolean) => void;
+}
+import { useState } from "react";
 import type { UseServicesResult } from "../../hooks/useServices";
 import type { Project } from "../../types/api";
 
@@ -16,6 +26,9 @@ interface PanneauxDuProjetProps {
   servicesOuverts: boolean;
   services?: UseServicesResult;
   sortieDeService?: (projectId: string, nom: string) => string[];
+  /** Un run tourne sur ce projet : le pipeline se règle en lecture seule (ticket-196). */
+  runEnCours?: boolean;
+  notifications?: ReglageDesNotifications;
 }
 
 export default function PanneauxDuProjet({
@@ -24,11 +37,32 @@ export default function PanneauxDuProjet({
   servicesOuverts,
   services,
   sortieDeService,
+  runEnCours = false,
+  notifications,
 }: PanneauxDuProjetProps) {
+  const [pipelineOuvert, setPipelineOuvert] = useState(false);
   if (!project) return null;
 
   return (
     <>
+      {notifications && (
+        <ReglageNotifications
+          active={notifications.active}
+          etat={notifications.etat}
+          onChange={notifications.onChange}
+        />
+      )}
+      <button
+        type="button"
+        onClick={() => setPipelineOuvert((v) => !v)}
+        aria-expanded={pipelineOuvert}
+        className="w-full px-3 py-1 text-left text-mini text-zinc-500 hover:text-zinc-300"
+      >
+        Pipeline
+      </button>
+      {pipelineOuvert && (
+        <PanneauPipeline projectId={project.id} runEnCours={runEnCours} />
+      )}
       {/* Sous l'en-tête, là où l'on vient de cliquer : c'est le reproche fait
           au premier usage — le retour arrivait dans une autre vue. */}
       {/* Le projet qui fait tourner l'IDE n'a pas de bouton : sans

@@ -13,8 +13,9 @@ from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.github_service import GitHubService
 from tessera.services.project_creator import ProjectCreatorService
-from tessera.services.providers import get_provider
+from tessera.services.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.providers.base import LLMProvider
+from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.project_loader import ProjectLoader, load_agents_config
 from tessera.services.sync_map import SyncMapService
 from tessera.services.ticket_service import TicketService
@@ -30,45 +31,31 @@ _OPEN_STATUSES = {
 
 
 def _make_runner(project_id: str) -> AgentRunner:
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-    )
-    registry = AgentRegistryService(settings.ide_prompts_dir)
     project_path = settings.ide_workspace_dir / project_id
+    registry = AgentRegistryService(settings.ide_prompts_dir)
+
+    def _par_role(role: str) -> LLMProvider:
+        # Le reviewer relit : le même provider, réduit à la lecture.
+        outils = OUTILS_DE_RELECTURE if role == "reviewer" else None
+        return provider_pour_role(project_path, role, tools=outils, project_id=project_id)
+
     return AgentRunner(
-        provider, registry, project_path=project_path, fabrique_provider=_provider_limite
-    )
-
-
-def _provider_limite(outils: list[str]) -> LLMProvider:
-    """Le même provider, réduit aux outils nommés — le reviewer ne lit que."""
-    return get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        tools=outils,
+        _par_role("codeur"), registry, project_path=project_path, provider_par_role=_par_role
     )
 
 
 def _make_project_creator() -> ProjectCreatorService:
     # Pure text-in/JSON-out: ProjectCreatorService writes files itself via
     # ProjectLoader, never through an SDK tool, and no cwd is threaded to it
-    # here (ticket-044 merge-gate review, finding 2).
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=False,
-    )
+    # here (ticket-044 merge-gate review, finding 2). Pas de projet encore :
+    # la fabrique rend le provider global.
+    provider = provider_pour_role(None, "project-creator", allow_tools=False)
     return ProjectCreatorService(provider, settings.ide_prompts_dir, settings.ide_workspace_dir)
 
 
 def _make_agent_creator() -> AgentCreatorService:
     # Pure text-in/JSON-out: no filesystem tools needed (ticket-044 review, finding 4).
-    provider = get_provider(
-        settings.llm_provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=False,
-    )
+    provider = provider_pour_role(None, "agent-creator", allow_tools=False)
     return AgentCreatorService(provider, settings.ide_prompts_dir)
 
 

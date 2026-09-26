@@ -49,9 +49,14 @@ class SecurityAuditResult:
 
 
 class SecurityAuditorService:
-    def __init__(self, provider: LLMProvider, prompts_dir: Path) -> None:
+    def __init__(
+        self, provider: LLMProvider, prompts_dir: Path, model: str | None = None
+    ) -> None:
         self._provider = provider
         self._prompts_dir = prompts_dir
+        # Le modèle vient du manifeste du projet quand il déclare ce rôle
+        # (ticket-188) ; sinon le défaut d'avant, rien ne change.
+        self._model = model or _MODEL
 
     async def audit(
         self,
@@ -65,7 +70,7 @@ class SecurityAuditorService:
             result = await self._provider.complete(
                 system=system_prompt,
                 user=user_message,
-                model=_MODEL,
+                model=self._model,
                 max_tokens=_MAX_TOKENS,
             )
         except Exception as exc:

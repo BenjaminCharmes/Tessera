@@ -10,6 +10,11 @@ from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse
 from tessera.services.github_service import GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
 from tessera.services.database import list_runs
+from tessera.services.event_hub import EVENT_HUB
+from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.project_loader import load_project
@@ -92,9 +97,24 @@ async def update_ticket_status(
     project_id: str, ticket_id: str, body: TicketStatusUpdate
 ) -> Ticket:
     try:
-        return await _svc(project_id).update_status(ticket_id, body.status)
+        ticket = await _svc(project_id).update_status(ticket_id, body.status)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    # Le même événement que le pipeline : la liste et le Kanban de chaque
+    # onglet se mettent à jour sans recharger (ticket-194). Un émetteur qui
+    # lève n'annule pas un statut déjà écrit sur disque (ADR-038).
+    try:
+        await EVENT_HUB.publish(
+            OrchestratorEvent(
+                type=EventType.TICKET_STATUS_CHANGED,
+                ticket_id=ticket_id,
+                project_id=project_id,
+                data={"status": body.status.value, "manuel": True},
+            )
+        )
+    except Exception as exc:  # noqa: BLE001
+        _logger.warning("status_event_emit_failed", extra={"error": str(exc)})
+    return ticket
 
 
 # ------------------------------------------------------------------

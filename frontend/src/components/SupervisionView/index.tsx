@@ -8,6 +8,7 @@ import type { UseRunActifResult } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { Project, ServiceActif } from "../../types/api";
 import { projetDuRun } from "./projetDuRun";
+import { useLimites } from "../../hooks/useLimites";
 
 /**
  * Ce que l'IDE est en train de faire, sur tous les projets — ticket-129.
@@ -38,6 +39,7 @@ export default function SupervisionView({
   services = [],
 }: SupervisionViewProps) {
   const { runs, selection, selectionner, etatDe } = supervision;
+  const limites = useLimites();
   const selectionne = runs.find((r) => r.run_id === selection) ?? runs[0];
 
   return (
@@ -71,6 +73,7 @@ export default function SupervisionView({
                 etat={etatDe(run.run_id)}
                 selectionne={run.run_id === selectionne?.run_id}
                 onSelect={() => selectionner(run.run_id)}
+                plafondUsd={limites?.run_max_budget_usd ?? null}
               />
             ))}
           </div>

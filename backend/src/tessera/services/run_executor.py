@@ -82,6 +82,12 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
     if event.type is EventType.AGENT_STARTED:
         run.etape = str(event.data.get("stage") or event.type.value)
         run.agent = event.agent.value if event.agent else None
+        run.outils = 0
+    elif event.type is EventType.AGENT_DONE:
+        cout = event.data.get("cost_usd")
+        if isinstance(cout, (int, float)):
+            run.cout_usd += float(cout)
+        run.appels += 1
     elif event.type is EventType.TICKET_STATUS_CHANGED:
         run.ticket_id = event.ticket_id or run.ticket_id
     elif event.type is EventType.QUEUE_PROGRESS:
@@ -103,6 +109,8 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
         expire = event.data.get("expire_a")
         run.question_expire_a = str(expire) if expire else None
     elif event.type in (EventType.AGENT_TOKEN, EventType.AGENT_TOOL_USE):
+        if event.type is EventType.AGENT_TOOL_USE:
+            run.outils += 1
         # L'agent a repris — sur réponse ou sur l'hypothèse d'ADR-025. Garder
         # la question afficherait une attente qui n'existe plus, et on
         # répondrait à un agent qui n'écoute pas.

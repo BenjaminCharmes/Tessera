@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import KanbanColumn from "./KanbanColumn";
 import type { Ticket } from "../../types/api";
 
@@ -107,5 +107,64 @@ describe("KanbanColumn", () => {
       />,
     );
     expect(screen.getByText("Fix login")).toBeTruthy();
+  });
+});
+
+describe("KanbanColumn — glisser-déposer (ticket-194)", () => {
+  function deposer(statutDepuis: string, id = "ticket-001") {
+    return {
+      dataTransfer: {
+        types: ["application/x-tessera-ticket"],
+        getData: () => JSON.stringify({ id, status: statutDepuis }),
+      },
+    };
+  }
+
+  it("change le statut d'un ticket depose sur la colonne", () => {
+    const onChangeStatus = vi.fn();
+    render(
+      <KanbanColumn
+        status="todo"
+        tickets={[]}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        onChangeStatus={onChangeStatus}
+      />,
+    );
+    fireEvent.drop(screen.getByTestId("colonne-todo"), deposer("blocked"));
+    expect(onChangeStatus).toHaveBeenCalledWith("ticket-001", "todo");
+  });
+
+  it("refuse un depot vers un statut tenu par le pipeline", () => {
+    const onChangeStatus = vi.fn();
+    render(
+      <KanbanColumn
+        status="in-progress"
+        tickets={[]}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        onChangeStatus={onChangeStatus}
+      />,
+    );
+    fireEvent.drop(screen.getByTestId("colonne-in-progress"), deposer("todo"));
+    expect(onChangeStatus).not.toHaveBeenCalled();
+  });
+
+  it("ignore un depot sans onChangeStatus", () => {
+    render(
+      <KanbanColumn
+        status="todo"
+        tickets={[]}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+      />,
+    );
+    fireEvent.drop(screen.getByTestId("colonne-todo"), deposer("blocked"));
   });
 });

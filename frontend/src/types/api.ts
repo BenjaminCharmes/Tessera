@@ -36,6 +36,7 @@ export type EventType =
   | "doc_updated"
   | "commit_created"
   | "quota_updated"
+  | "provider_fallback"
   | "queue_progress"
   | "livraison_done"
   | "pipeline_done"
@@ -160,6 +161,9 @@ export interface RunActif {
   tokens_entree: number;
   tokens_sortie: number;
   cout_usd: number;
+  /** Appels d'agent finis, et appels d'outils de l'agent en cours (ticket-197). */
+  appels?: number;
+  outils?: number;
   verdict: string | null;
   /** La question qu'un agent attend de voir répondue (ticket-163). */
   question?: string | null;
@@ -457,15 +461,53 @@ export interface VentilationDesCouts {
 }
 
 /** Un agent tel que ce projet le configure (ticket-080). */
+/** La configuration effective du pipeline d'un projet (ticket-196). */
+export interface PipelineReglages {
+  max_review_rounds: number;
+  testeur_enabled: boolean;
+  test_command: string | null;
+  securite_enabled: boolean;
+  validateur_enabled: boolean;
+  autonomy: string;
+  merge_without_ci: boolean;
+}
+
+export type PipelineReglagesPatch = Partial<PipelineReglages>;
+
+/** Les plafonds de dépense du backend (ticket-197). 0 = aucune borne. */
+export interface Limites {
+  run_max_budget_usd: number;
+  llm_max_budget_usd: number;
+}
+
+/** Sur quoi retomber quand le provider d'un rôle ne répond pas (ticket-188). */
+export interface FallbackConfig {
+  provider: string;
+  model: string;
+}
+
 export interface ProjectAgentConfig {
   role: string;
   model: string;
   max_tokens: number;
   active: boolean;
+  provider: string;
+  fallback: FallbackConfig | null;
 }
 
 export interface ProjectAgents {
   agents: ProjectAgentConfig[];
-  /** Les seuls modèles proposables : ceux dont l'app sait calculer le coût. */
+  /** Les seuls modèles proposables sur un provider Anthropic : ceux dont l'app sait calculer le coût. */
   known_models: string[];
+  /** Les providers qu'un rôle peut déclarer (ticket-188). */
+  known_providers: string[];
+  /** Par provider, la liste proposable — vide quand le nom est libre. */
+  known_models_by_provider: Record<string, string[]>;
+}
+
+/** Ce qu'on change sur un agent d'un projet. `fallback` omis : le repli ne bouge pas ; `null` : retiré. */
+export interface AgentSettingsPatch {
+  model: string;
+  provider?: string;
+  fallback?: FallbackConfig | null;
 }

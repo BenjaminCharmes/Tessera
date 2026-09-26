@@ -71,6 +71,7 @@ def _make_orchestrator(
     tickets: list[Ticket] | None = None,
     run_max_budget_usd: float = 0.0,
     quota_tracker: object | None = None,
+    carte_du_depot: object | None = None,
 ) -> Orchestrator:
     if tickets is not None and ticket_service is None:
         ticket_service = _make_ticket_service_for(tickets)
@@ -87,6 +88,7 @@ def _make_orchestrator(
         git_workspace=git_workspace,
         run_max_budget_usd=run_max_budget_usd,
         quota_tracker=quota_tracker,
+        carte_du_depot=carte_du_depot,  # type: ignore[arg-type]
     )
 
 

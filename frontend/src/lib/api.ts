@@ -1,6 +1,10 @@
 import type {
   AgentDetail,
   ProjectAgents,
+  AgentSettingsPatch,
+  Limites,
+  PipelineReglages,
+  PipelineReglagesPatch,
   VentilationDesCouts,
   AgentInfo,
   AnalysisResult,
@@ -28,6 +32,7 @@ import type {
   ProjectUsage,
   RunFromChatResponse,
   Ticket,
+  TicketStatus,
   TicketActivity,
   TicketDiff,
   PlanDeNettoyage,
@@ -60,6 +65,14 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 async function put<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, {
     method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+async function patch_<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -109,6 +122,13 @@ export const api = {
       post(`/projects/${projectId}/tickets/${ticketId}/merge-pr`, {}),
     list: (projectId: string): Promise<Ticket[]> =>
       request(`/projects/${projectId}/tickets`),
+    /** Un statut posé à la main (ticket-194) ; le backend déplace le fichier et publie l'événement. */
+    setStatus: (
+      ticketId: string,
+      status: TicketStatus,
+      projectId: string,
+    ): Promise<Ticket> =>
+      patch_(`/projects/${projectId}/tickets/${ticketId}`, { status }),
     create: (projectId: string, data: TicketCreate): Promise<Ticket> =>
       post(`/projects/${projectId}/tickets`, data),
     batch: (
@@ -129,6 +149,8 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       }),
+    /** Les plafonds de dépense, pour situer un coût (ticket-197). */
+    limits: (): Promise<Limites> => request("/orchestrator/limits"),
   },
   services: {
     /**
@@ -168,6 +190,13 @@ export const api = {
     getPrStatus: (projectId: string, ticketId: string): Promise<PRStatus> =>
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
   },
+  pipeline: {
+    /** Les réglages du pipeline d'un projet (ticket-196). */
+    get: (projectId: string): Promise<PipelineReglages> =>
+      request(`/projects/${projectId}/pipeline`),
+    set: (projectId: string, patch: PipelineReglagesPatch): Promise<PipelineReglages> =>
+      patch_(`/projects/${projectId}/pipeline`, patch),
+  },
   git: {
     status: (projectId: string): Promise<GitStatus> =>
       request(`/projects/${projectId}/git/status`),
@@ -193,9 +222,9 @@ export const api = {
     setAgentModel: (
       projectId: string,
       role: string,
-      model: string,
+      patch: AgentSettingsPatch,
     ): Promise<ProjectAgents> =>
-      put(`/projects/${projectId}/agents/${role}`, { model }),
+      put(`/projects/${projectId}/agents/${role}`, patch),
     cleanupPlan: (projectId: string): Promise<PlanDeNettoyage> =>
       request(`/projects/${projectId}/branches/cleanup`),
     cleanup: (projectId: string, branches: string[]): Promise<string[]> =>

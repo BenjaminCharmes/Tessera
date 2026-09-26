@@ -39,10 +39,14 @@ class FakeProvider:
         model: str,
         max_tokens: int,
         cwd: Path | None = None,
+        **extra: Any,
     ) -> ProviderResult:
+        # `extra` capture ce que le runner ne transmet que lorsqu'il a quelque
+        # chose à transmettre — `session` (ticket-187), `ask_user`. Un test
+        # peut ainsi vérifier qu'un paramètre est absent, pas seulement nul.
         self.calls.append(
             {"mode": "complete", "system": system, "user": user,
-             "model": model, "max_tokens": max_tokens, "cwd": cwd}
+             "model": model, "max_tokens": max_tokens, "cwd": cwd, **extra}
         )
         return ProviderResult(
             content=self._content,
@@ -62,11 +66,12 @@ class FakeProvider:
         cwd: Path | None = None,
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
+        **extra: Any,
     ) -> ProviderResult:
         self.calls.append(
             {"mode": "stream", "system": system, "user": user,
              "model": model, "max_tokens": max_tokens, "cwd": cwd,
-             "on_token": on_token, "on_tool_use": on_tool_use}
+             "on_token": on_token, "on_tool_use": on_tool_use, **extra}
         )
         if on_token is not None:
             for chunk in self._content.split(" "):

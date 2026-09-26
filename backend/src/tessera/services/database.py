@@ -107,7 +107,11 @@ class ProjectUsage(BaseModel):
 #: évolution s'ajoute ici. Le modifier ferait diverger une base neuve d'une
 #: base migrée, et l'écart ne se verrait qu'à l'usage, sur la base de
 #: quelqu'un. Un test compare les deux.
-_MIGRATIONS: list[str] = []
+_MIGRATIONS: list[str] = [
+    # 1 — ticket-188 : le provider qui a répondu, pour que la ventilation des
+    # coûts dise ce qui a tourné quand un repli a servi.
+    "ALTER TABLE agent_calls ADD COLUMN provider TEXT NOT NULL DEFAULT '';",
+]
 
 
 def version_du_schema() -> int:
@@ -207,16 +211,17 @@ async def save_agent_call(
     cache_read_tokens: int,
     cost_usd: float,
     duration_ms: int,
+    provider: str = "",
 ) -> None:
     created_at = datetime.now(timezone.utc).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
             """INSERT INTO agent_calls
                (run_id, ticket_id, role, model, input_tokens, output_tokens,
-                cache_read_tokens, cost_usd, duration_ms, created_at)
-               VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                cache_read_tokens, cost_usd, duration_ms, created_at, provider)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
             (run_id, ticket_id, role, model, input_tokens, output_tokens,
-             cache_read_tokens, cost_usd, duration_ms, created_at),
+             cache_read_tokens, cost_usd, duration_ms, created_at, provider),
         )
         await db.commit()
 

@@ -25,6 +25,13 @@ class AgentRole(str, Enum):
     github_sync = "github-sync"
 
 
+class FallbackConfig(BaseModel):
+    """Sur quoi retomber quand le provider d'un rôle ne répond pas (ticket-188)."""
+
+    provider: str
+    model: str
+
+
 class AgentConfig(BaseModel):
     """Un agent tel que décrit dans agents.json d'un projet."""
 
@@ -34,6 +41,10 @@ class AgentConfig(BaseModel):
     prompt_file: str
     active: bool = True
     max_instances: int = 1
+    # Le provider se déclare par rôle (ticket-188). Absent : le défaut du
+    # backend, comme avant — un manifeste muet ne change pas de comportement.
+    provider: str = "agent_sdk"
+    fallback: FallbackConfig | None = None
 
 
 class AgentPipelineConfig(BaseModel):
@@ -66,6 +77,9 @@ class AgentResult(BaseModel):
     # d'un run entier (issue #61). Il n'existait auparavant que dans la branche
     # qui écrit en base, donc seulement quand un `run_id` était fourni.
     cost_usd: float = 0.0
+    # La conversation du provider, à reprendre au tour suivant (ticket-187).
+    # None quand le provider n'en rend pas : le tour suivant repart à froid.
+    session_id: str | None = None
 
 
 class AgentRunRequest(BaseModel):
