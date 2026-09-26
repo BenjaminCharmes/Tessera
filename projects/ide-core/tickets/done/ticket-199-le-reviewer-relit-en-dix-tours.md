@@ -2,8 +2,8 @@
 id: ticket-199
 title: "Le reviewer relit en dix tours d'outils, pas trente"
 type: chore
-status: in-progress
-pr_number: null
+status: done
+pr_number: 66
 priority: medium
 agent: codeur
 depends_on: []
