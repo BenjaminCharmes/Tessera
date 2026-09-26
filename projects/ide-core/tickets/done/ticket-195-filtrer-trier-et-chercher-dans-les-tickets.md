@@ -2,8 +2,8 @@
 id: ticket-195
 title: "Filtrer, trier et chercher dans les tickets"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 60
 priority: medium
 agent: codeur
 depends_on: []
