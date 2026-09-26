@@ -20,7 +20,7 @@ from tessera.routers import (
     services as services_router,
     tickets,
 )
-from tessera.services.database import init_db
+from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.prompt_loader import MissingPromptError
 from tessera.utils.logger import get_logger
 
@@ -30,6 +30,10 @@ _logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await init_db(settings.ide_db_path)
+    # Les runs qu'un processus tué a laissés « en cours » (ticket-177).
+    orphelins = await solder_les_runs_orphelins(settings.ide_db_path)
+    if orphelins:
+        _logger.warning("runs_orphelins_soldes", extra={"runs": orphelins})
     yield
     # Les services lancés pour un projet sont des enfants de ce process et
     # s'arrêtent avec lui (ADR-042). Les terminer explicitement rend l'arrêt
