@@ -58,7 +58,7 @@ def _documentable(chemin: str) -> bool:
     return any(normalise.startswith(prefixe) for prefixe in _DOCUMENTABLE)
 
 
-def appliquer_editions(project_path: Path, editions: list[dict[str, object]]) -> list[str]:
+def appliquer_editions(racine: Path, editions: list[dict[str, object]]) -> list[str]:
     """Applique toutes les modifications, ou aucune.
 
     Une documentation à moitié mise à jour est pire qu'une documentation en
@@ -74,7 +74,7 @@ def appliquer_editions(project_path: Path, editions: list[dict[str, object]]) ->
                 "documentation ne touche ni au code, ni aux tickets, ni aux ADR."
             )
 
-        fichier = project_path / chemin
+        fichier = racine / chemin
         if not fichier.is_file():
             raise EditionRefusee(f"{chemin} : fichier introuvable.")
 
@@ -234,7 +234,18 @@ class DocumentationService:
         provider, modele = self._fournisseur(role)
         return provider, modele or _MODELE
 
-    async def mettre_a_jour(self, project_path: Path) -> ResultatDocumentation:
+    async def mettre_a_jour(
+        self, project_path: Path, racine_doc: Path | None = None
+    ) -> ResultatDocumentation:
+        """Documents the tickets delivered since the marker.
+
+        `racine_doc` est le dossier où vivent `README.md` et `docs/` : le
+        projet lui-même, ou le dépôt qui le contient quand il déclare
+        `git_root: ancestor` — le projet bootstrap documente l'IDE à la racine
+        du dépôt, pas sous `projects/ide-core/` (ticket-198). Les tickets et
+        le marqueur, eux, restent ceux du projet.
+        """
+        racine = racine_doc or project_path
         tickets = tickets_a_documenter(project_path)
         if not tickets:
             # Un lot vide ne coûte rien : c'est ce qui permet de brancher la
@@ -258,7 +269,7 @@ class DocumentationService:
             if not editions:
                 continue
             try:
-                modifies.extend(appliquer_editions(project_path, editions))
+                modifies.extend(appliquer_editions(racine, editions))
             except EditionRefusee as exc:
                 # Un agent qui se trompe n'empêche pas l'autre d'avoir raison.
                 _logger.warning("editions_refusees", extra={"role": role})

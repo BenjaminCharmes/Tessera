@@ -10,7 +10,7 @@ from tessera.agents.github_sync import GithubSyncAgent
 from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.sync_map import SyncMapService
 from tessera.services.agent_runner import AgentRunner
-from tessera.services.documentation import DocumentationService
+from tessera.services.documentation import DocumentationService, ResultatDocumentation
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.git_workspace import GitWorkspaceService
@@ -214,7 +214,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
         livrer=_livreur(project_id, runner, politique),
-        documenter=_documenteur(project_id),
+        documenter=_documenteur(project_id, politique),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
         # bootstrap travaille au-dessus de lui (ADR-028), et sa carte doit le
@@ -223,14 +223,19 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     )
 
 
-def _documenteur(project_id: str) -> Callable[[], Awaitable[None]]:
+def _documenteur(
+    project_id: str, politique: PolitiqueRun | None = None
+) -> Callable[[], Awaitable[ResultatDocumentation]]:
     """Fabrique la mise à jour de documentation d'un projet (ticket-092).
 
-    Appelée **une fois par lot**, pas par ticket : la documentation décrit le
-    produit, pas un changement. Sans outils — elle lit des tickets et rend du
-    JSON, elle n'a aucune raison d'écrire elle-même sur le disque.
+    Appelée après chaque run approuvé, sur sa branche (ticket-198), pour le
+    lot des tickets livrés depuis le marqueur. Sans outils — elle lit des
+    tickets et rend du JSON, elle n'a aucune raison d'écrire elle-même sur le
+    disque. `README.md` et `docs/` sont cherchés à la racine d'écriture : le
+    projet bootstrap documente l'IDE à la racine du dépôt (ADR-028).
     """
     project_path = settings.ide_workspace_dir / project_id
+    racine_doc = (politique or PolitiqueRun.lire(project_path)).racine_ecriture(project_path)
 
     def _fournisseur(role: str) -> tuple[LLMProvider, str | None]:
         # Deux rôles, chacun son provider et son modèle (ticket-188).
@@ -243,8 +248,8 @@ def _documenteur(project_id: str) -> Callable[[], Awaitable[None]]:
         _fournisseur("doc-technique")[0], settings.ide_prompts_dir, fournisseur=_fournisseur
     )
 
-    async def documenter() -> None:
-        resultat = await service.mettre_a_jour(project_path)
+    async def documenter() -> ResultatDocumentation:
+        resultat = await service.mettre_a_jour(project_path, racine_doc=racine_doc)
         if resultat.fichiers_modifies:
             _logger.info(
                 "documentation_mise_a_jour",
@@ -252,6 +257,7 @@ def _documenteur(project_id: str) -> Callable[[], Awaitable[None]]:
             )
         for refus in resultat.refus:
             _logger.warning("documentation_refusee", extra={"motif": refus})
+        return resultat
 
     return documenter
 
