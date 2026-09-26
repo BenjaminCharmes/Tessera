@@ -2,8 +2,8 @@
 id: ticket-194
 title: "Changer le statut d'un ticket à la main, depuis la liste et le Kanban"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 58
 priority: medium
 agent: codeur
 depends_on: []

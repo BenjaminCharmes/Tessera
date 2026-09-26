@@ -2,8 +2,8 @@
 id: ticket-188
 title: "Le provider et le modèle se déclarent par rôle, avec un repli"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 55
 priority: high
 agent: codeur
 depends_on: []

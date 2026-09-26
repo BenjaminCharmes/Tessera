@@ -2,8 +2,8 @@
 id: ticket-193
 title: "L'IDE rouvre là où on l'a laissé"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 57
 priority: medium
 agent: codeur
 depends_on: []

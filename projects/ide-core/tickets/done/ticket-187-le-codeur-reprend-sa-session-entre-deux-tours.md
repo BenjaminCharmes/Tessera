@@ -2,8 +2,8 @@
 id: ticket-187
 title: "Le codeur reprend sa session entre deux tours de revue"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 52
 priority: high
 agent: codeur
 depends_on: []

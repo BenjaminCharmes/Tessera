@@ -2,8 +2,8 @@
 id: ticket-191
 title: "Le plafond de dépense d'un run se vérifie entre deux tours"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 53
 priority: medium
 agent: codeur
 depends_on: []

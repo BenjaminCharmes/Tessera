@@ -2,8 +2,8 @@
 id: ticket-189
 title: "Un provider Ollama sert les rôles sans outils sur un modèle local"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 56
 priority: high
 agent: codeur
 depends_on: ["ticket-188"]
