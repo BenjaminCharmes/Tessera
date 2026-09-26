@@ -184,6 +184,47 @@ async def finish_run(
         await db.commit()
 
 
+#: La cause écrite sur un run que le processus a laissé derrière lui.
+CAUSE_RUN_ORPHELIN = "backend restarted: the run's process is gone"
+
+
+async def solder_les_runs_orphelins(db_path: Path | str) -> list[str]:
+    """Settles every run left without `finished_at` — ticket-177.
+
+    Un backend local n'a qu'un processus (ADR-038) : au démarrage, un run
+    encore « en cours » en base est celui d'un processus qui n'est plus là.
+    Un `kill` n'exécute aucun `finally`, donc ni ADR-037 ni le commit de fin
+    de run n'ont eu lieu. On solde en `blocked`, jamais en approuvé, en
+    laissant intacts les événements et les coûts déjà enregistrés, et on
+    écrit la cause comme un événement `error`, pour que l'historique la
+    montre. Le jour où deux backends partageraient une base, cette hypothèse
+    tomberait : elle est ici, pas supposée ailleurs.
+    """
+    maintenant = datetime.now(timezone.utc).isoformat()
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT id, rounds FROM pipeline_runs WHERE finished_at IS NULL"
+        ) as cursor:
+            orphelins = await cursor.fetchall()
+        for run_id, rounds in orphelins:
+            await db.execute(
+                "INSERT INTO agent_events (run_id, type, agent, data_json, ts) VALUES (?,?,?,?,?)",
+                (
+                    run_id, "error", None,
+                    json.dumps({"reason": "interrupted", "detail": CAUSE_RUN_ORPHELIN}),
+                    maintenant,
+                ),
+            )
+            await db.execute(
+                """UPDATE pipeline_runs
+                   SET finished_at=?, rounds=?, approved=0, final_status='blocked'
+                   WHERE id=?""",
+                (maintenant, int(rounds or 0), run_id),
+            )
+        await db.commit()
+    return [str(run_id) for run_id, _ in orphelins]
+
+
 async def save_event(
     db_path: Path | str,
     run_id: str,
