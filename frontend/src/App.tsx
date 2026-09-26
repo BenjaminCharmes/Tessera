@@ -9,6 +9,9 @@ import { useProjects } from "./hooks/useProjects";
 import { useServices } from "./hooks/useServices";
 import { useSupervision } from "./hooks/useSupervision";
 import { useRunActif } from "./hooks/useRunActif";
+import { parmi, useEtatPersistant } from "./hooks/useEtatPersistant";
+import { useProjetMemorise } from "./hooks/useProjetMemorise";
+import { PANNEAUX } from "./components/Sidebar/panels";
 import { BAND } from "./design/layout";
 import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
@@ -31,11 +34,21 @@ import { projetsEnAttente } from "./components/Sidebar/projetsEnAttente";
 
 export default function App() {
   const { project, ticket, setProject, setTicket } = useActiveProject();
-  const [panel, setPanel] = useState<SidebarPanel>("projects");
+  // Le panneau, la vue et l'onglet de droite survivent au rechargement
+  // (ticket-193) ; le projet actif aussi, via `useProjetMemorise` plus bas.
+  const [panel, setPanel] = useEtatPersistant<SidebarPanel>(
+    "panneau",
+    "projects",
+    parmi(PANNEAUX),
+  );
   // Le centre montre le tableau des tickets par défaut, pas un fichier : le
   // cockpit sert à suivre la flotte, et l'édition est partie dans VSCode
   // (ticket-065).
-  const [showKanban, setShowKanban] = useState(true);
+  const [showKanban, setShowKanban] = useEtatPersistant<boolean>(
+    "kanban",
+    true,
+    (v): v is boolean => typeof v === "boolean",
+  );
   // Le run passe devant quand il démarre — c'est ce qu'on veut voir — mais
   // tout geste explicite le lui reprend. Sans cet état, « Vue liste » n'avait
   // aucun effet tant qu'un run tournait (ticket-178).
@@ -50,7 +63,11 @@ export default function App() {
   const [selection, setSelection] = useState<string[]>([]);
   const [agentSelectionne, setAgentSelectionne] = useState<string | null>(null);
   // Colonne de droite : observer un run, ou discuter (ticket-048).
-  const [sidePanel, setSidePanel] = useState<"agents" | "chat">("agents");
+  const [sidePanel, setSidePanel] = useEtatPersistant<"agents" | "chat">(
+    "onglet-droit",
+    "agents",
+    parmi(["agents", "chat"] as const),
+  );
   const { toasts, addToast, removeToast } = useToast();
 
   // Une seule socket pour toute la machine (ticket-129) : `supervision`
@@ -75,6 +92,9 @@ export default function App() {
     showKanban,
   });
   const { projects: projets } = useProjects();
+  // Sans passer par `handleSelectProject` : la restauration ne doit pas
+  // écraser le panneau et la vue, eux aussi restaurés.
+  const { memoriser } = useProjetMemorise(projets, project, setProject);
   const services = useServices(project?.id ?? null, supervision.signalServices);
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
@@ -126,6 +146,7 @@ export default function App() {
 
   function handleSelectProject(p: typeof project) {
     setProject(p);
+    memoriser(p?.id ?? null);
     setPanel("tickets");
     setShowKanban(true);
     setOpenFilePath(null);
