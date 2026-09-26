@@ -461,6 +461,19 @@ export interface VentilationDesCouts {
 }
 
 /** Un agent tel que ce projet le configure (ticket-080). */
+/** La configuration effective du pipeline d'un projet (ticket-196). */
+export interface PipelineReglages {
+  max_review_rounds: number;
+  testeur_enabled: boolean;
+  test_command: string | null;
+  securite_enabled: boolean;
+  validateur_enabled: boolean;
+  autonomy: string;
+  merge_without_ci: boolean;
+}
+
+export type PipelineReglagesPatch = Partial<PipelineReglages>;
+
 /** Les plafonds de dépense du backend (ticket-197). 0 = aucune borne. */
 export interface Limites {
   run_max_budget_usd: number;
