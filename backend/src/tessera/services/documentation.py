@@ -20,6 +20,7 @@ pas un changement : elle se met à jour par **lot**, une fois par file de
 tickets, ce qui divise d'autant le nombre d'appels.
 """
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -213,9 +214,25 @@ class DocumentationService:
     pour une même feature.
     """
 
-    def __init__(self, provider: LLMProvider, prompts_dir: Path) -> None:
+    def __init__(
+        self,
+        provider: LLMProvider,
+        prompts_dir: Path,
+        fournisseur: "Callable[[str], tuple[LLMProvider, str | None]] | None" = None,
+    ) -> None:
         self._provider = provider
         self._prompts_dir = prompts_dir
+        # Deux rôles, donc potentiellement deux providers et deux modèles
+        # (ticket-188) : `fournisseur(role)` rend la paire de chacun, le
+        # modèle pouvant être None. Sans lui, le provider reçu et le modèle
+        # d'avant servent aux deux.
+        self._fournisseur = fournisseur
+
+    def _pour(self, role: str) -> "tuple[LLMProvider, str]":
+        if self._fournisseur is None:
+            return self._provider, _MODELE
+        provider, modele = self._fournisseur(role)
+        return provider, modele or _MODELE
 
     async def mettre_a_jour(self, project_path: Path) -> ResultatDocumentation:
         tickets = tickets_a_documenter(project_path)
@@ -230,10 +247,11 @@ class DocumentationService:
 
         for role in _ROLES:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
-            reponse = await self._provider.complete(
+            provider, modele = self._pour(role)
+            reponse = await provider.complete(
                 system=systeme,
                 user=brief,
-                model=_MODELE,
+                model=modele,
                 max_tokens=_MAX_TOKENS,
             )
             editions = _editions_de(str(reponse.content), role)

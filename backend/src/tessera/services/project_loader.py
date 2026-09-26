@@ -5,6 +5,11 @@ from pathlib import Path
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
 from tessera.services.artifacts import default_mode_for
+from tessera.services.providers.noms import (
+    PROVIDERS_ANTHROPIC,
+    PROVIDERS_CONNUS,
+    ProviderInconnu,
+)
 
 
 # ------------------------------------------------------------------
@@ -84,9 +89,26 @@ def load_agents_config(project_path: Path) -> list[AgentConfig]:
         return []
     try:
         data = json.loads(agents_json.read_text(encoding="utf-8"))
-        return [AgentConfig(**a) for a in data.get("agents", [])]
+        configs = [AgentConfig(**a) for a in data.get("agents", [])]
     except Exception:
         return []
+    # Un provider mal orthographié n'est pas un manifeste illisible : le
+    # taire enverrait le rôle sur le défaut sans rien dire (ticket-188).
+    for config in configs:
+        _verifier_provider(config.role, config.provider)
+        if config.fallback is not None:
+            _verifier_provider(config.role, config.fallback.provider, repli=True)
+    return configs
+
+
+def _verifier_provider(role: str, provider: str, repli: bool = False) -> None:
+    if provider in PROVIDERS_CONNUS:
+        return
+    quoi = "repli" if repli else "provider"
+    raise ProviderInconnu(
+        f"Rôle '{role}' : {quoi} inconnu {provider!r}. "
+        f"Valeurs acceptées : {', '.join(PROVIDERS_CONNUS)}."
+    )
 
 
 def fait_tourner_l_ide(
@@ -392,26 +414,55 @@ def set_agent_model(project_path: Path, role: str, model: str) -> None:
     """
     from tessera.services.cost_calculator import modeles_connus
 
-    if model not in modeles_connus():
+    data, agent = _entree_du_role(project_path, role)
+    # La grille tarifaire ne borne que les providers Anthropic : ailleurs le
+    # coût est rapporté par le provider ou nul, et la liste n'aurait rien à
+    # dire (ticket-188).
+    if agent.get("provider", "agent_sdk") in PROVIDERS_ANTHROPIC and model not in modeles_connus():
         raise ModeleInconnu(
             f"Modèle inconnu : {model}. L'application ne saurait pas en "
             "calculer le coût."
         )
+    agent["model"] = model
+    _ecrire_manifeste(project_path, data)
 
+
+def set_agent_provider(
+    project_path: Path,
+    role: str,
+    provider: str,
+    fallback: dict[str, str] | None,
+) -> None:
+    """Change le provider d'un rôle et son repli, dans le manifeste du projet
+    (ticket-188). `fallback=None` retire le repli."""
+    _verifier_provider(role, provider)
+    if fallback is not None:
+        _verifier_provider(role, fallback["provider"], repli=True)
+    data, agent = _entree_du_role(project_path, role)
+    agent["provider"] = provider
+    if fallback is None:
+        agent.pop("fallback", None)
+    else:
+        agent["fallback"] = {"provider": fallback["provider"], "model": fallback["model"]}
+    _ecrire_manifeste(project_path, data)
+
+
+def _entree_du_role(project_path: Path, role: str) -> tuple[dict[str, object], dict[str, object]]:
     agents_json = project_path / "agents.json"
     if not agents_json.is_file():
         raise AgentAbsentDuProjet(f"{project_path.name} ne déclare aucun agent")
 
     data = json.loads(agents_json.read_text(encoding="utf-8"))
-    agents = data.get("agents", [])
-    for agent in agents:
+    for agent in data.get("agents", []):
         if agent.get("role") == role:
-            agent["model"] = model
-            break
-    else:
-        raise AgentAbsentDuProjet(f"L'agent '{role}' n'est pas déclaré ici")
+            return data, agent
+    raise AgentAbsentDuProjet(f"L'agent '{role}' n'est pas déclaré ici")
 
-    agents_json.write_text(
+
+def _ecrire_manifeste(project_path: Path, data: dict[str, object]) -> None:
+    """Réécrit `agents.json` en préservant tout ce qu'il contient d'autre :
+    le mode des artefacts, la racine git, la configuration du pipeline."""
+    (project_path / "agents.json").write_text(
         json.dumps(data, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )

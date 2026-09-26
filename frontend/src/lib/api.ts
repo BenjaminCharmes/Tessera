@@ -1,6 +1,7 @@
 import type {
   AgentDetail,
   ProjectAgents,
+  AgentSettingsPatch,
   VentilationDesCouts,
   AgentInfo,
   AnalysisResult,
@@ -209,9 +210,9 @@ export const api = {
     setAgentModel: (
       projectId: string,
       role: string,
-      model: string,
+      patch: AgentSettingsPatch,
     ): Promise<ProjectAgents> =>
-      put(`/projects/${projectId}/agents/${role}`, { model }),
+      put(`/projects/${projectId}/agents/${role}`, patch),
     cleanupPlan: (projectId: string): Promise<PlanDeNettoyage> =>
       request(`/projects/${projectId}/branches/cleanup`),
     cleanup: (projectId: string, branches: string[]): Promise<string[]> =>

@@ -12,6 +12,7 @@ import pytest
 
 from tessera.config import settings
 from tessera.routers.agents import _make_agent_creator, _make_project_creator, _make_runner
+from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 
 
 @pytest.fixture(autouse=True)
@@ -67,4 +68,6 @@ def test_make_runner_donne_au_reviewer_des_outils_en_lecture_seule() -> None:
     # ne filtre rien : c'est ici que le produit construit ses runners.
     runner = _make_runner("mon-projet")
     assert runner._provider_pour("reviewer")._allowed_tools == ["Read", "Glob", "Grep"]
-    assert runner._provider_pour("codeur") is runner._provider
+    # Depuis ticket-188 chaque rôle a son provider : le codeur n'est plus
+    # l'instance commune, mais il garde le jeu d'outils complet.
+    assert runner._provider_pour("codeur")._allowed_tools == ClaudeAgentSDKProvider.ALLOWED_TOOLS
