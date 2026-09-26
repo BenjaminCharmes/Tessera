@@ -194,6 +194,16 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     if run.session_codeur is not None:
         extra["session"] = run.session_codeur
         context = run.contexte_du_tour
+    elif run.carte_du_depot:
+        # La carte précède le contexte : `adr_pertinents` découpe tout ce qui
+        # suit « Décisions récentes » en ADR, et une carte placée après serait
+        # avalée par le dernier d'entre eux (ticket-190). Le reviewer ne la
+        # reçoit pas : il part du diff.
+        context = (
+            "## Fichiers du projet\n"
+            "Lis ce dont tu as besoin ; ne relis pas cette carte.\n\n"
+            f"{run.carte_du_depot}\n\n{context}"
+        )
 
     codeur_result = await orch._runner.run(
         role=role,

@@ -29,6 +29,7 @@ from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 
 if TYPE_CHECKING:
+    from tessera.services.carte_du_depot import CarteDuDepot
     from tessera.services.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder
     from tessera.services.git_workspace import GitWorkspaceService
@@ -66,6 +67,7 @@ class Orchestrator:
         livrer: Optional[Callable[[PipelineResult], Awaitable["Livraison"]]] = None,
         documenter: Optional[Callable[[], Awaitable[None]]] = None,
         run_recorder: Optional["RunRecorder"] = None,
+        carte_du_depot: Optional["CarteDuDepot"] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -99,6 +101,9 @@ class Orchestrator:
         # fourni : la file, le run autonome et le chat ne persistaient ni
         # leurs runs ni les coûts de leurs appels (ticket-121).
         self._run_recorder = run_recorder
+        # La liste des fichiers suivis, donnée au codeur au premier tour pour
+        # qu'il ne la reconstruise pas à coups de `Glob` (ticket-190).
+        self._carte_du_depot = carte_du_depot
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -213,6 +218,7 @@ class Orchestrator:
 
         await set_status(self, run, TicketStatus.in_progress)
         await stages.create_branch(self, run)
+        run.carte_du_depot = await self._carte()
 
         # À partir d'ici une branche existe et les agents écrivent sur disque :
         # une panne qui remonterait laisserait leur travail non commité, donc
@@ -224,6 +230,16 @@ class Orchestrator:
             return await self._run_rounds(run, ticket_id)
         except Exception as exc:  # noqa: BLE001 — la cause part dans le résultat
             return await outcomes.finish_interrupted(self, run, exc)
+
+    async def _carte(self) -> str:
+        """The repository map, or nothing: an aid must never cost the run."""
+        if self._carte_du_depot is None:
+            return ""
+        try:
+            return await self._carte_du_depot.rendre()
+        except Exception as exc:  # noqa: BLE001 — une carte absente n'arrête rien
+            _logger.warning("carte_du_depot_failed", extra={"error": str(exc)})
+            return ""
 
     async def _run_rounds(self, run: PipelineRun, ticket_id: str) -> PipelineResult:
         """Enchaîne les tours de revue jusqu'à approbation, blocage ou épuisement."""

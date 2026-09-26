@@ -53,6 +53,11 @@ class PipelineRun:
     # None, et chaque tour reste l'appel complet.
     session_codeur: str | None = None
 
+    # La liste des fichiers suivis, calculée une fois avant le premier agent
+    # (ticket-190) : le codeur ne doit pas y voir ses propres fichiers du
+    # tour précédent. Vide quand git n'a rien à dire.
+    carte_du_depot: str = ""
+
     # --- remis à zéro à chaque tour ---
     round_num: int = 0
     reviewed_code: str = ""
