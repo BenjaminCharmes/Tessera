@@ -223,7 +223,13 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
             type=EventType.AGENT_DONE,
             agent=role,
             ticket_id=ticket_id,
-            data={"content": codeur_result.content},
+            # Le coût part avec la fin de l'appel : c'est pendant le run
+            # qu'on décide de l'arrêter (ticket-197).
+            data={
+                "content": codeur_result.content,
+                "cost_usd": codeur_result.cost_usd,
+                "duration_ms": codeur_result.duration_ms,
+            },
         )
     )
     orch._log(
@@ -413,7 +419,11 @@ async def run_review(
             type=EventType.AGENT_DONE,
             agent=AgentRole.reviewer,
             ticket_id=ticket_id,
-            data={"content": reviewer_result.content},
+            data={
+                "content": reviewer_result.content,
+                "cost_usd": reviewer_result.cost_usd,
+                "duration_ms": reviewer_result.duration_ms,
+            },
         )
     )
     orch._log(

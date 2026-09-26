@@ -2,6 +2,7 @@ import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconCross } from "../../design/icons";
 import RoundBadge from "./RoundBadge";
+import { resumeDuCout } from "../../lib/budget";
 import QuotaBadge from "./QuotaBadge";
 import AgentDialogue from "./AgentDialogue";
 import TicketActivity from "./TicketActivity";
@@ -28,6 +29,9 @@ export default function AgentPanel({
     ticketId,
     currentAgent,
     currentRound,
+    coutUsd,
+    appels,
+    outils,
     currentTokens,
     lastResult,
     errorMessage,
@@ -113,6 +117,11 @@ export default function AgentPanel({
         {(status === "running" || status === "done") && (
           <>
             {currentRound > 0 && <RoundBadge current={currentRound} />}
+            {(coutUsd > 0 || outils > 0) && (
+              <p className="px-4 pb-1 text-micro text-zinc-500" data-testid="cout-du-run">
+                {resumeDuCout(coutUsd, appels, outils)}
+              </p>
+            )}
 
             {coderStarted && (
               <AgentBlock

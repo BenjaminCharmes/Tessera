@@ -86,3 +86,24 @@ describe("RunCard — la file se déplie (ticket-179)", () => {
     expect(screen.queryByText("la file")).toBeNull();
   });
 });
+
+describe("RunCard — coût en direct (ticket-197)", () => {
+  it("montre le cout, les appels et les outils depuis l'instantane", () => {
+    // Un F5 pendant le run doit retrouver le cumul, pas repartir de zéro.
+    rendre(run({ cout_usd: 0.84, appels: 3, outils: 47 }));
+    expect(screen.getByText("0,84 $ · 3 appels · 47 outils")).toBeInTheDocument();
+  });
+
+  it("passe en amber a 70 % du plafond et en red a 90 %", () => {
+    // ADR-026 : amber pour l'alerte, red pour l'échec, jamais de violet.
+    const { unmount } = render(
+      <RunCard run={run({ cout_usd: 3.6, appels: 2, outils: 0 })} etat={INITIAL} selectionne={false} onSelect={vi.fn()} plafondUsd={5} />,
+    );
+    expect(screen.getByText(/3,60 \$ .* sur 5,00 \$/)).toHaveClass("text-amber-200");
+    unmount();
+    render(
+      <RunCard run={run({ cout_usd: 4.6, appels: 2, outils: 0 })} etat={INITIAL} selectionne={false} onSelect={vi.fn()} plafondUsd={5} />,
+    );
+    expect(screen.getByText(/4,60 \$ .* sur 5,00 \$/)).toHaveClass("text-red-200");
+  });
+});

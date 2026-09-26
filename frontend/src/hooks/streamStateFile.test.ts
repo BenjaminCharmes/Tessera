@@ -82,3 +82,18 @@ describe("applyEvent — un ticket de file n'hérite pas du précédent (ticket-
     expect(apres.status).toBe("running");
   });
 });
+
+describe("applyEvent — coût en direct (ticket-197)", () => {
+  it("cumule le coût et compte les appels, et remet les outils à zéro par agent", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "codeur", data: {} }));
+    s = applyEvent(s, ev({ type: "agent_tool_use", agent: "codeur", data: { tool: "Read" } }));
+    s = applyEvent(s, ev({ type: "agent_tool_use", agent: "codeur", data: { tool: "Edit" } }));
+    expect(s.outils).toBe(2);
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "", cost_usd: 0.4 } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "reviewer", data: {} }));
+    expect(s.outils).toBe(0);
+    s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "APPROVED", cost_usd: 0.2 } }));
+    expect(s.coutUsd).toBeCloseTo(0.6);
+    expect(s.appels).toBe(2);
+  });
+});

@@ -34,6 +34,13 @@ function avancementDeLaFile(ev: OrchestratorEvent): Partial<RunActif> {
   };
 }
 
+/** Ce qu'un `agent_done` a coûté ; zéro pour tout autre événement. */
+function coutDe(ev: OrchestratorEvent): number {
+  if (ev.type !== "agent_done") return 0;
+  const c = ev.data["cost_usd"];
+  return typeof c === "number" ? c : 0;
+}
+
 /** Garde la carte d'un run en phase avec ce qu'il annonce. */
 export function majDesRuns(
   prec: RunActif[],
@@ -56,7 +63,9 @@ export function majDesRuns(
         tour: 0,
         tokens_entree: 0,
         tokens_sortie: 0,
-        cout_usd: 0,
+        cout_usd: coutDe(ev),
+        appels: ev.type === "agent_done" ? 1 : 0,
+        outils: ev.type === "agent_tool_use" ? 1 : 0,
         verdict: null,
         demarre_a: ev.timestamp,
         ...avancementDeLaFile(ev),
@@ -72,6 +81,15 @@ export function majDesRuns(
           etape: ev.type === "agent_started" ? ev.type : r.etape,
           tour:
             typeof ev.data["round"] === "number" ? ev.data["round"] : r.tour,
+          // Le coût et les compteurs suivent les événements comme le
+          // registre le fait côté backend (ticket-197) : sans cela, un run
+          // créé côté client restait à zéro jusqu'au prochain instantané.
+          cout_usd: r.cout_usd + coutDe(ev),
+          appels: (r.appels ?? 0) + (ev.type === "agent_done" ? 1 : 0),
+          outils:
+            ev.type === "agent_started"
+              ? 0
+              : (r.outils ?? 0) + (ev.type === "agent_tool_use" ? 1 : 0),
           ...avancementDeLaFile(ev),
         }
       : r,

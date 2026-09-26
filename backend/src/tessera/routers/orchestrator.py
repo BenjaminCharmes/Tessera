@@ -341,6 +341,21 @@ def _libelle(request: RunRequest) -> str:
     return request.mode
 
 
+class Limites(BaseModel):
+    """Les plafonds de dépense, pour que l'écran situe un coût (ticket-197)."""
+
+    run_max_budget_usd: float
+    llm_max_budget_usd: float
+
+
+@router.get("/limits", response_model=Limites)
+async def get_limits() -> Limites:
+    return Limites(
+        run_max_budget_usd=settings.run_max_budget_usd,
+        llm_max_budget_usd=settings.llm_max_budget_usd,
+    )
+
+
 @router.post("/run", status_code=202, response_model=RunStarted)
 async def run_pipeline(request: RunRequest) -> RunStarted:
     """Start a run, and answer with its id without waiting for it to end.

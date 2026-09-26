@@ -2,6 +2,7 @@ import type {
   AgentDetail,
   ProjectAgents,
   AgentSettingsPatch,
+  Limites,
   VentilationDesCouts,
   AgentInfo,
   AnalysisResult,
@@ -146,6 +147,8 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       }),
+    /** Les plafonds de dépense, pour situer un coût (ticket-197). */
+    limits: (): Promise<Limites> => request("/orchestrator/limits"),
   },
   services: {
     /**
