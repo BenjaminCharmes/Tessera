@@ -2,8 +2,8 @@
 id: ticket-192
 title: "Une notification système quand un run a besoin de vous, ou finit"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 63
 priority: high
 agent: codeur
 depends_on: []
