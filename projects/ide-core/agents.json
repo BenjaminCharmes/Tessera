@@ -35,6 +35,66 @@
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/architect.md",
       "active": true
+    },
+    {
+      "role": "securite",
+      "model": "qwen3-coder:30b",
+      "max_tokens": 4096,
+      "prompt_file": "agents/prompts/securite.md",
+      "active": true,
+      "provider": "ollama",
+      "fallback": {
+        "provider": "agent_sdk",
+        "model": "claude-haiku-4-5"
+      }
+    },
+    {
+      "role": "validateur",
+      "model": "qwen3-coder:30b",
+      "max_tokens": 4096,
+      "prompt_file": "agents/prompts/validateur.md",
+      "active": true,
+      "provider": "ollama",
+      "fallback": {
+        "provider": "agent_sdk",
+        "model": "claude-haiku-4-5"
+      }
+    },
+    {
+      "role": "doc-technique",
+      "model": "qwen3-coder:30b",
+      "max_tokens": 4096,
+      "prompt_file": "agents/prompts/doc-technique.md",
+      "active": true,
+      "provider": "ollama",
+      "fallback": {
+        "provider": "agent_sdk",
+        "model": "claude-haiku-4-5"
+      }
+    },
+    {
+      "role": "doc-fonctionnelle",
+      "model": "qwen3-coder:30b",
+      "max_tokens": 4096,
+      "prompt_file": "agents/prompts/doc-fonctionnelle.md",
+      "active": true,
+      "provider": "ollama",
+      "fallback": {
+        "provider": "agent_sdk",
+        "model": "claude-haiku-4-5"
+      }
+    },
+    {
+      "role": "project-analyzer",
+      "model": "qwen3-coder:30b",
+      "max_tokens": 4096,
+      "prompt_file": "agents/prompts/project-analyzer.md",
+      "active": true,
+      "provider": "ollama",
+      "fallback": {
+        "provider": "agent_sdk",
+        "model": "claude-sonnet-4-6"
+      }
     }
   ],
   "pipeline": {

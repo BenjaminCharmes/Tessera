@@ -51,6 +51,23 @@ make dev-frontend   # interface → http://localhost:5173
 autre terminal. Le détail — Docker, Windows, build de production — est dans le
 [guide utilisateur](docs/guide-utilisateur.md).
 
+### Un modèle local pour les rôles de jugement
+
+Les rôles qui ne font qu'un appel texte → JSON — audit sécurité, validateur,
+documentation, analyse de projet — peuvent tourner sur un modèle servi par
+[Ollama](https://ollama.com), à coût nul. Le projet le déclare rôle par rôle
+dans son `agents.json` (`"provider": "ollama"`), avec un repli sur Claude pour
+les machines qui n'ont pas Ollama :
+
+```bash
+ollama pull qwen3-coder:30b     # ~19 Go, un seul modèle pour tous ces rôles
+```
+
+`OLLAMA_BASE_URL` (défaut `http://127.0.0.1:11434`) dit où est le serveur.
+L'IDE ne télécharge jamais un modèle lui-même : absent, le repli prend le
+relais et le signale. Le codeur, le reviewer et le chat restent sur Claude —
+ils ont besoin des outils fichier que seul le SDK fournit.
+
 ## Documentation
 
 | | |
