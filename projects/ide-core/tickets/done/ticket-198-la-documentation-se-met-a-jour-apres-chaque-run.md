@@ -2,8 +2,8 @@
 id: ticket-198
 title: "La documentation se met à jour à la fin de chaque run, pas seulement d'une file"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 65
 priority: high
 agent: codeur
 depends_on: []
