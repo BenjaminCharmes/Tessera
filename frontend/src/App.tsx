@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useState } from "react";
 import { useActiveProject } from "./hooks/useActiveProject";
 import { useTickets } from "./hooks/useTickets";
@@ -12,6 +12,10 @@ import { useRunActif } from "./hooks/useRunActif";
 import { parmi, useEtatPersistant } from "./hooks/useEtatPersistant";
 import { useProjetMemorise } from "./hooks/useProjetMemorise";
 import { useFiltresTickets } from "./hooks/useFiltresTickets";
+import {
+  demanderPermissionNotifications,
+  useNotificationsSysteme,
+} from "./hooks/useNotificationsSysteme";
 import { filtrerParStatut } from "./lib/filtresTickets";
 import { PANNEAUX } from "./components/Sidebar/panels";
 import { BAND } from "./design/layout";
@@ -98,6 +102,16 @@ export default function App() {
   // Sans passer par `handleSelectProject` : la restauration ne doit pas
   // écraser le panneau et la vue, eux aussi restaurés.
   const { memoriser } = useProjetMemorise(projets, project, setProject);
+  // Une notification ramène au projet concerné (ticket-192).
+  const ouvrirProjet = useCallback(
+    (id: string) => {
+      const p = projets.find((x) => x.id === id);
+      if (p) handleSelectProject(p);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [projets],
+  );
+  const notifications = useNotificationsSysteme(supervision, project?.id ?? null, ouvrirProjet);
   const services = useServices(project?.id ?? null, supervision.signalServices);
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
@@ -212,6 +226,8 @@ export default function App() {
   // effet, et dit mieux ce qui se passe (ticket-178).
   function handleRunPipeline(ticketId: string) {
     setRunAuPremierPlan(true);
+    // La permission se demande au premier run lancé, jamais au chargement.
+    void demanderPermissionNotifications();
     stream.connect(ticketId);
   }
 
@@ -292,6 +308,11 @@ export default function App() {
             }}
             onSelectProject={handleSelectProject}
             onChangeStatus={handleChangeStatus}
+            notifications={{
+              active: notifications.active,
+              etat: notifications.etat,
+              onChange: notifications.setActive,
+            }}
             onProjectCreated={handleProjectCreated}
             onSelectTicket={handleSelectTicket}
             onRunPipeline={handleRunPipeline}
@@ -329,10 +350,12 @@ export default function App() {
             }
             onRunQueue={() => {
               setRunAuPremierPlan(true);
+              void demanderPermissionNotifications();
               stream.connectQueue(selection);
             }}
             onRunAutonome={(options) => {
               setRunAuPremierPlan(true);
+              void demanderPermissionNotifications();
               stream.connectAutonome(options);
             }}
             onClearQueue={() => setSelection([])}
