@@ -2,8 +2,8 @@
 id: ticket-196
 title: "Régler le pipeline d'un projet depuis l'UI"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 62
 priority: medium
 agent: codeur
 depends_on: []
