@@ -2,8 +2,8 @@
 id: ticket-197
 title: "Le coût d'un run se lit pendant qu'il tourne"
 type: feat
-status: in-progress
-pr_number: null
+status: done
+pr_number: 61
 priority: medium
 agent: codeur
 depends_on: []
