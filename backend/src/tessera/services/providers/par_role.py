@@ -40,6 +40,7 @@ def provider_pour_role(
     tools: list[str] | None = None,
     racine_ecriture: Path | None = None,
     project_id: str | None = None,
+    max_turns: int | None = None,
 ) -> LLMProvider:
     """Builds the provider `role` declares, wrapped in its fallback if any.
 
@@ -50,16 +51,17 @@ def provider_pour_role(
     """
     config = config_du_role(project_path, role)
     nom = config.provider if config is not None else settings.llm_provider
+    tours = max_turns if max_turns is not None else settings.llm_max_turns
     principal = get_provider(
         nom, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
     )
     if config is None or config.fallback is None:
         return principal
     repli = get_provider(
         config.fallback.provider, settings.anthropic_api_key,
-        max_turns=settings.llm_max_turns, max_budget_usd=settings.llm_max_budget_usd,
+        max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
     )
     return ProviderAvecRepli(

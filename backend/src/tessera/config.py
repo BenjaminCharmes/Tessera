@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     # la dépense réelle d'un seul appel agent (le garde-fou qui protège le
     # quota de l'abonnement). Voir memory/decisions.md pour le choix de 1.0 USD.
     llm_max_turns: int = 30
+    # Le reviewer a le diff dans son prompt : ses outils servent à regarder
+    # autour, pas à redécouvrir le dépôt. Trente tours pour relire un diff
+    # qu'on lui a collé, c'est un budget de codeur donné à un lecteur
+    # (ticket-199).
+    llm_max_turns_reviewer: int = 10
     # Relevé de 1.0 à 2.0 (ticket-102) : le premier run réel de ce dépôt a
     # atteint le plafond au milieu du tour d'un codeur, sur un ticket de taille
     # ordinaire. Un garde-fou qu'une tâche normale déclenche ne borne pas un
