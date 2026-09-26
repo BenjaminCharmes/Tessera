@@ -149,6 +149,7 @@ export default function Sidebar({
         servicesOuverts={servicesOuverts}
         services={services}
         sortieDeService={sortieDeService}
+        runEnCours={running.size > 0}
       />
 
       <div className="flex-1 overflow-y-auto">

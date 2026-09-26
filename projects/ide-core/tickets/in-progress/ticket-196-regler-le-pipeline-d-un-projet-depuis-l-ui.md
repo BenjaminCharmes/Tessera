@@ -2,7 +2,7 @@
 id: ticket-196
 title: "Régler le pipeline d'un projet depuis l'UI"
 type: feat
-status: todo
+status: in-progress
 pr_number: null
 priority: medium
 agent: codeur

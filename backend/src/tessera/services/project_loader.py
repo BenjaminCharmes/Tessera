@@ -447,6 +447,31 @@ def set_agent_provider(
     _ecrire_manifeste(project_path, data)
 
 
+def set_pipeline_settings(
+    project_path: Path,
+    *,
+    pipeline: dict[str, object],
+    racine: dict[str, object],
+) -> None:
+    """Réécrit les seuls réglages reçus dans le manifeste du projet (ticket-196).
+
+    `pipeline` va sous la clef `pipeline`, `racine` au premier niveau
+    (`autonomy`, `merge_without_ci`). Tout le reste du fichier est préservé :
+    services, artefacts, racine git, agents.
+    """
+    agents_json = project_path / "agents.json"
+    if not agents_json.is_file():
+        raise AgentAbsentDuProjet(f"{project_path.name} n'a pas de manifeste")
+    data = json.loads(agents_json.read_text(encoding="utf-8"))
+    section = data.get("pipeline")
+    if not isinstance(section, dict):
+        section = {}
+    section.update(pipeline)
+    data["pipeline"] = section
+    data.update(racine)
+    _ecrire_manifeste(project_path, data)
+
+
 def _entree_du_role(project_path: Path, role: str) -> tuple[dict[str, object], dict[str, object]]:
     agents_json = project_path / "agents.json"
     if not agents_json.is_file():
