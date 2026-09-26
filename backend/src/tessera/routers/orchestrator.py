@@ -148,9 +148,10 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # review, finding 4).
     def _par_role(role: str) -> LLMProvider:
         outils = OUTILS_DE_RELECTURE if role == "reviewer" else None
+        tours = settings.llm_max_turns_reviewer if role == "reviewer" else None
         return provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
-            project_id=project_id,
+            project_id=project_id, max_turns=tours,
         )
 
     def _sans_outils(role: str) -> LLMProvider:

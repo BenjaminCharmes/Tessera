@@ -37,7 +37,10 @@ def _make_runner(project_id: str) -> AgentRunner:
     def _par_role(role: str) -> LLMProvider:
         # Le reviewer relit : le même provider, réduit à la lecture.
         outils = OUTILS_DE_RELECTURE if role == "reviewer" else None
-        return provider_pour_role(project_path, role, tools=outils, project_id=project_id)
+        tours = settings.llm_max_turns_reviewer if role == "reviewer" else None
+        return provider_pour_role(
+            project_path, role, tools=outils, project_id=project_id, max_turns=tours
+        )
 
     return AgentRunner(
         _par_role("codeur"), registry, project_path=project_path, provider_par_role=_par_role
