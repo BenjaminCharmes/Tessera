@@ -23,10 +23,9 @@ class _OrchestrateurFile:
         self._run_max_budget_usd = 0.0
         self._spent_usd = 0.0
         self.run_queue = Orchestrator.run_queue.__get__(self)  # type: ignore[attr-defined]
-        # La documentation se met à jour à la fin du lot (ticket-092) ; ce
-        # double n'en a pas, et `run_queue` doit s'en passer.
+        # La documentation se met à jour après chaque run approuvé (ticket-198),
+        # dans `run_pipeline`, que ce double remplace : rien à brancher ici.
         self._documenter = None
-        self._documenter_le_lot = Orchestrator._documenter_le_lot.__get__(self)  # type: ignore[attr-defined]
         self.budget_exhausted = lambda: False
         self._log = lambda m: None
         # Par défaut aucun ticket n'est terminé : les tests qui veulent

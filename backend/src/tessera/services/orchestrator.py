@@ -8,7 +8,7 @@ hard to get right.
 from datetime import datetime, timezone
 from pathlib import Path
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
@@ -65,7 +65,7 @@ class Orchestrator:
         run_max_budget_usd: float = 0.0,
         quota_tracker: Optional["QuotaTracker"] = None,
         livrer: Optional[Callable[[PipelineResult], Awaitable["Livraison"]]] = None,
-        documenter: Optional[Callable[[], Awaitable[None]]] = None,
+        documenter: Optional[Callable[[], Awaitable[Any]]] = None,
         run_recorder: Optional["RunRecorder"] = None,
         carte_du_depot: Optional["CarteDuDepot"] = None,
     ) -> None:
@@ -146,7 +146,14 @@ class Orchestrator:
         resultat = await self._run_enregistre(
             project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
         )
-        if self._livrer is None or not resultat.approved:
+        if not resultat.approved:
+            return resultat
+
+        # La documentation part sur la branche du run, avant sa livraison :
+        # elle décrit ce que la PR livre, et se relit avec (ticket-198).
+        await self._documenter_le_run(resultat, on_event)
+
+        if self._livrer is None:
             return resultat
 
         livraison = await self._livrer(resultat)
@@ -393,7 +400,6 @@ class Orchestrator:
                 )
                 break
 
-        await self._documenter_le_lot()
         return results
 
     async def run_autonomous(
@@ -457,22 +463,47 @@ class Orchestrator:
             result = await self.run_pipeline(project_id, ticket.id, callback)
             results.append(result)
 
-        await self._documenter_le_lot()
         return results
 
-    async def _documenter_le_lot(self) -> None:
-        """Met à jour la documentation, une fois, à la fin du lot.
+    async def _documenter_le_run(
+        self, resultat: PipelineResult, on_event: EventCallback
+    ) -> None:
+        """Met à jour la documentation après un run approuvé, sur sa branche.
 
-        Un échec ne casse pas la file : le travail des tickets est commité, et
-        perdre leurs résultats parce que la documentation n'a pas pu se mettre
-        à jour serait disproportionné.
+        Le lot reste celui du marqueur : un run qui suit cinq tickets non
+        documentés les documente tous. La documentation est commitée ici, sur
+        la branche du run, pour partir dans sa PR — à la fin d'une file, elle
+        restait sur le disque sans commit, et le run suivant refusait l'arbre
+        sale (ADR-018). Un échec ne casse pas le run : le travail est commité,
+        et perdre son résultat pour une documentation en retard serait
+        disproportionné (ticket-198).
         """
         if self._documenter is None:
             return
         try:
-            await self._documenter()
+            doc = await self._documenter()
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("documentation_echouee", extra={"erreur": str(exc)})
+            return
+        fichiers = list(getattr(doc, "fichiers_modifies", []) or [])
+        refus = list(getattr(doc, "refus", []) or [])
+        tickets = list(getattr(doc, "tickets", []) or [])
+        if fichiers and self._git_workspace is not None and resultat.branch is not None:
+            try:
+                await self._git_workspace.commit_all(
+                    f"docs: update documentation for {resultat.ticket_id}"
+                )
+            except Exception as exc:  # noqa: BLE001
+                _logger.warning("documentation_commit_echoue", extra={"erreur": str(exc)})
+                refus.append(f"commit : {exc}")
+        if fichiers or refus:
+            await on_event(
+                OrchestratorEvent(
+                    type=EventType.DOC_UPDATED,
+                    ticket_id=resultat.ticket_id,
+                    data={"fichiers": fichiers, "refus": refus, "tickets": tickets},
+                )
+            )
 
     def _log(self, message: str) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
