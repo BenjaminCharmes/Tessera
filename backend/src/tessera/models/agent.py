@@ -66,6 +66,9 @@ class AgentResult(BaseModel):
     # d'un run entier (issue #61). Il n'existait auparavant que dans la branche
     # qui écrit en base, donc seulement quand un `run_id` était fourni.
     cost_usd: float = 0.0
+    # La conversation du provider, à reprendre au tour suivant (ticket-187).
+    # None quand le provider n'en rend pas : le tour suivant repart à froid.
+    session_id: str | None = None
 
 
 class AgentRunRequest(BaseModel):

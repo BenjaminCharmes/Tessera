@@ -41,7 +41,10 @@ class AnthropicApiProvider:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> ProviderResult:
+        # `session` est ignoré : la Messages API n'a pas de conversation à
+        # reprendre, chaque appel est complet (ticket-187).
         response = await self._client.messages.create(
             model=model,
             max_tokens=max_tokens,
@@ -62,6 +65,7 @@ class AnthropicApiProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        session: str | None = None,
     ) -> ProviderResult:
         chunks: list[str] = []
         async with self._client.messages.stream(
