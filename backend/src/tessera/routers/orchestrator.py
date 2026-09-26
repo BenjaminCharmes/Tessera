@@ -12,6 +12,7 @@ from tessera.services.sync_map import SyncMapService
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.documentation import DocumentationService
 from tessera.services.event_hub import EVENT_HUB
+from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
@@ -208,6 +209,10 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         livrer=_livreur(project_id, runner, politique),
         documenter=_documenteur(project_id),
         run_recorder=RunRecorder(settings.ide_db_path),
+        # Depuis la racine d'écriture, pas le dossier du projet : le projet
+        # bootstrap travaille au-dessus de lui (ADR-028), et sa carte doit le
+        # montrer (ticket-190).
+        carte_du_depot=CarteDuDepot.depuis(project_path, politique),
     )
 
 
