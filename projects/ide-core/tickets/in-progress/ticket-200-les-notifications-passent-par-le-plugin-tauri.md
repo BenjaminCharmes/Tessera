@@ -57,6 +57,14 @@ ticket-192.
 
 Une demi-journée.
 
+## Vérification de `cargo check`
+
+Sur le poste de livraison, la politique de contrôle d'application (WDAC,
+erreur 4551) bloque l'exécution de tout binaire compilé localement, scripts
+de build de Cargo compris : aucun `cargo check` local n'est possible, quelle
+que soit la chaîne. Le job `tauri` de la CI, sur macOS, fait ce `cargo check`
+dès que `src-tauri/` change : c'est lui qui tranche.
+
 ## Risques
 
 Le plugin demande la permission système à l'usage ; refusée, la
