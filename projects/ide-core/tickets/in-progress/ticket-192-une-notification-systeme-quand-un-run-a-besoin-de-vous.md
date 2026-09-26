@@ -2,7 +2,7 @@
 id: ticket-192
 title: "Une notification système quand un run a besoin de vous, ou finit"
 type: feat
-status: todo
+status: in-progress
 pr_number: null
 priority: high
 agent: codeur
@@ -68,6 +68,16 @@ question posée, run bloqué, run fermé, file terminée.
 ## Ce que ça ne fait pas
 
 Pas de notification par e-mail ni sur mobile. Pas de son.
+
+**Livré sans le plugin Tauri.** La chaîne Rust n'était pas disponible sur la
+machine de livraison, donc `cargo check` n'aurait pas pu valider l'ajout de
+`tauri-plugin-notification` ni la permission `notification:default`. Les
+notifications passent par l'API `Notification` du web : elles servent dans le
+navigateur, et dans la WebView quand elle la porte. Le plugin, sa permission
+et le clic qui ramène la fenêtre au premier plan côté desktop sont à faire
+dans un ticket `chore` dès qu'un poste avec `cargo` est disponible. Un
+`provider_fallback` n'est pas notifié non plus : il ne passe pas par l'état
+des runs que le hook observe.
 
 ## Dépendances
 
