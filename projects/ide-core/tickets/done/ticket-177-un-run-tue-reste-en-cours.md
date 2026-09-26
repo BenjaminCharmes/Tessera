@@ -2,8 +2,8 @@
 id: ticket-177
 title: "Un backend redémarré laisse ses runs « en cours » pour toujours"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 68
 priority: high
 agent: codeur
 depends_on: []
