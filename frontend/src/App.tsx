@@ -25,7 +25,8 @@ import ChatPanel from "./components/ChatPanel";
 import BottomPanel from "./components/BottomPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
-import type { Project, Ticket } from "./types/api";
+import type { Project, Ticket, TicketStatus } from "./types/api";
+import { api } from "./lib/api";
 import { vueDuCentre } from "./vueDuCentre";
 import { projetsEnAttente } from "./components/Sidebar/projetsEnAttente";
 
@@ -154,6 +155,17 @@ export default function App() {
   // Le ticket porte désormais un `pr_number` : la liste se relit pour le
   // montrer. `TicketCard` attendait ce rappel sans que rien ne le fournisse
   // (ticket-123).
+  // Un statut posé à la main (ticket-194) : le backend déplace le fichier
+  // et publie l'événement ; on relit la liste sans attendre le sondage.
+  async function handleChangeStatus(ticketId: string, status: TicketStatus) {
+    try {
+      await api.tickets.setStatus(ticketId, status, project?.id ?? "");
+      tickets.refresh();
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : String(err), "error");
+    }
+  }
+
   function handlePrCreated(_ticketId: string, prNumber: number) {
     tickets.refresh();
     addToast(`PR #${prNumber} ouverte`, "success");
@@ -248,6 +260,7 @@ export default function App() {
               setRunAuPremierPlan(true);
             }}
             onSelectProject={handleSelectProject}
+            onChangeStatus={handleChangeStatus}
             onProjectCreated={handleProjectCreated}
             onSelectTicket={handleSelectTicket}
             onRunPipeline={handleRunPipeline}
@@ -346,6 +359,7 @@ export default function App() {
               onSelectTicket={handleSelectTicket}
               onRunPipeline={handleRunPipeline}
               onPrCreated={handlePrCreated}
+              onChangeStatus={handleChangeStatus}
             />
           ) : (
             <Editor ticket={ticket} openFilePath={openFilePath} />

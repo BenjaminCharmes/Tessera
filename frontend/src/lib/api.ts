@@ -28,6 +28,7 @@ import type {
   ProjectUsage,
   RunFromChatResponse,
   Ticket,
+  TicketStatus,
   TicketActivity,
   TicketDiff,
   PlanDeNettoyage,
@@ -60,6 +61,14 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 async function put<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, {
     method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+async function patch<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -109,6 +118,13 @@ export const api = {
       post(`/projects/${projectId}/tickets/${ticketId}/merge-pr`, {}),
     list: (projectId: string): Promise<Ticket[]> =>
       request(`/projects/${projectId}/tickets`),
+    /** Un statut posé à la main (ticket-194) ; le backend déplace le fichier et publie l'événement. */
+    setStatus: (
+      ticketId: string,
+      status: TicketStatus,
+      projectId: string,
+    ): Promise<Ticket> =>
+      patch(`/projects/${projectId}/tickets/${ticketId}`, { status }),
     create: (projectId: string, data: TicketCreate): Promise<Ticket> =>
       post(`/projects/${projectId}/tickets`, data),
     batch: (
