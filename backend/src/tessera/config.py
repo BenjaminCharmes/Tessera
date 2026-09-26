@@ -18,7 +18,11 @@ class Settings(BaseSettings):
     # Optionnel : vide lorsque le provider est `agent_sdk` (auth par abonnement).
     anthropic_api_key: str = ""
     # Provider LLM par défaut : "agent_sdk" (abonnement) ou "anthropic_api" (crédits).
+    # Un rôle peut en déclarer un autre dans son `agents.json` (ADR-046).
     llm_provider: str = "agent_sdk"
+    # Le serveur Ollama des rôles déclarés `provider: ollama` (ticket-189).
+    # Injoignable, le repli déclaré par le rôle prend le relais.
+    ollama_base_url: str = "http://127.0.0.1:11434"
     # Garde-fous ClaudeAgentSDKProvider — bornent une boucle d'agent qui dérape.
     # max_turns borne le nombre d'allers-retours outil ; max_budget_usd borne
     # la dépense réelle d'un seul appel agent (le garde-fou qui protège le

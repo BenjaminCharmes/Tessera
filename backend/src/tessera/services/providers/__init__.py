@@ -78,7 +78,14 @@ def get_provider(
                 "pour utiliser votre abonnement."
             )
         return AnthropicApiProvider(AsyncAnthropic(api_key=api_key))
+    if resolved == "ollama":
+        # Sans outils quoi qu'on demande : il sert les rôles texte→JSON, et
+        # la boucle agentique reste au SDK (ticket-189).
+        from tessera.config import settings
+        from tessera.services.providers.ollama import OllamaProvider
+
+        return OllamaProvider(settings.ollama_base_url)
     raise ValueError(
         f"Provider LLM inconnu : {resolved!r}. "
-        "Valeurs acceptées : 'agent_sdk', 'anthropic_api'."
+        "Valeurs acceptées : 'agent_sdk', 'anthropic_api', 'ollama'."
     )

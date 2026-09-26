@@ -108,7 +108,10 @@ def test_un_repli_sur_un_provider_inconnu_est_refuse_aussi(tmp_path: Path) -> No
 
 def test_les_manifestes_du_depot_chargent_toujours() -> None:
     racine = Path(__file__).resolve().parents[2] / "projects"
+    # `demineur` est un dépôt à part, absent d'un clone neuf de Tessera.
     for nom in ("ide-core", "demineur"):
+        if nom != "ide-core" and not (racine / nom / "agents.json").is_file():
+            continue
         assert load_agents_config(racine / nom), nom
 
 

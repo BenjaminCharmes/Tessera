@@ -5,7 +5,7 @@ les SDK derrière lui.
 """
 
 #: Les valeurs acceptées pour `provider` dans `agents.json` (ticket-188).
-PROVIDERS_CONNUS: tuple[str, ...] = ("agent_sdk", "anthropic_api")
+PROVIDERS_CONNUS: tuple[str, ...] = ("agent_sdk", "anthropic_api", "ollama")
 
 #: Ceux dont le modèle doit être dans la grille tarifaire : le coût d'un
 #: appel s'y calcule depuis les tokens (ticket-080). Un provider hors de
