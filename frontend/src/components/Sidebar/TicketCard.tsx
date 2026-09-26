@@ -8,6 +8,7 @@ import {
 } from "../../design/icons";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
+import { MIME_TICKET, transitionsManuelles } from "../../lib/transitionsManuelles";
 import type {
   PRStatus,
   Ticket,
@@ -70,6 +71,12 @@ interface TicketCardProps {
   onToggleQueue?: (ticketId: string) => void;
   dansLaFile?: boolean;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
+  /**
+   * Changer le statut à la main (ticket-194). Absent : ni menu ni
+   * glisser-déposer. Un ticket en cours de run n'en a jamais — le verrou
+   * d'ADR-038 le tient.
+   */
+  onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
 }
 
 export default function TicketCard({
@@ -85,8 +92,12 @@ export default function TicketCard({
   onToggleQueue,
   dansLaFile = false,
   onPrCreated,
+  onChangeStatus,
 }: TicketCardProps) {
   const canRun = ticket.status !== "done" && ticket.status !== "cancelled";
+  const transitions = transitionsManuelles(ticket.status);
+  const peutChangerDeStatut =
+    !!onChangeStatus && !isRunning && transitions.length > 0;
   const canOpenPr =
     ticket.status === "done" && !!githubRemote && ticket.pr_number === null;
 
@@ -157,6 +168,15 @@ export default function TicketCard({
       aria-pressed={isActive}
       onClick={() => onSelect(ticket)}
       onKeyDown={handleKeyDown}
+      draggable={peutChangerDeStatut}
+      onDragStart={(e) => {
+        if (!peutChangerDeStatut) return;
+        e.dataTransfer.setData(
+          MIME_TICKET,
+          JSON.stringify({ id: ticket.id, status: ticket.status }),
+        );
+        e.dataTransfer.effectAllowed = "move";
+      }}
       className={`relative mx-2 mb-1 p-2 rounded cursor-pointer transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-zinc-400 ${
         isActive ? "bg-zinc-700" : "hover:bg-zinc-800"
       }`}
@@ -168,11 +188,32 @@ export default function TicketCard({
             {ticket.title}
           </div>
           <div className="flex items-center gap-1 mt-1 flex-wrap">
-            <span
-              className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${STATUS_STYLE[ticket.status]}`}
-            >
-              {ticket.status}
-            </span>
+            {peutChangerDeStatut ? (
+              <select
+                aria-label={`Statut de ${ticket.id}`}
+                value={ticket.status}
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  onChangeStatus?.(ticket.id, e.target.value as TicketStatus);
+                }}
+                className={`text-micro px-1 py-0.5 rounded-sm font-medium border-0 outline-hidden cursor-pointer ${STATUS_STYLE[ticket.status]}`}
+              >
+                <option value={ticket.status}>{ticket.status}</option>
+                {transitions.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span
+                className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${STATUS_STYLE[ticket.status]}`}
+              >
+                {ticket.status}
+              </span>
+            )}
             <span
               className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${PRIORITY_STYLE[ticket.priority]}`}
             >

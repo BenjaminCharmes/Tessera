@@ -62,6 +62,7 @@ interface SidebarProps {
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
+  onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
   onSelectTicketById?: (ticketId: string) => void;
   onAgentCreated?: (role: string) => void;
   agentSelectionne?: string | null;
@@ -108,6 +109,7 @@ export default function Sidebar({
   onTicketCreated,
   onBatchCreated,
   onPrCreated,
+  onChangeStatus,
   onSelectTicketById,
   onAgentCreated,
   agentSelectionne,
@@ -175,6 +177,7 @@ export default function Sidebar({
             onTicketCreated={onTicketCreated}
             onBatchCreated={onBatchCreated}
             onPrCreated={onPrCreated}
+            onChangeStatus={onChangeStatus}
           />
         )}
         {panel === "files" &&

@@ -20,6 +20,7 @@ interface KanbanViewProps {
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
+  onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
 }
 
 export default function KanbanView({
@@ -30,6 +31,7 @@ export default function KanbanView({
   onSelectTicket,
   onRunPipeline,
   onPrCreated,
+  onChangeStatus,
 }: KanbanViewProps) {
   return (
     <div className="h-full flex flex-col bg-zinc-900">
@@ -50,6 +52,7 @@ export default function KanbanView({
             onSelectTicket={onSelectTicket}
             onRunPipeline={onRunPipeline}
             onPrCreated={onPrCreated}
+            onChangeStatus={onChangeStatus}
           />
         ))}
       </div>

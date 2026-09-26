@@ -58,6 +58,7 @@ interface TicketListProps {
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
   onPrCreated?: (ticketId: string, prNumber: number) => void;
+  onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
 }
 
 export default function TicketList({
@@ -85,6 +86,7 @@ export default function TicketList({
   onTicketCreated,
   onBatchCreated,
   onPrCreated,
+  onChangeStatus,
 }: TicketListProps) {
   const [collapsed, setCollapsed] = useState<Set<TicketStatus>>(
     new Set(["done", "cancelled"]),
@@ -231,6 +233,7 @@ export default function TicketList({
                         maxRounds={maxRounds}
                         githubRemote={project.github_remote}
                         onPrCreated={onPrCreated}
+                        onChangeStatus={onChangeStatus}
                         onSelect={onSelectTicket}
                         onRun={onRunPipeline}
                         onShowDiff={onShowDiff}

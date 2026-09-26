@@ -472,3 +472,65 @@ describe("TicketCard", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("TicketCard — statut à la main (ticket-194)", () => {
+  it("n'offre aucun menu sans onChangeStatus", () => {
+    render(
+      <TicketCard ticket={base} isActive={false} isRunning={false} onSelect={vi.fn()} onRun={vi.fn()} />,
+    );
+    expect(screen.queryByLabelText("Statut de ticket-001")).not.toBeInTheDocument();
+  });
+
+  it("ne propose ni in-progress ni in-review", () => {
+    // Ces statuts sont tenus par le pipeline : un ticket in-progress sans run
+    // se lirait comme un run fantome (ticket-177).
+    render(
+      <TicketCard
+        ticket={{ ...base, status: "blocked" }}
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+        onChangeStatus={vi.fn()}
+      />,
+    );
+    const options = Array.from(
+      (screen.getByLabelText("Statut de ticket-001") as HTMLSelectElement).options,
+    ).map((o) => o.value);
+    expect(options).toEqual(["blocked", "todo", "done", "cancelled"]);
+  });
+
+  it("n'a pas de menu pendant un run", () => {
+    render(
+      <TicketCard
+        ticket={{ ...base, status: "todo" }}
+        isActive={false}
+        isRunning={true}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+        onChangeStatus={vi.fn()}
+      />,
+    );
+    expect(screen.queryByLabelText("Statut de ticket-001")).not.toBeInTheDocument();
+  });
+
+  it("appelle onChangeStatus avec le statut choisi, sans selectionner la carte", () => {
+    const onChangeStatus = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <TicketCard
+        ticket={{ ...base, status: "blocked" }}
+        isActive={false}
+        isRunning={false}
+        onSelect={onSelect}
+        onRun={vi.fn()}
+        onChangeStatus={onChangeStatus}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText("Statut de ticket-001"), {
+      target: { value: "todo" },
+    });
+    expect(onChangeStatus).toHaveBeenCalledWith("ticket-001", "todo");
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+});
