@@ -23,3 +23,10 @@
 - 2026-09-28 12:59:51 UTC — [ticket-209] tour 1 — reviewer démarré
 - 2026-09-28 13:00:55 UTC — [ticket-209] tour 1 — reviewer terminé (63656ms)
 - 2026-09-28 13:00:55 UTC — [ticket-209] APPROVED après 1 tour(s)
+- 2026-09-28 13:19:34 UTC — [ticket-214] branche ticket-214-un-crit-re-d-acceptation-crit-sur-plusieurs-ligne
+- 2026-09-28 13:19:34 UTC — [ticket-214] tour 1 — codeur démarré
+- 2026-09-28 13:21:04 UTC — [ticket-214] tour 1 — codeur terminé (90280ms)
+- 2026-09-28 13:21:26 UTC — [ticket-214] securite: PASS — Audit de sécurité du diff terminé. Aucune vulnérabilité critique, haute ou moyen
+- 2026-09-28 13:21:26 UTC — [ticket-214] tour 1 — reviewer démarré
+- 2026-09-28 13:22:21 UTC — [ticket-214] tour 1 — reviewer terminé (55157ms)
+- 2026-09-28 13:22:21 UTC — [ticket-214] APPROVED après 1 tour(s)
