@@ -428,3 +428,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : trois teintes de données — `data-1` à `data-3` (cyan, indigo, magenta) — distinguent les séries d'un graphique, dans cet ordre fixe ; au-delà, « autres » en zinc. Elles ne s'emploient que dans `design/charts/`, et leurs familles jamais en brut. Une issue de run reste un état : couleurs d'ADR-026.
 **Raison** : ADR-026 ne donne des couleurs qu'aux états et à l'identité. Colorer deux séries en bleu et vert les ferait lire comme « activité » et « succès ». Les trois teintes passent le contrôle daltonien et de contraste sur zinc-900 ; une quatrième ne le passe plus.
 **Alternative rejetée** : une série colorée par graphique, le reste en zinc — deux séries superposées deviennent illisibles ; réutiliser `violet` — il marque l'identité, pas une donnée.
+
+---
+
+## ADR-048 — Vérifier les termes interdits avant tout push
+
+**Date** : 2026-09-28
+**Décision** : Avant tout push vers un dépôt distant, le backend contrôle les lignes ajoutées du diff, les messages de commit et les auteurs contre `FORBIDDEN_TERMS` (`.env` local, jamais versionné). Liste vide ou absente : aucun contrôle. Un terme trouvé bloque le push ; `Livraison.arret` signale la localisation sans nommer le terme. Un projet déclare `"confidentiality": "professional"` dans `agents.json` pour s'exempter ; défaut et valeur inconnue : contrôlé.
+**Raison** : ADR-018 et ADR-027 font commiter l'orchestrateur lui-même — ni l'identité git par dossier ni un hook global ne couvrent ces commits. Le push est le seul point de contrôle avant que le contenu quitte la machine.
+**Alternative rejetée** : contrôle au commit — ADR-018 exige un commit à chaque sortie, bloquer le commit casserait l'arbre propre ; hook pre-push global — ignoré pendant les runs (ADR-027).
