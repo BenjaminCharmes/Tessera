@@ -44,6 +44,17 @@ class TestExtractCriteria:
         result = _extract_criteria(body)
         assert result == ["Only line", "Next criterion"]
 
+    def test_indented_line_after_blank_line_is_not_a_continuation(self) -> None:
+        """An indented paragraph separated by a blank line stays out of the criterion."""
+        body = self._body(
+            "- [ ] Only line\n"
+            "\n"
+            "    an unrelated indented paragraph\n"
+            "- [ ] Next criterion\n"
+        )
+        result = _extract_criteria(body)
+        assert result == ["Only line", "Next criterion"]
+
     def test_checked_criteria_read_same_way(self) -> None:
         """Checked boxes `- [x]` are extracted the same as unchecked ones."""
         body = self._body(

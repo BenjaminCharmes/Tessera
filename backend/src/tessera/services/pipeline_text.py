@@ -43,6 +43,9 @@ def _extract_criteria(ticket_body: str) -> list[str]:
     """
     criteria: list[str] = []
     in_criteria_section = False
+    # Vrai tant que la ligne précédente appartient au critère en cours : une
+    # ligne vide le clôt, sinon un paragraphe indenté plus bas s'y collerait.
+    continuable = False
     for line in ticket_body.splitlines():
         if _CRITERIA_HEADING.search(line):
             in_criteria_section = True
@@ -54,9 +57,12 @@ def _extract_criteria(ticket_body: str) -> list[str]:
         m = _CRITERIA_ITEM.match(line)
         if m:
             criteria.append(m.group(1).strip())
-        elif criteria and _CONTINUATION_LINE.match(line):
+            continuable = True
+        elif continuable and _CONTINUATION_LINE.match(line):
             # Indented non-empty line right after a criterion: continuation.
             criteria[-1] = criteria[-1] + " " + line.strip()
+        else:
+            continuable = False
     return criteria
 
 
