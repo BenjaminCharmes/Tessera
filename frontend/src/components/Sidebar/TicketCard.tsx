@@ -108,8 +108,14 @@ export default function TicketCard({
         if (s.state === "merged" || s.state === "closed") {
           if (intervalRef.current) clearInterval(intervalRef.current);
         }
-      } catch {
-        // ignore transient errors
+      } catch (err) {
+        // Une erreur 4xx ne changera pas au prochain essai : un pr_number
+        // hérité d'un autre dépôt renvoie 404 pour toujours. Réessayer toutes
+        // les 30 s, sur chaque carte, épuisait le quota GitHub (ticket-217).
+        // Une 5xx peut être passagère, on continue.
+        if (err instanceof Error && /^API 4\d\d\b/.test(err.message)) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+        }
       }
     };
 
