@@ -1,3 +1,4 @@
+import { IconChevronDown, IconChevronRight } from "../../design/icons";
 import GitLinkPanel from "./GitLinkPanel";
 import PanneauServices from "./PanneauServices";
 import PanneauPipeline from "./PanneauPipeline";
@@ -56,8 +57,15 @@ export default function PanneauxDuProjet({
         type="button"
         onClick={() => setPipelineOuvert((v) => !v)}
         aria-expanded={pipelineOuvert}
-        className="w-full px-3 py-1 text-left text-mini text-zinc-500 hover:text-zinc-300"
+        className="flex w-full items-center gap-1.5 px-3 py-1 text-left text-mini text-zinc-500 hover:text-zinc-300"
       >
+        {/* Sans chevron, ce libellé gris ne se lisait pas comme un bouton
+            (ticket-205). Même affordance que les listes repliables du chat. */}
+        {pipelineOuvert ? (
+          <IconChevronDown size={12} />
+        ) : (
+          <IconChevronRight size={12} />
+        )}
         Pipeline
       </button>
       {pipelineOuvert && (

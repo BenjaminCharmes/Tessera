@@ -41,6 +41,8 @@ introuvable, et un nom de projet long qui passe sous les boutons de l'en-tête.
 - « Retirer ce projet de l'IDE… » passe du panneau Git au menu du sélecteur
   de projet.
 - Le bouton du sélecteur est borné à la largeur de son conteneur.
+- Le bouton « Pipeline » reçoit un chevron : un libellé gris seul ne se
+  lisait pas comme cliquable.
 
 ## Critères d'acceptation
 - [x] Un test vérifie qu'une livraison qui rend `pr_number` l'écrit dans le frontmatter du ticket
@@ -50,6 +52,7 @@ introuvable, et un nom de projet long qui passe sous les boutons de l'en-tête.
 - [x] Le menu du sélecteur de projet porte « Retirer ce projet de l'IDE… », qui ouvre `RemoveProjectModal`
 - [x] `GitLinkPanel` ne porte plus ce bouton
 - [x] Le bouton du sélecteur porte `max-w-full`, verrouillé par un test
+- [x] Le bouton « Pipeline » porte un chevron qui suit son état ouvert/fermé
 - [x] `uv run pytest`, `npm run test`, `npm run build` passent
 
 ## Ce que ça ne fait pas
