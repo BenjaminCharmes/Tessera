@@ -36,7 +36,7 @@ describe("NavRail", () => {
       "Historique",
       "Agents",
       "Supervision",
-      "Coûts",
+      "Statistiques",
     ]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }

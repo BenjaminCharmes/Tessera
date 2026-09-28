@@ -8,7 +8,7 @@ import type { Project } from "../../types/api";
  *
  * Le nom du projet était un titre ; c'est maintenant le déclencheur. Changer
  * de projet imposait un aller-retour par l'onglet « Projets », qui fait perdre
- * ce qu'on regardait — Tickets, Supervision, Coûts. À neuf projets et avec des
+ * ce qu'on regardait — Tickets, Supervision, Statistiques. À neuf projets et avec des
  * runs en parallèle (ADR-038), c'est le geste le plus fréquent d'une session.
  *
  * ADR-026 : le nom reste en `violet-100` — l'identité — et la liste n'emprunte

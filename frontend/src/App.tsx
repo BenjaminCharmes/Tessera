@@ -24,7 +24,7 @@ import NavRail from "./components/Sidebar/NavRail";
 import type { SidebarPanel } from "./components/Sidebar";
 import DiffView from "./components/DiffView";
 import AgentDetail from "./components/AgentDetail";
-import CostView from "./components/CostView";
+import StatsView from "./components/StatsView";
 import SupervisionView from "./components/SupervisionView";
 import RunView from "./components/RunView";
 import Editor from "./components/Editor";
@@ -399,7 +399,7 @@ export default function App() {
           ) : panel === "usage" ? (
             // Sans projet sélectionné, la vue d'ensemble : « combien me coûte
             // Tessera, et sur quel projet » n'avait aucune réponse.
-            <CostView projectId={project?.id ?? null} />
+            <StatsView projectId={project?.id ?? null} />
           ) : vueCentre === "run" ? (
             <RunView stream={stream} />
           ) : vueCentre === "diff" && project && ticket ? (

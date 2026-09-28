@@ -1,4 +1,5 @@
 import { IconRefresh } from "../../design/icons";
+import { ShareBar } from "../../design/charts/ShareBars";
 import type { ProjectUsage, TicketUsage } from "../../types/api";
 
 function formatTokens(n: number): string {
@@ -40,16 +41,12 @@ function TicketRow({ ticket, maxCost }: TicketRowProps) {
         <span className="text-mini font-mono text-zinc-300 truncate flex-1">
           {ticket.ticket_id}
         </span>
-        <span className="shrink-0 text-mini font-mono text-amber-400">
+        <span className="shrink-0 text-mini font-mono text-zinc-300">
           {formatCost(ticket.total_cost_usd)}
         </span>
       </div>
-      <div className="w-full bg-zinc-800 rounded-full h-1">
-        <div
-          className="bg-amber-500 h-1 rounded-full transition-all"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+      {/* Une dépense n'est pas une attente : plus d'ambre ici (ADR-047). */}
+      <ShareBar fraction={pct / 100} />
       <div className="flex gap-3 mt-1 text-micro text-zinc-600">
         <span>{formatTokens(ticket.input_tokens)} in</span>
         <span>{formatTokens(ticket.output_tokens)} out</span>
