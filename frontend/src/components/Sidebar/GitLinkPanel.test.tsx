@@ -210,4 +210,11 @@ describe("GitLinkPanel — artefacts Tessera (ticket-062)", () => {
       expect(screen.getByText(/git rm --cached/)).toBeInTheDocument(),
     );
   });
+
+  it("ne porte plus le retrait du projet", () => {
+    // Il passe au menu du sélecteur de projet (ticket-205).
+    render(<GitLinkPanel project={project} />);
+
+    expect(screen.queryByText(/Retirer ce projet/)).toBeNull();
+  });
 });
