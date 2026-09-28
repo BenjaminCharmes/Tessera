@@ -4,3 +4,9 @@
 - 2026-06-20 21:01:34 UTC — [ticket-016] tour 1 — codeur démarré
 - 2026-09-21 11:22:20 UTC — [ticket-101] branche ticket-101-la-marque-se-lit-l-o-elle-est-pos-e
 - 2026-09-21 11:22:20 UTC — [ticket-101] tour 1 — codeur démarré
+- 2026-09-28 10:09:08 UTC — [ticket-203] branche ticket-203-reformuler-les-adr-qui-racontent-un-usage-r-el-au
+- 2026-09-28 10:09:08 UTC — [ticket-203] tour 1 — codeur démarré
+- 2026-09-28 10:13:48 UTC — [ticket-203] tour 1 — codeur terminé (280531ms)
+- 2026-09-28 10:13:49 UTC — [ticket-203] tour 1 — reviewer démarré
+- 2026-09-28 10:15:41 UTC — [ticket-203] tour 1 — reviewer terminé (111735ms)
+- 2026-09-28 10:15:41 UTC — [ticket-203] APPROVED après 1 tour(s)
