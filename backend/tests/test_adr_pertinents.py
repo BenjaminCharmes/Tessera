@@ -119,7 +119,9 @@ _CONTRAINTES = {
 #: Les ADR qui n'enregistrent qu'un choix passé ou une méta-règle sur les
 #: ADR eux-mêmes : seul l'architecte a à les rediscuter. Sans portée, ils
 #: partiraient dans chaque appel de codeur sans rien lui apprendre.
-_CHOIX_PASSES = {"ADR-001", "ADR-003", "ADR-032", "ADR-034", "ADR-035", "ADR-036"}
+_CHOIX_PASSES = {
+    "ADR-001", "ADR-003", "ADR-032", "ADR-034", "ADR-035", "ADR-036", "ADR-047",
+}
 
 
 def test_les_choix_passes_portent_une_portee() -> None:
