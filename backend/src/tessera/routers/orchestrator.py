@@ -319,7 +319,7 @@ def _livreur(
     async def livrer(result: PipelineResult) -> Livraison:
         ticket = await ticket_svc.get_ticket(result.ticket_id)
         try:
-            return await service.livrer(
+            livraison = await service.livrer(
                 ticket_id=result.ticket_id,
                 ticket_title=ticket.title if ticket else result.ticket_id,
                 ticket_body=ticket.body if ticket else "",
@@ -329,6 +329,21 @@ def _livreur(
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
             return Livraison(arret=f"Livraison interrompue : {exc}")
+        if livraison.pr_number is not None:
+            await noter_la_pr(result.ticket_id, livraison.pr_number)
+        return livraison
+
+    async def noter_la_pr(ticket_id: str, pr_number: int) -> None:
+        # Sans ce numéro, la carte du ticket croit qu'il n'a pas de PR et
+        # propose d'en ouvrir une sur un travail déjà mergé (ticket-205). Une
+        # écriture ratée ne défait pas une PR ouverte : elle se journalise.
+        try:
+            await ticket_svc.set_pr_number(ticket_id, pr_number)
+            await GitWorkspaceService(
+                project_path, politique=politique
+            ).commit_bookkeeping()
+        except Exception as exc:  # noqa: BLE001 — même raison que la livraison
+            _logger.warning("pr_non_notee", extra={"erreur": str(exc)})
 
     return livrer
 
