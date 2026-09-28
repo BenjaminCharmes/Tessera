@@ -3,7 +3,7 @@ id: ticket-113
 title: "Le dossier d'un ticket et son champ status ne peuvent plus diverger"
 type: test
 status: done
-pr_number: 128
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: []

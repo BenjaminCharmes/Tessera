@@ -3,7 +3,7 @@ id: ticket-152
 title: "L'IDE ne peut pas se lancer lui-même, et doit le dire"
 type: feat
 status: done
-pr_number: 172
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: ["ticket-151"]

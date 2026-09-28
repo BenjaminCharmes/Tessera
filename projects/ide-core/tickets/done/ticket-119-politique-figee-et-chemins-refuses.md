@@ -3,7 +3,7 @@ id: ticket-119
 title: "Figer la politique du run et refuser les chemins qui la portent"
 type: fix
 status: done
-pr_number: 144
+pr_number: null
 priority: critical
 agent: codeur
 depends_on: []

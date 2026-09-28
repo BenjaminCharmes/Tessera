@@ -3,7 +3,7 @@ id: ticket-157
 title: "Le testeur ne sait pas lancer npm sous Windows"
 type: fix
 status: done
-pr_number: 179
+pr_number: null
 priority: critical
 agent: codeur
 depends_on: []

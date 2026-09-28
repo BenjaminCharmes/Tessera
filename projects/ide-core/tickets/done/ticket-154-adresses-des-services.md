@@ -3,7 +3,7 @@ id: ticket-154
 title: "L'adresse d'un service : toutes celles qu'il annonce, et aucune qui n'en soit pas une"
 type: fix
 status: done
-pr_number: 173
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-153"]

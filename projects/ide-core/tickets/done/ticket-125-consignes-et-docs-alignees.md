@@ -3,7 +3,7 @@ id: ticket-125
 title: "Aligner prompts, docs et outillage sur ce que le produit fait"
 type: docs
 status: done
-pr_number: 143
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: []

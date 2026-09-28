@@ -3,7 +3,7 @@ id: ticket-044
 title: "Migration vers le Claude Agent SDK (abonnement + outils fichier)"
 type: feat
 status: done
-pr_number: 60
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []

@@ -3,7 +3,7 @@ id: ticket-143
 title: "Le cwd d'un service doit honorer git_root: ancestor"
 type: fix
 status: done
-pr_number: 160
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: ["ticket-137"]

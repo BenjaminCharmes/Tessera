@@ -3,7 +3,7 @@ id: ticket-118
 title: "Finir la montée des dépendances frontend"
 type: chore
 status: done
-pr_number: 137
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: ["ticket-117"]

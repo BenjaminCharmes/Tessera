@@ -3,7 +3,7 @@ id: ticket-100
 title: "L'application porte enfin son nom et sa marque"
 type: feat
 status: done
-pr_number: 92
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: ["ticket-099"]

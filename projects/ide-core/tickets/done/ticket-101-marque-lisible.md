@@ -5,7 +5,7 @@ depends_on:
 - ticket-100
 estimated_days: 1
 id: ticket-101
-pr_number: 95
+pr_number: null
 priority: medium
 status: done
 title: La marque se lit là où elle est posée
