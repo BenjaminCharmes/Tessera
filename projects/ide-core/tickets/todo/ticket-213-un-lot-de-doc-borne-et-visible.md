@@ -63,6 +63,8 @@ n'est jamais documenté, parce que le filtre compare des identifiants
 - [ ] Un test : `ticket-208` terminé après `ticket-209` déjà documenté →
       `ticket-208` figure dans le lot suivant
 - [ ] Un `documentation.json` à l'ancien format est encore lu
+- [ ] Un test : lot dont toutes les éditions sont refusées → le marqueur n'avance pas
+- [ ] Un test : le marqueur réécrit est commité avec la doc, ou n'est pas versionné, et l'arbre reste propre avant la livraison
 - [ ] L'UI affiche `documentation_failed` dans le journal du run (test Vitest)
 - [ ] `uv run pytest` et `npm run test` passent
 
