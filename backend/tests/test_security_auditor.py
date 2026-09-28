@@ -239,3 +239,16 @@ class TestSecurityAuditResult:
         )
         assert result.has_high is True
         assert result.has_critical is False
+
+
+async def test_a_whole_branch_diff_reaches_the_auditor_intact(
+    service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+) -> None:
+    # ticket-221 : depuis le ticket-208, l'audit reçoit tout le diff d'une
+    # branche reprise. Coupé à 16 000 caractères, du code passait sans audit.
+    _set_response(provider, {"issues": [], "verdict": "PASS", "summary": "ok"})
+    diff = "+x = 1\n" * 10_000 + "+SENTINELLE_FIN_DU_DIFF\n"
+
+    await service.audit(diff, tmp_path)
+
+    assert "SENTINELLE_FIN_DU_DIFF" in provider.calls[0]["user"]
