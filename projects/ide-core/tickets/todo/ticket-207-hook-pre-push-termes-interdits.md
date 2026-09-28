@@ -3,6 +3,12 @@ id: ticket-207
 title: "Hook pre-push pour les commits manuels sur le dépôt Tessera"
 type: chore
 status: todo
+pr_number: null
+priority: medium
+agent: codeur
+depends_on: ["ticket-206"]
+estimated_days: 1
+created: 2026-09-28
 ---
 
 # ticket-207 — Hook pre-push pour les commits manuels sur le dépôt Tessera
