@@ -5,7 +5,8 @@ import type {
   Limites,
   PipelineReglages,
   PipelineReglagesPatch,
-  VentilationDesCouts,
+  StatsPeriod,
+  UsageStats,
   AgentInfo,
   AnalysisResult,
   CloneProjectRequest,
@@ -171,10 +172,11 @@ export const api = {
   usage: {
     get: (projectId: string): Promise<ProjectUsage> =>
       request(`/projects/${projectId}/usage`),
-    breakdown: (projectId: string): Promise<VentilationDesCouts> =>
-      request(`/projects/${projectId}/usage/breakdown`),
-    breakdownGlobal: (): Promise<VentilationDesCouts> =>
-      request("/projects/usage/breakdown"),
+    stats: (days: StatsPeriod, projectId: string | null): Promise<UsageStats> =>
+      request(
+        `/usage/stats?days=${days}` +
+          (projectId ? `&project_id=${encodeURIComponent(projectId)}` : ""),
+      ),
   },
   github: {
     createPr: (

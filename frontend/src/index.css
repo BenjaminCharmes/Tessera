@@ -5,6 +5,14 @@
   --text-micro--line-height: 0.875rem;
   --text-mini: 0.6875rem;
   --text-mini--line-height: 1rem;
+
+  /* Palette des graphiques — ticket-201. Trois teintes qui ne recoupent
+     aucune couleur d'état ni le violet d'identité (ADR-047), validées sur
+     zinc-900 : bande de luminance, séparation daltonienne, contraste.
+     Réservée à `design/charts/` ; un test le verrouille. */
+  --color-data-1: #0891b2;
+  --color-data-2: #6366f1;
+  --color-data-3: #db2777;
 }
 
 /*

@@ -70,6 +70,27 @@ describe("cohérence visuelle", () => {
     expect(fautifs).toEqual([]);
   });
 
+  it("réserve la palette de données aux graphiques", () => {
+    // ADR-047 : trois teintes pour distinguer des séries, jamais un état.
+    // Hors de `design/charts/`, un `data-1` se lirait comme une sixième
+    // couleur d'état ; et les familles d'où elles viennent ne s'emploient pas
+    // en brut, sinon la palette validée se contourne d'un nom de classe.
+    const token = /(bg|text|border|ring|fill|stroke)-data-\d/;
+    const brutes = ["cyan", "indigo", "pink"];
+    const fautifs = FICHIERS.flatMap(({ chemin, contenu }) => [
+      ...(token.test(contenu) && !chemin.startsWith("design/charts/")
+        ? [chemin + " → data-*"]
+        : []),
+      ...brutes
+        .filter((c) =>
+          new RegExp("(bg|text|border|ring|fill|stroke)-" + c + "-\\d").test(contenu),
+        )
+        .map((c) => chemin + " → " + c),
+    ]);
+
+    expect(fautifs).toEqual([]);
+  });
+
   it("n'utilise aucune taille de texte en valeur arbitraire", () => {
     // `text-micro` et `text-mini` sont déclarées dans tailwind.config : une
     // échelle nommée est un choix, `text-micro` est une échappatoire.

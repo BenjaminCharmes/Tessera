@@ -19,6 +19,7 @@ from tessera.routers import (
     projects,
     services as services_router,
     tickets,
+    usage,
 )
 from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.prompt_loader import MissingPromptError
@@ -83,6 +84,7 @@ app.include_router(observation.router, prefix="/api/v1")
 app.include_router(services_router.router, prefix="/api/v1")
 app.include_router(agent_admin.router, prefix="/api/v1")
 app.include_router(fs.router, prefix="/api/v1")
+app.include_router(usage.router, prefix="/api/v1")
 
 
 @app.get("/health")
