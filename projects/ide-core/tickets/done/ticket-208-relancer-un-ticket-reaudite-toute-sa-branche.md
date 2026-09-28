@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-208
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: Relancer un ticket fait relire tout le travail de sa branche, pas seulement
   le dernier tour
 type: fix

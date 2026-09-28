@@ -166,8 +166,7 @@ class GitWorkspaceService:
         self._preexisting_untracked: tuple[str, ...] = ()
         # The commit from which the current ticket branch diverged from its
         # base. On a fresh branch this equals `_base_ref`; on a resumed branch
-        # it is read from a persistent git ref stored when the branch was first
-        # created (ticket-208). Used by `diff_depuis_base` to include all prior
+        # it is the merge-base of the branch and `_base_ref` (ticket-208). Used by `diff_depuis_base` to include all prior
         # commits on the branch, not only the uncommitted work of the current
         # turn.
         self._fork_point: str | None = None
@@ -190,16 +189,13 @@ class GitWorkspaceService:
         exists = await self._branch_exists(branch_name)
         if exists:
             await self._run("checkout", branch_name)
-            # Résoudre le point de divergence depuis une ref persistante : le
-            # second run du même ticket repart depuis la branche elle-même
-            # (`rev-parse HEAD` = dernier commit de la branche), donc `_base_ref`
-            # ne peut pas servir de base pour le diff de tout le travail
-            # accumulé (ticket-208).
-            self._fork_point = await self._read_fork_point(branch_name)
+            # Le point de départ d'une branche reprise se déduit de la base :
+            # aucune ref à tenir, et les branches créées avant ce correctif
+            # sont couvertes aussi (ticket-208).
+            self._fork_point = await self._merge_base(branch_name)
         else:
             await self._run("checkout", "-b", branch_name, self._base_ref)
             self._fork_point = self._base_ref
-            await self._store_fork_point(branch_name, self._base_ref)  # type: ignore[arg-type]
         return branch_name
 
     async def advance_base_ref(self) -> None:
@@ -215,34 +211,17 @@ class GitWorkspaceService:
         self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
 
     # ------------------------------------------------------------------
-    # Persistent fork-point refs — ticket-208
+    # Fork point of a ticket branch — ticket-208
     # ------------------------------------------------------------------
 
-    #: Namespace for the git refs that record each branch's fork point.
-    _REF_BASE_PREFIX: str = "refs/tessera-base/"
-
-    async def _store_fork_point(self, branch_name: str, sha: str) -> None:
-        """Persist the fork point of `branch_name` in a git ref.
-
-        Best-effort: a failure here degrades gracefully — `diff_depuis_base`
-        falls back to `current_diff` on the next resume.
-        """
+    async def _merge_base(self, branch_name: str) -> str | None:
+        """Where `branch_name` left the base ref, or None if git cannot say."""
+        if self._base_ref is None:
+            return None
         try:
-            await self._run(
-                "update-ref", f"{self._REF_BASE_PREFIX}{branch_name}", sha
-            )
+            return (await self._run("merge-base", branch_name, self._base_ref)).strip()
         except GitCommandError as exc:
-            _logger.warning("fork_point_not_stored", extra={"error": str(exc)})
-
-    async def _read_fork_point(self, branch_name: str) -> str | None:
-        """Read the persisted fork point for `branch_name`, or None if absent."""
-        try:
-            return (
-                await self._run(
-                    "rev-parse", f"{self._REF_BASE_PREFIX}{branch_name}"
-                )
-            ).strip()
-        except GitCommandError:
+            _logger.warning("fork_point_unknown", extra={"error": str(exc)})
             return None
 
     async def diff_depuis_base(self) -> str:
@@ -258,8 +237,8 @@ class GitWorkspaceService:
         changes of the current turn (ticket-208).
 
         Falls back to `current_diff()` when no fork point is known (no branch
-        was created through this service instance, or the persistent ref was
-        not found).
+        was created through this service instance, or the
+        merge-base could not be computed).
         """
         base = self._fork_point
         if base is None:
