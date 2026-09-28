@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, TYPE_CHECKING
@@ -16,6 +17,8 @@ _MAX_TOKENS = 2048
 _PROMPT_FILE = "validateur.md"
 
 Verdict = Literal["APPROVED", "CHANGES_REQUESTED"]
+
+_CHECKBOX_PREFIX = re.compile(r"^\s*-?\s*\[[ xX]?\]\s*")
 
 
 @dataclass
@@ -78,7 +81,7 @@ class ValidatorService:
                 feedback=f"Validation indisponible : {exc}",
             )
 
-        return self._parse_response(result.content)
+        return self._parse_response(result.content, criteria)
 
     def _load_system_prompt(self) -> str:
         prompt_path = self._prompts_dir / _PROMPT_FILE
@@ -111,7 +114,9 @@ class ValidatorService:
             + test_block
         )
 
-    def _parse_response(self, raw: str) -> ValidationResult:
+    def _parse_response(
+        self, raw: str, sent_criteria: list[str]
+    ) -> ValidationResult:
         parsed = extract_json(raw)
         if not parsed:
             _logger.warning("validator_invalid_json", extra={"raw": raw[:200]})
@@ -122,13 +127,7 @@ class ValidatorService:
                 feedback="Réponse du validateur non parseable.",
             )
 
-        all_passed = bool(parsed.get("all_passed", False))
-        verdict: Verdict = "APPROVED" if all_passed else "CHANGES_REQUESTED"
-        raw_verdict = parsed.get("verdict", "")
-        if raw_verdict in ("APPROVED", "CHANGES_REQUESTED"):
-            verdict = raw_verdict
-
-        criteria = [
+        raw_criteria = [
             CriterionResult(
                 criterion=str(c.get("criterion", "")),
                 passed=bool(c.get("passed", False)),
@@ -138,9 +137,39 @@ class ValidatorService:
             if isinstance(c, dict)
         ]
 
+        # Rapprochement par texte normalisé : chaque critère envoyé doit
+        # figurer dans la réponse avec passed: true pour que la validation
+        # soit approuvée. Un critère absent de la réponse LLM est ajouté en
+        # passed: false (ADR-039).
+        response_by_norm = {_normalize(c.criterion): c for c in raw_criteria}
+        criteria: list[CriterionResult] = []
+        for sent in sent_criteria:
+            norm = _normalize(sent)
+            if norm in response_by_norm:
+                criteria.append(response_by_norm[norm])
+            else:
+                criteria.append(
+                    CriterionResult(
+                        criterion=sent,
+                        passed=False,
+                        note="non jugé par le validateur",
+                    )
+                )
+
+        # Le verdict se recalcule depuis les critères réconciliés ; le champ
+        # "verdict" du LLM est informatif mais ne pilote plus rien.
+        all_passed = all(c.passed for c in criteria) if criteria else True
+        verdict: Verdict = "APPROVED" if all_passed else "CHANGES_REQUESTED"
+
         return ValidationResult(
             all_passed=all_passed,
             criteria=criteria,
             verdict=verdict,
             feedback=str(parsed.get("feedback", "")),
         )
+
+
+def _normalize(text: str) -> str:
+    """Normalize a criterion text for matching: strip checkboxes and lowercase."""
+    text = _CHECKBOX_PREFIX.sub("", text.strip())
+    return text.lower().strip()
