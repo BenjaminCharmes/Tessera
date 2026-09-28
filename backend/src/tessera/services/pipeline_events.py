@@ -52,6 +52,9 @@ class EventType(str, Enum):
     #: Un service s'est terminé, avec son code de sortie (ticket-145). Sans
     #: lui, l'écran ne pourrait apprendre sa mort qu'en sondant en boucle.
     SERVICE_CLOSED = "service_closed"
+    #: La mise à jour de la documentation a échoué (ticket-213). Sans cet
+    #: événement, l'échec reste dans les logs du backend, invisible à l'écran.
+    DOCUMENTATION_FAILED = "documentation_failed"
 
 
 class OrchestratorEvent(BaseModel):

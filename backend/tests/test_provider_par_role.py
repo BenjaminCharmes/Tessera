@@ -339,6 +339,11 @@ async def test_la_documentation_prend_provider_et_modele_par_role(tmp_path: Path
         "---\nid: ticket-001\ntitle: \"x\"\ntype: feat\nstatus: done\n---\n# x\n",
         encoding="utf-8",
     )
+    # Un projet sans marqueur ne rattrape plus rien (ticket-213) : on en pose un.
+    (projet / "memory").mkdir(exist_ok=True)
+    (projet / "memory" / "documentation.json").write_text(
+        '{"dernier_ticket": "ticket-000"}', encoding="utf-8"
+    )
 
     def fournisseur(role: str) -> tuple[FakeProvider, str]:
         return (technique, "qwen") if role == "doc-technique" else (fonctionnel, "claude-haiku-4-5")
