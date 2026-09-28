@@ -22,10 +22,16 @@ Ce qui sert vraiment avant d'écrire du code :
 
 ## Ce qui tourne réellement sur ce projet
 
-`agents.json` déclare `codeur` et `reviewer` dans le pipeline. Le testeur, la
-sécurité et le validateur sont **désactivés** ici — leurs `*_enabled` sont
-absents, donc faux. La documentation, elle, se met à jour par lot en fin de
-file (ADR-035), jamais par ticket.
+`agents.json` déclare `codeur` et `reviewer` dans le pipeline, et l'audit
+sécurité est **actif**, sur Claude : rejoué sur une faille réelle, le modèle
+local ne la voyait pas. Le testeur et le validateur sont **désactivés** : leurs
+`*_enabled` sont absents, donc faux. Le validateur attend le ticket-209, parce
+que dans son état actuel il présume les critères qu'il ne juge pas. La
+documentation, elle, se met à jour par lot en fin de file (ADR-035), jamais par
+ticket.
+
+Un run approuvé pousse sa branche et ouvre sa PR vers `develop`. Il ne se
+merge pas seul tant que la CI ne peut pas tourner : `merge` exige une CI verte.
 
 Ce n'est pas un oubli à corriger à la légère : les tests de ce dépôt vivent
 dans `backend/` et `frontend/`, au-dessus du dossier du projet, et
