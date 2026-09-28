@@ -116,7 +116,7 @@ const DESTINATIONS: Destination[] = [
   },
   {
     panel: "usage",
-    label: "Coûts",
+    label: "Statistiques",
     icon: (
       <svg {...ICON}>
         <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />

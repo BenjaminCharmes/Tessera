@@ -444,20 +444,72 @@ export interface AgentDetail {
   system_prompt: string;
 }
 
-/** Une ligne de ventilation de la dépense (ticket-077). */
-export interface LigneDeCout {
-  total_cost_usd: number;
-  total_tokens: number;
-  call_count: number;
+/** Les statistiques d'une période, jours UTC (ticket-201). */
+export type StatsPeriod = 7 | 30 | 90;
+
+export interface UsageTotals {
+  runs: number;
+  calls: number;
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_tokens: number;
+  pipeline_cost_usd: number;
+  chat_cost_usd: number;
+  cost_usd: number;
+  call_duration_ms: number;
 }
 
-export interface VentilationDesCouts {
+export interface DailyPoint {
+  day: string;
+  runs: number;
+  input_tokens: number;
+  output_tokens: number;
+  /** Chat compris. */
+  cost_usd: number;
+}
+
+export interface BreakdownLine {
+  key: string;
+  cost_usd: number;
+  tokens: number;
+  calls: number;
+  avg_duration_ms: number;
+}
+
+export interface RunQuality {
+  finished_runs: number;
+  approval_rate: number | null;
+  avg_rounds: number | null;
+  avg_run_duration_ms: number | null;
+  by_status: { status: string; count: number }[];
+}
+
+export interface RecentRun {
+  id: string;
+  project_id: string;
+  ticket_id: string;
+  started_at: string;
+  finished_at: string | null;
+  approved: boolean | null;
+  final_status: string | null;
+  cost_usd: number;
+  input_tokens: number;
+  output_tokens: number;
+  duration_ms: number | null;
+}
+
+export interface UsageStats {
+  days: StatsPeriod;
   project_id: string | null;
-  total_cost_usd: number;
-  per_agent: (LigneDeCout & { role: string })[];
-  per_model: (LigneDeCout & { model: string })[];
-  /** Rempli seulement sur la vue d'ensemble, tous projets confondus. */
-  per_project: (LigneDeCout & { project_id: string })[];
+  since: string;
+  until: string;
+  totals: UsageTotals;
+  daily: DailyPoint[];
+  per_agent: BreakdownLine[];
+  per_model: BreakdownLine[];
+  per_project: BreakdownLine[];
+  quality: RunQuality;
+  recent_runs: RecentRun[];
 }
 
 /** Un agent tel que ce projet le configure (ticket-080). */

@@ -418,3 +418,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : chaque rôle déclare dans `agents.json` son `provider`, son `model`, et un `fallback` explicite (`provider` + `model`). Toute construction de provider passe par `provider_pour_role` ; un routeur n'appelle jamais `get_provider`. Seule une **indisponibilité** — connexion refusée, délai, modèle absent — déclenche le repli, qui émet `provider_fallback` sur le canal d'ADR-041. Une réponse illisible n'en déclenche aucun.
 **Raison** : le provider était global et cinq services avaient leur modèle codé en dur : brancher un modèle local aurait basculé le codeur avec. Un repli silencieux masquerait un modèle qui ne tient pas ; ADR-039 exige que ce qui n'a pas pu juger refuse, pas qu'un autre juge à sa place sans le dire.
 **Alternative rejetée** : router selon la charge ou la taille du ticket — deviné, donc invérifiable ; un réglage global de repli — le bon repli dépend du rôle.
+
+---
+
+## ADR-047 — Les graphiques ont leur palette, hors des couleurs d'état
+
+**Date** : 2026-09-28
+**Portée** : codeur, reviewer
+**Décision** : trois teintes de données — `data-1` à `data-3` (cyan, indigo, magenta) — distinguent les séries d'un graphique, dans cet ordre fixe ; au-delà, « autres » en zinc. Elles ne s'emploient que dans `design/charts/`, et leurs familles jamais en brut. Une issue de run reste un état : couleurs d'ADR-026.
+**Raison** : ADR-026 ne donne des couleurs qu'aux états et à l'identité. Colorer deux séries en bleu et vert les ferait lire comme « activité » et « succès ». Les trois teintes passent le contrôle daltonien et de contraste sur zinc-900 ; une quatrième ne le passe plus.
+**Alternative rejetée** : une série colorée par graphique, le reste en zinc — deux séries superposées deviennent illisibles ; réutiliser `violet` — il marque l'identité, pas une donnée.

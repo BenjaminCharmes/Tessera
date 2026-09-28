@@ -272,7 +272,7 @@ L'écran se lit en quatre colonnes :
 
 | Colonne | Ce qu'on y fait |
 |---|---|
-| **Le rail** | changer de vue : Projets, Tickets, Fichiers, Historique, Agents, Coûts |
+| **Le rail** | changer de vue : Projets, Tickets, Fichiers, Historique, Agents, Statistiques |
 | **La colonne de projet** | le projet actif, ses actions, et la vue choisie |
 | **Le centre** | le tableau des tickets par défaut ; un fichier si tu en ouvres un |
 | **La droite** | suivre un run (Agents) ou discuter (Chat) |
@@ -280,9 +280,12 @@ L'écran se lit en quatre colonnes :
 Les actions d'un projet — ouvrir dans VSCode, lier un dépôt, choisir le mode des
 artefacts, retirer le projet — sont dans l'en-tête, qui ne défile jamais.
 
-**Coûts** donne la dépense par ticket et l'état du quota d'abonnement. C'est le
-panneau à regarder après tes premiers runs : il donne l'échelle réelle, qui est
-rarement celle qu'on imagine.
+**Statistiques** donne, sur 7, 30 ou 90 jours : la dépense et les tokens par
+jour, la part de chaque agent, modèle et projet, le taux d'approbation des runs,
+leurs durées et les derniers runs. Sans projet sélectionné, la vue couvre tous
+les projets. Les jours sont des jours UTC. La colonne de gauche garde la dépense
+par ticket. C'est le panneau à regarder après tes premiers runs : il donne
+l'échelle réelle, qui est rarement celle qu'on imagine.
 
 ---
 
