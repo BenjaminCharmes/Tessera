@@ -1,5 +1,6 @@
 from typing import Literal
 
+import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -217,7 +218,18 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
             detail=f"Aucune PR associée au ticket {ticket_id}.",
         )
 
-    status: PRStatus = await github_svc.get_pull_request_status(ticket.pr_number)
+    try:
+        status: PRStatus = await github_svc.get_pull_request_status(ticket.pr_number)
+    except httpx.HTTPStatusError as exc:
+        # Un pr_number hérité d'un autre dépôt n'existe pas ici : c'est un
+        # 404 définitif, pas une panne. En 500, la carte réessayait toutes les
+        # 30 s et brûlait le quota GitHub (ticket-217).
+        if exc.response.status_code == 404:
+            raise HTTPException(
+                status_code=404,
+                detail=f"PR #{ticket.pr_number} introuvable dans {project.github_remote}.",
+            ) from exc
+        raise
     return PrStatusResponse(
         state=status.state,
         ci_status=status.ci_status,
