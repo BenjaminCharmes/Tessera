@@ -24,11 +24,10 @@ Ce qui sert vraiment avant d'écrire du code :
 
 `agents.json` déclare `codeur` et `reviewer` dans le pipeline, et l'audit
 sécurité est **actif**, sur Claude : rejoué sur une faille réelle, le modèle
-local ne la voyait pas. Le testeur et le validateur sont **désactivés** : leurs
-`*_enabled` sont absents, donc faux. Le validateur attend le ticket-209, parce
-que dans son état actuel il présume les critères qu'il ne juge pas. La
-documentation, elle, se met à jour par lot en fin de file (ADR-035), jamais par
-ticket.
+local ne la voyait pas. Le validateur est **actif** depuis les tickets 209 et
+214 : il juge chaque critère, lu en entier. Le testeur est **désactivé** — son
+`testeur_enabled` est absent, donc faux. La documentation, elle, se met à jour
+par lot en fin de file (ADR-035), jamais par ticket.
 
 Un run approuvé pousse sa branche et ouvre sa PR vers `develop`. Il ne se
 merge pas seul tant que la CI ne peut pas tourner : `merge` exige une CI verte.

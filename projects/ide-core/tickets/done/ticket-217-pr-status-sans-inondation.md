@@ -31,6 +31,8 @@ Ce correctif a été fait hors pipeline : lancer le run obligeait à ouvrir `ide
 - `TicketCard` : une erreur 4xx arrête le polling de la carte, alors qu'une erreur 5xx le laisse continuer.
 - Les 61 `pr_number` qui ne désignent pas une PR du dépôt actuel au nom du ticket (titre ou branche) passent à `null`.
 
+Pendant ce ticket, le validateur a été activé depuis l'IDE, ce qui a écrit `validateur_enabled: true` dans `agents.json`. **Ce ticket autorise la mise à jour de `projects/ide-core/CLAUDE.md`** (règle 5), limitée à la phrase que ce réglage rendait fausse.
+
 ## Critères d'acceptation
 
 - [x] Un test : GitHub répond 404 → la route rend 404 avec `#<numéro>` dans le détail
