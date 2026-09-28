@@ -485,6 +485,31 @@ def test_noter_la_pr_laisse_l_arbre_propre(
     assert "pr_number: 7" in git("show", "HEAD:tickets/todo/ticket-001.md")
 
 
+def test_noter_la_pr_avance_la_base_du_run(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # En file, chaque ticket part de la base mémorisée à l'approbation : sans
+    # l'avancer, le commit du numéro disparaissait dès le ticket suivant.
+    from tessera.routers.orchestrator import _livreur
+
+    appels: list[str] = []
+
+    class _Espace:
+        async def commit_bookkeeping(self) -> None:
+            appels.append("commit")
+
+        async def advance_base_ref(self) -> None:
+            appels.append("avance")
+
+    monkeypatch.setattr(
+        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+    )
+
+    asyncio.run(_livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
+
+    assert appels == ["commit", "avance"]
+
+
 def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

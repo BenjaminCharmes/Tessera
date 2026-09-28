@@ -214,7 +214,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
-        livrer=_livreur(project_id, runner, politique),
+        livrer=_livreur(project_id, runner, politique, espace=git_workspace),
         documenter=_documenteur(project_id, politique),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
@@ -267,8 +267,12 @@ def _livreur(
     project_id: str,
     runner: AgentRunner | None = None,
     politique: PolitiqueRun | None = None,
+    espace: GitWorkspaceService | None = None,
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison d'un projet, telle que l'orchestrateur l'appelle.
+
+    `espace` est l'espace git de l'orchestrateur : celui dont la base sert
+    de départ au ticket suivant de la file.
 
     Branchée sur l'orchestrateur plutôt qu'appelée par chaque endpoint : les
     trois modes de run — unique, file, autonome — passent par `run_pipeline`,
@@ -339,9 +343,15 @@ def _livreur(
         # écriture ratée ne défait pas une PR ouverte : elle se journalise.
         try:
             await ticket_svc.set_pr_number(ticket_id, pr_number)
-            await GitWorkspaceService(
-                project_path, politique=politique
-            ).commit_bookkeeping()
+            if espace is None:
+                await GitWorkspaceService(
+                    project_path, politique=politique
+                ).commit_bookkeeping()
+                return
+            await espace.commit_bookkeeping()
+            # En file, le ticket suivant part de la base mémorisée à
+            # l'approbation : sans l'avancer, ce commit n'y serait pas.
+            await espace.advance_base_ref()
         except Exception as exc:  # noqa: BLE001 — même raison que la livraison
             _logger.warning("pr_non_notee", extra={"erreur": str(exc)})
 

@@ -47,6 +47,7 @@ introuvable, et un nom de projet long qui passe sous les boutons de l'en-tête.
 ## Critères d'acceptation
 - [x] Un test vérifie qu'une livraison qui rend `pr_number` l'écrit dans le frontmatter du ticket
 - [x] Un test vérifie qu'après cette écriture, sur un projet `tracked`, `git status --porcelain --untracked-files=no` est vide
+- [x] Un test vérifie qu'après ce commit, la base du run avance
 - [x] Un test vérifie qu'une exception pendant cette écriture laisse la `Livraison` inchangée
 - [x] `TicketCard` n'affiche plus de bouton « Ouvrir une PR », quel que soit le statut
 - [x] Le menu du sélecteur de projet porte « Retirer ce projet de l'IDE… », qui ouvre `RemoveProjectModal`
@@ -57,9 +58,10 @@ introuvable, et un nom de projet long qui passe sous les boutons de l'en-tête.
 
 ## Ce que ça ne fait pas
 - Ne renseigne pas `pr_number` des tickets livrés avant ce correctif.
-- Sur un projet `tracked`, le numéro est commité sur la branche du ticket,
-  déjà mergée : la base ne le reçoit qu'au run suivant qui réécrit ce ticket,
-  c'est-à-dire jamais. Le cas qui compte — tickets `local` — n'a pas ce défaut.
+- Sur un dépôt qui versionne ses tickets, le numéro est commité sur la
+  branche du ticket, puis la base du run avance : il atteint la branche
+  distante avec la PR du ticket **suivant**, pas avec la sienne, déjà
+  mergée.
 - L'endpoint `create-pr` reste côté backend ; seul son appel par la carte
   disparaît.
 
