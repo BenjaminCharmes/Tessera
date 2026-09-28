@@ -2,8 +2,8 @@
 id: ticket-205
 title: "Sidebar polish: PR number after delivery, project removal, long names"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 78
 priority: medium
 agent: codeur
 depends_on: []
@@ -43,14 +43,14 @@ introuvable, et un nom de projet long qui passe sous les boutons de l'en-tête.
 - Le bouton du sélecteur est borné à la largeur de son conteneur.
 
 ## Critères d'acceptation
-- [ ] Un test vérifie qu'une livraison qui rend `pr_number` l'écrit dans le frontmatter du ticket
-- [ ] Un test vérifie qu'après cette écriture, sur un projet `tracked`, `git status --porcelain --untracked-files=no` est vide
-- [ ] Un test vérifie qu'une exception pendant cette écriture laisse la `Livraison` inchangée
-- [ ] `TicketCard` n'affiche plus de bouton « Ouvrir une PR », quel que soit le statut
-- [ ] Le menu du sélecteur de projet porte « Retirer ce projet de l'IDE… », qui ouvre `RemoveProjectModal`
-- [ ] `GitLinkPanel` ne porte plus ce bouton
-- [ ] Le bouton du sélecteur porte `max-w-full`, verrouillé par un test
-- [ ] `uv run pytest`, `npm run test`, `npm run build` passent
+- [x] Un test vérifie qu'une livraison qui rend `pr_number` l'écrit dans le frontmatter du ticket
+- [x] Un test vérifie qu'après cette écriture, sur un projet `tracked`, `git status --porcelain --untracked-files=no` est vide
+- [x] Un test vérifie qu'une exception pendant cette écriture laisse la `Livraison` inchangée
+- [x] `TicketCard` n'affiche plus de bouton « Ouvrir une PR », quel que soit le statut
+- [x] Le menu du sélecteur de projet porte « Retirer ce projet de l'IDE… », qui ouvre `RemoveProjectModal`
+- [x] `GitLinkPanel` ne porte plus ce bouton
+- [x] Le bouton du sélecteur porte `max-w-full`, verrouillé par un test
+- [x] `uv run pytest`, `npm run test`, `npm run build` passent
 
 ## Ce que ça ne fait pas
 - Ne renseigne pas `pr_number` des tickets livrés avant ce correctif.
