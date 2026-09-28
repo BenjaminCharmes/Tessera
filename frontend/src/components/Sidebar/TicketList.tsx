@@ -59,7 +59,6 @@ interface TicketListProps {
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
-  onPrCreated?: (ticketId: string, prNumber: number) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
   /** Filtres partagés avec le Kanban (ticket-195) ; absents, pas de barre. */
   filtres?: FiltresTickets;
@@ -93,7 +92,6 @@ export default function TicketList({
   onToggleKanban,
   onTicketCreated,
   onBatchCreated,
-  onPrCreated,
   onChangeStatus,
   filtres,
   onChangeFiltres,
@@ -255,7 +253,6 @@ export default function TicketList({
                         }
                         maxRounds={maxRounds}
                         githubRemote={project.github_remote}
-                        onPrCreated={onPrCreated}
                         onChangeStatus={onChangeStatus}
                         onSelect={onSelectTicket}
                         onRun={onRunPipeline}

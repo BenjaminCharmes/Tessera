@@ -103,3 +103,15 @@ describe("PanneauxDuProjet — un projet qui ne declare rien (ticket-156)", () =
     expect(screen.getByLabelText("Services du projet")).toBeInTheDocument();
   });
 });
+
+describe("PanneauxDuProjet — le réglage du pipeline s'annonce (ticket-205)", () => {
+  it("porte un chevron, comme les autres sections repliables", () => {
+    // Un simple libellé gris ne se lisait pas comme un bouton : la section
+    // passait inaperçue.
+    rendre(false, { enCours: false, services: [] });
+
+    const bouton = screen.getByRole("button", { name: "Pipeline" });
+    expect(bouton.getAttribute("aria-expanded")).toBe("false");
+    expect(bouton.querySelector("svg")).not.toBeNull();
+  });
+});

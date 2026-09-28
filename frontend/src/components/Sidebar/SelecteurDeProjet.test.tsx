@@ -103,3 +103,40 @@ describe("SelecteurDeProjet (ticket-174)", () => {
     await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
   });
 });
+
+describe("SelecteurDeProjet (ticket-205)", () => {
+  it("retire le projet depuis le menu", async () => {
+    // L'action vivait au pied du panneau Git, où rien ne l'annonçait.
+    const plan = vi.spyOn(api.git, "removalPlan").mockResolvedValue({
+      project_id: "demineur",
+      real_path: "/w/demineur",
+      is_symlink: false,
+      unpushed_commits: 0,
+    });
+    render(
+      <SelecteurDeProjet project={projet("demineur", "Démineur")} onSelectProject={vi.fn()} />,
+    );
+    await userEvent.click(screen.getByRole("button"));
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /Retirer ce projet de l'IDE/ }),
+    );
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(plan).toHaveBeenCalledWith("demineur");
+    expect(screen.queryByRole("listbox")).toBeNull();
+  });
+
+  it("borne le déclencheur à la largeur de l'en-tête", () => {
+    // Un `<button>` prend la largeur de son contenu : sans borne, un nom long
+    // passait sous « VSCode » et « Git » au lieu d'être tronqué.
+    render(
+      <SelecteurDeProjet
+        project={projet("portfolio", "Portfolio — un nom beaucoup trop long")}
+        onSelectProject={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("button").className).toContain("max-w-full");
+  });
+});

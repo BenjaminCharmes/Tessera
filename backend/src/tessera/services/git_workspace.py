@@ -469,6 +469,16 @@ class GitWorkspaceService:
             await self._run("commit", "-m", message)
             sha = (await self._run("rev-parse", "--short", "HEAD")).strip()
 
+        await self.commit_bookkeeping()
+        return sha
+
+    async def commit_bookkeeping(self) -> None:
+        """Commit only Tessera's own bookkeeping, under its fixed message.
+
+        Also called on its own once delivery has written the PR number into
+        the ticket (ticket-205): a tracked ticket left modified would send the
+        next run to `blocked`.
+        """
         # A project that has neither tickets/ nor memory/pipeline-log.md
         # yet (e.g. a git_workspace used outside the ticket pipeline, or a
         # fresh repository) must not fail `git add` on a pathspec matching
@@ -494,8 +504,6 @@ class GitWorkspaceService:
             staged_bookkeeping = await self._run("diff", "--cached", "--name-only")
             if staged_bookkeeping.strip():
                 await self._run("commit", "-m", _BOOKKEEPING_COMMIT_MESSAGE)
-
-        return sha
 
     async def _has_head(self) -> bool:
         proc = await asyncio.create_subprocess_exec(

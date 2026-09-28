@@ -19,7 +19,6 @@ interface KanbanViewProps {
   githubRemote?: string | null;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
-  onPrCreated?: (ticketId: string, prNumber: number) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
 }
 
@@ -30,7 +29,6 @@ export default function KanbanView({
   githubRemote,
   onSelectTicket,
   onRunPipeline,
-  onPrCreated,
   onChangeStatus,
 }: KanbanViewProps) {
   return (
@@ -51,7 +49,6 @@ export default function KanbanView({
             githubRemote={githubRemote}
             onSelectTicket={onSelectTicket}
             onRunPipeline={onRunPipeline}
-            onPrCreated={onPrCreated}
             onChangeStatus={onChangeStatus}
           />
         ))}

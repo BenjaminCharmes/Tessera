@@ -428,6 +428,112 @@ def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
     assert "injoignable" in (livraison.arret or "")
 
 
+def _livrer_la_pr(numero: int) -> object:
+    from tessera.services.livraison import Livraison
+
+    async def _livrer(self: object, **kwargs: object) -> Livraison:
+        return Livraison(pr_number=numero, merged=True)
+
+    return _livrer
+
+
+def test_le_livreur_note_la_pr_dans_le_ticket(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # La livraison ouvrait et mergeait la PR sans jamais l'écrire : la carte
+    # du ticket, qui lit `pr_number`, proposait d'en ouvrir une (ticket-205).
+    from tessera.routers.orchestrator import _livreur
+
+    monkeypatch.setattr(
+        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+    )
+
+    asyncio.run(_livreur("mon-projet")(_approved()))
+
+    fichier = workspace / "mon-projet" / "tickets" / "todo" / "ticket-001.md"
+    assert "pr_number: 7" in fichier.read_text(encoding="utf-8")
+
+
+def test_noter_la_pr_laisse_l_arbre_propre(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Sur un projet dont les tickets sont versionnés, un ticket modifié après
+    # coup enverrait le run suivant en `blocked` (ADR-018).
+    import subprocess
+
+    from tessera.routers.orchestrator import _livreur
+
+    projet = workspace / "mon-projet"
+
+    def git(*args: str) -> str:
+        return subprocess.run(
+            ["git", *args], cwd=projet, check=True, capture_output=True, text=True
+        ).stdout
+
+    git("init", "-q")
+    git("config", "user.email", "test@example.com")
+    git("config", "user.name", "Test")
+    git("add", "-A")
+    git("commit", "-q", "-m", "init")
+    monkeypatch.setattr(
+        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+    )
+
+    asyncio.run(_livreur("mon-projet")(_approved()))
+
+    assert git("status", "--porcelain", "--untracked-files=no") == ""
+    assert "pr_number: 7" in git("show", "HEAD:tickets/todo/ticket-001.md")
+
+
+def test_noter_la_pr_avance_la_base_du_run(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # En file, chaque ticket part de la base mémorisée à l'approbation : sans
+    # l'avancer, le commit du numéro disparaissait dès le ticket suivant.
+    from tessera.routers.orchestrator import _livreur
+
+    appels: list[str] = []
+
+    class _Espace:
+        async def commit_bookkeeping(self) -> None:
+            appels.append("commit")
+
+        async def advance_base_ref(self) -> None:
+            appels.append("avance")
+
+    monkeypatch.setattr(
+        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+    )
+
+    asyncio.run(_livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
+
+    assert appels == ["commit", "avance"]
+
+
+def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # La PR est mergée : un ticket qu'on n'a pas pu réécrire ne fait pas
+    # croire que la livraison a échoué (ADR-030).
+    from tessera.routers.orchestrator import _livreur
+
+    async def _leve(self: object, ticket_id: str, pr_number: int) -> object:
+        raise OSError("disque plein")
+
+    monkeypatch.setattr(
+        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+    )
+    monkeypatch.setattr(
+        "tessera.services.ticket_service.TicketService.set_pr_number", _leve
+    )
+
+    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+
+    assert livraison.pr_number == 7
+    assert livraison.merged is True
+    assert livraison.arret is None
+
+
 def test_un_run_autonome_peut_partir_des_issues_github(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
