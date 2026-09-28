@@ -92,6 +92,12 @@ Un ticket = **un changement cohérent**. Si les critères d'acceptation couvrent
 deux sujets sans rapport, ce sont deux tickets. Le symptôme classique :
 « et aussi » dans l'objectif.
 
+Le codeur a un nombre d'actions borné (`LLM_MAX_TURNS`) : chaque lecture,
+recherche, édition ou lancement de test en consomme une. Un ticket qui touche
+backend **et** frontend avec plus de six critères se découpe — le ticket-213
+(quatre changements, neuf critères, deux couches) a épuisé ses trente actions
+avant d'avoir fini.
+
 ## Avant de valider
 
 - [ ] Le fichier est dans le dossier qui correspond à son champ `status`

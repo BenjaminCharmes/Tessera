@@ -58,27 +58,19 @@
     },
     {
       "role": "doc-technique",
-      "model": "qwen3-coder:30b",
+      "model": "claude-haiku-4-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/doc-technique.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-haiku-4-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "doc-fonctionnelle",
-      "model": "qwen3-coder:30b",
+      "model": "claude-haiku-4-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/doc-fonctionnelle.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-haiku-4-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "project-analyzer",
