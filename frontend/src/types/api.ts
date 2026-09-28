@@ -96,11 +96,6 @@ export interface PRStatus {
   pr_number: number;
 }
 
-export interface CreatePrResponse {
-  pr_number: number;
-  pr_url: string;
-}
-
 export interface OrchestratorEvent {
   type: EventType;
   agent: AgentRole | null;

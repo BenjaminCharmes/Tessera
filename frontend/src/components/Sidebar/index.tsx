@@ -63,7 +63,6 @@ interface SidebarProps {
   onToggleKanban: () => void;
   onTicketCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
-  onPrCreated?: (ticketId: string, prNumber: number) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
   /** Le réglage des notifications système (ticket-192). */
   notifications?: ReglageDesNotifications;
@@ -116,7 +115,6 @@ export default function Sidebar({
   onToggleKanban,
   onTicketCreated,
   onBatchCreated,
-  onPrCreated,
   onChangeStatus,
   notifications,
   filtres,
@@ -191,7 +189,6 @@ export default function Sidebar({
             onToggleKanban={onToggleKanban}
             onTicketCreated={onTicketCreated}
             onBatchCreated={onBatchCreated}
-            onPrCreated={onPrCreated}
             onChangeStatus={onChangeStatus}
             filtres={filtres}
             onChangeFiltres={onChangeFiltres}

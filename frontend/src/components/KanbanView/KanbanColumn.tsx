@@ -22,7 +22,6 @@ interface KanbanColumnProps {
   githubRemote?: string | null;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
-  onPrCreated?: (ticketId: string, prNumber: number) => void;
   /** Un ticket déposé sur cette colonne y change de statut (ticket-194). */
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
 }
@@ -35,7 +34,6 @@ export default function KanbanColumn({
   githubRemote,
   onSelectTicket,
   onRunPipeline,
-  onPrCreated,
   onChangeStatus,
 }: KanbanColumnProps) {
   const [survol, setSurvol] = useState(false);
@@ -93,7 +91,6 @@ export default function KanbanColumn({
               isActive={activeTicket?.id === ticket.id}
               isRunning={running.has(ticket.id)}
               githubRemote={githubRemote}
-              onPrCreated={onPrCreated}
               onSelect={onSelectTicket}
               onRun={onRunPipeline}
               onChangeStatus={onChangeStatus}
