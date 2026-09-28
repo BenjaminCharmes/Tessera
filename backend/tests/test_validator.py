@@ -209,6 +209,120 @@ class TestValidatorService:
         assert "Network error" in result.feedback
 
 
+class TestCriteriaReconciliation:
+    """Tests for criterion-level reconciliation (ticket-209)."""
+
+    async def test_missing_criterion_causes_changes_requested(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # 3 critères envoyés, 2 jugés true dans la réponse → CHANGES_REQUESTED
+        # et le troisième figure en passed: false
+        _set_response(
+            provider,
+            {
+                "all_passed": True,
+                "criteria": [
+                    {"criterion": "Returns 200", "passed": True, "note": ""},
+                    {"criterion": "Writes to DB", "passed": True, "note": ""},
+                    # "Sends email" est absent de la réponse LLM
+                ],
+                "verdict": "APPROVED",
+                "feedback": "Two criteria checked.",
+            },
+        )
+
+        result = await service.validate(
+            criteria=["Returns 200", "Writes to DB", "Sends email"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.verdict == "CHANGES_REQUESTED"
+        assert result.all_passed is False
+        assert len(result.criteria) == 3
+        missing = next(c for c in result.criteria if "email" in c.criterion.lower())
+        assert missing.passed is False
+        assert "non jugé" in missing.note
+
+    async def test_llm_approved_verdict_ignored_when_criterion_fails(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Le champ "verdict" du LLM dit APPROVED mais un critère est passed: false
+        _set_response(
+            provider,
+            {
+                "all_passed": False,
+                "criteria": [
+                    {"criterion": "PR merged", "passed": False, "note": "PR still open"},
+                    {"criterion": "Tests pass", "passed": True, "note": ""},
+                ],
+                "verdict": "APPROVED",
+                "feedback": "Mostly good.",
+            },
+        )
+
+        result = await service.validate(
+            criteria=["PR merged", "Tests pass"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.verdict == "CHANGES_REQUESTED"
+        assert result.all_passed is False
+
+    async def test_all_criteria_judged_true_gives_approved(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Non-régression : tous les critères jugés true → APPROVED
+        _set_response(
+            provider,
+            {
+                "all_passed": True,
+                "criteria": [
+                    {"criterion": "Feature implemented", "passed": True, "note": ""},
+                    {"criterion": "Tests written", "passed": True, "note": ""},
+                ],
+                "verdict": "APPROVED",
+                "feedback": "All good.",
+            },
+        )
+
+        result = await service.validate(
+            criteria=["Feature implemented", "Tests written"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.verdict == "APPROVED"
+        assert result.all_passed is True
+        assert all(c.passed for c in result.criteria)
+
+    async def test_checkbox_prefix_normalized_for_matching(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Les critères du ticket arrivent avec "- [ ]" ; le LLM répond sans
+        _set_response(
+            provider,
+            {
+                "all_passed": True,
+                "criteria": [
+                    {"criterion": "Tests pass", "passed": True, "note": ""},
+                ],
+                "verdict": "APPROVED",
+                "feedback": "ok",
+            },
+        )
+
+        result = await service.validate(
+            criteria=["- [ ] Tests pass"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.verdict == "APPROVED"
+        assert result.criteria[0].passed is True
+
+
 class TestValidationResult:
     def test_dataclass_fields(self) -> None:
         cr = CriterionResult(criterion="x", passed=True, note="")

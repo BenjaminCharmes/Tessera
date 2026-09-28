@@ -1,14 +1,14 @@
 ---
-id: ticket-209
-title: "Le validateur n'approuve que s'il a jugé chaque critère du ticket"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-209
+pr_number: null
+priority: high
+status: done
+title: Le validateur n'approuve que s'il a jugé chaque critère du ticket
+type: fix
 ---
 
 # ticket-209 — Le validateur juge chaque critère
