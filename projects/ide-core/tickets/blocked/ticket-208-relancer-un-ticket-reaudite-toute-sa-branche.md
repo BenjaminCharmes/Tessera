@@ -1,14 +1,15 @@
 ---
-id: ticket-208
-title: "Relancer un ticket fait relire tout le travail de sa branche, pas seulement le dernier tour"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-208
+pr_number: null
+priority: high
+status: blocked
+title: Relancer un ticket fait relire tout le travail de sa branche, pas seulement
+  le dernier tour
+type: fix
 ---
 
 # ticket-208 — Relancer un ticket fait relire toute sa branche
