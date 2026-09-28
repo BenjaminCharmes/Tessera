@@ -2,8 +2,8 @@
 id: ticket-201
 title: "L'onglet Coûts devient un tableau de statistiques avec graphiques"
 type: feat
-status: in-review
-pr_number: null
+status: done
+pr_number: 75
 priority: medium
 agent: codeur
 depends_on: []
