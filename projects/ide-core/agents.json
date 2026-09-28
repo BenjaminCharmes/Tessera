@@ -38,15 +38,11 @@
     },
     {
       "role": "securite",
-      "model": "qwen3-coder:30b",
+      "model": "claude-haiku-4-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/securite.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-haiku-4-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "validateur",
@@ -102,7 +98,9 @@
       "codeur",
       "reviewer"
     ],
-    "max_review_rounds": 3
+    "max_review_rounds": 3,
+    "securite_enabled": true
   },
-  "autonomy": "merge"
+  "autonomy": "merge",
+  "github_remote": "BenjaminCharmes/Tessera"
 }
