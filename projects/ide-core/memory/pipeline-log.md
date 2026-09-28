@@ -30,3 +30,5 @@
 - 2026-09-28 13:21:26 UTC — [ticket-214] tour 1 — reviewer démarré
 - 2026-09-28 13:22:21 UTC — [ticket-214] tour 1 — reviewer terminé (55157ms)
 - 2026-09-28 13:22:21 UTC — [ticket-214] APPROVED après 1 tour(s)
+- 2026-09-28 14:09:15 UTC — [ticket-208] branche ticket-208-relancer-un-ticket-fait-relire-tout-le-travail-de
+- 2026-09-28 14:09:15 UTC — [ticket-208] tour 1 — codeur démarré

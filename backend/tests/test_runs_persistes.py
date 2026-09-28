@@ -57,6 +57,9 @@ class _Git:
     async def current_diff(self) -> str:
         return "diff --git a/x b/x\n+1\n"
 
+    async def diff_depuis_base(self) -> str:
+        return "diff --git a/x b/x\n+1\n"
+
     async def commit_all(self, message: str) -> str | None:
         return "abc1234"
 
