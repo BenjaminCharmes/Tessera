@@ -3,7 +3,7 @@ id: ticket-108
 title: "Le dépôt accueille correctement ceux qui arrivent"
 type: docs
 status: done
-pr_number: 111
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: ["ticket-106"]

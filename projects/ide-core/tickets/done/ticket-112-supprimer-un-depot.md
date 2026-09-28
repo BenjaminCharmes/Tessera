@@ -3,7 +3,7 @@ id: ticket-112
 title: "Supprimer un projet qui contient un dépôt git"
 type: fix
 status: done
-pr_number: 127
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-104"]

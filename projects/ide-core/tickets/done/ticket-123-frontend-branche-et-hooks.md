@@ -3,7 +3,7 @@ id: ticket-123
 title: "Remonter la branche du run, annuler les réponses obsolètes, lint en CI"
 type: fix
 status: done
-pr_number: 145
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []

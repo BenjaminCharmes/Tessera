@@ -3,7 +3,7 @@ id: ticket-111
 title: "La CI ne notifie que ce qui mérite d'être lu"
 type: chore
 status: done
-pr_number: 125
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: []

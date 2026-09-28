@@ -3,7 +3,7 @@ id: ticket-139
 title: "Un tour de chat qui écrit doit prendre le verrou du projet"
 type: fix
 status: done
-pr_number: 155
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []

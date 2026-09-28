@@ -99,7 +99,8 @@
       "reviewer"
     ],
     "max_review_rounds": 3,
-    "securite_enabled": true
+    "securite_enabled": true,
+    "validateur_enabled": true
   },
   "autonomy": "merge",
   "github_remote": "BenjaminCharmes/Tessera"

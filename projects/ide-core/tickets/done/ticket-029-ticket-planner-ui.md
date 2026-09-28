@@ -3,7 +3,7 @@ id: ticket-029
 title: "UI 'Planifier une évolution' + persistance batch"
 type: feat
 status: done
-pr_number: 40
+pr_number: null
 priority: medium
 agent: codeur
 depends_on:

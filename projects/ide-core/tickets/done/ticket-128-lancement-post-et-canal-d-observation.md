@@ -3,7 +3,7 @@ id: ticket-128
 title: "Lancer un run par POST et l'observer sur un canal partagé"
 type: refactor
 status: done
-pr_number: 150
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-127"]

@@ -3,7 +3,7 @@ id: ticket-132
 title: "Lancer un projet depuis l'IDE : back, front et base quand il en faut"
 type: design
 status: done
-pr_number: 154
+pr_number: null
 priority: medium
 agent: architect
 depends_on: []

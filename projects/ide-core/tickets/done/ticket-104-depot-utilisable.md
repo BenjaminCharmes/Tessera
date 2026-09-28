@@ -3,7 +3,7 @@ id: ticket-104
 title: "Un projet créé part avec un dépôt utilisable"
 type: feat
 status: done
-pr_number: 102
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []

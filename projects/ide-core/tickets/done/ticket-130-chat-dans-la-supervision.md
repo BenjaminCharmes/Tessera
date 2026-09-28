@@ -3,7 +3,7 @@ id: ticket-130
 title: "Faire apparaître les sessions de chat dans la vue Supervision"
 type: feat
 status: done
-pr_number: 156
+pr_number: null
 priority: low
 agent: codeur
 depends_on: ["ticket-129"]

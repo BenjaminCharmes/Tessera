@@ -3,7 +3,7 @@ id: ticket-153
 title: "Arrêter doit tuer l'arbre, et relancer ne doit pas doubler"
 type: fix
 status: done
-pr_number: 171
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-151"]

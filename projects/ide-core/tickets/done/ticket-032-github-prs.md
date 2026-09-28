@@ -3,7 +3,7 @@ id: ticket-032
 title: "Intégration GitHub Pull Requests"
 type: feat
 status: done
-pr_number: 40
+pr_number: null
 priority: low
 agent: codeur
 depends_on:

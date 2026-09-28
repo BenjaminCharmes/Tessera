@@ -3,7 +3,7 @@ id: ticket-122
 title: "Verdicts stricts, audit qui échoue fermé, logs qui gardent leur cause"
 type: fix
 status: done
-pr_number: 140
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []
