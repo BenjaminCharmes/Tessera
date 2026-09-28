@@ -11,7 +11,10 @@ _logger = get_logger(__name__)
 _MODEL = "claude-sonnet-4-6"
 _MAX_TOKENS = 2048
 _PROMPT_FILE = "securite.md"
-_CODE_MAX_CHARS = 16_000
+# Depuis le ticket-208, l'audit reçoit tout le diff d'une branche reprise :
+# à 16 000 caractères, la fin passait sans audit (ticket-221). ~30 000 tokens,
+# bien en deçà de la fenêtre des modèles servis.
+_CODE_MAX_CHARS = 120_000
 
 Severity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
 _SEVERITIES: dict[str, Severity] = {

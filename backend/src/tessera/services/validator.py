@@ -15,6 +15,9 @@ _logger = get_logger(__name__)
 _MODEL = "claude-sonnet-4-6"
 _MAX_TOKENS = 2048
 _PROMPT_FILE = "validateur.md"
+# Même borne que l'audit sécurité : à 8 000 caractères, un diff de branche
+# reprise rendait la plupart des critères invérifiables (ticket-221).
+_CODE_MAX_CHARS = 120_000
 
 Verdict = Literal["APPROVED", "CHANGES_REQUESTED"]
 
@@ -110,7 +113,7 @@ class ValidatorService:
             )
         return (
             f"## Critères d'acceptation\n{criteria_block}\n\n"
-            f"## Code produit\n{code_produced[:8000]}"
+            f"## Code produit\n{code_produced[:_CODE_MAX_CHARS]}"
             + test_block
         )
 

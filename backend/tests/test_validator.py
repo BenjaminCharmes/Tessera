@@ -334,3 +334,19 @@ class TestValidationResult:
         )
         assert vr.all_passed is True
         assert vr.verdict == "APPROVED"
+
+
+async def test_a_whole_branch_diff_reaches_the_validator_intact(
+    service: ValidatorService, provider: FakeProvider
+) -> None:
+    # ticket-221 : coupé à 8 000 caractères, le validateur déclarait
+    # invérifiables des critères que la fin du diff satisfaisait.
+    _set_response(
+        provider,
+        {"criteria": [{"criterion": "Returns 200", "passed": True, "note": ""}]},
+    )
+    diff = "+x = 1\n" * 10_000 + "+SENTINELLE_FIN_DU_DIFF\n"
+
+    await service.validate(criteria=["Returns 200"], code_produced=diff, test_result=None)
+
+    assert "SENTINELLE_FIN_DU_DIFF" in provider.calls[0]["user"]
