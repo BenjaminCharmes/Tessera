@@ -72,6 +72,8 @@ function eventToLine(ev: OrchestratorEvent): string | null {
       return `[${t}] Pipeline terminé — ${ev.data["approved"] ? "APPROVED" : "CHANGES_REQUESTED"} : ${String(ev.data["final_status"] ?? "")}`;
     case "livraison_done":
       return `[${t}] ${livraisonLisible(ev)}`;
+    case "documentation_failed":
+      return `[${t}] Documentation : échec — ${String(ev.data["error"] ?? "raison inconnue")}`;
     case "error":
       return `[${t}] Erreur : ${raisonLisible(ev)}`;
     default:

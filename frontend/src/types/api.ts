@@ -43,6 +43,7 @@ export type EventType =
   | "run_closed"
   | "service_output"
   | "service_closed"
+  | "documentation_failed"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */

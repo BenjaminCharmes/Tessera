@@ -1,5 +1,4 @@
-"""La doc se met à jour par lot, en modifications ciblées — ticket-092."""
-import io
+"""La doc se met à jour par lot, en modifications ciblées — ticket-092, ticket-213."""
 import json
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from tessera.services.documentation import (
     appliquer_editions,
     tickets_a_documenter,
     marquer_documente,
+    _PLAFOND,
 )
 
 
@@ -166,7 +166,8 @@ def test_sans_marqueur_tout_est_a_documenter(tmp_path: Path) -> None:
 def test_le_marqueur_borne_ce_qui_reste(tmp_path: Path) -> None:
     for n in (1, 2, 3):
         _ticket(tmp_path, f"ticket-00{n}")
-    marquer_documente(tmp_path, "ticket-002")
+    # Marquer les deux premiers comme documentés
+    marquer_documente(tmp_path, ["ticket-001", "ticket-002"])
 
     assert [t.id for t in tickets_a_documenter(tmp_path)] == ["ticket-003"]
 
@@ -178,6 +179,36 @@ def test_un_marqueur_illisible_ne_bloque_pas(tmp_path: Path) -> None:
     (tmp_path / "memory" / "documentation.json").write_text("{ cassé", encoding="utf-8")
 
     assert [t.id for t in tickets_a_documenter(tmp_path)] == ["ticket-001"]
+
+
+def test_ticket_hors_ordre_nest_pas_oublie(tmp_path: Path) -> None:
+    """ticket-208 livré après ticket-209 déjà documenté figure dans le lot suivant.
+
+    L'ancien filtre ``identifiant <= dernier`` excluait définitivement tout
+    ticket dont l'identifiant était inférieur au dernier documenté — même si
+    ce ticket avait été livré après. Le nouveau filtre par ensemble d'IDs
+    documentés ne fait que ça : exclure les IDs déjà vus.
+    """
+    _ticket(tmp_path, "ticket-209")
+    marquer_documente(tmp_path, ["ticket-209"])
+    # ticket-208 arrive dans done/ plus tard
+    _ticket(tmp_path, "ticket-208")
+
+    ids = [t.id for t in tickets_a_documenter(tmp_path)]
+    assert "ticket-208" in ids
+    assert "ticket-209" not in ids
+
+
+def test_ancien_format_encore_lu(tmp_path: Path) -> None:
+    """Un documentation.json à l'ancien format reste lisible (ADR-036)."""
+    for n in (1, 2, 3):
+        _ticket(tmp_path, f"ticket-00{n}")
+    (tmp_path / "memory").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "memory" / "documentation.json").write_text(
+        '{"dernier_ticket": "ticket-002"}', encoding="utf-8"
+    )
+
+    assert [t.id for t in tickets_a_documenter(tmp_path)] == ["ticket-003"]
 
 
 # ------------------------------------------------------------------
@@ -212,6 +243,50 @@ def _service(tmp_path: Path, reponses: list[str]):  # type: ignore[no-untyped-de
     return DocumentationService(provider, prompts), provider  # type: ignore[arg-type]
 
 
+def _avec_marqueur(tmp_path: Path) -> None:
+    """Crée un marqueur vide pour que `mettre_a_jour` ne fasse pas l'initialisation."""
+    (tmp_path / "memory").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "memory" / "documentation.json").write_text(
+        '{"documentes": []}', encoding="utf-8"
+    )
+
+
+async def test_sans_marqueur_le_service_initialise_sans_appel_provider(
+    tmp_path: Path,
+) -> None:
+    """Projet sans documentation.json : le service pose le marqueur, n'appelle pas le provider."""
+    for n in (1, 2, 3):
+        _ticket(tmp_path, f"ticket-{n:03d}")
+    svc, provider = _service(tmp_path, [])
+
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    assert provider.appels == []
+    assert resultat.fichiers_modifies == []
+    assert resultat.marqueur_ecrit is True
+    # Le marqueur est créé avec tous les tickets existants
+    assert (tmp_path / "memory" / "documentation.json").is_file()
+    assert tickets_a_documenter(tmp_path) == []
+
+
+async def test_plafond_de_tickets_par_lot(tmp_path: Path) -> None:
+    """15 tickets à documenter → le brief n'en contient que _PLAFOND, tronque=True."""
+    n_tickets = _PLAFOND + 5
+    for n in range(1, n_tickets + 1):
+        _ticket(tmp_path, f"ticket-{n:03d}")
+    _avec_marqueur(tmp_path)
+
+    svc, provider = _service(tmp_path, ['{"editions": []}', '{"editions": []}'])
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    assert resultat.tronque is True
+    assert len(resultat.tickets) == _PLAFOND
+    # Le brief n'inclut que les _PLAFOND tickets les plus récents
+    user_content = str(provider.appels[0]["user"])
+    # Les premiers tickets (hors plafond) ne sont pas dans le brief
+    assert "ticket-001" not in user_content
+
+
 async def test_un_lot_de_dix_tickets_fait_deux_appels(tmp_path: Path) -> None:
     # Le point du ticket : documenter par lot, pas par ticket. Dix tickets
     # documentés un par un, ce sont vingt appels ; ici il y en a deux.
@@ -219,6 +294,7 @@ async def test_un_lot_de_dix_tickets_fait_deux_appels(tmp_path: Path) -> None:
         _ticket(tmp_path, f"ticket-{n:03d}")
     _doc(tmp_path, "architecture.md", "# Archi\n\nancien texte\n")
     _doc(tmp_path, "guide-utilisateur.md", "# Guide\n\nancien guide\n")
+    _avec_marqueur(tmp_path)
 
     svc, provider = _service(tmp_path, ['{"editions": []}', '{"editions": []}'])
     await svc.mettre_a_jour(tmp_path)
@@ -228,6 +304,7 @@ async def test_un_lot_de_dix_tickets_fait_deux_appels(tmp_path: Path) -> None:
 
 async def test_les_deux_agents_recoivent_les_memes_tickets(tmp_path: Path) -> None:
     _ticket(tmp_path, "ticket-001", titre="Ajouter le mode autonome")
+    _avec_marqueur(tmp_path)
     svc, provider = _service(tmp_path, ['{"editions": []}', '{"editions": []}'])
 
     await svc.mettre_a_jour(tmp_path)
@@ -240,6 +317,7 @@ async def test_les_deux_agents_recoivent_les_memes_tickets(tmp_path: Path) -> No
 async def test_les_editions_proposees_sont_appliquees(tmp_path: Path) -> None:
     _ticket(tmp_path, "ticket-001")
     fichier = _doc(tmp_path, "architecture.md", "# Archi\n\ndeux agents\n")
+    _avec_marqueur(tmp_path)
     reponse = json.dumps(
         {
             "editions": [
@@ -265,6 +343,7 @@ async def test_une_edition_refusee_ne_casse_pas_la_mise_a_jour(tmp_path: Path) -
     _ticket(tmp_path, "ticket-001")
     _doc(tmp_path, "architecture.md", "# Archi\n")
     guide = _doc(tmp_path, "guide-utilisateur.md", "# Guide\n\nvieux\n")
+    _avec_marqueur(tmp_path)
     mauvaise = json.dumps(
         {"editions": [{"fichier": "docs/architecture.md", "ancien": "absent", "nouveau": "x"}]}
     )
@@ -282,11 +361,33 @@ async def test_une_edition_refusee_ne_casse_pas_la_mise_a_jour(tmp_path: Path) -
 async def test_le_marqueur_avance_apres_une_mise_a_jour(tmp_path: Path) -> None:
     _ticket(tmp_path, "ticket-001")
     _ticket(tmp_path, "ticket-002")
+    _avec_marqueur(tmp_path)
     svc, _ = _service(tmp_path, ['{"editions": []}', '{"editions": []}'])
 
     await svc.mettre_a_jour(tmp_path)
 
     assert tickets_a_documenter(tmp_path) == []
+
+
+async def test_le_marqueur_navance_pas_si_toutes_editions_refusees(
+    tmp_path: Path,
+) -> None:
+    """Si toutes les éditions proposées sont refusées, le marqueur n'avance pas."""
+    _ticket(tmp_path, "ticket-001")
+    _doc(tmp_path, "architecture.md", "# Archi\n")
+    _avec_marqueur(tmp_path)
+    mauvaise = json.dumps(
+        {"editions": [{"fichier": "docs/architecture.md", "ancien": "absent", "nouveau": "x"}]}
+    )
+    svc, _ = _service(tmp_path, [mauvaise, mauvaise])
+
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    assert resultat.refus
+    assert resultat.fichiers_modifies == []
+    assert resultat.marqueur_ecrit is False
+    # ticket-001 doit réapparaître dans le prochain lot
+    assert "ticket-001" in [t.id for t in tickets_a_documenter(tmp_path)]
 
 
 async def test_sans_ticket_nouveau_aucun_appel(tmp_path: Path) -> None:

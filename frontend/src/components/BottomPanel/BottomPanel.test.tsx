@@ -101,6 +101,15 @@ describe("BottomPanel", () => {
     expect(screen.getByText(/en attente/i)).toBeTruthy();
   });
 
+  it("affiche documentation_failed avec la cause dans le journal", () => {
+    const ev = makeEvent("documentation_failed", {
+      error: "Ollama absent — délai dépassé",
+    });
+    render(<BottomPanel events={[ev]} />);
+    expect(screen.getByText(/Documentation.*échec/i)).toBeTruthy();
+    expect(screen.getByText(/Ollama absent/)).toBeTruthy();
+  });
+
   it("renders multiple events in order", () => {
     const events = [
       makeEvent("agent_started", { round: 1 }, { agent: "codeur" }),

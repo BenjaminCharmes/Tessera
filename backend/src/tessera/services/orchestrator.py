@@ -484,11 +484,23 @@ class Orchestrator:
             doc = await self._documenter()
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("documentation_echouee", extra={"erreur": str(exc)})
+            await on_event(
+                OrchestratorEvent(
+                    type=EventType.DOCUMENTATION_FAILED,
+                    ticket_id=resultat.ticket_id,
+                    data={"error": str(exc)},
+                )
+            )
             return
         fichiers = list(getattr(doc, "fichiers_modifies", []) or [])
         refus = list(getattr(doc, "refus", []) or [])
         tickets = list(getattr(doc, "tickets", []) or [])
-        if fichiers and self._git_workspace is not None and resultat.branch is not None:
+        tronque = bool(getattr(doc, "tronque", False))
+        marqueur_ecrit = bool(getattr(doc, "marqueur_ecrit", False))
+        # Commiter si des fichiers de doc ont changé **ou** si le marqueur a
+        # été réécrit : dans les deux cas l'arbre doit rester propre avant la
+        # livraison (ADR-018, ticket-213).
+        if (fichiers or marqueur_ecrit) and self._git_workspace is not None and resultat.branch is not None:
             try:
                 await self._git_workspace.commit_all(
                     f"docs: update documentation for {resultat.ticket_id}"
@@ -496,12 +508,17 @@ class Orchestrator:
             except Exception as exc:  # noqa: BLE001
                 _logger.warning("documentation_commit_echoue", extra={"erreur": str(exc)})
                 refus.append(f"commit : {exc}")
-        if fichiers or refus:
+        if fichiers or refus or tronque:
             await on_event(
                 OrchestratorEvent(
                     type=EventType.DOC_UPDATED,
                     ticket_id=resultat.ticket_id,
-                    data={"fichiers": fichiers, "refus": refus, "tickets": tickets},
+                    data={
+                        "fichiers": fichiers,
+                        "refus": refus,
+                        "tickets": tickets,
+                        "tronque": tronque,
+                    },
                 )
             )
 

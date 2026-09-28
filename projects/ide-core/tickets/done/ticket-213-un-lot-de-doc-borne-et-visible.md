@@ -1,14 +1,14 @@
 ---
-id: ticket-213
-title: "La mise à jour de la doc est bornée, et son échec se voit"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-213
+pr_number: null
+priority: high
+status: done
+title: La mise à jour de la doc est bornée, et son échec se voit
+type: fix
 ---
 
 # ticket-213 — Un lot de doc borné et visible
