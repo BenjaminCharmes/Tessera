@@ -4,7 +4,6 @@ import { api } from "../../lib/api";
 import { useGitStatus } from "../../hooks/useGitStatus";
 import { lienDuDepot } from "../../lib/lienDuDepot";
 import { useResource } from "../../hooks/useResource";
-import RemoveProjectModal from "./RemoveProjectModal";
 import type { ArtifactMode, ArtifactModeState, Project } from "../../types/api";
 
 interface GitLinkPanelProps {
@@ -21,7 +20,6 @@ interface GitLinkPanelProps {
 export default function GitLinkPanel({ project }: GitLinkPanelProps) {
   const git = useGitStatus(project?.id ?? null);
   const [repoUrl, setRepoUrl] = useState("");
-  const [removing, setRemoving] = useState(false);
 
   const projectId = project?.id ?? null;
 
@@ -194,28 +192,6 @@ export default function GitLinkPanel({ project }: GitLinkPanelProps) {
               </p>
             )}
         </div>
-      )}
-
-      <div className="mt-2 border-t border-zinc-800 pt-2">
-        <button
-          type="button"
-          onClick={() => setRemoving(true)}
-          className="text-zinc-500 hover:text-zinc-300"
-        >
-          Retirer ce projet de l'IDE…
-        </button>
-      </div>
-
-      {removing && (
-        <RemoveProjectModal
-          project={project}
-          onClose={() => setRemoving(false)}
-          onRemoved={() => {
-            setRemoving(false);
-            // Le projet n'existe plus : la liste doit repartir du serveur.
-            window.location.reload();
-          }}
-        />
       )}
 
       {git.errorMessage && (

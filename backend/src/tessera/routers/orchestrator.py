@@ -214,7 +214,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
-        livrer=_livreur(project_id, runner, politique),
+        livrer=_livreur(project_id, runner, politique, espace=git_workspace),
         documenter=_documenteur(project_id, politique),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
@@ -267,8 +267,12 @@ def _livreur(
     project_id: str,
     runner: AgentRunner | None = None,
     politique: PolitiqueRun | None = None,
+    espace: GitWorkspaceService | None = None,
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison d'un projet, telle que l'orchestrateur l'appelle.
+
+    `espace` est l'espace git de l'orchestrateur : celui dont la base sert
+    de départ au ticket suivant de la file.
 
     Branchée sur l'orchestrateur plutôt qu'appelée par chaque endpoint : les
     trois modes de run — unique, file, autonome — passent par `run_pipeline`,
@@ -319,7 +323,7 @@ def _livreur(
     async def livrer(result: PipelineResult) -> Livraison:
         ticket = await ticket_svc.get_ticket(result.ticket_id)
         try:
-            return await service.livrer(
+            livraison = await service.livrer(
                 ticket_id=result.ticket_id,
                 ticket_title=ticket.title if ticket else result.ticket_id,
                 ticket_body=ticket.body if ticket else "",
@@ -329,6 +333,27 @@ def _livreur(
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
             return Livraison(arret=f"Livraison interrompue : {exc}")
+        if livraison.pr_number is not None:
+            await noter_la_pr(result.ticket_id, livraison.pr_number)
+        return livraison
+
+    async def noter_la_pr(ticket_id: str, pr_number: int) -> None:
+        # Sans ce numéro, la carte du ticket croit qu'il n'a pas de PR et
+        # propose d'en ouvrir une sur un travail déjà mergé (ticket-205). Une
+        # écriture ratée ne défait pas une PR ouverte : elle se journalise.
+        try:
+            await ticket_svc.set_pr_number(ticket_id, pr_number)
+            if espace is None:
+                await GitWorkspaceService(
+                    project_path, politique=politique
+                ).commit_bookkeeping()
+                return
+            await espace.commit_bookkeeping()
+            # En file, le ticket suivant part de la base mémorisée à
+            # l'approbation : sans l'avancer, ce commit n'y serait pas.
+            await espace.advance_base_ref()
+        except Exception as exc:  # noqa: BLE001 — même raison que la livraison
+            _logger.warning("pr_non_notee", extra={"erreur": str(exc)})
 
     return livrer
 

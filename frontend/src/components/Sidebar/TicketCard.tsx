@@ -1,8 +1,6 @@
 import {
-  IconCross,
   IconDiff,
   IconDot,
-  IconExternal,
   IconPlay,
   IconQueue,
 } from "../../design/icons";
@@ -70,7 +68,6 @@ interface TicketCardProps {
   onShowDiff?: (ticketId: string) => void;
   onToggleQueue?: (ticketId: string) => void;
   dansLaFile?: boolean;
-  onPrCreated?: (ticketId: string, prNumber: number) => void;
   /**
    * Changer le statut à la main (ticket-194). Absent : ni menu ni
    * glisser-déposer. Un ticket en cours de run n'en a jamais — le verrou
@@ -91,19 +88,12 @@ export default function TicketCard({
   onShowDiff,
   onToggleQueue,
   dansLaFile = false,
-  onPrCreated,
   onChangeStatus,
 }: TicketCardProps) {
   const canRun = ticket.status !== "done" && ticket.status !== "cancelled";
   const transitions = transitionsManuelles(ticket.status);
   const peutChangerDeStatut =
     !!onChangeStatus && !isRunning && transitions.length > 0;
-  const canOpenPr =
-    ticket.status === "done" && !!githubRemote && ticket.pr_number === null;
-
-  const [showPrForm, setShowPrForm] = useState(false);
-  const [headBranch, setHeadBranch] = useState(ticket.id);
-  const [isCreatingPr, setIsCreatingPr] = useState(false);
   const [prStatus, setPrStatus] = useState<PRStatus | null>(null);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -130,28 +120,9 @@ export default function TicketCard({
     };
   }, [ticket.pr_number, ticket.project_id, ticket.id, githubRemote]);
 
-  async function handleCreatePr(e: React.FormEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsCreatingPr(true);
-    try {
-      const result = await api.github.createPr(
-        ticket.project_id,
-        ticket.id,
-        headBranch,
-      );
-      setShowPrForm(false);
-      onPrCreated?.(ticket.id, result.pr_number);
-    } catch {
-      // errors will surface via toast at the caller level
-    } finally {
-      setIsCreatingPr(false);
-    }
-  }
-
   // La carte est un `div` cliquable : sans rôle ni focus, elle n'existait pas
   // au clavier. Seule la carte elle-même réagit à Entrée et Espace — la
-  // saisie du formulaire PR et les boutons internes ont leurs propres touches
+  // les boutons internes ont leurs propres touches
   // (ticket-123).
   function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     if (e.target !== e.currentTarget) return;
@@ -249,38 +220,6 @@ export default function TicketCard({
               </span>
             )}
           </div>
-          {showPrForm && (
-            <form
-              onSubmit={handleCreatePr}
-              onClick={(e) => e.stopPropagation()}
-              className="mt-1.5 flex gap-1"
-            >
-              <input
-                autoFocus
-                type="text"
-                value={headBranch}
-                onChange={(e) => setHeadBranch(e.target.value)}
-                placeholder="branch name"
-                className="flex-1 min-w-0 text-micro bg-zinc-800 border border-zinc-600 rounded-sm px-1.5 py-0.5 text-zinc-200 focus:outline-hidden focus:border-zinc-400"
-              />
-              <button
-                type="submit"
-                disabled={isCreatingPr || !headBranch.trim()}
-                className="text-micro px-1.5 py-0.5 rounded-sm bg-zinc-700 text-zinc-200 hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isCreatingPr ? "…" : "OK"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowPrForm(false)}
-                title="Annuler"
-                aria-label="Annuler"
-                className="text-micro px-1 py-0.5 rounded-sm text-zinc-500 hover:text-zinc-300 transition-colors"
-              >
-                <IconCross size={14} />
-              </button>
-            </form>
-          )}
         </div>
 
         <div className="flex flex-col gap-0.5 shrink-0">
@@ -337,19 +276,10 @@ export default function TicketCard({
               <IconDiff size={12} />
             </button>
           )}
-          {canOpenPr && !showPrForm && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowPrForm(true);
-              }}
-              title="Ouvrir une PR"
-              aria-label="Ouvrir une PR"
-              className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors text-zinc-500 hover:text-zinc-300 hover:bg-zinc-600"
-            >
-              <IconExternal size={12} />
-            </button>
-          )}
+          {/* Plus de bouton « Ouvrir une PR » : il ne poussait rien, visait une
+              branche `ticket-XXX` que les runs ne créent pas, et s'affichait
+              sur des tickets déjà mergés faute de `pr_number`. Le panneau
+              d'activité pousse puis ouvre la PR (ticket-205). */}
         </div>
       </div>
     </div>

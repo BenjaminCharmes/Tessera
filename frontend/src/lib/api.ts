@@ -18,7 +18,6 @@ import type {
   RemovalPlan,
   ConversationMessage,
   CreateAgentResponse,
-  CreatePrResponse,
   ImportProjectRequest,
   ImportProjectResponse,
   PRStatus,
@@ -179,16 +178,6 @@ export const api = {
       ),
   },
   github: {
-    createPr: (
-      projectId: string,
-      ticketId: string,
-      headBranch: string,
-      base = "develop",
-    ): Promise<CreatePrResponse> =>
-      post(`/projects/${projectId}/tickets/${ticketId}/create-pr`, {
-        head_branch: headBranch,
-        base,
-      }),
     getPrStatus: (projectId: string, ticketId: string): Promise<PRStatus> =>
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
   },

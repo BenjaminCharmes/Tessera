@@ -207,11 +207,6 @@ export default function App() {
     }
   }
 
-  function handlePrCreated(_ticketId: string, prNumber: number) {
-    tickets.refresh();
-    addToast(`PR #${prNumber} ouverte`, "success");
-  }
-
   function handleBatchCreated(created: Ticket[]) {
     tickets.refresh();
     addToast(
@@ -412,7 +407,6 @@ export default function App() {
               githubRemote={project?.github_remote ?? null}
               onSelectTicket={handleSelectTicket}
               onRunPipeline={handleRunPipeline}
-              onPrCreated={handlePrCreated}
               onChangeStatus={handleChangeStatus}
             />
           ) : (

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { IconChevronDown } from "../../design/icons";
 import { useProjects } from "../../hooks/useProjects";
 import type { Project } from "../../types/api";
+import RemoveProjectModal from "./RemoveProjectModal";
 
 /**
  * Changer de projet sans quitter la vue courante — ticket-174.
@@ -25,6 +26,7 @@ export default function SelecteurDeProjet({
   onSelectProject,
 }: SelecteurDeProjetProps) {
   const [ouvert, setOuvert] = useState(false);
+  const [retrait, setRetrait] = useState(false);
   const { projects } = useProjects();
   const conteneur = useRef<HTMLDivElement | null>(null);
 
@@ -54,7 +56,7 @@ export default function SelecteurDeProjet({
         aria-haspopup="listbox"
         aria-expanded={ouvert}
         title={`${project.id} — ${project.path ?? ""}`}
-        className="flex min-w-0 items-center gap-1 truncate text-sm font-medium text-violet-100 transition-colors hover:text-violet-50"
+        className="flex min-w-0 max-w-full items-center gap-1 truncate text-sm font-medium text-violet-100 transition-colors hover:text-violet-50"
       >
         <span className="truncate">{project.name}</span>
         {/* ADR-026 : les affordances viennent de `design/icons.tsx`, jamais
@@ -63,39 +65,68 @@ export default function SelecteurDeProjet({
       </button>
 
       {ouvert ? (
-        <ul
-          role="listbox"
-          aria-label="Projets"
-          className="absolute left-0 top-full z-20 mt-1 max-h-72 w-64 overflow-y-auto rounded-md border border-zinc-700 bg-zinc-900 py-1 shadow-lg"
-        >
-          {projects.map((p) => {
-            const actif = p.id === project.id;
-            return (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={actif}
-                  onClick={() => {
-                    onSelectProject(p);
-                    setOuvert(false);
-                  }}
-                  className={`flex w-full items-center gap-2 px-2 py-1.5 text-left text-xs transition-colors hover:bg-zinc-800 ${
-                    actif ? "text-zinc-100" : "text-zinc-400"
-                  }`}
-                >
-                  <span
-                    aria-hidden
-                    className={`h-3 w-0.5 shrink-0 rounded-full ${
-                      actif ? "bg-violet-400" : "bg-transparent"
+        <div className="absolute left-0 top-full z-20 mt-1 w-64 rounded-md border border-zinc-700 bg-zinc-900 py-1 shadow-lg">
+          <ul
+            role="listbox"
+            aria-label="Projets"
+            className="max-h-72 overflow-y-auto"
+          >
+            {projects.map((p) => {
+              const actif = p.id === project.id;
+              return (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={actif}
+                    onClick={() => {
+                      onSelectProject(p);
+                      setOuvert(false);
+                    }}
+                    className={`flex w-full items-center gap-2 px-2 py-1.5 text-left text-xs transition-colors hover:bg-zinc-800 ${
+                      actif ? "text-zinc-100" : "text-zinc-400"
                     }`}
-                  />
-                  <span className="truncate">{p.name}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                  >
+                    <span
+                      aria-hidden
+                      className={`h-3 w-0.5 shrink-0 rounded-full ${
+                        actif ? "bg-violet-400" : "bg-transparent"
+                      }`}
+                    />
+                    <span className="truncate">{p.name}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {/* Hors de la `listbox` : c'est une action sur le projet actif, pas
+              un projet à choisir. Elle vivait au pied du panneau Git, où
+              rien ne l'annonçait (ticket-205). */}
+          <div className="mt-1 border-t border-zinc-800 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                setOuvert(false);
+                setRetrait(true);
+              }}
+              className="w-full px-2 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+            >
+              Retirer ce projet de l'IDE…
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {retrait ? (
+        <RemoveProjectModal
+          project={project}
+          onClose={() => setRetrait(false)}
+          onRemoved={() => {
+            setRetrait(false);
+            // Le projet n'existe plus : la liste doit repartir du serveur.
+            window.location.reload();
+          }}
+        />
       ) : null}
     </div>
   );

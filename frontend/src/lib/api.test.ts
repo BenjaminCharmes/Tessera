@@ -208,29 +208,6 @@ describe("api.agents.list", () => {
   });
 });
 
-describe("api.github.createPr", () => {
-  it("POSTs to the create-pr endpoint", async () => {
-    const pr = { pr_url: "https://github.com/foo/bar/pull/1", pr_number: 1 };
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(pr),
-    });
-    const result = await api.github.createPr(
-      "ide-core",
-      "ticket-001",
-      "ticket-001-fix",
-    );
-    expect(result).toEqual(pr);
-    expect(mockFetch).toHaveBeenCalledWith(
-      "/api/v1/projects/ide-core/tickets/ticket-001/create-pr",
-      expect.objectContaining({
-        method: "POST",
-        body: JSON.stringify({ head_branch: "ticket-001-fix", base: "develop" }),
-      }),
-    );
-  });
-});
-
 describe("api.github.getPrStatus", () => {
   it("calls the pr-status endpoint", async () => {
     const status = { state: "open", pr_number: 1 };

@@ -224,13 +224,16 @@ describe("TicketCard", () => {
   });
 
   // ------------------------------------------------------------------
-  // PR button
+  // PR button — retiré (ticket-205)
   // ------------------------------------------------------------------
 
-  it("no PR button when ticket is not done", () => {
+  it("never offers to open a PR from the card", () => {
+    // Le cas où le bouton apparaissait : terminé, remote, sans numéro. La
+    // livraison note désormais sa PR ; ouvrir une PR à la main passe par le
+    // panneau d'activité, qui pousse la branche avant.
     render(
       <TicketCard
-        ticket={{ ...base, status: "in-progress" }}
+        ticket={{ ...base, status: "done" }}
         isActive={false}
         isRunning={false}
         githubRemote="owner/repo"
@@ -239,144 +242,7 @@ describe("TicketCard", () => {
       />,
     );
     expect(screen.queryByTitle("Ouvrir une PR")).not.toBeInTheDocument();
-  });
-
-  it("no PR button when githubRemote is absent", () => {
-    render(
-      <TicketCard
-        ticket={{ ...base, status: "done" }}
-        isActive={false}
-        isRunning={false}
-        onSelect={vi.fn()}
-        onRun={vi.fn()}
-      />,
-    );
-    expect(screen.queryByTitle("Ouvrir une PR")).not.toBeInTheDocument();
-  });
-
-  it("no PR button when pr_number already set", () => {
-    render(
-      <TicketCard
-        ticket={{ ...base, status: "done", pr_number: 15 }}
-        isActive={false}
-        isRunning={false}
-        githubRemote="owner/repo"
-        onSelect={vi.fn()}
-        onRun={vi.fn()}
-      />,
-    );
-    expect(screen.queryByTitle("Ouvrir une PR")).not.toBeInTheDocument();
-  });
-
-  it("shows PR button when ticket done + githubRemote + no pr_number", () => {
-    render(
-      <TicketCard
-        ticket={{ ...base, status: "done" }}
-        isActive={false}
-        isRunning={false}
-        githubRemote="owner/repo"
-        onSelect={vi.fn()}
-        onRun={vi.fn()}
-      />,
-    );
-    expect(screen.getByTitle("Ouvrir une PR")).toBeInTheDocument();
-  });
-
-  it("PR button click shows inline branch form", () => {
-    render(
-      <TicketCard
-        ticket={{ ...base, status: "done" }}
-        isActive={false}
-        isRunning={false}
-        githubRemote="owner/repo"
-        onSelect={vi.fn()}
-        onRun={vi.fn()}
-      />,
-    );
-    fireEvent.click(screen.getByTitle("Ouvrir une PR"));
-    expect(screen.getByPlaceholderText("branch name")).toBeInTheDocument();
-  });
-
-  it("branch input pre-filled with ticket id", () => {
-    render(
-      <TicketCard
-        ticket={{ ...base, status: "done" }}
-        isActive={false}
-        isRunning={false}
-        githubRemote="owner/repo"
-        onSelect={vi.fn()}
-        onRun={vi.fn()}
-      />,
-    );
-    fireEvent.click(screen.getByTitle("Ouvrir une PR"));
-    expect(screen.getByPlaceholderText("branch name")).toHaveValue(
-      "ticket-001",
-    );
-  });
-
-  it("cancel button hides the form", () => {
-    render(
-      <TicketCard
-        ticket={{ ...base, status: "done" }}
-        isActive={false}
-        isRunning={false}
-        githubRemote="owner/repo"
-        onSelect={vi.fn()}
-        onRun={vi.fn()}
-      />,
-    );
-    fireEvent.click(screen.getByTitle("Ouvrir une PR"));
-    fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
-    expect(
-      screen.queryByPlaceholderText("branch name"),
-    ).not.toBeInTheDocument();
-  });
-
-  it("submitting form calls api.github.createPr and onPrCreated", async () => {
-    const createPr = vi
-      .spyOn(apiModule.api.github, "createPr")
-      .mockResolvedValue({
-        pr_number: 42,
-        pr_url: "https://github.com/owner/repo/pull/42",
-      });
-    const getPrStatus = vi
-      .spyOn(apiModule.api.github, "getPrStatus")
-      .mockResolvedValue({
-        state: "open",
-        ci_status: "none",
-        pr_url: "https://github.com/owner/repo/pull/42",
-        pr_number: 42,
-      });
-
-    const onPrCreated = vi.fn();
-    render(
-      <TicketCard
-        ticket={{ ...base, status: "done" }}
-        isActive={false}
-        isRunning={false}
-        githubRemote="owner/repo"
-        onSelect={vi.fn()}
-        onRun={vi.fn()}
-        onPrCreated={onPrCreated}
-      />,
-    );
-
-    fireEvent.click(screen.getByTitle("Ouvrir une PR"));
-    fireEvent.submit(
-      screen.getByPlaceholderText("branch name").closest("form")!,
-    );
-
-    await waitFor(() => {
-      expect(createPr).toHaveBeenCalledWith(
-        "ide-core",
-        "ticket-001",
-        "ticket-001",
-      );
-      expect(onPrCreated).toHaveBeenCalledWith("ticket-001", 42);
-    });
-
-    createPr.mockRestore();
-    getPrStatus.mockRestore();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
 
   // ------------------------------------------------------------------
