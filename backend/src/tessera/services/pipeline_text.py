@@ -31,20 +31,38 @@ def _unapproved_commit_message(ticket_id: str, reason: str) -> str:
     return f"chore: {ticket_id} — unapproved work ({_single_line(reason)})"
 
 
+_CONTINUATION_LINE = re.compile(r"^[ \t]+\S")
+
+
 def _extract_criteria(ticket_body: str) -> list[str]:
-    """Extracts acceptance criteria checkboxes from ticket markdown body."""
+    """Extracts acceptance criteria checkboxes from ticket markdown body.
+
+    A criterion may span several lines: indented lines immediately following
+    a checkbox line are treated as continuations and joined with a space.
+    A blank line or a new checkbox terminates the current criterion.
+    """
     criteria: list[str] = []
     in_criteria_section = False
+    # Vrai tant que la ligne précédente appartient au critère en cours : une
+    # ligne vide le clôt, sinon un paragraphe indenté plus bas s'y collerait.
+    continuable = False
     for line in ticket_body.splitlines():
         if _CRITERIA_HEADING.search(line):
             in_criteria_section = True
             continue
-        if in_criteria_section:
-            if line.startswith("##"):
-                break
-            m = _CRITERIA_ITEM.match(line)
-            if m:
-                criteria.append(m.group(1).strip())
+        if not in_criteria_section:
+            continue
+        if line.startswith("##"):
+            break
+        m = _CRITERIA_ITEM.match(line)
+        if m:
+            criteria.append(m.group(1).strip())
+            continuable = True
+        elif continuable and _CONTINUATION_LINE.match(line):
+            # Indented non-empty line right after a criterion: continuation.
+            criteria[-1] = criteria[-1] + " " + line.strip()
+        else:
+            continuable = False
     return criteria
 
 

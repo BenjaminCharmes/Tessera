@@ -1,14 +1,14 @@
 ---
-id: ticket-214
-title: "Un critère d'acceptation écrit sur plusieurs lignes est lu en entier"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-214
+pr_number: null
+priority: high
+status: done
+title: Un critère d'acceptation écrit sur plusieurs lignes est lu en entier
+type: fix
 ---
 
 # ticket-214 — Lire les critères sur plusieurs lignes
