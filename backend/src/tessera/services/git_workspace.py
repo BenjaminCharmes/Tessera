@@ -164,6 +164,13 @@ class GitWorkspaceService:
         # the counterpart of `is_clean` ignoring untracked files: both ends
         # agree on what "not ours" means).
         self._preexisting_untracked: tuple[str, ...] = ()
+        # The commit from which the current ticket branch diverged from its
+        # base. On a fresh branch this equals `_base_ref`; on a resumed branch
+        # it is read from a persistent git ref stored when the branch was first
+        # created (ticket-208). Used by `diff_depuis_base` to include all prior
+        # commits on the branch, not only the uncommitted work of the current
+        # turn.
+        self._fork_point: str | None = None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         """Create `ticket-<id>-<slug>` and switch to it; idempotent if it already exists.
@@ -183,8 +190,16 @@ class GitWorkspaceService:
         exists = await self._branch_exists(branch_name)
         if exists:
             await self._run("checkout", branch_name)
+            # Résoudre le point de divergence depuis une ref persistante : le
+            # second run du même ticket repart depuis la branche elle-même
+            # (`rev-parse HEAD` = dernier commit de la branche), donc `_base_ref`
+            # ne peut pas servir de base pour le diff de tout le travail
+            # accumulé (ticket-208).
+            self._fork_point = await self._read_fork_point(branch_name)
         else:
             await self._run("checkout", "-b", branch_name, self._base_ref)
+            self._fork_point = self._base_ref
+            await self._store_fork_point(branch_name, self._base_ref)  # type: ignore[arg-type]
         return branch_name
 
     async def advance_base_ref(self) -> None:
@@ -198,6 +213,68 @@ class GitWorkspaceService:
         base.
         """
         self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
+
+    # ------------------------------------------------------------------
+    # Persistent fork-point refs — ticket-208
+    # ------------------------------------------------------------------
+
+    #: Namespace for the git refs that record each branch's fork point.
+    _REF_BASE_PREFIX: str = "refs/tessera-base/"
+
+    async def _store_fork_point(self, branch_name: str, sha: str) -> None:
+        """Persist the fork point of `branch_name` in a git ref.
+
+        Best-effort: a failure here degrades gracefully — `diff_depuis_base`
+        falls back to `current_diff` on the next resume.
+        """
+        try:
+            await self._run(
+                "update-ref", f"{self._REF_BASE_PREFIX}{branch_name}", sha
+            )
+        except GitCommandError as exc:
+            _logger.warning("fork_point_not_stored", extra={"error": str(exc)})
+
+    async def _read_fork_point(self, branch_name: str) -> str | None:
+        """Read the persisted fork point for `branch_name`, or None if absent."""
+        try:
+            return (
+                await self._run(
+                    "rev-parse", f"{self._REF_BASE_PREFIX}{branch_name}"
+                )
+            ).strip()
+        except GitCommandError:
+            return None
+
+    async def diff_depuis_base(self) -> str:
+        """Return the diff of the working tree against the branch's fork point.
+
+        On a fresh branch this is identical to `current_diff()`: the branch
+        was just created from the fork point, so HEAD is at that commit and
+        the two ranges coincide.
+
+        On a resumed branch (same ticket, second run) this extends the diff
+        to cover every commit already on the branch — security, reviewer and
+        validator then see the full accumulated work, not only the uncommitted
+        changes of the current turn (ticket-208).
+
+        Falls back to `current_diff()` when no fork point is known (no branch
+        was created through this service instance, or the persistent ref was
+        not found).
+        """
+        base = self._fork_point
+        if base is None:
+            return await self.current_diff()
+
+        non_suivis = await self._untracked_files()
+        await self._run("add", "-A", "-N")
+        pathspec = (
+            ":/" if self._travaille_dans_le_parent() else ".",
+            *await self._exclude_pathspecs(),
+        )
+        try:
+            return await self._run("diff", base, "--", *pathspec)
+        finally:
+            await self._oublier_dans_l_index(non_suivis)
 
     async def _exclude_pathspecs(self) -> tuple[str, ...]:
         """Les `:(exclude)` à poser, sans ceux que le dépôt ignore déjà.
