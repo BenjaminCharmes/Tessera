@@ -10,3 +10,9 @@
 - 2026-09-28 10:13:49 UTC — [ticket-203] tour 1 — reviewer démarré
 - 2026-09-28 10:15:41 UTC — [ticket-203] tour 1 — reviewer terminé (111735ms)
 - 2026-09-28 10:15:41 UTC — [ticket-203] APPROVED après 1 tour(s)
+- 2026-09-28 10:15:46 UTC — [ticket-204] branche ticket-204-refuser-de-publier-un-terme-interdit-sur-tous-les
+- 2026-09-28 10:15:46 UTC — [ticket-204] tour 1 — codeur démarré
+- 2026-09-28 10:20:01 UTC — [ticket-204] tour 1 — architect terminé (255031ms)
+- 2026-09-28 10:20:02 UTC — [ticket-204] tour 1 — reviewer démarré
+- 2026-09-28 10:22:07 UTC — [ticket-204] tour 1 — reviewer terminé (124608ms)
+- 2026-09-28 10:22:07 UTC — [ticket-204] APPROVED après 1 tour(s)

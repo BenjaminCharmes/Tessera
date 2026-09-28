@@ -1,14 +1,14 @@
 ---
-id: ticket-204
-title: "Refuser de publier un terme interdit, sur tous les projets"
-type: design
-status: todo
-pr_number: null
-priority: high
 agent: architect
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-204
+pr_number: null
+priority: high
+status: done
+title: Refuser de publier un terme interdit, sur tous les projets
+type: design
 ---
 
 # ticket-204 — Refuser de publier un terme interdit, sur tous les projets
