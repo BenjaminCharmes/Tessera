@@ -3,6 +3,12 @@ id: ticket-206
 title: "Implanter le contrôle des termes interdits au push"
 type: feat
 status: todo
+pr_number: null
+priority: high
+agent: codeur
+depends_on: []
+estimated_days: 1
+created: 2026-09-28
 ---
 
 # ticket-206 — Implanter le contrôle des termes interdits au push
