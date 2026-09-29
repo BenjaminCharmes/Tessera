@@ -103,6 +103,9 @@ export default function RunView({ stream }: RunViewProps) {
             reviewContent={
               agent === "reviewer" ? dernierContenu(events, agent) : undefined
             }
+            doneContent={
+              agent === "codeur" ? dernierContenu(events, agent) : undefined
+            }
           />
         ))}
 
