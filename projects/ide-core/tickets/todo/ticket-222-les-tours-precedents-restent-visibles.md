@@ -23,14 +23,14 @@ Quand un run passe au tour 2, l'utilisateur voit encore ce que le codeur a fait 
 
 ## Solution proposée
 
-L'état range les blocs par tour. Le panneau affiche le tour en cours déplié, et chaque tour précédent replié sous « Tour N », avec le verdict du reviewer en tête. Frontend uniquement.
+Le panneau devient un **fil chronologique**, comme une conversation : Codeur (tour 1) → Reviewer (tour 1) → Codeur (tour 2) → Reviewer (tour 2)… Chaque passage d'un agent est une entrée qui s'ajoute, et rien n'est écrasé. Les entrées terminées sont repliées, avec leur résumé visible (le verdict pour le reviewer, la première ligne du compte rendu pour le codeur). L'entrée en cours, en bas du fil, reste dépliée. L'état range les passages dans l'ordre des `agent_started`. Frontend uniquement.
 
 ## Critères d'acceptation
 
-- [ ] Un test Vitest : après `agent_started` au tour 2, le verdict du reviewer du tour 1 reste dans l'état
-- [ ] Un test Vitest : le panneau rend un en-tête « Tour 1 » replié et le tour 2 déplié
-- [ ] Un test Vitest : déplier « Tour 1 » affiche le compte rendu du codeur de ce tour
-- [ ] Un run à un seul tour s'affiche comme aujourd'hui, sans en-tête de tour (test Vitest)
+- [ ] Un test Vitest : après `agent_started` du codeur au tour 2, le verdict du reviewer du tour 1 reste dans l'état
+- [ ] Un test Vitest : un run à deux tours rend quatre entrées dans l'ordre codeur, reviewer, codeur, reviewer
+- [ ] Un test Vitest : une entrée terminée est repliée et affiche son résumé, et un clic la déplie
+- [ ] Un run à un seul tour s'affiche avec ses deux entrées, sans en-tête de tour (test Vitest)
 
 ## Dépendances
 

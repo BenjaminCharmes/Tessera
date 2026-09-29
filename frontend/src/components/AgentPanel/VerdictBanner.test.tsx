@@ -18,6 +18,14 @@ describe("VerdictBanner", () => {
     expect(screen.getByText("Please fix the types.")).toBeInTheDocument();
   });
 
+  it("keeps the verdict icon and word on one line", () => {
+    // ticket-227 : l'icône SVG passait seule sur une ligne, le mot en dessous.
+    render(<VerdictBanner content={"CHANGES_REQUESTED\nPlease fix the types."} />);
+    const entete = screen.getByText(/CHANGES_REQUESTED/);
+    expect(entete).toHaveClass("flex", "items-center");
+    expect(entete.querySelector("svg")).not.toBeNull();
+  });
+
   it("shows CHANGES_REQUESTED when both keywords appear (CHANGES_REQUESTED takes priority)", () => {
     render(
       <VerdictBanner content={"CHANGES_REQUESTED (not APPROVED)\nFix it."} />,

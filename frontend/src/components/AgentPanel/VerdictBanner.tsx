@@ -43,7 +43,8 @@ export default function VerdictBanner({ content }: VerdictBannerProps) {
           : "bg-amber-900/40 border border-amber-700/50 text-amber-300"
       }`}
     >
-      <div className="font-semibold mb-1">
+      {/* flex : sans lui, l'icône SVG passait seule sur une ligne (ticket-227). */}
+      <div className="font-semibold mb-1 flex items-center gap-1">
         {approved ? (
           <>
             <IconCheck size={14} /> APPROVED
