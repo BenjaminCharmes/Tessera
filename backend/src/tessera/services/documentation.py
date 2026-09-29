@@ -31,6 +31,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tessera.services import documentation_claude_md as claude_md_doc
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
 
@@ -75,23 +76,30 @@ def _documentable(chemin: str) -> bool:
     return any(normalise.startswith(prefixe) for prefixe in _DOCUMENTABLE)
 
 
-def appliquer_editions(racine: Path, editions: list[dict[str, object]]) -> list[str]:
+def appliquer_editions(
+    racine: Path, editions: list[dict[str, object]], claude_md: Path | None = None
+) -> list[str]:
     """Applique toutes les modifications, ou aucune.
 
     Une documentation à moitié mise à jour est pire qu'une documentation en
     retard : elle a l'air à jour.
+
+    ``claude_md`` est le CLAUDE.md du projet quand il le déclare documentable
+    (ticket-244) ; sans lui, une modification de « CLAUDE.md » est refusée.
     """
     resultat: dict[Path, str] = {}
 
     for edition in editions:
         chemin = str(edition.get("fichier", ""))
-        if not _documentable(chemin):
+        if chemin == claude_md_doc.NOM and claude_md is not None:
+            fichier = claude_md
+        elif not _documentable(chemin):
             raise EditionRefusee(
                 f"{chemin} n'est pas de la documentation : un agent de "
                 "documentation ne touche ni au code, ni aux tickets, ni aux ADR."
             )
-
-        fichier = racine / chemin
+        else:
+            fichier = racine / chemin
         if not fichier.is_file():
             raise EditionRefusee(f"{chemin} : fichier introuvable.")
 
@@ -102,6 +110,13 @@ def appliquer_editions(racine: Path, editions: list[dict[str, object]]) -> list[
             continue
 
         resultat[fichier] = _remplacer(avant, edition, chemin)
+
+    if claude_md is not None and claude_md in resultat:
+        refus = claude_md_doc.depasse_le_budget(
+            claude_md.read_text(encoding="utf-8"), resultat[claude_md]
+        )
+        if refus is not None:
+            raise EditionRefusee(refus)
 
     for fichier, contenu in resultat.items():
         fichier.write_text(contenu, encoding="utf-8")
@@ -278,9 +293,12 @@ class DocumentationService:
         provider: LLMProvider,
         prompts_dir: Path,
         fournisseur: "Callable[[str], tuple[LLMProvider, str | None]] | None" = None,
+        claude_md: Path | None = None,
     ) -> None:
         self._provider = provider
         self._prompts_dir = prompts_dir
+        # Le CLAUDE.md du projet, s'il le déclare documentable (ticket-244).
+        self._claude_md = claude_md
         # Deux rôles, donc potentiellement deux providers et deux modèles
         # (ticket-188) : `fournisseur(role)` rend la paire de chacun, le
         # modèle pouvant être None. Sans lui, le provider reçu et le modèle
@@ -335,9 +353,11 @@ class DocumentationService:
         for role in _ROLES:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
             provider, modele = self._pour(role)
+            # Seul `doc-technique` voit le CLAUDE.md, et seul lui peut l'éditer.
+            claude_md = self._claude_md if role == claude_md_doc.ROLE else None
             reponse = await provider.complete(
                 system=systeme,
-                user=brief,
+                user=brief + claude_md_doc.section_du_brief(claude_md),
                 model=modele,
                 max_tokens=_MAX_TOKENS,
             )
@@ -345,7 +365,7 @@ class DocumentationService:
             if not editions:
                 continue
             try:
-                modifies.extend(appliquer_editions(racine, editions))
+                modifies.extend(appliquer_editions(racine, editions, claude_md=claude_md))
             except EditionRefusee as exc:
                 # Un agent qui se trompe n'empêche pas l'autre d'avoir raison.
                 _logger.warning("editions_refusees", extra={"role": role})

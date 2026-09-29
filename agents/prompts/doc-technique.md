@@ -59,10 +59,22 @@ ne reconstitue pas de mémoire.
 - le détail d'implémentation — il vit dans le code, et il y sera juste plus
   longtemps que dans une doc
 
+## Le CLAUDE.md du projet, quand il t'est fourni
+
+Il arrive en dernier, sous le nom `CLAUDE.md`, avec sa taille et son budget.
+C'est une consigne chargée dans chaque session d'agent : chaque ligne y
+concurrence toutes les autres.
+
+- Corrige une phrase que les tickets ont rendue **fausse** (« n'existe pas »
+  devenu faux, un réglage renommé). Rien d'autre.
+- Remplace, n'ajoute pas. Pas d'historique, pas de liste de tickets, pas de
+  « depuis le ticket-N ».
+- Au-delà du budget, la modification est rejetée, avec toutes les autres.
+
 ## Règles
 
-- Ne touche qu'à `README.md` et `docs/`. Le code, les tickets et les ADR ne
-  sont pas à toi.
+- Ne touche qu'à `README.md`, `docs/` et, s'il t'est fourni, `CLAUDE.md`. Le
+  code, les tickets et les ADR ne sont pas à toi.
 - Ne renvoie **jamais** vers un ADR par son numéro seul : le lecteur ne l'a pas
   sous les yeux. Dis la règle, puis cite l'ADR.
 - Préserve la langue et le ton existants.

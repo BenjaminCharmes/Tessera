@@ -256,8 +256,16 @@ def _documenteur(
             modele_du_role(project_path, role),
         )
 
+    # Le CLAUDE.md du projet, pas celui de la racine d'écriture : pour le
+    # projet bootstrap, ce serait celui de Tessera (ticket-244).
+    claude_md = (
+        project_path / "CLAUDE.md"
+        if load_pipeline_config(project_path).doc_claude_md
+        else None
+    )
     service = DocumentationService(
-        _fournisseur("doc-technique")[0], settings.ide_prompts_dir, fournisseur=_fournisseur
+        _fournisseur("doc-technique")[0], settings.ide_prompts_dir,
+        fournisseur=_fournisseur, claude_md=claude_md,
     )
 
     async def documenter() -> ResultatDocumentation:
