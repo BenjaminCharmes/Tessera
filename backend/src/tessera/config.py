@@ -17,6 +17,9 @@ class Settings(BaseSettings):
 
     # Optionnel : vide lorsque le provider est `agent_sdk` (auth par abonnement).
     anthropic_api_key: str = ""
+    # Termes qui ne doivent jamais quitter la machine, séparés par des virgules
+    # (ADR-048). Vit dans `.env`, jamais versionné. Vide : aucun contrôle.
+    forbidden_terms: str = ""
     # Provider LLM par défaut : "agent_sdk" (abonnement) ou "anthropic_api" (crédits).
     # Un rôle peut en déclarer un autre dans son `agents.json` (ADR-046).
     llm_provider: str = "agent_sdk"
