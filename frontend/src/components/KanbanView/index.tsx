@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
+import { IconCross } from "../../design/icons";
 import KanbanColumn from "./KanbanColumn";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
 import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
@@ -84,7 +85,7 @@ export default function KanbanView({
                 title={u.error}
                 data-testid="kanban-unreadable-item"
               >
-                <span className="text-red-500 mr-1">✕</span>
+                <IconCross size={10} className="mr-1 inline text-red-500" />
                 <span className="font-mono">{u.file_path.split(/[\\/]/).pop()}</span>
                 <span className="ml-2 text-zinc-600">— {u.error}</span>
               </li>
