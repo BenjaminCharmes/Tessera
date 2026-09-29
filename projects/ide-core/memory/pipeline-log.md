@@ -56,3 +56,11 @@
 - 2026-09-29 07:51:20 UTC — [ticket-218] tour 2 — reviewer terminé (51891ms)
 - 2026-09-29 07:54:01 UTC — [ticket-218] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : le champ 'arret' est correctem
 - 2026-09-29 07:54:01 UTC — [ticket-218] APPROVED après 2 tour(s)
+- 2026-09-29 07:59:56 UTC — [ticket-215] branche ticket-215-github-remote-se-normalise-en-propri-taire-d-p-t
+- 2026-09-29 07:59:56 UTC — [ticket-215] tour 1 — codeur démarré
+- 2026-09-29 08:08:44 UTC — [ticket-215] tour 1 — codeur terminé (527500ms)
+- 2026-09-29 08:09:27 UTC — [ticket-215] securite: PASS — Audit terminé. Le diff normalise la parsing des URLs GitHub en slugs simples (ow
+- 2026-09-29 08:09:27 UTC — [ticket-215] tour 1 — reviewer démarré
+- 2026-09-29 08:11:06 UTC — [ticket-215] tour 1 — reviewer terminé (98718ms)
+- 2026-09-29 08:13:12 UTC — [ticket-215] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une normalis
+- 2026-09-29 08:13:12 UTC — [ticket-215] APPROVED après 1 tour(s)
