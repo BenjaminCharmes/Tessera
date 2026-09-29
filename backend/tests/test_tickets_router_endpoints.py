@@ -66,12 +66,27 @@ def _set_github_remote(ws: Path, remote: str) -> None:
 
 def test_liste_les_tickets_du_projet() -> None:
     body = _client().get("/api/v1/projects/mon-projet/tickets").json()
-    assert [t["id"] for t in body] == ["ticket-001"]
+    assert [t["id"] for t in body["tickets"]] == ["ticket-001"]
+    assert body["unreadable"] == []
 
 
 def test_liste_filtree_par_statut() -> None:
     body = _client().get("/api/v1/projects/mon-projet/tickets?status=done").json()
-    assert body == []
+    assert body["tickets"] == []
+
+
+def test_liste_expose_les_tickets_illisibles() -> None:
+    """A ticket file without `type` appears in unreadable (ticket-210)."""
+    ws_path = settings.ide_workspace_dir
+    bad = ws_path / "mon-projet" / "tickets" / "todo" / "ticket-099-bad.md"
+    bad.write_text(
+        "---\nid: ticket-099\ntitle: Bad\nstatus: todo\npriority: medium\nagent: codeur\n---\n",
+        encoding="utf-8",
+    )
+    body = _client().get("/api/v1/projects/mon-projet/tickets").json()
+    assert len(body["unreadable"]) == 1
+    assert "ticket-099-bad.md" in body["unreadable"][0]["file_path"]
+    assert body["unreadable"][0]["error"]
 
 
 def test_statut_de_filtre_invalide_est_refuse_lisiblement() -> None:

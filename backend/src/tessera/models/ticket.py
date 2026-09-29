@@ -97,3 +97,22 @@ class TicketBatchResponse(BaseModel):
     """Réponse après création batch."""
 
     created: list[Ticket]
+
+
+class TicketUnreadable(BaseModel):
+    """A ticket file that could not be parsed."""
+
+    file_path: str
+    error: str
+
+
+class TicketListResponse(BaseModel):
+    """Full response for the ticket list endpoint.
+
+    Carries both valid tickets and the files that could not be parsed.
+    Using a wrapper object instead of changing the list type preserves
+    backward compatibility by addition rather than substitution (ticket-210).
+    """
+
+    tickets: list[Ticket]
+    unreadable: list[TicketUnreadable] = Field(default_factory=list)

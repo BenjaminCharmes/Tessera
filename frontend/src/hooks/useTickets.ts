@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 import { groupByStatus, EMPTY_BY_STATUS } from "../lib/ticketBoard";
 import type { ByStatus } from "../lib/ticketBoard";
-import type { OrchestratorEvent, Ticket, TicketStatus } from "../types/api";
+import type { OrchestratorEvent, Ticket, TicketStatus, TicketUnreadable } from "../types/api";
 
 export type { ByStatus };
 
 export interface UseTicketsResult {
   tickets: Ticket[];
   byStatus: ByStatus;
+  /** Ticket files the backend could not parse (ticket-210). */
+  unreadable: TicketUnreadable[];
   loading: boolean;
   error: string | null;
   refresh: () => void;
@@ -26,10 +28,12 @@ interface Chargement {
   projectId: string;
   revision: number;
   tickets: Ticket[];
+  unreadable: TicketUnreadable[];
   error: string | null;
 }
 
 const AUCUN: Ticket[] = [];
+const AUCUN_ILLISIBLE: TicketUnreadable[] = [];
 
 export function useTickets(
   projectId: string | null,
@@ -54,7 +58,13 @@ export function useTickets(
       .then((data) => {
         if (cancelled) return;
         processedEventsRef.current = events.length;
-        setCharge({ projectId, revision, tickets: data, error: null });
+        setCharge({
+          projectId,
+          revision,
+          tickets: data.tickets,
+          unreadable: data.unreadable,
+          error: null,
+        });
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -63,6 +73,8 @@ export function useTickets(
           revision,
           tickets:
             prev && prev.projectId === projectId ? prev.tickets : AUCUN,
+          unreadable:
+            prev && prev.projectId === projectId ? prev.unreadable : AUCUN_ILLISIBLE,
           error: err instanceof Error ? err.message : "Unknown error",
         }));
       });
@@ -113,11 +125,13 @@ export function useTickets(
   }, [events]);
 
   const tickets = memeProjet ? charge.tickets : AUCUN;
+  const unreadable = memeProjet ? charge.unreadable : AUCUN_ILLISIBLE;
   const byStatus = tickets.length ? groupByStatus(tickets) : EMPTY_BY_STATUS;
 
   return {
     tickets,
     byStatus,
+    unreadable,
     loading: projectId !== null && !aJour,
     error: aJour ? charge.error : null,
     refresh: () => setRevision((r) => r + 1),

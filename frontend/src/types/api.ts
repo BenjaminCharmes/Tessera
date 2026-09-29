@@ -90,6 +90,18 @@ export interface Ticket {
   file_path: string;
 }
 
+/** A ticket file the backend could not parse (ticket-210). */
+export interface TicketUnreadable {
+  file_path: string;
+  error: string;
+}
+
+/** Full response from GET /projects/{id}/tickets (ticket-210). */
+export interface TicketListResponse {
+  tickets: Ticket[];
+  unreadable: TicketUnreadable[];
+}
+
 export interface PRStatus {
   state: "open" | "closed" | "merged";
   ci_status: "pending" | "passing" | "failing" | "none";

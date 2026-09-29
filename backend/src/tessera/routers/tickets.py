@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
-from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketStatus, TicketStatusUpdate
+from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.services.github_service import GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
 from tessera.services.database import list_runs
@@ -29,12 +29,13 @@ def _svc(project_id: str) -> TicketService:
     return TicketService(settings.ide_workspace_dir / project_id, project_id)
 
 
-@router.get("/{project_id}/tickets", response_model=list[Ticket])
+@router.get("/{project_id}/tickets", response_model=TicketListResponse)
 async def list_tickets(
     project_id: str, status: str | None = None
-) -> list[Ticket]:
+) -> TicketListResponse:
     filter_status = _parse_status_filter(status)
-    return await _svc(project_id).list_tickets(filter_status)
+    tickets, unreadable = await _svc(project_id).list_tickets_with_unreadable(filter_status)
+    return TicketListResponse(tickets=tickets, unreadable=unreadable)
 
 
 def _parse_status_filter(status: str | None) -> TicketStatus | None:
