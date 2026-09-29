@@ -26,6 +26,8 @@ env/
 # Database
 *.sqlite3
 *.db
+*.db-shm
+*.db-wal
 
 # macOS
 .DS_Store
