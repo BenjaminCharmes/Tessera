@@ -11,8 +11,28 @@ from tessera.config import settings
 from tessera.models.agent import AgentConfig
 from tessera.services.project_loader import load_agents_config
 from tessera.services.providers import get_provider
+from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.repli import ProviderAvecRepli
+
+#: Ce qu'un rôle déclaré `web` reçoit en plus (ticket-245).
+OUTILS_WEB = ["WebFetch", "WebSearch"]
+
+
+def outils_du_role(
+    config: AgentConfig | None, allow_tools: bool, tools: list[str] | None
+) -> list[str] | None:
+    """The tools the role gets once `web` is applied; `tools` unchanged otherwise.
+
+    Une page lue peut porter des instructions, et on ne sait pas filtrer une
+    page. On sait retirer le shell : sans `Bash`, l'agent n'a ni `curl` pour
+    envoyer vers l'extérieur ni script à lancer. Un rôle sans outils ne gagne
+    rien : le web est un outil de plus, pas une permission à part.
+    """
+    if config is None or not config.web or not allow_tools:
+        return tools
+    base = tools if tools is not None else ClaudeAgentSDKProvider.ALLOWED_TOOLS
+    return [outil for outil in base if outil != "Bash"] + OUTILS_WEB
 
 
 def config_du_role(project_path: Path | None, role: str) -> AgentConfig | None:
@@ -50,6 +70,7 @@ def provider_pour_role(
     doit pas en gagner parce qu'Ollama est tombé.
     """
     config = config_du_role(project_path, role)
+    tools = outils_du_role(config, allow_tools, tools)
     nom = config.provider if config is not None else settings.llm_provider
     tours = max_turns if max_turns is not None else settings.llm_max_turns
     skills = config.skills if config is not None else []

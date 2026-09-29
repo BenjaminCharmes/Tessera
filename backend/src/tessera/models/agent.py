@@ -41,6 +41,9 @@ class AgentConfig(BaseModel):
     prompt_file: str
     active: bool = True
     max_instances: int = 1
+    #: Le rôle lit le web — `WebFetch`, `WebSearch` — et perd `Bash` en
+    #: échange (ticket-245). Faux par défaut.
+    web: bool = False
     # Le provider se déclare par rôle (ticket-188). Absent : le défaut du
     # backend, comme avant — un manifeste muet ne change pas de comportement.
     provider: str = "agent_sdk"

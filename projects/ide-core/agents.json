@@ -37,7 +37,8 @@
       "model": "claude-sonnet-4-6",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/architect.md",
-      "active": true
+      "active": true,
+      "web": true
     },
     {
       "role": "securite",
