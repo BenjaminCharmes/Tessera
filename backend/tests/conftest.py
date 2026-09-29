@@ -87,3 +87,17 @@ def _singletons_propres() -> Iterator[None]:
     yield
     RUN_REGISTRY._runs.clear()
     EVENT_HUB._abonnes.clear()
+
+
+@pytest.fixture(autouse=True)
+def _aucun_terme_interdit_de_la_machine(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Les tests ne lisent jamais la vraie liste de `.env` (ADR-048).
+
+    Le service des termes interdits la lit par défaut : sans cette fixture, un
+    test passerait ou échouerait selon la machine, et un message d'erreur
+    pourrait citer un terme réel.
+    """
+    from tessera.config import settings
+
+    monkeypatch.setattr(settings, "forbidden_terms", "")
+    monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)

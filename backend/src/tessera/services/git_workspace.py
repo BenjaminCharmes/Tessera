@@ -12,6 +12,7 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.services.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -337,6 +338,44 @@ class GitWorkspaceService:
         est refusé, c'est à l'utilisateur de trancher.
         """
         await self._run("push", "--set-upstream", "origin", branch_name)
+
+    async def commits_depuis_base(self, base: str, branch: str) -> list[CommitInfo]:
+        """Short SHA, message and author of each commit between base and branch.
+
+        Uses ``base..branch`` range so only commits reachable from ``branch``
+        but not from ``base`` are returned — exactly the commits the pipeline
+        added. Returns an empty list when the range is empty or when git fails
+        (missing refs, unborn repository).
+        """
+        try:
+            # Message complet (%B) et committer compris : un corps de commit
+            # ou un committer mal configuré publient autant qu'un sujet.
+            output = await self._run(
+                "log", f"{base}..{branch}",
+                "--pretty=format:%h%x1f%aN <%aE> | %cN <%cE>%x1f%B%x1e",
+            )
+        except GitCommandError:
+            return []
+        commits: list[CommitInfo] = []
+        for bloc in output.split("\x1e"):
+            bloc = bloc.strip()
+            if not bloc:
+                continue
+            parts = bloc.split("\x1f", 2)
+            if len(parts) != 3:  # noqa: PLR2004
+                continue
+            sha7, auteur, message = parts
+            commits.append(CommitInfo(sha7=sha7, message=message.strip(), auteur=auteur))
+        return commits
+
+    async def diff_de_branche(self, base: str, branch: str) -> str:
+        """What `branch` commits on top of `base` — what a push publishes.
+
+        ``base...branch`` diffs from their merge-base, so work already on the
+        base is not counted twice. A failure raises: the push check must not
+        pass on a diff it could not read.
+        """
+        return await self._run("diff", f"{base}...{branch}")
 
     async def rejouer_sur(
         self,

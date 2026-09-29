@@ -43,6 +43,10 @@ class PolitiqueRun:
     #: pipeline suffise à merger (ADR-045). Faux par défaut : le défaut
     #: protège, l'exception s'énonce.
     merge_without_ci: bool = False
+    #: Valeur de la clef `confidentiality` dans agents.json. `None` si absente.
+    #: Seule la valeur `"professional"` exempte le projet du contrôle des
+    #: termes interdits (ADR-048).
+    confidentialite: str | None = None
 
     @classmethod
     def lire(cls, project_path: Path) -> "PolitiqueRun":
@@ -58,7 +62,18 @@ class PolitiqueRun:
             test_command=load_pipeline_config(project_path).test_command,
             base_branch=_lire_chaine(project_path, "base_branch"),
             merge_without_ci=_lire_booleen(project_path, "merge_without_ci"),
+            confidentialite=_lire_chaine(project_path, "confidentiality"),
         )
+
+    @property
+    def exempte_controle_termes(self) -> bool:
+        """True ssi le projet se déclare professionnel (ADR-048).
+
+        Un dépôt professionnel peut légitimement contenir des noms d'employeur
+        ou de client dans son code. Seule la valeur exacte ``"professional"``
+        ouvre l'exemption — une valeur inconnue ne la désarme pas.
+        """
+        return self.confidentialite == "professional"
 
     @property
     def dans_le_depot_parent(self) -> bool:
