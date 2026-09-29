@@ -12,17 +12,19 @@ export function useBlockedArrets(
   projectId: string | null,
   blockedIds: string[],
 ): Record<string, string | null> {
-  const [arrets, setArrets] = useState<Record<string, string | null>>({});
+  // Rangés sous la clé de la requête qui les a produits : une liste vide ou
+  // un autre projet rendent `{}` sans setState dans l'effet.
+  const [lu, setLu] = useState<{ cle: string; arrets: Record<string, string | null> }>({
+    cle: "",
+    arrets: {},
+  });
 
   // Sort + join to keep a stable dependency value without including the array
   // reference itself (changes identity on every render).
   const key = useMemo(() => [...blockedIds].sort().join(","), [blockedIds]);
 
   useEffect(() => {
-    if (!projectId || blockedIds.length === 0) {
-      setArrets({});
-      return;
-    }
+    if (!projectId || blockedIds.length === 0) return;
     let cancelled = false;
     void Promise.all(
       blockedIds.map((id) =>
@@ -38,7 +40,7 @@ export function useBlockedArrets(
       ),
     ).then((pairs) => {
       if (cancelled) return;
-      setArrets(Object.fromEntries(pairs));
+      setLu({ cle: `${projectId}|${key}`, arrets: Object.fromEntries(pairs) });
     });
     return () => {
       cancelled = true;
@@ -48,5 +50,5 @@ export function useBlockedArrets(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, key]);
 
-  return arrets;
+  return lu.cle === `${projectId}|${key}` ? lu.arrets : {};
 }

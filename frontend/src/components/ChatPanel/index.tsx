@@ -18,9 +18,15 @@ interface ChatPanelProps {
  * branche `chat-…` (ADR-019), jamais sur la branche courante.
  */
 export default function ChatPanel({ project }: ChatPanelProps) {
-  const [conversationId, setConversationId] = useState("default");
-  // Reset to default conversation when the user switches project.
-  useEffect(() => { setConversationId("default"); }, [project?.id]);
+  // Le choix retient le projet auquel il appartient : changer de projet
+  // retombe sur `default` sans effet ni rendu en cascade.
+  const [choix, setChoix] = useState<{ projet: string | null; id: string }>({
+    projet: null,
+    id: "default",
+  });
+  const projetId = project?.id ?? null;
+  const conversationId = choix.projet === projetId ? choix.id : "default";
+  const setConversationId = (id: string) => setChoix({ projet: projetId, id });
   const chat = useChat(project?.id ?? null, conversationId);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
