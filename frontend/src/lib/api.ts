@@ -14,6 +14,7 @@ import type {
   ArtifactMode,
   ArtifactModeState,
   ChatHistory,
+  ConversationSummary,
   GitStatus,
   RemovalPlan,
   ConversationMessage,
@@ -233,6 +234,8 @@ export const api = {
       put(`/projects/${projectId}/artifacts`, { mode }),
   },
   chat: {
+    list: (projectId: string): Promise<ConversationSummary[]> =>
+      request(`/projects/${projectId}/chat`),
     history: (
       projectId: string,
       conversationId: string,
