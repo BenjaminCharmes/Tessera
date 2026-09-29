@@ -1,64 +1,36 @@
 # CLAUDE.md — Tessera
 
 Tu travailles sur **Tessera** : un IDE multi-projets avec orchestration d'agents IA,
-construit de façon incrémentale et auto-hébergé (l'IDE se construit lui-même).
-
----
-
-## Principe fondateur
-
-Ce projet suit le pattern "self-hosting" : l'IDE est son propre premier projet.
-Le dossier `projects/ide-core/` contient les tickets, la mémoire et les décisions
-qui guident la construction de l'IDE lui-même.
+auto-hébergé — l'IDE se construit lui-même. `projects/ide-core/` porte les tickets,
+la mémoire et les décisions qui guident sa construction.
 
 ## Contexte toujours chargé
 
 @projects/ide-core/CLAUDE.md
 @projects/ide-core/memory/decisions.md
 
-Ces deux fichiers sont importés, pas seulement recommandés à la lecture. Un
-`@`-import coûte ~2000 tokens **une fois par session** — négligeable au regard
-d'une décision d'architecture violée faute de la connaître.
+Importés, pas seulement recommandés : les ADR sont des contraintes qui tiennent en
+permanence, alors qu'un skill décrit *comment* faire une tâche et se charge à la
+demande. Côté produit, `decisions.md` part aussi dans chaque appel d'agent, jusqu'à
+18 par ticket : c'est pourquoi le skill `write-adr` impose un budget.
 
-À ne pas confondre avec le coût côté produit : `decisions.md` est aussi injecté
-par le backend dans **chaque appel d'agent**, jusqu'à 18 par ticket. C'est là
-que la longueur d'un ADR compte, et c'est pourquoi le skill `write-adr` impose
-un budget. Les deux budgets sont distincts.
-
-Les **skills** restent chargés à la demande : ils décrivent *comment* faire une
-tâche donnée, alors que les ADR sont des contraintes qui doivent tenir en
-permanence. C'est ce qui justifie l'import ici et pas là.
+Ce fichier a le sien, mesuré par `test_consignes_coherentes.py` : chaque ligne y
+concurrence les autres. Une règle qui a son skill ou son ADR n'est pas recopiée ici.
 
 ---
 
 ## Stack décidée
 
-### Backend (orchestration & agents)
-- **Python 3.11+** avec **FastAPI** pour l'orchestrateur HTTP/WebSocket
-- **Anthropic SDK Python** pour les appels LLM
-- **uv** comme gestionnaire de paquets (pas pip, pas poetry)
-- Pas de framework agent externe (LangChain, CrewAI) — on construit le nôtre
-
-### Frontend (UI de l'IDE)
-- **TypeScript strict**
-- **React 19** avec hooks uniquement (pas de class components)
-- **Tailwind CSS v4** — configuration dans le CSS (`@theme` de `index.css`),
-  il n'y a plus de `tailwind.config.ts`
-- **Monaco Editor** pour l'éditeur de code embarqué
-- **Vite** comme bundler
-
-### Desktop shell
-- **Tauri v2** (Rust sous le capot, UI React) — pas Electron
-- Accès filesystem natif via les APIs Tauri
-
-### Protocoles inter-couches
-- **JSON-RPC 2.0** pour la communication UI ↔ orchestrateur
-- **WebSocket** pour le streaming des réponses agents
-- **Format ticket** : fichiers Markdown avec frontmatter YAML
-
-### Persistence
-- **SQLite** (via `aiosqlite`) pour la mémoire des agents et l'état des tickets
-- Fichiers Markdown pour les tickets (lisibles sans l'IDE)
+- **Backend** : Python 3.11+, **FastAPI**, Anthropic SDK et Agent SDK, **uv** (ni
+  pip ni poetry). Pas de framework agent externe (LangChain, CrewAI).
+- **Frontend** : TypeScript strict, **React 19** (hooks uniquement), **Tailwind CSS
+  v4** — configuré dans le `@theme` de `index.css`, sans `tailwind.config.ts` —,
+  **Monaco**, **Vite**.
+- **Desktop** : **Tauri v2**, pas Electron.
+- **Échanges** : HTTP pour lancer, une WebSocket d'observation pour suivre les runs
+  (ADR-041). Tickets en Markdown avec frontmatter YAML.
+- **Persistance** : SQLite via `aiosqlite` ; les tickets restent des fichiers,
+  lisibles sans l'IDE.
 
 ---
 
@@ -71,8 +43,7 @@ tessera/
   .claude/               ← config Claude Code (skills, commands)
   projects/              ← tous les projets gérés par l'IDE
     ide-core/            ← projet bootstrap (l'IDE se construit lui-même)
-  agents/                ← définitions et prompts des agents
-    prompts/             ← system prompts par rôle
+  agents/prompts/        ← system prompts du produit, par rôle
   backend/               ← orchestrateur Python/FastAPI
   frontend/              ← UI React/TypeScript
   docs/                  ← documentation architecture
@@ -82,36 +53,22 @@ tessera/
 
 ## Conventions de code
 
-### Python
-- Type hints partout, pas d'exception
-- Dataclasses ou Pydantic v2 pour les modèles
-- `async/await` partout dans FastAPI
-- Nommage : `snake_case` pour tout
-- Docstrings en anglais, commentaires en français si besoin de contexte métier
-  (la règle de langue complète est ADR-044)
+**Python** — type hints partout ; dataclasses ou Pydantic v2 ; `async/await` dans
+FastAPI ; `snake_case`. Docstrings en anglais, commentaires en français (ADR-044).
 
-### TypeScript
-- `strict: true` dans tsconfig, jamais de `any`
-- Composants : PascalCase, fichiers : kebab-case
-- Hooks custom préfixés `use`
-- Pas de `console.log` en production (utiliser le logger structuré)
+**TypeScript** — `strict: true`, jamais de `any` ; composants en PascalCase,
+fichiers en kebab-case ; hooks préfixés `use` ; pas de `console.log`, le logger
+structuré.
 
-### Git
-- Commits **et titres de PR** en anglais, format Conventional Commits :
-  `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:` (ADR-044)
-- Une branche par ticket : `ticket-XXX-description-courte`
-- **Flux** : `ticket-XXX` → PR vers `develop` → PR de `develop` vers `main`
-  - `main` — état publiable et branche par défaut du dépôt ; ne reçoit que des
-    merges depuis `develop`
-  - `develop` — intégration, cible par défaut de toutes les PR de ticket
-  - Pas de commit direct sur `main` ni sur `develop`
-  - `ticket → develop` : squash. **`develop → main` : merge commit, jamais
-    squash** — un squash réécrit les SHA, ferait diverger les deux branches et
-    priverait `main` de l'historique par ticket
+**Git**
+- Commits **et titres de PR** en anglais, Conventional Commits (ADR-044).
+- Une branche par ticket : `ticket-XXX-description-courte`.
+- `ticket-XXX` → PR vers `develop` (squash) → PR de `develop` vers `main`
+  (**merge commit, jamais squash** : un squash réécrit les SHA et fait diverger
+  les deux branches). Pas de commit direct sur `main` ni sur `develop`.
 - Stager les fichiers nommément, **jamais `git add -A`** (balaie les projets
-  importés dans `projects/`)
-- **Aucune attribution à un outil d'IA** : ni `Co-Authored-By`, ni mention
-  d'assistant dans un message de commit, un titre ou une description de PR
+  importés dans `projects/`).
+- **Aucune attribution à un outil d'IA**, ni trailer ni mention.
 
 Le détail opératoire est dans le skill `ticket-workflow`.
 
@@ -119,9 +76,7 @@ Le détail opératoire est dans le skill `ticket-workflow`.
 
 ## Configuration Claude Code (`.claude/`)
 
-`.claude/` contient la configuration **de Claude Code**, versionnée avec le
-dépôt — à ne pas confondre avec `agents/prompts/`, qui contient les prompts
-**du produit**, chargés par FastAPI.
+À ne pas confondre avec `agents/prompts/`, les prompts **du produit**.
 
 ```
 .claude/
@@ -130,81 +85,56 @@ dépôt — à ne pas confondre avec `agents/prompts/`, qui contient les prompts
   settings.local.json     ← préférences personnelles (gitignoré)
 ```
 
-Slash commands : `/new-ticket`, `/run-tessera`, `/ship`.
-
-**Skills et slash commands sont deux choses différentes.** Un skill est chargé
-par Claude quand sa `description` correspond à la tâche — il ne se tape pas.
-Une slash command est une invite que l'utilisateur déclenche à la main
-(`/run-tessera`), et qui peut s'appuyer sur un skill. Les skills ajoutés
-pendant une session ne sont visibles qu'au démarrage de la suivante.
+Slash commands : `/new-ticket`, `/run-tessera`, `/ship`. Un skill se charge quand
+sa `description` correspond à la tâche ; une slash command se tape. Un skill
+ajouté en session n'est visible qu'à la suivante.
 
 Skills disponibles : `brainstorming`, `writing-plans`,
 `test-driven-development`, `code-review`, `verification-before-completion`,
 `new-ticket`, `ticket-workflow`, `write-adr`, `run-tessera`.
 
-**Chargement à la demande, jamais par `@`-import.** Un `@`-import dans ce
-fichier est payé à chaque session ; un skill ne coûte que lorsqu'il sert. La
-`description` du frontmatter est ce qui décide du déclenchement : elle dit
-*quand* utiliser le skill, pas ce qu'il contient.
-
-Les skills des plugins installés restent une source d'inspiration, pas une
-dépendance : un clone neuf du dépôt doit disposer de tout ce qui précède.
+Ces skills servent au développeur. Un agent du produit ne voit que ceux que son
+rôle déclare dans `agents.json` (ticket-242). Les plugins installés restent une
+inspiration, pas une dépendance : un clone neuf doit disposer de tout ce qui
+précède.
 
 ---
 
 ## Règles pour les agents
 
-1. **Toujours lire le ticket complet** avant de commencer à coder
-2. **Mettre à jour le statut du ticket** (todo → in-progress → done) dès que l'état change
-3. **Consulter les ADR avant toute décision d'architecture** — ce sont des
-   contraintes en vigueur, pas des archives. Ils sont importés plus haut, donc
-   déjà en contexte : les ignorer est un choix, pas un oubli
+1. **Lire le ticket complet** avant de coder
+2. **Tenir le statut du ticket à jour** (todo → in-progress → done), dossier et champ
+3. **Consulter les ADR avant toute décision d'architecture** — déjà en contexte :
+   les ignorer est un choix, pas un oubli
 4. **Écrire dans `memory/decisions.md`** toute décision d'architecture non triviale
 5. **Ne jamais modifier** `CLAUDE.md` sans ticket explicite pour le faire
-6. **Préférer des petits fichiers** (<200 lignes) à de gros fichiers monolithiques
+6. **Préférer des petits fichiers** (<200 lignes)
 7. **Un test par fonction publique** au minimum
-8. **Ne jamais laisser de trace d'écriture par IA** dans ce qui est produit —
-   commits, PR, commentaires, docstrings, fichiers générés. Ce que l'IDE écrit
-   atterrit dans le dépôt de l'utilisateur, parfois celui d'un client : la
-   provenance du code n'y a pas sa place
+8. **Aucune trace d'écriture par IA** — commits, PR, commentaires, fichiers
+   générés : ce que l'IDE écrit atterrit dans le dépôt de l'utilisateur
 
 ---
 
 ## Où en est le produit
 
-Le détail par ticket est dans `projects/ide-core/tickets/done/`, et les
-contraintes en vigueur dans `memory/decisions.md`. Ce qui suit ne dit que ce
-qu'un agent doit savoir pour ne pas reconstruire ce qui existe.
+Le détail est dans `projects/ide-core/tickets/done/`, les contraintes dans
+`decisions.md`. Ceci ne dit que ce qu'il faut savoir pour ne pas reconstruire
+l'existant.
 
-### Ce qui marche
+**Ce qui marche**
+- Pipeline codeur → testeur → sécurité → reviewer → validateur sur le **diff git
+  réel**, une branche et un commit par run (ADR-018) ; documentation par lot en fin
+  de file (ADR-035)
+- Trois modes de run : un ticket, une file, autonome
+- Livraison enchaînée après approbation — rebase, PR, CI, merge — jusqu'où le projet
+  l'autorise (ADR-029, ADR-030) ; un conflit se tente et se relit (ADR-033)
+- Artefacts hors des dépôts clients par défaut (ADR-021, ADR-023) ; les agents ne
+  touchent pas à git (ADR-027) ni hors de leur projet (ADR-031)
+- Registre d'agents, modèle par rôle, coûts et quota d'abonnement réel
 
-- Pipeline codeur → testeur → sécurité → reviewer → validateur, sur le
-  **diff git réel**, une branche et un commit par run (ADR-018) ; la
-  documentation est mise à jour par lot en fin de file, par `doc-technique`
-  et `doc-fonctionnelle` (ADR-035)
-- Trois modes de run : un ticket, une file choisie, autonome
-- Après un run approuvé, la **livraison** enchaîne seule jusqu'où le projet
-  l'autorise : rebase, PR, attente de CI, merge (ADR-029, ADR-030)
-- Un conflit de rebase est tenté par un agent, et la résolution est toujours
-  relue (ADR-033)
-- Les artefacts Tessera restent hors des dépôts clients par défaut (ADR-021,
-  ADR-023) ; les agents ne touchent pas à git (ADR-027) et n'écrivent pas hors
-  de leur projet (ADR-031)
-- Registre d'agents, modèle par projet, coûts par projet/ticket/agent/modèle,
-  quota d'abonnement réel
-
-### Ce qui n'existe pas
-
-- Pas de comptes ni de multi-utilisateur, pas de déploiement cloud — hors
-  scope. `STATIC_TOKEN` existe malgré tout : renseignée, elle exige un
-  `Authorization: Bearer` sur **toutes** les requêtes. Vide — le défaut —
-  l'API est ouverte, donc à ne servir que sur une interface de confiance
+**Ce qui n'existe pas**
+- Ni comptes, ni multi-utilisateur, ni déploiement cloud — hors scope.
+  `STATIC_TOKEN`, renseignée, exige un `Authorization: Bearer` partout ; vide (le
+  défaut), l'API est ouverte : à ne servir que sur une interface de confiance
 - Pas de résolution de conflit sans relecture, et ce n'est pas un manque
-- Le contrôle d'écriture sur `Bash` attrape une erreur, pas une évasion
-  (ADR-031)
-
-### Le flux de travail courant
-
-Branche par ticket, PR vers `develop`, puis `develop` vers `main`. Plus de
-raccourci « commits directs sur develop » : la CI tourne sur chaque PR et la
-livraison automatique s'appuie dessus.
+- Le contrôle d'écriture sur `Bash` attrape une erreur, pas une évasion (ADR-031)
