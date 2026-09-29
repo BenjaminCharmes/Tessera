@@ -71,6 +71,57 @@ class TestAutoDetect:
         assert cmd == "uv run pytest"
 
 
+class TestDossierEtDelaiDeclares:
+    """Ticket-241 : les tests d'ide-core vivent dans `../../backend`."""
+
+    async def test_la_commande_se_lance_dans_le_dossier_declare(
+        self, tmp_path: Path
+    ) -> None:
+        (tmp_path / ".git").mkdir()
+        projet = tmp_path / "projects" / "ide-core"
+        projet.mkdir(parents=True)
+        (projet / "agents.json").write_text('{"git_root": "ancestor"}', encoding="utf-8")
+        (tmp_path / "backend").mkdir()
+        mock_proc = MagicMock()
+        mock_proc.returncode = 0
+        mock_proc.communicate = AsyncMock(return_value=(b"5 passed", b""))
+
+        runner = TestRunnerService(cwd="../../backend")
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc) as lance:
+            result = await runner.run_tests(projet, test_command="uv run pytest")
+
+        assert result.passed is True
+        assert Path(lance.call_args.kwargs["cwd"]) == (tmp_path / "backend").resolve()
+
+    async def test_un_dossier_hors_perimetre_ne_demarre_pas(
+        self, python_project: Path
+    ) -> None:
+        runner = TestRunnerService(cwd="../ailleurs")
+        with patch("asyncio.create_subprocess_exec") as lance:
+            result = await runner.run_tests(python_project, test_command="uv run pytest")
+
+        lance.assert_not_called()
+        assert result.passed is False
+        assert result.demarree is False
+        assert "../ailleurs" in result.output_summary
+
+    async def test_le_delai_declare_s_applique_par_defaut(
+        self, python_project: Path
+    ) -> None:
+        mock_proc = MagicMock()
+        mock_proc.communicate = AsyncMock(return_value=(b"5 passed", b""))
+        mock_proc.returncode = 0
+
+        runner = TestRunnerService(timeout=300)
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_proc),
+            patch("asyncio.wait_for", wraps=asyncio.wait_for) as attente,
+        ):
+            await runner.run_tests(python_project, test_command="uv run pytest")
+
+        assert attente.call_args.kwargs["timeout"] == 300.0
+
+
 class TestRunTests:
     async def test_returns_passed_result_on_success(
         self, service: TestRunnerService, python_project: Path

@@ -32,12 +32,11 @@ par lot en fin de file (ADR-035), jamais par ticket.
 Un run approuvé pousse sa branche et ouvre sa PR vers `develop`. Il ne se
 merge pas seul tant que la CI ne peut pas tourner : `merge` exige une CI verte.
 
-Ce n'est pas un oubli à corriger à la légère : les tests de ce dépôt vivent
-dans `backend/` et `frontend/`, au-dessus du dossier du projet, et
-`TestRunnerService` lance sa commande depuis le dossier du projet sans passer
-par un shell. Activer `testeur_enabled` demande donc un `test_command` qui
-atteigne `../../backend` par lui-même. Tant que ce n'est pas fait, le dire vaut
-mieux que laisser croire le contraire.
+Les tests de ce dépôt vivent dans `backend/` et `frontend/`, au-dessus du
+dossier du projet. Depuis le ticket-241, `pipeline.test_cwd` (`../../backend`)
+et `pipeline.test_timeout_s` permettent de les atteindre ; activer le testeur
+reste une décision à part, parce qu'elle allonge chaque run de la durée de la
+suite.
 
 ## Stack spécifique à ce projet
 

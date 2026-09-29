@@ -184,7 +184,13 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
 
     pipeline_cfg = load_pipeline_config(project_path)
 
-    test_runner = TestRunnerService() if pipeline_cfg.testeur_enabled else None
+    test_runner = (
+        TestRunnerService(
+            cwd=pipeline_cfg.test_cwd, timeout=pipeline_cfg.test_timeout_s
+        )
+        if pipeline_cfg.testeur_enabled
+        else None
+    )
     security_auditor = (
         SecurityAuditorService(
             _sans_outils("securite"), settings.ide_prompts_dir,

@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.lancement import essais_de_commande
+from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -44,6 +45,17 @@ class TestResult:
 
 
 class TestRunnerService:
+    def __init__(self, cwd: str | None = None, timeout: int | None = None) -> None:
+        """``cwd`` and ``timeout`` come from the project's pipeline config.
+
+        Les tests d'ide-core vivent dans `../../backend`, et la suite dure plus
+        que le délai par défaut : sans ces deux réglages, le testeur ne pouvait
+        être activé sur aucun projet dont les tests ne sont pas à sa racine
+        (ticket-241).
+        """
+        self._cwd = cwd
+        self._timeout = timeout if timeout is not None else _DEFAULT_TIMEOUT
+
     def detect_test_command(
         self,
         project_path: Path,
@@ -86,7 +98,7 @@ class TestRunnerService:
         self,
         project_path: Path,
         test_command: str | None = None,
-        timeout: int = _DEFAULT_TIMEOUT,
+        timeout: int | None = None,
     ) -> TestResult:
         # Résolu, et pas seulement absolu : `projects/` ne contient que des
         # liens symboliques vers les vrais dépôts. Lancé sur le chemin du
@@ -97,10 +109,26 @@ class TestRunnerService:
         project_path = project_path.resolve()
         cmd = self.detect_test_command(project_path, override=test_command)
         args = shlex.split(cmd)
+        if timeout is None:
+            timeout = self._timeout
+
+        # Même frontière que les services d'ADR-042 : un `cwd` qui sort du
+        # projet ne lance rien, et le résultat le dit plutôt que de lever.
+        try:
+            dossier = resoudre_le_cwd(project_path, self._cwd) if self._cwd else project_path
+        except CommandeInvalide as exc:
+            return TestResult(
+                passed=False,
+                demarree=False,
+                total=0,
+                failed=0,
+                output_summary=f"La commande de test n'a pas démarré : {exc}",
+                errors=[str(exc)],
+            )
 
         start = time.monotonic()
         try:
-            proc = await self._lancer(args, project_path)
+            proc = await self._lancer(args, dossier)
             stdout_bytes, stderr_bytes = await asyncio.wait_for(
                 proc.communicate(), timeout=float(timeout)
             )

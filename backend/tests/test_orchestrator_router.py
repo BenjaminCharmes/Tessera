@@ -71,6 +71,27 @@ async def test_build_orchestrator_validator_et_security_auditor_sans_outils(
     ]
 
 
+async def test_build_orchestrator_passe_le_dossier_et_le_delai_des_tests(
+    tmp_path: Path,
+) -> None:
+    # Ticket-241 : sans eux, le testeur d'ide-core lance ses tests depuis un
+    # dossier qui n'en contient pas, et coupe la suite à 120 s.
+    project_dir = tmp_path / "mon-projet"
+    project_dir.mkdir(parents=True)
+    (project_dir / "CLAUDE.md").write_text("# Projet de test\n", encoding="utf-8")
+    (project_dir / "agents.json").write_text(
+        '{"agents": [], "pipeline": {"testeur_enabled": true, "test_command": "pytest",'
+        ' "test_cwd": "backend", "test_timeout_s": 600}}',
+        encoding="utf-8",
+    )
+
+    orchestrator = await _build_orchestrator("mon-projet")
+
+    assert orchestrator._test_runner is not None
+    assert orchestrator._test_runner._cwd == "backend"
+    assert orchestrator._test_runner._timeout == 600
+
+
 def _make_project_with_claude_md_marker(workspace: Path, project_id: str) -> None:
     project_dir = workspace / project_id
     project_dir.mkdir(parents=True)
