@@ -72,6 +72,9 @@ class AgentPipelineConfig(BaseModel):
     test_timeout_s: int | None = None
     securite_enabled: bool = False
     validateur_enabled: bool = False
+    #: Le lot de documentation tient aussi le CLAUDE.md du projet, dans un
+    #: budget de taille (ticket-244). Faux par défaut : la consigne se déclare.
+    doc_claude_md: bool = False
 
 
 class AgentResult(BaseModel):
