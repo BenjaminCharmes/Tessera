@@ -329,6 +329,8 @@ class TicketService:
             if meta.get("github_issue_url")
             else None,
             pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
+            # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
+            plan=meta.get("plan") is True,
             body=str(post.content),
             project_id=self._project_id,
             file_path=str(path),

@@ -28,6 +28,7 @@ from tessera.utils.logger import get_logger
 from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
+from tessera.services.pipeline_plan import run_plan
 
 if TYPE_CHECKING:
     from tessera.services.carte_du_depot import CarteDuDepot
@@ -232,6 +233,9 @@ class Orchestrator:
         await stages.create_branch(self, run)
         await set_status(self, run, TicketStatus.in_progress)
         run.carte_du_depot = await self._carte()
+        # Avant le premier tour, et seulement si le ticket le déclare. Ne lève
+        # jamais : un plan manqué laisse le run tel qu'avant ticket-243.
+        await run_plan(self, run)
 
         # À partir d'ici une branche existe et les agents écrivent sur disque :
         # une panne qui remonterait laisserait leur travail non commité, donc

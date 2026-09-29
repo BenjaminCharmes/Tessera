@@ -19,6 +19,7 @@ from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
+from tessera.services.pipeline_plan import ROLE_PLAN
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
@@ -153,8 +154,11 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # à leur place (ticket-211). Envelopper aussi les premiers les compterait
     # deux fois.
     def _par_role(role: str) -> LLMProvider:
-        outils = OUTILS_DE_RELECTURE if role == "reviewer" else None
-        tours = settings.llm_max_turns_reviewer if role == "reviewer" else None
+        # Le plan lit comme le reviewer : il prépare le code, il ne l'écrit pas
+        # (ticket-243).
+        lecture = role in ("reviewer", ROLE_PLAN)
+        outils = OUTILS_DE_RELECTURE if lecture else None
+        tours = settings.llm_max_turns_reviewer if lecture else None
         inner = provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
             project_id=project_id, max_turns=tours,

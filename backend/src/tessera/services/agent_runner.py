@@ -47,6 +47,10 @@ _INSTRUCTIONS: dict[str, str] = {
     AgentRole.architect.value: (
         "Analyse les implications architecturales et propose une solution détaillée."
     ),
+    # Le tour de plan d'un ticket qui le déclare (ticket-243).
+    "plan": (
+        "Lis le code que ce ticket touche et rends le plan demandé. N'écris rien."
+    ),
     AgentRole.project_creator.value: (
         "Crée la structure complète du projet demandé avec ses fichiers de base."
     ),
