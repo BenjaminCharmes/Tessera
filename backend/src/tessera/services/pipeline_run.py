@@ -57,6 +57,9 @@ class PipelineRun:
     # (ticket-190) : le codeur ne doit pas y voir ses propres fichiers du
     # tour précédent. Vide quand git n'a rien à dire.
     carte_du_depot: str = ""
+    #: Le plan rendu avant le premier tour, si le ticket en demande un
+    #: (ticket-243). Vide : pas de plan, ou un plan qui a échoué.
+    plan: str = ""
 
     # --- remis à zéro à chaque tour ---
     round_num: int = 0

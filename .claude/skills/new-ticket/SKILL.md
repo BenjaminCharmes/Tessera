@@ -46,6 +46,10 @@ created: 2026-09-15
 ---
 ```
 
+Optionnel : `plan: true` fait passer le ticket par un tour de plan en lecture
+seule avant le code (ticket-243). À réserver aux tickets dont l'approche n'est
+pas évidente : c'est un appel de plus.
+
 `type` n'est pas cosmétique : le pipeline le réutilise comme **préfixe du
 message de commit** écrit dans le dépôt (`feat: ticket-050 — …`).
 

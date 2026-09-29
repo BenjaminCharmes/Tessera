@@ -68,6 +68,7 @@ class AgentRegistryService:
             "codeur",
             "doc-fonctionnelle",
             "doc-technique",
+            "plan",
             "planificateur",
             "project-analyzer",
             "project-creator",
@@ -83,6 +84,7 @@ class AgentRegistryService:
         {
             "architect",
             "codeur",
+            "plan",
             "reviewer",
             "securite",
             "validateur",

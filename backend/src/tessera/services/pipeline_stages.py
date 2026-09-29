@@ -103,6 +103,12 @@ def build_context(orch: "Orchestrator", run: PipelineRun) -> str:
     """
     parts = [orch._project_context]
 
+    # Le plan précède les retours : le codeur le suit, le reviewer juge
+    # l'écart (ticket-243). Il reste dans le contexte du tour, donc dans les
+    # reprises : c'est court, et c'est ce qui dit où le travail doit aller.
+    if run.plan:
+        parts.append(f"\n\n## Plan retenu avant le code\n{run.plan}")
+
     if run.review_feedback:
         parts.append(
             "\n\n## Retours reviewer précédents\n"

@@ -45,6 +45,9 @@ class Ticket(BaseModel):
     created: str = ""
     github_issue_url: str | None = Field(default=None)
     pr_number: int | None = Field(default=None)
+    #: Le ticket demande un tour de plan, en lecture seule, avant le code
+    #: (ticket-243). Il se déclare : rien ne devine qu'un ticket est gros.
+    plan: bool = False
     body: str = Field(default="")
     project_id: str = ""
     file_path: str = Field(default="", description="Chemin absolu du fichier sur disque")
