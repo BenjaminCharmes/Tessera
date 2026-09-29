@@ -1,14 +1,14 @@
 ---
-id: ticket-216
-title: "Le compte rendu du codeur reste visible après son tour"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-216
+pr_number: null
+priority: medium
+status: done
+title: Le compte rendu du codeur reste visible après son tour
+type: fix
 ---
 
 # ticket-216 — Le compte rendu du codeur reste visible
