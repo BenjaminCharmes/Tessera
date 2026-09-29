@@ -52,6 +52,10 @@ _PART_MINIMALE = 0.5
 #: que le premier agent ait commencé à réfléchir.
 _PLAFOND = 10
 
+#: Volume total de documentation inclus dans le message (en caractères).
+#: Au-delà, un fichier est représenté par ses seuls titres Markdown.
+_BORNE_DOC = 60_000
+
 
 class EditionRefusee(Exception):
     """Une modification proposée ne s'applique pas. Rien n'a été écrit."""
@@ -326,7 +330,7 @@ class DocumentationService:
 
         modifies: list[str] = []
         refus: list[str] = []
-        brief = _brief(tickets)
+        brief = _brief(tickets, _contenu_documentable(racine))
 
         for role in _ROLES:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
@@ -365,12 +369,60 @@ class DocumentationService:
         )
 
 
-def _brief(tickets: list[TicketADocumenter]) -> str:
-    """Ce que les agents reçoivent : les tickets, pas les diffs.
+def _titres_markdown(contenu: str) -> str:
+    """Extracts Markdown heading lines (starting with #) from file content."""
+    return "\n".join(l for l in contenu.splitlines() if l.startswith("#"))
+
+
+def _contenu_documentable(racine: Path, borne: int = _BORNE_DOC) -> str:
+    """Current content of documentable files, bounded to `borne` characters total.
+
+    Files are included in full up to the budget. When a file would push the
+    running total over ``borne``, its full content is replaced by a list of
+    Markdown headings so the agents can still see the structure.
+    """
+    fichiers: list[tuple[str, str]] = []
+
+    readme = racine / "README.md"
+    if readme.is_file():
+        fichiers.append(("README.md", readme.read_text(encoding="utf-8")))
+
+    docs_dir = racine / "docs"
+    if docs_dir.is_dir():
+        for f in sorted(docs_dir.glob("*.md")):
+            fichiers.append((f"docs/{f.name}", f.read_text(encoding="utf-8")))
+
+    if not fichiers:
+        return ""
+
+    morceaux: list[str] = []
+    budget = borne
+
+    for chemin, contenu in fichiers:
+        entete = f"\n### {chemin}\n\n"
+        if len(entete) + len(contenu) <= budget:
+            morceaux.append(entete + contenu)
+            budget -= len(entete) + len(contenu)
+        else:
+            titres = _titres_markdown(contenu)
+            resume = entete + f"[contenu trop long — titres uniquement]\n{titres}\n"
+            morceaux.append(resume)
+            budget -= len(resume)
+            if budget <= 0:
+                break
+
+    if not morceaux:
+        return ""
+    return "\n---\nDocumentation actuelle :\n" + "".join(morceaux)
+
+
+def _brief(tickets: list[TicketADocumenter], contenu_doc: str = "") -> str:
+    """Ce que les agents reçoivent : les tickets, puis la documentation actuelle.
 
     Un diff dit ce qui a bougé ligne à ligne ; un ticket dit ce que le produit
     fait de plus. C'est la seconde chose qu'on documente, et elle tient en
-    dix fois moins de tokens.
+    dix fois moins de tokens.  La documentation actuelle permet à l'agent de
+    copier mot pour mot l'ancien texte qu'il souhaite remplacer.
     """
     morceaux = [
         "Tickets livrés depuis la dernière mise à jour de la documentation :",
@@ -378,6 +430,8 @@ def _brief(tickets: list[TicketADocumenter]) -> str:
     ]
     for ticket in tickets:
         morceaux.append(f"## {ticket.id} — {ticket.titre}\n\n{ticket.corps}\n")
+    if contenu_doc:
+        morceaux.append(contenu_doc)
     return "\n".join(morceaux)
 
 

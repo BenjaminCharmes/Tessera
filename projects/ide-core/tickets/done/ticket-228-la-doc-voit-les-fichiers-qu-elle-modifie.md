@@ -1,14 +1,14 @@
 ---
-id: ticket-228
-title: "Les agents de documentation reçoivent les fichiers qu'ils modifient"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-29
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-29
+id: ticket-228
+pr_number: null
+priority: high
+status: done
+title: Les agents de documentation reçoivent les fichiers qu'ils modifient
+type: fix
 ---
 
 # ticket-228 — La doc voit les fichiers qu'elle modifie

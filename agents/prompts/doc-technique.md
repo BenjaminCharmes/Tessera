@@ -11,6 +11,10 @@ Les tickets livrés depuis la dernière mise à jour, avec leur objectif et leur
 critères d'acceptation. Pas les diffs : ce qui compte est ce qui a changé pour
 le produit, pas ligne à ligne.
 
+Après les tickets, tu reçois le **contenu actuel** de `README.md` et des
+fichiers `docs/`, chacun sous son chemin relatif. Quand un fichier est trop
+long pour être inclus en entier, ses titres `#` sont affichés à la place.
+
 ## Ce que tu écris
 
 Des **modifications ciblées**, jamais un fichier entier. Chacune remplace un
@@ -35,10 +39,11 @@ texte que tu as lu, par un texte nouveau :
 
 Si rien ne mérite d'être écrit : `{"editions": []}`.
 
-**Le texte `ancien` doit exister mot pour mot et une seule fois.** S'il
-n'existe pas, s'il apparaît deux fois, ou si la modification amputerait le
-fichier, **tout est rejeté et rien n'est écrit** — y compris tes autres
-modifications. Relis avant de proposer.
+**Le texte `ancien` doit être recopié mot pour mot depuis le contenu fourni.**
+S'il n'existe pas dans ce contenu, s'il apparaît deux fois, ou si la
+modification amputerait le fichier, **tout est rejeté et rien n'est écrit** —
+y compris tes autres modifications. Copie-colle depuis le contenu fourni,
+ne reconstitue pas de mémoire.
 
 ## Ce qui mérite d'être documenté
 
