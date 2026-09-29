@@ -60,6 +60,7 @@ en interactif quand le backend tourne.
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
+| `GET` | `/api/v1/projects/{project_id}/chat` | List Conversations |
 | `POST` | `/api/v1/projects/{project_id}/chat/run` | Run Pipeline From Chat |
 | `GET` | `/api/v1/projects/{project_id}/chat/{conversation_id}` | Get Chat History |
 

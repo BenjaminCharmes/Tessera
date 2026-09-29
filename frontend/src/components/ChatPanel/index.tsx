@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Project } from "../../types/api";
 import { useChat } from "../../hooks/useChat";
 import ChatMessageView from "./ChatMessageView";
+import ConversationSidebar from "./ConversationSidebar";
 import ToolUseList from "./ToolUseList";
 
 interface ChatPanelProps {
@@ -17,7 +18,10 @@ interface ChatPanelProps {
  * branche `chat-…` (ADR-019), jamais sur la branche courante.
  */
 export default function ChatPanel({ project }: ChatPanelProps) {
-  const chat = useChat(project?.id ?? null);
+  const [conversationId, setConversationId] = useState("default");
+  // Reset to default conversation when the user switches project.
+  useEffect(() => { setConversationId("default"); }, [project?.id]);
+  const chat = useChat(project?.id ?? null, conversationId);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +54,14 @@ export default function ChatPanel({ project }: ChatPanelProps) {
   const budgetRatio = chat.maxUsd > 0 ? chat.spentUsd / chat.maxUsd : 0;
 
   return (
-    <div className="h-full flex flex-col bg-zinc-900">
+    <div className="h-full flex bg-zinc-900">
+      <ConversationSidebar
+        projectId={project.id}
+        activeId={conversationId}
+        onSelect={setConversationId}
+        onNew={() => setConversationId(`conv-${Date.now()}`)}
+      />
+      <div className="flex-1 flex flex-col overflow-hidden">
       <header className={`${BAND} justify-between gap-2 border-b border-zinc-800 px-3`}>
         <span className="text-xs font-medium text-zinc-300">
           Chat — {project.id}
@@ -184,6 +195,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

@@ -319,6 +319,13 @@ export interface CloneProjectResponse {
 // ---------------------------------------------------------------- chat ----
 // ticket-048 — chat conversationnel avec outils.
 
+/** A conversation entry as returned by GET /{project_id}/chat — ticket-224. */
+export interface ConversationSummary {
+  conversation_id: string;
+  title: string;
+  last_activity: string;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;

@@ -143,3 +143,17 @@ Le
 - 2026-09-29 10:53:29 UTC — [ticket-223] tour 2 — reviewer terminé (68405ms)
 - 2026-09-29 10:55:07 UTC — [ticket-223] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests Vitest ont été ajoutés
 - 2026-09-29 10:55:07 UTC — [ticket-223] APPROVED après 2 tour(s)
+- 2026-09-29 11:05:57 UTC — [ticket-225] branche ticket-225-le-chat-s-organise-par-conversation-liste-nouvell
+- 2026-09-29 11:05:57 UTC — [ticket-225] tour 1 — codeur démarré
+- 2026-09-29 11:10:40 UTC — [ticket-225] tour 1 — codeur terminé (283421ms)
+- 2026-09-29 11:11:06 UTC — [ticket-225] securite: PASS — Frontend code is secure. HTML auto-escaping in React prevents XSS (line Conversa
+- 2026-09-29 11:11:06 UTC — [ticket-225] tour 1 — reviewer démarré
+- 2026-09-29 11:12:45 UTC — [ticket-225] tour 1 — reviewer terminé (98390ms)
+- 2026-09-29 11:12:45 UTC — [ticket-225] CHANGES_REQUESTED tour 1: 
+- 2026-09-29 11:12:45 UTC — [ticket-225] tour 2 — codeur démarré
+- 2026-09-29 11:14:06 UTC — [ticket-225] tour 2 — codeur terminé (81594ms)
+- 2026-09-29 11:14:44 UTC — [ticket-225] securite: PASS — Audit de la feature ticket-225 (conversations multi-projets) : aucune vulnérabil
+- 2026-09-29 11:14:44 UTC — [ticket-225] tour 2 — reviewer démarré
+- 2026-09-29 11:16:23 UTC — [ticket-225] tour 2 — reviewer terminé (98562ms)
+- 2026-09-29 11:18:22 UTC — [ticket-225] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par les tests ajoutés. Le compos
+- 2026-09-29 11:18:22 UTC — [ticket-225] APPROVED après 2 tour(s)

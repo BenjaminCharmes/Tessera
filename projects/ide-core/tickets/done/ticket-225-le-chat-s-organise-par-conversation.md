@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-09-29
+depends_on:
+- ticket-223
+- ticket-224
+estimated_days: 1
 id: ticket-225
-title: "Le chat s'organise par conversation : liste, nouvelle, reprise"
-type: feat
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-223", "ticket-224"]
-estimated_days: 1
-created: 2026-09-29
+status: done
+title: 'Le chat s''organise par conversation : liste, nouvelle, reprise'
+type: feat
 ---
 
 # ticket-225 — Le chat par conversation
