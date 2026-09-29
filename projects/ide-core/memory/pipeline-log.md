@@ -114,3 +114,17 @@ Le
 - 2026-09-29 10:09:46 UTC — [ticket-222] tour 2 — reviewer terminé (87593ms)
 - 2026-09-29 10:13:41 UTC — [ticket-222] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests Vitest couvrent les c
 - 2026-09-29 10:13:41 UTC — [ticket-222] APPROVED après 2 tour(s)
+- 2026-09-29 10:20:47 UTC — [ticket-224] branche ticket-224-le-backend-liste-les-conversations-du-chat-d-un-p
+- 2026-09-29 10:20:48 UTC — [ticket-224] tour 1 — codeur démarré
+- 2026-09-29 10:23:29 UTC — [ticket-224] tour 1 — codeur terminé (161140ms)
+- 2026-09-29 10:24:03 UTC — [ticket-224] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute un endpoint de listing
+- 2026-09-29 10:24:03 UTC — [ticket-224] tour 1 — reviewer démarré
+- 2026-09-29 10:25:37 UTC — [ticket-224] tour 1 — reviewer terminé (93906ms)
+- 2026-09-29 10:25:37 UTC — [ticket-224] CHANGES_REQUESTED tour 1: 
+- 2026-09-29 10:25:37 UTC — [ticket-224] tour 2 — codeur démarré
+- 2026-09-29 10:26:10 UTC — [ticket-224] tour 2 — codeur terminé (33327ms)
+- 2026-09-29 10:26:53 UTC — [ticket-224] securite: PASS — Audit complet du diff ticket-224 (conversations listing) : aucune vulnérabilité 
+- 2026-09-29 10:26:53 UTC — [ticket-224] tour 2 — reviewer démarré
+- 2026-09-29 10:28:17 UTC — [ticket-224] tour 2 — reviewer terminé (83625ms)
+- 2026-09-29 10:29:45 UTC — [ticket-224] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente une nouvelle 
+- 2026-09-29 10:29:45 UTC — [ticket-224] APPROVED après 2 tour(s)
