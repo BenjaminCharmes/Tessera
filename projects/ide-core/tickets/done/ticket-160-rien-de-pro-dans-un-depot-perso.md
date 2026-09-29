@@ -20,22 +20,14 @@ dépôt personnel — ni dans le contenu des fichiers, ni dans les métadonnées
 
 ## Contexte
 
-Le 2026-09-23, le service cybersécurité d'un client a signalé le dépôt
-`Tessera`, alors public. Cause : le `.gitconfig` global portait l'adresse
-e-mail professionnelle, qui s'est retrouvée auteur et committer de 162 commits,
-plus 91 trailers `Co-authored-by` produits par les squash-merges GitHub.
+Un dépôt personnel peut recevoir une donnée professionnelle par deux voies :
+ce qu'on lit dans les fichiers, et ce que git écrit tout seul à côté — auteur,
+committer, trailers `Co-authored-by` des squash-merges. Contrôler la première
+ne protège pas de la seconde : un `user.email` global s'applique à tous les
+dépôts d'une machine sans jamais se rappeler à l'attention.
 
-Le **contenu** était propre : ticket-103 avait déjà remplacé les noms de
-clients et le hostname d'infrastructure interne par des valeurs neutres. Le
-défaut était ailleurs, et c'est ce qui le rend intéressant : ticket-103 a
-vérifié ce qu'on lit dans les fichiers, personne n'a vérifié ce que git écrit
-tout seul à côté. Un `user.email` global s'applique à tous les dépôts d'une
-machine sans jamais se rappeler à l'attention.
-
-La réparation a coûté la réécriture complète de l'histoire des trois dépôts
-touchés, leur suppression et leur recréation sur GitHub — donc la perte des PR
-et de leurs discussions. Rien de tout cela n'aurait été nécessaire si la règle
-avait existé.
+Une métadonnée publiée ne se rattrape qu'en réécrivant l'histoire, et en
+perdant les PR et leurs discussions.
 
 Aucune règle du dépôt ne couvrait le cas. `CLAUDE.md` interdit de laisser une
 trace d'écriture par IA (règle 8) ; rien n'interdit de laisser une trace
