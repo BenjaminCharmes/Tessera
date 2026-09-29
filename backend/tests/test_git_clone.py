@@ -171,7 +171,9 @@ async def test_clone_github_remote_surfaced_in_project(tmp_path: Path) -> None:
     with patch.object(svc, "_run_clone", new=AsyncMock(side_effect=lambda url, dest: dest.mkdir(parents=True))):
         result = await svc.clone("https://github.com/owner/my-repo")
 
-    assert result.project.github_remote == "https://github.com/owner/my-repo"
+    # github_remote is normalised to 'owner/repo' at load time (ticket-215).
+    assert result.project.github_remote == "owner/my-repo"
+    assert result.project.github_forge == "GitHub"
 
 
 async def test_clone_returns_detected_stack(tmp_path: Path) -> None:
