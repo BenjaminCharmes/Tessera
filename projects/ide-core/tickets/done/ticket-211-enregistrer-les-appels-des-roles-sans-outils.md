@@ -4,7 +4,7 @@ created: 2026-09-28
 depends_on: []
 estimated_days: 1
 id: ticket-211
-pr_number: null
+pr_number: 103
 priority: medium
 status: done
 title: Les appels des rôles sans outils s'enregistrent dans agent_calls, avec leur
