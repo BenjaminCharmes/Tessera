@@ -4,7 +4,7 @@ created: 2026-09-28
 depends_on: []
 estimated_days: 1
 id: ticket-215
-pr_number: null
+pr_number: 99
 priority: high
 status: done
 title: github_remote se normalise en propriétaire/dépôt, quelle que soit sa forme
