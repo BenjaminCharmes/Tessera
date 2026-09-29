@@ -437,3 +437,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : Avant tout push vers un dépôt distant, le backend contrôle les lignes ajoutées du diff, les messages de commit et les auteurs contre `FORBIDDEN_TERMS` (`.env` local, jamais versionné). Liste vide ou absente : aucun contrôle. Un terme trouvé bloque le push ; `Livraison.arret` signale la localisation sans nommer le terme. Un projet déclare `"confidentiality": "professional"` dans `agents.json` pour s'exempter ; défaut et valeur inconnue : contrôlé.
 **Raison** : ADR-018 et ADR-027 font commiter l'orchestrateur lui-même — ni l'identité git par dossier ni un hook global ne couvrent ces commits. Le push est le seul point de contrôle avant que le contenu quitte la machine.
 **Alternative rejetée** : contrôle au commit — ADR-018 exige un commit à chaque sortie, bloquer le commit casserait l'arbre propre ; hook pre-push global — ignoré pendant les runs (ADR-027).
+
+---
+
+## ADR-049 — Un rôle qui lit le web n'a pas de shell
+
+**Date** : 2026-09-29
+**Décision** : un rôle déclaré `"web": true` dans `agents.json` reçoit `WebFetch` et `WebSearch` et perd `Bash`, principal comme repli. `par_role.outils_du_role` est le seul endroit qui compose ces outils ; un rôle sans outils ne gagne rien.
+**Raison** : une page lue peut porter des instructions, et on ne sait pas filtrer une page. Avec `Bash` et `acceptEdits`, l'agent aurait de quoi les exécuter — un `curl` suffit à faire sortir un fichier. Sans shell, une injection ne peut plus qu'écrire dans le périmètre, sous relecture.
+**Alternative rejetée** : un MCP de documentation — une dépendance et un réseau de plus au démarrage, pour un besoin que le CLI couvre ; le web au codeur — c'est le rôle qui a le plus besoin de `Bash`.

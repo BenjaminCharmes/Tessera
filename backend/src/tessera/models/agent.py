@@ -45,6 +45,9 @@ class AgentConfig(BaseModel):
     # backend, comme avant — un manifeste muet ne change pas de comportement.
     provider: str = "agent_sdk"
     fallback: FallbackConfig | None = None
+    #: Le rôle lit le web — `WebFetch`, `WebSearch` — et perd `Bash` en
+    #: échange (ticket-245). Faux par défaut.
+    web: bool = False
 
 
 class AgentPipelineConfig(BaseModel):
