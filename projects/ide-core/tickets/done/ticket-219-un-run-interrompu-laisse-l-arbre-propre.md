@@ -2,7 +2,7 @@
 id: ticket-219
 title: "Un run interrompu laisse l'arbre propre, journal compris"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -27,10 +27,10 @@ La ligne de journal de fin de run s'écrit avant le commit de suivi, ou elle est
 
 ## Critères d'acceptation
 
-- [ ] Un test : run interrompu par une exception du codeur → aucun fichier modifié ni non suivi après la fin du run
-- [ ] Un test : la ligne « INTERROMPU » figure dans le dernier commit de la branche
-- [ ] Les chemins approuvé et refusé gardent leur comportement (tests existants verts)
-- [ ] `uv run pytest` passe
+- [x] Un test : run interrompu par une exception du codeur → aucun fichier modifié ni non suivi après la fin du run
+- [x] Un test : la ligne « INTERROMPU » figure dans le dernier commit de la branche
+- [x] Les chemins approuvé et refusé gardent leur comportement (tests existants verts)
+- [x] `uv run pytest` passe
 
 ## Dépendances
 

@@ -285,6 +285,40 @@ class GitWorkspaceService:
         await proc.communicate()
         return proc.returncode == 0
 
+    async def _purger_stage_ignoré(self) -> None:
+        """Retire de l'index les fichiers désormais couverts par `.gitignore`.
+
+        `git add -A` ne dé-stage pas les fichiers déjà dans l'index — même
+        stagés comme intent-to-add — si une règle `.gitignore` les couvre
+        après coup. Cette méthode ferme ce gap : les fichiers listés par
+        `git ls-files --cached --ignored` ne doivent pas finir dans le commit.
+
+        Les artefacts de tenue de livres (`_ORCHESTRATOR_ARTIFACT_PATHS`) sont
+        gérés par `commit_bookkeeping` et sont donc exclus ici.
+        """
+        try:
+            out = await self._run(
+                "ls-files", "--cached", "--ignored", "--exclude-standard"
+            )
+        except GitCommandError as exc:
+            _logger.warning("staged_ignored_list_failed", extra={"error": str(exc)})
+            return
+        to_remove = [
+            p for p in out.splitlines()
+            if p and not any(
+                p.startswith(a.rstrip("/")) for a in _ORCHESTRATOR_ARTIFACT_PATHS
+            )
+        ]
+        if not to_remove:
+            return
+        try:
+            await self._run("rm", "--cached", "--", *to_remove)
+        except GitCommandError as exc:
+            _logger.warning(
+                "staged_ignored_cleanup_failed",
+                extra={"error": str(exc), "paths": to_remove},
+            )
+
     async def _untracked_files(self) -> tuple[str, ...]:
         """Paths git reports as untracked (respecting .gitignore), as a tuple."""
         listing = await self._run("ls-files", "--others", "--exclude-standard")
@@ -519,6 +553,13 @@ class GitWorkspaceService:
             *await self._exclude_pathspecs(),
             *(f":(exclude){path}" for path in self._preexisting_untracked),
         )
+        # Retire de l'index les fichiers devenus ignorés après le `git add -A`.
+        # `git add -A` ne dé-stage pas automatiquement des fichiers déjà dans
+        # l'index dont le chemin est maintenant couvert par `.gitignore` — par
+        # exemple des WAL SQLite capturés par `intent-to-add` lors d'un diff
+        # pendant qu'un serveur tournait, avant l'ajout de `*.db-shm` dans le
+        # `.gitignore` (ticket-219).
+        await self._purger_stage_ignoré()
         staged = await self._run("diff", "--cached", "--name-only")
         sha: str | None = None
         if staged.strip():
