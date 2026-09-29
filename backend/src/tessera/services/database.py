@@ -441,6 +441,78 @@ async def conversation_cost_usd(
     return round(float(row[0]) if row else 0.0, 10)
 
 
+class ConversationSummary(BaseModel):
+    """A conversation as the listing endpoint exposes it — ticket-224."""
+
+    conversation_id: str
+    title: str
+    last_activity: str
+    messages: list[ChatMessageRow]
+
+
+def _conversation_title(messages: list[ChatMessageRow], max_len: int = 60) -> str:
+    """First user message, truncated to max_len characters."""
+    for msg in messages:
+        if msg.role == "user":
+            return msg.content[:max_len]
+    return ""
+
+
+async def list_conversations(
+    db_path: Path | str, project_id: str
+) -> list[ConversationSummary]:
+    """All conversations for a project, most recent first — ticket-224."""
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT conversation_id, MAX(ts) AS last_activity
+               FROM chat_messages
+               WHERE project_id = ?
+               GROUP BY conversation_id
+               ORDER BY MAX(ts) DESC""",
+            (project_id,),
+        ) as cursor:
+            conv_rows = await cursor.fetchall()
+
+        if not conv_rows:
+            return []
+
+        async with db.execute(
+            """SELECT conversation_id, role, content, cost_usd, ts
+               FROM chat_messages
+               WHERE project_id = ?
+               ORDER BY id""",
+            (project_id,),
+        ) as cursor:
+            msg_rows = await cursor.fetchall()
+
+    messages_by_conv: dict[str, list[ChatMessageRow]] = {}
+    for row in msg_rows:
+        conv_id = str(row["conversation_id"])
+        if conv_id not in messages_by_conv:
+            messages_by_conv[conv_id] = []
+        messages_by_conv[conv_id].append(
+            ChatMessageRow(
+                role=str(row["role"]),
+                content=str(row["content"]),
+                cost_usd=float(row["cost_usd"]),
+                ts=str(row["ts"]),
+            )
+        )
+
+    return [
+        ConversationSummary(
+            conversation_id=str(row["conversation_id"]),
+            title=_conversation_title(
+                messages_by_conv.get(str(row["conversation_id"]), [])
+            ),
+            last_activity=str(row["last_activity"]),
+            messages=messages_by_conv.get(str(row["conversation_id"]), []),
+        )
+        for row in conv_rows
+    ]
+
+
 async def get_usage_breakdown(
     db_path: Path | str,
     project_id: str | None = None,

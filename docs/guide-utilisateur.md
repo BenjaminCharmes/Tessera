@@ -245,7 +245,10 @@ en `blocked/` et le reviewer n'est même pas appelé.
 
 Le panneau **Agent Stream** montre le déroulé en direct via WebSocket : quel agent
 tourne, ce qu'il écrit token par token, quels outils il utilise, et le verdict de
-chaque étape.
+chaque étape. Quand un agent termine son tour, son entrée s'ajoute au fil — rien
+n'est écrasé. Les entrées terminées sont repliées avec leur résumé visible (le
+verdict pour le reviewer, la première ligne du compte rendu pour le codeur).
+L'entrée en cours, en bas du fil, reste dépliée pour que tu suives en temps réel.
 
 Le panneau **Historique** liste tous les runs passés (persistés en SQLite), avec
 leur durée, leur verdict et leur nombre de tours.
@@ -380,6 +383,11 @@ tests » deviendrait la réponse à « on casse l'API ? ».
 Le chat n'est pas un pipeline. Il sert à décider **quoi** ticketiser, à
 comprendre un bout de code, à faire une modification ponctuelle — sans passer
 par le cycle complet codeur → reviewer → validateur.
+
+Les conversations du chat sont maintenant listées par projet, triées de la plus
+récente à la plus ancienne. Chacune a un titre (extrait du premier message,
+coupé à 60 caractères) et une date. Elles persistent : tu peux reprendre une
+ancienne conversation sans recommencer à zéro.
 
 ### Ce que l'agent peut faire
 

@@ -1,14 +1,14 @@
 ---
-id: ticket-224
-title: "Le backend liste les conversations du chat d'un projet"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-29
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-29
+id: ticket-224
+pr_number: null
+priority: medium
+status: done
+title: Le backend liste les conversations du chat d'un projet
+type: feat
 ---
 
 # ticket-224 — Lister les conversations du chat
