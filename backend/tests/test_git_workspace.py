@@ -606,3 +606,23 @@ async def test_un_pre_commit_depose_dans_le_depot_n_est_pas_execute(repo: Path) 
 
     assert sha is not None
     assert not marqueur.exists(), "le hook du dépôt a été exécuté par l'orchestrateur"
+
+
+async def test_what_a_push_publishes_is_read_from_the_commits(repo: Path) -> None:
+    # ticket-206 : au push, l'arbre est propre ; le contrôle des termes lit le
+    # contenu commité, le corps des messages et le committer.
+    await _git(repo, "branch", "-M", "develop")
+    service = GitWorkspaceService(repo)
+    branche = await service.create_branch("ticket-030", "publication")
+    (repo / "note.md").write_text("contenu commite\n", encoding="utf-8")
+    await _git(repo, "add", "note.md")
+    await _git(repo, "-c", "user.name=Committer Test", "-c", "user.email=c@example.com",
+               "commit", "-q", "-m", "feat: sujet", "-m", "un corps de message")
+
+    assert await service.current_diff() == "" or "note.md" not in await service.current_diff()
+    diff = await service.diff_de_branche("develop", branche)
+    assert "+contenu commite" in diff
+
+    (commit,) = await service.commits_depuis_base("develop", branche)
+    assert "un corps de message" in commit.message
+    assert "c@example.com" in commit.auteur

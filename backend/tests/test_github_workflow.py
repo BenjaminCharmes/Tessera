@@ -24,6 +24,16 @@ class _FakeGit:
     async def current_diff(self) -> str:
         return "diff --git a/x.py b/x.py\n+x = 1\n"
 
+    #: Ce qui a été commité sur la branche : c'est ce qui part au push.
+    diff_commite: str = "diff --git a/x.py b/x.py\n+x = 1\n"
+    commits: list[object] = []
+
+    async def diff_de_branche(self, base: str, branch: str) -> str:
+        return self.diff_commite
+
+    async def commits_depuis_base(self, base: str, branch: str) -> list[object]:
+        return list(self.commits)
+
 
 class _FakeStatut:
     def __init__(self, ci_status: str) -> None:
@@ -348,3 +358,80 @@ async def test_la_pr_referme_l_issue_du_ticket(tmp_path: Path) -> None:
     )
 
     assert "Closes #12" in str(github.created[0]["body"])
+
+
+# ------------------------------------------------------------------
+# Termes interdits au push — ADR-048, ticket-206
+# ------------------------------------------------------------------
+
+
+def _avec_termes(monkeypatch: pytest.MonkeyPatch, termes: str) -> None:
+    from tessera.config import settings
+
+    monkeypatch.setattr(settings, "forbidden_terms", termes)
+
+
+async def test_committed_content_with_a_forbidden_term_blocks_the_push(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Au push, tout est commité : l'arbre de travail est propre. C'est le
+    # contenu des commits qui doit être lu, pas `current_diff`.
+    _avec_termes(monkeypatch, "zorglub")
+    git, github = _FakeGit(), _FakeGitHub()
+    git.diff_commite = "diff --git a/n.md b/n.md\n+travail chez Zorglub\n"
+    svc = GitHubWorkflowService(
+        git_workspace=git, github=github, base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    with pytest.raises(WorkflowError) as exc:
+        await svc.open_pull_request(
+            branch="ticket-042-slug", ticket_id="ticket-042",
+            ticket_title="x", ticket_body=_ticket_body(),
+        )
+
+    assert git.pushed == []
+    assert "zorglub" not in str(exc.value).lower()
+
+
+async def test_a_manual_push_is_checked_too(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Sans politique de run (bouton de l'IDE), la politique vient du manifeste :
+    # ADR-048 dit « avant tout push ».
+    _avec_termes(monkeypatch, "zorglub")
+    git, github = _FakeGit(), _FakeGitHub()
+    git.diff_commite = "diff --git a/n.md b/n.md\n+Zorglub\n"
+    svc = GitHubWorkflowService(
+        git_workspace=git, github=github, base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    with pytest.raises(WorkflowError):
+        await svc.open_pull_request(
+            branch="ticket-042-slug", ticket_id="ticket-042",
+            ticket_title="x", ticket_body=_ticket_body(), autonome=False,
+        )
+    assert git.pushed == []
+
+
+async def test_a_professional_project_is_not_checked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _avec_termes(monkeypatch, "zorglub")
+    racine = tmp_path / "pro"
+    racine.mkdir()
+    (racine / "agents.json").write_text(
+        json.dumps({"autonomy": "pr", "confidentiality": "professional"}), encoding="utf-8"
+    )
+    git, github = _FakeGit(), _FakeGitHub()
+    git.diff_commite = "diff --git a/n.md b/n.md\n+Zorglub\n"
+    svc = GitHubWorkflowService(
+        git_workspace=git, github=github, base_branch="develop", project_path=racine,
+    )
+
+    await svc.open_pull_request(
+        branch="ticket-042-slug", ticket_id="ticket-042",
+        ticket_title="x", ticket_body=_ticket_body(),
+    )
+    assert git.pushed == ["ticket-042-slug"]

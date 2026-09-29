@@ -2,7 +2,7 @@
 id: ticket-206
 title: "Implanter le contrôle des termes interdits au push"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -84,19 +84,19 @@ async def commits_depuis_base(self, base: str, branch: str) -> list[CommitInfo]:
 
 ## Critères d'acceptation
 
-- [ ] `TermesInterditsService.verifier()` passe les cas : terme en majuscules,
+- [x] `TermesInterditsService.verifier()` passe les cas : terme en majuscules,
       terme accentué, terme avec tiret, correspondance sous-chaîne (doit
       **ne pas** déclencher), liste vide (doit ne pas déclencher)
-- [ ] Un push avec un terme dans une ligne ajoutée lève `WorkflowError` dont le
+- [x] Un push avec un terme dans une ligne ajoutée lève `WorkflowError` dont le
       message contient `"file:"` mais pas le terme lui-même
-- [ ] Un push avec un terme dans un message de commit lève `WorkflowError`
+- [x] Un push avec un terme dans un message de commit lève `WorkflowError`
       contenant `"commit:<sha7>"`
-- [ ] `"confidentiality": "professional"` dans `agents.json` court-circuite le
+- [x] `"confidentiality": "professional"` dans `agents.json` court-circuite le
       contrôle (aucune `WorkflowError` levée)
-- [ ] Liste `FORBIDDEN_TERMS` absente : aucun contrôle, pas d'exception
-- [ ] `PolitiqueRun.lire()` lit `confidentialite` sans casser les projets
+- [x] Liste `FORBIDDEN_TERMS` absente : aucun contrôle, pas d'exception
+- [x] `PolitiqueRun.lire()` lit `confidentialite` sans casser les projets
       existants (champ absent → `None`)
-- [ ] Le paramètre `termes` de `GitHubWorkflowService` est optionnel : les appels existants qui ne le fournissent pas restent valides
+- [x] Le paramètre `termes` de `GitHubWorkflowService` est optionnel : les appels existants qui ne le fournissent pas restent valides
 
 ## Ce que ça ne fait pas
 

@@ -26,6 +26,11 @@ from tessera.services.autonomie import (
 )
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.sync_map import SyncMapService
+from tessera.services.termes_interdits import (
+    CommitInfo,
+    TermesInterditsChecker,
+    TermesInterditsService,
+)
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -45,6 +50,8 @@ class PullRequestResult:
 class _GitWorkspace(Protocol):
     async def push_branch(self, branch_name: str) -> None: ...
     async def current_diff(self) -> str: ...
+    async def diff_de_branche(self, base: str, branch: str) -> str: ...
+    async def commits_depuis_base(self, base: str, branch: str) -> list[CommitInfo]: ...
 
 
 class _GitHub(Protocol):
@@ -115,6 +122,7 @@ class GitHubWorkflowService:
         base_branch: str,
         project_path: Path | None = None,
         politique: PolitiqueRun | None = None,
+        termes: TermesInterditsChecker | None = None,
     ) -> None:
         self._git = git_workspace
         self._github = github
@@ -123,6 +131,10 @@ class GitHubWorkflowService:
         # Figée par l'orchestrateur avant le premier agent (ticket-119). Sans
         # elle — geste demandé depuis l'IDE — le fichier fait foi, comme avant.
         self._politique = politique
+        # Contrôle des termes interdits (ADR-048). Construit ici quand
+        # l'appelant ne le fournit pas : aucun appelant ne le passait, et le
+        # contrôle ne tournait donc jamais (ticket-206).
+        self._termes = termes if termes is not None else TermesInterditsService()
 
     def _niveau(self) -> NiveauAutonomie:
         """Le niveau qui vaut pour cet appel : figé s'il l'a été, lu sinon."""
@@ -171,6 +183,8 @@ class GitHubWorkflowService:
                 "GITHUB_TOKEN et un dépôt distant lié."
             )
 
+        await self._verifier_termes_interdits(branch)
+
         await self._git.push_branch(branch)
 
         pr_number, pr_url = await self._github.create_pull_request(
@@ -187,6 +201,36 @@ class GitHubWorkflowService:
         )
         return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
 
+
+    async def _verifier_termes_interdits(self, branch: str) -> None:
+        """Bloque le push si un terme interdit est trouvé — ADR-048.
+
+        Court-circuité quand le service est inactif ou quand le projet se
+        déclare professionnel. Sans politique de run — un push demandé depuis
+        l'IDE —, la politique vient du manifeste : ADR-048 dit « avant tout
+        push ». On lit ce que la branche a **commité** : au push, l'arbre de
+        travail est propre et `current_diff` serait vide.
+        """
+        if not self._termes.actif:
+            return
+        politique = self._politique
+        if politique is None and self._project_path is not None:
+            politique = PolitiqueRun.lire(self._project_path)
+        if politique is not None and politique.exempte_controle_termes:
+            return
+        assert self._git is not None  # vérifié avant cet appel
+        diff = await self._git.diff_de_branche(self._base_branch, branch)
+        lignes_ajoutees = [l for l in diff.splitlines() if l.startswith("+")]
+        commits = await self._git.commits_depuis_base(self._base_branch, branch)
+        violations = self._termes.verifier(
+            lignes_ajoutees=lignes_ajoutees,
+            commits=commits,
+        )
+        if violations:
+            sources = ", ".join(v.source for v in violations)
+            raise WorkflowError(
+                f"Push bloqué : terme interdit détecté. Sources : {sources}"
+            )
 
     def _issue_de(self, ticket_id: str) -> int | None:
         """Le numéro d'issue GitHub dont ce ticket est né, s'il en vient d'une.
