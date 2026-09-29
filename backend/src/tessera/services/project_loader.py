@@ -26,6 +26,7 @@ def load_project(project_path: Path) -> Project:
     if (claude_md := project_path / "CLAUDE.md").exists():
         raw = claude_md.read_text(encoding="utf-8")
 
+    github_forge, github_slug = _load_github_remote(project_path)
     return Project(
         id=project_path.name,
         name=_parse_name(raw, fallback=project_path.name),
@@ -34,7 +35,8 @@ def load_project(project_path: Path) -> Project:
         active_agents=_parse_active_agents(raw),
         stack=_parse_stack(raw),
         raw_claude_md=raw,
-        github_remote=_load_github_remote(project_path),
+        github_remote=github_slug,
+        github_forge=github_forge,
         category=_load_category(project_path),
         fait_tourner_l_ide=fait_tourner_l_ide(project_path),
     )
@@ -70,16 +72,23 @@ def _load_category(project_path: Path) -> str | None:
     return valeur.strip()
 
 
-def _load_github_remote(project_path: Path) -> str | None:
+def _load_github_remote(project_path: Path) -> tuple[str | None, str | None]:
+    """Parse github_remote from agents.json into (forge_name, 'owner/repo').
+
+    The raw value is never rewritten (ADR-036 pattern).
+    Returns (None, None) when the field is absent, blank, or the file is unreadable.
+    """
+    from tessera.services.github_workflow import parse_remote
+
     agents_json = project_path / "agents.json"
     if not agents_json.exists():
-        return None
+        return None, None
     try:
         data = json.loads(agents_json.read_text(encoding="utf-8"))
         value = data.get("github_remote")
-        return str(value) if value else None
+        return parse_remote(str(value) if value else None)
     except Exception:
-        return None
+        return None, None
 
 
 def load_agents_config(project_path: Path) -> list[AgentConfig]:

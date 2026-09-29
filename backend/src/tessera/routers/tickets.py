@@ -5,7 +5,6 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.github_workflow import forge_supportee, nom_de_la_forge
 from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketStatus, TicketStatusUpdate
 from tessera.services.github_service import GitHubService, PRStatus
@@ -337,11 +336,12 @@ async def get_ticket_activity(project_id: str, ticket_id: str) -> TicketActivity
         project = None
 
     remote = getattr(project, "github_remote", None)
+    forge = getattr(project, "github_forge", None)
     return TicketActivity(
         ticket_id=ticket_id,
         runs=runs,
-        pr_supported=forge_supportee(remote),
-        forge=nom_de_la_forge(remote),
+        pr_supported=forge == "GitHub",
+        forge=forge,
         pr_number=ticket.pr_number,
         github_remote=remote,
         autonomy=lire_niveau(project_path).value,
