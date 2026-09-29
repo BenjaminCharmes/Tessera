@@ -319,8 +319,7 @@ async def test_pipeline_run_passe_hooks_path_vide(tmp_path: Path) -> None:
 
 
 def test_commits_carry_their_body_and_committer() -> None:
-    # Le corps d'un message et le committer publient autant que le sujet ;
-    # c'est par le committer qu'une adresse professionnelle était sortie.
+    # Le corps d'un message et le committer publient autant que le sujet.
     sortie = (
         "a" * 40 + "\x1fDev <d@example.com> | Zorglub Bot <bot@example.com>\x1f"
         "feat: sujet\n\nun corps qui cite zorglub\n\x1e"

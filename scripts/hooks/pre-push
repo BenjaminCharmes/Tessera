@@ -113,8 +113,8 @@ def verifier(
     return violations
 
 
-#: Nom et adresse de l'auteur ET du committer, puis le message complet : c'est
-#: par un committer mal configuré qu'une adresse professionnelle était sortie.
+#: Nom et adresse de l'auteur ET du committer, puis le message complet : un
+#: committer mal configuré publie son adresse autant qu'un auteur.
 _FORMAT = "--format=%H%x1f%an <%ae> | %cn <%ce>%x1f%B%x1e"
 
 

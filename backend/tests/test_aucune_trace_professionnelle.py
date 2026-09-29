@@ -106,8 +106,8 @@ def test_aucune_adresse_inconnue_dans_les_fichiers_suivis() -> None:
 def test_aucun_commit_n_est_signe_d_une_adresse_inconnue() -> None:
     """Auteur et committer, sur toute l'histoire.
 
-    C'est par la que l'incident est arrive : le contenu etait propre, et une
-    identite git globale signait chaque commit d'une adresse professionnelle.
+    Un contenu propre ne suffit pas : une identite git globale signe chaque
+    commit de la meme adresse, sur tous les depots de la machine.
     """
     adresses = {a for a in _git("log", "--all", "--format=%ae%n%ce").split("\n") if a}
     inconnues = {
