@@ -159,6 +159,42 @@ async def test_update_status_same_dir(tmp_path: Path) -> None:
     assert src.exists()
 
 
+async def test_update_status_supprime_les_doublons(tmp_path: Path) -> None:
+    # Scenario: branch resume leaves one copy in todo/ (base branch) and one in
+    # blocked/ (ticket branch).  update_status must consolidate to a single file
+    # in the target folder (ticket-220).
+    todo_copy = tmp_path / "tickets/todo/ticket-042-foo.md"
+    blocked_copy = tmp_path / "tickets/blocked/ticket-042-foo.md"
+    _write_ticket(todo_copy, "ticket-042")
+    _write_ticket(blocked_copy, "ticket-042", status="blocked")
+
+    ticket = await _svc(tmp_path).update_status("ticket-042", TicketStatus.in_review)
+
+    assert ticket.status == TicketStatus.in_review
+    assert not todo_copy.exists()
+    assert not blocked_copy.exists()
+    # Exactly one file remains, in the target folder.
+    in_review_files = list((tmp_path / "tickets/in-review").glob("ticket-042*.md"))
+    assert len(in_review_files) == 1
+
+
+async def test_update_status_ne_leve_pas_si_dest_existe(tmp_path: Path) -> None:
+    # On Windows Path.rename raises FileExistsError when the destination already
+    # exists.  Path.replace is used instead and must not raise (ticket-220).
+    src = tmp_path / "tickets/todo/ticket-007-bar.md"
+    existing_dest = tmp_path / "tickets/in-review/ticket-007-bar.md"
+    _write_ticket(src, "ticket-007")
+    _write_ticket(existing_dest, "ticket-007", status="in-review")
+
+    # Must not raise even though the destination file already exists.
+    ticket = await _svc(tmp_path).update_status("ticket-007", TicketStatus.in_review)
+
+    assert ticket.status == TicketStatus.in_review
+    assert not src.exists()
+    in_review_files = list((tmp_path / "tickets/in-review").glob("ticket-007*.md"))
+    assert len(in_review_files) == 1
+
+
 # ------------------------------------------------------------------
 # create_ticket
 # ------------------------------------------------------------------
