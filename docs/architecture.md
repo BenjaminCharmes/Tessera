@@ -279,15 +279,18 @@ github_issue_url: https://github.com/...  # optionnel
 Corps du ticket en Markdown...
 ```
 
-## Chat conversationnel (ticket-048)
+## Chat conversationnel (ticket-048, 225)
 
 Une conversation libre sur un projet, distincte du pipeline : l'agent a le
 contexte projet, lit et écrit les fichiers, et streame sa réponse.
 
 | Méthode | Route | Rôle |
 |---------|-------|------|
-| `GET` | `/api/v1/projects/{id}/chat/{conversation_id}` | Historique + coût cumulé |
+| `GET` | `/api/v1/projects/{id}/chat` | Liste des conversations |
+| `GET` | `/api/v1/projects/{id}/chat/{conversation_id}` | Historique + coût d'une conversation |
 | `WS` | `/api/v1/projects/{id}/chat` | Un tour de conversation, streamé |
+
+**Plusieurs conversations (ticket-225)** : un projet peut avoir plusieurs conversations, listées et gérées par l'UI. L'utilisateur peut en créer une nouvelle (nouvel identifiant) ou reprendre une ancienne. La conversation `"default"` persiste si elle existe. Le frontend passe le `conversation_id` au backend pour chaque tour.
 
 Trames WebSocket : `start`, `token`, `tool_use`, `done`, `budget_exceeded`,
 `error`.
