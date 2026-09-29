@@ -18,7 +18,6 @@ import {
 } from "./hooks/useNotificationsSysteme";
 import { filtrerParStatut } from "./lib/filtresTickets";
 import { PANNEAUX } from "./components/Sidebar/panels";
-import { BAND } from "./design/layout";
 import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
 import type { SidebarPanel } from "./components/Sidebar";
@@ -29,7 +28,6 @@ import SupervisionView from "./components/SupervisionView";
 import RunView from "./components/RunView";
 import Editor from "./components/Editor";
 import KanbanView from "./components/KanbanView";
-import AgentPanel from "./components/AgentPanel";
 import ChatPanel from "./components/ChatPanel";
 import BottomPanel from "./components/BottomPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -69,12 +67,6 @@ export default function App() {
   // ordonner (ticket-074).
   const [selection, setSelection] = useState<string[]>([]);
   const [agentSelectionne, setAgentSelectionne] = useState<string | null>(null);
-  // Colonne de droite : observer un run, ou discuter (ticket-048).
-  const [sidePanel, setSidePanel] = useEtatPersistant<"agents" | "chat">(
-    "onglet-droit",
-    "agents",
-    parmi(["agents", "chat"] as const),
-  );
   const { toasts, addToast, removeToast } = useToast();
 
   // Une seule socket pour toute la machine (ticket-129) : `supervision`
@@ -243,7 +235,7 @@ export default function App() {
       className="h-screen overflow-hidden bg-zinc-900 text-zinc-100"
       style={{
         display: "grid",
-        gridTemplateColumns: "100px 280px 1fr 320px",
+        gridTemplateColumns: "100px 280px 1fr",
         gridTemplateRows: "1fr 180px",
       }}
     >
@@ -378,7 +370,12 @@ export default function App() {
               tableau des tickets, ou « ce ticket n'a jamais été lancé »
               (ticket-075). Un fichier ou un diff ouvert explicitement garde la
               priorité : c'est une demande de l'utilisateur. */}
-          {panel === "supervision" ? (
+          {panel === "chat" ? (
+            // Le chat a sa propre vue centrale : plus large que l'ancienne
+            // colonne de droite, et sans partager la place avec les agents
+            // (ticket-223).
+            <ChatPanel project={project} />
+          ) : panel === "supervision" ? (
             // Vue globale : elle ne dépend d'aucun projet actif, comme les
             // coûts. C'est ce qui lui permet de montrer les autres.
             <SupervisionView
@@ -416,58 +413,6 @@ export default function App() {
           )}
         </ErrorBoundary>
       </main>
-
-      {/* Agent Panel / Chat — col 4, rows 1-2.
-          Deux vues du même espace : l'une observe un run de pipeline,
-          l'autre discute (ticket-048). Le chat ne remplace pas le stream. */}
-      <div
-        className="flex flex-col overflow-hidden border-l border-zinc-700"
-        style={{ gridColumn: "4", gridRow: "1 / 3" }}
-      >
-        <div
-          role="tablist"
-          aria-label="Panneau latéral"
-          className={`${BAND} border-b border-zinc-800 bg-zinc-900`}
-        >
-          {(["agents", "chat"] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              role="tab"
-              id={`side-tab-${tab}`}
-              aria-selected={sidePanel === tab}
-              aria-controls={`side-panel-${tab}`}
-              onClick={() => setSidePanel(tab)}
-              className={`h-full px-3 text-xs transition-colors ${
-                sidePanel === tab
-                  ? "text-zinc-100 border-b-2 border-zinc-400"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              {tab === "agents" ? "Agents" : "Chat"}
-            </button>
-          ))}
-        </div>
-
-        <div
-          id={`side-panel-${sidePanel}`}
-          role="tabpanel"
-          aria-labelledby={`side-tab-${sidePanel}`}
-          className="flex-1 overflow-hidden"
-        >
-          <ErrorBoundary>
-            {sidePanel === "agents" ? (
-              <AgentPanel
-                project={project}
-                stream={stream}
-                activeTicket={ticket}
-              />
-            ) : (
-              <ChatPanel project={project} />
-            )}
-          </ErrorBoundary>
-        </div>
-      </div>
 
       {/* Bottom Panel — col 3, row 2 */}
       <div
