@@ -2,7 +2,7 @@
 id: ticket-226
 title: "Un prompt d'agent se relit en diff avant d'être enregistré"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -27,10 +27,10 @@ La vue Agents permet déjà d'éditer et d'enregistrer un prompt, natif compris 
 
 ## Critères d'acceptation
 
-- [ ] Un test Vitest : « Enregistrer » affiche les lignes retirées et ajoutées, sans appeler `api.agents.updatePrompt`
-- [ ] Un test Vitest : « Confirmer » appelle `api.agents.updatePrompt` avec le brouillon
-- [ ] Un test Vitest : « Annuler » garde le brouillon et n'appelle pas l'API
-- [ ] Un brouillon identique au prompt enregistré n'ouvre pas de diff et n'envoie rien (test Vitest)
+- [x] Un test Vitest : « Enregistrer » affiche les lignes retirées et ajoutées, sans appeler `api.agents.updatePrompt`
+- [x] Un test Vitest : « Confirmer » appelle `api.agents.updatePrompt` avec le brouillon
+- [x] Un test Vitest : « Annuler » garde le brouillon et n'appelle pas l'API
+- [x] Un brouillon identique au prompt enregistré n'ouvre pas de diff et n'envoie rien (test Vitest)
 
 ## Dépendances
 

@@ -85,6 +85,9 @@ describe("AgentDetail — édition du prompt", () => {
     await userEvent.type(champ, "Tu testes d'abord.");
     await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
 
+    // Le diff est affiché — on confirme pour déclencher l'appel API.
+    await userEvent.click(screen.getByRole("button", { name: /Confirmer/ }));
+
     expect(api.agents.updatePrompt).toHaveBeenCalledWith(
       "codeur",
       "Tu testes d'abord.",
@@ -103,6 +106,102 @@ describe("AgentDetail — édition du prompt", () => {
     await userEvent.clear(screen.getByRole("textbox"));
     await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
 
+    expect(api.agents.updatePrompt).not.toHaveBeenCalled();
+  });
+});
+
+describe("AgentDetail — confirmation avant enregistrement (ticket-226)", () => {
+  beforeEach(() => {
+    detail.mockReset();
+    vi.mocked(api.agents.updatePrompt).mockReset();
+  });
+
+  it("affiche les lignes retirées et ajoutées sans appeler l'API", async () => {
+    detail.mockResolvedValue({
+      role: "codeur",
+      is_builtin: true,
+      system_prompt: "ligne un\nligne deux",
+    });
+
+    render(<AgentDetail role="codeur" />);
+    await screen.findByText(/ligne un/);
+
+    await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
+    const champ = screen.getByRole("textbox");
+    await userEvent.clear(champ);
+    await userEvent.type(champ, "ligne un\nligne trois");
+    await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
+
+    // La ligne retirée et la ligne ajoutée sont visibles dans le diff.
+    expect(screen.getByText("-ligne deux")).toBeInTheDocument();
+    expect(screen.getByText("+ligne trois")).toBeInTheDocument();
+    // L'API n'a pas encore été appelée.
+    expect(api.agents.updatePrompt).not.toHaveBeenCalled();
+  });
+
+  it("appelle l'API après Confirmer", async () => {
+    detail.mockResolvedValue({
+      role: "codeur",
+      is_builtin: true,
+      system_prompt: "ancien prompt",
+    });
+    vi.mocked(api.agents.updatePrompt).mockResolvedValue({
+      role: "codeur", is_builtin: true, system_prompt: "nouveau prompt",
+    });
+
+    render(<AgentDetail role="codeur" />);
+    await screen.findByText(/ancien prompt/);
+
+    await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
+    const champ = screen.getByRole("textbox");
+    await userEvent.clear(champ);
+    await userEvent.type(champ, "nouveau prompt");
+    await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Confirmer/ }));
+
+    expect(api.agents.updatePrompt).toHaveBeenCalledWith("codeur", "nouveau prompt");
+  });
+
+  it("garde le brouillon et n'appelle pas l'API après Annuler", async () => {
+    detail.mockResolvedValue({
+      role: "codeur",
+      is_builtin: true,
+      system_prompt: "ancien prompt",
+    });
+
+    render(<AgentDetail role="codeur" />);
+    await screen.findByText(/ancien prompt/);
+
+    await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
+    const champ = screen.getByRole("textbox");
+    await userEvent.clear(champ);
+    await userEvent.type(champ, "brouillon en cours");
+    await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
+
+    // Le diff est affiché — on annule.
+    await userEvent.click(screen.getByRole("button", { name: /Annuler/ }));
+
+    // Le brouillon est intact dans la textarea.
+    expect(screen.getByRole("textbox")).toHaveValue("brouillon en cours");
+    expect(api.agents.updatePrompt).not.toHaveBeenCalled();
+  });
+
+  it("n'ouvre pas le diff quand le brouillon est identique au prompt enregistré", async () => {
+    detail.mockResolvedValue({
+      role: "codeur",
+      is_builtin: true,
+      system_prompt: "prompt inchangé",
+    });
+
+    render(<AgentDetail role="codeur" />);
+    await screen.findByText(/prompt inchangé/);
+
+    await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
+    // On ne modifie rien : le brouillon est identique au prompt enregistré.
+    await userEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
+
+    // Aucun diff, aucun bouton Confirmer, aucun appel API.
+    expect(screen.queryByRole("button", { name: /Confirmer/ })).toBeNull();
     expect(api.agents.updatePrompt).not.toHaveBeenCalled();
   });
 });
