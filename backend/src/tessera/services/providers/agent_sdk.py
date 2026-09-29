@@ -45,6 +45,7 @@ def _build_options(
     ask_user: Callable[[str], Awaitable[str]] | None = None,
     racine_ecriture: Path | None = None,
     resume: str | None = None,
+    skills: list[str] | None = None,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
 
@@ -65,6 +66,13 @@ def _build_options(
     # merely withholding auto-approval, and no configuration path can end up
     # with an implicit toolset (ticket-044 merge-gate review, finding 1).
     effective_tools = allowed_tools if allowed_tools is not None else _ALLOWED_TOOLS
+
+    # `tools` étant explicite, l'option `skills` du SDK ne suffit pas à rendre
+    # l'outil disponible : il faut l'y ajouter. La liste, elle, borne ce que le
+    # CLI découvrirait seul — les skills de la racine du dépôt, ceux qu'il
+    # intègre — et un skill non listé est refusé par l'outil (ticket-242).
+    if skills:
+        effective_tools = [*effective_tools, "Skill"]
 
     # L'outil `ask_user` n'existe que si un canal de dialogue est branché sur
     # ce run (ticket-066). Le donner sans canal reviendrait à promettre à
@@ -102,6 +110,7 @@ def _build_options(
         max_budget_usd=max_budget_usd,
         mcp_servers=mcp_servers,
         resume=resume,
+        skills=list(skills) if skills else None,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
         # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
@@ -168,8 +177,10 @@ class ClaudeAgentSDKProvider:
         max_budget_usd: float | None = None,
         allowed_tools: list[str] | None = None,
         racine_ecriture: Path | None = None,
+        skills: list[str] | None = None,
     ) -> None:
         self._max_turns = max_turns
+        self._skills = list(skills) if skills else []
         self._max_budget_usd = max_budget_usd
         # La racine d'écriture figée pour tout le run (ticket-119). Les options
         # sont reconstruites à chaque appel d'agent : sans elle, chaque agent
@@ -257,6 +268,7 @@ class ClaudeAgentSDKProvider:
             max_budget_usd=self._max_budget_usd, cwd=cwd,
             allowed_tools=self._allowed_tools, ask_user=ask_user,
             racine_ecriture=self.racine_ecriture, resume=resume,
+            skills=self._skills,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None

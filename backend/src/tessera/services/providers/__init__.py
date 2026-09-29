@@ -31,6 +31,7 @@ def get_provider(
     allow_tools: bool = True,
     tools: list[str] | None = None,
     racine_ecriture: Path | None = None,
+    skills: list[str] | None = None,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -55,6 +56,9 @@ def get_provider(
     ``racine_ecriture`` is the write root a pipeline run froze before its
     first agent (ticket-119); only the SDK provider has a perimeter hook to
     hand it to.
+
+    ``skills`` names the skills the role may load (ticket-242); only the SDK
+    provider has a `Skill` tool to give.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -65,6 +69,8 @@ def get_provider(
             kwargs["max_turns"] = max_turns
         if max_budget_usd is not None:
             kwargs["max_budget_usd"] = max_budget_usd
+        if skills:
+            kwargs["skills"] = list(skills)
         if tools is not None:
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:

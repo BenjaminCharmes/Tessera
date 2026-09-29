@@ -20,7 +20,10 @@
       "model": "claude-sonnet-4-6",
       "max_tokens": 8192,
       "prompt_file": "agents/prompts/codeur.md",
-      "active": true
+      "active": true,
+      "skills": [
+        "verifier-mon-travail"
+      ]
     },
     {
       "role": "reviewer",

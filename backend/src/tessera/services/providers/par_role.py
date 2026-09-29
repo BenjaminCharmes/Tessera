@@ -52,10 +52,12 @@ def provider_pour_role(
     config = config_du_role(project_path, role)
     nom = config.provider if config is not None else settings.llm_provider
     tours = max_turns if max_turns is not None else settings.llm_max_turns
+    skills = config.skills if config is not None else []
     principal = get_provider(
         nom, settings.anthropic_api_key,
         max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
+        skills=skills,
     )
     if config is None or config.fallback is None:
         return principal
@@ -63,6 +65,7 @@ def provider_pour_role(
         config.fallback.provider, settings.anthropic_api_key,
         max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
+        skills=skills,
     )
     return ProviderAvecRepli(
         principal, repli, modele_repli=config.fallback.model, role=role, project_id=project_id
