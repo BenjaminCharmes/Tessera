@@ -45,6 +45,10 @@ class AgentConfig(BaseModel):
     # backend, comme avant — un manifeste muet ne change pas de comportement.
     provider: str = "agent_sdk"
     fallback: FallbackConfig | None = None
+    #: Les skills que ce rôle peut charger (ticket-242). Vide : pas d'outil
+    #: `Skill`. La liste borne aussi ce que le CLI découvrirait seul — les
+    #: skills de la racine du dépôt et ceux qu'il intègre.
+    skills: list[str] = Field(default_factory=list)
 
 
 class AgentPipelineConfig(BaseModel):
