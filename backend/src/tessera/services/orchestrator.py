@@ -14,6 +14,7 @@ from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
+from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import (
     EventCallback,
@@ -218,6 +219,11 @@ class Orchestrator:
             run_id=run_id,
             dialogue=dialogue or DialogueChannel(interactive=False),
         )
+
+        # Active l'enregistrement des appels LLM dans `agent_calls` pour la
+        # durée de ce ticket. Tous les providers enveloppés dans
+        # `ProviderEnregistrant` lisent ces variables de contexte (ticket-211).
+        activer_enregistrement(run.run_id, run.ticket_id)
 
         refused = await stages.ensure_clean_tree(self, run)
         if refused is not None:

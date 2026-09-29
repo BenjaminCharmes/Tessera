@@ -56,6 +56,26 @@ planificateur, project-analyzer, agent-creator, project-creator, doc-technique,
 doc-fonctionnelle) qui
 écrivent eux-mêmes leurs fichiers en Python.
 
+### Enregistrement automatique des appels
+
+Chaque appel LLM d'un run est enregistré dans `agent_calls` avec `run_id`,
+`ticket_id`, `role`, `model` et le **provider qui a effectivement répondu**, par
+deux chemins qui ne se recouvrent pas :
+
+- le codeur et le reviewer passent par `AgentRunner`, qui enregistre lui-même ;
+- la sécurité, le validateur et la documentation appellent leur provider
+  directement : `ProviderEnregistrant` enveloppe ce provider et enregistre à
+  leur place, sans que le service le sache.
+
+Si un rôle est déclaré sur Ollama mais que le serveur est indisponible, le
+provider enregistré est "agent_sdk" (Claude), avec le modèle du repli et son
+coût réel. Ollama tourne à coût nul : un appel Ollama enregistre `cost_usd = 0.0`
+(ADR-046).
+
+Les appels hors run — chat, analyse de projet — n'ont pas de `run_id` et ne
+sont pas écrits dans `agent_calls` : ils ne peuvent donc jamais se mélanger aux
+appels d'un pipeline.
+
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
@@ -209,6 +229,22 @@ CREATE TABLE agent_events (
     agent     TEXT,                  -- "codeur" | "reviewer" | null
     data_json TEXT,
     ts        TEXT NOT NULL
+);
+
+-- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/database.py)
+CREATE TABLE agent_calls (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id            TEXT NOT NULL REFERENCES pipeline_runs(id),
+    ticket_id         TEXT NOT NULL,
+    role              TEXT NOT NULL,   -- "codeur" | "reviewer" | "securite" | "validateur" | ...
+    model             TEXT NOT NULL,   -- modèle qui a répondu, repli compris
+    input_tokens      INTEGER NOT NULL DEFAULT 0,
+    output_tokens     INTEGER NOT NULL DEFAULT 0,
+    cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+    cost_usd          REAL NOT NULL DEFAULT 0.0,  -- 0.0 pour ollama ; estimation sinon
+    duration_ms       INTEGER NOT NULL DEFAULT 0,
+    created_at        TEXT NOT NULL,
+    provider          TEXT NOT NULL DEFAULT ''    -- ajoutée par migration
 );
 ```
 

@@ -20,6 +20,7 @@ from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.providers.base import LLMProvider
+from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.resolveur_conflit import ResolveurConflitService
@@ -146,18 +147,25 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # (ticket-188). Le reviewer relit : le sien est réduit à la lecture. Les
     # services texte→JSON n'ont aucun usage des outils fichier (ticket-044
     # review, finding 4).
+    # `AgentRunner` enregistre lui-même les appels du codeur et du reviewer.
+    # Les services sans outils — sécurité, validateur, documentation —
+    # appellent le provider directement : `ProviderEnregistrant` les enregistre
+    # à leur place (ticket-211). Envelopper aussi les premiers les compterait
+    # deux fois.
     def _par_role(role: str) -> LLMProvider:
         outils = OUTILS_DE_RELECTURE if role == "reviewer" else None
         tours = settings.llm_max_turns_reviewer if role == "reviewer" else None
-        return provider_pour_role(
+        inner = provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
             project_id=project_id, max_turns=tours,
         )
+        return inner
 
     def _sans_outils(role: str) -> LLMProvider:
-        return provider_pour_role(
+        inner = provider_pour_role(
             project_path, role, allow_tools=False, project_id=project_id
         )
+        return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
 
     try:
         agent_configs = load_agents_config(project_path)
@@ -240,8 +248,11 @@ def _documenteur(
 
     def _fournisseur(role: str) -> tuple[LLMProvider, str | None]:
         # Deux rôles, chacun son provider et son modèle (ticket-188).
+        # Enveloppé pour que les appels de documentation entrent dans
+        # `agent_calls` comme les autres (ticket-211).
+        inner = provider_pour_role(project_path, role, allow_tools=False, project_id=project_id)
         return (
-            provider_pour_role(project_path, role, allow_tools=False, project_id=project_id),
+            ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path),
             modele_du_role(project_path, role),
         )
 

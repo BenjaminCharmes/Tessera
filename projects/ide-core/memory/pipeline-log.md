@@ -82,3 +82,11 @@ Le
 - 2026-09-29 08:52:17 UTC — [ticket-210] tour 1 — reviewer terminé (83342ms)
 - 2026-09-29 08:55:34 UTC — [ticket-210] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code traite correctement les 
 - 2026-09-29 08:55:34 UTC — [ticket-210] APPROVED après 1 tour(s)
+- 2026-09-29 09:08:19 UTC — [ticket-211] branche ticket-211-les-appels-des-r-les-sans-outils-s-enregistrent-d
+- 2026-09-29 09:08:19 UTC — [ticket-211] tour 1 — codeur démarré
+- 2026-09-29 09:21:32 UTC — [ticket-211] tour 1 — codeur terminé (792984ms)
+- 2026-09-29 09:22:25 UTC — [ticket-211] securite: PASS — Le diff introduit un wrapper `ProviderEnregistrant` pour l'enregistrement centra
+- 2026-09-29 09:22:25 UTC — [ticket-211] tour 1 — reviewer démarré
+- 2026-09-29 09:24:31 UTC — [ticket-211] tour 1 — reviewer terminé (125437ms)
+- 2026-09-29 09:28:57 UTC — [ticket-211] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un wrapper `ProviderEnregi
+- 2026-09-29 09:28:57 UTC — [ticket-211] APPROVED après 1 tour(s)

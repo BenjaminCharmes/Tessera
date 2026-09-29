@@ -1,14 +1,15 @@
 ---
-id: ticket-211
-title: "Les appels des rôles sans outils s'enregistrent dans agent_calls, avec leur provider"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-211
+pr_number: 103
+priority: medium
+status: done
+title: Les appels des rôles sans outils s'enregistrent dans agent_calls, avec leur
+  provider
+type: fix
 ---
 
 # ticket-211 — Enregistrer les appels des rôles sans outils
