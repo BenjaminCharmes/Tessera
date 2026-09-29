@@ -180,7 +180,8 @@ def workspace_with_short_remote(
     )
     # Minimal ticket file — TicketService finds it by name prefix.
     (proj / "tickets" / "todo" / "ticket-001-test.md").write_text(
-        "---\ntitle: Test\n---\n# ticket-001\n",
+        "---\nid: ticket-001\ntitle: Test\ntype: feat\nstatus: todo\n"
+        "priority: medium\nagent: codeur\n---\n# ticket-001\n",
         encoding="utf-8",
     )
 
