@@ -96,7 +96,7 @@ async def commits_depuis_base(self, base: str, branch: str) -> list[CommitInfo]:
 - [ ] Liste `FORBIDDEN_TERMS` absente : aucun contrôle, pas d'exception
 - [ ] `PolitiqueRun.lire()` lit `confidentialite` sans casser les projets
       existants (champ absent → `None`)
-- [ ] `GitHubWorkflowService` existant passe ses tests sans `termes` fourni
+- [ ] Le paramètre `termes` de `GitHubWorkflowService` est optionnel : les appels existants qui ne le fournissent pas restent valides
 
 ## Ce que ça ne fait pas
 

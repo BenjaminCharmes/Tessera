@@ -31,7 +31,6 @@ Deux changements :
 
 - [ ] Un test : un ticket présent dans `todo/` et dans `blocked/` → après `update_status(in_review)`, un seul fichier, dans `in-review/`
 - [ ] Un test : `update_status` vers un dossier où le fichier existe déjà ne lève pas
-- [ ] `uv run pytest` passe
 
 ## Dépendances
 

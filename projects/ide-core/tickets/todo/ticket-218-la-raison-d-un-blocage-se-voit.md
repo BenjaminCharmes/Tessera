@@ -30,7 +30,6 @@ Le run du ticket-213 s'est arrêté sur « Reached maximum number of turns (30) 
 - [ ] Un test : un run clos avec `arret` renseigné → l'activité du ticket expose cet `arret`
 - [ ] Un test Vitest : une activité `blocked` avec un `arret` → le texte de l'arrêt est rendu dans le panneau
 - [ ] Un test Vitest : une carte `blocked` porte l'arrêt dans son attribut `title`
-- [ ] `uv run pytest` et `npm run test` passent
 
 ## Dépendances
 

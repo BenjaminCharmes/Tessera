@@ -37,7 +37,6 @@ Une fonction unique qui rend `(forge, owner/repo)` à partir de n'importe quelle
 - [ ] Un test : `GitHubService` construit avec un remote en forme URL appelle `repos/owner/repo/…`
 - [ ] `GET /api/v1/projects/{id}/tickets/{ticket}/activity` rend `pr_supported: true` pour un remote en forme courte
 - [ ] Les `agents.json` existants ne sont pas réécrits
-- [ ] `uv run pytest` passe
 
 ## Dépendances
 
