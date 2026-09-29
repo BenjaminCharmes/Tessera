@@ -1,14 +1,14 @@
 ---
-id: ticket-223
-title: "Le chat a sa propre vue, la colonne de droite disparaît"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-29
 depends_on: []
 estimated_days: 1
-created: 2026-09-29
+id: ticket-223
+pr_number: null
+priority: medium
+status: done
+title: Le chat a sa propre vue, la colonne de droite disparaît
+type: feat
 ---
 
 # ticket-223 — Le chat a sa propre vue

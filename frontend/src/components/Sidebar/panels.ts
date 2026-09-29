@@ -13,6 +13,7 @@ export const PANNEAUX = [
   "agents",
   "usage",
   "supervision",
+  "chat",
 ] as const;
 
 export type SidebarPanel = (typeof PANNEAUX)[number];

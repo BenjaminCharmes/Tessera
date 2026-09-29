@@ -18,10 +18,15 @@ describe("NavRail", () => {
     expect(nom.className).not.toMatch(/text-violet-/);
   });
 
-  it("rend toujours les sept destinations sans regression", () => {
+  it("rend toujours les huit destinations sans regression", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(7);
+    expect(tabs).toHaveLength(8);
+  });
+
+  it("propose une entree Chat", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    expect(screen.getByRole("tab", { name: /Chat/ })).toBeInTheDocument();
   });
 
   it("affiche un libelle visible pour chaque destination", () => {
@@ -37,6 +42,7 @@ describe("NavRail", () => {
       "Agents",
       "Supervision",
       "Statistiques",
+      "Chat",
     ]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
