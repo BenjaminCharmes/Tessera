@@ -24,6 +24,16 @@ décision déjà prise.
 Ouvrir une [discussion](https://github.com/BenjaminCharmes/Tessera/discussions)
 avant de coder évite ce gâchis.
 
+## Après le premier clone
+
+```bash
+make install-hooks   # installe le hook pre-push de contrôle des termes interdits
+```
+
+Ce hook vérifie que les commits et lignes ajoutées ne contiennent pas de termes
+déclarés dans `FORBIDDEN_TERMS` (`.env` local) avant tout push. Sans le hook,
+le contrôle n'a lieu que pour les pushes du pipeline (ADR-048).
+
 ## Si vous ouvrez une PR
 
 Le flux est `ticket-XXX` → `develop` → `main`. Les PR ciblent **`develop`**,
