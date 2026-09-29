@@ -62,6 +62,10 @@ class AgentPipelineConfig(BaseModel):
     max_review_rounds: int = 3
     testeur_enabled: bool = False
     test_command: str | None = None
+    #: Le dossier d'où la commande se lance, relatif au projet, et le temps
+    #: qu'elle a pour finir (ticket-241). Absents : le projet, 120 s.
+    test_cwd: str | None = None
+    test_timeout_s: int | None = None
     securite_enabled: bool = False
     validateur_enabled: bool = False
 
