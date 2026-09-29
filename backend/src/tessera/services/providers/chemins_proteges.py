@@ -7,7 +7,9 @@ faire : `agents.json` (autonomie, racine git), `.git/hooks/` (du code que
 l'utilisateur — sans une seule commande git dans `Bash`), `.git/config` (qui
 peut désigner ces hooks ailleurs), `.claude/settings*.json` (des hooks que le
 CLI exécute au run suivant) et `.github/workflows/` (ce qui rend la CI
-« verte » en mode `merge`).
+« verte » en mode `merge`). S'y ajoutent les consignes que le CLI charge dans
+les sessions suivantes : `CLAUDE.md`, et les skills, commandes et agents de
+`.claude/` (ticket-240).
 
 Le refus est distinct de celui du hors-périmètre : ces fichiers **sont** dans
 le projet. Dire à l'agent qu'il est ailleurs l'enverrait chercher un autre
@@ -30,6 +32,10 @@ PROTECTION_REFUS = (
 _MANIFESTE = "agents.json"
 #: Le motif de fichier de réglages du CLI, sous `.claude/`.
 _REGLAGES_CLI = "settings*.json"
+#: Les consignes que le CLI charge dans chaque session (ticket-240).
+_CONSIGNES = {"CLAUDE.md", "CLAUDE.local.md"}
+#: Les dossiers de `.claude/` dont le CLI charge le contenu à la demande.
+_DOSSIERS_CLI = {"skills", "commands", "agents"}
 
 
 def motif_de_protection(chemin: str, project_path: Path, racine: Path) -> str | None:
@@ -52,6 +58,14 @@ def motif_de_protection(chemin: str, project_path: Path, racine: Path) -> str | 
     if cible == (project_path / _MANIFESTE).resolve():
         return "`agents.json` déclare l'autonomie, la racine git et les artefacts du projet"
 
+    # Un `CLAUDE.md` réécrit pendant un run devient la consigne de tous les
+    # agents suivants, sans ticket pour l'autoriser (règle 5 de CLAUDE.md).
+    if cible.name in _CONSIGNES:
+        return (
+            f"`{cible.name}` est chargé dans chaque session du CLI : le réécrire "
+            "change la consigne de tous les agents suivants"
+        )
+
     segments = cible.parts
     if ".git" in segments:
         return (
@@ -63,6 +77,11 @@ def motif_de_protection(chemin: str, project_path: Path, racine: Path) -> str | 
             return (
                 "`.claude/settings*.json` déclare des hooks que le CLI exécuterait "
                 "au run suivant"
+            )
+        if precedent == ".claude" and suivant in _DOSSIERS_CLI:
+            return (
+                f"`.claude/{suivant}/` porte des consignes que le CLI charge à la "
+                "demande dans les sessions suivantes"
             )
         if precedent == ".github" and suivant == "workflows":
             return (
