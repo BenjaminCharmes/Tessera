@@ -32,3 +32,13 @@
 - 2026-09-28 13:22:21 UTC — [ticket-214] APPROVED après 1 tour(s)
 - 2026-09-28 14:09:15 UTC — [ticket-208] branche ticket-208-relancer-un-ticket-fait-relire-tout-le-travail-de
 - 2026-09-28 14:09:15 UTC — [ticket-208] tour 1 — codeur démarré
+- 2026-09-29 07:23:43 UTC — [ticket-220] branche ticket-220-reprendre-une-branche-de-ticket-ne-duplique-pas-l
+- 2026-09-29 07:23:43 UTC — [ticket-220] tour 1 — codeur démarré
+- 2026-09-29 07:28:00 UTC — [ticket-220] tour 1 — codeur terminé (256875ms)
+- 2026-09-29 07:28:30 UTC — [ticket-220] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+**Résumé des changements
+- 2026-09-29 07:28:30 UTC — [ticket-220] tour 1 — reviewer démarré
+- 2026-09-29 07:29:54 UTC — [ticket-220] tour 1 — reviewer terminé (83875ms)
+- 2026-09-29 07:31:13 UTC — [ticket-220] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code gère correctement la co
+- 2026-09-29 07:31:13 UTC — [ticket-220] APPROVED après 1 tour(s)
