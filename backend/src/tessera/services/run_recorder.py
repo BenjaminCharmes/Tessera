@@ -34,4 +34,5 @@ class RunRecorder:
             resultat.rounds if resultat else 0,
             resultat.approved if resultat else False,
             resultat.final_status.value if resultat else _INTERROMPU,
+            resultat.arret if resultat else None,
         )

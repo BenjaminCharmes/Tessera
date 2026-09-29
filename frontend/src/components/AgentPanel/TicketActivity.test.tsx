@@ -183,6 +183,60 @@ describe("TicketActivity — forge non supportée", () => {
   });
 });
 
+describe("TicketActivity — raison d'un blocage (ticket-218)", () => {
+  it("affiche l'arrêt sous le statut quand un run est bloqué", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [
+        {
+          id: "r1",
+          started_at: "t",
+          finished_at: "t",
+          rounds: 30,
+          approved: false,
+          final_status: "blocked",
+          total_cost_usd: 0.1,
+          arret: "Reached maximum number of turns (30)",
+        },
+      ],
+      pr_number: null,
+      github_remote: null,
+    });
+
+    render(<TicketActivity projectId="mon-projet" ticket={ticket} branch={null} />);
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("Reached maximum number of turns (30)"),
+      ).toBeInTheDocument(),
+    );
+  });
+
+  it("n'affiche rien sous le statut quand l'arrêt est absent", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [
+        {
+          id: "r1",
+          started_at: "t",
+          finished_at: "t",
+          rounds: 2,
+          approved: true,
+          final_status: "done",
+          total_cost_usd: 0.1,
+        },
+      ],
+      pr_number: null,
+      github_remote: null,
+    });
+
+    render(<TicketActivity projectId="mon-projet" ticket={ticket} branch={null} />);
+
+    await waitFor(() => expect(screen.getByText("approuvé")).toBeInTheDocument());
+    expect(screen.queryByTestId("run-arret")).toBeNull();
+  });
+});
+
 describe("TicketActivity — jusqu'où le projet laisse aller (ticket-082)", () => {
   it("dit que le merge reste manuel là où rien n'est déclaré", async () => {
     vi.spyOn(api.tickets, "activity").mockResolvedValue({

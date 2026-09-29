@@ -24,6 +24,11 @@ interface KanbanColumnProps {
   onRunPipeline: (ticketId: string) => void;
   /** Un ticket déposé sur cette colonne y change de statut (ticket-194). */
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
+  /**
+   * La cause d'un blocage par ticket (ticket-218). Passé par `KanbanView`
+   * qui le résout depuis l'API d'activité ; absent : aucune infobulle.
+   */
+  blockedArrets?: Record<string, string | null>;
 }
 
 export default function KanbanColumn({
@@ -35,6 +40,7 @@ export default function KanbanColumn({
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
+  blockedArrets,
 }: KanbanColumnProps) {
   const [survol, setSurvol] = useState(false);
 
@@ -94,6 +100,7 @@ export default function KanbanColumn({
               onSelect={onSelectTicket}
               onRun={onRunPipeline}
               onChangeStatus={onChangeStatus}
+              arret={blockedArrets?.[ticket.id] ?? null}
             />
           ))
         )}

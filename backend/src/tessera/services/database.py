@@ -81,6 +81,7 @@ class PipelineRunSummary(BaseModel):
     approved: bool | None = None
     final_status: str | None = None
     total_cost_usd: float = 0.0
+    arret: str | None = None
 
 
 class TicketUsage(BaseModel):
@@ -111,6 +112,9 @@ _MIGRATIONS: list[str] = [
     # 1 — ticket-188 : le provider qui a répondu, pour que la ventilation des
     # coûts dise ce qui a tourné quand un repli a servi.
     "ALTER TABLE agent_calls ADD COLUMN provider TEXT NOT NULL DEFAULT '';",
+    # 2 — ticket-218 : la cause d'un blocage, pour que l'activité du ticket
+    # l'expose sans fouiller les événements.
+    "ALTER TABLE pipeline_runs ADD COLUMN arret TEXT;",
 ]
 
 
@@ -172,14 +176,15 @@ async def finish_run(
     rounds: int,
     approved: bool,
     final_status: str,
+    arret: str | None = None,
 ) -> None:
     finished_at = datetime.now(timezone.utc).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
             """UPDATE pipeline_runs
-               SET finished_at=?, rounds=?, approved=?, final_status=?
+               SET finished_at=?, rounds=?, approved=?, final_status=?, arret=?
                WHERE id=?""",
-            (finished_at, rounds, int(approved), final_status, run_id),
+            (finished_at, rounds, int(approved), final_status, arret, run_id),
         )
         await db.commit()
 
@@ -217,9 +222,10 @@ async def solder_les_runs_orphelins(db_path: Path | str) -> list[str]:
             )
             await db.execute(
                 """UPDATE pipeline_runs
-                   SET finished_at=?, rounds=?, approved=0, final_status='blocked'
+                   SET finished_at=?, rounds=?, approved=0, final_status='blocked',
+                       arret=?
                    WHERE id=?""",
-                (maintenant, int(rounds or 0), run_id),
+                (maintenant, int(rounds or 0), CAUSE_RUN_ORPHELIN, run_id),
             )
         await db.commit()
     return [str(run_id) for run_id, _ in orphelins]
@@ -276,7 +282,7 @@ async def list_runs(
         db.row_factory = aiosqlite.Row
         async with db.execute(
             """SELECT pr.id, pr.ticket_id, pr.started_at, pr.finished_at,
-                      pr.rounds, pr.approved, pr.final_status,
+                      pr.rounds, pr.approved, pr.final_status, pr.arret,
                       COALESCE(SUM(ac.cost_usd), 0.0) as total_cost_usd
                FROM pipeline_runs pr
                LEFT JOIN agent_calls ac ON ac.run_id = pr.id
@@ -300,6 +306,7 @@ async def list_runs(
             "rounds": row["rounds"],
             "approved": bool(row["approved"]) if row["approved"] is not None else None,
             "final_status": row["final_status"],
+            "arret": row["arret"],
             "total_cost_usd": float(row["total_cost_usd"]),
         }
         for row in rows

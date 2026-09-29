@@ -405,6 +405,7 @@ export default function App() {
               activeTicket={ticket}
               running={running}
               githubRemote={project?.github_remote ?? null}
+              projectId={project?.id ?? null}
               onSelectTicket={handleSelectTicket}
               onRunPipeline={handleRunPipeline}
               onChangeStatus={handleChangeStatus}
