@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
+import { IconCross } from "../../design/icons";
 import KanbanColumn from "./KanbanColumn";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
-import type { Ticket, TicketStatus } from "../../types/api";
+import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
 
 const KANBAN_STATUSES: TicketStatus[] = [
   "todo",
@@ -21,6 +22,8 @@ interface KanbanViewProps {
   githubRemote?: string | null;
   /** Identifiant du projet actif, pour résoudre les arrêts des tickets bloqués (ticket-218). */
   projectId?: string | null;
+  /** Fichiers de ticket que le backend n'a pas pu parser (ticket-210). */
+  unreadable?: TicketUnreadable[];
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
@@ -32,6 +35,7 @@ export default function KanbanView({
   running,
   githubRemote,
   projectId,
+  unreadable = [],
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
@@ -65,6 +69,30 @@ export default function KanbanView({
           />
         ))}
       </div>
+      {unreadable.length > 0 && (
+        <div
+          className="border-t border-zinc-700 px-4 py-2"
+          data-testid="kanban-unreadable"
+        >
+          <p className="text-xs text-red-400 font-medium mb-1">
+            {unreadable.length} fichier{unreadable.length > 1 ? "s" : ""} illisible{unreadable.length > 1 ? "s" : ""}
+          </p>
+          <ul className="space-y-0.5">
+            {unreadable.map((u) => (
+              <li
+                key={u.file_path}
+                className="text-xs text-zinc-500"
+                title={u.error}
+                data-testid="kanban-unreadable-item"
+              >
+                <IconCross size={10} className="mr-1 inline text-red-500" />
+                <span className="font-mono">{u.file_path.split(/[\\/]/).pop()}</span>
+                <span className="ml-2 text-zinc-600">— {u.error}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

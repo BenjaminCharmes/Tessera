@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from pathlib import Path
@@ -86,6 +87,53 @@ async def test_list_tickets_skips_archive(tmp_path: Path) -> None:
     result = await _svc(tmp_path).list_tickets()
 
     assert len(result) == 1
+
+
+# ------------------------------------------------------------------
+# list_tickets_with_unreadable — ticket-210
+# ------------------------------------------------------------------
+
+
+async def test_list_tickets_with_unreadable_surfaces_missing_type(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A ticket-*.md without `type` appears in unreadable, not in tickets."""
+    bad = tmp_path / "tickets/todo/ticket-099-x.md"
+    bad.parent.mkdir(parents=True, exist_ok=True)
+    # Frontmatter without `type` — model validation will reject it.
+    bad.write_text(
+        "---\nid: ticket-099\ntitle: Bad ticket\nstatus: todo\npriority: medium\nagent: codeur\n---\n",
+        encoding="utf-8",
+    )
+    _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
+
+    with caplog.at_level(logging.WARNING, logger="tessera.services.ticket_service"):
+        tickets, unreadable = await _svc(tmp_path).list_tickets_with_unreadable()
+
+    # The valid ticket is listed; the broken file is not
+    assert len(tickets) == 1
+    assert tickets[0].id == "ticket-001"
+
+    # The unreadable file is surfaced with its path and an error mentioning `type`
+    assert len(unreadable) == 1
+    assert "ticket-099-x.md" in unreadable[0].file_path
+    assert "type" in unreadable[0].error.lower()
+
+    # A structured log entry was emitted
+    assert any("ticket_unreadable" in r.message for r in caplog.records)
+
+
+async def test_list_tickets_does_not_raise_on_unreadable(tmp_path: Path) -> None:
+    """list_tickets() silently skips bad files — backward-compatible."""
+    bad = tmp_path / "tickets/todo/ticket-099-x.md"
+    bad.parent.mkdir(parents=True, exist_ok=True)
+    bad.write_text(
+        "---\nid: ticket-099\ntitle: Bad\nstatus: todo\npriority: medium\nagent: codeur\n---\n",
+        encoding="utf-8",
+    )
+
+    result = await _svc(tmp_path).list_tickets()
+    assert result == []
 
 
 # ------------------------------------------------------------------

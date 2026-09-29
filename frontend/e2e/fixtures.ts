@@ -95,7 +95,8 @@ async function setupApiMocks(page: Page) {
 
   await page.route("/api/v1/projects/ide-core/tickets", async (route) => {
     if (route.request().method() === "GET") {
-      await route.fulfill({ json: TICKETS });
+      // Depuis le ticket-210, la liste arrive avec les fichiers illisibles.
+      await route.fulfill({ json: { tickets: TICKETS, unreadable: [] } });
     } else if (route.request().method() === "POST") {
       const body = route.request().postDataJSON() as { title: string };
       await route.fulfill({
@@ -108,7 +109,7 @@ async function setupApiMocks(page: Page) {
   });
 
   await page.route("/api/v1/projects/test-e2e/tickets", async (route) => {
-    await route.fulfill({ json: [] });
+    await route.fulfill({ json: { tickets: [], unreadable: [] } });
   });
 
   await page.route("/api/v1/projects/ide-core/runs*", async (route) => {

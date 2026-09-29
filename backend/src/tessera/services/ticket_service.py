@@ -12,7 +12,11 @@ from tessera.models.ticket import (
     TicketPriority,
     TicketStatus,
     TicketType,
+    TicketUnreadable,
 )
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 
 _STATUS_DIRS: dict[TicketStatus, str] = {
@@ -66,15 +70,30 @@ class TicketService:
     async def list_tickets(
         self, status: TicketStatus | None = None
     ) -> list[Ticket]:
+        """Return parseable tickets, logging unreadable files without raising."""
+        tickets, _ = await self.list_tickets_with_unreadable(status)
+        return tickets
+
+    async def list_tickets_with_unreadable(
+        self, status: TicketStatus | None = None
+    ) -> tuple[list[Ticket], list[TicketUnreadable]]:
+        """Return parseable tickets and files that could not be parsed."""
         tickets: list[Ticket] = []
+        unreadable: list[TicketUnreadable] = []
         for path in self._iter_active_files():
             try:
                 t = self._parse(path)
                 if status is None or t.status == status:
                     tickets.append(t)
-            except Exception:
-                continue
-        return sorted(tickets, key=lambda t: t.id)
+            except Exception as exc:
+                _logger.warning(
+                    "ticket_unreadable",
+                    extra={"path": str(path), "error": str(exc)},
+                )
+                unreadable.append(
+                    TicketUnreadable(file_path=str(path), error=str(exc))
+                )
+        return sorted(tickets, key=lambda t: t.id), unreadable
 
     async def get_ticket(self, ticket_id: str) -> Ticket | None:
         path = self._find_file(ticket_id)
