@@ -223,8 +223,8 @@ class Orchestrator:
         if refused is not None:
             return refused
 
-        await set_status(self, run, TicketStatus.in_progress)
         await stages.create_branch(self, run)
+        await set_status(self, run, TicketStatus.in_progress)
         run.carte_du_depot = await self._carte()
 
         # À partir d'ici une branche existe et les agents écrivent sur disque :

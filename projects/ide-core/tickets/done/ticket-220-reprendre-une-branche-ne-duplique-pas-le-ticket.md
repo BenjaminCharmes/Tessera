@@ -1,14 +1,14 @@
 ---
-id: ticket-220
-title: "Reprendre une branche de ticket ne duplique pas le fichier du ticket"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-28
+id: ticket-220
+pr_number: null
+priority: high
+status: done
+title: Reprendre une branche de ticket ne duplique pas le fichier du ticket
+type: fix
 ---
 
 # ticket-220 — Reprendre une branche ne duplique pas le ticket

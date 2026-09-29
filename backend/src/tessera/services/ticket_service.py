@@ -83,16 +83,31 @@ class TicketService:
     async def update_status(
         self, ticket_id: str, new_status: TicketStatus
     ) -> Ticket:
-        source = self._find_file(ticket_id)
-        if source is None:
+        sources = self._find_all_files(ticket_id)
+        if not sources:
             raise ValueError(f"Ticket introuvable : {ticket_id}")
 
         dest_dir = self._tickets_root() / _STATUS_DIRS[new_status]
         dest_dir.mkdir(parents=True, exist_ok=True)
-        dest = dest_dir / source.name
+        dest = dest_dir / sources[0].name
 
-        if source != dest:
-            source.rename(dest)
+        # Move one copy to the destination; delete any extra copies.
+        # `replace` is used instead of `rename` because on Windows `rename`
+        # raises `FileExistsError` when the destination already exists.
+        # Duplicates arise when a branch is resumed: the base branch holds
+        # the ticket in `todo/` and the ticket branch holds it in `blocked/`,
+        # and the `set_status` call runs after the branch switch so both
+        # copies are momentarily visible (ticket-220).
+        moved = False
+        for source in sources:
+            if source == dest:
+                moved = True
+                continue
+            if not moved:
+                source.replace(dest)
+                moved = True
+            else:
+                source.unlink()
 
         post = frontmatter.load(str(dest))
         post["status"] = new_status.value
@@ -248,6 +263,18 @@ class TicketService:
             if path.stem == ticket_id or path.stem.startswith(ticket_id + "-"):
                 return path
         return None
+
+    def _find_all_files(self, ticket_id: str) -> list[Path]:
+        """Return every active file matching `ticket_id`, across all status folders.
+
+        More than one result means a branch resume left a stale copy in another
+        folder (ticket-220).  `update_status` uses this list to consolidate them.
+        """
+        return [
+            path
+            for path in self._iter_active_files()
+            if path.stem == ticket_id or path.stem.startswith(ticket_id + "-")
+        ]
 
     def _next_n(self) -> int:
         max_n = 0
