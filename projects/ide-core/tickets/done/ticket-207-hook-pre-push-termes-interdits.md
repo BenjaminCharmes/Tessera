@@ -2,7 +2,7 @@
 id: ticket-207
 title: "Hook pre-push pour les commits manuels sur le dépôt Tessera"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -71,13 +71,13 @@ après le premier clone.
 
 ## Critères d'acceptation
 
-- [ ] `make install-hooks` copie le hook et le rend exécutable
-- [ ] Un `git push` manuel avec un terme dans un message de commit est bloqué,
+- [x] `make install-hooks` copie le hook et le rend exécutable
+- [x] Un `git push` manuel avec un terme dans un message de commit est bloqué,
       le message d'erreur contient `commit:<sha7>` et non le terme
-- [ ] Un `git push` sans `FORBIDDEN_TERMS` déclaré n'est pas bloqué
-- [ ] Le hook n'interfère pas avec les runs du pipeline (qui surchargent
+- [x] Un `git push` sans `FORBIDDEN_TERMS` déclaré n'est pas bloqué
+- [x] Le hook n'interfère pas avec les runs du pipeline (qui surchargent
       `core.hooksPath` de toute façon)
-- [ ] `CONTRIBUTING.md` mentionne `make install-hooks`
+- [x] `CONTRIBUTING.md` mentionne `make install-hooks`
 
 ## Ce que ça ne fait pas
 

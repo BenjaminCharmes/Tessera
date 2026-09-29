@@ -1,4 +1,4 @@
-.PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run stop verify test test-fast test-coverage lint clean
+.PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run stop verify test test-fast test-coverage lint clean install-hooks
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Tessera — Makefile
@@ -18,6 +18,7 @@ help:
 	@echo "  make test         — Lance la suite de tests"
 	@echo "  make lint         — Type-check avec mypy"
 	@echo "  make clean        — Supprime les artefacts de build et cache"
+	@echo "  make install-hooks — Installe les hooks git locaux (recommandé après le premier clone)"
 	@echo ""
 
 setup:
@@ -99,6 +100,11 @@ test-coverage:
 
 lint:
 	cd backend && uv run mypy src/ && uv run mypy --platform linux src/
+
+install-hooks:
+	cp scripts/hooks/pre-push .git/hooks/pre-push
+	chmod +x .git/hooks/pre-push
+	@echo "→ Hook pre-push installé dans .git/hooks/"
 
 clean:
 	find . -type d -name "__pycache__" -not -path "*/.venv/*" -exec rm -rf {} + 2>/dev/null || true
