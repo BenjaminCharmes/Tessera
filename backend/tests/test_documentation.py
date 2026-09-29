@@ -399,3 +399,63 @@ async def test_sans_ticket_nouveau_aucun_appel(tmp_path: Path) -> None:
 
     assert provider.appels == []
     assert resultat.fichiers_modifies == []
+
+
+# ------------------------------------------------------------------
+# ticket-228 : les agents voient les fichiers qu'ils modifient
+# ------------------------------------------------------------------
+
+
+async def test_brief_contient_une_section_du_readme(tmp_path: Path) -> None:
+    """Le message envoyé au provider contient le texte d'une section de README.md."""
+    _ticket(tmp_path, "ticket-001")
+    _avec_marqueur(tmp_path)
+    (tmp_path / "README.md").write_text(
+        "# Mon projet\n\n## Pipeline\n\nLe pipeline enchaîne les agents.\n",
+        encoding="utf-8",
+    )
+    svc, provider = _service(tmp_path, ['{"editions": []}', '{"editions": []}'])
+
+    await svc.mettre_a_jour(tmp_path)
+
+    msg = str(provider.appels[0]["user"])
+    assert "Le pipeline enchaîne les agents." in msg
+
+
+async def test_brief_contient_fichier_docs_sous_son_chemin_relatif(tmp_path: Path) -> None:
+    """Un fichier docs/ apparaît sous son chemin relatif dans le message."""
+    _ticket(tmp_path, "ticket-001")
+    _avec_marqueur(tmp_path)
+    _doc(tmp_path, "architecture.md", "# Architecture\n\nSection initiale.\n")
+    svc, provider = _service(tmp_path, ['{"editions": []}', '{"editions": []}'])
+
+    await svc.mettre_a_jour(tmp_path)
+
+    msg = str(provider.appels[0]["user"])
+    assert "docs/architecture.md" in msg
+    assert "Section initiale." in msg
+
+
+def test_fichier_trop_long_remplace_par_ses_titres_et_borne_respectee(
+    tmp_path: Path,
+) -> None:
+    """Au-delà de la borne, un fichier est remplacé par ses titres et le message
+    ne dépasse pas la borne."""
+    from tessera.services.documentation import _contenu_documentable
+
+    corps = "paragraphe " * 500  # ~5 500 caractères de corps
+    (tmp_path / "README.md").write_text(
+        f"# Grand titre\n\n## Section A\n\n{corps}",
+        encoding="utf-8",
+    )
+
+    borne = 200
+    contenu = _contenu_documentable(tmp_path, borne=borne)
+
+    # Les titres sont présents, pas le corps répété
+    assert "# Grand titre" in contenu
+    assert "## Section A" in contenu
+    assert "titres uniquement" in contenu
+    assert "paragraphe " * 10 not in contenu
+    # La section documentation reste dans la borne (+ tolérance pour les en-têtes fixes)
+    assert len(contenu) <= borne + len("\n---\nDocumentation actuelle :\n\n### README.md\n\n") + 100
