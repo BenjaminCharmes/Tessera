@@ -74,6 +74,14 @@ class ProviderEnregistrant:
         # `name` comme variable, et mypy refuse une lecture seule à sa place.
         self.name: str = inner.name
 
+    def __getattr__(self, nom: str) -> Any:
+        """Forward any other attribute to the inner provider.
+
+        Callers inspect provider settings (`_allowed_tools`, `_tools`…); an
+        envelope that hid them would change what they see.
+        """
+        return getattr(self._inner, nom)
+
     @property
     def quota(self) -> Any:
         """Forward the subscription quota if the inner provider tracks one."""

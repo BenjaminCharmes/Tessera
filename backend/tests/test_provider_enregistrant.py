@@ -121,12 +121,13 @@ async def test_securite_et_validateur_dans_agent_calls(tmp_path: Path) -> None:
 
     # Validateur — idem
     validator_provider = ProviderEnregistrant(
-        FakeProvider(content='{"criteria":[],"feedback":"ok","verdict":"APPROVED"}'),
+        FakeProvider(content='{"criteria":[{"criterion":"Returns 200","passed":true,"note":""}]}'),
         role="validateur",
         db_path=db_path,
     )
     validator = ValidatorService(validator_provider, prompts)
-    await validator.validate(criteria=[], code_produced="code", test_result=None)
+    # Sans critère, le validateur approuve sans appeler le modèle : rien à enregistrer.
+    await validator.validate(criteria=["Returns 200"], code_produced="code", test_result=None)
 
     async with aiosqlite.connect(str(db_path)) as db:
         async with db.execute(

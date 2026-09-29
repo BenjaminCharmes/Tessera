@@ -9,6 +9,7 @@ from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.adr import adr_pertinents
 from tessera.services.agent_registry import AgentNotFoundError, AgentRegistryService
 from tessera.services.cost_calculator import calculate_cost
+from tessera.services.database import save_agent_call
 from tessera.services.providers.base import (
     LLMProvider,
     ProviderResult,
@@ -164,9 +165,23 @@ class AgentRunner:
         # que celui demandé (ticket-188).
         modele_utilise = provider_result.model or model
 
-        # L'enregistrement en base se fait dans `ProviderEnregistrant`, qui
-        # enveloppe le provider et persiste chaque appel — ticket-211. Cette
-        # méthode n'appelle plus `save_agent_call` directement.
+        if run_id and self._db_path:
+            try:
+                await save_agent_call(
+                    self._db_path,
+                    run_id,
+                    ticket.id,
+                    role_str,
+                    modele_utilise,
+                    input_tokens,
+                    output_tokens,
+                    cache_read_tokens,
+                    cost_usd,
+                    duration_ms,
+                    provider=provider_result.provider_name,
+                )
+            except Exception as exc:
+                _logger.warning("agent_call_save_failed", extra={"error": str(exc)})
 
         return AgentResult(
             role=role_str,

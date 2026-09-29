@@ -58,22 +58,23 @@ doc-fonctionnelle) qui
 
 ### Enregistrement automatique des appels
 
-Chaque appel au protocole `LLMProvider` — via `complete()` ou `stream()` — est
-enregistré automatiquement dans `agent_calls` avec `run_id`, `ticket_id`, `role`,
-`model` et le **provider qui a effectivement répondu**. Cet enregistrement ne
-demande aucune action au service : il est transparent et vaut pour tous les
-rôles — codeur, reviewer, sécurité, validateur, documentation, analyste de projet,
-créateur d'agent.
+Chaque appel LLM d'un run est enregistré dans `agent_calls` avec `run_id`,
+`ticket_id`, `role`, `model` et le **provider qui a effectivement répondu**, par
+deux chemins qui ne se recouvrent pas :
+
+- le codeur et le reviewer passent par `AgentRunner`, qui enregistre lui-même ;
+- la sécurité, le validateur et la documentation appellent leur provider
+  directement : `ProviderEnregistrant` enveloppe ce provider et enregistre à
+  leur place, sans que le service le sache.
 
 Si un rôle est déclaré sur Ollama mais que le serveur est indisponible, le
 provider enregistré est "agent_sdk" (Claude), avec le modèle du repli et son
 coût réel. Ollama tourne à coût nul : un appel Ollama enregistre `cost_usd = 0.0`
 (ADR-046).
 
-Les appels hors run — chat, analyse de projet — n'ont pas de `run_id` : la table
-`agent_calls` les enregistre avec `run_id = NULL`, de sorte qu'une requête
-`SELECT … WHERE run_id = ?` ne les mélange jamais avec les appels d'un pipeline
-spécifique.
+Les appels hors run — chat, analyse de projet — n'ont pas de `run_id` et ne
+sont pas écrits dans `agent_calls` : ils ne peuvent donc jamais se mélanger aux
+appels d'un pipeline.
 
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
@@ -230,16 +231,20 @@ CREATE TABLE agent_events (
     ts        TEXT NOT NULL
 );
 
--- Enregistrement de chaque appel LLM — tous les rôles, tous les runs
+-- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/database.py)
 CREATE TABLE agent_calls (
-    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    run_id    TEXT,                  -- NULL pour les appels hors run (chat, analyse)
-    ticket_id TEXT,                  -- Renseigné pour les appels d'un pipeline
-    role      TEXT NOT NULL,         -- "codeur" | "reviewer" | "securite" | "validateur" | ...
-    model     TEXT NOT NULL,         -- Modèle utilisé : "claude-sonnet-4-6" | "qwen3-coder:30b" | ...
-    provider  TEXT NOT NULL,         -- "agent_sdk" | "anthropic_api" | "ollama"
-    cost_usd  REAL NOT NULL,         -- 0.0 pour ollama, valeur effective sinon
-    ts        TEXT NOT NULL          -- ISO 8601
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id            TEXT NOT NULL REFERENCES pipeline_runs(id),
+    ticket_id         TEXT NOT NULL,
+    role              TEXT NOT NULL,   -- "codeur" | "reviewer" | "securite" | "validateur" | ...
+    model             TEXT NOT NULL,   -- modèle qui a répondu, repli compris
+    input_tokens      INTEGER NOT NULL DEFAULT 0,
+    output_tokens     INTEGER NOT NULL DEFAULT 0,
+    cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+    cost_usd          REAL NOT NULL DEFAULT 0.0,  -- 0.0 pour ollama ; estimation sinon
+    duration_ms       INTEGER NOT NULL DEFAULT 0,
+    created_at        TEXT NOT NULL,
+    provider          TEXT NOT NULL DEFAULT ''    -- ajoutée par migration
 );
 ```
 

@@ -147,9 +147,11 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # (ticket-188). Le reviewer relit : le sien est réduit à la lecture. Les
     # services texte→JSON n'ont aucun usage des outils fichier (ticket-044
     # review, finding 4).
-    # Chaque provider est enveloppé dans `ProviderEnregistrant` pour que tout
-    # appel LLM du run — codeur, sécurité, reviewer, validateur, documentation
-    # — soit persisté dans `agent_calls` (ticket-211).
+    # `AgentRunner` enregistre lui-même les appels du codeur et du reviewer.
+    # Les services sans outils — sécurité, validateur, documentation —
+    # appellent le provider directement : `ProviderEnregistrant` les enregistre
+    # à leur place (ticket-211). Envelopper aussi les premiers les compterait
+    # deux fois.
     def _par_role(role: str) -> LLMProvider:
         outils = OUTILS_DE_RELECTURE if role == "reviewer" else None
         tours = settings.llm_max_turns_reviewer if role == "reviewer" else None
@@ -157,7 +159,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
             project_id=project_id, max_turns=tours,
         )
-        return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
+        return inner
 
     def _sans_outils(role: str) -> LLMProvider:
         inner = provider_pour_role(

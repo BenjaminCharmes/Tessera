@@ -18,10 +18,6 @@ from tessera.services.agent_runner import (
 )
 from tessera.services.cost_calculator import calculate_cost
 from tessera.services.database import create_run, init_db
-from tessera.services.providers.enregistrant import (
-    ProviderEnregistrant,
-    activer_enregistrement,
-)
 
 
 # ------------------------------------------------------------------
@@ -287,18 +283,17 @@ async def test_run_persiste_le_cout_rapporte_par_le_provider(tmp_path: Path) -> 
     run_id = await create_run(db_path, "project-1", "ticket-001")
 
     provider = FakeProvider(tokens=100, cost_usd=0.042)
-    wrapped = ProviderEnregistrant(provider, role="codeur", db_path=db_path)
     prompts = tmp_path / "prompts"
     prompts.mkdir(exist_ok=True)
     (prompts / "codeur.md").write_text("Tu es le codeur.", encoding="utf-8")
     registry = AgentRegistryService(prompts)
-    runner = AgentRunner(wrapped, registry)
+    runner = AgentRunner(provider, registry, db_path=db_path)
 
-    activer_enregistrement(run_id, "ticket-001")
     await runner.run(
         role=AgentRole.codeur,
         ticket=_make_ticket(),
         project_context="ctx",
+        run_id=run_id,
     )
 
     async with aiosqlite.connect(str(db_path)) as db:
@@ -319,18 +314,17 @@ async def test_run_calcule_le_cout_quand_le_provider_ne_le_rapporte_pas(
     run_id = await create_run(db_path, "project-1", "ticket-001")
 
     provider = FakeProvider(tokens=100)  # cost_usd=None par défaut
-    wrapped = ProviderEnregistrant(provider, role="codeur", db_path=db_path)
     prompts = tmp_path / "prompts"
     prompts.mkdir(exist_ok=True)
     (prompts / "codeur.md").write_text("Tu es le codeur.", encoding="utf-8")
     registry = AgentRegistryService(prompts)
-    runner = AgentRunner(wrapped, registry)
+    runner = AgentRunner(provider, registry, db_path=db_path)
 
-    activer_enregistrement(run_id, "ticket-001")
     await runner.run(
         role=AgentRole.codeur,
         ticket=_make_ticket(),
         project_context="ctx",
+        run_id=run_id,
     )
 
     async with aiosqlite.connect(str(db_path)) as db:
