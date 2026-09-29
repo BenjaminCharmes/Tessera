@@ -55,7 +55,6 @@ service n'a alors pas à y penser. `provider` enregistre le provider qui a
       `provider = "ollama"`
 - [ ] Aucun service n'appelle `save_agent_call` directement en dehors du point
       d'enregistrement unique
-- [ ] `uv run pytest` passe
 
 ## Dépendances
 

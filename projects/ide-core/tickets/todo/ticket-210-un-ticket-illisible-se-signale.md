@@ -54,7 +54,6 @@ frontmatter est exigé, et rien ne vérifie ce qu'ils écrivent.
 - [ ] L'UI affiche un ticket rejeté avec sa raison (test Vitest)
 - [ ] `agents/prompts/architect.md` liste `id`, `title`, `type`, `status`,
       `priority` et `agent` comme obligatoires, avec les valeurs de `type`
-- [ ] `uv run pytest` et `npm run test` passent
 
 ## Dépendances
 

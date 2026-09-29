@@ -86,6 +86,13 @@ produit. C'est la seule partie du ticket qui est mécaniquement contrôlée.
 Un critère qu'on ne peut pas trancher par oui/non produit une validation molle
 et un reviewer qui refuse en boucle.
 
+**Pas de « `uv run pytest` passe » ni de « `npm run test` passe »** tant que le
+testeur est désactivé sur le projet : le validateur ne reçoit alors aucun
+résultat de test, juge le critère invérifiable, et depuis le ticket-209 un
+critère invérifiable fait refuser le run (ticket-219). Nommer plutôt le test
+qui doit exister ; faire tourner les suites relève de la vérification avant
+merge.
+
 ## Portée
 
 Un ticket = **un changement cohérent**. Si les critères d'acceptation couvrent

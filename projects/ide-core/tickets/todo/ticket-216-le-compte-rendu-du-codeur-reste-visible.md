@@ -30,7 +30,6 @@ Quand le codeur est terminé et que les tokens reçus sont vides, ou plus courts
 - [ ] Un test Vitest : bloc codeur terminé, sans tokens, avec un contenu `agent_done` → le texte du compte rendu est rendu
 - [ ] Un test Vitest : tokens reçus en direct → ils restent affichés comme aujourd'hui (non-régression)
 - [ ] Le compte rendu est replié par défaut, et un clic le déplie
-- [ ] `npm run test` passe
 
 ## Dépendances
 
