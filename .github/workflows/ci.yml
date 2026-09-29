@@ -14,6 +14,9 @@ on:
     # `develop` est la cible par défaut des PR de ticket (ADR — ticket-049) :
     # sans elle ici, une PR vers develop ne déclenche aucun check.
     branches: [main, develop]
+    # `edited` : un titre ou un corps de PR modifié peut introduire un terme
+    # interdit, et c'est aussi ce que la publication expose (ticket-230).
+    types: [opened, synchronize, reopened, edited]
 
 # Une nouvelle poussée rend la précédente inutile : l'annuler évite de payer
 # un run dont personne ne lira le résultat.
@@ -31,6 +34,26 @@ permissions:
   pull-requests: write
 
 jobs:
+
+  termes-interdits:
+    # ADR-048 côté GitHub : ce que la PR publierait — lignes ajoutées,
+    # messages, auteurs et committers, titre et corps — contre la liste gardée
+    # en secret. Toujours sur un runner GitHub : c'est lui qui porte le secret.
+    # Requis par la protection de `develop` et de `main` (ticket-230).
+    name: Termes interdits (ADR-048)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Contrôler la PR
+        env:
+          FORBIDDEN_TERMS: ${{ secrets.FORBIDDEN_TERMS }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: python3 scripts/termes_interdits_ci.py
 
   backend:
     name: Backend (pytest)

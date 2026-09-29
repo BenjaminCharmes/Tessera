@@ -446,3 +446,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : un rôle déclaré `"web": true` dans `agents.json` reçoit `WebFetch` et `WebSearch` et perd `Bash`, principal comme repli. `par_role.outils_du_role` est le seul endroit qui compose ces outils ; un rôle sans outils ne gagne rien.
 **Raison** : une page lue peut porter des instructions, et on ne sait pas filtrer une page. Avec `Bash` et `acceptEdits`, l'agent aurait de quoi les exécuter — un `curl` suffit à faire sortir un fichier. Sans shell, une injection ne peut plus qu'écrire dans le périmètre, sous relecture.
 **Alternative rejetée** : un MCP de documentation — une dépendance et un réseau de plus au démarrage, pour un besoin que le CLI couvre ; le web au codeur — c'est le rôle qui a le plus besoin de `Bash`.
+
+---
+
+## ADR-050 — Un terme interdit est arrêté à trois portes, et une porte qui n'a pas pu juger refuse
+
+**Date** : 2026-09-29
+**Décision** : `FORBIDDEN_TERMS` (`.env`, jamais versionné) est contrôlé au push du pipeline (ADR-048), par un hook `pre-push` pour les pushes manuels, et en CI sur chaque PR — titre et corps compris — avec la liste en secret GitHub. Le job CI est requis par la protection de `develop` et `main`. Liste absente ou git en échec : refus. Avant toute publication, `scripts/scan_historique.py` couvre l'historique et les métadonnées GitHub.
+**Raison** : une seule porte se contourne sans le vouloir : push à la main, agent d'une autre session, corps de PR.
+**Alternative rejetée** : la CI seule — elle voit la PR après le push, quand la branche est déjà publique.
+**Conséquence assumée** : la liste vaut partout, son périmètre se déclare — `confidentiality: professional`, un CV qui cite ses employeurs.
