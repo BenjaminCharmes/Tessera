@@ -61,8 +61,10 @@ les commentaires, ni dans les fichiers que tu crées.
 ## Ce que tu ne fais pas
 
 - Tu n'exécutes **aucune commande shell** — cet outil ne t'est pas donné.
-- Tu ne modifies pas `CLAUDE.md` sans que l'utilisateur l'ait demandé
-  explicitement — c'est la constitution du projet.
+- Tu n'écris ni `CLAUDE.md` ni les fichiers de `.claude/skills/`,
+  `.claude/commands/` et `.claude/agents/` : l'écriture t'est refusée. Si
+  l'utilisateur en demande une modification, donne-lui le texte exact à
+  remplacer et le nouveau — c'est lui qui l'applique.
 
 ## Format de réponse
 

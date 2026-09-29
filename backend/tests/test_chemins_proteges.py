@@ -153,6 +153,58 @@ async def test_les_voisins_legitimes_passent(tmp_path: Path, relatif: str) -> No
     assert sortie == {}, relatif
 
 
+@pytest.mark.parametrize(
+    "relatif",
+    [
+        "CLAUDE.md",
+        "sous/dossier/CLAUDE.md",
+        "CLAUDE.local.md",
+        ".claude/skills/verifier/SKILL.md",
+        ".claude/commands/ship.md",
+        ".claude/agents/relecteur.md",
+    ],
+)
+async def test_les_fichiers_de_consignes_sont_proteges(
+    tmp_path: Path, relatif: str
+) -> None:
+    # Ticket-240 : le CLI charge ces fichiers dans chaque session. Les réécrire
+    # pendant un run change la consigne de tous les agents suivants.
+    projet = _projet(tmp_path)
+    hook = hook_refus_hors_perimetre(projet)
+
+    sortie = await hook(
+        {"tool_name": "Write", "tool_input": {"file_path": str(projet / relatif)}},
+        None,
+        None,
+    )
+
+    assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny", relatif
+
+
+@pytest.mark.parametrize("relatif", ["docs/CLAUDE-notes.md", "frontend/.claude/notes.md"])
+async def test_les_voisins_des_consignes_passent(tmp_path: Path, relatif: str) -> None:
+    projet = _projet(tmp_path)
+    hook = hook_refus_hors_perimetre(projet)
+
+    sortie = await hook(
+        {"tool_name": "Write", "tool_input": {"file_path": str(projet / relatif)}},
+        None,
+        None,
+    )
+
+    assert sortie == {}, relatif
+
+
+def test_le_motif_de_claude_md_dit_qu_il_est_charge_partout(tmp_path: Path) -> None:
+    projet = _projet(tmp_path)
+
+    motif = motif_de_protection(str(projet / "CLAUDE.md"), projet, projet)
+
+    assert motif is not None
+    assert "CLAUDE.md" in motif
+    assert "chaque session" in motif
+
+
 def test_le_motif_nomme_ce_qui_est_protege(tmp_path: Path) -> None:
     projet = _projet(tmp_path)
 
