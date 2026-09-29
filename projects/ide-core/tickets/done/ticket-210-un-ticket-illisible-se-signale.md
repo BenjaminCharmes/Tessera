@@ -4,7 +4,7 @@ created: 2026-09-28
 depends_on: []
 estimated_days: 1
 id: ticket-210
-pr_number: null
+pr_number: 102
 priority: high
 status: done
 title: Un fichier de ticket illisible se signale au lieu de disparaître
