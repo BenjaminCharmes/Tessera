@@ -3,7 +3,7 @@ id: ticket-034
 title: "Agent doc-updater — mise à jour automatique de la documentation"
 type: feat
 status: done
-pr_number: 45
+pr_number: null
 priority: medium
 agent: codeur
 depends_on:

@@ -50,6 +50,24 @@ def _client() -> TestClient:
     return TestClient(app)
 
 
+def test_arret_du_run_expose_dans_l_activite(workspace: Path) -> None:
+    # ticket-218 — un run clos avec `arret` → l'activité du ticket l'expose.
+    async def _seed() -> None:
+        run_id = await create_run(settings.ide_db_path, "mon-projet", "ticket-042")
+        await finish_run(
+            settings.ide_db_path, run_id, 30, False, "blocked",
+            "Reached maximum number of turns (30)",
+        )
+
+    asyncio.run(_seed())
+
+    body = _client().get("/api/v1/projects/mon-projet/tickets/ticket-042/activity").json()
+
+    assert len(body["runs"]) == 1
+    assert body["runs"][0]["arret"] == "Reached maximum number of turns (30)"
+    assert body["runs"][0]["final_status"] == "blocked"
+
+
 def test_un_ticket_sans_run_n_a_rien_a_montrer(workspace: Path) -> None:
     body = _client().get("/api/v1/projects/mon-projet/tickets/ticket-042/activity").json()
 

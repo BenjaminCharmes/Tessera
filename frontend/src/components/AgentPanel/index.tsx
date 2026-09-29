@@ -61,6 +61,15 @@ export default function AgentPanel({
       )
       .at(-1) ?? "";
 
+  // Compte rendu complet du codeur : rejoué après reconnexion (ticket-216, ADR-041).
+  const codeurDoneContent =
+    events
+      .filter((e) => e.type === "agent_done" && e.agent === "codeur")
+      .map((e) =>
+        typeof e.data["content"] === "string" ? e.data["content"] : "",
+      )
+      .at(-1) ?? "";
+
   const startTs = events.find((e) => e.type === "agent_started")?.timestamp;
   const endTs = events.find((e) => e.type === "pipeline_done")?.timestamp;
   const durationMs =
@@ -129,6 +138,7 @@ export default function AgentPanel({
                 tokens={currentTokens}
                 isActive={currentAgent === "codeur"}
                 isDone={coderDone}
+                doneContent={codeurDoneContent || undefined}
               />
             )}
 

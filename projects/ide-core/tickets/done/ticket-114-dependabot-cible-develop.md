@@ -3,7 +3,7 @@ id: ticket-114
 title: "Dependabot ouvre ses PR vers develop, comme tout le monde"
 type: fix
 status: done
-pr_number: 130
+pr_number: null
 priority: medium
 agent: codeur
 depends_on: ["ticket-108"]

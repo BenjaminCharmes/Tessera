@@ -110,6 +110,30 @@ describe("KanbanColumn", () => {
   });
 });
 
+describe("KanbanColumn — infobulle d'arrêt (ticket-218)", () => {
+  it("transmet l'arrêt au badge de statut d'un ticket bloqué", () => {
+    const blocked: typeof T1 = {
+      ...T1,
+      id: "ticket-blocked",
+      title: "Un ticket bloqué",
+      status: "blocked",
+    };
+    render(
+      <KanbanColumn
+        status="blocked"
+        tickets={[blocked]}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        blockedArrets={{ "ticket-blocked": "Reached maximum number of turns (30)" }}
+      />,
+    );
+    const badge = screen.getByText("blocked");
+    expect(badge).toHaveAttribute("title", "Reached maximum number of turns (30)");
+  });
+});
+
 describe("KanbanColumn — glisser-déposer (ticket-194)", () => {
   function deposer(statutDepuis: string, id = "ticket-001") {
     return {

@@ -294,6 +294,60 @@ describe("TicketCard", () => {
     });
   });
 
+  it("stops polling a PR the server reports as not found", async () => {
+    // ticket-217 : un pr_number hérité d'un autre dépôt renvoie 404. La carte
+    // réessayait toutes les 30 s, sur 106 cartes à la fois.
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatus")
+        .mockRejectedValue(new Error("API 404: PR #132 introuvable"));
+
+      render(
+        <TicketCard
+          ticket={{ ...base, pr_number: 132 }}
+          isActive={false}
+          isRunning={false}
+          githubRemote="owner/repo"
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+        />,
+      );
+      await vi.advanceTimersByTimeAsync(0);
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(5 * 60_000);
+      expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps polling after a transient server error", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatus")
+        .mockRejectedValue(new Error("API 502: Bad Gateway"));
+
+      render(
+        <TicketCard
+          ticket={{ ...base, pr_number: 7 }}
+          isActive={false}
+          isRunning={false}
+          githubRemote="owner/repo"
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+        />,
+      );
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(spy).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("n'offre pas la file sur un ticket deja termine", () => {
     // ticket-115 : le bouton « Lancer » etait bien cache sur un `done`, pas
     // celui de la file — et run_queue ne regardait pas le statut. Le ticket
@@ -336,6 +390,52 @@ describe("TicketCard", () => {
     expect(
       screen.getByRole("button", { name: "Ajouter à la file" }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("TicketCard — infobulle d'arrêt (ticket-218)", () => {
+  it("une carte blocked porte l'arrêt dans son attribut title", () => {
+    render(
+      <TicketCard
+        ticket={{ ...base, status: "blocked" }}
+        arret="Reached maximum number of turns (30)"
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    const badge = screen.getByText("blocked");
+    expect(badge).toHaveAttribute("title", "Reached maximum number of turns (30)");
+  });
+
+  it("une carte blocked sans arrêt n'a pas de title", () => {
+    render(
+      <TicketCard
+        ticket={{ ...base, status: "blocked" }}
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    const badge = screen.getByText("blocked");
+    expect(badge).not.toHaveAttribute("title");
+  });
+
+  it("une carte non-blocked ignore l'arrêt", () => {
+    render(
+      <TicketCard
+        ticket={{ ...base, status: "todo" }}
+        arret="quelque chose"
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    const badge = screen.getByText("todo");
+    expect(badge).not.toHaveAttribute("title");
   });
 });
 

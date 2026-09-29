@@ -15,7 +15,10 @@ class Project(BaseModel):
     active_agents: list[str] = Field(default_factory=list)
     stack: str | None = None
     raw_claude_md: str = ""
+    #: Always 'owner/repo' after loading, regardless of the raw form in agents.json.
     github_remote: str | None = None
+    #: The forge name derived from github_remote ('GitHub', 'GitLab', …).
+    github_forge: str | None = None
     #: Le rangement déclaré dans `agents.json`. Une catégorie se déclare, elle
     #: ne se devine pas : ni le nom du dossier ni l'URL du dépôt ne disent à
     #: quoi sert un projet — c'est le raisonnement d'ADR-042 pour les commandes

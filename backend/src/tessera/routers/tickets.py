@@ -1,12 +1,12 @@
 from typing import Literal
 
+import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.github_workflow import forge_supportee, nom_de_la_forge
 from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
-from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketStatus, TicketStatusUpdate
+from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.services.github_service import GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
 from tessera.services.database import list_runs
@@ -29,12 +29,13 @@ def _svc(project_id: str) -> TicketService:
     return TicketService(settings.ide_workspace_dir / project_id, project_id)
 
 
-@router.get("/{project_id}/tickets", response_model=list[Ticket])
+@router.get("/{project_id}/tickets", response_model=TicketListResponse)
 async def list_tickets(
     project_id: str, status: str | None = None
-) -> list[Ticket]:
+) -> TicketListResponse:
     filter_status = _parse_status_filter(status)
-    return await _svc(project_id).list_tickets(filter_status)
+    tickets, unreadable = await _svc(project_id).list_tickets_with_unreadable(filter_status)
+    return TicketListResponse(tickets=tickets, unreadable=unreadable)
 
 
 def _parse_status_filter(status: str | None) -> TicketStatus | None:
@@ -217,7 +218,18 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
             detail=f"Aucune PR associée au ticket {ticket_id}.",
         )
 
-    status: PRStatus = await github_svc.get_pull_request_status(ticket.pr_number)
+    try:
+        status: PRStatus = await github_svc.get_pull_request_status(ticket.pr_number)
+    except httpx.HTTPStatusError as exc:
+        # Un pr_number hérité d'un autre dépôt n'existe pas ici : c'est un
+        # 404 définitif, pas une panne. En 500, la carte réessayait toutes les
+        # 30 s et brûlait le quota GitHub (ticket-217).
+        if exc.response.status_code == 404:
+            raise HTTPException(
+                status_code=404,
+                detail=f"PR #{ticket.pr_number} introuvable dans {project.github_remote}.",
+            ) from exc
+        raise
     return PrStatusResponse(
         state=status.state,
         ci_status=status.ci_status,
@@ -239,6 +251,8 @@ class TicketRunSummary(BaseModel):
     approved: bool | None = None
     final_status: str | None = None
     total_cost_usd: float = 0.0
+    #: La cause d'un blocage, quand il y en a eu une (ticket-218).
+    arret: str | None = None
 
 
 class TicketActivity(BaseModel):
@@ -310,6 +324,7 @@ async def get_ticket_activity(project_id: str, ticket_id: str) -> TicketActivity
             approved=bool(row["approved"]) if row.get("approved") is not None else None,
             final_status=row.get("final_status"),
             total_cost_usd=float(row.get("total_cost_usd") or 0.0),
+            arret=row.get("arret"),
         )
         for row in rows
         if row.get("ticket_id") == ticket_id
@@ -322,11 +337,12 @@ async def get_ticket_activity(project_id: str, ticket_id: str) -> TicketActivity
         project = None
 
     remote = getattr(project, "github_remote", None)
+    forge = getattr(project, "github_forge", None)
     return TicketActivity(
         ticket_id=ticket_id,
         runs=runs,
-        pr_supported=forge_supportee(remote),
-        forge=nom_de_la_forge(remote),
+        pr_supported=forge == "GitHub",
+        forge=forge,
         pr_number=ticket.pr_number,
         github_remote=remote,
         autonomy=lire_niveau(project_path).value,

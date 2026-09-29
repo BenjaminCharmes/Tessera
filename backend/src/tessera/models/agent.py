@@ -41,10 +41,17 @@ class AgentConfig(BaseModel):
     prompt_file: str
     active: bool = True
     max_instances: int = 1
+    #: Le rôle lit le web — `WebFetch`, `WebSearch` — et perd `Bash` en
+    #: échange (ticket-245). Faux par défaut.
+    web: bool = False
     # Le provider se déclare par rôle (ticket-188). Absent : le défaut du
     # backend, comme avant — un manifeste muet ne change pas de comportement.
     provider: str = "agent_sdk"
     fallback: FallbackConfig | None = None
+    #: Les skills que ce rôle peut charger (ticket-242). Vide : pas d'outil
+    #: `Skill`. La liste borne aussi ce que le CLI découvrirait seul — les
+    #: skills de la racine du dépôt et ceux qu'il intègre.
+    skills: list[str] = Field(default_factory=list)
 
 
 class AgentPipelineConfig(BaseModel):
@@ -62,8 +69,15 @@ class AgentPipelineConfig(BaseModel):
     max_review_rounds: int = 3
     testeur_enabled: bool = False
     test_command: str | None = None
+    #: Le dossier d'où la commande se lance, relatif au projet, et le temps
+    #: qu'elle a pour finir (ticket-241). Absents : le projet, 120 s.
+    test_cwd: str | None = None
+    test_timeout_s: int | None = None
     securite_enabled: bool = False
     validateur_enabled: bool = False
+    #: Le lot de documentation tient aussi le CLAUDE.md du projet, dans un
+    #: budget de taille (ticket-244). Faux par défaut : la consigne se déclare.
+    doc_claude_md: bool = False
 
 
 class AgentResult(BaseModel):

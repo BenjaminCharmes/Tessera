@@ -3,7 +3,7 @@ id: ticket-131
 title: "Consolider les ADR : archiver les choix éteints, fusionner les amendements"
 type: docs
 status: done
-pr_number: 153
+pr_number: null
 priority: medium
 agent: architect
 depends_on: []

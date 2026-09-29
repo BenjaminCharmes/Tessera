@@ -3,7 +3,7 @@ id: ticket-150
 title: "Un backend tué brutalement laisse ses services derrière lui"
 type: fix
 status: done
-pr_number: 169
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-149"]

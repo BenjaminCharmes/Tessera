@@ -81,6 +81,7 @@ class PipelineRunSummary(BaseModel):
     approved: bool | None = None
     final_status: str | None = None
     total_cost_usd: float = 0.0
+    arret: str | None = None
 
 
 class TicketUsage(BaseModel):
@@ -111,6 +112,9 @@ _MIGRATIONS: list[str] = [
     # 1 — ticket-188 : le provider qui a répondu, pour que la ventilation des
     # coûts dise ce qui a tourné quand un repli a servi.
     "ALTER TABLE agent_calls ADD COLUMN provider TEXT NOT NULL DEFAULT '';",
+    # 2 — ticket-218 : la cause d'un blocage, pour que l'activité du ticket
+    # l'expose sans fouiller les événements.
+    "ALTER TABLE pipeline_runs ADD COLUMN arret TEXT;",
 ]
 
 
@@ -172,14 +176,15 @@ async def finish_run(
     rounds: int,
     approved: bool,
     final_status: str,
+    arret: str | None = None,
 ) -> None:
     finished_at = datetime.now(timezone.utc).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
             """UPDATE pipeline_runs
-               SET finished_at=?, rounds=?, approved=?, final_status=?
+               SET finished_at=?, rounds=?, approved=?, final_status=?, arret=?
                WHERE id=?""",
-            (finished_at, rounds, int(approved), final_status, run_id),
+            (finished_at, rounds, int(approved), final_status, arret, run_id),
         )
         await db.commit()
 
@@ -217,9 +222,10 @@ async def solder_les_runs_orphelins(db_path: Path | str) -> list[str]:
             )
             await db.execute(
                 """UPDATE pipeline_runs
-                   SET finished_at=?, rounds=?, approved=0, final_status='blocked'
+                   SET finished_at=?, rounds=?, approved=0, final_status='blocked',
+                       arret=?
                    WHERE id=?""",
-                (maintenant, int(rounds or 0), run_id),
+                (maintenant, int(rounds or 0), CAUSE_RUN_ORPHELIN, run_id),
             )
         await db.commit()
     return [str(run_id) for run_id, _ in orphelins]
@@ -276,7 +282,7 @@ async def list_runs(
         db.row_factory = aiosqlite.Row
         async with db.execute(
             """SELECT pr.id, pr.ticket_id, pr.started_at, pr.finished_at,
-                      pr.rounds, pr.approved, pr.final_status,
+                      pr.rounds, pr.approved, pr.final_status, pr.arret,
                       COALESCE(SUM(ac.cost_usd), 0.0) as total_cost_usd
                FROM pipeline_runs pr
                LEFT JOIN agent_calls ac ON ac.run_id = pr.id
@@ -300,6 +306,7 @@ async def list_runs(
             "rounds": row["rounds"],
             "approved": bool(row["approved"]) if row["approved"] is not None else None,
             "final_status": row["final_status"],
+            "arret": row["arret"],
             "total_cost_usd": float(row["total_cost_usd"]),
         }
         for row in rows
@@ -432,6 +439,78 @@ async def conversation_cost_usd(
         )
         row = await cursor.fetchone()
     return round(float(row[0]) if row else 0.0, 10)
+
+
+class ConversationSummary(BaseModel):
+    """A conversation as the listing endpoint exposes it — ticket-224."""
+
+    conversation_id: str
+    title: str
+    last_activity: str
+    messages: list[ChatMessageRow]
+
+
+def _conversation_title(messages: list[ChatMessageRow], max_len: int = 60) -> str:
+    """First user message, truncated to max_len characters."""
+    for msg in messages:
+        if msg.role == "user":
+            return msg.content[:max_len]
+    return ""
+
+
+async def list_conversations(
+    db_path: Path | str, project_id: str
+) -> list[ConversationSummary]:
+    """All conversations for a project, most recent first — ticket-224."""
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            """SELECT conversation_id, MAX(ts) AS last_activity
+               FROM chat_messages
+               WHERE project_id = ?
+               GROUP BY conversation_id
+               ORDER BY MAX(ts) DESC""",
+            (project_id,),
+        ) as cursor:
+            conv_rows = await cursor.fetchall()
+
+        if not conv_rows:
+            return []
+
+        async with db.execute(
+            """SELECT conversation_id, role, content, cost_usd, ts
+               FROM chat_messages
+               WHERE project_id = ?
+               ORDER BY id""",
+            (project_id,),
+        ) as cursor:
+            msg_rows = await cursor.fetchall()
+
+    messages_by_conv: dict[str, list[ChatMessageRow]] = {}
+    for row in msg_rows:
+        conv_id = str(row["conversation_id"])
+        if conv_id not in messages_by_conv:
+            messages_by_conv[conv_id] = []
+        messages_by_conv[conv_id].append(
+            ChatMessageRow(
+                role=str(row["role"]),
+                content=str(row["content"]),
+                cost_usd=float(row["cost_usd"]),
+                ts=str(row["ts"]),
+            )
+        )
+
+    return [
+        ConversationSummary(
+            conversation_id=str(row["conversation_id"]),
+            title=_conversation_title(
+                messages_by_conv.get(str(row["conversation_id"]), [])
+            ),
+            last_activity=str(row["last_activity"]),
+            messages=messages_by_conv.get(str(row["conversation_id"]), []),
+        )
+        for row in conv_rows
+    ]
 
 
 async def get_usage_breakdown(

@@ -3,7 +3,7 @@ id: ticket-149
 title: "La sortie doit apparaître après le lancement, et on doit savoir à qui elle est"
 type: fix
 status: done
-pr_number: 168
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-148"]

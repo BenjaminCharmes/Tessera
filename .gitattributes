@@ -1,0 +1,3 @@
+
+# Un hook en CRLF lit « python3 » dans son shebang et bloque tout push (ticket-207).
+scripts/hooks/* text eol=lf

@@ -46,6 +46,10 @@ created: 2026-09-15
 ---
 ```
 
+Optionnel : `plan: true` fait passer le ticket par un tour de plan en lecture
+seule avant le code (ticket-243). À réserver aux tickets dont l'approche n'est
+pas évidente : c'est un appel de plus.
+
 `type` n'est pas cosmétique : le pipeline le réutilise comme **préfixe du
 message de commit** écrit dans le dépôt (`feat: ticket-050 — …`).
 
@@ -86,11 +90,24 @@ produit. C'est la seule partie du ticket qui est mécaniquement contrôlée.
 Un critère qu'on ne peut pas trancher par oui/non produit une validation molle
 et un reviewer qui refuse en boucle.
 
+**Pas de « `uv run pytest` passe » ni de « `npm run test` passe »** tant que le
+testeur est désactivé sur le projet : le validateur ne reçoit alors aucun
+résultat de test, juge le critère invérifiable, et depuis le ticket-209 un
+critère invérifiable fait refuser le run (ticket-219). Nommer plutôt le test
+qui doit exister ; faire tourner les suites relève de la vérification avant
+merge.
+
 ## Portée
 
 Un ticket = **un changement cohérent**. Si les critères d'acceptation couvrent
 deux sujets sans rapport, ce sont deux tickets. Le symptôme classique :
 « et aussi » dans l'objectif.
+
+Le codeur a un nombre d'actions borné (`LLM_MAX_TURNS`) : chaque lecture,
+recherche, édition ou lancement de test en consomme une. Un ticket qui touche
+backend **et** frontend avec plus de six critères se découpe — le ticket-213
+(quatre changements, neuf critères, deux couches) a épuisé ses trente actions
+avant d'avoir fini.
 
 ## Avant de valider
 

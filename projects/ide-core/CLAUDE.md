@@ -22,17 +22,21 @@ Ce qui sert vraiment avant d'écrire du code :
 
 ## Ce qui tourne réellement sur ce projet
 
-`agents.json` déclare `codeur` et `reviewer` dans le pipeline. Le testeur, la
-sécurité et le validateur sont **désactivés** ici — leurs `*_enabled` sont
-absents, donc faux. La documentation, elle, se met à jour par lot en fin de
-file (ADR-035), jamais par ticket.
+`agents.json` déclare `codeur` et `reviewer` dans le pipeline, et l'audit
+sécurité est **actif**, sur Claude : rejoué sur une faille réelle, le modèle
+local ne la voyait pas. Le validateur est **actif** depuis les tickets 209 et
+214 : il juge chaque critère, lu en entier. Le testeur est **désactivé** — son
+`testeur_enabled` est absent, donc faux. La documentation, elle, se met à jour
+par lot en fin de file (ADR-035), jamais par ticket.
 
-Ce n'est pas un oubli à corriger à la légère : les tests de ce dépôt vivent
-dans `backend/` et `frontend/`, au-dessus du dossier du projet, et
-`TestRunnerService` lance sa commande depuis le dossier du projet sans passer
-par un shell. Activer `testeur_enabled` demande donc un `test_command` qui
-atteigne `../../backend` par lui-même. Tant que ce n'est pas fait, le dire vaut
-mieux que laisser croire le contraire.
+Un run approuvé pousse sa branche et ouvre sa PR vers `develop`. Il ne se
+merge pas seul tant que la CI ne peut pas tourner : `merge` exige une CI verte.
+
+Les tests de ce dépôt vivent dans `backend/` et `frontend/`, au-dessus du
+dossier du projet. Depuis le ticket-241, `pipeline.test_cwd` (`../../backend`)
+et `pipeline.test_timeout_s` permettent de les atteindre ; activer le testeur
+reste une décision à part, parce qu'elle allonge chaque run de la durée de la
+suite.
 
 ## Stack spécifique à ce projet
 

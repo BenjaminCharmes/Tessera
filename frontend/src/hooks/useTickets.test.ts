@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { useTickets } from "./useTickets";
 import * as apiModule from "../lib/api";
-import type { OrchestratorEvent, Ticket } from "../types/api";
+import type { OrchestratorEvent, Ticket, TicketListResponse } from "../types/api";
 
 const TICKET_TODO: Ticket = {
   id: "ticket-001",
@@ -49,12 +49,14 @@ function makeEvent(
 }
 
 describe("useTickets", () => {
+  const DEFAULT_RESPONSE: TicketListResponse = {
+    tickets: [TICKET_TODO, TICKET_DONE],
+    unreadable: [],
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(apiModule.api.tickets.list).mockResolvedValue([
-      TICKET_TODO,
-      TICKET_DONE,
-    ]);
+    vi.mocked(apiModule.api.tickets.list).mockResolvedValue(DEFAULT_RESPONSE);
   });
 
   it("fetches tickets on mount", async () => {

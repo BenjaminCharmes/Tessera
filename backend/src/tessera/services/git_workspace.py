@@ -12,6 +12,7 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.services.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -164,6 +165,12 @@ class GitWorkspaceService:
         # the counterpart of `is_clean` ignoring untracked files: both ends
         # agree on what "not ours" means).
         self._preexisting_untracked: tuple[str, ...] = ()
+        # The commit from which the current ticket branch diverged from its
+        # base. On a fresh branch this equals `_base_ref`; on a resumed branch
+        # it is the merge-base of the branch and `_base_ref` (ticket-208). Used by `diff_depuis_base` to include all prior
+        # commits on the branch, not only the uncommitted work of the current
+        # turn.
+        self._fork_point: str | None = None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         """Create `ticket-<id>-<slug>` and switch to it; idempotent if it already exists.
@@ -183,8 +190,13 @@ class GitWorkspaceService:
         exists = await self._branch_exists(branch_name)
         if exists:
             await self._run("checkout", branch_name)
+            # Le point de départ d'une branche reprise se déduit de la base :
+            # aucune ref à tenir, et les branches créées avant ce correctif
+            # sont couvertes aussi (ticket-208).
+            self._fork_point = await self._merge_base(branch_name)
         else:
             await self._run("checkout", "-b", branch_name, self._base_ref)
+            self._fork_point = self._base_ref
         return branch_name
 
     async def advance_base_ref(self) -> None:
@@ -198,6 +210,51 @@ class GitWorkspaceService:
         base.
         """
         self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
+
+    # ------------------------------------------------------------------
+    # Fork point of a ticket branch — ticket-208
+    # ------------------------------------------------------------------
+
+    async def _merge_base(self, branch_name: str) -> str | None:
+        """Where `branch_name` left the base ref, or None if git cannot say."""
+        if self._base_ref is None:
+            return None
+        try:
+            return (await self._run("merge-base", branch_name, self._base_ref)).strip()
+        except GitCommandError as exc:
+            _logger.warning("fork_point_unknown", extra={"error": str(exc)})
+            return None
+
+    async def diff_depuis_base(self) -> str:
+        """Return the diff of the working tree against the branch's fork point.
+
+        On a fresh branch this is identical to `current_diff()`: the branch
+        was just created from the fork point, so HEAD is at that commit and
+        the two ranges coincide.
+
+        On a resumed branch (same ticket, second run) this extends the diff
+        to cover every commit already on the branch — security, reviewer and
+        validator then see the full accumulated work, not only the uncommitted
+        changes of the current turn (ticket-208).
+
+        Falls back to `current_diff()` when no fork point is known (no branch
+        was created through this service instance, or the
+        merge-base could not be computed).
+        """
+        base = self._fork_point
+        if base is None:
+            return await self.current_diff()
+
+        non_suivis = await self._untracked_files()
+        await self._run("add", "-A", "-N")
+        pathspec = (
+            ":/" if self._travaille_dans_le_parent() else ".",
+            *await self._exclude_pathspecs(),
+        )
+        try:
+            return await self._run("diff", base, "--", *pathspec)
+        finally:
+            await self._oublier_dans_l_index(non_suivis)
 
     async def _exclude_pathspecs(self) -> tuple[str, ...]:
         """Les `:(exclude)` à poser, sans ceux que le dépôt ignore déjà.
@@ -229,6 +286,40 @@ class GitWorkspaceService:
         await proc.communicate()
         return proc.returncode == 0
 
+    async def _purger_stage_ignoré(self) -> None:
+        """Retire de l'index les fichiers désormais couverts par `.gitignore`.
+
+        `git add -A` ne dé-stage pas les fichiers déjà dans l'index — même
+        stagés comme intent-to-add — si une règle `.gitignore` les couvre
+        après coup. Cette méthode ferme ce gap : les fichiers listés par
+        `git ls-files --cached --ignored` ne doivent pas finir dans le commit.
+
+        Les artefacts de tenue de livres (`_ORCHESTRATOR_ARTIFACT_PATHS`) sont
+        gérés par `commit_bookkeeping` et sont donc exclus ici.
+        """
+        try:
+            out = await self._run(
+                "ls-files", "--cached", "--ignored", "--exclude-standard"
+            )
+        except GitCommandError as exc:
+            _logger.warning("staged_ignored_list_failed", extra={"error": str(exc)})
+            return
+        to_remove = [
+            p for p in out.splitlines()
+            if p and not any(
+                p.startswith(a.rstrip("/")) for a in _ORCHESTRATOR_ARTIFACT_PATHS
+            )
+        ]
+        if not to_remove:
+            return
+        try:
+            await self._run("rm", "--cached", "--", *to_remove)
+        except GitCommandError as exc:
+            _logger.warning(
+                "staged_ignored_cleanup_failed",
+                extra={"error": str(exc), "paths": to_remove},
+            )
+
     async def _untracked_files(self) -> tuple[str, ...]:
         """Paths git reports as untracked (respecting .gitignore), as a tuple."""
         listing = await self._run("ls-files", "--others", "--exclude-standard")
@@ -247,6 +338,44 @@ class GitWorkspaceService:
         est refusé, c'est à l'utilisateur de trancher.
         """
         await self._run("push", "--set-upstream", "origin", branch_name)
+
+    async def commits_depuis_base(self, base: str, branch: str) -> list[CommitInfo]:
+        """Short SHA, message and author of each commit between base and branch.
+
+        Uses ``base..branch`` range so only commits reachable from ``branch``
+        but not from ``base`` are returned — exactly the commits the pipeline
+        added. Returns an empty list when the range is empty or when git fails
+        (missing refs, unborn repository).
+        """
+        try:
+            # Message complet (%B) et committer compris : un corps de commit
+            # ou un committer mal configuré publient autant qu'un sujet.
+            output = await self._run(
+                "log", f"{base}..{branch}",
+                "--pretty=format:%h%x1f%aN <%aE> | %cN <%cE>%x1f%B%x1e",
+            )
+        except GitCommandError:
+            return []
+        commits: list[CommitInfo] = []
+        for bloc in output.split("\x1e"):
+            bloc = bloc.strip()
+            if not bloc:
+                continue
+            parts = bloc.split("\x1f", 2)
+            if len(parts) != 3:  # noqa: PLR2004
+                continue
+            sha7, auteur, message = parts
+            commits.append(CommitInfo(sha7=sha7, message=message.strip(), auteur=auteur))
+        return commits
+
+    async def diff_de_branche(self, base: str, branch: str) -> str:
+        """What `branch` commits on top of `base` — what a push publishes.
+
+        ``base...branch`` diffs from their merge-base, so work already on the
+        base is not counted twice. A failure raises: the push check must not
+        pass on a diff it could not read.
+        """
+        return await self._run("diff", f"{base}...{branch}")
 
     async def rejouer_sur(
         self,
@@ -463,6 +592,13 @@ class GitWorkspaceService:
             *await self._exclude_pathspecs(),
             *(f":(exclude){path}" for path in self._preexisting_untracked),
         )
+        # Retire de l'index les fichiers devenus ignorés après le `git add -A`.
+        # `git add -A` ne dé-stage pas automatiquement des fichiers déjà dans
+        # l'index dont le chemin est maintenant couvert par `.gitignore` — par
+        # exemple des WAL SQLite capturés par `intent-to-add` lors d'un diff
+        # pendant qu'un serveur tournait, avant l'ajout de `*.db-shm` dans le
+        # `.gitignore` (ticket-219).
+        await self._purger_stage_ignoré()
         staged = await self._run("diff", "--cached", "--name-only")
         sha: str | None = None
         if staged.strip():

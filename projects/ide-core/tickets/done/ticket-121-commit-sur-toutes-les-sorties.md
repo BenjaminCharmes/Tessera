@@ -3,7 +3,7 @@ id: ticket-121
 title: "Commiter sur toutes les sorties, tolérer une socket morte, un run à la fois par projet"
 type: fix
 status: done
-pr_number: 141
+pr_number: null
 priority: critical
 agent: codeur
 depends_on: []

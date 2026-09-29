@@ -3,7 +3,7 @@ id: ticket-103
 title: "Le dépôt peut être lu par des inconnus"
 type: docs
 status: done
-pr_number: 100
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []

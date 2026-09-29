@@ -20,7 +20,10 @@
       "model": "claude-sonnet-4-6",
       "max_tokens": 8192,
       "prompt_file": "agents/prompts/codeur.md",
-      "active": true
+      "active": true,
+      "skills": [
+        "verifier-mon-travail"
+      ]
     },
     {
       "role": "reviewer",
@@ -34,19 +37,16 @@
       "model": "claude-sonnet-4-6",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/architect.md",
-      "active": true
+      "active": true,
+      "web": true
     },
     {
       "role": "securite",
-      "model": "qwen3-coder:30b",
+      "model": "claude-haiku-4-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/securite.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-haiku-4-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "validateur",
@@ -62,27 +62,19 @@
     },
     {
       "role": "doc-technique",
-      "model": "qwen3-coder:30b",
+      "model": "claude-haiku-4-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/doc-technique.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-haiku-4-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "doc-fonctionnelle",
-      "model": "qwen3-coder:30b",
+      "model": "claude-haiku-4-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/doc-fonctionnelle.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-haiku-4-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "project-analyzer",
@@ -102,7 +94,11 @@
       "codeur",
       "reviewer"
     ],
-    "max_review_rounds": 3
+    "max_review_rounds": 3,
+    "securite_enabled": true,
+    "validateur_enabled": true,
+    "doc_claude_md": true
   },
-  "autonomy": "merge"
+  "autonomy": "merge",
+  "github_remote": "BenjaminCharmes/Tessera"
 }

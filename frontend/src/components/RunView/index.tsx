@@ -1,65 +1,136 @@
+import { useState } from "react";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
-import AgentBlock from "../AgentPanel/AgentBlock";
-import { resumeDuCout } from "../../lib/budget";
+import {
+  IconCheck,
+  IconChevronDown,
+  IconChevronRight,
+} from "../../design/icons";
+import TokenStream from "../AgentPanel/TokenStream";
+import VerdictBanner from "../AgentPanel/VerdictBanner";
 import PipelineSummary from "../AgentPanel/PipelineSummary";
-import type { AgentRole, OrchestratorEvent } from "../../types/api";
-import type { UseRunActifResult } from "../../hooks/streamState";
+import { resumeDuCout } from "../../lib/budget";
+import type { UseRunActifResult, PassageAgent } from "../../hooks/streamState";
 
 /**
  * Ce que le run est en train de faire, au centre de l'écran (ticket-075).
  *
- * Pendant un run, le centre affichait le tableau des tickets — ou, si on avait
- * demandé le diff, « ce ticket n'a jamais été lancé ». La seule fenêtre sur le
- * travail en cours était une colonne de 320 pixels à droite, où le flux d'un
- * agent défile dans un cadre de quelques lignes.
- *
- * Or c'est le moment où l'on a le plus besoin de place : ce que chaque agent
- * lit, écrit et conclut est ce qui permet de décider s'il faut intervenir ou
- * arrêter. Le centre le montre donc en grand, et la colonne de droite garde
- * ce qui sert à agir — répondre, infléchir, arrêter.
+ * Le panneau est un fil chronologique (ticket-222) : Codeur (tour 1) →
+ * Reviewer (tour 1) → Codeur (tour 2) → … Chaque passage est une entrée
+ * ajoutée dans l'ordre. Les passages terminés sont repliés ; l'entrée en
+ * cours reste dépliée.
  */
 interface RunViewProps {
   stream: UseRunActifResult;
 }
 
-function aFini(events: OrchestratorEvent[], agent: AgentRole): boolean {
-  return events.some((e) => e.type === "agent_done" && e.agent === agent);
+/** Résumé court affiché dans l'en-tête d'une entrée repliée. */
+function resumePassage(entry: PassageAgent): string {
+  if (entry.agent === "reviewer") {
+    if (!entry.content) return "";
+    const approved =
+      entry.content.includes("APPROVED") &&
+      !entry.content.includes("CHANGES_REQUESTED");
+    return approved ? "APPROVED" : "CHANGES_REQUESTED";
+  }
+  // Codeur : première ligne non vide du compte rendu.
+  return entry.content.split("\n").find((l) => l.trim()) ?? "";
 }
 
-/** Le dernier contenu rendu par un agent, ou la chaîne vide. */
-function dernierContenu(events: OrchestratorEvent[], agent: AgentRole): string {
-  return (
-    events
-      .filter((e) => e.type === "agent_done" && e.agent === agent)
-      .map((e) => (typeof e.data["content"] === "string" ? e.data["content"] : ""))
-      .at(-1) ?? ""
-  );
+interface EntreePipelineProps {
+  entry: PassageAgent;
+  /** Vraie si c'est la dernière entrée du fil (toujours dépliée). */
+  isLast: boolean;
 }
 
 /**
- * Les agents qui ont parlé, dans leur ordre d'apparition.
- *
- * Dérivé des événements plutôt que d'une liste écrite à la main : `AgentRole`
- * ne couvre pas toutes les étapes du pipeline, et une liste figée afficherait
- * des blocs vides pour des agents qui n'ont pas tourné — ce qui donnerait
- * l'impression qu'il ne se passe rien.
+ * Un passage d'agent dans le fil — repliable quand terminé et pas le dernier.
  */
-function agentsQuiOntParle(events: OrchestratorEvent[]): AgentRole[] {
-  const vus: AgentRole[] = [];
-  for (const e of events) {
-    if (e.type === "agent_started" && e.agent && !vus.includes(e.agent)) {
-      vus.push(e.agent);
-    }
-  }
-  return vus;
+function EntreePipeline({ entry, isLast }: EntreePipelineProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  // L'entrée en cours reste dépliée ; les autres se replient par défaut.
+  const ouvert = isLast || expanded;
+  const peutBasculer = entry.isDone && !isLast;
+
+  const approved =
+    entry.agent === "reviewer" &&
+    entry.content.includes("APPROVED") &&
+    !entry.content.includes("CHANGES_REQUESTED");
+
+  const resume = resumePassage(entry);
+
+  return (
+    <div
+      className="mx-3 mb-3 rounded-sm border border-zinc-700 overflow-hidden"
+      data-testid="entree-pipeline"
+    >
+      <button
+        type="button"
+        disabled={!peutBasculer}
+        onClick={() => peutBasculer && setExpanded((v) => !v)}
+        aria-expanded={ouvert}
+        className="flex w-full items-center gap-2 px-3 py-2 bg-zinc-800 text-xs font-semibold text-zinc-300 text-left disabled:cursor-default"
+      >
+        <span>{entry.agent.toUpperCase()}</span>
+
+        {/* Entrée terminée et repliable : résumé + chevron. */}
+        {peutBasculer && (
+          <span
+            className={`ml-auto flex items-center gap-1 font-normal ${
+              approved ? "text-green-400" : "text-zinc-400"
+            }`}
+          >
+            {resume && <span className="max-w-48 truncate">{resume}</span>}
+            {ouvert ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />}
+          </span>
+        )}
+
+        {/* Entrée en cours : points de chargement. */}
+        {isLast && !entry.isDone && (
+          <span className="ml-auto flex gap-0.5">
+            {[0, 150, 300].map((delay) => (
+              <span
+                key={delay}
+                className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce"
+                style={{ animationDelay: `${delay}ms` }}
+              />
+            ))}
+          </span>
+        )}
+
+        {/* Dernière entrée, terminée. */}
+        {isLast && entry.isDone && (
+          <span className="ml-auto flex items-center gap-1 font-normal text-green-400">
+            <IconCheck size={12} /> terminé
+          </span>
+        )}
+      </button>
+
+      {ouvert && (
+        <div className="p-3">
+          {entry.agent === "codeur" && !entry.isDone && entry.tokens && (
+            <TokenStream tokens={entry.tokens} isActive={isLast} />
+          )}
+          {entry.agent === "codeur" && entry.isDone && entry.content && (
+            <pre className="max-h-64 overflow-auto whitespace-pre-wrap wrap-break-word rounded-sm bg-zinc-950/60 p-2 font-mono text-mini text-zinc-300">
+              {entry.content}
+            </pre>
+          )}
+          {entry.agent === "reviewer" && entry.content && (
+            <VerdictBanner content={entry.content} />
+          )}
+          {!entry.tokens && !entry.content && (
+            <div className="text-zinc-600 text-xs italic">Génération…</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function RunView({ stream }: RunViewProps) {
-  const { events, currentAgent, currentRound, currentTokens, lastResult, queue } =
-    stream;
-
-  const demarres = agentsQuiOntParle(events);
+  const { entries, currentRound, lastResult, queue } = stream;
 
   return (
     <div className="flex h-full flex-col bg-zinc-900">
@@ -80,29 +151,24 @@ export default function RunView({ stream }: RunViewProps) {
               {resumeDuCout(stream.coutUsd, stream.appels, stream.outils)}
             </span>
           )}
-          {currentAgent && (
-            <span className="text-blue-300">{currentAgent.toUpperCase()}</span>
+          {stream.currentAgent && (
+            <span className="text-blue-300">{stream.currentAgent.toUpperCase()}</span>
           )}
         </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto py-3">
-        {demarres.length === 0 && (
+        {entries.length === 0 && (
           <p className="px-4 text-xs text-zinc-500">
             Le run démarre : la branche se crée et le premier agent se prépare.
           </p>
         )}
 
-        {demarres.map((agent) => (
-          <AgentBlock
-            key={agent}
-            agent={agent}
-            tokens={agent === "codeur" ? currentTokens : ""}
-            isActive={currentAgent === agent}
-            isDone={aFini(events, agent)}
-            reviewContent={
-              agent === "reviewer" ? dernierContenu(events, agent) : undefined
-            }
+        {entries.map((entry, idx) => (
+          <EntreePipeline
+            key={entry.id}
+            entry={entry}
+            isLast={idx === entries.length - 1}
           />
         ))}
 

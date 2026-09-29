@@ -69,3 +69,19 @@ def test_le_fichier_env_est_trouve_quel_que_soit_le_repertoire_de_lancement(
     assert Path(_ENV_FILE).is_absolute()
     assert Path(_ENV_FILE).name == ".env"
     assert Path(_ENV_FILE).parent.name == "project" or (Path(_ENV_FILE).parent / "CLAUDE.md").exists()
+
+
+def test_settings_accept_the_forbidden_terms_variable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # ADR-048 fait vivre la liste dans `.env` ; inconnue des réglages, elle
+    # empêchait le backend de démarrer (extra_forbidden).
+    monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+    env = tmp_path / ".env"
+    env.write_text("FORBIDDEN_TERMS=alpha,beta\n", encoding="utf-8")
+    assert Settings(_env_file=env).forbidden_terms == "alpha,beta"
+
+
+def test_settings_forbidden_terms_empty_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+    assert Settings(_env_file=None).forbidden_terms == ""

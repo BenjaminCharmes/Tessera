@@ -13,6 +13,8 @@ import re
 import subprocess
 from pathlib import Path
 
+import pytest
+
 _RACINE = Path(__file__).resolve().parents[2]
 
 #: Tout ce qu'un agent — Claude Code ou agent du produit — reçoit comme
@@ -89,6 +91,19 @@ def test_aucune_consigne_ne_code_en_dur_un_chemin_de_machine() -> None:
     fautifs = [c for c in _CONSIGNES if motif.search(_lire(c))]
 
     assert fautifs == [], f"chemin d'une machine précise : {fautifs}"
+
+
+#: Ce que chaque session paie avant d'avoir rien lu (ticket-246). Chaque ligne
+#: concurrence les autres pour l'attention du modèle : au-delà, on retire, on
+#: n'ajoute pas.
+_BUDGETS_CLAUDE_MD = {"CLAUDE.md": 7_000, "projects/ide-core/CLAUDE.md": 6_000}
+
+
+@pytest.mark.parametrize(("chemin", "budget"), sorted(_BUDGETS_CLAUDE_MD.items()))
+def test_les_claude_md_tiennent_leur_budget(chemin: str, budget: int) -> None:
+    taille = len(_lire(chemin))
+
+    assert taille <= budget, f"{chemin} : {taille} caractères pour {budget} permis"
 
 
 def test_les_skills_annonces_existent() -> None:

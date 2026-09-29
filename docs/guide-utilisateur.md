@@ -245,7 +245,10 @@ en `blocked/` et le reviewer n'est même pas appelé.
 
 Le panneau **Agent Stream** montre le déroulé en direct via WebSocket : quel agent
 tourne, ce qu'il écrit token par token, quels outils il utilise, et le verdict de
-chaque étape.
+chaque étape. Quand un agent termine son tour, son entrée s'ajoute au fil — rien
+n'est écrasé. Les entrées terminées sont repliées avec leur résumé visible (le
+verdict pour le reviewer, la première ligne du compte rendu pour le codeur).
+L'entrée en cours, en bas du fil, reste dépliée pour que tu suives en temps réel.
 
 Le panneau **Historique** liste tous les runs passés (persistés en SQLite), avec
 leur durée, leur verdict et leur nombre de tours.
@@ -282,7 +285,7 @@ artefacts, retirer le projet — sont dans l'en-tête, qui ne défile jamais.
 
 **Statistiques** donne, sur 7, 30 ou 90 jours : la dépense et les tokens par
 jour, la part de chaque agent, modèle et projet, le taux d'approbation des runs,
-leurs durées et les derniers runs. Sans projet sélectionné, la vue couvre tous
+leurs durées et les derniers runs. La comptabilité inclut **tous** les appels du pipeline — codeur, reviewer, sécurité, validateur, documentation — pas uniquement le codeur. Sans projet sélectionné, la vue couvre tous
 les projets. Les jours sont des jours UTC. La colonne de gauche garde la dépense
 par ticket. C'est le panneau à regarder après tes premiers runs : il donne
 l'échelle réelle, qui est rarement celle qu'on imagine.
@@ -381,6 +384,11 @@ Le chat n'est pas un pipeline. Il sert à décider **quoi** ticketiser, à
 comprendre un bout de code, à faire une modification ponctuelle — sans passer
 par le cycle complet codeur → reviewer → validateur.
 
+Les conversations du chat sont maintenant listées par projet, triées de la plus
+récente à la plus ancienne. Chacune a un titre (extrait du premier message,
+coupé à 60 caractères) et une date. Elles persistent : tu peux reprendre une
+ancienne conversation sans recommencer à zéro.
+
 ### Ce que l'agent peut faire
 
 - Lire n'importe quel fichier du projet, chercher dedans
@@ -446,6 +454,28 @@ projet permet de désactiver le testeur, la sécurité ou le validateur, et de
 régler `max_review_rounds`. La documentation ne se règle pas par ticket : elle
 se met à jour à la fin d'une file ou d'un run autonome (ADR-035).
 
+### Rôles de jugement sur Ollama
+
+Les rôles `validateur`, `doc-technique`, `doc-fonctionnelle`,
+`project-analyzer` et `agent-creator` ne font qu'un appel texte → JSON. Tu
+peux les configurer pour tourner sur [Ollama](https://ollama.com) à coût nul.
+
+Garde `securite` sur Claude : rejoué sur une traversée de chemin réelle,
+`qwen3-coder:30b` a rendu `PASS` trois fois sur trois.
+
+Pour chaque projet :
+1. Lance un serveur Ollama : `ollama pull qwen3-coder:30b` (~19 Go)
+2. Définis `OLLAMA_BASE_URL` dans `.env` (défaut : `http://127.0.0.1:11434`)
+3. Configure le rôle dans `agents.json` du projet : `"provider": "ollama"`,
+   et déclare son repli : `"fallback": {"provider": "agent_sdk", "model": "claude-haiku-4-5"}`
+
+Si le serveur n'est pas disponible, un rôle qui déclare un repli bascule sur
+Claude, ce qui est visible dans l'historique des appels (tableau des coûts). Sans
+repli déclaré, l'étape échoue — et la sécurité comme le validateur refusent
+alors le run (ADR-039, ADR-046). Le codeur, le
+reviewer et le chat restent toujours sur Claude — ils ont besoin des outils fichier
+que seul le SDK fournit.
+
 ---
 
 ## 10. Intégration GitHub
@@ -501,6 +531,7 @@ Tout est dans `.env` (copié depuis `.env.example`) :
 | `IDE_WORKSPACE_DIR` | `~/tessera-workspace` | Où vivent tes projets |
 | `IDE_PROMPTS_DIR` | `agents/prompts/` | Où vivent les prompts des agents |
 | `IDE_LOG_LEVEL` | `INFO` | Verbosité des logs |
+| `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Serveur Ollama (pour les rôles de jugement, voir section 9) |
 | `GITHUB_TOKEN` | — | Token GitHub |
 | `GITHUB_REPO` | — | Dépôt cible, format `owner/repo` |
 | `STATIC_TOKEN` | — | Si défini, l'API exige `Authorization: Bearer <token>` — WebSockets comprises, via `?token=`. Côté UI : `VITE_STATIC_TOKEN` dans `frontend/.env.local` |

@@ -26,6 +26,8 @@ env/
 # Database
 *.sqlite3
 *.db
+*.db-shm
+*.db-wal
 
 # macOS
 .DS_Store
@@ -74,3 +76,7 @@ htmlcov/
 # ne doit en aucun cas partir dans un commit.
 tessera-detaches/
 
+
+# Marqueur de la doc par lot (ADR-035) : réécrit par chaque run, il salissait
+# l arbre et bloquait le rebase de la livraison (ticket-213).
+projects/ide-core/memory/documentation.json

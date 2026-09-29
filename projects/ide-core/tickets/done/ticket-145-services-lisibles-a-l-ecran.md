@@ -3,7 +3,7 @@ id: ticket-145
 title: "Rendre les services lisibles : état à jour, sortie visible, adresse cliquable"
 type: fix
 status: done
-pr_number: 164
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-144"]

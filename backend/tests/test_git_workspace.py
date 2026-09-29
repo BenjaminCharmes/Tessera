@@ -83,6 +83,34 @@ async def test_create_branch_reutilise_une_branche_existante(repo: Path) -> None
     assert first == second
 
 
+async def test_diff_from_base_covers_earlier_commits_of_a_resumed_branch(repo: Path) -> None:
+    # ticket-208 : un premier run a commité `a.py` (travail non approuvé), un
+    # second run reprend la branche et n'écrit que `b.md`. La branche date
+    # d'avant le correctif : aucune ref ne retient son point de départ.
+    await _git(repo, "checkout", "-q", "-b", "ticket-020-reprise")
+    (repo / "a.py").write_text("print('premier run')\n", encoding="utf-8")
+    await _git(repo, "add", "a.py")
+    await _git(repo, "commit", "-q", "-m", "chore: unapproved work")
+    await _git(repo, "checkout", "-q", "-")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-020", "reprise")
+    (repo / "b.md").write_text("second run\n", encoding="utf-8")
+
+    diff = await service.diff_depuis_base()
+    assert "a.py" in diff
+    assert "b.md" in diff
+
+
+async def test_diff_from_base_equals_current_diff_on_a_fresh_branch(repo: Path) -> None:
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-021", "neuve")
+    (repo / "README.md").write_text("# projet modifie\n", encoding="utf-8")
+    (repo / "nouveau.py").write_text("x = 1\n", encoding="utf-8")
+
+    assert await service.diff_depuis_base() == await service.current_diff()
+
+
 async def test_current_diff_voit_un_fichier_modifie(repo: Path) -> None:
     service = GitWorkspaceService(repo)
     await service.create_branch("ticket-004", "modif")
@@ -578,3 +606,23 @@ async def test_un_pre_commit_depose_dans_le_depot_n_est_pas_execute(repo: Path) 
 
     assert sha is not None
     assert not marqueur.exists(), "le hook du dépôt a été exécuté par l'orchestrateur"
+
+
+async def test_what_a_push_publishes_is_read_from_the_commits(repo: Path) -> None:
+    # ticket-206 : au push, l'arbre est propre ; le contrôle des termes lit le
+    # contenu commité, le corps des messages et le committer.
+    await _git(repo, "branch", "-M", "develop")
+    service = GitWorkspaceService(repo)
+    branche = await service.create_branch("ticket-030", "publication")
+    (repo / "note.md").write_text("contenu commite\n", encoding="utf-8")
+    await _git(repo, "add", "note.md")
+    await _git(repo, "-c", "user.name=Committer Test", "-c", "user.email=c@example.com",
+               "commit", "-q", "-m", "feat: sujet", "-m", "un corps de message")
+
+    assert await service.current_diff() == "" or "note.md" not in await service.current_diff()
+    diff = await service.diff_de_branche("develop", branche)
+    assert "+contenu commite" in diff
+
+    (commit,) = await service.commits_depuis_base("develop", branche)
+    assert "un corps de message" in commit.message
+    assert "c@example.com" in commit.auteur

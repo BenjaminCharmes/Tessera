@@ -7,6 +7,7 @@ import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
 import type { AgentDetail as AgentDetailData } from "../../types/api";
+import { diffLignes } from "./diff";
 
 /**
  * La définition d'un agent, au centre de l'écran (ticket-076).
@@ -61,24 +62,37 @@ function Definition({
   const detail = enregistre ?? charge.data;
   const erreur = charge.error;
 
-  // Les prompts natifs sont des fichiers Markdown ; les lire avec leurs `##`
-  // et leurs `**` demande un effort que le contenu ne justifie pas
-  // (ticket-078).
   const [vue, setVue] = useState<"rendu" | "source" | "edition">("rendu");
   const [brouillonEdite, setBrouillon] = useState<string | null>(null);
   const brouillon = brouillonEdite ?? detail?.system_prompt ?? "";
   const [enregistrement, setEnregistrement] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  /** Vrai quand le diff de confirmation est affiché (ticket-226). */
+  const [diffOuvert, setDiffOuvert] = useState(false);
 
-  async function enregistrer() {
+  const lignesDiff = useMemo(
+    () => (diffOuvert ? diffLignes(detail?.system_prompt ?? "", brouillon) : []),
+    [diffOuvert, detail?.system_prompt, brouillon],
+  );
+
+  /** Vérifie les préconditions et ouvre le diff de confirmation. */
+  function demanderConfirmation() {
     if (!brouillon.trim()) {
       setMessage("Un prompt vide priverait l'agent de toute définition.");
       return;
     }
+    if (brouillon === (detail?.system_prompt ?? "")) {
+      return;
+    }
+    setDiffOuvert(true);
+  }
+
+  async function confirmer() {
     setEnregistrement(true);
     setMessage(null);
     try {
       setEnregistre(await api.agents.updatePrompt(role, brouillon));
+      setDiffOuvert(false);
       setMessage("Enregistré. Il s'applique au prochain appel de cet agent.");
     } catch (err: unknown) {
       setMessage(err instanceof Error ? err.message : String(err));
@@ -93,11 +107,7 @@ function Definition({
         <RegionTitle>{role}</RegionTitle>
         {detail && (
           <div className="flex items-center gap-2">
-            <div
-              className="flex items-center gap-0.5"
-              role="tablist"
-              aria-label="Affichage du prompt"
-            >
+            <div className="flex items-center gap-0.5" role="tablist" aria-label="Affichage du prompt">
               {(["rendu", "source", "edition"] as const).map((cle) => (
                 <button
                   key={cle}
@@ -129,7 +139,6 @@ function Definition({
       {detail && (
         <>
           {projectId && <ModelPicker projectId={projectId} role={role} />}
-
           <p className="border-b border-zinc-800 px-4 py-2 text-micro text-zinc-500">
             Ce texte est envoyé en tête de chaque appel de cet agent. Il décide
             de tout ce qu'il fait.
@@ -146,25 +155,71 @@ function Definition({
           )}
           {vue === "edition" && (
             <div className="flex min-h-0 flex-1 flex-col gap-2 p-4">
-              <textarea
-                value={brouillon}
-                onChange={(e) => setBrouillon(e.target.value)}
-                spellCheck={false}
-                className="min-h-0 flex-1 resize-none rounded-sm border border-zinc-700 bg-zinc-950 p-3 font-mono text-micro leading-relaxed text-zinc-200 outline-hidden focus:border-zinc-500"
-              />
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => void enregistrer()}
-                  disabled={enregistrement}
-                  className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
-                >
-                  {enregistrement ? "Enregistrement…" : "Enregistrer"}
-                </button>
-                {message && (
-                  <span className="text-mini text-zinc-400">{message}</span>
-                )}
-              </div>
+              {!diffOuvert ? (
+                <>
+                  <textarea
+                    value={brouillon}
+                    onChange={(e) => setBrouillon(e.target.value)}
+                    spellCheck={false}
+                    className="min-h-0 flex-1 resize-none rounded-sm border border-zinc-700 bg-zinc-950 p-3 font-mono text-micro leading-relaxed text-zinc-200 outline-hidden focus:border-zinc-500"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={demanderConfirmation}
+                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400"
+                    >
+                      Enregistrer
+                    </button>
+                    {message && (
+                      <span className="text-mini text-zinc-400">{message}</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="min-h-0 flex-1 overflow-auto rounded-sm border border-zinc-700 bg-zinc-950 font-mono text-micro leading-relaxed">
+                    {lignesDiff.map((l, i) => (
+                      <div
+                        key={i}
+                        className={`whitespace-pre-wrap break-all px-4 ${
+                          l.type === "ajout"
+                            ? "bg-green-950/40 text-green-300"
+                            : l.type === "retrait"
+                              ? "bg-red-950/40 text-red-300"
+                              : "text-zinc-400"
+                        }`}
+                      >
+                        {l.type === "ajout"
+                          ? `+${l.texte}`
+                          : l.type === "retrait"
+                            ? `-${l.texte}`
+                            : ` ${l.texte}`}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void confirmer()}
+                      disabled={enregistrement}
+                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
+                    >
+                      {enregistrement ? "Enregistrement…" : "Confirmer"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDiffOuvert(false)}
+                      className="rounded-sm border border-zinc-600 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-400"
+                    >
+                      Annuler
+                    </button>
+                    {message && (
+                      <span className="text-mini text-zinc-400">{message}</span>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </>

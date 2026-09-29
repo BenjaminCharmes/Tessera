@@ -3,7 +3,7 @@ id: ticket-129
 title: "Vue Supervision de tous les runs, et badge permanent dans le NavRail"
 type: feat
 status: done
-pr_number: 151
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-128"]

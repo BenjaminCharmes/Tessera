@@ -193,21 +193,21 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-09-15
 **Décision** : un projet déclare dans `agents.json` si ses `tickets/`, `memory/`, `CLAUDE.md` et `agents.json` partent dans son dépôt (`tracked`) ou restent sur la machine (`local`). En mode `local`, l'exclusion s'écrit dans `.git/info/exclude`, entre marqueurs, et **jamais** dans `.gitignore`.
-**Raison** : `.gitignore` est lui-même versionné. Le modifier sur un dépôt client produit un diff visible qui annonce exactement ce qu'on voulait garder hors du dépôt. `.git/info/exclude` a la même sémantique, reste local au clone, et n'apparaît ni dans l'historique ni dans un diff.
+**Raison** : `.gitignore` est lui-même versionné. Le modifier sur un dépôt tiers produit un diff visible qui annonce exactement ce qu'on voulait garder hors du dépôt. `.git/info/exclude` a la même sémantique, reste local au clone, et n'apparaît ni dans l'historique ni dans un diff.
 **Alternative rejetée** : un réglage global — le bon choix dépend du projet, pas de la machine ; retirer de l'index les artefacts déjà suivis, car `git rm --cached` modifie l'historique à venir du dépôt de l'utilisateur : ça se propose, ça ne se fait pas en silence.
 
 ## ADR-022 — L'agent de workflow pousse et ouvre la PR
 
 **Date** : 2026-09-15
 **Décision** : `GitHubWorkflowService` pousse la branche du ticket puis ouvre sa PR. Le push n'est **jamais** forcé. Le merge, lui, ne s'interdit plus partout : il se déclare par projet (ADR-029).
-**Raison** : merger, c'est décider qu'un travail est bon — sur le dépôt d'un client, le point où un humain tranche, et ce qui rend acceptable tout le reste de l'automatisation. Quant au push : cette branche part chez l'utilisateur, parfois chez son client, et écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
+**Raison** : merger, c'est décider qu'un travail est bon — sur un dépôt tiers, c'est le point où un humain tranche. Quant au push : écraser une référence distante peut détruire du travail qui n'est pas le nôtre. Un push refusé est une décision à remonter, pas un obstacle à contourner.
 **Alternative rejetée** : pousser en `--force` pour éviter les rejets — le rejet **est** l'information.
 
 ## ADR-023 — Le mode des artefacts échoue fermé
 
 **Date** : 2026-09-16
 **Décision** : `local` est le défaut quand `agents.json` ne déclare rien, est illisible ou absent, et le défaut d'origine de tout projet **sauf** un projet créé par l'IDE.
-**Raison** : ADR-021 posait le mécanisme mais le faisait dépendre d'une déclaration. Les deux erreurs ne sont pas symétriques : des artefacts non versionnés se rattrapent d'un clic, un push dans le dépôt d'un client ne se défait pas. Le défaut protège, le partage se déclare.
+**Raison** : ADR-021 posait le mécanisme mais le faisait dépendre d'une déclaration. Les deux erreurs ne sont pas symétriques : des artefacts non versionnés se rattrapent d'un clic, un push dans un dépôt tiers ne se défait pas. Le défaut protège, le partage se déclare.
 **Alternative rejetée** : garder `tracked` — fait reposer la confidentialité sur un fichier qui peut manquer ; avertir sans changer le défaut — l'avertissement arrive après le push.
 **Limite** : `.git/info/exclude` n'agit que sur le non-suivi. Un dépôt qui versionne déjà un `CLAUDE.md` en commitera les modifications ; c'est ce que `tracked_artifact_paths()` remonte.
 
@@ -215,9 +215,9 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-09-16
 **Décision** : `GitWorkspaceService` vérifie, avant toute création de branche, que `git rev-parse --show-toplevel` renvoie exactement le dossier du projet. Sinon il lève `NotAGitRepository` et le run s'arrête.
-**Raison** : `--is-inside-work-tree` réussit aussi quand le dépôt trouvé est un **ancêtre**. Un dossier client posé dans `projects/` sans dépôt à sa racine faisait remonter git jusqu'au dépôt de Tessera : le run créait sa branche et son commit dans l'IDE, au nom du projet du client. La classe promettait « never on Tessera itself » sans rien qui le garantisse.
+**Raison** : `--is-inside-work-tree` réussit aussi quand le dépôt trouvé est un **ancêtre**. Un dossier tiers dans `projects/` sans dépôt propre fait remonter git jusqu'au dépôt de Tessera : le run crée sa branche dans l'IDE au lieu de celle du projet. La classe promettait « never on Tessera itself » sans rien qui le garantisse.
 **Conséquence** : un dossier qui regroupe plusieurs dépôts n'est pas un projet. Chaque dépôt doit être déclaré comme son propre projet.
-**Alternative rejetée** : `git init` automatique à la racine (crée un dépôt non désiré au-dessus de ceux du client) ; descendre chercher le premier sous-dépôt (choix arbitraire dès qu'il y en a plusieurs).
+**Alternative rejetée** : `git init` automatique à la racine (crée un dépôt non désiré au-dessus de ceux du projet) ; descendre chercher le premier sous-dépôt (choix arbitraire dès qu'il y en a plusieurs).
 
 ---
 
@@ -247,14 +247,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-09-17
 **Décision** : ADR-024 refuse par défaut qu'un projet agisse sur un dépôt **ancêtre**. Un projet lève ce refus en déclarant `"git_root": "ancestor"` dans son `agents.json` ; il stage alors depuis la racine du dépôt (`:/`). Seule cette valeur exacte ouvre l'exception.
-**Raison** : ADR-024 est né d'un dossier client posé dans `projects/`, dont le dépôt ancêtre était Tessera — un accident. Mais c'est exactement ce que fait le projet bootstrap d'ADR-001 : il construit l'IDE, donc il travaille volontairement dans le dépôt qui le contient, et son travail est dans `backend/` et `frontend/`, au-dessus de lui. Traiter les deux cas pareil supprimait l'auto-hébergement, c'est-à-dire le principe fondateur.
+**Raison** : ADR-024 protège contre un dossier tiers dans `projects/` dont git remonterait jusqu'au dépôt de Tessera. Mais c'est exactement ce que fait le projet bootstrap d'ADR-001 : il construit l'IDE, donc il travaille volontairement dans le dépôt qui le contient, et son travail est dans `backend/` et `frontend/`, au-dessus de lui. Traiter les deux cas pareil supprimait l'auto-hébergement, c'est-à-dire le principe fondateur.
 **Forme** : celle d'ADR-021 et ADR-023 — le défaut protège, le cas particulier s'énonce. Une valeur inconnue ne désarme rien.
 
 ## ADR-029 — Jusqu'où l'agent va se déclare par projet
 
 **Date** : 2026-09-18
 **Décision** : `agents.json` porte un champ `autonomy` : `commit` (défaut — le travail reste sur sa branche), `pr` (pousse et ouvre la PR), `merge` (merge aussi, **si et seulement si** la CI est verte). Valeur absente ou inconnue : `commit`. Le niveau borne ce que l'IDE fait **seul** ; le même geste demandé depuis l'IDE reste la décision de l'utilisateur.
-**Raison** : le raisonnement d'ADR-022 — merger, c'est décider qu'un travail est bon — tient sur le dépôt d'un client, où les accès sont spécifiques et où l'utilisateur pousse lui-même. Il ne vaut pas sur un dépôt personnel doté d'une CI : y refuser le merge ne protège personne, ça ajoute un clic.
+**Raison** : le raisonnement d'ADR-022 — merger, c'est décider qu'un travail est bon — tient sur un dépôt tiers, où les accès sont spécifiques et où l'utilisateur pousse lui-même. Il ne vaut pas sur un dépôt personnel doté d'une CI : y refuser le merge ne protège personne, ça ajoute un clic.
 **Alternative rejetée** : un réglage global — le bon niveau dépend du dépôt ; merger sur une CI absente ou en cours — l'absence de signal n'est pas un signal favorable.
 
 ## ADR-030 — La livraison est une étape à part, et elle ne fait jamais échouer le run
@@ -268,7 +268,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-09-18
 **Décision** : un hook `PreToolUse` refuse `Write`, `Edit`, `NotebookEdit` et les redirections `Bash` simples (`>`, `>>`, `tee`) dont le chemin sort de la racine du projet — son dossier, ou le dépôt qui le contient s'il déclare `git_root: ancestor`. Les deux côtés sont résolus, symlinks compris. **Lire hors du projet reste permis.**
-**Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Six dépôts clients voisins dans `projects/`, et un agent qui se trompe de dossier écrit chez un autre client — la fuite qu'ADR-021 et ADR-023 empêchent, prise par l'autre bout.
+**Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Plusieurs dépôts tiers voisins dans `projects/`, et un agent qui se trompe de dossier écrit dans le mauvais — la fuite qu'ADR-021 et ADR-023 empêchent, prise par l'autre bout.
 **Ce que ça ne garantit pas** : le contrôle sur `Bash` attrape une erreur, pas une évasion — `python -c "open('../x','w')"` passe. Ce qui ne se lit pas avec certitude passe aussi : un faux refus priverait l'agent de son moyen de vérifier son travail.
 
 ## ADR-032 — Un ADR déclare qui il contraint
@@ -313,8 +313,8 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Date** : 2026-09-21
 **Portée** : architect
 **Décision** : le produit s'appelle Tessera. Les identifiants portant l'ancien nom sont réécrits, **sauf** `vibe_artifacts` dans `agents.json` : la clef devient `artifacts`, l'ancienne reste lue, jamais réécrite.
-**Raison** : huit manifestes la déclaraient déjà sur disque, dont des dépôts clients que ce dépôt ne versionne pas. Une clef inconnue tombe sur le défaut fermé d'ADR-023 : un projet en `tracked` serait repassé en `local` sans demande et sans message. Le renommage aurait donc changé un comportement qu'il prétendait préserver.
-**Alternative rejetée** : migrer les manifestes d'office — écrire dans le dépôt d'un client pour une question cosmétique ; garder les deux clefs en écriture — elles divergeraient.
+**Raison** : des manifestes la déclaraient déjà sur disque, dont des dépôts que ce dépôt ne versionne pas. Une clef inconnue tombe sur le défaut fermé d'ADR-023 : un projet en `tracked` serait repassé en `local` sans demande et sans message. Le renommage aurait donc changé un comportement qu'il prétendait préserver.
+**Alternative rejetée** : migrer les manifestes d'office — écrire dans un dépôt tiers pour une question cosmétique ; garder les deux clefs en écriture — elles divergeraient.
 **Conséquence assumée** : le nom d'origine survit dans une constante et ses tests. C'est le prix d'une donnée déjà écrite ailleurs.
 
 ---
@@ -385,7 +385,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-09-23
 **Décision** : un dépôt personnel ne reçoit aucune donnée professionnelle — nom de client, adresse e-mail d'employeur ou de client, identifiant, jeton, hostname interne. La règle porte sur le contenu **et** sur les métadonnées git : auteur, committer, trailers `Co-authored-by`. L'identité git se déclare par dossier (`includeIf`), jamais globalement.
-**Raison** : le service sécurité d'un client a signalé un dépôt personnel passé public ; 162 commits y portaient l'adresse professionnelle. Le contenu était propre, mais un `user.email` global écrit sur tous les dépôts d'une machine sans jamais se rappeler à l'attention, et personne ne relit les métadonnées.
+**Raison** : un `user.email` global écrit sur tous les dépôts d'une machine sans jamais se rappeler à l'attention : un dépôt personnel rendu public expose ces métadonnées, et personne ne les relit avant de pousser.
 **Alternative rejetée** : nettoyer après coup — un dépôt public est moissonné avant d'être corrigé, et un force-push laisse les objets joignables par leur SHA.
 **Conséquence assumée** : réparer coûte la réécriture de l'histoire et la perte des PR.
 
@@ -428,3 +428,31 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : trois teintes de données — `data-1` à `data-3` (cyan, indigo, magenta) — distinguent les séries d'un graphique, dans cet ordre fixe ; au-delà, « autres » en zinc. Elles ne s'emploient que dans `design/charts/`, et leurs familles jamais en brut. Une issue de run reste un état : couleurs d'ADR-026.
 **Raison** : ADR-026 ne donne des couleurs qu'aux états et à l'identité. Colorer deux séries en bleu et vert les ferait lire comme « activité » et « succès ». Les trois teintes passent le contrôle daltonien et de contraste sur zinc-900 ; une quatrième ne le passe plus.
 **Alternative rejetée** : une série colorée par graphique, le reste en zinc — deux séries superposées deviennent illisibles ; réutiliser `violet` — il marque l'identité, pas une donnée.
+
+---
+
+## ADR-048 — Vérifier les termes interdits avant tout push
+
+**Date** : 2026-09-28
+**Décision** : Avant tout push vers un dépôt distant, le backend contrôle les lignes ajoutées du diff, les messages de commit et les auteurs contre `FORBIDDEN_TERMS` (`.env` local, jamais versionné). Liste vide ou absente : aucun contrôle. Un terme trouvé bloque le push ; `Livraison.arret` signale la localisation sans nommer le terme. Un projet déclare `"confidentiality": "professional"` dans `agents.json` pour s'exempter ; défaut et valeur inconnue : contrôlé.
+**Raison** : ADR-018 et ADR-027 font commiter l'orchestrateur lui-même — ni l'identité git par dossier ni un hook global ne couvrent ces commits. Le push est le seul point de contrôle avant que le contenu quitte la machine.
+**Alternative rejetée** : contrôle au commit — ADR-018 exige un commit à chaque sortie, bloquer le commit casserait l'arbre propre ; hook pre-push global — ignoré pendant les runs (ADR-027).
+
+---
+
+## ADR-049 — Un rôle qui lit le web n'a pas de shell
+
+**Date** : 2026-09-29
+**Décision** : un rôle déclaré `"web": true` dans `agents.json` reçoit `WebFetch` et `WebSearch` et perd `Bash`, principal comme repli. `par_role.outils_du_role` est le seul endroit qui compose ces outils ; un rôle sans outils ne gagne rien.
+**Raison** : une page lue peut porter des instructions, et on ne sait pas filtrer une page. Avec `Bash` et `acceptEdits`, l'agent aurait de quoi les exécuter — un `curl` suffit à faire sortir un fichier. Sans shell, une injection ne peut plus qu'écrire dans le périmètre, sous relecture.
+**Alternative rejetée** : un MCP de documentation — une dépendance et un réseau de plus au démarrage, pour un besoin que le CLI couvre ; le web au codeur — c'est le rôle qui a le plus besoin de `Bash`.
+
+---
+
+## ADR-050 — Un terme interdit est arrêté à trois portes, et une porte qui n'a pas pu juger refuse
+
+**Date** : 2026-09-29
+**Décision** : `FORBIDDEN_TERMS` (`.env`, jamais versionné) est contrôlé au push du pipeline (ADR-048), par un hook `pre-push` pour les pushes manuels, et en CI sur chaque PR — titre et corps compris — avec la liste en secret GitHub. Le job CI est requis par la protection de `develop` et `main`. Liste absente ou git en échec : refus. Avant toute publication, `scripts/scan_historique.py` couvre l'historique et les métadonnées GitHub.
+**Raison** : une seule porte se contourne sans le vouloir : push à la main, agent d'une autre session, corps de PR.
+**Alternative rejetée** : la CI seule — elle voit la PR après le push, quand la branche est déjà publique.
+**Conséquence assumée** : la liste vaut partout, son périmètre se déclare — `confidentiality: professional`, un CV qui cite ses employeurs.

@@ -3,7 +3,7 @@ id: ticket-148
 title: "L'arrêt ne doit pas effacer le bouton, et la sortie d'un service doit survivre"
 type: fix
 status: done
-pr_number: 167
+pr_number: null
 priority: high
 agent: codeur
 depends_on: ["ticket-147"]

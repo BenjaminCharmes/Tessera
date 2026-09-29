@@ -232,7 +232,9 @@ async def test_ollama_injoignable_l_audit_passe_par_le_repli_et_le_dit(
 
 def test_les_manifestes_du_depot_declarent_les_roles_locaux() -> None:
     racine = Path(__file__).resolve().parents[2] / "projects"
-    attendus = {"securite", "validateur", "doc-technique", "doc-fonctionnelle", "project-analyzer"}
+    # La doc est sortie d'Ollama : à ~6 tokens/s elle retenait chaque run
+    # quatre minutes, pour des éditions sur un texte qui n'existait pas.
+    attendus = {"validateur", "project-analyzer"}
     # Seul `ide-core` est versionné ici ; `demineur` est un dépôt à part, et
     # son manifeste se met à jour dans ce dépôt-là.
     for nom in ("ide-core",):
@@ -242,3 +244,6 @@ def test_les_manifestes_du_depot_declarent_les_roles_locaux() -> None:
             assert configs[role].provider == "ollama", (nom, role)
             assert configs[role].fallback is not None, (nom, role)
             assert configs[role].fallback.provider == "agent_sdk", (nom, role)
+        # L'audit sécurité reste sur Claude : rejoué sur une traversée de
+        # chemin réelle, le modèle local rendait PASS (ticket-212).
+        assert configs["securite"].provider == "agent_sdk", nom

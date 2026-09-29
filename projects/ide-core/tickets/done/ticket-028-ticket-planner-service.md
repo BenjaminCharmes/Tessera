@@ -3,7 +3,7 @@ id: ticket-028
 title: "Agent planificateur — tickets depuis une description NL (backend)"
 type: feat
 status: done
-pr_number: 40
+pr_number: null
 priority: medium
 agent: codeur
 depends_on:

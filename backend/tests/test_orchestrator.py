@@ -147,6 +147,9 @@ class _FakeGit:
     async def current_diff(self) -> str:
         return self._diff
 
+    async def diff_depuis_base(self) -> str:
+        return self._diff
+
     async def is_clean(self) -> bool:
         return True
 
@@ -381,6 +384,9 @@ async def test_run_pipeline_cree_une_branche_et_emet_l_event(tmp_path: Path) -> 
         async def current_diff(self) -> str:
             return ""
 
+        async def diff_depuis_base(self) -> str:
+            return ""
+
         async def is_clean(self) -> bool:
             return True
 
@@ -429,6 +435,9 @@ async def test_pipeline_done_porte_la_branche_du_run(tmp_path: Path) -> None:
             return f"{ticket_id}-{slug}"
 
         async def current_diff(self) -> str:
+            return ""
+
+        async def diff_depuis_base(self) -> str:
             return ""
 
         async def is_clean(self) -> bool:
@@ -1139,9 +1148,12 @@ async def test_branche_en_echec_le_pipeline_termine_sans_commettre(tmp_path: Pat
 
 
 class _FailingDiffGit(_FakeGit):
-    """current_diff always fails; the pipeline must still complete."""
+    """diff_depuis_base always fails; the pipeline must still complete."""
 
     async def current_diff(self) -> str:
+        raise GitWorkspaceError("git diff failed")
+
+    async def diff_depuis_base(self) -> str:
         raise GitWorkspaceError("git diff failed")
 
 
@@ -1180,6 +1192,9 @@ class _DirtyingGit:
         return f"{ticket_id}-slug"
 
     async def current_diff(self) -> str:
+        return DIFF_REEL
+
+    async def diff_depuis_base(self) -> str:
         return DIFF_REEL
 
     async def is_clean(self) -> bool:

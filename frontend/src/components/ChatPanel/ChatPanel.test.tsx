@@ -29,6 +29,7 @@ beforeEach(() => {
     spent_usd: 0,
     max_usd: 2,
   });
+  vi.spyOn(api.chat, "list").mockResolvedValue([]);
 });
 
 describe("ChatPanel", () => {
@@ -204,6 +205,97 @@ describe("ChatPanel — lancement de pipeline (ticket-055)", () => {
     );
     await waitFor(() =>
       expect(screen.getByText(/approuvé après 1 tour/)).toBeInTheDocument(),
+    );
+  });
+});
+
+describe("ChatPanel — conversations (ticket-225)", () => {
+  it("affiche les conversations rendues par l'API avec leur titre", async () => {
+    vi.spyOn(api.chat, "list").mockResolvedValue([
+      {
+        conversation_id: "conv-abc",
+        title: "Explique le pipeline",
+        last_activity: "2026-09-29T10:00:00Z",
+      },
+      {
+        conversation_id: "default",
+        title: "Première discussion",
+        last_activity: "2026-09-28T09:00:00Z",
+      },
+    ]);
+
+    render(<ChatPanel project={project} />);
+
+    await waitFor(() =>
+      expect(screen.getByText("Explique le pipeline")).toBeInTheDocument(),
+    );
+    expect(screen.getByText("Première discussion")).toBeInTheDocument();
+  });
+
+  it("Nouvelle conversation ouvre une conversation avec un identifiant différent de default", async () => {
+    const user = userEvent.setup();
+    const historySpy = vi.spyOn(api.chat, "history").mockResolvedValue({
+      project_id: "ide-core",
+      conversation_id: "default",
+      messages: [],
+      spent_usd: 0,
+      max_usd: 2,
+    });
+
+    render(<ChatPanel project={project} />);
+
+    await user.click(screen.getByRole("button", { name: "Nouvelle conversation" }));
+
+    await waitFor(() => {
+      const calls = historySpy.mock.calls;
+      const lastConvId = calls[calls.length - 1]?.[1];
+      expect(lastConvId).not.toBe("default");
+    });
+  });
+
+  it("cliquer sur une conversation charge son historique avec son identifiant", async () => {
+    const historySpy = vi.spyOn(api.chat, "history").mockResolvedValue({
+      project_id: "ide-core",
+      conversation_id: "conv-xyz",
+      messages: [],
+      spent_usd: 0,
+      max_usd: 2,
+    });
+    vi.spyOn(api.chat, "list").mockResolvedValue([
+      {
+        conversation_id: "conv-xyz",
+        title: "Discussion sur les tests",
+        last_activity: "2026-09-29T08:00:00Z",
+      },
+    ]);
+
+    render(<ChatPanel project={project} />);
+
+    await waitFor(() =>
+      expect(screen.getByText("Discussion sur les tests")).toBeInTheDocument(),
+    );
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Discussion sur les tests"));
+
+    await waitFor(() =>
+      expect(historySpy).toHaveBeenCalledWith("ide-core", "conv-xyz"),
+    );
+  });
+
+  it("la conversation default reste accessible dans la liste", async () => {
+    vi.spyOn(api.chat, "list").mockResolvedValue([
+      {
+        conversation_id: "default",
+        title: "Conversation par défaut",
+        last_activity: "2026-09-29T07:00:00Z",
+      },
+    ]);
+
+    render(<ChatPanel project={project} />);
+
+    await waitFor(() =>
+      expect(screen.getByText("Conversation par défaut")).toBeInTheDocument(),
     );
   });
 });

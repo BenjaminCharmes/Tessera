@@ -12,7 +12,11 @@ from tessera.models.ticket import (
     TicketPriority,
     TicketStatus,
     TicketType,
+    TicketUnreadable,
 )
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 
 _STATUS_DIRS: dict[TicketStatus, str] = {
@@ -66,15 +70,30 @@ class TicketService:
     async def list_tickets(
         self, status: TicketStatus | None = None
     ) -> list[Ticket]:
+        """Return parseable tickets, logging unreadable files without raising."""
+        tickets, _ = await self.list_tickets_with_unreadable(status)
+        return tickets
+
+    async def list_tickets_with_unreadable(
+        self, status: TicketStatus | None = None
+    ) -> tuple[list[Ticket], list[TicketUnreadable]]:
+        """Return parseable tickets and files that could not be parsed."""
         tickets: list[Ticket] = []
+        unreadable: list[TicketUnreadable] = []
         for path in self._iter_active_files():
             try:
                 t = self._parse(path)
                 if status is None or t.status == status:
                     tickets.append(t)
-            except Exception:
-                continue
-        return sorted(tickets, key=lambda t: t.id)
+            except Exception as exc:
+                _logger.warning(
+                    "ticket_unreadable",
+                    extra={"path": str(path), "error": str(exc)},
+                )
+                unreadable.append(
+                    TicketUnreadable(file_path=str(path), error=str(exc))
+                )
+        return sorted(tickets, key=lambda t: t.id), unreadable
 
     async def get_ticket(self, ticket_id: str) -> Ticket | None:
         path = self._find_file(ticket_id)
@@ -83,16 +102,31 @@ class TicketService:
     async def update_status(
         self, ticket_id: str, new_status: TicketStatus
     ) -> Ticket:
-        source = self._find_file(ticket_id)
-        if source is None:
+        sources = self._find_all_files(ticket_id)
+        if not sources:
             raise ValueError(f"Ticket introuvable : {ticket_id}")
 
         dest_dir = self._tickets_root() / _STATUS_DIRS[new_status]
         dest_dir.mkdir(parents=True, exist_ok=True)
-        dest = dest_dir / source.name
+        dest = dest_dir / sources[0].name
 
-        if source != dest:
-            source.rename(dest)
+        # Move one copy to the destination; delete any extra copies.
+        # `replace` is used instead of `rename` because on Windows `rename`
+        # raises `FileExistsError` when the destination already exists.
+        # Duplicates arise when a branch is resumed: the base branch holds
+        # the ticket in `todo/` and the ticket branch holds it in `blocked/`,
+        # and the `set_status` call runs after the branch switch so both
+        # copies are momentarily visible (ticket-220).
+        moved = False
+        for source in sources:
+            if source == dest:
+                moved = True
+                continue
+            if not moved:
+                source.replace(dest)
+                moved = True
+            else:
+                source.unlink()
 
         post = frontmatter.load(str(dest))
         post["status"] = new_status.value
@@ -249,6 +283,18 @@ class TicketService:
                 return path
         return None
 
+    def _find_all_files(self, ticket_id: str) -> list[Path]:
+        """Return every active file matching `ticket_id`, across all status folders.
+
+        More than one result means a branch resume left a stale copy in another
+        folder (ticket-220).  `update_status` uses this list to consolidate them.
+        """
+        return [
+            path
+            for path in self._iter_active_files()
+            if path.stem == ticket_id or path.stem.startswith(ticket_id + "-")
+        ]
+
     def _next_n(self) -> int:
         max_n = 0
         root = self._tickets_root()
@@ -283,6 +329,8 @@ class TicketService:
             if meta.get("github_issue_url")
             else None,
             pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
+            # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
+            plan=meta.get("plan") is True,
             body=str(post.content),
             project_id=self._project_id,
             file_path=str(path),

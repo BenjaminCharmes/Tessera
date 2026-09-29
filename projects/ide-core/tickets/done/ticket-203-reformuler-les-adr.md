@@ -1,14 +1,14 @@
 ---
-id: ticket-203
-title: "Reformuler les ADR qui racontent un usage réel au lieu d'une règle"
-type: docs
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-203
+pr_number: null
+priority: medium
+status: done
+title: Reformuler les ADR qui racontent un usage réel au lieu d'une règle
+type: docs
 ---
 
 # ticket-203 — Reformuler les ADR qui racontent un usage réel

@@ -43,6 +43,7 @@ export type EventType =
   | "run_closed"
   | "service_output"
   | "service_closed"
+  | "documentation_failed"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
@@ -87,6 +88,18 @@ export interface Ticket {
   body: string;
   project_id: string;
   file_path: string;
+}
+
+/** A ticket file the backend could not parse (ticket-210). */
+export interface TicketUnreadable {
+  file_path: string;
+  error: string;
+}
+
+/** Full response from GET /projects/{id}/tickets (ticket-210). */
+export interface TicketListResponse {
+  tickets: Ticket[];
+  unreadable: TicketUnreadable[];
 }
 
 export interface PRStatus {
@@ -306,6 +319,13 @@ export interface CloneProjectResponse {
 // ---------------------------------------------------------------- chat ----
 // ticket-048 — chat conversationnel avec outils.
 
+/** A conversation entry as returned by GET /{project_id}/chat — ticket-224. */
+export interface ConversationSummary {
+  conversation_id: string;
+  title: string;
+  last_activity: string;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -380,6 +400,8 @@ export interface TicketRunSummary {
   approved: boolean | null;
   final_status: string | null;
   total_cost_usd: number;
+  /** La cause d'un blocage, quand il y en a eu une (ticket-218). */
+  arret?: string | null;
 }
 
 export interface TicketActivity {

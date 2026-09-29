@@ -3,7 +3,7 @@ id: ticket-115
 title: "La file refuse un ticket déjà terminé"
 type: fix
 status: done
-pr_number: 132
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []

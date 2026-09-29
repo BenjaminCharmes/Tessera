@@ -14,6 +14,7 @@ import type {
   ArtifactMode,
   ArtifactModeState,
   ChatHistory,
+  ConversationSummary,
   GitStatus,
   RemovalPlan,
   ConversationMessage,
@@ -32,6 +33,7 @@ import type {
   ProjectUsage,
   RunFromChatResponse,
   Ticket,
+  TicketListResponse,
   TicketStatus,
   TicketActivity,
   TicketDiff,
@@ -120,7 +122,7 @@ export const api = {
       post(`/projects/${projectId}/tickets/${ticketId}/open-pr`, { branch }),
     mergePr: (projectId: string, ticketId: string): Promise<MergeResponse> =>
       post(`/projects/${projectId}/tickets/${ticketId}/merge-pr`, {}),
-    list: (projectId: string): Promise<Ticket[]> =>
+    list: (projectId: string): Promise<TicketListResponse> =>
       request(`/projects/${projectId}/tickets`),
     /** Un statut posé à la main (ticket-194) ; le backend déplace le fichier et publie l'événement. */
     setStatus: (
@@ -232,6 +234,8 @@ export const api = {
       put(`/projects/${projectId}/artifacts`, { mode }),
   },
   chat: {
+    list: (projectId: string): Promise<ConversationSummary[]> =>
+      request(`/projects/${projectId}/chat`),
     history: (
       projectId: string,
       conversationId: string,

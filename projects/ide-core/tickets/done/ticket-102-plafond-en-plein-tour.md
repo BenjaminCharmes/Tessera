@@ -3,7 +3,7 @@ id: ticket-102
 title: "Un plafond atteint en plein tour ne doit pas perdre le travail"
 type: fix
 status: done
-pr_number: 98
+pr_number: null
 priority: high
 agent: codeur
 depends_on: []

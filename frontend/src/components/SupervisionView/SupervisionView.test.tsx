@@ -172,6 +172,20 @@ describe("SupervisionView", () => {
     expect(screen.queryByText("tour 3")).not.toBeInTheDocument();
   });
 
+  it("affiche le panneau Agents pour le run selectionne", () => {
+    // Critère ticket-223 : la suppression de la colonne de droite ne doit pas
+    // priver Supervision de son panneau Agents. AgentPanel est toujours rendu
+    // dans la partie droite de la grille de SupervisionView.
+    render(
+      <SupervisionView
+        supervision={supervision({ runs: [run()] })}
+        projects={PROJETS}
+      />,
+    );
+    // AgentPanel affiche systématiquement le titre « Agents » dans son header.
+    expect(screen.getByText("Agents")).toBeInTheDocument();
+  });
+
   it("compte le chat parmi ce qui tourne", () => {
     // Le badge doit dire ce que l'IDE fait, pas seulement ses pipelines.
     const sup = supervision({

@@ -4,3 +4,156 @@
 - 2026-06-20 21:01:34 UTC — [ticket-016] tour 1 — codeur démarré
 - 2026-09-21 11:22:20 UTC — [ticket-101] branche ticket-101-la-marque-se-lit-l-o-elle-est-pos-e
 - 2026-09-21 11:22:20 UTC — [ticket-101] tour 1 — codeur démarré
+- 2026-09-28 10:09:08 UTC — [ticket-203] branche ticket-203-reformuler-les-adr-qui-racontent-un-usage-r-el-au
+- 2026-09-28 10:09:08 UTC — [ticket-203] tour 1 — codeur démarré
+- 2026-09-28 10:13:48 UTC — [ticket-203] tour 1 — codeur terminé (280531ms)
+- 2026-09-28 10:13:49 UTC — [ticket-203] tour 1 — reviewer démarré
+- 2026-09-28 10:15:41 UTC — [ticket-203] tour 1 — reviewer terminé (111735ms)
+- 2026-09-28 10:15:41 UTC — [ticket-203] APPROVED après 1 tour(s)
+- 2026-09-28 10:15:46 UTC — [ticket-204] branche ticket-204-refuser-de-publier-un-terme-interdit-sur-tous-les
+- 2026-09-28 10:15:46 UTC — [ticket-204] tour 1 — codeur démarré
+- 2026-09-28 10:20:01 UTC — [ticket-204] tour 1 — architect terminé (255031ms)
+- 2026-09-28 10:20:02 UTC — [ticket-204] tour 1 — reviewer démarré
+- 2026-09-28 10:22:07 UTC — [ticket-204] tour 1 — reviewer terminé (124608ms)
+- 2026-09-28 10:22:07 UTC — [ticket-204] APPROVED après 1 tour(s)
+- 2026-09-28 12:56:39 UTC — [ticket-209] branche ticket-209-le-validateur-n-approuve-que-s-il-a-jug-chaque-cr
+- 2026-09-28 12:56:39 UTC — [ticket-209] tour 1 — codeur démarré
+- 2026-09-28 12:59:32 UTC — [ticket-209] tour 1 — codeur terminé (173593ms)
+- 2026-09-28 12:59:51 UTC — [ticket-209] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie le prompt du validateur et refact
+- 2026-09-28 12:59:51 UTC — [ticket-209] tour 1 — reviewer démarré
+- 2026-09-28 13:00:55 UTC — [ticket-209] tour 1 — reviewer terminé (63656ms)
+- 2026-09-28 13:00:55 UTC — [ticket-209] APPROVED après 1 tour(s)
+- 2026-09-28 13:19:34 UTC — [ticket-214] branche ticket-214-un-crit-re-d-acceptation-crit-sur-plusieurs-ligne
+- 2026-09-28 13:19:34 UTC — [ticket-214] tour 1 — codeur démarré
+- 2026-09-28 13:21:04 UTC — [ticket-214] tour 1 — codeur terminé (90280ms)
+- 2026-09-28 13:21:26 UTC — [ticket-214] securite: PASS — Audit de sécurité du diff terminé. Aucune vulnérabilité critique, haute ou moyen
+- 2026-09-28 13:21:26 UTC — [ticket-214] tour 1 — reviewer démarré
+- 2026-09-28 13:22:21 UTC — [ticket-214] tour 1 — reviewer terminé (55157ms)
+- 2026-09-28 13:22:21 UTC — [ticket-214] APPROVED après 1 tour(s)
+- 2026-09-28 14:09:15 UTC — [ticket-208] branche ticket-208-relancer-un-ticket-fait-relire-tout-le-travail-de
+- 2026-09-28 14:09:15 UTC — [ticket-208] tour 1 — codeur démarré
+- 2026-09-29 07:23:43 UTC — [ticket-220] branche ticket-220-reprendre-une-branche-de-ticket-ne-duplique-pas-l
+- 2026-09-29 07:23:43 UTC — [ticket-220] tour 1 — codeur démarré
+- 2026-09-29 07:28:00 UTC — [ticket-220] tour 1 — codeur terminé (256875ms)
+- 2026-09-29 07:28:30 UTC — [ticket-220] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+**Résumé des changements
+- 2026-09-29 07:28:30 UTC — [ticket-220] tour 1 — reviewer démarré
+- 2026-09-29 07:29:54 UTC — [ticket-220] tour 1 — reviewer terminé (83875ms)
+- 2026-09-29 07:31:13 UTC — [ticket-220] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code gère correctement la co
+- 2026-09-29 07:31:13 UTC — [ticket-220] APPROVED après 1 tour(s)
+- 2026-09-29 07:37:14 UTC — [ticket-218] branche ticket-218-la-raison-d-un-run-bloqu-se-voit-sur-la-carte-et
+- 2026-09-29 07:37:14 UTC — [ticket-218] tour 1 — codeur démarré
+- 2026-09-29 07:42:55 UTC — [ticket-218] tour 1 — codeur terminé (340312ms)
+- 2026-09-29 07:43:42 UTC — [ticket-218] securite: PASS — Audit de sécurité du diff ticket-218 (exposition de la cause d'un blocage). Aucu
+- 2026-09-29 07:43:42 UTC — [ticket-218] tour 1 — reviewer démarré
+- 2026-09-29 07:44:59 UTC — [ticket-218] tour 1 — reviewer terminé (77547ms)
+- 2026-09-29 07:44:59 UTC — [ticket-218] CHANGES_REQUESTED tour 1: 
+- 2026-09-29 07:44:59 UTC — [ticket-218] tour 2 — codeur démarré
+- 2026-09-29 07:49:45 UTC — [ticket-218] tour 2 — codeur terminé (286203ms)
+- 2026-09-29 07:50:28 UTC — [ticket-218] securite: PASS — Audit complet du diff ticket-218. Aucune vulnérabilité de sécurité détectée selo
+- 2026-09-29 07:50:28 UTC — [ticket-218] tour 2 — reviewer démarré
+- 2026-09-29 07:51:20 UTC — [ticket-218] tour 2 — reviewer terminé (51891ms)
+- 2026-09-29 07:54:01 UTC — [ticket-218] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : le champ 'arret' est correctem
+- 2026-09-29 07:54:01 UTC — [ticket-218] APPROVED après 2 tour(s)
+- 2026-09-29 07:59:56 UTC — [ticket-215] branche ticket-215-github-remote-se-normalise-en-propri-taire-d-p-t
+- 2026-09-29 07:59:56 UTC — [ticket-215] tour 1 — codeur démarré
+- 2026-09-29 08:08:44 UTC — [ticket-215] tour 1 — codeur terminé (527500ms)
+- 2026-09-29 08:09:27 UTC — [ticket-215] securite: PASS — Audit terminé. Le diff normalise la parsing des URLs GitHub en slugs simples (ow
+- 2026-09-29 08:09:27 UTC — [ticket-215] tour 1 — reviewer démarré
+- 2026-09-29 08:11:06 UTC — [ticket-215] tour 1 — reviewer terminé (98718ms)
+- 2026-09-29 08:13:12 UTC — [ticket-215] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une normalis
+- 2026-09-29 08:13:12 UTC — [ticket-215] APPROVED après 1 tour(s)
+- 2026-09-29 08:26:19 UTC — [ticket-228] branche ticket-228-les-agents-de-documentation-re-oivent-les-fichier
+- 2026-09-29 08:26:19 UTC — [ticket-228] tour 1 — codeur démarré
+- 2026-09-29 08:31:20 UTC — [ticket-228] tour 1 — codeur terminé (301422ms)
+- 2026-09-29 08:32:05 UTC — [ticket-228] securite: PASS — Audit du diff git : aucune vulnérabilité critique, HIGH ou MEDIUM détectée. 
+
+Le
+- 2026-09-29 08:32:05 UTC — [ticket-228] tour 1 — reviewer démarré
+- 2026-09-29 08:33:55 UTC — [ticket-228] tour 1 — reviewer terminé (110030ms)
+- 2026-09-29 08:35:35 UTC — [ticket-228] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
+- 2026-09-29 08:35:35 UTC — [ticket-228] APPROVED après 1 tour(s)
+- 2026-09-29 08:42:05 UTC — [ticket-210] branche ticket-210-un-fichier-de-ticket-illisible-se-signale-au-lieu
+- 2026-09-29 08:42:05 UTC — [ticket-210] tour 1 — codeur démarré
+- 2026-09-29 08:48:45 UTC — [ticket-210] tour 1 — codeur terminé (400187ms)
+- 2026-09-29 08:50:54 UTC — [ticket-210] securite: PASS — No CRITICAL or HIGH severity vulnerabilities introduced by this diff. The change
+- 2026-09-29 08:50:54 UTC — [ticket-210] tour 1 — reviewer démarré
+- 2026-09-29 08:52:17 UTC — [ticket-210] tour 1 — reviewer terminé (83342ms)
+- 2026-09-29 08:55:34 UTC — [ticket-210] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code traite correctement les 
+- 2026-09-29 08:55:34 UTC — [ticket-210] APPROVED après 1 tour(s)
+- 2026-09-29 09:08:19 UTC — [ticket-211] branche ticket-211-les-appels-des-r-les-sans-outils-s-enregistrent-d
+- 2026-09-29 09:08:19 UTC — [ticket-211] tour 1 — codeur démarré
+- 2026-09-29 09:21:32 UTC — [ticket-211] tour 1 — codeur terminé (792984ms)
+- 2026-09-29 09:22:25 UTC — [ticket-211] securite: PASS — Le diff introduit un wrapper `ProviderEnregistrant` pour l'enregistrement centra
+- 2026-09-29 09:22:25 UTC — [ticket-211] tour 1 — reviewer démarré
+- 2026-09-29 09:24:31 UTC — [ticket-211] tour 1 — reviewer terminé (125437ms)
+- 2026-09-29 09:28:57 UTC — [ticket-211] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un wrapper `ProviderEnregi
+- 2026-09-29 09:28:57 UTC — [ticket-211] APPROVED après 1 tour(s)
+- 2026-09-29 09:44:22 UTC — [ticket-216] branche ticket-216-le-compte-rendu-du-codeur-reste-visible-apr-s-son
+- 2026-09-29 09:44:23 UTC — [ticket-216] tour 1 — codeur démarré
+- 2026-09-29 09:47:20 UTC — [ticket-216] tour 1 — codeur terminé (176983ms)
+- 2026-09-29 09:47:39 UTC — [ticket-216] securite: PASS — Aucune vulnérabilité détectée. Le code TypeScript suit les bonnes pratiques Reac
+- 2026-09-29 09:47:39 UTC — [ticket-216] tour 1 — reviewer démarré
+- 2026-09-29 09:49:01 UTC — [ticket-216] tour 1 — reviewer terminé (81453ms)
+- 2026-09-29 09:50:26 UTC — [ticket-216] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le composant AgentBlock gère cor
+- 2026-09-29 09:50:26 UTC — [ticket-216] APPROVED après 1 tour(s)
+- 2026-09-29 09:54:52 UTC — [ticket-222] branche ticket-222-le-panneau-agents-garde-les-tours-pr-c-dents-d-un
+- 2026-09-29 09:54:52 UTC — [ticket-222] tour 1 — codeur démarré
+- 2026-09-29 10:03:49 UTC — [ticket-222] tour 1 — codeur terminé (537141ms)
+- 2026-09-29 10:04:16 UTC — [ticket-222] securite: PASS — Audit de sécurité du diff : aucune vulnérabilité détectée.
+
+**Analyse effectuée 
+- 2026-09-29 10:04:16 UTC — [ticket-222] tour 1 — reviewer démarré
+- 2026-09-29 10:06:18 UTC — [ticket-222] tour 1 — reviewer terminé (121687ms)
+- 2026-09-29 10:06:18 UTC — [ticket-222] CHANGES_REQUESTED tour 1: `VerdictBanner` filtre-t-elle "Ajoute des tests" au point que le test du critère 3 échoue ?L'analyse
+- 2026-09-29 10:06:18 UTC — [ticket-222] tour 2 — codeur démarré
+- 2026-09-29 10:07:37 UTC — [ticket-222] tour 2 — codeur terminé (79078ms)
+- 2026-09-29 10:08:19 UTC — [ticket-222] securite: PASS — Aucune vulnérabilité de sécurité détectée dans ce diff. Le code refactorise l'af
+- 2026-09-29 10:08:19 UTC — [ticket-222] tour 2 — reviewer démarré
+- 2026-09-29 10:09:46 UTC — [ticket-222] tour 2 — reviewer terminé (87593ms)
+- 2026-09-29 10:13:41 UTC — [ticket-222] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests Vitest couvrent les c
+- 2026-09-29 10:13:41 UTC — [ticket-222] APPROVED après 2 tour(s)
+- 2026-09-29 10:20:47 UTC — [ticket-224] branche ticket-224-le-backend-liste-les-conversations-du-chat-d-un-p
+- 2026-09-29 10:20:48 UTC — [ticket-224] tour 1 — codeur démarré
+- 2026-09-29 10:23:29 UTC — [ticket-224] tour 1 — codeur terminé (161140ms)
+- 2026-09-29 10:24:03 UTC — [ticket-224] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute un endpoint de listing
+- 2026-09-29 10:24:03 UTC — [ticket-224] tour 1 — reviewer démarré
+- 2026-09-29 10:25:37 UTC — [ticket-224] tour 1 — reviewer terminé (93906ms)
+- 2026-09-29 10:25:37 UTC — [ticket-224] CHANGES_REQUESTED tour 1: 
+- 2026-09-29 10:25:37 UTC — [ticket-224] tour 2 — codeur démarré
+- 2026-09-29 10:26:10 UTC — [ticket-224] tour 2 — codeur terminé (33327ms)
+- 2026-09-29 10:26:53 UTC — [ticket-224] securite: PASS — Audit complet du diff ticket-224 (conversations listing) : aucune vulnérabilité 
+- 2026-09-29 10:26:53 UTC — [ticket-224] tour 2 — reviewer démarré
+- 2026-09-29 10:28:17 UTC — [ticket-224] tour 2 — reviewer terminé (83625ms)
+- 2026-09-29 10:29:45 UTC — [ticket-224] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente une nouvelle 
+- 2026-09-29 10:29:45 UTC — [ticket-224] APPROVED après 2 tour(s)
+- 2026-09-29 10:37:08 UTC — [ticket-223] branche ticket-223-le-chat-a-sa-propre-vue-la-colonne-de-droite-disp
+- 2026-09-29 10:37:08 UTC — [ticket-223] tour 1 — codeur démarré
+- 2026-09-29 10:46:31 UTC — [ticket-223] tour 1 — codeur terminé (563171ms)
+- 2026-09-29 10:46:51 UTC — [ticket-223] securite: PASS — Refactorisation UI frontend (TypeScript/React) : suppression du panneau latéral 
+- 2026-09-29 10:46:51 UTC — [ticket-223] tour 1 — reviewer démarré
+- 2026-09-29 10:47:53 UTC — [ticket-223] tour 1 — reviewer terminé (62828ms)
+- 2026-09-29 10:50:45 UTC — [ticket-223] validateur: CHANGES_REQUESTED — Les tests pour les fonctionnalités liées au Chat sont présents et vérifiés. Le c
+- 2026-09-29 10:50:45 UTC — [ticket-223] CHANGES_REQUESTED tour 1: Les tests pour les fonctionnalités liées au Chat sont présents et vérifiés. Le composant App a été m
+- 2026-09-29 10:50:45 UTC — [ticket-223] tour 2 — codeur démarré
+- 2026-09-29 10:52:06 UTC — [ticket-223] tour 2 — codeur terminé (80405ms)
+- 2026-09-29 10:52:21 UTC — [ticket-223] securite: PASS — Audit de sécurité du diff App.tsx / tests frontend — aucune vulnérabilité détect
+- 2026-09-29 10:52:21 UTC — [ticket-223] tour 2 — reviewer démarré
+- 2026-09-29 10:53:29 UTC — [ticket-223] tour 2 — reviewer terminé (68405ms)
+- 2026-09-29 10:55:07 UTC — [ticket-223] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests Vitest ont été ajoutés
+- 2026-09-29 10:55:07 UTC — [ticket-223] APPROVED après 2 tour(s)
+- 2026-09-29 11:05:57 UTC — [ticket-225] branche ticket-225-le-chat-s-organise-par-conversation-liste-nouvell
+- 2026-09-29 11:05:57 UTC — [ticket-225] tour 1 — codeur démarré
+- 2026-09-29 11:10:40 UTC — [ticket-225] tour 1 — codeur terminé (283421ms)
+- 2026-09-29 11:11:06 UTC — [ticket-225] securite: PASS — Frontend code is secure. HTML auto-escaping in React prevents XSS (line Conversa
+- 2026-09-29 11:11:06 UTC — [ticket-225] tour 1 — reviewer démarré
+- 2026-09-29 11:12:45 UTC — [ticket-225] tour 1 — reviewer terminé (98390ms)
+- 2026-09-29 11:12:45 UTC — [ticket-225] CHANGES_REQUESTED tour 1: 
+- 2026-09-29 11:12:45 UTC — [ticket-225] tour 2 — codeur démarré
+- 2026-09-29 11:14:06 UTC — [ticket-225] tour 2 — codeur terminé (81594ms)
+- 2026-09-29 11:14:44 UTC — [ticket-225] securite: PASS — Audit de la feature ticket-225 (conversations multi-projets) : aucune vulnérabil
+- 2026-09-29 11:14:44 UTC — [ticket-225] tour 2 — reviewer démarré
+- 2026-09-29 11:16:23 UTC — [ticket-225] tour 2 — reviewer terminé (98562ms)
+- 2026-09-29 11:18:22 UTC — [ticket-225] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par les tests ajoutés. Le compos
+- 2026-09-29 11:18:22 UTC — [ticket-225] APPROVED après 2 tour(s)

@@ -189,13 +189,13 @@ async def finish_stopped(orch: "Orchestrator", run: PipelineRun) -> PipelineResu
     """
     await set_status(orch, run, TicketStatus.blocked)
     await emit(run, EventType.ERROR, reason="stopped_by_user")
+    orch._log(f"[{run.ticket_id}] ARRÊTÉ par l'utilisateur au tour {run.round_num}")
     commit_sha, arret = await commit_ou_bloquer(
         orch, run, _unapproved_commit_message(run.ticket_id, "arrêt demandé")
     )
     await emit(
         run, EventType.PIPELINE_DONE, approved=False, rounds=run.round_num, branch=run.branch
     )
-    orch._log(f"[{run.ticket_id}] ARRÊTÉ par l'utilisateur au tour {run.round_num}")
     return PipelineResult(
         ticket_id=run.ticket_id,
         final_status=TicketStatus.blocked,
@@ -212,6 +212,9 @@ async def finish_rounds_exhausted(
 ) -> PipelineResult:
     """Block the ticket after the last round, committing the work all the same."""
     await set_status(orch, run, TicketStatus.blocked)
+    orch._log(
+        f"[{run.ticket_id}] BLOCKED après {orch._max_review_rounds} tour(s) sans approbation"
+    )
     commit_sha, arret = await commit_ou_bloquer(
         orch,
         run,
@@ -227,9 +230,6 @@ async def finish_rounds_exhausted(
         approved=False,
         rounds=orch._max_review_rounds,
         branch=run.branch,
-    )
-    orch._log(
-        f"[{run.ticket_id}] BLOCKED après {orch._max_review_rounds} tour(s) sans approbation"
     )
     return PipelineResult(
         ticket_id=run.ticket_id,
@@ -256,6 +256,7 @@ async def finish_budget_exhausted(
         f"run budget exhausted: {orch.spent_usd:.2f} USD spent "
         f"of {orch._run_max_budget_usd:.2f} allowed"
     )
+    orch._log(f"[{run.ticket_id}] BLOCKED après le tour {run.round_num} — {raison}")
     commit_sha, arret = await commit_ou_bloquer(
         orch, run, _unapproved_commit_message(run.ticket_id, raison)
     )
@@ -267,7 +268,6 @@ async def finish_budget_exhausted(
         reason="run_budget_exhausted",
         branch=run.branch,
     )
-    orch._log(f"[{run.ticket_id}] BLOCKED après le tour {run.round_num} — {raison}")
     return PipelineResult(
         ticket_id=run.ticket_id,
         final_status=TicketStatus.blocked,
@@ -300,6 +300,7 @@ async def finish_interrupted(
     await set_status(orch, run, TicketStatus.blocked)
     raison = f"{type(cause).__name__}: {_single_line(str(cause))[:120]}"
     await emit(run, EventType.ERROR, reason="interrupted", detail=raison)
+    orch._log(f"[{run.ticket_id}] INTERROMPU au tour {run.round_num} — {raison}")
     commit_sha, echec_commit = await commit_ou_bloquer(
         orch, run, _unapproved_commit_message(run.ticket_id, raison)
     )
@@ -315,7 +316,6 @@ async def finish_interrupted(
         reason="interrupted",
         branch=run.branch,
     )
-    orch._log(f"[{run.ticket_id}] INTERROMPU au tour {run.round_num} — {raison}")
     return PipelineResult(
         ticket_id=run.ticket_id,
         final_status=TicketStatus.blocked,

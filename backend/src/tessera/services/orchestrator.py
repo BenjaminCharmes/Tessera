@@ -14,6 +14,7 @@ from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
+from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import (
     EventCallback,
@@ -27,6 +28,7 @@ from tessera.utils.logger import get_logger
 from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
+from tessera.services.pipeline_plan import run_plan
 
 if TYPE_CHECKING:
     from tessera.services.carte_du_depot import CarteDuDepot
@@ -219,13 +221,21 @@ class Orchestrator:
             dialogue=dialogue or DialogueChannel(interactive=False),
         )
 
+        # Active l'enregistrement des appels LLM dans `agent_calls` pour la
+        # durée de ce ticket. Tous les providers enveloppés dans
+        # `ProviderEnregistrant` lisent ces variables de contexte (ticket-211).
+        activer_enregistrement(run.run_id, run.ticket_id)
+
         refused = await stages.ensure_clean_tree(self, run)
         if refused is not None:
             return refused
 
-        await set_status(self, run, TicketStatus.in_progress)
         await stages.create_branch(self, run)
+        await set_status(self, run, TicketStatus.in_progress)
         run.carte_du_depot = await self._carte()
+        # Avant le premier tour, et seulement si le ticket le déclare. Ne lève
+        # jamais : un plan manqué laisse le run tel qu'avant ticket-243.
+        await run_plan(self, run)
 
         # À partir d'ici une branche existe et les agents écrivent sur disque :
         # une panne qui remonterait laisserait leur travail non commité, donc
@@ -484,11 +494,23 @@ class Orchestrator:
             doc = await self._documenter()
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("documentation_echouee", extra={"erreur": str(exc)})
+            await on_event(
+                OrchestratorEvent(
+                    type=EventType.DOCUMENTATION_FAILED,
+                    ticket_id=resultat.ticket_id,
+                    data={"error": str(exc)},
+                )
+            )
             return
         fichiers = list(getattr(doc, "fichiers_modifies", []) or [])
         refus = list(getattr(doc, "refus", []) or [])
         tickets = list(getattr(doc, "tickets", []) or [])
-        if fichiers and self._git_workspace is not None and resultat.branch is not None:
+        tronque = bool(getattr(doc, "tronque", False))
+        marqueur_ecrit = bool(getattr(doc, "marqueur_ecrit", False))
+        # Commiter si des fichiers de doc ont changé **ou** si le marqueur a
+        # été réécrit : dans les deux cas l'arbre doit rester propre avant la
+        # livraison (ADR-018, ticket-213).
+        if (fichiers or marqueur_ecrit) and self._git_workspace is not None and resultat.branch is not None:
             try:
                 await self._git_workspace.commit_all(
                     f"docs: update documentation for {resultat.ticket_id}"
@@ -496,12 +518,17 @@ class Orchestrator:
             except Exception as exc:  # noqa: BLE001
                 _logger.warning("documentation_commit_echoue", extra={"erreur": str(exc)})
                 refus.append(f"commit : {exc}")
-        if fichiers or refus:
+        if fichiers or refus or tronque:
             await on_event(
                 OrchestratorEvent(
                     type=EventType.DOC_UPDATED,
                     ticket_id=resultat.ticket_id,
-                    data={"fichiers": fichiers, "refus": refus, "tickets": tickets},
+                    data={
+                        "fichiers": fichiers,
+                        "refus": refus,
+                        "tickets": tickets,
+                        "tronque": tronque,
+                    },
                 )
             )
 

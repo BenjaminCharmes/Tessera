@@ -103,6 +103,12 @@ def build_context(orch: "Orchestrator", run: PipelineRun) -> str:
     """
     parts = [orch._project_context]
 
+    # Le plan précède les retours : le codeur le suit, le reviewer juge
+    # l'écart (ticket-243). Il reste dans le contexte du tour, donc dans les
+    # reprises : c'est court, et c'est ce qui dit où le travail doit aller.
+    if run.plan:
+        parts.append(f"\n\n## Plan retenu avant le code\n{run.plan}")
+
     if run.review_feedback:
         parts.append(
             "\n\n## Retours reviewer précédents\n"
@@ -246,11 +252,18 @@ async def _capture_diff(orch: "Orchestrator", run: PipelineRun, prose: str) -> s
 
     Le codeur écrit réellement sur disque : ce qui doit être relu, audité et
     validé, c'est le diff, pas la prose de l'agent.
+
+    Sur une branche reprise (second run du même ticket), `diff_depuis_base`
+    étend le diff jusqu'au point de divergence de la branche : l'audit
+    sécurité, le reviewer et le validateur voient tout le travail accumulé,
+    pas seulement ce que le dernier tour n'a pas encore commité (ticket-208).
+    Une seule fonction calcule le diff — `reviewed_code` est posé ici et les
+    trois portes le lisent, sans recalcul.
     """
     if orch._git_workspace is None:
         return prose
     try:
-        diff = await orch._git_workspace.current_diff()
+        diff = await orch._git_workspace.diff_depuis_base()
     except GitWorkspaceError as exc:
         _logger.warning("diff_failed", extra={"error": str(exc)})
         _logger.info("diff_empty_fallback_to_prose", extra={"ticket_id": run.ticket_id})

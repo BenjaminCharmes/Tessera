@@ -19,8 +19,10 @@ from tessera.services.run_lock import RUN_LOCK
 from tessera.services.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
 from tessera.services.database import (
     ChatMessageRow,
+    ConversationSummary,
     conversation_cost_usd,
     list_chat_messages,
+    list_conversations,
     save_chat_message,
 )
 from tessera.services.git_workspace import GitWorkspaceService
@@ -106,6 +108,13 @@ async def _build_service(project_id: str) -> ChatService:
         git_workspace=GitWorkspaceService(project_path),
         max_conversation_usd=settings.chat_max_conversation_usd,
     )
+
+
+@router.get("/{project_id}/chat", response_model=list[ConversationSummary])
+async def get_conversations(project_id: str) -> list[ConversationSummary]:
+    """All conversations for a project, most recent first — ticket-224."""
+    _project_path(project_id)
+    return await list_conversations(settings.ide_db_path, project_id)
 
 
 @router.get("/{project_id}/chat/{conversation_id}", response_model=ChatHistory)
