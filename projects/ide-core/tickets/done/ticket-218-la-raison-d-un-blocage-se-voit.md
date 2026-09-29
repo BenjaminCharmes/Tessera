@@ -1,14 +1,14 @@
 ---
-id: ticket-218
-title: "La raison d'un run bloqué se voit sur la carte et dans la Supervision"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-28
 depends_on: []
 estimated_days: 1
-created: 2026-09-28
+id: ticket-218
+pr_number: null
+priority: high
+status: done
+title: La raison d'un run bloqué se voit sur la carte et dans la Supervision
+type: fix
 ---
 
 # ticket-218 — La raison d'un blocage se voit

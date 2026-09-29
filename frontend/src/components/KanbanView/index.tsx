@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import KanbanColumn from "./KanbanColumn";
+import { useBlockedArrets } from "../../hooks/useBlockedArrets";
 import type { Ticket, TicketStatus } from "../../types/api";
 
 const KANBAN_STATUSES: TicketStatus[] = [
@@ -17,6 +19,8 @@ interface KanbanViewProps {
   running: Set<string>;
   /** Dépôt distant du projet : sans lui, aucune carte ne propose de PR (ticket-123). */
   githubRemote?: string | null;
+  /** Identifiant du projet actif, pour résoudre les arrêts des tickets bloqués (ticket-218). */
+  projectId?: string | null;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
@@ -27,10 +31,17 @@ export default function KanbanView({
   activeTicket,
   running,
   githubRemote,
+  projectId,
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
 }: KanbanViewProps) {
+  const blockedIds = useMemo(
+    () => byStatus["blocked"].map((t) => t.id),
+    [byStatus],
+  );
+  const blockedArrets = useBlockedArrets(projectId ?? null, blockedIds);
+
   return (
     <div className="h-full flex flex-col bg-zinc-900">
       <div className={`${BAND} border-b border-zinc-700 px-4`}>
@@ -50,6 +61,7 @@ export default function KanbanView({
             onSelectTicket={onSelectTicket}
             onRunPipeline={onRunPipeline}
             onChangeStatus={onChangeStatus}
+            blockedArrets={status === "blocked" ? blockedArrets : undefined}
           />
         ))}
       </div>

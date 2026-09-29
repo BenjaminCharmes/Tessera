@@ -10,11 +10,12 @@ import {
   IconChevronRight,
   IconPlus,
 } from "../../design/icons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TicketCard from "./TicketCard";
 import CreateTicketModal from "./CreateTicketModal";
 import PlanEvolutionModal from "./PlanEvolutionModal";
 import SkeletonList from "../SkeletonList";
+import { useBlockedArrets } from "../../hooks/useBlockedArrets";
 import type { Project, Ticket, TicketStatus } from "../../types/api";
 import BarreDeFiltres from "./BarreDeFiltres";
 import type { FiltresTickets } from "../../lib/filtresTickets";
@@ -104,6 +105,12 @@ export default function TicketList({
   );
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showPlanModal, setShowPlanModal] = useState(false);
+
+  const blockedIds = useMemo(
+    () => byStatus["blocked"].map((t) => t.id),
+    [byStatus],
+  );
+  const blockedArrets = useBlockedArrets(project?.id ?? null, blockedIds);
 
   if (!project) {
     return (
@@ -259,6 +266,7 @@ export default function TicketList({
                         onShowDiff={onShowDiff}
                         onToggleQueue={onToggleQueue}
                         dansLaFile={selection.includes(ticket.id)}
+                        arret={blockedArrets[ticket.id] ?? null}
                       />
                     ))}
                 </div>

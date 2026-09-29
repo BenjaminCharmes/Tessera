@@ -251,6 +251,8 @@ class TicketRunSummary(BaseModel):
     approved: bool | None = None
     final_status: str | None = None
     total_cost_usd: float = 0.0
+    #: La cause d'un blocage, quand il y en a eu une (ticket-218).
+    arret: str | None = None
 
 
 class TicketActivity(BaseModel):
@@ -322,6 +324,7 @@ async def get_ticket_activity(project_id: str, ticket_id: str) -> TicketActivity
             approved=bool(row["approved"]) if row.get("approved") is not None else None,
             final_status=row.get("final_status"),
             total_cost_usd=float(row.get("total_cost_usd") or 0.0),
+            arret=row.get("arret"),
         )
         for row in rows
         if row.get("ticket_id") == ticket_id

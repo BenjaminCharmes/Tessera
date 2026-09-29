@@ -86,19 +86,29 @@ export default function TicketActivity({
       {activity.runs.length === 0 ? (
         <p className="text-zinc-600">Aucun run pour l'instant.</p>
       ) : (
-        <ul className="space-y-0.5">
+        <ul className="space-y-1">
           {activity.runs.map((run) => (
-            <li key={run.id} className="flex items-baseline justify-between gap-2">
-              <span
-                className={
-                  run.approved ? "text-green-400" : "text-amber-400"
-                }
-              >
-                {run.approved ? "approuvé" : (run.final_status ?? "en cours")}
-              </span>
-              <span className="text-zinc-600 tabular-nums">
-                {run.rounds ?? 0} tour(s) · {run.total_cost_usd.toFixed(3)} $
-              </span>
+            <li key={run.id}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span
+                  className={
+                    run.approved ? "text-green-400" : "text-amber-400"
+                  }
+                >
+                  {run.approved ? "approuvé" : (run.final_status ?? "en cours")}
+                </span>
+                <span className="text-zinc-600 tabular-nums">
+                  {run.rounds ?? 0} tour(s) · {run.total_cost_usd.toFixed(3)} $
+                </span>
+              </div>
+              {run.arret && (
+                <p
+                  data-testid="run-arret"
+                  className="mt-0.5 break-all text-mini text-red-400"
+                >
+                  {run.arret}
+                </p>
+              )}
             </li>
           ))}
         </ul>

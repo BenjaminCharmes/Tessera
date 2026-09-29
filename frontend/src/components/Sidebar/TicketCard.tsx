@@ -74,6 +74,12 @@ interface TicketCardProps {
    * d'ADR-038 le tient.
    */
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
+  /**
+   * La cause d'un blocage, portée en infobulle sur le badge de statut
+   * (ticket-218). Optionnel : seul le contexte qui connaît l'activité du
+   * ticket peut le fournir.
+   */
+  arret?: string | null;
 }
 
 export default function TicketCard({
@@ -89,6 +95,7 @@ export default function TicketCard({
   onToggleQueue,
   dansLaFile = false,
   onChangeStatus,
+  arret,
 }: TicketCardProps) {
   const canRun = ticket.status !== "done" && ticket.status !== "cancelled";
   const transitions = transitionsManuelles(ticket.status);
@@ -187,6 +194,9 @@ export default function TicketCard({
             ) : (
               <span
                 className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${STATUS_STYLE[ticket.status]}`}
+                title={
+                  ticket.status === "blocked" && arret ? arret : undefined
+                }
               >
                 {ticket.status}
               </span>

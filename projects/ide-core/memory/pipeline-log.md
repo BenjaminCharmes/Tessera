@@ -42,3 +42,17 @@
 - 2026-09-29 07:29:54 UTC — [ticket-220] tour 1 — reviewer terminé (83875ms)
 - 2026-09-29 07:31:13 UTC — [ticket-220] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code gère correctement la co
 - 2026-09-29 07:31:13 UTC — [ticket-220] APPROVED après 1 tour(s)
+- 2026-09-29 07:37:14 UTC — [ticket-218] branche ticket-218-la-raison-d-un-run-bloqu-se-voit-sur-la-carte-et
+- 2026-09-29 07:37:14 UTC — [ticket-218] tour 1 — codeur démarré
+- 2026-09-29 07:42:55 UTC — [ticket-218] tour 1 — codeur terminé (340312ms)
+- 2026-09-29 07:43:42 UTC — [ticket-218] securite: PASS — Audit de sécurité du diff ticket-218 (exposition de la cause d'un blocage). Aucu
+- 2026-09-29 07:43:42 UTC — [ticket-218] tour 1 — reviewer démarré
+- 2026-09-29 07:44:59 UTC — [ticket-218] tour 1 — reviewer terminé (77547ms)
+- 2026-09-29 07:44:59 UTC — [ticket-218] CHANGES_REQUESTED tour 1: 
+- 2026-09-29 07:44:59 UTC — [ticket-218] tour 2 — codeur démarré
+- 2026-09-29 07:49:45 UTC — [ticket-218] tour 2 — codeur terminé (286203ms)
+- 2026-09-29 07:50:28 UTC — [ticket-218] securite: PASS — Audit complet du diff ticket-218. Aucune vulnérabilité de sécurité détectée selo
+- 2026-09-29 07:50:28 UTC — [ticket-218] tour 2 — reviewer démarré
+- 2026-09-29 07:51:20 UTC — [ticket-218] tour 2 — reviewer terminé (51891ms)
+- 2026-09-29 07:54:01 UTC — [ticket-218] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : le champ 'arret' est correctem
+- 2026-09-29 07:54:01 UTC — [ticket-218] APPROVED après 2 tour(s)
