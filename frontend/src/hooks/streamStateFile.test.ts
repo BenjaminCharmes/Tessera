@@ -83,6 +83,41 @@ describe("applyEvent — un ticket de file n'hérite pas du précédent (ticket-
   });
 });
 
+describe("applyEvent — fil chronologique des passages (ticket-222)", () => {
+  it("garde le verdict du reviewer au tour 1 après agent_started du codeur au tour 2", () => {
+    let s = INITIAL;
+    // Tour 1 : codeur puis reviewer
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "Implémentation terminée." } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "reviewer", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "CHANGES_REQUESTED\nAjoute des tests." } }));
+    // Tour 2 : le codeur reprend
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 2 } }));
+
+    // Le verdict du reviewer du tour 1 doit rester dans les entrées.
+    const reviewerEntry = s.entries.find((e) => e.agent === "reviewer" && e.isDone);
+    expect(reviewerEntry).toBeDefined();
+    expect(reviewerEntry?.content).toContain("CHANGES_REQUESTED");
+  });
+
+  it("un run à deux tours produit quatre entrées dans l'ordre codeur, reviewer, codeur, reviewer", () => {
+    let s = INITIAL;
+    // Tour 1
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "v1" } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "reviewer", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "CHANGES_REQUESTED" } }));
+    // Tour 2
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 2 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "v2" } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "reviewer", data: { round: 2 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "APPROVED" } }));
+
+    expect(s.entries).toHaveLength(4);
+    expect(s.entries.map((e) => e.agent)).toEqual(["codeur", "reviewer", "codeur", "reviewer"]);
+  });
+});
+
 describe("applyEvent — coût en direct (ticket-197)", () => {
   it("cumule le coût et compte les appels, et remet les outils à zéro par agent", () => {
     let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "codeur", data: {} }));

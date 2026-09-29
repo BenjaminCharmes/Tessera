@@ -17,6 +17,24 @@ import type {
 
 export type StreamStatus = "idle" | "connecting" | "running" | "done" | "error";
 
+/**
+ * Un passage d'un agent dans le fil chronologique du run (ticket-222).
+ *
+ * Chaque `agent_started` crée une entrée. Rien n'est écrasé : au tour 2,
+ * le passage du reviewer au tour 1 reste visible dans `entries`.
+ */
+export interface PassageAgent {
+  /** Clé unique pour React : `${agent}-${index}`. */
+  id: string;
+  agent: AgentRole;
+  round: number;
+  /** Tokens reçus en direct (codeur uniquement). Vide après reconnexion. */
+  tokens: string;
+  /** Contenu issu de `agent_done` : verdict ou compte rendu. */
+  content: string;
+  isDone: boolean;
+}
+
 export interface StreamState {
   status: StreamStatus;
   ticketId: string | null;
@@ -50,6 +68,8 @@ export interface StreamState {
   outils: number;
   /** Nombre de tours du run, quand le backend le dit ; null sinon. */
   maxRounds: number | null;
+  /** Fil chronologique des passages d'agents, dans l'ordre des `agent_started` (ticket-222). */
+  entries: PassageAgent[];
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -90,6 +110,7 @@ export const INITIAL: StreamState = {
   coutUsd: 0,
   appels: 0,
   outils: 0,
+  entries: [],
 };
 
 /**
@@ -113,29 +134,43 @@ export function etatDepuisRun(run: RunActif): StreamState {
     coutUsd: run.cout_usd,
     appels: run.appels ?? 0,
     outils: run.outils ?? 0,
+    // Les entrées se reconstruisent au fil des événements après reconnexion.
+    entries: [],
   };
 }
 
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
   const events = [...s.events, ev];
   switch (ev.type) {
-    case "agent_started":
+    case "agent_started": {
+      const round =
+        typeof ev.data["round"] === "number" ? ev.data["round"] : s.currentRound;
+      const agent = ev.agent;
+      const newEntry: PassageAgent | null = agent
+        ? {
+            id: `${agent}-${s.entries.length}`,
+            agent,
+            round,
+            tokens: "",
+            content: "",
+            isDone: false,
+          }
+        : null;
       return {
         ...s,
         events,
         status: "running",
-        currentAgent: ev.agent,
-        currentRound:
-          typeof ev.data["round"] === "number"
-            ? ev.data["round"]
-            : s.currentRound,
+        currentAgent: agent,
+        currentRound: round,
         maxRounds:
           typeof ev.data["max_rounds"] === "number"
             ? ev.data["max_rounds"]
             : s.maxRounds,
         currentTokens: "",
         outils: 0,
+        entries: newEntry ? [...s.entries, newEntry] : s.entries,
       };
+    }
     case "branch_created":
       return {
         ...s,
@@ -143,28 +178,63 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         branch:
           typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch,
       };
-    case "agent_done":
+    case "agent_done": {
       // Sans cela `currentAgent` restait figé sur le dernier agent démarré :
       // ses points de chargement continuaient de rebondir alors qu'il avait
       // rendu son verdict (ticket-073).
+      const doneAgent = ev.agent;
+      const doneContent =
+        typeof ev.data["content"] === "string" ? ev.data["content"] : "";
+      // Marquer le dernier passage non terminé de cet agent comme terminé.
+      const lastUnfinishedIdx = s.entries.reduceRight(
+        (found, e, i) =>
+          found === -1 && e.agent === doneAgent && !e.isDone ? i : found,
+        -1,
+      );
+      const updatedEntries =
+        lastUnfinishedIdx >= 0
+          ? s.entries.map((e, i) =>
+              i === lastUnfinishedIdx ? { ...e, isDone: true, content: doneContent } : e,
+            )
+          : s.entries;
       return {
         ...s,
         events,
-        currentAgent: s.currentAgent === ev.agent ? null : s.currentAgent,
+        currentAgent: s.currentAgent === doneAgent ? null : s.currentAgent,
         coutUsd:
           s.coutUsd +
           (typeof ev.data["cost_usd"] === "number" ? ev.data["cost_usd"] : 0),
         appels: s.appels + 1,
+        entries: updatedEntries,
       };
+    }
     case "agent_token":
-    case "agent_tool_use":
+    case "agent_tool_use": {
+      // L'agent a repris — sur réponse, ou seul passé le délai (ADR-025).
+      // Garder la question ferait répondre à un agent qui n'écoute plus ;
+      // le registre l'efface déjà, un client en direct ne le faisait pas
+      // (ticket-186).
+      const token =
+        ev.type === "agent_token" && ev.agent === "codeur"
+          ? (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
+          : "";
+      // Ajouter le token au dernier passage non terminé du codeur.
+      let tokenEntries = s.entries;
+      if (token) {
+        const lastCodeurIdx = s.entries.reduceRight(
+          (found, e, i) =>
+            found === -1 && e.agent === "codeur" && !e.isDone ? i : found,
+          -1,
+        );
+        if (lastCodeurIdx >= 0) {
+          tokenEntries = s.entries.map((e, i) =>
+            i === lastCodeurIdx ? { ...e, tokens: e.tokens + token } : e,
+          );
+        }
+      }
       return {
         ...s,
         events,
-        // L'agent a repris — sur réponse, ou seul passé le délai (ADR-025).
-        // Garder la question ferait répondre à un agent qui n'écoute plus ;
-        // le registre l'efface déjà, un client en direct ne le faisait pas
-        // (ticket-186).
         pendingQuestion: null,
         questionExpireA: null,
         outils: ev.type === "agent_tool_use" ? s.outils + 1 : s.outils,
@@ -173,7 +243,9 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
             ? s.currentTokens +
               (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
             : s.currentTokens,
+        entries: tokenEntries,
       };
+    }
     case "pipeline_done": {
       const branch =
         typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch;

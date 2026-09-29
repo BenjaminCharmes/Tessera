@@ -1,14 +1,15 @@
 ---
+agent: codeur
+created: 2026-09-29
+depends_on:
+- ticket-216
+estimated_days: 1
 id: ticket-222
-title: "Le panneau Agents garde les tours précédents d'un run"
-type: feat
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-216"]
-estimated_days: 1
-created: 2026-09-29
+status: done
+title: Le panneau Agents garde les tours précédents d'un run
+type: feat
 ---
 
 # ticket-222 — Les tours précédents restent visibles
