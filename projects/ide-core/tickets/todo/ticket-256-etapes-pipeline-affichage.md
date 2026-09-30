@@ -63,8 +63,8 @@ expose `etape` dans l'instantané du run. Rien ne les affiche encore :
       validation passe à l'état « faite » (test).
 - [ ] Une étape que le projet n'active pas (sécurité désactivée par exemple)
       n'a pas de pastille (test).
-- [ ] Aucune classe `text-violet-*` et aucun `<svg>` hors de `design/` ne sont
-      ajoutés (les tests de cohérence existants le vérifient).
+- [ ] Le diff n'ajoute aucune classe `text-violet-*`, et aucune balise `<svg>`
+      hors de `frontend/src/design/`.
 
 ## Dépendances
 
