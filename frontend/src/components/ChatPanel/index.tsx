@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import type { Project } from "../../types/api";
 import { useChat } from "../../hooks/useChat";
 import ChatMessageView from "./ChatMessageView";
-import ConversationSidebar from "./ConversationSidebar";
 import ToolUseList from "./ToolUseList";
 
 interface ChatPanelProps {
   project: Project | null;
+  /** La liste des conversations vit dans la colonne 2 (ticket-250). */
+  conversationId: string;
 }
 
 /**
@@ -17,16 +18,7 @@ interface ChatPanelProps {
  * pipeline, l'autre discute. Les écritures de l'agent sont commitées sur une
  * branche `chat-…` (ADR-019), jamais sur la branche courante.
  */
-export default function ChatPanel({ project }: ChatPanelProps) {
-  // Le choix retient le projet auquel il appartient : changer de projet
-  // retombe sur `default` sans effet ni rendu en cascade.
-  const [choix, setChoix] = useState<{ projet: string | null; id: string }>({
-    projet: null,
-    id: "default",
-  });
-  const projetId = project?.id ?? null;
-  const conversationId = choix.projet === projetId ? choix.id : "default";
-  const setConversationId = (id: string) => setChoix({ projet: projetId, id });
+export default function ChatPanel({ project, conversationId }: ChatPanelProps) {
   const chat = useChat(project?.id ?? null, conversationId);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
@@ -60,14 +52,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
   const budgetRatio = chat.maxUsd > 0 ? chat.spentUsd / chat.maxUsd : 0;
 
   return (
-    <div className="h-full flex bg-zinc-900">
-      <ConversationSidebar
-        projectId={project.id}
-        activeId={conversationId}
-        onSelect={setConversationId}
-        onNew={() => setConversationId(`conv-${Date.now()}`)}
-      />
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden bg-zinc-900">
       <header className={`${BAND} justify-between gap-2 border-b border-zinc-800 px-3`}>
         <span className="text-xs font-medium text-zinc-300">
           Chat — {project.id}
@@ -201,7 +186,6 @@ export default function ChatPanel({ project }: ChatPanelProps) {
           </button>
         </div>
       </form>
-      </div>
     </div>
   );
 }

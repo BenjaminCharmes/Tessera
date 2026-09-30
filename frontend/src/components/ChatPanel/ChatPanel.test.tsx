@@ -34,7 +34,7 @@ beforeEach(() => {
 
 describe("ChatPanel", () => {
   it("invite à choisir un projet quand aucun n'est sélectionné", () => {
-    render(<ChatPanel project={null} />);
+    render(<ChatPanel project={null} conversationId="default" />);
     expect(screen.getByText(/Sélectionne un projet/)).toBeInTheDocument();
   });
 
@@ -47,7 +47,7 @@ describe("ChatPanel", () => {
       max_usd: 2,
     });
 
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
 
     await waitFor(() =>
       expect(screen.getByText(/0\.250 \/ 2\.00/)).toBeInTheDocument(),
@@ -56,7 +56,7 @@ describe("ChatPanel", () => {
 
   it("envoie le message saisi et l'affiche dans le fil", async () => {
     const user = userEvent.setup();
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
 
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
     act(() => MockWebSocket.instance!.triggerOpen());
@@ -78,7 +78,7 @@ describe("ChatPanel", () => {
     // Après une fermeture propre, le panneau exigeait `ready` : textarea
     // active, bouton grisé, et rien pour expliquer ni pour repartir.
     const user = userEvent.setup();
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
 
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
     const premiere = MockWebSocket.instance!;
@@ -97,7 +97,7 @@ describe("ChatPanel", () => {
   });
 
   it("signale la branche sur laquelle le travail a été commité", async () => {
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
     act(() => MockWebSocket.instance!.triggerOpen());
 
@@ -120,7 +120,7 @@ describe("ChatPanel", () => {
 
 describe("ChatPanel — lancement de pipeline (ticket-055)", () => {
   it("propose un bouton quand l'agent suggère un lancement", async () => {
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
     act(() => MockWebSocket.instance!.triggerOpen());
 
@@ -144,7 +144,7 @@ describe("ChatPanel — lancement de pipeline (ticket-055)", () => {
   });
 
   it("n'affiche aucun bouton sans suggestion", async () => {
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
     act(() => MockWebSocket.instance!.triggerOpen());
 
@@ -177,7 +177,7 @@ describe("ChatPanel — lancement de pipeline (ticket-055)", () => {
         commit_sha: "abc1234",
       });
 
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
     act(() => MockWebSocket.instance!.triggerOpen());
     act(() =>
@@ -209,51 +209,10 @@ describe("ChatPanel — lancement de pipeline (ticket-055)", () => {
   });
 });
 
-describe("ChatPanel — conversations (ticket-225)", () => {
-  it("affiche les conversations rendues par l'API avec leur titre", async () => {
-    vi.spyOn(api.chat, "list").mockResolvedValue([
-      {
-        conversation_id: "conv-abc",
-        title: "Explique le pipeline",
-        last_activity: "2026-09-29T10:00:00Z",
-      },
-      {
-        conversation_id: "default",
-        title: "Première discussion",
-        last_activity: "2026-09-28T09:00:00Z",
-      },
-    ]);
-
-    render(<ChatPanel project={project} />);
-
-    await waitFor(() =>
-      expect(screen.getByText("Explique le pipeline")).toBeInTheDocument(),
-    );
-    expect(screen.getByText("Première discussion")).toBeInTheDocument();
-  });
-
-  it("Nouvelle conversation ouvre une conversation avec un identifiant différent de default", async () => {
-    const user = userEvent.setup();
-    const historySpy = vi.spyOn(api.chat, "history").mockResolvedValue({
-      project_id: "ide-core",
-      conversation_id: "default",
-      messages: [],
-      spent_usd: 0,
-      max_usd: 2,
-    });
-
-    render(<ChatPanel project={project} />);
-
-    await user.click(screen.getByRole("button", { name: "Nouvelle conversation" }));
-
-    await waitFor(() => {
-      const calls = historySpy.mock.calls;
-      const lastConvId = calls[calls.length - 1]?.[1];
-      expect(lastConvId).not.toBe("default");
-    });
-  });
-
-  it("cliquer sur une conversation charge son historique avec son identifiant", async () => {
+describe("ChatPanel — conversations (ticket-225, déplacées en colonne 2 par ticket-250)", () => {
+  // La liste des conversations vit désormais dans la Sidebar
+  // (SidebarChat.test.tsx) : le panneau ne fait que suivre la prop.
+  it("charge l'historique de la conversation reçue en prop", async () => {
     const historySpy = vi.spyOn(api.chat, "history").mockResolvedValue({
       project_id: "ide-core",
       conversation_id: "conv-xyz",
@@ -261,41 +220,27 @@ describe("ChatPanel — conversations (ticket-225)", () => {
       spent_usd: 0,
       max_usd: 2,
     });
-    vi.spyOn(api.chat, "list").mockResolvedValue([
-      {
-        conversation_id: "conv-xyz",
-        title: "Discussion sur les tests",
-        last_activity: "2026-09-29T08:00:00Z",
-      },
-    ]);
 
-    render(<ChatPanel project={project} />);
-
-    await waitFor(() =>
-      expect(screen.getByText("Discussion sur les tests")).toBeInTheDocument(),
-    );
-
-    const user = userEvent.setup();
-    await user.click(screen.getByText("Discussion sur les tests"));
+    render(<ChatPanel project={project} conversationId="conv-xyz" />);
 
     await waitFor(() =>
       expect(historySpy).toHaveBeenCalledWith("ide-core", "conv-xyz"),
     );
   });
 
-  it("la conversation default reste accessible dans la liste", async () => {
+  it("ne rend plus sa propre liste de conversations", async () => {
     vi.spyOn(api.chat, "list").mockResolvedValue([
       {
-        conversation_id: "default",
-        title: "Conversation par défaut",
-        last_activity: "2026-09-29T07:00:00Z",
+        conversation_id: "conv-abc",
+        title: "Explique le pipeline",
+        last_activity: "2026-09-29T10:00:00Z",
       },
     ]);
 
-    render(<ChatPanel project={project} />);
+    render(<ChatPanel project={project} conversationId="default" />);
 
-    await waitFor(() =>
-      expect(screen.getByText("Conversation par défaut")).toBeInTheDocument(),
-    );
+    expect(
+      screen.queryByRole("button", { name: "Nouvelle conversation" }),
+    ).not.toBeInTheDocument();
   });
 });

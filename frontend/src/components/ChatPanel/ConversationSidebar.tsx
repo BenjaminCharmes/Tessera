@@ -10,10 +10,12 @@ interface Props {
 }
 
 /**
- * Left sidebar listing conversations for a project — ticket-225.
+ * Conversation list for a project — ticket-225.
  *
  * Reloads the list whenever the project or the active conversation changes,
  * so a freshly created conversation appears after the first message is sent.
+ * Lives in the sidebar column (ticket-250): the chat panel used to open its
+ * own mini-column in the center while column 2 sat empty.
  */
 export default function ConversationSidebar({
   projectId,
@@ -39,7 +41,7 @@ export default function ConversationSidebar({
   }, [projectId, activeId]);
 
   return (
-    <aside className="w-44 shrink-0 flex flex-col border-r border-zinc-800 overflow-y-auto">
+    <div className="flex h-full flex-col overflow-y-auto">
       <button
         type="button"
         onClick={onNew}
@@ -64,6 +66,6 @@ export default function ConversationSidebar({
           </li>
         ))}
       </ul>
-    </aside>
+    </div>
   );
 }
