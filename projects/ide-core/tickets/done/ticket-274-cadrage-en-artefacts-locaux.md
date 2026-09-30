@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-274
 plan: true
-pr_number: null
+pr_number: 146
 priority: high
 status: done
 title: Design tickets on local-artifact projects show their decisions and tickets
