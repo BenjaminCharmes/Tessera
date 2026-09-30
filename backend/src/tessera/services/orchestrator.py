@@ -231,6 +231,7 @@ class Orchestrator:
             return refused
 
         await stages.create_branch(self, run)
+        stages.take_artifact_snapshot(self, run)
         await set_status(self, run, TicketStatus.in_progress)
         run.carte_du_depot = await self._carte()
         # Avant le premier tour, et seulement si le ticket le déclare. Ne lève
