@@ -2,7 +2,7 @@
 id: ticket-276
 title: "The codeur's self-check runs mypy after touching Python"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
