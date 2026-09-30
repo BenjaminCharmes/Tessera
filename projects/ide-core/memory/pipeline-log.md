@@ -268,3 +268,11 @@ Le diff refactorise la gestion d
 - 2026-09-30 11:44:34 UTC — [ticket-270] tour 1 — reviewer terminé (100468ms)
 - 2026-09-30 11:47:23 UTC — [ticket-270] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests montrent que les com
 - 2026-09-30 11:47:23 UTC — [ticket-270] APPROVED après 1 tour(s)
+- 2026-09-30 11:54:29 UTC — [ticket-271] branche ticket-271-switching-project-keeps-the-active-tab
+- 2026-09-30 11:54:29 UTC — [ticket-271] tour 1 — codeur démarré
+- 2026-09-30 11:56:28 UTC — [ticket-271] tour 1 — codeur terminé (118875ms)
+- 2026-09-30 11:56:44 UTC — [ticket-271] securite: PASS — Code sain : refactorisation TypeScript d'une logique de panneau. Fonction pure, 
+- 2026-09-30 11:56:44 UTC — [ticket-271] tour 1 — reviewer démarré
+- 2026-09-30 11:57:09 UTC — [ticket-271] tour 1 — reviewer terminé (25672ms)
+- 2026-09-30 11:58:08 UTC — [ticket-271] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente la fonction
+- 2026-09-30 11:58:08 UTC — [ticket-271] APPROVED après 1 tour(s)

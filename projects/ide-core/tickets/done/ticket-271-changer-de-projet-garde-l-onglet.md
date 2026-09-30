@@ -1,14 +1,14 @@
 ---
-id: ticket-271
-title: "Switching project keeps the active tab"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-271
+pr_number: 138
+priority: medium
+status: done
+title: Switching project keeps the active tab
+type: feat
 ---
 
 # ticket-271 — Changer de projet garde l'onglet actif

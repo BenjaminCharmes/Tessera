@@ -280,6 +280,8 @@ L'écran se lit en quatre colonnes :
 | **Le centre** | le tableau des tickets par défaut ; un fichier si tu en ouvres un |
 | **La droite** | suivre un run (Agents) ou discuter (Chat) |
 
+**Changer de projet** : le sélecteur en haut de la colonne te permet de passer d'un projet à l'autre. Tu restes sur l'onglet actuellement ouvert — par exemple, si tu consultais les Statistiques du projet A, passer au projet B te garde sur les Statistiques. Seule exception : si tu ouvres un projet depuis l'onglet Projets, tu vas aux Tickets de ce projet.
+
 Les actions d'un projet — ouvrir dans VSCode, lier un dépôt, choisir le mode des
 artefacts, retirer le projet — sont dans l'en-tête, qui ne défile jamais.
 
