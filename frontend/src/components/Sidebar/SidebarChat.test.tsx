@@ -38,23 +38,20 @@ type SidebarProps = Parameters<typeof Sidebar>[0];
 function renderSidebar(extra: Partial<SidebarProps> = {}) {
   const base: SidebarProps = {
     panel: "chat",
-    activeProject: project,
-    activeTicket: null,
-    byStatus,
-    ticketsLoading: false,
-    ticketsError: null,
-    runs: [],
-    runsLoading: false,
-    runsError: null,
-    usage: null,
-    usageLoading: false,
-    usageError: null,
-    running: new Set<string>(),
-    showKanban: false,
-    onSelectProject: () => {},
-    onSelectTicket: () => {},
-    onRunPipeline: () => {},
-    onToggleKanban: () => {},
+    projet: { actif: project, onSelect: () => {} },
+    tickets: {
+      byStatus,
+      loading: false,
+      error: null,
+      actif: null,
+      running: new Set<string>(),
+      showKanban: false,
+      onSelect: () => {},
+      onRunPipeline: () => {},
+      onToggleKanban: () => {},
+    },
+    runs: { liste: [], loading: false, error: null },
+    usage: { usage: null, loading: false, error: null },
   };
   return render(<Sidebar {...base} {...extra} />);
 }
@@ -73,7 +70,7 @@ beforeEach(() => {
 
 describe("Sidebar — panneau Chat (ticket-250)", () => {
   it("liste les conversations du projet dans la colonne", async () => {
-    renderSidebar({ chatConversationId: "default" });
+    renderSidebar({ chat: { conversationId: "default" } });
 
     expect(
       await screen.findByText("Explique le pipeline"),
@@ -84,17 +81,17 @@ describe("Sidebar — panneau Chat (ticket-250)", () => {
   });
 
   it("remonte l'identifiant de la conversation choisie", async () => {
-    const onSelectConversation = vi.fn();
-    renderSidebar({ chatConversationId: "default", onSelectConversation });
+    const onSelect = vi.fn();
+    renderSidebar({ chat: { conversationId: "default", onSelect } });
 
     const user = userEvent.setup();
     await user.click(await screen.findByText("Explique le pipeline"));
 
-    expect(onSelectConversation).toHaveBeenCalledWith("conv-abc");
+    expect(onSelect).toHaveBeenCalledWith("conv-abc");
   });
 
   it("invite à choisir un projet quand aucun n'est actif", () => {
-    renderSidebar({ activeProject: null });
+    renderSidebar({ projet: { actif: null, onSelect: () => {} } });
 
     expect(screen.getByText(/Sélectionne un projet/)).toBeInTheDocument();
   });
@@ -105,10 +102,14 @@ describe("Sidebar — panneau Usage (ticket-250)", () => {
     renderSidebar({
       panel: "usage",
       usage: {
-        total_cost_usd: 1.2345,
-        total_tokens: 1000,
-        total_runs: 3,
-        per_ticket: [],
+        usage: {
+          total_cost_usd: 1.2345,
+          total_tokens: 1000,
+          total_runs: 3,
+          per_ticket: [],
+        },
+        loading: false,
+        error: null,
       },
     });
 

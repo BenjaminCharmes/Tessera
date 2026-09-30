@@ -11,3 +11,16 @@
  * de base commune qui compte, pas l'uniformité du reste.
  */
 export const BAND = "flex h-10 shrink-0 items-center";
+
+/**
+ * La grille du cockpit — ticket-252.
+ *
+ * Rail de navigation, colonne latérale, centre, et bandeau d'événements en
+ * bas du centre. Les dimensions vivaient en `style` dans App.tsx : une grille
+ * définie là où les autres constantes de mise en page le sont déjà.
+ */
+export const GRILLE_COCKPIT = {
+  display: "grid",
+  gridTemplateColumns: "100px 280px 1fr",
+  gridTemplateRows: "1fr 180px",
+} as const;

@@ -21,117 +21,110 @@ import type {
 export type { SidebarPanel } from "./panels";
 import type { SidebarPanel } from "./panels";
 
-interface SidebarProps {
-  panel: SidebarPanel;
+/*
+ * Les props sont groupées par domaine (ticket-252) : App en passait une
+ * cinquantaine à plat, et plus personne ne voyait qui dépendait de quoi.
+ * Chaque groupe se lit comme une phrase : « voilà ce que la colonne sait
+ * des tickets », etc.
+ */
+
+export interface ProjetSidebar {
+  actif: Project | null;
   /** Les projets dont un run attend une réponse (ticket-186). */
-  projetsEnAttente?: ReadonlySet<string>;
+  enAttente?: ReadonlySet<string>;
   /** Les services du projet actif, pour le bouton « Lancer » (ticket-138). */
   services?: UseServicesResult;
   /** La sortie d'un service, pour le panneau du projet (ticket-147). */
   sortieDeService?: (projectId: string, nom: string) => string[];
-  activeProject: Project | null;
-  activeTicket: Ticket | null;
+  /** Le réglage des notifications système (ticket-192). */
+  notifications?: ReglageDesNotifications;
+  onSelect: (project: Project) => void;
+  onCreated?: (project: Project) => void;
+}
+
+export interface TicketsSidebar {
   byStatus: Record<TicketStatus, Ticket[]>;
-  ticketsLoading: boolean;
-  ticketsError: string | null;
-  runs: PipelineRun[];
-  runsLoading: boolean;
-  runsError: string | null;
-  usage: ProjectUsage | null;
-  usageLoading: boolean;
-  usageError: string | null;
-  /** La conversation de chat active — la liste vit ici (ticket-250). */
-  chatConversationId?: string;
-  onSelectConversation?: (id: string) => void;
-  onNewConversation?: () => void;
+  loading: boolean;
+  error: string | null;
+  actif: Ticket | null;
   running: Set<string>;
   runningRound?: number;
   maxRounds?: number | null;
   showKanban: boolean;
   /** Un run tourne mais le centre montre autre chose (ticket-178). */
   runCache?: boolean;
+  filtres?: FiltresTickets;
+  total?: number;
+  agents?: string[];
+  selection?: string[];
+  queueEnCours?: boolean;
   /** Ramène la vue du run au centre. */
   onVoirLeRun?: () => void;
-  onSelectProject: (project: Project) => void;
-  onProjectCreated?: (project: Project) => void;
-  onSelectTicket: (ticket: Ticket) => void;
+  onSelect: (ticket: Ticket) => void;
+  onSelectById?: (ticketId: string) => void;
   onRunPipeline: (ticketId: string) => void;
   onShowDiff?: (ticketId: string) => void;
-  selection?: string[];
   onToggleQueue?: (ticketId: string) => void;
   onRunQueue?: () => void;
   onRunAutonome?: (options: { depuisGithub: boolean }) => void;
   onClearQueue?: () => void;
-  queueEnCours?: boolean;
   onToggleKanban: () => void;
-  onTicketCreated?: (ticket: Ticket) => void;
+  onChangeFiltres?: (f: FiltresTickets) => void;
+  onCreated?: (ticket: Ticket) => void;
   onBatchCreated?: (tickets: Ticket[]) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
-  /** Le réglage des notifications système (ticket-192). */
-  notifications?: ReglageDesNotifications;
-  filtres?: FiltresTickets;
-  onChangeFiltres?: (f: FiltresTickets) => void;
-  totalTickets?: number;
-  agentsDesTickets?: string[];
-  onSelectTicketById?: (ticketId: string) => void;
-  onAgentCreated?: (role: string) => void;
-  agentSelectionne?: string | null;
-  onSelectAgent?: (role: string) => void;
-  openFilePath?: string | null;
-  onOpenFile?: (path: string) => void;
+}
+
+export interface RunsSidebar {
+  liste: PipelineRun[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface UsageSidebar {
+  usage: ProjectUsage | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface ChatSidebar {
+  /** La conversation active — la liste vit ici (ticket-250). */
+  conversationId?: string;
+  onSelect?: (id: string) => void;
+  onNew?: () => void;
+}
+
+export interface FichiersSidebar {
+  ouvert?: string | null;
+  onOpen?: (path: string) => void;
+}
+
+export interface AgentsSidebar {
+  selectionne?: string | null;
+  onSelect?: (role: string) => void;
+  onCreated?: (role: string) => void;
+}
+
+interface SidebarProps {
+  panel: SidebarPanel;
+  projet: ProjetSidebar;
+  tickets: TicketsSidebar;
+  runs: RunsSidebar;
+  usage: UsageSidebar;
+  chat?: ChatSidebar;
+  fichiers?: FichiersSidebar;
+  agents?: AgentsSidebar;
 }
 
 export default function Sidebar({
   panel,
-  projetsEnAttente,
-  services,
-  sortieDeService,
-  activeProject,
-  activeTicket,
-  byStatus,
-  ticketsLoading,
-  ticketsError,
+  projet,
+  tickets,
   runs,
-  runsLoading,
-  runsError,
   usage,
-  usageLoading,
-  usageError,
-  chatConversationId,
-  onSelectConversation,
-  onNewConversation,
-  running,
-  runningRound,
-  maxRounds,
-  showKanban,
-  runCache,
-  onVoirLeRun,
-  onSelectProject,
-  onProjectCreated,
-  onSelectTicket,
-  onRunPipeline,
-  onShowDiff,
-  selection,
-  onToggleQueue,
-  onRunQueue,
-  onRunAutonome,
-  onClearQueue,
-  queueEnCours,
-  onToggleKanban,
-  onTicketCreated,
-  onBatchCreated,
-  onChangeStatus,
-  notifications,
-  filtres,
-  onChangeFiltres,
-  totalTickets,
-  agentsDesTickets,
-  onSelectTicketById,
-  onAgentCreated,
-  agentSelectionne,
-  onSelectAgent,
-  openFilePath,
-  onOpenFile,
+  chat,
+  fichiers,
+  agents,
 }: SidebarProps) {
   // L'état git est replié par défaut : il occupe de la place, et on ne le
   // consulte qu'au moment de lier un dépôt ou de retirer le projet. Ce qui
@@ -142,71 +135,71 @@ export default function Sidebar({
   return (
     <div className="flex h-full flex-col bg-zinc-900 text-sm text-zinc-200">
       <ProjectHeader
-        project={activeProject}
+        project={projet.actif}
         gitOuvert={gitOuvert}
         onBasculerGit={() => setGitOuvert((v) => !v)}
-        services={services}
+        services={projet.services}
         onOuvrirLesServices={() => setServicesOuverts(true)}
-        onSelectProject={onSelectProject}
+        onSelectProject={projet.onSelect}
       />
 
       <PanneauxDuProjet
-        project={activeProject}
+        project={projet.actif}
         gitOuvert={gitOuvert}
         servicesOuverts={servicesOuverts}
-        services={services}
-        sortieDeService={sortieDeService}
-        runEnCours={running.size > 0}
-        notifications={notifications}
+        services={projet.services}
+        sortieDeService={projet.sortieDeService}
+        runEnCours={tickets.running.size > 0}
+        notifications={projet.notifications}
       />
 
       <div className="flex-1 overflow-y-auto">
         {panel === "projects" && (
           <ProjectNav
-            activeProject={activeProject}
-            onSelectProject={onSelectProject}
-            onProjectCreated={onProjectCreated}
-            enAttente={projetsEnAttente}
+            activeProject={projet.actif}
+            onSelectProject={projet.onSelect}
+            onProjectCreated={projet.onCreated}
+            enAttente={projet.enAttente}
           />
         )}
         {panel === "tickets" && (
           <TicketList
-            project={activeProject}
-            byStatus={byStatus}
-            loading={ticketsLoading}
-            error={ticketsError}
-            activeTicket={activeTicket}
-            running={running}
-            runningRound={runningRound}
-            maxRounds={maxRounds}
-            showKanban={showKanban}
-            runCache={runCache}
-            onVoirLeRun={onVoirLeRun}
-            onSelectTicket={onSelectTicket}
-            onRunPipeline={onRunPipeline}
-            onShowDiff={onShowDiff}
-            selection={selection}
-            onToggleQueue={onToggleQueue}
-            onRunQueue={onRunQueue}
-            onRunAutonome={onRunAutonome}
-            onClearQueue={onClearQueue}
-            queueEnCours={queueEnCours}
-            onToggleKanban={onToggleKanban}
-            onTicketCreated={onTicketCreated}
-            onBatchCreated={onBatchCreated}
-            onChangeStatus={onChangeStatus}
-            filtres={filtres}
-            onChangeFiltres={onChangeFiltres}
-            totalTickets={totalTickets}
-            agents={agentsDesTickets}
+            project={projet.actif}
+            byStatus={tickets.byStatus}
+            loading={tickets.loading}
+            error={tickets.error}
+            activeTicket={tickets.actif}
+            running={tickets.running}
+            runningRound={tickets.runningRound}
+            maxRounds={tickets.maxRounds}
+            showKanban={tickets.showKanban}
+            runCache={tickets.runCache}
+            onVoirLeRun={tickets.onVoirLeRun}
+            onSelectTicket={tickets.onSelect}
+            onRunPipeline={tickets.onRunPipeline}
+            onShowDiff={tickets.onShowDiff}
+            selection={tickets.selection}
+            onToggleQueue={tickets.onToggleQueue}
+            onRunQueue={tickets.onRunQueue}
+            onRunAutonome={tickets.onRunAutonome}
+            onClearQueue={tickets.onClearQueue}
+            queueEnCours={tickets.queueEnCours}
+            onToggleKanban={tickets.onToggleKanban}
+            onTicketCreated={tickets.onCreated}
+            onBatchCreated={tickets.onBatchCreated}
+            onChangeStatus={tickets.onChangeStatus}
+            filtres={tickets.filtres}
+            onChangeFiltres={tickets.onChangeFiltres}
+            totalTickets={tickets.total}
+            agents={tickets.agents}
           />
         )}
         {panel === "files" &&
-          (activeProject ? (
+          (projet.actif ? (
             <FileTree
-              racine={activeProject.path}
-              fichierActif={openFilePath ?? null}
-              onSelectFile={onOpenFile ?? (() => {})}
+              racine={projet.actif.path}
+              fichierActif={fichiers?.ouvert ?? null}
+              onSelectFile={fichiers?.onOpen ?? (() => {})}
             />
           ) : (
             <p className="px-3 py-3 text-xs text-zinc-500">
@@ -215,26 +208,26 @@ export default function Sidebar({
           ))}
         {panel === "history" && (
           <RunHistory
-            runs={runs}
-            loading={runsLoading}
-            error={runsError}
-            onSelectTicket={onSelectTicketById}
+            runs={runs.liste}
+            loading={runs.loading}
+            error={runs.error}
+            onSelectTicket={tickets.onSelectById}
           />
         )}
         {panel === "agents" && (
           <AgentList
-            onAgentCreated={onAgentCreated ?? (() => {})}
-            onSelect={onSelectAgent}
-            selectionne={agentSelectionne ?? null}
+            onAgentCreated={agents?.onCreated ?? (() => {})}
+            onSelect={agents?.onSelect}
+            selectionne={agents?.selectionne ?? null}
           />
         )}
         {panel === "chat" &&
-          (activeProject ? (
+          (projet.actif ? (
             <ConversationSidebar
-              projectId={activeProject.id}
-              activeId={chatConversationId ?? "default"}
-              onSelect={onSelectConversation ?? (() => {})}
-              onNew={onNewConversation ?? (() => {})}
+              projectId={projet.actif.id}
+              activeId={chat?.conversationId ?? "default"}
+              onSelect={chat?.onSelect ?? (() => {})}
+              onNew={chat?.onNew ?? (() => {})}
             />
           ) : (
             <p className="px-3 py-3 text-xs text-zinc-500">
@@ -246,17 +239,17 @@ export default function Sidebar({
           // résumé, sinon les mêmes chiffres s'affichaient deux fois
           // (ticket-250).
           <p className="px-3 py-3 text-xs text-zinc-400">
-            {usageError ? (
-              <span className="text-red-400">{usageError}</span>
-            ) : usageLoading ? (
+            {usage.error ? (
+              <span className="text-red-400">{usage.error}</span>
+            ) : usage.loading ? (
               "Chargement de l'usage…"
-            ) : usage && usage.total_runs > 0 ? (
+            ) : usage.usage && usage.usage.total_runs > 0 ? (
               <>
                 <span className="font-mono text-zinc-200">
-                  ${usage.total_cost_usd.toFixed(4)}
+                  ${usage.usage.total_cost_usd.toFixed(4)}
                 </span>{" "}
-                sur {usage.total_runs} run{usage.total_runs > 1 ? "s" : ""} —
-                détail au centre.
+                sur {usage.usage.total_runs} run
+                {usage.usage.total_runs > 1 ? "s" : ""} — détail au centre.
               </>
             ) : (
               "Aucun pipeline exécuté."
