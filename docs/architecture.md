@@ -99,6 +99,13 @@ Cette promesse a demandé trois correctifs, tous trois nés d'un usage réel :
   porte qu'une ligne de résumé : `<chemin> : fichier de verrouillage modifié,
   N lignes ajoutées, M supprimées`. Cela évite que des milliers de lignes noient
   les changements réels du ticket. Le commit, lui, porte le lockfile en entier.
+- **Artefacts dans le matériau relu** (ticket-274). Les fichiers de mémoire 
+  et de tickets — `memory/decisions.md`, `tickets/todo/`, etc. — ne sont ni 
+  versionnés (mode `artifacts: local`) ni inclus au diff relu standard 
+  (mode `artifacts: tracked`). Or, un ticket de cadrage crée justement des 
+  décisions et des tickets qui doivent être jugés par le reviewer et le 
+  validateur. Le pipeline transmet désormais ces artefacts au matériau relu, 
+  sans les committer.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et

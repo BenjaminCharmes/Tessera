@@ -535,6 +535,10 @@ Le code produit par les agents, lui, n'est jamais exclu : c'est ce que tu livres
 
 ---
 
+### Cadrages et artefacts locaux
+
+Ton cadrage (ticket `design`) crée de nouvelles décisions dans `memory/decisions.md` ou des tickets dans `tickets/todo/`. Si ton projet garde ces artefacts locaux (non versionnés), ces fichiers ne sont jamais commitées — ils restent chez toi. Cependant, le reviewer et le validateur les voient quand même, car le diff relu inclut un résumé textuel des changements. Ton cadrage peut donc être approuvé et mis en œuvre même s'il ne crée ni ne modifie aucun fichier du code.
+
 ## 11. Configuration
 
 Tout est dans `.env` (copié depuis `.env.example`) :
