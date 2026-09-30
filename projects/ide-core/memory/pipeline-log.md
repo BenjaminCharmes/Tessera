@@ -314,3 +314,12 @@ Le changement concer
 - 2026-09-30 13:52:13 UTC — [ticket-267] tour 1 — reviewer terminé (57391ms)
 - 2026-09-30 13:54:49 UTC — [ticket-267] validateur: APPROVED — Tous les critères sont respectés. Le code implémente correctement la logique de 
 - 2026-09-30 13:54:49 UTC — [ticket-267] APPROVED après 1 tour(s)
+- 2026-09-30 14:09:10 UTC — [ticket-274] branche ticket-274-design-tickets-on-local-artifact-projects-show-th
+- 2026-09-30 14:10:16 UTC — [ticket-274] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
+- 2026-09-30 14:10:16 UTC — [ticket-274] tour 1 — codeur démarré
+- 2026-09-30 14:20:04 UTC — [ticket-274] tour 1 — codeur terminé (587920ms)
+- 2026-09-30 14:20:34 UTC — [ticket-274] securite: PASS — Code de snapshot et diff d'artefacts (ticket-274). Analyse complète : pas de vul
+- 2026-09-30 14:20:34 UTC — [ticket-274] tour 1 — reviewer démarré
+- 2026-09-30 14:23:05 UTC — [ticket-274] tour 1 — reviewer terminé (150468ms)
+- 2026-09-30 14:26:12 UTC — [ticket-274] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
+- 2026-09-30 14:26:12 UTC — [ticket-274] APPROVED après 1 tour(s)
