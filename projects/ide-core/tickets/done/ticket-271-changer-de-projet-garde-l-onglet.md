@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-271
-pr_number: null
+pr_number: 138
 priority: medium
 status: done
 title: Switching project keeps the active tab
