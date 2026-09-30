@@ -96,6 +96,51 @@ describe("ChatPanel", () => {
     expect(screen.getByText("Toujours là ?")).toBeInTheDocument();
   });
 
+  it("le bouton 'Envoyer' est trouvable par son nom et soumet le message au clic", async () => {
+    const user = userEvent.setup();
+    render(<ChatPanel project={project} conversationId="default" />);
+
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    act(() => MockWebSocket.instance!.triggerOpen());
+
+    await user.type(screen.getByLabelText("Message"), "Clic pour envoyer");
+    const sendButton = screen.getByRole("button", { name: "Envoyer" });
+    await waitFor(() => expect(sendButton).toBeEnabled());
+    await user.click(sendButton);
+
+    expect(screen.getByText("Clic pour envoyer")).toBeInTheDocument();
+    expect(MockWebSocket.instance!.sent).toHaveLength(1);
+  });
+
+  it("soumet le message avec la touche Entrée", async () => {
+    const user = userEvent.setup();
+    render(<ChatPanel project={project} conversationId="default" />);
+
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    act(() => MockWebSocket.instance!.triggerOpen());
+
+    const input = screen.getByLabelText("Message");
+    await user.type(input, "Test Entrée");
+    await user.keyboard("{Enter}");
+
+    expect(screen.getByText("Test Entrée")).toBeInTheDocument();
+    expect(MockWebSocket.instance!.sent).toHaveLength(1);
+  });
+
+  it("indique 'Envoi en cours' et désactive le bouton pendant la réflexion de l'agent", async () => {
+    render(<ChatPanel project={project} conversationId="default" />);
+    await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());
+    act(() => MockWebSocket.instance!.triggerOpen());
+
+    act(() => MockWebSocket.instance!.triggerMessage({ type: "start" }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Envoi en cours" }),
+      ).toBeDisabled(),
+    );
+  });
+
   it("signale la branche sur laquelle le travail a été commité", async () => {
     render(<ChatPanel project={project} conversationId="default" />);
     await waitFor(() => expect(MockWebSocket.instance).not.toBeNull());

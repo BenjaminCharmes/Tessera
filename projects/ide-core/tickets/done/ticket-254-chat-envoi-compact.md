@@ -1,14 +1,14 @@
 ---
-id: ticket-254
-title: "Chat send button sits beside the input instead of on its own row"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-254
+pr_number: 131
+priority: low
+status: done
+title: Chat send button sits beside the input instead of on its own row
+type: feat
 ---
 
 # ticket-254 — Le bouton d'envoi du chat passe à côté de la zone de saisie

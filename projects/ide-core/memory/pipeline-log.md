@@ -183,3 +183,25 @@ Le diff refactorise la gestion d
 - 2026-09-30 08:20:02 UTC — [ticket-253] tour 3 — reviewer terminé (154422ms)
 - 2026-09-30 08:23:52 UTC — [ticket-253] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le sélecteur de période a été dé
 - 2026-09-30 08:23:52 UTC — [ticket-253] APPROVED après 3 tour(s)
+- 2026-09-30 08:28:38 UTC — [ticket-254] branche ticket-254-chat-send-button-sits-beside-the-input-instead-of
+- 2026-09-30 08:28:38 UTC — [ticket-254] tour 1 — codeur démarré
+- 2026-09-30 08:33:01 UTC — [ticket-254] tour 1 — codeur terminé (263453ms)
+- 2026-09-30 08:33:22 UTC — [ticket-254] securite: PASS — Audit sécurité du diff frontend (ChatPanel, TicketList, icons) : aucune vulnérab
+- 2026-09-30 08:33:22 UTC — [ticket-254] tour 1 — reviewer démarré
+- 2026-09-30 08:34:21 UTC — [ticket-254] tour 1 — reviewer terminé (59530ms)
+- 2026-09-30 08:36:10 UTC — [ticket-254] validateur: CHANGES_REQUESTED — Les critères liés à l'export d'`IconSend`, au design du bouton d'envoi et à la s
+- 2026-09-30 08:36:10 UTC — [ticket-254] CHANGES_REQUESTED tour 1: Les critères liés à l'export d'`IconSend`, au design du bouton d'envoi et à la soumission par Entrée
+- 2026-09-30 08:36:10 UTC — [ticket-254] tour 2 — codeur démarré
+- 2026-09-30 08:39:16 UTC — [ticket-254] tour 2 — codeur terminé (186000ms)
+- 2026-09-30 08:39:31 UTC — [ticket-254] securite: PASS — Diff de frontend (ChatPanel, TicketList, icônes) : réorganisation UI, ajout de t
+- 2026-09-30 08:39:31 UTC — [ticket-254] tour 2 — reviewer démarré
+- 2026-09-30 08:40:46 UTC — [ticket-254] tour 2 — reviewer terminé (75218ms)
+- 2026-09-30 08:42:01 UTC — [ticket-254] validateur: CHANGES_REQUESTED — Le critère sur l'export d'`IconSend` et la mise à jour de l'interface du chat so
+- 2026-09-30 08:42:01 UTC — [ticket-254] CHANGES_REQUESTED tour 2: Le critère sur l'export d'`IconSend` et la mise à jour de l'interface du chat sont respectés. Cepend
+- 2026-09-30 08:42:01 UTC — [ticket-254] tour 3 — codeur démarré
+- 2026-09-30 08:46:15 UTC — [ticket-254] tour 3 — codeur terminé (253250ms)
+- 2026-09-30 08:46:28 UTC — [ticket-254] securite: PASS — Audit complet — aucune vulnérabilité détectée. Le diff porte sur du code fronten
+- 2026-09-30 08:46:28 UTC — [ticket-254] tour 3 — reviewer démarré
+- 2026-09-30 08:47:52 UTC — [ticket-254] tour 3 — reviewer terminé (84467ms)
+- 2026-09-30 08:49:14 UTC — [ticket-254] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le bouton d'envoi du chat a été 
+- 2026-09-30 08:49:14 UTC — [ticket-254] APPROVED après 3 tour(s)

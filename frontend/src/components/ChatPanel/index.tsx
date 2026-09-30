@@ -4,7 +4,7 @@ import type { Project } from "../../types/api";
 import { useChat } from "../../hooks/useChat";
 import ChatMessageView from "./ChatMessageView";
 import ToolUseList from "./ToolUseList";
-import { IconCross } from "../../design/icons";
+import { IconCross, IconSend } from "../../design/icons";
 
 interface ChatPanelProps {
   project: Project | null;
@@ -161,29 +161,33 @@ export default function ChatPanel({ project, conversationId }: ChatPanelProps) {
         <label htmlFor="chat-input" className="sr-only">
           Message
         </label>
-        <textarea
-          id="chat-input"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) submit(e);
-          }}
-          rows={2}
-          placeholder={
-            chat.status === "connecting"
-              ? "Connexion…"
-              : "Écris ton message (Entrée pour envoyer)"
-          }
-          disabled={chat.status === "connecting"}
-          className="w-full resize-none rounded-sm bg-zinc-800 px-2 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 outline-hidden focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
-        />
-        <div className="mt-1.5 flex justify-end">
+        <div className="flex items-end gap-2">
+          <textarea
+            id="chat-input"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) submit(e);
+            }}
+            rows={2}
+            placeholder={
+              chat.status === "connecting"
+                ? "Connexion…"
+                : "Écris ton message (Entrée pour envoyer)"
+            }
+            disabled={chat.status === "connecting"}
+            className="flex-1 resize-none rounded-sm bg-zinc-800 px-2 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 outline-hidden focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
+          />
           <button
             type="submit"
             disabled={!canSend}
-            className="rounded-sm bg-zinc-700 px-3 py-1 text-xs text-zinc-100 hover:bg-zinc-600 disabled:opacity-40 disabled:hover:bg-zinc-700"
+            title="Envoyer (Entrée)"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-sm bg-violet-700 text-white hover:bg-violet-600 disabled:opacity-40 disabled:hover:bg-violet-700"
           >
-            {thinking ? "…" : "Envoyer"}
+            <IconSend size={16} />
+            <span className="sr-only">
+              {thinking ? "Envoi en cours" : "Envoyer"}
+            </span>
           </button>
         </div>
       </form>
