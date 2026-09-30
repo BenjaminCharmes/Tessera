@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-268
-pr_number: null
+pr_number: 136
 priority: critical
 status: done
 title: Validator matches verdicts to criteria by number, not by exact text
