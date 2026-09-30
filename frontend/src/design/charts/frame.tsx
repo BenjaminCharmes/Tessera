@@ -66,30 +66,34 @@ export function DataTable({
   headers: string[];
   rows: string[][];
 }) {
-  // `sr-only` positionne le tableau en absolu. Sans ancêtre positionné, il
-  // échappe au conteneur qui défile et allonge la page entière : on pouvait
-  // faire défiler l'app « sous » elle-même. Le conteneur `relative` l'y retient.
+  // `sr-only` est posé sur le <div>, pas sur le <table> : un tableau ignore
+  // `height: 1px` et `overflow: hidden` (il grandit pour contenir ses lignes),
+  // alors qu'un bloc les respecte. Sans ancêtre positionné, le div absolu
+  // échappe au conteneur qui défile et allonge la page ; le wrapper `relative`
+  // l'y retient.
   return (
     <div className="relative" data-testid="data-table">
-      <table className="sr-only">
-        <caption>{caption}</caption>
-        <thead>
-          <tr>
-            {headers.map((h) => (
-              <th key={h}>{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r[0]}>
-              {r.map((c, i) => (
-                <td key={i}>{c}</td>
+      <div className="sr-only">
+        <table>
+          <caption>{caption}</caption>
+          <thead>
+            <tr>
+              {headers.map((h) => (
+                <th key={h}>{h}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r[0]}>
+                {r.map((c, i) => (
+                  <td key={i}>{c}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
