@@ -55,7 +55,7 @@ export default function ConversationSidebar({
               onClick={() => onSelect(conv.conversation_id)}
               className={`w-full text-left truncate rounded-sm px-2 py-1.5 text-xs ${
                 conv.conversation_id === activeId
-                  ? "bg-violet-900/50 text-violet-200"
+                  ? "bg-violet-900/50 text-zinc-100"
                   : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
               }`}
             >

@@ -232,9 +232,9 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-09-17
 **Portée** : codeur, reviewer
-**Décision** : les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** — titre de région, élément actif, nom du projet. Bandes d'en-tête de hauteur unique, tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
+**Décision** : les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** et à l'**interaction** — titre de région, sélection, action principale. Bandes d'en-tête de hauteur unique, tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
 **Raison** : l'UI avait dérivé vers huit familles, trois tailles en dur et des glyphes de jeux différents. Personne n'avait choisi huit couleurs : chaque ticket prenait la sienne, et sans mesure la dérive ne se voit qu'une fois qu'elle saute aux yeux.
-**Conséquence** : l'accent d'identité est une **barre**, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus.
+**Conséquence** : le violet s'emploie en **fond ou en barre**, jamais en couleur de texte — du violet sur un mot se lirait comme un état de plus. Seule exception, les liens soulignés du Markdown rendu, définis dans `index.css` (amendé 2026-09-30, ticket-248).
 
 ## ADR-027 — Les agents ne touchent pas à l'historique git
 

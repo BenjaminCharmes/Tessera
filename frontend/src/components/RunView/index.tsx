@@ -138,7 +138,7 @@ export default function RunView({ stream }: RunViewProps) {
         <RegionTitle>Run en cours</RegionTitle>
         <div className="flex items-center gap-3 text-mini text-zinc-400">
           {queue && (
-            <span className="text-violet-300">
+            <span className="text-zinc-300">
               File : {queue.index}/{queue.total}
             </span>
           )}

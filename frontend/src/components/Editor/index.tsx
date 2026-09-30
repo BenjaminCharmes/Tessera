@@ -79,7 +79,7 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
                 onClick={() => setVueRendue(cle)}
                 className={`rounded px-1.5 py-0.5 text-micro transition-colors ${
                   vueRendue === cle
-                    ? "bg-violet-500/15 text-violet-200"
+                    ? "bg-violet-500/15 text-zinc-100"
                     : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
