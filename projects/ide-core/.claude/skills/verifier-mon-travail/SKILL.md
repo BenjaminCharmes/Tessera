@@ -21,6 +21,13 @@ Backend :
 cd ../../backend && uv run python -m pytest tests/test_mon_module.py -q -p no:cacheprovider
 ```
 
+Et le typage si tu as touché du Python — tout `src/`, pas un fichier : une
+erreur d'import croisé ne se voit qu'ainsi, et la CI lance exactement ceci :
+
+```bash
+cd ../../backend && uv run mypy src/
+```
+
 Frontend, et le typage si tu as touché du TypeScript :
 
 ```bash
@@ -32,8 +39,9 @@ cd ../../frontend && npx tsc -b --noEmit
 
 - **Rouge** : corrige, puis relance **le même** fichier. Trois essais au plus ;
   au-delà, arrête-toi et dis dans ton rapport ce qui reste rouge et pourquoi.
-- **Vert** : recopie la ligne de résumé réelle (`12 passed in 3.1s`) dans la
-  section « Vérification » de ton rapport. Pas de résumé inventé ou arrondi.
+- **Vert** : recopie la ligne de résumé réelle (`12 passed in 3.1s`, et pour
+  mypy `Success: no issues found in N source files`) dans la section
+  « Vérification » de ton rapport. Pas de résumé inventé ou arrondi.
 - **La commande ne démarre pas** (exécutable introuvable, dépendance absente) :
   ce n'est pas un test rouge. Dis-le tel quel, sans toucher au code pour ça.
 
