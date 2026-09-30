@@ -124,6 +124,18 @@ describe("cohérence visuelle", () => {
     expect(fautives).toEqual([]);
   });
 
+  it("ne trace aucune icône hors de design/", () => {
+    // NavRail définissait huit SVG locaux sur sa propre grille (ticket-251) :
+    // le jeu d'icônes se compose à un seul endroit, `design/icons.tsx`, sinon
+    // deux dessins d'une même famille divergent sans que rien ne le mesure.
+    const fautifs = FICHIERS.filter(
+      ({ chemin, contenu }) =>
+        !chemin.startsWith("design/") && contenu.includes("<svg"),
+    ).map(({ chemin }) => chemin);
+
+    expect(fautifs).toEqual([]);
+  });
+
   it("n'utilise aucune taille de texte en valeur arbitraire", () => {
     // `text-micro` et `text-mini` sont déclarées dans le `@theme` d'index.css :
     // une échelle nommée est un choix, `text-[10px]` est une échappatoire.
@@ -139,8 +151,10 @@ describe("cohérence visuelle", () => {
     // Les icônes viennent de `design/icons.tsx`, tracées sur une seule grille.
     // Un glyphe collé dans du JSX ne se contrôle ni en taille, ni en trait, ni
     // en alignement, et son rendu dépend de la police du système.
+    // `×` (×) : le signe multiplier servait de bouton de fermeture dans
+    // ChatPanel, hors des plages surveillées (ticket-251).
     const glyphes = new RegExp(
-      "[\\u2190-\\u21FF\\u2460-\\u27BF\\u2B00-\\u2BFF\\u2588\\u25A0-\\u25FF\\u2200-\\u22FF]|[\\u{1F000}-\\u{1FAFF}]",
+      "[\\u00D7\\u2190-\\u21FF\\u2460-\\u27BF\\u2B00-\\u2BFF\\u2588\\u25A0-\\u25FF\\u2200-\\u22FF]|[\\u{1F000}-\\u{1FAFF}]",
       "u",
     );
     const fautifs = FICHIERS.filter(({ chemin, contenu }) => {
