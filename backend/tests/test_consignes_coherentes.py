@@ -391,6 +391,38 @@ def test_le_manifeste_d_ide_core_ne_porte_aucune_clef_morte() -> None:
 
 
 # ------------------------------------------------------------------
+# La section « Agents actifs » suit le manifeste — ticket-249
+# ------------------------------------------------------------------
+
+
+def test_la_section_agents_actifs_suit_le_manifeste() -> None:
+    """The « Agents actifs » section names exactly the manifest's active roles.
+
+    Panne vécue : `agents.json` déclarait huit rôles actifs quand la section
+    n'en nommait que trois — `doc-technique`, `doc-fonctionnelle` et
+    `project-analyzer` n'apparaissaient nulle part dans le fichier importé à
+    chaque session. Rien ne confrontait les deux : c'est l'angle mort qui a
+    laissé la liste diverger (audit du 2026-09-29).
+    """
+    import json
+
+    manifeste = json.loads(_lire("projects/ide-core/agents.json"))
+    actifs = {a["role"] for a in manifeste["agents"] if a.get("active")}
+
+    texte = _lire("projects/ide-core/CLAUDE.md")
+    section = re.search(
+        r"^## Agents actifs sur ce projet\n(.*?)(?=\n## |\n---)", texte, re.M | re.S
+    )
+    assert section, "section « Agents actifs sur ce projet » introuvable"
+    nommes = set(re.findall(r"^- `([a-z-]+)`", section.group(1), re.M))
+
+    assert nommes == actifs, (
+        f"manquants dans CLAUDE.md : {sorted(actifs - nommes)} ; "
+        f"nommés mais inactifs ou absents du manifeste : {sorted(nommes - actifs)}"
+    )
+
+
+# ------------------------------------------------------------------
 # Le dossier et le champ disent la même chose — ticket-113
 # ------------------------------------------------------------------
 
