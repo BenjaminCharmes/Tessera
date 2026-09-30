@@ -1,15 +1,16 @@
 ---
-id: ticket-270
-title: "Bookkeeping written after delivery is no longer stranded on the merged ticket branch"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
-plan: true
+created: 2026-09-30
 depends_on: []
 estimated_days: 1
-created: 2026-09-30
+id: ticket-270
+plan: true
+pr_number: null
+priority: critical
+status: done
+title: Bookkeeping written after delivery is no longer stranded on the merged ticket
+  branch
+type: fix
 ---
 
 # ticket-270 — Le commit de suivi écrit après la livraison n'est plus perdu

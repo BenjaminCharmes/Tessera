@@ -259,3 +259,12 @@ Le diff refactorise la gestion d
 - 2026-09-30 10:05:56 UTC — [ticket-268] tour 1 — reviewer terminé (72172ms)
 - 2026-09-30 10:07:44 UTC — [ticket-268] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un mécanisme de correspond
 - 2026-09-30 10:07:44 UTC — [ticket-268] APPROVED après 1 tour(s)
+- 2026-09-30 11:24:28 UTC — [ticket-270] branche ticket-270-bookkeeping-written-after-delivery-is-no-longer-s
+- 2026-09-30 11:25:03 UTC — [ticket-270] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
+- 2026-09-30 11:25:03 UTC — [ticket-270] tour 1 — codeur démarré
+- 2026-09-30 11:42:29 UTC — [ticket-270] tour 1 — codeur terminé (1046265ms)
+- 2026-09-30 11:42:54 UTC — [ticket-270] securite: PASS — Le diff introduit un mécanisme de callback pour enregistrer le PR number avant l
+- 2026-09-30 11:42:54 UTC — [ticket-270] tour 1 — reviewer démarré
+- 2026-09-30 11:44:34 UTC — [ticket-270] tour 1 — reviewer terminé (100468ms)
+- 2026-09-30 11:47:23 UTC — [ticket-270] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests montrent que les com
+- 2026-09-30 11:47:23 UTC — [ticket-270] APPROVED après 1 tour(s)
