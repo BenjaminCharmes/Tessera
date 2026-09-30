@@ -611,9 +611,13 @@ class GitWorkspaceService:
     async def commit_bookkeeping(self) -> None:
         """Commit only Tessera's own bookkeeping, under its fixed message.
 
-        Also called on its own once delivery has written the PR number into
-        the ticket (ticket-205): a tracked ticket left modified would send the
-        next run to `blocked`.
+        The PR-number write, commit and push now happen inside livraison via
+        `post_pr_callback` *before* any merge, so no bookkeeping commit is
+        ever stranded on the ticket branch after a merged PR (ticket-270).
+
+        Files that were untracked at run start (`_preexisting_untracked`) are
+        excluded: they were not produced by Tessera's own bookkeeping, and
+        `commit_all` already excludes them from the main ticket commit.
         """
         # A project that has neither tickets/ nor memory/pipeline-log.md
         # yet (e.g. a git_workspace used outside the ticket pipeline, or a
@@ -636,7 +640,14 @@ class GitWorkspaceService:
                 conservees.append(chemin)
         existing_bookkeeping_paths = conservees
         if existing_bookkeeping_paths:
-            await self._run("add", "-A", "--", *existing_bookkeeping_paths)
+            # Exclut les fichiers qui étaient non suivis au démarrage du run :
+            # `commit_all` les exclut déjà du commit principal (ticket-270).
+            preexisting_excludes = tuple(
+                f":(exclude){p}" for p in self._preexisting_untracked
+            )
+            await self._run(
+                "add", "-A", "--", *existing_bookkeeping_paths, *preexisting_excludes
+            )
             staged_bookkeeping = await self._run("diff", "--cached", "--name-only")
             if staged_bookkeeping.strip():
                 await self._run("commit", "-m", _BOOKKEEPING_COMMIT_MESSAGE)

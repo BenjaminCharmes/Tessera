@@ -81,6 +81,7 @@ class LivraisonService:
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
         resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
         politique: PolitiqueRun | None = None,
+        post_pr_callback: Callable[[str, int, str], Awaitable[None]] | None = None,
     ) -> None:
         self._git = git_workspace
         self._workflow = workflow
@@ -96,6 +97,10 @@ class LivraisonService:
         # pouvait y écrire `merge` pendant le run (ticket-119). Sans politique
         # — appel hors pipeline — on lit le fichier, comme avant.
         self._politique = politique
+        # Appelé après `open_pull_request` mais avant tout merge : écrit le
+        # pr_number dans le ticket, commite et pousse, de sorte qu'aucun
+        # commit ne soit laissé sur la branche après le merge (ticket-270).
+        self._post_pr_callback = post_pr_callback
 
     async def livrer(
         self,
@@ -170,6 +175,15 @@ class LivraisonService:
         )
         pr_number = int(resultat.pr_number)
         etapes.append(f"PR #{pr_number} ouverte")
+
+        # Enregistre le pr_number dans le ticket, commite et pousse **avant**
+        # tout merge : garantit qu'aucun commit n'est laissé sur la branche
+        # locale après que la PR a été mergée (ticket-270).
+        if self._post_pr_callback is not None:
+            try:
+                await self._post_pr_callback(ticket_id, pr_number, branch)
+            except Exception as exc:  # noqa: BLE001 — non-critique, le merge continue
+                _logger.warning("post_pr_callback_failed", extra={"error": str(exc)})
 
         if resolus:
             # Un conflit est l'endroit où deux intentions divergent : le pire

@@ -326,6 +326,33 @@ def _livreur(
         politique.base_branch if politique else None
     ) or settings.github_base_branch
 
+    ticket_svc = TicketService(project_path, project_id)
+
+    async def _noter_et_pousser(ticket_id: str, pr_number: int, branch: str) -> None:
+        """Write pr_number, commit and push before any merge (ticket-270).
+
+        Called after opening the PR but before any merge, so the bookkeeping
+        commit for the PR number is on the remote and no commit is stranded on
+        the ticket branch after a merged PR.  Without this number the ticket
+        card would keep offering to open a PR on already-merged work (ticket-205).
+        A write failure never undoes an already-opened PR: it is logged instead.
+        """
+        try:
+            await ticket_svc.set_pr_number(ticket_id, pr_number)
+            git_espace: GitWorkspaceService
+            if espace is None:
+                git_espace = GitWorkspaceService(project_path, politique=politique)
+            else:
+                git_espace = espace
+            await git_espace.commit_bookkeeping()
+            await git_espace.push_branch(branch)
+            if espace is not None:
+                # En file, le ticket suivant part de la base mémorisée à
+                # l'approbation : sans l'avancer, ce commit n'y serait pas.
+                await espace.advance_base_ref()
+        except Exception as exc:  # noqa: BLE001 — même raison que la livraison
+            _logger.warning("pr_non_notee", extra={"erreur": str(exc)})
+
     service = LivraisonService(
         git_workspace=GitWorkspaceService(project_path, politique=politique),
         workflow=GitHubWorkflowService(
@@ -345,9 +372,8 @@ def _livreur(
             if runner is not None
             else None
         ),
+        post_pr_callback=_noter_et_pousser,
     )
-
-    ticket_svc = TicketService(project_path, project_id)
 
     async def livrer(result: PipelineResult) -> Livraison:
         ticket = await ticket_svc.get_ticket(result.ticket_id)
@@ -363,27 +389,8 @@ def _livreur(
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
             return Livraison(arret=f"Livraison interrompue : {exc}")
-        if livraison.pr_number is not None:
-            await noter_la_pr(result.ticket_id, livraison.pr_number)
+        # pr_number is now recorded inside service.livrer() via _noter_et_pousser
         return livraison
-
-    async def noter_la_pr(ticket_id: str, pr_number: int) -> None:
-        # Sans ce numéro, la carte du ticket croit qu'il n'a pas de PR et
-        # propose d'en ouvrir une sur un travail déjà mergé (ticket-205). Une
-        # écriture ratée ne défait pas une PR ouverte : elle se journalise.
-        try:
-            await ticket_svc.set_pr_number(ticket_id, pr_number)
-            if espace is None:
-                await GitWorkspaceService(
-                    project_path, politique=politique
-                ).commit_bookkeeping()
-                return
-            await espace.commit_bookkeeping()
-            # En file, le ticket suivant part de la base mémorisée à
-            # l'approbation : sans l'avancer, ce commit n'y serait pas.
-            await espace.advance_base_ref()
-        except Exception as exc:  # noqa: BLE001 — même raison que la livraison
-            _logger.warning("pr_non_notee", extra={"erreur": str(exc)})
 
     return livrer
 
