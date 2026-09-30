@@ -384,6 +384,12 @@ Les deux ne se confondent jamais. Une consigne envoyée pendant qu'une question
 est posée ne vaut pas réponse à cette question — sinon un « au fait, pense aux
 tests » deviendrait la réponse à « on casse l'API ? ».
 
+#### Trouver où répondre : les runs en attente d'abord
+
+Lorsque plusieurs agents tournent en parallèle, ceux qui t'attendent — qui ont posé une question — sont affichés en premier dans la Supervision. Sur chaque carte « attend une réponse », un bouton « Répondre » te sélectionne le run et te place directement dans le champ de réponse. Tu n'as pas à chercher.
+
+Si tu choisis une autre carte explicitement pour la lire, ta sélection y reste stable — elle ne bascule pas si un autre run demande quelque chose pendant ce temps.
+
 ### Le chat, hors pipeline
 
 Le chat n'est pas un pipeline. Il sert à décider **quoi** ticketiser, à
