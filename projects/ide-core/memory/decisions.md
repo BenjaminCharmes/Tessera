@@ -452,7 +452,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 ## ADR-050 — Un terme interdit est arrêté à trois portes, et une porte qui n'a pas pu juger refuse
 
 **Date** : 2026-09-29
-**Décision** : `FORBIDDEN_TERMS` (`.env`, jamais versionné) est contrôlé au push du pipeline (ADR-048), par un hook `pre-push` pour les pushes manuels, et en CI sur chaque PR — titre et corps compris — avec la liste en secret GitHub. Le job CI est requis par la protection de `develop` et `main`. Liste absente ou git en échec : refus. Avant toute publication, `scripts/scan_historique.py` couvre l'historique et les métadonnées GitHub.
-**Raison** : une seule porte se contourne sans le vouloir : push à la main, agent d'une autre session, corps de PR.
-**Alternative rejetée** : la CI seule — elle voit la PR après le push, quand la branche est déjà publique.
+**Décision** : `FORBIDDEN_TERMS` (`.env`, jamais versionné) est contrôlé au push du pipeline, par un hook `pre-push` en manuel, et en CI sur chaque PR — titre et corps compris — liste en secret GitHub, job requis par la protection des branches. Git en échec : refus, partout. Liste absente : refus en CI, où le secret se déclare ; en local, aucun contrôle (ADR-048), un clone neuf pousse (amendé 2026-09-29). Avant publication, `scripts/scan_historique.py` couvre l'historique et les métadonnées GitHub.
+**Raison** : une seule porte se contourne sans le vouloir : push manuel, agent d'une autre session, corps de PR.
+**Alternative rejetée** : la CI seule — elle voit la PR quand la branche est déjà publique.
 **Conséquence assumée** : la liste vaut partout, son périmètre se déclare — `confidentiality: professional`, un CV qui cite ses employeurs.
