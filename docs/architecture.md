@@ -238,6 +238,13 @@ En squash, le titre du commit reprend celui de la PR (conforme au format
 Conventional Commits depuis le ticket-259) suivi du numéro `(#N)` — par exemple,
 `feat: ticket-007 — Ajouter un endpoint (#42)`.
 
+### Suivi après l'ouverture de la PR
+
+Dès qu'une PR est ouverte, elle se voit assigner un `pr_number`. Celui-ci est écrit
+dans le fichier du ticket et commité **avant** le merge de la PR, garantissant que
+le `pr_number` remonte à la branche de base lors du merge. Aucun suivi n'est écrit
+après le merge : la branche du ticket ne reçoit pas de commit une fois fusionnée.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`
