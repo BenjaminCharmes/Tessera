@@ -530,20 +530,55 @@ async def test_repository_info_signale_un_depot_inaccessible() -> None:
 
 
 @respx.mock
-async def test_merge_pull_request_demande_un_merge_commit() -> None:
-    # `develop → main` doit rester un merge commit : un squash réécrit les SHA
-    # et ferait diverger les deux branches (CLAUDE.md, section Git).
+async def test_merge_pull_request_squash_envoie_squash_method() -> None:
+    # Les PR de ticket → develop sont mergées en squash : c'est la convention
+    # du dépôt (CLAUDE.md, section Git) et le défaut de ticket-265.
     route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
         return_value=httpx.Response(200, json={"merged": True, "sha": "abc"})
     )
 
-    await _make_service().merge_pull_request(7)
+    await _make_service().merge_pull_request(7, method="squash")
 
     assert route.called
     import json as _json
 
     envoye = _json.loads(route.calls[0].request.content)
+    assert envoye["merge_method"] == "squash"
+    assert "commit_title" not in envoye
+
+
+@respx.mock
+async def test_merge_pull_request_merge_envoie_merge_method() -> None:
+    # Un projet déclarant merge_method: "merge" dans agents.json obtient un
+    # merge commit (ticket-265).
+    route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True, "sha": "abc"})
+    )
+
+    await _make_service().merge_pull_request(7, method="merge")
+
+    import json as _json
+
+    envoye = _json.loads(route.calls[0].request.content)
     assert envoye["merge_method"] == "merge"
+
+
+@respx.mock
+async def test_merge_pull_request_avec_commit_title_le_transmet() -> None:
+    # Quand l'appelant fournit un commit_title, il est transmis à GitHub.
+    route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True, "sha": "abc"})
+    )
+
+    await _make_service().merge_pull_request(
+        7, method="squash", commit_title="feat: ticket-007 — Mon ticket (#7)"
+    )
+
+    import json as _json
+
+    envoye = _json.loads(route.calls[0].request.content)
+    assert envoye["merge_method"] == "squash"
+    assert envoye["commit_title"] == "feat: ticket-007 — Mon ticket (#7)"
 
 
 @respx.mock
