@@ -1,14 +1,15 @@
 ---
-id: ticket-267
-title: "Run summary: working Close in Supervision, ticket id shown, not 'finished' before delivery"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-267
+pr_number: 144
+priority: medium
+status: done
+title: 'Run summary: working Close in Supervision, ticket id shown, not ''finished''
+  before delivery'
+type: fix
 ---
 
 # ticket-267 — Le résumé du run : Fermer marche, le ticket s'affiche, « terminé » attend la livraison

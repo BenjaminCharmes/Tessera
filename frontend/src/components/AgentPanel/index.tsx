@@ -39,6 +39,7 @@ export default function AgentPanel({
     quota,
     pendingQuestion,
     questionExpireA,
+    runClosed,
     answer,
     interject,
     stop,
@@ -153,7 +154,11 @@ export default function AgentPanel({
             )}
 
             {status === "done" && lastResult && (
-              <PipelineSummary result={lastResult} durationMs={durationMs} />
+              <PipelineSummary
+                result={lastResult}
+                durationMs={durationMs}
+                runClosed={runClosed}
+              />
             )}
           </>
         )}
@@ -167,11 +172,11 @@ export default function AgentPanel({
       </div>
 
       {/* Footer actions */}
-      {(status === "done" || status === "error") && (
+      {((status === "done" && runClosed) || status === "error") && (
         <div className="px-4 py-3 border-t border-zinc-700 shrink-0 flex gap-3">
           <button
             onClick={clear}
-            className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
           >
             <IconCross size={12} /> Fermer
           </button>

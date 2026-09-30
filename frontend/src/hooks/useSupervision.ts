@@ -55,6 +55,14 @@ export interface UseSupervisionResult {
    * disparu.
    */
   signalServices: number;
+  /**
+   * Retire un run clos de la liste des cartes (ticket-267).
+   *
+   * `run_closed` marque le run comme terminé (`runClosed: true`) mais ne le
+   * retire pas automatiquement : c'est l'utilisateur qui ferme via le bouton
+   * « Fermer » de l'AgentPanel, après avoir vu le résumé final.
+   */
+  fermerRun: (runId: string) => void;
 }
 
 const VIDE: StreamState = INITIAL;
@@ -170,12 +178,9 @@ export function useSupervision(): UseSupervisionResult {
             [runId]: applyEvent(prec[runId] ?? INITIAL, brut),
           }));
 
-          // `run_closed` est le seul événement publié après la libération du
-          // projet : c'est lui, et pas `pipeline_done`, qui retire la carte.
-          if (brut.type === "run_closed") {
-            setRuns((prec) => prec.filter((r) => r.run_id !== runId));
-            return;
-          }
+          // `run_closed` marque le run clos dans son état (runClosed: true),
+          // mais ne le retire pas de la liste : l'utilisateur ferme via le
+          // bouton « Fermer » de l'AgentPanel (ticket-267).
           setRuns((prec) => majDesRuns(prec, brut, runId));
         } catch {
           // trame malformée : l'ignorer vaut mieux que casser l'affichage
@@ -255,6 +260,10 @@ export function useSupervision(): UseSupervisionResult {
     );
   }, []);
 
+  const fermerRun = useCallback((runId: string) => {
+    setRuns((prec) => prec.filter((r) => r.run_id !== runId));
+  }, []);
+
   return {
     runs,
     selection,
@@ -266,5 +275,6 @@ export function useSupervision(): UseSupervisionResult {
     observerLeTexte,
     sortieDuService,
     signalServices,
+    fermerRun,
   };
 }

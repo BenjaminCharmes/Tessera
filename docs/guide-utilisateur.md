@@ -298,6 +298,11 @@ l'échelle réelle, qui est rarement celle qu'on imagine.
 
 ---
 
+
+### Fermer un run achevé
+
+Une fois qu'un run est entièrement complété — sa revue approuvée et sa livraison effectuée (le cas échéant) — tu vois un bouton « Fermer » dans le résumé. Un clic le retire du panneau de Supervision pour dégager l'écran et passer aux tickets en cours ou suivants.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du

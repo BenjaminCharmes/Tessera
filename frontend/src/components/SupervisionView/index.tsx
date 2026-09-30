@@ -170,7 +170,8 @@ function projeter(
     connectQueue: rien,
     connectAutonome: rien,
     disconnect: rien,
-    clear: rien,
+    // « Fermer » retire la carte du run clos de la liste (ticket-267).
+    clear: () => supervision.fermerRun(runId),
     answer: (text: string) =>
       supervision.envoyer(runId, { type: "answer", text }),
     interject: (text: string) =>
