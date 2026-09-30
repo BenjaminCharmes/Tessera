@@ -205,3 +205,11 @@ Le diff refactorise la gestion d
 - 2026-09-30 08:47:52 UTC — [ticket-254] tour 3 — reviewer terminé (84467ms)
 - 2026-09-30 08:49:14 UTC — [ticket-254] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le bouton d'envoi du chat a été 
 - 2026-09-30 08:49:14 UTC — [ticket-254] APPROVED après 3 tour(s)
+- 2026-09-30 08:55:35 UTC — [ticket-259] branche ticket-259-pull-requests-opened-by-delivery-carry-the-ticket
+- 2026-09-30 08:55:35 UTC — [ticket-259] tour 1 — codeur démarré
+- 2026-09-30 08:59:14 UTC — [ticket-259] tour 1 — codeur terminé (219516ms)
+- 2026-09-30 09:00:12 UTC — [ticket-259] securite: PASS — Le diff ajoute le champ `ticket_type` aux appels de création de PR, construit vi
+- 2026-09-30 09:00:12 UTC — [ticket-259] tour 1 — reviewer démarré
+- 2026-09-30 09:00:55 UTC — [ticket-259] tour 1 — reviewer terminé (43592ms)
+- 2026-09-30 09:02:02 UTC — [ticket-259] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le paramètre `ticket_type` est c
+- 2026-09-30 09:02:02 UTC — [ticket-259] APPROVED après 1 tour(s)
