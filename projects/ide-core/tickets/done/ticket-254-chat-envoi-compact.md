@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-254
-pr_number: null
+pr_number: 131
 priority: low
 status: done
 title: Chat send button sits beside the input instead of on its own row
