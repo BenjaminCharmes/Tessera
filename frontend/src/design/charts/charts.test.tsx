@@ -47,11 +47,19 @@ describe("TimeBars", () => {
     expect(screen.getByRole("tooltip")).toHaveTextContent("mar · 5 $");
   });
   it("keeps its screen-reader table inside a positioned box", () => {
-    // Un `sr-only` sans ancêtre positionné échappait au conteneur qui défile
-    // et allongeait la page : on faisait défiler l'app sous elle-même.
+    // `sr-only` doit être sur le div parent du <table>, pas sur le <table>
+    // lui-même : un tableau ignore height:1px et overflow:hidden, ce qui
+    // allongeait la page au-delà du dernier bloc visible.
     render(<TimeBars label="Coût" points={[{ label: "a", value: 1 }]} format={fmt} empty="Rien" />);
     const table = screen.getByRole("table", { hidden: true });
-    expect(table.parentElement).toHaveClass("relative");
+    expect(table.parentElement).toHaveClass("sr-only");
+    expect(table.parentElement?.parentElement).toHaveClass("relative");
+  });
+
+  it("keeps its screen-reader table accessible with its caption", () => {
+    render(<TimeBars label="Coût" points={[{ label: "a", value: 1 }]} format={fmt} empty="Rien" />);
+    const table = screen.getByRole("table", { hidden: true });
+    expect(table.querySelector("caption")).toBeInTheDocument();
   });
 });
 
