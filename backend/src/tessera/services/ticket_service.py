@@ -58,8 +58,10 @@ def _normalize_depends_on(raw: object) -> list[str]:
 
     if isinstance(raw, str):
         pieces = [part.strip() for part in raw.split(",")]
+    elif isinstance(raw, (list, tuple)):
+        pieces = [str(item) for item in raw]
     else:
-        pieces = [str(item) for item in raw]  # type: ignore[arg-type]
+        pieces = [str(raw)]
 
     result: list[str] = []
     for piece in pieces:
