@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-266
-pr_number: null
+pr_number: 143
 priority: high
 status: done
 title: A run waiting for an answer comes first in Supervision, with a Reply button
