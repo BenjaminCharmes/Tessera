@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 1
 id: ticket-253
-pr_number: null
+pr_number: 130
 priority: medium
 status: done
 title: 'Stats column holds the view''s settings: period, scope and spending limits'
