@@ -251,3 +251,11 @@ Le diff refactorise la gestion d
 - 2026-09-30 09:43:33 UTC — [ticket-265] tour 3 — reviewer terminé (39406ms)
 - 2026-09-30 09:45:01 UTC — [ticket-265] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent explicitemen
 - 2026-09-30 09:45:01 UTC — [ticket-265] APPROVED après 3 tour(s)
+- 2026-09-30 09:59:22 UTC — [ticket-268] branche ticket-268-validator-matches-verdicts-to-criteria-by-number
+- 2026-09-30 09:59:22 UTC — [ticket-268] tour 1 — codeur démarré
+- 2026-09-30 10:04:27 UTC — [ticket-268] tour 1 — codeur terminé (304891ms)
+- 2026-09-30 10:04:43 UTC — [ticket-268] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff améliore la robustesse du val
+- 2026-09-30 10:04:43 UTC — [ticket-268] tour 1 — reviewer démarré
+- 2026-09-30 10:05:56 UTC — [ticket-268] tour 1 — reviewer terminé (72172ms)
+- 2026-09-30 10:07:44 UTC — [ticket-268] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un mécanisme de correspond
+- 2026-09-30 10:07:44 UTC — [ticket-268] APPROVED après 1 tour(s)

@@ -336,6 +336,109 @@ class TestValidationResult:
         assert vr.verdict == "APPROVED"
 
 
+class TestIndexAndTolerantMatching:
+    """Tests for index-based and tolerant text matching (ticket-268)."""
+
+    async def test_index_match_overrides_text_difference(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Un LLM qui rend index: 3 est rattaché au 3ème critère même si le
+        # texte qu'il a recopié diffère du critère envoyé
+        _set_response(
+            provider,
+            {
+                "criteria": [
+                    {"index": 1, "criterion": "First", "passed": True, "note": ""},
+                    {"index": 2, "criterion": "Second", "passed": True, "note": ""},
+                    {"index": 3, "criterion": "rewritten by llm", "passed": True, "note": ""},
+                ],
+                "feedback": "All good.",
+            },
+        )
+
+        result = await service.validate(
+            criteria=["First criterion", "Second criterion", "Third criterion original"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.criteria[2].passed is True
+        assert result.verdict == "APPROVED"
+
+    async def test_tolerant_match_ignores_backticks_and_guillemets(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Le LLM répond sans backticks ni guillemets ; le critère envoyé en a.
+        # La normalisation tolérante doit les rattacher l'un à l'autre.
+        _set_response(
+            provider,
+            {
+                "criteria": [
+                    {
+                        "criterion": "Un projet déclarant merge_method: squash fonctionne",
+                        "passed": True,
+                        "note": "",
+                    },
+                ],
+                "feedback": "ok",
+            },
+        )
+
+        result = await service.validate(
+            criteria=['Un projet déclarant `"merge_method": "squash"` fonctionne'],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.criteria[0].passed is True
+        assert result.verdict == "APPROVED"
+
+    async def test_absent_criterion_stays_false_with_unjudged_note(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Un critère absent de la réponse reste passed: false avec la note attendue
+        _set_response(
+            provider,
+            {
+                "criteria": [
+                    {"criterion": "First criterion", "passed": True, "note": ""},
+                ],
+                "feedback": "Only one judged.",
+            },
+        )
+
+        result = await service.validate(
+            criteria=["First criterion", "Second criterion absent from response"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.criteria[1].passed is False
+        assert "non jugé par le validateur" in result.criteria[1].note
+
+    async def test_feedback_prefixed_when_criterion_not_judged(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Si un critère n'est pas jugé, le feedback commence par une phrase qui le signale
+        _set_response(
+            provider,
+            {
+                "criteria": [
+                    {"criterion": "Judged criterion", "passed": True, "note": ""},
+                ],
+                "feedback": "One criterion checked.",
+            },
+        )
+
+        result = await service.validate(
+            criteria=["Judged criterion", "Unjudged criterion"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.feedback.startswith("1 critère(s) absent(s)")
+
+
 async def test_a_whole_branch_diff_reaches_the_validator_intact(
     service: ValidatorService, provider: FakeProvider
 ) -> None:
