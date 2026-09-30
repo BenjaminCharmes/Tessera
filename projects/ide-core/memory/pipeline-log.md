@@ -276,3 +276,11 @@ Le diff refactorise la gestion d
 - 2026-09-30 11:57:09 UTC — [ticket-271] tour 1 — reviewer terminé (25672ms)
 - 2026-09-30 11:58:08 UTC — [ticket-271] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente la fonction
 - 2026-09-30 11:58:08 UTC — [ticket-271] APPROVED après 1 tour(s)
+- 2026-09-30 12:08:44 UTC — [ticket-272] branche ticket-272-lockfiles-are-summarized-not-pasted-in-the-diff-g
+- 2026-09-30 12:08:44 UTC — [ticket-272] tour 1 — codeur démarré
+- 2026-09-30 12:12:59 UTC — [ticket-272] tour 1 — codeur terminé (254437ms)
+- 2026-09-30 12:13:31 UTC — [ticket-272] securite: PASS — Le diff ajoute une fonction `_resumer_lockfiles()` pour résumer les modification
+- 2026-09-30 12:13:31 UTC — [ticket-272] tour 1 — reviewer démarré
+- 2026-09-30 12:14:31 UTC — [ticket-272] tour 1 — reviewer terminé (60266ms)
+- 2026-09-30 12:16:39 UTC — [ticket-272] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests montrent que le conte
+- 2026-09-30 12:16:39 UTC — [ticket-272] APPROVED après 1 tour(s)

@@ -228,6 +228,10 @@ Trois points importants :
   du codeur. Ils valident l'implémentation, pas l'intention.
 - **Chaque run a sa propre branche git.** Ton travail en cours n'est jamais écrasé.
 
+Les fichiers de verrouillage (`uv.lock`, `package-lock.json`, `pnpm-lock.yaml`,
+`yarn.lock`, `poetry.lock`, `Cargo.lock`) apparaissent résumés dans ce diff
+pour que le vrai changement reste visible. Le commit, lui, les contient intégralement.
+
 ### Si le reviewer n'est pas d'accord
 
 Il renvoie `CHANGES_REQUESTED` avec sa raison, et le codeur repart pour un tour en

@@ -81,7 +81,7 @@ appels d'un pipeline.
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé deux correctifs, tous deux nés d'un usage réel :
+Cette promesse a demandé trois correctifs, tous trois nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -93,6 +93,12 @@ Cette promesse a demandé deux correctifs, tous deux nés d'un usage réel :
   `git merge`, `git push` sans passer par elle — ce qu'il a fait, jusqu'à
   pousser sur `main`. Un hook `PreToolUse` refuse maintenant toute
   sous-commande git qui écrit. Le git en lecture reste permis.
+- **Les lockfiles sont résumés dans le diff relu** (ticket-272). Quand un run
+  modifie un fichier de verrouillage connu — `uv.lock`, `package-lock.json`,
+  `pnpm-lock.yaml`, `yarn.lock`, `poetry.lock`, `Cargo.lock` — le diff relu ne
+  porte qu'une ligne de résumé : `<chemin> : fichier de verrouillage modifié,
+  N lignes ajoutées, M supprimées`. Cela évite que des milliers de lignes noient
+  les changements réels du ticket. Le commit, lui, porte le lockfile en entier.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et

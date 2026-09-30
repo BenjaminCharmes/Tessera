@@ -1,14 +1,14 @@
 ---
-id: ticket-272
-title: "Lockfiles are summarized, not pasted, in the diff given to reviewing agents"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-272
+pr_number: 139
+priority: high
+status: done
+title: Lockfiles are summarized, not pasted, in the diff given to reviewing agents
+type: fix
 ---
 
 # ticket-272 — Les lockfiles ne noient plus le diff relu par les agents

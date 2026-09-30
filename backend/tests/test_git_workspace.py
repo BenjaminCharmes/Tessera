@@ -8,6 +8,7 @@ from tessera.services.git_workspace import (
     GitWorkspaceService,
     InvalidSlugError,
     NotAGitRepository,
+    _resumer_lockfiles,
 )
 
 
@@ -626,3 +627,73 @@ async def test_what_a_push_publishes_is_read_from_the_commits(repo: Path) -> Non
     (commit,) = await service.commits_depuis_base("develop", branche)
     assert "un corps de message" in commit.message
     assert "c@example.com" in commit.auteur
+
+
+# ---------------------------------------------------------------------------
+# Lockfile summarization — ticket-272
+# ---------------------------------------------------------------------------
+
+
+def test_lockfile_summary_replaces_content_and_keeps_other_files() -> None:
+    """uv.lock content is replaced by a summary; package.json content is kept."""
+    diff = (
+        "diff --git a/uv.lock b/uv.lock\n"
+        "index abc..def 100644\n"
+        "--- a/uv.lock\n"
+        "+++ b/uv.lock\n"
+        "@@ -1,3 +1,3 @@\n"
+        " context\n"
+        "-old-dep==1.0.0\n"
+        "+old-dep==2.0.0\n"
+        "diff --git a/package.json b/package.json\n"
+        "index ghi..jkl 100644\n"
+        "--- a/package.json\n"
+        "+++ b/package.json\n"
+        '@@ -1,2 +1,2 @@\n'
+        '-  "version": "1.0"\n'
+        '+  "version": "1.1"\n'
+    )
+    result = _resumer_lockfiles(diff)
+    assert "uv.lock: lockfile modified" in result
+    assert "old-dep==1.0.0" not in result
+    assert "old-dep==2.0.0" not in result
+    assert "package.json" in result
+    assert '"version": "1.1"' in result
+
+
+def test_lockfile_summary_counts_added_and_removed_lines() -> None:
+    """The summary line reports the exact count of added and removed lines."""
+    diff = (
+        "diff --git a/yarn.lock b/yarn.lock\n"
+        "index abc..def 100644\n"
+        "--- a/yarn.lock\n"
+        "+++ b/yarn.lock\n"
+        "@@ -1,5 +1,6 @@\n"
+        " context\n"
+        "-removed1\n"
+        "-removed2\n"
+        "+added1\n"
+        "+added2\n"
+        "+added3\n"
+        " context\n"
+    )
+    result = _resumer_lockfiles(diff)
+    assert "3 lines added" in result
+    assert "2 deleted" in result
+
+
+def test_lockfile_in_subdirectory_is_summarized() -> None:
+    """backend/uv.lock is summarized even though it lives in a subdirectory."""
+    diff = (
+        "diff --git a/backend/uv.lock b/backend/uv.lock\n"
+        "index abc..def 100644\n"
+        "--- a/backend/uv.lock\n"
+        "+++ b/backend/uv.lock\n"
+        "@@ -1,2 +1,2 @@\n"
+        "-dep==1.0\n"
+        "+dep==2.0\n"
+    )
+    result = _resumer_lockfiles(diff)
+    assert "backend/uv.lock: lockfile modified" in result
+    assert "dep==1.0" not in result
+    assert "dep==2.0" not in result
