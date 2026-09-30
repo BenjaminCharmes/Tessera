@@ -24,6 +24,17 @@ import { api } from "../lib/api";
 import { vueDuCentre } from "../vueDuCentre";
 
 /**
+ * Returns the panel to activate when the user selects a project from the
+ * selector. Coming from the projects list always opens tickets; any other
+ * panel stays — the user was already where they wanted to be (ticket-271).
+ */
+export function panelAfterProjectSwitch(
+  current: SidebarPanel,
+): SidebarPanel {
+  return current === "projects" ? "tickets" : current;
+}
+
+/**
  * The cockpit's state graph — ticket-252.
  *
  * App.tsx portait tout : l'état, les hooks, les gestionnaires, et une
@@ -177,7 +188,7 @@ export function useCockpit() {
   function handleSelectProject(p: Project | null) {
     setProject(p);
     memoriser(p?.id ?? null);
-    setPanel("tickets");
+    setPanel(panelAfterProjectSwitch(panel));
     setShowKanban(true);
     setOpenFilePath(null);
     stream.clear();
