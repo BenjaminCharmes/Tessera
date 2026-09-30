@@ -19,7 +19,7 @@ import { filtrerParStatut } from "../lib/filtresTickets";
 import { PANNEAUX } from "../components/Sidebar/panels";
 import type { SidebarPanel } from "../components/Sidebar/panels";
 import { projetsEnAttente } from "../components/Sidebar/projetsEnAttente";
-import type { Project, Ticket, TicketStatus } from "../types/api";
+import type { Project, StatsPeriod, Ticket, TicketStatus } from "../types/api";
 import { api } from "../lib/api";
 import { vueDuCentre } from "../vueDuCentre";
 
@@ -64,6 +64,11 @@ export function useCockpit() {
   // ordonner (ticket-074).
   const [selection, setSelection] = useState<string[]>([]);
   const [agentSelectionne, setAgentSelectionne] = useState<string | null>(null);
+  // La période et la portée des statistiques vivent ici pour que la colonne
+  // latérale les contrôle et que StatsView les reçoive en props (ticket-253).
+  const [statsDays, setStatsDays] = useState<StatsPeriod>(30);
+  const [statsPortee, setStatsPortee] = useState<"projet" | "tous">("projet");
+
   // La liste des conversations vit dans la colonne 2, le fil au centre
   // (ticket-250) : l'état est donc partagé ici. Le choix retient son projet —
   // en changer retombe sur `default` sans effet ni rendu en cascade.
@@ -310,6 +315,11 @@ export function useCockpit() {
         usage: usageData.usage,
         loading: usageData.loading,
         error: usageData.error,
+        days: statsDays,
+        setDays: setStatsDays,
+        portee: statsPortee,
+        setPortee: setStatsPortee,
+        projetActifId: project?.id ?? null,
       },
       chat: {
         conversationId,
@@ -348,6 +358,9 @@ export function useCockpit() {
       running,
       unreadable: tickets.unreadable,
       openFilePath,
+      statsDays,
+      // Quand la portée est "tous", on passe null même si un projet est actif.
+      statsProjectId: statsPortee === "tous" ? null : (project?.id ?? null),
       onSelectTicket: handleSelectTicket,
       onRunPipeline: handleRunPipeline,
       onChangeStatus: handleChangeStatus,

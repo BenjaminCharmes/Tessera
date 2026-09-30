@@ -4,6 +4,7 @@ import type { SidebarPanel } from "./Sidebar/panels";
 import type {
   Project,
   ServiceActif,
+  StatsPeriod,
   Ticket,
   TicketStatus,
   TicketUnreadable,
@@ -40,6 +41,10 @@ interface CenterViewProps {
   running: Set<string>;
   unreadable: TicketUnreadable[];
   openFilePath: string | null;
+  /** Nombre de jours de la période stats, géré par useCockpit (ticket-253). */
+  statsDays: StatsPeriod;
+  /** Projet cible des stats — null si portée "tous projets" (ticket-253). */
+  statsProjectId: string | null;
   onSelectTicket: (t: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus: (ticketId: string, status: TicketStatus) => void;
@@ -60,6 +65,8 @@ export default function CenterView({
   running,
   unreadable,
   openFilePath,
+  statsDays,
+  statsProjectId,
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
@@ -87,9 +94,8 @@ export default function CenterView({
     return <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />;
   }
   if (panel === "usage") {
-    // Sans projet sélectionné, la vue d'ensemble : « combien me coûte
-    // Tessera, et sur quel projet » n'avait aucune réponse.
-    return <StatsView projectId={project?.id ?? null} />;
+    // La période et la portée viennent de la colonne latérale (ticket-253).
+    return <StatsView projectId={statsProjectId} days={statsDays} />;
   }
   if (vueCentre === "run") {
     return <RunView stream={stream} />;

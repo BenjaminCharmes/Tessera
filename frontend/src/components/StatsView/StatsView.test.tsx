@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import StatsView from "./index";
 import type { UsageStats } from "../../types/api";
 
@@ -50,7 +50,7 @@ describe("StatsView", () => {
   it("shows the headline figures and every chart for the period", async () => {
     stats.mockResolvedValue(payload());
 
-    render(<StatsView projectId="p" />);
+    render(<StatsView projectId="p" days={30} />);
 
     const tile = (await screen.findByText("Tokens entrants")).parentElement;
     expect(tile).toHaveTextContent("3 779");
@@ -64,15 +64,12 @@ describe("StatsView", () => {
     expect(screen.queryByRole("region", { name: "Dépense par projet" })).toBeNull();
   });
 
-  it("asks for another period when a period button is pressed", async () => {
+  it("calls the api with the days prop it receives", async () => {
     stats.mockResolvedValue(payload());
-    render(<StatsView projectId={null} />);
+    render(<StatsView projectId={null} days={90} />);
     await screen.findByText("Tokens entrants");
 
-    fireEvent.click(screen.getByRole("button", { name: "90 j" }));
-
-    expect(stats).toHaveBeenLastCalledWith(90, null);
-    expect(screen.getByRole("button", { name: "90 j" })).toHaveAttribute("aria-pressed", "true");
+    expect(stats).toHaveBeenCalledWith(90, null);
   });
 
   it("says the period is empty rather than drawing flat charts", async () => {
@@ -90,7 +87,7 @@ describe("StatsView", () => {
       }),
     );
 
-    render(<StatsView projectId="p" />);
+    render(<StatsView projectId="p" days={7} />);
 
     expect(await screen.findByText(/Aucun run sur les 7 derniers jours/)).toBeInTheDocument();
     expect(screen.getByText("Aucune dépense sur la période.")).toBeInTheDocument();
@@ -99,8 +96,37 @@ describe("StatsView", () => {
   it("says the statistics are unavailable when the request fails", async () => {
     stats.mockImplementation(() => Promise.reject(new Error("down")));
 
-    render(<StatsView projectId="p" />);
+    render(<StatsView projectId="p" days={30} />);
 
     expect(await screen.findByText("Statistiques indisponibles.")).toBeInTheDocument();
+  });
+
+  it("does not render a period selector (moved to the sidebar)", async () => {
+    stats.mockResolvedValue(payload());
+    render(<StatsView projectId="p" days={30} />);
+    await screen.findByText("Tokens entrants");
+
+    expect(screen.queryByRole("group", { name: "Période" })).toBeNull();
+  });
+
+  it("keeps KpiRow at the top of the view", async () => {
+    // Les tuiles de KpiRow (Runs, Tokens entrants, Coût total…) doivent rester
+    // au-dessus des graphiques dans StatsView (critère d'acceptation ticket-253).
+    stats.mockResolvedValue(payload());
+    render(<StatsView projectId="p" days={30} />);
+
+    // Toutes les tuiles de KpiRow sont présentes.
+    expect(await screen.findByText("Runs")).toBeInTheDocument();
+    expect(screen.getByText("Tokens entrants")).toBeInTheDocument();
+    expect(screen.getByText("Tokens sortants")).toBeInTheDocument();
+    expect(screen.getByText("Coût total")).toBeInTheDocument();
+    expect(screen.getByText("Taux d'approbation")).toBeInTheDocument();
+
+    // KpiRow précède le premier graphique dans l'ordre DOM.
+    const kpiTile = screen.getByText("Runs").closest("div");
+    const firstChart = screen.getByRole("region", { name: "Dépense par jour" });
+    expect(
+      kpiTile!.compareDocumentPosition(firstChart) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

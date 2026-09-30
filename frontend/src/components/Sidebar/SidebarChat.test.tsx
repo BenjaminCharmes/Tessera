@@ -51,7 +51,16 @@ function renderSidebar(extra: Partial<SidebarProps> = {}) {
       onToggleKanban: () => {},
     },
     runs: { liste: [], loading: false, error: null },
-    usage: { usage: null, loading: false, error: null },
+    usage: {
+      usage: null,
+      loading: false,
+      error: null,
+      days: 30,
+      setDays: () => {},
+      portee: "tous",
+      setPortee: () => {},
+      projetActifId: null,
+    },
   };
   return render(<Sidebar {...base} {...extra} />);
 }
@@ -97,25 +106,87 @@ describe("Sidebar — panneau Chat (ticket-250)", () => {
   });
 });
 
-describe("Sidebar — panneau Usage (ticket-250)", () => {
-  it("ne montre qu'un résumé, le détail vit au centre", () => {
+describe("Sidebar — panneau Usage (ticket-253)", () => {
+  beforeEach(() => {
+    vi.spyOn(api.orchestrator, "limits").mockResolvedValue({
+      run_max_budget_usd: 0,
+      llm_max_budget_usd: 0,
+    });
+  });
+
+  it("montre les boutons de période dans la colonne", async () => {
     renderSidebar({
       panel: "usage",
       usage: {
-        usage: {
-          total_cost_usd: 1.2345,
-          total_tokens: 1000,
-          total_runs: 3,
-          per_ticket: [],
-        },
+        usage: null,
         loading: false,
         error: null,
+        days: 30,
+        setDays: () => {},
+        portee: "tous",
+        setPortee: () => {},
+        projetActifId: null,
       },
     });
 
-    expect(screen.getByText(/\$1\.2345/)).toBeInTheDocument();
-    expect(screen.getByText(/détail au centre/)).toBeInTheDocument();
-    // Le tableau « Par ticket » de l'ancien UsageDashboard ne doit plus être là.
-    expect(screen.queryByText("Par ticket")).not.toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Période" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "7 j" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "30 j" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "90 j" })).toBeInTheDocument();
+  });
+
+  it("désactive le bouton Ce projet quand aucun projet n'est actif", () => {
+    renderSidebar({
+      panel: "usage",
+      usage: {
+        usage: null,
+        loading: false,
+        error: null,
+        days: 30,
+        setDays: () => {},
+        portee: "tous",
+        setPortee: () => {},
+        projetActifId: null,
+      },
+    });
+
+    expect(screen.getByRole("button", { name: "Ce projet" })).toBeDisabled();
+  });
+
+  it("active le bouton Ce projet quand un projet est actif", () => {
+    renderSidebar({
+      panel: "usage",
+      usage: {
+        usage: null,
+        loading: false,
+        error: null,
+        days: 30,
+        setDays: () => {},
+        portee: "projet",
+        setPortee: () => {},
+        projetActifId: "ide-core",
+      },
+    });
+
+    expect(screen.getByRole("button", { name: "Ce projet" })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: "Ce projet" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("affiche aucun plafond quand les limites sont à zéro", async () => {
+    renderSidebar({
+      panel: "usage",
+      usage: {
+        usage: null,
+        loading: false,
+        error: null,
+        days: 30,
+        setDays: () => {},
+        portee: "tous",
+        setPortee: () => {},
+        projetActifId: null,
+      },
+    });
+
+    expect(await screen.findAllByText("aucun plafond")).toHaveLength(2);
   });
 });
