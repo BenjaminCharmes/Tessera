@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.json_extract import extract_json
@@ -155,7 +155,7 @@ class ValidatorService:
 
 
 def _build_criterion_lookups(
-    raw_entries: list[dict],
+    raw_entries: list[dict[str, Any]],
     n_criteria: int,
 ) -> tuple[dict[int, CriterionResult], dict[str, CriterionResult]]:
     """Build index-based and tolerant-text-based lookup maps from LLM response entries."""
