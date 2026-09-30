@@ -63,6 +63,25 @@ describe("TicketList", () => {
   });
 });
 
+describe("TicketList — bascule kanban (ticket-254)", () => {
+  it("le bouton de bascule est trouvable par son nom 'Vue tableau' et déclenche la bascule au clic", async () => {
+    const onToggleKanban = vi.fn();
+    render(<TicketList {...props(false)} onToggleKanban={onToggleKanban} />);
+
+    const button = screen.getByRole("button", { name: "Vue tableau" });
+    await userEvent.click(button);
+
+    expect(onToggleKanban).toHaveBeenCalledTimes(1);
+  });
+
+  it("le bouton de bascule porte le nom 'Éditeur' quand le kanban est actif", () => {
+    render(<TicketList {...props(false)} showKanban={true} />);
+    expect(
+      screen.getByRole("button", { name: "Éditeur" }),
+    ).toBeInTheDocument();
+  });
+});
+
 describe("TicketList — filtres (ticket-195)", () => {
   it("dit combien les filtres cachent", () => {
     // Une liste vide sans explication se lit comme un projet sans tickets.
