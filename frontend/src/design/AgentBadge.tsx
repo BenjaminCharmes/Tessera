@@ -20,7 +20,7 @@ const LIBELLES: Record<MomentAgent, { texte: string; infobulle: string; classe: 
   pipeline: {
     texte: "pipeline",
     infobulle: "Appelé automatiquement pendant un run, sans que tu le demandes.",
-    classe: "bg-violet-500/20 text-violet-200",
+    classe: "bg-zinc-700 text-zinc-200",
   },
   demande: {
     texte: "à la demande",

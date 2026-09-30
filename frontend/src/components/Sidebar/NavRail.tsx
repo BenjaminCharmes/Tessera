@@ -172,7 +172,7 @@ export default function NavRail({
             onClick={() => onChangePanel(panel)}
             className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
               actif
-                ? "bg-violet-500/15 text-violet-200 ring-1 ring-inset ring-violet-500/40"
+                ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
                 : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
             }`}
           >

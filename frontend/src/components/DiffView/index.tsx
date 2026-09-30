@@ -95,7 +95,7 @@ export default function DiffView({ projectId, ticketId }: DiffViewProps) {
                 onClick={() => setChoix({ cle, index: i })}
                 className={`flex items-center gap-1.5 rounded px-2 py-1 font-mono text-micro transition-colors ${
                   i === actif
-                    ? "bg-violet-500/15 text-violet-200 ring-1 ring-inset ring-violet-500/40"
+                    ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
                     : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -119,7 +119,7 @@ export default function DiffView({ projectId, ticketId }: DiffViewProps) {
                   : ligne.type === "retrait"
                     ? "bg-red-950/40 text-red-300"
                     : ligne.type === "hunk"
-                      ? "mt-2 bg-zinc-900 py-0.5 text-violet-300"
+                      ? "mt-2 bg-zinc-900 py-0.5 text-zinc-400"
                       : "text-zinc-400"
               }`}
             >

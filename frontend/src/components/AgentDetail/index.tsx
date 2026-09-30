@@ -117,7 +117,7 @@ function Definition({
                   onClick={() => setVue(cle)}
                   className={`rounded px-1.5 py-0.5 text-micro capitalize transition-colors ${
                     vue === cle
-                      ? "bg-violet-500/15 text-violet-200"
+                      ? "bg-violet-500/15 text-zinc-100"
                       : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
@@ -167,7 +167,7 @@ function Definition({
                     <button
                       type="button"
                       onClick={demanderConfirmation}
-                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400"
+                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-zinc-100 transition-colors hover:border-violet-400"
                     >
                       Enregistrer
                     </button>
@@ -203,7 +203,7 @@ function Definition({
                       type="button"
                       onClick={() => void confirmer()}
                       disabled={enregistrement}
-                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
+                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-zinc-100 transition-colors hover:border-violet-400 disabled:opacity-50"
                     >
                       {enregistrement ? "Enregistrement…" : "Confirmer"}
                     </button>
