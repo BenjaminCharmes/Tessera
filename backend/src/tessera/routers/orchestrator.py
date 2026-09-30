@@ -356,6 +356,7 @@ def _livreur(
                 ticket_id=result.ticket_id,
                 ticket_title=ticket.title if ticket else result.ticket_id,
                 ticket_body=ticket.body if ticket else "",
+                ticket_type=ticket.type.value if ticket else "",
                 branch=result.branch,
                 approuve=result.approved,
             )

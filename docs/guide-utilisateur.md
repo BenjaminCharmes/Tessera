@@ -484,7 +484,7 @@ Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
 
 - **Import d'issues** → chaque issue devient un ticket
 - **Synchronisation bidirectionnelle** tickets ↔ issues
-- **Création de PR** depuis un ticket terminé
+- **Création de PR** depuis un ticket terminé — le titre respecte le format Conventional Commits, avec le type du ticket (par exemple `feat: ticket-007 — Ajouter un endpoint de santé`)
 - **Statut CI** de la PR remonté dans l'UI
 
 ---

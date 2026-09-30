@@ -1,14 +1,14 @@
 ---
-id: ticket-259
-title: "Pull requests opened by delivery carry the ticket type prefix in their title"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-259
+pr_number: null
+priority: high
+status: done
+title: Pull requests opened by delivery carry the ticket type prefix in their title
+type: fix
 ---
 
 # ticket-259 — Le titre d'une PR ouverte par la livraison porte le type du ticket

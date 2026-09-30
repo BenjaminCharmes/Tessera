@@ -384,6 +384,7 @@ async def open_pull_request_for_ticket(
             ticket_id=ticket_id,
             ticket_title=ticket.title,
             ticket_body=ticket.body or "",
+            ticket_type=ticket.type.value,
             # C'est l'utilisateur qui vient de cliquer. Le niveau d'autonomie
             # borne ce que l'IDE fait seul, pas ce qu'on peut lui demander.
             autonome=False,

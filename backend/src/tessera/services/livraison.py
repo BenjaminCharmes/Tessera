@@ -55,6 +55,7 @@ class _Workflow(Protocol):
         ticket_id: str,
         ticket_title: str,
         ticket_body: str,
+        ticket_type: str = "",
     ) -> Any: ...
     async def etat_ci(self, pr_number: int) -> str: ...
     async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool: ...
@@ -93,6 +94,7 @@ class LivraisonService:
         ticket_id: str,
         ticket_title: str,
         ticket_body: str,
+        ticket_type: str = "",
         branch: str | None,
         approuve: bool,
     ) -> Livraison:
@@ -155,6 +157,7 @@ class LivraisonService:
             ticket_id=ticket_id,
             ticket_title=ticket_title,
             ticket_body=ticket_body,
+            ticket_type=ticket_type,
         )
         pr_number = int(resultat.pr_number)
         etapes.append(f"PR #{pr_number} ouverte")
