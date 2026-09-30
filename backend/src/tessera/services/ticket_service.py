@@ -37,6 +37,44 @@ def _slugify(text: str, max_len: int = 40) -> str:
     return slug[:max_len].rstrip("-")
 
 
+_TICKET_ID_RE = re.compile(r"^ticket-\d+$")
+
+
+def _normalize_depends_on(raw: object) -> list[str]:
+    """Coerce any YAML representation of depends_on into a list of ticket ids.
+
+    YAML scalars like ``depends_on: ticket-001`` reach Python as a plain string.
+    Iterating over a string yields characters, not ticket ids — the root cause
+    of ticket-275.  This function handles all three forms:
+
+    * ``None`` / empty string / empty list → ``[]``
+    * ``str`` → split on commas, strip whitespace, discard empty pieces
+    * ``list`` → kept as-is after coercion to str
+
+    Items that do not look like ``ticket-NNN`` are discarded and logged.
+    """
+    if not raw:
+        return []
+
+    if isinstance(raw, str):
+        pieces = [part.strip() for part in raw.split(",")]
+    else:
+        pieces = [str(item) for item in raw]  # type: ignore[arg-type]
+
+    result: list[str] = []
+    for piece in pieces:
+        if not piece:
+            continue
+        if _TICKET_ID_RE.match(piece):
+            result.append(piece)
+        else:
+            _logger.warning(
+                "depends_on_invalid_id",
+                extra={"value": piece},
+            )
+    return result
+
+
 def _status_from_folder(path: Path, meta: dict[str, Any]) -> TicketStatus:
     """Le dossier fait foi ; le frontmatter n'est qu'un repli.
 
@@ -315,7 +353,6 @@ class TicketService:
         # ticket file fails loudly instead of producing a half-typed Ticket.
         meta: dict[str, Any] = dict(post.metadata)
         raw_pr_number = meta.get("pr_number")
-        raw_depends_on = meta.get("depends_on") or []
         return Ticket(
             id=str(meta["id"]),
             title=str(meta["title"]),
@@ -323,7 +360,7 @@ class TicketService:
             status=_status_from_folder(path, meta),
             priority=TicketPriority(meta["priority"]),
             agent=str(meta["agent"]),
-            depends_on=[str(dep) for dep in raw_depends_on],
+            depends_on=_normalize_depends_on(meta.get("depends_on")),
             created=str(meta.get("created", "")),
             github_issue_url=str(meta["github_issue_url"])
             if meta.get("github_issue_url")
