@@ -67,6 +67,17 @@ export default function App() {
   // ordonner (ticket-074).
   const [selection, setSelection] = useState<string[]>([]);
   const [agentSelectionne, setAgentSelectionne] = useState<string | null>(null);
+  // La liste des conversations vit dans la colonne 2, le fil au centre
+  // (ticket-250) : l'état est donc partagé ici. Le choix retient son projet —
+  // en changer retombe sur `default` sans effet ni rendu en cascade.
+  const [conversationChoisie, setConversationChoisie] = useState<{
+    projet: string | null;
+    id: string;
+  }>({ projet: null, id: "default" });
+  const conversationId =
+    conversationChoisie.projet === (project?.id ?? null)
+      ? conversationChoisie.id
+      : "default";
   const { toasts, addToast, removeToast } = useToast();
 
   // Une seule socket pour toute la machine (ticket-129) : `supervision`
@@ -282,7 +293,16 @@ export default function App() {
             usage={usageData.usage}
             usageLoading={usageData.loading}
             usageError={usageData.error}
-            onRefreshUsage={usageData.refresh}
+            chatConversationId={conversationId}
+            onSelectConversation={(id) =>
+              setConversationChoisie({ projet: project?.id ?? null, id })
+            }
+            onNewConversation={() =>
+              setConversationChoisie({
+                projet: project?.id ?? null,
+                id: `conv-${Date.now()}`,
+              })
+            }
             running={running}
             runningRound={stream.currentRound}
             maxRounds={stream.maxRounds}
@@ -374,7 +394,7 @@ export default function App() {
             // Le chat a sa propre vue centrale : plus large que l'ancienne
             // colonne de droite, et sans partager la place avec les agents
             // (ticket-223).
-            <ChatPanel project={project} />
+            <ChatPanel project={project} conversationId={conversationId} />
           ) : panel === "supervision" ? (
             // Vue globale : elle ne dépend d'aucun projet actif, comme les
             // coûts. C'est ce qui lui permet de montrer les autres.

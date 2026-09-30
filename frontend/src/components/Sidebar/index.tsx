@@ -9,7 +9,7 @@ import TicketList from "./TicketList";
 import PanneauxDuProjet from "./PanneauxDuProjet";
 import RunHistory from "./RunHistory";
 import AgentList from "./AgentList";
-import UsageDashboard from "./UsageDashboard";
+import ConversationSidebar from "../ChatPanel/ConversationSidebar";
 import type {
   PipelineRun,
   Project,
@@ -40,7 +40,10 @@ interface SidebarProps {
   usage: ProjectUsage | null;
   usageLoading: boolean;
   usageError: string | null;
-  onRefreshUsage: () => void;
+  /** La conversation de chat active — la liste vit ici (ticket-250). */
+  chatConversationId?: string;
+  onSelectConversation?: (id: string) => void;
+  onNewConversation?: () => void;
   running: Set<string>;
   runningRound?: number;
   maxRounds?: number | null;
@@ -94,7 +97,9 @@ export default function Sidebar({
   usage,
   usageLoading,
   usageError,
-  onRefreshUsage,
+  chatConversationId,
+  onSelectConversation,
+  onNewConversation,
   running,
   runningRound,
   maxRounds,
@@ -223,13 +228,40 @@ export default function Sidebar({
             selectionne={agentSelectionne ?? null}
           />
         )}
+        {panel === "chat" &&
+          (activeProject ? (
+            <ConversationSidebar
+              projectId={activeProject.id}
+              activeId={chatConversationId ?? "default"}
+              onSelect={onSelectConversation ?? (() => {})}
+              onNew={onNewConversation ?? (() => {})}
+            />
+          ) : (
+            <p className="px-3 py-3 text-xs text-zinc-500">
+              Sélectionne un projet pour discuter avec son agent.
+            </p>
+          ))}
         {panel === "usage" && (
-          <UsageDashboard
-            usage={usage}
-            loading={usageLoading}
-            error={usageError}
-            onRefresh={onRefreshUsage}
-          />
+          // Le détail vit au centre (StatsView) : la colonne n'en garde qu'un
+          // résumé, sinon les mêmes chiffres s'affichaient deux fois
+          // (ticket-250).
+          <p className="px-3 py-3 text-xs text-zinc-400">
+            {usageError ? (
+              <span className="text-red-400">{usageError}</span>
+            ) : usageLoading ? (
+              "Chargement de l'usage…"
+            ) : usage && usage.total_runs > 0 ? (
+              <>
+                <span className="font-mono text-zinc-200">
+                  ${usage.total_cost_usd.toFixed(4)}
+                </span>{" "}
+                sur {usage.total_runs} run{usage.total_runs > 1 ? "s" : ""} —
+                détail au centre.
+              </>
+            ) : (
+              "Aucun pipeline exécuté."
+            )}
+          </p>
         )}
       </div>
     </div>
