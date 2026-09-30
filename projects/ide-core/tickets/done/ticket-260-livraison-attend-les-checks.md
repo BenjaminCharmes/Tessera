@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-260
-pr_number: null
+pr_number: 133
 priority: high
 status: done
 title: Delivery waits for CI checks to register before reading an absent CI as none
