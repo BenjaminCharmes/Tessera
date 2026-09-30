@@ -4,6 +4,7 @@ import type { Project } from "../../types/api";
 import { useChat } from "../../hooks/useChat";
 import ChatMessageView from "./ChatMessageView";
 import ToolUseList from "./ToolUseList";
+import { IconCross } from "../../design/icons";
 
 interface ChatPanelProps {
   project: Project | null;
@@ -145,7 +146,7 @@ export default function ChatPanel({ project, conversationId }: ChatPanelProps) {
             className="text-amber-500 hover:text-amber-300"
             aria-label="Masquer l'erreur"
           >
-            ×
+            <IconCross size={12} />
           </button>
         </div>
       )}

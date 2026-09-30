@@ -1,6 +1,7 @@
 import { Component } from "react";
 import type { ReactNode } from "react";
 import { IconAlert } from "../design/icons";
+import { logger } from "../lib/logger";
 
 interface Props {
   children: ReactNode;
@@ -19,7 +20,10 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: { componentStack: string }) {
-    console.error("[ErrorBoundary]", error, info.componentStack);
+    logger.error("ErrorBoundary a attrapé une erreur de rendu", {
+      message: error.message,
+      stack: info.componentStack,
+    });
   }
 
   render() {

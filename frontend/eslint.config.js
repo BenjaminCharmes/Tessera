@@ -27,4 +27,19 @@ export default defineConfig([
       'react-hooks/rules-of-hooks': 'off',
     },
   },
+  {
+    // La convention exige le logger structuré ; la règle le rend mesurable
+    // (ticket-251).
+    files: ['src/**'],
+    rules: {
+      'no-console': 'error',
+    },
+  },
+  {
+    // Le logger est le seul point de sortie console autorisé (ticket-251).
+    files: ['src/lib/logger.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
 ])
