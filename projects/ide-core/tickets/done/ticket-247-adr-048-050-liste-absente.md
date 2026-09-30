@@ -41,7 +41,7 @@ de 160 mots tenu) et renommer le job CI.
 - [ ] ADR-050 distingue liste absente en local (aucun contrôle, renvoi vers ADR-048) et en CI (refus)
 - [ ] ADR-050 garde « git en échec : refus » pour toutes les portes
 - [ ] ADR-048 et ADR-050 ne portent plus deux phrases contradictoires sur la liste absente
-- [ ] Le job de `.github/workflows/ci.yml` cite ADR-050, plus ADR-048
+- [ ] Le commentaire du job de `.github/workflows/ci.yml` cite ADR-050 et explique pourquoi le `name` affiché reste « ADR-048 » (identifiant du check requis par la protection de branche)
 - [ ] ADR-050 amendé tient sous les 160 mots mesurés par `test_consignes_coherentes.py`
 
 ## Dépendances
@@ -55,3 +55,8 @@ Aucune.
 ## Risques
 
 Aucun changement de code : le comportement documenté est celui qui tourne.
+
+Renommer le `name` du job exigerait de remplacer le contexte requis dans la
+protection de `develop` et `main` en même temps — geste laissé à l'utilisateur
+(refusé aux agents), sans quoi toute PR resterait bloquée sur un check qui ne
+se présente plus.
