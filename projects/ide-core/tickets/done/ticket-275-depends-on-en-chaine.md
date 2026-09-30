@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-275
-pr_number: null
+pr_number: 140
 priority: high
 status: done
 title: A depends_on written as a string is read as ticket ids, not characters
