@@ -40,6 +40,7 @@ function supervision(
     observerLeTexte: vi.fn(),
     sortieDuService: () => [],
     signalServices: 0,
+    fermerRun: vi.fn(),
     ...over,
   };
 }
@@ -372,5 +373,112 @@ describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
 
     expect(selectionner).toHaveBeenCalledWith("run-2");
     expect(document.getElementById("dialogue-reponse")).toHaveFocus();
+  });
+});
+
+describe("SupervisionView — bouton Fermer (ticket-267)", () => {
+  it("ne rend pas Fermer avant run_closed meme si le pipeline est done", () => {
+    // Entre pipeline_done et run_closed, la livraison tourne encore.
+    // Le bouton ne doit pas apparaître : cliquer fermerait un run pas encore libéré.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          { runs: [run()] },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: false,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Fermer/i })).not.toBeInTheDocument();
+  });
+
+  it("rend Fermer uniquement apres run_closed", () => {
+    render(
+      <SupervisionView
+        supervision={supervision(
+          { runs: [run()] },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: true,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /Fermer/i })).toBeInTheDocument();
+  });
+
+  it("Fermer porte la classe inline-flex (ticket-267)", () => {
+    render(
+      <SupervisionView
+        supervision={supervision(
+          { runs: [run()] },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: true,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+    const bouton = screen.getByRole("button", { name: /Fermer/i });
+    expect(bouton.className).toContain("inline-flex");
+  });
+
+  it("un clic sur Fermer appelle fermerRun avec le bon run_id", async () => {
+    const fermerRun = vi.fn();
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [run()],
+            fermerRun,
+          },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: true,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /Fermer/i }));
+    expect(fermerRun).toHaveBeenCalledWith("run-1");
   });
 });

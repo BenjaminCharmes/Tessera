@@ -118,6 +118,40 @@ describe("applyEvent — fil chronologique des passages (ticket-222)", () => {
   });
 });
 
+describe("applyEvent — ticket_id depuis ev.ticket_id et run_closed (ticket-267)", () => {
+  it("lit le ticket_id au premier niveau de l'evenement, pas seulement dans data", () => {
+    // Le backend émet ticket_id en champ racine de l'événement ; data["ticket_id"]
+    // est un doublon de confort absent de certains backends.
+    const s = applyEvent(
+      INITIAL,
+      ev({
+        type: "pipeline_done",
+        ticket_id: "ticket-267",
+        data: { approved: true, rounds: 1, final_status: "done" },
+      }),
+    );
+    expect(s.lastResult?.ticket_id).toBe("ticket-267");
+  });
+
+  it("marque runClosed a true sur run_closed", () => {
+    const s = applyEvent(INITIAL, ev({ type: "run_closed" }));
+    expect(s.runClosed).toBe(true);
+  });
+
+  it("runClosed reste false apres pipeline_done", () => {
+    // Entre pipeline_done et run_closed, la livraison tourne encore.
+    const s = applyEvent(
+      INITIAL,
+      ev({
+        type: "pipeline_done",
+        ticket_id: "ticket-267",
+        data: { approved: true, rounds: 1, final_status: "done" },
+      }),
+    );
+    expect(s.runClosed).toBe(false);
+  });
+});
+
 describe("applyEvent — coût en direct (ticket-197)", () => {
   it("cumule le coût et compte les appels, et remet les outils à zéro par agent", () => {
     let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "codeur", data: {} }));

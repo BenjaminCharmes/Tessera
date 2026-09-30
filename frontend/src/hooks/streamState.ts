@@ -70,6 +70,12 @@ export interface StreamState {
   maxRounds: number | null;
   /** Fil chronologique des passages d'agents, dans l'ordre des `agent_started` (ticket-222). */
   entries: PassageAgent[];
+  /**
+   * Vrai après `run_closed` : la livraison et la documentation sont terminées,
+   * le projet est libéré. Entre `pipeline_done` et `run_closed`, le run est
+   * approuvé mais la livraison tourne encore (ticket-267).
+   */
+  runClosed: boolean;
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -111,6 +117,7 @@ export const INITIAL: StreamState = {
   appels: 0,
   outils: 0,
   entries: [],
+  runClosed: false,
 };
 
 /**
@@ -249,11 +256,16 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
     case "pipeline_done": {
       const branch =
         typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch;
+      // Le ticket_id est au premier niveau de l'événement (ev.ticket_id) ;
+      // ev.data["ticket_id"] est un doublon de confort, pas toujours présent.
       const result: PipelineResult = {
         ticket_id:
-          typeof ev.data["ticket_id"] === "string"
+          ev.ticket_id ||
+          (typeof ev.data["ticket_id"] === "string"
             ? ev.data["ticket_id"]
-            : (s.ticketId ?? ""),
+            : "") ||
+          s.ticketId ||
+          "",
         final_status: (ev.data["final_status"] as TicketStatus) ?? "done",
         rounds: typeof ev.data["rounds"] === "number" ? ev.data["rounds"] : 0,
         approved: ev.data["approved"] === true,
@@ -269,6 +281,10 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         branch,
       };
     }
+    case "run_closed":
+      // Le run est définitivement terminé : livraison et documentation sont finies.
+      // Le bouton « Fermer » n'apparaît qu'ici (ticket-267).
+      return { ...s, events, runClosed: true };
     case "error":
       return {
         ...s,

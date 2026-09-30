@@ -172,7 +172,9 @@ export default function RunView({ stream }: RunViewProps) {
           />
         ))}
 
-        {lastResult && <PipelineSummary result={lastResult} />}
+        {lastResult && (
+          <PipelineSummary result={lastResult} runClosed={stream.runClosed} />
+        )}
       </div>
     </div>
   );

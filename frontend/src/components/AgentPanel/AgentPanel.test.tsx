@@ -58,6 +58,19 @@ describe("PipelineSummary", () => {
     render(<PipelineSummary result={APPROVED} />);
     expect(screen.queryByText(/Durée/)).toBeNull();
   });
+
+  it("affiche livraison en cours entre pipeline_done et run_closed (ticket-267)", () => {
+    // Entre pipeline_done et run_closed, la livraison tourne encore.
+    render(<PipelineSummary result={APPROVED} runClosed={false} />);
+    expect(screen.getByText(/livraison en cours/)).toBeTruthy();
+    expect(screen.queryByText(/Pipeline terminé/)).toBeNull();
+  });
+
+  it("affiche Pipeline terminé apres run_closed (ticket-267)", () => {
+    render(<PipelineSummary result={APPROVED} runClosed={true} />);
+    expect(screen.getByText(/Pipeline terminé/)).toBeTruthy();
+    expect(screen.queryByText(/livraison en cours/)).toBeNull();
+  });
 });
 
 describe("TokenStream", () => {
