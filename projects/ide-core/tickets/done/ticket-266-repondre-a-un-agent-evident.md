@@ -1,14 +1,15 @@
 ---
-id: ticket-266
-title: "A run waiting for an answer comes first in Supervision, with a Reply button on its card"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-266
+pr_number: 143
+priority: high
+status: done
+title: A run waiting for an answer comes first in Supervision, with a Reply button
+  on its card
+type: feat
 ---
 
 # ticket-266 — Répondre à un agent se trouve sans chercher
