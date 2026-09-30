@@ -213,3 +213,11 @@ Le diff refactorise la gestion d
 - 2026-09-30 09:00:55 UTC — [ticket-259] tour 1 — reviewer terminé (43592ms)
 - 2026-09-30 09:02:02 UTC — [ticket-259] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le paramètre `ticket_type` est c
 - 2026-09-30 09:02:02 UTC — [ticket-259] APPROVED après 1 tour(s)
+- 2026-09-30 09:03:23 UTC — [ticket-260] branche ticket-260-delivery-waits-for-ci-checks-to-register-before-r
+- 2026-09-30 09:03:23 UTC — [ticket-260] tour 1 — codeur démarré
+- 2026-09-30 09:06:54 UTC — [ticket-260] tour 1 — codeur terminé (211062ms)
+- 2026-09-30 09:07:43 UTC — [ticket-260] securite: PASS — Audit de sécurité terminé sur le diff du service de livraison (ticket-260, délai
+- 2026-09-30 09:07:43 UTC — [ticket-260] tour 1 — reviewer démarré
+- 2026-09-30 09:09:02 UTC — [ticket-260] tour 1 — reviewer terminé (79750ms)
+- 2026-09-30 09:11:16 UTC — [ticket-260] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
+- 2026-09-30 09:11:16 UTC — [ticket-260] APPROVED après 1 tour(s)

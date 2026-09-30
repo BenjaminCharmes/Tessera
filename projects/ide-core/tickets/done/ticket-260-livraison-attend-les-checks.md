@@ -1,14 +1,14 @@
 ---
-id: ticket-260
-title: "Delivery waits for CI checks to register before reading an absent CI as none"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-260
+pr_number: 133
+priority: high
+status: done
+title: Delivery waits for CI checks to register before reading an absent CI as none
+type: fix
 ---
 
 # ticket-260 — La livraison laisse aux checks le temps d'apparaître

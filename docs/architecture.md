@@ -204,6 +204,29 @@ arbitraire ou d'un glyphe utilisé comme affordance.
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
 
+## Livraison (ADR-029, ADR-030)
+
+Après approbation du pipeline, la livraison s'enchaîne automatiquement — rebase 
+sur la branche de base, ouverture de la PR, attente de CI si exigée, merge — 
+jusqu'où le projet l'autorise.
+
+### Délai de grâce pour l'enregistrement des checks
+
+GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
+d'une PR. Une interrogation immédiate retournerait `none` (aucun check enregistré), 
+qu'ADR-029 traite comme l'absence de CI — un verdict qui arrêterait la livraison.
+
+Pour éviter cette fausse absence, `LivraisonService._attendre_la_ci` applique 
+un **délai de grâce** de 120 secondes (`grace_ci_s`, injectable au constructeur) :
+
+- **Pendant le délai** : `none` se traite comme `pending` → continue d'attendre
+- **Après le délai** : `none` devient un verdict final → livraison s'arrête
+- **État `failing`** : arrête immédiatement, même pendant le délai
+
+Un projet sans CI configurée attend donc ces 120 secondes supplémentaires avant 
+abandon. Une configuration permet de contourner cette vérification pour les 
+projets qui souhaitent merger malgré l'absence de CI.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

@@ -301,3 +301,78 @@ async def test_un_conflit_non_resolu_arrete_toujours_tout(tmp_path: Path) -> Non
 
     assert workflow.ouvertures == []
     assert livraison.conflits == ("src/app.py",)
+
+
+# ------------------------------------------------------------------
+# Délai de grâce avant de lire none comme verdict — ticket-260
+# ------------------------------------------------------------------
+
+
+def _service_avec_grace(
+    tmp_path: Path,
+    ci: list[str],
+    grace_ci_s: float = 20.0,
+    attente_ci_max_s: float = 60.0,
+    intervalle_ci_s: float = 10.0,
+) -> tuple[LivraisonService, _FauxWorkflow]:
+    """Service en mode `merge` avec paramètres de grâce configurables."""
+    racine = tmp_path / "projet_grace"
+    racine.mkdir(parents=True, exist_ok=True)
+    (racine / "agents.json").write_text(
+        json.dumps({"autonomy": "merge"}), encoding="utf-8"
+    )
+    w = _FauxWorkflow(ci=ci)
+    svc = LivraisonService(
+        git_workspace=_FauxGit(),
+        workflow=w,
+        project_path=racine,
+        base_branch="develop",
+        attente_ci_max_s=attente_ci_max_s,
+        intervalle_ci_s=intervalle_ci_s,
+        grace_ci_s=grace_ci_s,
+        dormir=_ne_dort_pas,
+    )
+    return svc, w
+
+
+async def test_none_puis_passing_dans_le_delai_de_grace_merge(
+    tmp_path: Path,
+) -> None:
+    # GitHub n'enregistre les checks qu'après l'ouverture de la PR.  Un
+    # premier poll renvoie `none` avant qu'aucun check n'existe.  La livraison
+    # doit continuer d'attendre pendant le délai de grâce et merger quand la
+    # CI passe au vert.
+    svc, workflow = _service_avec_grace(tmp_path, ci=["none", "passing"])
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is True
+    assert workflow.merges == [7]
+
+
+async def test_none_persistant_apres_le_delai_de_grace_arrete_la_livraison(
+    tmp_path: Path,
+) -> None:
+    # Passé le délai de grâce, `none` redevient un verdict final : l'absence
+    # de signal n'est pas un signal favorable (ADR-029).
+    svc, workflow = _service_avec_grace(tmp_path, ci=["none"])
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert workflow.merges == []
+    assert "none" in (livraison.arret or "")
+
+
+async def test_failing_pendant_le_delai_de_grace_arrete_immediatement(
+    tmp_path: Path,
+) -> None:
+    # `failing` est un verdict définitif : la livraison s'arrête sans
+    # attendre la fin du délai de grâce.
+    svc, workflow = _service_avec_grace(tmp_path, ci=["failing"])
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert workflow.merges == []
+    assert "CI" in (livraison.arret or "")

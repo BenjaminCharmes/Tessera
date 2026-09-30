@@ -487,6 +487,8 @@ Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
 - **Création de PR** depuis un ticket terminé — le titre respecte le format Conventional Commits, avec le type du ticket (par exemple `feat: ticket-007 — Ajouter un endpoint de santé`)
 - **Statut CI** de la PR remonté dans l'UI
 
+Une PR approuvée peut être mergée automatiquement une fois que la CI passe au vert, selon la configuration du projet. La livraison attend jusqu'à 2 minutes que les checks CI soient enregistrés par GitHub — l'absence momentanée de checks n'est pas interprétée comme un verdict favorable.
+
 ---
 
 ## 10 bis. Ce qui reste chez toi, ce qui part dans le dépôt
