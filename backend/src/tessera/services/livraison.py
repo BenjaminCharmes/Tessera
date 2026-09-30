@@ -25,6 +25,13 @@ _INTERVALLE_CI_S = 15.0
 #: Au-delà, on rend la main. Une attente sans borne bloquerait la file de
 #: tickets, et ADR-018 fait reposer le ticket suivant sur un arbre propre.
 _ATTENTE_CI_MAX_S = 900.0
+#: Délai de grâce avant de lire `none` comme un verdict final. GitHub
+#: n'enregistre les checks qu'après l'ouverture de la PR : interroger
+#: immédiatement retourne `none` sans qu'aucun check ait pu s'inscrire.
+#: Pendant ce délai, `none` est traité comme `pending`. Passé ce délai,
+#: `none` redevient un verdict et la livraison s'arrête (ADR-029 : l'absence
+#: de signal n'est pas un signal favorable).
+_GRACE_CI_S = 120.0
 
 
 @dataclass(frozen=True)
@@ -70,6 +77,7 @@ class LivraisonService:
         base_branch: str,
         attente_ci_max_s: float = _ATTENTE_CI_MAX_S,
         intervalle_ci_s: float = _INTERVALLE_CI_S,
+        grace_ci_s: float = _GRACE_CI_S,
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
         resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
         politique: PolitiqueRun | None = None,
@@ -80,6 +88,7 @@ class LivraisonService:
         self._base_branch = base_branch
         self._attente_ci_max_s = attente_ci_max_s
         self._intervalle_ci_s = intervalle_ci_s
+        self._grace_ci_s = grace_ci_s
         self._dormir = dormir
         self._resolveur = resolveur
         # Le niveau se fige **avant** le premier agent, jamais au moment de
@@ -227,12 +236,28 @@ class LivraisonService:
         return Livraison(etapes=tuple(etapes), pr_number=pr_number, merged=True)
 
     async def _attendre_la_ci(self, pr_number: int) -> str:
-        """Interroge la CI jusqu'à un verdict, ou jusqu'à la borne d'attente."""
+        """Poll CI until a verdict, or until the wait bound.
+
+        `none` is treated as `pending` during the grace period: GitHub
+        registers checks only after the PR is opened, so an immediate poll
+        returns `none` without any check having had time to appear.  Once the
+        grace period has elapsed, `none` becomes a final verdict (ADR-029).
+        `failing` always stops the wait immediately, even during grace.
+        """
         ecoule = 0.0
         while True:
             etat = await self._workflow.etat_ci(pr_number)
-            if etat != "pending":
+            if etat == "none" and ecoule < self._grace_ci_s:
+                # Dans le délai de grâce, on continue d'attendre comme si
+                # la CI était en cours.
+                pass
+            elif etat not in ("pending", "none"):
+                # Verdict définitif (passing, failing, …).
                 return etat
+            elif etat == "none":
+                # Délai de grâce écoulé : none devient un verdict final.
+                return etat
+            # etat vaut "pending", ou "none" dans le délai de grâce.
             if ecoule >= self._attente_ci_max_s:
                 return "pending"
             await self._dormir(self._intervalle_ci_s)
