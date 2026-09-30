@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProjectHeader from "./ProjectHeader";
+import PanneauUsage from "./PanneauUsage";
 import type { UseServicesResult } from "../../hooks/useServices";
 import type { FiltresTickets } from "../../lib/filtresTickets";
 import type { ReglageDesNotifications } from "./PanneauxDuProjet";
@@ -14,6 +15,7 @@ import type {
   PipelineRun,
   Project,
   ProjectUsage,
+  StatsPeriod,
   Ticket,
   TicketStatus,
 } from "../../types/api";
@@ -85,6 +87,14 @@ export interface UsageSidebar {
   usage: ProjectUsage | null;
   loading: boolean;
   error: string | null;
+  /** Période sélectionnée dans la colonne, transmise à StatsView (ticket-253). */
+  days: StatsPeriod;
+  setDays: (d: StatsPeriod) => void;
+  /** Portée : le projet actif ou tous les projets confondus (ticket-253). */
+  portee: "projet" | "tous";
+  setPortee: (p: "projet" | "tous") => void;
+  /** Id du projet actif — null si aucun, utilisé pour désactiver "Ce projet". */
+  projetActifId: string | null;
 }
 
 export interface ChatSidebar {
@@ -235,26 +245,15 @@ export default function Sidebar({
             </p>
           ))}
         {panel === "usage" && (
-          // Le détail vit au centre (StatsView) : la colonne n'en garde qu'un
-          // résumé, sinon les mêmes chiffres s'affichaient deux fois
-          // (ticket-250).
-          <p className="px-3 py-3 text-xs text-zinc-400">
-            {usage.error ? (
-              <span className="text-red-400">{usage.error}</span>
-            ) : usage.loading ? (
-              "Chargement de l'usage…"
-            ) : usage.usage && usage.usage.total_runs > 0 ? (
-              <>
-                <span className="font-mono text-zinc-200">
-                  ${usage.usage.total_cost_usd.toFixed(4)}
-                </span>{" "}
-                sur {usage.usage.total_runs} run
-                {usage.usage.total_runs > 1 ? "s" : ""} — détail au centre.
-              </>
-            ) : (
-              "Aucun pipeline exécuté."
-            )}
-          </p>
+          // La colonne porte les réglages de la vue centrale (ticket-253) :
+          // période, portée, et plafonds. Les chiffres eux-mêmes sont au centre.
+          <PanneauUsage
+            days={usage.days}
+            setDays={usage.setDays}
+            portee={usage.portee}
+            setPortee={usage.setPortee}
+            projetActifId={usage.projetActifId}
+          />
         )}
       </div>
     </div>

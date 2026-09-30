@@ -18,6 +18,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
+| `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
 
 ## `STATIC_TOKEN`

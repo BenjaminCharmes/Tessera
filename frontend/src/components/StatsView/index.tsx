@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
@@ -26,42 +26,27 @@ import RecentRuns from "./RecentRuns";
  *
  * Deux mesures d'unités différentes ne partagent jamais un axe : la dépense
  * et les tokens ont chacun leur graphique.
+ *
+ * La période et la portée sont remontées dans useCockpit (ticket-253) pour
+ * que la colonne latérale les contrôle.
  */
-const PERIODS: StatsPeriod[] = [7, 30, 90];
 
 interface StatsViewProps {
   /** `null` : tous projets confondus. */
   projectId: string | null;
+  /** Nombre de jours de la période sélectionnée, géré par useCockpit. */
+  days: StatsPeriod;
 }
 
-export default function StatsView({ projectId }: StatsViewProps) {
-  const [days, setDays] = useState<StatsPeriod>(30);
+export default function StatsView({ projectId, days }: StatsViewProps) {
   const fetcher = useMemo(() => () => api.usage.stats(days, projectId), [days, projectId]);
   // Une lecture qui échoue vaut « pas de donnée » : la vue le dit.
   const { data, loading } = useResource<UsageStats | null>(fetcher, null);
 
   return (
     <div className="flex h-full flex-col bg-zinc-950">
-      <div className={`${BAND} justify-between gap-3 border-b border-zinc-700 bg-zinc-900 px-4`}>
+      <div className={`${BAND} border-b border-zinc-700 bg-zinc-900 px-4`}>
         <RegionTitle>{projectId ? "Statistiques" : "Statistiques, tous projets"}</RegionTitle>
-        <div className="flex items-center gap-3">
-          <span className="hidden text-micro text-zinc-500 sm:inline">jours UTC</span>
-          <div className="flex rounded border border-zinc-700 p-0.5" role="group" aria-label="Période">
-            {PERIODS.map((p) => (
-              <button
-                key={p}
-                type="button"
-                aria-pressed={days === p}
-                onClick={() => setDays(p)}
-                className={`rounded-sm px-2 py-0.5 text-mini ${
-                  days === p ? "bg-zinc-700 text-zinc-100" : "text-zinc-400 hover:text-zinc-200"
-                }`}
-              >
-                {p} j
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4">

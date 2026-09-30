@@ -204,6 +204,24 @@ arbitraire ou d'un glyphe utilisé comme affordance.
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
 
+## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
+
+Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`
+applique un contrôle : la `TermesInterditsService` rejette tout terme déclaré dans
+`FORBIDDEN_TERMS` s'il apparaît dans le diff, les messages de commit, ou les
+auteurs. L'exception : un projet marqué `"confidentiality": "professional"` en
+`agents.json` contourne ce contrôle.
+
+Deux étapes complètent la protection hors du pipeline :
+
+1. **Hook pre-push** (`make install-hooks`) : rejette les commits manuels
+   violant les termes.
+2. **Job CI** (`.github/workflows/ci.yml`) : refuse la PR si `FORBIDDEN_TERMS`
+   est absent (erreur de configuration) ou si une violation est détectée.
+
+En local, une liste vide désactive le contrôle. En CI, son absence bloque le
+merge — c'est intentionnel.
+
 ## Couche SQLite (ticket-015)
 
 SQLite est une couche **cache/historique** — les fichiers Markdown restent la source de vérité (ADR-003).

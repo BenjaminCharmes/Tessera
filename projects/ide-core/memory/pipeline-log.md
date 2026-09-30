@@ -157,3 +157,29 @@ Le
 - 2026-09-29 11:16:23 UTC — [ticket-225] tour 2 — reviewer terminé (98562ms)
 - 2026-09-29 11:18:22 UTC — [ticket-225] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par les tests ajoutés. Le compos
 - 2026-09-29 11:18:22 UTC — [ticket-225] APPROVED après 2 tour(s)
+- 2026-09-30 07:52:19 UTC — [ticket-253] branche ticket-253-stats-column-holds-the-view-s-settings-period-sco
+- 2026-09-30 07:52:19 UTC — [ticket-253] tour 1 — codeur démarré
+- 2026-09-30 07:59:43 UTC — [ticket-253] tour 1 — codeur terminé (443483ms)
+- 2026-09-30 08:00:12 UTC — [ticket-253] securite: PASS — Audit complet : aucune vulnérabilité détectée.
+
+Le diff refactorise la gestion d
+- 2026-09-30 08:00:12 UTC — [ticket-253] tour 1 — reviewer démarré
+- 2026-09-30 08:03:13 UTC — [ticket-253] tour 1 — reviewer terminé (180781ms)
+- 2026-09-30 08:08:07 UTC — [ticket-253] validateur: CHANGES_REQUESTED — Les critères liés au déplacement du sélecteur de période et à la gestion de la p
+- 2026-09-30 08:08:07 UTC — [ticket-253] CHANGES_REQUESTED tour 1: Les critères liés au déplacement du sélecteur de période et à la gestion de la portée des statistiqu
+- 2026-09-30 08:08:07 UTC — [ticket-253] tour 2 — codeur démarré
+- 2026-09-30 08:09:50 UTC — [ticket-253] tour 2 — codeur terminé (103186ms)
+- 2026-09-30 08:10:21 UTC — [ticket-253] securite: PASS — Analyse complète du diff : aucune vulnérabilité détectée.
+
+**Points positifs :**
+- 2026-09-30 08:10:21 UTC — [ticket-253] tour 2 — reviewer démarré
+- 2026-09-30 08:11:33 UTC — [ticket-253] tour 2 — reviewer terminé (72811ms)
+- 2026-09-30 08:15:11 UTC — [ticket-253] validateur: CHANGES_REQUESTED — La majorité des critères sont satisfaits : le sélecteur de période a été déplacé
+- 2026-09-30 08:15:11 UTC — [ticket-253] CHANGES_REQUESTED tour 2: La majorité des critères sont satisfaits : le sélecteur de période a été déplacé dans la colonne lat
+- 2026-09-30 08:15:11 UTC — [ticket-253] tour 3 — codeur démarré
+- 2026-09-30 08:17:03 UTC — [ticket-253] tour 3 — codeur terminé (112452ms)
+- 2026-09-30 08:17:27 UTC — [ticket-253] securite: PASS — Aucune vulnérabilité détectée. Le diff porte un refactoring frontend (state lift
+- 2026-09-30 08:17:27 UTC — [ticket-253] tour 3 — reviewer démarré
+- 2026-09-30 08:20:02 UTC — [ticket-253] tour 3 — reviewer terminé (154422ms)
+- 2026-09-30 08:23:52 UTC — [ticket-253] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le sélecteur de période a été dé
+- 2026-09-30 08:23:52 UTC — [ticket-253] APPROVED après 3 tour(s)
