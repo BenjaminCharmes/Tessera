@@ -143,6 +143,24 @@ async def test_un_projet_en_pr_ouvre_et_s_arrete_la(tmp_path: Path) -> None:
     assert livraison.arret is None
 
 
+async def test_livraison_transmet_le_type_du_ticket(tmp_path: Path) -> None:
+    # ticket-259 : LivraisonService doit transmettre ticket_type à
+    # open_pull_request pour que le titre de la PR soit Conventional Commits.
+    svc, _git, workflow = _service(tmp_path, "pr")
+
+    await svc.livrer(
+        ticket_id="ticket-001",
+        ticket_title="T",
+        ticket_body="",
+        ticket_type="feat",
+        branch="ticket-001-x",
+        approuve=True,
+    )
+
+    assert len(workflow.ouvertures) == 1
+    assert workflow.ouvertures[0]["ticket_type"] == "feat"
+
+
 async def test_un_projet_en_merge_va_jusqu_au_bout(tmp_path: Path) -> None:
     svc, _git, workflow = _service(tmp_path, "merge")
 

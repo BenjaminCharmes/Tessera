@@ -130,6 +130,50 @@ async def test_pousse_la_branche_avant_d_ouvrir_la_pr(tmp_path: Path) -> None:
     assert github.created[0]["base"] == "develop"
 
 
+async def test_pr_title_carries_the_ticket_type(tmp_path: Path) -> None:
+    # ADR-044 + ticket-259 : le titre de la PR suit la même convention que le
+    # message de commit produit par pipeline_outcomes — préfixe Conventional
+    # Commits.
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    await svc.open_pull_request(
+        branch="ticket-123-slug",
+        ticket_id="ticket-123",
+        ticket_title="Add health endpoint",
+        ticket_body="",
+        ticket_type="feat",
+    )
+
+    assert github.created[0]["title"] == "feat: ticket-123 — Add health endpoint"
+
+
+async def test_pr_title_without_type_keeps_legacy_format(tmp_path: Path) -> None:
+    # Compatibilité ascendante : un appelant qui ne passe pas ticket_type obtient
+    # le format historique (sans préfixe) plutôt qu'une chaîne malformée « : … ».
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    await svc.open_pull_request(
+        branch="ticket-042-slug",
+        ticket_id="ticket-042",
+        ticket_title="Endpoint de santé",
+        ticket_body=_ticket_body(),
+    )
+
+    assert github.created[0]["title"] == "ticket-042 — Endpoint de santé"
+
+
 async def test_sans_branche_l_ouverture_est_refusee(tmp_path: Path) -> None:
     svc = GitHubWorkflowService(
         git_workspace=_FakeGit(), github=_FakeGitHub(), base_branch="develop"
