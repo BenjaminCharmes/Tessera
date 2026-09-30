@@ -105,7 +105,6 @@ describe("Sidebar — panneau Usage (ticket-250)", () => {
     renderSidebar({
       panel: "usage",
       usage: {
-        project_id: "ide-core",
         total_cost_usd: 1.2345,
         total_tokens: 1000,
         total_runs: 3,
