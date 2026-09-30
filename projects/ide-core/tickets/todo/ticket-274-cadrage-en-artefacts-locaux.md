@@ -1,15 +1,16 @@
 ---
-id: ticket-274
-title: "Design tickets on local-artifact projects show their decisions and tickets to reviewing agents"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-plan: true
+created: 2026-09-30
 depends_on: []
 estimated_days: 1
-created: 2026-09-30
+id: ticket-274
+plan: true
+pr_number: null
+priority: high
+status: todo
+title: Design tickets on local-artifact projects show their decisions and tickets
+  to reviewing agents
+type: fix
 ---
 
 # ticket-274 — Un cadrage sur un projet en artefacts locaux se relit
@@ -33,6 +34,14 @@ Le projet déclare `artifacts: local` (ADR-021, ADR-023) : `memory/` et
 **rien** de ce qu'un cadrage produit. Tout ticket `design` sur un tel projet est
 condamné au même refus.
 
+**Même défaut, plus large** (constaté le 2026-09-30 sur `carriere`,
+ticket-007, `artifacts: tracked`) : l'architecte a créé six tickets, commités
+sur la branche, et le validateur a refusé « aucune création de fichier dans
+`tickets/todo/` ». Le diff relu **exclut `tickets/` par construction**
+(`test_current_diff_exclut_les_tickets_et_le_journal_pipeline`). Un cadrage
+dont un critère est « créer des tickets » ne peut donc jamais être validé,
+quel que soit le mode des artefacts. La solution doit couvrir les deux cas.
+
 ## Solution proposée
 
 À concevoir au tour de plan. Piste : quand le projet est en artefacts locaux,
@@ -48,8 +57,9 @@ code) un diff textuel entre cette photo et l'état de fin de tour, étiqueté
       transmis au validateur.
 - [ ] Un test montre qu'un ticket créé dans `tickets/todo/` pendant le run y
       figure aussi.
-- [ ] Un test montre que ce matériau n'est pas transmis sur un projet
-      `artifacts: tracked` (le diff git y suffit).
+- [ ] Un test montre que, sur un projet `artifacts: tracked`, un ticket créé
+      pendant un run de type `design` figure dans le matériau transmis au
+      validateur, bien que `tickets/` soit exclu du diff git relu.
 - [ ] Un test montre qu'aucun fichier de `memory/` ni de `tickets/` n'est
       commité sur un projet `artifacts: local`.
 
