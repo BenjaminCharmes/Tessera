@@ -7,7 +7,7 @@ import frontmatter  # type: ignore[import-untyped]
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.ticket_service import TicketService
+from tessera.services.ticket_service import TicketService, _normalize_depends_on
 
 
 def _svc(project_path: Path) -> TicketService:
@@ -425,6 +425,92 @@ async def test_ticket_type_couvre_les_types_conventional_commits(tmp_path: Path)
 
     values = {t.value for t in TicketType}
     assert {"feat", "fix", "chore", "docs", "refactor", "test"} <= values
+
+
+# ------------------------------------------------------------------
+# _normalize_depends_on — ticket-275
+# ------------------------------------------------------------------
+
+
+def test_normalize_depends_on_string_single() -> None:
+    """A plain string 'ticket-001' becomes ['ticket-001']."""
+    assert _normalize_depends_on("ticket-001") == ["ticket-001"]
+
+
+def test_normalize_depends_on_string_multiple() -> None:
+    """A comma-separated string becomes a list of ticket ids."""
+    assert _normalize_depends_on("ticket-008, ticket-009") == ["ticket-008", "ticket-009"]
+
+
+def test_normalize_depends_on_list_unchanged() -> None:
+    """A proper YAML list is returned as-is."""
+    assert _normalize_depends_on(["ticket-001"]) == ["ticket-001"]
+
+
+def test_normalize_depends_on_empty_gives_empty_list() -> None:
+    """None and empty string both give []."""
+    assert _normalize_depends_on(None) == []
+    assert _normalize_depends_on("") == []
+    assert _normalize_depends_on([]) == []
+
+
+def test_normalize_depends_on_invalid_id_is_discarded(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """An item that does not match ticket-NNN is dropped and logged."""
+    with caplog.at_level(logging.WARNING, logger="tessera.services.ticket_service"):
+        result = _normalize_depends_on("ticket-001, not-a-ticket, ticket-002")
+
+    assert result == ["ticket-001", "ticket-002"]
+    assert any("depends_on_invalid_id" in r.message for r in caplog.records)
+
+
+async def test_parse_depends_on_string_in_file(tmp_path: Path) -> None:
+    """A ticket file with depends_on as a YAML scalar is parsed correctly."""
+    ticket_path = tmp_path / "tickets" / "todo" / "ticket-010-deps.md"
+    ticket_path.parent.mkdir(parents=True, exist_ok=True)
+    ticket_path.write_text(
+        "---\n"
+        "id: ticket-010\n"
+        "title: Test depends_on string\n"
+        "type: chore\n"
+        "status: todo\n"
+        "priority: medium\n"
+        "agent: codeur\n"
+        "depends_on: ticket-001\n"
+        "---\n",
+        encoding="utf-8",
+    )
+
+    svc = TicketService(tmp_path, "test-project")
+    ticket = await svc.get_ticket("ticket-010")
+
+    assert ticket is not None
+    assert ticket.depends_on == ["ticket-001"]
+
+
+async def test_parse_depends_on_csv_string_in_file(tmp_path: Path) -> None:
+    """A comma-separated depends_on string in a file is split into ids."""
+    ticket_path = tmp_path / "tickets" / "todo" / "ticket-011-deps.md"
+    ticket_path.parent.mkdir(parents=True, exist_ok=True)
+    ticket_path.write_text(
+        "---\n"
+        "id: ticket-011\n"
+        "title: Test depends_on csv\n"
+        "type: chore\n"
+        "status: todo\n"
+        "priority: medium\n"
+        "agent: codeur\n"
+        "depends_on: ticket-008, ticket-009\n"
+        "---\n",
+        encoding="utf-8",
+    )
+
+    svc = TicketService(tmp_path, "test-project")
+    ticket = await svc.get_ticket("ticket-011")
+
+    assert ticket is not None
+    assert ticket.depends_on == ["ticket-008", "ticket-009"]
 
 
 async def test_le_dossier_fait_foi_sur_le_statut(tmp_path: Path) -> None:
