@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-267
-pr_number: null
+pr_number: 144
 priority: medium
 status: done
 title: 'Run summary: working Close in Supervision, ticket id shown, not ''finished''
