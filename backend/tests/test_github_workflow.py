@@ -49,6 +49,7 @@ class _FakeGitHub:
         self.pr = pr
         self.created: list[dict[str, object]] = []
         self.merged: list[int] = []
+        self.merge_calls: list[dict[str, object]] = []
         self._ci_status = ci_status
 
     async def create_pull_request(self, **kwargs: object) -> tuple[int, str]:
@@ -58,8 +59,14 @@ class _FakeGitHub:
     async def get_pull_request_status(self, pr_number: int) -> _FakeStatut:
         return _FakeStatut(self._ci_status)
 
-    async def merge_pull_request(self, pr_number: int) -> None:
+    async def merge_pull_request(
+        self,
+        pr_number: int,
+        method: str = "squash",
+        commit_title: str | None = None,
+    ) -> None:
         self.merged.append(pr_number)
+        self.merge_calls.append({"pr_number": pr_number, "method": method})
 
 
 def _projet(tmp_path: Path, niveau: str | None) -> Path:
@@ -479,3 +486,79 @@ async def test_a_professional_project_is_not_checked(
         ticket_title="x", ticket_body=_ticket_body(),
     )
     assert git.pushed == ["ticket-042-slug"]
+
+
+# ------------------------------------------------------------------
+# Méthode de merge par projet — ticket-265
+# ------------------------------------------------------------------
+
+
+def _projet_merge_method(tmp_path: Path, manifeste: dict[str, object]) -> Path:
+    """Un projet déclarant autonomy: merge et les clefs du manifeste données."""
+    racine = tmp_path / "projet"
+    racine.mkdir(parents=True, exist_ok=True)
+    (racine / "agents.json").write_text(
+        json.dumps({"autonomy": "merge", **manifeste}), encoding="utf-8"
+    )
+    return racine
+
+
+async def test_sans_merge_method_la_pr_est_mergee_en_squash(tmp_path: Path) -> None:
+    # Absent de agents.json : le défaut fermé retombe sur squash (ticket-265).
+    github = _FakeGitHub(ci_status="passing")
+    from tessera.services.politique_run import PolitiqueRun
+
+    projet = _projet_merge_method(tmp_path, {})
+    politique = PolitiqueRun.lire(projet)
+
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+        politique=politique,
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert len(github.merge_calls) == 1
+    assert github.merge_calls[0]["method"] == "squash"
+
+
+async def test_merge_method_merge_transmet_merge_a_github(tmp_path: Path) -> None:
+    # Un projet déclarant "merge_method": "merge" obtient un merge commit.
+    github = _FakeGitHub(ci_status="passing")
+    from tessera.services.politique_run import PolitiqueRun
+
+    projet = _projet_merge_method(tmp_path, {"merge_method": "merge"})
+    politique = PolitiqueRun.lire(projet)
+
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+        politique=politique,
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert github.merge_calls[0]["method"] == "merge"
+
+
+async def test_merge_method_inconnu_retombe_sur_squash(tmp_path: Path) -> None:
+    # Une valeur non reconnue ne désarme pas le défaut (ADR-023 pattern).
+    github = _FakeGitHub(ci_status="passing")
+    from tessera.services.politique_run import PolitiqueRun
+
+    projet = _projet_merge_method(tmp_path, {"merge_method": "fast-forward"})
+    politique = PolitiqueRun.lire(projet)
+
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+        politique=politique,
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert github.merge_calls[0]["method"] == "squash"

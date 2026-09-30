@@ -184,6 +184,43 @@ async def test_le_hook_de_perimetre_tient_la_racine_figee(tmp_path: Path) -> Non
     assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny"
 
 
+# ------------------------------------------------------------------
+# merge_method — ticket-265
+# ------------------------------------------------------------------
+
+
+def test_merge_method_vaut_squash_par_defaut(tmp_path: Path) -> None:
+    # Absent de agents.json : le défaut protège (convention ticket → develop).
+    politique = PolitiqueRun.lire(_projet(tmp_path, {}))
+
+    assert politique.merge_method == "squash"
+
+
+def test_merge_method_sans_manifeste_vaut_squash(tmp_path: Path) -> None:
+    politique = PolitiqueRun.lire(_projet(tmp_path, None))
+
+    assert politique.merge_method == "squash"
+
+
+def test_merge_method_merge_est_respecte(tmp_path: Path) -> None:
+    politique = PolitiqueRun.lire(_projet(tmp_path, {"merge_method": "merge"}))
+
+    assert politique.merge_method == "merge"
+
+
+def test_merge_method_rebase_est_respecte(tmp_path: Path) -> None:
+    politique = PolitiqueRun.lire(_projet(tmp_path, {"merge_method": "rebase"}))
+
+    assert politique.merge_method == "rebase"
+
+
+def test_merge_method_valeur_inconnue_retombe_sur_squash(tmp_path: Path) -> None:
+    # Une valeur non reconnue ne désarme pas le défaut (ADR-023 pattern).
+    politique = PolitiqueRun.lire(_projet(tmp_path, {"merge_method": "fast-forward"}))
+
+    assert politique.merge_method == "squash"
+
+
 def test_les_options_du_sdk_recoivent_la_racine_figee(tmp_path: Path) -> None:
     # Le provider reconstruit ses options à chaque appel d'agent : sans racine
     # figée, chaque agent du pipeline relirait `agents.json` à son tour.
