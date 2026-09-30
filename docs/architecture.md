@@ -227,6 +227,17 @@ Un projet sans CI configurée attend donc ces 120 secondes supplémentaires avan
 abandon. Une configuration permet de contourner cette vérification pour les 
 projets qui souhaitent merger malgré l'absence de CI.
 
+
+### Méthode de merge configurable
+
+Une PR de ticket est mergée selon la méthode déclarée dans `agents.json` du 
+projet, champ `merge_method` (`squash`, `merge`, `rebase`). **Absent ou inconnu :
+`squash`** — une PR est condensée en un seul commit.
+
+En squash, le titre du commit reprend celui de la PR (conforme au format
+Conventional Commits depuis le ticket-259) suivi du numéro `(#N)` — par exemple,
+`feat: ticket-007 — Ajouter un endpoint (#42)`.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`
