@@ -4,13 +4,24 @@ import { IconCheck, IconCross } from "../../design/icons";
 interface PipelineSummaryProps {
   result: PipelineResult;
   durationMs?: number;
+  /**
+   * Vrai après `run_closed` : livraison et documentation sont terminées.
+   * Entre `pipeline_done` et `run_closed`, un run approuvé affiche
+   * « livraison en cours » plutôt que « Pipeline terminé » (ticket-267).
+   * Défaut `true` pour rétrocompatibilité avec RunView.
+   */
+  runClosed?: boolean;
 }
 
 export default function PipelineSummary({
   result,
   durationMs,
+  runClosed = true,
 }: PipelineSummaryProps) {
   const durationStr = durationMs ? `${Math.round(durationMs / 1000)}s` : null;
+  const titreApprouve = runClosed
+    ? "Pipeline terminé"
+    : "Revue terminée — livraison en cours";
 
   return (
     <div
@@ -23,7 +34,7 @@ export default function PipelineSummary({
       <div className="font-semibold">
         {result.approved ? (
           <>
-            <IconCheck size={14} /> Pipeline terminé
+            <IconCheck size={14} /> {titreApprouve}
           </>
         ) : (
           <>

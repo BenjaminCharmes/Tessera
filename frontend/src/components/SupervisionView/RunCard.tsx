@@ -19,6 +19,11 @@ interface RunCardProps {
   onSelect: () => void;
   /** Le plafond du run, pour situer son coût (ticket-197). */
   plafondUsd?: number | null;
+  /**
+   * Quand le run attend une réponse, sélectionne ce run et donne le focus
+   * au champ de réponse dans AgentDialogue (ticket-266).
+   */
+  onRepondre?: () => void;
 }
 
 const LIBELLE_DU_MODE: Record<string, string> = {
@@ -34,6 +39,7 @@ export default function RunCard({
   selectionne,
   onSelect,
   plafondUsd = null,
+  onRepondre,
 }: RunCardProps) {
   const attend = etat.pendingQuestion !== null;
   const echoue = etat.status === "error";
@@ -43,9 +49,16 @@ export default function RunCard({
   const estUnChat = run.mode === "chat";
 
   return (
-    <button
-      type="button"
+    <div
       onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      role="button"
+      tabIndex={0}
       aria-pressed={selectionne}
       aria-label={`Run ${run.ticket_id ?? run.mode} sur ${run.project_id}`}
       className={`flex w-full gap-3 rounded-md border p-3 text-left transition-colors ${
@@ -131,6 +144,21 @@ export default function RunCard({
           </span>
         ) : null}
 
+        {/* Bouton d'action principale pour répondre directement depuis la carte
+            (ticket-266). Fond violet = action principale (ADR-026). */}
+        {attend && onRepondre ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRepondre();
+            }}
+            className="mt-2 block w-full rounded-sm bg-violet-600 px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-violet-500"
+          >
+            Répondre
+          </button>
+        ) : null}
+
         <span className="mt-2 flex flex-wrap items-center gap-1.5">
           {echoue ? (
             <Etiquette classe="bg-red-500/20 text-red-200">bloqué</Etiquette>
@@ -155,7 +183,7 @@ export default function RunCard({
           ) : null}
         </span>
       </span>
-    </button>
+    </div>
   );
 }
 

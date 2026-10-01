@@ -74,6 +74,22 @@ function eventToLine(ev: OrchestratorEvent): string | null {
       return `[${t}] ${livraisonLisible(ev)}`;
     case "documentation_failed":
       return `[${t}] Documentation : échec — ${String(ev.data["error"] ?? "raison inconnue")}`;
+    case "security_audit_started":
+      return `[${t}] Audit sécurité : démarré`;
+    case "security_audit_done": {
+      const verdict = typeof ev.data["verdict"] === "string" ? ev.data["verdict"] : "inconnu";
+      return `[${t}] Audit sécurité : ${verdict}`;
+    }
+    case "validation_started":
+      return `[${t}] Validation : démarrée`;
+    case "validation_done":
+      return `[${t}] Validation : ${ev.data["approved"] === true ? "approuvée" : "refusée"}`;
+    case "documentation_started":
+      return `[${t}] Documentation : démarrée`;
+    case "doc_updated":
+      return `[${t}] Documentation mise à jour`;
+    case "livraison_started":
+      return `[${t}] Livraison : démarrée`;
     case "error":
       return `[${t}] Erreur : ${raisonLisible(ev)}`;
     default:

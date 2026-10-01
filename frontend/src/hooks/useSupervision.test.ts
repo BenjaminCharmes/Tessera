@@ -88,9 +88,10 @@ describe("useSupervision", () => {
     expect(result.current.etatDe("run-2").events).toHaveLength(0);
   });
 
-  it("retire un run sur run_closed, pas sur pipeline_done", () => {
-    // `pipeline_done` est publié avant que le projet soit libéré : retirer la
-    // carte à ce moment-là ferait croire qu'on peut déjà relancer.
+  it("ne retire pas un run sur pipeline_done ni sur run_closed (ticket-267)", () => {
+    // `pipeline_done` est publié avant que le projet soit libéré.
+    // `run_closed` marque le run clos (runClosed: true) mais laisse la carte
+    // visible : c'est l'utilisateur qui ferme via fermerRun.
     const { result } = renderHook(() => useSupervision());
     act(() => {
       MockWebSocket.instance!.triggerMessage({ type: "snapshot", runs: [run()] });
@@ -103,6 +104,21 @@ describe("useSupervision", () => {
 
     act(() => {
       MockWebSocket.instance!.triggerMessage(evenement({ type: "run_closed" }));
+    });
+    // La carte reste visible jusqu'au clic « Fermer ».
+    expect(result.current.runs).toHaveLength(1);
+    // Mais le run est bien marqué clos dans son état.
+    expect(result.current.etatDe("run-1").runClosed).toBe(true);
+  });
+
+  it("fermerRun retire le run de la liste", () => {
+    const { result } = renderHook(() => useSupervision());
+    act(() => {
+      MockWebSocket.instance!.triggerMessage({ type: "snapshot", runs: [run()] });
+    });
+
+    act(() => {
+      result.current.fermerRun("run-1");
     });
     expect(result.current.runs).toHaveLength(0);
   });

@@ -56,7 +56,7 @@ export default function SelecteurDeProjet({
         aria-haspopup="listbox"
         aria-expanded={ouvert}
         title={`${project.id} — ${project.path ?? ""}`}
-        className="flex min-w-0 max-w-full items-center gap-1 truncate text-sm font-medium text-violet-100 transition-colors hover:text-violet-50"
+        className="flex min-w-0 max-w-full items-center gap-1 truncate text-sm font-medium text-zinc-100 transition-colors hover:text-zinc-50"
       >
         <span className="truncate">{project.name}</span>
         {/* ADR-026 : les affordances viennent de `design/icons.tsx`, jamais

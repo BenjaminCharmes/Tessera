@@ -24,13 +24,14 @@ async def _run(
     approved: bool | None = None,
     status: str | None = None,
     rounds: int | None = None,
+    mode: str = "single",
 ) -> None:
     async with aiosqlite.connect(str(db)) as conn:
         await conn.execute(
             "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at, finished_at,"
-            " rounds, approved, final_status) VALUES (?,?,?,?,?,?,?,?)",
+            " rounds, approved, final_status, mode) VALUES (?,?,?,?,?,?,?,?,?)",
             (run_id, project_id, f"ticket-{run_id}", started_at, finished_at, rounds,
-             None if approved is None else int(approved), status),
+             None if approved is None else int(approved), status, mode),
         )
         await conn.commit()
 
@@ -224,3 +225,86 @@ def test_endpoint_rejects_an_unknown_period(client: TestClient) -> None:
         response = client.get("/api/v1/usage/stats", params={"days": 12})
 
     assert response.status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# Queue / autonomous envelope filtering — ticket-263
+# ---------------------------------------------------------------------------
+
+
+async def test_recent_runs_excludes_queue_envelope_but_keeps_ticket_runs(
+    tmp_path: Path,
+) -> None:
+    """A queue envelope row is invisible in recent_runs; its ticket runs are not."""
+    path = tmp_path / "queue.db"
+    await init_db(path)
+
+    # Envelope run (mode=queue) — created by run_executor for the queue itself.
+    await _run(path, "env-q", "alpha", "2026-09-27T10:00:00+00:00",
+               finished_at="2026-09-27T10:30:00+00:00", approved=True,
+               status="done", rounds=0, mode="queue")
+    # Per-ticket runs inside the queue — created by RunRecorder with mode=single.
+    await _run(path, "t1", "alpha", "2026-09-27T10:01:00+00:00",
+               finished_at="2026-09-27T10:10:00+00:00", approved=True,
+               status="done", rounds=1, mode="single")
+    await _run(path, "t2", "alpha", "2026-09-27T10:11:00+00:00",
+               finished_at="2026-09-27T10:20:00+00:00", approved=True,
+               status="done", rounds=1, mode="single")
+
+    stats = await usage_stats(path, days=7, project_id=None, today=TODAY)
+
+    ids = [r.id for r in stats.recent_runs]
+    assert "env-q" not in ids
+    assert "t1" in ids
+    assert "t2" in ids
+
+
+async def test_totals_run_count_excludes_queue_and_autonomous_rows(
+    tmp_path: Path,
+) -> None:
+    """Run totals count only single-mode rows; envelope rows are invisible."""
+    path = tmp_path / "modes.db"
+    await init_db(path)
+
+    await _run(path, "s1", "proj", "2026-09-27T10:00:00+00:00",
+               finished_at="2026-09-27T10:10:00+00:00",
+               approved=True, status="done", rounds=1, mode="single")
+    await _run(path, "q1", "proj", "2026-09-27T09:00:00+00:00",
+               finished_at="2026-09-27T09:30:00+00:00",
+               approved=True, status="done", rounds=0, mode="queue")
+    await _run(path, "au1", "proj", "2026-09-27T08:00:00+00:00",
+               finished_at="2026-09-27T08:40:00+00:00",
+               approved=True, status="done", rounds=0, mode="autonomous")
+
+    stats = await usage_stats(path, days=7, project_id=None, today=TODAY)
+
+    # Only the single-mode run counts.
+    assert stats.totals.runs == 1
+    assert stats.quality.finished_runs == 1
+    ids = [r.id for r in stats.recent_runs]
+    assert "q1" not in ids
+    assert "au1" not in ids
+    assert "s1" in ids
+
+
+async def test_null_mode_rows_are_treated_as_single(tmp_path: Path) -> None:
+    """Legacy rows (mode IS NULL) are counted as single, not excluded."""
+    path = tmp_path / "legacy.db"
+    await init_db(path)
+
+    # Insert directly with mode=NULL to simulate a pre-migration row.
+    async with aiosqlite.connect(str(path)) as conn:
+        await conn.execute(
+            "INSERT INTO pipeline_runs"
+            " (id, project_id, ticket_id, started_at, finished_at, rounds, approved,"
+            "  final_status, mode)"
+            " VALUES (?,?,?,?,?,?,?,?,?)",
+            ("legacy-1", "proj", "ticket-old", "2026-09-27T10:00:00+00:00",
+             "2026-09-27T10:10:00+00:00", 1, 1, "done", None),
+        )
+        await conn.commit()
+
+    stats = await usage_stats(path, days=7, project_id=None, today=TODAY)
+
+    assert stats.totals.runs == 1
+    assert stats.recent_runs[0].id == "legacy-1"

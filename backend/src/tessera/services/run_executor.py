@@ -116,6 +116,12 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
         # répondrait à un agent qui n'écoute pas.
         run.question = None
         run.question_expire_a = None
+    elif event.type is EventType.VALIDATION_STARTED:
+        run.etape = "validation"
+    elif event.type is EventType.DOCUMENTATION_STARTED:
+        run.etape = "documentation"
+    elif event.type is EventType.LIVRAISON_STARTED:
+        run.etape = "livraison"
     elif event.type in (EventType.VALIDATION_DONE, EventType.SECURITY_AUDIT_DONE):
         verdict = event.data.get("verdict")
         if verdict:
@@ -175,7 +181,10 @@ async def executer(
     run_id_en_base: str | None = None
     try:
         run_id_en_base = await create_run(
-            settings.ide_db_path, run.project_id, run.ticket_id or run.mode
+            settings.ide_db_path,
+            run.project_id,
+            run.ticket_id or run.mode,
+            mode=run.mode,
         )
     except Exception as exc:  # noqa: BLE001
         _logger.warning("run_non_persiste", extra={"erreur": str(exc)})

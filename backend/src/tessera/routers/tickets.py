@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 
 import httpx
@@ -17,6 +18,7 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.sync_map import SyncMapService
@@ -140,6 +142,16 @@ class PrStatusResponse(BaseModel):
     ci_status: Literal["pending", "passing", "failing", "none"]
     pr_url: str
     pr_number: int
+
+
+def _resoudre_base_branch(project_path: Path) -> str:
+    """Resolve the base branch for a project.
+
+    Reads ``base_branch`` from the project policy (``agents.json``), then
+    falls back to the global setting.  A single place for the rule — ADR-034.
+    """
+    politique = PolitiqueRun.lire(project_path)
+    return politique.base_branch or settings.github_base_branch
 
 
 def _require_github_service(github_remote: str | None) -> GitHubService:
@@ -374,7 +386,7 @@ async def open_pull_request_for_ticket(
     service = GitHubWorkflowService(
         git_workspace=GitWorkspaceService(project_path),
         github=github,
-        base_branch=settings.github_base_branch,
+        base_branch=_resoudre_base_branch(project_path),
         project_path=project_path,
     )
 
@@ -384,6 +396,7 @@ async def open_pull_request_for_ticket(
             ticket_id=ticket_id,
             ticket_title=ticket.title,
             ticket_body=ticket.body or "",
+            ticket_type=ticket.type.value,
             # C'est l'utilisateur qui vient de cliquer. Le niveau d'autonomie
             # borne ce que l'IDE fait seul, pas ce qu'on peut lui demander.
             autonome=False,
@@ -429,7 +442,7 @@ async def merge_pull_request_for_ticket(
     service = GitHubWorkflowService(
         git_workspace=GitWorkspaceService(project_path),
         github=github,
-        base_branch=settings.github_base_branch,
+        base_branch=_resoudre_base_branch(project_path),
         project_path=project_path,
     )
 

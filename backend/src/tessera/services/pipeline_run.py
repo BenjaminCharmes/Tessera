@@ -61,6 +61,11 @@ class PipelineRun:
     #: (ticket-243). Vide : pas de plan, ou un plan qui a échoué.
     plan: str = ""
 
+    # Instantané de memory/ et tickets/ pris avant le premier agent, utilisé
+    # pour calculer le diff d'artefacts à la fin de chaque tour (ticket-274).
+    # None quand aucun chemin de projet n'est configuré.
+    artifact_snapshot: dict[str, str] | None = None
+
     # --- remis à zéro à chaque tour ---
     round_num: int = 0
     reviewed_code: str = ""
@@ -71,6 +76,10 @@ class PipelineRun:
     # consignes de l'utilisateur. C'est tout ce qu'un codeur qui reprend sa
     # session a besoin de recevoir : le reste, il l'a déjà (ticket-187).
     contexte_du_tour: str = ""
+    # Diff textuel entre l'instantané et l'état courant de memory/ et tickets/.
+    # Transmis au reviewer et au validateur uniquement — jamais à l'audit
+    # sécurité (code uniquement) et jamais dans un commit (ticket-274).
+    artifact_diff: str = ""
 
     @property
     def stop_requested(self) -> bool:
@@ -88,6 +97,7 @@ class PipelineRun:
         self.test_context = ""
         self.security_context = ""
         self.contexte_du_tour = ""
+        self.artifact_diff = ""
 
 
 async def emit(run: PipelineRun, event_type: EventType, **data: Any) -> None:

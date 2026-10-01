@@ -9,7 +9,9 @@ import TicketActivity from "./TicketActivity";
 import AgentBlock from "./AgentBlock";
 import { blocsDuPanneau } from "./blocsDuPanneau";
 import PipelineSummary from "./PipelineSummary";
-import type { Project, Ticket } from "../../types/api";
+import StageStrip from "./StageStrip";
+import FilDuRun from "../FilDuRun";
+import type { Project, Ticket, PipelineReglages } from "../../types/api";
 import type { UseRunActifResult } from "../../hooks/streamState";
 
 interface AgentPanelProps {
@@ -17,12 +19,15 @@ interface AgentPanelProps {
   stream: UseRunActifResult;
   /** Ticket sélectionné, pour afficher ce qu'il a produit (ticket-064). */
   activeTicket?: Ticket | null;
+  /** Configuration du pipeline pour la frise d'étapes (ticket-256). */
+  reglages?: Pick<PipelineReglages, "securite_enabled" | "validateur_enabled"> | null;
 }
 
 export default function AgentPanel({
   project,
   stream,
   activeTicket = null,
+  reglages = null,
 }: AgentPanelProps) {
   const {
     status,
@@ -36,9 +41,12 @@ export default function AgentPanel({
     lastResult,
     errorMessage,
     events,
+    etape,
     quota,
     pendingQuestion,
     questionExpireA,
+    runClosed,
+    entries,
     answer,
     interject,
     stop,
@@ -125,6 +133,7 @@ export default function AgentPanel({
 
         {(status === "running" || status === "done") && (
           <>
+            <StageStrip etape={etape} events={events} reglages={reglages} />
             {currentRound > 0 && <RoundBadge current={currentRound} />}
             {(coutUsd > 0 || outils > 0) && (
               <p className="px-4 pb-1 text-micro text-zinc-500" data-testid="cout-du-run">
@@ -132,28 +141,40 @@ export default function AgentPanel({
               </p>
             )}
 
-            {coderStarted && (
-              <AgentBlock
-                agent="codeur"
-                tokens={currentTokens}
-                isActive={currentAgent === "codeur"}
-                isDone={coderDone}
-                doneContent={codeurDoneContent || undefined}
-              />
-            )}
-
-            {reviewerStarted && (
-              <AgentBlock
-                agent="reviewer"
-                tokens=""
-                isActive={currentAgent === "reviewer"}
-                isDone={status === "done"}
-                reviewContent={reviewerContent}
-              />
+            {/* Fil chronologique : agents, sécurité et validateur (ticket-257).
+                Repli sur blocsDuPanneau si entries est vide — observateur arrivé
+                après le début du run, sans historique (ticket-182). */}
+            {entries.length > 0 ? (
+              <FilDuRun entries={entries} />
+            ) : (
+              <>
+                {coderStarted && (
+                  <AgentBlock
+                    agent="codeur"
+                    tokens={currentTokens}
+                    isActive={currentAgent === "codeur"}
+                    isDone={coderDone}
+                    doneContent={codeurDoneContent || undefined}
+                  />
+                )}
+                {reviewerStarted && (
+                  <AgentBlock
+                    agent="reviewer"
+                    tokens=""
+                    isActive={currentAgent === "reviewer"}
+                    isDone={status === "done"}
+                    reviewContent={reviewerContent}
+                  />
+                )}
+              </>
             )}
 
             {status === "done" && lastResult && (
-              <PipelineSummary result={lastResult} durationMs={durationMs} />
+              <PipelineSummary
+                result={lastResult}
+                durationMs={durationMs}
+                runClosed={runClosed}
+              />
             )}
           </>
         )}
@@ -167,11 +188,11 @@ export default function AgentPanel({
       </div>
 
       {/* Footer actions */}
-      {(status === "done" || status === "error") && (
+      {((status === "done" && runClosed) || status === "error") && (
         <div className="px-4 py-3 border-t border-zinc-700 shrink-0 flex gap-3">
           <button
             onClick={clear}
-            className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
           >
             <IconCross size={12} /> Fermer
           </button>

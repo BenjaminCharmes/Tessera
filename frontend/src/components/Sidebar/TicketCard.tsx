@@ -270,7 +270,7 @@ export default function TicketCard({
               aria-label={dansLaFile ? "Retirer de la file" : "Ajouter à la file"}
               className={`flex h-6 w-6 items-center justify-center rounded transition-colors ${
                 dansLaFile
-                  ? "bg-violet-500/20 text-violet-300"
+                  ? "bg-violet-500/20 text-zinc-100"
                   : "text-zinc-500 hover:bg-zinc-600 hover:text-zinc-300"
               }`}
             >

@@ -40,7 +40,33 @@ export default function SupervisionView({
 }: SupervisionViewProps) {
   const { runs, selection, selectionner, etatDe } = supervision;
   const limites = useLimites();
-  const selectionne = runs.find((r) => r.run_id === selection) ?? runs[0];
+
+  // Les runs qui attendent une réponse passent en tête (ticket-266).
+  const runsTries = [...runs].sort((a, b) => {
+    const aAttend = etatDe(a.run_id).pendingQuestion !== null;
+    const bAttend = etatDe(b.run_id).pendingQuestion !== null;
+    if (aAttend === bAttend) return 0;
+    return aAttend ? -1 : 1;
+  });
+
+  // Sélection par défaut : un run en attente s'il y en a un, sinon le premier.
+  // Un choix explicite de l'utilisateur (selection != null) garde la priorité.
+  const runEnAttente = runs.find((r) => etatDe(r.run_id).pendingQuestion !== null);
+  const selectionne =
+    runs.find((r) => r.run_id === selection) ?? runEnAttente ?? runs[0];
+
+  /** Sélectionne le run et donne le focus au champ de réponse (ticket-266). */
+  function repondre(runId: string) {
+    selectionner(runId);
+    const input = document.getElementById("dialogue-reponse");
+    if (input) {
+      input.focus();
+    } else {
+      requestAnimationFrame(() => {
+        document.getElementById("dialogue-reponse")?.focus();
+      });
+    }
+  }
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-zinc-900">
@@ -66,7 +92,7 @@ export default function SupervisionView({
       ) : (
         <div className="grid min-h-0 flex-1 grid-cols-[minmax(240px,340px)_1fr] overflow-hidden">
           <div className="flex flex-col gap-2 overflow-y-auto border-r border-zinc-800 p-3">
-            {runs.map((run) => (
+            {runsTries.map((run) => (
               <RunCard
                 key={run.run_id}
                 run={run}
@@ -74,6 +100,11 @@ export default function SupervisionView({
                 selectionne={run.run_id === selectionne?.run_id}
                 onSelect={() => selectionner(run.run_id)}
                 plafondUsd={limites?.run_max_budget_usd ?? null}
+                onRepondre={
+                  etatDe(run.run_id).pendingQuestion !== null
+                    ? () => repondre(run.run_id)
+                    : undefined
+                }
               />
             ))}
           </div>
@@ -139,7 +170,8 @@ function projeter(
     connectQueue: rien,
     connectAutonome: rien,
     disconnect: rien,
-    clear: rien,
+    // « Fermer » retire la carte du run clos de la liste (ticket-267).
+    clear: () => supervision.fermerRun(runId),
     answer: (text: string) =>
       supervision.envoyer(runId, { type: "answer", text }),
     interject: (text: string) =>

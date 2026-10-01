@@ -47,6 +47,22 @@ _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS: tuple[str, ...] = tuple(
 # never the coder's work, so they must never ride under a ticket's message.
 _BOOKKEEPING_COMMIT_MESSAGE = "chore: tessera pipeline bookkeeping"
 
+#: Lockfile names whose diff content is replaced by a one-line summary when
+#: fed to reviewing agents.  The commit itself is not affected — lockfiles are
+#: committed in full.  A single entry here covers every subdirectory
+#: (``backend/uv.lock`` matches ``uv.lock``).
+LOCKFILE_NAMES: frozenset[str] = frozenset({
+    "uv.lock",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    "poetry.lock",
+    "Cargo.lock",
+})
+
+# Captures the destination path from ``diff --git a/<src> b/<dst>``.
+_DIFF_GIT_RE = re.compile(r"^diff --git a/.+ b/(.+)$")
+
 
 class GitWorkspaceError(Exception):
     """Base class for all errors raised by GitWorkspaceService."""
@@ -102,6 +118,73 @@ def _sanitize_slug(slug: str) -> str:
     lowered = slug.lower()
     normalized = re.sub(r"[^a-z0-9]+", "-", lowered)
     return normalized.strip("-")
+
+
+def _is_lockfile(path: str) -> bool:
+    """True if the path's filename matches a known lockfile."""
+    return Path(path).name in LOCKFILE_NAMES
+
+
+def _resumer_lockfiles(diff: str) -> str:
+    """Replace lockfile sections in a unified diff with a one-line summary.
+
+    For each known lockfile, the full hunk content is replaced by:
+      ``<path>: lockfile modified, N lines added, M deleted``
+
+    Non-lockfile sections are left untouched.  This only filters what
+    reviewing agents see — the commit itself is not affected.
+    """
+    if not diff:
+        return diff
+
+    lines = diff.splitlines(keepends=True)
+    output: list[str] = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        if not line.startswith("diff --git "):
+            output.append(line)
+            i += 1
+            continue
+
+        # Determine file path from the ``diff --git`` header.
+        m = _DIFF_GIT_RE.match(line.rstrip("\n"))
+        file_path = m.group(1) if m else ""
+
+        # Scan the metadata header lines (index, ---, +++) for a better path.
+        j = i + 1
+        while j < len(lines) and not lines[j].startswith(("diff --git ", "@@")):
+            if lines[j].startswith("+++ b/"):
+                file_path = lines[j][6:].rstrip("\n")
+            j += 1
+        # ``j`` now points to the first hunk line (``@@``) or next file section.
+
+        if not _is_lockfile(file_path):
+            # Keep diff --git line, metadata header, and all hunk lines.
+            output.append(lines[i])
+            i += 1
+            while i < len(lines) and not lines[i].startswith("diff --git "):
+                output.append(lines[i])
+                i += 1
+            continue
+
+        # Lockfile: skip header, count added/removed hunk lines, emit summary.
+        i = j
+        added = removed = 0
+        while i < len(lines) and not lines[i].startswith("diff --git "):
+            hunk_line = lines[i]
+            if hunk_line.startswith("+") and not hunk_line.startswith("+++"):
+                added += 1
+            elif hunk_line.startswith("-") and not hunk_line.startswith("---"):
+                removed += 1
+            i += 1
+
+        output.append(
+            f"{file_path}: lockfile modified, {added} lines added, {removed} deleted\n"
+        )
+
+    return "".join(output)
 
 
 def _branch_name(ticket_id: str, slug: str) -> str:
@@ -211,6 +294,79 @@ class GitWorkspaceService:
         """
         self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
 
+    async def sync_base_depuis_distant(self, base_branch: str) -> str | None:
+        """Fetch the remote base and fast-forward the local branch to it.
+
+        Called after a merged delivery: the squash on the remote means that
+        ``_base_ref`` (which points to the ticket branch tip) and the remote
+        base have diverged. Re-aligning ``_base_ref`` with the remote ensures
+        the next ticket in a queue starts from the squash commit, not from
+        the previous ticket's branch tip — which would carry duplicate commits
+        into the next PR (ticket-264).
+
+        Returns ``None`` on success, or a human-readable reason when the sync
+        was skipped (no remote configured, diverged local history). Never
+        force-pushes or hard-resets (ADR-022).
+        """
+        try:
+            await self._run("fetch", "origin", base_branch)
+        except GitCommandError as exc:
+            raison = f"fetch origin {base_branch} échoué : {exc.stderr.strip()}"
+            _logger.warning("sync_base_fetch_echoue", extra={"erreur": raison})
+            return raison
+
+        # Read FETCH_HEAD immediately after fetch to avoid a race with another
+        # concurrent git process overwriting the file (FETCH_HEAD is not a
+        # named ref, but a plain file that any fetch overwrites).
+        try:
+            fetch_sha = (await self._run("rev-parse", "FETCH_HEAD")).strip()
+        except GitCommandError as exc:
+            raison = f"rev-parse FETCH_HEAD échoué : {exc.stderr.strip()}"
+            _logger.warning("sync_base_rev_parse_echoue", extra={"erreur": raison})
+            return raison
+
+        # Verify fast-forward against the LOCAL base branch, not ``_base_ref``.
+        # After ``advance_base_ref()`` the latter points to the ticket branch tip,
+        # which is NOT an ancestor of the squash commit — yet the local base branch
+        # (e.g. develop) IS, because it has not moved since the ticket forked
+        # (ticket-264). Checking the wrong ref was what caused the squash scenario
+        # to be incorrectly treated as a divergence.
+        try:
+            local_sha = (
+                await self._run("rev-parse", f"refs/heads/{base_branch}")
+            ).strip()
+        except GitCommandError:
+            # Branch doesn't exist locally; nothing to check, proceed safely.
+            local_sha = None
+
+        if local_sha is not None and local_sha != fetch_sha:
+            proc = await asyncio.create_subprocess_exec(
+                "git", "merge-base", "--is-ancestor", local_sha, fetch_sha,
+                cwd=str(self._project_path),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            await proc.communicate()
+            if proc.returncode != 0:
+                raison = (
+                    f"La branche locale « {base_branch} » ({local_sha[:7]}) a divergé "
+                    f"de la base distante ({fetch_sha[:7]}) : mise à jour ignorée."
+                )
+                _logger.warning("sync_base_diverge", extra={"raison": raison})
+                return raison
+
+        # Safe: update the local branch ref and reposition _base_ref.
+        try:
+            await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
+        except GitCommandError as exc:
+            raison = f"update-ref refs/heads/{base_branch} échoué : {exc.stderr.strip()}"
+            _logger.warning("sync_base_update_ref_echoue", extra={"erreur": raison})
+            return raison
+
+        self._base_ref = fetch_sha
+        _logger.info("sync_base_depuis_distant_ok", extra={"sha": fetch_sha[:7]})
+        return None
+
     # ------------------------------------------------------------------
     # Fork point of a ticket branch — ticket-208
     # ------------------------------------------------------------------
@@ -240,10 +396,14 @@ class GitWorkspaceService:
         Falls back to `current_diff()` when no fork point is known (no branch
         was created through this service instance, or the
         merge-base could not be computed).
+
+        Lockfile sections are replaced by a one-line summary so that a large
+        ``uv.lock`` or ``package-lock.json`` does not crowd out the actual
+        code changes before the diff is truncated (ticket-272).
         """
         base = self._fork_point
         if base is None:
-            return await self.current_diff()
+            return _resumer_lockfiles(await self.current_diff())
 
         non_suivis = await self._untracked_files()
         await self._run("add", "-A", "-N")
@@ -252,7 +412,9 @@ class GitWorkspaceService:
             *await self._exclude_pathspecs(),
         )
         try:
-            return await self._run("diff", base, "--", *pathspec)
+            return _resumer_lockfiles(
+                await self._run("diff", base, "--", *pathspec)
+            )
         finally:
             await self._oublier_dans_l_index(non_suivis)
 
@@ -563,6 +725,64 @@ class GitWorkspaceService:
         status = await self._run("status", "--porcelain", "--untracked-files=no")
         return not status.strip()
 
+    async def _file_had_content_in_head(self, rel_path: str) -> bool:
+        """True when HEAD contains a non-empty, non-blank version of this file.
+
+        A file that was already empty (or absent) in HEAD was not *reduced*
+        to empty during this run — no warning needed.
+        """
+        if not await self._has_head():
+            return False
+        try:
+            content = await self._run("show", f"HEAD:{rel_path}")
+            return bool(content.strip())
+        except GitCommandError:
+            # File absent from HEAD (new file) — not a reduction.
+            return False
+
+    async def _detect_emptied_tracked_files(self) -> list[str]:
+        """Return paths of tracked files *reduced* to empty or blank during this run.
+
+        A file that was already empty in HEAD is excluded — only files whose
+        tracked content was non-empty and are now empty on disk are reported.
+        A brand-new empty file (not yet tracked) is also excluded.
+        Called before ``git add`` so the working-tree state reflects what the
+        coder left behind.
+        """
+        try:
+            listing = await self._run("ls-files")
+        except GitCommandError:
+            return []
+
+        emptied: list[str] = []
+        root = self._project_path.resolve()
+        for rel_path in listing.splitlines():
+            rel_path = rel_path.strip()
+            if not rel_path:
+                continue
+            full = self._project_path / rel_path
+            if not full.is_file():
+                # Deleted by rm — correct behaviour, not a warning.
+                continue
+            try:
+                # Resolve symlinks before reading: a tracked symlink pointing
+                # outside the project must never be followed (ADR-031).
+                resolved = full.resolve()
+                try:
+                    resolved.relative_to(root)
+                except ValueError:
+                    continue
+                content = resolved.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            if content.strip():
+                # File still has content — no problem.
+                continue
+            # File is empty or blank on disk; only warn if HEAD had content.
+            if await self._file_had_content_in_head(rel_path):
+                emptied.append(rel_path)
+        return emptied
+
     async def commit_all(self, message: str) -> str | None:
         """Commit the ticket's changes under `message`; return the short SHA.
 
@@ -578,7 +798,19 @@ class GitWorkspaceService:
         Returns the short SHA of the ticket commit, or None if nothing
         outside bookkeeping changed (a bookkeeping-only commit may still be
         created even when this returns None).
+
+        Tracked files reduced to empty or blank content are signalled via a
+        warning log entry (``emptied_tracked_files``): the coder should have
+        removed them with ``rm`` so they disappear from the repository rather
+        than staying as empty files. The commit is not blocked.
         """
+        emptied = await self._detect_emptied_tracked_files()
+        if emptied:
+            _logger.warning(
+                "emptied_tracked_files",
+                extra={"fichiers": emptied, "conseil": "utiliser rm pour supprimer"},
+            )
+
         # `.` borne l'ajout au dossier du projet. C'est ce qu'on veut d'un
         # projet ordinaire — il *est* la racine de son dépôt — mais pas du
         # projet bootstrap, dont le travail est dans `backend/` et `frontend/`,
@@ -611,9 +843,13 @@ class GitWorkspaceService:
     async def commit_bookkeeping(self) -> None:
         """Commit only Tessera's own bookkeeping, under its fixed message.
 
-        Also called on its own once delivery has written the PR number into
-        the ticket (ticket-205): a tracked ticket left modified would send the
-        next run to `blocked`.
+        The PR-number write, commit and push now happen inside livraison via
+        `post_pr_callback` *before* any merge, so no bookkeeping commit is
+        ever stranded on the ticket branch after a merged PR (ticket-270).
+
+        Files that were untracked at run start (`_preexisting_untracked`) are
+        excluded: they were not produced by Tessera's own bookkeeping, and
+        `commit_all` already excludes them from the main ticket commit.
         """
         # A project that has neither tickets/ nor memory/pipeline-log.md
         # yet (e.g. a git_workspace used outside the ticket pipeline, or a
@@ -636,7 +872,14 @@ class GitWorkspaceService:
                 conservees.append(chemin)
         existing_bookkeeping_paths = conservees
         if existing_bookkeeping_paths:
-            await self._run("add", "-A", "--", *existing_bookkeeping_paths)
+            # Exclut les fichiers qui étaient non suivis au démarrage du run :
+            # `commit_all` les exclut déjà du commit principal (ticket-270).
+            preexisting_excludes = tuple(
+                f":(exclude){p}" for p in self._preexisting_untracked
+            )
+            await self._run(
+                "add", "-A", "--", *existing_bookkeeping_paths, *preexisting_excludes
+            )
             staged_bookkeeping = await self._run("diff", "--cached", "--name-only")
             if staged_bookkeeping.strip():
                 await self._run("commit", "-m", _BOOKKEEPING_COMMIT_MESSAGE)

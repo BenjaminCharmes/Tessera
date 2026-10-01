@@ -432,6 +432,16 @@ def _livrer_la_pr(numero: int) -> object:
     from tessera.services.livraison import Livraison
 
     async def _livrer(self: object, **kwargs: object) -> Livraison:
+        # Simule le comportement réel : livrer() appelle post_pr_callback avant
+        # de retourner, ce que les tests de notation de PR vérifient (ticket-270).
+        callback = getattr(self, "_post_pr_callback", None)
+        if callback is not None:
+            try:
+                ticket_id = str(kwargs.get("ticket_id", ""))
+                branch = str(kwargs.get("branch", ""))
+                await callback(ticket_id, numero, branch)
+            except Exception:  # noqa: BLE001
+                pass
         return Livraison(pr_number=numero, merged=True)
 
     return _livrer
@@ -498,8 +508,16 @@ def test_noter_la_pr_avance_la_base_du_run(
         async def commit_bookkeeping(self) -> None:
             appels.append("commit")
 
+        async def push_branch(self, branch: str) -> None:
+            appels.append("push")
+
         async def advance_base_ref(self) -> None:
             appels.append("avance")
+
+        async def sync_base_depuis_distant(self, base_branch: str) -> str | None:
+            # ticket-264 : après un merge, la base locale se réaligne.
+            appels.append("sync")
+            return None
 
     monkeypatch.setattr(
         "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
@@ -507,7 +525,7 @@ def test_noter_la_pr_avance_la_base_du_run(
 
     asyncio.run(_livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
 
-    assert appels == ["commit", "avance"]
+    assert appels == ["commit", "push", "avance", "sync"]
 
 
 def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(

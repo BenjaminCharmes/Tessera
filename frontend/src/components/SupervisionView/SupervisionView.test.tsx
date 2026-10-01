@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SupervisionView from "./index";
 import { INITIAL } from "../../hooks/streamState";
@@ -40,6 +40,7 @@ function supervision(
     observerLeTexte: vi.fn(),
     sortieDuService: () => [],
     signalServices: 0,
+    fermerRun: vi.fn(),
     ...over,
   };
 }
@@ -264,5 +265,220 @@ describe("SupervisionView", () => {
     );
 
     expect(screen.getByText(/des services tournent/)).toBeInTheDocument();
+  });
+});
+
+describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
+  it("place la carte d'un run en attente en tete de liste", () => {
+    // Deux runs : le second attend une réponse. Sa carte doit être rendue
+    // avant celle du premier.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-009" }),
+            ],
+          },
+          { "run-2": { pendingQuestion: "On casse l'API ?" } },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    const carteIdeCore = screen.getByLabelText("Run ticket-001 sur ide-core");
+    const cartePortfolio = screen.getByLabelText("Run ticket-009 sur portfolio");
+    // portfolio (run-2, en attente) doit précéder ide-core (run-1) dans le DOM.
+    expect(
+      cartePortfolio.compareDocumentPosition(carteIdeCore) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("selectionne par defaut le run qui attend une reponse", () => {
+    // Sans sélection explicite, le panneau de détail montre le run en attente.
+    // Le champ de réponse (label « Votre réponse ») n'apparaît que dans
+    // AgentDialogue côté panneau — pas dans la carte — donc sa présence
+    // confirme que le bon run est affiché.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-009" }),
+            ],
+            selection: null,
+          },
+          { "run-2": { pendingQuestion: "On casse l'API ?", status: "running" } },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    expect(screen.getByLabelText(/Votre réponse/i)).toBeInTheDocument();
+  });
+
+  it("garde la carte selectionnee explicitement meme si un autre run attend", () => {
+    // Un clic de l'utilisateur sur run-1 doit rester prioritaire sur la
+    // sélection automatique vers run-2 qui attend.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-009" }),
+            ],
+            selection: "run-1",
+          },
+          {
+            "run-1": { status: "running" },
+            "run-2": { pendingQuestion: "On casse l'API ?", status: "running" },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    // AgentDialogue de run-1 : pas de pendingQuestion → pas de champ « Votre réponse ».
+    expect(screen.queryByLabelText(/Votre réponse/i)).not.toBeInTheDocument();
+  });
+
+  it("le bouton Repondre selectionne le run et donne le focus au champ", async () => {
+    // run-2 est déjà sélectionné (selection: "run-2") : AgentDialogue est rendu,
+    // l'input #dialogue-reponse est dans le DOM, le focus est donc synchrone.
+    const selectionner = vi.fn();
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-009" }),
+            ],
+            selection: "run-2",
+            selectionner,
+          },
+          { "run-2": { pendingQuestion: "On casse l'API ?", status: "running" } },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    // Le bouton « Répondre » de la carte (pas celui d'AgentDialogue).
+    const carte = screen.getByLabelText("Run ticket-009 sur portfolio");
+    const bouton = within(carte).getByRole("button", { name: /Répondre/i });
+    await userEvent.click(bouton);
+
+    expect(selectionner).toHaveBeenCalledWith("run-2");
+    expect(document.getElementById("dialogue-reponse")).toHaveFocus();
+  });
+});
+
+describe("SupervisionView — bouton Fermer (ticket-267)", () => {
+  it("ne rend pas Fermer avant run_closed meme si le pipeline est done", () => {
+    // Entre pipeline_done et run_closed, la livraison tourne encore.
+    // Le bouton ne doit pas apparaître : cliquer fermerait un run pas encore libéré.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          { runs: [run()] },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: false,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Fermer/i })).not.toBeInTheDocument();
+  });
+
+  it("rend Fermer uniquement apres run_closed", () => {
+    render(
+      <SupervisionView
+        supervision={supervision(
+          { runs: [run()] },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: true,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /Fermer/i })).toBeInTheDocument();
+  });
+
+  it("Fermer porte la classe inline-flex (ticket-267)", () => {
+    render(
+      <SupervisionView
+        supervision={supervision(
+          { runs: [run()] },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: true,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+    const bouton = screen.getByRole("button", { name: /Fermer/i });
+    expect(bouton.className).toContain("inline-flex");
+  });
+
+  it("un clic sur Fermer appelle fermerRun avec le bon run_id", async () => {
+    const fermerRun = vi.fn();
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [run()],
+            fermerRun,
+          },
+          {
+            "run-1": {
+              status: "done",
+              runClosed: true,
+              lastResult: {
+                ticket_id: "ticket-001",
+                final_status: "done",
+                rounds: 1,
+                approved: true,
+              },
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /Fermer/i }));
+    expect(fermerRun).toHaveBeenCalledWith("run-1");
   });
 });

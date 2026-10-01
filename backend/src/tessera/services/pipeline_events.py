@@ -55,6 +55,16 @@ class EventType(str, Enum):
     #: La mise à jour de la documentation a échoué (ticket-213). Sans cet
     #: événement, l'échec reste dans les logs du backend, invisible à l'écran.
     DOCUMENTATION_FAILED = "documentation_failed"
+    #: La validation des critères d'acceptation démarre (ticket-255). Émis
+    #: seulement si le validateur est actif — un run sans validateur ne produit
+    #: pas cet événement.
+    VALIDATION_STARTED = "validation_started"
+    #: La mise à jour de la documentation démarre (ticket-255). Émis seulement
+    #: sur un run approuvé disposant d'un documenteur.
+    DOCUMENTATION_STARTED = "documentation_started"
+    #: La livraison du commit démarre (ticket-255). Émis seulement sur un run
+    #: approuvé dont le projet autorise au moins `pr`.
+    LIVRAISON_STARTED = "livraison_started"
 
 
 class OrchestratorEvent(BaseModel):

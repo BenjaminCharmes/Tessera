@@ -8,6 +8,7 @@ from tessera.services.git_workspace import (
     GitWorkspaceService,
     InvalidSlugError,
     NotAGitRepository,
+    _resumer_lockfiles,
 )
 
 
@@ -626,3 +627,423 @@ async def test_what_a_push_publishes_is_read_from_the_commits(repo: Path) -> Non
     (commit,) = await service.commits_depuis_base("develop", branche)
     assert "un corps de message" in commit.message
     assert "c@example.com" in commit.auteur
+
+
+# ---------------------------------------------------------------------------
+# Lockfile summarization — ticket-272
+# ---------------------------------------------------------------------------
+
+
+def test_lockfile_summary_replaces_content_and_keeps_other_files() -> None:
+    """uv.lock content is replaced by a summary; package.json content is kept."""
+    diff = (
+        "diff --git a/uv.lock b/uv.lock\n"
+        "index abc..def 100644\n"
+        "--- a/uv.lock\n"
+        "+++ b/uv.lock\n"
+        "@@ -1,3 +1,3 @@\n"
+        " context\n"
+        "-old-dep==1.0.0\n"
+        "+old-dep==2.0.0\n"
+        "diff --git a/package.json b/package.json\n"
+        "index ghi..jkl 100644\n"
+        "--- a/package.json\n"
+        "+++ b/package.json\n"
+        '@@ -1,2 +1,2 @@\n'
+        '-  "version": "1.0"\n'
+        '+  "version": "1.1"\n'
+    )
+    result = _resumer_lockfiles(diff)
+    assert "uv.lock: lockfile modified" in result
+    assert "old-dep==1.0.0" not in result
+    assert "old-dep==2.0.0" not in result
+    assert "package.json" in result
+    assert '"version": "1.1"' in result
+
+
+def test_lockfile_summary_counts_added_and_removed_lines() -> None:
+    """The summary line reports the exact count of added and removed lines."""
+    diff = (
+        "diff --git a/yarn.lock b/yarn.lock\n"
+        "index abc..def 100644\n"
+        "--- a/yarn.lock\n"
+        "+++ b/yarn.lock\n"
+        "@@ -1,5 +1,6 @@\n"
+        " context\n"
+        "-removed1\n"
+        "-removed2\n"
+        "+added1\n"
+        "+added2\n"
+        "+added3\n"
+        " context\n"
+    )
+    result = _resumer_lockfiles(diff)
+    assert "3 lines added" in result
+    assert "2 deleted" in result
+
+
+def test_lockfile_in_subdirectory_is_summarized() -> None:
+    """backend/uv.lock is summarized even though it lives in a subdirectory."""
+    diff = (
+        "diff --git a/backend/uv.lock b/backend/uv.lock\n"
+        "index abc..def 100644\n"
+        "--- a/backend/uv.lock\n"
+        "+++ b/backend/uv.lock\n"
+        "@@ -1,2 +1,2 @@\n"
+        "-dep==1.0\n"
+        "+dep==2.0\n"
+    )
+    result = _resumer_lockfiles(diff)
+    assert "backend/uv.lock: lockfile modified" in result
+    assert "dep==1.0" not in result
+    assert "dep==2.0" not in result
+
+
+# ---------------------------------------------------------------------------
+# sync_base_depuis_distant — ticket-264
+# ---------------------------------------------------------------------------
+
+
+async def _git_out(cwd: Path, *args: str) -> str:
+    """Runs a git command and returns its stdout."""
+    proc = await asyncio.create_subprocess_exec(
+        "git", *args,
+        cwd=str(cwd),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    out, stderr = await proc.communicate()
+    assert proc.returncode == 0, stderr.decode()
+    return out.decode().strip()
+
+
+@pytest.fixture
+async def repo_avec_distant(tmp_path: Path) -> tuple[Path, Path]:
+    """A local repo linked to a bare remote, with a 'develop' branch."""
+    bare = tmp_path / "remote.git"
+    bare.mkdir()
+    await _git(bare, "init", "--bare", "-q")
+
+    local = tmp_path / "local"
+    local.mkdir()
+    await _git(local, "init", "-q")
+    await _git(local, "config", "user.email", "test@tessera.local")
+    await _git(local, "config", "user.name", "Tessera test")
+
+    # Premier commit sur develop
+    (local / "README.md").write_text("# projet\n", encoding="utf-8")
+    await _git(local, "add", "README.md")
+    await _git(local, "commit", "-q", "-m", "init")
+    await _git(local, "branch", "-M", "develop")
+    await _git(local, "remote", "add", "origin", str(bare))
+    await _git(local, "push", "-q", "--set-upstream", "origin", "develop")
+
+    return local, bare
+
+
+async def test_sync_base_depuis_distant_apres_merge_squash(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """After a squash merge on the remote, _base_ref advances to the squash commit.
+
+    Simulates a full queue cycle: ticket-1 gets approved and advance_base_ref()
+    is called, then the remote 'develop' gains a squash commit.
+    sync_base_depuis_distant() must reposition _base_ref so ticket-2 starts
+    from the squash commit, not from the ticket-1 branch tip.
+
+    Key invariant: ``advance_base_ref()`` sets ``_base_ref`` to the ticket branch
+    tip, which is NOT an ancestor of the squash commit (squash starts from the
+    original develop base, not from the ticket commits). The sync must check the
+    local ``develop`` branch ref instead of ``_base_ref``, because the local develop
+    IS an ancestor of the squash commit (it hasn't moved since the ticket forked).
+    """
+    local, _bare = repo_avec_distant
+
+    service = GitWorkspaceService(local)
+
+    # --- Ticket 1 cycle ---
+    await service.create_branch("ticket-001", "feat-a")
+    (local / "a.py").write_text("x = 1\n", encoding="utf-8")
+    await _git(local, "add", "a.py")
+    await _git(local, "commit", "-q", "-m", "feat: ticket-001")
+    # Orchestrateur appelle advance_base_ref après approbation : _base_ref pointe
+    # maintenant sur le commit du ticket, pas sur develop.
+    await service.advance_base_ref()
+
+    # Côté remote : squash commit sur develop via un worktree sur develop.
+    # Le worktree avance la branche locale develop ET la pousse, simulant le
+    # squash merge de GitHub : develop reçoit un nouveau commit qui n'est pas
+    # dans la lignée directe du ticket.
+    wt = local.parent / "worktree-squash"
+    await _git(local, "worktree", "add", str(wt), "develop")
+    try:
+        await _git(wt, "config", "user.email", "test@tessera.local")
+        await _git(wt, "config", "user.name", "Tessera test")
+        (wt / "squash.py").write_text("# squash\n", encoding="utf-8")
+        await _git(wt, "add", "squash.py")
+        await _git(wt, "commit", "-q", "-m", "feat: squash commit (ticket-001)")
+        await _git(wt, "push", "-q", "origin", "develop")
+    finally:
+        await _git(local, "worktree", "remove", "--force", str(wt))
+
+    # Après le worktree : local/develop = SHA_squash = remote/develop
+    squash_sha = await _git_out(local, "rev-parse", "refs/heads/develop")
+
+    # Sync
+    raison = await service.sync_base_depuis_distant("develop")
+
+    assert raison is None, f"sync a échoué : {raison}"
+    assert service._base_ref == squash_sha, (
+        f"_base_ref devrait être le squash commit ({squash_sha[:7]}), "
+        f"non {(service._base_ref or '')[:7]}"
+    )
+
+    # Ticket 2 doit partir du squash commit
+    await service.create_branch("ticket-002", "feat-b")
+    head2_sha = await _git_out(local, "rev-parse", "HEAD")
+
+    # HEAD de ticket-002 est exactement le squash commit (aucun commit encore dessus)
+    assert head2_sha == squash_sha, (
+        f"ticket-002 ({head2_sha[:7]}) devrait démarrer du squash commit "
+        f"({squash_sha[:7]})"
+    )
+
+
+async def test_sync_base_non_appelee_quand_non_merge(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """Without sync, the next ticket still starts from the previous ticket branch tip.
+
+    When delivery did not merge (autonomy: commit or pr, or CI was red), the
+    queue must stack on the approved branch tip — not on the remote develop.
+    This test verifies that _base_ref stays where advance_base_ref() left it.
+    """
+    local, _bare = repo_avec_distant
+
+    service = GitWorkspaceService(local)
+
+    # Ticket 1 : approuvé, advance_base_ref avance sur la branche
+    await service.create_branch("ticket-001", "feat-a")
+    (local / "a.py").write_text("x = 1\n", encoding="utf-8")
+    await _git(local, "add", "a.py")
+    await _git(local, "commit", "-q", "-m", "feat: ticket-001")
+    await service.advance_base_ref()
+    base_ref_apres_ticket1 = service._base_ref
+
+    # Pas de sync (livraison non mergée)
+
+    # Ticket 2 repart de la branche du ticket 1
+    await service.create_branch("ticket-002", "feat-b")
+    head2_sha = await _git_out(local, "rev-parse", "HEAD")
+
+    assert service._base_ref == base_ref_apres_ticket1, (
+        "_base_ref ne doit pas avoir changé sans appel à sync"
+    )
+    # HEAD de ticket-002 est identique à _base_ref (aucun commit encore)
+    assert head2_sha == base_ref_apres_ticket1
+
+
+async def test_sync_base_divergee_retourne_une_raison_sans_modifier_base_ref(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """A diverged local develop is not rewritten and the reason is returned.
+
+    We create a true divergence: local 'develop' is forced to a commit that is
+    NOT an ancestor of the commit on the remote — both are children of the
+    initial commit but with different content, so neither is ancestor of the other.
+    """
+    local, bare = repo_avec_distant
+
+    service = GitWorkspaceService(local)
+    await service.create_branch("ticket-001", "feat-a")
+
+    # Commit on the ticket branch → SHA_ticket (child of SHA_init with 'a.py')
+    (local / "a.py").write_text("x = 1\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-001")
+    sha_ticket = await _git_out(local, "rev-parse", "HEAD")
+
+    # Force la branche locale develop à pointer sur SHA_ticket.
+    # SHA_ticket est un enfant de SHA_init avec le fichier 'a.py', alors que
+    # le remote aura un commit différent (enfant de SHA_init sans 'a.py').
+    # Ni l'un ni l'autre n'est ancêtre de l'autre → divergence vraie.
+    proc = await asyncio.create_subprocess_exec(
+        "git", "update-ref", "refs/heads/develop", sha_ticket,
+        cwd=str(local),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    await proc.communicate()
+    assert proc.returncode == 0
+
+    # Dans le dépôt nu, crée un commit indépendant depuis l'état initial.
+    # git commit-tree crée un commit sans travailler dans un arbre de travail.
+    sha_init = await _git_out(bare, "rev-parse", "develop")
+    tree_sha = await _git_out(bare, "rev-parse", "develop^{tree}")
+    import os as _os
+    git_env = {
+        **_os.environ,
+        "GIT_AUTHOR_NAME": "Tessera test",
+        "GIT_AUTHOR_EMAIL": "test@tessera.local",
+        "GIT_AUTHOR_DATE": "2026-01-01T00:00:00+0000",
+        "GIT_COMMITTER_NAME": "Tessera test",
+        "GIT_COMMITTER_EMAIL": "test@tessera.local",
+        "GIT_COMMITTER_DATE": "2026-01-01T00:00:00+0000",
+    }
+    ct_proc = await asyncio.create_subprocess_exec(
+        "git", "commit-tree", tree_sha, "-p", sha_init, "-m", "remote diverge",
+        cwd=str(bare),
+        env=git_env,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    ct_out, ct_err = await ct_proc.communicate()
+    assert ct_proc.returncode == 0, ct_err.decode()
+    sha_remote = ct_out.decode().strip()
+
+    # Met à jour remote develop pour pointer sur ce commit indépendant.
+    ur_proc = await asyncio.create_subprocess_exec(
+        "git", "update-ref", "refs/heads/develop", sha_remote,
+        cwd=str(bare),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    await ur_proc.communicate()
+    assert ur_proc.returncode == 0
+
+    # local/develop = sha_ticket, remote/develop = sha_remote
+    # Aucun n'est ancêtre de l'autre : divergence confirmée.
+    raison = await service.sync_base_depuis_distant("develop")
+
+    assert raison is not None, "sync devait retourner une raison pour une base divergée"
+    assert "divergé" in raison, f"la raison devrait mentionner la divergence : {raison}"
+    # _base_ref ne doit pas avoir changé
+    current_base = service._base_ref
+    assert current_base != sha_remote, (
+        "_base_ref ne doit pas avoir été mis à jour sur une base divergée"
+    )
+
+
+# ------------------------------------------------------------------
+# Fichiers suivis vidés pendant un run — ticket-277
+# ------------------------------------------------------------------
+
+
+async def test_commit_all_signale_un_fichier_suivi_vide(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Un codeur qui vide un fichier suivi au lieu de le supprimer laisse un
+    # fichier vide dans le dépôt. Le commit ne doit pas être bloqué, mais un
+    # avertissement doit signaler le fichier concerné.
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "signaler-vide")
+
+    # README.md est suivi depuis le commit initial ; on le vide.
+    (repo / "README.md").write_text("", encoding="utf-8")
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        sha = await service.commit_all("feat: ticket-277 — vider un fichier")
+
+    assert sha is not None
+    assert any(
+        record.getMessage() == "emptied_tracked_files"
+        for record in caplog.records
+    ), f"Aucun avertissement emptied_tracked_files dans {[r.getMessage() for r in caplog.records]}"
+
+    # Le fichier vide est bien commité (pas bloqué).
+    files_at_head = await service._run("ls-tree", "-r", "--name-only", "HEAD")
+    assert "README.md" in files_at_head
+
+
+async def test_commit_all_ne_signale_pas_un_fichier_supprime_par_rm(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Un fichier supprimé par `rm` disparaît du système de fichiers : il ne
+    # doit pas déclencher d'avertissement, et sa suppression doit être commitée.
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "supprimer-par-rm")
+
+    # Suppression par rm (comportement attendu du codeur).
+    (repo / "README.md").unlink()
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        sha = await service.commit_all("feat: ticket-277 — supprimer un fichier")
+
+    assert sha is not None
+    emptied_records = [
+        r for r in caplog.records
+        if r.getMessage() == "emptied_tracked_files"
+    ]
+    assert not emptied_records, (
+        f"Aucun avertissement emptied_tracked_files ne devrait être émis pour un rm : {emptied_records}"
+    )
+
+    # Le fichier n'est plus dans l'arbre.
+    files_at_head = await service._run("ls-tree", "-r", "--name-only", "HEAD")
+    assert "README.md" not in files_at_head
+
+
+async def test_commit_all_ne_signale_pas_un_fichier_vide_depuis_le_debut(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Un fichier suivi qui était déjà vide dans HEAD (ex : __init__.py)
+    # n'a pas été *réduit* à vide pendant ce run : aucun avertissement.
+    (repo / "__init__.py").write_text("", encoding="utf-8")
+    await _git(repo, "add", "__init__.py")
+    await _git(repo, "commit", "-q", "-m", "chore: add empty init")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "init-vide")
+    # On ne touche pas à __init__.py — il reste vide comme en HEAD.
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        await service.commit_all("chore: rien ne change")
+
+    emptied_records = [
+        r for r in caplog.records
+        if r.getMessage() == "emptied_tracked_files"
+    ]
+    assert not emptied_records, (
+        f"Un fichier déjà vide en HEAD ne doit pas déclencher d'avertissement : {emptied_records}"
+    )
+
+
+async def test_detect_emptied_ne_suit_pas_un_symlink_hors_projet(
+    repo: Path, tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # ADR-031 : les deux côtés sont résolus, symlinks compris. Un dépôt qui
+    # trace un symlink pointant hors du projet ne doit pas permettre de lire
+    # le fichier cible lors de la détection des fichiers vidés.
+    external = tmp_path / "externe.txt"
+    external.write_text("contenu externe\n", encoding="utf-8")
+
+    symlink = repo / "lien.txt"
+    try:
+        symlink.symlink_to(external)
+    except (OSError, NotImplementedError):
+        pytest.skip("Création de symlink non disponible dans cet environnement")
+
+    await _git(repo, "add", "lien.txt")
+    await _git(repo, "commit", "-q", "-m", "chore: add symlink")
+
+    # On vide le fichier externe (le symlink pointe vers un fichier vide).
+    external.write_text("", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "symlink-hors-projet")
+
+    # Le symlink pointe hors du projet : _detect_emptied_tracked_files doit
+    # l'ignorer, pas le lire ni le signaler.
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        await service.commit_all("chore: symlink externe vide")
+
+    emptied_records = [
+        r for r in caplog.records
+        if r.getMessage() == "emptied_tracked_files"
+    ]
+    assert not emptied_records, (
+        f"Un symlink hors projet ne doit pas déclencher d'avertissement : {emptied_records}"
+    )

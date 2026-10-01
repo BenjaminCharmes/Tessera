@@ -33,10 +33,10 @@ Un run approuvé pousse sa branche et ouvre sa PR vers `develop`. Il ne se
 merge pas seul tant que la CI ne peut pas tourner : `merge` exige une CI verte.
 
 Les tests de ce dépôt vivent dans `backend/` et `frontend/`, au-dessus du
-dossier du projet. Depuis le ticket-241, `pipeline.test_cwd` (`../../backend`)
-et `pipeline.test_timeout_s` permettent de les atteindre ; activer le testeur
-reste une décision à part, parce qu'elle allonge chaque run de la durée de la
-suite.
+dossier du projet. Depuis le ticket-241, les clefs `pipeline.test_cwd` et
+`pipeline.test_timeout_s` existent pour les atteindre — non renseignées dans
+l'`agents.json` actuel ; activer le testeur reste une décision à part, parce
+qu'elle allonge chaque run de la durée de la suite.
 
 ## Stack spécifique à ce projet
 
@@ -47,6 +47,13 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 - `codeur` — implémente les tickets de type `feat` et `chore`
 - `reviewer` — valide le code produit par le codeur
 - `architect` — tient l'étape de production sur les tickets de type `design`
+- `securite` — audite le diff de chaque run avant la revue
+- `validateur` — juge chaque critère d'acceptation du ticket
+- `doc-technique` — documentation technique, par lot (ADR-035)
+- `doc-fonctionnelle` — guide utilisateur, par lot (ADR-035)
+- `project-analyzer` — génère le CLAUDE.md d'un projet importé
+
+Un test confronte cette liste aux rôles actifs d'`agents.json`.
 
 ---
 
@@ -76,6 +83,7 @@ make dev-frontend     # Lance Vite sur http://localhost:5173
 make tauri-dev        # Lance l'app desktop (nécessite make dev dans un autre terminal)
 make test             # Lance les tests Python
 make lint             # Type-check mypy
+make install-hooks    # Hook pre-push termes interdits (ADR-050) — chaque clone/worktree
 ```
 
 ---

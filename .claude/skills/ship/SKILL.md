@@ -1,5 +1,7 @@
 ---
+name: ship
 description: Vérifie, commite, pousse et ouvre la PR vers develop pour le travail en cours
+disable-model-invocation: true
 ---
 
 Termine le travail en cours : vérification, commits, push, PR.

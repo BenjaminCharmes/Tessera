@@ -16,10 +16,17 @@ qu'au run suivant — et le hook de périmètre le lui refuse de toute façon.
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 from tessera.services.artifacts import ArtifactMode, read_artifact_mode
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.project_loader import load_pipeline_config
+
+#: Méthodes de merge acceptées par GitHub.
+MergeMethod = Literal["squash", "merge", "rebase"]
+
+#: Valeurs reconnues — toute autre valeur retombe sur le défaut fermé.
+_MERGE_METHODS_VALIDES: frozenset[str] = frozenset({"squash", "merge", "rebase"})
 
 #: La seule valeur qui ouvre le dépôt parent (ADR-028). Une valeur inconnue
 #: ne désarme rien.
@@ -47,6 +54,10 @@ class PolitiqueRun:
     #: Seule la valeur `"professional"` exempte le projet du contrôle des
     #: termes interdits (ADR-048).
     confidentialite: str | None = None
+    #: Méthode de merge transmise à GitHub pour les PR de ticket (ticket-265).
+    #: Absente ou inconnue dans agents.json : `squash`. Le défaut protège :
+    #: squash est la convention de ce dépôt (CLAUDE.md, section Git).
+    merge_method: MergeMethod = "squash"
 
     @classmethod
     def lire(cls, project_path: Path) -> "PolitiqueRun":
@@ -63,6 +74,7 @@ class PolitiqueRun:
             base_branch=_lire_chaine(project_path, "base_branch"),
             merge_without_ci=_lire_booleen(project_path, "merge_without_ci"),
             confidentialite=_lire_chaine(project_path, "confidentiality"),
+            merge_method=_lire_merge_method(project_path),
         )
 
     @property
@@ -114,6 +126,19 @@ def _lire_booleen(project_path: Path, clef: str) -> bool:
     except (json.JSONDecodeError, OSError):
         return False
     return data.get(clef) is True
+
+
+def _lire_merge_method(project_path: Path) -> MergeMethod:
+    """La méthode de merge déclarée dans agents.json, ou `squash` par défaut.
+
+    Une valeur absente, illisible ou inconnue retombe sur `squash` : le défaut
+    protège, l'exception s'énonce (ADR-023). `squash` est la convention de
+    ticket → develop sur ce dépôt (CLAUDE.md, section Git).
+    """
+    valeur = _lire_chaine(project_path, "merge_method")
+    if valeur in _MERGE_METHODS_VALIDES:
+        return valeur  # type: ignore[return-value]
+    return "squash"
 
 
 def _lire_chaine(project_path: Path, clef: str) -> str | None:

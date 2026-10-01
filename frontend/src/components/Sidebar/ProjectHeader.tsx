@@ -72,7 +72,7 @@ export default function ProjectHeader({
         />
       ) : (
         <h2
-          className="truncate text-sm font-medium text-violet-100"
+          className="truncate text-sm font-medium text-zinc-100"
           title={`${project.id} — ${project.path ?? ""}`}
         >
           {project.name}

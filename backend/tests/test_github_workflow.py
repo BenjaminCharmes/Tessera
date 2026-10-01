@@ -49,6 +49,7 @@ class _FakeGitHub:
         self.pr = pr
         self.created: list[dict[str, object]] = []
         self.merged: list[int] = []
+        self.merge_calls: list[dict[str, object]] = []
         self._ci_status = ci_status
 
     async def create_pull_request(self, **kwargs: object) -> tuple[int, str]:
@@ -58,8 +59,14 @@ class _FakeGitHub:
     async def get_pull_request_status(self, pr_number: int) -> _FakeStatut:
         return _FakeStatut(self._ci_status)
 
-    async def merge_pull_request(self, pr_number: int) -> None:
+    async def merge_pull_request(
+        self,
+        pr_number: int,
+        method: str = "squash",
+        commit_title: str | None = None,
+    ) -> None:
         self.merged.append(pr_number)
+        self.merge_calls.append({"pr_number": pr_number, "method": method})
 
 
 def _projet(tmp_path: Path, niveau: str | None) -> Path:
@@ -128,6 +135,50 @@ async def test_pousse_la_branche_avant_d_ouvrir_la_pr(tmp_path: Path) -> None:
     assert result.pr_number == 7
     assert github.created[0]["head"] == "ticket-042-slug"
     assert github.created[0]["base"] == "develop"
+
+
+async def test_pr_title_carries_the_ticket_type(tmp_path: Path) -> None:
+    # ADR-044 + ticket-259 : le titre de la PR suit la même convention que le
+    # message de commit produit par pipeline_outcomes — préfixe Conventional
+    # Commits.
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    await svc.open_pull_request(
+        branch="ticket-123-slug",
+        ticket_id="ticket-123",
+        ticket_title="Add health endpoint",
+        ticket_body="",
+        ticket_type="feat",
+    )
+
+    assert github.created[0]["title"] == "feat: ticket-123 — Add health endpoint"
+
+
+async def test_pr_title_without_type_keeps_legacy_format(tmp_path: Path) -> None:
+    # Compatibilité ascendante : un appelant qui ne passe pas ticket_type obtient
+    # le format historique (sans préfixe) plutôt qu'une chaîne malformée « : … ».
+    git, github = _FakeGit(), _FakeGitHub()
+    svc = GitHubWorkflowService(
+        git_workspace=git,
+        github=github,
+        base_branch="develop",
+        project_path=_projet(tmp_path, "pr"),
+    )
+
+    await svc.open_pull_request(
+        branch="ticket-042-slug",
+        ticket_id="ticket-042",
+        ticket_title="Endpoint de santé",
+        ticket_body=_ticket_body(),
+    )
+
+    assert github.created[0]["title"] == "ticket-042 — Endpoint de santé"
 
 
 async def test_sans_branche_l_ouverture_est_refusee(tmp_path: Path) -> None:
@@ -435,3 +486,79 @@ async def test_a_professional_project_is_not_checked(
         ticket_title="x", ticket_body=_ticket_body(),
     )
     assert git.pushed == ["ticket-042-slug"]
+
+
+# ------------------------------------------------------------------
+# Méthode de merge par projet — ticket-265
+# ------------------------------------------------------------------
+
+
+def _projet_merge_method(tmp_path: Path, manifeste: dict[str, object]) -> Path:
+    """Un projet déclarant autonomy: merge et les clefs du manifeste données."""
+    racine = tmp_path / "projet"
+    racine.mkdir(parents=True, exist_ok=True)
+    (racine / "agents.json").write_text(
+        json.dumps({"autonomy": "merge", **manifeste}), encoding="utf-8"
+    )
+    return racine
+
+
+async def test_sans_merge_method_la_pr_est_mergee_en_squash(tmp_path: Path) -> None:
+    # Absent de agents.json : le défaut fermé retombe sur squash (ticket-265).
+    github = _FakeGitHub(ci_status="passing")
+    from tessera.services.politique_run import PolitiqueRun
+
+    projet = _projet_merge_method(tmp_path, {})
+    politique = PolitiqueRun.lire(projet)
+
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+        politique=politique,
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert len(github.merge_calls) == 1
+    assert github.merge_calls[0]["method"] == "squash"
+
+
+async def test_merge_method_merge_transmet_merge_a_github(tmp_path: Path) -> None:
+    # Un projet déclarant "merge_method": "merge" obtient un merge commit.
+    github = _FakeGitHub(ci_status="passing")
+    from tessera.services.politique_run import PolitiqueRun
+
+    projet = _projet_merge_method(tmp_path, {"merge_method": "merge"})
+    politique = PolitiqueRun.lire(projet)
+
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+        politique=politique,
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert github.merge_calls[0]["method"] == "merge"
+
+
+async def test_merge_method_inconnu_retombe_sur_squash(tmp_path: Path) -> None:
+    # Une valeur non reconnue ne désarme pas le défaut (ADR-023 pattern).
+    github = _FakeGitHub(ci_status="passing")
+    from tessera.services.politique_run import PolitiqueRun
+
+    projet = _projet_merge_method(tmp_path, {"merge_method": "fast-forward"})
+    politique = PolitiqueRun.lire(projet)
+
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+        politique=politique,
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert github.merge_calls[0]["method"] == "squash"

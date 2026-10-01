@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from tessera.models.agent import AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
+from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.pipeline_events import (
     EventType,
@@ -87,6 +88,23 @@ async def create_branch(orch: "Orchestrator", run: PipelineRun) -> None:
         # Volontairement restreint à GitWorkspaceError : une erreur de
         # programmation doit remonter, pas finir en avertissement.
         _logger.warning("branch_creation_failed", extra={"error": str(exc)})
+
+
+def take_artifact_snapshot(orch: "Orchestrator", run: PipelineRun) -> None:
+    """Take a snapshot of memory/ and tickets/ before any agent runs.
+
+    Stored in ``run.artifact_snapshot`` and used at the end of each coder turn
+    to produce the artifact diff — a textual view of what the agent wrote in
+    Tessera's own directories, which are excluded from the git diff either
+    because the project is in local-artifact mode (ADR-021) or because
+    ``_ORCHESTRATOR_ARTIFACT_PATHS`` excludes them from the reviewed diff.
+
+    Called once per run, before the first tour.  No-op when no project path is
+    configured (tests, projects without a filesystem path).
+    """
+    if orch._project_path is None:
+        return
+    run.artifact_snapshot = snapshot_artifacts(orch._project_path)
 
 
 def build_context(orch: "Orchestrator", run: PipelineRun) -> str:
@@ -244,6 +262,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     )
 
     run.reviewed_code = await _capture_diff(orch, run, codeur_result.content)
+    _capture_artifact_diff(orch, run)
     await set_status(orch, run, TicketStatus.in_review)
 
 
@@ -272,6 +291,22 @@ async def _capture_diff(orch: "Orchestrator", run: PipelineRun, prose: str) -> s
         return diff
     _logger.info("diff_empty_fallback_to_prose", extra={"ticket_id": run.ticket_id})
     return prose
+
+
+def _capture_artifact_diff(orch: "Orchestrator", run: PipelineRun) -> None:
+    """Compute and store the artifact diff since run start.
+
+    Populates ``run.artifact_diff`` with the textual diff of memory/ and
+    tickets/ since the snapshot taken by ``take_artifact_snapshot``.  No-op
+    when no snapshot exists (no project path, or not yet taken).
+
+    This diff is intentionally kept separate from ``run.reviewed_code`` (the
+    git diff): it is passed to the reviewer and the validator but never
+    committed, so it does not affect what ends up in the repository.
+    """
+    if orch._project_path is None or run.artifact_snapshot is None:
+        return
+    run.artifact_diff = diff_artifacts(run.artifact_snapshot, orch._project_path)
 
 
 def _role_qui_produit(type_de_ticket: "TicketType") -> AgentRole:
@@ -405,6 +440,7 @@ async def run_review(
     review_context = (
         context
         + f"\n\n## Code produit par le codeur (tour {run.round_num})\n{run.reviewed_code}"
+        + run.artifact_diff
         + run.test_context
         + run.security_context
     )
@@ -453,10 +489,11 @@ async def run_validation(
     """Check the ticket's acceptance criteria; may overturn an approval."""
     if orch._validator is None:
         return True, reason
+    await emit(run, EventType.VALIDATION_STARTED)
     try:
         validation = await orch._validator.validate(
             criteria=_extract_criteria(run.ticket.body),
-            code_produced=run.reviewed_code,
+            code_produced=run.reviewed_code + run.artifact_diff,
             test_result=run.test_result,
         )
     except Exception as exc:

@@ -80,18 +80,18 @@ Le détail opératoire est dans le skill `ticket-workflow`.
 
 ```
 .claude/
-  skills/<nom>/SKILL.md   ← workflows, chargés à la demande par Claude
-  commands/<nom>.md       ← slash commands, tapées par l'utilisateur
+  skills/<nom>/SKILL.md   ← workflows : chargés à la demande, ou tapés en /<nom>
   settings.local.json     ← préférences personnelles (gitignoré)
 ```
 
-Slash commands : `/new-ticket`, `/run-tessera`, `/ship`. Un skill se charge quand
-sa `description` correspond à la tâche ; une slash command se tape. Un skill
-ajouté en session n'est visible qu'à la suivante.
+Tout skill se tape en `/nom`, et se charge seul quand sa `description`
+correspond à la tâche — sauf `ship` (`disable-model-invocation`), qui ne part
+que tapé. Pas de `commands/` : une command homonyme d'un skill n'est jamais
+lue. Un skill ajouté en session n'est visible qu'à la suivante.
 
 Skills disponibles : `brainstorming`, `writing-plans`,
 `test-driven-development`, `code-review`, `verification-before-completion`,
-`new-ticket`, `ticket-workflow`, `write-adr`, `run-tessera`.
+`new-ticket`, `ticket-workflow`, `write-adr`, `run-tessera`, `ship`.
 
 Ces skills servent au développeur. Un agent du produit ne voit que ceux que son
 rôle déclare dans `agents.json` (ticket-242). Les plugins installés restent une

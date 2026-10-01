@@ -117,6 +117,16 @@ def test_les_skills_annonces_existent() -> None:
     assert annonces <= presents, f"annoncés mais absents : {sorted(annonces - presents)}"
 
 
+def test_aucune_command_ne_porte_le_nom_d_un_skill() -> None:
+    # Claude Code sert le skill quand une command porte le même nom : la
+    # command n'est alors jamais lue (ticket-261).
+    dossier = _RACINE / ".claude/commands"
+    commands = {f.stem for f in dossier.glob("*.md")} if dossier.is_dir() else set()
+    skills = {d.name for d in (_RACINE / ".claude/skills").iterdir() if d.is_dir()}
+
+    assert not commands & skills, f"command et skill homonymes : {sorted(commands & skills)}"
+
+
 def test_l_arborescence_decrite_existe() -> None:
     # `CLAUDE.md` décrit `.claude/` : ce qu'il montre doit exister, sinon il
     # décrit un dépôt imaginaire.
@@ -388,6 +398,38 @@ def test_le_manifeste_d_ide_core_ne_porte_aucune_clef_morte() -> None:
 
     mortes = _clefs_mortes(manifeste)
     assert mortes == [], f"clefs mortes dans projects/ide-core/agents.json : {mortes}"
+
+
+# ------------------------------------------------------------------
+# La section « Agents actifs » suit le manifeste — ticket-249
+# ------------------------------------------------------------------
+
+
+def test_la_section_agents_actifs_suit_le_manifeste() -> None:
+    """The « Agents actifs » section names exactly the manifest's active roles.
+
+    Panne vécue : `agents.json` déclarait huit rôles actifs quand la section
+    n'en nommait que trois — `doc-technique`, `doc-fonctionnelle` et
+    `project-analyzer` n'apparaissaient nulle part dans le fichier importé à
+    chaque session. Rien ne confrontait les deux : c'est l'angle mort qui a
+    laissé la liste diverger (audit du 2026-09-29).
+    """
+    import json
+
+    manifeste = json.loads(_lire("projects/ide-core/agents.json"))
+    actifs = {a["role"] for a in manifeste["agents"] if a.get("active")}
+
+    texte = _lire("projects/ide-core/CLAUDE.md")
+    section = re.search(
+        r"^## Agents actifs sur ce projet\n(.*?)(?=\n## |\n---)", texte, re.M | re.S
+    )
+    assert section, "section « Agents actifs sur ce projet » introuvable"
+    nommes = set(re.findall(r"^- `([a-z-]+)`", section.group(1), re.M))
+
+    assert nommes == actifs, (
+        f"manquants dans CLAUDE.md : {sorted(actifs - nommes)} ; "
+        f"nommés mais inactifs ou absents du manifeste : {sorted(nommes - actifs)}"
+    )
 
 
 # ------------------------------------------------------------------

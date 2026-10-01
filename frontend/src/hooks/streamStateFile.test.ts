@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { applyEvent, INITIAL } from "./streamState";
 import type { OrchestratorEvent } from "../types/api";
+import type { EntreeSecurite, EntreeValidateur } from "./streamState";
 
 function ev(over: Partial<OrchestratorEvent>): OrchestratorEvent {
   return {
@@ -95,9 +96,9 @@ describe("applyEvent — fil chronologique des passages (ticket-222)", () => {
     s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 2 } }));
 
     // Le verdict du reviewer du tour 1 doit rester dans les entrées.
-    const reviewerEntry = s.entries.find((e) => e.agent === "reviewer" && e.isDone);
+    const reviewerEntry = s.entries.find((e) => e.genre === "agent" && e.agent === "reviewer" && e.isDone);
     expect(reviewerEntry).toBeDefined();
-    expect(reviewerEntry?.content).toContain("CHANGES_REQUESTED");
+    expect(reviewerEntry?.genre === "agent" ? reviewerEntry.content : "").toContain("CHANGES_REQUESTED");
   });
 
   it("un run à deux tours produit quatre entrées dans l'ordre codeur, reviewer, codeur, reviewer", () => {
@@ -114,7 +115,94 @@ describe("applyEvent — fil chronologique des passages (ticket-222)", () => {
     s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "APPROVED" } }));
 
     expect(s.entries).toHaveLength(4);
-    expect(s.entries.map((e) => e.agent)).toEqual(["codeur", "reviewer", "codeur", "reviewer"]);
+    expect(s.entries.map((e) => (e.genre === "agent" ? e.agent : e.genre))).toEqual([
+      "codeur", "reviewer", "codeur", "reviewer",
+    ]);
+  });
+});
+
+describe("applyEvent — ticket_id depuis ev.ticket_id et run_closed (ticket-267)", () => {
+  it("lit le ticket_id au premier niveau de l'evenement, pas seulement dans data", () => {
+    // Le backend émet ticket_id en champ racine de l'événement ; data["ticket_id"]
+    // est un doublon de confort absent de certains backends.
+    const s = applyEvent(
+      INITIAL,
+      ev({
+        type: "pipeline_done",
+        ticket_id: "ticket-267",
+        data: { approved: true, rounds: 1, final_status: "done" },
+      }),
+    );
+    expect(s.lastResult?.ticket_id).toBe("ticket-267");
+  });
+
+  it("marque runClosed a true sur run_closed", () => {
+    const s = applyEvent(INITIAL, ev({ type: "run_closed" }));
+    expect(s.runClosed).toBe(true);
+  });
+
+  it("runClosed reste false apres pipeline_done", () => {
+    // Entre pipeline_done et run_closed, la livraison tourne encore.
+    const s = applyEvent(
+      INITIAL,
+      ev({
+        type: "pipeline_done",
+        ticket_id: "ticket-267",
+        data: { approved: true, rounds: 1, final_status: "done" },
+      }),
+    );
+    expect(s.runClosed).toBe(false);
+  });
+});
+
+describe("applyEvent — entrées securite et validateur dans le fil (ticket-257)", () => {
+  it("security_audit_done ajoute une EntreeSecurite avec le verdict", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "ok" } }));
+    s = applyEvent(s, ev({
+      type: "security_audit_done",
+      agent: null,
+      data: { verdict: "APPROVED", summary: "Aucune faille détectée.", issues_count: 0, reason: "" },
+    }));
+
+    expect(s.entries).toHaveLength(2);
+    const auditEntry = s.entries[1] as EntreeSecurite;
+    expect(auditEntry.genre).toBe("securite");
+    expect(auditEntry.verdict).toBe("APPROVED");
+    expect(auditEntry.summary).toBe("Aucune faille détectée.");
+    expect(auditEntry.isDone).toBe(true);
+  });
+
+  it("validation_done ajoute une EntreeValidateur avec ses critères", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "ok" } }));
+    s = applyEvent(s, ev({
+      type: "validation_done",
+      agent: null,
+      data: {
+        verdict: "CHANGES_REQUESTED",
+        feedback: "Deux critères échoués.",
+        criteria: [
+          { criterion: "Tests unitaires", passed: false, note: "Aucun test pour foo()." },
+          { criterion: "Typage", passed: true, note: "" },
+        ],
+      },
+    }));
+
+    expect(s.entries).toHaveLength(2);
+    const validEntry = s.entries[1] as EntreeValidateur;
+    expect(validEntry.genre).toBe("validateur");
+    expect(validEntry.verdict).toBe("CHANGES_REQUESTED");
+    expect(validEntry.feedback).toBe("Deux critères échoués.");
+    expect(validEntry.criteria).toHaveLength(2);
+    expect(validEntry.criteria[0]).toEqual({
+      criterion: "Tests unitaires",
+      passed: false,
+      note: "Aucun test pour foo().",
+    });
+    expect(validEntry.isDone).toBe(true);
   });
 });
 

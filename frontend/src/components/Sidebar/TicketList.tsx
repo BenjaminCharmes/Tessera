@@ -169,7 +169,8 @@ export default function TicketList({
             ) : null}
             <button
               onClick={onToggleKanban}
-              title={showKanban ? "Vue liste" : "Vue tableau"}
+              title={showKanban ? "Éditeur" : "Vue tableau"}
+              aria-label={showKanban ? "Éditeur" : "Vue tableau"}
               className={`w-6 h-6 flex items-center justify-center rounded text-sm transition-colors ${
                 showKanban
                   ? "bg-zinc-600 text-white"

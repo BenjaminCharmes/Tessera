@@ -65,7 +65,12 @@ class _GitHub(Protocol):
 
     async def get_pull_request_status(self, pr_number: int) -> Any: ...
 
-    async def merge_pull_request(self, pr_number: int) -> None: ...
+    async def merge_pull_request(
+        self,
+        pr_number: int,
+        method: str = "squash",
+        commit_title: str | None = None,
+    ) -> None: ...
 
 
 def _section(ticket_body: str, heading: str) -> str:
@@ -150,6 +155,7 @@ class GitHubWorkflowService:
         ticket_id: str,
         ticket_title: str,
         ticket_body: str,
+        ticket_type: str = "",
         autonome: bool = True,
     ) -> PullRequestResult:
         """Pousse la branche **puis** ouvre la PR.
@@ -187,8 +193,13 @@ class GitHubWorkflowService:
 
         await self._git.push_branch(branch)
 
+        pr_title = (
+            f"{ticket_type}: {ticket_id} — {ticket_title}"
+            if ticket_type
+            else f"{ticket_id} — {ticket_title}"
+        )
         pr_number, pr_url = await self._github.create_pull_request(
-            title=f"{ticket_id} — {ticket_title}",
+            title=pr_title,
             body=build_pr_body(
                 ticket_id, ticket_title, ticket_body, issue=self._issue_de(ticket_id)
             ),
@@ -287,8 +298,17 @@ class GitHubWorkflowService:
             )
             return False
 
-        await self._github.merge_pull_request(pr_number)
-        _logger.info("merge_effectue", extra={"pr": pr_number, "ci": ci})
+        # La méthode de merge vient de la politique figée avant le premier
+        # agent (ticket-265). Sans politique — geste manuel depuis l'IDE —,
+        # on revient au défaut système : squash.
+        merge_method = "squash"
+        if self._politique is not None:
+            merge_method = self._politique.merge_method
+        await self._github.merge_pull_request(pr_number, method=merge_method)
+        _logger.info(
+            "merge_effectue",
+            extra={"pr": pr_number, "ci": ci, "methode": merge_method},
+        )
         return True
 
 

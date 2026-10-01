@@ -1,7 +1,7 @@
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.json_extract import extract_json
@@ -22,6 +22,9 @@ _CODE_MAX_CHARS = 120_000
 Verdict = Literal["APPROVED", "CHANGES_REQUESTED"]
 
 _CHECKBOX_PREFIX = re.compile(r"^\s*-?\s*\[[ xX]?\]\s*")
+_QUOTES_AND_TICKS = re.compile(r'[`"\'«»“”‘’]')
+_PUNCTUATION_TAIL = re.compile(r"[.,;:!?]+$")
+_MULTI_SPACE = re.compile(r"\s+")
 
 
 @dataclass
@@ -98,7 +101,10 @@ class ValidatorService:
         code_produced: str,
         test_result: "TestResult | None",
     ) -> str:
-        criteria_block = "\n".join(f"- {c}" for c in criteria)
+        # Numérotation des critères pour que le LLM puisse rendre un `index`
+        criteria_block = "\n".join(
+            f"{i}. {c}" for i, c in enumerate(criteria, start=1)
+        )
         test_block = ""
         if test_result is not None:
             badge = "✅" if test_result.passed else "❌"
@@ -130,49 +136,89 @@ class ValidatorService:
                 feedback="Réponse du validateur non parseable.",
             )
 
-        raw_criteria = [
-            CriterionResult(
-                criterion=str(c.get("criterion", "")),
-                passed=bool(c.get("passed", False)),
-                note=str(c.get("note", "")),
-            )
-            for c in parsed.get("criteria", [])
-            if isinstance(c, dict)
-        ]
-
-        # Rapprochement par texte normalisé : chaque critère envoyé doit
-        # figurer dans la réponse avec passed: true pour que la validation
-        # soit approuvée. Un critère absent de la réponse LLM est ajouté en
-        # passed: false (ADR-039).
-        response_by_norm = {_normalize(c.criterion): c for c in raw_criteria}
-        criteria: list[CriterionResult] = []
-        for sent in sent_criteria:
-            norm = _normalize(sent)
-            if norm in response_by_norm:
-                criteria.append(response_by_norm[norm])
-            else:
-                criteria.append(
-                    CriterionResult(
-                        criterion=sent,
-                        passed=False,
-                        note="non jugé par le validateur",
-                    )
-                )
+        raw_entries = [c for c in parsed.get("criteria", []) if isinstance(c, dict)]
+        index_map, tolerant_map = _build_criterion_lookups(raw_entries, len(sent_criteria))
+        criteria = _reconcile_criteria(sent_criteria, index_map, tolerant_map)
 
         # Le verdict se recalcule depuis les critères réconciliés ; le champ
         # "verdict" du LLM est informatif mais ne pilote plus rien.
         all_passed = all(c.passed for c in criteria) if criteria else True
         verdict: Verdict = "APPROVED" if all_passed else "CHANGES_REQUESTED"
+        feedback = _build_feedback(str(parsed.get("feedback", "")), criteria)
 
         return ValidationResult(
             all_passed=all_passed,
             criteria=criteria,
             verdict=verdict,
-            feedback=str(parsed.get("feedback", "")),
+            feedback=feedback,
         )
+
+
+def _build_criterion_lookups(
+    raw_entries: list[dict[str, Any]],
+    n_criteria: int,
+) -> tuple[dict[int, CriterionResult], dict[str, CriterionResult]]:
+    """Build index-based and tolerant-text-based lookup maps from LLM response entries."""
+    index_map: dict[int, CriterionResult] = {}
+    tolerant_map: dict[str, CriterionResult] = {}
+    for entry in raw_entries:
+        cr = CriterionResult(
+            criterion=str(entry.get("criterion", "")),
+            passed=bool(entry.get("passed", False)),
+            note=str(entry.get("note", "")),
+        )
+        raw_idx = entry.get("index")
+        if isinstance(raw_idx, int) and 1 <= raw_idx <= n_criteria:
+            index_map[raw_idx] = cr
+        norm = _tolerant_normalize(cr.criterion)
+        if norm:
+            tolerant_map[norm] = cr
+    return index_map, tolerant_map
+
+
+def _reconcile_criteria(
+    sent_criteria: list[str],
+    index_map: dict[int, CriterionResult],
+    tolerant_map: dict[str, CriterionResult],
+) -> list[CriterionResult]:
+    """Match each sent criterion to an LLM response entry, by index then by text."""
+    criteria: list[CriterionResult] = []
+    for i, sent in enumerate(sent_criteria, start=1):
+        matched: CriterionResult | None = index_map.get(i)
+        if matched is None:
+            matched = tolerant_map.get(_tolerant_normalize(sent))
+        if matched is not None:
+            criteria.append(matched)
+        else:
+            criteria.append(
+                CriterionResult(
+                    criterion=sent,
+                    passed=False,
+                    note="non jugé par le validateur",
+                )
+            )
+    return criteria
+
+
+def _build_feedback(base_feedback: str, criteria: list[CriterionResult]) -> str:
+    """Prepend a warning to the feedback if any criterion was not judged."""
+    unjudged = sum(1 for c in criteria if "non jugé" in c.note)
+    if not unjudged:
+        return base_feedback
+    prefix = f"{unjudged} critère(s) absent(s) de la réponse du validateur. "
+    return prefix + base_feedback
 
 
 def _normalize(text: str) -> str:
     """Normalize a criterion text for matching: strip checkboxes and lowercase."""
     text = _CHECKBOX_PREFIX.sub("", text.strip())
+    return text.lower().strip()
+
+
+def _tolerant_normalize(text: str) -> str:
+    """Normalize tolerantly: strip checkboxes, backticks, quotes, trailing punctuation."""
+    text = _CHECKBOX_PREFIX.sub("", text.strip())
+    text = _QUOTES_AND_TICKS.sub("", text)
+    text = _PUNCTUATION_TAIL.sub("", text.strip())
+    text = _MULTI_SPACE.sub(" ", text)
     return text.lower().strip()

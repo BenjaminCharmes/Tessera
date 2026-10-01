@@ -1,4 +1,5 @@
 import AgentBadge from "../../design/AgentBadge";
+import InfoTip from "../../design/InfoTip";
 import { useMemo, useState } from "react";
 import MarkdownView from "../Editor/MarkdownView";
 import ModelPicker from "./ModelPicker";
@@ -117,7 +118,7 @@ function Definition({
                   onClick={() => setVue(cle)}
                   className={`rounded px-1.5 py-0.5 text-micro capitalize transition-colors ${
                     vue === cle
-                      ? "bg-violet-500/15 text-violet-200"
+                      ? "bg-violet-500/15 text-zinc-100"
                       : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
@@ -139,10 +140,12 @@ function Definition({
       {detail && (
         <>
           {projectId && <ModelPicker projectId={projectId} role={role} />}
-          <p className="border-b border-zinc-800 px-4 py-2 text-micro text-zinc-500">
-            Ce texte est envoyé en tête de chaque appel de cet agent. Il décide
-            de tout ce qu'il fait.
-          </p>
+          <div className="flex items-center gap-1 border-b border-zinc-800 px-4 py-2">
+            <span className="text-micro text-zinc-500">Prompt système</span>
+            <InfoTip>
+              {"Ce texte est envoyé en tête de chaque appel de cet agent. Il décide de tout ce qu'il fait."}
+            </InfoTip>
+          </div>
           {vue === "rendu" && (
             <div className="min-h-0 flex-1 overflow-auto">
               <MarkdownView source={detail.system_prompt} />
@@ -167,7 +170,7 @@ function Definition({
                     <button
                       type="button"
                       onClick={demanderConfirmation}
-                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400"
+                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-zinc-100 transition-colors hover:border-violet-400"
                     >
                       Enregistrer
                     </button>
@@ -203,7 +206,7 @@ function Definition({
                       type="button"
                       onClick={() => void confirmer()}
                       disabled={enregistrement}
-                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-violet-200 transition-colors hover:border-violet-400 disabled:opacity-50"
+                      className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-zinc-100 transition-colors hover:border-violet-400 disabled:opacity-50"
                     >
                       {enregistrement ? "Enregistrement…" : "Confirmer"}
                     </button>

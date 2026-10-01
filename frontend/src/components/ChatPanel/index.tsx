@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import type { Project } from "../../types/api";
 import { useChat } from "../../hooks/useChat";
 import ChatMessageView from "./ChatMessageView";
-import ConversationSidebar from "./ConversationSidebar";
 import ToolUseList from "./ToolUseList";
+import { IconCross, IconSend } from "../../design/icons";
 
 interface ChatPanelProps {
   project: Project | null;
+  /** La liste des conversations vit dans la colonne 2 (ticket-250). */
+  conversationId: string;
 }
 
 /**
@@ -17,16 +19,7 @@ interface ChatPanelProps {
  * pipeline, l'autre discute. Les écritures de l'agent sont commitées sur une
  * branche `chat-…` (ADR-019), jamais sur la branche courante.
  */
-export default function ChatPanel({ project }: ChatPanelProps) {
-  // Le choix retient le projet auquel il appartient : changer de projet
-  // retombe sur `default` sans effet ni rendu en cascade.
-  const [choix, setChoix] = useState<{ projet: string | null; id: string }>({
-    projet: null,
-    id: "default",
-  });
-  const projetId = project?.id ?? null;
-  const conversationId = choix.projet === projetId ? choix.id : "default";
-  const setConversationId = (id: string) => setChoix({ projet: projetId, id });
+export default function ChatPanel({ project, conversationId }: ChatPanelProps) {
   const chat = useChat(project?.id ?? null, conversationId);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
@@ -60,14 +53,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
   const budgetRatio = chat.maxUsd > 0 ? chat.spentUsd / chat.maxUsd : 0;
 
   return (
-    <div className="h-full flex bg-zinc-900">
-      <ConversationSidebar
-        projectId={project.id}
-        activeId={conversationId}
-        onSelect={setConversationId}
-        onNew={() => setConversationId(`conv-${Date.now()}`)}
-      />
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden bg-zinc-900">
       <header className={`${BAND} justify-between gap-2 border-b border-zinc-800 px-3`}>
         <span className="text-xs font-medium text-zinc-300">
           Chat — {project.id}
@@ -160,7 +146,7 @@ export default function ChatPanel({ project }: ChatPanelProps) {
             className="text-amber-500 hover:text-amber-300"
             aria-label="Masquer l'erreur"
           >
-            ×
+            <IconCross size={12} />
           </button>
         </div>
       )}
@@ -175,33 +161,36 @@ export default function ChatPanel({ project }: ChatPanelProps) {
         <label htmlFor="chat-input" className="sr-only">
           Message
         </label>
-        <textarea
-          id="chat-input"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) submit(e);
-          }}
-          rows={2}
-          placeholder={
-            chat.status === "connecting"
-              ? "Connexion…"
-              : "Écris ton message (Entrée pour envoyer)"
-          }
-          disabled={chat.status === "connecting"}
-          className="w-full resize-none rounded-sm bg-zinc-800 px-2 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 outline-hidden focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
-        />
-        <div className="mt-1.5 flex justify-end">
+        <div className="flex items-end gap-2">
+          <textarea
+            id="chat-input"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) submit(e);
+            }}
+            rows={2}
+            placeholder={
+              chat.status === "connecting"
+                ? "Connexion…"
+                : "Écris ton message (Entrée pour envoyer)"
+            }
+            disabled={chat.status === "connecting"}
+            className="flex-1 resize-none rounded-sm bg-zinc-800 px-2 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 outline-hidden focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
+          />
           <button
             type="submit"
             disabled={!canSend}
-            className="rounded-sm bg-zinc-700 px-3 py-1 text-xs text-zinc-100 hover:bg-zinc-600 disabled:opacity-40 disabled:hover:bg-zinc-700"
+            title="Envoyer (Entrée)"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-sm bg-violet-700 text-white hover:bg-violet-600 disabled:opacity-40 disabled:hover:bg-violet-700"
           >
-            {thinking ? "…" : "Envoyer"}
+            <IconSend size={16} />
+            <span className="sr-only">
+              {thinking ? "Envoi en cours" : "Envoyer"}
+            </span>
           </button>
         </div>
       </form>
-      </div>
     </div>
   );
 }

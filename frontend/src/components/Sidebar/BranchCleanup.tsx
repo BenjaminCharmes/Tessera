@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import InfoTip from "../../design/InfoTip";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import type { PlanDeNettoyage } from "../../types/api";
@@ -69,17 +70,19 @@ export default function BranchCleanup({ projectId }: BranchCleanupProps) {
               </li>
             ))}
           </ul>
-          <p className="mb-2 text-micro text-zinc-500">
-            Elles ne contiennent rien qui ne soit déjà dans la base.
-          </p>
-          <button
-            type="button"
-            onClick={() => void supprimer()}
-            disabled={enCours}
-            className="rounded-sm border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100 disabled:opacity-50"
-          >
-            {enCours ? "Suppression…" : `Supprimer ${plan.nettoyables.length}`}
-          </button>
+          <div className="mb-2 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void supprimer()}
+              disabled={enCours}
+              className="rounded-sm border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100 disabled:opacity-50"
+            >
+              {enCours ? "Suppression…" : `Supprimer ${plan.nettoyables.length}`}
+            </button>
+            <InfoTip>
+              Elles ne contiennent rien qui ne soit déjà dans la base.
+            </InfoTip>
+          </div>
         </>
       )}
 

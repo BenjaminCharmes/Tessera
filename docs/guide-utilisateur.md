@@ -228,6 +228,10 @@ Trois points importants :
   du codeur. Ils valident l'implémentation, pas l'intention.
 - **Chaque run a sa propre branche git.** Ton travail en cours n'est jamais écrasé.
 
+Les fichiers de verrouillage (`uv.lock`, `package-lock.json`, `pnpm-lock.yaml`,
+`yarn.lock`, `poetry.lock`, `Cargo.lock`) apparaissent résumés dans ce diff
+pour que le vrai changement reste visible. Le commit, lui, les contient intégralement.
+
 ### Si le reviewer n'est pas d'accord
 
 Il renvoie `CHANGES_REQUESTED` avec sa raison, et le codeur repart pour un tour en
@@ -264,6 +268,17 @@ Les statuts que tu verras passer :
 
 ---
 
+### Quand les étapes du pipeline s'affichent dans le log
+
+Pendant un run, des étapes du pipeline s'exécutent et émettent des événements affichés dans le log pour que tu saches où tu en es :
+
+- **Audit de sécurité lancé** et **Audit de sécurité terminé** — si bloqué, le verdict s'ajoute à la deuxième ligne
+- **Validation lancée** et **Validation terminée** — suivi de l'indication « approuvé » ou pas
+- **Documentation lancée** et **Documentation mise à jour** — quand les docs du projet changent
+- **Livraison lancée** — affiché juste avant l'ouverture de la PR
+
+Tu les lis dans le même panneau que les agents, dans l'ordre où elles se produisent.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -280,6 +295,8 @@ L'écran se lit en quatre colonnes :
 | **Le centre** | le tableau des tickets par défaut ; un fichier si tu en ouvres un |
 | **La droite** | suivre un run (Agents) ou discuter (Chat) |
 
+**Changer de projet** : le sélecteur en haut de la colonne te permet de passer d'un projet à l'autre. Tu restes sur l'onglet actuellement ouvert — par exemple, si tu consultais les Statistiques du projet A, passer au projet B te garde sur les Statistiques. Seule exception : si tu ouvres un projet depuis l'onglet Projets, tu vas aux Tickets de ce projet.
+
 Les actions d'un projet — ouvrir dans VSCode, lier un dépôt, choisir le mode des
 artefacts, retirer le projet — sont dans l'en-tête, qui ne défile jamais.
 
@@ -291,6 +308,43 @@ par ticket. C'est le panneau à regarder après tes premiers runs : il donne
 l'échelle réelle, qui est rarement celle qu'on imagine.
 
 ---
+
+
+### Fermer un run achevé
+
+Une fois qu'un run est entièrement complété — sa revue approuvée et sa livraison effectuée (le cas échéant) — tu vois un bouton « Fermer » dans le résumé. Un clic le retire du panneau de Supervision pour dégager l'écran et passer aux tickets en cours ou suivants.
+
+### La frise d'étapes
+
+En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
+
+Les couleurs :
+- **Bleu** : cette étape tourne en ce moment
+- **Vert** : elle est finie, tout a été accepté
+- **Rouge** : elle a refusé quelque chose (audit bloque, validation n'approuve pas)
+- **Gris** : elle n'a pas encore commencé
+
+Les étapes du pipeline sont **sécurité**, **revue**, **validation**, **documentation** et **livraison**. Si le projet n'en active pas une (par exemple pas d'audit de sécurité), sa pastille ne s'affiche pas.
+
+La pastille en bleu te dit en un coup d'œil où tu en es, sans lire le log ni quitter l'IDE.
+
+### Le fil du run : tous les verdicts en un seul endroit
+
+Quand tu observes un run qui a tourné plusieurs fois, tu vois maintenant un seul fil chronologique complet. Ce fil affiche tous les passages — codeur, reviewer, et maintenant aussi **sécurité** et **validateur**. C'est ce fil qui t'explique pourquoi le codeur repart tourner.
+
+**Exemple** : le reviewer approuve au tour 1, mais le validateur refuse car un critère d'acceptation n'est pas satisfait. Le fil du run affiche :
+
+1. Codeur — Tour 1
+2. Reviewer — Tour 1 — ✓ APPROVED
+3. **Sécurité — Tour 1** — ✓ Audit passé
+4. **Validateur — Tour 1 — ✗ Changements demandés**
+5. Codeur — Tour 2 (repart pour corriger)
+
+Ce que tu vois dans le fil pour chaque verdict :
+- **Sécurité** : son verdict (approuvé ou bloquant) et un résumé de ses findings
+- **Validateur** : son verdict (approuvé ou changements demandés), puis en détail, pour chaque critère d'acceptation du ticket, son état (✓ réussi / ✗ échoué) et la note du validateur
+
+Ce fil est le même partout — que tu regardes dans la **Supervision** (onglet Agents) ou dans l'**onglet du run**, tu vois l'histoire complète. Plus besoin de chercher dans les logs : tu sais d'un coup d'œil pourquoi le codeur repart.
 
 ## 6. Récupérer le travail des agents
 
@@ -377,6 +431,12 @@ pathlib » : ça infléchit la suite sans interrompre ce qui est en cours.
 Les deux ne se confondent jamais. Une consigne envoyée pendant qu'une question
 est posée ne vaut pas réponse à cette question — sinon un « au fait, pense aux
 tests » deviendrait la réponse à « on casse l'API ? ».
+
+#### Trouver où répondre : les runs en attente d'abord
+
+Lorsque plusieurs agents tournent en parallèle, ceux qui t'attendent — qui ont posé une question — sont affichés en premier dans la Supervision. Sur chaque carte « attend une réponse », un bouton « Répondre » te sélectionne le run et te place directement dans le champ de réponse. Tu n'as pas à chercher.
+
+Si tu choisis une autre carte explicitement pour la lire, ta sélection y reste stable — elle ne bascule pas si un autre run demande quelque chose pendant ce temps.
 
 ### Le chat, hors pipeline
 
@@ -484,8 +544,10 @@ Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
 
 - **Import d'issues** → chaque issue devient un ticket
 - **Synchronisation bidirectionnelle** tickets ↔ issues
-- **Création de PR** depuis un ticket terminé
+- **Création de PR** depuis un ticket terminé — le titre respecte le format Conventional Commits, avec le type du ticket (par exemple `feat: ticket-007 — Ajouter un endpoint de santé`)
 - **Statut CI** de la PR remonté dans l'UI
+
+Une PR approuvée peut être mergée automatiquement une fois que la CI passe au vert, selon la configuration du projet. La livraison attend jusqu'à 2 minutes que les checks CI soient enregistrés par GitHub — l'absence momentanée de checks n'est pas interprétée comme un verdict favorable.
 
 ---
 
@@ -515,6 +577,10 @@ continueront d'y partir. L'IDE te le signale.
 Le code produit par les agents, lui, n'est jamais exclu : c'est ce que tu livres.
 
 ---
+
+### Cadrages et artefacts locaux
+
+Ton cadrage (ticket `design`) crée de nouvelles décisions dans `memory/decisions.md` ou des tickets dans `tickets/todo/`. Si ton projet garde ces artefacts locaux (non versionnés), ces fichiers ne sont jamais commitées — ils restent chez toi. Cependant, le reviewer et le validateur les voient quand même, car le diff relu inclut un résumé textuel des changements. Ton cadrage peut donc être approuvé et mis en œuvre même s'il ne crée ni ne modifie aucun fichier du code.
 
 ## 11. Configuration
 

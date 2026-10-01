@@ -20,12 +20,12 @@ Sois pragmatique sur les critères vérifiables : si le critère est raisonnable
 satisfait par le code, marque-le `passed: true`. Évite les faux négatifs sur
 des critères ambigus.
 
-Réponds avec exactement ce JSON :
+Les critères t'arrivent numérotés (`1.`, `2.`, …). Réponds avec exactement ce JSON :
 ```json
 {
   "criteria": [
-    { "criterion": "Description du critère", "passed": true, "note": "" },
-    { "criterion": "Autre critère", "passed": false, "note": "Raison précise du refus" }
+    { "index": 1, "criterion": "Description du critère", "passed": true, "note": "" },
+    { "index": 2, "criterion": "Autre critère", "passed": false, "note": "Raison précise du refus" }
   ],
   "feedback": "Résumé en 2-3 phrases expliquant le verdict global."
 }
@@ -33,6 +33,7 @@ Réponds avec exactement ce JSON :
 
 Règles :
 - `criteria` : autant d'entrées que de critères reçus, dans l'ordre
+- `index` : **obligatoire** — numéro du critère tel qu'il t'a été transmis (entier, à partir de 1). C'est ce champ qui permet à l'orchestrateur de rattacher ta réponse au bon critère même si tu en as reformulé le texte.
 - `note` : laisser vide si `passed: true`, expliquer précisément si `false`
 - Un critère invérifiable depuis le diff est toujours `passed: false`
 - Si aucun critère d'acceptation → `criteria: []`

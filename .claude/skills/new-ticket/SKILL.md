@@ -109,11 +109,22 @@ backend **et** frontend avec plus de six critères se découpe — le ticket-213
 (quatre changements, neuf critères, deux couches) a épuisé ses trente actions
 avant d'avoir fini.
 
+## Ce qu'aucun agent ne peut écrire
+
+Le garde-fou refuse à tout agent l'écriture dans `.github/workflows/`,
+`.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`), `.git/` et
+`agents.json` (ADR-027, ticket-240). Un ticket dont le livrable vit là se fait
+**à la main** : lancé dans le pipeline, il tourne trois tours sur un diff vide
+et se bloque (tickets 001 de `carriere`/`freelance` pour la CI, ticket-276 pour
+un skill, le 2026-09-30). Le ticket peut porter la partie autorisée — un test,
+du code — et dire que le reste est manuel.
+
 ## Avant de valider
 
 - [ ] Le fichier est dans le dossier qui correspond à son champ `status`
 - [ ] Chaque valeur de frontmatter est dans la liste autorisée
 - [ ] Chaque critère d'acceptation se tranche par oui/non
 - [ ] `depends_on` contient des ids existants
+- [ ] Aucun livrable ne vit dans un chemin qu'un agent ne peut pas écrire
 - [ ] Si le ticket doit toucher `CLAUDE.md`, il le dit **explicitement**
       (règle 5 : aucune modification sans ticket qui l'autorise)

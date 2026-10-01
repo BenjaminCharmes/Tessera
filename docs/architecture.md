@@ -81,7 +81,7 @@ appels d'un pipeline.
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé deux correctifs, tous deux nés d'un usage réel :
+Cette promesse a demandé cinq correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -93,6 +93,26 @@ Cette promesse a demandé deux correctifs, tous deux nés d'un usage réel :
   `git merge`, `git push` sans passer par elle — ce qu'il a fait, jusqu'à
   pousser sur `main`. Un hook `PreToolUse` refuse maintenant toute
   sous-commande git qui écrit. Le git en lecture reste permis.
+- **Les lockfiles sont résumés dans le diff relu** (ticket-272). Quand un run
+  modifie un fichier de verrouillage connu — `uv.lock`, `package-lock.json`,
+  `pnpm-lock.yaml`, `yarn.lock`, `poetry.lock`, `Cargo.lock` — le diff relu ne
+  porte qu'une ligne de résumé : `<chemin> : fichier de verrouillage modifié,
+  N lignes ajoutées, M supprimées`. Cela évite que des milliers de lignes noient
+  les changements réels du ticket. Le commit, lui, porte le lockfile en entier.
+- **Artefacts dans le matériau relu** (ticket-274). Les fichiers de mémoire 
+  et de tickets — `memory/decisions.md`, `tickets/todo/`, etc. — ne sont ni 
+  versionnés (mode `artifacts: local`) ni inclus au diff relu standard 
+  (mode `artifacts: tracked`). Or, un ticket de cadrage crée justement des 
+  décisions et des tickets qui doivent être jugés par le reviewer et le 
+  validateur. Le pipeline transmet désormais ces artefacts au matériau relu, 
+  sans les committer.
+- **Fichiers vidés détectés et signalés** (ticket-277). Si le codeur vide un
+  fichier suivi au lieu de le supprimer (par oubli du `rm`), le pipeline
+  signale le fichier vidé dans le rapport du run — un événement ou une ligne de
+  log lisible à l'écran — sans bloquer le commit. Seul un fichier suivi
+  **ramené à vide** est signalé ; un fichier vide créé initialement ne l'est
+  pas. Cette détection aide à repérer les suppressions mal faites avant qu'elles
+  n'échouent en CI.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
@@ -119,10 +139,23 @@ un run suspendu tient du travail non commité, et bloquerait la file des tickets
 ### Système visuel du frontend (ADR-026)
 
 `frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :
-`icons.tsx` (un seul jeu, une grille de 24), `layout.ts` (la hauteur unique des
-bandes d'en-tête), `RegionTitle.tsx`. Cinq familles de couleurs ont chacune un
+`icons.tsx` (un seul jeu, grille de 24, trait 1.5), `layout.ts` (la hauteur unique des
+bandes d'en-tête), `RegionTitle.tsx`, `InfoTip.tsx`, `StageStrip.tsx`. Cinq familles de couleurs ont chacune un
 rôle d'état — neutre, échec, attente, succès, activité — et `violet` sert
 uniquement au repérage.
+
+`InfoTip` sépare les **explications** — affichées au survol et au focus d'une icône
+button, `role="tooltip"` — des **états** et **appels à l'action** qui restent toujours visibles.
+L'icône est liée au texte par `aria-describedby`. Ses couleurs sont zinc, pas de violet
+en texte.
+
+`StageStrip` (depuis ticket-256) affiche l'état de chaque étape du pipeline du run — 
+production, sécurité, revue, validation, documentation, livraison — en tête du panneau 
+Agents. Chaque pastille représente une étape, avec trois états : faite (`green`), en cours 
+(`blue`), à venir (`zinc`). Une étape désactivée pour le projet n'a pas de pastille. Un 
+refus de l'audit sécurité ou une validation rejetée passent la pastille correspondante en 
+`red`. L'étape en cours se déduit d'abord du champ `etape` dans l'instantané du run, puis 
+estrichie par les événements reçus au fil de l'exécution.
 
 `coherence.test.ts` verrouille les trois règles : il lit les sources et échoue
 à la première réintroduction d'une couleur bannie, d'une taille de texte
@@ -204,6 +237,100 @@ arbitraire ou d'un glyphe utilisé comme affordance.
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
 
+## Livraison (ADR-029, ADR-030)
+
+Après approbation du pipeline, la livraison s'enchaîne automatiquement — rebase 
+sur la branche de base, ouverture de la PR, attente de CI si exigée, merge — 
+jusqu'où le projet l'autorise.
+
+### Branche de base configurable
+
+Un projet peut déclarer sa propre branche de base dans `agents.json`, champ 
+`"base_branch"`. Par défaut (champ absent), on utilise `settings.github_base_branch` 
+défini par la variable d'environnement `GITHUB_BASE_BRANCH` (défaut : `develop`).
+
+Cette branche de base affecte :
+- Le **rebase** de la branche du ticket avant l'ouverture de la PR
+- La **cible** de la PR ouverte (elle vise cette branche)
+- L'**avancement de la ref de base** après merge — seul un ticket approuvé en fait 
+  avancer la ref, que le ticket suivant forkera
+
+### Délai de grâce pour l'enregistrement des checks
+
+GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
+d'une PR. Une interrogation immédiate retournerait `none` (aucun check enregistré), 
+qu'ADR-029 traite comme l'absence de CI — un verdict qui arrêterait la livraison.
+
+Pour éviter cette fausse absence, `LivraisonService._attendre_la_ci` applique 
+un **délai de grâce** de 120 secondes (`grace_ci_s`, injectable au constructeur) :
+
+- **Pendant le délai** : `none` se traite comme `pending` → continue d'attendre
+- **Après le délai** : `none` devient un verdict final → livraison s'arrête
+- **État `failing`** : arrête immédiatement, même pendant le délai
+
+Un projet sans CI configurée attend donc ces 120 secondes supplémentaires avant 
+abandon. Une configuration permet de contourner cette vérification pour les 
+projets qui souhaitent merger malgré l'absence de CI.
+
+
+### Méthode de merge configurable
+
+Une PR de ticket est mergée selon la méthode déclarée dans `agents.json` du 
+projet, champ `merge_method` (`squash`, `merge`, `rebase`). **Absent ou inconnu :
+`squash`** — une PR est condensée en un seul commit.
+
+En squash, le titre du commit reprend celui de la PR (conforme au format
+Conventional Commits depuis le ticket-259) suivi du numéro `(#N)` — par exemple,
+`feat: ticket-007 — Ajouter un endpoint (#42)`.
+
+### Suivi après l'ouverture de la PR
+
+Dès qu'une PR est ouverte, elle se voit assigner un `pr_number`. Celui-ci est écrit
+dans le fichier du ticket et commité **avant** le merge de la PR, garantissant que
+le `pr_number` remonte à la branche de base lors du merge. Aucun suivi n'est écrit
+après le merge : la branche du ticket ne reçoit pas de commit une fois fusionnée.
+
+
+### Mise à jour de la base distante après merge en file
+
+Quand la livraison opère en **mode file** (`queue`) sur un projet avec
+`autonomy: merge`, le ticket suivant doit partir d'une base à jour. Après qu'une
+livraison a mergé sa PR :
+
+- Un `fetch` met à jour les références locales depuis le serveur
+- La branche locale de base avance jusqu'au commit distant (avance rapide seulement)
+- `_base_ref` est repositionné sur ce nouveau commit
+
+Le ticket suivant forkera depuis ce commit, non depuis la branche du ticket
+précédent. Un rebase n'aura donc pas de conflit factice avec le squash du ticket
+précédent, déjà fusionné sur la branche de base distante.
+
+**Cas non mergés** : Cette mise à jour ne s'applique qu'après une livraison
+**mergée**. Après une livraison non mergée — CI rouge, niveau PR ou commit — le
+ticket suivant part du ticket précédent, ce qui permet à un plan séquentiel
+d'avancer malgré les obstacles (ADR-018).
+
+**Divergence** : Si la branche locale et distante divergent hors d'une avance
+rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
+
+## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
+
+Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`
+applique un contrôle : la `TermesInterditsService` rejette tout terme déclaré dans
+`FORBIDDEN_TERMS` s'il apparaît dans le diff, les messages de commit, ou les
+auteurs. L'exception : un projet marqué `"confidentiality": "professional"` en
+`agents.json` contourne ce contrôle.
+
+Deux étapes complètent la protection hors du pipeline :
+
+1. **Hook pre-push** (`make install-hooks`) : rejette les commits manuels
+   violant les termes.
+2. **Job CI** (`.github/workflows/ci.yml`) : refuse la PR si `FORBIDDEN_TERMS`
+   est absent (erreur de configuration) ou si une violation est détectée.
+
+En local, une liste vide désactive le contrôle. En CI, son absence bloque le
+merge — c'est intentionnel.
+
 ## Couche SQLite (ticket-015)
 
 SQLite est une couche **cache/historique** — les fichiers Markdown restent la source de vérité (ADR-003).
@@ -214,6 +341,7 @@ CREATE TABLE pipeline_runs (
     id           TEXT PRIMARY KEY,   -- UUID
     project_id   TEXT NOT NULL,
     ticket_id    TEXT NOT NULL,
+    mode         TEXT NOT NULL DEFAULT 'single', -- 'single' | 'queue' | 'autonomous'
     started_at   TEXT NOT NULL,      -- ISO 8601
     finished_at  TEXT,
     rounds       INTEGER,
@@ -247,6 +375,8 @@ CREATE TABLE agent_calls (
     provider          TEXT NOT NULL DEFAULT ''    -- ajoutée par migration
 );
 ```
+
+**Mode et statistiques** : la colonne `mode` (ajoutée par migration depuis ticket-263) distingue les runs de tickets (`single`) des enveloppes de pipeline (`queue` pour une file, `autonomous` pour un run autonome). Les statistiques — nombre de runs, taux d'aboutissement, runs récents — n'incluent que les lignes `mode = 'single'` ; les enveloppes sont conservées pour tracer les événements WebSocket, mais ne comptent pas dans les totaux. Les coûts et tokens restent attachés aux appels d'agents enregistrés dans `agent_calls`, pas à la ligne d'enveloppe.
 
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
@@ -317,8 +447,9 @@ Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
 {
   "type": "agent_started | agent_token | agent_tool_use | agent_done | branch_created |
            ticket_status_changed | test_result | security_audit_started |
-           security_audit_done | validation_done | doc_updated | commit_created |
-           pipeline_done | error",
+           security_audit_done | validation_started | validation_done | 
+           documentation_started | doc_updated | livraison_started | 
+           commit_created | pipeline_done | error",
   "agent": "codeur | reviewer | testeur | securite | validateur | doc-technique | doc-fonctionnelle | null",
   "ticket_id": "ticket-007",
   "data": { "round": 1, "token": "def foo", "status": "in-progress", "approved": true },

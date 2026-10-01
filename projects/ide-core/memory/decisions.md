@@ -232,9 +232,9 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-09-17
 **Portée** : codeur, reviewer
-**Décision** : les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** — titre de région, élément actif, nom du projet. Bandes d'en-tête de hauteur unique, tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
+**Décision** : les **états** n'utilisent que `zinc` (neutre), `red` (échec), `amber` (attente), `green` (succès), `blue` (activité) ; `violet` sert à l'**identité** et à l'**interaction** — titre de région, sélection, action principale. Bandes d'en-tête de hauteur unique, tailles de texte nommées, affordances dans `design/icons.tsx`. Un test verrouille ces règles.
 **Raison** : l'UI avait dérivé vers huit familles, trois tailles en dur et des glyphes de jeux différents. Personne n'avait choisi huit couleurs : chaque ticket prenait la sienne, et sans mesure la dérive ne se voit qu'une fois qu'elle saute aux yeux.
-**Conséquence** : l'accent d'identité est une **barre**, jamais la couleur d'un mot — du violet sur du texte se lirait comme un état de plus.
+**Conséquence** : le violet s'emploie en **fond ou en barre**, jamais en couleur de texte — du violet sur un mot se lirait comme un état de plus. Seule exception, les liens soulignés du Markdown rendu, définis dans `index.css` (amendé 2026-09-30, ticket-248).
 
 ## ADR-027 — Les agents ne touchent pas à l'historique git
 
@@ -452,7 +452,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 ## ADR-050 — Un terme interdit est arrêté à trois portes, et une porte qui n'a pas pu juger refuse
 
 **Date** : 2026-09-29
-**Décision** : `FORBIDDEN_TERMS` (`.env`, jamais versionné) est contrôlé au push du pipeline (ADR-048), par un hook `pre-push` pour les pushes manuels, et en CI sur chaque PR — titre et corps compris — avec la liste en secret GitHub. Le job CI est requis par la protection de `develop` et `main`. Liste absente ou git en échec : refus. Avant toute publication, `scripts/scan_historique.py` couvre l'historique et les métadonnées GitHub.
-**Raison** : une seule porte se contourne sans le vouloir : push à la main, agent d'une autre session, corps de PR.
-**Alternative rejetée** : la CI seule — elle voit la PR après le push, quand la branche est déjà publique.
+**Décision** : `FORBIDDEN_TERMS` (`.env`, jamais versionné) est contrôlé au push du pipeline, par un hook `pre-push` en manuel, et en CI sur chaque PR — titre et corps compris — liste en secret GitHub, job requis par la protection des branches. Git en échec : refus, partout. Liste absente : refus en CI, où le secret se déclare ; en local, aucun contrôle (ADR-048), un clone neuf pousse (amendé 2026-09-29). Avant publication, `scripts/scan_historique.py` couvre l'historique et les métadonnées GitHub.
+**Raison** : une seule porte se contourne sans le vouloir : push manuel, agent d'une autre session, corps de PR.
+**Alternative rejetée** : la CI seule — elle voit la PR quand la branche est déjà publique.
 **Conséquence assumée** : la liste vaut partout, son périmètre se déclare — `confidentiality: professional`, un CV qui cite ses employeurs.
