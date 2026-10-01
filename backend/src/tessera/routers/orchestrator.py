@@ -54,6 +54,21 @@ router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
 # verrou que `/chat/run` (ticket-121).
 _RUN_LOCK = RUN_LOCK
 
+
+def _tours_du_role(role: str) -> int | None:
+    """Returns the max_turns budget for a given pipeline role (ticket-297).
+
+    The plan role must read the codebase to decide on an approach — it does not
+    have the diff in its prompt. The reviewer has the diff and only needs to look
+    around. Other roles get the global default (None → settings.llm_max_turns).
+    """
+    if role == ROLE_PLAN:
+        return settings.llm_max_turns_plan
+    if role == "reviewer":
+        return settings.llm_max_turns_reviewer
+    return None
+
+
 _OPEN_STATUSES = {
     TicketStatus.todo,
     TicketStatus.in_progress,
@@ -155,13 +170,12 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # deux fois.
     def _par_role(role: str) -> LLMProvider:
         # Le plan lit comme le reviewer : il prépare le code, il ne l'écrit pas
-        # (ticket-243).
+        # (ticket-243). Chacun a son propre budget de tours (ticket-297).
         lecture = role in ("reviewer", ROLE_PLAN)
         outils = OUTILS_DE_RELECTURE if lecture else None
-        tours = settings.llm_max_turns_reviewer if lecture else None
         inner = provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
-            project_id=project_id, max_turns=tours,
+            project_id=project_id, max_turns=_tours_du_role(role),
         )
         return inner
 

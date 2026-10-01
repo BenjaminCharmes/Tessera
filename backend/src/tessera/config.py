@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     # qu'on lui a collé, c'est un budget de codeur donné à un lecteur
     # (ticket-199).
     llm_max_turns_reviewer: int = 10
+    # Le plan lit les services pour décider d'une approche : il n'a pas le
+    # diff dans son prompt et doit découvrir la base de code. Dix tours
+    # échouaient systématiquement sur les tickets de taille ordinaire
+    # (ticket-297).
+    llm_max_turns_plan: int = 25
     # Relevé de 1.0 à 2.0 (ticket-102) : le premier run réel de ce dépôt a
     # atteint le plafond au milieu du tour d'un codeur, sur un ticket de taille
     # ordinaire. Un garde-fou qu'une tâche normale déclenche ne borne pas un

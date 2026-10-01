@@ -32,6 +32,12 @@ def test_settings_llm_max_budget_usd_par_defaut_non_none() -> None:
     assert budget > 0
 
 
+def test_settings_llm_max_turns_plan_par_defaut() -> None:
+    # Le plan doit lire les services pour décider d'une approche : dix tours
+    # échouaient systématiquement (ticket-297).
+    assert Settings(_env_file=None).llm_max_turns_plan == 25
+
+
 def test_settings_llm_max_turns_surchargeable(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LLM_MAX_TURNS", "10")
     assert Settings(_env_file=None).llm_max_turns == 10

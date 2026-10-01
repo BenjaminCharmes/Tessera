@@ -11,7 +11,8 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.routers.orchestrator import _build_orchestrator, _build_project_context
+from tessera.routers.orchestrator import _build_orchestrator, _build_project_context, _tours_du_role
+from tessera.services.pipeline_plan import ROLE_PLAN
 
 
 @pytest.fixture(autouse=True)
@@ -124,3 +125,32 @@ async def test_project_context_conserve_claude_md_sur_le_provider_api(
     context = await _build_project_context("mon-projet")
 
     assert "MARQUEUR_CLAUDE_MD_UNIQUE" in context
+
+
+# ------------------------------------------------------------------
+# Budget de tours par rôle — ticket-297
+# ------------------------------------------------------------------
+
+
+def test_le_plan_recoit_son_propre_budget_de_tours() -> None:
+    # Le plan devait lire les services pour décider d'une approche — il
+    # recevait llm_max_turns_reviewer (10) et échouait systématiquement
+    # (ticket-297).
+    assert _tours_du_role(ROLE_PLAN) == settings.llm_max_turns_plan
+
+
+def test_le_reviewer_garde_son_budget_reduit() -> None:
+    # Le reviewer a le diff dans son prompt : dix tours suffisent à regarder
+    # autour. Ce budget ne doit pas changer avec ticket-297 (ticket-199).
+    assert _tours_du_role("reviewer") == settings.llm_max_turns_reviewer
+
+
+def test_le_codeur_n_a_pas_de_budget_specifique() -> None:
+    # Les autres rôles obtiennent None : provider_pour_role applique alors
+    # settings.llm_max_turns (30).
+    assert _tours_du_role("codeur") is None
+
+
+def test_plan_et_reviewer_ont_des_budgets_distincts() -> None:
+    # Régression : avant ticket-297 les deux recevaient llm_max_turns_reviewer.
+    assert _tours_du_role(ROLE_PLAN) != _tours_du_role("reviewer")

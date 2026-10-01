@@ -6,7 +6,11 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 |----------|--------|---------|-------------|
 | `LLM_PROVIDER` | | `agent_sdk` | `agent_sdk` (abonnement Claude) ou `anthropic_api` (crédits API) |
 | `ANTHROPIC_API_KEY` | si `anthropic_api` | — | Clef API Anthropic — inutile en mode `agent_sdk` |
-| `LLM_MAX_TURNS` | | `30` | Plafond d'allers-retours outil pour un agent |
+| `LLM_MAX_TURNS` | | `30` | Plafond d'allers-retours outil pour un agent (défaut global) |
+| `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'actions du reviewer dans la boucle de révision |
+| `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'actions du tour de cadrage (planification de tickets) |
+| `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'allers-retours outil pour le reviewer (lecture et critique du diff) |
+| `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'allers-retours outil pour le tour de plan (lecture seule) |
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond cumulé d'un run autonome (`0` = aucun) |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |

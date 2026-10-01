@@ -1,14 +1,14 @@
 ---
-id: ticket-297
-title: "The plan turn has its own turn budget instead of the reviewer's"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-01
+id: ticket-297
+pr_number: 186
+priority: medium
+status: done
+title: The plan turn has its own turn budget instead of the reviewer's
+type: fix
 ---
 
 # ticket-297 — Le tour de plan a son propre budget d'actions
