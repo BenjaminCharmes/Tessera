@@ -5,7 +5,7 @@
   "services": [
     {
       "nom": "backend",
-      "commande": "uv run uvicorn tessera.main:app --host 127.0.0.1 --port 8000",
+      "commande": "uv run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8000",
       "cwd": "../../backend"
     },
     {
