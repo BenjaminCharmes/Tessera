@@ -1,14 +1,15 @@
 ---
-id: ticket-258
-title: "Drop the unused per-project usage fetch, and show the stats scope actually applied"
-type: refactor
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-258
+pr_number: 151
+priority: medium
+status: done
+title: Drop the unused per-project usage fetch, and show the stats scope actually
+  applied
+type: refactor
 ---
 
 # ticket-258 — Retirer la lecture d'usage devenue morte, afficher la portée réelle

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useActiveProject } from "./useActiveProject";
 import { useTickets } from "./useTickets";
 import { useRuns } from "./useRuns";
-import { useUsage } from "./useUsage";
 import { useToast } from "./useToast";
 import { useProjects } from "./useProjects";
 import { useServices } from "./useServices";
@@ -32,6 +31,20 @@ export function panelAfterProjectSwitch(
   current: SidebarPanel,
 ): SidebarPanel {
   return current === "projects" ? "tickets" : current;
+}
+
+/**
+ * Returns the effective statistics scope — ticket-258.
+ *
+ * When no project is active there is nothing to scope to: the effective scope
+ * is always "tous", regardless of the user's prior selection.  When a project
+ * is active the user's explicit choice is honoured.
+ */
+export function porteeEffectiveFor(
+  project: { id: string } | null,
+  statsPortee: "projet" | "tous",
+): "projet" | "tous" {
+  return project === null ? "tous" : statsPortee;
 }
 
 /**
@@ -155,15 +168,14 @@ export function useCockpit() {
   const agentsDesTickets = Array.from(
     new Set(tickets.tickets.map((t) => t.agent)),
   ).sort();
-  const usageData = useUsage(project?.id ?? null);
+  const porteeEffective = porteeEffectiveFor(project, statsPortee);
 
-  // À la fin d'un pipeline : relire l'historique et le coût, dire l'issue.
+  // À la fin d'un pipeline : relire l'historique et dire l'issue.
   const prevLastResult = useRef(stream.lastResult);
   useEffect(() => {
     if (stream.lastResult && stream.lastResult !== prevLastResult.current) {
       prevLastResult.current = stream.lastResult;
       runs.refresh();
-      usageData.refresh();
       if (stream.lastResult.approved) {
         addToast(
           `${stream.lastResult.ticket_id} approuvé en ${stream.lastResult.rounds} tour${stream.lastResult.rounds > 1 ? "s" : ""}`,
@@ -323,12 +335,9 @@ export function useCockpit() {
       },
       runs: { liste: runs.runs, loading: runs.loading, error: runs.error },
       usage: {
-        usage: usageData.usage,
-        loading: usageData.loading,
-        error: usageData.error,
         days: statsDays,
         setDays: setStatsDays,
-        portee: statsPortee,
+        portee: porteeEffective,
         setPortee: setStatsPortee,
         projetActifId: project?.id ?? null,
       },
@@ -370,8 +379,8 @@ export function useCockpit() {
       unreadable: tickets.unreadable,
       openFilePath,
       statsDays,
-      // Quand la portée est "tous", on passe null même si un projet est actif.
-      statsProjectId: statsPortee === "tous" ? null : (project?.id ?? null),
+      // La portée effective est "tous" quand aucun projet n'est actif.
+      statsProjectId: porteeEffective === "tous" ? null : (project?.id ?? null),
       onSelectTicket: handleSelectTicket,
       onRunPipeline: handleRunPipeline,
       onChangeStatus: handleChangeStatus,

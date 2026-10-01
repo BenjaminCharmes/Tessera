@@ -14,7 +14,6 @@ import ConversationSidebar from "../ChatPanel/ConversationSidebar";
 import type {
   PipelineRun,
   Project,
-  ProjectUsage,
   StatsPeriod,
   Ticket,
   TicketStatus,
@@ -84,13 +83,10 @@ export interface RunsSidebar {
 }
 
 export interface UsageSidebar {
-  usage: ProjectUsage | null;
-  loading: boolean;
-  error: string | null;
   /** Période sélectionnée dans la colonne, transmise à StatsView (ticket-253). */
   days: StatsPeriod;
   setDays: (d: StatsPeriod) => void;
-  /** Portée : le projet actif ou tous les projets confondus (ticket-253). */
+  /** Portée effective : "tous" si aucun projet actif, sinon le choix utilisateur (ticket-258). */
   portee: "projet" | "tous";
   setPortee: (p: "projet" | "tous") => void;
   /** Id du projet actif — null si aucun, utilisé pour désactiver "Ce projet". */

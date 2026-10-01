@@ -347,3 +347,18 @@ Le changement concer
 - 2026-10-01 06:39:20 UTC — [ticket-263] tour 1 — reviewer terminé (78983ms)
 - 2026-10-01 06:42:34 UTC — [ticket-263] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute correctement une
 - 2026-10-01 06:42:34 UTC — [ticket-263] APPROVED après 1 tour(s)
+- 2026-10-01 06:48:52 UTC — [ticket-258] branche ticket-258-drop-the-unused-per-project-usage-fetch-and-show
+- 2026-10-01 06:48:52 UTC — [ticket-258] tour 1 — codeur démarré
+- 2026-10-01 06:54:20 UTC — [ticket-258] tour 1 — codeur terminé (328141ms)
+- 2026-10-01 06:54:42 UTC — [ticket-258] securite: PASS — Audit of the TypeScript/React frontend diff: no security vulnerabilities detecte
+- 2026-10-01 06:54:42 UTC — [ticket-258] tour 1 — reviewer démarré
+- 2026-10-01 06:56:16 UTC — [ticket-258] tour 1 — reviewer terminé (93578ms)
+- 2026-10-01 06:58:38 UTC — [ticket-258] validateur: CHANGES_REQUESTED — Les trois premiers critères sont respectés : `UsageSidebar` n'inclut plus les ch
+- 2026-10-01 06:58:38 UTC — [ticket-258] CHANGES_REQUESTED tour 1: Les trois premiers critères sont respectés : `UsageSidebar` n'inclut plus les champs inutiles, `useC
+- 2026-10-01 06:58:38 UTC — [ticket-258] tour 2 — codeur démarré
+- 2026-10-01 07:00:57 UTC — [ticket-258] tour 2 — codeur terminé (138937ms)
+- 2026-10-01 07:01:12 UTC — [ticket-258] securite: PASS — Audit complet du diff sans vulnérabilité détectée. Le diff contient exclusivemen
+- 2026-10-01 07:01:12 UTC — [ticket-258] tour 2 — reviewer démarré
+- 2026-10-01 07:02:24 UTC — [ticket-258] tour 2 — reviewer terminé (71625ms)
+- 2026-10-01 07:04:13 UTC — [ticket-258] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été mis à jour pour r
+- 2026-10-01 07:04:13 UTC — [ticket-258] APPROVED après 2 tour(s)
