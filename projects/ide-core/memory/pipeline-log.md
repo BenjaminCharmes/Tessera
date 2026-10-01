@@ -632,3 +632,16 @@ Le diff ajoute une fonctionnalité de lecture de  (26170ms)
 - 2026-10-01 22:26:50 UTC — [ticket-286] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (250750ms)
 - 2026-10-01 22:26:50 UTC — [ticket-286] APPROVED après 1 tour(s)
 - 2026-10-01 22:29:27 UTC — [ticket-286] documentation: 1 fichier(s) (155329ms)
+- 2026-10-01 22:32:04 UTC — [ticket-286] livraison: rebase sur develop (203ms)
+- 2026-10-01 22:32:04 UTC — [ticket-286] livraison: PR #183 ouverte (4157ms)
+- 2026-10-01 22:32:04 UTC — [ticket-286] livraison: CI : failing (147719ms)
+- 2026-10-01 22:32:04 UTC — [ticket-286] livraison: arrêt — CI failing : la PR #183 reste ouverte.
+- 2026-10-01 22:32:04 UTC — [ticket-287] branche ticket-287-clicking-the-board-toggle-from-the-run-view-opens
+- 2026-10-01 22:32:04 UTC — [ticket-287] tour 1 — codeur démarré
+- 2026-10-01 22:37:45 UTC — [ticket-287] tour 1 — codeur terminé (340610ms)
+- 2026-10-01 22:40:54 UTC — [ticket-287] testeur: 1751 passed, 2 deselected, 5 warnings in 186.65s (0:03:06)
+- 2026-10-01 22:41:06 UTC — [ticket-287] securite: PASS — Refactorisation logique d'un hook React : ajout de la fonction `prochainEtatKanb (12561ms)
+- 2026-10-01 22:41:06 UTC — [ticket-287] tour 1 — reviewer démarré
+- 2026-10-01 22:42:05 UTC — [ticket-287] tour 1 — reviewer terminé (59062ms)
+- 2026-10-01 22:44:12 UTC — [ticket-287] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (127000ms)
+- 2026-10-01 22:44:12 UTC — [ticket-287] APPROVED après 1 tour(s)
