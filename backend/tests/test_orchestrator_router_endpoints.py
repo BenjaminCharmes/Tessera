@@ -514,13 +514,18 @@ def test_noter_la_pr_avance_la_base_du_run(
         async def advance_base_ref(self) -> None:
             appels.append("avance")
 
+        async def sync_base_depuis_distant(self, base_branch: str) -> str | None:
+            # ticket-264 : après un merge, la base locale se réaligne.
+            appels.append("sync")
+            return None
+
     monkeypatch.setattr(
         "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
     )
 
     asyncio.run(_livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
 
-    assert appels == ["commit", "push", "avance"]
+    assert appels == ["commit", "push", "avance", "sync"]
 
 
 def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(

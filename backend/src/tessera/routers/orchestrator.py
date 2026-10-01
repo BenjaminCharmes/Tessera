@@ -390,6 +390,23 @@ def _livreur(
             _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
             return Livraison(arret=f"Livraison interrompue : {exc}")
         # pr_number is now recorded inside service.livrer() via _noter_et_pousser
+
+        # ticket-264 : après un merge en squash, la branche locale de base
+        # est en retard sur le distant. Le ticket suivant repart alors de
+        # l'ancienne branche, ses commits sont déjà présents sur develop
+        # sous forme d'un squash, et GitHub déclare la PR en conflit.
+        # On réconcilie uniquement si la livraison a réellement mergé
+        # (évite un fetch réseau inutile quand le niveau est `commit` ou `pr`).
+        if livraison.merged and espace is not None:
+            raison_sync = await espace.sync_base_depuis_distant(base_branch)
+            if raison_sync is not None:
+                livraison = Livraison(
+                    etapes=livraison.etapes,
+                    arret=raison_sync,
+                    conflits=livraison.conflits,
+                    pr_number=livraison.pr_number,
+                    merged=livraison.merged,
+                )
         return livraison
 
     return livrer

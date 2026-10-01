@@ -1,15 +1,16 @@
 ---
-id: ticket-264
-title: "In a queue, each ticket starts from the up-to-date remote base once the previous one merged"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-plan: true
+created: 2026-09-30
 depends_on: []
 estimated_days: 1
-created: 2026-09-30
+id: ticket-264
+plan: true
+pr_number: 152
+priority: high
+status: done
+title: In a queue, each ticket starts from the up-to-date remote base once the previous
+  one merged
+type: fix
 ---
 
 # ticket-264 — Dans une file, un ticket repart de la base distante à jour
