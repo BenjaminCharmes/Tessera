@@ -328,6 +328,24 @@ Les étapes du pipeline sont **sécurité**, **revue**, **validation**, **docume
 
 La pastille en bleu te dit en un coup d'œil où tu en es, sans lire le log ni quitter l'IDE.
 
+### Le fil du run : tous les verdicts en un seul endroit
+
+Quand tu observes un run qui a tourné plusieurs fois, tu vois maintenant un seul fil chronologique complet. Ce fil affiche tous les passages — codeur, reviewer, et maintenant aussi **sécurité** et **validateur**. C'est ce fil qui t'explique pourquoi le codeur repart tourner.
+
+**Exemple** : le reviewer approuve au tour 1, mais le validateur refuse car un critère d'acceptation n'est pas satisfait. Le fil du run affiche :
+
+1. Codeur — Tour 1
+2. Reviewer — Tour 1 — ✓ APPROVED
+3. **Sécurité — Tour 1** — ✓ Audit passé
+4. **Validateur — Tour 1 — ✗ Changements demandés**
+5. Codeur — Tour 2 (repart pour corriger)
+
+Ce que tu vois dans le fil pour chaque verdict :
+- **Sécurité** : son verdict (approuvé ou bloquant) et un résumé de ses findings
+- **Validateur** : son verdict (approuvé ou changements demandés), puis en détail, pour chaque critère d'acceptation du ticket, son état (✓ réussi / ✗ échoué) et la note du validateur
+
+Ce fil est le même partout — que tu regardes dans la **Supervision** (onglet Agents) ou dans l'**onglet du run**, tu vois l'histoire complète. Plus besoin de chercher dans les logs : tu sais d'un coup d'œil pourquoi le codeur repart.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
