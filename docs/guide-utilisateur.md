@@ -268,6 +268,17 @@ Les statuts que tu verras passer :
 
 ---
 
+### Quand les étapes du pipeline s'affichent dans le log
+
+Pendant un run, des étapes du pipeline s'exécutent et émettent des événements affichés dans le log pour que tu saches où tu en es :
+
+- **Audit de sécurité lancé** et **Audit de sécurité terminé** — si bloqué, le verdict s'ajoute à la deuxième ligne
+- **Validation lancée** et **Validation terminée** — suivi de l'indication « approuvé » ou pas
+- **Documentation lancée** et **Documentation mise à jour** — quand les docs du projet changent
+- **Livraison lancée** — affiché juste avant l'ouverture de la PR
+
+Tu les lis dans le même panneau que les agents, dans l'ordre où elles se produisent.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -302,6 +313,20 @@ l'échelle réelle, qui est rarement celle qu'on imagine.
 ### Fermer un run achevé
 
 Une fois qu'un run est entièrement complété — sa revue approuvée et sa livraison effectuée (le cas échéant) — tu vois un bouton « Fermer » dans le résumé. Un clic le retire du panneau de Supervision pour dégager l'écran et passer aux tickets en cours ou suivants.
+
+### La frise d'étapes
+
+En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
+
+Les couleurs :
+- **Bleu** : cette étape tourne en ce moment
+- **Vert** : elle est finie, tout a été accepté
+- **Rouge** : elle a refusé quelque chose (audit bloque, validation n'approuve pas)
+- **Gris** : elle n'a pas encore commencé
+
+Les étapes du pipeline sont **sécurité**, **revue**, **validation**, **documentation** et **livraison**. Si le projet n'en active pas une (par exemple pas d'audit de sécurité), sa pastille ne s'affiche pas.
+
+La pastille en bleu te dit en un coup d'œil où tu en es, sans lire le log ni quitter l'IDE.
 
 ## 6. Récupérer le travail des agents
 

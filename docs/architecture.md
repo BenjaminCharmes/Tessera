@@ -133,7 +133,7 @@ un run suspendu tient du travail non commité, et bloquerait la file des tickets
 
 `frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :
 `icons.tsx` (un seul jeu, grille de 24, trait 1.5), `layout.ts` (la hauteur unique des
-bandes d'en-tête), `RegionTitle.tsx`, `InfoTip.tsx`. Cinq familles de couleurs ont chacune un
+bandes d'en-tête), `RegionTitle.tsx`, `InfoTip.tsx`, `StageStrip.tsx`. Cinq familles de couleurs ont chacune un
 rôle d'état — neutre, échec, attente, succès, activité — et `violet` sert
 uniquement au repérage.
 
@@ -141,6 +141,14 @@ uniquement au repérage.
 button, `role="tooltip"` — des **états** et **appels à l'action** qui restent toujours visibles.
 L'icône est liée au texte par `aria-describedby`. Ses couleurs sont zinc, pas de violet
 en texte.
+
+`StageStrip` (depuis ticket-256) affiche l'état de chaque étape du pipeline du run — 
+production, sécurité, revue, validation, documentation, livraison — en tête du panneau 
+Agents. Chaque pastille représente une étape, avec trois états : faite (`green`), en cours 
+(`blue`), à venir (`zinc`). Une étape désactivée pour le projet n'a pas de pastille. Un 
+refus de l'audit sécurité ou une validation rejetée passent la pastille correspondante en 
+`red`. L'étape en cours se déduit d'abord du champ `etape` dans l'instantané du run, puis 
+estrichie par les événements reçus au fil de l'exécution.
 
 `coherence.test.ts` verrouille les trois règles : il lit les sources et échoue
 à la première réintroduction d'une couleur bannie, d'une taille de texte
@@ -432,8 +440,9 @@ Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
 {
   "type": "agent_started | agent_token | agent_tool_use | agent_done | branch_created |
            ticket_status_changed | test_result | security_audit_started |
-           security_audit_done | validation_done | doc_updated | commit_created |
-           pipeline_done | error",
+           security_audit_done | validation_started | validation_done | 
+           documentation_started | doc_updated | livraison_started | 
+           commit_created | pipeline_done | error",
   "agent": "codeur | reviewer | testeur | securite | validateur | doc-technique | doc-fonctionnelle | null",
   "ticket_id": "ticket-007",
   "data": { "round": 1, "token": "def foo", "status": "in-progress", "approved": true },
