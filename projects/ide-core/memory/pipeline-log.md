@@ -516,3 +516,14 @@ Analyse effectuée :
 - 2026-10-01 18:50:12 UTC — [ticket-288] tour 3 — reviewer terminé (105686ms)
 - 2026-10-01 18:50:12 UTC — [ticket-288] CHANGES_REQUESTED tour 3: 500]` puis `feedback[:100]` dans le log : une seule variable, deux usages synchronisés. Le test le v
 - 2026-10-01 18:50:12 UTC — [ticket-288] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-01 19:00:36 UTC — [ticket-288] branche ticket-288-every-pipeline-stage-writes-its-duration-to-the-p
+- 2026-10-01 19:00:37 UTC — [ticket-288] tour 1 — codeur démarré
+- 2026-10-01 19:06:32 UTC — [ticket-288] tour 1 — codeur terminé (355500ms)
+- 2026-10-01 19:10:02 UTC — [ticket-288] testeur: 1739 passed, 2 deselected, 5 warnings in 206.95s (0:03:26)
+- 2026-10-01 19:10:37 UTC — [ticket-288] securite: PASS — Audit complet : aucune vulnérabilité détectée.
+
+Le diff ajoute du timing (durées
+- 2026-10-01 19:10:37 UTC — [ticket-288] tour 1 — reviewer démarré
+- 2026-10-01 19:12:24 UTC — [ticket-288] tour 1 — reviewer terminé (106532ms)
+- 2026-10-01 19:16:42 UTC — [ticket-288] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code mesure et journalise les
+- 2026-10-01 19:16:42 UTC — [ticket-288] APPROVED après 1 tour(s)
