@@ -462,3 +462,18 @@ Analyse effectuée :
 - 2026-10-01 14:49:54 UTC — [ticket-280] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
 - 2026-10-01 14:49:54 UTC — [ticket-280] tour 1 — codeur démarré
 - 2026-10-01 15:02:29 UTC — [ticket-280] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: Reached maximum number of turns (60) (exit code: 1)
+- 2026-10-01 17:22:48 UTC — [ticket-280] branche ticket-280-a-finished-run-s-events-can-be-read-back-through
+- 2026-10-01 17:23:18 UTC — [ticket-280] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
+- 2026-10-01 17:23:18 UTC — [ticket-280] tour 1 — codeur démarré
+- 2026-10-01 17:28:59 UTC — [ticket-280] tour 1 — codeur terminé (340577ms)
+- 2026-10-01 17:29:51 UTC — [ticket-280] testeur: 1 failed, 495 passed, 2 deselected, 5 warnings in 49.77s
+- 2026-10-01 17:29:51 UTC — [ticket-280] tests rouges au tour 1
+- 2026-10-01 17:29:51 UTC — [ticket-280] tour 2 — codeur démarré
+- 2026-10-01 17:31:42 UTC — [ticket-280] tour 2 — codeur terminé (111061ms)
+- 2026-10-01 17:34:08 UTC — [ticket-280] testeur: 1 failed, 910 passed, 2 deselected, 5 warnings in 144.28s (0:02:24)
+- 2026-10-01 17:34:08 UTC — [ticket-280] tests rouges au tour 2
+- 2026-10-01 17:34:08 UTC — [ticket-280] tour 3 — codeur démarré
+- 2026-10-01 17:34:52 UTC — [ticket-280] tour 3 — codeur terminé (44108ms)
+- 2026-10-01 17:37:28 UTC — [ticket-280] testeur: 1 failed, 945 passed, 2 deselected, 5 warnings in 153.19s (0:02:33)
+- 2026-10-01 17:37:28 UTC — [ticket-280] tests rouges au tour 3
+- 2026-10-01 17:37:28 UTC — [ticket-280] BLOCKED après 3 tour(s) sans approbation
