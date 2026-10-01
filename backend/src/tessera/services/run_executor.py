@@ -68,6 +68,7 @@ def emetteur(
                 event.agent.value if event.agent else None,
                 event.data,
                 event.timestamp.isoformat(),
+                ticket_id=event.ticket_id or None,
             )
         except Exception as exc:  # noqa: BLE001
             # Un événement non persisté dégrade l'historique ; le faire
@@ -197,11 +198,13 @@ async def executer(
     try:
         if run.mode == "autonomous":
             resultats = await orchestrator.run_autonomous(
-                run.project_id, max_tickets, envoyer
+                run.project_id, max_tickets, envoyer,
+                envelope_run_id=run_id_en_base,
             )
         elif run.mode == "queue":
             resultats = await orchestrator.run_queue(
-                run.project_id, ticket_ids or [], envoyer, run.dialogue
+                run.project_id, ticket_ids or [], envoyer, run.dialogue,
+                envelope_run_id=run_id_en_base,
             )
         else:
             resultats = [
@@ -259,6 +262,8 @@ async def _clore(
     # Toujours, et en dernier : c'est le seul événement dont un client peut
     # déduire que le projet est de nouveau libre, et le seul qui porte encore
     # `arret` depuis que le POST ne rend plus le résultat (ADR-037).
+    # `db_run_id` permet au frontend d'appeler GET /runs/{id}/events pour
+    # relire les événements du run terminé (ticket-280).
     await envoyer(
         OrchestratorEvent(
             type=EventType.RUN_CLOSED,
@@ -273,6 +278,7 @@ async def _clore(
                 "commit_sha": dernier.commit_sha if dernier else None,
                 "arret": (dernier.arret if dernier else None) or echec,
                 "resultats": len(resultats),
+                "db_run_id": run_id_en_base,
             },
         )
     )

@@ -136,6 +136,7 @@ class Orchestrator:
         on_event: EventCallback,
         run_id: str | None = None,
         dialogue: DialogueChannel | None = None,
+        envelope_run_id: str | None = None,
     ) -> PipelineResult:
         """Mène le ticket, puis livre son travail si le projet le permet.
 
@@ -143,10 +144,17 @@ class Orchestrator:
         `run_autonomous` passent tous deux par cette méthode : la brancher
         ailleurs la réserverait au run unique, alors que c'est en file que
         l'absence de clic compte le plus.
+
+        ``envelope_run_id`` est l'identifiant de la ligne enveloppe créée par
+        ``executer`` pour un run en file ou autonome. Il est transmis à
+        ``RunRecorder`` pour lier la ligne par-ticket à son enveloppe
+        (ticket-280).
         """
         on_event = tolerant(on_event)
         resultat = await self._run_enregistre(
-            project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
+            project_id, ticket_id, on_event,
+            run_id=run_id, dialogue=dialogue,
+            envelope_run_id=envelope_run_id,
         )
         if not resultat.approved:
             return resultat
@@ -181,6 +189,7 @@ class Orchestrator:
         on_event: EventCallback,
         run_id: str | None,
         dialogue: DialogueChannel | None,
+        envelope_run_id: str | None = None,
     ) -> PipelineResult:
         """Run the pipeline inside a database record, when nobody opened one.
 
@@ -194,7 +203,9 @@ class Orchestrator:
             return await self._run_pipeline(
                 project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
             )
-        run_id = await self._run_recorder.ouvrir(project_id, ticket_id)
+        run_id = await self._run_recorder.ouvrir(
+            project_id, ticket_id, parent_run_id=envelope_run_id
+        )
         resultat: PipelineResult | None = None
         try:
             resultat = await self._run_pipeline(
@@ -349,6 +360,7 @@ class Orchestrator:
         ticket_ids: list[str],
         on_event: EventCallback | None = None,
         dialogue: "DialogueChannel | None" = None,
+        envelope_run_id: str | None = None,
     ) -> list[PipelineResult]:
         """Enchaîne une sélection de tickets, dans l'ordre demandé.
 
@@ -409,7 +421,8 @@ class Orchestrator:
             )
 
             result = await self.run_pipeline(
-                project_id, ticket_id, callback, dialogue=dialogue
+                project_id, ticket_id, callback, dialogue=dialogue,
+                envelope_run_id=envelope_run_id,
             )
             results.append(result)
 
@@ -426,6 +439,7 @@ class Orchestrator:
         project_id: str,
         max_tickets: int = 5,
         on_event: EventCallback | None = None,
+        envelope_run_id: str | None = None,
     ) -> list[PipelineResult]:
         async def _noop(event: OrchestratorEvent) -> None:
             pass
@@ -479,7 +493,10 @@ class Orchestrator:
             ticket = await self.pick_next_ticket(project_id)
             if ticket is None:
                 break
-            result = await self.run_pipeline(project_id, ticket.id, callback)
+            result = await self.run_pipeline(
+                project_id, ticket.id, callback,
+                envelope_run_id=envelope_run_id,
+            )
             results.append(result)
 
         return results
