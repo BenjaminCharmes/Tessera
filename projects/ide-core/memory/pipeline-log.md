@@ -444,3 +444,17 @@ Analyse effectuée :
 - 2026-10-01 14:12:28 UTC — [ticket-285] tour 1 — reviewer terminé (61813ms)
 - 2026-10-01 14:18:54 UTC — [ticket-285] validateur: APPROVED — Les cinq critères sont satisfaits. Le diff ajoute la méthode `initialiser_base_r
 - 2026-10-01 14:18:54 UTC — [ticket-285] APPROVED après 1 tour(s)
+- 2026-10-01 14:25:57 UTC — [ticket-279] branche ticket-279-a-finished-run-looks-finished-stage-strip-timer-c
+- 2026-10-01 14:25:58 UTC — [ticket-279] tour 1 — codeur démarré
+- 2026-10-01 14:33:20 UTC — [ticket-279] tour 1 — codeur terminé (442639ms)
+- 2026-10-01 14:33:43 UTC — [ticket-279] securite: PASS — Audit du diff ticket-279 : aucune vulnérabilité détectée. Le changement ajoute u
+- 2026-10-01 14:33:43 UTC — [ticket-279] tour 1 — reviewer démarré
+- 2026-10-01 14:35:16 UTC — [ticket-279] tour 1 — reviewer terminé (93390ms)
+- 2026-10-01 14:35:16 UTC — [ticket-279] CHANGES_REQUESTED tour 1: si un ancien backend envoie `validation_done` sans `approved` mais avec `verdict: "CHANGES_REQUESTED
+- 2026-10-01 14:35:16 UTC — [ticket-279] tour 2 — codeur démarré
+- 2026-10-01 14:36:28 UTC — [ticket-279] tour 2 — codeur terminé (72125ms)
+- 2026-10-01 14:36:54 UTC — [ticket-279] securite: PASS — Diff analysé : ajout du champ `approved` au backend (pipeline_stages.py) et prop
+- 2026-10-01 14:36:54 UTC — [ticket-279] tour 2 — reviewer démarré
+- 2026-10-01 14:37:52 UTC — [ticket-279] tour 2 — reviewer terminé (57467ms)
+- 2026-10-01 14:43:34 UTC — [ticket-279] validateur: APPROVED — Tous les critères d'acceptation du ticket-279 sont couverts par des tests foncti
+- 2026-10-01 14:43:34 UTC — [ticket-279] APPROVED après 2 tour(s)
