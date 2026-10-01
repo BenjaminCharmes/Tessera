@@ -1,14 +1,14 @@
 ---
-id: ticket-273
-title: "Explanations move into an info tooltip; states and calls to action stay visible"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 1
-created: 2026-09-30
+id: ticket-273
+pr_number: 147
+priority: medium
+status: done
+title: Explanations move into an info tooltip; states and calls to action stay visible
+type: feat
 ---
 
 # ticket-273 — Les explications passent en infobulle, les états restent visibles

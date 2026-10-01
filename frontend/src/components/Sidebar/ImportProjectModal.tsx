@@ -1,4 +1,5 @@
 import { IconCheck, IconSettings } from "../../design/icons";
+import InfoTip from "../../design/InfoTip";
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import type { AnalysisResult, Project } from "../../types/api";
@@ -256,12 +257,21 @@ export default function ImportProjectModal({
                   </>
                 ) : (
                   <div>
-                    <label
-                      htmlFor="github-url"
-                      className="block text-xs text-zinc-400 mb-1"
-                    >
-                      URL du repo GitHub <span className="text-red-400">*</span>
-                    </label>
+                    {/* L'icône reste hors du <label> : dedans, le bouton
+                        prendrait le libellé du champ (ticket-273). */}
+                    <div className="mb-1 flex items-center gap-1">
+                      <label
+                        htmlFor="github-url"
+                        className="text-xs text-zinc-400"
+                      >
+                        URL du repo GitHub{" "}
+                        <span className="text-red-400">*</span>
+                      </label>
+                      <InfoTip>
+                        Les repos privés nécessitent un token configuré dans
+                        les settings.
+                      </InfoTip>
+                    </div>
                     <input
                       id="github-url"
                       type="url"
@@ -279,10 +289,6 @@ export default function ImportProjectModal({
                         {inputError}
                       </p>
                     )}
-                    <p className="mt-1 text-xs text-zinc-500">
-                      Les repos privés nécessitent un token configuré dans les
-                      settings.
-                    </p>
                   </div>
                 )}
 

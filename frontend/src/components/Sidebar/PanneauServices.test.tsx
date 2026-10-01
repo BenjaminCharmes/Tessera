@@ -72,11 +72,13 @@ describe("PanneauServices", () => {
     ).toBeInTheDocument();
   });
 
-  it("previent que la commande n'est pas passee a un shell", () => {
+  it("previent que la commande n'est pas passee a un shell", async () => {
     // Sinon le premier reflexe est d'ecrire « npm i && npm run dev ».
+    // Explication, donc en infobulle (ticket-273) : visible au survol.
     rendre({ declare: false, services: [] });
 
-    expect(screen.getByText(/sans shell/)).toBeInTheDocument();
+    await userEvent.hover(screen.getByRole("button", { name: /plus d'informations/i }));
+    expect(screen.getByRole("tooltip")).toHaveTextContent(/sans shell/);
   });
 
   it("rend l'adresse cliquable sans qu'on ouvre quoi que ce soit", () => {
