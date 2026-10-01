@@ -6,7 +6,7 @@ depends_on:
 - ticket-279
 estimated_days: 1
 id: ticket-281
-pr_number: null
+pr_number: 182
 priority: medium
 status: done
 title: A finished run can be reopened in the run view from the run history
