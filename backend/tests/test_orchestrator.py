@@ -817,7 +817,9 @@ async def test_run_autonomous_processes_multiple_tickets(tmp_path: Path) -> None
             return ticket_b
         return None
 
-    async def mock_pipeline(project_id: str, ticket_id: str, on_event: object) -> PipelineResult:
+    async def mock_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
         return PipelineResult(
             ticket_id=ticket_id,
             final_status=TicketStatus.done,
@@ -841,7 +843,9 @@ async def test_run_autonomous_stops_at_max_tickets(tmp_path: Path) -> None:
     async def mock_pick(project_id: str) -> Ticket | None:
         return ticket  # always returns a ticket
 
-    async def mock_pipeline(project_id: str, ticket_id: str, on_event: object) -> PipelineResult:
+    async def mock_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
         return PipelineResult(
             ticket_id=ticket_id,
             final_status=TicketStatus.done,
@@ -880,7 +884,7 @@ async def test_run_autonomous_emits_events_via_callback(tmp_path: Path) -> None:
     events: list[OrchestratorEvent] = []
 
     async def mock_pipeline(
-        project_id: str, ticket_id: str, on_event: object
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
     ) -> PipelineResult:
         import inspect
         if callable(on_event) and inspect.iscoroutinefunction(on_event):

@@ -35,6 +35,7 @@ class _OrchestrateurFile:
 
     async def run_pipeline(
         self, project_id, ticket_id, on_event, run_id=None, dialogue=None,
+        envelope_run_id=None,
     ) -> PipelineResult:
         self.lances.append(ticket_id)
         approuve = ticket_id not in self._echecs
