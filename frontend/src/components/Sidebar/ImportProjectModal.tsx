@@ -1,4 +1,5 @@
 import { IconCheck, IconSettings } from "../../design/icons";
+import InfoTip from "../../design/InfoTip";
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import type { AnalysisResult, Project } from "../../types/api";
@@ -258,9 +259,14 @@ export default function ImportProjectModal({
                   <div>
                     <label
                       htmlFor="github-url"
-                      className="block text-xs text-zinc-400 mb-1"
+                      className="flex items-center gap-1 text-xs text-zinc-400 mb-1"
                     >
-                      URL du repo GitHub <span className="text-red-400">*</span>
+                      URL du repo GitHub{" "}
+                      <span className="text-red-400">*</span>
+                      <InfoTip>
+                        Les repos privés nécessitent un token configuré dans
+                        les settings.
+                      </InfoTip>
                     </label>
                     <input
                       id="github-url"
@@ -279,10 +285,6 @@ export default function ImportProjectModal({
                         {inputError}
                       </p>
                     )}
-                    <p className="mt-1 text-xs text-zinc-500">
-                      Les repos privés nécessitent un token configuré dans les
-                      settings.
-                    </p>
                   </div>
                 )}
 

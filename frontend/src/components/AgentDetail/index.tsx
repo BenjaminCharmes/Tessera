@@ -1,4 +1,5 @@
 import AgentBadge from "../../design/AgentBadge";
+import InfoTip from "../../design/InfoTip";
 import { useMemo, useState } from "react";
 import MarkdownView from "../Editor/MarkdownView";
 import ModelPicker from "./ModelPicker";
@@ -139,10 +140,12 @@ function Definition({
       {detail && (
         <>
           {projectId && <ModelPicker projectId={projectId} role={role} />}
-          <p className="border-b border-zinc-800 px-4 py-2 text-micro text-zinc-500">
-            Ce texte est envoyé en tête de chaque appel de cet agent. Il décide
-            de tout ce qu'il fait.
-          </p>
+          <div className="flex items-center gap-1 border-b border-zinc-800 px-4 py-2">
+            <span className="text-micro text-zinc-500">Prompt système</span>
+            <InfoTip>
+              {"Ce texte est envoyé en tête de chaque appel de cet agent. Il décide de tout ce qu'il fait."}
+            </InfoTip>
+          </div>
           {vue === "rendu" && (
             <div className="min-h-0 flex-1 overflow-auto">
               <MarkdownView source={detail.system_prompt} />

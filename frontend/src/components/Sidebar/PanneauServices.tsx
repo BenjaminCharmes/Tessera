@@ -1,4 +1,5 @@
 import { useState } from "react";
+import InfoTip from "../../design/InfoTip";
 import { adressesDansLaSortie } from "../SupervisionView/adresse";
 import AdresseDuService from "../SupervisionView/AdresseDuService";
 import { classeDeLEtat, libelleDeLEtat } from "../../design/etatDuService";
@@ -201,10 +202,14 @@ function RienDeclare({
           <pre className="overflow-x-auto rounded-sm bg-zinc-950 p-2 text-micro leading-relaxed text-zinc-400">
             {EXEMPLE}
           </pre>
-          <p className="text-micro text-zinc-500">
-            La commande est lancée telle quelle, sans shell : une commande par
-            service, et pas de <code>&amp;&amp;</code>.
-          </p>
+          <span className="flex items-center gap-1 text-micro text-zinc-500">
+            Commande
+            <InfoTip>
+              La commande est lancée telle quelle, sans shell : une commande
+              par service, et pas de{" "}
+              <code className="text-zinc-300">&amp;&amp;</code>.
+            </InfoTip>
+          </span>
           {chemin ? (
             <a
               href={`vscode://file/${chemin.replace(/\\/g, "/")}/agents.json`}
