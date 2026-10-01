@@ -85,3 +85,39 @@ async def test_une_declaration_inconnue_ne_desarme_rien(depot_parent: Path) -> N
 
     with pytest.raises(NotAGitRepository):
         await GitWorkspaceService(projet).create_branch("ticket-003", "essai")
+
+
+async def test_le_journal_du_pipeline_ne_salit_pas_l_arbre_dans_le_parent(
+    depot_parent: Path,
+) -> None:
+    # `git status --porcelain` rend les chemins depuis la racine du depot :
+    # le journal d'un projet `ancestor` n'etait pas reconnu comme un artefact,
+    # et la file refusait le ticket suivant (ticket-301).
+    projet = depot_parent / "projects" / "ide-core"
+    (projet / "agents.json").write_text(
+        json.dumps({"git_root": "ancestor"}), encoding="utf-8"
+    )
+    (projet / "memory").mkdir()
+    journal = projet / "memory" / "pipeline-log.md"
+    journal.write_text("- debut\n", encoding="utf-8")
+    await _git(depot_parent, "add", "-A")
+    await _git(depot_parent, "commit", "-qm", "journal")
+
+    journal.write_text("- debut\n- livraison : PR mergee\n", encoding="utf-8")
+
+    assert await GitWorkspaceService(projet).is_clean() is True
+
+
+async def test_un_fichier_de_code_modifie_salit_toujours_l_arbre_dans_le_parent(
+    depot_parent: Path,
+) -> None:
+    projet = depot_parent / "projects" / "ide-core"
+    (projet / "agents.json").write_text(
+        json.dumps({"git_root": "ancestor"}), encoding="utf-8"
+    )
+    await _git(depot_parent, "add", "-A")
+    await _git(depot_parent, "commit", "-qm", "manifeste")
+
+    (depot_parent / "backend" / "app.py").write_text("x = 3\n", encoding="utf-8")
+
+    assert await GitWorkspaceService(projet).is_clean() is False
