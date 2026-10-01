@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-280
 plan: true
-pr_number: null
+pr_number: 173
 priority: medium
 status: done
 title: A finished run's events can be read back through the API
