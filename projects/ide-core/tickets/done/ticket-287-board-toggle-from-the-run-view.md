@@ -1,14 +1,14 @@
 ---
-id: ticket-287
-title: "Clicking the board toggle from the run view opens the board"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-01
+id: ticket-287
+pr_number: 184
+priority: medium
+status: done
+title: Clicking the board toggle from the run view opens the board
+type: fix
 ---
 
 # ticket-287 — « Vue tableau » depuis le run ouvre le tableau
