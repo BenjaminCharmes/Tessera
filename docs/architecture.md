@@ -81,7 +81,7 @@ appels d'un pipeline.
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé six correctifs, tous nés d'un usage réel :
+Cette promesse a demandé sept correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -118,6 +118,13 @@ Cette promesse a demandé six correctifs, tous nés d'un usage réel :
   lui-même : `memory/pipeline-log.md` et les fichiers de `tickets/`. Une 
   modification ailleurs reste un refus. Cette liste vit à un seul endroit, 
   partagée avec ce que le diff relu exclut déjà.
+- **Les fichiers de configuration ne sont jamais commités** (ticket-296). 
+  Les réglages faits dans l'IDE pendant un run — `agents.json`, 
+  `.claude/settings*.json`, `.github/workflows/` — ne doivent pas partir 
+  dans le commit du pipeline. Le commit les exclut par pathspec, et l'arbre 
+  les garde modifiés : le rapport du run signale lesquels ont changé. Cela 
+  prévient qu'un réglage d'IDE voyage dans la PR d'un ticket qui ne l'avait 
+  pas demandé (incident du ticket-279).
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
