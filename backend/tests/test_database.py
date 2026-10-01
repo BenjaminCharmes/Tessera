@@ -11,6 +11,7 @@ from tessera.services.database import (
     list_runs,
     save_agent_call,
     save_event,
+    version_du_schema,
 )
 
 
@@ -230,3 +231,90 @@ async def test_list_runs_departage_a_egalite_d_horodatage(db_path: Path) -> None
     runs = await list_runs(db_path, "project-1", limit=10)
 
     assert [r["id"] for r in runs] == list(reversed(ids))
+
+
+# ---------------------------------------------------------------------------
+# Mode column — ticket-263
+# ---------------------------------------------------------------------------
+
+
+async def test_migration_adds_mode_column(db_path: Path) -> None:
+    """The mode column exists after init_db and init_db is idempotent."""
+    await init_db(db_path)
+    await init_db(db_path)  # second call must not raise
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute("PRAGMA table_info(pipeline_runs)") as cursor:
+            columns = {row[1] for row in await cursor.fetchall()}
+
+    assert "mode" in columns
+    assert version_du_schema() == 3
+
+
+async def test_create_run_stores_mode(db_path: Path) -> None:
+    """create_run persists the mode passed by the caller."""
+    await init_db(db_path)
+
+    run_id = await create_run(db_path, "project-1", "queue", mode="queue")
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT mode FROM pipeline_runs WHERE id = ?", (run_id,)
+        ) as cursor:
+            row = await cursor.fetchone()
+
+    assert row is not None
+    assert row[0] == "queue"
+
+
+async def test_create_run_defaults_to_single(db_path: Path) -> None:
+    """create_run writes mode='single' when no mode is given."""
+    await init_db(db_path)
+
+    run_id = await create_run(db_path, "project-1", "ticket-001")
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT mode FROM pipeline_runs WHERE id = ?", (run_id,)
+        ) as cursor:
+            row = await cursor.fetchone()
+
+    assert row is not None
+    assert row[0] == "single"
+
+
+async def test_migration_backfills_queue_and_autonomous_rows(db_path: Path) -> None:
+    """Old envelope rows whose ticket_id is 'queue'/'autonomous' get their mode set."""
+    # Simulate a pre-migration database: create without mode column.
+    async with aiosqlite.connect(str(db_path)) as db:
+        await db.execute(
+            "CREATE TABLE pipeline_runs (id TEXT PRIMARY KEY, project_id TEXT NOT NULL,"
+            " ticket_id TEXT NOT NULL, started_at TEXT NOT NULL,"
+            " finished_at TEXT, rounds INTEGER, approved INTEGER, final_status TEXT)"
+        )
+        await db.execute(
+            "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at)"
+            " VALUES ('r-queue', 'p1', 'queue', '2026-01-01T00:00:00+00:00')"
+        )
+        await db.execute(
+            "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at)"
+            " VALUES ('r-auto', 'p1', 'autonomous', '2026-01-01T00:00:00+00:00')"
+        )
+        await db.execute(
+            "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at)"
+            " VALUES ('r-single', 'p1', 'ticket-001', '2026-01-01T00:00:00+00:00')"
+        )
+        await db.commit()
+
+    await init_db(db_path)
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT id, mode FROM pipeline_runs ORDER BY id"
+        ) as cursor:
+            rows = {row[0]: row[1] for row in await cursor.fetchall()}
+
+    assert rows["r-queue"] == "queue"
+    assert rows["r-auto"] == "autonomous"
+    # Un run single sans mode explicite reste NULL (pas de devinage).
+    assert rows["r-single"] is None

@@ -1,14 +1,14 @@
 ---
-id: ticket-263
-title: "Queue and autonomous run containers stay out of run statistics"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 1
-created: 2026-09-30
+id: ticket-263
+pr_number: 150
+priority: medium
+status: done
+title: Queue and autonomous run containers stay out of run statistics
+type: fix
 ---
 
 # ticket-263 — Une file n'est pas un run dans les statistiques

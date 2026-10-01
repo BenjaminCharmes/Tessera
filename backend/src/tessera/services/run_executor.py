@@ -175,7 +175,10 @@ async def executer(
     run_id_en_base: str | None = None
     try:
         run_id_en_base = await create_run(
-            settings.ide_db_path, run.project_id, run.ticket_id or run.mode
+            settings.ide_db_path,
+            run.project_id,
+            run.ticket_id or run.mode,
+            mode=run.mode,
         )
     except Exception as exc:  # noqa: BLE001
         _logger.warning("run_non_persiste", extra={"erreur": str(exc)})

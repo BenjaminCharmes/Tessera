@@ -303,6 +303,7 @@ CREATE TABLE pipeline_runs (
     id           TEXT PRIMARY KEY,   -- UUID
     project_id   TEXT NOT NULL,
     ticket_id    TEXT NOT NULL,
+    mode         TEXT NOT NULL DEFAULT 'single', -- 'single' | 'queue' | 'autonomous'
     started_at   TEXT NOT NULL,      -- ISO 8601
     finished_at  TEXT,
     rounds       INTEGER,
@@ -336,6 +337,8 @@ CREATE TABLE agent_calls (
     provider          TEXT NOT NULL DEFAULT ''    -- ajoutée par migration
 );
 ```
+
+**Mode et statistiques** : la colonne `mode` (ajoutée par migration depuis ticket-263) distingue les runs de tickets (`single`) des enveloppes de pipeline (`queue` pour une file, `autonomous` pour un run autonome). Les statistiques — nombre de runs, taux d'aboutissement, runs récents — n'incluent que les lignes `mode = 'single'` ; les enveloppes sont conservées pour tracer les événements WebSocket, mais ne comptent pas dans les totaux. Les coûts et tokens restent attachés aux appels d'agents enregistrés dans `agent_calls`, pas à la ligne d'enveloppe.
 
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).

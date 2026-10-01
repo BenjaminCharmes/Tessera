@@ -115,6 +115,15 @@ _MIGRATIONS: list[str] = [
     # 2 — ticket-218 : la cause d'un blocage, pour que l'activité du ticket
     # l'expose sans fouiller les événements.
     "ALTER TABLE pipeline_runs ADD COLUMN arret TEXT;",
+    # 3 — ticket-263 : le mode du run (single, queue, autonomous) pour exclure
+    # les enveloppes de file des statistiques. Les lignes existantes restent
+    # NULL, lues comme single. On backfille les enveloppes identifiables à leur
+    # ticket_id : run_executor écrivait run.mode quand ticket_id était vide.
+    """ALTER TABLE pipeline_runs ADD COLUMN mode TEXT;
+UPDATE pipeline_runs SET mode = 'queue'
+    WHERE ticket_id = 'queue' AND mode IS NULL;
+UPDATE pipeline_runs SET mode = 'autonomous'
+    WHERE ticket_id = 'autonomous' AND mode IS NULL;""",
 ]
 
 
@@ -158,13 +167,26 @@ async def init_db(db_path: Path | str) -> None:
         await db.commit()
 
 
-async def create_run(db_path: Path | str, project_id: str, ticket_id: str) -> str:
+async def create_run(
+    db_path: Path | str,
+    project_id: str,
+    ticket_id: str,
+    mode: str = "single",
+) -> str:
+    """Insert a new pipeline run row and return its id.
+
+    `mode` is one of ``single`` (default), ``queue`` or ``autonomous``.  Queue
+    and autonomous rows are envelope runs that carry pipeline events but hold no
+    agent calls; statistics queries exclude them so they do not inflate run
+    counts or quality metrics.
+    """
     run_id = str(uuid.uuid4())
     started_at = datetime.now(timezone.utc).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
-            "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at) VALUES (?,?,?,?)",
-            (run_id, project_id, ticket_id, started_at),
+            "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at, mode)"
+            " VALUES (?,?,?,?,?)",
+            (run_id, project_id, ticket_id, started_at, mode),
         )
         await db.commit()
     return run_id
