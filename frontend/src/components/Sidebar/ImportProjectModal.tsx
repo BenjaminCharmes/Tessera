@@ -257,17 +257,21 @@ export default function ImportProjectModal({
                   </>
                 ) : (
                   <div>
-                    <label
-                      htmlFor="github-url"
-                      className="flex items-center gap-1 text-xs text-zinc-400 mb-1"
-                    >
-                      URL du repo GitHub{" "}
-                      <span className="text-red-400">*</span>
+                    {/* L'icône reste hors du <label> : dedans, le bouton
+                        prendrait le libellé du champ (ticket-273). */}
+                    <div className="mb-1 flex items-center gap-1">
+                      <label
+                        htmlFor="github-url"
+                        className="text-xs text-zinc-400"
+                      >
+                        URL du repo GitHub{" "}
+                        <span className="text-red-400">*</span>
+                      </label>
                       <InfoTip>
                         Les repos privés nécessitent un token configuré dans
                         les settings.
                       </InfoTip>
-                    </label>
+                    </div>
                     <input
                       id="github-url"
                       type="url"

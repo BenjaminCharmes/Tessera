@@ -13,11 +13,12 @@ describe("InfoTip", () => {
     expect(screen.getByRole("tooltip")).toHaveTextContent("Mon explication de test");
   });
 
-  it("shows tooltip text with role tooltip on keyboard focus", () => {
+  it("shows tooltip text with role tooltip on keyboard focus", async () => {
     render(<InfoTip>Mon explication de test</InfoTip>);
     const button = screen.getByRole("button", { name: /plus d'informations/i });
 
-    button.focus();
+    await userEvent.tab();
+    expect(button).toHaveFocus();
 
     expect(screen.getByRole("tooltip")).toHaveTextContent("Mon explication de test");
   });
@@ -45,8 +46,9 @@ describe("InfoTip", () => {
     render(<InfoTip>Mon explication de test</InfoTip>);
     const button = screen.getByRole("button", { name: /plus d'informations/i });
 
-    // Focus opens the tooltip and gives the button keyboard events
-    button.focus();
+    // Le focus clavier ouvre l'infobulle et donne les touches au bouton
+    await userEvent.tab();
+    expect(button).toHaveFocus();
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
 
     await userEvent.keyboard("{Escape}");
