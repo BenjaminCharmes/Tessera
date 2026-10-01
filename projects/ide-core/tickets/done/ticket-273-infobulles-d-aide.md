@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 1
 id: ticket-273
-pr_number: null
+pr_number: 147
 priority: medium
 status: done
 title: Explanations move into an info tooltip; states and calls to action stay visible
