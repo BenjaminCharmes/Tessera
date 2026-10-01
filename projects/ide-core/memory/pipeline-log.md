@@ -483,3 +483,13 @@ Analyse effectuée :
 - 2026-10-01 17:50:53 UTC — [ticket-280] tour 1 — codeur terminé (135343ms)
 - 2026-10-01 17:54:07 UTC — [ticket-280] testeur: 1732 passed, 2 deselected, 5 warnings in 192.56s (0:03:12)
 - 2026-10-01 17:55:02 UTC — [ticket-280] securite: BLOCK — One HIGH severity vulnerability detected: missing authentication check on the ne
+- 2026-10-01 17:56:26 UTC — [ticket-280] branche ticket-280-a-finished-run-s-events-can-be-read-back-through
+- 2026-10-01 17:56:57 UTC — [ticket-280] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
+- 2026-10-01 17:56:57 UTC — [ticket-280] tour 1 — codeur démarré
+- 2026-10-01 17:59:09 UTC — [ticket-280] tour 1 — codeur terminé (131968ms)
+- 2026-10-01 18:02:27 UTC — [ticket-280] testeur: 1733 passed, 2 deselected, 5 warnings in 195.65s (0:03:15)
+- 2026-10-01 18:03:17 UTC — [ticket-280] securite: PASS — No security vulnerabilities detected. The new `/api/v1/runs/{run_id}/events` end
+- 2026-10-01 18:03:17 UTC — [ticket-280] tour 1 — reviewer démarré
+- 2026-10-01 18:04:44 UTC — [ticket-280] tour 1 — reviewer terminé (86420ms)
+- 2026-10-01 18:10:13 UTC — [ticket-280] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par le code et les tests fournis
+- 2026-10-01 18:10:13 UTC — [ticket-280] APPROVED après 1 tour(s)
