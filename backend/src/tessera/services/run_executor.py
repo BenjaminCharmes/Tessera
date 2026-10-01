@@ -11,6 +11,7 @@ aperçoive.
 après, il disparaissait dès que le transport mourait, et l'historique restait
 bloqué sur « en cours » (ticket-079, ticket-121).
 """
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Protocol
 
@@ -26,6 +27,10 @@ from tessera.services.pipeline_events import (
 )
 from tessera.services.run_registry import RunActif, RunRegistry
 from tessera.utils.logger import get_logger
+
+#: Récupère le titre d'un ticket depuis son identifiant. Retourne None si
+#: le ticket est illisible, sans lever d'exception (ticket-286).
+TitreGetter = Callable[[str], Awaitable[str | None]]
 
 _logger = get_logger(__name__)
 
@@ -44,7 +49,10 @@ class Orchestrateur(Protocol):
 
 
 def emetteur(
-    hub: EventHub, run: RunActif, run_id_en_base: Optional[str]
+    hub: EventHub,
+    run: RunActif,
+    run_id_en_base: Optional[str],
+    titre_getter: Optional[TitreGetter] = None,
 ) -> EventCallback:
     """Publish on the hub, then persist — in that order.
 
@@ -56,7 +64,22 @@ def emetteur(
     async def envoyer(event: OrchestratorEvent) -> None:
         event.run_id = run.run_id
         event.project_id = run.project_id
+        ancien_ticket_id = run.ticket_id
         _suivre(run, event)
+        # Quand le ticket change, lire son titre et l'inclure dans l'événement
+        # pour que les observateurs déjà connectés le reçoivent (ticket-286).
+        if (
+            titre_getter is not None
+            and event.type is EventType.TICKET_STATUS_CHANGED
+            and run.ticket_id
+            and run.ticket_id != ancien_ticket_id
+        ):
+            try:
+                titre = await titre_getter(run.ticket_id)
+                run.ticket_titre = titre
+                event.data["ticket_titre"] = titre
+            except Exception:  # noqa: BLE001
+                run.ticket_titre = None
         await hub.publish(event)
         if run_id_en_base is None:
             return
@@ -172,6 +195,7 @@ async def executer(
     *,
     ticket_ids: Optional[list[str]] = None,
     max_tickets: int = 5,
+    titre_getter: Optional[TitreGetter] = None,
 ) -> None:
     """Run the pipeline to its end, then free the project.
 
@@ -190,7 +214,7 @@ async def executer(
     except Exception as exc:  # noqa: BLE001
         _logger.warning("run_non_persiste", extra={"erreur": str(exc)})
 
-    envoyer = emetteur(hub, run, run_id_en_base)
+    envoyer = emetteur(hub, run, run_id_en_base, titre_getter=titre_getter)
     run.dialogue = dialogue_du_run(envoyer, run)
 
     resultats: list[PipelineResult] = []

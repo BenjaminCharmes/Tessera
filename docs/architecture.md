@@ -479,7 +479,9 @@ affiché dans l'UI.
 
 ## OrchestratorEvents (WebSocket)
 
-Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
+Dès la connexion, le serveur envoie un instantané du run (`RunActif`), qui porte `ticket_id` et `ticket_titre`, permettant à la Supervision et à l'en-tête du run d'afficher ces informations sans ouvrir le projet (ticket-286).
+
+Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
 
 ```json
 {

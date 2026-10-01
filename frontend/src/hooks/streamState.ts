@@ -77,6 +77,8 @@ export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur;
 export interface StreamState {
   status: StreamStatus;
   ticketId: string | null;
+  /** Titre lisible du ticket en cours, reçu de l'instantané ou des événements (ticket-286). */
+  ticketTitre: string | null;
   events: OrchestratorEvent[];
   currentAgent: AgentRole | null;
   currentRound: number;
@@ -143,6 +145,7 @@ export interface UseRunActifResult extends StreamState {
 export const INITIAL: StreamState = {
   status: "idle",
   ticketId: null,
+  ticketTitre: null,
   events: [],
   currentAgent: null,
   currentRound: 0,
@@ -176,6 +179,7 @@ export function etatDepuisRun(run: RunActif): StreamState {
     ...INITIAL,
     status: "running",
     ticketId: run.ticket_id,
+    ticketTitre: run.ticket_titre ?? null,
     currentAgent: run.agent,
     currentRound: run.tour || INITIAL.currentRound,
     // L'étape en cours est dans l'instantané depuis ticket-255 (ticket-256).
@@ -384,6 +388,17 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         branch,
       };
     }
+    case "ticket_status_changed":
+      // Quand le backend change le ticket courant (file), il inclut le titre
+      // dans les données de l'événement pour les observateurs connectés (ticket-286).
+      return {
+        ...s,
+        events,
+        ticketTitre:
+          typeof ev.data["ticket_titre"] === "string"
+            ? ev.data["ticket_titre"]
+            : s.ticketTitre,
+      };
     case "run_closed":
       // Le run est définitivement terminé : livraison et documentation sont finies.
       // Le bouton « Fermer » n'apparaît qu'ici (ticket-267). L'étape active se

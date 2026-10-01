@@ -1,14 +1,14 @@
 ---
-id: ticket-286
-title: "A running run shows its ticket's title, in Supervision and in the run view"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
-created: 2026-10-01
+id: ticket-286
+pr_number: 183
+priority: medium
+status: done
+title: A running run shows its ticket's title, in Supervision and in the run view
+type: feat
 ---
 
 # ticket-286 — Un run affiche le titre de son ticket
