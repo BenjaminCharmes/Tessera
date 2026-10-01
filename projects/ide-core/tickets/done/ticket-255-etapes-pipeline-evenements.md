@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 1
 id: ticket-255
-pr_number: null
+pr_number: 153
 priority: high
 status: done
 title: Every pipeline stage announces its start, and the run snapshot names it
