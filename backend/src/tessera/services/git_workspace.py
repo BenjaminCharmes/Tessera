@@ -725,6 +725,64 @@ class GitWorkspaceService:
         status = await self._run("status", "--porcelain", "--untracked-files=no")
         return not status.strip()
 
+    async def _file_had_content_in_head(self, rel_path: str) -> bool:
+        """True when HEAD contains a non-empty, non-blank version of this file.
+
+        A file that was already empty (or absent) in HEAD was not *reduced*
+        to empty during this run — no warning needed.
+        """
+        if not await self._has_head():
+            return False
+        try:
+            content = await self._run("show", f"HEAD:{rel_path}")
+            return bool(content.strip())
+        except GitCommandError:
+            # File absent from HEAD (new file) — not a reduction.
+            return False
+
+    async def _detect_emptied_tracked_files(self) -> list[str]:
+        """Return paths of tracked files *reduced* to empty or blank during this run.
+
+        A file that was already empty in HEAD is excluded — only files whose
+        tracked content was non-empty and are now empty on disk are reported.
+        A brand-new empty file (not yet tracked) is also excluded.
+        Called before ``git add`` so the working-tree state reflects what the
+        coder left behind.
+        """
+        try:
+            listing = await self._run("ls-files")
+        except GitCommandError:
+            return []
+
+        emptied: list[str] = []
+        root = self._project_path.resolve()
+        for rel_path in listing.splitlines():
+            rel_path = rel_path.strip()
+            if not rel_path:
+                continue
+            full = self._project_path / rel_path
+            if not full.is_file():
+                # Deleted by rm — correct behaviour, not a warning.
+                continue
+            try:
+                # Resolve symlinks before reading: a tracked symlink pointing
+                # outside the project must never be followed (ADR-031).
+                resolved = full.resolve()
+                try:
+                    resolved.relative_to(root)
+                except ValueError:
+                    continue
+                content = resolved.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            if content.strip():
+                # File still has content — no problem.
+                continue
+            # File is empty or blank on disk; only warn if HEAD had content.
+            if await self._file_had_content_in_head(rel_path):
+                emptied.append(rel_path)
+        return emptied
+
     async def commit_all(self, message: str) -> str | None:
         """Commit the ticket's changes under `message`; return the short SHA.
 
@@ -740,7 +798,19 @@ class GitWorkspaceService:
         Returns the short SHA of the ticket commit, or None if nothing
         outside bookkeeping changed (a bookkeeping-only commit may still be
         created even when this returns None).
+
+        Tracked files reduced to empty or blank content are signalled via a
+        warning log entry (``emptied_tracked_files``): the coder should have
+        removed them with ``rm`` so they disappear from the repository rather
+        than staying as empty files. The commit is not blocked.
         """
+        emptied = await self._detect_emptied_tracked_files()
+        if emptied:
+            _logger.warning(
+                "emptied_tracked_files",
+                extra={"fichiers": emptied, "conseil": "utiliser rm pour supprimer"},
+            )
+
         # `.` borne l'ajout au dossier du projet. C'est ce qu'on veut d'un
         # projet ordinaire — il *est* la racine de son dépôt — mais pas du
         # projet bootstrap, dont le travail est dans `backend/` et `frontend/`,

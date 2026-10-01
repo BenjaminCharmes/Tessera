@@ -921,3 +921,129 @@ async def test_sync_base_divergee_retourne_une_raison_sans_modifier_base_ref(
     assert current_base != sha_remote, (
         "_base_ref ne doit pas avoir été mis à jour sur une base divergée"
     )
+
+
+# ------------------------------------------------------------------
+# Fichiers suivis vidés pendant un run — ticket-277
+# ------------------------------------------------------------------
+
+
+async def test_commit_all_signale_un_fichier_suivi_vide(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Un codeur qui vide un fichier suivi au lieu de le supprimer laisse un
+    # fichier vide dans le dépôt. Le commit ne doit pas être bloqué, mais un
+    # avertissement doit signaler le fichier concerné.
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "signaler-vide")
+
+    # README.md est suivi depuis le commit initial ; on le vide.
+    (repo / "README.md").write_text("", encoding="utf-8")
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        sha = await service.commit_all("feat: ticket-277 — vider un fichier")
+
+    assert sha is not None
+    assert any(
+        record.getMessage() == "emptied_tracked_files"
+        for record in caplog.records
+    ), f"Aucun avertissement emptied_tracked_files dans {[r.getMessage() for r in caplog.records]}"
+
+    # Le fichier vide est bien commité (pas bloqué).
+    files_at_head = await service._run("ls-tree", "-r", "--name-only", "HEAD")
+    assert "README.md" in files_at_head
+
+
+async def test_commit_all_ne_signale_pas_un_fichier_supprime_par_rm(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Un fichier supprimé par `rm` disparaît du système de fichiers : il ne
+    # doit pas déclencher d'avertissement, et sa suppression doit être commitée.
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "supprimer-par-rm")
+
+    # Suppression par rm (comportement attendu du codeur).
+    (repo / "README.md").unlink()
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        sha = await service.commit_all("feat: ticket-277 — supprimer un fichier")
+
+    assert sha is not None
+    emptied_records = [
+        r for r in caplog.records
+        if r.getMessage() == "emptied_tracked_files"
+    ]
+    assert not emptied_records, (
+        f"Aucun avertissement emptied_tracked_files ne devrait être émis pour un rm : {emptied_records}"
+    )
+
+    # Le fichier n'est plus dans l'arbre.
+    files_at_head = await service._run("ls-tree", "-r", "--name-only", "HEAD")
+    assert "README.md" not in files_at_head
+
+
+async def test_commit_all_ne_signale_pas_un_fichier_vide_depuis_le_debut(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # Un fichier suivi qui était déjà vide dans HEAD (ex : __init__.py)
+    # n'a pas été *réduit* à vide pendant ce run : aucun avertissement.
+    (repo / "__init__.py").write_text("", encoding="utf-8")
+    await _git(repo, "add", "__init__.py")
+    await _git(repo, "commit", "-q", "-m", "chore: add empty init")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "init-vide")
+    # On ne touche pas à __init__.py — il reste vide comme en HEAD.
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        await service.commit_all("chore: rien ne change")
+
+    emptied_records = [
+        r for r in caplog.records
+        if r.getMessage() == "emptied_tracked_files"
+    ]
+    assert not emptied_records, (
+        f"Un fichier déjà vide en HEAD ne doit pas déclencher d'avertissement : {emptied_records}"
+    )
+
+
+async def test_detect_emptied_ne_suit_pas_un_symlink_hors_projet(
+    repo: Path, tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    # ADR-031 : les deux côtés sont résolus, symlinks compris. Un dépôt qui
+    # trace un symlink pointant hors du projet ne doit pas permettre de lire
+    # le fichier cible lors de la détection des fichiers vidés.
+    external = tmp_path / "externe.txt"
+    external.write_text("contenu externe\n", encoding="utf-8")
+
+    symlink = repo / "lien.txt"
+    try:
+        symlink.symlink_to(external)
+    except (OSError, NotImplementedError):
+        pytest.skip("Création de symlink non disponible dans cet environnement")
+
+    await _git(repo, "add", "lien.txt")
+    await _git(repo, "commit", "-q", "-m", "chore: add symlink")
+
+    # On vide le fichier externe (le symlink pointe vers un fichier vide).
+    external.write_text("", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-277", "symlink-hors-projet")
+
+    # Le symlink pointe hors du projet : _detect_emptied_tracked_files doit
+    # l'ignorer, pas le lire ni le signaler.
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        await service.commit_all("chore: symlink externe vide")
+
+    emptied_records = [
+        r for r in caplog.records
+        if r.getMessage() == "emptied_tracked_files"
+    ]
+    assert not emptied_records, (
+        f"Un symlink hors projet ne doit pas déclencher d'avertissement : {emptied_records}"
+    )
