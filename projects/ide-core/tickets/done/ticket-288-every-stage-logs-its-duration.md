@@ -1,14 +1,15 @@
 ---
-id: ticket-288
-title: "Every pipeline stage writes its duration to the pipeline log, delivery steps included"
-type: chore
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
-created: 2026-10-01
+id: ticket-288
+pr_number: 175
+priority: high
+status: done
+title: Every pipeline stage writes its duration to the pipeline log, delivery steps
+  included
+type: chore
 ---
 
 # ticket-288 — Chaque étape du pipeline journalise sa durée

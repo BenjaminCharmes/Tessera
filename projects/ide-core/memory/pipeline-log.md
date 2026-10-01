@@ -493,3 +493,37 @@ Analyse effectuée :
 - 2026-10-01 18:04:44 UTC — [ticket-280] tour 1 — reviewer terminé (86420ms)
 - 2026-10-01 18:10:13 UTC — [ticket-280] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par le code et les tests fournis
 - 2026-10-01 18:10:13 UTC — [ticket-280] APPROVED après 1 tour(s)
+- 2026-10-01 18:16:57 UTC — [ticket-288] branche ticket-288-every-pipeline-stage-writes-its-duration-to-the-p
+- 2026-10-01 18:16:57 UTC — [ticket-288] tour 1 — codeur démarré
+- 2026-10-01 18:29:43 UTC — [ticket-288] tour 1 — codeur terminé (766531ms)
+- 2026-10-01 18:33:13 UTC — [ticket-288] testeur: 1739 passed, 2 deselected, 5 warnings in 207.34s (0:03:27)
+- 2026-10-01 18:33:26 UTC — [ticket-288] securite: PASS — Le diff ajoute du tracking de performance via `time.monotonic()` et du logging a
+- 2026-10-01 18:33:26 UTC — [ticket-288] tour 1 — reviewer démarré
+- 2026-10-01 18:34:49 UTC — [ticket-288] tour 1 — reviewer terminé (83047ms)
+- 2026-10-01 18:34:49 UTC — [ticket-288] CHANGES_REQUESTED tour 1: 500]` synchronise le texte transmis au codeur et celui journalisé en une seule variable. Le bug des 
+- 2026-10-01 18:34:49 UTC — [ticket-288] tour 2 — codeur démarré
+- 2026-10-01 18:36:42 UTC — [ticket-288] tour 2 — codeur terminé (113514ms)
+- 2026-10-01 18:40:08 UTC — [ticket-288] testeur: 1739 passed, 2 deselected, 5 warnings in 203.12s (0:03:23)
+- 2026-10-01 18:40:27 UTC — [ticket-288] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute exclusivement de l'instrumentation
+- 2026-10-01 18:40:27 UTC — [ticket-288] tour 2 — reviewer démarré
+- 2026-10-01 18:41:45 UTC — [ticket-288] tour 2 — reviewer terminé (78563ms)
+- 2026-10-01 18:41:45 UTC — [ticket-288] CHANGES_REQUESTED tour 2: audit PASS, validateur APPROVED, doc réussie, doc en panne, livraison à 4 étapes dont CI à 8 500 ms,
+- 2026-10-01 18:41:45 UTC — [ticket-288] tour 3 — codeur démarré
+- 2026-10-01 18:44:04 UTC — [ticket-288] tour 3 — codeur terminé (138609ms)
+- 2026-10-01 18:47:29 UTC — [ticket-288] testeur: 1739 passed, 2 deselected, 5 warnings in 203.07s (0:03:23)
+- 2026-10-01 18:48:27 UTC — [ticket-288] securite: PASS — Audit de sécurité complet du diff : aucune vulnérabilité OWASP Top 10 ni CVE dét
+- 2026-10-01 18:48:27 UTC — [ticket-288] tour 3 — reviewer démarré
+- 2026-10-01 18:50:12 UTC — [ticket-288] tour 3 — reviewer terminé (105686ms)
+- 2026-10-01 18:50:12 UTC — [ticket-288] CHANGES_REQUESTED tour 3: 500]` puis `feedback[:100]` dans le log : une seule variable, deux usages synchronisés. Le test le v
+- 2026-10-01 18:50:12 UTC — [ticket-288] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-01 19:00:36 UTC — [ticket-288] branche ticket-288-every-pipeline-stage-writes-its-duration-to-the-p
+- 2026-10-01 19:00:37 UTC — [ticket-288] tour 1 — codeur démarré
+- 2026-10-01 19:06:32 UTC — [ticket-288] tour 1 — codeur terminé (355500ms)
+- 2026-10-01 19:10:02 UTC — [ticket-288] testeur: 1739 passed, 2 deselected, 5 warnings in 206.95s (0:03:26)
+- 2026-10-01 19:10:37 UTC — [ticket-288] securite: PASS — Audit complet : aucune vulnérabilité détectée.
+
+Le diff ajoute du timing (durées
+- 2026-10-01 19:10:37 UTC — [ticket-288] tour 1 — reviewer démarré
+- 2026-10-01 19:12:24 UTC — [ticket-288] tour 1 — reviewer terminé (106532ms)
+- 2026-10-01 19:16:42 UTC — [ticket-288] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code mesure et journalise les
+- 2026-10-01 19:16:42 UTC — [ticket-288] APPROVED après 1 tour(s)

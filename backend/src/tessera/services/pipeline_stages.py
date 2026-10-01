@@ -12,6 +12,7 @@ visible instead of hiding it behind a mixin.
 A stage that can end the run returns a `PipelineResult`; returning `None`
 means "carry on".
 """
+import time
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -412,6 +413,7 @@ async def run_security_audit(
         return None
 
     await emit(run, EventType.SECURITY_AUDIT_STARTED, round=run.round_num)
+    t0 = time.monotonic()
     try:
         audit = await orch._security_auditor.audit(
             code_diff=run.reviewed_code, project_path=orch._project_path
@@ -422,6 +424,7 @@ async def run_security_audit(
         audit = SecurityAuditResult(
             issues=[], verdict="BLOCK", summary=reason, reason=reason
         )
+    audit_ms = int((time.monotonic() - t0) * 1000)
 
     await emit(
         run,
@@ -433,7 +436,9 @@ async def run_security_audit(
         summary=audit.summary,
         reason=audit.reason,
     )
-    orch._log(f"[{run.ticket_id}] securite: {audit.verdict} — {audit.summary[:80]}")
+    orch._log(
+        f"[{run.ticket_id}] securite: {audit.verdict} — {audit.summary[:80]} ({audit_ms}ms)"
+    )
 
     if audit.verdict == "BLOCK":
         return await finish_security_block(orch, run, audit.summary)
@@ -513,6 +518,7 @@ async def run_validation(
     if orch._validator is None:
         return True, reason
     await emit(run, EventType.VALIDATION_STARTED)
+    t0 = time.monotonic()
     try:
         validation = await orch._validator.validate(
             criteria=_extract_criteria(run.ticket.body),
@@ -524,6 +530,7 @@ async def run_validation(
         # n'approuve rien (ticket-122).
         _logger.warning("validator_failed", extra={"error": str(exc)})
         return False, f"Validation en panne : {exc}"
+    validation_ms = int((time.monotonic() - t0) * 1000)
 
     await emit(
         run,
@@ -541,7 +548,8 @@ async def run_validation(
         ],
     )
     orch._log(
-        f"[{run.ticket_id}] validateur: {validation.verdict} — {validation.feedback[:80]}"
+        f"[{run.ticket_id}] validateur: {validation.verdict} — "
+        f"{validation.feedback[:80]} ({validation_ms}ms)"
     )
     if validation.verdict == "CHANGES_REQUESTED":
         return False, validation.feedback

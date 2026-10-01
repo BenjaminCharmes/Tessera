@@ -9,6 +9,7 @@ lit `autonomy` et s'arrête là où le projet le dit. Il ne force rien non plus 
 un conflit, une CI rouge ou une CI muette l'arrêtent, et il dit pourquoi.
 """
 import asyncio
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
@@ -39,6 +40,9 @@ class Livraison:
     """Ce que la livraison a fait, et pourquoi elle s'est arrêtée."""
 
     etapes: tuple[str, ...] = ()
+    #: Durée en millisecondes de chaque étape, dans le même ordre que `etapes`.
+    #: `tuple[float, ...]` est JSON-sérialisable (devient une liste). (ticket-288)
+    durees_ms: tuple[float, ...] = ()
     #: `None` quand la livraison est allée aussi loin que le projet l'autorise.
     arret: str | None = None
     conflits: tuple[str, ...] = ()
@@ -115,6 +119,7 @@ class LivraisonService:
     ) -> Livraison:
         """Porte le travail du ticket jusqu'où le projet le permet."""
         etapes: list[str] = []
+        durees_ms: list[float] = []
 
         if not approuve:
             return Livraison(
@@ -153,13 +158,17 @@ class LivraisonService:
         # Non-blocking: a failed sync falls back to the current local branch.
         await self._git.sync_base_depuis_distant(self._base_branch)
 
+        t0 = time.monotonic()
         conflits = await self._git.rejouer_sur(
             self._base_branch,
             resolveur=resoudre if self._resolveur is not None else None,
         )
+        rebase_ms = (time.monotonic() - t0) * 1000
+
         if conflits:
             return Livraison(
                 etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
                 conflits=conflits,
                 arret=(
                     f"Conflit avec {self._base_branch} sur : "
@@ -168,9 +177,13 @@ class LivraisonService:
                 ),
             )
         etapes.append(f"rebase sur {self._base_branch}")
+        durees_ms.append(rebase_ms)
         if resolus:
+            # La résolution est incluse dans la durée du rebase ci-dessus.
             etapes.append("conflit résolu : " + ", ".join(resolus))
+            durees_ms.append(0.0)
 
+        t0 = time.monotonic()
         resultat = await self._workflow.open_pull_request(
             branch=branch,
             ticket_id=ticket_id,
@@ -178,8 +191,10 @@ class LivraisonService:
             ticket_body=ticket_body,
             ticket_type=ticket_type,
         )
+        pr_ms = (time.monotonic() - t0) * 1000
         pr_number = int(resultat.pr_number)
         etapes.append(f"PR #{pr_number} ouverte")
+        durees_ms.append(pr_ms)
 
         # Enregistre le pr_number dans le ticket, commite et pousse **avant**
         # tout merge : garantit qu'aucun commit n'est laissé sur la branche
@@ -196,6 +211,7 @@ class LivraisonService:
             # pas déclaré ça — et personne n'a relu la résolution.
             return Livraison(
                 etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
                 conflits=tuple(resolus),
                 arret=(
@@ -207,7 +223,8 @@ class LivraisonService:
 
         if niveau is not NiveauAutonomie.merge:
             return Livraison(
-                etapes=tuple(etapes), pr_number=pr_number, arret=None
+                etapes=tuple(etapes), durees_ms=tuple(durees_ms),
+                pr_number=pr_number, arret=None,
             )
 
         # Attendre une CI que le projet déclare absente, c'est payer le délai
@@ -216,13 +233,19 @@ class LivraisonService:
         # dit « pas de CI », pas « ignore la CI ».
         if self._politique is not None and self._politique.merge_without_ci:
             etapes.append("CI : non attendue, déclarée absente")
-            return await self._merger(pr_number, etapes, ticket_id)
+            durees_ms.append(0.0)
+            return await self._merger(pr_number, etapes, durees_ms, ticket_id)
 
+        t0 = time.monotonic()
         ci = await self._attendre_la_ci(pr_number)
+        ci_ms = (time.monotonic() - t0) * 1000
         etapes.append(f"CI : {ci}")
+        durees_ms.append(ci_ms)
+
         if ci == "pending":
             return Livraison(
                 etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
                 arret=(
                     "Fin de l'attente : la CI de la PR "
@@ -233,26 +256,38 @@ class LivraisonService:
         if ci != "passing":
             return Livraison(
                 etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
                 arret=f"CI {ci} : la PR #{pr_number} reste ouverte.",
             )
 
-        return await self._merger(pr_number, etapes, ticket_id)
+        return await self._merger(pr_number, etapes, durees_ms, ticket_id)
 
     async def _merger(
-        self, pr_number: int, etapes: list[str], ticket_id: str
+        self,
+        pr_number: int,
+        etapes: list[str],
+        durees_ms: list[float],
+        ticket_id: str,
     ) -> Livraison:
         """Le dernier maillon, commun aux deux chemins de décision."""
+        t0 = time.monotonic()
         merged = await self._workflow.merge_si_la_ci_est_verte(pr_number)
+        merge_ms = (time.monotonic() - t0) * 1000
         if not merged:
             return Livraison(
                 etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
                 arret=f"GitHub a refusé le merge de la PR #{pr_number}.",
             )
         etapes.append(f"PR #{pr_number} mergée")
+        durees_ms.append(merge_ms)
         _logger.info("livraison_complete", extra={"ticket": ticket_id, "pr": pr_number})
-        return Livraison(etapes=tuple(etapes), pr_number=pr_number, merged=True)
+        return Livraison(
+            etapes=tuple(etapes), durees_ms=tuple(durees_ms),
+            pr_number=pr_number, merged=True,
+        )
 
     async def _attendre_la_ci(self, pr_number: int) -> str:
         """Poll CI until a verdict, or until the wait bound.

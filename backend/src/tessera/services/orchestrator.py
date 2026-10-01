@@ -5,6 +5,7 @@ the early exits. Keeping the flow readable in one screen is the point: the
 order of the stages, and the conditions that end a run, are the part that is
 hard to get right.
 """
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from collections.abc import Awaitable, Callable
@@ -173,6 +174,10 @@ class Orchestrator:
             )
         )
         livraison = await self._livrer(resultat)
+        for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms):
+            self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
+        if livraison.arret:
+            self._log(f"[{ticket_id}] livraison: arrêt — {livraison.arret[:100]}")
         await on_event(
             OrchestratorEvent(
                 type=EventType.LIVRAISON_DONE,
@@ -326,9 +331,10 @@ class Orchestrator:
             if approved:
                 return await outcomes.finish_approved(self, run)
 
-            run.review_feedback.append(reason or raw_verdict[:500])
+            feedback = reason or raw_verdict[:500]
+            run.review_feedback.append(feedback)
             self._log(
-                f"[{ticket_id}] CHANGES_REQUESTED tour {round_num}: {(reason or '')[:100]}"
+                f"[{ticket_id}] CHANGES_REQUESTED tour {round_num}: {feedback[:100]}"
             )
 
         return await outcomes.finish_rounds_exhausted(self, run)
@@ -522,10 +528,14 @@ class Orchestrator:
                 ticket_id=resultat.ticket_id,
             )
         )
+        t0 = time.monotonic()
         try:
             doc = await self._documenter()
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("documentation_echouee", extra={"erreur": str(exc)})
+            self._log(
+                f"[{resultat.ticket_id}] documentation: échec — {str(exc)[:80]}"
+            )
             await on_event(
                 OrchestratorEvent(
                     type=EventType.DOCUMENTATION_FAILED,
@@ -534,7 +544,11 @@ class Orchestrator:
                 )
             )
             return
+        doc_ms = int((time.monotonic() - t0) * 1000)
         fichiers = list(getattr(doc, "fichiers_modifies", []) or [])
+        self._log(
+            f"[{resultat.ticket_id}] documentation: {len(fichiers)} fichier(s) ({doc_ms}ms)"
+        )
         refus = list(getattr(doc, "refus", []) or [])
         tickets = list(getattr(doc, "tickets", []) or [])
         tronque = bool(getattr(doc, "tronque", False))
