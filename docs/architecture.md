@@ -275,6 +275,29 @@ dans le fichier du ticket et commité **avant** le merge de la PR, garantissant 
 le `pr_number` remonte à la branche de base lors du merge. Aucun suivi n'est écrit
 après le merge : la branche du ticket ne reçoit pas de commit une fois fusionnée.
 
+
+### Mise à jour de la base distante après merge en file
+
+Quand la livraison opère en **mode file** (`queue`) sur un projet avec
+`autonomy: merge`, le ticket suivant doit partir d'une base à jour. Après qu'une
+livraison a mergé sa PR :
+
+- Un `fetch` met à jour les références locales depuis le serveur
+- La branche locale de base avance jusqu'au commit distant (avance rapide seulement)
+- `_base_ref` est repositionné sur ce nouveau commit
+
+Le ticket suivant forkera depuis ce commit, non depuis la branche du ticket
+précédent. Un rebase n'aura donc pas de conflit factice avec le squash du ticket
+précédent, déjà fusionné sur la branche de base distante.
+
+**Cas non mergés** : Cette mise à jour ne s'applique qu'après une livraison
+**mergée**. Après une livraison non mergée — CI rouge, niveau PR ou commit — le
+ticket suivant part du ticket précédent, ce qui permet à un plan séquentiel
+d'avancer malgré les obstacles (ADR-018).
+
+**Divergence** : Si la branche locale et distante divergent hors d'une avance
+rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`
