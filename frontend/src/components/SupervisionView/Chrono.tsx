@@ -11,14 +11,25 @@ import { formater } from "./duree";
  * `setState` vit dans le callback de l'intervalle, jamais dans le corps de
  * l'effet : c'est exactement le motif des dix-neuf erreurs
  * `react-hooks/set-state-in-effect` corrigées par ticket-123.
+ *
+ * `termineA` fige l'affichage à l'heure de clôture du run (ticket-279) :
+ * le chrono s'arrête dès que le run est fermé.
  */
-export default function Chrono({ depuis }: { depuis: string }) {
+export default function Chrono({
+  depuis,
+  termineA,
+}: {
+  depuis: string;
+  termineA?: string;
+}) {
   const [maintenant, setMaintenant] = useState(() => Date.now());
 
   useEffect(() => {
+    if (termineA) return; // Run terminé : l'horloge reste figée.
     const t = setInterval(() => setMaintenant(Date.now()), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [termineA]);
 
-  return <span>{formater(maintenant - Date.parse(depuis))}</span>;
+  const reference = termineA ? Date.parse(termineA) : maintenant;
+  return <span>{formater(reference - Date.parse(depuis))}</span>;
 }

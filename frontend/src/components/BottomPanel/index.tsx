@@ -82,14 +82,30 @@ function eventToLine(ev: OrchestratorEvent): string | null {
     }
     case "validation_started":
       return `[${t}] Validation : démarrée`;
-    case "validation_done":
-      return `[${t}] Validation : ${ev.data["approved"] === true ? "approuvée" : "refusée"}`;
+    case "validation_done": {
+      // Le champ `approved` est ajouté depuis ticket-279 ; les backends plus
+      // anciens n'émettent que `verdict` — on retombe sur lui en dernier recours.
+      const hasApproved = "approved" in ev.data;
+      const approved = hasApproved
+        ? ev.data["approved"] === true
+        : typeof ev.data["verdict"] === "string"
+          ? ev.data["verdict"] === "APPROVED"
+          : false;
+      return `[${t}] Validation : ${approved ? "approuvée" : "refusée"}`;
+    }
     case "documentation_started":
       return `[${t}] Documentation : démarrée`;
     case "doc_updated":
       return `[${t}] Documentation mise à jour`;
     case "livraison_started":
       return `[${t}] Livraison : démarrée`;
+    case "test_result": {
+      // Une suite rouge renvoie le travail au codeur sans passer par la revue
+      // (ticket-098) ; sans ligne dans le log, trois tours de codeur s'affichaient
+      // d'affilée sans raison apparente (ticket-279).
+      const passed = ev.data["passed"] === true;
+      return `[${t}] Tests : ${passed ? "verts" : "rouges — retour au codeur"}`;
+    }
     case "error":
       return `[${t}] Erreur : ${raisonLisible(ev)}`;
     default:

@@ -1,6 +1,12 @@
 import type { PipelineResult } from "../../types/api";
 import { IconCheck, IconCross } from "../../design/icons";
 
+interface LivraisonData {
+  pr_number?: number;
+  merged?: boolean;
+  arret?: string;
+}
+
 interface PipelineSummaryProps {
   result: PipelineResult;
   durationMs?: number;
@@ -11,12 +17,18 @@ interface PipelineSummaryProps {
    * Défaut `true` pour rétrocompatibilité avec RunView.
    */
   runClosed?: boolean;
+  /**
+   * Ce que la livraison a produit, extrait de `livraison_done` (ticket-279).
+   * Affiché après `runClosed` : numéro de PR, mergée ou cause d'arrêt.
+   */
+  livraisonData?: LivraisonData | null;
 }
 
 export default function PipelineSummary({
   result,
   durationMs,
   runClosed = true,
+  livraisonData = null,
 }: PipelineSummaryProps) {
   const durationStr = durationMs ? `${Math.round(durationMs / 1000)}s` : null;
   const titreApprouve = runClosed
@@ -56,6 +68,20 @@ export default function PipelineSummary({
         {durationStr && (
           <div>
             Durée : <span className="text-zinc-300">{durationStr}</span>
+          </div>
+        )}
+        {runClosed && livraisonData && (
+          <div>
+            Livraison :{" "}
+            <span className="text-zinc-300">
+              {livraisonData.merged
+                ? `PR #${livraisonData.pr_number ?? "?"} mergée`
+                : livraisonData.arret !== undefined
+                  ? livraisonData.arret
+                  : livraisonData.pr_number !== undefined
+                    ? `PR #${livraisonData.pr_number} ouverte`
+                    : "terminée"}
+            </span>
           </div>
         )}
       </div>

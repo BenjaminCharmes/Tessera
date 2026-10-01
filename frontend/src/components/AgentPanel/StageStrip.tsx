@@ -23,6 +23,18 @@ const ETAPES: StageInfo[] = [
 const ORDRE_IDS = ETAPES.map((e) => e.id);
 
 /**
+ * Vrai si un `validation_done` correspond à un refus.
+ *
+ * Depuis ticket-279 le backend émet `approved: boolean`. Les backends plus
+ * anciens n'émettent que `verdict` — on retombe sur lui en dernier recours,
+ * pour que la frise reste cohérente avec le Pipeline log (retour reviewer).
+ */
+function estValidationRefusee(e: OrchestratorEvent): boolean {
+  if ("approved" in e.data) return e.data["approved"] === false;
+  return typeof e.data["verdict"] === "string" && e.data["verdict"] !== "APPROVED";
+}
+
+/**
  * Détermine les étapes que ce projet active.
  *
  * Si `reglages` n'est pas fourni (observation sans contexte de projet),
@@ -69,7 +81,31 @@ function etatEtape(
   const indexActuel = etape ? ORDRE_IDS.indexOf(etape) : -1;
   const indexEtape = ORDRE_IDS.indexOf(id);
 
-  if (etape === id) return "active";
+  if (etape === id) {
+    // Une étape peut recevoir son événement de fin pendant qu'elle est encore
+    // active dans l'instantané (livraison_done reçu avant run_closed, par ex.).
+    // On vérifie d'abord les événements de fin avant de rendre "active" (ticket-279).
+    switch (id) {
+      case "livraison":
+        if (events.some((e) => e.type === "livraison_done")) return "done";
+        break;
+      case "documentation":
+        if (events.some((e) => e.type === "doc_updated" || e.type === "documentation_failed"))
+          return "done";
+        break;
+      case "validation":
+        if (events.some((e) => e.type === "validation_done" && estValidationRefusee(e)))
+          return "rejected";
+        if (events.some((e) => e.type === "validation_done")) return "done";
+        break;
+      case "securite":
+        if (events.some((e) => e.type === "security_audit_done" && e.data["verdict"] === "BLOCK"))
+          return "rejected";
+        if (events.some((e) => e.type === "security_audit_done")) return "done";
+        break;
+    }
+    return "active";
+  }
 
   if (indexActuel > indexEtape && indexActuel >= 0) {
     // On est plus loin dans le pipeline — mais cette étape a-t-elle été refusée ?
@@ -79,7 +115,7 @@ function etatEtape(
       return "rejected";
     }
     if (id === "validation" && events.some(
-      (e) => e.type === "validation_done" && e.data["approved"] === false,
+      (e) => e.type === "validation_done" && estValidationRefusee(e),
     )) {
       return "rejected";
     }
@@ -105,7 +141,7 @@ function etatEtape(
       break;
     case "validation": {
       const validsDone = events.filter((e) => e.type === "validation_done");
-      if (validsDone.some((e) => e.data["approved"] === false)) return "rejected";
+      if (validsDone.some(estValidationRefusee)) return "rejected";
       if (validsDone.length > 0) return "done";
       if (events.some((e) => e.type === "validation_started")) return "active";
       break;

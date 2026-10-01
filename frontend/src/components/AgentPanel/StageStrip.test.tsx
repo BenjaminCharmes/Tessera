@@ -102,6 +102,44 @@ describe("StageStrip — enrichissement par les événements (ticket-256)", () =
   });
 });
 
+describe("StageStrip — fallback verdict pour validation_done sans approved (retour reviewer ticket-279)", () => {
+  it("marque validation rejected si verdict=CHANGES_REQUESTED sans approved", () => {
+    // Ancien backend : seul `verdict` est émis, pas `approved`.
+    const events = [ev("validation_done", { verdict: "CHANGES_REQUESTED" })];
+    render(<StageStrip etape={null} events={events} reglages={REGLAGES_TOUT} />);
+    expect(screen.getByLabelText(/Validation : rejected/)).toBeTruthy();
+  });
+
+  it("marque validation done si verdict=APPROVED sans approved", () => {
+    const events = [ev("validation_done", { verdict: "APPROVED" })];
+    render(<StageStrip etape={null} events={events} reglages={REGLAGES_TOUT} />);
+    expect(screen.getByLabelText(/Validation : done/)).toBeTruthy();
+  });
+
+  it("marque validation rejected si etape=validation et verdict=CHANGES_REQUESTED sans approved", () => {
+    // L'instantané dit que l'étape est active mais l'événement de fin est arrivé.
+    const events = [ev("validation_done", { verdict: "CHANGES_REQUESTED" })];
+    render(<StageStrip etape="validation" events={events} reglages={REGLAGES_TOUT} />);
+    expect(screen.getByLabelText(/Validation : rejected/)).toBeTruthy();
+  });
+});
+
+describe("StageStrip — etape active ne persiste pas apres son evenement de fin (ticket-279)", () => {
+  it("marque livraison done quand livraison_done recu meme si etape=livraison", () => {
+    const events = [ev("livraison_started"), ev("livraison_done")];
+    render(<StageStrip etape="livraison" events={events} reglages={REGLAGES_TOUT} />);
+    expect(screen.getByLabelText(/Livraison : done/)).toBeTruthy();
+    expect(screen.queryByLabelText(/Livraison : active/)).toBeNull();
+  });
+
+  it("marque documentation done quand doc_updated recu meme si etape=documentation", () => {
+    const events = [ev("documentation_started"), ev("doc_updated")];
+    render(<StageStrip etape="documentation" events={events} reglages={REGLAGES_TOUT} />);
+    expect(screen.getByLabelText(/Docs : done/)).toBeTruthy();
+    expect(screen.queryByLabelText(/Docs : active/)).toBeNull();
+  });
+});
+
 describe("StageStrip — étapes inactives (ticket-256)", () => {
   it("n'affiche pas de pastille sécurité quand securite_enabled=false", () => {
     render(

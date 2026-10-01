@@ -382,8 +382,9 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
     }
     case "run_closed":
       // Le run est définitivement terminé : livraison et documentation sont finies.
-      // Le bouton « Fermer » n'apparaît qu'ici (ticket-267).
-      return { ...s, events, runClosed: true };
+      // Le bouton « Fermer » n'apparaît qu'ici (ticket-267). L'étape active se
+      // remet à null : livraison ou doc ne clignotent plus après la clôture (ticket-279).
+      return { ...s, events, runClosed: true, etape: null };
     case "error":
       return {
         ...s,

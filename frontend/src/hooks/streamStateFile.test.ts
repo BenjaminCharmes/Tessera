@@ -206,6 +206,22 @@ describe("applyEvent — entrées securite et validateur dans le fil (ticket-257
   });
 });
 
+describe("applyEvent — run_closed remet etape a null (ticket-279)", () => {
+  it("etape vaut null apres run_closed suite a livraison_started", () => {
+    let s = applyEvent(INITIAL, ev({ type: "livraison_started" }));
+    expect(s.etape).toBe("livraison");
+    s = applyEvent(s, ev({ type: "run_closed" }));
+    expect(s.etape).toBeNull();
+  });
+
+  it("etape vaut null apres run_closed suite a documentation_started", () => {
+    let s = applyEvent(INITIAL, ev({ type: "documentation_started" }));
+    expect(s.etape).toBe("documentation");
+    s = applyEvent(s, ev({ type: "run_closed" }));
+    expect(s.etape).toBeNull();
+  });
+});
+
 describe("applyEvent — coût en direct (ticket-197)", () => {
   it("cumule le coût et compte les appels, et remet les outils à zéro par agent", () => {
     let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "codeur", data: {} }));

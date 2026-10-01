@@ -186,6 +186,73 @@ function streamMock(over: Partial<UseRunActifResult> = {}): UseRunActifResult {
   } as UseRunActifResult;
 }
 
+describe("PipelineSummary — livraison apres run_closed (ticket-279)", () => {
+  it("affiche le numero de PR mergee", () => {
+    render(
+      <PipelineSummary
+        result={APPROVED}
+        runClosed={true}
+        livraisonData={{ pr_number: 42, merged: true }}
+      />,
+    );
+    expect(screen.getByText(/PR #42 mergée/)).toBeTruthy();
+  });
+
+  it("affiche la cause d'arret quand la PR n'a pas été mergée", () => {
+    render(
+      <PipelineSummary
+        result={APPROVED}
+        runClosed={true}
+        livraisonData={{ merged: false, arret: "Conflit sur main" }}
+      />,
+    );
+    expect(screen.getByText(/Conflit sur main/)).toBeTruthy();
+  });
+
+  it("n'affiche pas la livraison avant run_closed", () => {
+    render(
+      <PipelineSummary
+        result={APPROVED}
+        runClosed={false}
+        livraisonData={{ pr_number: 7, merged: true }}
+      />,
+    );
+    expect(screen.queryByText(/PR #7/)).toBeNull();
+  });
+});
+
+describe("AgentPanel — croix Effacer le run (ticket-279)", () => {
+  it("absente quand status=done mais runClosed=false", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ status: "done", runClosed: false, lastResult: APPROVED })}
+      />,
+    );
+    expect(screen.queryByLabelText(/Effacer le run/)).toBeNull();
+  });
+
+  it("presente quand runClosed=true", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ status: "done", runClosed: true, lastResult: APPROVED })}
+      />,
+    );
+    expect(screen.getByLabelText(/Effacer le run/)).toBeTruthy();
+  });
+
+  it("presente quand status=error indépendamment de runClosed", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ status: "error", runClosed: false, errorMessage: "oups" })}
+      />,
+    );
+    expect(screen.getByLabelText(/Effacer le run/)).toBeTruthy();
+  });
+});
+
 describe("AgentPanel — fil multi-tours (ticket-257)", () => {
   it("montre le passage du codeur au tour 1 apres le tour 2", () => {
     // Trois entrées : codeur t1 (done), reviewer t1 (done), codeur t2 (actif).

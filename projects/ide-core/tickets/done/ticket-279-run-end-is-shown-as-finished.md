@@ -1,14 +1,15 @@
 ---
-id: ticket-279
-title: "A finished run looks finished: stage strip, timer, close button and verdict lines"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
-created: 2026-10-01
+id: ticket-279
+pr_number: 169
+priority: high
+status: done
+title: 'A finished run looks finished: stage strip, timer, close button and verdict
+  lines'
+type: fix
 ---
 
 # ticket-279 — Un run terminé a l'air terminé
