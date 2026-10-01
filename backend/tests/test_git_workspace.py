@@ -1093,3 +1093,188 @@ async def test_detect_emptied_ne_suit_pas_un_symlink_hors_projet(
     assert not emptied_records, (
         f"Un symlink hors projet ne doit pas déclencher d'avertissement : {emptied_records}"
     )
+
+
+# ------------------------------------------------------------------
+# Initialisation de la base depuis le distant — ticket-285
+# ------------------------------------------------------------------
+
+
+async def test_initialiser_base_ref_depuis_origin(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """A run started when HEAD is on an old ticket branch forks from origin/develop.
+
+    After a delivered ticket, the repo stays on the ticket branch. The next run
+    must fork from origin/develop (the squash base), not from HEAD.
+    """
+    local, _bare = repo_avec_distant
+
+    # Add a remote-only commit (simulates a squash merge on develop)
+    autre = local.parent / "autre-clone"
+    autre.mkdir()
+    await _git(autre, "init", "-q")
+    await _git(autre, "config", "user.email", "test@tessera.local")
+    await _git(autre, "config", "user.name", "Tessera test")
+    await _git(autre, "remote", "add", "origin", str(_bare))
+    await _git(autre, "fetch", "-q", "origin")
+    await _git(autre, "checkout", "-q", "-b", "develop", "origin/develop")
+    (autre / "remote-commit.py").write_text("# remote\n", encoding="utf-8")
+    await _git(autre, "add", "remote-commit.py")
+    await _git(autre, "commit", "-q", "-m", "feat: remote commit on develop")
+    await _git(autre, "push", "-q", "origin", "develop")
+
+    remote_sha = await _git_out(local, "ls-remote", "origin", "refs/heads/develop")
+    remote_sha = remote_sha.split("\t")[0].strip()
+
+    # Local repo left on an old ticket branch (HEAD is not develop)
+    await _git(local, "checkout", "-q", "-b", "ticket-old-branch")
+    (local / "old.py").write_text("x = 1\n", encoding="utf-8")
+    await _git(local, "add", "old.py")
+    await _git(local, "commit", "-q", "-m", "feat: old ticket work")
+
+    service = GitWorkspaceService(local)
+    raison = await service.initialiser_base_ref("develop")
+
+    assert raison is None
+    assert service._base_ref == remote_sha, (
+        f"_base_ref should point to remote commit ({remote_sha[:7]}), "
+        f"not HEAD of ticket-old-branch ({(service._base_ref or '')[:7]})"
+    )
+
+    # New ticket branch forks from the remote SHA
+    await service.create_branch("ticket-new", "nouvelle-feature")
+    head_sha = await _git_out(local, "rev-parse", "HEAD")
+    assert head_sha == remote_sha, (
+        f"ticket-new ({head_sha[:7]}) should start from remote develop ({remote_sha[:7]})"
+    )
+
+
+async def test_initialiser_base_ref_sans_distant_utilise_base_locale(
+    repo: Path,
+) -> None:
+    """Without a remote, initialiser_base_ref uses the local base_branch ref, not HEAD."""
+    # Create a develop branch ahead of main
+    await _git(repo, "checkout", "-q", "-b", "develop")
+    (repo / "develop.py").write_text("on develop\n", encoding="utf-8")
+    await _git(repo, "add", "develop.py")
+    await _git(repo, "commit", "-q", "-m", "chore: develop commit")
+    develop_sha = await _git_out(repo, "rev-parse", "HEAD")
+
+    # Leave HEAD on an old ticket branch (different from develop)
+    await _git(repo, "checkout", "-q", "-b", "ticket-old")
+    (repo / "old.py").write_text("old\n", encoding="utf-8")
+    await _git(repo, "add", "old.py")
+    await _git(repo, "commit", "-q", "-m", "feat: old work")
+
+    service = GitWorkspaceService(repo)
+    raison = await service.initialiser_base_ref("develop")
+
+    assert raison is None, f"Sans distant, pas de blocage attendu : {raison}"
+    assert service._base_ref == develop_sha, (
+        f"_base_ref devrait être develop ({develop_sha[:7]}), "
+        f"non HEAD de ticket-old ({(service._base_ref or '')[:7]})"
+    )
+
+
+async def test_initialiser_base_ref_base_divergee_bloque(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """A locally diverged base_branch blocks the run with a reason naming the branch.
+
+    We create a true divergence: local develop has a commit that is not an
+    ancestor of the remote develop, and remote has a commit not in local.
+    Neither is ancestor of the other.
+    """
+    local, bare = repo_avec_distant
+
+    # Add a remote-only commit (via a separate clone)
+    autre = local.parent / "autre-diverge"
+    autre.mkdir()
+    await _git(autre, "init", "-q")
+    await _git(autre, "config", "user.email", "test@tessera.local")
+    await _git(autre, "config", "user.name", "Tessera test")
+    await _git(autre, "remote", "add", "origin", str(bare))
+    await _git(autre, "fetch", "-q", "origin")
+    await _git(autre, "checkout", "-q", "-b", "develop", "origin/develop")
+    (autre / "remote-only.py").write_text("remote\n", encoding="utf-8")
+    await _git(autre, "add", "remote-only.py")
+    await _git(autre, "commit", "-q", "-m", "chore: remote only commit")
+    await _git(autre, "push", "-q", "origin", "develop")
+
+    # Add a LOCAL commit to local develop (without fetching → divergence)
+    await _git(local, "checkout", "-q", "develop")
+    (local / "local-only.py").write_text("local\n", encoding="utf-8")
+    await _git(local, "add", "local-only.py")
+    await _git(local, "commit", "-q", "-m", "chore: local only commit")
+    local_sha_before = await _git_out(local, "rev-parse", "refs/heads/develop")
+
+    service = GitWorkspaceService(local)
+    raison = await service.initialiser_base_ref("develop")
+
+    assert raison is not None, "A diverged base must return a blocking reason"
+    assert "develop" in raison, f"The reason must name the branch: {raison}"
+    # Local branch must NOT have been force-reset
+    local_sha_after = await _git_out(local, "rev-parse", "refs/heads/develop")
+    assert local_sha_after == local_sha_before, (
+        "Local develop must not be rewritten on divergence"
+    )
+
+
+async def test_scenario_freelance_ticket_b_ne_contient_pas_les_commits_de_ticket_a(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """Ticket-285 scenario: ticket A squash-merged, repo on A's branch, ticket B is clean.
+
+    After ticket A is squash-merged on the remote, the local repo is left on the
+    ticket-A branch. The next run must fork from origin/develop (the squash),
+    so ticket B's commits contain only ticket B's work — no duplicates of A.
+    """
+    local, bare = repo_avec_distant
+
+    service_a = GitWorkspaceService(local)
+
+    # --- Ticket A ---
+    await service_a.create_branch("ticket-a", "feature-a")
+    (local / "a.py").write_text("# work for A\n", encoding="utf-8")
+    await service_a.commit_all("feat: ticket-a — feature a")
+    branch_a = await _git_out(local, "rev-parse", "--abbrev-ref", "HEAD")
+
+    # Simulate squash merge on remote: another clone adds A's content in a squash commit
+    squash_clone = local.parent / "squash-clone"
+    squash_clone.mkdir()
+    await _git(squash_clone, "init", "-q")
+    await _git(squash_clone, "config", "user.email", "test@tessera.local")
+    await _git(squash_clone, "config", "user.name", "Tessera test")
+    await _git(squash_clone, "remote", "add", "origin", str(bare))
+    await _git(squash_clone, "fetch", "-q", "origin")
+    await _git(squash_clone, "checkout", "-q", "-b", "develop", "origin/develop")
+    (squash_clone / "a.py").write_text("# work for A\n", encoding="utf-8")
+    await _git(squash_clone, "add", "a.py")
+    await _git(squash_clone, "commit", "-q", "-m", "feat: ticket-a — feature a (squash)")
+    await _git(squash_clone, "push", "-q", "origin", "develop")
+    squash_sha = await _git_out(squash_clone, "rev-parse", "HEAD")
+
+    # Local repo stays on ticket-a branch (as after a livraison push)
+    current_branch = await _git_out(local, "rev-parse", "--abbrev-ref", "HEAD")
+    assert current_branch == branch_a
+
+    # --- Ticket B run: initialiser_base_ref syncs develop with remote ---
+    service_b = GitWorkspaceService(local)
+    raison = await service_b.initialiser_base_ref("develop")
+    assert raison is None, f"No divergence expected: {raison}"
+    assert service_b._base_ref == squash_sha, (
+        f"_base_ref should be the squash commit ({squash_sha[:7]}), "
+        f"not {(service_b._base_ref or '')[:7]}"
+    )
+
+    await service_b.create_branch("ticket-b", "feature-b")
+    (local / "b.py").write_text("# work for B\n", encoding="utf-8")
+    await service_b.commit_all("feat: ticket-b — feature b")
+
+    # Commits from ticket-b above squash_sha must not include ticket-a's commits
+    log = await _git_out(local, "log", f"{squash_sha}..HEAD", "--oneline")
+    assert "feat: ticket-b" in log
+    assert "feat: ticket-a" not in log, (
+        "Ticket B's commits above the squash base must not include ticket A's commits"
+    )

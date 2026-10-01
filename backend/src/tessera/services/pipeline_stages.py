@@ -72,11 +72,33 @@ async def ensure_clean_tree(
     )
 
 
-async def create_branch(orch: "Orchestrator", run: PipelineRun) -> None:
-    """Switch to the ticket's own branch; degrade without one if git is absent."""
+async def create_branch(
+    orch: "Orchestrator", run: PipelineRun
+) -> Optional[PipelineResult]:
+    """Switch to the ticket's own branch; degrade without one if git is absent.
+
+    Aligns the base ref with the remote before forking (ticket-285).
+    Returns a blocked ``PipelineResult`` when the local base has diverged
+    from the remote and the run cannot safely start.
+    """
     if orch._git_workspace is None:
-        return
+        return None
     try:
+        # Sync base_branch with remote before forking the ticket branch (ticket-285).
+        # A diverged local base blocks the run immediately rather than producing
+        # a PR that GitHub will immediately reject.
+        raison_blocage = await orch._git_workspace.initialiser_base_ref()
+        if raison_blocage is not None:
+            _logger.warning("base_divergee_blocage", extra={"raison": raison_blocage})
+            await set_status(orch, run, TicketStatus.blocked)
+            await emit(run, EventType.ERROR, reason=raison_blocage)
+            return PipelineResult(
+                ticket_id=run.ticket_id,
+                final_status=TicketStatus.blocked,
+                rounds=0,
+                approved=False,
+                arret=raison_blocage,
+            )
         run.branch = await orch._git_workspace.create_branch(
             run.ticket_id, run.ticket.title
         )
@@ -88,6 +110,7 @@ async def create_branch(orch: "Orchestrator", run: PipelineRun) -> None:
         # Volontairement restreint à GitWorkspaceError : une erreur de
         # programmation doit remonter, pas finir en avertissement.
         _logger.warning("branch_creation_failed", extra={"error": str(exc)})
+    return None
 
 
 def take_artifact_snapshot(orch: "Orchestrator", run: PipelineRun) -> None:

@@ -52,6 +52,7 @@ class _Git(Protocol):
         base: str,
         resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
     ) -> tuple[str, ...]: ...
+    async def sync_base_depuis_distant(self, base_branch: str) -> str | None: ...
 
 
 class _Workflow(Protocol):
@@ -147,6 +148,10 @@ class LivraisonService:
             resolus.extend(fichiers)
             if self._resolveur is not None:
                 await self._resolveur(fichiers)
+
+        # Align local base_branch with remote before rebase (ticket-285).
+        # Non-blocking: a failed sync falls back to the current local branch.
+        await self._git.sync_base_depuis_distant(self._base_branch)
 
         conflits = await self._git.rejouer_sur(
             self._base_branch,
