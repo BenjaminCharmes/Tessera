@@ -1,14 +1,14 @@
 ---
-id: ticket-269
-title: "Opening a PR from the IDE targets the project's declared base branch"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-09-30
+id: ticket-269
+pr_number: 149
+priority: medium
+status: done
+title: Opening a PR from the IDE targets the project's declared base branch
+type: fix
 ---
 
 # ticket-269 — « Ouvrir la PR » vise la branche de base du projet
