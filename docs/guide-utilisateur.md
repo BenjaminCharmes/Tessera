@@ -623,6 +623,13 @@ Le code produit par les agents, lui, n'est jamais exclu : c'est ce que tu livres
 
 Ton cadrage (ticket `design`) crée de nouvelles décisions dans `memory/decisions.md` ou des tickets dans `tickets/todo/`. Si ton projet garde ces artefacts locaux (non versionnés), ces fichiers ne sont jamais commitées — ils restent chez toi. Cependant, le reviewer et le validateur les voient quand même, car le diff relu inclut un résumé textuel des changements. Ton cadrage peut donc être approuvé et mis en œuvre même s'il ne crée ni ne modifie aucun fichier du code.
 
+
+### Configuration locale : jamais committée
+
+`agents.json`, `.claude/settings.json` et `.github/workflows/` ne voyagent **jamais** dans un commit du pipeline, même si tu les modifies pendant un run.
+
+Si tu changes un modèle d'agent via l'écran Agents de l'IDE pendant qu'un ticket est en cours, par exemple, cette modification reste dans ton arbre de travail mais n'est pas committée. Le run te le signale dans son rapport. Cela garantit que la configuration de l'IDE ne voyage pas accidentellement avec le travail d'un ticket.
+
 ## 11. Configuration
 
 Tout est dans `.env` (copié depuis `.env.example`) :

@@ -1,14 +1,14 @@
 ---
-id: ticket-296
-title: "A pipeline commit never carries agents.json or another run-policy file"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-01
+id: ticket-296
+pr_number: 185
+priority: high
+status: done
+title: A pipeline commit never carries agents.json or another run-policy file
+type: fix
 ---
 
 # ticket-296 — Un commit du pipeline n'embarque jamais la politique du run
