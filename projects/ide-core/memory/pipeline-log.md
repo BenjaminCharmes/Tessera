@@ -458,3 +458,7 @@ Analyse effectuée :
 - 2026-10-01 14:37:52 UTC — [ticket-279] tour 2 — reviewer terminé (57467ms)
 - 2026-10-01 14:43:34 UTC — [ticket-279] validateur: APPROVED — Tous les critères d'acceptation du ticket-279 sont couverts par des tests foncti
 - 2026-10-01 14:43:34 UTC — [ticket-279] APPROVED après 2 tour(s)
+- 2026-10-01 14:49:18 UTC — [ticket-280] branche ticket-280-a-finished-run-s-events-can-be-read-back-through
+- 2026-10-01 14:49:54 UTC — [ticket-280] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
+- 2026-10-01 14:49:54 UTC — [ticket-280] tour 1 — codeur démarré
+- 2026-10-01 15:02:29 UTC — [ticket-280] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: Reached maximum number of turns (60) (exit code: 1)
