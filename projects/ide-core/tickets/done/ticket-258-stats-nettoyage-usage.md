@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-258
-pr_number: null
+pr_number: 151
 priority: medium
 status: done
 title: Drop the unused per-project usage fetch, and show the stats scope actually
