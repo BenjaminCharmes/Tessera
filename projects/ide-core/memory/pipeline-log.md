@@ -323,3 +323,11 @@ Le changement concer
 - 2026-09-30 14:23:05 UTC — [ticket-274] tour 1 — reviewer terminé (150468ms)
 - 2026-09-30 14:26:12 UTC — [ticket-274] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
 - 2026-09-30 14:26:12 UTC — [ticket-274] APPROVED après 1 tour(s)
+- 2026-09-30 14:50:45 UTC — [ticket-273] branche ticket-273-explanations-move-into-an-info-tooltip-states-and
+- 2026-09-30 14:50:45 UTC — [ticket-273] tour 1 — codeur démarré
+- 2026-09-30 15:00:54 UTC — [ticket-273] tour 1 — codeur terminé (608297ms)
+- 2026-09-30 15:01:17 UTC — [ticket-273] securite: PASS — Audit complet : pas de vulnérabilité détectée. Ce diff refactorise l'UI React/Ty
+- 2026-09-30 15:01:17 UTC — [ticket-273] tour 1 — reviewer démarré
+- 2026-09-30 15:02:05 UTC — [ticket-273] tour 1 — reviewer terminé (47766ms)
+- 2026-10-01 06:09:04 UTC — [ticket-273] validateur: APPROVED — Tous les critères sont satisfaits. Le composant `InfoTip` est bien implémenté av
+- 2026-10-01 06:09:04 UTC — [ticket-273] APPROVED après 1 tour(s)
