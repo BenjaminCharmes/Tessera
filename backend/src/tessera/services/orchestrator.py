@@ -158,6 +158,12 @@ class Orchestrator:
         if self._livrer is None:
             return resultat
 
+        await on_event(
+            OrchestratorEvent(
+                type=EventType.LIVRAISON_STARTED,
+                ticket_id=ticket_id,
+            )
+        )
         livraison = await self._livrer(resultat)
         await on_event(
             OrchestratorEvent(
@@ -491,6 +497,12 @@ class Orchestrator:
         """
         if self._documenter is None:
             return
+        await on_event(
+            OrchestratorEvent(
+                type=EventType.DOCUMENTATION_STARTED,
+                ticket_id=resultat.ticket_id,
+            )
+        )
         try:
             doc = await self._documenter()
         except Exception as exc:  # noqa: BLE001 — voir la docstring

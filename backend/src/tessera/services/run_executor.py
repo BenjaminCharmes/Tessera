@@ -116,6 +116,12 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
         # répondrait à un agent qui n'écoute pas.
         run.question = None
         run.question_expire_a = None
+    elif event.type is EventType.VALIDATION_STARTED:
+        run.etape = "validation"
+    elif event.type is EventType.DOCUMENTATION_STARTED:
+        run.etape = "documentation"
+    elif event.type is EventType.LIVRAISON_STARTED:
+        run.etape = "livraison"
     elif event.type in (EventType.VALIDATION_DONE, EventType.SECURITY_AUDIT_DONE):
         verdict = event.data.get("verdict")
         if verdict:
