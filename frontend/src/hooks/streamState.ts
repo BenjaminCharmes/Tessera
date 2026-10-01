@@ -416,11 +416,16 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       // `APPROVED` compris, sur un ticket que personne n'avait encore relu
       // (ticket-180).
       //
-      // Ce qui appartient au **run** survit : l'avancement de la file, le
-      // quota, la branche. Ce qui appartient au **ticket** repart de zéro.
+      // Ce qui appartient au **run** survit : les événements bruts (Pipeline
+      // log), l'avancement de la file, le quota, la branche.
+      // Ce qui appartient au **ticket** repart de zéro : `entries`, `currentAgent`,
+      // `currentRound` — l'affichage du tableau d'agents.
+      // Les événements bruts sont gardés pour que le Pipeline log montre
+      // l'historique complet d'une file (ticket-283).
       return {
         ...INITIAL,
         status: "running",
+        events: [...s.events, ev],
         quota: s.quota,
         branch: s.branch,
         maxRounds: s.maxRounds,

@@ -393,6 +393,73 @@ describe("TicketCard", () => {
   });
 });
 
+describe("TicketCard — Voir le run (ticket-283)", () => {
+  const runningTicket: Ticket = { ...base, status: "in-progress" };
+
+  it("affiche un bouton « Voir le run » actif quand onVoirLeRun est fourni", () => {
+    const onVoirLeRun = vi.fn();
+    render(
+      <TicketCard
+        ticket={runningTicket}
+        isActive={false}
+        isRunning={true}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+        onVoirLeRun={onVoirLeRun}
+      />,
+    );
+    const btn = screen.getByRole("button", { name: "Voir le run" });
+    expect(btn).not.toBeDisabled();
+    fireEvent.click(btn);
+    expect(onVoirLeRun).toHaveBeenCalledTimes(1);
+  });
+
+  it("le bouton Voir le run n'appelle pas onRun", () => {
+    const onRun = vi.fn();
+    render(
+      <TicketCard
+        ticket={runningTicket}
+        isActive={false}
+        isRunning={true}
+        onSelect={vi.fn()}
+        onRun={onRun}
+        onVoirLeRun={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Voir le run" }));
+    expect(onRun).not.toHaveBeenCalled();
+  });
+
+  it("le clic sur Voir le run ne sélectionne pas la carte", () => {
+    const onSelect = vi.fn();
+    render(
+      <TicketCard
+        ticket={runningTicket}
+        isActive={false}
+        isRunning={true}
+        onSelect={onSelect}
+        onRun={vi.fn()}
+        onVoirLeRun={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Voir le run" }));
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("sans onVoirLeRun, le ticket en cours garde le bouton désactivé", () => {
+    render(
+      <TicketCard
+        ticket={runningTicket}
+        isActive={false}
+        isRunning={true}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Lancer le pipeline" })).toBeDisabled();
+  });
+});
+
 describe("TicketCard — infobulle d'arrêt (ticket-218)", () => {
   it("une carte blocked porte l'arrêt dans son attribut title", () => {
     render(

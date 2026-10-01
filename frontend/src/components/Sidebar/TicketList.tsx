@@ -268,6 +268,7 @@ export default function TicketList({
                         onToggleQueue={onToggleQueue}
                         dansLaFile={selection.includes(ticket.id)}
                         arret={blockedArrets[ticket.id] ?? null}
+                        onVoirLeRun={running.has(ticket.id) ? onVoirLeRun : undefined}
                       />
                     ))}
                 </div>
