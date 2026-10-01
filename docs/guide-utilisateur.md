@@ -427,6 +427,11 @@ tes tickets.
 
 ---
 
+
+**Depuis la Vue Tableau**
+
+Tu n'as pas besoin de passer par la sidebar pour composer et lancer la file — la Vue Tableau t'offre exactement les mêmes contrôles. Chaque carte affiche un bouton « Ajouter à la file » ou « Retirer de la file ». Quand tu as sélectionné au moins un ticket, une barre apparaît au-dessus des colonnes : elle montre le nombre de tickets en attente et propose « Lancer la file » et « Vider ». Un ticket ajouté d'un côté se voit aussitôt de l'autre — sidebar et Vue Tableau restent synchronisées.
+
 ## 8. Discuter avec l'agent, pendant qu'il travaille
 
 Le panneau de droite a deux onglets : **Agents**, qui observe un run de
