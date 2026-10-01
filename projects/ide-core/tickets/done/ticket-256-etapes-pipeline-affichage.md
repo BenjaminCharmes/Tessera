@@ -5,7 +5,7 @@ depends_on:
 - ticket-255
 estimated_days: 1
 id: ticket-256
-pr_number: null
+pr_number: 154
 priority: high
 status: done
 title: 'The run view shows every pipeline stage: a stage strip and one log line each'
