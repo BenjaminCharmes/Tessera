@@ -228,6 +228,18 @@ Après approbation du pipeline, la livraison s'enchaîne automatiquement — reb
 sur la branche de base, ouverture de la PR, attente de CI si exigée, merge — 
 jusqu'où le projet l'autorise.
 
+### Branche de base configurable
+
+Un projet peut déclarer sa propre branche de base dans `agents.json`, champ 
+`"base_branch"`. Par défaut (champ absent), on utilise `settings.github_base_branch` 
+défini par la variable d'environnement `GITHUB_BASE_BRANCH` (défaut : `develop`).
+
+Cette branche de base affecte :
+- Le **rebase** de la branche du ticket avant l'ouverture de la PR
+- La **cible** de la PR ouverte (elle vise cette branche)
+- L'**avancement de la ref de base** après merge — seul un ticket approuvé en fait 
+  avancer la ref, que le ticket suivant forkera
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
