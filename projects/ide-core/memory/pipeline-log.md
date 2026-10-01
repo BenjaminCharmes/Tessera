@@ -662,3 +662,16 @@ Le changement introduit  (16829ms)
 - 2026-10-01 23:02:15 UTC — [ticket-296] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (158233ms)
 - 2026-10-01 23:02:15 UTC — [ticket-296] APPROVED après 1 tour(s)
 - 2026-10-01 23:04:04 UTC — [ticket-296] documentation: 2 fichier(s) (107906ms)
+- 2026-10-01 23:06:40 UTC — [ticket-296] livraison: rebase sur develop (203ms)
+- 2026-10-01 23:06:40 UTC — [ticket-296] livraison: PR #185 ouverte (4485ms)
+- 2026-10-01 23:06:40 UTC — [ticket-296] livraison: CI : failing (146422ms)
+- 2026-10-01 23:06:40 UTC — [ticket-296] livraison: arrêt — CI failing : la PR #185 reste ouverte.
+- 2026-10-01 23:06:41 UTC — [ticket-297] branche ticket-297-the-plan-turn-has-its-own-turn-budget-instead-of
+- 2026-10-01 23:06:41 UTC — [ticket-297] tour 1 — codeur démarré
+- 2026-10-01 23:10:55 UTC — [ticket-297] tour 1 — codeur terminé (254563ms)
+- 2026-10-01 23:14:21 UTC — [ticket-297] testeur: 1762 passed, 2 deselected, 5 warnings in 203.35s (0:03:23)
+- 2026-10-01 23:14:37 UTC — [ticket-297] securite: PASS — Configuration and routing logic to allocate distinct LLM token budgets per pipel (15797ms)
+- 2026-10-01 23:14:37 UTC — [ticket-297] tour 1 — reviewer démarré
+- 2026-10-01 23:15:11 UTC — [ticket-297] tour 1 — reviewer terminé (34405ms)
+- 2026-10-01 23:16:56 UTC — [ticket-297] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute correctement le  (104327ms)
+- 2026-10-01 23:16:56 UTC — [ticket-297] APPROVED après 1 tour(s)
