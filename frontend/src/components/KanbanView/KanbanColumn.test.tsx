@@ -134,6 +134,44 @@ describe("KanbanColumn — infobulle d'arrêt (ticket-218)", () => {
   });
 });
 
+describe("KanbanColumn — file de tickets (ticket-284)", () => {
+  it("affiche le bouton Ajouter à la file sur une carte todo quand onToggleQueue est fourni", () => {
+    render(
+      <KanbanColumn
+        status="todo"
+        tickets={[T1]}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        onToggleQueue={vi.fn()}
+        selection={[]}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Ajouter à la file" }),
+    ).toBeInTheDocument();
+  });
+
+  it("appelle onToggleQueue avec l'id du ticket au clic", () => {
+    const onToggleQueue = vi.fn();
+    render(
+      <KanbanColumn
+        status="todo"
+        tickets={[T1]}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        onToggleQueue={onToggleQueue}
+        selection={[]}
+      />,
+    );
+    screen.getByRole("button", { name: "Ajouter à la file" }).click();
+    expect(onToggleQueue).toHaveBeenCalledWith(T1.id);
+  });
+});
+
 describe("KanbanColumn — glisser-déposer (ticket-194)", () => {
   function deposer(statutDepuis: string, id = "ticket-001") {
     return {
