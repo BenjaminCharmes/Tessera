@@ -247,6 +247,42 @@ def test_parse_verdict_unclear_response_is_rejected() -> None:
     assert approved is False
 
 
+def test_parse_verdict_une_approbation_qui_cite_changes_requested_approuve() -> None:
+    # Ticket-288 : trois APPROVED lus comme des refus, parce que le corps
+    # disait « Bug `CHANGES_REQUESTED` réellement corrigé » (ticket-298).
+    content = (
+        "APPROVED\n\n## Ce qui est bien\n\n"
+        "- **Bug `CHANGES_REQUESTED` réellement corrigé** — le motif est journalisé."
+    )
+    approved, reason = _parse_reviewer_verdict(content)
+    assert approved is True
+    assert reason == ""
+
+
+def test_parse_verdict_la_premiere_ligne_de_verdict_l_emporte_sur_la_prose() -> None:
+    content = (
+        "Je vérifie d'abord la structure de l'orchestrateur.\n---\n\n"
+        "**APPROVED**\n\n## Suggestions\n- éviter un CHANGES_REQUESTED inutile"
+    )
+    approved, _ = _parse_reviewer_verdict(content)
+    assert approved is True
+
+
+def test_parse_verdict_un_refus_en_tete_garde_son_motif() -> None:
+    approved, reason = _parse_reviewer_verdict(
+        "## CHANGES_REQUESTED: tests manquants\n\nLe reste serait APPROVED."
+    )
+    assert approved is False
+    assert reason == "tests manquants"
+
+
+def test_parse_verdict_une_ligne_approved_qui_nomme_un_refus_refuse() -> None:
+    approved, _ = _parse_reviewer_verdict(
+        "APPROVED serait prématuré, CHANGES_REQUESTED : la migration casse."
+    )
+    assert approved is False
+
+
 # ------------------------------------------------------------------
 # pick_next_ticket
 # ------------------------------------------------------------------

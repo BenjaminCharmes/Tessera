@@ -67,20 +67,48 @@ def _extract_criteria(ticket_body: str) -> list[str]:
 
 
 _APPROVED_WORD = re.compile(r"\bAPPROVED\b")
+_APPROVED_LEADING = re.compile(r"APPROVED\b")
+# Ce qui entoure un verdict sans en changer le sens : `**APPROVED**`,
+# `## CHANGES_REQUESTED`, `` `APPROVED` ``.
+_DECORATION = " \t*_`#>"
+
+
+def _verdict_line(line: str) -> tuple[bool, str] | None:
+    """The verdict a line opens with, or None when it opens with something else."""
+    s = line.strip().strip(_DECORATION)
+    if s.upper().startswith("CHANGES_REQUESTED"):
+        reason = s.split(":", 1)[-1].strip() if ":" in s else ""
+        return False, reason
+    if _APPROVED_LEADING.match(s):
+        # « APPROVED serait prématuré : CHANGES_REQUESTED » reste un refus.
+        if "CHANGES_REQUESTED" in s.upper():
+            return False, s
+        return True, ""
+    return None
 
 
 def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
-    """Returns (approved, reason). CHANGES_REQUESTED takes priority over APPROVED.
+    """Returns (approved, reason) from the reviewer's answer.
 
-    Le verdict est un mot entier, en majuscules, sur une ligne qui ne porte pas
-    `CHANGES_REQUESTED` : le reviewer est prompté pour répondre ainsi
-    (ADR-009). `"APPROVED" in content.upper()` lisait « this should not be
-    approved » comme une approbation (ticket-122).
+    Le reviewer est prompté pour ouvrir sa réponse par le verdict, seul sur sa
+    ligne (ADR-009). La première ligne qui *commence* par un verdict le
+    porte : un reviewer qui cite `CHANGES_REQUESTED` dans le corps d'une
+    approbation n'est plus lu comme un refus (ticket-298, trois APPROVED
+    refusés sur le ticket-288).
+
+    Sans ligne de verdict, la règle d'avant tient : `CHANGES_REQUESTED`
+    n'importe où l'emporte, puis `APPROVED` en mot entier et en majuscules —
+    « this should not be approved » n'approuve rien (ticket-122).
     """
-    for line in content.splitlines():
+    lines = content.splitlines()
+    for line in lines:
+        verdict = _verdict_line(line)
+        if verdict is not None:
+            return verdict
+    for line in lines:
         if "CHANGES_REQUESTED" in line.upper():
             reason = line.split(":", 1)[-1].strip() if ":" in line else ""
             return False, reason
-    if any(_APPROVED_WORD.search(line) for line in content.splitlines()):
+    if any(_APPROVED_WORD.search(line) for line in lines):
         return True, ""
     return False, content[:200]
