@@ -137,6 +137,71 @@ describe("FilDuRun — entrée validateur (ticket-257)", () => {
   });
 });
 
+describe("FilDuRun — en-têtes de verdict unifiés (ticket-282)", () => {
+  it("reviewer approuvé, sécurité PASS et validateur APPROVED rendent la même icône de succès dans leur en-tête", () => {
+    const entries: EntreeFil[] = [
+      agentEntry({ id: "reviewer-0", agent: "reviewer", isDone: true, content: "APPROVED" }),
+      {
+        genre: "securite",
+        id: "securite-1",
+        round: 1,
+        verdict: "PASS",
+        summary: "",
+        issues_count: 0,
+        reason: "",
+        isDone: true,
+      },
+      {
+        genre: "validateur",
+        id: "validateur-2",
+        round: 1,
+        verdict: "APPROVED",
+        feedback: "",
+        criteria: [],
+        isDone: true,
+      },
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    const blocs = screen.getAllByTestId("entree-pipeline");
+    expect(blocs).toHaveLength(3);
+
+    // Chaque en-tête doit porter la même icône SVG (IconCheck — la coche de succès).
+    const iconPaths = blocs.map(
+      (bloc) => bloc.querySelector("button svg path")?.getAttribute("d"),
+    );
+    expect(new Set(iconPaths).size).toBe(1);
+    // La coche IconCheck contient "12.5" dans son tracé.
+    expect(iconPaths[0]).toContain("12.5");
+  });
+
+  it("l'en-tête replié du codeur affiche sa durée et non la première ligne du rapport", () => {
+    // Le codeur (tour 1) est terminé et non-dernier : son en-tête doit montrer
+    // la durée, pas le début de son compte rendu.
+    const entries: EntreeFil[] = [
+      agentEntry({
+        id: "codeur-0",
+        agent: "codeur",
+        round: 1,
+        isDone: true,
+        content: "python-multipart est absent des dépendances.",
+        duration_ms: 170000,
+      }),
+      agentEntry({ id: "codeur-1", agent: "codeur", round: 2, isDone: false }),
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    const boutons = screen.getAllByRole("button");
+    // Le premier bouton est l'en-tête du codeur du tour 1 (replié).
+    const headerCodeur = boutons[0];
+
+    expect(headerCodeur).toHaveTextContent("2 min 50 s");
+    expect(headerCodeur).not.toHaveTextContent("python-multipart");
+  });
+});
+
 describe("FilDuRun — mélange d'entrées (ticket-257)", () => {
   it("rend toutes les entrées dans l'ordre", () => {
     const entries: EntreeFil[] = [

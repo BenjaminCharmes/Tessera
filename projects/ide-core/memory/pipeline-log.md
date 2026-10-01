@@ -527,3 +527,58 @@ Le diff ajoute du timing (durées
 - 2026-10-01 19:12:24 UTC — [ticket-288] tour 1 — reviewer terminé (106532ms)
 - 2026-10-01 19:16:42 UTC — [ticket-288] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code mesure et journalise les
 - 2026-10-01 19:16:42 UTC — [ticket-288] APPROVED après 1 tour(s)
+- 2026-10-01 19:22:14 UTC — [ticket-282] branche ticket-282-agent-cards-share-one-verdict-header-icons-stay-o
+- 2026-10-01 19:22:14 UTC — [ticket-282] tour 1 — codeur démarré
+- 2026-10-01 19:34:00 UTC — [ticket-282] tour 1 — codeur terminé (706391ms)
+- 2026-10-01 19:37:31 UTC — [ticket-282] testeur: 1743 passed, 2 deselected, 5 warnings in 208.39s (0:03:28)
+- 2026-10-01 19:37:56 UTC — [ticket-282] securite: PASS — Ce diff contient principalement du refactoring frontend (extraction de composant
+- 2026-10-01 19:37:56 UTC — [ticket-282] tour 1 — reviewer démarré
+- 2026-10-01 19:39:06 UTC — [ticket-282] tour 1 — reviewer terminé (69781ms)
+- 2026-10-01 19:44:02 UTC — [ticket-282] validateur: CHANGES_REQUESTED — Les critères 1 à 5 sont satisfaits : les en-têtes des cartes sont unifiés avec l
+- 2026-10-01 19:44:02 UTC — [ticket-282] CHANGES_REQUESTED tour 1: Les critères 1 à 5 sont satisfaits : les en-têtes des cartes sont unifiés avec les bonnes icônes, le
+- 2026-10-01 19:44:02 UTC — [ticket-282] tour 2 — codeur démarré
+- 2026-10-01 19:44:33 UTC — [ticket-282] tour 2 — codeur terminé (30593ms)
+- 2026-10-01 19:47:39 UTC — [ticket-282] testeur: 1743 passed, 2 deselected, 5 warnings in 183.94s (0:03:03)
+- 2026-10-01 19:48:01 UTC — [ticket-282] securite: PASS — Audit de ticket-282 : refactoring frontend (composants React, portal tooltip, fo
+- 2026-10-01 19:48:01 UTC — [ticket-282] tour 2 — reviewer démarré
+- 2026-10-01 19:49:59 UTC — [ticket-282] tour 2 — reviewer terminé (118063ms)
+- 2026-10-01 19:54:40 UTC — [ticket-282] validateur: CHANGES_REQUESTED — Les critères 1 à 5 sont satisfaits : les en-têtes des cartes sont unifiés avec l
+- 2026-10-01 19:54:40 UTC — [ticket-282] CHANGES_REQUESTED tour 2: Les critères 1 à 5 sont satisfaits : les en-têtes des cartes sont unifiés avec les bonnes icônes, le
+- 2026-10-01 19:54:40 UTC — [ticket-282] tour 3 — codeur démarré
+- 2026-10-01 19:55:50 UTC — [ticket-282] tour 3 — codeur terminé (69969ms)
+- 2026-10-01 19:58:58 UTC — [ticket-282] testeur: 1743 passed, 2 deselected, 5 warnings in 185.73s (0:03:05)
+- 2026-10-01 19:59:13 UTC — [ticket-282] securite: PASS — Audit terminé. Aucune vulnérabilité détectée.
+
+Le diff contient un refactoring p
+- 2026-10-01 19:59:13 UTC — [ticket-282] tour 3 — reviewer démarré
+- 2026-10-01 20:00:24 UTC — [ticket-282] tour 3 — reviewer terminé (70688ms)
+- 2026-10-01 20:05:17 UTC — [ticket-282] validateur: CHANGES_REQUESTED — Les critères 1 à 5 sont satisfaits : les en-têtes des cartes sont unifiés avec l
+- 2026-10-01 20:05:17 UTC — [ticket-282] CHANGES_REQUESTED tour 3: Les critères 1 à 5 sont satisfaits : les en-têtes des cartes sont unifiés avec les bonnes icônes, le
+- 2026-10-01 20:05:17 UTC — [ticket-282] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-01 20:12:43 UTC — [ticket-282] branche ticket-282-agent-cards-share-one-verdict-header-icons-stay-o
+- 2026-10-01 20:12:43 UTC — [ticket-282] tour 1 — codeur démarré
+- 2026-10-01 20:16:11 UTC — [ticket-282] tour 1 — codeur terminé (207906ms)
+- 2026-10-01 20:19:17 UTC — [ticket-282] testeur: 1743 passed, 2 deselected, 5 warnings in 183.96s (0:03:03)
+- 2026-10-01 20:19:49 UTC — [ticket-282] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée. Ce diff concerne exclusivemen
+- 2026-10-01 20:19:49 UTC — [ticket-282] tour 1 — reviewer démarré
+- 2026-10-01 20:21:30 UTC — [ticket-282] tour 1 — reviewer terminé (100639ms)
+- 2026-10-01 20:26:09 UTC — [ticket-282] validateur: CHANGES_REQUESTED — Les critères 1 à 5 sont tous satisfaits : les en-têtes des cartes sont unifiés a
+- 2026-10-01 20:26:09 UTC — [ticket-282] CHANGES_REQUESTED tour 1: Les critères 1 à 5 sont tous satisfaits : les en-têtes des cartes sont unifiés avec les bonnes icône
+- 2026-10-01 20:26:09 UTC — [ticket-282] tour 2 — codeur démarré
+- 2026-10-01 20:27:36 UTC — [ticket-282] tour 2 — codeur terminé (86516ms)
+- 2026-10-01 20:30:44 UTC — [ticket-282] testeur: 1743 passed, 2 deselected, 5 warnings in 186.15s (0:03:06)
+- 2026-10-01 20:31:19 UTC — [ticket-282] securite: PASS — Audit de sécurité du diff — Frontend React/TypeScript (ticket-282).
+
+Le diff por
+- 2026-10-01 20:31:19 UTC — [ticket-282] tour 2 — reviewer démarré
+- 2026-10-01 20:33:03 UTC — [ticket-282] tour 2 — reviewer terminé (104219ms)
+- 2026-10-01 20:37:45 UTC — [ticket-282] validateur: CHANGES_REQUESTED — Les critères 1 à 5 sont tous satisfaits. Le diff montre une refonte complète de 
+- 2026-10-01 20:37:45 UTC — [ticket-282] CHANGES_REQUESTED tour 2: Les critères 1 à 5 sont tous satisfaits. Le diff montre une refonte complète de l'en-tête des cartes
+- 2026-10-01 20:37:45 UTC — [ticket-282] tour 3 — codeur démarré
+- 2026-10-01 20:39:19 UTC — [ticket-282] tour 3 — codeur terminé (93157ms)
+- 2026-10-01 20:42:26 UTC — [ticket-282] testeur: 1743 passed, 2 deselected, 5 warnings in 185.35s (0:03:05)
+- 2026-10-01 20:43:06 UTC — [ticket-282] securite: PASS — Analyse du diff : refactorisation frontend (React/TypeScript) sans vulnérabilité
+- 2026-10-01 20:43:06 UTC — [ticket-282] tour 3 — reviewer démarré
+- 2026-10-01 20:44:20 UTC — [ticket-282] tour 3 — reviewer terminé (73781ms)
+- 2026-10-01 20:50:02 UTC — [ticket-282] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff unifie les en-têtes des
+- 2026-10-01 20:50:02 UTC — [ticket-282] APPROVED après 3 tour(s)

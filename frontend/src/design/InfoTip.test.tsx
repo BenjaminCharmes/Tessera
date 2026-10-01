@@ -65,4 +65,16 @@ describe("InfoTip", () => {
     await userEvent.unhover(button);
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
+
+  it("rend la bulle dans un portal sur document.body et non dans le parent de l'icône", async () => {
+    // La sidebar est overflow-hidden : un z-index seul ne dépasse pas ce
+    // conteneur. Le portal rend la bulle directement dans document.body.
+    render(<InfoTip>Mon explication de test</InfoTip>);
+    const button = screen.getByRole("button", { name: /plus d'informations/i });
+
+    await userEvent.hover(button);
+
+    const tooltip = screen.getByRole("tooltip");
+    expect(tooltip.parentElement).toBe(document.body);
+  });
 });

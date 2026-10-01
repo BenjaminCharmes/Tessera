@@ -81,7 +81,7 @@ export default function CreateProjectModal({
         aria-label="Projet créé"
       >
         <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
-          <p className="text-green-400 text-sm font-medium mb-1">
+          <p className="inline-flex items-center gap-1 text-green-400 text-sm font-medium mb-1">
             <IconCheck size={14} /> Projet &ldquo;{createdProject.name}&rdquo; créé
           </p>
           {agentsCreated.length > 0 && (

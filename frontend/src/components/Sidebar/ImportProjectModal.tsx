@@ -332,7 +332,7 @@ export default function ImportProjectModal({
           {/* Step 3 — Review */}
           {step === "review" && analysis && project && (
             <>
-              <h2 className="text-zinc-100 text-base font-semibold">
+              <h2 className="flex items-center gap-1 text-zinc-100 text-base font-semibold">
                 <IconCheck size={14} /> {project.name} importé
               </h2>
 

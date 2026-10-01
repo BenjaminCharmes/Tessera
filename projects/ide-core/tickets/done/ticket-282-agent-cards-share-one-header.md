@@ -1,14 +1,15 @@
 ---
-id: ticket-282
-title: "Agent cards share one verdict header, icons stay on their text's line, tooltips are not clipped"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
-created: 2026-10-01
+id: ticket-282
+pr_number: null
+priority: medium
+status: done
+title: Agent cards share one verdict header, icons stay on their text's line, tooltips
+  are not clipped
+type: fix
 ---
 
 # ticket-282 — Les cartes d'agents parlent la même langue
