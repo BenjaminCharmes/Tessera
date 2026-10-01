@@ -81,7 +81,7 @@ appels d'un pipeline.
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé cinq correctifs, tous nés d'un usage réel :
+Cette promesse a demandé six correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -113,6 +113,11 @@ Cette promesse a demandé cinq correctifs, tous nés d'un usage réel :
   **ramené à vide** est signalé ; un fichier vide créé initialement ne l'est
   pas. Cette détection aide à repérer les suppressions mal faites avant qu'elles
   n'échouent en CI.
+- **Le journal du pipeline n'arrête plus le ticket suivant** (ticket-278). 
+  `ensure_clean_tree` ignore les fichiers que le pipeline écrit et commite 
+  lui-même : `memory/pipeline-log.md` et les fichiers de `tickets/`. Une 
+  modification ailleurs reste un refus. Cette liste vit à un seul endroit, 
+  partagée avec ce que le diff relu exclut déjà.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
@@ -201,8 +206,8 @@ arbitraire ou d'un glyphe utilisé comme affordance.
  2. DB : create_run(project_id, ticket_id) → run_id
  3. Garde-fou : arbre de travail sale ? → ticket → blocked/, run terminé
  4. Orchestrateur: ticket → in-progress/
- 5. git checkout -b ticket-XXX-slug  (forkée de la ref de base, pas du ticket
-    précédent) → OrchestratorEvent.BRANCH_CREATED
+ 5. git checkout -b ticket-XXX-slug  (forkée de la base synchronisée sur le 
+    distant, pas du ticket précédent) → OrchestratorEvent.BRANCH_CREATED
  6. Codeur (Claude) → ÉCRIT RÉELLEMENT les fichiers (outils fichier du SDK)
     └─ tokens streamés via WS → UI en temps réel
     └─ chaque event → save_event(run_id, ...)
@@ -254,6 +259,17 @@ Cette branche de base affecte :
 - La **cible** de la PR ouverte (elle vise cette branche)
 - L'**avancement de la ref de base** après merge — seul un ticket approuvé en fait 
   avancer la ref, que le ticket suivant forkera
+
+### Synchronisation de la base avant livraison
+
+Au moment du rebase, la branche de base est alignée sur le distant pour 
+assurer que le rebase se fait sur l'état réel. Un `fetch` met à jour les 
+références locales ; la branche locale de base avance jusqu'au commit distant 
+(avance rapide seulement). 
+
+Sans distant joignable, le rebase utilise la base locale. Si elle a divergé 
+du distant hors d'une avance rapide, la livraison s'arrête avec cette raison 
+et ne procède pas au rebase.
 
 ### Délai de grâce pour l'enregistrement des checks
 

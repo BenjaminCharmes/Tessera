@@ -29,6 +29,9 @@ class _GitQuiCommite:
     async def is_clean(self) -> bool:
         return True
 
+    async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+        return None
+
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         return f"{ticket_id}-slug"
 

@@ -178,6 +178,9 @@ async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie
 async def test_create_branch_degrade_sans_depot_git() -> None:
     # Un projet sans dépôt git reste utilisable : on continue sans branche.
     class _NoRepoGit:
+        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+            return None
+
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             raise GitCommandError(command=["git", "checkout"], returncode=128, stderr="not a repo")
 
@@ -189,6 +192,9 @@ async def test_create_branch_degrade_sans_depot_git() -> None:
 
 async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
     class _Git:
+        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+            return None
+
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             return f"{ticket_id}-slug"
 

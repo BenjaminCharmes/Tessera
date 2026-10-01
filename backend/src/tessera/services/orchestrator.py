@@ -236,7 +236,9 @@ class Orchestrator:
         if refused is not None:
             return refused
 
-        await stages.create_branch(self, run)
+        refused = await stages.create_branch(self, run)
+        if refused is not None:
+            return refused
         stages.take_artifact_snapshot(self, run)
         await set_status(self, run, TicketStatus.in_progress)
         run.carte_du_depot = await self._carte()

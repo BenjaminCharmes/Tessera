@@ -12,6 +12,7 @@ class _FauxGit:
         self._conflits = conflits
         self._resolvables = resolvables
         self.rejoue: list[str] = []
+        self.syncs: list[str] = []
 
     async def rejouer_sur(self, base, resolveur=None):  # type: ignore[no-untyped-def]
         self.rejoue.append(base)
@@ -19,6 +20,10 @@ class _FauxGit:
             await resolveur(self._conflits)
             return ()
         return self._conflits
+
+    async def sync_base_depuis_distant(self, base_branch: str) -> str | None:
+        self.syncs.append(base_branch)
+        return None
 
 
 class _FauxWorkflow:
@@ -376,3 +381,26 @@ async def test_failing_pendant_le_delai_de_grace_arrete_immediatement(
     assert livraison.merged is False
     assert workflow.merges == []
     assert "CI" in (livraison.arret or "")
+
+
+# ------------------------------------------------------------------
+# Livraison aligne la base sur le distant avant le rebase — ticket-285
+# ------------------------------------------------------------------
+
+
+async def test_livraison_sync_base_avant_rebase(tmp_path: Path) -> None:
+    """Livraison calls sync_base_depuis_distant before rejoyer_sur (ticket-285).
+
+    The rebase in livraison must happen on the remote-synced base, not on
+    whatever the local branch currently points to.
+    """
+    git = _FauxGit()
+    svc, g, _w = _service(tmp_path, "pr", git=git)
+
+    await _livrer(svc)
+
+    # sync must have been called, and before the rebase
+    assert g.syncs == ["develop"], (
+        "sync_base_depuis_distant must be called once with the base branch"
+    )
+    assert g.rejoue == ["develop"], "rejoyer_sur must follow the sync"

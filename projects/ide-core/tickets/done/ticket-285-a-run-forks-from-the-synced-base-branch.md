@@ -1,15 +1,16 @@
 ---
-id: ticket-285
-title: "A run forks from its base branch synced with the remote, not from whatever HEAD is checked out"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
+id: ticket-285
 plan: true
-created: 2026-10-01
+pr_number: 166
+priority: critical
+status: done
+title: A run forks from its base branch synced with the remote, not from whatever
+  HEAD is checked out
+type: fix
 ---
 
 # ticket-285 — Un run part de sa base à jour, pas du HEAD du moment
@@ -50,7 +51,7 @@ même défaut.
   distant joignable, la base est `base_branch` locale. Si elle n'existe pas
   non plus, c'est `HEAD`, comme aujourd'hui.
 - Une base locale qui a divergé du distant n'est pas écrasée : le run s'arrête
-  en `blocked` avec la raison que rend déjà `sync_base_depuis_distant`.
+  en `blocked` avec la raison que rend déjà `sync_base_depuis_isant`.
 - Avant `rejouer_sur`, la livraison aligne la base sur le distant, pour
   rebaser sur l'état réel de la branche cible.
 - Le tour de plan vérifie comment `base_branch` atteint `GitWorkspaceService`,
@@ -59,16 +60,16 @@ même défaut.
 
 ## Critères d'acceptation
 
-- [ ] Un test sur un vrai dépôt git temporaire, avec un distant nu, vérifie
+- [x] Un test sur un vrai dépôt git temporaire, avec un distant nu, vérifie
       qu'un run démarré alors que `HEAD` est sur une ancienne branche de
       ticket crée sa branche depuis `origin/<base_branch>`
-- [ ] Un test vérifie que, sans distant, la branche est créée depuis
+- [x] Un test vérifie que, sans distant, la branche est créée depuis
       `base_branch` locale et non depuis `HEAD`
-- [ ] Un test vérifie qu'une base locale divergente arrête le run en `blocked`
+- [x] Un test vérifie qu'une base locale divergente arrête le run en `blocked`
       avec une raison qui nomme la branche, sans réécrire la base
-- [ ] Un test vérifie que la livraison aligne la base sur le distant avant
-      `rejouer_sur`
-- [ ] Un test reproduit le cas de `freelance` (ticket A mergé en squash,
+- [x] Un test vérifie que la livraison aligne la base sur le distant avant
+      `rejoyer_sur`
+- [x] Un test reproduit le cas de `freelance` (ticket A mergé en squash,
       dépôt laissé sur la branche de A, puis ticket B) et vérifie que les
       commits de B depuis la base ne contiennent aucun commit de A
 
