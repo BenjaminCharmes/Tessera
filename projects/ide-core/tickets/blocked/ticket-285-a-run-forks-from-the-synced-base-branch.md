@@ -1,15 +1,16 @@
 ---
-id: ticket-285
-title: "A run forks from its base branch synced with the remote, not from whatever HEAD is checked out"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
+id: ticket-285
 plan: true
-created: 2026-10-01
+pr_number: null
+priority: critical
+status: blocked
+title: A run forks from its base branch synced with the remote, not from whatever
+  HEAD is checked out
+type: fix
 ---
 
 # ticket-285 — Un run part de sa base à jour, pas du HEAD du moment
