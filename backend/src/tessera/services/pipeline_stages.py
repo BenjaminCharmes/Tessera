@@ -529,6 +529,10 @@ async def run_validation(
         run,
         EventType.VALIDATION_DONE,
         verdict=validation.verdict,
+        # Le frontend lit `approved` pour afficher le statut ; le fallback sur
+        # `verdict` existe côté frontend, mais le champ explicite est plus fiable
+        # (ticket-279).
+        approved=(validation.verdict == "APPROVED"),
         all_passed=validation.all_passed,
         feedback=validation.feedback,
         criteria=[

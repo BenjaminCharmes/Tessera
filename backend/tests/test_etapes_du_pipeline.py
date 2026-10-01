@@ -286,3 +286,44 @@ def test_etape_vaut_livraison_apres_livraison_started() -> None:
     run = RunActif(run_id="r1", project_id="p")
     _suivre(run, OrchestratorEvent(type=EventType.LIVRAISON_STARTED, ticket_id="t", data={}))
     assert run.etape == "livraison"
+
+
+# ------------------------------------------------------------------
+# validation_done.approved (ticket-279)
+# ------------------------------------------------------------------
+
+
+class _ValidateurKO:
+    """Double du validateur qui retourne CHANGES_REQUESTED."""
+
+    async def validate(self, **kwargs: object) -> ValidationResult:
+        return ValidationResult(
+            verdict="CHANGES_REQUESTED",
+            all_passed=False,
+            feedback="critère échoué",
+            criteria=[CriterionResult(criterion="ça marche", passed=False, note="")],
+        )
+
+
+async def test_validation_done_porte_approved_true_pour_verdict_approved() -> None:
+    # Le frontend lit ev.data["approved"] pour colorer le pipeline log.
+    # Sans ce champ, il affichait toujours « refusée » (ticket-279).
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    orch = _Orch(_validator=_ValidateurOK())
+
+    await stages.run_validation(orch, run, "")
+
+    validation_done = next(e for e in events if e.type == EventType.VALIDATION_DONE)
+    assert validation_done.data["approved"] is True
+
+
+async def test_validation_done_porte_approved_false_pour_changes_requested() -> None:
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    orch = _Orch(_validator=_ValidateurKO())
+
+    await stages.run_validation(orch, run, "")
+
+    validation_done = next(e for e in events if e.type == EventType.VALIDATION_DONE)
+    assert validation_done.data["approved"] is False

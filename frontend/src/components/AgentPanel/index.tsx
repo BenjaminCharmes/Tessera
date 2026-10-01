@@ -85,6 +85,22 @@ export default function AgentPanel({
       ? new Date(endTs).getTime() - new Date(startTs).getTime()
       : undefined;
 
+  // Résultat de la livraison, affiché dans PipelineSummary après run_closed (ticket-279).
+  const livraisonEvent = events.find((e) => e.type === "livraison_done");
+  const livraisonData = livraisonEvent
+    ? {
+        pr_number:
+          typeof livraisonEvent.data["pr_number"] === "number"
+            ? livraisonEvent.data["pr_number"]
+            : undefined,
+        merged: livraisonEvent.data["merged"] === true,
+        arret:
+          typeof livraisonEvent.data["arret"] === "string"
+            ? livraisonEvent.data["arret"]
+            : undefined,
+      }
+    : null;
+
   return (
     <div className="flex h-full flex-col bg-zinc-900">
       {/* Header */}
@@ -102,7 +118,7 @@ export default function AgentPanel({
           {project && !ticketId && (
             <span className="text-xs text-zinc-600">{project.name}</span>
           )}
-          {(status === "done" || status === "error") && (
+          {(runClosed || status === "error") && (
             <button
               onClick={clear}
               title="Effacer le run"
@@ -174,6 +190,7 @@ export default function AgentPanel({
                 result={lastResult}
                 durationMs={durationMs}
                 runClosed={runClosed}
+                livraisonData={livraisonData}
               />
             )}
           </>

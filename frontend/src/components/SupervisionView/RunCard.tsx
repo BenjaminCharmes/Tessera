@@ -94,7 +94,10 @@ export default function RunCard({
             {estUnChat ? "conversation" : (run.ticket_id ?? "—")}
           </span>
           <span className="shrink-0 text-micro tabular-nums text-zinc-500">
-            <Chrono depuis={run.demarre_a} />
+            <Chrono
+              depuis={run.demarre_a}
+              termineA={etat.events.find((e) => e.type === "run_closed")?.timestamp}
+            />
           </span>
         </span>
 

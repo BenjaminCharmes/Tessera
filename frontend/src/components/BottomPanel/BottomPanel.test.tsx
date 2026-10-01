@@ -174,6 +174,37 @@ describe("BottomPanel — étapes du pipeline (ticket-256)", () => {
   });
 });
 
+describe("BottomPanel — test_result et validation_done (ticket-279)", () => {
+  it("affiche une ligne rouge pour test_result echoue", () => {
+    render(<BottomPanel events={[makeEvent("test_result", { passed: false })]} />);
+    expect(screen.getByText(/rouges — retour au codeur/)).toBeTruthy();
+  });
+
+  it("affiche une ligne verte pour test_result reussi", () => {
+    render(<BottomPanel events={[makeEvent("test_result", { passed: true })]} />);
+    expect(screen.getByText(/Tests : verts/)).toBeTruthy();
+  });
+
+  it("affiche 'approuvée' pour validation_done sans approved mais verdict APPROVED", () => {
+    // Backends plus anciens n'émettent que `verdict`, pas `approved` (ticket-279).
+    render(
+      <BottomPanel
+        events={[makeEvent("validation_done", { verdict: "APPROVED" })]}
+      />,
+    );
+    expect(screen.getByText(/Validation : approuvée/)).toBeTruthy();
+  });
+
+  it("affiche 'refusée' pour validation_done sans approved mais verdict CHANGES_REQUESTED", () => {
+    render(
+      <BottomPanel
+        events={[makeEvent("validation_done", { verdict: "CHANGES_REQUESTED" })]}
+      />,
+    );
+    expect(screen.getByText(/Validation : refusée/)).toBeTruthy();
+  });
+});
+
 describe("BottomPanel — la livraison (ticket-083)", () => {
   it("dit jusqu'où le travail est allé", () => {
     const ev = makeEvent(

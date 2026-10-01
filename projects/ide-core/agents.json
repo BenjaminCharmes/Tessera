@@ -23,7 +23,12 @@
       "active": true,
       "skills": [
         "verifier-mon-travail"
-      ]
+      ],
+      "provider": "agent_sdk",
+      "fallback": {
+        "provider": "agent_sdk",
+        "model": "claude-fable-5"
+      }
     },
     {
       "role": "reviewer",
