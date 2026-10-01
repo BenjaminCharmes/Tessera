@@ -477,3 +477,9 @@ Analyse effectuée :
 - 2026-10-01 17:37:28 UTC — [ticket-280] testeur: 1 failed, 945 passed, 2 deselected, 5 warnings in 153.19s (0:02:33)
 - 2026-10-01 17:37:28 UTC — [ticket-280] tests rouges au tour 3
 - 2026-10-01 17:37:28 UTC — [ticket-280] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-01 17:48:01 UTC — [ticket-280] branche ticket-280-a-finished-run-s-events-can-be-read-back-through
+- 2026-10-01 17:48:37 UTC — [ticket-280] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
+- 2026-10-01 17:48:37 UTC — [ticket-280] tour 1 — codeur démarré
+- 2026-10-01 17:50:53 UTC — [ticket-280] tour 1 — codeur terminé (135343ms)
+- 2026-10-01 17:54:07 UTC — [ticket-280] testeur: 1732 passed, 2 deselected, 5 warnings in 192.56s (0:03:12)
+- 2026-10-01 17:55:02 UTC — [ticket-280] securite: BLOCK — One HIGH severity vulnerability detected: missing authentication check on the ne
