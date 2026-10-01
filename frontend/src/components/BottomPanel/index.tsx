@@ -5,6 +5,9 @@ import type { OrchestratorEvent } from "../../types/api";
 
 interface BottomPanelProps {
   events: OrchestratorEvent[];
+  /** Nom du projet dont on affiche le run — quand la sélection de Supervision
+   *  diffère du projet actif (ticket-283). Absent : le projet actif. */
+  projetLabel?: string | null;
 }
 
 /**
@@ -113,7 +116,7 @@ function eventToLine(ev: OrchestratorEvent): string | null {
   }
 }
 
-export default function BottomPanel({ events }: BottomPanelProps) {
+export default function BottomPanel({ events, projetLabel }: BottomPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const lines = events.map(eventToLine).filter((l): l is string => l !== null);
 
@@ -124,7 +127,7 @@ export default function BottomPanel({ events }: BottomPanelProps) {
   return (
     <div className="h-full flex flex-col bg-zinc-950 border-t border-zinc-700">
       <div className={`${BAND} gap-4 border-b border-zinc-700 px-4`}>
-        <RegionTitle>Pipeline log</RegionTitle>
+        <RegionTitle>Pipeline log{projetLabel ? ` — ${projetLabel}` : ""}</RegionTitle>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-2 text-xs font-mono">
         {lines.length === 0 ? (

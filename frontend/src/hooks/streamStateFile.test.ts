@@ -29,9 +29,23 @@ function apresLePremierTicket() {
 }
 
 describe("applyEvent — un ticket de file n'hérite pas du précédent (ticket-180)", () => {
-  it("oublie les événements du ticket précédent", () => {
+  it("remet les entries à zéro pour le nouveau ticket", () => {
     // Le bloc reviewer de ticket-012 restait affiché sous le codeur de
-    // ticket-013, verdict APPROVED compris.
+    // ticket-013, verdict APPROVED compris — c'est `entries` qui pilote
+    // l'affichage, pas `events`.
+    const avant = apresLePremierTicket();
+
+    const apres = applyEvent(
+      avant,
+      ev({ type: "queue_progress", ticket_id: "ticket-013", data: { index: 2, total: 3 } }),
+    );
+
+    expect(apres.entries).toEqual([]);
+  });
+
+  it("garde les événements des tickets précédents dans la file (ticket-283)", () => {
+    // `events` alimente le Pipeline log : effacer l'historique d'un ticket
+    // précédent efface son journal de la vue, alors que c'est un seul run.
     const avant = apresLePremierTicket();
 
     const apres = applyEvent(
@@ -41,7 +55,7 @@ describe("applyEvent — un ticket de file n'hérite pas du précédent (ticket-
 
     expect(
       apres.events.some((e) => e.type === "agent_done" && e.agent === "reviewer"),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("oublie l'agent courant et le tour du ticket précédent", () => {

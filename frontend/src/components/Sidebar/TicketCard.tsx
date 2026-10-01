@@ -80,6 +80,12 @@ interface TicketCardProps {
    * ticket peut le fournir.
    */
   arret?: string | null;
+  /**
+   * Amène le run de ce ticket au centre (ticket-283). Quand fourni et que le
+   * ticket est en cours, le rond bleu devient un bouton « Voir le run » actif
+   * au lieu d'un indicateur désactivé.
+   */
+  onVoirLeRun?: () => void;
 }
 
 export default function TicketCard({
@@ -96,6 +102,7 @@ export default function TicketCard({
   dansLaFile = false,
   onChangeStatus,
   arret,
+  onVoirLeRun,
 }: TicketCardProps) {
   const canRun = ticket.status !== "done" && ticket.status !== "cancelled";
   const transitions = transitionsManuelles(ticket.status);
@@ -240,22 +247,38 @@ export default function TicketCard({
 
         <div className="flex flex-col gap-0.5 shrink-0">
           {canRun && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRun(ticket.id);
-              }}
-              disabled={isRunning}
-              title="Lancer le pipeline"
-              aria-label="Lancer le pipeline"
-              className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors text-zinc-500 hover:text-zinc-200 hover:bg-zinc-600 disabled:cursor-not-allowed"
-            >
-              {isRunning ? (
+            isRunning && onVoirLeRun ? (
+              /* Ticket en cours : le rond devient un raccourci « Voir le run »
+                 actif (ticket-283) — au lieu d'un indicateur désactivé. */
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onVoirLeRun();
+                }}
+                title="Voir le run"
+                aria-label="Voir le run"
+                className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors text-blue-300 hover:bg-zinc-600"
+              >
                 <IconDot size={8} className="animate-pulse text-blue-400" />
-              ) : (
-                <IconPlay size={12} />
-              )}
-            </button>
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRun(ticket.id);
+                }}
+                disabled={isRunning}
+                title="Lancer le pipeline"
+                aria-label="Lancer le pipeline"
+                className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors text-zinc-500 hover:text-zinc-200 hover:bg-zinc-600 disabled:cursor-not-allowed"
+              >
+                {isRunning ? (
+                  <IconDot size={8} className="animate-pulse text-blue-400" />
+                ) : (
+                  <IconPlay size={12} />
+                )}
+              </button>
+            )
           )}
           {/* Même condition que le bouton « Lancer » : les deux mènent au
               même endroit, ils obéissent à la même règle. La file acceptait

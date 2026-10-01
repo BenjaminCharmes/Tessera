@@ -1,14 +1,15 @@
 ---
-id: ticket-283
-title: "The way back to the running run is always offered, and the pipeline log follows the selected run"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
-created: 2026-10-01
+id: ticket-283
+pr_number: 179
+priority: medium
+status: done
+title: The way back to the running run is always offered, and the pipeline log follows
+  the selected run
+type: fix
 ---
 
 # ticket-283 — On retrouve toujours le run, et le log suit celui qu'on regarde

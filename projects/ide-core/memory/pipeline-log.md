@@ -582,3 +582,13 @@ Le diff por
 - 2026-10-01 20:44:20 UTC — [ticket-282] tour 3 — reviewer terminé (73781ms)
 - 2026-10-01 20:50:02 UTC — [ticket-282] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff unifie les en-têtes des
 - 2026-10-01 20:50:02 UTC — [ticket-282] APPROVED après 3 tour(s)
+- 2026-10-01 20:59:43 UTC — [ticket-283] branche ticket-283-the-way-back-to-the-running-run-is-always-offered
+- 2026-10-01 20:59:43 UTC — [ticket-283] tour 1 — codeur démarré
+- 2026-10-01 21:08:33 UTC — [ticket-283] tour 1 — codeur terminé (529531ms)
+- 2026-10-01 21:11:41 UTC — [ticket-283] testeur: 1743 passed, 2 deselected, 5 warnings in 186.24s (0:03:06)
+- 2026-10-01 21:12:13 UTC — [ticket-283] securite: PASS — Audit du diff frontend TypeScript/React pour ticket-283 (suivi de run en Supervi (31250ms)
+- 2026-10-01 21:12:13 UTC — [ticket-283] tour 1 — reviewer démarré
+- 2026-10-01 21:13:11 UTC — [ticket-283] tour 1 — reviewer terminé (58125ms)
+- 2026-10-01 21:16:37 UTC — [ticket-283] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ajoutés couvrent les  (206000ms)
+- 2026-10-01 21:16:37 UTC — [ticket-283] APPROVED après 1 tour(s)
+- 2026-10-01 21:18:04 UTC — [ticket-283] documentation: 0 fichier(s) (85844ms)

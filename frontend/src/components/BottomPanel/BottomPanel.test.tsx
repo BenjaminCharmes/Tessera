@@ -205,6 +205,19 @@ describe("BottomPanel — test_result et validation_done (ticket-279)", () => {
   });
 });
 
+describe("BottomPanel — suivi d'un autre projet (ticket-283)", () => {
+  it("affiche le projet dans le titre quand projetLabel est fourni", () => {
+    render(<BottomPanel events={[]} projetLabel="mon-projet" />);
+    expect(screen.getByText(/Pipeline log.*mon-projet/)).toBeTruthy();
+  });
+
+  it("n'affiche pas de suffixe sans projetLabel", () => {
+    render(<BottomPanel events={[]} />);
+    // Le titre ne comporte pas de tiret ni de nom de projet
+    expect(screen.getByText("Pipeline log")).toBeTruthy();
+  });
+});
+
 describe("BottomPanel — la livraison (ticket-083)", () => {
   it("dit jusqu'où le travail est allé", () => {
     const ev = makeEvent(
