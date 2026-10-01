@@ -132,10 +132,15 @@ un run suspendu tient du travail non commité, et bloquerait la file des tickets
 ### Système visuel du frontend (ADR-026)
 
 `frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :
-`icons.tsx` (un seul jeu, une grille de 24), `layout.ts` (la hauteur unique des
-bandes d'en-tête), `RegionTitle.tsx`. Cinq familles de couleurs ont chacune un
+`icons.tsx` (un seul jeu, grille de 24, trait 1.5), `layout.ts` (la hauteur unique des
+bandes d'en-tête), `RegionTitle.tsx`, `InfoTip.tsx`. Cinq familles de couleurs ont chacune un
 rôle d'état — neutre, échec, attente, succès, activité — et `violet` sert
 uniquement au repérage.
+
+`InfoTip` sépare les **explications** — affichées au survol et au focus d'une icône
+button, `role="tooltip"` — des **états** et **appels à l'action** qui restent toujours visibles.
+L'icône est liée au texte par `aria-describedby`. Ses couleurs sont zinc, pas de violet
+en texte.
 
 `coherence.test.ts` verrouille les trois règles : il lit les sources et échoue
 à la première réintroduction d'une couleur bannie, d'une taille de texte
