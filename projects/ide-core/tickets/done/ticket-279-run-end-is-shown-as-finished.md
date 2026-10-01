@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 1
 id: ticket-279
-pr_number: null
+pr_number: 169
 priority: high
 status: done
 title: 'A finished run looks finished: stage strip, timer, close button and verdict
