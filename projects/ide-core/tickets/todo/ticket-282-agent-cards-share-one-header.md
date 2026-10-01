@@ -64,7 +64,9 @@ Retour d'usage du 2026-10-01 :
       icône dans un conteneur `flex` ou `inline-flex`
 - [ ] Un test d'`InfoTip` vérifie que la bulle est rendue sous `document.body`
       et non dans le parent de l'icône
-- [ ] Le test de palette d'ADR-026 passe sans exception ajoutée
+- [ ] Le diff n'ajoute aucune classe de couleur hors des familles d'ADR-026
+      (`zinc`, `red`, `amber`, `green`, `blue`, `violet`), et aucune entrée
+      aux exceptions du test de palette
 
 ## Dépendances
 
