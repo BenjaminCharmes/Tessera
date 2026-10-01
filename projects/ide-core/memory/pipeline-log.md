@@ -646,3 +646,18 @@ Le diff ajoute une fonctionnalité de lecture de  (26170ms)
 - 2026-10-01 22:44:12 UTC — [ticket-287] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (127000ms)
 - 2026-10-01 22:44:12 UTC — [ticket-287] APPROVED après 1 tour(s)
 - 2026-10-01 22:44:48 UTC — [ticket-287] documentation: 0 fichier(s) (34702ms)
+- 2026-10-01 22:47:24 UTC — [ticket-287] livraison: rebase sur develop (203ms)
+- 2026-10-01 22:47:24 UTC — [ticket-287] livraison: PR #184 ouverte (4375ms)
+- 2026-10-01 22:47:24 UTC — [ticket-287] livraison: CI : failing (146515ms)
+- 2026-10-01 22:47:24 UTC — [ticket-287] livraison: arrêt — CI failing : la PR #184 reste ouverte.
+- 2026-10-01 22:47:24 UTC — [ticket-296] branche ticket-296-a-pipeline-commit-never-carries-agents-json-or-an
+- 2026-10-01 22:47:24 UTC — [ticket-296] tour 1 — codeur démarré
+- 2026-10-01 22:54:37 UTC — [ticket-296] tour 1 — codeur terminé (432608ms)
+- 2026-10-01 22:58:06 UTC — [ticket-296] testeur: 1757 passed, 2 deselected, 5 warnings in 206.82s (0:03:26)
+- 2026-10-01 22:58:23 UTC — [ticket-296] securite: PASS — Audit complet du diff — aucune vulnérabilité détectée.
+
+Le changement introduit  (16829ms)
+- 2026-10-01 22:58:23 UTC — [ticket-296] tour 1 — reviewer démarré
+- 2026-10-01 22:59:37 UTC — [ticket-296] tour 1 — reviewer terminé (73780ms)
+- 2026-10-01 23:02:15 UTC — [ticket-296] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (158233ms)
+- 2026-10-01 23:02:15 UTC — [ticket-296] APPROVED après 1 tour(s)
