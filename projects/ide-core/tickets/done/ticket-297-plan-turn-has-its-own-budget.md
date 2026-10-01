@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
 id: ticket-297
-pr_number: null
+pr_number: 186
 priority: medium
 status: done
 title: The plan turn has its own turn budget instead of the reviewer's
