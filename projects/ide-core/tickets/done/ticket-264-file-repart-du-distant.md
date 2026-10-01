@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-264
 plan: true
-pr_number: null
+pr_number: 152
 priority: high
 status: done
 title: In a queue, each ticket starts from the up-to-date remote base once the previous
