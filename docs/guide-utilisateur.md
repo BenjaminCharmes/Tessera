@@ -327,6 +327,18 @@ Quand le pipeline finit (approuvé ou bloqué), la carte du run change d'aspect 
 
 Par défaut, une fois approuvé, le pipeline enchaîne jusqu'à la livraison — tant qu'il y a un dépôt git et que le projet l'autorise. Sinon, tu vois pourquoi ça s'est arrêté.
 
+
+### Rouvrir un run terminé
+
+Un run une fois terminé disparaît de la Supervision après un rechargement ou une fermeture de session. Mais tu peux le relire à tout moment depuis l'historique :
+
+- Ouvre le panneau **Historique** (panneau de droite) — il liste les runs récents avec leur verdict et leur date
+- Clique sur une ligne pour rouvrir la vue complète du run : étapes, cartes par agent (codeur, testeur, sécurité, reviewer, validateur), verdict final
+- La vue rouverte est **en lecture seule** : pas de bouton pour arrêter le run, pas de champ pour envoyer un message à l'agent, pas de chrono qui avance
+- Un bouton **Fermer** te ramène à l'historique
+
+C'est utile pour vérifier les détails d'un run après coup — comment chaque étape s'est déroulée, pourquoi un ticket a terminé bloqué — sans relancer la machine.
+
 ### La frise d'étapes
 
 En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
