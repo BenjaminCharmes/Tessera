@@ -618,3 +618,16 @@ Le diff ajoute une fonctionnalité de lecture de  (26170ms)
 - 2026-10-01 21:59:47 UTC — [ticket-281] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent efficacement  (172672ms)
 - 2026-10-01 21:59:47 UTC — [ticket-281] APPROVED après 1 tour(s)
 - 2026-10-01 22:01:34 UTC — [ticket-281] documentation: 2 fichier(s) (105702ms)
+- 2026-10-01 22:03:54 UTC — [ticket-281] livraison: rebase sur develop (188ms)
+- 2026-10-01 22:03:54 UTC — [ticket-281] livraison: PR #182 ouverte (4375ms)
+- 2026-10-01 22:03:54 UTC — [ticket-281] livraison: CI : failing (130656ms)
+- 2026-10-01 22:03:54 UTC — [ticket-281] livraison: arrêt — CI failing : la PR #182 reste ouverte.
+- 2026-10-01 22:03:54 UTC — [ticket-286] branche ticket-286-a-running-run-shows-its-ticket-s-title-in-supervi
+- 2026-10-01 22:03:54 UTC — [ticket-286] tour 1 — codeur démarré
+- 2026-10-01 22:16:48 UTC — [ticket-286] tour 1 — codeur terminé (773030ms)
+- 2026-10-01 22:19:53 UTC — [ticket-286] testeur: 1751 passed, 2 deselected, 5 warnings in 183.62s (0:03:03)
+- 2026-10-01 22:20:36 UTC — [ticket-286] securite: PASS — Aucune vulnérabilité détectée dans ce diff. Le code introduit une nouvelle fonct (42984ms)
+- 2026-10-01 22:20:36 UTC — [ticket-286] tour 1 — reviewer démarré
+- 2026-10-01 22:22:40 UTC — [ticket-286] tour 1 — reviewer terminé (123359ms)
+- 2026-10-01 22:26:50 UTC — [ticket-286] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (250750ms)
+- 2026-10-01 22:26:50 UTC — [ticket-286] APPROVED après 1 tour(s)
