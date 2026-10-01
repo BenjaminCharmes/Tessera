@@ -101,6 +101,7 @@ class _FakeOrchestrator:
         on_event: object,
         run_id: str | None = None,
         dialogue: object = None,
+        envelope_run_id: str | None = None,
     ) -> PipelineResult:
         self.calls.append((project_id, ticket_id))
         await on_event(  # type: ignore[operator]
@@ -114,7 +115,11 @@ class _FakeOrchestrator:
         return _approved(ticket_id)
 
     async def run_autonomous(
-        self, project_id: str, max_tickets: int = 5, on_event: object = None
+        self,
+        project_id: str,
+        max_tickets: int = 5,
+        on_event: object = None,
+        envelope_run_id: str | None = None,
     ) -> list[PipelineResult]:
         self.calls.append((project_id, f"autonomous:{max_tickets}"))
         if on_event is not None:

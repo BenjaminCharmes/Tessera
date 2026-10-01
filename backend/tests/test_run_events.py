@@ -17,6 +17,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.services.database import (
     create_run,
+    finish_run,
     get_run_events,
     init_db,
     list_runs,
@@ -153,6 +154,9 @@ async def test_api_get_events_returns_events_in_order(db_path: Path) -> None:
                      {"round": 1}, "2026-10-01T10:00:01+00:00")
     await save_event(db_path, run_id, "agent_done", None,
                      {"cost_usd": 0.0}, "2026-10-01T10:00:02+00:00")
+    # Un run resté ouvert reçoit au démarrage de l'app un `error`
+    # « interrupted » (backend redémarré) : on relit un run terminé.
+    await finish_run(db_path, run_id, rounds=1, approved=True, final_status="done")
 
     with TestClient(app) as client:
         resp = client.get(f"/api/v1/runs/{run_id}/events")
