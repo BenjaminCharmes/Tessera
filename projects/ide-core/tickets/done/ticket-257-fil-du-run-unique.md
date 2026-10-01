@@ -1,14 +1,16 @@
 ---
-id: ticket-257
-title: "Supervision and the run view share one timeline, with security and validator verdicts in it"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-256"]
-estimated_days: 1
 created: 2026-09-30
+depends_on:
+- ticket-256
+estimated_days: 1
+id: ticket-257
+pr_number: 155
+priority: high
+status: done
+title: Supervision and the run view share one timeline, with security and validator
+  verdicts in it
+type: feat
 ---
 
 # ticket-257 — Un seul fil du run, avec les verdicts sécurité et validateur

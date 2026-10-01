@@ -24,6 +24,8 @@ export type StreamStatus = "idle" | "connecting" | "running" | "done" | "error";
  * le passage du reviewer au tour 1 reste visible dans `entries`.
  */
 export interface PassageAgent {
+  /** Discriminant du type d'entrée dans le fil (ticket-257). */
+  genre: "agent";
   /** Clé unique pour React : `${agent}-${index}`. */
   id: string;
   agent: AgentRole;
@@ -34,6 +36,41 @@ export interface PassageAgent {
   content: string;
   isDone: boolean;
 }
+
+/**
+ * Entrée de l'audit sécurité dans le fil chronologique (ticket-257).
+ *
+ * Ajoutée par `security_audit_done` : toujours terminée, jamais modifiée.
+ */
+export interface EntreeSecurite {
+  genre: "securite";
+  id: string;
+  round: number;
+  verdict: string;
+  summary: string;
+  issues_count: number;
+  reason: string;
+  isDone: true;
+}
+
+/**
+ * Entrée du validateur dans le fil chronologique (ticket-257).
+ *
+ * Ajoutée par `validation_done` : toujours terminée, jamais modifiée.
+ * `criteria` porte le détail critère par critère, avec son résultat et sa note.
+ */
+export interface EntreeValidateur {
+  genre: "validateur";
+  id: string;
+  round: number;
+  verdict: string;
+  feedback: string;
+  criteria: { criterion: string; passed: boolean; note: string }[];
+  isDone: true;
+}
+
+/** Une entrée du fil chronologique : agent, sécurité ou validateur. */
+export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur;
 
 export interface StreamState {
   status: StreamStatus;
@@ -71,8 +108,8 @@ export interface StreamState {
   outils: number;
   /** Nombre de tours du run, quand le backend le dit ; null sinon. */
   maxRounds: number | null;
-  /** Fil chronologique des passages d'agents, dans l'ordre des `agent_started` (ticket-222). */
-  entries: PassageAgent[];
+  /** Fil chronologique des passages d'agents, d'audits et de validations (ticket-222, ticket-257). */
+  entries: EntreeFil[];
   /**
    * Vrai après `run_closed` : la livraison et la documentation sont terminées,
    * le projet est libéré. Entre `pipeline_done` et `run_closed`, le run est
@@ -166,6 +203,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         : s.etape;
       const newEntry: PassageAgent | null = agent
         ? {
+            genre: "agent",
             id: `${agent}-${s.entries.length}`,
             agent,
             round,
@@ -205,16 +243,18 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       const doneContent =
         typeof ev.data["content"] === "string" ? ev.data["content"] : "";
       // Marquer le dernier passage non terminé de cet agent comme terminé.
+      // Seules les entrées de genre "agent" ont un champ `agent`.
       const lastUnfinishedIdx = s.entries.reduceRight(
         (found, e, i) =>
-          found === -1 && e.agent === doneAgent && !e.isDone ? i : found,
+          found === -1 && e.genre === "agent" && e.agent === doneAgent && !e.isDone ? i : found,
         -1,
       );
       const updatedEntries =
         lastUnfinishedIdx >= 0
-          ? s.entries.map((e, i) =>
-              i === lastUnfinishedIdx ? { ...e, isDone: true, content: doneContent } : e,
-            )
+          ? s.entries.map((e, i) => {
+              if (i !== lastUnfinishedIdx || e.genre !== "agent") return e;
+              return { ...e, isDone: true, content: doneContent };
+            })
           : s.entries;
       return {
         ...s,
@@ -238,17 +278,19 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
           ? (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
           : "";
       // Ajouter le token au dernier passage non terminé du codeur.
+      // Seules les entrées de genre "agent" ont un champ `agent`.
       let tokenEntries = s.entries;
       if (token) {
         const lastCodeurIdx = s.entries.reduceRight(
           (found, e, i) =>
-            found === -1 && e.agent === "codeur" && !e.isDone ? i : found,
+            found === -1 && e.genre === "agent" && e.agent === "codeur" && !e.isDone ? i : found,
           -1,
         );
         if (lastCodeurIdx >= 0) {
-          tokenEntries = s.entries.map((e, i) =>
-            i === lastCodeurIdx ? { ...e, tokens: e.tokens + token } : e,
-          );
+          tokenEntries = s.entries.map((e, i) => {
+            if (i !== lastCodeurIdx || e.genre !== "agent") return e;
+            return { ...e, tokens: e.tokens + token };
+          });
         }
       }
       return {
@@ -264,6 +306,42 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
             : s.currentTokens,
         entries: tokenEntries,
       };
+    }
+    case "security_audit_done": {
+      // L'audit ajoute une entrée dans le fil, visible à côté des agents (ticket-257).
+      const auditEntry: EntreeSecurite = {
+        genre: "securite",
+        id: `securite-${s.entries.length}`,
+        round: s.currentRound,
+        verdict: typeof ev.data["verdict"] === "string" ? ev.data["verdict"] : "",
+        summary: typeof ev.data["summary"] === "string" ? ev.data["summary"] : "",
+        issues_count: typeof ev.data["issues_count"] === "number" ? ev.data["issues_count"] : 0,
+        reason: typeof ev.data["reason"] === "string" ? ev.data["reason"] : "",
+        isDone: true,
+      };
+      return { ...s, events, entries: [...s.entries, auditEntry] };
+    }
+    case "validation_done": {
+      // La validation ajoute une entrée dans le fil, critère par critère (ticket-257).
+      const rawCriteria = Array.isArray(ev.data["criteria"]) ? ev.data["criteria"] : [];
+      const criteria = rawCriteria.map((c: unknown) => {
+        const cr = c as Record<string, unknown>;
+        return {
+          criterion: typeof cr["criterion"] === "string" ? cr["criterion"] : "",
+          passed: cr["passed"] === true,
+          note: typeof cr["note"] === "string" ? cr["note"] : "",
+        };
+      });
+      const validEntry: EntreeValidateur = {
+        genre: "validateur",
+        id: `validateur-${s.entries.length}`,
+        round: s.currentRound,
+        verdict: typeof ev.data["verdict"] === "string" ? ev.data["verdict"] : "",
+        feedback: typeof ev.data["feedback"] === "string" ? ev.data["feedback"] : "",
+        criteria,
+        isDone: true,
+      };
+      return { ...s, events, entries: [...s.entries, validEntry] };
     }
     case "security_audit_started":
       return { ...s, events, etape: "securite" };

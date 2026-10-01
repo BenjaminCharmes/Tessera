@@ -10,6 +10,7 @@ import AgentBlock from "./AgentBlock";
 import { blocsDuPanneau } from "./blocsDuPanneau";
 import PipelineSummary from "./PipelineSummary";
 import StageStrip from "./StageStrip";
+import FilDuRun from "../FilDuRun";
 import type { Project, Ticket, PipelineReglages } from "../../types/api";
 import type { UseRunActifResult } from "../../hooks/streamState";
 
@@ -45,6 +46,7 @@ export default function AgentPanel({
     pendingQuestion,
     questionExpireA,
     runClosed,
+    entries,
     answer,
     interject,
     stop,
@@ -139,24 +141,32 @@ export default function AgentPanel({
               </p>
             )}
 
-            {coderStarted && (
-              <AgentBlock
-                agent="codeur"
-                tokens={currentTokens}
-                isActive={currentAgent === "codeur"}
-                isDone={coderDone}
-                doneContent={codeurDoneContent || undefined}
-              />
-            )}
-
-            {reviewerStarted && (
-              <AgentBlock
-                agent="reviewer"
-                tokens=""
-                isActive={currentAgent === "reviewer"}
-                isDone={status === "done"}
-                reviewContent={reviewerContent}
-              />
+            {/* Fil chronologique : agents, sécurité et validateur (ticket-257).
+                Repli sur blocsDuPanneau si entries est vide — observateur arrivé
+                après le début du run, sans historique (ticket-182). */}
+            {entries.length > 0 ? (
+              <FilDuRun entries={entries} />
+            ) : (
+              <>
+                {coderStarted && (
+                  <AgentBlock
+                    agent="codeur"
+                    tokens={currentTokens}
+                    isActive={currentAgent === "codeur"}
+                    isDone={coderDone}
+                    doneContent={codeurDoneContent || undefined}
+                  />
+                )}
+                {reviewerStarted && (
+                  <AgentBlock
+                    agent="reviewer"
+                    tokens=""
+                    isActive={currentAgent === "reviewer"}
+                    isDone={status === "done"}
+                    reviewContent={reviewerContent}
+                  />
+                )}
+              </>
             )}
 
             {status === "done" && lastResult && (
