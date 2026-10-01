@@ -34,6 +34,10 @@ async def get_events(run_id: str) -> list[RunEvent]:
     Returns 404 when the run_id is unknown. For a per-ticket row inside a
     queue, returns only events that belong to that ticket (filtered by
     ``ticket_id`` in SQL, against the parent run's events).
+
+    Authentication is not checked here: ``StaticTokenMiddleware``
+    (``tessera/auth.py``, installed in ``main.py``) guards every path but
+    ``/health``, this one included.
     """
     events = await get_run_events(settings.ide_db_path, run_id)
     if events is None:
