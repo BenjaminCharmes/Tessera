@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 1
 id: ticket-286
-pr_number: null
+pr_number: 183
 priority: medium
 status: done
 title: A running run shows its ticket's title, in Supervision and in the run view
