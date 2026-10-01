@@ -81,7 +81,7 @@ appels d'un pipeline.
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé trois correctifs, tous trois nés d'un usage réel :
+Cette promesse a demandé cinq correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -106,6 +106,13 @@ Cette promesse a demandé trois correctifs, tous trois nés d'un usage réel :
   décisions et des tickets qui doivent être jugés par le reviewer et le 
   validateur. Le pipeline transmet désormais ces artefacts au matériau relu, 
   sans les committer.
+- **Fichiers vidés détectés et signalés** (ticket-277). Si le codeur vide un
+  fichier suivi au lieu de le supprimer (par oubli du `rm`), le pipeline
+  signale le fichier vidé dans le rapport du run — un événement ou une ligne de
+  log lisible à l'écran — sans bloquer le commit. Seul un fichier suivi
+  **ramené à vide** est signalé ; un fichier vide créé initialement ne l'est
+  pas. Cette détection aide à repérer les suppressions mal faites avant qu'elles
+  n'échouent en CI.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
