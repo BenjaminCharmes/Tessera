@@ -1,14 +1,15 @@
 ---
-id: ticket-277
-title: "The codeur deletes a file with rm instead of emptying it, and an emptied tracked file is flagged"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-01
+id: ticket-277
+pr_number: 157
+priority: medium
+status: done
+title: The codeur deletes a file with rm instead of emptying it, and an emptied tracked
+  file is flagged
+type: fix
 ---
 
 # ticket-277 — Supprimer un fichier, pas le vider

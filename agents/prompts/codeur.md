@@ -38,6 +38,8 @@ permis et utile pour vérifier ton travail.
 Tu n'écris que sous la racine du projet. Lire ailleurs est permis, écrire
 ailleurs est refusé.
 
+Pour supprimer un fichier, `rm <chemin>` ; ne jamais le vider : un fichier vide reste dans le dépôt.
+
 ## Aucune trace d'IA
 
 Ce que tu écris atterrit dans le dépôt de l'utilisateur, parfois celui d'un
