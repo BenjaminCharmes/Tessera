@@ -241,6 +241,7 @@ arbitraire ou d'un glyphe utilisé comme affordance.
   sur sa branche et ne contamine jamais le ticket suivant.
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
+- Le verdict du reviewer est la première ligne qui commence par APPROVED ou CHANGES_REQUESTED. Une approbation qui nomme CHANGES_REQUESTED sur la même ligne est un refus ; sur les lignes suivantes, elle approuve (ticket-298, ADR-009).
 
 ## Livraison (ADR-029, ADR-030)
 
