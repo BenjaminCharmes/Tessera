@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
 id: ticket-277
-pr_number: null
+pr_number: 157
 priority: medium
 status: done
 title: The codeur deletes a file with rm instead of emptying it, and an emptied tracked
