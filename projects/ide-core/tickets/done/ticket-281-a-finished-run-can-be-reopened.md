@@ -1,14 +1,16 @@
 ---
-id: ticket-281
-title: "A finished run can be reopened in the run view from the run history"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-280", "ticket-279"]
-estimated_days: 1
 created: 2026-10-01
+depends_on:
+- ticket-280
+- ticket-279
+estimated_days: 1
+id: ticket-281
+pr_number: 182
+priority: medium
+status: done
+title: A finished run can be reopened in the run view from the run history
+type: feat
 ---
 
 # ticket-281 — Un run terminé se rouvre depuis l'historique

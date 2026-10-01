@@ -398,6 +398,27 @@ CREATE TABLE agent_calls (
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
 
+## Visualisation des runs terminés (ticket-280, ticket-281)
+
+Un run qui quitte la supervision — fermé ou au redémarrage du backend — disparaît 
+de la WebSocket temps réel. Les événements persistent en SQLite, et l'utilisateur 
+peut les rejouer depuis l'historique :
+
+1. **Récupération** : un clic sur une ligne de `RecentRuns` appelle l'endpoint 
+   du ticket-280 avec l'identifiant du run, qui retourne l'ensemble de ses 
+   événements, du début à la fin.
+2. **Rejeu** : le frontend applique chaque événement dans `applyEvent` — le même 
+   code que pour la WebSocket temps réel. L'état visuel se reconstruit entièrement 
+   en quelques millisecondes, cartes comprises.
+3. **Lecture seule** : la vue rouverte n'affiche ni bouton d'arrêt, ni champ de 
+   message, ni chrono qui tourne. C'est un instantané interactif du passé, pas 
+   un run vivant.
+
+Cette capacité de rejeu repose sur le fait que chaque événement porte assez 
+d'information pour reconstituer l'état. Les `OrchestratorEvent` — écrits 
+initialement pour le temps réel — le satisfont aussi bien pour l'historique : 
+c'est la même sérialisation JSON, les mêmes champs, aucune adaptation.
+
 ## Structure des fichiers de tickets
 
 ```
