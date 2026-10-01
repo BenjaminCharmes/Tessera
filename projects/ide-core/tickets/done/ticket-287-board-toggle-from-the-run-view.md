@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
 id: ticket-287
-pr_number: null
+pr_number: 184
 priority: medium
 status: done
 title: Clicking the board toggle from the run view opens the board
