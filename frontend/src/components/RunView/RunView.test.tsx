@@ -31,6 +31,7 @@ function flux(over: Partial<UseRunActifResult> = {}) {
 
 function passage(over: Partial<PassageAgent>): PassageAgent {
   return {
+    genre: "agent",
     id: "codeur-0",
     agent: "codeur",
     round: 1,
