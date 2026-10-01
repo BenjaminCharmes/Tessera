@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
 id: ticket-296
-pr_number: null
+pr_number: 185
 priority: high
 status: done
 title: A pipeline commit never carries agents.json or another run-policy file
