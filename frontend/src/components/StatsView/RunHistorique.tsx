@@ -4,6 +4,7 @@ import { applyEvent, INITIAL } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { OrchestratorEvent, RunEvent } from "../../types/api";
 import RegionTitle from "../../design/RegionTitle";
+import { IconHistory } from "../../design/icons";
 import { BAND } from "../../design/layout";
 import FilDuRun from "../FilDuRun";
 import PipelineSummary from "../AgentPanel/PipelineSummary";
@@ -90,9 +91,9 @@ export default function RunHistorique({
         <button
           type="button"
           onClick={onClose}
-          className="text-xs text-zinc-400 hover:text-zinc-200"
+          className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200"
         >
-          ← Historique
+          <IconHistory size={12} /> Historique
         </button>
       </div>
 
