@@ -47,6 +47,19 @@ _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS: tuple[str, ...] = tuple(
 # never the coder's work, so they must never ride under a ticket's message.
 _BOOKKEEPING_COMMIT_MESSAGE = "chore: tessera pipeline bookkeeping"
 
+# Paths that hold the run policy the orchestrator reads once before the first
+# agent. The user may edit them through the IDE while the run is in progress
+# (e.g. changing the provider in the Agents screen). Those edits must never
+# ride along with the coder's work — ticket-296, ADR-027.
+# Files are excluded from both the reviewed diff and the ticket commit;
+# they are left uncommitted in the working tree and the run logs a warning.
+_RUN_POLICY_PATHS: tuple[str, ...] = (
+    "agents.json",
+    ".claude/settings.json",
+    ".claude/settings.local.json",
+    ".github/workflows/",
+)
+
 
 def _is_orchestrator_artifact_path(path: str) -> bool:
     """True when ``path`` belongs to Tessera's own pipeline bookkeeping.
@@ -60,6 +73,22 @@ def _is_orchestrator_artifact_path(path: str) -> bool:
             if path.startswith(artifact):
                 return True
         elif path == artifact:
+            return True
+    return False
+
+
+def _is_run_policy_path(path: str) -> bool:
+    """True when ``path`` holds part of the run policy (ticket-296, ADR-027).
+
+    These files are read once before the pipeline starts and must never
+    appear in a ticket's commit, even when the user edits them during a run.
+    Directory entries (ending with ``/``) match any file underneath them.
+    """
+    for policy in _RUN_POLICY_PATHS:
+        if policy.endswith("/"):
+            if path.startswith(policy):
+                return True
+        elif path == policy:
             return True
     return False
 
@@ -532,11 +561,15 @@ class GitWorkspaceService:
         `tickets/` et `memory/` sont dans `.git/info/exclude`, ces exclusions
         n'étaient donc pas seulement inutiles : elles faisaient échouer le
         commit de fin de run, et donc le run entier (ticket-072).
+
+        Les fichiers de politique du run (`_RUN_POLICY_PATHS`) sont également
+        exclus : un réglage effectué dans l'IDE pendant le run ne doit jamais
+        se retrouver dans le commit du ticket (ticket-296, ADR-027).
         """
         # Boucle explicite : une compréhension contenant un `await` produit un
         # générateur asynchrone, pas un tuple.
         pathspecs: list[str] = []
-        for chemin in _ORCHESTRATOR_ARTIFACT_PATHS:
+        for chemin in (*_ORCHESTRATOR_ARTIFACT_PATHS, *_RUN_POLICY_PATHS):
             if not await self._is_ignored(chemin):
                 pathspecs.append(f":(exclude){chemin}")
         return tuple(pathspecs)
@@ -846,7 +879,11 @@ class GitWorkspaceService:
             path = line[3:]
             if prefixe and path.startswith(prefixe):
                 path = path[len(prefixe):]
-            if not _is_orchestrator_artifact_path(path):
+            # Tolerates both Tessera's own bookkeeping (tickets/, pipeline-log)
+            # and run-policy files (agents.json, .claude/settings*.json,
+            # .github/workflows/) that the commit intentionally skips —
+            # their presence in the working tree must not block the next ticket.
+            if not _is_orchestrator_artifact_path(path) and not _is_run_policy_path(path):
                 return False
         return True
 
@@ -908,6 +945,29 @@ class GitWorkspaceService:
                 emptied.append(rel_path)
         return emptied
 
+    async def _detect_modified_policy_files(self) -> list[str]:
+        """Return paths of run-policy files modified in the working tree.
+
+        These files are excluded from the ticket commit (ticket-296, ADR-027).
+        Any modification found is logged as a warning in `commit_all` so the
+        run report makes the exclusion visible, without blocking the commit.
+        """
+        try:
+            status = await self._run("status", "--porcelain", "--untracked-files=no")
+        except GitCommandError:
+            return []
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        modified: list[str] = []
+        for line in status.splitlines():
+            if len(line) < 3:  # noqa: PLR2004
+                continue
+            path = line[3:]
+            if prefixe and path.startswith(prefixe):
+                path = path[len(prefixe):]
+            if _is_run_policy_path(path):
+                modified.append(path)
+        return modified
+
     async def commit_all(self, message: str) -> str | None:
         """Commit the ticket's changes under `message`; return the short SHA.
 
@@ -920,6 +980,12 @@ class GitWorkspaceService:
         — so the working tree ends up clean either way, which the next run's
         dirty-tree check relies on.
 
+        Run-policy files (`_RUN_POLICY_PATHS`) are also excluded: a change
+        made through the IDE during the run (e.g. updating the provider in the
+        Agents screen) must not ride along with the coder's work. They remain
+        in the working tree, uncommitted, and a warning is logged so the run
+        report makes the exclusion visible (ticket-296, ADR-027).
+
         Returns the short SHA of the ticket commit, or None if nothing
         outside bookkeeping changed (a bookkeeping-only commit may still be
         created even when this returns None).
@@ -929,6 +995,15 @@ class GitWorkspaceService:
         removed them with ``rm`` so they disappear from the repository rather
         than staying as empty files. The commit is not blocked.
         """
+        policy_modifiees = await self._detect_modified_policy_files()
+        if policy_modifiees:
+            _logger.warning(
+                "run_policy_files_not_committed",
+                extra={
+                    "fichiers": policy_modifiees,
+                    "raison": "politique du run — modifiée pendant le run, exclue du commit du ticket",
+                },
+            )
         emptied = await self._detect_emptied_tracked_files()
         if emptied:
             _logger.warning(

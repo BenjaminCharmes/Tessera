@@ -1278,3 +1278,161 @@ async def test_scenario_freelance_ticket_b_ne_contient_pas_les_commits_de_ticket
     assert "feat: ticket-a" not in log, (
         "Ticket B's commits above the squash base must not include ticket A's commits"
     )
+
+
+# ------------------------------------------------------------------
+# Run-policy files — ticket-296
+# ------------------------------------------------------------------
+
+
+async def test_commit_all_ne_committe_pas_agents_json_modifie(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A change to agents.json made during a run must not appear in the ticket commit.
+
+    The policy file may be edited through the IDE's Agents screen while the
+    pipeline is running. The commit must contain only the coder's work.
+    """
+    agents_json = repo / "agents.json"
+    agents_json.write_text('{"autonomy": "commit"}\n', encoding="utf-8")
+    await _git(repo, "add", "agents.json")
+    await _git(repo, "commit", "-q", "-m", "chore: add agents.json")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-296", "no-agents-json")
+
+    (repo / "feature.py").write_text("x = 1\n", encoding="utf-8")
+    agents_json.write_text('{"autonomy": "pr", "provider": "claude"}\n', encoding="utf-8")
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        sha = await service.commit_all("feat: ticket-296 — feature")
+
+    assert sha is not None, "The coder's work must have been committed"
+
+    files_in_commit = await _git_out(repo, "show", "--name-only", "--format=", sha)
+    assert "agents.json" not in files_in_commit, (
+        "agents.json must never appear in the ticket commit"
+    )
+
+
+async def test_agents_json_reste_dans_arbre_apres_commit(repo: Path) -> None:
+    """A modified agents.json must remain in the working tree after the commit.
+
+    The pipeline explicitly leaves it uncommitted: the next ticket should not
+    find it missing, and the user's IDE edit must not be silently discarded.
+    """
+    agents_json = repo / "agents.json"
+    agents_json.write_text('{"autonomy": "commit"}\n', encoding="utf-8")
+    await _git(repo, "add", "agents.json")
+    await _git(repo, "commit", "-q", "-m", "chore: add agents.json")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-296", "agents-reste-dans-arbre")
+
+    (repo / "work.py").write_text("y = 2\n", encoding="utf-8")
+    agents_json.write_text('{"autonomy": "merge"}\n', encoding="utf-8")
+
+    await service.commit_all("feat: ticket-296 — work")
+
+    assert agents_json.read_text(encoding="utf-8") == '{"autonomy": "merge"}\n', (
+        "agents.json modification must remain in the working tree after the commit"
+    )
+
+
+async def test_commit_all_ne_committe_pas_github_workflows_modifie(
+    repo: Path,
+) -> None:
+    """A file inside .github/workflows/ must not appear in the ticket commit."""
+    workflows_dir = repo / ".github" / "workflows"
+    workflows_dir.mkdir(parents=True)
+    ci_yml = workflows_dir / "ci.yml"
+    ci_yml.write_text("name: CI\n", encoding="utf-8")
+    await _git(repo, "add", ".github/workflows/ci.yml")
+    await _git(repo, "commit", "-q", "-m", "chore: add ci workflow")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-296", "no-workflows")
+
+    (repo / "main.py").write_text("main = True\n", encoding="utf-8")
+    ci_yml.write_text("name: CI\non: [push]\n", encoding="utf-8")
+
+    sha = await service.commit_all("feat: ticket-296 — main")
+
+    assert sha is not None
+    files_in_commit = await _git_out(repo, "show", "--name-only", "--format=", sha)
+    assert ".github/workflows/ci.yml" not in files_in_commit, (
+        ".github/workflows/ files must never appear in the ticket commit"
+    )
+
+
+async def test_commit_all_committe_le_travail_du_codeur_normalement(
+    repo: Path,
+) -> None:
+    """Coder's own files must be committed normally even when policy files are modified."""
+    agents_json = repo / "agents.json"
+    agents_json.write_text('{"autonomy": "commit"}\n', encoding="utf-8")
+    await _git(repo, "add", "agents.json")
+    await _git(repo, "commit", "-q", "-m", "chore: add agents.json")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-296", "coder-work-committed")
+
+    (repo / "solution.py").write_text("answer = 42\n", encoding="utf-8")
+    agents_json.write_text('{"autonomy": "pr"}\n', encoding="utf-8")
+
+    sha = await service.commit_all("feat: ticket-296 — solution")
+
+    assert sha is not None, "The coder's file must have produced a commit"
+    files_in_commit = await _git_out(repo, "show", "--name-only", "--format=", sha)
+    assert "solution.py" in files_in_commit, (
+        "The coder's solution.py must be in the ticket commit"
+    )
+    assert "agents.json" not in files_in_commit
+
+
+async def test_is_clean_vrai_si_seul_agents_json_est_modifie(repo: Path) -> None:
+    """A modified agents.json must not block the next ticket (ticket-296).
+
+    When a pipeline commit intentionally leaves agents.json uncommitted,
+    is_clean() must still return True so the next ticket in the queue
+    can start without being refused.
+    """
+    agents_json = repo / "agents.json"
+    agents_json.write_text('{"autonomy": "commit"}\n', encoding="utf-8")
+    await _git(repo, "add", "agents.json")
+    await _git(repo, "commit", "-q", "-m", "chore: add agents.json")
+
+    agents_json.write_text('{"autonomy": "pr"}\n', encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    assert await service.is_clean() is True, (
+        "A modified agents.json must not block the next ticket"
+    )
+
+
+async def test_commit_all_logue_un_warning_si_agents_json_modifie(
+    repo: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """commit_all must log a warning when a policy file is excluded from the commit."""
+    agents_json = repo / "agents.json"
+    agents_json.write_text('{"autonomy": "commit"}\n', encoding="utf-8")
+    await _git(repo, "add", "agents.json")
+    await _git(repo, "commit", "-q", "-m", "chore: add agents.json")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-296", "warning-policy")
+
+    (repo / "code.py").write_text("pass\n", encoding="utf-8")
+    agents_json.write_text('{"autonomy": "merge"}\n', encoding="utf-8")
+
+    import logging
+    with caplog.at_level(logging.WARNING, logger="tessera.services.git_workspace"):
+        await service.commit_all("feat: ticket-296 — code")
+
+    policy_records = [
+        r for r in caplog.records
+        if r.getMessage() == "run_policy_files_not_committed"
+    ]
+    assert policy_records, "A warning must be emitted when a policy file is excluded"
+    assert "agents.json" in str(policy_records[0].__dict__)
