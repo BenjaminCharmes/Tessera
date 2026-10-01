@@ -1,17 +1,17 @@
 ---
-id: ticket-289
+id: ticket-294
 title: "Agents load a UI design skill, declared by default in new projects"
 type: feat
 status: todo
 pr_number: null
 priority: medium
 agent: codeur
-depends_on: ["ticket-288"]
+depends_on: ["ticket-293"]
 estimated_days: 1
 created: 2026-10-01
 ---
 
-# ticket-289 — Un skill de design d'interface pour le codeur et l'architect
+# ticket-294 — Un skill de design d'interface pour le codeur et l'architect
 
 ## Objectif
 
@@ -30,7 +30,7 @@ dans Tessera, ticket après ticket.
 
 Mettre ces règles dans `codeur.md` les ferait payer à chaque appel, y compris
 sur un ticket purement backend. Un skill ne se charge que quand sa
-`description` correspond à la tâche (ticket-242). Le ticket-288 permet de le
+`description` correspond à la tâche (ticket-242). Le ticket-293 permet de le
 livrer une seule fois pour tous les projets.
 
 ## Solution proposée

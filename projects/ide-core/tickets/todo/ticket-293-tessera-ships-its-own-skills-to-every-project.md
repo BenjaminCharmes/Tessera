@@ -1,5 +1,5 @@
 ---
-id: ticket-288
+id: ticket-293
 title: "Tessera ships its own skills to every project's agents"
 type: feat
 status: todo
@@ -11,7 +11,7 @@ estimated_days: 1
 created: 2026-10-01
 ---
 
-# ticket-288 — Tessera livre ses propres skills aux agents de tous les projets
+# ticket-293 — Tessera livre ses propres skills aux agents de tous les projets
 
 ## Objectif
 
@@ -43,7 +43,7 @@ applique le contenu.
   `agents/plugin/` :
   - `.claude-plugin/plugin.json` avec `{"name": "tessera", "version": "0.1.0"}` ;
   - `skills/<nom>/SKILL.md` pour chaque skill. Ce ticket n'en livre aucun de
-    réel ; le premier arrive avec le ticket-289.
+    réel ; le premier arrive avec le ticket-294.
 - Localiser le dossier comme les prompts du produit (voir `prompt_loader.py`
   et `IDE_PROMPTS_DIR`), en chemin absolu résolu. Ne jamais le résoudre depuis
   le `cwd` du projet.
