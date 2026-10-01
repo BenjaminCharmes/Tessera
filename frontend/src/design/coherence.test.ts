@@ -58,6 +58,10 @@ describe("cohérence visuelle", () => {
     //
     // emerald doublait green ; orange et yellow doublaient amber ; purple
     // servait des métadonnées, qui sont neutres.
+    //
+    // Aucune exception déclarée : le test couvre l'ensemble des fichiers .tsx,
+    // y compris ceux du ticket-282 (FilDuRun, PipelineSummary, InfoTip,
+    // CreateProjectModal, ImportProjectModal, ProjectNav).
     const bannies = ["emerald", "purple", "orange", "yellow"];
     const fautifs = FICHIERS.flatMap(({ chemin, contenu }) =>
       bannies
