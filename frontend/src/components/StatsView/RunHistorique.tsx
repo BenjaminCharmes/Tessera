@@ -57,20 +57,30 @@ export default function RunHistorique({
   ticketId,
   onClose,
 }: RunHistoriqueProps) {
-  const [phase, setPhase] = useState<Phase>({ kind: "loading" });
+  // Le résultat garde le run qu'il décrit : changer de run repasse en
+  // chargement sans `setState` synchrone dans l'effet, que la règle
+  // `react-hooks/set-state-in-effect` refuse.
+  const [resultat, setResultat] = useState<{ runId: string; phase: Phase } | null>(null);
+  const phase: Phase =
+    resultat !== null && resultat.runId === runId ? resultat.phase : { kind: "loading" };
 
   useEffect(() => {
-    setPhase({ kind: "loading" });
+    let abandonne = false;
     api.runs
       .events(runId)
       .then((events) => {
+        if (abandonne) return;
         const stream = events.map(toOrchestratorEvent).reduce(applyEvent, INITIAL);
-        setPhase({ kind: "done", stream });
+        setResultat({ runId, phase: { kind: "done", stream } });
       })
       .catch((err: unknown) => {
+        if (abandonne) return;
         const message = err instanceof Error ? err.message : String(err);
-        setPhase({ kind: "error", message });
+        setResultat({ runId, phase: { kind: "error", message } });
       });
+    return () => {
+      abandonne = true;
+    };
   }, [runId]);
 
   return (
