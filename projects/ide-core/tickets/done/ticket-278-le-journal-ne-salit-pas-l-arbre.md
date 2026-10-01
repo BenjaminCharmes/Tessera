@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
 id: ticket-278
-pr_number: null
+pr_number: 161
 priority: high
 status: done
 title: The pipeline's own log lines no longer make the clean-tree check refuse the
