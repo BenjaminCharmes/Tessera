@@ -23,8 +23,12 @@ class RunRecorder:
         self._db_path = db_path
 
     async def ouvrir(self, project_id: str, ticket_id: str) -> str:
-        """Insert the run's row and return its id."""
-        return await create_run(self._db_path, project_id, ticket_id)
+        """Insert the run's row and return its id.
+
+        Always ``single``: RunRecorder is called once per ticket inside a
+        queue or autonomous run, never for the envelope itself.
+        """
+        return await create_run(self._db_path, project_id, ticket_id, mode="single")
 
     async def clore(self, run_id: str, resultat: PipelineResult | None) -> None:
         """Close the row — with the result, or as interrupted when there is none."""

@@ -42,7 +42,14 @@ class _Scope:
         projet = " AND pr.project_id = ?" if project_id is not None else ""
         extra: tuple[Any, ...] = (project_id,) if project_id is not None else ()
         self.calls = f"substr(ac.created_at, 1, 10) BETWEEN ? AND ?{projet}"
-        self.runs = f"substr(pr.started_at, 1, 10) BETWEEN ? AND ?{projet}"
+        # Les enveloppes de file (mode = 'queue' ou 'autonomous') ne sont pas
+        # des runs de tickets : elles portent les événements du canal mais n'ont
+        # pas d'appels agents rattachés. Les coûts et tokens ne sont pas filtrés
+        # ici — ils viennent de agent_calls, qui n'ont de lignes que sur les
+        # runs de tickets (ticket-263).
+        # mode IS NULL : lignes antérieures à la migration, traitées comme single.
+        mode_ok = " AND (pr.mode IS NULL OR pr.mode = 'single')"
+        self.runs = f"substr(pr.started_at, 1, 10) BETWEEN ? AND ?{projet}{mode_ok}"
         self.chat = "substr(ts, 1, 10) BETWEEN ? AND ?" + (
             " AND project_id = ?" if project_id is not None else ""
         )
