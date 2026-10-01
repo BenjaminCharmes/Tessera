@@ -127,6 +127,53 @@ describe("BottomPanel", () => {
   });
 });
 
+describe("BottomPanel — étapes du pipeline (ticket-256)", () => {
+  it("affiche security_audit_started", () => {
+    render(<BottomPanel events={[makeEvent("security_audit_started")]} />);
+    expect(screen.getByText(/Audit sécurité : démarré/)).toBeTruthy();
+  });
+
+  it("affiche security_audit_done avec le verdict", () => {
+    render(<BottomPanel events={[makeEvent("security_audit_done", { verdict: "BLOCK" })]} />);
+    expect(screen.getByText(/Audit sécurité : BLOCK/)).toBeTruthy();
+  });
+
+  it("affiche security_audit_done sans verdict connu", () => {
+    render(<BottomPanel events={[makeEvent("security_audit_done", {})]} />);
+    expect(screen.getByText(/Audit sécurité : inconnu/)).toBeTruthy();
+  });
+
+  it("affiche validation_started", () => {
+    render(<BottomPanel events={[makeEvent("validation_started")]} />);
+    expect(screen.getByText(/Validation : démarrée/)).toBeTruthy();
+  });
+
+  it("affiche validation_done approuvée", () => {
+    render(<BottomPanel events={[makeEvent("validation_done", { approved: true })]} />);
+    expect(screen.getByText(/Validation : approuvée/)).toBeTruthy();
+  });
+
+  it("affiche validation_done refusée", () => {
+    render(<BottomPanel events={[makeEvent("validation_done", { approved: false })]} />);
+    expect(screen.getByText(/Validation : refusée/)).toBeTruthy();
+  });
+
+  it("affiche documentation_started", () => {
+    render(<BottomPanel events={[makeEvent("documentation_started")]} />);
+    expect(screen.getByText(/Documentation : démarrée/)).toBeTruthy();
+  });
+
+  it("affiche doc_updated", () => {
+    render(<BottomPanel events={[makeEvent("doc_updated")]} />);
+    expect(screen.getByText(/Documentation mise à jour/)).toBeTruthy();
+  });
+
+  it("affiche livraison_started", () => {
+    render(<BottomPanel events={[makeEvent("livraison_started")]} />);
+    expect(screen.getByText(/Livraison : démarrée/)).toBeTruthy();
+  });
+});
+
 describe("BottomPanel — la livraison (ticket-083)", () => {
   it("dit jusqu'où le travail est allé", () => {
     const ev = makeEvent(
