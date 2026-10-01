@@ -4,15 +4,28 @@ Les tests de `test_orchestrator.py` exercent l'enchaînement complet. Ceux-ci
 exercent chaque étape isolément : c'est ce que la décomposition rend possible,
 et ce qui permet de couvrir un cas limite sans monter tout un pipeline.
 """
+import asyncio
 from pathlib import Path
 
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import pipeline_stages as stages
-from tessera.services.git_workspace import GitCommandError
+from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
+
+
+async def _git(cwd: Path, *args: str) -> None:
+    """Helper: run a git command in a test fixture repo."""
+    proc = await asyncio.create_subprocess_exec(
+        "git", *args,
+        cwd=str(cwd),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _, stderr = await proc.communicate()
+    assert proc.returncode == 0, stderr.decode()
 
 
 def _ticket(**kwargs: object) -> Ticket:
@@ -121,6 +134,40 @@ async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> No
             raise GitCommandError(command=["git", "status"], returncode=128, stderr="boom")
 
     assert await stages.ensure_clean_tree(_Orch(_git_workspace=_BrokenGit()), _run()) is None
+
+
+async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie(
+    tmp_path: Path,
+) -> None:
+    """A queue that skips done tickets must not block the next real ticket (ticket-278).
+
+    `run_queue` calls `_log` for each skipped ticket, which appends to
+    `memory/pipeline-log.md`.  When `ensure_clean_tree` runs for the next
+    ticket, only the pipeline log is dirty — a modification the orchestrator
+    made itself.  It must be treated as clean.
+    """
+    root = tmp_path / "projet"
+    root.mkdir()
+    await _git(root, "init", "-q")
+    await _git(root, "config", "user.email", "test@tessera.local")
+    await _git(root, "config", "user.name", "Tessera test")
+
+    # Track README and pipeline log so both appear in the index.
+    (root / "README.md").write_text("# projet\n", encoding="utf-8")
+    (root / "memory").mkdir()
+    (root / "memory" / "pipeline-log.md").write_text("# log\n", encoding="utf-8")
+    await _git(root, "add", "README.md", "memory/pipeline-log.md")
+    await _git(root, "commit", "-q", "-m", "init")
+
+    # Simulate what _log writes when run_queue skips already-done tickets.
+    (root / "memory" / "pipeline-log.md").write_text(
+        "# log\n- ticket-006 saute : deja termine\n", encoding="utf-8"
+    )
+
+    workspace = GitWorkspaceService(root)
+    result = await stages.ensure_clean_tree(_Orch(_git_workspace=workspace), _run())
+
+    assert result is None, "Le journal modifie par _log ne doit pas bloquer le ticket suivant"
 
 
 # ------------------------------------------------------------------

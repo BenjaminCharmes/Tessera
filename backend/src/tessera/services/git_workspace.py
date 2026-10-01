@@ -47,6 +47,22 @@ _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS: tuple[str, ...] = tuple(
 # never the coder's work, so they must never ride under a ticket's message.
 _BOOKKEEPING_COMMIT_MESSAGE = "chore: tessera pipeline bookkeeping"
 
+
+def _is_orchestrator_artifact_path(path: str) -> bool:
+    """True when ``path`` belongs to Tessera's own pipeline bookkeeping.
+
+    Directory entries (ending with ``/``) match any file under them;
+    file entries match exactly, so ``memory/pipeline-log.md`` does not
+    accidentally match ``memory/pipeline-log.md.bak``.
+    """
+    for artifact in _ORCHESTRATOR_ARTIFACT_PATHS:
+        if artifact.endswith("/"):
+            if path.startswith(artifact):
+                return True
+        elif path == artifact:
+            return True
+    return False
+
 #: Lockfile names whose diff content is replaced by a one-line summary when
 #: fed to reviewing agents.  The commit itself is not affected — lockfiles are
 #: committed in full.  A single entry here covers every subdirectory
@@ -712,7 +728,7 @@ class GitWorkspaceService:
             _logger.warning("index_non_restaure", extra={"erreur": str(exc)})
 
     async def is_clean(self) -> bool:
-        """Return True when tracked files have no staged or unstaged changes.
+        """Return True when tracked files outside Tessera's bookkeeping have no changes.
 
         Deliberately narrowed to tracked modifications (`--untracked-files=no`):
         this is now a safety net for state changed *outside* Tessera, not the
@@ -721,9 +737,21 @@ class GitWorkspaceService:
         reports untracked files, which would refuse a first run in any
         project holding a non-ignored untracked file (build output, scratch
         notes) before anything happened.
+
+        Tessera's own bookkeeping paths (`_ORCHESTRATOR_ARTIFACT_PATHS`) are
+        excluded: `_log` writes to `memory/pipeline-log.md` and ticket files
+        are rewritten when a queue skips already-done tickets. Both are
+        committed by the run's bookkeeping commit and must not be mistaken for
+        an external modification that would block the next ticket.
         """
         status = await self._run("status", "--porcelain", "--untracked-files=no")
-        return not status.strip()
+        for line in status.splitlines():
+            if len(line) < 3:  # noqa: PLR2004
+                continue
+            path = line[3:]
+            if not _is_orchestrator_artifact_path(path):
+                return False
+        return True
 
     async def _file_had_content_in_head(self, rel_path: str) -> bool:
         """True when HEAD contains a non-empty, non-blank version of this file.

@@ -198,6 +198,52 @@ async def test_is_clean_faux_avec_changement(repo: Path) -> None:
     assert await service.is_clean() is False
 
 
+async def test_is_clean_vrai_si_seul_le_journal_pipeline_est_modifie(repo: Path) -> None:
+    """A modified pipeline log must not block the next ticket (ticket-278).
+
+    `_log` writes to `memory/pipeline-log.md` when a queue skips done
+    tickets.  The dirty-tree check must ignore that write so it does not
+    mistake the orchestrator's own bookkeeping for an external modification.
+    """
+    (repo / "memory").mkdir()
+    log = repo / "memory" / "pipeline-log.md"
+    log.write_text("# log\n", encoding="utf-8")
+    await _git(repo, "add", "memory/pipeline-log.md")
+    await _git(repo, "commit", "-q", "-m", "track log")
+
+    log.write_text("# log\n- ticket-006 saute : deja termine\n", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    assert await service.is_clean() is True
+
+
+async def test_is_clean_vrai_si_seul_un_fichier_tickets_est_modifie(repo: Path) -> None:
+    """A modified ticket file must not block the next ticket (ticket-278).
+
+    `TicketService.update_status` rewrites ticket files when a queue skips
+    done tickets.  The dirty-tree check must ignore those rewrites.
+    """
+    tickets_dir = repo / "tickets" / "todo"
+    tickets_dir.mkdir(parents=True)
+    ticket_file = tickets_dir / "ticket-001-feature.md"
+    ticket_file.write_text("# ticket-001\nstatus: todo\n", encoding="utf-8")
+    await _git(repo, "add", "tickets/")
+    await _git(repo, "commit", "-q", "-m", "track tickets")
+
+    ticket_file.write_text("# ticket-001\nstatus: done\n", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    assert await service.is_clean() is True
+
+
+async def test_is_clean_faux_si_un_fichier_non_bookkeeping_est_modifie(repo: Path) -> None:
+    """A modification outside bookkeeping paths must still be refused (ticket-278)."""
+    (repo / "README.md").write_text("# modifie par quelqu un d autre\n", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    assert await service.is_clean() is False
+
+
 async def test_repertoire_sans_depot_git_leve_not_a_git_repository(tmp_path: Path) -> None:
     service = GitWorkspaceService(tmp_path)
     with pytest.raises(NotAGitRepository):
