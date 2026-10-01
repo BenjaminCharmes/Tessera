@@ -90,7 +90,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-06  
 **Portée** : architect, codeur, reviewer  
-**Décision** : L'orchestrateur parse la sortie du reviewer en cherchant `CHANGES_REQUESTED` (prioritaire) puis `APPROVED`. Absence des deux = rejet.  
+**Décision** : L'orchestrateur parse la sortie du reviewer en cherchant `CHANGES_REQUESTED` (prioritaire) puis `APPROVED`. Absence des deux = rejet. Amendé 2026-10-01 (ticket-298) : la première ligne qui **commence** par un verdict l'emporte ; la priorité ne joue qu'en son absence.  
 **Raison** : Le reviewer est prompté pour répondre dans ce format. La priorité de `CHANGES_REQUESTED` évite les faux positifs si les deux mots apparaissent ("sinon APPROVED").  
 **Alternative rejetée** : Parser un JSON structuré — trop contraignant pour un LLM qui génère aussi du texte libre.
 
