@@ -2,7 +2,7 @@
 id: ticket-261
 title: "No slash command shares a skill's name, and ship becomes a user-only skill"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur

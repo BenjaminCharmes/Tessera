@@ -117,6 +117,16 @@ def test_les_skills_annonces_existent() -> None:
     assert annonces <= presents, f"annoncés mais absents : {sorted(annonces - presents)}"
 
 
+def test_aucune_command_ne_porte_le_nom_d_un_skill() -> None:
+    # Claude Code sert le skill quand une command porte le même nom : la
+    # command n'est alors jamais lue (ticket-261).
+    dossier = _RACINE / ".claude/commands"
+    commands = {f.stem for f in dossier.glob("*.md")} if dossier.is_dir() else set()
+    skills = {d.name for d in (_RACINE / ".claude/skills").iterdir() if d.is_dir()}
+
+    assert not commands & skills, f"command et skill homonymes : {sorted(commands & skills)}"
+
+
 def test_l_arborescence_decrite_existe() -> None:
     # `CLAUDE.md` décrit `.claude/` : ce qu'il montre doit exister, sinon il
     # décrit un dépôt imaginaire.
