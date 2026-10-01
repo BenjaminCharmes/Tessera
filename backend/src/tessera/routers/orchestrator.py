@@ -418,13 +418,26 @@ def _livreur(
 _TACHES: set[asyncio.Task[None]] = set()
 
 
-def _libelle(request: RunRequest) -> str:
-    """What the registry shows as running: the ticket, the queue, or the mode."""
+def _ticket_initial(request: RunRequest) -> str | None:
+    """Le premier ticket traité par le run — le seul connu au démarrage."""
     if request.ticket_id:
         return request.ticket_id
     if request.ticket_ids:
-        return ", ".join(request.ticket_ids)
-    return request.mode
+        return request.ticket_ids[0]
+    return None
+
+
+async def _lire_titre(
+    ticket_svc: TicketService, ticket_id: str | None
+) -> str | None:
+    """Lit le titre d'un ticket ; renvoie None si illisible ou absent."""
+    if not ticket_id:
+        return None
+    try:
+        ticket = await ticket_svc.get_ticket(ticket_id)
+        return ticket.title if ticket else None
+    except Exception:  # noqa: BLE001
+        return None
 
 
 class Limites(BaseModel):
@@ -457,9 +470,18 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
     if request.mode == "single" and not request.ticket_id:
         raise HTTPException(status_code=422, detail="ticket_id requis en mode single")
 
+    # Lire le titre du ticket initial avant de réserver le run (ticket-286).
+    project_path = settings.ide_workspace_dir / request.project_id
+    ticket_svc = TicketService(project_path, request.project_id)
+    initial_ticket_id = _ticket_initial(request)
+    ticket_titre = await _lire_titre(ticket_svc, initial_ticket_id)
+
     try:
         run = RUN_REGISTRY.ouvrir(
-            request.project_id, _libelle(request), mode=request.mode
+            request.project_id,
+            initial_ticket_id,
+            mode=request.mode,
+            ticket_titre=ticket_titre,
         )
     except RunAlreadyInProgress as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
@@ -476,6 +498,9 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             raise
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
+    async def titre_getter(ticket_id: str) -> str | None:
+        return await _lire_titre(ticket_svc, ticket_id)
+
     tache = asyncio.create_task(
         executer(
             run,
@@ -484,6 +509,7 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             RUN_REGISTRY,
             ticket_ids=request.ticket_ids,
             max_tickets=request.max_tickets,
+            titre_getter=titre_getter,
         )
     )
     _TACHES.add(tache)

@@ -101,6 +101,16 @@ export default function RunCard({
           </span>
         </span>
 
+        {/* Titre du ticket sous le numéro (ticket-286). */}
+        {!estUnChat && run.ticket_titre ? (
+          <span
+            className="mt-0.5 block truncate text-micro text-zinc-500"
+            title={run.ticket_titre}
+          >
+            {run.ticket_titre}
+          </span>
+        ) : null}
+
         {/* Lu depuis le réseau : un backend plus ancien n'envoie pas encore
             ces champs, et une carte ne doit pas disparaître pour ça.
             Replié par défaut : ce qu'une carte montre sans qu'on l'ouvre se

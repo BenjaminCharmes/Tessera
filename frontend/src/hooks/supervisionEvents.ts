@@ -41,6 +41,13 @@ function coutDe(ev: OrchestratorEvent): number {
   return typeof c === "number" ? c : 0;
 }
 
+/** Le titre du ticket, extrait de l'événement `ticket_status_changed` (ticket-286). */
+function titreDuStatut(ev: OrchestratorEvent): Partial<RunActif> {
+  if (ev.type !== "ticket_status_changed") return {};
+  const titre = ev.data["ticket_titre"];
+  return typeof titre === "string" ? { ticket_titre: titre } : {};
+}
+
 /** Garde la carte d'un run en phase avec ce qu'il annonce. */
 export function majDesRuns(
   prec: RunActif[],
@@ -69,6 +76,7 @@ export function majDesRuns(
         verdict: null,
         demarre_a: ev.timestamp,
         ...avancementDeLaFile(ev),
+        ...titreDuStatut(ev),
       },
     ];
   }
@@ -91,6 +99,7 @@ export function majDesRuns(
               ? 0
               : (r.outils ?? 0) + (ev.type === "agent_tool_use" ? 1 : 0),
           ...avancementDeLaFile(ev),
+          ...titreDuStatut(ev),
         }
       : r,
   );

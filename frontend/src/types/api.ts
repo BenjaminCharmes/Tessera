@@ -166,6 +166,8 @@ export interface RunActif {
   project_id: string;
   mode: string;
   ticket_id: string | null;
+  /** Titre lisible du ticket en cours (ticket-286). Absent sur un backend ancien. */
+  ticket_titre?: string | null;
   etape: string | null;
   agent: AgentRole | null;
   tour: number;

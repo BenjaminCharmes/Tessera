@@ -156,6 +156,7 @@ function streamMock(over: Partial<UseRunActifResult> = {}): UseRunActifResult {
   return {
     status: "running",
     ticketId: "ticket-001",
+    ticketTitre: null,
     events: [],
     entries: [],
     currentAgent: null,
@@ -250,6 +251,29 @@ describe("AgentPanel — croix Effacer le run (ticket-279)", () => {
       />,
     );
     expect(screen.getByLabelText(/Effacer le run/)).toBeTruthy();
+  });
+});
+
+describe("AgentPanel — titre du ticket dans l'en-tête (ticket-286)", () => {
+  it("affiche le titre du ticket dans l'en-tête quand il est connu", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ ticketId: "ticket-001", ticketTitre: "Ma super feature" })}
+      />,
+    );
+    expect(screen.getByText(/ticket-001 · Ma super feature/)).toBeTruthy();
+  });
+
+  it("n'affiche que l'identifiant quand le titre est absent", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ ticketId: "ticket-001", ticketTitre: null })}
+      />,
+    );
+    // L'identifiant est dans l'en-tête, mais aucun séparateur · ne doit apparaître
+    expect(screen.queryByText(/·/)).toBeNull();
   });
 });
 

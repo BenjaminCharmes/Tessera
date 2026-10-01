@@ -32,6 +32,7 @@ export default function AgentPanel({
   const {
     status,
     ticketId,
+    ticketTitre,
     currentAgent,
     currentRound,
     coutUsd,
@@ -108,8 +109,12 @@ export default function AgentPanel({
         <RegionTitle>
           Agents
           {ticketId && (
-            <span className="ml-2 font-normal normal-case text-zinc-600">
+            <span
+              className="ml-2 min-w-0 truncate font-normal normal-case text-zinc-600"
+              title={ticketTitre ?? undefined}
+            >
               — {ticketId}
+              {ticketTitre ? ` · ${ticketTitre}` : ""}
             </span>
           )}
         </RegionTitle>
