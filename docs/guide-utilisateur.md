@@ -314,6 +314,19 @@ l'échelle réelle, qui est rarement celle qu'on imagine.
 
 Une fois qu'un run est entièrement complété — sa revue approuvée et sa livraison effectuée (le cas échéant) — tu vois un bouton « Fermer » dans le résumé. Un clic le retire du panneau de Supervision pour dégager l'écran et passer aux tickets en cours ou suivants.
 
+
+#### Signes de fin du run
+
+Quand le pipeline finit (approuvé ou bloqué), la carte du run change d'aspect :
+
+- **Le chrono s'arrête.** Il affiche l'heure exacte de fin et ne compte plus les secondes.
+- **Le résumé en haut se met à jour :**
+  - `PR #42 mergée` si livraison réussie (le numéro est un lien vers GitHub)
+  - `Livraison : <raison>` si elle n'a pas abouti (dépôt absent, CI rouge, branche divergée…)
+- **Le bouton « Fermer »** est maintenant actif pour masquer la carte.
+
+Par défaut, une fois approuvé, le pipeline enchaîne jusqu'à la livraison — tant qu'il y a un dépôt git et que le projet l'autorise. Sinon, tu vois pourquoi ça s'est arrêté.
+
 ### La frise d'étapes
 
 En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
@@ -345,6 +358,17 @@ Ce que tu vois dans le fil pour chaque verdict :
 - **Validateur** : son verdict (approuvé ou changements demandés), puis en détail, pour chaque critère d'acceptation du ticket, son état (✓ réussi / ✗ échoué) et la note du validateur
 
 Ce fil est le même partout — que tu regardes dans la **Supervision** (onglet Agents) ou dans l'**onglet du run**, tu vois l'histoire complète. Plus besoin de chercher dans les logs : tu sais d'un coup d'œil pourquoi le codeur repart.
+
+
+#### Verdicts lisibles dans le log
+
+Le Pipeline log énumère maintenant chaque étape du pipeline avec son résultat exact :
+
+- **Tests** : « Tests : verts » ou « Tests : rouges — retour au codeur » si le testeur a tourné. Un échec renvoie au codeur sans passer à la revue.
+- **Validation** : « Validation : approuvée » ou « Validation : refusée ». C'est le verdict du validateur tel qu'il l'a décidé.
+- **Livraison** : « PR #42 », « PR #42 mergée » ou la raison de l'arrêt (CI non verte, branche divergée, absence de dépôt…).
+
+Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
 
 ## 6. Récupérer le travail des agents
 
