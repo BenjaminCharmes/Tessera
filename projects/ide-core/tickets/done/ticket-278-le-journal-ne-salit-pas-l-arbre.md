@@ -1,14 +1,15 @@
 ---
-id: ticket-278
-title: "The pipeline's own log lines no longer make the clean-tree check refuse the next ticket"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-01
+id: ticket-278
+pr_number: 161
+priority: high
+status: done
+title: The pipeline's own log lines no longer make the clean-tree check refuse the
+  next ticket
+type: fix
 ---
 
 # ticket-278 — Le journal du pipeline ne fait plus refuser le ticket suivant
