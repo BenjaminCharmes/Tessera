@@ -1,14 +1,15 @@
 ---
-id: ticket-256
-title: "The run view shows every pipeline stage: a stage strip and one log line each"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-255"]
-estimated_days: 1
 created: 2026-09-30
+depends_on:
+- ticket-255
+estimated_days: 1
+id: ticket-256
+pr_number: 154
+priority: high
+status: done
+title: 'The run view shows every pipeline stage: a stage strip and one log line each'
+type: feat
 ---
 
 # ticket-256 — La vue du run montre chaque étape du pipeline

@@ -9,7 +9,8 @@ import TicketActivity from "./TicketActivity";
 import AgentBlock from "./AgentBlock";
 import { blocsDuPanneau } from "./blocsDuPanneau";
 import PipelineSummary from "./PipelineSummary";
-import type { Project, Ticket } from "../../types/api";
+import StageStrip from "./StageStrip";
+import type { Project, Ticket, PipelineReglages } from "../../types/api";
 import type { UseRunActifResult } from "../../hooks/streamState";
 
 interface AgentPanelProps {
@@ -17,12 +18,15 @@ interface AgentPanelProps {
   stream: UseRunActifResult;
   /** Ticket sélectionné, pour afficher ce qu'il a produit (ticket-064). */
   activeTicket?: Ticket | null;
+  /** Configuration du pipeline pour la frise d'étapes (ticket-256). */
+  reglages?: Pick<PipelineReglages, "securite_enabled" | "validateur_enabled"> | null;
 }
 
 export default function AgentPanel({
   project,
   stream,
   activeTicket = null,
+  reglages = null,
 }: AgentPanelProps) {
   const {
     status,
@@ -36,6 +40,7 @@ export default function AgentPanel({
     lastResult,
     errorMessage,
     events,
+    etape,
     quota,
     pendingQuestion,
     questionExpireA,
@@ -126,6 +131,7 @@ export default function AgentPanel({
 
         {(status === "running" || status === "done") && (
           <>
+            <StageStrip etape={etape} events={events} reglages={reglages} />
             {currentRound > 0 && <RoundBadge current={currentRound} />}
             {(coutUsd > 0 || outils > 0) && (
               <p className="px-4 pb-1 text-micro text-zinc-500" data-testid="cout-du-run">

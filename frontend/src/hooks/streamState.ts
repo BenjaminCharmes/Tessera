@@ -44,6 +44,9 @@ export interface StreamState {
   currentTokens: string;
   lastResult: PipelineResult | null;
   errorMessage: string | null;
+  /** Étape du pipeline en cours (ticket-256) : "production", "securite", "revue",
+   *  "validation", "documentation", "livraison". Null hors run ou après pipeline_done. */
+  etape: string | null;
   /** Dernier état connu du quota d'abonnement, ou null tant que rien n'est remonté. */
   quota: QuotaState | null;
   /** Question posée par l'agent en cours, tant qu'on n'y a pas répondu (ticket-066). */
@@ -107,6 +110,7 @@ export const INITIAL: StreamState = {
   currentTokens: "",
   lastResult: null,
   errorMessage: null,
+  etape: null,
   quota: null,
   pendingQuestion: null,
   questionExpireA: null,
@@ -135,6 +139,8 @@ export function etatDepuisRun(run: RunActif): StreamState {
     ticketId: run.ticket_id,
     currentAgent: run.agent,
     currentRound: run.tour || INITIAL.currentRound,
+    // L'étape en cours est dans l'instantané depuis ticket-255 (ticket-256).
+    etape: run.etape ?? null,
     pendingQuestion: run.question ?? null,
     questionExpireA: run.question_expire_a ?? null,
     // Un F5 retrouve le cumul depuis l'instantané (ticket-197).
@@ -153,6 +159,11 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       const round =
         typeof ev.data["round"] === "number" ? ev.data["round"] : s.currentRound;
       const agent = ev.agent;
+      // L'étape se déduit du rôle : codeur = production, reviewer = revue.
+      const etapeAgent =
+        agent === "codeur" ? "production"
+        : agent === "reviewer" ? "revue"
+        : s.etape;
       const newEntry: PassageAgent | null = agent
         ? {
             id: `${agent}-${s.entries.length}`,
@@ -169,6 +180,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         status: "running",
         currentAgent: agent,
         currentRound: round,
+        etape: etapeAgent,
         maxRounds:
           typeof ev.data["max_rounds"] === "number"
             ? ev.data["max_rounds"]
@@ -253,6 +265,14 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         entries: tokenEntries,
       };
     }
+    case "security_audit_started":
+      return { ...s, events, etape: "securite" };
+    case "validation_started":
+      return { ...s, events, etape: "validation" };
+    case "documentation_started":
+      return { ...s, events, etape: "documentation" };
+    case "livraison_started":
+      return { ...s, events, etape: "livraison" };
     case "pipeline_done": {
       const branch =
         typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch;
@@ -276,6 +296,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         events,
         status: "done",
         lastResult: result,
+        etape: null,
         pendingQuestion: null,
         questionExpireA: null,
         branch,
