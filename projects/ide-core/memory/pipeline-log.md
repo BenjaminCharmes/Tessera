@@ -383,3 +383,11 @@ Analyse effectuée :
 - 2026-10-01 07:55:29 UTC — [ticket-255] tour 1 — reviewer terminé (185281ms)
 - 2026-10-01 07:58:10 UTC — [ticket-255] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute les trois nouvea
 - 2026-10-01 07:58:10 UTC — [ticket-255] APPROVED après 1 tour(s)
+- 2026-10-01 08:04:12 UTC — [ticket-256] branche ticket-256-the-run-view-shows-every-pipeline-stage-a-stage-s
+- 2026-10-01 08:04:13 UTC — [ticket-256] tour 1 — codeur démarré
+- 2026-10-01 08:12:07 UTC — [ticket-256] tour 1 — codeur terminé (474313ms)
+- 2026-10-01 08:12:50 UTC — [ticket-256] securite: PASS — Audit du composant StageStrip et des modifications associées au pipeline fronten
+- 2026-10-01 08:12:50 UTC — [ticket-256] tour 1 — reviewer démarré
+- 2026-10-01 08:13:42 UTC — [ticket-256] tour 1 — reviewer terminé (52203ms)
+- 2026-10-01 08:19:18 UTC — [ticket-256] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la frise d'étape
+- 2026-10-01 08:19:18 UTC — [ticket-256] APPROVED après 1 tour(s)
