@@ -61,6 +61,21 @@ export function runCachePour(runEnCours: boolean, vueCentre: VueCentre): boolean
 }
 
 /**
+ * Next `showKanban` value after the user clicks the board toggle — ticket-287.
+ *
+ * The decision is based on the currently *displayed* view, not on the raw
+ * `showKanban` flag.  When the board is showing, the toggle returns to the
+ * editor; from any other view (run, editor, diff) it opens the board.
+ *
+ * This avoids the situation where `showKanban` is already `true` while the
+ * run occupies the foreground: a first click would have flipped it to `false`
+ * and shown the editor instead of the board.
+ */
+export function prochainEtatKanban(vueCentre: VueCentre): boolean {
+  return vueCentre !== "kanban";
+}
+
+/**
  * Événements à afficher dans le Pipeline log — ticket-283.
  *
  * Quand l'utilisateur a sélectionné un run dans la Supervision, c'est celui-là
@@ -295,7 +310,10 @@ export function useCockpit() {
         running,
         runningRound: stream.currentRound,
         maxRounds: stream.maxRounds,
-        showKanban,
+        // L'état actif du bouton se lit depuis la vue affichée, pas depuis
+        // showKanban : quand le run est au premier plan avec showKanban=true,
+        // le bouton ne doit pas paraître actif (ticket-287).
+        showKanban: vueCentre === "kanban",
         runCache: runCachePour(runEnCours, vueCentre),
         filtres,
         total: filtrage.total,
@@ -342,10 +360,14 @@ export function useCockpit() {
         onToggleKanban: () => {
           // Un fichier ouvert gardait la main sur le centre : basculer la vue
           // ne produisait rien tant qu'on ne l'avait pas refermé (ticket-073).
+          // La décision part de la vue affichée, pas de showKanban : quand le
+          // run occupait le premier plan avec showKanban=true, l'ancienne
+          // logique (!v) passait showKanban à false et montrait l'éditeur
+          // au lieu du tableau (ticket-287).
           setOpenFilePath(null);
           setShowDiff(false);
           setRunAuPremierPlan(false);
-          setShowKanban((v) => !v);
+          setShowKanban(prochainEtatKanban(vueCentre));
         },
         onChangeFiltres: setFiltres,
         onCreated: (t: Ticket) => {

@@ -4,7 +4,9 @@ import {
   porteeEffectiveFor,
   runCachePour,
   eventsAffichiesFor,
+  prochainEtatKanban,
 } from "./useCockpit";
+import { vueDuCentre } from "../vueDuCentre";
 import { INITIAL } from "./streamState";
 import type { RunActif, OrchestratorEvent } from "../types/api";
 
@@ -97,6 +99,53 @@ describe("runCachePour (ticket-283)", () => {
 
   it("ne propose pas le retour sans run en cours", () => {
     expect(runCachePour(false, "editor")).toBe(false);
+  });
+});
+
+// Critères ticket-287 : le toggle kanban décide depuis la vue affichée, pas
+// depuis showKanban.
+describe("prochainEtatKanban (ticket-287)", () => {
+  it("ouvre le kanban depuis la vue run, même si showKanban est déjà true", () => {
+    // Situation : run au premier plan, showKanban=true → vueDuCentre = "run".
+    // Cliquer "Vue tableau" doit afficher le kanban, pas l'éditeur.
+    // prochainEtatKanban("run") = true ; runAuPremierPlan est remis à false.
+    expect(
+      vueDuCentre({
+        runEnCours: true,
+        runAuPremierPlan: false,
+        openFilePath: null,
+        showDiff: false,
+        showKanban: prochainEtatKanban("run"),
+      }),
+    ).toBe("kanban");
+  });
+
+  it("revient à l'éditeur depuis le tableau", () => {
+    // prochainEtatKanban("kanban") = false → vueDuCentre = "editor".
+    expect(
+      vueDuCentre({
+        runEnCours: false,
+        runAuPremierPlan: false,
+        openFilePath: null,
+        showDiff: false,
+        showKanban: prochainEtatKanban("kanban"),
+      }),
+    ).toBe("editor");
+  });
+
+  it("le bouton Vue tableau n'est pas actif tant que le centre affiche le run", () => {
+    // sidebar.tickets.showKanban = vueCentre === "kanban".
+    // Quand run au premier plan avec showKanban=true interne, vueCentre = "run".
+    const vueCentre = vueDuCentre({
+      runEnCours: true,
+      runAuPremierPlan: true,
+      openFilePath: null,
+      showDiff: false,
+      showKanban: true,
+    });
+    expect(vueCentre).toBe("run");
+    // Le bouton n'est pas actif.
+    expect(vueCentre === "kanban").toBe(false);
   });
 });
 
