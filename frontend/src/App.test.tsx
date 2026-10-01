@@ -110,15 +110,6 @@ vi.mock("./hooks/useRuns", () => ({
   useRuns: () => ({ runs: [], loading: false, error: null, refresh: vi.fn() }),
 }));
 
-vi.mock("./hooks/useUsage", () => ({
-  useUsage: () => ({
-    usage: null,
-    loading: false,
-    error: null,
-    refresh: vi.fn(),
-  }),
-}));
-
 vi.mock("./hooks/useToast", () => ({
   useToast: () => ({
     toasts: [],

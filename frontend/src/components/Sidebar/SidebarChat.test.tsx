@@ -52,9 +52,6 @@ function renderSidebar(extra: Partial<SidebarProps> = {}) {
     },
     runs: { liste: [], loading: false, error: null },
     usage: {
-      usage: null,
-      loading: false,
-      error: null,
       days: 30,
       setDays: () => {},
       portee: "tous",
@@ -118,9 +115,6 @@ describe("Sidebar — panneau Usage (ticket-253)", () => {
     renderSidebar({
       panel: "usage",
       usage: {
-        usage: null,
-        loading: false,
-        error: null,
         days: 30,
         setDays: () => {},
         portee: "tous",
@@ -139,9 +133,6 @@ describe("Sidebar — panneau Usage (ticket-253)", () => {
     renderSidebar({
       panel: "usage",
       usage: {
-        usage: null,
-        loading: false,
-        error: null,
         days: 30,
         setDays: () => {},
         portee: "tous",
@@ -153,13 +144,32 @@ describe("Sidebar — panneau Usage (ticket-253)", () => {
     expect(screen.getByRole("button", { name: "Ce projet" })).toBeDisabled();
   });
 
+  // Critère d'acceptation ticket-258 : sans projet actif, la portée effective
+  // est "tous" — le bouton "Tous les projets" doit être pressé.
+  it("sans projet actif, Tous les projets a aria-pressed=true", () => {
+    renderSidebar({
+      panel: "usage",
+      usage: {
+        days: 30,
+        setDays: () => {},
+        portee: "tous",
+        setPortee: () => {},
+        projetActifId: null,
+      },
+    });
+
+    expect(
+      screen.getByRole("button", { name: "Tous les projets" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: "Ce projet" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("active le bouton Ce projet quand un projet est actif", () => {
     renderSidebar({
       panel: "usage",
       usage: {
-        usage: null,
-        loading: false,
-        error: null,
         days: 30,
         setDays: () => {},
         portee: "projet",
@@ -176,9 +186,6 @@ describe("Sidebar — panneau Usage (ticket-253)", () => {
     renderSidebar({
       panel: "usage",
       usage: {
-        usage: null,
-        loading: false,
-        error: null,
         days: 30,
         setDays: () => {},
         portee: "tous",
