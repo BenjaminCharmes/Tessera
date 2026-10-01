@@ -833,10 +833,19 @@ class GitWorkspaceService:
         an external modification that would block the next ticket.
         """
         status = await self._run("status", "--porcelain", "--untracked-files=no")
+        # `--porcelain` donne les chemins depuis la racine du dépôt. Sous
+        # `git_root: ancestor`, le journal est donc
+        # `projects/ide-core/memory/pipeline-log.md`, que la comparaison avec
+        # `memory/pipeline-log.md` ne reconnaissait pas : le ticket suivant
+        # de la file était refusé dès que la livraison journalisait après son
+        # dernier commit (ticket-301).
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
         for line in status.splitlines():
             if len(line) < 3:  # noqa: PLR2004
                 continue
             path = line[3:]
+            if prefixe and path.startswith(prefixe):
+                path = path[len(prefixe):]
             if not _is_orchestrator_artifact_path(path):
                 return False
         return True
