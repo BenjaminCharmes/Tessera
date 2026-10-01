@@ -532,6 +532,14 @@ export interface UsageStats {
   recent_runs: RecentRun[];
 }
 
+/** Un événement d'un run terminé, renvoyé par GET /runs/{id}/events (ticket-280). */
+export interface RunEvent {
+  type: EventType;
+  agent: string | null;
+  data: Record<string, unknown>;
+  timestamp: string;
+}
+
 /** Un agent tel que ce projet le configure (ticket-080). */
 /** La configuration effective du pipeline d'un projet (ticket-196). */
 export interface PipelineReglages {

@@ -31,8 +31,15 @@ function when(iso: string): string {
   });
 }
 
+interface RecentRunsProps {
+  runs: RecentRun[];
+  showProject: boolean;
+  /** Appelé quand l'utilisateur clique sur une ligne — ouvre la vue du run (ticket-281). */
+  onSelect?: (run: RecentRun) => void;
+}
+
 /** Les derniers runs de la période — ticket-201. */
-export default function RecentRuns({ runs, showProject }: { runs: RecentRun[]; showProject: boolean }) {
+export default function RecentRuns({ runs, showProject, onSelect }: RecentRunsProps) {
   if (runs.length === 0) {
     return <p className="text-xs text-zinc-500">Aucun run sur la période.</p>;
   }
@@ -54,7 +61,11 @@ export default function RecentRuns({ runs, showProject }: { runs: RecentRun[]; s
         </thead>
         <tbody>
           {runs.map((r) => (
-            <tr key={r.id} className="border-b border-zinc-800/60 last:border-0 hover:bg-zinc-800/40">
+            <tr
+              key={r.id}
+              onClick={() => onSelect?.(r)}
+              className={`border-b border-zinc-800/60 last:border-0 hover:bg-zinc-800/40 ${onSelect ? "cursor-pointer" : ""}`}
+            >
               <td className={`${td} whitespace-nowrap text-zinc-400`}>{when(r.started_at)}</td>
               {showProject && <td className={`${td} font-mono text-zinc-300`}>{r.project_id}</td>}
               <td className={`${td} font-mono text-zinc-200`}>{r.ticket_id}</td>
