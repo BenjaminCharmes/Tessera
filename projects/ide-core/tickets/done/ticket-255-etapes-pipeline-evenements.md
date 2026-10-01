@@ -1,14 +1,14 @@
 ---
-id: ticket-255
-title: "Every pipeline stage announces its start, and the run snapshot names it"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-09-30
 depends_on: []
 estimated_days: 1
-created: 2026-09-30
+id: ticket-255
+pr_number: 153
+priority: high
+status: done
+title: Every pipeline stage announces its start, and the run snapshot names it
+type: feat
 ---
 
 # ticket-255 — Chaque étape du pipeline annonce son début

@@ -489,6 +489,7 @@ async def run_validation(
     """Check the ticket's acceptance criteria; may overturn an approval."""
     if orch._validator is None:
         return True, reason
+    await emit(run, EventType.VALIDATION_STARTED)
     try:
         validation = await orch._validator.validate(
             criteria=_extract_criteria(run.ticket.body),
