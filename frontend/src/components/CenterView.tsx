@@ -48,6 +48,16 @@ interface CenterViewProps {
   onSelectTicket: (t: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus: (ticketId: string, status: TicketStatus) => void;
+  /** Identifiants en file — partagé avec la sidebar (ticket-284). */
+  selection?: string[];
+  /** Bascule l'appartenance d'un ticket à la file (ticket-284). */
+  onToggleQueue?: (ticketId: string) => void;
+  /** Lance la file (ticket-284). */
+  onRunQueue?: () => void;
+  /** Vide la file (ticket-284). */
+  onClearQueue?: () => void;
+  /** Un run de file est en cours (ticket-284). */
+  queueEnCours?: boolean;
 }
 
 export default function CenterView({
@@ -70,6 +80,11 @@ export default function CenterView({
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
+  selection,
+  onToggleQueue,
+  onRunQueue,
+  onClearQueue,
+  queueEnCours,
 }: CenterViewProps) {
   /* L'onglet Agents donne un détail au centre : le rail dit *quel* agent, le
      centre montre *ce qu'il est* (ticket-076). Pendant un run, le centre
@@ -115,6 +130,11 @@ export default function CenterView({
         onSelectTicket={onSelectTicket}
         onRunPipeline={onRunPipeline}
         onChangeStatus={onChangeStatus}
+        selection={selection}
+        onToggleQueue={onToggleQueue}
+        onRunQueue={onRunQueue}
+        onClearQueue={onClearQueue}
+        queueEnCours={queueEnCours}
       />
     );
   }

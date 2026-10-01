@@ -29,6 +29,10 @@ interface KanbanColumnProps {
    * qui le résout depuis l'API d'activité ; absent : aucune infobulle.
    */
   blockedArrets?: Record<string, string | null>;
+  /** Identifiants en file — détermine le libellé du bouton par carte (ticket-284). */
+  selection?: string[];
+  /** Bascule l'appartenance d'un ticket à la file (ticket-284). */
+  onToggleQueue?: (ticketId: string) => void;
 }
 
 export default function KanbanColumn({
@@ -41,6 +45,8 @@ export default function KanbanColumn({
   onRunPipeline,
   onChangeStatus,
   blockedArrets,
+  selection,
+  onToggleQueue,
 }: KanbanColumnProps) {
   const [survol, setSurvol] = useState(false);
 
@@ -101,6 +107,8 @@ export default function KanbanColumn({
               onRun={onRunPipeline}
               onChangeStatus={onChangeStatus}
               arret={blockedArrets?.[ticket.id] ?? null}
+              onToggleQueue={onToggleQueue}
+              dansLaFile={selection?.includes(ticket.id) ?? false}
             />
           ))
         )}

@@ -3,6 +3,7 @@ import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconCross } from "../../design/icons";
 import KanbanColumn from "./KanbanColumn";
+import QueueBar from "../Sidebar/QueueBar";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
 import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
 
@@ -27,6 +28,16 @@ interface KanbanViewProps {
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus?: (ticketId: string, status: TicketStatus) => void;
+  /** Identifiants des tickets en file — partagé avec la sidebar (ticket-284). */
+  selection?: string[];
+  /** Bascule l'appartenance d'un ticket à la file (ticket-284). */
+  onToggleQueue?: (ticketId: string) => void;
+  /** Lance la file courante (ticket-284). */
+  onRunQueue?: () => void;
+  /** Vide la file courante (ticket-284). */
+  onClearQueue?: () => void;
+  /** Un run de file est en cours — désactive le bouton « Lancer » (ticket-284). */
+  queueEnCours?: boolean;
 }
 
 export default function KanbanView({
@@ -39,6 +50,11 @@ export default function KanbanView({
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
+  selection = [],
+  onToggleQueue,
+  onRunQueue,
+  onClearQueue,
+  queueEnCours = false,
 }: KanbanViewProps) {
   const blockedIds = useMemo(
     () => byStatus["blocked"].map((t) => t.id),
@@ -53,6 +69,14 @@ export default function KanbanView({
           Kanban Board
         </RegionTitle>
       </div>
+      {!!(onToggleQueue ?? onRunQueue ?? onClearQueue) && (
+        <QueueBar
+          selection={selection}
+          onRun={onRunQueue ?? (() => {})}
+          onClear={onClearQueue ?? (() => {})}
+          enCours={queueEnCours}
+        />
+      )}
       <div className="flex-1 flex overflow-x-auto overflow-y-hidden">
         {KANBAN_STATUSES.map((status) => (
           <KanbanColumn
@@ -66,6 +90,8 @@ export default function KanbanView({
             onRunPipeline={onRunPipeline}
             onChangeStatus={onChangeStatus}
             blockedArrets={status === "blocked" ? blockedArrets : undefined}
+            selection={selection}
+            onToggleQueue={onToggleQueue}
           />
         ))}
       </div>

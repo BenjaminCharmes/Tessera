@@ -1,14 +1,14 @@
 ---
-id: ticket-284
-title: "Tickets can be added to the queue from the board view"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-01
+id: ticket-284
+pr_number: 181
+priority: medium
+status: done
+title: Tickets can be added to the queue from the board view
+type: feat
 ---
 
 # ticket-284 — La file se compose depuis la Vue Tableau

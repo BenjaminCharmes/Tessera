@@ -592,3 +592,13 @@ Le diff por
 - 2026-10-01 21:16:37 UTC — [ticket-283] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ajoutés couvrent les  (206000ms)
 - 2026-10-01 21:16:37 UTC — [ticket-283] APPROVED après 1 tour(s)
 - 2026-10-01 21:18:04 UTC — [ticket-283] documentation: 0 fichier(s) (85844ms)
+- 2026-10-01 21:29:38 UTC — [ticket-284] branche ticket-284-tickets-can-be-added-to-the-queue-from-the-board
+- 2026-10-01 21:29:38 UTC — [ticket-284] tour 1 — codeur démarré
+- 2026-10-01 21:33:47 UTC — [ticket-284] tour 1 — codeur terminé (249156ms)
+- 2026-10-01 21:36:50 UTC — [ticket-284] testeur: 1745 passed, 2 deselected, 5 warnings in 180.75s (0:03:00)
+- 2026-10-01 21:37:10 UTC — [ticket-284] securite: PASS — Audit de sécurité complet du diff ticket-284 (file de tickets). Aucune vulnérabi (20250ms)
+- 2026-10-01 21:37:10 UTC — [ticket-284] tour 1 — reviewer démarré
+- 2026-10-01 21:38:04 UTC — [ticket-284] tour 1 — reviewer terminé (54077ms)
+- 2026-10-01 21:39:43 UTC — [ticket-284] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour (98266ms)
+- 2026-10-01 21:39:43 UTC — [ticket-284] APPROVED après 1 tour(s)
+- 2026-10-01 21:41:37 UTC — [ticket-284] documentation: 1 fichier(s) (113266ms)

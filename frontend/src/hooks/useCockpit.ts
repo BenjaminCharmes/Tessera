@@ -413,6 +413,20 @@ export function useCockpit() {
       onSelectTicket: handleSelectTicket,
       onRunPipeline: handleRunPipeline,
       onChangeStatus: handleChangeStatus,
+      selection,
+      queueEnCours: runEnCours,
+      onToggleQueue: (ticketId: string) =>
+        setSelection((prec) =>
+          prec.includes(ticketId)
+            ? prec.filter((t) => t !== ticketId)
+            : [...prec, ticketId],
+        ),
+      onRunQueue: () => {
+        setRunAuPremierPlan(true);
+        void demanderPermissionNotifications();
+        stream.connectQueue(selection);
+      },
+      onClearQueue: () => setSelection([]),
     },
     bottomPanel: (() => {
       // Le run sélectionné dans la Supervision, ou null si rien n'est choisi.
