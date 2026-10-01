@@ -363,15 +363,15 @@ class GitWorkspaceService:
 
         # Check for divergence against local branch
         try:
-            local_sha = (
+            sha_locale = (
                 await self._run("rev-parse", f"refs/heads/{base_branch}")
             ).strip()
         except GitCommandError:
-            local_sha = None
+            sha_locale = None
 
-        if local_sha is not None and local_sha != fetch_sha:
+        if sha_locale is not None and sha_locale != fetch_sha:
             proc = await asyncio.create_subprocess_exec(
-                "git", "merge-base", "--is-ancestor", local_sha, fetch_sha,
+                "git", "merge-base", "--is-ancestor", sha_locale, fetch_sha,
                 cwd=str(self._project_path),
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
@@ -379,7 +379,7 @@ class GitWorkspaceService:
             await proc.communicate()
             if proc.returncode != 0:
                 raison = (
-                    f"La branche locale « {base_branch} » ({local_sha[:7]}) a divergé "
+                    f"La branche locale « {base_branch} » ({sha_locale[:7]}) a divergé "
                     f"de la base distante ({fetch_sha[:7]}) : le run est bloqué."
                 )
                 _logger.warning("base_ref_divergee", extra={"raison": raison})
