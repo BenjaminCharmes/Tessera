@@ -4,7 +4,7 @@ created: 2026-09-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-269
-pr_number: null
+pr_number: 149
 priority: medium
 status: done
 title: Opening a PR from the IDE targets the project's declared base branch
