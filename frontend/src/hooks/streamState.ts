@@ -35,6 +35,8 @@ export interface PassageAgent {
   /** Contenu issu de `agent_done` : verdict ou compte rendu. */
   content: string;
   isDone: boolean;
+  /** Durée de l'appel en ms, remontée par `agent_done`. Absente si le backend ne l'envoie pas. */
+  duration_ms?: number;
 }
 
 /**
@@ -242,6 +244,8 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       const doneAgent = ev.agent;
       const doneContent =
         typeof ev.data["content"] === "string" ? ev.data["content"] : "";
+      const doneDurationMs =
+        typeof ev.data["duration_ms"] === "number" ? ev.data["duration_ms"] : undefined;
       // Marquer le dernier passage non terminé de cet agent comme terminé.
       // Seules les entrées de genre "agent" ont un champ `agent`.
       const lastUnfinishedIdx = s.entries.reduceRight(
@@ -253,7 +257,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         lastUnfinishedIdx >= 0
           ? s.entries.map((e, i) => {
               if (i !== lastUnfinishedIdx || e.genre !== "agent") return e;
-              return { ...e, isDone: true, content: doneContent };
+              return { ...e, isDone: true, content: doneContent, duration_ms: doneDurationMs };
             })
           : s.entries;
       return {

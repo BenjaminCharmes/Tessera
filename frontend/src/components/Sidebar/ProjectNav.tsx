@@ -82,7 +82,7 @@ export default function ProjectNav({
             </button>
             <button
               onClick={() => setShowImportModal(true)}
-              className="text-xs px-3 py-1.5 rounded-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
+              className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
             >
               <IconDownload size={12} /> Importer un projet
             </button>

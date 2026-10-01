@@ -43,7 +43,7 @@ export default function PipelineSummary({
           : "bg-red-900/30 border-red-700/50 text-red-300"
       }`}
     >
-      <div className="font-semibold">
+      <div className="font-semibold flex items-center gap-1">
         {result.approved ? (
           <>
             <IconCheck size={14} /> {titreApprouve}
