@@ -40,6 +40,18 @@ ailleurs est refusé.
 
 Pour supprimer un fichier, `rm <chemin>` ; ne jamais le vider : un fichier vide reste dans le dépôt.
 
+## Un refus de hook est définitif
+
+Un garde-fou qui refuse un outil (`Write`, `Edit`, `Bash`…) dit non pour de
+bon. N'essaie **aucune autre voie** pour obtenir le même effet — autre outil,
+script, `python -c`, redirection shell. La limite est une limite, pas un
+obstacle à contourner.
+
+Si un refus bloque quelque chose que le ticket demande :
+1. Arrête-toi sur ce point.
+2. Note dans ton rapport ce qui a été refusé et pourquoi le ticket le demandait.
+3. Continue avec le reste du ticket, s'il en reste un.
+
 ## Aucune trace d'IA
 
 Ce que tu écris atterrit dans le dépôt de l'utilisateur, parfois celui d'un

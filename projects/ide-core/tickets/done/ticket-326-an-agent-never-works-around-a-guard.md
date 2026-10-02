@@ -1,14 +1,15 @@
 ---
-id: ticket-326
-title: "An agent never works around a guard's refusal: it stops and reports, and python -c writes to protected files are caught"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
-created: 2026-10-02
+id: ticket-326
+pr_number: 226
+priority: critical
+status: done
+title: 'An agent never works around a guard''s refusal: it stops and reports, and
+  python -c writes to protected files are caught'
+type: fix
 ---
 
 # ticket-326 — Un agent ne contourne jamais le refus d'un garde-fou

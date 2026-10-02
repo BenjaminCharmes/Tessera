@@ -1071,3 +1071,13 @@ Les nou (39750ms)
 - 2026-10-02 13:02:01 UTC — [ticket-315] APPROVED après 1 tour(s)
 - 2026-10-02 13:03:27 UTC — [ticket-315] documentation: 1 fichier(s) (84077ms)
 - 2026-10-02 13:04:47 UTC — [ticket-315] livraison: arrêt — Conflit avec develop sur : projects/ide-core/memory/pipeline-log.md. La branche est restée intacte, 
+- 2026-10-02 20:00:58 UTC — [ticket-326] branche ticket-326-an-agent-never-works-around-a-guard-s-refusal-it
+- 2026-10-02 20:00:59 UTC — [ticket-326] tour 1 — codeur démarré
+- 2026-10-02 20:08:47 UTC — [ticket-326] tour 1 — codeur terminé (468390ms)
+- 2026-10-02 20:15:17 UTC — [ticket-326] testeur: OK (exit 0)
+- 2026-10-02 20:15:46 UTC — [ticket-326] securite: PASS — Ce diff améliore la sécurité du système de perímètre. Il ajoute une détection he (29125ms)
+- 2026-10-02 20:15:46 UTC — [ticket-326] tour 1 — reviewer démarré
+- 2026-10-02 20:17:14 UTC — [ticket-326] tour 1 — reviewer terminé (88156ms)
+- 2026-10-02 20:19:38 UTC — [ticket-326] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les fichiers promps ont été mis  (231750ms)
+- 2026-10-02 20:19:38 UTC — [ticket-326] APPROVED après 1 tour(s)
+- 2026-10-02 20:22:07 UTC — [ticket-326] documentation: 1 fichier(s) (147016ms)
