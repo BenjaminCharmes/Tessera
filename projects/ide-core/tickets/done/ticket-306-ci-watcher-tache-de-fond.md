@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-306
 plan: true
-pr_number: null
+pr_number: 208
 priority: high
 status: done
 title: CIWatcher waits for CI and merges in the background, one delivery per project
