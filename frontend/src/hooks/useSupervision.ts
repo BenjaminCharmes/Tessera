@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { wsUrl } from "../lib/ws";
-import { INITIAL, applyEvent, etatDepuisRun } from "./streamState";
+import { INITIAL, applyEvent, etatDepuisRun, clearTokensForReplay } from "./streamState";
 import type { StreamState } from "./streamState";
 import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
 import { abonnementsVoulus, diffDesAbonnements } from "./abonnements";
@@ -88,9 +88,19 @@ export function useSupervision(): UseSupervisionResult {
     const voulus = abonnementsVoulus(slotsRef.current);
     const { ajouts, retraits } = diffDesAbonnements(abonnesRef.current, voulus);
     for (const run of retraits) ws.send(JSON.stringify({ unsubscribe: run }));
-    for (const run of ajouts) ws.send(JSON.stringify({ subscribe: run }));
+    for (const run of ajouts) {
+      ws.send(JSON.stringify({ subscribe: run }));
+      // Vider les tokens avant le rejeu : le backend renvoie le texte à chaque
+      // abonnement, et les ajouter à l'état déjà accumulé doublerait le texte
+      // visible (ticket-313). setEtats est stable (React useState).
+      setEtats((prec) => {
+        const etat = prec[run];
+        if (!etat) return prec;
+        return { ...prec, [run]: clearTokensForReplay(etat) };
+      });
+    }
     abonnesRef.current = voulus;
-  }, []);
+  }, []); // setEtats et clearTokensForReplay sont stables
 
   useEffect(() => {
     // La socket se rouvre : un redémarrage du backend suffisait à rendre

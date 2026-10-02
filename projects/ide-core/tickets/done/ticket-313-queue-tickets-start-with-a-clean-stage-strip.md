@@ -1,15 +1,16 @@
 ---
-id: ticket-313
-title: "In a queue, each ticket starts with a clean stage strip, and returning to a run does not repeat its text"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
+id: ticket-313
 plan: true
-created: 2026-10-02
+pr_number: 211
+priority: high
+status: done
+title: In a queue, each ticket starts with a clean stage strip, and returning to a
+  run does not repeat its text
+type: fix
 ---
 
 # ticket-313 — Dans une file, chaque ticket repart d'une bande d'étapes vierge

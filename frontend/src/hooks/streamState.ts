@@ -80,6 +80,15 @@ export interface StreamState {
   /** Titre lisible du ticket en cours, reçu de l'instantané ou des événements (ticket-286). */
   ticketTitre: string | null;
   events: OrchestratorEvent[];
+  /**
+   * Événements du ticket en cours seulement (ticket-313).
+   *
+   * `events` garde tout l'historique d'un run de file (Pipeline log) ; cette
+   * liste repart de zéro à chaque `queue_progress`, de sorte que `StageStrip`
+   * et les autres dérivations voient les étapes du ticket en cours et non celles
+   * du ticket précédent.
+   */
+  ticketEvents: OrchestratorEvent[];
   currentAgent: AgentRole | null;
   currentRound: number;
   currentTokens: string;
@@ -159,6 +168,7 @@ export const INITIAL: StreamState = {
   ticketId: null,
   ticketTitre: null,
   events: [],
+  ticketEvents: [],
   currentAgent: null,
   currentRound: 0,
   currentTokens: "",
@@ -212,6 +222,31 @@ export function etatDepuisRun(run: RunActif): StreamState {
   };
 }
 
+/**
+ * Vide les accumulateurs de tokens avant un rejeu côté serveur (ticket-313).
+ *
+ * À chaque `subscribe`, le backend renvoie le tampon de texte du run. Si
+ * l'état accumulé contient déjà ces tokens (visite précédente), les ajouter
+ * de nouveau doublerait le texte affiché. Vider les tokens des entrées non
+ * terminées avant le rejeu les remet à zéro : le rejeu les remplit depuis
+ * le début, et le résultat est identique à la première visite.
+ *
+ * Les entrées `isDone: true` gardent leur `content` (issu de `agent_done`) ;
+ * seul le streaming en direct, stocké dans `tokens`, est effacé.
+ */
+export function clearTokensForReplay(s: StreamState): StreamState {
+  return {
+    ...s,
+    currentTokens: "",
+    entries: s.entries.map((e) => {
+      if (e.genre === "agent" && !e.isDone) {
+        return { ...e, tokens: "" };
+      }
+      return e;
+    }),
+  };
+}
+
 /** Ajoute une étape à la liste des étapes en cours (sans doublon). */
 function addEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
   if (etapesEnCours.includes(etape)) return etapesEnCours;
@@ -225,6 +260,10 @@ function removeEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
 
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
   const events = [...s.events, ev];
+  // ticketEvents repart de zéro à chaque queue_progress : StageStrip voit
+  // les étapes du ticket en cours, pas celles du ticket précédent (ticket-313).
+  const ticketEvents =
+    ev.type === "queue_progress" ? [ev] : [...s.ticketEvents, ev];
   switch (ev.type) {
     case "agent_started": {
       const round =
@@ -257,6 +296,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         status: "running",
         currentAgent: agent,
         currentRound: round,
@@ -275,6 +315,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         branch:
           typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch,
       };
@@ -312,6 +353,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         currentAgent: s.currentAgent === doneAgent ? null : s.currentAgent,
         etapesEnCours: etapesEnCoursApresDone,
         coutUsd:
@@ -350,6 +392,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         pendingQuestion: null,
         questionExpireA: null,
         outils: ev.type === "agent_tool_use" ? s.outils + 1 : s.outils,
@@ -376,6 +419,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         entries: [...s.entries, auditEntry],
         etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "securite"),
       };
@@ -403,6 +447,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         entries: [...s.entries, validEntry],
         etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "validation"),
       };
@@ -411,6 +456,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         etape: "securite",
         etapesEnCours: addEtapeEnCours(s.etapesEnCours, "securite"),
       };
@@ -418,6 +464,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         etape: "validation",
         etapesEnCours: addEtapeEnCours(s.etapesEnCours, "validation"),
       };
@@ -425,6 +472,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         etape: "documentation",
         etapesEnCours: addEtapeEnCours(s.etapesEnCours, "documentation"),
       };
@@ -432,6 +480,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         etape: "livraison",
         etapesEnCours: addEtapeEnCours(s.etapesEnCours, "livraison"),
       };
@@ -456,6 +505,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         status: "done",
         lastResult: result,
         etape: null,
@@ -471,6 +521,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         ticketTitre:
           typeof ev.data["ticket_titre"] === "string"
             ? ev.data["ticket_titre"]
@@ -482,6 +533,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "livraison"),
         livraisonPrNumber: prNumber ?? s.livraisonPrNumber,
       };
@@ -490,20 +542,21 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       const merged = ev.data["merged"] === true;
       const arret =
         typeof ev.data["arret"] === "string" ? ev.data["arret"] : null;
-      return { ...s, events, ciMerge: { merged, arret } };
+      return { ...s, events, ticketEvents, ciMerge: { merged, arret } };
     }
     case "doc_updated":
     case "documentation_failed":
-      return { ...s, events, etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "documentation") };
+      return { ...s, events, ticketEvents, etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "documentation") };
     case "run_closed":
       // Le run est définitivement terminé : livraison et documentation sont finies.
       // Le bouton « Fermer » n'apparaît qu'ici (ticket-267). L'étape active se
       // remet à null : livraison ou doc ne clignotent plus après la clôture (ticket-279).
-      return { ...s, events, runClosed: true, etape: null, etapesEnCours: [] };
+      return { ...s, events, ticketEvents, runClosed: true, etape: null, etapesEnCours: [] };
     case "error":
       return {
         ...s,
         events,
+        ticketEvents,
         status: "error",
         errorMessage:
           typeof ev.data["message"] === "string"
@@ -514,6 +567,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...s,
         events,
+        ticketEvents,
         pendingQuestion:
           typeof ev.data["question"] === "string" ? ev.data["question"] : null,
         questionExpireA:
@@ -537,6 +591,8 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         ...INITIAL,
         status: "running",
         events: [...s.events, ev],
+        // ticketEvents = [ev] pour ce cas (ternaire en tête de applyEvent).
+        ticketEvents,
         quota: s.quota,
         branch: s.branch,
         maxRounds: s.maxRounds,
@@ -549,9 +605,9 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
     case "quota_updated":
       // Le quota d'abonnement est la ressource réellement finie : l'afficher
       // évite d'être coupé sans comprendre pourquoi (ticket-054).
-      return { ...s, events, quota: ev.data as unknown as QuotaState };
+      return { ...s, events, ticketEvents, quota: ev.data as unknown as QuotaState };
 
     default:
-      return { ...s, events };
+      return { ...s, events, ticketEvents };
   }
 }

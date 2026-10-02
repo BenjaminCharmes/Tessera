@@ -158,6 +158,7 @@ function streamMock(over: Partial<UseRunActifResult> = {}): UseRunActifResult {
     ticketId: "ticket-001",
     ticketTitre: null,
     events: [],
+    ticketEvents: [],
     entries: [],
     currentAgent: null,
     currentRound: 0,
