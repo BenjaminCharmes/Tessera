@@ -779,3 +779,16 @@ Points positifs :
 - 2026-10-02 02:28:09 UTC — [ticket-293] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (129890ms)
 - 2026-10-02 02:28:09 UTC — [ticket-293] APPROVED après 1 tour(s)
 - 2026-10-02 02:30:18 UTC — [ticket-293] documentation: 0 fichier(s) (127186ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: rebase sur develop (218ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: PR #192 ouverte (4454ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: CI : failing (179921ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: arrêt — CI failing : la PR #192 reste ouverte.
+- 2026-10-02 02:33:28 UTC — [ticket-294] branche ticket-294-agents-load-a-ui-design-skill-declared-by-default
+- 2026-10-02 02:33:28 UTC — [ticket-294] tour 1 — codeur démarré
+- 2026-10-02 02:35:42 UTC — [ticket-294] tour 1 — codeur terminé (134406ms)
+- 2026-10-02 02:39:17 UTC — [ticket-294] testeur: 1792 passed, 2 deselected, 5 warnings in 212.10s (0:03:32)
+- 2026-10-02 02:39:32 UTC — [ticket-294] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un skill de design UI assigné cond (15327ms)
+- 2026-10-02 02:39:32 UTC — [ticket-294] tour 1 — reviewer démarré
+- 2026-10-02 02:40:17 UTC — [ticket-294] tour 1 — reviewer terminé (44640ms)
+- 2026-10-02 02:42:04 UTC — [ticket-294] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le fichier SKILL.md est correcte (106687ms)
+- 2026-10-02 02:42:04 UTC — [ticket-294] APPROVED après 1 tour(s)
