@@ -1081,3 +1081,16 @@ Les nou (39750ms)
 - 2026-10-02 20:19:38 UTC — [ticket-326] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les fichiers promps ont été mis  (231750ms)
 - 2026-10-02 20:19:38 UTC — [ticket-326] APPROVED après 1 tour(s)
 - 2026-10-02 20:22:07 UTC — [ticket-326] documentation: 1 fichier(s) (147016ms)
+- 2026-10-02 20:22:21 UTC — [ticket-319] branche ticket-319-agents-get-their-shell-on-windows-tessera-finds-g
+- 2026-10-02 20:22:21 UTC — [ticket-319] tour 1 — codeur démarré
+- 2026-10-02 20:29:53 UTC — [ticket-319] tour 1 — codeur terminé (451407ms)
+- 2026-10-02 20:30:15 UTC — [ticket-319] testeur: 1 failed, 200 passed, 2 deselected, 5 warnings in 17.89s
+- 2026-10-02 20:30:15 UTC — [ticket-319] tests rouges au tour 1
+- 2026-10-02 20:30:15 UTC — [ticket-319] tour 2 — codeur démarré
+- 2026-10-02 20:30:52 UTC — [ticket-319] tour 2 — codeur terminé (37077ms)
+- 2026-10-02 20:37:52 UTC — [ticket-319] testeur: OK (exit 0)
+- 2026-10-02 20:38:15 UTC — [ticket-319] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une résolution de chemin Git Bash  (22780ms)
+- 2026-10-02 20:38:15 UTC — [ticket-319] tour 2 — reviewer démarré
+- 2026-10-02 20:39:07 UTC — [ticket-319] tour 2 — reviewer terminé (51969ms)
+- 2026-10-02 20:41:13 UTC — [ticket-319] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la détection (178219ms)
+- 2026-10-02 20:41:13 UTC — [ticket-319] APPROVED après 2 tour(s)
