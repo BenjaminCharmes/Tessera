@@ -1619,3 +1619,39 @@ async def test_double_refus_inclut_les_deux_motifs_avec_auteur(tmp_path: Path) -
     assert "Validateur" in second_round_context
     assert "motif reviewer" in second_round_context
     assert "motif validateur" in second_round_context
+
+
+async def test_validateur_qui_leve_refuse_et_reviewer_va_au_bout(tmp_path: Path) -> None:
+    """A validator whose validate() raises refuses the turn (ADR-039: fails
+    closed), without cancelling the reviewer — run_validation catches every
+    Exception and returns (False, msg) so asyncio.gather never sees it raise."""
+    import asyncio
+
+    reviewer_done = asyncio.Event()
+
+    class _RaisingValidator:
+        async def validate(
+            self, criteria: list[str], code_produced: str, test_result: object
+        ) -> object:
+            raise RuntimeError("provider indisponible")
+
+    class _TrackingRunner(_RecordingRunner):
+        async def run(self, **kwargs: object) -> AgentResult:
+            result = await super().run(**kwargs)
+            if kwargs["role"] == AgentRole.reviewer:
+                reviewer_done.set()
+            return result
+
+    orchestrator = _make_orchestrator(
+        tmp_path,
+        runner=_TrackingRunner(),
+        git_workspace=_FakeGit(),
+        validator=_RaisingValidator(),
+        max_review_rounds=1,
+    )
+    result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
+
+    assert not result.approved, "un validateur qui lève doit refuser le tour"
+    assert reviewer_done.is_set(), (
+        "le reviewer doit aller au bout malgré l'exception du validateur"
+    )
