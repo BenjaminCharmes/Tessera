@@ -329,10 +329,14 @@ Le ticket suivant forkera depuis ce commit, non depuis la branche du ticket
 précédent. Un rebase n'aura donc pas de conflit factice avec le squash du ticket
 précédent, déjà fusionné sur la branche de base distante.
 
-**Cas non mergés** : Cette mise à jour ne s'applique qu'après une livraison
-**mergée**. Après une livraison non mergée — CI rouge, niveau PR ou commit — le
-ticket suivant part du ticket précédent, ce qui permet à un plan séquentiel
-d'avancer malgré les obstacles (ADR-018).
+**Cas non mergés** (ticket-302) : Si la PR du ticket n'a pas mergé — erreur CI,
+conflits, ou autre raison — le ticket suivant part de la base distante, pas du
+ticket précédent. Cela prévient qu'un ticket approuvé mais non mergé n'empoisonne
+le ticket suivant.
+
+Un ticket suivant qui déclare son prédécesseur dans `depends_on` arrête la
+file. Le `arret` nomme la PR restée ouverte ; le ticket refusera d'avancer
+tant qu'elle n'aura pas mergé.
 
 **Divergence** : Si la branche locale et distante divergent hors d'une avance
 rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.

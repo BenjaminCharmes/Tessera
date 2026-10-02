@@ -1,15 +1,15 @@
 ---
-id: ticket-302
-title: "A queue does not build the next ticket on an approved ticket whose merge failed"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
+id: ticket-302
 plan: true
-created: 2026-10-02
+pr_number: 188
+priority: high
+status: done
+title: A queue does not build the next ticket on an approved ticket whose merge failed
+type: fix
 ---
 
 # ticket-302 — Une file ne s'empile pas sur un ticket que la livraison n'a pas mergé

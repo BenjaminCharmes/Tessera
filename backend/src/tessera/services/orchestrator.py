@@ -438,6 +438,34 @@ class Orchestrator:
                 )
                 break
 
+            # Un ticket approuvé dont la livraison n'a pas mergé peut bloquer
+            # un ticket suivant qui en dépend : démarrer sur la pointe du
+            # ticket non mergé le contaminerait (ticket-302).
+            if (
+                result.livraison is not None
+                and not result.livraison.merged
+                and result.livraison.pr_number is not None
+            ):
+                restants = ticket_ids[index:]
+                bloquant = await _trouver_bloquant(
+                    self._ticket_svc, ticket_id, restants, result.livraison.pr_number
+                )
+                if bloquant is not None:
+                    arret, _ = bloquant
+                    self._log(f"[{project_id}] file interrompue : {arret}")
+                    livraison_avec_arret = Livraison(
+                        etapes=result.livraison.etapes,
+                        durees_ms=result.livraison.durees_ms,
+                        arret=arret,
+                        conflits=result.livraison.conflits,
+                        pr_number=result.livraison.pr_number,
+                        merged=result.livraison.merged,
+                    )
+                    results[-1] = result.model_copy(
+                        update={"livraison": livraison_avec_arret}
+                    )
+                    break
+
         return results
 
     async def run_autonomous(
@@ -596,6 +624,27 @@ __all__ = [
     "OrchestratorEvent",
     "PipelineResult",
 ]
+
+
+async def _trouver_bloquant(
+    ticket_svc: TicketService,
+    ticket_id: str,
+    restants: list[str],
+    pr_number: int,
+) -> tuple[str, str] | None:
+    """Find the first remaining ticket that depends on an unmerged ticket.
+
+    Returns ``(arret_message, dep_ticket_id)`` when a ticket in ``restants``
+    declares ``ticket_id`` in its ``depends_on``, ``None`` otherwise.
+    """
+    for tid_dep in restants:
+        ticket_dep = await ticket_svc.get_ticket(tid_dep)
+        if ticket_dep is not None and ticket_id in ticket_dep.depends_on:
+            return (
+                f"{tid_dep} dépend de {ticket_id} dont la PR #{pr_number} n'a pas été mergée",
+                tid_dep,
+            )
+    return None
 
 
 def _echec_de_tests(run: "PipelineRun") -> str:
