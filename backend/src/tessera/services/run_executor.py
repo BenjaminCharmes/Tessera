@@ -234,6 +234,9 @@ async def executer(
             run.ticket_id or run.mode,
             mode=run.mode,
         )
+        # Exposé dans l'instantané pour que le frontend puisse relire
+        # les événements persistés au rechargement de page (ticket-325).
+        run.db_run_id = run_id_en_base
     except Exception as exc:  # noqa: BLE001
         _logger.warning("run_non_persiste", extra={"erreur": str(exc)})
 

@@ -42,6 +42,10 @@ class RunActif:
     #: Titre lisible du ticket en cours — absent tant qu'il n'a pas pu être lu
     #: ou que le run n'a pas encore de ticket (autonome) (ticket-286).
     ticket_titre: str | None = None
+    #: Identifiant en base (table `pipeline_runs`) — positionné dès que la
+    #: ligne existe, pour que le frontend puisse relire les événements persistés
+    #: au rechargement de page (ticket-325).
+    db_run_id: str | None = None
     etape: str | None = None
     agent: str | None = None
     tour: int = 0
@@ -97,6 +101,7 @@ class RunActif:
             "mode": self.mode,
             "ticket_id": self.ticket_id,
             "ticket_titre": self.ticket_titre,
+            "db_run_id": self.db_run_id,
             "etape": self.etape,
             "agent": self.agent,
             "tour": self.tour,

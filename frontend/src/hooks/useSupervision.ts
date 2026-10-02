@@ -5,7 +5,8 @@ import type { StreamState } from "./streamState";
 import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
 import { abonnementsVoulus, diffDesAbonnements } from "./abonnements";
 import type { SlotsDAbonnement } from "./abonnements";
-import type { OrchestratorEvent, RunActif } from "../types/api";
+import type { OrchestratorEvent, RunActif, RunEvent } from "../types/api";
+import { api } from "../lib/api";
 
 /**
  * Tous les runs de la machine, sur une seule socket — ticket-129.
@@ -80,6 +81,10 @@ export function useSupervision(): UseSupervisionResult {
   // actif (ticket-183).
   const slotsRef = useRef<SlotsDAbonnement>({ selection: null, panneau: null });
   const abonnesRef = useRef<Set<string>>(new Set());
+  // Rechargement de page (ticket-325) : runs dont l'historique a été chargé.
+  const historyLoadedRef = useRef<Set<string>>(new Set());
+  // Événements en direct reçus pendant qu'on attend le chargement de l'historique.
+  const historyBufferRef = useRef<Record<string, OrchestratorEvent[]>>({});
 
   /** Met la socket à jour sur ce que les slots demandent. */
   const majDesAbonnements = useCallback(() => {
@@ -125,6 +130,45 @@ export function useSupervision(): UseSupervisionResult {
       minuteur = setTimeout(ouvrir, delai);
     };
 
+    /**
+     * Charge les événements persistés d'un run vivant et les rejoue dans
+     * l'état — ticket-325.
+     *
+     * Les événements en direct reçus pendant le chargement sont mis en
+     * tampon dans `historyBufferRef` et appliqués après, en écartant ceux
+     * dont l'horodatage est couvert par l'historique (déduplication).
+     */
+    const chargerHistorique = async (runId: string, dbRunId: string) => {
+      try {
+        const evts: RunEvent[] = await api.runs.events(dbRunId);
+        const dernierTs = evts.length > 0 ? evts[evts.length - 1].timestamp : null;
+        setEtats((prec) => {
+          let etat: StreamState = INITIAL;
+          for (const ev of evts) {
+            etat = applyEvent(etat, { ...ev, ticket_id: "", run_id: runId } as OrchestratorEvent);
+          }
+          for (const ev of historyBufferRef.current[runId] ?? []) {
+            if (!dernierTs || ev.timestamp > dernierTs) {
+              etat = applyEvent(etat, ev);
+            }
+          }
+          return { ...prec, [runId]: etat };
+        });
+      } catch {
+        // Historique indisponible : vider le tampon sur l'état courant.
+        setEtats((prec) => {
+          let etat = prec[runId] ?? INITIAL;
+          for (const ev of historyBufferRef.current[runId] ?? []) {
+            etat = applyEvent(etat, ev);
+          }
+          return { ...prec, [runId]: etat };
+        });
+      } finally {
+        historyLoadedRef.current.add(runId);
+        delete historyBufferRef.current[runId];
+      }
+    };
+
     const brancher = (ws: WebSocket) => {
       ws.onopen = () => {
         essais = 0;
@@ -157,6 +201,14 @@ export function useSupervision(): UseSupervisionResult {
               }
               return suite;
             });
+            // Ticket-325 : charger l'historique pour les runs vivants dont
+            // on ne connaît pas encore les cartes passées.
+            for (const r of recus) {
+              if (r.db_run_id && !historyLoadedRef.current.has(r.run_id)) {
+                historyBufferRef.current[r.run_id] = [];
+                void chargerHistorique(r.run_id, r.db_run_id);
+              }
+            }
             return;
           }
 
@@ -182,6 +234,14 @@ export function useSupervision(): UseSupervisionResult {
 
           const runId = brut.run_id;
           if (!runId) return;
+
+          // Ticket-325 : si l'historique est en cours de chargement, mettre
+          // l'événement en tampon plutôt que de l'appliquer immédiatement.
+          if (runId in historyBufferRef.current) {
+            historyBufferRef.current[runId]!.push(brut);
+            setRuns((prec) => majDesRuns(prec, brut, runId));
+            return;
+          }
 
           setEtats((prec) => ({
             ...prec,
