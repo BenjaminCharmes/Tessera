@@ -383,6 +383,9 @@ La carte du run affiche maintenant l'**état de la PR** en temps réel, même ap
 
 Tu peux donc suivre la livraison d'un ticket **après** le run, sans relancer le pipeline ni vérifier GitHub : ouvre juste la carte fermée.
 
+
+Si tu recharges la page durant un run en cours, tu retrouves instantanément tout l'historique — plan, tours précédents, tous les agents qui ont déjà passé. Le frontend rejoue les événements enregistrés en base de données, sans perdre ni dupliquer aucun message. C'est une des sécurités de l'interface : un rechargement accidentel ne coûte rien.
+
 ### La frise d'étapes
 
 En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
