@@ -43,7 +43,8 @@ son ADR source. La justification et l'histoire complète vivent dans
   en `merge`. Tout doute annule tout. (ADR-033)
 - **La phase 1 de livraison (rebase, push, PR) libère le verrou du
   projet.** La phase 2 (attente CI, merge) tourne dans `CIWatcher`, en
-  fond. `depends_on` bloque le ticket suivant jusqu'au merge. (ADR-051)
+  fond. `depends_on` bloque le ticket suivant jusqu'au merge. Une CI rouge
+  met le ticket en `blocked`, PR laissée ouverte, sans relance. (ADR-051)
 
 ## Portes qui échouent fermées
 
@@ -101,8 +102,9 @@ son ADR source. La justification et l'histoire complète vivent dans
   Ce qui survit entre requêtes (`RunLock`, `RunRegistry`) vit hors de
   lui. (ADR-008)
 - **Le verdict reviewer se parse par mot-clé :** la première ligne qui
-  commence par `APPROVED` ou `CHANGES_REQUESTED` l'emporte ; la priorité
-  ne joue qu'en leur absence simultanée. (ADR-009)
+  commence par `APPROVED` ou `CHANGES_REQUESTED` l'emporte. Sans ligne de
+  verdict, `CHANGES_REQUESTED` n'importe où prime, et une réponse sans
+  verdict refuse. (ADR-009)
 - **`role: github-sync` est géré dans `POST /api/v1/agents/run`, pas
   dans un endpoint dédié.** (ADR-010)
 
