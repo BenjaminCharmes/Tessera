@@ -5,6 +5,7 @@ from pathlib import Path
 from tessera.models.agent import AgentCreatedInfo, CreateAgentConversationResponse
 from tessera.models.project import ConversationMessage
 from tessera.services.agent_registry import AgentRegistryService
+from tessera.services.cost_calculator import DEFAULT_MODEL
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.conversation import format_conversation
 from tessera.utils.json_extract import extract_json
@@ -13,7 +14,7 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-_DEFAULT_MODEL = "claude-sonnet-4-6"
+_DEFAULT_MODEL = DEFAULT_MODEL
 _DEFAULT_MAX_TOKENS = 2048
 
 

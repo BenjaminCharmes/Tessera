@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 from tessera.models.project import AnalysisResult
+from tessera.services.cost_calculator import DEFAULT_MODEL
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.json_extract import extract_json
 from tessera.services.prompt_loader import load_system_prompt
@@ -11,7 +12,7 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-_DEFAULT_MODEL = "claude-sonnet-4-6"
+_DEFAULT_MODEL = DEFAULT_MODEL
 _DEFAULT_MAX_TOKENS = 4096
 
 _BINARY_PROBE_BYTES = 512
