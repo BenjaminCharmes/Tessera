@@ -8,6 +8,7 @@ from claude_agent_sdk import (
     HookMatcher,
     RateLimitEvent,
     ResultMessage,
+    SdkPluginConfig,
     StreamEvent,
     TextBlock,
     ToolUseBlock,
@@ -83,7 +84,7 @@ def _build_options(
     # Plugin local Tessera : chargé uniquement si au moins un skill déclaré
     # porte le préfixe `tessera:`. Le chemin est absolu, ancré sur la racine
     # du dépôt, jamais sur le cwd du projet (ticket-293).
-    plugins: list[dict[str, str]] = []
+    plugins: list[SdkPluginConfig] = []
     if skills and any(s.startswith("tessera:") for s in skills):
         plugins = [{"type": "local", "path": str(_TESSERA_PLUGIN_PATH)}]
 
