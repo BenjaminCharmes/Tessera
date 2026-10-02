@@ -405,7 +405,7 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
         recu.update(kwargs)
         return Livraison(pr_number=7)
 
-    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     livraison = asyncio.run(_livreur("mon-projet")(_approved()))
 
@@ -425,7 +425,7 @@ def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
     async def _livrer(self: object, **kwargs: object) -> object:
         raise RuntimeError("GitHub injoignable")
 
-    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     livraison = asyncio.run(_livreur("mon-projet")(_approved()))
 
@@ -437,8 +437,8 @@ def _livrer_la_pr(numero: int) -> object:
     from tessera.services.livraison import Livraison
 
     async def _livrer(self: object, **kwargs: object) -> Livraison:
-        # Simule le comportement réel : livrer() appelle post_pr_callback avant
-        # de retourner, ce que les tests de notation de PR vérifient (ticket-270).
+        # Simule la phase 1 : livrer_phase_1() ouvre la PR et appelle
+        # post_pr_callback. Le merge (phase 2) est délégué à CIWatcher (ADR-051).
         callback = getattr(self, "_post_pr_callback", None)
         if callback is not None:
             try:
@@ -447,7 +447,7 @@ def _livrer_la_pr(numero: int) -> object:
                 await callback(ticket_id, numero, branch)
             except Exception:  # noqa: BLE001
                 pass
-        return Livraison(pr_number=numero, merged=True)
+        return Livraison(pr_number=numero, merged=False)
 
     return _livrer
 
@@ -460,7 +460,7 @@ def test_le_livreur_note_la_pr_dans_le_ticket(
     from tessera.routers.orchestrator import _livreur
 
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
     asyncio.run(_livreur("mon-projet")(_approved()))
@@ -491,7 +491,7 @@ def test_noter_la_pr_laisse_l_arbre_propre(
     git("add", "-A")
     git("commit", "-q", "-m", "init")
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
     asyncio.run(_livreur("mon-projet")(_approved()))
@@ -500,11 +500,11 @@ def test_noter_la_pr_laisse_l_arbre_propre(
     assert "pr_number: 7" in git("show", "HEAD:tickets/todo/ticket-001.md")
 
 
-def test_noter_la_pr_avance_la_base_du_run(
+def test_noter_la_pr_synchronise_la_base_distante(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # En file, chaque ticket part de la base mémorisée à l'approbation : sans
-    # l'avancer, le commit du numéro disparaissait dès le ticket suivant.
+    # Après la phase 1 (PR ouverte), la base distante est synchronisée pour
+    # que le ticket suivant forke depuis origin/<base> (ADR-051).
     from tessera.routers.orchestrator import _livreur
 
     appels: list[str] = []
@@ -516,21 +516,17 @@ def test_noter_la_pr_avance_la_base_du_run(
         async def push_branch(self, branch: str) -> None:
             appels.append("push")
 
-        async def advance_base_ref(self) -> None:
-            appels.append("avance")
-
         async def sync_base_depuis_distant(self, base_branch: str) -> str | None:
-            # ticket-264 : après un merge, la base locale se réaligne.
             appels.append("sync")
             return None
 
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
     asyncio.run(_livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
 
-    assert appels == ["commit", "push", "avance", "sync"]
+    assert appels == ["commit", "push", "sync"]
 
 
 def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
@@ -544,7 +540,7 @@ def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
         raise OSError("disque plein")
 
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer", _livrer_la_pr(7)
+        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
     monkeypatch.setattr(
         "tessera.services.ticket_service.TicketService.set_pr_number", _leve
@@ -553,7 +549,7 @@ def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
     livraison = asyncio.run(_livreur("mon-projet")(_approved()))
 
     assert livraison.pr_number == 7
-    assert livraison.merged is True
+    assert livraison.merged is False
     assert livraison.arret is None
 
 

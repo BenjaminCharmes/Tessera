@@ -1,15 +1,18 @@
 ---
-id: ticket-307
-title: "A run frees its project once the PR is open, and a dependent ticket waits for the merge"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-305", "ticket-306"]
-estimated_days: 1
-plan: true
 created: 2026-10-02
+depends_on:
+- ticket-305
+- ticket-306
+estimated_days: 1
+id: ticket-307
+plan: true
+pr_number: 209
+priority: high
+status: done
+title: A run frees its project once the PR is open, and a dependent ticket waits for
+  the merge
+type: feat
 ---
 
 # ticket-307 — Un run libère son projet dès la PR ouverte

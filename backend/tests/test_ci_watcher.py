@@ -197,6 +197,82 @@ async def test_en_attente_projet_inconnu_retourne_tuple_vide() -> None:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# attendre_merge — ticket-307
+# ---------------------------------------------------------------------------
+
+
+async def test_attendre_merge_retourne_immediatement_si_deja_fini() -> None:
+    """attendre_merge returns immediately when the ticket is no longer waiting."""
+    watcher = CIWatcher()
+    # Le ticket n'est pas dans _en_attente → retour immédiat.
+    await watcher.attendre_merge("proj", "ticket-001")  # no hang
+
+
+async def test_attendre_merge_suspend_jusqu_a_la_fin() -> None:
+    """attendre_merge suspends the caller until ci_merge_done is emitted."""
+    watcher = CIWatcher()
+    gate = asyncio.Event()
+    termine: list[bool] = []
+
+    async def phase2_bloquante(pr_number: int) -> Livraison:
+        await gate.wait()
+        return Livraison(pr_number=pr_number, merged=True)
+
+    await watcher.surveiller("proj", "ticket-001", 1, phase2_bloquante, _rien)
+    await asyncio.sleep(0)
+
+    assert "ticket-001" in watcher.en_attente("proj")
+
+    async def _attendre() -> None:
+        await watcher.attendre_merge("proj", "ticket-001")
+        termine.append(True)
+
+    tache = asyncio.create_task(_attendre())
+    await asyncio.sleep(0)
+
+    # Pas encore terminé.
+    assert termine == []
+
+    gate.set()
+    await asyncio.sleep(0.05)
+
+    # Terminé après que la gate a été levée.
+    assert termine == [True]
+    await tache
+
+
+async def test_attendre_merge_deux_appelants() -> None:
+    """Multiple waiters on the same ticket are all unblocked."""
+    watcher = CIWatcher()
+    gate = asyncio.Event()
+    termines: list[int] = []
+
+    async def phase2_bloquante(pr_number: int) -> Livraison:
+        await gate.wait()
+        return Livraison(pr_number=pr_number, merged=True)
+
+    await watcher.surveiller("proj", "ticket-001", 1, phase2_bloquante, _rien)
+    await asyncio.sleep(0)
+
+    async def _attendre(n: int) -> None:
+        await watcher.attendre_merge("proj", "ticket-001")
+        termines.append(n)
+
+    t1 = asyncio.create_task(_attendre(1))
+    t2 = asyncio.create_task(_attendre(2))
+    await asyncio.sleep(0)
+
+    assert termines == []
+
+    gate.set()
+    await asyncio.sleep(0.05)
+
+    assert sorted(termines) == [1, 2]
+    await t1
+    await t2
+
+
 async def test_arret_annule_les_taches_sans_lever() -> None:
     """arreter() cancels running tasks without raising any exception."""
     watcher = CIWatcher()

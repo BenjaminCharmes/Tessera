@@ -138,6 +138,29 @@ async def test_sync_preserve_la_livraison_en_cas_d_erreur_distante() -> None:
 
 
 @pytest.mark.asyncio
+async def test_sync_appele_apres_livraison_exception_sans_pr() -> None:
+    """Critère 5 ticket-307 — livraison arrêtée par exception sans PR → sync quand même.
+
+    Le bogue du 2026-10-02 : quand la phase 1 levait avant d'ouvrir la PR
+    (rebase refusé, réseau injoignable…), _sync_apres_livraison n'était pas
+    appelé — ``needs_sync`` était False car ni ``merged``, ni ``pr_number``.
+    Le ticket suivant forkait depuis la pointe du ticket précédent au lieu
+    d'``origin/<base>``, et ses propres commits arrivaient dans la PR du
+    prochain ticket approuvé.
+    """
+    politique = PolitiqueRun(autonomy=NiveauAutonomie.merge, base_branch="develop")
+    espace = MagicMock()
+    espace.sync_base_depuis_distant = AsyncMock(return_value=None)
+    # Phase 1 échouée par exception : arret set, pr_number absent — c'est
+    # exactement ce que `_livreur` produit quand livrer_phase_1 lève.
+    livraison = Livraison(arret="Livraison interrompue : réseau injoignable")
+
+    await _sync_apres_livraison(livraison, espace, politique, "develop")
+
+    espace.sync_base_depuis_distant.assert_awaited_once_with("develop")
+
+
+@pytest.mark.asyncio
 async def test_file_s_arrete_si_ticket_suivant_depend_du_ticket_non_merge(
     tmp_path: Path,
 ) -> None:
