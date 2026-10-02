@@ -125,6 +125,14 @@ Cette promesse a demandé sept correctifs, tous nés d'un usage réel :
   les garde modifiés : le rapport du run signale lesquels ont changé. Cela 
   prévient qu'un réglage d'IDE voyage dans la PR d'un ticket qui ne l'avait 
   pas demandé (incident du ticket-279).
+- **Commit des artefacts de tenue de livres avant la création de branche du ticket
+  suivant** (ticket-314). Avant de créer la branche d'un nouveau ticket, 
+  le pipeline commite les fichiers modifiés par les étapes précédentes
+  (`memory/pipeline-log.md` et fichiers de `tickets/`) via `commit_bookkeeping`. 
+  Cela évite que ces fichiers bloquent le `git checkout -b` du ticket suivant. 
+  Si ce commit échoue (absence de configuration git, pas de HEAD), le pipeline 
+  tente quand même le checkout ; seul un fichier de code modifié déclenche 
+  un `blocked` avec un `GitCommandError` explicite.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
@@ -222,6 +230,10 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
  4. Orchestrateur: ticket → in-progress/
  5. git checkout -b ticket-XXX-slug  (forkée de la base synchronisée sur le 
     distant, pas du ticket précédent) → OrchestratorEvent.BRANCH_CREATED
+    Avant le checkout, le pipeline commite les artefacts de tenue de livres
+    (`memory/pipeline-log.md`, fichiers de `tickets/`) pour éviter qu'ils ne
+    bloquent ce checkout. Toute GitWorkspaceError autre que NotAGitRepository
+    arrête le run en `blocked`, sans appeler aucun agent.
  6. Codeur (Claude) → ÉCRIT RÉELLEMENT les fichiers (outils fichier du SDK)
     └─ tokens streamés via WS → UI en temps réel
     └─ chaque event → save_event(run_id, ...)
@@ -257,7 +269,9 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
 
 - Le commit est conditionné à la **réussite** de la création de branche : si le
   projet n'est pas un dépôt git, le pipeline continue sans committer plutôt que de
-  committer sur une branche arbitraire.
+  committer sur une branche arbitraire. Toute autre erreur lors de la création de
+  branche (GitWorkspaceError autre que NotAGitRepository) arrête le run en
+  `blocked`, avec un `arret` qui cite l'erreur git, et aucun agent ne tourne.
 - Seul un ticket **approuvé** fait avancer la ref de base. Le travail rejeté reste
   sur sa branche et ne contamine jamais le ticket suivant.
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le

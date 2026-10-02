@@ -1,14 +1,15 @@
 ---
-id: ticket-314
-title: "A run never continues without its branch in a git repository, and pending bookkeeping never blocks the checkout"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
-created: 2026-10-02
+id: ticket-314
+pr_number: 207
+priority: critical
+status: done
+title: A run never continues without its branch in a git repository, and pending bookkeeping
+  never blocks the checkout
+type: fix
 ---
 
 # ticket-314 — Un run ne continue jamais sans sa branche
@@ -35,8 +36,8 @@ modifié dans l'arbre. Le `git checkout -b` du ticket suivant, qui part d'une
 base où ce fichier diffère, a été refusé par git, qui protège une
 modification locale.
 
-`pipeline_stages.create_branch` (vers la ligne 76) attrape **toute**
-`GitWorkspaceError` et poursuit avec un simple avertissement. Ce repli était
+`pipeline_stages.create_branch` (vers la ligne 76) attrapait **toute**
+`GitWorkspaceError` et poursuivait avec un simple avertissement. Ce repli était
 prévu pour un projet sans dépôt git : sur un dépôt réel, il fait coder le
 ticket sur la branche courante, celle du ticket précédent.
 
@@ -53,16 +54,16 @@ ticket sur la branche courante, celle du ticket précédent.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie qu'une `GitCommandError` levée par `create_branch` sur
+- [x] Un test vérifie qu'une `GitCommandError` levée par `create_branch` sur
       un dépôt réel termine le run en `blocked`, avec un `arret` qui contient
       le message git, et qu'aucun agent n'est appelé
-- [ ] Un test vérifie qu'un projet sans dépôt git (`NotAGitRepository`)
+- [x] Un test vérifie qu'un projet sans dépôt git (`NotAGitRepository`)
       continue sans branche, comme aujourd'hui
-- [ ] Un test sur un dépôt git temporaire reproduit le cas : journal modifié
+- [x] Un test sur un dépôt git temporaire reproduit le cas : journal modifié
       dans l'arbre, base où il diffère, puis nouveau ticket. Il vérifie que
       la branche du ticket est créée, et que la modification du journal est
       commitée sur la branche précédente
-- [ ] Un test vérifie qu'un fichier de **code** modifié dans l'arbre empêche
+- [x] Un test vérifie qu'un fichier de **code** modifié dans l'arbre empêche
       toujours la création de branche (`blocked`), au lieu d'être commité
 
 ## Dépendances
@@ -75,3 +76,11 @@ Commiter la tenue de livres sur la branche du ticket précédent ajoute un
 commit à une branche dont la PR est peut-être déjà ouverte : c'est un commit
 `chore: tessera pipeline bookkeeping`, qui suit le même chemin que ceux
 d'aujourd'hui.
+
+## Ce que ça ne fait pas
+
+- `commit_bookkeeping` avant le checkout est non-fatal : si le commit échoue
+  (pas de config git, pas de HEAD), le pipeline tente quand même le checkout.
+  Un fichier de code sale déclenche malgré tout un `blocked` via `GitCommandError`.
+- `ensure_clean_tree` reste le garde-fou amont pour les modifications de code
+  hors pipeline ; `create_branch` n'en est que le filet de sécurité aval.
