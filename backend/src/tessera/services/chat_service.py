@@ -26,6 +26,7 @@ from tessera.services.chat_suggestion import (
 )
 from tessera.services.database import ChatMessageRow
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
+from tessera.services.cost_calculator import DEFAULT_MODEL
 from tessera.services.prompt_loader import load_system_prompt
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
@@ -33,7 +34,7 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 _PROMPT_FILE = "chat.md"
-_DEFAULT_MODEL = "claude-sonnet-5"
+_DEFAULT_MODEL = DEFAULT_MODEL
 _DEFAULT_MAX_TOKENS = 8192
 
 # Les tours les plus anciens sont élagués au-delà de cette limite : le contexte

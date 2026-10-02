@@ -1,14 +1,14 @@
 ---
-id: ticket-312
-title: "The pricing grid and the default models move to the current Claude generation"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-312
+pr_number: 213
+priority: high
+status: done
+title: The pricing grid and the default models move to the current Claude generation
+type: fix
 ---
 
 # ticket-312 — La grille de prix et les modèles par défaut passent à la génération actuelle

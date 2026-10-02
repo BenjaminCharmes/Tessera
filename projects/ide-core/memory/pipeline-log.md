@@ -993,3 +993,13 @@ Ce diff refactorise la gesti (21686ms)
 - 2026-10-02 12:20:54 UTC — [ticket-313] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas de f (286406ms)
 - 2026-10-02 12:20:54 UTC — [ticket-313] APPROVED après 2 tour(s)
 - 2026-10-02 12:23:12 UTC — [ticket-313] documentation: 1 fichier(s) (135843ms)
+- 2026-10-02 12:28:52 UTC — [ticket-312] branche ticket-312-the-pricing-grid-and-the-default-models-move-to-t
+- 2026-10-02 12:28:52 UTC — [ticket-312] tour 1 — codeur démarré
+- 2026-10-02 12:33:14 UTC — [ticket-312] tour 1 — codeur terminé (261578ms)
+- 2026-10-02 12:38:29 UTC — [ticket-312] testeur: OK (exit 0)
+- 2026-10-02 12:38:49 UTC — [ticket-312] securite: PASS — Aucune vulnérabilité détectée. Ce diff refactorise la gestion du modèle LLM par  (20343ms)
+- 2026-10-02 12:38:49 UTC — [ticket-312] tour 1 — reviewer démarré
+- 2026-10-02 12:39:54 UTC — [ticket-312] tour 1 — reviewer terminé (64672ms)
+- 2026-10-02 12:41:49 UTC — [ticket-312] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie la grille de pri (180202ms)
+- 2026-10-02 12:41:49 UTC — [ticket-312] APPROVED après 1 tour(s)
+- 2026-10-02 12:43:11 UTC — [ticket-312] documentation: 1 fichier(s) (79968ms)

@@ -9,6 +9,7 @@ from tessera.models.project import (
 )
 from tessera.models.ticket import TicketDraft, TicketPriority, TicketType
 from tessera.services.agent_registry import AgentRegistryService
+from tessera.services.cost_calculator import DEFAULT_MODEL
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.conversation import format_conversation
@@ -18,7 +19,7 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-_DEFAULT_MODEL = "claude-sonnet-4-6"
+_DEFAULT_MODEL = DEFAULT_MODEL
 _BOOTSTRAP_MODEL = "claude-haiku-4-5-20251001"
 _DEFAULT_MAX_TOKENS = 4096
 _BOOTSTRAP_MAX_TOKENS = 1024
