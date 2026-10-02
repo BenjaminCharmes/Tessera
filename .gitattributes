@@ -1,3 +1,7 @@
-
 # Un hook en CRLF lit « python3 » dans son shebang et bloque tout push (ticket-207).
 scripts/hooks/* text eol=lf
+
+# Le journal du pipeline ne fait que croître : deux tickets livrés en parallèle
+# (ADR-051) y ajoutent chacun leurs lignes, et garder les deux est toujours
+# la bonne résolution. Seul ce fichier : decisions.md doit rester un choix humain.
+projects/ide-core/memory/pipeline-log.md merge=union
