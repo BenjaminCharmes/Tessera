@@ -1060,3 +1060,12 @@ Les nou (39750ms)
 - 2026-10-02 14:58:18 UTC — [ticket-311] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente correctement (332250ms)
 - 2026-10-02 14:58:18 UTC — [ticket-311] APPROVED après 2 tour(s)
 - 2026-10-02 14:59:41 UTC — [ticket-311] documentation: 0 fichier(s) (80656ms)
+- 2026-10-02 12:43:26 UTC — [ticket-315] branche ticket-315-merging-without-ci-waits-until-github-knows-wheth
+- 2026-10-02 12:43:27 UTC — [ticket-315] tour 1 — codeur démarré
+- 2026-10-02 12:53:49 UTC — [ticket-315] tour 1 — codeur terminé (621983ms)
+- 2026-10-02 12:58:46 UTC — [ticket-315] testeur: OK (exit 0)
+- 2026-10-02 12:59:14 UTC — [ticket-315] securite: PASS — Le diff introduit deux nouvelles méthodes pour gérer la fusion de PRs avec atten (27514ms)
+- 2026-10-02 12:59:14 UTC — [ticket-315] tour 1 — reviewer démarré
+- 2026-10-02 13:01:23 UTC — [ticket-315] tour 1 — reviewer terminé (128483ms)
+- 2026-10-02 13:02:01 UTC — [ticket-315] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests associés couvrent cor (167125ms)
+- 2026-10-02 13:02:01 UTC — [ticket-315] APPROVED après 1 tour(s)
