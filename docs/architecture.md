@@ -149,6 +149,12 @@ Cette promesse a demandé sept correctifs, tous nés d'un usage réel :
   Si ce commit échoue (absence de configuration git, pas de HEAD), le pipeline 
   tente quand même le checkout ; seul un fichier de code modifié déclenche 
   un `blocked` avec un `GitCommandError` explicite.
+- **Messages d'erreur d'arbre sale nomment les fichiers qui bloquent** (ticket-323). 
+  Quand l'arbre de travail contient des modifications en dehors de la tenue de 
+  livres au démarrage du run, l'événement `error` porte la liste des fichiers 
+  suivis qui ont changé. Le Pipeline log et la vue du run affichent ces chemins, 
+  permettant à l'utilisateur de savoir immédiatement ce qu'il faut commiter ou 
+  annuler avant de relancer le pipeline.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et

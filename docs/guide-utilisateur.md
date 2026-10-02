@@ -806,6 +806,8 @@ L'arbre de travail du projet était sale au démarrage. C'est un filet de sécur
 quelque chose a modifié des fichiers **suivis** en dehors de Tessera. Committe ou
 annule ces changements, puis repasse le ticket en `todo`.
 
+L'IDE refuse de lancer si ton arbre contient des fichiers modifiés en dehors du pipeline — un `agents.json` changé dans l'écran Agents, ou un journal de pipeline en attente. Le Pipeline log affiche les chemins bloquants, par exemple : « l'arbre contient des modifications hors pipeline : agents.json, tickets/in-progress/ticket-007.md ». Tu **commites** ces fichiers s'ils sont volontaires, ou tu les **annules** (`git restore`) avant de relancer le ticket.
+
 ### Le pipeline tourne mais rien ne change dans les fichiers
 
 Vérifie `LLM_PROVIDER`. Seul le mode `agent_sdk` donne les outils fichier au codeur.
