@@ -976,3 +976,19 @@ Le diff ajoute l'affichage de l'état (23891ms)
 - 2026-10-02 11:40:26 UTC — [ticket-308] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (244858ms)
 - 2026-10-02 11:40:26 UTC — [ticket-308] APPROVED après 1 tour(s)
 - 2026-10-02 11:43:16 UTC — [ticket-308] documentation: 2 fichier(s) (168312ms)
+- 2026-10-02 11:47:35 UTC — [ticket-313] branche ticket-313-in-a-queue-each-ticket-starts-with-a-clean-stage
+- 2026-10-02 11:51:41 UTC — [ticket-313] plan rendu (245827ms)
+- 2026-10-02 11:51:41 UTC — [ticket-313] tour 1 — codeur démarré
+- 2026-10-02 12:04:40 UTC — [ticket-313] tour 1 — codeur terminé (779233ms)
+- 2026-10-02 12:08:49 UTC — [ticket-313] testeur: src/components/AgentPanel/index.tsx(44,5): error TS6133: 'events' is declared but its value is never read.
+- 2026-10-02 12:08:49 UTC — [ticket-313] tests rouges au tour 1
+- 2026-10-02 12:08:49 UTC — [ticket-313] tour 2 — codeur démarré
+- 2026-10-02 12:10:31 UTC — [ticket-313] tour 2 — codeur terminé (102077ms)
+- 2026-10-02 12:15:46 UTC — [ticket-313] testeur: OK (exit 0)
+- 2026-10-02 12:16:07 UTC — [ticket-313] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée.
+
+Ce diff refactorise la gesti (21686ms)
+- 2026-10-02 12:16:07 UTC — [ticket-313] tour 2 — reviewer démarré
+- 2026-10-02 12:17:35 UTC — [ticket-313] tour 2 — reviewer terminé (87906ms)
+- 2026-10-02 12:20:54 UTC — [ticket-313] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas de f (286406ms)
+- 2026-10-02 12:20:54 UTC — [ticket-313] APPROVED après 2 tour(s)
