@@ -53,6 +53,7 @@ def _build_options(
     racine_ecriture: Path | None = None,
     resume: str | None = None,
     skills: list[str] | None = None,
+    git_bash_path: str | None = None,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
 
@@ -105,7 +106,11 @@ def _build_options(
     # On la neutralise explicitement pour le sous-process du SDK ; la clef
     # reste disponible pour `AnthropicApiProvider`, qui est le seul à devoir
     # l'utiliser.
-    env = {"ANTHROPIC_API_KEY": ""}
+    env: dict[str, str] = {"ANTHROPIC_API_KEY": ""}
+    # Sous Windows, le SDK n'active `Bash` que si cette variable pointe vers
+    # un bash.exe. Sans elle, l'outil disparaît en silence (ticket-319).
+    if git_bash_path:
+        env["CLAUDE_CODE_GIT_BASH_PATH"] = git_bash_path
 
     return ClaudeAgentOptions(
         env=env,
@@ -193,6 +198,7 @@ class ClaudeAgentSDKProvider:
         allowed_tools: list[str] | None = None,
         racine_ecriture: Path | None = None,
         skills: list[str] | None = None,
+        git_bash_path: str | None = None,
     ) -> None:
         self._max_turns = max_turns
         self._skills = list(skills) if skills else []
@@ -205,6 +211,9 @@ class ClaudeAgentSDKProvider:
         # donc ici que le quota se capte, et sa forme s'arrête ici (ticket-054).
         self.quota = QuotaTracker()
         self._allowed_tools = list(allowed_tools) if allowed_tools is not None else list(_ALLOWED_TOOLS)
+        # Chemin vers bash.exe sous Windows, transmis au sous-processus du SDK
+        # pour activer l'outil `Bash` (ticket-319).
+        self._git_bash_path = git_bash_path
 
     async def complete(
         self,
@@ -283,7 +292,7 @@ class ClaudeAgentSDKProvider:
             max_budget_usd=self._max_budget_usd, cwd=cwd,
             allowed_tools=self._allowed_tools, ask_user=ask_user,
             racine_ecriture=self.racine_ecriture, resume=resume,
-            skills=self._skills,
+            skills=self._skills, git_bash_path=self._git_bash_path,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None
