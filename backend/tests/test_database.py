@@ -248,7 +248,7 @@ async def test_migration_adds_mode_column(db_path: Path) -> None:
             columns = {row[1] for row in await cursor.fetchall()}
 
     assert "mode" in columns
-    assert version_du_schema() == 3
+    assert version_du_schema() == 5
 
 
 async def test_create_run_stores_mode(db_path: Path) -> None:

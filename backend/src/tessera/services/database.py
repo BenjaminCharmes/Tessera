@@ -82,6 +82,7 @@ class PipelineRunSummary(BaseModel):
     final_status: str | None = None
     total_cost_usd: float = 0.0
     arret: str | None = None
+    parent_run_id: str | None = None
 
 
 class TicketUsage(BaseModel):
@@ -124,6 +125,13 @@ UPDATE pipeline_runs SET mode = 'queue'
     WHERE ticket_id = 'queue' AND mode IS NULL;
 UPDATE pipeline_runs SET mode = 'autonomous'
     WHERE ticket_id = 'autonomous' AND mode IS NULL;""",
+    # 4 — ticket-280 : ticket_id dans agent_events pour filtrer les événements
+    # d'un ticket donné à l'intérieur d'une file. Nullable : les lignes
+    # existantes et les événements d'enveloppe sans ticket cible restent NULL.
+    "ALTER TABLE agent_events ADD COLUMN ticket_id TEXT;",
+    # 5 — ticket-280 : parent_run_id lie les lignes par-ticket à leur enveloppe
+    # de file, ce qui permet à l'endpoint d'événements de trouver les données.
+    "ALTER TABLE pipeline_runs ADD COLUMN parent_run_id TEXT REFERENCES pipeline_runs(id);",
 ]
 
 
@@ -172,6 +180,7 @@ async def create_run(
     project_id: str,
     ticket_id: str,
     mode: str = "single",
+    parent_run_id: str | None = None,
 ) -> str:
     """Insert a new pipeline run row and return its id.
 
@@ -179,14 +188,18 @@ async def create_run(
     and autonomous rows are envelope runs that carry pipeline events but hold no
     agent calls; statistics queries exclude them so they do not inflate run
     counts or quality metrics.
+
+    `parent_run_id` links a per-ticket run (created inside a queue or autonomous
+    run) to its envelope row. Events are stored on the envelope; this link lets
+    the events endpoint filter them by ticket.
     """
     run_id = str(uuid.uuid4())
     started_at = datetime.now(timezone.utc).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
-            "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at, mode)"
-            " VALUES (?,?,?,?,?)",
-            (run_id, project_id, ticket_id, started_at, mode),
+            "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at, mode, parent_run_id)"
+            " VALUES (?,?,?,?,?,?)",
+            (run_id, project_id, ticket_id, started_at, mode, parent_run_id),
         )
         await db.commit()
     return run_id
@@ -260,11 +273,13 @@ async def save_event(
     agent: str | None,
     data: dict[str, Any],
     timestamp: str,
+    ticket_id: str | None = None,
 ) -> None:
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
-            "INSERT INTO agent_events (run_id, type, agent, data_json, ts) VALUES (?,?,?,?,?)",
-            (run_id, event_type, agent, json.dumps(data), timestamp),
+            "INSERT INTO agent_events (run_id, type, agent, data_json, ts, ticket_id)"
+            " VALUES (?,?,?,?,?,?)",
+            (run_id, event_type, agent, json.dumps(data), timestamp, ticket_id or None),
         )
         await db.commit()
 
@@ -305,6 +320,7 @@ async def list_runs(
         async with db.execute(
             """SELECT pr.id, pr.ticket_id, pr.started_at, pr.finished_at,
                       pr.rounds, pr.approved, pr.final_status, pr.arret,
+                      pr.parent_run_id,
                       COALESCE(SUM(ac.cost_usd), 0.0) as total_cost_usd
                FROM pipeline_runs pr
                LEFT JOIN agent_calls ac ON ac.run_id = pr.id
@@ -329,9 +345,72 @@ async def list_runs(
             "approved": bool(row["approved"]) if row["approved"] is not None else None,
             "final_status": row["final_status"],
             "arret": row["arret"],
+            "parent_run_id": row["parent_run_id"],
             "total_cost_usd": float(row["total_cost_usd"]),
         }
         for row in rows
+    ]
+
+
+async def get_run_events(
+    db_path: Path | str,
+    run_id: str,
+) -> list[dict[str, Any]] | None:
+    """Return persisted events for a run, excluding agent_token streaming chunks.
+
+    Returns ``None`` when the run_id is unknown (caller maps this to 404).
+
+    For a per-ticket row inside a queue (``parent_run_id`` set), events are
+    fetched from the parent run and filtered by the row's ``ticket_id``,
+    because ``emetteur`` stores all events under the envelope. For a standalone
+    run or a queue envelope, all non-token events are returned.
+
+    The filter is applied in SQL to avoid loading large token streams into
+    memory (see ticket-280 risk section).
+    """
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT id, ticket_id, parent_run_id FROM pipeline_runs WHERE id=?",
+            (run_id,),
+        ) as cursor:
+            row = await cursor.fetchone()
+
+        if row is None:
+            return None
+
+        parent_run_id: str | None = row["parent_run_id"]
+        ticket_id: str | None = row["ticket_id"]
+
+        if parent_run_id is not None and ticket_id:
+            # Per-ticket queue row: events live on the parent, filtered by ticket.
+            async with db.execute(
+                """SELECT type, agent, data_json, ts
+                   FROM agent_events
+                   WHERE run_id=? AND ticket_id=? AND type != 'agent_token'
+                   ORDER BY ts, id""",
+                (parent_run_id, ticket_id),
+            ) as cursor:
+                event_rows = await cursor.fetchall()
+        else:
+            # Standalone run or queue envelope: return all non-token events.
+            async with db.execute(
+                """SELECT type, agent, data_json, ts
+                   FROM agent_events
+                   WHERE run_id=? AND type != 'agent_token'
+                   ORDER BY ts, id""",
+                (run_id,),
+            ) as cursor:
+                event_rows = await cursor.fetchall()
+
+    return [
+        {
+            "type": r["type"],
+            "agent": r["agent"],
+            "data": json.loads(r["data_json"] or "{}"),
+            "timestamp": r["ts"],
+        }
+        for r in event_rows
     ]
 
 

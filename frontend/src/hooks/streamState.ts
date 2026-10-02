@@ -35,6 +35,8 @@ export interface PassageAgent {
   /** Contenu issu de `agent_done` : verdict ou compte rendu. */
   content: string;
   isDone: boolean;
+  /** Durée de l'appel en ms, remontée par `agent_done`. Absente si le backend ne l'envoie pas. */
+  duration_ms?: number;
 }
 
 /**
@@ -75,6 +77,8 @@ export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur;
 export interface StreamState {
   status: StreamStatus;
   ticketId: string | null;
+  /** Titre lisible du ticket en cours, reçu de l'instantané ou des événements (ticket-286). */
+  ticketTitre: string | null;
   events: OrchestratorEvent[];
   currentAgent: AgentRole | null;
   currentRound: number;
@@ -84,6 +88,8 @@ export interface StreamState {
   /** Étape du pipeline en cours (ticket-256) : "production", "securite", "revue",
    *  "validation", "documentation", "livraison". Null hors run ou après pipeline_done. */
   etape: string | null;
+  /** Étapes actives en parallèle (ticket-290). Vide hors run. */
+  etapesEnCours: string[];
   /** Dernier état connu du quota d'abonnement, ou null tant que rien n'est remonté. */
   quota: QuotaState | null;
   /** Question posée par l'agent en cours, tant qu'on n'y a pas répondu (ticket-066). */
@@ -141,6 +147,7 @@ export interface UseRunActifResult extends StreamState {
 export const INITIAL: StreamState = {
   status: "idle",
   ticketId: null,
+  ticketTitre: null,
   events: [],
   currentAgent: null,
   currentRound: 0,
@@ -148,6 +155,7 @@ export const INITIAL: StreamState = {
   lastResult: null,
   errorMessage: null,
   etape: null,
+  etapesEnCours: [],
   quota: null,
   pendingQuestion: null,
   questionExpireA: null,
@@ -174,10 +182,13 @@ export function etatDepuisRun(run: RunActif): StreamState {
     ...INITIAL,
     status: "running",
     ticketId: run.ticket_id,
+    ticketTitre: run.ticket_titre ?? null,
     currentAgent: run.agent,
     currentRound: run.tour || INITIAL.currentRound,
     // L'étape en cours est dans l'instantané depuis ticket-255 (ticket-256).
     etape: run.etape ?? null,
+    // ticket-290 : liste des étapes actives en parallèle. Repli sur [etape] si absent.
+    etapesEnCours: run.etapes_en_cours ?? (run.etape ? [run.etape] : []),
     pendingQuestion: run.question ?? null,
     questionExpireA: run.question_expire_a ?? null,
     // Un F5 retrouve le cumul depuis l'instantané (ticket-197).
@@ -187,6 +198,17 @@ export function etatDepuisRun(run: RunActif): StreamState {
     // Les entrées se reconstruisent au fil des événements après reconnexion.
     entries: [],
   };
+}
+
+/** Ajoute une étape à la liste des étapes en cours (sans doublon). */
+function addEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
+  if (etapesEnCours.includes(etape)) return etapesEnCours;
+  return [...etapesEnCours, etape];
+}
+
+/** Retire une étape de la liste des étapes en cours. */
+function removeEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
+  return etapesEnCours.filter((e) => e !== etape);
 }
 
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
@@ -201,6 +223,14 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         agent === "codeur" ? "production"
         : agent === "reviewer" ? "revue"
         : s.etape;
+      // ticket-290 : suivre les étapes en cours pour le parallélisme.
+      const etapeEnCoursToAdd =
+        agent === "codeur" ? "production"
+        : agent === "reviewer" ? "revue"
+        : null;
+      const newEtapesEnCours = etapeEnCoursToAdd
+        ? addEtapeEnCours(s.etapesEnCours, etapeEnCoursToAdd)
+        : s.etapesEnCours;
       const newEntry: PassageAgent | null = agent
         ? {
             genre: "agent",
@@ -219,6 +249,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         currentAgent: agent,
         currentRound: round,
         etape: etapeAgent,
+        etapesEnCours: newEtapesEnCours,
         maxRounds:
           typeof ev.data["max_rounds"] === "number"
             ? ev.data["max_rounds"]
@@ -242,6 +273,8 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       const doneAgent = ev.agent;
       const doneContent =
         typeof ev.data["content"] === "string" ? ev.data["content"] : "";
+      const doneDurationMs =
+        typeof ev.data["duration_ms"] === "number" ? ev.data["duration_ms"] : undefined;
       // Marquer le dernier passage non terminé de cet agent comme terminé.
       // Seules les entrées de genre "agent" ont un champ `agent`.
       const lastUnfinishedIdx = s.entries.reduceRight(
@@ -253,13 +286,22 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         lastUnfinishedIdx >= 0
           ? s.entries.map((e, i) => {
               if (i !== lastUnfinishedIdx || e.genre !== "agent") return e;
-              return { ...e, isDone: true, content: doneContent };
+              return { ...e, isDone: true, content: doneContent, duration_ms: doneDurationMs };
             })
           : s.entries;
+      // ticket-290 : retirer l'étape de la liste des étapes en cours.
+      const etapeAgentDone =
+        doneAgent === "codeur" ? "production"
+        : doneAgent === "reviewer" ? "revue"
+        : null;
+      const etapesEnCoursApresDone = etapeAgentDone
+        ? removeEtapeEnCours(s.etapesEnCours, etapeAgentDone)
+        : s.etapesEnCours;
       return {
         ...s,
         events,
         currentAgent: s.currentAgent === doneAgent ? null : s.currentAgent,
+        etapesEnCours: etapesEnCoursApresDone,
         coutUsd:
           s.coutUsd +
           (typeof ev.data["cost_usd"] === "number" ? ev.data["cost_usd"] : 0),
@@ -319,7 +361,12 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         reason: typeof ev.data["reason"] === "string" ? ev.data["reason"] : "",
         isDone: true,
       };
-      return { ...s, events, entries: [...s.entries, auditEntry] };
+      return {
+        ...s,
+        events,
+        entries: [...s.entries, auditEntry],
+        etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "securite"),
+      };
     }
     case "validation_done": {
       // La validation ajoute une entrée dans le fil, critère par critère (ticket-257).
@@ -341,16 +388,41 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         criteria,
         isDone: true,
       };
-      return { ...s, events, entries: [...s.entries, validEntry] };
+      return {
+        ...s,
+        events,
+        entries: [...s.entries, validEntry],
+        etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "validation"),
+      };
     }
     case "security_audit_started":
-      return { ...s, events, etape: "securite" };
+      return {
+        ...s,
+        events,
+        etape: "securite",
+        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "securite"),
+      };
     case "validation_started":
-      return { ...s, events, etape: "validation" };
+      return {
+        ...s,
+        events,
+        etape: "validation",
+        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "validation"),
+      };
     case "documentation_started":
-      return { ...s, events, etape: "documentation" };
+      return {
+        ...s,
+        events,
+        etape: "documentation",
+        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "documentation"),
+      };
     case "livraison_started":
-      return { ...s, events, etape: "livraison" };
+      return {
+        ...s,
+        events,
+        etape: "livraison",
+        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "livraison"),
+      };
     case "pipeline_done": {
       const branch =
         typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch;
@@ -375,15 +447,33 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         status: "done",
         lastResult: result,
         etape: null,
+        etapesEnCours: [],
         pendingQuestion: null,
         questionExpireA: null,
         branch,
       };
     }
+    case "ticket_status_changed":
+      // Quand le backend change le ticket courant (file), il inclut le titre
+      // dans les données de l'événement pour les observateurs connectés (ticket-286).
+      return {
+        ...s,
+        events,
+        ticketTitre:
+          typeof ev.data["ticket_titre"] === "string"
+            ? ev.data["ticket_titre"]
+            : s.ticketTitre,
+      };
+    case "livraison_done":
+      return { ...s, events, etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "livraison") };
+    case "doc_updated":
+    case "documentation_failed":
+      return { ...s, events, etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "documentation") };
     case "run_closed":
       // Le run est définitivement terminé : livraison et documentation sont finies.
-      // Le bouton « Fermer » n'apparaît qu'ici (ticket-267).
-      return { ...s, events, runClosed: true };
+      // Le bouton « Fermer » n'apparaît qu'ici (ticket-267). L'étape active se
+      // remet à null : livraison ou doc ne clignotent plus après la clôture (ticket-279).
+      return { ...s, events, runClosed: true, etape: null, etapesEnCours: [] };
     case "error":
       return {
         ...s,
@@ -411,11 +501,16 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       // `APPROVED` compris, sur un ticket que personne n'avait encore relu
       // (ticket-180).
       //
-      // Ce qui appartient au **run** survit : l'avancement de la file, le
-      // quota, la branche. Ce qui appartient au **ticket** repart de zéro.
+      // Ce qui appartient au **run** survit : les événements bruts (Pipeline
+      // log), l'avancement de la file, le quota, la branche.
+      // Ce qui appartient au **ticket** repart de zéro : `entries`, `currentAgent`,
+      // `currentRound` — l'affichage du tableau d'agents.
+      // Les événements bruts sont gardés pour que le Pipeline log montre
+      // l'historique complet d'une file (ticket-283).
       return {
         ...INITIAL,
         status: "running",
+        events: [...s.events, ev],
         quota: s.quota,
         branch: s.branch,
         maxRounds: s.maxRounds,

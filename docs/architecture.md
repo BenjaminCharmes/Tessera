@@ -81,7 +81,7 @@ appels d'un pipeline.
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé cinq correctifs, tous nés d'un usage réel :
+Cette promesse a demandé sept correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -113,6 +113,18 @@ Cette promesse a demandé cinq correctifs, tous nés d'un usage réel :
   **ramené à vide** est signalé ; un fichier vide créé initialement ne l'est
   pas. Cette détection aide à repérer les suppressions mal faites avant qu'elles
   n'échouent en CI.
+- **Le journal du pipeline n'arrête plus le ticket suivant** (ticket-278). 
+  `ensure_clean_tree` ignore les fichiers que le pipeline écrit et commite 
+  lui-même : `memory/pipeline-log.md` et les fichiers de `tickets/`. Une 
+  modification ailleurs reste un refus. Cette liste vit à un seul endroit, 
+  partagée avec ce que le diff relu exclut déjà.
+- **Les fichiers de configuration ne sont jamais commités** (ticket-296). 
+  Les réglages faits dans l'IDE pendant un run — `agents.json`, 
+  `.claude/settings*.json`, `.github/workflows/` — ne doivent pas partir 
+  dans le commit du pipeline. Le commit les exclut par pathspec, et l'arbre 
+  les garde modifiés : le rapport du run signale lesquels ont changé. Cela 
+  prévient qu'un réglage d'IDE voyage dans la PR d'un ticket qui ne l'avait 
+  pas demandé (incident du ticket-279).
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
@@ -154,12 +166,19 @@ production, sécurité, revue, validation, documentation, livraison — en tête
 Agents. Chaque pastille représente une étape, avec trois états : faite (`green`), en cours 
 (`blue`), à venir (`zinc`). Une étape désactivée pour le projet n'a pas de pastille. Un 
 refus de l'audit sécurité ou une validation rejetée passent la pastille correspondante en 
-`red`. L'étape en cours se déduit d'abord du champ `etape` dans l'instantané du run, puis 
-estrichie par les événements reçus au fil de l'exécution.
+`red`. 
+
+Après l'audit sécurité, reviewer et validateur peuvent tourner en parallèle (ticket-289) :
+`StageStrip` marque `active` toute étape présente dans `etapesEnCours`, permettant 
+d'afficher deux pastilles `blue` au même moment. Une étape n'est `done` que si son 
+événement de fin a été reçu, ou si une étape qui la suit (et ne tourne pas en parallèle) 
+a démarré.
 
 `coherence.test.ts` verrouille les trois règles : il lit les sources et échoue
 à la première réintroduction d'une couleur bannie, d'une taille de texte
 arbitraire ou d'un glyphe utilisé comme affordance.
+
+Ce système est imposé aux agents créant une interface via le skill `tessera:design-ui`, chargé par défaut par le codeur et l'architect : toute UI doit partir d'une charte déclarée (couleurs, typographie, espacement), et n'en sortir sur aucune valeur.
 
 ## Endpoints implémentés
 
@@ -201,30 +220,31 @@ arbitraire ou d'un glyphe utilisé comme affordance.
  2. DB : create_run(project_id, ticket_id) → run_id
  3. Garde-fou : arbre de travail sale ? → ticket → blocked/, run terminé
  4. Orchestrateur: ticket → in-progress/
- 5. git checkout -b ticket-XXX-slug  (forkée de la ref de base, pas du ticket
-    précédent) → OrchestratorEvent.BRANCH_CREATED
+ 5. git checkout -b ticket-XXX-slug  (forkée de la base synchronisée sur le 
+    distant, pas du ticket précédent) → OrchestratorEvent.BRANCH_CREATED
  6. Codeur (Claude) → ÉCRIT RÉELLEMENT les fichiers (outils fichier du SDK)
     └─ tokens streamés via WS → UI en temps réel
     └─ chaque event → save_event(run_id, ...)
  7. git diff → c'est CE diff qui alimente toutes les étapes suivantes
     (repli sur la prose du codeur si le diff est vide)
- 8. Testeur → exécute la suite de tests du projet → TEST_RESULT
+ 8. Testeur → exécute la suite complète de vérification (pytest, mypy, tsc, eslint) → TEST_RESULT
  9. Auditeur sécurité (OWASP) → BLOCK si CRITICAL/HIGH → ticket → blocked/
 10. Ticket → in-review/
-11. Reviewer (Claude) → relit le diff
-    ├─ "APPROVED" → étape 12
-    └─ "CHANGES_REQUESTED: {raison}" → retour au Codeur avec feedback
-         (max 3 tours ; sinon ticket → blocked/)
-12. Validateur → vérifie les critères d'acceptation un par un
-13. Doc-updater → met à jour README / docs / CLAUDE.md du projet
-14. git commit — sur TOUS les chemins de sortie :
+11. Reviewer (Claude) et Validateur tournent en parallèle
+    ├─ Reviewer relit le diff
+    ├─ Validateur vérifie les critères d'acceptation un par un
+    ├─ Approuvé seulement si le reviewer approuve ET le validateur ne refuse pas
+    ├─ Sur un refus, le codeur reçoit les motifs de tous les agents qui ont refusé
+    └─ Retour au Codeur si refusé (max 3 tours ; sinon ticket → blocked/)
+12. Doc-updater → met à jour README / docs / CLAUDE.md du projet (sauté si `light: true`)
+13. git commit — sur TOUS les chemins de sortie :
     ├─ approuvé      → "<type>: ticket-XXX — <titre>" puis advance_base_ref()
     └─ non approuvé  → "chore: ticket-XXX — unapproved work (<raison>)"
     (+ un second commit séparé pour la comptabilité Tessera :
      statuts de tickets et pipeline-log, jamais sous le message du ticket)
-15. DB : finish_run(run_id, rounds, approved, final_status)
-16. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
-17. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
+14. DB : finish_run(run_id, rounds, approved, final_status)
+15. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
+16. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
 ```
 
 **Invariants** (voir ADR-018) :
@@ -236,6 +256,25 @@ arbitraire ou d'un glyphe utilisé comme affordance.
   sur sa branche et ne contamine jamais le ticket suivant.
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
+- Le verdict du reviewer est la première ligne qui commence par APPROVED ou CHANGES_REQUESTED. Une approbation qui nomme CHANGES_REQUESTED sur la même ligne est un refus ; sur les lignes suivantes, elle approuve (ticket-298, ADR-009).
+
+## Documentation par lot (ADR-035, ticket-292)
+
+Après approbation, le pipeline met à jour la documentation technique et fonctionnelle 
+du projet — pas d'office, mais par lot, pour économiser les appels LLM sur les petits 
+changements.
+
+Un ticket peut se déclarer `light: true` dans son frontmatter. Les conséquences :
+
+- Le run approuvé **saute** les étapes de doc-technique et doc-fonctionnelle
+- Le marqueur d'avancement n'est **pas** avancé — le prochain lot partira du même point
+- Le ticket suivant, non-léger, documentera **tous** les tickets depuis ce marqueur, 
+  tickets légers compris
+- Sécurité et validateur **tournent normalement** — ce sont des portes qui échouent 
+  fermées (ADR-039), jamais optimisées
+
+Cas limite : une file qui se termine sur des tickets légers les laisse sans documentation 
+jusqu'à l'appel suivant d'un agent de documentation (mode autonome, chat, nouveau run).
 
 ## Livraison (ADR-029, ADR-030)
 
@@ -254,6 +293,51 @@ Cette branche de base affecte :
 - La **cible** de la PR ouverte (elle vise cette branche)
 - L'**avancement de la ref de base** après merge — seul un ticket approuvé en fait 
   avancer la ref, que le ticket suivant forkera
+
+### Synchronisation de la base avant livraison
+
+Au moment du rebase, la branche de base est alignée sur le distant pour 
+assurer que le rebase se fait sur l'état réel. Un `fetch` met à jour les 
+références locales ; la branche locale de base avance jusqu'au commit distant 
+(avance rapide seulement). 
+
+Sans distant joignable, le rebase utilise la base locale. Si elle a divergé 
+du distant hors d'une avance rapide, la livraison s'arrête avec cette raison 
+et ne procède pas au rebase.
+
+### Commit des artefacts de tenue de livres avant rebase
+
+Avant de rebaser la branche du ticket, la livraison commite tous les artefacts 
+restants (`memory/pipeline-log.md` et fichiers de tickets) via `commit_bookkeeping`. 
+Le pipeline enregistre des durées et des étapes dans le journal après la 
+documentation, et ces lignes doivent être commitées avant le rebase — sinon 
+l'arbre reste sale et `git rebase` échoue avec « You have unstaged changes » 
+(ticket-303).
+
+Seul un fichier de code modifié — celui qu'un agent aurait omis de committer — 
+fait échouer la livraison, avec un message d'erreur explicite.
+
+### Gestion des conflits de rebase
+
+Pendant le rebase du ticket sur la branche de base, les conflits sont traités selon
+leur nature :
+
+**Fichier ticket** (le statut du ticket dans `tickets/todo/`, `in-progress/`, etc.) :
+En cas de conflit sur ce fichier — modifié/supprimé ou modifié/modifié — l'IDE le
+résout automatiquement en faveur de la branche du ticket. Le fichier porte le bon
+statut pour son propre run et ne doit pas être jugé par un agent. Cette résolution
+n'est jamais relue.
+
+**Autres fichiers** : tout conflit est annulé (`rebase --abort`) et remonté à
+un agent (resolveur-conflit, ticket-282), qui le tente sous relecture (ADR-033).
+Aucune résolution automatique en dehors du fichier ticket.
+
+**Annulation robuste** : si `rebase --abort` gêne des **fichiers non suivis**
+portant les noms d'artefacts Tessera (`memory/`, `tickets/`, etc.),
+l'IDE les met de côté et réessaie. En dernier recours, l'arbre revient à la
+pointe d'origine de la branche du ticket, **sans perdre ce qui était commité**.
+Après l'échec, `.git/rebase-merge` n'existe plus : l'arbre est propre pour le
+ticket suivant, même en mode file.
 
 ### Délai de grâce pour l'enregistrement des checks
 
@@ -305,10 +389,14 @@ Le ticket suivant forkera depuis ce commit, non depuis la branche du ticket
 précédent. Un rebase n'aura donc pas de conflit factice avec le squash du ticket
 précédent, déjà fusionné sur la branche de base distante.
 
-**Cas non mergés** : Cette mise à jour ne s'applique qu'après une livraison
-**mergée**. Après une livraison non mergée — CI rouge, niveau PR ou commit — le
-ticket suivant part du ticket précédent, ce qui permet à un plan séquentiel
-d'avancer malgré les obstacles (ADR-018).
+**Cas non mergés** (ticket-302) : Si la PR du ticket n'a pas mergé — erreur CI,
+conflits, ou autre raison — le ticket suivant part de la base distante, pas du
+ticket précédent. Cela prévient qu'un ticket approuvé mais non mergé n'empoisonne
+le ticket suivant.
+
+Un ticket suivant qui déclare son prédécesseur dans `depends_on` arrête la
+file. Le `arret` nomme la PR restée ouverte ; le ticket refusera d'avancer
+tant qu'elle n'aura pas mergé.
 
 **Divergence** : Si la branche locale et distante divergent hors d'une avance
 rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
@@ -381,6 +469,27 @@ CREATE TABLE agent_calls (
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
 
+## Visualisation des runs terminés (ticket-280, ticket-281)
+
+Un run qui quitte la supervision — fermé ou au redémarrage du backend — disparaît 
+de la WebSocket temps réel. Les événements persistent en SQLite, et l'utilisateur 
+peut les rejouer depuis l'historique :
+
+1. **Récupération** : un clic sur une ligne de `RecentRuns` appelle l'endpoint 
+   du ticket-280 avec l'identifiant du run, qui retourne l'ensemble de ses 
+   événements, du début à la fin.
+2. **Rejeu** : le frontend applique chaque événement dans `applyEvent` — le même 
+   code que pour la WebSocket temps réel. L'état visuel se reconstruit entièrement 
+   en quelques millisecondes, cartes comprises.
+3. **Lecture seule** : la vue rouverte n'affiche ni bouton d'arrêt, ni champ de 
+   message, ni chrono qui tourne. C'est un instantané interactif du passé, pas 
+   un run vivant.
+
+Cette capacité de rejeu repose sur le fait que chaque événement porte assez 
+d'information pour reconstituer l'état. Les `OrchestratorEvent` — écrits 
+initialement pour le temps réel — le satisfont aussi bien pour l'historique : 
+c'est la même sérialisation JSON, les mêmes champs, aucune adaptation.
+
 ## Structure des fichiers de tickets
 
 ```
@@ -441,7 +550,9 @@ affiché dans l'UI.
 
 ## OrchestratorEvents (WebSocket)
 
-Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
+Dès la connexion, le serveur envoie un instantané du run (`RunActif`), qui porte `ticket_id` et `ticket_titre`, permettant à la Supervision et à l'en-tête du run d'afficher ces informations sans ouvrir le projet (ticket-286). L'instantané contient désormais `etapes_en_cours: string[]`, qui liste toutes les étapes actuellement en cours d'exécution (ticket-289). Après l'audit sécurité, reviewer et validateur peuvent tourner en parallèle : le client affiche les deux pastilles actives. Quand `etapes_en_cours` est absent (run ancien), les clients replient sur le champ `etape`.
+
+Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
 
 ```json
 {
@@ -467,6 +578,8 @@ Les clients WebSocket reçoivent des `OrchestratorEvent` au format JSON :
 | `architect` | claude-sonnet-4-6 | Analyse architecturale |
 | `project-creator` | claude-sonnet-4-6 | Crée de nouveaux projets |
 | `github-sync` | — (pas de LLM) | Synchronise GitHub Issues → tickets |
+
+**Skills fournis par défaut** : `codeur` et `architect` chargent `tessera:design-ui` au démarrage, qui impose une charte visuelle (couleurs, typographie, espacement) et les règles de l'ADR-026 à toute création d'interface.
 
 ## Communication inter-agents
 

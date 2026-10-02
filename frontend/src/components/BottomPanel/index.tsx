@@ -5,6 +5,9 @@ import type { OrchestratorEvent } from "../../types/api";
 
 interface BottomPanelProps {
   events: OrchestratorEvent[];
+  /** Nom du projet dont on affiche le run — quand la sélection de Supervision
+   *  diffère du projet actif (ticket-283). Absent : le projet actif. */
+  projetLabel?: string | null;
 }
 
 /**
@@ -82,14 +85,30 @@ function eventToLine(ev: OrchestratorEvent): string | null {
     }
     case "validation_started":
       return `[${t}] Validation : démarrée`;
-    case "validation_done":
-      return `[${t}] Validation : ${ev.data["approved"] === true ? "approuvée" : "refusée"}`;
+    case "validation_done": {
+      // Le champ `approved` est ajouté depuis ticket-279 ; les backends plus
+      // anciens n'émettent que `verdict` — on retombe sur lui en dernier recours.
+      const hasApproved = "approved" in ev.data;
+      const approved = hasApproved
+        ? ev.data["approved"] === true
+        : typeof ev.data["verdict"] === "string"
+          ? ev.data["verdict"] === "APPROVED"
+          : false;
+      return `[${t}] Validation : ${approved ? "approuvée" : "refusée"}`;
+    }
     case "documentation_started":
       return `[${t}] Documentation : démarrée`;
     case "doc_updated":
       return `[${t}] Documentation mise à jour`;
     case "livraison_started":
       return `[${t}] Livraison : démarrée`;
+    case "test_result": {
+      // Une suite rouge renvoie le travail au codeur sans passer par la revue
+      // (ticket-098) ; sans ligne dans le log, trois tours de codeur s'affichaient
+      // d'affilée sans raison apparente (ticket-279).
+      const passed = ev.data["passed"] === true;
+      return `[${t}] Tests : ${passed ? "verts" : "rouges — retour au codeur"}`;
+    }
     case "error":
       return `[${t}] Erreur : ${raisonLisible(ev)}`;
     default:
@@ -97,7 +116,7 @@ function eventToLine(ev: OrchestratorEvent): string | null {
   }
 }
 
-export default function BottomPanel({ events }: BottomPanelProps) {
+export default function BottomPanel({ events, projetLabel }: BottomPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const lines = events.map(eventToLine).filter((l): l is string => l !== null);
 
@@ -108,7 +127,7 @@ export default function BottomPanel({ events }: BottomPanelProps) {
   return (
     <div className="h-full flex flex-col bg-zinc-950 border-t border-zinc-700">
       <div className={`${BAND} gap-4 border-b border-zinc-700 px-4`}>
-        <RegionTitle>Pipeline log</RegionTitle>
+        <RegionTitle>Pipeline log{projetLabel ? ` — ${projetLabel}` : ""}</RegionTitle>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-2 text-xs font-mono">
         {lines.length === 0 ? (

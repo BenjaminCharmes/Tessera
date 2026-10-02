@@ -80,6 +80,12 @@ def test_une_requete_http_sans_bearer_recoit_401(client: TestClient) -> None:
     assert client.get("/api/v1/projects").status_code == 401
 
 
+def test_les_evenements_d_un_run_exigent_le_bearer(client: TestClient) -> None:
+    # La relecture d'un run (ticket-280) passe par le même middleware global
+    # que le reste de l'API : aucune route ne se protège elle-même.
+    assert client.get("/api/v1/runs/inconnu/events").status_code == 401
+
+
 def test_une_requete_http_avec_bearer_passe(client: TestClient) -> None:
     reponse = client.get(
         "/api/v1/projects", headers={"Authorization": f"Bearer {_TOKEN}"}

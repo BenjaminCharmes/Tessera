@@ -12,6 +12,7 @@ visible instead of hiding it behind a mixin.
 A stage that can end the run returns a `PipelineResult`; returning `None`
 means "carry on".
 """
+import time
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any, Optional
 
@@ -72,11 +73,33 @@ async def ensure_clean_tree(
     )
 
 
-async def create_branch(orch: "Orchestrator", run: PipelineRun) -> None:
-    """Switch to the ticket's own branch; degrade without one if git is absent."""
+async def create_branch(
+    orch: "Orchestrator", run: PipelineRun
+) -> Optional[PipelineResult]:
+    """Switch to the ticket's own branch; degrade without one if git is absent.
+
+    Aligns the base ref with the remote before forking (ticket-285).
+    Returns a blocked ``PipelineResult`` when the local base has diverged
+    from the remote and the run cannot safely start.
+    """
     if orch._git_workspace is None:
-        return
+        return None
     try:
+        # Sync base_branch with remote before forking the ticket branch (ticket-285).
+        # A diverged local base blocks the run immediately rather than producing
+        # a PR that GitHub will immediately reject.
+        raison_blocage = await orch._git_workspace.initialiser_base_ref()
+        if raison_blocage is not None:
+            _logger.warning("base_divergee_blocage", extra={"raison": raison_blocage})
+            await set_status(orch, run, TicketStatus.blocked)
+            await emit(run, EventType.ERROR, reason=raison_blocage)
+            return PipelineResult(
+                ticket_id=run.ticket_id,
+                final_status=TicketStatus.blocked,
+                rounds=0,
+                approved=False,
+                arret=raison_blocage,
+            )
         run.branch = await orch._git_workspace.create_branch(
             run.ticket_id, run.ticket.title
         )
@@ -88,6 +111,7 @@ async def create_branch(orch: "Orchestrator", run: PipelineRun) -> None:
         # Volontairement restreint à GitWorkspaceError : une erreur de
         # programmation doit remonter, pas finir en avertissement.
         _logger.warning("branch_creation_failed", extra={"error": str(exc)})
+    return None
 
 
 def take_artifact_snapshot(orch: "Orchestrator", run: PipelineRun) -> None:
@@ -389,6 +413,7 @@ async def run_security_audit(
         return None
 
     await emit(run, EventType.SECURITY_AUDIT_STARTED, round=run.round_num)
+    t0 = time.monotonic()
     try:
         audit = await orch._security_auditor.audit(
             code_diff=run.reviewed_code, project_path=orch._project_path
@@ -399,6 +424,7 @@ async def run_security_audit(
         audit = SecurityAuditResult(
             issues=[], verdict="BLOCK", summary=reason, reason=reason
         )
+    audit_ms = int((time.monotonic() - t0) * 1000)
 
     await emit(
         run,
@@ -410,7 +436,9 @@ async def run_security_audit(
         summary=audit.summary,
         reason=audit.reason,
     )
-    orch._log(f"[{run.ticket_id}] securite: {audit.verdict} — {audit.summary[:80]}")
+    orch._log(
+        f"[{run.ticket_id}] securite: {audit.verdict} — {audit.summary[:80]} ({audit_ms}ms)"
+    )
 
     if audit.verdict == "BLOCK":
         return await finish_security_block(orch, run, audit.summary)
@@ -484,12 +512,17 @@ async def run_review(
 
 
 async def run_validation(
-    orch: "Orchestrator", run: PipelineRun, reason: str
+    orch: "Orchestrator", run: PipelineRun
 ) -> tuple[bool, str]:
-    """Check the ticket's acceptance criteria; may overturn an approval."""
+    """Check the ticket's acceptance criteria independently of the reviewer.
+
+    Returns ``(True, "")`` when the validator is absent or approves,
+    ``(False, feedback)`` when it refuses or is unavailable.
+    """
     if orch._validator is None:
-        return True, reason
+        return True, ""
     await emit(run, EventType.VALIDATION_STARTED)
+    t0 = time.monotonic()
     try:
         validation = await orch._validator.validate(
             criteria=_extract_criteria(run.ticket.body),
@@ -501,11 +534,16 @@ async def run_validation(
         # n'approuve rien (ticket-122).
         _logger.warning("validator_failed", extra={"error": str(exc)})
         return False, f"Validation en panne : {exc}"
+    validation_ms = int((time.monotonic() - t0) * 1000)
 
     await emit(
         run,
         EventType.VALIDATION_DONE,
         verdict=validation.verdict,
+        # Le frontend lit `approved` pour afficher le statut ; le fallback sur
+        # `verdict` existe côté frontend, mais le champ explicite est plus fiable
+        # (ticket-279).
+        approved=(validation.verdict == "APPROVED"),
         all_passed=validation.all_passed,
         feedback=validation.feedback,
         criteria=[
@@ -514,9 +552,10 @@ async def run_validation(
         ],
     )
     orch._log(
-        f"[{run.ticket_id}] validateur: {validation.verdict} — {validation.feedback[:80]}"
+        f"[{run.ticket_id}] validateur: {validation.verdict} — "
+        f"{validation.feedback[:80]} ({validation_ms}ms)"
     )
     if validation.verdict == "CHANGES_REQUESTED":
         return False, validation.feedback
-    return True, reason
+    return True, ""
 

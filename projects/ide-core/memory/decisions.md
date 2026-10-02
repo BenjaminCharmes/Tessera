@@ -90,7 +90,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-06  
 **Portée** : architect, codeur, reviewer  
-**Décision** : L'orchestrateur parse la sortie du reviewer en cherchant `CHANGES_REQUESTED` (prioritaire) puis `APPROVED`. Absence des deux = rejet.  
+**Décision** : L'orchestrateur parse la sortie du reviewer en cherchant `CHANGES_REQUESTED` (prioritaire) puis `APPROVED`. Absence des deux = rejet. Amendé 2026-10-01 (ticket-298) : la première ligne qui **commence** par un verdict l'emporte ; la priorité ne joue qu'en son absence.  
 **Raison** : Le reviewer est prompté pour répondre dans ce format. La priorité de `CHANGES_REQUESTED` évite les faux positifs si les deux mots apparaissent ("sinon APPROVED").  
 **Alternative rejetée** : Parser un JSON structuré — trop contraignant pour un LLM qui génère aussi du texte libre.
 
@@ -456,3 +456,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : une seule porte se contourne sans le vouloir : push manuel, agent d'une autre session, corps de PR.
 **Alternative rejetée** : la CI seule — elle voit la PR quand la branche est déjà publique.
 **Conséquence assumée** : la liste vaut partout, son périmètre se déclare — `confidentiality: professional`, un CV qui cite ses employeurs.
+
+---
+
+## ADR-051 — Libérer l'arbre après la PR, pas après le merge
+
+**Date** : 2026-10-02
+**Décision** : `LivraisonService` se scinde. Phase 1 — rebase, push, PR — libère le verrou (ADR-038) via `run_closed` (ADR-041). Phase 2 — attente CI, merge — tourne dans `CIWatcher`, tâche de fond. Au plus une livraison en attente par projet. CI rouge : ticket repassé `todo` avec le log CI, relancé comme nouveau run (ADR-030 tient) ; au deuxième rouge, `blocked`. Arrêt backend : PRs laissées ouvertes, sans reprise. `CI_MERGE_DONE` s'émet sur le canal projet. `depends_on` bloque le ticket suivant jusqu'au merge. Amende ADR-018, ADR-030, ADR-038.
+**Raison** : N+1 forke depuis `origin/<base>` (ticket-285) sans le code de N. Conflits sur `decisions.md` et `pipeline-log.md` : committés avant le rebase (ticket-303), N+1 ne conflicte que si N est mergé et touche les mêmes lignes — même fréquence qu'aujourd'hui.
+**Alternative rejetée** : reprise au redémarrage — état à persister, disproportionné ; sémaphore global — bloque deux projets indépendants.

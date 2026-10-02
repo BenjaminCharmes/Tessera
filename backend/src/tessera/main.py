@@ -17,6 +17,7 @@ from tessera.routers import (
     observation,
     orchestrator,
     projects,
+    runs,
     services as services_router,
     tickets,
     usage,
@@ -85,6 +86,7 @@ app.include_router(services_router.router, prefix="/api/v1")
 app.include_router(agent_admin.router, prefix="/api/v1")
 app.include_router(fs.router, prefix="/api/v1")
 app.include_router(usage.router, prefix="/api/v1")
+app.include_router(runs.router, prefix="/api/v1")
 
 
 @app.get("/health")

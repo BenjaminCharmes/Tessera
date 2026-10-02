@@ -87,6 +87,26 @@ describe("RunCard — la file se déplie (ticket-179)", () => {
   });
 });
 
+describe("RunCard — titre du ticket (ticket-286)", () => {
+  it("affiche le titre sous le numéro du ticket", () => {
+    rendre(run({ ticket_titre: "Implémenter la feature X" }));
+    expect(screen.getByText("Implémenter la feature X")).toBeInTheDocument();
+  });
+
+  it("expose le titre complet dans l'attribut title", () => {
+    rendre(run({ ticket_titre: "Mon titre complet" }));
+    const elem = screen.getByTitle("Mon titre complet");
+    expect(elem).toBeInTheDocument();
+  });
+
+  it("n'affiche pas de ligne de titre si le titre est absent", () => {
+    rendre(run({ ticket_titre: undefined }));
+    // Le ticket_id est affiché mais pas de ligne de titre supplémentaire
+    expect(screen.getByText("ticket-004")).toBeInTheDocument();
+    expect(screen.queryByTitle(/./)).toBeNull();
+  });
+});
+
 describe("RunCard — coût en direct (ticket-197)", () => {
   it("montre le cout, les appels et les outils depuis l'instantane", () => {
     // Un F5 pendant le run doit retrouver le cumul, pas repartir de zéro.

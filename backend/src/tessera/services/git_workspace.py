@@ -7,6 +7,7 @@ diff (including untracked files) and commit the work.
 import asyncio
 import json
 import re
+import shutil
 import tempfile
 from collections.abc import Awaitable, Callable
 from pathlib import Path
@@ -46,6 +47,81 @@ _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS: tuple[str, ...] = tuple(
 # status changes and pipeline-log growth are Tessera's own housekeeping,
 # never the coder's work, so they must never ride under a ticket's message.
 _BOOKKEEPING_COMMIT_MESSAGE = "chore: tessera pipeline bookkeeping"
+
+# Paths that hold the run policy the orchestrator reads once before the first
+# agent. The user may edit them through the IDE while the run is in progress
+# (e.g. changing the provider in the Agents screen). Those edits must never
+# ride along with the coder's work — ticket-296, ADR-027.
+# Files are excluded from both the reviewed diff and the ticket commit;
+# they are left uncommitted in the working tree and the run logs a warning.
+_RUN_POLICY_PATHS: tuple[str, ...] = (
+    "agents.json",
+    ".claude/settings.json",
+    ".claude/settings.local.json",
+    ".github/workflows/",
+)
+
+
+def _is_orchestrator_artifact_path(path: str) -> bool:
+    """True when ``path`` belongs to Tessera's own pipeline bookkeeping.
+
+    Directory entries (ending with ``/``) match any file under them;
+    file entries match exactly, so ``memory/pipeline-log.md`` does not
+    accidentally match ``memory/pipeline-log.md.bak``.
+    """
+    for artifact in _ORCHESTRATOR_ARTIFACT_PATHS:
+        if artifact.endswith("/"):
+            if path.startswith(artifact):
+                return True
+        elif path == artifact:
+            return True
+    return False
+
+
+def _extraire_fichiers_bloques(stderr: str) -> list[str]:
+    """Extract untracked file paths that blocked a ``git rebase --abort``.
+
+    Git emits, in this order:
+        error: The following untracked working tree files would be overwritten by reset:
+            path/to/file.md
+        fatal: could not move back to <sha>
+
+    Returns the list of file paths found between the header line and the
+    ``fatal:`` line. Paths are returned as git reports them (relative to the
+    repository root, with forward slashes on all platforms).
+    """
+    fichiers: list[str] = []
+    en_section = False
+    for ligne in stderr.splitlines():
+        if "untracked working tree files" in ligne and "overwritten" in ligne:
+            en_section = True
+            continue
+        if en_section:
+            stripped = ligne.strip()
+            if stripped and not any(
+                stripped.startswith(p)
+                for p in ("fatal:", "error:", "hint:", "Please")
+            ):
+                fichiers.append(stripped)
+            else:
+                en_section = False
+    return fichiers
+
+
+def _is_run_policy_path(path: str) -> bool:
+    """True when ``path`` holds part of the run policy (ticket-296, ADR-027).
+
+    These files are read once before the pipeline starts and must never
+    appear in a ticket's commit, even when the user edits them during a run.
+    Directory entries (ending with ``/``) match any file underneath them.
+    """
+    for policy in _RUN_POLICY_PATHS:
+        if policy.endswith("/"):
+            if path.startswith(policy):
+                return True
+        elif path == policy:
+            return True
+    return False
 
 #: Lockfile names whose diff content is replaced by a one-line summary when
 #: fed to reviewing agents.  The commit itself is not affected — lockfiles are
@@ -294,6 +370,94 @@ class GitWorkspaceService:
         """
         self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
 
+    async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+        """Align ``_base_ref`` with the remote base branch before the first ticket.
+
+        Called once by the pipeline before any ``create_branch`` : sets
+        ``_base_ref`` so new ticket branches fork from the remote-synced base,
+        not from whatever HEAD happens to be checked out (ticket-285).
+
+        Returns ``None`` on success — ``_base_ref`` is now set, or the fallback
+        (local branch / HEAD) will be used by ``create_branch``.  Returns a
+        human-readable reason when the local branch has **diverged** from the
+        remote: the caller must block the run in that case.
+
+        Fall-back chain:
+        1. ``origin/<base_branch>`` fast-forward → use remote SHA.
+        2. No remote or unreachable → local ``base_branch`` ref.
+        3. No local branch either → HEAD, via ``create_branch``'s own fallback.
+        """
+        if base_branch is None and self._politique is not None:
+            base_branch = self._politique.base_branch
+        if not base_branch:
+            return None
+
+        # Attempt remote fetch
+        try:
+            await self._run("fetch", "origin", base_branch)
+        except GitCommandError:
+            # No remote or network error: use local base_branch if it exists
+            try:
+                local_sha = (
+                    await self._run("rev-parse", f"refs/heads/{base_branch}")
+                ).strip()
+                self._base_ref = local_sha
+                _logger.info(
+                    "base_ref_initialisee_locale",
+                    extra={"branch": base_branch, "sha": local_sha[:7]},
+                )
+            except GitCommandError:
+                _logger.info(
+                    "base_ref_locale_introuvable", extra={"branch": base_branch}
+                )
+            return None
+
+        # Parse FETCH_HEAD
+        try:
+            fetch_sha = (await self._run("rev-parse", "FETCH_HEAD")).strip()
+        except GitCommandError as exc:
+            _logger.warning(
+                "base_ref_fetch_head_introuvable", extra={"error": str(exc)}
+            )
+            return None
+
+        # Check for divergence against local branch
+        try:
+            sha_locale = (
+                await self._run("rev-parse", f"refs/heads/{base_branch}")
+            ).strip()
+        except GitCommandError:
+            sha_locale = None
+
+        if sha_locale is not None and sha_locale != fetch_sha:
+            proc = await asyncio.create_subprocess_exec(
+                "git", "merge-base", "--is-ancestor", sha_locale, fetch_sha,
+                cwd=str(self._project_path),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            await proc.communicate()
+            if proc.returncode != 0:
+                raison = (
+                    f"La branche locale « {base_branch} » ({sha_locale[:7]}) a divergé "
+                    f"de la base distante ({fetch_sha[:7]}) : le run est bloqué."
+                )
+                _logger.warning("base_ref_divergee", extra={"raison": raison})
+                return raison
+
+        # Fast-forward local branch ref
+        try:
+            await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
+        except GitCommandError as exc:
+            _logger.warning("base_ref_update_echoue", extra={"error": str(exc)})
+
+        self._base_ref = fetch_sha
+        _logger.info(
+            "base_ref_initialisee_distante",
+            extra={"branch": base_branch, "sha": fetch_sha[:7]},
+        )
+        return None
+
     async def sync_base_depuis_distant(self, base_branch: str) -> str | None:
         """Fetch the remote base and fast-forward the local branch to it.
 
@@ -428,11 +592,15 @@ class GitWorkspaceService:
         `tickets/` et `memory/` sont dans `.git/info/exclude`, ces exclusions
         n'étaient donc pas seulement inutiles : elles faisaient échouer le
         commit de fin de run, et donc le run entier (ticket-072).
+
+        Les fichiers de politique du run (`_RUN_POLICY_PATHS`) sont également
+        exclus : un réglage effectué dans l'IDE pendant le run ne doit jamais
+        se retrouver dans le commit du ticket (ticket-296, ADR-027).
         """
         # Boucle explicite : une compréhension contenant un `await` produit un
         # générateur asynchrone, pas un tuple.
         pathspecs: list[str] = []
-        for chemin in _ORCHESTRATOR_ARTIFACT_PATHS:
+        for chemin in (*_ORCHESTRATOR_ARTIFACT_PATHS, *_RUN_POLICY_PATHS):
             if not await self._is_ignored(chemin):
                 pathspecs.append(f":(exclude){chemin}")
         return tuple(pathspecs)
@@ -561,6 +729,9 @@ class GitWorkspaceService:
         await self._ensure_own_repository()
         if not await self._ref_existe(base):
             raise BaseIntrouvable(base)
+
+        sha_avant = (await self._run("rev-parse", "HEAD")).strip()
+
         try:
             await self._run("rebase", base)
         except GitCommandError as echec:
@@ -579,8 +750,14 @@ class GitWorkspaceService:
             await self._annuler_si_en_cours()
             raise refus
 
+        # Si tous les conflits sont des artefacts Tessera, les résoudre
+        # automatiquement en faveur de la branche (ticket-300, ADR-033).
+        if all(_is_orchestrator_artifact_path(c) for c in conflits):
+            if await self._resoudre_conflits_artefacts(conflits):
+                return ()
+
         if resolveur is None or not await self._faire_resoudre(conflits, resolveur):
-            await self._run("rebase", "--abort")
+            await self._annuler_rebase_robuste(sha_avant)
             return conflits
         return ()
 
@@ -603,6 +780,140 @@ class GitWorkspaceService:
                 await self._run("rebase", "--abort")
             except GitCommandError as exc:
                 _logger.warning("rebase_abort_failed", extra={"error": str(exc)})
+
+    async def _annuler_rebase_robuste(self, sha_avant: str) -> None:
+        """Abort the rebase even when untracked Tessera files block ``--abort``.
+
+        Sequence:
+        1. Try ``rebase --abort``.
+        2. On failure: remove any Tessera artifact paths that are blocking the
+           reset (parsed from stderr), then retry ``--abort``.
+        3. Last resort: manually remove the rebase state directory and
+           hard-reset HEAD to *sha_avant*.
+
+        Blocking paths come from git relative to the **repository root**, not
+        the project directory.  For a project with ``git_root: ancestor`` the
+        two differ (e.g. the git root is ``tessera/``, the project is
+        ``tessera/projects/ide-core/``), so the absolute path is resolved from
+        the git root and then re-expressed relative to the project before
+        calling ``_is_orchestrator_artifact_path``.
+        """
+        try:
+            await self._run("rebase", "--abort")
+            return
+        except GitCommandError as echec:
+            bloquants = _extraire_fichiers_bloques(echec.stderr)
+            artefacts_supprimes: list[str] = []
+            if bloquants:
+                git_root = await self._chemin_racine_git()
+                project_root = self._project_path.resolve()
+                for chemin_git in bloquants:
+                    abs_path = (git_root / chemin_git).resolve()
+                    try:
+                        rel = str(abs_path.relative_to(project_root)).replace("\\", "/")
+                    except ValueError:
+                        continue
+                    if _is_orchestrator_artifact_path(rel) and abs_path.is_file():
+                        abs_path.unlink()
+                        artefacts_supprimes.append(chemin_git)
+                        _logger.info(
+                            "artefact_supprime_pour_rebase_abort",
+                            extra={"chemin": chemin_git},
+                        )
+            if artefacts_supprimes:
+                try:
+                    await self._run("rebase", "--abort")
+                    return
+                except GitCommandError:
+                    pass
+
+        _logger.warning("rebase_abort_dernier_recours", extra={"sha": sha_avant[:7]})
+        await self._restaurer_depuis_sha(sha_avant)
+
+    async def _chemin_racine_git(self) -> Path:
+        """Return the absolute path of the git repository root (``--show-toplevel``)."""
+        try:
+            top = (await self._run("rev-parse", "--show-toplevel")).strip()
+            return Path(top).resolve()
+        except GitCommandError:
+            return self._project_path.resolve()
+
+    async def _restaurer_depuis_sha(self, sha: str) -> None:
+        """Remove rebase state and hard-reset the branch to *sha*.
+
+        Called only when both ``rebase --abort`` attempts have failed. Reads
+        the original branch name from ``.git/rebase-merge/head-name`` before
+        deleting the state directory so we can check it back out.
+        """
+        try:
+            git_dir_str = (await self._run("rev-parse", "--git-dir")).strip()
+            git_dir = Path(git_dir_str)
+            if not git_dir.is_absolute():
+                git_dir = self._project_path / git_dir
+            head_name_file = git_dir / "rebase-merge" / "head-name"
+            head_name = (
+                head_name_file.read_text(encoding="utf-8").strip()
+                if head_name_file.exists()
+                else None
+            )
+            for nom in ("rebase-merge", "rebase-apply"):
+                d = git_dir / nom
+                if d.exists():
+                    shutil.rmtree(str(d))
+                    _logger.info("rebase_etat_supprime", extra={"dossier": nom})
+            if head_name and head_name.startswith("refs/heads/"):
+                branch = head_name[len("refs/heads/"):]
+                try:
+                    await self._run("checkout", branch)
+                except GitCommandError:
+                    pass
+        except (GitCommandError, OSError) as exc:
+            _logger.warning("rebase_etat_suppression_echoue", extra={"erreur": str(exc)})
+        try:
+            await self._run("reset", "--hard", sha)
+        except GitCommandError as exc:
+            _logger.error("rebase_reset_hard_echoue", extra={"erreur": str(exc)})
+
+    async def _resoudre_conflits_artefacts(self, conflits: tuple[str, ...]) -> bool:
+        """Auto-resolve conflicts where all files are Tessera artifacts.
+
+        Accepts the branch version (theirs) for each conflict:
+        - UD (updated by base, deleted by branch): stage the deletion via
+          ``git rm -f``.
+        - Any other conflict: check out theirs and stage.
+
+        Also stages any untracked Tessera artifact files (e.g. a ``done/``
+        ticket the cherry-pick added alongside the conflict), so that
+        ``rebase --continue`` can create a clean commit.
+
+        Returns True when the rebase completed successfully, False on any error.
+        """
+        try:
+            for chemin in conflits:
+                status_out = await self._run("status", "--porcelain", "--", chemin)
+                code = status_out[:2] if len(status_out) >= 2 else "UU"  # noqa: PLR2004
+                if code == "UD":
+                    # Branch deleted the file; stage the deletion.
+                    await self._run("rm", "-f", "--", chemin)
+                else:
+                    await self._run("checkout", "--theirs", "--", chemin)
+                    await self._run("add", "--", chemin)
+
+            if await self._fichiers_en_conflit():
+                return False
+
+            # Stage any untracked Tessera artifacts the cherry-pick was adding
+            # (e.g. a tickets/done/ file written alongside the conflict).
+            listing = await self._run("ls-files", "--others", "--exclude-standard")
+            for untracked in listing.splitlines():
+                untracked = untracked.strip()
+                if untracked and _is_orchestrator_artifact_path(untracked):
+                    await self._run("add", "--", untracked)
+
+            await self._run("-c", "core.editor=true", "rebase", "--continue")
+            return True
+        except GitCommandError:
+            return False
 
     async def _rebase_en_cours(self) -> bool:
         """Git a-t-il un rebase à moitié appliqué sous la main ?"""
@@ -712,7 +1023,7 @@ class GitWorkspaceService:
             _logger.warning("index_non_restaure", extra={"erreur": str(exc)})
 
     async def is_clean(self) -> bool:
-        """Return True when tracked files have no staged or unstaged changes.
+        """Return True when tracked files outside Tessera's bookkeeping have no changes.
 
         Deliberately narrowed to tracked modifications (`--untracked-files=no`):
         this is now a safety net for state changed *outside* Tessera, not the
@@ -721,9 +1032,34 @@ class GitWorkspaceService:
         reports untracked files, which would refuse a first run in any
         project holding a non-ignored untracked file (build output, scratch
         notes) before anything happened.
+
+        Tessera's own bookkeeping paths (`_ORCHESTRATOR_ARTIFACT_PATHS`) are
+        excluded: `_log` writes to `memory/pipeline-log.md` and ticket files
+        are rewritten when a queue skips already-done tickets. Both are
+        committed by the run's bookkeeping commit and must not be mistaken for
+        an external modification that would block the next ticket.
         """
         status = await self._run("status", "--porcelain", "--untracked-files=no")
-        return not status.strip()
+        # `--porcelain` donne les chemins depuis la racine du dépôt. Sous
+        # `git_root: ancestor`, le journal est donc
+        # `projects/ide-core/memory/pipeline-log.md`, que la comparaison avec
+        # `memory/pipeline-log.md` ne reconnaissait pas : le ticket suivant
+        # de la file était refusé dès que la livraison journalisait après son
+        # dernier commit (ticket-301).
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        for line in status.splitlines():
+            if len(line) < 3:  # noqa: PLR2004
+                continue
+            path = line[3:]
+            if prefixe and path.startswith(prefixe):
+                path = path[len(prefixe):]
+            # Tolerates both Tessera's own bookkeeping (tickets/, pipeline-log)
+            # and run-policy files (agents.json, .claude/settings*.json,
+            # .github/workflows/) that the commit intentionally skips —
+            # their presence in the working tree must not block the next ticket.
+            if not _is_orchestrator_artifact_path(path) and not _is_run_policy_path(path):
+                return False
+        return True
 
     async def _file_had_content_in_head(self, rel_path: str) -> bool:
         """True when HEAD contains a non-empty, non-blank version of this file.
@@ -783,6 +1119,29 @@ class GitWorkspaceService:
                 emptied.append(rel_path)
         return emptied
 
+    async def _detect_modified_policy_files(self) -> list[str]:
+        """Return paths of run-policy files modified in the working tree.
+
+        These files are excluded from the ticket commit (ticket-296, ADR-027).
+        Any modification found is logged as a warning in `commit_all` so the
+        run report makes the exclusion visible, without blocking the commit.
+        """
+        try:
+            status = await self._run("status", "--porcelain", "--untracked-files=no")
+        except GitCommandError:
+            return []
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        modified: list[str] = []
+        for line in status.splitlines():
+            if len(line) < 3:  # noqa: PLR2004
+                continue
+            path = line[3:]
+            if prefixe and path.startswith(prefixe):
+                path = path[len(prefixe):]
+            if _is_run_policy_path(path):
+                modified.append(path)
+        return modified
+
     async def commit_all(self, message: str) -> str | None:
         """Commit the ticket's changes under `message`; return the short SHA.
 
@@ -795,6 +1154,12 @@ class GitWorkspaceService:
         — so the working tree ends up clean either way, which the next run's
         dirty-tree check relies on.
 
+        Run-policy files (`_RUN_POLICY_PATHS`) are also excluded: a change
+        made through the IDE during the run (e.g. updating the provider in the
+        Agents screen) must not ride along with the coder's work. They remain
+        in the working tree, uncommitted, and a warning is logged so the run
+        report makes the exclusion visible (ticket-296, ADR-027).
+
         Returns the short SHA of the ticket commit, or None if nothing
         outside bookkeeping changed (a bookkeeping-only commit may still be
         created even when this returns None).
@@ -804,6 +1169,15 @@ class GitWorkspaceService:
         removed them with ``rm`` so they disappear from the repository rather
         than staying as empty files. The commit is not blocked.
         """
+        policy_modifiees = await self._detect_modified_policy_files()
+        if policy_modifiees:
+            _logger.warning(
+                "run_policy_files_not_committed",
+                extra={
+                    "fichiers": policy_modifiees,
+                    "raison": "politique du run — modifiée pendant le run, exclue du commit du ticket",
+                },
+            )
         emptied = await self._detect_emptied_tracked_files()
         if emptied:
             _logger.warning(

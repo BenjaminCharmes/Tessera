@@ -32,6 +32,7 @@ export default function AgentPanel({
   const {
     status,
     ticketId,
+    ticketTitre,
     currentAgent,
     currentRound,
     coutUsd,
@@ -42,6 +43,7 @@ export default function AgentPanel({
     errorMessage,
     events,
     etape,
+    etapesEnCours,
     quota,
     pendingQuestion,
     questionExpireA,
@@ -85,6 +87,22 @@ export default function AgentPanel({
       ? new Date(endTs).getTime() - new Date(startTs).getTime()
       : undefined;
 
+  // Résultat de la livraison, affiché dans PipelineSummary après run_closed (ticket-279).
+  const livraisonEvent = events.find((e) => e.type === "livraison_done");
+  const livraisonData = livraisonEvent
+    ? {
+        pr_number:
+          typeof livraisonEvent.data["pr_number"] === "number"
+            ? livraisonEvent.data["pr_number"]
+            : undefined,
+        merged: livraisonEvent.data["merged"] === true,
+        arret:
+          typeof livraisonEvent.data["arret"] === "string"
+            ? livraisonEvent.data["arret"]
+            : undefined,
+      }
+    : null;
+
   return (
     <div className="flex h-full flex-col bg-zinc-900">
       {/* Header */}
@@ -92,8 +110,12 @@ export default function AgentPanel({
         <RegionTitle>
           Agents
           {ticketId && (
-            <span className="ml-2 font-normal normal-case text-zinc-600">
+            <span
+              className="ml-2 min-w-0 truncate font-normal normal-case text-zinc-600"
+              title={ticketTitre ?? undefined}
+            >
               — {ticketId}
+              {ticketTitre ? ` · ${ticketTitre}` : ""}
             </span>
           )}
         </RegionTitle>
@@ -102,7 +124,7 @@ export default function AgentPanel({
           {project && !ticketId && (
             <span className="text-xs text-zinc-600">{project.name}</span>
           )}
-          {(status === "done" || status === "error") && (
+          {(runClosed || status === "error") && (
             <button
               onClick={clear}
               title="Effacer le run"
@@ -133,7 +155,7 @@ export default function AgentPanel({
 
         {(status === "running" || status === "done") && (
           <>
-            <StageStrip etape={etape} events={events} reglages={reglages} />
+            <StageStrip etape={etape} etapesEnCours={etapesEnCours} events={events} reglages={reglages} />
             {currentRound > 0 && <RoundBadge current={currentRound} />}
             {(coutUsd > 0 || outils > 0) && (
               <p className="px-4 pb-1 text-micro text-zinc-500" data-testid="cout-du-run">
@@ -174,6 +196,7 @@ export default function AgentPanel({
                 result={lastResult}
                 durationMs={durationMs}
                 runClosed={runClosed}
+                livraisonData={livraisonData}
               />
             )}
           </>

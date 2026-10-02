@@ -120,7 +120,7 @@ async def test_decision_en_local_figure_dans_le_materiau_du_validateur(
     validator = _MockValidator()
     orch = _Orch(validator=validator, project_path=project)
 
-    approved, _ = await stages.run_validation(orch, run, "approbation reviewer")  # type: ignore[arg-type]
+    approved, _ = await stages.run_validation(orch, run)  # type: ignore[arg-type]
 
     assert approved
     assert validator.calls, "le validateur doit être appelé"
@@ -156,7 +156,7 @@ async def test_ticket_cree_figure_dans_le_materiau_du_validateur(
     validator = _MockValidator()
     orch = _Orch(validator=validator, project_path=project)
 
-    approved, _ = await stages.run_validation(orch, run, "approbation reviewer")  # type: ignore[arg-type]
+    approved, _ = await stages.run_validation(orch, run)  # type: ignore[arg-type]
 
     assert approved
     assert validator.calls
@@ -206,7 +206,7 @@ async def test_ticket_tracked_figure_dans_le_materiau_du_validateur(
     # Simulate no git diff (as on a tracked project where tickets/ is excluded)
     run.reviewed_code = ""
 
-    approved, _ = await stages.run_validation(orch, run, "approbation reviewer")  # type: ignore[arg-type]
+    approved, _ = await stages.run_validation(orch, run)  # type: ignore[arg-type]
 
     assert approved
     assert validator.calls

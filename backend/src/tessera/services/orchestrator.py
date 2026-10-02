@@ -5,6 +5,8 @@ the early exits. Keeping the flow readable in one screen is the point: the
 order of the stages, and the conditions that end a run, are the part that is
 hard to get right.
 """
+import asyncio
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from collections.abc import Awaitable, Callable
@@ -136,6 +138,7 @@ class Orchestrator:
         on_event: EventCallback,
         run_id: str | None = None,
         dialogue: DialogueChannel | None = None,
+        envelope_run_id: str | None = None,
     ) -> PipelineResult:
         """Mène le ticket, puis livre son travail si le projet le permet.
 
@@ -143,17 +146,29 @@ class Orchestrator:
         `run_autonomous` passent tous deux par cette méthode : la brancher
         ailleurs la réserverait au run unique, alors que c'est en file que
         l'absence de clic compte le plus.
+
+        ``envelope_run_id`` est l'identifiant de la ligne enveloppe créée par
+        ``executer`` pour un run en file ou autonome. Il est transmis à
+        ``RunRecorder`` pour lier la ligne par-ticket à son enveloppe
+        (ticket-280).
         """
         on_event = tolerant(on_event)
         resultat = await self._run_enregistre(
-            project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
+            project_id, ticket_id, on_event,
+            run_id=run_id, dialogue=dialogue,
+            envelope_run_id=envelope_run_id,
         )
         if not resultat.approved:
             return resultat
 
         # La documentation part sur la branche du run, avant sa livraison :
         # elle décrit ce que la PR livre, et se relit avec (ticket-198).
-        await self._documenter_le_run(resultat, on_event)
+        # Exception : les tickets légers (ticket-292) ne déclenchent pas de
+        # mise à jour immédiate — le marqueur ne bouge pas, et le prochain
+        # ticket normal documente le lot entier, léger compris.
+        ticket_approuve = await self._ticket_svc.get_ticket(ticket_id)
+        if ticket_approuve is None or not ticket_approuve.light:
+            await self._documenter_le_run(resultat, on_event)
 
         if self._livrer is None:
             return resultat
@@ -165,6 +180,10 @@ class Orchestrator:
             )
         )
         livraison = await self._livrer(resultat)
+        for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms):
+            self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
+        if livraison.arret:
+            self._log(f"[{ticket_id}] livraison: arrêt — {livraison.arret[:100]}")
         await on_event(
             OrchestratorEvent(
                 type=EventType.LIVRAISON_DONE,
@@ -181,6 +200,7 @@ class Orchestrator:
         on_event: EventCallback,
         run_id: str | None,
         dialogue: DialogueChannel | None,
+        envelope_run_id: str | None = None,
     ) -> PipelineResult:
         """Run the pipeline inside a database record, when nobody opened one.
 
@@ -194,7 +214,9 @@ class Orchestrator:
             return await self._run_pipeline(
                 project_id, ticket_id, on_event, run_id=run_id, dialogue=dialogue
             )
-        run_id = await self._run_recorder.ouvrir(project_id, ticket_id)
+        run_id = await self._run_recorder.ouvrir(
+            project_id, ticket_id, parent_run_id=envelope_run_id
+        )
         resultat: PipelineResult | None = None
         try:
             resultat = await self._run_pipeline(
@@ -236,7 +258,9 @@ class Orchestrator:
         if refused is not None:
             return refused
 
-        await stages.create_branch(self, run)
+        refused = await stages.create_branch(self, run)
+        if refused is not None:
+            return refused
         stages.take_artifact_snapshot(self, run)
         await set_status(self, run, TicketStatus.in_progress)
         run.carte_du_depot = await self._carte()
@@ -304,18 +328,32 @@ class Orchestrator:
             if run.stop_requested:
                 return await outcomes.finish_stopped(self, run)
 
-            approved, reason, raw_verdict = await stages.run_review(self, run, context)
+            # Reviewer et validateur tournent en parallèle — la sécurité leur
+            # est commune, mais aucun ne dépend de l'autre (ticket-289).
+            (rev_approved, rev_reason, raw_verdict), (val_approved, val_reason) = (
+                await asyncio.gather(
+                    stages.run_review(self, run, context),
+                    stages.run_validation(self, run),
+                )
+            )
 
-            if approved:
-                # Le validateur peut court-circuiter l'approbation du reviewer.
-                approved, reason = await stages.run_validation(self, run, reason)
-
+            approved = rev_approved and val_approved
             if approved:
                 return await outcomes.finish_approved(self, run)
 
-            run.review_feedback.append(reason or raw_verdict[:500])
+            # Nommer l'auteur quand les deux refusent : le codeur voit un seul
+            # feedback au tour suivant, et il doit savoir qui objecte quoi.
+            feedback_parts: list[str] = []
+            if not rev_approved:
+                rev_feedback = rev_reason or raw_verdict[:500]
+                feedback_parts.append(f"Reviewer : {rev_feedback}")
+            if not val_approved:
+                feedback_parts.append(f"Validateur : {val_reason}")
+            feedback = "\n\n".join(feedback_parts) if feedback_parts else raw_verdict[:500]
+
+            run.review_feedback.append(feedback)
             self._log(
-                f"[{ticket_id}] CHANGES_REQUESTED tour {round_num}: {(reason or '')[:100]}"
+                f"[{ticket_id}] CHANGES_REQUESTED tour {round_num}: {feedback[:100]}"
             )
 
         return await outcomes.finish_rounds_exhausted(self, run)
@@ -347,6 +385,7 @@ class Orchestrator:
         ticket_ids: list[str],
         on_event: EventCallback | None = None,
         dialogue: "DialogueChannel | None" = None,
+        envelope_run_id: str | None = None,
     ) -> list[PipelineResult]:
         """Enchaîne une sélection de tickets, dans l'ordre demandé.
 
@@ -407,7 +446,8 @@ class Orchestrator:
             )
 
             result = await self.run_pipeline(
-                project_id, ticket_id, callback, dialogue=dialogue
+                project_id, ticket_id, callback, dialogue=dialogue,
+                envelope_run_id=envelope_run_id,
             )
             results.append(result)
 
@@ -417,6 +457,34 @@ class Orchestrator:
                 )
                 break
 
+            # Un ticket approuvé dont la livraison n'a pas mergé peut bloquer
+            # un ticket suivant qui en dépend : démarrer sur la pointe du
+            # ticket non mergé le contaminerait (ticket-302).
+            if (
+                result.livraison is not None
+                and not result.livraison.merged
+                and result.livraison.pr_number is not None
+            ):
+                restants = ticket_ids[index:]
+                bloquant = await _trouver_bloquant(
+                    self._ticket_svc, ticket_id, restants, result.livraison.pr_number
+                )
+                if bloquant is not None:
+                    arret, _ = bloquant
+                    self._log(f"[{project_id}] file interrompue : {arret}")
+                    livraison_avec_arret = Livraison(
+                        etapes=result.livraison.etapes,
+                        durees_ms=result.livraison.durees_ms,
+                        arret=arret,
+                        conflits=result.livraison.conflits,
+                        pr_number=result.livraison.pr_number,
+                        merged=result.livraison.merged,
+                    )
+                    results[-1] = result.model_copy(
+                        update={"livraison": livraison_avec_arret}
+                    )
+                    break
+
         return results
 
     async def run_autonomous(
@@ -424,6 +492,7 @@ class Orchestrator:
         project_id: str,
         max_tickets: int = 5,
         on_event: EventCallback | None = None,
+        envelope_run_id: str | None = None,
     ) -> list[PipelineResult]:
         async def _noop(event: OrchestratorEvent) -> None:
             pass
@@ -477,7 +546,10 @@ class Orchestrator:
             ticket = await self.pick_next_ticket(project_id)
             if ticket is None:
                 break
-            result = await self.run_pipeline(project_id, ticket.id, callback)
+            result = await self.run_pipeline(
+                project_id, ticket.id, callback,
+                envelope_run_id=envelope_run_id,
+            )
             results.append(result)
 
         return results
@@ -503,10 +575,14 @@ class Orchestrator:
                 ticket_id=resultat.ticket_id,
             )
         )
+        t0 = time.monotonic()
         try:
             doc = await self._documenter()
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("documentation_echouee", extra={"erreur": str(exc)})
+            self._log(
+                f"[{resultat.ticket_id}] documentation: échec — {str(exc)[:80]}"
+            )
             await on_event(
                 OrchestratorEvent(
                     type=EventType.DOCUMENTATION_FAILED,
@@ -515,7 +591,11 @@ class Orchestrator:
                 )
             )
             return
+        doc_ms = int((time.monotonic() - t0) * 1000)
         fichiers = list(getattr(doc, "fichiers_modifies", []) or [])
+        self._log(
+            f"[{resultat.ticket_id}] documentation: {len(fichiers)} fichier(s) ({doc_ms}ms)"
+        )
         refus = list(getattr(doc, "refus", []) or [])
         tickets = list(getattr(doc, "tickets", []) or [])
         tronque = bool(getattr(doc, "tronque", False))
@@ -563,6 +643,27 @@ __all__ = [
     "OrchestratorEvent",
     "PipelineResult",
 ]
+
+
+async def _trouver_bloquant(
+    ticket_svc: TicketService,
+    ticket_id: str,
+    restants: list[str],
+    pr_number: int,
+) -> tuple[str, str] | None:
+    """Find the first remaining ticket that depends on an unmerged ticket.
+
+    Returns ``(arret_message, dep_ticket_id)`` when a ticket in ``restants``
+    declares ``ticket_id`` in its ``depends_on``, ``None`` otherwise.
+    """
+    for tid_dep in restants:
+        ticket_dep = await ticket_svc.get_ticket(tid_dep)
+        if ticket_dep is not None and ticket_id in ticket_dep.depends_on:
+            return (
+                f"{tid_dep} dépend de {ticket_id} dont la PR #{pr_number} n'a pas été mergée",
+                tid_dep,
+            )
+    return None
 
 
 def _echec_de_tests(run: "PipelineRun") -> str:

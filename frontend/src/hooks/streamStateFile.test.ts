@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { applyEvent, INITIAL } from "./streamState";
-import type { OrchestratorEvent } from "../types/api";
+import { applyEvent, etatDepuisRun, INITIAL } from "./streamState";
+import type { OrchestratorEvent, RunActif } from "../types/api";
 import type { EntreeSecurite, EntreeValidateur } from "./streamState";
 
 function ev(over: Partial<OrchestratorEvent>): OrchestratorEvent {
@@ -29,9 +29,23 @@ function apresLePremierTicket() {
 }
 
 describe("applyEvent — un ticket de file n'hérite pas du précédent (ticket-180)", () => {
-  it("oublie les événements du ticket précédent", () => {
+  it("remet les entries à zéro pour le nouveau ticket", () => {
     // Le bloc reviewer de ticket-012 restait affiché sous le codeur de
-    // ticket-013, verdict APPROVED compris.
+    // ticket-013, verdict APPROVED compris — c'est `entries` qui pilote
+    // l'affichage, pas `events`.
+    const avant = apresLePremierTicket();
+
+    const apres = applyEvent(
+      avant,
+      ev({ type: "queue_progress", ticket_id: "ticket-013", data: { index: 2, total: 3 } }),
+    );
+
+    expect(apres.entries).toEqual([]);
+  });
+
+  it("garde les événements des tickets précédents dans la file (ticket-283)", () => {
+    // `events` alimente le Pipeline log : effacer l'historique d'un ticket
+    // précédent efface son journal de la vue, alors que c'est un seul run.
     const avant = apresLePremierTicket();
 
     const apres = applyEvent(
@@ -41,7 +55,7 @@ describe("applyEvent — un ticket de file n'hérite pas du précédent (ticket-
 
     expect(
       apres.events.some((e) => e.type === "agent_done" && e.agent === "reviewer"),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("oublie l'agent courant et le tour du ticket précédent", () => {
@@ -206,6 +220,22 @@ describe("applyEvent — entrées securite et validateur dans le fil (ticket-257
   });
 });
 
+describe("applyEvent — run_closed remet etape a null (ticket-279)", () => {
+  it("etape vaut null apres run_closed suite a livraison_started", () => {
+    let s = applyEvent(INITIAL, ev({ type: "livraison_started" }));
+    expect(s.etape).toBe("livraison");
+    s = applyEvent(s, ev({ type: "run_closed" }));
+    expect(s.etape).toBeNull();
+  });
+
+  it("etape vaut null apres run_closed suite a documentation_started", () => {
+    let s = applyEvent(INITIAL, ev({ type: "documentation_started" }));
+    expect(s.etape).toBe("documentation");
+    s = applyEvent(s, ev({ type: "run_closed" }));
+    expect(s.etape).toBeNull();
+  });
+});
+
 describe("applyEvent — coût en direct (ticket-197)", () => {
   it("cumule le coût et compte les appels, et remet les outils à zéro par agent", () => {
     let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "codeur", data: {} }));
@@ -218,5 +248,60 @@ describe("applyEvent — coût en direct (ticket-197)", () => {
     s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "APPROVED", cost_usd: 0.2 } }));
     expect(s.coutUsd).toBeCloseTo(0.6);
     expect(s.appels).toBe(2);
+  });
+});
+
+describe("applyEvent — etapesEnCours pour le parallélisme (ticket-290)", () => {
+  it("ajoute revue et validation à etapesEnCours quand les deux démarrent", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "agent_started", agent: "reviewer", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "validation_started", data: {} }));
+
+    expect(s.etapesEnCours).toContain("revue");
+    expect(s.etapesEnCours).toContain("validation");
+  });
+
+  it("retire validation de etapesEnCours après validation_done, laisse revue", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "agent_started", agent: "reviewer", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "validation_started", data: {} }));
+    s = applyEvent(s, ev({ type: "validation_done", data: { approved: true, criteria: [] } }));
+
+    expect(s.etapesEnCours).not.toContain("validation");
+    expect(s.etapesEnCours).toContain("revue");
+  });
+});
+
+describe("etatDepuisRun — lecture de etapes_en_cours (ticket-290)", () => {
+  const baseRun: RunActif = {
+    run_id: "r1",
+    project_id: "proj",
+    mode: "single",
+    ticket_id: "ticket-290",
+    etape: "revue",
+    agent: "reviewer",
+    tour: 1,
+    tokens_entree: 0,
+    tokens_sortie: 0,
+    cout_usd: 0,
+    verdict: null,
+    demarre_a: new Date().toISOString(),
+  };
+
+  it("lit etapes_en_cours depuis l'instantané quand présent", () => {
+    const run: RunActif = { ...baseRun, etapes_en_cours: ["revue", "validation"] };
+    const s = etatDepuisRun(run);
+    expect(s.etapesEnCours).toEqual(["revue", "validation"]);
+  });
+
+  it("retombe sur [etape] quand etapes_en_cours est absent", () => {
+    const s = etatDepuisRun(baseRun);
+    expect(s.etapesEnCours).toEqual(["revue"]);
+  });
+
+  it("retombe sur [] quand etapes_en_cours est absent et etape est null", () => {
+    const run: RunActif = { ...baseRun, etape: null };
+    const s = etatDepuisRun(run);
+    expect(s.etapesEnCours).toEqual([]);
   });
 });

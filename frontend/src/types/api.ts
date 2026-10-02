@@ -166,7 +166,11 @@ export interface RunActif {
   project_id: string;
   mode: string;
   ticket_id: string | null;
+  /** Titre lisible du ticket en cours (ticket-286). Absent sur un backend ancien. */
+  ticket_titre?: string | null;
   etape: string | null;
+  /** Étapes actives en parallèle — livré par ticket-289. Absent sur un backend ancien. */
+  etapes_en_cours?: string[] | null;
   agent: AgentRole | null;
   tour: number;
   tokens_entree: number;
@@ -530,6 +534,14 @@ export interface UsageStats {
   per_project: BreakdownLine[];
   quality: RunQuality;
   recent_runs: RecentRun[];
+}
+
+/** Un événement d'un run terminé, renvoyé par GET /runs/{id}/events (ticket-280). */
+export interface RunEvent {
+  type: EventType;
+  agent: string | null;
+  data: Record<string, unknown>;
+  timestamp: string;
 }
 
 /** Un agent tel que ce projet le configure (ticket-080). */

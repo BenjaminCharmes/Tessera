@@ -7,6 +7,7 @@ import {
 } from "../../design/icons";
 import TokenStream from "../AgentPanel/TokenStream";
 import VerdictBanner from "../AgentPanel/VerdictBanner";
+import { verdictDuReviewer } from "./verdict";
 import type {
   EntreeFil,
   PassageAgent,
@@ -15,20 +16,85 @@ import type {
 } from "../../hooks/streamState";
 
 // ---------------------------------------------------------------------------
-// EntreePipeline — passage d'un agent (codeur ou reviewer)
+// EnteteVerdict — en-tête commun à toutes les cartes du fil du run
 // ---------------------------------------------------------------------------
 
-/** Résumé court affiché dans l'en-tête d'une entrée repliée. */
-function resumePassage(entry: PassageAgent): string {
-  if (entry.agent === "reviewer") {
-    if (!entry.content) return "";
-    const approved =
-      entry.content.includes("APPROVED") &&
-      !entry.content.includes("CHANGES_REQUESTED");
-    return approved ? "APPROVED" : "CHANGES_REQUESTED";
-  }
-  return entry.content.split("\n").find((l) => l.trim()) ?? "";
+/** Formate une durée en millisecondes : "2 min 50 s" ou "45 s". */
+function formatDuree(ms: number): string {
+  const s = Math.round(ms / 1000);
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  return m > 0 ? `${m} min ${rem} s` : `${s} s`;
 }
+
+interface EnteteVerdictProps {
+  label: string;
+  approved: boolean;
+  verdictText: string;
+  loading?: boolean;
+  peutBasculer: boolean;
+  ouvert: boolean;
+  onToggle?: () => void;
+}
+
+/**
+ * En-tête partagé par les quatre types de cartes dans le fil du run.
+ *
+ * Affiche : nom de l'agent | icône + verdict + chevron (si repliable)
+ * ou points animés (si le traitement est en cours).
+ */
+function EnteteVerdict({
+  label,
+  approved,
+  verdictText,
+  loading = false,
+  peutBasculer,
+  ouvert,
+  onToggle,
+}: EnteteVerdictProps) {
+  return (
+    <button
+      type="button"
+      disabled={!peutBasculer}
+      onClick={() => peutBasculer && onToggle?.()}
+      aria-expanded={ouvert}
+      className="flex w-full items-center gap-2 px-3 py-2 bg-zinc-800 text-xs font-semibold text-zinc-300 text-left disabled:cursor-default"
+    >
+      <span>{label}</span>
+
+      {loading ? (
+        <span className="ml-auto flex gap-0.5">
+          {[0, 150, 300].map((delay) => (
+            <span
+              key={delay}
+              className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce"
+              style={{ animationDelay: `${delay}ms` }}
+            />
+          ))}
+        </span>
+      ) : (
+        <span
+          className={`ml-auto flex items-center gap-1 font-normal ${
+            approved ? "text-green-400" : "text-red-400"
+          }`}
+        >
+          {approved ? <IconCheck size={12} /> : <IconCross size={12} />}
+          <span>{verdictText}</span>
+          {peutBasculer &&
+            (ouvert ? (
+              <IconChevronDown size={12} />
+            ) : (
+              <IconChevronRight size={12} />
+            ))}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// EntreePipeline — passage d'un agent (codeur ou reviewer)
+// ---------------------------------------------------------------------------
 
 interface EntreePipelineProps {
   entry: PassageAgent;
@@ -40,63 +106,38 @@ interface EntreePipelineProps {
  */
 function EntreePipeline({ entry, isLast }: EntreePipelineProps) {
   const [expanded, setExpanded] = useState(false);
-
   const ouvert = isLast || expanded;
   const peutBasculer = entry.isDone && !isLast;
+  const loading = isLast && !entry.isDone;
 
   const approved =
-    entry.agent === "reviewer" &&
-    entry.content.includes("APPROVED") &&
-    !entry.content.includes("CHANGES_REQUESTED");
+    entry.agent === "reviewer"
+      ? verdictDuReviewer(entry.content) === "APPROVED"
+      : true;
 
-  const resume = resumePassage(entry);
+  let verdictText: string;
+  if (entry.agent === "reviewer") {
+    verdictText = approved ? "APPROVED" : "CHANGES_REQUESTED";
+  } else if (peutBasculer && entry.duration_ms !== undefined) {
+    verdictText = `terminé · ${formatDuree(entry.duration_ms)}`;
+  } else {
+    verdictText = "terminé";
+  }
 
   return (
     <div
       className="mx-3 mb-3 rounded-sm border border-zinc-700 overflow-hidden"
       data-testid="entree-pipeline"
     >
-      <button
-        type="button"
-        disabled={!peutBasculer}
-        onClick={() => peutBasculer && setExpanded((v) => !v)}
-        aria-expanded={ouvert}
-        className="flex w-full items-center gap-2 px-3 py-2 bg-zinc-800 text-xs font-semibold text-zinc-300 text-left disabled:cursor-default"
-      >
-        <span>{entry.agent.toUpperCase()}</span>
-
-        {/* Entrée terminée et repliable : résumé + chevron. */}
-        {peutBasculer && (
-          <span
-            className={`ml-auto flex items-center gap-1 font-normal ${
-              approved ? "text-green-400" : "text-zinc-400"
-            }`}
-          >
-            {resume && <span className="max-w-48 truncate">{resume}</span>}
-            {ouvert ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />}
-          </span>
-        )}
-
-        {/* Entrée en cours : points de chargement. */}
-        {isLast && !entry.isDone && (
-          <span className="ml-auto flex gap-0.5">
-            {[0, 150, 300].map((delay) => (
-              <span
-                key={delay}
-                className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce"
-                style={{ animationDelay: `${delay}ms` }}
-              />
-            ))}
-          </span>
-        )}
-
-        {/* Dernière entrée, terminée. */}
-        {isLast && entry.isDone && (
-          <span className="ml-auto flex items-center gap-1 font-normal text-green-400">
-            <IconCheck size={12} /> terminé
-          </span>
-        )}
-      </button>
+      <EnteteVerdict
+        label={entry.agent.toUpperCase()}
+        approved={approved}
+        verdictText={verdictText}
+        loading={loading}
+        peutBasculer={peutBasculer}
+        ouvert={ouvert}
+        onToggle={() => setExpanded((v) => !v)}
+      />
 
       {ouvert && (
         <div className="p-3">
@@ -140,25 +181,14 @@ function EntreeSecuriteView({ entry, isLast }: EntreeSecuriteViewProps) {
       className="mx-3 mb-3 rounded-sm border border-zinc-700 overflow-hidden"
       data-testid="entree-pipeline"
     >
-      <button
-        type="button"
-        disabled={!peutBasculer}
-        onClick={() => peutBasculer && setExpanded((v) => !v)}
-        aria-expanded={ouvert}
-        className="flex w-full items-center gap-2 px-3 py-2 bg-zinc-800 text-xs font-semibold text-zinc-300 text-left disabled:cursor-default"
-      >
-        <span>SÉCURITÉ</span>
-        <span
-          className={`ml-auto flex items-center gap-1 font-normal ${
-            approved ? "text-green-400" : "text-red-400"
-          }`}
-        >
-          {approved ? <IconCheck size={12} /> : <IconCross size={12} />}
-          <span>{entry.verdict}</span>
-          {peutBasculer &&
-            (ouvert ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />)}
-        </span>
-      </button>
+      <EnteteVerdict
+        label="SÉCURITÉ"
+        approved={approved}
+        verdictText={entry.verdict}
+        peutBasculer={peutBasculer}
+        ouvert={ouvert}
+        onToggle={() => setExpanded((v) => !v)}
+      />
 
       {ouvert && entry.summary && (
         <div className="p-3 text-xs text-zinc-400">{entry.summary}</div>
@@ -187,25 +217,14 @@ function EntreeValidateurView({ entry, isLast }: EntreeValidateurViewProps) {
       className="mx-3 mb-3 rounded-sm border border-zinc-700 overflow-hidden"
       data-testid="entree-pipeline"
     >
-      <button
-        type="button"
-        disabled={!peutBasculer}
-        onClick={() => peutBasculer && setExpanded((v) => !v)}
-        aria-expanded={ouvert}
-        className="flex w-full items-center gap-2 px-3 py-2 bg-zinc-800 text-xs font-semibold text-zinc-300 text-left disabled:cursor-default"
-      >
-        <span>VALIDATEUR</span>
-        <span
-          className={`ml-auto flex items-center gap-1 font-normal ${
-            approved ? "text-green-400" : "text-red-400"
-          }`}
-        >
-          {approved ? <IconCheck size={12} /> : <IconCross size={12} />}
-          <span>{entry.verdict}</span>
-          {peutBasculer &&
-            (ouvert ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />)}
-        </span>
-      </button>
+      <EnteteVerdict
+        label="VALIDATEUR"
+        approved={approved}
+        verdictText={entry.verdict}
+        peutBasculer={peutBasculer}
+        ouvert={ouvert}
+        onToggle={() => setExpanded((v) => !v)}
+      />
 
       {ouvert && (
         <div className="p-3">

@@ -4,15 +4,28 @@ Les tests de `test_orchestrator.py` exercent l'enchaînement complet. Ceux-ci
 exercent chaque étape isolément : c'est ce que la décomposition rend possible,
 et ce qui permet de couvrir un cas limite sans monter tout un pipeline.
 """
+import asyncio
 from pathlib import Path
 
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import pipeline_stages as stages
-from tessera.services.git_workspace import GitCommandError
+from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
+
+
+async def _git(cwd: Path, *args: str) -> None:
+    """Helper: run a git command in a test fixture repo."""
+    proc = await asyncio.create_subprocess_exec(
+        "git", *args,
+        cwd=str(cwd),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _, stderr = await proc.communicate()
+    assert proc.returncode == 0, stderr.decode()
 
 
 def _ticket(**kwargs: object) -> Ticket:
@@ -123,6 +136,40 @@ async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> No
     assert await stages.ensure_clean_tree(_Orch(_git_workspace=_BrokenGit()), _run()) is None
 
 
+async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie(
+    tmp_path: Path,
+) -> None:
+    """A queue that skips done tickets must not block the next real ticket (ticket-278).
+
+    `run_queue` calls `_log` for each skipped ticket, which appends to
+    `memory/pipeline-log.md`.  When `ensure_clean_tree` runs for the next
+    ticket, only the pipeline log is dirty — a modification the orchestrator
+    made itself.  It must be treated as clean.
+    """
+    root = tmp_path / "projet"
+    root.mkdir()
+    await _git(root, "init", "-q")
+    await _git(root, "config", "user.email", "test@tessera.local")
+    await _git(root, "config", "user.name", "Tessera test")
+
+    # Track README and pipeline log so both appear in the index.
+    (root / "README.md").write_text("# projet\n", encoding="utf-8")
+    (root / "memory").mkdir()
+    (root / "memory" / "pipeline-log.md").write_text("# log\n", encoding="utf-8")
+    await _git(root, "add", "README.md", "memory/pipeline-log.md")
+    await _git(root, "commit", "-q", "-m", "init")
+
+    # Simulate what _log writes when run_queue skips already-done tickets.
+    (root / "memory" / "pipeline-log.md").write_text(
+        "# log\n- ticket-006 saute : deja termine\n", encoding="utf-8"
+    )
+
+    workspace = GitWorkspaceService(root)
+    result = await stages.ensure_clean_tree(_Orch(_git_workspace=workspace), _run())
+
+    assert result is None, "Le journal modifie par _log ne doit pas bloquer le ticket suivant"
+
+
 # ------------------------------------------------------------------
 # create_branch
 # ------------------------------------------------------------------
@@ -131,6 +178,9 @@ async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> No
 async def test_create_branch_degrade_sans_depot_git() -> None:
     # Un projet sans dépôt git reste utilisable : on continue sans branche.
     class _NoRepoGit:
+        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+            return None
+
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             raise GitCommandError(command=["git", "checkout"], returncode=128, stderr="not a repo")
 
@@ -142,6 +192,9 @@ async def test_create_branch_degrade_sans_depot_git() -> None:
 
 async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
     class _Git:
+        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+            return None
+
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             return f"{ticket_id}-slug"
 
@@ -273,7 +326,97 @@ async def test_une_panne_du_validateur_demande_des_changements() -> None:
     run = _run(events)
     orch = _Orch(_validator=_ValidateurEnPanne())
 
-    approved, reason = await stages.run_validation(orch, run, "")
+    approved, reason = await stages.run_validation(orch, run)
 
     assert approved is False
     assert "provider down" in reason
+
+
+async def test_run_validation_sans_validateur_approuve_avec_raison_vide() -> None:
+    # run_validation est maintenant indépendante : sans validateur elle rend
+    # (True, "") et non plus (True, reason_du_reviewer) (ticket-289).
+    run = _run()
+    orch = _Orch()
+
+    approved, reason = await stages.run_validation(orch, run)
+
+    assert approved is True
+    assert reason == ""
+
+
+# ------------------------------------------------------------------
+# RunActif.en_dict — etapes_en_cours (ticket-289)
+# ------------------------------------------------------------------
+
+
+def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
+    from tessera.services.run_registry import RunActif
+
+    run = RunActif(run_id="r1", project_id="p1")
+    d = run.en_dict()
+
+    assert "etapes_en_cours" in d
+    assert d["etapes_en_cours"] == []
+
+
+def test_en_dict_expose_les_etapes_en_cours() -> None:
+    from tessera.services.run_registry import RunActif
+
+    run = RunActif(run_id="r1", project_id="p1")
+    run.etapes_en_cours = ["revue", "validation"]
+    d = run.en_dict()
+
+    assert d["etapes_en_cours"] == ["revue", "validation"]
+
+
+def test_suivre_ajoute_revue_et_validation_dans_etapes_en_cours() -> None:
+    """_suivre tracks both stages when reviewer and validator run concurrently."""
+    from tessera.models.agent import AgentRole
+    from tessera.services.pipeline_events import EventType, OrchestratorEvent
+    from tessera.services.run_executor import _suivre
+    from tessera.services.run_registry import RunActif
+
+    run_actif = RunActif(run_id="r1", project_id="p1")
+
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.AGENT_STARTED,
+            agent=AgentRole.reviewer,
+            ticket_id="ticket-001",
+            data={"round": 1},
+        ),
+    )
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.VALIDATION_STARTED,
+            ticket_id="ticket-001",
+            data={},
+        ),
+    )
+
+    assert "revue" in run_actif.etapes_en_cours
+    assert "validation" in run_actif.etapes_en_cours
+    assert run_actif.en_dict()["etapes_en_cours"] == ["revue", "validation"]
+
+    # Les étapes disparaissent quand les événements DONE arrivent.
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.VALIDATION_DONE,
+            ticket_id="ticket-001",
+            data={"verdict": "APPROVED"},
+        ),
+    )
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.AGENT_DONE,
+            agent=AgentRole.reviewer,
+            ticket_id="ticket-001",
+            data={"cost_usd": 0.0, "duration_ms": 100},
+        ),
+    )
+
+    assert run_actif.etapes_en_cours == []

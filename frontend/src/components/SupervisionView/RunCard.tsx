@@ -94,9 +94,22 @@ export default function RunCard({
             {estUnChat ? "conversation" : (run.ticket_id ?? "—")}
           </span>
           <span className="shrink-0 text-micro tabular-nums text-zinc-500">
-            <Chrono depuis={run.demarre_a} />
+            <Chrono
+              depuis={run.demarre_a}
+              termineA={etat.events.find((e) => e.type === "run_closed")?.timestamp}
+            />
           </span>
         </span>
+
+        {/* Titre du ticket sous le numéro (ticket-286). */}
+        {!estUnChat && run.ticket_titre ? (
+          <span
+            className="mt-0.5 block truncate text-micro text-zinc-500"
+            title={run.ticket_titre}
+          >
+            {run.ticket_titre}
+          </span>
+        ) : null}
 
         {/* Lu depuis le réseau : un backend plus ancien n'envoie pas encore
             ces champs, et une carte ne doit pas disparaître pour ça.

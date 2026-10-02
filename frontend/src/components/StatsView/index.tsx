@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
@@ -13,11 +13,12 @@ import {
   formatDurationMs,
   formatUsd,
 } from "../../design/charts/palette";
-import type { StatsPeriod, UsageStats } from "../../types/api";
+import type { RecentRun, StatsPeriod, UsageStats } from "../../types/api";
 import Card from "./Card";
 import KpiRow from "./KpiRow";
 import QualityCard from "./QualityCard";
 import RecentRuns from "./RecentRuns";
+import RunHistorique from "./RunHistorique";
 
 /**
  * Le tableau de statistiques — ticket-201. Remplace la ventilation seule de
@@ -42,6 +43,18 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
   const fetcher = useMemo(() => () => api.usage.stats(days, projectId), [days, projectId]);
   // Une lecture qui échoue vaut « pas de donnée » : la vue le dit.
   const { data, loading } = useResource<UsageStats | null>(fetcher, null);
+  // Le run sélectionné dans l'historique — ouvre sa vue en lecture seule (ticket-281).
+  const [selectedRun, setSelectedRun] = useState<RecentRun | null>(null);
+
+  if (selectedRun) {
+    return (
+      <RunHistorique
+        runId={selectedRun.id}
+        ticketId={selectedRun.ticket_id}
+        onClose={() => setSelectedRun(null)}
+      />
+    );
+  }
 
   return (
     <div className="flex h-full flex-col bg-zinc-950">
@@ -61,13 +74,18 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
             pipeline exécuté.
           </p>
         )}
-        {data && <Dashboard data={data} />}
+        {data && <Dashboard data={data} onSelectRun={setSelectedRun} />}
       </div>
     </div>
   );
 }
 
-function Dashboard({ data }: { data: UsageStats }) {
+interface DashboardProps {
+  data: UsageStats;
+  onSelectRun: (run: RecentRun) => void;
+}
+
+function Dashboard({ data, onSelectRun }: DashboardProps) {
   const labels = data.daily.map((p) => formatDay(p.day));
   const global = data.project_id === null;
   return (
@@ -140,7 +158,7 @@ function Dashboard({ data }: { data: UsageStats }) {
       </div>
 
       <Card title="Runs récents" aside={`${data.recent_runs.length} derniers`}>
-        <RecentRuns runs={data.recent_runs} showProject={global} />
+        <RecentRuns runs={data.recent_runs} showProject={global} onSelect={onSelectRun} />
       </Card>
     </div>
   );

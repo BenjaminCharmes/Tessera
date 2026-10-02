@@ -18,9 +18,11 @@ import { filtrerParStatut } from "../lib/filtresTickets";
 import { PANNEAUX } from "../components/Sidebar/panels";
 import type { SidebarPanel } from "../components/Sidebar/panels";
 import { projetsEnAttente } from "../components/Sidebar/projetsEnAttente";
-import type { Project, StatsPeriod, Ticket, TicketStatus } from "../types/api";
+import type { Project, RunActif, OrchestratorEvent, StatsPeriod, Ticket, TicketStatus } from "../types/api";
 import { api } from "../lib/api";
 import { vueDuCentre } from "../vueDuCentre";
+import type { VueCentre } from "../vueDuCentre";
+import type { StreamState } from "./streamState";
 
 /**
  * Returns the panel to activate when the user selects a project from the
@@ -45,6 +47,48 @@ export function porteeEffectiveFor(
   statsPortee: "projet" | "tous",
 ): "projet" | "tous" {
   return project === null ? "tous" : statsPortee;
+}
+
+/**
+ * Indique si « Revenir au run en cours » doit être proposé — ticket-283.
+ *
+ * Avant ticket-283, le calcul était `runEnCours && !runAuPremierPlan`. Ouvrir
+ * un fichier ou un diff ne remettait pas `runAuPremierPlan` à faux : le bouton
+ * restait caché alors qu'un run tournait derrière l'éditeur ou le diff.
+ */
+export function runCachePour(runEnCours: boolean, vueCentre: VueCentre): boolean {
+  return runEnCours && vueCentre !== "run";
+}
+
+/**
+ * Next `showKanban` value after the user clicks the board toggle — ticket-287.
+ *
+ * The decision is based on the currently *displayed* view, not on the raw
+ * `showKanban` flag.  When the board is showing, the toggle returns to the
+ * editor; from any other view (run, editor, diff) it opens the board.
+ *
+ * This avoids the situation where `showKanban` is already `true` while the
+ * run occupies the foreground: a first click would have flipped it to `false`
+ * and shown the editor instead of the board.
+ */
+export function prochainEtatKanban(vueCentre: VueCentre): boolean {
+  return vueCentre !== "kanban";
+}
+
+/**
+ * Événements à afficher dans le Pipeline log — ticket-283.
+ *
+ * Quand l'utilisateur a sélectionné un run dans la Supervision, c'est celui-là
+ * qu'on affiche — sinon les événements du projet actif.
+ */
+export function eventsAffichiesFor(
+  selection: string | null,
+  runs: RunActif[],
+  etatDe: (runId: string) => StreamState,
+  streamEvents: OrchestratorEvent[],
+): OrchestratorEvent[] {
+  const run = selection ? (runs.find((r) => r.run_id === selection) ?? null) : null;
+  return run ? etatDe(run.run_id).events : streamEvents;
 }
 
 /**
@@ -266,8 +310,11 @@ export function useCockpit() {
         running,
         runningRound: stream.currentRound,
         maxRounds: stream.maxRounds,
-        showKanban,
-        runCache: runEnCours && !runAuPremierPlan,
+        // L'état actif du bouton se lit depuis la vue affichée, pas depuis
+        // showKanban : quand le run est au premier plan avec showKanban=true,
+        // le bouton ne doit pas paraître actif (ticket-287).
+        showKanban: vueCentre === "kanban",
+        runCache: runCachePour(runEnCours, vueCentre),
         filtres,
         total: filtrage.total,
         agents: agentsDesTickets,
@@ -313,10 +360,14 @@ export function useCockpit() {
         onToggleKanban: () => {
           // Un fichier ouvert gardait la main sur le centre : basculer la vue
           // ne produisait rien tant qu'on ne l'avait pas refermé (ticket-073).
+          // La décision part de la vue affichée, pas de showKanban : quand le
+          // run occupait le premier plan avec showKanban=true, l'ancienne
+          // logique (!v) passait showKanban à false et montrait l'éditeur
+          // au lieu du tableau (ticket-287).
           setOpenFilePath(null);
           setShowDiff(false);
           setRunAuPremierPlan(false);
-          setShowKanban((v) => !v);
+          setShowKanban(prochainEtatKanban(vueCentre));
         },
         onChangeFiltres: setFiltres,
         onCreated: (t: Ticket) => {
@@ -384,8 +435,39 @@ export function useCockpit() {
       onSelectTicket: handleSelectTicket,
       onRunPipeline: handleRunPipeline,
       onChangeStatus: handleChangeStatus,
+      selection,
+      queueEnCours: runEnCours,
+      onToggleQueue: (ticketId: string) =>
+        setSelection((prec) =>
+          prec.includes(ticketId)
+            ? prec.filter((t) => t !== ticketId)
+            : [...prec, ticketId],
+        ),
+      onRunQueue: () => {
+        setRunAuPremierPlan(true);
+        void demanderPermissionNotifications();
+        stream.connectQueue(selection);
+      },
+      onClearQueue: () => setSelection([]),
     },
-    events: stream.events,
+    bottomPanel: (() => {
+      // Le run sélectionné dans la Supervision, ou null si rien n'est choisi.
+      const runSel = supervision.selection
+        ? (supervision.runs.find((r) => r.run_id === supervision.selection) ?? null)
+        : null;
+      return {
+        events: eventsAffichiesFor(
+          supervision.selection,
+          supervision.runs,
+          supervision.etatDe,
+          stream.events,
+        ),
+        // Le projet du run affiché, quand il diffère du projet actif — ticket-283.
+        projetLabel: runSel
+          ? (projets.find((p) => p.id === runSel.project_id)?.name ?? runSel.project_id)
+          : null,
+      };
+    })(),
     toasts,
     fermerToast: removeToast,
   };

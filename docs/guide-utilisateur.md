@@ -170,6 +170,13 @@ depends_on: []
 created: 2026-09-15
 ---
 
+
+#### Tickets légers
+
+Si ton ticket est petit — juste un test supplémentaire, un renommage, une correction — tu peux ajouter `light: true` dans le frontmatter pour le signaler. Par défaut, chaque run approuvé déclenche une passe de documentation : elle coûte plus qu'un petit changement lui-même. Un ticket léger reporte sa documentation au lot suivant ; l'IDE en documentera plusieurs à la fois, une optimisation qui évite de payer une passe entière pour trois lignes de code.
+
+L'audit sécurité et la validation tournent toujours normalement — ce sont des portes critiques qu'on ne saute jamais. Seule la documentation s'allège.
+
 # ticket-007 — Ajouter un endpoint de santé
 
 ## Objectif
@@ -279,6 +286,12 @@ Pendant un run, des étapes du pipeline s'exécutent et émettent des événemen
 
 Tu les lis dans le même panneau que les agents, dans l'ordre où elles se produisent.
 
+
+
+Après l'audit de sécurité, les étapes de **revue** et de **validation** démarrent ensemble — aucune n'attend l'autre. C'est pour gagner du temps : pendant que le reviewer lit le code, le validateur vérifie les critères d'acceptation. Ils peuvent finir à des moments différents, et tu verras l'un puis l'autre revenir avec son verdict.
+
+Pour que le ticket soit approuvé, le reviewer **et** le validateur doivent tous les deux approuver. Si l'un refuse, le ticket est refusé — même si l'autre a approuvé. Tu reçois les motifs de celui qui a refusé, ou des deux si les deux ont refusé.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -314,6 +327,31 @@ l'échelle réelle, qui est rarement celle qu'on imagine.
 
 Une fois qu'un run est entièrement complété — sa revue approuvée et sa livraison effectuée (le cas échéant) — tu vois un bouton « Fermer » dans le résumé. Un clic le retire du panneau de Supervision pour dégager l'écran et passer aux tickets en cours ou suivants.
 
+
+#### Signes de fin du run
+
+Quand le pipeline finit (approuvé ou bloqué), la carte du run change d'aspect :
+
+- **Le chrono s'arrête.** Il affiche l'heure exacte de fin et ne compte plus les secondes.
+- **Le résumé en haut se met à jour :**
+  - `PR #42 mergée` si livraison réussie (le numéro est un lien vers GitHub)
+  - `Livraison : <raison>` si elle n'a pas abouti (dépôt absent, CI rouge, branche divergée…)
+- **Le bouton « Fermer »** est maintenant actif pour masquer la carte.
+
+Par défaut, une fois approuvé, le pipeline enchaîne jusqu'à la livraison — tant qu'il y a un dépôt git et que le projet l'autorise. Sinon, tu vois pourquoi ça s'est arrêté.
+
+
+### Rouvrir un run terminé
+
+Un run une fois terminé disparaît de la Supervision après un rechargement ou une fermeture de session. Mais tu peux le relire à tout moment depuis l'historique :
+
+- Ouvre le panneau **Historique** (panneau de droite) — il liste les runs récents avec leur verdict et leur date
+- Clique sur une ligne pour rouvrir la vue complète du run : étapes, cartes par agent (codeur, testeur, sécurité, reviewer, validateur), verdict final
+- La vue rouverte est **en lecture seule** : pas de bouton pour arrêter le run, pas de champ pour envoyer un message à l'agent, pas de chrono qui avance
+- Un bouton **Fermer** te ramène à l'historique
+
+C'est utile pour vérifier les détails d'un run après coup — comment chaque étape s'est déroulée, pourquoi un ticket a terminé bloqué — sans relancer la machine.
+
 ### La frise d'étapes
 
 En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
@@ -327,6 +365,10 @@ Les couleurs :
 Les étapes du pipeline sont **sécurité**, **revue**, **validation**, **documentation** et **livraison**. Si le projet n'en active pas une (par exemple pas d'audit de sécurité), sa pastille ne s'affiche pas.
 
 La pastille en bleu te dit en un coup d'œil où tu en es, sans lire le log ni quitter l'IDE.
+
+
+
+Quand revue et validation tournent ensemble, tu vois deux pastilles bleues actives au même moment : la pastille revue et la pastille validation. Chacune devient verte quand elle approuve, ou rouge si elle refuse. Elles ne finissent pas forcément au même moment : l'une peut passer au vert avant l'autre.
 
 ### Le fil du run : tous les verdicts en un seul endroit
 
@@ -345,6 +387,21 @@ Ce que tu vois dans le fil pour chaque verdict :
 - **Validateur** : son verdict (approuvé ou changements demandés), puis en détail, pour chaque critère d'acceptation du ticket, son état (✓ réussi / ✗ échoué) et la note du validateur
 
 Ce fil est le même partout — que tu regardes dans la **Supervision** (onglet Agents) ou dans l'**onglet du run**, tu vois l'histoire complète. Plus besoin de chercher dans les logs : tu sais d'un coup d'œil pourquoi le codeur repart.
+
+
+#### Verdicts lisibles dans le log
+
+Le Pipeline log énumère maintenant chaque étape du pipeline avec son résultat exact :
+
+- **Tests** : « Tests : verts » ou « Tests : rouges — retour au codeur » si le testeur a tourné. Un échec renvoie au codeur sans passer à la revue.
+- **Validation** : « Validation : approuvée » ou « Validation : refusée ». C'est le verdict du validateur tel qu'il l'a décidé.
+- **Livraison** : « PR #42 », « PR #42 mergée » ou la raison de l'arrêt (CI non verte, branche divergée, absence de dépôt…).
+
+Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
+
+
+
+Quand revue et validation sont parallèles, leurs événements s'entrelaçent dans le fil : le reviewer démarre, puis le validateur démarre, puis des tokens du reviewer, puis des tokens du validateur, etc. Si les deux refusent, tu vois les deux motifs avec le nom de chaque étape.
 
 ## 6. Récupérer le travail des agents
 
@@ -402,6 +459,11 @@ Commence par des lots courts (`max_tickets: 3`) le temps de calibrer la qualité
 tes tickets.
 
 ---
+
+
+**Depuis la Vue Tableau**
+
+Tu n'as pas besoin de passer par la sidebar pour composer et lancer la file — la Vue Tableau t'offre exactement les mêmes contrôles. Chaque carte affiche un bouton « Ajouter à la file » ou « Retirer de la file ». Quand tu as sélectionné au moins un ticket, une barre apparaît au-dessus des colonnes : elle montre le nombre de tickets en attente et propose « Lancer la file » et « Vider ». Un ticket ajouté d'un côté se voit aussitôt de l'autre — sidebar et Vue Tableau restent synchronisées.
 
 ## 8. Discuter avec l'agent, pendant qu'il travaille
 
@@ -538,6 +600,37 @@ que seul le SDK fournit.
 
 ---
 
+### Direction visuelle pour les interfaces
+
+Quand un ticket crée ou modifie une interface — une route qui ajoute des écrans, un composant UI — le codeur commence par établir une charte visuelle avant d'écrire du code.
+
+Il crée cette charte dans `memory/design.md` s'il n'y en a pas une :
+
+- Une direction en une phrase, avec une référence (« sobre et épurée, comme le design de GitHub »)
+- Cinq familles de couleurs maximum, chacune avec un rôle
+- Une échelle typographique
+- Une échelle d'espacement et des rayons
+
+Tu dois revoir et approuver cette charte avant qu'il ne touche au code.
+
+Puis le codeur code l'interface en respectant ces règles :
+
+- **Aucune valeur en dur** (couleur, taille, espacement) — tout vient des tokens de la charte
+- **Une seule action principale par vue**
+- **États vide, chargement et erreur** prévus
+- **Contraste AA**
+- **Une vue de travail montre des données**, pas des marges
+- **Pas de dégradé décoratif**, pas de cartes ombrées partout, pas d'emoji en guise d'icônes
+
+Cette charte garantit une cohérence dans le temps : chaque ticket UI la respecte, tu ne risques plus de passer d'une couleur à l'autre ou d'une taille arbitraire.
+
+**Sur les projets existants**, cette direction n'est pas active par défaut. Tu peux l'ajouter en éditant `agents.json` : ajoute `"tessera:design-ui"` dans la clé `skills` du codeur et de l'architect.
+
+
+### Ce que le testeur attrape
+
+Le testeur lance les mêmes outils que ta CI : `pytest` et `mypy` pour Python, `tsc` pour TypeScript, puis `eslint` et `vitest` pour le frontend. Un ticket n'échouera plus soudain en CI sur une erreur de typage ou de lint — le pipeline les détecte tous maintenant, avant même que la PR soit ouverte.
+
 ## 10. Intégration GitHub
 
 Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
@@ -581,6 +674,13 @@ Le code produit par les agents, lui, n'est jamais exclu : c'est ce que tu livres
 ### Cadrages et artefacts locaux
 
 Ton cadrage (ticket `design`) crée de nouvelles décisions dans `memory/decisions.md` ou des tickets dans `tickets/todo/`. Si ton projet garde ces artefacts locaux (non versionnés), ces fichiers ne sont jamais commitées — ils restent chez toi. Cependant, le reviewer et le validateur les voient quand même, car le diff relu inclut un résumé textuel des changements. Ton cadrage peut donc être approuvé et mis en œuvre même s'il ne crée ni ne modifie aucun fichier du code.
+
+
+### Configuration locale : jamais committée
+
+`agents.json`, `.claude/settings.json` et `.github/workflows/` ne voyagent **jamais** dans un commit du pipeline, même si tu les modifies pendant un run.
+
+Si tu changes un modèle d'agent via l'écran Agents de l'IDE pendant qu'un ticket est en cours, par exemple, cette modification reste dans ton arbre de travail mais n'est pas committée. Le run te le signale dans son rapport. Cela garantit que la configuration de l'IDE ne voyage pas accidentellement avec le travail d'un ticket.
 
 ## 11. Configuration
 

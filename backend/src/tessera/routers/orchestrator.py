@@ -16,6 +16,7 @@ from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
+from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
@@ -53,6 +54,21 @@ router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
 # Un run à la fois par projet, sur tous les points d'entrée — le même
 # verrou que `/chat/run` (ticket-121).
 _RUN_LOCK = RUN_LOCK
+
+
+def _tours_du_role(role: str) -> int | None:
+    """Returns the max_turns budget for a given pipeline role (ticket-297).
+
+    The plan role must read the codebase to decide on an approach — it does not
+    have the diff in its prompt. The reviewer has the diff and only needs to look
+    around. Other roles get the global default (None → settings.llm_max_turns).
+    """
+    if role == ROLE_PLAN:
+        return settings.llm_max_turns_plan
+    if role == "reviewer":
+        return settings.llm_max_turns_reviewer
+    return None
+
 
 _OPEN_STATUSES = {
     TicketStatus.todo,
@@ -155,13 +171,12 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # deux fois.
     def _par_role(role: str) -> LLMProvider:
         # Le plan lit comme le reviewer : il prépare le code, il ne l'écrit pas
-        # (ticket-243).
+        # (ticket-243). Chacun a son propre budget de tours (ticket-297).
         lecture = role in ("reviewer", ROLE_PLAN)
         outils = OUTILS_DE_RELECTURE if lecture else None
-        tours = settings.llm_max_turns_reviewer if lecture else None
         inner = provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
-            project_id=project_id, max_turns=tours,
+            project_id=project_id, max_turns=_tours_du_role(role),
         )
         return inner
 
@@ -292,6 +307,43 @@ def _documenteur(
     return documenter
 
 
+async def _sync_apres_livraison(
+    livraison: Livraison,
+    espace: GitWorkspaceService | None,
+    politique: PolitiqueRun | None,
+    base_branch: str,
+) -> Livraison:
+    """Sync the base ref with the remote after a delivery, when needed.
+
+    Après un merge en squash (ticket-264) : la branche locale de base est en
+    retard sur le distant. Sans sync, le ticket suivant repart de l'ancienne
+    branche — ses commits sont déjà dans le squash sur develop — et GitHub
+    déclare sa PR en conflit.
+
+    Après un non-merge sur un projet en `autonomy: merge` (ticket-302) : le
+    ticket suivant doit partir de la base distante, pas de la pointe du ticket
+    non mergé. Sur `commit` ou `pr`, l'empilement est voulu — pas de sync.
+    """
+    needs_sync = livraison.merged or (
+        not livraison.merged
+        and politique is not None
+        and politique.autonomy is NiveauAutonomie.merge
+    )
+    if espace is None or not needs_sync:
+        return livraison
+    raison = await espace.sync_base_depuis_distant(base_branch)
+    if raison is None:
+        return livraison
+    return Livraison(
+        etapes=livraison.etapes,
+        durees_ms=livraison.durees_ms,
+        arret=raison,
+        conflits=livraison.conflits,
+        pr_number=livraison.pr_number,
+        merged=livraison.merged,
+    )
+
+
 def _livreur(
     project_id: str,
     runner: AgentRunner | None = None,
@@ -391,22 +443,7 @@ def _livreur(
             return Livraison(arret=f"Livraison interrompue : {exc}")
         # pr_number is now recorded inside service.livrer() via _noter_et_pousser
 
-        # ticket-264 : après un merge en squash, la branche locale de base
-        # est en retard sur le distant. Le ticket suivant repart alors de
-        # l'ancienne branche, ses commits sont déjà présents sur develop
-        # sous forme d'un squash, et GitHub déclare la PR en conflit.
-        # On réconcilie uniquement si la livraison a réellement mergé
-        # (évite un fetch réseau inutile quand le niveau est `commit` ou `pr`).
-        if livraison.merged and espace is not None:
-            raison_sync = await espace.sync_base_depuis_distant(base_branch)
-            if raison_sync is not None:
-                livraison = Livraison(
-                    etapes=livraison.etapes,
-                    arret=raison_sync,
-                    conflits=livraison.conflits,
-                    pr_number=livraison.pr_number,
-                    merged=livraison.merged,
-                )
+        livraison = await _sync_apres_livraison(livraison, espace, politique, base_branch)
         return livraison
 
     return livrer
@@ -418,13 +455,26 @@ def _livreur(
 _TACHES: set[asyncio.Task[None]] = set()
 
 
-def _libelle(request: RunRequest) -> str:
-    """What the registry shows as running: the ticket, the queue, or the mode."""
+def _ticket_initial(request: RunRequest) -> str | None:
+    """Le premier ticket traité par le run — le seul connu au démarrage."""
     if request.ticket_id:
         return request.ticket_id
     if request.ticket_ids:
-        return ", ".join(request.ticket_ids)
-    return request.mode
+        return request.ticket_ids[0]
+    return None
+
+
+async def _lire_titre(
+    ticket_svc: TicketService, ticket_id: str | None
+) -> str | None:
+    """Lit le titre d'un ticket ; renvoie None si illisible ou absent."""
+    if not ticket_id:
+        return None
+    try:
+        ticket = await ticket_svc.get_ticket(ticket_id)
+        return ticket.title if ticket else None
+    except Exception:  # noqa: BLE001
+        return None
 
 
 class Limites(BaseModel):
@@ -457,9 +507,18 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
     if request.mode == "single" and not request.ticket_id:
         raise HTTPException(status_code=422, detail="ticket_id requis en mode single")
 
+    # Lire le titre du ticket initial avant de réserver le run (ticket-286).
+    project_path = settings.ide_workspace_dir / request.project_id
+    ticket_svc = TicketService(project_path, request.project_id)
+    initial_ticket_id = _ticket_initial(request)
+    ticket_titre = await _lire_titre(ticket_svc, initial_ticket_id)
+
     try:
         run = RUN_REGISTRY.ouvrir(
-            request.project_id, _libelle(request), mode=request.mode
+            request.project_id,
+            initial_ticket_id,
+            mode=request.mode,
+            ticket_titre=ticket_titre,
         )
     except RunAlreadyInProgress as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
@@ -476,6 +535,9 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             raise
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
+    async def titre_getter(ticket_id: str) -> str | None:
+        return await _lire_titre(ticket_svc, ticket_id)
+
     tache = asyncio.create_task(
         executer(
             run,
@@ -484,6 +546,7 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             RUN_REGISTRY,
             ticket_ids=request.ticket_ids,
             max_tickets=request.max_tickets,
+            titre_getter=titre_getter,
         )
     )
     _TACHES.add(tache)

@@ -39,6 +39,9 @@ class RunActif:
     project_id: str
     mode: str = "single"
     ticket_id: str | None = None
+    #: Titre lisible du ticket en cours — absent tant qu'il n'a pas pu être lu
+    #: ou que le run n'a pas encore de ticket (autonome) (ticket-286).
+    ticket_titre: str | None = None
     etape: str | None = None
     agent: str | None = None
     tour: int = 0
@@ -77,6 +80,11 @@ class RunActif:
     #: observateur de répondre à un agent qui pose une question (ADR-025),
     #: au lieu du seul onglet qui a lancé le run.
     dialogue: Any = None
+    #: Étapes actuellement en cours sur ce run — renseigné par `run_executor`
+    #: quand le reviewer et le validateur tournent en parallèle (ticket-289).
+    #: ``"revue"`` et ``"validation"`` peuvent coexister ; ``etape`` garde la
+    #: dernière étape démarrée pour les clients qui s'en servent.
+    etapes_en_cours: list[str] = field(default_factory=list)
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -88,6 +96,7 @@ class RunActif:
             "project_id": self.project_id,
             "mode": self.mode,
             "ticket_id": self.ticket_id,
+            "ticket_titre": self.ticket_titre,
             "etape": self.etape,
             "agent": self.agent,
             "tour": self.tour,
@@ -103,6 +112,7 @@ class RunActif:
             "file_total": self.file_total,
             "file_restants": list(self.file_restants),
             "file_faits": list(self.file_faits),
+            "etapes_en_cours": list(self.etapes_en_cours),
             "demarre_a": self.demarre_a.isoformat(),
         }
 
@@ -156,6 +166,7 @@ class RunRegistry:
         mode: str = "single",
         run_id: Optional[str] = None,
         dialogue: Any = None,
+        ticket_titre: str | None = None,
     ) -> RunActif:
         """Reserve `project_id`, refusing a second run on it.
 
@@ -172,6 +183,7 @@ class RunRegistry:
             project_id=project_id,
             mode=mode,
             ticket_id=ticket_id,
+            ticket_titre=ticket_titre,
             dialogue=dialogue,
         )
         self._runs[run.run_id] = run
@@ -189,10 +201,12 @@ class RunRegistry:
         mode: str = "single",
         run_id: Optional[str] = None,
         dialogue: Any = None,
+        ticket_titre: str | None = None,
     ) -> AsyncIterator[RunActif]:
         """Open a run on `project_id`, refusing a second one on that project."""
         run = self.ouvrir(
-            project_id, ticket_id, mode=mode, run_id=run_id, dialogue=dialogue
+            project_id, ticket_id, mode=mode, run_id=run_id, dialogue=dialogue,
+            ticket_titre=ticket_titre,
         )
         try:
             yield run

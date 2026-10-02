@@ -5,7 +5,7 @@
   "services": [
     {
       "nom": "backend",
-      "commande": "uv run uvicorn tessera.main:app --host 127.0.0.1 --port 8000",
+      "commande": "uv run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8000",
       "cwd": "../../backend"
     },
     {
@@ -95,6 +95,10 @@
       "reviewer"
     ],
     "max_review_rounds": 3,
+    "testeur_enabled": true,
+    "test_command": "uv run python ../scripts/verifier.py",
+    "test_cwd": "../../backend",
+    "test_timeout_s": 900,
     "securite_enabled": true,
     "validateur_enabled": true,
     "doc_claude_md": true

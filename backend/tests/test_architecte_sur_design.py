@@ -75,6 +75,7 @@ async def _lance(
     tickets.get_ticket.return_value = _ticket(type_)
     tickets.update_status.return_value = _ticket(type_)
     git = AsyncMock()
+    git.initialiser_base_ref.return_value = None
     git.is_clean.return_value = True
     git.create_branch.return_value = "b"
     git.current_diff.return_value = "diff --git a/x b/x\n+x\n"

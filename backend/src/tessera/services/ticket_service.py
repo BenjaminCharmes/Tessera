@@ -370,6 +370,7 @@ class TicketService:
             pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
             # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
             plan=meta.get("plan") is True,
+            light=meta.get("light") is True,
             body=str(post.content),
             project_id=self._project_id,
             file_path=str(path),

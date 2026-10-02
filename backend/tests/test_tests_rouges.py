@@ -51,6 +51,7 @@ def _orchestrateur(tmp_path: Path, runner_tests: _FauxTestRunner, **kw: Any) -> 
     tickets.get_ticket.return_value = _ticket()
     tickets.update_status.return_value = _ticket()
     git = AsyncMock()
+    git.initialiser_base_ref.return_value = None
     git.is_clean.return_value = True
     git.create_branch.return_value = "ticket-001-slug"
     git.current_diff.return_value = "diff --git a/x.py b/x.py\n+x = 1\n"
@@ -175,6 +176,7 @@ async def test_sans_testeur_rien_ne_change(tmp_path: Path, monkeypatch: Any) -> 
     tickets.get_ticket.return_value = _ticket()
     tickets.update_status.return_value = _ticket()
     git = AsyncMock()
+    git.initialiser_base_ref.return_value = None
     git.is_clean.return_value = True
     git.create_branch.return_value = "b"
     git.current_diff.return_value = "diff"

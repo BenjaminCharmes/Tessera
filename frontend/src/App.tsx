@@ -65,7 +65,7 @@ export default function App() {
         className="overflow-hidden"
         style={{ gridColumn: "3", gridRow: "2" }}
       >
-        <BottomPanel events={cockpit.events} />
+        <BottomPanel {...cockpit.bottomPanel} />
       </div>
 
       <ToastContainer toasts={cockpit.toasts} onDismiss={cockpit.fermerToast} />

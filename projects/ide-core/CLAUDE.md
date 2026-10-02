@@ -25,18 +25,17 @@ Ce qui sert vraiment avant d'écrire du code :
 `agents.json` déclare `codeur` et `reviewer` dans le pipeline, et l'audit
 sécurité est **actif**, sur Claude : rejoué sur une faille réelle, le modèle
 local ne la voyait pas. Le validateur est **actif** depuis les tickets 209 et
-214 : il juge chaque critère, lu en entier. Le testeur est **désactivé** — son
-`testeur_enabled` est absent, donc faux. La documentation, elle, se met à jour
+214 : il juge chaque critère, lu en entier. Le testeur est **actif** depuis le
+ticket-295 : il lance la suite backend. La documentation, elle, se met à jour
 par lot en fin de file (ADR-035), jamais par ticket.
 
 Un run approuvé pousse sa branche et ouvre sa PR vers `develop`. Il ne se
 merge pas seul tant que la CI ne peut pas tourner : `merge` exige une CI verte.
 
 Les tests de ce dépôt vivent dans `backend/` et `frontend/`, au-dessus du
-dossier du projet. Depuis le ticket-241, les clefs `pipeline.test_cwd` et
-`pipeline.test_timeout_s` existent pour les atteindre — non renseignées dans
-l'`agents.json` actuel ; activer le testeur reste une décision à part, parce
-qu'elle allonge chaque run de la durée de la suite.
+dossier du projet : `pipeline.test_cwd` (ticket-241) y mène le testeur.
+Il lance `scripts/verifier.py` : pytest et mypy, puis tsc, eslint et vitest —
+environ six minutes par tour (tickets 295 et 304, qui disent pourquoi).
 
 ## Stack spécifique à ce projet
 

@@ -156,6 +156,7 @@ function streamMock(over: Partial<UseRunActifResult> = {}): UseRunActifResult {
   return {
     status: "running",
     ticketId: "ticket-001",
+    ticketTitre: null,
     events: [],
     entries: [],
     currentAgent: null,
@@ -185,6 +186,96 @@ function streamMock(over: Partial<UseRunActifResult> = {}): UseRunActifResult {
     ...over,
   } as UseRunActifResult;
 }
+
+describe("PipelineSummary — livraison apres run_closed (ticket-279)", () => {
+  it("affiche le numero de PR mergee", () => {
+    render(
+      <PipelineSummary
+        result={APPROVED}
+        runClosed={true}
+        livraisonData={{ pr_number: 42, merged: true }}
+      />,
+    );
+    expect(screen.getByText(/PR #42 mergée/)).toBeTruthy();
+  });
+
+  it("affiche la cause d'arret quand la PR n'a pas été mergée", () => {
+    render(
+      <PipelineSummary
+        result={APPROVED}
+        runClosed={true}
+        livraisonData={{ merged: false, arret: "Conflit sur main" }}
+      />,
+    );
+    expect(screen.getByText(/Conflit sur main/)).toBeTruthy();
+  });
+
+  it("n'affiche pas la livraison avant run_closed", () => {
+    render(
+      <PipelineSummary
+        result={APPROVED}
+        runClosed={false}
+        livraisonData={{ pr_number: 7, merged: true }}
+      />,
+    );
+    expect(screen.queryByText(/PR #7/)).toBeNull();
+  });
+});
+
+describe("AgentPanel — croix Effacer le run (ticket-279)", () => {
+  it("absente quand status=done mais runClosed=false", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ status: "done", runClosed: false, lastResult: APPROVED })}
+      />,
+    );
+    expect(screen.queryByLabelText(/Effacer le run/)).toBeNull();
+  });
+
+  it("presente quand runClosed=true", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ status: "done", runClosed: true, lastResult: APPROVED })}
+      />,
+    );
+    expect(screen.getByLabelText(/Effacer le run/)).toBeTruthy();
+  });
+
+  it("presente quand status=error indépendamment de runClosed", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ status: "error", runClosed: false, errorMessage: "oups" })}
+      />,
+    );
+    expect(screen.getByLabelText(/Effacer le run/)).toBeTruthy();
+  });
+});
+
+describe("AgentPanel — titre du ticket dans l'en-tête (ticket-286)", () => {
+  it("affiche le titre du ticket dans l'en-tête quand il est connu", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ ticketId: "ticket-001", ticketTitre: "Ma super feature" })}
+      />,
+    );
+    expect(screen.getByText(/ticket-001 · Ma super feature/)).toBeTruthy();
+  });
+
+  it("n'affiche que l'identifiant quand le titre est absent", () => {
+    render(
+      <AgentPanel
+        project={null}
+        stream={streamMock({ ticketId: "ticket-001", ticketTitre: null })}
+      />,
+    );
+    // L'identifiant est dans l'en-tête, mais aucun séparateur · ne doit apparaître
+    expect(screen.queryByText(/·/)).toBeNull();
+  });
+});
 
 describe("AgentPanel — fil multi-tours (ticket-257)", () => {
   it("montre le passage du codeur au tour 1 apres le tour 2", () => {
