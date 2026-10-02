@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
 id: ticket-320
-pr_number: null
+pr_number: 231
 priority: high
 status: done
 title: 'An answer sent after its question expired is not lost: it is delivered as
