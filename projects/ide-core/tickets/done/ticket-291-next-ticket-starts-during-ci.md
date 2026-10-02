@@ -1,14 +1,15 @@
 ---
-id: ticket-291
-title: "Design: a queue starts its next ticket while the previous one waits for CI"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
-depends_on: ["ticket-288"]
-estimated_days: 1
 created: 2026-10-01
+depends_on:
+- ticket-288
+estimated_days: 1
+id: ticket-291
+pr_number: 197
+priority: medium
+status: done
+title: 'Design: a queue starts its next ticket while the previous one waits for CI'
+type: design
 ---
 
 # ticket-291 — La file démarre le ticket suivant pendant la CI du précédent

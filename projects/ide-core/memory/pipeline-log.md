@@ -835,3 +835,35 @@ Points positifs :
 - 2026-10-02 03:41:40 UTC — [ticket-292] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (111079ms)
 - 2026-10-02 03:41:40 UTC — [ticket-292] APPROVED après 1 tour(s)
 - 2026-10-02 03:44:53 UTC — [ticket-292] documentation: 2 fichier(s) (191514ms)
+- 2026-10-02 03:48:06 UTC — [ticket-292] livraison: rebase sur develop (219ms)
+- 2026-10-02 03:48:06 UTC — [ticket-292] livraison: PR #196 ouverte (4125ms)
+- 2026-10-02 03:48:06 UTC — [ticket-292] livraison: CI : passing (178750ms)
+- 2026-10-02 03:48:06 UTC — [ticket-292] livraison: PR #196 mergée (3609ms)
+- 2026-10-02 03:48:06 UTC — [ticket-291] branche ticket-291-design-a-queue-starts-its-next-ticket-while-the-p
+- 2026-10-02 03:48:06 UTC — [ticket-291] tour 1 — codeur démarré
+- 2026-10-02 03:53:41 UTC — [ticket-291] tour 1 — architect terminé (334327ms)
+- 2026-10-02 03:57:18 UTC — [ticket-291] testeur: 1816 passed, 2 deselected, 5 warnings in 214.95s (0:03:34)
+- 2026-10-02 03:57:27 UTC — [ticket-291] securite: PASS — Audit du diff : ajout d'une ADR (ADR-051) dans le fichier decisions.md. Il s'agi (8907ms)
+- 2026-10-02 03:57:27 UTC — [ticket-291] tour 1 — reviewer démarré
+- 2026-10-02 03:58:51 UTC — [ticket-291] tour 1 — reviewer terminé (83687ms)
+- 2026-10-02 04:00:32 UTC — [ticket-291] validateur: CHANGES_REQUESTED — L'ADR-051 est bien rédigé et couvre les exigences principales. Les tickets d'imp (185421ms)
+- 2026-10-02 04:00:32 UTC — [ticket-291] CHANGES_REQUESTED tour 1: Reviewer : Je vérifie le contenu exact de l'ADR produit et des tickets d'implémentation.Le ticket es
+- 2026-10-02 04:00:32 UTC — [ticket-291] tour 2 — codeur démarré
+- 2026-10-02 04:01:22 UTC — [ticket-291] tour 2 — architect terminé (49531ms)
+- 2026-10-02 04:05:00 UTC — [ticket-291] testeur: 1816 passed, 2 deselected, 5 warnings in 216.02s (0:03:36)
+- 2026-10-02 04:05:18 UTC — [ticket-291] securite: PASS — Le diff modifie uniquement `decisions.md`, un document d'architecture Markdown d (17670ms)
+- 2026-10-02 04:05:18 UTC — [ticket-291] tour 2 — reviewer démarré
+- 2026-10-02 04:07:04 UTC — [ticket-291] tour 2 — reviewer terminé (105922ms)
+- 2026-10-02 04:08:07 UTC — [ticket-291] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. L'ADR-051 est bien rédigé et co (168953ms)
+- 2026-10-02 04:08:07 UTC — [ticket-291] CHANGES_REQUESTED tour 2: Reviewer : Je vérifie les critères d'acceptation un par un contre le diff.CHANGES_REQUESTED
+
+## Prob
+- 2026-10-02 04:08:07 UTC — [ticket-291] tour 3 — codeur démarré
+- 2026-10-02 04:09:47 UTC — [ticket-291] tour 3 — architect terminé (100406ms)
+- 2026-10-02 04:13:29 UTC — [ticket-291] testeur: 1816 passed, 2 deselected, 5 warnings in 219.21s (0:03:39)
+- 2026-10-02 04:13:40 UTC — [ticket-291] securite: PASS — Le diff porte sur un ajout de documentation architecturale (ADR-051) dans un fic (11188ms)
+- 2026-10-02 04:13:40 UTC — [ticket-291] tour 3 — reviewer démarré
+- 2026-10-02 04:14:51 UTC — [ticket-291] tour 3 — reviewer terminé (70875ms)
+- 2026-10-02 04:16:53 UTC — [ticket-291] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-051 est bien rédigé et couvre les exige (192641ms)
+- 2026-10-02 04:16:53 UTC — [ticket-291] APPROVED après 3 tour(s)
+- 2026-10-02 04:18:56 UTC — [ticket-291] documentation: 0 fichier(s) (121171ms)
