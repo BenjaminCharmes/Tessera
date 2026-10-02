@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CompteARebours from "./CompteARebours";
 
 /**
@@ -25,6 +25,8 @@ interface AgentDialogueProps {
   onAnswer: (text: string) => void;
   onInterject: (text: string) => void;
   onStop: () => void;
+  /** Accusé de réception de la dernière réponse envoyée (ticket-320). */
+  answerAck?: "transmitted" | "deposited" | null;
 }
 
 export default function AgentDialogue({
@@ -34,11 +36,41 @@ export default function AgentDialogue({
   onAnswer,
   onInterject,
   onStop,
+  answerAck = null,
 }: AgentDialogueProps) {
   const [reponse, setReponse] = useState("");
   const [consigne, setConsigne] = useState("");
 
+  // Même patron que CompteARebours : la valeur initiale est capturée dans le
+  // lazy initializer — autorisé par react-hooks/purity — puis mise à jour par
+  // l'intervalle quand une échéance est active.
+  const [maintenant, setMaintenant] = useState(() => Date.now());
+  useEffect(() => {
+    if (!questionExpireA || !pendingQuestion) return;
+    const echeance = Date.parse(questionExpireA);
+    if (Number.isNaN(echeance) || maintenant >= echeance) return;
+    const t = setInterval(() => {
+      setMaintenant(Date.now());
+      if (Date.now() >= echeance) clearInterval(t);
+    }, 1000);
+    return () => clearInterval(t);
+  }, [questionExpireA, pendingQuestion, maintenant]);
+
   if (!enCours) return null;
+
+  // Une question expirée n'attend plus de réponse : l'agent a repris seul.
+  const isExpired =
+    questionExpireA !== null &&
+    pendingQuestion !== null &&
+    maintenant > new Date(questionExpireA).getTime();
+
+  // Heure d'expiration lisible : « 13:14 » en heure locale.
+  const expireLabel = questionExpireA
+    ? new Date(questionExpireA).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
 
   function envoyerReponse() {
     const texte = reponse.trim();
@@ -58,15 +90,32 @@ export default function AgentDialogue({
     <div className="border-t border-zinc-800 bg-zinc-900 px-3 py-2.5">
       {pendingQuestion ? (
         <div className="mb-3">
-          <p className="mb-1 text-micro uppercase tracking-wide text-amber-500">
-            L'agent attend votre réponse
-          </p>
-          <p className="rounded-sm border border-amber-900/60 bg-amber-950/30 px-2 py-1.5 text-xs text-amber-100">
+          {isExpired ? (
+            <p
+              className="mb-1 text-micro uppercase tracking-wide text-zinc-500"
+              data-testid="question-expiree"
+            >
+              Question expirée à {expireLabel} — l'agent a repris sur une hypothèse
+            </p>
+          ) : (
+            <p className="mb-1 text-micro uppercase tracking-wide text-amber-500">
+              L'agent attend votre réponse
+            </p>
+          )}
+          <p
+            className={`rounded-sm border px-2 py-1.5 text-xs ${
+              isExpired
+                ? "border-zinc-700 bg-zinc-800/40 text-zinc-400"
+                : "border-amber-900/60 bg-amber-950/30 text-amber-100"
+            }`}
+          >
             {pendingQuestion}
           </p>
-          <div className="mb-2">
-            <CompteARebours expireA={questionExpireA} />
-          </div>
+          {!isExpired && (
+            <div className="mb-2">
+              <CompteARebours expireA={questionExpireA} />
+            </div>
+          )}
           <label
             htmlFor="dialogue-reponse"
             className="mb-1 block text-mini text-zinc-400"
@@ -91,6 +140,15 @@ export default function AgentDialogue({
           </div>
         </div>
       ) : null}
+
+      {answerAck === "deposited" && (
+        <p
+          className="mb-2 text-micro text-zinc-500"
+          data-testid="answer-ack-deposited"
+        >
+          Votre réponse a été déposée pour le tour suivant.
+        </p>
+      )}
 
       {/* L'arrêt est une sortie, pas une annulation : le run commite ce qu'il
           a déjà produit, parce que le ticket suivant dépend d'un arbre propre

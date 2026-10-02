@@ -141,6 +141,14 @@ export interface StreamState {
    * Null tant que le watcher n'a pas rendu son verdict.
    */
   ciMerge: { merged: boolean; arret: string | null } | null;
+  /**
+   * Accusé de réception de la dernière réponse envoyée (ticket-320).
+   * « transmitted » : la réponse est parvenue à la question en attente.
+   * « deposited » : aucune question n'attendait, la réponse a été déposée
+   * en boîte aux lettres pour le prochain tour d'agent.
+   * Null avant tout envoi, ou après que l'agent a repris.
+   */
+  answerAck: "transmitted" | "deposited" | null;
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -189,6 +197,7 @@ export const INITIAL: StreamState = {
   runClosed: false,
   livraisonPrNumber: null,
   ciMerge: null,
+  answerAck: null,
 };
 
 /**
@@ -369,6 +378,8 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       // Garder la question ferait répondre à un agent qui n'écoute plus ;
       // le registre l'efface déjà, un client en direct ne le faisait pas
       // (ticket-186).
+      // L'accusé de réception s'efface aussi : l'agent a pris la main, le
+      // message est consommé (ticket-320).
       const token =
         ev.type === "agent_token" && ev.agent === "codeur"
           ? (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
@@ -395,6 +406,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         ticketEvents,
         pendingQuestion: null,
         questionExpireA: null,
+        answerAck: null,
         outils: ev.type === "agent_tool_use" ? s.outils + 1 : s.outils,
         currentTokens:
           ev.agent === "codeur"
@@ -572,7 +584,22 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
           typeof ev.data["question"] === "string" ? ev.data["question"] : null,
         questionExpireA:
           typeof ev.data["expire_a"] === "string" ? ev.data["expire_a"] : null,
+        // Une nouvelle question efface l'accusé de la réponse précédente.
+        answerAck: null,
       };
+    case "answer_ack": {
+      // Le backend accuse réception de la réponse (ticket-320).
+      const outcome = ev.data["outcome"];
+      return {
+        ...s,
+        events,
+        ticketEvents,
+        answerAck:
+          outcome === "transmitted" || outcome === "deposited"
+            ? outcome
+            : null,
+      };
+    }
     case "queue_progress":
       // Un nouveau ticket commence. Une file est **un** run (ADR-041), donc un
       // seul état accumulé : sans remise à zéro, les drapeaux dérivés de

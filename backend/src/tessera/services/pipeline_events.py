@@ -70,6 +70,11 @@ class EventType(str, Enum):
     #: `merged` indique si la PR a été mergée ; `arret` contient la raison du
     #: blocage quand `merged` est faux.
     CI_MERGE_DONE = "ci_merge_done"
+    #: Accusé de réception d'une réponse utilisateur (ticket-320).
+    #: `outcome` vaut « transmitted » si la réponse a été transmise à la
+    #: question en cours, « deposited » si elle a été déposée en boîte aux
+    #: lettres faute de question en attente.
+    ANSWER_ACK = "answer_ack"
 
 
 class OrchestratorEvent(BaseModel):

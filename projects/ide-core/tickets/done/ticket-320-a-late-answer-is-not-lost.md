@@ -1,14 +1,15 @@
 ---
-id: ticket-320
-title: "An answer sent after its question expired is not lost: it is delivered as a message and the screen says so"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-320
+pr_number: 231
+priority: high
+status: done
+title: 'An answer sent after its question expired is not lost: it is delivered as
+  a message and the screen says so'
+type: fix
 ---
 
 # ticket-320 — Une réponse arrivée trop tard n'est pas perdue

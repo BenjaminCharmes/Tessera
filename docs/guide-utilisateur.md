@@ -556,6 +556,18 @@ Lorsque plusieurs agents tournent en parallèle, ceux qui t'attendent — qui on
 
 Si tu choisis une autre carte explicitement pour la lire, ta sélection y reste stable — elle ne bascule pas si un autre run demande quelque chose pendant ce temps.
 
+
+#### Quand ta réponse arrive trop tard
+
+Une question a une durée de vie : passé ce délai (cinq minutes par défaut), l'agent reprend seul en énonçant son hypothèse. Si ta réponse arrive après ce délai, elle n'est pas perdue.
+
+Le backend la dépose comme message spontané — l'agent la trouvera au tour suivant et pourra la lire, même si la question a expiré. L'écran te dit ce qu'il s'est passé :
+
+- **« Réponse transmise »** si elle a rejoint la question à temps
+- **« Réponse déposée pour le tour suivant »** si elle est arrivée tard
+
+Une question expirée s'affiche comme telle : **« Expirée à HH:MM »**, accompagnée de l'hypothèse que l'agent a énoncée pour continuer. C'est un signal : l'agent a poursuivi sans ta réponse, mais il lira ta réponse quand tu l'enverras, au tour suivant.
+
 ### Le chat, hors pipeline
 
 Le chat n'est pas un pipeline. Il sert à décider **quoi** ticketiser, à
