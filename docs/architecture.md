@@ -622,11 +622,11 @@ Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
 
 | Rôle | Modèle | Usage |
 |------|--------|-------|
-| `codeur` | claude-sonnet-4-6 | Implémente les tickets feat/fix |
-| `reviewer` | claude-sonnet-4-6 | Valide le code produit |
-| `orchestrateur` | claude-sonnet-4-6 | Décompose les tickets complexes |
-| `architect` | claude-sonnet-4-6 | Analyse architecturale |
-| `project-creator` | claude-sonnet-4-6 | Crée de nouveaux projets |
+| `codeur` | claude-sonnet-5-5 | Implémente les tickets feat/fix |
+| `reviewer` | claude-sonnet-5-5 | Valide le code produit |
+| `orchestrateur` | claude-sonnet-5-5 | Décompose les tickets complexes |
+| `architect` | claude-sonnet-5-5 | Analyse architecturale |
+| `project-creator` | claude-sonnet-5-5 | Crée de nouveaux projets |
 | `github-sync` | — (pas de LLM) | Synchronise GitHub Issues → tickets |
 
 **Skills fournis par défaut** : `codeur` et `architect` chargent `tessera:design-ui` au démarrage, qui impose une charte visuelle (couleurs, typographie, espacement) et les règles de l'ADR-026 à toute création d'interface.
