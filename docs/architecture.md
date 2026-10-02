@@ -279,6 +279,28 @@ Sans distant joignable, le rebase utilise la base locale. Si elle a divergé
 du distant hors d'une avance rapide, la livraison s'arrête avec cette raison 
 et ne procède pas au rebase.
 
+### Gestion des conflits de rebase
+
+Pendant le rebase du ticket sur la branche de base, les conflits sont traités selon
+leur nature :
+
+**Fichier ticket** (le statut du ticket dans `tickets/todo/`, `in-progress/`, etc.) :
+En cas de conflit sur ce fichier — modifié/supprimé ou modifié/modifié — l'IDE le
+résout automatiquement en faveur de la branche du ticket. Le fichier porte le bon
+statut pour son propre run et ne doit pas être jugé par un agent. Cette résolution
+n'est jamais relue.
+
+**Autres fichiers** : tout conflit est annulé (`rebase --abort`) et remonté à
+un agent (resolveur-conflit, ticket-282), qui le tente sous relecture (ADR-033).
+Aucune résolution automatique en dehors du fichier ticket.
+
+**Annulation robuste** : si `rebase --abort` gêne des **fichiers non suivis**
+portant les noms d'artefacts Tessera (`memory/`, `tickets/`, etc.),
+l'IDE les met de côté et réessaie. En dernier recours, l'arbre revient à la
+pointe d'origine de la branche du ticket, **sans perdre ce qui était commité**.
+Après l'échec, `.git/rebase-merge` n'existe plus : l'arbre est propre pour le
+ticket suivant, même en mode file.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 

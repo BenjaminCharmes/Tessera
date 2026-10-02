@@ -1,15 +1,16 @@
 ---
-id: ticket-300
-title: "A delivery rebase that stops always gives the tree back, even with untracked files in the way"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 1
+id: ticket-300
 plan: true
-created: 2026-10-01
+pr_number: 190
+priority: high
+status: done
+title: A delivery rebase that stops always gives the tree back, even with untracked
+  files in the way
+type: fix
 ---
 
 # ticket-300 — Un rebase de livraison arrêté rend toujours l'arbre
