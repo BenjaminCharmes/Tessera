@@ -1,14 +1,15 @@
 ---
-id: ticket-318
-title: "The board shows when remembered filters hide tickets, and clears them in one click"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-318
+pr_number: null
+priority: high
+status: done
+title: The board shows when remembered filters hide tickets, and clears them in one
+  click
+type: fix
 ---
 
 # ticket-318 — Le tableau dit quand des filtres mémorisés cachent des tickets

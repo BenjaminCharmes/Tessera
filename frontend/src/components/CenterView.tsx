@@ -9,6 +9,7 @@ import type {
   TicketStatus,
   TicketUnreadable,
 } from "../types/api";
+import type { FiltresTickets } from "../lib/filtresTickets";
 import type { VueCentre } from "../vueDuCentre";
 import DiffView from "./DiffView";
 import AgentDetail from "./AgentDetail";
@@ -58,6 +59,14 @@ interface CenterViewProps {
   onClearQueue?: () => void;
   /** Un run de file est en cours (ticket-284). */
   queueEnCours?: boolean;
+  /** Filtres actifs sur le tableau — ticket-318. */
+  filtres?: FiltresTickets;
+  /** Nombre total de tickets avant filtrage — ticket-318. */
+  total?: number;
+  /** Nombre de tickets retenus après filtrage — ticket-318. */
+  retenus?: number;
+  /** Réinitialise les filtres mémorisés du projet — ticket-318. */
+  onClearFiltres?: () => void;
 }
 
 export default function CenterView({
@@ -85,6 +94,10 @@ export default function CenterView({
   onRunQueue,
   onClearQueue,
   queueEnCours,
+  filtres,
+  total,
+  retenus,
+  onClearFiltres,
 }: CenterViewProps) {
   /* L'onglet Agents donne un détail au centre : le rail dit *quel* agent, le
      centre montre *ce qu'il est* (ticket-076). Pendant un run, le centre
@@ -135,6 +148,10 @@ export default function CenterView({
         onRunQueue={onRunQueue}
         onClearQueue={onClearQueue}
         queueEnCours={queueEnCours}
+        filtres={filtres}
+        total={total}
+        retenus={retenus}
+        onClearFiltres={onClearFiltres}
       />
     );
   }

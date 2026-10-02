@@ -1030,3 +1030,14 @@ Les nou (39750ms)
 - 2026-10-02 14:04:13 UTC — [ticket-316] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le validateur peut maintenant l (149609ms)
 - 2026-10-02 14:04:13 UTC — [ticket-316] APPROVED après 1 tour(s)
 - 2026-10-02 14:06:31 UTC — [ticket-316] documentation: 1 fichier(s) (136563ms)
+- 2026-10-02 14:06:43 UTC — [ticket-318] branche ticket-318-the-board-shows-when-remembered-filters-hide-tick
+- 2026-10-02 14:06:43 UTC — [ticket-318] tour 1 — codeur démarré
+- 2026-10-02 14:10:22 UTC — [ticket-318] tour 1 — codeur terminé (218766ms)
+- 2026-10-02 14:15:07 UTC — [ticket-318] testeur: OK (exit 0)
+- 2026-10-02 14:15:33 UTC — [ticket-318] securite: PASS — Code frontend TypeScript/React pour un bandeau de filtres (ticket-318). Aucune v (25250ms)
+- 2026-10-02 14:15:33 UTC — [ticket-318] tour 1 — reviewer démarré
+- 2026-10-02 14:17:03 UTC — [ticket-318] tour 1 — reviewer terminé (90311ms)
+- 2026-10-02 14:17:49 UTC — [ticket-318] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent correctement (135843ms)
+- 2026-10-02 14:17:49 UTC — [ticket-318] APPROVED après 1 tour(s)
+- 2026-10-02 14:19:51 UTC — [ticket-318] documentation: 1 fichier(s) (120608ms)
+- 2026-10-02 14:20:16 UTC — [ticket-318] livraison: arrêt — Conflit avec develop sur : projects/ide-core/memory/pipeline-log.md. La branche est restée intacte, 
