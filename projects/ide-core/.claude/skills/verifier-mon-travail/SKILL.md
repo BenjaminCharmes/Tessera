@@ -6,8 +6,9 @@ description: Use after writing or changing code on ide-core and before writing y
 # Vérifier son travail sur ide-core
 
 Le code de ce projet vit au-dessus de toi : `../../backend/` et `../../frontend/`.
-Aucune étape du pipeline ne lance les tests sur ce projet. Si tu ne les lances
-pas, personne ne le fera avant la PR.
+Le testeur lance toute la vérification après ton tour (`scripts/verifier.py`,
+environ six minutes). Une erreur qu'il trouve te coûte un tour entier :
+lance d'abord ce que tu as touché, ça prend quelques secondes.
 
 ## Ce que tu lances
 
@@ -25,7 +26,7 @@ Et le typage si tu as touché du Python — tout `src/`, pas un fichier : une
 erreur d'import croisé ne se voit qu'ainsi, et la CI lance exactement ceci :
 
 ```bash
-cd ../../backend && uv run mypy src/
+cd ../../backend && uv run python -m mypy src/
 ```
 
 Frontend, et le typage si tu as touché du TypeScript :
@@ -42,7 +43,9 @@ cd ../../frontend && npx tsc -b --noEmit
 - **Vert** : recopie la ligne de résumé réelle (`12 passed in 3.1s`, et pour
   mypy `Success: no issues found in N source files`) dans la section
   « Vérification » de ton rapport. Pas de résumé inventé ou arrondi.
-- **La commande ne démarre pas** (exécutable introuvable, dépendance absente) :
+- **La commande ne démarre pas** (exécutable introuvable, dépendance absente,
+  `os error 4551` : le contrôle d'applications Windows refuse les lanceurs
+  `.exe` du `.venv`, d'où `python -m`) :
   ce n'est pas un test rouge. Dis-le tel quel, sans toucher au code pour ça.
 
 ## Ce que tu ne fais pas
