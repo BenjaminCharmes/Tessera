@@ -456,3 +456,45 @@ describe("applyEvent — livraison_done et ci_merge_done (ticket-308)", () => {
     expect(s.ciMerge).toBeNull();
   });
 });
+
+describe("applyEvent — answer_ack (ticket-320)", () => {
+  it("enregistre l'accusé de réception d'une réponse déposée", () => {
+    const s = applyEvent(
+      INITIAL,
+      ev({ type: "answer_ack", agent: null, data: { outcome: "deposited" } }),
+    );
+    expect(s.answerAck).toBe("deposited");
+  });
+
+  it("enregistre l'accusé de réception d'une réponse transmise", () => {
+    const s = applyEvent(
+      INITIAL,
+      ev({ type: "answer_ack", agent: null, data: { outcome: "transmitted" } }),
+    );
+    expect(s.answerAck).toBe("transmitted");
+  });
+
+  it("efface l'accusé quand une nouvelle question arrive", () => {
+    let s = applyEvent(
+      INITIAL,
+      ev({ type: "answer_ack", agent: null, data: { outcome: "deposited" } }),
+    );
+    s = applyEvent(
+      s,
+      ev({ type: "agent_question", data: { question: "On casse l'API ?" } }),
+    );
+    expect(s.answerAck).toBeNull();
+  });
+
+  it("efface l'accusé quand l'agent reprend (agent_token)", () => {
+    let s = applyEvent(
+      INITIAL,
+      ev({ type: "answer_ack", agent: null, data: { outcome: "transmitted" } }),
+    );
+    s = applyEvent(
+      s,
+      ev({ type: "agent_token", agent: "codeur", data: { token: "…" } }),
+    );
+    expect(s.answerAck).toBeNull();
+  });
+});

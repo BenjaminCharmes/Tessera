@@ -47,6 +47,7 @@ export default function AgentPanel({
     quota,
     pendingQuestion,
     questionExpireA,
+    answerAck,
     runClosed,
     entries,
     answer,
@@ -228,6 +229,7 @@ export default function AgentPanel({
       <AgentDialogue
         pendingQuestion={pendingQuestion}
         questionExpireA={questionExpireA}
+        answerAck={answerAck}
         enCours={status === "running" || status === "connecting"}
         onAnswer={answer}
         onInterject={interject}

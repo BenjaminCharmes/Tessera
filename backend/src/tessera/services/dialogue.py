@@ -30,9 +30,11 @@ whole overnight run on questions no one could ever answer.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
-from typing import Optional
+from typing import Literal, Optional
 
 from tessera.utils.logger import get_logger
+
+AnswerOutcome = Literal["transmitted", "deposited"]
 
 _logger = get_logger(__name__)
 
@@ -116,12 +118,20 @@ class DialogueChannel:
 
     # -- côté utilisateur ------------------------------------------
 
-    def answer(self, text: str) -> None:
-        """Répond à la question en cours. Sans question en cours, ne fait rien."""
+    def answer(self, text: str) -> AnswerOutcome:
+        """Répond à la question en cours.
+
+        Sans question en attente, dépose le texte en boîte aux lettres pour
+        que le prochain tour d'agent le lise — la réponse n'est pas perdue.
+        Renvoie « transmitted » quand la question a reçu la réponse, et
+        « deposited » quand le texte a été placé en boîte aux lettres.
+        """
         if self._answer is None or self._answer.done():
             _logger.info("reponse_sans_question")
-            return
+            self.interject(text)
+            return "deposited"
         self._answer.set_result(text)
+        return "transmitted"
 
     def request_stop(self) -> None:
         """Demande l'arrêt du run. Débloque aussi une question en attente."""
