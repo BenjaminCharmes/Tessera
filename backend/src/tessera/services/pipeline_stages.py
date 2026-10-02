@@ -410,6 +410,7 @@ async def run_tests(orch: "Orchestrator", run: PipelineRun) -> bool:
             total=result.total,
             failed=result.failed,
             output_summary=result.output_summary,
+            errors=result.errors,
             duration_ms=result.duration_ms,
         )
         badge = "✅" if result.passed else "❌"

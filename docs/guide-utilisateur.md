@@ -404,6 +404,8 @@ La pastille en bleu te dit en un coup d'œil où tu en es, sans lire le log ni q
 
 Quand revue et validation tournent ensemble, tu vois deux pastilles bleues actives au même moment : la pastille revue et la pastille validation. Chacune devient verte quand elle approuve, ou rouge si elle refuse. Elles ne finissent pas forcément au même moment : l'une peut passer au vert avant l'autre.
 
+Tu vois l'étape **Tests** dans la frise si ton projet a un testeur. Elle est verte quand la suite réussit, rouge si elle échoue. L'étape n'apparaît que si le projet a un testeur configuré.
+
 ### Le fil du run : tous les verdicts en un seul endroit
 
 Quand tu observes un run qui a tourné plusieurs fois, tu vois maintenant un seul fil chronologique complet. Ce fil affiche tous les passages — codeur, reviewer, et maintenant aussi **sécurité** et **validateur**. C'est ce fil qui t'explique pourquoi le codeur repart tourner.
@@ -436,6 +438,8 @@ Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
 
 
 Quand revue et validation sont parallèles, leurs événements s'entrelaçent dans le fil : le reviewer démarre, puis le validateur démarre, puis des tokens du reviewer, puis des tokens du validateur, etc. Si les deux refusent, tu vois les deux motifs avec le nom de chaque étape.
+
+Une carte **TESTEUR** s'ajoute au fil après chaque passage du codeur. Elle porte le résumé des résultats — `1 error in 2.32s` ou `all pass` — et, dépliée, le détail des erreurs. Si la suite est rouge, elle t'explique : **« retour au codeur, sans revue »** — c'est pourquoi l'étape Tests est rouge et que l'audit de sécurité et la revue ne tourneront pas ce tour.
 
 ## 5 ter. Après le run : fusion automatique
 

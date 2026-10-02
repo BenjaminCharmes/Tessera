@@ -191,11 +191,11 @@ L'icône est liée au texte par `aria-describedby`. Ses couleurs sont zinc, pas 
 en texte.
 
 `StageStrip` (depuis ticket-256) affiche l'état de chaque étape du pipeline du run — 
-production, sécurité, revue, validation, documentation, livraison — en tête du panneau 
+production, tests, sécurité, revue, validation, documentation, livraison — en tête du panneau 
 Agents. Chaque pastille représente une étape, avec trois états : faite (`green`), en cours 
-(`blue`), à venir (`zinc`). Une étape désactivée pour le projet n'a pas de pastille. Un 
-refus de l'audit sécurité ou une validation rejetée passent la pastille correspondante en 
-`red`. 
+(`blue`), à venir (`zinc`). Une étape désactivée pour le projet n'a pas de pastille. 
+L'étape Tests n'apparaît que si le projet a un testeur. Un refus de l'audit sécurité, 
+une validation rejetée, ou un échec des tests rendent leur pastille respective `red`. 
 
 Après l'audit sécurité, reviewer et validateur peuvent tourner en parallèle (ticket-289) :
 `StageStrip` marque `active` toute étape présente dans `etapesEnCours`, permettant 

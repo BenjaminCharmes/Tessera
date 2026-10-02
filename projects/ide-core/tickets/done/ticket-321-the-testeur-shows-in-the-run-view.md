@@ -1,14 +1,15 @@
 ---
-id: ticket-321
-title: "The testeur shows in the run view: a Tests stage and a card that says why the codeur starts again"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
-created: 2026-10-02
+id: ticket-321
+pr_number: 232
+priority: high
+status: done
+title: 'The testeur shows in the run view: a Tests stage and a card that says why
+  the codeur starts again'
+type: feat
 ---
 
 # ticket-321 — Le testeur apparaît dans la vue du run
