@@ -512,11 +512,15 @@ async def run_review(
 
 
 async def run_validation(
-    orch: "Orchestrator", run: PipelineRun, reason: str
+    orch: "Orchestrator", run: PipelineRun
 ) -> tuple[bool, str]:
-    """Check the ticket's acceptance criteria; may overturn an approval."""
+    """Check the ticket's acceptance criteria independently of the reviewer.
+
+    Returns ``(True, "")`` when the validator is absent or approves,
+    ``(False, feedback)`` when it refuses or is unavailable.
+    """
     if orch._validator is None:
-        return True, reason
+        return True, ""
     await emit(run, EventType.VALIDATION_STARTED)
     t0 = time.monotonic()
     try:
@@ -553,5 +557,5 @@ async def run_validation(
     )
     if validation.verdict == "CHANGES_REQUESTED":
         return False, validation.feedback
-    return True, reason
+    return True, ""
 

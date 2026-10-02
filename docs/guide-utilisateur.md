@@ -279,6 +279,12 @@ Pendant un run, des étapes du pipeline s'exécutent et émettent des événemen
 
 Tu les lis dans le même panneau que les agents, dans l'ordre où elles se produisent.
 
+
+
+Après l'audit de sécurité, les étapes de **revue** et de **validation** démarrent ensemble — aucune n'attend l'autre. C'est pour gagner du temps : pendant que le reviewer lit le code, le validateur vérifie les critères d'acceptation. Ils peuvent finir à des moments différents, et tu verras l'un puis l'autre revenir avec son verdict.
+
+Pour que le ticket soit approuvé, le reviewer **et** le validateur doivent tous les deux approuver. Si l'un refuse, le ticket est refusé — même si l'autre a approuvé. Tu reçois les motifs de celui qui a refusé, ou des deux si les deux ont refusé.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -353,6 +359,10 @@ Les étapes du pipeline sont **sécurité**, **revue**, **validation**, **docume
 
 La pastille en bleu te dit en un coup d'œil où tu en es, sans lire le log ni quitter l'IDE.
 
+
+
+Quand revue et validation tournent ensemble, tu vois deux pastilles bleues actives au même moment : la pastille revue et la pastille validation. Chacune devient verte quand elle approuve, ou rouge si elle refuse. Elles ne finissent pas forcément au même moment : l'une peut passer au vert avant l'autre.
+
 ### Le fil du run : tous les verdicts en un seul endroit
 
 Quand tu observes un run qui a tourné plusieurs fois, tu vois maintenant un seul fil chronologique complet. Ce fil affiche tous les passages — codeur, reviewer, et maintenant aussi **sécurité** et **validateur**. C'est ce fil qui t'explique pourquoi le codeur repart tourner.
@@ -381,6 +391,10 @@ Le Pipeline log énumère maintenant chaque étape du pipeline avec son résulta
 - **Livraison** : « PR #42 », « PR #42 mergée » ou la raison de l'arrêt (CI non verte, branche divergée, absence de dépôt…).
 
 Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
+
+
+
+Quand revue et validation sont parallèles, leurs événements s'entrelaçent dans le fil : le reviewer démarre, puis le validateur démarre, puis des tokens du reviewer, puis des tokens du validateur, etc. Si les deux refusent, tu vois les deux motifs avec le nom de chaque étape.
 
 ## 6. Récupérer le travail des agents
 

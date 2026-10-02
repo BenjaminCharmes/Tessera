@@ -1,14 +1,15 @@
 ---
-id: ticket-290
-title: "The stage strip and the run feed show two stages running at once"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-289"]
-estimated_days: 1
 created: 2026-10-01
+depends_on:
+- ticket-289
+estimated_days: 1
+id: ticket-290
+pr_number: 191
+priority: high
+status: done
+title: The stage strip and the run feed show two stages running at once
+type: feat
 ---
 
 # ticket-290 — La frise montre deux étapes actives à la fois

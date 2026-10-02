@@ -1,15 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-01
+depends_on:
+- ticket-279
+estimated_days: 1
 id: ticket-289
-title: "The reviewer and the validator judge the same diff concurrently"
-type: feat
-status: todo
+plan: true
 pr_number: null
 priority: high
-agent: codeur
-depends_on: ["ticket-279"]
-estimated_days: 1
-created: 2026-10-01
-plan: true
+status: done
+title: The reviewer and the validator judge the same diff concurrently
+type: feat
 ---
 
 # ticket-289 — Reviewer et validateur jugent le même diff en parallèle
@@ -52,17 +53,17 @@ découvrir le validateur au tour 2 : 28 % des tickets font deux ou trois tours.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie que le validateur démarre avant la fin du reviewer
+- [x] Un test vérifie que le validateur démarre avant la fin du reviewer
       (deux faux agents qui s'attendent mutuellement aboutissent)
-- [ ] Un test vérifie qu'un audit `BLOCK` ne démarre ni le reviewer ni le
+- [x] Un test vérifie qu'un audit `BLOCK` ne démarre ni le reviewer ni le
       validateur
-- [ ] Un test vérifie qu'un reviewer qui approuve et un validateur qui
+- [x] Un test vérifie qu'un reviewer qui approuve et un validateur qui
       refuse donnent un tour refusé
-- [ ] Un test vérifie qu'un tour refusé par les deux transmet au codeur les
+- [x] Un test vérifie qu'un tour refusé par les deux transmet au codeur les
       deux motifs, chacun avec son auteur
-- [ ] Un test vérifie qu'un validateur qui lève refuse le tour, et que le
+- [x] Un test vérifie qu'un validateur qui lève refuse le tour, et que le
       reviewer va quand même au bout
-- [ ] Un test vérifie que `en_dict()` contient `etapes_en_cours` avec
+- [x] Un test vérifie que `en_dict()` contient `etapes_en_cours` avec
       `revue` et `validation` pendant que les deux tournent
 
 ## Ce que ça ne fait pas

@@ -43,6 +43,7 @@ export default function AgentPanel({
     errorMessage,
     events,
     etape,
+    etapesEnCours,
     quota,
     pendingQuestion,
     questionExpireA,
@@ -154,7 +155,7 @@ export default function AgentPanel({
 
         {(status === "running" || status === "done") && (
           <>
-            <StageStrip etape={etape} events={events} reglages={reglages} />
+            <StageStrip etape={etape} etapesEnCours={etapesEnCours} events={events} reglages={reglages} />
             {currentRound > 0 && <RoundBadge current={currentRound} />}
             {(coutUsd > 0 || outils > 0) && (
               <p className="px-4 pb-1 text-micro text-zinc-500" data-testid="cout-du-run">

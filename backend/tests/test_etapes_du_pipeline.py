@@ -94,7 +94,7 @@ async def test_validation_started_emis_avant_validation_done_avec_validateur() -
     run = _run(events)
     orch = _Orch(_validator=_ValidateurOK())
 
-    await stages.run_validation(orch, run, "")
+    await stages.run_validation(orch, run)
 
     types = [e.type for e in events]
     assert EventType.VALIDATION_STARTED in types, "validation_started absent"
@@ -110,7 +110,7 @@ async def test_validation_started_non_emis_sans_validateur() -> None:
     run = _run(events)
     orch = _Orch()  # _validator = None
 
-    await stages.run_validation(orch, run, "")
+    await stages.run_validation(orch, run)
 
     assert EventType.VALIDATION_STARTED not in [e.type for e in events]
 
@@ -312,7 +312,7 @@ async def test_validation_done_porte_approved_true_pour_verdict_approved() -> No
     run = _run(events)
     orch = _Orch(_validator=_ValidateurOK())
 
-    await stages.run_validation(orch, run, "")
+    await stages.run_validation(orch, run)
 
     validation_done = next(e for e in events if e.type == EventType.VALIDATION_DONE)
     assert validation_done.data["approved"] is True
@@ -323,7 +323,7 @@ async def test_validation_done_porte_approved_false_pour_changes_requested() -> 
     run = _run(events)
     orch = _Orch(_validator=_ValidateurKO())
 
-    await stages.run_validation(orch, run, "")
+    await stages.run_validation(orch, run)
 
     validation_done = next(e for e in events if e.type == EventType.VALIDATION_DONE)
     assert validation_done.data["approved"] is False

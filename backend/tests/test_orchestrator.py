@@ -1441,3 +1441,217 @@ async def test_commit_chore_quand_un_agent_leve(tmp_path: Path) -> None:
     # La cause part dans le message : un commit qui ne dit pas pourquoi il
     # existe se relit comme un travail abandonné sans raison.
     assert "budget" in git.commits[0]
+
+
+# ------------------------------------------------------------------
+# Reviewer et validateur en parallèle — ticket-289
+# ------------------------------------------------------------------
+
+
+async def test_reviewer_et_validateur_tournent_en_parallele(tmp_path: Path) -> None:
+    """Two agents waiting for each other's signal only succeed if they run
+    concurrently.  With sequential execution the second never starts and the
+    first times out, making this test the deadlock detector."""
+    import asyncio
+    from unittest.mock import patch
+
+    reviewer_started = asyncio.Event()
+    validator_started = asyncio.Event()
+
+    async def fake_review(orch: object, run: object, context: object) -> tuple[bool, str, str]:
+        reviewer_started.set()
+        await asyncio.wait_for(validator_started.wait(), timeout=2.0)
+        return True, "", "APPROVED"
+
+    async def fake_validation(orch: object, run: object) -> tuple[bool, str]:
+        validator_started.set()
+        await asyncio.wait_for(reviewer_started.wait(), timeout=2.0)
+        return True, ""
+
+    orchestrator = _make_orchestrator(tmp_path, runner=_RecordingRunner(), git_workspace=_FakeGit())
+
+    with (
+        patch("tessera.services.pipeline_stages.run_review", fake_review),
+        patch("tessera.services.pipeline_stages.run_validation", fake_validation),
+    ):
+        result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
+
+    assert result.approved is True
+
+
+async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) -> None:
+    """A BLOCK from the security audit short-circuits before reviewer and validator."""
+    review_calls: list[str] = []
+    validation_calls: list[str] = []
+
+    class _BlockingAuditor:
+        async def audit(self, code_diff: str, project_path: Path) -> object:
+            return SecurityAuditResult(
+                verdict="BLOCK", issues=[], summary="faille critique"
+            )
+
+    from unittest.mock import patch
+
+    async def spy_review(orch: object, run: object, context: object) -> tuple[bool, str, str]:
+        review_calls.append("called")
+        return True, "", "APPROVED"
+
+    async def spy_validation(orch: object, run: object) -> tuple[bool, str]:
+        validation_calls.append("called")
+        return True, ""
+
+    orchestrator = _make_orchestrator(
+        tmp_path,
+        runner=_RecordingRunner(),
+        git_workspace=_FakeGit(),
+        security_auditor=_BlockingAuditor(),
+        project_path=tmp_path,
+    )
+
+    with (
+        patch("tessera.services.pipeline_stages.run_review", spy_review),
+        patch("tessera.services.pipeline_stages.run_validation", spy_validation),
+    ):
+        result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
+
+    assert not result.approved
+    assert review_calls == [], "le reviewer ne doit pas être appelé après un BLOCK"
+    assert validation_calls == [], "le validateur ne doit pas être appelé après un BLOCK"
+
+
+async def test_reviewer_approuve_et_validateur_refuse_donne_un_refus(tmp_path: Path) -> None:
+    """The turn is refused when the reviewer approves but the validator does not."""
+    from tessera.services.validator import ValidationResult, CriterionResult
+
+    class _RefusingValidator:
+        async def validate(
+            self, criteria: list[str], code_produced: str, test_result: object
+        ) -> object:
+            return ValidationResult(
+                all_passed=False,
+                criteria=[
+                    CriterionResult(
+                        criterion="critère manquant", passed=False, note="non couvert"
+                    )
+                ],
+                verdict="CHANGES_REQUESTED",
+                feedback="critère non couvert",
+            )
+
+    orchestrator = _make_orchestrator(
+        tmp_path,
+        runner=_RecordingRunner(),
+        git_workspace=_FakeGit(),
+        validator=_RefusingValidator(),
+        max_review_rounds=1,
+    )
+    result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
+
+    assert not result.approved
+    assert result.final_status is TicketStatus.blocked
+
+
+async def test_double_refus_inclut_les_deux_motifs_avec_auteur(tmp_path: Path) -> None:
+    """When both reviewer and validator refuse, the combined feedback names both.
+
+    On round 2 the coder receives a context that lists both reviewers' reasons
+    with their author label.  Two rounds are needed: round 1 produces the
+    combined feedback, round 2 lets us intercept the coder context before it runs.
+    """
+    from tessera.services.validator import ValidationResult, CriterionResult
+
+    class _RefusingValidator:
+        async def validate(
+            self, criteria: list[str], code_produced: str, test_result: object
+        ) -> object:
+            return ValidationResult(
+                all_passed=False,
+                criteria=[
+                    CriterionResult(
+                        criterion="c1", passed=False, note="raté"
+                    )
+                ],
+                verdict="CHANGES_REQUESTED",
+                feedback="motif validateur",
+            )
+
+    # Round 1 : reviewer refuse + validator refuse.
+    # Round 2 : reviewer approuve (pour terminer proprement).
+    call_count = 0
+
+    class _TwoRoundRunner:
+        async def run(self, **kwargs: object) -> AgentResult:
+            nonlocal call_count
+            call_count += 1
+            role = kwargs["role"]
+            if role == AgentRole.codeur:
+                return _make_agent_result("prose du codeur", role=role)  # type: ignore[arg-type]
+            # Reviewer : refuse au tour 1, approuve au tour 2.
+            content = "CHANGES_REQUESTED: motif reviewer" if call_count <= 2 else "APPROVED"
+            return _make_agent_result(content, role=role)  # type: ignore[arg-type]
+
+    runner = _TwoRoundRunner()
+    captured_contexts: list[str] = []
+
+    original_run = runner.run
+
+    async def capturing_run(**kwargs: object) -> AgentResult:
+        role = kwargs.get("role")
+        if role == AgentRole.codeur:
+            captured_contexts.append(str(kwargs.get("project_context", "")))
+        return await original_run(**kwargs)
+
+    runner.run = capturing_run  # type: ignore[method-assign]
+
+    orchestrator = _make_orchestrator(
+        tmp_path,
+        runner=runner,
+        git_workspace=_FakeGit(),
+        validator=_RefusingValidator(),
+        max_review_rounds=2,
+    )
+    await orchestrator.run_pipeline("projet", "ticket-001", _noop)
+
+    # Le contexte du coder au tour 2 doit nommer les deux auteurs du tour 1.
+    assert len(captured_contexts) >= 2, "le coder n'a pas été appelé deux fois"
+    second_round_context = captured_contexts[1]
+    assert "Reviewer" in second_round_context
+    assert "Validateur" in second_round_context
+    assert "motif reviewer" in second_round_context
+    assert "motif validateur" in second_round_context
+
+
+async def test_validateur_qui_leve_refuse_et_reviewer_va_au_bout(tmp_path: Path) -> None:
+    """A validator whose validate() raises refuses the turn (ADR-039: fails
+    closed), without cancelling the reviewer — run_validation catches every
+    Exception and returns (False, msg) so asyncio.gather never sees it raise."""
+    import asyncio
+
+    reviewer_done = asyncio.Event()
+
+    class _RaisingValidator:
+        async def validate(
+            self, criteria: list[str], code_produced: str, test_result: object
+        ) -> object:
+            raise RuntimeError("provider indisponible")
+
+    class _TrackingRunner(_RecordingRunner):
+        async def run(self, **kwargs: object) -> AgentResult:
+            result = await super().run(**kwargs)
+            if kwargs["role"] == AgentRole.reviewer:
+                reviewer_done.set()
+            return result
+
+    orchestrator = _make_orchestrator(
+        tmp_path,
+        runner=_TrackingRunner(),
+        git_workspace=_FakeGit(),
+        validator=_RaisingValidator(),
+        max_review_rounds=1,
+    )
+    result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
+
+    assert not result.approved, "un validateur qui lève doit refuser le tour"
+    assert reviewer_done.is_set(), (
+        "le reviewer doit aller au bout malgré l'exception du validateur"
+    )
