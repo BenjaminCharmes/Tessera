@@ -1,15 +1,16 @@
 ---
-id: ticket-325
-title: "Reloading the page rebuilds a running run's view from its recorded events, previous agents included"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
+id: ticket-325
 plan: true
-created: 2026-10-02
+pr_number: 230
+priority: high
+status: done
+title: Reloading the page rebuilds a running run's view from its recorded events,
+  previous agents included
+type: fix
 ---
 
 # ticket-325 — Recharger la page garde l'historique du run en cours

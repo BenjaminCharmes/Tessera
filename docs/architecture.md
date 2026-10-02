@@ -561,15 +561,41 @@ CREATE TABLE agent_calls (
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
 
-## Visualisation des runs terminés (ticket-280, ticket-281)
+## Récupération de l'historique d'un run (ticket-280, ticket-281, ticket-325)
 
 Un run qui quitte la supervision — fermé ou au redémarrage du backend — disparaît 
-de la WebSocket temps réel. Les événements persistent en SQLite, et l'utilisateur 
-peut les rejouer depuis l'historique :
+de la WebSocket temps réel. Les événements persistent en SQLite et peuvent être 
+rechargés de deux façons : lors d'une visite de l'historique, ou lors d'un 
+rechargement de page si le run est encore en cours.
 
-1. **Récupération** : un clic sur une ligne de `RecentRuns` appelle l'endpoint 
-   du ticket-280 avec l'identifiant du run, qui retourne l'ensemble de ses 
-   événements, du début à la fin.
+### Rechargement d'un run vivant
+
+Lors d'un rechargement de page, l'écran découvre les runs en cours via 
+l'instantané (`RunActif`). Si le run est vivant (en cours d'exécution), l'écran 
+charge automatiquement ses événements historiques enregistrés :
+
+1. Le frontend utilise le `db_run_id` de l'instantané pour appeler l'endpoint 
+   du ticket-280
+2. Les événements du début du run jusqu'à l'instant du rechargement sont retournés 
+   en entier
+3. Le frontend les rejoue dans `applyEvent`, la même fonction qui applique les 
+   événements temps réel
+4. Après le rejeu complet, le frontend se reconnecte à la WebSocket et reçoit 
+   les événements en direct
+5. Un mécanisme de déduplication écarte les événements reçus à la fois par 
+   l'historique et par le flux en direct (ticket-313)
+
+L'écran retrouve l'état du run tel qu'il était avant le rechargement. Un 
+rechargement pendant le tour du codeur affiche le plan initial, tous les tours 
+antérieurs, et reçoit ensuite les événements en direct du tour en cours.
+
+### Visualisation des runs terminés
+
+Un utilisateur peut aussi consulter l'historique en cliquant sur une ligne 
+de `RecentRuns` :
+
+1. **Récupération** : le clic appelle l'endpoint du ticket-280 avec l'identifiant 
+   du run en base SQLite
 2. **Rejeu** : le frontend applique chaque événement dans `applyEvent` — le même 
    code que pour la WebSocket temps réel. L'état visuel se reconstruit entièrement 
    en quelques millisecondes, cartes comprises.
@@ -577,9 +603,11 @@ peut les rejouer depuis l'historique :
    message, ni chrono qui tourne. C'est un instantané interactif du passé, pas 
    un run vivant.
 
+### Invariants du rejeu
+
 Cette capacité de rejeu repose sur le fait que chaque événement porte assez 
-d'information pour reconstituer l'état. Les `OrchestratorEvent` — écrits 
-initialement pour le temps réel — le satisfont aussi bien pour l'historique : 
+d'information pour reconstituer l'état. Les `OrchestratorEvent` — conçus 
+initialement pour le temps réel — servent tout aussi bien au rejeu historique : 
 c'est la même sérialisation JSON, les mêmes champs, aucune adaptation.
 
 
@@ -657,7 +685,19 @@ affiché dans l'UI.
 
 ## OrchestratorEvents (WebSocket)
 
-Dès la connexion, le serveur envoie un instantané du run (`RunActif`), qui porte `ticket_id` et `ticket_titre`, permettant à la Supervision et à l'en-tête du run d'afficher ces informations sans ouvrir le projet (ticket-286). L'instantané contient désormais `etapes_en_cours: string[]`, qui liste toutes les étapes actuellement en cours d'exécution (ticket-289). Après l'audit sécurité, reviewer et validateur peuvent tourner en parallèle : le client affiche les deux pastilles actives. Quand `etapes_en_cours` est absent (run ancien), les clients replient sur le champ `etape`.
+Dès la connexion, le serveur envoie un instantané du run (`RunActif`) :
+- `ticket_id` et `ticket_titre` — permettent à la Supervision et à l'en-tête 
+  du run d'afficher ces informations sans ouvrir le projet (ticket-286)
+- `db_run_id` — identifiant du run en base SQLite, qui permet au frontend de 
+  charger l'historique des événements enregistrés lors d'un rechargement 
+  (ticket-325)
+- `etapes_en_cours: string[]` — liste toutes les étapes actuellement en cours 
+  d'exécution (ticket-289). Après l'audit sécurité, reviewer et validateur 
+  peuvent tourner en parallèle : le client affiche les deux pastilles actives.
+
+Quand `etapes_en_cours` ou `db_run_id` sont absents (runs lancés avant ces 
+additions), les clients replient respectivement sur le champ `etape` et ne 
+rechargent pas automatiquement l'historique enregistré.
 
 Tout événement `ticket_status_changed` porte `ticket_titre` dès réception (ticket-324). Pour chaque ticket,
 le titre est lu une seule fois du disque ; les événements ultérieurs sur le même ticket portent ce titre en cache,

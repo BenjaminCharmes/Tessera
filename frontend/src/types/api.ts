@@ -169,6 +169,13 @@ export interface RunActif {
   ticket_id: string | null;
   /** Titre lisible du ticket en cours (ticket-286). Absent sur un backend ancien. */
   ticket_titre?: string | null;
+  /**
+   * Identifiant en base du run (ticket-325). Présent dès que la ligne existe
+   * en base ; absent sur un backend plus ancien. Permet au frontend de charger
+   * les événements persistés via GET /runs/{db_run_id}/events au rechargement
+   * de page, pour reconstruire toutes les cartes du fil chronologique.
+   */
+  db_run_id?: string | null;
   etape: string | null;
   /** Étapes actives en parallèle — livré par ticket-289. Absent sur un backend ancien. */
   etapes_en_cours?: string[] | null;
