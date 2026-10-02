@@ -81,6 +81,16 @@ describe("BottomPanel", () => {
     expect(screen.getByText(/arbre de travail/i)).toBeTruthy();
   });
 
+  it("affiche les chemins des fichiers qui bloquent un arbre sale (ticket-323)", () => {
+    const ev = makeEvent("error", {
+      reason: "dirty_working_tree",
+      fichiers: ["agents.json", "memory/pipeline-log.md"],
+    });
+    render(<BottomPanel events={[ev]} />);
+    expect(screen.getByText(/agents\.json/)).toBeTruthy();
+    expect(screen.getByText(/memory\/pipeline-log\.md/)).toBeTruthy();
+  });
+
   it("montre une raison inconnue telle quelle plutot que de l'effacer", () => {
     const ev = makeEvent("error", { reason: "quelque_chose_de_nouveau" });
     render(<BottomPanel events={[ev]} />);

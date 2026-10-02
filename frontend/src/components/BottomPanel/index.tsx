@@ -23,7 +23,7 @@ interface BottomPanelProps {
  */
 const RAISONS: Record<string, string> = {
   dirty_working_tree:
-    "l'arbre de travail contient des modifications que le pipeline n'a pas faites. Commite-les ou remise-les avant de relancer.",
+    "l'arbre de travail contient des modifications hors pipeline",
   commit_failed:
     "le commit de fin de run a échoué : le travail est resté dans l'arbre et le ticket n'est pas passé done.",
 };
@@ -31,9 +31,15 @@ const RAISONS: Record<string, string> = {
 function raisonLisible(ev: OrchestratorEvent): string {
   const reason = ev.data["reason"];
   const message = ev.data["message"];
+  const fichiers = ev.data["fichiers"];
+  const fichiersSuffix =
+    Array.isArray(fichiers) && fichiers.length > 0
+      ? ` : ${fichiers.join(", ")}`
+      : "";
   if (typeof reason === "string") {
     const lisible = RAISONS[reason] ?? reason;
-    return typeof message === "string" ? `${lisible} (${message})` : lisible;
+    const withFiles = `${lisible}${fichiersSuffix}`;
+    return typeof message === "string" ? `${withFiles} (${message})` : withFiles;
   }
   return typeof message === "string" ? message : "raison non précisée";
 }

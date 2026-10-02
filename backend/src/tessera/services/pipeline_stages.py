@@ -62,9 +62,30 @@ async def ensure_clean_tree(
         _logger.warning("dirty_check_failed", extra={"error": str(exc)})
         return None
 
-    _logger.warning("dirty_working_tree_refused", extra={"ticket_id": run.ticket_id})
+    fichiers: list[str] = []
+    try:
+        fichiers = await orch._git_workspace.dirty_files()
+    except GitWorkspaceError:
+        pass
+
+    noms = ", ".join(fichiers)
+    arret = (
+        f"l'arbre contient des modifications hors pipeline : {noms}"
+        if noms
+        else "l'arbre contient des modifications hors pipeline"
+    )
+
+    _logger.warning(
+        "dirty_working_tree_refused",
+        extra={"ticket_id": run.ticket_id, "fichiers": fichiers},
+    )
     await set_status(orch, run, TicketStatus.blocked)
-    await emit(run, EventType.ERROR, reason="dirty_working_tree")
+    await emit(
+        run, EventType.ERROR,
+        reason="dirty_working_tree",
+        fichiers=fichiers,
+        arret=arret,
+    )
     return PipelineResult(
         ticket_id=run.ticket_id,
         final_status=TicketStatus.blocked,
