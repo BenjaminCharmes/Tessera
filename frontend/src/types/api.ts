@@ -47,6 +47,7 @@ export type EventType =
   | "validation_started"
   | "documentation_started"
   | "livraison_started"
+  | "ci_merge_done"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */

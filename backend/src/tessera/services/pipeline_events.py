@@ -65,6 +65,11 @@ class EventType(str, Enum):
     #: La livraison du commit démarre (ticket-255). Émis seulement sur un run
     #: approuvé dont le projet autorise au moins `pr`.
     LIVRAISON_STARTED = "livraison_started"
+    #: La phase 2 de la livraison est terminée — CI attendue et merge tenté
+    #: (ticket-306). Émis par `CIWatcher` après chaque merge ou échec de CI.
+    #: `merged` indique si la PR a été mergée ; `arret` contient la raison du
+    #: blocage quand `merged` est faux.
+    CI_MERGE_DONE = "ci_merge_done"
 
 
 class OrchestratorEvent(BaseModel):
