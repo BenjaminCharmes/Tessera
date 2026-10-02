@@ -1162,3 +1162,15 @@ Le diff ajoute une étape (24750ms)
 - 2026-10-02 22:42:36 UTC — [ticket-321] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés via les tests. L (167077ms)
 - 2026-10-02 22:42:36 UTC — [ticket-321] APPROVED après 3 tour(s)
 - 2026-10-02 22:45:15 UTC — [ticket-321] documentation: 2 fichier(s) (156593ms)
+- 2026-10-02 22:45:29 UTC — [ticket-323] branche ticket-323-a-run-refused-for-a-dirty-tree-names-the-files-th
+- 2026-10-02 22:45:29 UTC — [ticket-323] tour 1 — codeur démarré
+- 2026-10-02 22:52:46 UTC — [ticket-323] tour 1 — codeur terminé (436452ms)
+- 2026-10-02 22:59:12 UTC — [ticket-323] testeur: OK (exit 0)
+- 2026-10-02 22:59:45 UTC — [ticket-323] securite: PASS — Aucune vulnérabilité détectée.
+
+Analyse effectuée :
+- **git_workspace.py** : la  (32406ms)
+- 2026-10-02 22:59:45 UTC — [ticket-323] tour 1 — reviewer démarré
+- 2026-10-02 23:00:40 UTC — [ticket-323] tour 1 — reviewer terminé (55610ms)
+- 2026-10-02 23:01:52 UTC — [ticket-323] validateur: APPROVED — Les trois critères d'acceptation ont été implémentés et testés. Le code ajoute u (127343ms)
+- 2026-10-02 23:01:52 UTC — [ticket-323] APPROVED après 1 tour(s)
