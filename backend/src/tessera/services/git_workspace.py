@@ -7,6 +7,7 @@ diff (including untracked files) and commit the work.
 import asyncio
 import json
 import re
+import shutil
 import tempfile
 from collections.abc import Awaitable, Callable
 from pathlib import Path
@@ -75,6 +76,36 @@ def _is_orchestrator_artifact_path(path: str) -> bool:
         elif path == artifact:
             return True
     return False
+
+
+def _extraire_fichiers_bloques(stderr: str) -> list[str]:
+    """Extract untracked file paths that blocked a ``git rebase --abort``.
+
+    Git emits, in this order:
+        error: The following untracked working tree files would be overwritten by reset:
+            path/to/file.md
+        fatal: could not move back to <sha>
+
+    Returns the list of file paths found between the header line and the
+    ``fatal:`` line. Paths are returned as git reports them (relative to the
+    repository root, with forward slashes on all platforms).
+    """
+    fichiers: list[str] = []
+    en_section = False
+    for ligne in stderr.splitlines():
+        if "untracked working tree files" in ligne and "overwritten" in ligne:
+            en_section = True
+            continue
+        if en_section:
+            stripped = ligne.strip()
+            if stripped and not any(
+                stripped.startswith(p)
+                for p in ("fatal:", "error:", "hint:", "Please")
+            ):
+                fichiers.append(stripped)
+            else:
+                en_section = False
+    return fichiers
 
 
 def _is_run_policy_path(path: str) -> bool:
@@ -698,6 +729,9 @@ class GitWorkspaceService:
         await self._ensure_own_repository()
         if not await self._ref_existe(base):
             raise BaseIntrouvable(base)
+
+        sha_avant = (await self._run("rev-parse", "HEAD")).strip()
+
         try:
             await self._run("rebase", base)
         except GitCommandError as echec:
@@ -716,8 +750,14 @@ class GitWorkspaceService:
             await self._annuler_si_en_cours()
             raise refus
 
+        # Si tous les conflits sont des artefacts Tessera, les résoudre
+        # automatiquement en faveur de la branche (ticket-300, ADR-033).
+        if all(_is_orchestrator_artifact_path(c) for c in conflits):
+            if await self._resoudre_conflits_artefacts(conflits):
+                return ()
+
         if resolveur is None or not await self._faire_resoudre(conflits, resolveur):
-            await self._run("rebase", "--abort")
+            await self._annuler_rebase_robuste(sha_avant)
             return conflits
         return ()
 
@@ -740,6 +780,140 @@ class GitWorkspaceService:
                 await self._run("rebase", "--abort")
             except GitCommandError as exc:
                 _logger.warning("rebase_abort_failed", extra={"error": str(exc)})
+
+    async def _annuler_rebase_robuste(self, sha_avant: str) -> None:
+        """Abort the rebase even when untracked Tessera files block ``--abort``.
+
+        Sequence:
+        1. Try ``rebase --abort``.
+        2. On failure: remove any Tessera artifact paths that are blocking the
+           reset (parsed from stderr), then retry ``--abort``.
+        3. Last resort: manually remove the rebase state directory and
+           hard-reset HEAD to *sha_avant*.
+
+        Blocking paths come from git relative to the **repository root**, not
+        the project directory.  For a project with ``git_root: ancestor`` the
+        two differ (e.g. the git root is ``tessera/``, the project is
+        ``tessera/projects/ide-core/``), so the absolute path is resolved from
+        the git root and then re-expressed relative to the project before
+        calling ``_is_orchestrator_artifact_path``.
+        """
+        try:
+            await self._run("rebase", "--abort")
+            return
+        except GitCommandError as echec:
+            bloquants = _extraire_fichiers_bloques(echec.stderr)
+            artefacts_supprimes: list[str] = []
+            if bloquants:
+                git_root = await self._chemin_racine_git()
+                project_root = self._project_path.resolve()
+                for chemin_git in bloquants:
+                    abs_path = (git_root / chemin_git).resolve()
+                    try:
+                        rel = str(abs_path.relative_to(project_root)).replace("\\", "/")
+                    except ValueError:
+                        continue
+                    if _is_orchestrator_artifact_path(rel) and abs_path.is_file():
+                        abs_path.unlink()
+                        artefacts_supprimes.append(chemin_git)
+                        _logger.info(
+                            "artefact_supprime_pour_rebase_abort",
+                            extra={"chemin": chemin_git},
+                        )
+            if artefacts_supprimes:
+                try:
+                    await self._run("rebase", "--abort")
+                    return
+                except GitCommandError:
+                    pass
+
+        _logger.warning("rebase_abort_dernier_recours", extra={"sha": sha_avant[:7]})
+        await self._restaurer_depuis_sha(sha_avant)
+
+    async def _chemin_racine_git(self) -> Path:
+        """Return the absolute path of the git repository root (``--show-toplevel``)."""
+        try:
+            top = (await self._run("rev-parse", "--show-toplevel")).strip()
+            return Path(top).resolve()
+        except GitCommandError:
+            return self._project_path.resolve()
+
+    async def _restaurer_depuis_sha(self, sha: str) -> None:
+        """Remove rebase state and hard-reset the branch to *sha*.
+
+        Called only when both ``rebase --abort`` attempts have failed. Reads
+        the original branch name from ``.git/rebase-merge/head-name`` before
+        deleting the state directory so we can check it back out.
+        """
+        try:
+            git_dir_str = (await self._run("rev-parse", "--git-dir")).strip()
+            git_dir = Path(git_dir_str)
+            if not git_dir.is_absolute():
+                git_dir = self._project_path / git_dir
+            head_name_file = git_dir / "rebase-merge" / "head-name"
+            head_name = (
+                head_name_file.read_text(encoding="utf-8").strip()
+                if head_name_file.exists()
+                else None
+            )
+            for nom in ("rebase-merge", "rebase-apply"):
+                d = git_dir / nom
+                if d.exists():
+                    shutil.rmtree(str(d))
+                    _logger.info("rebase_etat_supprime", extra={"dossier": nom})
+            if head_name and head_name.startswith("refs/heads/"):
+                branch = head_name[len("refs/heads/"):]
+                try:
+                    await self._run("checkout", branch)
+                except GitCommandError:
+                    pass
+        except (GitCommandError, OSError) as exc:
+            _logger.warning("rebase_etat_suppression_echoue", extra={"erreur": str(exc)})
+        try:
+            await self._run("reset", "--hard", sha)
+        except GitCommandError as exc:
+            _logger.error("rebase_reset_hard_echoue", extra={"erreur": str(exc)})
+
+    async def _resoudre_conflits_artefacts(self, conflits: tuple[str, ...]) -> bool:
+        """Auto-resolve conflicts where all files are Tessera artifacts.
+
+        Accepts the branch version (theirs) for each conflict:
+        - UD (updated by base, deleted by branch): stage the deletion via
+          ``git rm -f``.
+        - Any other conflict: check out theirs and stage.
+
+        Also stages any untracked Tessera artifact files (e.g. a ``done/``
+        ticket the cherry-pick added alongside the conflict), so that
+        ``rebase --continue`` can create a clean commit.
+
+        Returns True when the rebase completed successfully, False on any error.
+        """
+        try:
+            for chemin in conflits:
+                status_out = await self._run("status", "--porcelain", "--", chemin)
+                code = status_out[:2] if len(status_out) >= 2 else "UU"  # noqa: PLR2004
+                if code == "UD":
+                    # Branch deleted the file; stage the deletion.
+                    await self._run("rm", "-f", "--", chemin)
+                else:
+                    await self._run("checkout", "--theirs", "--", chemin)
+                    await self._run("add", "--", chemin)
+
+            if await self._fichiers_en_conflit():
+                return False
+
+            # Stage any untracked Tessera artifacts the cherry-pick was adding
+            # (e.g. a tickets/done/ file written alongside the conflict).
+            listing = await self._run("ls-files", "--others", "--exclude-standard")
+            for untracked in listing.splitlines():
+                untracked = untracked.strip()
+                if untracked and _is_orchestrator_artifact_path(untracked):
+                    await self._run("add", "--", untracked)
+
+            await self._run("-c", "core.editor=true", "rebase", "--continue")
+            return True
+        except GitCommandError:
+            return False
 
     async def _rebase_en_cours(self) -> bool:
         """Git a-t-il un rebase à moitié appliqué sous la main ?"""
