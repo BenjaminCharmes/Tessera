@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-316
 plan: true
-pr_number: null
+pr_number: 216
 priority: medium
 status: done
 title: The validator also receives the current content of the test files a criterion
