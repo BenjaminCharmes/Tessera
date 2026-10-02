@@ -1,13 +1,23 @@
 ---
-id: ticket-312
-title: "Fix: SupervisionView selection test fails — selectionner not called with run-2"
+id: ticket-317
+title: "The SupervisionView selection test is flaky under load"
 type: fix
 status: todo
-priority: high
+priority: low
 agent: codeur
+pr_number: null
+depends_on: []
+estimated_days: 0.5
+created: 2026-10-02
 ---
 
-# ticket-312 — Corriger le test de sélection de SupervisionView
+# ticket-317 — Le test de sélection de SupervisionView est instable sous charge
+
+Constaté le 2026-10-02 : ce test a échoué une fois pendant la vérification du
+ticket-310, alors que la machine faisait aussi tourner un modèle local. Lancé
+seul sur `develop`, il passe trois fois sur trois. Ce ticket cherche donc une
+dépendance au temps (clic non attendu, `waitFor` trop court), pas un bogue
+du composant.
 
 ## Symptôme
 
