@@ -145,9 +145,24 @@ def test_exit_code_reflects_tool_returncode() -> None:
 # ---------------------------------------------------------------------------
 
 def test_no_venv_executable_in_any_step() -> None:
-    """None of the declared steps calls a binary under .venv."""
+    """No step calls a console-script launcher such as `.venv/Scripts/pytest.exe`.
+
+    The interpreter itself is allowed: it is what `uv run python` runs, and the
+    only way to reach the project's pytest and mypy (`<interpreter> -m tool`).
+    """
     for step in STEPS:
-        for part in step.cmd:
+        programme, *args = step.cmd
+        assert programme == sys.executable or Path(programme).stem == "npx", (
+            f"Step {step.name!r} starts with {programme!r}"
+        )
+        for part in args:
             assert ".venv" not in part, (
                 f"Step {step.name!r} contains a .venv path in its command: {part!r}"
             )
+
+
+def test_python_steps_use_the_running_interpreter() -> None:
+    """`python` alone is the system interpreter on Windows, without pytest."""
+    for step in STEPS:
+        if step.name in ("pytest", "mypy"):
+            assert step.cmd[0] == sys.executable

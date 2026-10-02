@@ -34,8 +34,8 @@ merge pas seul tant que la CI ne peut pas tourner : `merge` exige une CI verte.
 
 Les tests de ce dépôt vivent dans `backend/` et `frontend/`, au-dessus du
 dossier du projet : `pipeline.test_cwd` (ticket-241) y mène le testeur.
-Il ne lance que `backend/` — environ quatre minutes par tour ; le frontend
-reste vérifié par la CI. Le ticket-295 dit pourquoi ce coût vaut d'être payé.
+Il lance `scripts/verifier.py` : pytest et mypy, puis tsc, eslint et vitest —
+environ six minutes par tour (tickets 295 et 304, qui disent pourquoi).
 
 ## Stack spécifique à ce projet
 

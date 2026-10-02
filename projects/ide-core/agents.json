@@ -96,9 +96,9 @@
     ],
     "max_review_rounds": 3,
     "testeur_enabled": true,
-    "test_command": "uv run python -m pytest -q -x -m \"not integration\" -p no:cacheprovider",
+    "test_command": "uv run python ../scripts/verifier.py",
     "test_cwd": "../../backend",
-    "test_timeout_s": 600,
+    "test_timeout_s": 900,
     "securite_enabled": true,
     "validateur_enabled": true,
     "doc_claude_md": true
