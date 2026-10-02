@@ -421,6 +421,10 @@ En mode autonome, le ticket suivant commence immédiatement (le projet n'est plu
 
 Si une étape échoue — conflit de rebase, ou vérification CI — tu vois l'erreur dans le run. La PR n'est ouverte que si la livraison a réussi.
 
+Si la CI échoue, le ticket passe en `blocked` — tu dois corriger le problème et relancer le pipeline. Il n'y a pas de relance automatique.
+
+En mode file (`queue`), un seul merge par projet peut être en cours à la fois. Les tickets suivants attendent que le précédent soit fusionné avant de pouvoir commencer leur propre livraison.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
