@@ -926,3 +926,18 @@ Points positifs :
 - 2026-10-02 09:42:47 UTC — [ticket-306] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le code implémente correctement (276859ms)
 - 2026-10-02 09:42:47 UTC — [ticket-306] APPROVED après 1 tour(s)
 - 2026-10-02 09:46:30 UTC — [ticket-306] documentation: 1 fichier(s) (220046ms)
+- 2026-10-02 09:50:16 UTC — [ticket-307] branche ticket-307-a-run-frees-its-project-once-the-pr-is-open-and-a
+- 2026-10-02 09:52:58 UTC — [ticket-307] plan rendu (162500ms)
+- 2026-10-02 09:52:58 UTC — [ticket-307] tour 1 — codeur démarré
+- 2026-10-02 10:15:02 UTC — [ticket-307] tour 1 — codeur terminé (1324014ms)
+- 2026-10-02 10:16:01 UTC — [ticket-307] testeur: 1 failed, 516 passed, 2 deselected, 5 warnings in 56.06s
+- 2026-10-02 10:16:01 UTC — [ticket-307] tests rouges au tour 1
+- 2026-10-02 10:16:01 UTC — [ticket-307] tour 2 — codeur démarré
+- 2026-10-02 10:23:50 UTC — [ticket-307] tour 2 — codeur terminé (469217ms)
+- 2026-10-02 10:24:50 UTC — [ticket-307] testeur: 1 failed, 518 passed, 2 deselected, 5 warnings in 57.14s
+- 2026-10-02 10:24:50 UTC — [ticket-307] tests rouges au tour 2
+- 2026-10-02 10:24:50 UTC — [ticket-307] tour 3 — codeur démarré
+- 2026-10-02 10:27:57 UTC — [ticket-307] tour 3 — codeur terminé (186936ms)
+- 2026-10-02 10:31:36 UTC — [ticket-307] testeur: Found 1 error in 1 file (checked 101 source files)
+- 2026-10-02 10:31:36 UTC — [ticket-307] tests rouges au tour 3
+- 2026-10-02 10:31:36 UTC — [ticket-307] BLOCKED après 3 tour(s) sans approbation
