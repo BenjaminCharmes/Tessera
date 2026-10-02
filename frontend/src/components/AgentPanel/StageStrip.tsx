@@ -71,87 +71,87 @@ function etapesActives(
   return actives;
 }
 
-/** Détermine l'état d'une étape depuis l'instantané et les événements. */
+/**
+ * Détermine l'état d'une étape depuis l'instantané et les événements.
+ *
+ * `etapesEnCours` permet le suivi de plusieurs étapes actives en parallèle
+ * (ticket-290 : reviewer + validateur simultanés). Quand cette liste est
+ * fournie et non vide, elle prend le dessus sur le heuristique d'index.
+ */
 function etatEtape(
   id: string,
   etape: string | null,
+  etapesEnCours: string[],
   events: OrchestratorEvent[],
 ): EtatEtape {
-  // L'instantané décide : si l'étape actuelle est plus avancée, celle-ci est done.
-  const indexActuel = etape ? ORDRE_IDS.indexOf(etape) : -1;
-  const indexEtape = ORDRE_IDS.indexOf(id);
-
-  if (etape === id) {
-    // Une étape peut recevoir son événement de fin pendant qu'elle est encore
-    // active dans l'instantané (livraison_done reçu avant run_closed, par ex.).
-    // On vérifie d'abord les événements de fin avant de rendre "active" (ticket-279).
-    switch (id) {
-      case "livraison":
-        if (events.some((e) => e.type === "livraison_done")) return "done";
-        break;
-      case "documentation":
-        if (events.some((e) => e.type === "doc_updated" || e.type === "documentation_failed"))
-          return "done";
-        break;
-      case "validation":
-        if (events.some((e) => e.type === "validation_done" && estValidationRefusee(e)))
-          return "rejected";
-        if (events.some((e) => e.type === "validation_done")) return "done";
-        break;
-      case "securite":
-        if (events.some((e) => e.type === "security_audit_done" && e.data["verdict"] === "BLOCK"))
-          return "rejected";
-        if (events.some((e) => e.type === "security_audit_done")) return "done";
-        break;
-    }
-    return "active";
-  }
-
-  if (indexActuel > indexEtape && indexActuel >= 0) {
-    // On est plus loin dans le pipeline — mais cette étape a-t-elle été refusée ?
-    if (id === "securite" && events.some(
-      (e) => e.type === "security_audit_done" && e.data["verdict"] === "BLOCK",
-    )) {
-      return "rejected";
-    }
-    if (id === "validation" && events.some(
-      (e) => e.type === "validation_done" && estValidationRefusee(e),
-    )) {
-      return "rejected";
-    }
-    return "done";
-  }
-
-  // Pas de contexte depuis l'instantané : se fier aux événements.
+  // 1. Les événements de fin ont toujours priorité (ticket-279).
   switch (id) {
+    case "livraison":
+      if (events.some((e) => e.type === "livraison_done")) return "done";
+      break;
+    case "documentation":
+      if (events.some((e) => e.type === "doc_updated" || e.type === "documentation_failed"))
+        return "done";
+      break;
+    case "validation":
+      if (events.some((e) => e.type === "validation_done" && estValidationRefusee(e)))
+        return "rejected";
+      if (events.some((e) => e.type === "validation_done")) return "done";
+      break;
+    case "securite":
+      if (events.some((e) => e.type === "security_audit_done" && e.data["verdict"] === "BLOCK"))
+        return "rejected";
+      if (events.some((e) => e.type === "security_audit_done")) return "done";
+      break;
     case "production":
       if (events.some((e) => e.type === "agent_done" && e.agent === "codeur")) return "done";
-      if (events.some((e) => e.type === "agent_started" && e.agent === "codeur")) return "active";
       break;
-    case "securite": {
-      const auditsDone = events.filter((e) => e.type === "security_audit_done");
-      if (auditsDone.some((e) => e.data["verdict"] === "BLOCK")) return "rejected";
-      if (auditsDone.length > 0) return "done";
-      if (events.some((e) => e.type === "security_audit_started")) return "active";
-      break;
-    }
     case "revue":
       if (events.some((e) => e.type === "agent_done" && e.agent === "reviewer")) return "done";
+      break;
+  }
+
+  // 2. Étape explicitement en cours (ticket-290 : parallélisme revue + validation).
+  if (etapesEnCours.includes(id)) return "active";
+
+  // 3. Heuristique d'index : uniquement quand aucune étape parallèle n'est connue,
+  //    pour ne pas marquer "revue" comme done parce que "validation" a démarré
+  //    alors qu'elles tournent en même temps.
+  if (etapesEnCours.length === 0 && etape !== null) {
+    const indexActuel = ORDRE_IDS.indexOf(etape);
+    const indexEtape = ORDRE_IDS.indexOf(id);
+
+    if (etape === id) return "active";
+
+    if (indexActuel > indexEtape && indexActuel >= 0) {
+      if (id === "securite" && events.some(
+        (e) => e.type === "security_audit_done" && e.data["verdict"] === "BLOCK",
+      )) return "rejected";
+      if (id === "validation" && events.some(
+        (e) => e.type === "validation_done" && estValidationRefusee(e),
+      )) return "rejected";
+      return "done";
+    }
+  }
+
+  // 4. Détection active par événements (reconnexion sans etapesEnCours).
+  switch (id) {
+    case "production":
+      if (events.some((e) => e.type === "agent_started" && e.agent === "codeur")) return "active";
+      break;
+    case "securite":
+      if (events.some((e) => e.type === "security_audit_started")) return "active";
+      break;
+    case "revue":
       if (events.some((e) => e.type === "agent_started" && e.agent === "reviewer")) return "active";
       break;
-    case "validation": {
-      const validsDone = events.filter((e) => e.type === "validation_done");
-      if (validsDone.some(estValidationRefusee)) return "rejected";
-      if (validsDone.length > 0) return "done";
+    case "validation":
       if (events.some((e) => e.type === "validation_started")) return "active";
       break;
-    }
     case "documentation":
-      if (events.some((e) => e.type === "doc_updated")) return "done";
       if (events.some((e) => e.type === "documentation_started")) return "active";
       break;
     case "livraison":
-      if (events.some((e) => e.type === "livraison_done")) return "done";
       if (events.some((e) => e.type === "livraison_started")) return "active";
       break;
   }
@@ -190,6 +190,8 @@ function Pastille({ etat, label }: PastilleProps) {
 interface StageStripProps {
   /** Étape en cours depuis le snapshot du run (ticket-255). */
   etape: string | null;
+  /** Étapes actives en parallèle (ticket-290). Vide par défaut. */
+  etapesEnCours?: string[];
   /** Événements reçus pour enrichir ou suppléer l'état. */
   events: OrchestratorEvent[];
   /** Configuration du pipeline pour filtrer les étapes inactives. */
@@ -200,9 +202,11 @@ interface StageStripProps {
  * Frise d'étapes du pipeline, une pastille par étape active (ticket-256).
  *
  * L'état décide (depuis `etape` du snapshot), les événements enrichissent.
+ * `etapesEnCours` permet d'afficher plusieurs pastilles actives en même temps
+ * (ticket-290 : reviewer + validateur en parallèle).
  * Une étape que le projet désactive n'a pas de pastille.
  */
-export default function StageStrip({ etape, events, reglages }: StageStripProps) {
+export default function StageStrip({ etape, etapesEnCours = [], events, reglages }: StageStripProps) {
   const actives = etapesActives(events, reglages);
   const visibles = ETAPES.filter((e) => actives.has(e.id));
 
@@ -212,7 +216,7 @@ export default function StageStrip({ etape, events, reglages }: StageStripProps)
     <div className="flex items-center px-3 pt-3 pb-2 gap-0">
       {visibles.map((stage, i) => (
         <Fragment key={stage.id}>
-          <Pastille etat={etatEtape(stage.id, etape, events)} label={stage.label} />
+          <Pastille etat={etatEtape(stage.id, etape, etapesEnCours, events)} label={stage.label} />
           {i < visibles.length - 1 && (
             <div className="flex-1 h-px bg-zinc-700 mx-1 mb-4" />
           )}

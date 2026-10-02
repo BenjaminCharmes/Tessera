@@ -169,6 +169,8 @@ export interface RunActif {
   /** Titre lisible du ticket en cours (ticket-286). Absent sur un backend ancien. */
   ticket_titre?: string | null;
   etape: string | null;
+  /** Étapes actives en parallèle — livré par ticket-289. Absent sur un backend ancien. */
+  etapes_en_cours?: string[] | null;
   agent: AgentRole | null;
   tour: number;
   tokens_entree: number;

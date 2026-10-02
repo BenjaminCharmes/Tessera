@@ -140,6 +140,46 @@ describe("StageStrip — etape active ne persiste pas apres son evenement de fin
   });
 });
 
+describe("StageStrip — étapes parallèles revue + validation (ticket-290)", () => {
+  it("affiche revue et validation toutes deux actives quand etapesEnCours les contient", () => {
+    const events = [
+      ev("agent_started", { round: 1 }, "reviewer"),
+      ev("validation_started"),
+    ];
+    render(
+      <StageStrip
+        etape="revue"
+        etapesEnCours={["revue", "validation"]}
+        events={events}
+        reglages={REGLAGES_TOUT}
+      />,
+    );
+    expect(screen.getByLabelText(/Revue : active/)).toBeTruthy();
+    expect(screen.getByLabelText(/Validation : active/)).toBeTruthy();
+  });
+
+  it("maintient revue active, et non done, quand validation_done arrive en premier", () => {
+    const events = [
+      ev("agent_started", { round: 1 }, "reviewer"),
+      ev("validation_started"),
+      ev("validation_done", { approved: true }),
+    ];
+    render(
+      <StageStrip
+        etape="revue"
+        etapesEnCours={["revue"]}
+        events={events}
+        reglages={REGLAGES_TOUT}
+      />,
+    );
+    // La revue est encore active — son agent_done n'est pas arrivé.
+    expect(screen.getByLabelText(/Revue : active/)).toBeTruthy();
+    expect(screen.queryByLabelText(/Revue : done/)).toBeNull();
+    // La validation est terminée.
+    expect(screen.getByLabelText(/Validation : done/)).toBeTruthy();
+  });
+});
+
 describe("StageStrip — étapes inactives (ticket-256)", () => {
   it("n'affiche pas de pastille sécurité quand securite_enabled=false", () => {
     render(
