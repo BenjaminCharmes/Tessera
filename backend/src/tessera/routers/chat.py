@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.adr import adr_pertinents
+from tessera.services.adr import adr_pertinents, lire_contraintes
 from tessera.services.chat_service import ChatBudgetExceeded, ChatService
 from tessera.services.chat_suggestion import summarize_conversation
 from tessera.services.event_hub import EVENT_HUB
@@ -78,10 +78,7 @@ async def _build_context(project_id: str, project_path: Path) -> str:
         "\n".join(f"- [{t.id}] {t.title} ({t.status.value})" for t in open_tickets)
         or "_Aucun ticket ouvert._"
     )
-    decisions_path = project_path / "memory" / "decisions.md"
-    decisions = (
-        decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
-    )
+    decisions = lire_contraintes(project_path / "memory")
     # Le même titre que le pipeline : c'est lui que `adr_pertinents` reconnaît.
     # Sous un autre titre, le chat recevait le fichier entier, choix de stack
     # compris, quand chaque agent du pipeline est filtré (ticket-126).

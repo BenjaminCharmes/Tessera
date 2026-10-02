@@ -7,12 +7,12 @@ la mémoire et les décisions qui guident sa construction.
 ## Contexte toujours chargé
 
 @projects/ide-core/CLAUDE.md
-@projects/ide-core/memory/decisions.md
+@projects/ide-core/memory/contraintes.md
 
-Importés, pas seulement recommandés : les ADR sont des contraintes qui tiennent en
-permanence, alors qu'un skill décrit *comment* faire une tâche et se charge à la
-demande. Côté produit, `decisions.md` part aussi dans chaque appel d'agent, jusqu'à
-18 par ticket : c'est pourquoi le skill `write-adr` impose un budget.
+Importés, pas seulement recommandés : les contraintes s'appliquent en permanence,
+alors qu'un skill décrit *comment* faire une tâche et se charge à la demande.
+Côté produit, `contraintes.md` part dans chaque appel d'agent, réduit au rôle
+appelé — jusqu'à 18 par ticket. Le journal complet reste dans `decisions.md`.
 
 Ce fichier a le sien, mesuré par `test_consignes_coherentes.py` : chaque ligne y
 concurrence les autres. Une règle qui a son skill ou son ADR n'est pas recopiée ici.
