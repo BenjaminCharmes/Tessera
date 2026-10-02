@@ -593,6 +593,32 @@ que seul le SDK fournit.
 
 ---
 
+### Direction visuelle pour les interfaces
+
+Quand un ticket crée ou modifie une interface — une route qui ajoute des écrans, un composant UI — le codeur commence par établir une charte visuelle avant d'écrire du code.
+
+Il crée cette charte dans `memory/design.md` s'il n'y en a pas une :
+
+- Une direction en une phrase, avec une référence (« sobre et épurée, comme le design de GitHub »)
+- Cinq familles de couleurs maximum, chacune avec un rôle
+- Une échelle typographique
+- Une échelle d'espacement et des rayons
+
+Tu dois revoir et approuver cette charte avant qu'il ne touche au code.
+
+Puis le codeur code l'interface en respectant ces règles :
+
+- **Aucune valeur en dur** (couleur, taille, espacement) — tout vient des tokens de la charte
+- **Une seule action principale par vue**
+- **États vide, chargement et erreur** prévus
+- **Contraste AA**
+- **Une vue de travail montre des données**, pas des marges
+- **Pas de dégradé décoratif**, pas de cartes ombrées partout, pas d'emoji en guise d'icônes
+
+Cette charte garantit une cohérence dans le temps : chaque ticket UI la respecte, tu ne risques plus de passer d'une couleur à l'autre ou d'une taille arbitraire.
+
+**Sur les projets existants**, cette direction n'est pas active par défaut. Tu peux l'ajouter en éditant `agents.json` : ajoute `"tessera:design-ui"` dans la clé `skills` du codeur et de l'architect.
+
 ## 10. Intégration GitHub
 
 Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
