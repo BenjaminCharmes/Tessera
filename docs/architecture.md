@@ -178,6 +178,8 @@ a démarré.
 à la première réintroduction d'une couleur bannie, d'une taille de texte
 arbitraire ou d'un glyphe utilisé comme affordance.
 
+Ce système est imposé aux agents créant une interface via le skill `tessera:design-ui`, chargé par défaut par le codeur et l'architect : toute UI doit partir d'une charte déclarée (couleurs, typographie, espacement), et n'en sortir sur aucune valeur.
+
 ## Endpoints implémentés
 
 ### Projets
@@ -546,6 +548,8 @@ Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
 | `architect` | claude-sonnet-4-6 | Analyse architecturale |
 | `project-creator` | claude-sonnet-4-6 | Crée de nouveaux projets |
 | `github-sync` | — (pas de LLM) | Synchronise GitHub Issues → tickets |
+
+**Skills fournis par défaut** : `codeur` et `architect` chargent `tessera:design-ui` au démarrage, qui impose une charte visuelle (couleurs, typographie, espacement) et les règles de l'ADR-026 à toute création d'interface.
 
 ## Communication inter-agents
 

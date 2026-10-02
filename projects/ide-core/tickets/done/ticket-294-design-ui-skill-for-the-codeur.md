@@ -1,14 +1,15 @@
 ---
-id: ticket-294
-title: "Agents load a UI design skill, declared by default in new projects"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-293"]
-estimated_days: 1
 created: 2026-10-01
+depends_on:
+- ticket-293
+estimated_days: 1
+id: ticket-294
+pr_number: 193
+priority: medium
+status: done
+title: Agents load a UI design skill, declared by default in new projects
+type: feat
 ---
 
 # ticket-294 — Un skill de design d'interface pour le codeur et l'architect

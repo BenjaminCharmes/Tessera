@@ -366,6 +366,8 @@ def _default_agents_json(
     qu'on lit et qu'on croit.
     """
     roles = active_agents or _ROLES_PAR_DEFAUT
+    # Rôles qui reçoivent le skill de design d'interface (ticket-294).
+    _ROLES_AVEC_SKILL_DESIGN = {"codeur", "architect"}
     agents = [
         {
             "role": role,
@@ -373,6 +375,7 @@ def _default_agents_json(
             "max_tokens": 8192 if role == "codeur" else 4096,
             "prompt_file": f"agents/prompts/{role}.md",
             "active": True,
+            **({"skills": ["tessera:design-ui"]} if role in _ROLES_AVEC_SKILL_DESIGN else {}),
         }
         for role in roles
     ]

@@ -762,3 +762,34 @@ Le diff introduit une exécut (40375ms)
 - 2026-10-02 02:08:18 UTC — [ticket-290] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour  (167108ms)
 - 2026-10-02 02:08:18 UTC — [ticket-290] APPROVED après 1 tour(s)
 - 2026-10-02 02:12:31 UTC — [ticket-290] documentation: 2 fichier(s) (251733ms)
+- 2026-10-02 02:17:05 UTC — [ticket-290] livraison: rebase sur develop (188ms)
+- 2026-10-02 02:17:05 UTC — [ticket-290] livraison: PR #191 ouverte (4203ms)
+- 2026-10-02 02:17:05 UTC — [ticket-290] livraison: CI : passing (259468ms)
+- 2026-10-02 02:17:05 UTC — [ticket-290] livraison: PR #191 mergée (3422ms)
+- 2026-10-02 02:17:05 UTC — [ticket-293] branche ticket-293-tessera-ships-its-own-skills-to-every-project-s-a
+- 2026-10-02 02:17:06 UTC — [ticket-293] tour 1 — codeur démarré
+- 2026-10-02 02:20:59 UTC — [ticket-293] tour 1 — codeur terminé (233156ms)
+- 2026-10-02 02:24:36 UTC — [ticket-293] testeur: 1786 passed, 2 deselected, 5 warnings in 214.72s (0:03:34)
+- 2026-10-02 02:24:56 UTC — [ticket-293] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée. 
+
+Points positifs :
+- Che (20265ms)
+- 2026-10-02 02:24:56 UTC — [ticket-293] tour 1 — reviewer démarré
+- 2026-10-02 02:26:00 UTC — [ticket-293] tour 1 — reviewer terminé (63343ms)
+- 2026-10-02 02:28:09 UTC — [ticket-293] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (129890ms)
+- 2026-10-02 02:28:09 UTC — [ticket-293] APPROVED après 1 tour(s)
+- 2026-10-02 02:30:18 UTC — [ticket-293] documentation: 0 fichier(s) (127186ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: rebase sur develop (218ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: PR #192 ouverte (4454ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: CI : failing (179921ms)
+- 2026-10-02 02:33:27 UTC — [ticket-293] livraison: arrêt — CI failing : la PR #192 reste ouverte.
+- 2026-10-02 02:33:28 UTC — [ticket-294] branche ticket-294-agents-load-a-ui-design-skill-declared-by-default
+- 2026-10-02 02:33:28 UTC — [ticket-294] tour 1 — codeur démarré
+- 2026-10-02 02:35:42 UTC — [ticket-294] tour 1 — codeur terminé (134406ms)
+- 2026-10-02 02:39:17 UTC — [ticket-294] testeur: 1792 passed, 2 deselected, 5 warnings in 212.10s (0:03:32)
+- 2026-10-02 02:39:32 UTC — [ticket-294] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un skill de design UI assigné cond (15327ms)
+- 2026-10-02 02:39:32 UTC — [ticket-294] tour 1 — reviewer démarré
+- 2026-10-02 02:40:17 UTC — [ticket-294] tour 1 — reviewer terminé (44640ms)
+- 2026-10-02 02:42:04 UTC — [ticket-294] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le fichier SKILL.md est correcte (106687ms)
+- 2026-10-02 02:42:04 UTC — [ticket-294] APPROVED après 1 tour(s)
+- 2026-10-02 02:44:55 UTC — [ticket-294] documentation: 2 fichier(s) (169578ms)

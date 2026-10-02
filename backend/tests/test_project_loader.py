@@ -7,6 +7,7 @@ import pytest
 from tessera.models.project import ProjectCreate
 from tessera.services.project_loader import (
     ProjectLoader,
+    _default_agents_json,
     list_projects,
     load_agents_config,
     load_pipeline_config,
@@ -358,3 +359,71 @@ def test_un_titre_qui_ne_serait_que_la_decoration_retombe_sur_le_dossier(
     (projet / "CLAUDE.md").write_text("# CLAUDE.md\n", encoding="utf-8")
 
     assert load_project(projet).name == "mon-projet"
+
+
+# ------------------------------------------------------------------
+# _default_agents_json — skills tessera:design-ui (ticket-294)
+# ------------------------------------------------------------------
+
+
+def _agents_by_role(manifeste: str) -> dict[str, dict]:
+    """Retourne un dict role → entrée agent depuis le JSON du manifeste."""
+    data = json.loads(manifeste)
+    return {a["role"]: a for a in data["agents"]}
+
+
+def test_default_agents_json_adds_design_skill_to_codeur() -> None:
+    """codeur reçoit tessera:design-ui dans le manifeste par défaut."""
+    manifeste = _default_agents_json("mon-projet", ["codeur"], "local")
+    agents = _agents_by_role(manifeste)
+
+    assert "codeur" in agents
+    assert agents["codeur"].get("skills") == ["tessera:design-ui"]
+
+
+def test_default_agents_json_adds_design_skill_to_architect() -> None:
+    """architect reçoit tessera:design-ui dans le manifeste par défaut."""
+    manifeste = _default_agents_json("mon-projet", ["architect"], "local")
+    agents = _agents_by_role(manifeste)
+
+    assert "architect" in agents
+    assert agents["architect"].get("skills") == ["tessera:design-ui"]
+
+
+def test_default_agents_json_no_skill_for_reviewer() -> None:
+    """reviewer ne reçoit aucun skill dans le manifeste par défaut."""
+    manifeste = _default_agents_json("mon-projet", ["reviewer"], "local")
+    agents = _agents_by_role(manifeste)
+
+    assert "reviewer" in agents
+    assert "skills" not in agents["reviewer"]
+
+
+def test_default_agents_json_no_skill_for_securite() -> None:
+    """securite ne reçoit aucun skill dans le manifeste par défaut."""
+    manifeste = _default_agents_json("mon-projet", ["securite"], "local")
+    agents = _agents_by_role(manifeste)
+
+    assert "securite" in agents
+    assert "skills" not in agents["securite"]
+
+
+def test_default_agents_json_no_skill_for_validateur() -> None:
+    """validateur ne reçoit aucun skill dans le manifeste par défaut."""
+    manifeste = _default_agents_json("mon-projet", ["validateur"], "local")
+    agents = _agents_by_role(manifeste)
+
+    assert "validateur" in agents
+    assert "skills" not in agents["validateur"]
+
+
+def test_default_agents_json_mixed_roles_skills_only_for_ui_roles() -> None:
+    """Sur un pipeline complet, seuls codeur et architect ont le skill de design."""
+    roles = ["codeur", "reviewer", "architect", "securite", "validateur"]
+    manifeste = _default_agents_json("mon-projet", roles, "local")
+    agents = _agents_by_role(manifeste)
+
+    for role in ("codeur", "architect"):
+        assert agents[role].get("skills") == ["tessera:design-ui"], f"{role} doit avoir le skill"
+    for role in ("reviewer", "securite", "validateur"):
+        assert "skills" not in agents[role], f"{role} ne doit pas avoir de skills"
