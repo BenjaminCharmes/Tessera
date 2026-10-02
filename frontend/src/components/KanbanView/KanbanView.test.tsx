@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import KanbanView from "./index";
 import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
+import { FILTRES_VIDES, type FiltresTickets } from "../../lib/filtresTickets";
 
 const EMPTY_BY_STATUS: Record<TicketStatus, never[]> = {
   todo: [],
@@ -86,6 +87,95 @@ describe("KanbanView — file de tickets (ticket-284)", () => {
     );
     screen.getByRole("button", { name: "Ajouter à la file" }).click();
     expect(onToggleQueue).toHaveBeenCalledWith("ticket-001");
+  });
+});
+
+describe("KanbanView — bandeau de filtres (ticket-318)", () => {
+  const FILTRES_TYPE_FEAT: FiltresTickets = {
+    ...FILTRES_VIDES,
+    type: "feat",
+  };
+
+  const FILTRES_COMPLETS: FiltresTickets = {
+    texte: "login",
+    type: "feat",
+    priorite: "high",
+    agent: "codeur",
+    tri: "numero",
+  };
+
+  it("affiche le bandeau avec les bons compteurs quand un filtre est actif", () => {
+    render(
+      <KanbanView
+        byStatus={EMPTY_BY_STATUS}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        filtres={FILTRES_TYPE_FEAT}
+        retenus={4}
+        total={297}
+      />,
+    );
+    expect(screen.getByTestId("kanban-filtre-bandeau")).toBeTruthy();
+    const compte = screen.getByTestId("kanban-filtre-compte");
+    expect(compte.textContent).toContain("4");
+    expect(compte.textContent).toContain("297");
+  });
+
+  it("n'affiche pas le bandeau quand aucun filtre n'est actif", () => {
+    render(
+      <KanbanView
+        byStatus={EMPTY_BY_STATUS}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        filtres={FILTRES_VIDES}
+        retenus={297}
+        total={297}
+      />,
+    );
+    expect(screen.queryByTestId("kanban-filtre-bandeau")).toBeNull();
+  });
+
+  it("appelle onClearFiltres au clic sur « Effacer les filtres »", () => {
+    const onClearFiltres = vi.fn();
+    render(
+      <KanbanView
+        byStatus={EMPTY_BY_STATUS}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        filtres={FILTRES_TYPE_FEAT}
+        retenus={4}
+        total={297}
+        onClearFiltres={onClearFiltres}
+      />,
+    );
+    screen.getByRole("button", { name: "Effacer les filtres" }).click();
+    expect(onClearFiltres).toHaveBeenCalledOnce();
+  });
+
+  it("nomme chaque filtre actif dans le bandeau (texte, type, priorité, agent)", () => {
+    render(
+      <KanbanView
+        byStatus={EMPTY_BY_STATUS}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        filtres={FILTRES_COMPLETS}
+        retenus={1}
+        total={297}
+      />,
+    );
+    const bandeau = screen.getByTestId("kanban-filtre-bandeau");
+    expect(bandeau.textContent).toContain("type feat");
+    expect(bandeau.textContent).toContain("priorité high");
+    expect(bandeau.textContent).toContain("agent codeur");
+    expect(bandeau.textContent).toContain("login");
   });
 });
 
