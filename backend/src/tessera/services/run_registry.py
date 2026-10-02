@@ -80,6 +80,11 @@ class RunActif:
     #: observateur de répondre à un agent qui pose une question (ADR-025),
     #: au lieu du seul onglet qui a lancé le run.
     dialogue: Any = None
+    #: Étapes actuellement en cours sur ce run — renseigné par `run_executor`
+    #: quand le reviewer et le validateur tournent en parallèle (ticket-289).
+    #: ``"revue"`` et ``"validation"`` peuvent coexister ; ``etape`` garde la
+    #: dernière étape démarrée pour les clients qui s'en servent.
+    etapes_en_cours: list[str] = field(default_factory=list)
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -107,6 +112,7 @@ class RunActif:
             "file_total": self.file_total,
             "file_restants": list(self.file_restants),
             "file_faits": list(self.file_faits),
+            "etapes_en_cours": list(self.etapes_en_cours),
             "demarre_a": self.demarre_a.isoformat(),
         }
 

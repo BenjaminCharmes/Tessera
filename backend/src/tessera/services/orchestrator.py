@@ -5,6 +5,7 @@ the early exits. Keeping the flow readable in one screen is the point: the
 order of the stages, and the conditions that end a run, are the part that is
 hard to get right.
 """
+import asyncio
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -322,16 +323,29 @@ class Orchestrator:
             if run.stop_requested:
                 return await outcomes.finish_stopped(self, run)
 
-            approved, reason, raw_verdict = await stages.run_review(self, run, context)
+            # Reviewer et validateur tournent en parallèle — la sécurité leur
+            # est commune, mais aucun ne dépend de l'autre (ticket-289).
+            (rev_approved, rev_reason, raw_verdict), (val_approved, val_reason) = (
+                await asyncio.gather(
+                    stages.run_review(self, run, context),
+                    stages.run_validation(self, run),
+                )
+            )
 
-            if approved:
-                # Le validateur peut court-circuiter l'approbation du reviewer.
-                approved, reason = await stages.run_validation(self, run, reason)
-
+            approved = rev_approved and val_approved
             if approved:
                 return await outcomes.finish_approved(self, run)
 
-            feedback = reason or raw_verdict[:500]
+            # Nommer l'auteur quand les deux refusent : le codeur voit un seul
+            # feedback au tour suivant, et il doit savoir qui objecte quoi.
+            feedback_parts: list[str] = []
+            if not rev_approved:
+                rev_feedback = rev_reason or raw_verdict[:500]
+                feedback_parts.append(f"Reviewer : {rev_feedback}")
+            if not val_approved:
+                feedback_parts.append(f"Validateur : {val_reason}")
+            feedback = "\n\n".join(feedback_parts) if feedback_parts else raw_verdict[:500]
+
             run.review_feedback.append(feedback)
             self._log(
                 f"[{ticket_id}] CHANGES_REQUESTED tour {round_num}: {feedback[:100]}"

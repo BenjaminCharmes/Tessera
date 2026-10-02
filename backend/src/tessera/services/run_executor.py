@@ -17,6 +17,7 @@ from typing import Any, Optional, Protocol
 
 from tessera.config import settings
 from tessera.services.database import create_run, finish_run, save_event
+from tessera.models.agent import AgentRole
 from tessera.services.dialogue import DialogueChannel
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import (
@@ -107,11 +108,20 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
         run.etape = str(event.data.get("stage") or event.type.value)
         run.agent = event.agent.value if event.agent else None
         run.outils = 0
+        # Reviewer démarre : marquer l'étape de revue en cours (ticket-289).
+        if event.agent is AgentRole.reviewer and "revue" not in run.etapes_en_cours:
+            run.etapes_en_cours.append("revue")
     elif event.type is EventType.AGENT_DONE:
         cout = event.data.get("cost_usd")
         if isinstance(cout, (int, float)):
             run.cout_usd += float(cout)
         run.appels += 1
+        # Reviewer terminé : retirer "revue" des étapes en cours (ticket-289).
+        if event.agent is AgentRole.reviewer:
+            try:
+                run.etapes_en_cours.remove("revue")
+            except ValueError:
+                pass
     elif event.type is EventType.TICKET_STATUS_CHANGED:
         run.ticket_id = event.ticket_id or run.ticket_id
     elif event.type is EventType.QUEUE_PROGRESS:
@@ -142,11 +152,23 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
         run.question_expire_a = None
     elif event.type is EventType.VALIDATION_STARTED:
         run.etape = "validation"
+        # Validateur démarre : marquer l'étape en cours (ticket-289).
+        if "validation" not in run.etapes_en_cours:
+            run.etapes_en_cours.append("validation")
     elif event.type is EventType.DOCUMENTATION_STARTED:
         run.etape = "documentation"
     elif event.type is EventType.LIVRAISON_STARTED:
         run.etape = "livraison"
-    elif event.type in (EventType.VALIDATION_DONE, EventType.SECURITY_AUDIT_DONE):
+    elif event.type is EventType.VALIDATION_DONE:
+        # Validateur terminé : retirer "validation" des étapes en cours (ticket-289).
+        try:
+            run.etapes_en_cours.remove("validation")
+        except ValueError:
+            pass
+        verdict = event.data.get("verdict")
+        if verdict:
+            run.verdict = str(verdict)
+    elif event.type is EventType.SECURITY_AUDIT_DONE:
         verdict = event.data.get("verdict")
         if verdict:
             run.verdict = str(verdict)

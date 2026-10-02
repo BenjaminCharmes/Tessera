@@ -147,7 +147,7 @@ async def test_validation_log_contient_la_duree() -> None:
     orch = _OrchStub(_validator=_ValidateurInstant())
     run = _run()
 
-    await stages.run_validation(orch, run, "reason")  # type: ignore[arg-type]
+    await stages.run_validation(orch, run)  # type: ignore[arg-type]
 
     assert orch.logs, "validation should write at least one log line"
     line = orch.logs[-1]

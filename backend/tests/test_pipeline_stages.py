@@ -326,7 +326,97 @@ async def test_une_panne_du_validateur_demande_des_changements() -> None:
     run = _run(events)
     orch = _Orch(_validator=_ValidateurEnPanne())
 
-    approved, reason = await stages.run_validation(orch, run, "")
+    approved, reason = await stages.run_validation(orch, run)
 
     assert approved is False
     assert "provider down" in reason
+
+
+async def test_run_validation_sans_validateur_approuve_avec_raison_vide() -> None:
+    # run_validation est maintenant indépendante : sans validateur elle rend
+    # (True, "") et non plus (True, reason_du_reviewer) (ticket-289).
+    run = _run()
+    orch = _Orch()
+
+    approved, reason = await stages.run_validation(orch, run)
+
+    assert approved is True
+    assert reason == ""
+
+
+# ------------------------------------------------------------------
+# RunActif.en_dict — etapes_en_cours (ticket-289)
+# ------------------------------------------------------------------
+
+
+def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
+    from tessera.services.run_registry import RunActif
+
+    run = RunActif(run_id="r1", project_id="p1")
+    d = run.en_dict()
+
+    assert "etapes_en_cours" in d
+    assert d["etapes_en_cours"] == []
+
+
+def test_en_dict_expose_les_etapes_en_cours() -> None:
+    from tessera.services.run_registry import RunActif
+
+    run = RunActif(run_id="r1", project_id="p1")
+    run.etapes_en_cours = ["revue", "validation"]
+    d = run.en_dict()
+
+    assert d["etapes_en_cours"] == ["revue", "validation"]
+
+
+def test_suivre_ajoute_revue_et_validation_dans_etapes_en_cours() -> None:
+    """_suivre tracks both stages when reviewer and validator run concurrently."""
+    from tessera.models.agent import AgentRole
+    from tessera.services.pipeline_events import EventType, OrchestratorEvent
+    from tessera.services.run_executor import _suivre
+    from tessera.services.run_registry import RunActif
+
+    run_actif = RunActif(run_id="r1", project_id="p1")
+
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.AGENT_STARTED,
+            agent=AgentRole.reviewer,
+            ticket_id="ticket-001",
+            data={"round": 1},
+        ),
+    )
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.VALIDATION_STARTED,
+            ticket_id="ticket-001",
+            data={},
+        ),
+    )
+
+    assert "revue" in run_actif.etapes_en_cours
+    assert "validation" in run_actif.etapes_en_cours
+    assert run_actif.en_dict()["etapes_en_cours"] == ["revue", "validation"]
+
+    # Les étapes disparaissent quand les événements DONE arrivent.
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.VALIDATION_DONE,
+            ticket_id="ticket-001",
+            data={"verdict": "APPROVED"},
+        ),
+    )
+    _suivre(
+        run_actif,
+        OrchestratorEvent(
+            type=EventType.AGENT_DONE,
+            agent=AgentRole.reviewer,
+            ticket_id="ticket-001",
+            data={"cost_usd": 0.0, "duration_ms": 100},
+        ),
+    )
+
+    assert run_actif.etapes_en_cours == []
