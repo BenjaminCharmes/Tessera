@@ -183,6 +183,52 @@ describe("useSupervision", () => {
   });
 });
 
+describe("useSupervision — aller-retour entre deux runs (ticket-313)", () => {
+  it("un aller-retour laisse le texte du codeur inchangé", () => {
+    // Le backend rejoue les tokens à chaque abonnement. Sans clearTokensForReplay,
+    // revenir sur run-1 doublerait le texte déjà accumulé.
+    const { result } = renderHook(() => useSupervision());
+    act(() => MockWebSocket.instance!.triggerOpen());
+
+    act(() => {
+      MockWebSocket.instance!.triggerMessage({
+        type: "snapshot",
+        runs: [run(), run({ run_id: "run-2", project_id: "autre" })],
+      });
+    });
+
+    // Sélectionner run-1 → subscribe envoyé, tokens vidés (état initial vide)
+    act(() => { result.current.selectionner("run-1"); });
+
+    // Le backend envoie agent_started + un token (premier abonnement)
+    act(() => {
+      MockWebSocket.instance!.triggerMessage(
+        evenement({ type: "agent_started", run_id: "run-1", agent: "codeur", data: { round: 1 } }),
+      );
+      MockWebSocket.instance!.triggerMessage(
+        evenement({ type: "agent_token", run_id: "run-1", agent: "codeur", data: { token: "bonjour" } }),
+      );
+    });
+
+    // Passer à run-2 → unsubscribe run-1
+    act(() => { result.current.selectionner("run-2"); });
+
+    // Revenir sur run-1 → subscribe envoyé, tokens vidés avant le rejeu
+    act(() => { result.current.selectionner("run-1"); });
+
+    // Le backend rejoue uniquement agent_token (pas agent_started, cf. RETENUS)
+    act(() => {
+      MockWebSocket.instance!.triggerMessage(
+        evenement({ type: "agent_token", run_id: "run-1", agent: "codeur", data: { token: "bonjour" } }),
+      );
+    });
+
+    const etat = result.current.etatDe("run-1");
+    const codeurEntry = etat.entries.find((e) => e.genre === "agent" && e.agent === "codeur");
+    expect(codeurEntry?.genre === "agent" ? codeurEntry.tokens : "").toBe("bonjour");
+  });
+});
+
 describe("useSupervision — les services (ticket-145)", () => {
   function evenementService(over: Record<string, unknown> = {}) {
     return {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { applyEvent, etatDepuisRun, INITIAL } from "./streamState";
+import { applyEvent, etatDepuisRun, INITIAL, clearTokensForReplay } from "./streamState";
 import type { OrchestratorEvent, RunActif } from "../types/api";
 import type { EntreeSecurite, EntreeValidateur } from "./streamState";
 
@@ -303,6 +303,95 @@ describe("etatDepuisRun — lecture de etapes_en_cours (ticket-290)", () => {
     const run: RunActif = { ...baseRun, etape: null };
     const s = etatDepuisRun(run);
     expect(s.etapesEnCours).toEqual([]);
+  });
+});
+
+describe("applyEvent — ticketEvents séparé du journal du run (ticket-313)", () => {
+  it("ticketEvents ne contient pas security_audit_done du ticket précédent", () => {
+    // Dans une file, StageStrip utilise ticketEvents : les étapes du ticket A
+    // ne doivent pas apparaître comme « done » pour le ticket B.
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "queue_progress", ticket_id: "ticket-A", data: { index: 1, total: 2 } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({
+      type: "security_audit_done",
+      agent: null,
+      data: { verdict: "APPROVED", summary: "ok", issues_count: 0, reason: "" },
+    }));
+
+    // Ticket B démarre
+    s = applyEvent(s, ev({ type: "queue_progress", ticket_id: "ticket-B", data: { index: 2, total: 2 } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+
+    // ticketEvents ne voit pas l'audit du ticket A
+    expect(s.ticketEvents.some((e) => e.type === "security_audit_done")).toBe(false);
+  });
+
+  it("events (Pipeline log) conserve les événements du ticket A après queue_progress", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "queue_progress", ticket_id: "ticket-A", data: { index: 1, total: 2 } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "ok" } }));
+
+    s = applyEvent(s, ev({ type: "queue_progress", ticket_id: "ticket-B", data: { index: 2, total: 2 } }));
+
+    // events garde tout pour le Pipeline log
+    expect(s.events.some((e) => e.type === "agent_done" && e.agent === "codeur")).toBe(true);
+    // ticketEvents repart propre
+    expect(s.ticketEvents.some((e) => e.type === "agent_done")).toBe(false);
+  });
+
+  it("ticketEvents s'accumule normalement entre deux queue_progress", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "queue_progress", ticket_id: "ticket-B", data: { index: 2, total: 2 } }));
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "security_audit_started", data: {} }));
+
+    expect(s.ticketEvents.some((e) => e.type === "agent_started")).toBe(true);
+    expect(s.ticketEvents.some((e) => e.type === "security_audit_started")).toBe(true);
+  });
+});
+
+describe("clearTokensForReplay — rejeu sans doublon (ticket-313)", () => {
+  it("le même lot de agent_token reçu deux fois ne double pas le texte", () => {
+    // Simule un aller-retour dans la Supervision : le backend rejoue les tokens
+    // à chaque abonnement. clearTokensForReplay vide les tokens avant le rejeu
+    // pour que le résultat soit identique à la première visite.
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_token", agent: "codeur", data: { token: "bonjour" } }));
+
+    // Vider avant le rejeu (ce que useSupervision fait à l'abonnement)
+    s = clearTokensForReplay(s);
+
+    // Même token arrive à nouveau (rejeu)
+    s = applyEvent(s, ev({ type: "agent_token", agent: "codeur", data: { token: "bonjour" } }));
+
+    const codeurEntry = s.entries.find((e) => e.genre === "agent" && e.agent === "codeur");
+    expect(codeurEntry?.genre === "agent" ? codeurEntry.tokens : "").toBe("bonjour");
+  });
+
+  it("ne touche pas aux entrées déjà terminées (isDone)", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_token", agent: "codeur", data: { token: "hello" } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "Résultat final." } }));
+
+    s = clearTokensForReplay(s);
+
+    const doneEntry = s.entries.find((e) => e.genre === "agent" && e.isDone);
+    // content (issu de agent_done) est préservé ; seuls les tokens en live sont effacés
+    expect(doneEntry?.genre === "agent" ? doneEntry.content : "").toBe("Résultat final.");
+  });
+
+  it("vide currentTokens en plus des entrées", () => {
+    let s = INITIAL;
+    s = applyEvent(s, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_token", agent: "codeur", data: { token: "abc" } }));
+    expect(s.currentTokens).toBe("abc");
+
+    s = clearTokensForReplay(s);
+    expect(s.currentTokens).toBe("");
   });
 });
 
