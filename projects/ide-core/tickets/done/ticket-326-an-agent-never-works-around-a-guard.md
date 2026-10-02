@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 1
 id: ticket-326
-pr_number: null
+pr_number: 226
 priority: critical
 status: done
 title: 'An agent never works around a guard''s refusal: it stops and reports, and
