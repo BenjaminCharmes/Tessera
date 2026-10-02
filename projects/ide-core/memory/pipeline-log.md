@@ -1070,3 +1070,4 @@ Les nou (39750ms)
 - 2026-10-02 13:02:01 UTC — [ticket-315] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests associés couvrent cor (167125ms)
 - 2026-10-02 13:02:01 UTC — [ticket-315] APPROVED après 1 tour(s)
 - 2026-10-02 13:03:27 UTC — [ticket-315] documentation: 1 fichier(s) (84077ms)
+- 2026-10-02 13:04:47 UTC — [ticket-315] livraison: arrêt — Conflit avec develop sur : projects/ide-core/memory/pipeline-log.md. La branche est restée intacte, 
