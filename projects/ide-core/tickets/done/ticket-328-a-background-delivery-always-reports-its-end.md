@@ -1,14 +1,14 @@
 ---
-id: ticket-328
-title: "A background delivery always reports how it ended, even when it fails or hangs"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-328
+pr_number: 234
+priority: high
+status: done
+title: A background delivery always reports how it ended, even when it fails or hangs
+type: fix
 ---
 
 # ticket-328 — Une livraison en tâche de fond dit toujours comment elle a fini

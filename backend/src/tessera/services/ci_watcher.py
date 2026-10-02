@@ -11,6 +11,12 @@ When CI is red, CIWatcher emits ticket_status_changed (blocked) so the board
 reflects the outcome, then ci_merge_done with merged=False and an arret naming
 the PR number.
 
+Error handling (ticket-328): any exception raised by livraison_phase_2, or a
+timeout of the entire phase 2 (including CI wait), emits ci_merge_done with
+merged=False and an arret describing the cause, then transitions the ticket to
+blocked.  A CancelledError from backend shutdown is NOT treated as an error —
+no ci_merge_done is emitted.
+
 Shutdown: call arreter() to cancel all running tasks without raising exceptions.
 """
 import asyncio
@@ -23,11 +29,15 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
+#: Borne globale de la phase 2 (attente CI + merge). Supérieure à
+#: _ATTENTE_CI_MAX_S (900 s) pour couvrir également les appels réseau du merge.
+_TIMEOUT_PHASE2_S = 1200.0
+
 
 class CIWatcher:
     """Background CI watcher — at most one active delivery per project."""
 
-    def __init__(self) -> None:
+    def __init__(self, timeout_phase2_s: float = _TIMEOUT_PHASE2_S) -> None:
         # Un sémaphore par projet : valeur 1 = une seule livraison active à
         # la fois. Un second appel attend derrière le premier sans le rejeter.
         self._semaphores: dict[str, asyncio.Semaphore] = {}
@@ -38,6 +48,8 @@ class CIWatcher:
         # Événements signalés quand un ticket quitte la file d'attente.
         # Clé : "project_id:ticket_id".
         self._events_merge: dict[str, asyncio.Event] = {}
+        # Borne temporelle de la phase 2 entière. Paramétrable pour les tests.
+        self._timeout_phase2_s = timeout_phase2_s
 
     # ------------------------------------------------------------------
     # Interface publique
@@ -119,17 +131,39 @@ class CIWatcher:
         sem = self._semaphore_du_projet(project_id)
         try:
             async with sem:
-                await self._livrer_et_emettre(
-                    project_id, ticket_id, pr_number, livraison_phase_2, on_event
-                )
+                arret_erreur: str | None = None
+                try:
+                    await asyncio.wait_for(
+                        self._livrer_et_emettre(
+                            project_id, ticket_id, pr_number, livraison_phase_2, on_event
+                        ),
+                        timeout=self._timeout_phase2_s,
+                    )
+                except asyncio.TimeoutError:
+                    arret_erreur = f"délai dépassé ({self._timeout_phase2_s:.0f}s)"
+                    _logger.warning(
+                        "ci_watcher_timeout",
+                        extra={"project": project_id, "ticket": ticket_id},
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    arret_erreur = f"erreur inattendue : {exc}"
+                    _logger.exception(
+                        "ci_watcher_error",
+                        extra={"project": project_id, "ticket": ticket_id},
+                    )
+                if arret_erreur is not None:
+                    await self._emettre_echec(
+                        project_id, ticket_id, pr_number, arret_erreur, on_event
+                    )
         except asyncio.CancelledError:
             _logger.info(
                 "ci_watcher_cancelled",
                 extra={"project": project_id, "ticket": ticket_id},
             )
         except Exception:  # noqa: BLE001
+            # L'émission elle-même a échoué — on journalise sans relancer.
             _logger.exception(
-                "ci_watcher_error",
+                "ci_watcher_emit_error",
                 extra={"project": project_id, "ticket": ticket_id},
             )
         finally:
@@ -139,6 +173,42 @@ class CIWatcher:
             evt = self._events_merge.pop(cle, None)
             if evt is not None:
                 evt.set()
+
+    async def _emettre_echec(
+        self,
+        project_id: str,
+        ticket_id: str,
+        pr_number: int,
+        arret: str,
+        on_event: EventCallback,
+    ) -> None:
+        """Emit ticket_status_changed(blocked) then ci_merge_done(merged=False)."""
+        await on_event(
+            OrchestratorEvent(
+                type=EventType.TICKET_STATUS_CHANGED,
+                ticket_id=ticket_id,
+                project_id=project_id,
+                data={"status": TicketStatus.blocked.value},
+            )
+        )
+        await on_event(
+            OrchestratorEvent(
+                type=EventType.CI_MERGE_DONE,
+                ticket_id=ticket_id,
+                project_id=project_id,
+                data={
+                    "project_id": project_id,
+                    "ticket_id": ticket_id,
+                    "pr_number": pr_number,
+                    "merged": False,
+                    "arret": arret,
+                },
+            )
+        )
+        _logger.warning(
+            "ci_watcher_blocked",
+            extra={"project": project_id, "ticket": ticket_id, "pr": pr_number, "arret": arret},
+        )
 
     async def _livrer_et_emettre(
         self,

@@ -7,6 +7,10 @@ Couverture :
 - CI rouge → ticket blocked, ci_merge_done avec merged=False et arret contenant le numéro de PR.
 - en_attente liste le ticket pendant l'attente, plus après ci_merge_done.
 - Arrêt : les tâches en cours sont annulées sans lever d'exception.
+- Exception dans livraison_phase_2 → ci_merge_done(merged=False) avec message d'erreur (ticket-328).
+- Exception → ticket passe en blocked (ticket-328).
+- Timeout de la phase 2 → ci_merge_done(merged=False) avec 'délai dépassé' (ticket-328).
+- Annulation à l'arrêt → aucun ci_merge_done émis (ticket-328).
 """
 import asyncio
 from collections.abc import Awaitable, Callable
@@ -291,3 +295,86 @@ async def test_arret_annule_les_taches_sans_lever() -> None:
 
     # Après l'arrêt, plus de tâches actives.
     assert len(watcher._taches) == 0
+
+
+# ---------------------------------------------------------------------------
+# Erreur dans livraison_phase_2 — ticket-328
+# ---------------------------------------------------------------------------
+
+
+async def test_exception_emet_ci_merge_done_avec_arret() -> None:
+    """An exception in livraison_phase_2 emits ci_merge_done(merged=False) with the message."""
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    async def phase2_qui_explose(pr_number: int) -> Livraison:
+        raise RuntimeError("connexion refusée")
+
+    await watcher.surveiller("proj", "ticket-001", 7, phase2_qui_explose, collect)
+    await asyncio.sleep(0.05)
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert len(done) == 1
+    assert done[0].data["merged"] is False
+    assert "connexion refusée" in done[0].data["arret"]
+    assert done[0].data["pr_number"] == 7
+    assert done[0].data["ticket_id"] == "ticket-001"
+
+
+async def test_exception_passe_le_ticket_en_blocked() -> None:
+    """An exception in livraison_phase_2 transitions the ticket to blocked."""
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    async def phase2_qui_explose(pr_number: int) -> Livraison:
+        raise RuntimeError("boom")
+
+    await watcher.surveiller("proj", "ticket-001", 7, phase2_qui_explose, collect)
+    await asyncio.sleep(0.05)
+
+    status_events = [e for e in events if e.type is EventType.TICKET_STATUS_CHANGED]
+    assert len(status_events) == 1
+    assert status_events[0].data["status"] == TicketStatus.blocked.value
+
+    # L'ordre doit être : blocked d'abord, puis ci_merge_done.
+    types = [e.type for e in events]
+    assert types.index(EventType.TICKET_STATUS_CHANGED) < types.index(EventType.CI_MERGE_DONE)
+
+
+async def test_timeout_emet_ci_merge_done_avec_arret_delai_depasse() -> None:
+    """Phase 2 timeout emits ci_merge_done(merged=False) with 'délai dépassé'."""
+    watcher = CIWatcher(timeout_phase2_s=0.02)  # délai très court pour le test
+    events, collect = _collecteur()
+
+    async def phase2_infinie(pr_number: int) -> Livraison:
+        await asyncio.sleep(3600)
+        return Livraison(pr_number=pr_number, merged=True)
+
+    await watcher.surveiller("proj", "ticket-001", 5, phase2_infinie, collect)
+    await asyncio.sleep(0.15)
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert len(done) == 1
+    assert done[0].data["merged"] is False
+    assert "délai" in done[0].data["arret"]
+    assert done[0].data["pr_number"] == 5
+
+
+async def test_arret_backend_n_emet_pas_de_ci_merge_done() -> None:
+    """Backend shutdown (arreter) does not emit a false ci_merge_done."""
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+    started = asyncio.Event()
+
+    async def phase2_infinie(pr_number: int) -> Livraison:
+        started.set()
+        await asyncio.sleep(3600)
+        return Livraison(pr_number=pr_number, merged=True)
+
+    await watcher.surveiller("proj", "ticket-001", 1, phase2_infinie, collect)
+    await started.wait()
+
+    await watcher.arreter()
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert done == [], "un arrêt propre ne doit pas émettre ci_merge_done"

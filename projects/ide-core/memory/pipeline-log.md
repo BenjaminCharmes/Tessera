@@ -1175,3 +1175,13 @@ Analyse effectuée :
 - 2026-10-02 23:01:52 UTC — [ticket-323] validateur: APPROVED — Les trois critères d'acceptation ont été implémentés et testés. Le code ajoute u (127343ms)
 - 2026-10-02 23:01:52 UTC — [ticket-323] APPROVED après 1 tour(s)
 - 2026-10-02 23:03:43 UTC — [ticket-323] documentation: 2 fichier(s) (108593ms)
+- 2026-10-02 23:04:57 UTC — [ticket-328] branche ticket-328-a-background-delivery-always-reports-how-it-ended
+- 2026-10-02 23:04:57 UTC — [ticket-328] tour 1 — codeur démarré
+- 2026-10-02 23:09:43 UTC — [ticket-328] tour 1 — codeur terminé (285688ms)
+- 2026-10-02 23:16:02 UTC — [ticket-328] testeur: OK (exit 0)
+- 2026-10-02 23:16:30 UTC — [ticket-328] securite: PASS — No CRITICAL or HIGH vulnerabilities detected. One MEDIUM risk identified: except (28750ms)
+- 2026-10-02 23:16:30 UTC — [ticket-328] tour 1 — reviewer démarré
+- 2026-10-02 23:17:15 UTC — [ticket-328] tour 1 — reviewer terminé (44968ms)
+- 2026-10-02 23:19:18 UTC — [ticket-328] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (167436ms)
+- 2026-10-02 23:19:18 UTC — [ticket-328] APPROVED après 1 tour(s)
+- 2026-10-02 23:22:04 UTC — [ticket-328] documentation: 2 fichier(s) (163311ms)

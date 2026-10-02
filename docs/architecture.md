@@ -364,6 +364,25 @@ de commencer pendant l'attente de CI.
 Hors pipeline (appels directs depuis le chat ou l'interface), la méthode 
 `livrer()` enchaîne les deux phases pour livrer entièrement en synchrone.
 
+### Garanties de la phase 2 (ticket-328)
+
+La phase 2 opère en arrière-plan, sans intervention humaine jusqu'au verdict final.
+Trois garanties assurent qu'elle rapporte toujours comment elle a terminé :
+
+**Exception capturée, verdict émis** : si une erreur survient pendant la phase 2
+(erreur réseau, GitHub API indisponible, permission insuffisante), l'exception
+est capturée et un `ci_merge_done` est émis avec `merged: false`. L'`arret`
+porte le message d'erreur, et le ticket passe en `blocked` (ADR-051 : sans relance).
+
+**Timeout** : la phase 2 entière est bornée dans le temps (merge et attente CI
+comprises) — pas d'espoir de catch-all. Si elle ne rend pas la main avant ce
+délai, un `ci_merge_done` est émis avec un `arret` qui dit que le délai est dépassé.
+
+**Arrêt du backend** : une tâche de phase 2 en cours au moment du shutdown ne
+génère pas de faux `ci_merge_done` d'échec. Seules les tâches complètement
+terminées émettent leur verdict. Une tâche annulée reste non rapportée jusqu'au
+redémarrage.
+
 ### Branche de base configurable
 
 Un projet peut déclarer sa propre branche de base dans `agents.json`, champ 
