@@ -166,8 +166,13 @@ production, sécurité, revue, validation, documentation, livraison — en tête
 Agents. Chaque pastille représente une étape, avec trois états : faite (`green`), en cours 
 (`blue`), à venir (`zinc`). Une étape désactivée pour le projet n'a pas de pastille. Un 
 refus de l'audit sécurité ou une validation rejetée passent la pastille correspondante en 
-`red`. L'étape en cours se déduit d'abord du champ `etape` dans l'instantané du run, puis 
-estrichie par les événements reçus au fil de l'exécution.
+`red`. 
+
+Après l'audit sécurité, reviewer et validateur peuvent tourner en parallèle (ticket-289) :
+`StageStrip` marque `active` toute étape présente dans `etapesEnCours`, permettant 
+d'afficher deux pastilles `blue` au même moment. Une étape n'est `done` que si son 
+événement de fin a été reçu, ou si une étape qui la suit (et ne tourne pas en parallèle) 
+a démarré.
 
 `coherence.test.ts` verrouille les trois règles : il lit les sources et échoue
 à la première réintroduction d'une couleur bannie, d'une taille de texte
@@ -223,20 +228,21 @@ arbitraire ou d'un glyphe utilisé comme affordance.
  8. Testeur → exécute la suite de tests du projet → TEST_RESULT
  9. Auditeur sécurité (OWASP) → BLOCK si CRITICAL/HIGH → ticket → blocked/
 10. Ticket → in-review/
-11. Reviewer (Claude) → relit le diff
-    ├─ "APPROVED" → étape 12
-    └─ "CHANGES_REQUESTED: {raison}" → retour au Codeur avec feedback
-         (max 3 tours ; sinon ticket → blocked/)
-12. Validateur → vérifie les critères d'acceptation un par un
-13. Doc-updater → met à jour README / docs / CLAUDE.md du projet
-14. git commit — sur TOUS les chemins de sortie :
+11. Reviewer (Claude) et Validateur tournent en parallèle
+    ├─ Reviewer relit le diff
+    ├─ Validateur vérifie les critères d'acceptation un par un
+    ├─ Approuvé seulement si le reviewer approuve ET le validateur ne refuse pas
+    ├─ Sur un refus, le codeur reçoit les motifs de tous les agents qui ont refusé
+    └─ Retour au Codeur si refusé (max 3 tours ; sinon ticket → blocked/)
+12. Doc-updater → met à jour README / docs / CLAUDE.md du projet
+13. git commit — sur TOUS les chemins de sortie :
     ├─ approuvé      → "<type>: ticket-XXX — <titre>" puis advance_base_ref()
     └─ non approuvé  → "chore: ticket-XXX — unapproved work (<raison>)"
     (+ un second commit séparé pour la comptabilité Tessera :
      statuts de tickets et pipeline-log, jamais sous le message du ticket)
-15. DB : finish_run(run_id, rounds, approved, final_status)
-16. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
-17. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
+14. DB : finish_run(run_id, rounds, approved, final_status)
+15. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
+16. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
 ```
 
 **Invariants** (voir ADR-018) :
@@ -512,7 +518,7 @@ affiché dans l'UI.
 
 ## OrchestratorEvents (WebSocket)
 
-Dès la connexion, le serveur envoie un instantané du run (`RunActif`), qui porte `ticket_id` et `ticket_titre`, permettant à la Supervision et à l'en-tête du run d'afficher ces informations sans ouvrir le projet (ticket-286).
+Dès la connexion, le serveur envoie un instantané du run (`RunActif`), qui porte `ticket_id` et `ticket_titre`, permettant à la Supervision et à l'en-tête du run d'afficher ces informations sans ouvrir le projet (ticket-286). L'instantané contient désormais `etapes_en_cours: string[]`, qui liste toutes les étapes actuellement en cours d'exécution (ticket-289). Après l'audit sécurité, reviewer et validateur peuvent tourner en parallèle : le client affiche les deux pastilles actives. Quand `etapes_en_cours` est absent (run ancien), les clients replient sur le champ `etape`.
 
 Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
 
