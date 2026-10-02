@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-300
 plan: true
-pr_number: null
+pr_number: 190
 priority: high
 status: done
 title: A delivery rebase that stops always gives the tree back, even with untracked
