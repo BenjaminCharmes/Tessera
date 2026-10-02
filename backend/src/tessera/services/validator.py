@@ -280,12 +280,30 @@ def _find_file_in_project(ref: str, project_root: Path) -> Path | None:
     Tries the reference as a relative path first, then falls back to a
     recursive search by filename, skipping common non-source directories.
     """
+    # Un critère vient d'un ticket, qui peut venir d'une issue GitHub : sans
+    # cette borne, `../../.env` ou un chemin absolu ferait joindre au message
+    # du validateur un fichier hors du projet (audit sécurité du ticket-316).
+    racine = project_root.resolve()
+
+    def _dans_le_projet(chemin: Path) -> bool:
+        try:
+            chemin.resolve().relative_to(racine)
+        except ValueError:
+            return False
+        return True
+
+    if Path(ref).is_absolute():
+        return None
     candidate = project_root / ref
-    if candidate.exists() and candidate.is_file():
+    if candidate.is_file() and _dans_le_projet(candidate):
         return candidate
     name = Path(ref).name
+    if not name or name in (".", ".."):
+        return None
     for found in project_root.rglob(name):
-        if not any(part in _EXCLUDED_DIRS for part in found.parts):
+        if any(part in _EXCLUDED_DIRS for part in found.parts):
+            continue
+        if found.is_file() and _dans_le_projet(found):
             return found
     return None
 

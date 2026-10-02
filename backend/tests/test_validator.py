@@ -531,3 +531,39 @@ class TestCitedFiles:
         assert "tronqué" in user_msg
         # Le message ne contient pas les 25 000 « x » du fichier original.
         assert user_msg.count("x") < _CITED_FILES_MAX_CHARS + 5_000
+
+
+# Frontière du projet pour les fichiers cités (audit sécurité, ticket-316)
+
+
+def test_un_fichier_cite_hors_du_projet_n_est_pas_lu(tmp_path: Path) -> None:
+    from tessera.services.validator import _find_file_in_project
+
+    projet = tmp_path / "projet"
+    projet.mkdir()
+    (tmp_path / "secret.env").write_text("TOKEN=x", encoding="utf-8")
+
+    assert _find_file_in_project("../secret.env", projet) is None
+
+
+def test_un_chemin_absolu_cite_n_est_pas_lu(tmp_path: Path) -> None:
+    from tessera.services.validator import _find_file_in_project
+
+    projet = tmp_path / "projet"
+    projet.mkdir()
+    secret = tmp_path / "secret.env"
+    secret.write_text("TOKEN=x", encoding="utf-8")
+
+    assert _find_file_in_project(str(secret), projet) is None
+
+
+def test_un_fichier_du_projet_reste_trouve(tmp_path: Path) -> None:
+    from tessera.services.validator import _find_file_in_project
+
+    projet = tmp_path / "projet"
+    (projet / "src").mkdir(parents=True)
+    cible = projet / "src" / "BillingTab.test.tsx"
+    cible.write_text("test", encoding="utf-8")
+
+    assert _find_file_in_project("src/BillingTab.test.tsx", projet) == cible
+    assert _find_file_in_project("BillingTab.test.tsx", projet) == cible
