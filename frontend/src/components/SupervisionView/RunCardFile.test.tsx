@@ -107,6 +107,74 @@ describe("RunCard — titre du ticket (ticket-286)", () => {
   });
 });
 
+describe("RunCard — état CI de la PR livrée (ticket-308)", () => {
+  it("affiche en attente de CI quand livraison_done est reçu mais pas ci_merge_done", () => {
+    // ADR-026 : amber pour l'attente.
+    render(
+      <RunCard
+        run={run()}
+        etat={{ ...INITIAL, runClosed: true, livraisonPrNumber: 42, ciMerge: null }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("PR #42 — en attente de CI")).toBeInTheDocument();
+    expect(screen.getByText("PR #42 — en attente de CI").className).toMatch(/amber/);
+  });
+
+  it("affiche 'PR #N mergée' apres ci_merge_done avec merged: true", () => {
+    // ADR-026 : green pour le succès.
+    render(
+      <RunCard
+        run={run()}
+        etat={{
+          ...INITIAL,
+          runClosed: true,
+          livraisonPrNumber: 42,
+          ciMerge: { merged: true, arret: null },
+        }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("PR #42 mergée")).toBeInTheDocument();
+    expect(screen.getByText("PR #42 mergée").className).toMatch(/green/);
+  });
+
+  it("affiche l'arret apres ci_merge_done avec merged: false", () => {
+    // ADR-026 : red pour l'échec.
+    render(
+      <RunCard
+        run={run()}
+        etat={{
+          ...INITIAL,
+          runClosed: true,
+          livraisonPrNumber: 7,
+          ciMerge: { merged: false, arret: "CI rouge : la PR #7 reste ouverte." },
+        }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("CI rouge : la PR #7 reste ouverte.")).toBeInTheDocument();
+    expect(screen.getByText("CI rouge : la PR #7 reste ouverte.").className).toMatch(/red/);
+  });
+
+  it("n'affiche rien de CI quand livraisonPrNumber est null", () => {
+    // Pas de PR ouverte : ni attente, ni résultat.
+    render(
+      <RunCard
+        run={run()}
+        etat={{ ...INITIAL, runClosed: true, livraisonPrNumber: null, ciMerge: null }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText(/en attente de CI/)).toBeNull();
+    expect(screen.queryByText(/mergée/)).toBeNull();
+  });
+});
+
 describe("RunCard — coût en direct (ticket-197)", () => {
   it("montre le cout, les appels et les outils depuis l'instantane", () => {
     // Un F5 pendant le run doit retrouver le cumul, pas repartir de zéro.

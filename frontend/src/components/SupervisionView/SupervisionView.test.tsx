@@ -376,6 +376,48 @@ describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
   });
 });
 
+describe("SupervisionView — état CI par run (ticket-308)", () => {
+  it("ci_merge_done est rattache a la carte du bon ticket_id, pas a la derniere recue", () => {
+    // Deux runs clos avec une PR chacun.
+    // run-1 (ticket-001) a reçu ci_merge_done (merged: true).
+    // run-2 (ticket-002) attend encore la CI.
+    // Seule la carte de run-1 doit afficher "mergée".
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-2", project_id: "ide-core", ticket_id: "ticket-002" }),
+            ],
+          },
+          {
+            "run-1": {
+              runClosed: true,
+              livraisonPrNumber: 10,
+              ciMerge: { merged: true, arret: null },
+            },
+            "run-2": {
+              runClosed: true,
+              livraisonPrNumber: 11,
+              ciMerge: null,
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    // run-1 doit montrer "mergée".
+    const carteIdeCore1 = screen.getByLabelText("Run ticket-001 sur ide-core");
+    expect(carteIdeCore1.textContent).toContain("PR #10 mergée");
+
+    // run-2 doit montrer "en attente de CI".
+    const carteIdeCore2 = screen.getByLabelText("Run ticket-002 sur ide-core");
+    expect(carteIdeCore2.textContent).toContain("PR #11 — en attente de CI");
+  });
+});
+
 describe("SupervisionView — bouton Fermer (ticket-267)", () => {
   it("ne rend pas Fermer avant run_closed meme si le pipeline est done", () => {
     // Entre pipeline_done et run_closed, la livraison tourne encore.

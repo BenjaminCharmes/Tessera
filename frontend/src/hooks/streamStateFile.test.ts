@@ -305,3 +305,65 @@ describe("etatDepuisRun — lecture de etapes_en_cours (ticket-290)", () => {
     expect(s.etapesEnCours).toEqual([]);
   });
 });
+
+describe("applyEvent — livraison_done et ci_merge_done (ticket-308)", () => {
+  it("livraison_done capture le pr_number", () => {
+    const s = applyEvent(
+      INITIAL,
+      ev({
+        type: "livraison_done",
+        agent: null,
+        data: { pr_number: 42, merged: false, arret: null },
+      }),
+    );
+    expect(s.livraisonPrNumber).toBe(42);
+  });
+
+  it("livraison_done sans pr_number laisse livraisonPrNumber a null", () => {
+    const s = applyEvent(
+      INITIAL,
+      ev({ type: "livraison_done", agent: null, data: {} }),
+    );
+    expect(s.livraisonPrNumber).toBeNull();
+  });
+
+  it("ci_merge_done avec merged: true marque la fusion", () => {
+    let s = applyEvent(
+      INITIAL,
+      ev({ type: "livraison_done", agent: null, data: { pr_number: 10 } }),
+    );
+    s = applyEvent(
+      s,
+      ev({
+        type: "ci_merge_done",
+        agent: null,
+        data: { pr_number: 10, merged: true, arret: null },
+      }),
+    );
+    expect(s.ciMerge).toEqual({ merged: true, arret: null });
+  });
+
+  it("ci_merge_done avec merged: false conserve l'arret", () => {
+    let s = applyEvent(
+      INITIAL,
+      ev({ type: "livraison_done", agent: null, data: { pr_number: 7 } }),
+    );
+    s = applyEvent(
+      s,
+      ev({
+        type: "ci_merge_done",
+        agent: null,
+        data: { pr_number: 7, merged: false, arret: "CI rouge : la PR #7 reste ouverte." },
+      }),
+    );
+    expect(s.ciMerge).toEqual({ merged: false, arret: "CI rouge : la PR #7 reste ouverte." });
+  });
+
+  it("ciMerge reste null avant ci_merge_done", () => {
+    const s = applyEvent(
+      INITIAL,
+      ev({ type: "livraison_done", agent: null, data: { pr_number: 5 } }),
+    );
+    expect(s.ciMerge).toBeNull();
+  });
+});
