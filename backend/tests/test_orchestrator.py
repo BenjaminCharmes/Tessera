@@ -15,7 +15,7 @@ from tessera.services.orchestrator import (
 # Le parsing du verdict vit dans pipeline_text depuis ticket-045, et les étapes
 # du pipeline dans pipeline_stages depuis ticket-046.
 from tessera.services.pipeline_text import _parse_reviewer_verdict
-from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services.security_auditor import SecurityAuditResult, SecurityIssue
 from tessera.services.validator import ValidationResult
 
@@ -140,6 +140,9 @@ class _FakeGit:
         self._diff = diff
         self.commits: list[str] = []
         self.base_ref_advances = 0
+
+    async def commit_bookkeeping(self) -> None:
+        pass
 
     async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
         return None
@@ -416,6 +419,9 @@ async def test_run_pipeline_cree_une_branche_et_emet_l_event(tmp_path: Path) -> 
         def __init__(self) -> None:
             self.created: list[tuple[str, str]] = []
 
+        async def commit_bookkeeping(self) -> None:
+            pass
+
         async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
             return None
 
@@ -473,6 +479,9 @@ async def test_pipeline_done_porte_la_branche_du_run(tmp_path: Path) -> None:
     events: list[OrchestratorEvent] = []
 
     class FakeGit:
+        async def commit_bookkeeping(self) -> None:
+            pass
+
         async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
             return None
 
@@ -1168,10 +1177,15 @@ async def test_commit_chore_quand_la_securite_bloque(tmp_path: Path) -> None:
 
 
 class _FailingBranchGit(_FakeGit):
-    """create_branch always fails; the rest of the pipeline still works."""
+    """create_branch raises NotAGitRepository so the pipeline continues without
+    a branch — the invariant is that no commit must happen on the wrong ref."""
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
-        raise GitWorkspaceError("checkout -b failed: local modifications")
+        raise NotAGitRepository(
+            command=["git", "checkout", "-b"],
+            returncode=128,
+            stderr="not a git repository",
+        )
 
 
 async def test_branche_en_echec_le_pipeline_termine_sans_commettre(tmp_path: Path) -> None:
@@ -1235,6 +1249,9 @@ class _DirtyingGit:
         self.commits: list[str] = []
         self.branches_created: list[str] = []
         self.base_ref_advances = 0
+
+    async def commit_bookkeeping(self) -> None:
+        pass
 
     async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
         return None

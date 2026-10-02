@@ -48,6 +48,9 @@ class _Tickets:
 
 
 class _Git:
+    async def commit_bookkeeping(self) -> None:
+        pass
+
     async def is_clean(self) -> bool:
         return True
 

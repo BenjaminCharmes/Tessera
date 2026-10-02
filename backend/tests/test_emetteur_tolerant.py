@@ -26,6 +26,9 @@ class _GitQuiCommite:
     def __init__(self) -> None:
         self.commits: list[str] = []
 
+    async def commit_bookkeeping(self) -> None:
+        pass
+
     async def is_clean(self) -> bool:
         return True
 
