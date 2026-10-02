@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
 id: ticket-323
-pr_number: null
+pr_number: 233
 priority: medium
 status: done
 title: A run refused for a dirty tree names the files that block it
