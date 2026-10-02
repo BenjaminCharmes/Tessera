@@ -35,6 +35,9 @@ class CIWatcher:
         self._en_attente: dict[str, set[str]] = {}
         # Tâches asyncio en cours — tenues pour pouvoir les annuler à l'arrêt.
         self._taches: set[asyncio.Task[None]] = set()
+        # Événements signalés quand un ticket quitte la file d'attente.
+        # Clé : "project_id:ticket_id".
+        self._events_merge: dict[str, asyncio.Event] = {}
 
     # ------------------------------------------------------------------
     # Interface publique
@@ -70,6 +73,20 @@ class CIWatcher:
     def en_attente(self, project_id: str) -> tuple[str, ...]:
         """Ticket ids whose PR is open and waiting for CI or merge."""
         return tuple(self._en_attente.get(project_id, set()))
+
+    async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+        """Wait until the ticket is no longer waiting for CI or merge.
+
+        Returns immediately if the ticket is already done or was never
+        registered. Safe to call from a queue loop: a dependent ticket
+        suspends here until the background task signals completion.
+        """
+        if ticket_id not in self._en_attente.get(project_id, set()):
+            return
+        cle = f"{project_id}:{ticket_id}"
+        if cle not in self._events_merge:
+            self._events_merge[cle] = asyncio.Event()
+        await self._events_merge[cle].wait()
 
     async def arreter(self) -> None:
         """Cancel all running tasks and wait for them to finish.
@@ -117,6 +134,11 @@ class CIWatcher:
             )
         finally:
             self._en_attente.get(project_id, set()).discard(ticket_id)
+            # Signaler les éventuels appelants d'`attendre_merge`.
+            cle = f"{project_id}:{ticket_id}"
+            evt = self._events_merge.pop(cle, None)
+            if evt is not None:
+                evt.set()
 
     async def _livrer_et_emettre(
         self,

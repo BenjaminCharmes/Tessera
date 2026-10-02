@@ -1,4 +1,8 @@
-"""La livraison suit chaque run, quel que soit le mode — ticket-084."""
+"""La livraison suit chaque run, quel que soit le mode — ticket-084.
+
+Ticket-307 : phase 1 dans run_pipeline, phase 2 dans CIWatcher (ADR-051).
+"""
+import asyncio
 from pathlib import Path
 from typing import Any
 
@@ -9,7 +13,7 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
-from tessera.models.ticket import TicketStatus
+from tessera.models.ticket import TicketStatus, TicketType, TicketPriority
 
 
 def _resultat(ticket_id: str, approuve: bool = True) -> PipelineResult:
@@ -175,3 +179,301 @@ async def test_une_doc_qui_echoue_ne_casse_pas_la_file(tmp_path: Path) -> None:
     resultats = await orch.run_queue("p", ["ticket-001"])
 
     assert len(resultats) == 1
+
+
+# ------------------------------------------------------------------
+# ADR-051 — Phase 1 dans run_pipeline, phase 2 dans CIWatcher
+# ------------------------------------------------------------------
+
+
+def _construire_avec_surveiller(
+    tmp_path: Path,
+    resultats: list[PipelineResult],
+    livrer: Any,
+    surveiller: Any = None,
+    ci_watcher: Any = None,
+    ticket_service: Any = None,
+) -> _OrchestrateurDouble:
+    from unittest.mock import AsyncMock, MagicMock
+
+    if ticket_service is None:
+        tickets = AsyncMock()
+        tickets.get_ticket.return_value = None
+        ticket_service = tickets
+    return _OrchestrateurDouble(
+        resultats,
+        runner=MagicMock(),
+        ticket_service=ticket_service,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        livrer=livrer,
+        surveiller=surveiller,
+        ci_watcher=ci_watcher,
+    )
+
+
+async def test_run_approuve_appelle_livrer_phase_1_puis_surveiller(
+    tmp_path: Path,
+) -> None:
+    """Critère 1 : run approuvé → livrer appelé, surveiller délégué en arrière-plan."""
+    surveilles: list[tuple[str, str, int]] = []
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    async def _surveiller(
+        project_id: str, ticket_id: str, pr_number: int, on_event: Any
+    ) -> None:
+        surveilles.append((project_id, ticket_id, pr_number))
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001")],
+        _livrer,
+        surveiller=_surveiller,
+    )
+
+    result = await orch.run_pipeline("proj", "ticket-001", _rien)
+
+    assert result.livraison is not None
+    assert result.livraison.pr_number == 7
+    # surveiller a été appelé (phase 2 confiée au CIWatcher)
+    assert surveilles == [("proj", "ticket-001", 7)]
+
+
+async def test_surveiller_non_appele_sans_pr(tmp_path: Path) -> None:
+    """Pas de surveillance quand la phase 1 n'a pas ouvert de PR."""
+    surveilles: list[str] = []
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        # Phase 1 arrêtée (rebase refusé, etc.)
+        return Livraison(arret="Rebase refusé")
+
+    async def _surveiller(
+        project_id: str, ticket_id: str, pr_number: int, on_event: Any
+    ) -> None:
+        surveilles.append(ticket_id)
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001")],
+        _livrer,
+        surveiller=_surveiller,
+    )
+
+    await orch.run_pipeline("proj", "ticket-001", _rien)
+
+    assert surveilles == []
+
+
+async def test_run_closed_emis_avant_ci_merge_done(tmp_path: Path) -> None:
+    """Critère 2 : run_closed précède ci_merge_done (arrière-plan)."""
+    from tessera.services.ci_watcher import CIWatcher
+    from tessera.services.pipeline_events import EventType
+
+    watcher = CIWatcher()
+    gate = asyncio.Event()
+    events_recus: list[OrchestratorEvent] = []
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=42, arret=None)
+
+    async def _phase2_bloquante(pr_number: int) -> Livraison:
+        await gate.wait()
+        return Livraison(pr_number=pr_number, merged=True)
+
+    async def _surveiller(
+        project_id: str, ticket_id: str, pr_number: int, on_event: Any
+    ) -> None:
+        # Démarre la tâche de fond, retourne immédiatement.
+        await watcher.surveiller(project_id, ticket_id, pr_number, _phase2_bloquante, on_event)
+
+    async def _capturer(event: OrchestratorEvent) -> None:
+        events_recus.append(event)
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001")],
+        _livrer,
+        surveiller=_surveiller,
+    )
+
+    # run_pipeline retourne avant que la gate soit levée.
+    result = await orch.run_pipeline("proj", "ticket-001", _capturer)
+
+    # À ce stade, la phase 2 est bloquée sur la gate : ci_merge_done n'a pas
+    # encore été émis.
+    ci_done_avant = [e for e in events_recus if e.type is EventType.CI_MERGE_DONE]
+    assert ci_done_avant == [], "ci_merge_done ne doit pas être émis avant run_closed"
+
+    # Lever la gate : la phase 2 peut terminer.
+    gate.set()
+    await asyncio.sleep(0.05)
+
+    ci_done_apres = [e for e in events_recus if e.type is EventType.CI_MERGE_DONE]
+    assert len(ci_done_apres) == 1
+    assert ci_done_apres[0].data["merged"] is True
+
+    await watcher.arreter()
+
+
+async def test_ticket_dependant_attend_le_merge_avant_de_demarrer(
+    tmp_path: Path,
+) -> None:
+    """Critère 3 : ticket dépendant attend ci_merge_done avant de démarrer."""
+    from unittest.mock import AsyncMock
+    from tessera.models.ticket import Ticket
+
+    gate = asyncio.Event()
+    departs: list[str] = []
+
+    class _FakeCIWatcher:
+        def en_attente(self, project_id: str) -> tuple[str, ...]:
+            return ("ticket-001",)
+
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+            await gate.wait()
+
+    def _make_ticket_dep(tid: str, depends_on: list[str]) -> Ticket:
+        return Ticket(
+            id=tid,
+            title="titre",
+            type=TicketType.feat,
+            status=TicketStatus.todo,
+            priority=TicketPriority.medium,
+            agent="codeur",
+            body="corps",
+            depends_on=depends_on,
+        )
+
+    ticket_001 = _make_ticket_dep("ticket-001", [])
+    ticket_002 = _make_ticket_dep("ticket-002", ["ticket-001"])
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: {
+        "ticket-001": ticket_001,
+        "ticket-002": ticket_002,
+    }.get(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        departs.append(result.ticket_id)
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcher(),
+        ticket_service=tickets,
+    )
+
+    # Démarrer la file en arrière-plan.
+    tache = asyncio.create_task(
+        orch.run_queue("proj", ["ticket-001", "ticket-002"])
+    )
+    await asyncio.sleep(0.05)
+
+    # ticket-001 a démarré, ticket-002 attend.
+    assert "ticket-001" in departs
+    assert "ticket-002" not in departs
+
+    # Lever la gate → ticket-002 peut démarrer.
+    gate.set()
+    await asyncio.sleep(0.05)
+
+    results = await tache
+    assert len(results) == 2
+    assert "ticket-002" in departs
+
+
+async def test_ticket_sans_dependance_demarre_sans_attendre(
+    tmp_path: Path,
+) -> None:
+    """Critère 4 : ticket sans dépendance démarre pendant que la PR attend la CI."""
+    from unittest.mock import AsyncMock
+    from tessera.models.ticket import Ticket
+
+    gate = asyncio.Event()
+    departs: list[str] = []
+
+    class _FakeCIWatcher:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+            # Ne doit jamais être appelé pour un ticket sans dépendance.
+            raise AssertionError(f"attendre_merge appelé pour {ticket_id}")
+
+    def _make_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid,
+            title="titre",
+            type=TicketType.feat,
+            status=TicketStatus.todo,
+            priority=TicketPriority.medium,
+            agent="codeur",
+            body="corps",
+            depends_on=[],  # pas de dépendance
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: _make_ticket(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        departs.append(result.ticket_id)
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcher(),
+        ticket_service=tickets,
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    # Les deux tickets ont démarré sans attente.
+    assert departs == ["ticket-001", "ticket-002"]
+    assert len(results) == 2
+
+
+async def test_livraison_sans_pr_ne_bloque_pas_le_ticket_suivant(
+    tmp_path: Path,
+) -> None:
+    """Critère 5 : livraison échouée sans PR → file continue normalement."""
+    from unittest.mock import AsyncMock
+    from tessera.models.ticket import Ticket
+
+    departs: list[str] = []
+
+    class _FakeCIWatcher:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+            raise AssertionError("attendre_merge ne doit pas être appelé")
+
+    def _make_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=[],
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: _make_ticket(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        departs.append(result.ticket_id)
+        # Phase 1 échouée : exception capturée → pas de PR, arret set
+        return Livraison(arret="Livraison interrompue : réseau injoignable")
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcher(),
+        ticket_service=tickets,
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    # La file n'est pas arrêtée par la livraison échouée.
+    assert departs == ["ticket-001", "ticket-002"]
+    assert len(results) == 2
