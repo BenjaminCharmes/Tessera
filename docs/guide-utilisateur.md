@@ -403,6 +403,24 @@ Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
 
 Quand revue et validation sont parallèles, leurs événements s'entrelaçent dans le fil : le reviewer démarre, puis le validateur démarre, puis des tokens du reviewer, puis des tokens du validateur, etc. Si les deux refusent, tu vois les deux motifs avec le nom de chaque étape.
 
+## 5 ter. Après le run : fusion automatique
+
+Quand le run se termine approuvé, l'IDE :
+- Rebase ta branche sur la branche de base
+- Ouvre une pull request sur GitHub
+- Finit le run — tu vois le badge ✅
+
+Ensuite, la pull request se fusionne seule en arrière-plan :
+- Elle attend les checks CI (tests, qualité de code…)
+- Dès que tout est vert, elle se fusionne automatiquement
+- Le commit arrive sur la branche de base
+
+Tu peux suivre son état en cliquant sur le numéro de PR du ticket ou en consultant l'historique. Aucune action n'est attendue de ta part — tout est automatique.
+
+En mode autonome, le ticket suivant commence immédiatement (le projet n'est plus verrouillé). S'il dépend du précédent (`depends_on`), la file attend la fusion du parent.
+
+Si une étape échoue — conflit de rebase, ou vérification CI — tu vois l'erreur dans le run. La PR n'est ouverte que si la livraison a réussi.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
