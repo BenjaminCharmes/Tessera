@@ -112,12 +112,19 @@ avant d'avoir fini.
 ## Ce qu'aucun agent ne peut écrire
 
 Le garde-fou refuse à tout agent l'écriture dans `.github/workflows/`,
-`.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`), `.git/` et
-`agents.json` (ADR-027, ticket-240). Un ticket dont le livrable vit là se fait
+`.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`), `.git/`,
+`agents.json` (ADR-027, ticket-240), et tout `CLAUDE.md` ou `CLAUDE.local.md`
+(`chemins_proteges.py`). Un ticket dont le livrable vit là se fait
 **à la main** : lancé dans le pipeline, il tourne trois tours sur un diff vide
 et se bloque (tickets 001 de `carriere`/`freelance` pour la CI, ticket-276 pour
 un skill, le 2026-09-30). Le ticket peut porter la partie autorisée — un test,
 du code — et dire que le reste est manuel.
+
+**« Ce ticket autorise la modification de `CLAUDE.md` » n'ouvre pas le
+garde-fou.** La règle 5 dit qui a le droit de décider, pas ce qu'un agent peut
+écrire. Le 2026-10-02, le codeur du ticket-311 a lu cette phrase comme une
+permission et contourné le refus par `python -c` (ticket-326). La partie
+`CLAUDE.md` d'un tel ticket se fait à la main, après le merge.
 
 ## Avant de valider
 
