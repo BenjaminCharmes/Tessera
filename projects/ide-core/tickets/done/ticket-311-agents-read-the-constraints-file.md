@@ -1,15 +1,16 @@
 ---
-id: ticket-311
-title: "Agents read the short constraints file instead of the whole decision log"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-310"]
-estimated_days: 1
-plan: true
 created: 2026-10-02
+depends_on:
+- ticket-310
+estimated_days: 1
+id: ticket-311
+plan: true
+pr_number: 222
+priority: high
+status: done
+title: Agents read the short constraints file instead of the whole decision log
+type: feat
 ---
 
 # ticket-311 — Les agents lisent les contraintes, plus le journal

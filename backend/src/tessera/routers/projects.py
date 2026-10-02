@@ -24,6 +24,7 @@ from tessera.models.project import (
 from tessera.models.ticket import TicketStatus
 from tessera.services.database import get_usage_breakdown, PipelineRunSummary, ProjectUsage, get_project_usage, list_runs
 from tessera.agents.github_sync import GithubSyncAgent
+from tessera.services.adr import lire_contraintes
 from tessera.services.git_clone import CloneError, GitCloneService
 from tessera.services.github_service import GitHubService
 from tessera.services.planner import PlannerService
@@ -201,10 +202,7 @@ async def get_project_context(project_id: str) -> ProjectContext:
     all_tickets = await _ticket_svc(project_id).list_tickets()
     open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
 
-    decisions_path = project_path / "memory" / "decisions.md"
-    recent_decisions = (
-        decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
-    )
+    recent_decisions = lire_contraintes(project_path / "memory")
 
     return ProjectContext(
         project_id=project_id,

@@ -34,6 +34,7 @@ from tessera.services.run_recorder import RunRecorder
 from tessera.services.security_auditor import SecurityAuditorService
 from tessera.services.test_runner import TestRunnerService
 from tessera.services.validator import ValidatorService
+from tessera.services.adr import lire_contraintes
 from tessera.services.orchestrator import (
     Orchestrator,
     OrchestratorEvent,
@@ -122,10 +123,7 @@ async def _build_project_context(project_id: str) -> str:
     all_tickets = await ticket_svc.list_tickets()
     open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
 
-    decisions_path = project_path / "memory" / "decisions.md"
-    recent_decisions = (
-        decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
-    )
+    recent_decisions = lire_contraintes(project_path / "memory")
 
     tickets_summary = (
         "\n".join(f"- [{t.id}] {t.title} ({t.status.value})" for t in open_tickets)

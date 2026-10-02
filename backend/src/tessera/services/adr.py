@@ -1,28 +1,27 @@
-"""N'injecter à chaque agent que les ADR qui le contraignent — ticket-087.
+"""N'injecter à chaque agent que les contraintes qui le concernent.
 
-`decisions.md` part **en entier** dans chaque appel d'agent, jusqu'à dix-huit
-fois par ticket. À trente et un ADR il pèse plus de cinq mille tokens, et il
-grossit à chaque décision.
+`contraintes.md` remplace `decisions.md` dans le prompt des agents (ticket-311).
+Il porte des règles concises, filtrées par rôle via des marqueurs `*(role)*`.
+Si `contraintes.md` est absent, on retombe sur `decisions.md` (ticket-087).
 
-Le coût n'est pas le vrai problème — c'est la dilution. Un codeur reçoit la
-palette de couleurs, le choix de Tauri contre Electron et le gestionnaire de
-paquets Python, au milieu des quelques contraintes qu'il doit réellement
-respecter. Les règles qui comptent se noient dans celles qui ne le concernent
-pas.
+Dans `decisions.md`, la portée s'exprime via `**Portée** : rôle` dans chaque
+bloc ADR. Dans `contraintes.md`, des marqueurs `*(role1, role2)*` sur leur
+propre ligne ouvrent un bloc scoped ; les règles sans marqueur vont à tous.
 
-Un ADR déclare donc sa portée, en une ligne : `**Portée** : codeur, reviewer`.
-**Sans portée, il vaut pour tous** — le défaut protège, comme partout ailleurs
-ici. Rater une contrainte serait silencieux, et une contrainte qu'un agent
-n'a pas lue n'en est plus une.
+**Sans portée, une contrainte vaut pour tous** — le défaut protège.
 """
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 #: `## ADR-0xx — Titre` ouvre un bloc ; le suivant le ferme.
 _DEBUT_ADR = re.compile(r"^##\s+(ADR-\d+)\b", re.MULTILINE)
 
 #: `**Portée** : a, b` — la ligne, où qu'elle soit dans le bloc.
 _PORTEE = re.compile(r"^\*\*Port[ée]e\*\*\s*:\s*(.+)$", re.MULTILINE | re.IGNORECASE)
+
+#: `*(role1, role2)*` seul sur sa ligne — marqueur de portée dans contraintes.md.
+_MARQUEUR_ROLE = re.compile(r"^\*\(([^)]+)\)\*$")
 
 
 @dataclass(frozen=True)
@@ -87,6 +86,58 @@ def adr_pour(contenu: str, role: str) -> str:
     return preambule(contenu).rstrip() + "\n\n" + "\n\n---\n\n".join(retenus) + "\n"
 
 
+def contraintes_pour(contenu: str, role: str) -> str:
+    """Filtre contraintes.md : garde les règles universelles et celles de `role`.
+
+    Un marqueur `*(role1, role2)*` seul sur sa ligne ouvre un bloc scoped qui
+    court jusqu'à la prochaine section `## Header` ou au prochain marqueur.
+    Les règles sans marqueur précédent sont universelles et vont à tous les rôles.
+    Le marqueur lui-même n'apparaît pas dans la sortie.
+    """
+    if not contenu.strip():
+        return contenu
+
+    cible = role.strip().lower()
+    lignes = contenu.splitlines(keepends=True)
+    result: list[str] = []
+    portee_courante: set[str] | None = None  # None = universel
+
+    for ligne in lignes:
+        stripped = ligne.strip()
+
+        # Marqueur de rôle : met à jour la portée sans s'inclure dans la sortie.
+        m = _MARQUEUR_ROLE.match(stripped)
+        if m:
+            roles = {r.strip().lower() for r in m.group(1).split(",") if r.strip()}
+            portee_courante = roles if roles else None
+            continue
+
+        # Un en-tête de section `## Header` réinitialise la portée (universel).
+        if stripped.startswith("## "):
+            portee_courante = None
+            result.append(ligne)
+            continue
+
+        # Inclure si universel ou si le rôle fait partie de la portée courante.
+        if portee_courante is None or cible in portee_courante:
+            result.append(ligne)
+
+    return "".join(result)
+
+
+def lire_contraintes(memory_dir: Path) -> str:
+    """Lit `contraintes.md` si présent, sinon retombe sur `decisions.md`.
+
+    Retourne une chaîne vide si les deux fichiers sont absents — comportement
+    identique à l'ancienne lecture directe de `decisions.md`.
+    """
+    contraintes = memory_dir / "contraintes.md"
+    if contraintes.exists():
+        return contraintes.read_text(encoding="utf-8")
+    decisions = memory_dir / "decisions.md"
+    return decisions.read_text(encoding="utf-8") if decisions.exists() else ""
+
+
 #: Le titre sous lequel `_build_project_context` place les ADR.
 _SECTION = "## Décisions récentes"
 
@@ -94,9 +145,9 @@ _SECTION = "## Décisions récentes"
 def adr_pertinents(contexte_projet: str, role: str) -> str:
     """Réduit la section « Décisions récentes » d'un contexte projet à ce rôle.
 
-    Le contexte est assemblé une fois par run et sert à tous les agents ; le
-    filtrage doit donc avoir lieu ici, au moment de rédiger le prompt, seul
-    endroit où le rôle est connu.
+    Détecte le format du contenu : si des blocs `## ADR-xxx` sont présents,
+    c'est le format `decisions.md` et `adr_pour` s'applique. Sinon, c'est le
+    format `contraintes.md` et `contraintes_pour` s'applique.
 
     Un contexte sans section de décisions traverse intact : c'est le cas d'un
     projet qui n'en a pas encore, et celui de la plupart des tests.
@@ -104,4 +155,8 @@ def adr_pertinents(contexte_projet: str, role: str) -> str:
     tete, separateur, decisions = contexte_projet.partition(_SECTION)
     if not separateur:
         return contexte_projet
-    return tete + separateur + adr_pour(decisions, role)
+    if _DEBUT_ADR.search(decisions):
+        filtrees = adr_pour(decisions, role)
+    else:
+        filtrees = contraintes_pour(decisions, role)
+    return tete + separateur + filtrees

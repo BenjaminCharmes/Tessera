@@ -8,6 +8,7 @@ from tessera.config import settings
 from tessera.models.agent import AgentResult, AgentRole, AgentRunRequest, CreateAgentConversationResponse
 from tessera.models.project import ConversationMessage, CreateProjectRequest, CreateProjectResponse, ProjectContext
 from tessera.models.ticket import TicketStatus
+from tessera.services.adr import lire_contraintes
 from tessera.services.agent_creator import AgentCreatorService
 from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.agent_runner import AgentRunner
@@ -79,10 +80,7 @@ async def _build_context(project_id: str) -> ProjectContext:
     all_tickets = await ticket_svc.list_tickets()
     open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
 
-    decisions_path = project_path / "memory" / "decisions.md"
-    recent_decisions = (
-        decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
-    )
+    recent_decisions = lire_contraintes(project_path / "memory")
 
     return ProjectContext(
         project_id=project_id,
