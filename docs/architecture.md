@@ -253,7 +253,8 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
     ├─ Rebase de la branche du ticket sur la branche de base (sync du distant)
     ├─ Gestion des conflits : si conflit hors fichier ticket, rebase aborté et conflit tenté par resolveur-conflit (ADR-033)
     ├─ Push de la branche du ticket vers le distant
-    └─ Ouverture de la PR vers la branche de base → rend pr_number
+    ├─ Ouverture de la PR vers la branche de base → rend pr_number
+    └─ Émission de `run_closed` — le run n'est plus vivant
     La phase 2 (attente CI + merge) se poursuivra asynchrone après le run via CIWatcher.
 14. git commit — sur TOUS les chemins de sortie :
     ├─ approuvé      → "<type>: ticket-XXX — <titre>" puis advance_base_ref()
@@ -594,7 +595,7 @@ Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
            ticket_status_changed | test_result | security_audit_started |
            security_audit_done | validation_started | validation_done | 
            documentation_started | doc_updated | livraison_started | 
-           commit_created | pipeline_done | error",
+           run_closed | ci_merge_done | commit_created | pipeline_done | error",
   "agent": "codeur | reviewer | testeur | securite | validateur | doc-technique | doc-fonctionnelle | null",
   "ticket_id": "ticket-007",
   "data": { "round": 1, "token": "def foo", "status": "in-progress", "approved": true },

@@ -122,6 +122,16 @@ export interface StreamState {
    * approuvé mais la livraison tourne encore (ticket-267).
    */
   runClosed: boolean;
+  /**
+   * Numéro de PR ouverte lors de la livraison (phase 1), disponible dès
+   * `livraison_done`. Null si aucune PR n'a été ouverte (ticket-308).
+   */
+  livraisonPrNumber: number | null;
+  /**
+   * Résultat du merge CI, disponible après `ci_merge_done` (ticket-308).
+   * Null tant que le watcher n'a pas rendu son verdict.
+   */
+  ciMerge: { merged: boolean; arret: string | null } | null;
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -167,6 +177,8 @@ export const INITIAL: StreamState = {
   outils: 0,
   entries: [],
   runClosed: false,
+  livraisonPrNumber: null,
+  ciMerge: null,
 };
 
 /**
@@ -464,8 +476,22 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
             ? ev.data["ticket_titre"]
             : s.ticketTitre,
       };
-    case "livraison_done":
-      return { ...s, events, etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "livraison") };
+    case "livraison_done": {
+      const prNumber =
+        typeof ev.data["pr_number"] === "number" ? ev.data["pr_number"] : null;
+      return {
+        ...s,
+        events,
+        etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "livraison"),
+        livraisonPrNumber: prNumber ?? s.livraisonPrNumber,
+      };
+    }
+    case "ci_merge_done": {
+      const merged = ev.data["merged"] === true;
+      const arret =
+        typeof ev.data["arret"] === "string" ? ev.data["arret"] : null;
+      return { ...s, events, ciMerge: { merged, arret } };
+    }
     case "doc_updated":
     case "documentation_failed":
       return { ...s, events, etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "documentation") };

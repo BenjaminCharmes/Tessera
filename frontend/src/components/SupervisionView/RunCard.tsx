@@ -195,6 +195,27 @@ export default function RunCard({
             </Etiquette>
           ) : null}
         </span>
+
+        {/* État CI/merge de la PR livrée — ticket-308.
+            Visible seulement si une PR a été ouverte. Couleurs ADR-026 :
+            amber = attente, green = succès, red = échec. */}
+        {etat.livraisonPrNumber !== null ? (
+          <span className="mt-1.5 block">
+            {etat.ciMerge === null ? (
+              <Etiquette classe="bg-amber-500/20 text-amber-200">
+                PR #{etat.livraisonPrNumber} — en attente de CI
+              </Etiquette>
+            ) : etat.ciMerge.merged ? (
+              <Etiquette classe="bg-green-500/20 text-green-200">
+                PR #{etat.livraisonPrNumber} mergée
+              </Etiquette>
+            ) : (
+              <Etiquette classe="bg-red-500/20 text-red-200">
+                {etat.ciMerge.arret ?? `PR #${etat.livraisonPrNumber} bloquée`}
+              </Etiquette>
+            )}
+          </span>
+        ) : null}
       </span>
     </div>
   );
