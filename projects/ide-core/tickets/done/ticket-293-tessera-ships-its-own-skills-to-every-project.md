@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 1
 id: ticket-293
-pr_number: null
+pr_number: 192
 priority: medium
 status: done
 title: Tessera ships its own skills to every project's agents
