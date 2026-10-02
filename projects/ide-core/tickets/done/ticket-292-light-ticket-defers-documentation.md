@@ -5,7 +5,7 @@ depends_on:
 - ticket-288
 estimated_days: 1
 id: ticket-292
-pr_number: null
+pr_number: 196
 priority: low
 status: done
 title: A ticket declared light defers its documentation to the next batch
