@@ -48,6 +48,10 @@ class Ticket(BaseModel):
     #: Le ticket demande un tour de plan, en lecture seule, avant le code
     #: (ticket-243). Il se déclare : rien ne devine qu'un ticket est gros.
     plan: bool = False
+    #: Le ticket est léger : son run approuvé ne déclenche pas de mise à jour
+    #: de la documentation. Le prochain ticket normal documente le lot entier,
+    #: marqueur compris (ticket-292).
+    light: bool = False
     body: str = Field(default="")
     project_id: str = ""
     file_path: str = Field(default="", description="Chemin absolu du fichier sur disque")

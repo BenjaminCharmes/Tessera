@@ -1,14 +1,15 @@
 ---
-id: ticket-304
-title: "A verification script runs pytest, mypy and the frontend checks, so the testeur catches what CI catches"
-type: chore
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
-created: 2026-10-02
+id: ticket-304
+pr_number: null
+priority: high
+status: done
+title: A verification script runs pytest, mypy and the frontend checks, so the testeur
+  catches what CI catches
+type: chore
 ---
 
 # ticket-304 — Le testeur attrape ce que la CI attrape

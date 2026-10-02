@@ -1,14 +1,15 @@
 ---
-id: ticket-292
-title: "A ticket declared light defers its documentation to the next batch"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: ["ticket-288"]
-estimated_days: 1
 created: 2026-10-01
+depends_on:
+- ticket-288
+estimated_days: 1
+id: ticket-292
+pr_number: 196
+priority: low
+status: done
+title: A ticket declared light defers its documentation to the next batch
+type: feat
 ---
 
 # ticket-292 — Un ticket léger reporte sa documentation au lot suivant
