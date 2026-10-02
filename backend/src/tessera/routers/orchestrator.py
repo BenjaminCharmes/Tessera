@@ -16,6 +16,7 @@ from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
+from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
@@ -306,6 +307,43 @@ def _documenteur(
     return documenter
 
 
+async def _sync_apres_livraison(
+    livraison: Livraison,
+    espace: GitWorkspaceService | None,
+    politique: PolitiqueRun | None,
+    base_branch: str,
+) -> Livraison:
+    """Sync the base ref with the remote after a delivery, when needed.
+
+    Après un merge en squash (ticket-264) : la branche locale de base est en
+    retard sur le distant. Sans sync, le ticket suivant repart de l'ancienne
+    branche — ses commits sont déjà dans le squash sur develop — et GitHub
+    déclare sa PR en conflit.
+
+    Après un non-merge sur un projet en `autonomy: merge` (ticket-302) : le
+    ticket suivant doit partir de la base distante, pas de la pointe du ticket
+    non mergé. Sur `commit` ou `pr`, l'empilement est voulu — pas de sync.
+    """
+    needs_sync = livraison.merged or (
+        not livraison.merged
+        and politique is not None
+        and politique.autonomy is NiveauAutonomie.merge
+    )
+    if espace is None or not needs_sync:
+        return livraison
+    raison = await espace.sync_base_depuis_distant(base_branch)
+    if raison is None:
+        return livraison
+    return Livraison(
+        etapes=livraison.etapes,
+        durees_ms=livraison.durees_ms,
+        arret=raison,
+        conflits=livraison.conflits,
+        pr_number=livraison.pr_number,
+        merged=livraison.merged,
+    )
+
+
 def _livreur(
     project_id: str,
     runner: AgentRunner | None = None,
@@ -405,22 +443,7 @@ def _livreur(
             return Livraison(arret=f"Livraison interrompue : {exc}")
         # pr_number is now recorded inside service.livrer() via _noter_et_pousser
 
-        # ticket-264 : après un merge en squash, la branche locale de base
-        # est en retard sur le distant. Le ticket suivant repart alors de
-        # l'ancienne branche, ses commits sont déjà présents sur develop
-        # sous forme d'un squash, et GitHub déclare la PR en conflit.
-        # On réconcilie uniquement si la livraison a réellement mergé
-        # (évite un fetch réseau inutile quand le niveau est `commit` ou `pr`).
-        if livraison.merged and espace is not None:
-            raison_sync = await espace.sync_base_depuis_distant(base_branch)
-            if raison_sync is not None:
-                livraison = Livraison(
-                    etapes=livraison.etapes,
-                    arret=raison_sync,
-                    conflits=livraison.conflits,
-                    pr_number=livraison.pr_number,
-                    merged=livraison.merged,
-                )
+        livraison = await _sync_apres_livraison(livraison, espace, politique, base_branch)
         return livraison
 
     return livrer
