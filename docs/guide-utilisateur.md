@@ -575,6 +575,12 @@ ancienne conversation sans recommencer à zéro.
 - **Exécuter des commandes** — aucun outil shell ne lui est donné
 - Lancer un pipeline lui-même : il peut le suggérer, tu décides
 
+#### Fichiers protégés contre toute modification
+
+L'agent ne peut modifier aucun des fichiers système ou de configuration protégés : `CLAUDE.md` (à la racine du projet), `agents.json`, les fichiers du dossier `.claude/`, `.github/workflows/`, ou `.git/`.
+
+Si un ticket demande une modification de ces fichiers, l'agent la refuse et le rapporte clairement : ce qui a été demandé et pourquoi c'est hors de son périmètre. Un refus est **définitif** — l'agent ne cherche jamais un contournement par un script, `python -c`, ou une autre voie. Tu relises ce refus pour clarifier le ticket.
+
 ### Ses écritures sont commitées, pas laissées en vrac
 
 Quand l'agent modifie des fichiers, son travail est **commité automatiquement**
@@ -808,6 +814,12 @@ travaillent à l'aveugle. C'est le fichier le plus rentable à soigner.
 
 Tes critères d'acceptation sont probablement trop vagues, ou le ticket demande trop
 de choses à la fois. Un ticket = un changement cohérent.
+
+### L'agent refuse une modification de fichier système
+
+Si un rapport d'agent indique qu'une modification a été refusée — par exemple, une tentative de modifier `CLAUDE.md`, `agents.json`, `.claude/`, `.github/workflows/`, ou `.git/` — c'est intentionnel. Ces fichiers sont des garde-fous que l'agent ne peut pas franchir.
+
+Relire le ticket : demandait-il vraiment cette modification, ou y a-t-il une approche différente ? Si tu dois absolument faire cette modification, c'est une tâche manuelle — pas un travail d'agent. Les agents n'essaient jamais de contourner ce refus par une autre méthode. Un refus de ce type est définitif.
 
 ### Les tests échouent alors qu'ils passent chez moi
 
