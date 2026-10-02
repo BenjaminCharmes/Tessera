@@ -964,3 +964,14 @@ CHANGES_REQUESTE
 - 2026-10-02 11:11:21 UTC — [ticket-307] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. L'implémentation sépare correct (359156ms)
 - 2026-10-02 11:11:21 UTC — [ticket-307] APPROVED après 2 tour(s)
 - 2026-10-02 11:14:12 UTC — [ticket-307] documentation: 0 fichier(s) (168843ms)
+- 2026-10-02 11:18:15 UTC — [ticket-308] branche ticket-308-a-closed-run-s-card-says-its-pr-is-waiting-for-ci
+- 2026-10-02 11:18:15 UTC — [ticket-308] tour 1 — codeur démarré
+- 2026-10-02 11:30:25 UTC — [ticket-308] tour 1 — codeur terminé (729968ms)
+- 2026-10-02 11:35:57 UTC — [ticket-308] testeur: OK (exit 0)
+- 2026-10-02 11:36:21 UTC — [ticket-308] securite: PASS — Aucune vulnérabilité de sécurité détectée.
+
+Le diff ajoute l'affichage de l'état (23891ms)
+- 2026-10-02 11:36:21 UTC — [ticket-308] tour 1 — reviewer démarré
+- 2026-10-02 11:37:51 UTC — [ticket-308] tour 1 — reviewer terminé (90516ms)
+- 2026-10-02 11:40:26 UTC — [ticket-308] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (244858ms)
+- 2026-10-02 11:40:26 UTC — [ticket-308] APPROVED après 1 tour(s)
