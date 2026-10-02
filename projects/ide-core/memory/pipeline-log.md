@@ -881,3 +881,13 @@ Points positifs :
 - 2026-10-02 07:51:00 UTC — [ticket-310] validateur: APPROVED — Le travail sépare efficacement le journal des décisions (`decisions.md`, 51 ADR  (348859ms)
 - 2026-10-02 07:51:00 UTC — [ticket-310] APPROVED après 2 tour(s)
 - 2026-10-02 07:51:39 UTC — [ticket-310] documentation: 0 fichier(s) (36983ms)
+- 2026-10-02 07:54:46 UTC — [ticket-310] livraison: arrêt — Livraison interrompue : 
+- 2026-10-02 07:54:46 UTC — [ticket-305] branche ticket-305-delivery-splits-in-two-rebase-push-and-pr-in-the
+- 2026-10-02 07:54:46 UTC — [ticket-305] tour 1 — codeur démarré
+- 2026-10-02 08:00:00 UTC — [ticket-305] tour 1 — codeur terminé (314077ms)
+- 2026-10-02 08:06:02 UTC — [ticket-305] testeur: OK (exit 0)
+- 2026-10-02 08:06:35 UTC — [ticket-305] securite: PASS — Aucune vulnérabilité détectée. Ce diff implémente une refacto de la méthode `liv (32843ms)
+- 2026-10-02 08:06:35 UTC — [ticket-305] tour 1 — reviewer démarré
+- 2026-10-02 08:08:04 UTC — [ticket-305] tour 1 — reviewer terminé (89187ms)
+- 2026-10-02 08:09:35 UTC — [ticket-305] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été modifié pour extra (180313ms)
+- 2026-10-02 08:09:35 UTC — [ticket-305] APPROVED après 1 tour(s)
