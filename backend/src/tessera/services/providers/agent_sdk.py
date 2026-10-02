@@ -33,6 +33,12 @@ _logger = get_logger(__name__)
 
 _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 
+# Chemin absolu vers le plugin Tessera, ancré sur la racine du dépôt.
+# Ne jamais le résoudre depuis le cwd d'un projet : il vit dans le dépôt
+# de l'IDE, pas dans celui du projet qui déclare le skill.
+# backend/src/tessera/services/providers/ → parents[5] = racine du dépôt
+_TESSERA_PLUGIN_PATH: Path = Path(__file__).resolve().parents[5] / "agents" / "plugin"
+
 
 def _build_options(
     *,
@@ -74,6 +80,13 @@ def _build_options(
     if skills:
         effective_tools = [*effective_tools, "Skill"]
 
+    # Plugin local Tessera : chargé uniquement si au moins un skill déclaré
+    # porte le préfixe `tessera:`. Le chemin est absolu, ancré sur la racine
+    # du dépôt, jamais sur le cwd du projet (ticket-293).
+    plugins: list[dict[str, str]] = []
+    if skills and any(s.startswith("tessera:") for s in skills):
+        plugins = [{"type": "local", "path": str(_TESSERA_PLUGIN_PATH)}]
+
     # L'outil `ask_user` n'existe que si un canal de dialogue est branché sur
     # ce run (ticket-066). Le donner sans canal reviendrait à promettre à
     # l'agent une réponse que personne ne pourrait lui apporter.
@@ -111,6 +124,7 @@ def _build_options(
         mcp_servers=mcp_servers,
         resume=resume,
         skills=list(skills) if skills else None,
+        plugins=plugins,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
         # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
