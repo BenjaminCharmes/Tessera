@@ -1118,3 +1118,16 @@ Les nou (39750ms)
 - 2026-10-02 21:35:15 UTC — [ticket-325] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests backend et frontend c (228546ms)
 - 2026-10-02 21:35:15 UTC — [ticket-325] APPROVED après 1 tour(s)
 - 2026-10-02 21:38:13 UTC — [ticket-325] documentation: 2 fichier(s) (174515ms)
+- 2026-10-02 21:38:26 UTC — [ticket-320] branche ticket-320-an-answer-sent-after-its-question-expired-is-not
+- 2026-10-02 21:38:26 UTC — [ticket-320] tour 1 — codeur démarré
+- 2026-10-02 21:45:27 UTC — [ticket-320] tour 1 — codeur terminé (420342ms)
+- 2026-10-02 21:50:57 UTC — [ticket-320] testeur: ✖ 1 problem (1 error, 0 warnings)
+- 2026-10-02 21:50:57 UTC — [ticket-320] tests rouges au tour 1
+- 2026-10-02 21:50:57 UTC — [ticket-320] tour 2 — codeur démarré
+- 2026-10-02 21:52:40 UTC — [ticket-320] tour 2 — codeur terminé (102296ms)
+- 2026-10-02 21:59:00 UTC — [ticket-320] testeur: OK (exit 0)
+- 2026-10-02 21:59:28 UTC — [ticket-320] securite: PASS — Audit complet du diff ticket-320 (accusé de réception d'une réponse utilisateur) (27921ms)
+- 2026-10-02 21:59:28 UTC — [ticket-320] tour 2 — reviewer démarré
+- 2026-10-02 22:01:01 UTC — [ticket-320] tour 2 — reviewer terminé (92766ms)
+- 2026-10-02 22:03:04 UTC — [ticket-320] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le code gère corr (215703ms)
+- 2026-10-02 22:03:04 UTC — [ticket-320] APPROVED après 2 tour(s)
