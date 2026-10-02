@@ -525,6 +525,21 @@ d'information pour reconstituer l'état. Les `OrchestratorEvent` — écrits
 initialement pour le temps réel — le satisfont aussi bien pour l'historique : 
 c'est la même sérialisation JSON, les mêmes champs, aucune adaptation.
 
+
+## Gestion des événements en file (ticket-313)
+
+Un mode file traite plusieurs tickets en séquence. Le pipeline enregistre l'historique complet de tous les événements (Pipeline log, SQLite) pour l'audit et la traçabilité. Mais côté interface, **chaque ticket affiche son propre état d'étapes**, vierge au démarrage.
+
+À chaque nouveau ticket (`queue_progress`), les événements du ticket courant repartent de zéro :
+
+- Les pastilles de `StageStrip` reflètent l'état du ticket **en cours**
+- Le ticket suivant démarre avec une bande d'étapes vierge (production à faire, sécurité à venir, etc.)
+- Le Pipeline log accumule tous les événements de tous les tickets et reste complet
+
+### Rejouer un run fermé sans dupliquer le texte
+
+Quand un utilisateur revient à un run depuis la Supervision, le serveur rejoue le contenu textuel accumulé. Un aller-retour entre deux runs recevrait le même rejeu deux fois. Pour prévenir une duplication visible, le client traite les événements replayed de manière à garder une trace fidèle du texte — ni doublon, ni perte.
+
 ## Structure des fichiers de tickets
 
 ```
