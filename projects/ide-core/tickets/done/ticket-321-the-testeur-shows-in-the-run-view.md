@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 1
 id: ticket-321
-pr_number: null
+pr_number: 232
 priority: high
 status: done
 title: 'The testeur shows in the run view: a Tests stage and a card that says why
