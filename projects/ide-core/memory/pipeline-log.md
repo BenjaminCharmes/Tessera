@@ -1132,3 +1132,32 @@ Les nou (39750ms)
 - 2026-10-02 22:03:04 UTC — [ticket-320] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le code gère corr (215703ms)
 - 2026-10-02 22:03:04 UTC — [ticket-320] APPROVED après 2 tour(s)
 - 2026-10-02 22:04:51 UTC — [ticket-320] documentation: 2 fichier(s) (104327ms)
+- 2026-10-02 22:05:04 UTC — [ticket-321] branche ticket-321-the-testeur-shows-in-the-run-view-a-tests-stage-a
+- 2026-10-02 22:05:04 UTC — [ticket-321] tour 1 — codeur démarré
+- 2026-10-02 22:11:35 UTC — [ticket-321] tour 1 — codeur terminé (390672ms)
+- 2026-10-02 22:17:52 UTC — [ticket-321] testeur: OK (exit 0)
+- 2026-10-02 22:18:21 UTC — [ticket-321] securite: PASS — Audit du diff pour le ticket-321 (ajout de l'étape Tests au pipeline). Aucune vu (28860ms)
+- 2026-10-02 22:18:21 UTC — [ticket-321] tour 1 — reviewer démarré
+- 2026-10-02 22:19:26 UTC — [ticket-321] tour 1 — reviewer terminé (64281ms)
+- 2026-10-02 22:20:53 UTC — [ticket-321] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : les tests vérifient correctement  (151797ms)
+- 2026-10-02 22:20:53 UTC — [ticket-321] CHANGES_REQUESTED tour 1: Validateur : Les quatre premiers critères sont satisfaits : les tests vérifient correctement le comp
+- 2026-10-02 22:20:53 UTC — [ticket-321] tour 2 — codeur démarré
+- 2026-10-02 22:21:38 UTC — [ticket-321] tour 2 — codeur terminé (44531ms)
+- 2026-10-02 22:28:01 UTC — [ticket-321] testeur: OK (exit 0)
+- 2026-10-02 22:28:35 UTC — [ticket-321] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+**Backend (pipeline_stag (33797ms)
+- 2026-10-02 22:28:35 UTC — [ticket-321] tour 2 — reviewer démarré
+- 2026-10-02 22:29:31 UTC — [ticket-321] tour 2 — reviewer terminé (56014ms)
+- 2026-10-02 22:31:18 UTC — [ticket-321] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : les tests de StageStrip et FilDuR (162327ms)
+- 2026-10-02 22:31:18 UTC — [ticket-321] CHANGES_REQUESTED tour 2: Validateur : Les quatre premiers critères sont satisfaits : les tests de StageStrip et FilDuRun couv
+- 2026-10-02 22:31:18 UTC — [ticket-321] tour 3 — codeur démarré
+- 2026-10-02 22:33:08 UTC — [ticket-321] tour 3 — codeur terminé (110546ms)
+- 2026-10-02 22:39:24 UTC — [ticket-321] testeur: OK (exit 0)
+- 2026-10-02 22:39:49 UTC — [ticket-321] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+Le diff ajoute une étape (24750ms)
+- 2026-10-02 22:39:49 UTC — [ticket-321] tour 3 — reviewer démarré
+- 2026-10-02 22:41:13 UTC — [ticket-321] tour 3 — reviewer terminé (83765ms)
+- 2026-10-02 22:42:36 UTC — [ticket-321] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés via les tests. L (167077ms)
+- 2026-10-02 22:42:36 UTC — [ticket-321] APPROVED après 3 tour(s)
