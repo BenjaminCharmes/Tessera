@@ -5,7 +5,7 @@ depends_on:
 - ticket-288
 estimated_days: 1
 id: ticket-291
-pr_number: null
+pr_number: 197
 priority: medium
 status: done
 title: 'Design: a queue starts its next ticket while the previous one waits for CI'
