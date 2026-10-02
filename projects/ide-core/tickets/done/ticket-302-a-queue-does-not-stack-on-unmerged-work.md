@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-302
 plan: true
-pr_number: null
+pr_number: 188
 priority: high
 status: done
 title: A queue does not build the next ticket on an approved ticket whose merge failed
