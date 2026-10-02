@@ -11,6 +11,7 @@ from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.sync_map import SyncMapService
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.documentation import DocumentationService, ResultatDocumentation
+from tessera.services.pipeline_events import EventCallback
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.git_workspace import GitWorkspaceService
