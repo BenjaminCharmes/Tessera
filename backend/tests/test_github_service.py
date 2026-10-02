@@ -1,8 +1,16 @@
+import asyncio
+
 import httpx
 import pytest
 import respx
 
-from tessera.services.github_service import GitHubIssue, GitHubService, PRStatus
+from tessera.services.github_service import (
+    GitHubIssue,
+    GitHubService,
+    MergeabiliteTimeoutError,
+    PRNonFusionnableError,
+    PRStatus,
+)
 
 
 _TOKEN = "ghp_test_token"
@@ -591,3 +599,100 @@ async def test_un_merge_refuse_par_github_remonte() -> None:
 
     with pytest.raises(httpx.HTTPStatusError):
         await _make_service().merge_pull_request(7)
+
+
+# ------------------------------------------------------------------
+# merge_quand_fusionnable — ticket-315
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_merge_attend_null_puis_fusionne_quand_true() -> None:
+    # GitHub retourne d'abord mergeable: null (calcul en cours), puis true.
+    # Le service doit attendre et merger quand la valeur est disponible.
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/7").mock(
+        side_effect=[
+            httpx.Response(200, json={"mergeable": None}),
+            httpx.Response(200, json={"mergeable": True}),
+        ]
+    )
+    merge_route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True, "sha": "abc"})
+    )
+
+    svc = _make_service()
+    await svc.merge_quand_fusionnable(
+        7,
+        attente_max_s=10.0,
+        intervalle_s=5.0,
+        dormir=lambda _: asyncio.sleep(0),
+    )
+
+    assert merge_route.call_count == 1
+
+
+@respx.mock
+async def test_merge_non_fusionnable_ne_tente_pas_le_merge() -> None:
+    # Une PR avec mergeable: false (conflit) ne doit pas appeler l'endpoint
+    # de merge. L'exception doit décrire la raison.
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/7").mock(
+        return_value=httpx.Response(200, json={"mergeable": False})
+    )
+    merge_route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True})
+    )
+
+    svc = _make_service()
+    with pytest.raises(PRNonFusionnableError) as exc_info:
+        await svc.merge_quand_fusionnable(7, dormir=lambda _: asyncio.sleep(0))
+
+    assert merge_route.call_count == 0
+    assert "7" in str(exc_info.value)
+
+
+@respx.mock
+async def test_merge_attente_bornee_quand_null_persiste() -> None:
+    # Si GitHub ne calcule jamais la fusionnabilité, l'attente s'arrête au
+    # délai maximal et l'exception décrit le dépassement.
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/7").mock(
+        return_value=httpx.Response(200, json={"mergeable": None})
+    )
+    merge_route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True})
+    )
+
+    svc = _make_service()
+    with pytest.raises(MergeabiliteTimeoutError) as exc_info:
+        await svc.merge_quand_fusionnable(
+            7,
+            attente_max_s=0.0,  # délai nul : la première lecture nulle déclenche le timeout
+            intervalle_s=5.0,
+            dormir=lambda _: asyncio.sleep(0),
+        )
+
+    assert merge_route.call_count == 0
+    assert "7" in str(exc_info.value)
+
+
+@respx.mock
+async def test_merge_retente_sur_405_et_reussit() -> None:
+    # Un 405 immédiat (GitHub encore en calcul côté interne) est retenté une
+    # fois. Si le second appel réussit, le merge est considéré comme effectué.
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/7").mock(
+        return_value=httpx.Response(200, json={"mergeable": True})
+    )
+    merge_route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        side_effect=[
+            httpx.Response(405, json={"message": "Method Not Allowed"}),
+            httpx.Response(200, json={"merged": True, "sha": "abc"}),
+        ]
+    )
+
+    svc = _make_service()
+    await svc.merge_quand_fusionnable(
+        7,
+        intervalle_s=0.0,
+        dormir=lambda _: asyncio.sleep(0),
+    )
+
+    assert merge_route.call_count == 2

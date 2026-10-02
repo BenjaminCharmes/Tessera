@@ -429,6 +429,27 @@ dans le fichier du ticket et commité **avant** le merge de la PR, garantissant 
 le `pr_number` remonte à la branche de base lors du merge. Aucun suivi n'est écrit
 après le merge : la branche du ticket ne reçoit pas de commit une fois fusionnée.
 
+### Attente du statut mergeable avant le merge
+
+Avant d'appeler l'endpoint de merge, `GitHubService` vérifie que la PR est 
+fusionnable. GitHub calcule le statut `mergeable` de manière asynchrone peu après 
+l'ouverture d'une PR — ce champ peut valoir `null` pendant quelques secondes.
+
+Le processus :
+
+- `GitHubService` lit la PR. Tant que `mergeable` vaut `null`, il attend et 
+  relit, avec un délai maximum (60 secondes par défaut) pour éviter une 
+  boucle infinie
+- Si `mergeable` passe à `true`, le merge procède normalement
+- Si `mergeable` devient `false`, la livraison s'arrête avec un `arret` explicite,
+  sans appeler l'endpoint de merge
+- Un statut HTTP 405 (`Method Not Allowed`) au merge — cas résiduel après l'attente 
+  — est retenté une fois, puis remonté en `arret` si l'erreur persiste
+
+Cette attente élimine les fausses erreurs 405 quand une PR est ouverte sur un 
+projet avec `merge_without_ci: true`, qui merge immédiatement après approbation 
+du pipeline, avant que GitHub n'ait eu le temps de calculer la fusibilité.
+
 
 ### Mise à jour de la base distante après merge en file
 

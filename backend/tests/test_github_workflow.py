@@ -68,6 +68,15 @@ class _FakeGitHub:
         self.merged.append(pr_number)
         self.merge_calls.append({"pr_number": pr_number, "method": method})
 
+    async def merge_quand_fusionnable(
+        self,
+        pr_number: int,
+        method: str = "squash",
+        commit_title: str | None = None,
+    ) -> None:
+        self.merged.append(pr_number)
+        self.merge_calls.append({"pr_number": pr_number, "method": method})
+
 
 def _projet(tmp_path: Path, niveau: str | None) -> Path:
     """Un dossier de projet qui declare (ou non) son niveau d'autonomie."""
@@ -230,7 +239,7 @@ def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
         if l.strip() and not l.strip().lstrip("#").strip().startswith(("#",))
         and not l.strip().startswith("#")
     ]
-    appels = [l for l in lignes if "merge_pull_request" in l and "def " not in l]
+    appels = [l for l in lignes if "merge_quand_fusionnable" in l and "def " not in l]
 
     assert appels, "le merge doit exister pour être testable"
     for ligne in appels:

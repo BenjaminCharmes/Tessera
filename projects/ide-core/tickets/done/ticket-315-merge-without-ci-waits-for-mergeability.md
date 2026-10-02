@@ -1,14 +1,14 @@
 ---
-id: ticket-315
-title: "Merging without CI waits until GitHub knows whether the PR is mergeable"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-315
+pr_number: null
+priority: high
+status: done
+title: Merging without CI waits until GitHub knows whether the PR is mergeable
+type: fix
 ---
 
 # ticket-315 — Merger sans CI attend que GitHub sache si la PR est fusionnable
