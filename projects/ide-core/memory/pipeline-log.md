@@ -915,3 +915,14 @@ Points positifs :
 - 2026-10-02 09:13:17 UTC — [ticket-314] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (274031ms)
 - 2026-10-02 09:13:17 UTC — [ticket-314] APPROVED après 1 tour(s)
 - 2026-10-02 09:15:43 UTC — [ticket-314] documentation: 1 fichier(s) (142907ms)
+- 2026-10-02 09:20:16 UTC — [ticket-306] branche ticket-306-ciwatcher-waits-for-ci-and-merges-in-the-backgrou
+- 2026-10-02 09:21:30 UTC — [ticket-306] plan rendu (73016ms)
+- 2026-10-02 09:21:30 UTC — [ticket-306] tour 1 — codeur démarré
+- 2026-10-02 09:32:26 UTC — [ticket-306] tour 1 — codeur terminé (656609ms)
+- 2026-10-02 09:37:50 UTC — [ticket-306] testeur: OK (exit 0)
+- 2026-10-02 09:38:11 UTC — [ticket-306] securite: PASS — Audit complet : le diff ajoute un service `CIWatcher` pour surveiller CI et merg (20641ms)
+- 2026-10-02 09:38:11 UTC — [ticket-306] tour 1 — reviewer démarré
+- 2026-10-02 09:38:51 UTC — [ticket-306] tour 1 — reviewer terminé (40516ms)
+- 2026-10-02 09:42:47 UTC — [ticket-306] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le code implémente correctement (276859ms)
+- 2026-10-02 09:42:47 UTC — [ticket-306] APPROVED après 1 tour(s)
+- 2026-10-02 09:46:30 UTC — [ticket-306] documentation: 1 fichier(s) (220046ms)

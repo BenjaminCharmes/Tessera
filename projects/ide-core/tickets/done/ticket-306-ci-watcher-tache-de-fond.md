@@ -1,15 +1,16 @@
 ---
-id: ticket-306
-title: "CIWatcher waits for CI and merges in the background, one delivery per project"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-305"]
-estimated_days: 1
-plan: true
 created: 2026-10-02
+depends_on:
+- ticket-305
+estimated_days: 1
+id: ticket-306
+plan: true
+pr_number: 208
+priority: high
+status: done
+title: CIWatcher waits for CI and merges in the background, one delivery per project
+type: feat
 ---
 
 # ticket-306 — CIWatcher attend la CI et merge en tâche de fond
