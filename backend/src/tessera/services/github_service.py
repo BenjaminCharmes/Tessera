@@ -1,3 +1,5 @@
+import asyncio
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any, Literal
 
@@ -5,6 +7,15 @@ import httpx
 
 from tessera.config import settings
 from pydantic import BaseModel
+
+
+class MergeabiliteTimeoutError(Exception):
+    """GitHub has not computed PR mergeability within the allowed time."""
+
+
+class PRNonFusionnableError(Exception):
+    """GitHub says the PR is not mergeable (conflict, protection rule, etc.)."""
+
 
 _BASE = "https://api.github.com"
 
@@ -196,6 +207,75 @@ class GitHubService:
         if any(c in ("failure", "timed_out", "cancelled") for c in conclusions):
             return "failing"
         return "passing"
+
+    async def _lire_mergeabilite(self, pr_number: int) -> bool | None:
+        """Read the 'mergeable' field of a pull request.
+
+        Returns None when GitHub has not yet computed mergeability (the field
+        is null in the API response). Returns True or False once computed.
+        """
+        url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._headers)
+            resp.raise_for_status()
+        raw = resp.json().get("mergeable")
+        if raw is None:
+            return None
+        return bool(raw)
+
+    async def merge_quand_fusionnable(
+        self,
+        pr_number: int,
+        method: str = "squash",
+        commit_title: str | None = None,
+        attente_max_s: float = 60.0,
+        intervalle_s: float = 5.0,
+        dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
+    ) -> None:
+        """Merge the PR after verifying GitHub has computed mergeability.
+
+        Polls the PR until `mergeable` is non-null (up to `attente_max_s`
+        seconds). On a 405 response from the merge endpoint, waits and retries
+        once — GitHub may lag slightly even after returning `mergeable: true`.
+
+        Raises:
+            MergeabiliteTimeoutError: mergeability still null after the timeout.
+            PRNonFusionnableError: the PR is not mergeable (conflict, etc.).
+            httpx.HTTPStatusError: HTTP error on merge after the retry on 405.
+        """
+        ecoule = 0.0
+        while True:
+            mergeable = await self._lire_mergeabilite(pr_number)
+            if mergeable is not None:
+                break
+            if ecoule >= attente_max_s:
+                raise MergeabiliteTimeoutError(
+                    f"La PR #{pr_number} est encore en attente de calcul de "
+                    f"fusionnabilité après {attente_max_s:.0f} s. "
+                    "La livraison s'arrête."
+                )
+            await dormir(intervalle_s)
+            ecoule += intervalle_s
+
+        if not mergeable:
+            raise PRNonFusionnableError(
+                f"La PR #{pr_number} n'est pas fusionnable "
+                "(conflit ou branche protégée). La livraison s'arrête."
+            )
+
+        # Attempt the merge; retry once on 405 — GitHub's internal mergeability
+        # state can lag behind the field it just returned.
+        try:
+            await self.merge_pull_request(
+                pr_number, method=method, commit_title=commit_title
+            )
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code != 405:
+                raise
+            await dormir(intervalle_s)
+            await self.merge_pull_request(
+                pr_number, method=method, commit_title=commit_title
+            )
 
     async def get_repository_info(self) -> RepositoryInfo:
         """Inspecte le dépôt distant : existe-t-il, et a-t-il un historique ?
