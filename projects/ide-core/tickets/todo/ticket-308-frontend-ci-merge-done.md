@@ -1,43 +1,50 @@
 ---
 id: ticket-308
-title: "Frontend : afficher CI_MERGE_DONE et les livraisons en cours"
+title: "A closed run's card says its PR is waiting for CI, then merged or blocked"
 type: feat
 status: todo
+pr_number: null
 priority: medium
 agent: codeur
+depends_on: ["ticket-307"]
+estimated_days: 0.5
+created: 2026-10-02
 ---
 
-# ticket-308 — Frontend : afficher CI_MERGE_DONE et les livraisons en cours
+# ticket-308 — La carte d'un run clos suit la CI de sa PR
 
 ## Objectif
 
-Après ticket-307, `run_closed` arrive avant le merge. L'UI doit montrer que
-la livraison continue en arrière-plan. Un événement `CI_MERGE_DONE` sur le
-canal projet (ADR-041) signale la fin.
+Après le ticket-307, `run_closed` arrive avant le merge. La carte du run doit
+montrer que la livraison continue, puis comment elle a fini.
 
 ## Contexte
 
-ADR-051, ADR-041. Le canal WebSocket reçoit déjà tous les événements du run.
-`CI_MERGE_DONE` n'est lié à aucun run actif : il arrive sur le canal global
-après que le run est clos.
+ADR-051, ADR-041. `ci_merge_done` arrive sur le canal d'observation après la
+clôture du run, sans run vivant associé. La carte d'un run clos reste dans la
+Supervision jusqu'à ce qu'on la ferme (ticket-279) : c'est là qu'il faut
+l'afficher.
 
 ## Critères d'acceptation
 
-- [ ] `EventType.CI_MERGE_DONE` ajouté côté frontend (`types/api.ts`)
-- [ ] Le `RunView` affiche un bandeau "livraison en attente de CI" entre
-      `LIVRAISON_DONE` (PR ouverte) et `CI_MERGE_DONE`
-- [ ] `CI_MERGE_DONE` avec `merged: true` referme le bandeau et affiche
-      "mergée" ; `merged: false` affiche l'`arret`
-- [ ] Le bandeau utilise uniquement les couleurs d'ADR-026 (amber pendant
-      l'attente, green sur succès, red sur échec)
-- [ ] Tests Vitest couvrent les trois états (attente, mergée, échec)
-- [ ] `npm run build` et `tsc --noEmit` passent
+- [ ] `ci_merge_done` est déclaré dans les types d'événements du frontend
+- [ ] Un test vérifie qu'une carte de run clos, qui a reçu `livraison_done`
+      avec un `pr_number` mais pas encore `ci_merge_done`, affiche « PR #N —
+      en attente de CI »
+- [ ] Un test vérifie que `ci_merge_done` avec `merged: true` affiche « PR #N
+      mergée »
+- [ ] Un test vérifie que `ci_merge_done` avec `merged: false` affiche
+      l'`arret`
+- [ ] Un test vérifie que `ci_merge_done` d'un projet est rattaché à la carte
+      du bon `ticket_id`, et non à la dernière carte reçue
+- [ ] Les couleurs restent celles d'ADR-026 : `amber` pour l'attente, `green`
+      pour le succès, `red` pour l'échec
 
 ## Dépendances
 
-ticket-307 (l'événement existe en backend)
+ticket-307 (l'événement existe côté backend).
 
 ## Périmètre
 
-`frontend/src/components/RunView/`,
-`frontend/src/types/api.ts`.
+`frontend/src/components/SupervisionView/`, `frontend/src/hooks/`
+(`supervisionEvents`, `streamState`), `frontend/src/types/api.ts`.
