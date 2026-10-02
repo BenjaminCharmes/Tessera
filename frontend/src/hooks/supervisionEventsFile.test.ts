@@ -83,6 +83,37 @@ describe("majDesRuns — l'avancement arrive aussi par événement (ticket-181)"
   });
 });
 
+describe("majDesRuns — titre du ticket via ticket_status_changed (ticket-324)", () => {
+  it("crée une carte avec ticket_titre quand l'événement le porte", () => {
+    // Un écran ouvert avant le run reçoit uniquement des événements, jamais
+    // l'instantané. La carte doit afficher le titre reçu dans l'événement.
+    const [carte] = majDesRuns(
+      [],
+      ev({
+        type: "ticket_status_changed",
+        ticket_id: "ticket-016",
+        data: { ticket_titre: "Implémenter la feature Y" },
+      }),
+      "r1",
+    );
+    expect(carte?.ticket_titre).toBe("Implémenter la feature Y");
+  });
+
+  it("met à jour ticket_titre d'une carte existante", () => {
+    // Un run connu qui change de ticket doit voir son titre mis à jour.
+    const [carte] = majDesRuns(
+      [run()],
+      ev({
+        type: "ticket_status_changed",
+        ticket_id: "ticket-016",
+        data: { ticket_titre: "Nouveau titre" },
+      }),
+      "r1",
+    );
+    expect(carte?.ticket_titre).toBe("Nouveau titre");
+  });
+});
+
 describe("majDesRuns — coût en direct (ticket-197)", () => {
   const base: RunActif = {
     run_id: "r1", project_id: "p", mode: "single", ticket_id: "ticket-001",

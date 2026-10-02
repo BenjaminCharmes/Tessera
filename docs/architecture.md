@@ -56,6 +56,22 @@ planificateur, project-analyzer, agent-creator, project-creator, doc-technique,
 doc-fonctionnelle) qui
 écrivent eux-mêmes leurs fichiers en Python.
 
+### Shell des agents (Windows — ticket-319)
+
+Sous Windows, Claude Code n'active `Bash` que s'il trouve Git Bash à un emplacement standard.
+Git installé par un gestionnaire comme `scoop` échappe à cette détection automatique, ce qui
+laissait les agents sans shell bien que le CLAUDE.md le promette.
+
+L'IDE résout ceci au démarrage :
+- Si `CLAUDE_CODE_GIT_BASH_PATH` est posée, elle est utilisée.
+- Sinon, l'IDE cherche `git` via `shutil.which()` et place `bash.exe` au même endroit.
+- Pas trouvé : l'IDE continue, mais `GET /health` rend `"agent_shell": false`, avertissant que
+  les outils shell vont manquer.
+
+Chaque appel d'agent SDK reçoit `CLAUDE_CODE_GIT_BASH_PATH` dans son environnement, permettant
+au Code Engine local de lancer Bash. Hors Windows, ce mécanisme ne s'applique pas (bash est
+toujours disponible) et `agent_shell` vaut `true`.
+
 ### Enregistrement automatique des appels
 
 Chaque appel LLM d'un run est enregistré dans `agent_calls` avec `run_id`,
@@ -642,6 +658,10 @@ affiché dans l'UI.
 ## OrchestratorEvents (WebSocket)
 
 Dès la connexion, le serveur envoie un instantané du run (`RunActif`), qui porte `ticket_id` et `ticket_titre`, permettant à la Supervision et à l'en-tête du run d'afficher ces informations sans ouvrir le projet (ticket-286). L'instantané contient désormais `etapes_en_cours: string[]`, qui liste toutes les étapes actuellement en cours d'exécution (ticket-289). Après l'audit sécurité, reviewer et validateur peuvent tourner en parallèle : le client affiche les deux pastilles actives. Quand `etapes_en_cours` est absent (run ancien), les clients replient sur le champ `etape`.
+
+Tout événement `ticket_status_changed` porte `ticket_titre` dès réception (ticket-324). Pour chaque ticket,
+le titre est lu une seule fois du disque ; les événements ultérieurs sur le même ticket portent ce titre en cache,
+économisant une lecture par événement.
 
 Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
 

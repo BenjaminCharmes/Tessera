@@ -1,14 +1,14 @@
 ---
-id: ticket-324
-title: "The first ticket of a queue shows its title to a screen that was already open"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-324
+pr_number: 229
+priority: medium
+status: done
+title: The first ticket of a queue shows its title to a screen that was already open
+type: fix
 ---
 
 # ticket-324 — Le premier ticket d'une file affiche son titre
