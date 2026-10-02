@@ -5,7 +5,7 @@ depends_on:
 - ticket-289
 estimated_days: 1
 id: ticket-290
-pr_number: null
+pr_number: 191
 priority: high
 status: done
 title: The stage strip and the run feed show two stages running at once
