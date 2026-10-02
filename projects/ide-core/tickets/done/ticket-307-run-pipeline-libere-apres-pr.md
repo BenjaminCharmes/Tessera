@@ -7,7 +7,7 @@ depends_on:
 estimated_days: 1
 id: ticket-307
 plan: true
-pr_number: null
+pr_number: 209
 priority: high
 status: done
 title: A run frees its project once the PR is open, and a dependent ticket waits for
