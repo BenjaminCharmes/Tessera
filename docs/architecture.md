@@ -245,6 +245,8 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
 11. Reviewer (Claude) et Validateur tournent en parallèle
     ├─ Reviewer relit le diff
     ├─ Validateur vérifie les critères d'acceptation un par un
+    ├─ Validateur reçoit aussi le contenu des fichiers cités dans les critères
+    │  (pour juger un critère rempli par du code préexistant — ticket-316)
     ├─ Approuvé seulement si le reviewer approuve ET le validateur ne refuse pas
     ├─ Sur un refus, le codeur reçoit les motifs de tous les agents qui ont refusé
     └─ Retour au Codeur si refusé (max 3 tours ; sinon ticket → blocked/)
@@ -278,6 +280,24 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
 - Le verdict du reviewer est la première ligne qui commence par APPROVED ou CHANGES_REQUESTED. Une approbation qui nomme CHANGES_REQUESTED sur la même ligne est un refus ; sur les lignes suivantes, elle approuve (ticket-298, ADR-009).
+
+### Validation et fichiers cités (ticket-316)
+
+Le validateur vérifie chaque critère d'acceptation du ticket. Un critère peut être 
+satisfait par du code préexistant — par exemple, un test nommé dans le critère existe 
+depuis un ticket précédent, et n'apparaît donc pas dans le diff du run en cours.
+
+Pour éviter que le validateur ne refuse un critère simplement parce que le code n'est 
+pas visible dans le diff, le pipeline extrait tous les chemins de fichiers cités dans 
+les critères (chemins entre backticks, noms de fichiers de test) et joint leur contenu 
+actuel au message du validateur, dans une section distincte du diff. Cette section :
+
+- Borne la taille totale pour limiter le contexte ;
+- Signale tout fichier cité mais absent du dépôt ;
+- Permet au validateur de juger des critères sur code préexistant.
+
+Le prompt du validateur (`agents/prompts/validateur.md`) l'instruit sur cette section 
+et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas être refusé.
 
 ## Documentation par lot (ADR-035, ticket-292)
 
