@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
 id: ticket-328
-pr_number: null
+pr_number: 234
 priority: high
 status: done
 title: A background delivery always reports how it ended, even when it fails or hangs
