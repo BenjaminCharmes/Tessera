@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-311
 plan: true
-pr_number: null
+pr_number: 222
 priority: high
 status: done
 title: Agents read the short constraints file instead of the whole decision log
