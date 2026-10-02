@@ -867,3 +867,17 @@ Points positifs :
 - 2026-10-02 04:16:53 UTC — [ticket-291] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-051 est bien rédigé et couvre les exige (192641ms)
 - 2026-10-02 04:16:53 UTC — [ticket-291] APPROVED après 3 tour(s)
 - 2026-10-02 04:18:56 UTC — [ticket-291] documentation: 0 fichier(s) (121171ms)
+- 2026-10-02 07:19:23 UTC — [ticket-310] branche ticket-310-design-audit-the-adrs-and-draft-the-short-constra
+- 2026-10-02 07:19:23 UTC — [ticket-310] tour 1 — codeur démarré
+- 2026-10-02 07:28:57 UTC — [ticket-310] tour 1 — architect terminé (573656ms)
+- 2026-10-02 07:36:01 UTC — [ticket-310] testeur: \u276f src/components/SupervisionView/SupervisionView.test.tsx:118:50
+- 2026-10-02 07:36:01 UTC — [ticket-310] tests rouges au tour 1
+- 2026-10-02 07:36:01 UTC — [ticket-310] tour 2 — codeur démarré
+- 2026-10-02 07:39:25 UTC — [ticket-310] tour 2 — architect terminé (203375ms)
+- 2026-10-02 07:45:02 UTC — [ticket-310] testeur: OK (exit 0)
+- 2026-10-02 07:45:11 UTC — [ticket-310] securite: PASS — Le diff ajoute trois fichiers Markdown de documentation (adr-audit.md, contraint (8921ms)
+- 2026-10-02 07:45:11 UTC — [ticket-310] tour 2 — reviewer démarré
+- 2026-10-02 07:46:38 UTC — [ticket-310] tour 2 — reviewer terminé (86342ms)
+- 2026-10-02 07:51:00 UTC — [ticket-310] validateur: APPROVED — Le travail sépare efficacement le journal des décisions (`decisions.md`, 51 ADR  (348859ms)
+- 2026-10-02 07:51:00 UTC — [ticket-310] APPROVED après 2 tour(s)
+- 2026-10-02 07:51:39 UTC — [ticket-310] documentation: 0 fichier(s) (36983ms)

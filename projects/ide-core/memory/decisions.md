@@ -465,3 +465,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : `LivraisonService` se scinde. Phase 1 — rebase, push, PR — libère le verrou (ADR-038) via `run_closed` (ADR-041). Phase 2 — attente CI, merge — tourne dans `CIWatcher`, tâche de fond. Au plus une livraison en attente par projet. CI rouge : `blocked`, PR ouverte, sans relance (amendé 2026-10-02, ticket-304). Arrêt backend : PRs laissées ouvertes, sans reprise. `CI_MERGE_DONE` s'émet sur le canal projet. `depends_on` bloque le ticket suivant jusqu'au merge. Amende ADR-018, ADR-030, ADR-038.
 **Raison** : N+1 forke depuis `origin/<base>` (ticket-285) sans le code de N. Conflits sur `decisions.md` et `pipeline-log.md` : committés avant le rebase (ticket-303), N+1 ne conflicte que si N est mergé et touche les mêmes lignes — même fréquence qu'aujourd'hui.
 **Alternative rejetée** : reprise au redémarrage — état à persister, disproportionné ; sémaphore global — bloque deux projets indépendants.
+
+---
+
+## ADR-052 — Séparer le journal des contraintes en vigueur
+
+**Date** : 2026-10-02
+**Portée** : architect
+**Décision** : `memory/decisions.md` reste le journal complet. `memory/contraintes.md` en extrait les règles actives, regroupées par thème, une ou deux phrases à l'impératif. `memory/adr-audit.md` classe chaque ADR (règle, histoire, obsolète, fusion). Les agents liront `contraintes.md` à la place du journal une fois ticket-311 livré.
+**Raison** : le journal fait 43 Ko et 51 ADR ; un codeur en reçoit 39 après filtrage par portée. La moitié raconte *pourquoi* un choix a été fait, pas ce qu'un agent doit faire. Les règles de design (ADR-026, ADR-047) ont été régulièrement ignorées — une règle noyée dans un journal se lit mal.
+**Alternative rejetée** : raccourcir `decisions.md` — on perd l'histoire et la justification ; n'archiver que les ADR obsolètes — la dilution reste, la taille change peu.
