@@ -1,15 +1,16 @@
 ---
-id: ticket-316
-title: "The validator also receives the current content of the test files a criterion names"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
+id: ticket-316
 plan: true
-created: 2026-10-02
+pr_number: 216
+priority: medium
+status: done
+title: The validator also receives the current content of the test files a criterion
+  names
+type: fix
 ---
 
 # ticket-316 — Le validateur lit aussi les fichiers qu'un critère nomme
@@ -44,13 +45,13 @@ Le validateur tourne sur un modèle local, sans outil pour lire le dépôt.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie qu'un critère qui cite `BillingTab.test.tsx` fait
+- [x] Un test vérifie qu'un critère qui cite `BillingTab.test.tsx` fait
       joindre le contenu de ce fichier au message du validateur
-- [ ] Un test vérifie qu'un fichier cité mais absent du dépôt est signalé
+- [x] Un test vérifie qu'un fichier cité mais absent du dépôt est signalé
       comme absent, sans lever d'exception
-- [ ] Un test vérifie que la section jointe reste sous une taille maximale,
+- [x] Un test vérifie que la section jointe reste sous une taille maximale,
       et qu'au-delà le fichier est tronqué avec une mention
-- [ ] `agents/prompts/validateur.md` dit comment lire cette section
+- [x] `agents/prompts/validateur.md` dit comment lire cette section
 
 ## Dépendances
 

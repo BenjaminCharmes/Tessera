@@ -11,6 +11,8 @@ from tessera.services.validator import (
     CriterionResult,
     ValidationResult,
     ValidatorService,
+    extract_file_refs,
+    _CITED_FILES_MAX_CHARS,
 )
 
 
@@ -453,3 +455,115 @@ async def test_a_whole_branch_diff_reaches_the_validator_intact(
     await service.validate(criteria=["Returns 200"], code_produced=diff, test_result=None)
 
     assert "SENTINELLE_FIN_DU_DIFF" in provider.calls[0]["user"]
+
+
+class TestCitedFiles:
+    """Tests for the cited-files section injected into the validator message (ticket-316)."""
+
+    def _approved_response(self) -> dict:
+        return {
+            "criteria": [{"index": 1, "criterion": "x", "passed": True, "note": ""}],
+            "feedback": "ok",
+        }
+
+    async def test_criterion_citing_file_joins_its_content(
+        self, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Un critère qui cite `BillingTab.test.tsx:44` doit faire apparaître
+        # le contenu du fichier dans le message envoyé au validateur.
+        test_file = tmp_path / "BillingTab.test.tsx"
+        test_file.write_text("describe('BillingTab', () => { it('shows empty state', () => {}) })")
+
+        _set_response(provider, self._approved_response())
+        svc = ValidatorService(provider, Path("agents/prompts"))
+
+        await svc.validate(
+            criteria=["Un test le vérifie dans `BillingTab.test.tsx:44`"],
+            code_produced="some diff",
+            test_result=None,
+            project_root=tmp_path,
+        )
+
+        user_msg = provider.calls[0]["user"]
+        assert "BillingTab.test.tsx" in user_msg
+        assert "shows empty state" in user_msg
+
+    async def test_absent_file_is_noted_without_exception(
+        self, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Un fichier cité mais absent du dépôt doit être signalé comme absent,
+        # sans lever d'exception.
+        _set_response(provider, self._approved_response())
+        svc = ValidatorService(provider, Path("agents/prompts"))
+
+        await svc.validate(
+            criteria=["Le test est dans `AbsentFile.test.tsx`"],
+            code_produced="some diff",
+            test_result=None,
+            project_root=tmp_path,
+        )
+
+        user_msg = provider.calls[0]["user"]
+        assert "AbsentFile.test.tsx" in user_msg
+        assert "absent" in user_msg.lower()
+
+    async def test_section_truncated_when_file_exceeds_max_size(
+        self, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Le contenu d'un fichier plus grand que le budget est tronqué,
+        # avec une mention de troncature dans le message.
+        oversized = "x" * (_CITED_FILES_MAX_CHARS + 5_000)
+        (tmp_path / "BigFile.test.tsx").write_text(oversized)
+
+        _set_response(provider, self._approved_response())
+        svc = ValidatorService(provider, Path("agents/prompts"))
+
+        await svc.validate(
+            criteria=["check `BigFile.test.tsx`"],
+            code_produced="code",
+            test_result=None,
+            project_root=tmp_path,
+        )
+
+        user_msg = provider.calls[0]["user"]
+        # La section est présente mais le fichier n'y est pas en entier.
+        assert "BigFile.test.tsx" in user_msg
+        assert "tronqué" in user_msg
+        # Le message ne contient pas les 25 000 « x » du fichier original.
+        assert user_msg.count("x") < _CITED_FILES_MAX_CHARS + 5_000
+
+
+# Frontière du projet pour les fichiers cités (audit sécurité, ticket-316)
+
+
+def test_un_fichier_cite_hors_du_projet_n_est_pas_lu(tmp_path: Path) -> None:
+    from tessera.services.validator import _find_file_in_project
+
+    projet = tmp_path / "projet"
+    projet.mkdir()
+    (tmp_path / "secret.env").write_text("TOKEN=x", encoding="utf-8")
+
+    assert _find_file_in_project("../secret.env", projet) is None
+
+
+def test_un_chemin_absolu_cite_n_est_pas_lu(tmp_path: Path) -> None:
+    from tessera.services.validator import _find_file_in_project
+
+    projet = tmp_path / "projet"
+    projet.mkdir()
+    secret = tmp_path / "secret.env"
+    secret.write_text("TOKEN=x", encoding="utf-8")
+
+    assert _find_file_in_project(str(secret), projet) is None
+
+
+def test_un_fichier_du_projet_reste_trouve(tmp_path: Path) -> None:
+    from tessera.services.validator import _find_file_in_project
+
+    projet = tmp_path / "projet"
+    (projet / "src").mkdir(parents=True)
+    cible = projet / "src" / "BillingTab.test.tsx"
+    cible.write_text("test", encoding="utf-8")
+
+    assert _find_file_in_project("src/BillingTab.test.tsx", projet) == cible
+    assert _find_file_in_project("BillingTab.test.tsx", projet) == cible
