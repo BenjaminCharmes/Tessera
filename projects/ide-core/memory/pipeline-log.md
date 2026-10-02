@@ -880,3 +880,4 @@ Points positifs :
 - 2026-10-02 07:46:38 UTC — [ticket-310] tour 2 — reviewer terminé (86342ms)
 - 2026-10-02 07:51:00 UTC — [ticket-310] validateur: APPROVED — Le travail sépare efficacement le journal des décisions (`decisions.md`, 51 ADR  (348859ms)
 - 2026-10-02 07:51:00 UTC — [ticket-310] APPROVED après 2 tour(s)
+- 2026-10-02 07:51:39 UTC — [ticket-310] documentation: 0 fichier(s) (36983ms)
