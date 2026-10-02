@@ -171,6 +171,11 @@ et le mode autonome testables sans lancer un run.
 
 Passé `dialogue_timeout_s`, l'agent reprend seul en **énonçant son hypothèse** :
 un run suspendu tient du travail non commité, et bloquerait la file des tickets.
+Une réponse qui arrive après l'expiration n'est pas perdue : elle est déposée dans
+la boîte aux lettres comme message spontané, que l'agent lira au tour suivant.
+Le système signale à l'interface si la réponse a été transmise à la question ou
+déposée pour le tour suivant, et l'interface affiche cet accusé. Une question
+expirée s'affiche comme telle, avec l'hypothèse que l'agent a énoncée.
 
 ### Système visuel du frontend (ADR-026)
 
