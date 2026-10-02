@@ -287,6 +287,18 @@ Sans distant joignable, le rebase utilise la base locale. Si elle a divergé
 du distant hors d'une avance rapide, la livraison s'arrête avec cette raison 
 et ne procède pas au rebase.
 
+### Commit des artefacts de tenue de livres avant rebase
+
+Avant de rebaser la branche du ticket, la livraison commite tous les artefacts 
+restants (`memory/pipeline-log.md` et fichiers de tickets) via `commit_bookkeeping`. 
+Le pipeline enregistre des durées et des étapes dans le journal après la 
+documentation, et ces lignes doivent être commitées avant le rebase — sinon 
+l'arbre reste sale et `git rebase` échoue avec « You have unstaged changes » 
+(ticket-303).
+
+Seul un fichier de code modifié — celui qu'un agent aurait omis de committer — 
+fait échouer la livraison, avec un message d'erreur explicite.
+
 ### Gestion des conflits de rebase
 
 Pendant le rebase du ticket sur la branche de base, les conflits sont traités selon

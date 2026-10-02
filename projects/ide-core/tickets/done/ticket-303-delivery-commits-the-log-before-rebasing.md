@@ -1,14 +1,14 @@
 ---
-id: ticket-303
-title: "Delivery commits the pipeline's pending log lines before it rebases"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-303
+pr_number: 195
+priority: high
+status: done
+title: Delivery commits the pipeline's pending log lines before it rebases
+type: fix
 ---
 
 # ticket-303 — La livraison commite le journal avant de rebaser

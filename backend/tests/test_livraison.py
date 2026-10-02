@@ -25,6 +25,9 @@ class _FauxGit:
         self.syncs.append(base_branch)
         return None
 
+    async def commit_bookkeeping(self) -> None:
+        pass
+
 
 class _FauxWorkflow:
     def __init__(self, ci: list[str] | None = None, merge: bool = True) -> None:

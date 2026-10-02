@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
 
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.git_workspace import GitCommandError
 from tessera.services.politique_run import PolitiqueRun
 from tessera.utils.logger import get_logger
 
@@ -57,6 +58,7 @@ class _Git(Protocol):
         resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
     ) -> tuple[str, ...]: ...
     async def sync_base_depuis_distant(self, base_branch: str) -> str | None: ...
+    async def commit_bookkeeping(self) -> None: ...
 
 
 class _Workflow(Protocol):
@@ -158,11 +160,29 @@ class LivraisonService:
         # Non-blocking: a failed sync falls back to the current local branch.
         await self._git.sync_base_depuis_distant(self._base_branch)
 
+        # Commite les artefacts de tenue de livres en attente (pipeline-log,
+        # statuts de tickets) avant le rebase : `git rebase` exige un arbre
+        # entièrement propre, sans exception, alors qu'`is_clean` tolère ces
+        # chemins pour ne pas bloquer le ticket suivant (ticket-303).
+        await self._git.commit_bookkeeping()
+
         t0 = time.monotonic()
-        conflits = await self._git.rejouer_sur(
-            self._base_branch,
-            resolveur=resoudre if self._resolveur is not None else None,
-        )
+        try:
+            conflits = await self._git.rejouer_sur(
+                self._base_branch,
+                resolveur=resoudre if self._resolveur is not None else None,
+            )
+        except GitCommandError as exc:
+            # Le rebase a refusé de démarrer — arbre sale (fichier de code
+            # modifié non commité), base inconnue ou autre erreur git.
+            # `commit_bookkeeping` a déjà commité les artefacts Tessera : ce
+            # qui reste est du code que le pipeline n'a pas produit.
+            raison = exc.stderr.strip() or str(exc)
+            return Livraison(
+                etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
+                arret=f"Rebase refusé : {raison}",
+            )
         rebase_ms = (time.monotonic() - t0) * 1000
 
         if conflits:
