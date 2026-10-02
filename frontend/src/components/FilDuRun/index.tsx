@@ -7,6 +7,7 @@ import {
 } from "../../design/icons";
 import TokenStream from "../AgentPanel/TokenStream";
 import VerdictBanner from "../AgentPanel/VerdictBanner";
+import { verdictDuReviewer } from "./verdict";
 import type {
   EntreeFil,
   PassageAgent,
@@ -111,8 +112,7 @@ function EntreePipeline({ entry, isLast }: EntreePipelineProps) {
 
   const approved =
     entry.agent === "reviewer"
-      ? entry.content.includes("APPROVED") &&
-        !entry.content.includes("CHANGES_REQUESTED")
+      ? verdictDuReviewer(entry.content) === "APPROVED"
       : true;
 
   let verdictText: string;

@@ -1,14 +1,14 @@
 ---
-id: ticket-299
-title: "The run view reads the reviewer's verdict from its opening line, like the backend"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-01
+id: ticket-299
+pr_number: 189
+priority: medium
+status: done
+title: The run view reads the reviewer's verdict from its opening line, like the backend
+type: fix
 ---
 
 # ticket-299 — La vue du run lit le verdict du reviewer comme le backend
