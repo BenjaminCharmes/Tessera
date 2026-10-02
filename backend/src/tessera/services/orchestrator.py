@@ -163,7 +163,12 @@ class Orchestrator:
 
         # La documentation part sur la branche du run, avant sa livraison :
         # elle décrit ce que la PR livre, et se relit avec (ticket-198).
-        await self._documenter_le_run(resultat, on_event)
+        # Exception : les tickets légers (ticket-292) ne déclenchent pas de
+        # mise à jour immédiate — le marqueur ne bouge pas, et le prochain
+        # ticket normal documente le lot entier, léger compris.
+        ticket_approuve = await self._ticket_svc.get_ticket(ticket_id)
+        if ticket_approuve is None or not ticket_approuve.light:
+            await self._documenter_le_run(resultat, on_event)
 
         if self._livrer is None:
             return resultat
