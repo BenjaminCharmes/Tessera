@@ -905,3 +905,12 @@ Points positifs :
 **Analyse de (21546ms)
 - 2026-10-02 08:51:50 UTC — [ticket-314] tour 2 — reviewer démarré
 - 2026-10-02 08:52:24 UTC — [ticket-314] INTERROMPU au tour 2 — ResultError: Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1)
+- 2026-10-02 08:53:22 UTC — [ticket-314] branche ticket-314-a-run-never-continues-without-its-branch-in-a-git
+- 2026-10-02 08:53:23 UTC — [ticket-314] tour 1 — codeur démarré
+- 2026-10-02 09:03:01 UTC — [ticket-314] tour 1 — codeur terminé (578217ms)
+- 2026-10-02 09:08:14 UTC — [ticket-314] testeur: OK (exit 0)
+- 2026-10-02 09:08:43 UTC — [ticket-314] securite: PASS — Audit du diff pipeline_stages.py + tests : aucune vulnérabilité critique, haute  (28186ms)
+- 2026-10-02 09:08:43 UTC — [ticket-314] tour 1 — reviewer démarré
+- 2026-10-02 09:10:08 UTC — [ticket-314] tour 1 — reviewer terminé (85594ms)
+- 2026-10-02 09:13:17 UTC — [ticket-314] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (274031ms)
+- 2026-10-02 09:13:17 UTC — [ticket-314] APPROVED après 1 tour(s)
