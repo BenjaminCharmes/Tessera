@@ -1022,6 +1022,27 @@ class GitWorkspaceService:
         except GitCommandError as exc:
             _logger.warning("index_non_restaure", extra={"erreur": str(exc)})
 
+    async def dirty_files(self) -> list[str]:
+        """Return tracked files modified outside Tessera's own bookkeeping.
+
+        Same narrowing as ``is_clean``: restricted to tracked modifications
+        (``--untracked-files=no``), with orchestrator-artifact and run-policy
+        paths excluded.  Returns the list of files that would cause
+        ``is_clean`` to return ``False``.
+        """
+        status = await self._run("status", "--porcelain", "--untracked-files=no")
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        fichiers: list[str] = []
+        for line in status.splitlines():
+            if len(line) < 3:  # noqa: PLR2004
+                continue
+            path = line[3:]
+            if prefixe and path.startswith(prefixe):
+                path = path[len(prefixe):]
+            if not _is_orchestrator_artifact_path(path) and not _is_run_policy_path(path):
+                fichiers.append(path)
+        return fichiers
+
     async def is_clean(self) -> bool:
         """Return True when tracked files outside Tessera's bookkeeping have no changes.
 

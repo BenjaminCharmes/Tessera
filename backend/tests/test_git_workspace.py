@@ -244,6 +244,38 @@ async def test_is_clean_faux_si_un_fichier_non_bookkeeping_est_modifie(repo: Pat
     assert await service.is_clean() is False
 
 
+async def test_dirty_files_contient_le_fichier_code_modifie(repo: Path) -> None:
+    """A modified code file appears in dirty_files (ticket-323)."""
+    (repo / "README.md").write_text("# modifie\n", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    fichiers = await service.dirty_files()
+
+    assert "README.md" in fichiers
+
+
+async def test_dirty_files_exclut_le_journal_pipeline(repo: Path) -> None:
+    """The pipeline log does not appear in dirty_files (ticket-323).
+
+    ``_log`` appends to ``memory/pipeline-log.md`` between tickets. That
+    modification belongs to Tessera's own bookkeeping and must not be
+    reported as a blocking dirty file — otherwise the next ticket in a queue
+    would be refused.
+    """
+    (repo / "memory").mkdir()
+    log = repo / "memory" / "pipeline-log.md"
+    log.write_text("# log\n", encoding="utf-8")
+    await _git(repo, "add", "memory/pipeline-log.md")
+    await _git(repo, "commit", "-q", "-m", "track log")
+
+    log.write_text("# log\n- ticket-006 saute\n", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    fichiers = await service.dirty_files()
+
+    assert fichiers == []
+
+
 async def test_repertoire_sans_depot_git_leve_not_a_git_repository(tmp_path: Path) -> None:
     service = GitWorkspaceService(tmp_path)
     with pytest.raises(NotAGitRepository):

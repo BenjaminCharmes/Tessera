@@ -119,6 +119,9 @@ async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
         async def is_clean(self) -> bool:
             return False
 
+        async def dirty_files(self) -> list[str]:
+            return []
+
     class _TicketSvc:
         def __init__(self) -> None:
             self.statuses: list[TicketStatus] = []
@@ -137,6 +140,33 @@ async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
     assert result.rounds == 0
     assert svc.statuses == [TicketStatus.blocked]
     assert any(e.type == EventType.ERROR for e in events)
+
+
+async def test_ensure_clean_tree_porte_la_liste_des_fichiers_dans_l_evenement_error() -> None:
+    """The error event carries the list of blocking files (ticket-323)."""
+    class _DirtyGit:
+        async def is_clean(self) -> bool:
+            return False
+
+        async def dirty_files(self) -> list[str]:
+            return ["src/feature.py", "README.md"]
+
+    class _TicketSvc:
+        async def update_status(self, ticket_id: str, status: TicketStatus) -> None:
+            pass
+
+    events: list[OrchestratorEvent] = []
+    orch = _Orch(_git_workspace=_DirtyGit(), _ticket_svc=_TicketSvc())
+
+    result = await stages.ensure_clean_tree(orch, _run(events))
+
+    assert result is not None
+    error_events = [e for e in events if e.type == EventType.ERROR]
+    assert len(error_events) == 1
+    fichiers = error_events[0].data.get("fichiers")
+    assert isinstance(fichiers, list)
+    assert "src/feature.py" in fichiers
+    assert "README.md" in fichiers
 
 
 async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> None:

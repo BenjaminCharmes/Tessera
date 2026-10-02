@@ -1,14 +1,14 @@
 ---
-id: ticket-323
-title: "A run refused for a dirty tree names the files that block it"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-323
+pr_number: 233
+priority: medium
+status: done
+title: A run refused for a dirty tree names the files that block it
+type: fix
 ---
 
 # ticket-323 — Un refus pour arbre sale nomme les fichiers en cause
