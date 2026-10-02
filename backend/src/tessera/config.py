@@ -82,6 +82,10 @@ class Settings(BaseSettings):
     github_base_branch: str = "develop"
     ide_db_path: Path = Path("tessera.db")
     static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
+    # Chemin vers bash.exe sous Windows, pour que le SDK puisse activer l'outil
+    # `Bash` des agents. Lu depuis CLAUDE_CODE_GIT_BASH_PATH ; absent, le backend
+    # tente de le déduire depuis l'emplacement de `git` au démarrage (ticket-319).
+    claude_code_git_bash_path: str = ""
 
 
 settings = Settings()

@@ -2,6 +2,7 @@ from pathlib import Path
 
 from anthropic import AsyncAnthropic
 
+from tessera.config import settings
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.anthropic_api import AnthropicApiProvider
 from tessera.services.providers.base import (
@@ -10,6 +11,7 @@ from tessera.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from tessera.services.shell_detection import resolve_git_bash
 
 __all__ = [
     "AnthropicApiProvider",
@@ -75,6 +77,10 @@ def get_provider(
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:
             kwargs["allowed_tools"] = []
+        # Résout une seule fois : l'env var est fixe pour la durée du processus.
+        git_bash = resolve_git_bash(settings.claude_code_git_bash_path)
+        if git_bash is not None:
+            kwargs["git_bash_path"] = git_bash
         return ClaudeAgentSDKProvider(**kwargs)  # type: ignore[arg-type]
     if resolved == "anthropic_api":
         if not api_key:
@@ -87,7 +93,6 @@ def get_provider(
     if resolved == "ollama":
         # Sans outils quoi qu'on demande : il sert les rôles texte→JSON, et
         # la boucle agentique reste au SDK (ticket-189).
-        from tessera.config import settings
         from tessera.services.providers.ollama import OllamaProvider
 
         return OllamaProvider(settings.ollama_base_url)

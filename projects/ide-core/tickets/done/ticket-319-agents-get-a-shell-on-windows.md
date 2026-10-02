@@ -1,14 +1,15 @@
 ---
-id: ticket-319
-title: "Agents get their shell on Windows: Tessera finds Git Bash and passes it to the SDK, and says so when it cannot"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-319
+pr_number: null
+priority: critical
+status: done
+title: 'Agents get their shell on Windows: Tessera finds Git Bash and passes it to
+  the SDK, and says so when it cannot'
+type: fix
 ---
 
 # ticket-319 — Les agents ont leur shell sous Windows
