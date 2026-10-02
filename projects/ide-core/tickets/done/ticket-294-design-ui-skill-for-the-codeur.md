@@ -5,7 +5,7 @@ depends_on:
 - ticket-293
 estimated_days: 1
 id: ticket-294
-pr_number: null
+pr_number: 193
 priority: medium
 status: done
 title: Agents load a UI design skill, declared by default in new projects
