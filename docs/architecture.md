@@ -227,7 +227,7 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
     └─ chaque event → save_event(run_id, ...)
  7. git diff → c'est CE diff qui alimente toutes les étapes suivantes
     (repli sur la prose du codeur si le diff est vide)
- 8. Testeur → exécute la suite de tests du projet → TEST_RESULT
+ 8. Testeur → exécute la suite complète de vérification (pytest, mypy, tsc, eslint) → TEST_RESULT
  9. Auditeur sécurité (OWASP) → BLOCK si CRITICAL/HIGH → ticket → blocked/
 10. Ticket → in-review/
 11. Reviewer (Claude) et Validateur tournent en parallèle
@@ -236,7 +236,7 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
     ├─ Approuvé seulement si le reviewer approuve ET le validateur ne refuse pas
     ├─ Sur un refus, le codeur reçoit les motifs de tous les agents qui ont refusé
     └─ Retour au Codeur si refusé (max 3 tours ; sinon ticket → blocked/)
-12. Doc-updater → met à jour README / docs / CLAUDE.md du projet
+12. Doc-updater → met à jour README / docs / CLAUDE.md du projet (sauté si `light: true`)
 13. git commit — sur TOUS les chemins de sortie :
     ├─ approuvé      → "<type>: ticket-XXX — <titre>" puis advance_base_ref()
     └─ non approuvé  → "chore: ticket-XXX — unapproved work (<raison>)"
@@ -257,6 +257,24 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
 - Le verdict du reviewer est la première ligne qui commence par APPROVED ou CHANGES_REQUESTED. Une approbation qui nomme CHANGES_REQUESTED sur la même ligne est un refus ; sur les lignes suivantes, elle approuve (ticket-298, ADR-009).
+
+## Documentation par lot (ADR-035, ticket-292)
+
+Après approbation, le pipeline met à jour la documentation technique et fonctionnelle 
+du projet — pas d'office, mais par lot, pour économiser les appels LLM sur les petits 
+changements.
+
+Un ticket peut se déclarer `light: true` dans son frontmatter. Les conséquences :
+
+- Le run approuvé **saute** les étapes de doc-technique et doc-fonctionnelle
+- Le marqueur d'avancement n'est **pas** avancé — le prochain lot partira du même point
+- Le ticket suivant, non-léger, documentera **tous** les tickets depuis ce marqueur, 
+  tickets légers compris
+- Sécurité et validateur **tournent normalement** — ce sont des portes qui échouent 
+  fermées (ADR-039), jamais optimisées
+
+Cas limite : une file qui se termine sur des tickets légers les laisse sans documentation 
+jusqu'à l'appel suivant d'un agent de documentation (mode autonome, chat, nouveau run).
 
 ## Livraison (ADR-029, ADR-030)
 

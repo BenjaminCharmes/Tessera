@@ -170,6 +170,13 @@ depends_on: []
 created: 2026-09-15
 ---
 
+
+#### Tickets légers
+
+Si ton ticket est petit — juste un test supplémentaire, un renommage, une correction — tu peux ajouter `light: true` dans le frontmatter pour le signaler. Par défaut, chaque run approuvé déclenche une passe de documentation : elle coûte plus qu'un petit changement lui-même. Un ticket léger reporte sa documentation au lot suivant ; l'IDE en documentera plusieurs à la fois, une optimisation qui évite de payer une passe entière pour trois lignes de code.
+
+L'audit sécurité et la validation tournent toujours normalement — ce sont des portes critiques qu'on ne saute jamais. Seule la documentation s'allège.
+
 # ticket-007 — Ajouter un endpoint de santé
 
 ## Objectif
@@ -618,6 +625,11 @@ Puis le codeur code l'interface en respectant ces règles :
 Cette charte garantit une cohérence dans le temps : chaque ticket UI la respecte, tu ne risques plus de passer d'une couleur à l'autre ou d'une taille arbitraire.
 
 **Sur les projets existants**, cette direction n'est pas active par défaut. Tu peux l'ajouter en éditant `agents.json` : ajoute `"tessera:design-ui"` dans la clé `skills` du codeur et de l'architect.
+
+
+### Ce que le testeur attrape
+
+Le testeur lance les mêmes outils que ta CI : `pytest` et `mypy` pour Python, `tsc` pour TypeScript, puis `eslint` et `vitest` pour le frontend. Un ticket n'échouera plus soudain en CI sur une erreur de typage ou de lint — le pipeline les détecte tous maintenant, avant même que la PR soit ouverte.
 
 ## 10. Intégration GitHub
 
