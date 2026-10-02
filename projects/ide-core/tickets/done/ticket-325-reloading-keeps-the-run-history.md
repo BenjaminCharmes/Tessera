@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-325
 plan: true
-pr_number: null
+pr_number: 230
 priority: high
 status: done
 title: Reloading the page rebuilds a running run's view from its recorded events,
