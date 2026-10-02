@@ -5,7 +5,7 @@ depends_on:
 - ticket-307
 estimated_days: 0.5
 id: ticket-308
-pr_number: null
+pr_number: 210
 priority: medium
 status: done
 title: A closed run's card says its PR is waiting for CI, then merged or blocked
