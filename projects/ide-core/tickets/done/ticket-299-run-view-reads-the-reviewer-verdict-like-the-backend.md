@@ -4,7 +4,7 @@ created: 2026-10-01
 depends_on: []
 estimated_days: 0.5
 id: ticket-299
-pr_number: null
+pr_number: 189
 priority: medium
 status: done
 title: The run view reads the reviewer's verdict from its opening line, like the backend
