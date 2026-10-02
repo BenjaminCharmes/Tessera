@@ -1,46 +1,61 @@
 ---
 id: ticket-307
-title: "run_pipeline libère le verrou après la PR et gère depends_on"
+title: "A run frees its project once the PR is open, and a dependent ticket waits for the merge"
 type: feat
 status: todo
+pr_number: null
 priority: high
 agent: codeur
+depends_on: ["ticket-305", "ticket-306"]
+estimated_days: 1
+plan: true
+created: 2026-10-02
 ---
 
-# ticket-307 — run_pipeline libère le verrou après la PR et gère depends_on
+# ticket-307 — Un run libère son projet dès la PR ouverte
 
 ## Objectif
 
-Brancher `livrer_phase_1` dans `run_pipeline` et confier la phase 2 à
-`CIWatcher`. Le verrou de projet (ADR-038) se libère après `run_closed`
-(ADR-041), dès la PR ouverte. Ajouter la lecture de `depends_on` dans
-`run_queue` : un ticket qui déclare dépendre d'un autre attend son merge
-avant de démarrer.
+Brancher `livrer_phase_1` dans `run_pipeline`, et confier la phase 2 à
+`CIWatcher`. Le verrou du projet (ADR-038) se libère dès la PR ouverte.
+Un ticket qui dépend d'un autre attend son merge.
 
 ## Contexte
 
-ADR-051. `run_pipeline` appelle aujourd'hui `self._livrer(resultat)` qui
-bloque sur la CI. Après ticket-305 et ticket-306, il appelle `livrer_phase_1`
-puis soumet la phase 2 à `CIWatcher`, sans attendre.
+ADR-051. `run_pipeline` attend aujourd'hui toute la livraison.
+
+Le ticket-302 empêche une file de s'empiler sur un ticket dont la CI est
+rouge. Mais il ne couvre pas le cas d'une livraison qui s'arrête sur une
+**exception** : un rebase refusé, ou un push impossible. Le 2026-10-02, le
+289 et le 304 se sont ainsi retrouvés dans la PR du ticket suivant. Ce ticket
+réécrit ce chemin : il doit couvrir ce cas.
+
+Il n'existe pas de statut « PR ouverte » parmi les statuts de ticket, et il
+ne faut pas en ajouter un : le modèle refuse toute valeur inconnue, et le
+projet entier cesserait de se charger. L'attente se lit dans
+`CIWatcher.en_attente()` (ticket-306).
 
 ## Critères d'acceptation
 
-- [ ] `run_pipeline` appelle `livrer_phase_1`, émet `LIVRAISON_DONE` avec le
-      `pr_number`, confie la phase 2 à `CIWatcher` sans `await`
-- [ ] `run_closed` est émis avant la fin de la phase 2
-- [ ] `run_queue` lit `ticket.depends_on` ; si une dépendance est en `pr_open`
-      (PR ouverte, merge en attente), le ticket suivant attend avant de démarrer
-- [ ] Un test couvre le cas de base : pipeline approuvé → `livrer_phase_1` appelée
-      → `CIWatcher.surveiller` appelé → `run_closed` émis
-- [ ] Un test couvre `depends_on` : ticket B attend que A soit `done` avant de
-      démarrer quand A a une PR ouverte
-- [ ] Les tests existants de `run_pipeline` (arbre sale, non approuvé) passent
+- [ ] Un test vérifie qu'un run approuvé appelle `livrer_phase_1`, confie la
+      phase 2 à `CIWatcher.surveiller` sans l'attendre, puis émet
+      `run_closed`
+- [ ] Un test vérifie que `run_closed` est émis avant `ci_merge_done`
+- [ ] Un test vérifie que, dans une file, un ticket dont `depends_on` nomme un
+      ticket encore listé par `CIWatcher.en_attente()` attend avant de
+      démarrer, puis démarre après son merge
+- [ ] Un test vérifie qu'un ticket sans dépendance démarre depuis la base
+      distante pendant que la PR du précédent attend sa CI
+- [ ] Un test vérifie qu'après une livraison arrêtée par une exception, sans
+      PR, le ticket suivant part de la base distante et non de la pointe du
+      ticket précédent
+- [ ] Les tests existants de `run_pipeline` (arbre sale, non approuvé)
+      passent
 
 ## Dépendances
 
-ticket-305, ticket-306
+ticket-305, ticket-306.
 
 ## Périmètre
 
-`backend/src/tessera/services/orchestrator.py`,
-`backend/src/tessera/models/ticket.py` (champ `depends_on` si absent).
+`backend/src/tessera/services/orchestrator.py` et ses tests.
