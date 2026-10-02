@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 1
 id: ticket-310
-pr_number: null
+pr_number: 203
 priority: high
 status: done
 title: 'Design: audit the ADRs and draft the short constraints file agents will read
