@@ -1,14 +1,15 @@
 ---
-id: ticket-305
-title: "Delivery splits in two: rebase, push and PR in the run, CI and merge after it"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
-created: 2026-10-02
+id: ticket-305
+pr_number: null
+priority: high
+status: done
+title: 'Delivery splits in two: rebase, push and PR in the run, CI and merge after
+  it'
+type: feat
 ---
 
 # ticket-305 — La livraison se scinde : rebase, push et PR dans le run

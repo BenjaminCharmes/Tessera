@@ -237,14 +237,20 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
     ├─ Sur un refus, le codeur reçoit les motifs de tous les agents qui ont refusé
     └─ Retour au Codeur si refusé (max 3 tours ; sinon ticket → blocked/)
 12. Doc-updater → met à jour README / docs / CLAUDE.md du projet (sauté si `light: true`)
-13. git commit — sur TOUS les chemins de sortie :
+13. Livraison Phase 1 (si approuvé) :
+    ├─ Rebase de la branche du ticket sur la branche de base (sync du distant)
+    ├─ Gestion des conflits : si conflit hors fichier ticket, rebase aborté et conflit tenté par resolveur-conflit (ADR-033)
+    ├─ Push de la branche du ticket vers le distant
+    └─ Ouverture de la PR vers la branche de base → rend pr_number
+    La phase 2 (attente CI + merge) se poursuivra asynchrone après le run via CIWatcher.
+14. git commit — sur TOUS les chemins de sortie :
     ├─ approuvé      → "<type>: ticket-XXX — <titre>" puis advance_base_ref()
     └─ non approuvé  → "chore: ticket-XXX — unapproved work (<raison>)"
     (+ un second commit séparé pour la comptabilité Tessera :
      statuts de tickets et pipeline-log, jamais sous le message du ticket)
-14. DB : finish_run(run_id, rounds, approved, final_status)
-15. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
-16. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
+15. DB : finish_run(run_id, rounds, approved, final_status)
+16. PipelineResult { ticket_id, final_status, rounds, approved, branch, commit_sha }
+17. OrchestratorEvent.PIPELINE_DONE envoyé via WebSocket
 ```
 
 **Invariants** (voir ADR-018) :
@@ -276,11 +282,25 @@ Un ticket peut se déclarer `light: true` dans son frontmatter. Les conséquence
 Cas limite : une file qui se termine sur des tickets légers les laisse sans documentation 
 jusqu'à l'appel suivant d'un agent de documentation (mode autonome, chat, nouveau run).
 
-## Livraison (ADR-029, ADR-030)
+## Livraison (ADR-029, ADR-030, ADR-051)
 
 Après approbation du pipeline, la livraison s'enchaîne automatiquement — rebase 
 sur la branche de base, ouverture de la PR, attente de CI si exigée, merge — 
-jusqu'où le projet l'autorise.
+jusqu'où le projet l'autorise. Cette séquence se scinde en deux phases (ADR-051) 
+pour libérer le verrou dès l'ouverture de la PR et permettre au ticket suivant 
+de commencer pendant l'attente de CI.
+
+### Scission en deux phases
+
+- **Phase 1** (`livrer_phase_1`) — s'exécute **dans le run du pipeline** : 
+  rebase de la branche du ticket sur la base, push, ouverture de la PR. Retourne 
+  le `pr_number`. Après succès, le verrou est libéré et le run peut terminer.
+- **Phase 2** (`livrer_phase_2`) — s'exécute **après le run**, asynchrone via 
+  `CIWatcher` : attente de CI si le projet l'exige, merge de la PR selon la 
+  méthode déclarée. N'interfère jamais avec le ticket suivant.
+
+Hors pipeline (appels directs depuis le chat ou l'interface), la méthode 
+`livrer()` enchaîne les deux phases pour livrer entièrement en synchrone.
 
 ### Branche de base configurable
 
