@@ -463,6 +463,12 @@ Si la CI échoue, le ticket passe en `blocked` — tu dois corriger le problème
 
 En mode file (`queue`), un seul merge par projet peut être en cours à la fois. Les tickets suivants attendent que le précédent soit fusionné avant de pouvoir commencer leur propre livraison.
 
+### Si la phase 2 échoue (après le run)
+
+La fusion se poursuit en arrière-plan, après que le run soit terminé. Si elle échoue — conflit de rebase, CI rouge, ou délai dépassé — tu ne resteras pas dans le doute : l'IDE te signale comment elle a fini. Le ticket passe en `blocked` avec la raison explicite.
+
+Le travail du codeur est déjà commité sur la branche du ticket, et la PR est ouverte sur GitHub. Tu peux reprendre manuellement s'il y a un conflit simple, ou relancer le codeur si des modifications sont nécessaires.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
@@ -848,6 +854,13 @@ Le testeur lance la commande configurée dans le pipeline du projet, depuis la r
 du projet, avec un timeout de 120 s.
 
 ---
+
+
+### La PR s'est ouverte mais le ticket passe en `blocked`
+
+Tu vois la PR ouverte sur GitHub, mais le ticket passe en `blocked` — la phase 2 de la livraison (attente CI, merge) a échoué. La raison est indiquée : conflit de rebase, CI rouge, ou délai dépassé.
+
+Le travail du codeur est toujours sur la branche du ticket, commité et poussé. Rien n'est perdu.
 
 ## Pour aller plus loin
 
