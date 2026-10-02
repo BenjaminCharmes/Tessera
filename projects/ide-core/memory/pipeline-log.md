@@ -1041,3 +1041,21 @@ Les nou (39750ms)
 - 2026-10-02 14:17:49 UTC — [ticket-318] APPROVED après 1 tour(s)
 - 2026-10-02 14:19:51 UTC — [ticket-318] documentation: 1 fichier(s) (120608ms)
 - 2026-10-02 14:20:16 UTC — [ticket-318] livraison: arrêt — Conflit avec develop sur : projects/ide-core/memory/pipeline-log.md. La branche est restée intacte, 
+- 2026-10-02 14:20:17 UTC — [ticket-311] branche ticket-311-agents-read-the-short-constraints-file-instead-of
+- 2026-10-02 14:22:16 UTC — [ticket-311] plan rendu (118688ms)
+- 2026-10-02 14:22:16 UTC — [ticket-311] tour 1 — codeur démarré
+- 2026-10-02 14:33:42 UTC — [ticket-311] tour 1 — codeur terminé (685906ms)
+- 2026-10-02 14:38:27 UTC — [ticket-311] testeur: OK (exit 0)
+- 2026-10-02 14:39:02 UTC — [ticket-311] securite: PASS — Audit du diff — refactorisation de services/adr.py pour supporter contraintes.md (35234ms)
+- 2026-10-02 14:39:02 UTC — [ticket-311] tour 1 — reviewer démarré
+- 2026-10-02 14:40:15 UTC — [ticket-311] tour 1 — reviewer terminé (72797ms)
+- 2026-10-02 14:44:48 UTC — [ticket-311] validateur: CHANGES_REQUESTED — Le code du backend intègre correctement les deux formats (decisions.md et contra (346172ms)
+- 2026-10-02 14:44:48 UTC — [ticket-311] CHANGES_REQUESTED tour 1: Reviewer : Je vais commencer par examiner les fichiers clés créés ou modifiés pour ce ticket.Mainten
+- 2026-10-02 14:44:48 UTC — [ticket-311] tour 2 — codeur démarré
+- 2026-10-02 14:46:44 UTC — [ticket-311] tour 2 — codeur terminé (115797ms)
+- 2026-10-02 14:52:21 UTC — [ticket-311] testeur: OK (exit 0)
+- 2026-10-02 14:52:46 UTC — [ticket-311] securite: PASS — Refactorisation de sécurité : migration de `decisions.md` (journal ADR complet)  (25155ms)
+- 2026-10-02 14:52:46 UTC — [ticket-311] tour 2 — reviewer démarré
+- 2026-10-02 14:54:38 UTC — [ticket-311] tour 2 — reviewer terminé (112187ms)
+- 2026-10-02 14:58:18 UTC — [ticket-311] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente correctement (332250ms)
+- 2026-10-02 14:58:18 UTC — [ticket-311] APPROVED après 2 tour(s)
