@@ -187,6 +187,21 @@ Si un ticket dépend d'un autre, l'IDE t'empêche de le lancer tant que la dépe
 
 Un ticket sans dépendance peut commencer pendant que la PR du précédent attend sa CI : tu gagnes en vitesse en les lançant tous d'un coup. Déclare une dépendance uniquement si ton ticket repose vraiment sur le code d'un autre — par exemple, une API qu'on ajoute et le client qui l'utilise.
 
+
+## 3 bis. Filtrer et trouver les tickets
+
+Une fois que tu as plusieurs tickets, tu veux souvent en retrouver un particulier. Le tableau mémorise tes filtres (type, priorité, agent, texte) — ils survivent même au redémarrage de l'IDE.
+
+### Quand un filtre cache des tickets
+
+Si tu vois peu de tickets et que le panneau Tickets n'est pas ouvert, il y a souvent un filtre ancien qui s'applique toujours. Le tableau affiche une ligne au-dessus des colonnes dès qu'un filtre est actif :
+
+- Combien de tickets tu vois versus combien il y en a en total (« 4 tickets sur 297 »)
+- Le nom de chaque filtre appliqué (type design · priorité high)
+- Un bouton **Effacer les filtres** pour tous les enlever d'un coup
+
+Un clic sur ce bouton remet les filtres à zéro — tu verras tous les tickets de nouveau.
+
 # ticket-007 — Ajouter un endpoint de santé
 
 ## Objectif
