@@ -177,6 +177,16 @@ Si ton ticket est petit — juste un test supplémentaire, un renommage, une cor
 
 L'audit sécurité et la validation tournent toujours normalement — ce sont des portes critiques qu'on ne saute jamais. Seule la documentation s'allège.
 
+
+
+#### Exprimer une dépendance entre tickets
+
+Un ticket peut déclarer une dépendance via le champ `depends_on` : une liste d'identifiants d'autres tickets, comme `depends_on: [ticket-305]` ou `depends_on: [ticket-305, ticket-306]`.
+
+Si un ticket dépend d'un autre, l'IDE t'empêche de le lancer tant que la dépendance n'a pas **complètement mergé** — la branche doit être rebasée, la PR ouverte, la CI validée, et la PR fusionnée dans la branche de base.
+
+Un ticket sans dépendance peut commencer pendant que la PR du précédent attend sa CI : tu gagnes en vitesse en les lançant tous d'un coup. Déclare une dépendance uniquement si ton ticket repose vraiment sur le code d'un autre — par exemple, une API qu'on ajoute et le client qui l'utilise.
+
 # ticket-007 — Ajouter un endpoint de santé
 
 ## Objectif
@@ -351,6 +361,12 @@ Un run une fois terminé disparaît de la Supervision après un rechargement ou 
 - Un bouton **Fermer** te ramène à l'historique
 
 C'est utile pour vérifier les détails d'un run après coup — comment chaque étape s'est déroulée, pourquoi un ticket a terminé bloqué — sans relancer la machine.
+
+
+
+La carte du run affiche maintenant l'**état de la PR** en temps réel, même après fermeture. Si tu as fermé le run pendant que la PR attendait la CI, tu reverras « PR #42 — en attente de CI » la prochaine fois. Une heure plus tard, en rouvrant le run, tu verras « PR #42 mergée ». Si la CI a rejeté la PR, l'IDE affiche le motif de blocage.
+
+Tu peux donc suivre la livraison d'un ticket **après** le run, sans relancer le pipeline ni vérifier GitHub : ouvre juste la carte fermée.
 
 ### La frise d'étapes
 
