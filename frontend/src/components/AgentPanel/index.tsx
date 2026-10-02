@@ -20,7 +20,7 @@ interface AgentPanelProps {
   /** Ticket sélectionné, pour afficher ce qu'il a produit (ticket-064). */
   activeTicket?: Ticket | null;
   /** Configuration du pipeline pour la frise d'étapes (ticket-256). */
-  reglages?: Pick<PipelineReglages, "securite_enabled" | "validateur_enabled"> | null;
+  reglages?: Partial<Pick<PipelineReglages, "securite_enabled" | "validateur_enabled" | "testeur_enabled">> | null;
 }
 
 export default function AgentPanel({

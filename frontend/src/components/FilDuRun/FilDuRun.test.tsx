@@ -2,7 +2,20 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FilDuRun from "./index";
-import type { EntreeFil } from "../../hooks/streamState";
+import type { EntreeFil, EntreeTesteur } from "../../hooks/streamState";
+
+function testeurEntry(over: Partial<EntreeTesteur> = {}): EntreeTesteur {
+  return {
+    genre: "testeur",
+    id: "testeur-0",
+    round: 1,
+    passed: true,
+    output_summary: "42 passed in 1.2s",
+    errors: [],
+    isDone: true,
+    ...over,
+  };
+}
 
 function agentEntry(over: Partial<Extract<EntreeFil, { genre: "agent" }>> = {}): Extract<EntreeFil, { genre: "agent" }> {
   return {
@@ -199,6 +212,96 @@ describe("FilDuRun — en-têtes de verdict unifiés (ticket-282)", () => {
 
     expect(headerCodeur).toHaveTextContent("2 min 50 s");
     expect(headerCodeur).not.toHaveTextContent("python-multipart");
+  });
+});
+
+describe("FilDuRun — carte TESTEUR (ticket-321)", () => {
+  it("affiche une carte TESTEUR avec le résumé en en-tête sur une suite verte", () => {
+    const entries: EntreeFil[] = [
+      testeurEntry({ output_summary: "42 passed in 1.2s" }),
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    expect(screen.getByText("TESTEUR")).toBeInTheDocument();
+    expect(screen.getByText("42 passed in 1.2s")).toBeInTheDocument();
+  });
+
+  it("affiche 'retour au codeur, sans revue' pour une suite rouge", () => {
+    const entries: EntreeFil[] = [
+      testeurEntry({
+        passed: false,
+        output_summary: "1 error in 2.32s",
+        errors: ["FAILED test_foo.py::test_bar"],
+      }),
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    expect(screen.getByText("retour au codeur, sans revue")).toBeInTheDocument();
+  });
+
+  it("affiche les erreurs dans le corps d'une carte TESTEUR rouge dépliée", async () => {
+    // La carte rouge n'est pas la dernière : elle est repliée par défaut.
+    const entries: EntreeFil[] = [
+      testeurEntry({
+        id: "testeur-0",
+        passed: false,
+        output_summary: "1 error in 2.32s",
+        errors: ["FAILED test_foo.py::test_bar"],
+      }),
+      agentEntry({ id: "codeur-1", round: 2, isDone: false }),
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    // Erreur non visible tant que repliée.
+    expect(screen.queryByText("FAILED test_foo.py::test_bar")).toBeNull();
+
+    const header = screen.getByRole("button", { name: /TESTEUR/i });
+    await userEvent.click(header);
+
+    expect(screen.getByText("FAILED test_foo.py::test_bar")).toBeInTheDocument();
+  });
+
+  it("n'affiche pas les erreurs pour une carte TESTEUR verte", () => {
+    const entries: EntreeFil[] = [
+      testeurEntry({ passed: true, errors: [] }),
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    // Pas de liste d'erreurs pour une suite verte.
+    expect(screen.queryByRole("list")).toBeNull();
+  });
+
+  it("le verdict rouge de la carte TESTEUR utilise text-red (ADR-026)", () => {
+    // ADR-026 : les états d'échec n'utilisent que la famille `red`.
+    const entries: EntreeFil[] = [
+      testeurEntry({ passed: false, output_summary: "1 error in 2.32s" }),
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    const verdictSpan = screen.getByText("retour au codeur, sans revue");
+    expect(verdictSpan.closest(".text-red-400")).toBeTruthy();
+  });
+
+  it("les lignes d'erreur de la carte TESTEUR utilisent text-red (ADR-026)", async () => {
+    // ADR-026 : les états d'échec n'utilisent que la famille `red`.
+    // La carte est la dernière (seule) : elle est dépliée par défaut.
+    const entries: EntreeFil[] = [
+      testeurEntry({
+        passed: false,
+        output_summary: "1 error in 2.32s",
+        errors: ["FAILED test_foo.py::test_bar"],
+      }),
+    ];
+
+    render(<FilDuRun entries={entries} />);
+
+    const ligne = screen.getByText("FAILED test_foo.py::test_bar");
+    expect(ligne.className).toMatch(/text-red/);
   });
 });
 

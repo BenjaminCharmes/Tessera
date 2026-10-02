@@ -71,8 +71,24 @@ export interface EntreeValidateur {
   isDone: true;
 }
 
-/** Une entrée du fil chronologique : agent, sécurité ou validateur. */
-export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur;
+/**
+ * Entrée du testeur dans le fil chronologique (ticket-321).
+ *
+ * Ajoutée par `test_result` : toujours terminée, jamais modifiée.
+ * `errors` porte les lignes d'erreur extraites par le backend (au plus 5).
+ */
+export interface EntreeTesteur {
+  genre: "testeur";
+  id: string;
+  round: number;
+  passed: boolean;
+  output_summary: string;
+  errors: string[];
+  isDone: true;
+}
+
+/** Une entrée du fil chronologique : agent, sécurité, validateur ou testeur. */
+export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur | EntreeTesteur;
 
 export interface StreamState {
   status: StreamStatus;
@@ -414,6 +430,26 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
               (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
             : s.currentTokens,
         entries: tokenEntries,
+      };
+    }
+    case "test_result": {
+      // Le testeur ajoute une entrée dans le fil après chaque passage du codeur (ticket-321).
+      const rawErrors = Array.isArray(ev.data["errors"]) ? ev.data["errors"] : [];
+      const testEntry: EntreeTesteur = {
+        genre: "testeur",
+        id: `testeur-${s.entries.length}`,
+        round: s.currentRound,
+        passed: ev.data["passed"] === true,
+        output_summary:
+          typeof ev.data["output_summary"] === "string" ? ev.data["output_summary"] : "",
+        errors: rawErrors.filter((e: unknown): e is string => typeof e === "string"),
+        isDone: true,
+      };
+      return {
+        ...s,
+        events,
+        ticketEvents,
+        entries: [...s.entries, testEntry],
       };
     }
     case "security_audit_done": {
