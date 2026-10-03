@@ -1,14 +1,14 @@
 ---
-id: ticket-317
-title: "The SupervisionView selection test is flaky under load"
-type: fix
-status: todo
-priority: low
 agent: codeur
-pr_number: null
+created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-02
+id: ticket-317
+pr_number: 239
+priority: low
+status: done
+title: The SupervisionView selection test is flaky under load
+type: fix
 ---
 
 # ticket-317 — Le test de sélection de SupervisionView est instable sous charge

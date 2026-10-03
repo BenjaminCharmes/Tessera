@@ -1250,3 +1250,13 @@ Analyse effectuée :
 - 2026-10-03 17:16:17 UTC — [ticket-327] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente un endpoint l (251312ms)
 - 2026-10-03 17:16:17 UTC — [ticket-327] APPROVED après 3 tour(s)
 - 2026-10-03 17:18:56 UTC — [ticket-327] documentation: 3 fichier(s) (156000ms)
+- 2026-10-03 17:19:09 UTC — [ticket-317] branche ticket-317-the-supervisionview-selection-test-is-flaky-under
+- 2026-10-03 17:19:09 UTC — [ticket-317] tour 1 — codeur démarré
+- 2026-10-03 17:21:25 UTC — [ticket-317] tour 1 — codeur terminé (135952ms)
+- 2026-10-03 17:30:43 UTC — [ticket-317] testeur: OK (exit 0)
+- 2026-10-03 17:30:58 UTC — [ticket-317] securite: PASS — Audit du diff terminé. Ce changement modifie un test unitaire TypeScript/React e (15468ms)
+- 2026-10-03 17:30:58 UTC — [ticket-317] tour 1 — reviewer démarré
+- 2026-10-03 17:31:19 UTC — [ticket-317] tour 1 — reviewer terminé (20375ms)
+- 2026-10-03 17:32:57 UTC — [ticket-317] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le test a été corrigé pour évite (119187ms)
+- 2026-10-03 17:32:57 UTC — [ticket-317] APPROVED après 1 tour(s)
+- 2026-10-03 17:33:21 UTC — [ticket-317] documentation: 0 fichier(s) (20593ms)
