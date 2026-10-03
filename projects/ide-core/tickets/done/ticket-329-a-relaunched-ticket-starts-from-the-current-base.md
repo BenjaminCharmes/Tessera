@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-329
 plan: true
-pr_number: null
+pr_number: 235
 priority: high
 status: done
 title: A relaunched ticket rebuilds its branch on the current base, and finds its
