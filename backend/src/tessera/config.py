@@ -81,6 +81,9 @@ class Settings(BaseSettings):
     # entre eux avant qu'ils n'atteignent l'état publiable.
     github_base_branch: str = "develop"
     ide_db_path: Path = Path("tessera.db")
+    # Fichier de log tournant (5 × 10 Mo). Ancré sur la racine du dépôt pour
+    # ne pas dépendre du répertoire de lancement (ticket-330).
+    ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"
     static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
     # Chemin vers bash.exe sous Windows, pour que le SDK puisse activer l'outil
     # `Bash` des agents. Lu depuis CLAUDE_CODE_GIT_BASH_PATH ; absent, le backend

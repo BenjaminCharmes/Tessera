@@ -1,3 +1,4 @@
+from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -25,7 +26,7 @@ from tessera.routers import (
 )
 from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.prompt_loader import MissingPromptError
-from tessera.utils.logger import get_logger
+from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
 
 _logger = get_logger(__name__)
 
@@ -38,6 +39,11 @@ _AGENT_SHELL_OK: bool = agent_shell_ok(_GIT_BASH_PATH)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # Le chemin peut venir de l'environnement : il reste sous backend/logs.
+    configure_file_logging(
+        settings.ide_log_file, racine=Path(__file__).resolve().parents[2] / "logs"
+    )
+    install_asyncio_exception_handler()
     warn_if_shell_missing(_GIT_BASH_PATH)
     await init_db(settings.ide_db_path)
     # Les runs qu'un processus tué a laissés « en cours » (ticket-177).

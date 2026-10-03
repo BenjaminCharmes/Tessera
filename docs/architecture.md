@@ -92,6 +92,19 @@ Les appels hors run — chat, analyse de projet — n'ont pas de `run_id` et ne
 sont pas écrits dans `agent_calls` : ils ne peuvent donc jamais se mélanger aux
 appels d'un pipeline.
 
+
+### Logs du backend (ticket-330)
+
+Au démarrage, le backend configure un logger qui écrit dans un fichier rotatif `backend/logs/tessera.log`, en plus de la sortie standard. Cela garantit qu'une trace persiste après un crash.
+
+**Garanties** :
+- Le dossier `backend/logs/` est créé s'il n'existe pas
+- Les fichiers tournent (rotation basée sur la taille)
+- Les exceptions non rattrapées dans les tâches `asyncio` y sont capturées avec leur trace complète
+- Les fichiers `.log` sont ignorés par git
+
+Un opérateur peut consulter ces fichiers pour déboguer un arrêt inattendu du backend.
+
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique

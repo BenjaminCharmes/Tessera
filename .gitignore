@@ -62,6 +62,9 @@ projects/*
 # Logs de lancement locaux
 *.log
 
+# Fichier de journal tournant du backend (ticket-330)
+backend/logs/
+
 # Claude Code : la config partagée (skills, settings.json) est versionnée,
 # les préférences personnelles ne le sont pas.
 .claude/settings.local.json
