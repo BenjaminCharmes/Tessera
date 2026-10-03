@@ -3,7 +3,7 @@ id: ticket-322
 title: "The Claude Agent SDK moves to 0.2.159, whose bundled Claude Code supports claude-opus-5-5"
 type: chore
 status: done
-pr_number: null
+pr_number: 240
 priority: high
 agent: codeur
 depends_on: []
