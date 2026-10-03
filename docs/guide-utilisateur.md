@@ -277,6 +277,12 @@ en `blocked/` et le reviewer n'est même pas appelé.
 
 ---
 
+### Relancer un ticket
+
+Quand tu relances un ticket, sa branche précédente est réutilisée — tu ne perds pas le travail d'avant. Le pipeline la met à jour automatiquement si elle est en retard sur la base du projet, ce qui évite que des changements d'autres tickets n'y causent des conflits imprévus lors de la livraison.
+
+Si le rebasage échoue, l'ancienne branche est renommée `stale/<ancien-nom>` pour que tu ne la perdes pas, et une branche neuve est créée à partir de la base actuelle. Le codeur repartira d'une base propre.
+
 ## 5. Lire ce qui se passe
 
 Le panneau **Agent Stream** montre le déroulé en direct via WebSocket : quel agent
