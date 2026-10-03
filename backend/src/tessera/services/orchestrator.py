@@ -261,6 +261,13 @@ class Orchestrator:
         dialogue: DialogueChannel | None = None,
     ) -> PipelineResult:
         ticket = await self._ticket_svc.get_ticket(ticket_id)
+        if ticket is None and self._git_workspace is not None:
+            # Le fichier ticket a pu être déplacé sans commit lors d'un run
+            # précédent coupé net (ex: blocked/ sans commit). On tente de le
+            # retrouver sur la base distante avant de conclure « introuvable ».
+            restored = await self._git_workspace.restaurer_ticket_depuis_base(ticket_id)
+            if restored:
+                ticket = await self._ticket_svc.get_ticket(ticket_id)
         if ticket is None:
             raise ValueError(f"Ticket introuvable : {ticket_id}")
 

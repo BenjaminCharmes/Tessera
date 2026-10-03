@@ -97,7 +97,7 @@ appels d'un pipeline.
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé sept correctifs, tous nés d'un usage réel :
+Cette promesse a demandé onze correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -155,6 +155,20 @@ Cette promesse a demandé sept correctifs, tous nés d'un usage réel :
   suivis qui ont changé. Le Pipeline log et la vue du run affichent ces chemins, 
   permettant à l'utilisateur de savoir immédiatement ce qu'il faut commiter ou 
   annuler avant de relancer le pipeline.
+- **Branche existante rejouée sur la base actuelle** (ticket-329). Quand un 
+  ticket est relancé, sa branche locale peut exister mais être basée sur une 
+  version antérieure de la branche de base. Le pipeline détecte ce cas et 
+  rejoue la branche sur la base actuelle via `git rebase`. Si le rejeu crée 
+  des conflits, l'ancienne branche est renommée en `stale/ticket-XXX` pour 
+  préservation, et une nouvelle branche est créée depuis la base actuelle. 
+  Cela évite qu'un ticket relancé reprenne silencieusement du travail périmé.
+- **Recherche du ticket dans tous les dossiers de statut** (ticket-329). Si 
+  le fichier ticket n'existe pas dans le dossier attendu — par exemple, un 
+  run interrompu a déplacé le ticket dans `tickets/blocked/` sans le committer 
+  — le pipeline le cherche dans tous les dossiers (`todo/`, `in-progress/`, 
+  `in-review/`, `done/`, `blocked/`, `archive/`). Si absent localement, il 
+  le cherche sur la branche de base distante. Seul si absent partout, le 
+  pipeline émet un événement d'erreur et passe le ticket en `blocked`.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et

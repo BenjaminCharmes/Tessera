@@ -1,15 +1,16 @@
 ---
-id: ticket-329
-title: "A relaunched ticket rebuilds its branch on the current base, and finds its ticket file wherever the last run left it"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
+id: ticket-329
 plan: true
-created: 2026-10-02
+pr_number: 235
+priority: high
+status: done
+title: A relaunched ticket rebuilds its branch on the current base, and finds its
+  ticket file wherever the last run left it
+type: fix
 ---
 
 # ticket-329 — Un ticket relancé repart de la base actuelle
