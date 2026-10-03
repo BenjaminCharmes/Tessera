@@ -84,4 +84,38 @@ describe("RunHistorique — ticket-281", () => {
 
     expect(handleClose).toHaveBeenCalledOnce();
   });
+
+  it("shows 'Pipeline terminé' and the ticket id even without a run_closed event (criterion 4)", async () => {
+    // Un run joué dans une file n'émet pas toujours run_closed dans les
+    // événements filtrés par ticket_id. La vue doit quand même afficher
+    // « Pipeline terminé » (runClosed forcé) et le numéro du ticket (fallback
+    // sur la prop ticketId quand pipeline_done n'en contient pas).
+    mockEvents.mockResolvedValue([
+      {
+        type: "agent_started",
+        agent: "codeur",
+        data: { round: 1 },
+        timestamp: "2026-01-01T00:00:00Z",
+      },
+      {
+        type: "agent_done",
+        agent: "codeur",
+        data: { content: "Fait." },
+        timestamp: "2026-01-01T00:01:00Z",
+      },
+      {
+        type: "pipeline_done",
+        agent: null,
+        // ticket_id absent — cas d'une file où l'événement n'est pas filtré
+        data: { approved: true, final_status: "done", rounds: 1 },
+        timestamp: "2026-01-01T00:02:00Z",
+      },
+      // Pas de run_closed : le run est terminé, mais l'événement n'est pas dans les données filtrées.
+    ]);
+
+    render(<RunHistorique runId="run-queue" ticketId="ticket-042" onClose={() => {}} />);
+
+    await screen.findByText("Pipeline terminé");
+    expect(screen.getByText("ticket-042")).toBeInTheDocument();
+  });
 });

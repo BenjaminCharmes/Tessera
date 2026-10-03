@@ -1223,3 +1223,30 @@ Analyse effectuée :
 - 2026-10-03 07:05:20 UTC — [ticket-330] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests vérifient la bonne éc (173375ms)
 - 2026-10-03 07:05:20 UTC — [ticket-330] APPROVED après 2 tour(s)
 - 2026-10-03 07:07:15 UTC — [ticket-330] documentation: 1 fichier(s) (112421ms)
+- 2026-10-03 16:33:14 UTC — [ticket-327] branche ticket-327-a-finished-run-is-reopened-from-its-ticket-and-fr
+- 2026-10-03 16:36:18 UTC — [ticket-327] plan rendu (184171ms)
+- 2026-10-03 16:36:18 UTC — [ticket-327] tour 1 — codeur démarré
+- 2026-10-03 16:43:46 UTC — [ticket-327] tour 1 — codeur terminé (447733ms)
+- 2026-10-03 16:44:39 UTC — [ticket-327] testeur: 1 failed, 426 passed, 2 deselected, 5 warnings in 50.47s
+- 2026-10-03 16:44:39 UTC — [ticket-327] tests rouges au tour 1
+- 2026-10-03 16:44:39 UTC — [ticket-327] tour 2 — codeur démarré
+- 2026-10-03 16:45:13 UTC — [ticket-327] tour 2 — codeur terminé (33172ms)
+- 2026-10-03 16:53:38 UTC — [ticket-327] testeur: OK (exit 0)
+- 2026-10-03 16:54:12 UTC — [ticket-327] securite: PASS — Audit de sécurité complet du diff ticket-327. Aucune vulnérabilité détectée.
+
+✅  (33391ms)
+- 2026-10-03 16:54:12 UTC — [ticket-327] tour 2 — reviewer démarré
+- 2026-10-03 16:55:33 UTC — [ticket-327] tour 2 — reviewer terminé (81531ms)
+- 2026-10-03 16:59:59 UTC — [ticket-327] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le backend expose un endpoint ` (346889ms)
+- 2026-10-03 16:59:59 UTC — [ticket-327] CHANGES_REQUESTED tour 2: Reviewer : Je vais vérifier deux points clés avant de rendre mon verdict : le câblage de `onRevoirRu
+- 2026-10-03 16:59:59 UTC — [ticket-327] tour 3 — codeur démarré
+- 2026-10-03 17:03:48 UTC — [ticket-327] tour 3 — codeur terminé (229406ms)
+- 2026-10-03 17:11:28 UTC — [ticket-327] testeur: OK (exit 0)
+- 2026-10-03 17:12:06 UTC — [ticket-327] securite: PASS — Audit de la feature ticket-327 (Revoir le run). Aucune vulnérabilité détectée.
+
+ (38203ms)
+- 2026-10-03 17:12:06 UTC — [ticket-327] tour 3 — reviewer démarré
+- 2026-10-03 17:13:27 UTC — [ticket-327] tour 3 — reviewer terminé (81000ms)
+- 2026-10-03 17:16:17 UTC — [ticket-327] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente un endpoint l (251312ms)
+- 2026-10-03 17:16:17 UTC — [ticket-327] APPROVED après 3 tour(s)
+- 2026-10-03 17:18:56 UTC — [ticket-327] documentation: 3 fichier(s) (156000ms)

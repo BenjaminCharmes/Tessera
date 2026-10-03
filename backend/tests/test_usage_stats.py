@@ -287,6 +287,55 @@ async def test_totals_run_count_excludes_queue_and_autonomous_rows(
     assert "s1" in ids
 
 
+async def test_usage_stats_responds_in_under_two_seconds_on_fifty_thousand_rows(
+    tmp_path: Path,
+) -> None:
+    """Criterion 5 — performance bound avec 50 000 lignes agent_calls.
+
+    Les index ajoutés en migration #6 (ticket-327) ramènent la requête de
+    plusieurs secondes à quelques centaines de millisecondes. Le seuil de 2 s
+    est large : il ne doit pas casser sur un poste lent, mais doit détecter
+    une régression majeure (requête sans index sur grande table).
+    """
+    import time
+
+    path = tmp_path / "perf.db"
+    await init_db(path)
+
+    # Un run porteur de tous les appels.
+    async with aiosqlite.connect(str(path)) as conn:
+        await conn.execute(
+            "INSERT INTO pipeline_runs"
+            " (id, project_id, ticket_id, started_at, finished_at, rounds, approved, final_status, mode)"
+            " VALUES (?,?,?,?,?,?,?,?,?)",
+            ("perf-run", "proj", "ticket-perf",
+             "2026-09-27T10:00:00+00:00", "2026-09-27T10:30:00+00:00",
+             1, 1, "done", "single"),
+        )
+        # Insertion par lot pour ne pas ralentir la suite (évite 50 000 commits).
+        await conn.executemany(
+            "INSERT INTO agent_calls"
+            " (run_id, ticket_id, role, model, input_tokens, output_tokens,"
+            "  cache_read_tokens, cost_usd, duration_ms, created_at)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?)",
+            [
+                (
+                    "perf-run", "ticket-perf", "codeur", "sonnet",
+                    100, 50, 0, 0.01, 1000,
+                    f"2026-09-27T10:{i // 60:02d}:{i % 60:02d}+00:00",
+                )
+                for i in range(50_000)
+            ],
+        )
+        await conn.commit()
+
+    debut = time.perf_counter()
+    await usage_stats(path, days=30, project_id=None, today=TODAY)
+    duree = time.perf_counter() - debut
+
+    assert duree < 2.0, f"usage_stats a pris {duree:.2f} s sur 50 000 lignes (seuil : 2 s)"
+
+
 async def test_null_mode_rows_are_treated_as_single(tmp_path: Path) -> None:
     """Legacy rows (mode IS NULL) are counted as single, not excluded."""
     path = tmp_path / "legacy.db"

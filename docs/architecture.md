@@ -618,12 +618,28 @@ CREATE TABLE agent_calls (
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
 
-## Récupération de l'historique d'un run (ticket-280, ticket-281, ticket-325)
+## Récupération de l'historique d'un run (ticket-280, ticket-281, ticket-327)
 
 Un run qui quitte la supervision — fermé ou au redémarrage du backend — disparaît 
 de la WebSocket temps réel. Les événements persistent en SQLite et peuvent être 
-rechargés de deux façons : lors d'une visite de l'historique, ou lors d'un 
-rechargement de page si le run est encore en cours.
+rechargés lors d'une visite de l'historique, ou lors d'un rechargement de page 
+si le run est encore en cours.
+
+Deux entrées permettent de consulter un run terminé :
+
+- **Panneau du ticket** : un bouton « Revoir le run » s'affiche si le ticket a un 
+  run terminé, ouvrant la vue avec tous les événements enregistrés ;
+- **Supervision** : une carte d'un run clos propose « Revoir le run » pour consulter 
+  son déroulé complet.
+
+Un endpoint léger, `GET /projects/{id}/tickets/{ticket_id}/runs`, rend la liste 
+des runs du ticket, du plus récent au plus ancien, **sans calculer les statistiques** 
+longues. C'est cet endpoint qui alimente le bouton « Revoir le run » depuis le 
+panneau d'un ticket.
+
+La vue rouverte affiche toujours le numéro du ticket et « Run terminé » quand le 
+run est clos, même pour un ticket joué dans une file (où l'événement `run_closed` 
+n'est pas émis lors du rejeu).
 
 ### Rechargement d'un run vivant
 

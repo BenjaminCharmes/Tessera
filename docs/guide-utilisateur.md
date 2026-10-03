@@ -392,6 +392,9 @@ Tu peux donc suivre la livraison d'un ticket **après** le run, sans relancer le
 
 Si tu recharges la page durant un run en cours, tu retrouves instantanément tout l'historique — plan, tours précédents, tous les agents qui ont déjà passé. Le frontend rejoue les événements enregistrés en base de données, sans perdre ni dupliquer aucun message. C'est une des sécurités de l'interface : un rechargement accidentel ne coûte rien.
 
+
+Tu retrouves aussi un run depuis le panneau du ticket. Ouvre le ticket — le bouton « Voir le ticket » en haut du run fermé t'y mène — et clique sur « Revoir le run » pour afficher le déroulé complet : plan initial, tous les tours, verdicts du reviewer et du validateur.
+
 ### La frise d'étapes
 
 En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.

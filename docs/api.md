@@ -50,6 +50,7 @@ en interactif quand le backend tourne.
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Get Ticket |
 | `PATCH` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Update Ticket Status |
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/activity` | Get Ticket Activity |
+| `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/runs` | List Runs For Ticket |
 | `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/create-pr` | Create Pull Request |
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/diff` | Get Ticket Diff |
 | `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/merge-pr` | Merge Pull Request For Ticket |

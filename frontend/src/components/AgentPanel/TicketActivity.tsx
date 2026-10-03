@@ -8,6 +8,11 @@ interface TicketActivityProps {
   ticket: Ticket | null;
   /** Branche du dernier run, quand il y en a eu un dans cette session. */
   branch: string | null;
+  /**
+   * Ouvre la vue en lecture seule d'un run terminé (ticket-327).
+   * Appelé avec l'id de run en base et l'id du ticket.
+   */
+  onRevoirRun?: ((runId: string, ticketId: string) => void) | null;
 }
 
 /**
@@ -28,6 +33,7 @@ export default function TicketActivity({
   projectId,
   ticket,
   branch,
+  onRevoirRun = null,
 }: TicketActivityProps) {
   const [busy, setBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -108,6 +114,16 @@ export default function TicketActivity({
                 >
                   {run.arret}
                 </p>
+              )}
+              {/* Bouton visible sur un run terminé, quand le parent sait ouvrir la vue (ticket-327). */}
+              {run.finished_at && onRevoirRun && ticketId && (
+                <button
+                  type="button"
+                  onClick={() => onRevoirRun(run.id, ticketId)}
+                  className="mt-0.5 text-mini text-zinc-500 underline hover:text-zinc-300"
+                >
+                  Revoir le run
+                </button>
               )}
             </li>
           ))}

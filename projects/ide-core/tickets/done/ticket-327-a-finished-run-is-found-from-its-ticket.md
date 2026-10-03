@@ -1,15 +1,16 @@
 ---
-id: ticket-327
-title: "A finished run is reopened from its ticket and from Supervision, opens complete, and the stats view loads fast"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-02
 depends_on: []
 estimated_days: 1
+id: ticket-327
 plan: true
-created: 2026-10-02
+pr_number: 238
+priority: medium
+status: done
+title: A finished run is reopened from its ticket and from Supervision, opens complete,
+  and the stats view loads fast
+type: feat
 ---
 
 # ticket-327 — Un run terminé se rouvre depuis son ticket
