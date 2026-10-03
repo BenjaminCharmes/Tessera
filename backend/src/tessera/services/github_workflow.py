@@ -17,6 +17,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Optional, Protocol
 
+import httpx
 from pathlib import Path
 
 from tessera.services.autonomie import (
@@ -24,6 +25,7 @@ from tessera.services.autonomie import (
     lire_niveau,
     niveau_peut_merger,
 )
+from tessera.services.github_service import MergeabiliteTimeoutError, PRNonFusionnableError
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.sync_map import SyncMapService
 from tessera.services.termes_interdits import (
@@ -66,6 +68,13 @@ class _GitHub(Protocol):
     async def get_pull_request_status(self, pr_number: int) -> Any: ...
 
     async def merge_pull_request(
+        self,
+        pr_number: int,
+        method: str = "squash",
+        commit_title: str | None = None,
+    ) -> None: ...
+
+    async def merge_quand_fusionnable(
         self,
         pr_number: int,
         method: str = "squash",
@@ -304,7 +313,20 @@ class GitHubWorkflowService:
         merge_method = "squash"
         if self._politique is not None:
             merge_method = self._politique.merge_method
-        await self._github.merge_pull_request(pr_number, method=merge_method)
+        try:
+            await self._github.merge_quand_fusionnable(pr_number, method=merge_method)
+        except (MergeabiliteTimeoutError, PRNonFusionnableError) as exc:
+            _logger.warning(
+                "merge_fusionnabilite_refusee",
+                extra={"pr": pr_number, "raison": str(exc)},
+            )
+            return False
+        except httpx.HTTPStatusError as exc:
+            _logger.warning(
+                "merge_http_erreur",
+                extra={"pr": pr_number, "status": exc.response.status_code},
+            )
+            return False
         _logger.info(
             "merge_effectue",
             extra={"pr": pr_number, "ci": ci, "methode": merge_method},

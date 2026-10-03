@@ -28,10 +28,14 @@ from typing import Any, Awaitable, Callable
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.services.providers.chemins_proteges import (
+    INTERPRETE_PROTEGE_REFUS,
     motif_de_protection,
     refus_de_protection,
 )
-from tessera.services.providers.redirections_bash import cibles_ecrites
+from tessera.services.providers.redirections_bash import (
+    cibles_ecrites,
+    cibles_interpreteur_ecriture,
+)
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -142,7 +146,17 @@ def hook_refus_hors_perimetre(
         entrees: dict[str, Any] = donnees.get("tool_input", {})
 
         if outil == "Bash":
-            cibles = cibles_ecrites(str(entrees.get("command", "")))
+            commande = str(entrees.get("command", ""))
+            cibles = cibles_ecrites(commande)
+            # Filet ADR-031 : python/node -c avec fichier protégé en écriture.
+            noms = cibles_interpreteur_ecriture(commande)
+            if noms:
+                return _refus(
+                    "interprete_ecrit_protege_refuse",
+                    noms[0],
+                    project_path,
+                    INTERPRETE_PROTEGE_REFUS,
+                )
         elif outil in _OUTILS_QUI_ECRIVENT:
             chemin = str(entrees.get("file_path", ""))
             cibles = [chemin] if chemin else []

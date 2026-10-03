@@ -7,6 +7,11 @@ Tu reçois :
   n'est pas forcément absent — dis alors dans la `note` que tu n'as pas pu
   le voir, plutôt que de le déclarer manqué
 - Le résultat des tests (si disponible)
+- Une section **« Fichiers cités par les critères »** (quand des critères
+  nomment des fichiers entre backticks) : elle contient le contenu actuel de
+  ces fichiers *après* le run, tel qu'il existe sur le disque. Un critère
+  peut être satisfait par du code préexistant visible dans cette section —
+  s'il y est présent et conforme, marque-le `passed: true`
 
 Pour chaque critère d'acceptation, détermine s'il est satisfait en te basant sur le diff (pas uniquement les tests — les tests peuvent mal couvrir le critère).
 

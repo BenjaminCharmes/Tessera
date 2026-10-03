@@ -244,6 +244,38 @@ async def test_is_clean_faux_si_un_fichier_non_bookkeeping_est_modifie(repo: Pat
     assert await service.is_clean() is False
 
 
+async def test_dirty_files_contient_le_fichier_code_modifie(repo: Path) -> None:
+    """A modified code file appears in dirty_files (ticket-323)."""
+    (repo / "README.md").write_text("# modifie\n", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    fichiers = await service.dirty_files()
+
+    assert "README.md" in fichiers
+
+
+async def test_dirty_files_exclut_le_journal_pipeline(repo: Path) -> None:
+    """The pipeline log does not appear in dirty_files (ticket-323).
+
+    ``_log`` appends to ``memory/pipeline-log.md`` between tickets. That
+    modification belongs to Tessera's own bookkeeping and must not be
+    reported as a blocking dirty file — otherwise the next ticket in a queue
+    would be refused.
+    """
+    (repo / "memory").mkdir()
+    log = repo / "memory" / "pipeline-log.md"
+    log.write_text("# log\n", encoding="utf-8")
+    await _git(repo, "add", "memory/pipeline-log.md")
+    await _git(repo, "commit", "-q", "-m", "track log")
+
+    log.write_text("# log\n- ticket-006 saute\n", encoding="utf-8")
+
+    service = GitWorkspaceService(repo)
+    fichiers = await service.dirty_files()
+
+    assert fichiers == []
+
+
 async def test_repertoire_sans_depot_git_leve_not_a_git_repository(tmp_path: Path) -> None:
     service = GitWorkspaceService(tmp_path)
     with pytest.raises(NotAGitRepository):
@@ -1436,3 +1468,145 @@ async def test_commit_all_logue_un_warning_si_agents_json_modifie(
     ]
     assert policy_records, "A warning must be emitted when a policy file is excluded"
     assert "agents.json" in str(policy_records[0].__dict__)
+
+
+# ------------------------------------------------------------------
+# Branche en retard — ticket-329
+# ------------------------------------------------------------------
+
+
+async def test_create_branch_reprise_branche_en_retard_la_rejoue(repo: Path) -> None:
+    """A resumed branch whose base is behind _base_ref is rebased before handoff.
+
+    Sequence: ticket branch created at commit A; base advances to commit B;
+    service resumes the branch → rebase on B → branch tip contains B's files.
+    """
+    # Build the stale ticket branch
+    await _git(repo, "checkout", "-q", "-b", "ticket-329-feature")
+    (repo / "feature.py").write_text("x = 1\n", encoding="utf-8")
+    await _git(repo, "add", "feature.py")
+    await _git(repo, "commit", "-q", "-m", "feat: coder work")
+
+    # Advance the base branch with a non-conflicting commit
+    await _git(repo, "checkout", "-q", "-")  # back to main/master
+    (repo / "advance.py").write_text("y = 2\n", encoding="utf-8")
+    await _git(repo, "add", "advance.py")
+    await _git(repo, "commit", "-q", "-m", "chore: base advances")
+    advanced_sha = await _git_out(repo, "rev-parse", "HEAD")
+
+    # New service: HEAD is on the advanced base → _base_ref = advanced_sha
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-329", "feature")
+
+    # Branch must include both the coder's file and the base's new file
+    files_at_head = await service._run("ls-tree", "-r", "--name-only", "HEAD")
+    assert "advance.py" in files_at_head, "rebased branch must contain base commits"
+    assert "feature.py" in files_at_head, "coder work must survive the rebase"
+    assert service._fork_point == advanced_sha, "_fork_point must be updated to the new base"
+
+
+async def test_create_branch_reprise_avec_conflit_renomme_stale_et_cree_neuve(
+    repo: Path,
+) -> None:
+    """On rebase conflict: old branch saved as stale/…, fresh branch from base.
+
+    Sequence: coder and base both write the same file with different content
+    → rebase conflict → old branch renamed to stale/…, fresh branch from base.
+    """
+    # Ticket branch modifies shared.py
+    await _git(repo, "checkout", "-q", "-b", "ticket-329-conflict")
+    (repo / "shared.py").write_text("version = 'ticket'\n", encoding="utf-8")
+    await _git(repo, "add", "shared.py")
+    await _git(repo, "commit", "-q", "-m", "feat: ticket writes shared.py")
+
+    # Base also modifies shared.py → guaranteed conflict
+    await _git(repo, "checkout", "-q", "-")
+    (repo / "shared.py").write_text("version = 'base'\n", encoding="utf-8")
+    await _git(repo, "add", "shared.py")
+    await _git(repo, "commit", "-q", "-m", "chore: base changes shared.py")
+    advanced_sha = await _git_out(repo, "rev-parse", "HEAD")
+
+    # Service resumes the stale branch → conflict → stale rename + fresh branch
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-329", "conflict")
+
+    # Old branch must be preserved under stale/...
+    all_branches_out = await service._run("branch", "--list")
+    all_branches = [b.strip().lstrip("* ") for b in all_branches_out.splitlines()]
+    stale_branches = [b for b in all_branches if b.startswith("stale/ticket-329-conflict")]
+    assert stale_branches, f"a stale branch must exist; branches found: {all_branches}"
+
+    # Current branch must be fresh from the advanced base
+    current = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+    assert current == "ticket-329-conflict", "must be back on the ticket branch name"
+    assert service._fork_point == advanced_sha, "_fork_point must equal the new base"
+
+    # Working tree is clean: no conflict markers left
+    assert await service.is_clean(), "tree must be clean after the fresh branch creation"
+
+
+async def test_restaurer_ticket_depuis_base_retrouve_et_pose_le_fichier(
+    repo: Path,
+) -> None:
+    """A ticket file present on _base_ref but absent from the tree is restored.
+
+    Simulates a run that moved the ticket to tickets/blocked/ and was cut
+    before committing: the file disappeared from the branch, but its last
+    committed version is reachable from _base_ref.
+    """
+    # Commit the ticket file on main (base)
+    tickets_dir = repo / "tickets" / "blocked"
+    tickets_dir.mkdir(parents=True)
+    ticket_file = tickets_dir / "ticket-027-une-feature.md"
+    ticket_file.write_text("# ticket-027\nstatus: blocked\n", encoding="utf-8")
+    await _git(repo, "add", "tickets/")
+    await _git(repo, "commit", "-q", "-m", "chore: track ticket file")
+    base_sha = await _git_out(repo, "rev-parse", "HEAD")
+
+    # The file is missing from the working tree (run cut before commit)
+    ticket_file.unlink()
+    tickets_dir.rmdir()
+
+    service = GitWorkspaceService(repo)
+    service._base_ref = base_sha  # as initialiser_base_ref would have set it
+
+    restored = await service.restaurer_ticket_depuis_base("ticket-027")
+
+    assert restored is True, "restaurer_ticket_depuis_base must return True on success"
+    expected = repo / "tickets" / "blocked" / "ticket-027-une-feature.md"
+    assert expected.is_file(), "ticket file must be present on disk after restoration"
+    assert "ticket-027" in expected.read_text(encoding="utf-8")
+
+
+async def test_create_branch_a_jour_reprise_sans_changement(repo: Path) -> None:
+    """A branch whose fork point already equals _base_ref is resumed as-is.
+
+    No stale branch must be created, and the coder's previous commits must
+    remain intact on the branch.
+    """
+    # Create the branch and add a commit
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-329", "up-to-date")
+    (repo / "work.py").write_text("z = 3\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-329 — work")
+    commit_sha = await _git_out(repo, "rev-parse", "HEAD")
+    original_base = service._base_ref  # SHA of main before the ticket branch
+
+    # Go back to the base ref so HEAD is there (new service sees it as base)
+    await _git(repo, "checkout", "-q", "-")
+
+    # New service: _base_ref = original_base (same as when the branch was created)
+    service2 = GitWorkspaceService(repo)
+    service2._base_ref = original_base  # identical to the branch's fork point
+
+    await service2.create_branch("ticket-329", "up-to-date")
+
+    # No stale branch should exist
+    all_branches_out = await service2._run("branch", "--list")
+    all_branches = [b.strip().lstrip("* ") for b in all_branches_out.splitlines()]
+    stale_branches = [b for b in all_branches if b.startswith("stale/")]
+    assert not stale_branches, f"no stale branch expected; found: {all_branches}"
+
+    # Coder's commit is still reachable
+    head_sha = await _git_out(repo, "rev-parse", "HEAD")
+    assert head_sha == commit_sha, "previous coder commit must still be HEAD"

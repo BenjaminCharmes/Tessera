@@ -8,7 +8,7 @@ from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.adr import adr_pertinents
 from tessera.services.agent_registry import AgentNotFoundError, AgentRegistryService
-from tessera.services.cost_calculator import calculate_cost
+from tessera.services.cost_calculator import DEFAULT_MODEL, calculate_cost
 from tessera.services.database import save_agent_call
 from tessera.services.providers.base import (
     LLMProvider,
@@ -20,7 +20,7 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-_DEFAULT_MODEL = "claude-sonnet-4-6"
+_DEFAULT_MODEL = DEFAULT_MODEL
 _DEFAULT_MAX_TOKENS = 8192
 
 #: Ce que le reviewer peut faire : lire. Son prompt dit « tu ne modifies

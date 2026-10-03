@@ -20,7 +20,12 @@ interface AgentPanelProps {
   /** Ticket sélectionné, pour afficher ce qu'il a produit (ticket-064). */
   activeTicket?: Ticket | null;
   /** Configuration du pipeline pour la frise d'étapes (ticket-256). */
-  reglages?: Pick<PipelineReglages, "securite_enabled" | "validateur_enabled"> | null;
+  reglages?: Partial<Pick<PipelineReglages, "securite_enabled" | "validateur_enabled" | "testeur_enabled">> | null;
+  /**
+   * Ouvre la vue en lecture seule d'un run terminé (ticket-327).
+   * Transmis à TicketActivity ; absent → le bouton « Revoir le run » reste masqué.
+   */
+  onRevoirRun?: ((runId: string, ticketId: string) => void) | null;
 }
 
 export default function AgentPanel({
@@ -28,6 +33,7 @@ export default function AgentPanel({
   stream,
   activeTicket = null,
   reglages = null,
+  onRevoirRun = null,
 }: AgentPanelProps) {
   const {
     status,
@@ -41,12 +47,13 @@ export default function AgentPanel({
     currentTokens,
     lastResult,
     errorMessage,
-    events,
+    ticketEvents,
     etape,
     etapesEnCours,
     quota,
     pendingQuestion,
     questionExpireA,
+    answerAck,
     runClosed,
     entries,
     answer,
@@ -58,13 +65,15 @@ export default function AgentPanel({
   // L'état décide, les événements enrichissent : un observateur arrivé après
   // le début n'a aucun événement, et le panneau restait vide pendant qu'un run
   // travaillait (ticket-182).
+  // ticketEvents contient uniquement les événements du ticket en cours : dans
+  // une file, les étapes du ticket précédent n'interfèrent plus (ticket-313).
   const { coderStarted, coderDone, reviewerStarted } = blocsDuPanneau(
-    events,
+    ticketEvents,
     currentAgent,
   );
 
   const reviewerContent =
-    events
+    ticketEvents
       .filter((e) => e.type === "agent_done" && e.agent === "reviewer")
       .map((e) =>
         typeof e.data["content"] === "string" ? e.data["content"] : "",
@@ -73,22 +82,22 @@ export default function AgentPanel({
 
   // Compte rendu complet du codeur : rejoué après reconnexion (ticket-216, ADR-041).
   const codeurDoneContent =
-    events
+    ticketEvents
       .filter((e) => e.type === "agent_done" && e.agent === "codeur")
       .map((e) =>
         typeof e.data["content"] === "string" ? e.data["content"] : "",
       )
       .at(-1) ?? "";
 
-  const startTs = events.find((e) => e.type === "agent_started")?.timestamp;
-  const endTs = events.find((e) => e.type === "pipeline_done")?.timestamp;
+  const startTs = ticketEvents.find((e) => e.type === "agent_started")?.timestamp;
+  const endTs = ticketEvents.find((e) => e.type === "pipeline_done")?.timestamp;
   const durationMs =
     startTs && endTs
       ? new Date(endTs).getTime() - new Date(startTs).getTime()
       : undefined;
 
   // Résultat de la livraison, affiché dans PipelineSummary après run_closed (ticket-279).
-  const livraisonEvent = events.find((e) => e.type === "livraison_done");
+  const livraisonEvent = ticketEvents.find((e) => e.type === "livraison_done");
   const livraisonData = livraisonEvent
     ? {
         pr_number:
@@ -155,7 +164,7 @@ export default function AgentPanel({
 
         {(status === "running" || status === "done") && (
           <>
-            <StageStrip etape={etape} etapesEnCours={etapesEnCours} events={events} reglages={reglages} />
+            <StageStrip etape={etape} etapesEnCours={etapesEnCours} events={ticketEvents} reglages={reglages} />
             {currentRound > 0 && <RoundBadge current={currentRound} />}
             {(coutUsd > 0 || outils > 0) && (
               <p className="px-4 pb-1 text-micro text-zinc-500" data-testid="cout-du-run">
@@ -226,6 +235,7 @@ export default function AgentPanel({
       <AgentDialogue
         pendingQuestion={pendingQuestion}
         questionExpireA={questionExpireA}
+        answerAck={answerAck}
         enCours={status === "running" || status === "connecting"}
         onAnswer={answer}
         onInterject={interject}
@@ -237,6 +247,7 @@ export default function AgentPanel({
         projectId={project?.id ?? null}
         ticket={activeTicket}
         branch={lastResult?.branch ?? null}
+        onRevoirRun={onRevoirRun}
       />
     </div>
   );

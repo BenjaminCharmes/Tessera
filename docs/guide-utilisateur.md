@@ -177,6 +177,31 @@ Si ton ticket est petit — juste un test supplémentaire, un renommage, une cor
 
 L'audit sécurité et la validation tournent toujours normalement — ce sont des portes critiques qu'on ne saute jamais. Seule la documentation s'allège.
 
+
+
+#### Exprimer une dépendance entre tickets
+
+Un ticket peut déclarer une dépendance via le champ `depends_on` : une liste d'identifiants d'autres tickets, comme `depends_on: [ticket-305]` ou `depends_on: [ticket-305, ticket-306]`.
+
+Si un ticket dépend d'un autre, l'IDE t'empêche de le lancer tant que la dépendance n'a pas **complètement mergé** — la branche doit être rebasée, la PR ouverte, la CI validée, et la PR fusionnée dans la branche de base.
+
+Un ticket sans dépendance peut commencer pendant que la PR du précédent attend sa CI : tu gagnes en vitesse en les lançant tous d'un coup. Déclare une dépendance uniquement si ton ticket repose vraiment sur le code d'un autre — par exemple, une API qu'on ajoute et le client qui l'utilise.
+
+
+## 3 bis. Filtrer et trouver les tickets
+
+Une fois que tu as plusieurs tickets, tu veux souvent en retrouver un particulier. Le tableau mémorise tes filtres (type, priorité, agent, texte) — ils survivent même au redémarrage de l'IDE.
+
+### Quand un filtre cache des tickets
+
+Si tu vois peu de tickets et que le panneau Tickets n'est pas ouvert, il y a souvent un filtre ancien qui s'applique toujours. Le tableau affiche une ligne au-dessus des colonnes dès qu'un filtre est actif :
+
+- Combien de tickets tu vois versus combien il y en a en total (« 4 tickets sur 297 »)
+- Le nom de chaque filtre appliqué (type design · priorité high)
+- Un bouton **Effacer les filtres** pour tous les enlever d'un coup
+
+Un clic sur ce bouton remet les filtres à zéro — tu verras tous les tickets de nouveau.
+
 # ticket-007 — Ajouter un endpoint de santé
 
 ## Objectif
@@ -251,6 +276,12 @@ Une faille `CRITICAL` ou `HIGH` arrête le pipeline immédiatement : le ticket p
 en `blocked/` et le reviewer n'est même pas appelé.
 
 ---
+
+### Relancer un ticket
+
+Quand tu relances un ticket, sa branche précédente est réutilisée — tu ne perds pas le travail d'avant. Le pipeline la met à jour automatiquement si elle est en retard sur la base du projet, ce qui évite que des changements d'autres tickets n'y causent des conflits imprévus lors de la livraison.
+
+Si le rebasage échoue, l'ancienne branche est renommée `stale/<ancien-nom>` pour que tu ne la perdes pas, et une branche neuve est créée à partir de la base actuelle. Le codeur repartira d'une base propre.
 
 ## 5. Lire ce qui se passe
 
@@ -352,6 +383,18 @@ Un run une fois terminé disparaît de la Supervision après un rechargement ou 
 
 C'est utile pour vérifier les détails d'un run après coup — comment chaque étape s'est déroulée, pourquoi un ticket a terminé bloqué — sans relancer la machine.
 
+
+
+La carte du run affiche maintenant l'**état de la PR** en temps réel, même après fermeture. Si tu as fermé le run pendant que la PR attendait la CI, tu reverras « PR #42 — en attente de CI » la prochaine fois. Une heure plus tard, en rouvrant le run, tu verras « PR #42 mergée ». Si la CI a rejeté la PR, l'IDE affiche le motif de blocage.
+
+Tu peux donc suivre la livraison d'un ticket **après** le run, sans relancer le pipeline ni vérifier GitHub : ouvre juste la carte fermée.
+
+
+Si tu recharges la page durant un run en cours, tu retrouves instantanément tout l'historique — plan, tours précédents, tous les agents qui ont déjà passé. Le frontend rejoue les événements enregistrés en base de données, sans perdre ni dupliquer aucun message. C'est une des sécurités de l'interface : un rechargement accidentel ne coûte rien.
+
+
+Tu retrouves aussi un run depuis le panneau du ticket. Ouvre le ticket — le bouton « Voir le ticket » en haut du run fermé t'y mène — et clique sur « Revoir le run » pour afficher le déroulé complet : plan initial, tous les tours, verdicts du reviewer et du validateur.
+
 ### La frise d'étapes
 
 En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
@@ -369,6 +412,8 @@ La pastille en bleu te dit en un coup d'œil où tu en es, sans lire le log ni q
 
 
 Quand revue et validation tournent ensemble, tu vois deux pastilles bleues actives au même moment : la pastille revue et la pastille validation. Chacune devient verte quand elle approuve, ou rouge si elle refuse. Elles ne finissent pas forcément au même moment : l'une peut passer au vert avant l'autre.
+
+Tu vois l'étape **Tests** dans la frise si ton projet a un testeur. Elle est verte quand la suite réussit, rouge si elle échoue. L'étape n'apparaît que si le projet a un testeur configuré.
 
 ### Le fil du run : tous les verdicts en un seul endroit
 
@@ -402,6 +447,36 @@ Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
 
 
 Quand revue et validation sont parallèles, leurs événements s'entrelaçent dans le fil : le reviewer démarre, puis le validateur démarre, puis des tokens du reviewer, puis des tokens du validateur, etc. Si les deux refusent, tu vois les deux motifs avec le nom de chaque étape.
+
+Une carte **TESTEUR** s'ajoute au fil après chaque passage du codeur. Elle porte le résumé des résultats — `1 error in 2.32s` ou `all pass` — et, dépliée, le détail des erreurs. Si la suite est rouge, elle t'explique : **« retour au codeur, sans revue »** — c'est pourquoi l'étape Tests est rouge et que l'audit de sécurité et la revue ne tourneront pas ce tour.
+
+## 5 ter. Après le run : fusion automatique
+
+Quand le run se termine approuvé, l'IDE :
+- Rebase ta branche sur la branche de base
+- Ouvre une pull request sur GitHub
+- Finit le run — tu vois le badge ✅
+
+Ensuite, la pull request se fusionne seule en arrière-plan :
+- Elle attend les checks CI (tests, qualité de code…)
+- Dès que tout est vert, elle se fusionne automatiquement
+- Le commit arrive sur la branche de base
+
+Tu peux suivre son état en cliquant sur le numéro de PR du ticket ou en consultant l'historique. Aucune action n'est attendue de ta part — tout est automatique.
+
+En mode autonome, le ticket suivant commence immédiatement (le projet n'est plus verrouillé). S'il dépend du précédent (`depends_on`), la file attend la fusion du parent.
+
+Si une étape échoue — conflit de rebase, ou vérification CI — tu vois l'erreur dans le run. La PR n'est ouverte que si la livraison a réussi.
+
+Si la CI échoue, le ticket passe en `blocked` — tu dois corriger le problème et relancer le pipeline. Il n'y a pas de relance automatique.
+
+En mode file (`queue`), un seul merge par projet peut être en cours à la fois. Les tickets suivants attendent que le précédent soit fusionné avant de pouvoir commencer leur propre livraison.
+
+### Si la phase 2 échoue (après le run)
+
+La fusion se poursuit en arrière-plan, après que le run soit terminé. Si elle échoue — conflit de rebase, CI rouge, ou délai dépassé — tu ne resteras pas dans le doute : l'IDE te signale comment elle a fini. Le ticket passe en `blocked` avec la raison explicite.
+
+Le travail du codeur est déjà commité sur la branche du ticket, et la PR est ouverte sur GitHub. Tu peux reprendre manuellement s'il y a un conflit simple, ou relancer le codeur si des modifications sont nécessaires.
 
 ## 6. Récupérer le travail des agents
 
@@ -500,6 +575,18 @@ Lorsque plusieurs agents tournent en parallèle, ceux qui t'attendent — qui on
 
 Si tu choisis une autre carte explicitement pour la lire, ta sélection y reste stable — elle ne bascule pas si un autre run demande quelque chose pendant ce temps.
 
+
+#### Quand ta réponse arrive trop tard
+
+Une question a une durée de vie : passé ce délai (cinq minutes par défaut), l'agent reprend seul en énonçant son hypothèse. Si ta réponse arrive après ce délai, elle n'est pas perdue.
+
+Le backend la dépose comme message spontané — l'agent la trouvera au tour suivant et pourra la lire, même si la question a expiré. L'écran te dit ce qu'il s'est passé :
+
+- **« Réponse transmise »** si elle a rejoint la question à temps
+- **« Réponse déposée pour le tour suivant »** si elle est arrivée tard
+
+Une question expirée s'affiche comme telle : **« Expirée à HH:MM »**, accompagnée de l'hypothèse que l'agent a énoncée pour continuer. C'est un signal : l'agent a poursuivi sans ta réponse, mais il lira ta réponse quand tu l'enverras, au tour suivant.
+
 ### Le chat, hors pipeline
 
 Le chat n'est pas un pipeline. Il sert à décider **quoi** ticketiser, à
@@ -521,6 +608,12 @@ ancienne conversation sans recommencer à zéro.
 
 - **Exécuter des commandes** — aucun outil shell ne lui est donné
 - Lancer un pipeline lui-même : il peut le suggérer, tu décides
+
+#### Fichiers protégés contre toute modification
+
+L'agent ne peut modifier aucun des fichiers système ou de configuration protégés : `CLAUDE.md` (à la racine du projet), `agents.json`, les fichiers du dossier `.claude/`, `.github/workflows/`, ou `.git/`.
+
+Si un ticket demande une modification de ces fichiers, l'agent la refuse et le rapporte clairement : ce qui a été demandé et pourquoi c'est hors de son périmètre. Un refus est **définitif** — l'agent ne cherche jamais un contournement par un script, `python -c`, ou une autre voie. Tu relises ce refus pour clarifier le ticket.
 
 ### Ses écritures sont commitées, pas laissées en vrac
 
@@ -728,6 +821,8 @@ L'arbre de travail du projet était sale au démarrage. C'est un filet de sécur
 quelque chose a modifié des fichiers **suivis** en dehors de Tessera. Committe ou
 annule ces changements, puis repasse le ticket en `todo`.
 
+L'IDE refuse de lancer si ton arbre contient des fichiers modifiés en dehors du pipeline — un `agents.json` changé dans l'écran Agents, ou un journal de pipeline en attente. Le Pipeline log affiche les chemins bloquants, par exemple : « l'arbre contient des modifications hors pipeline : agents.json, tickets/in-progress/ticket-007.md ». Tu **commites** ces fichiers s'ils sont volontaires, ou tu les **annules** (`git restore`) avant de relancer le ticket.
+
 ### Le pipeline tourne mais rien ne change dans les fichiers
 
 Vérifie `LLM_PROVIDER`. Seul le mode `agent_sdk` donne les outils fichier au codeur.
@@ -756,12 +851,25 @@ travaillent à l'aveugle. C'est le fichier le plus rentable à soigner.
 Tes critères d'acceptation sont probablement trop vagues, ou le ticket demande trop
 de choses à la fois. Un ticket = un changement cohérent.
 
+### L'agent refuse une modification de fichier système
+
+Si un rapport d'agent indique qu'une modification a été refusée — par exemple, une tentative de modifier `CLAUDE.md`, `agents.json`, `.claude/`, `.github/workflows/`, ou `.git/` — c'est intentionnel. Ces fichiers sont des garde-fous que l'agent ne peut pas franchir.
+
+Relire le ticket : demandait-il vraiment cette modification, ou y a-t-il une approche différente ? Si tu dois absolument faire cette modification, c'est une tâche manuelle — pas un travail d'agent. Les agents n'essaient jamais de contourner ce refus par une autre méthode. Un refus de ce type est définitif.
+
 ### Les tests échouent alors qu'ils passent chez moi
 
 Le testeur lance la commande configurée dans le pipeline du projet, depuis la racine
 du projet, avec un timeout de 120 s.
 
 ---
+
+
+### La PR s'est ouverte mais le ticket passe en `blocked`
+
+Tu vois la PR ouverte sur GitHub, mais le ticket passe en `blocked` — la phase 2 de la livraison (attente CI, merge) a échoué. La raison est indiquée : conflit de rebase, CI rouge, ou délai dépassé.
+
+Le travail du codeur est toujours sur la branche du ticket, commité et poussé. Rien n'est perdu.
 
 ## Pour aller plus loin
 

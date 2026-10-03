@@ -13,6 +13,7 @@ interface StageInfo {
 /** Ordre canonique des étapes du pipeline. */
 const ETAPES: StageInfo[] = [
   { id: "production", label: "Production" },
+  { id: "tests", label: "Tests" },
   { id: "securite", label: "Sécurité" },
   { id: "revue", label: "Revue" },
   { id: "validation", label: "Validation" },
@@ -42,18 +43,22 @@ function estValidationRefusee(e: OrchestratorEvent): boolean {
  */
 function etapesActives(
   events: OrchestratorEvent[],
-  reglages?: Pick<PipelineReglages, "securite_enabled" | "validateur_enabled"> | null,
+  reglages?: Partial<Pick<PipelineReglages, "securite_enabled" | "validateur_enabled" | "testeur_enabled">> | null,
 ): Set<string> {
   // Production et revue sont toujours actives.
   const actives = new Set<string>(["production", "revue"]);
 
   if (reglages !== undefined && reglages !== null) {
+    if (reglages.testeur_enabled) actives.add("tests");
     if (reglages.securite_enabled) actives.add("securite");
     if (reglages.validateur_enabled) actives.add("validation");
     actives.add("documentation");
     actives.add("livraison");
   } else {
     // Fallback : déduire depuis les événements.
+    if (events.some((e) => e.type === "test_result")) {
+      actives.add("tests");
+    }
     if (events.some((e) => e.type === "security_audit_started" || e.type === "security_audit_done")) {
       actives.add("securite");
     }
@@ -102,6 +107,13 @@ function etatEtape(
       if (events.some((e) => e.type === "security_audit_done" && e.data["verdict"] === "BLOCK"))
         return "rejected";
       if (events.some((e) => e.type === "security_audit_done")) return "done";
+      break;
+    case "tests":
+      // Suite rouge → retour au codeur (rejected) ; suite verte → done (ticket-321).
+      if (events.some((e) => e.type === "test_result" && e.data["passed"] === false))
+        return "rejected";
+      if (events.some((e) => e.type === "test_result" && e.data["passed"] === true))
+        return "done";
       break;
     case "production":
       if (events.some((e) => e.type === "agent_done" && e.agent === "codeur")) return "done";
@@ -195,7 +207,7 @@ interface StageStripProps {
   /** Événements reçus pour enrichir ou suppléer l'état. */
   events: OrchestratorEvent[];
   /** Configuration du pipeline pour filtrer les étapes inactives. */
-  reglages?: Pick<PipelineReglages, "securite_enabled" | "validateur_enabled"> | null;
+  reglages?: Partial<Pick<PipelineReglages, "securite_enabled" | "validateur_enabled" | "testeur_enabled">> | null;
 }
 
 /**

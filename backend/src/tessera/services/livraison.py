@@ -109,7 +109,7 @@ class LivraisonService:
         # commit ne soit laissé sur la branche après le merge (ticket-270).
         self._post_pr_callback = post_pr_callback
 
-    async def livrer(
+    async def livrer_phase_1(
         self,
         *,
         ticket_id: str,
@@ -119,7 +119,12 @@ class LivraisonService:
         branch: str | None,
         approuve: bool,
     ) -> Livraison:
-        """Porte le travail du ticket jusqu'où le projet le permet."""
+        """Rebase, push, and open the PR.
+
+        Returns a Livraison with pr_number set on success, or arret set if
+        anything prevents opening the PR (unapproved, commit level, conflict).
+        The CI wait and merge are handled by livrer_phase_2.
+        """
         etapes: list[str] = []
         durees_ms: list[float] = []
 
@@ -241,11 +246,36 @@ class LivraisonService:
                 ),
             )
 
+        return Livraison(
+            etapes=tuple(etapes),
+            durees_ms=tuple(durees_ms),
+            pr_number=pr_number,
+            arret=None,
+        )
+
+    async def livrer_phase_2(
+        self,
+        pr_number: int,
+        *,
+        ticket_id: str = "",
+    ) -> Livraison:
+        """CI wait and merge.
+
+        Called after livrer_phase_1 has opened the PR. Returns a Livraison
+        with merged=True on success, or arret set if the CI fails or the
+        project does not declare merge autonomy.
+        """
+        etapes: list[str] = []
+        durees_ms: list[float] = []
+
+        niveau = (
+            self._politique.autonomy
+            if self._politique is not None
+            else lire_niveau(self._project_path)
+        )
         if niveau is not NiveauAutonomie.merge:
-            return Livraison(
-                etapes=tuple(etapes), durees_ms=tuple(durees_ms),
-                pr_number=pr_number, arret=None,
-            )
+            # Nothing to do beyond the PR — project declared pr or commit.
+            return Livraison(etapes=(), durees_ms=())
 
         # Attendre une CI que le projet déclare absente, c'est payer le délai
         # complet pour un verdict qui ne viendra pas (ADR-045). Le refus sur
@@ -282,6 +312,45 @@ class LivraisonService:
             )
 
         return await self._merger(pr_number, etapes, durees_ms, ticket_id)
+
+    async def livrer(
+        self,
+        *,
+        ticket_id: str,
+        ticket_title: str,
+        ticket_body: str,
+        ticket_type: str = "",
+        branch: str | None,
+        approuve: bool,
+    ) -> Livraison:
+        """Porte le travail du ticket jusqu'où le projet le permet.
+
+        Chains livrer_phase_1 (rebase, push, PR) and livrer_phase_2 (CI, merge).
+        Existing callers use this method unchanged.
+        """
+        phase1 = await self.livrer_phase_1(
+            ticket_id=ticket_id,
+            ticket_title=ticket_title,
+            ticket_body=ticket_body,
+            ticket_type=ticket_type,
+            branch=branch,
+            approuve=approuve,
+        )
+        # Stop here if phase 1 did not open a PR, or if it stopped on a conflict.
+        if phase1.pr_number is None or phase1.arret is not None:
+            return phase1
+
+        phase2 = await self.livrer_phase_2(phase1.pr_number, ticket_id=ticket_id)
+
+        # Merge the two phases: etapes and durees from both, other fields from phase2.
+        return Livraison(
+            etapes=phase1.etapes + phase2.etapes,
+            durees_ms=phase1.durees_ms + phase2.durees_ms,
+            pr_number=phase1.pr_number,
+            merged=phase2.merged,
+            conflits=phase1.conflits,
+            arret=phase2.arret,
+        )
 
     async def _merger(
         self,

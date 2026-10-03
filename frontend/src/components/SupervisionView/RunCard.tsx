@@ -24,6 +24,11 @@ interface RunCardProps {
    * au champ de réponse dans AgentDialogue (ticket-266).
    */
   onRepondre?: () => void;
+  /**
+   * Ouvre la vue en lecture seule du run terminé (ticket-327).
+   * Présent uniquement si le run est clos et que `run.db_run_id` est renseigné.
+   */
+  onRevoir?: () => void;
 }
 
 const LIBELLE_DU_MODE: Record<string, string> = {
@@ -40,6 +45,7 @@ export default function RunCard({
   onSelect,
   plafondUsd = null,
   onRepondre,
+  onRevoir,
 }: RunCardProps) {
   const attend = etat.pendingQuestion !== null;
   const echoue = etat.status === "error";
@@ -195,6 +201,42 @@ export default function RunCard({
             </Etiquette>
           ) : null}
         </span>
+
+        {/* État CI/merge de la PR livrée — ticket-308.
+            Visible seulement si une PR a été ouverte. Couleurs ADR-026 :
+            amber = attente, green = succès, red = échec. */}
+        {etat.livraisonPrNumber !== null ? (
+          <span className="mt-1.5 block">
+            {etat.ciMerge === null ? (
+              <Etiquette classe="bg-amber-500/20 text-amber-200">
+                PR #{etat.livraisonPrNumber} — en attente de CI
+              </Etiquette>
+            ) : etat.ciMerge.merged ? (
+              <Etiquette classe="bg-green-500/20 text-green-200">
+                PR #{etat.livraisonPrNumber} mergée
+              </Etiquette>
+            ) : (
+              <Etiquette classe="bg-red-500/20 text-red-200">
+                {etat.ciMerge.arret ?? `PR #${etat.livraisonPrNumber} bloquée`}
+              </Etiquette>
+            )}
+          </span>
+        ) : null}
+
+        {/* Bouton d'accès à la vue en lecture seule — ticket-327.
+            Visible uniquement quand le run est clos et que son id en base est connu. */}
+        {etat.runClosed && run.db_run_id && onRevoir ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRevoir();
+            }}
+            className="mt-2 block w-full rounded-sm bg-zinc-700 px-2 py-1 text-xs text-zinc-100 transition-colors hover:bg-zinc-600"
+          >
+            Revoir le run
+          </button>
+        ) : null}
       </span>
     </div>
   );

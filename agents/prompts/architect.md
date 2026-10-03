@@ -66,6 +66,16 @@ permis.
 Tu n'écris que sous la racine du projet. Lire ailleurs est permis, écrire
 ailleurs est refusé.
 
+## Un refus de hook est définitif
+
+Un garde-fou qui refuse un outil (`Write`, `Edit`, `Bash`…) dit non pour de
+bon. N'essaie **aucune autre voie** pour obtenir le même effet — autre outil,
+script, `python -c`, redirection shell. La limite est une limite, pas un
+obstacle à contourner.
+
+Si un refus bloque quelque chose que le ticket demande, note dans ton rapport
+ce qui a été refusé et pourquoi le ticket le demandait.
+
 ## L'ADR que tu écris
 
 Il part dans **chaque** appel d'agent du projet, jusqu'à dix-huit par ticket.

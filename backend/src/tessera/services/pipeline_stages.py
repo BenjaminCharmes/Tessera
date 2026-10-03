@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, Any, Optional
 from tessera.models.agent import AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
-from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
@@ -62,9 +62,30 @@ async def ensure_clean_tree(
         _logger.warning("dirty_check_failed", extra={"error": str(exc)})
         return None
 
-    _logger.warning("dirty_working_tree_refused", extra={"ticket_id": run.ticket_id})
+    fichiers: list[str] = []
+    try:
+        fichiers = await orch._git_workspace.dirty_files()
+    except GitWorkspaceError:
+        pass
+
+    noms = ", ".join(fichiers)
+    arret = (
+        f"l'arbre contient des modifications hors pipeline : {noms}"
+        if noms
+        else "l'arbre contient des modifications hors pipeline"
+    )
+
+    _logger.warning(
+        "dirty_working_tree_refused",
+        extra={"ticket_id": run.ticket_id, "fichiers": fichiers},
+    )
     await set_status(orch, run, TicketStatus.blocked)
-    await emit(run, EventType.ERROR, reason="dirty_working_tree")
+    await emit(
+        run, EventType.ERROR,
+        reason="dirty_working_tree",
+        fichiers=fichiers,
+        arret=arret,
+    )
     return PipelineResult(
         ticket_id=run.ticket_id,
         final_status=TicketStatus.blocked,
@@ -81,9 +102,27 @@ async def create_branch(
     Aligns the base ref with the remote before forking (ticket-285).
     Returns a blocked ``PipelineResult`` when the local base has diverged
     from the remote and the run cannot safely start.
+
+    Commits any pending pipeline bookkeeping (pipeline-log, ticket files)
+    before switching branches: an interrupted delivery may have left them
+    modified in the working tree, causing ``git checkout`` to refuse the
+    switch when the base has a different version of those files (ticket-314).
+    Only Tessera's own bookkeeping paths are staged — code files are not
+    touched.  ``ensure_clean_tree`` still blocks on code modifications before
+    this stage is reached.
     """
     if orch._git_workspace is None:
         return None
+
+    # Commit pending bookkeeping before the branch switch.  Failures here
+    # are logged but not fatal: the following branch creation attempt may
+    # still succeed, and a missing bookkeeping commit is better than a
+    # blocked pipeline when git is not fully configured.
+    try:
+        await orch._git_workspace.commit_bookkeeping()
+    except GitWorkspaceError as exc:
+        _logger.warning("bookkeeping_before_branch_failed", extra={"error": str(exc)})
+
     try:
         # Sync base_branch with remote before forking the ticket branch (ticket-285).
         # A diverged local base blocks the run immediately rather than producing
@@ -105,12 +144,26 @@ async def create_branch(
         )
         await emit(run, EventType.BRANCH_CREATED, branch=run.branch)
         orch._log(f"[{run.ticket_id}] branche {run.branch}")
-    except GitWorkspaceError as exc:
+    except NotAGitRepository:
         # Un projet sans dépôt git reste utilisable : on continue sans
         # garde-fou de branche plutôt que d'interrompre le pipeline.
-        # Volontairement restreint à GitWorkspaceError : une erreur de
-        # programmation doit remonter, pas finir en avertissement.
-        _logger.warning("branch_creation_failed", extra={"error": str(exc)})
+        _logger.warning("branch_creation_no_repo", extra={"ticket_id": run.ticket_id})
+    except GitWorkspaceError as exc:
+        # Any other git error on a real repository: block the run (ADR-037,
+        # ticket-314).  Running a ticket on the wrong branch — or without a
+        # branch at all — lets subsequent commits land on whatever ref was
+        # checked out, mixing unrelated work across tickets.
+        arret = str(exc)
+        _logger.warning("branch_creation_failed", extra={"error": arret})
+        await set_status(orch, run, TicketStatus.blocked)
+        await emit(run, EventType.ERROR, reason=arret)
+        return PipelineResult(
+            ticket_id=run.ticket_id,
+            final_status=TicketStatus.blocked,
+            rounds=0,
+            approved=False,
+            arret=arret,
+        )
     return None
 
 
@@ -378,6 +431,7 @@ async def run_tests(orch: "Orchestrator", run: PipelineRun) -> bool:
             total=result.total,
             failed=result.failed,
             output_summary=result.output_summary,
+            errors=result.errors,
             duration_ms=result.duration_ms,
         )
         badge = "✅" if result.passed else "❌"
@@ -528,6 +582,7 @@ async def run_validation(
             criteria=_extract_criteria(run.ticket.body),
             code_produced=run.reviewed_code + run.artifact_diff,
             test_result=run.test_result,
+            project_root=orch._project_path,
         )
     except Exception as exc:
         # Échoue fermé, comme l'audit : une validation qui n'a pas eu lieu

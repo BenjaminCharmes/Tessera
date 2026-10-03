@@ -72,6 +72,10 @@ class Orchestrator:
         documenter: Optional[Callable[[], Awaitable[Any]]] = None,
         run_recorder: Optional["RunRecorder"] = None,
         carte_du_depot: Optional["CarteDuDepot"] = None,
+        surveiller: Optional[
+            Callable[[str, str, int, "EventCallback"], Awaitable[None]]
+        ] = None,
+        ci_watcher: Optional[Any] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -108,6 +112,12 @@ class Orchestrator:
         # La liste des fichiers suivis, donnée au codeur au premier tour pour
         # qu'il ne la reconstruise pas à coups de `Glob` (ticket-190).
         self._carte_du_depot = carte_du_depot
+        # Confie la phase 2 (attente CI + merge) à `CIWatcher`, sans attendre
+        # (ADR-051). Appelé seulement quand la phase 1 a ouvert une PR.
+        self._surveiller = surveiller
+        # Permet à `run_queue` de savoir quels tickets attendent leur CI,
+        # et d'attendre leur merge avant de démarrer un ticket dépendant.
+        self._ci_watcher = ci_watcher
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -179,6 +189,10 @@ class Orchestrator:
                 ticket_id=ticket_id,
             )
         )
+        # Phase 1 seulement : rebase, push, PR. La phase 2 (attente CI + merge)
+        # est confiée à `CIWatcher` en tâche de fond (ADR-051). Le verrou
+        # (ADR-038) se libère dès que `run_pipeline` rend la main, c'est-à-dire
+        # dès la PR ouverte — pas après le merge.
         livraison = await self._livrer(resultat)
         for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms):
             self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
@@ -191,6 +205,18 @@ class Orchestrator:
                 data=livraison.__dict__,
             )
         )
+        # Si la phase 1 a ouvert une PR sans conflit, confier la phase 2 au
+        # CIWatcher : il attend la CI et merge en arrière-plan. `surveiller`
+        # retourne immédiatement (crée une tâche asyncio), ce qui permet à
+        # `run_pipeline` de rendre la main et au verrou de se libérer avant
+        # que `ci_merge_done` soit émis.
+        if (
+            livraison.pr_number is not None
+            and livraison.arret is None
+            and self._surveiller is not None
+        ):
+            await self._surveiller(project_id, ticket_id, livraison.pr_number, on_event)
+
         return resultat.model_copy(update={"livraison": livraison})
 
     async def _run_enregistre(
@@ -235,6 +261,13 @@ class Orchestrator:
         dialogue: DialogueChannel | None = None,
     ) -> PipelineResult:
         ticket = await self._ticket_svc.get_ticket(ticket_id)
+        if ticket is None and self._git_workspace is not None:
+            # Le fichier ticket a pu être déplacé sans commit lors d'un run
+            # précédent coupé net (ex: blocked/ sans commit). On tente de le
+            # retrouver sur la base distante avant de conclure « introuvable ».
+            restored = await self._git_workspace.restaurer_ticket_depuis_base(ticket_id)
+            if restored:
+                ticket = await self._ticket_svc.get_ticket(ticket_id)
         if ticket is None:
             raise ValueError(f"Ticket introuvable : {ticket_id}")
 
@@ -457,33 +490,40 @@ class Orchestrator:
                 )
                 break
 
-            # Un ticket approuvé dont la livraison n'a pas mergé peut bloquer
-            # un ticket suivant qui en dépend : démarrer sur la pointe du
-            # ticket non mergé le contaminerait (ticket-302).
+            # Si la PR de ce ticket est ouverte et attend la CI :
+            # — avec CIWatcher (ADR-051) : attendre le merge pour les tickets
+            #   dépendants, laisser les indépendants démarrer.
+            # — sans CIWatcher (compatibilité) : arrêter la file si le ticket
+            #   suivant dépend de celui-ci, comme avant ticket-307.
             if (
                 result.livraison is not None
-                and not result.livraison.merged
                 and result.livraison.pr_number is not None
             ):
                 restants = ticket_ids[index:]
-                bloquant = await _trouver_bloquant(
-                    self._ticket_svc, ticket_id, restants, result.livraison.pr_number
-                )
-                if bloquant is not None:
-                    arret, _ = bloquant
-                    self._log(f"[{project_id}] file interrompue : {arret}")
-                    livraison_avec_arret = Livraison(
-                        etapes=result.livraison.etapes,
-                        durees_ms=result.livraison.durees_ms,
-                        arret=arret,
-                        conflits=result.livraison.conflits,
-                        pr_number=result.livraison.pr_number,
-                        merged=result.livraison.merged,
+                if self._ci_watcher is not None:
+                    await _attendre_si_dependant(
+                        self._ticket_svc,
+                        self._ci_watcher,
+                        project_id,
+                        ticket_id,
+                        restants,
                     )
-                    results[-1] = result.model_copy(
-                        update={"livraison": livraison_avec_arret}
+                    self._log(
+                        f"[{project_id}] {ticket_id} PR #{result.livraison.pr_number}"
+                        " confiée au CIWatcher"
                     )
-                    break
+                else:
+                    livraison_bloquee = await _trouver_bloquant(
+                        self._ticket_svc,
+                        ticket_id,
+                        result.livraison.pr_number,
+                        restants,
+                    )
+                    if livraison_bloquee is not None:
+                        results[-1] = results[-1].model_copy(
+                            update={"livraison": livraison_bloquee}
+                        )
+                        break
 
         return results
 
@@ -645,23 +685,48 @@ __all__ = [
 ]
 
 
-async def _trouver_bloquant(
+async def _attendre_si_dependant(
     ticket_svc: TicketService,
+    ci_watcher: Any,
+    project_id: str,
     ticket_id: str,
     restants: list[str],
-    pr_number: int,
-) -> tuple[str, str] | None:
-    """Find the first remaining ticket that depends on an unmerged ticket.
+) -> None:
+    """Await the CI merge for ``ticket_id`` if a remaining ticket depends on it.
 
-    Returns ``(arret_message, dep_ticket_id)`` when a ticket in ``restants``
-    declares ``ticket_id`` in its ``depends_on``, ``None`` otherwise.
+    Walks ``restants`` to find the first ticket that declares ``ticket_id``
+    in its ``depends_on``. When found, suspends until ``CIWatcher`` signals
+    that ``ticket_id`` is no longer in the waiting set (merged or blocked).
+    Tickets without such a dependency are not delayed.
     """
     for tid_dep in restants:
         ticket_dep = await ticket_svc.get_ticket(tid_dep)
         if ticket_dep is not None and ticket_id in ticket_dep.depends_on:
-            return (
-                f"{tid_dep} dépend de {ticket_id} dont la PR #{pr_number} n'a pas été mergée",
-                tid_dep,
+            await ci_watcher.attendre_merge(project_id, ticket_id)
+            return
+
+
+async def _trouver_bloquant(
+    ticket_svc: TicketService,
+    ticket_id: str,
+    pr_number: int,
+    restants: list[str],
+) -> "Livraison | None":
+    """Return a blocking Livraison when a remaining ticket depends on ``ticket_id``.
+
+    Fallback used when CIWatcher is not wired (pre-ADR-051 deployments or
+    tests that don't use the background watcher). When a dependent ticket is
+    found, the returned livraison carries an ``arret`` that names the blocker;
+    the caller stops the queue. Returns None when the queue may continue.
+    """
+    for tid_suivant in restants:
+        ticket_suivant = await ticket_svc.get_ticket(tid_suivant)
+        if ticket_suivant is not None and ticket_id in ticket_suivant.depends_on:
+            return Livraison(
+                arret=(
+                    f"{tid_suivant} dépend de {ticket_id} "
+                    f"dont la PR #{pr_number} n'est pas encore mergée."
+                )
             )
     return None
 

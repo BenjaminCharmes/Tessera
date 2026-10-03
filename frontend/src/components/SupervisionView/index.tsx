@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import RunCard from "./RunCard";
 import ServicesLances from "./ServicesLances";
 import AgentPanel from "../AgentPanel";
+import RunHistorique from "../StatsView/RunHistorique";
 import { INITIAL } from "../../hooks/streamState";
 import type { UseRunActifResult } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
@@ -40,6 +42,9 @@ export default function SupervisionView({
 }: SupervisionViewProps) {
   const { runs, selection, selectionner, etatDe } = supervision;
   const limites = useLimites();
+
+  // Run affiché en lecture seule — ticket-327.
+  const [revisuRun, setRevisuRun] = useState<{ runId: string; ticketId: string } | null>(null);
 
   // Les runs qui attendent une réponse passent en tête (ticket-266).
   const runsTries = [...runs].sort((a, b) => {
@@ -92,28 +97,50 @@ export default function SupervisionView({
       ) : (
         <div className="grid min-h-0 flex-1 grid-cols-[minmax(240px,340px)_1fr] overflow-hidden">
           <div className="flex flex-col gap-2 overflow-y-auto border-r border-zinc-800 p-3">
-            {runsTries.map((run) => (
-              <RunCard
-                key={run.run_id}
-                run={run}
-                etat={etatDe(run.run_id)}
-                selectionne={run.run_id === selectionne?.run_id}
-                onSelect={() => selectionner(run.run_id)}
-                plafondUsd={limites?.run_max_budget_usd ?? null}
-                onRepondre={
-                  etatDe(run.run_id).pendingQuestion !== null
-                    ? () => repondre(run.run_id)
-                    : undefined
-                }
-              />
-            ))}
+            {runsTries.map((run) => {
+              const etat = etatDe(run.run_id);
+              return (
+                <RunCard
+                  key={run.run_id}
+                  run={run}
+                  etat={etat}
+                  selectionne={run.run_id === selectionne?.run_id}
+                  onSelect={() => {
+                    setRevisuRun(null);
+                    selectionner(run.run_id);
+                  }}
+                  plafondUsd={limites?.run_max_budget_usd ?? null}
+                  onRepondre={
+                    etat.pendingQuestion !== null
+                      ? () => repondre(run.run_id)
+                      : undefined
+                  }
+                  onRevoir={
+                    etat.runClosed && run.db_run_id && run.ticket_id
+                      ? () =>
+                          setRevisuRun({
+                            runId: run.db_run_id as string,
+                            ticketId: run.ticket_id as string,
+                          })
+                      : undefined
+                  }
+                />
+              );
+            })}
           </div>
 
           <div className="min-h-0 overflow-hidden">
-            {selectionne ? (
+            {revisuRun ? (
+              <RunHistorique
+                runId={revisuRun.runId}
+                ticketId={revisuRun.ticketId}
+                onClose={() => setRevisuRun(null)}
+              />
+            ) : selectionne ? (
               <AgentPanel
                 project={projetDuRun(projects, selectionne)}
                 stream={projeter(supervision, selectionne.run_id)}
+                onRevoirRun={(runId, ticketId) => setRevisuRun({ runId, ticketId })}
               />
             ) : null}
           </div>

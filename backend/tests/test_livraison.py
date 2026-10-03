@@ -392,7 +392,7 @@ async def test_failing_pendant_le_delai_de_grace_arrete_immediatement(
 
 
 async def test_livraison_sync_base_avant_rebase(tmp_path: Path) -> None:
-    """Livraison calls sync_base_depuis_distant before rejoyer_sur (ticket-285).
+    """Livraison calls sync_base_depuis_distant before rejouer_sur (ticket-285).
 
     The rebase in livraison must happen on the remote-synced base, not on
     whatever the local branch currently points to.
@@ -406,4 +406,83 @@ async def test_livraison_sync_base_avant_rebase(tmp_path: Path) -> None:
     assert g.syncs == ["develop"], (
         "sync_base_depuis_distant must be called once with the base branch"
     )
-    assert g.rejoue == ["develop"], "rejoyer_sur must follow the sync"
+    assert g.rejoue == ["develop"], "rejouer_sur must follow the sync"
+
+
+# ------------------------------------------------------------------
+# livrer_phase_1 et livrer_phase_2 — ticket-305
+# ------------------------------------------------------------------
+
+
+async def _phase_1(svc: LivraisonService, approuve: bool = True) -> Livraison:
+    return await svc.livrer_phase_1(
+        ticket_id="ticket-001",
+        ticket_title="T",
+        ticket_body="",
+        branch="ticket-001-x",
+        approuve=approuve,
+    )
+
+
+async def test_phase_1_produit_memes_etapes_et_durees_que_livrer_jusqu_a_la_pr(
+    tmp_path: Path,
+) -> None:
+    """livrer_phase_1 rend les mêmes étapes que livrer() jusqu'à l'ouverture de la PR."""
+    svc_phase, _g1, _w1 = _service(tmp_path / "phase", "pr")
+    svc_livrer, _g2, _w2 = _service(tmp_path / "livrer", "pr")
+
+    phase1 = await _phase_1(svc_phase)
+    livraison = await _livrer(svc_livrer)
+
+    # Les étapes jusqu'à la PR sont identiques.
+    assert phase1.etapes == livraison.etapes
+    assert phase1.pr_number == livraison.pr_number
+    assert phase1.arret is None
+
+
+async def test_phase_1_conflit_non_resolvable_arrete_sans_pr(tmp_path: Path) -> None:
+    """Un rebase en conflit arrête la phase 1 avec un arret, sans PR."""
+    svc, _git, workflow = _service(
+        tmp_path, "merge", git=_FauxGit(conflits=("src/app.py",))
+    )
+
+    phase1 = await _phase_1(svc)
+
+    assert phase1.pr_number is None
+    assert phase1.arret is not None
+    assert "src/app.py" in phase1.arret
+    assert workflow.ouvertures == []
+
+
+async def test_phase_1_autonomy_commit_ne_pousse_rien(tmp_path: Path) -> None:
+    """Sur autonomy: commit, la phase 1 ne pousse rien et rend un arret."""
+    svc, git, workflow = _service(tmp_path, "commit")
+
+    phase1 = await _phase_1(svc)
+
+    assert git.rejoue == []
+    assert workflow.ouvertures == []
+    assert phase1.arret is not None
+    assert "agents.json" in phase1.arret
+
+
+async def test_phase_2_merge_apres_ci_verte(tmp_path: Path) -> None:
+    """livrer_phase_2 merge la PR quand la CI est verte."""
+    svc, _git, workflow = _service(tmp_path, "merge")
+
+    phase2 = await svc.livrer_phase_2(pr_number=7, ticket_id="ticket-001")
+
+    assert phase2.merged is True
+    assert workflow.merges == [7]
+    assert phase2.arret is None
+
+
+async def test_phase_2_autonomy_pr_ne_merge_pas(tmp_path: Path) -> None:
+    """livrer_phase_2 est un no-op quand le projet déclare autonomy: pr."""
+    svc, _git, workflow = _service(tmp_path, "pr")
+
+    phase2 = await svc.livrer_phase_2(pr_number=7)
+
+    assert phase2.merged is False
+    assert workflow.merges == []
+    assert phase2.arret is None

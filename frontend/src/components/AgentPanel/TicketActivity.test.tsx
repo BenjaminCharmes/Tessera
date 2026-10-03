@@ -237,6 +237,132 @@ describe("TicketActivity — raison d'un blocage (ticket-218)", () => {
   });
 });
 
+describe("TicketActivity — Revoir le run (ticket-327)", () => {
+  it("affiche le bouton sur un run terminé quand onRevoirRun est fourni", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [
+        {
+          id: "run-xyz",
+          started_at: "2026-09-01T10:00:00Z",
+          finished_at: "2026-09-01T10:10:00Z",
+          rounds: 1,
+          approved: true,
+          final_status: "done",
+          total_cost_usd: 0.1,
+        },
+      ],
+      pr_number: null,
+      github_remote: null,
+    });
+
+    const handleRevoir = vi.fn();
+    render(
+      <TicketActivity
+        projectId="mon-projet"
+        ticket={ticket}
+        branch={null}
+        onRevoirRun={handleRevoir}
+      />,
+    );
+
+    const btn = await screen.findByRole("button", { name: /Revoir le run/ });
+    expect(btn).toBeInTheDocument();
+  });
+
+  it("appelle onRevoirRun avec le runId et le ticketId au clic", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [
+        {
+          id: "run-xyz",
+          started_at: "2026-09-01T10:00:00Z",
+          finished_at: "2026-09-01T10:10:00Z",
+          rounds: 1,
+          approved: true,
+          final_status: "done",
+          total_cost_usd: 0.1,
+        },
+      ],
+      pr_number: null,
+      github_remote: null,
+    });
+
+    const handleRevoir = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <TicketActivity
+        projectId="mon-projet"
+        ticket={ticket}
+        branch={null}
+        onRevoirRun={handleRevoir}
+      />,
+    );
+
+    await user.click(await screen.findByRole("button", { name: /Revoir le run/ }));
+
+    expect(handleRevoir).toHaveBeenCalledWith("run-xyz", "ticket-042");
+  });
+
+  it("n'affiche pas le bouton quand onRevoirRun est absent", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [
+        {
+          id: "run-xyz",
+          started_at: "2026-09-01T10:00:00Z",
+          finished_at: "2026-09-01T10:10:00Z",
+          rounds: 1,
+          approved: true,
+          final_status: "done",
+          total_cost_usd: 0.1,
+        },
+      ],
+      pr_number: null,
+      github_remote: null,
+    });
+
+    render(
+      <TicketActivity projectId="mon-projet" ticket={ticket} branch={null} />,
+    );
+
+    await waitFor(() => expect(screen.getByText("approuvé")).toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+
+  it("n'affiche pas le bouton sur un run sans finished_at", async () => {
+    vi.spyOn(api.tickets, "activity").mockResolvedValue({
+      ticket_id: "ticket-042",
+      runs: [
+        {
+          id: "run-live",
+          started_at: "2026-09-01T10:00:00Z",
+          finished_at: null,
+          rounds: null,
+          approved: null,
+          final_status: null,
+          total_cost_usd: 0.0,
+        },
+      ],
+      pr_number: null,
+      github_remote: null,
+    });
+
+    const handleRevoir = vi.fn();
+    render(
+      <TicketActivity
+        projectId="mon-projet"
+        ticket={ticket}
+        branch={null}
+        onRevoirRun={handleRevoir}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByText("en cours")).toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+});
+
 describe("TicketActivity — jusqu'où le projet laisse aller (ticket-082)", () => {
   it("dit que le merge reste manuel là où rien n'est déclaré", async () => {
     vi.spyOn(api.tickets, "activity").mockResolvedValue({

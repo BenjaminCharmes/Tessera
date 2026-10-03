@@ -528,3 +528,66 @@ def test_l_archive_n_est_importee_nulle_part() -> None:
         assert "decisions-archive" not in texte, (
             f"{claude_md} importe l'archive : elle repartirait dans chaque appel"
         )
+
+
+# ------------------------------------------------------------------
+# Traçabilité contraintes.md — ticket-311
+# ------------------------------------------------------------------
+
+
+def _audit_classement() -> dict[str, str]:
+    """Retourne {ADR-xxx: classement} depuis adr-audit.md."""
+    chemin = _RACINE / "projects/ide-core/memory/adr-audit.md"
+    if not chemin.exists():
+        return {}
+    contenu = chemin.read_text(encoding="utf-8")
+    result: dict[str, str] = {}
+    for m in re.finditer(
+        r"^\|\s*(\d+)\s*\|[^|]*\|\s*(règle|fusion|histoire|obsolète)\s*\|",
+        contenu,
+        re.MULTILINE,
+    ):
+        numero = f"ADR-{m.group(1).zfill(3)}"
+        result[numero] = m.group(2).strip()
+    return result
+
+
+def test_tracabilite_chaque_regle_sans_portee_est_citee_dans_contraintes() -> None:
+    """Tout ADR classé « règle » ou « fusion » sans **Portée** est cité dans contraintes.md.
+
+    La portée d'un ADR le réserve à certains rôles. Sans portée, la règle
+    vaut pour tous — et elle doit donc apparaître dans contraintes.md, le
+    fichier qui remplace decisions.md dans le prompt des agents.
+    Une règle absente de contraintes.md serait silencieusement ignorée.
+    """
+    from tessera.services.adr import decouper, portee_de
+
+    decisions = _lire("projects/ide-core/memory/decisions.md")
+    audit = _audit_classement()
+    contraintes = _lire("projects/ide-core/memory/contraintes.md")
+
+    assert audit, "adr-audit.md vide ou introuvable"
+    assert contraintes, "contraintes.md vide ou introuvable"
+
+    blocs = {b.numero: b for b in decouper(decisions)}
+    # ADRs classés « règle » ou « fusion » sans portée dans decisions.md
+    a_verifier = {
+        numero
+        for numero, classement in audit.items()
+        if classement in ("règle", "fusion")
+        and numero in blocs
+        and portee_de(blocs[numero]) is None
+    }
+    manquants = sorted(n for n in a_verifier if n not in contraintes)
+
+    assert manquants == [], (
+        f"ADR règle/fusion sans portée absents de contraintes.md : {manquants}"
+    )
+
+
+def test_contraintes_md_tient_sous_12000_caracteres() -> None:
+    taille = len(_lire("projects/ide-core/memory/contraintes.md"))
+
+    assert taille <= 12_000, (
+        f"contraintes.md : {taille} caractères pour 12 000 permis"
+    )

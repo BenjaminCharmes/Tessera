@@ -107,6 +107,74 @@ describe("RunCard — titre du ticket (ticket-286)", () => {
   });
 });
 
+describe("RunCard — état CI de la PR livrée (ticket-308)", () => {
+  it("affiche en attente de CI quand livraison_done est reçu mais pas ci_merge_done", () => {
+    // ADR-026 : amber pour l'attente.
+    render(
+      <RunCard
+        run={run()}
+        etat={{ ...INITIAL, runClosed: true, livraisonPrNumber: 42, ciMerge: null }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("PR #42 — en attente de CI")).toBeInTheDocument();
+    expect(screen.getByText("PR #42 — en attente de CI").className).toMatch(/amber/);
+  });
+
+  it("affiche 'PR #N mergée' apres ci_merge_done avec merged: true", () => {
+    // ADR-026 : green pour le succès.
+    render(
+      <RunCard
+        run={run()}
+        etat={{
+          ...INITIAL,
+          runClosed: true,
+          livraisonPrNumber: 42,
+          ciMerge: { merged: true, arret: null },
+        }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("PR #42 mergée")).toBeInTheDocument();
+    expect(screen.getByText("PR #42 mergée").className).toMatch(/green/);
+  });
+
+  it("affiche l'arret apres ci_merge_done avec merged: false", () => {
+    // ADR-026 : red pour l'échec.
+    render(
+      <RunCard
+        run={run()}
+        etat={{
+          ...INITIAL,
+          runClosed: true,
+          livraisonPrNumber: 7,
+          ciMerge: { merged: false, arret: "CI rouge : la PR #7 reste ouverte." },
+        }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("CI rouge : la PR #7 reste ouverte.")).toBeInTheDocument();
+    expect(screen.getByText("CI rouge : la PR #7 reste ouverte.").className).toMatch(/red/);
+  });
+
+  it("n'affiche rien de CI quand livraisonPrNumber est null", () => {
+    // Pas de PR ouverte : ni attente, ni résultat.
+    render(
+      <RunCard
+        run={run()}
+        etat={{ ...INITIAL, runClosed: true, livraisonPrNumber: null, ciMerge: null }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText(/en attente de CI/)).toBeNull();
+    expect(screen.queryByText(/mergée/)).toBeNull();
+  });
+});
+
 describe("RunCard — coût en direct (ticket-197)", () => {
   it("montre le cout, les appels et les outils depuis l'instantane", () => {
     // Un F5 pendant le run doit retrouver le cumul, pas repartir de zéro.
@@ -125,5 +193,81 @@ describe("RunCard — coût en direct (ticket-197)", () => {
       <RunCard run={run({ cout_usd: 4.6, appels: 2, outils: 0 })} etat={INITIAL} selectionne={false} onSelect={vi.fn()} plafondUsd={5} />,
     );
     expect(screen.getByText(/4,60 \$ .* sur 5,00 \$/)).toHaveClass("text-red-200");
+  });
+});
+
+describe("RunCard — Revoir le run (ticket-327)", () => {
+  it("affiche le bouton quand le run est clos, db_run_id connu et onRevoir fourni", () => {
+    const onRevoir = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={vi.fn()}
+        onRevoir={onRevoir}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /Revoir le run/ })).toBeInTheDocument();
+  });
+
+  it("appelle onRevoir au clic sans propager la sélection", async () => {
+    const { default: userEvent } = await import("@testing-library/user-event");
+    const onRevoir = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={onSelect}
+        onRevoir={onRevoir}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /Revoir le run/ }));
+
+    expect(onRevoir).toHaveBeenCalledOnce();
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("n'affiche pas le bouton quand le run n'est pas clos", () => {
+    const onRevoir = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: false }}
+        selectionne={false}
+        onSelect={vi.fn()}
+        onRevoir={onRevoir}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+
+  it("n'affiche pas le bouton quand db_run_id est absent", () => {
+    const onRevoir = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: undefined })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={vi.fn()}
+        onRevoir={onRevoir}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+
+  it("n'affiche pas le bouton quand onRevoir est absent", () => {
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
   });
 });

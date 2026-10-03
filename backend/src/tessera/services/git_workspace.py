@@ -353,10 +353,135 @@ class GitWorkspaceService:
             # aucune ref à tenir, et les branches créées avant ce correctif
             # sont couvertes aussi (ticket-208).
             self._fork_point = await self._merge_base(branch_name)
+            # Si la branche diverge de la base actuelle (relance après que
+            # develop a avancé), rejouer avant de donner la main au codeur
+            # plutôt qu'envoyer une PR sur une base périmée (ticket-329).
+            if (
+                self._fork_point is not None
+                and self._base_ref is not None
+                and self._fork_point != self._base_ref
+            ):
+                await self._rejouer_branche_en_retard(branch_name)
         else:
             await self._run("checkout", "-b", branch_name, self._base_ref)
             self._fork_point = self._base_ref
         return branch_name
+
+    async def _rejouer_branche_en_retard(self, branch_name: str) -> None:
+        """Rebase ``branch_name`` (already checked out) on the current base ref.
+
+        Called when a resumed branch's fork point is behind ``_base_ref``.
+        On success the branch is up to date and ``_fork_point`` is updated.
+        On conflict the rebase is aborted, the stale branch is preserved under
+        ``stale/<name>`` and a fresh branch is created from ``_base_ref``.
+        """
+        assert self._base_ref is not None  # guaranteed by the caller
+        _logger.info(
+            "branche_en_retard_rejeu",
+            extra={
+                "branche": branch_name,
+                "fork_point": (self._fork_point or "")[:7],
+                "base": self._base_ref[:7],
+            },
+        )
+        conflits = await self.rejouer_sur(self._base_ref)
+        if not conflits:
+            # Rebase réussi : le point de départ est maintenant la base actuelle.
+            self._fork_point = self._base_ref
+            _logger.info("branche_en_retard_rejouee", extra={"branche": branch_name})
+            return
+
+        # Conflit irrécupérable : conserver l'ancienne branche sous stale/…
+        # pour ne rien perdre et repartir proprement depuis la base.
+        stale_name = await self._choisir_nom_stale(branch_name)
+        await self._run("branch", "-m", branch_name, stale_name)
+        _logger.warning(
+            "branche_en_retard_renommee_stale",
+            extra={
+                "ancienne": branch_name,
+                "stale": stale_name,
+                "conflits": conflits,
+            },
+        )
+        await self._run("checkout", "-b", branch_name, self._base_ref)
+        self._fork_point = self._base_ref
+        _logger.info(
+            "branche_neuve_depuis_base",
+            extra={"branche": branch_name, "base": self._base_ref[:7]},
+        )
+
+    async def _choisir_nom_stale(self, branch_name: str) -> str:
+        """Return ``stale/<branch>`` or ``stale/<branch>-<n>`` if the former exists."""
+        candidat = f"stale/{branch_name}"
+        if not await self._branch_exists(candidat):
+            return candidat
+        n = 1
+        while n < 100:  # noqa: PLR2004 — borne de sécurité, pas une constante métier
+            candidat = f"stale/{branch_name}-{n}"
+            if not await self._branch_exists(candidat):
+                return candidat
+            n += 1
+        # Cas extrêmement improbable : on repasse 100 fois sur le même ticket.
+        return f"stale/{branch_name}-{n}"
+
+    async def restaurer_ticket_depuis_base(self, ticket_id: str) -> bool:
+        """Restore a ticket file from ``_base_ref`` when it is absent from the tree.
+
+        Searches every file under ``tickets/`` on the base ref and writes the
+        first one whose name contains ``ticket_id`` to disk.  Returns True when
+        a file was restored, False when nothing was found or ``_base_ref`` is
+        not set (method is safe to call unconditionally).
+        """
+        if self._base_ref is None:
+            return False
+
+        try:
+            prefix = (await self._run("rev-parse", "--show-prefix")).strip()
+        except GitCommandError:
+            return False
+
+        # Chemin du dossier tickets/ depuis la racine du dépôt.
+        tickets_root = f"{prefix}tickets/" if prefix else "tickets/"
+        try:
+            listing = await self._run(
+                "ls-tree", "-r", "--name-only", self._base_ref, "--", tickets_root
+            )
+        except GitCommandError:
+            return False
+
+        for path_in_repo in listing.splitlines():
+            path_in_repo = path_in_repo.strip()
+            if not path_in_repo:
+                continue
+            if ticket_id not in Path(path_in_repo).name:
+                continue
+
+            # Lit le contenu depuis l'historique.
+            try:
+                content = await self._run("show", f"{self._base_ref}:{path_in_repo}")
+            except GitCommandError:
+                continue
+
+            # Chemin relatif au projet (strip du prefix si on est dans un sous-dossier).
+            if prefix and path_in_repo.startswith(prefix):
+                rel_path = path_in_repo[len(prefix):]
+            else:
+                rel_path = path_in_repo
+
+            dest = self._project_path / rel_path
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(content, encoding="utf-8")
+            _logger.info(
+                "ticket_restaure_depuis_base",
+                extra={
+                    "ticket_id": ticket_id,
+                    "chemin": rel_path,
+                    "base": self._base_ref[:7],
+                },
+            )
+            return True
+
+        return False
 
     async def advance_base_ref(self) -> None:
         """Move the base ref to the current HEAD, so the next ticket builds on it.
@@ -1021,6 +1146,27 @@ class GitWorkspaceService:
             await self._run("reset", "-q", "--", *chemins)
         except GitCommandError as exc:
             _logger.warning("index_non_restaure", extra={"erreur": str(exc)})
+
+    async def dirty_files(self) -> list[str]:
+        """Return tracked files modified outside Tessera's own bookkeeping.
+
+        Same narrowing as ``is_clean``: restricted to tracked modifications
+        (``--untracked-files=no``), with orchestrator-artifact and run-policy
+        paths excluded.  Returns the list of files that would cause
+        ``is_clean`` to return ``False``.
+        """
+        status = await self._run("status", "--porcelain", "--untracked-files=no")
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        fichiers: list[str] = []
+        for line in status.splitlines():
+            if len(line) < 3:  # noqa: PLR2004
+                continue
+            path = line[3:]
+            if prefixe and path.startswith(prefixe):
+                path = path[len(prefixe):]
+            if not _is_orchestrator_artifact_path(path) and not _is_run_policy_path(path):
+                fichiers.append(path)
+        return fichiers
 
     async def is_clean(self) -> bool:
         """Return True when tracked files outside Tessera's bookkeeping have no changes.

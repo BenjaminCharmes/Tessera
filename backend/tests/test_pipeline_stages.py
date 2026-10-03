@@ -11,7 +11,7 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import pipeline_stages as stages
-from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
+from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
 
@@ -26,6 +26,19 @@ async def _git(cwd: Path, *args: str) -> None:
     )
     _, stderr = await proc.communicate()
     assert proc.returncode == 0, stderr.decode()
+
+
+async def _git_out(cwd: Path, *args: str) -> str:
+    """Helper: run a git command and return its stdout."""
+    proc = await asyncio.create_subprocess_exec(
+        "git", *args,
+        cwd=str(cwd),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    assert proc.returncode == 0, stderr.decode()
+    return stdout.decode().strip()
 
 
 def _ticket(**kwargs: object) -> Ticket:
@@ -106,6 +119,9 @@ async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
         async def is_clean(self) -> bool:
             return False
 
+        async def dirty_files(self) -> list[str]:
+            return []
+
     class _TicketSvc:
         def __init__(self) -> None:
             self.statuses: list[TicketStatus] = []
@@ -124,6 +140,33 @@ async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
     assert result.rounds == 0
     assert svc.statuses == [TicketStatus.blocked]
     assert any(e.type == EventType.ERROR for e in events)
+
+
+async def test_ensure_clean_tree_porte_la_liste_des_fichiers_dans_l_evenement_error() -> None:
+    """The error event carries the list of blocking files (ticket-323)."""
+    class _DirtyGit:
+        async def is_clean(self) -> bool:
+            return False
+
+        async def dirty_files(self) -> list[str]:
+            return ["src/feature.py", "README.md"]
+
+    class _TicketSvc:
+        async def update_status(self, ticket_id: str, status: TicketStatus) -> None:
+            pass
+
+    events: list[OrchestratorEvent] = []
+    orch = _Orch(_git_workspace=_DirtyGit(), _ticket_svc=_TicketSvc())
+
+    result = await stages.ensure_clean_tree(orch, _run(events))
+
+    assert result is not None
+    error_events = [e for e in events if e.type == EventType.ERROR]
+    assert len(error_events) == 1
+    fichiers = error_events[0].data.get("fichiers")
+    assert isinstance(fichiers, list)
+    assert "src/feature.py" in fichiers
+    assert "README.md" in fichiers
 
 
 async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> None:
@@ -177,21 +220,31 @@ async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie
 
 async def test_create_branch_degrade_sans_depot_git() -> None:
     # Un projet sans dépôt git reste utilisable : on continue sans branche.
+    # NotAGitRepository est la seule erreur qui autorise ce repli (ticket-314).
     class _NoRepoGit:
+        async def commit_bookkeeping(self) -> None:
+            pass
+
         async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
             return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:
-            raise GitCommandError(command=["git", "checkout"], returncode=128, stderr="not a repo")
+            raise NotAGitRepository(
+                command=["git", "checkout"], returncode=128, stderr="not a git repository"
+            )
 
     run = _run()
-    await stages.create_branch(_Orch(_git_workspace=_NoRepoGit()), run)
+    result = await stages.create_branch(_Orch(_git_workspace=_NoRepoGit()), run)
 
+    assert result is None
     assert run.branch is None
 
 
 async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
     class _Git:
+        async def commit_bookkeeping(self) -> None:
+            pass
+
         async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
             return None
 
@@ -204,6 +257,164 @@ async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
 
     assert run.branch == "ticket-001-slug"
     assert [e.type for e in events] == [EventType.BRANCH_CREATED]
+
+
+async def test_create_branch_git_command_error_bloque_le_run() -> None:
+    """A GitCommandError from create_branch blocks the run — ticket-314, criterion 1.
+
+    Only ``NotAGitRepository`` allows continuing without a branch.  Any other
+    git failure on a real repository must stop the pipeline so that the coder
+    agent never runs on the wrong branch.
+    """
+    class _GitAvecErreur:
+        async def commit_bookkeeping(self) -> None:
+            pass
+
+        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+            return None
+
+        async def create_branch(self, ticket_id: str, slug: str) -> str:
+            raise GitCommandError(
+                command=["git", "checkout", "-b"],
+                returncode=1,
+                stderr=(
+                    "error: Your local changes to the following files would be "
+                    "overwritten by checkout:\n        code.py\nAborting"
+                ),
+            )
+
+    svc = _Tickets()
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    result = await stages.create_branch(
+        _Orch(_git_workspace=_GitAvecErreur(), _ticket_svc=svc), run
+    )
+
+    assert result is not None
+    assert result.final_status is TicketStatus.blocked
+    assert result.approved is False
+    assert result.arret is not None
+    assert "overwritten" in result.arret
+    assert run.branch is None
+    assert TicketStatus.blocked in svc.statuts
+    assert any(e.type == EventType.ERROR for e in events)
+
+
+async def test_create_branch_commit_bookkeeping_avant_le_checkout(
+    tmp_path: Path,
+) -> None:
+    """Pending bookkeeping is committed before the branch switch — ticket-314, criterion 3.
+
+    Reproduces the real failure: pipeline-log.md is modified in the working
+    tree, and the base (develop) has a different version of it.  Without the
+    fix, ``git checkout -b`` refuses the switch.  With it, the log is committed
+    first and the new branch is created successfully.
+    """
+    root = tmp_path / "repo"
+    root.mkdir()
+    await _git(root, "init", "-q")
+    await _git(root, "config", "user.email", "test@tessera.local")
+    await _git(root, "config", "user.name", "Tessera test")
+
+    # Initial commit: pipeline-log at version A (represents develop state)
+    (root / "memory").mkdir()
+    (root / "memory" / "pipeline-log.md").write_text("# log\n", encoding="utf-8")
+    (root / "code.py").write_text("x = 1\n", encoding="utf-8")
+    await _git(root, "add", ".")
+    await _git(root, "commit", "-q", "-m", "init")
+    initial_sha = await _git_out(root, "rev-parse", "HEAD")
+
+    # Ticket-016 branch: pipeline-log at version B (differs from A on develop)
+    await _git(root, "checkout", "-q", "-b", "ticket-016-old-feat")
+    (root / "memory" / "pipeline-log.md").write_text(
+        "# log\n- ticket 016\n", encoding="utf-8"
+    )
+    await _git(root, "add", "memory/pipeline-log.md")
+    await _git(root, "commit", "-q", "-m", "ticket 016 work")
+
+    # Interrupted delivery left pipeline-log uncommitted at version C
+    (root / "memory" / "pipeline-log.md").write_text(
+        "# log\n- ticket 016\n- delivery note\n", encoding="utf-8"
+    )
+
+    # Workspace on ticket-016, base_ref forced to the initial commit (like develop)
+    workspace = GitWorkspaceService(root)
+    workspace._base_ref = initial_sha  # type: ignore[assignment]
+
+    class _Svc:
+        async def update_status(self, ticket_id: str, status: TicketStatus) -> None:
+            pass
+
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    result = await stages.create_branch(
+        _Orch(_git_workspace=workspace, _ticket_svc=_Svc()), run
+    )
+
+    # Branch was created: bookkeeping commit cleared the obstacle
+    assert result is None, "Branch creation should succeed after committing bookkeeping"
+    assert run.branch is not None
+
+    # The pipeline-log modification was committed on the previous branch
+    await _git(root, "checkout", "-q", "ticket-016-old-feat")
+    log_content = (root / "memory" / "pipeline-log.md").read_text(encoding="utf-8")
+    assert "delivery note" in log_content, (
+        "Bookkeeping should have been committed on the previous branch"
+    )
+
+
+async def test_create_branch_fichier_code_modifie_bloque(tmp_path: Path) -> None:
+    """A modified code file still blocks branch creation — ticket-314, criterion 4.
+
+    ``commit_bookkeeping`` only stages Tessera's own artifact paths.  A code
+    file left dirty in the working tree causes the checkout to fail, and the
+    resulting ``GitCommandError`` produces a blocked result.  The code file
+    itself is never swept into a bookkeeping commit.
+    """
+    root = tmp_path / "repo"
+    root.mkdir()
+    await _git(root, "init", "-q")
+    await _git(root, "config", "user.email", "test@tessera.local")
+    await _git(root, "config", "user.name", "Tessera test")
+
+    # Initial commit: code.py at version A (represents develop state)
+    (root / "code.py").write_text("x = 1\n", encoding="utf-8")
+    await _git(root, "add", ".")
+    await _git(root, "commit", "-q", "-m", "init")
+    initial_sha = await _git_out(root, "rev-parse", "HEAD")
+
+    # Ticket-016 branch: code.py at version B
+    await _git(root, "checkout", "-q", "-b", "ticket-016-with-code")
+    (root / "code.py").write_text("x = 2\n", encoding="utf-8")
+    await _git(root, "add", "code.py")
+    await _git(root, "commit", "-q", "-m", "ticket 016 code change")
+
+    # Uncommitted modification to code.py (version C — differs from A on develop)
+    (root / "code.py").write_text("x = 3\n", encoding="utf-8")
+
+    # Workspace on ticket-016, base_ref forced to the initial commit
+    workspace = GitWorkspaceService(root)
+    workspace._base_ref = initial_sha  # type: ignore[assignment]
+
+    svc = _Tickets()
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    result = await stages.create_branch(
+        _Orch(_git_workspace=workspace, _ticket_svc=svc), run
+    )
+
+    # Branch creation must be blocked: checkout would overwrite code.py
+    assert result is not None
+    assert result.final_status is TicketStatus.blocked
+    assert result.arret is not None
+    assert run.branch is None
+    assert TicketStatus.blocked in svc.statuts
+
+    # code.py was NOT committed by commit_bookkeeping: it is still dirty
+    status_out = await _git_out(root, "status", "--porcelain", "--untracked-files=no")
+    assert any("code.py" in line for line in status_out.splitlines()), (
+        "code.py should still be modified (not committed by commit_bookkeeping)"
+    )
 
 
 # ------------------------------------------------------------------

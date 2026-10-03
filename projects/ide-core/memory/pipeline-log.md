@@ -867,3 +867,396 @@ Points positifs :
 - 2026-10-02 04:16:53 UTC — [ticket-291] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-051 est bien rédigé et couvre les exige (192641ms)
 - 2026-10-02 04:16:53 UTC — [ticket-291] APPROVED après 3 tour(s)
 - 2026-10-02 04:18:56 UTC — [ticket-291] documentation: 0 fichier(s) (121171ms)
+- 2026-10-02 07:19:23 UTC — [ticket-310] branche ticket-310-design-audit-the-adrs-and-draft-the-short-constra
+- 2026-10-02 07:19:23 UTC — [ticket-310] tour 1 — codeur démarré
+- 2026-10-02 07:28:57 UTC — [ticket-310] tour 1 — architect terminé (573656ms)
+- 2026-10-02 07:36:01 UTC — [ticket-310] testeur: \u276f src/components/SupervisionView/SupervisionView.test.tsx:118:50
+- 2026-10-02 07:36:01 UTC — [ticket-310] tests rouges au tour 1
+- 2026-10-02 07:36:01 UTC — [ticket-310] tour 2 — codeur démarré
+- 2026-10-02 07:39:25 UTC — [ticket-310] tour 2 — architect terminé (203375ms)
+- 2026-10-02 07:45:02 UTC — [ticket-310] testeur: OK (exit 0)
+- 2026-10-02 07:45:11 UTC — [ticket-310] securite: PASS — Le diff ajoute trois fichiers Markdown de documentation (adr-audit.md, contraint (8921ms)
+- 2026-10-02 07:45:11 UTC — [ticket-310] tour 2 — reviewer démarré
+- 2026-10-02 07:46:38 UTC — [ticket-310] tour 2 — reviewer terminé (86342ms)
+- 2026-10-02 07:51:00 UTC — [ticket-310] validateur: APPROVED — Le travail sépare efficacement le journal des décisions (`decisions.md`, 51 ADR  (348859ms)
+- 2026-10-02 07:51:00 UTC — [ticket-310] APPROVED après 2 tour(s)
+- 2026-10-02 07:51:39 UTC — [ticket-310] documentation: 0 fichier(s) (36983ms)
+- 2026-10-02 07:54:46 UTC — [ticket-310] livraison: arrêt — Livraison interrompue : 
+- 2026-10-02 07:54:46 UTC — [ticket-305] branche ticket-305-delivery-splits-in-two-rebase-push-and-pr-in-the
+- 2026-10-02 07:54:46 UTC — [ticket-305] tour 1 — codeur démarré
+- 2026-10-02 08:00:00 UTC — [ticket-305] tour 1 — codeur terminé (314077ms)
+- 2026-10-02 08:06:02 UTC — [ticket-305] testeur: OK (exit 0)
+- 2026-10-02 08:06:35 UTC — [ticket-305] securite: PASS — Aucune vulnérabilité détectée. Ce diff implémente une refacto de la méthode `liv (32843ms)
+- 2026-10-02 08:06:35 UTC — [ticket-305] tour 1 — reviewer démarré
+- 2026-10-02 08:08:04 UTC — [ticket-305] tour 1 — reviewer terminé (89187ms)
+- 2026-10-02 08:09:35 UTC — [ticket-305] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été modifié pour extra (180313ms)
+- 2026-10-02 08:09:35 UTC — [ticket-305] APPROVED après 1 tour(s)
+- 2026-10-02 08:13:35 UTC — [ticket-305] documentation: 2 fichier(s) (237702ms)
+- 2026-10-02 08:26:31 UTC — [ticket-314] branche ticket-314-a-run-never-continues-without-its-branch-in-a-git
+- 2026-10-02 08:26:31 UTC — [ticket-314] tour 1 — codeur démarré
+- 2026-10-02 08:43:19 UTC — [ticket-314] tour 1 — codeur terminé (1007125ms)
+- 2026-10-02 08:45:56 UTC — [ticket-314] testeur: 1 failed, 957 passed, 2 deselected, 5 warnings in 154.32s (0:02:34)
+- 2026-10-02 08:45:56 UTC — [ticket-314] tests rouges au tour 1
+- 2026-10-02 08:45:56 UTC — [ticket-314] tour 2 — codeur démarré
+- 2026-10-02 08:46:21 UTC — [ticket-314] tour 2 — codeur terminé (25391ms)
+- 2026-10-02 08:51:28 UTC — [ticket-314] testeur: OK (exit 0)
+- 2026-10-02 08:51:50 UTC — [ticket-314] securite: PASS — Audit de sécurité complet du diff — aucune vulnérabilité détectée.
+
+**Analyse de (21546ms)
+- 2026-10-02 08:51:50 UTC — [ticket-314] tour 2 — reviewer démarré
+- 2026-10-02 08:52:24 UTC — [ticket-314] INTERROMPU au tour 2 — ResultError: Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1)
+- 2026-10-02 08:53:22 UTC — [ticket-314] branche ticket-314-a-run-never-continues-without-its-branch-in-a-git
+- 2026-10-02 08:53:23 UTC — [ticket-314] tour 1 — codeur démarré
+- 2026-10-02 09:03:01 UTC — [ticket-314] tour 1 — codeur terminé (578217ms)
+- 2026-10-02 09:08:14 UTC — [ticket-314] testeur: OK (exit 0)
+- 2026-10-02 09:08:43 UTC — [ticket-314] securite: PASS — Audit du diff pipeline_stages.py + tests : aucune vulnérabilité critique, haute  (28186ms)
+- 2026-10-02 09:08:43 UTC — [ticket-314] tour 1 — reviewer démarré
+- 2026-10-02 09:10:08 UTC — [ticket-314] tour 1 — reviewer terminé (85594ms)
+- 2026-10-02 09:13:17 UTC — [ticket-314] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (274031ms)
+- 2026-10-02 09:13:17 UTC — [ticket-314] APPROVED après 1 tour(s)
+- 2026-10-02 09:15:43 UTC — [ticket-314] documentation: 1 fichier(s) (142907ms)
+- 2026-10-02 09:20:16 UTC — [ticket-306] branche ticket-306-ciwatcher-waits-for-ci-and-merges-in-the-backgrou
+- 2026-10-02 09:21:30 UTC — [ticket-306] plan rendu (73016ms)
+- 2026-10-02 09:21:30 UTC — [ticket-306] tour 1 — codeur démarré
+- 2026-10-02 09:32:26 UTC — [ticket-306] tour 1 — codeur terminé (656609ms)
+- 2026-10-02 09:37:50 UTC — [ticket-306] testeur: OK (exit 0)
+- 2026-10-02 09:38:11 UTC — [ticket-306] securite: PASS — Audit complet : le diff ajoute un service `CIWatcher` pour surveiller CI et merg (20641ms)
+- 2026-10-02 09:38:11 UTC — [ticket-306] tour 1 — reviewer démarré
+- 2026-10-02 09:38:51 UTC — [ticket-306] tour 1 — reviewer terminé (40516ms)
+- 2026-10-02 09:42:47 UTC — [ticket-306] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le code implémente correctement (276859ms)
+- 2026-10-02 09:42:47 UTC — [ticket-306] APPROVED après 1 tour(s)
+- 2026-10-02 09:46:30 UTC — [ticket-306] documentation: 1 fichier(s) (220046ms)
+- 2026-10-02 09:50:16 UTC — [ticket-307] branche ticket-307-a-run-frees-its-project-once-the-pr-is-open-and-a
+- 2026-10-02 09:52:58 UTC — [ticket-307] plan rendu (162500ms)
+- 2026-10-02 09:52:58 UTC — [ticket-307] tour 1 — codeur démarré
+- 2026-10-02 10:15:02 UTC — [ticket-307] tour 1 — codeur terminé (1324014ms)
+- 2026-10-02 10:16:01 UTC — [ticket-307] testeur: 1 failed, 516 passed, 2 deselected, 5 warnings in 56.06s
+- 2026-10-02 10:16:01 UTC — [ticket-307] tests rouges au tour 1
+- 2026-10-02 10:16:01 UTC — [ticket-307] tour 2 — codeur démarré
+- 2026-10-02 10:23:50 UTC — [ticket-307] tour 2 — codeur terminé (469217ms)
+- 2026-10-02 10:24:50 UTC — [ticket-307] testeur: 1 failed, 518 passed, 2 deselected, 5 warnings in 57.14s
+- 2026-10-02 10:24:50 UTC — [ticket-307] tests rouges au tour 2
+- 2026-10-02 10:24:50 UTC — [ticket-307] tour 3 — codeur démarré
+- 2026-10-02 10:27:57 UTC — [ticket-307] tour 3 — codeur terminé (186936ms)
+- 2026-10-02 10:31:36 UTC — [ticket-307] testeur: Found 1 error in 1 file (checked 101 source files)
+- 2026-10-02 10:31:36 UTC — [ticket-307] tests rouges au tour 3
+- 2026-10-02 10:31:36 UTC — [ticket-307] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-02 10:33:17 UTC — [ticket-307] branche ticket-307-a-run-frees-its-project-once-the-pr-is-open-and-a
+- 2026-10-02 10:38:10 UTC — [ticket-307] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (25) (exit code: 1))
+- 2026-10-02 10:38:10 UTC — [ticket-307] tour 1 — codeur démarré
+- 2026-10-02 10:44:49 UTC — [ticket-307] tour 1 — codeur terminé (398717ms)
+- 2026-10-02 10:49:50 UTC — [ticket-307] testeur: OK (exit 0)
+- 2026-10-02 10:50:49 UTC — [ticket-307] securite: PASS — No critical or high-severity vulnerabilities detected. Code quality is good: pro (59516ms)
+- 2026-10-02 10:50:49 UTC — [ticket-307] tour 1 — reviewer démarré
+- 2026-10-02 10:54:13 UTC — [ticket-307] tour 1 — reviewer terminé (203656ms)
+- 2026-10-02 10:57:33 UTC — [ticket-307] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (403391ms)
+- 2026-10-02 10:57:33 UTC — [ticket-307] CHANGES_REQUESTED tour 1: Reviewer : Avec 7 tours utilisés, j'ai suffisamment d'éléments pour trancher.
+
+---
+
+CHANGES_REQUESTE
+- 2026-10-02 10:57:33 UTC — [ticket-307] tour 2 — codeur démarré
+- 2026-10-02 10:59:13 UTC — [ticket-307] tour 2 — codeur terminé (99875ms)
+- 2026-10-02 11:04:50 UTC — [ticket-307] testeur: OK (exit 0)
+- 2026-10-02 11:05:22 UTC — [ticket-307] securite: PASS — Diff audité pour ticket-307 (ADR-051) : implémentation de la phase 2 (attente CI (32202ms)
+- 2026-10-02 11:05:22 UTC — [ticket-307] tour 2 — reviewer démarré
+- 2026-10-02 11:07:10 UTC — [ticket-307] tour 2 — reviewer terminé (107827ms)
+- 2026-10-02 11:11:21 UTC — [ticket-307] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. L'implémentation sépare correct (359156ms)
+- 2026-10-02 11:11:21 UTC — [ticket-307] APPROVED après 2 tour(s)
+- 2026-10-02 11:14:12 UTC — [ticket-307] documentation: 0 fichier(s) (168843ms)
+- 2026-10-02 11:18:15 UTC — [ticket-308] branche ticket-308-a-closed-run-s-card-says-its-pr-is-waiting-for-ci
+- 2026-10-02 11:18:15 UTC — [ticket-308] tour 1 — codeur démarré
+- 2026-10-02 11:30:25 UTC — [ticket-308] tour 1 — codeur terminé (729968ms)
+- 2026-10-02 11:35:57 UTC — [ticket-308] testeur: OK (exit 0)
+- 2026-10-02 11:36:21 UTC — [ticket-308] securite: PASS — Aucune vulnérabilité de sécurité détectée.
+
+Le diff ajoute l'affichage de l'état (23891ms)
+- 2026-10-02 11:36:21 UTC — [ticket-308] tour 1 — reviewer démarré
+- 2026-10-02 11:37:51 UTC — [ticket-308] tour 1 — reviewer terminé (90516ms)
+- 2026-10-02 11:40:26 UTC — [ticket-308] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (244858ms)
+- 2026-10-02 11:40:26 UTC — [ticket-308] APPROVED après 1 tour(s)
+- 2026-10-02 11:43:16 UTC — [ticket-308] documentation: 2 fichier(s) (168312ms)
+- 2026-10-02 11:47:35 UTC — [ticket-313] branche ticket-313-in-a-queue-each-ticket-starts-with-a-clean-stage
+- 2026-10-02 11:51:41 UTC — [ticket-313] plan rendu (245827ms)
+- 2026-10-02 11:51:41 UTC — [ticket-313] tour 1 — codeur démarré
+- 2026-10-02 12:04:40 UTC — [ticket-313] tour 1 — codeur terminé (779233ms)
+- 2026-10-02 12:08:49 UTC — [ticket-313] testeur: src/components/AgentPanel/index.tsx(44,5): error TS6133: 'events' is declared but its value is never read.
+- 2026-10-02 12:08:49 UTC — [ticket-313] tests rouges au tour 1
+- 2026-10-02 12:08:49 UTC — [ticket-313] tour 2 — codeur démarré
+- 2026-10-02 12:10:31 UTC — [ticket-313] tour 2 — codeur terminé (102077ms)
+- 2026-10-02 12:15:46 UTC — [ticket-313] testeur: OK (exit 0)
+- 2026-10-02 12:16:07 UTC — [ticket-313] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée.
+
+Ce diff refactorise la gesti (21686ms)
+- 2026-10-02 12:16:07 UTC — [ticket-313] tour 2 — reviewer démarré
+- 2026-10-02 12:17:35 UTC — [ticket-313] tour 2 — reviewer terminé (87906ms)
+- 2026-10-02 12:20:54 UTC — [ticket-313] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas de f (286406ms)
+- 2026-10-02 12:20:54 UTC — [ticket-313] APPROVED après 2 tour(s)
+- 2026-10-02 12:23:12 UTC — [ticket-313] documentation: 1 fichier(s) (135843ms)
+- 2026-10-02 12:28:52 UTC — [ticket-312] branche ticket-312-the-pricing-grid-and-the-default-models-move-to-t
+- 2026-10-02 12:28:52 UTC — [ticket-312] tour 1 — codeur démarré
+- 2026-10-02 12:33:14 UTC — [ticket-312] tour 1 — codeur terminé (261578ms)
+- 2026-10-02 12:38:29 UTC — [ticket-312] testeur: OK (exit 0)
+- 2026-10-02 12:38:49 UTC — [ticket-312] securite: PASS — Aucune vulnérabilité détectée. Ce diff refactorise la gestion du modèle LLM par  (20343ms)
+- 2026-10-02 12:38:49 UTC — [ticket-312] tour 1 — reviewer démarré
+- 2026-10-02 12:39:54 UTC — [ticket-312] tour 1 — reviewer terminé (64672ms)
+- 2026-10-02 12:41:49 UTC — [ticket-312] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie la grille de pri (180202ms)
+- 2026-10-02 12:41:49 UTC — [ticket-312] APPROVED après 1 tour(s)
+- 2026-10-02 12:43:11 UTC — [ticket-312] documentation: 1 fichier(s) (79968ms)
+- 2026-10-02 13:04:47 UTC — [ticket-316] branche ticket-316-the-validator-also-receives-the-current-content-o
+- 2026-10-02 13:05:41 UTC — [ticket-316] plan rendu (53842ms)
+- 2026-10-02 13:05:41 UTC — [ticket-316] tour 1 — codeur démarré
+- 2026-10-02 13:15:28 UTC — [ticket-316] tour 1 — codeur terminé (586515ms)
+- 2026-10-02 13:15:32 UTC — [ticket-316] testeur: 1 error in 2.32s
+- 2026-10-02 13:15:32 UTC — [ticket-316] tests rouges au tour 1
+- 2026-10-02 13:15:32 UTC — [ticket-316] tour 2 — codeur démarré
+- 2026-10-02 13:42:27 UTC — [ticket-316] tour 2 — codeur terminé (1614561ms)
+- 2026-10-02 13:42:57 UTC — [ticket-316] testeur: 1 failed, 192 passed, 2 deselected, 5 warnings in 28.34s
+- 2026-10-02 13:42:57 UTC — [ticket-316] tests rouges au tour 2
+- 2026-10-02 13:42:57 UTC — [ticket-316] tour 3 — codeur démarré
+- 2026-10-02 13:44:23 UTC — [ticket-316] tour 3 — codeur terminé (85952ms)
+- 2026-10-02 13:50:02 UTC — [ticket-316] testeur: OK (exit 0)
+- 2026-10-02 13:50:24 UTC — [ticket-316] securite: BLOCK — Une vulnérabilité **HIGH** de path traversal détectée dans `_find_file_in_projec (21281ms)
+- 2026-10-02 13:52:43 UTC — [ticket-316] branche ticket-316-the-validator-also-receives-the-current-content-o
+- 2026-10-02 13:53:48 UTC — [ticket-316] plan rendu (64983ms)
+- 2026-10-02 13:53:48 UTC — [ticket-316] tour 1 — codeur démarré
+- 2026-10-02 13:56:14 UTC — [ticket-316] tour 1 — codeur terminé (146358ms)
+- 2026-10-02 14:01:03 UTC — [ticket-316] testeur: OK (exit 0)
+- 2026-10-02 14:01:43 UTC — [ticket-316] securite: PASS — Audit de sécurité du diff — aucune vulnérabilité OWASP Top 10 détectée.
+
+Les nou (39750ms)
+- 2026-10-02 14:01:43 UTC — [ticket-316] tour 1 — reviewer démarré
+- 2026-10-02 14:03:29 UTC — [ticket-316] tour 1 — reviewer terminé (106453ms)
+- 2026-10-02 14:04:13 UTC — [ticket-316] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le validateur peut maintenant l (149609ms)
+- 2026-10-02 14:04:13 UTC — [ticket-316] APPROVED après 1 tour(s)
+- 2026-10-02 14:06:31 UTC — [ticket-316] documentation: 1 fichier(s) (136563ms)
+- 2026-10-02 14:06:43 UTC — [ticket-318] branche ticket-318-the-board-shows-when-remembered-filters-hide-tick
+- 2026-10-02 14:06:43 UTC — [ticket-318] tour 1 — codeur démarré
+- 2026-10-02 14:10:22 UTC — [ticket-318] tour 1 — codeur terminé (218766ms)
+- 2026-10-02 14:15:07 UTC — [ticket-318] testeur: OK (exit 0)
+- 2026-10-02 14:15:33 UTC — [ticket-318] securite: PASS — Code frontend TypeScript/React pour un bandeau de filtres (ticket-318). Aucune v (25250ms)
+- 2026-10-02 14:15:33 UTC — [ticket-318] tour 1 — reviewer démarré
+- 2026-10-02 14:17:03 UTC — [ticket-318] tour 1 — reviewer terminé (90311ms)
+- 2026-10-02 14:17:49 UTC — [ticket-318] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent correctement (135843ms)
+- 2026-10-02 14:17:49 UTC — [ticket-318] APPROVED après 1 tour(s)
+- 2026-10-02 14:19:51 UTC — [ticket-318] documentation: 1 fichier(s) (120608ms)
+- 2026-10-02 14:20:16 UTC — [ticket-318] livraison: arrêt — Conflit avec develop sur : projects/ide-core/memory/pipeline-log.md. La branche est restée intacte, 
+- 2026-10-02 14:20:17 UTC — [ticket-311] branche ticket-311-agents-read-the-short-constraints-file-instead-of
+- 2026-10-02 14:22:16 UTC — [ticket-311] plan rendu (118688ms)
+- 2026-10-02 14:22:16 UTC — [ticket-311] tour 1 — codeur démarré
+- 2026-10-02 14:33:42 UTC — [ticket-311] tour 1 — codeur terminé (685906ms)
+- 2026-10-02 14:38:27 UTC — [ticket-311] testeur: OK (exit 0)
+- 2026-10-02 14:39:02 UTC — [ticket-311] securite: PASS — Audit du diff — refactorisation de services/adr.py pour supporter contraintes.md (35234ms)
+- 2026-10-02 14:39:02 UTC — [ticket-311] tour 1 — reviewer démarré
+- 2026-10-02 14:40:15 UTC — [ticket-311] tour 1 — reviewer terminé (72797ms)
+- 2026-10-02 14:44:48 UTC — [ticket-311] validateur: CHANGES_REQUESTED — Le code du backend intègre correctement les deux formats (decisions.md et contra (346172ms)
+- 2026-10-02 14:44:48 UTC — [ticket-311] CHANGES_REQUESTED tour 1: Reviewer : Je vais commencer par examiner les fichiers clés créés ou modifiés pour ce ticket.Mainten
+- 2026-10-02 14:44:48 UTC — [ticket-311] tour 2 — codeur démarré
+- 2026-10-02 14:46:44 UTC — [ticket-311] tour 2 — codeur terminé (115797ms)
+- 2026-10-02 14:52:21 UTC — [ticket-311] testeur: OK (exit 0)
+- 2026-10-02 14:52:46 UTC — [ticket-311] securite: PASS — Refactorisation de sécurité : migration de `decisions.md` (journal ADR complet)  (25155ms)
+- 2026-10-02 14:52:46 UTC — [ticket-311] tour 2 — reviewer démarré
+- 2026-10-02 14:54:38 UTC — [ticket-311] tour 2 — reviewer terminé (112187ms)
+- 2026-10-02 14:58:18 UTC — [ticket-311] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente correctement (332250ms)
+- 2026-10-02 14:58:18 UTC — [ticket-311] APPROVED après 2 tour(s)
+- 2026-10-02 14:59:41 UTC — [ticket-311] documentation: 0 fichier(s) (80656ms)
+- 2026-10-02 12:43:26 UTC — [ticket-315] branche ticket-315-merging-without-ci-waits-until-github-knows-wheth
+- 2026-10-02 12:43:27 UTC — [ticket-315] tour 1 — codeur démarré
+- 2026-10-02 12:53:49 UTC — [ticket-315] tour 1 — codeur terminé (621983ms)
+- 2026-10-02 12:58:46 UTC — [ticket-315] testeur: OK (exit 0)
+- 2026-10-02 12:59:14 UTC — [ticket-315] securite: PASS — Le diff introduit deux nouvelles méthodes pour gérer la fusion de PRs avec atten (27514ms)
+- 2026-10-02 12:59:14 UTC — [ticket-315] tour 1 — reviewer démarré
+- 2026-10-02 13:01:23 UTC — [ticket-315] tour 1 — reviewer terminé (128483ms)
+- 2026-10-02 13:02:01 UTC — [ticket-315] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests associés couvrent cor (167125ms)
+- 2026-10-02 13:02:01 UTC — [ticket-315] APPROVED après 1 tour(s)
+- 2026-10-02 13:03:27 UTC — [ticket-315] documentation: 1 fichier(s) (84077ms)
+- 2026-10-02 13:04:47 UTC — [ticket-315] livraison: arrêt — Conflit avec develop sur : projects/ide-core/memory/pipeline-log.md. La branche est restée intacte, 
+- 2026-10-02 20:00:58 UTC — [ticket-326] branche ticket-326-an-agent-never-works-around-a-guard-s-refusal-it
+- 2026-10-02 20:00:59 UTC — [ticket-326] tour 1 — codeur démarré
+- 2026-10-02 20:08:47 UTC — [ticket-326] tour 1 — codeur terminé (468390ms)
+- 2026-10-02 20:15:17 UTC — [ticket-326] testeur: OK (exit 0)
+- 2026-10-02 20:15:46 UTC — [ticket-326] securite: PASS — Ce diff améliore la sécurité du système de perímètre. Il ajoute une détection he (29125ms)
+- 2026-10-02 20:15:46 UTC — [ticket-326] tour 1 — reviewer démarré
+- 2026-10-02 20:17:14 UTC — [ticket-326] tour 1 — reviewer terminé (88156ms)
+- 2026-10-02 20:19:38 UTC — [ticket-326] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les fichiers promps ont été mis  (231750ms)
+- 2026-10-02 20:19:38 UTC — [ticket-326] APPROVED après 1 tour(s)
+- 2026-10-02 20:22:07 UTC — [ticket-326] documentation: 1 fichier(s) (147016ms)
+- 2026-10-02 20:22:21 UTC — [ticket-319] branche ticket-319-agents-get-their-shell-on-windows-tessera-finds-g
+- 2026-10-02 20:22:21 UTC — [ticket-319] tour 1 — codeur démarré
+- 2026-10-02 20:29:53 UTC — [ticket-319] tour 1 — codeur terminé (451407ms)
+- 2026-10-02 20:30:15 UTC — [ticket-319] testeur: 1 failed, 200 passed, 2 deselected, 5 warnings in 17.89s
+- 2026-10-02 20:30:15 UTC — [ticket-319] tests rouges au tour 1
+- 2026-10-02 20:30:15 UTC — [ticket-319] tour 2 — codeur démarré
+- 2026-10-02 20:30:52 UTC — [ticket-319] tour 2 — codeur terminé (37077ms)
+- 2026-10-02 20:37:52 UTC — [ticket-319] testeur: OK (exit 0)
+- 2026-10-02 20:38:15 UTC — [ticket-319] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une résolution de chemin Git Bash  (22780ms)
+- 2026-10-02 20:38:15 UTC — [ticket-319] tour 2 — reviewer démarré
+- 2026-10-02 20:39:07 UTC — [ticket-319] tour 2 — reviewer terminé (51969ms)
+- 2026-10-02 20:41:13 UTC — [ticket-319] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la détection (178219ms)
+- 2026-10-02 20:41:13 UTC — [ticket-319] APPROVED après 2 tour(s)
+- 2026-10-02 20:51:40 UTC — [ticket-324] branche ticket-324-the-first-ticket-of-a-queue-shows-its-title-to-a
+- 2026-10-02 20:51:40 UTC — [ticket-324] tour 1 — codeur démarré
+- 2026-10-02 20:57:21 UTC — [ticket-324] tour 1 — codeur terminé (340672ms)
+- 2026-10-02 21:05:24 UTC — [ticket-324] testeur: OK (exit 0)
+- 2026-10-02 21:05:42 UTC — [ticket-324] securite: PASS — Aucune vulnérabilité détectée.
+
+**Observations:**
+- **Python (run_executor.py)** (18391ms)
+- 2026-10-02 21:05:42 UTC — [ticket-324] tour 1 — reviewer démarré
+- 2026-10-02 21:07:27 UTC — [ticket-324] tour 1 — reviewer terminé (104250ms)
+- 2026-10-02 21:08:03 UTC — [ticket-324] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests backend et frontend  (140563ms)
+- 2026-10-02 21:08:03 UTC — [ticket-324] APPROVED après 1 tour(s)
+- 2026-10-02 21:10:18 UTC — [ticket-324] documentation: 1 fichier(s) (132515ms)
+- 2026-10-02 21:10:34 UTC — [ticket-325] branche ticket-325-reloading-the-page-rebuilds-a-running-run-s-view
+- 2026-10-02 21:12:34 UTC — [ticket-325] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (25) (exit code: 1))
+- 2026-10-02 21:12:34 UTC — [ticket-325] tour 1 — codeur démarré
+- 2026-10-02 21:24:01 UTC — [ticket-325] tour 1 — codeur terminé (687203ms)
+- 2026-10-02 21:30:51 UTC — [ticket-325] testeur: OK (exit 0)
+- 2026-10-02 21:31:27 UTC — [ticket-325] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un champ `db_run_id` au modèle de  (35702ms)
+- 2026-10-02 21:31:27 UTC — [ticket-325] tour 1 — reviewer démarré
+- 2026-10-02 21:32:36 UTC — [ticket-325] tour 1 — reviewer terminé (68765ms)
+- 2026-10-02 21:35:15 UTC — [ticket-325] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests backend et frontend c (228546ms)
+- 2026-10-02 21:35:15 UTC — [ticket-325] APPROVED après 1 tour(s)
+- 2026-10-02 21:38:13 UTC — [ticket-325] documentation: 2 fichier(s) (174515ms)
+- 2026-10-02 21:38:26 UTC — [ticket-320] branche ticket-320-an-answer-sent-after-its-question-expired-is-not
+- 2026-10-02 21:38:26 UTC — [ticket-320] tour 1 — codeur démarré
+- 2026-10-02 21:45:27 UTC — [ticket-320] tour 1 — codeur terminé (420342ms)
+- 2026-10-02 21:50:57 UTC — [ticket-320] testeur: ✖ 1 problem (1 error, 0 warnings)
+- 2026-10-02 21:50:57 UTC — [ticket-320] tests rouges au tour 1
+- 2026-10-02 21:50:57 UTC — [ticket-320] tour 2 — codeur démarré
+- 2026-10-02 21:52:40 UTC — [ticket-320] tour 2 — codeur terminé (102296ms)
+- 2026-10-02 21:59:00 UTC — [ticket-320] testeur: OK (exit 0)
+- 2026-10-02 21:59:28 UTC — [ticket-320] securite: PASS — Audit complet du diff ticket-320 (accusé de réception d'une réponse utilisateur) (27921ms)
+- 2026-10-02 21:59:28 UTC — [ticket-320] tour 2 — reviewer démarré
+- 2026-10-02 22:01:01 UTC — [ticket-320] tour 2 — reviewer terminé (92766ms)
+- 2026-10-02 22:03:04 UTC — [ticket-320] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le code gère corr (215703ms)
+- 2026-10-02 22:03:04 UTC — [ticket-320] APPROVED après 2 tour(s)
+- 2026-10-02 22:04:51 UTC — [ticket-320] documentation: 2 fichier(s) (104327ms)
+- 2026-10-02 22:05:04 UTC — [ticket-321] branche ticket-321-the-testeur-shows-in-the-run-view-a-tests-stage-a
+- 2026-10-02 22:05:04 UTC — [ticket-321] tour 1 — codeur démarré
+- 2026-10-02 22:11:35 UTC — [ticket-321] tour 1 — codeur terminé (390672ms)
+- 2026-10-02 22:17:52 UTC — [ticket-321] testeur: OK (exit 0)
+- 2026-10-02 22:18:21 UTC — [ticket-321] securite: PASS — Audit du diff pour le ticket-321 (ajout de l'étape Tests au pipeline). Aucune vu (28860ms)
+- 2026-10-02 22:18:21 UTC — [ticket-321] tour 1 — reviewer démarré
+- 2026-10-02 22:19:26 UTC — [ticket-321] tour 1 — reviewer terminé (64281ms)
+- 2026-10-02 22:20:53 UTC — [ticket-321] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : les tests vérifient correctement  (151797ms)
+- 2026-10-02 22:20:53 UTC — [ticket-321] CHANGES_REQUESTED tour 1: Validateur : Les quatre premiers critères sont satisfaits : les tests vérifient correctement le comp
+- 2026-10-02 22:20:53 UTC — [ticket-321] tour 2 — codeur démarré
+- 2026-10-02 22:21:38 UTC — [ticket-321] tour 2 — codeur terminé (44531ms)
+- 2026-10-02 22:28:01 UTC — [ticket-321] testeur: OK (exit 0)
+- 2026-10-02 22:28:35 UTC — [ticket-321] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+**Backend (pipeline_stag (33797ms)
+- 2026-10-02 22:28:35 UTC — [ticket-321] tour 2 — reviewer démarré
+- 2026-10-02 22:29:31 UTC — [ticket-321] tour 2 — reviewer terminé (56014ms)
+- 2026-10-02 22:31:18 UTC — [ticket-321] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : les tests de StageStrip et FilDuR (162327ms)
+- 2026-10-02 22:31:18 UTC — [ticket-321] CHANGES_REQUESTED tour 2: Validateur : Les quatre premiers critères sont satisfaits : les tests de StageStrip et FilDuRun couv
+- 2026-10-02 22:31:18 UTC — [ticket-321] tour 3 — codeur démarré
+- 2026-10-02 22:33:08 UTC — [ticket-321] tour 3 — codeur terminé (110546ms)
+- 2026-10-02 22:39:24 UTC — [ticket-321] testeur: OK (exit 0)
+- 2026-10-02 22:39:49 UTC — [ticket-321] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+Le diff ajoute une étape (24750ms)
+- 2026-10-02 22:39:49 UTC — [ticket-321] tour 3 — reviewer démarré
+- 2026-10-02 22:41:13 UTC — [ticket-321] tour 3 — reviewer terminé (83765ms)
+- 2026-10-02 22:42:36 UTC — [ticket-321] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés via les tests. L (167077ms)
+- 2026-10-02 22:42:36 UTC — [ticket-321] APPROVED après 3 tour(s)
+- 2026-10-02 22:45:15 UTC — [ticket-321] documentation: 2 fichier(s) (156593ms)
+- 2026-10-02 22:45:29 UTC — [ticket-323] branche ticket-323-a-run-refused-for-a-dirty-tree-names-the-files-th
+- 2026-10-02 22:45:29 UTC — [ticket-323] tour 1 — codeur démarré
+- 2026-10-02 22:52:46 UTC — [ticket-323] tour 1 — codeur terminé (436452ms)
+- 2026-10-02 22:59:12 UTC — [ticket-323] testeur: OK (exit 0)
+- 2026-10-02 22:59:45 UTC — [ticket-323] securite: PASS — Aucune vulnérabilité détectée.
+
+Analyse effectuée :
+- **git_workspace.py** : la  (32406ms)
+- 2026-10-02 22:59:45 UTC — [ticket-323] tour 1 — reviewer démarré
+- 2026-10-02 23:00:40 UTC — [ticket-323] tour 1 — reviewer terminé (55610ms)
+- 2026-10-02 23:01:52 UTC — [ticket-323] validateur: APPROVED — Les trois critères d'acceptation ont été implémentés et testés. Le code ajoute u (127343ms)
+- 2026-10-02 23:01:52 UTC — [ticket-323] APPROVED après 1 tour(s)
+- 2026-10-02 23:03:43 UTC — [ticket-323] documentation: 2 fichier(s) (108593ms)
+- 2026-10-02 23:04:57 UTC — [ticket-328] branche ticket-328-a-background-delivery-always-reports-how-it-ended
+- 2026-10-02 23:04:57 UTC — [ticket-328] tour 1 — codeur démarré
+- 2026-10-02 23:09:43 UTC — [ticket-328] tour 1 — codeur terminé (285688ms)
+- 2026-10-02 23:16:02 UTC — [ticket-328] testeur: OK (exit 0)
+- 2026-10-02 23:16:30 UTC — [ticket-328] securite: PASS — No CRITICAL or HIGH vulnerabilities detected. One MEDIUM risk identified: except (28750ms)
+- 2026-10-02 23:16:30 UTC — [ticket-328] tour 1 — reviewer démarré
+- 2026-10-02 23:17:15 UTC — [ticket-328] tour 1 — reviewer terminé (44968ms)
+- 2026-10-02 23:19:18 UTC — [ticket-328] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (167436ms)
+- 2026-10-02 23:19:18 UTC — [ticket-328] APPROVED après 1 tour(s)
+- 2026-10-02 23:22:04 UTC — [ticket-328] documentation: 2 fichier(s) (163311ms)
+- 2026-10-03 06:03:54 UTC — [ticket-329] branche ticket-329-a-relaunched-ticket-rebuilds-its-branch-on-the-cu
+- 2026-10-03 06:05:47 UTC — [ticket-329] plan rendu (113218ms)
+- 2026-10-03 06:05:47 UTC — [ticket-329] tour 1 — codeur démarré
+- 2026-10-03 06:12:13 UTC — [ticket-329] tour 1 — codeur terminé (385703ms)
+- 2026-10-03 06:19:26 UTC — [ticket-329] testeur: OK (exit 0)
+- 2026-10-03 06:20:25 UTC — [ticket-329] securite: PASS — No critical vulnerabilities detected. The code implements git-based ticket resto (59156ms)
+- 2026-10-03 06:20:25 UTC — [ticket-329] tour 1 — reviewer démarré
+- 2026-10-03 06:21:51 UTC — [ticket-329] tour 1 — reviewer terminé (86453ms)
+- 2026-10-03 06:24:16 UTC — [ticket-329] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (231235ms)
+- 2026-10-03 06:24:16 UTC — [ticket-329] APPROVED après 1 tour(s)
+- 2026-10-03 06:27:10 UTC — [ticket-329] documentation: 2 fichier(s) (171436ms)
+- 2026-10-03 06:27:23 UTC — [ticket-330] branche ticket-330-the-backend-writes-its-logs-to-a-rotating-file-so
+- 2026-10-03 06:27:23 UTC — [ticket-330] tour 1 — codeur démarré
+- 2026-10-03 06:31:10 UTC — [ticket-330] tour 1 — codeur terminé (226578ms)
+- 2026-10-03 06:31:27 UTC — [ticket-330] testeur: 1 failed, 200 passed, 2 deselected, 5 warnings in 13.70s
+- 2026-10-03 06:31:27 UTC — [ticket-330] tests rouges au tour 1
+- 2026-10-03 06:31:27 UTC — [ticket-330] tour 2 — codeur démarré
+- 2026-10-03 06:31:55 UTC — [ticket-330] tour 2 — codeur terminé (28030ms)
+- 2026-10-03 06:39:26 UTC — [ticket-330] testeur: OK (exit 0)
+- 2026-10-03 06:40:33 UTC — [ticket-330] securite: BLOCK — Path traversal via variable d'environnement non validée. La création de répertoi (66891ms)
+- 2026-10-03 06:42:38 UTC — [ticket-330] branche ticket-330-the-backend-writes-its-logs-to-a-rotating-file-so
+- 2026-10-03 06:42:38 UTC — [ticket-330] tour 1 — codeur démarré
+- 2026-10-03 06:43:54 UTC — [ticket-330] tour 1 — codeur terminé (75281ms)
+- 2026-10-03 06:51:21 UTC — [ticket-330] testeur: OK (exit 0)
+- 2026-10-03 06:51:55 UTC — [ticket-330] securite: PASS — Audit de sécurité du diff : aucune vulnérabilité détectée. La fonction `configur (34577ms)
+- 2026-10-03 06:51:55 UTC — [ticket-330] tour 1 — reviewer démarré
+- 2026-10-03 06:53:53 UTC — [ticket-330] validateur: CHANGES_REQUESTED — Les trois premiers critères sont respectés : un test vérifie que les messages so (117766ms)
+- 2026-10-03 06:54:03 UTC — [ticket-330] tour 1 — reviewer terminé (128156ms)
+- 2026-10-03 06:54:03 UTC — [ticket-330] CHANGES_REQUESTED tour 1: Validateur : Les trois premiers critères sont respectés : un test vérifie que les messages sont écri
+- 2026-10-03 06:54:03 UTC — [ticket-330] tour 2 — codeur démarré
+- 2026-10-03 06:54:38 UTC — [ticket-330] tour 2 — codeur terminé (34500ms)
+- 2026-10-03 07:01:43 UTC — [ticket-330] testeur: OK (exit 0)
+- 2026-10-03 07:02:26 UTC — [ticket-330] securite: PASS — Audit de sécurité du diff ticket-330 (logging fichier tournant). Aucune vulnérab (43141ms)
+- 2026-10-03 07:02:26 UTC — [ticket-330] tour 2 — reviewer démarré
+- 2026-10-03 07:03:50 UTC — [ticket-330] tour 2 — reviewer terminé (83828ms)
+- 2026-10-03 07:05:20 UTC — [ticket-330] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests vérifient la bonne éc (173375ms)
+- 2026-10-03 07:05:20 UTC — [ticket-330] APPROVED après 2 tour(s)
+- 2026-10-03 07:07:15 UTC — [ticket-330] documentation: 1 fichier(s) (112421ms)
+- 2026-10-03 16:33:14 UTC — [ticket-327] branche ticket-327-a-finished-run-is-reopened-from-its-ticket-and-fr
+- 2026-10-03 16:36:18 UTC — [ticket-327] plan rendu (184171ms)
+- 2026-10-03 16:36:18 UTC — [ticket-327] tour 1 — codeur démarré
+- 2026-10-03 16:43:46 UTC — [ticket-327] tour 1 — codeur terminé (447733ms)
+- 2026-10-03 16:44:39 UTC — [ticket-327] testeur: 1 failed, 426 passed, 2 deselected, 5 warnings in 50.47s
+- 2026-10-03 16:44:39 UTC — [ticket-327] tests rouges au tour 1
+- 2026-10-03 16:44:39 UTC — [ticket-327] tour 2 — codeur démarré
+- 2026-10-03 16:45:13 UTC — [ticket-327] tour 2 — codeur terminé (33172ms)
+- 2026-10-03 16:53:38 UTC — [ticket-327] testeur: OK (exit 0)
+- 2026-10-03 16:54:12 UTC — [ticket-327] securite: PASS — Audit de sécurité complet du diff ticket-327. Aucune vulnérabilité détectée.
+
+✅  (33391ms)
+- 2026-10-03 16:54:12 UTC — [ticket-327] tour 2 — reviewer démarré
+- 2026-10-03 16:55:33 UTC — [ticket-327] tour 2 — reviewer terminé (81531ms)
+- 2026-10-03 16:59:59 UTC — [ticket-327] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le backend expose un endpoint ` (346889ms)
+- 2026-10-03 16:59:59 UTC — [ticket-327] CHANGES_REQUESTED tour 2: Reviewer : Je vais vérifier deux points clés avant de rendre mon verdict : le câblage de `onRevoirRu
+- 2026-10-03 16:59:59 UTC — [ticket-327] tour 3 — codeur démarré
+- 2026-10-03 17:03:48 UTC — [ticket-327] tour 3 — codeur terminé (229406ms)
+- 2026-10-03 17:11:28 UTC — [ticket-327] testeur: OK (exit 0)
+- 2026-10-03 17:12:06 UTC — [ticket-327] securite: PASS — Audit de la feature ticket-327 (Revoir le run). Aucune vulnérabilité détectée.
+
+ (38203ms)
+- 2026-10-03 17:12:06 UTC — [ticket-327] tour 3 — reviewer démarré
+- 2026-10-03 17:13:27 UTC — [ticket-327] tour 3 — reviewer terminé (81000ms)
+- 2026-10-03 17:16:17 UTC — [ticket-327] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente un endpoint l (251312ms)
+- 2026-10-03 17:16:17 UTC — [ticket-327] APPROVED après 3 tour(s)
+- 2026-10-03 17:18:56 UTC — [ticket-327] documentation: 3 fichier(s) (156000ms)
+- 2026-10-03 17:19:09 UTC — [ticket-317] branche ticket-317-the-supervisionview-selection-test-is-flaky-under
+- 2026-10-03 17:19:09 UTC — [ticket-317] tour 1 — codeur démarré
+- 2026-10-03 17:21:25 UTC — [ticket-317] tour 1 — codeur terminé (135952ms)
+- 2026-10-03 17:30:43 UTC — [ticket-317] testeur: OK (exit 0)
+- 2026-10-03 17:30:58 UTC — [ticket-317] securite: PASS — Audit du diff terminé. Ce changement modifie un test unitaire TypeScript/React e (15468ms)
+- 2026-10-03 17:30:58 UTC — [ticket-317] tour 1 — reviewer démarré
+- 2026-10-03 17:31:19 UTC — [ticket-317] tour 1 — reviewer terminé (20375ms)
+- 2026-10-03 17:32:57 UTC — [ticket-317] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le test a été corrigé pour évite (119187ms)
+- 2026-10-03 17:32:57 UTC — [ticket-317] APPROVED après 1 tour(s)
+- 2026-10-03 17:33:21 UTC — [ticket-317] documentation: 0 fichier(s) (20593ms)

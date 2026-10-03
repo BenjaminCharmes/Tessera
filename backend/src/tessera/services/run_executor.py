@@ -67,20 +67,21 @@ def emetteur(
         event.project_id = run.project_id
         ancien_ticket_id = run.ticket_id
         _suivre(run, event)
-        # Quand le ticket change, lire son titre et l'inclure dans l'événement
-        # pour que les observateurs déjà connectés le reçoivent (ticket-286).
+        # Tout ticket_status_changed porte ticket_titre dès que le run le connaît.
+        # Le titre n'est relu sur disque qu'au changement de ticket (ticket-324).
         if (
             titre_getter is not None
             and event.type is EventType.TICKET_STATUS_CHANGED
             and run.ticket_id
-            and run.ticket_id != ancien_ticket_id
         ):
-            try:
-                titre = await titre_getter(run.ticket_id)
-                run.ticket_titre = titre
-                event.data["ticket_titre"] = titre
-            except Exception:  # noqa: BLE001
-                run.ticket_titre = None
+            if run.ticket_id != ancien_ticket_id:
+                # Le ticket vient de changer : relire depuis le disque.
+                try:
+                    run.ticket_titre = await titre_getter(run.ticket_id)
+                except Exception:  # noqa: BLE001
+                    run.ticket_titre = None
+            if run.ticket_titre is not None:
+                event.data["ticket_titre"] = run.ticket_titre
         await hub.publish(event)
         if run_id_en_base is None:
             return
@@ -233,6 +234,9 @@ async def executer(
             run.ticket_id or run.mode,
             mode=run.mode,
         )
+        # Exposé dans l'instantané pour que le frontend puisse relire
+        # les événements persistés au rechargement de page (ticket-325).
+        run.db_run_id = run_id_en_base
     except Exception as exc:  # noqa: BLE001
         _logger.warning("run_non_persiste", extra={"erreur": str(exc)})
 

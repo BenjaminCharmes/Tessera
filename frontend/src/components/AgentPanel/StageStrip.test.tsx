@@ -20,11 +20,19 @@ function ev(
 const REGLAGES_TOUT = {
   securite_enabled: true,
   validateur_enabled: true,
+  testeur_enabled: false,
 };
 
 const REGLAGES_SANS_SECURITE = {
   securite_enabled: false,
   validateur_enabled: true,
+  testeur_enabled: false,
+};
+
+const REGLAGES_AVEC_TESTEUR = {
+  securite_enabled: true,
+  validateur_enabled: true,
+  testeur_enabled: true,
 };
 
 describe("StageStrip — état depuis l'instantané (ticket-256)", () => {
@@ -177,6 +185,52 @@ describe("StageStrip — étapes parallèles revue + validation (ticket-290)", (
     expect(screen.queryByLabelText(/Revue : done/)).toBeNull();
     // La validation est terminée.
     expect(screen.getByLabelText(/Validation : done/)).toBeTruthy();
+  });
+});
+
+describe("StageStrip — étape Tests (ticket-321)", () => {
+  it("marque Tests en échec (rejected) après test_result rouge", () => {
+    const events = [ev("test_result", { passed: false, output_summary: "1 error in 2.32s" })];
+    render(<StageStrip etape={null} events={events} reglages={REGLAGES_AVEC_TESTEUR} />);
+    expect(screen.getByLabelText(/Tests : rejected/)).toBeTruthy();
+  });
+
+  it("marque Tests comme terminé (done) après test_result vert", () => {
+    const events = [ev("test_result", { passed: true, output_summary: "All tests passed" })];
+    render(<StageStrip etape={null} events={events} reglages={REGLAGES_AVEC_TESTEUR} />);
+    expect(screen.getByLabelText(/Tests : done/)).toBeTruthy();
+  });
+
+  it("n'affiche pas Tests quand testeur_enabled=false", () => {
+    render(<StageStrip etape={null} events={[]} reglages={REGLAGES_TOUT} />);
+    expect(screen.queryByLabelText(/Tests/)).toBeNull();
+  });
+
+  it("n'affiche pas Tests sans reglages ni événement test_result", () => {
+    render(<StageStrip etape={null} events={[]} />);
+    expect(screen.queryByLabelText(/Tests/)).toBeNull();
+  });
+
+  it("affiche Tests déduit depuis un événement test_result sans reglages", () => {
+    const events = [ev("test_result", { passed: true })];
+    render(<StageStrip etape={null} events={events} />);
+    expect(screen.getByLabelText(/Tests/)).toBeTruthy();
+  });
+
+  it("la pastille Tests rejected est rouge — bg-red (ADR-026)", () => {
+    // ADR-026 : les états d'échec utilisent la famille `red`, pas d'autre.
+    const events = [ev("test_result", { passed: false })];
+    render(<StageStrip etape={null} events={events} reglages={REGLAGES_AVEC_TESTEUR} />);
+    const pastille = screen.getByLabelText(/Tests : rejected/);
+    expect(pastille.className).toMatch(/bg-red/);
+  });
+
+  it("la pastille Tests done est verte — bg-green (ADR-026)", () => {
+    // ADR-026 : les états de succès utilisent la famille `green`, pas d'autre.
+    const events = [ev("test_result", { passed: true })];
+    render(<StageStrip etape={null} events={events} reglages={REGLAGES_AVEC_TESTEUR} />);
+    const pastille = screen.getByLabelText(/Tests : done/);
+    expect(pastille.className).toMatch(/bg-green/);
   });
 });
 

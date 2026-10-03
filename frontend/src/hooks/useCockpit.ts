@@ -14,7 +14,7 @@ import {
   demanderPermissionNotifications,
   useNotificationsSysteme,
 } from "./useNotificationsSysteme";
-import { filtrerParStatut } from "../lib/filtresTickets";
+import { FILTRES_VIDES, filtrerParStatut } from "../lib/filtresTickets";
 import { PANNEAUX } from "../components/Sidebar/panels";
 import type { SidebarPanel } from "../components/Sidebar/panels";
 import { projetsEnAttente } from "../components/Sidebar/projetsEnAttente";
@@ -426,6 +426,10 @@ export function useCockpit() {
       agentSelectionne,
       stream,
       byStatus: filtrage.byStatus,
+      filtres,
+      total: filtrage.total,
+      retenus: filtrage.retenus,
+      onClearFiltres: () => setFiltres(FILTRES_VIDES),
       running,
       unreadable: tickets.unreadable,
       openFilePath,

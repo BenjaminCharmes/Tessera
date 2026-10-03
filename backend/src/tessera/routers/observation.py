@@ -22,6 +22,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from tessera.services.event_hub import EVENT_HUB, JETABLES
 from tessera.services.journal_du_texte import JOURNAL_DU_TEXTE
+from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
 
@@ -63,7 +64,15 @@ async def _lire_les_messages(websocket: WebSocket, abonnements: set[str]) -> Non
         texte = str(message.get("text", ""))
         genre = message.get("type")
         if genre == "answer":
-            run.dialogue.answer(texte)
+            outcome = run.dialogue.answer(texte)
+            ack = OrchestratorEvent(
+                type=EventType.ANSWER_ACK,
+                ticket_id=run.ticket_id or "",
+                run_id=run.run_id,
+                project_id=run.project_id,
+                data={"outcome": outcome},
+            )
+            await EVENT_HUB.publish(ack)
         elif genre == "interject":
             run.dialogue.interject(texte)
         elif genre == "stop":

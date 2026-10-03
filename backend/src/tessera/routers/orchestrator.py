@@ -11,6 +11,7 @@ from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.sync_map import SyncMapService
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.documentation import DocumentationService, ResultatDocumentation
+from tessera.services.pipeline_events import EventCallback
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.git_workspace import GitWorkspaceService
@@ -33,6 +34,7 @@ from tessera.services.run_recorder import RunRecorder
 from tessera.services.security_auditor import SecurityAuditorService
 from tessera.services.test_runner import TestRunnerService
 from tessera.services.validator import ValidatorService
+from tessera.services.adr import lire_contraintes
 from tessera.services.orchestrator import (
     Orchestrator,
     OrchestratorEvent,
@@ -121,10 +123,7 @@ async def _build_project_context(project_id: str) -> str:
     all_tickets = await ticket_svc.list_tickets()
     open_tickets = [t for t in all_tickets if t.status in _OPEN_STATUSES]
 
-    decisions_path = project_path / "memory" / "decisions.md"
-    recent_decisions = (
-        decisions_path.read_text(encoding="utf-8") if decisions_path.exists() else ""
-    )
+    recent_decisions = lire_contraintes(project_path / "memory")
 
     tickets_summary = (
         "\n".join(f"- [{t.id}] {t.title} ({t.status.value})" for t in open_tickets)
@@ -229,6 +228,8 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
 
     git_workspace = GitWorkspaceService(project_path, politique=politique)
 
+    from tessera.services.ci_watcher import CI_WATCHER
+
     return Orchestrator(
         runner=runner,
         ticket_service=ticket_svc,
@@ -247,7 +248,11 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).
         quota_tracker=getattr(provider, "quota", None),
+        # Phase 1 seulement — rebase, push, PR. Phase 2 confiée à
+        # CI_WATCHER via `surveiller` (ADR-051).
         livrer=_livreur(project_id, runner, politique, espace=git_workspace),
+        surveiller=_surveillance_pour(project_id, runner, politique, espace=git_workspace),
+        ci_watcher=CI_WATCHER,
         documenter=_documenteur(project_id, politique),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
@@ -313,23 +318,35 @@ async def _sync_apres_livraison(
     politique: PolitiqueRun | None,
     base_branch: str,
 ) -> Livraison:
-    """Sync the base ref with the remote after a delivery, when needed.
+    """Sync the base ref with the remote after a delivery attempt.
 
-    Après un merge en squash (ticket-264) : la branche locale de base est en
-    retard sur le distant. Sans sync, le ticket suivant repart de l'ancienne
-    branche — ses commits sont déjà dans le squash sur develop — et GitHub
-    déclare sa PR en conflit.
+    Toujours appelé après la phase 1 (succès ou exception), pour que le
+    ticket suivant forke depuis `origin/<base>` et non depuis la pointe du
+    ticket précédent (ADR-051).
 
-    Après un non-merge sur un projet en `autonomy: merge` (ticket-302) : le
-    ticket suivant doit partir de la base distante, pas de la pointe du ticket
-    non mergé. Sur `commit` ou `pr`, l'empilement est voulu — pas de sync.
+    Cas couverts :
+    - PR ouverte : `advance_base_ref()` a été appelé dans `_noter_et_pousser`
+      → le sync remet `_base_ref` sur la base distante.
+    - Phase 1 échouée sans PR (exception, rebase refusé) : `advance_base_ref()`
+      n'a pas été appelé, mais la base distante est la bonne référence.
+    - Merge (squash) : `_base_ref` pointe sur la pointe du ticket, pas sur le
+      squash commit → le sync corrige le décalage (ticket-264).
+
+    Sur un projet `commit` (pas de push), la sync est sans effet : il n'y a
+    pas de distante à rejoindre.
     """
-    needs_sync = livraison.merged or (
-        not livraison.merged
-        and politique is not None
-        and politique.autonomy is NiveauAutonomie.merge
+    if espace is None:
+        return livraison
+    # Projets commit-only : pas de distante, la sync est sans effet
+    # et ne doit pas être appelée (ticket-307).
+    if politique is not None and politique.autonomy is NiveauAutonomie.commit:
+        return livraison
+    needs_sync = (
+        livraison.merged
+        or livraison.pr_number is not None
+        or livraison.arret is not None
     )
-    if espace is None or not needs_sync:
+    if not needs_sync:
         return livraison
     raison = await espace.sync_base_depuis_distant(base_branch)
     if raison is None:
@@ -350,15 +367,13 @@ def _livreur(
     politique: PolitiqueRun | None = None,
     espace: GitWorkspaceService | None = None,
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
-    """Fabrique la livraison d'un projet, telle que l'orchestrateur l'appelle.
+    """Fabrique la livraison de phase 1 d'un projet (ADR-051).
+
+    N'exécute que la phase 1 : rebase, push, PR. La phase 2 (attente CI +
+    merge) est confiée à `CIWatcher` via `_surveillance_pour`.
 
     `espace` est l'espace git de l'orchestrateur : celui dont la base sert
     de départ au ticket suivant de la file.
-
-    Branchée sur l'orchestrateur plutôt qu'appelée par chaque endpoint : les
-    trois modes de run — unique, file, autonome — passent par `run_pipeline`,
-    et n'en brancher qu'un réservait la livraison au cas où l'utilisateur est
-    déjà devant son écran (ticket-084).
 
     Une livraison qui échoue ne fait **pas** échouer le run : le travail est
     commité, et perdre la réponse du pipeline parce que GitHub est injoignable
@@ -398,10 +413,6 @@ def _livreur(
                 git_espace = espace
             await git_espace.commit_bookkeeping()
             await git_espace.push_branch(branch)
-            if espace is not None:
-                # En file, le ticket suivant part de la base mémorisée à
-                # l'approbation : sans l'avancer, ce commit n'y serait pas.
-                await espace.advance_base_ref()
         except Exception as exc:  # noqa: BLE001 — même raison que la livraison
             _logger.warning("pr_non_notee", extra={"erreur": str(exc)})
 
@@ -428,9 +439,11 @@ def _livreur(
     )
 
     async def livrer(result: PipelineResult) -> Livraison:
+        """Phase 1 seulement : rebase, push, PR. Syncing remote base after."""
         ticket = await ticket_svc.get_ticket(result.ticket_id)
+        livraison: Livraison
         try:
-            livraison = await service.livrer(
+            livraison = await service.livrer_phase_1(
                 ticket_id=result.ticket_id,
                 ticket_title=ticket.title if ticket else result.ticket_id,
                 ticket_body=ticket.body if ticket else "",
@@ -440,13 +453,75 @@ def _livreur(
             )
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
-            return Livraison(arret=f"Livraison interrompue : {exc}")
-        # pr_number is now recorded inside service.livrer() via _noter_et_pousser
-
+            livraison = Livraison(arret=f"Livraison interrompue : {exc}")
+        # Syncing is always attempted so the next ticket forks from origin/<base>
+        # regardless of whether this phase 1 succeeded or failed (ADR-051).
         livraison = await _sync_apres_livraison(livraison, espace, politique, base_branch)
         return livraison
 
     return livrer
+
+
+def _surveillance_pour(
+    project_id: str,
+    runner: AgentRunner | None = None,
+    politique: PolitiqueRun | None = None,
+    espace: GitWorkspaceService | None = None,
+) -> Callable[[str, str, int, "EventCallback"], Awaitable[None]]:
+    """Fabrique le callback `surveiller` pour l'orchestrateur (ADR-051).
+
+    Retourne une coroutine qui démarre la phase 2 (attente CI + merge) en
+    tâche de fond via `CI_WATCHER.surveiller`. Retourne immédiatement, sans
+    attendre la fin de la CI.
+    """
+    from tessera.services.ci_watcher import CI_WATCHER
+    from tessera.services.pipeline_events import EventCallback as _CB
+
+    project_path = settings.ide_workspace_dir / project_id
+    project = load_project(project_path)
+    github = None
+    if project.github_remote and settings.github_token:
+        github = GitHubService(token=settings.github_token, repo=project.github_remote)
+
+    base_branch = (
+        politique.base_branch if politique else None
+    ) or settings.github_base_branch
+
+    service = LivraisonService(
+        git_workspace=GitWorkspaceService(project_path, politique=politique),
+        workflow=GitHubWorkflowService(
+            git_workspace=GitWorkspaceService(project_path, politique=politique),
+            github=github,
+            base_branch=base_branch,
+            project_path=project_path,
+            politique=politique,
+        ),
+        project_path=project_path,
+        base_branch=base_branch,
+        politique=politique,
+        resolveur=(
+            ResolveurConflitService(runner, project_path).resoudre
+            if runner is not None
+            else None
+        ),
+    )
+
+    async def surveiller(
+        p_id: str,
+        ticket_id: str,
+        pr_number: int,
+        on_event: "_CB",
+    ) -> None:
+        """Start CI watching for pr_number in a background task."""
+        await CI_WATCHER.surveiller(
+            p_id,
+            ticket_id,
+            pr_number,
+            service.livrer_phase_2,
+            on_event,
+        )
+
+    return surveiller
 
 
 #: Les tâches de run en vol. Sans référence forte, asyncio peut collecter

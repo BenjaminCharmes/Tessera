@@ -3,7 +3,7 @@ import asyncio
 
 import pytest
 
-from tessera.services.dialogue import DialogueChannel, NO_HUMAN_ANSWER
+from tessera.services.dialogue import DialogueChannel, NO_HUMAN_ANSWER, AnswerOutcome
 
 
 # ------------------------------------------------------------------
@@ -58,12 +58,33 @@ async def test_en_mode_autonome_la_question_ne_bloque_jamais() -> None:
     assert reponse == NO_HUMAN_ANSWER
 
 
-async def test_une_reponse_sans_question_est_ignoree() -> None:
+async def test_une_reponse_sans_question_est_deposee_en_boite_aux_lettres() -> None:
+    # ADR-025 corollaire : une réponse tardive n'est pas perdue — elle attend
+    # dans la boîte aux lettres et sera lue par le prochain tour d'agent.
     canal = DialogueChannel(timeout_s=5.0, interactive=True)
 
-    canal.answer("personne n'a rien demande")  # ne doit pas lever
+    canal.answer("réponse tardive")
 
-    assert canal.pending_question is None
+    assert canal.drain() == ["réponse tardive"]
+
+
+async def test_une_reponse_sans_question_retourne_deposited() -> None:
+    canal = DialogueChannel(timeout_s=5.0, interactive=True)
+
+    outcome: AnswerOutcome = canal.answer("réponse tardive")
+
+    assert outcome == "deposited"
+
+
+async def test_une_reponse_a_une_question_retourne_transmitted() -> None:
+    canal = DialogueChannel(timeout_s=5.0, interactive=True)
+
+    tache = asyncio.create_task(canal.ask("Quel format ?"))
+    await canal.wait_for_question()
+    outcome: AnswerOutcome = canal.answer("ISO 8601")
+    await tache
+
+    assert outcome == "transmitted"
 
 
 # ------------------------------------------------------------------

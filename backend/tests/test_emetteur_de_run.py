@@ -100,3 +100,62 @@ async def test_l_evenement_porte_son_run_et_son_projet() -> None:
     recu = abonne.vider()[0]
     assert recu.run_id == "run-1"
     assert recu.project_id == "p"
+
+
+def _event_ticket_status(ticket_id: str = "ticket-001") -> OrchestratorEvent:
+    return OrchestratorEvent(
+        type=EventType.TICKET_STATUS_CHANGED, ticket_id=ticket_id, data={}
+    )
+
+
+async def test_premier_ticket_status_porte_le_titre_quand_le_ticket_etait_deja_connu() -> None:
+    # Critère ticket-324 : une file connaît son premier ticket à la création
+    # du RunActif (ticket-286). Le premier ticket_status_changed ne change pas
+    # l'identifiant, mais doit quand même porter ticket_titre depuis le cache.
+    hub = EventHub()
+    abonne = hub.subscribe()
+    appels: list[str] = []
+
+    async def getter(tid: str) -> str | None:
+        appels.append(tid)
+        return f"Titre de {tid}"
+
+    run = RunActif(
+        run_id="run-1",
+        project_id="p",
+        ticket_id="ticket-001",
+        ticket_titre="Titre du premier ticket",
+    )
+    await emetteur(hub, run, None, titre_getter=getter)(
+        _event_ticket_status("ticket-001")
+    )
+
+    recu = abonne.vider()[0]
+    assert recu.data.get("ticket_titre") == "Titre du premier ticket"
+    # Le titre était déjà en cache : aucune lecture disque.
+    assert appels == []
+
+
+async def test_le_titre_n_est_relu_qu_une_fois_par_ticket() -> None:
+    # Critère ticket-324 : quand plusieurs ticket_status_changed arrivent pour
+    # le même ticket, le lecteur de titre n'est appelé qu'une seule fois.
+    hub = EventHub()
+    abonne = hub.subscribe()
+    appels: list[str] = []
+
+    async def getter(tid: str) -> str | None:
+        appels.append(tid)
+        return f"Titre de {tid}"
+
+    run = RunActif(run_id="run-1", project_id="p", ticket_id="ticket-001")
+    envoyer = emetteur(hub, run, None, titre_getter=getter)
+
+    # Trois événements consécutifs, le ticket passe de ticket-001 à ticket-002.
+    for _ in range(3):
+        await envoyer(_event_ticket_status("ticket-002"))
+
+    # Un seul appel disque, lors du changement de ticket.
+    assert appels == ["ticket-002"]
+    # Les trois événements portent tous le titre.
+    recus = abonne.vider()
+    assert all(e.data.get("ticket_titre") == "Titre de ticket-002" for e in recus)

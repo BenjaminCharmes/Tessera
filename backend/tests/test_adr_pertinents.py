@@ -1,9 +1,11 @@
-"""Chaque agent ne reçoit que les ADR qui le contraignent — ticket-087."""
+"""Chaque agent ne reçoit que les contraintes qui le concernent — tickets 087 et 311."""
 from pathlib import Path
 
 from tessera.services.adr import (
     adr_pour,
+    contraintes_pour,
     decouper,
+    lire_contraintes,
     portee_de,
 )
 
@@ -205,6 +207,191 @@ def test_un_contexte_sans_section_de_decisions_traverse_intact(
     prompt = runner._build_user_prompt(_ticket(), "codeur", "# projet\n\nRien ici.")
 
     assert "Rien ici." in prompt
+
+
+# ------------------------------------------------------------------
+# Tests pour contraintes_pour — ticket-311
+# ------------------------------------------------------------------
+
+_EXEMPLE_CONTRAINTES = """# Contraintes en vigueur
+
+## Git et périmètre
+
+- **Ne jamais écrire hors du projet.** (ADR-031)
+- **Ne jamais écrire en git.** (ADR-027)
+
+*(codeur, reviewer)*
+
+- **Monaco bundlé localement.** (ADR-012)
+
+## Provider
+
+*(architect, codeur, reviewer)*
+
+- **Passer par LLMProvider.** (ADR-017)
+"""
+
+
+def test_contraintes_regle_universelle_va_a_tous() -> None:
+    texte = contraintes_pour(_EXEMPLE_CONTRAINTES, "validateur")
+
+    assert "ADR-031" in texte
+    assert "ADR-027" in texte
+
+
+def test_contraintes_regle_scoped_va_au_bon_role() -> None:
+    texte = contraintes_pour(_EXEMPLE_CONTRAINTES, "codeur")
+
+    assert "ADR-012" in texte
+
+
+def test_contraintes_regle_scoped_ne_va_pas_aux_autres_roles() -> None:
+    texte = contraintes_pour(_EXEMPLE_CONTRAINTES, "validateur")
+
+    assert "ADR-012" not in texte
+
+
+def test_contraintes_regle_multirole_va_au_bon_role() -> None:
+    texte = contraintes_pour(_EXEMPLE_CONTRAINTES, "architect")
+
+    assert "ADR-017" in texte
+
+
+def test_contraintes_regle_multirole_ne_va_pas_aux_autres_roles() -> None:
+    texte = contraintes_pour(_EXEMPLE_CONTRAINTES, "validateur")
+
+    assert "ADR-017" not in texte
+
+
+def test_contraintes_section_reinitialise_la_portee() -> None:
+    # Un `## Header` après un bloc scoped remet la portée à universel :
+    # les règles qui suivent partent à tous les rôles.
+    contenu = (
+        "*(codeur)*\n\n"
+        "- règle codeur\n\n"
+        "## Nouvelle section\n\n"
+        "- règle universelle\n"
+    )
+
+    texte = contraintes_pour(contenu, "validateur")
+
+    assert "règle codeur" not in texte
+    assert "règle universelle" in texte
+
+
+def test_contraintes_vide_ne_casse_rien() -> None:
+    assert contraintes_pour("", "codeur") == ""
+
+
+def test_contraintes_role_inconnu_recoit_les_universelles() -> None:
+    # Un rôle jamais déclaré dans un marqueur reçoit les règles universelles.
+    texte = contraintes_pour(_EXEMPLE_CONTRAINTES, "mon-agent-inconnu")
+
+    assert "ADR-031" in texte
+    assert "ADR-012" not in texte
+    assert "ADR-017" not in texte
+
+
+# ------------------------------------------------------------------
+# Tests pour lire_contraintes — ticket-311
+# ------------------------------------------------------------------
+
+
+def test_lire_contraintes_retourne_contraintes_si_present(tmp_path: Path) -> None:
+    memory = tmp_path / "memory"
+    memory.mkdir()
+    (memory / "contraintes.md").write_text("# Contraintes\n- règle A\n", encoding="utf-8")
+    (memory / "decisions.md").write_text("# Décisions\n## ADR-001\n...\n", encoding="utf-8")
+
+    resultat = lire_contraintes(memory)
+
+    assert "règle A" in resultat
+    assert "ADR-001" not in resultat
+
+
+def test_lire_contraintes_retombe_sur_decisions_si_contraintes_absent(tmp_path: Path) -> None:
+    memory = tmp_path / "memory"
+    memory.mkdir()
+    (memory / "decisions.md").write_text("# Décisions\n## ADR-001\ncontenu\n", encoding="utf-8")
+
+    resultat = lire_contraintes(memory)
+
+    assert "ADR-001" in resultat
+
+
+def test_lire_contraintes_retourne_vide_si_tout_absent(tmp_path: Path) -> None:
+    memory = tmp_path / "memory"
+    memory.mkdir()
+
+    assert lire_contraintes(memory) == ""
+
+
+# ------------------------------------------------------------------
+# Critères d'acceptation ticket-311 — le prompt reçoit le bon fichier
+# ------------------------------------------------------------------
+
+
+def test_le_prompt_du_codeur_contient_une_regle_de_contraintes_et_non_le_titre_d_un_adr_histoire(
+    tmp_path: Path,
+) -> None:
+    # Avec contraintes.md, le codeur reçoit les règles concises, pas les blocs
+    # ADR du journal. « Tauri plutôt qu'Electron » (ADR-004) n'y figure pas.
+    memory = tmp_path / "memory"
+    memory.mkdir()
+    (memory / "contraintes.md").write_text(
+        "# Contraintes\n\n## Git\n- **Ne jamais écrire en git.** (ADR-027)\n",
+        encoding="utf-8",
+    )
+    (memory / "decisions.md").write_text(
+        "# Décisions\n\n## ADR-004 — Tauri plutôt qu'Electron\n**Date** : 2026\n",
+        encoding="utf-8",
+    )
+
+    from tessera.services.agent_runner import AgentRunner
+    runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
+    contenu = lire_contraintes(memory)
+    contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
+    prompt = runner._build_user_prompt(_ticket(), "codeur", contexte)
+
+    assert "ADR-027" in prompt
+    assert "Tauri plutôt qu'Electron" not in prompt
+
+
+def test_une_regle_scoped_n_atteint_pas_le_validateur(tmp_path: Path) -> None:
+    memory = tmp_path / "memory"
+    memory.mkdir()
+    (memory / "contraintes.md").write_text(
+        "# Contraintes\n\n## Tests\n\n*(codeur, reviewer)*\n\n"
+        "- **Vitest + RTL pour les tests.** (ADR-014)\n",
+        encoding="utf-8",
+    )
+
+    from tessera.services.agent_runner import AgentRunner
+    runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
+    contenu = lire_contraintes(memory)
+    contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
+    prompt = runner._build_user_prompt(_ticket(), "validateur", contexte)
+
+    assert "ADR-014" not in prompt
+
+
+def test_sans_contraintes_md_le_prompt_recoit_decisions_md(tmp_path: Path) -> None:
+    # Sans contraintes.md, le pipeline retombe sur decisions.md : l'ancien
+    # comportement est préservé pour les projets qui n'ont pas encore le fichier.
+    memory = tmp_path / "memory"
+    memory.mkdir()
+    (memory / "decisions.md").write_text(
+        "# Décisions\n\n## ADR-999 — Une décision passée\n**Date** : 2026\n**Décision** : x.\n",
+        encoding="utf-8",
+    )
+
+    from tessera.services.agent_runner import AgentRunner
+    runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
+    contenu = lire_contraintes(memory)
+    contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
+    prompt = runner._build_user_prompt(_ticket(), "codeur", contexte)
+
+    assert "ADR-999" in prompt
 
 
 def _ticket():  # type: ignore[no-untyped-def]

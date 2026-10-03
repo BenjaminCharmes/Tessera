@@ -1,11 +1,19 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SupervisionView from "./index";
 import { INITIAL } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { Project, RunActif } from "../../types/api";
+
+vi.mock("../../lib/api", () => ({
+  api: {
+    runs: { events: vi.fn().mockResolvedValue([]) },
+    orchestrator: { limits: vi.fn().mockResolvedValue({ run_max_budget_usd: 0, llm_max_budget_usd: 0 }) },
+    tickets: { activity: vi.fn().mockResolvedValue({ ticket_id: "", runs: [], pr_number: null, github_remote: null }) },
+  },
+}));
 
 function run(over: Partial<RunActif> = {}): RunActif {
   return {
@@ -100,7 +108,7 @@ describe("SupervisionView", () => {
     ).toBeInTheDocument();
   });
 
-  it("selectionne un run au clic, ce qui declenche son abonnement", () => {
+  it("selectionne un run au clic, ce qui declenche son abonnement", async () => {
     const selectionner = vi.fn();
     render(
       <SupervisionView
@@ -112,10 +120,13 @@ describe("SupervisionView", () => {
       />,
     );
 
-    void userEvent.click(
+    // Attendre la fin de l'événement avant de vérifier : la version void + waitFor
+    // était instable sous charge (le waitFor expirait avant que le clic soit
+    // traité par userEvent v14 — ticket-317).
+    await userEvent.click(
       screen.getByLabelText("Run ticket-001 sur portfolio"),
     );
-    return vi.waitFor(() => expect(selectionner).toHaveBeenCalledWith("run-2"));
+    expect(selectionner).toHaveBeenCalledWith("run-2");
   });
 
   it("signale qu'un agent attend une reponse", () => {
@@ -376,6 +387,48 @@ describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
   });
 });
 
+describe("SupervisionView — état CI par run (ticket-308)", () => {
+  it("ci_merge_done est rattache a la carte du bon ticket_id, pas a la derniere recue", () => {
+    // Deux runs clos avec une PR chacun.
+    // run-1 (ticket-001) a reçu ci_merge_done (merged: true).
+    // run-2 (ticket-002) attend encore la CI.
+    // Seule la carte de run-1 doit afficher "mergée".
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-2", project_id: "ide-core", ticket_id: "ticket-002" }),
+            ],
+          },
+          {
+            "run-1": {
+              runClosed: true,
+              livraisonPrNumber: 10,
+              ciMerge: { merged: true, arret: null },
+            },
+            "run-2": {
+              runClosed: true,
+              livraisonPrNumber: 11,
+              ciMerge: null,
+            },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    // run-1 doit montrer "mergée".
+    const carteIdeCore1 = screen.getByLabelText("Run ticket-001 sur ide-core");
+    expect(carteIdeCore1.textContent).toContain("PR #10 mergée");
+
+    // run-2 doit montrer "en attente de CI".
+    const carteIdeCore2 = screen.getByLabelText("Run ticket-002 sur ide-core");
+    expect(carteIdeCore2.textContent).toContain("PR #11 — en attente de CI");
+  });
+});
+
 describe("SupervisionView — bouton Fermer (ticket-267)", () => {
   it("ne rend pas Fermer avant run_closed meme si le pipeline est done", () => {
     // Entre pipeline_done et run_closed, la livraison tourne encore.
@@ -480,5 +533,63 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /Fermer/i }));
     expect(fermerRun).toHaveBeenCalledWith("run-1");
+  });
+
+  it("ouvre RunHistorique au clic sur Revoir le run d'une carte close (ticket-327)", async () => {
+    // Un run clos avec db_run_id doit afficher le bouton « Revoir le run » sur
+    // sa RunCard, et le clic doit remplacer le panneau de droite par RunHistorique.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [run({ db_run_id: "db-run-1", ticket_id: "ticket-001" })],
+          },
+          {
+            "run-1": { runClosed: true },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /Revoir le run/ }),
+    );
+
+    // RunHistorique affiche un bouton « Historique » pour revenir.
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /historique/i })).toBeInTheDocument(),
+    );
+  });
+
+  it("ferme RunHistorique et revient au panneau Agents (ticket-327)", async () => {
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [run({ db_run_id: "db-run-1", ticket_id: "ticket-001" })],
+          },
+          {
+            "run-1": { runClosed: true },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /Revoir le run/ }),
+    );
+    // RunHistorique est visible.
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /historique/i })).toBeInTheDocument(),
+    );
+
+    // Clic sur « Historique » : retour au panneau Agents.
+    await userEvent.click(screen.getByRole("button", { name: /historique/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Agents")).toBeInTheDocument(),
+    );
   });
 });

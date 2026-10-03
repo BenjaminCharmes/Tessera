@@ -1,3 +1,4 @@
+from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -9,6 +10,7 @@ from starlette.requests import Request
 from tessera.auth import StaticTokenMiddleware
 from tessera.config import settings
 from tessera.services.process_registry import PROCESS_REGISTRY
+from tessera.services.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
 from tessera.routers import (
     agent_admin,
     agents,
@@ -24,13 +26,25 @@ from tessera.routers import (
 )
 from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.prompt_loader import MissingPromptError
-from tessera.utils.logger import get_logger
+from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
 
 _logger = get_logger(__name__)
+
+# Résolution unique au démarrage : la variable d'environnement ne change pas
+# en cours d'exécution. Sous Windows, un bash.exe introuvable loge un
+# avertissement dans le lifespan et se reflète dans GET /health (ticket-319).
+_GIT_BASH_PATH: str | None = resolve_git_bash(settings.claude_code_git_bash_path)
+_AGENT_SHELL_OK: bool = agent_shell_ok(_GIT_BASH_PATH)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # Le chemin peut venir de l'environnement : il reste sous backend/logs.
+    configure_file_logging(
+        settings.ide_log_file, racine=Path(__file__).resolve().parents[2] / "logs"
+    )
+    install_asyncio_exception_handler()
+    warn_if_shell_missing(_GIT_BASH_PATH)
     await init_db(settings.ide_db_path)
     # Les runs qu'un processus tué a laissés « en cours » (ticket-177).
     orphelins = await solder_les_runs_orphelins(settings.ide_db_path)
@@ -90,5 +104,5 @@ app.include_router(runs.router, prefix="/api/v1")
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.1.0"}
+async def health() -> dict[str, str | bool]:
+    return {"status": "ok", "version": "0.1.0", "agent_shell": _AGENT_SHELL_OK}

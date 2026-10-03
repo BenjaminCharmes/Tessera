@@ -5,6 +5,7 @@ import { IconCross } from "../../design/icons";
 import KanbanColumn from "./KanbanColumn";
 import QueueBar from "../Sidebar/QueueBar";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
+import { filtresActifs, type FiltresTickets } from "../../lib/filtresTickets";
 import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
 
 const KANBAN_STATUSES: TicketStatus[] = [
@@ -38,6 +39,24 @@ interface KanbanViewProps {
   onClearQueue?: () => void;
   /** Un run de file est en cours — désactive le bouton « Lancer » (ticket-284). */
   queueEnCours?: boolean;
+  /** Filtres actifs sur le tableau — ticket-318. */
+  filtres?: FiltresTickets;
+  /** Nombre total de tickets avant filtrage — ticket-318. */
+  total?: number;
+  /** Nombre de tickets retenus après filtrage — ticket-318. */
+  retenus?: number;
+  /** Réinitialise les filtres mémorisés du projet — ticket-318. */
+  onClearFiltres?: () => void;
+}
+
+/** Returns labels for each active filter dimension, for display in the banner. */
+function labelsDesFiltres(f: FiltresTickets): string[] {
+  const labels: string[] = [];
+  if (f.type) labels.push(`type ${f.type}`);
+  if (f.priorite) labels.push(`priorité ${f.priorite}`);
+  if (f.agent) labels.push(`agent ${f.agent}`);
+  if (f.texte.trim()) labels.push(`texte « ${f.texte.trim()} »`);
+  return labels;
 }
 
 export default function KanbanView({
@@ -55,6 +74,10 @@ export default function KanbanView({
   onRunQueue,
   onClearQueue,
   queueEnCours = false,
+  filtres,
+  total,
+  retenus,
+  onClearFiltres,
 }: KanbanViewProps) {
   const blockedIds = useMemo(
     () => byStatus["blocked"].map((t) => t.id),
@@ -76,6 +99,30 @@ export default function KanbanView({
           onClear={onClearQueue ?? (() => {})}
           enCours={queueEnCours}
         />
+      )}
+      {filtres && filtresActifs(filtres) && total !== undefined && retenus !== undefined && (
+        <div
+          className="flex items-center gap-2 border-b border-zinc-700 bg-zinc-800/60 px-4 py-1.5"
+          data-testid="kanban-filtre-bandeau"
+        >
+          <span className="text-xs text-zinc-400">
+            Filtres :{" "}
+            <span className="text-zinc-300">{labelsDesFiltres(filtres).join(" · ")}</span>
+          </span>
+          <span
+            className="text-xs text-amber-400"
+            data-testid="kanban-filtre-compte"
+          >
+            {retenus} ticket{retenus !== 1 ? "s" : ""} sur {total}
+          </span>
+          <button
+            type="button"
+            onClick={onClearFiltres}
+            className="ml-auto text-xs text-zinc-500 hover:text-zinc-300"
+          >
+            Effacer les filtres
+          </button>
+        </div>
       )}
       <div className="flex-1 flex overflow-x-auto overflow-y-hidden">
         {KANBAN_STATUSES.map((status) => (
