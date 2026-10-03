@@ -1,3 +1,4 @@
+from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -38,7 +39,10 @@ _AGENT_SHELL_OK: bool = agent_shell_ok(_GIT_BASH_PATH)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    configure_file_logging(settings.ide_log_file)
+    # Le chemin peut venir de l'environnement : il reste sous backend/logs.
+    configure_file_logging(
+        settings.ide_log_file, racine=Path(__file__).resolve().parents[2] / "logs"
+    )
     install_asyncio_exception_handler()
     warn_if_shell_missing(_GIT_BASH_PATH)
     await init_db(settings.ide_db_path)

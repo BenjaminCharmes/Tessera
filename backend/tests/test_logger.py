@@ -148,3 +148,22 @@ async def test_asyncio_unhandled_exception_is_logged_with_traceback(
     content = log_file.read_text(encoding="utf-8")
     assert "async_task_crash" in content
     assert "asyncio_unhandled_exception" in content
+
+
+def test_un_chemin_de_journal_hors_de_la_racine_est_ramene_dedans(tmp_path: Path) -> None:
+    # Le chemin vient de IDE_LOG_FILE : un `..` ne doit pas faire écrire
+    # hors de backend/logs (audit sécurité du ticket-330).
+    racine = tmp_path / "logs"
+    hors = tmp_path / "ailleurs" / "x.log"
+
+    utilise = configure_file_logging(hors, racine=racine)
+
+    assert utilise == racine.resolve() / "tessera.log"
+    assert not hors.parent.exists()
+
+
+def test_un_chemin_de_journal_dans_la_racine_est_garde(tmp_path: Path) -> None:
+    racine = tmp_path / "logs"
+    dedans = racine / "sous" / "a.log"
+
+    assert configure_file_logging(dedans, racine=racine) == dedans

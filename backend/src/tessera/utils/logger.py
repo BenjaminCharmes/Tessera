@@ -57,13 +57,27 @@ def configure_file_logging(
     log_file: Path,
     max_bytes: int = 10 * 1024 * 1024,
     backup_count: int = 5,
-) -> None:
-    """Add a rotating file handler to the root logger.
+    racine: Path | None = None,
+) -> Path:
+    """Add a rotating file handler to the root logger; return the file used.
 
     Crée le dossier parent s'il n'existe pas. Les enregistrements de tous les
     loggers du backend remontent au root (propagation activée par défaut) et
     atterrissent dans ce fichier, en plus de la sortie standard.
+
+    Avec `racine`, le chemin vient d'une variable d'environnement : un `..` ou
+    un chemin absolu ailleurs ferait créer des dossiers et écrire hors de
+    `racine`. Un tel chemin est remplacé par `racine/tessera.log`.
     """
+    if racine is not None:
+        borne = racine.resolve()
+        try:
+            log_file.resolve().relative_to(borne)
+        except ValueError:
+            logging.getLogger(__name__).warning(
+                "log_file_hors_racine", extra={"refuse": str(log_file), "racine": str(borne)}
+            )
+            log_file = borne / "tessera.log"
     log_file.parent.mkdir(parents=True, exist_ok=True)
     handler = logging.handlers.RotatingFileHandler(
         log_file,
@@ -73,6 +87,7 @@ def configure_file_logging(
     )
     handler.setFormatter(_JsonFormatter())
     logging.getLogger().addHandler(handler)
+    return log_file
 
 
 def install_asyncio_exception_handler() -> None:
