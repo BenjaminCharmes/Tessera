@@ -47,6 +47,9 @@ frontend/src-tauri/target/
 
 # GitHub Actions
 .github/workflows/*.log
+# Journaux du backend, rotation comprise (tessera.log.1, .2…) : `*.log` ne
+# couvre pas les fichiers tournés, et un run les a commités (ticket-330).
+backend/logs/
 
 # Workspace Tessera : les projets importés, clonés ou créés via l'IDE
 # atterrissent dans projects/. Seul `ide-core` (le projet bootstrap) est
