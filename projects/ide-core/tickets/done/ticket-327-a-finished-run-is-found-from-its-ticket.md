@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-327
 plan: true
-pr_number: null
+pr_number: 238
 priority: medium
 status: done
 title: A finished run is reopened from its ticket and from Supervision, opens complete,
