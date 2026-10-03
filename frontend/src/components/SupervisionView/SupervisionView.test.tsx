@@ -108,7 +108,7 @@ describe("SupervisionView", () => {
     ).toBeInTheDocument();
   });
 
-  it("selectionne un run au clic, ce qui declenche son abonnement", () => {
+  it("selectionne un run au clic, ce qui declenche son abonnement", async () => {
     const selectionner = vi.fn();
     render(
       <SupervisionView
@@ -120,10 +120,13 @@ describe("SupervisionView", () => {
       />,
     );
 
-    void userEvent.click(
+    // Attendre la fin de l'événement avant de vérifier : la version void + waitFor
+    // était instable sous charge (le waitFor expirait avant que le clic soit
+    // traité par userEvent v14 — ticket-317).
+    await userEvent.click(
       screen.getByLabelText("Run ticket-001 sur portfolio"),
     );
-    return vi.waitFor(() => expect(selectionner).toHaveBeenCalledWith("run-2"));
+    expect(selectionner).toHaveBeenCalledWith("run-2");
   });
 
   it("signale qu'un agent attend une reponse", () => {
