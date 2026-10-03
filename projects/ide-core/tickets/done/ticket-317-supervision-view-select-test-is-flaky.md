@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
 id: ticket-317
-pr_number: null
+pr_number: 239
 priority: low
 status: done
 title: The SupervisionView selection test is flaky under load
