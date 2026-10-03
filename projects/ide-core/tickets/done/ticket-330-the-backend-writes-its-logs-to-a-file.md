@@ -4,7 +4,7 @@ created: 2026-10-02
 depends_on: []
 estimated_days: 0.5
 id: ticket-330
-pr_number: null
+pr_number: 236
 priority: medium
 status: done
 title: The backend writes its logs to a rotating file, so a crash leaves a trace
