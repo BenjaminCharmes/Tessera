@@ -1,9 +1,9 @@
 ---
 id: ticket-322
-title: "The Claude Agent SDK moves to 0.2.163, whose bundled Claude Code supports claude-opus-5-5"
+title: "The Claude Agent SDK moves to 0.2.159, whose bundled Claude Code supports claude-opus-5-5"
 type: chore
-status: todo
-pr_number: null
+status: done
+pr_number: 240
 priority: high
 agent: codeur
 depends_on: []
@@ -11,7 +11,7 @@ estimated_days: 0.5
 created: 2026-10-02
 ---
 
-# ticket-322 — Le SDK Agent passe en 0.2.163
+# ticket-322 — Le SDK Agent passe en 0.2.159
 
 ## Objectif
 
@@ -45,11 +45,27 @@ le CLI journalise `unrecognized_model`, mais c'est bien ce modèle qui répond.
 
 ## Critères d'acceptation
 
-- [ ] `backend/pyproject.toml` exige `claude-agent-sdk>=0.2.163`
-- [ ] `backend/uv.lock` résout `claude-agent-sdk` en 0.2.163 ou plus
-- [ ] Un test marqué `integration` appelle `claude-opus-5-5` et vérifie le
+- [x] ~~`backend/pyproject.toml` exige `claude-agent-sdk>=0.2.163`~~ —
+      `>=0.2.159`, voir « Écart » ci-dessous
+- [x] ~~`backend/uv.lock` résout `claude-agent-sdk` en 0.2.163 ou plus~~ —
+      résout en 0.2.159
+- [x] Un test marqué `integration` appelle `claude-opus-5-5` et vérifie le
       modèle rapporté par `model_usage`
-- [ ] Les tests existants de `providers/agent_sdk.py` passent
+- [x] Les tests existants de `providers/agent_sdk.py` passent
+
+## Écart : 0.2.159 et non 0.2.163
+
+Les versions 0.2.160 à 0.2.163 ne publient **aucun wheel `win_amd64`** sur
+PyPI. Sous Windows, uv construit alors le SDK depuis le sdist, sans le
+`claude.exe` embarqué ; le SDK se rabat sur le `claude.CMD` du PATH et refuse
+de l'exécuter (`CLIConnectionError: Refusing to execute batch script`). Chaque
+run aurait échoué dès son premier appel.
+
+La 0.2.159 a un wheel Windows et embarque Claude Code 2.1.281, au-dessus des
+2.1.280 qu'exige Opus 5.5 : le test d'intégration le vérifie en réel.
+`test_agent_sdk_windows_wheel.py` refuse un `uv.lock` dont la version du SDK
+n'a pas de wheel Windows — c'est lui qui arrêtera une prochaine montée
+aveugle.
 
 ## Ce que ça ne fait pas
 
