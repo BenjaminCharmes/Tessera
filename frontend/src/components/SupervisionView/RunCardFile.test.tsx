@@ -195,3 +195,79 @@ describe("RunCard — coût en direct (ticket-197)", () => {
     expect(screen.getByText(/4,60 \$ .* sur 5,00 \$/)).toHaveClass("text-red-200");
   });
 });
+
+describe("RunCard — Revoir le run (ticket-327)", () => {
+  it("affiche le bouton quand le run est clos, db_run_id connu et onRevoir fourni", () => {
+    const onRevoir = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={vi.fn()}
+        onRevoir={onRevoir}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /Revoir le run/ })).toBeInTheDocument();
+  });
+
+  it("appelle onRevoir au clic sans propager la sélection", async () => {
+    const { default: userEvent } = await import("@testing-library/user-event");
+    const onRevoir = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={onSelect}
+        onRevoir={onRevoir}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /Revoir le run/ }));
+
+    expect(onRevoir).toHaveBeenCalledOnce();
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("n'affiche pas le bouton quand le run n'est pas clos", () => {
+    const onRevoir = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: false }}
+        selectionne={false}
+        onSelect={vi.fn()}
+        onRevoir={onRevoir}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+
+  it("n'affiche pas le bouton quand db_run_id est absent", () => {
+    const onRevoir = vi.fn();
+    render(
+      <RunCard
+        run={run({ db_run_id: undefined })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={vi.fn()}
+        onRevoir={onRevoir}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+
+  it("n'affiche pas le bouton quand onRevoir est absent", () => {
+    render(
+      <RunCard
+        run={run({ db_run_id: "db-run-1" })}
+        etat={{ ...INITIAL, runClosed: true }}
+        selectionne={false}
+        onSelect={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+});

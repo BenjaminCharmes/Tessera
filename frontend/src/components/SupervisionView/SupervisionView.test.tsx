@@ -1,11 +1,19 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SupervisionView from "./index";
 import { INITIAL } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { Project, RunActif } from "../../types/api";
+
+vi.mock("../../lib/api", () => ({
+  api: {
+    runs: { events: vi.fn().mockResolvedValue([]) },
+    orchestrator: { limits: vi.fn().mockResolvedValue({ run_max_budget_usd: 0, llm_max_budget_usd: 0 }) },
+    tickets: { activity: vi.fn().mockResolvedValue({ ticket_id: "", runs: [], pr_number: null, github_remote: null }) },
+  },
+}));
 
 function run(over: Partial<RunActif> = {}): RunActif {
   return {
@@ -522,5 +530,63 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /Fermer/i }));
     expect(fermerRun).toHaveBeenCalledWith("run-1");
+  });
+
+  it("ouvre RunHistorique au clic sur Revoir le run d'une carte close (ticket-327)", async () => {
+    // Un run clos avec db_run_id doit afficher le bouton « Revoir le run » sur
+    // sa RunCard, et le clic doit remplacer le panneau de droite par RunHistorique.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [run({ db_run_id: "db-run-1", ticket_id: "ticket-001" })],
+          },
+          {
+            "run-1": { runClosed: true },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /Revoir le run/ }),
+    );
+
+    // RunHistorique affiche un bouton « Historique » pour revenir.
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /historique/i })).toBeInTheDocument(),
+    );
+  });
+
+  it("ferme RunHistorique et revient au panneau Agents (ticket-327)", async () => {
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [run({ db_run_id: "db-run-1", ticket_id: "ticket-001" })],
+          },
+          {
+            "run-1": { runClosed: true },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /Revoir le run/ }),
+    );
+    // RunHistorique est visible.
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /historique/i })).toBeInTheDocument(),
+    );
+
+    // Clic sur « Historique » : retour au panneau Agents.
+    await userEvent.click(screen.getByRole("button", { name: /historique/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Agents")).toBeInTheDocument(),
+    );
   });
 });

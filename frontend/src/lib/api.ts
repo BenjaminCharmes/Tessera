@@ -35,6 +35,7 @@ import type {
   RunFromChatResponse,
   Ticket,
   TicketListResponse,
+  TicketRunSummary,
   TicketStatus,
   TicketActivity,
   TicketDiff,
@@ -139,6 +140,9 @@ export const api = {
       tickets: TicketDraft[],
     ): Promise<TicketBatchResponse> =>
       post(`/projects/${projectId}/tickets/batch`, { tickets }),
+    /** Les runs d'un ticket, du plus récent au plus ancien — ticket-327. */
+    runs: (projectId: string, ticketId: string): Promise<TicketRunSummary[]> =>
+      request(`/projects/${projectId}/tickets/${ticketId}/runs`),
   },
   orchestrator: {
     /**

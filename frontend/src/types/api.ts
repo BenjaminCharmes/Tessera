@@ -231,6 +231,8 @@ export interface PipelineRun {
   approved: boolean | null;
   final_status: string | null;
   total_cost_usd: number;
+  /** La cause d'un blocage, quand il y en a eu une (ticket-218). */
+  arret?: string | null;
 }
 
 export interface TicketUsage {

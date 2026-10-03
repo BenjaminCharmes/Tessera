@@ -21,6 +21,11 @@ interface AgentPanelProps {
   activeTicket?: Ticket | null;
   /** Configuration du pipeline pour la frise d'étapes (ticket-256). */
   reglages?: Partial<Pick<PipelineReglages, "securite_enabled" | "validateur_enabled" | "testeur_enabled">> | null;
+  /**
+   * Ouvre la vue en lecture seule d'un run terminé (ticket-327).
+   * Transmis à TicketActivity ; absent → le bouton « Revoir le run » reste masqué.
+   */
+  onRevoirRun?: ((runId: string, ticketId: string) => void) | null;
 }
 
 export default function AgentPanel({
@@ -28,6 +33,7 @@ export default function AgentPanel({
   stream,
   activeTicket = null,
   reglages = null,
+  onRevoirRun = null,
 }: AgentPanelProps) {
   const {
     status,
@@ -241,6 +247,7 @@ export default function AgentPanel({
         projectId={project?.id ?? null}
         ticket={activeTicket}
         branch={lastResult?.branch ?? null}
+        onRevoirRun={onRevoirRun}
       />
     </div>
   );

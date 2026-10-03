@@ -10,7 +10,7 @@ from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.services.github_service import GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
-from tessera.services.database import list_runs
+from tessera.services.database import list_runs, list_runs_for_ticket
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
@@ -265,6 +265,34 @@ class TicketRunSummary(BaseModel):
     total_cost_usd: float = 0.0
     #: La cause d'un blocage, quand il y en a eu une (ticket-218).
     arret: str | None = None
+
+
+@router.get("/{project_id}/tickets/{ticket_id}/runs", response_model=list[TicketRunSummary])
+async def list_runs_for_ticket_endpoint(
+    project_id: str, ticket_id: str
+) -> list[TicketRunSummary]:
+    """Les runs d'un ticket, du plus récent au plus ancien — ticket-327.
+
+    N'appelle pas `usage_stats` — renvoie juste les lignes du ticket,
+    sans recalculer les statistiques globales.
+    """
+    ticket = await _svc(project_id).get_ticket(ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail=f"Ticket {ticket_id} introuvable")
+    rows = await list_runs_for_ticket(settings.ide_db_path, project_id, ticket_id)
+    return [
+        TicketRunSummary(
+            id=str(row["id"]),
+            started_at=str(row["started_at"]),
+            finished_at=row.get("finished_at"),
+            rounds=row.get("rounds"),
+            approved=row.get("approved"),
+            final_status=row.get("final_status"),
+            total_cost_usd=float(row.get("total_cost_usd") or 0.0),
+            arret=row.get("arret"),
+        )
+        for row in rows
+    ]
 
 
 class TicketActivity(BaseModel):

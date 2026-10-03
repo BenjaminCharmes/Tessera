@@ -119,8 +119,13 @@ export default function RunHistorique({
             <FilDuRun entries={phase.stream.entries} />
             {phase.stream.lastResult && (
               <PipelineSummary
-                result={phase.stream.lastResult}
-                runClosed={phase.stream.runClosed}
+                result={{
+                  ...phase.stream.lastResult,
+                  // Un run rejoué est terminé par construction : le ticket_id
+                  // peut manquer dans les événements d'une file (ticket-327).
+                  ticket_id: phase.stream.lastResult.ticket_id || ticketId,
+                }}
+                runClosed={true}
               />
             )}
           </>
