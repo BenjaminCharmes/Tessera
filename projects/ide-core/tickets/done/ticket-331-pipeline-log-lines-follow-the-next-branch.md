@@ -2,8 +2,8 @@
 id: ticket-331
 title: "Pipeline log lines written after delivery follow the next run onto its branch, instead of being stranded on the delivered one"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 246
 priority: medium
 agent: codeur
 depends_on: []
@@ -56,16 +56,16 @@ aucune n'est perdue.
 
 ## Critères d'acceptation
 
-- [ ] Un test sur un dépôt git temporaire vérifie que des lignes de journal
+- [x] Un test sur un dépôt git temporaire vérifie que des lignes de journal
       en attente sur la branche d'un ticket précédent se retrouvent dans le
       journal de la nouvelle branche
-- [ ] Le même test vérifie que la branche précédente ne reçoit aucun commit
+- [x] Le même test vérifie que la branche précédente ne reçoit aucun commit
       portant ces lignes
-- [ ] Un test vérifie qu'une ligne déjà présente dans le journal de la
+- [x] Un test vérifie qu'une ligne déjà présente dans le journal de la
       nouvelle branche n'est pas dupliquée
-- [ ] Un test vérifie que les lignes sont réécrites quand la création de la
+- [x] Un test vérifie que les lignes sont réécrites quand la création de la
       branche échoue
-- [ ] Un test vérifie qu'un fichier de ticket en attente est toujours commité
+- [x] Un test vérifie qu'un fichier de ticket en attente est toujours commité
       avant le changement de branche (ticket-314)
 
 ## Dépendances
