@@ -14,12 +14,14 @@ means "carry on".
 """
 import time
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 from tessera.models.agent import AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
+from tessera.services import journal_en_attente
 from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
@@ -110,9 +112,41 @@ async def create_branch(
     Only Tessera's own bookkeeping paths are staged — code files are not
     touched.  ``ensure_clean_tree`` still blocks on code modifications before
     this stage is reached.
+
+    Pending pipeline-log lines are the exception: they are set aside before
+    that commit and written back into the new branch's log, so that lines
+    logged after a delivery's push reach the base with the next run instead
+    of being stranded on the delivered branch (ticket-331).
     """
     if orch._git_workspace is None:
         return None
+
+    racine = orch._project_path
+    lignes = await journal_en_attente.mettre_de_cote(racine) if racine else []
+    try:
+        return await _basculer(orch, run, racine, lignes)
+    finally:
+        # Réécrites même si la branche n'a pas pu être créée : aucune ligne
+        # ne se perd. Sans effet si `_basculer` l'a déjà fait.
+        _reecrire_journal(racine, lignes)
+
+
+def _reecrire_journal(racine: Optional[Path], lignes: list[str]) -> None:
+    if racine is None:
+        return
+    try:
+        journal_en_attente.reecrire(racine, lignes)
+    except OSError as exc:
+        _logger.warning("pending_log_rewrite_failed", extra={"error": str(exc)})
+
+
+async def _basculer(
+    orch: "Orchestrator",
+    run: PipelineRun,
+    racine: Optional[Path],
+    lignes: list[str],
+) -> Optional[PipelineResult]:
+    assert orch._git_workspace is not None
 
     # Commit pending bookkeeping before the branch switch.  Failures here
     # are logged but not fatal: the following branch creation attempt may
@@ -142,6 +176,8 @@ async def create_branch(
         run.branch = await orch._git_workspace.create_branch(
             run.ticket_id, run.ticket.title
         )
+        # Avant la ligne « branche » : le journal garde son ordre.
+        _reecrire_journal(racine, lignes)
         await emit(run, EventType.BRANCH_CREATED, branch=run.branch)
         orch._log(f"[{run.ticket_id}] branche {run.branch}")
     except NotAGitRepository:

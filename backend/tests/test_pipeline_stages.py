@@ -309,6 +309,10 @@ async def test_create_branch_commit_bookkeeping_avant_le_checkout(
     tree, and the base (develop) has a different version of it.  Without the
     fix, ``git checkout -b`` refuses the switch.  With it, the log is committed
     first and the new branch is created successfully.
+
+    The orchestrator here has no project path, so the pending log lines are
+    not carried to the new branch (ticket-331): this is the fallback, where
+    the bookkeeping commit takes them as before.
     """
     root = tmp_path / "repo"
     root.mkdir()
