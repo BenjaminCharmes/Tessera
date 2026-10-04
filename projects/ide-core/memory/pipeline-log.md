@@ -1260,3 +1260,6 @@ Analyse effectuée :
 - 2026-10-03 17:32:57 UTC — [ticket-317] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le test a été corrigé pour évite (119187ms)
 - 2026-10-03 17:32:57 UTC — [ticket-317] APPROVED après 1 tour(s)
 - 2026-10-03 17:33:21 UTC — [ticket-317] documentation: 0 fichier(s) (20593ms)
+- 2026-10-03 17:33:34 UTC — [ticket-317] livraison: rebase sur develop (828ms)
+- 2026-10-03 17:33:34 UTC — [ticket-317] livraison: PR #239 ouverte (4375ms)
+- 2026-10-03 17:33:34 UTC — [ide-core] ticket-317 PR #239 confiée au CIWatcher
