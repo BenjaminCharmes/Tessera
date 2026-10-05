@@ -17,7 +17,7 @@ import type { RecentRun, StatsPeriod, UsageStats } from "../../types/api";
 import Card from "./Card";
 import KpiRow from "./KpiRow";
 import QualityCard from "./QualityCard";
-import RecentRuns from "./RecentRuns";
+import RecentRunsCard from "./RecentRunsCard";
 import RunHistorique from "./RunHistorique";
 
 /**
@@ -157,9 +157,12 @@ function Dashboard({ data, onSelectRun }: DashboardProps) {
         </Card>
       </div>
 
-      <Card title="Runs récents" aside={`${data.recent_runs.length} derniers`}>
-        <RecentRuns runs={data.recent_runs} showProject={global} onSelect={onSelectRun} />
-      </Card>
+      <RecentRunsCard
+        initial={data.recent_runs}
+        days={data.days}
+        projectId={data.project_id}
+        onSelect={onSelectRun}
+      />
     </div>
   );
 }

@@ -206,7 +206,48 @@ async def _quality(db: aiosqlite.Connection, scope: _Scope) -> RunQuality:
     )
 
 
-async def _recent_runs(db: aiosqlite.Connection, scope: _Scope) -> list[RecentRun]:
+async def recent_runs(
+    db_path: Path | str,
+    days: int,
+    project_id: str | None,
+    *,
+    limit: int,
+    recherche: str | None = None,
+    today: date | None = None,
+) -> list[RecentRun]:
+    """The latest `limit` ticket runs of the period, filtered by `recherche`.
+
+    Serves the « Afficher plus » and the search of the recent-runs card
+    (ticket-335) without recomputing the whole statistics screen.
+    """
+    until_day = today or datetime.now(timezone.utc).date()
+    since_day = until_day - timedelta(days=days - 1)
+    scope = _Scope(since_day.isoformat(), until_day.isoformat(), project_id)
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+        return await _recent_runs(db, scope, limit=limit, recherche=recherche)
+
+
+def _motif_like(recherche: str) -> str:
+    # `%` et `_` tapés dans la recherche sont des caractères, pas des jokers.
+    echappe = recherche.replace("!", "!!").replace("%", "!%").replace("_", "!_")
+    return f"%{echappe}%"
+
+
+async def _recent_runs(
+    db: aiosqlite.Connection,
+    scope: _Scope,
+    *,
+    limit: int = RECENT_RUNS_LIMIT,
+    recherche: str | None = None,
+) -> list[RecentRun]:
+    filtre = ""
+    params: tuple[Any, ...] = scope.params
+    if recherche:
+        # LIKE ignore la casse des lettres ASCII : « BETA » trouve « beta ».
+        filtre = " AND (pr.ticket_id LIKE ? ESCAPE '!' OR pr.project_id LIKE ? ESCAPE '!')"
+        motif = _motif_like(recherche)
+        params = (*params, motif, motif)
     rows = await _all(db, f"""
         SELECT pr.id, pr.project_id, pr.ticket_id, pr.started_at, pr.finished_at,
                pr.approved, pr.final_status,
@@ -216,8 +257,8 @@ async def _recent_runs(db: aiosqlite.Connection, scope: _Scope) -> list[RecentRu
         LEFT JOIN (SELECT run_id, SUM(cost_usd) AS cost, SUM(input_tokens) AS tin,
                           SUM(output_tokens) AS tout
                    FROM agent_calls GROUP BY run_id) c ON c.run_id = pr.id
-        WHERE {scope.runs}
-        ORDER BY pr.started_at DESC LIMIT {RECENT_RUNS_LIMIT}""", scope.params)
+        WHERE {scope.runs}{filtre}
+        ORDER BY pr.started_at DESC LIMIT ?""", (*params, limit))
     return [
         RecentRun(
             id=str(r["id"]), project_id=str(r["project_id"]), ticket_id=str(r["ticket_id"]),
