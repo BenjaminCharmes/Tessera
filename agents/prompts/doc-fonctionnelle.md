@@ -51,6 +51,17 @@ exact, comme dans la doc technique.
 { "fichier": "docs/guide-utilisateur.md", "apres_section": "## Lancer un ticket", "texte": "…" }
 ```
 
+Un fichier qui n'apparaît pas dans le contenu fourni n'existe pas encore :
+`ancien` et `apres_section` y seraient refusés. Crée-le en donnant son texte
+entier dans `contenu`. `contenu` ne sert qu'à créer, jamais à remplacer un
+fichier existant.
+
+```json
+{ "fichier": "docs/guide-utilisateur.md", "contenu": "# Titre
+
+…" }
+```
+
 Si rien ne change pour l'utilisateur : `{"editions": []}`. C'est une réponse
 fréquente et parfaitement valable — beaucoup de tickets ne changent rien de
 visible.
