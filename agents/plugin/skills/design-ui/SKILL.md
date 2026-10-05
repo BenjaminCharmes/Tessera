@@ -22,13 +22,27 @@ La charte contient, dans cet ordre :
    (fond, texte, état, identité, donnée).
 3. Une échelle typographique : les tailles nommées et leurs usages.
 4. Une échelle d'espacement et les valeurs de rayon retenues.
+5. Le thème déclaré au navigateur, clair ou sombre (voir §3).
 
 ## 2. Aucune valeur en dur
 
 Hors des tokens, rien. Pas de `#3b82f6`, pas de `text-[13px]`, pas de
 `p-[18px]`. Si un token manque, l'ajouter à la charte avant de l'utiliser.
 
-## 3. Défauts à éviter
+## 3. Thème du navigateur
+
+Le navigateur ne déduit pas le thème des couleurs CSS : sans `color-scheme`,
+il peint scrollbars, champs, menus `select` et curseur dans **sa** préférence.
+Une app sombre ouverte dans un navigateur clair garde des scrollbars blanches.
+
+- Déclarer `:root { color-scheme: dark; }` (ou `light`) : la valeur suit la
+  **charte**, jamais le système.
+- Une charte à deux thèmes bascule `color-scheme` avec sa classe ou sa media
+  query, en même temps que ses couleurs.
+- Styler les scrollbars (`scrollbar-color`, `::-webkit-scrollbar-*`) avec les
+  tokens de surface et de bordure. L'accent s'y lirait comme un état de plus.
+
+## 4. Défauts à éviter
 
 Ces choix sont les plus probables pour un modèle sans contrainte ; ils sont
 tous interdits sauf décision explicite de la charte :
@@ -43,7 +57,7 @@ tous interdits sauf décision explicite de la charte :
 - **Une couleur différente par section** : la dérive commence ici. Cinq familles,
   pas plus.
 
-## 4. Hiérarchie
+## 5. Hiérarchie
 
 - Une seule action principale par vue — le bouton le plus visible appelle
   l'action la plus fréquente.
@@ -53,7 +67,7 @@ tous interdits sauf décision explicite de la charte :
 - Contraste minimum AA : 4,5:1 pour le texte courant, 3:1 pour les grandes
   tailles et les composants.
 
-## 5. Densité
+## 6. Densité
 
 Une vue de travail montre des données, pas des marges. L'espace sert à
 séparer des groupes, pas à remplir l'écran. Règle de décision : si tu peux
