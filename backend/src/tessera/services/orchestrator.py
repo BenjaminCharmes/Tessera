@@ -633,10 +633,14 @@ class Orchestrator:
             return
         doc_ms = int((time.monotonic() - t0) * 1000)
         fichiers = list(getattr(doc, "fichiers_modifies", []) or [])
-        self._log(
-            f"[{resultat.ticket_id}] documentation: {len(fichiers)} fichier(s) ({doc_ms}ms)"
-        )
         refus = list(getattr(doc, "refus", []) or [])
+        # « 0 fichier(s) » seul cachait six refus d'affilée sur démineur, chacun
+        # pour plusieurs minutes de calcul (ticket-342).
+        motifs = "".join(f" — refusé : {r[:160]}" for r in refus)
+        self._log(
+            f"[{resultat.ticket_id}] documentation: {len(fichiers)} fichier(s)"
+            f" ({doc_ms}ms){motifs}"
+        )
         tickets = list(getattr(doc, "tickets", []) or [])
         tronque = bool(getattr(doc, "tronque", False))
         marqueur_ecrit = bool(getattr(doc, "marqueur_ecrit", False))
