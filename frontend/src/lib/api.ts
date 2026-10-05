@@ -32,6 +32,7 @@ import type {
   OpenPrResponse,
   Project,
   ProjectUsage,
+  RecentRun,
   RunFromChatResponse,
   Ticket,
   TicketListResponse,
@@ -185,6 +186,18 @@ export const api = {
       request(
         `/usage/stats?days=${days}` +
           (projectId ? `&project_id=${encodeURIComponent(projectId)}` : ""),
+      ),
+    /** Plus de runs récents, ou ceux qu'une recherche retient — ticket-335. */
+    recentRuns: (
+      days: StatsPeriod,
+      projectId: string | null,
+      limit: number,
+      recherche: string,
+    ): Promise<RecentRun[]> =>
+      request(
+        `/usage/recent-runs?days=${days}&limit=${limit}` +
+          (projectId ? `&project_id=${encodeURIComponent(projectId)}` : "") +
+          (recherche ? `&q=${encodeURIComponent(recherche)}` : ""),
       ),
   },
   github: {

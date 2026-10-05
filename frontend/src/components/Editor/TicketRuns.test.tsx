@@ -77,4 +77,19 @@ describe("Editor — runs d'un ticket (ticket-332)", () => {
     expect(api.tickets.runs).not.toHaveBeenCalled();
     expect(screen.queryByRole("button", { name: "Revoir le run" })).not.toBeInTheDocument();
   });
+
+  it("shows the three latest runs and folds the others behind a button (ticket-333)", async () => {
+    const runs = Array.from({ length: 8 }, (_, i) => run({ id: `run-${i}` }));
+    vi.mocked(api.tickets.runs).mockResolvedValue(runs);
+    render(<Editor ticket={ticket} />);
+
+    await screen.findAllByRole("button", { name: "Revoir le run" });
+    expect(screen.getAllByRole("button", { name: "Revoir le run" })).toHaveLength(3);
+
+    await userEvent.click(screen.getByRole("button", { name: "Afficher les 5 autres" }));
+    expect(screen.getAllByRole("button", { name: "Revoir le run" })).toHaveLength(8);
+
+    await userEvent.click(screen.getByRole("button", { name: "Masquer" }));
+    expect(screen.getAllByRole("button", { name: "Revoir le run" })).toHaveLength(3);
+  });
 });

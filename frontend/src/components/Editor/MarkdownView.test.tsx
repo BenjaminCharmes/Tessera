@@ -40,4 +40,18 @@ describe("MarkdownView", () => {
     expect(href).toBeNull();
     expect(container.querySelector('a[href="https://exemple.fr"]')).toBeTruthy();
   });
+
+  it("affiche l'en-tête YAML d'un ticket en fiche, pas en paragraphe (ticket-334)", () => {
+    const { container } = render(
+      <MarkdownView source={"---\nid: ticket-042\nstatus: done\n---\n\n# ticket-042 — Titre\n"} />,
+    );
+
+    const fiche = screen.getByRole("group", { name: "En-tête du fichier" });
+    expect(fiche).toHaveTextContent("id");
+    expect(fiche).toHaveTextContent("ticket-042");
+    expect(fiche).toHaveTextContent("done");
+    expect(container.querySelector("hr")).toBeNull();
+    expect(screen.queryByText(/id: ticket-042/)).toBeNull();
+    expect(screen.getByRole("heading", { name: "ticket-042 — Titre" })).toBeInTheDocument();
+  });
 });
