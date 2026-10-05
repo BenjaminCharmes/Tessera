@@ -3,7 +3,7 @@ id: ticket-333
 title: "A ticket's run strip leaves out queue envelopes and folds runs beyond the three latest"
 type: fix
 status: done
-pr_number: null
+pr_number: 250
 priority: medium
 agent: codeur
 depends_on: ["ticket-332"]
