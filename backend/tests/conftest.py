@@ -101,3 +101,21 @@ def _aucun_terme_interdit_de_la_machine(monkeypatch: pytest.MonkeyPatch) -> None
 
     monkeypatch.setattr(settings, "forbidden_terms", "")
     monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _pas_de_vrai_journal() -> Iterator[None]:
+    """Keep the app's startup from attaching the real log file in tests.
+
+    Chaque `TestClient(app)` exécute le `lifespan`, qui ajoutait au logger
+    racine un gestionnaire sur `backend/logs/tessera.log`, jamais retiré : la
+    suite y écrivait, en autant d'exemplaires que de démarrages, et faisait
+    tourner les fichiers gardés pour la trace d'un vrai plantage
+    (ticket-339). `configure_file_logging` reste testé directement, dans
+    `test_logger.py`.
+    """
+    import tessera.main
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(tessera.main, "configure_file_logging", lambda *a, **k: None)
+        yield
