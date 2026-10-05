@@ -144,7 +144,9 @@ class _FakeGit:
     async def commit_bookkeeping(self) -> None:
         pass
 
-    async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+    async def initialiser_base_ref(
+        self, base_branch: str | None = None, *, exiger_distant: bool = False
+    ) -> str | None:
         return None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
@@ -422,7 +424,9 @@ async def test_run_pipeline_cree_une_branche_et_emet_l_event(tmp_path: Path) -> 
         async def commit_bookkeeping(self) -> None:
             pass
 
-        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+        async def initialiser_base_ref(
+            self, base_branch: str | None = None, *, exiger_distant: bool = False
+        ) -> str | None:
             return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:
@@ -482,7 +486,9 @@ async def test_pipeline_done_porte_la_branche_du_run(tmp_path: Path) -> None:
         async def commit_bookkeeping(self) -> None:
             pass
 
-        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+        async def initialiser_base_ref(
+            self, base_branch: str | None = None, *, exiger_distant: bool = False
+        ) -> str | None:
             return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:
@@ -1254,7 +1260,9 @@ class _DirtyingGit:
     async def commit_bookkeeping(self) -> None:
         pass
 
-    async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+    async def initialiser_base_ref(
+        self, base_branch: str | None = None, *, exiger_distant: bool = False
+    ) -> str | None:
         return None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
