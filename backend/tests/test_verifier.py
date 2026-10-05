@@ -166,3 +166,35 @@ def test_python_steps_use_the_running_interpreter() -> None:
     for step in STEPS:
         if step.name in ("pytest", "mypy"):
             assert step.cmd[0] == sys.executable
+
+
+# ---------------------------------------------------------------------------
+# Parallel pytest (ticket-357)
+# ---------------------------------------------------------------------------
+
+
+def test_pytest_runs_on_several_workers_when_xdist_is_installed() -> None:
+    from verifier import pytest_command
+
+    with patch("verifier.importlib.util.find_spec", return_value=MagicMock()):
+        cmd = pytest_command()
+
+    assert cmd[:3] == [sys.executable, "-m", "pytest"]
+    assert cmd[cmd.index("-n") + 1] == "8"
+
+
+def test_pytest_runs_serially_when_xdist_is_missing() -> None:
+    from verifier import pytest_command
+
+    with patch("verifier.importlib.util.find_spec", return_value=None):
+        cmd = pytest_command()
+
+    assert "-n" not in cmd
+    assert cmd[:3] == [sys.executable, "-m", "pytest"]
+
+
+def test_xdist_is_a_dev_dependency() -> None:
+    pyproject = (Path(__file__).resolve().parent.parent / "pyproject.toml").read_text(
+        encoding="utf-8"
+    )
+    assert '"pytest-xdist' in pyproject
