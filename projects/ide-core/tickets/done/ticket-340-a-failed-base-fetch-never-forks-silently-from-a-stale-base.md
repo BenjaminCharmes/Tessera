@@ -3,7 +3,7 @@ id: ticket-340
 title: "A failed fetch of the base is retried, logged, and blocks a dependent ticket instead of forking it from a stale base"
 type: fix
 status: done
-pr_number: null
+pr_number: 259
 priority: high
 agent: codeur
 depends_on: []
