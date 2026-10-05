@@ -36,12 +36,19 @@ interface RecentRunsProps {
   showProject: boolean;
   /** Appelé quand l'utilisateur clique sur une ligne — ouvre la vue du run (ticket-281). */
   onSelect?: (run: RecentRun) => void;
+  /** Le message d'une liste vide : une recherche n'est pas une période vide. */
+  vide?: string;
 }
 
 /** Les derniers runs de la période — ticket-201. */
-export default function RecentRuns({ runs, showProject, onSelect }: RecentRunsProps) {
+export default function RecentRuns({
+  runs,
+  showProject,
+  onSelect,
+  vide = "Aucun run sur la période.",
+}: RecentRunsProps) {
   if (runs.length === 0) {
-    return <p className="text-xs text-zinc-500">Aucun run sur la période.</p>;
+    return <p className="text-xs text-zinc-500">{vide}</p>;
   }
   const th = "px-2 py-1.5 text-left font-normal text-zinc-500";
   const td = "px-2 py-1.5";
