@@ -1276,3 +1276,4 @@ Analyse effectuée :
 - 2026-10-05 12:30:15 UTC — [ticket-343] tour 2 — reviewer terminé (200812ms)
 - 2026-10-05 12:30:45 UTC — [ticket-343] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (231296ms)
 - 2026-10-05 12:30:45 UTC — [ticket-343] APPROVED après 2 tour(s)
+- 2026-10-05 12:34:18 UTC — [ticket-343] documentation: échec — coroutine raised StopIteration
