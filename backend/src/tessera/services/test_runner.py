@@ -5,6 +5,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tessera.services.commande_chainee import decouper
 from tessera.services.lancement import essais_de_commande
 from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
 from tessera.utils.logger import get_logger
@@ -42,6 +43,18 @@ class TestResult:
     #: ne demande pas la même chose au codeur. Deux tours de revue ont été
     #: dépensés à corriger du code qui n'était pas en cause (ticket-157).
     demarree: bool = True
+    #: Chaque étape lancée et son code de sortie, dans l'ordre : ce que le
+    #: validateur lit pour juger « typecheck, lint et build passent »
+    #: (ticket-337).
+    etapes: list["EtapeTest"] = field(default_factory=list)
+
+
+@dataclass
+class EtapeTest:
+    """One step of the test command, as it was launched."""
+
+    commande: str
+    code: int
 
 
 class TestRunnerService:
@@ -108,9 +121,21 @@ class TestRunnerService:
         # provider ; il vaut partout où l'on lance un processus (ticket-158).
         project_path = project_path.resolve()
         cmd = self.detect_test_command(project_path, override=test_command)
-        args = shlex.split(cmd)
         if timeout is None:
             timeout = self._timeout
+        try:
+            etapes_args = decouper(cmd)
+        except ValueError as exc:
+            # `CommandeNonGeree`, ou des guillemets que `shlex` ne referme pas :
+            # rien n'a été lancé, et ce n'est pas un test rouge (ticket-337).
+            return TestResult(
+                passed=False,
+                demarree=False,
+                total=0,
+                failed=0,
+                output_summary=f"La commande de test n'a pas démarré : {exc}",
+                errors=[str(exc)],
+            )
 
         # Même frontière que les services d'ADR-042 : un `cwd` qui sort du
         # projet ne lance rien, et le résultat le dit plutôt que de lever.
@@ -126,11 +151,41 @@ class TestRunnerService:
                 errors=[str(exc)],
             )
 
+        # Une étape après l'autre, et l'on s'arrête à la première qui échoue,
+        # comme `&&` le ferait dans un shell (ticket-337).
         start = time.monotonic()
+        etapes: list[EtapeTest] = []
+        sorties: list[str] = []
+        code = 0
+        for args in etapes_args:
+            issue = await self._executer(args, dossier, cmd, timeout, start)
+            if isinstance(issue, TestResult):
+                issue.etapes = etapes
+                return issue
+            code, sortie = issue
+            etapes.append(EtapeTest(commande=shlex.join(args), code=code))
+            sorties.append(sortie)
+            if code != 0:
+                break
+
+        duration_ms = int((time.monotonic() - start) * 1000)
+        result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
+        result.etapes = etapes
+        return result
+
+    async def _executer(
+        self, args: list[str], dossier: Path, cmd: str, timeout: int, start: float
+    ) -> "tuple[int, str] | TestResult":
+        """Run one step; a ``TestResult`` when it could not run to its end.
+
+        ``timeout`` bounds the whole command, not each step: what earlier
+        steps used is taken from what this one may use.
+        """
+        restant = max(float(timeout) - (time.monotonic() - start), 0.0)
         try:
             proc = await self._lancer(args, dossier)
             stdout_bytes, stderr_bytes = await asyncio.wait_for(
-                proc.communicate(), timeout=float(timeout)
+                proc.communicate(), timeout=restant
             )
         except asyncio.TimeoutError:
             # `kill()` sans `wait()` laisse un zombie et un transport que
@@ -165,7 +220,7 @@ class TestRunnerService:
                 total=0,
                 failed=0,
                 output_summary=(
-                    f"La commande de test n'a pas démarré : « {cmd} » — "
+                    f"La commande de test n'a pas démarré : « {shlex.join(args)} » — "
                     "exécutable introuvable. Ce n'est pas un test en échec."
                 ),
                 errors=[str(exc)],
@@ -183,12 +238,9 @@ class TestRunnerService:
                 duration_ms=duration_ms,
             )
 
-        duration_ms = int((time.monotonic() - start) * 1000)
         stdout = stdout_bytes.decode("utf-8", errors="replace")
         stderr = stderr_bytes.decode("utf-8", errors="replace")
-        combined = (stdout + "\n" + stderr).strip()
-
-        return _parse_output(proc.returncode or 0, combined, duration_ms)
+        return proc.returncode or 0, (stdout + "\n" + stderr).strip()
 
 
 def _parse_output(returncode: int, output: str, duration_ms: int) -> TestResult:

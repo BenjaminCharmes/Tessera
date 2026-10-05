@@ -41,5 +41,10 @@ Règles :
 - `index` : **obligatoire** — numéro du critère tel qu'il t'a été transmis (entier, à partir de 1). C'est ce champ qui permet à l'orchestrateur de rattacher ta réponse au bon critère même si tu en as reformulé le texte.
 - `note` : laisser vide si `passed: true`, expliquer précisément si `false`
 - Un critère invérifiable depuis le diff est toujours `passed: false`
+- Un critère qui demande qu'une commande passe (typecheck, lint, tests, build)
+  se juge sur « Étapes lancées » : satisfait si une étape qui la lance a rendu
+  `exit 0`, invérifiable si aucune ne la lance
+- Un critère refusé parce que le code qu'il vise est hors du diff le dit dans
+  `note` : nommer le fichier entre backticks dans le critère le joindrait
 - Si aucun critère d'acceptation → `criteria: []`
 - Le verdict final est calculé par l'orchestrateur ; tu n'as pas à le rendre

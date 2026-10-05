@@ -95,7 +95,16 @@ testeur est désactivé sur le projet : le validateur ne reçoit alors aucun
 résultat de test, juge le critère invérifiable, et depuis le ticket-209 un
 critère invérifiable fait refuser le run (ticket-219). Nommer plutôt le test
 qui doit exister ; faire tourner les suites relève de la vérification avant
-merge.
+merge. Testeur actif, le validateur voit chaque étape de la `test_command` et
+son code de sortie (ticket-337) : « `npm run build` passe » ne se vérifie que
+si `build` en fait partie.
+
+**Un critère satisfait par du code déjà là nomme son fichier entre
+backticks.** Le validateur ne voit que le diff, plus les fichiers que les
+critères citent ainsi (ticket-316). « La grille porte `overflow-x: auto` »,
+déjà vrai dans un CSS que le run ne touche pas, se refuse ;
+« `main.css` donne `overflow-x: auto` à la grille » se vérifie (démineur,
+ticket-033).
 
 ## Portée
 

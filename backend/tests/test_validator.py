@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from tessera.services.test_runner import TestResult
+from tessera.services.test_runner import EtapeTest, TestResult
 from tessera.services.validator import (
     CriterionResult,
     ValidationResult,
@@ -119,6 +119,27 @@ class TestValidatorService:
 
         assert len(provider.calls) == 1
         assert "5 passed" in provider.calls[0]["user"]
+
+    async def test_lists_each_step_the_testeur_ran_with_its_exit_code(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # ticket-337 — « typecheck, lint et build passent » se refusait faute
+        # de voir quelles commandes le testeur avait lancées.
+        _set_response(provider, {"criteria": [], "feedback": "OK"})
+        test_result = TestResult(
+            passed=True, total=5, failed=0, output_summary="5 passed",
+            etapes=[EtapeTest("npm run typecheck", 0), EtapeTest("npm run build", 0)],
+        )
+
+        await service.validate(
+            criteria=["typecheck et build passent"],
+            code_produced="code",
+            test_result=test_result,
+        )
+
+        message = provider.calls[0]["user"]
+        assert "`npm run typecheck` — exit 0" in message
+        assert "`npm run build` — exit 0" in message
 
     async def test_changes_requested_on_invalid_json_response(
         self, service: ValidatorService, provider: FakeProvider
