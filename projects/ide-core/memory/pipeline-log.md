@@ -1277,3 +1277,14 @@ Analyse effectuée :
 - 2026-10-05 12:30:45 UTC — [ticket-343] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (231296ms)
 - 2026-10-05 12:30:45 UTC — [ticket-343] APPROVED après 2 tour(s)
 - 2026-10-05 12:34:18 UTC — [ticket-343] documentation: échec — coroutine raised StopIteration
+- 2026-10-05 12:34:30 UTC — [ticket-343] livraison: rebase sur develop (390ms)
+- 2026-10-05 12:34:30 UTC — [ticket-343] livraison: PR #265 ouverte (5454ms)
+- 2026-10-05 12:40:53 UTC — [ticket-344] branche ticket-344-supervision-closes-finished-runs-in-bulk-by-outco
+- 2026-10-05 12:40:54 UTC — [ticket-344] tour 1 — codeur démarré
+- 2026-10-05 12:50:51 UTC — [ticket-344] tour 1 — codeur terminé (596984ms)
+- 2026-10-05 13:04:32 UTC — [ticket-344] testeur: OK (exit 0)
+- 2026-10-05 13:05:00 UTC — [ticket-344] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un composant React pour fermer des (28078ms)
+- 2026-10-05 13:05:00 UTC — [ticket-344] tour 1 — reviewer démarré
+- 2026-10-05 13:06:38 UTC — [ticket-344] tour 1 — reviewer terminé (97921ms)
+- 2026-10-05 13:10:44 UTC — [ticket-344] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit `issueDuRun.ts` (catégorisa (343344ms)
+- 2026-10-05 13:10:44 UTC — [ticket-344] APPROVED après 1 tour(s)
