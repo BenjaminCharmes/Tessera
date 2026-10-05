@@ -330,6 +330,15 @@ class GitWorkspaceService:
         # the counterpart of `is_clean` ignoring untracked files: both ends
         # agree on what "not ours" means).
         self._preexisting_untracked: tuple[str, ...] = ()
+        # Basenames of tracked ticket files at run start (ticket-343).
+        # Set by `create_branch`; `None` means it was not called yet.
+        # `commit_bookkeeping` uses this to decide whether an untracked file
+        # under `tickets/` is a status-folder move (basename was tracked → stage)
+        # or a freshly created ticket (→ leave untracked).
+        # When None, falls back to the original behaviour: stage every
+        # untracked ticket file that is not pre-existing (ticket-314 scenario
+        # where bookkeeping is committed before the branch switch).
+        self._tracked_ticket_basenames: frozenset[str] | None = None
         # The commit from which the current ticket branch diverged from its
         # base. On a fresh branch this equals `_base_ref`; on a resumed branch
         # it is the merge-base of the branch and `_base_ref` (ticket-208). Used by `diff_depuis_base` to include all prior
@@ -349,6 +358,7 @@ class GitWorkspaceService:
         if self._base_ref is None:
             self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
         self._preexisting_untracked = await self._untracked_files()
+        self._tracked_ticket_basenames = await self._list_tracked_ticket_basenames()
 
         branch_name = _branch_name(ticket_id, slug)
 
@@ -1406,6 +1416,68 @@ class GitWorkspaceService:
         await self.commit_bookkeeping()
         return sha
 
+    async def _list_tracked_ticket_basenames(self) -> frozenset[str]:
+        """Return the basenames of tracked files under ``tickets/`` at call time.
+
+        Used by ``commit_bookkeeping`` to distinguish a status-folder move
+        (the ticket's basename reappears in a new folder) from a ticket file
+        created from scratch during the run, which must not ride along in the
+        bookkeeping commit (ticket-343).
+        """
+        try:
+            listing = await self._run("ls-files", "--", "tickets/")
+        except GitCommandError:
+            return frozenset()
+        return frozenset(
+            Path(p).name for p in listing.splitlines() if p.strip()
+        )
+
+    async def _stage_tickets_selectively(self) -> None:
+        """Stage ticket files for the bookkeeping commit without sweeping new ones.
+
+        Stages modifications and deletions of already-tracked ticket files (via
+        ``git add --update``) and untracked files according to context:
+
+        - Before ``create_branch`` (``_tracked_ticket_basenames is None``): every
+          untracked ticket file is staged minus pre-existing ones.  This preserves
+          the original behaviour needed when bookkeeping is committed before the
+          branch switch (ticket-314).
+        - After ``create_branch``: only untracked files whose basename was tracked
+          at run start are staged (status-folder moves).  Files created from
+          scratch during the run are left untracked (ticket-343).
+        """
+        # Run --update only when tickets/ has tracked content; an empty pathspec
+        # match causes git to exit 128 on some platforms.
+        try:
+            tracked_under_tickets = await self._run("ls-files", "--", "tickets/")
+        except GitCommandError:
+            tracked_under_tickets = ""
+        if tracked_under_tickets.strip():
+            try:
+                await self._run("add", "--update", "--", "tickets/")
+            except GitCommandError as exc:
+                _logger.warning("stage_tickets_update_failed", extra={"error": str(exc)})
+
+        try:
+            listing = await self._run(
+                "ls-files", "--others", "--exclude-standard", "--", "tickets/"
+            )
+        except GitCommandError:
+            return
+        for untracked in listing.splitlines():
+            untracked = untracked.strip()
+            if not untracked:
+                continue
+            if untracked in self._preexisting_untracked:
+                continue
+            # None → create_branch not yet called, use original permissive behaviour.
+            # frozenset → use the selective (basename-match) behaviour.
+            if (
+                self._tracked_ticket_basenames is None
+                or Path(untracked).name in self._tracked_ticket_basenames
+            ):
+                await self._run("add", "--", untracked)
+
     async def commit_bookkeeping(self) -> None:
         """Commit only Tessera's own bookkeeping, under its fixed message.
 
@@ -1438,14 +1510,16 @@ class GitWorkspaceService:
                 conservees.append(chemin)
         existing_bookkeeping_paths = conservees
         if existing_bookkeeping_paths:
-            # Exclut les fichiers qui étaient non suivis au démarrage du run :
-            # `commit_all` les exclut déjà du commit principal (ticket-270).
-            preexisting_excludes = tuple(
-                f":(exclude){p}" for p in self._preexisting_untracked
-            )
-            await self._run(
-                "add", "-A", "--", *existing_bookkeeping_paths, *preexisting_excludes
-            )
+            # Stage each bookkeeping path selectively:
+            # - tickets/ : modifications/deletions of tracked files + untracked
+            #   status moves only — new tickets created during the run are left
+            #   untracked (ticket-343).
+            # - memory/pipeline-log.md : always Tessera's own file, stage directly.
+            for chemin in existing_bookkeeping_paths:
+                if chemin == "tickets/":
+                    await self._stage_tickets_selectively()
+                else:
+                    await self._run("add", "--", chemin)
             staged_bookkeeping = await self._run("diff", "--cached", "--name-only")
             if staged_bookkeeping.strip():
                 await self._run("commit", "-m", _BOOKKEEPING_COMMIT_MESSAGE)

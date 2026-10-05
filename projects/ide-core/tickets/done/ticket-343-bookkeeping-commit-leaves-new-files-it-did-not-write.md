@@ -1,14 +1,15 @@
 ---
-id: ticket-343
-title: "The bookkeeping commit leaves out ticket files created during the run that Tessera did not move"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-05
+id: ticket-343
+pr_number: 265
+priority: medium
+status: done
+title: The bookkeeping commit leaves out ticket files created during the run that
+  Tessera did not move
+type: fix
 ---
 
 # ticket-343 — Le commit de suivi n'embarque plus un ticket écrit pendant le run
