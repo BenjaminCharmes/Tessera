@@ -196,8 +196,11 @@ async def test_preexisting_untracked_not_swept_into_bookkeeping(repo: Path) -> N
     scratch.write_text("# brouillon\n", encoding="utf-8")
 
     service = GitWorkspaceService(repo)
-    # Simule l'état enregistré lors de create_branch() au démarrage du run
+    # Simule l'état enregistré lors de create_branch() au démarrage du run.
+    # ticket-001-un-ticket.md était suivi avant le run (déplacement de statut) ;
+    # scratch.md existait déjà non suivi (ticket-343).
     service._preexisting_untracked = ("tickets/todo/scratch.md",)
+    service._tracked_ticket_basenames = frozenset({"ticket-001-un-ticket.md"})
 
     await service.commit_bookkeeping()
 
