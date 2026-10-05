@@ -2,8 +2,8 @@
 id: ticket-332
 title: "A selected ticket lists its finished runs and offers to replay each one"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 248
 priority: medium
 agent: codeur
 depends_on: []
@@ -45,14 +45,14 @@ n'affiche pas de bande. Un fichier ouvert depuis l'arbre non plus.
 
 ## Critères d'acceptation
 
-- [ ] Un test du frontend rend l'éditeur sur un ticket qui a un run terminé et
+- [x] Un test du frontend rend l'éditeur sur un ticket qui a un run terminé et
       vérifie qu'il affiche « Revoir le run »
-- [ ] Le même test clique sur le bouton et vérifie que la vue du run
+- [x] Le même test clique sur le bouton et vérifie que la vue du run
       (`RunHistorique`) remplace le fichier du ticket, puis que la fermer
       ramène au ticket
-- [ ] Un test vérifie qu'un run non terminé (enveloppe de file, run en cours)
+- [x] Un test vérifie qu'un run non terminé (enveloppe de file, run en cours)
       n'est pas proposé
-- [ ] Un test vérifie qu'un fichier ouvert depuis l'arbre n'affiche pas la
+- [x] Un test vérifie qu'un fichier ouvert depuis l'arbre n'affiche pas la
       bande
 
 ## Ce que ça ne fait pas
