@@ -3,7 +3,7 @@ id: ticket-342
 title: "Documentation agents can create a missing file, and the pipeline log says why a batch was refused"
 type: fix
 status: done
-pr_number: null
+pr_number: 261
 priority: high
 agent: codeur
 depends_on: []
