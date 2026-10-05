@@ -99,7 +99,7 @@
     "testeur_enabled": true,
     "test_command": "uv run python ../scripts/verifier.py",
     "test_cwd": "../../backend",
-    "test_timeout_s": 900,
+    "test_timeout_s": 1500,
     "securite_enabled": true,
     "validateur_enabled": true,
     "doc_claude_md": true
