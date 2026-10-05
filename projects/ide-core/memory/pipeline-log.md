@@ -1263,3 +1263,16 @@ Analyse effectuée :
 - 2026-10-03 17:33:34 UTC — [ticket-317] livraison: rebase sur develop (828ms)
 - 2026-10-03 17:33:34 UTC — [ticket-317] livraison: PR #239 ouverte (4375ms)
 - 2026-10-03 17:33:34 UTC — [ide-core] ticket-317 PR #239 confiée au CIWatcher
+- 2026-10-05 12:00:10 UTC — [ticket-343] branche ticket-343-the-bookkeeping-commit-leaves-out-ticket-files-cr
+- 2026-10-05 12:00:10 UTC — [ticket-343] tour 1 — codeur démarré
+- 2026-10-05 12:07:27 UTC — [ticket-343] tour 1 — codeur terminé (436046ms)
+- 2026-10-05 12:12:40 UTC — [ticket-343] testeur: 1 failed, 909 passed, 3 deselected, 6 warnings in 309.94s (0:05:09)
+- 2026-10-05 12:12:40 UTC — [ticket-343] tests rouges au tour 1
+- 2026-10-05 12:12:40 UTC — [ticket-343] tour 2 — codeur démarré
+- 2026-10-05 12:16:55 UTC — [ticket-343] tour 2 — codeur terminé (255250ms)
+- 2026-10-05 12:26:22 UTC — [ticket-343] testeur: OK (exit 0)
+- 2026-10-05 12:26:54 UTC — [ticket-343] securite: PASS — Audit de sécurité du diff git_workspace.py / ticket-343 — aucune vulnérabilité d (31952ms)
+- 2026-10-05 12:26:54 UTC — [ticket-343] tour 2 — reviewer démarré
+- 2026-10-05 12:30:15 UTC — [ticket-343] tour 2 — reviewer terminé (200812ms)
+- 2026-10-05 12:30:45 UTC — [ticket-343] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (231296ms)
+- 2026-10-05 12:30:45 UTC — [ticket-343] APPROVED après 2 tour(s)
