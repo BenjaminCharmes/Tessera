@@ -40,6 +40,8 @@ interface RunHistoriqueProps {
   ticketId: string;
   /** Appelé quand l'utilisateur ferme la vue et revient à l'historique. */
   onClose: () => void;
+  /** Libellé du bouton de fermeture : là d'où l'on vient (ticket-332). */
+  libelleRetour?: string;
 }
 
 type Phase =
@@ -57,6 +59,7 @@ export default function RunHistorique({
   runId,
   ticketId,
   onClose,
+  libelleRetour = "Historique",
 }: RunHistoriqueProps) {
   // Le résultat garde le run qu'il décrit : changer de run repasse en
   // chargement sans `setState` synchrone dans l'effet, que la règle
@@ -93,7 +96,7 @@ export default function RunHistorique({
           onClick={onClose}
           className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200"
         >
-          <IconHistory size={12} /> Historique
+          <IconHistory size={12} /> {libelleRetour}
         </button>
       </div>
 
