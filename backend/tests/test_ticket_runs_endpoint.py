@@ -40,13 +40,14 @@ async def _insert_run(
     ticket_id: str,
     started_at: str,
     finished_at: str | None = None,
+    mode: str | None = "single",
 ) -> None:
     async with aiosqlite.connect(str(db_path)) as conn:
         await conn.execute(
             "INSERT INTO pipeline_runs"
             " (id, project_id, ticket_id, started_at, finished_at, rounds, approved, final_status, mode)"
             " VALUES (?,?,?,?,?,?,?,?,?)",
-            (run_id, project_id, ticket_id, started_at, finished_at, 1, 1, "done", "single"),
+            (run_id, project_id, ticket_id, started_at, finished_at, 1, 1, "done", mode),
         )
         await conn.commit()
 
@@ -119,3 +120,23 @@ def test_unknown_ticket_returns_404() -> None:
     resp = _client().get("/api/v1/projects/proj-alpha/tickets/ticket-999/runs")
 
     assert resp.status_code == 404
+
+
+def test_queue_and_autonomous_envelopes_are_excluded() -> None:
+    """ticket-333 — an envelope carries the first ticket's id but is not its run.
+
+    It replays every ticket of its queue: listed under the first one, it showed
+    as a second « approuvé » run at 0 $ (ticket-327, 2026-10-05). A row from
+    before the migration (mode NULL) is a ticket run and stays.
+    """
+    for run_id, mode in (("r-file", "queue"), ("r-auto", "autonomous"),
+                         ("r-seul", "single"), ("r-ancien", None)):
+        asyncio.run(_insert_run(
+            settings.ide_db_path, run_id, "proj-alpha", "ticket-001",
+            "2026-09-01T10:00:00+00:00", "2026-09-01T10:10:00+00:00", mode=mode,
+        ))
+
+    resp = _client().get("/api/v1/projects/proj-alpha/tickets/ticket-001/runs")
+
+    assert resp.status_code == 200
+    assert {r["id"] for r in resp.json()} == {"r-seul", "r-ancien"}
