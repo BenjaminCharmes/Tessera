@@ -119,7 +119,9 @@ class TestDossierEtDelaiDeclares:
         ):
             await runner.run_tests(python_project, test_command="uv run pytest")
 
-        assert attente.call_args.kwargs["timeout"] == 300.0
+        # Le délai borne la commande entière : une étape reçoit ce qui reste,
+        # moins les microsecondes déjà écoulées (ticket-337).
+        assert attente.call_args.kwargs["timeout"] == pytest.approx(300.0, abs=1.0)
 
 
 class TestRunTests:
