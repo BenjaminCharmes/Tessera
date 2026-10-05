@@ -4,7 +4,7 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
 id: ticket-344
-pr_number: null
+pr_number: 268
 priority: medium
 status: done
 title: Supervision closes finished runs in bulk, by outcome
