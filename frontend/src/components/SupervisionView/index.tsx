@@ -5,6 +5,9 @@ import RunCard from "./RunCard";
 import ServicesLances from "./ServicesLances";
 import AgentPanel from "../AgentPanel";
 import RunHistorique from "../StatsView/RunHistorique";
+import MenuFermer from "./MenuFermer";
+import { issueDuRun } from "./issueDuRun";
+import type { IssueDuRun } from "./issueDuRun";
 import { INITIAL } from "../../hooks/streamState";
 import type { UseRunActifResult } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
@@ -40,11 +43,35 @@ export default function SupervisionView({
   projects,
   services = [],
 }: SupervisionViewProps) {
-  const { runs, selection, selectionner, etatDe } = supervision;
+  const { runs, selection, selectionner, etatDe, fermerRuns } = supervision;
   const limites = useLimites();
 
   // Run affiché en lecture seule — ticket-327.
   const [revisuRun, setRevisuRun] = useState<{ runId: string; ticketId: string } | null>(null);
+
+  // Runs déjà clos, classés par issue (ticket-344).
+  const runsClos = runs.filter((r) => etatDe(r.run_id).runClosed);
+  const compterIssue = (issue: IssueDuRun): number =>
+    runsClos.filter((r) => issueDuRun(etatDe(r.run_id)) === issue).length;
+
+  /** Ferme un lot de runs et nettoie la revue en lecture seule si besoin. */
+  function fermerLot(issue: IssueDuRun | null) {
+    const aFermer =
+      issue === null
+        ? runsClos.map((r) => r.run_id)
+        : runsClos
+            .filter((r) => issueDuRun(etatDe(r.run_id)) === issue)
+            .map((r) => r.run_id);
+    const ensemble = new Set(aFermer);
+    // Fermer revisuRun si son run est dans le lot.
+    if (revisuRun !== null) {
+      const runEnRevisu = runs.find((r) => r.db_run_id === revisuRun.runId);
+      if (runEnRevisu && ensemble.has(runEnRevisu.run_id)) {
+        setRevisuRun(null);
+      }
+    }
+    fermerRuns(aFermer);
+  }
 
   // Les runs qui attendent une réponse passent en tête (ticket-266).
   const runsTries = [...runs].sort((a, b) => {
@@ -77,9 +104,22 @@ export default function SupervisionView({
     <div className="flex h-full flex-col overflow-hidden bg-zinc-900">
       <div className={`${BAND} justify-between border-b border-zinc-800 px-3`}>
         <RegionTitle>Supervision</RegionTitle>
-        <span className="text-micro text-zinc-500">
-          {supervision.connecte ? etiquette(runs.length) : "hors ligne"}
-        </span>
+        <div className="flex items-center gap-3">
+          {runsClos.length > 0 && (
+            <MenuFermer
+              entrees={[
+                { label: "Les terminés", issue: "termine", count: compterIssue("termine") },
+                { label: "Les bloqués", issue: "bloque", count: compterIssue("bloque") },
+                { label: "En erreur", issue: "erreur", count: compterIssue("erreur") },
+                { label: "Tous les runs clos", issue: null, count: runsClos.length },
+              ]}
+              onFermer={fermerLot}
+            />
+          )}
+          <span className="text-micro text-zinc-500">
+            {supervision.connecte ? etiquette(runs.length) : "hors ligne"}
+          </span>
+        </div>
       </div>
 
       {services.length > 0 ? (
