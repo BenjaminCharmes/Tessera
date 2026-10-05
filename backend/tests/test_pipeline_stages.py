@@ -225,7 +225,9 @@ async def test_create_branch_degrade_sans_depot_git() -> None:
         async def commit_bookkeeping(self) -> None:
             pass
 
-        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+        async def initialiser_base_ref(
+            self, base_branch: str | None = None, *, exiger_distant: bool = False
+        ) -> str | None:
             return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:
@@ -245,7 +247,9 @@ async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
         async def commit_bookkeeping(self) -> None:
             pass
 
-        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+        async def initialiser_base_ref(
+            self, base_branch: str | None = None, *, exiger_distant: bool = False
+        ) -> str | None:
             return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:
@@ -270,7 +274,9 @@ async def test_create_branch_git_command_error_bloque_le_run() -> None:
         async def commit_bookkeeping(self) -> None:
             pass
 
-        async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+        async def initialiser_base_ref(
+            self, base_branch: str | None = None, *, exiger_distant: bool = False
+        ) -> str | None:
             return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:

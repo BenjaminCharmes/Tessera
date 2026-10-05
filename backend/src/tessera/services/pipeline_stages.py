@@ -161,7 +161,12 @@ async def _basculer(
         # Sync base_branch with remote before forking the ticket branch (ticket-285).
         # A diverged local base blocks the run immediately rather than producing
         # a PR that GitHub will immediately reject.
-        raison_blocage = await orch._git_workspace.initialiser_base_ref()
+        # Un ticket qui dépend d'un autre ne part jamais d'une base locale
+        # faute de lire le distant : elle peut précéder le merge attendu
+        # (ticket-340).
+        raison_blocage = await orch._git_workspace.initialiser_base_ref(
+            exiger_distant=bool(run.ticket.depends_on)
+        )
         if raison_blocage is not None:
             _logger.warning("base_divergee_blocage", extra={"raison": raison_blocage})
             await set_status(orch, run, TicketStatus.blocked)
