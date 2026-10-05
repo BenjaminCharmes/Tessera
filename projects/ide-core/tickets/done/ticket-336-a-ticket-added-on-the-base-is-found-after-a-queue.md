@@ -3,7 +3,7 @@ id: ticket-336
 title: "A ticket added on the base is found even when the repo still sits on the last delivered branch"
 type: fix
 status: done
-pr_number: null
+pr_number: 254
 priority: high
 agent: codeur
 depends_on: []
