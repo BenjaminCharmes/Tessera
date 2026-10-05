@@ -2,8 +2,8 @@
 id: ticket-338
 title: "The design-ui skill makes every charter declare its color-scheme and style its scrollbars"
 type: docs
-status: in-progress
-pr_number: null
+status: done
+pr_number: 257
 priority: medium
 agent: codeur
 depends_on: []
