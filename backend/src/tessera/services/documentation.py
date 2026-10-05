@@ -86,6 +86,10 @@ def appliquer_editions(
 
     ``claude_md`` est le CLAUDE.md du projet quand il le déclare documentable
     (ticket-244) ; sans lui, une modification de « CLAUDE.md » est refusée.
+
+    Une édition ``contenu`` crée un fichier absent (ticket-342) : sans elle, un
+    guide qui n'existe pas encore ne pouvait jamais naître. Elle n'écrase
+    jamais un fichier existant.
     """
     resultat: dict[Path, str] = {}
 
@@ -100,10 +104,28 @@ def appliquer_editions(
             )
         else:
             fichier = racine / chemin
-        if not fichier.is_file():
-            raise EditionRefusee(f"{chemin} : fichier introuvable.")
 
-        avant = resultat.get(fichier, fichier.read_text(encoding="utf-8"))
+        if "contenu" in edition:
+            if fichier in resultat or fichier.exists():
+                raise EditionRefusee(
+                    f"{chemin} existe déjà : `contenu` ne sert qu'à créer un fichier "
+                    "absent. Modifier un fichier passe par `ancien` ou `apres_section`."
+                )
+            contenu = str(edition.get("contenu", ""))
+            if not contenu.strip():
+                raise EditionRefusee(f"{chemin} : création sans contenu.")
+            resultat[fichier] = contenu
+            continue
+
+        if fichier not in resultat and not fichier.is_file():
+            raise EditionRefusee(
+                f"{chemin} : fichier introuvable. Pour le créer, donner son texte "
+                "entier dans `contenu`."
+            )
+
+        # Pas de `resultat.get(fichier, read_text())` : le défaut serait lu sur
+        # disque même pour un fichier que ce lot vient de créer.
+        avant = resultat[fichier] if fichier in resultat else fichier.read_text(encoding="utf-8")
 
         if "apres_section" in edition:
             resultat[fichier] = _inserer(avant, edition, chemin)
@@ -119,6 +141,7 @@ def appliquer_editions(
             raise EditionRefusee(refus)
 
     for fichier, contenu in resultat.items():
+        fichier.parent.mkdir(parents=True, exist_ok=True)
         fichier.write_text(contenu, encoding="utf-8")
     return [str(f) for f in resultat]
 
@@ -368,7 +391,7 @@ class DocumentationService:
                 modifies.extend(appliquer_editions(racine, editions, claude_md=claude_md))
             except EditionRefusee as exc:
                 # Un agent qui se trompe n'empêche pas l'autre d'avoir raison.
-                _logger.warning("editions_refusees", extra={"role": role})
+                _logger.warning("editions_refusees", extra={"role": role, "motif": str(exc)})
                 refus.append(f"{role} : {exc}")
 
         # Le marqueur n'avance que si au moins une édition a été appliquée, ou

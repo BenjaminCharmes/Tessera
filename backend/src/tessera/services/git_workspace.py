@@ -144,6 +144,12 @@ class GitWorkspaceError(Exception):
     """Base class for all errors raised by GitWorkspaceService."""
 
 
+# Un `git fetch` qui échoue une fois — réseau, ou un autre fetch du même dépôt
+# au même instant — réussit souvent à la tentative suivante (ticket-340).
+_TENTATIVES_FETCH = 3
+_ATTENTE_ENTRE_FETCH_S = 2.0
+
+
 class GitCommandError(GitWorkspaceError):
     """A git command failed; carries the context for logging."""
 
@@ -502,7 +508,20 @@ class GitWorkspaceService:
         """
         self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
 
-    async def initialiser_base_ref(self, base_branch: str | None = None) -> str | None:
+    async def _fetch_base(self, base_branch: str) -> None:
+        """Fetch ``base_branch``, retrying a transient failure (ticket-340)."""
+        for tentative in range(1, _TENTATIVES_FETCH + 1):
+            try:
+                await self._run("fetch", "origin", base_branch)
+                return
+            except GitCommandError:
+                if tentative == _TENTATIVES_FETCH:
+                    raise
+                await asyncio.sleep(_ATTENTE_ENTRE_FETCH_S)
+
+    async def initialiser_base_ref(
+        self, base_branch: str | None = None, *, exiger_distant: bool = False
+    ) -> str | None:
         """Align ``_base_ref`` with the remote base branch before the first ticket.
 
         Called once by the pipeline before any ``create_branch`` : sets
@@ -518,6 +537,12 @@ class GitWorkspaceService:
         1. ``origin/<base_branch>`` fast-forward → use remote SHA.
         2. No remote or unreachable → local ``base_branch`` ref.
         3. No local branch either → HEAD, via ``create_branch``'s own fallback.
+
+        ``exiger_distant`` — the ticket depends on another one (ticket-340):
+        a remote that cannot be read is then a reason to block, not to fall
+        back. The local base may predate the dependency's merge, and the
+        ticket would be coded against it, approved, then stopped by a
+        conflict at delivery.
         """
         if base_branch is None and self._politique is not None:
             base_branch = self._politique.base_branch
@@ -526,9 +551,23 @@ class GitWorkspaceService:
 
         # Attempt remote fetch
         try:
-            await self._run("fetch", "origin", base_branch)
-        except GitCommandError:
-            # No remote or network error: use local base_branch if it exists
+            await self._fetch_base(base_branch)
+        except GitCommandError as exc:
+            erreur = exc.stderr.strip() or str(exc)
+            if exiger_distant:
+                raison = (
+                    f"La base distante « {base_branch} » est illisible ({erreur}) : "
+                    "ce ticket dépend d'un autre, et la base locale peut précéder "
+                    "son merge. Le run est bloqué plutôt que parti d'une base périmée."
+                )
+                _logger.warning("base_distante_exigee_illisible", extra={"raison": raison})
+                return raison
+            # No remote or network error: use local base_branch if it exists.
+            # La raison est journalisée : son absence a caché l'origine de la
+            # base périmée du ticket-034 de démineur (ticket-340).
+            _logger.warning(
+                "base_ref_fetch_echoue", extra={"branch": base_branch, "erreur": erreur}
+            )
             try:
                 local_sha = (
                     await self._run("rev-parse", f"refs/heads/{base_branch}")

@@ -37,6 +37,17 @@ texte que tu as lu, par un texte nouveau :
 }
 ```
 
+Un fichier qui n'apparaît pas dans le contenu fourni n'existe pas encore :
+`ancien` et `apres_section` y seraient refusés. Crée-le en donnant son texte
+entier dans `contenu`. `contenu` ne sert qu'à créer, jamais à remplacer un
+fichier existant.
+
+```json
+{ "fichier": "docs/architecture.md", "contenu": "# Titre
+
+…" }
+```
+
 Si rien ne mérite d'être écrit : `{"editions": []}`.
 
 **Le texte `ancien` doit être recopié mot pour mot depuis le contenu fourni.**
