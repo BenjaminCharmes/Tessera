@@ -1,14 +1,14 @@
 ---
-id: ticket-344
-title: "Supervision closes finished runs in bulk, by outcome"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-05
+id: ticket-344
+pr_number: 268
+priority: medium
+status: done
+title: Supervision closes finished runs in bulk, by outcome
+type: feat
 ---
 
 # ticket-344 — Fermer les runs clos par lot, selon leur issue

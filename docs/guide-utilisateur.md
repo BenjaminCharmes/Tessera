@@ -188,6 +188,8 @@ Si un ticket dépend d'un autre, l'IDE t'empêche de le lancer tant que la dépe
 Un ticket sans dépendance peut commencer pendant que la PR du précédent attend sa CI : tu gagnes en vitesse en les lançant tous d'un coup. Déclare une dépendance uniquement si ton ticket repose vraiment sur le code d'un autre — par exemple, une API qu'on ajoute et le client qui l'utilise.
 
 
+Si le ticket dépend d'un autre et que le serveur distant n'est pas accessible, le pipeline arrête le ticket avec une raison explicite. C'est voulu : un ticket qui dépend d'un autre doit partir d'une base à jour, qui contient le merge du prédécesseur. Le fetch distant est retenté jusqu'à trois fois ; après trois échecs, le ticket se bloque plutôt que de partir d'une base périmée.
+
 ## 3 bis. Filtrer et trouver les tickets
 
 Une fois que tu as plusieurs tickets, tu veux souvent en retrouver un particulier. Le tableau mémorise tes filtres (type, priorité, agent, texte) — ils survivent même au redémarrage de l'IDE.
@@ -372,6 +374,10 @@ Quand le pipeline finit (approuvé ou bloqué), la carte du run change d'aspect 
 Par défaut, une fois approuvé, le pipeline enchaîne jusqu'à la livraison — tant qu'il y a un dépôt git et que le projet l'autorise. Sinon, tu vois pourquoi ça s'est arrêté.
 
 
+En haut de l'onglet Supervision, tu as aussi un menu « Fermer… » qui t'affiche le nombre de runs dans chaque catégorie : « Les terminés (3) », « Les bloqués (1) », « En erreur ». Tu cliques sur une entrée pour fermer tous les runs de cette catégorie en un coup. Une entrée avec zéro run est grisée. Le menu ne s'affiche que si au moins un run est clos.
+
+Si tu avais sélectionné un run que tu fermes avec le lot, la Supervision bascule sur un run restant.
+
 ### Rouvrir un run terminé
 
 Un run une fois terminé disparaît de la Supervision après un rechargement ou une fermeture de session. Mais tu peux le relire à tout moment depuis l'historique :
@@ -449,6 +455,14 @@ Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
 Quand revue et validation sont parallèles, leurs événements s'entrelaçent dans le fil : le reviewer démarre, puis le validateur démarre, puis des tokens du reviewer, puis des tokens du validateur, etc. Si les deux refusent, tu vois les deux motifs avec le nom de chaque étape.
 
 Une carte **TESTEUR** s'ajoute au fil après chaque passage du codeur. Elle porte le résumé des résultats — `1 error in 2.32s` ou `all pass` — et, dépliée, le détail des erreurs. Si la suite est rouge, elle t'explique : **« retour au codeur, sans revue »** — c'est pourquoi l'étape Tests est rouge et que l'audit de sécurité et la revue ne tourneront pas ce tour.
+
+### Runs récents — chercher et afficher plus
+
+Dans le cockpit ou l'onglet Supervision, une carte « Runs récents » affiche les dix derniers runs. Tu peux :
+- **Chercher** : tape dans le champ en haut de la carte pour filtrer par numéro de ticket ou nom du projet. La recherche se lance automatiquement quand tu arrêtes de taper.
+- **Afficher plus** : clique le bouton en bas pour ajouter 20 runs à la liste.
+
+Sans action de ta part, la carte reste aux dix runs : elle ne fait aucun appel API en arrière-plan.
 
 ## 5 ter. Après le run : fusion automatique
 
@@ -723,6 +737,8 @@ Cette charte garantit une cohérence dans le temps : chaque ticket UI la respect
 ### Ce que le testeur attrape
 
 Le testeur lance les mêmes outils que ta CI : `pytest` et `mypy` pour Python, `tsc` pour TypeScript, puis `eslint` et `vitest` pour le frontend. Un ticket n'échouera plus soudain en CI sur une erreur de typage ou de lint — le pipeline les détecte tous maintenant, avant même que la PR soit ouverte.
+
+Si tes critères de test chaînent plusieurs étapes avec l'opérateur `&&` (par exemple, `npm run build && npm run test`), le testeur les lance une à une et s'arrête à la première qui échoue. C'est le seul opérateur supporté : `|`, `||`, `;`, `>`, `&` et les redirections sont refusés avec un message d'erreur.
 
 ## 10. Intégration GitHub
 

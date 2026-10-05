@@ -123,6 +123,26 @@ describe("useSupervision", () => {
     expect(result.current.runs).toHaveLength(0);
   });
 
+  it("fermerRuns removes named runs and keeps the others", () => {
+    const { result } = renderHook(() => useSupervision());
+    act(() => {
+      MockWebSocket.instance!.triggerMessage({
+        type: "snapshot",
+        runs: [
+          run({ run_id: "run-1" }),
+          run({ run_id: "run-2", project_id: "portfolio" }),
+          run({ run_id: "run-3", project_id: "autre" }),
+        ],
+      });
+    });
+
+    act(() => {
+      result.current.fermerRuns(["run-1", "run-3"]);
+    });
+
+    expect(result.current.runs.map((r) => r.run_id)).toEqual(["run-2"]);
+  });
+
   it("s'abonne au run sélectionné et se désabonne du précédent", () => {
     // Sans le désabonnement, le flux de tokens de tous les runs déjà regardés
     // continuerait d'arriver — ce que l'abonnement existe pour éviter.
