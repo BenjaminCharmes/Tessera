@@ -38,10 +38,22 @@ def test_les_attributs_extra_sont_dans_le_json() -> None:
     assert payload["message"] == "x"
 
 
+def test_chaque_ligne_porte_son_heure_utc() -> None:
+    # ticket-341 — sans heure, l'échec du fetch du ticket-034 de démineur n'a
+    # pas pu être daté par rapport au merge dont il dépendait.
+    record = _record()
+    record.created = 1_759_653_123.25  # 2025-10-05T08:32:03.250Z
+
+    payload = json.loads(_JsonFormatter().format(record))
+
+    assert payload["ts"] == "2025-10-05T08:32:03.250Z"
+    assert next(iter(payload)) == "ts"
+
+
 def test_les_attributs_standard_ne_sont_pas_dupliques() -> None:
     payload = json.loads(_JsonFormatter().format(_record()))
 
-    assert set(payload) == {"level", "logger", "message"}
+    assert set(payload) == {"ts", "level", "logger", "message"}
 
 
 def test_une_valeur_extra_non_sérialisable_ne_casse_pas_le_log() -> None:

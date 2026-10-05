@@ -10,6 +10,7 @@ import json
 import logging
 import logging.handlers
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -24,9 +25,17 @@ _STANDARD_ATTRIBUTES: frozenset[str] = frozenset(
 ) | {"message", "asctime"}
 
 
+def _horodatage(secondes: float) -> str:
+    instant = datetime.fromtimestamp(secondes, timezone.utc)
+    return instant.strftime("%Y-%m-%dT%H:%M:%S.") + f"{instant.microsecond // 1000:03d}Z"
+
+
 class _JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {
+            # En tête, en UTC à la milliseconde : sans heure, un échec ne se
+            # datait pas par rapport aux événements git qu'il suit (ticket-341).
+            "ts": _horodatage(record.created),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
