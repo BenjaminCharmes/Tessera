@@ -9,6 +9,7 @@ application control refuses them (os error 4551). Python tools run as
 """
 from __future__ import annotations
 
+import importlib.util
 import os
 import subprocess
 import sys
@@ -25,6 +26,12 @@ FRONTEND_DIR = REPO_ROOT / "frontend"
 _PYTHON = sys.executable
 _NPX = "npx.cmd" if os.name == "nt" else "npx"
 
+# 1 973 tests en série prenaient douze minutes, et la suite complète
+# dépassait les 900 s du testeur à elle seule (ticket-357). Huit processus la
+# ramènent à deux minutes et demie sans saturer une machine qui fait tourner
+# d'autres files.
+_PYTEST_WORKERS = "8"
+
 # Ligne max renvoyée au codeur pour ne pas inonder sa fenêtre.
 _MAX_LINES = 120
 
@@ -36,10 +43,20 @@ class Step:
     cwd: Path
 
 
+def pytest_command() -> list[str]:
+    """Return the pytest command, spread over several workers when xdist is installed."""
+    cmd = [_PYTHON, "-m", "pytest", "-q", "-x", "-m", "not integration"]
+    # Sans xdist (environnement synchronisé sans l'extra `dev`), la suite
+    # tourne en série plutôt que d'échouer sur une option inconnue.
+    if importlib.util.find_spec("xdist") is not None:
+        cmd += ["-n", _PYTEST_WORKERS]
+    return cmd
+
+
 STEPS: list[Step] = [
     Step(
         name="pytest",
-        cmd=[_PYTHON, "-m", "pytest", "-q", "-x", "-m", "not integration"],
+        cmd=pytest_command(),
         cwd=BACKEND_DIR,
     ),
     Step(
