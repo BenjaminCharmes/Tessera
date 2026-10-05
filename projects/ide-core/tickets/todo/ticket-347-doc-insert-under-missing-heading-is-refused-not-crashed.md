@@ -1,5 +1,5 @@
 ---
-id: ticket-345
+id: ticket-347
 title: "An insertion under a heading that no line starts with is refused, not a crash of the documentation batch"
 type: fix
 status: todo
@@ -11,7 +11,7 @@ estimated_days: 0.25
 created: 2026-10-05
 ---
 
-# ticket-345 — Une section introuvable se refuse, elle ne fait pas tomber le lot
+# ticket-347 — Une section introuvable se refuse, elle ne fait pas tomber le lot
 
 ## Objectif
 
