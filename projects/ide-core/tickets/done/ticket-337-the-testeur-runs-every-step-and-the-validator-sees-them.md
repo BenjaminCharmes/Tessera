@@ -3,7 +3,7 @@ id: ticket-337
 title: "The testeur runs every step of an && chain, and the validator sees each step with its exit code"
 type: fix
 status: done
-pr_number: null
+pr_number: 255
 priority: high
 agent: codeur
 depends_on: []
