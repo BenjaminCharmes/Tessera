@@ -3,7 +3,7 @@ id: ticket-335
 title: "The recent runs card can show more runs and search them by ticket or project"
 type: feat
 status: done
-pr_number: null
+pr_number: 252
 priority: low
 agent: codeur
 depends_on: []
