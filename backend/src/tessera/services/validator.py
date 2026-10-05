@@ -131,9 +131,15 @@ class ValidatorService:
         test_block = ""
         if test_result is not None:
             badge = "✅" if test_result.passed else "❌"
+            # Chaque étape lancée et son code : sans elles, « typecheck, lint
+            # et build passent » restait invérifiable (ticket-337).
+            etapes = "".join(
+                f"- `{e.commande}` — exit {e.code}\n" for e in test_result.etapes
+            )
             test_block = (
                 f"\n\n## Résultats des tests {badge}\n"
-                f"{test_result.output_summary}\n"
+                + (f"Étapes lancées, dans l'ordre :\n{etapes}\n" if etapes else "")
+                + f"{test_result.output_summary}\n"
                 + (
                     "\nErreurs:\n" + "\n".join(test_result.errors[:3])
                     if test_result.errors
