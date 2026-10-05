@@ -5,6 +5,8 @@ import MonacoEditor from "@monaco-editor/react";
 import { detectLanguage } from "./useMonaco";
 import { readFile } from "../../lib/fs";
 import { useResource } from "../../hooks/useResource";
+import RunHistorique from "../StatsView/RunHistorique";
+import TicketRuns from "./TicketRuns";
 import type { Ticket } from "../../types/api";
 
 interface EditorProps {
@@ -55,6 +57,22 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
   // comme des documents, pas comme du source (ticket-078).
   const [vueRendue, setVueRendue] = useState(true);
 
+  // Le run rouvert depuis la bande du ticket (ticket-332). Rattaché à son
+  // ticket : en sélectionner un autre, ou ouvrir un fichier, le referme.
+  const [revu, setRevu] = useState<{ ticketId: string; runId: string } | null>(null);
+  const ticketAffiche = openFilePath === null ? ticket : null;
+
+  if (ticketAffiche && revu?.ticketId === ticketAffiche.id) {
+    return (
+      <RunHistorique
+        runId={revu.runId}
+        ticketId={ticketAffiche.id}
+        onClose={() => setRevu(null)}
+        libelleRetour="Retour au ticket"
+      />
+    );
+  }
+
   return (
     <div className="flex h-full flex-col">
       {/* Header : chemin du fichier actif */}
@@ -89,6 +107,14 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
           </div>
         )}
       </div>
+
+      {ticketAffiche && (
+        <TicketRuns
+          projectId={ticketAffiche.project_id}
+          ticketId={ticketAffiche.id}
+          onRevoir={(runId) => setRevu({ ticketId: ticketAffiche.id, runId })}
+        />
+      )}
 
       {/* Erreur */}
       {error && (
