@@ -369,6 +369,10 @@ async def list_runs_for_ticket(
     Filters by both `project_id` and `ticket_id` in SQL so the caller never
     receives rows from another project. Uses the covering index added in
     migration #6 to avoid a full-table scan.
+
+    Queue and autonomous envelopes are left out (ticket-333): they carry the
+    first ticket's id but replay the whole queue, as `usage_stats` already
+    assumes (ticket-263).
     """
     async with aiosqlite.connect(str(db_path)) as db:
         db.row_factory = aiosqlite.Row
@@ -379,6 +383,7 @@ async def list_runs_for_ticket(
                FROM pipeline_runs pr
                LEFT JOIN agent_calls ac ON ac.run_id = pr.id
                WHERE pr.project_id = ? AND pr.ticket_id = ?
+                 AND (pr.mode IS NULL OR pr.mode = 'single')
                GROUP BY pr.id
                ORDER BY pr.started_at DESC, pr.rowid DESC""",
             (project_id, ticket_id),
