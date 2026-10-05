@@ -122,6 +122,39 @@ def test_un_ajout_apres_une_section_absente_est_refuse(tmp_path: Path) -> None:
         )
 
 
+def test_insertion_section_niveau_different_leve_edition_refusee(tmp_path: Path) -> None:
+    """'## Supervision' absent quand seul '### Supervision' existe → EditionRefusee, pas StopIteration."""
+    fichier = _doc(tmp_path, "archi.md", "# Titre\n\n### Supervision\n\nDu texte.\n")
+
+    with pytest.raises(EditionRefusee) as exc:
+        appliquer_editions(
+            tmp_path,
+            [{"fichier": "docs/archi.md", "apres_section": "## Supervision", "texte": "ajout"}],
+        )
+
+    message = str(exc.value)
+    assert "## Supervision" in message
+    assert "docs/archi.md" in message
+    assert fichier.read_text(encoding="utf-8") == "# Titre\n\n### Supervision\n\nDu texte.\n"
+
+
+def test_insertion_section_au_milieu_dune_phrase_leve_edition_refusee(tmp_path: Path) -> None:
+    """Section visée présente uniquement au milieu d'une phrase → EditionRefusee."""
+    contenu = "# Titre\n\nVoir aussi ## Supervision pour les détails.\n"
+    fichier = _doc(tmp_path, "archi.md", contenu)
+
+    with pytest.raises(EditionRefusee) as exc:
+        appliquer_editions(
+            tmp_path,
+            [{"fichier": "docs/archi.md", "apres_section": "## Supervision", "texte": "ajout"}],
+        )
+
+    message = str(exc.value)
+    assert "## Supervision" in message
+    assert "docs/archi.md" in message
+    assert fichier.read_text(encoding="utf-8") == contenu
+
+
 def test_une_edition_ne_peut_pas_vider_un_fichier(tmp_path: Path) -> None:
     # Le garde-fou contre la panne d'origine : `doc-updater` réécrivait le
     # fichier entier depuis une vue tronquée à 8 000 caractères, sur un README

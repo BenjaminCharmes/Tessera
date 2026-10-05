@@ -2,7 +2,7 @@
 id: ticket-347
 title: "An insertion under a heading that no line starts with is refused, not a crash of the documentation batch"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -53,18 +53,18 @@ celui des autres éditions refusées (ticket-342).
 
 ## Critères d'acceptation
 
-- [ ] Un test de `backend/tests/test_documentation.py` montre qu'une
+- [x] Un test de `backend/tests/test_documentation.py` montre qu'une
       insertion avec `apres_section: "## Supervision"` dans un texte qui ne
       porte que `### Supervision` lève `EditionRefusee`, et non
       `StopIteration` ni `RuntimeError`
-- [ ] Un test de `backend/tests/test_documentation.py` montre qu'une
+- [x] Un test de `backend/tests/test_documentation.py` montre qu'une
       insertion dont la section n'apparaît qu'au milieu d'une phrase lève
       `EditionRefusee`
-- [ ] Le message de l'`EditionRefusee` contient le chemin et la section visée
-- [ ] Un test existant d'insertion réussie dans `test_documentation.py`
+- [x] Le message de l'`EditionRefusee` contient le chemin et la section visée
+- [x] Un test existant d'insertion réussie dans `test_documentation.py`
       passe toujours sans modification
-- [ ] `_inserer` n'appelle plus `next` sans valeur par défaut
-- [ ] Aucun fichier sous `frontend/` n'est modifié
+- [x] `_inserer` n'appelle plus `next` sans valeur par défaut
+- [x] Aucun fichier sous `frontend/` n'est modifié
 
 ## Ce que ça ne fait pas
 

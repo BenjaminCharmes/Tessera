@@ -177,11 +177,11 @@ def _remplacer(avant: str, edition: dict[str, object], chemin: str) -> str:
 def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
     section = str(edition.get("apres_section", ""))
     texte = str(edition.get("texte", ""))
-    if section not in avant:
-        raise EditionRefusee(f"{chemin} : section « {section} » introuvable.")
 
     lignes = avant.splitlines(keepends=True)
-    debut = next(i for i, l in enumerate(lignes) if l.startswith(section))
+    debut = next((i for i, l in enumerate(lignes) if l.startswith(section)), None)
+    if debut is None:
+        raise EditionRefusee(f"{chemin} : section « {section} » introuvable.")
     niveau = len(section) - len(section.lstrip("#"))
     fin = len(lignes)
     for i in range(debut + 1, len(lignes)):
