@@ -429,9 +429,16 @@ class GitWorkspaceService:
 
         Searches every file under ``tickets/`` on the base ref and writes the
         first one whose name contains ``ticket_id`` to disk.  Returns True when
-        a file was restored, False when nothing was found or ``_base_ref`` is
-        not set (method is safe to call unconditionally).
+        a file was restored, False when nothing was found or no base can be
+        resolved (method is safe to call unconditionally).
+
+        A fresh workspace — one per request (ADR-008) — has no ``_base_ref``
+        yet: it aligns it with the remote base first, so that a ticket added
+        on the base while the repo sat on a delivered branch is found
+        (ticket-336).
         """
+        if self._base_ref is None:
+            await self.initialiser_base_ref()
         if self._base_ref is None:
             return False
 
