@@ -1,14 +1,15 @@
 ---
-id: ticket-348
-title: "Test suites wait for a shared slot across projects, and their timeout starts once it is granted"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-05
+id: ticket-348
+pr_number: 278
+priority: high
+status: done
+title: Test suites wait for a shared slot across projects, and their timeout starts
+  once it is granted
+type: fix
 ---
 
 # ticket-348 — Les suites de tests attendent un créneau partagé entre projets

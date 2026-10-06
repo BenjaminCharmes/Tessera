@@ -105,6 +105,34 @@ Au démarrage, le backend configure un logger qui écrit dans un fichier rotatif
 
 Un opérateur peut consulter ces fichiers pour déboguer un arrêt inattendu du backend.
 
+
+### Gestion du parallélisme des tests (ticket-348)
+
+Quand plusieurs files tournent en parallèle sur plusieurs projets, le testeur de 
+chaque file lançait simultanément sa suite complète. Cela saturait la machine — 
+six suites d'environ six minutes chacune ne laissaient à aucune de CPU libre, 
+causant des timeouts (ticket-347).
+
+`TestRunnerService` est instancié à chaque requête. Un verrou posé sur l'instance 
+ne protège rien. La solution est un `asyncio.Semaphore` **au niveau du module**, 
+créé paresseusement à la première utilisation avec la valeur `max_parallel_test_runs` 
+(défaut **2** — configuré dans `config.py`, variable `MAX_PARALLEL_TEST_RUNS`).
+
+**Garanties** :
+- Au maximum `N` suites de tests tournent en parallèle sur la machine, tous 
+  projets confondus
+- Le timeout ne s'écoule qu'**après** l'obtention du créneau — l'attente en file 
+  d'attente n'est pas décomptée du délai alloué
+- Un rappel optionnel `en_attente: Callable` est appelé une seule fois quand un 
+  créneau n'est pas immédiatement disponible, permettant au pipeline d'enregistrer 
+  une ligne dans le log : `[ticket-XXX] testeur: en attente d'un créneau de test`
+- Le créneau est rendu sur tous les chemins de sortie : timeout, exception, 
+  annulation (`async with`)
+
+Un réglage à 0 ou moins **désactive** cette borne — utile pour le développement 
+mono-projet ou les machines puissantes. La valeur par défaut de 2 est 
+suffisante pour une machine de développement typique sous quatre cœurs.
+
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique

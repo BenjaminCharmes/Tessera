@@ -461,8 +461,13 @@ async def run_tests(orch: "Orchestrator", run: PipelineRun) -> bool:
     from tessera.services.test_runner import TestCommandNotFound
 
     try:
+        async def _on_attente() -> None:
+            orch._log(f"[{run.ticket_id}] testeur: en attente d'un créneau de test")
+
         result = await orch._test_runner.run_tests(
-            orch._project_path, test_command=orch._test_command
+            orch._project_path,
+            test_command=orch._test_command,
+            en_attente=_on_attente,
         )
         run.test_result = result
         await emit(

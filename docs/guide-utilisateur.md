@@ -332,6 +332,9 @@ Après l'audit de sécurité, les étapes de **revue** et de **validation** dém
 
 Pour que le ticket soit approuvé, le reviewer **et** le validateur doivent tous les deux approuver. Si l'un refuse, le ticket est refusé — même si l'autre a approuvé. Tu reçois les motifs de celui qui a refusé, ou des deux si les deux ont refusé.
 
+
+Quand tu vois la ligne « testeur: en attente d'un créneau de test » dans le log, cela signifie qu'un autre testeur utilise le créneau de tests (limité à `MAX_PARALLEL_TEST_RUNS` tests simultanés). Le testeur actuel attend son tour, mais cette attente n'affecte pas le timeout — seul le temps réel d'exécution du test compte.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
