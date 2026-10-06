@@ -801,6 +801,16 @@ Un mode file traite plusieurs tickets en séquence. Le pipeline enregistre l'his
 
 Quand un utilisateur revient à un run depuis la Supervision, le serveur rejoue le contenu textuel accumulé. Un aller-retour entre deux runs recevrait le même rejeu deux fois. Pour prévenir une duplication visible, le client traite les événements replayed de manière à garder une trace fidèle du texte — ni doublon, ni perte.
 
+## Gestion de l'état du frontend — store des runs (ticket-354)
+
+L'état de chaque run vit dans un store externe (`frontend/src/hooks/runStore.ts`) utilisant `useSyncExternalStore`, pas dans un objet `etats` remonté jusqu'à `App`. Un événement d'un run redessine uniquement les composants qui l'affichent, réduisant drastiquement les re-renders inutiles.
+
+**Sélecteurs** — Les composants ne lisent jamais le store directement :
+- `useEtatRun(runId)` — Ne redessine que si le run change.
+- `useListeRuns()` — Ne redessine que si la liste ou un statut change (pas sur `agent_token`).
+
+**Optimisations** — `Sidebar`, `TicketCard`, `KanbanView` en `React.memo` avec props stables, pour éviter les re-renders en cascade. ADR-013 : la solution reste en React pur, sans Zustand.
+
 ## Structure des fichiers de tickets
 
 ```
