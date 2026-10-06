@@ -1319,3 +1319,4 @@ Analyse effectuée :
 - 2026-10-06 06:44:07 UTC — [ticket-346] tour 1 — reviewer terminé (67032ms)
 - 2026-10-06 06:44:52 UTC — [ticket-346] validateur: APPROVED — Tous les critères sont respectés. Le code ajoute l'option `-c core.quotePath=fal (112344ms)
 - 2026-10-06 06:44:52 UTC — [ticket-346] APPROVED après 1 tour(s)
+- 2026-10-06 06:46:28 UTC — [ticket-346] documentation: 1 fichier(s) (93108ms)
