@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 0.5
 id: ticket-349
 plan: true
-pr_number: null
+pr_number: 279
 priority: high
 status: done
 title: A test timeout replays the testeur once instead of sending the ticket back
