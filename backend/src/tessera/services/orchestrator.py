@@ -529,6 +529,28 @@ class Orchestrator:
                             update={"livraison": livraison_bloquee}
                         )
                         break
+            else:
+                # Approuvé mais sans PR : si un ticket restant dépend de
+                # celui-ci, son travail n'est pas sur la base — il partirait
+                # d'un état qui ne contient pas la dépendance. On arrête la
+                # file plutôt que de laisser ce ticket produire du travail à
+                # jeter (ticket-361).
+                restants = ticket_ids[index:]
+                livraison_bloquee = await _trouver_bloquant_sans_pr(
+                    self._ticket_svc,
+                    ticket_id,
+                    result.livraison,
+                    restants,
+                )
+                if livraison_bloquee is not None:
+                    results[-1] = results[-1].model_copy(
+                        update={"livraison": livraison_bloquee}
+                    )
+                    self._log(
+                        f"[{project_id}] file interrompue : {ticket_id}"
+                        " n'a pas été livré"
+                    )
+                    break
 
         return results
 
@@ -735,6 +757,38 @@ async def _trouver_bloquant(
                 arret=(
                     f"{tid_suivant} dépend de {ticket_id} "
                     f"dont la PR #{pr_number} n'est pas encore mergée."
+                )
+            )
+    return None
+
+
+async def _trouver_bloquant_sans_pr(
+    ticket_svc: TicketService,
+    ticket_id: str,
+    livraison: "Livraison | None",
+    restants: list[str],
+) -> "Livraison | None":
+    """Return a blocking Livraison when an approved-but-undelivered ticket has a dependent.
+
+    Called when a ticket was approved but no PR was opened (livraison absent or
+    pr_number is None).  Any remaining ticket that lists ticket_id in its
+    depends_on cannot safely start from the current base without the approved
+    changes.  Returns a Livraison whose arret names both the dependent and the
+    undelivered ticket.  Returns None when no remaining ticket depends on
+    ticket_id.
+    """
+    raison = (
+        livraison.arret
+        if livraison is not None and livraison.arret
+        else "livraison non effectuée"
+    )
+    for tid_suivant in restants:
+        ticket_suivant = await ticket_svc.get_ticket(tid_suivant)
+        if ticket_suivant is not None and ticket_id in ticket_suivant.depends_on:
+            return Livraison(
+                arret=(
+                    f"{tid_suivant} dépend de {ticket_id}, "
+                    f"qui n'a pas été livré : {raison}"
                 )
             )
     return None

@@ -1,3 +1,4 @@
+import asyncio
 import re
 import time
 from datetime import datetime, timezone
@@ -18,6 +19,21 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
+# ------------------------------------------------------------------
+# Module-level parse cache
+# Key: (resolved_path_str, st_mtime_ns, st_size)
+# ------------------------------------------------------------------
+
+_TicketCacheKey = tuple[str, int, int]
+_ticket_cache: dict[_TicketCacheKey, Ticket] = {}
+
+
+def _purge_ticket_cache(seen_paths: set[str]) -> None:
+    """Remove cache entries for paths absent from the current active listing."""
+    stale = [k for k in _ticket_cache if k[0] not in seen_paths]
+    for k in stale:
+        del _ticket_cache[k]
+
 
 _STATUS_DIRS: dict[TicketStatus, str] = {
     TicketStatus.todo: "todo",
@@ -29,6 +45,21 @@ _STATUS_DIRS: dict[TicketStatus, str] = {
 }
 
 _PIPELINE_LOG_MAX_LINES = 200
+
+
+def _build_body(description: str, acceptance_criteria: list[str]) -> str:
+    """Assemble ticket body from description and acceptance criteria.
+
+    When criteria are present, appends a '## Critères d'acceptation' section
+    with one '- [ ] …' checkbox per criterion — the format that
+    `_extract_criteria` (pipeline_text.py) expects.  When the list is empty,
+    returns the description unchanged so no empty section is written.
+    """
+    if not acceptance_criteria:
+        return description
+    lines = [description, "", "## Critères d'acceptation", ""]
+    lines.extend(f"- [ ] {criterion}" for criterion in acceptance_criteria)
+    return "\n".join(lines)
 
 
 def _slugify(text: str, max_len: int = 40) -> str:
@@ -118,11 +149,19 @@ class TicketService:
         self, status: TicketStatus | None = None
     ) -> tuple[list[Ticket], list[TicketUnreadable]]:
         """Return parseable tickets and files that could not be parsed."""
+        return await asyncio.to_thread(self._sync_list_tickets_with_unreadable, status)
+
+    def _sync_list_tickets_with_unreadable(
+        self, status: TicketStatus | None
+    ) -> tuple[list[Ticket], list[TicketUnreadable]]:
         tickets: list[Ticket] = []
         unreadable: list[TicketUnreadable] = []
+        seen_paths: set[str] = set()
         for path in self._iter_active_files():
+            resolved = str(path.resolve())
+            seen_paths.add(resolved)
             try:
-                t = self._parse(path)
+                t = self._cached_parse(path)
                 if status is None or t.status == status:
                     tickets.append(t)
             except Exception as exc:
@@ -133,11 +172,15 @@ class TicketService:
                 unreadable.append(
                     TicketUnreadable(file_path=str(path), error=str(exc))
                 )
+        _purge_ticket_cache(seen_paths)
         return sorted(tickets, key=lambda t: t.id), unreadable
 
     async def get_ticket(self, ticket_id: str) -> Ticket | None:
+        return await asyncio.to_thread(self._sync_get_ticket, ticket_id)
+
+    def _sync_get_ticket(self, ticket_id: str) -> Ticket | None:
         path = self._find_file(ticket_id)
-        return self._parse(path) if path is not None else None
+        return self._cached_parse(path) if path is not None else None
 
     async def update_status(
         self, ticket_id: str, new_status: TicketStatus
@@ -224,7 +267,7 @@ class TicketService:
                 priority=TicketPriority(draft.priority),
                 agent=draft.agent,
                 depends_on=depends_on,
-                body=draft.description,
+                body=_build_body(draft.description, draft.acceptance_criteria),
             )
             created.append(await self.create_ticket(ticket))
         return created
@@ -347,6 +390,14 @@ class TicketService:
 
     def _next_id(self) -> str:
         return f"ticket-{self._next_n():03d}"
+
+    def _cached_parse(self, path: Path) -> Ticket:
+        """Return a cached Ticket for `path`, re-parsing only when mtime/size changes."""
+        stat = path.stat()
+        key: _TicketCacheKey = (str(path.resolve()), stat.st_mtime_ns, stat.st_size)
+        if key not in _ticket_cache:
+            _ticket_cache[key] = self._parse(path)
+        return _ticket_cache[key]
 
     def _parse(self, path: Path) -> Ticket:
         post = frontmatter.load(str(path))

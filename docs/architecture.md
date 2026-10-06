@@ -133,6 +133,15 @@ Un réglage à 0 ou moins **désactive** cette borne — utile pour le développ
 mono-projet ou les machines puissantes. La valeur par défaut de 2 est 
 suffisante pour une machine de développement typique sous quatre cœurs.
 
+#### Parallélisme des chaînes frontend et backend (ticket-351)
+
+`verifier.py` organise les tests en deux chaînes indépendantes, exécutées en parallèle :
+
+- **BACKEND_STEPS** : pytest (tests), puis mypy (type-checking)
+- **FRONTEND_STEPS** : tsc (type-checking), eslint (linter), puis vitest (tests)
+
+Chaque chaîne s'exécute séquentiellement — un échec dans une étape bloque les suivantes de la même chaîne — et s'arrête à son premier échec. Les deux chaînes tournent simultanément, ce qui réduit la durée totale au maximum des deux au lieu de leur somme. Le code de sortie est non nul si l'une des deux échoue. Les sorties sont capturées séparément pour éviter l'entrelacement et affichées à la fin : d'abord backend, puis frontend.
+
 ### Gestion du parallélisme Ollama (ticket-350)
 
 Quand plusieurs runs utilisent un même serveur Ollama local, les requêtes
@@ -162,6 +171,14 @@ serveur, avec la valeur `OLLAMA_MAX_CONCURRENT` (défaut **1** — configuré da
 Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes sont
 lancées concurremment. Utile pour déboguer un modèle ou tester le
 load-balancing interne d'Ollama.
+
+### Parsing et caching off-loop (ticket-352)
+
+`TicketService.list_tickets()` et `ProjectLoader.list_projects()` relisaient chaque fichier à chaque requête, bloquant la boucle d'événements sur du parsing YAML. Problème : le pipeline appelle ces services plusieurs fois par étape; avec plusieurs files, l'interface gelait.
+
+**Optimisation** : cache de parsing par fichier, clé `(chemin résolu, st_mtime_ns, st_size)`. Chaque requête fait un `stat()` peu coûteux; seul un fichier modifié est re-parsé. Même logique pour projets (`CLAUDE.md`, `agents.json`). Tout travail disque via `asyncio.to_thread` — la boucle n'est jamais bloquée.
+
+Invariant : deux requêtes successives sans changement de fichier ne lisent et ne parsent chacun qu'une fois.
 
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
@@ -801,6 +818,42 @@ Un mode file traite plusieurs tickets en séquence. Le pipeline enregistre l'his
 
 Quand un utilisateur revient à un run depuis la Supervision, le serveur rejoue le contenu textuel accumulé. Un aller-retour entre deux runs recevrait le même rejeu deux fois. Pour prévenir une duplication visible, le client traite les événements replayed de manière à garder une trace fidèle du texte — ni doublon, ni perte.
 
+## Gestion de l'état du frontend — store des runs (ticket-354)
+
+L'état de chaque run vit dans un store externe (`frontend/src/hooks/runStore.ts`) utilisant `useSyncExternalStore`, pas dans un objet `etats` remonté jusqu'à `App`. Un événement d'un run redessine uniquement les composants qui l'affichent, réduisant drastiquement les re-renders inutiles.
+
+**Sélecteurs** — Les composants ne lisent jamais le store directement :
+- `useEtatRun(runId)` — Ne redessine que si le run change.
+- `useListeRuns()` — Ne redessine que si la liste ou un statut change (pas sur `agent_token`).
+
+**Optimisations** — `Sidebar`, `TicketCard`, `KanbanView` en `React.memo` avec props stables, pour éviter les re-renders en cascade. ADR-013 : la solution reste en React pur, sans Zustand.
+
+## Caching des ressources et gestion de la visibilité fenêtre (ticket-356)
+
+Quand l'utilisateur revient sur un ticket ou un projet déjà ouvert, l'application doit afficher immédiatement la donnée précédemment vue (pas d'écran de chargement), puis rafraîchir en fond. Parallèlement, le polling (rechargement périodique) doit cesser quand la fenêtre est cachée, pour économiser quota et CPU.
+
+### Caching au niveau du module
+
+`useResource(fetcher, initial, cle?)` peut accepter une clé optionnelle (chaîne). Avec clé :
+- La dernière donnée obtenue est gardée dans un cache de niveau module (LRU, 100 entrées max)
+- Au changement de `fetcher`, la données en cache est rendue **aussitôt** au composant, avec `loading: true`
+- Un rafraîchissement part en fond ; quand il arrive, l'état est mis à jour sans défilement intempestif
+- La clé inclut toujours l'id du projet, pour qu'une donnée d'un autre projet ne s'affiche jamais
+
+Sans clé, `useResource` a le comportement actuel : changement de `fetcher` → rendu de `initial` immédiat, puis fetch.
+
+Cette décision répond à deux cas d'usage :
+1. Ouvrir un ticket, fermer le panneau, rouvrir le ticket → voir immédiatement les données
+2. Cliquer d'avant en arrière dans un historique → pas d'écrans blanc
+
+### Suspension du polling hors vue
+
+`useFenetreVisible()` lit `document.visibilityState` et expose un booléen qui se met à jour sur `visibilitychange`. Les trois points de polling (`useTickets`, `useServices`, et le polling de statut PR dans `TicketCard`) utilisent ce hook pour :
+- Suspendre leur intervalle quand `visibilitystate === 'hidden'`
+- Relancer une requête immédiate au retour en avant-plan
+
+Cette optimisation diminue significativement le nombre d'appels API quand plusieurs onglets ou fenêtres sont ouverts mais non actifs.
+
 ## Structure des fichiers de tickets
 
 ```
@@ -828,6 +881,15 @@ github_issue_url: https://github.com/...  # optionnel
 ---
 Corps du ticket en Markdown...
 ```
+
+Les tickets créés par lot depuis un plan conservent leurs critères d'acceptation : le corps du ticket inclut une section `## Critères d'acceptation` avec une case à cocher par critère (`- [ ] …`). Ce format est directement lisible par `_extract_criteria` et permet au validateur de juger chaque critère indépendamment.
+
+
+### Extraction des critères d'acceptation
+
+Les critères d'acceptation d'un ticket sont extraits du corps Markdown par le service `pipeline_text`. La section de critères commence dès qu'une ligne **commence** par `## Critères d'acceptation` (insensible à la casse, ignorant l'indentation). Les références au titre dans la prose — même entre backticks, même sur la même ligne — ne sont jamais prises pour un en-tête réel.
+
+Chaque ligne non vide de la liste de critères devient un critère distinct. Un critère dont le texte cite le titre (ex. « Vérifier `## Critères d'acceptation` en début de ligne ») reste lisible et est compté normalement. Cette règle évite les faux positifs où une citation du titre de section dans le contexte ou la prose aurait fermé prématurément la section avant les vrais critères.
 
 ## Chat conversationnel (ticket-048, 225)
 
@@ -894,6 +956,25 @@ Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
   "timestamp": "2026-06-20T14:30:00Z"
 }
 ```
+
+## Optimisation du streaming frontend (ticket-353)
+
+Le streaming des tokens peut générer des centaines d'événements par seconde. Pour éviter que l'interface ralentisse, trois optimisations sont appliquées au frontend :
+
+1. **Séparation des tokens** : `agent_token` ne va plus dans `events` ni `ticketEvents`. Le texte s'accumule dans `entries[…].tokens` comme avant. Les consommateurs d'événements lisent seulement les événements de contrôle (`pipeline_done`, `run_closed`, `queue_progress`, `pipeline_start`).
+
+2. **Borne des événements** : au-delà de `MAX_EVENTS = 2000`, les plus anciens sont retirés pour préserver la mémoire. Les événements de contrôle sont **toujours conservés**, même au-delà du plafond, pour que les jalons du pipeline restent visibles dans l'historique.
+
+3. **Regroupement par frame** : dans `useSupervision`, les messages WebSocket reçus sont mis en file et appliqués ensemble une fois par `requestAnimationFrame` (repli sur `setTimeout(…, 16)` hors navigateur), en un seul `setEtats` et un seul `setRuns` par lot. L'ordre d'application reste celui de réception. Un `snapshot` vide d'abord la file en attente avant d'appliquer l'état de référence.
+
+Ces trois changements réduisent les rendus de plusieurs centaines par seconde à **un seul** par cycle d'image, tout en préservant la cohérence de l'état et la traçabilité des événements critiques.
+
+
+## Chargement dynamique du frontend (ticket-355)
+
+Monaco et les composants centraux du panel d'édition (`Editor`, `DiffView`, `StatsView`, `ChatPanel`) ne sont plus chargés au démarrage global de l'application. Chacun utilise `React.lazy()` et `Suspense` pour se charger à la demande — la première ouverture du composant déclenche le chargement de son code source, pendant qu'un état de chargement sobre s'affiche (`zinc`, ADR-026).
+
+La configuration de Monaco (`MonacoEnvironment`, `loader.config`, workers) s'initialise dynamiquement lors du premier rendu de l'éditeur, non lors du boot de l'application. Vite isole `monaco-editor` dans son propre chunk via `build.rollupOptions.output.manualChunks`, réduisant la taille du bundle initial et permettant au navigateur de l'ignorer jusqu'à sa première utilisation.
 
 ## Agents disponibles
 

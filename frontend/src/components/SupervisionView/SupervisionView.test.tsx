@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useState } from "react";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -7,6 +7,7 @@ import { INITIAL } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { OrchestratorEvent, Project, RunActif } from "../../types/api";
+import { runStore } from "../../hooks/runStore";
 
 vi.mock("../../lib/api", () => ({
   api: {
@@ -34,10 +35,20 @@ function run(over: Partial<RunActif> = {}): RunActif {
   };
 }
 
+beforeEach(() => {
+  // Le store externe accumule l'état entre tests : remettre à zéro (ticket-354).
+  runStore.reset();
+});
+
 function supervision(
   over: Partial<UseSupervisionResult> = {},
   etats: Record<string, Partial<StreamState>> = {},
 ): UseSupervisionResult {
+  // Peupler le store avec les mêmes états que la prop `etatDe` (ticket-354).
+  // `useEtatRun` lit le store directement, pas la prop.
+  for (const [runId, etat] of Object.entries(etats)) {
+    runStore.set(runId, { ...INITIAL, ...etat });
+  }
   return {
     runs: [],
     selection: null,

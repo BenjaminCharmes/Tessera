@@ -4,6 +4,7 @@ import { INITIAL } from "./streamState";
 import type { StreamState, UseRunActifResult } from "./streamState";
 import type { UseSupervisionResult } from "./useSupervision";
 import type { RunRequest } from "../types/api";
+import { useEtatRun } from "./runStore";
 
 /**
  * Le run du projet actif, vu depuis la supervision — ticket-129.
@@ -40,7 +41,10 @@ export function useRunActif(
           (r) => r.project_id === projectId && r.run_id !== masque,
         );
 
-  const etat: StreamState = run ? supervision.etatDe(run.run_id) : INITIAL;
+  // Souscrit directement au store pour ce run — ne redessine que si son état
+  // change, pas quand un autre run reçoit un événement (ticket-354).
+  const etatFromStore = useEtatRun(run?.run_id ?? "");
+  const etat: StreamState = run ? etatFromStore : INITIAL;
 
   // Déclarer le run qu'on affiche : ADR-041 ne pousse son texte qu'aux clients
   // abonnés, et seul un lancement ou un clic dans Supervision abonnait. Une

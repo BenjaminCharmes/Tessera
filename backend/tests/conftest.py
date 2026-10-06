@@ -80,13 +80,20 @@ def _singletons_propres() -> Iterator[None]:
     suite : un run qu'un test laisse ouvert occupe le projet du suivant, et
     un abonnement jamais fermé reçoit les événements des tests d'après. Les
     deux symptômes se lisent comme un échec du code testé.
+
+    Les caches de parsing de ticket et de projet sont également vidés pour
+    que les tests restent indépendants (ticket-352).
     """
     from tessera.services.event_hub import EVENT_HUB
     from tessera.services.run_registry import RUN_REGISTRY
+    from tessera.services import ticket_service as _ts_module
+    from tessera.services import project_loader as _pl_module
 
     yield
     RUN_REGISTRY._runs.clear()
     EVENT_HUB._abonnes.clear()
+    _ts_module._ticket_cache.clear()
+    _pl_module._project_cache.clear()
 
 
 @pytest.fixture(autouse=True)

@@ -1,14 +1,15 @@
 ---
-id: ticket-356
-title: "Data already seen shows at once while it refreshes, and polling pauses while the window is hidden"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 1
-created: 2026-10-05
+id: ticket-356
+pr_number: null
+priority: medium
+status: done
+title: Data already seen shows at once while it refreshes, and polling pauses while
+  the window is hidden
+type: fix
 ---
 
 # ticket-356 — Une donnée déjà vue s'affiche aussitôt, et le polling s'arrête fenêtre cachée

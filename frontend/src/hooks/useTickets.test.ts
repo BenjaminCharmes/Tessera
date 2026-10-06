@@ -1,8 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { useTickets } from "./useTickets";
 import * as apiModule from "../lib/api";
 import type { OrchestratorEvent, Ticket, TicketListResponse } from "../types/api";
+
+function setVisibility(state: "visible" | "hidden"): void {
+  Object.defineProperty(document, "visibilityState", {
+    value: state,
+    configurable: true,
+  });
+}
 
 const TICKET_TODO: Ticket = {
   id: "ticket-001",
@@ -56,7 +63,12 @@ describe("useTickets", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setVisibility("visible");
     vi.mocked(apiModule.api.tickets.list).mockResolvedValue(DEFAULT_RESPONSE);
+  });
+
+  afterEach(() => {
+    setVisibility("visible");
   });
 
   it("fetches tickets on mount", async () => {
@@ -165,6 +177,45 @@ describe("useTickets", () => {
     expect(
       result.current.tickets.find((t) => t.id === "ticket-001")?.status,
     ).toBe("in-review");
+  });
+
+  it("ne fait aucune requête de polling fenêtre cachée, et relance au retour (ticket-356)", async () => {
+    // Critère : le polling s'arrête quand personne ne regarde, et repart
+    // dès que la fenêtre revient au premier plan.
+    vi.useFakeTimers();
+    try {
+      renderHook(() =>
+        useTickets("proj-1", true /* pipeline actif = intervalle 30 s */),
+      );
+      // Attendre le chargement initial.
+      await vi.advanceTimersByTimeAsync(0);
+      const apresInit = vi.mocked(apiModule.api.tickets.list).mock.calls.length;
+
+      // Cacher la fenêtre.
+      await act(async () => {
+        setVisibility("hidden");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // Avancer bien au-delà de l'intervalle de 30 s : aucun appel supplémentaire.
+      await vi.advanceTimersByTimeAsync(120_000);
+      expect(vi.mocked(apiModule.api.tickets.list).mock.calls.length).toBe(
+        apresInit,
+      );
+
+      // Rendre la fenêtre visible : une requête immédiate doit partir.
+      await act(async () => {
+        setVisibility("visible");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(
+        vi.mocked(apiModule.api.tickets.list).mock.calls.length,
+      ).toBeGreaterThan(apresInit);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("ignores events with unknown type", async () => {

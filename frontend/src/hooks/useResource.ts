@@ -15,6 +15,46 @@ interface Reponse<T> {
   error: string | null;
 }
 
+// Cache de niveau module — borné à 100 entrées, LRU (ticket-356).
+// La Map préserve l'ordre d'insertion : `keys().next()` donne la plus ancienne.
+const _cache = new Map<string, unknown>();
+const CACHE_MAX = 100;
+
+function getCached<T>(cle: string): T | undefined {
+  return _cache.get(cle) as T | undefined;
+}
+
+function setCached(cle: string, value: unknown): void {
+  // Supprimer pour réinsérer en fin : la Map garde l'ordre, LRU naturel.
+  _cache.delete(cle);
+  if (_cache.size >= CACHE_MAX) {
+    const oldest = _cache.keys().next().value as string | undefined;
+    if (oldest !== undefined) _cache.delete(oldest);
+  }
+  _cache.set(cle, value);
+}
+
+/**
+ * Clé de cache d'une ressource : l'id du projet est obligatoire, et c'est
+ * `useResource` qui assemble la clé. Un appelant ne peut donc pas oublier le
+ * projet et faire partager une entrée à deux projets (ticket-356).
+ */
+export interface CleRessource {
+  projet: string;
+  ressource: string;
+}
+
+function cleInterne(cle: CleRessource): string {
+  // Le séparateur NUL ne peut apparaître ni dans un id de projet ni dans un
+  // chemin : `a` + `b:c` et `a:b` + `c` ne se confondent pas.
+  return `${cle.projet}\u0000${cle.ressource}`;
+}
+
+/** Vide le cache — pour les tests uniquement. */
+export function _viderCacheResource(): void {
+  _cache.clear();
+}
+
 /**
  * Une donnée distante, lue à chaque changement de `fetcher` — ticket-123.
  *
@@ -31,11 +71,24 @@ interface Reponse<T> {
  * Pendant un `refresh()`, la donnée précédente reste affichée ; au changement
  * de `fetcher`, elle repasse à `initial` — ce qui vient d'un autre projet ne
  * s'affiche pas sous celui-ci.
+ *
+ * Avec une `cle` (ticket-356), la dernière donnée obtenue pour cette clé est
+ * gardée dans un cache de niveau module (borné, 100 entrées, LRU) et rendue
+ * aussitôt au changement de `fetcher`, avec `loading: true` le temps du
+ * rafraîchissement. Sans `cle`, le comportement actuel est inchangé. La clé
+ * porte l'id du projet (`CleRessource`) : une donnée d'un autre projet ne
+ * s'affiche jamais sous celui-ci.
+ *
+ * `cle` et `fetcher` doivent toujours changer ensemble (ils dérivent des mêmes
+ * paramètres via `useMemo`) : `cle` est capturée dans la closure de l'effet,
+ * sans l'ajouter aux dépendances, exactement comme `initial`.
  */
 export function useResource<T>(
   fetcher: (() => Promise<T>) | null,
   initial: T,
+  cle?: CleRessource,
 ): UseResourceResult<T> {
+  const cleCache = cle !== undefined ? cleInterne(cle) : undefined;
   const [tick, setTick] = useState(0);
   const [reponse, setReponse] = useState<Reponse<T> | null>(null);
 
@@ -45,6 +98,9 @@ export function useResource<T>(
     fetcher()
       .then((data) => {
         if (cancelled) return;
+        // `cle` est capturée depuis la closure au moment où l'effet se lance :
+        // elle correspond toujours au fetcher qui vient de répondre.
+        if (cleCache !== undefined) setCached(cleCache, data);
         setReponse({ fetcher, tick, data, error: null });
       })
       .catch((err: unknown) => {
@@ -59,8 +115,9 @@ export function useResource<T>(
     return () => {
       cancelled = true;
     };
-    // `initial` ne sert qu'en cas d'erreur ; le relire à chaque rendu ne
-    // justifie pas de relancer la requête.
+    // `initial` et `cle` ne servent qu'en cas de succès/erreur ; les relire à
+    // chaque rendu ne justifie pas de relancer la requête — et `cle` change
+    // toujours avec `fetcher` puisqu'ils dérivent des mêmes paramètres.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetcher, tick]);
 
@@ -69,8 +126,20 @@ export function useResource<T>(
   const memeRequete = reponse !== null && reponse.fetcher === fetcher;
   const aJour = memeRequete && reponse.tick === tick;
 
+  // Donnée en cache : utilisée quand le fetcher a changé et qu'on n'a pas
+  // encore reçu la réponse pour la clé courante.
+  const donneeEnCache =
+    cleCache !== undefined && fetcher !== null && !memeRequete
+      ? getCached<T>(cleCache)
+      : undefined;
+
   return {
-    data: fetcher !== null && memeRequete ? reponse.data : initial,
+    data:
+      fetcher !== null && memeRequete
+        ? reponse.data
+        : donneeEnCache !== undefined
+          ? donneeEnCache
+          : initial,
     loading: fetcher !== null && !aJour,
     error: aJour ? reponse.error : null,
     refresh,

@@ -116,3 +116,31 @@ class TestExtractCriteria:
         body = self._body("- [X] Uppercase checked\n")
         result = _extract_criteria(body)
         assert result == ["Uppercase checked"]
+
+    # --- ticket-362 acceptance criteria ---
+
+    def test_heading_title_in_prose_does_not_open_section(self) -> None:
+        """A criteria heading cited in prose (e.g. backticks) must not open the section."""
+        body = (
+            "## Contexte\n"
+            "See `## Critères d'acceptation` below.\n"
+            "## Solution proposée\n"
+            "Some text.\n"
+            "## Critères d'acceptation\n"
+            "- [ ] First real criterion\n"
+            "- [ ] Second real criterion\n"
+        )
+        result = _extract_criteria(body)
+        assert result == ["First real criterion", "Second real criterion"]
+
+    def test_criterion_whose_text_cites_heading_is_included(self) -> None:
+        """A criterion whose text contains the heading title is still extracted."""
+        body = self._body(
+            "- [ ] Verify that `## Critères d'acceptation` is matched only at line start\n"
+            "- [ ] Another criterion\n"
+        )
+        result = _extract_criteria(body)
+        assert result == [
+            "Verify that `## Critères d'acceptation` is matched only at line start",
+            "Another criterion",
+        ]

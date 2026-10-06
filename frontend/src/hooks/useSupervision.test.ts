@@ -1,12 +1,24 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { MockWebSocket } from "../test/mockWebSocket";
 import { useSupervision } from "./useSupervision";
+import { applyEvent } from "./streamState";
+import { runStore } from "./runStore";
+import type { OrchestratorEvent } from "../types/api";
 
 vi.stubGlobal("WebSocket", MockWebSocket);
 
 beforeEach(() => {
   MockWebSocket.instance = null;
+  // Le store externe accumule l'état entre tests : le remettre à zéro (ticket-354).
+  runStore.reset();
+  // Les événements WebSocket sont regroupés par image (ticket-353) :
+  // les tests avancent les timers d'une image (16 ms) après chaque envoi.
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 function run(over: Record<string, unknown> = {}) {
@@ -79,6 +91,8 @@ describe("useSupervision", () => {
     act(() => {
       MockWebSocket.instance!.triggerMessage(evenement({ run_id: "run-1" }));
     });
+    // Avancer d'une image pour déclencher le flush du regroupement (ticket-353).
+    act(() => { vi.advanceTimersByTime(16); });
 
     expect(result.current.runs).toHaveLength(2);
     // Chaque run accumule le sien : un état partagé afficherait l'agent d'un
@@ -100,11 +114,13 @@ describe("useSupervision", () => {
     act(() => {
       MockWebSocket.instance!.triggerMessage(evenement({ type: "pipeline_done" }));
     });
+    act(() => { vi.advanceTimersByTime(16); });
     expect(result.current.runs).toHaveLength(1);
 
     act(() => {
       MockWebSocket.instance!.triggerMessage(evenement({ type: "run_closed" }));
     });
+    act(() => { vi.advanceTimersByTime(16); });
     // La carte reste visible jusqu'au clic « Fermer ».
     expect(result.current.runs).toHaveLength(1);
     // Mais le run est bien marqué clos dans son état.
@@ -229,6 +245,10 @@ describe("useSupervision — aller-retour entre deux runs (ticket-313)", () => {
         evenement({ type: "agent_token", run_id: "run-1", agent: "codeur", data: { token: "bonjour" } }),
       );
     });
+    // Avancer d'une image : flush applique agent_started + agent_token.
+    // clearTokensForReplay doit voir l'état APRÈS ce flush pour effacer
+    // les bons tokens (ticket-353).
+    act(() => { vi.advanceTimersByTime(16); });
 
     // Passer à run-2 → unsubscribe run-1
     act(() => { result.current.selectionner("run-2"); });
@@ -242,6 +262,8 @@ describe("useSupervision — aller-retour entre deux runs (ticket-313)", () => {
         evenement({ type: "agent_token", run_id: "run-1", agent: "codeur", data: { token: "bonjour" } }),
       );
     });
+    // Avancer d'une image pour déclencher le flush du token rejoué.
+    act(() => { vi.advanceTimersByTime(16); });
 
     const etat = result.current.etatDe("run-1");
     const codeurEntry = etat.entries.find((e) => e.genre === "agent" && e.agent === "codeur");
@@ -314,5 +336,80 @@ describe("useSupervision — les services (ticket-145)", () => {
     });
 
     expect(result.current.signalServices).toBeGreaterThan(avant);
+  });
+});
+
+describe("useSupervision — regroupement par image (ticket-353)", () => {
+  /**
+   * Critère 3 : cinquante messages reçus dans la même image ne produisent
+   * qu'un rendu du consommateur.
+   */
+  it("fifty messages received in the same frame produce only one consumer re-render", () => {
+    let renders = 0;
+    renderHook(() => {
+      renders++;
+      return useSupervision();
+    });
+
+    act(() => {
+      MockWebSocket.instance!.triggerMessage({ type: "snapshot", runs: [run()] });
+    });
+
+    renders = 0; // Remettre à zéro après les rendus de démarrage.
+
+    // Envoyer 50 événements sans avancer le temps : ils sont mis en file (pendingRef).
+    act(() => {
+      for (let i = 0; i < 50; i++) {
+        MockWebSocket.instance!.triggerMessage(
+          evenement({ type: "agent_tool_use", agent: "codeur", data: {} }),
+        );
+      }
+    });
+
+    // Aucun rendu avant le flush : les événements sont toujours en attente.
+    expect(renders).toBe(0);
+
+    // Avancer d'une image : flush applique les 50 en un seul setEtats + setRuns.
+    act(() => { vi.advanceTimersByTime(16); });
+
+    // React 18 automatic batching regroupe setEtats + setRuns en un seul rendu.
+    expect(renders).toBe(1);
+  });
+
+  /**
+   * Critère 4 : l'état final après un lot est identique à celui obtenu
+   * en appliquant les mêmes messages un par un.
+   */
+  it("batch final state matches sequential application of the same events", () => {
+    const { result } = renderHook(() => useSupervision());
+
+    act(() => {
+      MockWebSocket.instance!.triggerMessage({ type: "snapshot", runs: [run()] });
+    });
+
+    const initState = result.current.etatDe("run-1");
+
+    const eventsToSend: OrchestratorEvent[] = [
+      evenement({ type: "agent_started", agent: "codeur", data: { round: 1 } }),
+      evenement({ type: "agent_done", agent: "codeur", data: { content: "done" } }),
+      evenement({ type: "agent_started", agent: "reviewer", data: { round: 1 } }),
+      evenement({ type: "agent_done", agent: "reviewer", data: { content: "APPROVED" } }),
+    ] as OrchestratorEvent[];
+
+    // État attendu par application séquentielle (référence).
+    let expected = initState;
+    for (const ev of eventsToSend) {
+      expected = applyEvent(expected, ev);
+    }
+
+    // État réel via le lot de la RAF (tous envoyés dans la même image).
+    act(() => {
+      for (const ev of eventsToSend) {
+        MockWebSocket.instance!.triggerMessage(ev as unknown as Record<string, unknown>);
+      }
+    });
+    act(() => { vi.advanceTimersByTime(16); });
+
+    expect(result.current.etatDe("run-1")).toEqual(expected);
   });
 });

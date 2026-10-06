@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import { useResource } from "./useResource";
+import { useFenetreVisible } from "./useFenetreVisible";
 import type { ServiceActif } from "../types/api";
 
 /**
@@ -76,6 +77,8 @@ export function useServices(
   const { data: lus, error: erreurDeLecture, refresh } = useResource<
     ServiceActif[]
   >(fetcher, AUCUN);
+
+  const fenetreVisible = useFenetreVisible();
 
   // Ce qu'une action vient de produire, tant que la relecture n'a pas eu
   // lieu : sans ça, le bouton ne changerait d'état qu'au rafraîchissement
@@ -166,12 +169,11 @@ export function useServices(
   const enCours = services.some((service) => service.en_cours);
 
   useEffect(() => {
-    // Rien en cours : pas de minuteur. Un battement dans le vide ferait
-    // travailler l'interface pour rien.
-    if (!projectId || !enCours) return;
+    // Rien en cours ou fenêtre cachée : pas de minuteur (ticket-356).
+    if (!projectId || !enCours || !fenetreVisible) return;
     const minuteur = setInterval(refresh, CADENCE_MS);
     return () => clearInterval(minuteur);
-  }, [projectId, enCours, refresh]);
+  }, [projectId, enCours, refresh, fenetreVisible]);
 
   return {
     services,

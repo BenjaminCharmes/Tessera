@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { useMemo } from "react";
-import { useResource } from "./useResource";
+import { useResource, _viderCacheResource } from "./useResource";
 
 /** Une promesse qu'on résout à la main, pour ordonner les réponses. */
 function differee<T>() {
@@ -25,6 +25,122 @@ function useListe(cle: string | null) {
 }
 
 const fetchListe = vi.fn<(cle: string) => Promise<string[]>>();
+
+/** Variante avec une `cle` de cache passée à useResource. */
+function useListeAvecCle(cle: string | null, projet = "proj-a") {
+  const fetcher = useMemo(
+    () => (cle ? () => fetchListe(`${projet}/${cle}`) : null),
+    [cle, projet],
+  );
+  return useResource(
+    fetcher,
+    AUCUN,
+    cle ? { projet, ressource: cle } : undefined,
+  );
+}
+
+describe("useResource — sans cle (comportement inchangé)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    _viderCacheResource();
+  });
+
+  it("sans cle, un changement de fetcher repasse toujours à initial", async () => {
+    // Critère ticket-356 : sans cle, le comportement de ticket-123 est intact.
+    fetchListe.mockResolvedValueOnce(["p1"]);
+    fetchListe.mockResolvedValueOnce(["p2"]);
+
+    const { result, rerender } = renderHook(
+      ({ cle }: { cle: string | null }) => useListe(cle),
+      { initialProps: { cle: "p1" } as { cle: string | null } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["p1"]);
+
+    act(() => {
+      rerender({ cle: "p2" });
+    });
+
+    // Avant que p2 réponde, on doit voir `initial` (pas le cache de p1).
+    expect(result.current.data).toBe(AUCUN);
+    expect(result.current.loading).toBe(true);
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["p2"]);
+  });
+});
+
+describe("useResource — avec cle (cache ticket-356)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    _viderCacheResource();
+  });
+
+  it("rend la donnée en cache aussitôt au retour sur une clé connue, loading vrai", async () => {
+    // Critère ticket-356 : revenir sur une clé déjà chargée affiche la donnée
+    // précédente immédiatement, avec loading: true le temps du rafraîchissement.
+    const lente = differee<string[]>();
+    // Séquence : p1 initial → p2 (ignoré) → p1 lent (retour avec cache).
+    fetchListe
+      .mockResolvedValueOnce(["p1"])
+      .mockResolvedValueOnce(["p2-data"])
+      .mockImplementationOnce(() => lente.promise);
+
+    // Premier passage sur "p1" : charge et met en cache.
+    const { result, rerender } = renderHook(
+      ({ cle }: { cle: string | null }) => useListeAvecCle(cle),
+      { initialProps: { cle: "p1" } as { cle: string | null } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["p1"]);
+
+    // Naviguer sur "p2" et attendre son chargement complet.
+    act(() => { rerender({ cle: "p2" }); });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Revenir sur "p1" avec une réponse lente.
+    act(() => { rerender({ cle: "p1" }); });
+
+    // La donnée en cache doit être visible immédiatement, et loading doit être vrai.
+    expect(result.current.data).toEqual(["p1"]);
+    expect(result.current.loading).toBe(true);
+
+    // La réponse arrive : loading passe à false.
+    await act(async () => {
+      lente.resolve(["p1-rafraichi"]);
+      await lente.promise;
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["p1-rafraichi"]);
+  });
+  it("ne rend jamais la donnée d'un autre projet pour la même ressource", async () => {
+    // Revue sécurité ticket-356 : la clé porte le projet, deux projets qui
+    // lisent un même chemin ne partagent pas leur entrée de cache.
+    const lente = differee<string[]>();
+    fetchListe
+      .mockResolvedValueOnce(["contenu-a"])
+      .mockImplementationOnce(() => lente.promise);
+
+    const { result, rerender } = renderHook(
+      ({ projet }: { projet: string }) => useListeAvecCle("README.md", projet),
+      { initialProps: { projet: "proj-a" } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["contenu-a"]);
+
+    act(() => { rerender({ projet: "proj-b" }); });
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.data).toBe(AUCUN);
+
+    await act(async () => {
+      lente.resolve(["contenu-b"]);
+      await lente.promise;
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["contenu-b"]);
+  });
+});
 
 describe("useResource", () => {
   it("charge au montage puis rend la donnée", async () => {

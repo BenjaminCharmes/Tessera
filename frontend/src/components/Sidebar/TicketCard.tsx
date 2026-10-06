@@ -4,9 +4,10 @@ import {
   IconPlay,
   IconQueue,
 } from "../../design/icons";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
 import { MIME_TICKET, transitionsManuelles } from "../../lib/transitionsManuelles";
+import { useFenetreVisible } from "../../hooks/useFenetreVisible";
 import type {
   PRStatus,
   Ticket,
@@ -88,7 +89,14 @@ interface TicketCardProps {
   onVoirLeRun?: () => void;
 }
 
-export default function TicketCard({
+/**
+ * Carte d'un ticket dans la colonne latérale.
+ *
+ * Enveloppée dans `React.memo` : avec des callbacks stables en amont, elle ne
+ * se redessine pas quand un événement de run arrive pour un autre composant
+ * (ticket-354).
+ */
+const TicketCard = memo(function TicketCard({
   ticket,
   isActive,
   isRunning,
@@ -109,11 +117,13 @@ export default function TicketCard({
   const peutChangerDeStatut =
     !!onChangeStatus && !isRunning && transitions.length > 0;
   const [prStatus, setPrStatus] = useState<PRStatus | null>(null);
+  const fenetreVisible = useFenetreVisible();
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!ticket.pr_number || !githubRemote) return;
+    // Pas de polling sans PR, ni quand la fenêtre est cachée (ticket-356).
+    if (!ticket.pr_number || !githubRemote || !fenetreVisible) return;
 
     const fetchStatus = async () => {
       try {
@@ -138,7 +148,7 @@ export default function TicketCard({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [ticket.pr_number, ticket.project_id, ticket.id, githubRemote]);
+  }, [ticket.pr_number, ticket.project_id, ticket.id, githubRemote, fenetreVisible]);
 
   // La carte est un `div` cliquable : sans rôle ni focus, elle n'existait pas
   // au clavier. Seule la carte elle-même réagit à Entrée et Espace — la
@@ -323,4 +333,6 @@ export default function TicketCard({
       </div>
     </div>
   );
-}
+});
+
+export default TicketCard;

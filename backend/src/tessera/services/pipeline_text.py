@@ -47,7 +47,7 @@ def _extract_criteria(ticket_body: str) -> list[str]:
     # ligne vide le clôt, sinon un paragraphe indenté plus bas s'y collerait.
     continuable = False
     for line in ticket_body.splitlines():
-        if _CRITERIA_HEADING.search(line):
+        if _CRITERIA_HEADING.match(line):
             in_criteria_section = True
             continue
         if not in_criteria_section:

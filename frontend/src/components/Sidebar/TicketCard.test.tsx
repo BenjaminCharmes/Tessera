@@ -1,8 +1,19 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import TicketCard from "./TicketCard";
 import type { Ticket } from "../../types/api";
 import * as apiModule from "../../lib/api";
+
+function setVisibility(state: "visible" | "hidden"): void {
+  Object.defineProperty(document, "visibilityState", {
+    value: state,
+    configurable: true,
+  });
+}
+
+afterEach(() => {
+  setVisibility("visible");
+});
 
 const base: Ticket = {
   id: "ticket-001",
@@ -318,6 +329,50 @@ describe("TicketCard", () => {
 
       await vi.advanceTimersByTimeAsync(5 * 60_000);
       expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("suspend le polling de PR quand la fenêtre est cachée (ticket-356)", async () => {
+    vi.useFakeTimers();
+    try {
+      setVisibility("visible");
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatus")
+        .mockResolvedValue({
+          state: "open",
+          ci_status: "none",
+          pr_url: "https://github.com/owner/repo/pull/7",
+          pr_number: 7,
+        });
+
+      render(
+        <TicketCard
+          ticket={{ ...base, pr_number: 7 }}
+          isActive={false}
+          isRunning={false}
+          githubRemote="owner/repo"
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+        />,
+      );
+
+      // Appel initial au montage.
+      await vi.advanceTimersByTimeAsync(0);
+      const apresInit = spy.mock.calls.length;
+      expect(apresInit).toBeGreaterThanOrEqual(1);
+
+      // Cacher la fenêtre : l'intervalle doit s'arrêter.
+      await act(async () => {
+        setVisibility("hidden");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // Avancer au-delà de l'intervalle de 30 s — aucun appel supplémentaire.
+      await vi.advanceTimersByTimeAsync(90_000);
+      expect(spy.mock.calls.length).toBe(apresInit);
     } finally {
       vi.useRealTimers();
     }

@@ -4,11 +4,17 @@
  * ticket-325 — quand la page se recharge, l'instantané ne contient que
  * l'agent en cours. GET /runs/{db_run_id}/events renvoie les événements
  * persistés ; useSupervision les rejoue pour reconstruire toutes les cartes.
+ *
+ * Critère 5 (ticket-353) : ces tests restent verts sans ajustement de
+ * temporisation, car chargerHistorique applique les événements directement
+ * via runStore.set (pas par pendingRef) — le regroupement par image ne les
+ * concerne pas.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { MockWebSocket } from "../test/mockWebSocket";
 import { useSupervision } from "./useSupervision";
+import { runStore } from "./runStore";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockFetch = vi.fn<any>();
@@ -17,6 +23,7 @@ vi.stubGlobal("fetch", mockFetch);
 
 beforeEach(() => {
   MockWebSocket.instance = null;
+  runStore.reset();
   mockFetch.mockReset();
 });
 

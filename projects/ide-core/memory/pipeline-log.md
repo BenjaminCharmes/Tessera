@@ -1417,3 +1417,234 @@ Analyse effectuée :
 - 2026-10-06 08:46:18 UTC — [ticket-358] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés et respectés. Les tests ont été (224703ms)
 - 2026-10-06 08:46:18 UTC — [ticket-358] APPROVED après 1 tour(s)
 - 2026-10-06 08:47:50 UTC — [ticket-358] documentation: 1 fichier(s) (88953ms)
+- 2026-10-06 08:48:04 UTC — [ticket-358] livraison: rebase sur develop (594ms)
+- 2026-10-06 08:48:04 UTC — [ticket-358] livraison: PR #282 ouverte (4422ms)
+- 2026-10-06 12:51:43 UTC — [ticket-359] branche ticket-359-tickets-created-from-a-plan-keep-their-acceptance
+- 2026-10-06 12:51:44 UTC — [ticket-359] tour 1 — codeur démarré
+- 2026-10-06 12:54:10 UTC — [ticket-359] tour 1 — codeur terminé (145360ms)
+- 2026-10-06 12:59:57 UTC — [ticket-359] testeur: OK (exit 0)
+- 2026-10-06 13:00:39 UTC — [ticket-359] securite: PASS — Aucune vulnérabilité critique ou haute sévérité détectée.
+
+L'ajout de la fonctio (41733ms)
+- 2026-10-06 13:00:39 UTC — [ticket-359] tour 1 — reviewer démarré
+- 2026-10-06 13:00:39 UTC — [ticket-359] validateur: APPROVED — Aucun critère d'acceptation — approbation automatique. (0ms)
+- 2026-10-06 13:01:10 UTC — [ticket-359] tour 1 — reviewer terminé (30797ms)
+- 2026-10-06 13:01:10 UTC — [ticket-359] APPROVED après 1 tour(s)
+- 2026-10-06 13:04:21 UTC — [ticket-359] livraison: rebase sur develop (297ms)
+- 2026-10-06 13:04:21 UTC — [ticket-359] livraison: PR #284 ouverte (4437ms)
+- 2026-10-06 13:04:21 UTC — [ticket-359] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 13:04:21 UTC — [ide-core] ticket-359 PR #284 confiée au CIWatcher
+- 2026-10-06 13:04:22 UTC — [ticket-360] branche ticket-360-a-feat-or-fix-ticket-without-acceptance-criteria
+- 2026-10-06 13:04:22 UTC — [ticket-360] tour 1 — codeur démarré
+- 2026-10-06 13:06:08 UTC — [ticket-360] tour 1 — codeur terminé (106157ms)
+- 2026-10-06 13:09:16 UTC — [ticket-360] testeur: 2 failed, 1070 passed, 20 warnings in 185.50s (0:03:05)
+- 2026-10-06 13:09:16 UTC — [ticket-360] tests rouges au tour 1
+- 2026-10-06 13:09:16 UTC — [ticket-360] tour 2 — codeur démarré
+- 2026-10-06 13:10:19 UTC — [ticket-360] tour 2 — codeur terminé (63125ms)
+- 2026-10-06 13:13:27 UTC — [ticket-360] testeur: \u276f src/components/ChatPanel/ChatPanel.test.tsx:57:3
+- 2026-10-06 13:13:27 UTC — [ticket-360] tests rouges au tour 2
+- 2026-10-06 13:13:27 UTC — [ticket-360] tour 3 — codeur démarré
+- 2026-10-06 13:14:18 UTC — [ticket-360] tour 3 — codeur terminé (50969ms)
+- 2026-10-06 13:18:03 UTC — [ticket-360] testeur: 81|     render(<RunHistory runs={[RUN_DONE]} loading={false} error={null} �
+- 2026-10-06 13:18:03 UTC — [ticket-360] tests rouges au tour 3
+- 2026-10-06 13:18:03 UTC — [ticket-360] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 13:18:05 UTC — [ide-core] file interrompue : ticket-360 non approuvé
+- 2026-10-06 13:22:13 UTC — [ticket-360] branche ticket-360-a-feat-or-fix-ticket-without-acceptance-criteria
+- 2026-10-06 13:22:13 UTC — [ticket-360] tour 1 — codeur démarré
+- 2026-10-06 13:23:39 UTC — [ticket-360] tour 1 — codeur terminé (86250ms)
+- 2026-10-06 13:26:37 UTC — [ticket-360] testeur: OK (exit 0)
+- 2026-10-06 13:26:46 UTC — [ticket-360] securite: PASS — Aucun fichier modifié dans ce run. L'implémentation du ticket-360 était déjà pré (9032ms)
+- 2026-10-06 13:26:46 UTC — [ticket-360] tour 1 — reviewer démarré
+- 2026-10-06 13:27:22 UTC — [ticket-360] tour 1 — reviewer terminé (35733ms)
+- 2026-10-06 13:28:39 UTC — [ticket-360] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente déjà le comp (112530ms)
+- 2026-10-06 13:28:39 UTC — [ticket-360] APPROVED après 1 tour(s)
+- 2026-10-06 13:32:29 UTC — [ticket-360] livraison: rebase sur develop (281ms)
+- 2026-10-06 13:32:29 UTC — [ticket-360] livraison: PR #285 ouverte (4766ms)
+- 2026-10-06 13:32:29 UTC — [ticket-360] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 13:32:29 UTC — [ide-core] ticket-360 PR #285 confiée au CIWatcher
+- 2026-10-06 13:32:30 UTC — [ticket-361] branche ticket-361-a-queue-stops-before-a-ticket-whose-dependency-wa
+- 2026-10-06 13:32:31 UTC — [ticket-361] tour 1 — codeur démarré
+- 2026-10-06 13:38:03 UTC — [ticket-361] tour 1 — codeur terminé (332608ms)
+- 2026-10-06 13:41:07 UTC — [ticket-361] testeur: OK (exit 0)
+- 2026-10-06 13:41:38 UTC — [ticket-361] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute une logique de gestion (31092ms)
+- 2026-10-06 13:41:38 UTC — [ticket-361] tour 1 — reviewer démarré
+- 2026-10-06 13:43:12 UTC — [ticket-361] tour 1 — reviewer terminé (93827ms)
+- 2026-10-06 13:44:06 UTC — [ticket-361] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (148078ms)
+- 2026-10-06 13:44:06 UTC — [ticket-361] APPROVED après 1 tour(s)
+- 2026-10-06 13:46:50 UTC — [ticket-361] livraison: rebase sur develop (297ms)
+- 2026-10-06 13:46:50 UTC — [ticket-361] livraison: PR #286 ouverte (4328ms)
+- 2026-10-06 13:46:50 UTC — [ticket-361] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 13:46:50 UTC — [ide-core] ticket-361 PR #286 confiée au CIWatcher
+- 2026-10-06 13:46:51 UTC — [ticket-352] branche ticket-352-tickets-and-projects-are-parsed-once-per-file-cha
+- 2026-10-06 13:46:52 UTC — [ticket-352] tour 1 — codeur démarré
+- 2026-10-06 13:54:39 UTC — [ticket-352] tour 1 — codeur terminé (467187ms)
+- 2026-10-06 13:57:35 UTC — [ticket-352] testeur: OK (exit 0)
+- 2026-10-06 13:58:08 UTC — [ticket-352] securite: PASS — Audit de sécurité du diff — ticket-352 (caching des projets et tickets).
+
+Le cod (32766ms)
+- 2026-10-06 13:58:08 UTC — [ticket-352] tour 1 — reviewer démarré
+- 2026-10-06 13:59:26 UTC — [ticket-352] tour 1 — reviewer terminé (78094ms)
+- 2026-10-06 14:01:52 UTC — [ticket-352] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les comportem (223266ms)
+- 2026-10-06 14:01:52 UTC — [ticket-352] APPROVED après 1 tour(s)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: rebase sur develop (235ms)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: PR #287 ouverte (5484ms)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 14:03:01 UTC — [ide-core] ticket-352 PR #287 confiée au CIWatcher
+- 2026-10-06 14:03:02 UTC — [ticket-353] branche ticket-353-streamed-tokens-are-batched-per-frame-and-a-run-s
+- 2026-10-06 14:03:02 UTC — [ticket-353] tour 1 — codeur démarré
+- 2026-10-06 14:19:59 UTC — [ticket-353] tour 1 — codeur terminé (1017546ms)
+- 2026-10-06 14:22:59 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 14:23:28 UTC — [ticket-353] securite: PASS — Audit de sécurité du diff frontend (streamState.ts, useSupervision.ts et tests a (29718ms)
+- 2026-10-06 14:23:28 UTC — [ticket-353] tour 1 — reviewer démarré
+- 2026-10-06 14:25:14 UTC — [ticket-353] tour 1 — reviewer terminé (105592ms)
+- 2026-10-06 14:26:44 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : le code implémente correctement l (195906ms)
+- 2026-10-06 14:26:44 UTC — [ticket-353] CHANGES_REQUESTED tour 1: Validateur : Les quatre premiers critères sont satisfaits : le code implémente correctement le regro
+- 2026-10-06 14:26:44 UTC — [ticket-353] tour 2 — codeur démarré
+- 2026-10-06 14:27:26 UTC — [ticket-353] tour 2 — codeur terminé (41907ms)
+- 2026-10-06 14:30:16 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 14:30:52 UTC — [ticket-353] securite: PASS — Audit de sécurité du refactor ticket-353 (optimisation performance + limitation  (35608ms)
+- 2026-10-06 14:30:52 UTC — [ticket-353] tour 2 — reviewer démarré
+- 2026-10-06 14:33:05 UTC — [ticket-353] tour 2 — reviewer terminé (132905ms)
+- 2026-10-06 14:34:09 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : le code gère correctement les `ag (197547ms)
+- 2026-10-06 14:34:09 UTC — [ticket-353] CHANGES_REQUESTED tour 2: Validateur : Les quatre premiers critères sont satisfaits : le code gère correctement les `agent_tok
+- 2026-10-06 14:34:09 UTC — [ticket-353] tour 3 — codeur démarré
+- 2026-10-06 14:35:55 UTC — [ticket-353] tour 3 — codeur terminé (105875ms)
+- 2026-10-06 14:39:20 UTC — [ticket-353] testeur: 1 failed, 686 passed, 20 warnings in 202.33s (0:03:22)
+- 2026-10-06 14:39:20 UTC — [ticket-353] tests rouges au tour 3
+- 2026-10-06 14:39:20 UTC — [ticket-353] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 14:39:23 UTC — [ide-core] file interrompue : ticket-353 non approuvé
+- 2026-10-06 14:50:51 UTC — [ticket-353] branche ticket-353-streamed-tokens-are-batched-per-frame-and-a-run-s
+- 2026-10-06 14:50:52 UTC — [ticket-353] tour 1 — codeur démarré
+- 2026-10-06 14:55:50 UTC — [ticket-353] tour 1 — codeur terminé (298110ms)
+- 2026-10-06 15:00:26 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:00:34 UTC — [ticket-353] securite: PASS — Diff cosmétique : réarrangement des imports (groupage des imports généraux en ha (8578ms)
+- 2026-10-06 15:00:35 UTC — [ticket-353] tour 1 — reviewer démarré
+- 2026-10-06 15:02:03 UTC — [ticket-353] tour 1 — reviewer terminé (88625ms)
+- 2026-10-06 15:04:51 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Aucun test n'a été fourni dans les fichiers cités par les critères, et le diff n (256405ms)
+- 2026-10-06 15:04:51 UTC — [ticket-353] CHANGES_REQUESTED tour 1: Validateur : Aucun test n'a été fourni dans les fichiers cités par les critères, et le diff ne conti
+- 2026-10-06 15:04:51 UTC — [ticket-353] tour 2 — codeur démarré
+- 2026-10-06 15:07:56 UTC — [ticket-353] tour 2 — codeur terminé (184875ms)
+- 2026-10-06 15:11:00 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:11:15 UTC — [ticket-353] securite: PASS — Audit de sécurité du diff : refactorisation de tests TypeScript et réorganisatio (14610ms)
+- 2026-10-06 15:11:15 UTC — [ticket-353] tour 2 — reviewer démarré
+- 2026-10-06 15:12:25 UTC — [ticket-353] tour 2 — reviewer terminé (70000ms)
+- 2026-10-06 15:14:08 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les critères 1 à 4 sont satisfaits. Le cinquième critère ne peut être jugé car l (173062ms)
+- 2026-10-06 15:14:08 UTC — [ticket-353] CHANGES_REQUESTED tour 2: Validateur : Les critères 1 à 4 sont satisfaits. Le cinquième critère ne peut être jugé car les fich
+- 2026-10-06 15:14:08 UTC — [ticket-353] tour 3 — codeur démarré
+- 2026-10-06 15:15:49 UTC — [ticket-353] tour 3 — codeur terminé (101016ms)
+- 2026-10-06 15:18:45 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:18:56 UTC — [ticket-353] securite: PASS — Audit complet du diff : refactorisation cosmétique uniquement. Trois catégories  (11469ms)
+- 2026-10-06 15:18:56 UTC — [ticket-353] tour 3 — reviewer démarré
+- 2026-10-06 15:20:05 UTC — [ticket-353] tour 3 — reviewer terminé (68282ms)
+- 2026-10-06 15:20:48 UTC — [ticket-353] validateur: APPROVED — Tous les critères sont satisfaits. Les tests ont été ajoutés ou modifiés pour co (111671ms)
+- 2026-10-06 15:20:48 UTC — [ticket-353] APPROVED après 3 tour(s)
+- 2026-10-06 15:22:24 UTC — [ticket-353] livraison: rebase sur develop (188ms)
+- 2026-10-06 15:22:24 UTC — [ticket-353] livraison: PR #288 ouverte (4906ms)
+- 2026-10-06 15:22:24 UTC — [ticket-353] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 15:22:24 UTC — [ide-core] ticket-353 PR #288 confiée au CIWatcher
+- 2026-10-06 15:22:25 UTC — [ticket-354] branche ticket-354-run-state-lives-in-a-store-that-components-subscr
+- 2026-10-06 15:23:41 UTC — [ticket-354] plan rendu (75187ms)
+- 2026-10-06 15:23:41 UTC — [ticket-354] tour 1 — codeur démarré
+- 2026-10-06 15:45:04 UTC — [ticket-354] tour 1 — codeur terminé (1283610ms)
+- 2026-10-06 15:47:56 UTC — [ticket-354] testeur: OK (exit 0)
+- 2026-10-06 15:48:29 UTC — [ticket-354] securite: PASS — Audit du refactoring ticket-354 (store externe de runs). Aucune vulnérabilité dé (32984ms)
+- 2026-10-06 15:48:29 UTC — [ticket-354] tour 1 — reviewer démarré
+- 2026-10-06 15:50:52 UTC — [ticket-354] tour 1 — reviewer terminé (142641ms)
+- 2026-10-06 15:54:54 UTC — [ticket-354] validateur: APPROVED — Le refactor est complet et bien exécuté. Un store externe minimal basé sur `useS (384342ms)
+- 2026-10-06 15:54:54 UTC — [ticket-354] APPROVED après 1 tour(s)
+- 2026-10-06 15:56:23 UTC — [ticket-354] documentation: 1 fichier(s) (88046ms)
+- 2026-10-06 15:22:13 UTC — [ticket-353] documentation: 1 fichier(s) (83078ms)
+- 2026-10-06 14:02:48 UTC — [ticket-352] documentation: 1 fichier(s) (54671ms)
+- 2026-10-06 13:46:38 UTC — [ticket-361] documentation: 1 fichier(s) (150140ms)
+- 2026-10-06 13:32:17 UTC — [ticket-360] documentation: 1 fichier(s) (215625ms)
+- 2026-10-06 13:04:05 UTC — [ticket-359] documentation: 1 fichier(s) (172219ms)
+- 2026-10-06 15:56:35 UTC — [ticket-354] livraison: rebase sur develop (266ms)
+- 2026-10-06 15:56:35 UTC — [ticket-354] livraison: PR #289 ouverte (4875ms)
+- 2026-10-06 15:56:35 UTC — [ticket-354] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 15:56:35 UTC — [ide-core] ticket-354 PR #289 confiée au CIWatcher
+- 2026-10-06 15:56:36 UTC — [ticket-355] branche ticket-355-monaco-and-the-center-views-load-on-demand-instea
+- 2026-10-06 15:56:36 UTC — [ticket-355] tour 1 — codeur démarré
+- 2026-10-06 16:02:15 UTC — [ticket-355] tour 1 — codeur terminé (338625ms)
+- 2026-10-06 16:05:10 UTC — [ticket-355] testeur: 161|     expect(main).toContainElement(screen.getByTestId("chat-panel"));
+- 2026-10-06 16:05:10 UTC — [ticket-355] tests rouges au tour 1
+- 2026-10-06 16:05:10 UTC — [ticket-355] tour 2 — codeur démarré
+- 2026-10-06 16:06:15 UTC — [ticket-355] tour 2 — codeur terminé (65484ms)
+- 2026-10-06 16:09:04 UTC — [ticket-355] testeur: Error: [vitest] No "loader" export is defined on the "@monaco-editor/react" mock. Did you forget to return it from "vi.mock"?
+- 2026-10-06 16:09:04 UTC — [ticket-355] tests rouges au tour 2
+- 2026-10-06 16:09:04 UTC — [ticket-355] BLOCKED après le tour 2 — run budget exhausted: 15.09 USD spent of 15.00 allowed
+- 2026-10-06 16:09:06 UTC — [ide-core] file interrompue : ticket-355 non approuvé
+- 2026-10-06 16:09:26 UTC — [ticket-355] branche ticket-355-monaco-and-the-center-views-load-on-demand-instea
+- 2026-10-06 16:09:26 UTC — [ticket-355] tour 1 — codeur démarré
+- 2026-10-06 16:11:51 UTC — [ticket-355] tour 1 — codeur terminé (144328ms)
+- 2026-10-06 16:14:39 UTC — [ticket-355] testeur: Error: [vitest] No "loader" export is defined on the "@monaco-editor/react" mock. Did you forget to return it from "vi.mock"?
+- 2026-10-06 16:14:39 UTC — [ticket-355] tests rouges au tour 1
+- 2026-10-06 16:14:39 UTC — [ticket-355] tour 2 — codeur démarré
+- 2026-10-06 16:15:46 UTC — [ticket-355] tour 2 — codeur terminé (66687ms)
+- 2026-10-06 16:18:53 UTC — [ticket-355] testeur: OK (exit 0)
+- 2026-10-06 16:19:02 UTC — [ticket-355] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute du mocking de dépendances dans des (9578ms)
+- 2026-10-06 16:19:02 UTC — [ticket-355] tour 2 — reviewer démarré
+- 2026-10-06 16:20:15 UTC — [ticket-355] tour 2 — reviewer terminé (73125ms)
+- 2026-10-06 16:21:12 UTC — [ticket-355] validateur: CHANGES_REQUESTED — Aucun des fichiers requis pour valider les critères n’est disponible dans la sec (129937ms)
+- 2026-10-06 16:21:12 UTC — [ticket-355] CHANGES_REQUESTED tour 2: Validateur : Aucun des fichiers requis pour valider les critères n’est disponible dans la section « 
+- 2026-10-06 16:21:12 UTC — [ticket-355] tour 3 — codeur démarré
+- 2026-10-06 16:25:08 UTC — [ticket-355] tour 3 — codeur terminé (235921ms)
+- 2026-10-06 16:28:19 UTC — [ticket-355] testeur: OK (exit 0)
+- 2026-10-06 16:28:33 UTC — [ticket-355] securite: PASS — Aucune vulnérabilité détectée. Ce diff améliore l'architecture frontend en refac (13687ms)
+- 2026-10-06 16:28:33 UTC — [ticket-355] tour 3 — reviewer démarré
+- 2026-10-06 16:29:31 UTC — [ticket-355] tour 3 — reviewer terminé (57812ms)
+- 2026-10-06 16:30:37 UTC — [ticket-355] validateur: CHANGES_REQUESTED — Les modifications apportées montrent clairement que le code a été mis à jour pou (124203ms)
+- 2026-10-06 16:30:37 UTC — [ticket-355] CHANGES_REQUESTED tour 3: Validateur : Les modifications apportées montrent clairement que le code a été mis à jour pour charg
+- 2026-10-06 16:30:37 UTC — [ticket-355] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 16:30:39 UTC — [ide-core] file interrompue : ticket-355 non approuvé
+- 2026-10-06 20:39:06 UTC — [ticket-355] branche ticket-355-monaco-and-the-center-views-load-on-demand-instea
+- 2026-10-06 20:39:06 UTC — [ticket-355] tour 1 — codeur démarré
+- 2026-10-06 20:44:49 UTC — [ticket-355] tour 1 — codeur terminé (342796ms)
+- 2026-10-06 20:46:12 UTC — [ticket-355] testeur: 76|     await screen.findByTestId("monaco");
+- 2026-10-06 20:46:12 UTC — [ticket-355] tests rouges au tour 1
+- 2026-10-06 20:46:12 UTC — [ticket-355] tour 2 — codeur démarré
+- 2026-10-06 20:47:31 UTC — [ticket-355] tour 2 — codeur terminé (78983ms)
+- 2026-10-06 20:48:39 UTC — [ticket-355] testeur: 76|     await screen.findByTestId("monaco");
+- 2026-10-06 20:48:39 UTC — [ticket-355] tests rouges au tour 2
+- 2026-10-06 20:48:39 UTC — [ticket-355] tour 3 — codeur démarré
+- 2026-10-06 20:51:40 UTC — [ticket-355] tour 3 — codeur terminé (181187ms)
+- 2026-10-06 20:53:14 UTC — [ticket-355] testeur: 161|     expect(main).toContainElement(screen.getByTestId("chat-panel"));
+- 2026-10-06 20:53:14 UTC — [ticket-355] tests rouges au tour 3
+- 2026-10-06 20:53:14 UTC — [ticket-355] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 20:53:16 UTC — [ide-core] file interrompue : ticket-355 non approuvé
+- 2026-10-06 20:53:55 UTC — [ticket-356] branche ticket-356-data-already-seen-shows-at-once-while-it-refreshe
+- 2026-10-06 20:53:55 UTC — [ticket-356] tour 1 — codeur démarré
+- 2026-10-06 21:04:39 UTC — [ticket-356] tour 1 — codeur terminé (643140ms)
+- 2026-10-06 21:04:57 UTC — [ticket-356] testeur: \u2716 1 problem (1 error, 0 warnings)
+- 2026-10-06 21:04:57 UTC — [ticket-356] tests rouges au tour 1
+- 2026-10-06 21:04:57 UTC — [ticket-356] tour 2 — codeur démarré
+- 2026-10-06 21:06:42 UTC — [ticket-356] tour 2 — codeur terminé (105078ms)
+- 2026-10-06 21:07:49 UTC — [ticket-356] testeur: c:\Users\Benjamin.CHARMES\Desktop\tessera\backend\.venv\Scripts\python.exe: No module named pytest
+- 2026-10-06 21:07:49 UTC — [ticket-356] tests rouges au tour 2
+- 2026-10-06 21:07:49 UTC — [ticket-356] tour 3 — codeur démarré
+- 2026-10-06 21:16:37 UTC — [ticket-356] tour 3 — codeur terminé (528343ms)
+- 2026-10-06 21:19:24 UTC — [ticket-356] testeur: OK (exit 0)
+- 2026-10-06 21:20:32 UTC — [ticket-356] securite: BLOCK — One HIGH severity vulnerability detected: the caching mechanism introduced in `u (68219ms)
+- 2026-10-06 21:20:33 UTC — [ide-core] file interrompue : ticket-356 non approuvé
+- 2026-10-06 21:25:36 UTC — [ticket-362] branche ticket-362-the-acceptance-criteria-heading-is-recognised-onl
+- 2026-10-06 21:25:36 UTC — [ticket-362] tour 1 — codeur démarré
+- 2026-10-06 21:26:58 UTC — [ticket-362] tour 1 — codeur terminé (81842ms)
+- 2026-10-06 21:29:59 UTC — [ticket-362] testeur: OK (exit 0)
+- 2026-10-06 21:30:12 UTC — [ticket-362] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie le comportement d'une corresponda (13687ms)
+- 2026-10-06 21:30:12 UTC — [ticket-362] tour 1 — reviewer démarré
+- 2026-10-06 21:30:52 UTC — [ticket-362] tour 1 — reviewer terminé (39562ms)
+- 2026-10-06 21:32:05 UTC — [ticket-362] validateur: APPROVED — Tous les critères sont respectés. Le code a été modifié pour utiliser `match()`  (112921ms)
+- 2026-10-06 21:32:05 UTC — [ticket-362] APPROVED après 1 tour(s)
+- 2026-10-06 21:34:34 UTC — [ticket-362] documentation: 1 fichier(s) (146844ms)
+- 2026-10-06 21:34:45 UTC — [ticket-362] livraison: rebase sur develop (516ms)
+- 2026-10-06 21:34:45 UTC — [ticket-362] livraison: PR #293 ouverte (4141ms)
+- 2026-10-06 21:34:45 UTC — [ide-core] ticket-362 PR #293 confiée au CIWatcher
+- 2026-10-06 21:34:46 UTC — [ticket-363] branche ticket-363-frontend-tests-allow-for-a-loaded-machine-instead
+- 2026-10-06 21:34:46 UTC — [ticket-363] tour 1 — codeur démarré
+- 2026-10-06 21:36:04 UTC — [ticket-363] tour 1 — codeur terminé (77014ms)
+- 2026-10-06 21:39:00 UTC — [ticket-363] testeur: OK (exit 0)
+- 2026-10-06 21:39:10 UTC — [ticket-363] securite: PASS — Audit réalisé. Le diff modifie uniquement la configuration Vitest (frontend/vite (9530ms)
+- 2026-10-06 21:39:10 UTC — [ticket-363] tour 1 — reviewer démarré
+- 2026-10-06 21:39:22 UTC — [ticket-363] tour 1 — reviewer terminé (12141ms)
+- 2026-10-06 21:40:15 UTC — [ticket-363] validateur: APPROVED — Les deux premiers critères sont respectés : `testTimeout` et `hookTimeout` sont  (65155ms)
+- 2026-10-06 21:40:15 UTC — [ticket-363] APPROVED après 1 tour(s)
+- 2026-10-06 21:42:01 UTC — [ticket-363] documentation: 1 fichier(s) (103671ms)

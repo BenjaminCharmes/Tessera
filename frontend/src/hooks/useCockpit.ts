@@ -23,6 +23,7 @@ import { api } from "../lib/api";
 import { vueDuCentre } from "../vueDuCentre";
 import type { VueCentre } from "../vueDuCentre";
 import type { StreamState } from "./streamState";
+import { useListeRuns } from "./runStore";
 
 /**
  * Returns the panel to activate when the user selects a project from the
@@ -155,11 +156,17 @@ export function useCockpit() {
   // regardé — pour les composants qui n'en attendaient qu'un.
   const supervision = useSupervision();
   const stream = useRunActif(supervision, project?.id ?? null);
+
+  // Statuts lus depuis le store externe — ne redessine pas à chaque token
+  // (ticket-354). `useListeRuns()` ne change de référence que si un statut
+  // ou une pendingQuestion change.
+  const runsStatus = useListeRuns();
+
   // Une question ne se voyait que dans le panneau du projet sélectionné : la
   // sidebar la signale depuis n'importe quel onglet (ticket-186).
   const enAttente = projetsEnAttente(
     supervision.runs,
-    (runId) => supervision.etatDe(runId).pendingQuestion,
+    (runId) => runsStatus.find((r) => r.runId === runId)?.pendingQuestion ?? null,
   );
 
   const runEnCours =
@@ -194,10 +201,10 @@ export function useCockpit() {
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
   // bloque un humain, un run bloqué demande une décision. L'activité est le
   // cas nominal, donc le dernier à mériter la couleur.
-  const etatsDesRuns = supervision.runs.map((r) => supervision.etatDe(r.run_id));
-  const alerteDeSupervision = etatsDesRuns.some((e) => e.status === "error")
+  // Lire depuis runsStatus (store) : ne change pas à chaque token (ticket-354).
+  const alerteDeSupervision = runsStatus.some((e) => e.status === "error")
     ? ("bloque" as const)
-    : etatsDesRuns.some((e) => e.pendingQuestion !== null)
+    : runsStatus.some((e) => e.pendingQuestion !== null)
       ? ("attente" as const)
       : null;
   const tickets = useTickets(

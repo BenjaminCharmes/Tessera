@@ -9,11 +9,12 @@ import MenuFermer from "./MenuFermer";
 import { issueDuRun } from "./issueDuRun";
 import type { IssueDuRun } from "./issueDuRun";
 import { INITIAL } from "../../hooks/streamState";
-import type { UseRunActifResult } from "../../hooks/streamState";
+import type { StreamState, UseRunActifResult } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { Project, ServiceActif } from "../../types/api";
 import { projetDuRun } from "./projetDuRun";
 import { useLimites } from "../../hooks/useLimites";
+import { useEtatRun } from "../../hooks/runStore";
 
 /**
  * Ce que l'IDE est en train de faire, sur tous les projets — ticket-129.
@@ -45,6 +46,17 @@ export default function SupervisionView({
 }: SupervisionViewProps) {
   const { runs, selection, selectionner, etatDe, fermerRuns } = supervision;
   const limites = useLimites();
+
+  // Sélection par défaut calculée avant les cartes triées, pour le runId.
+  // On la recalcule après le tri, mais on a besoin du runId pour useEtatRun.
+  const runEnAttentePrelim = runs.find(
+    (r) => etatDe(r.run_id).pendingQuestion !== null,
+  );
+  const prelim = runs.find((r) => r.run_id === selection) ?? runEnAttentePrelim ?? runs[0];
+
+  // Souscrit directement au store pour le run sélectionné : les tokens du
+  // codeur se mettent à jour sans attendre un re-rendu du parent (ticket-354).
+  const etatSelectionne = useEtatRun(prelim?.run_id ?? "");
 
   // Run affiché en lecture seule — ticket-327.
   const [revisuRun, setRevisuRun] = useState<{ runId: string; ticketId: string } | null>(null);
@@ -81,11 +93,8 @@ export default function SupervisionView({
     return aAttend ? -1 : 1;
   });
 
-  // Sélection par défaut : un run en attente s'il y en a un, sinon le premier.
-  // Un choix explicite de l'utilisateur (selection != null) garde la priorité.
-  const runEnAttente = runs.find((r) => etatDe(r.run_id).pendingQuestion !== null);
-  const selectionne =
-    runs.find((r) => r.run_id === selection) ?? runEnAttente ?? runs[0];
+  // `selectionne` = run affiché dans le panneau de détail.
+  const selectionne = prelim;
 
   /** Sélectionne le run et donne le focus au champ de réponse (ticket-266). */
   function repondre(runId: string) {
@@ -179,7 +188,7 @@ export default function SupervisionView({
             ) : selectionne ? (
               <AgentPanel
                 project={projetDuRun(projects, selectionne)}
-                stream={projeter(supervision, selectionne.run_id)}
+                stream={projeter(supervision, selectionne.run_id, etatSelectionne)}
                 onRevoirRun={(runId, ticketId) => setRevisuRun({ runId, ticketId })}
               />
             ) : null}
@@ -222,17 +231,17 @@ function VueVide({
 /**
  * Donne à `AgentPanel` l'interface qu'il attend, pour un run quelconque.
  *
- * Les actions de lancement n'ont pas de sens ici — on observe un run qui
- * tourne déjà — mais le dialogue, lui, en a : depuis ticket-128 n'importe
- * quel client peut répondre à un agent, pas seulement celui qui a lancé.
+ * `etat` est fourni par l'appelant (via `useEtatRun`) pour que les tokens
+ * arrivent en temps réel sans attendre un re-rendu du parent (ticket-354).
  */
 function projeter(
   supervision: UseSupervisionResult,
   runId: string,
+  etat: StreamState,
 ): UseRunActifResult {
   const rien = () => undefined;
   return {
-    ...(supervision.etatDe(runId) ?? INITIAL),
+    ...(etat ?? INITIAL),
     connect: rien,
     connectQueue: rien,
     connectAutonome: rien,

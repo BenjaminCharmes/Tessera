@@ -1,14 +1,14 @@
 ---
-id: ticket-353
-title: "Streamed tokens are batched per frame and a run's event history is bounded"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 1
-created: 2026-10-05
+id: ticket-353
+pr_number: 288
+priority: high
+status: done
+title: Streamed tokens are batched per frame and a run's event history is bounded
+type: fix
 ---
 
 # ticket-353 — Les tokens sont regroupés par image et l'historique d'un run est borné

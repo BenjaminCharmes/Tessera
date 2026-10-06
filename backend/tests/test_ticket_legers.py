@@ -205,6 +205,7 @@ async def test_light_ticket_runs_validator(tmp_path: Path) -> None:
             code_produced: str,
             test_result: object,
             project_root: object = None,
+            ticket_type: object = None,
         ) -> object:
             validated.append(code_produced)
             return ValidationResult(

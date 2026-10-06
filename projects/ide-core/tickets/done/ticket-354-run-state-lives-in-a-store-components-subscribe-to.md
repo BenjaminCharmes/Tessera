@@ -1,15 +1,17 @@
 ---
-id: ticket-354
-title: "Run state lives in a store that components subscribe to, so one run's event re-renders only what shows it"
-type: refactor
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-353"]
-estimated_days: 1.5
-plan: true
 created: 2026-10-05
+depends_on:
+- ticket-353
+estimated_days: 1.5
+id: ticket-354
+plan: true
+pr_number: 289
+priority: high
+status: done
+title: Run state lives in a store that components subscribe to, so one run's event
+  re-renders only what shows it
+type: refactor
 ---
 
 # ticket-354 — L'état des runs vit dans un store, et un événement ne redessine que ce qui l'affiche
