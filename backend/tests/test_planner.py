@@ -1,5 +1,6 @@
 """TDD tests for PlannerService — ticket-028."""
 import json
+import logging
 from pathlib import Path
 
 import pytest
@@ -212,6 +213,20 @@ async def test_json_missing_tickets_raises_value_error(tmp_path: Path) -> None:
     svc = _make_service(tmp_path, bad_response)
     with pytest.raises(ValueError, match="JSON valide"):
         await svc.plan("proj", "description")
+
+
+async def test_illisible_logs_full_raw_response(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """An unreadable response is logged in full before the error is raised."""
+    raw_response = "Désolé, voici quelque chose d'illisible — " + "x" * 500
+    svc = _make_service(tmp_path, raw_response)
+    with caplog.at_level(logging.WARNING, logger="tessera.services.planner"):
+        with pytest.raises(ValueError, match="JSON valide"):
+            await svc.plan("proj", "description")
+    records = [r for r in caplog.records if r.getMessage() == "planner_reponse_illisible"]
+    assert records, "Expected a 'planner_reponse_illisible' log record"
+    assert records[0].__dict__.get("raw") == raw_response
 
 
 async def test_json_in_markdown_code_block(tmp_path: Path) -> None:

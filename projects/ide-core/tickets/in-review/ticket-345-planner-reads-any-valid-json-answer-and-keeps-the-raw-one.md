@@ -1,14 +1,14 @@
 ---
-id: ticket-345
-title: "The planner reads any valid JSON answer, and keeps the raw answer when it cannot"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-05
+id: ticket-345
+pr_number: null
+priority: high
+status: in-review
+title: The planner reads any valid JSON answer, and keeps the raw answer when it cannot
+type: fix
 ---
 
 # ticket-345 — Le planificateur lit toute réponse JSON valide, et garde la réponse brute quand il ne peut pas
