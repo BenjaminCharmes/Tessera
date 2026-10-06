@@ -1558,3 +1558,69 @@ Le cod (32766ms)
 - 2026-10-06 13:46:38 UTC — [ticket-361] documentation: 1 fichier(s) (150140ms)
 - 2026-10-06 13:32:17 UTC — [ticket-360] documentation: 1 fichier(s) (215625ms)
 - 2026-10-06 13:04:05 UTC — [ticket-359] documentation: 1 fichier(s) (172219ms)
+- 2026-10-06 15:56:35 UTC — [ticket-354] livraison: rebase sur develop (266ms)
+- 2026-10-06 15:56:35 UTC — [ticket-354] livraison: PR #289 ouverte (4875ms)
+- 2026-10-06 15:56:35 UTC — [ticket-354] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 15:56:35 UTC — [ide-core] ticket-354 PR #289 confiée au CIWatcher
+- 2026-10-06 15:56:36 UTC — [ticket-355] branche ticket-355-monaco-and-the-center-views-load-on-demand-instea
+- 2026-10-06 15:56:36 UTC — [ticket-355] tour 1 — codeur démarré
+- 2026-10-06 16:02:15 UTC — [ticket-355] tour 1 — codeur terminé (338625ms)
+- 2026-10-06 16:05:10 UTC — [ticket-355] testeur: 161|     expect(main).toContainElement(screen.getByTestId("chat-panel"));
+- 2026-10-06 16:05:10 UTC — [ticket-355] tests rouges au tour 1
+- 2026-10-06 16:05:10 UTC — [ticket-355] tour 2 — codeur démarré
+- 2026-10-06 16:06:15 UTC — [ticket-355] tour 2 — codeur terminé (65484ms)
+- 2026-10-06 16:09:04 UTC — [ticket-355] testeur: Error: [vitest] No "loader" export is defined on the "@monaco-editor/react" mock. Did you forget to return it from "vi.mock"?
+- 2026-10-06 16:09:04 UTC — [ticket-355] tests rouges au tour 2
+- 2026-10-06 16:09:04 UTC — [ticket-355] BLOCKED après le tour 2 — run budget exhausted: 15.09 USD spent of 15.00 allowed
+- 2026-10-06 16:09:06 UTC — [ide-core] file interrompue : ticket-355 non approuvé
+- 2026-10-06 16:09:26 UTC — [ticket-355] branche ticket-355-monaco-and-the-center-views-load-on-demand-instea
+- 2026-10-06 16:09:26 UTC — [ticket-355] tour 1 — codeur démarré
+- 2026-10-06 16:11:51 UTC — [ticket-355] tour 1 — codeur terminé (144328ms)
+- 2026-10-06 16:14:39 UTC — [ticket-355] testeur: Error: [vitest] No "loader" export is defined on the "@monaco-editor/react" mock. Did you forget to return it from "vi.mock"?
+- 2026-10-06 16:14:39 UTC — [ticket-355] tests rouges au tour 1
+- 2026-10-06 16:14:39 UTC — [ticket-355] tour 2 — codeur démarré
+- 2026-10-06 16:15:46 UTC — [ticket-355] tour 2 — codeur terminé (66687ms)
+- 2026-10-06 16:18:53 UTC — [ticket-355] testeur: OK (exit 0)
+- 2026-10-06 16:19:02 UTC — [ticket-355] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute du mocking de dépendances dans des (9578ms)
+- 2026-10-06 16:19:02 UTC — [ticket-355] tour 2 — reviewer démarré
+- 2026-10-06 16:20:15 UTC — [ticket-355] tour 2 — reviewer terminé (73125ms)
+- 2026-10-06 16:21:12 UTC — [ticket-355] validateur: CHANGES_REQUESTED — Aucun des fichiers requis pour valider les critères n’est disponible dans la sec (129937ms)
+- 2026-10-06 16:21:12 UTC — [ticket-355] CHANGES_REQUESTED tour 2: Validateur : Aucun des fichiers requis pour valider les critères n’est disponible dans la section « 
+- 2026-10-06 16:21:12 UTC — [ticket-355] tour 3 — codeur démarré
+- 2026-10-06 16:25:08 UTC — [ticket-355] tour 3 — codeur terminé (235921ms)
+- 2026-10-06 16:28:19 UTC — [ticket-355] testeur: OK (exit 0)
+- 2026-10-06 16:28:33 UTC — [ticket-355] securite: PASS — Aucune vulnérabilité détectée. Ce diff améliore l'architecture frontend en refac (13687ms)
+- 2026-10-06 16:28:33 UTC — [ticket-355] tour 3 — reviewer démarré
+- 2026-10-06 16:29:31 UTC — [ticket-355] tour 3 — reviewer terminé (57812ms)
+- 2026-10-06 16:30:37 UTC — [ticket-355] validateur: CHANGES_REQUESTED — Les modifications apportées montrent clairement que le code a été mis à jour pou (124203ms)
+- 2026-10-06 16:30:37 UTC — [ticket-355] CHANGES_REQUESTED tour 3: Validateur : Les modifications apportées montrent clairement que le code a été mis à jour pour charg
+- 2026-10-06 16:30:37 UTC — [ticket-355] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 16:30:39 UTC — [ide-core] file interrompue : ticket-355 non approuvé
+- 2026-10-06 20:39:06 UTC — [ticket-355] branche ticket-355-monaco-and-the-center-views-load-on-demand-instea
+- 2026-10-06 20:39:06 UTC — [ticket-355] tour 1 — codeur démarré
+- 2026-10-06 20:44:49 UTC — [ticket-355] tour 1 — codeur terminé (342796ms)
+- 2026-10-06 20:46:12 UTC — [ticket-355] testeur: 76|     await screen.findByTestId("monaco");
+- 2026-10-06 20:46:12 UTC — [ticket-355] tests rouges au tour 1
+- 2026-10-06 20:46:12 UTC — [ticket-355] tour 2 — codeur démarré
+- 2026-10-06 20:47:31 UTC — [ticket-355] tour 2 — codeur terminé (78983ms)
+- 2026-10-06 20:48:39 UTC — [ticket-355] testeur: 76|     await screen.findByTestId("monaco");
+- 2026-10-06 20:48:39 UTC — [ticket-355] tests rouges au tour 2
+- 2026-10-06 20:48:39 UTC — [ticket-355] tour 3 — codeur démarré
+- 2026-10-06 20:51:40 UTC — [ticket-355] tour 3 — codeur terminé (181187ms)
+- 2026-10-06 20:53:14 UTC — [ticket-355] testeur: 161|     expect(main).toContainElement(screen.getByTestId("chat-panel"));
+- 2026-10-06 20:53:14 UTC — [ticket-355] tests rouges au tour 3
+- 2026-10-06 20:53:14 UTC — [ticket-355] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 20:53:16 UTC — [ide-core] file interrompue : ticket-355 non approuvé
+- 2026-10-06 20:53:55 UTC — [ticket-356] branche ticket-356-data-already-seen-shows-at-once-while-it-refreshe
+- 2026-10-06 20:53:55 UTC — [ticket-356] tour 1 — codeur démarré
+- 2026-10-06 21:04:39 UTC — [ticket-356] tour 1 — codeur terminé (643140ms)
+- 2026-10-06 21:04:57 UTC — [ticket-356] testeur: \u2716 1 problem (1 error, 0 warnings)
+- 2026-10-06 21:04:57 UTC — [ticket-356] tests rouges au tour 1
+- 2026-10-06 21:04:57 UTC — [ticket-356] tour 2 — codeur démarré
+- 2026-10-06 21:06:42 UTC — [ticket-356] tour 2 — codeur terminé (105078ms)
+- 2026-10-06 21:07:49 UTC — [ticket-356] testeur: c:\Users\Benjamin.CHARMES\Desktop\tessera\backend\.venv\Scripts\python.exe: No module named pytest
+- 2026-10-06 21:07:49 UTC — [ticket-356] tests rouges au tour 2
+- 2026-10-06 21:07:49 UTC — [ticket-356] tour 3 — codeur démarré
+- 2026-10-06 21:16:37 UTC — [ticket-356] tour 3 — codeur terminé (528343ms)
+- 2026-10-06 21:19:24 UTC — [ticket-356] testeur: OK (exit 0)
+- 2026-10-06 21:20:32 UTC — [ticket-356] securite: BLOCK — One HIGH severity vulnerability detected: the caching mechanism introduced in `u (68219ms)

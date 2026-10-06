@@ -164,7 +164,13 @@ export default function CenterView({
       />
     );
   } else {
-    content = <Editor ticket={ticket} openFilePath={openFilePath} />;
+    content = (
+      <Editor
+        ticket={ticket}
+        openFilePath={openFilePath}
+        projectId={project?.id ?? null}
+      />
+    );
   }
 
   return (

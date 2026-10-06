@@ -7,6 +7,7 @@ import {
 import { memo, useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
 import { MIME_TICKET, transitionsManuelles } from "../../lib/transitionsManuelles";
+import { useFenetreVisible } from "../../hooks/useFenetreVisible";
 import type {
   PRStatus,
   Ticket,
@@ -116,11 +117,13 @@ const TicketCard = memo(function TicketCard({
   const peutChangerDeStatut =
     !!onChangeStatus && !isRunning && transitions.length > 0;
   const [prStatus, setPrStatus] = useState<PRStatus | null>(null);
+  const fenetreVisible = useFenetreVisible();
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!ticket.pr_number || !githubRemote) return;
+    // Pas de polling sans PR, ni quand la fenêtre est cachée (ticket-356).
+    if (!ticket.pr_number || !githubRemote || !fenetreVisible) return;
 
     const fetchStatus = async () => {
       try {
@@ -145,7 +148,7 @@ const TicketCard = memo(function TicketCard({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [ticket.pr_number, ticket.project_id, ticket.id, githubRemote]);
+  }, [ticket.pr_number, ticket.project_id, ticket.id, githubRemote, fenetreVisible]);
 
   // La carte est un `div` cliquable : sans rôle ni focus, elle n'existait pas
   // au clavier. Seule la carte elle-même réagit à Entrée et Espace — la
