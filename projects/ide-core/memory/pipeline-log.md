@@ -1448,3 +1448,13 @@ L'ajout de la fonctio (41733ms)
 - 2026-10-06 13:18:03 UTC — [ticket-360] testeur: 81|     render(<RunHistory runs={[RUN_DONE]} loading={false} error={null} �
 - 2026-10-06 13:18:03 UTC — [ticket-360] tests rouges au tour 3
 - 2026-10-06 13:18:03 UTC — [ticket-360] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 13:18:05 UTC — [ide-core] file interrompue : ticket-360 non approuvé
+- 2026-10-06 13:22:13 UTC — [ticket-360] branche ticket-360-a-feat-or-fix-ticket-without-acceptance-criteria
+- 2026-10-06 13:22:13 UTC — [ticket-360] tour 1 — codeur démarré
+- 2026-10-06 13:23:39 UTC — [ticket-360] tour 1 — codeur terminé (86250ms)
+- 2026-10-06 13:26:37 UTC — [ticket-360] testeur: OK (exit 0)
+- 2026-10-06 13:26:46 UTC — [ticket-360] securite: PASS — Aucun fichier modifié dans ce run. L'implémentation du ticket-360 était déjà pré (9032ms)
+- 2026-10-06 13:26:46 UTC — [ticket-360] tour 1 — reviewer démarré
+- 2026-10-06 13:27:22 UTC — [ticket-360] tour 1 — reviewer terminé (35733ms)
+- 2026-10-06 13:28:39 UTC — [ticket-360] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente déjà le comp (112530ms)
+- 2026-10-06 13:28:39 UTC — [ticket-360] APPROVED après 1 tour(s)
