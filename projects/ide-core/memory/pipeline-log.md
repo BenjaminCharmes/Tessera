@@ -1382,3 +1382,4 @@ Analyse effectuée :
 - 2026-10-06 08:26:00 UTC — [ticket-351] tour 1 — reviewer terminé (75594ms)
 - 2026-10-06 08:27:13 UTC — [ticket-351] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été mis à jour pour d (148875ms)
 - 2026-10-06 08:27:13 UTC — [ticket-351] APPROVED après 1 tour(s)
+- 2026-10-06 08:28:40 UTC — [ticket-351] documentation: 0 fichier(s) (83952ms) — refusé : doc-technique : projects/ide-core/CLAUDE.md n'est pas de la documentation : un agent de documentation ne touche ni au code, ni aux tickets, ni aux ADR.
