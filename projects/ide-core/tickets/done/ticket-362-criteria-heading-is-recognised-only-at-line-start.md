@@ -1,14 +1,14 @@
 ---
-id: ticket-362
-title: "The acceptance-criteria heading is recognised only at the start of a line"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-06
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-06
+id: ticket-362
+pr_number: 293
+priority: high
+status: done
+title: The acceptance-criteria heading is recognised only at the start of a line
+type: fix
 ---
 
 # ticket-362 — Le titre des critères n'est reconnu qu'en début de ligne

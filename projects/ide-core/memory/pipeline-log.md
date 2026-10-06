@@ -1624,3 +1624,14 @@ Le cod (32766ms)
 - 2026-10-06 21:16:37 UTC — [ticket-356] tour 3 — codeur terminé (528343ms)
 - 2026-10-06 21:19:24 UTC — [ticket-356] testeur: OK (exit 0)
 - 2026-10-06 21:20:32 UTC — [ticket-356] securite: BLOCK — One HIGH severity vulnerability detected: the caching mechanism introduced in `u (68219ms)
+- 2026-10-06 21:20:33 UTC — [ide-core] file interrompue : ticket-356 non approuvé
+- 2026-10-06 21:25:36 UTC — [ticket-362] branche ticket-362-the-acceptance-criteria-heading-is-recognised-onl
+- 2026-10-06 21:25:36 UTC — [ticket-362] tour 1 — codeur démarré
+- 2026-10-06 21:26:58 UTC — [ticket-362] tour 1 — codeur terminé (81842ms)
+- 2026-10-06 21:29:59 UTC — [ticket-362] testeur: OK (exit 0)
+- 2026-10-06 21:30:12 UTC — [ticket-362] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie le comportement d'une corresponda (13687ms)
+- 2026-10-06 21:30:12 UTC — [ticket-362] tour 1 — reviewer démarré
+- 2026-10-06 21:30:52 UTC — [ticket-362] tour 1 — reviewer terminé (39562ms)
+- 2026-10-06 21:32:05 UTC — [ticket-362] validateur: APPROVED — Tous les critères sont respectés. Le code a été modifié pour utiliser `match()`  (112921ms)
+- 2026-10-06 21:32:05 UTC — [ticket-362] APPROVED après 1 tour(s)
+- 2026-10-06 21:34:34 UTC — [ticket-362] documentation: 1 fichier(s) (146844ms)
