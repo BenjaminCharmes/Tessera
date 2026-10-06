@@ -197,6 +197,22 @@ En vue Rendu (la vue par défaut), cet en-tête s'affiche en **fiche clé/valeur
 
 En vue Source (Monaco), tu vois le fichier brut, frontmatter compris.
 
+### Critères d'acceptation obligatoires pour le code
+
+Pour tout ticket `feat`, `fix` ou `refactor`, tu dois ajouter une section `## Critères d'acceptation`. C'est là que tu énumères les comportements ou résultats que le validateur vérifiera.
+
+Si tu omets cette section, le pipeline refuse le ticket — le message te demande d'ajouter une section `## Critères d'acceptation`. Les tickets `chore` ou `docs` (mise à jour de documentation, maintenance) n'en ont pas besoin : ils sont approuvés d'office.
+
+Chaque critère se note en ligne séparée pour que le validateur puisse les vérifier un par un :
+
+    ## Critères d'acceptation
+    
+    - [ ] La fonction `trier()` retourne une liste triée en ordre croissant
+    - [ ] Elle gère les listes vides sans erreur
+    - [ ] Elle supporte les nombres négatifs
+
+Le `[ ]` n'est que du markdown lisible — c'est pour ta clarté, pas pour que l'IDE les transforme en cases à cocher.
+
 ## 3 bis. Filtrer et trouver les tickets
 
 Une fois que tu as plusieurs tickets, tu veux souvent en retrouver un particulier. Le tableau mémorise tes filtres (type, priorité, agent, texte) — ils survivent même au redémarrage de l'IDE.
@@ -285,6 +301,12 @@ Une faille `CRITICAL` ou `HIGH` arrête le pipeline immédiatement : le ticket p
 en `blocked/` et le reviewer n'est même pas appelé.
 
 ---
+
+### Si le validateur refuse
+
+Si tu as écrit un ticket `feat`, `fix` ou `refactor` sans section `## Critères d'acceptation`, le validateur refuse et te demande d'en ajouter une. C'est voulu : rien ne peut être validé sans critères d'acceptation.
+
+Édite le ticket, ajoute ta section `## Critères d'acceptation` avec tes critères, et relance le pipeline sur le même ticket — il reprendra du validateur. Rien n'est perdu, rien ne bloque le ticket suivant.
 
 ### Relancer un ticket
 
