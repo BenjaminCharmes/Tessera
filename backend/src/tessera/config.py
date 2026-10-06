@@ -85,6 +85,9 @@ class Settings(BaseSettings):
     # ne pas dépendre du répertoire de lancement (ticket-330).
     ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"
     static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
+    # Borne le nombre de suites de tests lancées simultanément sur la machine.
+    # 0 ou moins : pas de borne. Voir ticket-348.
+    max_parallel_test_runs: int = 2
     # Chemin vers bash.exe sous Windows, pour que le SDK puisse activer l'outil
     # `Bash` des agents. Lu depuis CLAUDE_CODE_GIT_BASH_PATH ; absent, le backend
     # tente de le déduire depuis l'emplacement de `git` au démarrage (ticket-319).

@@ -1,5 +1,7 @@
 import asyncio
 import shlex
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from typing import Any
 import time
 from dataclasses import dataclass, field
@@ -13,6 +15,55 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 _DEFAULT_TIMEOUT = 120
+
+# Sémaphore partagé entre tous les TestRunnerService du processus.
+# Créé paresseusement : il n'y a pas de boucle asyncio à l'import (ticket-348).
+_semaphore: asyncio.Semaphore | None = None
+
+
+def _get_semaphore() -> asyncio.Semaphore | None:
+    """Return (or create) the process-wide test slot semaphore.
+
+    Lazily created on first call so that no event loop is required at import
+    time.  Returns ``None`` when the bound is disabled (limit ≤ 0).
+    """
+    global _semaphore
+    from tessera.config import settings
+
+    limit = settings.max_parallel_test_runs
+    if limit <= 0:
+        return None
+    if _semaphore is None:
+        _semaphore = asyncio.Semaphore(limit)
+    return _semaphore
+
+
+def reset_semaphore_for_tests(limit: int | None = None) -> None:
+    """Reset the shared semaphore.  For test isolation only."""
+    global _semaphore
+    _semaphore = asyncio.Semaphore(limit) if (limit is not None and limit > 0) else None
+
+
+@asynccontextmanager
+async def _acquis(
+    en_attente_fn: Callable[[], Awaitable[None]] | None,
+) -> AsyncGenerator[None, None]:
+    """Hold the shared test slot for the duration of a ``run_tests`` call.
+
+    Calls ``en_attente_fn`` once if the slot is not immediately available.
+    A ``None`` semaphore (limit ≤ 0) lets every call through without waiting.
+    The check of ``_value`` is safe in asyncio's single-threaded model : no
+    other coroutine runs between the check and the ``async with`` unless we
+    yield, and we only yield here when the slot is already taken.
+    """
+    sem = _get_semaphore()
+    if sem is None:
+        yield
+        return
+    if sem._value <= 0 and en_attente_fn is not None:
+        await en_attente_fn()
+    async with sem:
+        yield
 
 # pytest sort 5 quand il n'a collecté aucun test. Ce n'est pas un test rouge :
 # lu comme tel, un projet neuf renvoyait le codeur corriger des tests qui
@@ -112,6 +163,7 @@ class TestRunnerService:
         project_path: Path,
         test_command: str | None = None,
         timeout: int | None = None,
+        en_attente: Callable[[], Awaitable[None]] | None = None,
     ) -> TestResult:
         # Résolu, et pas seulement absolu : `projects/` ne contient que des
         # liens symboliques vers les vrais dépôts. Lancé sur le chemin du
@@ -151,27 +203,28 @@ class TestRunnerService:
                 errors=[str(exc)],
             )
 
-        # Une étape après l'autre, et l'on s'arrête à la première qui échoue,
-        # comme `&&` le ferait dans un shell (ticket-337).
-        start = time.monotonic()
-        etapes: list[EtapeTest] = []
-        sorties: list[str] = []
-        code = 0
-        for args in etapes_args:
-            issue = await self._executer(args, dossier, cmd, timeout, start)
-            if isinstance(issue, TestResult):
-                issue.etapes = etapes
-                return issue
-            code, sortie = issue
-            etapes.append(EtapeTest(commande=shlex.join(args), code=code))
-            sorties.append(sortie)
-            if code != 0:
-                break
+        # Le créneau est pris ici : l'attente ne compte pas dans le délai.
+        # `start` n'est relevé qu'une fois le créneau obtenu (ticket-348).
+        async with _acquis(en_attente):
+            start = time.monotonic()
+            etapes: list[EtapeTest] = []
+            sorties: list[str] = []
+            code = 0
+            for args in etapes_args:
+                issue = await self._executer(args, dossier, cmd, timeout, start)
+                if isinstance(issue, TestResult):
+                    issue.etapes = etapes
+                    return issue
+                code, sortie = issue
+                etapes.append(EtapeTest(commande=shlex.join(args), code=code))
+                sorties.append(sortie)
+                if code != 0:
+                    break
 
-        duration_ms = int((time.monotonic() - start) * 1000)
-        result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
-        result.etapes = etapes
-        return result
+            duration_ms = int((time.monotonic() - start) * 1000)
+            result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
+            result.etapes = etapes
+            return result
 
     async def _executer(
         self, args: list[str], dossier: Path, cmd: str, timeout: int, start: float

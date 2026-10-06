@@ -19,7 +19,7 @@ class _FauxTestRunner:
         self._resultats = list(resultats)
         self.appels = 0
 
-    async def run_tests(self, project_path: Path, test_command: Any = None) -> TestResult:
+    async def run_tests(self, project_path: Path, test_command: Any = None, **_: Any) -> TestResult:
         self.appels += 1
         passe = self._resultats.pop(0) if self._resultats else True
         return TestResult(

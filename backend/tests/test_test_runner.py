@@ -15,6 +15,8 @@ from tessera.services.test_runner import (
     TestCommandNotFound,
     TestResult,
     TestRunnerService,
+    _get_semaphore,
+    reset_semaphore_for_tests,
 )
 
 
@@ -349,3 +351,171 @@ class TestCheminSymlinke:
         await runner.run_tests(lien, test_command="peu-importe")
 
         assert vus == [str(reel)], f"cwd non résolu : {vus}"
+
+
+class TestSemaphore:
+    """Ticket-348 : shared slot that bounds concurrent test runs."""
+
+    @pytest.fixture(autouse=True)
+    def reset_sema(self) -> "Any":
+        yield
+        reset_semaphore_for_tests(None)
+
+    async def test_trois_runs_avec_borne_1_nexecutent_jamais_ensemble(
+        self, python_project: Path
+    ) -> None:
+        reset_semaphore_for_tests(1)
+        simultanes = 0
+        max_simultanes = 0
+
+        async def faux_communicate() -> "tuple[bytes, bytes]":
+            nonlocal simultanes, max_simultanes
+            simultanes += 1
+            max_simultanes = max(max_simultanes, simultanes)
+            await asyncio.sleep(0.05)
+            simultanes -= 1
+            return b"1 passed", b""
+
+        mock_proc = MagicMock()
+        mock_proc.returncode = 0
+        mock_proc.communicate = AsyncMock(side_effect=faux_communicate)
+
+        runner = TestRunnerService()
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            await asyncio.gather(*[
+                runner.run_tests(python_project, test_command="uv run pytest")
+                for _ in range(3)
+            ])
+
+        assert max_simultanes <= 1, f"max_simultanes={max_simultanes}, attendu ≤ 1"
+
+    async def test_attente_ne_consomme_pas_le_delai(
+        self, python_project: Path
+    ) -> None:
+        # Le slot est pris 100 ms. Le second runner a un délai de 50 ms qui ne
+        # doit démarrer qu'une fois le slot obtenu, pas en comptant l'attente.
+        reset_semaphore_for_tests(1)
+        sem = _get_semaphore()
+        assert sem is not None
+        await sem.acquire()
+
+        mock_proc = MagicMock()
+        mock_proc.returncode = 0
+        mock_proc.communicate = AsyncMock(return_value=(b"1 passed", b""))
+
+        runner = TestRunnerService()
+
+        async def liberer() -> None:
+            await asyncio.sleep(0.1)
+            sem.release()
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            _, result = await asyncio.gather(
+                liberer(),
+                runner.run_tests(
+                    python_project,
+                    test_command="uv run pytest",
+                    timeout=0.05,
+                ),
+            )
+
+        # Sans le correctif, le délai de 50 ms expire pendant l'attente (100 ms).
+        assert result.passed is True, f"output={result.output_summary!r}"
+
+    async def test_creneau_libere_apres_timeout(
+        self, python_project: Path
+    ) -> None:
+        reset_semaphore_for_tests(1)
+        sem = _get_semaphore()
+        assert sem is not None
+        await sem.acquire()
+
+        mock_ko = MagicMock()
+        mock_ko.kill = MagicMock()
+        mock_ko.wait = AsyncMock()
+        mock_ko.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+
+        runner = TestRunnerService()
+
+        async def liberer() -> None:
+            await asyncio.sleep(0.03)
+            sem.release()
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_ko):
+            _, result_ko = await asyncio.gather(
+                liberer(),
+                runner.run_tests(
+                    python_project, test_command="uv run pytest", timeout=0.01
+                ),
+            )
+
+        assert result_ko.passed is False
+        assert "timeout" in result_ko.output_summary.lower()
+
+        # Le sémaphore doit être libéré : un second run peut démarrer.
+        mock_ok = MagicMock()
+        mock_ok.returncode = 0
+        mock_ok.communicate = AsyncMock(return_value=(b"1 passed", b""))
+        with patch("asyncio.create_subprocess_exec", return_value=mock_ok):
+            result_ok = await runner.run_tests(python_project, test_command="uv run pytest")
+
+        assert result_ok.passed is True
+
+    async def test_en_attente_appele_quand_creneau_pris(
+        self, python_project: Path
+    ) -> None:
+        reset_semaphore_for_tests(1)
+        sem = _get_semaphore()
+        assert sem is not None
+        await sem.acquire()
+
+        appele = False
+
+        async def on_attente() -> None:
+            nonlocal appele
+            appele = True
+
+        mock_proc = MagicMock()
+        mock_proc.returncode = 0
+        mock_proc.communicate = AsyncMock(return_value=(b"1 passed", b""))
+
+        runner = TestRunnerService()
+
+        async def liberer() -> None:
+            await asyncio.sleep(0.03)
+            sem.release()
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            _, result = await asyncio.gather(
+                liberer(),
+                runner.run_tests(
+                    python_project, test_command="uv run pytest", en_attente=on_attente
+                ),
+            )
+
+        assert appele is True
+        assert result.passed is True
+
+    async def test_en_attente_non_appele_quand_creneau_libre(
+        self, python_project: Path
+    ) -> None:
+        reset_semaphore_for_tests(2)
+
+        appele = False
+
+        async def on_attente() -> None:
+            nonlocal appele
+            appele = True
+
+        mock_proc = MagicMock()
+        mock_proc.returncode = 0
+        mock_proc.communicate = AsyncMock(return_value=(b"1 passed", b""))
+
+        runner = TestRunnerService()
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            result = await runner.run_tests(
+                python_project, test_command="uv run pytest", en_attente=on_attente
+            )
+
+        assert appele is False
+        assert result.passed is True
