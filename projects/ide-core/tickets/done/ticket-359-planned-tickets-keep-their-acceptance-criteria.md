@@ -4,7 +4,7 @@ created: 2026-10-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-359
-pr_number: null
+pr_number: 284
 priority: critical
 status: done
 title: Tickets created from a plan keep their acceptance criteria

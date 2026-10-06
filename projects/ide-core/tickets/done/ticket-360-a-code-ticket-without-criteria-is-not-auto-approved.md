@@ -5,7 +5,7 @@ depends_on:
 - ticket-359
 estimated_days: 0.5
 id: ticket-360
-pr_number: null
+pr_number: 285
 priority: high
 status: done
 title: A feat or fix ticket without acceptance criteria is refused, not auto-approved
