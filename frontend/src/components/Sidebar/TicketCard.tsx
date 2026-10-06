@@ -4,7 +4,7 @@ import {
   IconPlay,
   IconQueue,
 } from "../../design/icons";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { api } from "../../lib/api";
 import { MIME_TICKET, transitionsManuelles } from "../../lib/transitionsManuelles";
 import type {
@@ -88,7 +88,14 @@ interface TicketCardProps {
   onVoirLeRun?: () => void;
 }
 
-export default function TicketCard({
+/**
+ * Carte d'un ticket dans la colonne latérale.
+ *
+ * Enveloppée dans `React.memo` : avec des callbacks stables en amont, elle ne
+ * se redessine pas quand un événement de run arrive pour un autre composant
+ * (ticket-354).
+ */
+const TicketCard = memo(function TicketCard({
   ticket,
   isActive,
   isRunning,
@@ -323,4 +330,6 @@ export default function TicketCard({
       </div>
     </div>
   );
-}
+});
+
+export default TicketCard;
