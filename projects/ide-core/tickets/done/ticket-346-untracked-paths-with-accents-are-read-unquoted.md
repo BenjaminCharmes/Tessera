@@ -5,7 +5,7 @@ depends_on:
 - ticket-343
 estimated_days: 0.5
 id: ticket-346
-pr_number: null
+pr_number: 276
 priority: high
 status: done
 title: Git paths with accents are read unquoted, so their tickets are not swept into
