@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-356
 pr_number: null
 priority: medium
-status: blocked
+status: done
 title: Data already seen shows at once while it refreshes, and polling pauses while
   the window is hidden
 type: fix
