@@ -1458,5 +1458,19 @@ L'ajout de la fonctio (41733ms)
 - 2026-10-06 13:27:22 UTC — [ticket-360] tour 1 — reviewer terminé (35733ms)
 - 2026-10-06 13:28:39 UTC — [ticket-360] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente déjà le comp (112530ms)
 - 2026-10-06 13:28:39 UTC — [ticket-360] APPROVED après 1 tour(s)
+- 2026-10-06 13:32:29 UTC — [ticket-360] livraison: rebase sur develop (281ms)
+- 2026-10-06 13:32:29 UTC — [ticket-360] livraison: PR #285 ouverte (4766ms)
+- 2026-10-06 13:32:29 UTC — [ticket-360] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 13:32:29 UTC — [ide-core] ticket-360 PR #285 confiée au CIWatcher
+- 2026-10-06 13:32:30 UTC — [ticket-361] branche ticket-361-a-queue-stops-before-a-ticket-whose-dependency-wa
+- 2026-10-06 13:32:31 UTC — [ticket-361] tour 1 — codeur démarré
+- 2026-10-06 13:38:03 UTC — [ticket-361] tour 1 — codeur terminé (332608ms)
+- 2026-10-06 13:41:07 UTC — [ticket-361] testeur: OK (exit 0)
+- 2026-10-06 13:41:38 UTC — [ticket-361] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute une logique de gestion (31092ms)
+- 2026-10-06 13:41:38 UTC — [ticket-361] tour 1 — reviewer démarré
+- 2026-10-06 13:43:12 UTC — [ticket-361] tour 1 — reviewer terminé (93827ms)
+- 2026-10-06 13:44:06 UTC — [ticket-361] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (148078ms)
+- 2026-10-06 13:44:06 UTC — [ticket-361] APPROVED après 1 tour(s)
+- 2026-10-06 13:46:38 UTC — [ticket-361] documentation: 1 fichier(s) (150140ms)
 - 2026-10-06 13:32:17 UTC — [ticket-360] documentation: 1 fichier(s) (215625ms)
 - 2026-10-06 13:04:05 UTC — [ticket-359] documentation: 1 fichier(s) (172219ms)

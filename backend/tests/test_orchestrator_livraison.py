@@ -477,3 +477,105 @@ async def test_livraison_sans_pr_ne_bloque_pas_le_ticket_suivant(
     # La file n'est pas arrêtée par la livraison échouée.
     assert departs == ["ticket-001", "ticket-002"]
     assert len(results) == 2
+
+
+# ------------------------------------------------------------------
+# ticket-361 — la file s'arrête quand une dépendance n'a pas été livrée
+# ------------------------------------------------------------------
+
+
+async def test_queue_stops_when_approved_no_pr_and_dependent_follows(
+    tmp_path: Path,
+) -> None:
+    """Criteria 1-3: approved ticket with no PR opened, dependent ticket B → queue
+    stops before B, livraison.arret names both tickets, log records the
+    interruption."""
+    from unittest.mock import AsyncMock, MagicMock
+    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    def _make_dep_ticket(tid: str, depends_on: list[str]) -> Ticket:
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=depends_on,
+        )
+
+    ticket_a = _make_dep_ticket("ticket-001", [])
+    ticket_b = _make_dep_ticket("ticket-002", ["ticket-001"])
+
+    ticket_svc = AsyncMock()
+    ticket_svc.get_ticket.side_effect = lambda tid: {
+        "ticket-001": ticket_a,
+        "ticket-002": ticket_b,
+    }.get(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(arret="404 Not Found : jeton sans accès au dépôt")
+
+    log_path = tmp_path / "memory" / "log.md"
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        runner=MagicMock(),
+        ticket_service=ticket_svc,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=log_path,
+        livrer=_livrer,
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    # Criterion 1: ticket-002 did not run
+    assert len(results) == 1
+    assert results[0].ticket_id == "ticket-001"
+
+    # Criterion 2: livraison.arret names ticket-002 and ticket-001
+    livraison = results[0].livraison
+    assert livraison is not None
+    assert livraison.arret is not None
+    assert "ticket-002" in livraison.arret
+    assert "ticket-001" in livraison.arret
+
+    # Criterion 3: log records the interruption and names the undelivered ticket
+    log_content = log_path.read_text(encoding="utf-8")
+    assert "file interrompue" in log_content
+    assert "ticket-001" in log_content
+
+
+async def test_queue_continues_when_approved_no_pr_and_no_dependent(
+    tmp_path: Path,
+) -> None:
+    """Criterion 4: approved ticket with no PR opened, next ticket has no
+    dependency on it → queue continues normally."""
+    from unittest.mock import AsyncMock, MagicMock
+    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    def _make_nodep_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=[],
+        )
+
+    ticket_svc = AsyncMock()
+    ticket_svc.get_ticket.side_effect = lambda tid: _make_nodep_ticket(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(arret="404 Not Found : jeton sans accès au dépôt")
+
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        runner=MagicMock(),
+        ticket_service=ticket_svc,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        livrer=_livrer,
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    # Both tickets ran
+    assert len(results) == 2
+    assert results[0].ticket_id == "ticket-001"
+    assert results[1].ticket_id == "ticket-002"

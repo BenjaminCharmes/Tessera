@@ -1,14 +1,14 @@
 ---
-id: ticket-361
-title: "A queue stops before a ticket whose dependency was approved but never delivered"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-06
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-06
+id: ticket-361
+pr_number: 286
+priority: high
+status: done
+title: A queue stops before a ticket whose dependency was approved but never delivered
+type: fix
 ---
 
 # ticket-361 — Une file s'arrête avant un ticket dont la dépendance n'a pas été livrée
