@@ -1,14 +1,16 @@
 ---
-id: ticket-346
-title: "Git paths with accents are read unquoted, so their tickets are not swept into a run's commit"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-343"]
-estimated_days: 0.5
 created: 2026-10-05
+depends_on:
+- ticket-343
+estimated_days: 0.5
+id: ticket-346
+pr_number: 276
+priority: high
+status: done
+title: Git paths with accents are read unquoted, so their tickets are not swept into
+  a run's commit
+type: fix
 ---
 
 # ticket-346 — Les chemins accentués sont lus sans guillemets

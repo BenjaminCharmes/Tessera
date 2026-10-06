@@ -1307,3 +1307,16 @@ Analyse effectuée :
 - 2026-10-06 06:29:47 UTC — [ticket-345] validateur: APPROVED — Tous les critères sont satisfaits. Le code modifié améliore significativement l' (178390ms)
 - 2026-10-06 06:29:47 UTC — [ticket-345] APPROVED après 1 tour(s)
 - 2026-10-06 06:33:07 UTC — [ticket-345] documentation: 1 fichier(s) (196843ms) — refusé : doc-technique : docs/architecture.md : section « Couche LLM (ADR-017) » introuvable.
+- 2026-10-06 06:33:19 UTC — [ticket-345] livraison: rebase sur develop (375ms)
+- 2026-10-06 06:33:19 UTC — [ticket-345] livraison: PR #275 ouverte (4203ms)
+- 2026-10-06 06:33:19 UTC — [ide-core] ticket-345 PR #275 confiée au CIWatcher
+- 2026-10-06 06:33:20 UTC — [ticket-346] branche ticket-346-git-paths-with-accents-are-read-unquoted-so-their
+- 2026-10-06 06:33:21 UTC — [ticket-346] tour 1 — codeur démarré
+- 2026-10-06 06:39:12 UTC — [ticket-346] tour 1 — codeur terminé (351108ms)
+- 2026-10-06 06:42:41 UTC — [ticket-346] testeur: OK (exit 0)
+- 2026-10-06 06:43:00 UTC — [ticket-346] securite: PASS — Audit de sécurité complet. Le diff ajoute l'option `core.quotePath=false` à la c (18671ms)
+- 2026-10-06 06:43:00 UTC — [ticket-346] tour 1 — reviewer démarré
+- 2026-10-06 06:44:07 UTC — [ticket-346] tour 1 — reviewer terminé (67032ms)
+- 2026-10-06 06:44:52 UTC — [ticket-346] validateur: APPROVED — Tous les critères sont respectés. Le code ajoute l'option `-c core.quotePath=fal (112344ms)
+- 2026-10-06 06:44:52 UTC — [ticket-346] APPROVED après 1 tour(s)
+- 2026-10-06 06:46:28 UTC — [ticket-346] documentation: 1 fichier(s) (93108ms)
