@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { applyEvent, etatDepuisRun, INITIAL, clearTokensForReplay } from "./streamState";
+import { applyEvent, etatDepuisRun, INITIAL, clearTokensForReplay, MAX_EVENTS } from "./streamState";
 import type { OrchestratorEvent, RunActif } from "../types/api";
 import type { EntreeSecurite, EntreeValidateur } from "./streamState";
 
@@ -499,6 +499,54 @@ describe("applyEvent — answer_ack (ticket-320)", () => {
       ev({ type: "agent_token", agent: "codeur", data: { token: "…" } }),
     );
     expect(s.answerAck).toBe("transmitted");
+  });
+});
+
+describe("applyEvent — agent_token exclu de events et ticketEvents (ticket-353)", () => {
+  /**
+   * Critère 1 : un agent_token du codeur allonge entries[…].tokens
+   * sans ajouter d'élément à events ni à ticketEvents.
+   */
+  it("agent_token du codeur allonge entries[…].tokens sans ajouter d'élément à events ni à ticketEvents", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    const eventsAvant = s.events.length;
+    const ticketEventsAvant = s.ticketEvents.length;
+
+    s = applyEvent(s, ev({ type: "agent_token", agent: "codeur", data: { token: "bonjour " } }));
+    s = applyEvent(s, ev({ type: "agent_token", agent: "codeur", data: { token: "monde" } }));
+
+    // Les tableaux events et ticketEvents n'ont pas bougé.
+    expect(s.events.length).toBe(eventsAvant);
+    expect(s.ticketEvents.length).toBe(ticketEventsAvant);
+    expect(s.events.every((e) => e.type !== "agent_token")).toBe(true);
+    expect(s.ticketEvents.every((e) => e.type !== "agent_token")).toBe(true);
+    // Le token est bien accumulé dans l'entrée du codeur.
+    const codeurEntry = s.entries.find((e) => e.genre === "agent" && e.agent === "codeur");
+    expect(codeurEntry?.genre === "agent" ? codeurEntry.tokens : "").toBe("bonjour monde");
+  });
+});
+
+describe("applyEvent — bornage de events à MAX_EVENTS (ticket-353)", () => {
+  /**
+   * Critère 2 : après 2 500 événements ordinaires, events en garde MAX_EVENTS
+   * et un pipeline_done reçu au début y figure toujours.
+   */
+  it("après 2 500 événements ordinaires, events en garde MAX_EVENTS et pipeline_done du début y figure toujours", () => {
+    let s = INITIAL;
+    // Premier événement : pipeline_done (événement de contrôle, toujours gardé).
+    s = applyEvent(s, ev({
+      type: "pipeline_done",
+      ticket_id: "ticket-353",
+      data: { approved: true, rounds: 1, final_status: "done" },
+    }));
+    // 2 499 événements ordinaires — agent_tool_use entre dans events.
+    for (let i = 0; i < 2499; i++) {
+      s = applyEvent(s, ev({ type: "agent_tool_use", agent: "codeur", data: {} }));
+    }
+    // La borne est respectée.
+    expect(s.events).toHaveLength(MAX_EVENTS);
+    // pipeline_done (événement de contrôle) est préservé malgré son ancienneté.
+    expect(s.events.some((e) => e.type === "pipeline_done")).toBe(true);
   });
 });
 

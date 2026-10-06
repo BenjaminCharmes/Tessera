@@ -8,6 +8,23 @@ import type { SlotsDAbonnement } from "./abonnements";
 import type { OrchestratorEvent, RunActif, RunEvent } from "../types/api";
 import { api } from "../lib/api";
 
+/** Lance une RAF en navigateur, un setTimeout(16) hors navigateur (ticket-353). */
+function scheduleRaf(fn: () => void): number {
+  if (typeof requestAnimationFrame !== "undefined") {
+    return requestAnimationFrame(fn);
+  }
+  return setTimeout(fn, 16) as unknown as number;
+}
+
+/** Annule une RAF ou un setTimeout lancé par scheduleRaf. */
+function cancelRaf(id: number): void {
+  if (typeof cancelAnimationFrame !== "undefined") {
+    cancelAnimationFrame(id);
+  } else {
+    clearTimeout(id);
+  }
+}
+
 /**
  * Tous les runs de la machine, sur une seule socket — ticket-129.
  *
@@ -90,6 +107,44 @@ export function useSupervision(): UseSupervisionResult {
   const historyLoadedRef = useRef<Set<string>>(new Set());
   // Événements en direct reçus pendant qu'on attend le chargement de l'historique.
   const historyBufferRef = useRef<Record<string, OrchestratorEvent[]>>({});
+  // Regroupement par image : événements reçus mais pas encore appliqués (ticket-353).
+  const pendingRef = useRef<OrchestratorEvent[]>([]);
+  const rafIdRef = useRef<number | null>(null);
+
+  /**
+   * Applique tous les événements en attente en un seul setEtats + setRuns (ticket-353).
+   *
+   * Appelé soit par la RAF planifiée, soit en avance par le handler de snapshot
+   * pour que l'instantané voit un état à jour. setEtats et setRuns sont stables
+   * (contrat React useState) : useCallback([]) est correct.
+   */
+  const flush = useCallback(() => {
+    rafIdRef.current = null;
+    const batch = pendingRef.current.splice(0);
+    if (batch.length === 0) return;
+    setEtats((prec) => {
+      const suite = { ...prec };
+      for (const ev of batch) {
+        if (!ev.run_id) continue;
+        suite[ev.run_id] = applyEvent(suite[ev.run_id] ?? INITIAL, ev);
+      }
+      return suite;
+    });
+    setRuns((prec) => {
+      let liste = prec;
+      for (const ev of batch) {
+        if (!ev.run_id) continue;
+        liste = majDesRuns(liste, ev, ev.run_id);
+      }
+      return liste;
+    });
+  }, []); // setEtats, setRuns, INITIAL, applyEvent, majDesRuns sont stables
+
+  /** Programme un flush si aucun n'est déjà planifié (ticket-353). */
+  const scheduleFlush = useCallback(() => {
+    if (rafIdRef.current !== null) return;
+    rafIdRef.current = scheduleRaf(flush);
+  }, [flush]); // flush est stable
 
   /** Met la socket à jour sur ce que les slots demandent. */
   const majDesAbonnements = useCallback(() => {
@@ -194,6 +249,10 @@ export function useSupervision(): UseSupervisionResult {
           };
 
           if ((brut.type as string) === "snapshot") {
+            // Vider la file en attente avant l'instantané (ticket-353) : les
+            // événements déjà reçus doivent être dans l'état avant que le
+            // snapshot ne sème les nouveaux runs.
+            flush();
             const recus = brut.runs ?? [];
             setRuns(recus);
             // Semer l'état : `agent_started` ne repassera pas, et sans lui le
@@ -248,15 +307,11 @@ export function useSupervision(): UseSupervisionResult {
             return;
           }
 
-          setEtats((prec) => ({
-            ...prec,
-            [runId]: applyEvent(prec[runId] ?? INITIAL, brut),
-          }));
-
-          // `run_closed` marque le run clos dans son état (runClosed: true),
-          // mais ne le retire pas de la liste : l'utilisateur ferme via le
-          // bouton « Fermer » de l'AgentPanel (ticket-267).
-          setRuns((prec) => majDesRuns(prec, brut, runId));
+          // Regroupement par image : les événements sont mis en file et
+          // appliqués ensemble à la prochaine RAF (ticket-353). Cela réduit
+          // les mises à jour d'état racine de N par image à 1.
+          pendingRef.current.push(brut);
+          scheduleFlush();
         } catch {
           // trame malformée : l'ignorer vaut mieux que casser l'affichage
         }
@@ -273,15 +328,21 @@ export function useSupervision(): UseSupervisionResult {
     return () => {
       vivant = false;
       if (minuteur !== null) clearTimeout(minuteur);
+      // Annuler le flush planifié pour ne pas appliquer d'événements après
+      // le démontage (ticket-353).
+      if (rafIdRef.current !== null) {
+        cancelRaf(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       ws.onopen = null;
       ws.onmessage = null;
       ws.onclose = null;
       ws.close();
       wsRef.current = null;
     };
-    // `majDesAbonnements` ne change jamais d'identité : la socket ne se rouvre
-    // pas pour autant.
-  }, [majDesAbonnements]);
+    // flush et scheduleFlush sont stables (useCallback([])) : la socket ne
+    // se rouvre pas pour autant.
+  }, [majDesAbonnements, flush, scheduleFlush]);
 
   const selectionner = useCallback(
     (runId: string | null) => {

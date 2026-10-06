@@ -283,8 +283,71 @@ function removeEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
   return etapesEnCours.filter((e) => e !== etape);
 }
 
+/** Borne maximale du tableau `events` d'un run (ticket-353). */
+export const MAX_EVENTS = 2000;
+
+/**
+ * Événements de contrôle toujours conservés dans `events`, même quand la
+ * borne est atteinte. Ce sont eux que lisent les consommateurs de `events`
+ * (issueDuRun, RunCard, useCockpit, BottomPanel).
+ */
+const CONTROL_EVENT_TYPES = new Set([
+  "pipeline_done",
+  "run_closed",
+  "queue_progress",
+  "pipeline_start",
+]);
+
+/**
+ * Borne le tableau des événements à MAX_EVENTS en gardant toujours les
+ * événements de contrôle, quel que soit leur âge (ticket-353).
+ *
+ * Les plus anciens événements ordinaires sont retirés en premier, de sorte
+ * que `pipeline_done`, `run_closed`, `queue_progress` et `pipeline_start`
+ * restent visibles dans le Pipeline log même après un long run.
+ */
+function boundEvents(events: OrchestratorEvent[]): OrchestratorEvent[] {
+  if (events.length <= MAX_EVENTS) return events;
+  const toRemove = events.length - MAX_EVENTS;
+  let removed = 0;
+  return events.filter((ev) => {
+    if (CONTROL_EVENT_TYPES.has(ev.type)) return true;
+    if (removed < toRemove) {
+      removed++;
+      return false;
+    }
+    return true;
+  });
+}
+
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
-  const events = [...s.events, ev];
+  // agent_token ne va plus dans events ni ticketEvents (ticket-353) :
+  // il ne met à jour que entries[…].tokens et currentTokens, sans alourdir
+  // l'historique ni déclencher de mise à jour de l'état racine par token.
+  if (ev.type === "agent_token") {
+    const token =
+      ev.agent === "codeur"
+        ? (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
+        : "";
+    if (!token) return s;
+    const lastCodeurIdx = s.entries.reduceRight(
+      (found, e, i) =>
+        found === -1 && e.genre === "agent" && e.agent === "codeur" && !e.isDone
+          ? i
+          : found,
+      -1,
+    );
+    const newEntries =
+      lastCodeurIdx >= 0
+        ? s.entries.map((e, i) => {
+            if (i !== lastCodeurIdx || e.genre !== "agent") return e;
+            return { ...e, tokens: e.tokens + token };
+          })
+        : s.entries;
+    return { ...s, currentTokens: s.currentTokens + token, entries: newEntries };
+  }
+
+  const events = boundEvents([...s.events, ev]);
   // ticketEvents repart de zéro à chaque queue_progress : StageStrip voit
   // les étapes du ticket en cours, pas celles du ticket précédent (ticket-313).
   const ticketEvents =
@@ -393,44 +456,14 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         entries: updatedEntries,
       };
     }
-    case "agent_token":
     case "agent_tool_use": {
-      // Ces événements signalent que l'agent produit du texte ou utilise un
-      // outil — ils n'ont aucun lien avec la question en attente ni l'accusé
-      // de réception. Le rejeu du journal (ticket-185) émet des agent_token
-      // antérieurs à la question : les effacer ici ferait disparaître une
-      // question toujours en attente (ticket-358).
-      const token =
-        ev.type === "agent_token" && ev.agent === "codeur"
-          ? (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
-          : "";
-      // Ajouter le token au dernier passage non terminé du codeur.
-      // Seules les entrées de genre "agent" ont un champ `agent`.
-      let tokenEntries = s.entries;
-      if (token) {
-        const lastCodeurIdx = s.entries.reduceRight(
-          (found, e, i) =>
-            found === -1 && e.genre === "agent" && e.agent === "codeur" && !e.isDone ? i : found,
-          -1,
-        );
-        if (lastCodeurIdx >= 0) {
-          tokenEntries = s.entries.map((e, i) => {
-            if (i !== lastCodeurIdx || e.genre !== "agent") return e;
-            return { ...e, tokens: e.tokens + token };
-          });
-        }
-      }
+      // L'utilisation d'un outil est visible dans le Pipeline log.
+      // agent_token est traité en amont de la fonction, avant le switch.
       return {
         ...s,
         events,
         ticketEvents,
-        outils: ev.type === "agent_tool_use" ? s.outils + 1 : s.outils,
-        currentTokens:
-          ev.agent === "codeur"
-            ? s.currentTokens +
-              (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
-            : s.currentTokens,
-        entries: tokenEntries,
+        outils: s.outils + 1,
       };
     }
     case "test_result": {
@@ -660,7 +693,7 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
       return {
         ...INITIAL,
         status: "running",
-        events: [...s.events, ev],
+        events,
         // ticketEvents = [ev] pour ce cas (ternaire en tête de applyEvent).
         ticketEvents,
         quota: s.quota,

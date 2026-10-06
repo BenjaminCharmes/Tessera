@@ -1486,6 +1486,59 @@ Le cod (32766ms)
 - 2026-10-06 13:59:26 UTC — [ticket-352] tour 1 — reviewer terminé (78094ms)
 - 2026-10-06 14:01:52 UTC — [ticket-352] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les comportem (223266ms)
 - 2026-10-06 14:01:52 UTC — [ticket-352] APPROVED après 1 tour(s)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: rebase sur develop (235ms)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: PR #287 ouverte (5484ms)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 14:03:01 UTC — [ide-core] ticket-352 PR #287 confiée au CIWatcher
+- 2026-10-06 14:03:02 UTC — [ticket-353] branche ticket-353-streamed-tokens-are-batched-per-frame-and-a-run-s
+- 2026-10-06 14:03:02 UTC — [ticket-353] tour 1 — codeur démarré
+- 2026-10-06 14:19:59 UTC — [ticket-353] tour 1 — codeur terminé (1017546ms)
+- 2026-10-06 14:22:59 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 14:23:28 UTC — [ticket-353] securite: PASS — Audit de sécurité du diff frontend (streamState.ts, useSupervision.ts et tests a (29718ms)
+- 2026-10-06 14:23:28 UTC — [ticket-353] tour 1 — reviewer démarré
+- 2026-10-06 14:25:14 UTC — [ticket-353] tour 1 — reviewer terminé (105592ms)
+- 2026-10-06 14:26:44 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : le code implémente correctement l (195906ms)
+- 2026-10-06 14:26:44 UTC — [ticket-353] CHANGES_REQUESTED tour 1: Validateur : Les quatre premiers critères sont satisfaits : le code implémente correctement le regro
+- 2026-10-06 14:26:44 UTC — [ticket-353] tour 2 — codeur démarré
+- 2026-10-06 14:27:26 UTC — [ticket-353] tour 2 — codeur terminé (41907ms)
+- 2026-10-06 14:30:16 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 14:30:52 UTC — [ticket-353] securite: PASS — Audit de sécurité du refactor ticket-353 (optimisation performance + limitation  (35608ms)
+- 2026-10-06 14:30:52 UTC — [ticket-353] tour 2 — reviewer démarré
+- 2026-10-06 14:33:05 UTC — [ticket-353] tour 2 — reviewer terminé (132905ms)
+- 2026-10-06 14:34:09 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : le code gère correctement les `ag (197547ms)
+- 2026-10-06 14:34:09 UTC — [ticket-353] CHANGES_REQUESTED tour 2: Validateur : Les quatre premiers critères sont satisfaits : le code gère correctement les `agent_tok
+- 2026-10-06 14:34:09 UTC — [ticket-353] tour 3 — codeur démarré
+- 2026-10-06 14:35:55 UTC — [ticket-353] tour 3 — codeur terminé (105875ms)
+- 2026-10-06 14:39:20 UTC — [ticket-353] testeur: 1 failed, 686 passed, 20 warnings in 202.33s (0:03:22)
+- 2026-10-06 14:39:20 UTC — [ticket-353] tests rouges au tour 3
+- 2026-10-06 14:39:20 UTC — [ticket-353] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 14:39:23 UTC — [ide-core] file interrompue : ticket-353 non approuvé
+- 2026-10-06 14:50:51 UTC — [ticket-353] branche ticket-353-streamed-tokens-are-batched-per-frame-and-a-run-s
+- 2026-10-06 14:50:52 UTC — [ticket-353] tour 1 — codeur démarré
+- 2026-10-06 14:55:50 UTC — [ticket-353] tour 1 — codeur terminé (298110ms)
+- 2026-10-06 15:00:26 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:00:34 UTC — [ticket-353] securite: PASS — Diff cosmétique : réarrangement des imports (groupage des imports généraux en ha (8578ms)
+- 2026-10-06 15:00:35 UTC — [ticket-353] tour 1 — reviewer démarré
+- 2026-10-06 15:02:03 UTC — [ticket-353] tour 1 — reviewer terminé (88625ms)
+- 2026-10-06 15:04:51 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Aucun test n'a été fourni dans les fichiers cités par les critères, et le diff n (256405ms)
+- 2026-10-06 15:04:51 UTC — [ticket-353] CHANGES_REQUESTED tour 1: Validateur : Aucun test n'a été fourni dans les fichiers cités par les critères, et le diff ne conti
+- 2026-10-06 15:04:51 UTC — [ticket-353] tour 2 — codeur démarré
+- 2026-10-06 15:07:56 UTC — [ticket-353] tour 2 — codeur terminé (184875ms)
+- 2026-10-06 15:11:00 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:11:15 UTC — [ticket-353] securite: PASS — Audit de sécurité du diff : refactorisation de tests TypeScript et réorganisatio (14610ms)
+- 2026-10-06 15:11:15 UTC — [ticket-353] tour 2 — reviewer démarré
+- 2026-10-06 15:12:25 UTC — [ticket-353] tour 2 — reviewer terminé (70000ms)
+- 2026-10-06 15:14:08 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les critères 1 à 4 sont satisfaits. Le cinquième critère ne peut être jugé car l (173062ms)
+- 2026-10-06 15:14:08 UTC — [ticket-353] CHANGES_REQUESTED tour 2: Validateur : Les critères 1 à 4 sont satisfaits. Le cinquième critère ne peut être jugé car les fich
+- 2026-10-06 15:14:08 UTC — [ticket-353] tour 3 — codeur démarré
+- 2026-10-06 15:15:49 UTC — [ticket-353] tour 3 — codeur terminé (101016ms)
+- 2026-10-06 15:18:45 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:18:56 UTC — [ticket-353] securite: PASS — Audit complet du diff : refactorisation cosmétique uniquement. Trois catégories  (11469ms)
+- 2026-10-06 15:18:56 UTC — [ticket-353] tour 3 — reviewer démarré
+- 2026-10-06 15:20:05 UTC — [ticket-353] tour 3 — reviewer terminé (68282ms)
+- 2026-10-06 15:20:48 UTC — [ticket-353] validateur: APPROVED — Tous les critères sont satisfaits. Les tests ont été ajoutés ou modifiés pour co (111671ms)
+- 2026-10-06 15:20:48 UTC — [ticket-353] APPROVED après 3 tour(s)
+- 2026-10-06 15:22:13 UTC — [ticket-353] documentation: 1 fichier(s) (83078ms)
 - 2026-10-06 14:02:48 UTC — [ticket-352] documentation: 1 fichier(s) (54671ms)
 - 2026-10-06 13:46:38 UTC — [ticket-361] documentation: 1 fichier(s) (150140ms)
 - 2026-10-06 13:32:17 UTC — [ticket-360] documentation: 1 fichier(s) (215625ms)
