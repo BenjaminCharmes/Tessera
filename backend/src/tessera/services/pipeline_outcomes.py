@@ -24,6 +24,41 @@ class CommitFailed(Exception):
     """Le commit de fin de run a échoué — le run ne peut pas s'annoncer réussi."""
 
 
+async def finish_timeout_expired(
+    orch: "Orchestrator", run: PipelineRun
+) -> PipelineResult:
+    """Block the run when the test suite times out twice in a row (ticket-349).
+
+    Deux expirations consécutives signifient que la machine ou la suite est trop
+    lente pour le délai configuré, et non que le code est en cause.  Bloquer
+    ici évite de consommer un tour de codeur pour rien.
+    """
+    raison = "testeur: délai dépassé deux fois"
+    await set_status(orch, run, TicketStatus.blocked)
+    await emit(run, EventType.ERROR, reason="test_timeout_expired", detail=raison)
+    orch._log(f"[{run.ticket_id}] BLOCKED — {raison}")
+    commit_sha, arret = await commit_ou_bloquer(
+        orch, run, _unapproved_commit_message(run.ticket_id, raison)
+    )
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="test_timeout_expired",
+        branch=run.branch,
+    )
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.blocked,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=arret or raison,
+    )
+
+
 async def finish_security_block(
     orch: "Orchestrator", run: PipelineRun, summary: str
 ) -> PipelineResult:

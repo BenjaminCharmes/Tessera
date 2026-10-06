@@ -23,12 +23,13 @@ function run(over: Partial<RecentRun> = {}): RecentRun {
 
 describe("RecentRuns — onSelect (ticket-281)", () => {
   it("calls onSelect with the run when clicking a row", async () => {
+    const user = userEvent.setup();
     const handleSelect = vi.fn();
     const r = run({ id: "run-abc", ticket_id: "ticket-042" });
 
     render(<RecentRuns runs={[r]} showProject={false} onSelect={handleSelect} />);
 
-    await userEvent.click(screen.getByText("ticket-042").closest("tr")!);
+    await user.click(screen.getByText("ticket-042").closest("tr")!);
 
     expect(handleSelect).toHaveBeenCalledOnce();
     expect(handleSelect).toHaveBeenCalledWith(r);
