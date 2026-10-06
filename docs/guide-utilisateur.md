@@ -910,6 +910,20 @@ Tu vois la PR ouverte sur GitHub, mais le ticket passe en `blocked` — la phase
 
 Le travail du codeur est toujours sur la branche du ticket, commité et poussé. Rien n'est perdu.
 
+### Une file s'arrête en disant qu'une dépendance n'a pas été livrée
+
+Tu as lancé plusieurs tickets en file, certains avec `depends_on : [...]`, et la file s'arrête sur un message du type : « ticket-003 dépend de ticket-002, qui n'a pas été livré : … ».
+
+Cela signifie que ticket-002 a été approuvé, mais **sa livraison n'a pas atteint la branche principale du projet**. Elle s'est arrêtée avant l'ouverture d'une PR (conflit de rebase, erreur API, autonomie insuffisante). Ticket-003, qui dépend de son code, ne peut pas partir sur une base incomplète : la file s'arrête plutôt que de laisser ticket-003 tomber sur des tests rouges ou du code qui n'existe pas encore.
+
+**Ce qu'il faut faire :**
+
+1. **Vérifie le journal du pipeline** du ticket qui n'a pas livré — cherche « livraison » ou « rebase ». Il te dit pourquoi ça s'est arrêté.
+2. **Corrige la cause** : jeton GitHub expiré, conflit non résolu, autonomie insuffisante…
+3. **Relance la file** à partir du ticket arrêté.
+
+La file ne se relance pas toute seule : il faut que tu corriges la cause d'abord.
+
 ## Pour aller plus loin
 
 - [`architecture.md`](architecture.md) — comment Tessera est construit
