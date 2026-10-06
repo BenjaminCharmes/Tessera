@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-352
 pr_number: null
 priority: high
-status: in-progress
+status: done
 title: Tickets and projects are parsed once per file change, off the event loop
 type: fix
 ---
