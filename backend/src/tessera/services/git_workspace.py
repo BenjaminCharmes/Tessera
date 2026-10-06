@@ -1635,7 +1635,12 @@ class GitWorkspaceService:
         # — `python -c`, un clone déjà piégé — ne doit pas tourner non plus.
         # `-c` prime sur `.git/config`, donc sur un `core.hooksPath` qu'un
         # agent y aurait écrit.
-        command = ["git", "-c", f"core.hooksPath={_dossier_sans_hooks()}", *args]
+        command = [
+            "git",
+            "-c", f"core.hooksPath={_dossier_sans_hooks()}",
+            "-c", "core.quotePath=false",
+            *args,
+        ]
         proc = await asyncio.create_subprocess_exec(
             *command,
             cwd=str(self._project_path),
