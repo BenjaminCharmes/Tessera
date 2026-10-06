@@ -1,14 +1,14 @@
 ---
-id: ticket-358
-title: "An agent's question survives the text replay, and a transmitted answer is acknowledged"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-05
+id: ticket-358
+pr_number: 282
+priority: high
+status: done
+title: An agent's question survives the text replay, and a transmitted answer is acknowledged
+type: fix
 ---
 
 # ticket-358 — La question d'un agent ne disparaît plus, et la réponse se voit partir

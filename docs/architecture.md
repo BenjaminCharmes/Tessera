@@ -272,9 +272,21 @@ Passé `dialogue_timeout_s`, l'agent reprend seul en **énonçant son hypothèse
 un run suspendu tient du travail non commité, et bloquerait la file des tickets.
 Une réponse qui arrive après l'expiration n'est pas perdue : elle est déposée dans
 la boîte aux lettres comme message spontané, que l'agent lira au tour suivant.
-Le système signale à l'interface si la réponse a été transmise à la question ou
-déposée pour le tour suivant, et l'interface affiche cet accusé. Une question
-expirée s'affiche comme telle, avec l'hypothèse que l'agent a énoncée.
+
+L'interface affiche l'état de chaque réponse :
+
+- **Transmise** (`answer_ack` avec `outcome: "transmitted"`) : la question et le
+  champ disparaissent, remplacés par un accusé « Réponse transmise à l'agent. »
+  (style `zinc`). Cet accusé est émis à tous les observateurs du run.
+- **Déposée** (`outcome: "deposited"`) : la réponse attend le tour suivant, la
+  question reste affichée.
+- **Expirée** : sans réponse jusqu'au `agent_done`, elle s'affiche comme « Question
+  expirée… » avec l'hypothèse de l'agent.
+
+Lors du rejeu du journal du texte (quand l'utilisateur change de sélection ou
+recharge la page), les événements texte (`agent_token`, `agent_tool_use`) ne
+modifient pas l'état d'une question en attente. Seul un événement de réponse
+(`answer_ack`) ou de fin d'agent (`agent_done`) nettoie cet état.
 
 ### Système visuel du frontend (ADR-026)
 
