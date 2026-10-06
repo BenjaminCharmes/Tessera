@@ -1538,3 +1538,17 @@ Le cod (32766ms)
 - 2026-10-06 15:20:05 UTC — [ticket-353] tour 3 — reviewer terminé (68282ms)
 - 2026-10-06 15:20:48 UTC — [ticket-353] validateur: APPROVED — Tous les critères sont satisfaits. Les tests ont été ajoutés ou modifiés pour co (111671ms)
 - 2026-10-06 15:20:48 UTC — [ticket-353] APPROVED après 3 tour(s)
+- 2026-10-06 15:22:24 UTC — [ticket-353] livraison: rebase sur develop (188ms)
+- 2026-10-06 15:22:24 UTC — [ticket-353] livraison: PR #288 ouverte (4906ms)
+- 2026-10-06 15:22:24 UTC — [ticket-353] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 15:22:24 UTC — [ide-core] ticket-353 PR #288 confiée au CIWatcher
+- 2026-10-06 15:22:25 UTC — [ticket-354] branche ticket-354-run-state-lives-in-a-store-that-components-subscr
+- 2026-10-06 15:23:41 UTC — [ticket-354] plan rendu (75187ms)
+- 2026-10-06 15:23:41 UTC — [ticket-354] tour 1 — codeur démarré
+- 2026-10-06 15:45:04 UTC — [ticket-354] tour 1 — codeur terminé (1283610ms)
+- 2026-10-06 15:47:56 UTC — [ticket-354] testeur: OK (exit 0)
+- 2026-10-06 15:48:29 UTC — [ticket-354] securite: PASS — Audit du refactoring ticket-354 (store externe de runs). Aucune vulnérabilité dé (32984ms)
+- 2026-10-06 15:48:29 UTC — [ticket-354] tour 1 — reviewer démarré
+- 2026-10-06 15:50:52 UTC — [ticket-354] tour 1 — reviewer terminé (142641ms)
+- 2026-10-06 15:54:54 UTC — [ticket-354] validateur: APPROVED — Le refactor est complet et bien exécuté. Un store externe minimal basé sur `useS (384342ms)
+- 2026-10-06 15:54:54 UTC — [ticket-354] APPROVED après 1 tour(s)
