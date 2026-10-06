@@ -34,6 +34,22 @@ function setCached(cle: string, value: unknown): void {
   _cache.set(cle, value);
 }
 
+/**
+ * Clé de cache d'une ressource : l'id du projet est obligatoire, et c'est
+ * `useResource` qui assemble la clé. Un appelant ne peut donc pas oublier le
+ * projet et faire partager une entrée à deux projets (ticket-356).
+ */
+export interface CleRessource {
+  projet: string;
+  ressource: string;
+}
+
+function cleInterne(cle: CleRessource): string {
+  // Le séparateur NUL ne peut apparaître ni dans un id de projet ni dans un
+  // chemin : `a` + `b:c` et `a:b` + `c` ne se confondent pas.
+  return `${cle.projet}\u0000${cle.ressource}`;
+}
+
 /** Vide le cache — pour les tests uniquement. */
 export function _viderCacheResource(): void {
   _cache.clear();
@@ -60,8 +76,8 @@ export function _viderCacheResource(): void {
  * gardée dans un cache de niveau module (borné, 100 entrées, LRU) et rendue
  * aussitôt au changement de `fetcher`, avec `loading: true` le temps du
  * rafraîchissement. Sans `cle`, le comportement actuel est inchangé. La clé
- * doit inclure l'id du projet pour ne jamais afficher des données d'un autre
- * projet.
+ * porte l'id du projet (`CleRessource`) : une donnée d'un autre projet ne
+ * s'affiche jamais sous celui-ci.
  *
  * `cle` et `fetcher` doivent toujours changer ensemble (ils dérivent des mêmes
  * paramètres via `useMemo`) : `cle` est capturée dans la closure de l'effet,
@@ -70,8 +86,9 @@ export function _viderCacheResource(): void {
 export function useResource<T>(
   fetcher: (() => Promise<T>) | null,
   initial: T,
-  cle?: string,
+  cle?: CleRessource,
 ): UseResourceResult<T> {
+  const cleCache = cle !== undefined ? cleInterne(cle) : undefined;
   const [tick, setTick] = useState(0);
   const [reponse, setReponse] = useState<Reponse<T> | null>(null);
 
@@ -83,7 +100,7 @@ export function useResource<T>(
         if (cancelled) return;
         // `cle` est capturée depuis la closure au moment où l'effet se lance :
         // elle correspond toujours au fetcher qui vient de répondre.
-        if (cle !== undefined) setCached(cle, data);
+        if (cleCache !== undefined) setCached(cleCache, data);
         setReponse({ fetcher, tick, data, error: null });
       })
       .catch((err: unknown) => {
@@ -112,8 +129,8 @@ export function useResource<T>(
   // Donnée en cache : utilisée quand le fetcher a changé et qu'on n'a pas
   // encore reçu la réponse pour la clé courante.
   const donneeEnCache =
-    cle !== undefined && fetcher !== null && !memeRequete
-      ? getCached<T>(cle)
+    cleCache !== undefined && fetcher !== null && !memeRequete
+      ? getCached<T>(cleCache)
       : undefined;
 
   return {

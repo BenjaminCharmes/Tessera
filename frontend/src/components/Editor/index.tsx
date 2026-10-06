@@ -13,6 +13,8 @@ interface EditorProps {
   ticket: Ticket | null;
   /** Fichier ouvert depuis l'arbre ; prioritaire sur celui du ticket. */
   openFilePath?: string | null;
+  /** Projet affiché : sans lui, la lecture ne passe pas par le cache (ticket-356). */
+  projectId?: string | null;
 }
 
 /**
@@ -36,15 +38,23 @@ interface EditorProps {
 const WELCOME =
   "# Tessera\n\nSélectionne un projet puis un ticket dans la sidebar.\n";
 
-export default function Editor({ ticket, openFilePath = null }: EditorProps) {
+export default function Editor({
+  ticket,
+  openFilePath = null,
+  projectId = null,
+}: EditorProps) {
   const cible = openFilePath ?? ticket?.file_path ?? null;
   const fetcher = useMemo(
     () => (cible ? () => readFile(cible) : null),
     [cible],
   );
-  // La clé de cache est le chemin du fichier : il est unique par projet, ce qui
-  // garantit qu'on ne mélange jamais les contenus de deux projets (ticket-356).
-  const lecture = useResource<string | null>(fetcher, null, cible ?? undefined);
+  // La clé de cache porte le projet et le chemin du fichier : le contenu d'un
+  // projet ne s'affiche jamais sous un autre (ticket-356).
+  const lecture = useResource<string | null>(
+    fetcher,
+    null,
+    projectId && cible ? { projet: projectId, ressource: cible } : undefined,
+  );
 
   const filePath = cible;
   const loading = lecture.loading;

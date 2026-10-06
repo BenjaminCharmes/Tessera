@@ -27,12 +27,16 @@ function useListe(cle: string | null) {
 const fetchListe = vi.fn<(cle: string) => Promise<string[]>>();
 
 /** Variante avec une `cle` de cache passée à useResource. */
-function useListeAvecCle(cle: string | null) {
+function useListeAvecCle(cle: string | null, projet = "proj-a") {
   const fetcher = useMemo(
-    () => (cle ? () => fetchListe(cle) : null),
-    [cle],
+    () => (cle ? () => fetchListe(`${projet}/${cle}`) : null),
+    [cle, projet],
   );
-  return useResource(fetcher, AUCUN, cle ?? undefined);
+  return useResource(
+    fetcher,
+    AUCUN,
+    cle ? { projet, ressource: cle } : undefined,
+  );
 }
 
 describe("useResource — sans cle (comportement inchangé)", () => {
@@ -108,6 +112,33 @@ describe("useResource — avec cle (cache ticket-356)", () => {
     });
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.data).toEqual(["p1-rafraichi"]);
+  });
+  it("ne rend jamais la donnée d'un autre projet pour la même ressource", async () => {
+    // Revue sécurité ticket-356 : la clé porte le projet, deux projets qui
+    // lisent un même chemin ne partagent pas leur entrée de cache.
+    const lente = differee<string[]>();
+    fetchListe
+      .mockResolvedValueOnce(["contenu-a"])
+      .mockImplementationOnce(() => lente.promise);
+
+    const { result, rerender } = renderHook(
+      ({ projet }: { projet: string }) => useListeAvecCle("README.md", projet),
+      { initialProps: { projet: "proj-a" } },
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["contenu-a"]);
+
+    act(() => { rerender({ projet: "proj-b" }); });
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.data).toBe(AUCUN);
+
+    await act(async () => {
+      lente.resolve(["contenu-b"]);
+      await lente.promise;
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual(["contenu-b"]);
   });
 });
 
