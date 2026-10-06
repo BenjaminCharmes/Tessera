@@ -1,9 +1,10 @@
-"""Tests TDD pour create_tickets_batch — ticket-029."""
+"""Tests TDD pour create_tickets_batch — ticket-029, ticket-359."""
 from pathlib import Path
 
 import pytest
 
 from tessera.models.ticket import TicketDraftPlan, TicketStatus
+from tessera.services.pipeline_text import _extract_criteria
 from tessera.services.ticket_service import TicketService
 
 
@@ -169,3 +170,80 @@ async def test_batch_tickets_visible_via_list_tickets(tmp_path: Path) -> None:
     await svc.create_tickets_batch([_draft("A"), _draft("B")])
     all_tickets = await svc.list_tickets()
     assert len(all_tickets) == 2
+
+
+# ------------------------------------------------------------------
+# Critères d'acceptation dans le corps du ticket — ticket-359
+# ------------------------------------------------------------------
+
+
+async def test_batch_body_contains_criteria_heading(tmp_path: Path) -> None:
+    """A draft with two criteria produces a body with the criteria heading."""
+    svc = _svc(tmp_path)
+    draft = TicketDraftPlan(
+        title="Avec critères",
+        type="feat",
+        priority="medium",
+        agent="codeur",
+        description="La description du ticket.",
+        acceptance_criteria=["Premier critère", "Deuxième critère"],
+        depends_on_index=[],
+    )
+    result = await svc.create_tickets_batch([draft])
+    body = result[0].body
+    assert "## Critères d'acceptation" in body
+    assert body.count("- [ ]") == 2
+
+
+async def test_batch_extract_criteria_matches_draft(tmp_path: Path) -> None:
+    """_extract_criteria applied to the created body returns the draft's criteria."""
+    svc = _svc(tmp_path)
+    criteria = ["Vérifier que X fonctionne", "Vérifier que Y ne régresse pas"]
+    draft = TicketDraftPlan(
+        title="Test extraction",
+        type="feat",
+        priority="medium",
+        agent="codeur",
+        description="Description courte.",
+        acceptance_criteria=criteria,
+        depends_on_index=[],
+    )
+    result = await svc.create_tickets_batch([draft])
+    extracted = _extract_criteria(result[0].body)
+    assert extracted == criteria
+
+
+async def test_batch_draft_without_criteria_has_no_criteria_section(tmp_path: Path) -> None:
+    """A draft without criteria produces a body without an acceptance-criteria section."""
+    svc = _svc(tmp_path)
+    draft = TicketDraftPlan(
+        title="Sans critères",
+        type="chore",
+        priority="low",
+        agent="codeur",
+        description="Juste une description.",
+        acceptance_criteria=[],
+        depends_on_index=[],
+    )
+    result = await svc.create_tickets_batch([draft])
+    body = result[0].body
+    assert "## Critères" not in body
+    assert "- [ ]" not in body
+
+
+async def test_batch_description_is_at_start_of_body(tmp_path: Path) -> None:
+    """The draft description is at the head of the body, unchanged."""
+    svc = _svc(tmp_path)
+    description = "Voici la description originale du ticket."
+    draft = TicketDraftPlan(
+        title="Ordre du corps",
+        type="feat",
+        priority="high",
+        agent="codeur",
+        description=description,
+        acceptance_criteria=["Un critère"],
+        depends_on_index=[],
+    )
+    result = await svc.create_tickets_batch([draft])
+    body = result[0].body
+    assert body.startswith(description)
