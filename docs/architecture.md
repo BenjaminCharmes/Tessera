@@ -858,6 +858,13 @@ Corps du ticket en Markdown...
 
 Les tickets créés par lot depuis un plan conservent leurs critères d'acceptation : le corps du ticket inclut une section `## Critères d'acceptation` avec une case à cocher par critère (`- [ ] …`). Ce format est directement lisible par `_extract_criteria` et permet au validateur de juger chaque critère indépendamment.
 
+
+### Extraction des critères d'acceptation
+
+Les critères d'acceptation d'un ticket sont extraits du corps Markdown par le service `pipeline_text`. La section de critères commence dès qu'une ligne **commence** par `## Critères d'acceptation` (insensible à la casse, ignorant l'indentation). Les références au titre dans la prose — même entre backticks, même sur la même ligne — ne sont jamais prises pour un en-tête réel.
+
+Chaque ligne non vide de la liste de critères devient un critère distinct. Un critère dont le texte cite le titre (ex. « Vérifier `## Critères d'acceptation` en début de ligne ») reste lisible et est compté normalement. Cette règle évite les faux positifs où une citation du titre de section dans le contexte ou la prose aurait fermé prématurément la section avant les vrais critères.
+
 ## Chat conversationnel (ticket-048, 225)
 
 Une conversation libre sur un projet, distincte du pipeline : l'agent a le
@@ -935,6 +942,13 @@ Le streaming des tokens peut générer des centaines d'événements par seconde.
 3. **Regroupement par frame** : dans `useSupervision`, les messages WebSocket reçus sont mis en file et appliqués ensemble une fois par `requestAnimationFrame` (repli sur `setTimeout(…, 16)` hors navigateur), en un seul `setEtats` et un seul `setRuns` par lot. L'ordre d'application reste celui de réception. Un `snapshot` vide d'abord la file en attente avant d'appliquer l'état de référence.
 
 Ces trois changements réduisent les rendus de plusieurs centaines par seconde à **un seul** par cycle d'image, tout en préservant la cohérence de l'état et la traçabilité des événements critiques.
+
+
+## Chargement dynamique du frontend (ticket-355)
+
+Monaco et les composants centraux du panel d'édition (`Editor`, `DiffView`, `StatsView`, `ChatPanel`) ne sont plus chargés au démarrage global de l'application. Chacun utilise `React.lazy()` et `Suspense` pour se charger à la demande — la première ouverture du composant déclenche le chargement de son code source, pendant qu'un état de chargement sobre s'affiche (`zinc`, ADR-026).
+
+La configuration de Monaco (`MonacoEnvironment`, `loader.config`, workers) s'initialise dynamiquement lors du premier rendu de l'éditeur, non lors du boot de l'application. Vite isole `monaco-editor` dans son propre chunk via `build.rollupOptions.output.manualChunks`, réduisant la taille du bundle initial et permettant au navigateur de l'ignorer jusqu'à sa première utilisation.
 
 ## Agents disponibles
 
