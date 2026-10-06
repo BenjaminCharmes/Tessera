@@ -4,7 +4,7 @@ created: 2026-10-06
 depends_on: []
 estimated_days: 0.25
 id: ticket-362
-pr_number: null
+pr_number: 293
 priority: high
 status: done
 title: The acceptance-criteria heading is recognised only at the start of a line
