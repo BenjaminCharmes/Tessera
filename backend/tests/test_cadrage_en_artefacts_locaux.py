@@ -70,6 +70,7 @@ class _MockValidator:
         code_produced: str,
         test_result: object,
         project_root: object = None,
+        ticket_type: object = None,
     ) -> ValidationResult:
         self.calls.append(_FakeValidation(code_produced=code_produced))
         return ValidationResult(

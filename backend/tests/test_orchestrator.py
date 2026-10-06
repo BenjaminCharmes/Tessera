@@ -999,6 +999,7 @@ async def test_le_validateur_recoit_le_diff_reel(tmp_path: Path) -> None:
         async def validate(
             self, criteria: list[str], code_produced: str, test_result: object,
             project_root: object = None,
+            ticket_type: object = None,
         ) -> object:
             validated.append(code_produced)
             return ValidationResult(
@@ -1553,6 +1554,7 @@ async def test_reviewer_approuve_et_validateur_refuse_donne_un_refus(tmp_path: P
         async def validate(
             self, criteria: list[str], code_produced: str, test_result: object,
             project_root: object = None,
+            ticket_type: object = None,
         ) -> object:
             return ValidationResult(
                 all_passed=False,
@@ -1591,6 +1593,7 @@ async def test_double_refus_inclut_les_deux_motifs_avec_auteur(tmp_path: Path) -
         async def validate(
             self, criteria: list[str], code_produced: str, test_result: object,
             project_root: object = None,
+            ticket_type: object = None,
         ) -> object:
             return ValidationResult(
                 all_passed=False,
@@ -1661,6 +1664,7 @@ async def test_validateur_qui_leve_refuse_et_reviewer_va_au_bout(tmp_path: Path)
         async def validate(
             self, criteria: list[str], code_produced: str, test_result: object,
             project_root: object = None,
+            ticket_type: object = None,
         ) -> object:
             raise RuntimeError("provider indisponible")
 

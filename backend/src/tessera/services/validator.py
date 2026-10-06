@@ -27,6 +27,10 @@ _EXCLUDED_DIRS = {".venv", "node_modules", ".git", "__pycache__", "dist", "build
 
 Verdict = Literal["APPROVED", "CHANGES_REQUESTED"]
 
+# Ticket types that must have acceptance criteria to be approved (ticket-360).
+# A code ticket without criteria cannot be validated — nothing was verified.
+_CODE_TICKET_TYPES: frozenset[str] = frozenset({"feat", "fix", "refactor"})
+
 _CHECKBOX_PREFIX = re.compile(r"^\s*-?\s*\[[ xX]?\]\s*")
 # Matches backtick, ASCII quotes, guillemets and typographic curly quotes.
 # \uXXXX escapes keep this file 100 % ASCII on disk (avoids cp1252/UTF-8 mix).
@@ -74,8 +78,22 @@ class ValidatorService:
         code_produced: str,
         test_result: "TestResult | None",
         project_root: Path | None = None,
+        ticket_type: str | None = None,
     ) -> ValidationResult:
         if not criteria:
+            # Un ticket de code sans critère ne peut pas être validé : rien
+            # n'a été vérifié (ADR-039, ticket-360).
+            if ticket_type in _CODE_TICKET_TYPES:
+                return ValidationResult(
+                    all_passed=False,
+                    criteria=[],
+                    verdict="CHANGES_REQUESTED",
+                    feedback=(
+                        "Aucun critère d'acceptation pour un ticket"
+                        f" `{ticket_type}` — ajouter une section"
+                        " `## Critères d'acceptation` au ticket."
+                    ),
+                )
             return ValidationResult(
                 all_passed=True,
                 criteria=[],
