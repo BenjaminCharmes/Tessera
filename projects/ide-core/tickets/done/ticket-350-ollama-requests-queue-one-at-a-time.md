@@ -4,7 +4,7 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
 id: ticket-350
-pr_number: null
+pr_number: 280
 priority: high
 status: done
 title: Ollama requests queue one at a time per server instead of competing for the
