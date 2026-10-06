@@ -5,7 +5,7 @@ depends_on:
 - ticket-348
 estimated_days: 0.5
 id: ticket-351
-pr_number: null
+pr_number: 281
 priority: medium
 status: done
 title: verifier.py runs the backend and frontend checks side by side
