@@ -1370,3 +1370,16 @@ Analyse effectuée :
 - 2026-10-06 08:14:36 UTC — [ticket-350] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une sérialis (174312ms)
 - 2026-10-06 08:14:36 UTC — [ticket-350] APPROVED après 3 tour(s)
 - 2026-10-06 08:16:32 UTC — [ticket-350] documentation: 3 fichier(s) (112610ms)
+- 2026-10-06 08:16:46 UTC — [ticket-350] livraison: rebase sur develop (437ms)
+- 2026-10-06 08:16:46 UTC — [ticket-350] livraison: PR #280 ouverte (4688ms)
+- 2026-10-06 08:16:46 UTC — [ide-core] ticket-350 PR #280 confiée au CIWatcher
+- 2026-10-06 08:16:48 UTC — [ticket-351] branche ticket-351-verifier-py-runs-the-backend-and-frontend-checks
+- 2026-10-06 08:16:48 UTC — [ticket-351] tour 1 — codeur démarré
+- 2026-10-06 08:21:19 UTC — [ticket-351] tour 1 — codeur terminé (270984ms)
+- 2026-10-06 08:24:27 UTC — [ticket-351] testeur: OK (exit 0)
+- 2026-10-06 08:24:44 UTC — [ticket-351] securite: PASS — Audit complet : aucune vulnérabilité détectée. Le code refactorise l'orchestrati (17108ms)
+- 2026-10-06 08:24:44 UTC — [ticket-351] tour 1 — reviewer démarré
+- 2026-10-06 08:26:00 UTC — [ticket-351] tour 1 — reviewer terminé (75594ms)
+- 2026-10-06 08:27:13 UTC — [ticket-351] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été mis à jour pour d (148875ms)
+- 2026-10-06 08:27:13 UTC — [ticket-351] APPROVED après 1 tour(s)
+- 2026-10-06 08:28:40 UTC — [ticket-351] documentation: 0 fichier(s) (83952ms) — refusé : doc-technique : projects/ide-core/CLAUDE.md n'est pas de la documentation : un agent de documentation ne touche ni au code, ni aux tickets, ni aux ADR.
