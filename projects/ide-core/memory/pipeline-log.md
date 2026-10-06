@@ -1383,3 +1383,18 @@ Analyse effectuée :
 - 2026-10-06 08:27:13 UTC — [ticket-351] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été mis à jour pour d (148875ms)
 - 2026-10-06 08:27:13 UTC — [ticket-351] APPROVED après 1 tour(s)
 - 2026-10-06 08:28:40 UTC — [ticket-351] documentation: 0 fichier(s) (83952ms) — refusé : doc-technique : projects/ide-core/CLAUDE.md n'est pas de la documentation : un agent de documentation ne touche ni au code, ni aux tickets, ni aux ADR.
+- 2026-10-06 08:28:58 UTC — [ticket-351] livraison: rebase sur develop (1500ms)
+- 2026-10-06 08:28:58 UTC — [ticket-351] livraison: PR #281 ouverte (6188ms)
+- 2026-10-06 08:28:58 UTC — [ide-core] ticket-351 PR #281 confiée au CIWatcher
+- 2026-10-06 08:28:58 UTC — [ide-core] file interrompue : plafond de dépense
+- 2026-10-06 08:31:38 UTC — [ticket-358] branche ticket-358-an-agent-s-question-survives-the-text-replay-and
+- 2026-10-06 08:31:39 UTC — [ticket-358] tour 1 — codeur démarré
+- 2026-10-06 08:35:48 UTC — [ticket-358] tour 1 — codeur terminé (248812ms)
+- 2026-10-06 08:42:19 UTC — [ticket-358] testeur: OK (exit 0)
+- 2026-10-06 08:42:33 UTC — [ticket-358] securite: PASS — Audit de sécurité du diff : modifications frontend TypeScript/React. Analyse :
+
+ (14937ms)
+- 2026-10-06 08:42:33 UTC — [ticket-358] tour 1 — reviewer démarré
+- 2026-10-06 08:43:11 UTC — [ticket-358] tour 1 — reviewer terminé (37092ms)
+- 2026-10-06 08:46:18 UTC — [ticket-358] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés et respectés. Les tests ont été (224703ms)
+- 2026-10-06 08:46:18 UTC — [ticket-358] APPROVED après 1 tour(s)
