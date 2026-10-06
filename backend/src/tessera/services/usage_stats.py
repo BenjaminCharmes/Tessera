@@ -38,10 +38,15 @@ _RUN_DURATION_MS = (
 class _Scope:
     """The WHERE clauses shared by every query of one request."""
 
-    def __init__(self, since: str, until: str, project_id: str | None) -> None:
+    def __init__(self, since: str, until_exc: str, project_id: str | None) -> None:
         projet = " AND pr.project_id = ?" if project_id is not None else ""
         extra: tuple[Any, ...] = (project_id,) if project_id is not None else ()
-        self.calls = f"substr(ac.created_at, 1, 10) BETWEEN ? AND ?{projet}"
+        # Les timestamps ISO (`2026-09-27T10:00:00+00:00`) trient
+        # lexicographiquement comme des dates : `>= since AND < until_exc`
+        # (borne exclusive = jour suivant) évite `substr()`, qui empêchait
+        # SQLite d'utiliser l'index `(run_id, created_at)` même quand le
+        # planificateur connaissait le `run_id` via la jointure (ticket-345).
+        self.calls = f"ac.created_at >= ? AND ac.created_at < ?{projet}"
         # Les enveloppes de file (mode = 'queue' ou 'autonomous') ne sont pas
         # des runs de tickets : elles portent les événements du canal mais n'ont
         # pas d'appels agents rattachés. Les coûts et tokens ne sont pas filtrés
@@ -49,11 +54,11 @@ class _Scope:
         # runs de tickets (ticket-263).
         # mode IS NULL : lignes antérieures à la migration, traitées comme single.
         mode_ok = " AND (pr.mode IS NULL OR pr.mode = 'single')"
-        self.runs = f"substr(pr.started_at, 1, 10) BETWEEN ? AND ?{projet}{mode_ok}"
-        self.chat = "substr(ts, 1, 10) BETWEEN ? AND ?" + (
+        self.runs = f"pr.started_at >= ? AND pr.started_at < ?{projet}{mode_ok}"
+        self.chat = "ts >= ? AND ts < ?" + (
             " AND project_id = ?" if project_id is not None else ""
         )
-        self.params: tuple[Any, ...] = (since, until, *extra)
+        self.params: tuple[Any, ...] = (since, until_exc, *extra)
 
 
 async def usage_stats(
@@ -65,8 +70,10 @@ async def usage_stats(
     """Everything the statistics screen shows for the last `days` UTC days."""
     until_day = today or datetime.now(timezone.utc).date()
     since_day = until_day - timedelta(days=days - 1)
-    since, until = since_day.isoformat(), until_day.isoformat()
-    scope = _Scope(since, until, project_id)
+    since = since_day.isoformat()
+    until = until_day.isoformat()
+    until_exc = (until_day + timedelta(days=1)).isoformat()
+    scope = _Scope(since, until_exc, project_id)
 
     async with aiosqlite.connect(str(db_path)) as db:
         db.row_factory = aiosqlite.Row
@@ -222,7 +229,8 @@ async def recent_runs(
     """
     until_day = today or datetime.now(timezone.utc).date()
     since_day = until_day - timedelta(days=days - 1)
-    scope = _Scope(since_day.isoformat(), until_day.isoformat(), project_id)
+    until_exc = (until_day + timedelta(days=1)).isoformat()
+    scope = _Scope(since_day.isoformat(), until_exc, project_id)
     async with aiosqlite.connect(str(db_path)) as db:
         db.row_factory = aiosqlite.Row
         return await _recent_runs(db, scope, limit=limit, recherche=recherche)

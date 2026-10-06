@@ -59,8 +59,12 @@ class PlannerService:
 
         data = extract_json(raw)
         if data is None or "tickets" not in data:
+            _logger.warning(
+                "planner_reponse_illisible",
+                extra={"project": project_id, "raw": raw},
+            )
             raise ValueError(
-                f"Le planificateur n'a pas retourné un JSON valide. Réponse : {raw[:200]}"
+                "Le planificateur n'a pas retourné un JSON valide."
             )
 
         drafts = self._parse_drafts(data["tickets"])

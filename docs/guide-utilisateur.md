@@ -190,6 +190,13 @@ Un ticket sans dépendance peut commencer pendant que la PR du précédent atten
 
 Si le ticket dépend d'un autre et que le serveur distant n'est pas accessible, le pipeline arrête le ticket avec une raison explicite. C'est voulu : un ticket qui dépend d'un autre doit partir d'une base à jour, qui contient le merge du prédécesseur. Le fetch distant est retenté jusqu'à trois fois ; après trois échecs, le ticket se bloque plutôt que de partir d'une base périmée.
 
+
+Chaque ticket débute par un **en-tête YAML** — les champs `id`, `title`, `type`, `status`, etc. — suivi de son corps en Markdown.
+
+En vue Rendu (la vue par défaut), cet en-tête s'affiche en **fiche clé/valeur** au-dessus du corps, un champ par ligne. C'est bien plus lisible que l'ancien affichage, où le `---` devenait une barre, tous les champs un seul bloc de texte, et le `---` de fermeture un titre.
+
+En vue Source (Monaco), tu vois le fichier brut, frontmatter compris.
+
 ## 3 bis. Filtrer et trouver les tickets
 
 Une fois que tu as plusieurs tickets, tu veux souvent en retrouver un particulier. Le tableau mémorise tes filtres (type, priorité, agent, texte) — ils survivent même au redémarrage de l'IDE.
@@ -401,6 +408,11 @@ Si tu recharges la page durant un run en cours, tu retrouves instantanément tou
 
 Tu retrouves aussi un run depuis le panneau du ticket. Ouvre le ticket — le bouton « Voir le ticket » en haut du run fermé t'y mène — et clique sur « Revoir le run » pour afficher le déroulé complet : plan initial, tous les tours, verdicts du reviewer et du validateur.
 
+
+Quand tu sélectionnes un ticket qui a des runs terminés, une bande « Runs de ce ticket » apparaît sous la fiche d'en-tête. Elle liste chaque run : son statut (approuvé, rejeté), la date, les tours complétés, le coût. Un bouton « Revoir le run » ouvre la vue en lecture seule du run, qui rejoue son déroulé entier — tous les événements, les verdicts étape par étape, exactement comme à l'époque. Fermer cette vue revient au fichier du ticket.
+
+Un ticket sans run terminé ne montre pas de bande. Un fichier ouvert depuis l'arbre (par double-clic dans l'explorateur) n'en montre pas non plus.
+
 ### La frise d'étapes
 
 En haut du panneau des agents s'affiche une barre avec les étapes que ce projet utilise : une pastille arrondie par étape, avec une couleur qui te dit où elle en est.
@@ -463,6 +475,9 @@ Dans le cockpit ou l'onglet Supervision, une carte « Runs récents » affiche l
 - **Afficher plus** : clique le bouton en bas pour ajouter 20 runs à la liste.
 
 Sans action de ta part, la carte reste aux dix runs : elle ne fait aucun appel API en arrière-plan.
+
+
+La bande « Runs de ce ticket » affiche tes trois runs les plus récents, triés du plus neuf au plus vieux. Seuls les vrais runs du ticket apparaissent : les enveloppes de file — qui portent l'id du premier ticket et rejouent les événements de la file entière — sont écartées. Un bouton « Afficher les N autres » déplie le reste. La bande est bornée en hauteur et défile si besoin, afin que le ticket lui-même reste lisible même après beaucoup de runs.
 
 ## 5 ter. Après le run : fusion automatique
 
