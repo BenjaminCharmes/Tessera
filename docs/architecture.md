@@ -133,6 +133,15 @@ Un réglage à 0 ou moins **désactive** cette borne — utile pour le développ
 mono-projet ou les machines puissantes. La valeur par défaut de 2 est 
 suffisante pour une machine de développement typique sous quatre cœurs.
 
+#### Parallélisme des chaînes frontend et backend (ticket-351)
+
+`verifier.py` organise les tests en deux chaînes indépendantes, exécutées en parallèle :
+
+- **BACKEND_STEPS** : pytest (tests), puis mypy (type-checking)
+- **FRONTEND_STEPS** : tsc (type-checking), eslint (linter), puis vitest (tests)
+
+Chaque chaîne s'exécute séquentiellement — un échec dans une étape bloque les suivantes de la même chaîne — et s'arrête à son premier échec. Les deux chaînes tournent simultanément, ce qui réduit la durée totale au maximum des deux au lieu de leur somme. Le code de sortie est non nul si l'une des deux échoue. Les sorties sont capturées séparément pour éviter l'entrelacement et affichées à la fin : d'abord backend, puis frontend.
+
 ### Gestion du parallélisme Ollama (ticket-350)
 
 Quand plusieurs runs utilisent un même serveur Ollama local, les requêtes
@@ -162,6 +171,14 @@ serveur, avec la valeur `OLLAMA_MAX_CONCURRENT` (défaut **1** — configuré da
 Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes sont
 lancées concurremment. Utile pour déboguer un modèle ou tester le
 load-balancing interne d'Ollama.
+
+### Parsing et caching off-loop (ticket-352)
+
+`TicketService.list_tickets()` et `ProjectLoader.list_projects()` relisaient chaque fichier à chaque requête, bloquant la boucle d'événements sur du parsing YAML. Problème : le pipeline appelle ces services plusieurs fois par étape; avec plusieurs files, l'interface gelait.
+
+**Optimisation** : cache de parsing par fichier, clé `(chemin résolu, st_mtime_ns, st_size)`. Chaque requête fait un `stat()` peu coûteux; seul un fichier modifié est re-parsé. Même logique pour projets (`CLAUDE.md`, `agents.json`). Tout travail disque via `asyncio.to_thread` — la boucle n'est jamais bloquée.
+
+Invariant : deux requêtes successives sans changement de fichier ne lisent et ne parsent chacun qu'une fois.
 
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
@@ -828,6 +845,8 @@ github_issue_url: https://github.com/...  # optionnel
 ---
 Corps du ticket en Markdown...
 ```
+
+Les tickets créés par lot depuis un plan conservent leurs critères d'acceptation : le corps du ticket inclut une section `## Critères d'acceptation` avec une case à cocher par critère (`- [ ] …`). Ce format est directement lisible par `_extract_criteria` et permet au validateur de juger chaque critère indépendamment.
 
 ## Chat conversationnel (ticket-048, 225)
 
