@@ -12,6 +12,10 @@ import type { Ticket, TicketRunSummary } from "../../types/api";
 vi.mock("@monaco-editor/react", () => ({
   default: ({ value }: { value: string }) => <pre data-testid="monaco">{value}</pre>,
 }));
+
+// lib/monaco exporte configureMonaco — on le stubbe pour éviter de charger
+// les workers réels dans jsdom.
+vi.mock("../../lib/monaco", () => ({ configureMonaco: vi.fn() }));
 vi.mock("../../lib/fs", () => ({ readFile: vi.fn() }));
 vi.mock("../../lib/api");
 

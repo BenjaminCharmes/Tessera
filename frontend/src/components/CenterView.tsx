@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import type { useSupervision } from "../hooks/useSupervision";
 import type { useRunActif } from "../hooks/useRunActif";
 import type { SidebarPanel } from "./Sidebar/panels";
@@ -11,14 +12,18 @@ import type {
 } from "../types/api";
 import type { FiltresTickets } from "../lib/filtresTickets";
 import type { VueCentre } from "../vueDuCentre";
-import DiffView from "./DiffView";
 import AgentDetail from "./AgentDetail";
-import StatsView from "./StatsView";
 import SupervisionView from "./SupervisionView";
 import RunView from "./RunView";
-import Editor from "./Editor";
 import KanbanView from "./KanbanView";
-import ChatPanel from "./ChatPanel";
+
+// Vues lourdes — chargées à la demande, après le premier rendu du cockpit
+// (ticket-355). DiffView et Editor tirent Monaco ; les garder lazy réduit le
+// bundle initial et accélère le premier affichage.
+const DiffView = lazy(() => import("./DiffView"));
+const StatsView = lazy(() => import("./StatsView"));
+const Editor = lazy(() => import("./Editor"));
+const ChatPanel = lazy(() => import("./ChatPanel"));
 
 /**
  * La vue centrale du cockpit — ticket-252.
@@ -69,6 +74,14 @@ interface CenterViewProps {
   onClearFiltres?: () => void;
 }
 
+function FallbackChargement() {
+  return (
+    <div className="flex h-full items-center justify-center text-zinc-500 text-sm">
+      Chargement…
+    </div>
+  );
+}
+
 export default function CenterView({
   panel,
   vueCentre,
@@ -103,36 +116,32 @@ export default function CenterView({
      centre montre *ce qu'il est* (ticket-076). Pendant un run, le centre
      montre le run — sauf fichier ou diff ouvert explicitement, qui garde la
      priorité (ticket-075, ticket-178). */
+  let content: React.ReactNode;
+
   if (panel === "chat") {
     // Le chat a sa propre vue centrale (ticket-223) ; sa liste de
     // conversations vit dans la colonne 2 (ticket-250).
-    return <ChatPanel project={project} conversationId={conversationId} />;
-  }
-  if (panel === "supervision") {
+    content = <ChatPanel project={project} conversationId={conversationId} />;
+  } else if (panel === "supervision") {
     // Vue globale : elle ne dépend d'aucun projet actif, comme les coûts.
-    return (
+    content = (
       <SupervisionView
         supervision={supervision}
         projects={projets}
         services={servicesDuProjet}
       />
     );
-  }
-  if (panel === "agents") {
-    return <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />;
-  }
-  if (panel === "usage") {
+  } else if (panel === "agents") {
+    content = <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />;
+  } else if (panel === "usage") {
     // La période et la portée viennent de la colonne latérale (ticket-253).
-    return <StatsView projectId={statsProjectId} days={statsDays} />;
-  }
-  if (vueCentre === "run") {
-    return <RunView stream={stream} />;
-  }
-  if (vueCentre === "diff" && project && ticket) {
-    return <DiffView projectId={project.id} ticketId={ticket.id} />;
-  }
-  if (vueCentre === "kanban") {
-    return (
+    content = <StatsView projectId={statsProjectId} days={statsDays} />;
+  } else if (vueCentre === "run") {
+    content = <RunView stream={stream} />;
+  } else if (vueCentre === "diff" && project && ticket) {
+    content = <DiffView projectId={project.id} ticketId={ticket.id} />;
+  } else if (vueCentre === "kanban") {
+    content = (
       <KanbanView
         byStatus={byStatus}
         activeTicket={ticket}
@@ -154,6 +163,13 @@ export default function CenterView({
         onClearFiltres={onClearFiltres}
       />
     );
+  } else {
+    content = <Editor ticket={ticket} openFilePath={openFilePath} />;
   }
-  return <Editor ticket={ticket} openFilePath={openFilePath} />;
+
+  return (
+    <Suspense fallback={<FallbackChargement />}>
+      {content}
+    </Suspense>
+  );
 }
