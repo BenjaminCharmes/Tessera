@@ -11,6 +11,10 @@ vi.mock("@monaco-editor/react", () => ({
   ),
 }));
 
+// lib/monaco exporte configureMonaco — on le stubbe pour éviter de charger
+// les workers réels dans jsdom.
+vi.mock("../../lib/monaco", () => ({ configureMonaco: vi.fn() }));
+
 vi.mock("../../lib/fs", () => ({
   readFile: vi.fn(),
 }));

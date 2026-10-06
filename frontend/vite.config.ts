@@ -3,6 +3,21 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        // Isole monaco-editor (et @monaco-editor/react) dans leur propre chunk
+        // — chargés uniquement quand l'éditeur s'ouvre, pas au démarrage de
+        // l'application (ticket-355, ADR-012).
+        manualChunks: (id: string) => {
+          if (id.includes("monaco-editor") || id.includes("@monaco-editor/react")) {
+            return "monaco-editor";
+          }
+          return undefined;
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       "/api": {

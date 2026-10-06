@@ -158,7 +158,9 @@ describe("App — panneau Chat", () => {
     await userEvent.click(screen.getByRole("tab", { name: /^Chat$/ }));
 
     const main = screen.getByRole("main");
-    expect(main).toContainElement(screen.getByTestId("chat-panel"));
+    // ChatPanel est chargé en lazy : on attend sa résolution avant l'assertion.
+    const chatPanel = await screen.findByTestId("chat-panel");
+    expect(main).toContainElement(chatPanel);
   });
 
   it("ne rend plus d'onglets Agents et Chat en colonne de droite", () => {

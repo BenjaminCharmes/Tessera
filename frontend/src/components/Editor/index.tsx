@@ -4,6 +4,9 @@ import MarkdownView from "./MarkdownView";
 import MonacoEditor from "@monaco-editor/react";
 import { detectLanguage } from "./useMonaco";
 import { readFile } from "../../lib/fs";
+// Configure Monaco workers and loader before first render (ADR-012, ticket-355).
+import { configureMonaco } from "../../lib/monaco";
+configureMonaco();
 import { useResource } from "../../hooks/useResource";
 import RunHistorique from "../StatsView/RunHistorique";
 import TicketRuns from "./TicketRuns";
