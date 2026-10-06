@@ -1486,3 +1486,29 @@ Le cod (32766ms)
 - 2026-10-06 13:59:26 UTC — [ticket-352] tour 1 — reviewer terminé (78094ms)
 - 2026-10-06 14:01:52 UTC — [ticket-352] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les comportem (223266ms)
 - 2026-10-06 14:01:52 UTC — [ticket-352] APPROVED après 1 tour(s)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: rebase sur develop (235ms)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: PR #287 ouverte (5484ms)
+- 2026-10-06 14:03:01 UTC — [ticket-352] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 14:03:01 UTC — [ide-core] ticket-352 PR #287 confiée au CIWatcher
+- 2026-10-06 14:03:02 UTC — [ticket-353] branche ticket-353-streamed-tokens-are-batched-per-frame-and-a-run-s
+- 2026-10-06 14:03:02 UTC — [ticket-353] tour 1 — codeur démarré
+- 2026-10-06 14:19:59 UTC — [ticket-353] tour 1 — codeur terminé (1017546ms)
+- 2026-10-06 14:22:59 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 14:23:28 UTC — [ticket-353] securite: PASS — Audit de sécurité du diff frontend (streamState.ts, useSupervision.ts et tests a (29718ms)
+- 2026-10-06 14:23:28 UTC — [ticket-353] tour 1 — reviewer démarré
+- 2026-10-06 14:25:14 UTC — [ticket-353] tour 1 — reviewer terminé (105592ms)
+- 2026-10-06 14:26:44 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : le code implémente correctement l (195906ms)
+- 2026-10-06 14:26:44 UTC — [ticket-353] CHANGES_REQUESTED tour 1: Validateur : Les quatre premiers critères sont satisfaits : le code implémente correctement le regro
+- 2026-10-06 14:26:44 UTC — [ticket-353] tour 2 — codeur démarré
+- 2026-10-06 14:27:26 UTC — [ticket-353] tour 2 — codeur terminé (41907ms)
+- 2026-10-06 14:30:16 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 14:30:52 UTC — [ticket-353] securite: PASS — Audit de sécurité du refactor ticket-353 (optimisation performance + limitation  (35608ms)
+- 2026-10-06 14:30:52 UTC — [ticket-353] tour 2 — reviewer démarré
+- 2026-10-06 14:33:05 UTC — [ticket-353] tour 2 — reviewer terminé (132905ms)
+- 2026-10-06 14:34:09 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits : le code gère correctement les `ag (197547ms)
+- 2026-10-06 14:34:09 UTC — [ticket-353] CHANGES_REQUESTED tour 2: Validateur : Les quatre premiers critères sont satisfaits : le code gère correctement les `agent_tok
+- 2026-10-06 14:34:09 UTC — [ticket-353] tour 3 — codeur démarré
+- 2026-10-06 14:35:55 UTC — [ticket-353] tour 3 — codeur terminé (105875ms)
+- 2026-10-06 14:39:20 UTC — [ticket-353] testeur: 1 failed, 686 passed, 20 warnings in 202.33s (0:03:22)
+- 2026-10-06 14:39:20 UTC — [ticket-353] tests rouges au tour 3
+- 2026-10-06 14:39:20 UTC — [ticket-353] BLOCKED après 3 tour(s) sans approbation
