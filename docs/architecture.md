@@ -133,6 +133,15 @@ Un réglage à 0 ou moins **désactive** cette borne — utile pour le développ
 mono-projet ou les machines puissantes. La valeur par défaut de 2 est 
 suffisante pour une machine de développement typique sous quatre cœurs.
 
+#### Parallélisme des chaînes frontend et backend (ticket-351)
+
+`verifier.py` organise les tests en deux chaînes indépendantes, exécutées en parallèle :
+
+- **BACKEND_STEPS** : pytest (tests), puis mypy (type-checking)
+- **FRONTEND_STEPS** : tsc (type-checking), eslint (linter), puis vitest (tests)
+
+Chaque chaîne s'exécute séquentiellement — un échec dans une étape bloque les suivantes de la même chaîne — et s'arrête à son premier échec. Les deux chaînes tournent simultanément, ce qui réduit la durée totale au maximum des deux au lieu de leur somme. Le code de sortie est non nul si l'une des deux échoue. Les sorties sont capturées séparément pour éviter l'entrelacement et affichées à la fin : d'abord backend, puis frontend.
+
 ### Gestion du parallélisme Ollama (ticket-350)
 
 Quand plusieurs runs utilisent un même serveur Ollama local, les requêtes
@@ -162,6 +171,14 @@ serveur, avec la valeur `OLLAMA_MAX_CONCURRENT` (défaut **1** — configuré da
 Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes sont
 lancées concurremment. Utile pour déboguer un modèle ou tester le
 load-balancing interne d'Ollama.
+
+### Parsing et caching off-loop (ticket-352)
+
+`TicketService.list_tickets()` et `ProjectLoader.list_projects()` relisaient chaque fichier à chaque requête, bloquant la boucle d'événements sur du parsing YAML. Problème : le pipeline appelle ces services plusieurs fois par étape; avec plusieurs files, l'interface gelait.
+
+**Optimisation** : cache de parsing par fichier, clé `(chemin résolu, st_mtime_ns, st_size)`. Chaque requête fait un `stat()` peu coûteux; seul un fichier modifié est re-parsé. Même logique pour projets (`CLAUDE.md`, `agents.json`). Tout travail disque via `asyncio.to_thread` — la boucle n'est jamais bloquée.
+
+Invariant : deux requêtes successives sans changement de fichier ne lisent et ne parsent chacun qu'une fois.
 
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
@@ -839,6 +856,8 @@ github_issue_url: https://github.com/...  # optionnel
 Corps du ticket en Markdown...
 ```
 
+Les tickets créés par lot depuis un plan conservent leurs critères d'acceptation : le corps du ticket inclut une section `## Critères d'acceptation` avec une case à cocher par critère (`- [ ] …`). Ce format est directement lisible par `_extract_criteria` et permet au validateur de juger chaque critère indépendamment.
+
 ## Chat conversationnel (ticket-048, 225)
 
 Une conversation libre sur un projet, distincte du pipeline : l'agent a le
@@ -904,6 +923,18 @@ Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
   "timestamp": "2026-06-20T14:30:00Z"
 }
 ```
+
+## Optimisation du streaming frontend (ticket-353)
+
+Le streaming des tokens peut générer des centaines d'événements par seconde. Pour éviter que l'interface ralentisse, trois optimisations sont appliquées au frontend :
+
+1. **Séparation des tokens** : `agent_token` ne va plus dans `events` ni `ticketEvents`. Le texte s'accumule dans `entries[…].tokens` comme avant. Les consommateurs d'événements lisent seulement les événements de contrôle (`pipeline_done`, `run_closed`, `queue_progress`, `pipeline_start`).
+
+2. **Borne des événements** : au-delà de `MAX_EVENTS = 2000`, les plus anciens sont retirés pour préserver la mémoire. Les événements de contrôle sont **toujours conservés**, même au-delà du plafond, pour que les jalons du pipeline restent visibles dans l'historique.
+
+3. **Regroupement par frame** : dans `useSupervision`, les messages WebSocket reçus sont mis en file et appliqués ensemble une fois par `requestAnimationFrame` (repli sur `setTimeout(…, 16)` hors navigateur), en un seul `setEtats` et un seul `setRuns` par lot. L'ordre d'application reste celui de réception. Un `snapshot` vide d'abord la file en attente avant d'appliquer l'état de référence.
+
+Ces trois changements réduisent les rendus de plusieurs centaines par seconde à **un seul** par cycle d'image, tout en préservant la cohérence de l'état et la traçabilité des événements critiques.
 
 ## Agents disponibles
 
