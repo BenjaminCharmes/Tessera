@@ -1358,3 +1358,4 @@ Analyse effectuée :
 - 2026-10-06 07:36:46 UTC — [ticket-349] tour 2 — reviewer terminé (76172ms)
 - 2026-10-06 07:41:10 UTC — [ticket-349] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute le champ `expiree` à `TestResu (340062ms)
 - 2026-10-06 07:41:10 UTC — [ticket-349] APPROVED après 2 tour(s)
+- 2026-10-06 07:43:43 UTC — [ticket-349] documentation: 1 fichier(s) (148671ms) — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : section « Ce que le testeur attrape » introuvable.
