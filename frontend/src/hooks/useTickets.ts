@@ -3,6 +3,7 @@ import { api } from "../lib/api";
 import { groupByStatus, EMPTY_BY_STATUS } from "../lib/ticketBoard";
 import type { ByStatus } from "../lib/ticketBoard";
 import type { OrchestratorEvent, Ticket, TicketStatus, TicketUnreadable } from "../types/api";
+import { useFenetreVisible } from "./useFenetreVisible";
 
 export type { ByStatus };
 
@@ -43,6 +44,9 @@ export function useTickets(
   const [charge, setCharge] = useState<Chargement | null>(null);
   const [revision, setRevision] = useState(0);
   const processedEventsRef = useRef(0);
+  const fenetreVisible = useFenetreVisible();
+  // Permet de détecter la transition cachée → visible sans relancer au montage.
+  const prevFenetreVisibleRef = useRef<boolean | null>(null);
 
   const memeProjet = charge !== null && charge.projectId === projectId;
   const aJour = memeProjet && charge.revision === revision;
@@ -84,13 +88,22 @@ export function useTickets(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, revision]);
 
-  // Polling fallback (slower when pipeline active)
+  // Polling fallback — suspendu quand la fenêtre est cachée (ticket-356).
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId || !fenetreVisible) return;
     const delay = isPipelineActive ? 30_000 : 60_000;
     const timer = setInterval(() => setRevision((r) => r + 1), delay);
     return () => clearInterval(timer);
-  }, [projectId, isPipelineActive]);
+  }, [projectId, isPipelineActive, fenetreVisible]);
+
+  // Relance immédiate au retour en premier plan (ticket-356).
+  useEffect(() => {
+    if (!projectId) return;
+    if (prevFenetreVisibleRef.current === false && fenetreVisible) {
+      setRevision((r) => r + 1);
+    }
+    prevFenetreVisibleRef.current = fenetreVisible;
+  }, [fenetreVisible, projectId]);
 
   // React to real-time WS events
   useEffect(() => {

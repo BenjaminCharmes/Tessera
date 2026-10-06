@@ -42,7 +42,9 @@ export default function Editor({ ticket, openFilePath = null }: EditorProps) {
     () => (cible ? () => readFile(cible) : null),
     [cible],
   );
-  const lecture = useResource<string | null>(fetcher, null);
+  // La clé de cache est le chemin du fichier : il est unique par projet, ce qui
+  // garantit qu'on ne mélange jamais les contenus de deux projets (ticket-356).
+  const lecture = useResource<string | null>(fetcher, null, cible ?? undefined);
 
   const filePath = cible;
   const loading = lecture.loading;
