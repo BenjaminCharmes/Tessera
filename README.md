@@ -68,6 +68,11 @@ L'IDE ne télécharge jamais un modèle lui-même : absent, le repli prend le
 relais et le signale. Le codeur, le reviewer et le chat restent sur Claude —
 ils ont besoin des outils fichier que seul le SDK fournit.
 
+**Sérialisation des requêtes** : quand plusieurs runs appellent le même serveur
+Ollama, l'IDE les sérialise (une à la fois par serveur) pour éviter la compétition
+pour le modèle et la mémoire. Un réglage `OLLAMA_MAX_CONCURRENT` contrôle ce
+comportement — voir la [configuration](docs/configuration.md).
+
 ## Documentation
 
 | | |

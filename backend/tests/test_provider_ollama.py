@@ -4,6 +4,7 @@ Sept services ne font qu'un appel texte→JSON : un modèle local les sert à
 coût nul. Le repli du ticket-188 est ce qui rend le manifeste portable sur
 une machine où Ollama n'est pas là.
 """
+import asyncio
 import json
 from pathlib import Path
 from typing import Any
@@ -18,7 +19,7 @@ from tessera.services.pipeline_events import EventType
 from tessera.services.providers import get_provider
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.noms import PROVIDERS_CONNUS, ProviderIndisponible
-from tessera.services.providers.ollama import OllamaProvider
+from tessera.services.providers.ollama import OllamaProvider, _reset_slots
 from tessera.services.providers import par_role
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.security_auditor import SecurityAuditorService
@@ -228,6 +229,172 @@ async def test_ollama_injoignable_l_audit_passe_par_le_repli_et_le_dit(
     assert repli.calls[0]["model"] == "claude-haiku-4-5"
     assert len(evenements) == 1
     assert evenements[0].data["tente"] == "ollama"
+
+
+# ------------------------------------------------------------------
+# Sérialisation des requêtes Ollama par serveur (ticket-350)
+# ------------------------------------------------------------------
+
+
+class _CountingTransport(httpx.AsyncBaseTransport):
+    """Fake transport that counts concurrent /api/chat requests."""
+
+    def __init__(
+        self,
+        tags_json: dict[str, Any],
+        chat_json: dict[str, Any],
+        hold_s: float = 0.05,
+    ) -> None:
+        self._tags_json = tags_json
+        self._chat_json = chat_json
+        self._hold_s = hold_s
+        self.concurrent = 0
+        self.max_concurrent = 0
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/tags":
+            return httpx.Response(200, json=self._tags_json)
+        # /api/chat
+        self.concurrent += 1
+        self.max_concurrent = max(self.max_concurrent, self.concurrent)
+        await asyncio.sleep(self._hold_s)
+        self.concurrent -= 1
+        return httpx.Response(
+            200,
+            content=json.dumps(self._chat_json).encode(),
+            headers={"content-type": "application/json"},
+        )
+
+
+async def test_deux_complete_sur_meme_url_ne_se_chevauchent_pas(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Deux providers distincts vers le même serveur Ollama doivent se sérialiser :
+    # le compteur de requêtes simultanées dans le transport ne doit jamais dépasser 1.
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 1)
+    _reset_slots()
+
+    base = "http://serial-same.local:11434"
+    transport = _CountingTransport(_tags("q"), _reponse("ok"), hold_s=0.05)
+
+    def _make() -> OllamaProvider:
+        client = httpx.AsyncClient(transport=transport, base_url=base)
+        return OllamaProvider(base_url=base, client=client)
+
+    await asyncio.gather(
+        _make().complete(system="s", user="u", model="q", max_tokens=1),
+        _make().complete(system="s", user="u", model="q", max_tokens=1),
+    )
+
+    assert transport.max_concurrent == 1, (
+        f"Attendu 1 requête simultanée max, observé {transport.max_concurrent}"
+    )
+
+
+async def test_deux_urls_differentes_ne_se_bloquent_pas(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Des providers sur deux serveurs distincts doivent tourner en parallèle.
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 1)
+    _reset_slots()
+
+    base_a = "http://parallel-a.local:11434"
+    base_b = "http://parallel-b.local:11434"
+
+    total_concurrent: list[int] = [0]  # mutable pour nonlocal dans la closure
+    max_total: list[int] = [0]
+
+    class _TrackingTransport(httpx.AsyncBaseTransport):
+        async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/api/tags":
+                return httpx.Response(200, json=_tags("q"))
+            total_concurrent[0] += 1
+            max_total[0] = max(max_total[0], total_concurrent[0])
+            await asyncio.sleep(0.05)
+            total_concurrent[0] -= 1
+            return httpx.Response(200, json=_reponse("ok"))
+
+    p_a = OllamaProvider(base_url=base_a, client=httpx.AsyncClient(transport=_TrackingTransport(), base_url=base_a))
+    p_b = OllamaProvider(base_url=base_b, client=httpx.AsyncClient(transport=_TrackingTransport(), base_url=base_b))
+
+    await asyncio.gather(
+        p_a.complete(system="s", user="u", model="q", max_tokens=1),
+        p_b.complete(system="s", user="u", model="q", max_tokens=1),
+    )
+
+    assert max_total[0] == 2, (
+        f"Les deux URLs doivent tourner en parallèle, max observé : {max_total[0]}"
+    )
+
+
+async def test_stream_abandonne_rend_le_creneau(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Si on_token lève une exception, le créneau est rendu et un complete suivant aboutit.
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 1)
+    _reset_slots()
+
+    base = "http://stream-abort.local:11434"
+    lignes = [
+        {"message": {"role": "assistant", "content": "token"}, "done": False},
+        {"message": {"role": "assistant", "content": ""}, "done": True,
+         "prompt_eval_count": 3, "eval_count": 1},
+    ]
+    stream_content = "\n".join(json.dumps(l) for l in lignes).encode()
+
+    class _StreamTransport(httpx.AsyncBaseTransport):
+        async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/api/tags":
+                return httpx.Response(200, json=_tags("q"))
+            if request.url.path == "/api/chat":
+                body = json.loads(request.content)
+                if body.get("stream"):
+                    return httpx.Response(200, content=stream_content)
+                return httpx.Response(200, json=_reponse("ok"))
+            return httpx.Response(404)
+
+    client = httpx.AsyncClient(transport=_StreamTransport(), base_url=base)
+    provider = OllamaProvider(base_url=base, client=client)
+
+    async def _on_token_raises(t: str) -> None:
+        raise RuntimeError("consumer stopped")
+
+    with pytest.raises(RuntimeError, match="consumer stopped"):
+        await provider.stream(system="s", user="u", model="q", max_tokens=1, on_token=_on_token_raises)
+
+    # Le créneau a été rendu — un complete suivant doit aboutir sans se bloquer.
+    result = await provider.complete(system="s", user="u", model="q", max_tokens=1)
+    assert result.content == "ok"
+
+
+async def test_erreur_complete_rend_le_creneau(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Une erreur réseau pendant complete rend le créneau : l'appel suivant aboutit.
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 1)
+    _reset_slots()
+
+    base = "http://error-release.local:11434"
+    calls: list[int] = [0]
+
+    class _ErrorThenOkTransport(httpx.AsyncBaseTransport):
+        async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/api/tags":
+                return httpx.Response(200, json=_tags("q"))
+            calls[0] += 1
+            if calls[0] == 1:
+                raise httpx.ConnectError("réseau KO")
+            return httpx.Response(200, json=_reponse("ok"))
+
+    client = httpx.AsyncClient(transport=_ErrorThenOkTransport(), base_url=base)
+    provider = OllamaProvider(base_url=base, client=client)
+
+    with pytest.raises(ProviderIndisponible):
+        await provider.complete(system="s", user="u", model="q", max_tokens=1)
+
+    # Le créneau a été rendu — l'appel suivant aboutit.
+    result = await provider.complete(system="s", user="u", model="q", max_tokens=1)
+    assert result.content == "ok"
 
 
 def test_les_manifestes_du_depot_declarent_les_roles_locaux() -> None:

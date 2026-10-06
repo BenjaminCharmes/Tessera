@@ -1,14 +1,15 @@
 ---
-id: ticket-350
-title: "Ollama requests queue one at a time per server instead of competing for the model"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-05
+id: ticket-350
+pr_number: 280
+priority: high
+status: done
+title: Ollama requests queue one at a time per server instead of competing for the
+  model
+type: fix
 ---
 
 # ticket-350 — Les requêtes Ollama passent une à la fois par serveur

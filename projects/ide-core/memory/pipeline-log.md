@@ -1341,3 +1341,32 @@ Analyse effectuée :
 - 2026-10-06 07:06:08 UTC — [ticket-348] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (182219ms)
 - 2026-10-06 07:06:08 UTC — [ticket-348] APPROVED après 3 tour(s)
 - 2026-10-06 07:08:29 UTC — [ticket-348] documentation: 3 fichier(s) (137406ms)
+- 2026-10-06 07:44:05 UTC — [ticket-349] livraison: rebase sur develop (2125ms)
+- 2026-10-06 07:44:05 UTC — [ticket-349] livraison: PR #279 ouverte (6782ms)
+- 2026-10-06 07:44:05 UTC — [ide-core] ticket-349 PR #279 confiée au CIWatcher
+- 2026-10-06 07:44:09 UTC — [ticket-350] branche ticket-350-ollama-requests-queue-one-at-a-time-per-server-in
+- 2026-10-06 07:44:09 UTC — [ticket-350] tour 1 — codeur démarré
+- 2026-10-06 07:50:34 UTC — [ticket-350] tour 1 — codeur terminé (384546ms)
+- 2026-10-06 07:52:24 UTC — [ticket-350] testeur: 1 failed, 800 passed, 20 warnings in 108.42s (0:01:48)
+- 2026-10-06 07:52:24 UTC — [ticket-350] tests rouges au tour 1
+- 2026-10-06 07:52:24 UTC — [ticket-350] tour 2 — codeur démarré
+- 2026-10-06 07:53:01 UTC — [ticket-350] tour 2 — codeur terminé (36312ms)
+- 2026-10-06 07:57:14 UTC — [ticket-350] testeur: OK (exit 0)
+- 2026-10-06 07:57:42 UTC — [ticket-350] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff implémente une sérialisation  (27092ms)
+- 2026-10-06 07:57:42 UTC — [ticket-350] tour 2 — reviewer démarré
+- 2026-10-06 07:58:55 UTC — [ticket-350] tour 2 — reviewer terminé (73358ms)
+- 2026-10-06 08:03:38 UTC — [ticket-350] validateur: APPROVED — Tous les critères sont satisfaits. La configuration `ollama_max_concurrent` a ét (356655ms)
+- 2026-10-06 08:03:38 UTC — [ticket-350] CHANGES_REQUESTED tour 2: Reviewer : ## Vérification rapide du diffAPPROVED
+
+## Ce qui est bien
+
+1. **Mécanique irréprochable*
+- 2026-10-06 08:03:38 UTC — [ticket-350] tour 3 — codeur démarré
+- 2026-10-06 08:03:54 UTC — [ticket-350] tour 3 — codeur terminé (15671ms)
+- 2026-10-06 08:11:12 UTC — [ticket-350] testeur: OK (exit 0)
+- 2026-10-06 08:11:42 UTC — [ticket-350] securite: PASS — Aucune vulnérabilité OWASP Top 10 détectée dans ce diff. Les modifications intro (29375ms)
+- 2026-10-06 08:11:42 UTC — [ticket-350] tour 3 — reviewer démarré
+- 2026-10-06 08:12:56 UTC — [ticket-350] tour 3 — reviewer terminé (74640ms)
+- 2026-10-06 08:14:36 UTC — [ticket-350] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une sérialis (174312ms)
+- 2026-10-06 08:14:36 UTC — [ticket-350] APPROVED après 3 tour(s)
+- 2026-10-06 08:16:32 UTC — [ticket-350] documentation: 3 fichier(s) (112610ms)
