@@ -1635,3 +1635,15 @@ Le cod (32766ms)
 - 2026-10-06 21:32:05 UTC — [ticket-362] validateur: APPROVED — Tous les critères sont respectés. Le code a été modifié pour utiliser `match()`  (112921ms)
 - 2026-10-06 21:32:05 UTC — [ticket-362] APPROVED après 1 tour(s)
 - 2026-10-06 21:34:34 UTC — [ticket-362] documentation: 1 fichier(s) (146844ms)
+- 2026-10-06 21:34:45 UTC — [ticket-362] livraison: rebase sur develop (516ms)
+- 2026-10-06 21:34:45 UTC — [ticket-362] livraison: PR #293 ouverte (4141ms)
+- 2026-10-06 21:34:45 UTC — [ide-core] ticket-362 PR #293 confiée au CIWatcher
+- 2026-10-06 21:34:46 UTC — [ticket-363] branche ticket-363-frontend-tests-allow-for-a-loaded-machine-instead
+- 2026-10-06 21:34:46 UTC — [ticket-363] tour 1 — codeur démarré
+- 2026-10-06 21:36:04 UTC — [ticket-363] tour 1 — codeur terminé (77014ms)
+- 2026-10-06 21:39:00 UTC — [ticket-363] testeur: OK (exit 0)
+- 2026-10-06 21:39:10 UTC — [ticket-363] securite: PASS — Audit réalisé. Le diff modifie uniquement la configuration Vitest (frontend/vite (9530ms)
+- 2026-10-06 21:39:10 UTC — [ticket-363] tour 1 — reviewer démarré
+- 2026-10-06 21:39:22 UTC — [ticket-363] tour 1 — reviewer terminé (12141ms)
+- 2026-10-06 21:40:15 UTC — [ticket-363] validateur: APPROVED — Les deux premiers critères sont respectés : `testTimeout` et `hookTimeout` sont  (65155ms)
+- 2026-10-06 21:40:15 UTC — [ticket-363] APPROVED après 1 tour(s)
