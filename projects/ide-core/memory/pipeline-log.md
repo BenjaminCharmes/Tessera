@@ -1306,3 +1306,4 @@ Analyse effectuée :
 - 2026-10-06 06:28:03 UTC — [ticket-345] tour 1 — reviewer terminé (74750ms)
 - 2026-10-06 06:29:47 UTC — [ticket-345] validateur: APPROVED — Tous les critères sont satisfaits. Le code modifié améliore significativement l' (178390ms)
 - 2026-10-06 06:29:47 UTC — [ticket-345] APPROVED après 1 tour(s)
+- 2026-10-06 06:33:07 UTC — [ticket-345] documentation: 1 fichier(s) (196843ms) — refusé : doc-technique : docs/architecture.md : section « Couche LLM (ADR-017) » introuvable.
