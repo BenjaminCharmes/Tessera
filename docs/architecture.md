@@ -413,6 +413,31 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
   commit du ticket : il ne vient pas du codeur.
 - Le verdict du reviewer est la première ligne qui commence par APPROVED ou CHANGES_REQUESTED. Une approbation qui nomme CHANGES_REQUESTED sur la même ligne est un refus ; sur les lignes suivantes, elle approuve (ticket-298, ADR-009).
 
+### Testeur et timeouts (ticket-349)
+
+`TestResult` porte un champ `expiree: bool = False` pour distinguer un timeout d'un vrai test échoué.
+
+**Cas 1 : Test échoué ordinaire** (`expiree=False`, `passed=False`)
+- Le codeur a écrit du code qui ne marche pas
+- Le pipeline renvoie le ticket au codeur pour correction
+- Comportement existant, inchangé
+
+**Cas 2 : Premier timeout** (`expiree=True`)
+- La suite de tests n'a pas terminé dans le délai autorisé
+- Elle n'a rien prouvé sur le code
+- Le pipeline rejoue la suite **une fois**, sur la même branche, espérant que la machine soit moins chargée
+- Si la relance passe, le run continue normalement vers la sécurité
+- Si la relance expire aussi, passage au cas 3
+
+**Cas 3 : Deux timeouts consécutifs** (`expiree=True` deux fois)
+- La suite expire malgré une relance
+- Le run se termine en `blocked` avec raison « testeur: délai dépassé deux fois »
+- Le commit est fait (comme toute sortie terminale)
+- Le ticket n'est pas renvoyé au codeur et aucun tour n'est consommé
+- Cet état signale un problème système (machine surchargée, délai configuré trop court) plutôt qu'un défaut du code
+
+L'enregistrement du pipeline écrit « testeur: délai dépassé, suite relancée » dans le `pipeline-log.md` à chaque relance.
+
 ### Validation et fichiers cités (ticket-316)
 
 Le validateur vérifie chaque critère d'acceptation du ticket. Un critère peut être 

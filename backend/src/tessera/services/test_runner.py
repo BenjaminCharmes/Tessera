@@ -94,6 +94,11 @@ class TestResult:
     #: ne demande pas la même chose au codeur. Deux tours de revue ont été
     #: dépensés à corriger du code qui n'était pas en cause (ticket-157).
     demarree: bool = True
+    #: Le délai global a-t-il été dépassé avant la fin de la commande ?
+    #: Distinct d'un test rouge : aucun test n'a été exécuté jusqu'au bout,
+    #: donc rien ne dit que le code est en cause. Relancer sans repasser par
+    #: le codeur est la bonne réponse (ticket-349).
+    expiree: bool = False
     #: Chaque étape lancée et son code de sortie, dans l'ordre : ce que le
     #: validateur lit pour juger « typecheck, lint et build passent »
     #: (ticket-337).
@@ -252,6 +257,7 @@ class TestRunnerService:
             _logger.warning("test_runner_timeout", extra={"cmd": cmd, "timeout": timeout})
             return TestResult(
                 passed=False,
+                expiree=True,
                 total=0,
                 failed=0,
                 output_summary=f"Timeout après {timeout}s — {cmd}",

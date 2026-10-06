@@ -349,7 +349,12 @@ class Orchestrator:
             # Une suite rouge renvoie au codeur sans passer par la revue :
             # un reviewer n'a pas à arbitrer un fait déjà établi, et l'appel
             # est économisé (ticket-098).
-            if not await stages.run_tests(self, run):
+            # Deux expirations de suite terminent le run en blocked sans
+            # repasser par le codeur (ticket-349).
+            tests_result = await stages.run_tests(self, run)
+            if not isinstance(tests_result, bool):
+                return tests_result
+            if not tests_result:
                 run.review_feedback.append(_echec_de_tests(run))
                 self._log(f"[{ticket_id}] tests rouges au tour {round_num}")
                 continue

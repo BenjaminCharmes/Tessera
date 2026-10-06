@@ -1341,6 +1341,24 @@ Analyse effectuée :
 - 2026-10-06 07:06:08 UTC — [ticket-348] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (182219ms)
 - 2026-10-06 07:06:08 UTC — [ticket-348] APPROVED après 3 tour(s)
 - 2026-10-06 07:08:29 UTC — [ticket-348] documentation: 3 fichier(s) (137406ms)
+- 2026-10-06 07:08:43 UTC — [ticket-348] livraison: rebase sur develop (906ms)
+- 2026-10-06 07:08:43 UTC — [ticket-348] livraison: PR #278 ouverte (4141ms)
+- 2026-10-06 07:11:32 UTC — [ide-core] ticket-348 PR #278 confiée au CIWatcher
+- 2026-10-06 07:11:36 UTC — [ticket-349] branche ticket-349-a-test-timeout-replays-the-testeur-once-instead-o
+- 2026-10-06 07:14:32 UTC — [ticket-349] plan rendu (174781ms)
+- 2026-10-06 07:14:32 UTC — [ticket-349] tour 1 — codeur démarré
+- 2026-10-06 07:18:28 UTC — [ticket-349] tour 1 — codeur terminé (235265ms)
+- 2026-10-06 07:25:19 UTC — [ticket-349] testeur: ❯ src/components/StatsView/RecentRuns.test.tsx:25:3
+- 2026-10-06 07:25:19 UTC — [ticket-349] tests rouges au tour 1
+- 2026-10-06 07:25:19 UTC — [ticket-349] tour 2 — codeur démarré
+- 2026-10-06 07:27:53 UTC — [ticket-349] tour 2 — codeur terminé (153500ms)
+- 2026-10-06 07:35:06 UTC — [ticket-349] testeur: OK (exit 0)
+- 2026-10-06 07:35:30 UTC — [ticket-349] securite: PASS — Aucune vulnérabilité de sécurité détectée dans ce diff. Le changement implémente (24219ms)
+- 2026-10-06 07:35:30 UTC — [ticket-349] tour 2 — reviewer démarré
+- 2026-10-06 07:36:46 UTC — [ticket-349] tour 2 — reviewer terminé (76172ms)
+- 2026-10-06 07:41:10 UTC — [ticket-349] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute le champ `expiree` à `TestResu (340062ms)
+- 2026-10-06 07:41:10 UTC — [ticket-349] APPROVED après 2 tour(s)
+- 2026-10-06 07:43:43 UTC — [ticket-349] documentation: 1 fichier(s) (148671ms) — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : section « Ce que le testeur attrape » introuvable.
 - 2026-10-06 07:44:05 UTC — [ticket-349] livraison: rebase sur develop (2125ms)
 - 2026-10-06 07:44:05 UTC — [ticket-349] livraison: PR #279 ouverte (6782ms)
 - 2026-10-06 07:44:05 UTC — [ide-core] ticket-349 PR #279 confiée au CIWatcher

@@ -263,6 +263,43 @@ class TestTestResult:
         assert result.errors == []
 
 
+class TestExpired:
+    """ticket-349: expiree distinguishes a timeout from a real test failure."""
+
+    async def test_expiree_is_true_on_timeout(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        mock_proc = MagicMock()
+        mock_proc.kill = MagicMock()
+        mock_proc.wait = AsyncMock()
+        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            result = await service.run_tests(
+                python_project, test_command="uv run pytest", timeout=1
+            )
+
+        assert result.expiree is True
+        assert result.passed is False
+
+    async def test_expiree_is_false_on_nonzero_exit(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        mock_proc = MagicMock()
+        mock_proc.returncode = 1
+        mock_proc.communicate = AsyncMock(
+            return_value=(b"1 failed, 4 passed in 0.6s", b"AssertionError: x != y")
+        )
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            result = await service.run_tests(
+                python_project, test_command="uv run pytest"
+            )
+
+        assert result.expiree is False
+        assert result.passed is False
+
+
 # ---------------------------------------------------------------------------
 # Lancer une commande qui est un script Windows — ticket-157
 # ---------------------------------------------------------------------------

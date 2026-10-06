@@ -1,15 +1,17 @@
 ---
-id: ticket-349
-title: "A test timeout replays the testeur once instead of sending the ticket back to the codeur"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-348"]
-estimated_days: 0.5
-plan: true
 created: 2026-10-05
+depends_on:
+- ticket-348
+estimated_days: 0.5
+id: ticket-349
+plan: true
+pr_number: 279
+priority: high
+status: done
+title: A test timeout replays the testeur once instead of sending the ticket back
+  to the codeur
+type: fix
 ---
 
 # ticket-349 — Un timeout du testeur rejoue le testeur, pas le codeur
