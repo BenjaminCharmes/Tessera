@@ -3,12 +3,15 @@ import { renderHook, act } from "@testing-library/react";
 import { MockWebSocket } from "../test/mockWebSocket";
 import { useSupervision } from "./useSupervision";
 import { applyEvent } from "./streamState";
+import { runStore } from "./runStore";
 import type { OrchestratorEvent } from "../types/api";
 
 vi.stubGlobal("WebSocket", MockWebSocket);
 
 beforeEach(() => {
   MockWebSocket.instance = null;
+  // Le store externe accumule l'état entre tests : le remettre à zéro (ticket-354).
+  runStore.reset();
   // Les événements WebSocket sont regroupés par image (ticket-353) :
   // les tests avancent les timers d'une image (16 ms) après chaque envoi.
   vi.useFakeTimers();

@@ -3,11 +3,13 @@ import { renderHook, act } from "@testing-library/react";
 import { MockWebSocket } from "../test/mockWebSocket";
 import { useSupervision } from "./useSupervision";
 import { etatDepuisRun } from "./streamState";
+import { runStore } from "./runStore";
 
 vi.stubGlobal("WebSocket", MockWebSocket);
 
 beforeEach(() => {
   MockWebSocket.instance = null;
+  runStore.reset();
   vi.useFakeTimers();
 });
 

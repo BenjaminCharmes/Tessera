@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { wsUrl } from "../lib/ws";
-import { INITIAL, applyEvent, etatDepuisRun, clearTokensForReplay } from "./streamState";
+import { INITIAL, applyEvent, etatDepuisRun } from "./streamState";
 import type { StreamState } from "./streamState";
 import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
 import { abonnementsVoulus, diffDesAbonnements } from "./abonnements";
 import type { SlotsDAbonnement } from "./abonnements";
 import type { OrchestratorEvent, RunActif, RunEvent } from "../types/api";
 import { api } from "../lib/api";
+import { runStore } from "./runStore";
 
 /** Lance une RAF en navigateur, un setTimeout(16) hors navigateur (ticket-353). */
 function scheduleRaf(fn: () => void): number {
@@ -38,9 +39,8 @@ function cancelRaf(id: number): void {
  * l'interface que `AgentPanel`, `RunView` et la sidebar attendent déjà — un
  * seul projet, celui qui est actif.
  *
- * Pas de store global ni de Context : les deux consommateurs sont des enfants
- * directs d'`App`, donc un passage par props suffit, et ADR-013 reste tenu
- * sans exception à justifier.
+ * Les états de run vivent dans `runStore` (store externe, ticket-354) :
+ * un événement d'un run ne redessine que les composants qui l'affichent.
  */
 export interface UseSupervisionResult {
   /** Les runs vivants, tous projets confondus. */
@@ -92,7 +92,6 @@ const VIDE: StreamState = INITIAL;
 
 export function useSupervision(): UseSupervisionResult {
   const [runs, setRuns] = useState<RunActif[]>([]);
-  const [etats, setEtats] = useState<Record<string, StreamState>>({});
   const [selection, setSelection] = useState<string | null>(null);
   const [connecte, setConnecte] = useState(false);
   const [sorties, setSorties] = useState<Record<string, string[]>>({});
@@ -112,33 +111,28 @@ export function useSupervision(): UseSupervisionResult {
   const rafIdRef = useRef<number | null>(null);
 
   /**
-   * Applique tous les événements en attente en un seul setEtats + setRuns (ticket-353).
+   * Applique tous les événements en attente : met à jour le store externe
+   * (ticket-354) et setRuns (hors agent_token qui n'affecte pas la liste).
    *
-   * Appelé soit par la RAF planifiée, soit en avance par le handler de snapshot
-   * pour que l'instantané voit un état à jour. setEtats et setRuns sont stables
-   * (contrat React useState) : useCallback([]) est correct.
+   * Appelé soit par la RAF planifiée, soit en avance par le handler de snapshot.
+   * setRuns est stable (contrat React useState) : useCallback([]) est correct.
    */
   const flush = useCallback(() => {
     rafIdRef.current = null;
     const batch = pendingRef.current.splice(0);
     if (batch.length === 0) return;
-    setEtats((prec) => {
-      const suite = { ...prec };
-      for (const ev of batch) {
-        if (!ev.run_id) continue;
-        suite[ev.run_id] = applyEvent(suite[ev.run_id] ?? INITIAL, ev);
-      }
-      return suite;
-    });
+    // Mettre à jour le store externe en une passe (ticket-354).
+    runStore.appliquer(batch);
+    // Mettre à jour la liste des runs (hors tokens qui ne changent rien).
     setRuns((prec) => {
       let liste = prec;
       for (const ev of batch) {
-        if (!ev.run_id) continue;
+        if (!ev.run_id || ev.type === "agent_token") continue;
         liste = majDesRuns(liste, ev, ev.run_id);
       }
       return liste;
     });
-  }, []); // setEtats, setRuns, INITIAL, applyEvent, majDesRuns sont stables
+  }, []); // setRuns, runStore.appliquer et majDesRuns sont stables
 
   /** Programme un flush si aucun n'est déjà planifié (ticket-353). */
   const scheduleFlush = useCallback(() => {
@@ -157,15 +151,11 @@ export function useSupervision(): UseSupervisionResult {
       ws.send(JSON.stringify({ subscribe: run }));
       // Vider les tokens avant le rejeu : le backend renvoie le texte à chaque
       // abonnement, et les ajouter à l'état déjà accumulé doublerait le texte
-      // visible (ticket-313). setEtats est stable (React useState).
-      setEtats((prec) => {
-        const etat = prec[run];
-        if (!etat) return prec;
-        return { ...prec, [run]: clearTokensForReplay(etat) };
-      });
+      // visible (ticket-313). runStore.clearTokens lit directement le store.
+      runStore.clearTokens(run);
     }
     abonnesRef.current = voulus;
-  }, []); // setEtats et clearTokensForReplay sont stables
+  }, []); // runStore.clearTokens est stable
 
   useEffect(() => {
     // La socket se rouvre : un redémarrage du backend suffisait à rendre
@@ -192,37 +182,33 @@ export function useSupervision(): UseSupervisionResult {
 
     /**
      * Charge les événements persistés d'un run vivant et les rejoue dans
-     * l'état — ticket-325.
-     *
-     * Les événements en direct reçus pendant le chargement sont mis en
-     * tampon dans `historyBufferRef` et appliqués après, en écartant ceux
-     * dont l'horodatage est couvert par l'historique (déduplication).
+     * le store — ticket-325.
      */
     const chargerHistorique = async (runId: string, dbRunId: string) => {
       try {
         const evts: RunEvent[] = await api.runs.events(dbRunId);
         const dernierTs = evts.length > 0 ? evts[evts.length - 1].timestamp : null;
-        setEtats((prec) => {
-          let etat: StreamState = INITIAL;
-          for (const ev of evts) {
-            etat = applyEvent(etat, { ...ev, ticket_id: "", run_id: runId } as OrchestratorEvent);
-          }
-          for (const ev of historyBufferRef.current[runId] ?? []) {
-            if (!dernierTs || ev.timestamp > dernierTs) {
-              etat = applyEvent(etat, ev);
-            }
-          }
-          return { ...prec, [runId]: etat };
-        });
-      } catch {
-        // Historique indisponible : vider le tampon sur l'état courant.
-        setEtats((prec) => {
-          let etat = prec[runId] ?? INITIAL;
-          for (const ev of historyBufferRef.current[runId] ?? []) {
+        let etat: StreamState = INITIAL;
+        for (const ev of evts) {
+          etat = applyEvent(etat, {
+            ...ev,
+            ticket_id: "",
+            run_id: runId,
+          } as OrchestratorEvent);
+        }
+        for (const ev of historyBufferRef.current[runId] ?? []) {
+          if (!dernierTs || ev.timestamp > dernierTs) {
             etat = applyEvent(etat, ev);
           }
-          return { ...prec, [runId]: etat };
-        });
+        }
+        runStore.set(runId, etat);
+      } catch {
+        // Historique indisponible : vider le tampon sur l'état courant.
+        let etat = runStore.getSnapshot()[runId] ?? INITIAL;
+        for (const ev of historyBufferRef.current[runId] ?? []) {
+          etat = applyEvent(etat, ev);
+        }
+        runStore.set(runId, etat);
       } finally {
         historyLoadedRef.current.add(runId);
         delete historyBufferRef.current[runId];
@@ -249,24 +235,20 @@ export function useSupervision(): UseSupervisionResult {
           };
 
           if ((brut.type as string) === "snapshot") {
-            // Vider la file en attente avant l'instantané (ticket-353) : les
-            // événements déjà reçus doivent être dans l'état avant que le
-            // snapshot ne sème les nouveaux runs.
+            // Vider la file en attente avant l'instantané (ticket-353).
             flush();
             const recus = brut.runs ?? [];
             setRuns(recus);
-            // Semer l'état : `agent_started` ne repassera pas, et sans lui le
-            // panneau resterait au repos pour toute la durée du run — sans
-            // agents, et sans la question en attente (ticket-163).
-            setEtats((prec) => {
-              const suite = { ...prec };
-              for (const r of recus) {
-                if (!suite[r.run_id]) suite[r.run_id] = etatDepuisRun(r);
+            // Semer l'état dans le store : `agent_started` ne repassera pas,
+            // et sans lui le panneau resterait au repos pour toute la durée
+            // du run (ticket-163).
+            const snapshot = runStore.getSnapshot();
+            for (const r of recus) {
+              if (!snapshot[r.run_id]) {
+                runStore.set(r.run_id, etatDepuisRun(r));
               }
-              return suite;
-            });
-            // Ticket-325 : charger l'historique pour les runs vivants dont
-            // on ne connaît pas encore les cartes passées.
+            }
+            // Ticket-325 : charger l'historique pour les runs vivants.
             for (const r of recus) {
               if (r.db_run_id && !historyLoadedRef.current.has(r.run_id)) {
                 historyBufferRef.current[r.run_id] = [];
@@ -276,9 +258,7 @@ export function useSupervision(): UseSupervisionResult {
             return;
           }
 
-          // Les évènements de service n'ont pas de `run_id` : les laisser
-          // tomber dans le test ci-dessous jetait leur sortie avant même
-          // qu'on ait écrit de quoi l'afficher (ticket-145).
+          // Les évènements de service n'ont pas de `run_id`.
           const type = brut.type as string;
           if (type === "service_output" || type === "service_closed") {
             const nom = String(
@@ -303,13 +283,14 @@ export function useSupervision(): UseSupervisionResult {
           // l'événement en tampon plutôt que de l'appliquer immédiatement.
           if (runId in historyBufferRef.current) {
             historyBufferRef.current[runId]!.push(brut);
-            setRuns((prec) => majDesRuns(prec, brut, runId));
+            // Tokens ignorés ici aussi : ils ne changent rien dans la liste.
+            if (brut.type !== "agent_token") {
+              setRuns((prec) => majDesRuns(prec, brut, runId));
+            }
             return;
           }
 
-          // Regroupement par image : les événements sont mis en file et
-          // appliqués ensemble à la prochaine RAF (ticket-353). Cela réduit
-          // les mises à jour d'état racine de N par image à 1.
+          // Regroupement par image : mise en file + RAF (ticket-353).
           pendingRef.current.push(brut);
           scheduleFlush();
         } catch {
@@ -328,8 +309,7 @@ export function useSupervision(): UseSupervisionResult {
     return () => {
       vivant = false;
       if (minuteur !== null) clearTimeout(minuteur);
-      // Annuler le flush planifié pour ne pas appliquer d'événements après
-      // le démontage (ticket-353).
+      // Annuler le flush planifié (ticket-353).
       if (rafIdRef.current !== null) {
         cancelRaf(rafIdRef.current);
         rafIdRef.current = null;
@@ -340,18 +320,12 @@ export function useSupervision(): UseSupervisionResult {
       ws.close();
       wsRef.current = null;
     };
-    // flush et scheduleFlush sont stables (useCallback([])) : la socket ne
-    // se rouvre pas pour autant.
   }, [majDesAbonnements, flush, scheduleFlush]);
 
   const selectionner = useCallback(
     (runId: string | null) => {
       slotsRef.current = { ...slotsRef.current, selection: runId };
       setSelection(runId);
-      // Le désabonnement du run précédent se déduit des slots : sans cela le
-      // flux de tokens de tous les runs déjà regardés continuerait d'arriver,
-      // ce que l'abonnement existe précisément pour éviter — mais le lâcher
-      // pendant que le panneau le regarde encore le rendrait muet.
       majDesAbonnements();
     },
     [majDesAbonnements],
@@ -366,9 +340,15 @@ export function useSupervision(): UseSupervisionResult {
     [majDesAbonnements],
   );
 
+  /**
+   * Lit l'état d'un run depuis le store externe (ticket-354).
+   *
+   * Identité stable : ne change pas quand un autre run reçoit un événement.
+   * L'état retourné est toujours celui du store au moment de l'appel.
+   */
   const etatDe = useCallback(
-    (runId: string): StreamState => etats[runId] ?? VIDE,
-    [etats],
+    (runId: string): StreamState => runStore.getSnapshot()[runId] ?? VIDE,
+    [], // stable — lit depuis le store, pas depuis un state React
   );
 
   const envoyer = useCallback(
@@ -388,9 +368,6 @@ export function useSupervision(): UseSupervisionResult {
   );
 
   const suivre = useCallback((run: RunActif) => {
-    // Le POST repond avant le premier evenement du run : sans cette entree,
-    // la carte n'apparaitrait qu'au premier `agent_started`, et le bouton
-    // semblerait n'avoir rien fait.
     setRuns((prec) =>
       prec.some((r) => r.run_id === run.run_id) ? prec : [...prec, run],
     );
@@ -420,3 +397,4 @@ export function useSupervision(): UseSupervisionResult {
     fermerRuns,
   };
 }
+
