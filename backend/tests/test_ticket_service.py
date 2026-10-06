@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import os
 import time
 from pathlib import Path
+from unittest.mock import patch
 
 import frontmatter  # type: ignore[import-untyped]
 import pytest
@@ -511,6 +513,108 @@ async def test_parse_depends_on_csv_string_in_file(tmp_path: Path) -> None:
 
     assert ticket is not None
     assert ticket.depends_on == ["ticket-008", "ticket-009"]
+
+
+# ------------------------------------------------------------------
+# Cache de parsing par fichier — ticket-352
+# ------------------------------------------------------------------
+
+
+def _advance_mtime(path: Path, seconds: float = 1.0) -> None:
+    """Force the mtime of a file ahead by `seconds` to guarantee a cache miss."""
+    ts = time.time() + seconds
+    os.utime(path, (ts, ts))
+
+
+async def test_cache_avoids_double_parse_on_unchanged_files(tmp_path: Path) -> None:
+    """Two successive listings without file changes parse each file only once."""
+    path1 = tmp_path / "tickets/todo/ticket-001-a.md"
+    path2 = tmp_path / "tickets/todo/ticket-002-b.md"
+    _write_ticket(path1, "ticket-001")
+    _write_ticket(path2, "ticket-002")
+
+    svc = _svc(tmp_path)
+    with patch.object(svc, "_parse", wraps=svc._parse) as mock_parse:
+        await svc.list_tickets()
+        after_first = mock_parse.call_count
+        await svc.list_tickets()
+        after_second = mock_parse.call_count
+
+    assert after_first == 2   # both files parsed on first listing
+    assert after_second == 2  # no additional parse on second listing
+
+
+async def test_cache_invalidated_when_file_modified(tmp_path: Path) -> None:
+    """A file modified between two listings is re-parsed with its new content."""
+    path = tmp_path / "tickets/todo/ticket-001-a.md"
+    _write_ticket(path, "ticket-001", title="Titre original")
+
+    svc = _svc(tmp_path)
+    result1 = await svc.list_tickets()
+    assert result1[0].title == "Titre original"
+
+    _write_ticket(path, "ticket-001", title="Titre modifié")
+    _advance_mtime(path)
+
+    result2 = await svc.list_tickets()
+    assert result2[0].title == "Titre modifié"
+
+
+async def test_cache_reflects_ticket_moved_to_done(tmp_path: Path) -> None:
+    """A ticket moved to done/ is listed with done status after the move."""
+    todo_path = tmp_path / "tickets/todo/ticket-001-a.md"
+    done_dir = tmp_path / "tickets/done"
+    done_dir.mkdir(parents=True, exist_ok=True)
+    _write_ticket(todo_path, "ticket-001", status="todo")
+
+    svc = _svc(tmp_path)
+    result1 = await svc.list_tickets()
+    assert result1[0].status == TicketStatus.todo
+
+    done_path = done_dir / "ticket-001-a.md"
+    todo_path.rename(done_path)
+
+    result2 = await svc.list_tickets()
+    assert len(result2) == 1
+    assert result2[0].status == TicketStatus.done
+
+
+async def test_cache_purges_deleted_file(tmp_path: Path) -> None:
+    """A deleted file no longer appears in the listing and its cache entry is removed."""
+    from tessera.services import ticket_service as ts_module
+
+    path = tmp_path / "tickets/todo/ticket-001-a.md"
+    _write_ticket(path, "ticket-001")
+
+    svc = _svc(tmp_path)
+    result1 = await svc.list_tickets()
+    assert len(result1) == 1
+
+    resolved = str(path.resolve())
+    assert any(k[0] == resolved for k in ts_module._ticket_cache)
+
+    path.unlink()
+
+    result2 = await svc.list_tickets()
+    assert result2 == []
+    assert not any(k[0] == resolved for k in ts_module._ticket_cache)
+
+
+async def test_list_tickets_uses_asyncio_to_thread(tmp_path: Path) -> None:
+    """list_tickets_with_unreadable delegates its disk work to asyncio.to_thread."""
+    svc = _svc(tmp_path)
+    with patch("asyncio.to_thread", wraps=asyncio.to_thread) as mock_thread:
+        await svc.list_tickets_with_unreadable()
+    assert mock_thread.called
+
+
+async def test_get_ticket_uses_asyncio_to_thread(tmp_path: Path) -> None:
+    """get_ticket delegates its disk work to asyncio.to_thread."""
+    _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
+    svc = _svc(tmp_path)
+    with patch("asyncio.to_thread", wraps=asyncio.to_thread) as mock_thread:
+        await svc.get_ticket("ticket-001")
+    assert mock_thread.called
 
 
 async def test_le_dossier_fait_foi_sur_le_statut(tmp_path: Path) -> None:

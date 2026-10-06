@@ -4,9 +4,9 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 1
 id: ticket-352
-pr_number: null
+pr_number: 287
 priority: high
-status: in-progress
+status: done
 title: Tickets and projects are parsed once per file change, off the event loop
 type: fix
 ---

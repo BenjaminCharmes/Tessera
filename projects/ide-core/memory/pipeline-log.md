@@ -1471,6 +1471,22 @@ L'ajout de la fonctio (41733ms)
 - 2026-10-06 13:43:12 UTC — [ticket-361] tour 1 — reviewer terminé (93827ms)
 - 2026-10-06 13:44:06 UTC — [ticket-361] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (148078ms)
 - 2026-10-06 13:44:06 UTC — [ticket-361] APPROVED après 1 tour(s)
+- 2026-10-06 13:46:50 UTC — [ticket-361] livraison: rebase sur develop (297ms)
+- 2026-10-06 13:46:50 UTC — [ticket-361] livraison: PR #286 ouverte (4328ms)
+- 2026-10-06 13:46:50 UTC — [ticket-361] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 13:46:50 UTC — [ide-core] ticket-361 PR #286 confiée au CIWatcher
+- 2026-10-06 13:46:51 UTC — [ticket-352] branche ticket-352-tickets-and-projects-are-parsed-once-per-file-cha
+- 2026-10-06 13:46:52 UTC — [ticket-352] tour 1 — codeur démarré
+- 2026-10-06 13:54:39 UTC — [ticket-352] tour 1 — codeur terminé (467187ms)
+- 2026-10-06 13:57:35 UTC — [ticket-352] testeur: OK (exit 0)
+- 2026-10-06 13:58:08 UTC — [ticket-352] securite: PASS — Audit de sécurité du diff — ticket-352 (caching des projets et tickets).
+
+Le cod (32766ms)
+- 2026-10-06 13:58:08 UTC — [ticket-352] tour 1 — reviewer démarré
+- 2026-10-06 13:59:26 UTC — [ticket-352] tour 1 — reviewer terminé (78094ms)
+- 2026-10-06 14:01:52 UTC — [ticket-352] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les comportem (223266ms)
+- 2026-10-06 14:01:52 UTC — [ticket-352] APPROVED après 1 tour(s)
+- 2026-10-06 14:02:48 UTC — [ticket-352] documentation: 1 fichier(s) (54671ms)
 - 2026-10-06 13:46:38 UTC — [ticket-361] documentation: 1 fichier(s) (150140ms)
 - 2026-10-06 13:32:17 UTC — [ticket-360] documentation: 1 fichier(s) (215625ms)
 - 2026-10-06 13:04:05 UTC — [ticket-359] documentation: 1 fichier(s) (172219ms)

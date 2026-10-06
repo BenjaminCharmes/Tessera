@@ -172,6 +172,14 @@ Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes s
 lancées concurremment. Utile pour déboguer un modèle ou tester le
 load-balancing interne d'Ollama.
 
+### Parsing et caching off-loop (ticket-352)
+
+`TicketService.list_tickets()` et `ProjectLoader.list_projects()` relisaient chaque fichier à chaque requête, bloquant la boucle d'événements sur du parsing YAML. Problème : le pipeline appelle ces services plusieurs fois par étape; avec plusieurs files, l'interface gelait.
+
+**Optimisation** : cache de parsing par fichier, clé `(chemin résolu, st_mtime_ns, st_size)`. Chaque requête fait un `stat()` peu coûteux; seul un fichier modifié est re-parsé. Même logique pour projets (`CLAUDE.md`, `agents.json`). Tout travail disque via `asyncio.to_thread` — la boucle n'est jamais bloquée.
+
+Invariant : deux requêtes successives sans changement de fichier ne lisent et ne parsent chacun qu'une fois.
+
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
