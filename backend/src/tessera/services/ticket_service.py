@@ -31,6 +31,21 @@ _STATUS_DIRS: dict[TicketStatus, str] = {
 _PIPELINE_LOG_MAX_LINES = 200
 
 
+def _build_body(description: str, acceptance_criteria: list[str]) -> str:
+    """Assemble ticket body from description and acceptance criteria.
+
+    When criteria are present, appends a '## Critères d'acceptation' section
+    with one '- [ ] …' checkbox per criterion — the format that
+    `_extract_criteria` (pipeline_text.py) expects.  When the list is empty,
+    returns the description unchanged so no empty section is written.
+    """
+    if not acceptance_criteria:
+        return description
+    lines = [description, "", "## Critères d'acceptation", ""]
+    lines.extend(f"- [ ] {criterion}" for criterion in acceptance_criteria)
+    return "\n".join(lines)
+
+
 def _slugify(text: str, max_len: int = 40) -> str:
     slug = re.sub(r"[^\w\s-]", "", text.lower())
     slug = re.sub(r"[\s_]+", "-", slug)
@@ -224,7 +239,7 @@ class TicketService:
                 priority=TicketPriority(draft.priority),
                 agent=draft.agent,
                 depends_on=depends_on,
-                body=draft.description,
+                body=_build_body(draft.description, draft.acceptance_criteria),
             )
             created.append(await self.create_ticket(ticket))
         return created

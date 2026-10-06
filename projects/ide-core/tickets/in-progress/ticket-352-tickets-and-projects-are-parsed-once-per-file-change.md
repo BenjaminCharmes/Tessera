@@ -1,14 +1,14 @@
 ---
-id: ticket-352
-title: "Tickets and projects are parsed once per file change, off the event loop"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-05
 depends_on: []
 estimated_days: 1
-created: 2026-10-05
+id: ticket-352
+pr_number: null
+priority: high
+status: in-progress
+title: Tickets and projects are parsed once per file change, off the event loop
+type: fix
 ---
 
 # ticket-352 — Tickets et projets ne se relisent qu'à leur changement, hors de la boucle

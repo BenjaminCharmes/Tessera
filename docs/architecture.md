@@ -133,6 +133,15 @@ Un réglage à 0 ou moins **désactive** cette borne — utile pour le développ
 mono-projet ou les machines puissantes. La valeur par défaut de 2 est 
 suffisante pour une machine de développement typique sous quatre cœurs.
 
+#### Parallélisme des chaînes frontend et backend (ticket-351)
+
+`verifier.py` organise les tests en deux chaînes indépendantes, exécutées en parallèle :
+
+- **BACKEND_STEPS** : pytest (tests), puis mypy (type-checking)
+- **FRONTEND_STEPS** : tsc (type-checking), eslint (linter), puis vitest (tests)
+
+Chaque chaîne s'exécute séquentiellement — un échec dans une étape bloque les suivantes de la même chaîne — et s'arrête à son premier échec. Les deux chaînes tournent simultanément, ce qui réduit la durée totale au maximum des deux au lieu de leur somme. Le code de sortie est non nul si l'une des deux échoue. Les sorties sont capturées séparément pour éviter l'entrelacement et affichées à la fin : d'abord backend, puis frontend.
+
 ### Gestion du parallélisme Ollama (ticket-350)
 
 Quand plusieurs runs utilisent un même serveur Ollama local, les requêtes
@@ -828,6 +837,8 @@ github_issue_url: https://github.com/...  # optionnel
 ---
 Corps du ticket en Markdown...
 ```
+
+Les tickets créés par lot depuis un plan conservent leurs critères d'acceptation : le corps du ticket inclut une section `## Critères d'acceptation` avec une case à cocher par critère (`- [ ] …`). Ce format est directement lisible par `_extract_criteria` et permet au validateur de juger chaque critère indépendamment.
 
 ## Chat conversationnel (ticket-048, 225)
 

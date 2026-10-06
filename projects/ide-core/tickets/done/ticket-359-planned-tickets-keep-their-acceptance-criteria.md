@@ -1,14 +1,14 @@
 ---
-id: ticket-359
-title: "Tickets created from a plan keep their acceptance criteria"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-06
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-06
+id: ticket-359
+pr_number: 284
+priority: critical
+status: done
+title: Tickets created from a plan keep their acceptance criteria
+type: fix
 ---
 
 # ticket-359 — Un ticket créé depuis un plan garde ses critères d'acceptation
