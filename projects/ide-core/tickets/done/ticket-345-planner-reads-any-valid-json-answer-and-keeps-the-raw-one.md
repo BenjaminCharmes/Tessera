@@ -4,7 +4,7 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
 id: ticket-345
-pr_number: null
+pr_number: 275
 priority: high
 status: done
 title: The planner reads any valid JSON answer, and keeps the raw answer when it cannot
