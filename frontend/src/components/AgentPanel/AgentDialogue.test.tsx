@@ -93,10 +93,10 @@ describe("AgentDialogue", () => {
     ).toBeInTheDocument();
   });
 
-  it("n'affiche pas l'accusé pour une réponse transmise", () => {
+  it("n'affiche pas l'accusé 'déposée' pour une réponse transmise", () => {
     render(
       <AgentDialogue
-        pendingQuestion="On casse l'API ?"
+        pendingQuestion={null}
         enCours
         answerAck="transmitted"
         onAnswer={() => {}}
@@ -106,6 +106,22 @@ describe("AgentDialogue", () => {
     );
 
     expect(screen.queryByTestId("answer-ack-deposited")).toBeNull();
+  });
+
+  it("affiche 'Réponse transmise à l'agent.' quand answerAck vaut 'transmitted' (ticket-358)", () => {
+    render(
+      <AgentDialogue
+        pendingQuestion={null}
+        enCours
+        answerAck="transmitted"
+        onAnswer={() => {}}
+        onInterject={() => {}}
+        onStop={() => {}}
+      />,
+    );
+
+    expect(screen.getByTestId("answer-ack-transmitted")).toBeInTheDocument();
+    expect(screen.getByText(/Réponse transmise à l'agent\./i)).toBeInTheDocument();
   });
 
   it("disparait quand aucun run ne tourne", () => {
