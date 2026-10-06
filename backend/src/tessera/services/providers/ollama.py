@@ -7,8 +7,10 @@ gardes d'ADR-027 et ADR-031, le budget et le quota vivent dans le SDK Claude.
 L'API native (`/api/chat`) plutôt qu'une compatibilité OpenAI : elle rend les
 compteurs de tokens, et c'est tout ce qu'on lui demande de plus que du texte.
 """
+import asyncio
 import json
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +33,40 @@ DELAI_CONNEXION_S = 5.0
 #: Estimation grossière, volontairement pessimiste : un token vaut environ
 #: trois caractères de code ou de français.
 CARACTERES_PAR_TOKEN = 3
+
+# Registre module-level : base_url → sémaphore (ticket-350).
+# Partagé par tous les OllamaProvider du processus pour sérialiser les
+# requêtes vers le même serveur Ollama. Créé paresseusement à la première
+# demande pour chaque serveur distinct.
+_SLOTS: dict[str, asyncio.Semaphore] = {}
+
+
+def _get_slot(base_url: str) -> asyncio.Semaphore | None:
+    """Returns the shared semaphore for *base_url*, or None when unbounded."""
+    from tessera.config import settings
+
+    limit = settings.ollama_max_concurrent
+    if limit <= 0:
+        return None
+    if base_url not in _SLOTS:
+        _SLOTS[base_url] = asyncio.Semaphore(limit)
+    return _SLOTS[base_url]
+
+
+@asynccontextmanager
+async def _maybe_slot(base_url: str) -> AsyncGenerator[None, None]:
+    """Acquire the per-server slot before entering, release on exit (even on error)."""
+    slot = _get_slot(base_url)
+    if slot is None:
+        yield
+    else:
+        async with slot:
+            yield
+
+
+def _reset_slots() -> None:
+    """Clear the semaphore registry — for tests only."""
+    _SLOTS.clear()
 
 
 class OllamaProvider:
@@ -70,10 +106,13 @@ class OllamaProvider:
         # reprendre — ignorés, comme dans `AnthropicApiProvider`.
         await self._verifier_modele(model)
         corps = _corps(system, user, model, max_tokens, stream=False)
-        try:
-            reponse = await self._http().post("/api/chat", json=corps)
-        except httpx.HTTPError as exc:
-            raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
+        # Le créneau est pris avant d'envoyer la requête : le délai de lecture
+        # httpx ne court qu'à partir de l'envoi, pas pendant l'attente du slot.
+        async with _maybe_slot(self.base_url):
+            try:
+                reponse = await self._http().post("/api/chat", json=corps)
+            except httpx.HTTPError as exc:
+                raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
         _verifier_statut(reponse)
         donnees = reponse.json()
         return _resultat(str(donnees.get("message", {}).get("content", "")), donnees)
@@ -95,22 +134,25 @@ class OllamaProvider:
         corps = _corps(system, user, model, max_tokens, stream=True)
         fragments: list[str] = []
         dernier: dict[str, Any] = {}
-        try:
-            async with self._http().stream("POST", "/api/chat", json=corps) as reponse:
-                _verifier_statut(reponse)
-                async for ligne in reponse.aiter_lines():
-                    if not ligne.strip():
-                        continue
-                    donnees = json.loads(ligne)
-                    fragment = str(donnees.get("message", {}).get("content", ""))
-                    if fragment:
-                        fragments.append(fragment)
-                        if on_token is not None:
-                            await on_token(fragment)
-                    if donnees.get("done"):
-                        dernier = donnees
-        except httpx.HTTPError as exc:
-            raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
+        # Le créneau est tenu pendant tout le flux : un flux interrompu (exception
+        # du consommateur ou réseau) sort du contextmanager et rend le créneau.
+        async with _maybe_slot(self.base_url):
+            try:
+                async with self._http().stream("POST", "/api/chat", json=corps) as reponse:
+                    _verifier_statut(reponse)
+                    async for ligne in reponse.aiter_lines():
+                        if not ligne.strip():
+                            continue
+                        donnees = json.loads(ligne)
+                        fragment = str(donnees.get("message", {}).get("content", ""))
+                        if fragment:
+                            fragments.append(fragment)
+                            if on_token is not None:
+                                await on_token(fragment)
+                        if donnees.get("done"):
+                            dernier = donnees
+            except httpx.HTTPError as exc:
+                raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
         return _resultat("".join(fragments), dernier)
 
     async def _verifier_modele(self, model: str) -> None:

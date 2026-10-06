@@ -381,6 +381,11 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         ticketEvents,
         currentAgent: s.currentAgent === doneAgent ? null : s.currentAgent,
         etapesEnCours: etapesEnCoursApresDone,
+        // L'agent qui avait posé la question a terminé : plus rien n'attend
+        // de réponse, et l'accusé de réception n'a plus lieu d'être (ticket-358).
+        pendingQuestion: null,
+        questionExpireA: null,
+        answerAck: null,
         coutUsd:
           s.coutUsd +
           (typeof ev.data["cost_usd"] === "number" ? ev.data["cost_usd"] : 0),
@@ -390,12 +395,11 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
     }
     case "agent_token":
     case "agent_tool_use": {
-      // L'agent a repris — sur réponse, ou seul passé le délai (ADR-025).
-      // Garder la question ferait répondre à un agent qui n'écoute plus ;
-      // le registre l'efface déjà, un client en direct ne le faisait pas
-      // (ticket-186).
-      // L'accusé de réception s'efface aussi : l'agent a pris la main, le
-      // message est consommé (ticket-320).
+      // Ces événements signalent que l'agent produit du texte ou utilise un
+      // outil — ils n'ont aucun lien avec la question en attente ni l'accusé
+      // de réception. Le rejeu du journal (ticket-185) émet des agent_token
+      // antérieurs à la question : les effacer ici ferait disparaître une
+      // question toujours en attente (ticket-358).
       const token =
         ev.type === "agent_token" && ev.agent === "codeur"
           ? (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
@@ -420,9 +424,6 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         ...s,
         events,
         ticketEvents,
-        pendingQuestion: null,
-        questionExpireA: null,
-        answerAck: null,
         outils: ev.type === "agent_tool_use" ? s.outils + 1 : s.outils,
         currentTokens:
           ev.agent === "codeur"
@@ -624,12 +625,18 @@ export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
         answerAck: null,
       };
     case "answer_ack": {
-      // Le backend accuse réception de la réponse (ticket-320).
+      // Le backend accuse réception de la réponse (ticket-320, ticket-358).
+      // « transmitted » : la réponse est parvenue à l'agent, la question
+      // disparaît. « deposited » : aucune question n'attendait, la réponse
+      // est en boîte aux lettres — la question éventuelle reste affichée.
       const outcome = ev.data["outcome"];
+      const isTransmitted = outcome === "transmitted";
       return {
         ...s,
         events,
         ticketEvents,
+        pendingQuestion: isTransmitted ? null : s.pendingQuestion,
+        questionExpireA: isTransmitted ? null : s.questionExpireA,
         answerAck:
           outcome === "transmitted" || outcome === "deposited"
             ? outcome

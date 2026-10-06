@@ -641,3 +641,114 @@ def test_suivre_ajoute_revue_et_validation_dans_etapes_en_cours() -> None:
     )
 
     assert run_actif.etapes_en_cours == []
+
+
+# ------------------------------------------------------------------
+# run_tests — gestion des timeouts (ticket-349)
+# ------------------------------------------------------------------
+
+
+class _TestRunnerResult:
+    """Fake TestRunnerService that returns a sequence of results."""
+
+    def __init__(self, results: list) -> None:
+        self._results = iter(results)
+
+    async def run_tests(
+        self, project_path: object, test_command: object = None, **_kwargs: object
+    ) -> object:
+        return next(self._results)
+
+
+def _expired_result() -> object:
+    from tessera.services.test_runner import TestResult
+    return TestResult(passed=False, expiree=True, total=0, failed=0, output_summary="Timeout après 60s — cmd")
+
+
+def _green_result() -> object:
+    from tessera.services.test_runner import TestResult
+    return TestResult(passed=True, expiree=False, total=5, failed=0, output_summary="5 passed in 0.5s")
+
+
+def _red_result() -> object:
+    from tessera.services.test_runner import TestResult
+    return TestResult(passed=False, expiree=False, total=5, failed=1, output_summary="1 failed, 4 passed in 0.5s")
+
+
+async def test_run_tests_sans_runner_rend_true() -> None:
+    """Without a test runner configured, run_tests returns True."""
+    result = await stages.run_tests(_Orch(), _run())
+    assert result is True
+
+
+async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> None:
+    """First timeout + second green: continues without invoking the coder again (ticket-349)."""
+    from tessera.services.pipeline_events import PipelineResult
+
+    runner = _TestRunnerResult([_expired_result(), _green_result()])
+    orch = _Orch(
+        _test_runner=runner,
+        _project_path=Path("/fake"),
+        _test_command="uv run pytest",
+    )
+    result = await stages.run_tests(orch, _run())
+
+    assert result is True, "After expired+green, run_tests must return True (not a bool‑like PipelineResult)"
+    assert "délai dépassé, suite relancée" in "\n".join(orch.logs)
+
+
+async def test_run_tests_deux_expirements_bloquent_le_run() -> None:
+    """Two consecutive timeouts terminate the run as blocked (ticket-349)."""
+    from tessera.services.pipeline_events import PipelineResult
+    from tessera.models.ticket import TicketStatus
+
+    class _TicketSvcMock:
+        def __init__(self) -> None:
+            self.statuts: list[TicketStatus] = []
+
+        async def update_status(self, ticket_id: str, status: TicketStatus) -> None:
+            self.statuts.append(status)
+
+    svc = _TicketSvcMock()
+    events: list[OrchestratorEvent] = []
+    runner = _TestRunnerResult([_expired_result(), _expired_result()])
+    orch = _Orch(
+        _test_runner=runner,
+        _project_path=Path("/fake"),
+        _test_command="uv run pytest",
+        _ticket_svc=svc,
+    )
+    result = await stages.run_tests(orch, _run(events))
+
+    assert isinstance(result, PipelineResult)
+    assert result.final_status is TicketStatus.blocked
+    assert result.approved is False
+    assert result.arret is not None
+    assert "délai dépassé deux fois" in result.arret
+
+
+async def test_run_tests_rouge_non_expire_renvoie_false() -> None:
+    """A regular (non-expired) test failure returns False as before (ticket-349)."""
+    runner = _TestRunnerResult([_red_result()])
+    orch = _Orch(
+        _test_runner=runner,
+        _project_path=Path("/fake"),
+        _test_command="uv run pytest",
+    )
+    result = await stages.run_tests(orch, _run())
+
+    assert result is False
+
+
+async def test_run_tests_log_mentionne_relance_sur_timeout() -> None:
+    """The pipeline-log records the retry when a timeout triggers a replay (ticket-349)."""
+    runner = _TestRunnerResult([_expired_result(), _green_result()])
+    orch = _Orch(
+        _test_runner=runner,
+        _project_path=Path("/fake"),
+        _test_command="uv run pytest",
+    )
+    await stages.run_tests(orch, _run())
+
+    relance_logs = [l for l in orch.logs if "délai dépassé, suite relancée" in l]
+    assert relance_logs, "Expected a log line mentioning 'délai dépassé, suite relancée'"

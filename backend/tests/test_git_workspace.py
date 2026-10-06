@@ -1610,3 +1610,106 @@ async def test_create_branch_a_jour_reprise_sans_changement(repo: Path) -> None:
     # Coder's commit is still reachable
     head_sha = await _git_out(repo, "rev-parse", "HEAD")
     assert head_sha == commit_sha, "previous coder commit must still be HEAD"
+
+
+# ------------------------------------------------------------------
+# Chemins accentués — ticket-346
+# ------------------------------------------------------------------
+
+
+async def test_untracked_files_rend_le_chemin_avec_accent_sans_guillemets(
+    repo: Path,
+) -> None:
+    """_untracked_files must return the exact UTF-8 path, not git's quoted form.
+
+    Without core.quotePath=false, git wraps non-ASCII paths in double quotes
+    and replaces each byte with its octal escape (e.g.
+    ``"tickets/todo/ticket-004-fl\\303\\250ches.md"``).  That quoted string
+    matches no real filesystem path, so every subsequent comparison fails.
+    """
+    tickets_dir = repo / "tickets" / "todo"
+    tickets_dir.mkdir(parents=True)
+    (tickets_dir / "ticket-004-flèches.md").write_text(
+        "# ticket-004\n", encoding="utf-8"
+    )
+
+    service = GitWorkspaceService(repo)
+    untracked = await service._untracked_files()
+
+    assert "tickets/todo/ticket-004-flèches.md" in untracked, (
+        f"expected exact UTF-8 path; got: {untracked!r}"
+    )
+    for path in untracked:
+        assert not path.startswith('"'), f"quoted path detected: {path!r}"
+        assert "\\303" not in path, f"octal-escaped byte detected: {path!r}"
+
+
+async def test_commit_all_exclut_un_fichier_preexistant_avec_accent(
+    repo: Path,
+) -> None:
+    """A pre-existing untracked file with an accent must not be swept into the commit.
+
+    Reproduces the serpent incident: five accented ticket files were untracked
+    before the run.  Because their paths were quoted by git, the exclusion
+    pathspec built from _preexisting_untracked did not match them, and they
+    ended up in the ticket's commit.
+    """
+    tickets_dir = repo / "tickets" / "todo"
+    tickets_dir.mkdir(parents=True)
+    (tickets_dir / "ticket-021-spécification.md").write_text(
+        "# ticket-021\nstatus: todo\n", encoding="utf-8"
+    )
+
+    # create_branch records _preexisting_untracked before the coder runs.
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-040", "feature")
+
+    (repo / "code.py").write_text("x = 1\n", encoding="utf-8")
+    sha = await service.commit_all("feat: ticket-040 — feature")
+    assert sha is not None
+
+    files_in_commit = await service._run("show", "--name-only", "--format=", sha)
+    assert "ticket-021" not in files_in_commit, (
+        f"pre-existing accented ticket must not appear in the ticket commit; "
+        f"files in commit: {files_in_commit!r}"
+    )
+
+
+async def test_commit_bookkeeping_inclut_un_ticket_avec_accent_deplace(
+    repo: Path,
+) -> None:
+    """A tracked ticket with accent moved from todo/ to done/ must be in the bookkeeping commit.
+
+    The demineur project holds tickets like ``ticket-021-spécification-…``.
+    After a run, TicketService moves the file from ``tickets/todo/`` to
+    ``tickets/done/``.  Without core.quotePath=false, the new path was quoted
+    and never matched the basename recorded in _tracked_ticket_basenames, so
+    the move was silently ignored and the bookkeeping commit omitted it.
+    """
+    tickets_todo = repo / "tickets" / "todo"
+    tickets_todo.mkdir(parents=True)
+    ticket_file = tickets_todo / "ticket-021-spécification.md"
+    ticket_file.write_text("# ticket-021\nstatus: todo\n", encoding="utf-8")
+    await _git(repo, "add", "tickets/")
+    await _git(repo, "commit", "-q", "-m", "chore: track accented ticket")
+
+    service = GitWorkspaceService(repo)
+    await service.create_branch("ticket-040", "feature")
+
+    # Simulate TicketService moving the file from todo/ to done/
+    tickets_done = repo / "tickets" / "done"
+    tickets_done.mkdir(parents=True)
+    done_file = tickets_done / "ticket-021-spécification.md"
+    done_file.write_text("# ticket-021\nstatus: done\n", encoding="utf-8")
+    ticket_file.unlink()
+
+    (repo / "code.py").write_text("x = 1\n", encoding="utf-8")
+    sha = await service.commit_all("feat: ticket-040 — feature")
+    assert sha is not None
+
+    # HEAD is the bookkeeping commit (landed after the ticket commit).
+    bookkeeping_files = await service._run("show", "--name-only", "--format=", "HEAD")
+    assert "ticket-021-spécification.md" in bookkeeping_files, (
+        f"moved accented ticket must appear in the bookkeeping commit; "
+        f"files: {bookkeeping_files!r}"
+    )

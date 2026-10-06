@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
+import { useState } from "react";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SupervisionView from "./index";
 import { INITIAL } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
-import type { Project, RunActif } from "../../types/api";
+import type { OrchestratorEvent, Project, RunActif } from "../../types/api";
 
 vi.mock("../../lib/api", () => ({
   api: {
@@ -49,7 +50,18 @@ function supervision(
     sortieDuService: () => [],
     signalServices: 0,
     fermerRun: vi.fn(),
+    fermerRuns: vi.fn(),
     ...over,
+  };
+}
+
+function pipelineDoneEvent(finalStatus: string, ticketId = "ticket-001"): OrchestratorEvent {
+  return {
+    type: "pipeline_done",
+    agent: null,
+    ticket_id: ticketId,
+    data: { final_status: finalStatus },
+    timestamp: "2026-01-01T00:00:00.000Z",
   };
 }
 
@@ -477,7 +489,9 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
         projects={PROJETS}
       />,
     );
-    expect(screen.getByRole("button", { name: /Fermer/i })).toBeInTheDocument();
+    // Requête exacte pour ne pas confondre avec le bouton « Fermer par lot »
+    // du menu apparu simultanément (ticket-344).
+    expect(screen.getByRole("button", { name: "Fermer" })).toBeInTheDocument();
   });
 
   it("Fermer porte la classe inline-flex (ticket-267)", () => {
@@ -501,7 +515,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
         projects={PROJETS}
       />,
     );
-    const bouton = screen.getByRole("button", { name: /Fermer/i });
+    const bouton = screen.getByRole("button", { name: "Fermer" });
     expect(bouton.className).toContain("inline-flex");
   });
 
@@ -531,7 +545,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
       />,
     );
 
-    await userEvent.click(screen.getByRole("button", { name: /Fermer/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Fermer" }));
     expect(fermerRun).toHaveBeenCalledWith("run-1");
   });
 
@@ -591,5 +605,162 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
     await waitFor(() =>
       expect(screen.getByText("Agents")).toBeInTheDocument(),
     );
+  });
+});
+
+describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
+  it("Les bloquees retire les bloquees et laisse les terminees et le run en cours", async () => {
+    // run-1 : en cours (runClosed: false)
+    // run-2 : terminé (runClosed: true, done)
+    // run-3 : bloqué (runClosed: true, blocked)
+    const fermerRuns = vi.fn();
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-002" }),
+              run({ run_id: "run-3", project_id: "autre", ticket_id: "ticket-003" }),
+            ],
+            fermerRuns,
+          },
+          {
+            "run-1": { runClosed: false },
+            "run-2": { runClosed: true, events: [pipelineDoneEvent("done")] },
+            "run-3": { runClosed: true, events: [pipelineDoneEvent("blocked")] },
+          },
+        )}
+        projects={[
+          { id: "ide-core", name: "ide-core", path: "/p/ide-core" } as Project,
+          { id: "portfolio", name: "portfolio", path: "/p/portfolio" } as Project,
+          { id: "autre", name: "autre", path: "/p/autre" } as Project,
+        ]}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Fermer par lot" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: /Les bloqués/ }));
+
+    // Seul run-3 est bloqué.
+    expect(fermerRuns).toHaveBeenCalledWith(["run-3"]);
+    // run-1 (en cours) et run-2 (terminé) ne sont pas dans le lot.
+    const appel = fermerRuns.mock.calls[0][0] as string[];
+    expect(appel).not.toContain("run-1");
+    expect(appel).not.toContain("run-2");
+  });
+
+  it("Tous les runs clos ne retire jamais un run dont runClosed est false", async () => {
+    const fermerRuns = vi.fn();
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-actif", project_id: "ide-core", ticket_id: "ticket-001" }),
+              run({ run_id: "run-clos", project_id: "portfolio", ticket_id: "ticket-002" }),
+            ],
+            fermerRuns,
+          },
+          {
+            "run-actif": { runClosed: false },
+            "run-clos": { runClosed: true, events: [pipelineDoneEvent("done")] },
+          },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Fermer par lot" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: /Tous les runs clos/ }));
+
+    const appel = fermerRuns.mock.calls[0][0] as string[];
+    expect(appel).not.toContain("run-actif");
+    expect(appel).toContain("run-clos");
+  });
+
+  it("le menu est absent sans run clos", () => {
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+            ],
+          },
+          { "run-1": { runClosed: false } },
+        )}
+        projects={PROJETS}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "Fermer par lot" })).not.toBeInTheDocument();
+  });
+
+  it("une entree dont le compte vaut zero est desactivee", async () => {
+    // Un run terminé : « Les bloqués (0) » doit être désactivé dans le menu.
+    render(
+      <SupervisionView
+        supervision={supervision(
+          {
+            runs: [
+              run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+            ],
+          },
+          { "run-1": { runClosed: true, events: [pipelineDoneEvent("done")] } },
+        )}
+        projects={PROJETS}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Fermer par lot" }));
+
+    // « Les bloqués (0) » est dans le menu et désactivé.
+    const entreeBloquee = screen.getByRole("menuitem", { name: /Les bloqués/ });
+    expect(entreeBloquee).toBeDisabled();
+    // « Les terminés (1) » est activé.
+    const entreeTerminee = screen.getByRole("menuitem", { name: /Les terminés/ });
+    expect(entreeTerminee).not.toBeDisabled();
+  });
+
+  it("fermer le lot qui contient le run selectionne laisse le panneau sur un run restant", async () => {
+    // Wrapper avec état local pour simuler la suppression effective des runs.
+    function Wrapper() {
+      const [runsActifs, setRunsActifs] = useState([
+        run({ run_id: "run-1", project_id: "ide-core", ticket_id: "ticket-001" }),
+        run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-002" }),
+      ]);
+
+      const sup = supervision(
+        {
+          runs: runsActifs,
+          selection: "run-1",
+          fermerRuns: (ids: string[]) =>
+            setRunsActifs((prev) => prev.filter((r) => !ids.includes(r.run_id))),
+        },
+        {
+          "run-1": { runClosed: true, events: [pipelineDoneEvent("done")] },
+          "run-2": { runClosed: false },
+        },
+      );
+
+      return <SupervisionView supervision={sup} projects={PROJETS} />;
+    }
+
+    render(<Wrapper />);
+
+    // Ouvrir le menu et cliquer sur « Les terminés ».
+    await userEvent.click(screen.getByRole("button", { name: "Fermer par lot" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: /Les terminés/ }));
+
+    // run-1 (terminé) a été retiré : sa carte disparaît.
+    await waitFor(() =>
+      expect(
+        screen.queryByLabelText("Run ticket-001 sur ide-core"),
+      ).not.toBeInTheDocument(),
+    );
+
+    // run-2 (en cours) reste : le panneau Agents est toujours affiché.
+    expect(screen.getByLabelText("Run ticket-002 sur portfolio")).toBeInTheDocument();
+    expect(screen.getByText("Agents")).toBeInTheDocument();
   });
 });

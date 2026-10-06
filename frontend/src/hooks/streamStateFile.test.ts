@@ -486,7 +486,10 @@ describe("applyEvent — answer_ack (ticket-320)", () => {
     expect(s.answerAck).toBeNull();
   });
 
-  it("efface l'accusé quand l'agent reprend (agent_token)", () => {
+  it("ne touche pas à l'accusé de réception quand l'agent produit un token (ticket-358)", () => {
+    // agent_token décrivait précédemment le défaut : effacer l'accusé sur token
+    // masquait aussi la question en attente après un rejeu de journal.
+    // Désormais, agent_token ne touche ni pendingQuestion ni answerAck.
     let s = applyEvent(
       INITIAL,
       ev({ type: "answer_ack", agent: null, data: { outcome: "transmitted" } }),
@@ -495,6 +498,40 @@ describe("applyEvent — answer_ack (ticket-320)", () => {
       s,
       ev({ type: "agent_token", agent: "codeur", data: { token: "…" } }),
     );
-    expect(s.answerAck).toBeNull();
+    expect(s.answerAck).toBe("transmitted");
+  });
+});
+
+describe("applyEvent — question persistante après token/tool_use (ticket-358)", () => {
+  it("pendingQuestion reste après agent_token", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_question", data: { question: "On casse l'API ?" } }));
+    s = applyEvent(s, ev({ type: "agent_token", agent: "codeur", data: { token: "…" } }));
+    expect(s.pendingQuestion).toBe("On casse l'API ?");
+  });
+
+  it("pendingQuestion reste après agent_tool_use", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_question", data: { question: "On casse l'API ?" } }));
+    s = applyEvent(s, ev({ type: "agent_tool_use", agent: "codeur", data: { tool: "Read" } }));
+    expect(s.pendingQuestion).toBe("On casse l'API ?");
+  });
+
+  it("answer_ack transmitted met pendingQuestion à null et answerAck à 'transmitted'", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_question", data: { question: "On casse l'API ?" } }));
+    s = applyEvent(s, ev({ type: "answer_ack", agent: null, data: { outcome: "transmitted" } }));
+    expect(s.pendingQuestion).toBeNull();
+    expect(s.answerAck).toBe("transmitted");
+  });
+
+  it("answer_ack deposited ne retire pas une question en attente", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_question", data: { question: "On casse l'API ?" } }));
+    s = applyEvent(s, ev({ type: "answer_ack", agent: null, data: { outcome: "deposited" } }));
+    expect(s.pendingQuestion).toBe("On casse l'API ?");
+  });
+
+  it("agent_done met pendingQuestion à null", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "codeur", data: { round: 1 } }));
+    s = applyEvent(s, ev({ type: "agent_question", data: { question: "On casse l'API ?" } }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "codeur", data: { content: "fait" } }));
+    expect(s.pendingQuestion).toBeNull();
   });
 });

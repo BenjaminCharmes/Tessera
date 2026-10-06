@@ -150,6 +150,15 @@ export default function AgentDialogue({
         </p>
       )}
 
+      {answerAck === "transmitted" && (
+        <p
+          className="mb-2 text-micro text-zinc-500"
+          data-testid="answer-ack-transmitted"
+        >
+          Réponse transmise à l'agent.
+        </p>
+      )}
+
       {/* L'arrêt est une sortie, pas une annulation : le run commite ce qu'il
           a déjà produit, parce que le ticket suivant dépend d'un arbre propre
           (ADR-018). */}

@@ -27,7 +27,7 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
-from tessera.services.pipeline_outcomes import finish_security_block
+from tessera.services.pipeline_outcomes import finish_security_block, finish_timeout_expired
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
 from tessera.services.security_auditor import SecurityAuditResult
@@ -444,15 +444,18 @@ def _role_qui_produit(type_de_ticket: "TicketType") -> AgentRole:
 # ------------------------------------------------------------------
 
 
-async def run_tests(orch: "Orchestrator", run: PipelineRun) -> bool:
-    """Lance la suite de tests du projet. Rend `False` si elle est rouge.
+async def run_tests(
+    orch: "Orchestrator", run: PipelineRun
+) -> "bool | PipelineResult":
+    """Lance la suite de tests du projet.
 
-    Le résultat n'était qu'ajouté au contexte du reviewer : un ticket dont les
-    tests cassent pouvait donc être approuvé par un reviewer qui n'avait pas
-    regardé la ligne rouge. Le rendre ici permet à l'orchestrateur de renvoyer
-    au codeur sans passer par la revue (ticket-098).
+    Rend ``False`` quand les tests sont rouges (le codeur reprend).
+    Rend ``True`` quand les tests passent, ou quand il n'y a pas de testeur.
+    Rend un ``PipelineResult`` (blocked) quand le délai expire deux fois de
+    suite : aucun code n'est en cause, et il serait inutile d'invoquer le
+    codeur (ticket-349).
 
-    Rend `True` quand il n'y a pas de testeur, ou pas de commande détectée :
+    Rend ``True`` quand il n'y a pas de testeur, ou pas de commande détectée :
     l'absence de test n'est pas un échec de test.
     """
     if not (orch._test_runner and orch._project_path):
@@ -461,9 +464,27 @@ async def run_tests(orch: "Orchestrator", run: PipelineRun) -> bool:
     from tessera.services.test_runner import TestCommandNotFound
 
     try:
+        async def _on_attente() -> None:
+            orch._log(f"[{run.ticket_id}] testeur: en attente d'un créneau de test")
+
         result = await orch._test_runner.run_tests(
-            orch._project_path, test_command=orch._test_command
+            orch._project_path,
+            test_command=orch._test_command,
+            en_attente=_on_attente,
         )
+
+        # Un timeout ne dit rien sur le code : relancer une fois sans repasser
+        # par le codeur est moins coûteux qu'un tour complet (ticket-349).
+        if result.expiree:
+            orch._log(
+                f"[{run.ticket_id}] testeur: délai dépassé, suite relancée"
+            )
+            result = await orch._test_runner.run_tests(
+                orch._project_path, test_command=orch._test_command
+            )
+            if result.expiree:
+                return await finish_timeout_expired(orch, run)
+
         run.test_result = result
         await emit(
             run,

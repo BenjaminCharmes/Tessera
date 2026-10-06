@@ -85,3 +85,12 @@ npm run test          # Vitest unit tests
 npm run test:coverage # Rapport de couverture
 npm run test:e2e      # Playwright E2E (5 flows, nécessite npm run dev)
 ```
+
+## MAX_PARALLEL_TEST_RUNS
+
+Par défaut, `2`. Nombre maximum de suites de tests qui peuvent tourner en parallèle sur la machine.
+
+Quand plusieurs files lancent des tests en même temps sur des projets différents, ce réglage les met en file d'attente : seul `MAX_PARALLEL_TEST_RUNS` tests avancent à la fois. Les autres attendent leur créneau. Le log du pipeline affiche « testeur: en attente d'un créneau de test » quand un testeur attend son tour.
+
+Mettre la valeur à `0` ou moins désactive la borne — tous les tests tournent en parallèle, ce qui peut surcharger la machine quand plusieurs files tournent simultanément.
+

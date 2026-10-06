@@ -105,12 +105,70 @@ Au démarrage, le backend configure un logger qui écrit dans un fichier rotatif
 
 Un opérateur peut consulter ces fichiers pour déboguer un arrêt inattendu du backend.
 
+
+### Gestion du parallélisme des tests (ticket-348)
+
+Quand plusieurs files tournent en parallèle sur plusieurs projets, le testeur de 
+chaque file lançait simultanément sa suite complète. Cela saturait la machine — 
+six suites d'environ six minutes chacune ne laissaient à aucune de CPU libre, 
+causant des timeouts (ticket-347).
+
+`TestRunnerService` est instancié à chaque requête. Un verrou posé sur l'instance 
+ne protège rien. La solution est un `asyncio.Semaphore` **au niveau du module**, 
+créé paresseusement à la première utilisation avec la valeur `max_parallel_test_runs` 
+(défaut **2** — configuré dans `config.py`, variable `MAX_PARALLEL_TEST_RUNS`).
+
+**Garanties** :
+- Au maximum `N` suites de tests tournent en parallèle sur la machine, tous 
+  projets confondus
+- Le timeout ne s'écoule qu'**après** l'obtention du créneau — l'attente en file 
+  d'attente n'est pas décomptée du délai alloué
+- Un rappel optionnel `en_attente: Callable` est appelé une seule fois quand un 
+  créneau n'est pas immédiatement disponible, permettant au pipeline d'enregistrer 
+  une ligne dans le log : `[ticket-XXX] testeur: en attente d'un créneau de test`
+- Le créneau est rendu sur tous les chemins de sortie : timeout, exception, 
+  annulation (`async with`)
+
+Un réglage à 0 ou moins **désactive** cette borne — utile pour le développement 
+mono-projet ou les machines puissantes. La valeur par défaut de 2 est 
+suffisante pour une machine de développement typique sous quatre cœurs.
+
+### Gestion du parallélisme Ollama (ticket-350)
+
+Quand plusieurs runs utilisent un même serveur Ollama local, les requêtes
+se disputaient le modèle et la mémoire. Un validateur appelant le même serveur
+qu'un codeur voyait ses délais grandir — des validations de 330 secondes ont
+été relevées le 2026-10-05, frôlant le timeout de 300 s. Quand le délai de
+lecture httpx commence à courir en attente invisible du créneau du serveur,
+l'appel expire sans avoir pu faire de progrès.
+
+`OllamaProvider` est instancié par rôle (`provider_pour_role`) : un verrou sur
+l'instance ne protège qu'elle seule. Plusieurs rôles demandent le même modèle
+à la fois. La solution est un `asyncio.Semaphore` **au niveau du module**,
+créé paresseusement à la première utilisation, keyed par la `base_url` du
+serveur, avec la valeur `OLLAMA_MAX_CONCURRENT` (défaut **1** — configuré dans
+`config.py`).
+
+**Garanties** :
+- Au maximum **1** requête en vol par `base_url` à la fois
+- Plusieurs serveurs Ollama (différentes `base_url`) ne se bloquent pas
+  mutuellement
+- L'attente du créneau n'est pas bornée par le timeout httpx : le délai de
+  lecture ne s'écoule qu'après l'envoi réel de la requête
+- Un flux (`stream`) abandonné avant sa fin rend le créneau : un `complete`
+  suivant aboutit
+- Une requête en erreur rend le créneau, exception quelconque
+
+Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes sont
+lancées concurremment. Utile pour déboguer un modèle ou tester le
+load-balancing interne d'Ollama.
+
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé onze correctifs, tous nés d'un usage réel :
+Cette promesse a demandé douze correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -182,6 +240,14 @@ Cette promesse a demandé onze correctifs, tous nés d'un usage réel :
   `in-review/`, `done/`, `blocked/`, `archive/`). Si absent localement, il 
   le cherche sur la branche de base distante. Seul si absent partout, le 
   pipeline émet un événement d'erreur et passe le ticket en `blocked`.
+- **Chemins accentués lus correctement** (ticket-346). `git ls-files` et autres 
+  commandes listant les chemins encodent les noms non ASCII avec guillemets et 
+  octets échappés — `"tickets/todo/ticket-004-clavier-fl\303\250ches.md"` — ce qui 
+  ne correspond à aucun chemin réel du système de fichiers. Toute lecture de liste 
+  de chemins git utilise désormais l'option `-z` (séparateur null) ou 
+  `-c core.quotePath=false` (désactiver l'échappement), et découpe sur le 
+  séparateur réel. Cela garantit que les tickets à accent ne sont jamais perdus 
+  lors du balayage des modifications ou du déplacement de fichiers.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
@@ -206,9 +272,21 @@ Passé `dialogue_timeout_s`, l'agent reprend seul en **énonçant son hypothèse
 un run suspendu tient du travail non commité, et bloquerait la file des tickets.
 Une réponse qui arrive après l'expiration n'est pas perdue : elle est déposée dans
 la boîte aux lettres comme message spontané, que l'agent lira au tour suivant.
-Le système signale à l'interface si la réponse a été transmise à la question ou
-déposée pour le tour suivant, et l'interface affiche cet accusé. Une question
-expirée s'affiche comme telle, avec l'hypothèse que l'agent a énoncée.
+
+L'interface affiche l'état de chaque réponse :
+
+- **Transmise** (`answer_ack` avec `outcome: "transmitted"`) : la question et le
+  champ disparaissent, remplacés par un accusé « Réponse transmise à l'agent. »
+  (style `zinc`). Cet accusé est émis à tous les observateurs du run.
+- **Déposée** (`outcome: "deposited"`) : la réponse attend le tour suivant, la
+  question reste affichée.
+- **Expirée** : sans réponse jusqu'au `agent_done`, elle s'affiche comme « Question
+  expirée… » avec l'hypothèse de l'agent.
+
+Lors du rejeu du journal du texte (quand l'utilisateur change de sélection ou
+recharge la page), les événements texte (`agent_token`, `agent_tool_use`) ne
+modifient pas l'état d'une question en attente. Seul un événement de réponse
+(`answer_ack`) ou de fin d'agent (`agent_done`) nettoie cet état.
 
 ### Système visuel du frontend (ADR-026)
 
@@ -334,6 +412,31 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
 - Un fichier non suivi déjà présent au démarrage du run n'est jamais balayé dans le
   commit du ticket : il ne vient pas du codeur.
 - Le verdict du reviewer est la première ligne qui commence par APPROVED ou CHANGES_REQUESTED. Une approbation qui nomme CHANGES_REQUESTED sur la même ligne est un refus ; sur les lignes suivantes, elle approuve (ticket-298, ADR-009).
+
+### Testeur et timeouts (ticket-349)
+
+`TestResult` porte un champ `expiree: bool = False` pour distinguer un timeout d'un vrai test échoué.
+
+**Cas 1 : Test échoué ordinaire** (`expiree=False`, `passed=False`)
+- Le codeur a écrit du code qui ne marche pas
+- Le pipeline renvoie le ticket au codeur pour correction
+- Comportement existant, inchangé
+
+**Cas 2 : Premier timeout** (`expiree=True`)
+- La suite de tests n'a pas terminé dans le délai autorisé
+- Elle n'a rien prouvé sur le code
+- Le pipeline rejoue la suite **une fois**, sur la même branche, espérant que la machine soit moins chargée
+- Si la relance passe, le run continue normalement vers la sécurité
+- Si la relance expire aussi, passage au cas 3
+
+**Cas 3 : Deux timeouts consécutifs** (`expiree=True` deux fois)
+- La suite expire malgré une relance
+- Le run se termine en `blocked` avec raison « testeur: délai dépassé deux fois »
+- Le commit est fait (comme toute sortie terminale)
+- Le ticket n'est pas renvoyé au codeur et aucun tour n'est consommé
+- Cet état signale un problème système (machine surchargée, délai configuré trop court) plutôt qu'un défaut du code
+
+L'enregistrement du pipeline écrit « testeur: délai dépassé, suite relancée » dans le `pipeline-log.md` à chaque relance.
 
 ### Validation et fichiers cités (ticket-316)
 

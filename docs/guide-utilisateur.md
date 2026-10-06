@@ -188,6 +188,15 @@ Si un ticket dépend d'un autre, l'IDE t'empêche de le lancer tant que la dépe
 Un ticket sans dépendance peut commencer pendant que la PR du précédent attend sa CI : tu gagnes en vitesse en les lançant tous d'un coup. Déclare une dépendance uniquement si ton ticket repose vraiment sur le code d'un autre — par exemple, une API qu'on ajoute et le client qui l'utilise.
 
 
+Si le ticket dépend d'un autre et que le serveur distant n'est pas accessible, le pipeline arrête le ticket avec une raison explicite. C'est voulu : un ticket qui dépend d'un autre doit partir d'une base à jour, qui contient le merge du prédécesseur. Le fetch distant est retenté jusqu'à trois fois ; après trois échecs, le ticket se bloque plutôt que de partir d'une base périmée.
+
+
+Chaque ticket débute par un **en-tête YAML** — les champs `id`, `title`, `type`, `status`, etc. — suivi de son corps en Markdown.
+
+En vue Rendu (la vue par défaut), cet en-tête s'affiche en **fiche clé/valeur** au-dessus du corps, un champ par ligne. C'est bien plus lisible que l'ancien affichage, où le `---` devenait une barre, tous les champs un seul bloc de texte, et le `---` de fermeture un titre.
+
+En vue Source (Monaco), tu vois le fichier brut, frontmatter compris.
+
 ## 3 bis. Filtrer et trouver les tickets
 
 Une fois que tu as plusieurs tickets, tu veux souvent en retrouver un particulier. Le tableau mémorise tes filtres (type, priorité, agent, texte) — ils survivent même au redémarrage de l'IDE.
@@ -323,6 +332,9 @@ Après l'audit de sécurité, les étapes de **revue** et de **validation** dém
 
 Pour que le ticket soit approuvé, le reviewer **et** le validateur doivent tous les deux approuver. Si l'un refuse, le ticket est refusé — même si l'autre a approuvé. Tu reçois les motifs de celui qui a refusé, ou des deux si les deux ont refusé.
 
+
+Quand tu vois la ligne « testeur: en attente d'un créneau de test » dans le log, cela signifie qu'un autre testeur utilise le créneau de tests (limité à `MAX_PARALLEL_TEST_RUNS` tests simultanés). Le testeur actuel attend son tour, mais cette attente n'affecte pas le timeout — seul le temps réel d'exécution du test compte.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -372,6 +384,10 @@ Quand le pipeline finit (approuvé ou bloqué), la carte du run change d'aspect 
 Par défaut, une fois approuvé, le pipeline enchaîne jusqu'à la livraison — tant qu'il y a un dépôt git et que le projet l'autorise. Sinon, tu vois pourquoi ça s'est arrêté.
 
 
+En haut de l'onglet Supervision, tu as aussi un menu « Fermer… » qui t'affiche le nombre de runs dans chaque catégorie : « Les terminés (3) », « Les bloqués (1) », « En erreur ». Tu cliques sur une entrée pour fermer tous les runs de cette catégorie en un coup. Une entrée avec zéro run est grisée. Le menu ne s'affiche que si au moins un run est clos.
+
+Si tu avais sélectionné un run que tu fermes avec le lot, la Supervision bascule sur un run restant.
+
 ### Rouvrir un run terminé
 
 Un run une fois terminé disparaît de la Supervision après un rechargement ou une fermeture de session. Mais tu peux le relire à tout moment depuis l'historique :
@@ -394,6 +410,11 @@ Si tu recharges la page durant un run en cours, tu retrouves instantanément tou
 
 
 Tu retrouves aussi un run depuis le panneau du ticket. Ouvre le ticket — le bouton « Voir le ticket » en haut du run fermé t'y mène — et clique sur « Revoir le run » pour afficher le déroulé complet : plan initial, tous les tours, verdicts du reviewer et du validateur.
+
+
+Quand tu sélectionnes un ticket qui a des runs terminés, une bande « Runs de ce ticket » apparaît sous la fiche d'en-tête. Elle liste chaque run : son statut (approuvé, rejeté), la date, les tours complétés, le coût. Un bouton « Revoir le run » ouvre la vue en lecture seule du run, qui rejoue son déroulé entier — tous les événements, les verdicts étape par étape, exactement comme à l'époque. Fermer cette vue revient au fichier du ticket.
+
+Un ticket sans run terminé ne montre pas de bande. Un fichier ouvert depuis l'arbre (par double-clic dans l'explorateur) n'en montre pas non plus.
 
 ### La frise d'étapes
 
@@ -449,6 +470,17 @@ Le log reste affiché une fois le run clos, pour relire ce qui s'est passé.
 Quand revue et validation sont parallèles, leurs événements s'entrelaçent dans le fil : le reviewer démarre, puis le validateur démarre, puis des tokens du reviewer, puis des tokens du validateur, etc. Si les deux refusent, tu vois les deux motifs avec le nom de chaque étape.
 
 Une carte **TESTEUR** s'ajoute au fil après chaque passage du codeur. Elle porte le résumé des résultats — `1 error in 2.32s` ou `all pass` — et, dépliée, le détail des erreurs. Si la suite est rouge, elle t'explique : **« retour au codeur, sans revue »** — c'est pourquoi l'étape Tests est rouge et que l'audit de sécurité et la revue ne tourneront pas ce tour.
+
+### Runs récents — chercher et afficher plus
+
+Dans le cockpit ou l'onglet Supervision, une carte « Runs récents » affiche les dix derniers runs. Tu peux :
+- **Chercher** : tape dans le champ en haut de la carte pour filtrer par numéro de ticket ou nom du projet. La recherche se lance automatiquement quand tu arrêtes de taper.
+- **Afficher plus** : clique le bouton en bas pour ajouter 20 runs à la liste.
+
+Sans action de ta part, la carte reste aux dix runs : elle ne fait aucun appel API en arrière-plan.
+
+
+La bande « Runs de ce ticket » affiche tes trois runs les plus récents, triés du plus neuf au plus vieux. Seuls les vrais runs du ticket apparaissent : les enveloppes de file — qui portent l'id du premier ticket et rejouent les événements de la file entière — sont écartées. Un bouton « Afficher les N autres » déplie le reste. La bande est bornée en hauteur et défile si besoin, afin que le ticket lui-même reste lisible même après beaucoup de runs.
 
 ## 5 ter. Après le run : fusion automatique
 
@@ -693,6 +725,11 @@ que seul le SDK fournit.
 
 ---
 
+
+Les requêtes à Ollama sont **mises en file d'attente par serveur** — une seule à la fois par défaut. Cela élimine la compétition sur le modèle quand plusieurs runs demandent Ollama au même moment : chacun attend son tour, puis obtient une réponse à pleine vitesse.
+
+Si tu as besoin d'augmenter le nombre de requêtes concurrentes (sur une machine très puissante, par exemple), configure `ollama_max_concurrent` dans ta configuration Tessera (défaut 1 ; à 0 ou moins pour désactiver cette borne).
+
 ### Direction visuelle pour les interfaces
 
 Quand un ticket crée ou modifie une interface — une route qui ajoute des écrans, un composant UI — le codeur commence par établir une charte visuelle avant d'écrire du code.
@@ -723,6 +760,8 @@ Cette charte garantit une cohérence dans le temps : chaque ticket UI la respect
 ### Ce que le testeur attrape
 
 Le testeur lance les mêmes outils que ta CI : `pytest` et `mypy` pour Python, `tsc` pour TypeScript, puis `eslint` et `vitest` pour le frontend. Un ticket n'échouera plus soudain en CI sur une erreur de typage ou de lint — le pipeline les détecte tous maintenant, avant même que la PR soit ouverte.
+
+Si tes critères de test chaînent plusieurs étapes avec l'opérateur `&&` (par exemple, `npm run build && npm run test`), le testeur les lance une à une et s'arrête à la première qui échoue. C'est le seul opérateur supporté : `|`, `||`, `;`, `>`, `&` et les redirections sont refusés avec un message d'erreur.
 
 ## 10. Intégration GitHub
 

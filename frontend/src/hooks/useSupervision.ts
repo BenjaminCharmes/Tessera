@@ -64,6 +64,11 @@ export interface UseSupervisionResult {
    * « Fermer » de l'AgentPanel, après avoir vu le résumé final.
    */
   fermerRun: (runId: string) => void;
+  /**
+   * Retire plusieurs runs clos en une seule mise à jour d'état (ticket-344).
+   * `fermerRun` reste disponible pour la fermeture unitaire depuis AgentPanel.
+   */
+  fermerRuns: (runIds: string[]) => void;
 }
 
 const VIDE: StreamState = INITIAL;
@@ -334,6 +339,11 @@ export function useSupervision(): UseSupervisionResult {
     setRuns((prec) => prec.filter((r) => r.run_id !== runId));
   }, []);
 
+  const fermerRuns = useCallback((runIds: string[]) => {
+    const ids = new Set(runIds);
+    setRuns((prec) => prec.filter((r) => !ids.has(r.run_id)));
+  }, []);
+
   return {
     runs,
     selection,
@@ -346,5 +356,6 @@ export function useSupervision(): UseSupervisionResult {
     sortieDuService,
     signalServices,
     fermerRun,
+    fermerRuns,
   };
 }
