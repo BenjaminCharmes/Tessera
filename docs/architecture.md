@@ -133,6 +133,36 @@ Un réglage à 0 ou moins **désactive** cette borne — utile pour le développ
 mono-projet ou les machines puissantes. La valeur par défaut de 2 est 
 suffisante pour une machine de développement typique sous quatre cœurs.
 
+### Gestion du parallélisme Ollama (ticket-350)
+
+Quand plusieurs runs utilisent un même serveur Ollama local, les requêtes
+se disputaient le modèle et la mémoire. Un validateur appelant le même serveur
+qu'un codeur voyait ses délais grandir — des validations de 330 secondes ont
+été relevées le 2026-10-05, frôlant le timeout de 300 s. Quand le délai de
+lecture httpx commence à courir en attente invisible du créneau du serveur,
+l'appel expire sans avoir pu faire de progrès.
+
+`OllamaProvider` est instancié par rôle (`provider_pour_role`) : un verrou sur
+l'instance ne protège qu'elle seule. Plusieurs rôles demandent le même modèle
+à la fois. La solution est un `asyncio.Semaphore` **au niveau du module**,
+créé paresseusement à la première utilisation, keyed par la `base_url` du
+serveur, avec la valeur `OLLAMA_MAX_CONCURRENT` (défaut **1** — configuré dans
+`config.py`).
+
+**Garanties** :
+- Au maximum **1** requête en vol par `base_url` à la fois
+- Plusieurs serveurs Ollama (différentes `base_url`) ne se bloquent pas
+  mutuellement
+- L'attente du créneau n'est pas bornée par le timeout httpx : le délai de
+  lecture ne s'écoule qu'après l'envoi réel de la requête
+- Un flux (`stream`) abandonné avant sa fin rend le créneau : un `complete`
+  suivant aboutit
+- Une requête en erreur rend le créneau, exception quelconque
+
+Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes sont
+lancées concurremment. Utile pour déboguer un modèle ou tester le
+load-balancing interne d'Ollama.
+
 ### Couche git (ADR-018, ADR-024, ADR-027)
 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique

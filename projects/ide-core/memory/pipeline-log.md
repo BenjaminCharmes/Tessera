@@ -1359,3 +1359,45 @@ Analyse effectuée :
 - 2026-10-06 07:41:10 UTC — [ticket-349] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute le champ `expiree` à `TestResu (340062ms)
 - 2026-10-06 07:41:10 UTC — [ticket-349] APPROVED après 2 tour(s)
 - 2026-10-06 07:43:43 UTC — [ticket-349] documentation: 1 fichier(s) (148671ms) — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : section « Ce que le testeur attrape » introuvable.
+- 2026-10-06 07:44:05 UTC — [ticket-349] livraison: rebase sur develop (2125ms)
+- 2026-10-06 07:44:05 UTC — [ticket-349] livraison: PR #279 ouverte (6782ms)
+- 2026-10-06 07:44:05 UTC — [ide-core] ticket-349 PR #279 confiée au CIWatcher
+- 2026-10-06 07:44:09 UTC — [ticket-350] branche ticket-350-ollama-requests-queue-one-at-a-time-per-server-in
+- 2026-10-06 07:44:09 UTC — [ticket-350] tour 1 — codeur démarré
+- 2026-10-06 07:50:34 UTC — [ticket-350] tour 1 — codeur terminé (384546ms)
+- 2026-10-06 07:52:24 UTC — [ticket-350] testeur: 1 failed, 800 passed, 20 warnings in 108.42s (0:01:48)
+- 2026-10-06 07:52:24 UTC — [ticket-350] tests rouges au tour 1
+- 2026-10-06 07:52:24 UTC — [ticket-350] tour 2 — codeur démarré
+- 2026-10-06 07:53:01 UTC — [ticket-350] tour 2 — codeur terminé (36312ms)
+- 2026-10-06 07:57:14 UTC — [ticket-350] testeur: OK (exit 0)
+- 2026-10-06 07:57:42 UTC — [ticket-350] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff implémente une sérialisation  (27092ms)
+- 2026-10-06 07:57:42 UTC — [ticket-350] tour 2 — reviewer démarré
+- 2026-10-06 07:58:55 UTC — [ticket-350] tour 2 — reviewer terminé (73358ms)
+- 2026-10-06 08:03:38 UTC — [ticket-350] validateur: APPROVED — Tous les critères sont satisfaits. La configuration `ollama_max_concurrent` a ét (356655ms)
+- 2026-10-06 08:03:38 UTC — [ticket-350] CHANGES_REQUESTED tour 2: Reviewer : ## Vérification rapide du diffAPPROVED
+
+## Ce qui est bien
+
+1. **Mécanique irréprochable*
+- 2026-10-06 08:03:38 UTC — [ticket-350] tour 3 — codeur démarré
+- 2026-10-06 08:03:54 UTC — [ticket-350] tour 3 — codeur terminé (15671ms)
+- 2026-10-06 08:11:12 UTC — [ticket-350] testeur: OK (exit 0)
+- 2026-10-06 08:11:42 UTC — [ticket-350] securite: PASS — Aucune vulnérabilité OWASP Top 10 détectée dans ce diff. Les modifications intro (29375ms)
+- 2026-10-06 08:11:42 UTC — [ticket-350] tour 3 — reviewer démarré
+- 2026-10-06 08:12:56 UTC — [ticket-350] tour 3 — reviewer terminé (74640ms)
+- 2026-10-06 08:14:36 UTC — [ticket-350] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une sérialis (174312ms)
+- 2026-10-06 08:14:36 UTC — [ticket-350] APPROVED après 3 tour(s)
+- 2026-10-06 08:16:32 UTC — [ticket-350] documentation: 3 fichier(s) (112610ms)
+- 2026-10-06 08:16:46 UTC — [ticket-350] livraison: rebase sur develop (437ms)
+- 2026-10-06 08:16:46 UTC — [ticket-350] livraison: PR #280 ouverte (4688ms)
+- 2026-10-06 08:16:46 UTC — [ide-core] ticket-350 PR #280 confiée au CIWatcher
+- 2026-10-06 08:16:48 UTC — [ticket-351] branche ticket-351-verifier-py-runs-the-backend-and-frontend-checks
+- 2026-10-06 08:16:48 UTC — [ticket-351] tour 1 — codeur démarré
+- 2026-10-06 08:21:19 UTC — [ticket-351] tour 1 — codeur terminé (270984ms)
+- 2026-10-06 08:24:27 UTC — [ticket-351] testeur: OK (exit 0)
+- 2026-10-06 08:24:44 UTC — [ticket-351] securite: PASS — Audit complet : aucune vulnérabilité détectée. Le code refactorise l'orchestrati (17108ms)
+- 2026-10-06 08:24:44 UTC — [ticket-351] tour 1 — reviewer démarré
+- 2026-10-06 08:26:00 UTC — [ticket-351] tour 1 — reviewer terminé (75594ms)
+- 2026-10-06 08:27:13 UTC — [ticket-351] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été mis à jour pour d (148875ms)
+- 2026-10-06 08:27:13 UTC — [ticket-351] APPROVED après 1 tour(s)
+- 2026-10-06 08:28:40 UTC — [ticket-351] documentation: 0 fichier(s) (83952ms) — refusé : doc-technique : projects/ide-core/CLAUDE.md n'est pas de la documentation : un agent de documentation ne touche ni au code, ni aux tickets, ni aux ADR.

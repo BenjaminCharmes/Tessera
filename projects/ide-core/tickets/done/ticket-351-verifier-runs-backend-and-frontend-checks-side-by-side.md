@@ -1,14 +1,15 @@
 ---
-id: ticket-351
-title: "verifier.py runs the backend and frontend checks side by side"
-type: refactor
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-348"]
-estimated_days: 0.5
 created: 2026-10-05
+depends_on:
+- ticket-348
+estimated_days: 0.5
+id: ticket-351
+pr_number: 281
+priority: medium
+status: done
+title: verifier.py runs the backend and frontend checks side by side
+type: refactor
 ---
 
 # ticket-351 — `verifier.py` lance les vérifications backend et frontend côte à côte

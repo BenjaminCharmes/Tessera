@@ -1,12 +1,14 @@
-"""Tests for scripts/verifier.py (ticket-304).
+"""Tests for scripts/verifier.py (tickets 304, 351).
 
-The script runs pytest → mypy → tsc → eslint → vitest in order and stops
-at the first failure. Subprocess calls are replaced by stubs so no real tool
-is invoked during the test suite.
+The script runs two chains in parallel — backend (pytest → mypy) and frontend
+(tsc → eslint → vitest) — each stopping at its first failure. Subprocess calls
+are replaced by stubs so no real tool is invoked during the test suite.
 """
 from __future__ import annotations
 
 import sys
+import threading
+import time
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -17,7 +19,15 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent.parent / "scripts"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from verifier import STEPS, Step, run_steps  # noqa: E402
+from verifier import (  # noqa: E402
+    BACKEND_STEPS,
+    FRONTEND_STEPS,
+    STEPS,
+    Step,
+    _run_chain,
+    run_parallel,
+    run_steps,
+)
 
 _FAKE_BACKEND = Path("/fake/backend")
 _FAKE_FRONTEND = Path("/fake/frontend")
@@ -46,7 +56,7 @@ def _make_steps(*names: str) -> list[Step]:
 
 
 # ---------------------------------------------------------------------------
-# Order and stop-on-failure
+# Order and stop-on-failure (run_steps — backward compat)
 # ---------------------------------------------------------------------------
 
 def test_stops_at_first_failure() -> None:
@@ -198,3 +208,121 @@ def test_xdist_is_a_dev_dependency() -> None:
         encoding="utf-8"
     )
     assert '"pytest-xdist' in pyproject
+
+
+# ---------------------------------------------------------------------------
+# Parallel chains (ticket-351)
+# ---------------------------------------------------------------------------
+
+
+def test_backend_and_frontend_steps_are_defined() -> None:
+    """BACKEND_STEPS and FRONTEND_STEPS are both non-empty with the right steps."""
+    assert {s.name for s in BACKEND_STEPS} == {"pytest", "mypy"}
+    assert {s.name for s in FRONTEND_STEPS} == {"tsc", "eslint", "vitest"}
+
+
+def test_steps_equals_backend_plus_frontend() -> None:
+    """The legacy STEPS list is exactly BACKEND_STEPS followed by FRONTEND_STEPS."""
+    assert STEPS == BACKEND_STEPS + FRONTEND_STEPS
+
+
+def test_chains_overlap_in_time() -> None:
+    """Backend and frontend chains run concurrently.
+
+    Uses a shared counter under a lock: if more than one subprocess call is
+    active at the same time, the chains are truly parallel.
+    """
+    active: list[str] = []
+    lock = threading.Lock()
+    overlapped = threading.Event()
+    DELAY = 0.1
+
+    def slow_run(cmd: list[str], **_: object) -> MagicMock:
+        step_id = " ".join(cmd)
+        with lock:
+            active.append(step_id)
+            if len(active) > 1:
+                overlapped.set()
+        time.sleep(DELAY)
+        with lock:
+            active.remove(step_id)
+        return _result(0)
+
+    backend = [Step("pytest", ["python", "-m", "pytest"], _FAKE_BACKEND)]
+    frontend = [Step("vitest", ["npx", "vitest", "run"], _FAKE_FRONTEND)]
+
+    with patch(_PATCH, side_effect=slow_run):
+        rc = run_parallel(backend, frontend)
+
+    assert overlapped.is_set(), "backend and frontend chains never ran at the same time"
+    assert rc == 0
+
+
+def test_backend_failure_does_not_stop_frontend_chain() -> None:
+    """A failure in the backend chain lets the frontend chain run to completion."""
+    call_counts: dict[str, int] = {"backend": 0, "frontend": 0}
+
+    def stubbed_run(cmd: list[str], *, cwd: Path, **_: object) -> MagicMock:
+        if cwd == _FAKE_BACKEND:
+            call_counts["backend"] += 1
+            return _result(1, "backend error")
+        call_counts["frontend"] += 1
+        return _result(0)
+
+    backend = _make_steps("pytest")
+    frontend = _make_steps("tsc", "eslint", "vitest")
+
+    with patch(_PATCH, side_effect=stubbed_run):
+        rc = run_parallel(backend, frontend)
+
+    assert rc != 0, "exit code must be non-zero when backend fails"
+    assert call_counts["backend"] == 1, "backend should have run exactly once"
+    assert call_counts["frontend"] == 3, "all 3 frontend steps should have run"
+
+
+def test_chain_head_failure_stops_remaining_chain_steps() -> None:
+    """A failure at the head of a chain prevents subsequent steps from running."""
+    call_count = 0
+
+    def stubbed_run(cmd: list[str], **_: object) -> MagicMock:
+        nonlocal call_count
+        call_count += 1
+        return _result(1, "error")
+
+    backend = _make_steps("pytest", "mypy")
+    with patch(_PATCH, side_effect=stubbed_run):
+        _run_chain(backend)
+
+    assert call_count == 1, f"only the first step should run, got {call_count} call(s)"
+
+
+def test_report_names_both_failing_steps(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """When both chains fail, stderr names each failing step (backend first)."""
+    def stubbed_run(cmd: list[str], *, cwd: Path, **_: object) -> MagicMock:
+        if cwd == _FAKE_BACKEND:
+            return _result(1, "pytest error", "")
+        return _result(1, "tsc error", "")
+
+    backend = _make_steps("pytest")
+    frontend = _make_steps("tsc")
+
+    with patch(_PATCH, side_effect=stubbed_run):
+        rc = run_parallel(backend, frontend)
+
+    captured = capsys.readouterr()
+    assert "pytest" in captured.err, "backend failure not reported"
+    assert "tsc" in captured.err, "frontend failure not reported"
+    assert captured.err.index("pytest") < captured.err.index("tsc"), (
+        "backend failure should appear before frontend failure"
+    )
+    assert rc != 0
+
+
+def test_run_parallel_returns_zero_when_all_pass() -> None:
+    """Exit code is 0 when both chains succeed."""
+    backend = _make_steps("pytest", "mypy")
+    frontend = _make_steps("tsc", "eslint", "vitest")
+    with patch(_PATCH, return_value=_result(0)):
+        assert run_parallel(backend, frontend) == 0
