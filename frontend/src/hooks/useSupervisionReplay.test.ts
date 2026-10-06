@@ -5,10 +5,10 @@
  * l'agent en cours. GET /runs/{db_run_id}/events renvoie les événements
  * persistés ; useSupervision les rejoue pour reconstruire toutes les cartes.
  *
- * Compatibilité ticket-353 : le chemin historique passe par chargerHistorique
- * qui applique les événements directement via setEtats (pas par pendingRef),
- * donc ces tests ne dépendent pas du regroupement par image et restent verts
- * sans avance de frame.
+ * Critère 5 (ticket-353) : ces tests restent verts sans ajustement de
+ * temporisation, car chargerHistorique applique les événements directement
+ * via setEtats (pas par pendingRef) — le regroupement par image ne les
+ * concerne pas.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";

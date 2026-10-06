@@ -2,6 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { wsUrl } from "../lib/ws";
 import { INITIAL, applyEvent, etatDepuisRun, clearTokensForReplay } from "./streamState";
 import type { StreamState } from "./streamState";
+import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
+import { abonnementsVoulus, diffDesAbonnements } from "./abonnements";
+import type { SlotsDAbonnement } from "./abonnements";
+import type { OrchestratorEvent, RunActif, RunEvent } from "../types/api";
+import { api } from "../lib/api";
 
 /** Lance une RAF en navigateur, un setTimeout(16) hors navigateur (ticket-353). */
 function scheduleRaf(fn: () => void): number {
@@ -19,11 +24,6 @@ function cancelRaf(id: number): void {
     clearTimeout(id);
   }
 }
-import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
-import { abonnementsVoulus, diffDesAbonnements } from "./abonnements";
-import type { SlotsDAbonnement } from "./abonnements";
-import type { OrchestratorEvent, RunActif, RunEvent } from "../types/api";
-import { api } from "../lib/api";
 
 /**
  * Tous les runs de la machine, sur une seule socket — ticket-129.

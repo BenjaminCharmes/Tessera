@@ -337,7 +337,11 @@ describe("useSupervision — les services (ticket-145)", () => {
 });
 
 describe("useSupervision — regroupement par image (ticket-353)", () => {
-  it("fifty events received in the same frame produce only one re-render", () => {
+  /**
+   * Critère 3 : cinquante messages reçus dans la même image ne produisent
+   * qu'un rendu du consommateur.
+   */
+  it("fifty messages received in the same frame produce only one consumer re-render", () => {
     let renders = 0;
     renderHook(() => {
       renders++;
@@ -350,7 +354,7 @@ describe("useSupervision — regroupement par image (ticket-353)", () => {
 
     renders = 0; // Remettre à zéro après les rendus de démarrage.
 
-    // Envoyer 50 événements sans avancer le temps : ils sont mis en file.
+    // Envoyer 50 événements sans avancer le temps : ils sont mis en file (pendingRef).
     act(() => {
       for (let i = 0; i < 50; i++) {
         MockWebSocket.instance!.triggerMessage(
@@ -362,14 +366,18 @@ describe("useSupervision — regroupement par image (ticket-353)", () => {
     // Aucun rendu avant le flush : les événements sont toujours en attente.
     expect(renders).toBe(0);
 
-    // Avancer d'une image : flush déclenche setEtats + setRuns une fois.
+    // Avancer d'une image : flush applique les 50 en un seul setEtats + setRuns.
     act(() => { vi.advanceTimersByTime(16); });
 
-    // React 18 regroupe setEtats + setRuns en un seul rendu.
+    // React 18 automatic batching regroupe setEtats + setRuns en un seul rendu.
     expect(renders).toBe(1);
   });
 
-  it("batch state matches sequential application of the same events", () => {
+  /**
+   * Critère 4 : l'état final après un lot est identique à celui obtenu
+   * en appliquant les mêmes messages un par un.
+   */
+  it("batch final state matches sequential application of the same events", () => {
     const { result } = renderHook(() => useSupervision());
 
     act(() => {
@@ -391,7 +399,7 @@ describe("useSupervision — regroupement par image (ticket-353)", () => {
       expected = applyEvent(expected, ev);
     }
 
-    // État réel via le lot de la RAF.
+    // État réel via le lot de la RAF (tous envoyés dans la même image).
     act(() => {
       for (const ev of eventsToSend) {
         MockWebSocket.instance!.triggerMessage(ev as unknown as Record<string, unknown>);
