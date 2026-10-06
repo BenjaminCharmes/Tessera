@@ -1,3 +1,4 @@
+import asyncio
 import json
 import re
 from pathlib import Path
@@ -11,6 +12,31 @@ from tessera.services.providers.noms import (
     ProviderInconnu,
 )
 
+# ------------------------------------------------------------------
+# Module-level project cache
+# Key: (resolved_project_path, claude_md_mtime_ns, claude_md_size, agents_json_mtime_ns, agents_json_size)
+# ------------------------------------------------------------------
+
+_ProjectCacheKey = tuple[str, int, int, int, int]
+_project_cache: dict[_ProjectCacheKey, Project] = {}
+
+
+def _stat_key(path: Path) -> tuple[int, int]:
+    """Return (mtime_ns, size) for `path`, or (0, 0) if it does not exist."""
+    try:
+        s = path.stat()
+        return s.st_mtime_ns, s.st_size
+    except OSError:
+        return 0, 0
+
+
+def _project_cache_key(project_path: Path) -> _ProjectCacheKey:
+    """Build a cache key from the project directory's two key files."""
+    resolved = str(project_path.resolve())
+    cm_mtime, cm_size = _stat_key(project_path / "CLAUDE.md")
+    aj_mtime, aj_size = _stat_key(project_path / "agents.json")
+    return resolved, cm_mtime, cm_size, aj_mtime, aj_size
+
 
 # ------------------------------------------------------------------
 # Module-level helpers (conservés pour les tests existants)
@@ -22,12 +48,16 @@ def load_project(project_path: Path) -> Project:
     if not project_path.is_dir():
         raise ValueError(f"Dossier introuvable : {project_path}")
 
+    key = _project_cache_key(project_path)
+    if key in _project_cache:
+        return _project_cache[key]
+
     raw = ""
     if (claude_md := project_path / "CLAUDE.md").exists():
         raw = claude_md.read_text(encoding="utf-8")
 
     github_forge, github_slug = _load_github_remote(project_path)
-    return Project(
+    project = Project(
         id=project_path.name,
         name=_parse_name(raw, fallback=project_path.name),
         path=project_path,
@@ -40,6 +70,8 @@ def load_project(project_path: Path) -> Project:
         category=_load_category(project_path),
         fait_tourner_l_ide=fait_tourner_l_ide(project_path),
     )
+    _project_cache[key] = project
+    return project
 
 
 def list_projects(workspace: Path) -> list[Project]:
@@ -200,6 +232,9 @@ class ProjectLoader:
         self._workspace = workspace_dir
 
     async def list_projects(self) -> list[Project]:
+        return await asyncio.to_thread(self._sync_list_projects)
+
+    def _sync_list_projects(self) -> list[Project]:
         if not self._workspace.is_dir():
             return []
         projects: list[Project] = []

@@ -1,6 +1,9 @@
-from pathlib import Path
-
+import asyncio
 import json
+import os
+import time
+from pathlib import Path
+from unittest.mock import patch as mock_patch
 
 import pytest
 
@@ -8,6 +11,7 @@ from tessera.models.project import ProjectCreate
 from tessera.services.project_loader import (
     ProjectLoader,
     _default_agents_json,
+    _load_category,
     list_projects,
     load_agents_config,
     load_pipeline_config,
@@ -427,3 +431,68 @@ def test_default_agents_json_mixed_roles_skills_only_for_ui_roles() -> None:
         assert agents[role].get("skills") == ["tessera:design-ui"], f"{role} doit avoir le skill"
     for role in ("reviewer", "securite", "validateur"):
         assert "skills" not in agents[role], f"{role} ne doit pas avoir de skills"
+
+
+# ------------------------------------------------------------------
+# Cache de projet — ticket-352
+# ------------------------------------------------------------------
+
+
+def _advance_mtime(path: Path, seconds: float = 1.0) -> None:
+    """Force the mtime of a file ahead by `seconds` to guarantee a cache miss."""
+    ts = time.time() + seconds
+    os.utime(path, (ts, ts))
+
+
+async def test_project_cache_reloads_on_agents_json_change(tmp_path: Path) -> None:
+    """A modified agents.json is reloaded on the next list_projects call."""
+    project_dir = tmp_path / "my-project"
+    project_dir.mkdir()
+    (project_dir / "CLAUDE.md").write_text("# My Project\n", encoding="utf-8")
+    agents_json = project_dir / "agents.json"
+    agents_json.write_text(
+        '{"project_id": "my-project", "agents": [], "category": "first"}',
+        encoding="utf-8",
+    )
+
+    loader = ProjectLoader(tmp_path)
+    projects1 = await loader.list_projects()
+    assert projects1[0].category == "first"
+
+    agents_json.write_text(
+        '{"project_id": "my-project", "agents": [], "category": "second"}',
+        encoding="utf-8",
+    )
+    _advance_mtime(agents_json)
+
+    projects2 = await loader.list_projects()
+    assert projects2[0].category == "second"
+
+
+async def test_project_cache_skips_reload_without_change(tmp_path: Path) -> None:
+    """list_projects does not re-read project files when neither key file has changed."""
+    project_dir = tmp_path / "my-project"
+    project_dir.mkdir()
+    (project_dir / "CLAUDE.md").write_text("# My Project\n", encoding="utf-8")
+
+    loader = ProjectLoader(tmp_path)
+    with mock_patch(
+        "tessera.services.project_loader._load_category",
+        wraps=_load_category,
+    ) as mock_cat:
+        await loader.list_projects()
+        first_count = mock_cat.call_count
+        await loader.list_projects()
+        second_count = mock_cat.call_count
+
+    # _load_category reads agents.json; it must not be called again on cache hit
+    assert first_count == 1
+    assert second_count == 1
+
+
+async def test_project_loader_list_projects_uses_asyncio_to_thread(tmp_path: Path) -> None:
+    """ProjectLoader.list_projects delegates its disk work to asyncio.to_thread."""
+    loader = ProjectLoader(tmp_path)
+    with mock_patch("asyncio.to_thread", wraps=asyncio.to_thread) as mock_thread:
+        await loader.list_projects()
+    assert mock_thread.called
