@@ -4,7 +4,7 @@ created: 2026-10-06
 depends_on: []
 estimated_days: 0.25
 id: ticket-363
-pr_number: null
+pr_number: 294
 priority: medium
 status: done
 title: Frontend tests allow for a loaded machine instead of timing out at 5 seconds
