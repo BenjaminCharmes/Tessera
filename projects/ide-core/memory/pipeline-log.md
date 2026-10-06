@@ -1512,3 +1512,29 @@ Le cod (32766ms)
 - 2026-10-06 14:39:20 UTC — [ticket-353] testeur: 1 failed, 686 passed, 20 warnings in 202.33s (0:03:22)
 - 2026-10-06 14:39:20 UTC — [ticket-353] tests rouges au tour 3
 - 2026-10-06 14:39:20 UTC — [ticket-353] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 14:39:23 UTC — [ide-core] file interrompue : ticket-353 non approuvé
+- 2026-10-06 14:50:51 UTC — [ticket-353] branche ticket-353-streamed-tokens-are-batched-per-frame-and-a-run-s
+- 2026-10-06 14:50:52 UTC — [ticket-353] tour 1 — codeur démarré
+- 2026-10-06 14:55:50 UTC — [ticket-353] tour 1 — codeur terminé (298110ms)
+- 2026-10-06 15:00:26 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:00:34 UTC — [ticket-353] securite: PASS — Diff cosmétique : réarrangement des imports (groupage des imports généraux en ha (8578ms)
+- 2026-10-06 15:00:35 UTC — [ticket-353] tour 1 — reviewer démarré
+- 2026-10-06 15:02:03 UTC — [ticket-353] tour 1 — reviewer terminé (88625ms)
+- 2026-10-06 15:04:51 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Aucun test n'a été fourni dans les fichiers cités par les critères, et le diff n (256405ms)
+- 2026-10-06 15:04:51 UTC — [ticket-353] CHANGES_REQUESTED tour 1: Validateur : Aucun test n'a été fourni dans les fichiers cités par les critères, et le diff ne conti
+- 2026-10-06 15:04:51 UTC — [ticket-353] tour 2 — codeur démarré
+- 2026-10-06 15:07:56 UTC — [ticket-353] tour 2 — codeur terminé (184875ms)
+- 2026-10-06 15:11:00 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:11:15 UTC — [ticket-353] securite: PASS — Audit de sécurité du diff : refactorisation de tests TypeScript et réorganisatio (14610ms)
+- 2026-10-06 15:11:15 UTC — [ticket-353] tour 2 — reviewer démarré
+- 2026-10-06 15:12:25 UTC — [ticket-353] tour 2 — reviewer terminé (70000ms)
+- 2026-10-06 15:14:08 UTC — [ticket-353] validateur: CHANGES_REQUESTED — Les critères 1 à 4 sont satisfaits. Le cinquième critère ne peut être jugé car l (173062ms)
+- 2026-10-06 15:14:08 UTC — [ticket-353] CHANGES_REQUESTED tour 2: Validateur : Les critères 1 à 4 sont satisfaits. Le cinquième critère ne peut être jugé car les fich
+- 2026-10-06 15:14:08 UTC — [ticket-353] tour 3 — codeur démarré
+- 2026-10-06 15:15:49 UTC — [ticket-353] tour 3 — codeur terminé (101016ms)
+- 2026-10-06 15:18:45 UTC — [ticket-353] testeur: OK (exit 0)
+- 2026-10-06 15:18:56 UTC — [ticket-353] securite: PASS — Audit complet du diff : refactorisation cosmétique uniquement. Trois catégories  (11469ms)
+- 2026-10-06 15:18:56 UTC — [ticket-353] tour 3 — reviewer démarré
+- 2026-10-06 15:20:05 UTC — [ticket-353] tour 3 — reviewer terminé (68282ms)
+- 2026-10-06 15:20:48 UTC — [ticket-353] validateur: APPROVED — Tous les critères sont satisfaits. Les tests ont été ajoutés ou modifiés pour co (111671ms)
+- 2026-10-06 15:20:48 UTC — [ticket-353] APPROVED après 3 tour(s)
