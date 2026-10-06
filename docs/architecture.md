@@ -895,6 +895,18 @@ Ensuite, les clients reçoivent des `OrchestratorEvent` au format JSON :
 }
 ```
 
+## Optimisation du streaming frontend (ticket-353)
+
+Le streaming des tokens peut générer des centaines d'événements par seconde. Pour éviter que l'interface ralentisse, trois optimisations sont appliquées au frontend :
+
+1. **Séparation des tokens** : `agent_token` ne va plus dans `events` ni `ticketEvents`. Le texte s'accumule dans `entries[…].tokens` comme avant. Les consommateurs d'événements lisent seulement les événements de contrôle (`pipeline_done`, `run_closed`, `queue_progress`, `pipeline_start`).
+
+2. **Borne des événements** : au-delà de `MAX_EVENTS = 2000`, les plus anciens sont retirés pour préserver la mémoire. Les événements de contrôle sont **toujours conservés**, même au-delà du plafond, pour que les jalons du pipeline restent visibles dans l'historique.
+
+3. **Regroupement par frame** : dans `useSupervision`, les messages WebSocket reçus sont mis en file et appliqués ensemble une fois par `requestAnimationFrame` (repli sur `setTimeout(…, 16)` hors navigateur), en un seul `setEtats` et un seul `setRuns` par lot. L'ordre d'application reste celui de réception. Un `snapshot` vide d'abord la file en attente avant d'appliquer l'état de référence.
+
+Ces trois changements réduisent les rendus de plusieurs centaines par seconde à **un seul** par cycle d'image, tout en préservant la cohérence de l'état et la traçabilité des événements critiques.
+
 ## Agents disponibles
 
 | Rôle | Modèle | Usage |
