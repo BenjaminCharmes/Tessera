@@ -725,6 +725,11 @@ que seul le SDK fournit.
 
 ---
 
+
+Les requêtes à Ollama sont **mises en file d'attente par serveur** — une seule à la fois par défaut. Cela élimine la compétition sur le modèle quand plusieurs runs demandent Ollama au même moment : chacun attend son tour, puis obtient une réponse à pleine vitesse.
+
+Si tu as besoin d'augmenter le nombre de requêtes concurrentes (sur une machine très puissante, par exemple), configure `ollama_max_concurrent` dans ta configuration Tessera (défaut 1 ; à 0 ou moins pour désactiver cette borne).
+
 ### Direction visuelle pour les interfaces
 
 Quand un ticket crée ou modifie une interface — une route qui ajoute des écrans, un composant UI — le codeur commence par établir une charte visuelle avant d'écrire du code.
