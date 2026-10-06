@@ -654,7 +654,9 @@ class _TestRunnerResult:
     def __init__(self, results: list) -> None:
         self._results = iter(results)
 
-    async def run_tests(self, project_path: object, test_command: object = None) -> object:
+    async def run_tests(
+        self, project_path: object, test_command: object = None, **_kwargs: object
+    ) -> object:
         return next(self._results)
 
 
