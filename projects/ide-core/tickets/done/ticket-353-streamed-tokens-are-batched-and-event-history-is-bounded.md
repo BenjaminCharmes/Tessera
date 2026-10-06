@@ -4,7 +4,7 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 1
 id: ticket-353
-pr_number: null
+pr_number: 288
 priority: high
 status: done
 title: Streamed tokens are batched per frame and a run's event history is bounded
