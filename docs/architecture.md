@@ -828,6 +828,32 @@ L'état de chaque run vit dans un store externe (`frontend/src/hooks/runStore.ts
 
 **Optimisations** — `Sidebar`, `TicketCard`, `KanbanView` en `React.memo` avec props stables, pour éviter les re-renders en cascade. ADR-013 : la solution reste en React pur, sans Zustand.
 
+## Caching des ressources et gestion de la visibilité fenêtre (ticket-356)
+
+Quand l'utilisateur revient sur un ticket ou un projet déjà ouvert, l'application doit afficher immédiatement la donnée précédemment vue (pas d'écran de chargement), puis rafraîchir en fond. Parallèlement, le polling (rechargement périodique) doit cesser quand la fenêtre est cachée, pour économiser quota et CPU.
+
+### Caching au niveau du module
+
+`useResource(fetcher, initial, cle?)` peut accepter une clé optionnelle (chaîne). Avec clé :
+- La dernière donnée obtenue est gardée dans un cache de niveau module (LRU, 100 entrées max)
+- Au changement de `fetcher`, la données en cache est rendue **aussitôt** au composant, avec `loading: true`
+- Un rafraîchissement part en fond ; quand il arrive, l'état est mis à jour sans défilement intempestif
+- La clé inclut toujours l'id du projet, pour qu'une donnée d'un autre projet ne s'affiche jamais
+
+Sans clé, `useResource` a le comportement actuel : changement de `fetcher` → rendu de `initial` immédiat, puis fetch.
+
+Cette décision répond à deux cas d'usage :
+1. Ouvrir un ticket, fermer le panneau, rouvrir le ticket → voir immédiatement les données
+2. Cliquer d'avant en arrière dans un historique → pas d'écrans blanc
+
+### Suspension du polling hors vue
+
+`useFenetreVisible()` lit `document.visibilityState` et expose un booléen qui se met à jour sur `visibilitychange`. Les trois points de polling (`useTickets`, `useServices`, et le polling de statut PR dans `TicketCard`) utilisent ce hook pour :
+- Suspendre leur intervalle quand `visibilitystate === 'hidden'`
+- Relancer une requête immédiate au retour en avant-plan
+
+Cette optimisation diminue significativement le nombre d'appels API quand plusieurs onglets ou fenêtres sont ouverts mais non actifs.
+
 ## Structure des fichiers de tickets
 
 ```
