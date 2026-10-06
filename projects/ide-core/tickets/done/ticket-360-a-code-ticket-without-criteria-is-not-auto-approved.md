@@ -1,14 +1,15 @@
 ---
-id: ticket-360
-title: "A feat or fix ticket without acceptance criteria is refused, not auto-approved"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-359"]
-estimated_days: 0.5
 created: 2026-10-06
+depends_on:
+- ticket-359
+estimated_days: 0.5
+id: ticket-360
+pr_number: 285
+priority: high
+status: done
+title: A feat or fix ticket without acceptance criteria is refused, not auto-approved
+type: fix
 ---
 
 # ticket-360 — Un ticket de code sans critère n'est plus approuvé d'office

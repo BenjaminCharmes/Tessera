@@ -1430,4 +1430,33 @@ L'ajout de la fonctio (41733ms)
 - 2026-10-06 13:00:39 UTC — [ticket-359] validateur: APPROVED — Aucun critère d'acceptation — approbation automatique. (0ms)
 - 2026-10-06 13:01:10 UTC — [ticket-359] tour 1 — reviewer terminé (30797ms)
 - 2026-10-06 13:01:10 UTC — [ticket-359] APPROVED après 1 tour(s)
+- 2026-10-06 13:04:21 UTC — [ticket-359] livraison: rebase sur develop (297ms)
+- 2026-10-06 13:04:21 UTC — [ticket-359] livraison: PR #284 ouverte (4437ms)
+- 2026-10-06 13:04:21 UTC — [ticket-359] livraison: arrêt — La branche locale « develop » (34b5405) a divergé de la base distante (314c4ab) : mise à jour ignoré
+- 2026-10-06 13:04:21 UTC — [ide-core] ticket-359 PR #284 confiée au CIWatcher
+- 2026-10-06 13:04:22 UTC — [ticket-360] branche ticket-360-a-feat-or-fix-ticket-without-acceptance-criteria
+- 2026-10-06 13:04:22 UTC — [ticket-360] tour 1 — codeur démarré
+- 2026-10-06 13:06:08 UTC — [ticket-360] tour 1 — codeur terminé (106157ms)
+- 2026-10-06 13:09:16 UTC — [ticket-360] testeur: 2 failed, 1070 passed, 20 warnings in 185.50s (0:03:05)
+- 2026-10-06 13:09:16 UTC — [ticket-360] tests rouges au tour 1
+- 2026-10-06 13:09:16 UTC — [ticket-360] tour 2 — codeur démarré
+- 2026-10-06 13:10:19 UTC — [ticket-360] tour 2 — codeur terminé (63125ms)
+- 2026-10-06 13:13:27 UTC — [ticket-360] testeur: \u276f src/components/ChatPanel/ChatPanel.test.tsx:57:3
+- 2026-10-06 13:13:27 UTC — [ticket-360] tests rouges au tour 2
+- 2026-10-06 13:13:27 UTC — [ticket-360] tour 3 — codeur démarré
+- 2026-10-06 13:14:18 UTC — [ticket-360] tour 3 — codeur terminé (50969ms)
+- 2026-10-06 13:18:03 UTC — [ticket-360] testeur: 81|     render(<RunHistory runs={[RUN_DONE]} loading={false} error={null} �
+- 2026-10-06 13:18:03 UTC — [ticket-360] tests rouges au tour 3
+- 2026-10-06 13:18:03 UTC — [ticket-360] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-06 13:18:05 UTC — [ide-core] file interrompue : ticket-360 non approuvé
+- 2026-10-06 13:22:13 UTC — [ticket-360] branche ticket-360-a-feat-or-fix-ticket-without-acceptance-criteria
+- 2026-10-06 13:22:13 UTC — [ticket-360] tour 1 — codeur démarré
+- 2026-10-06 13:23:39 UTC — [ticket-360] tour 1 — codeur terminé (86250ms)
+- 2026-10-06 13:26:37 UTC — [ticket-360] testeur: OK (exit 0)
+- 2026-10-06 13:26:46 UTC — [ticket-360] securite: PASS — Aucun fichier modifié dans ce run. L'implémentation du ticket-360 était déjà pré (9032ms)
+- 2026-10-06 13:26:46 UTC — [ticket-360] tour 1 — reviewer démarré
+- 2026-10-06 13:27:22 UTC — [ticket-360] tour 1 — reviewer terminé (35733ms)
+- 2026-10-06 13:28:39 UTC — [ticket-360] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente déjà le comp (112530ms)
+- 2026-10-06 13:28:39 UTC — [ticket-360] APPROVED après 1 tour(s)
+- 2026-10-06 13:32:17 UTC — [ticket-360] documentation: 1 fichier(s) (215625ms)
 - 2026-10-06 13:04:05 UTC — [ticket-359] documentation: 1 fichier(s) (172219ms)

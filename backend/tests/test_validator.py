@@ -95,6 +95,63 @@ class TestValidatorService:
         assert result.all_passed is True
         assert result.criteria == []
 
+
+class TestNoCriteriaCodeTickets:
+    """A code ticket without acceptance criteria must not be auto-approved (ticket-360)."""
+
+    async def test_feat_without_criteria_is_changes_requested(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        result = await service.validate(
+            criteria=[],
+            code_produced="some code",
+            test_result=None,
+            ticket_type="feat",
+        )
+
+        assert provider.calls == []
+        assert result.verdict == "CHANGES_REQUESTED"
+        assert result.all_passed is False
+
+    async def test_fix_without_criteria_is_changes_requested(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        result = await service.validate(
+            criteria=[],
+            code_produced="some fix",
+            test_result=None,
+            ticket_type="fix",
+        )
+
+        assert provider.calls == []
+        assert result.verdict == "CHANGES_REQUESTED"
+        assert result.all_passed is False
+
+    async def test_chore_without_criteria_is_still_approved(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        result = await service.validate(
+            criteria=[],
+            code_produced="some bookkeeping",
+            test_result=None,
+            ticket_type="chore",
+        )
+
+        assert provider.calls == []
+        assert result.verdict == "APPROVED"
+
+    async def test_code_ticket_without_criteria_message_names_section(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        result = await service.validate(
+            criteria=[],
+            code_produced="some code",
+            test_result=None,
+            ticket_type="feat",
+        )
+
+        assert "## Critères d'acceptation" in result.feedback
+
     async def test_includes_test_result_in_context(
         self, service: ValidatorService, provider: FakeProvider
     ) -> None:

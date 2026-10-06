@@ -645,6 +645,7 @@ async def run_validation(
             code_produced=run.reviewed_code + run.artifact_diff,
             test_result=run.test_result,
             project_root=orch._project_path,
+            ticket_type=run.ticket.type,
         )
     except Exception as exc:
         # Échoue fermé, comme l'audit : une validation qui n'a pas eu lieu
