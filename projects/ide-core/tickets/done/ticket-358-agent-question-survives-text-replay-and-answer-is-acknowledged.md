@@ -4,7 +4,7 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
 id: ticket-358
-pr_number: null
+pr_number: 282
 priority: high
 status: done
 title: An agent's question survives the text replay, and a transmitted answer is acknowledged
