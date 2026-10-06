@@ -103,6 +103,9 @@ describe("useSupervision — l'instantané alimente l'état du run", () => {
         runs: [run({ agent: "codeur", tour: 1, question: "On casse l'API ?" })],
       }),
     );
+    // Avancer d'une image (ticket-353) : le snapshot est traité de façon
+    // synchrone, donc l'état est déjà disponible sans attendre le flush.
+    act(() => { vi.advanceTimersByTime(16); });
 
     const etat = result.current.etatDe("run-1");
     expect(etat.status).toBe("running");

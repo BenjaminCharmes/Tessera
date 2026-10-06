@@ -4,6 +4,11 @@
  * ticket-325 — quand la page se recharge, l'instantané ne contient que
  * l'agent en cours. GET /runs/{db_run_id}/events renvoie les événements
  * persistés ; useSupervision les rejoue pour reconstruire toutes les cartes.
+ *
+ * Compatibilité ticket-353 : le chemin historique passe par chargerHistorique
+ * qui applique les événements directement via setEtats (pas par pendingRef),
+ * donc ces tests ne dépendent pas du regroupement par image et restent verts
+ * sans avance de frame.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
