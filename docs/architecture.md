@@ -110,7 +110,7 @@ Un opérateur peut consulter ces fichiers pour déboguer un arrêt inattendu du 
 `GitWorkspaceService` isole les opérations git du pipeline, et ne s'applique
 **jamais** au dépôt de Tessera lui-même — uniquement au projet ciblé.
 
-Cette promesse a demandé onze correctifs, tous nés d'un usage réel :
+Cette promesse a demandé douze correctifs, tous nés d'un usage réel :
 
 - **Le projet doit être la racine de son dépôt** (ADR-024). `git rev-parse
   --is-inside-work-tree` réussit aussi quand le dépôt trouvé est un *ancêtre* :
@@ -182,6 +182,14 @@ Cette promesse a demandé onze correctifs, tous nés d'un usage réel :
   `in-review/`, `done/`, `blocked/`, `archive/`). Si absent localement, il 
   le cherche sur la branche de base distante. Seul si absent partout, le 
   pipeline émet un événement d'erreur et passe le ticket en `blocked`.
+- **Chemins accentués lus correctement** (ticket-346). `git ls-files` et autres 
+  commandes listant les chemins encodent les noms non ASCII avec guillemets et 
+  octets échappés — `"tickets/todo/ticket-004-clavier-fl\303\250ches.md"` — ce qui 
+  ne correspond à aucun chemin réel du système de fichiers. Toute lecture de liste 
+  de chemins git utilise désormais l'option `-z` (séparateur null) ou 
+  `-c core.quotePath=false` (désactiver l'échappement), et découpe sur le 
+  séparateur réel. Cela garantit que les tickets à accent ne sont jamais perdus 
+  lors du balayage des modifications ou du déplacement de fichiers.
 
 Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
