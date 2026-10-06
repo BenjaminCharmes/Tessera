@@ -4,7 +4,7 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 0.5
 id: ticket-348
-pr_number: null
+pr_number: 278
 priority: high
 status: done
 title: Test suites wait for a shared slot across projects, and their timeout starts
