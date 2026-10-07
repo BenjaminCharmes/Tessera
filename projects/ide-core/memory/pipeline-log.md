@@ -1665,3 +1665,26 @@ Le cod (32766ms)
 - 2026-10-07 07:48:21 UTC — [ticket-364] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La solution implémente un cache (334078ms)
 - 2026-10-07 07:48:21 UTC — [ticket-364] APPROVED après 2 tour(s)
 - 2026-10-07 07:50:15 UTC — [ticket-364] documentation: 1 fichier(s) (111469ms)
+- 2026-10-07 07:50:26 UTC — [ticket-364] livraison: rebase sur develop (203ms)
+- 2026-10-07 07:50:26 UTC — [ticket-364] livraison: PR #297 ouverte (4563ms)
+- 2026-10-07 07:50:26 UTC — [ide-core] ticket-364 PR #297 confiée au CIWatcher
+- 2026-10-07 07:50:27 UTC — [ticket-365] branche ticket-365-a-card-whose-pr-is-merged-or-closed-does-not-ask
+- 2026-10-07 07:50:27 UTC — [ticket-365] tour 1 — codeur démarré
+- 2026-10-07 07:52:08 UTC — [ticket-365] tour 1 — codeur terminé (101061ms)
+- 2026-10-07 07:56:18 UTC — [ticket-365] testeur: OK (exit 0)
+- 2026-10-07 07:56:33 UTC — [ticket-365] securite: PASS — Audit complet : aucune vulnérabilité détectée. Le diff ajoute des tests unitaire (14717ms)
+- 2026-10-07 07:56:33 UTC — [ticket-365] tour 1 — reviewer démarré
+- 2026-10-07 07:57:20 UTC — [ticket-365] tour 1 — reviewer terminé (47297ms)
+- 2026-10-07 07:59:47 UTC — [ticket-365] validateur: CHANGES_REQUESTED — Les trois premiers critères sont satisfaits : des tests ont été ajoutés pour vér (193922ms)
+- 2026-10-07 07:59:47 UTC — [ticket-365] CHANGES_REQUESTED tour 1: Validateur : Les trois premiers critères sont satisfaits : des tests ont été ajoutés pour vérifier l
+- 2026-10-07 07:59:47 UTC — [ticket-365] tour 2 — codeur démarré
+- 2026-10-07 08:16:14 UTC — [ticket-365] branche ticket-365-a-card-whose-pr-is-merged-or-closed-does-not-ask
+- 2026-10-07 08:16:14 UTC — [ticket-365] tour 1 — codeur démarré
+- 2026-10-07 08:18:04 UTC — [ticket-365] tour 1 — codeur terminé (109547ms)
+- 2026-10-07 08:21:39 UTC — [ticket-365] testeur: OK (exit 0)
+- 2026-10-07 08:22:03 UTC — [ticket-365] securite: PASS — Diff complet analysé. Aucune vulnérabilité de sécurité détectée. Le code ajoute  (23969ms)
+- 2026-10-07 08:22:03 UTC — [ticket-365] tour 1 — reviewer démarré
+- 2026-10-07 08:22:59 UTC — [ticket-365] tour 1 — reviewer terminé (56796ms)
+- 2026-10-07 08:24:28 UTC — [ticket-365] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour  (145375ms)
+- 2026-10-07 08:24:28 UTC — [ticket-365] APPROVED après 1 tour(s)
+- 2026-10-07 08:25:58 UTC — [ticket-365] documentation: 1 fichier(s) (86733ms)

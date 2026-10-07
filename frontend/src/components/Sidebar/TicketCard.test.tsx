@@ -561,6 +561,150 @@ describe("TicketCard — infobulle d'arrêt (ticket-218)", () => {
   });
 });
 
+describe("TicketCard — PR réglée non redemandée au retour de fenêtre (ticket-365)", () => {
+  it("ne redemande pas getPrStatus quand la PR est merged et la fenêtre revient", async () => {
+    vi.useFakeTimers();
+    try {
+      setVisibility("visible");
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatus")
+        .mockResolvedValue({
+          state: "merged",
+          ci_status: "passing",
+          pr_url: "https://github.com/owner/repo/pull/7",
+          pr_number: 7,
+        });
+
+      render(
+        <TicketCard
+          ticket={{ ...base, pr_number: 7 }}
+          isActive={false}
+          isRunning={false}
+          githubRemote="owner/repo"
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+        />,
+      );
+
+      // Appel initial au montage.
+      await vi.advanceTimersByTimeAsync(0);
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      // Cacher puis réafficher la fenêtre.
+      await act(async () => {
+        setVisibility("hidden");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        setVisibility("visible");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // Aucun appel supplémentaire : la PR est réglée.
+      expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("ne redemande pas getPrStatus quand la PR est closed et la fenêtre revient", async () => {
+    vi.useFakeTimers();
+    try {
+      setVisibility("visible");
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatus")
+        .mockResolvedValue({
+          state: "closed",
+          ci_status: "none",
+          pr_url: "https://github.com/owner/repo/pull/8",
+          pr_number: 8,
+        });
+
+      render(
+        <TicketCard
+          ticket={{ ...base, pr_number: 8 }}
+          isActive={false}
+          isRunning={false}
+          githubRemote="owner/repo"
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+        />,
+      );
+
+      // Appel initial au montage.
+      await vi.advanceTimersByTimeAsync(0);
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      // Cacher puis réafficher la fenêtre.
+      await act(async () => {
+        setVisibility("hidden");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        setVisibility("visible");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // Aucun appel supplémentaire : la PR est réglée.
+      expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("redemande getPrStatus quand la PR est open et la fenêtre revient", async () => {
+    vi.useFakeTimers();
+    try {
+      setVisibility("visible");
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatus")
+        .mockResolvedValue({
+          state: "open",
+          ci_status: "pending",
+          pr_url: "https://github.com/owner/repo/pull/9",
+          pr_number: 9,
+        });
+
+      render(
+        <TicketCard
+          ticket={{ ...base, pr_number: 9 }}
+          isActive={false}
+          isRunning={false}
+          githubRemote="owner/repo"
+          onSelect={vi.fn()}
+          onRun={vi.fn()}
+        />,
+      );
+
+      // Appel initial au montage.
+      await vi.advanceTimersByTimeAsync(0);
+      const apresInit = spy.mock.calls.length;
+      expect(apresInit).toBeGreaterThanOrEqual(1);
+
+      // Cacher puis réafficher la fenêtre.
+      await act(async () => {
+        setVisibility("hidden");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        setVisibility("visible");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // Un appel supplémentaire au retour de la fenêtre : la PR est ouverte.
+      expect(spy.mock.calls.length).toBeGreaterThan(apresInit);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("TicketCard — statut à la main (ticket-194)", () => {
   it("n'offre aucun menu sans onChangeStatus", () => {
     render(

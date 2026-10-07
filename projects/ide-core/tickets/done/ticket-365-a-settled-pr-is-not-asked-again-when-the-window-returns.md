@@ -1,14 +1,15 @@
 ---
-id: ticket-365
-title: "A card whose PR is merged or closed does not ask again when the window comes back"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-07
+id: ticket-365
+pr_number: 298
+priority: high
+status: done
+title: A card whose PR is merged or closed does not ask again when the window comes
+  back
+type: fix
 ---
 
 # ticket-365 — Une PR réglée n'est pas redemandée au retour de la fenêtre
