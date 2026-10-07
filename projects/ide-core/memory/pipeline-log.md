@@ -1804,3 +1804,5 @@ PointsControls effectués :
 - 2026-10-07 12:37:26 UTC — [ticket-376] tour 1 — reviewer terminé (40031ms)
 - 2026-10-07 12:39:23 UTC — [ticket-376] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente une correction pour gérer  (157281ms)
 - 2026-10-07 12:39:23 UTC — [ticket-376] APPROVED après 1 tour(s)
+- 2026-10-07 12:41:20 UTC — [ticket-376] documentation: 0 fichier(s) (114250ms) — refusé : doc-technique : README.md : texte introuvable — « ├── projects/
+│   └── ide-core/             ← Projet bootstr ». L'agent a proposé une modification sur un text
