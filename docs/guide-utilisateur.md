@@ -227,6 +227,18 @@ Si tu vois peu de tickets et que le panneau Tickets n'est pas ouvert, il y a sou
 
 Un clic sur ce bouton remet les filtres à zéro — tu verras tous les tickets de nouveau.
 
+### Les colonnes done et cancelled ne montrent que les 30 derniers tickets
+
+Dans les colonnes **done** et **cancelled** du kanban, seules les 30 cartes avec les numéros les plus élevés sont rendues au départ — c'est une optimisation pour garder l'écran fluide quand le projet accumule des centaines de tickets terminés.
+
+En bas de la colonne, un bouton te permet d'afficher la totalité.
+
+Le compteur de la colonne (le nombre en haut) affiche toujours le total réel, même quand seules les 30 cartes récentes sont visibles.
+
+**Les autres colonnes** — todo, in-progress, in-review, blocked — affichent tous les tickets, quel que soit leur taille.
+
+**La recherche et les filtres s'appliquent avant la limite** : tu cherches un ticket ancien dans done ? Il s'affiche même s'il n'est pas parmi les 30 récents.
+
 # ticket-007 — Ajouter un endpoint de santé
 
 ## Objectif
