@@ -4,7 +4,7 @@ created: 2026-10-05
 depends_on: []
 estimated_days: 1
 id: ticket-356
-pr_number: null
+pr_number: 292
 priority: medium
 status: done
 title: Data already seen shows at once while it refreshes, and polling pauses while
