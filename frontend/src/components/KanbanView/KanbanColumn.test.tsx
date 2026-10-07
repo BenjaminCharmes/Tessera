@@ -1,7 +1,26 @@
 import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import KanbanColumn from "./KanbanColumn";
-import type { Ticket } from "../../types/api";
+import type { Ticket, TicketStatus } from "../../types/api";
+
+function makeTicket(n: number, status: TicketStatus = "done"): Ticket {
+  const id = `ticket-${String(n).padStart(3, "0")}`;
+  return {
+    id,
+    title: `Ticket Title ${String(n).padStart(3, "0")}`,
+    status,
+    type: "feat",
+    priority: "medium",
+    depends_on: [],
+    created: "2026-07-13T10:00:00Z",
+    agent: "codeur",
+    github_issue_url: null,
+    pr_number: null,
+    body: "",
+    project_id: "ide-core",
+    file_path: `tickets/done/${id}.md`,
+  };
+}
 
 const T1: Ticket = {
   id: "ticket-001",
@@ -169,6 +188,79 @@ describe("KanbanColumn — file de tickets (ticket-284)", () => {
     );
     screen.getByRole("button", { name: "Ajouter à la file" }).click();
     expect(onToggleQueue).toHaveBeenCalledWith(T1.id);
+  });
+});
+
+describe("KanbanColumn — limite done/cancelled (ticket-368)", () => {
+  const FIFTY_DONE = Array.from({ length: 50 }, (_, i) => makeTicket(i + 1, "done"));
+  const FIFTY_TODO = Array.from({ length: 50 }, (_, i) => makeTicket(i + 1, "todo"));
+
+  it("rend 30 cartes sur les 30 numéros les plus élevés pour une colonne done de 50", () => {
+    render(
+      <KanbanColumn
+        status="done"
+        tickets={FIFTY_DONE}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+      />,
+    );
+    // Les 30 numéros les plus élevés (021–050) sont visibles.
+    expect(screen.queryByText("ticket-050")).toBeTruthy();
+    expect(screen.queryByText("ticket-021")).toBeTruthy();
+    // Les numéros inférieurs (001–020) sont masqués.
+    expect(screen.queryByText("ticket-020")).toBeNull();
+    expect(screen.queryByText("ticket-001")).toBeNull();
+  });
+
+  it("rend les 50 cartes après un clic sur Afficher les 20 autres", () => {
+    render(
+      <KanbanColumn
+        status="done"
+        tickets={FIFTY_DONE}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Afficher les 20 autres" }));
+    // Tous les identifiants de ticket sont désormais dans le DOM.
+    expect(screen.queryByText("ticket-001")).toBeTruthy();
+    expect(screen.queryByText("ticket-050")).toBeTruthy();
+    const allIds = screen.getAllByText(/^ticket-\d{3}$/);
+    expect(allIds).toHaveLength(50);
+  });
+
+  it("rend les 50 cartes d'une colonne todo sans limitation", () => {
+    render(
+      <KanbanColumn
+        status="todo"
+        tickets={FIFTY_TODO}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText("ticket-001")).toBeTruthy();
+    expect(screen.queryByText("ticket-050")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Afficher les/ })).toBeNull();
+  });
+
+  it("affiche le compteur total de la colonne done même quand 30 cartes seulement sont rendues", () => {
+    render(
+      <KanbanColumn
+        status="done"
+        tickets={FIFTY_DONE}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("(50)")).toBeTruthy();
   });
 });
 
