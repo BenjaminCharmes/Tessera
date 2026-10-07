@@ -1688,3 +1688,9 @@ Le cod (32766ms)
 - 2026-10-07 08:24:28 UTC — [ticket-365] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour  (145375ms)
 - 2026-10-07 08:24:28 UTC — [ticket-365] APPROVED après 1 tour(s)
 - 2026-10-07 08:25:58 UTC — [ticket-365] documentation: 1 fichier(s) (86733ms)
+- 2026-10-07 08:26:09 UTC — [ticket-365] livraison: rebase sur develop (234ms)
+- 2026-10-07 08:26:09 UTC — [ticket-365] livraison: PR #298 ouverte (5063ms)
+- 2026-10-07 08:26:09 UTC — [ide-core] ticket-365 PR #298 confiée au CIWatcher
+- 2026-10-07 09:03:19 UTC — [ticket-369] branche ticket-369-at-startup-a-run-interrupted-by-a-stop-leaves-its
+- 2026-10-07 09:03:19 UTC — [ticket-369] tour 1 — codeur démarré
+- 2026-10-07 09:14:39 UTC — [ticket-369] tour 1 — codeur terminé (679875ms)

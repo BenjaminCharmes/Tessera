@@ -1,14 +1,15 @@
 ---
-id: ticket-369
-title: "At startup, a run interrupted by a stop leaves its repository ready for the next run"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 1
-created: 2026-10-07
+id: ticket-369
+pr_number: 303
+priority: high
+status: done
+title: At startup, a run interrupted by a stop leaves its repository ready for the
+  next run
+type: fix
 ---
 
 # ticket-369 — Au démarrage, un run interrompu remet son dépôt d'aplomb
