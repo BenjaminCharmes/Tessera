@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 1
 id: ticket-372
-pr_number: null
+pr_number: 309
 priority: high
 status: done
 title: A versioned FastAPI + React project template lives in Tessera, and its test
