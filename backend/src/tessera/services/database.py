@@ -139,6 +139,17 @@ UPDATE pipeline_runs SET mode = 'autonomous'
         ON pipeline_runs (project_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_ac_run_created
         ON agent_calls (run_id, created_at);""",
+    # 7 — ticket-364 : cache persistant des statuts de PR mergées ou fermées.
+    # Clé (repo, pr_number) ; seules les PR définitives y vivent — une PR
+    # ouverte ne s'écrit pas en base, elle est gardée 30 s en mémoire.
+    """CREATE TABLE IF NOT EXISTS pr_status_cache (
+    repo       TEXT NOT NULL,
+    pr_number  INTEGER NOT NULL,
+    state      TEXT NOT NULL,
+    ci_status  TEXT NOT NULL,
+    pr_url     TEXT NOT NULL,
+    PRIMARY KEY (repo, pr_number)
+);""",
 ]
 
 
