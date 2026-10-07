@@ -1,14 +1,14 @@
 ---
-id: ticket-376
-title: "An agent's JSON answer is read even when a string holds an unescaped backslash"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-07
+id: ticket-376
+pr_number: 312
+priority: critical
+status: done
+title: An agent's JSON answer is read even when a string holds an unescaped backslash
+type: fix
 ---
 
 # ticket-376 — Une réponse JSON se lit même avec une barre oblique inverse non échappée

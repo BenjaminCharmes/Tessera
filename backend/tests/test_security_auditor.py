@@ -274,6 +274,24 @@ class TestAuditWithLeadingJsonObject:
         assert result.reason
 
 
+async def test_pass_verdict_survives_unescaped_backslash_in_summary(
+    service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+) -> None:
+    # ticket-376 : une réponse dont le résumé cite un chemin Windows (..\x)
+    # produisait un JSON invalide ; extract_json le corrigeait pas, l'audit
+    # retombait sur BLOCK alors que le LLM avait conclu PASS.
+    raw = (
+        "```json\n"
+        '{"issues": [], "verdict": "PASS", "summary": "No issue. Path ..\\x is safe."}'
+        "\n```"
+    )
+    provider.set_content(raw)
+
+    result = await service.audit("code", tmp_path)
+
+    assert result.verdict == "PASS"
+
+
 async def test_a_whole_branch_diff_reaches_the_auditor_intact(
     service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
 ) -> None:
