@@ -120,16 +120,22 @@ const TicketCard = memo(function TicketCard({
   const fenetreVisible = useFenetreVisible();
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Une fois réglée (merged ou closed), la PR ne sera plus interrogée même
+  // si la fenêtre redevient visible (ticket-365).
+  const prSettledRef = useRef(false);
 
   useEffect(() => {
     // Pas de polling sans PR, ni quand la fenêtre est cachée (ticket-356).
     if (!ticket.pr_number || !githubRemote || !fenetreVisible) return;
+    // PR déjà réglée : pas besoin de redemander au retour de la fenêtre (ticket-365).
+    if (prSettledRef.current) return;
 
     const fetchStatus = async () => {
       try {
         const s = await api.github.getPrStatus(ticket.project_id, ticket.id);
         setPrStatus(s);
         if (s.state === "merged" || s.state === "closed") {
+          prSettledRef.current = true;
           if (intervalRef.current) clearInterval(intervalRef.current);
         }
       } catch (err) {

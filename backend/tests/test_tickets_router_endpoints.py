@@ -1,4 +1,5 @@
 """Endpoints du router tickets — ticket-053."""
+import asyncio
 from pathlib import Path
 
 import httpx
@@ -7,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
+from tessera.services.database import init_db
 from tessera.services.github_service import PRStatus
 
 _TICKET_MD = """---
@@ -34,7 +36,10 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         _TICKET_MD.format(id="ticket-001", title="Un ticket", extra=""),
         encoding="utf-8",
     )
+    db_path = tmp_path / "tessera.db"
+    asyncio.run(init_db(db_path))
     monkeypatch.setattr(settings, "ide_workspace_dir", ws)
+    monkeypatch.setattr(settings, "ide_db_path", db_path)
     monkeypatch.setattr(settings, "github_token", "")
     return ws
 
