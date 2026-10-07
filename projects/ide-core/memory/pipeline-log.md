@@ -1859,3 +1859,4 @@ PointsControls effectués :
 - 2026-10-07 14:37:38 UTC — [ticket-366] tour 1 — reviewer terminé (88639ms)
 - 2026-10-07 14:43:31 UTC — [ticket-366] validateur: APPROVED — Les six critères sont satisfaits. Le diff introduit le nouvel endpoint `GET /pro (441640ms)
 - 2026-10-07 14:43:31 UTC — [ticket-366] APPROVED après 1 tour(s)
+- 2026-10-07 14:44:51 UTC — [ticket-366] documentation: 2 fichier(s) (73453ms)
