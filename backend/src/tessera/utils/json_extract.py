@@ -4,12 +4,21 @@ from typing import Any
 
 # Barre oblique inverse non suivie d'un caractère d'échappement JSON valide.
 # Valides après \ : " \ / b f n r t u (pour \uXXXX).
-_INVALID_ESCAPE = re.compile(r'\\(?!["\\/bfnrtu])')
+#
+# Les barres se lisent **par paires** : `\\` est un échappement complet, et la
+# barre qui le termine ne doit pas être examinée seule. Sans cela, `a\\p`
+# (barre échappée puis `p`, valide) devenait `a\\\p` dès qu'une autre barre du
+# texte était fautive, et l'objet restait illisible.
+_ESCAPE = re.compile(r"\\(.)", re.DOTALL)
+_VALID_ESCAPE_CHARS = frozenset('"\\/bfnrtu')
 
 
 def _fix_backslashes(text: str) -> str:
     """Double les barres obliques inverses qui ne commencent pas un échappement JSON valide."""
-    return _INVALID_ESCAPE.sub(r"\\\\", text)
+    return _ESCAPE.sub(
+        lambda m: m.group(0) if m.group(1) in _VALID_ESCAPE_CHARS else "\\\\" + m.group(1),
+        text,
+    )
 
 
 def _scan_dict(decoder: json.JSONDecoder, text: str) -> "dict[str, Any] | None":

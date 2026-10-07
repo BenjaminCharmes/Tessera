@@ -164,3 +164,17 @@ def test_broken_json_missing_brace_still_returns_none() -> None:
     """A JSON object broken by a missing brace is still None after the backslash retry."""
     result = extract_json('{"key": "value", "nested": {"a": 1')
     assert result is None
+
+
+def test_valid_escaped_backslash_survives_the_fix_of_an_invalid_one() -> None:
+    r"""An escaped backslash before a letter is kept when another backslash is fixed.
+
+    Le texte JSON contient `a\\p` (barre échappée puis `p`, valide) et `..\x`
+    (invalide). Doubler chaque barre isolément cassait la première séquence.
+    """
+    texte = r'{"verdict": "PASS", "ok": "a\\p", "bad": "..\x"}'
+    result = extract_json(texte, required_key="verdict")
+    assert result is not None
+    assert result["verdict"] == "PASS"
+    assert result["ok"] == r"a\p"
+    assert result["bad"] == r"..\x"
