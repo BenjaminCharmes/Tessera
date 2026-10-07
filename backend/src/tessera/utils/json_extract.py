@@ -2,9 +2,18 @@ import json
 import re
 from typing import Any
 
+# Barre oblique inverse non suivie d'un caractère d'échappement JSON valide.
+# Valides après \ : " \ / b f n r t u (pour \uXXXX).
+_INVALID_ESCAPE = re.compile(r'\\(?!["\\/bfnrtu])')
 
-def _first_dict(decoder: json.JSONDecoder, text: str) -> "dict[str, Any] | None":
-    """Return the first JSON object decoded from *text*, or None."""
+
+def _fix_backslashes(text: str) -> str:
+    """Double les barres obliques inverses qui ne commencent pas un échappement JSON valide."""
+    return _INVALID_ESCAPE.sub(r"\\\\", text)
+
+
+def _scan_dict(decoder: json.JSONDecoder, text: str) -> "dict[str, Any] | None":
+    """Scan *text* from each ``{`` and return the first valid JSON object, or None."""
     for i, ch in enumerate(text):
         if ch != "{":
             continue
@@ -17,10 +26,10 @@ def _first_dict(decoder: json.JSONDecoder, text: str) -> "dict[str, Any] | None"
     return None
 
 
-def _first_dict_with_key(
+def _scan_dict_with_key(
     decoder: json.JSONDecoder, text: str, key: str
 ) -> "dict[str, Any] | None":
-    """Return the first JSON object from *text* that contains *key*, or None."""
+    """Scan *text* from each ``{`` and return the first object containing *key*, or None."""
     for i, ch in enumerate(text):
         if ch != "{":
             continue
@@ -31,6 +40,32 @@ def _first_dict_with_key(
         if isinstance(obj, dict) and key in obj:
             return obj
     return None
+
+
+def _first_dict(decoder: json.JSONDecoder, text: str) -> "dict[str, Any] | None":
+    """Return the first JSON object decoded from *text*, or None.
+
+    When the initial scan fails, retries once after doubling any backslash
+    that does not introduce a valid JSON escape sequence.
+    """
+    result = _scan_dict(decoder, text)
+    if result is None:
+        result = _scan_dict(decoder, _fix_backslashes(text))
+    return result
+
+
+def _first_dict_with_key(
+    decoder: json.JSONDecoder, text: str, key: str
+) -> "dict[str, Any] | None":
+    """Return the first JSON object from *text* that contains *key*, or None.
+
+    When the initial scan fails, retries once after doubling any backslash
+    that does not introduce a valid JSON escape sequence.
+    """
+    result = _scan_dict_with_key(decoder, text, key)
+    if result is None:
+        result = _scan_dict_with_key(decoder, _fix_backslashes(text), key)
+    return result
 
 
 def extract_json(
@@ -47,6 +82,12 @@ def extract_json(
     then the full text — returning the first object that **contains** that
     key.  Without *required_key*, the existing behaviour is unchanged: the
     very first valid object is returned.
+
+    In both cases, if a JSON object cannot be decoded because it contains
+    a backslash not followed by a valid JSON escape character (e.g. ``\\x``,
+    ``\\p``, ``\\.``), the scan is retried after doubling those backslashes.
+    A truly malformed object (missing brace, mismatched quotes…) still
+    returns None.
     """
     decoder = json.JSONDecoder()
 

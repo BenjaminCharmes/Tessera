@@ -129,3 +129,38 @@ def test_required_key_returns_none_when_no_object_has_key() -> None:
     result = extract_json(text, required_key="verdict")
 
     assert result is None
+
+
+# ------------------------------------------------------------------
+# Barres obliques inverses non échappées — ticket-376
+# ------------------------------------------------------------------
+
+
+def test_unescaped_backslash_in_string_is_fixed() -> None:
+    """A JSON object whose string contains an invalid escape (\\x) is still decoded.
+
+    Mirrors the exact criterion from ticket-376.
+    """
+    # \x n'est pas un échappement JSON valide : le décodeur doit doubler le \
+    # puis retenter, et rendre quand même le verdict.
+    text = '{"verdict": "PASS", "summary": "refuse ..\\x"}'
+    result = extract_json(text, required_key="verdict")
+    assert result is not None
+    assert result["verdict"] == "PASS"
+
+
+def test_valid_json_escapes_not_doubled() -> None:
+    """A valid JSON object containing \\n and \\uXXXX is decoded as-is, without doubling."""
+    # Ces séquences sont valides ; elles ne doivent pas être touchées par le
+    # correcteur, et les valeurs décodées doivent être les caractères réels.
+    text = '{"message": "line1\\nline2", "char": "\\u0041"}'
+    result = extract_json(text)
+    assert result is not None
+    assert result["message"] == "line1\nline2"
+    assert result["char"] == "A"
+
+
+def test_broken_json_missing_brace_still_returns_none() -> None:
+    """A JSON object broken by a missing brace is still None after the backslash retry."""
+    result = extract_json('{"key": "value", "nested": {"a": 1')
+    assert result is None
