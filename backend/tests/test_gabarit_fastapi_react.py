@@ -121,14 +121,21 @@ def test_integration_template_builds_and_tests_pass(tmp_path: Path) -> None:
     backend_dir = dest / "backend"
     frontend_dir = dest / "frontend"
 
+    # Sous Windows, npm est `npm.cmd` : `subprocess` ne le trouve pas sans son
+    # chemin complet, que `shutil.which` résout.
+    npm = shutil.which("npm")
+    assert npm is not None, "npm introuvable dans le PATH"
+
     # --- Frontend ---
-    subprocess.run(["npm", "install"], cwd=frontend_dir, check=True)
-    subprocess.run(["npm", "run", "typecheck"], cwd=frontend_dir, check=True)
-    subprocess.run(["npm", "run", "lint"], cwd=frontend_dir, check=True)
-    subprocess.run(["npm", "run", "test"], cwd=frontend_dir, check=True)
-    subprocess.run(["npm", "run", "build"], cwd=frontend_dir, check=True)
+    subprocess.run([npm, "install"], cwd=frontend_dir, check=True)
+    subprocess.run([npm, "run", "typecheck"], cwd=frontend_dir, check=True)
+    subprocess.run([npm, "run", "lint"], cwd=frontend_dir, check=True)
+    subprocess.run([npm, "run", "test"], cwd=frontend_dir, check=True)
+    subprocess.run([npm, "run", "build"], cwd=frontend_dir, check=True)
 
     # --- Backend ---
+    # `python -m` comme dans la test_command des projets : WDAC bloque les
+    # lanceurs .exe de mypy et pytest.
     subprocess.run(["uv", "sync"], cwd=backend_dir, check=True)
-    subprocess.run(["uv", "run", "mypy", "app"], cwd=backend_dir, check=True)
-    subprocess.run(["uv", "run", "pytest"], cwd=backend_dir, check=True)
+    subprocess.run(["uv", "run", "python", "-m", "mypy", "."], cwd=backend_dir, check=True)
+    subprocess.run(["uv", "run", "python", "-m", "pytest", "-q"], cwd=backend_dir, check=True)
