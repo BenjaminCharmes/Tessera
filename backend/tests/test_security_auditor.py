@@ -241,6 +241,39 @@ class TestSecurityAuditResult:
         assert result.has_critical is False
 
 
+class TestAuditWithLeadingJsonObject:
+    """Tests for ticket-371 — audit skips JSON objects that lack the verdict key."""
+
+    async def test_block_when_leading_json_precedes_block_verdict(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # ticket-371 : un objet JSON sans "verdict" cité avant le verdict réel
+        # était pris comme réponse et valait PASS par défaut (ADR-039).
+        verdict_obj = {"issues": [], "verdict": "BLOCK", "summary": "Injection found."}
+        provider.set_content(
+            '{"project_id": "abc"}\n\nSome analysis.\n\n'
+            + __import__("json").dumps(verdict_obj)
+        )
+
+        result = await service.audit("unsafe code", tmp_path)
+
+        assert result.verdict == "BLOCK"
+
+    async def test_block_when_no_object_has_verdict_key(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # ticket-371 : une réponse sans aucun objet portant "verdict" doit
+        # bloquer (ADR-039 : l'audit échoue fermé), jamais rendre PASS.
+        provider.set_content(
+            '{"project_id": "abc"} {"issues": [], "summary": "no verdict key"}'
+        )
+
+        result = await service.audit("some code", tmp_path)
+
+        assert result.verdict == "BLOCK"
+        assert result.reason
+
+
 async def test_a_whole_branch_diff_reaches_the_auditor_intact(
     service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
 ) -> None:

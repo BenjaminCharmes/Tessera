@@ -265,6 +265,32 @@ class TestNoCriteriaCodeTickets:
         # pour une raison qui n'avait rien à voir avec le code (ticket-126).
         assert call["max_tokens"] >= 2048
 
+    async def test_criteria_judged_when_earlier_json_object_present(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # ticket-371 : le validateur citait les fichiers du ticket dans sa
+        # réponse ; l'objet {"project_id": ".."} était pris pour le verdict,
+        # et les critères se retrouvaient tous « non jugé par le validateur ».
+        verdict_obj = {
+            "criteria": [{"index": 1, "criterion": "Check X", "passed": True, "note": ""}],
+            "feedback": "All verified.",
+        }
+        provider.set_content(
+            '{"project_id": "abc"}\n\nSome explanation.\n\n'
+            + __import__("json").dumps(verdict_obj)
+        )
+
+        result = await service.validate(
+            criteria=["Check X"],
+            code_produced="code",
+            test_result=None,
+        )
+
+        assert result.verdict == "APPROVED"
+        assert len(result.criteria) == 1
+        assert result.criteria[0].passed is True
+        assert "non jugé" not in result.criteria[0].note
+
     async def test_changes_requested_quand_le_provider_est_indisponible(
         self, service: ValidatorService
     ) -> None:

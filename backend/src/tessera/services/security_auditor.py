@@ -92,13 +92,15 @@ class SecurityAuditorService:
         return "Audit code for security vulnerabilities. Respond with JSON."
 
     def _parse_response(self, raw: str) -> SecurityAuditResult:
-        parsed = extract_json(raw)
+        parsed = extract_json(raw, required_key="verdict")
         if not parsed:
             _logger.warning("security_auditor_invalid_json", extra={"raw": raw[:200]})
             return _blocked("Réponse de l'auditeur sécurité illisible (JSON attendu).")
 
-        raw_verdict = parsed.get("verdict", "PASS")
-        verdict: AuditVerdict = "BLOCK" if raw_verdict == "BLOCK" else "PASS"
+        # Seul "PASS" explicite est accepté ; toute autre valeur ferme l'audit
+        # (ADR-039 : l'audit échoue fermé si la réponse est ambiguë).
+        raw_verdict = str(parsed.get("verdict", ""))
+        verdict: AuditVerdict = "PASS" if raw_verdict == "PASS" else "BLOCK"
 
         issues: list[SecurityIssue] = []
         for entry in parsed.get("issues", []):

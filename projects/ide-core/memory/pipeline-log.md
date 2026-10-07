@@ -1694,3 +1694,51 @@ Le cod (32766ms)
 - 2026-10-07 09:03:19 UTC — [ticket-369] branche ticket-369-at-startup-a-run-interrupted-by-a-stop-leaves-its
 - 2026-10-07 09:03:19 UTC — [ticket-369] tour 1 — codeur démarré
 - 2026-10-07 09:14:39 UTC — [ticket-369] tour 1 — codeur terminé (679875ms)
+- 2026-10-07 09:24:10 UTC — [ticket-369] livraison: rebase sur develop (203ms)
+- 2026-10-07 09:24:10 UTC — [ticket-369] livraison: PR #303 ouverte (4468ms)
+- 2026-10-07 09:24:10 UTC — [ticket-369] livraison: arrêt — La branche locale « develop » (7e55f2d) a divergé de la base distante (b2949bd) : mise à jour ignoré
+- 2026-10-07 09:24:10 UTC — [ide-core] ticket-369 PR #303 confiée au CIWatcher
+- 2026-10-07 09:24:11 UTC — [ticket-366] branche ticket-366-one-request-gives-the-status-of-every-pr-of-a-pro
+- 2026-10-07 09:24:11 UTC — [ticket-366] tour 1 — codeur démarré
+- 2026-10-07 09:33:30 UTC — [ticket-366] tour 1 — codeur terminé (559250ms)
+- 2026-10-07 09:37:22 UTC — [ticket-366] testeur: OK (exit 0)
+- 2026-10-07 09:38:39 UTC — [ticket-366] securite: BLOCK — Two HIGH severity vulnerabilities detected: (1) Missing authentication enforceme (77047ms)
+- 2026-10-07 09:38:41 UTC — [ide-core] file interrompue : ticket-366 non approuvé
+- 2026-10-07 09:49:59 UTC — [ticket-370] branche ticket-370-a-project-id-is-validated-on-every-route-and-can
+- 2026-10-07 09:49:59 UTC — [ticket-370] tour 1 — codeur démarré
+- 2026-10-07 10:02:50 UTC — [ticket-370] tour 1 — codeur terminé (770313ms)
+- 2026-10-07 10:06:07 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 10:06:43 UTC — [ticket-370] securite: PASS — Excellent security addition for path traversal prevention. The diff adds multi-l (36139ms)
+- 2026-10-07 10:06:43 UTC — [ticket-370] tour 1 — reviewer démarré
+- 2026-10-07 10:08:40 UTC — [ticket-370] tour 1 — reviewer terminé (117061ms)
+- 2026-10-07 10:10:12 UTC — [ticket-370] validateur: CHANGES_REQUESTED — 5 critère(s) absent(s) de la réponse du validateur.  (209140ms)
+- 2026-10-07 10:10:12 UTC — [ticket-370] CHANGES_REQUESTED tour 1: Validateur : 5 critère(s) absent(s) de la réponse du validateur. 
+- 2026-10-07 10:10:12 UTC — [ticket-370] tour 2 — codeur démarré
+- 2026-10-07 10:18:42 UTC — [ticket-370] tour 2 — codeur terminé (509655ms)
+- 2026-10-07 10:22:29 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 10:23:09 UTC — [ticket-370] securite: PASS — Audit de sécurité — aucune vulnérabilité détectée.
+Ce patch **renforce** la séc (40953ms)
+- 2026-10-07 10:23:10 UTC — [ticket-370] tour 2 — reviewer démarré
+- 2026-10-07 10:24:15 UTC — [ticket-370] tour 2 — reviewer terminé (65313ms)
+- 2026-10-07 10:27:12 UTC — [ticket-370] validateur: CHANGES_REQUESTED — 5 critère(s) absent(s) de la réponse du validateur.  (241453ms)
+- 2026-10-07 10:27:12 UTC — [ticket-370] CHANGES_REQUESTED tour 2: Validateur : 5 critère(s) absent(s) de la réponse du validateur. 
+- 2026-10-07 10:27:12 UTC — [ticket-370] tour 3 — codeur démarré
+- 2026-10-07 10:34:33 UTC — [ticket-370] tour 3 — codeur terminé (441015ms)
+- 2026-10-07 10:38:27 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 10:39:07 UTC — [ticket-370] securite: PASS — Audit complet du diff de sécurité pour la validation de `project_id` — aucune vu (39983ms)
+- 2026-10-07 10:39:07 UTC — [ticket-370] tour 3 — reviewer démarré
+- 2026-10-07 10:40:31 UTC — [ticket-370] tour 3 — reviewer terminé (84155ms)
+- 2026-10-07 10:42:40 UTC — [ticket-370] validateur: CHANGES_REQUESTED — 5 critère(s) absent(s) de la réponse du validateur.  (212811ms)
+- 2026-10-07 10:42:40 UTC — [ticket-370] CHANGES_REQUESTED tour 3: Validateur : 5 critère(s) absent(s) de la réponse du validateur. 
+- 2026-10-07 10:42:40 UTC — [ticket-370] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-07 10:42:43 UTC — [ide-core] file interrompue : ticket-370 non approuvé
+- 2026-10-07 10:43:09 UTC — [ticket-371] branche ticket-371-the-validator-and-the-security-audit-read-their-o
+- 2026-10-07 10:43:09 UTC — [ticket-371] tour 1 — codeur démarré
+- 2026-10-07 10:48:39 UTC — [ticket-371] tour 1 — codeur terminé (329625ms)
+- 2026-10-07 10:53:20 UTC — [ticket-371] testeur: OK (exit 0)
+- 2026-10-07 10:53:46 UTC — [ticket-371] securite: PASS — Audit terminé : aucune vulnérabilité détectée. Les modifications renforcent la s (26500ms)
+- 2026-10-07 10:53:46 UTC — [ticket-371] tour 1 — reviewer démarré
+- 2026-10-07 10:55:02 UTC — [ticket-371] tour 1 — reviewer terminé (75875ms)
+- 2026-10-07 10:59:40 UTC — [ticket-371] validateur: APPROVED — Tous les critères sont satisfaits. Les tests ont été ajoutés pour valider le com (353375ms)
+- 2026-10-07 10:59:40 UTC — [ticket-371] APPROVED après 1 tour(s)
+- 2026-10-07 11:01:00 UTC — [ticket-371] documentation: 0 fichier(s) (78483ms)

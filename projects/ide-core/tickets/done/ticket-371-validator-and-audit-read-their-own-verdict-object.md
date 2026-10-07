@@ -1,14 +1,15 @@
 ---
-id: ticket-371
-title: "The validator and the security audit read their own verdict object, not the first JSON in the answer"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-07
+id: ticket-371
+pr_number: 307
+priority: critical
+status: done
+title: The validator and the security audit read their own verdict object, not the
+  first JSON in the answer
+type: fix
 ---
 
 # ticket-371 — Le validateur et l'audit lisent leur propre objet de verdict
