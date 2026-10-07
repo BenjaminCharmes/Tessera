@@ -270,6 +270,18 @@ Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
 s'en distingue.
 
+### Reprise de runs orphelins (ticket-369)
+
+Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
+
+Pour chaque run interrompu, si la copie de travail du projet est restée sur une branche `<ticket_id>-…` :
+
+1. Les changements non committés sont committés avec le message du pipeline non approuvé, ce qui garantit que l'arbre n'est jamais sale entre deux runs (ADR-018)
+2. La fiche de ticket est remise en `todo` si elle était en `in-progress` ou `in-review`
+3. La copie de travail revient sur la branche de base du projet
+
+Si la copie de travail est sur une autre branche, aucune action n'est prise. Les erreurs git durant cette reprise sont loggées sans exception : un problème au redémarrage ne doit jamais bloquer le backend.
+
 ### Dialogue pendant un run (ADR-025)
 
 `DialogueChannel` porte les deux sens du dialogue sans rien savoir du
