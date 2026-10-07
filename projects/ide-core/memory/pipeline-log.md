@@ -1755,3 +1755,28 @@ Ce patch **renforce** la séc (40953ms)
 - 2026-10-07 11:22:11 UTC — [ticket-368] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour  (431125ms)
 - 2026-10-07 11:22:11 UTC — [ticket-368] APPROVED après 1 tour(s)
 - 2026-10-07 11:23:42 UTC — [ticket-368] documentation: 1 fichier(s) (87452ms)
+- 2026-10-07 11:23:55 UTC — [ticket-368] livraison: rebase sur develop (312ms)
+- 2026-10-07 11:23:55 UTC — [ticket-368] livraison: PR #308 ouverte (4954ms)
+- 2026-10-07 11:23:55 UTC — [ide-core] ticket-368 PR #308 confiée au CIWatcher
+- 2026-10-07 11:23:57 UTC — [ticket-372] branche ticket-372-a-versioned-fastapi-react-project-template-lives
+- 2026-10-07 11:23:57 UTC — [ticket-372] tour 1 — codeur démarré
+- 2026-10-07 11:28:41 UTC — [ticket-372] tour 1 — codeur terminé (283514ms)
+- 2026-10-07 11:32:22 UTC — [ticket-372] testeur: OK (exit 0)
+- 2026-10-07 11:32:57 UTC — [ticket-372] securite: PASS — Audit complet — aucune vulnérabilité détectée.
+
+PointsControls effectués :
+• Sub (35094ms)
+- 2026-10-07 11:32:57 UTC — [ticket-372] tour 1 — reviewer démarré
+- 2026-10-07 11:34:37 UTC — [ticket-372] tour 1 — reviewer terminé (99750ms)
+- 2026-10-07 11:37:51 UTC — [ticket-372] validateur: CHANGES_REQUESTED — Les critères d'acceptation sont globalement respectés. Le stub jiter est présent (294468ms)
+- 2026-10-07 11:37:51 UTC — [ticket-372] CHANGES_REQUESTED tour 1: Validateur : Les critères d'acceptation sont globalement respectés. Le stub jiter est présent dans l
+- 2026-10-07 11:37:51 UTC — [ticket-372] tour 2 — codeur démarré
+- 2026-10-07 11:38:01 UTC — [ticket-372] tour 2 — codeur terminé (9313ms)
+- 2026-10-07 11:43:15 UTC — [ticket-372] testeur: OK (exit 0)
+- 2026-10-07 11:43:50 UTC — [ticket-372] securite: PASS — No security vulnerabilities detected. The diff introduces a test suite and a Fas (34468ms)
+- 2026-10-07 11:43:50 UTC — [ticket-372] tour 2 — reviewer démarré
+- 2026-10-07 11:44:50 UTC — [ticket-372] tour 2 — reviewer terminé (59968ms)
+- 2026-10-07 11:48:55 UTC — [ticket-372] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le gabarit FastAPI + React a été (305406ms)
+- 2026-10-07 11:48:55 UTC — [ticket-372] APPROVED après 2 tour(s)
+- 2026-10-07 11:51:39 UTC — [ticket-372] documentation: 0 fichier(s) (161172ms) — refusé : doc-technique : README.md : texte introuvable — « ├── projects/
+│   └── ide-core/             ← Projet bootstr ». L'agent a proposé une modification sur un text

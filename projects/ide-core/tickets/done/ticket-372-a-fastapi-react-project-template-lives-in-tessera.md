@@ -1,14 +1,15 @@
 ---
-id: ticket-372
-title: "A versioned FastAPI + React project template lives in Tessera, and its test suite passes as created"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 1
-created: 2026-10-07
+id: ticket-372
+pr_number: 309
+priority: high
+status: done
+title: A versioned FastAPI + React project template lives in Tessera, and its test
+  suite passes as created
+type: feat
 ---
 
 # ticket-372 — Un gabarit de projet FastAPI + React versionné dans Tessera

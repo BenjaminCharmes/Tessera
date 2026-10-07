@@ -1,0 +1,31 @@
+[project]
+name = "{{project_id}}-backend"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.27.0",
+    "mypy>=1.13.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = []
+markers = ["integration: tests that install dependencies and take several minutes"]
+
+[tool.mypy]
+strict = true
+exclude = ["^\\.venv/"]
+
+[[tool.mypy.overrides]]
+# conftest.py : stub jiter de contournement AppLocker, hors typage.
+module = ["conftest"]
+ignore_errors = true
