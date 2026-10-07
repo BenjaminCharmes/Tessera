@@ -47,6 +47,7 @@ en interactif quand le backend tourne.
 | `POST` | `/api/v1/projects/{project_id}/tickets` | Create Ticket |
 | `GET` | `/api/v1/projects/{project_id}/tickets/archive` | List Archived Tickets |
 | `POST` | `/api/v1/projects/{project_id}/tickets/batch` | Create Tickets Batch |
+| `GET` | `/api/v1/projects/{project_id}/pr-statuses` | List PR Statuses For Project |
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Get Ticket |
 | `PATCH` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Update Ticket Status |
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/activity` | Get Ticket Activity |

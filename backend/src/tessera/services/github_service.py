@@ -37,6 +37,15 @@ class PRStatus:
 
 
 @dataclass
+class PRListEntry:
+    """Partial PR data extracted from the paginated listing API — ticket-366."""
+
+    state: Literal["open", "closed", "merged"]
+    pr_url: str
+    head_sha: str
+
+
+@dataclass
 class RepositoryInfo:
     """Ce qu'il faut savoir d'un dépôt distant avant d'y attacher un projet."""
 
@@ -189,6 +198,56 @@ class GitHubService:
         async with httpx.AsyncClient() as client:
             resp = await client.put(url, headers=self._headers, json=payload)
             resp.raise_for_status()
+
+    async def get_ci_status(
+        self, sha: str
+    ) -> Literal["pending", "passing", "failing", "none"]:
+        """Public CI check-runs query — used by the bulk PR status service."""
+        return await self._get_ci_status(sha)
+
+    async def list_pull_requests(self, needed: set[int]) -> dict[int, PRListEntry]:
+        """Return listing entries for the requested pr_numbers — ticket-366.
+
+        Paginates through GET /pulls?state=all&per_page=100, stopping as soon
+        as all requested numbers have been found or pages are exhausted.
+        PR numbers absent from the repository are simply not in the result.
+        """
+        if not needed:
+            return {}
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        found: dict[int, PRListEntry] = {}
+        remaining = set(needed)
+        page = 1
+        while remaining:
+            params: dict[str, str | int] = {
+                "state": "all", "per_page": 100, "page": page
+            }
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(url, headers=self._headers, params=params)
+                resp.raise_for_status()
+            items: list[dict[str, Any]] = resp.json()
+            if not items:
+                break
+            for item in items:
+                num = int(item["number"])
+                if num in remaining:
+                    merged_at = item.get("merged_at")
+                    if merged_at:
+                        state: Literal["open", "closed", "merged"] = "merged"
+                    elif item["state"] == "closed":
+                        state = "closed"
+                    else:
+                        state = "open"
+                    found[num] = PRListEntry(
+                        state=state,
+                        pr_url=str(item["html_url"]),
+                        head_sha=str(item["head"]["sha"]),
+                    )
+                    remaining.discard(num)
+            if len(items) < 100:
+                break
+            page += 1
+        return found
 
     async def _get_ci_status(
         self, sha: str

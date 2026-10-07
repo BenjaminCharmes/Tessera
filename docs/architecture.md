@@ -694,6 +694,20 @@ Le module `backend/src/tessera/services/pr_status_cache.py` implémente deux niv
 
 `GitHubService.get_pull_request_status` et `github_workflow.py` restent inchangés : la livraison doit interroger GitHub en temps réel pour suivre la CI.
 
+### Endpoint consolidé de statuts PR (ticket-366)
+
+L'endpoint `GET /projects/{project_id}/pr-statuses` consolide l'état de toutes les PR d'un projet en une seule requête HTTP, éliminant le coût N du nombre de tickets. C'est le jour et la nuit sur un projet volumineux : 139 tickets sur ide-core le 2026-10-07.
+
+**Optimisations appliquées** :
+
+1. **PR réglées** (merged/closed) : rendues depuis la base sans appel GitHub
+2. **PR absentes de la base** : listées une seule fois via `GET /repos/{repo}/pulls?state=all&per_page=100`, paginée jusqu'à épuisement ou trouvaille complète
+3. **PR réglées retrouvées** : écrites en base pour les futurs appels
+4. **PR ouvertes** : leur statut CI est vérifié avec le cache mémoire 30 s (ticket-364)
+5. **PR orphelines** (`pr_number` hérité d'un autre dépôt, ticket-217) : omises sans erreur
+
+L'endpoint par ticket reste en place : rien d'autre ne change.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

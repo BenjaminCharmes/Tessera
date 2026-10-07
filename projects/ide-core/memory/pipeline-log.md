@@ -1847,3 +1847,16 @@ PointsControls effectués :
 - 2026-10-07 14:06:16 UTC — [ticket-370] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une validati (522766ms)
 - 2026-10-07 14:06:16 UTC — [ticket-370] APPROVED après 1 tour(s)
 - 2026-10-07 14:08:06 UTC — [ticket-370] documentation: 1 fichier(s) (106562ms)
+- 2026-10-07 14:08:55 UTC — [ticket-370] livraison: rebase sur develop (1063ms)
+- 2026-10-07 14:08:55 UTC — [ticket-370] livraison: PR #314 ouverte (14437ms)
+- 2026-10-07 14:17:56 UTC — [ide-core] ticket-370 PR #314 confiée au CIWatcher
+- 2026-10-07 14:18:06 UTC — [ticket-366] branche ticket-366-one-request-gives-the-status-of-every-pr-of-a-pro
+- 2026-10-07 14:18:07 UTC — [ticket-366] tour 1 — codeur démarré
+- 2026-10-07 14:27:52 UTC — [ticket-366] tour 1 — codeur terminé (584016ms)
+- 2026-10-07 14:35:24 UTC — [ticket-366] testeur: OK (exit 0)
+- 2026-10-07 14:36:10 UTC — [ticket-366] securite: PASS — No critical or high-severity security vulnerabilities detected. The codebase fol (45172ms)
+- 2026-10-07 14:36:10 UTC — [ticket-366] tour 1 — reviewer démarré
+- 2026-10-07 14:37:38 UTC — [ticket-366] tour 1 — reviewer terminé (88639ms)
+- 2026-10-07 14:43:31 UTC — [ticket-366] validateur: APPROVED — Les six critères sont satisfaits. Le diff introduit le nouvel endpoint `GET /pro (441640ms)
+- 2026-10-07 14:43:31 UTC — [ticket-366] APPROVED après 1 tour(s)
+- 2026-10-07 14:44:51 UTC — [ticket-366] documentation: 2 fichier(s) (73453ms)

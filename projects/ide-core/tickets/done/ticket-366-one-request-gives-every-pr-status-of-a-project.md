@@ -1,14 +1,15 @@
 ---
-id: ticket-366
-title: "One request gives the status of every PR of a project"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-370"]
-estimated_days: 1
 created: 2026-10-07
+depends_on:
+- ticket-370
+estimated_days: 1
+id: ticket-366
+pr_number: 317
+priority: high
+status: done
+title: One request gives the status of every PR of a project
+type: feat
 ---
 
 # ticket-366 — Une requête donne l'état de toutes les PR d'un projet
