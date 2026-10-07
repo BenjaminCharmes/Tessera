@@ -1,14 +1,15 @@
 ---
-id: ticket-368
-title: "The kanban's done and cancelled columns show the 30 latest tickets, the rest on demand"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-07
+id: ticket-368
+pr_number: 308
+priority: medium
+status: done
+title: The kanban's done and cancelled columns show the 30 latest tickets, the rest
+  on demand
+type: feat
 ---
 
 # ticket-368 — Les colonnes terminées du kanban montrent les 30 derniers tickets

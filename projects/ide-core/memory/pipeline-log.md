@@ -1742,3 +1742,16 @@ Ce patch **renforce** la séc (40953ms)
 - 2026-10-07 10:59:40 UTC — [ticket-371] validateur: APPROVED — Tous les critères sont satisfaits. Les tests ont été ajoutés pour valider le com (353375ms)
 - 2026-10-07 10:59:40 UTC — [ticket-371] APPROVED après 1 tour(s)
 - 2026-10-07 11:01:00 UTC — [ticket-371] documentation: 0 fichier(s) (78483ms)
+- 2026-10-07 11:01:12 UTC — [ticket-371] livraison: rebase sur develop (531ms)
+- 2026-10-07 11:01:12 UTC — [ticket-371] livraison: PR #307 ouverte (4437ms)
+- 2026-10-07 11:01:12 UTC — [ide-core] ticket-371 PR #307 confiée au CIWatcher
+- 2026-10-07 11:06:33 UTC — [ticket-368] branche ticket-368-the-kanban-s-done-and-cancelled-columns-show-the
+- 2026-10-07 11:06:33 UTC — [ticket-368] tour 1 — codeur démarré
+- 2026-10-07 11:10:32 UTC — [ticket-368] tour 1 — codeur terminé (238077ms)
+- 2026-10-07 11:14:42 UTC — [ticket-368] testeur: OK (exit 0)
+- 2026-10-07 11:15:00 UTC — [ticket-368] securite: PASS — Aucune vulnérabilité détectée. Le diff améliore la performance de rendu du compo (17561ms)
+- 2026-10-07 11:15:00 UTC — [ticket-368] tour 1 — reviewer démarré
+- 2026-10-07 11:15:48 UTC — [ticket-368] tour 1 — reviewer terminé (47733ms)
+- 2026-10-07 11:22:11 UTC — [ticket-368] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour  (431125ms)
+- 2026-10-07 11:22:11 UTC — [ticket-368] APPROVED après 1 tour(s)
+- 2026-10-07 11:23:42 UTC — [ticket-368] documentation: 1 fichier(s) (87452ms)
