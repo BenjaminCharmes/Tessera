@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-364
-pr_number: null
+pr_number: 297
 priority: high
 status: done
 title: A PR's status is remembered instead of being asked of GitHub on every card
