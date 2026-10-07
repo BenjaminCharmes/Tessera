@@ -13,6 +13,7 @@ bloqué sur « en cours » (ticket-079, ticket-121).
 """
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any, Optional, Protocol
 
 from tessera.config import settings
@@ -34,6 +35,24 @@ from tessera.utils.logger import get_logger
 TitreGetter = Callable[[str], Awaitable[str | None]]
 
 _logger = get_logger(__name__)
+
+
+def _log_pipeline(project_id: str, message: str) -> None:
+    """Write a 'file interrompue' line to the project's pipeline log.
+
+    Mirrors the `_log` method of `Orchestrator` so the user can see that the
+    queue died, even when the exception was raised outside of the orchestrator
+    (e.g. a DB error or an unexpected crash in `executer`).
+    """
+    log_path: Path = settings.ide_workspace_dir / project_id / "memory" / "pipeline-log.md"
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    line = f"- {ts} — [{project_id}] file interrompue : {message}\n"
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(line)
+    except Exception as exc:  # noqa: BLE001
+        _logger.warning("pipeline_log_write_failed", extra={"error": str(exc)})
 
 
 class Orchestrateur(Protocol):
@@ -271,6 +290,7 @@ async def executer(
     except Exception as exc:  # noqa: BLE001 — voir la docstring
         echec = str(exc)
         _logger.warning("run_interrompu", extra={"erreur": echec})
+        _log_pipeline(run.project_id, echec)
     finally:
         # Libérer le projet **avant** d'écrire en base : le pipeline a rendu
         # la main, et quelqu'un qui relance au signal de fin ne doit pas

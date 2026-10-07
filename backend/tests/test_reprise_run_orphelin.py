@@ -395,6 +395,89 @@ async def test_aucune_divergence_base_apres_reprise(tmp_path: Path) -> None:
     )
 
 
+async def test_fiche_non_suivie_in_progress_dans_commit(tmp_path: Path) -> None:
+    """An untracked ticket file in in-progress/ lands in the recovery commit under todo/.
+
+    Simule le cas réel : la fiche passe de tickets/todo/ (suivie) à
+    tickets/in-progress/ (non suivie) au démarrage du run, qui meurt aussitôt.
+    La reprise doit la retrouver, la remettre en todo et la commiter sur la
+    branche du ticket, même si git ne la connaît pas encore.
+    """
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    repo = ws / "mon-projet"
+    repo.mkdir()
+
+    await _git(repo, "init", "-q", "-b", "develop")
+    await _git(repo, "config", "user.email", "test@tessera.local")
+    await _git(repo, "config", "user.name", "Tessera Test")
+    (repo / "README.md").write_text("# projet\n", encoding="utf-8")
+    await _git(repo, "add", "README.md")
+    await _git(repo, "commit", "-q", "-m", "init")
+    await _git(repo, "checkout", "-b", "ticket-901-mon-ticket")
+
+    # Fiche du ticket dans in-progress/ (non suivie par git — le déplacement
+    # depuis todo/ n'a pas encore été commité).
+    in_progress = repo / "tickets" / "in-progress"
+    in_progress.mkdir(parents=True)
+    ticket_file = in_progress / "ticket-901-mon-ticket.md"
+    ticket_file.write_text(
+        _ticket_frontmatter("ticket-901", "in-progress"), encoding="utf-8"
+    )
+
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    # Le commit de la branche du ticket doit contenir la fiche dans todo/.
+    shown = await _git(
+        repo,
+        "show",
+        "ticket-901-mon-ticket:tickets/todo/ticket-901-mon-ticket.md",
+    )
+    assert "status: todo" in shown, (
+        f"champ status: todo absent du commit sur la branche ticket : {shown!r}"
+    )
+    assert not ticket_file.exists(), "la fiche ne doit plus être dans in-progress/"
+
+
+async def test_fiche_non_suivie_seule_dans_commit(tmp_path: Path) -> None:
+    """Only the untracked ticket file enters the recovery commit; other untracked files stay out.
+
+    Lorsque la fiche est dans in-progress/ non suivie et qu'un autre fichier
+    non suivi traîne dans l'arbre, seule la fiche (remise en todo/) doit
+    apparaître dans le commit de reprise. Aucun fichier étranger ne s'y glisse.
+    """
+    ws, repo = await _make_workspace_on_ticket_branch(tmp_path)
+
+    # Fiche non suivie dans in-progress/
+    in_progress = repo / "tickets" / "in-progress"
+    in_progress.mkdir(parents=True)
+    ticket_file = in_progress / "ticket-901-mon-ticket.md"
+    ticket_file.write_text(
+        _ticket_frontmatter("ticket-901", "in-progress"), encoding="utf-8"
+    )
+    # Autre fichier non suivi qui ne doit pas entrer dans le commit.
+    brouillon = repo / "brouillon.txt"
+    brouillon.write_text("non suivi\n", encoding="utf-8")
+
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    commits = await _git(
+        repo, "show", "--name-only", "--format=", "ticket-901-mon-ticket"
+    )
+    assert "tickets/todo/ticket-901-mon-ticket.md" in commits, (
+        f"la fiche doit être dans le commit : {commits!r}"
+    )
+    assert "brouillon.txt" not in commits, (
+        f"brouillon.txt ne doit pas être dans le commit : {commits!r}"
+    )
+    assert brouillon.exists(), "brouillon.txt doit encore exister sur le disque"
+    assert not ticket_file.exists(), "la fiche ne doit plus être dans in-progress/"
+
+
 async def test_le_demarrage_de_l_app_en_test_ne_solde_ni_ne_reprend_rien() -> None:
     """Starting the app in tests never settles runs nor touches a repository.
 
