@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.25
 id: ticket-376
-pr_number: null
+pr_number: 312
 priority: critical
 status: done
 title: An agent's JSON answer is read even when a string holds an unescaped backslash
