@@ -1778,3 +1778,5 @@ PointsControls effectués :
 - 2026-10-07 11:44:50 UTC — [ticket-372] tour 2 — reviewer terminé (59968ms)
 - 2026-10-07 11:48:55 UTC — [ticket-372] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le gabarit FastAPI + React a été (305406ms)
 - 2026-10-07 11:48:55 UTC — [ticket-372] APPROVED après 2 tour(s)
+- 2026-10-07 11:51:39 UTC — [ticket-372] documentation: 0 fichier(s) (161172ms) — refusé : doc-technique : README.md : texte introuvable — « ├── projects/
+│   └── ide-core/             ← Projet bootstr ». L'agent a proposé une modification sur un text
