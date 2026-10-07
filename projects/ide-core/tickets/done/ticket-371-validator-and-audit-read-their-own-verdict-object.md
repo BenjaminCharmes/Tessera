@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-371
-pr_number: null
+pr_number: 307
 priority: critical
 status: done
 title: The validator and the security audit read their own verdict object, not the
