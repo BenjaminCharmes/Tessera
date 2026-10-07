@@ -252,3 +252,19 @@ async def test_ni_fichier_non_suivi_ni_depot_imbrique_dans_le_commit(tmp_path: P
     assert "brouillon.txt" not in commites
     assert "autre-projet" not in commites
     assert (repo / "brouillon.txt").read_text(encoding="utf-8") == "non suivi\n"
+
+
+async def test_le_demarrage_de_l_app_en_test_ne_solde_ni_ne_reprend_rien() -> None:
+    """Starting the app in tests never settles runs nor touches a repository.
+
+    `settings` désigne la vraie base et le vrai dossier des projets : le
+    testeur du pipeline lance cette suite pendant un run, que chaque
+    `TestClient(app)` soldait puis, avec la reprise, commitait et déplaçait
+    de branche (2026-10-07). `conftest.py` neutralise les deux appels du
+    `lifespan`.
+    """
+    import tessera.main
+
+    assert await tessera.main.solder_les_runs_orphelins("inutile") == []
+    assert await tessera.main.reprendre_depots_orphelins([], "inutile", Path(".")) is None
+    assert tessera.main.solder_les_runs_orphelins is not solder_les_runs_orphelins

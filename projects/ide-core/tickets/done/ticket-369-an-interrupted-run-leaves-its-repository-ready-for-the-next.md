@@ -4,9 +4,9 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 1
 id: ticket-369
-pr_number: null
+pr_number: 303
 priority: high
-status: in-review
+status: done
 title: At startup, a run interrupted by a stop leaves its repository ready for the
   next run
 type: fix
