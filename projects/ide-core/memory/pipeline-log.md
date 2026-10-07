@@ -1806,3 +1806,24 @@ PointsControls effectués :
 - 2026-10-07 12:39:23 UTC — [ticket-376] APPROVED après 1 tour(s)
 - 2026-10-07 12:41:20 UTC — [ticket-376] documentation: 0 fichier(s) (114250ms) — refusé : doc-technique : README.md : texte introuvable — « ├── projects/
 │   └── ide-core/             ← Projet bootstr ». L'agent a proposé une modification sur un text
+- 2026-10-07 12:41:30 UTC — [ticket-376] livraison: rebase sur develop (266ms)
+- 2026-10-07 12:41:30 UTC — [ticket-376] livraison: PR #312 ouverte (4484ms)
+- 2026-10-07 12:41:30 UTC — [ide-core] ticket-376 PR #312 confiée au CIWatcher
+- 2026-10-07 12:41:31 UTC — [ticket-375] branche ticket-375-startup-recovery-resets-the-ticket-on-its-own-bra
+- 2026-10-07 12:41:32 UTC — [ticket-375] tour 1 — codeur démarré
+- 2026-10-07 12:50:47 UTC — [ticket-375] tour 1 — codeur terminé (555453ms)
+- 2026-10-07 12:55:38 UTC — [ticket-375] testeur: 2 failed, 2053 passed, 20 warnings in 286.62s (0:04:46)
+- 2026-10-07 12:55:38 UTC — [ticket-375] tests rouges au tour 1
+- 2026-10-07 12:55:38 UTC — [ticket-375] tour 2 — codeur démarré
+- 2026-10-07 12:59:25 UTC — [ticket-375] tour 2 — codeur terminé (226687ms)
+- 2026-10-07 13:02:40 UTC — [ticket-375] testeur: 1 failed, 735 passed, 20 warnings in 190.86s (0:03:10)
+- 2026-10-07 13:02:40 UTC — [ticket-375] tests rouges au tour 2
+- 2026-10-07 13:02:40 UTC — [ticket-375] tour 3 — codeur démarré
+- 2026-10-07 13:06:23 UTC — [ticket-375] tour 3 — codeur terminé (223203ms)
+- 2026-10-07 13:11:45 UTC — [ticket-375] testeur: OK (exit 0)
+- 2026-10-07 13:12:29 UTC — [ticket-375] securite: PASS — Audit de sécurité complet sur le diff de reprise d'orphelins : aucune vulnérabil (43266ms)
+- 2026-10-07 13:12:29 UTC — [ticket-375] tour 3 — reviewer démarré
+- 2026-10-07 13:14:06 UTC — [ticket-375] tour 3 — reviewer terminé (97561ms)
+- 2026-10-07 13:17:25 UTC — [ticket-375] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés et mo (296344ms)
+- 2026-10-07 13:17:25 UTC — [ticket-375] APPROVED après 3 tour(s)
+- 2026-10-07 13:19:52 UTC — [ticket-375] documentation: 0 fichier(s) (143687ms)

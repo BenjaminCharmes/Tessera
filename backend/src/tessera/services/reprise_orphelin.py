@@ -6,10 +6,14 @@ du ticket dans un statut intermédiaire, branche courante sur la branche du
 ticket. Ce module comble le gap au démarrage.
 
 Pour chaque run soldé, si la copie de travail est sur la branche du ticket :
-1. les changements en cours sont commités avec le message des runs non approuvés
-   (ADR-018 : l'arbre ne reste jamais sale) ;
-2. la fiche du ticket est remise en todo si elle est en in-progress ou in-review ;
-3. la copie de travail revient sur la branche de base du projet.
+1. la fiche du ticket est déplacée dans tickets/todo/ et son statut forcé à todo,
+   sur la branche du ticket, avant tout commit ;
+2. les changements en cours (fiche incluse) sont commités avec le message des runs
+   non approuvés (ADR-018 : l'arbre ne reste jamais sale) ;
+3. la copie de travail revient sur la branche de base sans y écrire quoi que ce soit.
+
+La branche de base n'est jamais modifiée : un run suivant ne trouve donc aucune
+divergence locale (ticket-375).
 
 Une erreur git est journalisée et n'empêche jamais le démarrage du backend.
 """
@@ -139,26 +143,46 @@ async def _reprendre_depot_seul(
         )
         return
 
-    # Sauvegarde le contenu de la fiche avant toute opération git.
-    # Après `git checkout base_branch`, le fichier peut disparaître si le ticket
-    # n'existe pas encore sur la branche de base (nouveau ticket, jamais poussé
-    # en mode suivi). La sauvegarde permet de le recréer dans todo/.
+    # Lit la fiche avant toute opération : le statut et le chemin sont stables
+    # tant qu'on est sur la branche du ticket.
     ticket_svc = TicketService(project_path, project_id)
     ticket_avant = await ticket_svc.get_ticket(ticket_id)
     ticket_contenu: str | None = None
     ticket_nom: str | None = None
+    old_ticket_path: Path | None = None
     if ticket_avant is not None and ticket_avant.status in (
         TicketStatus.in_progress,
         TicketStatus.in_review,
     ):
         try:
-            ticket_contenu = Path(ticket_avant.file_path).read_text(encoding="utf-8")
-            ticket_nom = Path(ticket_avant.file_path).name
+            old_ticket_path = Path(ticket_avant.file_path)
+            ticket_contenu = old_ticket_path.read_text(encoding="utf-8")
+            ticket_nom = old_ticket_path.name
         except OSError:
             pass
 
     try:
-        # 1. Commiter les changements en cours (ADR-018 : l'arbre ne reste jamais sale).
+        # 1. Remettre la fiche du ticket en todo SUR LA BRANCHE DU TICKET,
+        #    avant le commit, pour qu'elle en fasse partie (ticket-375).
+        #    La branche de base n'est plus touchée du tout après le checkout.
+        todo_path: Path | None = None
+        if ticket_contenu is not None and ticket_nom is not None:
+            todo_dir = project_path / "tickets" / "todo"
+            todo_dir.mkdir(parents=True, exist_ok=True)
+            todo_path = todo_dir / ticket_nom
+            _ecrire_ticket_todo(todo_path, ticket_contenu)
+            # Supprimer l'ancien emplacement s'il diffère du nouveau.
+            if old_ticket_path is not None and old_ticket_path != todo_path:
+                try:
+                    old_ticket_path.unlink()
+                except OSError:
+                    pass
+            _logger.info(
+                "reprise_ticket_remis_en_todo_sur_branche_ticket",
+                extra={"project_id": project_id, "ticket_id": ticket_id},
+            )
+
+        # 2. Commiter les changements en cours (ADR-018 : l'arbre ne reste jamais sale).
         # Seuls les fichiers déjà suivis, dans tout le dépôt (`:/`) : jamais
         # `add -A`. Pour un projet `git_root: ancestor` (ide-core), le dépôt est
         # celui de Tessera entier, et `add -A` y embarquerait les fichiers non
@@ -168,6 +192,11 @@ async def _reprendre_depot_seul(
         # fichier créé par le codeur reste donc dans l'arbre, non suivi : rien
         # n'est perdu, rien d'étranger n'est commité.
         await _git(project_path, "add", "--update", "--", ":/")
+        # Ajouter aussi la fiche déplacée dans todo/ : `--update` ne suit que les
+        # fichiers déjà connus de l'index, pas les nouveaux emplacements.
+        if todo_path is not None:
+            rel = todo_path.relative_to(project_path)
+            await _git(project_path, "add", "--", rel.as_posix())
         staged = await _git(project_path, "diff", "--cached", "--name-only")
         if staged:
             commit_msg = _unapproved_commit_message(ticket_id, _RAISON_ARRET)
@@ -177,36 +206,13 @@ async def _reprendre_depot_seul(
                 extra={"project_id": project_id, "ticket_id": ticket_id},
             )
 
-        # 2. Revenir sur la branche de base.
+        # 3. Revenir sur la branche de base sans y écrire quoi que ce soit.
         base_branch = _lire_base_branch(project_path)
         await _git(project_path, "checkout", base_branch)
         _logger.info(
             "reprise_retour_branche_base",
             extra={"project_id": project_id, "base_branch": base_branch},
         )
-
-        # 3. Remettre la fiche du ticket en todo.
-        if ticket_contenu is not None and ticket_nom is not None:
-            ticket_apres = await ticket_svc.get_ticket(ticket_id)
-            if ticket_apres is None:
-                # Le checkout a supprimé la fiche (ticket uniquement sur la
-                # branche du ticket) : la recréer dans todo/.
-                todo_dir = project_path / "tickets" / "todo"
-                todo_dir.mkdir(parents=True, exist_ok=True)
-                _ecrire_ticket_todo(todo_dir / ticket_nom, ticket_contenu)
-                _logger.info(
-                    "reprise_ticket_restaure_en_todo",
-                    extra={"project_id": project_id, "ticket_id": ticket_id},
-                )
-            elif ticket_apres.status in (
-                TicketStatus.in_progress,
-                TicketStatus.in_review,
-            ):
-                await ticket_svc.update_status(ticket_id, TicketStatus.todo)
-                _logger.info(
-                    "reprise_ticket_remis_en_todo",
-                    extra={"project_id": project_id, "ticket_id": ticket_id},
-                )
 
     except Exception as exc:
         _logger.warning(

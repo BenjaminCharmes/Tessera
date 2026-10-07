@@ -127,7 +127,11 @@ async def test_commit_unapproved_sur_branche_ticket(tmp_path: Path) -> None:
 
 
 async def test_ticket_in_review_revient_en_todo(tmp_path: Path) -> None:
-    """A ticket in tickets/in-review/ moves back to tickets/todo/ with status: todo."""
+    """A ticket in tickets/in-review/ is committed in tickets/todo/ with status: todo.
+
+    Après la reprise, la fiche est dans le commit « unapproved work » de la branche
+    du ticket, pas sur la branche de base (ticket-375 : la base n'est plus touchée).
+    """
     ws = tmp_path / "ws"
     ws.mkdir()
     repo = ws / "mon-projet"
@@ -141,7 +145,7 @@ async def test_ticket_in_review_revient_en_todo(tmp_path: Path) -> None:
     await _git(repo, "commit", "-q", "-m", "init")
     await _git(repo, "checkout", "-b", "ticket-901-mon-ticket")
 
-    # Fiche du ticket dans in-review/
+    # Fiche du ticket dans in-review/ (non suivie par git pour tester le cas limite)
     in_review = repo / "tickets" / "in-review"
     in_review.mkdir(parents=True)
     ticket_file = in_review / "ticket-901-mon-ticket.md"
@@ -153,13 +157,16 @@ async def test_ticket_in_review_revient_en_todo(tmp_path: Path) -> None:
 
     await reprendre_depots_orphelins(orphelins, db, ws)
 
-    todo_dir = repo / "tickets" / "todo"
-    expected = todo_dir / "ticket-901-mon-ticket.md"
-    assert expected.is_file(), "la fiche doit être dans tickets/todo/"
+    # La fiche doit apparaître dans le commit sur la branche du ticket (ticket-375).
+    shown = await _git(
+        repo,
+        "show",
+        "ticket-901-mon-ticket:tickets/todo/ticket-901-mon-ticket.md",
+    )
+    assert "status: todo" in shown, (
+        f"champ status: todo absent du commit sur la branche ticket : {shown!r}"
+    )
     assert not ticket_file.exists(), "la fiche ne doit plus être dans in-review/"
-
-    content = expected.read_text(encoding="utf-8")
-    assert "status: todo" in content, f"champ status: todo absent : {content!r}"
 
 
 async def test_retour_sur_branche_de_base(tmp_path: Path) -> None:
@@ -252,6 +259,140 @@ async def test_ni_fichier_non_suivi_ni_depot_imbrique_dans_le_commit(tmp_path: P
     assert "brouillon.txt" not in commites
     assert "autre-projet" not in commites
     assert (repo / "brouillon.txt").read_text(encoding="utf-8") == "non suivi\n"
+
+
+async def _make_workspace_with_ticket(
+    tmp_path: Path, ticket_status: str = "in-progress"
+) -> tuple[Path, Path]:
+    """Create a workspace with a tracked ticket file on the ticket branch.
+
+    Le ticket est commité sur la branche du ticket (pas sur develop) :
+    c'est le cas réel, où le pipeline a déjà poussé la fiche.
+    """
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    repo = ws / "mon-projet"
+    repo.mkdir()
+
+    await _git(repo, "init", "-q", "-b", "develop")
+    await _git(repo, "config", "user.email", "test@tessera.local")
+    await _git(repo, "config", "user.name", "Tessera Test")
+    (repo / "README.md").write_text("# projet\n", encoding="utf-8")
+    await _git(repo, "add", "README.md")
+    await _git(repo, "commit", "-q", "-m", "init")
+    await _git(repo, "checkout", "-b", "ticket-901-mon-ticket")
+
+    # Fiche suivie par git, commitée sur la branche du ticket
+    status_dir = repo / "tickets" / ticket_status
+    status_dir.mkdir(parents=True)
+    ticket_file = status_dir / "ticket-901-mon-ticket.md"
+    ticket_file.write_text(
+        _ticket_frontmatter("ticket-901", ticket_status), encoding="utf-8"
+    )
+    await _git(repo, "add", f"tickets/{ticket_status}/ticket-901-mon-ticket.md")
+    await _git(repo, "commit", "-q", "-m", "chore: add ticket")
+
+    # Travail du codeur non commité
+    (repo / "README.md").write_text("# projet\n\nmodifié\n", encoding="utf-8")
+    return ws, repo
+
+
+async def test_base_branch_sha_inchange_apres_reprise(tmp_path: Path) -> None:
+    """After recovery the base branch HEAD SHA is exactly the same as before."""
+    ws, repo = await _make_workspace_with_ticket(tmp_path)
+    sha_avant = await _git(repo, "rev-parse", "develop")
+
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    sha_apres = await _git(repo, "rev-parse", "develop")
+    assert sha_avant == sha_apres, (
+        f"le SHA de la branche de base ne doit pas changer "
+        f"(avant: {sha_avant!r}, après: {sha_apres!r})"
+    )
+
+
+async def test_statut_propre_base_avec_ticket_apres_reprise(tmp_path: Path) -> None:
+    """Base branch has no uncommitted changes after recovery, even when a ticket is reset."""
+    ws, repo = await _make_workspace_with_ticket(tmp_path)
+
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    # HEAD est sur develop après la reprise.
+    status = await _git(repo, "status", "--porcelain", "--untracked-files=no")
+    assert status.strip() == "", (
+        f"l'arbre de la branche de base doit être propre ; git status: {status!r}"
+    )
+
+
+async def test_commit_unapproved_contient_ticket_en_todo(tmp_path: Path) -> None:
+    """The unapproved-work commit on the ticket branch holds the ticket in tickets/todo/."""
+    ws, repo = await _make_workspace_with_ticket(tmp_path, "in-progress")
+
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    # Le contenu du fichier depuis le commit de la branche du ticket.
+    shown = await _git(
+        repo,
+        "show",
+        "ticket-901-mon-ticket:tickets/todo/ticket-901-mon-ticket.md",
+    )
+    assert "status: todo" in shown, (
+        f"champ status: todo absent du commit : {shown!r}"
+    )
+    # La fiche n'est plus dans in-progress/ dans ce commit.
+    files_in_commit = await _git(
+        repo, "diff-tree", "--no-commit-id", "-r", "--name-only",
+        "ticket-901-mon-ticket",
+    )
+    assert "tickets/todo/ticket-901-mon-ticket.md" in files_in_commit, (
+        f"tickets/todo/ absent du commit : {files_in_commit!r}"
+    )
+
+
+async def test_aucune_divergence_base_apres_reprise(tmp_path: Path) -> None:
+    """After recovery the base branch has no commit absent from its simulated upstream."""
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    repo = ws / "mon-projet"
+    repo.mkdir()
+
+    # Remote simulé : dépôt nu
+    bare = tmp_path / "origin.git"
+    bare.mkdir()
+    await _git(bare, "init", "-q", "--bare", "-b", "develop")
+
+    await _git(repo, "init", "-q", "-b", "develop")
+    await _git(repo, "config", "user.email", "test@tessera.local")
+    await _git(repo, "config", "user.name", "Tessera Test")
+    (repo / "README.md").write_text("# projet\n", encoding="utf-8")
+    await _git(repo, "add", "README.md")
+    await _git(repo, "commit", "-q", "-m", "init")
+    await _git(repo, "remote", "add", "origin", str(bare))
+    await _git(repo, "push", "-u", "origin", "develop")
+
+    # Branche du ticket avec un ticket suivi
+    await _git(repo, "checkout", "-b", "ticket-901-mon-ticket")
+    in_progress = repo / "tickets" / "in-progress"
+    in_progress.mkdir(parents=True)
+    ticket_file = in_progress / "ticket-901-mon-ticket.md"
+    ticket_file.write_text(
+        _ticket_frontmatter("ticket-901", "in-progress"), encoding="utf-8"
+    )
+    await _git(repo, "add", "tickets/in-progress/ticket-901-mon-ticket.md")
+    await _git(repo, "commit", "-q", "-m", "chore: add ticket")
+    (repo / "README.md").write_text("# projet\n\nmodifié\n", encoding="utf-8")
+
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    # La branche de base locale ne doit avoir aucun commit absent de son amont.
+    divergence = await _git(repo, "log", "--oneline", "origin/develop..develop")
+    assert divergence.strip() == "", (
+        f"la branche de base a divergé de son amont : {divergence!r}"
+    )
 
 
 async def test_le_demarrage_de_l_app_en_test_ne_solde_ni_ne_reprend_rien() -> None:

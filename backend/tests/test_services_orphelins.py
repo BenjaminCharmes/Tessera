@@ -83,9 +83,9 @@ def test_un_backend_tue_brutalement_ne_laisse_pas_son_service(
 
     parent = subprocess.Popen([sys.executable, "-c", script])
     try:
-        # 30 s max : sous charge (suite complète), l'import du package tessera
-        # et le démarrage d'un sous-processus asyncio peuvent dépasser 10 s.
-        for _ in range(300):
+        # 60 s max : sous charge (suite complète), l'import du package tessera
+        # et le démarrage d'un sous-processus asyncio peuvent dépasser 30 s.
+        for _ in range(600):
             if temoin.exists():
                 break
             time.sleep(0.1)

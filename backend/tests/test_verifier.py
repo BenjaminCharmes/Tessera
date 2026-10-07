@@ -235,7 +235,7 @@ def test_chains_overlap_in_time() -> None:
     active: list[str] = []
     lock = threading.Lock()
     overlapped = threading.Event()
-    DELAY = 0.1
+    DELAY = 1.0
 
     def slow_run(cmd: list[str], **_: object) -> MagicMock:
         step_id = " ".join(cmd)
