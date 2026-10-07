@@ -1780,3 +1780,27 @@ PointsControls effectués :
 - 2026-10-07 11:48:55 UTC — [ticket-372] APPROVED après 2 tour(s)
 - 2026-10-07 11:51:39 UTC — [ticket-372] documentation: 0 fichier(s) (161172ms) — refusé : doc-technique : README.md : texte introuvable — « ├── projects/
 │   └── ide-core/             ← Projet bootstr ». L'agent a proposé une modification sur un text
+- 2026-10-07 11:51:59 UTC — [ticket-372] livraison: rebase sur develop (2016ms)
+- 2026-10-07 11:51:59 UTC — [ticket-372] livraison: PR #309 ouverte (8297ms)
+- 2026-10-07 11:55:56 UTC — [ide-core] ticket-372 PR #309 confiée au CIWatcher
+- 2026-10-07 11:55:57 UTC — [ticket-373] branche ticket-373-a-project-is-created-from-the-template-in-one-cal
+- 2026-10-07 11:55:57 UTC — [ticket-373] tour 1 — codeur démarré
+- 2026-10-07 12:07:32 UTC — [ticket-373] tour 1 — codeur terminé (694890ms)
+- 2026-10-07 12:13:23 UTC — [ticket-373] testeur: OK (exit 0)
+- 2026-10-07 12:14:23 UTC — [ticket-373] securite: BLOCK — One HIGH severity vulnerability detected: 'project_id' is not validated before u (59906ms)
+- 2026-10-07 12:14:30 UTC — [ide-core] file interrompue : ticket-373 non approuvé
+- 2026-10-07 12:18:59 UTC — [ticket-370] branche ticket-370-a-project-id-is-validated-on-every-route-and-can
+- 2026-10-07 12:18:59 UTC — [ticket-370] tour 1 — codeur démarré
+- 2026-10-07 12:20:27 UTC — [ticket-370] tour 1 — codeur terminé (87750ms)
+- 2026-10-07 12:24:18 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 12:24:54 UTC — [ticket-370] securite: BLOCK — Réponse de l'auditeur sécurité illisible (JSON attendu). (36030ms)
+- 2026-10-07 12:24:56 UTC — [ide-core] file interrompue : ticket-370 non approuvé
+- 2026-10-07 12:29:01 UTC — [ticket-376] branche ticket-376-an-agent-s-json-answer-is-read-even-when-a-string
+- 2026-10-07 12:29:02 UTC — [ticket-376] tour 1 — codeur démarré
+- 2026-10-07 12:33:10 UTC — [ticket-376] tour 1 — codeur terminé (247936ms)
+- 2026-10-07 12:36:21 UTC — [ticket-376] testeur: OK (exit 0)
+- 2026-10-07 12:36:46 UTC — [ticket-376] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente un mécanisme robuste de correc (25311ms)
+- 2026-10-07 12:36:46 UTC — [ticket-376] tour 1 — reviewer démarré
+- 2026-10-07 12:37:26 UTC — [ticket-376] tour 1 — reviewer terminé (40031ms)
+- 2026-10-07 12:39:23 UTC — [ticket-376] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente une correction pour gérer  (157281ms)
+- 2026-10-07 12:39:23 UTC — [ticket-376] APPROVED après 1 tour(s)
