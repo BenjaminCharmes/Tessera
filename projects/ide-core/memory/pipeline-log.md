@@ -1717,6 +1717,7 @@ Le cod (32766ms)
 - 2026-10-07 10:18:42 UTC — [ticket-370] tour 2 — codeur terminé (509655ms)
 - 2026-10-07 10:22:29 UTC — [ticket-370] testeur: OK (exit 0)
 - 2026-10-07 10:23:09 UTC — [ticket-370] securite: PASS — Audit de sécurité — aucune vulnérabilité détectée.
+
 Ce patch **renforce** la séc (40953ms)
 - 2026-10-07 10:23:10 UTC — [ticket-370] tour 2 — reviewer démarré
 - 2026-10-07 10:24:15 UTC — [ticket-370] tour 2 — reviewer terminé (65313ms)
