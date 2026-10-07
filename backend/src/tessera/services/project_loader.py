@@ -5,6 +5,7 @@ from pathlib import Path
 
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
+from tessera.utils.project_id import validate_project_id  # noqa: F401 — réexportée
 from tessera.services.artifacts import default_mode_for
 from tessera.services.providers.noms import (
     PROVIDERS_ANTHROPIC,
@@ -16,17 +17,9 @@ from tessera.services.providers.noms import (
 # Project-id validation — ticket-370
 # ------------------------------------------------------------------
 
-_PROJECT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+# La validation vit dans `tessera.utils.project_id` (importée ci-dessus) :
+# les modèles en ont besoin aussi, et ils sont importés par ce module.
 
-
-def validate_project_id(project_id: str) -> bool:
-    """Return True when project_id is safe to use as a directory name.
-
-    Accepts identifiers matching ``^[A-Za-z0-9][A-Za-z0-9._-]*$``.
-    Rejects empty strings, path separators (/ and \\) and traversal
-    sequences (., .., ../x, ..\\x) without touching the filesystem.
-    """
-    return bool(_PROJECT_ID_RE.match(project_id))
 
 
 # ------------------------------------------------------------------

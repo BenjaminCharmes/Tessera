@@ -120,3 +120,28 @@ def test_tickets_endpoint_returns_200_for_valid_project(workspace: Path) -> None
     with TestClient(app) as c:
         response = c.get("/api/v1/projects/mon-projet/tickets")
     assert response.status_code == 200
+
+
+# ------------------------------------------------------------------ revue (corps de création)
+
+
+def test_validate_project_id_refuses_a_trailing_newline() -> None:
+    """A trailing newline is refused: the whole string must match."""
+    assert validate_project_id("ide-core\n") is False
+
+
+@pytest.mark.parametrize(
+    ("route", "corps"),
+    [
+        ("/api/v1/projects", {"project_id": "../hors", "name": "x"}),
+        ("/api/v1/projects/import", {"source_path": "C:/nulle-part", "project_id": ".."}),
+        ("/api/v1/projects/clone", {"repo_url": "https://github.com/o/r", "project_id": ".."}),
+    ],
+)
+def test_project_creation_bodies_refuse_an_unsafe_id(
+    client: TestClient, workspace: Path, route: str, corps: dict[str, str]
+) -> None:
+    """Creating, importing or cloning a project refuses an id that leaves the projects folder."""
+    reponse = client.post(route, json=corps)
+    assert reponse.status_code == 422
+    assert not (workspace.parent / "hors").exists()
