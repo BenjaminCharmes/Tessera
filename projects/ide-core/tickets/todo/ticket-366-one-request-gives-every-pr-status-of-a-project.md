@@ -6,7 +6,7 @@ status: todo
 pr_number: null
 priority: high
 agent: codeur
-depends_on: []
+depends_on: ["ticket-370"]
 estimated_days: 1
 created: 2026-10-07
 ---
@@ -49,6 +49,11 @@ entrée par ticket portant un `pr_number` :
 4. Un `pr_number` introuvable dans le dépôt (hérité d'un autre dépôt,
    ticket-217) est omis de la réponse, sans erreur.
 
+L'authentification `STATIC_TOKEN` est globale (`StaticTokenMiddleware`,
+`backend/src/tessera/main.py`) : l'endpoint n'a rien à y ajouter. Le
+`project_id` est validé pour toutes les routes par le ticket-370, dont ce
+ticket dépend : l'endpoint passe par le même mécanisme.
+
 L'endpoint par ticket existant reste en place : rien d'autre ne change.
 `github_workflow.py` et `GitHubService.get_pull_request_status` ne sont pas
 modifiés.
@@ -64,7 +69,9 @@ modifiés.
 
 ## Dépendances
 
-Aucune.
+ticket-370 (validation du `project_id` sur toutes les routes). Un premier run,
+le 2026-10-07, a été bloqué par l'audit sécurité sur ce point et sur une
+authentification jugée absente, qui est en fait globale.
 
 ## Estimation
 
