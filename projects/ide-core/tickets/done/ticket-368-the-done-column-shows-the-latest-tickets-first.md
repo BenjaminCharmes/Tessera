@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-368
-pr_number: null
+pr_number: 308
 priority: medium
 status: done
 title: The kanban's done and cancelled columns show the 30 latest tickets, the rest
