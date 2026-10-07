@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.25
 id: ticket-365
-pr_number: null
+pr_number: 298
 priority: high
 status: done
 title: A card whose PR is merged or closed does not ask again when the window comes
