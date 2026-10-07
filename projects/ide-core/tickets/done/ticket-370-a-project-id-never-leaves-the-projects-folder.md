@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-370
-pr_number: null
+pr_number: 314
 priority: critical
 status: done
 title: A project id is validated on every route and can never point outside the projects
