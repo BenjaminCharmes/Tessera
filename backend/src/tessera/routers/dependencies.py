@@ -2,7 +2,7 @@
 from fastapi import HTTPException
 from starlette.requests import Request
 
-from tessera.services.project_loader import validate_project_id
+from tessera.utils.project_id import validate_project_id
 
 
 async def require_valid_project_id(request: Request) -> None:

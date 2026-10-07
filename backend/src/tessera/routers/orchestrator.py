@@ -45,8 +45,8 @@ from tessera.services.project_loader import (
     load_agents_config,
     load_pipeline_config,
     load_project,
-    validate_project_id,
 )
+from tessera.utils.project_id import validate_project_id
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 

@@ -28,7 +28,7 @@ from tessera.services.database import (
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.project_loader import load_project
 from tessera.routers.dependencies import require_valid_project_id
-from tessera.services.project_loader import validate_project_id
+from tessera.utils.project_id import validate_project_id
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger

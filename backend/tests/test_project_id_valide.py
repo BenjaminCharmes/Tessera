@@ -18,7 +18,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.database import init_db
-from tessera.services.project_loader import validate_project_id
+from tessera.utils.project_id import validate_project_id
 
 
 # ------------------------------------------------------------------ fixtures

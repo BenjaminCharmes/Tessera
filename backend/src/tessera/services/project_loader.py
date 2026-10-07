@@ -5,7 +5,6 @@ from pathlib import Path
 
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
-from tessera.utils.project_id import validate_project_id  # noqa: F401 — réexportée
 from tessera.services.artifacts import default_mode_for
 from tessera.services.providers.noms import (
     PROVIDERS_ANTHROPIC,
@@ -17,8 +16,8 @@ from tessera.services.providers.noms import (
 # Project-id validation — ticket-370
 # ------------------------------------------------------------------
 
-# La validation vit dans `tessera.utils.project_id` (importée ci-dessus) :
-# les modèles en ont besoin aussi, et ils sont importés par ce module.
+# La validation des identifiants vit dans `tessera.utils.project_id`
+# (ticket-370) : les modèles en ont besoin aussi, et ce module les importe.
 
 
 
