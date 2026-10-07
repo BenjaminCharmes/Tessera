@@ -77,3 +77,55 @@ def test_array_at_root_returns_none() -> None:
     """A JSON array (not an object) is not returned."""
     result = extract_json("[1, 2, 3]")
     assert result is None
+
+
+# ------------------------------------------------------------------
+# required_key — ticket-371
+# ------------------------------------------------------------------
+
+
+def test_required_key_skips_first_object_without_key() -> None:
+    """With required_key, a leading JSON object that lacks the key is skipped."""
+    first = {"project_id": "abc"}
+    verdict_obj = {"criteria": [{"criterion": "x", "passed": True}], "feedback": "ok"}
+    text = json.dumps(first) + "\n\nSome prose.\n\n" + json.dumps(verdict_obj)
+
+    result = extract_json(text, required_key="criteria")
+
+    assert result == verdict_obj
+
+
+def test_required_key_skips_json_block_without_key() -> None:
+    """With required_key, a ```json block without the key is skipped, the next block wins."""
+    first = {"project_id": "abc"}
+    verdict_obj = {"criteria": [{"criterion": "y", "passed": False}], "feedback": "bad"}
+    text = (
+        f"```json\n{json.dumps(first)}\n```\n\n"
+        "Some prose.\n\n"
+        f"```json\n{json.dumps(verdict_obj)}\n```"
+    )
+
+    result = extract_json(text, required_key="criteria")
+
+    assert result == verdict_obj
+
+
+def test_without_required_key_returns_first_object() -> None:
+    """Without required_key, the first JSON object is always returned even if a later
+    one would contain a desired key."""
+    first = {"project_id": "abc"}
+    second = {"criteria": [{"criterion": "x", "passed": True}]}
+    text = json.dumps(first) + "\n\n" + json.dumps(second)
+
+    result = extract_json(text)
+
+    assert result == first
+
+
+def test_required_key_returns_none_when_no_object_has_key() -> None:
+    """With required_key, None is returned when no object contains that key."""
+    text = json.dumps({"project_id": "abc"}) + " " + json.dumps({"issues": []})
+
+    result = extract_json(text, required_key="verdict")
+
+    assert result is None
