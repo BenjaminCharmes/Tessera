@@ -3,7 +3,7 @@ id: ticket-355
 title: "Monaco and the center views load on demand instead of at startup"
 type: fix
 status: done
-pr_number: null
+pr_number: 290
 priority: medium
 agent: codeur
 depends_on: []
