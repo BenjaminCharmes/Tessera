@@ -106,3 +106,76 @@ async def _save_to_db(
             (repo, pr_number, status.state, status.ci_status, status.pr_url),
         )
         await db.commit()
+
+
+async def save_settled_to_db(
+    db_path: Path | str, repo: str, pr_number: int, status: PRStatus
+) -> None:
+    """Public facade — persist a settled (merged/closed) status from any module."""
+    await _save_to_db(db_path, repo, pr_number, status)
+
+
+async def load_settled_from_db(
+    db_path: Path | str,
+    repo: str,
+    pr_numbers: set[int],
+) -> dict[int, PRStatus]:
+    """Bulk-load settled statuses for the given pr_numbers from SQLite.
+
+    Returns only the entries that exist in the table; absent pr_numbers are
+    simply not present in the returned dict.
+    """
+    if not pr_numbers:
+        return {}
+    placeholders = ",".join("?" * len(pr_numbers))
+    result: dict[int, PRStatus] = {}
+    async with aiosqlite.connect(str(db_path)) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            f"SELECT pr_number, state, ci_status, pr_url"
+            f" FROM pr_status_cache"
+            f" WHERE repo = ? AND pr_number IN ({placeholders})",
+            (repo, *sorted(pr_numbers)),
+        ) as cursor:
+            async for row in cursor:
+                num = int(row["pr_number"])
+                result[num] = PRStatus(
+                    state=row["state"],
+                    ci_status=row["ci_status"],
+                    pr_url=row["pr_url"],
+                    pr_number=num,
+                )
+    return result
+
+
+def check_memory_cache(
+    repo: str,
+    pr_number: int,
+    *,
+    now: Callable[[], float] = time.monotonic,
+) -> PRStatus | None:
+    """Return a cached status if still fresh, or None.
+
+    Settled (merged/closed) statuses are always fresh.
+    Open statuses expire after OPEN_TTL seconds.
+    """
+    key = (repo, pr_number)
+    if key not in _memory:
+        return None
+    cached, ts = _memory[key]
+    if cached.state in ("merged", "closed"):
+        return cached
+    if now() - ts < OPEN_TTL:
+        return cached
+    return None
+
+
+def write_memory_cache(
+    repo: str,
+    pr_number: int,
+    status: PRStatus,
+    *,
+    now: Callable[[], float] = time.monotonic,
+) -> None:
+    """Write a status into the in-memory cache with the current timestamp."""
+    _memory[(repo, pr_number)] = (status, now())
