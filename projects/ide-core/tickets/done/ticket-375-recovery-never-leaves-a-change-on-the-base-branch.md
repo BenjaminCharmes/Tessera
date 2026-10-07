@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-375
-pr_number: null
+pr_number: 313
 priority: high
 status: done
 title: Startup recovery resets the ticket on its own branch and never leaves a change
