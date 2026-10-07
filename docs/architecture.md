@@ -670,6 +670,18 @@ tant qu'elle n'aura pas mergé.
 **Divergence** : Si la branche locale et distante divergent hors d'une avance
 rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
 
+## Caching des statuts GitHub (ticket-364)
+
+L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).
+
+Le module `backend/src/tessera/services/pr_status_cache.py` implémente deux niveaux de cache :
+
+- **Statuts définitifs** (`merged`, `closed`) : persistés dans une table SQLite `pr_status_cache`, relus sans appel GitHub — y compris après redémarrage.
+- **Statuts ouverts** : gardés en mémoire 30 secondes, puis redemandés.
+- **Erreurs** : jamais cachées.
+
+`GitHubService.get_pull_request_status` et `github_workflow.py` restent inchangés : la livraison doit interroger GitHub en temps réel pour suivre la CI.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

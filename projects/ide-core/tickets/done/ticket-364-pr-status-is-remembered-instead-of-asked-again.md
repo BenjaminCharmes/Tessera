@@ -1,14 +1,14 @@
 ---
-id: ticket-364
-title: "A PR's status is remembered instead of being asked of GitHub on every card"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-07
+id: ticket-364
+pr_number: 297
+priority: high
+status: done
+title: A PR's status is remembered instead of being asked of GitHub on every card
+type: fix
 ---
 
 # ticket-364 — L'état d'une PR se retient au lieu d'être redemandé à GitHub

@@ -11,6 +11,7 @@ from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse
 from tessera.services.github_service import GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
 from tessera.services.database import list_runs, list_runs_for_ticket
+from tessera.services.pr_status_cache import get_cached_status
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
@@ -230,8 +231,19 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
             detail=f"Aucune PR associée au ticket {ticket_id}.",
         )
 
+    # Capture narrowed non-None values for use inside the lambda and error
+    # messages — mypy cannot narrow through closure captures or the
+    # _require_github_service guard.
+    pr_number: int = ticket.pr_number
+    repo: str = project.github_remote or ""
+
     try:
-        status: PRStatus = await github_svc.get_pull_request_status(ticket.pr_number)
+        status: PRStatus = await get_cached_status(
+            settings.ide_db_path,
+            repo,
+            pr_number,
+            lambda: github_svc.get_pull_request_status(pr_number),
+        )
     except httpx.HTTPStatusError as exc:
         # Un pr_number hérité d'un autre dépôt n'existe pas ici : c'est un
         # 404 définitif, pas une panne. En 500, la carte réessayait toutes les
@@ -239,7 +251,7 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
         if exc.response.status_code == 404:
             raise HTTPException(
                 status_code=404,
-                detail=f"PR #{ticket.pr_number} introuvable dans {project.github_remote}.",
+                detail=f"PR #{pr_number} introuvable dans {repo}.",
             ) from exc
         raise
     return PrStatusResponse(
