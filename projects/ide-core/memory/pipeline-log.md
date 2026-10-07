@@ -1648,3 +1648,19 @@ Le cod (32766ms)
 - 2026-10-06 21:40:15 UTC — [ticket-363] validateur: APPROVED — Les deux premiers critères sont respectés : `testTimeout` et `hookTimeout` sont  (65155ms)
 - 2026-10-06 21:40:15 UTC — [ticket-363] APPROVED après 1 tour(s)
 - 2026-10-06 21:42:01 UTC — [ticket-363] documentation: 1 fichier(s) (103671ms)
+- 2026-10-06 21:42:12 UTC — [ticket-363] livraison: rebase sur develop (500ms)
+- 2026-10-06 21:42:12 UTC — [ticket-363] livraison: PR #294 ouverte (3828ms)
+- 2026-10-06 21:42:12 UTC — [ide-core] ticket-363 PR #294 confiée au CIWatcher
+- 2026-10-07 07:25:58 UTC — [ticket-364] branche ticket-364-a-pr-s-status-is-remembered-instead-of-being-aske
+- 2026-10-07 07:25:58 UTC — [ticket-364] tour 1 — codeur démarré
+- 2026-10-07 07:35:08 UTC — [ticket-364] tour 1 — codeur terminé (549860ms)
+- 2026-10-07 07:37:54 UTC — [ticket-364] testeur: 1 failed, 717 passed, 20 warnings in 164.73s (0:02:44)
+- 2026-10-07 07:37:54 UTC — [ticket-364] tests rouges au tour 1
+- 2026-10-07 07:37:54 UTC — [ticket-364] tour 2 — codeur démarré
+- 2026-10-07 07:38:30 UTC — [ticket-364] tour 2 — codeur terminé (36391ms)
+- 2026-10-07 07:42:26 UTC — [ticket-364] testeur: OK (exit 0)
+- 2026-10-07 07:42:47 UTC — [ticket-364] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff introduit un système de cache (21686ms)
+- 2026-10-07 07:42:47 UTC — [ticket-364] tour 2 — reviewer démarré
+- 2026-10-07 07:43:53 UTC — [ticket-364] tour 2 — reviewer terminé (65469ms)
+- 2026-10-07 07:48:21 UTC — [ticket-364] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La solution implémente un cache (334078ms)
+- 2026-10-07 07:48:21 UTC — [ticket-364] APPROVED après 2 tour(s)
