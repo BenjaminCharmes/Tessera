@@ -5,7 +5,7 @@ carries one turn with its tokens and tool calls streamed as they arrive.
 """
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 from tessera.config import settings
@@ -27,6 +27,8 @@ from tessera.services.database import (
 )
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.project_loader import load_project
+from tessera.routers.dependencies import require_valid_project_id
+from tessera.services.project_loader import validate_project_id
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
@@ -107,14 +109,22 @@ async def _build_service(project_id: str) -> ChatService:
     )
 
 
-@router.get("/{project_id}/chat", response_model=list[ConversationSummary])
+@router.get(
+    "/{project_id}/chat",
+    response_model=list[ConversationSummary],
+    dependencies=[Depends(require_valid_project_id)],
+)
 async def get_conversations(project_id: str) -> list[ConversationSummary]:
     """All conversations for a project, most recent first — ticket-224."""
     _project_path(project_id)
     return await list_conversations(settings.ide_db_path, project_id)
 
 
-@router.get("/{project_id}/chat/{conversation_id}", response_model=ChatHistory)
+@router.get(
+    "/{project_id}/chat/{conversation_id}",
+    response_model=ChatHistory,
+    dependencies=[Depends(require_valid_project_id)],
+)
 async def get_chat_history(project_id: str, conversation_id: str) -> ChatHistory:
     _project_path(project_id)
     return ChatHistory(
@@ -129,6 +139,9 @@ async def get_chat_history(project_id: str, conversation_id: str) -> ChatHistory
 @router.websocket("/{project_id}/chat")
 async def chat_stream(websocket: WebSocket, project_id: str) -> None:
     """One connection, many turns. Each inbound message is one exchange."""
+    if not validate_project_id(project_id):
+        await websocket.close(code=1008)  # Policy Violation
+        return
     await websocket.accept()
     try:
         while True:
@@ -312,7 +325,11 @@ def _with_conversation(project_context: str, summary: str) -> str:
     return f"{project_context}\n\n{heading}\n{summary}"
 
 
-@router.post("/{project_id}/chat/run", response_model=RunFromChatResponse)
+@router.post(
+    "/{project_id}/chat/run",
+    response_model=RunFromChatResponse,
+    dependencies=[Depends(require_valid_project_id)],
+)
 async def run_pipeline_from_chat(
     project_id: str, body: RunFromChatRequest
 ) -> RunFromChatResponse:

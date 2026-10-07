@@ -2,7 +2,7 @@ import asyncio
 from collections.abc import Awaitable, Callable
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
@@ -45,6 +45,7 @@ from tessera.services.project_loader import (
     load_agents_config,
     load_pipeline_config,
     load_project,
+    validate_project_id,
 )
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
@@ -90,6 +91,13 @@ class RunRequest(BaseModel):
     max_tickets: int = 5
     depuis_github: bool = False
 
+    @field_validator("project_id")
+    @classmethod
+    def _check_project_id(cls, v: str) -> str:
+        if not validate_project_id(v):
+            raise ValueError(f"project_id invalide : {v!r}")
+        return v
+
 
 class RunStarted(BaseModel):
     """What POST /run answers: the run started, here is how to watch it."""
@@ -104,6 +112,13 @@ class RunAutonomousRequest(BaseModel):
     #: (ticket-084). Faux par défaut : un appel réseau vers le dépôt d'un
     #: client ne part pas sans qu'on l'ait demandé.
     depuis_github: bool = False
+
+    @field_validator("project_id")
+    @classmethod
+    def _check_project_id(cls, v: str) -> str:
+        if not validate_project_id(v):
+            raise ValueError(f"project_id invalide : {v!r}")
+        return v
 
 
 async def _build_project_context(project_id: str) -> str:

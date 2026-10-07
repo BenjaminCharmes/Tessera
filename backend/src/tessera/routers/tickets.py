@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from tessera.config import settings
@@ -20,12 +20,16 @@ _logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.politique_run import PolitiqueRun
+from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.sync_map import SyncMapService
 from tessera.services.ticket_service import TicketService
 
-router = APIRouter(tags=["tickets"])
+router = APIRouter(
+    tags=["tickets"],
+    dependencies=[Depends(require_valid_project_id)],
+)
 
 
 def _svc(project_id: str) -> TicketService:

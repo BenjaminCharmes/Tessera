@@ -13,6 +13,23 @@ from tessera.services.providers.noms import (
 )
 
 # ------------------------------------------------------------------
+# Project-id validation — ticket-370
+# ------------------------------------------------------------------
+
+_PROJECT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def validate_project_id(project_id: str) -> bool:
+    """Return True when project_id is safe to use as a directory name.
+
+    Accepts identifiers matching ``^[A-Za-z0-9][A-Za-z0-9._-]*$``.
+    Rejects empty strings, path separators (/ and \\) and traversal
+    sequences (., .., ../x, ..\\x) without touching the filesystem.
+    """
+    return bool(_PROJECT_ID_RE.match(project_id))
+
+
+# ------------------------------------------------------------------
 # Module-level project cache
 # Key: (resolved_project_path, claude_md_mtime_ns, claude_md_size, agents_json_mtime_ns, agents_json_size)
 # ------------------------------------------------------------------
