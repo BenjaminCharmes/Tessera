@@ -5,7 +5,7 @@ depends_on:
 - ticket-370
 estimated_days: 1
 id: ticket-366
-pr_number: null
+pr_number: 317
 priority: high
 status: done
 title: One request gives the status of every PR of a project
