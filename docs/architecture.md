@@ -866,6 +866,13 @@ Cette décision répond à deux cas d'usage :
 
 Cette optimisation diminue significativement le nombre d'appels API quand plusieurs onglets ou fenêtres sont ouverts mais non actifs.
 
+
+### Arrêt du polling pour PR réglées (ticket-365)
+
+Une optimisation de ticket-365 raffine le mécanisme précédent. Quand la PR passe à `merged` ou `closed`, le composant `TicketCard` arrête le polling **définitivement** : l'appel `getPrStatus` n'est plus relancé, même quand la fenêtre redevient visible. Seules les PR `open` gardent le cycle pause/reprise (suspension fenêtre cachée, reprise à la réapparition).
+
+Cette optimisation élimine les appels redondants sur les cartes dont la PR est réglée depuis longtemps.
+
 ## Structure des fichiers de tickets
 
 ```
