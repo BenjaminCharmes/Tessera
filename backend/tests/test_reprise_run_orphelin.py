@@ -59,7 +59,7 @@ async def _make_workspace_on_ticket_branch(tmp_path: Path) -> tuple[Path, Path]:
 
     Returns (workspace_dir, repo_path).
     The repo has a develop branch (initial commit) and a ticket-901-mon-ticket
-    branch with one dirty file (work.py, not yet committed).
+    branch where the tracked README.md is modified and not yet committed.
     """
     ws = tmp_path / "ws"
     ws.mkdir()
@@ -74,8 +74,8 @@ async def _make_workspace_on_ticket_branch(tmp_path: Path) -> tuple[Path, Path]:
     await _git(repo, "commit", "-q", "-m", "init")
     await _git(repo, "checkout", "-b", "ticket-901-mon-ticket")
 
-    # Travail du codeur, non commité
-    (repo / "work.py").write_text("x = 1\n", encoding="utf-8")
+    # Travail du codeur, non commité : un fichier suivi modifié.
+    (repo / "README.md").write_text("# projet\n\nmodifié par le codeur\n", encoding="utf-8")
 
     return ws, repo
 
@@ -221,3 +221,34 @@ async def test_erreur_git_journalisee_sans_exception(tmp_path: Path) -> None:
 
     # Ne doit pas lever d'exception, quelle que soit l'erreur git
     await reprendre_depots_orphelins(orphelins, db, ws)
+
+
+async def test_ni_fichier_non_suivi_ni_depot_imbrique_dans_le_commit(tmp_path: Path) -> None:
+    """Recovery commits tracked changes only: no untracked file, no nested repository.
+
+    Pour un projet `git_root: ancestor`, le dépôt est celui de Tessera entier :
+    un `git add -A` y embarquerait les autres projets de `projects/` (dépôts
+    git à part) comme sous-dépôts, et tout fichier non suivi.
+    """
+    ws, repo = await _make_workspace_on_ticket_branch(tmp_path)
+    (repo / "brouillon.txt").write_text("non suivi\n", encoding="utf-8")
+    imbrique = repo / "autre-projet"
+    imbrique.mkdir()
+    # Un vrai projet voisin : un dépôt avec au moins un commit.
+    await _git(imbrique, "init", "-q")
+    await _git(imbrique, "config", "user.email", "test@tessera.local")
+    await _git(imbrique, "config", "user.name", "Tessera Test")
+    (imbrique / "f.txt").write_text("x\n", encoding="utf-8")
+    await _git(imbrique, "add", "f.txt")
+    await _git(imbrique, "commit", "-q", "-m", "init")
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    message = await _git(repo, "log", "-1", "--format=%s", "ticket-901-mon-ticket")
+    assert "unapproved work" in message
+    commites = await _git(repo, "show", "--name-only", "--format=", "ticket-901-mon-ticket")
+    assert "README.md" in commites
+    assert "brouillon.txt" not in commites
+    assert "autre-projet" not in commites
+    assert (repo / "brouillon.txt").read_text(encoding="utf-8") == "non suivi\n"

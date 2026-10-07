@@ -159,7 +159,15 @@ async def _reprendre_depot_seul(
 
     try:
         # 1. Commiter les changements en cours (ADR-018 : l'arbre ne reste jamais sale).
-        await _git(project_path, "add", "-A")
+        # Seuls les fichiers déjà suivis, dans tout le dépôt (`:/`) : jamais
+        # `add -A`. Pour un projet `git_root: ancestor` (ide-core), le dépôt est
+        # celui de Tessera entier, et `add -A` y embarquerait les fichiers non
+        # suivis et les autres projets de `projects/` comme sous-dépôts. Le
+        # pipeline exclut les non-suivis préexistants qu'il a relevés à la
+        # création de la branche ; après un arrêt, cette liste est perdue. Un
+        # fichier créé par le codeur reste donc dans l'arbre, non suivi : rien
+        # n'est perdu, rien d'étranger n'est commité.
+        await _git(project_path, "add", "--update", "--", ":/")
         staged = await _git(project_path, "diff", "--cached", "--name-only")
         if staged:
             commit_msg = _unapproved_commit_message(ticket_id, _RAISON_ARRET)
