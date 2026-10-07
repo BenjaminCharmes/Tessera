@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from tessera.models.agent import AgentConfig
 from tessera.models.ticket import Ticket, TicketDraft, TicketDraftPlan
+from tessera.utils.project_id import validate_project_id
 
 
 class Project(BaseModel):
@@ -32,11 +33,20 @@ class Project(BaseModel):
     fait_tourner_l_ide: bool = False
 
 
+def _verifier_project_id(v: str | None) -> str | None:
+    """Refuse a project_id that could point outside the projects folder (ticket-370)."""
+    if v is not None and not validate_project_id(v):
+        raise ValueError(f"project_id invalide : {v!r}")
+    return v
+
+
 class ProjectCreate(BaseModel):
     project_id: str
     name: str
     active_agents: list[str] = Field(default_factory=list)
     claude_md_content: str = ""
+
+    _project_id_valide = field_validator("project_id")(_verifier_project_id)
 
 
 class ProjectContext(BaseModel):
@@ -83,6 +93,8 @@ class ProjectImport(BaseModel):
     mode: Literal["copy", "symlink"] = Field(default="symlink")
     project_id: str | None = Field(default=None, description="ID désiré (déduit du nom du dossier si absent)")
 
+    _project_id_valide = field_validator("project_id")(_verifier_project_id)
+
 
 class ProjectImportResponse(BaseModel):
     project: Project
@@ -111,6 +123,8 @@ class AnalysisResult(BaseModel):
 class CloneProjectRequest(BaseModel):
     repo_url: str = Field(description="URL HTTPS du repo GitHub, ex: https://github.com/owner/repo")
     project_id: str | None = Field(default=None, description="ID désiré (déduit du nom du repo si absent)")
+
+    _project_id_valide = field_validator("project_id")(_verifier_project_id)
 
 
 class CloneProjectResponse(BaseModel):

@@ -1,14 +1,15 @@
 ---
-id: ticket-370
-title: "A project id is validated on every route and can never point outside the projects folder"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-07
+id: ticket-370
+pr_number: 314
+priority: critical
+status: done
+title: A project id is validated on every route and can never point outside the projects
+  folder
+type: fix
 ---
 
 # ticket-370 — Un identifiant de projet ne sort jamais du dossier des projets

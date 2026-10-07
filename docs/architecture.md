@@ -712,6 +712,17 @@ Deux étapes complètent la protection hors du pipeline :
 En local, une liste vide désactive le contrôle. En CI, son absence bloque le
 merge — c'est intentionnel.
 
+## Validation des identifiants de projet (ticket-370)
+
+Toutes les routes contenant un paramètre `project_id` valident cet identifiant pour assurer que le chemin du projet reste conforme au dossier des projets configuré. Un `project_id` invalide — contenant `.`, `..`, `/`, `\` ou tout caractère ne correspondant pas au pattern `^[A-Za-z0-9][A-Za-z0-9._-]*$` — retourne une `404` sans jamais accéder au disque.
+
+La validation est centralisée dans `backend/src/tessera/services/project_loader.py` :
+
+1. **Paramètres de chemin** — FastAPI refuse un identifiant invalide avant l'appel du routeur (→ `404`)
+2. **Corps de requête** — les objets `RunRequest` et `RunAutonomousRequest` rejettent un `project_id` invalide (→ `422`)
+
+Cette approche centralise la prévention des path traversals pour l'ensemble des routes via une seule décision.
+
 ## Couche SQLite (ticket-015)
 
 SQLite est une couche **cache/historique** — les fichiers Markdown restent la source de vérité (ADR-003).

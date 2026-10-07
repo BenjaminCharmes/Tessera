@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from tessera.config import settings
@@ -56,6 +56,7 @@ from tessera.services.cost_calculator import modeles_connus
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.models.agent import FallbackConfig
+from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.project_loader import (
     AgentAbsentDuProjet,
     ModeleInconnu,
@@ -74,7 +75,11 @@ _logger = get_logger(__name__)
 from tessera.services.sync_map import SyncMapService
 from tessera.services.ticket_service import TicketService
 
-router = APIRouter(prefix="/projects", tags=["projects"])
+router = APIRouter(
+    prefix="/projects",
+    tags=["projects"],
+    dependencies=[Depends(require_valid_project_id)],
+)
 
 _OPEN_STATUSES = {TicketStatus.todo, TicketStatus.in_progress, TicketStatus.in_review, TicketStatus.blocked}
 

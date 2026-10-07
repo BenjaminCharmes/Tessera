@@ -1717,6 +1717,7 @@ Le cod (32766ms)
 - 2026-10-07 10:18:42 UTC — [ticket-370] tour 2 — codeur terminé (509655ms)
 - 2026-10-07 10:22:29 UTC — [ticket-370] testeur: OK (exit 0)
 - 2026-10-07 10:23:09 UTC — [ticket-370] securite: PASS — Audit de sécurité — aucune vulnérabilité détectée.
+
 Ce patch **renforce** la séc (40953ms)
 - 2026-10-07 10:23:10 UTC — [ticket-370] tour 2 — reviewer démarré
 - 2026-10-07 10:24:15 UTC — [ticket-370] tour 2 — reviewer terminé (65313ms)
@@ -1827,3 +1828,22 @@ PointsControls effectués :
 - 2026-10-07 13:17:25 UTC — [ticket-375] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés et mo (296344ms)
 - 2026-10-07 13:17:25 UTC — [ticket-375] APPROVED après 3 tour(s)
 - 2026-10-07 13:19:52 UTC — [ticket-375] documentation: 0 fichier(s) (143687ms)
+- 2026-10-07 13:20:48 UTC — [ticket-375] livraison: rebase sur develop (3406ms)
+- 2026-10-07 13:20:48 UTC — [ticket-375] livraison: PR #313 ouverte (13625ms)
+- 2026-10-07 13:20:48 UTC — [ide-core] ticket-375 PR #313 confiée au CIWatcher
+- 2026-10-07 13:25:38 UTC — [ticket-377] branche ticket-377-a-queue-that-dies-writes-it-in-the-pipeline-log-a
+- 2026-10-07 13:25:38 UTC — [ticket-377] tour 1 — codeur démarré
+- 2026-10-07 13:33:53 UTC — [ticket-377] tour 1 — codeur terminé (493311ms)
+- 2026-10-07 13:41:45 UTC — [ticket-377] testeur: OK (exit 0)
+- 2026-10-07 13:42:46 UTC — [ticket-377] securite: BLOCK — A HIGH-severity path traversal vulnerability was detected in `_log_pipeline()`.  (60985ms)
+- 2026-10-07 13:43:14 UTC — [ide-core] file interrompue : ticket-377 non approuvé
+- 2026-10-07 13:49:03 UTC — [ticket-370] branche ticket-370-a-project-id-is-validated-on-every-route-and-can
+- 2026-10-07 13:49:03 UTC — [ticket-370] tour 1 — codeur démarré
+- 2026-10-07 13:51:17 UTC — [ticket-370] tour 1 — codeur terminé (133969ms)
+- 2026-10-07 13:56:38 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 13:57:33 UTC — [ticket-370] securite: PASS — Ce diff implémente une validation robuste des identifiants de projet (ticket-370 (55250ms)
+- 2026-10-07 13:57:33 UTC — [ticket-370] tour 1 — reviewer démarré
+- 2026-10-07 14:00:36 UTC — [ticket-370] tour 1 — reviewer terminé (182078ms)
+- 2026-10-07 14:06:16 UTC — [ticket-370] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une validati (522766ms)
+- 2026-10-07 14:06:16 UTC — [ticket-370] APPROVED après 1 tour(s)
+- 2026-10-07 14:08:06 UTC — [ticket-370] documentation: 1 fichier(s) (106562ms)

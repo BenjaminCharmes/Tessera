@@ -6,7 +6,7 @@ protège, et le refus dit quoi écrire plutôt que d'envoyer lire le code.
 """
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from tessera.config import settings
 from tessera.services.event_hub import EVENT_HUB
@@ -17,12 +17,17 @@ from tessera.services.process_registry import (
     Service,
     ServiceDejaEnCours,
 )
+from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.project_loader import load_services_config
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-router = APIRouter(prefix="/projects", tags=["services"])
+router = APIRouter(
+    prefix="/projects",
+    tags=["services"],
+    dependencies=[Depends(require_valid_project_id)],
+)
 
 
 def _racine(project_id: str) -> Path:
