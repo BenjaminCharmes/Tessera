@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-379
-pr_number: null
+pr_number: 320
 priority: critical
 status: done
 title: Filtering decisions by role no longer swallows the diff, the test results and
