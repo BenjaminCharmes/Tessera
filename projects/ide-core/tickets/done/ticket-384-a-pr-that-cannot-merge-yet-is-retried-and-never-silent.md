@@ -1,14 +1,15 @@
 ---
-id: ticket-384
-title: "A PR whose mergeability is still being computed is retried, a failed merge is logged and blocks its dependents"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-08
 depends_on: []
 estimated_days: 1
-created: 2026-10-08
+id: ticket-384
+pr_number: 330
+priority: critical
+status: done
+title: A PR whose mergeability is still being computed is retried, a failed merge
+  is logged and blocks its dependents
+type: fix
 ---
 
 # ticket-384 — Une PR pas encore fusionnable est réessayée, un merge raté se voit et bloque

@@ -513,13 +513,18 @@ class Orchestrator:
             ):
                 restants = ticket_ids[index:]
                 if self._ci_watcher is not None:
-                    await _attendre_si_dependant(
+                    stop = await _attendre_si_dependant(
                         self._ticket_svc,
                         self._ci_watcher,
                         project_id,
                         ticket_id,
                         restants,
                     )
+                    if stop:
+                        self._log(
+                            f"[{project_id}] file interrompue : {ticket_id} non mergé"
+                        )
+                        break
                     self._log(
                         f"[{project_id}] {ticket_id} PR #{result.livraison.pr_number}"
                         " confiée au CIWatcher"
@@ -754,19 +759,22 @@ async def _attendre_si_dependant(
     project_id: str,
     ticket_id: str,
     restants: list[str],
-) -> None:
+) -> bool:
     """Await the CI merge for ``ticket_id`` if a remaining ticket depends on it.
 
     Walks ``restants`` to find the first ticket that declares ``ticket_id``
     in its ``depends_on``. When found, suspends until ``CIWatcher`` signals
     that ``ticket_id`` is no longer in the waiting set (merged or blocked).
-    Tickets without such a dependency are not delayed.
+
+    Returns True when the queue must stop (dependency not merged).
+    Returns False when the queue may continue (no dependent, or merge succeeded).
     """
     for tid_dep in restants:
         ticket_dep = await ticket_svc.get_ticket(tid_dep)
         if ticket_dep is not None and ticket_id in ticket_dep.depends_on:
-            await ci_watcher.attendre_merge(project_id, ticket_id)
-            return
+            merged = await ci_watcher.attendre_merge(project_id, ticket_id)
+            return not merged
+    return False
 
 
 async def _trouver_bloquant(

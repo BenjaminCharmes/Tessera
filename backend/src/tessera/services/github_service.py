@@ -287,15 +287,20 @@ class GitHubService:
         pr_number: int,
         method: str = "squash",
         commit_title: str | None = None,
-        attente_max_s: float = 60.0,
+        attente_fusionnabilite_max_s: float = 300.0,
         intervalle_s: float = 5.0,
+        intervalle_max_s: float = 30.0,
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
     ) -> None:
         """Merge the PR after verifying GitHub has computed mergeability.
 
-        Polls the PR until `mergeable` is non-null (up to `attente_max_s`
-        seconds). On a 405 response from the merge endpoint, waits and retries
-        once — GitHub may lag slightly even after returning `mergeable: true`.
+        Polls the PR until `mergeable` is non-null (up to
+        `attente_fusionnabilite_max_s` seconds). The polling interval grows
+        from `intervalle_s` (doubling each time, capped at `intervalle_max_s`)
+        to reduce pressure on the API during long computation windows.
+
+        On a 405 response from the merge endpoint, waits and retries once —
+        GitHub may lag slightly even after returning `mergeable: true`.
 
         Raises:
             MergeabiliteTimeoutError: mergeability still null after the timeout.
@@ -303,18 +308,27 @@ class GitHubService:
             httpx.HTTPStatusError: HTTP error on merge after the retry on 405.
         """
         ecoule = 0.0
+        delai = intervalle_s
         while True:
             mergeable = await self._lire_mergeabilite(pr_number)
             if mergeable is not None:
                 break
-            if ecoule >= attente_max_s:
+            if ecoule >= attente_fusionnabilite_max_s:
                 raise MergeabiliteTimeoutError(
                     f"La PR #{pr_number} est encore en attente de calcul de "
-                    f"fusionnabilité après {attente_max_s:.0f} s. "
+                    f"fusionnabilité après {attente_fusionnabilite_max_s:.0f} s. "
                     "La livraison s'arrête."
                 )
-            await dormir(intervalle_s)
-            ecoule += intervalle_s
+            # Croissance du délai : on double à chaque tour jusqu'à intervalle_max_s,
+            # sans dépasser le temps restant avant le timeout.
+            delai_actuel = min(
+                delai,
+                attente_fusionnabilite_max_s - ecoule,
+                intervalle_max_s,
+            )
+            await dormir(delai_actuel)
+            ecoule += delai_actuel
+            delai = min(delai * 2.0, intervalle_max_s)
 
         if not mergeable:
             raise PRNonFusionnableError(

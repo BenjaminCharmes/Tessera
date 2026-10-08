@@ -523,6 +523,9 @@ def _surveillance_pour(
         ),
     )
 
+    ticket_svc_ci = TicketService(project_path, project_id)
+    pipeline_log_path_ci = project_path / "memory" / "pipeline-log.md"
+
     async def surveiller(
         p_id: str,
         ticket_id: str,
@@ -536,6 +539,8 @@ def _surveillance_pour(
             pr_number,
             service.livrer_phase_2,
             on_event,
+            pipeline_log_path=pipeline_log_path_ci,
+            ticket_svc=ticket_svc_ci,
         )
 
     return surveiller
