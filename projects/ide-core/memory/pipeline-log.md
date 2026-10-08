@@ -1977,3 +1977,13 @@ Le code introduit une sé (44328ms)
 - 2026-10-08 14:05:02 UTC — [ticket-384] tour 1 — codeur démarré
 - 2026-10-08 14:08:15 UTC — [ticket-384] tour 1 — codeur terminé (193577ms)
 - 2026-10-08 14:08:16 UTC — [ticket-384] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-10-08 14:08:18 UTC — [ide-core] file interrompue : ticket-384 non approuvé
+- 2026-10-08 15:03:47 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 15:03:48 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 15:08:09 UTC — [ticket-384] tour 1 — codeur terminé (261702ms)
+- 2026-10-08 15:12:58 UTC — [ticket-384] testeur: OK (exit 0)
+- 2026-10-08 15:13:45 UTC — [ticket-384] securite: PASS — No CRITICAL or HIGH severity vulnerabilities detected. The diff adds merge-failu (46155ms)
+- 2026-10-08 15:13:45 UTC — [ticket-384] tour 1 — reviewer démarré
+- 2026-10-08 15:16:03 UTC — [ticket-384] tour 1 — reviewer terminé (138905ms)
+- 2026-10-08 15:20:20 UTC — [ticket-384] validateur: APPROVED — Tous les critères sont satisfaits par les tests ajoutés au diff. Les trois modif (395250ms)
+- 2026-10-08 15:20:20 UTC — [ticket-384] APPROVED après 1 tour(s)
