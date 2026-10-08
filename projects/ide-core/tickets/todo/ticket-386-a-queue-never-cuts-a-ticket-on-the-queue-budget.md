@@ -43,12 +43,17 @@ en `blocked`.
 2. Si ce contrôle coupe un ticket d'une file, le ticket repasse en `todo`
    (et non `blocked`), avec la raison « budget » dans le journal ; son
    travail reste commité comme non approuvé.
+3. Tout arrêt sur un plafond dit le montant atteint et le plafond, par
+   exemple « file interrompue : plafond de dépense (15,24 $ / 15,00 $) » —
+   aujourd'hui, la ligne d'arrêt de la file n'en dit rien et il faut lire
+   `/limits` (signalé par la session qui pilote affut).
 
 ## Critères d'acceptation
 
 - [ ] Un test de `backend/tests/test_orchestrator.py` fait tourner une file où le premier ticket coûte 12 $, puis vérifie que le second ticket, qui coûte 4 $ par tour avec `run_max_budget_usd` à 15 $, n'est pas arrêté entre ses tours 1 et 2
 - [ ] Un test de `backend/tests/test_orchestrator.py` vérifie qu'un ticket dont sa propre dépense dépasse `run_max_budget_usd` est arrêté entre deux tours
 - [ ] Un test de `backend/tests/test_orchestrator.py` vérifie qu'un ticket de file arrêté sur le plafond repasse en `todo`, avec une ligne de journal qui contient « budget »
+- [ ] Un test de `backend/tests/test_orchestrator.py` vérifie que la ligne « file interrompue : plafond de dépense » du journal contient le montant dépensé et le plafond
 - [ ] Un test de `backend/tests/test_orchestrator.py` vérifie qu'en lancement simple, le comportement du ticket-191 est inchangé
 
 ## Dépendances
