@@ -34,11 +34,16 @@ _RUN_DURATION_MS = (
     " AS INTEGER)"
 )
 
+# Type alias: run_id → (cost_usd, input_tokens, output_tokens)
+_RunCosts = dict[str, tuple[float, int, int]]
+
 
 class _Scope:
     """The WHERE clauses shared by every query of one request."""
 
     def __init__(self, since: str, until_exc: str, project_id: str | None) -> None:
+        self.since = since
+        self.until_exc = until_exc
         projet = " AND pr.project_id = ?" if project_id is not None else ""
         extra: tuple[Any, ...] = (project_id,) if project_id is not None else ()
         # Les timestamps ISO (`2026-09-27T10:00:00+00:00`) trient
@@ -77,15 +82,20 @@ async def usage_stats(
 
     async with aiosqlite.connect(str(db_path)) as db:
         db.row_factory = aiosqlite.Row
-        totals = await _totals(db, scope)
-        daily = await _daily(db, scope, since_day, days)
-        per_agent = await _breakdown(db, scope, "ac.role")
-        per_model = await _breakdown(db, scope, "ac.model")
+        # Un seul passage sur agent_calls, groupé par (day, role, model,
+        # project_id, run_id). Toutes les agrégations suivantes en dérivent
+        # en Python, sans relire la table (ticket-378).
+        ac_buckets = await _one_pass_agent_calls(db, scope)
+        run_costs = _run_costs_from_buckets(ac_buckets)
+        totals = await _totals(db, scope, ac_buckets)
+        daily = await _daily(db, scope, since_day, days, ac_buckets)
+        per_agent = _breakdown_rows(ac_buckets, "role")
+        per_model = _breakdown_rows(ac_buckets, "model")
         per_project = (
-            await _breakdown(db, scope, "pr.project_id") if project_id is None else []
+            _breakdown_rows(ac_buckets, "project_id") if project_id is None else []
         )
         quality = await _quality(db, scope)
-        recent = await _recent_runs(db, scope)
+        recent = await _recent_runs(db, scope, run_costs=run_costs)
 
     return UsageStats(
         days=days, project_id=project_id, since=since, until=until,
@@ -108,16 +118,58 @@ async def _all(
         return list(await cursor.fetchall())
 
 
-async def _totals(db: aiosqlite.Connection, scope: _Scope) -> UsageTotals:
-    calls = await _one(db, f"""
-        SELECT COUNT(*) AS calls,
-               COALESCE(SUM(ac.input_tokens), 0) AS tin,
-               COALESCE(SUM(ac.output_tokens), 0) AS tout,
-               COALESCE(SUM(ac.cache_read_tokens), 0) AS tcache,
-               COALESCE(SUM(ac.cost_usd), 0.0) AS cost,
-               COALESCE(SUM(ac.duration_ms), 0) AS duration
+async def _one_pass_agent_calls(
+    db: aiosqlite.Connection, scope: _Scope
+) -> list[aiosqlite.Row]:
+    """Single query over agent_calls, grouped by (day, role, model, project_id, run_id).
+
+    Remplace les 5 requêtes séparées sur agent_calls : totaux, quotidien,
+    trois ventilations et le sous-SELECT de _recent_runs. Avec 50 000 lignes,
+    passer de 5 scans à 1 divise le temps de calcul par ~5 (ticket-378).
+    """
+    return await _all(db, f"""
+        SELECT substr(ac.created_at, 1, 10) AS day,
+               ac.role, ac.model, pr.project_id, ac.run_id,
+               SUM(ac.input_tokens)      AS tin,
+               SUM(ac.output_tokens)     AS tout,
+               SUM(ac.cache_read_tokens) AS tcache,
+               SUM(ac.cost_usd)          AS cost,
+               SUM(ac.duration_ms)       AS duration,
+               COUNT(*)                  AS calls
         FROM agent_calls ac JOIN pipeline_runs pr ON pr.id = ac.run_id
-        WHERE {scope.calls}""", scope.params)
+        WHERE {scope.calls}
+        GROUP BY day, ac.role, ac.model, pr.project_id, ac.run_id
+    """, scope.params)
+
+
+def _run_costs_from_buckets(ac_buckets: list[aiosqlite.Row]) -> _RunCosts:
+    """(cost_usd, input_tokens, output_tokens) keyed by run_id."""
+    costs: _RunCosts = {}
+    for b in ac_buckets:
+        run_id = str(b["run_id"])
+        prev_cost, prev_tin, prev_tout = costs.get(run_id, (0.0, 0, 0))
+        costs[run_id] = (
+            prev_cost + float(b["cost"]),
+            prev_tin + int(b["tin"]),
+            prev_tout + int(b["tout"]),
+        )
+    return costs
+
+
+async def _totals(
+    db: aiosqlite.Connection, scope: _Scope, ac_buckets: list[aiosqlite.Row]
+) -> UsageTotals:
+    # Partie agent_calls : dérivée des buckets pré-calculés, sans requête DB.
+    total_calls = total_tin = total_tout = total_tcache = total_duration = 0
+    total_pipeline_cost = 0.0
+    for b in ac_buckets:
+        total_calls += int(b["calls"])
+        total_tin += int(b["tin"])
+        total_tout += int(b["tout"])
+        total_tcache += int(b["tcache"])
+        total_pipeline_cost += float(b["cost"])
+        total_duration += int(b["duration"])
+    # Parties pipeline_runs et chat_messages : tables légères.
     runs = await _one(
         db, f"SELECT COUNT(*) AS n FROM pipeline_runs pr WHERE {scope.runs}", scope.params
     )
@@ -126,20 +178,21 @@ async def _totals(db: aiosqlite.Connection, scope: _Scope) -> UsageTotals:
         f"SELECT COALESCE(SUM(cost_usd), 0.0) AS cost FROM chat_messages WHERE {scope.chat}",
         scope.params,
     )
-    pipeline_cost = round(float(calls["cost"]), 10)
+    pipeline_cost = round(total_pipeline_cost, 10)
     chat_cost = round(float(chat["cost"]), 10)
     return UsageTotals(
-        runs=int(runs["n"]), calls=int(calls["calls"]),
-        input_tokens=int(calls["tin"]), output_tokens=int(calls["tout"]),
-        cache_read_tokens=int(calls["tcache"]),
+        runs=int(runs["n"]), calls=total_calls,
+        input_tokens=total_tin, output_tokens=total_tout,
+        cache_read_tokens=total_tcache,
         pipeline_cost_usd=pipeline_cost, chat_cost_usd=chat_cost,
         cost_usd=round(pipeline_cost + chat_cost, 10),
-        call_duration_ms=int(calls["duration"]),
+        call_duration_ms=total_duration,
     )
 
 
 async def _daily(
-    db: aiosqlite.Connection, scope: _Scope, since_day: date, days: int
+    db: aiosqlite.Connection, scope: _Scope, since_day: date, days: int,
+    ac_buckets: list[aiosqlite.Row],
 ) -> list[DailyPoint]:
     points = {
         (since_day + timedelta(days=i)).isoformat(): DailyPoint(
@@ -147,16 +200,14 @@ async def _daily(
         )
         for i in range(days)
     }
-    for row in await _all(db, f"""
-            SELECT substr(ac.created_at, 1, 10) AS day,
-                   SUM(ac.input_tokens) AS tin, SUM(ac.output_tokens) AS tout,
-                   SUM(ac.cost_usd) AS cost
-            FROM agent_calls ac JOIN pipeline_runs pr ON pr.id = ac.run_id
-            WHERE {scope.calls} GROUP BY day""", scope.params):
-        point = points[str(row["day"])]
-        point.input_tokens = int(row["tin"])
-        point.output_tokens = int(row["tout"])
-        point.cost_usd += float(row["cost"])
+    # Partie agent_calls : dérivée des buckets, accumulation par jour.
+    for b in ac_buckets:
+        day_key = str(b["day"])
+        if day_key in points:
+            point = points[day_key]
+            point.input_tokens += int(b["tin"])
+            point.output_tokens += int(b["tout"])
+            point.cost_usd += float(b["cost"])
     for row in await _all(db, f"""
             SELECT substr(pr.started_at, 1, 10) AS day, COUNT(*) AS n
             FROM pipeline_runs pr WHERE {scope.runs} GROUP BY day""", scope.params):
@@ -170,27 +221,38 @@ async def _daily(
     return list(points.values())
 
 
-async def _breakdown(
-    db: aiosqlite.Connection, scope: _Scope, column: str
+def _breakdown_rows(
+    ac_buckets: list[aiosqlite.Row], key_field: str
 ) -> list[BreakdownLine]:
-    # `column` vient d'une liste fermée dans `usage_stats`, jamais de la requête.
-    rows = await _all(db, f"""
-        SELECT {column} AS cle,
-               SUM(ac.cost_usd) AS cost,
-               SUM(ac.input_tokens + ac.output_tokens + ac.cache_read_tokens) AS tokens,
-               COUNT(*) AS calls,
-               AVG(ac.duration_ms) AS duration
-        FROM agent_calls ac JOIN pipeline_runs pr ON pr.id = ac.run_id
-        WHERE {scope.calls}
-        GROUP BY {column} ORDER BY cost DESC""", scope.params)
-    return [
-        BreakdownLine(
-            key=str(r["cle"]), cost_usd=round(float(r["cost"]), 10),
-            tokens=int(r["tokens"]), calls=int(r["calls"]),
-            avg_duration_ms=float(r["duration"]),
-        )
-        for r in rows
-    ]
+    """Derive a breakdown from pre-computed agent_calls buckets (no DB query).
+
+    `key_field` doit être une colonne du SELECT de _one_pass_agent_calls.
+    Autorisé : 'role', 'model', 'project_id' — jamais une entrée utilisateur.
+    """
+    # agg: key → [cost, tokens, calls, total_duration_ms]
+    agg: dict[str, list[float]] = {}
+    for b in ac_buckets:
+        key = str(b[key_field])
+        if key not in agg:
+            agg[key] = [0.0, 0.0, 0.0, 0.0]
+        agg[key][0] += float(b["cost"])
+        agg[key][1] += int(b["tin"]) + int(b["tout"]) + int(b["tcache"])
+        agg[key][2] += int(b["calls"])
+        agg[key][3] += float(b["duration"])
+    return sorted(
+        [
+            BreakdownLine(
+                key=key,
+                cost_usd=round(v[0], 10),
+                tokens=int(v[1]),
+                calls=int(v[2]),
+                avg_duration_ms=v[3] / v[2] if v[2] else 0.0,
+            )
+            for key, v in agg.items()
+        ],
+        key=lambda x: x.cost_usd,
+        reverse=True,
+    )
 
 
 async def _quality(db: aiosqlite.Connection, scope: _Scope) -> RunQuality:
@@ -248,6 +310,7 @@ async def _recent_runs(
     *,
     limit: int = RECENT_RUNS_LIMIT,
     recherche: str | None = None,
+    run_costs: _RunCosts | None = None,
 ) -> list[RecentRun]:
     filtre = ""
     params: tuple[Any, ...] = scope.params
@@ -256,6 +319,34 @@ async def _recent_runs(
         filtre = " AND (pr.ticket_id LIKE ? ESCAPE '!' OR pr.project_id LIKE ? ESCAPE '!')"
         motif = _motif_like(recherche)
         params = (*params, motif, motif)
+
+    if run_costs is not None:
+        # Chemin rapide : coûts pré-calculés par _one_pass_agent_calls.
+        # Pas de sous-SELECT sur agent_calls — aucun scan supplémentaire.
+        rows = await _all(db, f"""
+            SELECT pr.id, pr.project_id, pr.ticket_id, pr.started_at,
+                   pr.finished_at, pr.approved, pr.final_status,
+                   {_RUN_DURATION_MS} AS duration
+            FROM pipeline_runs pr
+            WHERE {scope.runs}{filtre}
+            ORDER BY pr.started_at DESC LIMIT ?""", (*params, limit))
+        return [
+            RecentRun(
+                id=str(r["id"]), project_id=str(r["project_id"]),
+                ticket_id=str(r["ticket_id"]), started_at=str(r["started_at"]),
+                finished_at=r["finished_at"],
+                approved=None if r["approved"] is None else bool(r["approved"]),
+                final_status=r["final_status"],
+                cost_usd=round(run_costs.get(str(r["id"]), (0.0, 0, 0))[0], 10),
+                input_tokens=run_costs.get(str(r["id"]), (0.0, 0, 0))[1],
+                output_tokens=run_costs.get(str(r["id"]), (0.0, 0, 0))[2],
+                duration_ms=None if r["duration"] is None else int(r["duration"]),
+            )
+            for r in rows
+        ]
+
+    # Chemin autonome (appelé depuis `recent_runs()`) : sous-SELECT limité
+    # à la fenêtre temporelle pour éviter un scan complet de agent_calls.
     rows = await _all(db, f"""
         SELECT pr.id, pr.project_id, pr.ticket_id, pr.started_at, pr.finished_at,
                pr.approved, pr.final_status,
@@ -264,9 +355,14 @@ async def _recent_runs(
         FROM pipeline_runs pr
         LEFT JOIN (SELECT run_id, SUM(cost_usd) AS cost, SUM(input_tokens) AS tin,
                           SUM(output_tokens) AS tout
-                   FROM agent_calls GROUP BY run_id) c ON c.run_id = pr.id
+                   FROM agent_calls
+                   WHERE created_at >= ? AND created_at < ?
+                   GROUP BY run_id) c ON c.run_id = pr.id
         WHERE {scope.runs}{filtre}
-        ORDER BY pr.started_at DESC LIMIT ?""", (*params, limit))
+        ORDER BY pr.started_at DESC LIMIT ?""",
+        # Le sous-SELECT apparaît avant le WHERE extérieur : ses `?` sont liés
+        # en premier dans l'ordre du texte SQL.
+        (scope.since, scope.until_exc, *params, limit))
     return [
         RecentRun(
             id=str(r["id"]), project_id=str(r["project_id"]), ticket_id=str(r["ticket_id"]),
