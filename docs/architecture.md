@@ -716,6 +716,15 @@ Après la livraison d'un run, le dépôt local finit dans un état garanti :
 
 Cela permet d'enchaîner plusieurs runs sans accumulation d'état en attente de nettoyage manuel.
 
+
+### Attente de fusionnabilité et gestion des dépendances (ticket-384)
+
+Quand le statut `mergeable` d'une PR n'est pas encore calculé par GitHub (valeur `null`), l'IDE attend jusqu'à `ATTENTE_FUSIONNABILITE_MAX_S` (défaut 300 s) avant d'abandonner la tentative de merge. Le délai entre deux lectures augmente progressivement pour éviter de surcharger l'API.
+
+**Échec d'une fusion** : Si une PR approuvée ne peut pas être mergée — conflit détecté par `mergeable: false`, ou dépassement du délai — le ticket passe en statut `blocked` (dossier *et* champ). Une ligne est écrite dans `memory/pipeline-log.md` : `[<ticket>] livraison: arrêt — PR #N non mergée : <raison>`. La file s'arrête.
+
+**Dépendances interrompues** : Si un ticket A n'a pas été mergé, les tickets qui en dépendent ne sont pas lancés. La file s'arrête avec le message `[<projet>] file interrompue : <ticket> non mergé`. Résolvez A avant de relancer la file.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).

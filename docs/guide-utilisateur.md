@@ -197,6 +197,17 @@ En vue Rendu (la vue par défaut), cet en-tête s'affiche en **fiche clé/valeur
 
 En vue Source (Monaco), tu vois le fichier brut, frontmatter compris.
 
+
+**Quand une dépendance n'est pas mergée (ticket-384)**
+
+La file n'attend pas — elle s'arrête. Si le ticket A (que B dépend de) échoue à se merger, alors :
+
+- A passe en statut `blocked`, avec le motif dans `memory/pipeline-log.md`.
+- B n'est pas lancé.
+- La file s'arrête : `[<projet>] file interrompue : <ticket-A> non mergé`.
+
+Résolvez A (conflit, rebase, relance manuelle) avant de relancer la file.
+
 ### Critères d'acceptation obligatoires pour le code
 
 Pour tout ticket `feat`, `fix` ou `refactor`, tu dois ajouter une section `## Critères d'acceptation`. C'est là que tu énumères les comportements ou résultats que le validateur vérifiera.
@@ -549,6 +560,20 @@ Le travail du codeur est déjà commité sur la branche du ticket, et la PR est 
 Un run terminé laisse toujours ton arbre git propre. La copie de travail revient sur la branche de base du projet (pas la branche du ticket), et aucune modification n'est laissée en vrac.
 
 Tu peux lancer le ticket suivant sans nettoyer après toi. Le travail du run précédent reste sur sa branche dédiée (`ticket-XXX`) si tu veux le consulter plus tard.
+
+
+### Si une PR ne peut pas se fusionner
+
+Une PR approuvée peut rester en attente de calcul de sa fusionnabilité chez
+GitHub pendant plusieurs minutes — c'est normal après un autre merge sur la
+même branche de base. L'IDE l'attend jusqu'à 5 minutes.
+
+Si la PR reste non fusionnable après cette attente (conflit Git, règles de
+branche, révisions manquantes), le merge échoue. Le ticket passe en `blocked`
+et une ligne de log dans `memory/pipeline-log.md` explique pourquoi.
+
+Les tickets dépendants d'un ticket bloqué refusent de démarrer — la file
+s'arrête et t'affiche l'erreur.
 
 ## 6. Récupérer le travail des agents
 
@@ -967,6 +992,15 @@ Cela signifie que ticket-002 a été approuvé, mais **sa livraison n'a pas atte
 3. **Relance la file** à partir du ticket arrêté.
 
 La file ne se relance pas toute seule : il faut que tu corriges la cause d'abord.
+
+
+C'est que la PR du ticket dépendant n'a pas pu fusionner. Regarde le log du
+projet (`memory/pipeline-log.md`) — il te dit pourquoi : conflit Git, règles
+de branche, révisions manquantes, ou autre blocage sur le dépôt.
+
+Le ticket bloqué passe automatiquement en `blocked` (visible dans la colonne).
+Corrige le problème sous-jacent, relance le ticket bloqué, et la file reprendra
+à partir du ticket qui l'attendait.
 
 ## Pour aller plus loin
 
