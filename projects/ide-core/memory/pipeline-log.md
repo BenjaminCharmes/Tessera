@@ -1898,3 +1898,20 @@ Le code introduit une sé (44328ms)
 - 2026-10-08 07:38:35 UTC — [ticket-380] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une attente  (206375ms)
 - 2026-10-08 07:38:35 UTC — [ticket-380] APPROVED après 2 tour(s)
 - 2026-10-08 07:42:51 UTC — [ticket-380] documentation: 6 fichier(s) (253187ms)
+- 2026-10-08 07:43:11 UTC — [ticket-380] livraison: rebase sur develop (1437ms)
+- 2026-10-08 07:43:11 UTC — [ticket-380] livraison: PR #321 ouverte (6625ms)
+- 2026-10-08 07:43:12 UTC — [ide-core] ticket-380 PR #321 confiée au CIWatcher
+- 2026-10-08 07:43:13 UTC — [ticket-378] branche ticket-378-after-delivery-the-delivery-log-lines-are-committ
+- 2026-10-08 07:43:13 UTC — [ticket-378] tour 1 — codeur démarré
+- 2026-10-08 07:55:30 UTC — [ticket-378] tour 1 — codeur terminé (737266ms)
+- 2026-10-08 07:59:25 UTC — [ticket-378] testeur: 1 failed, 2082 passed, 20 warnings in 230.83s (0:03:50)
+- 2026-10-08 07:59:25 UTC — [ticket-378] tests rouges au tour 1
+- 2026-10-08 07:59:25 UTC — [ticket-378] tour 2 — codeur démarré
+- 2026-10-08 08:10:50 UTC — [ticket-378] tour 2 — codeur terminé (685296ms)
+- 2026-10-08 08:15:16 UTC — [ticket-378] testeur: 1 failed, 1731 passed, 20 warnings in 229.51s (0:03:49)
+- 2026-10-08 08:15:16 UTC — [ticket-378] tests rouges au tour 2
+- 2026-10-08 08:15:16 UTC — [ticket-378] tour 3 — codeur démarré
+- 2026-10-08 08:17:38 UTC — [ticket-378] tour 3 — codeur terminé (141875ms)
+- 2026-10-08 08:21:28 UTC — [ticket-378] testeur: ImportError: DLL load failed while importing base64: Une strat\ufffdgie de contr\ufffdle d\ufffdapplication a bloqu\ufffd ce fichier.
+- 2026-10-08 08:21:28 UTC — [ticket-378] tests rouges au tour 3
+- 2026-10-08 08:21:28 UTC — [ticket-378] BLOCKED après 3 tour(s) sans approbation
