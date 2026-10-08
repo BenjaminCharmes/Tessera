@@ -1915,3 +1915,14 @@ Le code introduit une sé (44328ms)
 - 2026-10-08 08:21:28 UTC — [ticket-378] testeur: ImportError: DLL load failed while importing base64: Une strat\ufffdgie de contr\ufffdle d\ufffdapplication a bloqu\ufffd ce fichier.
 - 2026-10-08 08:21:28 UTC — [ticket-378] tests rouges au tour 3
 - 2026-10-08 08:21:28 UTC — [ticket-378] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-08 08:21:30 UTC — [ide-core] file interrompue : ticket-378 non approuvé
+- 2026-10-08 08:26:15 UTC — [ticket-378] branche ticket-378-after-delivery-the-delivery-log-lines-are-committ
+- 2026-10-08 08:26:15 UTC — [ticket-378] tour 1 — codeur démarré
+- 2026-10-08 08:28:59 UTC — [ticket-378] tour 1 — codeur terminé (163906ms)
+- 2026-10-08 08:32:28 UTC — [ticket-378] testeur: ImportError: DLL load failed while importing base64: Une strat\ufffdgie de contr\ufffdle d\ufffdapplication a bloqu\ufffd ce fichier.
+- 2026-10-08 08:32:28 UTC — [ticket-378] tests rouges au tour 1
+- 2026-10-08 08:32:28 UTC — [ticket-378] tour 2 — codeur démarré
+- 2026-10-08 08:34:11 UTC — [ticket-378] tour 2 — codeur terminé (103750ms)
+- 2026-10-08 08:38:09 UTC — [ticket-378] testeur: ImportError: DLL load failed while importing base64: Une strat\ufffdgie de contr\ufffdle d\ufffdapplication a bloqu\ufffd ce fichier.
+- 2026-10-08 08:38:09 UTC — [ticket-378] tests rouges au tour 2
+- 2026-10-08 08:38:10 UTC — [ticket-378] ARRÊTÉ par l'utilisateur au tour 3
