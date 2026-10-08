@@ -9,6 +9,7 @@ compteurs de tokens, et c'est tout ce qu'on lui demande de plus que du texte.
 """
 import asyncio
 import json
+import time
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -34,7 +35,9 @@ DELAI_CONNEXION_S = 5.0
 #: trois caractères de code ou de français.
 CARACTERES_PAR_TOKEN = 3
 
-# Registre module-level : base_url → sémaphore (ticket-350).
+# --- Sérialisation par serveur (ticket-350) ---
+
+# Registre module-level : base_url → sémaphore.
 # Partagé par tous les OllamaProvider du processus pour sérialiser les
 # requêtes vers le même serveur Ollama. Créé paresseusement à la première
 # demande pour chaque serveur distinct.
@@ -55,18 +58,70 @@ def _get_slot(base_url: str) -> asyncio.Semaphore | None:
 
 @asynccontextmanager
 async def _maybe_slot(base_url: str) -> AsyncGenerator[None, None]:
-    """Acquire the per-server slot before entering, release on exit (even on error)."""
+    """Acquiert le créneau avant d'entrer, le rend à la sortie.
+
+    Raises `ProviderIndisponible` si le créneau n'est pas libre dans
+    `ollama_slot_wait_s` secondes — sans envoyer aucune requête HTTP.
+    """
     slot = _get_slot(base_url)
     if slot is None:
         yield
-    else:
-        async with slot:
-            yield
+        return
+
+    from tessera.config import settings
+
+    wait_s = settings.ollama_slot_wait_s
+    try:
+        await asyncio.wait_for(slot.acquire(), timeout=wait_s)
+    except asyncio.TimeoutError:
+        raise ProviderIndisponible(
+            f"Ollama : créneau occupé depuis plus de {wait_s:.0f} s"
+        )
+    try:
+        yield
+    finally:
+        slot.release()
 
 
 def _reset_slots() -> None:
     """Clear the semaphore registry — for tests only."""
     _SLOTS.clear()
+
+
+# --- Disjoncteur par serveur (ticket-380) ---
+
+# Registre module-level : base_url → horodatage d'expiry du refroidissement.
+# Après un dépassement du délai de lecture, le serveur est marqué lent pendant
+# `ollama_cooldown_s` secondes ; tout appel pendant ce temps lève
+# `ProviderIndisponible` aussitôt, sans requête HTTP.
+_COOLDOWNS: dict[str, float] = {}
+
+#: Horloge utilisée par le disjoncteur. Variable pour permettre les tests.
+_clock: Callable[[], float] = time.monotonic
+
+
+def _check_cooldown(base_url: str) -> None:
+    """Raises `ProviderIndisponible` immédiatement si le serveur est en refroidissement."""
+    expiry = _COOLDOWNS.get(base_url)
+    if expiry is not None and _clock() < expiry:
+        raise ProviderIndisponible(
+            f"Ollama : serveur {base_url!r} en refroidissement"
+        )
+
+
+def _set_cooldown(base_url: str) -> None:
+    """Marque *base_url* comme lent pour `ollama_cooldown_s` secondes."""
+    from tessera.config import settings
+
+    _COOLDOWNS[base_url] = _clock() + settings.ollama_cooldown_s
+
+
+def _reset_cooldowns() -> None:
+    """Clear the cooldown registry — for tests only."""
+    _COOLDOWNS.clear()
+
+
+# --- Provider ---
 
 
 class OllamaProvider:
@@ -104,6 +159,7 @@ class OllamaProvider:
     ) -> ProviderResult:
         # `cwd`, `ask_user`, `session` : pas d'outils, pas de conversation à
         # reprendre — ignorés, comme dans `AnthropicApiProvider`.
+        _check_cooldown(self.base_url)
         await self._verifier_modele(model)
         corps = _corps(system, user, model, max_tokens, stream=False)
         # Le créneau est pris avant d'envoyer la requête : le délai de lecture
@@ -111,6 +167,11 @@ class OllamaProvider:
         async with _maybe_slot(self.base_url):
             try:
                 reponse = await self._http().post("/api/chat", json=corps)
+            except httpx.ReadTimeout as exc:
+                _set_cooldown(self.base_url)
+                raise ProviderIndisponible(
+                    f"Ollama : délai dépassé ({DELAI_LECTURE_S:.0f} s)"
+                ) from exc
             except httpx.HTTPError as exc:
                 raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
         _verifier_statut(reponse)
@@ -130,6 +191,7 @@ class OllamaProvider:
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
     ) -> ProviderResult:
+        _check_cooldown(self.base_url)
         await self._verifier_modele(model)
         corps = _corps(system, user, model, max_tokens, stream=True)
         fragments: list[str] = []
@@ -151,6 +213,11 @@ class OllamaProvider:
                                 await on_token(fragment)
                         if donnees.get("done"):
                             dernier = donnees
+            except httpx.ReadTimeout as exc:
+                _set_cooldown(self.base_url)
+                raise ProviderIndisponible(
+                    f"Ollama : délai dépassé ({DELAI_LECTURE_S:.0f} s)"
+                ) from exc
             except httpx.HTTPError as exc:
                 raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
         return _resultat("".join(fragments), dernier)
