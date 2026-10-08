@@ -317,6 +317,14 @@ recharge la page), les événements texte (`agent_token`, `agent_tool_use`) ne
 modifient pas l'état d'une question en attente. Seul un événement de réponse
 (`answer_ack`) ou de fin d'agent (`agent_done`) nettoie cet état.
 
+### Filtrage du contexte par rôle (ticket-379)
+
+Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR du projet. Pour éviter que ce filtrage ne supprime le diff à relire, les résultats du testeur ou l'audit sécurité qui suivent les décisions, le contexte borde la section `Décisions récentes` à son premier titre de niveau 2 qui n'est pas un titre d'ADR (`## ADR-NNN`).
+
+**Invariant** : le contexte d'un agent inclut toujours le diff git, les résultats des étapes précédentes et l'audit, indépendamment de la portée des ADR du projet. Seule la section des décisions elle-même est filtrée par rôle.
+
+`adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
+
 ### Système visuel du frontend (ADR-026)
 
 `frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :

@@ -1860,3 +1860,24 @@ PointsControls effectués :
 - 2026-10-07 14:43:31 UTC — [ticket-366] validateur: APPROVED — Les six critères sont satisfaits. Le diff introduit le nouvel endpoint `GET /pro (441640ms)
 - 2026-10-07 14:43:31 UTC — [ticket-366] APPROVED après 1 tour(s)
 - 2026-10-07 14:44:51 UTC — [ticket-366] documentation: 2 fichier(s) (73453ms)
+- 2026-10-07 14:45:13 UTC — [ticket-366] livraison: rebase sur develop (1765ms)
+- 2026-10-07 14:45:13 UTC — [ticket-366] livraison: PR #317 ouverte (7547ms)
+- 2026-10-07 14:49:24 UTC — [ide-core] ticket-366 PR #317 confiée au CIWatcher
+- 2026-10-07 14:49:29 UTC — [ticket-367] branche ticket-367-ticket-cards-read-their-pr-status-from-one-projec
+- 2026-10-07 14:49:30 UTC — [ticket-367] tour 1 — codeur démarré
+- 2026-10-07 15:01:08 UTC — [ticket-367] tour 1 — codeur terminé (698077ms)
+- 2026-10-07 18:17:57 UTC — [ticket-367] testeur: délai dépassé, suite relancée
+- 2026-10-08 07:03:09 UTC — [ticket-367] BLOCKED — testeur: délai dépassé deux fois
+- 2026-10-08 07:03:13 UTC — [ide-core] file interrompue : ticket-367 non approuvé
+- 2026-10-08 07:03:44 UTC — [ticket-379] branche ticket-379-filtering-decisions-by-role-no-longer-swallows-th
+- 2026-10-08 07:03:45 UTC — [ticket-379] tour 1 — codeur démarré
+- 2026-10-08 07:08:03 UTC — [ticket-379] tour 1 — codeur terminé (258452ms)
+- 2026-10-08 07:13:35 UTC — [ticket-379] testeur: OK (exit 0)
+- 2026-10-08 07:14:19 UTC — [ticket-379] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+Le code introduit une sé (44328ms)
+- 2026-10-08 07:14:19 UTC — [ticket-379] tour 1 — reviewer démarré
+- 2026-10-08 07:15:24 UTC — [ticket-379] tour 1 — reviewer terminé (65062ms)
+- 2026-10-08 07:17:14 UTC — [ticket-379] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (175093ms)
+- 2026-10-08 07:17:14 UTC — [ticket-379] APPROVED après 1 tour(s)
+- 2026-10-08 07:18:34 UTC — [ticket-379] documentation: 1 fichier(s) (76764ms)

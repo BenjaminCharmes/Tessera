@@ -1,14 +1,15 @@
 ---
-id: ticket-379
-title: "Filtering decisions by role no longer swallows the diff, the test results and the audit that follow them"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-07
+id: ticket-379
+pr_number: 320
+priority: critical
+status: done
+title: Filtering decisions by role no longer swallows the diff, the test results and
+  the audit that follow them
+type: fix
 ---
 
 # ticket-379 — Le dernier ADR n'avale plus le diff, les tests et l'audit
