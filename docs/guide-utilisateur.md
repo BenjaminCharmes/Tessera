@@ -764,6 +764,10 @@ Les requêtes à Ollama sont **mises en file d'attente par serveur** — une seu
 
 Si tu as besoin d'augmenter le nombre de requêtes concurrentes (sur une machine très puissante, par exemple), configure `ollama_max_concurrent` dans ta configuration Tessera (défaut 1 ; à 0 ou moins pour désactiver cette borne).
 
+
+
+Si le serveur Ollama est indisponible ou surchargé, les rôles basculent automatiquement et rapidement sur Claude. Tu n'as rien à faire.
+
 ### Direction visuelle pour les interfaces
 
 Quand un ticket crée ou modifie une interface — une route qui ajoute des écrans, un composant UI — le codeur commence par établir une charte visuelle avant d'écrire du code.

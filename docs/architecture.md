@@ -172,6 +172,22 @@ Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes s
 lancées concurremment. Utile pour déboguer un modèle ou tester le
 load-balancing interne d'Ollama.
 
+La sérialisation des requêtes (une par serveur) évite la compétition pour le modèle
+et la mémoire. Un serveur saturé ou trop lent bascule rapidement sur le repli :
+
+- **Attente de créneau bornée** : si une requête attend un créneau plus de
+  `OLLAMA_SLOT_WAIT_S` secondes (défaut 30), elle lève `ProviderIndisponible`
+  et le repli prend le relais, sans dépenser le temps d'attente.
+- **Disjoncteur par serveur** : après un dépassement du délai de lecture, ce
+  serveur est marqué lent pendant `OLLAMA_COOLDOWN_S` secondes (défaut 600) ;
+  pendant cette période, tout appel lève `ProviderIndisponible` aussitôt,
+  sans requête HTTP. L'appel suivant, s'il arrive après le refroidissement,
+  envoie une nouvelle requête.
+- **Message clair** : un dépassement du délai produit « Ollama : délai
+  dépassé (… s) », distinct d'une connexion refusée.
+
+Voir [configuration](configuration.md#ollama) pour les réglages.
+
 ### Parsing et caching off-loop (ticket-352)
 
 `TicketService.list_tickets()` et `ProjectLoader.list_projects()` relisaient chaque fichier à chaque requête, bloquant la boucle d'événements sur du parsing YAML. Problème : le pipeline appelle ces services plusieurs fois par étape; avec plusieurs files, l'interface gelait.
