@@ -4,7 +4,7 @@ created: 2026-10-08
 depends_on: []
 estimated_days: 1
 id: ticket-384
-pr_number: null
+pr_number: 330
 priority: critical
 status: done
 title: A PR whose mergeability is still being computed is retried, a failed merge
