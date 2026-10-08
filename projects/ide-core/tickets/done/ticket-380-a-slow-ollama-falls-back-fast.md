@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-380
-pr_number: null
+pr_number: 321
 priority: critical
 status: done
 title: A saturated or timed-out Ollama falls back at once instead of making every
