@@ -831,6 +831,15 @@ class GitWorkspaceService:
                 extra={"error": str(exc), "paths": to_remove},
             )
 
+    async def retourner_sur_base(self, base_branch: str) -> None:
+        """Check out the base branch after a delivered run (ticket-378).
+
+        Leaves the working tree on the base branch so the next ticket
+        starts from a clean, known state (ADR-018). Safe to call when
+        already on the base branch — git treats it as a no-op.
+        """
+        await self._run("checkout", base_branch)
+
     async def _untracked_files(self) -> tuple[str, ...]:
         """Paths git reports as untracked (respecting .gitignore), as a tuple."""
         listing = await self._run("ls-files", "--others", "--exclude-standard")

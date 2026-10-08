@@ -1,14 +1,15 @@
 ---
-id: ticket-378
-title: "After delivery, the delivery log lines are committed and the working tree is back, clean, on the base branch"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-07
+id: ticket-378
+pr_number: 327
+priority: high
+status: done
+title: After delivery, the delivery log lines are committed and the working tree is
+  back, clean, on the base branch
+type: fix
 ---
 
 # ticket-378 — Après livraison, l'arbre est propre et revenu sur la branche de base

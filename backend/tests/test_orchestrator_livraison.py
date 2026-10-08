@@ -1,11 +1,15 @@
 """La livraison suit chaque run, quel que soit le mode — ticket-084.
 
 Ticket-307 : phase 1 dans run_pipeline, phase 2 dans CIWatcher (ADR-051).
+Ticket-378 : après livraison, arbre propre et branche de base active.
 """
 import asyncio
 from pathlib import Path
 from typing import Any
 
+import pytest
+
+from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import (
@@ -579,3 +583,199 @@ async def test_queue_continues_when_approved_no_pr_and_no_dependent(
     assert len(results) == 2
     assert results[0].ticket_id == "ticket-001"
     assert results[1].ticket_id == "ticket-002"
+
+
+# ------------------------------------------------------------------
+# ticket-378 — arbre propre et branche de base après livraison
+# ------------------------------------------------------------------
+
+
+async def _git(cwd: Path, *args: str) -> None:
+    """Run a git command, assert success."""
+    proc = await asyncio.create_subprocess_exec(
+        "git", *args,
+        cwd=str(cwd),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _, stderr = await proc.communicate()
+    assert proc.returncode == 0, f"git {' '.join(args)} failed: {stderr.decode()}"
+
+
+async def _git_out(cwd: Path, *args: str) -> str:
+    """Run a git command and return stdout."""
+    proc = await asyncio.create_subprocess_exec(
+        "git", *args,
+        cwd=str(cwd),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, _ = await proc.communicate()
+    return stdout.decode().strip()
+
+
+@pytest.fixture
+async def depot_avec_distant(tmp_path: Path) -> tuple[Path, Path]:
+    """Bare remote + cloned local repo with a ticket branch ready for delivery.
+
+    Returns (local_path, remote_path). The local repo is on
+    ``ticket-001-slug`` with one commit on top of ``main``.
+    ``memory/pipeline-log.md`` is tracked on the ticket branch.
+    """
+    distant = tmp_path / "distant.git"
+    distant.mkdir()
+    await _git(distant, "init", "--bare", "-q", "-b", "main")
+
+    local = tmp_path / "local"
+    proc = await asyncio.create_subprocess_exec(
+        "git", "clone", str(distant), str(local),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    await proc.communicate()
+
+    await _git(local, "config", "user.email", "test@tessera.local")
+    await _git(local, "config", "user.name", "Tessera test")
+
+    # Initial commit on main
+    (local / "README.md").write_text("# projet\n", encoding="utf-8")
+    await _git(local, "add", "README.md")
+    await _git(local, "commit", "-m", "init")
+    await _git(local, "push", "origin", "main")
+
+    # Ticket branch
+    await _git(local, "checkout", "-b", "ticket-001-slug")
+    (local / "code.py").write_text("x = 1\n", encoding="utf-8")
+    (local / "memory").mkdir()
+    (local / "memory" / "pipeline-log.md").write_text(
+        "- run started\n", encoding="utf-8"
+    )
+    await _git(local, "add", "code.py", "memory/pipeline-log.md")
+    await _git(local, "commit", "-m", "feat: du travail")
+    await _git(local, "push", "origin", "ticket-001-slug")
+
+    return local, distant
+
+
+def _construire_avec_git(
+    repo: Path,
+    base_branch: str,
+    git_ws: GitWorkspaceService,
+    resultat: PipelineResult,
+) -> "_OrchestrateurDouble":
+    """Orchestrator double backed by a real git workspace and base_branch."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    tickets = AsyncMock()
+    tickets.get_ticket.return_value = None
+
+    log_path = repo / "memory" / "pipeline-log.md"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    async def _livrer_simule(result: PipelineResult) -> Livraison:
+        """Simulate phase-1 delivery: commit bookkeeping, return Livraison."""
+        await git_ws.commit_bookkeeping()
+        return Livraison(
+            etapes=("rebase sur main", "PR #7 ouverte"),
+            durees_ms=(100.0, 200.0),
+            pr_number=7,
+        )
+
+    return _OrchestrateurDouble(
+        [resultat],
+        runner=MagicMock(),
+        ticket_service=tickets,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=log_path,
+        git_workspace=git_ws,
+        base_branch=base_branch,
+        livrer=_livrer_simule,
+    )
+
+
+async def test_arbre_propre_apres_livraison(
+    depot_avec_distant: tuple[Path, Path],
+) -> None:
+    """Criterion 1: working tree is clean after a delivered run (ticket-378).
+
+    Tracked files only (--untracked-files=no): the test verifies that
+    pipeline-log.md is committed and no tracked file is left modified.
+    """
+    local, _ = depot_avec_distant
+    git_ws = GitWorkspaceService(local)
+    res = _resultat("ticket-001")
+    res = res.model_copy(update={"branch": "ticket-001-slug"})
+
+    orch = _construire_avec_git(local, "main", git_ws, res)
+    await orch.run_pipeline("p", "ticket-001", _rien)
+
+    status = await _git_out(local, "status", "--porcelain", "--untracked-files=no")
+    assert status == "", (
+        f"working tree must be clean after delivery, got: {status!r}"
+    )
+
+
+async def test_log_livraison_dans_dernier_commit(
+    depot_avec_distant: tuple[Path, Path],
+) -> None:
+    """Criterion 2: the PR line appears in pipeline-log.md of the last
+    commit on the ticket branch (ticket-378)."""
+    local, _ = depot_avec_distant
+    git_ws = GitWorkspaceService(local)
+    res = _resultat("ticket-001")
+    res = res.model_copy(update={"branch": "ticket-001-slug"})
+
+    orch = _construire_avec_git(local, "main", git_ws, res)
+    await orch.run_pipeline("p", "ticket-001", _rien)
+
+    # Read pipeline-log.md from the last commit of the ticket branch
+    log_content = await _git_out(
+        local, "show", "ticket-001-slug:memory/pipeline-log.md"
+    )
+    assert "PR #7 ouverte" in log_content, (
+        f"'PR #7 ouverte' must appear in the last commit of the ticket branch; "
+        f"got:\n{log_content}"
+    )
+
+
+async def test_copie_de_travail_sur_branche_de_base(
+    depot_avec_distant: tuple[Path, Path],
+) -> None:
+    """Criterion 3: after delivery, the working tree is on the base branch
+    (ticket-378)."""
+    local, _ = depot_avec_distant
+    git_ws = GitWorkspaceService(local)
+    res = _resultat("ticket-001")
+    res = res.model_copy(update={"branch": "ticket-001-slug"})
+
+    orch = _construire_avec_git(local, "main", git_ws, res)
+    await orch.run_pipeline("p", "ticket-001", _rien)
+
+    current_branch = await _git_out(local, "rev-parse", "--abbrev-ref", "HEAD")
+    assert current_branch == "main", (
+        f"working tree must be on 'main' after delivery, got: {current_branch!r}"
+    )
+
+
+async def test_base_sans_nouveau_commit_apres_livraison(
+    depot_avec_distant: tuple[Path, Path],
+) -> None:
+    """Criterion 4: the local base branch receives no new commits during
+    delivery (ticket-378)."""
+    local, _ = depot_avec_distant
+    git_ws = GitWorkspaceService(local)
+
+    # Record the tip of main before delivery
+    main_sha_avant = await _git_out(local, "rev-parse", "main")
+
+    res = _resultat("ticket-001")
+    res = res.model_copy(update={"branch": "ticket-001-slug"})
+
+    orch = _construire_avec_git(local, "main", git_ws, res)
+    await orch.run_pipeline("p", "ticket-001", _rien)
+
+    main_sha_apres = await _git_out(local, "rev-parse", "main")
+    assert main_sha_avant == main_sha_apres, (
+        "delivery must not add commits to the base branch"
+    )

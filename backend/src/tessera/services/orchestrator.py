@@ -76,6 +76,7 @@ class Orchestrator:
             Callable[[str, str, int, "EventCallback"], Awaitable[None]]
         ] = None,
         ci_watcher: Optional[Any] = None,
+        base_branch: Optional[str] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -118,6 +119,9 @@ class Orchestrator:
         # Permet à `run_queue` de savoir quels tickets attendent leur CI,
         # et d'attendre leur merge avant de démarrer un ticket dépendant.
         self._ci_watcher = ci_watcher
+        # La branche de base du projet — utilisée pour y revenir après livraison
+        # (ticket-378). None quand l'orchestrateur tourne sans git workspace.
+        self._base_branch = base_branch
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -198,6 +202,9 @@ class Orchestrator:
             self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
         if livraison.arret:
             self._log(f"[{ticket_id}] livraison: arrêt — {livraison.arret[:100]}")
+        # Commit the delivery log lines just written, then return to the base
+        # branch so the working tree is clean after a delivered run (ticket-378).
+        await self._finaliser_livraison(livraison)
         await on_event(
             OrchestratorEvent(
                 type=EventType.LIVRAISON_DONE,
@@ -695,6 +702,31 @@ class Orchestrator:
                     },
                 )
             )
+
+    async def _finaliser_livraison(self, livraison: "Livraison") -> None:
+        """Commit delivery log lines and return to the base branch (ticket-378).
+
+        Called after a successful delivery (PR opened). The log lines written
+        just before this call are in ``pipeline-log.md`` but not yet committed;
+        ``commit_bookkeeping`` picks them up so they appear in the last commit
+        of the ticket branch.  Checking out the base branch then leaves the
+        working tree clean, matching ADR-018.
+
+        Errors are logged and swallowed: a failure here must not undo an
+        already-opened PR.
+        """
+        if self._git_workspace is None or livraison.pr_number is None:
+            return
+        try:
+            await self._git_workspace.commit_bookkeeping()
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("livraison_bookkeeping_failed", extra={"error": str(exc)})
+        if self._base_branch is None:
+            return
+        try:
+            await self._git_workspace.retourner_sur_base(self._base_branch)
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("livraison_checkout_base_failed", extra={"error": str(exc)})
 
     def _log(self, message: str) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")

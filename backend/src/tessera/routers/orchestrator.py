@@ -274,6 +274,8 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # bootstrap travaille au-dessus de lui (ADR-028), et sa carte doit le
         # montrer (ticket-190).
         carte_du_depot=CarteDuDepot.depuis(project_path, politique),
+        # Pour retourner sur la branche de base après livraison (ticket-378).
+        base_branch=(politique.base_branch if politique else None) or settings.github_base_branch,
     )
 
 
