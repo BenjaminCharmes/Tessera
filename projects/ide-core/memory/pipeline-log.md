@@ -1881,3 +1881,20 @@ Le code introduit une sé (44328ms)
 - 2026-10-08 07:17:14 UTC — [ticket-379] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (175093ms)
 - 2026-10-08 07:17:14 UTC — [ticket-379] APPROVED après 1 tour(s)
 - 2026-10-08 07:18:34 UTC — [ticket-379] documentation: 1 fichier(s) (76764ms)
+- 2026-10-08 07:18:47 UTC — [ticket-379] livraison: rebase sur develop (500ms)
+- 2026-10-08 07:18:47 UTC — [ticket-379] livraison: PR #320 ouverte (3969ms)
+- 2026-10-08 07:18:47 UTC — [ide-core] ticket-379 PR #320 confiée au CIWatcher
+- 2026-10-08 07:18:49 UTC — [ticket-380] branche ticket-380-a-saturated-or-timed-out-ollama-falls-back-at-onc
+- 2026-10-08 07:18:50 UTC — [ticket-380] tour 1 — codeur démarré
+- 2026-10-08 07:25:42 UTC — [ticket-380] tour 1 — codeur terminé (412281ms)
+- 2026-10-08 07:30:22 UTC — [ticket-380] testeur: \u276f src/components/Sidebar/TicketList.test.tsx:41:3
+- 2026-10-08 07:30:22 UTC — [ticket-380] tests rouges au tour 1
+- 2026-10-08 07:30:22 UTC — [ticket-380] tour 2 — codeur démarré
+- 2026-10-08 07:31:05 UTC — [ticket-380] tour 2 — codeur terminé (42968ms)
+- 2026-10-08 07:34:33 UTC — [ticket-380] testeur: OK (exit 0)
+- 2026-10-08 07:35:08 UTC — [ticket-380] securite: PASS — Audit complet : aucune vulnérabilité détectée. Le diff implémente un système de  (35639ms)
+- 2026-10-08 07:35:08 UTC — [ticket-380] tour 2 — reviewer démarré
+- 2026-10-08 07:36:05 UTC — [ticket-380] tour 2 — reviewer terminé (57078ms)
+- 2026-10-08 07:38:35 UTC — [ticket-380] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une attente  (206375ms)
+- 2026-10-08 07:38:35 UTC — [ticket-380] APPROVED après 2 tour(s)
+- 2026-10-08 07:42:51 UTC — [ticket-380] documentation: 6 fichier(s) (253187ms)

@@ -23,6 +23,10 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
+| `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | URL du serveur Ollama pour les modèles locaux (rôles de jugement uniquement) |
+| `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama. Au-delà, les requêtes attendent leur créneau |
+| `OLLAMA_SLOT_WAIT_S` | | `30` | Délai maximum d'attente pour un créneau chez le serveur Ollama avant basculement sur le repli (en secondes) |
+| `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
 
 ## `STATIC_TOKEN`
@@ -47,6 +51,20 @@ Sans elle, une UI face à un backend protégé ne reçoit que des `401`.
 uvicorn et dans tout proxy sur le chemin. Le Bearer HTTP n'y apparaît pas.
 `VITE_STATIC_TOKEN` est inliné dans le bundle : c'est un secret partagé
 entre le poste et son backend, pas un mécanisme de comptes.
+
+## Ollama
+
+Quand plusieurs runs lancent des appels au serveur Ollama simultanément, l'IDE les
+sérialise pour éviter la compétition pour le modèle et la mémoire. Si le serveur
+ne peut pas traiter une requête assez vite, l'IDE bascule automatiquement sur le
+repli Claude pour ne pas bloquer le run.
+
+| Variable | Requis | Default | Description |
+|----------|--------|---------|-------------|
+| `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | Adresse du serveur Ollama |
+| `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama (sérialisation par serveur) |
+| `OLLAMA_SLOT_WAIT_S` | | `30` | Délai d'attente maximum pour un créneau disponible. Au-delà, le serveur est considéré saturé et le repli prend le relais (en secondes) |
+| `OLLAMA_COOLDOWN_S` | | `600` | Après un dépassement du délai de lecture, le serveur est marqué lent pendant cette durée ; tout appel lève `ProviderIndisponible` aussitôt, sans requête (en secondes) |
 
 ## Application desktop (Tauri)
 

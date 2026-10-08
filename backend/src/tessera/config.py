@@ -94,6 +94,14 @@ class Settings(BaseSettings):
     # serveur rallongent le délai de chacune sans améliorer le débit global.
     # 0 ou moins : pas de borne.
     ollama_max_concurrent: int = 1
+    # Délai max pour obtenir un créneau Ollama (ticket-380). Au-delà, le repli
+    # prend le relais sans envoyer la requête. Évite d'attendre en file pendant
+    # plusieurs minutes quand le serveur est saturé.
+    ollama_slot_wait_s: float = 30.0
+    # Durée de refroidissement après un dépassement de délai de lecture
+    # (ticket-380). Pendant ce temps, tout appel lève `ProviderIndisponible`
+    # aussitôt, sans requête — le repli prend le relais.
+    ollama_cooldown_s: float = 600.0
     # Chemin vers bash.exe sous Windows, pour que le SDK puisse activer l'outil
     # `Bash` des agents. Lu depuis CLAUDE_CODE_GIT_BASH_PATH ; absent, le backend
     # tente de le déduire depuis l'emplacement de `git` au démarrage (ticket-319).

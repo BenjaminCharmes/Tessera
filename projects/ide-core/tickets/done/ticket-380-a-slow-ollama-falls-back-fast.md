@@ -1,14 +1,15 @@
 ---
-id: ticket-380
-title: "A saturated or timed-out Ollama falls back at once instead of making every role wait minutes"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-07
+id: ticket-380
+pr_number: 321
+priority: critical
+status: done
+title: A saturated or timed-out Ollama falls back at once instead of making every
+  role wait minutes
+type: fix
 ---
 
 # ticket-380 — Un Ollama saturé ou trop lent bascule tout de suite sur le repli
