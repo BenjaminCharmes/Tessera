@@ -2,6 +2,7 @@
 from pathlib import Path
 
 from tessera.services.adr import (
+    adr_pertinents,
     adr_pour,
     contraintes_pour,
     decouper,
@@ -392,6 +393,78 @@ def test_sans_contraintes_md_le_prompt_recoit_decisions_md(tmp_path: Path) -> No
     prompt = runner._build_user_prompt(_ticket(), "codeur", contexte)
 
     assert "ADR-999" in prompt
+
+
+# ------------------------------------------------------------------
+# Tests pour ticket-379 — le dernier ADR ne swallows plus ce qui suit
+# ------------------------------------------------------------------
+
+_CONTEXTE_AVEC_DIFF = (
+    "# projet\n\n"
+    "## Décisions récentes\n"
+    "# Décisions\n\n"
+    "## ADR-001 — Un choix de stack\n\n"
+    "**Portée** : codeur\n"
+    "**Décision** : utiliser uv.\n\n"
+    "## Diff à relire\n\n"
+    "```diff\n+ligne ajoutée\n```\n"
+)
+
+
+def test_le_dernier_adr_scoped_ne_swallows_plus_le_diff() -> None:
+    # Régression ticket-379 : un ADR de portée codeur engloutissait le diff
+    # quand le reviewer ne faisait pas partie de la portée.
+    pour_reviewer = adr_pertinents(_CONTEXTE_AVEC_DIFF, "reviewer")
+    pour_codeur = adr_pertinents(_CONTEXTE_AVEC_DIFF, "codeur")
+
+    # Le reviewer voit le diff même si l'ADR est de portée codeur
+    assert "ligne ajoutée" in pour_reviewer
+    # L'ADR de portée codeur n'est pas visible par le reviewer
+    assert "ADR-001" not in pour_reviewer
+    # Le codeur voit son ADR et le diff
+    assert "ADR-001" in pour_codeur
+    assert "ligne ajoutée" in pour_codeur
+
+
+def test_les_sections_apres_decisions_sont_rendues_intactes_et_en_ordre() -> None:
+    # Résultats du testeur et audit sont rendus intacts, dans l'ordre, quel que
+    # soit le rôle.
+    contexte = (
+        "# projet\n\n"
+        "## Décisions récentes\n"
+        "# Décisions\n\n"
+        "## ADR-002 — Règle de portée codeur\n\n"
+        "**Portée** : codeur\n"
+        "**Décision** : règle technique.\n\n"
+        "## Résultats du testeur\n\n"
+        "✓ 12 tests passés\n\n"
+        "## Audit sécurité\n\n"
+        "PASS: aucune faille critique\n"
+    )
+
+    pour_reviewer = adr_pertinents(contexte, "reviewer")
+
+    assert "Résultats du testeur" in pour_reviewer
+    assert "Audit sécurité" in pour_reviewer
+    assert pour_reviewer.index("Résultats du testeur") < pour_reviewer.index("Audit sécurité")
+    # L'ADR de portée codeur n'est pas visible par le reviewer
+    assert "ADR-002" not in pour_reviewer
+
+
+def test_le_format_contraintes_md_donne_le_meme_resultat_qu_avant() -> None:
+    # Le format contraintes.md n'est pas affecté par la correction ticket-379
+    contexte = "# projet\n\n## Décisions récentes\n" + _EXEMPLE_CONTRAINTES
+
+    pour_codeur = adr_pertinents(contexte, "codeur")
+    pour_validateur = adr_pertinents(contexte, "validateur")
+
+    # Le codeur reçoit sa règle scoped
+    assert "ADR-012" in pour_codeur
+    # Le validateur ne la reçoit pas
+    assert "ADR-012" not in pour_validateur
+    # Tous les deux reçoivent les règles universelles
+    assert "ADR-031" in pour_codeur
+    assert "ADR-031" in pour_validateur
 
 
 def _ticket():  # type: ignore[no-untyped-def]

@@ -141,6 +141,23 @@ def lire_contraintes(memory_dir: Path) -> str:
 #: Le titre sous lequel `_build_project_context` place les ADR.
 _SECTION = "## Décisions récentes"
 
+#: Premier titre de niveau 2 qui n'est pas un en-tête ADR.
+#: Marque la frontière entre les décisions et ce qui les suit (diff, tests, audit).
+_SECTION_NON_ADR = re.compile(r"^## (?!ADR-\d+\b)", re.MULTILINE)
+
+
+def _separer_decisions_et_queue(decisions: str) -> tuple[str, str]:
+    """Sépare les blocs ADR de ce qui les suit dans le contexte.
+
+    Returns (decisions_part, queue) where decisions_part contains only the
+    ## ADR-NNN blocks and queue contains everything from the first non-ADR
+    level-2 header onward (diff, test results, audit, etc.).
+    """
+    m = _SECTION_NON_ADR.search(decisions)
+    if m is None:
+        return decisions, ""
+    return decisions[: m.start()], decisions[m.start() :]
+
 
 def adr_pertinents(contexte_projet: str, role: str) -> str:
     """Réduit la section « Décisions récentes » d'un contexte projet à ce rôle.
@@ -149,6 +166,9 @@ def adr_pertinents(contexte_projet: str, role: str) -> str:
     c'est le format `decisions.md` et `adr_pour` s'applique. Sinon, c'est le
     format `contraintes.md` et `contraintes_pour` s'applique.
 
+    Ce qui suit la section des décisions (diff, résultats du testeur, audit)
+    est toujours rendu intact, quel que soit le rôle.
+
     Un contexte sans section de décisions traverse intact : c'est le cas d'un
     projet qui n'en a pas encore, et celui de la plupart des tests.
     """
@@ -156,7 +176,10 @@ def adr_pertinents(contexte_projet: str, role: str) -> str:
     if not separateur:
         return contexte_projet
     if _DEBUT_ADR.search(decisions):
-        filtrees = adr_pour(decisions, role)
+        decisions_part, queue = _separer_decisions_et_queue(decisions)
+        filtrees = adr_pour(decisions_part, role)
     else:
-        filtrees = contraintes_pour(decisions, role)
-    return tete + separateur + filtrees
+        decisions_part = decisions
+        queue = ""
+        filtrees = contraintes_pour(decisions_part, role)
+    return tete + separateur + filtrees + queue
