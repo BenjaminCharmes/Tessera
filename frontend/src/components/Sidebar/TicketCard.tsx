@@ -4,10 +4,8 @@ import {
   IconPlay,
   IconQueue,
 } from "../../design/icons";
-import { memo, useEffect, useRef, useState } from "react";
-import { api } from "../../lib/api";
+import { memo } from "react";
 import { MIME_TICKET, transitionsManuelles } from "../../lib/transitionsManuelles";
-import { useFenetreVisible } from "../../hooks/useFenetreVisible";
 import type {
   PRStatus,
   Ticket,
@@ -54,8 +52,6 @@ const PR_STATE_LABEL: Record<string, string> = {
   merged: "PR mergée",
 };
 
-const POLL_INTERVAL_MS = 30_000;
-
 interface TicketCardProps {
   ticket: Ticket;
   isActive: boolean;
@@ -63,7 +59,11 @@ interface TicketCardProps {
   runningRound?: number;
   /** Nombre de tours du run quand le backend le dit ; sinon le badge ne compte pas (ticket-123). */
   maxRounds?: number | null;
-  githubRemote?: string | null;
+  /**
+   * Statut de la PR de ce ticket, fourni par le parent depuis `usePrStatuses`
+   * (ticket-367). La carte ne fait plus aucun appel réseau pour sa propre PR.
+   */
+  prStatus?: PRStatus | null;
   onSelect: (ticket: Ticket) => void;
   onRun: (ticketId: string) => void;
   onShowDiff?: (ticketId: string) => void;
@@ -102,7 +102,7 @@ const TicketCard = memo(function TicketCard({
   isRunning,
   runningRound,
   maxRounds,
-  githubRemote,
+  prStatus = null,
   onSelect,
   onRun,
   onShowDiff,
@@ -116,45 +116,6 @@ const TicketCard = memo(function TicketCard({
   const transitions = transitionsManuelles(ticket.status);
   const peutChangerDeStatut =
     !!onChangeStatus && !isRunning && transitions.length > 0;
-  const [prStatus, setPrStatus] = useState<PRStatus | null>(null);
-  const fenetreVisible = useFenetreVisible();
-
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Une fois réglée (merged ou closed), la PR ne sera plus interrogée même
-  // si la fenêtre redevient visible (ticket-365).
-  const prSettledRef = useRef(false);
-
-  useEffect(() => {
-    // Pas de polling sans PR, ni quand la fenêtre est cachée (ticket-356).
-    if (!ticket.pr_number || !githubRemote || !fenetreVisible) return;
-    // PR déjà réglée : pas besoin de redemander au retour de la fenêtre (ticket-365).
-    if (prSettledRef.current) return;
-
-    const fetchStatus = async () => {
-      try {
-        const s = await api.github.getPrStatus(ticket.project_id, ticket.id);
-        setPrStatus(s);
-        if (s.state === "merged" || s.state === "closed") {
-          prSettledRef.current = true;
-          if (intervalRef.current) clearInterval(intervalRef.current);
-        }
-      } catch (err) {
-        // Une erreur 4xx ne changera pas au prochain essai : un pr_number
-        // hérité d'un autre dépôt renvoie 404 pour toujours. Réessayer toutes
-        // les 30 s, sur chaque carte, épuisait le quota GitHub (ticket-217).
-        // Une 5xx peut être passagère, on continue.
-        if (err instanceof Error && /^API 4\d\d\b/.test(err.message)) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-        }
-      }
-    };
-
-    fetchStatus();
-    intervalRef.current = setInterval(fetchStatus, POLL_INTERVAL_MS);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [ticket.pr_number, ticket.project_id, ticket.id, githubRemote, fenetreVisible]);
 
   // La carte est un `div` cliquable : sans rôle ni focus, elle n'existait pas
   // au clavier. Seule la carte elle-même réagit à Entrée et Espace — la

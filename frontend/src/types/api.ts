@@ -114,6 +114,11 @@ export interface PRStatus {
   pr_number: number;
 }
 
+/** One entry from GET /projects/{id}/pr-statuses (ticket-367). */
+export interface PRStatusEntry extends PRStatus {
+  ticket_id: string;
+}
+
 export interface OrchestratorEvent {
   type: EventType;
   agent: AgentRole | null;

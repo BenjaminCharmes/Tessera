@@ -5,6 +5,7 @@ import { IconCross } from "../../design/icons";
 import KanbanColumn from "./KanbanColumn";
 import QueueBar from "../Sidebar/QueueBar";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
+import { usePrStatuses } from "../../hooks/usePrStatuses";
 import { filtresActifs, type FiltresTickets } from "../../lib/filtresTickets";
 import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
 
@@ -63,7 +64,6 @@ export default function KanbanView({
   byStatus,
   activeTicket,
   running,
-  githubRemote,
   projectId,
   unreadable = [],
   onSelectTicket,
@@ -84,6 +84,7 @@ export default function KanbanView({
     [byStatus],
   );
   const blockedArrets = useBlockedArrets(projectId ?? null, blockedIds);
+  const prStatuses = usePrStatuses(projectId ?? null);
 
   return (
     <div className="h-full flex flex-col bg-zinc-900">
@@ -132,7 +133,7 @@ export default function KanbanView({
             tickets={byStatus[status]}
             activeTicket={activeTicket}
             running={running}
-            githubRemote={githubRemote}
+            prStatuses={prStatuses}
             onSelectTicket={onSelectTicket}
             onRunPipeline={onRunPipeline}
             onChangeStatus={onChangeStatus}

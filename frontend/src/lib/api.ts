@@ -22,6 +22,7 @@ import type {
   ImportProjectRequest,
   ImportProjectResponse,
   PRStatus,
+  PRStatusEntry,
   RunRequest,
   RunEvent,
   ServiceActif,
@@ -203,6 +204,9 @@ export const api = {
   github: {
     getPrStatus: (projectId: string, ticketId: string): Promise<PRStatus> =>
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
+    /** Statut de toutes les PR d'un projet en un seul appel (ticket-367). */
+    getPrStatuses: (projectId: string): Promise<PRStatusEntry[]> =>
+      request(`/projects/${projectId}/pr-statuses`),
   },
   pipeline: {
     /** Les réglages du pipeline d'un projet (ticket-196). */

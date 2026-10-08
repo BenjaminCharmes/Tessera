@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import TicketCard from "./TicketCard";
-import type { Ticket } from "../../types/api";
+import type { PRStatus, Ticket } from "../../types/api";
 import * as apiModule from "../../lib/api";
 
 function setVisibility(state: "visible" | "hidden"): void {
@@ -13,6 +13,7 @@ function setVisibility(state: "visible" | "hidden"): void {
 
 afterEach(() => {
   setVisibility("visible");
+  vi.restoreAllMocks();
 });
 
 const base: Ticket = {
@@ -247,7 +248,6 @@ describe("TicketCard", () => {
         ticket={{ ...base, status: "done" }}
         isActive={false}
         isRunning={false}
-        githubRemote="owner/repo"
         onSelect={vi.fn()}
         onRun={vi.fn()}
       />,
@@ -257,23 +257,17 @@ describe("TicketCard", () => {
   });
 
   // ------------------------------------------------------------------
-  // PR badge
+  // PR badge — la carte lit son statut depuis la prop (ticket-367)
   // ------------------------------------------------------------------
 
   it("shows PR number badge when pr_number set", () => {
-    vi.spyOn(apiModule.api.github, "getPrStatus").mockResolvedValue({
-      state: "open",
-      ci_status: "none",
-      pr_url: "https://github.com/owner/repo/pull/7",
-      pr_number: 7,
-    });
-
+    // Pas de prop prStatus : le badge PR s'affiche quand même (il ne dépend
+    // que de ticket.pr_number).
     render(
       <TicketCard
         ticket={{ ...base, pr_number: 7 }}
         isActive={false}
         isRunning={false}
-        githubRemote="owner/repo"
         onSelect={vi.fn()}
         onRun={vi.fn()}
       />,
@@ -281,126 +275,80 @@ describe("TicketCard", () => {
     expect(screen.getByText("PR #7")).toBeInTheDocument();
   });
 
-  it("shows CI status badge after polling resolves", async () => {
-    vi.spyOn(apiModule.api.github, "getPrStatus").mockResolvedValue({
+  it("shows CI status badge from prStatus prop", () => {
+    // Le badge de CI vient de la prop — aucun appel réseau.
+    const prStatus: PRStatus = {
       state: "open",
       ci_status: "passing",
       pr_url: "https://github.com/owner/repo/pull/7",
       pr_number: 7,
-    });
+    };
 
     render(
       <TicketCard
         ticket={{ ...base, pr_number: 7 }}
         isActive={false}
         isRunning={false}
-        githubRemote="owner/repo"
+        prStatus={prStatus}
         onSelect={vi.fn()}
         onRun={vi.fn()}
       />,
     );
-
-    await waitFor(() => {
-      expect(screen.getByText("CI verte")).toBeInTheDocument();
-    });
+    expect(screen.getByText("CI verte")).toBeInTheDocument();
   });
 
-  it("stops polling a PR the server reports as not found", async () => {
-    // ticket-217 : un pr_number hérité d'un autre dépôt renvoie 404. La carte
-    // réessayait toutes les 30 s, sur 106 cartes à la fois.
-    vi.useFakeTimers();
-    try {
-      const spy = vi
-        .spyOn(apiModule.api.github, "getPrStatus")
-        .mockRejectedValue(new Error("API 404: PR #132 introuvable"));
+  it("affiche l'infobulle « PR mergée » depuis la prop prStatus", () => {
+    const prStatus: PRStatus = {
+      state: "merged",
+      ci_status: "passing",
+      pr_url: "https://github.com/owner/repo/pull/7",
+      pr_number: 7,
+    };
 
-      render(
-        <TicketCard
-          ticket={{ ...base, pr_number: 132 }}
-          isActive={false}
-          isRunning={false}
-          githubRemote="owner/repo"
-          onSelect={vi.fn()}
-          onRun={vi.fn()}
-        />,
-      );
-      await vi.advanceTimersByTimeAsync(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-
-      await vi.advanceTimersByTimeAsync(5 * 60_000);
-      expect(spy).toHaveBeenCalledTimes(1);
-    } finally {
-      vi.useRealTimers();
-    }
+    render(
+      <TicketCard
+        ticket={{ ...base, pr_number: 7 }}
+        isActive={false}
+        isRunning={false}
+        prStatus={prStatus}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    // L'infobulle porte l'état de la PR.
+    const lienPr = screen.getByText("PR #7");
+    expect(lienPr).toHaveAttribute("title", "PR mergée");
+    expect(screen.getByText("CI verte")).toBeInTheDocument();
   });
 
-  it("suspend le polling de PR quand la fenêtre est cachée (ticket-356)", async () => {
-    vi.useFakeTimers();
-    try {
-      setVisibility("visible");
-      const spy = vi
-        .spyOn(apiModule.api.github, "getPrStatus")
-        .mockResolvedValue({
-          state: "open",
-          ci_status: "none",
-          pr_url: "https://github.com/owner/repo/pull/7",
-          pr_number: 7,
-        });
+  it("n'appelle pas getPrStatus — la carte ne fait plus d'appel réseau pour sa PR", () => {
+    const spy = vi.spyOn(apiModule.api.github, "getPrStatus");
 
-      render(
-        <TicketCard
-          ticket={{ ...base, pr_number: 7 }}
-          isActive={false}
-          isRunning={false}
-          githubRemote="owner/repo"
-          onSelect={vi.fn()}
-          onRun={vi.fn()}
-        />,
-      );
-
-      // Appel initial au montage.
-      await vi.advanceTimersByTimeAsync(0);
-      const apresInit = spy.mock.calls.length;
-      expect(apresInit).toBeGreaterThanOrEqual(1);
-
-      // Cacher la fenêtre : l'intervalle doit s'arrêter.
-      await act(async () => {
-        setVisibility("hidden");
-        document.dispatchEvent(new Event("visibilitychange"));
-        await vi.advanceTimersByTimeAsync(0);
-      });
-
-      // Avancer au-delà de l'intervalle de 30 s — aucun appel supplémentaire.
-      await vi.advanceTimersByTimeAsync(90_000);
-      expect(spy.mock.calls.length).toBe(apresInit);
-    } finally {
-      vi.useRealTimers();
-    }
+    render(
+      <TicketCard
+        ticket={{ ...base, pr_number: 7 }}
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(spy).not.toHaveBeenCalled();
   });
 
-  it("keeps polling after a transient server error", async () => {
-    vi.useFakeTimers();
-    try {
-      const spy = vi
-        .spyOn(apiModule.api.github, "getPrStatus")
-        .mockRejectedValue(new Error("API 502: Bad Gateway"));
-
-      render(
-        <TicketCard
-          ticket={{ ...base, pr_number: 7 }}
-          isActive={false}
-          isRunning={false}
-          githubRemote="owner/repo"
-          onSelect={vi.fn()}
-          onRun={vi.fn()}
-        />,
-      );
-      await vi.advanceTimersByTimeAsync(0);
-      await vi.advanceTimersByTimeAsync(30_000);
-      expect(spy).toHaveBeenCalledTimes(2);
-    } finally {
-      vi.useRealTimers();
-    }
+  it("pas de badge CI sans prStatus", () => {
+    render(
+      <TicketCard
+        ticket={{ ...base, pr_number: 7 }}
+        isActive={false}
+        isRunning={false}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    // Aucun badge CI si le parent n'a pas encore chargé le statut.
+    expect(screen.queryByText("CI verte")).not.toBeInTheDocument();
+    expect(screen.queryByText("CI en cours")).not.toBeInTheDocument();
   });
 
   it("n'offre pas la file sur un ticket deja termine", () => {
@@ -561,147 +509,71 @@ describe("TicketCard — infobulle d'arrêt (ticket-218)", () => {
   });
 });
 
-describe("TicketCard — PR réglée non redemandée au retour de fenêtre (ticket-365)", () => {
-  it("ne redemande pas getPrStatus quand la PR est merged et la fenêtre revient", async () => {
-    vi.useFakeTimers();
-    try {
-      setVisibility("visible");
-      const spy = vi
-        .spyOn(apiModule.api.github, "getPrStatus")
-        .mockResolvedValue({
-          state: "merged",
-          ci_status: "passing",
-          pr_url: "https://github.com/owner/repo/pull/7",
-          pr_number: 7,
-        });
+describe("TicketCard — PR réglée (ticket-365 / ticket-367)", () => {
+  // L'intention de ticket-365 (PR réglée non redemandée) est désormais
+  // couverte dans usePrStatuses.test.ts. Ici on vérifie que la carte rend
+  // correctement les états merged/closed/open reçus par prop.
 
-      render(
-        <TicketCard
-          ticket={{ ...base, pr_number: 7 }}
-          isActive={false}
-          isRunning={false}
-          githubRemote="owner/repo"
-          onSelect={vi.fn()}
-          onRun={vi.fn()}
-        />,
-      );
-
-      // Appel initial au montage.
-      await vi.advanceTimersByTimeAsync(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-
-      // Cacher puis réafficher la fenêtre.
-      await act(async () => {
-        setVisibility("hidden");
-        document.dispatchEvent(new Event("visibilitychange"));
-        await vi.advanceTimersByTimeAsync(0);
-      });
-      await act(async () => {
-        setVisibility("visible");
-        document.dispatchEvent(new Event("visibilitychange"));
-        await vi.advanceTimersByTimeAsync(0);
-      });
-
-      // Aucun appel supplémentaire : la PR est réglée.
-      expect(spy).toHaveBeenCalledTimes(1);
-    } finally {
-      vi.useRealTimers();
-    }
+  it("affiche « PR mergée » en infobulle pour une PR merged", () => {
+    const prStatus: PRStatus = {
+      state: "merged",
+      ci_status: "passing",
+      pr_url: "https://github.com/owner/repo/pull/7",
+      pr_number: 7,
+    };
+    render(
+      <TicketCard
+        ticket={{ ...base, pr_number: 7 }}
+        isActive={false}
+        isRunning={false}
+        prStatus={prStatus}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("PR #7")).toHaveAttribute("title", "PR mergée");
+    expect(screen.getByText("CI verte")).toBeInTheDocument();
   });
 
-  it("ne redemande pas getPrStatus quand la PR est closed et la fenêtre revient", async () => {
-    vi.useFakeTimers();
-    try {
-      setVisibility("visible");
-      const spy = vi
-        .spyOn(apiModule.api.github, "getPrStatus")
-        .mockResolvedValue({
-          state: "closed",
-          ci_status: "none",
-          pr_url: "https://github.com/owner/repo/pull/8",
-          pr_number: 8,
-        });
-
-      render(
-        <TicketCard
-          ticket={{ ...base, pr_number: 8 }}
-          isActive={false}
-          isRunning={false}
-          githubRemote="owner/repo"
-          onSelect={vi.fn()}
-          onRun={vi.fn()}
-        />,
-      );
-
-      // Appel initial au montage.
-      await vi.advanceTimersByTimeAsync(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-
-      // Cacher puis réafficher la fenêtre.
-      await act(async () => {
-        setVisibility("hidden");
-        document.dispatchEvent(new Event("visibilitychange"));
-        await vi.advanceTimersByTimeAsync(0);
-      });
-      await act(async () => {
-        setVisibility("visible");
-        document.dispatchEvent(new Event("visibilitychange"));
-        await vi.advanceTimersByTimeAsync(0);
-      });
-
-      // Aucun appel supplémentaire : la PR est réglée.
-      expect(spy).toHaveBeenCalledTimes(1);
-    } finally {
-      vi.useRealTimers();
-    }
+  it("affiche « PR fermée » en infobulle pour une PR closed", () => {
+    const prStatus: PRStatus = {
+      state: "closed",
+      ci_status: "none",
+      pr_url: "https://github.com/owner/repo/pull/8",
+      pr_number: 8,
+    };
+    render(
+      <TicketCard
+        ticket={{ ...base, pr_number: 8 }}
+        isActive={false}
+        isRunning={false}
+        prStatus={prStatus}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("PR #8")).toHaveAttribute("title", "PR fermée");
   });
 
-  it("redemande getPrStatus quand la PR est open et la fenêtre revient", async () => {
-    vi.useFakeTimers();
-    try {
-      setVisibility("visible");
-      const spy = vi
-        .spyOn(apiModule.api.github, "getPrStatus")
-        .mockResolvedValue({
-          state: "open",
-          ci_status: "pending",
-          pr_url: "https://github.com/owner/repo/pull/9",
-          pr_number: 9,
-        });
-
-      render(
-        <TicketCard
-          ticket={{ ...base, pr_number: 9 }}
-          isActive={false}
-          isRunning={false}
-          githubRemote="owner/repo"
-          onSelect={vi.fn()}
-          onRun={vi.fn()}
-        />,
-      );
-
-      // Appel initial au montage.
-      await vi.advanceTimersByTimeAsync(0);
-      const apresInit = spy.mock.calls.length;
-      expect(apresInit).toBeGreaterThanOrEqual(1);
-
-      // Cacher puis réafficher la fenêtre.
-      await act(async () => {
-        setVisibility("hidden");
-        document.dispatchEvent(new Event("visibilitychange"));
-        await vi.advanceTimersByTimeAsync(0);
-      });
-      await act(async () => {
-        setVisibility("visible");
-        document.dispatchEvent(new Event("visibilitychange"));
-        await vi.advanceTimersByTimeAsync(0);
-      });
-
-      // Un appel supplémentaire au retour de la fenêtre : la PR est ouverte.
-      expect(spy.mock.calls.length).toBeGreaterThan(apresInit);
-    } finally {
-      vi.useRealTimers();
-    }
+  it("affiche « PR ouverte » en infobulle pour une PR open", () => {
+    const prStatus: PRStatus = {
+      state: "open",
+      ci_status: "pending",
+      pr_url: "https://github.com/owner/repo/pull/9",
+      pr_number: 9,
+    };
+    render(
+      <TicketCard
+        ticket={{ ...base, pr_number: 9 }}
+        isActive={false}
+        isRunning={false}
+        prStatus={prStatus}
+        onSelect={vi.fn()}
+        onRun={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("PR #9")).toHaveAttribute("title", "PR ouverte");
+    expect(screen.getByText("CI en cours")).toBeInTheDocument();
   });
 });
 
