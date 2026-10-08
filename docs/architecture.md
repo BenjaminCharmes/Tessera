@@ -706,6 +706,16 @@ tant qu'elle n'aura pas mergé.
 **Divergence** : Si la branche locale et distante divergent hors d'une avance
 rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
 
+### État du dépôt après livraison (ticket-378)
+
+Après la livraison d'un run, le dépôt local finit dans un état garanti :
+
+- **Arbre propre** : aucune modification et aucun fichier non-tracké ; `git status --porcelain --untracked-files=no` est vide.
+- **Retour à la branche de base** : la copie de travail est revenue sur la branche de base du projet (défaut : `develop`) ; aucun commit n'a été ajouté à cette branche pendant la livraison.
+- **Logs dans le commit** : les lignes de livraison figurent dans le dernier commit de la branche du ticket (celui utilisé pour la PR), pas dans des commits orphelins de suivi.
+
+Cela permet d'enchaîner plusieurs runs sans accumulation d'état en attente de nettoyage manuel.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).

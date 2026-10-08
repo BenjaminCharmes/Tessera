@@ -544,6 +544,12 @@ La fusion se poursuit en arrière-plan, après que le run soit terminé. Si elle
 
 Le travail du codeur est déjà commité sur la branche du ticket, et la PR est ouverte sur GitHub. Tu peux reprendre manuellement s'il y a un conflit simple, ou relancer le codeur si des modifications sont nécessaires.
 
+### L'arbre revient propre
+
+Un run terminé laisse toujours ton arbre git propre. La copie de travail revient sur la branche de base du projet (pas la branche du ticket), et aucune modification n'est laissée en vrac.
+
+Tu peux lancer le ticket suivant sans nettoyer après toi. Le travail du run précédent reste sur sa branche dédiée (`ticket-XXX`) si tu veux le consulter plus tard.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
