@@ -4,7 +4,7 @@ created: 2026-10-07
 depends_on: []
 estimated_days: 0.5
 id: ticket-378
-pr_number: null
+pr_number: 327
 priority: high
 status: done
 title: After delivery, the delivery log lines are committed and the working tree is
