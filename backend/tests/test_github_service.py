@@ -623,7 +623,7 @@ async def test_merge_attend_null_puis_fusionne_quand_true() -> None:
     svc = _make_service()
     await svc.merge_quand_fusionnable(
         7,
-        attente_max_s=10.0,
+        attente_fusionnabilite_max_s=10.0,
         intervalle_s=5.0,
         dormir=lambda _: asyncio.sleep(0),
     )
@@ -665,7 +665,7 @@ async def test_merge_attente_bornee_quand_null_persiste() -> None:
     with pytest.raises(MergeabiliteTimeoutError) as exc_info:
         await svc.merge_quand_fusionnable(
             7,
-            attente_max_s=0.0,  # délai nul : la première lecture nulle déclenche le timeout
+            attente_fusionnabilite_max_s=0.0,  # délai nul : la première lecture nulle déclenche le timeout
             intervalle_s=5.0,
             dormir=lambda _: asyncio.sleep(0),
         )
@@ -696,3 +696,51 @@ async def test_merge_retente_sur_405_et_reussit() -> None:
     )
 
     assert merge_route.call_count == 2
+
+
+@respx.mock
+async def test_merge_attend_null_90s_simule_puis_fusionne() -> None:
+    # Simule mergeable: null pendant plusieurs sondages (délais croissants)
+    # totalisant ~95 s simulées, puis true. Vérifie que merge_quand_fusionnable
+    # fusionne sans lever avec l'attente par défaut de 300 s.
+    # Délais croissants : 5, 10, 20, 30, 30 → total 95 s simulées.
+    null_responses = [httpx.Response(200, json={"mergeable": None})] * 5
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/7").mock(
+        side_effect=null_responses + [httpx.Response(200, json={"mergeable": True})]
+    )
+    merge_route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True, "sha": "abc"})
+    )
+
+    svc = _make_service()
+    # dormir est instantané ; attente_fusionnabilite_max_s=300 est suffisant.
+    await svc.merge_quand_fusionnable(
+        7,
+        dormir=lambda _: asyncio.sleep(0),
+    )
+
+    assert merge_route.call_count == 1
+
+
+@respx.mock
+async def test_merge_depasse_attente_fusionnabilite_max_s() -> None:
+    # Au-delà de attente_fusionnabilite_max_s, l'erreur de délai est levée.
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/7").mock(
+        return_value=httpx.Response(200, json={"mergeable": None})
+    )
+    merge_route = respx.put(f"{_BASE}/repos/{_REPO}/pulls/7/merge").mock(
+        return_value=httpx.Response(200, json={"merged": True, "sha": "abc"})
+    )
+
+    svc = _make_service()
+    with pytest.raises(MergeabiliteTimeoutError) as exc_info:
+        await svc.merge_quand_fusionnable(
+            7,
+            attente_fusionnabilite_max_s=10.0,
+            intervalle_s=5.0,
+            dormir=lambda _: asyncio.sleep(0),
+        )
+
+    assert merge_route.call_count == 0
+    assert "7" in str(exc_info.value)
+    assert "10" in str(exc_info.value)

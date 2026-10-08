@@ -1939,3 +1939,37 @@ Le code introduit une sé (44328ms)
 - 2026-10-08 09:02:15 UTC — [ticket-378] validateur: APPROVED — Les 4 critères sont satisfaits. Le diff ajoute l'implémentation complète dans `o (325562ms)
 - 2026-10-08 09:02:15 UTC — [ticket-378] APPROVED après 1 tour(s)
 - 2026-10-08 09:04:48 UTC — [ticket-378] documentation: 2 fichier(s) (151422ms)
+- 2026-10-08 09:05:01 UTC — [ticket-378] livraison: rebase sur develop (297ms)
+- 2026-10-08 09:05:01 UTC — [ticket-378] livraison: PR #327 ouverte (4188ms)
+- 2026-10-08 09:05:01 UTC — [ide-core] ticket-378 PR #327 confiée au CIWatcher
+- 2026-10-08 09:05:02 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 09:05:02 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 09:19:30 UTC — [ticket-384] tour 1 — codeur terminé (867891ms)
+- 2026-10-08 09:23:59 UTC — [ticket-384] testeur: OK (exit 0)
+- 2026-10-08 09:24:38 UTC — [ticket-384] securite: PASS — No CRITICAL or HIGH vulnerabilities detected. The diff implements ticket-384 (qu (38875ms)
+- 2026-10-08 09:24:38 UTC — [ticket-384] tour 1 — reviewer démarré
+- 2026-10-08 09:26:47 UTC — [ticket-384] tour 1 — reviewer terminé (129546ms)
+- 2026-10-08 09:30:25 UTC — [ticket-384] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff montre les cinq tests a (347750ms)
+- 2026-10-08 09:30:25 UTC — [ticket-384] CHANGES_REQUESTED tour 1: Reviewer : Je vais vérifier deux points critiques avant de rendre mon verdict : ce que fait réelleme
+- 2026-10-08 09:30:25 UTC — [ticket-384] tour 2 — codeur démarré
+- 2026-10-08 09:32:29 UTC — [ticket-384] tour 2 — codeur terminé (123468ms)
+- 2026-10-08 09:36:13 UTC — [ticket-384] testeur: 1 failed, 2087 passed, 20 warnings in 220.52s (0:03:40)
+- 2026-10-08 09:36:13 UTC — [ticket-384] tests rouges au tour 2
+- 2026-10-08 09:36:13 UTC — [ticket-384] tour 3 — codeur démarré
+- 2026-10-08 09:42:26 UTC — [ticket-384] INTERROMPU au tour 3 — ResultError: Claude Code returned an error result: You've hit your session limit · resets 1:50pm (Europe/Paris) (exit code: 1)
+- 2026-10-08 09:42:28 UTC — [ide-core] file interrompue : ticket-384 non approuvé
+- 2026-10-08 13:14:13 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 13:14:13 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 13:24:07 UTC — [ticket-384] tour 1 — codeur terminé (593844ms)
+- 2026-10-08 13:27:12 UTC — [ticket-384] testeur: OK (exit 0)
+- 2026-10-08 13:28:16 UTC — [ticket-384] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le diff ajoute la gestion du blo (64156ms)
+- 2026-10-08 13:28:16 UTC — [ticket-384] tour 1 — reviewer démarré
+- 2026-10-08 13:30:29 UTC — [ticket-384] tour 1 — reviewer terminé (133390ms)
+- 2026-10-08 13:34:08 UTC — [ticket-384] validateur: APPROVED — Tous les critères sont satisfaits. Les cinq tests requis sont présents dans le d (352391ms)
+- 2026-10-08 13:34:08 UTC — [ticket-384] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **`ticket_svc: Any | None` dans `ci_watcher
+- 2026-10-08 13:34:08 UTC — [ticket-384] tour 2 — codeur démarré
+- 2026-10-08 13:35:43 UTC — [ticket-384] tour 2 — codeur terminé (95218ms)

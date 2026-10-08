@@ -21,11 +21,20 @@ Shutdown: call arreter() to cancel all running tasks without raising exceptions.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
+from pathlib import Path
+from typing import Protocol
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
+
+
+class _TicketSvcProto(Protocol):
+    """Minimal interface of TicketService required by CIWatcher."""
+
+    async def update_status(self, ticket_id: str, new_status: TicketStatus) -> object:
+        ...
 
 _logger = get_logger(__name__)
 
@@ -48,6 +57,9 @@ class CIWatcher:
         # Événements signalés quand un ticket quitte la file d'attente.
         # Clé : "project_id:ticket_id".
         self._events_merge: dict[str, asyncio.Event] = {}
+        # Résultats de merge : True = mergé, False = bloqué/échoué.
+        # Clé : "project_id:ticket_id".
+        self._resultats_merge: dict[str, bool] = {}
         # Borne temporelle de la phase 2 entière. Paramétrable pour les tests.
         self._timeout_phase2_s = timeout_phase2_s
 
@@ -62,11 +74,16 @@ class CIWatcher:
         pr_number: int,
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
+        pipeline_log_path: Path | None = None,
+        ticket_svc: _TicketSvcProto | None = None,
     ) -> None:
         """Start watching `pr_number` for `ticket_id` in the background.
 
         Returns immediately; the background task emits ci_merge_done when done.
         A second call for the same project waits for the first to finish.
+
+        When the merge fails, writes a line to `pipeline_log_path` (if given)
+        and calls `ticket_svc.update_status(ticket_id, blocked)` (if given).
         """
         # Le ticket est en attente dès l'inscription, même avant que le
         # sémaphore soit acquis : `en_attente` doit le lister pendant l'attente
@@ -75,7 +92,8 @@ class CIWatcher:
 
         task = asyncio.create_task(
             self._surveiller_impl(
-                project_id, ticket_id, pr_number, livraison_phase_2, on_event
+                project_id, ticket_id, pr_number, livraison_phase_2, on_event,
+                pipeline_log_path, ticket_svc,
             ),
             name=f"ci-watcher:{project_id}:{ticket_id}",
         )
@@ -86,19 +104,24 @@ class CIWatcher:
         """Ticket ids whose PR is open and waiting for CI or merge."""
         return tuple(self._en_attente.get(project_id, set()))
 
-    async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+    async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
         """Wait until the ticket is no longer waiting for CI or merge.
 
-        Returns immediately if the ticket is already done or was never
-        registered. Safe to call from a queue loop: a dependent ticket
-        suspends here until the background task signals completion.
+        Returns True if the ticket was merged, False if it was blocked or failed.
+        Returns True immediately when the ticket was never registered (safe
+        default — not applicable to this queue).
+
+        Safe to call from a queue loop: a dependent ticket suspends here until
+        the background task signals completion.
         """
-        if ticket_id not in self._en_attente.get(project_id, set()):
-            return
         cle = f"{project_id}:{ticket_id}"
+        if ticket_id not in self._en_attente.get(project_id, set()):
+            # Already finished or never registered — return recorded result.
+            return self._resultats_merge.get(cle, True)
         if cle not in self._events_merge:
             self._events_merge[cle] = asyncio.Event()
         await self._events_merge[cle].wait()
+        return self._resultats_merge.get(cle, True)
 
     async def arreter(self) -> None:
         """Cancel all running tasks and wait for them to finish.
@@ -127,6 +150,8 @@ class CIWatcher:
         pr_number: int,
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
+        pipeline_log_path: Path | None,
+        ticket_svc: _TicketSvcProto | None,
     ) -> None:
         sem = self._semaphore_du_projet(project_id)
         try:
@@ -135,7 +160,8 @@ class CIWatcher:
                 try:
                     await asyncio.wait_for(
                         self._livrer_et_emettre(
-                            project_id, ticket_id, pr_number, livraison_phase_2, on_event
+                            project_id, ticket_id, pr_number, livraison_phase_2,
+                            on_event, pipeline_log_path, ticket_svc,
                         ),
                         timeout=self._timeout_phase2_s,
                     )
@@ -153,7 +179,8 @@ class CIWatcher:
                     )
                 if arret_erreur is not None:
                     await self._emettre_echec(
-                        project_id, ticket_id, pr_number, arret_erreur, on_event
+                        project_id, ticket_id, pr_number, arret_erreur, on_event,
+                        pipeline_log_path, ticket_svc,
                     )
         except asyncio.CancelledError:
             _logger.info(
@@ -181,8 +208,13 @@ class CIWatcher:
         pr_number: int,
         arret: str,
         on_event: EventCallback,
+        pipeline_log_path: Path | None,
+        ticket_svc: _TicketSvcProto | None,
     ) -> None:
         """Emit ticket_status_changed(blocked) then ci_merge_done(merged=False)."""
+        self._resultats_merge[f"{project_id}:{ticket_id}"] = False
+        self._ecrire_log_blocage(pipeline_log_path, ticket_id, pr_number, arret)
+        await self._bloquer_ticket(ticket_svc, ticket_id)
         await on_event(
             OrchestratorEvent(
                 type=EventType.TICKET_STATUS_CHANGED,
@@ -217,12 +249,17 @@ class CIWatcher:
         pr_number: int,
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
+        pipeline_log_path: Path | None,
+        ticket_svc: _TicketSvcProto | None,
     ) -> None:
         livraison = await livraison_phase_2(pr_number)
 
         if not livraison.merged:
             # CI rouge ou merge refusé : le ticket passe en blocked.
             arret = livraison.arret or f"CI rouge : la PR #{pr_number} reste ouverte."
+            self._resultats_merge[f"{project_id}:{ticket_id}"] = False
+            self._ecrire_log_blocage(pipeline_log_path, ticket_id, pr_number, arret)
+            await self._bloquer_ticket(ticket_svc, ticket_id)
             await on_event(
                 OrchestratorEvent(
                     type=EventType.TICKET_STATUS_CHANGED,
@@ -250,6 +287,7 @@ class CIWatcher:
                 extra={"project": project_id, "ticket": ticket_id, "pr": pr_number},
             )
         else:
+            self._resultats_merge[f"{project_id}:{ticket_id}"] = True
             await on_event(
                 OrchestratorEvent(
                     type=EventType.CI_MERGE_DONE,
@@ -267,6 +305,41 @@ class CIWatcher:
             _logger.info(
                 "ci_merge_done",
                 extra={"project": project_id, "ticket": ticket_id, "pr": pr_number},
+            )
+
+    def _ecrire_log_blocage(
+        self,
+        pipeline_log_path: Path | None,
+        ticket_id: str,
+        pr_number: int,
+        arret: str,
+    ) -> None:
+        """Write a blocking delivery entry to the pipeline log."""
+        if pipeline_log_path is None:
+            return
+        from datetime import datetime, timezone
+        ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        line = (
+            f"- {ts} — [{ticket_id}] livraison: arrêt — "
+            f"PR #{pr_number} non mergée : {arret[:200]}\n"
+        )
+        try:
+            pipeline_log_path.parent.mkdir(parents=True, exist_ok=True)
+            with pipeline_log_path.open("a", encoding="utf-8") as f:
+                f.write(line)
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("pipeline_log_write_failed", extra={"error": str(exc)})
+
+    async def _bloquer_ticket(self, ticket_svc: _TicketSvcProto | None, ticket_id: str) -> None:
+        """Move the ticket to blocked/ and set status: blocked in its frontmatter."""
+        if ticket_svc is None:
+            return
+        try:
+            await ticket_svc.update_status(ticket_id, TicketStatus.blocked)
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning(
+                "ticket_blocked_update_failed",
+                extra={"ticket": ticket_id, "error": str(exc)},
             )
 
 

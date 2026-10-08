@@ -336,8 +336,9 @@ async def test_ticket_dependant_attend_le_merge_avant_de_demarrer(
         def en_attente(self, project_id: str) -> tuple[str, ...]:
             return ("ticket-001",)
 
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
             await gate.wait()
+            return True  # merge succeeded
 
     def _make_ticket_dep(tid: str, depends_on: list[str]) -> Ticket:
         return Ticket(
@@ -779,3 +780,103 @@ async def test_base_sans_nouveau_commit_apres_livraison(
     assert main_sha_avant == main_sha_apres, (
         "delivery must not add commits to the base branch"
     )
+
+
+# ------------------------------------------------------------------
+# ticket-384 — la file s'arrête quand le merge d'une dépendance échoue
+# ------------------------------------------------------------------
+
+
+async def test_file_s_arrete_quand_dependance_non_mergee(
+    tmp_path: Path,
+) -> None:
+    """A queue stops and logs 'file interrompue : ticket-… non mergé' when
+    the merge of a dependency fails."""
+    from unittest.mock import AsyncMock
+    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    class _FakeCIWatcherFail:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+            return False  # merge failed
+
+    def _make_ticket(tid: str, depends_on: list[str]) -> Ticket:
+        return Ticket(
+            id=tid, title="titre", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="corps", depends_on=depends_on,
+        )
+
+    ticket_a = _make_ticket("ticket-001", [])
+    ticket_b = _make_ticket("ticket-002", ["ticket-001"])
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: {
+        "ticket-001": ticket_a,
+        "ticket-002": ticket_b,
+    }.get(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    log_path = tmp_path / "memory" / "log.md"
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcherFail(),
+        ticket_service=tickets,
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    # ticket-002 ne doit pas avoir démarré.
+    assert len(results) == 1
+    assert results[0].ticket_id == "ticket-001"
+
+    # Le log doit enregistrer l'interruption.
+    assert log_path.exists(), "pipeline-log.md doit avoir été créé"
+    log_content = log_path.read_text(encoding="utf-8")
+    assert "file interrompue" in log_content
+    assert "ticket-001" in log_content
+    assert "non mergé" in log_content
+
+
+async def test_ticket_independant_continue_quand_dependance_non_mergee(
+    tmp_path: Path,
+) -> None:
+    """A ticket with no dependency on A continues normally even when A's merge
+    fails — it is not blocked by A's outcome."""
+    from unittest.mock import AsyncMock
+    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    class _FakeCIWatcherFail:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+            return False  # merge failed — but caller should never reach this
+
+    def _make_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid, title="titre", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="corps", depends_on=[],  # no dependency
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: _make_ticket(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-003")],
+        _livrer,
+        ci_watcher=_FakeCIWatcherFail(),
+        ticket_service=tickets,
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-003"])
+
+    # Les deux tickets doivent avoir tourné : ticket-003 ne dépend pas de ticket-001.
+    assert len(results) == 2
+    assert results[0].ticket_id == "ticket-001"
+    assert results[1].ticket_id == "ticket-003"

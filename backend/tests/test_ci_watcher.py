@@ -11,9 +11,11 @@ Couverture :
 - Exception → ticket passe en blocked (ticket-328).
 - Timeout de la phase 2 → ci_merge_done(merged=False) avec 'délai dépassé' (ticket-328).
 - Annulation à l'arrêt → aucun ci_merge_done émis (ticket-328).
+- Merge raté → pipeline-log.md + fiche ticket en blocked (ticket-384).
 """
 import asyncio
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.ci_watcher import CIWatcher
@@ -378,3 +380,73 @@ async def test_arret_backend_n_emet_pas_de_ci_merge_done() -> None:
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert done == [], "un arrêt propre ne doit pas émettre ci_merge_done"
+
+
+# ---------------------------------------------------------------------------
+# Merge raté → pipeline log + ticket blocked — ticket-384
+# ---------------------------------------------------------------------------
+
+
+async def test_merge_rate_ecrit_log_et_passe_ticket_en_blocked(
+    tmp_path: Path,
+) -> None:
+    """A failed merge writes 'PR #… non mergée' to pipeline-log.md and moves
+    the ticket to tickets/blocked/ with status: blocked."""
+    import frontmatter as _fm
+    from tessera.services.ticket_service import TicketService
+
+    # Créer la structure du projet avec un ticket en todo.
+    tickets_dir = tmp_path / "tickets" / "todo"
+    tickets_dir.mkdir(parents=True)
+    ticket_file = tickets_dir / "ticket-007-fix-bug.md"
+    post = _fm.Post(
+        "",
+        id="ticket-007",
+        title="Fix bug",
+        type="feat",
+        status="in_progress",
+        priority="medium",
+        agent="codeur",
+        depends_on=[],
+    )
+    ticket_file.write_text(_fm.dumps(post), encoding="utf-8")
+
+    log_path = tmp_path / "memory" / "pipeline-log.md"
+    ticket_svc = TicketService(tmp_path, "proj")
+
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    async def phase2_red_ci(pr_number: int) -> Livraison:
+        return Livraison(
+            pr_number=pr_number,
+            merged=False,
+            arret=f"CI failing : la PR #{pr_number} reste ouverte.",
+        )
+
+    await watcher.surveiller(
+        "proj", "ticket-007", 10, phase2_red_ci, collect,
+        pipeline_log_path=log_path,
+        ticket_svc=ticket_svc,
+    )
+    await asyncio.sleep(0.1)
+
+    # Le pipeline log doit contenir la ligne de blocage.
+    assert log_path.exists(), "pipeline-log.md doit avoir été créé"
+    log_content = log_path.read_text(encoding="utf-8")
+    assert "PR #10 non mergée" in log_content, (
+        f"Le log doit mentionner 'PR #10 non mergée', got:\n{log_content}"
+    )
+    assert "ticket-007" in log_content
+
+    # Le ticket doit être déplacé dans tickets/blocked/.
+    blocked_dir = tmp_path / "tickets" / "blocked"
+    assert blocked_dir.exists(), "tickets/blocked/ doit exister"
+    blocked_files = list(blocked_dir.iterdir())
+    assert len(blocked_files) == 1, f"Un fichier attendu dans blocked/, got: {blocked_files}"
+
+    # Le champ status doit être 'blocked'.
+    moved = _fm.load(str(blocked_files[0]))
+    assert moved.metadata["status"] == "blocked", (
+        f"status doit être 'blocked', got: {moved.metadata['status']}"
+    )
