@@ -1973,3 +1973,7 @@ Le code introduit une sé (44328ms)
 1. **`ticket_svc: Any | None` dans `ci_watcher
 - 2026-10-08 13:34:08 UTC — [ticket-384] tour 2 — codeur démarré
 - 2026-10-08 13:35:43 UTC — [ticket-384] tour 2 — codeur terminé (95218ms)
+- 2026-10-08 14:05:02 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 14:05:02 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 14:08:15 UTC — [ticket-384] tour 1 — codeur terminé (193577ms)
+- 2026-10-08 14:08:16 UTC — [ticket-384] ARRÊTÉ par l'utilisateur au tour 1
