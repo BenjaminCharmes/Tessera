@@ -314,6 +314,53 @@ async def finish_budget_exhausted(
     )
 
 
+async def finish_session_limit(
+    orch: "Orchestrator", run: PipelineRun, cause: BaseException, reset_time: str | None
+) -> PipelineResult:
+    """Termine un run interrompu par la limite de session de l'abonnement.
+
+    Contrairement aux autres sorties en erreur, le ticket repasse en `todo`
+    pour être relancé dès la reprise de la session — un ticket `blocked`
+    resterait en attente d'une intervention manuelle qui n'est pas nécessaire
+    ici : la limite est temporaire, pas une vraie panne.
+
+    Le travail est quand même commité, comme sur toutes les autres sorties
+    (ADR-018) : l'arbre doit rester propre pour le ticket suivant, même si
+    la file s'arrête ici.
+    """
+    reset_info = f" (reprise : {reset_time})" if reset_time else ""
+    raison = f"session_limit{reset_info}"
+    # Le log **avant** le commit : la ligne doit figurer dans le commit final
+    # (même règle que finish_interrupted, corrigée dans ticket-219).
+    orch._log(
+        f"[{run.ticket_id}] INTERROMPU par limite de session{reset_info}"
+    )
+    await set_status(orch, run, TicketStatus.todo)
+    await emit(run, EventType.ERROR, reason="session_limit", reset_time=reset_time or "")
+    commit_sha, echec_commit = await commit_ou_bloquer(
+        orch, run, _unapproved_commit_message(run.ticket_id, f"session limit{reset_info}")
+    )
+    if echec_commit is not None:
+        raison = f"{echec_commit} (après {raison})"
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="session_limit",
+        branch=run.branch,
+    )
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.todo,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=raison,
+    )
+
+
 async def finish_interrupted(
     orch: "Orchestrator", run: PipelineRun, cause: BaseException
 ) -> PipelineResult:
