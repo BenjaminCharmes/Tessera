@@ -90,10 +90,11 @@ class RunRequest(BaseModel):
     mode: str = "single"
     max_tickets: int = 5
     depuis_github: bool = False
-    #: Plafond de dépense explicite pour ce run (ticket-383). En mode file,
-    #: remplace le calcul automatique `run_max_budget_usd × nombre de tickets`.
-    #: En mode autonome, remplace `run_max_budget_usd`. None : pas d'override.
-    budget_usd: float | None = None
+    #: Plafond de dépense explicite d'une file (ticket-383) : remplace le calcul
+    #: `run_max_budget_usd × nombre de tickets`. Strictement positif — 0
+    #: voudrait dire « sans plafond » et permettrait à tout appelant de
+    #: lever la borne. None : calcul par défaut. Ignoré hors mode file.
+    budget_usd: float | None = Field(default=None, gt=0)
 
     @field_validator("project_id")
     @classmethod

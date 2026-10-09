@@ -6,7 +6,7 @@ estimated_days: 0.5
 id: ticket-383
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: A queue's spending ceiling scales with its number of tickets, and stopping
   on it is visible
 type: fix
