@@ -324,6 +324,37 @@ class TestIntroducedField:
 
         assert result.verdict == "BLOCK"
 
+    @pytest.mark.parametrize("valeur", [None, 0, "", "false"])
+    async def test_high_with_non_boolean_introduced_still_blocks(
+        self,
+        service: SecurityAuditorService,
+        provider: FakeProvider,
+        tmp_path: Path,
+        valeur: object,
+    ) -> None:
+        # Seul un False explicite exempte : null, 0, "" ou "false" bloquent.
+        _set_response(
+            provider,
+            {
+                "verdict": "PASS",
+                "summary": "ok",
+                "issues": [
+                    {
+                        "severity": "HIGH",
+                        "type": "SQL Injection",
+                        "location": "db.py:10",
+                        "description": "Unsafe query",
+                        "fix": "Use parameterized queries",
+                        "introduced": valeur,
+                    }
+                ],
+            },
+        )
+
+        result = await service.audit("+ query = f'SELECT * FROM {id}'", tmp_path)
+
+        assert result.verdict == "BLOCK"
+
     async def test_preexisting_issue_included_in_result(
         self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:

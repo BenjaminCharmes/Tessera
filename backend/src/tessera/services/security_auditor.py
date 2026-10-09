@@ -112,9 +112,10 @@ class SecurityAuditorService:
             if not isinstance(entry, dict):
                 continue
             severity = _SEVERITIES.get(str(entry.get("severity", "INFO")), "INFO")
-            # Echec fermé (ADR-039) : un champ absent vaut True (code introduit).
-            # Seul un False explicite marque la faille comme préexistante.
-            introduced = bool(entry.get("introduced", True))
+            # Echec fermé (ADR-039) : seul un booléen False explicite marque la
+            # faille comme préexistante. Absent, null, 0, "" ou "false" (chaîne)
+            # valent True — bool() ferait passer null, 0 et "" pour False.
+            introduced = entry.get("introduced", True) is not False
             issues.append(
                 SecurityIssue(
                     severity=severity,
