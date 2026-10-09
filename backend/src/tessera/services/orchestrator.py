@@ -99,6 +99,13 @@ class Orchestrator:
         self._git_workspace = git_workspace
         self._run_max_budget_usd = run_max_budget_usd
         self._spent_usd = 0.0
+        # Dépense du ticket en cours depuis son premier tour : remise à zéro
+        # à l'entrée de chaque _run_pipeline. Permet au contrôle entre deux
+        # tours de raisonner sur le ticket seul, pas sur la file (ticket-386).
+        self._ticket_spent_usd = 0.0
+        # True quand run_queue est en cours : oriente l'issue du contrôle de
+        # budget entre deux tours (todo vs blocked, ticket-386).
+        self._in_queue = False
         # Le quota d'abonnement est la ressource réellement finie en mode
         # `agent_sdk` : la dépense estimée de ticket-052 ne la mesure pas.
         self._quota_tracker = quota_tracker
@@ -146,15 +153,33 @@ class Orchestrator:
         """Cumulative spend since this orchestrator was built."""
         return round(self._spent_usd, 10)
 
+    @property
+    def spent_ticket_usd(self) -> float:
+        """Spend by the current ticket only, since its first round."""
+        return round(self._ticket_spent_usd, 10)
+
     def record_spend(self, cost_usd: float) -> None:
         """Add one agent call's cost to the run's running total."""
         self._spent_usd += cost_usd or 0.0
+        self._ticket_spent_usd += cost_usd or 0.0
 
     def budget_exhausted(self) -> bool:
         """True once the run has spent its ceiling. `0` means no ceiling."""
         if self._run_max_budget_usd <= 0:
             return False
         return self._spent_usd >= self._run_max_budget_usd
+
+    def ticket_budget_exhausted(self) -> bool:
+        """True once the current ticket has spent its per-ticket ceiling.
+
+        Distinct from `budget_exhausted`: compares only the spend accumulated
+        since this ticket's first round, not the cumulative queue total.  This
+        prevents a long previous ticket from cutting the current one short
+        (ticket-386).
+        """
+        if self._run_max_budget_usd <= 0:
+            return False
+        return self._ticket_spent_usd >= self._run_max_budget_usd
 
     def _config_for(self, role: AgentRole) -> Optional[AgentConfig]:
         return next((c for c in self._agent_configs if c.role == role.value), None)
@@ -292,6 +317,11 @@ class Orchestrator:
         if ticket is None:
             raise ValueError(f"Ticket introuvable : {ticket_id}")
 
+        # Réinitialise le compteur de dépense du ticket : en file, les tickets
+        # précédents ont déjà alimenté _spent_usd, et le contrôle entre deux
+        # tours ne doit comparer que la dépense propre à ce ticket (ticket-386).
+        self._ticket_spent_usd = 0.0
+
         # Sans canal branché — appel programmatique, test, run autonome — le
         # run reste non interactif : il ne doit jamais se suspendre en
         # attendant une réponse que personne ne viendra donner (ticket-066).
@@ -350,11 +380,14 @@ class Orchestrator:
     async def _run_rounds(self, run: PipelineRun, ticket_id: str) -> PipelineResult:
         """Enchaîne les tours de revue jusqu'à approbation, blocage ou épuisement."""
         for round_num in range(1, self._max_review_rounds + 1):
-            # Le plafond du run se vérifiait entre deux tickets seulement : un
-            # ticket seul pouvait le dépasser de plus du double sur trois tours
-            # (ticket-191). Un tour 1 démarre toujours — refuser un ticket est
-            # le rôle de la vérification entre tickets, pas de celle-ci.
-            if round_num > 1 and self.budget_exhausted():
+            # Le plafond se vérifie sur la dépense du ticket en cours depuis
+            # son premier tour, et non sur le cumul de la file : un ticket
+            # précédent coûteux ne doit pas couper le suivant (ticket-386).
+            # Un tour 1 démarre toujours — refuser un ticket est le rôle de
+            # la vérification entre tickets, pas de celle-ci (ticket-191).
+            if round_num > 1 and self.ticket_budget_exhausted():
+                if self._in_queue:
+                    return await outcomes.finish_budget_exhausted_in_queue(self, run)
                 return await outcomes.finish_budget_exhausted(self, run)
 
             run.start_round(round_num)
@@ -484,6 +517,7 @@ class Orchestrator:
         callback = tolerant(on_event or _noop)
         results: list[PipelineResult] = []
 
+        self._in_queue = True
         for index, ticket_id in enumerate(ticket_ids, start=1):
             # Comme pour le budget et le quota, on vérifie **entre** deux
             # tickets : s'arrêter au milieu de l'un laisserait son travail non
@@ -492,7 +526,10 @@ class Orchestrator:
                 self._log(f"[{project_id}] file interrompue : arrêt demandé")
                 break
             if effective_budget > 0 and self._spent_usd >= effective_budget:
-                self._log(f"[{project_id}] file interrompue : plafond de dépense")
+                self._log(
+                    f"[{project_id}] file interrompue : plafond de dépense"
+                    f" ({self._spent_usd:.2f} $ / {effective_budget:.2f} $)"
+                )
                 await callback(
                     OrchestratorEvent(
                         type=EventType.QUEUE_PROGRESS,
@@ -547,27 +584,50 @@ class Orchestrator:
 
             if not result.approved:
                 if result.final_status == TicketStatus.todo:
-                    # Limite de session : le ticket est remis en todo, la file
-                    # s'arrête proprement avant le ticket suivant.
-                    reset_time = extract_reset_time_from_arret(result.arret)
-                    reset_info = f" (reprise : {reset_time})" if reset_time else ""
-                    self._log(
-                        f"[{project_id}] file interrompue : limite de session{reset_info}"
-                    )
-                    await callback(
-                        OrchestratorEvent(
-                            type=EventType.QUEUE_PROGRESS,
-                            ticket_id=ticket_id,
-                            data={
-                                "raison": "session_limit",
-                                "reset_time": reset_time or "",
-                                "index": index,
-                                "total": len(ticket_ids),
-                                "restants": list(ticket_ids[index:]),
-                                "faits": list(ticket_ids[: index - 1]),
-                            },
+                    arret = result.arret or ""
+                    if arret.startswith("run budget exhausted"):
+                        # Plafond par ticket atteint entre deux tours : le ticket
+                        # a déjà loggé la raison dans finish_budget_exhausted_in_queue.
+                        # On arrête la file sans émettre de session_limit (ticket-386).
+                        self._log(
+                            f"[{project_id}] file interrompue : {ticket_id}"
+                            f" — budget ({arret[:80]})"
                         )
-                    )
+                        await callback(
+                            OrchestratorEvent(
+                                type=EventType.QUEUE_PROGRESS,
+                                ticket_id=ticket_id,
+                                data={
+                                    "raison": "budget",
+                                    "index": index,
+                                    "total": len(ticket_ids),
+                                    "restants": list(ticket_ids[index:]),
+                                    "faits": list(ticket_ids[: index - 1]),
+                                },
+                            )
+                        )
+                    else:
+                        # Limite de session : le ticket est remis en todo, la file
+                        # s'arrête proprement avant le ticket suivant.
+                        reset_time = extract_reset_time_from_arret(result.arret)
+                        reset_info = f" (reprise : {reset_time})" if reset_time else ""
+                        self._log(
+                            f"[{project_id}] file interrompue : limite de session{reset_info}"
+                        )
+                        await callback(
+                            OrchestratorEvent(
+                                type=EventType.QUEUE_PROGRESS,
+                                ticket_id=ticket_id,
+                                data={
+                                    "raison": "session_limit",
+                                    "reset_time": reset_time or "",
+                                    "index": index,
+                                    "total": len(ticket_ids),
+                                    "restants": list(ticket_ids[index:]),
+                                    "faits": list(ticket_ids[: index - 1]),
+                                },
+                            )
+                        )
                 else:
                     self._log(
                         f"[{project_id}] file interrompue : {ticket_id} non approuvé"
@@ -644,6 +704,7 @@ class Orchestrator:
                     )
                     break
 
+        self._in_queue = False
         return results
 
     async def run_autonomous(

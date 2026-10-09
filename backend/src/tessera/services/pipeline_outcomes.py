@@ -288,7 +288,7 @@ async def finish_budget_exhausted(
     """
     await set_status(orch, run, TicketStatus.blocked)
     raison = (
-        f"run budget exhausted: {orch.spent_usd:.2f} USD spent "
+        f"run budget exhausted: {orch.spent_ticket_usd:.2f} USD spent "
         f"of {orch._run_max_budget_usd:.2f} allowed"
     )
     orch._log(f"[{run.ticket_id}] BLOCKED après le tour {run.round_num} — {raison}")
@@ -306,6 +306,44 @@ async def finish_budget_exhausted(
     return PipelineResult(
         ticket_id=run.ticket_id,
         final_status=TicketStatus.blocked,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=arret or raison,
+    )
+
+
+async def finish_budget_exhausted_in_queue(
+    orch: "Orchestrator", run: PipelineRun
+) -> PipelineResult:
+    """Remet en todo un ticket de file arrêté sur son plafond par ticket (ticket-386).
+
+    Contrairement au lancement simple, un ticket de file qui dépasse son plafond
+    entre deux tours n'est pas en erreur : il n'y a pas de défaut à corriger,
+    juste un budget à réévaluer. Il repasse en `todo` pour pouvoir être relancé
+    sans intervention manuelle. L'arbre est quand même commité (ADR-018).
+    """
+    raison = (
+        f"run budget exhausted: {orch.spent_ticket_usd:.2f} USD spent "
+        f"of {orch._run_max_budget_usd:.2f} allowed"
+    )
+    orch._log(f"[{run.ticket_id}] budget — {raison}")
+    await set_status(orch, run, TicketStatus.todo)
+    commit_sha, arret = await commit_ou_bloquer(
+        orch, run, _unapproved_commit_message(run.ticket_id, raison)
+    )
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="run_budget_exhausted",
+        branch=run.branch,
+    )
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.todo,
         rounds=run.round_num,
         approved=False,
         branch=run.branch,

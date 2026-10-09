@@ -1903,3 +1903,261 @@ async def test_autonomous_mode_keeps_per_ticket_budget(tmp_path: Path) -> None:
         f"Autonomous mode should stop after first ticket (spent 6 > limit 5), "
         f"got {len(results)} results. Queue multiplication must not apply."
     )
+
+
+# ------------------------------------------------------------------
+# Between-rounds per-ticket budget check — ticket-386
+# ------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_per_ticket_budget_does_not_stop_second_ticket_between_rounds(
+    tmp_path: Path,
+) -> None:
+    """The between-rounds check compares the CURRENT ticket's spending, not the
+    cumulative queue total.
+
+    First ticket costs 12 USD (6 USD coder + 6 USD reviewer), second ticket
+    costs 4 USD per round (coder only) and needs 2 rounds.
+    With run_max_budget_usd=15, the cumulative total after the second ticket's
+    first round is 16 USD — which would have triggered the old check — but the
+    per-ticket spend is only 4 USD, so the second ticket should complete both
+    rounds and be approved.
+    """
+    ticket_a = _make_ticket(id="ticket-001")
+    ticket_b = _make_ticket(id="ticket-002")
+    ticket_service = _make_ticket_service_for([ticket_a, ticket_b])
+
+    reviewer_calls: dict[str, int] = {}
+
+    class _PerTicketRunner:
+        async def run(self, **kwargs: object) -> AgentResult:
+            role = kwargs["role"]
+            ticket = kwargs["ticket"]
+            tid = ticket.id  # type: ignore[union-attr]
+
+            if tid == "ticket-001":
+                # First ticket: approved in round 1, costs 6 USD per call
+                content = "APPROVED" if role == AgentRole.reviewer else "prose"
+                cost = 6.0
+            else:
+                # Second ticket: CHANGES_REQUESTED first, then APPROVED; coder costs 4 USD
+                if role == AgentRole.reviewer:
+                    reviewer_calls[tid] = reviewer_calls.get(tid, 0) + 1
+                    content = (
+                        "APPROVED"
+                        if reviewer_calls[tid] >= 2
+                        else "CHANGES_REQUESTED: needs more work"
+                    )
+                    cost = 0.0
+                else:
+                    content = "prose du codeur"
+                    cost = 4.0
+            return AgentResult(
+                role=role,  # type: ignore[arg-type]
+                ticket_id=tid,
+                content=content,
+                suggested_status=TicketStatus.in_review,
+                duration_ms=100,
+                cost_usd=cost,
+            )
+
+    orc = _make_orchestrator(
+        tmp_path,
+        runner=_PerTicketRunner(),
+        ticket_service=ticket_service,
+        run_max_budget_usd=15.0,
+    )
+    results = await orc.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    assert len(results) == 2, (
+        f"Both tickets should run, got {len(results)}. "
+        "Queue should not be stopped for the second ticket."
+    )
+    second = results[1]
+    assert second.approved is True, (
+        f"Second ticket should be approved (per-ticket spend 4 USD < 15 USD limit), "
+        f"got final_status={second.final_status}"
+    )
+    assert second.rounds == 2, (
+        f"Second ticket should complete 2 rounds (not stopped between them), "
+        f"got rounds={second.rounds}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_ticket_own_spend_exceeds_per_ticket_limit_stops_between_rounds(
+    tmp_path: Path,
+) -> None:
+    """A ticket whose own spending exceeds run_max_budget_usd is stopped between
+    two rounds, even in a single-run context (ticket-386).
+
+    The coder costs 4 USD; run_max_budget_usd=3 USD. After round 1, the
+    per-ticket spend is 4 >= 3, so the run must stop before round 2.
+    """
+
+    class _CostingRunner:
+        async def run(self, **kwargs: object) -> AgentResult:
+            role = kwargs["role"]
+            ticket = kwargs["ticket"]
+            tid = ticket.id  # type: ignore[union-attr]
+            # Always CHANGES_REQUESTED so a second round would be attempted
+            content = (
+                "CHANGES_REQUESTED: fix this" if role == AgentRole.reviewer else "prose"
+            )
+            return AgentResult(
+                role=role,  # type: ignore[arg-type]
+                ticket_id=tid,
+                content=content,
+                suggested_status=TicketStatus.in_review,
+                duration_ms=100,
+                cost_usd=4.0,  # exceeds the 3 USD limit
+            )
+
+    orc = _make_orchestrator(
+        tmp_path,
+        runner=_CostingRunner(),
+        run_max_budget_usd=3.0,
+    )
+    result = await orc.run_pipeline("proj", "ticket-001", _noop)
+
+    assert result.approved is False
+    assert result.final_status == TicketStatus.blocked, (
+        f"Single-run budget exhausted should set status to blocked, "
+        f"got {result.final_status}"
+    )
+    assert result.rounds == 1, (
+        f"Should stop after round 1 (before round 2), got rounds={result.rounds}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_queue_ticket_stopped_on_per_ticket_budget_goes_to_todo(
+    tmp_path: Path,
+) -> None:
+    """In a queue, a ticket stopped on the per-ticket budget goes to todo (not
+    blocked), and the pipeline log contains 'budget' (ticket-386).
+    """
+
+    class _CostingRunner:
+        async def run(self, **kwargs: object) -> AgentResult:
+            role = kwargs["role"]
+            ticket = kwargs["ticket"]
+            tid = ticket.id  # type: ignore[union-attr]
+            content = (
+                "CHANGES_REQUESTED: fix this" if role == AgentRole.reviewer else "prose"
+            )
+            return AgentResult(
+                role=role,  # type: ignore[arg-type]
+                ticket_id=tid,
+                content=content,
+                suggested_status=TicketStatus.in_review,
+                duration_ms=100,
+                cost_usd=4.0,  # exceeds the 3 USD per-ticket limit
+            )
+
+    orc = _make_orchestrator(
+        tmp_path,
+        runner=_CostingRunner(),
+        run_max_budget_usd=3.0,
+    )
+    results = await orc.run_queue("proj", ["ticket-001"])
+
+    assert len(results) == 1
+    result = results[0]
+    assert result.approved is False
+    assert result.final_status == TicketStatus.todo, (
+        f"Queue ticket stopped on per-ticket budget should go to todo, "
+        f"got {result.final_status}"
+    )
+
+    log_path = tmp_path / "memory" / "pipeline-log.md"
+    log_content = log_path.read_text(encoding="utf-8")
+    assert "budget" in log_content, (
+        f"Pipeline log should contain 'budget' after a per-ticket budget stop. "
+        f"Log content: {log_content[:500]}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_queue_interrupted_log_contains_amounts(tmp_path: Path) -> None:
+    """When the queue stops on the effective budget (between tickets), the pipeline
+    log line contains the amount spent and the ceiling (ticket-386).
+    """
+    ticket_a = _make_ticket(id="ticket-001")
+    ticket_b = _make_ticket(id="ticket-002")
+    ticket_service = _make_ticket_service_for([ticket_a, ticket_b])
+
+    orc = _make_orchestrator(
+        tmp_path,
+        ticket_service=ticket_service,
+        run_max_budget_usd=3.0,
+    )
+
+    async def _spending_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
+        orc.record_spend(4.0)
+        return PipelineResult(
+            ticket_id=ticket_id,
+            final_status=TicketStatus.done,
+            rounds=1,
+            approved=True,
+        )
+
+    orc.run_pipeline = _spending_pipeline  # type: ignore[method-assign]
+
+    # budget_override_usd=3 so it fires after the first ticket spends 4 USD
+    await orc.run_queue("proj", ["ticket-001", "ticket-002"], budget_override_usd=3.0)
+
+    log_path = tmp_path / "memory" / "pipeline-log.md"
+    log_content = log_path.read_text(encoding="utf-8")
+    assert "plafond de dépense" in log_content, (
+        f"Log should mention 'plafond de dépense'. Content: {log_content[:500]}"
+    )
+    assert "4.00" in log_content, (
+        f"Log should contain spent amount '4.00'. Content: {log_content[:500]}"
+    )
+    assert "3.00" in log_content, (
+        f"Log should contain budget ceiling '3.00'. Content: {log_content[:500]}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_single_run_budget_exhausted_still_blocks_ticket_191(
+    tmp_path: Path,
+) -> None:
+    """In a single (non-queue) run, a ticket stopped on the per-ticket budget
+    goes to blocked — the ticket-191 behaviour is unchanged (ticket-386).
+    """
+
+    class _CostingReviewerRunner:
+        async def run(self, **kwargs: object) -> AgentResult:
+            role = kwargs["role"]
+            ticket = kwargs["ticket"]
+            tid = ticket.id  # type: ignore[union-attr]
+            # Reviewer always refuses so rounds > 1 would be attempted
+            content = (
+                "CHANGES_REQUESTED: not done yet" if role == AgentRole.reviewer else "prose"
+            )
+            return AgentResult(
+                role=role,  # type: ignore[arg-type]
+                ticket_id=tid,
+                content=content,
+                suggested_status=TicketStatus.in_review,
+                duration_ms=100,
+                cost_usd=4.0,  # exceeds the 3 USD limit
+            )
+
+    orc = _make_orchestrator(
+        tmp_path,
+        runner=_CostingReviewerRunner(),
+        run_max_budget_usd=3.0,
+    )
+    result = await orc.run_pipeline("proj", "ticket-001", _noop)
+
+    assert result.approved is False
+    assert result.final_status == TicketStatus.blocked, (
+        f"Single run with budget exhausted should remain blocked (ticket-191), "
+        f"got {result.final_status}"
+    )
