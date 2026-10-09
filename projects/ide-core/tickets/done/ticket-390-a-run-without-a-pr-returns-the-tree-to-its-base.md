@@ -4,7 +4,7 @@ created: 2026-10-09
 depends_on: []
 estimated_days: 0.5
 id: ticket-390
-pr_number: null
+pr_number: 343
 priority: high
 status: done
 title: A run that ends without a PR commits its bookkeeping and returns the tree to
