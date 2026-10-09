@@ -2067,3 +2067,21 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 13:31:23 UTC — [ticket-392] validateur: APPROVED — Les quatre critères sont satisfaits. Le diff supprime correctement la modificati (56405ms)
 - 2026-10-09 13:31:23 UTC — [ticket-392] APPROVED après 1 tour(s)
 - 2026-10-09 13:34:24 UTC — [ticket-392] documentation: 0 fichier(s) (175375ms)
+- 2026-10-09 13:34:40 UTC — [ide-core] ticket-392 PR #342 confiée au CIWatcher
+- 2026-10-09 13:34:42 UTC — [ticket-390] branche ticket-390-a-run-that-ends-without-a-pr-commits-its-bookkeep
+- 2026-10-09 13:34:43 UTC — [ticket-390] tour 1 — codeur démarré
+- 2026-10-09 13:42:47 UTC — [ticket-390] tour 1 — codeur terminé (483985ms)
+- 2026-10-09 13:45:45 UTC — [ticket-390] testeur: 1 failed, 769 passed, 20 warnings in 174.86s (0:02:54)
+- 2026-10-09 13:45:45 UTC — [ticket-390] tests rouges au tour 1
+- 2026-10-09 13:45:45 UTC — [ticket-390] tour 2 — codeur démarré
+- 2026-10-09 13:46:59 UTC — [ticket-390] tour 2 — codeur terminé (74094ms)
+- 2026-10-09 13:50:11 UTC — [ticket-390] testeur: 1 failed, 1216 passed, 20 warnings in 189.25s (0:03:09)
+- 2026-10-09 13:50:11 UTC — [ticket-390] tests rouges au tour 2
+- 2026-10-09 13:50:11 UTC — [ticket-390] tour 3 — codeur démarré
+- 2026-10-09 13:51:10 UTC — [ticket-390] tour 3 — codeur terminé (58172ms)
+- 2026-10-09 13:54:43 UTC — [ticket-390] testeur: OK (exit 0)
+- 2026-10-09 13:55:13 UTC — [ticket-390] securite: PASS — Audit de sécurité complet du diff orchestrator.py + tests : aucune vulnérabilité (29671ms)
+- 2026-10-09 13:55:13 UTC — [ticket-390] tour 3 — reviewer démarré
+- 2026-10-09 13:55:42 UTC — [ticket-390] validateur: APPROVED — Tous les quatre critères d'acceptation sont satisfaits. Le diff introduit quatre (28953ms)
+- 2026-10-09 13:56:49 UTC — [ticket-390] tour 3 — reviewer terminé (96375ms)
+- 2026-10-09 13:56:49 UTC — [ticket-390] APPROVED après 3 tour(s)
