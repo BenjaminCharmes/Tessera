@@ -31,6 +31,11 @@ from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_plan import run_plan
+from tessera.services.session_limit import (
+    extract_reset_time,
+    extract_reset_time_from_arret,
+    is_session_limit,
+)
 
 if TYPE_CHECKING:
     from tessera.services.carte_du_depot import CarteDuDepot
@@ -326,6 +331,10 @@ class Orchestrator:
         try:
             return await self._run_rounds(run, ticket_id)
         except Exception as exc:  # noqa: BLE001 — la cause part dans le résultat
+            msg = str(exc)
+            if is_session_limit(msg):
+                reset_time = extract_reset_time(msg)
+                return await outcomes.finish_session_limit(self, run, exc, reset_time)
             return await outcomes.finish_interrupted(self, run, exc)
 
     async def _carte(self) -> str:
@@ -537,9 +546,32 @@ class Orchestrator:
             results.append(result)
 
             if not result.approved:
-                self._log(
-                    f"[{project_id}] file interrompue : {ticket_id} non approuvé"
-                )
+                if result.final_status == TicketStatus.todo:
+                    # Limite de session : le ticket est remis en todo, la file
+                    # s'arrête proprement avant le ticket suivant.
+                    reset_time = extract_reset_time_from_arret(result.arret)
+                    reset_info = f" (reprise : {reset_time})" if reset_time else ""
+                    self._log(
+                        f"[{project_id}] file interrompue : limite de session{reset_info}"
+                    )
+                    await callback(
+                        OrchestratorEvent(
+                            type=EventType.QUEUE_PROGRESS,
+                            ticket_id=ticket_id,
+                            data={
+                                "raison": "session_limit",
+                                "reset_time": reset_time or "",
+                                "index": index,
+                                "total": len(ticket_ids),
+                                "restants": list(ticket_ids[index:]),
+                                "faits": list(ticket_ids[: index - 1]),
+                            },
+                        )
+                    )
+                else:
+                    self._log(
+                        f"[{project_id}] file interrompue : {ticket_id} non approuvé"
+                    )
                 break
 
             # Si la PR de ce ticket est ouverte et attend la CI :
