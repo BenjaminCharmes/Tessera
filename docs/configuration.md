@@ -13,7 +13,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'allers-retours outil pour le tour de plan (lecture seule) |
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
 | `AGENT_SILENCE_MAX_S` | | `1200` | Délai maximum sans message du flux d'un agent avant interruption du processus (en secondes, ticket-381) |
-| `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond cumulé d'un run autonome (`0` = aucun) |
+| `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond de dépense d'un run autonome (`0` = aucun). En mode file, le plafond est multiplié par le nombre de tickets, sauf si la requête fixe `budget_usd` |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |

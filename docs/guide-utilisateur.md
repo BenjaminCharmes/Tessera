@@ -637,6 +637,10 @@ tes tickets.
 
 Tu n'as pas besoin de passer par la sidebar pour composer et lancer la file — la Vue Tableau t'offre exactement les mêmes contrôles. Chaque carte affiche un bouton « Ajouter à la file » ou « Retirer de la file ». Quand tu as sélectionné au moins un ticket, une barre apparaît au-dessus des colonnes : elle montre le nombre de tickets en attente et propose « Lancer la file » et « Vider ». Un ticket ajouté d'un côté se voit aussitôt de l'autre — sidebar et Vue Tableau restent synchronisées.
 
+### Limites de budget et arrêt de file
+
+Une file s'arrête proprement si le budget cumulé atteint son plafond (par défaut 5 $ × nombre de tickets) ou si ton abonnement atteint sa limite de session. Voir la section « Problèmes fréquents » pour les détails sur chacun de ces cas.
+
 ## 8. Discuter avec l'agent, pendant qu'il travaille
 
 Le panneau de droite a deux onglets : **Agents**, qui observe un run de
@@ -1007,6 +1011,20 @@ Corrige le problème sous-jacent, relance le ticket bloqué, et la file reprendr
 L'IDE a stoppé cet agent parce qu'il n'émettait rien depuis trop longtemps. C'est **auto-géré** : le run reprend avec un fallback (Ollama ou fermeture gracieuse). Rien à faire.
 
 Pour allonger le délai avant arrêt, modifie `agent_silence_max_s` dans la configuration (défaut 1200 s).
+
+### Une file s'arrête sur son plafond de budget
+
+Une file peut s'arrêter avant de traiter tous ses tickets si la dépense cumulée atteint le plafond fixé. Par défaut, ce plafond = nombre de tickets × 5 $. Une file de 3 tickets peut donc coûter jusqu'à 15 $.
+
+Si tu veux fixer une limite stricte (par exemple 10 $ pour une file de 3 tickets), déclare-la quand tu lances la file — le paramètre `budget_usd` remplace alors le calcul automatique.
+
+Quand une file s'arrête sur le budget, le log affiche `[<projet>] file interrompue : plafond de dépense` et l'interface confirme l'arrêt. Les tickets non lancés restent en `todo`.
+
+### Une file s'arrête pour « limite de session »
+
+Quand ton abonnement Claude atteint sa limite de session (« You've hit your session limit »), la file s'arrête avant le prochain ticket. Le ticket en cours repasse en `todo` — aucun n'est endommagé. Le log affiche `[<projet>] file interrompue : limite de session (reprise : <heure>)` et l'interface affiche l'heure à laquelle ton abonnement se réinitialise. Relance ta file après cette heure.
+
+Contrairement aux autres arrêts, celui-ci ne marque aucun ticket en `blocked`.
 
 ## Pour aller plus loin
 
