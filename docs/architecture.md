@@ -511,6 +511,16 @@ Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le s
 
 L'enregistrement du pipeline écrit « testeur: délai dépassé, suite relancée » dans le `pipeline-log.md` à chaque relance.
 
+
+### Résultats des tests et extraction d'erreurs (ticket-393)
+
+Quand les tests échouent, `test_runner.py` extrait :
+
+- **Résumé** : la ligne officielle de pytest/vitest (ex : `1 failed, 455 passed in 12s`)
+- **Détails** (`failure_details` dans `TestResult`) : synthèse courte et bloc de défaillances, tronqués à 8 000 caractères
+
+Le prompt du codeur (tour suivant) reçoit `failure_details`, remplaçant une liste brute. Le journal n'affiche que le résumé. Cela concentre l'attention sur le test échoué même quand des centaines passent.
+
 ### Validation et fichiers cités (ticket-316)
 
 Le validateur vérifie chaque critère d'acceptation du ticket. Un critère peut être 
