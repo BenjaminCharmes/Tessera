@@ -2016,3 +2016,4 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 12:32:54 UTC — [ticket-383] tour 1 — codeur terminé (233735ms)
 - 2026-10-09 12:36:51 UTC — [ticket-383] testeur: OK (exit 0)
 - 2026-10-09 12:37:55 UTC — [ticket-383] securite: BLOCK — A HIGH severity budget control bypass has been detected. The `budget_usd` parame (63858ms)
+- 2026-10-09 12:37:56 UTC — [ide-core] file interrompue : ticket-383 non approuvé
