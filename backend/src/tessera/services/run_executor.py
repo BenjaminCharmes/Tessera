@@ -29,6 +29,7 @@ from tessera.services.pipeline_events import (
 )
 from tessera.services.run_registry import RunActif, RunRegistry
 from tessera.utils.logger import get_logger
+from tessera.utils.project_id import validate_project_id
 
 #: Récupère le titre d'un ticket depuis son identifiant. Retourne None si
 #: le ticket est illisible, sans lever d'exception (ticket-286).
@@ -44,11 +45,23 @@ def _log_pipeline(project_id: str, message: str) -> None:
     queue died, even when the exception was raised outside of the orchestrator
     (e.g. a DB error or an unexpected crash in `executer`).
     """
-    log_path: Path = settings.ide_workspace_dir / project_id / "memory" / "pipeline-log.md"
+    # Défense en profondeur : l'identifiant est déjà validé à l'entrée de
+    # l'API (ticket-370), mais ce chemin s'écrit hors de toute requête.
+    if not validate_project_id(project_id):
+        _logger.warning("pipeline_log_invalid_project", extra={"project": project_id})
+        return
+    racine = settings.ide_workspace_dir.resolve()
+    log_path: Path = (racine / project_id / "memory" / "pipeline-log.md").resolve()
+    # Jamais de dossier créé : un projet sans `memory/` n'a pas de journal.
+    if not log_path.is_relative_to(racine) or not log_path.parent.is_dir():
+        _logger.warning("pipeline_log_missing", extra={"project": project_id})
+        return
+    # Une ligne par entrée : un message d'exception multiligne casserait le
+    # format du journal.
+    resume = " ".join(message.split())[:300]
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    line = f"- {ts} — [{project_id}] file interrompue : {message}\n"
+    line = f"- {ts} — [{project_id}] file interrompue : {resume}\n"
     try:
-        log_path.parent.mkdir(parents=True, exist_ok=True)
         with log_path.open("a", encoding="utf-8") as f:
             f.write(line)
     except Exception as exc:  # noqa: BLE001

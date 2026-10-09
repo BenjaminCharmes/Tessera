@@ -63,7 +63,7 @@ async def test_exception_pipeline_ecrit_dans_pipeline_log(
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     project_dir = workspace / "mon-projet"
-    project_dir.mkdir()
+    (project_dir / "memory").mkdir(parents=True)
 
     db_path = tmp_path / "tessera.db"
     await init_db(db_path)
@@ -97,7 +97,7 @@ async def test_exception_pipeline_mentionne_le_projet(
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     project_dir = workspace / "autre-projet"
-    project_dir.mkdir()
+    (project_dir / "memory").mkdir(parents=True)
 
     db_path = tmp_path / "tessera.db"
     await init_db(db_path)
@@ -118,3 +118,52 @@ async def test_exception_pipeline_mentionne_le_projet(
     assert "[autre-projet]" in content, (
         f"le nom du projet doit figurer dans le pipeline-log.md : {content!r}"
     )
+
+
+@pytest.mark.parametrize("project_id", ["../dehors", "a/../../dehors", ".."])
+def test_log_pipeline_refuse_un_identifiant_qui_sort_du_workspace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, project_id: str
+) -> None:
+    """Ticket-377 security audit: no write outside the workspace."""
+    from tessera.services.run_executor import _log_pipeline
+
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (tmp_path / "dehors" / "memory").mkdir(parents=True)
+    monkeypatch.setattr(settings, "ide_workspace_dir", workspace)
+
+    _log_pipeline(project_id, "panne")
+
+    assert not (tmp_path / "dehors" / "memory" / "pipeline-log.md").exists()
+
+
+def test_log_pipeline_ne_cree_aucun_dossier(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tessera.services.run_executor import _log_pipeline
+
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    monkeypatch.setattr(settings, "ide_workspace_dir", workspace)
+
+    _log_pipeline("projet-inconnu", "panne")
+
+    assert not (workspace / "projet-inconnu").exists()
+
+
+def test_log_pipeline_ecrit_une_seule_ligne(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tessera.services.run_executor import _log_pipeline
+
+    workspace = tmp_path / "workspace"
+    (workspace / "mon-projet" / "memory").mkdir(parents=True)
+    monkeypatch.setattr(settings, "ide_workspace_dir", workspace)
+
+    _log_pipeline("mon-projet", "ligne un\n- fausse entrée\nligne trois")
+
+    lignes = (workspace / "mon-projet" / "memory" / "pipeline-log.md").read_text(
+        encoding="utf-8"
+    ).splitlines()
+    assert len(lignes) == 1
+    assert "ligne un - fausse entrée ligne trois" in lignes[0]

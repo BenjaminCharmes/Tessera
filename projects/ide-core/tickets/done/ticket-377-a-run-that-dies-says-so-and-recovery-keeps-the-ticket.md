@@ -7,7 +7,7 @@ estimated_days: 0.5
 id: ticket-377
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: A queue that dies writes it in the pipeline log, and a recovered ticket branch
   always keeps its ticket file
 type: fix
