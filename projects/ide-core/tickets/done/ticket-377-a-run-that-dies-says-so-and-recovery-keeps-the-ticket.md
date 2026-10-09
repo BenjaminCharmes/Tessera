@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-07
+depends_on:
+- ticket-375
+estimated_days: 0.5
 id: ticket-377
-title: "A queue that dies writes it in the pipeline log, and a recovered ticket branch always keeps its ticket file"
-type: fix
-status: todo
 pr_number: null
 priority: high
-agent: codeur
-depends_on: ["ticket-375"]
-estimated_days: 0.5
-created: 2026-10-07
+status: done
+title: A queue that dies writes it in the pipeline log, and a recovered ticket branch
+  always keeps its ticket file
+type: fix
 ---
 
 # ticket-377 — Une file qui meurt le dit, et une branche reprise garde sa fiche
