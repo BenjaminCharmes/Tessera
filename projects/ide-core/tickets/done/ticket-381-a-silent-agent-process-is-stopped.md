@@ -4,7 +4,7 @@ created: 2026-10-08
 depends_on: []
 estimated_days: 0.5
 id: ticket-381
-pr_number: null
+pr_number: 332
 priority: critical
 status: done
 title: An agent process that stays silent too long is stopped, instead of holding
