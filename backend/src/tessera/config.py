@@ -111,6 +111,9 @@ class Settings(BaseSettings):
     # la suite de tests (≈ 6 min) peut rester muette sans être figée.
     # 0 désactive la borne.
     agent_silence_max_s: float = 1200.0
+    # Délai maximum d'attente du calcul « fusionnable » d'une PR par GitHub
+    # avant d'abandonner le merge (ticket-384).
+    attente_fusionnabilite_max_s: float = 300.0
 
 
 settings = Settings()

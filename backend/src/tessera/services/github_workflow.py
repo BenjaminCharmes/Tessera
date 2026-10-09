@@ -20,6 +20,7 @@ from typing import Any, Optional, Protocol
 import httpx
 from pathlib import Path
 
+from tessera.config import settings
 from tessera.services.autonomie import (
     NiveauAutonomie,
     lire_niveau,
@@ -79,6 +80,7 @@ class _GitHub(Protocol):
         pr_number: int,
         method: str = "squash",
         commit_title: str | None = None,
+        attente_fusionnabilite_max_s: float = 300.0,
     ) -> None: ...
 
 
@@ -314,7 +316,11 @@ class GitHubWorkflowService:
         if self._politique is not None:
             merge_method = self._politique.merge_method
         try:
-            await self._github.merge_quand_fusionnable(pr_number, method=merge_method)
+            await self._github.merge_quand_fusionnable(
+                pr_number,
+                method=merge_method,
+                attente_fusionnabilite_max_s=settings.attente_fusionnabilite_max_s,
+            )
         except (MergeabiliteTimeoutError, PRNonFusionnableError) as exc:
             _logger.warning(
                 "merge_fusionnabilite_refusee",
