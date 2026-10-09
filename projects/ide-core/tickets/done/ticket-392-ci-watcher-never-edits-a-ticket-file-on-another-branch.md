@@ -1,14 +1,14 @@
 ---
-id: ticket-392
-title: "CIWatcher never edits a ticket file in the working tree when it blocks a PR"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-09
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-09
+id: ticket-392
+pr_number: 342
+priority: high
+status: done
+title: CIWatcher never edits a ticket file in the working tree when it blocks a PR
+type: fix
 ---
 
 # ticket-392 — CIWatcher ne modifie plus une fiche dans l'arbre de travail

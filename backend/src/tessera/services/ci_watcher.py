@@ -9,7 +9,8 @@ starting. Two different projects are fully independent.
 
 When CI is red, CIWatcher emits ticket_status_changed (blocked) so the board
 reflects the outcome, then ci_merge_done with merged=False and an arret naming
-the PR number.
+the PR number.  The ticket file in the working tree is never touched — the
+board reads the event; the pipeline log keeps the trace (ticket-392).
 
 Error handling (ticket-328): any exception raised by livraison_phase_2, or a
 timeout of the entire phase 2 (including CI wait), emits ci_merge_done with
@@ -22,19 +23,11 @@ Shutdown: call arreter() to cancel all running tasks without raising exceptions.
 import asyncio
 from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Protocol
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
-
-
-class _TicketSvcProto(Protocol):
-    """Minimal interface of TicketService required by CIWatcher."""
-
-    async def update_status(self, ticket_id: str, new_status: TicketStatus) -> object:
-        ...
 
 _logger = get_logger(__name__)
 
@@ -75,15 +68,14 @@ class CIWatcher:
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
         pipeline_log_path: Path | None = None,
-        ticket_svc: _TicketSvcProto | None = None,
     ) -> None:
         """Start watching `pr_number` for `ticket_id` in the background.
 
         Returns immediately; the background task emits ci_merge_done when done.
         A second call for the same project waits for the first to finish.
 
-        When the merge fails, writes a line to `pipeline_log_path` (if given)
-        and calls `ticket_svc.update_status(ticket_id, blocked)` (if given).
+        When the merge fails, writes a line to `pipeline_log_path` (if given).
+        The ticket file in the working tree is never modified (ticket-392).
         """
         # Le ticket est en attente dès l'inscription, même avant que le
         # sémaphore soit acquis : `en_attente` doit le lister pendant l'attente
@@ -93,7 +85,7 @@ class CIWatcher:
         task = asyncio.create_task(
             self._surveiller_impl(
                 project_id, ticket_id, pr_number, livraison_phase_2, on_event,
-                pipeline_log_path, ticket_svc,
+                pipeline_log_path,
             ),
             name=f"ci-watcher:{project_id}:{ticket_id}",
         )
@@ -151,7 +143,6 @@ class CIWatcher:
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
         pipeline_log_path: Path | None,
-        ticket_svc: _TicketSvcProto | None,
     ) -> None:
         sem = self._semaphore_du_projet(project_id)
         try:
@@ -161,7 +152,7 @@ class CIWatcher:
                     await asyncio.wait_for(
                         self._livrer_et_emettre(
                             project_id, ticket_id, pr_number, livraison_phase_2,
-                            on_event, pipeline_log_path, ticket_svc,
+                            on_event, pipeline_log_path,
                         ),
                         timeout=self._timeout_phase2_s,
                     )
@@ -180,7 +171,7 @@ class CIWatcher:
                 if arret_erreur is not None:
                     await self._emettre_echec(
                         project_id, ticket_id, pr_number, arret_erreur, on_event,
-                        pipeline_log_path, ticket_svc,
+                        pipeline_log_path,
                     )
         except asyncio.CancelledError:
             _logger.info(
@@ -209,12 +200,10 @@ class CIWatcher:
         arret: str,
         on_event: EventCallback,
         pipeline_log_path: Path | None,
-        ticket_svc: _TicketSvcProto | None,
     ) -> None:
         """Emit ticket_status_changed(blocked) then ci_merge_done(merged=False)."""
         self._resultats_merge[f"{project_id}:{ticket_id}"] = False
         self._ecrire_log_blocage(pipeline_log_path, ticket_id, pr_number, arret)
-        await self._bloquer_ticket(ticket_svc, ticket_id)
         await on_event(
             OrchestratorEvent(
                 type=EventType.TICKET_STATUS_CHANGED,
@@ -250,16 +239,14 @@ class CIWatcher:
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
         pipeline_log_path: Path | None,
-        ticket_svc: _TicketSvcProto | None,
     ) -> None:
         livraison = await livraison_phase_2(pr_number)
 
         if not livraison.merged:
-            # CI rouge ou merge refusé : le ticket passe en blocked.
+            # CI rouge ou merge refusé : signaler sans toucher la fiche (ticket-392).
             arret = livraison.arret or f"CI rouge : la PR #{pr_number} reste ouverte."
             self._resultats_merge[f"{project_id}:{ticket_id}"] = False
             self._ecrire_log_blocage(pipeline_log_path, ticket_id, pr_number, arret)
-            await self._bloquer_ticket(ticket_svc, ticket_id)
             await on_event(
                 OrchestratorEvent(
                     type=EventType.TICKET_STATUS_CHANGED,
@@ -329,19 +316,6 @@ class CIWatcher:
                 f.write(line)
         except Exception as exc:  # noqa: BLE001
             _logger.warning("pipeline_log_write_failed", extra={"error": str(exc)})
-
-    async def _bloquer_ticket(self, ticket_svc: _TicketSvcProto | None, ticket_id: str) -> None:
-        """Move the ticket to blocked/ and set status: blocked in its frontmatter."""
-        if ticket_svc is None:
-            return
-        try:
-            await ticket_svc.update_status(ticket_id, TicketStatus.blocked)
-        except Exception as exc:  # noqa: BLE001
-            _logger.warning(
-                "ticket_blocked_update_failed",
-                extra={"ticket": ticket_id, "error": str(exc)},
-            )
-
 
 #: Instance partagée par tous les routeurs. Un singleton en mémoire suffit
 #: pour un backend local (ADR-038).
