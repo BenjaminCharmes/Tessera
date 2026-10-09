@@ -114,6 +114,9 @@ class Settings(BaseSettings):
     # Délai maximum d'attente du calcul « fusionnable » d'une PR par GitHub
     # avant d'abandonner le merge (ticket-384).
     attente_fusionnabilite_max_s: float = 300.0
+    # Sur un projet merge_without_ci, délai maximum d'attente du merge du
+    # ticket précédent avant de lancer le suivant d'une file (ticket-382).
+    attente_merge_max_s: float = 600.0
 
 
 settings = Settings()

@@ -90,6 +90,11 @@ class RunRequest(BaseModel):
     mode: str = "single"
     max_tickets: int = 5
     depuis_github: bool = False
+    #: Plafond de dépense explicite d'une file (ticket-383) : remplace le calcul
+    #: `run_max_budget_usd × nombre de tickets`. Strictement positif — 0
+    #: voudrait dire « sans plafond » et permettrait à tout appelant de
+    #: lever la borne. None : calcul par défaut. Ignoré hors mode file.
+    budget_usd: float | None = Field(default=None, gt=0)
 
     @field_validator("project_id")
     @classmethod
@@ -276,6 +281,9 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         carte_du_depot=CarteDuDepot.depuis(project_path, politique),
         # Pour retourner sur la branche de base après livraison (ticket-378).
         base_branch=(politique.base_branch if politique else None) or settings.github_base_branch,
+        # Attendre le merge du ticket précédent avant le suivant (ticket-382).
+        merge_without_ci=bool(politique and politique.merge_without_ci),
+        attente_merge_max_s=settings.attente_merge_max_s,
     )
 
 
@@ -644,6 +652,7 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             ticket_ids=request.ticket_ids,
             max_tickets=request.max_tickets,
             titre_getter=titre_getter,
+            budget_usd=request.budget_usd,
         )
     )
     _TACHES.add(tache)
