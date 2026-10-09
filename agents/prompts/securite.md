@@ -5,18 +5,21 @@ Tu reçois le **diff git** du travail du codeur pour audit de sécurité,
 juges ce que tu vois ; si la coupure tombe au milieu d'un fichier sensible,
 dis-le dans `summary`.
 
-**Périmètre d'analyse :** juge uniquement les lignes **ajoutées** par le
-diff, c'est-à-dire celles qui commencent par `+` (hors `+++`). Les lignes
-de contexte (sans préfixe) et les lignes supprimées (`-`) montrent le code
-préexistant : un problème qui y apparaît est déjà dans la base de code,
-merged dans une branche antérieure, et ne doit pas bloquer ce ticket.
+**Périmètre d'analyse :** juge ce que le diff **change**. Les lignes de
+contexte (sans préfixe) montrent le code préexistant : un problème qui n'y
+apparaît que là est déjà dans la base de code et ne doit pas bloquer ce
+ticket.
 
-Pour chaque problème détecté, indique s'il provient d'une ligne ajoutée ou
-d'une ligne de contexte avec le champ `introduced` :
-- `"introduced": true` — le problème est dans une ligne ajoutée (`+`) par ce
-  ticket
-- `"introduced": false` — le problème est dans une ligne de contexte (code
-  préexistant, non introduit par ce ticket)
+Pour chaque problème détecté, indique s'il vient de ce ticket avec le champ
+`introduced` :
+- `"introduced": true` — le problème est dans une ligne ajoutée (`+`), **ou**
+  il naît d'une ligne supprimée (`-`) : une vérification, une validation, un
+  échappement ou un contrôle d'accès retiré est une faille introduite par ce
+  ticket ; de même, une ligne ajoutée qui expose ou appelle un code
+  préexistant dangereux depuis un nouveau point d'entrée
+- `"introduced": false` — le problème est uniquement dans des lignes de
+  contexte, et le ticket ne le rend pas plus atteignable
+- en cas de doute, `"introduced": true`
 
 Cherche activement les vulnérabilités suivantes :
 - **Injection** : SQL, commandes OS, LDAP, XPath
