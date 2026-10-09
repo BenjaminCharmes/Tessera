@@ -1988,3 +1988,25 @@ Le code introduit une sé (44328ms)
 - 2026-10-08 15:20:20 UTC — [ticket-384] validateur: APPROVED — Tous les critères sont satisfaits par les tests ajoutés au diff. Les trois modif (395250ms)
 - 2026-10-08 15:20:20 UTC — [ticket-384] APPROVED après 1 tour(s)
 - 2026-10-08 15:24:00 UTC — [ticket-384] documentation: 4 fichier(s) (218765ms)
+- 2026-10-08 15:29:33 UTC — [ticket-381] branche ticket-381-an-agent-process-that-stays-silent-too-long-is-st
+- 2026-10-08 15:29:34 UTC — [ticket-381] tour 1 — codeur démarré
+- 2026-10-08 15:39:53 UTC — [ticket-381] tour 1 — codeur terminé (619656ms)
+- 2026-10-09 07:36:46 UTC — [ticket-381] testeur: délai dépassé, suite relancée
+- 2026-10-09 07:37:07 UTC — [ticket-381] testeur: pytest :
+- 2026-10-09 07:37:07 UTC — [ticket-381] tests rouges au tour 1
+- 2026-10-09 07:37:07 UTC — [ticket-381] tour 2 — codeur démarré
+- 2026-10-09 07:37:09 UTC — [ticket-381] INTERROMPU au tour 2 — ProcessError: Command failed with exit code 3221226091 (exit code: 3221226091) Error output: Check stderr output for details
+- 2026-10-09 12:00:48 UTC — [ticket-381] branche ticket-381-an-agent-process-that-stays-silent-too-long-is-st
+- 2026-10-09 12:00:48 UTC — [ticket-381] tour 1 — codeur démarré
+- 2026-10-09 12:02:00 UTC — [ticket-381] tour 1 — codeur terminé (71781ms)
+- 2026-10-09 12:04:24 UTC — [ticket-381] testeur: 1 failed, 743 passed, 20 warnings in 141.80s (0:02:21)
+- 2026-10-09 12:04:24 UTC — [ticket-381] tests rouges au tour 1
+- 2026-10-09 12:04:24 UTC — [ticket-381] tour 2 — codeur démarré
+- 2026-10-09 12:05:06 UTC — [ticket-381] tour 2 — codeur terminé (42140ms)
+- 2026-10-09 12:08:04 UTC — [ticket-381] testeur: OK (exit 0)
+- 2026-10-09 12:08:45 UTC — [ticket-381] securite: PASS — Aucune vulnérabilité critique, haute ou moyenne détectée. Le diff implémente un  (40796ms)
+- 2026-10-09 12:08:45 UTC — [ticket-381] tour 2 — reviewer démarré
+- 2026-10-09 12:09:16 UTC — [ticket-381] validateur: APPROVED — Tous les critères sont satisfaits. Le diff implémente la détection de silence d' (30968ms)
+- 2026-10-09 12:09:34 UTC — [ticket-381] tour 2 — reviewer terminé (49281ms)
+- 2026-10-09 12:09:34 UTC — [ticket-381] APPROVED après 2 tour(s)
+- 2026-10-09 12:14:06 UTC — [ticket-381] documentation: 4 fichier(s) (270125ms)

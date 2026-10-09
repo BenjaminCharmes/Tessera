@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,7 @@ from tessera.services.providers.agent_sdk import (
     _extract_stream_delta,
     _usage_from,
 )
+from tessera.services.providers.noms import ProviderIndisponible
 
 
 def test_nom_du_provider() -> None:
@@ -415,6 +417,86 @@ async def test_stream_sans_result_message_leve_runtime_error(
         await provider.stream(
             system="sys", user="user", model="claude-sonnet-4-6", max_tokens=100
         )
+
+
+async def test_run_leve_provider_indisponible_apres_silence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A stream that goes silent after one message raises ProviderIndisponible."""
+
+    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+        yield AssistantMessage(content=[TextBlock(text="début")], model="m")
+        await asyncio.sleep(9999)
+        yield _make_result_message(usage=None, total_cost_usd=None)
+
+    monkeypatch.setattr(agent_sdk_module, "query", fake_query)
+
+    provider = ClaudeAgentSDKProvider(silence_max_s=0.05)
+    with pytest.raises(ProviderIndisponible, match="silencieux"):
+        await provider.complete(system="s", user="u", model="m", max_tokens=100)
+
+
+async def test_run_ferme_le_flux_apres_silence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """aclose() is called on the stream when the silence timeout is exceeded."""
+
+    class SilentGen:
+        """Async iterable that returns one message then blocks forever."""
+
+        def __init__(self) -> None:
+            self.closed = False
+            self._sent = False
+
+        def __aiter__(self) -> "SilentGen":
+            return self
+
+        async def __anext__(self) -> Any:
+            if not self._sent:
+                self._sent = True
+                return AssistantMessage(content=[TextBlock(text="x")], model="m")
+            await asyncio.sleep(9999)
+            raise StopAsyncIteration
+
+        async def aclose(self) -> None:
+            self.closed = True
+
+    gen_instance = SilentGen()
+
+    # Patch _sdk_gen so that aclosing() wraps gen_instance directly;
+    # aclosing() guarantees aclose() is called when the context exits.
+    def fake_sdk_gen(*, prompt: str, options: Any) -> SilentGen:
+        return gen_instance
+
+    monkeypatch.setattr(agent_sdk_module, "_sdk_gen", fake_sdk_gen)
+
+    provider = ClaudeAgentSDKProvider(silence_max_s=0.05)
+    with pytest.raises(ProviderIndisponible):
+        await provider.complete(system="s", user="u", model="m", max_tokens=100)
+
+    assert gen_instance.closed
+
+
+async def test_run_aboutit_si_messages_plus_frequents_que_le_silence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A stream that emits each message faster than silence_max_s completes
+    normally, even when the total run duration would exceed the threshold."""
+    # 4 messages at 30 ms intervals → total ≈ 120 ms > silence_max_s (100 ms).
+    # Each individual interval (30 ms) stays below the 100 ms threshold.
+    silence_max_s = 0.1
+
+    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+        for _ in range(4):
+            yield AssistantMessage(content=[TextBlock(text="y")], model="m")
+            await asyncio.sleep(0.03)
+        yield _make_result_message(usage=None, total_cost_usd=None)
+
+    monkeypatch.setattr(agent_sdk_module, "query", fake_query)
+
+    provider = ClaudeAgentSDKProvider(silence_max_s=silence_max_s)
+    outcome = await provider.complete(system="s", user="u", model="m", max_tokens=100)
+    assert outcome.content == "yyyy"
 
 
 def test_build_options_neutralise_anthropic_api_key(

@@ -1,19 +1,43 @@
-from collections.abc import Awaitable, Callable
+import asyncio
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from contextlib import aclosing
 from pathlib import Path
 from typing import Any
 
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
+    ConversationResetMessage,
     HookMatcher,
     RateLimitEvent,
     ResultMessage,
     SdkPluginConfig,
     StreamEvent,
+    SystemMessage,
     TextBlock,
     ToolUseBlock,
+    UserMessage,
     query,
 )
+
+# Union de tous les types émis par query() — utilisé pour typer le générateur.
+_SdkMessage = (
+    UserMessage
+    | AssistantMessage
+    | SystemMessage
+    | ResultMessage
+    | StreamEvent
+    | RateLimitEvent
+    | ConversationResetMessage
+)
+
+
+async def _sdk_gen(
+    prompt: str, options: ClaudeAgentOptions
+) -> AsyncGenerator[_SdkMessage, None]:
+    """Wraps query() as a typed AsyncGenerator so it exposes aclose()."""
+    async for msg in query(prompt=prompt, options=options):
+        yield msg
 
 from tessera.services.providers.git_guard import hook_refus_git
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
@@ -27,6 +51,7 @@ from tessera.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
 
@@ -199,6 +224,7 @@ class ClaudeAgentSDKProvider:
         racine_ecriture: Path | None = None,
         skills: list[str] | None = None,
         git_bash_path: str | None = None,
+        silence_max_s: float | None = None,
     ) -> None:
         self._max_turns = max_turns
         self._skills = list(skills) if skills else []
@@ -214,6 +240,13 @@ class ClaudeAgentSDKProvider:
         # Chemin vers bash.exe sous Windows, transmis au sous-processus du SDK
         # pour activer l'outil `Bash` (ticket-319).
         self._git_bash_path = git_bash_path
+        # Délai maximum entre deux messages consécutifs (ticket-381).
+        # None à la construction → lu depuis les réglages.
+        if silence_max_s is not None:
+            self._silence_max_s = silence_max_s
+        else:
+            from tessera.config import settings
+            self._silence_max_s = settings.agent_silence_max_s
 
     async def complete(
         self,
@@ -296,31 +329,49 @@ class ClaudeAgentSDKProvider:
         )
         chunks: list[str] = []
         result: ResultMessage | None = None
+        # None → pas de borne (0 ou négatif désactive également).
+        silence_timeout: float | None = self._silence_max_s if self._silence_max_s > 0 else None
 
-        async for message in query(prompt=user, options=options):
-            if isinstance(message, RateLimitEvent):
-                # L'état du quota d'abonnement : la seule mesure de la
-                # ressource réellement finie en mode abonnement. Un provider
-                # qui n'en émet pas laisse le tracker vide, et rien ne casse.
-                self.quota.observe(getattr(message, "rate_limit_info", None))
-            elif isinstance(message, ResultMessage):
-                result = message
-            elif isinstance(message, StreamEvent):
-                # Forwarded live for display only — the authoritative record
-                # of content is the buffered TextBlock below, so this must
-                # never also be appended to `chunks` (would double the text).
-                if on_token is not None:
-                    delta = _extract_stream_delta(message.event)
-                    if delta:
-                        await on_token(delta)
-            elif isinstance(message, AssistantMessage):
-                for block in message.content:
-                    # isinstance plutôt que comparaison de type().__name__ :
-                    # robuste et vérifiable statiquement (finding 2, revue ticket-044).
-                    if isinstance(block, TextBlock):
-                        chunks.append(block.text)
-                    elif isinstance(block, ToolUseBlock) and on_tool_use is not None:
-                        await on_tool_use(block.name, dict(block.input))
+        async with aclosing(_sdk_gen(prompt=user, options=options)) as gen:
+            while True:
+                try:
+                    message = await asyncio.wait_for(
+                        gen.__anext__(), timeout=silence_timeout
+                    )
+                except asyncio.TimeoutError:
+                    _logger.warning(
+                        "agent_silencieux_arrete",
+                        extra={"model": model, "silence_s": self._silence_max_s},
+                    )
+                    raise ProviderIndisponible(
+                        f"agent silencieux depuis {self._silence_max_s:.0f} s"
+                    )
+                except StopAsyncIteration:
+                    break
+
+                if isinstance(message, RateLimitEvent):
+                    # L'état du quota d'abonnement : la seule mesure de la
+                    # ressource réellement finie en mode abonnement. Un provider
+                    # qui n'en émet pas laisse le tracker vide, et rien ne casse.
+                    self.quota.observe(getattr(message, "rate_limit_info", None))
+                elif isinstance(message, ResultMessage):
+                    result = message
+                elif isinstance(message, StreamEvent):
+                    # Forwarded live for display only — the authoritative record
+                    # of content is the buffered TextBlock below, so this must
+                    # never also be appended to `chunks` (would double the text).
+                    if on_token is not None:
+                        delta = _extract_stream_delta(message.event)
+                        if delta:
+                            await on_token(delta)
+                elif isinstance(message, AssistantMessage):
+                    for block in message.content:
+                        # isinstance plutôt que comparaison de type().__name__ :
+                        # robuste et vérifiable statiquement (finding 2, revue ticket-044).
+                        if isinstance(block, TextBlock):
+                            chunks.append(block.text)
+                        elif isinstance(block, ToolUseBlock) and on_tool_use is not None:
+                            await on_tool_use(block.name, dict(block.input))
 
         if result is None:
             raise RuntimeError("Agent SDK: aucun ResultMessage reçu")
