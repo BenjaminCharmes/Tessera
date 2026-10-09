@@ -30,6 +30,9 @@ class SecurityIssue:
     location: str
     description: str
     fix: str
+    # True par défaut : un champ absent vaut "introduit par ce ticket"
+    # (echec fermé, ADR-039). L'auditeur pose False quand c'est du contexte.
+    introduced: bool = True
 
 
 @dataclass
@@ -44,11 +47,13 @@ class SecurityAuditResult:
 
     @property
     def has_critical(self) -> bool:
-        return any(i.severity == "CRITICAL" for i in self.issues)
+        # Seules les failles introduites par ce ticket comptent pour le blocage.
+        return any(i.severity == "CRITICAL" and i.introduced for i in self.issues)
 
     @property
     def has_high(self) -> bool:
-        return any(i.severity == "HIGH" for i in self.issues)
+        # Seules les failles introduites par ce ticket comptent pour le blocage.
+        return any(i.severity == "HIGH" and i.introduced for i in self.issues)
 
 
 class SecurityAuditorService:
@@ -107,6 +112,9 @@ class SecurityAuditorService:
             if not isinstance(entry, dict):
                 continue
             severity = _SEVERITIES.get(str(entry.get("severity", "INFO")), "INFO")
+            # Echec fermé (ADR-039) : un champ absent vaut True (code introduit).
+            # Seul un False explicite marque la faille comme préexistante.
+            introduced = bool(entry.get("introduced", True))
             issues.append(
                 SecurityIssue(
                     severity=severity,
@@ -114,6 +122,7 @@ class SecurityAuditorService:
                     location=str(entry.get("location", "")),
                     description=str(entry.get("description", "")),
                     fix=str(entry.get("fix", "")),
+                    introduced=introduced,
                 )
             )
 
