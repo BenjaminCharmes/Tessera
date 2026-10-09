@@ -276,6 +276,9 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         carte_du_depot=CarteDuDepot.depuis(project_path, politique),
         # Pour retourner sur la branche de base après livraison (ticket-378).
         base_branch=(politique.base_branch if politique else None) or settings.github_base_branch,
+        # Attendre le merge du ticket précédent avant le suivant (ticket-382).
+        merge_without_ci=bool(politique and politique.merge_without_ci),
+        attente_merge_max_s=settings.attente_merge_max_s,
     )
 
 
