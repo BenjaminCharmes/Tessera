@@ -845,7 +845,8 @@ class Orchestrator:
         if self._git_workspace is None:
             return
         try:
-            await self._git_workspace.commit_bookkeeping()
+            if not await self._sur_la_base():
+                await self._git_workspace.commit_bookkeeping()
         except Exception as exc:  # noqa: BLE001
             _logger.warning("livraison_bookkeeping_failed", extra={"error": str(exc)})
         if self._base_branch is None:
@@ -869,13 +870,29 @@ class Orchestrator:
         if self._git_workspace is None or self._base_branch is None:
             return
         try:
-            await self._git_workspace.commit_bookkeeping()
+            if not await self._sur_la_base():
+                await self._git_workspace.commit_bookkeeping()
         except Exception as exc:  # noqa: BLE001
             _logger.warning("queue_bookkeeping_failed", extra={"error": str(exc)})
         try:
             await self._git_workspace.retourner_sur_base(self._base_branch)
         except Exception as exc:  # noqa: BLE001
             _logger.warning("queue_checkout_base_failed", extra={"error": str(exc)})
+
+    async def _sur_la_base(self) -> bool:
+        """True when the working tree is already on the base branch.
+
+        Bookkeeping is never committed there: a local commit on the base
+        branch would diverge it from the remote (no direct commit on develop
+        or main). The lines stay in the tree and ride with the next ticket's
+        branch, as before ticket-390.
+        """
+        if self._git_workspace is None or self._base_branch is None:
+            return False
+        branche_courante = getattr(self._git_workspace, "branche_courante", None)
+        if branche_courante is None:
+            return False
+        return bool(await branche_courante() == self._base_branch)
 
     def _log(self, message: str) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")

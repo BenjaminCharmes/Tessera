@@ -840,6 +840,10 @@ class GitWorkspaceService:
         """
         await self._run("checkout", base_branch)
 
+    async def branche_courante(self) -> str:
+        """Name of the checked-out branch (``HEAD`` when detached)."""
+        return (await self._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
     async def _untracked_files(self) -> tuple[str, ...]:
         """Paths git reports as untracked (respecting .gitignore), as a tuple."""
         listing = await self._run("ls-files", "--others", "--exclude-standard")

@@ -1276,3 +1276,34 @@ async def test_merge_without_ci_timeout_continue_et_log(
     # Le journal mentionne le délai dépassé.
     log_content = log_path.read_text(encoding="utf-8")
     assert "délai" in log_content
+
+
+async def test_aucun_commit_de_journal_sur_la_branche_de_base(tmp_path: Path) -> None:
+    """Ticket-390 review: when the tree is already on the base branch, the
+    bookkeeping is never committed there — a local commit on develop would
+    diverge it from the remote."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    git_ws = AsyncMock()
+    git_ws.branche_courante.return_value = "main"
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(arret="Conflit sur rebase — aucune PR ouverte")
+
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001")],
+        runner=MagicMock(),
+        ticket_service=AsyncMock(**{"get_ticket.return_value": None}),
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        git_workspace=git_ws,
+        base_branch="main",
+        livrer=_livrer,
+    )
+
+    await orch.run_pipeline("proj", "ticket-001", _rien)
+    await orch._nettoyer_apres_file()
+
+    git_ws.commit_bookkeeping.assert_not_called()
+    git_ws.retourner_sur_base.assert_called_with("main")
