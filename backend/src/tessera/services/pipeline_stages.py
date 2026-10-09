@@ -494,12 +494,18 @@ async def run_tests(
             failed=result.failed,
             output_summary=result.output_summary,
             errors=result.errors,
+            failure_details=result.failure_details,
             duration_ms=result.duration_ms,
         )
         badge = "✅" if result.passed else "❌"
-        errors = "\nErreurs:\n" + "\n".join(result.errors) if result.errors else ""
+        if result.failure_details:
+            details = f"\nDétail des échecs:\n{result.failure_details}"
+        elif result.errors:
+            details = "\nErreurs:\n" + "\n".join(result.errors)
+        else:
+            details = ""
         run.test_context = (
-            f"\n\n## Résultats des tests {badge}\n{result.output_summary}\n{errors}"
+            f"\n\n## Résultats des tests {badge}\n{result.output_summary}\n{details}"
         )
         orch._log(f"[{run.ticket_id}] testeur: {result.output_summary}")
         return bool(result.passed)

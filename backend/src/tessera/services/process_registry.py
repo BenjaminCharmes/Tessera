@@ -379,12 +379,16 @@ class ProcessRegistry:
             # le premier maillon et laissait les descendants avec leurs ports
             # — « 2 arrêtés » pendant que douze processus tournaient
             # (ticket-153).
-            # Le groupe d'abord : il emporte la descendance que `taskkill`
-            # ne retrouve plus quand un maillon a disparu.
+            # `tuer_l_arbre` d'abord, pendant que le parent est vivant :
+            # `taskkill /T` suit la filiation courante, et si le groupe fermait
+            # le parent avant que `taskkill` passe, l'enfant orphelin n'est
+            # plus rattaché au PID cible et survit (ticket-393).
+            # Le groupe ensuite : il frappe les descendants que `taskkill` n'a
+            # pas atteints parce qu'un maillon intermédiaire était déjà disparu.
+            await tuer_l_arbre(processus.pid)
             if service.groupe is not None:
                 fermer_le_groupe(service.groupe)
                 service.groupe = None
-            await tuer_l_arbre(processus.pid)
             processus.terminate()
             await asyncio.wait_for(processus.wait(), timeout=DELAI_D_ARRET_S)
         except asyncio.TimeoutError:
