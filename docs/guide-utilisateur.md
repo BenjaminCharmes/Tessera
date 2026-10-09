@@ -340,6 +340,12 @@ Quand tu relances un ticket, sa branche précédente est réutilisée — tu ne 
 
 Si le rebasage échoue, l'ancienne branche est renommée `stale/<ancien-nom>` pour que tu ne la perdes pas, et une branche neuve est créée à partir de la base actuelle. Le codeur repartira d'une base propre.
 
+### Quand des tests échouent
+
+Quand des tests échouent, le **résumé du test** affiché dans le journal est clair et lisible — « 1 failed, 455 passed » au lieu d'une ligne de warning confuse. Le codeur reçoit aussi le **détail de chaque échec** — le nom du test et l'assertion qui a échoué — pour corriger en un seul tour.
+
+Au lieu de tourner à l'aveugle plusieurs fois, tu remarques que les tickets progressent plus vite.
+
 ## 5. Lire ce qui se passe
 
 Le panneau **Agent Stream** montre le déroulé en direct via WebSocket : quel agent

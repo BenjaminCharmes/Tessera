@@ -7,8 +7,9 @@ passait par cmd.exe, qui enchaînait — par chance, et seulement sous Windows.
 """
 import sys
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock
 
-from tessera.services.test_runner import TestRunnerService
+from tessera.services.test_runner import TestResult, TestRunnerService
 
 PY = f'"{sys.executable}" -c'
 
@@ -55,3 +56,53 @@ async def test_an_unsupported_operator_does_not_start(tmp_path: Path) -> None:
     assert result.passed is False
     assert result.demarree is False
     assert "|" in result.output_summary
+
+
+async def test_failure_details_in_coder_context(tmp_path: Path) -> None:
+    """Ticket-393 : failure_details from the test result reaches the coder's context.
+
+    The pipeline stage ``run_tests`` must include ``failure_details`` in
+    ``run.test_context``, which is the piece appended to the coder's prompt on
+    the next turn.
+    """
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+    from tessera.services import pipeline_stages
+    from tessera.services.pipeline_run import PipelineRun
+
+    failure_detail = "FAILED tests/test_foo.py::test_bar - assert [5, 6] == [5]\n\nE   AssertionError: assert [5, 6] == [5]"
+    mock_test_result = TestResult(
+        passed=False,
+        total=5,
+        failed=1,
+        output_summary="1 failed, 4 passed in 1.23s",
+        errors=["FAILED tests/test_foo.py::test_bar"],
+        failure_details=failure_detail,
+    )
+
+    mock_runner = MagicMock()
+    mock_runner.run_tests = AsyncMock(return_value=mock_test_result)
+
+    orch = MagicMock()
+    orch._test_runner = mock_runner
+    orch._project_path = tmp_path
+    orch._test_command = None
+    orch._log = MagicMock()
+
+    ticket = Ticket(
+        id="ticket-000",
+        title="test ticket",
+        type=TicketType.feat,
+        status=TicketStatus.in_progress,
+        priority=TicketPriority.medium,
+        agent="codeur",
+    )
+    run = PipelineRun(
+        project_id="proj",
+        ticket=ticket,
+        on_event=AsyncMock(),
+    )
+
+    await pipeline_stages.run_tests(orch, run)
+
+    assert failure_detail in run.test_context
+    assert "Détail des échecs:" in run.test_context

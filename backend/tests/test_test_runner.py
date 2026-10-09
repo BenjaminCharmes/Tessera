@@ -15,6 +15,11 @@ from tessera.services.test_runner import (
     TestCommandNotFound,
     TestResult,
     TestRunnerService,
+    _extract_failure_details,
+    _extract_pytest_failures_section,
+    _extract_pytest_short_summary,
+    _extract_summary_line,
+    _extract_vitest_failures,
     _get_semaphore,
     reset_semaphore_for_tests,
 )
@@ -556,3 +561,154 @@ class TestSemaphore:
 
         assert appele is False
         assert result.passed is True
+
+
+# ---------------------------------------------------------------------------
+# Extraction du résumé et des détails d'échec — ticket-393
+# ---------------------------------------------------------------------------
+
+_PYTEST_OUTPUT_ONE_FAILURE = """\
+================================= FAILURES =================================
+______________ test_migration_story _______________
+
+    async def test_migration_story(conn):
+>       assert await migrate(conn) == [5]
+E       AssertionError: assert [5, 6] == [5]
+
+tests/test_migration_story.py:42: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_migration_story.py::test_migration_story - assert [5, 6] == [5]
+================= 1 failed, 455 passed in 45.67s =================
+/usr/local/lib/python3.11/site-packages/pluggy/_hooks.py:39: UserWarning
+  res = hook_impl.function(*args)
+"""
+
+
+class TestSummaryLineExtraction:
+    """Ticket-393 : le résumé retenu est le vrai résumé pytest, pas un warning."""
+
+    def test_pytest_summary_preferred_over_trailing_warning(self) -> None:
+        # Régression documentée : le scan en reverse prenait la dernière ligne
+        # contenant « test » — un warning de pluggy — au lieu du résumé pytest.
+        summary = _extract_summary_line(_PYTEST_OUTPUT_ONE_FAILURE)
+        assert "1 failed, 455 passed" in summary
+        assert "hook_impl" not in summary
+
+    def test_vitest_summary_line_extracted(self) -> None:
+        vitest_output = (
+            " FAIL  src/components/Widget.test.tsx\n"
+            "\n"
+            " Test Files  1 failed | 3 passed (4)\n"
+            " Tests  1 failed | 12 passed (13)\n"
+            " Duration  1.23s\n"
+        )
+        summary = _extract_summary_line(vitest_output)
+        assert "1 failed" in summary
+        assert "12 passed" in summary
+
+    def test_fallback_heuristic_when_no_canonical_line(self) -> None:
+        output = "some output\n5 tests passed\nno timing banner"
+        summary = _extract_summary_line(output)
+        assert "passed" in summary
+
+
+class TestFailureDetailsExtraction:
+    """Ticket-393 : failure_details contient le résumé court et le bloc FAILURES."""
+
+    def test_contains_short_summary_failed_line(self) -> None:
+        details = _extract_failure_details(_PYTEST_OUTPUT_ONE_FAILURE)
+        assert "FAILED tests/test_migration_story.py::test_migration_story" in details
+
+    def test_contains_assertion_error_line(self) -> None:
+        details = _extract_failure_details(_PYTEST_OUTPUT_ONE_FAILURE)
+        assert "assert [5, 6] == [5]" in details
+
+    def test_short_summary_comes_before_failures_block(self) -> None:
+        details = _extract_failure_details(_PYTEST_OUTPUT_ONE_FAILURE)
+        pos_short = details.find("FAILED tests/test_migration_story")
+        pos_block = details.find("FAILURES")
+        assert pos_short < pos_block  # short summary first, then FAILURES detail block
+
+    def test_truncated_at_8000_chars_with_fifty_failures(self) -> None:
+        # Construit une sortie avec 50 échecs — chacun avec une section FAILURES
+        # et une ligne dans short test summary info.
+        failed_blocks = []
+        short_lines = []
+        for i in range(50):
+            name = f"tests/test_file.py::test_case_{i:02d}"
+            failed_blocks.append(
+                f"{'_' * 60} test_case_{i:02d} {'_' * 60}\n"
+                f"E   AssertionError: value {i} != expected\n"
+                f"{name}:10: AssertionError"
+            )
+            short_lines.append(f"FAILED {name} - value {i} != expected")
+
+        failures_section = (
+            "=" * 25 + " FAILURES " + "=" * 25 + "\n"
+            + "\n".join(failed_blocks)
+        )
+        short_section = (
+            "=" * 25 + " short test summary info " + "=" * 25 + "\n"
+            + "\n".join(short_lines) + "\n"
+            + "=" * 25 + " 50 failed in 10.00s " + "=" * 25
+        )
+        output = failures_section + "\n" + short_section
+
+        details = _extract_failure_details(output)
+        assert len(details) <= 8000
+        # Le début doit contenir la section short test summary info
+        assert "FAILED" in details[:500]
+
+    def test_empty_when_tests_pass(self) -> None:
+        output = "5 passed in 0.5s"
+        # _extract_failure_details est appelé seulement sur les échecs,
+        # mais on vérifie que la fonction elle-même ne plante pas sur succès.
+        details = _extract_failure_details(output)
+        assert details == ""
+
+    def test_vitest_failure_name_extracted(self) -> None:
+        vitest_output = (
+            " FAIL  src/Widget.test.tsx\n"
+            " ✓ renders label (3ms)\n"
+            " × renders title\n"
+            "\n"
+            "AssertionError: expected 'Hello' to equal 'World'\n"
+            "\n"
+            " Tests  1 failed | 1 passed (2)\n"
+            " Duration  0.50s\n"
+        )
+        details = _extract_failure_details(vitest_output)
+        assert "× renders title" in details or "FAIL" in details
+
+
+class TestParseOutputIntegration:
+    """Ticket-393 : _parse_output remplit failure_details sur les résultats rouges."""
+
+    async def test_failure_details_populated_on_red_tests(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        mock_proc = MagicMock()
+        mock_proc.returncode = 1
+        mock_proc.communicate = AsyncMock(
+            return_value=(_PYTEST_OUTPUT_ONE_FAILURE.encode(), b"")
+        )
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            result = await service.run_tests(python_project, test_command="uv run pytest")
+
+        assert result.passed is False
+        assert "FAILED tests/test_migration_story.py" in result.failure_details
+        assert result.output_summary == "================= 1 failed, 455 passed in 45.67s ================="
+
+    async def test_failure_details_empty_on_green_tests(
+        self, service: TestRunnerService, python_project: Path
+    ) -> None:
+        mock_proc = MagicMock()
+        mock_proc.returncode = 0
+        mock_proc.communicate = AsyncMock(return_value=(b"5 passed in 0.5s", b""))
+
+        with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
+            result = await service.run_tests(python_project, test_command="uv run pytest")
+
+        assert result.passed is True
+        assert result.failure_details == ""

@@ -1,14 +1,14 @@
 ---
-id: ticket-393
-title: "The coder sees which test failed and why, and the log shows the real test summary"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-09
 depends_on: []
 estimated_days: 1
-created: 2026-10-09
+id: ticket-393
+pr_number: 346
+priority: high
+status: done
+title: The coder sees which test failed and why, and the log shows the real test summary
+type: fix
 ---
 
 # ticket-393 — Le codeur voit quel test échoue et pourquoi
