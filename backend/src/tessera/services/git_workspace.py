@@ -43,6 +43,15 @@ _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS: tuple[str, ...] = tuple(
     f":(exclude){p}" for p in _ORCHESTRATOR_ARTIFACT_PATHS
 )
 
+# Fichiers journal résolubles en union lors du rebase de livraison (ticket-391).
+# Seuls ces deux fichiers ne font qu'ajouter des entrées : une union n'y laisse
+# jamais de contenu ambigu, contrairement à un fichier de code modifié des
+# deux côtés.
+_JOURNAL_UNION_SUFFIXES: frozenset[str] = frozenset({
+    "memory/pipeline-log.md",
+    "memory/documentation.json",
+})
+
 # Fixed, non-ticket-branded message for the bookkeeping-only commit: ticket
 # status changes and pipeline-log growth are Tessera's own housekeeping,
 # never the coder's work, so they must never ride under a ticket's message.
@@ -76,6 +85,49 @@ def _is_orchestrator_artifact_path(path: str) -> bool:
         elif path == artifact:
             return True
     return False
+
+
+def _is_journal_union_file(path: str) -> bool:
+    """True when ``path`` is a journal file eligible for automatic union resolution.
+
+    Matches both ``memory/pipeline-log.md`` (project root) and
+    ``projects/ide-core/memory/pipeline-log.md`` (git_root: ancestor).
+    """
+    return any(
+        path == suffix or path.endswith(f"/{suffix}")
+        for suffix in _JOURNAL_UNION_SUFFIXES
+    )
+
+
+def _union_lines(base: str, theirs: str) -> str:
+    """Union of two append-only text files, base lines first, no duplicates."""
+    base_lines = base.splitlines(keepends=True)
+    theirs_lines = theirs.splitlines(keepends=True)
+    base_set = set(base_lines)
+    extra = [line for line in theirs_lines if line not in base_set]
+    return "".join(base_lines + extra)
+
+
+def _union_json_lists(base_text: str, theirs_text: str) -> str | None:
+    """Union of two JSON array versions, base items first, no duplicates.
+
+    Returns None when either side is not a valid JSON array.
+    """
+    try:
+        base_list = json.loads(base_text)
+        theirs_list = json.loads(theirs_text)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    if not isinstance(base_list, list) or not isinstance(theirs_list, list):
+        return None
+    seen: set[str] = set()
+    result: list[object] = []
+    for item in (*base_list, *theirs_list):
+        key = json.dumps(item, sort_keys=True)
+        if key not in seen:
+            seen.add(key)
+            result.append(item)
+    return json.dumps(result, ensure_ascii=False, indent=2)
 
 
 def _extraire_fichiers_bloques(stderr: str) -> list[str]:
@@ -944,6 +996,13 @@ class GitWorkspaceService:
             await self._annuler_si_en_cours()
             raise refus
 
+        # Résolution en union pour les fichiers journal (ticket-391, ADR-035) :
+        # pipeline-log.md et documentation.json ne font qu'ajouter des entrées,
+        # donc une union ne laisse jamais de contenu ambigu.
+        if all(_is_journal_union_file(c) for c in conflits):
+            if await self._resoudre_conflits_journal_en_union(conflits):
+                return ()
+
         # Si tous les conflits sont des artefacts Tessera, les résoudre
         # automatiquement en faveur de la branche (ticket-300, ADR-033).
         if all(_is_orchestrator_artifact_path(c) for c in conflits):
@@ -1104,6 +1163,67 @@ class GitWorkspaceService:
                 if untracked and _is_orchestrator_artifact_path(untracked):
                     await self._run("add", "--", untracked)
 
+            await self._run("-c", "core.editor=true", "rebase", "--continue")
+            return True
+        except GitCommandError:
+            return False
+
+    async def _resoudre_conflits_journal_en_union(
+        self, conflits: tuple[str, ...]
+    ) -> bool:
+        """Résout en union les conflits sur les fichiers journal (ticket-391).
+
+        Appelée uniquement quand tous les fichiers en conflit sont dans
+        ``_JOURNAL_UNION_SUFFIXES``. Pour chaque fichier :
+        - ``pipeline-log.md`` : union des lignes, base en premier ;
+        - ``documentation.json`` : union des listes JSON sans doublon ;
+          JSON illisible → renvoie False, le conflit reste non résolu.
+
+        Renvoie True quand le rebase s'est poursuivi avec succès.
+        """
+        try:
+            for chemin in conflits:
+                # Stage 2 = ours (base sur laquelle on rejoue), stage 3 = theirs (ticket).
+                try:
+                    base_content = await self._run("show", f":2:{chemin}")
+                except GitCommandError:
+                    base_content = ""
+                try:
+                    theirs_content = await self._run("show", f":3:{chemin}")
+                except GitCommandError:
+                    theirs_content = ""
+
+                if chemin.endswith("pipeline-log.md"):
+                    resolved: str = _union_lines(base_content, theirs_content)
+                elif chemin.endswith("documentation.json"):
+                    maybe = _union_json_lists(base_content, theirs_content)
+                    if maybe is None:
+                        _logger.warning(
+                            "journal_union_json_illisible", extra={"chemin": chemin}
+                        )
+                        return False
+                    resolved = maybe
+                else:
+                    return False
+
+                # git show :2:path retourne le chemin depuis la racine du dépôt.
+                # Pour un projet déclaré git_root: ancestor, ce chemin inclut
+                # le préfixe (ex. projects/ide-core/memory/…). On le retire pour
+                # écrire dans le bon emplacement sur le disque.
+                rel_in_project = chemin
+                if self._travaille_dans_le_parent():
+                    try:
+                        prefix = (await self._run("rev-parse", "--show-prefix")).strip()
+                        if prefix and rel_in_project.startswith(prefix):
+                            rel_in_project = rel_in_project[len(prefix):]
+                    except GitCommandError:
+                        pass
+                dest = self._project_path / rel_in_project
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_text(resolved, encoding="utf-8")
+                await self._run("add", "--", chemin)
+
+            _logger.info("journal_union_resolu", extra={"fichiers": list(conflits)})
             await self._run("-c", "core.editor=true", "rebase", "--continue")
             return True
         except GitCommandError:
