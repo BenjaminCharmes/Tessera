@@ -1002,6 +1002,12 @@ Le ticket bloqué passe automatiquement en `blocked` (visible dans la colonne).
 Corrige le problème sous-jacent, relance le ticket bloqué, et la file reprendra
 à partir du ticket qui l'attendait.
 
+### « Agent silencieux depuis X secondes »
+
+L'IDE a stoppé cet agent parce qu'il n'émettait rien depuis trop longtemps. C'est **auto-géré** : le run reprend avec un fallback (Ollama ou fermeture gracieuse). Rien à faire.
+
+Pour allonger le délai avant arrêt, modifie `agent_silence_max_s` dans la configuration (défaut 1200 s).
+
 ## Pour aller plus loin
 
 - [`architecture.md`](architecture.md) — comment Tessera est construit
