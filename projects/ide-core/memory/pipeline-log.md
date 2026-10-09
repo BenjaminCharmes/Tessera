@@ -2021,3 +2021,10 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 12:09:34 UTC — [ticket-381] tour 2 — reviewer terminé (49281ms)
 - 2026-10-09 12:09:34 UTC — [ticket-381] APPROVED après 2 tour(s)
 - 2026-10-09 12:14:06 UTC — [ticket-381] documentation: 4 fichier(s) (270125ms)
+- 2026-10-09 12:28:59 UTC — [ticket-382] livraison: arrêt — Conflit avec develop sur : docs/configuration.md. La branche est restée intacte, à toi de trancher.
+- 2026-10-09 12:29:00 UTC — [ticket-383] branche ticket-383-a-queue-s-spending-ceiling-scales-with-its-number
+- 2026-10-09 12:29:00 UTC — [ticket-383] tour 1 — codeur démarré
+- 2026-10-09 12:32:54 UTC — [ticket-383] tour 1 — codeur terminé (233735ms)
+- 2026-10-09 12:36:51 UTC — [ticket-383] testeur: OK (exit 0)
+- 2026-10-09 12:37:55 UTC — [ticket-383] securite: BLOCK — A HIGH severity budget control bypass has been detected. The `budget_usd` parame (63858ms)
+- 2026-10-09 12:37:56 UTC — [ide-core] file interrompue : ticket-383 non approuvé

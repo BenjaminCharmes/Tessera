@@ -440,6 +440,7 @@ class Orchestrator:
         on_event: EventCallback | None = None,
         dialogue: "DialogueChannel | None" = None,
         envelope_run_id: str | None = None,
+        budget_override_usd: float | None = None,
     ) -> list[PipelineResult]:
         """Enchaîne une sélection de tickets, dans l'ordre demandé.
 
@@ -451,7 +452,22 @@ class Orchestrator:
         produit le planificateur — et enchaîner sur une base que personne n'a
         validée ferait travailler le suivant sur un état douteux. Mieux vaut
         s'arrêter net et laisser décider.
+
+        En mode file, le plafond de dépense vaut `run_max_budget_usd × nombre
+        de tickets` par défaut — un plafond pensé pour un ticket seul ne doit
+        pas arrêter une file de quinze (ticket-383). ``budget_override_usd``
+        remplace ce calcul quand la requête fixe explicitement un budget.
         """
+        # Plafond effectif pour l'ensemble de la file : on multiplie le plafond
+        # par ticket par le nombre de tickets, sauf si la requête en fixe un
+        # autre. 0 signifie « pas de plafond » (même sémantique que
+        # `run_max_budget_usd`).
+        if budget_override_usd is not None:
+            effective_budget = budget_override_usd
+        elif self._run_max_budget_usd > 0:
+            effective_budget = self._run_max_budget_usd * len(ticket_ids)
+        else:
+            effective_budget = 0.0
 
         async def _noop(event: OrchestratorEvent) -> None:
             pass
@@ -466,8 +482,23 @@ class Orchestrator:
             if dialogue is not None and dialogue.stop_requested:
                 self._log(f"[{project_id}] file interrompue : arrêt demandé")
                 break
-            if self.budget_exhausted():
+            if effective_budget > 0 and self._spent_usd >= effective_budget:
                 self._log(f"[{project_id}] file interrompue : plafond de dépense")
+                await callback(
+                    OrchestratorEvent(
+                        type=EventType.QUEUE_PROGRESS,
+                        ticket_id=ticket_id,
+                        data={
+                            "raison": "budget",
+                            "index": index,
+                            "total": len(ticket_ids),
+                            "restants": list(ticket_ids[index - 1 :]),
+                            "faits": list(ticket_ids[: index - 1]),
+                            "spent_usd": self._spent_usd,
+                            "budget_usd": effective_budget,
+                        },
+                    )
+                )
                 break
 
             # Un ticket déjà terminé se **saute**, il ne s'exécute pas : le

@@ -1688,3 +1688,218 @@ async def test_validateur_qui_leve_refuse_et_reviewer_va_au_bout(tmp_path: Path)
     assert reviewer_done.is_set(), (
         "le reviewer doit aller au bout malgré l'exception du validateur"
     )
+
+
+# ------------------------------------------------------------------
+# Plafond de dépense en file — ticket-383
+# ------------------------------------------------------------------
+
+
+async def test_queue_budget_scales_with_ticket_count(tmp_path: Path) -> None:
+    """A queue with run_max_budget_usd=5 runs all 3 tickets when each costs 4 USD.
+
+    The effective ceiling is 5 × 3 = 15 USD, so 12 USD total (3 × 4) stays
+    under the limit and all tickets execute.
+    """
+    ticket_a = _make_ticket(id="ticket-001")
+    ticket_b = _make_ticket(id="ticket-002")
+    ticket_c = _make_ticket(id="ticket-003")
+    tickets = [ticket_a, ticket_b, ticket_c]
+
+    ticket_service = _make_ticket_service_for(tickets)
+
+    async def _mock_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
+        return PipelineResult(
+            ticket_id=ticket_id,
+            final_status=TicketStatus.done,
+            rounds=1,
+            approved=True,
+        )
+
+    orc = _make_orchestrator(
+        tmp_path,
+        ticket_service=ticket_service,
+        run_max_budget_usd=5.0,
+    )
+    orc.run_pipeline = _mock_pipeline  # type: ignore[method-assign]
+
+    # Simulate each ticket costing 4 USD.
+    for _ in tickets:
+        orc.record_spend(4.0)
+    # Reset to zero so the queue checks apply as tickets are processed.
+    orc._spent_usd = 0.0  # noqa: SLF001
+
+    async def _spending_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
+        orc.record_spend(4.0)
+        return PipelineResult(
+            ticket_id=ticket_id,
+            final_status=TicketStatus.done,
+            rounds=1,
+            approved=True,
+        )
+
+    orc.run_pipeline = _spending_pipeline  # type: ignore[method-assign]
+
+    results = await orc.run_queue(
+        "proj",
+        ["ticket-001", "ticket-002", "ticket-003"],
+    )
+
+    assert len(results) == 3, (
+        f"Expected all 3 tickets to run, got {len(results)}. "
+        "Effective budget should be 5 × 3 = 15 USD, total spend is 12 USD."
+    )
+
+
+async def test_queue_stops_on_explicit_budget_usd(tmp_path: Path) -> None:
+    """A queue with budget_override_usd=6 stops before the 3rd ticket when
+    each ticket costs 4 USD (cumulative: 8 USD after 2 tickets > 6 USD limit).
+    """
+    ticket_a = _make_ticket(id="ticket-001")
+    ticket_b = _make_ticket(id="ticket-002")
+    ticket_c = _make_ticket(id="ticket-003")
+    tickets = [ticket_a, ticket_b, ticket_c]
+
+    ticket_service = _make_ticket_service_for(tickets)
+
+    orc = _make_orchestrator(
+        tmp_path,
+        ticket_service=ticket_service,
+        run_max_budget_usd=5.0,
+    )
+
+    async def _spending_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
+        orc.record_spend(4.0)
+        return PipelineResult(
+            ticket_id=ticket_id,
+            final_status=TicketStatus.done,
+            rounds=1,
+            approved=True,
+        )
+
+    orc.run_pipeline = _spending_pipeline  # type: ignore[method-assign]
+
+    results = await orc.run_queue(
+        "proj",
+        ["ticket-001", "ticket-002", "ticket-003"],
+        budget_override_usd=6.0,
+    )
+
+    assert len(results) == 2, (
+        f"Expected queue to stop after 2 tickets (8 USD > 6 USD limit), got {len(results)}."
+    )
+
+
+async def test_queue_budget_exhausted_emits_queue_progress_with_reason(
+    tmp_path: Path,
+) -> None:
+    """Stopping on the budget emits a QUEUE_PROGRESS event carrying raison='budget'."""
+    ticket_a = _make_ticket(id="ticket-001")
+    ticket_b = _make_ticket(id="ticket-002")
+    tickets = [ticket_a, ticket_b]
+
+    ticket_service = _make_ticket_service_for(tickets)
+
+    orc = _make_orchestrator(
+        tmp_path,
+        ticket_service=ticket_service,
+        run_max_budget_usd=3.0,
+    )
+
+    async def _spending_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
+        orc.record_spend(4.0)
+        return PipelineResult(
+            ticket_id=ticket_id,
+            final_status=TicketStatus.done,
+            rounds=1,
+            approved=True,
+        )
+
+    orc.run_pipeline = _spending_pipeline  # type: ignore[method-assign]
+
+    events: list[OrchestratorEvent] = []
+
+    async def _collect(event: OrchestratorEvent) -> None:
+        events.append(event)
+
+    # Effective budget = 3 × 2 = 6 USD. First ticket spends 4 USD, second
+    # is about to start but 4 >= 6 is False — wait, 4 < 6 so it runs.
+    # After second: 8 >= 6, so no third ticket. But there are only 2 tickets.
+    # Use budget_override_usd=3 so it stops after the first (4 >= 3).
+    results = await orc.run_queue(
+        "proj",
+        ["ticket-001", "ticket-002"],
+        on_event=_collect,
+        budget_override_usd=3.0,
+    )
+
+    assert len(results) == 1
+    budget_events = [
+        e for e in events
+        if e.type is EventType.QUEUE_PROGRESS and e.data.get("raison") == "budget"
+    ]
+    assert budget_events, (
+        "Expected at least one QUEUE_PROGRESS event with raison='budget' "
+        f"when queue stops on budget. Events received: {[e.type for e in events]}"
+    )
+
+
+async def test_autonomous_mode_keeps_per_ticket_budget(tmp_path: Path) -> None:
+    """Autonomous mode still uses run_max_budget_usd as its ceiling (ticket-383).
+
+    With run_max_budget_usd=5 and two tickets costing 3 USD each, the first
+    runs (total 3 < 5), then the check fires and stops the run (3 < 5 still —
+    wait: 3 < 5, second would run; after second: 6 >= 5, stops before third).
+    Use one ticket costing 6 USD to confirm the ceiling is 5, not 5 × n.
+    """
+    ticket_a = _make_ticket(id="ticket-001")
+    ticket_b = _make_ticket(id="ticket-002")
+
+    pick_calls = 0
+
+    async def mock_pick(project_id: str) -> Ticket | None:
+        nonlocal pick_calls
+        pick_calls += 1
+        if pick_calls == 1:
+            return ticket_a
+        if pick_calls == 2:
+            return ticket_b
+        return None
+
+    orc = _make_orchestrator(
+        tmp_path,
+        run_max_budget_usd=5.0,
+    )
+    orc.pick_next_ticket = mock_pick  # type: ignore[method-assign]
+
+    async def _spending_pipeline(
+        project_id: str, ticket_id: str, on_event: object, **kwargs: object
+    ) -> PipelineResult:
+        # Each ticket costs 6 USD — over the 5 USD per-run ceiling.
+        orc.record_spend(6.0)
+        return PipelineResult(
+            ticket_id=ticket_id,
+            final_status=TicketStatus.done,
+            rounds=1,
+            approved=True,
+        )
+
+    orc.run_pipeline = _spending_pipeline  # type: ignore[method-assign]
+
+    results = await orc.run_autonomous("proj", max_tickets=5)
+
+    # First ticket runs (budget check fires *before* each ticket, so ticket-001
+    # starts when spent=0 < 5, records 6 USD, then the loop checks again:
+    # 6 >= 5 → stop). Only ticket-001 completes.
+    assert len(results) == 1, (
+        f"Autonomous mode should stop after first ticket (spent 6 > limit 5), "
+        f"got {len(results)} results. Queue multiplication must not apply."
+    )

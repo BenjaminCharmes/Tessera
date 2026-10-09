@@ -90,6 +90,11 @@ class RunRequest(BaseModel):
     mode: str = "single"
     max_tickets: int = 5
     depuis_github: bool = False
+    #: Plafond de dépense explicite d'une file (ticket-383) : remplace le calcul
+    #: `run_max_budget_usd × nombre de tickets`. Strictement positif — 0
+    #: voudrait dire « sans plafond » et permettrait à tout appelant de
+    #: lever la borne. None : calcul par défaut. Ignoré hors mode file.
+    budget_usd: float | None = Field(default=None, gt=0)
 
     @field_validator("project_id")
     @classmethod
@@ -647,6 +652,7 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             ticket_ids=request.ticket_ids,
             max_tickets=request.max_tickets,
             titre_getter=titre_getter,
+            budget_usd=request.budget_usd,
         )
     )
     _TACHES.add(tache)

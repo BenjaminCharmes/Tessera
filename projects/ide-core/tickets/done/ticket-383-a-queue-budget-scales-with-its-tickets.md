@@ -1,14 +1,15 @@
 ---
-id: ticket-383
-title: "A queue's spending ceiling scales with its number of tickets, and stopping on it is visible"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-08
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-08
+id: ticket-383
+pr_number: null
+priority: high
+status: done
+title: A queue's spending ceiling scales with its number of tickets, and stopping
+  on it is visible
+type: fix
 ---
 
 # ticket-383 — Le plafond de dépense d'une file suit son nombre de tickets

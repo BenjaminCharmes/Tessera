@@ -176,3 +176,21 @@ async def test_build_orchestrator_merge_without_ci_off_by_default(tmp_path: Path
     orchestrator = await _build_orchestrator("mon-projet")
 
     assert orchestrator._merge_without_ci is False
+
+
+@pytest.mark.parametrize("budget", [0, -1.0])
+def test_run_request_rejects_non_positive_budget(budget: float) -> None:
+    """Ticket-383 security audit: 0 means "no ceiling", so a request must not
+    be able to lift the spending ceiling through budget_usd."""
+    from pydantic import ValidationError
+
+    from tessera.routers.orchestrator import RunRequest
+
+    with pytest.raises(ValidationError):
+        RunRequest(project_id="mon-projet", mode="queue", budget_usd=budget)
+
+
+def test_run_request_accepts_positive_budget() -> None:
+    from tessera.routers.orchestrator import RunRequest
+
+    assert RunRequest(project_id="mon-projet", mode="queue", budget_usd=6.0).budget_usd == 6.0

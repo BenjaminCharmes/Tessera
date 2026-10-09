@@ -219,6 +219,7 @@ async def executer(
     ticket_ids: Optional[list[str]] = None,
     max_tickets: int = 5,
     titre_getter: Optional[TitreGetter] = None,
+    budget_usd: Optional[float] = None,
 ) -> None:
     """Run the pipeline to its end, then free the project.
 
@@ -255,6 +256,7 @@ async def executer(
             resultats = await orchestrator.run_queue(
                 run.project_id, ticket_ids or [], envoyer, run.dialogue,
                 envelope_run_id=run_id_en_base,
+                budget_override_usd=budget_usd,
             )
         else:
             resultats = [
