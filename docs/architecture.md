@@ -373,6 +373,22 @@ arbitraire ou d'un glyphe utilisé comme affordance.
 
 Ce système est imposé aux agents créant une interface via le skill `tessera:design-ui`, chargé par défaut par le codeur et l'architect : toute UI doit partir d'une charte déclarée (couleurs, typographie, espacement), et n'en sortir sur aucune valeur.
 
+### Limite de silence des agents (ticket-381)
+
+Un processus d'agent qui n'émet aucun message pendant plus de `AGENT_SILENCE_MAX_S` secondes (défaut : 1200 s, soit 20 min) est interrompu.
+
+L'attente se mesure **entre deux messages** du flux, pas la durée totale de l'appel. Un agent qui lance une commande longue (suite de tests : ~6 min) mais émet régulièrement n'est jamais arrêté.
+
+Quand le silence est détecté :
+1. Le flux est fermé (`aclose` appelé)
+2. Le processus `claude.exe` est terminé
+3. Une `ProviderIndisponible("agent silencieux depuis … s")` est levée
+4. L'événement `agent_silencieux_arrete` est journalisé
+
+Le repli ou l'échec fermé existant (ADR-037, ADR-039) reprend aussitôt le run ou en demande l'approbation.
+
+Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le silence du flux. Deux cas réels qui l'ont motivé (octobre 2026) ont impliqué une veille du PC et un CLI bloqué.
+
 ## Endpoints implémentés
 
 ### Projets

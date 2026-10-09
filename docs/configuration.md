@@ -12,6 +12,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'allers-retours outil pour le reviewer (lecture et critique du diff) |
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'allers-retours outil pour le tour de plan (lecture seule) |
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
+| `AGENT_SILENCE_MAX_S` | | `1200` | Délai maximum sans message du flux d'un agent avant interruption du processus (en secondes, ticket-381) |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond cumulé d'un run autonome (`0` = aucun) |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
@@ -22,6 +23,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
 | `ATTENTE_FUSIONNABILITE_MAX_S` | | `300` | Délai maximum d'attente pour le calcul du statut fusionnable d'une PR avant abandon de la tentative de merge (en secondes, ticket-384) |
+| `agent_silence_max_s` | | `1200` | Délai maximum (en secondes) d'inactivité avant arrêt d'un agent silencieux. Évite qu'un processus figé ne bloque le run indéfiniment |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | URL du serveur Ollama pour les modèles locaux (rôles de jugement uniquement) |
