@@ -17,7 +17,7 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
-from tessera.models.ticket import TicketStatus, TicketType, TicketPriority
+from tessera.models.ticket import Ticket, TicketStatus, TicketType, TicketPriority
 
 
 def _resultat(ticket_id: str, approuve: bool = True) -> PipelineResult:
@@ -880,3 +880,229 @@ async def test_ticket_independant_continue_quand_dependance_non_mergee(
     assert len(results) == 2
     assert results[0].ticket_id == "ticket-001"
     assert results[1].ticket_id == "ticket-003"
+
+
+# ------------------------------------------------------------------
+# ticket-382 — merge_without_ci : attendre le merge avant le suivant
+# ------------------------------------------------------------------
+
+
+def _construire_merge_without_ci(
+    tmp_path: Path,
+    resultats: list[PipelineResult],
+    livrer: Any,
+    ci_watcher: Any = None,
+    ticket_service: Any = None,
+    attente_merge_max_s: float = 600.0,
+    git_workspace: Any = None,
+    base_branch: str | None = None,
+) -> _OrchestrateurDouble:
+    """Orchestrator double with merge_without_ci=True and a short timeout."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    if ticket_service is None:
+        tickets = AsyncMock()
+        tickets.get_ticket.return_value = None
+        ticket_service = tickets
+    return _OrchestrateurDouble(
+        resultats,
+        runner=MagicMock(),
+        ticket_service=ticket_service,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        livrer=livrer,
+        ci_watcher=ci_watcher,
+        merge_without_ci=True,
+        attente_merge_max_s=attente_merge_max_s,
+        git_workspace=git_workspace,
+        base_branch=base_branch,
+    )
+
+
+async def test_merge_without_ci_attend_le_merge_avant_ticket_suivant(
+    tmp_path: Path,
+) -> None:
+    """Criterion 1: two independent tickets on merge_without_ci=True — ticket-002
+    does not start until ticket-001's merge is signalled."""
+    from unittest.mock import AsyncMock
+
+    gate = asyncio.Event()
+    departs: list[str] = []
+
+    class _FakeCIWatcher:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+            await gate.wait()
+            return True
+
+    def _make_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=[],
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: _make_ticket(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        departs.append(result.ticket_id)
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _construire_merge_without_ci(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcher(),
+        ticket_service=tickets,
+    )
+
+    # Démarrer la file en arrière-plan.
+    tache = asyncio.create_task(
+        orch.run_queue("proj", ["ticket-001", "ticket-002"])
+    )
+    await asyncio.sleep(0.05)
+
+    # ticket-001 livré, ticket-002 attend le merge du premier.
+    assert "ticket-001" in departs
+    assert "ticket-002" not in departs
+
+    # Lever la gate → le merge est signalé, ticket-002 peut démarrer.
+    gate.set()
+    results = await tache
+
+    assert len(results) == 2
+    assert "ticket-002" in departs
+
+
+async def test_sans_merge_without_ci_ticket_independant_demarre_sans_attendre(
+    tmp_path: Path,
+) -> None:
+    """Criterion 2: without merge_without_ci, independent tickets start without
+    waiting for any merge — attendre_merge is never called."""
+    from unittest.mock import AsyncMock
+
+    class _FakeCIWatcherNeverResolves:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+            raise AssertionError("attendre_merge ne doit pas être appelé")
+
+    def _make_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=[],
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: _make_ticket(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    # Sans merge_without_ci=True (utilise _construire_avec_surveiller standard).
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcherNeverResolves(),
+        ticket_service=tickets,
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    assert len(results) == 2
+    assert results[0].ticket_id == "ticket-001"
+    assert results[1].ticket_id == "ticket-002"
+
+
+async def test_merge_without_ci_sync_base_depuis_distant_appele(
+    tmp_path: Path,
+) -> None:
+    """Criterion 3: after the merge, sync_base_depuis_distant is called on
+    git_workspace with the configured base branch."""
+    from unittest.mock import AsyncMock
+
+    class _FakeCIWatcher:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+            return True  # merge immédiat
+
+    def _make_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=[],
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: _make_ticket(tid)
+
+    sync_appels: list[str] = []
+    git_ws = AsyncMock()
+    # sync_base_depuis_distant retourne None = succès.
+    git_ws.sync_base_depuis_distant.side_effect = lambda branch: (
+        sync_appels.append(branch) or None
+    )
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _construire_merge_without_ci(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcher(),
+        ticket_service=tickets,
+        git_workspace=git_ws,
+        base_branch="main",
+    )
+
+    await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    # sync appelé une fois, après le merge du premier ticket.
+    assert sync_appels == ["main"]
+
+
+async def test_merge_without_ci_timeout_continue_et_log(
+    tmp_path: Path,
+) -> None:
+    """Criterion 4: when attente_merge_max_s is exceeded, the queue continues
+    to the next ticket and logs the timeout."""
+    from unittest.mock import AsyncMock
+
+    class _FakeCIWatcherBlocking:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+            # Ne se résout jamais — simule un merge qui tarde.
+            await asyncio.Event().wait()
+            return True  # jamais atteint
+
+    def _make_ticket(tid: str) -> Ticket:
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=[],
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: _make_ticket(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    log_path = tmp_path / "memory" / "log.md"
+    orch = _construire_merge_without_ci(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-002")],
+        _livrer,
+        ci_watcher=_FakeCIWatcherBlocking(),
+        ticket_service=tickets,
+        attente_merge_max_s=0.01,  # délai très court pour le test
+    )
+
+    results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
+
+    # La file continue malgré le timeout.
+    assert len(results) == 2
+
+    # Le journal mentionne le délai dépassé.
+    log_content = log_path.read_text(encoding="utf-8")
+    assert "délai" in log_content
