@@ -2119,3 +2119,4 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 14:22:47 UTC — [ticket-391] tour 1 — codeur démarré
 - 2026-10-09 14:29:55 UTC — [ticket-391] tour 1 — codeur terminé (427577ms)
 - 2026-10-09 14:29:55 UTC — [ticket-391] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-10-09 14:29:57 UTC — [ide-core] file interrompue : ticket-391 non approuvé
