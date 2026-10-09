@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-08
+depends_on:
+- ticket-383
+estimated_days: 0.5
 id: ticket-386
-title: "In a queue, the between-rounds spending check looks at the current ticket's own spending, not the whole queue's"
-type: fix
-status: todo
 pr_number: null
 priority: high
-agent: codeur
-depends_on: ["ticket-383"]
-estimated_days: 0.5
-created: 2026-10-08
+status: done
+title: In a queue, the between-rounds spending check looks at the current ticket's
+  own spending, not the whole queue's
+type: fix
 ---
 
 # ticket-386 — En file, le contrôle entre deux tours regarde la dépense du ticket

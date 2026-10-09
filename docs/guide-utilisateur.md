@@ -1029,6 +1029,13 @@ Si tu veux fixer une limite stricte (par exemple 10 $ pour une file de 3 tickets
 
 Quand une file s'arrête sur le budget, le log affiche `[<projet>] file interrompue : plafond de dépense` et l'interface confirme l'arrêt. Les tickets non lancés restent en `todo`.
 
+
+**Depuis octobre 2026** : en file, deux limites s'appliquent :
+- Chaque ticket a son propre budget (15 $ par défaut). S'il le dépasse entre ses tours, il repassera en `todo` — tu le relances après.
+- La file elle-même a un budget global (le cumul de tous les tickets). Quand il est atteint, la file s'arrête et affiche son coût : « file interrompue : plafond de dépense (15,24 $ / 15,00 $) ».
+
+Avant cette date, un ticket pouvait être coupé parce que ses prédécesseurs avaient trop dépensé. À présent, chaque ticket se mesure à son propre budget — tu ne paieras jamais pour les autres.
+
 ### Une file s'arrête pour « limite de session »
 
 Quand ton abonnement Claude atteint sa limite de session (« You've hit your session limit »), la file s'arrête avant le prochain ticket. Le ticket en cours repasse en `todo` — aucun n'est endommagé. Le log affiche `[<projet>] file interrompue : limite de session (reprise : <heure>)` et l'interface affiche l'heure à laquelle ton abonnement se réinitialise. Relance ta file après cette heure.
