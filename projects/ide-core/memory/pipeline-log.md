@@ -2067,3 +2067,13 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 13:31:23 UTC — [ticket-392] validateur: APPROVED — Les quatre critères sont satisfaits. Le diff supprime correctement la modificati (56405ms)
 - 2026-10-09 13:31:23 UTC — [ticket-392] APPROVED après 1 tour(s)
 - 2026-10-09 13:34:24 UTC — [ticket-392] documentation: 0 fichier(s) (175375ms)
+- 2026-10-09 14:00:35 UTC — [ide-core] ticket-390 PR #343 confiée au CIWatcher
+- 2026-10-09 14:00:37 UTC — [ticket-386] branche ticket-386-in-a-queue-the-between-rounds-spending-check-look
+- 2026-10-09 14:00:37 UTC — [ticket-386] tour 1 — codeur démarré
+- 2026-10-09 14:13:37 UTC — [ticket-386] tour 1 — codeur terminé (779875ms)
+- 2026-10-09 14:17:24 UTC — [ticket-386] testeur: OK (exit 0)
+- 2026-10-09 14:17:43 UTC — [ticket-386] securite: PASS — Audit de sécurité du diff pour le ticket-386 (gestion du budget par ticket en fi (18922ms)
+- 2026-10-09 14:17:43 UTC — [ticket-386] tour 1 — reviewer démarré
+- 2026-10-09 14:18:15 UTC — [ticket-386] validateur: APPROVED — Les cinq tests requis sont présents dans le diff et couvrent exhaustivement les  (31703ms)
+- 2026-10-09 14:19:00 UTC — [ticket-386] tour 1 — reviewer terminé (76921ms)
+- 2026-10-09 14:19:00 UTC — [ticket-386] APPROVED après 1 tour(s)
