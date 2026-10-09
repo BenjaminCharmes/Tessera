@@ -2028,3 +2028,14 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 12:36:51 UTC — [ticket-383] testeur: OK (exit 0)
 - 2026-10-09 12:37:55 UTC — [ticket-383] securite: BLOCK — A HIGH severity budget control bypass has been detected. The `budget_usd` parame (63858ms)
 - 2026-10-09 12:37:56 UTC — [ide-core] file interrompue : ticket-383 non approuvé
+- 2026-10-09 12:52:11 UTC — [ide-core] ticket-387 PR #337 confiée au CIWatcher
+- 2026-10-09 12:52:14 UTC — [ticket-388] branche ticket-388-a-subscription-session-limit-pauses-the-queue-and
+- 2026-10-09 12:52:14 UTC — [ticket-388] tour 1 — codeur démarré
+- 2026-10-09 12:54:21 UTC — [ticket-387] livraison: arrêt — PR #337 non mergée : CI none : la PR #337 reste ouverte.
+- 2026-10-09 12:57:30 UTC — [ticket-388] tour 1 — codeur terminé (315703ms)
+- 2026-10-09 13:01:20 UTC — [ticket-388] testeur: OK (exit 0)
+- 2026-10-09 13:01:43 UTC — [ticket-388] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une gestion de la limite de sessio (23688ms)
+- 2026-10-09 13:01:43 UTC — [ticket-388] tour 1 — reviewer démarré
+- 2026-10-09 13:02:55 UTC — [ticket-388] validateur: APPROVED — Le diff implémente tous les critères : la nouvelle fonction `finish_session_limi (71000ms)
+- 2026-10-09 13:03:53 UTC — [ticket-388] tour 1 — reviewer terminé (129061ms)
+- 2026-10-09 13:03:53 UTC — [ticket-388] APPROVED après 1 tour(s)
