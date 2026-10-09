@@ -1,14 +1,15 @@
 ---
-id: ticket-381
-title: "An agent process that stays silent too long is stopped, instead of holding its run and its project forever"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-08
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-08
+id: ticket-381
+pr_number: null
+priority: critical
+status: todo
+title: An agent process that stays silent too long is stopped, instead of holding
+  its run and its project forever
+type: fix
 ---
 
 # ticket-381 — Un agent resté silencieux trop longtemps est arrêté

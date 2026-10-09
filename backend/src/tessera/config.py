@@ -106,6 +106,11 @@ class Settings(BaseSettings):
     # `Bash` des agents. Lu depuis CLAUDE_CODE_GIT_BASH_PATH ; absent, le backend
     # tente de le déduire depuis l'emplacement de `git` au démarrage (ticket-319).
     claude_code_git_bash_path: str = ""
+    # Délai maximum entre deux messages consécutifs d'un agent (ticket-381).
+    # Borné par intervalle, pas par durée totale : une commande longue comme
+    # la suite de tests (≈ 6 min) peut rester muette sans être figée.
+    # 0 désactive la borne.
+    agent_silence_max_s: float = 1200.0
 
 
 settings = Settings()

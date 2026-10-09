@@ -1988,3 +1988,11 @@ Le code introduit une sé (44328ms)
 - 2026-10-08 15:20:20 UTC — [ticket-384] validateur: APPROVED — Tous les critères sont satisfaits par les tests ajoutés au diff. Les trois modif (395250ms)
 - 2026-10-08 15:20:20 UTC — [ticket-384] APPROVED après 1 tour(s)
 - 2026-10-08 15:24:00 UTC — [ticket-384] documentation: 4 fichier(s) (218765ms)
+- 2026-10-08 15:29:33 UTC — [ticket-381] branche ticket-381-an-agent-process-that-stays-silent-too-long-is-st
+- 2026-10-08 15:29:34 UTC — [ticket-381] tour 1 — codeur démarré
+- 2026-10-08 15:39:53 UTC — [ticket-381] tour 1 — codeur terminé (619656ms)
+- 2026-10-09 07:36:46 UTC — [ticket-381] testeur: délai dépassé, suite relancée
+- 2026-10-09 07:37:07 UTC — [ticket-381] testeur: pytest :
+- 2026-10-09 07:37:07 UTC — [ticket-381] tests rouges au tour 1
+- 2026-10-09 07:37:07 UTC — [ticket-381] tour 2 — codeur démarré
+- 2026-10-09 07:37:09 UTC — [ticket-381] INTERROMPU au tour 2 — ProcessError: Command failed with exit code 3221226091 (exit code: 3221226091) Error output: Check stderr output for details
