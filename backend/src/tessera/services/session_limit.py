@@ -2,7 +2,8 @@
 import re
 
 _SESSION_LIMIT_RE = re.compile(r"hit your session limit", re.IGNORECASE)
-_RESET_TIME_RE = re.compile(r"\bresets\s+(.+?)(?:\s*·|\s*$)", re.IGNORECASE)
+# Le CLI suffixe « (exit code: 1) » : l'heure s'arrête avant.
+_RESET_TIME_RE = re.compile(r"\bresets\s+(.+?)(?:\s*·|\s*\(exit code|\s*$)", re.IGNORECASE)
 _ARRET_RESET_RE = re.compile(r"\(reprise\s*:\s*(.+)\)$")
 
 

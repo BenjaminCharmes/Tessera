@@ -273,3 +273,14 @@ async def test_other_exception_keeps_blocked_behavior() -> None:
     assert orch._ticket_svc.statut is TicketStatus.blocked
     assert result.final_status is TicketStatus.blocked
     assert result.approved is False
+
+
+def test_extract_reset_time_ignores_exit_code_suffix() -> None:
+    # Message réel du CLI, relevé dans un pipeline-log le 2026-10-05.
+    message = (
+        "Claude Code returned an error result: You've hit your session limit"
+        " · resets 12:50pm (Europe/Paris) (exit code: 1)"
+    )
+
+    assert extract_reset_time(message) == "12:50pm (Europe/Paris)"
+
