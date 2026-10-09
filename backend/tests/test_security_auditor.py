@@ -241,6 +241,151 @@ class TestSecurityAuditResult:
         assert result.has_critical is False
 
 
+class TestIntroducedField:
+    """Tests for ticket-387 — only introduced issues trigger BLOCK."""
+
+    async def test_high_preexisting_does_not_block(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Un HIGH dans le contexte (code déjà mergé) ne doit pas bloquer le
+        # ticket courant : introduced: false signale un problème préexistant.
+        _set_response(
+            provider,
+            {
+                "verdict": "PASS",
+                "summary": "Context-only flaw, not introduced here.",
+                "issues": [
+                    {
+                        "severity": "HIGH",
+                        "type": "localStorage secret",
+                        "location": "auth.ts:12",
+                        "description": "Token stored in localStorage",
+                        "fix": "Use httpOnly cookie",
+                        "introduced": False,
+                    }
+                ],
+            },
+        )
+
+        result = await service.audit("+ localStorage.clear()", tmp_path)
+
+        assert result.verdict == "PASS"
+
+    async def test_high_introduced_blocks_even_when_verdict_is_pass(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Un HIGH introduced: true impose BLOCK même si l'auditeur a conclu PASS.
+        _set_response(
+            provider,
+            {
+                "verdict": "PASS",
+                "summary": "ok",
+                "issues": [
+                    {
+                        "severity": "HIGH",
+                        "type": "XSS",
+                        "location": "a.tsx:5",
+                        "description": "Unescaped HTML",
+                        "fix": "Escape output",
+                        "introduced": True,
+                    }
+                ],
+            },
+        )
+
+        result = await service.audit("+ dangerouslySetInnerHTML", tmp_path)
+
+        assert result.verdict == "BLOCK"
+        assert "HIGH" in result.reason
+
+    async def test_high_without_introduced_field_defaults_to_block(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Champ absent → True par défaut (échec fermé, ADR-039).
+        _set_response(
+            provider,
+            {
+                "verdict": "PASS",
+                "summary": "ok",
+                "issues": [
+                    {
+                        "severity": "HIGH",
+                        "type": "SQL Injection",
+                        "location": "db.py:10",
+                        "description": "Unsafe query",
+                        "fix": "Use parameterized queries",
+                        # pas de champ "introduced"
+                    }
+                ],
+            },
+        )
+
+        result = await service.audit("+ query = f'SELECT * FROM {id}'", tmp_path)
+
+        assert result.verdict == "BLOCK"
+
+    @pytest.mark.parametrize("valeur", [None, 0, "", "false"])
+    async def test_high_with_non_boolean_introduced_still_blocks(
+        self,
+        service: SecurityAuditorService,
+        provider: FakeProvider,
+        tmp_path: Path,
+        valeur: object,
+    ) -> None:
+        # Seul un False explicite exempte : null, 0, "" ou "false" bloquent.
+        _set_response(
+            provider,
+            {
+                "verdict": "PASS",
+                "summary": "ok",
+                "issues": [
+                    {
+                        "severity": "HIGH",
+                        "type": "SQL Injection",
+                        "location": "db.py:10",
+                        "description": "Unsafe query",
+                        "fix": "Use parameterized queries",
+                        "introduced": valeur,
+                    }
+                ],
+            },
+        )
+
+        result = await service.audit("+ query = f'SELECT * FROM {id}'", tmp_path)
+
+        assert result.verdict == "BLOCK"
+
+    async def test_preexisting_issue_included_in_result(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Un problème préexistant doit figurer dans issues pour être transmis
+        # au reviewer, même s'il ne bloque pas.
+        _set_response(
+            provider,
+            {
+                "verdict": "PASS",
+                "summary": "Preexisting flaw noted.",
+                "issues": [
+                    {
+                        "severity": "HIGH",
+                        "type": "localStorage secret",
+                        "location": "auth.ts:12",
+                        "description": "Token in localStorage",
+                        "fix": "Use httpOnly cookie",
+                        "introduced": False,
+                    }
+                ],
+            },
+        )
+
+        result = await service.audit("+ localStorage.clear()", tmp_path)
+
+        assert result.verdict == "PASS"
+        assert len(result.issues) == 1
+        assert result.issues[0].introduced is False
+        assert result.issues[0].severity == "HIGH"
+
+
 class TestAuditWithLeadingJsonObject:
     """Tests for ticket-371 — audit skips JSON objects that lack the verdict key."""
 

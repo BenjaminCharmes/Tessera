@@ -325,6 +325,9 @@ en `blocked/` et le reviewer n'est même pas appelé.
 
 ---
 
+
+L'audit de sécurité vérifie uniquement les lignes que tu ajoutes. Si tu modifies un fichier qui contient déjà une faille de sécurité, elle ne t'arrête pas : elle est signalée au reviewer, mais n'a pas d'effet sur ton ticket. Tu n'es responsable que du code que tu écris.
+
 ### Si le validateur refuse
 
 Si tu as écrit un ticket `feat`, `fix` ou `refactor` sans section `## Critères d'acceptation`, le validateur refuse et te demande d'en ajouter une. C'est voulu : rien ne peut être validé sans critères d'acceptation.

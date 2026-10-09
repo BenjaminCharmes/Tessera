@@ -2028,3 +2028,13 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 12:36:51 UTC — [ticket-383] testeur: OK (exit 0)
 - 2026-10-09 12:37:55 UTC — [ticket-383] securite: BLOCK — A HIGH severity budget control bypass has been detected. The `budget_usd` parame (63858ms)
 - 2026-10-09 12:37:56 UTC — [ide-core] file interrompue : ticket-383 non approuvé
+- 2026-10-09 12:42:06 UTC — [ticket-387] branche ticket-387-the-security-audit-blocks-only-on-what-the-ticket
+- 2026-10-09 12:42:07 UTC — [ticket-387] tour 1 — codeur démarré
+- 2026-10-09 12:45:12 UTC — [ticket-387] tour 1 — codeur terminé (185577ms)
+- 2026-10-09 12:48:52 UTC — [ticket-387] testeur: OK (exit 0)
+- 2026-10-09 12:49:09 UTC — [ticket-387] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une clarification du prompt de séc (16547ms)
+- 2026-10-09 12:49:09 UTC — [ticket-387] tour 1 — reviewer démarré
+- 2026-10-09 12:49:38 UTC — [ticket-387] validateur: APPROVED — Tous les critères sont satisfaits. Le prompt `securite.md` a été enrichi pour dé (28703ms)
+- 2026-10-09 12:50:16 UTC — [ticket-387] tour 1 — reviewer terminé (66734ms)
+- 2026-10-09 12:50:16 UTC — [ticket-387] APPROVED après 1 tour(s)
+- 2026-10-09 12:51:56 UTC — [ticket-387] documentation: 1 fichier(s) (98547ms)

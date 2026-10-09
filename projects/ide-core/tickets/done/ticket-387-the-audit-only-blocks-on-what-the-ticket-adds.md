@@ -1,14 +1,15 @@
 ---
-id: ticket-387
-title: "The security audit blocks only on what the ticket adds; a flaw already merged is reported without blocking"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-08
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-08
+id: ticket-387
+pr_number: 337
+priority: high
+status: done
+title: The security audit blocks only on what the ticket adds; a flaw already merged
+  is reported without blocking
+type: fix
 ---
 
 # ticket-387 — L'audit ne bloque que sur ce que le ticket ajoute
