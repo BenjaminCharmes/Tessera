@@ -1062,6 +1062,176 @@ async def test_merge_without_ci_sync_base_depuis_distant_appele(
     assert sync_appels == ["main"]
 
 
+# ------------------------------------------------------------------
+# ticket-390 — arbre propre après tout run, livré ou non
+# ------------------------------------------------------------------
+
+
+async def test_queue_unapproved_retourne_sur_base_apres_file_interrompue(
+    tmp_path: Path,
+) -> None:
+    """Criterion 1 (ticket-390): after a queue stopped by an unapproved ticket,
+    retourner_sur_base is called with the base branch after the 'file
+    interrompue' line has been written to the pipeline log."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    log_path = tmp_path / "memory" / "log.md"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    checkout_calls: list[str] = []
+
+    git_ws = AsyncMock()
+
+    async def _retourner(branch: str) -> None:
+        # Pipeline-log must already contain 'file interrompue' at this point.
+        log_content = log_path.read_text(encoding="utf-8")
+        assert "file interrompue" in log_content, (
+            f"'file interrompue' not yet logged when retourner_sur_base was called:\n"
+            f"{log_content}"
+        )
+        checkout_calls.append(branch)
+
+    git_ws.retourner_sur_base.side_effect = _retourner
+
+    tickets = AsyncMock()
+    tickets.get_ticket.return_value = None
+
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001", approuve=False)],
+        runner=MagicMock(),
+        ticket_service=tickets,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=log_path,
+        git_workspace=git_ws,
+        base_branch="main",
+    )
+
+    await orch.run_queue("proj", ["ticket-001"])
+
+    assert checkout_calls == ["main"], (
+        f"retourner_sur_base must be called once with 'main', got: {checkout_calls}"
+    )
+
+
+async def test_livraison_sans_pr_appelle_commit_bookkeeping_puis_retour_base(
+    tmp_path: Path,
+) -> None:
+    """Criterion 2 (ticket-390): a delivery stopped without a PR (conflict)
+    calls commit_bookkeeping then retourner_sur_base."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    calls: list[str] = []
+    git_ws = AsyncMock()
+    git_ws.commit_bookkeeping.side_effect = lambda: calls.append("commit")
+    git_ws.retourner_sur_base.side_effect = (
+        lambda branch: calls.append(f"checkout:{branch}")
+    )
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        # Delivery stopped on conflict — no PR opened.
+        return Livraison(arret="Conflit sur rebase — aucune PR ouverte")
+
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001")],
+        runner=MagicMock(),
+        ticket_service=AsyncMock(**{"get_ticket.return_value": None}),
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        git_workspace=git_ws,
+        base_branch="main",
+        livrer=_livrer,
+    )
+
+    await orch.run_pipeline("proj", "ticket-001", _rien)
+
+    assert "commit" in calls, "commit_bookkeeping was not called"
+    assert "checkout:main" in calls, "retourner_sur_base was not called with 'main'"
+    assert calls.index("commit") < calls.index("checkout:main"), (
+        "commit_bookkeeping must be called before retourner_sur_base"
+    )
+
+
+async def test_exception_retourner_sur_base_ne_fait_pas_echouer_le_run(
+    tmp_path: Path,
+) -> None:
+    """Criterion 3 (ticket-390): an exception from retourner_sur_base does not
+    cause run_pipeline to raise."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    git_ws = AsyncMock()
+    git_ws.retourner_sur_base.side_effect = RuntimeError("git checkout failed")
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(arret="Conflit sur rebase")
+
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001")],
+        runner=MagicMock(),
+        ticket_service=AsyncMock(**{"get_ticket.return_value": None}),
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        git_workspace=git_ws,
+        base_branch="main",
+        livrer=_livrer,
+    )
+
+    # Must not raise — the run itself was approved.
+    result = await orch.run_pipeline("proj", "ticket-001", _rien)
+    assert result.approved
+
+
+async def test_file_interrompue_est_commitee_dans_bookkeeping(
+    depot_avec_distant: tuple[Path, Path],
+) -> None:
+    """Criterion 4 (ticket-390): the 'file interrompue' line is committed in
+    the last bookkeeping commit on the ticket branch; no modification of
+    memory/pipeline-log.md remains uncommitted after the queue ends."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    local, _ = depot_avec_distant
+    git_ws = GitWorkspaceService(local)
+
+    log_path = local / "memory" / "pipeline-log.md"
+
+    tickets = AsyncMock()
+    tickets.get_ticket.return_value = None
+
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001", approuve=False)],
+        runner=MagicMock(),
+        ticket_service=tickets,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=log_path,
+        git_workspace=git_ws,
+        base_branch="main",
+    )
+
+    await orch.run_queue("proj", ["ticket-001"])
+
+    # After cleanup, the working tree must be on the base branch.
+    current_branch = await _git_out(local, "rev-parse", "--abbrev-ref", "HEAD")
+    assert current_branch == "main", (
+        f"Expected branch 'main' after queue, got: {current_branch!r}"
+    )
+
+    # The 'file interrompue' line must be committed on the ticket branch.
+    committed_log = await _git_out(
+        local, "show", "ticket-001-slug:memory/pipeline-log.md"
+    )
+    assert "file interrompue" in committed_log, (
+        f"'file interrompue' not found in last commit of ticket-001-slug:\n"
+        f"{committed_log}"
+    )
+
+    # No uncommitted tracked changes anywhere.
+    status = await _git_out(local, "status", "--porcelain", "--untracked-files=no")
+    assert status == "", f"Working tree must be clean after queue, got: {status!r}"
+
+
 async def test_merge_without_ci_timeout_continue_et_log(
     tmp_path: Path,
 ) -> None:

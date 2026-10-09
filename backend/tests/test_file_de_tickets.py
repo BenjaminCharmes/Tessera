@@ -32,6 +32,10 @@ class _OrchestrateurFile:
         # l'inverse posent leur propre service (ticket-115).
         self._ticket_svc = _ServiceTickets({})
         self._est_termine = Orchestrator._est_termine.__get__(self)  # type: ignore[attr-defined]
+        # Aucun espace git dans ce double : le nettoyage est un no-op (ticket-390).
+        self._git_workspace = None
+        self._base_branch = None
+        self._nettoyer_apres_file = Orchestrator._nettoyer_apres_file.__get__(self)  # type: ignore[attr-defined]
 
     async def run_pipeline(
         self, project_id, ticket_id, on_event, run_id=None, dialogue=None,

@@ -166,6 +166,10 @@ class _OrchFile:
         self._ticket_svc = _ServiceTickets({})
         self._est_termine = Orchestrator._est_termine.__get__(self)  # type: ignore[attr-defined]
         self._ci_watcher = None
+        # Aucun espace git dans ce double : le nettoyage est un no-op (ticket-390).
+        self._git_workspace = None
+        self._base_branch = None
+        self._nettoyer_apres_file = Orchestrator._nettoyer_apres_file.__get__(self)  # type: ignore[attr-defined]
 
     def _log(self, message: str) -> None:
         self._log_lines.append(message)
