@@ -73,9 +73,12 @@ class _FakeGitHub:
         pr_number: int,
         method: str = "squash",
         commit_title: str | None = None,
+        attente_fusionnabilite_max_s: float = 300.0,
     ) -> None:
         self.merged.append(pr_number)
-        self.merge_calls.append({"pr_number": pr_number, "method": method})
+        self.merge_calls.append(
+            {"pr_number": pr_number, "method": method, "attente": attente_fusionnabilite_max_s}
+        )
 
 
 def _projet(tmp_path: Path, niveau: str | None) -> Path:
@@ -571,3 +574,26 @@ async def test_merge_method_inconnu_retombe_sur_squash(tmp_path: Path) -> None:
 
     assert await svc.merge_si_la_ci_est_verte(7) is True
     assert github.merge_calls[0]["method"] == "squash"
+
+
+async def test_attente_fusionnabilite_vient_des_reglages(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # ATTENTE_FUSIONNABILITE_MAX_S est documentée : elle doit atteindre le merge.
+    from tessera.config import settings
+
+    monkeypatch.setattr(settings, "attente_fusionnabilite_max_s", 42.0)
+    github = _FakeGitHub(ci_status="passing")
+    from tessera.services.politique_run import PolitiqueRun
+
+    projet = _projet_merge_method(tmp_path, {})
+    svc = GitHubWorkflowService(
+        git_workspace=_FakeGit(),
+        github=github,
+        base_branch="develop",
+        project_path=projet,
+        politique=PolitiqueRun.lire(projet),
+    )
+
+    assert await svc.merge_si_la_ci_est_verte(7) is True
+    assert github.merge_calls[0]["attente"] == 42.0
