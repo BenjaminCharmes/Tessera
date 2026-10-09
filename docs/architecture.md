@@ -525,6 +525,18 @@ actuel au message du validateur, dans une section distincte du diff. Cette secti
 Le prompt du validateur (`agents/prompts/validateur.md`) l'instruit sur cette section 
 et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas être refusé.
 
+## Gestion des limites de session
+
+Quand l'abonnement Claude atteint sa limite horaire, le CLI répond : « You've hit your session limit · resets <heure> ». Avant, le pipeline traitait cette erreur comme toute exception : le ticket passait en `blocked`, bloquant le projet.
+
+Depuis le ticket-388, une erreur de limite de session provoque :
+1. Le ticket en cours repasse en `todo` (son travail reste commité comme non approuvé)
+2. La file s'arrête **avant** le ticket suivant
+3. Un événement est émis portant `session_limit` comme raison et l'heure de reprise
+4. Un log dans `memory/pipeline-log.md` : `[<projet>] file interrompue : limite de session (reprise : <heure>)`
+
+Contrairement à `blocked`, `todo` ne bloque pas le projet. La file peut reprendre après l'heure indiquée. Aucun ticket n'est abîmé.
+
 ## Documentation par lot (ADR-035, ticket-292)
 
 Après approbation, le pipeline met à jour la documentation technique et fonctionnelle 
@@ -937,6 +949,14 @@ Un mode file traite plusieurs tickets en séquence. Le pipeline enregistre l'his
 ### Rejouer un run fermé sans dupliquer le texte
 
 Quand un utilisateur revient à un run depuis la Supervision, le serveur rejoue le contenu textuel accumulé. Un aller-retour entre deux runs recevrait le même rejeu deux fois. Pour prévenir une duplication visible, le client traite les événements replayed de manière à garder une trace fidèle du texte — ni doublon, ni perte.
+
+### Gestion du budget en file
+
+En mode autonome (un seul ticket), le plafond d'un run est `RUN_MAX_BUDGET_USD` (5$ par défaut). En mode file (plusieurs tickets), le plafond s'étend : `RUN_MAX_BUDGET_USD` × nombre de tickets de la file. Cela évite qu'une file longue s'arrête prématurément sur un plafond pensé pour le mode autonome.
+
+Une requête peut surcharger ce calcul en fixant `budget_usd` : ce montant devient le plafond pour ce run, en autonome comme en file.
+
+Quand le plafond est atteint, le run s'arrête et émet un événement portant `budget` comme raison.
 
 ## Gestion de l'état du frontend — store des runs (ticket-354)
 

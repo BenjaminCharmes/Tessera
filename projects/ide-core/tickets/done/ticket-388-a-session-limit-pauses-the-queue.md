@@ -1,14 +1,15 @@
 ---
-id: ticket-388
-title: "A subscription session limit pauses the queue and returns the ticket to todo, instead of blocking ticket after ticket"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-08
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-08
+id: ticket-388
+pr_number: null
+priority: high
+status: done
+title: A subscription session limit pauses the queue and returns the ticket to todo,
+  instead of blocking ticket after ticket
+type: fix
 ---
 
 # ticket-388 — Une limite de session met la file en pause au lieu de bloquer les tickets
