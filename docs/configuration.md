@@ -32,6 +32,15 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
 
+## Budget et limites
+
+En file, Tessera applique deux contrôles de budget :
+
+- **Par ticket** (entre deux tours) : la dépense du ticket courant ne doit pas dépasser `RUN_MAX_BUDGET_USD`. Si ce seuil est atteint, le ticket repasse en `todo` avec raison « budget » et sort de la file (ticket-386).
+- **Par file** (entre deux tickets) : la dépense cumulée de tous les tickets ne doit pas dépasser `RUN_MAX_BUDGET_USD` × nombre de tickets (ou la valeur de `budget_usd` si fixée dans la requête). Si ce seuil est atteint, la file s'arrête.
+
+Le message d'arrêt affiche toujours le montant dépensé et le plafond, par exemple `file interrompue : plafond de dépense (15,24 $ / 15,00 $)` (ticket-386).
+
 ## `STATIC_TOKEN`
 
 Renseigné, le token protège chaque route, `OPTIONS` (préflight CORS) et
