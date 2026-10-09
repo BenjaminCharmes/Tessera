@@ -4,7 +4,7 @@ created: 2026-10-08
 depends_on: []
 estimated_days: 0.5
 id: ticket-387
-pr_number: null
+pr_number: 337
 priority: high
 status: done
 title: The security audit blocks only on what the ticket adds; a flaw already merged
