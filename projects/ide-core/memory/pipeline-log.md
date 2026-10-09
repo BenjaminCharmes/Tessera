@@ -2038,3 +2038,9 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 12:50:16 UTC — [ticket-387] tour 1 — reviewer terminé (66734ms)
 - 2026-10-09 12:50:16 UTC — [ticket-387] APPROVED après 1 tour(s)
 - 2026-10-09 12:51:56 UTC — [ticket-387] documentation: 1 fichier(s) (98547ms)
+- 2026-10-09 13:08:00 UTC — [ticket-388] livraison: arrêt — Conflit avec develop sur : projects/ide-core/tickets/done/ticket-387-the-audit-only-blocks-on-what-t
+- 2026-10-09 13:08:01 UTC — [ticket-377] branche ticket-377-a-queue-that-dies-writes-it-in-the-pipeline-log-a
+- 2026-10-09 13:08:02 UTC — [ticket-377] tour 1 — codeur démarré
+- 2026-10-09 13:11:45 UTC — [ticket-377] tour 1 — codeur terminé (223390ms)
+- 2026-10-09 13:15:51 UTC — [ticket-377] testeur: OK (exit 0)
+- 2026-10-09 13:17:20 UTC — [ticket-377] securite: BLOCK — A HIGH severity path traversal vulnerability was introduced in the _log_pipeline (88905ms)
