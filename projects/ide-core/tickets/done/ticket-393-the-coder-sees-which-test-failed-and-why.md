@@ -4,7 +4,7 @@ created: 2026-10-09
 depends_on: []
 estimated_days: 1
 id: ticket-393
-pr_number: null
+pr_number: 346
 priority: high
 status: done
 title: The coder sees which test failed and why, and the log shows the real test summary
