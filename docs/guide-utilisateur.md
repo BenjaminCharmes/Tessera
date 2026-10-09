@@ -383,6 +383,10 @@ Pour que le ticket soit approuvé, le reviewer **et** le validateur doivent tous
 
 Quand tu vois la ligne « testeur: en attente d'un créneau de test » dans le log, cela signifie qu'un autre testeur utilise le créneau de tests (limité à `MAX_PARALLEL_TEST_RUNS` tests simultanés). Le testeur actuel attend son tour, mais cette attente n'affecte pas le timeout — seul le temps réel d'exécution du test compte.
 
+### Quand une file s'arrête
+
+Une file arrêtée par une exception (timeout, saturation de ressources, etc.) écrit une ligne dans le journal du pipeline : `[projet] file interrompue : motif de l'erreur`. Tu peux voir l'arrêt immédiatement dans l'IDE, au même endroit que les autres interruptions (refus d'audit, dépassement de budget, limite de session). Tu n'as pas besoin de chercher dans les logs du serveur.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -564,6 +568,8 @@ Un run terminé laisse toujours ton arbre git propre. La copie de travail revien
 
 Tu peux lancer le ticket suivant sans nettoyer après toi. Le travail du run précédent reste sur sa branche dédiée (`ticket-XXX`) si tu veux le consulter plus tard.
 
+
+Cela s'applique **même si le run n'a pas ouvert de PR** — que le run soit refusé à l'audit, interrompu, ou n'ait pas généré de changements. Le journal du pipeline est toujours commité sur la branche de base, et tu te retrouves sur cette branche, pas sur celle du ticket. La branche du ticket, elle, garde son dernier commit ; si tu dois relancer le ticket, tu auras à faire un `git checkout ticket-…` pour y revenir.
 
 ### Si une PR ne peut pas se fusionner
 

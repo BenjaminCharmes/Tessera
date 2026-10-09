@@ -705,6 +705,7 @@ class Orchestrator:
                     break
 
         self._in_queue = False
+        await self._nettoyer_apres_file()
         return results
 
     async def run_autonomous(
@@ -891,21 +892,22 @@ class Orchestrator:
             )
 
     async def _finaliser_livraison(self, livraison: "Livraison") -> None:
-        """Commit delivery log lines and return to the base branch (ticket-378).
+        """Commit delivery log lines and return to the base branch (ticket-378, ticket-390).
 
-        Called after a successful delivery (PR opened). The log lines written
-        just before this call are in ``pipeline-log.md`` but not yet committed;
-        ``commit_bookkeeping`` picks them up so they appear in the last commit
-        of the ticket branch.  Checking out the base branch then leaves the
-        working tree clean, matching ADR-018.
+        Called after any delivery attempt, whether or not a PR was opened. The
+        log lines written just before this call are in ``pipeline-log.md`` but
+        not yet committed; ``commit_bookkeeping`` picks them up so they appear
+        in the last commit of the ticket branch.  Checking out the base branch
+        then leaves the working tree clean, matching ADR-018.
 
         Errors are logged and swallowed: a failure here must not undo an
         already-opened PR.
         """
-        if self._git_workspace is None or livraison.pr_number is None:
+        if self._git_workspace is None:
             return
         try:
-            await self._git_workspace.commit_bookkeeping()
+            if not await self._sur_la_base():
+                await self._git_workspace.commit_bookkeeping()
         except Exception as exc:  # noqa: BLE001
             _logger.warning("livraison_bookkeeping_failed", extra={"error": str(exc)})
         if self._base_branch is None:
@@ -914,6 +916,44 @@ class Orchestrator:
             await self._git_workspace.retourner_sur_base(self._base_branch)
         except Exception as exc:  # noqa: BLE001
             _logger.warning("livraison_checkout_base_failed", extra={"error": str(exc)})
+
+    async def _nettoyer_apres_file(self) -> None:
+        """Commit remaining log lines and return to the base branch after a queue.
+
+        The 'file interrompue' lines written after the last ticket's own
+        bookkeeping commit modify pipeline-log.md but are not yet committed.
+        This method ensures nothing stays uncommitted, and the working tree is
+        left on the base branch regardless of how the queue ended (ticket-390).
+
+        Errors are logged and swallowed: a cleanup failure must not mask the
+        queue's own result.
+        """
+        if self._git_workspace is None or self._base_branch is None:
+            return
+        try:
+            if not await self._sur_la_base():
+                await self._git_workspace.commit_bookkeeping()
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("queue_bookkeeping_failed", extra={"error": str(exc)})
+        try:
+            await self._git_workspace.retourner_sur_base(self._base_branch)
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("queue_checkout_base_failed", extra={"error": str(exc)})
+
+    async def _sur_la_base(self) -> bool:
+        """True when the working tree is already on the base branch.
+
+        Bookkeeping is never committed there: a local commit on the base
+        branch would diverge it from the remote (no direct commit on develop
+        or main). The lines stay in the tree and ride with the next ticket's
+        branch, as before ticket-390.
+        """
+        if self._git_workspace is None or self._base_branch is None:
+            return False
+        branche_courante = getattr(self._git_workspace, "branche_courante", None)
+        if branche_courante is None:
+            return False
+        return bool(await branche_courante() == self._base_branch)
 
     def _log(self, message: str) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")

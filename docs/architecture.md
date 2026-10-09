@@ -298,6 +298,10 @@ Pour chaque run interrompu, si la copie de travail du projet est restée sur une
 
 Si la copie de travail est sur une autre branche, aucune action n'est prise. Les erreurs git durant cette reprise sont loggées sans exception : un problème au redémarrage ne doit jamais bloquer le backend.
 
+### Intégrité de la fiche lors de la reprise (ticket-377)
+
+Quand une branche de ticket est reprise au démarrage, sa fiche est validée. Si le ticket a été déplacé de `tickets/todo/` vers `tickets/in-progress/` ou `tickets/in-review/` mais que ce déplacement n'a pas été committé (fichier non suivi), la reprise ajoute explicitement le fichier au commit « unapproved work ». Seule la fiche du ticket est ajoutée ; aucun autre fichier non suivi ne peut y entrer.
+
 ### Dialogue pendant un run (ADR-025)
 
 `DialogueChannel` porte les deux sens du dialogue sans rien savoir du
@@ -744,6 +748,18 @@ Après la livraison d'un run, le dépôt local finit dans un état garanti :
 
 Cela permet d'enchaîner plusieurs runs sans accumulation d'état en attente de nettoyage manuel.
 
+
+### Finalisation de tous les runs et journalisation des défaillances (tickets-377, 390)
+
+Après ticket-378, les tickets-377 et 390 étendent le nettoyage et la journalisation à tous les runs.
+
+Quand une file ou un run s'arrête sur une exception, une ligne `[<projet>] file interrompue : <erreur>` est écrite dans `memory/pipeline-log.md` du projet pour le rendre visible dans l'IDE (ticket-377).
+
+À la fin de tout run — qu'il aboutisse à une livraison, qu'il échoue en cours ou en fin de file — deux étapes finales sont franchies (ticket-390) :
+1. `commit_bookkeeping()` — le journal du pipeline, les coûts et autres fichiers de suivi sont committés
+2. `retourner_sur_base(base_branch)` — l'arbre revient sur sa branche de base
+
+Les erreurs levées par ces étapes sont journalisées sans interrompre le run. Le retour ne touche pas à la branche du ticket : son commit reste où il est pour relecture future.
 
 ### Attente de fusionnabilité et gestion des dépendances (ticket-384)
 
