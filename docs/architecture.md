@@ -725,6 +725,18 @@ Quand le statut `mergeable` d'une PR n'est pas encore calculé par GitHub (valeu
 
 **Dépendances interrompues** : Si un ticket A n'a pas été mergé, les tickets qui en dépendent ne sont pas lancés. La file s'arrête avec le message `[<projet>] file interrompue : <ticket> non mergé`. Résolvez A avant de relancer la file.
 
+### Attente du merge pour les projets merge_without_ci (ticket-382)
+
+Sur un projet déclarant `merge_without_ci: true` (merge sans attendre la CI), le pipeline évite les conflits de rebase en file.
+
+Quand le projet est configuré pour fusionner sans CI, la file **attend le merge** du ticket courant avant de lancer le ticket suivant, indépendamment de ses dépendances déclarées. Un plafond `ATTENTE_MERGE_MAX_S` (600 secondes par défaut) prévient une attente infinie : au-delà de ce délai, le ticket suivant démarre et le fichier de log enregistre l'abandon.
+
+Après le merge du ticket précédent (ou l'expiration du plafond), la base du ticket suivant est réalignée sur la base distante (`sync_base_depuis_distant`) avant la création de sa branche. Cette réalignement garantit que le nouveau ticket part du dernier état du dépôt distant.
+
+Cette mécanique prévient les conflits causés par plusieurs tickets qui réécrivent les mêmes fichiers — en particulier `memory/architecture.md` et les guides de documentation — sans voir le changement du ticket précédent, qui a déjà fusionné.
+
+Pour les projets avec une vraie CI, le comportement reste inchangé : le ticket suivant démarre sans attendre le merge (ADR-051) et n'attend que ses dépendances explicites (`depends_on`).
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).

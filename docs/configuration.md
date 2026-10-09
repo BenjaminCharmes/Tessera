@@ -22,6 +22,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
 | `ATTENTE_FUSIONNABILITE_MAX_S` | | `300` | Délai maximum d'attente pour le calcul du statut fusionnable d'une PR avant abandon de la tentative de merge (en secondes, ticket-384) |
+| `ATTENTE_MERGE_MAX_S` | | `600` | Pour les projets avec `merge_without_ci: true`, délai maximum d'attente du merge du ticket précédent avant de lancer le ticket suivant d'une file (en secondes, ticket-382) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | URL du serveur Ollama pour les modèles locaux (rôles de jugement uniquement) |
