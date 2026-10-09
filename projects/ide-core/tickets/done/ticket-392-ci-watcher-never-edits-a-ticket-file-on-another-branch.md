@@ -4,7 +4,7 @@ created: 2026-10-09
 depends_on: []
 estimated_days: 0.5
 id: ticket-392
-pr_number: null
+pr_number: 342
 priority: high
 status: done
 title: CIWatcher never edits a ticket file in the working tree when it blocks a PR
