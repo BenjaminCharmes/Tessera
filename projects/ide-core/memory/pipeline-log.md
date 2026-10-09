@@ -2114,3 +2114,8 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 15:01:18 UTC — [ticket-393] tour 2 — reviewer terminé (81734ms)
 - 2026-10-09 15:01:18 UTC — [ticket-393] APPROVED après 2 tour(s)
 - 2026-10-09 15:04:10 UTC — [ticket-393] documentation: 2 fichier(s) (169625ms)
+- 2026-10-09 14:22:46 UTC — [ticket-386] livraison: arrêt — Conflit avec develop sur : backend/src/tessera/services/orchestrator.py. La branche est restée intac
+- 2026-10-09 14:22:47 UTC — [ticket-391] branche ticket-391-the-delivery-rebase-merges-the-pipeline-log-and-t
+- 2026-10-09 14:22:47 UTC — [ticket-391] tour 1 — codeur démarré
+- 2026-10-09 14:29:55 UTC — [ticket-391] tour 1 — codeur terminé (427577ms)
+- 2026-10-09 14:29:55 UTC — [ticket-391] ARRÊTÉ par l'utilisateur au tour 1
