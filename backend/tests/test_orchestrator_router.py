@@ -154,3 +154,25 @@ def test_le_codeur_n_a_pas_de_budget_specifique() -> None:
 def test_plan_et_reviewer_ont_des_budgets_distincts() -> None:
     # Régression : avant ticket-297 les deux recevaient llm_max_turns_reviewer.
     assert _tours_du_role(ROLE_PLAN) != _tours_du_role("reviewer")
+
+
+async def test_build_orchestrator_passes_merge_without_ci(tmp_path: Path) -> None:
+    """Ticket-382 — the queue waits for the previous merge only if the
+    factory actually forwards the project's merge_without_ci flag."""
+    _make_minimal_project(tmp_path, "mon-projet")
+    (tmp_path / "mon-projet" / "agents.json").write_text(
+        '{"agents": [], "merge_without_ci": true}', encoding="utf-8"
+    )
+
+    orchestrator = await _build_orchestrator("mon-projet")
+
+    assert orchestrator._merge_without_ci is True
+    assert orchestrator._attente_merge_max_s == settings.attente_merge_max_s
+
+
+async def test_build_orchestrator_merge_without_ci_off_by_default(tmp_path: Path) -> None:
+    _make_minimal_project(tmp_path, "mon-projet")
+
+    orchestrator = await _build_orchestrator("mon-projet")
+
+    assert orchestrator._merge_without_ci is False

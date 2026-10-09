@@ -1,14 +1,15 @@
 ---
-id: ticket-382
-title: "On a project that merges without CI, the next ticket of a queue starts from the base that holds the previous ticket"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-08
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-08
+id: ticket-382
+pr_number: null
+priority: high
+status: done
+title: On a project that merges without CI, the next ticket of a queue starts from
+  the base that holds the previous ticket
+type: fix
 ---
 
 # ticket-382 — Le ticket suivant part de la base qui contient le précédent

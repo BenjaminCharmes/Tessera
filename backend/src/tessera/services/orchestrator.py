@@ -77,6 +77,8 @@ class Orchestrator:
         ] = None,
         ci_watcher: Optional[Any] = None,
         base_branch: Optional[str] = None,
+        merge_without_ci: bool = False,
+        attente_merge_max_s: float = 600.0,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -122,6 +124,13 @@ class Orchestrator:
         # La branche de base du projet — utilisée pour y revenir après livraison
         # (ticket-378). None quand l'orchestrateur tourne sans git workspace.
         self._base_branch = base_branch
+        # Sur un projet merge_without_ci: true, le merge suit la PR de quelques
+        # secondes. La file attend ce signal avant de laisser le ticket suivant
+        # créer sa branche, pour qu'il parte d'une base à jour (ticket-382).
+        self._merge_without_ci = merge_without_ci
+        # Durée maximale d'attente du merge en secondes. Passé ce délai, la file
+        # continue sans réalignement plutôt que de bloquer indéfiniment.
+        self._attente_merge_max_s = attente_merge_max_s
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -544,22 +553,30 @@ class Orchestrator:
             ):
                 restants = ticket_ids[index:]
                 if self._ci_watcher is not None:
-                    stop = await _attendre_si_dependant(
-                        self._ticket_svc,
-                        self._ci_watcher,
-                        project_id,
-                        ticket_id,
-                        restants,
-                    )
-                    if stop:
-                        self._log(
-                            f"[{project_id}] file interrompue : {ticket_id} non mergé"
+                    if self._merge_without_ci and restants:
+                        # merge_without_ci : attendre le merge pour TOUS les
+                        # tickets suivants, qu'ils en dépendent ou non — puis
+                        # réaligner la base distante avant la création de la
+                        # branche du ticket suivant (ticket-382).
+                        # Sans ticket restant, l'attente n'apporte rien.
+                        await self._attendre_merge_et_syncer(project_id, ticket_id)
+                    else:
+                        stop = await _attendre_si_dependant(
+                            self._ticket_svc,
+                            self._ci_watcher,
+                            project_id,
+                            ticket_id,
+                            restants,
                         )
-                        break
-                    self._log(
-                        f"[{project_id}] {ticket_id} PR #{result.livraison.pr_number}"
-                        " confiée au CIWatcher"
-                    )
+                        if stop:
+                            self._log(
+                                f"[{project_id}] file interrompue : {ticket_id} non mergé"
+                            )
+                            break
+                        self._log(
+                            f"[{project_id}] {ticket_id} PR #{result.livraison.pr_number}"
+                            " confiée au CIWatcher"
+                        )
                 else:
                     livraison_bloquee = await _trouver_bloquant(
                         self._ticket_svc,
@@ -737,6 +754,47 @@ class Orchestrator:
                         "tronque": tronque,
                     },
                 )
+            )
+
+    async def _attendre_merge_et_syncer(
+        self,
+        project_id: str,
+        ticket_id: str,
+    ) -> None:
+        """Wait for the merge then realign the local base from the remote.
+
+        Called from run_queue when merge_without_ci is True, for every
+        subsequent ticket regardless of depends_on. A timeout logs a warning
+        and lets the queue continue without sync — better a possible conflict
+        (which resolveur-conflit can handle) than a frozen queue (ticket-382).
+        """
+        assert self._ci_watcher is not None
+        try:
+            merged = await asyncio.wait_for(
+                self._ci_watcher.attendre_merge(project_id, ticket_id),
+                timeout=self._attente_merge_max_s,
+            )
+        except asyncio.TimeoutError:
+            self._log(
+                f"[{project_id}] {ticket_id} : délai d'attente du merge dépassé"
+                f" ({self._attente_merge_max_s:.0f}s) — ticket suivant sans réalignement"
+            )
+            return
+
+        if not merged:
+            return
+
+        if self._git_workspace is None or self._base_branch is None:
+            return
+
+        raison = await self._git_workspace.sync_base_depuis_distant(self._base_branch)
+        if raison is not None:
+            self._log(
+                f"[{project_id}] {ticket_id} : réalignement de la base ignoré — {raison}"
+            )
+        else:
+            self._log(
+                f"[{project_id}] {ticket_id} : base réalignée sur {self._base_branch}"
             )
 
     async def _finaliser_livraison(self, livraison: "Livraison") -> None:

@@ -111,6 +111,9 @@ class Settings(BaseSettings):
     # la suite de tests (≈ 6 min) peut rester muette sans être figée.
     # 0 désactive la borne.
     agent_silence_max_s: float = 1200.0
+    # Sur un projet merge_without_ci, délai maximum d'attente du merge du
+    # ticket précédent avant de lancer le suivant d'une file (ticket-382).
+    attente_merge_max_s: float = 600.0
 
 
 settings = Settings()
