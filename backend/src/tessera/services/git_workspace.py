@@ -81,33 +81,29 @@ def _is_orchestrator_artifact_path(path: str) -> bool:
     file entries match exactly, so ``memory/pipeline-log.md`` does not
     accidentally match ``memory/pipeline-log.md.bak``.
 
-    Both project-root-relative paths (``tickets/done/ticket-001.md``) and
-    repository-root-relative paths (``projects/p/tickets/done/ticket-001.md``)
-    are matched, to handle ``git_root: ancestor`` projects where
-    ``git diff --name-only`` outputs paths from the repository root.
+    Paths are relative to the project: callers holding repository-root paths
+    (``git diff --name-only`` under ``git_root: ancestor``) strip the project
+    prefix first (``_relatif_au_projet``), so that a ``tickets/`` folder
+    elsewhere in the repository is never taken for Tessera's own.
     """
     for artifact in _ORCHESTRATOR_ARTIFACT_PATHS:
         if artifact.endswith("/"):
-            # Match "tickets/..." (project at root) or ".../tickets/..." (ancestor).
-            if path.startswith(artifact) or f"/{artifact}" in path:
+            if path.startswith(artifact):
                 return True
-        else:
-            # Match exact path (root) or "…/memory/pipeline-log.md" (ancestor).
-            if path == artifact or path.endswith(f"/{artifact}"):
-                return True
+        elif path == artifact:
+            return True
     return False
 
 
-def _is_journal_union_file(path: str) -> bool:
-    """True when ``path`` is a journal file eligible for automatic union resolution.
+def _relatif_au_projet(chemin: str, prefixe: str) -> str | None:
+    """Repository-root path → project-relative path, or None outside the project.
 
-    Matches both ``memory/pipeline-log.md`` (project root) and
-    ``projects/ide-core/memory/pipeline-log.md`` (git_root: ancestor).
+    ``prefixe`` is ``git rev-parse --show-prefix`` from the project folder:
+    empty for a project at the root of its repository.
     """
-    return any(
-        path == suffix or path.endswith(f"/{suffix}")
-        for suffix in _JOURNAL_UNION_SUFFIXES
-    )
+    if not prefixe:
+        return chemin
+    return chemin[len(prefixe):] if chemin.startswith(prefixe) else None
 
 
 def _union_lines(base: str, theirs: str) -> str:
@@ -1049,13 +1045,17 @@ class GitWorkspaceService:
         # Résolution en union pour les fichiers journal (ticket-391, ADR-035) :
         # pipeline-log.md et documentation.json ne font qu'ajouter des entrées,
         # donc une union ne laisse jamais de contenu ambigu.
-        if all(_is_journal_union_file(c) for c in conflits):
+        # Les chemins de `git diff` partent de la racine du dépôt : sous
+        # `git_root: ancestor`, seuls ceux du projet lui-même comptent.
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        relatifs = [_relatif_au_projet(c, prefixe) for c in conflits]
+        if all(r is not None and r in _JOURNAL_UNION_SUFFIXES for r in relatifs):
             if await self._resoudre_conflits_journal_en_union(conflits):
                 return ()
 
         # Si tous les conflits sont des artefacts Tessera, les résoudre
         # automatiquement en faveur de la branche (ticket-300, ADR-033).
-        if all(_is_orchestrator_artifact_path(c) for c in conflits):
+        if all(r is not None and _is_orchestrator_artifact_path(r) for r in relatifs):
             if await self._resoudre_conflits_artefacts(conflits):
                 return ()
 

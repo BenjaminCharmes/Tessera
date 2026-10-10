@@ -2049,7 +2049,7 @@ async def test_rejouer_sur_resout_journal_pipeline_log_projet_imbrique(
 ) -> None:
     """Pipeline-log conflict in a nested project resolves as union (ticket-396).
 
-    Both the ancestor-prefix check (``_is_journal_union_file``) and the
+    Both the project-prefix check (``_relatif_au_projet``) and the
     ``:/`` pathspec in ``_resoudre_conflits_journal_en_union`` must work
     together so that both lines end up in the resolved log.
     """
@@ -2137,3 +2137,36 @@ async def test_rejouer_sur_conflit_mixte_non_resolu_projet_imbrique(
     assert code_conflicts, f"code.py doit figurer dans les conflits : {conflits}"
     # Rebase must be aborted — tree must be clean
     assert await service.is_clean()
+
+
+async def test_rejouer_sur_ne_prend_pas_un_dossier_tickets_du_code_pour_un_artefact(
+    repo_imbrique: tuple[Path, Path],
+) -> None:
+    """A code file under some other ``tickets/`` folder of the repository is
+    never auto-resolved as a Tessera artifact (ticket-396 review): only the
+    project's own ``tickets/`` and ``memory/pipeline-log.md`` count."""
+    root, projet = repo_imbrique
+    code = root / "frontend" / "src" / "tickets" / "liste.ts"
+    code.parent.mkdir(parents=True)
+    code.write_text("export const v = 'base';\n", encoding="utf-8")
+    await _git(root, "add", "frontend/src/tickets/liste.ts")
+    await _git(root, "commit", "-q", "-m", "chore: add code")
+
+    service = GitWorkspaceService(projet)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    branche = await service.create_branch("ticket-001", "feature")
+    code.write_text("export const v = 'ticket';\n", encoding="utf-8")
+    await _git(root, "add", "frontend/src/tickets/liste.ts")
+    await _git(root, "commit", "-q", "-m", "feat: ticket-001")
+
+    await _git(root, "checkout", "-q", base_name)
+    code.write_text("export const v = 'other';\n", encoding="utf-8")
+    await _git(root, "add", "frontend/src/tickets/liste.ts")
+    await _git(root, "commit", "-q", "-m", "chore: base changes code")
+    await _git(root, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    assert conflits == ("frontend/src/tickets/liste.ts",), conflits
+
