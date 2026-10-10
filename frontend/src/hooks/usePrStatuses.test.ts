@@ -171,6 +171,39 @@ describe("usePrStatuses — PR ouverte", () => {
   });
 });
 
+describe("usePrStatuses — erreur réseau", () => {
+  it("ne plante pas sur erreur et réessaie au tick suivant", async () => {
+    // Intention héritée de l'ancien test TicketCard qui espionnait getPrStatus
+    // et vérifiait la gestion des erreurs (critère 5, ticket-367).
+    // Désormais c'est le hook, non la carte, qui fait les appels.
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockRejectedValueOnce(new Error("network error"))
+        .mockResolvedValue(withOpen);
+
+      const { result } = renderHook(() => usePrStatuses("ide-core"));
+
+      // Premier appel échoue — la table reste vide, pas de crash.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(result.current).toEqual({});
+
+      // Au tick suivant (30 s) l'appel réussit et la table se remplit.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(30_000);
+      });
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(result.current["ticket-003"]?.state).toBe("open");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("usePrStatuses — projet null", () => {
   it("n'appelle pas getPrStatuses quand projectId est null", async () => {
     vi.useFakeTimers();

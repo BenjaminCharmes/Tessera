@@ -26,12 +26,13 @@ export function usePrStatuses(
   // Permet d'annuler une réponse en vol à la destruction de l'effet.
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Réinitialiser l'état settled quand le projet change.
-  const prevProjectIdRef = useRef<string | null>(null);
-  if (prevProjectIdRef.current !== projectId) {
+  // Réinitialiser l'état settled quand le projet change (dans un effet,
+  // jamais pendant le rendu — React 19 interdit l'accès aux refs pendant le
+  // rendu). Déclaré avant l'effet de polling : React exécute les effets dans
+  // l'ordre de déclaration, donc le reset est appliqué en premier.
+  useEffect(() => {
     allSettledRef.current = false;
-    prevProjectIdRef.current = projectId;
-  }
+  }, [projectId]);
 
   useEffect(() => {
     if (!projectId || !fenetreVisible || allSettledRef.current) return;
