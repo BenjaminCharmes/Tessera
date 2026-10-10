@@ -1974,3 +1974,166 @@ async def test_rebase_documentation_json_invalid_leaves_conflict_unresolved(
     assert len(conflits) > 0, "un JSON illisible doit laisser le conflit non résolu"
     assert any("documentation.json" in c for c in conflits)
     assert await service.is_clean()
+
+
+# ------------------------------------------------------------------
+# Auto-resolution in a nested project (git_root: ancestor) — ticket-396
+# ------------------------------------------------------------------
+
+
+@pytest.fixture
+async def repo_imbrique(tmp_path: Path) -> tuple[Path, Path]:
+    """A git repo with a project nested at projects/p/ (git_root: ancestor)."""
+    root = tmp_path / "depot"
+    root.mkdir()
+    await _git(root, "init", "-q")
+    await _git(root, "config", "user.email", "test@tessera.local")
+    await _git(root, "config", "user.name", "Tessera test")
+
+    projet = root / "projects" / "p"
+    projet.mkdir(parents=True)
+    (projet / "agents.json").write_text(
+        '{"git_root": "ancestor"}\n', encoding="utf-8"
+    )
+
+    await _git(root, "add", "projects/p/agents.json")
+    await _git(root, "commit", "-q", "-m", "init")
+
+    return root, projet
+
+
+async def test_rejouer_sur_resout_conflit_ticket_projet_imbrique(
+    repo_imbrique: tuple[Path, Path],
+) -> None:
+    """A ticket-file conflict in a nested project auto-resolves (ticket-396).
+
+    git diff --name-only returns paths relative to the repository root
+    (e.g. ``projects/p/tickets/done/ticket-001.md``). For a project that
+    declares ``git_root: ancestor``, the cwd is ``projects/p/``, so a bare
+    pathspec would resolve to the wrong location. :/<path> forces resolution
+    from the repository root and the conflict resolves cleanly.
+    """
+    root, projet = repo_imbrique
+
+    # Add a ticket file on the base branch
+    tickets_done = projet / "tickets" / "done"
+    tickets_done.mkdir(parents=True)
+    ticket = tickets_done / "ticket-001.md"
+    ticket.write_text("# ticket-001\nstatus: done\n", encoding="utf-8")
+    await _git(root, "add", "projects/p/tickets/done/ticket-001.md")
+    await _git(root, "commit", "-q", "-m", "chore: add ticket file")
+
+    service = GitWorkspaceService(projet)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    # Ticket branch: the pipeline moves the ticket to review
+    branche = await service.create_branch("ticket-001", "une-feature")
+    ticket.write_text("# ticket-001\nstatus: review\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-001")
+
+    # Advance the base with a conflicting modification of the same ticket file
+    await _git(root, "checkout", "-q", base_name)
+    ticket.write_text("# ticket-001\nstatus: in-progress\n", encoding="utf-8")
+    await _git(root, "add", "projects/p/tickets/done/ticket-001.md")
+    await _git(root, "commit", "-q", "-m", "chore: base touches ticket")
+    await _git(root, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    assert conflits == (), f"doit résoudre sans conflit, obtenu : {conflits}"
+    assert await service.is_clean()
+
+
+async def test_rejouer_sur_resout_journal_pipeline_log_projet_imbrique(
+    repo_imbrique: tuple[Path, Path],
+) -> None:
+    """Pipeline-log conflict in a nested project resolves as union (ticket-396).
+
+    Both the ancestor-prefix check (``_is_journal_union_file``) and the
+    ``:/`` pathspec in ``_resoudre_conflits_journal_en_union`` must work
+    together so that both lines end up in the resolved log.
+    """
+    root, projet = repo_imbrique
+
+    # Add a pipeline-log file on the base branch
+    (projet / "memory").mkdir(parents=True)
+    log = projet / "memory" / "pipeline-log.md"
+    log.write_text("# log\n", encoding="utf-8")
+    await _git(root, "add", "projects/p/memory/pipeline-log.md")
+    await _git(root, "commit", "-q", "-m", "chore: init pipeline log")
+
+    service = GitWorkspaceService(projet)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    # Ticket branch: the pipeline appends its own run line
+    branche = await service.create_branch("ticket-001", "une-feature")
+    log.write_text("# log\n- ticket-001 run\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-001")
+
+    # Advance the base with a different appended line (previous ticket's run)
+    await _git(root, "checkout", "-q", base_name)
+    log.write_text("# log\n- ticket-000 run\n", encoding="utf-8")
+    await _git(root, "add", "projects/p/memory/pipeline-log.md")
+    await _git(root, "commit", "-q", "-m", "chore: base appends to log")
+    await _git(root, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    assert conflits == (), f"doit résoudre en union, obtenu : {conflits}"
+    contenu = log.read_text(encoding="utf-8")
+    assert "ticket-001 run" in contenu, "la ligne du ticket doit être présente"
+    assert "ticket-000 run" in contenu, "la ligne de base doit être présente"
+
+
+async def test_rejouer_sur_conflit_mixte_non_resolu_projet_imbrique(
+    repo_imbrique: tuple[Path, Path],
+) -> None:
+    """A conflict touching a code file is not auto-resolved in a nested project.
+
+    Auto-resolution only kicks in when ALL conflicting files are Tessera
+    artifacts.  When a code file is also in conflict, the list is returned
+    unchanged and the tree is left clean (rebase aborted).
+    """
+    root, projet = repo_imbrique
+
+    # Add a ticket file and a code file on the base branch
+    tickets_done = projet / "tickets" / "done"
+    tickets_done.mkdir(parents=True)
+    ticket = tickets_done / "ticket-001.md"
+    ticket.write_text("# ticket-001\nstatus: done\n", encoding="utf-8")
+    code = projet / "code.py"
+    code.write_text("version = 'base'\n", encoding="utf-8")
+    await _git(root, "add",
+               "projects/p/tickets/done/ticket-001.md",
+               "projects/p/code.py")
+    await _git(root, "commit", "-q", "-m", "chore: add files")
+
+    service = GitWorkspaceService(projet)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    # Ticket branch: commit both files together so both conflict at the same step
+    branche = await service.create_branch("ticket-001", "feature")
+    ticket.write_text("# ticket-001\nstatus: review\n", encoding="utf-8")
+    code.write_text("version = 'ticket'\n", encoding="utf-8")
+    await _git(root, "add",
+               "projects/p/tickets/done/ticket-001.md",
+               "projects/p/code.py")
+    await _git(root, "commit", "-q", "-m", "feat: ticket modifies both")
+
+    # Advance the base: different content in both files
+    await _git(root, "checkout", "-q", base_name)
+    ticket.write_text("# ticket-001\nstatus: in-progress\n", encoding="utf-8")
+    code.write_text("version = 'other'\n", encoding="utf-8")
+    await _git(root, "add",
+               "projects/p/tickets/done/ticket-001.md",
+               "projects/p/code.py")
+    await _git(root, "commit", "-q", "-m", "chore: base modifies both")
+    await _git(root, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    assert len(conflits) > 0, "des conflits doivent subsister (fichier de code)"
+    code_conflicts = [c for c in conflits if "code.py" in c]
+    assert code_conflicts, f"code.py doit figurer dans les conflits : {conflits}"
+    # Rebase must be aborted — tree must be clean
+    assert await service.is_clean()

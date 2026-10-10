@@ -1,14 +1,15 @@
 ---
-id: ticket-396
-title: "Automatic rebase conflict resolution works for a project nested in its repository (git_root: ancestor)"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-10
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-10
+id: ticket-396
+pr_number: 358
+priority: high
+status: done
+title: 'Automatic rebase conflict resolution works for a project nested in its repository
+  (git_root: ancestor)'
+type: fix
 ---
 
 # ticket-396 — La résolution des conflits de rebase marche dans un projet imbriqué

@@ -80,13 +80,21 @@ def _is_orchestrator_artifact_path(path: str) -> bool:
     Directory entries (ending with ``/``) match any file under them;
     file entries match exactly, so ``memory/pipeline-log.md`` does not
     accidentally match ``memory/pipeline-log.md.bak``.
+
+    Both project-root-relative paths (``tickets/done/ticket-001.md``) and
+    repository-root-relative paths (``projects/p/tickets/done/ticket-001.md``)
+    are matched, to handle ``git_root: ancestor`` projects where
+    ``git diff --name-only`` outputs paths from the repository root.
     """
     for artifact in _ORCHESTRATOR_ARTIFACT_PATHS:
         if artifact.endswith("/"):
-            if path.startswith(artifact):
+            # Match "tickets/..." (project at root) or ".../tickets/..." (ancestor).
+            if path.startswith(artifact) or f"/{artifact}" in path:
                 return True
-        elif path == artifact:
-            return True
+        else:
+            # Match exact path (root) or "…/memory/pipeline-log.md" (ancestor).
+            if path == artifact or path.endswith(f"/{artifact}"):
+                return True
     return False
 
 
@@ -1185,14 +1193,21 @@ class GitWorkspaceService:
         """
         try:
             for chemin in conflits:
-                status_out = await self._run("status", "--porcelain", "--", chemin)
+                # `:/<chemin>` : les chemins viennent de `git diff --name-only`,
+                # relatifs à la racine du dépôt. Pour un projet déclaré
+                # `git_root: ancestor`, le cwd est un sous-dossier du dépôt ;
+                # un chemin nu serait résolu depuis ce cwd et ne désignerait
+                # aucun fichier. `:/<chemin>` force la résolution depuis la
+                # racine du dépôt, ce qui est correct pour les deux modes.
+                pathspec = f":/{chemin}"
+                status_out = await self._run("status", "--porcelain", "--", pathspec)
                 code = status_out[:2] if len(status_out) >= 2 else "UU"  # noqa: PLR2004
                 if code == "UD":
                     # Branch deleted the file; stage the deletion.
-                    await self._run("rm", "-f", "--", chemin)
+                    await self._run("rm", "-f", "--", pathspec)
                 else:
-                    await self._run("checkout", "--theirs", "--", chemin)
-                    await self._run("add", "--", chemin)
+                    await self._run("checkout", "--theirs", "--", pathspec)
+                    await self._run("add", "--", pathspec)
 
             if await self._fichiers_en_conflit():
                 return False
