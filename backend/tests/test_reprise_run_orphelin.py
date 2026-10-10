@@ -9,7 +9,11 @@ checks out the base branch.
 from __future__ import annotations
 
 import asyncio
+import os
+from datetime import datetime, timezone
 from pathlib import Path
+
+import aiosqlite
 
 from tessera.services.database import (
     create_run,
@@ -476,6 +480,117 @@ async def test_fiche_non_suivie_seule_dans_commit(tmp_path: Path) -> None:
     )
     assert brouillon.exists(), "brouillon.txt doit encore exister sur le disque"
     assert not ticket_file.exists(), "la fiche ne doit plus être dans in-progress/"
+
+
+# ---------------------------------------------------------------------------
+# Tests ticket-389 — fichiers neufs du codeur + ticket approuvé non livré
+# ---------------------------------------------------------------------------
+
+
+async def _lire_started_at(db: Path) -> datetime:
+    """Read started_at from the single run in the DB and return an aware datetime."""
+    async with aiosqlite.connect(str(db)) as conn:
+        cursor = await conn.execute("SELECT started_at FROM pipeline_runs LIMIT 1")
+        row = await cursor.fetchone()
+    assert row is not None, "aucun run en base"
+    dt = datetime.fromisoformat(str(row[0]))
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+async def test_fichier_nouveau_entre_dans_commit(tmp_path: Path) -> None:
+    """An untracked file newer than started_at lands in the recovery commit."""
+    ws, repo = await _make_workspace_on_ticket_branch(tmp_path)
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+
+    started_at = await _lire_started_at(db)
+    nouveau = repo / "nouveau.py"
+    nouveau.write_text("# nouveau\n", encoding="utf-8")
+    new_mtime = started_at.timestamp() + 1.0
+    os.utime(str(nouveau), (new_mtime, new_mtime))
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    commites = await _git(repo, "show", "--name-only", "--format=", "ticket-901-mon-ticket")
+    assert "nouveau.py" in commites, (
+        f"nouveau.py doit figurer dans le commit de reprise : {commites!r}"
+    )
+
+
+async def test_fichier_ancien_reste_hors_commit(tmp_path: Path) -> None:
+    """An untracked file older than started_at is not included in the recovery commit."""
+    ws, repo = await _make_workspace_on_ticket_branch(tmp_path)
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+
+    started_at = await _lire_started_at(db)
+    ancien = repo / "ancien.py"
+    ancien.write_text("# ancien\n", encoding="utf-8")
+    old_mtime = started_at.timestamp() - 1.0
+    os.utime(str(ancien), (old_mtime, old_mtime))
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    commites = await _git(repo, "show", "--name-only", "--format=", "ticket-901-mon-ticket")
+    assert "ancien.py" not in commites, (
+        f"ancien.py ne doit pas figurer dans le commit de reprise : {commites!r}"
+    )
+    assert ancien.exists(), "le fichier doit encore exister sur le disque"
+
+
+async def test_depot_imbrique_recent_exclu_du_commit(tmp_path: Path) -> None:
+    """A nested git repository newer than started_at is not included in the recovery commit."""
+    ws, repo = await _make_workspace_on_ticket_branch(tmp_path)
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+
+    started_at = await _lire_started_at(db)
+    imbrique = repo / "nested-repo"
+    imbrique.mkdir()
+    await _git(imbrique, "init", "-q")
+    await _git(imbrique, "config", "user.email", "test@tessera.local")
+    await _git(imbrique, "config", "user.name", "Tessera Test")
+    fichier_imbrique = imbrique / "f.txt"
+    fichier_imbrique.write_text("x\n", encoding="utf-8")
+    await _git(imbrique, "add", "f.txt")
+    await _git(imbrique, "commit", "-q", "-m", "init")
+    # Fichier dans le dépôt imbriqué, mtime > started_at
+    new_mtime = started_at.timestamp() + 1.0
+    os.utime(str(fichier_imbrique), (new_mtime, new_mtime))
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    commites = await _git(repo, "show", "--name-only", "--format=", "ticket-901-mon-ticket")
+    assert "nested-repo" not in commites, (
+        f"nested-repo ne doit pas figurer dans le commit de reprise : {commites!r}"
+    )
+
+
+async def test_ticket_done_non_remis_en_todo(tmp_path: Path) -> None:
+    """A ticket already 'done' on the branch is left done; pipeline log records it."""
+    ws, repo = await _make_workspace_with_ticket(tmp_path, "done")
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    # La fiche doit rester dans done/ sur la branche du ticket (non déplacée en todo/).
+    shown = await _git(
+        repo,
+        "show",
+        "ticket-901-mon-ticket:tickets/done/ticket-901-mon-ticket.md",
+    )
+    assert "status: done" in shown, (
+        f"ticket doit rester done sur la branche ticket : {shown!r}"
+    )
+    # pipeline-log.md doit mentionner « approuvé mais non livré ».
+    log_path = repo / "memory" / "pipeline-log.md"
+    assert log_path.exists(), "memory/pipeline-log.md doit exister"
+    contenu = log_path.read_text(encoding="utf-8")
+    assert "approuvé mais non livré" in contenu, (
+        f"'approuvé mais non livré' absent du journal : {contenu!r}"
+    )
+    assert "ticket-901" in contenu, (
+        f"ticket_id absent du journal : {contenu!r}"
+    )
 
 
 async def test_le_demarrage_de_l_app_en_test_ne_solde_ni_ne_reprend_rien() -> None:
