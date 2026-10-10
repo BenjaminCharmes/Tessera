@@ -4,7 +4,7 @@ created: 2026-10-09
 depends_on: []
 estimated_days: 1
 id: ticket-391
-pr_number: null
+pr_number: 348
 priority: medium
 status: done
 title: The delivery rebase merges the pipeline log and the documentation list as a
