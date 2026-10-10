@@ -1,14 +1,15 @@
 ---
-id: ticket-367
-title: "Ticket cards read their PR status from one project-wide request"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-366"]
-estimated_days: 1
 created: 2026-10-07
+depends_on:
+- ticket-366
+estimated_days: 1
+id: ticket-367
+pr_number: 353
+priority: high
+status: done
+title: Ticket cards read their PR status from one project-wide request
+type: feat
 ---
 
 # ticket-367 — Les cartes lisent l'état de leur PR dans une seule requête par projet

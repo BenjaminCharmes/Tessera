@@ -3,7 +3,7 @@ import RegionTitle from "../../design/RegionTitle";
 import { useState } from "react";
 import TicketCard from "../Sidebar/TicketCard";
 import { MIME_TICKET, transitionPermise } from "../../lib/transitionsManuelles";
-import type { Ticket, TicketStatus } from "../../types/api";
+import type { PRStatus, Ticket, TicketStatus } from "../../types/api";
 
 const STATUS_LABEL: Record<TicketStatus, string> = {
   todo: "TODO",
@@ -29,7 +29,8 @@ interface KanbanColumnProps {
   tickets: Ticket[];
   activeTicket: Ticket | null;
   running: Set<string>;
-  githubRemote?: string | null;
+  /** Table ticket_id → PRStatus fournie par `usePrStatuses` (ticket-367). */
+  prStatuses?: Record<string, PRStatus>;
   onSelectTicket: (ticket: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   /** Un ticket déposé sur cette colonne y change de statut (ticket-194). */
@@ -50,7 +51,7 @@ export default function KanbanColumn({
   tickets,
   activeTicket,
   running,
-  githubRemote,
+  prStatuses,
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
@@ -127,7 +128,7 @@ export default function KanbanColumn({
                 ticket={ticket}
                 isActive={activeTicket?.id === ticket.id}
                 isRunning={running.has(ticket.id)}
-                githubRemote={githubRemote}
+                prStatus={prStatuses?.[ticket.id] ?? null}
                 onSelect={onSelectTicket}
                 onRun={onRunPipeline}
                 onChangeStatus={onChangeStatus}
