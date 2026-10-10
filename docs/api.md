@@ -17,6 +17,7 @@ en interactif quand le backend tourne.
 | `POST` | `/api/v1/projects` | Create Project |
 | `POST` | `/api/v1/projects/clone` | Clone Project |
 | `POST` | `/api/v1/projects/import` | Import Project |
+| `POST` | `/api/v1/projects/from-template` | Create Project From Template |
 | `GET` | `/api/v1/projects/usage/breakdown` | Get Usage Breakdown Global |
 | `GET` | `/api/v1/projects/{project_id}` | Get Project |
 | `DELETE` | `/api/v1/projects/{project_id}` | Delete |

@@ -18,6 +18,8 @@ from tessera.models.project import (
     ProjectContext,
     ProjectCreate,
     ProjectCreationResult,
+    ProjectFromTemplateRequest,
+    ProjectFromTemplateResult,
     ProjectImport,
     ProjectImportResponse,
 )
@@ -57,6 +59,9 @@ from tessera.services.politique_run import PolitiqueRun
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.models.agent import FallbackConfig
 from tessera.routers.dependencies import require_valid_project_id
+from tessera.services.project_from_template import (
+    create_project_from_template as _create_from_template,
+)
 from tessera.services.project_loader import (
     AgentAbsentDuProjet,
     ModeleInconnu,
@@ -178,6 +183,26 @@ async def clone_project(body: CloneProjectRequest) -> CloneProjectResponse:
         )
     except CloneError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/from-template", response_model=ProjectFromTemplateResult, status_code=201)
+async def create_project_from_template(
+    body: ProjectFromTemplateRequest,
+) -> ProjectFromTemplateResult:
+    """Crée un projet depuis le gabarit fastapi-react en un appel.
+
+    Attribue automatiquement des ports libres, crée la structure de dossiers,
+    copie le gabarit avec substitution des marqueurs, et initialise le dépôt git.
+    Aucun dépôt GitHub n'est créé.
+    """
+    try:
+        return await _create_from_template(
+            workspace=settings.ide_workspace_dir,
+            project_id=body.project_id,
+            name=body.name,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
 
 # Note : les routes avec sous-chemin spécifique doivent être avant /{project_id}
