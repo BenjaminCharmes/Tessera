@@ -5,7 +5,7 @@ depends_on:
 - ticket-366
 estimated_days: 1
 id: ticket-367
-pr_number: null
+pr_number: 353
 priority: high
 status: done
 title: Ticket cards read their PR status from one project-wide request
