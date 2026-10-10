@@ -1,14 +1,16 @@
 ---
-id: ticket-389
-title: "Startup recovery keeps the files the coder created, and an approved but undelivered ticket is flagged for delivery"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-377"]
-estimated_days: 0.5
 created: 2026-10-09
+depends_on:
+- ticket-377
+estimated_days: 0.5
+id: ticket-389
+pr_number: 351
+priority: high
+status: done
+title: Startup recovery keeps the files the coder created, and an approved but undelivered
+  ticket is flagged for delivery
+type: fix
 ---
 
 # ticket-389 — La reprise garde les fichiers neufs du codeur et signale un ticket approuvé non livré

@@ -2138,3 +2138,16 @@ Le code introduit une sé (44328ms)
 - 2026-10-10 16:44:32 UTC — [ticket-391] validateur: APPROVED — Les quatre critères sont satisfaits : le diff ajoute trois fonctions helper (`_i (334343ms)
 - 2026-10-10 16:44:32 UTC — [ticket-391] APPROVED après 1 tour(s)
 - 2026-10-10 16:46:50 UTC — [ticket-391] documentation: 2 fichier(s) (130109ms)
+- 2026-10-10 16:47:08 UTC — [ide-core] ticket-391 PR #348 confiée au CIWatcher
+- 2026-10-10 16:47:10 UTC — [ticket-389] branche ticket-389-startup-recovery-keeps-the-files-the-coder-create
+- 2026-10-10 16:47:10 UTC — [ticket-389] tour 1 — codeur démarré
+- 2026-10-10 16:57:52 UTC — [ticket-389] tour 1 — codeur terminé (641500ms)
+- 2026-10-10 17:01:42 UTC — [ticket-389] testeur: OK (exit 0)
+- 2026-10-10 17:02:18 UTC — [ticket-389] securite: PASS — Audit complet du diff sans vulnérabilités critiques ou hautes introduites.
+
+**An (36250ms)
+- 2026-10-10 17:02:18 UTC — [ticket-389] tour 1 — reviewer démarré
+- 2026-10-10 17:04:01 UTC — [ticket-389] tour 1 — reviewer terminé (103170ms)
+- 2026-10-10 17:07:53 UTC — [ticket-389] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests couvrant les troi (335078ms)
+- 2026-10-10 17:07:53 UTC — [ticket-389] APPROVED après 1 tour(s)
+- 2026-10-10 17:10:30 UTC — [ticket-389] documentation: 2 fichier(s) (154983ms)

@@ -1052,6 +1052,15 @@ Quand ton abonnement Claude atteint sa limite de session (« You've hit your ses
 
 Contrairement aux autres arrêts, celui-ci ne marque aucun ticket en `blocked`.
 
+### Un run s'est arrêté avant d'être livré (backend redémarré)
+
+Si le backend s'arrête avant de finaliser la livraison d'un ticket approuvé, au redémarrage tu vois :
+
+- Tous les fichiers que le codeur a créés pendant le run sont restaurés
+- Le ticket reste en état « approuvé/done » au lieu d'être repassé en `todo` — tu vois une note dans le journal : « [ticket-XXX] approuvé mais non livré : livraison à reprendre »
+
+**Attention** : un fichier créé accidentellement par toi pendant le run — un brouillon, un `.tmp` — sera aussi restauré dans la branche. Il sera visible dans la PR ; nettoie-le avant de merger.
+
 ## Pour aller plus loin
 
 - [`architecture.md`](architecture.md) — comment Tessera est construit

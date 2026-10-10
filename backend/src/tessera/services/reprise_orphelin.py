@@ -7,10 +7,15 @@ ticket. Ce module comble le gap au démarrage.
 
 Pour chaque run soldé, si la copie de travail est sur la branche du ticket :
 1. la fiche du ticket est déplacée dans tickets/todo/ et son statut forcé à todo,
-   sur la branche du ticket, avant tout commit ;
-2. les changements en cours (fiche incluse) sont commités avec le message des runs
+   sur la branche du ticket, avant tout commit — sauf si elle est déjà « done »
+   (ticket approuvé non livré) : dans ce cas elle est laissée telle quelle et
+   une ligne est ajoutée dans memory/pipeline-log.md ;
+2. les fichiers non suivis créés par le codeur après le démarrage du run
+   (date de modification > started_at) sont ajoutés au commit de reprise,
+   hors chemins ignorés par git et hors dépôts imbriqués (ticket-389) ;
+3. les changements en cours (fiche incluse) sont commités avec le message des runs
    non approuvés (ADR-018 : l'arbre ne reste jamais sale) ;
-3. la copie de travail revient sur la branche de base sans y écrire quoi que ce soit.
+4. la copie de travail revient sur la branche de base sans y écrire quoi que ce soit.
 
 La branche de base n'est jamais modifiée : un run suivant ne trouve donc aucune
 divergence locale (ticket-375).
@@ -23,6 +28,7 @@ from __future__ import annotations
 import asyncio
 import json
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 import aiosqlite
@@ -97,10 +103,150 @@ def _ecrire_ticket_todo(dest: Path, contenu: str) -> None:
     dest.write_text(fm.dumps(post), encoding="utf-8")
 
 
+def _est_dans_depot_imbrique(project_path: Path, fichier: Path) -> bool:
+    """True si `fichier` se trouve dans un dépôt git imbriqué sous `project_path`.
+
+    Parcourt les ancêtres de `fichier` jusqu'à `project_path` et renvoie True
+    dès qu'un dossier intermédiaire contient un `.git`.
+    """
+    current = fichier.parent
+    while True:
+        try:
+            if current == project_path or not current.is_relative_to(project_path):
+                break
+        except ValueError:
+            break
+        if (current / ".git").exists():
+            return True
+        current = current.parent
+    return False
+
+
+async def _trouver_fichiers_nouveaux(
+    project_path: Path,
+    started_at: datetime,
+) -> list[str]:
+    """List untracked, non-ignored files newer than `started_at`.
+
+    Exclut les répertoires (y compris les dépôts imbriqués, listés avec "/"),
+    les fichiers ignorés par git et les fichiers dans un dépôt imbriqué.
+    Renvoie des chemins POSIX relatifs à `project_path`, prêts pour `git add`.
+    """
+    try:
+        sortie = await _git(
+            project_path, "ls-files", "--others", "--exclude-standard", "-z"
+        )
+    except Exception:
+        return []
+
+    if not sortie:
+        return []
+
+    fichiers: list[str] = []
+    for chemin in sortie.split("\0"):
+        if not chemin:
+            continue
+        # Les répertoires (dépôts imbriqués ou vides) se terminent par "/" :
+        # seuls les fichiers entrent dans le commit.
+        if chemin.endswith("/"):
+            continue
+        fichier = project_path / chemin
+        if _est_dans_depot_imbrique(project_path, fichier):
+            continue
+        try:
+            mtime = datetime.fromtimestamp(fichier.stat().st_mtime, tz=timezone.utc)
+            if mtime > started_at:
+                fichiers.append(chemin)
+        except OSError:
+            pass
+    return fichiers
+
+
+def _journaliser_approuve_non_livre(project_path: Path, ticket_id: str) -> None:
+    """Appends an 'approved but undelivered' entry to memory/pipeline-log.md."""
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ligne = (
+        f"- {ts} — [{ticket_id}] approuvé mais non livré : livraison à reprendre\n"
+    )
+    log_path = project_path / "memory" / "pipeline-log.md"
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(ligne)
+    except Exception as exc:
+        _logger.warning(
+            "reprise_journal_echec",
+            extra={
+                "project_path": str(project_path),
+                "ticket_id": ticket_id,
+                "error": str(exc),
+            },
+        )
+
+
+async def _gerer_fiche_ticket(
+    project_path: Path,
+    project_id: str,
+    ticket_id: str,
+    ticket_svc: TicketService,
+) -> tuple[Path | None, bool]:
+    """Handle the ticket file during recovery.
+
+    Returns ``(todo_path, ticket_was_approved)`` :
+    - ``todo_path`` : chemin de la fiche déplacée en todo/ à stager dans git,
+      ou ``None`` si aucun déplacement n'a eu lieu.
+    - ``ticket_was_approved`` : ``True`` si le ticket était déjà ``done`` ;
+      l'appelant écrira le journal **après** le checkout pour que le fichier
+      ne soit pas commité puis supprimé par le retour sur la branche de base.
+
+    Cas traités :
+    - Ticket ``done`` : ne touche pas à la fiche, signale l'état à l'appelant.
+    - Ticket ``in_progress`` ou ``in_review`` : déplace la fiche en todo/ et
+      renvoie son nouveau chemin.
+    - Tout autre statut ou ticket introuvable : ne fait rien.
+    """
+    ticket = await ticket_svc.get_ticket(ticket_id)
+    if ticket is None:
+        return None, False
+
+    if ticket.status == TicketStatus.done:
+        _logger.info(
+            "reprise_ticket_approuve_non_livre",
+            extra={"project_id": project_id, "ticket_id": ticket_id},
+        )
+        return None, True
+
+    if ticket.status not in (TicketStatus.in_progress, TicketStatus.in_review):
+        return None, False
+
+    try:
+        old_path = Path(ticket.file_path)
+        contenu = old_path.read_text(encoding="utf-8")
+        nom = old_path.name
+    except OSError:
+        return None, False
+
+    todo_dir = project_path / "tickets" / "todo"
+    todo_dir.mkdir(parents=True, exist_ok=True)
+    todo_path = todo_dir / nom
+    _ecrire_ticket_todo(todo_path, contenu)
+    if old_path != todo_path:
+        try:
+            old_path.unlink()
+        except OSError:
+            pass
+    _logger.info(
+        "reprise_ticket_remis_en_todo_sur_branche_ticket",
+        extra={"project_id": project_id, "ticket_id": ticket_id},
+    )
+    return todo_path, False
+
+
 async def _reprendre_depot_seul(
     project_id: str,
     ticket_id: str,
     workspace_dir: Path,
+    started_at: datetime,
 ) -> None:
     """Remet d'aplomb le dépôt d'un seul run orphelin.
 
@@ -122,11 +268,7 @@ async def _reprendre_depot_seul(
     except Exception as exc:
         _logger.warning(
             "reprise_erreur_git",
-            extra={
-                "project_id": project_id,
-                "ticket_id": ticket_id,
-                "error": str(exc),
-            },
+            extra={"project_id": project_id, "ticket_id": ticket_id, "error": str(exc)},
         )
         return
 
@@ -143,60 +285,33 @@ async def _reprendre_depot_seul(
         )
         return
 
-    # Lit la fiche avant toute opération : le statut et le chemin sont stables
-    # tant qu'on est sur la branche du ticket.
-    ticket_svc = TicketService(project_path, project_id)
-    ticket_avant = await ticket_svc.get_ticket(ticket_id)
-    ticket_contenu: str | None = None
-    ticket_nom: str | None = None
-    old_ticket_path: Path | None = None
-    if ticket_avant is not None and ticket_avant.status in (
-        TicketStatus.in_progress,
-        TicketStatus.in_review,
-    ):
-        try:
-            old_ticket_path = Path(ticket_avant.file_path)
-            ticket_contenu = old_ticket_path.read_text(encoding="utf-8")
-            ticket_nom = old_ticket_path.name
-        except OSError:
-            pass
-
     try:
-        # 1. Remettre la fiche du ticket en todo SUR LA BRANCHE DU TICKET,
-        #    avant le commit, pour qu'elle en fasse partie (ticket-375).
-        #    La branche de base n'est plus touchée du tout après le checkout.
-        todo_path: Path | None = None
-        if ticket_contenu is not None and ticket_nom is not None:
-            todo_dir = project_path / "tickets" / "todo"
-            todo_dir.mkdir(parents=True, exist_ok=True)
-            todo_path = todo_dir / ticket_nom
-            _ecrire_ticket_todo(todo_path, ticket_contenu)
-            # Supprimer l'ancien emplacement s'il diffère du nouveau.
-            if old_ticket_path is not None and old_ticket_path != todo_path:
-                try:
-                    old_ticket_path.unlink()
-                except OSError:
-                    pass
-            _logger.info(
-                "reprise_ticket_remis_en_todo_sur_branche_ticket",
-                extra={"project_id": project_id, "ticket_id": ticket_id},
-            )
+        ticket_svc = TicketService(project_path, project_id)
+
+        # 1. Gérer la fiche du ticket SUR LA BRANCHE DU TICKET, avant le commit.
+        #    - in_progress / in_review → déplacement en todo/ (ticket-375)
+        #    - done → signalé par ticket_approuve pour journalisation après checkout
+        todo_path, ticket_approuve = await _gerer_fiche_ticket(
+            project_path, project_id, ticket_id, ticket_svc
+        )
 
         # 2. Commiter les changements en cours (ADR-018 : l'arbre ne reste jamais sale).
-        # Seuls les fichiers déjà suivis, dans tout le dépôt (`:/`) : jamais
-        # `add -A`. Pour un projet `git_root: ancestor` (ide-core), le dépôt est
-        # celui de Tessera entier, et `add -A` y embarquerait les fichiers non
-        # suivis et les autres projets de `projects/` comme sous-dépôts. Le
-        # pipeline exclut les non-suivis préexistants qu'il a relevés à la
-        # création de la branche ; après un arrêt, cette liste est perdue. Un
-        # fichier créé par le codeur reste donc dans l'arbre, non suivi : rien
-        # n'est perdu, rien d'étranger n'est commité.
+        # Seuls les fichiers déjà suivis d'abord (`--update`), pour ne jamais
+        # embarquer un projet voisin ou un brouillon étranger.
         await _git(project_path, "add", "--update", "--", ":/")
+
         # Ajouter aussi la fiche déplacée dans todo/ : `--update` ne suit que les
         # fichiers déjà connus de l'index, pas les nouveaux emplacements.
         if todo_path is not None:
             rel = todo_path.relative_to(project_path)
             await _git(project_path, "add", "--", rel.as_posix())
+
+        # Ajouter les fichiers non suivis créés par le codeur après started_at
+        # (ticket-389) : nouveaux fichiers source, tests, etc. créés pendant le run.
+        nouveaux = await _trouver_fichiers_nouveaux(project_path, started_at)
+        for chemin in nouveaux:
+            await _git(project_path, "add", "--", chemin)
+
         staged = await _git(project_path, "diff", "--cached", "--name-only")
         if staged:
             commit_msg = _unapproved_commit_message(ticket_id, _RAISON_ARRET)
@@ -214,14 +329,16 @@ async def _reprendre_depot_seul(
             extra={"project_id": project_id, "base_branch": base_branch},
         )
 
+        # 4. Journaliser « approuvé mais non livré » APRÈS le checkout pour que
+        #    le fichier reste sur le disque sans jamais être commité ni supprimé
+        #    par le retour sur la branche de base.
+        if ticket_approuve:
+            _journaliser_approuve_non_livre(project_path, ticket_id)
+
     except Exception as exc:
         _logger.warning(
             "reprise_erreur_git",
-            extra={
-                "project_id": project_id,
-                "ticket_id": ticket_id,
-                "error": str(exc),
-            },
+            extra={"project_id": project_id, "ticket_id": ticket_id, "error": str(exc)},
         )
 
 
@@ -233,8 +350,8 @@ async def reprendre_depots_orphelins(
     """Pour chaque run orphelin soldé, remet d'aplomb le dépôt de son projet.
 
     Appelée dans le lifespan après `solder_les_runs_orphelins`. Les `run_ids`
-    sont ceux retournés par le solde : leurs `project_id` et `ticket_id` sont
-    lus en base pour trouver le dépôt à nettoyer.
+    sont ceux retournés par le solde : leurs `project_id`, `ticket_id` et
+    `started_at` sont lus en base pour trouver le dépôt à nettoyer.
     """
     if not run_ids:
         return
@@ -242,10 +359,19 @@ async def reprendre_depots_orphelins(
     async with aiosqlite.connect(str(db_path)) as db:
         placeholders = ",".join("?" * len(run_ids))
         async with db.execute(
-            f"SELECT project_id, ticket_id FROM pipeline_runs WHERE id IN ({placeholders})",
+            f"SELECT project_id, ticket_id, started_at"
+            f" FROM pipeline_runs WHERE id IN ({placeholders})",
             run_ids,
         ) as cursor:
             rows = await cursor.fetchall()
 
-    for project_id, ticket_id in rows:
-        await _reprendre_depot_seul(str(project_id), str(ticket_id), workspace_dir)
+    for project_id, ticket_id, started_at_str in rows:
+        try:
+            started_at = datetime.fromisoformat(str(started_at_str))
+            if started_at.tzinfo is None:
+                started_at = started_at.replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError):
+            started_at = datetime.now(timezone.utc)
+        await _reprendre_depot_seul(
+            str(project_id), str(ticket_id), workspace_dir, started_at
+        )
