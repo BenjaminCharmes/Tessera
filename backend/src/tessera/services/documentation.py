@@ -27,6 +27,7 @@ les tickets existants, et ne documente rien — le rattrapage d'un coup
 coûterait plus qu'il n'apporterait.
 """
 import json
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -174,15 +175,46 @@ def _remplacer(avant: str, edition: dict[str, object], chemin: str) -> str:
     return apres
 
 
+def _normaliser_section(texte: str) -> str:
+    """Normalize a section title for case- and whitespace-tolerant comparison.
+
+    Collapses multiple spaces, strips leading/trailing whitespace and lowercases.
+    Applied to both the requested section and each candidate heading line.
+    """
+    return re.sub(r"\s+", " ", texte.strip()).lower()
+
+
 def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
+    """Insert text after a Markdown section, with tolerant anchor matching.
+
+    The section is matched after normalizing casse and extra whitespace (ticket-395).
+    A unique match at the exact heading level is required; zero or two+ matches → refused.
+    """
     section = str(edition.get("apres_section", ""))
     texte = str(edition.get("texte", ""))
 
-    lignes = avant.splitlines(keepends=True)
-    debut = next((i for i, l in enumerate(lignes) if l.startswith(section)), None)
-    if debut is None:
-        raise EditionRefusee(f"{chemin} : section « {section} » introuvable.")
     niveau = len(section) - len(section.lstrip("#"))
+    prefixe = "#" * niveau + " "
+    section_norm = _normaliser_section(section)
+
+    lignes = avant.splitlines(keepends=True)
+    # Candidats : lignes qui démarrent au bon niveau de titre et correspondent
+    # après normalisation (casse et espaces multiples tolérés).
+    candidats = [
+        i
+        for i, l in enumerate(lignes)
+        if l.startswith(prefixe) and _normaliser_section(l.rstrip()) == section_norm
+    ]
+
+    if len(candidats) == 0:
+        raise EditionRefusee(f"{chemin} : section « {section} » introuvable.")
+    if len(candidats) > 1:
+        raise EditionRefusee(
+            f"{chemin} : section « {section} » correspond à {len(candidats)} titres "
+            "après normalisation — titre ambigu."
+        )
+
+    debut = candidats[0]
     fin = len(lignes)
     for i in range(debut + 1, len(lignes)):
         titre = lignes[i].lstrip()
@@ -292,6 +324,8 @@ class ResultatDocumentation:
     #: à ``_documenter_le_run`` de commiter le marqueur même quand aucun
     #: fichier de doc n'a changé, pour garder l'arbre propre (ticket-213).
     marqueur_ecrit: bool = False
+    #: True si au moins un agent a nécessité un tour de correction (ticket-395).
+    tour_de_correction: bool = False
 
 
 #: Les deux lectures d'une même livraison. Deux rôles et pas un seul : un agent
@@ -371,6 +405,7 @@ class DocumentationService:
 
         modifies: list[str] = []
         refus: list[str] = []
+        tour_de_correction = False
         brief = _brief(tickets, _contenu_documentable(racine))
 
         for role in _ROLES:
@@ -378,9 +413,10 @@ class DocumentationService:
             provider, modele = self._pour(role)
             # Seul `doc-technique` voit le CLAUDE.md, et seul lui peut l'éditer.
             claude_md = self._claude_md if role == claude_md_doc.ROLE else None
+            user = brief + claude_md_doc.section_du_brief(claude_md)
             reponse = await provider.complete(
                 system=systeme,
-                user=brief + claude_md_doc.section_du_brief(claude_md),
+                user=user,
                 model=modele,
                 max_tokens=_MAX_TOKENS,
             )
@@ -390,9 +426,28 @@ class DocumentationService:
             try:
                 modifies.extend(appliquer_editions(racine, editions, claude_md=claude_md))
             except EditionRefusee as exc:
-                # Un agent qui se trompe n'empêche pas l'autre d'avoir raison.
-                _logger.warning("editions_refusees", extra={"role": role, "motif": str(exc)})
-                refus.append(f"{role} : {exc}")
+                # Tour de correction (ticket-395) : rappeler l'agent une seule fois
+                # avec le motif du refus et les titres des fichiers visés.
+                tour_de_correction = True
+                motif = str(exc)
+                titres = _titres_fichiers_vises(racine, editions)
+                reponse2 = await provider.complete(
+                    system=systeme,
+                    user=_brief_correction(user, str(reponse.content), motif, titres),
+                    model=modele,
+                    max_tokens=_MAX_TOKENS,
+                )
+                editions2 = _editions_de(str(reponse2.content), role)
+                if not editions2:
+                    continue
+                try:
+                    modifies.extend(appliquer_editions(racine, editions2, claude_md=claude_md))
+                except EditionRefusee as exc2:
+                    # Deuxième refus : comportement courant (ticket-395).
+                    _logger.warning(
+                        "editions_refusees", extra={"role": role, "motif": str(exc2)}
+                    )
+                    refus.append(f"{role} : {exc2}")
 
         # Le marqueur n'avance que si au moins une édition a été appliquée, ou
         # si aucune édition n'a été proposée. S'il n'y a que des refus, on
@@ -409,6 +464,7 @@ class DocumentationService:
             tickets=[t.id for t in tickets],
             tronque=tronque,
             marqueur_ecrit=marqueur_ecrit,
+            tour_de_correction=tour_de_correction,
         )
 
 
@@ -476,6 +532,47 @@ def _brief(tickets: list[TicketADocumenter], contenu_doc: str = "") -> str:
     if contenu_doc:
         morceaux.append(contenu_doc)
     return "\n".join(morceaux)
+
+
+def _titres_fichiers_vises(racine: Path, editions: list[dict[str, object]]) -> str:
+    """Get Markdown headings of files targeted by the editions.
+
+    Returns a formatted string listing headings per file, to be included in the
+    corrective-round message so the agent can pick a valid existing section.
+    """
+    morceaux: list[str] = []
+    vus: set[str] = set()
+    for ed in editions:
+        chemin = str(ed.get("fichier", ""))
+        if chemin in vus:
+            continue
+        vus.add(chemin)
+        fichier = racine / chemin
+        if fichier.is_file():
+            titres = _titres_markdown(fichier.read_text(encoding="utf-8"))
+            if titres:
+                morceaux.append(f"\n### {chemin}\n\n{titres}")
+    return "".join(morceaux)
+
+
+def _brief_correction(
+    user_original: str,
+    reponse_precedente: str,
+    motif_refus: str,
+    titres_fichiers: str,
+) -> str:
+    """Message for the one-shot corrective round (ticket-395)."""
+    parties: list[str] = [
+        user_original,
+        "\n\n---\n\nTa réponse précédente a été refusée.\n\n"
+        f"Motif du refus : {motif_refus}",
+    ]
+    if titres_fichiers:
+        parties.append(
+            "\n\nTitres Markdown des fichiers visés (liste exhaustive) :" + titres_fichiers
+        )
+    parties.append("\n\nPropose une nouvelle liste d'éditions corrigée.")
+    return "".join(parties)
 
 
 def _editions_de(contenu: str, role: str) -> list[dict[str, object]]:

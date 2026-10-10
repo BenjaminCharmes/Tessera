@@ -371,8 +371,8 @@ async def test_les_editions_proposees_sont_appliquees(tmp_path: Path) -> None:
 
 
 async def test_une_edition_refusee_ne_casse_pas_la_mise_a_jour(tmp_path: Path) -> None:
-    # L'agent a proposé une modification sur un texte inexistant. On le dit,
-    # on n'écrit rien de sa part, et l'autre agent garde sa chance.
+    # L'agent a proposé une modification sur un texte inexistant. Il obtient un
+    # tour de correction (qui échoue aussi), et l'autre agent garde sa chance.
     _ticket(tmp_path, "ticket-001")
     _doc(tmp_path, "architecture.md", "# Archi\n")
     guide = _doc(tmp_path, "guide-utilisateur.md", "# Guide\n\nvieux\n")
@@ -383,7 +383,9 @@ async def test_une_edition_refusee_ne_casse_pas_la_mise_a_jour(tmp_path: Path) -
     bonne = json.dumps(
         {"editions": [{"fichier": "docs/guide-utilisateur.md", "ancien": "vieux", "nouveau": "neuf"}]}
     )
-    svc, _ = _service(tmp_path, [mauvaise, bonne])
+    # doc-technique reçoit mauvaise (1er tour) puis mauvaise (correction) ;
+    # doc-fonctionnelle reçoit bonne.
+    svc, _ = _service(tmp_path, [mauvaise, mauvaise, bonne])
 
     resultat = await svc.mettre_a_jour(tmp_path)
 
@@ -467,6 +469,138 @@ async def test_brief_contient_fichier_docs_sous_son_chemin_relatif(tmp_path: Pat
     msg = str(provider.appels[0]["user"])
     assert "docs/architecture.md" in msg
     assert "Section initiale." in msg
+
+
+# ------------------------------------------------------------------
+# ticket-395 : ancrage tolérant sur les sections Markdown
+# ------------------------------------------------------------------
+
+
+def test_apres_section_tolere_casse_et_espaces(tmp_path: Path) -> None:
+    """'## prochaines  étapes' trouve '## Prochaines étapes' (cas réel affut)."""
+    _doc(tmp_path, "guide.md", "# Guide\n\n## Prochaines étapes\n\ncontenu\n")
+
+    appliquer_editions(
+        tmp_path,
+        [{"fichier": "docs/guide.md", "apres_section": "## prochaines  étapes", "texte": "suite"}],
+    )
+
+    assert "suite" in (tmp_path / "docs" / "guide.md").read_text(encoding="utf-8")
+
+
+def test_apres_section_ambigu_apres_normalisation_est_refuse(tmp_path: Path) -> None:
+    """Deux titres identiques après normalisation → EditionRefusee."""
+    _doc(
+        tmp_path,
+        "guide.md",
+        "# Guide\n\n## Section A\n\nfoo\n\n## Section  A\n\nbar\n",
+    )
+
+    with pytest.raises(EditionRefusee) as exc:
+        appliquer_editions(
+            tmp_path,
+            [{"fichier": "docs/guide.md", "apres_section": "## Section A", "texte": "x"}],
+        )
+
+    assert "ambigu" in str(exc.value)
+
+
+# ------------------------------------------------------------------
+# ticket-395 : tour de correction
+# ------------------------------------------------------------------
+
+
+async def test_tour_de_correction_applique_si_deuxieme_reponse_valide(
+    tmp_path: Path,
+) -> None:
+    """La seconde réponse est appliquée quand la première visait une section absente."""
+    _ticket(tmp_path, "ticket-001")
+    fichier = _doc(tmp_path, "architecture.md", "# Archi\n\n## Section existante\n\ncontenu\n")
+    _avec_marqueur(tmp_path)
+
+    mauvaise = json.dumps(
+        {
+            "editions": [
+                {
+                    "fichier": "docs/architecture.md",
+                    "apres_section": "## Section absente",
+                    "texte": "ajout",
+                }
+            ]
+        }
+    )
+    bonne = json.dumps(
+        {
+            "editions": [
+                {
+                    "fichier": "docs/architecture.md",
+                    "apres_section": "## Section existante",
+                    "texte": "ajout",
+                }
+            ]
+        }
+    )
+    # doc-technique : mauvaise (1er), bonne (correction) ; doc-fonctionnelle : vide
+    svc, _ = _service(tmp_path, [mauvaise, bonne, '{"editions": []}'])
+
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    assert resultat.tour_de_correction is True
+    assert "ajout" in fichier.read_text(encoding="utf-8")
+    assert not resultat.refus
+
+
+async def test_tour_de_correction_second_appel_contient_motif_et_titres(
+    tmp_path: Path,
+) -> None:
+    """Le second appel reçoit le motif du refus et les titres du fichier visé."""
+    _ticket(tmp_path, "ticket-001")
+    _doc(tmp_path, "architecture.md", "# Archi\n\n## Section existante\n\ncontenu\n")
+    _avec_marqueur(tmp_path)
+
+    mauvaise = json.dumps(
+        {
+            "editions": [
+                {
+                    "fichier": "docs/architecture.md",
+                    "apres_section": "## Section absente",
+                    "texte": "ajout",
+                }
+            ]
+        }
+    )
+    svc, provider = _service(
+        tmp_path, [mauvaise, '{"editions": []}', '{"editions": []}']
+    )
+
+    await svc.mettre_a_jour(tmp_path)
+
+    # appels[1] = tour de correction (le premier appel de correction)
+    assert len(provider.appels) >= 2
+    user_correction = str(provider.appels[1]["user"])
+    assert "introuvable" in user_correction  # motif du refus
+    assert "## Section existante" in user_correction  # titre du fichier visé
+    assert "# Archi" in user_correction  # autre titre du même fichier
+
+
+async def test_agent_refuse_deux_fois_n_est_pas_rappele(tmp_path: Path) -> None:
+    """Un agent refusé deux fois n'est pas rappelé une troisième fois."""
+    _ticket(tmp_path, "ticket-001")
+    _doc(tmp_path, "architecture.md", "# Archi\n")
+    _avec_marqueur(tmp_path)
+
+    mauvaise = json.dumps(
+        {"editions": [{"fichier": "docs/architecture.md", "ancien": "absent", "nouveau": "x"}]}
+    )
+    # doc-technique : mauvaise + mauvaise (2 tours) ; doc-fonctionnelle : vide
+    svc, provider = _service(tmp_path, [mauvaise, mauvaise, '{"editions": []}'])
+
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    # doc-technique : 2 appels (1er + correction) ; doc-fonctionnelle : 1 appel
+    assert len(provider.appels) == 3
+    assert resultat.refus  # refus conservé
+    assert resultat.tour_de_correction is True
 
 
 def test_fichier_trop_long_remplace_par_ses_titres_et_borne_respectee(
