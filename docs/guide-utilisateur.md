@@ -110,20 +110,27 @@ d'en obtenir un.
 Sidebar → **Nouveau projet**. Tu décris ton idée en langage naturel, l'agent
 *project-creator* génère la structure, le `CLAUDE.md` et les premiers tickets.
 
-Quand tu ouvres la fenêtre de création, tu dois choisir entre deux options :
+### Créer un projet depuis le gabarit FastAPI + React
 
-**Projet vide** — l'IDE crée un dossier vide. Tu dois ajouter tes fichiers, écrire le `CLAUDE.md` et initialiser git toi-même.
+La fenêtre **Nouveau projet** propose deux types :
 
-**Gabarit FastAPI + React** — l'IDE génère une base prête à développer :
-- Backend : dossier `backend/` avec FastAPI, pytest, et `pyproject.toml`
-- Frontend : dossier `frontend/` avec React, Vite, TypeScript, Tailwind
-- Deux ports de développement automatiquement attribués et affichés après création
+**Projet vide** : l'IDE crée la structure Tessera (tickets, mémoire,
+`CLAUDE.md`, `agents.json`) et initialise le dépôt git ; le code reste à
+écrire.
 
-Après création depuis le gabarit, tu dois encore :
-1. Écrire le `CLAUDE.md` du projet (ce que le projet fait, ses agents, ses contraintes)
-2. Créer le dépôt GitHub et le lier à l'IDE (optionnel, mais nécessaire si tu veux les PR et la sync bidirectionnelle)
+**Gabarit FastAPI + React** : l'IDE génère une base prête à développer.
+- Backend `backend/` (FastAPI, pytest, mypy) et frontend `frontend/` (React,
+  Vite, TypeScript, Tailwind), tous les marqueurs remplacés.
+- Deux ports libres attribués et affichés après création (backend à partir de
+  8020, frontend à partir de 5190), jamais déjà pris par un autre projet.
+- Un `agents.json` complet : les rôles du pipeline, `autonomy: merge`,
+  `merge_without_ci: true`, une `test_command` qui lance toute la suite.
+- Un dépôt git local initialisé.
 
-L'IDE n'agit pas sur ces deux points — c'est à toi de les faire. Les ports affichés (ex: `Backend: 8001`, `Frontend: 5174`) servent si tu dois lancer le projet en local dans d'autres terminaux.
+Il te reste deux choses à faire toi-même :
+1. Écrire le `CLAUDE.md` du projet (ce qu'il fait, ses contraintes).
+2. Créer le dépôt GitHub et le lier (voir « Intégration GitHub ») : l'IDE ne
+   le crée jamais sans toi.
 
 ### Importer un projet existant de ta machine
 

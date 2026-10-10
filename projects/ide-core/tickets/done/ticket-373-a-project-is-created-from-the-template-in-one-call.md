@@ -1,14 +1,16 @@
 ---
-id: ticket-373
-title: "A project is created from the template in one call, with free ports and a ready agents.json"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-372"]
-estimated_days: 1
 created: 2026-10-07
+depends_on:
+- ticket-372
+estimated_days: 1
+id: ticket-373
+pr_number: 355
+priority: high
+status: done
+title: A project is created from the template in one call, with free ports and a ready
+  agents.json
+type: feat
 ---
 
 # ticket-373 — Créer un projet depuis le gabarit en un appel
