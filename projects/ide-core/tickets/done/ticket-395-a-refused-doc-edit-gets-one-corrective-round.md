@@ -1,14 +1,15 @@
 ---
-id: ticket-395
-title: "A doc agent whose edits are refused gets one corrective round with the exact headings, and section anchors tolerate case and spacing"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-10
 depends_on: []
 estimated_days: 1
-created: 2026-10-10
+id: ticket-395
+pr_number: null
+priority: medium
+status: done
+title: A doc agent whose edits are refused gets one corrective round with the exact
+  headings, and section anchors tolerate case and spacing
+type: fix
 ---
 
 # ticket-395 — Un agent de doc refusé a droit à un tour de correction
