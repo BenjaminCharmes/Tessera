@@ -1263,7 +1263,9 @@ class GitWorkspaceService:
                 dest = self._project_path / rel_in_project
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_text(resolved, encoding="utf-8")
-                await self._run("add", "--", chemin)
+                # `:/` : `chemin` est relatif à la racine du dépôt, et le cwd
+                # est le dossier du projet (git_root: ancestor).
+                await self._run("add", "--", f":/{chemin}")
 
             _logger.info("journal_union_resolu", extra={"fichiers": list(conflits)})
             await self._run("-c", "core.editor=true", "rebase", "--continue")
