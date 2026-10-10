@@ -222,3 +222,60 @@ describe("usePrStatuses — projet null", () => {
     }
   });
 });
+
+describe("usePrStatuses — nouvelle PR et erreurs définitives", () => {
+  it("recharge quand un run ouvre une PR, même après des PR toutes réglées", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockResolvedValueOnce(settled)
+        .mockResolvedValue([...settled, ...withOpen]);
+
+      const { result, rerender } = renderHook(
+        ({ cle }: { cle: string }) => usePrStatuses("ide-core", cle),
+        { initialProps: { cle: "ticket-001:1,ticket-002:2" } },
+      );
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      rerender({ cle: "ticket-001:1,ticket-002:2,ticket-003:3" });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(result.current["ticket-003"]?.state).toBe("open");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("n'appelle rien quand aucun ticket ne porte de PR", async () => {
+    const spy = vi.spyOn(apiModule.api.github, "getPrStatuses").mockResolvedValue([]);
+    renderHook(() => usePrStatuses("ide-core", ""));
+    await act(async () => {});
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("arrête de demander après une erreur 4xx (projet sans dépôt GitHub)", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockRejectedValue(new Error("API 404: GitHub non configuré"));
+
+      renderHook(() => usePrStatuses("ide-core", "ticket-001:1"));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(90_000);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});

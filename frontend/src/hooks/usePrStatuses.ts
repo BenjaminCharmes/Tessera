@@ -1,43 +1,70 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 import { useFenetreVisible } from "./useFenetreVisible";
-import type { PRStatus } from "../types/api";
+import type { PRStatus, Ticket } from "../types/api";
 
 const POLL_INTERVAL_MS = 30_000;
+
+/**
+ * Clé des PR connues d'une liste de tickets : elle change quand un run ouvre
+ * une nouvelle PR, ce qui relance le chargement (ticket-367).
+ */
+export function clePrDesTickets(tickets: readonly Ticket[]): string {
+  return tickets
+    .filter((t) => t.pr_number)
+    .map((t) => `${t.id}:${t.pr_number}`)
+    .sort()
+    .join(",");
+}
 
 /**
  * Charge l'état de toutes les PR d'un projet en une seule requête et le rend
  * sous forme de table `ticket_id → PRStatus` (ticket-367).
  *
- * - Ne démarre que si `projectId` est fourni et la fenêtre visible.
+ * - Ne démarre que si `projectId` est fourni, la fenêtre visible, et sauf si
+ *   `clePr` dit qu'aucun ticket ne porte de PR (chaîne vide).
  * - Renouvelle toutes les 30 s tant qu'au moins une PR est `open`.
- * - S'arrête définitivement quand toutes les PR sont réglées, même si la
- *   fenêtre revient visible.
+ * - S'arrête quand toutes les PR sont réglées, jusqu'à ce que `clePr` change :
+ *   une PR ouverte par un run relance le chargement.
+ * - Une erreur 4xx (projet sans dépôt GitHub, jeton absent) ne changera pas au
+ *   prochain essai : le polling s'arrête (ticket-217). Une 5xx réessaie.
  * - Suspend le polling quand la fenêtre est cachée ; reprend au retour.
  */
 export function usePrStatuses(
   projectId: string | null,
+  clePr?: string,
 ): Record<string, PRStatus> {
-  const [statuses, setStatuses] = useState<Record<string, PRStatus>>({});
+  // La table est rangée avec le projet qui l'a produite : celle d'un autre
+  // projet ne s'affiche jamais, les identifiants de tickets s'y recoupent.
+  const [charge, setCharge] = useState<{
+    projet: string;
+    table: Record<string, PRStatus>;
+  } | null>(null);
   const fenetreVisible = useFenetreVisible();
 
   // Évite de redemander après que toutes les PR sont réglées.
   const allSettledRef = useRef(false);
-  // Permet d'annuler une réponse en vol à la destruction de l'effet.
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Réinitialiser l'état settled quand le projet change (dans un effet,
-  // jamais pendant le rendu — React 19 interdit l'accès aux refs pendant le
-  // rendu). Déclaré avant l'effet de polling : React exécute les effets dans
-  // l'ordre de déclaration, donc le reset est appliqué en premier.
+  // Nouveau projet ou nouvelle PR : repartir de zéro. Déclaré avant l'effet
+  // de polling : React exécute les effets dans l'ordre de déclaration.
   useEffect(() => {
     allSettledRef.current = false;
-  }, [projectId]);
+  }, [projectId, clePr]);
 
   useEffect(() => {
-    if (!projectId || !fenetreVisible || allSettledRef.current) return;
+    // `clePr` vide : aucun ticket ne porte de PR, rien à demander.
+    if (!projectId || clePr === "" || !fenetreVisible || allSettledRef.current) return;
 
     let cancelled = false;
+
+    const arreter = () => {
+      allSettledRef.current = true;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
 
     const doFetch = async () => {
       if (allSettledRef.current) return;
@@ -53,18 +80,10 @@ export function usePrStatuses(
             pr_number: e.pr_number,
           };
         }
-        setStatuses(table);
-        // Arrêter le polling si toutes les PR connues sont réglées.
-        const hasOpen = entries.some((e) => e.state === "open");
-        if (!hasOpen) {
-          allSettledRef.current = true;
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-          }
-        }
-      } catch {
-        // Erreur passagère : on réessaiera au prochain tick.
+        setCharge({ projet: projectId, table });
+        if (!entries.some((e) => e.state === "open")) arreter();
+      } catch (err) {
+        if (err instanceof Error && /^API 4\d\d\b/.test(err.message)) arreter();
       }
     };
 
@@ -78,7 +97,9 @@ export function usePrStatuses(
         intervalRef.current = null;
       }
     };
-  }, [projectId, fenetreVisible]);
+  }, [projectId, clePr, fenetreVisible]);
 
-  return statuses;
+  return charge !== null && charge.projet === projectId ? charge.table : VIDE;
 }
+
+const VIDE: Record<string, PRStatus> = {};
