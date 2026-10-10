@@ -31,6 +31,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `OLLAMA_SLOT_WAIT_S` | | `30` | Délai maximum d'attente pour un créneau chez le serveur Ollama avant basculement sur le repli (en secondes) |
 | `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
+| `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 
 ## Budget et limites
 

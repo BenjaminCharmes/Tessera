@@ -16,6 +16,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
+from tessera.services import eveil
+
 
 class RunAlreadyInProgress(Exception):
     """A pipeline is already running on this project."""
@@ -183,6 +185,7 @@ class RunRegistry:
         if self.projet_occupe(project_id):
             raise RunAlreadyInProgress(project_id, self.ticket_du_projet(project_id))
 
+        was_empty = not self._runs
         run = RunActif(
             run_id=run_id or uuid.uuid4().hex,
             project_id=project_id,
@@ -192,10 +195,14 @@ class RunRegistry:
             dialogue=dialogue,
         )
         self._runs[run.run_id] = run
+        if was_empty:
+            eveil.retenir()
         return run
 
     def fermer(self, run_id: str) -> None:
         self._runs.pop(run_id, None)
+        if not self._runs:
+            eveil.relacher()
 
     @asynccontextmanager
     async def acquire(
