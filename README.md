@@ -30,8 +30,10 @@ Trois choix le distinguent d'un assistant de code classique :
   au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
 
 Après un run approuvé, la livraison enchaîne seule jusqu'où le projet
-l'autorise : rebase, PR, attente de CI, merge. Un conflit de rebase est tenté
-par un agent, et sa résolution est toujours relue.
+l'autorise : rebase, PR, attente de CI, merge. Certains conflits simples — dans
+le journal (`memory/pipeline-log.md`) et la liste de documentation
+(`memory/documentation.json`) — sont résolus automatiquement en union. Les autres
+sont tentés par un agent, et leur résolution est toujours relue.
 
 ## Démarrer
 
