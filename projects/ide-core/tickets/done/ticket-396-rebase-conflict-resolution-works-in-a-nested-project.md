@@ -4,7 +4,7 @@ created: 2026-10-10
 depends_on: []
 estimated_days: 0.5
 id: ticket-396
-pr_number: null
+pr_number: 358
 priority: high
 status: done
 title: 'Automatic rebase conflict resolution works for a project nested in its repository
