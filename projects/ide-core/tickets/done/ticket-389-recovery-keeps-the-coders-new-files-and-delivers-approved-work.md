@@ -5,7 +5,7 @@ depends_on:
 - ticket-377
 estimated_days: 0.5
 id: ticket-389
-pr_number: null
+pr_number: 351
 priority: high
 status: done
 title: Startup recovery keeps the files the coder created, and an approved but undelivered
