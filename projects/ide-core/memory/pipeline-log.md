@@ -2128,3 +2128,12 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 15:10:25 UTC — [ticket-391] tests rouges au tour 1
 - 2026-10-09 15:10:25 UTC — [ticket-391] tour 2 — codeur démarré
 - 2026-10-10 16:27:23 UTC — [ticket-391] INTERROMPU au tour 2 (arrêt du PC le 2026-10-09 vers 15:10 UTC) — repris à la main, fiche en todo
+- 2026-10-10 16:29:24 UTC — [ticket-391] branche ticket-391-the-delivery-rebase-merges-the-pipeline-log-and-t
+- 2026-10-10 16:29:24 UTC — [ticket-391] tour 1 — codeur démarré
+- 2026-10-10 16:32:29 UTC — [ticket-391] tour 1 — codeur terminé (184858ms)
+- 2026-10-10 16:36:57 UTC — [ticket-391] testeur: OK (exit 0)
+- 2026-10-10 16:38:57 UTC — [ticket-391] securite: PASS — No security vulnerabilities detected in this ticket's changes. The code introduc (120000ms)
+- 2026-10-10 16:38:57 UTC — [ticket-391] tour 1 — reviewer démarré
+- 2026-10-10 16:40:16 UTC — [ticket-391] tour 1 — reviewer terminé (78453ms)
+- 2026-10-10 16:44:32 UTC — [ticket-391] validateur: APPROVED — Les quatre critères sont satisfaits : le diff ajoute trois fonctions helper (`_i (334343ms)
+- 2026-10-10 16:44:32 UTC — [ticket-391] APPROVED après 1 tour(s)
