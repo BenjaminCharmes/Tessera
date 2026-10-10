@@ -626,3 +626,28 @@ def test_fichier_trop_long_remplace_par_ses_titres_et_borne_respectee(
     assert "paragraphe " * 10 not in contenu
     # La section documentation reste dans la borne (+ tolérance pour les en-têtes fixes)
     assert len(contenu) <= borne + len("\n---\nDocumentation actuelle :\n\n### README.md\n\n") + 100
+
+
+@pytest.mark.parametrize("chemin", ["../secret.md", "../../.env", "src/app.py", "/etc/passwd"])
+def test_titres_fichiers_vises_ne_lit_que_la_documentation(tmp_path: Path, chemin: str) -> None:
+    """Ticket-395 security audit: the corrective round never reads a file the
+    agent names outside the documentation, nor outside the root."""
+    from tessera.services.documentation import _titres_fichiers_vises
+
+    racine = tmp_path / "projet"
+    (racine / "src").mkdir(parents=True)
+    (racine / "src" / "app.py").write_text("# secret code\n", encoding="utf-8")
+    (tmp_path / "secret.md").write_text("# Secret\n", encoding="utf-8")
+
+    assert _titres_fichiers_vises(racine, [{"fichier": chemin}]) == ""
+
+
+def test_titres_fichiers_vises_lit_un_fichier_de_doc(tmp_path: Path) -> None:
+    from tessera.services.documentation import _titres_fichiers_vises
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "guide.md").write_text("# Guide\n\n## Étapes\n", encoding="utf-8")
+
+    titres = _titres_fichiers_vises(tmp_path, [{"fichier": "docs/guide.md"}])
+
+    assert "## Étapes" in titres

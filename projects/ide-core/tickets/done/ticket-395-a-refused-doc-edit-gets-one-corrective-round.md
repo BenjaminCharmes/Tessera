@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-395
 pr_number: null
 priority: medium
-status: blocked
+status: done
 title: A doc agent whose edits are refused gets one corrective round with the exact
   headings, and section anchors tolerate case and spacing
 type: fix

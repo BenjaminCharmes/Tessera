@@ -547,7 +547,14 @@ def _titres_fichiers_vises(racine: Path, editions: list[dict[str, object]]) -> s
         if chemin in vus:
             continue
         vus.add(chemin)
-        fichier = racine / chemin
+        # `fichier` vient de la réponse de l'agent : seule la documentation se
+        # lit, comme seule elle s'écrit (`appliquer_editions`), et jamais hors
+        # de la racine — un « ../../.env » ne doit rien renvoyer au modèle.
+        if not _documentable(chemin):
+            continue
+        fichier = (racine / chemin).resolve()
+        if not fichier.is_relative_to(racine.resolve()):
+            continue
         if fichier.is_file():
             titres = _titres_markdown(fichier.read_text(encoding="utf-8"))
             if titres:

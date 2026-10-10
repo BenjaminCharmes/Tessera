@@ -818,9 +818,15 @@ class Orchestrator:
         # « 0 fichier(s) » seul cachait six refus d'affilée sur démineur, chacun
         # pour plusieurs minutes de calcul (ticket-342).
         motifs = "".join(f" — refusé : {r[:160]}" for r in refus)
+        # Un tour de correction coûte un appel de plus : le journal le dit (ticket-395).
+        correction = (
+            " — après tour de correction"
+            if getattr(doc, "tour_de_correction", False)
+            else ""
+        )
         self._log(
             f"[{resultat.ticket_id}] documentation: {len(fichiers)} fichier(s)"
-            f" ({doc_ms}ms){motifs}"
+            f" ({doc_ms}ms){correction}{motifs}"
         )
         tickets = list(getattr(doc, "tickets", []) or [])
         tronque = bool(getattr(doc, "tronque", False))
