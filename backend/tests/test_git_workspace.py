@@ -1719,6 +1719,71 @@ async def test_commit_bookkeeping_inclut_un_ticket_avec_accent_deplace(
     )
 
 
+async def test_sync_base_active_avance_les_fichiers_et_garde_le_journal(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """Base checked out (ticket-390): the sync fast-forwards index and files,
+    not only the ref, and keeps the uncommitted pipeline-log lines (vigie,
+    2026-10-10: the next ticket was refused for a reverse-dirty tree)."""
+    local, bare = repo_avec_distant
+    (local / "memory").mkdir()
+    (local / "memory" / "pipeline-log.md").write_text("- ligne 1\n", encoding="utf-8")
+    await _git(local, "add", "memory/pipeline-log.md")
+    await _git(local, "commit", "-q", "-m", "log")
+    await _git(local, "push", "-q", "origin", "develop")
+    service = GitWorkspaceService(local)
+
+    # Le merge distant du ticket : un fichier de code et ses lignes de journal.
+    autre = local.parent / "autre"
+    await _git(local.parent, "clone", "-q", "-b", "develop", str(bare), str(autre))
+    await _git(autre, "config", "user.email", "test@tessera.local")
+    await _git(autre, "config", "user.name", "Tessera test")
+    (autre / "code.py").write_text("x = 1\n", encoding="utf-8")
+    with (autre / "memory" / "pipeline-log.md").open("a", encoding="utf-8") as f:
+        f.write("- ligne du ticket\n")
+    await _git(autre, "add", "code.py", "memory/pipeline-log.md")
+    await _git(autre, "commit", "-q", "-m", "feat: ticket-001 (#1)")
+    await _git(autre, "push", "-q", "origin", "develop")
+    distant = await _git_out(autre, "rev-parse", "HEAD")
+
+    # Ligne écrite après le retour sur la base, pas encore commitée.
+    with (local / "memory" / "pipeline-log.md").open("a", encoding="utf-8") as f:
+        f.write("- PR confiée au CIWatcher\n")
+
+    raison = await service.sync_base_depuis_distant("develop")
+
+    assert raison is None, raison
+    assert await _git_out(local, "rev-parse", "HEAD") == distant
+    assert (local / "code.py").read_text(encoding="utf-8") == "x = 1\n"
+    statut = await _git_out(local, "status", "--porcelain")
+    assert statut == "M memory/pipeline-log.md", statut
+    journal = (local / "memory" / "pipeline-log.md").read_text(encoding="utf-8")
+    assert journal == "- ligne 1\n- ligne du ticket\n- PR confiée au CIWatcher\n"
+
+
+async def test_sync_base_active_renonce_si_un_autre_fichier_est_modifie(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """A local change that the fast-forward would overwrite skips the sync."""
+    local, bare = repo_avec_distant
+    service = GitWorkspaceService(local)
+    autre = local.parent / "autre"
+    await _git(local.parent, "clone", "-q", "-b", "develop", str(bare), str(autre))
+    await _git(autre, "config", "user.email", "test@tessera.local")
+    await _git(autre, "config", "user.name", "Tessera test")
+    (autre / "README.md").write_text("# distant\n", encoding="utf-8")
+    await _git(autre, "commit", "-q", "-am", "docs")
+    await _git(autre, "push", "-q", "origin", "develop")
+    avant = await _git_out(local, "rev-parse", "HEAD")
+    (local / "README.md").write_text("# local\n", encoding="utf-8")
+
+    raison = await service.sync_base_depuis_distant("develop")
+
+    assert raison is not None
+    assert await _git_out(local, "rev-parse", "HEAD") == avant
+    assert (local / "README.md").read_text(encoding="utf-8") == "# local\n"
+
+
 # ------------------------------------------------------------------
 # Union resolution of journal files on delivery rebase — ticket-391
 # ------------------------------------------------------------------

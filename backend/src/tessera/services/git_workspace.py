@@ -37,6 +37,9 @@ _EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 # pathspec `:(exclude)`.
 _ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = ("tickets/", "memory/pipeline-log.md")
 
+#: Journal du pipeline, relatif au dossier du projet.
+_JOURNAL_PIPELINE = "memory/pipeline-log.md"
+
 # The same paths, without the `:(exclude)` magic, used to stage and commit
 # them separately from the ticket's own code changes (see `commit_all`).
 _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS: tuple[str, ...] = tuple(
@@ -752,17 +755,56 @@ class GitWorkspaceService:
                 _logger.warning("sync_base_diverge", extra={"raison": raison})
                 return raison
 
-        # Safe: update the local branch ref and reposition _base_ref.
-        try:
-            await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
-        except GitCommandError as exc:
-            raison = f"update-ref refs/heads/{base_branch} échoué : {exc.stderr.strip()}"
-            _logger.warning("sync_base_update_ref_echoue", extra={"erreur": raison})
-            return raison
+        # La base est la branche active depuis ticket-390 (retour sur la base
+        # après livraison) : `update-ref` y avancerait la référence sans
+        # l'index ni les fichiers, et l'arbre paraîtrait sale à l'envers.
+        if await self.branche_courante() == base_branch:
+            raison_ff = await self._avancer_base_active(fetch_sha)
+            if raison_ff is not None:
+                _logger.warning("sync_base_ff_echoue", extra={"erreur": raison_ff})
+                return raison_ff
+        else:
+            # Safe: update the local branch ref and reposition _base_ref.
+            try:
+                await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
+            except GitCommandError as exc:
+                raison = f"update-ref refs/heads/{base_branch} échoué : {exc.stderr.strip()}"
+                _logger.warning("sync_base_update_ref_echoue", extra={"erreur": raison})
+                return raison
 
         self._base_ref = fetch_sha
         _logger.info("sync_base_depuis_distant_ok", extra={"sha": fetch_sha[:7]})
         return None
+
+    async def _avancer_base_active(self, cible: str) -> str | None:
+        """Fast-forward the checked-out base branch to ``cible``, files included.
+
+        Uncommitted pipeline-log lines are set aside and appended back after
+        the fast-forward: the merged ticket's commit carries its own log
+        lines, so a plain merge would refuse to overwrite the file. Any other
+        local change makes ``merge --ff-only`` refuse, and the sync is skipped
+        rather than forced (ADR-022).
+        """
+        journal = _JOURNAL_PIPELINE
+        lignes: list[str] = []
+        if (self._project_path / journal).is_file():
+            diff = await self._run("diff", "-U0", "HEAD", "--", journal)
+            lignes = [
+                ligne[1:]
+                for ligne in diff.splitlines()
+                if ligne.startswith("+") and not ligne.startswith("+++")
+            ]
+            if lignes:
+                await self._run("checkout", "HEAD", "--", journal)
+        try:
+            await self._run("merge", "--ff-only", "-q", cible)
+            raison = None
+        except GitCommandError as exc:
+            raison = f"avance rapide de la base refusée : {exc.stderr.strip()}"
+        if lignes:
+            with (self._project_path / journal).open("a", encoding="utf-8") as f:
+                f.write("\n".join(lignes) + "\n")
+        return raison
 
     # ------------------------------------------------------------------
     # Fork point of a ticket branch — ticket-208
@@ -1221,7 +1263,9 @@ class GitWorkspaceService:
                 dest = self._project_path / rel_in_project
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_text(resolved, encoding="utf-8")
-                await self._run("add", "--", chemin)
+                # `:/` : `chemin` est relatif à la racine du dépôt, et le cwd
+                # est le dossier du projet (git_root: ancestor).
+                await self._run("add", "--", f":/{chemin}")
 
             _logger.info("journal_union_resolu", extra={"fichiers": list(conflits)})
             await self._run("-c", "core.editor=true", "rebase", "--continue")
