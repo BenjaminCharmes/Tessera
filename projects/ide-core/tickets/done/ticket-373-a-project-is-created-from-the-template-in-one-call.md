@@ -5,7 +5,7 @@ depends_on:
 - ticket-372
 estimated_days: 1
 id: ticket-373
-pr_number: null
+pr_number: 355
 priority: high
 status: done
 title: A project is created from the template in one call, with free ports and a ready
