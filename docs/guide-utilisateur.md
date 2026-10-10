@@ -590,6 +590,10 @@ et une ligne de log dans `memory/pipeline-log.md` explique pourquoi.
 Les tickets dépendants d'un ticket bloqué refusent de démarrer — la file
 s'arrête et t'affiche l'erreur.
 
+### Conflits sur le journal fusionnés automatiquement
+
+Dans une file, quand plusieurs tickets tournent d'affilée, chacun enregistre ses changements au journal du pipeline et à la documentation. Autrefois, tu devais arrêter la file quand le ticket suivant heurtait un conflit sur ces fichiers. Depuis, l'IDE les fusionne automatiquement—la file continue sans interruption. S'il y a aussi un conflit sur d'autres fichiers, tu dois approuver la résolution.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du

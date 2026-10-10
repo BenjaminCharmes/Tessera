@@ -1,14 +1,15 @@
 ---
-id: ticket-391
-title: "The delivery rebase merges the pipeline log and the documentation list as a union instead of stopping"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-09
 depends_on: []
 estimated_days: 1
-created: 2026-10-09
+id: ticket-391
+pr_number: 348
+priority: medium
+status: done
+title: The delivery rebase merges the pipeline log and the documentation list as a
+  union instead of stopping
+type: fix
 ---
 
 # ticket-391 — Le rebase de livraison fusionne le journal en union

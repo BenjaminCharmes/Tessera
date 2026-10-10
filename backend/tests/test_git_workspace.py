@@ -3,12 +3,16 @@ from pathlib import Path
 
 import pytest
 
+import json
+
 from tessera.services.git_workspace import (
     GitCommandError,
     GitWorkspaceService,
     InvalidSlugError,
     NotAGitRepository,
     _resumer_lockfiles,
+    _union_lines,
+    _union_json_lists,
 )
 
 
@@ -1713,3 +1717,195 @@ async def test_commit_bookkeeping_inclut_un_ticket_avec_accent_deplace(
         f"moved accented ticket must appear in the bookkeeping commit; "
         f"files: {bookkeeping_files!r}"
     )
+
+
+# ------------------------------------------------------------------
+# Union resolution of journal files on delivery rebase — ticket-391
+# ------------------------------------------------------------------
+
+
+def test_union_lines_merges_without_duplicates() -> None:
+    """Lines unique to either side are kept; common lines appear only once."""
+    base = "line-a\nline-b\n"
+    theirs = "line-a\nline-c\n"
+    result = _union_lines(base, theirs)
+    assert "line-a\n" in result
+    assert "line-b\n" in result
+    assert "line-c\n" in result
+    # No duplicate: line-a appears exactly once.
+    assert result.count("line-a\n") == 1
+    # Base lines come first.
+    assert result.index("line-a\n") < result.index("line-c\n")
+
+
+def test_union_json_lists_merges_without_duplicates() -> None:
+    """Items unique to either side are kept; common items appear only once."""
+    base_text = json.dumps(["a", "b"])
+    theirs_text = json.dumps(["a", "c"])
+    result = _union_json_lists(base_text, theirs_text)
+    assert result is not None
+    parsed = json.loads(result)
+    assert "a" in parsed
+    assert "b" in parsed
+    assert "c" in parsed
+    assert parsed.count("a") == 1
+
+
+def test_union_json_lists_returns_none_on_invalid_json() -> None:
+    """An unreadable JSON on either side signals failure with None."""
+    assert _union_json_lists("not json", json.dumps(["a"])) is None
+    assert _union_json_lists(json.dumps(["a"]), "not json") is None
+
+
+async def test_rebase_journal_pipeline_log_resolves_as_union(repo: Path) -> None:
+    """Two branches that each append a line to pipeline-log.md merge cleanly.
+
+    Ticket-391: the delivery rebase must not stop on a conflict in an
+    append-only journal file. Both lines must be present in the result.
+    """
+    (repo / "memory").mkdir()
+    log = repo / "memory" / "pipeline-log.md"
+    log.write_text("# log\n", encoding="utf-8")
+    await _git(repo, "add", "memory/pipeline-log.md")
+    await _git(repo, "commit", "-q", "-m", "chore: init log")
+
+    base = (await asyncio.create_subprocess_exec(
+        "git", "rev-parse", "--abbrev-ref", "HEAD",
+        cwd=str(repo), stdout=asyncio.subprocess.PIPE,
+    )).stdout  # type: ignore[union-attr]
+
+    service = GitWorkspaceService(repo)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    # Ticket branch: append a line from the ticket run.
+    branche = await service.create_branch("ticket-391", "pipeline-log-union")
+    log.write_text("# log\n- ticket-391 run\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-391")
+
+    # Advance the base branch with a different line (simulates a previous ticket's run).
+    await _git(repo, "checkout", "-q", base_name)
+    log.write_text("# log\n- ticket-390 run\n", encoding="utf-8")
+    await _git(repo, "add", "memory/pipeline-log.md")
+    await _git(repo, "commit", "-q", "-m", "chore: ticket-390 bookkeeping")
+    await _git(repo, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    assert conflits == (), f"rebase doit réussir sans conflit, got: {conflits}"
+    contenu = log.read_text(encoding="utf-8")
+    assert "ticket-390 run" in contenu, "la ligne de base doit être présente"
+    assert "ticket-391 run" in contenu, "la ligne du ticket doit être présente"
+
+
+async def test_rebase_documentation_json_resolves_as_union(repo: Path) -> None:
+    """Two branches with different documentation.json lists merge without duplicates.
+
+    Ticket-391: documentation.json grows one ticket at a time; a conflict
+    between two queued tickets must resolve as the union of both lists.
+    """
+    (repo / "memory").mkdir()
+    doc = repo / "memory" / "documentation.json"
+    doc.write_text(json.dumps([]), encoding="utf-8")
+    await _git(repo, "add", "memory/documentation.json")
+    await _git(repo, "commit", "-q", "-m", "chore: init doc list")
+
+    service = GitWorkspaceService(repo)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    # Ticket branch: add ticket-391.
+    branche = await service.create_branch("ticket-391", "doc-union")
+    doc.write_text(json.dumps(["ticket-391"]), encoding="utf-8")
+    await service.commit_all("feat: ticket-391")
+
+    # Advance the base with ticket-390 (simulates previous delivery).
+    await _git(repo, "checkout", "-q", base_name)
+    doc.write_text(json.dumps(["ticket-390"]), encoding="utf-8")
+    await _git(repo, "add", "memory/documentation.json")
+    await _git(repo, "commit", "-q", "-m", "chore: ticket-390 bookkeeping")
+    await _git(repo, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    assert conflits == (), f"rebase doit réussir sans conflit, got: {conflits}"
+    parsed = json.loads(doc.read_text(encoding="utf-8"))
+    assert "ticket-390" in parsed
+    assert "ticket-391" in parsed
+    assert parsed.count("ticket-390") == 1
+    assert parsed.count("ticket-391") == 1
+
+
+async def test_rebase_with_non_journal_conflict_is_not_auto_resolved(repo: Path) -> None:
+    """A conflict on a non-journal file is not auto-resolved; files list is returned.
+
+    Ticket-391: only pure journal-file conflicts are resolved in union.
+    When docs/architecture.md (or any non-journal file) is also in conflict,
+    the existing behavior must be preserved: abort and return the conflict list.
+    """
+    (repo / "memory").mkdir()
+    log = repo / "memory" / "pipeline-log.md"
+    log.write_text("# log\n", encoding="utf-8")
+    (repo / "docs").mkdir()
+    arch = repo / "docs" / "architecture.md"
+    arch.write_text("# arch v0\n", encoding="utf-8")
+    await _git(repo, "add", "memory/pipeline-log.md", "docs/architecture.md")
+    await _git(repo, "commit", "-q", "-m", "chore: init")
+
+    service = GitWorkspaceService(repo)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    # Ticket branch: append to log AND modify architecture.md.
+    branche = await service.create_branch("ticket-391", "mixed-conflict")
+    log.write_text("# log\n- ticket-391\n", encoding="utf-8")
+    arch.write_text("# arch ticket-391\n", encoding="utf-8")
+    await service.commit_all("feat: ticket-391")
+
+    # Advance base: different content in both files.
+    await _git(repo, "checkout", "-q", base_name)
+    log.write_text("# log\n- ticket-390\n", encoding="utf-8")
+    arch.write_text("# arch ticket-390\n", encoding="utf-8")
+    await _git(repo, "add", "memory/pipeline-log.md", "docs/architecture.md")
+    await _git(repo, "commit", "-q", "-m", "chore: ticket-390")
+    await _git(repo, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    assert len(conflits) > 0, "doit retourner les fichiers en conflit"
+    assert any("architecture.md" in c for c in conflits)
+    assert await service.is_clean()
+
+
+async def test_rebase_documentation_json_invalid_leaves_conflict_unresolved(
+    repo: Path,
+) -> None:
+    """An unreadable documentation.json on either side leaves the conflict open.
+
+    Ticket-391: only a parseable JSON array qualifies for union resolution.
+    Corrupted JSON must fall through to the existing conflict-abort behaviour.
+    """
+    (repo / "memory").mkdir()
+    doc = repo / "memory" / "documentation.json"
+    doc.write_text("[]", encoding="utf-8")
+    await _git(repo, "add", "memory/documentation.json")
+    await _git(repo, "commit", "-q", "-m", "chore: init doc list")
+
+    service = GitWorkspaceService(repo)
+    base_name = (await service._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
+    # Ticket branch: write corrupted JSON.
+    branche = await service.create_branch("ticket-391", "bad-json")
+    doc.write_text("not valid json {{", encoding="utf-8")
+    await service.commit_all("feat: ticket-391")
+
+    # Advance base with valid JSON.
+    await _git(repo, "checkout", "-q", base_name)
+    doc.write_text(json.dumps(["ticket-390"]), encoding="utf-8")
+    await _git(repo, "add", "memory/documentation.json")
+    await _git(repo, "commit", "-q", "-m", "chore: ticket-390 bookkeeping")
+    await _git(repo, "checkout", "-q", branche)
+
+    conflits = await service.rejouer_sur(base_name)
+
+    # The conflict could not be auto-resolved: files in conflict are returned.
+    assert len(conflits) > 0, "un JSON illisible doit laisser le conflit non résolu"
+    assert any("documentation.json" in c for c in conflits)
+    assert await service.is_clean()
