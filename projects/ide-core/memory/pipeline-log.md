@@ -2151,3 +2151,27 @@ Le code introduit une sé (44328ms)
 - 2026-10-10 17:07:53 UTC — [ticket-389] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests couvrant les troi (335078ms)
 - 2026-10-10 17:07:53 UTC — [ticket-389] APPROVED après 1 tour(s)
 - 2026-10-10 17:10:30 UTC — [ticket-389] documentation: 2 fichier(s) (154983ms)
+- 2026-10-10 17:10:43 UTC — [ide-core] ticket-389 PR #351 confiée au CIWatcher
+- 2026-10-10 17:10:45 UTC — [ticket-367] branche ticket-367-ticket-cards-read-their-pr-status-from-one-projec
+- 2026-10-10 17:10:45 UTC — [ticket-367] tour 1 — codeur démarré
+- 2026-10-10 17:12:21 UTC — [ticket-367] tour 1 — codeur terminé (95250ms)
+- 2026-10-10 17:15:47 UTC — [ticket-367] testeur: ✖ 3 problems (3 errors, 0 warnings)
+- 2026-10-10 17:15:47 UTC — [ticket-367] tests rouges au tour 1
+- 2026-10-10 17:15:47 UTC — [ticket-367] tour 2 — codeur démarré
+- 2026-10-10 17:17:38 UTC — [ticket-367] tour 2 — codeur terminé (111188ms)
+- 2026-10-10 17:21:43 UTC — [ticket-367] testeur: OK (exit 0)
+- 2026-10-10 17:22:31 UTC — [ticket-367] securite: PASS — Refactorisation du polling des statuts PR sans vulnérabilité détectée. Le diff d (48797ms)
+- 2026-10-10 17:22:31 UTC — [ticket-367] tour 2 — reviewer démarré
+- 2026-10-10 17:24:10 UTC — [ticket-367] tour 2 — reviewer terminé (98155ms)
+- 2026-10-10 17:26:41 UTC — [ticket-367] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été mis à jour pou (249860ms)
+- 2026-10-10 17:26:41 UTC — [ticket-367] CHANGES_REQUESTED tour 2: Reviewer : Je vais vérifier le fichier KanbanView pour m'assurer que l'interface TypeScript est cohé
+- 2026-10-10 17:26:41 UTC — [ticket-367] tour 3 — codeur démarré
+- 2026-10-10 17:27:52 UTC — [ticket-367] tour 3 — codeur terminé (70702ms)
+- 2026-10-10 17:31:48 UTC — [ticket-367] testeur: OK (exit 0)
+- 2026-10-10 17:32:25 UTC — [ticket-367] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée.
+
+Ce diff effectue un refactor (37061ms)
+- 2026-10-10 17:32:25 UTC — [ticket-367] tour 3 — reviewer démarré
+- 2026-10-10 17:33:57 UTC — [ticket-367] tour 3 — reviewer terminé (92421ms)
+- 2026-10-10 17:36:47 UTC — [ticket-367] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été mis à jour pou (261905ms)
+- 2026-10-10 17:36:47 UTC — [ticket-367] APPROVED après 3 tour(s)
