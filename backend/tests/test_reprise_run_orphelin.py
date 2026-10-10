@@ -607,3 +607,42 @@ async def test_le_demarrage_de_l_app_en_test_ne_solde_ni_ne_reprend_rien() -> No
     assert await tessera.main.solder_les_runs_orphelins("inutile") == []
     assert await tessera.main.reprendre_depots_orphelins([], "inutile", Path(".")) is None
     assert tessera.main.solder_les_runs_orphelins is not solder_les_runs_orphelins
+
+
+async def test_projet_imbrique_fichier_nouveau_hors_du_projet(tmp_path: Path) -> None:
+    """git_root: ancestor (ide-core): a file the coder created in the
+    repository's backend/, outside the project folder, lands in the recovery
+    commit; a neighbour project's nested repository does not."""
+    racine = tmp_path / "depot"
+    ws = racine / "projects"
+    projet = ws / "mon-projet"
+    projet.mkdir(parents=True)
+    await _git(racine, "init", "-q", "-b", "develop")
+    await _git(racine, "config", "user.email", "test@tessera.local")
+    await _git(racine, "config", "user.name", "Tessera Test")
+    (projet / "CLAUDE.md").write_text("# p\n", encoding="utf-8")
+    (racine / "README.md").write_text("# depot\n", encoding="utf-8")
+    await _git(racine, "add", "README.md", "projects/mon-projet/CLAUDE.md")
+    await _git(racine, "commit", "-q", "-m", "init")
+    await _git(racine, "checkout", "-q", "-b", "ticket-901-mon-ticket")
+
+    db, orphelins = await _setup_db_with_orphan(tmp_path)
+    started_at = await _lire_started_at(db)
+    recent = started_at.timestamp() + 1.0
+
+    (racine / "backend").mkdir()
+    nouveau = racine / "backend" / "test_nouveau.py"
+    nouveau.write_text("# nouveau\n", encoding="utf-8")
+    os.utime(str(nouveau), (recent, recent))
+
+    voisin = ws / "voisin"
+    voisin.mkdir()
+    await _git(voisin, "init", "-q")
+    (voisin / "f.txt").write_text("x\n", encoding="utf-8")
+    os.utime(str(voisin / "f.txt"), (recent, recent))
+
+    await reprendre_depots_orphelins(orphelins, db, ws)
+
+    commites = await _git(racine, "show", "--name-only", "--format=", "ticket-901-mon-ticket")
+    assert "backend/test_nouveau.py" in commites, commites
+    assert "voisin" not in commites, commites
