@@ -141,3 +141,17 @@ class GithubSyncResult(BaseModel):
     pulled: int
     pushed: int
     skipped: int
+
+
+class ProjectFromTemplateRequest(BaseModel):
+    project_id: str
+    name: str
+
+    _project_id_valide = field_validator("project_id")(_verifier_project_id)
+
+
+class ProjectFromTemplateResult(BaseModel):
+    project: Project
+    backend_port: int
+    frontend_port: int
+    git_ready: bool
