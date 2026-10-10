@@ -829,6 +829,19 @@ L'endpoint `GET /projects/{project_id}/pr-statuses` consolide l'état de toutes 
 
 L'endpoint par ticket reste en place : rien d'autre ne change.
 
+### Cache et rafraîchissement intelligent du frontend (ticket-367)
+
+L'endpoint `pr-statuses` retourne l'état de tous les PR d'un projet, mais c'est une seule fois au montage du composant qui affiche les cartes. Un hook `usePrStatuses` (`frontend/src/hooks/usePrStatuses.ts`) gère le cache côté frontend avec une stratégie de rafraîchissement intelligente :
+
+- **Charge au montage** du composant contenant les cartes (Sidebar/TicketList.tsx, KanbanView)
+- **Rafraîchit toutes les 30 s seulement** tant qu'au moins une PR est `open` ; arrêt complet dès que toutes sont réglées
+- **Pause quand la fenêtre est cachée** — intégration `useFenetreVisible` (ticket-356) : aucun appel en arrière-plan
+- **Rend une table** `ticket_id → PR status`, consommée en prop par chaque `TicketCard`
+
+Chaque carte reçoit son statut en prop et n'émet aucun appel réseau — elle affiche ce qu'elle reçoit. Le rendu (badge « PR #N », info-bulle d'état, couleurs de CI) reste identique à l'utilisateur. L'économie est drastique : au lieu de N requêtes par ouverture (une par carte, souvent 50–150 sur les gros projets) plus un rafraîchissement N toutes les 30 s, c'est un appel unique par ouverture du projet, plus un toutes les 30 s si une PR est ouverte.
+
+Cette consolidation suit le même principe que le ticket-365 (arrêt du polling pour une PR réglée), mais au niveau du projet entier : dès qu'aucune PR n'est ouverte, les appels s'arrêtent complètement.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`
