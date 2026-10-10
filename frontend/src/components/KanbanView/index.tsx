@@ -5,7 +5,7 @@ import { IconCross } from "../../design/icons";
 import KanbanColumn from "./KanbanColumn";
 import QueueBar from "../Sidebar/QueueBar";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
-import { usePrStatuses } from "../../hooks/usePrStatuses";
+import { clePrDesTickets, usePrStatuses } from "../../hooks/usePrStatuses";
 import { filtresActifs, type FiltresTickets } from "../../lib/filtresTickets";
 import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
 
@@ -84,7 +84,11 @@ export default function KanbanView({
     [byStatus],
   );
   const blockedArrets = useBlockedArrets(projectId ?? null, blockedIds);
-  const prStatuses = usePrStatuses(projectId ?? null);
+  const clePr = useMemo(
+    () => clePrDesTickets(Object.values(byStatus).flat()),
+    [byStatus],
+  );
+  const prStatuses = usePrStatuses(projectId ?? null, clePr);
 
   return (
     <div className="h-full flex flex-col bg-zinc-900">

@@ -16,7 +16,7 @@ import CreateTicketModal from "./CreateTicketModal";
 import PlanEvolutionModal from "./PlanEvolutionModal";
 import SkeletonList from "../SkeletonList";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
-import { usePrStatuses } from "../../hooks/usePrStatuses";
+import { clePrDesTickets, usePrStatuses } from "../../hooks/usePrStatuses";
 import type { Project, Ticket, TicketStatus } from "../../types/api";
 import BarreDeFiltres from "./BarreDeFiltres";
 import type { FiltresTickets } from "../../lib/filtresTickets";
@@ -112,7 +112,11 @@ export default function TicketList({
     [byStatus],
   );
   const blockedArrets = useBlockedArrets(project?.id ?? null, blockedIds);
-  const prStatuses = usePrStatuses(project?.id ?? null);
+  const clePr = useMemo(
+    () => clePrDesTickets(Object.values(byStatus).flat()),
+    [byStatus],
+  );
+  const prStatuses = usePrStatuses(project?.id ?? null, clePr);
 
   if (!project) {
     return (
