@@ -2217,3 +2217,9 @@ Ce diff effectue un refactor (37061ms)
 - 2026-10-10 19:00:30 UTC — [ticket-396] validateur: APPROVED — Le diff ajoute trois tests couvrant exactement les trois premiers critères (conf (331313ms)
 - 2026-10-10 19:00:30 UTC — [ticket-396] APPROVED après 2 tour(s)
 - 2026-10-10 19:01:21 UTC — [ticket-396] documentation: 0 fichier(s) (48563ms)
+- 2026-10-10 19:17:06 UTC — [ide-core] ticket-394 PR #360 confiée au CIWatcher
+- 2026-10-10 19:17:07 UTC — [ticket-395] branche ticket-395-a-doc-agent-whose-edits-are-refused-gets-one-corr
+- 2026-10-10 19:17:08 UTC — [ticket-395] tour 1 — codeur démarré
+- 2026-10-10 19:25:25 UTC — [ticket-395] tour 1 — codeur terminé (497297ms)
+- 2026-10-10 19:29:21 UTC — [ticket-395] testeur: OK (exit 0)
+- 2026-10-10 19:30:34 UTC — [ticket-395] securite: BLOCK — A HIGH severity path traversal vulnerability is introduced in the new _titres_fi (73389ms)
