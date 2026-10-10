@@ -110,19 +110,27 @@ d'en obtenir un.
 Sidebar → **Nouveau projet**. Tu décris ton idée en langage naturel, l'agent
 *project-creator* génère la structure, le `CLAUDE.md` et les premiers tickets.
 
-### Créer un projet depuis un gabarit
+### Créer un projet depuis le gabarit FastAPI + React
 
-Tu peux démarrer rapidement avec le gabarit `fastapi-react` qui fournit une base complète : backend Python/FastAPI, frontend React, avec tous les fichiers de configuration nécessaires.
+La fenêtre **Nouveau projet** propose deux types :
 
-Tu indiques un identifiant unique de projet et un nom. Le gabarit configure automatiquement :
-- Squelette prêt à l'emploi (tous les marqueurs remplacés)
-- Deux ports libres attribués pour les deux services (backend 8020+, frontend 5190+)
-- `agents.json` avec les bons réglages : `autonomy: merge`, `merge_without_ci: true`, `test_command` complète
-- Dépôt git local initialisé
+**Projet vide** : l'IDE crée la structure Tessera (tickets, mémoire,
+`CLAUDE.md`, `agents.json`) et initialise le dépôt git ; le code reste à
+écrire.
 
-Ce choix te fait gagner du temps par rapport à « Créer from scratch » — plus de ports à chercher, plus d'`agents.json` à remplir.
+**Gabarit FastAPI + React** : l'IDE génère une base prête à développer.
+- Backend `backend/` (FastAPI, pytest, mypy) et frontend `frontend/` (React,
+  Vite, TypeScript, Tailwind), tous les marqueurs remplacés.
+- Deux ports libres attribués et affichés après création (backend à partir de
+  8020, frontend à partir de 5190), jamais déjà pris par un autre projet.
+- Un `agents.json` complet : les rôles du pipeline, `autonomy: merge`,
+  `merge_without_ci: true`, une `test_command` qui lance toute la suite.
+- Un dépôt git local initialisé.
 
-Le dépôt GitHub reste à créer séparément, voir « Intégration GitHub ».
+Il te reste deux choses à faire toi-même :
+1. Écrire le `CLAUDE.md` du projet (ce qu'il fait, ses contraintes).
+2. Créer le dépôt GitHub et le lier (voir « Intégration GitHub ») : l'IDE ne
+   le crée jamais sans toi.
 
 ### Importer un projet existant de ta machine
 

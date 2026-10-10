@@ -292,6 +292,14 @@ export interface ProjectCreationResult {
   repository_ready: boolean;
 }
 
+/** Résultat de la création depuis le gabarit FastAPI + React (ticket-373). */
+export interface TemplateCreationResult {
+  project: Project;
+  backend_port: number;
+  frontend_port: number;
+  git_ready: boolean;
+}
+
 export interface ImportProjectRequest {
   source_path: string;
   mode: "copy" | "symlink";

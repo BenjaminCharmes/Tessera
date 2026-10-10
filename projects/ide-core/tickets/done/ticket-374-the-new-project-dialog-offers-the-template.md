@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-07
+depends_on:
+- ticket-373
+estimated_days: 0.5
 id: ticket-374
-title: "The new-project dialog offers the FastAPI + React template and shows what is left to do by hand"
-type: feat
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-373"]
-estimated_days: 0.5
-created: 2026-10-07
+status: done
+title: The new-project dialog offers the FastAPI + React template and shows what is
+  left to do by hand
+type: feat
 ---
 
 # ticket-374 — La fenêtre de création propose le gabarit FastAPI + React
