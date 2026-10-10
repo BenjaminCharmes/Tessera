@@ -302,6 +302,34 @@ describe("CreateProjectModal", () => {
       expect(screen.getByText(/5192/)).toBeInTheDocument();
     });
 
+    it("lowercases the project id like an empty project", async () => {
+      mockCreateFromTemplate.mockResolvedValue(mockTemplateResult);
+
+      render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+      await selectTemplate();
+      await userEvent.type(screen.getByLabelText(/nom/i), "MonProjet");
+      fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+      await waitFor(() => {
+        expect(mockCreateFromTemplate).toHaveBeenCalledWith("monprojet", "MonProjet");
+      });
+    });
+
+    it("warns when the git repository could not be initialised", async () => {
+      mockCreateFromTemplate.mockResolvedValue({
+        ...mockTemplateResult,
+        git_ready: false,
+      });
+
+      render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+      await selectTemplate();
+      await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+      fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+      await screen.findByText(/continuer/i);
+      expect(screen.getByText(/n.a pas pu être initialisé/)).toBeInTheDocument();
+    });
+
     it("shows remaining steps after template creation", async () => {
       mockCreateFromTemplate.mockResolvedValue(mockTemplateResult);
 

@@ -49,7 +49,11 @@ export default function CreateProjectModal({
     setLoading(true);
     try {
       if (templateMode) {
-        const result = await api.projects.createFromTemplate(name, name);
+        // Même identifiant que pour un projet vide (`api.projects.create`).
+        const result = await api.projects.createFromTemplate(
+          name.toLowerCase().replace(/\s+/g, "-"),
+          name,
+        );
         setCreatedProject(result.project);
         setAgentsCreated([]);
         setDepotPret(result.git_ready);
@@ -130,6 +134,13 @@ export default function CreateProjectModal({
               <p className="text-zinc-400 text-xs mt-3 font-medium">
                 Étapes restantes :
               </p>
+              {!depotPret && (
+                <p className="text-amber-400 text-xs mt-2">
+                  Le dépôt git n&rsquo;a pas pu être initialisé&nbsp;:
+                  rattrapez-le depuis la section Git de la barre latérale avant
+                  le premier run.
+                </p>
+              )}
               <ul className="mt-1 text-zinc-400 text-xs list-disc list-inside space-y-1">
                 <li>
                   Écrire le{" "}
