@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-391
 pr_number: null
 priority: medium
-status: blocked
+status: todo
 title: The delivery rebase merges the pipeline log and the documentation list as a
   union instead of stopping
 type: fix

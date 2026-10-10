@@ -2120,3 +2120,11 @@ Le code introduit une sé (44328ms)
 - 2026-10-09 14:29:55 UTC — [ticket-391] tour 1 — codeur terminé (427577ms)
 - 2026-10-09 14:29:55 UTC — [ticket-391] ARRÊTÉ par l'utilisateur au tour 1
 - 2026-10-09 14:29:57 UTC — [ide-core] file interrompue : ticket-391 non approuvé
+- 2026-10-09 15:04:24 UTC — [ide-core] ticket-393 PR #346 confiée au CIWatcher
+- 2026-10-09 15:04:26 UTC — [ticket-391] branche ticket-391-the-delivery-rebase-merges-the-pipeline-log-and-t
+- 2026-10-09 15:04:26 UTC — [ticket-391] tour 1 — codeur démarré
+- 2026-10-09 15:07:40 UTC — [ticket-391] tour 1 — codeur terminé (193655ms)
+- 2026-10-09 15:10:25 UTC — [ticket-391] testeur: FAILED (exit 1073807364)
+- 2026-10-09 15:10:25 UTC — [ticket-391] tests rouges au tour 1
+- 2026-10-09 15:10:25 UTC — [ticket-391] tour 2 — codeur démarré
+- 2026-10-10 16:27:23 UTC — [ticket-391] INTERROMPU au tour 2 (arrêt du PC le 2026-10-09 vers 15:10 UTC) — repris à la main, fiche en todo
