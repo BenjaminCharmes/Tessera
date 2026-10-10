@@ -2187,3 +2187,4 @@ Ce diff effectue un refactor (37061ms)
 - 2026-10-10 18:12:39 UTC — [ticket-374] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés pour v (111844ms)
 - 2026-10-10 18:12:39 UTC — [ticket-374] APPROVED après 1 tour(s)
 - 2026-10-10 18:15:06 UTC — [ticket-374] documentation: 1 fichier(s) (144686ms)
+- 2026-10-10 18:15:45 UTC — [ticket-374] livraison: arrêt — Conflit avec develop sur : docs/guide-utilisateur.md. La branche est restée intacte, à toi de tranch
