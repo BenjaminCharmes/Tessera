@@ -302,6 +302,18 @@ Si la copie de travail est sur une autre branche, aucune action n'est prise. Les
 
 Quand une branche de ticket est reprise au démarrage, sa fiche est validée. Si le ticket a été déplacé de `tickets/todo/` vers `tickets/in-progress/` ou `tickets/in-review/` mais que ce déplacement n'a pas été committé (fichier non suivi), la reprise ajoute explicitement le fichier au commit « unapproved work ». Seule la fiche du ticket est ajoutée ; aucun autre fichier non suivi ne peut y entrer.
 
+### Récupération des fichiers neufs et gestion des tickets approuvés (ticket-389)
+
+Lors d'une reprise au démarrage, deux garanties préviennent la perte de travail :
+
+**Fichiers non suivis créés pendant le run**
+
+Les fichiers créés par le codeur après le `started_at` du run, mais non encore suivis par git, sont intégrés au commit de reprise — pourvu qu'ils ne soient pas ignorés (`.gitignore`) et qu'ils ne vivent pas dans un dépôt imbriqué (un dossier contenant un `.git` propre). Un fichier antérieur au `started_at` reste sur la branche de travail sans être commité : l'utilisateur peut y laisser des brouillons sans les perdre.
+
+**Tickets approuvés mais non livrés**
+
+Si un run avait atteint l'état `APPROVED` (fiche marquée `done` sur sa branche) avant d'être interrompu, la reprise ne le remet pas en `todo`. Il reste `done` et un événement est enregistré dans `memory/pipeline-log.md` : `[<ticket>] approuvé mais non livré : livraison à reprendre`. La livraison n'est pas relancée automatiquement ; elle demande une action manuelle.
+
 ### Dialogue pendant un run (ADR-025)
 
 `DialogueChannel` porte les deux sens du dialogue sans rien savoir du
