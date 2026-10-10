@@ -15,18 +15,27 @@ function validateName(value: string): string | null {
   return null;
 }
 
+interface TemplatePorts {
+  backend: number;
+  frontend: number;
+}
+
 export default function CreateProjectModal({
   onClose,
   onCreated,
 }: CreateProjectModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [templateMode, setTemplateMode] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [createdProject, setCreatedProject] = useState<Project | null>(null);
   const [agentsCreated, setAgentsCreated] = useState<string[]>([]);
   const [depotPret, setDepotPret] = useState(true);
+  const [templatePorts, setTemplatePorts] = useState<TemplatePorts | null>(
+    null,
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,10 +48,21 @@ export default function CreateProjectModal({
     setApiError(null);
     setLoading(true);
     try {
-      const result = await api.projects.create(name, description);
-      setCreatedProject(result.project);
-      setAgentsCreated(result.agents_created);
-      setDepotPret(result.repository_ready);
+      if (templateMode) {
+        const result = await api.projects.createFromTemplate(name, name);
+        setCreatedProject(result.project);
+        setAgentsCreated([]);
+        setDepotPret(result.git_ready);
+        setTemplatePorts({
+          backend: result.backend_port,
+          frontend: result.frontend_port,
+        });
+      } else {
+        const result = await api.projects.create(name, description);
+        setCreatedProject(result.project);
+        setAgentsCreated(result.agents_created);
+        setDepotPret(result.repository_ready);
+      }
     } catch (err: unknown) {
       setApiError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
@@ -82,7 +102,8 @@ export default function CreateProjectModal({
       >
         <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
           <p className="inline-flex items-center gap-1 text-green-400 text-sm font-medium mb-1">
-            <IconCheck size={14} /> Projet &ldquo;{createdProject.name}&rdquo; créé
+            <IconCheck size={14} /> Projet &ldquo;{createdProject.name}&rdquo;
+            créé
           </p>
           {agentsCreated.length > 0 && (
             <p className="text-zinc-400 text-xs mt-1">
@@ -94,21 +115,51 @@ export default function CreateProjectModal({
               </span>
             </p>
           )}
-          {/*
-            Sans dépôt à sa racine, un projet est inerte pour le pipeline :
-            GitWorkspaceService lève NotAGitRepository et le run s'arrête
-            avant la première branche (ADR-024). Le dire ici plutôt qu'au
-            premier run, où le message ne dirait pas quoi faire.
-          */}
-          {depotPret ? (
-            <p className="text-zinc-400 text-xs mt-1">Dépôt git initialisé</p>
+          {templatePorts !== null ? (
+            <>
+              <p className="text-zinc-400 text-xs mt-2">
+                Ports attribués : backend{" "}
+                <span className="font-mono text-zinc-300">
+                  {templatePorts.backend}
+                </span>
+                , frontend{" "}
+                <span className="font-mono text-zinc-300">
+                  {templatePorts.frontend}
+                </span>
+              </p>
+              <p className="text-zinc-400 text-xs mt-3 font-medium">
+                Étapes restantes :
+              </p>
+              <ul className="mt-1 text-zinc-400 text-xs list-disc list-inside space-y-1">
+                <li>
+                  Écrire le{" "}
+                  <span className="font-mono text-zinc-300">CLAUDE.md</span> du
+                  projet
+                </li>
+                <li>Créer le dépôt GitHub</li>
+              </ul>
+            </>
           ) : (
-            <p className="text-amber-400 text-xs mt-1">
-              Le dépôt git n&rsquo;a pas pu être initialisé. Le projet est créé,
-              mais aucun run ne démarrera tant qu&rsquo;il n&rsquo;aura pas de
-              dépôt à sa racine&nbsp;: rattrapez-le depuis la section Git de la
-              barre latérale.
-            </p>
+            <>
+              {/*
+                Sans dépôt à sa racine, un projet est inerte pour le pipeline :
+                GitWorkspaceService lève NotAGitRepository et le run s'arrête
+                avant la première branche (ADR-024). Le dire ici plutôt qu'au
+                premier run, où le message ne dirait pas quoi faire.
+              */}
+              {depotPret ? (
+                <p className="text-zinc-400 text-xs mt-1">
+                  Dépôt git initialisé
+                </p>
+              ) : (
+                <p className="text-amber-400 text-xs mt-1">
+                  Le dépôt git n&rsquo;a pas pu être initialisé. Le projet est
+                  créé, mais aucun run ne démarrera tant qu&rsquo;il
+                  n&rsquo;aura pas de dépôt à sa racine&nbsp;: rattrapez-le
+                  depuis la section Git de la barre latérale.
+                </p>
+              )}
+            </>
           )}
           <div className="flex justify-end mt-4">
             <button
@@ -140,6 +191,35 @@ export default function CreateProjectModal({
         </h2>
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
+            <p className="text-xs text-zinc-400 mb-2">Type de projet</p>
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="project-type"
+                  value="empty"
+                  checked={!templateMode}
+                  onChange={() => setTemplateMode(false)}
+                  disabled={loading}
+                />
+                <span className="text-sm text-zinc-200">Projet vide</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="project-type"
+                  value="template"
+                  checked={templateMode}
+                  onChange={() => setTemplateMode(true)}
+                  disabled={loading}
+                />
+                <span className="text-sm text-zinc-200">
+                  Gabarit FastAPI + React
+                </span>
+              </label>
+            </div>
+          </div>
+          <div className="mb-4">
             <label
               htmlFor="project-name"
               className="block text-xs text-zinc-400 mb-1"
@@ -166,24 +246,26 @@ export default function CreateProjectModal({
               </p>
             )}
           </div>
-          <div className="mb-5">
-            <label
-              htmlFor="project-description"
-              className="block text-xs text-zinc-400 mb-1"
-            >
-              Description
-            </label>
-            <textarea
-              id="project-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Description optionnelle…"
-              maxLength={200}
-              rows={3}
-              className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400 resize-none"
-              disabled={loading}
-            />
-          </div>
+          {!templateMode && (
+            <div className="mb-5">
+              <label
+                htmlFor="project-description"
+                className="block text-xs text-zinc-400 mb-1"
+              >
+                Description
+              </label>
+              <textarea
+                id="project-description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Description optionnelle…"
+                maxLength={200}
+                rows={3}
+                className="w-full bg-zinc-800 border border-zinc-600 rounded-sm px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden focus:border-zinc-400 resize-none"
+                disabled={loading}
+              />
+            </div>
+          )}
           {apiError && (
             <p className="mb-4 text-xs text-red-400" role="alert">
               {apiError}

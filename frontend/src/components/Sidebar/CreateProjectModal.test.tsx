@@ -8,11 +8,13 @@ vi.mock("../../lib/api", () => ({
   api: {
     projects: {
       create: vi.fn(),
+      createFromTemplate: vi.fn(),
     },
   },
 }));
 
 const mockCreate = vi.mocked(api.projects.create);
+const mockCreateFromTemplate = vi.mocked(api.projects.createFromTemplate);
 
 const mockProject = {
   id: "mon-projet",
@@ -254,5 +256,77 @@ describe("CreateProjectModal", () => {
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  describe("template mode", () => {
+    const mockTemplateResult = {
+      project: mockProject,
+      backend_port: 8022,
+      frontend_port: 5192,
+      git_ready: true,
+    };
+
+    async function selectTemplate() {
+      fireEvent.click(
+        screen.getByRole("radio", { name: /gabarit fastapi \+ react/i }),
+      );
+    }
+
+    it("calls createFromTemplate (not create) when template is selected", async () => {
+      mockCreateFromTemplate.mockResolvedValue(mockTemplateResult);
+
+      render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+      await selectTemplate();
+      await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+      fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+      await waitFor(() => {
+        expect(mockCreateFromTemplate).toHaveBeenCalledWith(
+          "mon-projet",
+          "mon-projet",
+        );
+        expect(mockCreate).not.toHaveBeenCalled();
+      });
+    });
+
+    it("displays assigned ports after template creation", async () => {
+      mockCreateFromTemplate.mockResolvedValue(mockTemplateResult);
+
+      render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+      await selectTemplate();
+      await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+      fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+      await screen.findByText(/continuer/i);
+      expect(screen.getByText(/8022/)).toBeInTheDocument();
+      expect(screen.getByText(/5192/)).toBeInTheDocument();
+    });
+
+    it("shows remaining steps after template creation", async () => {
+      mockCreateFromTemplate.mockResolvedValue(mockTemplateResult);
+
+      render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+      await selectTemplate();
+      await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+      fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+      await screen.findByText(/continuer/i);
+      expect(screen.getByText(/CLAUDE\.md/)).toBeInTheDocument();
+      expect(screen.getByText(/dépôt GitHub/i)).toBeInTheDocument();
+    });
+
+    it("calls create (not createFromTemplate) when empty project is selected", async () => {
+      mockCreate.mockResolvedValue(mockResult);
+
+      render(<CreateProjectModal onClose={onClose} onCreated={onCreated} />);
+      // "Projet vide" est sélectionné par défaut
+      await userEvent.type(screen.getByLabelText(/nom/i), "mon-projet");
+      fireEvent.click(screen.getByRole("button", { name: /créer/i }));
+
+      await waitFor(() => {
+        expect(mockCreate).toHaveBeenCalledWith("mon-projet", "");
+        expect(mockCreateFromTemplate).not.toHaveBeenCalled();
+      });
+    });
   });
 });

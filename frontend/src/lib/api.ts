@@ -27,6 +27,7 @@ import type {
   RunEvent,
   ServiceActif,
   ProjectCreationResult,
+  TemplateCreationResult,
   PipelineRun,
   PlanResult,
   MergeResponse,
@@ -104,6 +105,11 @@ export const api = {
         name,
         description,
       }),
+    createFromTemplate: (
+      projectId: string,
+      name: string,
+    ): Promise<TemplateCreationResult> =>
+      post("/projects/from-template", { project_id: projectId, name }),
     import: (req: ImportProjectRequest): Promise<ImportProjectResponse> =>
       post("/projects/import", req),
     clone: (req: CloneProjectRequest): Promise<CloneProjectResponse> =>
