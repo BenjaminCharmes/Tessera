@@ -2223,3 +2223,4 @@ Ce diff effectue un refactor (37061ms)
 - 2026-10-10 19:25:25 UTC — [ticket-395] tour 1 — codeur terminé (497297ms)
 - 2026-10-10 19:29:21 UTC — [ticket-395] testeur: OK (exit 0)
 - 2026-10-10 19:30:34 UTC — [ticket-395] securite: BLOCK — A HIGH severity path traversal vulnerability is introduced in the new _titres_fi (73389ms)
+- 2026-10-10 19:30:36 UTC — [ide-core] file interrompue : ticket-395 non approuvé
