@@ -185,3 +185,30 @@ async def test_response_contains_ports_and_git_ready(workspace: Path) -> None:
     assert result.frontend_port == 5190
     assert result.git_ready is True
     assert result.project is not None
+
+
+async def test_agents_json_declares_every_pipeline_role(workspace: Path) -> None:
+    """Every role the pipeline runs is declared with a current model: judgment
+    and documentation roles on Haiku through the subscription (vigie's setup),
+    and the backend service listens on 127.0.0.1 only."""
+    with patch(_PATCH_GIT, new_callable=AsyncMock) as m:
+        m.return_value = _GIT_OK
+        await create_project_from_template(
+            workspace, "mon-projet", "Mon Projet", _TEMPLATE_DIR
+        )
+
+    data = json.loads(
+        (workspace / "mon-projet" / "agents.json").read_text(encoding="utf-8")
+    )
+    roles = {a["role"]: a for a in data["agents"]}
+    assert set(roles) == {
+        "codeur", "architect", "reviewer",
+        "securite", "validateur", "doc-technique", "doc-fonctionnelle",
+    }
+    assert roles["codeur"]["model"] == "claude-sonnet-5-5"
+    for role in ("securite", "validateur", "doc-technique", "doc-fonctionnelle"):
+        assert roles[role]["model"] == "claude-haiku-4-5"
+        assert roles[role]["provider"] == "agent_sdk"
+    backend_svc = next(s for s in data["services"] if s["nom"] == "backend")
+    assert "--host 127.0.0.1" in backend_svc["commande"]
+    assert "cd " not in data["pipeline"]["test_command"]

@@ -19,15 +19,21 @@ _TEMPLATE_DIR = _REPO_ROOT / "templates" / "fastapi-react"
 _BACKEND_PORT_BASE = 8020
 _FRONTEND_PORT_BASE = 5190
 
-# Commande de tests complète, compatible WDAC (python -m).
+# Commande de tests complète, compatible WDAC (python -m), sans `cd` :
+# reprise de la configuration éprouvée de vigie.
 _TEST_COMMAND = (
-    "cd frontend && npm run typecheck && npm run lint && npm run test && npm run build"
-    " && cd .. && uv --directory backend run python -m mypy ."
+    "npm --prefix frontend run typecheck && npm --prefix frontend run lint"
+    " && npm --prefix frontend test && npm --prefix frontend run build"
+    " && uv --directory backend run python -m mypy ."
     " && uv --directory backend run python -m pytest -q"
 )
 
-# Rôles actifs sur les projets créés depuis le gabarit.
-_TEMPLATE_ROLES = ["codeur", "reviewer"]
+# Rôles des projets créés depuis le gabarit : production sur Sonnet, jugement
+# et documentation sur Haiku via l'abonnement (configuration de vigie).
+_MODELE_PRODUCTION = "claude-sonnet-5-5"
+_MODELE_JUGEMENT = "claude-haiku-4-5"
+_ROLES_PRODUCTION = ["codeur", "architect", "reviewer"]
+_ROLES_JUGEMENT = ["securite", "validateur", "doc-technique", "doc-fonctionnelle"]
 _ROLES_AVEC_SKILL_DESIGN = {"codeur", "architect"}
 
 
@@ -106,16 +112,27 @@ def _copy_template(template_dir: Path, dest_dir: Path, markers: dict[str, str]) 
 
 def _build_agents_json(project_id: str, backend_port: int, frontend_port: int) -> str:
     """Construit le manifeste agents.json pour un projet gabarit."""
-    agents = [
+    agents: list[dict[str, object]] = [
         {
             "role": role,
-            "model": "claude-sonnet-4-6",
+            "model": _MODELE_PRODUCTION,
             "max_tokens": 8192 if role == "codeur" else 4096,
             "prompt_file": f"agents/prompts/{role}.md",
             "active": True,
             **({"skills": ["tessera:design-ui"]} if role in _ROLES_AVEC_SKILL_DESIGN else {}),
         }
-        for role in _TEMPLATE_ROLES
+        for role in _ROLES_PRODUCTION
+    ]
+    agents += [
+        {
+            "role": role,
+            "model": _MODELE_JUGEMENT,
+            "max_tokens": 4096,
+            "prompt_file": f"agents/prompts/{role}.md",
+            "active": True,
+            "provider": "agent_sdk",
+        }
+        for role in _ROLES_JUGEMENT
     ]
     data: dict[str, object] = {
         "project_id": project_id,
@@ -128,7 +145,8 @@ def _build_agents_json(project_id: str, backend_port: int, frontend_port: int) -
             {
                 "nom": "backend",
                 "commande": (
-                    f"uv run python -m uvicorn app.main:app --port {backend_port}"
+                    "uv run python -m uvicorn app.main:app"
+                    f" --host 127.0.0.1 --port {backend_port}"
                 ),
                 "cwd": "backend",
             },
