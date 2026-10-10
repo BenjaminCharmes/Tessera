@@ -2176,3 +2176,13 @@ Ce diff effectue un refactor (37061ms)
 - 2026-10-10 17:36:47 UTC — [ticket-367] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été mis à jour pou (261905ms)
 - 2026-10-10 17:36:47 UTC — [ticket-367] APPROVED après 3 tour(s)
 - 2026-10-10 17:38:08 UTC — [ticket-367] documentation: 1 fichier(s) (77967ms)
+- 2026-10-10 18:02:10 UTC — [ide-core] ticket-373 PR #355 confiée au CIWatcher
+- 2026-10-10 18:02:11 UTC — [ticket-374] branche ticket-374-the-new-project-dialog-offers-the-fastapi-react-t
+- 2026-10-10 18:02:12 UTC — [ticket-374] tour 1 — codeur démarré
+- 2026-10-10 18:06:07 UTC — [ticket-374] tour 1 — codeur terminé (235250ms)
+- 2026-10-10 18:10:02 UTC — [ticket-374] testeur: OK (exit 0)
+- 2026-10-10 18:10:47 UTC — [ticket-374] securite: PASS — Audit du diff de CreateProjectModal (frontend) : aucune vulnérabilité critique o (45078ms)
+- 2026-10-10 18:10:47 UTC — [ticket-374] tour 1 — reviewer démarré
+- 2026-10-10 18:11:24 UTC — [ticket-374] tour 1 — reviewer terminé (37125ms)
+- 2026-10-10 18:12:39 UTC — [ticket-374] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés pour v (111844ms)
+- 2026-10-10 18:12:39 UTC — [ticket-374] APPROVED après 1 tour(s)
