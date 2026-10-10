@@ -103,19 +103,17 @@ def _ecrire_ticket_todo(dest: Path, contenu: str) -> None:
     dest.write_text(fm.dumps(post), encoding="utf-8")
 
 
-def _est_dans_depot_imbrique(project_path: Path, fichier: Path) -> bool:
-    """True si `fichier` se trouve dans un dépôt git imbriqué sous `project_path`.
+def _est_dans_depot_imbrique(racine_depot: Path, fichier: Path) -> bool:
+    """True si `fichier` se trouve dans un dépôt git imbriqué sous `racine_depot`.
 
-    Parcourt les ancêtres de `fichier` jusqu'à `project_path` et renvoie True
-    dès qu'un dossier intermédiaire contient un `.git`.
+    Parcourt les ancêtres **résolus** de `fichier` jusqu'à la racine du dépôt
+    (exclue) et renvoie True dès qu'un dossier intermédiaire contient un
+    `.git`. Résoudre est nécessaire : un chemin en `../..` (projet
+    `git_root: ancestor`) remonterait sinon jusqu'au `.git` du dépôt lui-même.
     """
-    current = fichier.parent
-    while True:
-        try:
-            if current == project_path or not current.is_relative_to(project_path):
-                break
-        except ValueError:
-            break
+    racine = racine_depot.resolve()
+    current = fichier.resolve().parent
+    while current != racine and current.is_relative_to(racine):
         if (current / ".git").exists():
             return True
         current = current.parent
@@ -133,13 +131,22 @@ async def _trouver_fichiers_nouveaux(
     Renvoie des chemins POSIX relatifs à `project_path`, prêts pour `git add`.
     """
     try:
+        # `:/` : tout le dépôt. Pour un projet `git_root: ancestor` (ide-core),
+        # le codeur écrit dans `backend/` et `frontend/`, hors du dossier du
+        # projet ; les chemins restent rendus relatifs au cwd (`../../…`).
+        # Les autres projets imbriqués apparaissent comme des dossiers (« / »).
         sortie = await _git(
-            project_path, "ls-files", "--others", "--exclude-standard", "-z"
+            project_path, "ls-files", "--others", "--exclude-standard", "-z", "--", ":/"
         )
     except Exception:
         return []
 
     if not sortie:
+        return []
+
+    try:
+        racine_depot = Path(await _git(project_path, "rev-parse", "--show-toplevel"))
+    except Exception:
         return []
 
     fichiers: list[str] = []
@@ -151,7 +158,7 @@ async def _trouver_fichiers_nouveaux(
         if chemin.endswith("/"):
             continue
         fichier = project_path / chemin
-        if _est_dans_depot_imbrique(project_path, fichier):
+        if _est_dans_depot_imbrique(racine_depot, fichier):
             continue
         try:
             mtime = datetime.fromtimestamp(fichier.stat().st_mtime, tz=timezone.utc)
