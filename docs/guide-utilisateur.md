@@ -682,6 +682,14 @@ Tu n'as pas besoin de passer par la sidebar pour composer et lancer la file — 
 
 Une file s'arrête proprement si le budget cumulé atteint son plafond (par défaut 5 $ × nombre de tickets) ou si ton abonnement atteint sa limite de session. Voir la section « Problèmes fréquents » pour les détails sur chacun de ces cas.
 
+Dès que tu lances un run, ton PC reste éveillé — tes agents peuvent travailler toute la nuit. L'écran peut s'éteindre, mais la mise en veille du système est empêchée.
+
+Sur Windows, c'est actif. Sur Mac et Linux, ça n'a aucun effet — on laisse juste le réglage pour la cohérence.
+
+Tu peux désactiver ça si tu veux que ton PC dorme normalement, ou si un autre outil gère la veille pour toi : mets `KEEP_AWAKE_DURING_RUNS=false` dans `.env`.
+
+Ça n'empêche pas Windows Update de redémarrer le PC, ni l'écran de s'éteindre.
+
 ## 8. Discuter avec l'agent, pendant qu'il travaille
 
 Le panneau de droite a deux onglets : **Agents**, qui observe un run de

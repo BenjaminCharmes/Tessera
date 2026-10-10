@@ -117,6 +117,10 @@ class Settings(BaseSettings):
     # Sur un projet merge_without_ci, délai maximum d'attente du merge du
     # ticket précédent avant de lancer le suivant d'une file (ticket-382).
     attente_merge_max_s: float = 600.0
+    # Maintient le système éveillé tant qu'un run est ouvert (ticket-394).
+    # Utilise SetThreadExecutionState sous Windows ; no-op ailleurs.
+    # Désactivable si un outil externe gère déjà la veille.
+    keep_awake_during_runs: bool = True
 
 
 settings = Settings()

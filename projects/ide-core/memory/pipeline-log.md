@@ -2224,3 +2224,14 @@ Ce diff effectue un refactor (37061ms)
 - 2026-10-10 19:29:21 UTC — [ticket-395] testeur: OK (exit 0)
 - 2026-10-10 19:30:34 UTC — [ticket-395] securite: BLOCK — A HIGH severity path traversal vulnerability is introduced in the new _titres_fi (73389ms)
 - 2026-10-10 19:30:36 UTC — [ide-core] file interrompue : ticket-395 non approuvé
+- 2026-10-10 19:01:35 UTC — [ide-core] ticket-396 PR #358 confiée au CIWatcher
+- 2026-10-10 19:01:36 UTC — [ticket-394] branche ticket-394-the-pc-stays-awake-while-a-run-is-open-and-may-sl
+- 2026-10-10 19:01:36 UTC — [ticket-394] tour 1 — codeur démarré
+- 2026-10-10 19:07:15 UTC — [ticket-394] tour 1 — codeur terminé (338765ms)
+- 2026-10-10 19:11:26 UTC — [ticket-394] testeur: OK (exit 0)
+- 2026-10-10 19:11:49 UTC — [ticket-394] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code ajoute un service pour mainte (22703ms)
+- 2026-10-10 19:11:49 UTC — [ticket-394] tour 1 — reviewer démarré
+- 2026-10-10 19:12:56 UTC — [ticket-394] tour 1 — reviewer terminé (67234ms)
+- 2026-10-10 19:14:24 UTC — [ticket-394] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (154593ms)
+- 2026-10-10 19:14:24 UTC — [ticket-394] APPROVED après 1 tour(s)
+- 2026-10-10 19:16:52 UTC — [ticket-394] documentation: 2 fichier(s) (146155ms)
