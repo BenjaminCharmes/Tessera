@@ -110,6 +110,20 @@ d'en obtenir un.
 Sidebar → **Nouveau projet**. Tu décris ton idée en langage naturel, l'agent
 *project-creator* génère la structure, le `CLAUDE.md` et les premiers tickets.
 
+### Créer un projet depuis un gabarit
+
+Tu peux démarrer rapidement avec le gabarit `fastapi-react` qui fournit une base complète : backend Python/FastAPI, frontend React, avec tous les fichiers de configuration nécessaires.
+
+Tu indiques un identifiant unique de projet et un nom. Le gabarit configure automatiquement :
+- Squelette prêt à l'emploi (tous les marqueurs remplacés)
+- Deux ports libres attribués pour les deux services (backend 8020+, frontend 5190+)
+- `agents.json` avec les bons réglages : `autonomy: merge`, `merge_without_ci: true`, `test_command` complète
+- Dépôt git local initialisé
+
+Ce choix te fait gagner du temps par rapport à « Créer from scratch » — plus de ports à chercher, plus d'`agents.json` à remplir.
+
+Le dépôt GitHub reste à créer séparément, voir « Intégration GitHub ».
+
 ### Importer un projet existant de ta machine
 
 Sidebar → **Importer un projet**. Deux modes :
