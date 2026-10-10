@@ -125,6 +125,22 @@ def _pas_de_vrai_journal() -> Iterator[None]:
     """
     import tessera.main
 
+    async def _aucun_run_solde(*_a: object, **_k: object) -> list[str]:
+        return []
+
+    async def _aucune_reprise(*_a: object, **_k: object) -> None:
+        return None
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(tessera.main, "configure_file_logging", lambda *a, **k: None)
+        # Le `lifespan` solde aussi les runs « en cours » de la base et remet
+        # leurs dépôts d'aplomb (tickets 177, 369). En test, `settings` désigne
+        # la vraie base et le vrai dossier des projets : quand le testeur du
+        # pipeline lance cette suite, le run qui la lance est bien en cours, et
+        # chaque `TestClient(app)` le soldait — puis, depuis le ticket-369,
+        # commitait son travail et changeait de branche en plein run
+        # (2026-10-07). Les deux fonctions restent testées directement, dans
+        # `test_runs_orphelins.py` et `test_reprise_run_orphelin.py`.
+        mp.setattr(tessera.main, "solder_les_runs_orphelins", _aucun_run_solde)
+        mp.setattr(tessera.main, "reprendre_depots_orphelins", _aucune_reprise)
         yield

@@ -30,8 +30,10 @@ Trois choix le distinguent d'un assistant de code classique :
   au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
 
 Après un run approuvé, la livraison enchaîne seule jusqu'où le projet
-l'autorise : rebase, PR, attente de CI, merge. Un conflit de rebase est tenté
-par un agent, et sa résolution est toujours relue.
+l'autorise : rebase, PR, attente de CI, merge. Certains conflits simples — dans
+le journal (`memory/pipeline-log.md`) et la liste de documentation
+(`memory/documentation.json`) — sont résolus automatiquement en union. Les autres
+sont tentés par un agent, et leur résolution est toujours relue.
 
 ## Démarrer
 
@@ -71,7 +73,12 @@ ils ont besoin des outils fichier que seul le SDK fournit.
 **Sérialisation des requêtes** : quand plusieurs runs appellent le même serveur
 Ollama, l'IDE les sérialise (une à la fois par serveur) pour éviter la compétition
 pour le modèle et la mémoire. Un réglage `OLLAMA_MAX_CONCURRENT` contrôle ce
-comportement — voir la [configuration](docs/configuration.md).
+comportement. Si le serveur est saturé ou trop lent, l'IDE bascule rapidement sur
+le repli pour ne pas bloquer le run — voir la [configuration](docs/configuration.md#ollama).
+
+
+
+Si le serveur Ollama est lent ou indisponible, l'agent bascule rapidement sur le repli — voir `OLLAMA_SLOT_WAIT_S` dans la [configuration](docs/configuration.md).
 
 ## Documentation
 

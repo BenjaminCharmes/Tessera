@@ -172,6 +172,22 @@ Un réglage à 0 ou moins **désactive** cette limite — toutes les requêtes s
 lancées concurremment. Utile pour déboguer un modèle ou tester le
 load-balancing interne d'Ollama.
 
+La sérialisation des requêtes (une par serveur) évite la compétition pour le modèle
+et la mémoire. Un serveur saturé ou trop lent bascule rapidement sur le repli :
+
+- **Attente de créneau bornée** : si une requête attend un créneau plus de
+  `OLLAMA_SLOT_WAIT_S` secondes (défaut 30), elle lève `ProviderIndisponible`
+  et le repli prend le relais, sans dépenser le temps d'attente.
+- **Disjoncteur par serveur** : après un dépassement du délai de lecture, ce
+  serveur est marqué lent pendant `OLLAMA_COOLDOWN_S` secondes (défaut 600) ;
+  pendant cette période, tout appel lève `ProviderIndisponible` aussitôt,
+  sans requête HTTP. L'appel suivant, s'il arrive après le refroidissement,
+  envoie une nouvelle requête.
+- **Message clair** : un dépassement du délai produit « Ollama : délai
+  dépassé (… s) », distinct d'une connexion refusée.
+
+Voir [configuration](configuration.md#ollama) pour les réglages.
+
 ### Parsing et caching off-loop (ticket-352)
 
 `TicketService.list_tickets()` et `ProjectLoader.list_projects()` relisaient chaque fichier à chaque requête, bloquant la boucle d'événements sur du parsing YAML. Problème : le pipeline appelle ces services plusieurs fois par étape; avec plusieurs files, l'interface gelait.
@@ -270,6 +286,34 @@ Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
 s'en distingue.
 
+### Reprise de runs orphelins (ticket-369)
+
+Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
+
+Pour chaque run interrompu, si la copie de travail du projet est restée sur une branche `<ticket_id>-…` :
+
+1. Les changements non committés sont committés avec le message du pipeline non approuvé, ce qui garantit que l'arbre n'est jamais sale entre deux runs (ADR-018)
+2. La fiche de ticket est remise en `todo` si elle était en `in-progress` ou `in-review`
+3. La copie de travail revient sur la branche de base du projet
+
+Si la copie de travail est sur une autre branche, aucune action n'est prise. Les erreurs git durant cette reprise sont loggées sans exception : un problème au redémarrage ne doit jamais bloquer le backend.
+
+### Intégrité de la fiche lors de la reprise (ticket-377)
+
+Quand une branche de ticket est reprise au démarrage, sa fiche est validée. Si le ticket a été déplacé de `tickets/todo/` vers `tickets/in-progress/` ou `tickets/in-review/` mais que ce déplacement n'a pas été committé (fichier non suivi), la reprise ajoute explicitement le fichier au commit « unapproved work ». Seule la fiche du ticket est ajoutée ; aucun autre fichier non suivi ne peut y entrer.
+
+### Récupération des fichiers neufs et gestion des tickets approuvés (ticket-389)
+
+Lors d'une reprise au démarrage, deux garanties préviennent la perte de travail :
+
+**Fichiers non suivis créés pendant le run**
+
+Les fichiers créés par le codeur après le `started_at` du run, mais non encore suivis par git, sont intégrés au commit de reprise — pourvu qu'ils ne soient pas ignorés (`.gitignore`) et qu'ils ne vivent pas dans un dépôt imbriqué (un dossier contenant un `.git` propre). Un fichier antérieur au `started_at` reste sur la branche de travail sans être commité : l'utilisateur peut y laisser des brouillons sans les perdre.
+
+**Tickets approuvés mais non livrés**
+
+Si un run avait atteint l'état `APPROVED` (fiche marquée `done` sur sa branche) avant d'être interrompu, la reprise ne le remet pas en `todo`. Il reste `done` et un événement est enregistré dans `memory/pipeline-log.md` : `[<ticket>] approuvé mais non livré : livraison à reprendre`. La livraison n'est pas relancée automatiquement ; elle demande une action manuelle.
+
 ### Dialogue pendant un run (ADR-025)
 
 `DialogueChannel` porte les deux sens du dialogue sans rien savoir du
@@ -305,6 +349,14 @@ recharge la page), les événements texte (`agent_token`, `agent_tool_use`) ne
 modifient pas l'état d'une question en attente. Seul un événement de réponse
 (`answer_ack`) ou de fin d'agent (`agent_done`) nettoie cet état.
 
+### Filtrage du contexte par rôle (ticket-379)
+
+Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR du projet. Pour éviter que ce filtrage ne supprime le diff à relire, les résultats du testeur ou l'audit sécurité qui suivent les décisions, le contexte borde la section `Décisions récentes` à son premier titre de niveau 2 qui n'est pas un titre d'ADR (`## ADR-NNN`).
+
+**Invariant** : le contexte d'un agent inclut toujours le diff git, les résultats des étapes précédentes et l'audit, indépendamment de la portée des ADR du projet. Seule la section des décisions elle-même est filtrée par rôle.
+
+`adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
+
 ### Système visuel du frontend (ADR-026)
 
 `frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :
@@ -336,6 +388,22 @@ a démarré.
 arbitraire ou d'un glyphe utilisé comme affordance.
 
 Ce système est imposé aux agents créant une interface via le skill `tessera:design-ui`, chargé par défaut par le codeur et l'architect : toute UI doit partir d'une charte déclarée (couleurs, typographie, espacement), et n'en sortir sur aucune valeur.
+
+### Limite de silence des agents (ticket-381)
+
+Un processus d'agent qui n'émet aucun message pendant plus de `AGENT_SILENCE_MAX_S` secondes (défaut : 1200 s, soit 20 min) est interrompu.
+
+L'attente se mesure **entre deux messages** du flux, pas la durée totale de l'appel. Un agent qui lance une commande longue (suite de tests : ~6 min) mais émet régulièrement n'est jamais arrêté.
+
+Quand le silence est détecté :
+1. Le flux est fermé (`aclose` appelé)
+2. Le processus `claude.exe` est terminé
+3. Une `ProviderIndisponible("agent silencieux depuis … s")` est levée
+4. L'événement `agent_silencieux_arrete` est journalisé
+
+Le repli ou l'échec fermé existant (ADR-037, ADR-039) reprend aussitôt le run ou en demande l'approbation.
+
+Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le silence du flux. Deux cas réels qui l'ont motivé (octobre 2026) ont impliqué une veille du PC et un CLI bloqué.
 
 ## Endpoints implémentés
 
@@ -455,6 +523,16 @@ Ce système est imposé aux agents créant une interface via le skill `tessera:d
 
 L'enregistrement du pipeline écrit « testeur: délai dépassé, suite relancée » dans le `pipeline-log.md` à chaque relance.
 
+
+### Résultats des tests et extraction d'erreurs (ticket-393)
+
+Quand les tests échouent, `test_runner.py` extrait :
+
+- **Résumé** : la ligne officielle de pytest/vitest (ex : `1 failed, 455 passed in 12s`)
+- **Détails** (`failure_details` dans `TestResult`) : synthèse courte et bloc de défaillances, tronqués à 8 000 caractères
+
+Le prompt du codeur (tour suivant) reçoit `failure_details`, remplaçant une liste brute. Le journal n'affiche que le résumé. Cela concentre l'attention sur le test échoué même quand des centaines passent.
+
 ### Validation et fichiers cités (ticket-316)
 
 Le validateur vérifie chaque critère d'acceptation du ticket. Un critère peut être 
@@ -472,6 +550,18 @@ actuel au message du validateur, dans une section distincte du diff. Cette secti
 
 Le prompt du validateur (`agents/prompts/validateur.md`) l'instruit sur cette section 
 et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas être refusé.
+
+## Gestion des limites de session
+
+Quand l'abonnement Claude atteint sa limite horaire, le CLI répond : « You've hit your session limit · resets <heure> ». Avant, le pipeline traitait cette erreur comme toute exception : le ticket passait en `blocked`, bloquant le projet.
+
+Depuis le ticket-388, une erreur de limite de session provoque :
+1. Le ticket en cours repasse en `todo` (son travail reste commité comme non approuvé)
+2. La file s'arrête **avant** le ticket suivant
+3. Un événement est émis portant `session_limit` comme raison et l'heure de reprise
+4. Un log dans `memory/pipeline-log.md` : `[<projet>] file interrompue : limite de session (reprise : <heure>)`
+
+Contrairement à `blocked`, `todo` ne bloque pas le projet. La file peut reprendre après l'heure indiquée. Aucun ticket n'est abîmé.
 
 ## Documentation par lot (ADR-035, ticket-292)
 
@@ -670,6 +760,49 @@ tant qu'elle n'aura pas mergé.
 **Divergence** : Si la branche locale et distante divergent hors d'une avance
 rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
 
+### État du dépôt après livraison (ticket-378)
+
+Après la livraison d'un run, le dépôt local finit dans un état garanti :
+
+- **Arbre propre** : aucune modification et aucun fichier non-tracké ; `git status --porcelain --untracked-files=no` est vide.
+- **Retour à la branche de base** : la copie de travail est revenue sur la branche de base du projet (défaut : `develop`) ; aucun commit n'a été ajouté à cette branche pendant la livraison.
+- **Logs dans le commit** : les lignes de livraison figurent dans le dernier commit de la branche du ticket (celui utilisé pour la PR), pas dans des commits orphelins de suivi.
+
+Cela permet d'enchaîner plusieurs runs sans accumulation d'état en attente de nettoyage manuel.
+
+
+### Finalisation de tous les runs et journalisation des défaillances (tickets-377, 390)
+
+Après ticket-378, les tickets-377 et 390 étendent le nettoyage et la journalisation à tous les runs.
+
+Quand une file ou un run s'arrête sur une exception, une ligne `[<projet>] file interrompue : <erreur>` est écrite dans `memory/pipeline-log.md` du projet pour le rendre visible dans l'IDE (ticket-377).
+
+À la fin de tout run — qu'il aboutisse à une livraison, qu'il échoue en cours ou en fin de file — deux étapes finales sont franchies (ticket-390) :
+1. `commit_bookkeeping()` — le journal du pipeline, les coûts et autres fichiers de suivi sont committés
+2. `retourner_sur_base(base_branch)` — l'arbre revient sur sa branche de base
+
+Les erreurs levées par ces étapes sont journalisées sans interrompre le run. Le retour ne touche pas à la branche du ticket : son commit reste où il est pour relecture future.
+
+### Attente de fusionnabilité et gestion des dépendances (ticket-384)
+
+Quand le statut `mergeable` d'une PR n'est pas encore calculé par GitHub (valeur `null`), l'IDE attend jusqu'à `ATTENTE_FUSIONNABILITE_MAX_S` (défaut 300 s) avant d'abandonner la tentative de merge. Le délai entre deux lectures augmente progressivement pour éviter de surcharger l'API.
+
+**Échec d'une fusion** : Si une PR approuvée ne peut pas être mergée — conflit détecté par `mergeable: false`, ou dépassement du délai — le ticket passe en statut `blocked` (dossier *et* champ). Une ligne est écrite dans `memory/pipeline-log.md` : `[<ticket>] livraison: arrêt — PR #N non mergée : <raison>`. La file s'arrête.
+
+**Dépendances interrompues** : Si un ticket A n'a pas été mergé, les tickets qui en dépendent ne sont pas lancés. La file s'arrête avec le message `[<projet>] file interrompue : <ticket> non mergé`. Résolvez A avant de relancer la file.
+
+### Attente du merge pour les projets merge_without_ci (ticket-382)
+
+Sur un projet déclarant `merge_without_ci: true` (merge sans attendre la CI), le pipeline évite les conflits de rebase en file.
+
+Quand le projet est configuré pour fusionner sans CI, la file **attend le merge** du ticket courant avant de lancer le ticket suivant, indépendamment de ses dépendances déclarées. Un plafond `ATTENTE_MERGE_MAX_S` (600 secondes par défaut) prévient une attente infinie : au-delà de ce délai, le ticket suivant démarre et le fichier de log enregistre l'abandon.
+
+Après le merge du ticket précédent (ou l'expiration du plafond), la base du ticket suivant est réalignée sur la base distante (`sync_base_depuis_distant`) avant la création de sa branche. Cette réalignement garantit que le nouveau ticket part du dernier état du dépôt distant.
+
+Cette mécanique prévient les conflits causés par plusieurs tickets qui réécrivent les mêmes fichiers — en particulier `memory/architecture.md` et les guides de documentation — sans voir le changement du ticket précédent, qui a déjà fusionné.
+
+Pour les projets avec une vraie CI, le comportement reste inchangé : le ticket suivant démarre sans attendre le merge (ADR-051) et n'attend que ses dépendances explicites (`depends_on`).
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).
@@ -681,6 +814,33 @@ Le module `backend/src/tessera/services/pr_status_cache.py` implémente deux niv
 - **Erreurs** : jamais cachées.
 
 `GitHubService.get_pull_request_status` et `github_workflow.py` restent inchangés : la livraison doit interroger GitHub en temps réel pour suivre la CI.
+
+### Endpoint consolidé de statuts PR (ticket-366)
+
+L'endpoint `GET /projects/{project_id}/pr-statuses` consolide l'état de toutes les PR d'un projet en une seule requête HTTP, éliminant le coût N du nombre de tickets. C'est le jour et la nuit sur un projet volumineux : 139 tickets sur ide-core le 2026-10-07.
+
+**Optimisations appliquées** :
+
+1. **PR réglées** (merged/closed) : rendues depuis la base sans appel GitHub
+2. **PR absentes de la base** : listées une seule fois via `GET /repos/{repo}/pulls?state=all&per_page=100`, paginée jusqu'à épuisement ou trouvaille complète
+3. **PR réglées retrouvées** : écrites en base pour les futurs appels
+4. **PR ouvertes** : leur statut CI est vérifié avec le cache mémoire 30 s (ticket-364)
+5. **PR orphelines** (`pr_number` hérité d'un autre dépôt, ticket-217) : omises sans erreur
+
+L'endpoint par ticket reste en place : rien d'autre ne change.
+
+### Cache et rafraîchissement intelligent du frontend (ticket-367)
+
+L'endpoint `pr-statuses` retourne l'état de tous les PR d'un projet, mais c'est une seule fois au montage du composant qui affiche les cartes. Un hook `usePrStatuses` (`frontend/src/hooks/usePrStatuses.ts`) gère le cache côté frontend avec une stratégie de rafraîchissement intelligente :
+
+- **Charge au montage** du composant contenant les cartes (Sidebar/TicketList.tsx, KanbanView)
+- **Rafraîchit toutes les 30 s seulement** tant qu'au moins une PR est `open` ; arrêt complet dès que toutes sont réglées
+- **Pause quand la fenêtre est cachée** — intégration `useFenetreVisible` (ticket-356) : aucun appel en arrière-plan
+- **Rend une table** `ticket_id → PR status`, consommée en prop par chaque `TicketCard`
+
+Chaque carte reçoit son statut en prop et n'émet aucun appel réseau — elle affiche ce qu'elle reçoit. Le rendu (badge « PR #N », info-bulle d'état, couleurs de CI) reste identique à l'utilisateur. L'économie est drastique : au lieu de N requêtes par ouverture (une par carte, souvent 50–150 sur les gros projets) plus un rafraîchissement N toutes les 30 s, c'est un appel unique par ouverture du projet, plus un toutes les 30 s si une PR est ouverte.
+
+Cette consolidation suit le même principe que le ticket-365 (arrêt du polling pour une PR réglée), mais au niveau du projet entier : dès qu'aucune PR n'est ouverte, les appels s'arrêtent complètement.
 
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
@@ -699,6 +859,17 @@ Deux étapes complètent la protection hors du pipeline :
 
 En local, une liste vide désactive le contrôle. En CI, son absence bloque le
 merge — c'est intentionnel.
+
+## Validation des identifiants de projet (ticket-370)
+
+Toutes les routes contenant un paramètre `project_id` valident cet identifiant pour assurer que le chemin du projet reste conforme au dossier des projets configuré. Un `project_id` invalide — contenant `.`, `..`, `/`, `\` ou tout caractère ne correspondant pas au pattern `^[A-Za-z0-9][A-Za-z0-9._-]*$` — retourne une `404` sans jamais accéder au disque.
+
+La validation est centralisée dans `backend/src/tessera/services/project_loader.py` :
+
+1. **Paramètres de chemin** — FastAPI refuse un identifiant invalide avant l'appel du routeur (→ `404`)
+2. **Corps de requête** — les objets `RunRequest` et `RunAutonomousRequest` rejettent un `project_id` invalide (→ `422`)
+
+Cette approche centralise la prévention des path traversals pour l'ensemble des routes via une seule décision.
 
 ## Couche SQLite (ticket-015)
 
@@ -829,6 +1000,14 @@ Un mode file traite plusieurs tickets en séquence. Le pipeline enregistre l'his
 ### Rejouer un run fermé sans dupliquer le texte
 
 Quand un utilisateur revient à un run depuis la Supervision, le serveur rejoue le contenu textuel accumulé. Un aller-retour entre deux runs recevrait le même rejeu deux fois. Pour prévenir une duplication visible, le client traite les événements replayed de manière à garder une trace fidèle du texte — ni doublon, ni perte.
+
+### Gestion du budget en file
+
+En mode autonome (un seul ticket), le plafond d'un run est `RUN_MAX_BUDGET_USD` (5$ par défaut). En mode file (plusieurs tickets), le plafond s'étend : `RUN_MAX_BUDGET_USD` × nombre de tickets de la file. Cela évite qu'une file longue s'arrête prématurément sur un plafond pensé pour le mode autonome.
+
+Une requête peut surcharger ce calcul en fixant `budget_usd` : ce montant devient le plafond pour ce run, en autonome comme en file.
+
+Quand le plafond est atteint, le run s'arrête et émet un événement portant `budget` comme raison.
 
 ## Gestion de l'état du frontend — store des runs (ticket-354)
 

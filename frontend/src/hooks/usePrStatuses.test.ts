@@ -1,0 +1,281 @@
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { usePrStatuses } from "./usePrStatuses";
+import * as apiModule from "../lib/api";
+import type { PRStatusEntry } from "../types/api";
+
+function setVisibility(state: "visible" | "hidden"): void {
+  Object.defineProperty(document, "visibilityState", {
+    value: state,
+    configurable: true,
+  });
+}
+
+beforeEach(() => {
+  setVisibility("visible");
+});
+
+afterEach(() => {
+  setVisibility("visible");
+  vi.restoreAllMocks();
+});
+
+const settled: PRStatusEntry[] = [
+  {
+    ticket_id: "ticket-001",
+    pr_number: 1,
+    state: "merged",
+    ci_status: "passing",
+    pr_url: "https://github.com/owner/repo/pull/1",
+  },
+  {
+    ticket_id: "ticket-002",
+    pr_number: 2,
+    state: "closed",
+    ci_status: "none",
+    pr_url: "https://github.com/owner/repo/pull/2",
+  },
+];
+
+const withOpen: PRStatusEntry[] = [
+  {
+    ticket_id: "ticket-003",
+    pr_number: 3,
+    state: "open",
+    ci_status: "pending",
+    pr_url: "https://github.com/owner/repo/pull/3",
+  },
+];
+
+describe("usePrStatuses — toutes les PR réglées", () => {
+  it("appelle getPrStatuses une seule fois et ne rappelle pas après 30 s", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockResolvedValue(settled);
+
+      const { result } = renderHook(() => usePrStatuses("ide-core"));
+
+      // Appel initial + résolution de la promesse + flush React.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      // Avancer au-delà des 30 s : aucun rappel — les PR sont réglées.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(90_000);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      // La table est bien remplie.
+      expect(result.current["ticket-001"]?.state).toBe("merged");
+      expect(result.current["ticket-002"]?.state).toBe("closed");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("usePrStatuses — PR ouverte", () => {
+  it("rappelle getPrStatuses après 30 s tant que la PR est ouverte", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockResolvedValue(withOpen);
+
+      renderHook(() => usePrStatuses("ide-core"));
+
+      // Appel initial.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      // Un premier rappel après 30 s.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(30_000);
+      });
+      expect(spy).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("ne rappelle pas pendant que la fenêtre est cachée", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockResolvedValue(withOpen);
+
+      renderHook(() => usePrStatuses("ide-core"));
+
+      // Appel initial au montage.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      const apresInit = spy.mock.calls.length;
+      expect(apresInit).toBeGreaterThanOrEqual(1);
+
+      // Cacher la fenêtre : l'intervalle doit s'arrêter.
+      await act(async () => {
+        setVisibility("hidden");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // Avancer au-delà de 30 s sans appel supplémentaire.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(90_000);
+      });
+      expect(spy.mock.calls.length).toBe(apresInit);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("reprend le polling quand la fenêtre redevient visible", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockResolvedValue(withOpen);
+
+      renderHook(() => usePrStatuses("ide-core"));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      const apresInit = spy.mock.calls.length;
+
+      // Cacher puis réafficher la fenêtre.
+      await act(async () => {
+        setVisibility("hidden");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        setVisibility("visible");
+        document.dispatchEvent(new Event("visibilitychange"));
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // Un appel supplémentaire au retour de la fenêtre.
+      expect(spy.mock.calls.length).toBeGreaterThan(apresInit);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("usePrStatuses — erreur réseau", () => {
+  it("ne plante pas sur erreur et réessaie au tick suivant", async () => {
+    // Intention héritée de l'ancien test TicketCard qui espionnait getPrStatus
+    // et vérifiait la gestion des erreurs (critère 5, ticket-367).
+    // Désormais c'est le hook, non la carte, qui fait les appels.
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockRejectedValueOnce(new Error("network error"))
+        .mockResolvedValue(withOpen);
+
+      const { result } = renderHook(() => usePrStatuses("ide-core"));
+
+      // Premier appel échoue — la table reste vide, pas de crash.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(result.current).toEqual({});
+
+      // Au tick suivant (30 s) l'appel réussit et la table se remplit.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(30_000);
+      });
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(result.current["ticket-003"]?.state).toBe("open");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("usePrStatuses — projet null", () => {
+  it("n'appelle pas getPrStatuses quand projectId est null", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockResolvedValue([]);
+
+      renderHook(() => usePrStatuses(null));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(90_000);
+      });
+      expect(spy).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("usePrStatuses — nouvelle PR et erreurs définitives", () => {
+  it("recharge quand un run ouvre une PR, même après des PR toutes réglées", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockResolvedValueOnce(settled)
+        .mockResolvedValue([...settled, ...withOpen]);
+
+      const { result, rerender } = renderHook(
+        ({ cle }: { cle: string }) => usePrStatuses("ide-core", cle),
+        { initialProps: { cle: "ticket-001:1,ticket-002:2" } },
+      );
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      rerender({ cle: "ticket-001:1,ticket-002:2,ticket-003:3" });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(result.current["ticket-003"]?.state).toBe("open");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("n'appelle rien quand aucun ticket ne porte de PR", async () => {
+    const spy = vi.spyOn(apiModule.api.github, "getPrStatuses").mockResolvedValue([]);
+    renderHook(() => usePrStatuses("ide-core", ""));
+    await act(async () => {});
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("arrête de demander après une erreur 4xx (projet sans dépôt GitHub)", async () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi
+        .spyOn(apiModule.api.github, "getPrStatuses")
+        .mockRejectedValue(new Error("API 404: GitHub non configuré"));
+
+      renderHook(() => usePrStatuses("ide-core", "ticket-001:1"));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(90_000);
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});

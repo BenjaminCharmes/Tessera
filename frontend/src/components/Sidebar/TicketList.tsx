@@ -16,6 +16,7 @@ import CreateTicketModal from "./CreateTicketModal";
 import PlanEvolutionModal from "./PlanEvolutionModal";
 import SkeletonList from "../SkeletonList";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
+import { clePrDesTickets, usePrStatuses } from "../../hooks/usePrStatuses";
 import type { Project, Ticket, TicketStatus } from "../../types/api";
 import BarreDeFiltres from "./BarreDeFiltres";
 import type { FiltresTickets } from "../../lib/filtresTickets";
@@ -111,6 +112,11 @@ export default function TicketList({
     [byStatus],
   );
   const blockedArrets = useBlockedArrets(project?.id ?? null, blockedIds);
+  const clePr = useMemo(
+    () => clePrDesTickets(Object.values(byStatus).flat()),
+    [byStatus],
+  );
+  const prStatuses = usePrStatuses(project?.id ?? null, clePr);
 
   if (!project) {
     return (
@@ -260,7 +266,7 @@ export default function TicketList({
                           running.has(ticket.id) ? runningRound : undefined
                         }
                         maxRounds={maxRounds}
-                        githubRemote={project.github_remote}
+                        prStatus={prStatuses[ticket.id] ?? null}
                         onChangeStatus={onChangeStatus}
                         onSelect={onSelectTicket}
                         onRun={onRunPipeline}

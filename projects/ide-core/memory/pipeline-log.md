@@ -1688,3 +1688,550 @@ Le cod (32766ms)
 - 2026-10-07 08:24:28 UTC — [ticket-365] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour  (145375ms)
 - 2026-10-07 08:24:28 UTC — [ticket-365] APPROVED après 1 tour(s)
 - 2026-10-07 08:25:58 UTC — [ticket-365] documentation: 1 fichier(s) (86733ms)
+- 2026-10-07 08:26:09 UTC — [ticket-365] livraison: rebase sur develop (234ms)
+- 2026-10-07 08:26:09 UTC — [ticket-365] livraison: PR #298 ouverte (5063ms)
+- 2026-10-07 08:26:09 UTC — [ide-core] ticket-365 PR #298 confiée au CIWatcher
+- 2026-10-07 09:03:19 UTC — [ticket-369] branche ticket-369-at-startup-a-run-interrupted-by-a-stop-leaves-its
+- 2026-10-07 09:03:19 UTC — [ticket-369] tour 1 — codeur démarré
+- 2026-10-07 09:14:39 UTC — [ticket-369] tour 1 — codeur terminé (679875ms)
+- 2026-10-07 09:24:10 UTC — [ticket-369] livraison: rebase sur develop (203ms)
+- 2026-10-07 09:24:10 UTC — [ticket-369] livraison: PR #303 ouverte (4468ms)
+- 2026-10-07 09:24:10 UTC — [ticket-369] livraison: arrêt — La branche locale « develop » (7e55f2d) a divergé de la base distante (b2949bd) : mise à jour ignoré
+- 2026-10-07 09:24:10 UTC — [ide-core] ticket-369 PR #303 confiée au CIWatcher
+- 2026-10-07 09:24:11 UTC — [ticket-366] branche ticket-366-one-request-gives-the-status-of-every-pr-of-a-pro
+- 2026-10-07 09:24:11 UTC — [ticket-366] tour 1 — codeur démarré
+- 2026-10-07 09:33:30 UTC — [ticket-366] tour 1 — codeur terminé (559250ms)
+- 2026-10-07 09:37:22 UTC — [ticket-366] testeur: OK (exit 0)
+- 2026-10-07 09:38:39 UTC — [ticket-366] securite: BLOCK — Two HIGH severity vulnerabilities detected: (1) Missing authentication enforceme (77047ms)
+- 2026-10-07 09:38:41 UTC — [ide-core] file interrompue : ticket-366 non approuvé
+- 2026-10-07 09:49:59 UTC — [ticket-370] branche ticket-370-a-project-id-is-validated-on-every-route-and-can
+- 2026-10-07 09:49:59 UTC — [ticket-370] tour 1 — codeur démarré
+- 2026-10-07 10:02:50 UTC — [ticket-370] tour 1 — codeur terminé (770313ms)
+- 2026-10-07 10:06:07 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 10:06:43 UTC — [ticket-370] securite: PASS — Excellent security addition for path traversal prevention. The diff adds multi-l (36139ms)
+- 2026-10-07 10:06:43 UTC — [ticket-370] tour 1 — reviewer démarré
+- 2026-10-07 10:08:40 UTC — [ticket-370] tour 1 — reviewer terminé (117061ms)
+- 2026-10-07 10:10:12 UTC — [ticket-370] validateur: CHANGES_REQUESTED — 5 critère(s) absent(s) de la réponse du validateur.  (209140ms)
+- 2026-10-07 10:10:12 UTC — [ticket-370] CHANGES_REQUESTED tour 1: Validateur : 5 critère(s) absent(s) de la réponse du validateur. 
+- 2026-10-07 10:10:12 UTC — [ticket-370] tour 2 — codeur démarré
+- 2026-10-07 10:18:42 UTC — [ticket-370] tour 2 — codeur terminé (509655ms)
+- 2026-10-07 10:22:29 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 10:23:09 UTC — [ticket-370] securite: PASS — Audit de sécurité — aucune vulnérabilité détectée.
+
+Ce patch **renforce** la séc (40953ms)
+- 2026-10-07 10:23:10 UTC — [ticket-370] tour 2 — reviewer démarré
+- 2026-10-07 10:24:15 UTC — [ticket-370] tour 2 — reviewer terminé (65313ms)
+- 2026-10-07 10:27:12 UTC — [ticket-370] validateur: CHANGES_REQUESTED — 5 critère(s) absent(s) de la réponse du validateur.  (241453ms)
+- 2026-10-07 10:27:12 UTC — [ticket-370] CHANGES_REQUESTED tour 2: Validateur : 5 critère(s) absent(s) de la réponse du validateur. 
+- 2026-10-07 10:27:12 UTC — [ticket-370] tour 3 — codeur démarré
+- 2026-10-07 10:34:33 UTC — [ticket-370] tour 3 — codeur terminé (441015ms)
+- 2026-10-07 10:38:27 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 10:39:07 UTC — [ticket-370] securite: PASS — Audit complet du diff de sécurité pour la validation de `project_id` — aucune vu (39983ms)
+- 2026-10-07 10:39:07 UTC — [ticket-370] tour 3 — reviewer démarré
+- 2026-10-07 10:40:31 UTC — [ticket-370] tour 3 — reviewer terminé (84155ms)
+- 2026-10-07 10:42:40 UTC — [ticket-370] validateur: CHANGES_REQUESTED — 5 critère(s) absent(s) de la réponse du validateur.  (212811ms)
+- 2026-10-07 10:42:40 UTC — [ticket-370] CHANGES_REQUESTED tour 3: Validateur : 5 critère(s) absent(s) de la réponse du validateur. 
+- 2026-10-07 10:42:40 UTC — [ticket-370] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-07 10:42:43 UTC — [ide-core] file interrompue : ticket-370 non approuvé
+- 2026-10-07 10:43:09 UTC — [ticket-371] branche ticket-371-the-validator-and-the-security-audit-read-their-o
+- 2026-10-07 10:43:09 UTC — [ticket-371] tour 1 — codeur démarré
+- 2026-10-07 10:48:39 UTC — [ticket-371] tour 1 — codeur terminé (329625ms)
+- 2026-10-07 10:53:20 UTC — [ticket-371] testeur: OK (exit 0)
+- 2026-10-07 10:53:46 UTC — [ticket-371] securite: PASS — Audit terminé : aucune vulnérabilité détectée. Les modifications renforcent la s (26500ms)
+- 2026-10-07 10:53:46 UTC — [ticket-371] tour 1 — reviewer démarré
+- 2026-10-07 10:55:02 UTC — [ticket-371] tour 1 — reviewer terminé (75875ms)
+- 2026-10-07 10:59:40 UTC — [ticket-371] validateur: APPROVED — Tous les critères sont satisfaits. Les tests ont été ajoutés pour valider le com (353375ms)
+- 2026-10-07 10:59:40 UTC — [ticket-371] APPROVED après 1 tour(s)
+- 2026-10-07 11:01:00 UTC — [ticket-371] documentation: 0 fichier(s) (78483ms)
+- 2026-10-07 11:01:12 UTC — [ticket-371] livraison: rebase sur develop (531ms)
+- 2026-10-07 11:01:12 UTC — [ticket-371] livraison: PR #307 ouverte (4437ms)
+- 2026-10-07 11:01:12 UTC — [ide-core] ticket-371 PR #307 confiée au CIWatcher
+- 2026-10-07 11:06:33 UTC — [ticket-368] branche ticket-368-the-kanban-s-done-and-cancelled-columns-show-the
+- 2026-10-07 11:06:33 UTC — [ticket-368] tour 1 — codeur démarré
+- 2026-10-07 11:10:32 UTC — [ticket-368] tour 1 — codeur terminé (238077ms)
+- 2026-10-07 11:14:42 UTC — [ticket-368] testeur: OK (exit 0)
+- 2026-10-07 11:15:00 UTC — [ticket-368] securite: PASS — Aucune vulnérabilité détectée. Le diff améliore la performance de rendu du compo (17561ms)
+- 2026-10-07 11:15:00 UTC — [ticket-368] tour 1 — reviewer démarré
+- 2026-10-07 11:15:48 UTC — [ticket-368] tour 1 — reviewer terminé (47733ms)
+- 2026-10-07 11:22:11 UTC — [ticket-368] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour  (431125ms)
+- 2026-10-07 11:22:11 UTC — [ticket-368] APPROVED après 1 tour(s)
+- 2026-10-07 11:23:42 UTC — [ticket-368] documentation: 1 fichier(s) (87452ms)
+- 2026-10-07 11:23:55 UTC — [ticket-368] livraison: rebase sur develop (312ms)
+- 2026-10-07 11:23:55 UTC — [ticket-368] livraison: PR #308 ouverte (4954ms)
+- 2026-10-07 11:23:55 UTC — [ide-core] ticket-368 PR #308 confiée au CIWatcher
+- 2026-10-07 11:23:57 UTC — [ticket-372] branche ticket-372-a-versioned-fastapi-react-project-template-lives
+- 2026-10-07 11:23:57 UTC — [ticket-372] tour 1 — codeur démarré
+- 2026-10-07 11:28:41 UTC — [ticket-372] tour 1 — codeur terminé (283514ms)
+- 2026-10-07 11:32:22 UTC — [ticket-372] testeur: OK (exit 0)
+- 2026-10-07 11:32:57 UTC — [ticket-372] securite: PASS — Audit complet — aucune vulnérabilité détectée.
+
+PointsControls effectués :
+• Sub (35094ms)
+- 2026-10-07 11:32:57 UTC — [ticket-372] tour 1 — reviewer démarré
+- 2026-10-07 11:34:37 UTC — [ticket-372] tour 1 — reviewer terminé (99750ms)
+- 2026-10-07 11:37:51 UTC — [ticket-372] validateur: CHANGES_REQUESTED — Les critères d'acceptation sont globalement respectés. Le stub jiter est présent (294468ms)
+- 2026-10-07 11:37:51 UTC — [ticket-372] CHANGES_REQUESTED tour 1: Validateur : Les critères d'acceptation sont globalement respectés. Le stub jiter est présent dans l
+- 2026-10-07 11:37:51 UTC — [ticket-372] tour 2 — codeur démarré
+- 2026-10-07 11:38:01 UTC — [ticket-372] tour 2 — codeur terminé (9313ms)
+- 2026-10-07 11:43:15 UTC — [ticket-372] testeur: OK (exit 0)
+- 2026-10-07 11:43:50 UTC — [ticket-372] securite: PASS — No security vulnerabilities detected. The diff introduces a test suite and a Fas (34468ms)
+- 2026-10-07 11:43:50 UTC — [ticket-372] tour 2 — reviewer démarré
+- 2026-10-07 11:44:50 UTC — [ticket-372] tour 2 — reviewer terminé (59968ms)
+- 2026-10-07 11:48:55 UTC — [ticket-372] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le gabarit FastAPI + React a été (305406ms)
+- 2026-10-07 11:48:55 UTC — [ticket-372] APPROVED après 2 tour(s)
+- 2026-10-07 11:51:39 UTC — [ticket-372] documentation: 0 fichier(s) (161172ms) — refusé : doc-technique : README.md : texte introuvable — « ├── projects/
+│   └── ide-core/             ← Projet bootstr ». L'agent a proposé une modification sur un text
+- 2026-10-07 11:51:59 UTC — [ticket-372] livraison: rebase sur develop (2016ms)
+- 2026-10-07 11:51:59 UTC — [ticket-372] livraison: PR #309 ouverte (8297ms)
+- 2026-10-07 11:55:56 UTC — [ide-core] ticket-372 PR #309 confiée au CIWatcher
+- 2026-10-07 11:55:57 UTC — [ticket-373] branche ticket-373-a-project-is-created-from-the-template-in-one-cal
+- 2026-10-07 11:55:57 UTC — [ticket-373] tour 1 — codeur démarré
+- 2026-10-07 12:07:32 UTC — [ticket-373] tour 1 — codeur terminé (694890ms)
+- 2026-10-07 12:13:23 UTC — [ticket-373] testeur: OK (exit 0)
+- 2026-10-07 12:14:23 UTC — [ticket-373] securite: BLOCK — One HIGH severity vulnerability detected: 'project_id' is not validated before u (59906ms)
+- 2026-10-07 12:14:30 UTC — [ide-core] file interrompue : ticket-373 non approuvé
+- 2026-10-07 12:18:59 UTC — [ticket-370] branche ticket-370-a-project-id-is-validated-on-every-route-and-can
+- 2026-10-07 12:18:59 UTC — [ticket-370] tour 1 — codeur démarré
+- 2026-10-07 12:20:27 UTC — [ticket-370] tour 1 — codeur terminé (87750ms)
+- 2026-10-07 12:24:18 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 12:24:54 UTC — [ticket-370] securite: BLOCK — Réponse de l'auditeur sécurité illisible (JSON attendu). (36030ms)
+- 2026-10-07 12:24:56 UTC — [ide-core] file interrompue : ticket-370 non approuvé
+- 2026-10-07 12:29:01 UTC — [ticket-376] branche ticket-376-an-agent-s-json-answer-is-read-even-when-a-string
+- 2026-10-07 12:29:02 UTC — [ticket-376] tour 1 — codeur démarré
+- 2026-10-07 12:33:10 UTC — [ticket-376] tour 1 — codeur terminé (247936ms)
+- 2026-10-07 12:36:21 UTC — [ticket-376] testeur: OK (exit 0)
+- 2026-10-07 12:36:46 UTC — [ticket-376] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente un mécanisme robuste de correc (25311ms)
+- 2026-10-07 12:36:46 UTC — [ticket-376] tour 1 — reviewer démarré
+- 2026-10-07 12:37:26 UTC — [ticket-376] tour 1 — reviewer terminé (40031ms)
+- 2026-10-07 12:39:23 UTC — [ticket-376] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente une correction pour gérer  (157281ms)
+- 2026-10-07 12:39:23 UTC — [ticket-376] APPROVED après 1 tour(s)
+- 2026-10-07 12:41:20 UTC — [ticket-376] documentation: 0 fichier(s) (114250ms) — refusé : doc-technique : README.md : texte introuvable — « ├── projects/
+│   └── ide-core/             ← Projet bootstr ». L'agent a proposé une modification sur un text
+- 2026-10-07 12:41:30 UTC — [ticket-376] livraison: rebase sur develop (266ms)
+- 2026-10-07 12:41:30 UTC — [ticket-376] livraison: PR #312 ouverte (4484ms)
+- 2026-10-07 12:41:30 UTC — [ide-core] ticket-376 PR #312 confiée au CIWatcher
+- 2026-10-07 12:41:31 UTC — [ticket-375] branche ticket-375-startup-recovery-resets-the-ticket-on-its-own-bra
+- 2026-10-07 12:41:32 UTC — [ticket-375] tour 1 — codeur démarré
+- 2026-10-07 12:50:47 UTC — [ticket-375] tour 1 — codeur terminé (555453ms)
+- 2026-10-07 12:55:38 UTC — [ticket-375] testeur: 2 failed, 2053 passed, 20 warnings in 286.62s (0:04:46)
+- 2026-10-07 12:55:38 UTC — [ticket-375] tests rouges au tour 1
+- 2026-10-07 12:55:38 UTC — [ticket-375] tour 2 — codeur démarré
+- 2026-10-07 12:59:25 UTC — [ticket-375] tour 2 — codeur terminé (226687ms)
+- 2026-10-07 13:02:40 UTC — [ticket-375] testeur: 1 failed, 735 passed, 20 warnings in 190.86s (0:03:10)
+- 2026-10-07 13:02:40 UTC — [ticket-375] tests rouges au tour 2
+- 2026-10-07 13:02:40 UTC — [ticket-375] tour 3 — codeur démarré
+- 2026-10-07 13:06:23 UTC — [ticket-375] tour 3 — codeur terminé (223203ms)
+- 2026-10-07 13:11:45 UTC — [ticket-375] testeur: OK (exit 0)
+- 2026-10-07 13:12:29 UTC — [ticket-375] securite: PASS — Audit de sécurité complet sur le diff de reprise d'orphelins : aucune vulnérabil (43266ms)
+- 2026-10-07 13:12:29 UTC — [ticket-375] tour 3 — reviewer démarré
+- 2026-10-07 13:14:06 UTC — [ticket-375] tour 3 — reviewer terminé (97561ms)
+- 2026-10-07 13:17:25 UTC — [ticket-375] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés et mo (296344ms)
+- 2026-10-07 13:17:25 UTC — [ticket-375] APPROVED après 3 tour(s)
+- 2026-10-07 13:19:52 UTC — [ticket-375] documentation: 0 fichier(s) (143687ms)
+- 2026-10-07 13:20:48 UTC — [ticket-375] livraison: rebase sur develop (3406ms)
+- 2026-10-07 13:20:48 UTC — [ticket-375] livraison: PR #313 ouverte (13625ms)
+- 2026-10-07 13:20:48 UTC — [ide-core] ticket-375 PR #313 confiée au CIWatcher
+- 2026-10-07 13:25:38 UTC — [ticket-377] branche ticket-377-a-queue-that-dies-writes-it-in-the-pipeline-log-a
+- 2026-10-07 13:25:38 UTC — [ticket-377] tour 1 — codeur démarré
+- 2026-10-07 13:33:53 UTC — [ticket-377] tour 1 — codeur terminé (493311ms)
+- 2026-10-07 13:41:45 UTC — [ticket-377] testeur: OK (exit 0)
+- 2026-10-07 13:42:46 UTC — [ticket-377] securite: BLOCK — A HIGH-severity path traversal vulnerability was detected in `_log_pipeline()`.  (60985ms)
+- 2026-10-07 13:43:14 UTC — [ide-core] file interrompue : ticket-377 non approuvé
+- 2026-10-07 13:49:03 UTC — [ticket-370] branche ticket-370-a-project-id-is-validated-on-every-route-and-can
+- 2026-10-07 13:49:03 UTC — [ticket-370] tour 1 — codeur démarré
+- 2026-10-07 13:51:17 UTC — [ticket-370] tour 1 — codeur terminé (133969ms)
+- 2026-10-07 13:56:38 UTC — [ticket-370] testeur: OK (exit 0)
+- 2026-10-07 13:57:33 UTC — [ticket-370] securite: PASS — Ce diff implémente une validation robuste des identifiants de projet (ticket-370 (55250ms)
+- 2026-10-07 13:57:33 UTC — [ticket-370] tour 1 — reviewer démarré
+- 2026-10-07 14:00:36 UTC — [ticket-370] tour 1 — reviewer terminé (182078ms)
+- 2026-10-07 14:06:16 UTC — [ticket-370] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une validati (522766ms)
+- 2026-10-07 14:06:16 UTC — [ticket-370] APPROVED après 1 tour(s)
+- 2026-10-07 14:08:06 UTC — [ticket-370] documentation: 1 fichier(s) (106562ms)
+- 2026-10-07 14:08:55 UTC — [ticket-370] livraison: rebase sur develop (1063ms)
+- 2026-10-07 14:08:55 UTC — [ticket-370] livraison: PR #314 ouverte (14437ms)
+- 2026-10-07 14:17:56 UTC — [ide-core] ticket-370 PR #314 confiée au CIWatcher
+- 2026-10-07 14:18:06 UTC — [ticket-366] branche ticket-366-one-request-gives-the-status-of-every-pr-of-a-pro
+- 2026-10-07 14:18:07 UTC — [ticket-366] tour 1 — codeur démarré
+- 2026-10-07 14:27:52 UTC — [ticket-366] tour 1 — codeur terminé (584016ms)
+- 2026-10-07 14:35:24 UTC — [ticket-366] testeur: OK (exit 0)
+- 2026-10-07 14:36:10 UTC — [ticket-366] securite: PASS — No critical or high-severity security vulnerabilities detected. The codebase fol (45172ms)
+- 2026-10-07 14:36:10 UTC — [ticket-366] tour 1 — reviewer démarré
+- 2026-10-07 14:37:38 UTC — [ticket-366] tour 1 — reviewer terminé (88639ms)
+- 2026-10-07 14:43:31 UTC — [ticket-366] validateur: APPROVED — Les six critères sont satisfaits. Le diff introduit le nouvel endpoint `GET /pro (441640ms)
+- 2026-10-07 14:43:31 UTC — [ticket-366] APPROVED après 1 tour(s)
+- 2026-10-07 14:44:51 UTC — [ticket-366] documentation: 2 fichier(s) (73453ms)
+- 2026-10-07 14:45:13 UTC — [ticket-366] livraison: rebase sur develop (1765ms)
+- 2026-10-07 14:45:13 UTC — [ticket-366] livraison: PR #317 ouverte (7547ms)
+- 2026-10-07 14:49:24 UTC — [ide-core] ticket-366 PR #317 confiée au CIWatcher
+- 2026-10-07 14:49:29 UTC — [ticket-367] branche ticket-367-ticket-cards-read-their-pr-status-from-one-projec
+- 2026-10-07 14:49:30 UTC — [ticket-367] tour 1 — codeur démarré
+- 2026-10-07 15:01:08 UTC — [ticket-367] tour 1 — codeur terminé (698077ms)
+- 2026-10-07 18:17:57 UTC — [ticket-367] testeur: délai dépassé, suite relancée
+- 2026-10-08 07:03:09 UTC — [ticket-367] BLOCKED — testeur: délai dépassé deux fois
+- 2026-10-08 07:03:13 UTC — [ide-core] file interrompue : ticket-367 non approuvé
+- 2026-10-08 07:03:44 UTC — [ticket-379] branche ticket-379-filtering-decisions-by-role-no-longer-swallows-th
+- 2026-10-08 07:03:45 UTC — [ticket-379] tour 1 — codeur démarré
+- 2026-10-08 07:08:03 UTC — [ticket-379] tour 1 — codeur terminé (258452ms)
+- 2026-10-08 07:13:35 UTC — [ticket-379] testeur: OK (exit 0)
+- 2026-10-08 07:14:19 UTC — [ticket-379] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
+
+Le code introduit une sé (44328ms)
+- 2026-10-08 07:14:19 UTC — [ticket-379] tour 1 — reviewer démarré
+- 2026-10-08 07:15:24 UTC — [ticket-379] tour 1 — reviewer terminé (65062ms)
+- 2026-10-08 07:17:14 UTC — [ticket-379] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (175093ms)
+- 2026-10-08 07:17:14 UTC — [ticket-379] APPROVED après 1 tour(s)
+- 2026-10-08 07:18:34 UTC — [ticket-379] documentation: 1 fichier(s) (76764ms)
+- 2026-10-08 07:18:47 UTC — [ticket-379] livraison: rebase sur develop (500ms)
+- 2026-10-08 07:18:47 UTC — [ticket-379] livraison: PR #320 ouverte (3969ms)
+- 2026-10-08 07:18:47 UTC — [ide-core] ticket-379 PR #320 confiée au CIWatcher
+- 2026-10-08 07:18:49 UTC — [ticket-380] branche ticket-380-a-saturated-or-timed-out-ollama-falls-back-at-onc
+- 2026-10-08 07:18:50 UTC — [ticket-380] tour 1 — codeur démarré
+- 2026-10-08 07:25:42 UTC — [ticket-380] tour 1 — codeur terminé (412281ms)
+- 2026-10-08 07:30:22 UTC — [ticket-380] testeur: \u276f src/components/Sidebar/TicketList.test.tsx:41:3
+- 2026-10-08 07:30:22 UTC — [ticket-380] tests rouges au tour 1
+- 2026-10-08 07:30:22 UTC — [ticket-380] tour 2 — codeur démarré
+- 2026-10-08 07:31:05 UTC — [ticket-380] tour 2 — codeur terminé (42968ms)
+- 2026-10-08 07:34:33 UTC — [ticket-380] testeur: OK (exit 0)
+- 2026-10-08 07:35:08 UTC — [ticket-380] securite: PASS — Audit complet : aucune vulnérabilité détectée. Le diff implémente un système de  (35639ms)
+- 2026-10-08 07:35:08 UTC — [ticket-380] tour 2 — reviewer démarré
+- 2026-10-08 07:36:05 UTC — [ticket-380] tour 2 — reviewer terminé (57078ms)
+- 2026-10-08 07:38:35 UTC — [ticket-380] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une attente  (206375ms)
+- 2026-10-08 07:38:35 UTC — [ticket-380] APPROVED après 2 tour(s)
+- 2026-10-08 07:42:51 UTC — [ticket-380] documentation: 6 fichier(s) (253187ms)
+- 2026-10-08 07:43:11 UTC — [ticket-380] livraison: rebase sur develop (1437ms)
+- 2026-10-08 07:43:11 UTC — [ticket-380] livraison: PR #321 ouverte (6625ms)
+- 2026-10-08 07:43:12 UTC — [ide-core] ticket-380 PR #321 confiée au CIWatcher
+- 2026-10-08 07:43:13 UTC — [ticket-378] branche ticket-378-after-delivery-the-delivery-log-lines-are-committ
+- 2026-10-08 07:43:13 UTC — [ticket-378] tour 1 — codeur démarré
+- 2026-10-08 07:55:30 UTC — [ticket-378] tour 1 — codeur terminé (737266ms)
+- 2026-10-08 07:59:25 UTC — [ticket-378] testeur: 1 failed, 2082 passed, 20 warnings in 230.83s (0:03:50)
+- 2026-10-08 07:59:25 UTC — [ticket-378] tests rouges au tour 1
+- 2026-10-08 07:59:25 UTC — [ticket-378] tour 2 — codeur démarré
+- 2026-10-08 08:10:50 UTC — [ticket-378] tour 2 — codeur terminé (685296ms)
+- 2026-10-08 08:15:16 UTC — [ticket-378] testeur: 1 failed, 1731 passed, 20 warnings in 229.51s (0:03:49)
+- 2026-10-08 08:15:16 UTC — [ticket-378] tests rouges au tour 2
+- 2026-10-08 08:15:16 UTC — [ticket-378] tour 3 — codeur démarré
+- 2026-10-08 08:17:38 UTC — [ticket-378] tour 3 — codeur terminé (141875ms)
+- 2026-10-08 08:21:28 UTC — [ticket-378] testeur: ImportError: DLL load failed while importing base64: Une strat\ufffdgie de contr\ufffdle d\ufffdapplication a bloqu\ufffd ce fichier.
+- 2026-10-08 08:21:28 UTC — [ticket-378] tests rouges au tour 3
+- 2026-10-08 08:21:28 UTC — [ticket-378] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-08 08:21:30 UTC — [ide-core] file interrompue : ticket-378 non approuvé
+- 2026-10-08 08:26:15 UTC — [ticket-378] branche ticket-378-after-delivery-the-delivery-log-lines-are-committ
+- 2026-10-08 08:26:15 UTC — [ticket-378] tour 1 — codeur démarré
+- 2026-10-08 08:28:59 UTC — [ticket-378] tour 1 — codeur terminé (163906ms)
+- 2026-10-08 08:32:28 UTC — [ticket-378] testeur: ImportError: DLL load failed while importing base64: Une strat\ufffdgie de contr\ufffdle d\ufffdapplication a bloqu\ufffd ce fichier.
+- 2026-10-08 08:32:28 UTC — [ticket-378] tests rouges au tour 1
+- 2026-10-08 08:32:28 UTC — [ticket-378] tour 2 — codeur démarré
+- 2026-10-08 08:34:11 UTC — [ticket-378] tour 2 — codeur terminé (103750ms)
+- 2026-10-08 08:38:09 UTC — [ticket-378] testeur: ImportError: DLL load failed while importing base64: Une strat\ufffdgie de contr\ufffdle d\ufffdapplication a bloqu\ufffd ce fichier.
+- 2026-10-08 08:38:09 UTC — [ticket-378] tests rouges au tour 2
+- 2026-10-08 08:38:10 UTC — [ticket-378] ARRÊTÉ par l'utilisateur au tour 3
+- 2026-10-08 08:38:11 UTC — [ide-core] file interrompue : ticket-378 non approuvé
+- 2026-10-08 08:47:00 UTC — [ticket-378] branche ticket-378-after-delivery-the-delivery-log-lines-are-committ
+- 2026-10-08 08:47:01 UTC — [ticket-378] tour 1 — codeur démarré
+- 2026-10-08 08:52:38 UTC — [ticket-378] tour 1 — codeur terminé (337639ms)
+- 2026-10-08 08:55:58 UTC — [ticket-378] testeur: OK (exit 0)
+- 2026-10-08 08:56:49 UTC — [ticket-378] securite: PASS — Audit de sécurité complet : aucune vulnérabilité détectée.
+
+**Refactoring sûr de (50844ms)
+- 2026-10-08 08:56:49 UTC — [ticket-378] tour 1 — reviewer démarré
+- 2026-10-08 08:59:11 UTC — [ticket-378] tour 1 — reviewer terminé (141281ms)
+- 2026-10-08 09:02:15 UTC — [ticket-378] validateur: APPROVED — Les 4 critères sont satisfaits. Le diff ajoute l'implémentation complète dans `o (325562ms)
+- 2026-10-08 09:02:15 UTC — [ticket-378] APPROVED après 1 tour(s)
+- 2026-10-08 09:04:48 UTC — [ticket-378] documentation: 2 fichier(s) (151422ms)
+- 2026-10-08 09:05:01 UTC — [ticket-378] livraison: rebase sur develop (297ms)
+- 2026-10-08 09:05:01 UTC — [ticket-378] livraison: PR #327 ouverte (4188ms)
+- 2026-10-08 09:05:01 UTC — [ide-core] ticket-378 PR #327 confiée au CIWatcher
+- 2026-10-08 09:05:02 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 09:05:02 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 09:19:30 UTC — [ticket-384] tour 1 — codeur terminé (867891ms)
+- 2026-10-08 09:23:59 UTC — [ticket-384] testeur: OK (exit 0)
+- 2026-10-08 09:24:38 UTC — [ticket-384] securite: PASS — No CRITICAL or HIGH vulnerabilities detected. The diff implements ticket-384 (qu (38875ms)
+- 2026-10-08 09:24:38 UTC — [ticket-384] tour 1 — reviewer démarré
+- 2026-10-08 09:26:47 UTC — [ticket-384] tour 1 — reviewer terminé (129546ms)
+- 2026-10-08 09:30:25 UTC — [ticket-384] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff montre les cinq tests a (347750ms)
+- 2026-10-08 09:30:25 UTC — [ticket-384] CHANGES_REQUESTED tour 1: Reviewer : Je vais vérifier deux points critiques avant de rendre mon verdict : ce que fait réelleme
+- 2026-10-08 09:30:25 UTC — [ticket-384] tour 2 — codeur démarré
+- 2026-10-08 09:32:29 UTC — [ticket-384] tour 2 — codeur terminé (123468ms)
+- 2026-10-08 09:36:13 UTC — [ticket-384] testeur: 1 failed, 2087 passed, 20 warnings in 220.52s (0:03:40)
+- 2026-10-08 09:36:13 UTC — [ticket-384] tests rouges au tour 2
+- 2026-10-08 09:36:13 UTC — [ticket-384] tour 3 — codeur démarré
+- 2026-10-08 09:42:26 UTC — [ticket-384] INTERROMPU au tour 3 — ResultError: Claude Code returned an error result: You've hit your session limit · resets 1:50pm (Europe/Paris) (exit code: 1)
+- 2026-10-08 09:42:28 UTC — [ide-core] file interrompue : ticket-384 non approuvé
+- 2026-10-08 13:14:13 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 13:14:13 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 13:24:07 UTC — [ticket-384] tour 1 — codeur terminé (593844ms)
+- 2026-10-08 13:27:12 UTC — [ticket-384] testeur: OK (exit 0)
+- 2026-10-08 13:28:16 UTC — [ticket-384] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le diff ajoute la gestion du blo (64156ms)
+- 2026-10-08 13:28:16 UTC — [ticket-384] tour 1 — reviewer démarré
+- 2026-10-08 13:30:29 UTC — [ticket-384] tour 1 — reviewer terminé (133390ms)
+- 2026-10-08 13:34:08 UTC — [ticket-384] validateur: APPROVED — Tous les critères sont satisfaits. Les cinq tests requis sont présents dans le d (352391ms)
+- 2026-10-08 13:34:08 UTC — [ticket-384] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **`ticket_svc: Any | None` dans `ci_watcher
+- 2026-10-08 13:34:08 UTC — [ticket-384] tour 2 — codeur démarré
+- 2026-10-08 13:35:43 UTC — [ticket-384] tour 2 — codeur terminé (95218ms)
+- 2026-10-08 14:05:02 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 14:05:02 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 14:08:15 UTC — [ticket-384] tour 1 — codeur terminé (193577ms)
+- 2026-10-08 14:08:16 UTC — [ticket-384] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-10-08 14:08:18 UTC — [ide-core] file interrompue : ticket-384 non approuvé
+- 2026-10-08 15:03:47 UTC — [ticket-384] branche ticket-384-a-pr-whose-mergeability-is-still-being-computed-i
+- 2026-10-08 15:03:48 UTC — [ticket-384] tour 1 — codeur démarré
+- 2026-10-08 15:08:09 UTC — [ticket-384] tour 1 — codeur terminé (261702ms)
+- 2026-10-08 15:12:58 UTC — [ticket-384] testeur: OK (exit 0)
+- 2026-10-08 15:13:45 UTC — [ticket-384] securite: PASS — No CRITICAL or HIGH severity vulnerabilities detected. The diff adds merge-failu (46155ms)
+- 2026-10-08 15:13:45 UTC — [ticket-384] tour 1 — reviewer démarré
+- 2026-10-08 15:16:03 UTC — [ticket-384] tour 1 — reviewer terminé (138905ms)
+- 2026-10-08 15:20:20 UTC — [ticket-384] validateur: APPROVED — Tous les critères sont satisfaits par les tests ajoutés au diff. Les trois modif (395250ms)
+- 2026-10-08 15:20:20 UTC — [ticket-384] APPROVED après 1 tour(s)
+- 2026-10-08 15:24:00 UTC — [ticket-384] documentation: 4 fichier(s) (218765ms)
+- 2026-10-09 12:14:18 UTC — [ide-core] ticket-381 PR #332 confiée au CIWatcher
+- 2026-10-09 12:14:18 UTC — [ticket-382] branche ticket-382-on-a-project-that-merges-without-ci-the-next-tick
+- 2026-10-09 12:14:19 UTC — [ticket-382] tour 1 — codeur démarré
+- 2026-10-09 12:21:04 UTC — [ticket-382] tour 1 — codeur terminé (405297ms)
+- 2026-10-09 12:23:58 UTC — [ticket-382] testeur: OK (exit 0)
+- 2026-10-09 12:24:31 UTC — [ticket-382] securite: PASS — Audit de sécurité du diff ticket-382 (merge_without_ci) — aucune vulnérabilité d (32578ms)
+- 2026-10-09 12:24:31 UTC — [ticket-382] tour 1 — reviewer démarré
+- 2026-10-09 12:25:59 UTC — [ticket-382] tour 1 — reviewer terminé (88592ms)
+- 2026-10-09 12:26:23 UTC — [ticket-382] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests bien structurés q (111969ms)
+- 2026-10-09 12:26:23 UTC — [ticket-382] APPROVED après 1 tour(s)
+- 2026-10-09 12:28:39 UTC — [ticket-382] documentation: 2 fichier(s) (134469ms)
+- 2026-10-08 15:29:33 UTC — [ticket-381] branche ticket-381-an-agent-process-that-stays-silent-too-long-is-st
+- 2026-10-08 15:29:34 UTC — [ticket-381] tour 1 — codeur démarré
+- 2026-10-08 15:39:53 UTC — [ticket-381] tour 1 — codeur terminé (619656ms)
+- 2026-10-09 07:36:46 UTC — [ticket-381] testeur: délai dépassé, suite relancée
+- 2026-10-09 07:37:07 UTC — [ticket-381] testeur: pytest :
+- 2026-10-09 07:37:07 UTC — [ticket-381] tests rouges au tour 1
+- 2026-10-09 07:37:07 UTC — [ticket-381] tour 2 — codeur démarré
+- 2026-10-09 07:37:09 UTC — [ticket-381] INTERROMPU au tour 2 — ProcessError: Command failed with exit code 3221226091 (exit code: 3221226091) Error output: Check stderr output for details
+- 2026-10-09 12:00:48 UTC — [ticket-381] branche ticket-381-an-agent-process-that-stays-silent-too-long-is-st
+- 2026-10-09 12:00:48 UTC — [ticket-381] tour 1 — codeur démarré
+- 2026-10-09 12:02:00 UTC — [ticket-381] tour 1 — codeur terminé (71781ms)
+- 2026-10-09 12:04:24 UTC — [ticket-381] testeur: 1 failed, 743 passed, 20 warnings in 141.80s (0:02:21)
+- 2026-10-09 12:04:24 UTC — [ticket-381] tests rouges au tour 1
+- 2026-10-09 12:04:24 UTC — [ticket-381] tour 2 — codeur démarré
+- 2026-10-09 12:05:06 UTC — [ticket-381] tour 2 — codeur terminé (42140ms)
+- 2026-10-09 12:08:04 UTC — [ticket-381] testeur: OK (exit 0)
+- 2026-10-09 12:08:45 UTC — [ticket-381] securite: PASS — Aucune vulnérabilité critique, haute ou moyenne détectée. Le diff implémente un  (40796ms)
+- 2026-10-09 12:08:45 UTC — [ticket-381] tour 2 — reviewer démarré
+- 2026-10-09 12:09:16 UTC — [ticket-381] validateur: APPROVED — Tous les critères sont satisfaits. Le diff implémente la détection de silence d' (30968ms)
+- 2026-10-09 12:09:34 UTC — [ticket-381] tour 2 — reviewer terminé (49281ms)
+- 2026-10-09 12:09:34 UTC — [ticket-381] APPROVED après 2 tour(s)
+- 2026-10-09 12:14:06 UTC — [ticket-381] documentation: 4 fichier(s) (270125ms)
+- 2026-10-09 12:28:59 UTC — [ticket-382] livraison: arrêt — Conflit avec develop sur : docs/configuration.md. La branche est restée intacte, à toi de trancher.
+- 2026-10-09 12:29:00 UTC — [ticket-383] branche ticket-383-a-queue-s-spending-ceiling-scales-with-its-number
+- 2026-10-09 12:29:00 UTC — [ticket-383] tour 1 — codeur démarré
+- 2026-10-09 12:32:54 UTC — [ticket-383] tour 1 — codeur terminé (233735ms)
+- 2026-10-09 12:36:51 UTC — [ticket-383] testeur: OK (exit 0)
+- 2026-10-09 12:37:55 UTC — [ticket-383] securite: BLOCK — A HIGH severity budget control bypass has been detected. The `budget_usd` parame (63858ms)
+- 2026-10-09 12:37:56 UTC — [ide-core] file interrompue : ticket-383 non approuvé
+- 2026-10-09 12:52:11 UTC — [ide-core] ticket-387 PR #337 confiée au CIWatcher
+- 2026-10-09 12:52:14 UTC — [ticket-388] branche ticket-388-a-subscription-session-limit-pauses-the-queue-and
+- 2026-10-09 12:52:14 UTC — [ticket-388] tour 1 — codeur démarré
+- 2026-10-09 12:54:21 UTC — [ticket-387] livraison: arrêt — PR #337 non mergée : CI none : la PR #337 reste ouverte.
+- 2026-10-09 12:57:30 UTC — [ticket-388] tour 1 — codeur terminé (315703ms)
+- 2026-10-09 13:01:20 UTC — [ticket-388] testeur: OK (exit 0)
+- 2026-10-09 13:01:43 UTC — [ticket-388] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une gestion de la limite de sessio (23688ms)
+- 2026-10-09 13:01:43 UTC — [ticket-388] tour 1 — reviewer démarré
+- 2026-10-09 13:02:55 UTC — [ticket-388] validateur: APPROVED — Le diff implémente tous les critères : la nouvelle fonction `finish_session_limi (71000ms)
+- 2026-10-09 13:03:53 UTC — [ticket-388] tour 1 — reviewer terminé (129061ms)
+- 2026-10-09 13:03:53 UTC — [ticket-388] APPROVED après 1 tour(s)
+- 2026-10-09 13:07:42 UTC — [ticket-388] documentation: 3 fichier(s) (227750ms)
+- 2026-10-09 12:42:06 UTC — [ticket-387] branche ticket-387-the-security-audit-blocks-only-on-what-the-ticket
+- 2026-10-09 12:42:07 UTC — [ticket-387] tour 1 — codeur démarré
+- 2026-10-09 12:45:12 UTC — [ticket-387] tour 1 — codeur terminé (185577ms)
+- 2026-10-09 12:48:52 UTC — [ticket-387] testeur: OK (exit 0)
+- 2026-10-09 12:49:09 UTC — [ticket-387] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une clarification du prompt de séc (16547ms)
+- 2026-10-09 12:49:09 UTC — [ticket-387] tour 1 — reviewer démarré
+- 2026-10-09 12:49:38 UTC — [ticket-387] validateur: APPROVED — Tous les critères sont satisfaits. Le prompt `securite.md` a été enrichi pour dé (28703ms)
+- 2026-10-09 12:50:16 UTC — [ticket-387] tour 1 — reviewer terminé (66734ms)
+- 2026-10-09 12:50:16 UTC — [ticket-387] APPROVED après 1 tour(s)
+- 2026-10-09 12:51:56 UTC — [ticket-387] documentation: 1 fichier(s) (98547ms)
+- 2026-10-09 13:08:00 UTC — [ticket-388] livraison: arrêt — Conflit avec develop sur : projects/ide-core/tickets/done/ticket-387-the-audit-only-blocks-on-what-t
+- 2026-10-09 13:08:01 UTC — [ticket-377] branche ticket-377-a-queue-that-dies-writes-it-in-the-pipeline-log-a
+- 2026-10-09 13:08:02 UTC — [ticket-377] tour 1 — codeur démarré
+- 2026-10-09 13:11:45 UTC — [ticket-377] tour 1 — codeur terminé (223390ms)
+- 2026-10-09 13:15:51 UTC — [ticket-377] testeur: OK (exit 0)
+- 2026-10-09 13:17:20 UTC — [ticket-377] securite: BLOCK — A HIGH severity path traversal vulnerability was introduced in the _log_pipeline (88905ms)
+- 2026-10-09 13:17:21 UTC — [ide-core] file interrompue : ticket-377 non approuvé
+- 2026-10-09 13:21:11 UTC — [ticket-392] branche ticket-392-ciwatcher-never-edits-a-ticket-file-in-the-workin
+- 2026-10-09 13:21:12 UTC — [ticket-392] tour 1 — codeur démarré
+- 2026-10-09 13:25:25 UTC — [ticket-392] tour 1 — codeur terminé (252750ms)
+- 2026-10-09 13:30:01 UTC — [ticket-392] testeur: OK (exit 0)
+- 2026-10-09 13:30:27 UTC — [ticket-392] securite: PASS — Ce diff refactorise l'architecture de gestion des tickets failed : au lieu de mo (25594ms)
+- 2026-10-09 13:30:27 UTC — [ticket-392] tour 1 — reviewer démarré
+- 2026-10-09 13:31:06 UTC — [ticket-392] tour 1 — reviewer terminé (38968ms)
+- 2026-10-09 13:31:23 UTC — [ticket-392] validateur: APPROVED — Les quatre critères sont satisfaits. Le diff supprime correctement la modificati (56405ms)
+- 2026-10-09 13:31:23 UTC — [ticket-392] APPROVED après 1 tour(s)
+- 2026-10-09 13:34:24 UTC — [ticket-392] documentation: 0 fichier(s) (175375ms)
+- 2026-10-09 14:00:35 UTC — [ide-core] ticket-390 PR #343 confiée au CIWatcher
+- 2026-10-09 14:00:37 UTC — [ticket-386] branche ticket-386-in-a-queue-the-between-rounds-spending-check-look
+- 2026-10-09 14:00:37 UTC — [ticket-386] tour 1 — codeur démarré
+- 2026-10-09 14:13:37 UTC — [ticket-386] tour 1 — codeur terminé (779875ms)
+- 2026-10-09 14:17:24 UTC — [ticket-386] testeur: OK (exit 0)
+- 2026-10-09 14:17:43 UTC — [ticket-386] securite: PASS — Audit de sécurité du diff pour le ticket-386 (gestion du budget par ticket en fi (18922ms)
+- 2026-10-09 14:17:43 UTC — [ticket-386] tour 1 — reviewer démarré
+- 2026-10-09 14:18:15 UTC — [ticket-386] validateur: APPROVED — Les cinq tests requis sont présents dans le diff et couvrent exhaustivement les  (31703ms)
+- 2026-10-09 14:19:00 UTC — [ticket-386] tour 1 — reviewer terminé (76921ms)
+- 2026-10-09 14:19:00 UTC — [ticket-386] APPROVED après 1 tour(s)
+- 2026-10-09 14:22:26 UTC — [ticket-386] documentation: 2 fichier(s) (204860ms)
+- 2026-10-09 13:34:40 UTC — [ide-core] ticket-392 PR #342 confiée au CIWatcher
+- 2026-10-09 13:34:42 UTC — [ticket-390] branche ticket-390-a-run-that-ends-without-a-pr-commits-its-bookkeep
+- 2026-10-09 13:34:43 UTC — [ticket-390] tour 1 — codeur démarré
+- 2026-10-09 13:42:47 UTC — [ticket-390] tour 1 — codeur terminé (483985ms)
+- 2026-10-09 13:45:45 UTC — [ticket-390] testeur: 1 failed, 769 passed, 20 warnings in 174.86s (0:02:54)
+- 2026-10-09 13:45:45 UTC — [ticket-390] tests rouges au tour 1
+- 2026-10-09 13:45:45 UTC — [ticket-390] tour 2 — codeur démarré
+- 2026-10-09 13:46:59 UTC — [ticket-390] tour 2 — codeur terminé (74094ms)
+- 2026-10-09 13:50:11 UTC — [ticket-390] testeur: 1 failed, 1216 passed, 20 warnings in 189.25s (0:03:09)
+- 2026-10-09 13:50:11 UTC — [ticket-390] tests rouges au tour 2
+- 2026-10-09 13:50:11 UTC — [ticket-390] tour 3 — codeur démarré
+- 2026-10-09 13:51:10 UTC — [ticket-390] tour 3 — codeur terminé (58172ms)
+- 2026-10-09 13:54:43 UTC — [ticket-390] testeur: OK (exit 0)
+- 2026-10-09 13:55:13 UTC — [ticket-390] securite: PASS — Audit de sécurité complet du diff orchestrator.py + tests : aucune vulnérabilité (29671ms)
+- 2026-10-09 13:55:13 UTC — [ticket-390] tour 3 — reviewer démarré
+- 2026-10-09 13:55:42 UTC — [ticket-390] validateur: APPROVED — Tous les quatre critères d'acceptation sont satisfaits. Le diff introduit quatre (28953ms)
+- 2026-10-09 13:56:49 UTC — [ticket-390] tour 3 — reviewer terminé (96375ms)
+- 2026-10-09 13:56:49 UTC — [ticket-390] APPROVED après 3 tour(s)
+- 2026-10-09 14:00:13 UTC — [ticket-390] documentation: 2 fichier(s) (201203ms)
+- 2026-10-09 14:31:20 UTC — [ticket-393] branche ticket-393-the-coder-sees-which-test-failed-and-why-and-the
+- 2026-10-09 14:31:20 UTC — [ticket-393] tour 1 — codeur démarré
+- 2026-10-09 14:39:25 UTC — [ticket-393] tour 1 — codeur terminé (485719ms)
+- 2026-10-09 14:44:34 UTC — [ticket-393] testeur: 1 failed, 2109 passed, 20 warnings in 306.37s (0:05:06)
+- 2026-10-09 14:44:34 UTC — [ticket-393] tests rouges au tour 1
+- 2026-10-09 14:44:34 UTC — [ticket-393] tour 2 — codeur démarré
+- 2026-10-09 14:53:39 UTC — [ticket-393] tour 2 — codeur terminé (544561ms)
+- 2026-10-09 14:59:18 UTC — [ticket-393] testeur: OK (exit 0)
+- 2026-10-09 14:59:57 UTC — [ticket-393] securite: PASS — Audit complet : aucune vulnérabilité détectée.
+
+**Scope du diff**
+- Ajout de `fa (38719ms)
+- 2026-10-09 14:59:57 UTC — [ticket-393] tour 2 — reviewer démarré
+- 2026-10-09 15:00:32 UTC — [ticket-393] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre : (1) quatre nouvelles fonctio (35592ms)
+- 2026-10-09 15:01:18 UTC — [ticket-393] tour 2 — reviewer terminé (81734ms)
+- 2026-10-09 15:01:18 UTC — [ticket-393] APPROVED après 2 tour(s)
+- 2026-10-09 15:04:10 UTC — [ticket-393] documentation: 2 fichier(s) (169625ms)
+- 2026-10-09 14:22:46 UTC — [ticket-386] livraison: arrêt — Conflit avec develop sur : backend/src/tessera/services/orchestrator.py. La branche est restée intac
+- 2026-10-09 14:22:47 UTC — [ticket-391] branche ticket-391-the-delivery-rebase-merges-the-pipeline-log-and-t
+- 2026-10-09 14:22:47 UTC — [ticket-391] tour 1 — codeur démarré
+- 2026-10-09 14:29:55 UTC — [ticket-391] tour 1 — codeur terminé (427577ms)
+- 2026-10-09 14:29:55 UTC — [ticket-391] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-10-09 14:29:57 UTC — [ide-core] file interrompue : ticket-391 non approuvé
+- 2026-10-09 15:04:24 UTC — [ide-core] ticket-393 PR #346 confiée au CIWatcher
+- 2026-10-09 15:04:26 UTC — [ticket-391] branche ticket-391-the-delivery-rebase-merges-the-pipeline-log-and-t
+- 2026-10-09 15:04:26 UTC — [ticket-391] tour 1 — codeur démarré
+- 2026-10-09 15:07:40 UTC — [ticket-391] tour 1 — codeur terminé (193655ms)
+- 2026-10-09 15:10:25 UTC — [ticket-391] testeur: FAILED (exit 1073807364)
+- 2026-10-09 15:10:25 UTC — [ticket-391] tests rouges au tour 1
+- 2026-10-09 15:10:25 UTC — [ticket-391] tour 2 — codeur démarré
+- 2026-10-10 16:27:23 UTC — [ticket-391] INTERROMPU au tour 2 (arrêt du PC le 2026-10-09 vers 15:10 UTC) — repris à la main, fiche en todo
+- 2026-10-10 16:29:24 UTC — [ticket-391] branche ticket-391-the-delivery-rebase-merges-the-pipeline-log-and-t
+- 2026-10-10 16:29:24 UTC — [ticket-391] tour 1 — codeur démarré
+- 2026-10-10 16:32:29 UTC — [ticket-391] tour 1 — codeur terminé (184858ms)
+- 2026-10-10 16:36:57 UTC — [ticket-391] testeur: OK (exit 0)
+- 2026-10-10 16:38:57 UTC — [ticket-391] securite: PASS — No security vulnerabilities detected in this ticket's changes. The code introduc (120000ms)
+- 2026-10-10 16:38:57 UTC — [ticket-391] tour 1 — reviewer démarré
+- 2026-10-10 16:40:16 UTC — [ticket-391] tour 1 — reviewer terminé (78453ms)
+- 2026-10-10 16:44:32 UTC — [ticket-391] validateur: APPROVED — Les quatre critères sont satisfaits : le diff ajoute trois fonctions helper (`_i (334343ms)
+- 2026-10-10 16:44:32 UTC — [ticket-391] APPROVED après 1 tour(s)
+- 2026-10-10 16:46:50 UTC — [ticket-391] documentation: 2 fichier(s) (130109ms)
+- 2026-10-10 16:47:08 UTC — [ide-core] ticket-391 PR #348 confiée au CIWatcher
+- 2026-10-10 16:47:10 UTC — [ticket-389] branche ticket-389-startup-recovery-keeps-the-files-the-coder-create
+- 2026-10-10 16:47:10 UTC — [ticket-389] tour 1 — codeur démarré
+- 2026-10-10 16:57:52 UTC — [ticket-389] tour 1 — codeur terminé (641500ms)
+- 2026-10-10 17:01:42 UTC — [ticket-389] testeur: OK (exit 0)
+- 2026-10-10 17:02:18 UTC — [ticket-389] securite: PASS — Audit complet du diff sans vulnérabilités critiques ou hautes introduites.
+
+**An (36250ms)
+- 2026-10-10 17:02:18 UTC — [ticket-389] tour 1 — reviewer démarré
+- 2026-10-10 17:04:01 UTC — [ticket-389] tour 1 — reviewer terminé (103170ms)
+- 2026-10-10 17:07:53 UTC — [ticket-389] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests couvrant les troi (335078ms)
+- 2026-10-10 17:07:53 UTC — [ticket-389] APPROVED après 1 tour(s)
+- 2026-10-10 17:10:30 UTC — [ticket-389] documentation: 2 fichier(s) (154983ms)
+- 2026-10-10 17:10:43 UTC — [ide-core] ticket-389 PR #351 confiée au CIWatcher
+- 2026-10-10 17:10:45 UTC — [ticket-367] branche ticket-367-ticket-cards-read-their-pr-status-from-one-projec
+- 2026-10-10 17:10:45 UTC — [ticket-367] tour 1 — codeur démarré
+- 2026-10-10 17:12:21 UTC — [ticket-367] tour 1 — codeur terminé (95250ms)
+- 2026-10-10 17:15:47 UTC — [ticket-367] testeur: ✖ 3 problems (3 errors, 0 warnings)
+- 2026-10-10 17:15:47 UTC — [ticket-367] tests rouges au tour 1
+- 2026-10-10 17:15:47 UTC — [ticket-367] tour 2 — codeur démarré
+- 2026-10-10 17:17:38 UTC — [ticket-367] tour 2 — codeur terminé (111188ms)
+- 2026-10-10 17:21:43 UTC — [ticket-367] testeur: OK (exit 0)
+- 2026-10-10 17:22:31 UTC — [ticket-367] securite: PASS — Refactorisation du polling des statuts PR sans vulnérabilité détectée. Le diff d (48797ms)
+- 2026-10-10 17:22:31 UTC — [ticket-367] tour 2 — reviewer démarré
+- 2026-10-10 17:24:10 UTC — [ticket-367] tour 2 — reviewer terminé (98155ms)
+- 2026-10-10 17:26:41 UTC — [ticket-367] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été mis à jour pou (249860ms)
+- 2026-10-10 17:26:41 UTC — [ticket-367] CHANGES_REQUESTED tour 2: Reviewer : Je vais vérifier le fichier KanbanView pour m'assurer que l'interface TypeScript est cohé
+- 2026-10-10 17:26:41 UTC — [ticket-367] tour 3 — codeur démarré
+- 2026-10-10 17:27:52 UTC — [ticket-367] tour 3 — codeur terminé (70702ms)
+- 2026-10-10 17:31:48 UTC — [ticket-367] testeur: OK (exit 0)
+- 2026-10-10 17:32:25 UTC — [ticket-367] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée.
+
+Ce diff effectue un refactor (37061ms)
+- 2026-10-10 17:32:25 UTC — [ticket-367] tour 3 — reviewer démarré
+- 2026-10-10 17:33:57 UTC — [ticket-367] tour 3 — reviewer terminé (92421ms)
+- 2026-10-10 17:36:47 UTC — [ticket-367] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été mis à jour pou (261905ms)
+- 2026-10-10 17:36:47 UTC — [ticket-367] APPROVED après 3 tour(s)
+- 2026-10-10 17:38:08 UTC — [ticket-367] documentation: 1 fichier(s) (77967ms)
+- 2026-10-10 18:02:10 UTC — [ide-core] ticket-373 PR #355 confiée au CIWatcher
+- 2026-10-10 18:02:11 UTC — [ticket-374] branche ticket-374-the-new-project-dialog-offers-the-fastapi-react-t
+- 2026-10-10 18:02:12 UTC — [ticket-374] tour 1 — codeur démarré
+- 2026-10-10 18:06:07 UTC — [ticket-374] tour 1 — codeur terminé (235250ms)
+- 2026-10-10 18:10:02 UTC — [ticket-374] testeur: OK (exit 0)
+- 2026-10-10 18:10:47 UTC — [ticket-374] securite: PASS — Audit du diff de CreateProjectModal (frontend) : aucune vulnérabilité critique o (45078ms)
+- 2026-10-10 18:10:47 UTC — [ticket-374] tour 1 — reviewer démarré
+- 2026-10-10 18:11:24 UTC — [ticket-374] tour 1 — reviewer terminé (37125ms)
+- 2026-10-10 18:12:39 UTC — [ticket-374] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés pour v (111844ms)
+- 2026-10-10 18:12:39 UTC — [ticket-374] APPROVED après 1 tour(s)
+- 2026-10-10 18:15:06 UTC — [ticket-374] documentation: 1 fichier(s) (144686ms)
+- 2026-10-10 18:15:45 UTC — [ticket-374] livraison: arrêt — Conflit avec develop sur : docs/guide-utilisateur.md. La branche est restée intacte, à toi de tranch
+- 2026-10-10 17:38:21 UTC — [ide-core] ticket-367 PR #353 confiée au CIWatcher
+- 2026-10-10 17:38:24 UTC — [ticket-373] branche ticket-373-a-project-is-created-from-the-template-in-one-cal
+- 2026-10-10 17:38:25 UTC — [ticket-373] tour 1 — codeur démarré
+- 2026-10-10 17:47:54 UTC — [ticket-373] tour 1 — codeur terminé (568921ms)
+- 2026-10-10 17:51:46 UTC — [ticket-373] testeur: OK (exit 0)
+- 2026-10-10 17:52:58 UTC — [ticket-373] securite: PASS — Audit de sécurité : deux problèmes détectés, tous deux MEDIUM/LOW. Aucune vulnér (71686ms)
+- 2026-10-10 17:52:58 UTC — [ticket-373] tour 1 — reviewer démarré
+- 2026-10-10 17:54:29 UTC — [ticket-373] tour 1 — reviewer terminé (91140ms)
+- 2026-10-10 17:56:45 UTC — [ticket-373] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (226686ms)
+- 2026-10-10 17:56:45 UTC — [ticket-373] APPROVED après 1 tour(s)
+- 2026-10-10 17:59:10 UTC — [ticket-373] documentation: 2 fichier(s) (142484ms)
+- 2026-10-10 18:28:57 UTC — [ticket-396] branche ticket-396-automatic-rebase-conflict-resolution-works-for-a
+- 2026-10-10 18:28:57 UTC — [ticket-396] tour 1 — codeur démarré
+- 2026-10-10 18:38:26 UTC — [ticket-396] tour 1 — codeur terminé (569296ms)
+- 2026-10-10 18:42:14 UTC — [ticket-396] testeur: OK (exit 0)
+- 2026-10-10 18:43:14 UTC — [ticket-396] securite: PASS — Le diff modifie la gestion des projets imbriqués (git_root: ancestor) en ajoutan (59702ms)
+- 2026-10-10 18:43:14 UTC — [ticket-396] tour 1 — reviewer démarré
+- 2026-10-10 18:45:06 UTC — [ticket-396] tour 1 — reviewer terminé (112297ms)
+- 2026-10-10 18:47:50 UTC — [ticket-396] validateur: CHANGES_REQUESTED — Réponse du validateur non parseable. (276734ms)
+- 2026-10-10 18:47:50 UTC — [ticket-396] CHANGES_REQUESTED tour 1: Validateur : Réponse du validateur non parseable.
+- 2026-10-10 18:47:50 UTC — [ticket-396] tour 2 — codeur démarré
+- 2026-10-10 18:50:16 UTC — [ticket-396] tour 2 — codeur terminé (145968ms)
+- 2026-10-10 18:54:12 UTC — [ticket-396] testeur: OK (exit 0)
+- 2026-10-10 18:54:59 UTC — [ticket-396] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff améliore le traitement des ch (46640ms)
+- 2026-10-10 18:54:59 UTC — [ticket-396] tour 2 — reviewer démarré
+- 2026-10-10 18:56:08 UTC — [ticket-396] tour 2 — reviewer terminé (68421ms)
+- 2026-10-10 19:00:30 UTC — [ticket-396] validateur: APPROVED — Le diff ajoute trois tests couvrant exactement les trois premiers critères (conf (331313ms)
+- 2026-10-10 19:00:30 UTC — [ticket-396] APPROVED après 2 tour(s)
+- 2026-10-10 19:01:21 UTC — [ticket-396] documentation: 0 fichier(s) (48563ms)
+- 2026-10-10 19:17:06 UTC — [ide-core] ticket-394 PR #360 confiée au CIWatcher
+- 2026-10-10 19:17:07 UTC — [ticket-395] branche ticket-395-a-doc-agent-whose-edits-are-refused-gets-one-corr
+- 2026-10-10 19:17:08 UTC — [ticket-395] tour 1 — codeur démarré
+- 2026-10-10 19:25:25 UTC — [ticket-395] tour 1 — codeur terminé (497297ms)
+- 2026-10-10 19:29:21 UTC — [ticket-395] testeur: OK (exit 0)
+- 2026-10-10 19:30:34 UTC — [ticket-395] securite: BLOCK — A HIGH severity path traversal vulnerability is introduced in the new _titres_fi (73389ms)
+- 2026-10-10 19:30:36 UTC — [ide-core] file interrompue : ticket-395 non approuvé
+- 2026-10-10 19:01:35 UTC — [ide-core] ticket-396 PR #358 confiée au CIWatcher
+- 2026-10-10 19:01:36 UTC — [ticket-394] branche ticket-394-the-pc-stays-awake-while-a-run-is-open-and-may-sl
+- 2026-10-10 19:01:36 UTC — [ticket-394] tour 1 — codeur démarré
+- 2026-10-10 19:07:15 UTC — [ticket-394] tour 1 — codeur terminé (338765ms)
+- 2026-10-10 19:11:26 UTC — [ticket-394] testeur: OK (exit 0)
+- 2026-10-10 19:11:49 UTC — [ticket-394] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code ajoute un service pour mainte (22703ms)
+- 2026-10-10 19:11:49 UTC — [ticket-394] tour 1 — reviewer démarré
+- 2026-10-10 19:12:56 UTC — [ticket-394] tour 1 — reviewer terminé (67234ms)
+- 2026-10-10 19:14:24 UTC — [ticket-394] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (154593ms)
+- 2026-10-10 19:14:24 UTC — [ticket-394] APPROVED après 1 tour(s)
+- 2026-10-10 19:16:52 UTC — [ticket-394] documentation: 2 fichier(s) (146155ms)

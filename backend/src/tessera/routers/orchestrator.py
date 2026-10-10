@@ -2,7 +2,7 @@ import asyncio
 from collections.abc import Awaitable, Callable
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
@@ -46,6 +46,7 @@ from tessera.services.project_loader import (
     load_pipeline_config,
     load_project,
 )
+from tessera.utils.project_id import validate_project_id
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
@@ -89,6 +90,18 @@ class RunRequest(BaseModel):
     mode: str = "single"
     max_tickets: int = 5
     depuis_github: bool = False
+    #: Plafond de dépense explicite d'une file (ticket-383) : remplace le calcul
+    #: `run_max_budget_usd × nombre de tickets`. Strictement positif — 0
+    #: voudrait dire « sans plafond » et permettrait à tout appelant de
+    #: lever la borne. None : calcul par défaut. Ignoré hors mode file.
+    budget_usd: float | None = Field(default=None, gt=0)
+
+    @field_validator("project_id")
+    @classmethod
+    def _check_project_id(cls, v: str) -> str:
+        if not validate_project_id(v):
+            raise ValueError(f"project_id invalide : {v!r}")
+        return v
 
 
 class RunStarted(BaseModel):
@@ -104,6 +117,13 @@ class RunAutonomousRequest(BaseModel):
     #: (ticket-084). Faux par défaut : un appel réseau vers le dépôt d'un
     #: client ne part pas sans qu'on l'ait demandé.
     depuis_github: bool = False
+
+    @field_validator("project_id")
+    @classmethod
+    def _check_project_id(cls, v: str) -> str:
+        if not validate_project_id(v):
+            raise ValueError(f"project_id invalide : {v!r}")
+        return v
 
 
 async def _build_project_context(project_id: str) -> str:
@@ -259,6 +279,11 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # bootstrap travaille au-dessus de lui (ADR-028), et sa carte doit le
         # montrer (ticket-190).
         carte_du_depot=CarteDuDepot.depuis(project_path, politique),
+        # Pour retourner sur la branche de base après livraison (ticket-378).
+        base_branch=(politique.base_branch if politique else None) or settings.github_base_branch,
+        # Attendre le merge du ticket précédent avant le suivant (ticket-382).
+        merge_without_ci=bool(politique and politique.merge_without_ci),
+        attente_merge_max_s=settings.attente_merge_max_s,
     )
 
 
@@ -506,6 +531,8 @@ def _surveillance_pour(
         ),
     )
 
+    pipeline_log_path_ci = project_path / "memory" / "pipeline-log.md"
+
     async def surveiller(
         p_id: str,
         ticket_id: str,
@@ -519,6 +546,7 @@ def _surveillance_pour(
             pr_number,
             service.livrer_phase_2,
             on_event,
+            pipeline_log_path=pipeline_log_path_ci,
         )
 
     return surveiller
@@ -622,6 +650,7 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             ticket_ids=request.ticket_ids,
             max_tickets=request.max_tickets,
             titre_getter=titre_getter,
+            budget_usd=request.budget_usd,
         )
     )
     _TACHES.add(tache)

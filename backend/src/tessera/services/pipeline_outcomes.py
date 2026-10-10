@@ -288,7 +288,7 @@ async def finish_budget_exhausted(
     """
     await set_status(orch, run, TicketStatus.blocked)
     raison = (
-        f"run budget exhausted: {orch.spent_usd:.2f} USD spent "
+        f"run budget exhausted: {orch.spent_ticket_usd:.2f} USD spent "
         f"of {orch._run_max_budget_usd:.2f} allowed"
     )
     orch._log(f"[{run.ticket_id}] BLOCKED après le tour {run.round_num} — {raison}")
@@ -311,6 +311,91 @@ async def finish_budget_exhausted(
         branch=run.branch,
         commit_sha=commit_sha,
         arret=arret or raison,
+    )
+
+
+async def finish_budget_exhausted_in_queue(
+    orch: "Orchestrator", run: PipelineRun
+) -> PipelineResult:
+    """Remet en todo un ticket de file arrêté sur son plafond par ticket (ticket-386).
+
+    Contrairement au lancement simple, un ticket de file qui dépasse son plafond
+    entre deux tours n'est pas en erreur : il n'y a pas de défaut à corriger,
+    juste un budget à réévaluer. Il repasse en `todo` pour pouvoir être relancé
+    sans intervention manuelle. L'arbre est quand même commité (ADR-018).
+    """
+    raison = (
+        f"run budget exhausted: {orch.spent_ticket_usd:.2f} USD spent "
+        f"of {orch._run_max_budget_usd:.2f} allowed"
+    )
+    orch._log(f"[{run.ticket_id}] budget — {raison}")
+    await set_status(orch, run, TicketStatus.todo)
+    commit_sha, arret = await commit_ou_bloquer(
+        orch, run, _unapproved_commit_message(run.ticket_id, raison)
+    )
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="run_budget_exhausted",
+        branch=run.branch,
+    )
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.todo,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=arret or raison,
+    )
+
+
+async def finish_session_limit(
+    orch: "Orchestrator", run: PipelineRun, cause: BaseException, reset_time: str | None
+) -> PipelineResult:
+    """Termine un run interrompu par la limite de session de l'abonnement.
+
+    Contrairement aux autres sorties en erreur, le ticket repasse en `todo`
+    pour être relancé dès la reprise de la session — un ticket `blocked`
+    resterait en attente d'une intervention manuelle qui n'est pas nécessaire
+    ici : la limite est temporaire, pas une vraie panne.
+
+    Le travail est quand même commité, comme sur toutes les autres sorties
+    (ADR-018) : l'arbre doit rester propre pour le ticket suivant, même si
+    la file s'arrête ici.
+    """
+    reset_info = f" (reprise : {reset_time})" if reset_time else ""
+    raison = f"session_limit{reset_info}"
+    # Le log **avant** le commit : la ligne doit figurer dans le commit final
+    # (même règle que finish_interrupted, corrigée dans ticket-219).
+    orch._log(
+        f"[{run.ticket_id}] INTERROMPU par limite de session{reset_info}"
+    )
+    await set_status(orch, run, TicketStatus.todo)
+    await emit(run, EventType.ERROR, reason="session_limit", reset_time=reset_time or "")
+    commit_sha, echec_commit = await commit_ou_bloquer(
+        orch, run, _unapproved_commit_message(run.ticket_id, f"session limit{reset_info}")
+    )
+    if echec_commit is not None:
+        raison = f"{echec_commit} (après {raison})"
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="session_limit",
+        branch=run.branch,
+    )
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.todo,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=raison,
     )
 
 

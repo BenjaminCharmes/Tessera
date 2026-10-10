@@ -19,7 +19,8 @@ from tessera.services.pipeline_events import EventType
 from tessera.services.providers import get_provider
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.noms import PROVIDERS_CONNUS, ProviderIndisponible
-from tessera.services.providers.ollama import OllamaProvider, _reset_slots
+import tessera.services.providers.ollama as ollama_module
+from tessera.services.providers.ollama import OllamaProvider, _reset_slots, _reset_cooldowns
 from tessera.services.providers import par_role
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.security_auditor import SecurityAuditorService
@@ -27,6 +28,17 @@ from tessera.services.project_loader import load_agents_config
 from tests.test_providers_base import FakeProvider
 
 _BASE = "http://ollama.test:11434"
+
+
+@pytest.fixture(autouse=True)
+def _reset_module_state() -> None:
+    """Remet l'état module-level à zéro avant chaque test.
+
+    `_COOLDOWNS` est partagé par tout le processus ; un ReadTimeout dans un
+    test activerait un cooldown qui ferait échouer les tests suivants sur la
+    même base_url.
+    """
+    _reset_cooldowns()
 
 
 def _tags(*modeles: str) -> dict[str, Any]:
@@ -395,6 +407,144 @@ async def test_erreur_complete_rend_le_creneau(
     # Le créneau a été rendu — l'appel suivant aboutit.
     result = await provider.complete(system="s", user="u", model="q", max_tokens=1)
     assert result.content == "ok"
+
+
+# ------------------------------------------------------------------
+# Attente de créneau bornée et disjoncteur par serveur (ticket-380)
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_creneau_occupe_leve_provider_indisponible_sans_requete(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Un créneau occupé fait lever ProviderIndisponible sans requête HTTP."""
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 1)
+    monkeypatch.setattr(settings, "ollama_slot_wait_s", 0.1)
+    _reset_slots()
+    _reset_cooldowns()
+
+    base = "http://slot-wait.local:11434"
+    respx.get(f"{base}/api/tags").mock(return_value=httpx.Response(200, json=_tags("q")))
+    chat_route = respx.post(f"{base}/api/chat").mock(
+        return_value=httpx.Response(200, json=_reponse("ok"))
+    )
+
+    # Occuper manuellement le créneau pour le bloquer
+    from tessera.services.providers.ollama import _get_slot
+
+    slot = _get_slot(base)
+    assert slot is not None
+    await slot.acquire()
+
+    try:
+        with pytest.raises(ProviderIndisponible):
+            await OllamaProvider(base_url=base).complete(
+                system="s", user="u", model="q", max_tokens=1
+            )
+    finally:
+        slot.release()
+
+    assert not chat_route.called, "Aucune requête /api/chat ne doit avoir été envoyée"
+
+
+async def test_apres_delai_lecture_le_serveur_est_en_refroidissement(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Après un ReadTimeout, l'appel suivant lève ProviderIndisponible immédiatement."""
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 0)
+    monkeypatch.setattr(settings, "ollama_cooldown_s", 600.0)
+    _reset_slots()
+    _reset_cooldowns()
+
+    base = "http://timeout-cooldown.local:11434"
+    fake_now = [0.0]
+    monkeypatch.setattr(ollama_module, "_clock", lambda: fake_now[0])
+
+    chat_calls: list[int] = [0]
+
+    class _TimeoutTransport(httpx.AsyncBaseTransport):
+        async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/api/tags":
+                return httpx.Response(200, json=_tags("q"))
+            chat_calls[0] += 1
+            raise httpx.ReadTimeout("too slow")
+
+    client = httpx.AsyncClient(transport=_TimeoutTransport(), base_url=base)
+    provider = OllamaProvider(base_url=base, client=client)
+
+    # Premier appel : ReadTimeout → cooldown activé
+    with pytest.raises(ProviderIndisponible):
+        await provider.complete(system="s", user="u", model="q", max_tokens=1)
+
+    assert chat_calls[0] == 1
+
+    # Deuxième appel : doit lever ProviderIndisponible aussitôt, sans requête
+    with pytest.raises(ProviderIndisponible):
+        await provider.complete(system="s", user="u", model="q", max_tokens=1)
+
+    assert chat_calls[0] == 1, "Aucune nouvelle requête /api/chat ne doit avoir été envoyée"
+
+
+async def test_apres_refroidissement_les_requetes_reprennent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Une fois ollama_cooldown_s écoulé, un appel envoie de nouveau une requête."""
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 0)
+    monkeypatch.setattr(settings, "ollama_cooldown_s", 600.0)
+    _reset_slots()
+    _reset_cooldowns()
+
+    base = "http://cooldown-resume.local:11434"
+    fake_now = [0.0]
+    monkeypatch.setattr(ollama_module, "_clock", lambda: fake_now[0])
+
+    chat_calls: list[int] = [0]
+
+    class _TimeoutThenOkTransport(httpx.AsyncBaseTransport):
+        async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+            if request.url.path == "/api/tags":
+                return httpx.Response(200, json=_tags("q"))
+            chat_calls[0] += 1
+            if chat_calls[0] == 1:
+                raise httpx.ReadTimeout("too slow")
+            return httpx.Response(200, json=_reponse("ok"))
+
+    client = httpx.AsyncClient(transport=_TimeoutThenOkTransport(), base_url=base)
+    provider = OllamaProvider(base_url=base, client=client)
+
+    # Premier appel : timeout → cooldown activé
+    with pytest.raises(ProviderIndisponible):
+        await provider.complete(system="s", user="u", model="q", max_tokens=1)
+
+    assert chat_calls[0] == 1
+
+    # Simuler l'écoulement du refroidissement
+    fake_now[0] = 601.0
+
+    # Troisième appel : le cooldown est expiré, une requête est envoyée
+    result = await provider.complete(system="s", user="u", model="q", max_tokens=1)
+    assert result.content == "ok"
+    assert chat_calls[0] == 2
+
+
+@respx.mock
+async def test_delai_depasse_message_contient_delai_depasse(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Un dépassement de délai produit un message contenant 'délai dépassé'."""
+    monkeypatch.setattr(settings, "ollama_max_concurrent", 0)
+    _reset_slots()
+    _reset_cooldowns()
+
+    base = "http://timeout-msg.local:11434"
+    respx.get(f"{base}/api/tags").mock(return_value=httpx.Response(200, json=_tags("q")))
+    respx.post(f"{base}/api/chat").mock(side_effect=httpx.ReadTimeout("trop long"))
+
+    with pytest.raises(ProviderIndisponible, match="délai dépassé"):
+        await OllamaProvider(base_url=base).complete(
+            system="s", user="u", model="q", max_tokens=1
+        )
 
 
 def test_les_manifestes_du_depot_declarent_les_roles_locaux() -> None:

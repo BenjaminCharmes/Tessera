@@ -114,6 +114,11 @@ export interface PRStatus {
   pr_number: number;
 }
 
+/** One entry from GET /projects/{id}/pr-statuses (ticket-367). */
+export interface PRStatusEntry extends PRStatus {
+  ticket_id: string;
+}
+
 export interface OrchestratorEvent {
   type: EventType;
   agent: AgentRole | null;
@@ -285,6 +290,14 @@ export interface ProjectCreationResult {
    * mais aucun run n'y démarrera tant qu'on n'aura pas rattrapé à la main.
    */
   repository_ready: boolean;
+}
+
+/** Résultat de la création depuis le gabarit FastAPI + React (ticket-373). */
+export interface TemplateCreationResult {
+  project: Project;
+  backend_port: number;
+  frontend_port: number;
+  git_ready: boolean;
 }
 
 export interface ImportProjectRequest {

@@ -12,8 +12,10 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'allers-retours outil pour le reviewer (lecture et critique du diff) |
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'allers-retours outil pour le tour de plan (lecture seule) |
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
-| `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond cumulé d'un run autonome (`0` = aucun) |
+| `AGENT_SILENCE_MAX_S` | | `1200` | Délai maximum sans message du flux d'un agent avant interruption du processus (en secondes, ticket-381) |
+| `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond de dépense d'un run autonome (`0` = aucun). En mode file, le plafond est multiplié par le nombre de tickets, sauf si la requête fixe `budget_usd` |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
+| `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
@@ -21,9 +23,25 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `GITHUB_REPO` | | `""` | Repo cible `owner/repo` |
 | `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
+| `ATTENTE_FUSIONNABILITE_MAX_S` | | `300` | Délai maximum d'attente pour le calcul du statut fusionnable d'une PR avant abandon de la tentative de merge (en secondes, ticket-384) |
+| `ATTENTE_MERGE_MAX_S` | | `600` | Pour les projets avec `merge_without_ci: true`, délai maximum d'attente du merge du ticket précédent avant de lancer le ticket suivant d'une file (en secondes, ticket-382) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
+| `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | URL du serveur Ollama pour les modèles locaux (rôles de jugement uniquement) |
+| `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama. Au-delà, les requêtes attendent leur créneau |
+| `OLLAMA_SLOT_WAIT_S` | | `30` | Délai maximum d'attente pour un créneau chez le serveur Ollama avant basculement sur le repli (en secondes) |
+| `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
+| `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
+
+## Budget et limites
+
+En file, Tessera applique deux contrôles de budget :
+
+- **Par ticket** (entre deux tours) : la dépense du ticket courant ne doit pas dépasser `RUN_MAX_BUDGET_USD`. Si ce seuil est atteint, le ticket repasse en `todo` avec raison « budget » et sort de la file (ticket-386).
+- **Par file** (entre deux tickets) : la dépense cumulée de tous les tickets ne doit pas dépasser `RUN_MAX_BUDGET_USD` × nombre de tickets (ou la valeur de `budget_usd` si fixée dans la requête). Si ce seuil est atteint, la file s'arrête.
+
+Le message d'arrêt affiche toujours le montant dépensé et le plafond, par exemple `file interrompue : plafond de dépense (15,24 $ / 15,00 $)` (ticket-386).
 
 ## `STATIC_TOKEN`
 
@@ -47,6 +65,20 @@ Sans elle, une UI face à un backend protégé ne reçoit que des `401`.
 uvicorn et dans tout proxy sur le chemin. Le Bearer HTTP n'y apparaît pas.
 `VITE_STATIC_TOKEN` est inliné dans le bundle : c'est un secret partagé
 entre le poste et son backend, pas un mécanisme de comptes.
+
+## Ollama
+
+Quand plusieurs runs lancent des appels au serveur Ollama simultanément, l'IDE les
+sérialise pour éviter la compétition pour le modèle et la mémoire. Si le serveur
+ne peut pas traiter une requête assez vite, l'IDE bascule automatiquement sur le
+repli Claude pour ne pas bloquer le run.
+
+| Variable | Requis | Default | Description |
+|----------|--------|---------|-------------|
+| `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | Adresse du serveur Ollama |
+| `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama (sérialisation par serveur) |
+| `OLLAMA_SLOT_WAIT_S` | | `30` | Délai d'attente maximum pour un créneau disponible. Au-delà, le serveur est considéré saturé et le repli prend le relais (en secondes) |
+| `OLLAMA_COOLDOWN_S` | | `600` | Après un dépassement du délai de lecture, le serveur est marqué lent pendant cette durée ; tout appel lève `ProviderIndisponible` aussitôt, sans requête (en secondes) |
 
 ## Application desktop (Tauri)
 

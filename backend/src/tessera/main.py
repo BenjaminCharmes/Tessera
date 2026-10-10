@@ -25,6 +25,8 @@ from tessera.routers import (
     usage,
 )
 from tessera.services.database import init_db, solder_les_runs_orphelins
+from tessera.services.eveil import relacher as eveil_relacher
+from tessera.services.reprise_orphelin import reprendre_depots_orphelins
 from tessera.services.prompt_loader import MissingPromptError
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
 
@@ -50,6 +52,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     orphelins = await solder_les_runs_orphelins(settings.ide_db_path)
     if orphelins:
         _logger.warning("runs_orphelins_soldes", extra={"runs": orphelins})
+        # Remet d'aplomb les dépôts laissés en état intermédiaire (ticket-369).
+        await reprendre_depots_orphelins(
+            orphelins, settings.ide_db_path, settings.ide_workspace_dir
+        )
     yield
     # Les services lancés pour un projet sont des enfants de ce process et
     # s'arrêtent avec lui (ADR-042). Les terminer explicitement rend l'arrêt
@@ -58,6 +64,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     arretes = await PROCESS_REGISTRY.tout_arreter()
     if arretes:
         _logger.info("services_arretes", extra={"nombre": arretes})
+    # Filet de sécurité : relâche la demande de veille au cas où un run
+    # n'aurait pas été fermé proprement avant l'arrêt (ticket-394).
+    eveil_relacher()
 
 
 app = FastAPI(title="Tessera", version="0.1.0", lifespan=lifespan)

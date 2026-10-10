@@ -9,6 +9,7 @@ donc toujours en contexte, la bonne seulement parfois.
 Il portait aussi `GH_CONFIG_DIR=/Users/<moi>/.config/gh`, un chemin d'une autre
 machine, dans un dépôt utilisé sur deux postes.
 """
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -521,9 +522,17 @@ def test_tout_adr_cite_existe_encore() -> None:
 
 def test_l_archive_n_est_importee_nulle_part() -> None:
     # Elle existe pour *sortir* du prompt : l'importer annulerait le ticket.
-    for claude_md in _RACINE.rglob("CLAUDE.md"):
-        if ".venv" in claude_md.parts or "node_modules" in claude_md.parts:
+    # `rglob` descend dans `.venv` avant de filtrer et échoue sur des entrées
+    # Windows cassées (ex. pywin32 data dirs) — `os.walk` avec élagage préalable
+    # et `onerror` évite ces chemins sans planter.
+    _SKIP = {".venv", "node_modules"}
+    for dirpath_s, dirnames, filenames in os.walk(
+        str(_RACINE), onerror=lambda _: None
+    ):
+        dirnames[:] = [d for d in dirnames if d not in _SKIP]
+        if "CLAUDE.md" not in filenames:
             continue
+        claude_md = Path(dirpath_s) / "CLAUDE.md"
         texte = claude_md.read_text(encoding="utf-8", errors="ignore")
         assert "decisions-archive" not in texte, (
             f"{claude_md} importe l'archive : elle repartirait dans chaque appel"

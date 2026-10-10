@@ -37,6 +37,15 @@ class PRStatus:
 
 
 @dataclass
+class PRListEntry:
+    """Partial PR data extracted from the paginated listing API — ticket-366."""
+
+    state: Literal["open", "closed", "merged"]
+    pr_url: str
+    head_sha: str
+
+
+@dataclass
 class RepositoryInfo:
     """Ce qu'il faut savoir d'un dépôt distant avant d'y attacher un projet."""
 
@@ -190,6 +199,56 @@ class GitHubService:
             resp = await client.put(url, headers=self._headers, json=payload)
             resp.raise_for_status()
 
+    async def get_ci_status(
+        self, sha: str
+    ) -> Literal["pending", "passing", "failing", "none"]:
+        """Public CI check-runs query — used by the bulk PR status service."""
+        return await self._get_ci_status(sha)
+
+    async def list_pull_requests(self, needed: set[int]) -> dict[int, PRListEntry]:
+        """Return listing entries for the requested pr_numbers — ticket-366.
+
+        Paginates through GET /pulls?state=all&per_page=100, stopping as soon
+        as all requested numbers have been found or pages are exhausted.
+        PR numbers absent from the repository are simply not in the result.
+        """
+        if not needed:
+            return {}
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        found: dict[int, PRListEntry] = {}
+        remaining = set(needed)
+        page = 1
+        while remaining:
+            params: dict[str, str | int] = {
+                "state": "all", "per_page": 100, "page": page
+            }
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(url, headers=self._headers, params=params)
+                resp.raise_for_status()
+            items: list[dict[str, Any]] = resp.json()
+            if not items:
+                break
+            for item in items:
+                num = int(item["number"])
+                if num in remaining:
+                    merged_at = item.get("merged_at")
+                    if merged_at:
+                        state: Literal["open", "closed", "merged"] = "merged"
+                    elif item["state"] == "closed":
+                        state = "closed"
+                    else:
+                        state = "open"
+                    found[num] = PRListEntry(
+                        state=state,
+                        pr_url=str(item["html_url"]),
+                        head_sha=str(item["head"]["sha"]),
+                    )
+                    remaining.discard(num)
+            if len(items) < 100:
+                break
+            page += 1
+        return found
+
     async def _get_ci_status(
         self, sha: str
     ) -> Literal["pending", "passing", "failing", "none"]:
@@ -228,15 +287,20 @@ class GitHubService:
         pr_number: int,
         method: str = "squash",
         commit_title: str | None = None,
-        attente_max_s: float = 60.0,
+        attente_fusionnabilite_max_s: float = 300.0,
         intervalle_s: float = 5.0,
+        intervalle_max_s: float = 30.0,
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
     ) -> None:
         """Merge the PR after verifying GitHub has computed mergeability.
 
-        Polls the PR until `mergeable` is non-null (up to `attente_max_s`
-        seconds). On a 405 response from the merge endpoint, waits and retries
-        once — GitHub may lag slightly even after returning `mergeable: true`.
+        Polls the PR until `mergeable` is non-null (up to
+        `attente_fusionnabilite_max_s` seconds). The polling interval grows
+        from `intervalle_s` (doubling each time, capped at `intervalle_max_s`)
+        to reduce pressure on the API during long computation windows.
+
+        On a 405 response from the merge endpoint, waits and retries once —
+        GitHub may lag slightly even after returning `mergeable: true`.
 
         Raises:
             MergeabiliteTimeoutError: mergeability still null after the timeout.
@@ -244,18 +308,27 @@ class GitHubService:
             httpx.HTTPStatusError: HTTP error on merge after the retry on 405.
         """
         ecoule = 0.0
+        delai = intervalle_s
         while True:
             mergeable = await self._lire_mergeabilite(pr_number)
             if mergeable is not None:
                 break
-            if ecoule >= attente_max_s:
+            if ecoule >= attente_fusionnabilite_max_s:
                 raise MergeabiliteTimeoutError(
                     f"La PR #{pr_number} est encore en attente de calcul de "
-                    f"fusionnabilité après {attente_max_s:.0f} s. "
+                    f"fusionnabilité après {attente_fusionnabilite_max_s:.0f} s. "
                     "La livraison s'arrête."
                 )
-            await dormir(intervalle_s)
-            ecoule += intervalle_s
+            # Croissance du délai : on double à chaque tour jusqu'à intervalle_max_s,
+            # sans dépasser le temps restant avant le timeout.
+            delai_actuel = min(
+                delai,
+                attente_fusionnabilite_max_s - ecoule,
+                intervalle_max_s,
+            )
+            await dormir(delai_actuel)
+            ecoule += delai_actuel
+            delai = min(delai * 2.0, intervalle_max_s)
 
         if not mergeable:
             raise PRNonFusionnableError(

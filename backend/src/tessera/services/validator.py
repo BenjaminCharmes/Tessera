@@ -178,7 +178,7 @@ class ValidatorService:
     def _parse_response(
         self, raw: str, sent_criteria: list[str]
     ) -> ValidationResult:
-        parsed = extract_json(raw)
+        parsed = extract_json(raw, required_key="criteria")
         if not parsed:
             _logger.warning("validator_invalid_json", extra={"raw": raw[:200]})
             return ValidationResult(

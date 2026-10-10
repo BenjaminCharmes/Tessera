@@ -22,10 +22,12 @@ import type {
   ImportProjectRequest,
   ImportProjectResponse,
   PRStatus,
+  PRStatusEntry,
   RunRequest,
   RunEvent,
   ServiceActif,
   ProjectCreationResult,
+  TemplateCreationResult,
   PipelineRun,
   PlanResult,
   MergeResponse,
@@ -103,6 +105,11 @@ export const api = {
         name,
         description,
       }),
+    createFromTemplate: (
+      projectId: string,
+      name: string,
+    ): Promise<TemplateCreationResult> =>
+      post("/projects/from-template", { project_id: projectId, name }),
     import: (req: ImportProjectRequest): Promise<ImportProjectResponse> =>
       post("/projects/import", req),
     clone: (req: CloneProjectRequest): Promise<CloneProjectResponse> =>
@@ -203,6 +210,9 @@ export const api = {
   github: {
     getPrStatus: (projectId: string, ticketId: string): Promise<PRStatus> =>
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
+    /** Statut de toutes les PR d'un projet en un seul appel (ticket-367). */
+    getPrStatuses: (projectId: string): Promise<PRStatusEntry[]> =>
+      request(`/projects/${projectId}/pr-statuses`),
   },
   pipeline: {
     /** Les réglages du pipeline d'un projet (ticket-196). */

@@ -30,6 +30,9 @@ class SecurityIssue:
     location: str
     description: str
     fix: str
+    # True par défaut : un champ absent vaut "introduit par ce ticket"
+    # (echec fermé, ADR-039). L'auditeur pose False quand c'est du contexte.
+    introduced: bool = True
 
 
 @dataclass
@@ -44,11 +47,13 @@ class SecurityAuditResult:
 
     @property
     def has_critical(self) -> bool:
-        return any(i.severity == "CRITICAL" for i in self.issues)
+        # Seules les failles introduites par ce ticket comptent pour le blocage.
+        return any(i.severity == "CRITICAL" and i.introduced for i in self.issues)
 
     @property
     def has_high(self) -> bool:
-        return any(i.severity == "HIGH" for i in self.issues)
+        # Seules les failles introduites par ce ticket comptent pour le blocage.
+        return any(i.severity == "HIGH" and i.introduced for i in self.issues)
 
 
 class SecurityAuditorService:
@@ -92,19 +97,25 @@ class SecurityAuditorService:
         return "Audit code for security vulnerabilities. Respond with JSON."
 
     def _parse_response(self, raw: str) -> SecurityAuditResult:
-        parsed = extract_json(raw)
+        parsed = extract_json(raw, required_key="verdict")
         if not parsed:
             _logger.warning("security_auditor_invalid_json", extra={"raw": raw[:200]})
             return _blocked("Réponse de l'auditeur sécurité illisible (JSON attendu).")
 
-        raw_verdict = parsed.get("verdict", "PASS")
-        verdict: AuditVerdict = "BLOCK" if raw_verdict == "BLOCK" else "PASS"
+        # Seul "PASS" explicite est accepté ; toute autre valeur ferme l'audit
+        # (ADR-039 : l'audit échoue fermé si la réponse est ambiguë).
+        raw_verdict = str(parsed.get("verdict", ""))
+        verdict: AuditVerdict = "PASS" if raw_verdict == "PASS" else "BLOCK"
 
         issues: list[SecurityIssue] = []
         for entry in parsed.get("issues", []):
             if not isinstance(entry, dict):
                 continue
             severity = _SEVERITIES.get(str(entry.get("severity", "INFO")), "INFO")
+            # Echec fermé (ADR-039) : seul un booléen False explicite marque la
+            # faille comme préexistante. Absent, null, 0, "" ou "false" (chaîne)
+            # valent True — bool() ferait passer null, 0 et "" pour False.
+            introduced = entry.get("introduced", True) is not False
             issues.append(
                 SecurityIssue(
                     severity=severity,
@@ -112,6 +123,7 @@ class SecurityAuditorService:
                     location=str(entry.get("location", "")),
                     description=str(entry.get("description", "")),
                     fix=str(entry.get("fix", "")),
+                    introduced=introduced,
                 )
             )
 

@@ -94,10 +94,33 @@ class Settings(BaseSettings):
     # serveur rallongent le délai de chacune sans améliorer le débit global.
     # 0 ou moins : pas de borne.
     ollama_max_concurrent: int = 1
+    # Délai max pour obtenir un créneau Ollama (ticket-380). Au-delà, le repli
+    # prend le relais sans envoyer la requête. Évite d'attendre en file pendant
+    # plusieurs minutes quand le serveur est saturé.
+    ollama_slot_wait_s: float = 30.0
+    # Durée de refroidissement après un dépassement de délai de lecture
+    # (ticket-380). Pendant ce temps, tout appel lève `ProviderIndisponible`
+    # aussitôt, sans requête — le repli prend le relais.
+    ollama_cooldown_s: float = 600.0
     # Chemin vers bash.exe sous Windows, pour que le SDK puisse activer l'outil
     # `Bash` des agents. Lu depuis CLAUDE_CODE_GIT_BASH_PATH ; absent, le backend
     # tente de le déduire depuis l'emplacement de `git` au démarrage (ticket-319).
     claude_code_git_bash_path: str = ""
+    # Délai maximum entre deux messages consécutifs d'un agent (ticket-381).
+    # Borné par intervalle, pas par durée totale : une commande longue comme
+    # la suite de tests (≈ 6 min) peut rester muette sans être figée.
+    # 0 désactive la borne.
+    agent_silence_max_s: float = 1200.0
+    # Délai maximum d'attente du calcul « fusionnable » d'une PR par GitHub
+    # avant d'abandonner le merge (ticket-384).
+    attente_fusionnabilite_max_s: float = 300.0
+    # Sur un projet merge_without_ci, délai maximum d'attente du merge du
+    # ticket précédent avant de lancer le suivant d'une file (ticket-382).
+    attente_merge_max_s: float = 600.0
+    # Maintient le système éveillé tant qu'un run est ouvert (ticket-394).
+    # Utilise SetThreadExecutionState sous Windows ; no-op ailleurs.
+    # Désactivable si un outil externe gère déjà la veille.
+    keep_awake_during_runs: bool = True
 
 
 settings = Settings()

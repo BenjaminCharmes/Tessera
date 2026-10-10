@@ -13,6 +13,15 @@ from tessera.services.providers.noms import (
 )
 
 # ------------------------------------------------------------------
+# Project-id validation — ticket-370
+# ------------------------------------------------------------------
+
+# La validation des identifiants vit dans `tessera.utils.project_id`
+# (ticket-370) : les modèles en ont besoin aussi, et ce module les importe.
+
+
+
+# ------------------------------------------------------------------
 # Module-level project cache
 # Key: (resolved_project_path, claude_md_mtime_ns, claude_md_size, agents_json_mtime_ns, agents_json_size)
 # ------------------------------------------------------------------

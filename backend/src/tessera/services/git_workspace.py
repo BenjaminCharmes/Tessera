@@ -37,11 +37,23 @@ _EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 # pathspec `:(exclude)`.
 _ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = ("tickets/", "memory/pipeline-log.md")
 
+#: Journal du pipeline, relatif au dossier du projet.
+_JOURNAL_PIPELINE = "memory/pipeline-log.md"
+
 # The same paths, without the `:(exclude)` magic, used to stage and commit
 # them separately from the ticket's own code changes (see `commit_all`).
 _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS: tuple[str, ...] = tuple(
     f":(exclude){p}" for p in _ORCHESTRATOR_ARTIFACT_PATHS
 )
+
+# Fichiers journal résolubles en union lors du rebase de livraison (ticket-391).
+# Seuls ces deux fichiers ne font qu'ajouter des entrées : une union n'y laisse
+# jamais de contenu ambigu, contrairement à un fichier de code modifié des
+# deux côtés.
+_JOURNAL_UNION_SUFFIXES: frozenset[str] = frozenset({
+    "memory/pipeline-log.md",
+    "memory/documentation.json",
+})
 
 # Fixed, non-ticket-branded message for the bookkeeping-only commit: ticket
 # status changes and pipeline-log growth are Tessera's own housekeeping,
@@ -68,6 +80,11 @@ def _is_orchestrator_artifact_path(path: str) -> bool:
     Directory entries (ending with ``/``) match any file under them;
     file entries match exactly, so ``memory/pipeline-log.md`` does not
     accidentally match ``memory/pipeline-log.md.bak``.
+
+    Paths are relative to the project: callers holding repository-root paths
+    (``git diff --name-only`` under ``git_root: ancestor``) strip the project
+    prefix first (``_relatif_au_projet``), so that a ``tickets/`` folder
+    elsewhere in the repository is never taken for Tessera's own.
     """
     for artifact in _ORCHESTRATOR_ARTIFACT_PATHS:
         if artifact.endswith("/"):
@@ -76,6 +93,48 @@ def _is_orchestrator_artifact_path(path: str) -> bool:
         elif path == artifact:
             return True
     return False
+
+
+def _relatif_au_projet(chemin: str, prefixe: str) -> str | None:
+    """Repository-root path → project-relative path, or None outside the project.
+
+    ``prefixe`` is ``git rev-parse --show-prefix`` from the project folder:
+    empty for a project at the root of its repository.
+    """
+    if not prefixe:
+        return chemin
+    return chemin[len(prefixe):] if chemin.startswith(prefixe) else None
+
+
+def _union_lines(base: str, theirs: str) -> str:
+    """Union of two append-only text files, base lines first, no duplicates."""
+    base_lines = base.splitlines(keepends=True)
+    theirs_lines = theirs.splitlines(keepends=True)
+    base_set = set(base_lines)
+    extra = [line for line in theirs_lines if line not in base_set]
+    return "".join(base_lines + extra)
+
+
+def _union_json_lists(base_text: str, theirs_text: str) -> str | None:
+    """Union of two JSON array versions, base items first, no duplicates.
+
+    Returns None when either side is not a valid JSON array.
+    """
+    try:
+        base_list = json.loads(base_text)
+        theirs_list = json.loads(theirs_text)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    if not isinstance(base_list, list) or not isinstance(theirs_list, list):
+        return None
+    seen: set[str] = set()
+    result: list[object] = []
+    for item in (*base_list, *theirs_list):
+        key = json.dumps(item, sort_keys=True)
+        if key not in seen:
+            seen.add(key)
+            result.append(item)
+    return json.dumps(result, ensure_ascii=False, indent=2)
 
 
 def _extraire_fichiers_bloques(stderr: str) -> list[str]:
@@ -700,17 +759,56 @@ class GitWorkspaceService:
                 _logger.warning("sync_base_diverge", extra={"raison": raison})
                 return raison
 
-        # Safe: update the local branch ref and reposition _base_ref.
-        try:
-            await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
-        except GitCommandError as exc:
-            raison = f"update-ref refs/heads/{base_branch} échoué : {exc.stderr.strip()}"
-            _logger.warning("sync_base_update_ref_echoue", extra={"erreur": raison})
-            return raison
+        # La base est la branche active depuis ticket-390 (retour sur la base
+        # après livraison) : `update-ref` y avancerait la référence sans
+        # l'index ni les fichiers, et l'arbre paraîtrait sale à l'envers.
+        if await self.branche_courante() == base_branch:
+            raison_ff = await self._avancer_base_active(fetch_sha)
+            if raison_ff is not None:
+                _logger.warning("sync_base_ff_echoue", extra={"erreur": raison_ff})
+                return raison_ff
+        else:
+            # Safe: update the local branch ref and reposition _base_ref.
+            try:
+                await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
+            except GitCommandError as exc:
+                raison = f"update-ref refs/heads/{base_branch} échoué : {exc.stderr.strip()}"
+                _logger.warning("sync_base_update_ref_echoue", extra={"erreur": raison})
+                return raison
 
         self._base_ref = fetch_sha
         _logger.info("sync_base_depuis_distant_ok", extra={"sha": fetch_sha[:7]})
         return None
+
+    async def _avancer_base_active(self, cible: str) -> str | None:
+        """Fast-forward the checked-out base branch to ``cible``, files included.
+
+        Uncommitted pipeline-log lines are set aside and appended back after
+        the fast-forward: the merged ticket's commit carries its own log
+        lines, so a plain merge would refuse to overwrite the file. Any other
+        local change makes ``merge --ff-only`` refuse, and the sync is skipped
+        rather than forced (ADR-022).
+        """
+        journal = _JOURNAL_PIPELINE
+        lignes: list[str] = []
+        if (self._project_path / journal).is_file():
+            diff = await self._run("diff", "-U0", "HEAD", "--", journal)
+            lignes = [
+                ligne[1:]
+                for ligne in diff.splitlines()
+                if ligne.startswith("+") and not ligne.startswith("+++")
+            ]
+            if lignes:
+                await self._run("checkout", "HEAD", "--", journal)
+        try:
+            await self._run("merge", "--ff-only", "-q", cible)
+            raison = None
+        except GitCommandError as exc:
+            raison = f"avance rapide de la base refusée : {exc.stderr.strip()}"
+        if lignes:
+            with (self._project_path / journal).open("a", encoding="utf-8") as f:
+                f.write("\n".join(lignes) + "\n")
+        return raison
 
     # ------------------------------------------------------------------
     # Fork point of a ticket branch — ticket-208
@@ -831,6 +929,19 @@ class GitWorkspaceService:
                 extra={"error": str(exc), "paths": to_remove},
             )
 
+    async def retourner_sur_base(self, base_branch: str) -> None:
+        """Check out the base branch after a delivered run (ticket-378).
+
+        Leaves the working tree on the base branch so the next ticket
+        starts from a clean, known state (ADR-018). Safe to call when
+        already on the base branch — git treats it as a no-op.
+        """
+        await self._run("checkout", base_branch)
+
+    async def branche_courante(self) -> str:
+        """Name of the checked-out branch (``HEAD`` when detached)."""
+        return (await self._run("rev-parse", "--abbrev-ref", "HEAD")).strip()
+
     async def _untracked_files(self) -> tuple[str, ...]:
         """Paths git reports as untracked (respecting .gitignore), as a tuple."""
         listing = await self._run("ls-files", "--others", "--exclude-standard")
@@ -931,9 +1042,20 @@ class GitWorkspaceService:
             await self._annuler_si_en_cours()
             raise refus
 
+        # Résolution en union pour les fichiers journal (ticket-391, ADR-035) :
+        # pipeline-log.md et documentation.json ne font qu'ajouter des entrées,
+        # donc une union ne laisse jamais de contenu ambigu.
+        # Les chemins de `git diff` partent de la racine du dépôt : sous
+        # `git_root: ancestor`, seuls ceux du projet lui-même comptent.
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        relatifs = [_relatif_au_projet(c, prefixe) for c in conflits]
+        if all(r is not None and r in _JOURNAL_UNION_SUFFIXES for r in relatifs):
+            if await self._resoudre_conflits_journal_en_union(conflits):
+                return ()
+
         # Si tous les conflits sont des artefacts Tessera, les résoudre
         # automatiquement en faveur de la branche (ticket-300, ADR-033).
-        if all(_is_orchestrator_artifact_path(c) for c in conflits):
+        if all(r is not None and _is_orchestrator_artifact_path(r) for r in relatifs):
             if await self._resoudre_conflits_artefacts(conflits):
                 return ()
 
@@ -1071,14 +1193,21 @@ class GitWorkspaceService:
         """
         try:
             for chemin in conflits:
-                status_out = await self._run("status", "--porcelain", "--", chemin)
+                # `:/<chemin>` : les chemins viennent de `git diff --name-only`,
+                # relatifs à la racine du dépôt. Pour un projet déclaré
+                # `git_root: ancestor`, le cwd est un sous-dossier du dépôt ;
+                # un chemin nu serait résolu depuis ce cwd et ne désignerait
+                # aucun fichier. `:/<chemin>` force la résolution depuis la
+                # racine du dépôt, ce qui est correct pour les deux modes.
+                pathspec = f":/{chemin}"
+                status_out = await self._run("status", "--porcelain", "--", pathspec)
                 code = status_out[:2] if len(status_out) >= 2 else "UU"  # noqa: PLR2004
                 if code == "UD":
                     # Branch deleted the file; stage the deletion.
-                    await self._run("rm", "-f", "--", chemin)
+                    await self._run("rm", "-f", "--", pathspec)
                 else:
-                    await self._run("checkout", "--theirs", "--", chemin)
-                    await self._run("add", "--", chemin)
+                    await self._run("checkout", "--theirs", "--", pathspec)
+                    await self._run("add", "--", pathspec)
 
             if await self._fichiers_en_conflit():
                 return False
@@ -1091,6 +1220,69 @@ class GitWorkspaceService:
                 if untracked and _is_orchestrator_artifact_path(untracked):
                     await self._run("add", "--", untracked)
 
+            await self._run("-c", "core.editor=true", "rebase", "--continue")
+            return True
+        except GitCommandError:
+            return False
+
+    async def _resoudre_conflits_journal_en_union(
+        self, conflits: tuple[str, ...]
+    ) -> bool:
+        """Résout en union les conflits sur les fichiers journal (ticket-391).
+
+        Appelée uniquement quand tous les fichiers en conflit sont dans
+        ``_JOURNAL_UNION_SUFFIXES``. Pour chaque fichier :
+        - ``pipeline-log.md`` : union des lignes, base en premier ;
+        - ``documentation.json`` : union des listes JSON sans doublon ;
+          JSON illisible → renvoie False, le conflit reste non résolu.
+
+        Renvoie True quand le rebase s'est poursuivi avec succès.
+        """
+        try:
+            for chemin in conflits:
+                # Stage 2 = ours (base sur laquelle on rejoue), stage 3 = theirs (ticket).
+                try:
+                    base_content = await self._run("show", f":2:{chemin}")
+                except GitCommandError:
+                    base_content = ""
+                try:
+                    theirs_content = await self._run("show", f":3:{chemin}")
+                except GitCommandError:
+                    theirs_content = ""
+
+                if chemin.endswith("pipeline-log.md"):
+                    resolved: str = _union_lines(base_content, theirs_content)
+                elif chemin.endswith("documentation.json"):
+                    maybe = _union_json_lists(base_content, theirs_content)
+                    if maybe is None:
+                        _logger.warning(
+                            "journal_union_json_illisible", extra={"chemin": chemin}
+                        )
+                        return False
+                    resolved = maybe
+                else:
+                    return False
+
+                # git show :2:path retourne le chemin depuis la racine du dépôt.
+                # Pour un projet déclaré git_root: ancestor, ce chemin inclut
+                # le préfixe (ex. projects/ide-core/memory/…). On le retire pour
+                # écrire dans le bon emplacement sur le disque.
+                rel_in_project = chemin
+                if self._travaille_dans_le_parent():
+                    try:
+                        prefix = (await self._run("rev-parse", "--show-prefix")).strip()
+                        if prefix and rel_in_project.startswith(prefix):
+                            rel_in_project = rel_in_project[len(prefix):]
+                    except GitCommandError:
+                        pass
+                dest = self._project_path / rel_in_project
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_text(resolved, encoding="utf-8")
+                # `:/` : `chemin` est relatif à la racine du dépôt, et le cwd
+                # est le dossier du projet (git_root: ancestor).
+                await self._run("add", "--", f":/{chemin}")
+
+            _logger.info("journal_union_resolu", extra={"fichiers": list(conflits)})
             await self._run("-c", "core.editor=true", "rebase", "--continue")
             return True
         except GitCommandError:

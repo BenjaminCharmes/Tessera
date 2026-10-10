@@ -110,6 +110,28 @@ d'en obtenir un.
 Sidebar → **Nouveau projet**. Tu décris ton idée en langage naturel, l'agent
 *project-creator* génère la structure, le `CLAUDE.md` et les premiers tickets.
 
+### Créer un projet depuis le gabarit FastAPI + React
+
+La fenêtre **Nouveau projet** propose deux types :
+
+**Projet vide** : l'IDE crée la structure Tessera (tickets, mémoire,
+`CLAUDE.md`, `agents.json`) et initialise le dépôt git ; le code reste à
+écrire.
+
+**Gabarit FastAPI + React** : l'IDE génère une base prête à développer.
+- Backend `backend/` (FastAPI, pytest, mypy) et frontend `frontend/` (React,
+  Vite, TypeScript, Tailwind), tous les marqueurs remplacés.
+- Deux ports libres attribués et affichés après création (backend à partir de
+  8020, frontend à partir de 5190), jamais déjà pris par un autre projet.
+- Un `agents.json` complet : les rôles du pipeline, `autonomy: merge`,
+  `merge_without_ci: true`, une `test_command` qui lance toute la suite.
+- Un dépôt git local initialisé.
+
+Il te reste deux choses à faire toi-même :
+1. Écrire le `CLAUDE.md` du projet (ce qu'il fait, ses contraintes).
+2. Créer le dépôt GitHub et le lier (voir « Intégration GitHub ») : l'IDE ne
+   le crée jamais sans toi.
+
 ### Importer un projet existant de ta machine
 
 Sidebar → **Importer un projet**. Deux modes :
@@ -197,6 +219,17 @@ En vue Rendu (la vue par défaut), cet en-tête s'affiche en **fiche clé/valeur
 
 En vue Source (Monaco), tu vois le fichier brut, frontmatter compris.
 
+
+**Quand une dépendance n'est pas mergée (ticket-384)**
+
+La file n'attend pas — elle s'arrête. Si le ticket A (que B dépend de) échoue à se merger, alors :
+
+- A passe en statut `blocked`, avec le motif dans `memory/pipeline-log.md`.
+- B n'est pas lancé.
+- La file s'arrête : `[<projet>] file interrompue : <ticket-A> non mergé`.
+
+Résolvez A (conflit, rebase, relance manuelle) avant de relancer la file.
+
 ### Critères d'acceptation obligatoires pour le code
 
 Pour tout ticket `feat`, `fix` ou `refactor`, tu dois ajouter une section `## Critères d'acceptation`. C'est là que tu énumères les comportements ou résultats que le validateur vérifiera.
@@ -226,6 +259,18 @@ Si tu vois peu de tickets et que le panneau Tickets n'est pas ouvert, il y a sou
 - Un bouton **Effacer les filtres** pour tous les enlever d'un coup
 
 Un clic sur ce bouton remet les filtres à zéro — tu verras tous les tickets de nouveau.
+
+### Les colonnes done et cancelled ne montrent que les 30 derniers tickets
+
+Dans les colonnes **done** et **cancelled** du kanban, seules les 30 cartes avec les numéros les plus élevés sont rendues au départ — c'est une optimisation pour garder l'écran fluide quand le projet accumule des centaines de tickets terminés.
+
+En bas de la colonne, un bouton te permet d'afficher la totalité.
+
+Le compteur de la colonne (le nombre en haut) affiche toujours le total réel, même quand seules les 30 cartes récentes sont visibles.
+
+**Les autres colonnes** — todo, in-progress, in-review, blocked — affichent tous les tickets, quel que soit leur taille.
+
+**La recherche et les filtres s'appliquent avant la limite** : tu cherches un ticket ancien dans done ? Il s'affiche même s'il n'est pas parmi les 30 récents.
 
 # ticket-007 — Ajouter un endpoint de santé
 
@@ -302,6 +347,9 @@ en `blocked/` et le reviewer n'est même pas appelé.
 
 ---
 
+
+L'audit de sécurité vérifie uniquement les lignes que tu ajoutes. Si tu modifies un fichier qui contient déjà une faille de sécurité, elle ne t'arrête pas : elle est signalée au reviewer, mais n'a pas d'effet sur ton ticket. Tu n'es responsable que du code que tu écris.
+
 ### Si le validateur refuse
 
 Si tu as écrit un ticket `feat`, `fix` ou `refactor` sans section `## Critères d'acceptation`, le validateur refuse et te demande d'en ajouter une. C'est voulu : rien ne peut être validé sans critères d'acceptation.
@@ -313,6 +361,12 @@ Si tu as écrit un ticket `feat`, `fix` ou `refactor` sans section `## Critères
 Quand tu relances un ticket, sa branche précédente est réutilisée — tu ne perds pas le travail d'avant. Le pipeline la met à jour automatiquement si elle est en retard sur la base du projet, ce qui évite que des changements d'autres tickets n'y causent des conflits imprévus lors de la livraison.
 
 Si le rebasage échoue, l'ancienne branche est renommée `stale/<ancien-nom>` pour que tu ne la perdes pas, et une branche neuve est créée à partir de la base actuelle. Le codeur repartira d'une base propre.
+
+### Quand des tests échouent
+
+Quand des tests échouent, le **résumé du test** affiché dans le journal est clair et lisible — « 1 failed, 455 passed » au lieu d'une ligne de warning confuse. Le codeur reçoit aussi le **détail de chaque échec** — le nom du test et l'assertion qui a échoué — pour corriger en un seul tour.
+
+Au lieu de tourner à l'aveugle plusieurs fois, tu remarques que les tickets progressent plus vite.
 
 ## 5. Lire ce qui se passe
 
@@ -356,6 +410,10 @@ Pour que le ticket soit approuvé, le reviewer **et** le validateur doivent tous
 
 
 Quand tu vois la ligne « testeur: en attente d'un créneau de test » dans le log, cela signifie qu'un autre testeur utilise le créneau de tests (limité à `MAX_PARALLEL_TEST_RUNS` tests simultanés). Le testeur actuel attend son tour, mais cette attente n'affecte pas le timeout — seul le temps réel d'exécution du test compte.
+
+### Quand une file s'arrête
+
+Une file arrêtée par une exception (timeout, saturation de ressources, etc.) écrit une ligne dans le journal du pipeline : `[projet] file interrompue : motif de l'erreur`. Tu peux voir l'arrêt immédiatement dans l'IDE, au même endroit que les autres interruptions (refus d'audit, dépassement de budget, limite de session). Tu n'as pas besoin de chercher dans les logs du serveur.
 
 ## 5 bis. Se repérer dans l'écran
 
@@ -532,6 +590,32 @@ La fusion se poursuit en arrière-plan, après que le run soit terminé. Si elle
 
 Le travail du codeur est déjà commité sur la branche du ticket, et la PR est ouverte sur GitHub. Tu peux reprendre manuellement s'il y a un conflit simple, ou relancer le codeur si des modifications sont nécessaires.
 
+### L'arbre revient propre
+
+Un run terminé laisse toujours ton arbre git propre. La copie de travail revient sur la branche de base du projet (pas la branche du ticket), et aucune modification n'est laissée en vrac.
+
+Tu peux lancer le ticket suivant sans nettoyer après toi. Le travail du run précédent reste sur sa branche dédiée (`ticket-XXX`) si tu veux le consulter plus tard.
+
+
+Cela s'applique **même si le run n'a pas ouvert de PR** — que le run soit refusé à l'audit, interrompu, ou n'ait pas généré de changements. Le journal du pipeline est toujours commité sur la branche de base, et tu te retrouves sur cette branche, pas sur celle du ticket. La branche du ticket, elle, garde son dernier commit ; si tu dois relancer le ticket, tu auras à faire un `git checkout ticket-…` pour y revenir.
+
+### Si une PR ne peut pas se fusionner
+
+Une PR approuvée peut rester en attente de calcul de sa fusionnabilité chez
+GitHub pendant plusieurs minutes — c'est normal après un autre merge sur la
+même branche de base. L'IDE l'attend jusqu'à 5 minutes.
+
+Si la PR reste non fusionnable après cette attente (conflit Git, règles de
+branche, révisions manquantes), le merge échoue. Le ticket passe en `blocked`
+et une ligne de log dans `memory/pipeline-log.md` explique pourquoi.
+
+Les tickets dépendants d'un ticket bloqué refusent de démarrer — la file
+s'arrête et t'affiche l'erreur.
+
+### Conflits sur le journal fusionnés automatiquement
+
+Dans une file, quand plusieurs tickets tournent d'affilée, chacun enregistre ses changements au journal du pipeline et à la documentation. Autrefois, tu devais arrêter la file quand le ticket suivant heurtait un conflit sur ces fichiers. Depuis, l'IDE les fusionne automatiquement—la file continue sans interruption. S'il y a aussi un conflit sur d'autres fichiers, tu dois approuver la résolution.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
@@ -593,6 +677,18 @@ tes tickets.
 **Depuis la Vue Tableau**
 
 Tu n'as pas besoin de passer par la sidebar pour composer et lancer la file — la Vue Tableau t'offre exactement les mêmes contrôles. Chaque carte affiche un bouton « Ajouter à la file » ou « Retirer de la file ». Quand tu as sélectionné au moins un ticket, une barre apparaît au-dessus des colonnes : elle montre le nombre de tickets en attente et propose « Lancer la file » et « Vider ». Un ticket ajouté d'un côté se voit aussitôt de l'autre — sidebar et Vue Tableau restent synchronisées.
+
+### Limites de budget et arrêt de file
+
+Une file s'arrête proprement si le budget cumulé atteint son plafond (par défaut 5 $ × nombre de tickets) ou si ton abonnement atteint sa limite de session. Voir la section « Problèmes fréquents » pour les détails sur chacun de ces cas.
+
+Dès que tu lances un run, ton PC reste éveillé — tes agents peuvent travailler toute la nuit. L'écran peut s'éteindre, mais la mise en veille du système est empêchée.
+
+Sur Windows, c'est actif. Sur Mac et Linux, ça n'a aucun effet — on laisse juste le réglage pour la cohérence.
+
+Tu peux désactiver ça si tu veux que ton PC dorme normalement, ou si un autre outil gère la veille pour toi : mets `KEEP_AWAKE_DURING_RUNS=false` dans `.env`.
+
+Ça n'empêche pas Windows Update de redémarrer le PC, ni l'écran de s'éteindre.
 
 ## 8. Discuter avec l'agent, pendant qu'il travaille
 
@@ -751,6 +847,10 @@ que seul le SDK fournit.
 Les requêtes à Ollama sont **mises en file d'attente par serveur** — une seule à la fois par défaut. Cela élimine la compétition sur le modèle quand plusieurs runs demandent Ollama au même moment : chacun attend son tour, puis obtient une réponse à pleine vitesse.
 
 Si tu as besoin d'augmenter le nombre de requêtes concurrentes (sur une machine très puissante, par exemple), configure `ollama_max_concurrent` dans ta configuration Tessera (défaut 1 ; à 0 ou moins pour désactiver cette borne).
+
+
+
+Si le serveur Ollama est indisponible ou surchargé, les rôles basculent automatiquement et rapidement sur Claude. Tu n'as rien à faire.
 
 ### Direction visuelle pour les interfaces
 
@@ -945,6 +1045,51 @@ Cela signifie que ticket-002 a été approuvé, mais **sa livraison n'a pas atte
 3. **Relance la file** à partir du ticket arrêté.
 
 La file ne se relance pas toute seule : il faut que tu corriges la cause d'abord.
+
+
+C'est que la PR du ticket dépendant n'a pas pu fusionner. Regarde le log du
+projet (`memory/pipeline-log.md`) — il te dit pourquoi : conflit Git, règles
+de branche, révisions manquantes, ou autre blocage sur le dépôt.
+
+Le ticket bloqué passe automatiquement en `blocked` (visible dans la colonne).
+Corrige le problème sous-jacent, relance le ticket bloqué, et la file reprendra
+à partir du ticket qui l'attendait.
+
+### « Agent silencieux depuis X secondes »
+
+L'IDE a stoppé cet agent parce qu'il n'émettait rien depuis trop longtemps. C'est **auto-géré** : le run reprend avec un fallback (Ollama ou fermeture gracieuse). Rien à faire.
+
+Pour allonger le délai avant arrêt, modifie `agent_silence_max_s` dans la configuration (défaut 1200 s).
+
+### Une file s'arrête sur son plafond de budget
+
+Une file peut s'arrêter avant de traiter tous ses tickets si la dépense cumulée atteint le plafond fixé. Par défaut, ce plafond = nombre de tickets × 5 $. Une file de 3 tickets peut donc coûter jusqu'à 15 $.
+
+Si tu veux fixer une limite stricte (par exemple 10 $ pour une file de 3 tickets), déclare-la quand tu lances la file — le paramètre `budget_usd` remplace alors le calcul automatique.
+
+Quand une file s'arrête sur le budget, le log affiche `[<projet>] file interrompue : plafond de dépense` et l'interface confirme l'arrêt. Les tickets non lancés restent en `todo`.
+
+
+**Depuis octobre 2026** : en file, deux limites s'appliquent :
+- Chaque ticket a son propre budget (15 $ par défaut). S'il le dépasse entre ses tours, il repassera en `todo` — tu le relances après.
+- La file elle-même a un budget global (le cumul de tous les tickets). Quand il est atteint, la file s'arrête et affiche son coût : « file interrompue : plafond de dépense (15,24 $ / 15,00 $) ».
+
+Avant cette date, un ticket pouvait être coupé parce que ses prédécesseurs avaient trop dépensé. À présent, chaque ticket se mesure à son propre budget — tu ne paieras jamais pour les autres.
+
+### Une file s'arrête pour « limite de session »
+
+Quand ton abonnement Claude atteint sa limite de session (« You've hit your session limit »), la file s'arrête avant le prochain ticket. Le ticket en cours repasse en `todo` — aucun n'est endommagé. Le log affiche `[<projet>] file interrompue : limite de session (reprise : <heure>)` et l'interface affiche l'heure à laquelle ton abonnement se réinitialise. Relance ta file après cette heure.
+
+Contrairement aux autres arrêts, celui-ci ne marque aucun ticket en `blocked`.
+
+### Un run s'est arrêté avant d'être livré (backend redémarré)
+
+Si le backend s'arrête avant de finaliser la livraison d'un ticket approuvé, au redémarrage tu vois :
+
+- Tous les fichiers que le codeur a créés pendant le run sont restaurés
+- Le ticket reste en état « approuvé/done » au lieu d'être repassé en `todo` — tu vois une note dans le journal : « [ticket-XXX] approuvé mais non livré : livraison à reprendre »
+
+**Attention** : un fichier créé accidentellement par toi pendant le run — un brouillon, un `.tmp` — sera aussi restauré dans la branche. Il sera visible dans la PR ; nettoie-le avant de merger.
 
 ## Pour aller plus loin
 

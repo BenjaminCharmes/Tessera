@@ -88,6 +88,10 @@ class TestResult:
     failed: int
     output_summary: str
     errors: list[str] = field(default_factory=list)
+    #: Détail structuré des échecs : section « short test summary info » de
+    #: pytest ou lignes FAIL/× de vitest, suivi du bloc FAILURES/ERRORS,
+    #: tronqué à 8 000 caractères. Vide quand les tests passent (ticket-393).
+    failure_details: str = ""
     duration_ms: int = 0
     #: La commande a-t-elle seulement démarré ? Faux quand l'exécutable est
     #: introuvable — ce qui n'est pas la même chose que des tests rouges, et
@@ -318,12 +322,14 @@ def _parse_output(returncode: int, output: str, duration_ms: int) -> TestResult:
         f"{'OK' if passed else 'FAILED'} (exit {returncode})"
     )
     errors = _extract_errors(output) if not passed else []
+    failure_details = _extract_failure_details(output) if not passed else ""
     return TestResult(
         passed=passed,
         total=total,
         failed=failed,
         output_summary=summary,
         errors=errors,
+        failure_details=failure_details,
         duration_ms=duration_ms,
     )
 
@@ -345,6 +351,33 @@ def _extract_counts(output: str) -> tuple[int, int]:
 
 
 def _extract_summary_line(output: str) -> str:
+    """Extract the canonical summary line from pytest or vitest output.
+
+    Prioritises the pytest timing banner (=== N failed, M passed in X.XXs ===)
+    and the vitest summary line over the heuristic reverse scan, which can
+    pick up warnings printed after the real summary (ticket-393).
+    """
+    import re
+
+    # Priorité 1 : résumé final de pytest (=== N failed, M passed in X.XXs ===)
+    for line in output.splitlines():
+        stripped = line.strip()
+        if (
+            re.match(r"={4,}[^=]+={4,}$", stripped)
+            and re.search(r"\d+.*in\s+[\d.]+s", stripped)
+            and any(kw in stripped.lower() for kw in ("passed", "failed", "error"))
+        ):
+            return stripped[:200]
+
+    # Priorité 2 : résumé vitest (Tests  N failed | M passed)
+    for line in output.splitlines():
+        stripped = line.strip()
+        if re.match(r"Tests\s+\d+", stripped, re.IGNORECASE) and any(
+            kw in stripped.lower() for kw in ("passed", "failed")
+        ):
+            return stripped[:200]
+
+    # Repli : heuristique (dernière ligne avec un mot-clé de test)
     for line in reversed(output.splitlines()):
         line = line.strip()
         if line and any(
@@ -353,6 +386,87 @@ def _extract_summary_line(output: str) -> str:
         ):
             return line[:200]
     return ""
+
+
+def _extract_failure_details(output: str, max_chars: int = 8000) -> str:
+    """Extract structured failure details from pytest or vitest output.
+
+    Returns, in order: the 'short test summary info' section of pytest (or
+    FAIL/× lines of vitest), then the FAILURES/ERRORS detail blocks.
+    Truncated to ``max_chars`` characters, keeping the beginning.
+    """
+    short = _extract_pytest_short_summary(output)
+    failures = _extract_pytest_failures_section(output)
+
+    parts: list[str] = [p for p in (short, failures) if p]
+    if not parts:
+        vitest = _extract_vitest_failures(output)
+        if vitest:
+            parts.append(vitest)
+
+    combined = "\n\n".join(parts)
+    return combined[:max_chars]
+
+
+def _extract_pytest_short_summary(output: str) -> str:
+    """Extract FAILED/ERROR lines from the pytest 'short test summary info' section."""
+    import re
+
+    in_section = False
+    result: list[str] = []
+
+    for line in output.splitlines():
+        stripped = line.strip()
+        if re.match(r"={4,}\s+short test summary info\s+={4,}", stripped, re.IGNORECASE):
+            in_section = True
+            continue
+        if in_section:
+            if stripped.startswith("="):
+                break
+            if stripped:
+                result.append(stripped)
+
+    return "\n".join(result)
+
+
+def _extract_pytest_failures_section(output: str) -> str:
+    """Extract the FAILURES and ERRORS detail blocks from pytest output."""
+    import re
+
+    in_section = False
+    result: list[str] = []
+
+    for line in output.splitlines():
+        stripped = line.strip()
+        is_section_header = bool(re.match(r"={4,}[^=]+={4,}$", stripped))
+        if is_section_header:
+            if re.match(r"={4,}\s*(?:FAILURES|ERRORS)\s*={4,}$", stripped, re.IGNORECASE):
+                in_section = True
+                result.append(stripped)
+            elif in_section:
+                in_section = False
+        elif in_section:
+            result.append(line.rstrip())
+
+    return "\n".join(result).strip()
+
+
+def _extract_vitest_failures(output: str) -> str:
+    """Extract failing test names and assertion errors from vitest output."""
+    result: list[str] = []
+
+    for line in output.splitlines():
+        stripped = line.strip()
+        if (
+            stripped.startswith("×")
+            or stripped.startswith("✗")
+            or stripped.startswith("FAIL ")
+            or stripped.startswith("AssertionError")
+            or stripped.startswith("Error:")
+        ):
+            result.append(stripped)
+
+    return "\n".join(result)
 
 
 def _extract_errors(output: str, max_errors: int = 5) -> list[str]:

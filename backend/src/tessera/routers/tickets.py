@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from tessera.config import settings
@@ -20,12 +20,16 @@ _logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.politique_run import PolitiqueRun
+from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.sync_map import SyncMapService
 from tessera.services.ticket_service import TicketService
 
-router = APIRouter(tags=["tickets"])
+router = APIRouter(
+    tags=["tickets"],
+    dependencies=[Depends(require_valid_project_id)],
+)
 
 
 def _svc(project_id: str) -> TicketService:
@@ -145,6 +149,20 @@ class PrStatusResponse(BaseModel):
     pr_number: int
 
 
+class PrStatusEntry(BaseModel):
+    """One entry in the bulk PR status response — ticket-366."""
+
+    ticket_id: str
+    pr_number: int
+    state: Literal["open", "closed", "merged"]
+    ci_status: Literal["pending", "passing", "failing", "none"]
+    pr_url: str
+
+
+class AllPrStatusesResponse(BaseModel):
+    statuses: list[PrStatusEntry]
+
+
 def _resoudre_base_branch(project_path: Path) -> str:
     """Resolve the base branch for a project.
 
@@ -259,6 +277,43 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
         ci_status=status.ci_status,
         pr_url=status.pr_url,
         pr_number=status.pr_number,
+    )
+
+
+@router.get("/{project_id}/pr-statuses", response_model=AllPrStatusesResponse)
+async def get_all_pr_statuses_endpoint(project_id: str) -> AllPrStatusesResponse:
+    """Return PR statuses for every ticket that has a pr_number — ticket-366.
+
+    A single paginated GitHub call resolves PRs not yet in the cache.
+    Tickets without a pr_number and PR numbers absent from the repository are
+    both silently omitted (status 200 with a shorter list).
+    """
+    from tessera.services.pr_statuses import get_all_pr_statuses
+
+    loader = ProjectLoader(settings.ide_workspace_dir)
+    try:
+        project = await loader.load_project(project_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    github_svc = _require_github_service(project.github_remote)
+    tickets, _ = await _svc(project_id).list_tickets_with_unreadable(None)
+    repo: str = project.github_remote or ""
+
+    statuses = await get_all_pr_statuses(
+        settings.ide_db_path, repo, github_svc, tickets
+    )
+    return AllPrStatusesResponse(
+        statuses=[
+            PrStatusEntry(
+                ticket_id=s.ticket_id,
+                pr_number=s.pr_number,
+                state=s.state,
+                ci_status=s.ci_status,
+                pr_url=s.pr_url,
+            )
+            for s in statuses
+        ]
     )
 
 
