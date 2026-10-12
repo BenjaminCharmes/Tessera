@@ -17,7 +17,7 @@ from pathlib import Path
 
 from tessera.config import settings
 
-_BACKEND_PORT = 8000
+_BACKEND_PORT = 8100
 _FRONTEND_PORT = 5173
 
 
@@ -172,7 +172,7 @@ def check_ports() -> Check:
     return Check(
         name="Ports libres",
         ok=not taken,
-        detail="8000 et 5173 libres" if not taken else f"déjà occupés : {taken}",
+        detail="8100 et 5173 libres" if not taken else f"déjà occupés : {taken}",
         fix=""
         if not taken
         else (

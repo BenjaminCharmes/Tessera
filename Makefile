@@ -10,7 +10,7 @@ help:
 	@echo "  make doctor       — Vérifie les prérequis avant de lancer (à faire en premier)"
 	@echo "  make run          — Lance backend + frontend en parallèle (Ctrl+C pour tout arrêter)"
 	@echo "  make stop         — Arrête backend et frontend, worker --reload orphelin compris"
-	@echo "  make dev          — Lance uniquement le serveur FastAPI en mode reload (port 8000)"
+	@echo "  make dev          — Lance uniquement le serveur FastAPI en mode reload (port 8100)"
 	@echo "  make verify       — Tout ce que la CI vérifie, en local (à faire avant de merger)"
 	@echo "  make dev-frontend — Lance uniquement Vite en mode dev (port 5173)"
 	@echo "  make tauri-dev    — Lance l'app Tauri (desktop) — nécessite 'make dev' dans un autre terminal"
@@ -35,20 +35,20 @@ doctor:
 # les prérequis — les deux pannes de ticket-050 étaient détectables avant le
 # lancement.
 run: doctor
-	@echo "→ Lancement Tessera : backend (port 8000) + frontend (port 5173)"
+	@echo "→ Lancement Tessera : backend (port 8100) + frontend (port 5173)"
 	@echo "→ Ctrl+C pour arrêter les deux processus"
 	@trap 'kill 0' SIGINT SIGTERM; \
-	 (cd backend && uv run uvicorn tessera.main:app --reload --host 127.0.0.1 --port 8000 --env-file ../.env) & \
+	 (cd backend && uv run uvicorn tessera.main:app --reload --host 127.0.0.1 --port 8100 --env-file ../.env) & \
 	 (cd frontend && npm run dev) & \
 	 wait
 
 dev:
-	@echo "→ Serveur démarré sur http://localhost:8000"
-	@echo "→ Swagger UI : http://localhost:8000/docs"
+	@echo "→ Serveur démarré sur http://localhost:8100"
+	@echo "→ Swagger UI : http://localhost:8100/docs"
 	cd backend && uv run uvicorn tessera.main:app \
 		--reload \
 		--host 127.0.0.1 \
-		--port 8000 \
+		--port 8100 \
 		--env-file ../.env
 
 dev-frontend:
@@ -64,7 +64,7 @@ stop:
 
 tauri-dev:
 	@echo "→ Lancement de Tessera en mode desktop (Tauri)"
-	@echo "→ Assure-toi que 'make dev' tourne dans un autre terminal (FastAPI sur :8000)"
+	@echo "→ Assure-toi que 'make dev' tourne dans un autre terminal (FastAPI sur :8100)"
 	cd frontend && npm run tauri-dev
 
 tauri-build:
