@@ -4,7 +4,7 @@ created: 2026-10-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-402
-pr_number: null
+pr_number: 376
 priority: medium
 status: done
 title: Doc edits find their anchor text despite typographic punctuation and non-breaking
