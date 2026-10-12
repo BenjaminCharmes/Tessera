@@ -4,7 +4,7 @@ created: 2026-10-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-405
-pr_number: null
+pr_number: 382
 priority: medium
 status: done
 title: 'Delivery phase 2 survives a slow GitHub: late CI checks are awaited, and a
