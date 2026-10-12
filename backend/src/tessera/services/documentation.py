@@ -34,6 +34,7 @@ from pathlib import Path
 
 from tessera.services import documentation_claude_md as claude_md_doc
 from tessera.services.providers.base import LLMProvider
+from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -333,7 +334,7 @@ class ResultatDocumentation:
 #: classes, parce que c'est ce qu'il vient de lire.
 _ROLES = ("doc-technique", "doc-fonctionnelle")
 
-_MODELE = "claude-haiku-4-5-20251001"
+_MODELE = MODELE_JUGEMENT
 _MAX_TOKENS = 4096
 
 

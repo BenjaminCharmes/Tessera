@@ -6,6 +6,7 @@ from typing import Any, Literal, TYPE_CHECKING
 
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.json_extract import extract_json
+from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 _logger = get_logger(__name__)
 
-_MODEL = "claude-sonnet-4-6"
+_MODEL = MODELE_JUGEMENT
 _MAX_TOKENS = 2048
 _PROMPT_FILE = "validateur.md"
 # Same cap as the security audit: at 8 000 chars a branch diff made most

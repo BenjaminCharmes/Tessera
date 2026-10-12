@@ -13,6 +13,7 @@ import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
+from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.agent import AgentConfig, AgentRole
@@ -297,7 +298,7 @@ async def test_la_securite_utilise_le_modele_recu(tmp_path: Path) -> None:
 async def test_la_securite_garde_son_defaut_sans_modele(tmp_path: Path) -> None:
     provider = FakeProvider(content='{"issues": [], "verdict": "PASS", "summary": "ok"}')
     await SecurityAuditorService(provider, _prompts(tmp_path)).audit("diff", tmp_path)
-    assert provider.calls[0]["model"] == "claude-sonnet-4-6"
+    assert provider.calls[0]["model"] == MODELE_JUGEMENT
 
 
 async def test_le_validateur_utilise_le_modele_recu(tmp_path: Path) -> None:

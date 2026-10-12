@@ -8,6 +8,7 @@ from tessera.config import _REPO_ROOT
 from tessera.models.project import ProjectCreate, ProjectFromTemplateResult
 from tessera.services.git_link import init_repository
 from tessera.services.project_loader import ProjectLoader
+from tessera.services.modeles_par_defaut import MODELE_JUGEMENT, MODELE_PRODUCTION
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -30,8 +31,8 @@ _TEST_COMMAND = (
 
 # Rôles des projets créés depuis le gabarit : production sur Sonnet, jugement
 # et documentation sur Haiku via l'abonnement (configuration de vigie).
-_MODELE_PRODUCTION = "claude-sonnet-5-5"
-_MODELE_JUGEMENT = "claude-haiku-4-5"
+_MODELE_PRODUCTION = MODELE_PRODUCTION
+_MODELE_JUGEMENT = MODELE_JUGEMENT
 _ROLES_PRODUCTION = ["codeur", "architect", "reviewer"]
 _ROLES_JUGEMENT = ["securite", "validateur", "doc-technique", "doc-fonctionnelle"]
 _ROLES_AVEC_SKILL_DESIGN = {"codeur", "architect"}

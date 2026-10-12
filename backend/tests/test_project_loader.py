@@ -7,6 +7,7 @@ from unittest.mock import patch as mock_patch
 
 import pytest
 
+from tessera.services.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.models.project import ProjectCreate
 from tessera.services.project_loader import (
     ProjectLoader,
@@ -217,7 +218,7 @@ async def test_create_project_scaffolds_agents_json(tmp_path: Path) -> None:
     data = json.loads(agents_json.read_text(encoding="utf-8"))
     roles = [a["role"] for a in data["agents"]]
     assert roles == ["codeur", "reviewer"]
-    assert data["agents"][0]["model"] == "claude-sonnet-4-6"
+    assert data["agents"][0]["model"] == MODELE_PRODUCTION
     # Pas de `auto_merge_on_approve` : il était écrit à `true` et ne faisait
     # rien. Qui merge est décidé par `autonomy` (ADR-029, ticket-091).
     assert "auto_merge_on_approve" not in data["pipeline"]
