@@ -1307,3 +1307,68 @@ async def test_aucun_commit_de_journal_sur_la_branche_de_base(tmp_path: Path) ->
 
     git_ws.commit_bookkeeping.assert_not_called()
     git_ws.retourner_sur_base.assert_called_with("main")
+
+
+async def test_le_ticket_dependant_part_de_la_base_realignee_apres_le_merge(
+    tmp_path: Path,
+) -> None:
+    """Ticket-403: on a project that waits for its CI, a dependent ticket
+    starts only after the base was realigned onto the merge — not from the
+    stale local base (ticket-400 had started without ticket-399)."""
+    from unittest.mock import AsyncMock, MagicMock
+    from tessera.models.ticket import Ticket
+
+    ordre: list[str] = []
+
+    class _FakeCIWatcher:
+        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+            ordre.append(f"merge:{ticket_id}")
+            return True
+
+    def _t(tid: str, depends_on: list[str]) -> Ticket:
+        return Ticket(
+            id=tid, title="titre", type=TicketType.feat, status=TicketStatus.todo,
+            priority=TicketPriority.medium, agent="codeur", body="corps",
+            depends_on=depends_on,
+        )
+
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: {
+        "ticket-001": _t("ticket-001", []),
+        "ticket-002": _t("ticket-002", ["ticket-001"]),
+        "ticket-003": _t("ticket-003", []),
+    }.get(tid)
+
+    git_ws = AsyncMock()
+    git_ws.sync_base_depuis_distant.side_effect = lambda base: ordre.append(
+        f"sync:{base}"
+    )
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        ordre.append(f"depart:{result.ticket_id}")
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _OrchestrateurDouble(
+        [_resultat("ticket-001"), _resultat("ticket-002"), _resultat("ticket-003")],
+        runner=MagicMock(),
+        ticket_service=tickets,
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        livrer=_livrer,
+        ci_watcher=_FakeCIWatcher(),
+        git_workspace=git_ws,
+        base_branch="develop",
+    )
+
+    await orch.run_queue("proj", ["ticket-001", "ticket-002", "ticket-003"])
+
+    # 001 → attente de son merge → réalignement → 002. Personne ne dépend de 002 :
+    # pas d'attente ni de réalignement avant 003.
+    assert ordre == [
+        "depart:ticket-001",
+        "merge:ticket-001",
+        "sync:develop",
+        "depart:ticket-002",
+        "depart:ticket-003",
+    ]
