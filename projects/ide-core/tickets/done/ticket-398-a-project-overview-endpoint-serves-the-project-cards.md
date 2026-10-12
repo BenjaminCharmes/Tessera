@@ -4,7 +4,7 @@ created: 2026-10-12
 depends_on: []
 estimated_days: 1
 id: ticket-398
-pr_number: null
+pr_number: 372
 priority: high
 status: done
 title: A project overview endpoint serves everything the project cards show, and a
