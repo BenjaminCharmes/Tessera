@@ -1,17 +1,21 @@
 ---
 name: run-tessera
-description: Use when asked to launch, start, restart or stop Tessera locally, or to check whether the backend and frontend are actually serving — covers the port-8000 and orphaned-worker traps that make a "running" server serve stale code.
+description: Use when asked to launch, start, restart or stop Tessera locally, or to check whether the backend and frontend are actually serving — covers the port-8100 and orphaned-worker traps that make a "running" server serve stale code.
 ---
 
 # Lancer Tessera en local
 
 ## Avant tout : vérifier ce qui tourne déjà
 
+Le backend de Tessera écoute sur **8100**, pas sur 8000 : 8000 est le défaut
+d'uvicorn et d'autres applications locales l'occupent. Un service trouvé sur
+8000 n'est donc pas Tessera, et ne se tue pas.
+
 Ne jamais lancer sans vérifier. Un backend qui répond ne prouve pas qu'il sert
 le code courant.
 
 ```bash
-curl -s -m 5 http://127.0.0.1:8000/health
+curl -s -m 5 http://127.0.0.1:8100/health
 curl -s -m 5 -o /dev/null -w "%{http_code}\n" http://localhost:5173/
 ```
 
@@ -23,7 +27,7 @@ conclure** — voir le piège du worker orphelin plus bas.
 Depuis la racine du dépôt, jamais depuis `backend/` :
 
 ```powershell
-.\scripts\tessera.ps1 run       # Windows : backend (8000) + frontend (5173)
+.\scripts\tessera.ps1 run       # Windows : backend (8100) + frontend (5173)
 .\scripts\tessera.ps1 stop      # arrête tout, worker orphelin compris
 ```
 
@@ -42,8 +46,8 @@ ce que `tessera.ps1 run` remplace. Ne pas relancer les deux serveurs à la main.
 cassé. Vérifier au moins un projet réel :
 
 ```bash
-curl -s http://127.0.0.1:8000/api/v1/projects | head -c 200
-curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/api/v1/projects/ide-core/tickets
+curl -s http://127.0.0.1:8100/api/v1/projects | head -c 200
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8100/api/v1/projects/ide-core/tickets
 ```
 
 Un `500` ici avec un `/health` vert signale presque toujours un fichier de
@@ -53,12 +57,12 @@ worker orphelin.
 ## Piège : le worker `--reload` orphelin
 
 `uvicorn --reload` lance un process parent **et** un worker enfant. Tuer le
-parent laisse l'enfant vivant : il garde le port 8000 et continue de servir le
+parent laisse l'enfant vivant : il garde le port 8100 et continue de servir le
 code tel qu'il était à son dernier rechargement — souvent un état incohérent,
 qui produit des 500 inexplicables et survit à tous les redémarrages
 (`[Errno 10048] ... bind`).
 
-Le symptôme : `Get-NetTCPConnection -LocalPort 8000` donne un PID que
+Le symptôme : `Get-NetTCPConnection -LocalPort 8100` donne un PID que
 `Get-Process` ne trouve pas.
 
 ```bash
@@ -84,7 +88,7 @@ précisément ce qui crée ces états incohérents.
 ```
 
 Il arrête les deux serveurs **et** cherche le worker orphelin. Vérifier
-ensuite que le port 8000 est libre — sinon l'identifier comme ci-dessus.
+ensuite que le port 8100 est libre — sinon l'identifier comme ci-dessus.
 
 ## Provider LLM
 

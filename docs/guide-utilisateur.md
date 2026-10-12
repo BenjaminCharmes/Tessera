@@ -80,7 +80,7 @@ make run      # backend + frontend
 Une fois lancé :
 
 - **L'IDE** → <http://localhost:5173>
-- **L'API et sa doc interactive** → <http://localhost:8000/docs>
+- **L'API et sa doc interactive** → <http://localhost:8100/docs>
 
 Pour arrêter : `Ctrl+C`.
 
@@ -988,7 +988,7 @@ L'IDE refuse de lancer si ton arbre contient des fichiers modifiés en dehors du
 
 Vérifie `LLM_PROVIDER`. Seul le mode `agent_sdk` donne les outils fichier au codeur.
 
-### Des `500` inexplicables, et un port 8000 impossible à libérer
+### Des `500` inexplicables, et un port 8100 impossible à libérer
 
 C'est le **worker `uvicorn --reload` orphelin**. Tuer le processus parent laisse
 son enfant vivant : il garde le port et continue de servir le code tel qu'il
