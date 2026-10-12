@@ -1372,3 +1372,123 @@ async def test_le_ticket_dependant_part_de_la_base_realignee_apres_le_merge(
         "depart:ticket-002",
         "depart:ticket-003",
     ]
+
+
+# ------------------------------------------------------------------
+# ticket-406 — réalignement de la base au départ d'un run
+# ------------------------------------------------------------------
+
+
+def _orchestrateur_de_depart(
+    tmp_path: Path, git_ws: Any, base_branch: str | None
+) -> Orchestrator:
+    from unittest.mock import AsyncMock, MagicMock
+
+    return Orchestrator(
+        runner=MagicMock(),
+        ticket_service=AsyncMock(),
+        project_context="ctx",
+        agent_configs=[],
+        pipeline_log_path=tmp_path / "memory" / "log.md",
+        git_workspace=git_ws,
+        base_branch=base_branch,
+    )
+
+
+def _espace_git_double(ordre: list[str], branche_courante: str = "develop") -> Any:
+    from unittest.mock import AsyncMock
+
+    git_ws = AsyncMock()
+    git_ws.branche_courante.return_value = branche_courante
+    git_ws.initialiser_base_ref.return_value = None
+
+    async def _sync(base: str) -> None:
+        ordre.append(f"sync:{base}")
+
+    async def _creer(ticket_id: str, slug: str) -> str:
+        ordre.append("create_branch")
+        return f"{ticket_id}-slug"
+
+    git_ws.sync_base_depuis_distant.side_effect = _sync
+    git_ws.create_branch.side_effect = _creer
+    return git_ws
+
+
+def _run_de_depart() -> Any:
+    from tessera.services.pipeline_run import PipelineRun
+
+    async def _on_event(event: OrchestratorEvent) -> None:
+        pass
+
+    ticket = Ticket(
+        id="ticket-001", title="t", type=TicketType.feat,
+        status=TicketStatus.todo, priority=TicketPriority.medium,
+        agent="codeur", body="b",
+    )
+    return PipelineRun(project_id="proj", ticket=ticket, on_event=_on_event)
+
+
+async def test_la_base_est_realignee_avant_la_creation_de_la_branche(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_stages as stages
+
+    ordre: list[str] = []
+    git_ws = _espace_git_double(ordre)
+    orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
+
+    refused = await stages.create_branch(orch, _run_de_depart())
+
+    assert refused is None
+    assert ordre == ["sync:develop", "create_branch"]
+
+
+async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_stages as stages
+
+    ordre: list[str] = []
+    git_ws = _espace_git_double(ordre)
+    git_ws.sync_base_depuis_distant.side_effect = None
+    git_ws.sync_base_depuis_distant.return_value = "fetch origin develop échoué"
+    orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
+    run = _run_de_depart()
+
+    refused = await stages.create_branch(orch, run)
+
+    assert refused is None
+    assert run.branch == "ticket-001-slug"
+    journal = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
+    assert "base non réalignée — fetch origin develop échoué" in journal
+
+
+async def test_aucun_realignement_sans_espace_git_ni_branche_de_base(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_stages as stages
+
+    ordre: list[str] = []
+    git_ws = _espace_git_double(ordre)
+    sans_base = _orchestrateur_de_depart(tmp_path, git_ws, None)
+
+    assert await stages.create_branch(sans_base, _run_de_depart()) is None
+    git_ws.sync_base_depuis_distant.assert_not_called()
+
+    sans_espace = _orchestrateur_de_depart(tmp_path, None, "develop")
+    assert await stages.create_branch(sans_espace, _run_de_depart()) is None
+
+
+async def test_aucun_realignement_quand_l_arbre_n_est_pas_sur_la_base(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_stages as stages
+
+    ordre: list[str] = []
+    git_ws = _espace_git_double(ordre, branche_courante="ticket-000-ancien")
+    orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
+
+    assert await stages.create_branch(orch, _run_de_depart()) is None
+
+    git_ws.sync_base_depuis_distant.assert_not_called()
+    assert ordre == ["create_branch"]

@@ -140,6 +140,29 @@ def _reecrire_journal(racine: Optional[Path], lignes: list[str]) -> None:
         _logger.warning("pending_log_rewrite_failed", extra={"error": str(exc)})
 
 
+async def _realigner_base_au_depart(orch: "Orchestrator") -> Optional[str]:
+    """Fast-forward the local base onto the remote before forking (ticket-406).
+
+    The last ticket of a queue is merged by the CIWatcher after the run is
+    over, so nobody realigns the base behind it: the next run would fork from
+    a base that lags the remote. Does nothing unless a git workspace and a base
+    branch are known and the tree is on that base. Returns the refusal reason,
+    or ``None`` when the base was realigned or nothing was attempted — a
+    refusal never stops the run.
+    """
+    # getattr : les doubles d'orchestrateur des tests d'étape n'ont pas de base.
+    base: Optional[str] = getattr(orch, "_base_branch", None)
+    if orch._git_workspace is None or base is None:
+        return None
+    try:
+        if not await orch._sur_la_base():
+            return None
+        return await orch._git_workspace.sync_base_depuis_distant(base)
+    except GitWorkspaceError as exc:
+        _logger.warning("realignement_debut_de_run_echoue", extra={"error": str(exc)})
+        return str(exc)
+
+
 async def _basculer(
     orch: "Orchestrator",
     run: PipelineRun,
@@ -147,6 +170,10 @@ async def _basculer(
     lignes: list[str],
 ) -> Optional[PipelineResult]:
     assert orch._git_workspace is not None
+
+    # Avant tout commit de tenue de livres : le journal est déjà mis de côté,
+    # l'arbre est donc propre pour l'avance rapide de la base (ticket-406).
+    raison_base = await _realigner_base_au_depart(orch)
 
     # Commit pending bookkeeping before the branch switch.  Failures here
     # are logged but not fatal: the following branch creation attempt may
@@ -185,6 +212,10 @@ async def _basculer(
         _reecrire_journal(racine, lignes)
         await emit(run, EventType.BRANCH_CREATED, branch=run.branch)
         orch._log(f"[{run.ticket_id}] branche {run.branch}")
+        # Journalisé ici et non plus tôt : une ligne écrite avant le commit de
+        # tenue de livres partirait en commit sur la base locale.
+        if raison_base is not None:
+            orch._log(f"[{run.ticket_id}] base non réalignée — {raison_base}")
     except NotAGitRepository:
         # Un projet sans dépôt git reste utilisable : on continue sans
         # garde-fou de branche plutôt que d'interrompre le pipeline.
