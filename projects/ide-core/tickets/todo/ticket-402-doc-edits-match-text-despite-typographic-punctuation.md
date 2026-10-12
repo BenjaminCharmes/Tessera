@@ -1,14 +1,15 @@
 ---
-id: ticket-402
-title: "Doc edits find their anchor text despite typographic punctuation and non-breaking spaces"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-12
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-12
+id: ticket-402
+pr_number: null
+priority: medium
+status: todo
+title: Doc edits find their anchor text despite typographic punctuation and non-breaking
+  spaces
+type: fix
 ---
 
 # ticket-402 — Les éditions de doc retrouvent leur texte malgré la typographie

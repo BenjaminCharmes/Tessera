@@ -154,19 +154,8 @@ def _remplacer(avant: str, edition: dict[str, object], chemin: str) -> str:
     if not ancien:
         raise EditionRefusee(f"{chemin} : modification sans texte à remplacer.")
 
-    occurrences = avant.count(ancien)
-    if occurrences == 0:
-        raise EditionRefusee(
-            f"{chemin} : texte introuvable — « {ancien[:60]} ». "
-            "L'agent a proposé une modification sur un texte qui n'existe pas."
-        )
-    if occurrences > 1:
-        raise EditionRefusee(
-            f"{chemin} : texte présent {occurrences} fois — on ne devine pas "
-            "laquelle remplacer."
-        )
-
-    apres = avant.replace(ancien, nouveau, 1)
+    debut, fin = _localiser(avant, ancien, chemin)
+    apres = avant[:debut] + nouveau + avant[fin:]
     if len(apres) < len(avant) * _PART_MINIMALE:
         raise EditionRefusee(
             f"{chemin} : le fichier serait amputé de plus de la moitié "

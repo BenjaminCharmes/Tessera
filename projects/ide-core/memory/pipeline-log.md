@@ -2309,3 +2309,5 @@ Aucune vulné (52469ms)
 - 2026-10-12 09:27:55 UTC — [ticket-399] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la vue Projets c (337547ms)
 - 2026-10-12 09:27:55 UTC — [ticket-399] APPROVED après 1 tour(s)
 - 2026-10-12 09:30:01 UTC — [ticket-399] documentation: 1 fichier(s) (123280ms)
+- 2026-10-12 10:16:55 UTC — [ticket-402] branche ticket-402-doc-edits-find-their-anchor-text-despite-typograp
+- 2026-10-12 10:16:55 UTC — [ticket-402] tour 1 — codeur démarré
