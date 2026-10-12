@@ -163,6 +163,66 @@ lit le code et rédige le `CLAUDE.md` à ta place. Relis-le — c'est le documen
 
 ---
 
+
+## 2 bis. Naviguer entre les projets
+
+La barre latérale te permet de voir rapidement tes projets, rangés par catégorie. Quand tu as beaucoup de projets, tu peux les explorer autrement : en cliquant sur l'onglet **Projets** en haut de la zone centrale, tu obtiens une vue en cartes.
+
+### Afficher la liste des projets
+
+Tu vois trois onglets en haut de la zone centrale : **Kanban**, **Projets** et éventuellement **Chat**. Clique sur **Projets** pour voir la grille de cartes.
+
+### Chercher un projet
+
+Un champ de recherche te permet de taper le nom d'un projet, son identifiant ou sa description — sans tenir compte de la casse ni des accents. Par exemple, taper « deminéür » filtre sur le projet `demineur`.
+
+### Filtrer par catégorie
+
+Des pastilles colorées au-dessous du champ affichent tes catégories. Clique sur une pastille pour garder seulement ses projets ; clique sur « Toutes » pour revenir à la liste complète. Chaque pastille affiche le nombre de projets de sa catégorie.
+
+### Trier les projets
+
+Un menu te propose plusieurs ordres :
+- **Nom** : alphabétique
+- **Activité récente** : les projets modifiés en dernier d'abord
+- **Création récente** : les plus jeunes d'abord
+
+### Lire une carte de projet
+
+Chaque carte affiche :
+- L'**icône** du projet (ou l'initiale si pas d'icône)
+- Le **nom**, l'**identifiant** et la **catégorie**
+- La **description**, limitée à 3 lignes
+- Le **lien du dépôt** : clique dessus pour l'ouvrir dans un nouvel onglet, sans quitter l'IDE
+- Les **dates** : création et dernière activité, en relatif (« il y a 2 j ») avec la date exacte en info-bulle
+- Les **compteurs** : nombre de tickets à faire, en cours, bloqués et faits
+- Un **point animé** si un run tourne sur ce projet
+
+Le projet actuellement actif est marqué d'une barre violette sur la gauche.
+
+### Sélectionner un projet
+
+Clique sur une carte pour la sélectionner. La zone centrale passe au Kanban de ce projet, comme si tu l'avais choisi dans la barre latérale.
+
+### Changer la catégorie d'un projet
+
+Chaque carte a un menu accessible (trois points verticaux). Clique dessus pour :
+- Choisir une catégorie existante
+- Taper une nouvelle catégorie
+- Retirer la catégorie
+
+La liste se recharge, et la barre latérale s'actualise.
+
+### États de la vue
+
+- **Chargement** : tu vois des cartes-squelettes gris clair
+- **Erreur** : un message avec un bouton « Réessayer »
+- **Aucun résultat** : un message et un bouton « Effacer la recherche »
+
+### Les filtres survivent au changement d'onglet
+
+Si tu cherches « api » et que tu tris par activité récente, puis que tu reviens à l'onglet Kanban et au Projets, tu retrouves les mêmes réglages.
+
 ## 3. Écrire des tickets
 
 Un ticket est un **fichier Markdown**. Pas de base de données propriétaire : tu peux

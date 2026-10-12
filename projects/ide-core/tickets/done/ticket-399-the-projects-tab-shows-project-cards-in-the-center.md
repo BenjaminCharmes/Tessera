@@ -1,14 +1,16 @@
 ---
-id: ticket-399
-title: "The Projects tab shows every project as a card in the center view, with search, category filter and sorting"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-398"]
-estimated_days: 1.5
 created: 2026-10-12
+depends_on:
+- ticket-398
+estimated_days: 1.5
+id: ticket-399
+pr_number: 373
+priority: high
+status: done
+title: The Projects tab shows every project as a card in the center view, with search,
+  category filter and sorting
+type: feat
 ---
 
 # ticket-399 — L'onglet Projets montre une carte par projet

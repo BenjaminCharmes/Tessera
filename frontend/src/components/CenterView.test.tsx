@@ -30,6 +30,9 @@ vi.mock("./RunView", () => ({
 vi.mock("./KanbanView", () => ({
   default: () => <div data-testid="kanban-view">KanbanView</div>,
 }));
+vi.mock("./ProjetsView", () => ({
+  default: () => <div data-testid="projets-view">ProjetsView</div>,
+}));
 
 const STATUTS: TicketStatus[] = [
   "todo",
@@ -62,6 +65,7 @@ const baseProps = {
   openFilePath: null,
   statsDays: 7 as const,
   statsProjectId: null,
+  onSelectProject: vi.fn(),
   onSelectTicket: vi.fn(),
   onRunPipeline: vi.fn(),
   onChangeStatus: vi.fn(),
@@ -115,6 +119,12 @@ describe("CenterView", () => {
       />,
     );
     expect(await screen.findByTestId("diff-view")).toBeInTheDocument();
+  });
+
+  it("renders ProjetsView when panel is projects", () => {
+    render(<CenterView {...baseProps} panel="projects" vueCentre="kanban" />);
+    expect(screen.getByTestId("projets-view")).toBeInTheDocument();
+    expect(screen.queryByTestId("kanban-view")).not.toBeInTheDocument();
   });
 
   it("displays the lazy StatsView when panel is usage", async () => {
