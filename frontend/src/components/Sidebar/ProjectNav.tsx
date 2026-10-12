@@ -1,14 +1,16 @@
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
-import { IconDownload, IconProject } from "../../design/icons";
+import { IconDownload } from "../../design/icons";
 import { useState } from "react";
+import { useCategoriesRepliees } from "../../hooks/useCategoriesRepliees";
 import { useProjects } from "../../hooks/useProjects";
 import type { Project } from "../../types/api";
 import CreateProjectModal from "./CreateProjectModal";
+import EnTeteDeCategorie from "./EnTeteDeCategorie";
 import { grouperParCategorie } from "./grouperParCategorie";
 import ImportProjectModal from "./ImportProjectModal";
+import LigneDeProjet from "./LigneDeProjet";
 import SkeletonList from "../SkeletonList";
-import { lienDuDepot } from "../../lib/lienDuDepot";
 
 interface ProjectNavProps {
   /** Les projets dont un run attend une réponse (ticket-186). */
@@ -25,6 +27,7 @@ export default function ProjectNav({
   enAttente,
 }: ProjectNavProps) {
   const { projects, loading, error, refresh } = useProjects();
+  const { estRepliee, basculer } = useCategoriesRepliees();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
 
@@ -88,48 +91,33 @@ export default function ProjectNav({
             </button>
           </div>
         )}
-        {/* Le lien GitHub est un voisin du bouton, pas son enfant : un `<a>`
-            dans un `<button>` est du HTML invalide, et deux cibles imbriquées
-            se disputent le clic et le focus (ticket-123). */}
-        {grouperParCategorie(projects).map((groupe) => (
-          <div key={groupe.categorie ?? "__sans__"}>
-            {/* Un intitulé de groupe est un titre de région : ADR-026 lui donne
-                le neutre, et réserve le violet à l'identité. */}
-            <p className="px-3 pb-1 pt-3 text-micro uppercase tracking-wide text-zinc-600">
-              {groupe.categorie ?? "Sans catégorie"}
-            </p>
-            {groupe.projets.map((project) => (
-              <div
-                key={project.id}
-                className={`flex items-center transition-colors ${
-                  activeProject?.id === project.id
-                    ? "bg-zinc-700 text-white"
-                    : "hover:bg-zinc-800 text-zinc-300"
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => onSelectProject(project)}
-                  className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left"
-                >
-                  <IconProject size={12} className="shrink-0 text-zinc-500" />
-                  <span className="truncate flex-1">{project.name}</span>
-                  {/* Ambre : une attente, au sens d'ADR-026. Visible depuis
-                      n'importe quel onglet, ce que ni le panneau ni la carte
-                      de Supervision ne permettaient (ticket-186). */}
-                  {enAttente?.has(project.id) && (
-                    <span
-                      className="size-1.5 shrink-0 rounded-full bg-amber-400"
-                      title="Un agent attend une réponse"
-                      aria-label="Un agent attend une réponse"
-                    />
-                  )}
-                </button>
-                <LienDuDepot project={project} />
-              </div>
-            ))}
-          </div>
-        ))}
+        {grouperParCategorie(projects).map((groupe) => {
+          const repliee = estRepliee(groupe.categorie);
+          // Le projet actif reste affiché sous un titre replié : on ne perd
+          // jamais de vue où l'on travaille (ticket-400).
+          const visibles = repliee
+            ? groupe.projets.filter((p) => p.id === activeProject?.id)
+            : groupe.projets;
+          return (
+            <div key={groupe.categorie ?? "__sans__"}>
+              <EnTeteDeCategorie
+                categorie={groupe.categorie}
+                projets={groupe.projets}
+                repliee={repliee}
+                onBasculer={() => basculer(groupe.categorie)}
+              />
+              {visibles.map((project) => (
+                <LigneDeProjet
+                  key={project.id}
+                  project={project}
+                  active={activeProject?.id === project.id}
+                  enAttente={enAttente?.has(project.id) ?? false}
+                  onSelect={() => onSelectProject(project)}
+                />
+              ))}
+            </div>
+          );
+        })}
       </div>
       {showCreateModal && (
         <CreateProjectModal
@@ -144,29 +132,5 @@ export default function ProjectNav({
         />
       )}
     </>
-  );
-}
-
-/**
- * Le raccourci vers le dépôt d'un projet, quand il en a un d'ouvrable.
- *
- * `github_remote` vaut `owner/repo` : posée telle quelle en `href`, elle se
- * résolvait contre l'origine de l'app et le lien menait à une page de l'IDE
- * (ticket-184).
- */
-function LienDuDepot({ project }: { project: Project }) {
-  const lien = lienDuDepot(project.github_remote);
-  if (!lien) return null;
-  return (
-    <a
-      href={lien}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="shrink-0 px-3 py-2 text-xs leading-none text-zinc-500 transition-colors hover:text-zinc-200"
-      title={lien}
-      aria-label={`Ouvrir le repo GitHub de ${project.name}`}
-    >
-      GH
-    </a>
   );
 }
