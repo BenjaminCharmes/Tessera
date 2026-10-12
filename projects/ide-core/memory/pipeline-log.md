@@ -2323,3 +2323,17 @@ Le diff refactorise  (32359ms)
 - 2026-10-12 10:29:58 UTC — [ticket-402] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente une logique d (225890ms)
 - 2026-10-12 10:29:58 UTC — [ticket-402] APPROVED après 1 tour(s)
 - 2026-10-12 10:32:40 UTC — [ticket-402] documentation: 1 fichier(s) (159717ms)
+- 2026-10-12 10:32:54 UTC — [ide-core] ticket-402 PR #376 confiée au CIWatcher
+- 2026-10-12 13:49:13 UTC — [ticket-405] branche ticket-405-delivery-phase-2-survives-a-slow-github-late-ci-c
+- 2026-10-12 13:49:13 UTC — [ticket-405] tour 1 — codeur démarré
+- 2026-10-12 13:53:02 UTC — [ticket-405] tour 1 — codeur terminé (228188ms)
+- 2026-10-12 13:59:46 UTC — [ticket-405] testeur: 1 failed, 985 passed, 20 warnings in 400.07s (0:06:40)
+- 2026-10-12 13:59:46 UTC — [ticket-405] tests rouges au tour 1
+- 2026-10-12 13:59:46 UTC — [ticket-405] tour 2 — codeur démarré
+- 2026-10-12 14:00:18 UTC — [ticket-405] tour 2 — codeur terminé (32328ms)
+- 2026-10-12 14:05:38 UTC — [ticket-405] testeur: OK (exit 0)
+- 2026-10-12 14:06:24 UTC — [ticket-405] securite: PASS — Audit complet du diff ticket-405 (gestion des erreurs réseau en livraison, délai (46217ms)
+- 2026-10-12 14:06:24 UTC — [ticket-405] tour 2 — reviewer démarré
+- 2026-10-12 14:06:57 UTC — [ticket-405] tour 2 — reviewer terminé (32952ms)
+- 2026-10-12 14:06:59 UTC — [ticket-405] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit quatre tests nouveaux qui c (35031ms)
+- 2026-10-12 14:06:59 UTC — [ticket-405] APPROVED après 2 tour(s)
