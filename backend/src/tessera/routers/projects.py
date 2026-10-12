@@ -1,7 +1,9 @@
+import asyncio
 import re
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from tessera.config import settings
@@ -56,6 +58,7 @@ from tessera.services.git_link import (
 )
 from tessera.services.cost_calculator import modeles_connus
 from tessera.services.politique_run import PolitiqueRun
+from tessera.services.project_overview import ProjectOverview, build_overview, find_icon
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.models.agent import FallbackConfig
 from tessera.routers.dependencies import require_valid_project_id
@@ -100,6 +103,32 @@ def _ticket_svc(project_id: str) -> TicketService:
 @router.get("", response_model=list[Project])
 async def list_projects() -> list[Project]:
     return await _loader().list_projects()
+
+
+# `/overview` doit rester avant toute route `/{project_id}` : sinon « overview »
+# serait lu comme un identifiant de projet (ticket-398).
+@router.get("/overview", response_model=list[ProjectOverview])
+async def get_projects_overview() -> list[ProjectOverview]:
+    """Tout ce qu'affiche une carte de projet, en une seule requête."""
+    projets = await _loader().list_projects()
+    return list(
+        await asyncio.gather(
+            *(
+                build_overview(p, run_actif=RUN_REGISTRY.projet_occupe(p.id))
+                for p in projets
+            )
+        )
+    )
+
+
+@router.get("/{project_id}/icon")
+async def get_project_icon(project_id: str) -> FileResponse:
+    """L'icône d'app du projet, parmi des chemins fixes ; 404 sans icône."""
+    trouvee = find_icon(_require_project_path(project_id))
+    if trouvee is None:
+        raise HTTPException(status_code=404, detail="Ce projet n'a pas d'icône.")
+    chemin, media_type = trouvee
+    return FileResponse(chemin, media_type=media_type)
 
 
 @router.post("", response_model=ProjectCreationResult, status_code=201)
@@ -591,6 +620,8 @@ class PipelineReglagesPatch(BaseModel):
     validateur_enabled: bool | None = None
     autonomy: str | None = None
     merge_without_ci: bool | None = None
+    #: Écrite à la racine du manifeste ; vide (ou `null`), elle est retirée.
+    category: str | None = None
 
 
 _NIVEAUX = ("commit", "pr", "merge")
@@ -634,6 +665,8 @@ async def set_pipeline_settings_route(
             "modifie-les une fois le run terminé.",
         )
     recus = body.model_dump(exclude_unset=True)
+    categorie_recue = "category" in recus
+    categorie = (recus.pop("category", None) or "").strip()
     actuel = _reglages(project_path)
     fusion = actuel.model_copy(update=recus)
     if fusion.autonomy not in _NIVEAUX:
@@ -652,8 +685,15 @@ async def set_pipeline_settings_route(
         )
     pipeline = {k: v for k, v in recus.items() if k not in ("autonomy", "merge_without_ci")}
     racine = {k: v for k, v in recus.items() if k in ("autonomy", "merge_without_ci")}
+    retirer: tuple[str, ...] = ()
+    if categorie_recue and categorie:
+        racine["category"] = categorie
+    elif categorie_recue:
+        retirer = ("category",)
     try:
-        set_pipeline_settings(project_path, pipeline=pipeline, racine=racine)
+        set_pipeline_settings(
+            project_path, pipeline=pipeline, racine=racine, retirer=retirer
+        )
     except AgentAbsentDuProjet as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return _reglages(project_path)
