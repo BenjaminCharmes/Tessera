@@ -5,7 +5,7 @@ depends_on:
 - ticket-398
 estimated_days: 1.5
 id: ticket-399
-pr_number: null
+pr_number: 373
 priority: high
 status: done
 title: The Projects tab shows every project as a card in the center view, with search,
