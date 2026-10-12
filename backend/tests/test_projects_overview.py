@@ -222,3 +222,50 @@ def test_overview_flags_an_active_run(
 
     assert body["alpha"]["run_actif"] is True
     assert body["beta"]["run_actif"] is False
+
+
+def test_tessera_icon_wins_and_next_and_root_favicons_are_found(plain_workspace: Path) -> None:
+    """Ticket-404: `.tessera/icon.svg` (projects without a web app) comes first;
+    a Next.js `src/app/icon.svg`, a root `favicon.svg` (static games) and a
+    `frontend/public/logo.svg` are found too."""
+    from tessera.services.project_overview import find_icon
+
+    svg = "<svg xmlns='http://www.w3.org/2000/svg'/>"
+    profil = _project(plain_workspace, "profil")
+    (profil / ".tessera").mkdir()
+    (profil / ".tessera" / "icon.svg").write_text(svg, encoding="utf-8")
+    (profil / "favicon.svg").write_text(svg, encoding="utf-8")
+    site = _project(plain_workspace, "site")
+    (site / "src" / "app").mkdir(parents=True)
+    (site / "src" / "app" / "icon.svg").write_text(svg, encoding="utf-8")
+    jeu = _project(plain_workspace, "jeu")
+    (jeu / "favicon.svg").write_text(svg, encoding="utf-8")
+    app_logo = _project(plain_workspace, "app")
+    (app_logo / "frontend" / "public").mkdir(parents=True)
+    (app_logo / "frontend" / "public" / "logo.svg").write_text(svg, encoding="utf-8")
+
+    trouvees = {p.name: find_icon(p) for p in (profil, site, jeu, app_logo)}
+
+    assert trouvees["profil"][0].relative_to(profil.resolve()).as_posix() == ".tessera/icon.svg"  # type: ignore[index]
+    assert trouvees["site"][0].name == "icon.svg"  # type: ignore[index]
+    assert trouvees["jeu"][0].name == "favicon.svg"  # type: ignore[index]
+    assert trouvees["app"][0].name == "logo.svg"  # type: ignore[index]
+
+
+def test_ancestor_project_uses_the_repository_icon(repo_workspace: Path) -> None:
+    """Ticket-404: a `git_root: ancestor` project (ide-core) shows the icon of
+    the repository that contains it — the IDE's own; a plain project does not."""
+    from tessera.services.project_overview import find_icon
+
+    public = repo_workspace / "frontend" / "public"
+    public.mkdir(parents=True)
+    (public / "favicon.svg").write_text("<svg xmlns='http://www.w3.org/2000/svg'/>", encoding="utf-8")
+    bootstrap = _project(repo_workspace / "projects", "bootstrap")
+    (bootstrap / "agents.json").write_text(json.dumps({"git_root": "ancestor"}), encoding="utf-8")
+    voisin = _project(repo_workspace / "projects", "voisin")
+
+    trouvee = find_icon(bootstrap)
+
+    assert trouvee is not None
+    assert trouvee[0] == (public / "favicon.svg").resolve()
+    assert find_icon(voisin) is None

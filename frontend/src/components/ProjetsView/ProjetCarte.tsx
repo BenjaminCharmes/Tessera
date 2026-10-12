@@ -114,8 +114,10 @@ export default function ProjetCarte({
       aria-current={actif ? "true" : undefined}
       onClick={onSelect}
       onKeyDown={surClavier}
-      className={`flex cursor-pointer flex-col gap-2 rounded-sm border border-zinc-800 border-l-2 bg-zinc-900 p-3 outline-hidden transition-colors hover:bg-zinc-800/60 focus-visible:border-zinc-500 ${
-        actif ? "border-l-violet-500" : "border-l-transparent"
+      className={`flex cursor-pointer flex-col gap-2 rounded-sm border border-zinc-800 bg-zinc-900 p-3 outline-hidden transition-colors hover:bg-zinc-800/60 focus-visible:border-zinc-500 ${
+        // Au repos, la bordure fait le tour de la carte ; le projet actif
+        // seul reçoit la barre violette, plus épaisse (ADR-026 : identité).
+        actif ? "border-l-2 border-l-violet-500" : ""
       }`}
     >
       <div className="flex items-start gap-3">

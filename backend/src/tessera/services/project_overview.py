@@ -8,6 +8,7 @@ aucune commande git.
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,13 +24,24 @@ _logger = get_logger(__name__)
 
 #: Icônes d'app cherchées, dans cet ordre. Des chemins fixes, jamais reçus de
 #: la requête : servir un chemin venu du client ouvrirait tout le disque.
+#: `.tessera/icon.svg` passe en premier : c'est l'icône que Tessera affiche pour
+#: un projet sans interface web (profil, script, bibliothèque), hors de l'app.
 ICON_CANDIDATES: tuple[tuple[str, str], ...] = (
+    (".tessera/icon.svg", "image/svg+xml"),
     ("frontend/public/favicon.svg", "image/svg+xml"),
     ("frontend/public/favicon.png", "image/png"),
     ("frontend/public/icon.svg", "image/svg+xml"),
+    ("frontend/public/logo.svg", "image/svg+xml"),
     ("frontend/public/icons/icon-192.png", "image/png"),
     ("public/favicon.svg", "image/svg+xml"),
     ("public/favicon.png", "image/png"),
+    ("public/icon.svg", "image/svg+xml"),
+    # Convention Next.js (app router) : l'icône vit à côté des pages.
+    ("src/app/icon.svg", "image/svg+xml"),
+    ("src/app/icon.png", "image/png"),
+    # Jeux et pages statiques : un index.html et son favicon à la racine.
+    ("favicon.svg", "image/svg+xml"),
+    ("favicon.png", "image/png"),
 )
 
 _COUNTED = (
@@ -77,17 +89,42 @@ def clear_overview_cache() -> None:
     _cache.clear()
 
 
-def find_icon(project_path: Path) -> tuple[Path, str] | None:
-    """La première icône trouvée, avec son type de contenu, ou `None`.
-
-    Un lien symbolique qui sortirait du dossier du projet est ignoré.
-    """
-    racine = project_path.resolve()
+def _chercher(racine: Path) -> tuple[Path, str] | None:
     for relatif, media_type in ICON_CANDIDATES:
         fichier = (racine / relatif).resolve()
         if fichier.is_file() and fichier.is_relative_to(racine):
             return fichier, media_type
     return None
+
+
+def _racine_ancestrale(project_path: Path) -> Path | None:
+    """Le dépôt qui contient le projet, s'il déclare `git_root: ancestor`.
+
+    Le projet bootstrap (ide-core) vit dans `projects/ide-core/` : son app est
+    l'IDE lui-même, dont l'icône est à la racine du dépôt (ADR-028).
+    """
+    try:
+        manifeste = json.loads((project_path / "agents.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(manifeste, dict) or manifeste.get("git_root") != "ancestor":
+        return None
+    git = _git_dir(project_path)
+    return git.parent.resolve() if git is not None and git.name == ".git" else None
+
+
+def find_icon(project_path: Path) -> tuple[Path, str] | None:
+    """La première icône trouvée, avec son type de contenu, ou `None`.
+
+    Cherchée dans le projet, puis, pour un projet `git_root: ancestor`, à la
+    racine du dépôt qui le contient. Un lien symbolique qui sortirait du
+    dossier fouillé est ignoré.
+    """
+    trouvee = _chercher(project_path.resolve())
+    if trouvee is not None:
+        return trouvee
+    ancetre = _racine_ancestrale(project_path)
+    return _chercher(ancetre) if ancetre is not None else None
 
 
 def _mtime(path: Path) -> int:
