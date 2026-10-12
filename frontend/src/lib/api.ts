@@ -33,6 +33,7 @@ import type {
   MergeResponse,
   OpenPrResponse,
   Project,
+  ProjectOverview,
   ProjectUsage,
   RecentRun,
   RunFromChatResponse,
@@ -96,6 +97,11 @@ async function del(path: string): Promise<void> {
 export const api = {
   projects: {
     list: (): Promise<Project[]> => request("/projects"),
+    /** Tout ce que les cartes de la vue Projets affichent, en une requête (ticket-399). */
+    overview: (): Promise<ProjectOverview[]> => request("/projects/overview"),
+    /** Range un projet dans une catégorie ; une chaîne vide l'en retire (ticket-399). */
+    setCategory: (projectId: string, category: string): Promise<PipelineReglages> =>
+      patch_(`/projects/${projectId}/pipeline`, { category }),
     create: (
       name: string,
       description: string,

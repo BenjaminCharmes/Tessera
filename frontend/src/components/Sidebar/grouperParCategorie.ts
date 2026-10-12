@@ -1,9 +1,12 @@
 import type { Project } from "../../types/api";
 
-export interface GroupeDeProjets {
+/** Tout ce qui porte une catégorie se range : `Project`, ou sa vue d'ensemble (ticket-399). */
+type AvecCategorie = { category?: string | null };
+
+export interface GroupeDeProjets<T extends AvecCategorie = Project> {
   /** `null` : les projets qui ne déclarent rien. */
   categorie: string | null;
-  projets: Project[];
+  projets: T[];
 }
 
 /**
@@ -18,9 +21,11 @@ export interface GroupeDeProjets {
  * projet. Ceux qui ne déclarent rien ferment la marche : le défaut range
  * ailleurs, il ne cache jamais.
  */
-export function grouperParCategorie(projects: Project[]): GroupeDeProjets[] {
-  const parCategorie = new Map<string, Project[]>();
-  const sansCategorie: Project[] = [];
+export function grouperParCategorie<T extends AvecCategorie>(
+  projects: T[],
+): GroupeDeProjets<T>[] {
+  const parCategorie = new Map<string, T[]>();
+  const sansCategorie: T[] = [];
 
   for (const projet of projects) {
     const categorie = projet.category?.trim();
@@ -33,7 +38,7 @@ export function grouperParCategorie(projects: Project[]): GroupeDeProjets[] {
     else parCategorie.set(categorie, [projet]);
   }
 
-  const groupes: GroupeDeProjets[] = [...parCategorie.entries()]
+  const groupes: GroupeDeProjets<T>[] = [...parCategorie.entries()]
     .sort(([a], [b]) => a.localeCompare(b, "fr"))
     .map(([categorie, projets]) => ({ categorie, projets }));
 

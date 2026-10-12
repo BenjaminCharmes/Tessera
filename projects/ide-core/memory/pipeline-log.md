@@ -2235,3 +2235,91 @@ Ce diff effectue un refactor (37061ms)
 - 2026-10-10 19:14:24 UTC — [ticket-394] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (154593ms)
 - 2026-10-10 19:14:24 UTC — [ticket-394] APPROVED après 1 tour(s)
 - 2026-10-10 19:16:52 UTC — [ticket-394] documentation: 2 fichier(s) (146155ms)
+- 2026-10-12 08:19:12 UTC — [ticket-401] branche ticket-401-a-chained-test-command-reports-the-step-that-fail
+- 2026-10-12 08:19:13 UTC — [ticket-401] tour 1 — codeur démarré
+- 2026-10-12 08:21:19 UTC — [ticket-401] tour 1 — codeur terminé (126375ms)
+- 2026-10-12 08:26:21 UTC — [ticket-401] testeur: OK (exit 0)
+- 2026-10-12 08:27:06 UTC — [ticket-401] securite: PASS — The diff introduces a refactoring of test output parsing to better handle chaine (44344ms)
+- 2026-10-12 08:27:06 UTC — [ticket-401] tour 1 — reviewer démarré
+- 2026-10-12 08:27:29 UTC — [ticket-401] tour 1 — reviewer terminé (23202ms)
+- 2026-10-12 08:27:38 UTC — [ticket-401] validateur: APPROVED — Les quatre critères d'acceptation sont pleinement satisfaits. Le code ajoute la  (32594ms)
+- 2026-10-12 08:27:38 UTC — [ticket-401] APPROVED après 1 tour(s)
+- 2026-10-12 08:31:01 UTC — [ticket-401] documentation: 1 fichier(s) (198938ms)
+- 2026-10-12 08:31:19 UTC — [ide-core] ticket-401 PR #371 confiée au CIWatcher
+- 2026-10-12 08:31:21 UTC — [ticket-398] branche ticket-398-a-project-overview-endpoint-serves-everything-the
+- 2026-10-12 08:31:22 UTC — [ticket-398] tour 1 — codeur démarré
+- 2026-10-12 08:36:23 UTC — [ticket-398] tour 1 — codeur terminé (301078ms)
+- 2026-10-12 08:40:34 UTC — [ticket-398] testeur: 1 failed, 918 passed, 20 warnings in 248.62s (0:04:08)
+- 2026-10-12 08:40:34 UTC — [ticket-398] tests rouges au tour 1
+- 2026-10-12 08:40:35 UTC — [ticket-398] tour 2 — codeur démarré
+- 2026-10-12 08:41:08 UTC — [ticket-398] tour 2 — codeur terminé (33280ms)
+- 2026-10-12 08:54:05 UTC — [ticket-398] INTERROMPU au tour 2 (redémarrage du PC vers 08:45 UTC) — repris à la main, fiche en todo
+- 2026-10-12 08:55:11 UTC — [ticket-398] branche ticket-398-a-project-overview-endpoint-serves-everything-the
+- 2026-10-12 08:55:12 UTC — [ticket-398] tour 1 — codeur démarré
+- 2026-10-12 08:56:50 UTC — [ticket-398] tour 1 — codeur terminé (98734ms)
+- 2026-10-12 09:01:50 UTC — [ticket-398] testeur: OK (exit 0)
+- 2026-10-12 09:02:42 UTC — [ticket-398] securite: PASS — Audit de sécurité du diff ticket-398 (overview, icône, catégorie).
+
+Aucune vulné (52469ms)
+- 2026-10-12 09:02:42 UTC — [ticket-398] tour 1 — reviewer démarré
+- 2026-10-12 09:03:13 UTC — [ticket-398] tour 1 — reviewer terminé (30453ms)
+- 2026-10-12 09:03:53 UTC — [ticket-398] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute un endpoint `/api/v1/projects/ (71280ms)
+- 2026-10-12 09:03:53 UTC — [ticket-398] APPROVED après 1 tour(s)
+- 2026-10-12 09:06:54 UTC — [ticket-398] documentation: 2 fichier(s) (178437ms)
+- 2026-10-12 09:34:46 UTC — [ide-core] ticket-399 PR #373 confiée au CIWatcher
+- 2026-10-12 09:34:48 UTC — [ticket-400] branche ticket-400-project-categories-collapse-in-the-sidebar-and-th
+- 2026-10-12 09:34:49 UTC — [ticket-400] tour 1 — codeur démarré
+- 2026-10-12 09:36:54 UTC — [ticket-400] tour 1 — codeur terminé (124952ms)
+- 2026-10-12 09:40:33 UTC — [ticket-400] testeur: ✖ 1 problem (1 error, 0 warnings)
+- 2026-10-12 09:40:33 UTC — [ticket-400] tests rouges au tour 1
+- 2026-10-12 09:40:33 UTC — [ticket-400] tour 2 — codeur démarré
+- 2026-10-12 09:41:21 UTC — [ticket-400] tour 2 — codeur terminé (47938ms)
+- 2026-10-12 09:46:01 UTC — [ticket-400] testeur: OK (exit 0)
+- 2026-10-12 09:46:39 UTC — [ticket-400] securite: PASS — Aucune vulnérabilité introduite. Ce diff refactorise la navigation des projets e (37954ms)
+- 2026-10-12 09:46:39 UTC — [ticket-400] tour 2 — reviewer démarré
+- 2026-10-12 09:47:02 UTC — [ticket-400] tour 2 — reviewer terminé (22891ms)
+- 2026-10-12 09:48:12 UTC — [ticket-400] validateur: CHANGES_REQUESTED — Les critères 1–4 sont satisfaits : le diff crée ProjectNav.test.tsx avec tous le (92563ms)
+- 2026-10-12 09:48:12 UTC — [ticket-400] CHANGES_REQUESTED tour 2: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **Le critère 5 et le point 5 de la solution
+- 2026-10-12 09:48:12 UTC — [ticket-400] tour 3 — codeur démarré
+- 2026-10-12 09:54:06 UTC — [ticket-400] tour 3 — codeur terminé (353422ms)
+- 2026-10-12 09:59:46 UTC — [ticket-400] testeur: OK (exit 0)
+- 2026-10-12 10:00:14 UTC — [ticket-400] securite: PASS — Audit de sécurité réussi. Le code ajouté par ce ticket (refactorisation UI de la (28609ms)
+- 2026-10-12 10:00:14 UTC — [ticket-400] tour 3 — reviewer démarré
+- 2026-10-12 10:00:40 UTC — [ticket-400] tour 3 — reviewer terminé (25515ms)
+- 2026-10-12 10:06:00 UTC — [ticket-400] validateur: CHANGES_REQUESTED — Les critères 1–4 pour `ProjectNav.test.tsx` sont satisfaits : le diff crée le fi (345625ms)
+- 2026-10-12 10:06:00 UTC — [ticket-400] CHANGES_REQUESTED tour 3: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **Le critère 5 n'est toujours pas rempli, e
+- 2026-10-12 10:06:00 UTC — [ticket-400] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-12 10:06:12 UTC — [ide-core] file interrompue : ticket-400 non approuvé
+- 2026-10-12 09:10:25 UTC — [ide-core] ticket-398 PR #372 confiée au CIWatcher
+- 2026-10-12 09:10:27 UTC — [ticket-399] branche ticket-399-the-projects-tab-shows-every-project-as-a-card-in
+- 2026-10-12 09:10:27 UTC — [ticket-399] tour 1 — codeur démarré
+- 2026-10-12 09:16:31 UTC — [ticket-399] tour 1 — codeur terminé (364187ms)
+- 2026-10-12 09:21:39 UTC — [ticket-399] testeur: OK (exit 0)
+- 2026-10-12 09:22:17 UTC — [ticket-399] securite: PASS — Le diff ajoute une nouvelle vue Projets avec recherche, filtrage et gestion de c (38094ms)
+- 2026-10-12 09:22:17 UTC — [ticket-399] tour 1 — reviewer démarré
+- 2026-10-12 09:22:52 UTC — [ticket-399] tour 1 — reviewer terminé (34891ms)
+- 2026-10-12 09:27:55 UTC — [ticket-399] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la vue Projets c (337547ms)
+- 2026-10-12 09:27:55 UTC — [ticket-399] APPROVED après 1 tour(s)
+- 2026-10-12 09:30:01 UTC — [ticket-399] documentation: 1 fichier(s) (123280ms)
+- 2026-10-12 10:16:55 UTC — [ticket-402] branche ticket-402-doc-edits-find-their-anchor-text-despite-typograp
+- 2026-10-12 10:16:55 UTC — [ticket-402] tour 1 — codeur démarré
+- 2026-10-12 10:18:57 UTC — [ticket-402] branche ticket-402-doc-edits-find-their-anchor-text-despite-typograp
+- 2026-10-12 10:18:57 UTC — [ticket-402] tour 1 — codeur démarré
+- 2026-10-12 10:20:21 UTC — [ticket-402] tour 1 — codeur terminé (84422ms)
+- 2026-10-12 10:25:39 UTC — [ticket-402] testeur: OK (exit 0)
+- 2026-10-12 10:26:12 UTC — [ticket-402] securite: PASS — Audit de sécurité du diff : aucune vulnérabilité détectée.
+
+Le diff refactorise  (32359ms)
+- 2026-10-12 10:26:12 UTC — [ticket-402] tour 1 — reviewer démarré
+- 2026-10-12 10:26:31 UTC — [ticket-402] tour 1 — reviewer terminé (19390ms)
+- 2026-10-12 10:29:58 UTC — [ticket-402] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente une logique d (225890ms)
+- 2026-10-12 10:29:58 UTC — [ticket-402] APPROVED après 1 tour(s)
+- 2026-10-12 10:32:40 UTC — [ticket-402] documentation: 1 fichier(s) (159717ms)

@@ -653,18 +653,23 @@ class Orchestrator:
                         # Sans ticket restant, l'attente n'apporte rien.
                         await self._attendre_merge_et_syncer(project_id, ticket_id)
                     else:
-                        stop = await _attendre_si_dependant(
+                        merge = await _attendre_si_dependant(
                             self._ticket_svc,
                             self._ci_watcher,
                             project_id,
                             ticket_id,
                             restants,
                         )
-                        if stop:
+                        if merge is False:
                             self._log(
                                 f"[{project_id}] file interrompue : {ticket_id} non mergé"
                             )
                             break
+                        if merge:
+                            # Le ticket suivant en dépend : il doit partir de la
+                            # base qui contient ce merge, pas de la base locale
+                            # d'avant (ticket-403 — le 400 était parti sans le 399).
+                            await self._realigner_base(project_id, ticket_id)
                         self._log(
                             f"[{project_id}] {ticket_id} PR #{result.livraison.pr_number}"
                             " confiée au CIWatcher"
@@ -884,6 +889,14 @@ class Orchestrator:
         if not merged:
             return
 
+        await self._realigner_base(project_id, ticket_id)
+
+    async def _realigner_base(self, project_id: str, ticket_id: str) -> None:
+        """Fast-forward the local base onto the remote after ``ticket_id`` merged.
+
+        Shared by the merge_without_ci wait (ticket-382) and the dependency
+        wait (ticket-403). A refused sync is logged, never raised.
+        """
         if self._git_workspace is None or self._base_branch is None:
             return
 
@@ -987,22 +1000,22 @@ async def _attendre_si_dependant(
     project_id: str,
     ticket_id: str,
     restants: list[str],
-) -> bool:
+) -> bool | None:
     """Await the CI merge for ``ticket_id`` if a remaining ticket depends on it.
 
     Walks ``restants`` to find the first ticket that declares ``ticket_id``
     in its ``depends_on``. When found, suspends until ``CIWatcher`` signals
     that ``ticket_id`` is no longer in the waiting set (merged or blocked).
 
-    Returns True when the queue must stop (dependency not merged).
-    Returns False when the queue may continue (no dependent, or merge succeeded).
+    Returns None when no remaining ticket depends on it (nothing awaited),
+    True when it merged (the caller realigns the base, ticket-403), and False
+    when it did not (the queue must stop).
     """
     for tid_dep in restants:
         ticket_dep = await ticket_svc.get_ticket(tid_dep)
         if ticket_dep is not None and ticket_id in ticket_dep.depends_on:
-            merged = await ci_watcher.attendre_merge(project_id, ticket_id)
-            return not merged
-    return False
+            return bool(await ci_watcher.attendre_merge(project_id, ticket_id))
+    return None
 
 
 async def _trouver_bloquant(

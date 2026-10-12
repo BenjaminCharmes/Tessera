@@ -69,6 +69,23 @@ export const NEW_TICKET = {
 };
 
 async function setupApiMocks(page: Page) {
+  // La vue Projets du centre (ticket-399) lit la vue d'ensemble au chargement.
+  await page.route("/api/v1/projects/overview", async (route) => {
+    await route.fulfill({
+      json: PROJECTS.map((p) => ({
+        id: p.id,
+        name: p.name,
+        category: null,
+        description: p.description,
+        github_remote: null,
+        created_at: "2026-06-01T00:00:00Z",
+        last_activity: "2026-06-20T00:00:00Z",
+        tickets: { todo: 1, in_progress: 0, in_review: 0, blocked: 0, done: 0 },
+        run_actif: false,
+        icon: false,
+      })),
+    });
+  });
   await page.route("/api/v1/projects", async (route) => {
     if (route.request().method() === "GET") {
       await route.fulfill({ json: PROJECTS });

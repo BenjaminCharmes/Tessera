@@ -14,12 +14,14 @@ en interactif quand le backend tourne.
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
 | `GET` | `/api/v1/projects` | List Projects |
+| `GET` | `/api/v1/projects/overview` | List Projects Overview |
 | `POST` | `/api/v1/projects` | Create Project |
 | `POST` | `/api/v1/projects/clone` | Clone Project |
 | `POST` | `/api/v1/projects/import` | Import Project |
 | `POST` | `/api/v1/projects/from-template` | Create Project From Template |
 | `GET` | `/api/v1/projects/usage/breakdown` | Get Usage Breakdown Global |
 | `GET` | `/api/v1/projects/{project_id}` | Get Project |
+| `GET` | `/api/v1/projects/{project_id}/icon` | Get Project Icon |
 | `DELETE` | `/api/v1/projects/{project_id}` | Delete |
 | `GET` | `/api/v1/projects/{project_id}/agents` | Get Project Agents |
 | `PUT` | `/api/v1/projects/{project_id}/agents/{role}` | Set Project Agent Model |

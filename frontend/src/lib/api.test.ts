@@ -334,3 +334,24 @@ describe("api et STATIC_TOKEN", () => {
     expect(init.method).toBe("DELETE");
   });
 });
+
+describe("api.projects.overview and setCategory (ticket-399)", () => {
+  it("reads the overview from /projects/overview", async () => {
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve([]) });
+
+    await api.projects.overview();
+
+    expect(mockFetch).toHaveBeenCalledWith("/api/v1/projects/overview", undefined);
+  });
+
+  it("patches the category through the project settings route", async () => {
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
+
+    await api.projects.setCategory("serpent", "Jeux");
+
+    const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("/api/v1/projects/serpent/pipeline");
+    expect(init.method).toBe("PATCH");
+    expect(JSON.parse(init.body as string)).toEqual({ category: "Jeux" });
+  });
+});

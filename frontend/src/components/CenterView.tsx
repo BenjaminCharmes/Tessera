@@ -16,6 +16,7 @@ import AgentDetail from "./AgentDetail";
 import SupervisionView from "./SupervisionView";
 import RunView from "./RunView";
 import KanbanView from "./KanbanView";
+import ProjetsView from "./ProjetsView";
 
 // Vues lourdes — chargées à la demande, après le premier rendu du cockpit
 // (ticket-355). DiffView et Editor tirent Monaco ; les garder lazy réduit le
@@ -51,6 +52,8 @@ interface CenterViewProps {
   statsDays: StatsPeriod;
   /** Projet cible des stats — null si portée "tous projets" (ticket-253). */
   statsProjectId: string | null;
+  /** Sélectionne un projet, comme la barre latérale (ticket-399). */
+  onSelectProject: (p: Project) => void;
   onSelectTicket: (t: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus: (ticketId: string, status: TicketStatus) => void;
@@ -99,6 +102,7 @@ export default function CenterView({
   openFilePath,
   statsDays,
   statsProjectId,
+  onSelectProject,
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
@@ -129,6 +133,15 @@ export default function CenterView({
         supervision={supervision}
         projects={projets}
         services={servicesDuProjet}
+      />
+    );
+  } else if (panel === "projects") {
+    // Choisir un projet se fait en les voyant : une carte chacun (ticket-399).
+    content = (
+      <ProjetsView
+        projets={projets}
+        activeProject={project}
+        onSelectProject={onSelectProject}
       />
     );
   } else if (panel === "agents") {

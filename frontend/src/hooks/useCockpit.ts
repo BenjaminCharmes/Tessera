@@ -443,6 +443,7 @@ export function useCockpit() {
       statsDays,
       // La portée effective est "tous" quand aucun projet n'est actif.
       statsProjectId: porteeEffective === "tous" ? null : (project?.id ?? null),
+      onSelectProject: handleSelectProject,
       onSelectTicket: handleSelectTicket,
       onRunPipeline: handleRunPipeline,
       onChangeStatus: handleChangeStatus,
