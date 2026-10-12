@@ -70,6 +70,10 @@ async def _acquis(
 # n'existent pas (ticket-122).
 _PYTEST_NO_TESTS_COLLECTED = 5
 
+# Nombre de lignes finales gardées comme détail d'échec quand la sortie de
+# l'étape n'a aucune structure pytest ou vitest (ticket-401).
+_LIGNES_DE_QUEUE = 60
+
 
 class TestCommandNotFound(Exception):
     # Not a pytest test class despite the "Test" prefix — see TestResult.
@@ -231,7 +235,14 @@ class TestRunnerService:
                     break
 
             duration_ms = int((time.monotonic() - start) * 1000)
-            result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
+            if code != 0:
+                # Seule la sortie de l'étape en échec est lue : les étapes
+                # précédentes, vertes, masquaient son résumé (ticket-401).
+                result = _parse_failed_step(
+                    etapes[-1], sorties[-1].strip(), duration_ms, len(etapes_args) > 1
+                )
+            else:
+                result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
             result.etapes = etapes
             return result
 
@@ -306,6 +317,29 @@ class TestRunnerService:
         return proc.returncode or 0, (stdout + "\n" + stderr).strip()
 
 
+def _parse_failed_step(
+    etape: EtapeTest, sortie: str, duration_ms: int, enchainee: bool
+) -> TestResult:
+    """Build the result of a chain stopped by ``etape``, from its own output.
+
+    Pour une commande enchaînée, le résumé nomme l'étape et son code de
+    sortie : sans cela, rien n'indique laquelle des étapes a échoué. Une
+    commande à étape unique garde son résumé tel quel.
+    """
+    result = _parse_output(etape.code, sortie, duration_ms)
+    if result.passed:
+        return result
+    if enchainee:
+        result.output_summary = (
+            f"étape `{etape.commande}` (exit {etape.code}) — {result.output_summary}"
+        )
+    if not result.failure_details:
+        # Une étape lint ou tsc n'a ni bandeau pytest ni ligne vitest :
+        # la fin de sa sortie est ce qui explique l'échec.
+        result.failure_details = "\n".join(sortie.splitlines()[-_LIGNES_DE_QUEUE:])
+    return result
+
+
 def _parse_output(returncode: int, output: str, duration_ms: int) -> TestResult:
     if returncode == _PYTEST_NO_TESTS_COLLECTED and "no tests ran" in output.lower():
         _logger.warning("test_runner_no_tests_collected")
@@ -369,7 +403,15 @@ def _extract_summary_line(output: str) -> str:
         ):
             return stripped[:200]
 
-    # Priorité 2 : résumé vitest (Tests  N failed | M passed)
+    # Priorité 2 : résumé de `pytest -q`, sans bandeaux (N failed, M passed in X.XXs)
+    for line in output.splitlines():
+        stripped = line.strip()
+        if re.match(
+            r"\d+ (?:failed|passed|errors?)\b.*\bin\s+[\d.]+s\b", stripped
+        ):
+            return stripped[:200]
+
+    # Priorité 3 : résumé vitest (Tests  N failed | M passed)
     for line in output.splitlines():
         stripped = line.strip()
         if re.match(r"Tests\s+\d+", stripped, re.IGNORECASE) and any(

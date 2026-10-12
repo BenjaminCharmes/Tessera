@@ -1,14 +1,15 @@
 ---
-id: ticket-401
-title: "A chained test command reports the step that failed, not the last summary of the whole output"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-12
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-12
+id: ticket-401
+pr_number: 371
+priority: high
+status: done
+title: A chained test command reports the step that failed, not the last summary of
+  the whole output
+type: fix
 ---
 
 # ticket-401 — Une commande de test enchaînée rend compte de l'étape en échec

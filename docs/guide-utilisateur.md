@@ -368,6 +368,9 @@ Quand des tests échouent, le **résumé du test** affiché dans le journal est 
 
 Au lieu de tourner à l'aveugle plusieurs fois, tu remarques que les tickets progressent plus vite.
 
+
+Quand une commande de test enchaîne plusieurs outils (vitest suivi de pytest, par exemple), le rapport affiche l'étape qui a échoué — avec sa propre sortie. Tu vois immédiatement la raison du blocage, au lieu d'être trompé par le résumé d'une étape précédente qui avait réussi.
+
 ## 5. Lire ce qui se passe
 
 Le panneau **Agent Stream** montre le déroulé en direct via WebSocket : quel agent
