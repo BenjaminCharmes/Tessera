@@ -842,6 +842,22 @@ Chaque carte reçoit son statut en prop et n'émet aucun appel réseau — elle 
 
 Cette consolidation suit le même principe que le ticket-365 (arrêt du polling pour une PR réglée), mais au niveau du projet entier : dès qu'aucune PR n'est ouverte, les appels s'arrêtent complètement.
 
+## Vue d'ensemble et caching des projets (ticket-398)
+
+L'endpoint `GET /api/v1/projects/overview` consolide en une seule requête tout ce qu'une fiche projet affiche : métadonnées, dates de création et activité, comptage des tickets par statut, état d'un run actif, présence d'une icône.
+
+C'est l'application au catalogue des projets de la même optimisation qu'on a appliquée aux statuts GitHub (tickets 364–367) : plutôt que N requêtes, l'IDE n'en fait qu'une.
+
+### Caching par projet
+
+Les calculs git — dates de création et activité — et le comptage des tickets sont cachés par projet. Le cache s'invalide quand la date de modification change pour `.git/HEAD`, `.git/refs/heads/` ou le dossier `tickets/`. Deux appels de suite sans changement ne relancent aucune commande git.
+
+C'est particulièrement important pour ide-core (`git_root: ancestor`) : les dates doivent porter sur le dossier du projet seul, pas sur tout l'ancêtre.
+
+### Servage des icônes du projet
+
+`GET /api/v1/projects/{project_id}/icon` sert la première icône trouvée dans une liste de chemins fixes — `frontend/public/favicon.svg`, `frontend/public/favicon.png`, `frontend/public/icon.svg`, etc. **Aucun chemin n'est reçu de la requête** : cela prévient tout accès à un fichier arbitraire du projet. Pas de fichier trouvé → `404`.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

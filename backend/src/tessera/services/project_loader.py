@@ -509,12 +509,14 @@ def set_pipeline_settings(
     *,
     pipeline: dict[str, object],
     racine: dict[str, object],
+    retirer: tuple[str, ...] = (),
 ) -> None:
     """Réécrit les seuls réglages reçus dans le manifeste du projet (ticket-196).
 
     `pipeline` va sous la clef `pipeline`, `racine` au premier niveau
-    (`autonomy`, `merge_without_ci`). Tout le reste du fichier est préservé :
-    services, artefacts, racine git, agents.
+    (`autonomy`, `merge_without_ci`, `category`) ; `retirer` nomme les clefs
+    de la racine à supprimer (ticket-398). Tout le reste du fichier est
+    préservé : services, artefacts, racine git, agents.
     """
     agents_json = project_path / "agents.json"
     if not agents_json.is_file():
@@ -526,6 +528,8 @@ def set_pipeline_settings(
     section.update(pipeline)
     data["pipeline"] = section
     data.update(racine)
+    for clef in retirer:
+        data.pop(clef, None)
     _ecrire_manifeste(project_path, data)
 
 

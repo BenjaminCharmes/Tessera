@@ -1,14 +1,15 @@
 ---
-id: ticket-398
-title: "A project overview endpoint serves everything the project cards show, and a project's category can be changed from the API"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-12
 depends_on: []
 estimated_days: 1
-created: 2026-10-12
+id: ticket-398
+pr_number: 372
+priority: high
+status: done
+title: A project overview endpoint serves everything the project cards show, and a
+  project's category can be changed from the API
+type: feat
 ---
 
 # ticket-398 — Un endpoint de vue d'ensemble pour les cartes de projets
