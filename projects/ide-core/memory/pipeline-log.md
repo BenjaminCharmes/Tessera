@@ -2309,3 +2309,17 @@ Aucune vulné (52469ms)
 - 2026-10-12 09:27:55 UTC — [ticket-399] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la vue Projets c (337547ms)
 - 2026-10-12 09:27:55 UTC — [ticket-399] APPROVED après 1 tour(s)
 - 2026-10-12 09:30:01 UTC — [ticket-399] documentation: 1 fichier(s) (123280ms)
+- 2026-10-12 10:16:55 UTC — [ticket-402] branche ticket-402-doc-edits-find-their-anchor-text-despite-typograp
+- 2026-10-12 10:16:55 UTC — [ticket-402] tour 1 — codeur démarré
+- 2026-10-12 10:18:57 UTC — [ticket-402] branche ticket-402-doc-edits-find-their-anchor-text-despite-typograp
+- 2026-10-12 10:18:57 UTC — [ticket-402] tour 1 — codeur démarré
+- 2026-10-12 10:20:21 UTC — [ticket-402] tour 1 — codeur terminé (84422ms)
+- 2026-10-12 10:25:39 UTC — [ticket-402] testeur: OK (exit 0)
+- 2026-10-12 10:26:12 UTC — [ticket-402] securite: PASS — Audit de sécurité du diff : aucune vulnérabilité détectée.
+
+Le diff refactorise  (32359ms)
+- 2026-10-12 10:26:12 UTC — [ticket-402] tour 1 — reviewer démarré
+- 2026-10-12 10:26:31 UTC — [ticket-402] tour 1 — reviewer terminé (19390ms)
+- 2026-10-12 10:29:58 UTC — [ticket-402] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente une logique d (225890ms)
+- 2026-10-12 10:29:58 UTC — [ticket-402] APPROVED après 1 tour(s)
+- 2026-10-12 10:32:40 UTC — [ticket-402] documentation: 1 fichier(s) (159717ms)

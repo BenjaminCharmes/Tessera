@@ -180,6 +180,27 @@ Un champ de recherche te permet de taper le nom d'un projet, son identifiant ou 
 
 Des pastilles colorées au-dessous du champ affichent tes catégories. Clique sur une pastille pour garder seulement ses projets ; clique sur « Toutes » pour revenir à la liste complète. Chaque pastille affiche le nombre de projets de sa catégorie.
 
+
+Tu organises tes projets par catégorie (par exemple : frontend, backend, infrastructure). Chaque catégorie peut être **repliée** pour gagner de la place.
+
+**Replier et déplier**
+
+Clique sur le titre de la catégorie (à côté du chevron) pour la replier. Le chevron tourne, et tu vois apparaître un **badge** affichant le nombre de projets cachés. Passe la souris dessus : une info-bulle te donne la liste complète — « 3 projets : demineur, serpent, cookie-clicker ».
+
+Clique à nouveau sur le titre pour redéplier.
+
+**L'état est sauvegardé**
+
+Le navigateur retient les catégories que tu as repliées. Quand tu reviens plus tard, tu les retrouves dans le même état — à la fois dans la barre latérale et dans la vue « Projets ».
+
+**Pendant une recherche**
+
+Si tu cherches un projet dans la vue « Projets » et qu'il y a des résultats dans une catégorie repliée, cette catégorie se **déplie automatiquement** pour te montrer les résultats. Quand tu effaces la recherche, elle revient à son état replié précédent.
+
+**Le projet actif reste visible**
+
+Le projet sur lequel tu travailles, ou celui qu'un agent exécute en ce moment, est toujours affiché — même si sa catégorie est repliée. L'IDE ne la replie jamais d'elle-même ; c'est toi qui dois la replier manuellement si tu veux.
+
 ### Trier les projets
 
 Un menu te propose plusieurs ordres :
