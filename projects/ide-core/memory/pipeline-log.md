@@ -2297,3 +2297,4 @@ Aucune vulné (52469ms)
 
 1. **Le critère 5 n'est toujours pas rempli, e
 - 2026-10-12 10:06:00 UTC — [ticket-400] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-12 10:06:12 UTC — [ide-core] file interrompue : ticket-400 non approuvé
