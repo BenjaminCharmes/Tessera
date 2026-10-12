@@ -1,5 +1,6 @@
 {
   "project_id": "ide-core",
+  "category": "Tessera",
   "artifacts": "tracked",
   "git_root": "ancestor",
   "services": [
