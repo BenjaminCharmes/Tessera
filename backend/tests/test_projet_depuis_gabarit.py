@@ -212,3 +212,22 @@ async def test_agents_json_declares_every_pipeline_role(workspace: Path) -> None
     backend_svc = next(s for s in data["services"] if s["nom"] == "backend")
     assert "--host 127.0.0.1" in backend_svc["commande"]
     assert "cd " not in data["pipeline"]["test_command"]
+
+
+def test_template_and_backend_pin_packages_blocked_by_smart_app_control() -> None:
+    """mypy (< 1.19, pure Python) and rpds-py 2026.6.3 are pinned in Tessera's
+    backend and in the template, so a new project does not inherit DLLs that
+    Smart App Control blocks (tickets 385 and the 2026-10-12 report)."""
+    import tomllib
+
+    racine = Path(__file__).resolve().parents[2]
+    for chemin in (
+        racine / "backend" / "pyproject.toml",
+        racine / "templates" / "fastapi-react" / "backend" / "pyproject.toml",
+    ):
+        texte = chemin.read_text(encoding="utf-8")
+        data = tomllib.loads(texte.replace("{{project_id}}", "p"))
+        uv = data["tool"]["uv"]
+        assert uv["no-binary-package"] == ["mypy"], chemin
+        assert "rpds-py==2026.6.3" in uv["constraint-dependencies"], chemin
+        assert "mypy>=1.13.0,<1.19" in texte or "<1.19" in texte, chemin
