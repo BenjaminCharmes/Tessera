@@ -2266,6 +2266,38 @@ Aucune vulné (52469ms)
 - 2026-10-12 09:03:53 UTC — [ticket-398] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute un endpoint `/api/v1/projects/ (71280ms)
 - 2026-10-12 09:03:53 UTC — [ticket-398] APPROVED après 1 tour(s)
 - 2026-10-12 09:06:54 UTC — [ticket-398] documentation: 2 fichier(s) (178437ms)
+- 2026-10-12 09:34:46 UTC — [ide-core] ticket-399 PR #373 confiée au CIWatcher
+- 2026-10-12 09:34:48 UTC — [ticket-400] branche ticket-400-project-categories-collapse-in-the-sidebar-and-th
+- 2026-10-12 09:34:49 UTC — [ticket-400] tour 1 — codeur démarré
+- 2026-10-12 09:36:54 UTC — [ticket-400] tour 1 — codeur terminé (124952ms)
+- 2026-10-12 09:40:33 UTC — [ticket-400] testeur: ✖ 1 problem (1 error, 0 warnings)
+- 2026-10-12 09:40:33 UTC — [ticket-400] tests rouges au tour 1
+- 2026-10-12 09:40:33 UTC — [ticket-400] tour 2 — codeur démarré
+- 2026-10-12 09:41:21 UTC — [ticket-400] tour 2 — codeur terminé (47938ms)
+- 2026-10-12 09:46:01 UTC — [ticket-400] testeur: OK (exit 0)
+- 2026-10-12 09:46:39 UTC — [ticket-400] securite: PASS — Aucune vulnérabilité introduite. Ce diff refactorise la navigation des projets e (37954ms)
+- 2026-10-12 09:46:39 UTC — [ticket-400] tour 2 — reviewer démarré
+- 2026-10-12 09:47:02 UTC — [ticket-400] tour 2 — reviewer terminé (22891ms)
+- 2026-10-12 09:48:12 UTC — [ticket-400] validateur: CHANGES_REQUESTED — Les critères 1–4 sont satisfaits : le diff crée ProjectNav.test.tsx avec tous le (92563ms)
+- 2026-10-12 09:48:12 UTC — [ticket-400] CHANGES_REQUESTED tour 2: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **Le critère 5 et le point 5 de la solution
+- 2026-10-12 09:48:12 UTC — [ticket-400] tour 3 — codeur démarré
+- 2026-10-12 09:54:06 UTC — [ticket-400] tour 3 — codeur terminé (353422ms)
+- 2026-10-12 09:59:46 UTC — [ticket-400] testeur: OK (exit 0)
+- 2026-10-12 10:00:14 UTC — [ticket-400] securite: PASS — Audit de sécurité réussi. Le code ajouté par ce ticket (refactorisation UI de la (28609ms)
+- 2026-10-12 10:00:14 UTC — [ticket-400] tour 3 — reviewer démarré
+- 2026-10-12 10:00:40 UTC — [ticket-400] tour 3 — reviewer terminé (25515ms)
+- 2026-10-12 10:06:00 UTC — [ticket-400] validateur: CHANGES_REQUESTED — Les critères 1–4 pour `ProjectNav.test.tsx` sont satisfaits : le diff crée le fi (345625ms)
+- 2026-10-12 10:06:00 UTC — [ticket-400] CHANGES_REQUESTED tour 3: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **Le critère 5 n'est toujours pas rempli, e
+- 2026-10-12 10:06:00 UTC — [ticket-400] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-12 10:06:12 UTC — [ide-core] file interrompue : ticket-400 non approuvé
 - 2026-10-12 09:10:25 UTC — [ide-core] ticket-398 PR #372 confiée au CIWatcher
 - 2026-10-12 09:10:27 UTC — [ticket-399] branche ticket-399-the-projects-tab-shows-every-project-as-a-card-in
 - 2026-10-12 09:10:27 UTC — [ticket-399] tour 1 — codeur démarré

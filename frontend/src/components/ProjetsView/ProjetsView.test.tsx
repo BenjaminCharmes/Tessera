@@ -255,4 +255,20 @@ describe("ProjetsView", () => {
     await waitFor(() => expect(screen.getByRole("searchbox")).toHaveValue("serp"));
     expect(cartes()).toEqual(["Serpent"]);
   });
+
+  it("unfolds a collapsed section while a search finds a result there, without changing the saved state", async () => {
+    localStorage.setItem("tessera.categories-repliees", JSON.stringify(["Jeux"]));
+    afficher();
+    await screen.findAllByRole("article");
+    expect(cartes()).toEqual(["ide-core"]);
+    const entete = screen
+      .getAllByRole("button", { name: /Jeux/ })
+      .find((b) => b.hasAttribute("aria-expanded"));
+    expect(entete).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.type(screen.getByRole("searchbox", { name: "Chercher un projet" }), "serpent");
+
+    expect(cartes()).toEqual(["Serpent"]);
+    expect(localStorage.getItem("tessera.categories-repliees")).toBe(JSON.stringify(["Jeux"]));
+  });
 });

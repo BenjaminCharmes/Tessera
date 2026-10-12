@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-12
+depends_on:
+- ticket-399
+estimated_days: 0.5
 id: ticket-400
-title: "Project categories collapse in the sidebar and the projects view, and a collapsed category shows how many projects it holds"
-type: feat
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-399"]
-estimated_days: 0.5
-created: 2026-10-12
+status: done
+title: Project categories collapse in the sidebar and the projects view, and a collapsed
+  category shows how many projects it holds
+type: feat
 ---
 
 # ticket-400 — Les catégories de projets se replient
