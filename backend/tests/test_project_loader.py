@@ -497,3 +497,77 @@ async def test_project_loader_list_projects_uses_asyncio_to_thread(tmp_path: Pat
     with mock_patch("asyncio.to_thread", wraps=asyncio.to_thread) as mock_thread:
         await loader.list_projects()
     assert mock_thread.called
+
+
+def test_description_skips_agent_notes_and_strips_markdown(tmp_path: Path) -> None:
+    """The project cards show plain text: a blockquote note to the agents is
+    skipped, the whole first paragraph is kept, and inline Markdown is
+    removed (bold, italics, code, links)."""
+    project_dir = tmp_path / "p"
+    project_dir.mkdir()
+    (project_dir / "CLAUDE.md").write_text(
+        "# Jeu\n\n"
+        "> Fichier local uniquement — ne jamais committer\n\n"
+        "Un démineur jouable dans le navigateur. **Ce projet est un banc d'essai** :\n"
+        "il est construit par le `pipeline`, voir [la doc](docs/x.md), *vraiment*.\n\n"
+        "Second paragraphe.\n\n## Section\n\nHors description.\n",
+        encoding="utf-8",
+    )
+
+    project = load_project(project_dir)
+
+    assert project.description == (
+        "Un démineur jouable dans le navigateur. Ce projet est un banc d'essai : "
+        "il est construit par le pipeline, voir la doc, vraiment."
+    )
+
+
+def test_description_falls_back_to_the_readme(tmp_path: Path) -> None:
+    """A CLAUDE.md that only speaks to the agents (note, then sections) takes
+    its description from the README introduction."""
+    project_dir = tmp_path / "p"
+    project_dir.mkdir()
+    (project_dir / "CLAUDE.md").write_text(
+        "# Outil\n\n> Fichier local uniquement\n\n## Profil attendu\n\nRépondre avec…\n",
+        encoding="utf-8",
+    )
+    (project_dir / "README.md").write_text(
+        "# 🍪 Outil\n\nUn bot **mono-fichier** pour un jeu.\n\nDétails.\n", encoding="utf-8"
+    )
+
+    project = load_project(project_dir)
+
+    assert project.description == "Un bot mono-fichier pour un jeu."
+
+
+def test_description_is_empty_without_prose(tmp_path: Path) -> None:
+    """An HTML-only README (a GitHub profile) gives no description rather than tags."""
+    project_dir = tmp_path / "p"
+    project_dir.mkdir()
+    (project_dir / "CLAUDE.md").write_text("# Profil\n\n> Note\n\n## Section\n", encoding="utf-8")
+    (project_dir / "README.md").write_text('<h1 align="center">Nom</h1>\n\n<p>…</p>\n', encoding="utf-8")
+
+    assert load_project(project_dir).description == ""
+
+
+def test_declared_description_wins_and_agent_profiles_are_skipped(tmp_path: Path) -> None:
+    """`description` in agents.json overrides everything; without it, a
+    « Profil agent : … » paragraph is not taken for a description."""
+    import json as _json
+
+    project_dir = tmp_path / "p"
+    project_dir.mkdir()
+    (project_dir / "CLAUDE.md").write_text(
+        "# Portfolio\n\nProfil agent : **Développeur fullstack**. Réponds vite.\n\n"
+        "Le site personnel.\n",
+        encoding="utf-8",
+    )
+    assert load_project(project_dir).description == "Le site personnel."
+
+    autre = tmp_path / "q"
+    autre.mkdir()
+    (autre / "CLAUDE.md").write_text("# Q\n\nIntro du CLAUDE.md.\n", encoding="utf-8")
+    (autre / "agents.json").write_text(
+        _json.dumps({"description": "Description déclarée."}), encoding="utf-8"
+    )
+    assert load_project(autre).description == "Description déclarée."
