@@ -2170,3 +2170,80 @@ async def test_rejouer_sur_ne_prend_pas_un_dossier_tickets_du_code_pour_un_artef
 
     assert conflits == ("frontend/src/tickets/liste.ts",), conflits
 
+
+
+# ------------------------------------------------------------------
+# Réalignement de la base au départ d'un run — ticket-406
+# ------------------------------------------------------------------
+
+
+class _OrchDeDepart:
+    """Minimal orchestrator stand-in for the branch-creation stage."""
+
+    def __init__(self, workspace: GitWorkspaceService, racine: Path) -> None:
+        self._git_workspace = workspace
+        self._project_path = racine
+        self._base_branch = "develop"
+        self.logs: list[str] = []
+
+    async def _sur_la_base(self) -> bool:
+        return await self._git_workspace.branche_courante() == self._base_branch
+
+    def _log(self, message: str) -> None:
+        self.logs.append(message)
+
+
+async def test_la_branche_du_ticket_part_du_commit_distant_et_garde_le_journal(
+    repo_avec_distant: tuple[Path, Path],
+) -> None:
+    """A base that lags the remote by one merge, with an uncommitted log line:
+    the run realigns it first, so the ticket branch forks from the remote
+    commit and the log line survives (the state the CIWatcher leaves behind)."""
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+    from tessera.services import pipeline_stages as stages
+    from tessera.services.pipeline_events import OrchestratorEvent
+    from tessera.services.pipeline_run import PipelineRun
+
+    local, bare = repo_avec_distant
+    journal = local / "memory" / "pipeline-log.md"
+    journal.parent.mkdir()
+    journal.write_text("- ligne 1\n", encoding="utf-8")
+    await _git(local, "add", "memory/pipeline-log.md")
+    await _git(local, "commit", "-q", "-m", "log")
+    await _git(local, "push", "-q", "origin", "develop")
+
+    # Le dernier merge, fait côté distant pendant que personne ne regardait.
+    autre = local.parent / "autre"
+    await _git(local.parent, "clone", "-q", "-b", "develop", str(bare), str(autre))
+    await _git(autre, "config", "user.email", "test@tessera.local")
+    await _git(autre, "config", "user.name", "Tessera test")
+    (autre / "code.py").write_text("x = 1\n", encoding="utf-8")
+    await _git(autre, "add", "code.py")
+    await _git(autre, "commit", "-q", "-m", "feat: ticket-001 (#1)")
+    await _git(autre, "push", "-q", "origin", "develop")
+    distant = await _git_out(autre, "rev-parse", "HEAD")
+
+    ligne = "- 2026-10-12 15:11:00 UTC — [ticket-001] PR #1 confiée au CIWatcher"
+    with journal.open("a", encoding="utf-8") as f:
+        f.write(ligne + "\n")
+
+    async def _on_event(event: OrchestratorEvent) -> None:
+        pass
+
+    ticket = Ticket(
+        id="ticket-002", title="Suite", type=TicketType.feat,
+        status=TicketStatus.todo, priority=TicketPriority.medium,
+        agent="codeur", body="",
+    )
+    run = PipelineRun(project_id="projet", ticket=ticket, on_event=_on_event)
+
+    refused = await stages.create_branch(
+        _OrchDeDepart(GitWorkspaceService(local), local), run  # type: ignore[arg-type]
+    )
+
+    assert refused is None
+    assert run.branch is not None
+    assert await _git_out(local, "branch", "--show-current") == run.branch
+    assert await _git_out(local, "rev-parse", "HEAD") == distant
+    assert (local / "code.py").is_file()
+    assert ligne in journal.read_text(encoding="utf-8")

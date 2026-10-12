@@ -551,6 +551,14 @@ actuel au message du validateur, dans une section distincte du diff. Cette secti
 Le prompt du validateur (`agents/prompts/validateur.md`) l'instruit sur cette section 
 et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas être refusé.
 
+## Synchronisation de la base au démarrage
+
+Au début de chaque run, avant la création de la branche, si un espace git et une branche de base sont connus et que l'arbre se trouve sur la base, l'orchestrateur appelle `sync_base_depuis_distant(base_branch)` (ticket-406). Cette fonction met les lignes de journal non commitées de côté, avance la base par `merge --ff-only` depuis le distant, puis réécrit les lignes à la suite.
+
+Un réalignement refusé — base locale divergente, autre fichier modifié, fetch impossible — n'empêche pas le run de partir. Le refus est journalisé (« base non réalignée — <raison> »), identiquement au réalignement entre deux tickets d'une file.
+
+Aucune tentative de synchronisation n'est faite si l'espace git ou la branche de base est inconnu.
+
 ## Gestion des limites de session
 
 Quand l'abonnement Claude atteint sa limite horaire, le CLI répond : « You've hit your session limit · resets <heure> ». Avant, le pipeline traitait cette erreur comme toute exception : le ticket passait en `blocked`, bloquant le projet.
