@@ -20,12 +20,14 @@ fn spawn_backend() -> Option<Child> {
     let spawned = Command::new("uv")
         .args([
             "run",
+            "python",
+            "-m",
             "uvicorn",
             "tessera.main:app",
             "--host",
             "127.0.0.1",
             "--port",
-            "8000",
+            "8100",
             "--env-file",
             "../.env",
         ])

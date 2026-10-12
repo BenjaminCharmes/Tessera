@@ -2,7 +2,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "8100:8000"
     env_file: .env
     environment:
       # claude-agent-sdk vendors its own CLI, but the container has no

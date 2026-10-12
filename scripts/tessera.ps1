@@ -57,7 +57,7 @@ function Invoke-Setup {
 
 function Stop-Tessera {
     # Le worker `uvicorn --reload` orphelin est le piège principal : tuer le
-    # parent laisse l'enfant vivant, qui garde le port 8000 et sert le code de
+    # parent laisse l'enfant vivant, qui garde le port 8100 et sert le code de
     # son dernier rechargement. On cible donc la ligne de commande, pas un PID.
     $stopped = 0
     foreach ($spec in @(
@@ -72,7 +72,7 @@ function Stop-Tessera {
     }
     Write-Host "-> $stopped processus arrete(s)"
 
-    foreach ($port in 8000, 5173) {
+    foreach ($port in 8100, 5173) {
         $conn = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
         if ($conn) {
             Write-Warning "Le port $port est encore tenu par le PID $($conn.OwningProcess)."
@@ -93,7 +93,7 @@ function Start-Backend {
     #     PowerShell interactif. En session non interactive, lancer les deux
     #     commandes directement (voir README).
     Start-Process -FilePath 'uv' `
-        -ArgumentList 'run', 'uvicorn', 'tessera.main:app', '--host', '127.0.0.1', '--port', '8000' `
+        -ArgumentList 'run', 'python', '-m', 'uvicorn', 'tessera.main:app', '--host', '127.0.0.1', '--port', '8100' `
         -WorkingDirectory (Join-Path $Root 'backend')
 }
 
@@ -107,14 +107,14 @@ switch ($Task) {
     'setup' { Invoke-Setup }
     'doctor' { Invoke-Doctor }
     'stop' { Stop-Tessera }
-    'dev' { Start-Backend; Write-Host '-> http://localhost:8000/docs' }
+    'dev' { Start-Backend; Write-Host '-> http://localhost:8100/docs' }
     'dev-frontend' { Start-Frontend; Write-Host '-> http://localhost:5173' }
     'run' {
         Invoke-Doctor
         Start-Backend
         Start-Frontend
         Write-Host ''
-        Write-Host '-> Backend  : http://localhost:8000/docs'
+        Write-Host '-> Backend  : http://localhost:8100/docs'
         Write-Host '-> Frontend : http://localhost:5173'
         Write-Host '-> Arreter  : .\scripts\tessera.ps1 stop'
     }

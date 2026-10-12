@@ -45,7 +45,7 @@ git clone https://github.com/BenjaminCharmes/Tessera.git
 cd Tessera
 make setup
 
-make dev            # backend   → http://localhost:8000
+make dev            # backend   → http://localhost:8100
 make dev-frontend   # interface → http://localhost:5173
 ```
 

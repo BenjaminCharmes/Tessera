@@ -87,7 +87,7 @@ sur `/api/v1` : l'origine du backend est figée **au build** par Vite.
 
 | Variable | Où | Default | Description |
 |----------|----|---------|-------------|
-| `VITE_API_URL` | `frontend/.env.production` | `http://127.0.0.1:8000` | Origine du backend pour les appels REST, WebSocket et fichiers. Vide en dev : les URL restent relatives et le proxy Vite les résout |
+| `VITE_API_URL` | `frontend/.env.production` | `http://127.0.0.1:8100` | Origine du backend pour les appels REST, WebSocket et fichiers. Vide en dev : les URL restent relatives et le proxy Vite les résout |
 | `TESSERA_BACKEND_DIR` | environnement de l'app | `../../backend` (résolu à la compilation) | Dossier depuis lequel l'app release lance `uv run uvicorn … --host 127.0.0.1`. À renseigner dès que l'app ne vit plus à côté de ses sources |
 
 Le shell desktop n'a aucune commande fichier à lui : tout accès disque passe
@@ -96,9 +96,14 @@ backend Python n'est pas embarqué dans le bundle : la machine doit avoir `uv`.
 
 ## Commandes de développement
 
+Le backend écoute sur le port **8100**, et non sur 8000 : 8000 est le port par
+défaut d'uvicorn, déjà pris par d'autres applications locales. Le proxy Vite
+(`frontend/vite.config.ts`), l'app Tauri et `scripts/tessera.ps1` suivent ce
+port.
+
 ```bash
 make setup         # Initialisation complète (première fois)
-make dev           # Lance FastAPI sur http://localhost:8000
+make dev           # Lance FastAPI sur http://localhost:8100
 make dev-frontend  # Lance Vite sur http://localhost:5173
 make tauri-dev     # Lance l'app desktop Tauri (nécessite make dev)
 make tauri-build   # Build production (.app distributable)

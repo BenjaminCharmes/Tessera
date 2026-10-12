@@ -12,7 +12,7 @@ charge ce bundle, il n'existe pas de seconde UI (ADR-004).
 Depuis la racine du dépôt, jamais depuis ce dossier :
 
 ```bash
-make dev            # le backend, sur http://localhost:8000
+make dev            # le backend, sur http://localhost:8100
 make dev-frontend   # cette UI, sur http://localhost:5173
 ```
 

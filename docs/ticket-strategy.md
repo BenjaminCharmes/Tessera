@@ -81,7 +81,7 @@ activée par projet via `agents.json` :
 
 Déclenché via :
 ```bash
-curl -X POST http://localhost:8000/api/v1/projects/{project_id}/github/sync \
+curl -X POST http://localhost:8100/api/v1/projects/{project_id}/github/sync \
   -H "Content-Type: application/json" \
   -d '{"direction": "both"}'
 ```
