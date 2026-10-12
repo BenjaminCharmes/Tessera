@@ -170,6 +170,37 @@ class GitHubService:
             pr_number=pr_number,
         )
 
+    async def get_pull_request_state(
+        self, pr_number: int
+    ) -> Literal["open", "closed", "merged"]:
+        """Read only the state of a PR, without querying its CI — ticket-405."""
+        url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._headers)
+            resp.raise_for_status()
+        pr_data = resp.json()
+        if pr_data.get("merged"):
+            return "merged"
+        return "closed" if pr_data["state"] == "closed" else "open"
+
+    async def has_workflows(self) -> bool:
+        """Whether the repository declares at least one GitHub Actions workflow.
+
+        Answers True whenever GitHub cannot say (HTTP error, network error):
+        concluding "no CI" on a failed read is the mistake ticket-405 fixes.
+        """
+        url = f"{_BASE}/repos/{self._repo}/actions/workflows"
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(
+                    url, headers=self._headers, params={"per_page": 1}
+                )
+        except httpx.TransportError:
+            return True
+        if resp.status_code != 200:
+            return True
+        return int(resp.json().get("total_count", 1)) > 0
+
     async def merge_pull_request(
         self,
         pr_number: int,

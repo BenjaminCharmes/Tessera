@@ -117,6 +117,11 @@ class Settings(BaseSettings):
     # Sur un projet merge_without_ci, délai maximum d'attente du merge du
     # ticket précédent avant de lancer le suivant d'une file (ticket-382).
     attente_merge_max_s: float = 600.0
+    # Délai de grâce avant de lire une CI « none » comme un verdict (ticket-405).
+    # GitHub inscrit les checks après l'ouverture de la PR, parfois tard quand
+    # son API est lente : 120 s coupaient une CI qui existait bel et bien.
+    # Passé ce délai, `none` ne conclut que si le dépôt ne déclare aucun workflow.
+    ci_grace_s: float = 300.0
     # Maintient le système éveillé tant qu'un run est ouvert (ticket-394).
     # Utilise SetThreadExecutionState sous Windows ; no-op ailleurs.
     # Désactivable si un outil externe gère déjà la veille.

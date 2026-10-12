@@ -13,13 +13,16 @@ Couverture :
 - Annulation à l'arrêt → aucun ci_merge_done émis (ticket-328).
 - Merge raté → pipeline-log.md écrit, aucun fichier tickets/ déplacé (ticket-392).
 - Merge raté → attendre_merge retourne False (ticket-392).
+- Erreur réseau puis PR mergée → succès journalisé ; exception sans texte nommée (ticket-405).
 """
 import asyncio
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
+import httpx
+
 from tessera.models.ticket import TicketStatus
-from tessera.services.ci_watcher import CIWatcher
+from tessera.services.ci_watcher import CIWatcher, decrire_exception
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 
@@ -470,3 +473,131 @@ async def test_phase2_echouee_attendre_merge_retourne_false() -> None:
     assert result is False, (
         f"attendre_merge doit retourner False après un échec de phase 2, got: {result}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Erreur réseau pendant la phase 2 — ticket-405
+# ---------------------------------------------------------------------------
+
+
+async def _phase2_read_timeout(pr_number: int) -> Livraison:
+    raise httpx.ReadTimeout("")
+
+
+def _lecture_pr(etat: str) -> Callable[[int], Awaitable[str]]:
+    async def lire(pr_number: int) -> str:
+        return etat
+
+    return lire
+
+
+async def test_read_timeout_puis_pr_mergee_est_un_succes(tmp_path: Path) -> None:
+    """A ReadTimeout followed by a merged PR is merged=True, and the log says so."""
+    log_path = tmp_path / "memory" / "pipeline-log.md"
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    await watcher.surveiller(
+        "proj", "ticket-006", 8, _phase2_read_timeout, collect,
+        pipeline_log_path=log_path, etat_pr=_lecture_pr("merged"),
+    )
+    await asyncio.sleep(0.1)
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert len(done) == 1
+    assert done[0].data["merged"] is True
+    assert done[0].data["arret"] is None
+    assert [e for e in events if e.type is EventType.TICKET_STATUS_CHANGED] == []
+    contenu = log_path.read_text(encoding="utf-8")
+    assert "mergée malgré une erreur réseau" in contenu
+    assert "PR #8" in contenu
+    assert "ReadTimeout" in contenu
+    assert await watcher.attendre_merge("proj", "ticket-006") is True
+
+
+async def test_read_timeout_pr_encore_ouverte_reste_un_echec() -> None:
+    """A network error on a PR that is still open stays a failure."""
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    await watcher.surveiller(
+        "proj", "ticket-006", 8, _phase2_read_timeout, collect,
+        etat_pr=_lecture_pr("open"),
+    )
+    await asyncio.sleep(0.05)
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert len(done) == 1
+    assert done[0].data["merged"] is False
+    assert "ReadTimeout" in done[0].data["arret"]
+
+
+async def test_read_timeout_relecture_impossible_reste_un_echec() -> None:
+    """If the PR cannot be re-read either, the delivery is reported failed."""
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    async def lecture_en_panne(pr_number: int) -> str:
+        raise httpx.ConnectError("")
+
+    await watcher.surveiller(
+        "proj", "ticket-006", 8, _phase2_read_timeout, collect,
+        etat_pr=lecture_en_panne,
+    )
+    await asyncio.sleep(0.05)
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert len(done) == 1
+    assert done[0].data["merged"] is False
+
+
+async def test_erreur_reseau_sans_relecture_reste_un_echec() -> None:
+    """Without `etat_pr`, a network error is a failure, as before."""
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    await watcher.surveiller("proj", "ticket-006", 8, _phase2_read_timeout, collect)
+    await asyncio.sleep(0.05)
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert done[0].data["merged"] is False
+
+
+async def test_exception_a_message_vide_nomme_son_type_dans_le_journal(
+    tmp_path: Path,
+) -> None:
+    """A failure by an exception with empty text still names its type in the log."""
+    log_path = tmp_path / "memory" / "pipeline-log.md"
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    await watcher.surveiller(
+        "proj", "ticket-006", 8, _phase2_read_timeout, collect,
+        pipeline_log_path=log_path,
+    )
+    await asyncio.sleep(0.1)
+
+    contenu = log_path.read_text(encoding="utf-8")
+    assert "erreur inattendue : ReadTimeout" in contenu
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert "ReadTimeout" in done[0].data["arret"]
+
+
+async def test_exception_non_reseau_a_message_vide_nomme_son_type() -> None:
+    """Any exception, not only network ones, is named in the failure message."""
+    watcher = CIWatcher()
+    events, collect = _collecteur()
+
+    async def phase2_vide(pr_number: int) -> Livraison:
+        raise RuntimeError()
+
+    await watcher.surveiller("proj", "ticket-006", 8, phase2_vide, collect)
+    await asyncio.sleep(0.05)
+
+    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    assert done[0].data["arret"] == "erreur inattendue : RuntimeError"
+
+
+def test_decrire_exception_garde_le_texte_quand_il_existe() -> None:
+    assert decrire_exception(RuntimeError("boom")) == "RuntimeError: boom"
+    assert decrire_exception(RuntimeError()) == "RuntimeError"

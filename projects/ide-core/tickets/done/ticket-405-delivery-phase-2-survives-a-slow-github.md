@@ -1,14 +1,15 @@
 ---
-id: ticket-405
-title: "Delivery phase 2 survives a slow GitHub: late CI checks are awaited, and a network error re-reads the PR before giving up"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-12
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-12
+id: ticket-405
+pr_number: 382
+priority: medium
+status: done
+title: 'Delivery phase 2 survives a slow GitHub: late CI checks are awaited, and a
+  network error re-reads the PR before giving up'
+type: fix
 ---
 
 # ticket-405 — La phase 2 de livraison résiste à un GitHub lent

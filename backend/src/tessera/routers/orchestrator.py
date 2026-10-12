@@ -547,6 +547,7 @@ def _surveillance_pour(
             service.livrer_phase_2,
             on_event,
             pipeline_log_path=pipeline_log_path_ci,
+            etat_pr=service.pr_state,
         )
 
     return surveiller
