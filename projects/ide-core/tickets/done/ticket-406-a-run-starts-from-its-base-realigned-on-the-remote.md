@@ -4,7 +4,7 @@ created: 2026-10-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-406
-pr_number: null
+pr_number: 385
 priority: high
 status: done
 title: A run starts from its base branch realigned on the remote, whatever the previous
