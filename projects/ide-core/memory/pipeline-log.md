@@ -2266,3 +2266,13 @@ Aucune vulné (52469ms)
 - 2026-10-12 09:03:53 UTC — [ticket-398] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute un endpoint `/api/v1/projects/ (71280ms)
 - 2026-10-12 09:03:53 UTC — [ticket-398] APPROVED après 1 tour(s)
 - 2026-10-12 09:06:54 UTC — [ticket-398] documentation: 2 fichier(s) (178437ms)
+- 2026-10-12 09:10:25 UTC — [ide-core] ticket-398 PR #372 confiée au CIWatcher
+- 2026-10-12 09:10:27 UTC — [ticket-399] branche ticket-399-the-projects-tab-shows-every-project-as-a-card-in
+- 2026-10-12 09:10:27 UTC — [ticket-399] tour 1 — codeur démarré
+- 2026-10-12 09:16:31 UTC — [ticket-399] tour 1 — codeur terminé (364187ms)
+- 2026-10-12 09:21:39 UTC — [ticket-399] testeur: OK (exit 0)
+- 2026-10-12 09:22:17 UTC — [ticket-399] securite: PASS — Le diff ajoute une nouvelle vue Projets avec recherche, filtrage et gestion de c (38094ms)
+- 2026-10-12 09:22:17 UTC — [ticket-399] tour 1 — reviewer démarré
+- 2026-10-12 09:22:52 UTC — [ticket-399] tour 1 — reviewer terminé (34891ms)
+- 2026-10-12 09:27:55 UTC — [ticket-399] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la vue Projets c (337547ms)
+- 2026-10-12 09:27:55 UTC — [ticket-399] APPROVED après 1 tour(s)
