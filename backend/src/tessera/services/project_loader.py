@@ -71,7 +71,10 @@ def load_project(project_path: Path) -> Project:
         id=project_path.name,
         name=_parse_name(raw, fallback=project_path.name),
         path=project_path,
-        description=_parse_description(raw),
+        # Une description déclarée l'emporte : quand ni le CLAUDE.md ni le
+        # README ne présentent le projet (ticket-399, cartes de projets).
+        description=_chaine_declaree(project_path, "description")
+        or _parse_description(raw, _lire_readme(project_path)),
         active_agents=_parse_active_agents(raw),
         stack=_parse_stack(raw),
         raw_claude_md=raw,
@@ -101,6 +104,11 @@ def _load_category(project_path: Path) -> str | None:
     Une catégorie vide vaudrait un groupe sans nom à l'écran ; mieux vaut
     ranger le projet avec ceux qui ne déclarent rien.
     """
+    return _chaine_declaree(project_path, "category")
+
+
+def _chaine_declaree(project_path: Path, cle: str) -> str | None:
+    """Une chaîne non vide déclarée à la racine d'`agents.json`, sinon `None`."""
     agents_json = project_path / "agents.json"
     if not agents_json.exists():
         return None
@@ -108,7 +116,7 @@ def _load_category(project_path: Path) -> str | None:
         data = json.loads(agents_json.read_text(encoding="utf-8"))
     except Exception:
         return None
-    valeur = data.get("category")
+    valeur = data.get(cle) if isinstance(data, dict) else None
     if not isinstance(valeur, str) or not valeur.strip():
         return None
     return valeur.strip()
@@ -325,16 +333,76 @@ def _parse_name(content: str, fallback: str) -> str:
     return fallback
 
 
-def _parse_description(content: str) -> str:
-    skip_heading = True
-    for line in content.splitlines():
-        stripped = line.strip()
-        if skip_heading and stripped.startswith("#"):
-            skip_heading = False
+#: Débuts de paragraphe qui ne sont pas de la prose : citation (une note aux
+#: agents, « > Fichier local uniquement… »), séparateur, HTML, tableau, code,
+#: liste.
+_PAS_DE_LA_PROSE = (">", "---", "***", "<", "|", "```", "- ", "* ", "!")
+
+#: Un paragraphe qui s'adresse aux agents (« Profil agent : … ») ne décrit pas
+#: le projet.
+_CONSIGNE_AUX_AGENTS = re.compile(r"^(\*\*)?profil (agent|attendu)\b", re.IGNORECASE)
+
+_MARKDOWN_EN_LIGNE: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"!\[[^\]]*\]\([^)]*\)"), ""),  # image
+    (re.compile(r"\[([^\]]+)\]\([^)]*\)"), r"\1"),  # lien → son texte
+    (re.compile(r"(\*\*|__)(.+?)\1"), r"\2"),  # gras
+    (re.compile(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])"), r"\1"),  # italique
+    (re.compile(r"(?<![\w_])_(?!\s)(.+?)(?<!\s)_(?![\w_])"), r"\1"),
+    (re.compile(r"`([^`]+)`"), r"\1"),  # code
+)
+
+
+def _texte_brut(markdown: str) -> str:
+    """Inline Markdown → plain text, whitespace collapsed (ticket-399 cards)."""
+    texte = markdown
+    for motif, remplacement in _MARKDOWN_EN_LIGNE:
+        texte = motif.sub(remplacement, texte)
+    return re.sub(r"\s+", " ", texte).strip()
+
+
+def _introduction(content: str) -> str:
+    """The first prose paragraph between the title and the first section.
+
+    Les notes aux agents (citations), les séparateurs, le HTML d'un README de
+    profil et les listes ne décrivent pas le projet : ils sont sautés.
+    """
+    paragraphes: list[list[str]] = [[]]
+    titre_vu = False
+    for ligne in content.splitlines():
+        brute = ligne.strip()
+        if brute.startswith("#"):
+            if titre_vu or brute.startswith("##"):
+                break
+            titre_vu = True
             continue
-        if stripped and not stripped.startswith("#"):
-            return stripped
+        if not brute:
+            paragraphes.append([])
+        else:
+            paragraphes[-1].append(brute)
+    for lignes in paragraphes:
+        if (
+            lignes
+            and not lignes[0].startswith(_PAS_DE_LA_PROSE)
+            and not _CONSIGNE_AUX_AGENTS.match(lignes[0])
+        ):
+            return _texte_brut(" ".join(lignes))
     return ""
+
+
+def _parse_description(content: str, readme: str = "") -> str:
+    """The project's description, in plain text.
+
+    D'abord l'introduction du `CLAUDE.md` ; à défaut (un `CLAUDE.md` qui ne
+    s'adresse qu'aux agents), celle du `README.md`.
+    """
+    return _introduction(content) or _introduction(readme)
+
+
+def _lire_readme(project_path: Path) -> str:
+    try:
+        return (project_path / "README.md").read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return ""
 
 
 def _parse_active_agents(content: str) -> list[str]:
