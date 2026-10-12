@@ -7,7 +7,7 @@ estimated_days: 0.5
 id: ticket-400
 pr_number: null
 priority: medium
-status: blocked
+status: done
 title: Project categories collapse in the sidebar and the projects view, and a collapsed
   category shows how many projects it holds
 type: feat

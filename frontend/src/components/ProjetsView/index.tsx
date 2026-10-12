@@ -5,6 +5,8 @@ import { useEtatPersistant } from "../../hooks/useEtatPersistant";
 import { useResource } from "../../hooks/useResource";
 import type { Project, ProjectOverview } from "../../types/api";
 import { grouperParCategorie } from "../Sidebar/grouperParCategorie";
+import EnTeteDeCategorie from "../Sidebar/EnTeteDeCategorie";
+import { useCategoriesRepliees } from "../../hooks/useCategoriesRepliees";
 import BarreProjets from "./BarreProjets";
 import ProjetCarte from "./ProjetCarte";
 import {
@@ -80,6 +82,7 @@ export default function ProjetsView({
     estFiltresProjets,
   );
   const [echec, setEchec] = useState<string | null>(null);
+  const { estRepliee, basculer } = useCategoriesRepliees();
 
   const pastilles = pastillesDeCategories(data);
   // Une catégorie mémorisée mais disparue (retirée depuis) ne doit pas vider la vue.
@@ -139,14 +142,24 @@ export default function ProjetsView({
   } else {
     corps = (
       <div className="flex flex-col gap-4 p-4">
-        {grouperParCategorie(visibles).map((groupe) => (
-          <section key={groupe.categorie ?? "__sans__"} className="flex flex-col gap-2">
-            <h2 className="text-micro uppercase tracking-wide text-zinc-600">
-              {groupe.categorie ?? "Sans catégorie"}
-            </h2>
-            <div className={GRILLE}>{groupe.projets.map(carte)}</div>
-          </section>
-        ))}
+        {grouperParCategorie(visibles).map((groupe) => {
+          // Une recherche active montre ses résultats même dans une catégorie
+          // repliée, sans toucher à l'état mémorisé (ticket-400).
+          const repliee = estRepliee(groupe.categorie) && !filtres.recherche.trim();
+          return (
+            <section key={groupe.categorie ?? "__sans__"} className="flex flex-col gap-2">
+              <h2>
+                <EnTeteDeCategorie
+                  categorie={groupe.categorie}
+                  projets={groupe.projets}
+                  repliee={repliee}
+                  onBasculer={() => basculer(groupe.categorie)}
+                />
+              </h2>
+              {!repliee && <div className={GRILLE}>{groupe.projets.map(carte)}</div>}
+            </section>
+          );
+        })}
       </div>
     );
   }

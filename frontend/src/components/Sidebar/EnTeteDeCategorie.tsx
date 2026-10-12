@@ -1,11 +1,11 @@
 import { IconChevronDown } from "../../design/icons";
-import type { Project } from "../../types/api";
 import { resumeDeCategorie } from "./resumeDeCategorie";
 
 interface EnTeteDeCategorieProps {
   /** `null` : les projets qui ne déclarent aucune catégorie. */
   categorie: string | null;
-  projets: Project[];
+  /** `Project` (barre latérale) ou sa vue d'ensemble (vue « Projets »). */
+  projets: ReadonlyArray<{ name: string }>;
   repliee: boolean;
   onBasculer: () => void;
 }
