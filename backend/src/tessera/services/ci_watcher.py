@@ -18,11 +18,20 @@ merged=False and an arret describing the cause, then transitions the ticket to
 blocked.  A CancelledError from backend shutdown is NOT treated as an error —
 no ci_merge_done is emitted.
 
+Network errors (ticket-405): an httpx.TransportError (ReadTimeout…) during
+phase 2 does not prove the delivery failed — GitHub may have merged the PR
+before the answer was lost.  When the caller provides `etat_pr`, the watcher
+re-reads the PR first; a merged PR is a success, logged as such.  Every failure
+message names the exception type, even when its text is empty.
+
 Shutdown: call arreter() to cancel all running tasks without raising exceptions.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
+from datetime import datetime, timezone
 from pathlib import Path
+
+import httpx
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.livraison import Livraison
@@ -34,6 +43,16 @@ _logger = get_logger(__name__)
 #: Borne globale de la phase 2 (attente CI + merge). Supérieure à
 #: _ATTENTE_CI_MAX_S (900 s) pour couvrir également les appels réseau du merge.
 _TIMEOUT_PHASE2_S = 1200.0
+
+#: Relit l'état d'une PR : « open », « closed », « merged » ou « unknown ».
+EtatPr = Callable[[int], Awaitable[str]]
+
+
+def decrire_exception(exc: BaseException) -> str:
+    """Name the exception type, then its text when it has one."""
+    texte = str(exc)
+    nom = type(exc).__name__
+    return f"{nom}: {texte}" if texte else nom
 
 
 class CIWatcher:
@@ -68,6 +87,7 @@ class CIWatcher:
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
         pipeline_log_path: Path | None = None,
+        etat_pr: EtatPr | None = None,
     ) -> None:
         """Start watching `pr_number` for `ticket_id` in the background.
 
@@ -76,6 +96,8 @@ class CIWatcher:
 
         When the merge fails, writes a line to `pipeline_log_path` (if given).
         The ticket file in the working tree is never modified (ticket-392).
+        `etat_pr` lets the watcher re-read the PR after a network error
+        (ticket-405); without it, a network error is a failure.
         """
         # Le ticket est en attente dès l'inscription, même avant que le
         # sémaphore soit acquis : `en_attente` doit le lister pendant l'attente
@@ -85,7 +107,7 @@ class CIWatcher:
         task = asyncio.create_task(
             self._surveiller_impl(
                 project_id, ticket_id, pr_number, livraison_phase_2, on_event,
-                pipeline_log_path,
+                pipeline_log_path, etat_pr,
             ),
             name=f"ci-watcher:{project_id}:{ticket_id}",
         )
@@ -143,6 +165,7 @@ class CIWatcher:
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
         pipeline_log_path: Path | None,
+        etat_pr: EtatPr | None = None,
     ) -> None:
         sem = self._semaphore_du_projet(project_id)
         try:
@@ -162,8 +185,24 @@ class CIWatcher:
                         "ci_watcher_timeout",
                         extra={"project": project_id, "ticket": ticket_id},
                     )
+                except httpx.TransportError as exc:
+                    # Une réponse perdue ne dit pas que l'action a échoué : on
+                    # relit la PR avant de conclure (ticket-405).
+                    if await self._pr_mergee(etat_pr, pr_number):
+                        await self._succes_malgre_erreur_reseau(
+                            project_id, ticket_id, pr_number, exc, on_event,
+                            pipeline_log_path,
+                        )
+                    else:
+                        arret_erreur = (
+                            f"erreur inattendue : {decrire_exception(exc)}"
+                        )
+                        _logger.exception(
+                            "ci_watcher_error",
+                            extra={"project": project_id, "ticket": ticket_id},
+                        )
                 except Exception as exc:  # noqa: BLE001
-                    arret_erreur = f"erreur inattendue : {exc}"
+                    arret_erreur = f"erreur inattendue : {decrire_exception(exc)}"
                     _logger.exception(
                         "ci_watcher_error",
                         extra={"project": project_id, "ticket": ticket_id},
@@ -274,25 +313,66 @@ class CIWatcher:
                 extra={"project": project_id, "ticket": ticket_id, "pr": pr_number},
             )
         else:
-            self._resultats_merge[f"{project_id}:{ticket_id}"] = True
-            await on_event(
-                OrchestratorEvent(
-                    type=EventType.CI_MERGE_DONE,
-                    ticket_id=ticket_id,
-                    project_id=project_id,
-                    data={
-                        "project_id": project_id,
-                        "ticket_id": ticket_id,
-                        "pr_number": pr_number,
-                        "merged": True,
-                        "arret": None,
-                    },
-                )
+            await self._emettre_succes(project_id, ticket_id, pr_number, on_event)
+
+    async def _emettre_succes(
+        self,
+        project_id: str,
+        ticket_id: str,
+        pr_number: int,
+        on_event: EventCallback,
+    ) -> None:
+        """Emit ci_merge_done(merged=True) and record the success."""
+        self._resultats_merge[f"{project_id}:{ticket_id}"] = True
+        await on_event(
+            OrchestratorEvent(
+                type=EventType.CI_MERGE_DONE,
+                ticket_id=ticket_id,
+                project_id=project_id,
+                data={
+                    "project_id": project_id,
+                    "ticket_id": ticket_id,
+                    "pr_number": pr_number,
+                    "merged": True,
+                    "arret": None,
+                },
             )
-            _logger.info(
-                "ci_merge_done",
-                extra={"project": project_id, "ticket": ticket_id, "pr": pr_number},
+        )
+        _logger.info(
+            "ci_merge_done",
+            extra={"project": project_id, "ticket": ticket_id, "pr": pr_number},
+        )
+
+    async def _pr_mergee(self, etat_pr: EtatPr | None, pr_number: int) -> bool:
+        """Re-read the PR; False when it cannot be read or is not merged."""
+        if etat_pr is None:
+            return False
+        try:
+            return await etat_pr(pr_number) == "merged"
+        except Exception as exc:  # noqa: BLE001 — relecture best effort
+            _logger.warning(
+                "ci_watcher_relecture_pr_echouee",
+                extra={"pr": pr_number, "erreur": decrire_exception(exc)},
             )
+            return False
+
+    async def _succes_malgre_erreur_reseau(
+        self,
+        project_id: str,
+        ticket_id: str,
+        pr_number: int,
+        exc: BaseException,
+        on_event: EventCallback,
+        pipeline_log_path: Path | None,
+    ) -> None:
+        """The PR is merged although the network call failed: a success."""
+        self._ecrire_ligne_log(
+            pipeline_log_path,
+            ticket_id,
+            f"livraison: PR #{pr_number} mergée malgré une erreur réseau "
+            f"({decrire_exception(exc)})",
+        )
+        await self._emettre_succes(project_id, ticket_id, pr_number, on_event)
 
     def _ecrire_log_blocage(
         self,
@@ -302,14 +382,23 @@ class CIWatcher:
         arret: str,
     ) -> None:
         """Write a blocking delivery entry to the pipeline log."""
+        self._ecrire_ligne_log(
+            pipeline_log_path,
+            ticket_id,
+            f"livraison: arrêt — PR #{pr_number} non mergée : {arret[:200]}",
+        )
+
+    def _ecrire_ligne_log(
+        self,
+        pipeline_log_path: Path | None,
+        ticket_id: str,
+        message: str,
+    ) -> None:
+        """Append one timestamped line for `ticket_id` to the pipeline log."""
         if pipeline_log_path is None:
             return
-        from datetime import datetime, timezone
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-        line = (
-            f"- {ts} — [{ticket_id}] livraison: arrêt — "
-            f"PR #{pr_number} non mergée : {arret[:200]}\n"
-        )
+        line = f"- {ts} — [{ticket_id}] {message}\n"
         try:
             pipeline_log_path.parent.mkdir(parents=True, exist_ok=True)
             with pipeline_log_path.open("a", encoding="utf-8") as f:

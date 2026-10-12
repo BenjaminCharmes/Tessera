@@ -68,6 +68,10 @@ class _GitHub(Protocol):
 
     async def get_pull_request_status(self, pr_number: int) -> Any: ...
 
+    async def get_pull_request_state(self, pr_number: int) -> str: ...
+
+    async def has_workflows(self) -> bool: ...
+
     async def merge_pull_request(
         self,
         pr_number: int,
@@ -275,6 +279,18 @@ class GitHubWorkflowService:
             return "none"
         statut = await self._github.get_pull_request_status(pr_number)
         return str(getattr(statut, "ci_status", "none"))
+
+    async def has_workflows(self) -> bool:
+        """Le dépôt déclare-t-il au moins un workflow ? Sans GitHub : non."""
+        if self._github is None:
+            return False
+        return await self._github.has_workflows()
+
+    async def pr_state(self, pr_number: int) -> str:
+        """L'état de la PR (open, closed, merged), ou `unknown` sans GitHub."""
+        if self._github is None:
+            return "unknown"
+        return str(await self._github.get_pull_request_state(pr_number))
 
     async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool:
         """Merge la PR **si** le projet l'autorise et **si** la CI est verte.

@@ -2,6 +2,9 @@
 import json
 from pathlib import Path
 
+import pytest
+
+from tessera.config import settings
 from tessera.services.livraison import LivraisonService, Livraison
 
 
@@ -30,11 +33,25 @@ class _FauxGit:
 
 
 class _FauxWorkflow:
-    def __init__(self, ci: list[str] | None = None, merge: bool = True) -> None:
+    def __init__(
+        self,
+        ci: list[str] | None = None,
+        merge: bool = True,
+        workflows: bool = False,
+    ) -> None:
         self.ouvertures: list[dict[str, object]] = []
         self.merges: list[int] = []
+        self.lectures_workflows = 0
         self._ci = list(ci or ["passing"])
         self._merge = merge
+        self._workflows = workflows
+
+    async def has_workflows(self) -> bool:
+        self.lectures_workflows += 1
+        return self._workflows
+
+    async def pr_state(self, pr_number: int) -> str:
+        return "open"
 
     async def open_pull_request(self, **kwargs: object) -> object:
         self.ouvertures.append(kwargs)
@@ -322,6 +339,7 @@ def _service_avec_grace(
     grace_ci_s: float = 20.0,
     attente_ci_max_s: float = 60.0,
     intervalle_ci_s: float = 10.0,
+    workflows: bool = False,
 ) -> tuple[LivraisonService, _FauxWorkflow]:
     """Service en mode `merge` avec paramètres de grâce configurables."""
     racine = tmp_path / "projet_grace"
@@ -329,7 +347,7 @@ def _service_avec_grace(
     (racine / "agents.json").write_text(
         json.dumps({"autonomy": "merge"}), encoding="utf-8"
     )
-    w = _FauxWorkflow(ci=ci)
+    w = _FauxWorkflow(ci=ci, workflows=workflows)
     svc = LivraisonService(
         git_workspace=_FauxGit(),
         workflow=w,
@@ -370,6 +388,72 @@ async def test_none_persistant_apres_le_delai_de_grace_arrete_la_livraison(
     assert livraison.merged is False
     assert workflow.merges == []
     assert "none" in (livraison.arret or "")
+
+
+async def test_none_apres_la_grace_avec_workflows_declares_reste_pending(
+    tmp_path: Path,
+) -> None:
+    # ticket-405 : le dépôt déclare des workflows, leurs checks sont en retard.
+    # `none` n'est pas un verdict : la livraison attend jusqu'à la borne, puis
+    # rend `pending` — jamais `none`, et jamais de merge.
+    svc, workflow = _service_avec_grace(tmp_path, ci=["none"], workflows=True)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert workflow.merges == []
+    assert "CI : pending" in livraison.etapes
+    assert "n'a pas rendu de verdict" in (livraison.arret or "")
+    # Une fois les workflows vus, on ne les redemande plus à chaque poll.
+    assert workflow.lectures_workflows == 1
+
+
+async def test_checks_inscrits_tard_apres_la_grace_sont_attendus(
+    tmp_path: Path,
+) -> None:
+    # Les checks n'apparaissent qu'après le délai de grâce (20 s) : la
+    # livraison attend un verdict et merge sur le vert.
+    svc, workflow = _service_avec_grace(
+        tmp_path,
+        ci=["none", "none", "none", "none", "pending", "passing"],
+        workflows=True,
+    )
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is True
+    assert workflow.merges == [7]
+
+
+async def test_depot_sans_workflow_conclut_none_apres_la_grace(
+    tmp_path: Path,
+) -> None:
+    # Aucun workflow déclaré : personne n'inscrira de check, `none` conclut
+    # comme avant le ticket-405.
+    svc, workflow = _service_avec_grace(tmp_path, ci=["none"], workflows=False)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert workflow.merges == []
+    assert "CI : none" in livraison.etapes
+    assert workflow.lectures_workflows == 1
+
+
+async def test_grace_par_defaut_vient_du_reglage_ci_grace_s(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Sans valeur explicite, le délai de grâce est le réglage CI_GRACE_S.
+    monkeypatch.setattr(settings, "ci_grace_s", 42.0)
+    svc = LivraisonService(
+        git_workspace=_FauxGit(),
+        workflow=_FauxWorkflow(),
+        project_path=tmp_path,
+        base_branch="develop",
+    )
+
+    assert svc._grace_ci_s == 42.0
+    assert settings.__class__.model_fields["ci_grace_s"].default == 300.0
 
 
 async def test_failing_pendant_le_delai_de_grace_arrete_immediatement(

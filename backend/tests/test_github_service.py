@@ -744,3 +744,50 @@ async def test_merge_depasse_attente_fusionnabilite_max_s() -> None:
     assert merge_route.call_count == 0
     assert "7" in str(exc_info.value)
     assert "10" in str(exc_info.value)
+
+
+# ------------------------------------------------------------------
+# has_workflows, get_pull_request_state — ticket-405
+# ------------------------------------------------------------------
+
+
+@respx.mock
+async def test_has_workflows_false_when_total_count_is_zero() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/actions/workflows").mock(
+        return_value=httpx.Response(200, json={"total_count": 0, "workflows": []})
+    )
+
+    assert await _make_service().has_workflows() is False
+
+
+@respx.mock
+async def test_has_workflows_true_when_a_workflow_is_declared() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/actions/workflows").mock(
+        return_value=httpx.Response(200, json={"total_count": 2, "workflows": []})
+    )
+
+    assert await _make_service().has_workflows() is True
+
+
+@respx.mock
+async def test_has_workflows_true_when_github_cannot_answer() -> None:
+    # Un doute ne doit jamais conclure « pas de CI ».
+    route = respx.get(f"{_BASE}/repos/{_REPO}/actions/workflows")
+    route.mock(return_value=httpx.Response(504))
+    assert await _make_service().has_workflows() is True
+
+    route.mock(side_effect=httpx.ReadTimeout(""))
+    assert await _make_service().has_workflows() is True
+
+
+@respx.mock
+async def test_get_pull_request_state_reads_merged_open_and_closed() -> None:
+    route = respx.get(f"{_BASE}/repos/{_REPO}/pulls/7")
+    svc = _make_service()
+
+    route.mock(return_value=httpx.Response(200, json={"merged": True, "state": "closed"}))
+    assert await svc.get_pull_request_state(7) == "merged"
+    route.mock(return_value=httpx.Response(200, json={"merged": False, "state": "closed"}))
+    assert await svc.get_pull_request_state(7) == "closed"
+    route.mock(return_value=httpx.Response(200, json={"merged": False, "state": "open"}))
+    assert await svc.get_pull_request_state(7) == "open"
