@@ -4,7 +4,7 @@ created: 2026-10-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-401
-pr_number: null
+pr_number: 371
 priority: high
 status: done
 title: A chained test command reports the step that failed, not the last summary of
