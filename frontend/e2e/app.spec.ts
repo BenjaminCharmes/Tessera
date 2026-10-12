@@ -6,7 +6,7 @@ test.describe("Flow 1 — Affichage des projets", () => {
     mockedPage,
   }) => {
     await mockedPage.goto("/");
-    await expect(mockedPage.getByText("ide-core")).toBeVisible();
+    await expect(lateral(mockedPage).getByText("ide-core")).toBeVisible();
   });
 });
 
@@ -23,8 +23,10 @@ test.describe("Flow 2 — Sélection d'un projet → liste de tickets", () => {
   }) => {
     await mockedPage.goto("/");
 
-    // Click the project — triggers handleSelectProject → switches to tickets panel
-    await mockedPage.getByText("ide-core").click();
+    // Click the project — triggers handleSelectProject → switches to tickets panel.
+    // Depuis le ticket-399 le centre montre aussi une carte de ce projet : la
+    // région latérale lève l'ambiguïté.
+    await lateral(mockedPage).getByText("ide-core").click();
 
     // Only check the "todo" ticket — "done" tickets are collapsed by default
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;
@@ -66,7 +68,7 @@ test.describe("Flow 4 — Création d'un ticket", () => {
     await mockedPage.goto("/");
 
     // Select project (auto-switches to tickets panel)
-    await mockedPage.getByText("ide-core").click();
+    await lateral(mockedPage).getByText("ide-core").click();
 
     // Open create ticket modal via the + button in the Tickets panel header
     await lateral(mockedPage)
@@ -104,7 +106,7 @@ test.describe("Flow 5 — Ouverture de l'éditeur Monaco", () => {
     await mockedPage.goto("/");
 
     // Select project
-    await mockedPage.getByText("ide-core").click();
+    await lateral(mockedPage).getByText("ide-core").click();
 
     // Click on the todo ticket
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;
