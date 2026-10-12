@@ -16,6 +16,7 @@ vi.mock("./components/StatsView", () => ({ default: () => null }));
 vi.mock("./components/RunView", () => ({ default: () => null }));
 vi.mock("./components/Editor", () => ({ default: () => null }));
 vi.mock("./components/KanbanView", () => ({ default: () => null }));
+vi.mock("./components/ProjetsView", () => ({ default: () => null }));
 vi.mock("./components/DiffView", () => ({ default: () => null }));
 vi.mock("./components/BottomPanel", () => ({ default: () => null }));
 vi.mock("./components/Toast", () => ({ default: () => null }));

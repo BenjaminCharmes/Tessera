@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
-import { useProjects } from "./useProjects";
+import { notifierProjetsModifies, useProjects } from "./useProjects";
 import * as apiModule from "../lib/api";
 import type { Project } from "../types/api";
 
@@ -81,5 +81,17 @@ describe("useProjects", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(apiModule.api.projects.list).toHaveBeenCalledTimes(2);
+  });
+
+  it("reloads every mounted list when notifierProjetsModifies is called", async () => {
+    const { result } = renderHook(() => useProjects());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(apiModule.api.projects.list).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      notifierProjetsModifies();
+    });
+
+    await waitFor(() => expect(apiModule.api.projects.list).toHaveBeenCalledTimes(2));
   });
 });
