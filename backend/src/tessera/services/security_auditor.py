@@ -4,11 +4,12 @@ from typing import Literal
 
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.json_extract import extract_json
+from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-_MODEL = "claude-sonnet-4-6"
+_MODEL = MODELE_JUGEMENT
 _MAX_TOKENS = 2048
 _PROMPT_FILE = "securite.md"
 # Depuis le ticket-208, l'audit reçoit tout le diff d'une branche reprise :

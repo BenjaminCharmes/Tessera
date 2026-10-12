@@ -15,12 +15,13 @@ from tessera.services.providers.base import LLMProvider
 from tessera.utils.conversation import format_conversation
 from tessera.utils.json_extract import extract_json
 from tessera.services.prompt_loader import load_system_prompt
+from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
 _DEFAULT_MODEL = DEFAULT_MODEL
-_BOOTSTRAP_MODEL = "claude-haiku-4-5-20251001"
+_BOOTSTRAP_MODEL = MODELE_JUGEMENT
 _DEFAULT_MAX_TOKENS = 4096
 _BOOTSTRAP_MAX_TOKENS = 1024
 

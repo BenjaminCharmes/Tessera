@@ -6,6 +6,7 @@ from pathlib import Path
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
 from tessera.services.artifacts import default_mode_for
+from tessera.services.modeles_par_defaut import modele_par_defaut
 from tessera.services.providers.noms import (
     PROVIDERS_ANTHROPIC,
     PROVIDERS_CONNUS,
@@ -415,7 +416,7 @@ def _default_agents_json(
     agents = [
         {
             "role": role,
-            "model": "claude-sonnet-4-6",
+            "model": modele_par_defaut(role),
             "max_tokens": 8192 if role == "codeur" else 4096,
             "prompt_file": f"agents/prompts/{role}.md",
             "active": True,
