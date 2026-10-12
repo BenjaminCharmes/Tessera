@@ -506,6 +506,94 @@ def test_apres_section_ambigu_apres_normalisation_est_refuse(tmp_path: Path) -> 
 
 
 # ------------------------------------------------------------------
+# ticket-402 : ancrage tolérant à la typographie
+# ------------------------------------------------------------------
+
+
+def test_apostrophe_droite_retrouve_apostrophe_typographique(tmp_path: Path) -> None:
+    fichier = _doc(
+        tmp_path,
+        "guide.md",
+        "L’application suit. Et l’IDE aussi, comme d’habitude.\n",
+    )
+
+    appliquer_editions(
+        tmp_path,
+        [{"fichier": "docs/guide.md", "ancien": "L'application suit", "nouveau": "Le produit suit"}],
+    )
+
+    assert fichier.read_text(encoding="utf-8") == (
+        "Le produit suit. Et l’IDE aussi, comme d’habitude.\n"
+    )
+
+
+def test_guillemets_droits_et_espace_normale_retrouvent_espaces_insecables(
+    tmp_path: Path,
+) -> None:
+    fichier = _doc(
+        tmp_path,
+        "guide.md",
+        "Il dit « ainsi » ! Fin.\n",
+    )
+
+    appliquer_editions(
+        tmp_path,
+        [{"fichier": "docs/guide.md", "ancien": 'dit " ainsi " !', "nouveau": "dit autrement"}],
+    )
+
+    assert fichier.read_text(encoding="utf-8") == "Il dit autrement Fin.\n"
+
+
+def test_points_de_suspension_normalises_gardent_les_positions(tmp_path: Path) -> None:
+    fichier = _doc(tmp_path, "guide.md", "Avant… milieu … après, puis la suite.\n")
+
+    appliquer_editions(
+        tmp_path,
+        [{"fichier": "docs/guide.md", "ancien": "Avant... milieu", "nouveau": "Debut ok"}],
+    )
+
+    assert fichier.read_text(encoding="utf-8") == "Debut ok … après, puis la suite.\n"
+
+
+def test_ancien_ambigu_apres_normalisation_est_refuse(tmp_path: Path) -> None:
+    fichier = _doc(tmp_path, "guide.md", "Voir l’exemple.\nVoir l‘exemple.\n")
+    avant = fichier.read_text(encoding="utf-8")
+
+    with pytest.raises(EditionRefusee) as exc:
+        appliquer_editions(
+            tmp_path,
+            [{"fichier": "docs/guide.md", "ancien": "Voir l'exemple", "nouveau": "x"}],
+        )
+
+    assert "2 fois" in str(exc.value)
+    assert fichier.read_text(encoding="utf-8") == avant
+
+
+def test_correspondance_exacte_reste_prioritaire(tmp_path: Path) -> None:
+    # Le texte exact existe une fois ; sa variante typographique aussi. Sans
+    # priorité de l'exact, la normalisation y verrait deux passages.
+    fichier = _doc(tmp_path, "guide.md", "Voir l'exemple.\nVoir l’exemple.\n")
+
+    appliquer_editions(
+        tmp_path,
+        [{"fichier": "docs/guide.md", "ancien": "Voir l'exemple", "nouveau": "Voir ceci"}],
+    )
+
+    assert fichier.read_text(encoding="utf-8") == "Voir ceci.\nVoir l’exemple.\n"
+
+
+def test_apres_section_tolere_la_typographie(tmp_path: Path) -> None:
+    _doc(tmp_path, "guide.md", "# Guide\n\n## L’essentiel\n\ncontenu\n")
+
+    appliquer_editions(
+        tmp_path,
+        [{"fichier": "docs/guide.md", "apres_section": "## L'essentiel", "texte": "suite"}],
+    )
+
+    assert "suite" in (tmp_path / "docs" / "guide.md").read_text(encoding="utf-8")
+
+
+# ------------------------------------------------------------------
 # ticket-395 : tour de correction
 # ------------------------------------------------------------------
 

@@ -165,13 +165,89 @@ def _remplacer(avant: str, edition: dict[str, object], chemin: str) -> str:
     return apres
 
 
-def _normaliser_section(texte: str) -> str:
-    """Normalize a section title for case- and whitespace-tolerant comparison.
+#: Typographie française ramenée à son équivalent ASCII (ticket-402). Chaque
+#: caractère devient exactement un caractère : les positions se correspondent.
+_TYPO = str.maketrans(
+    {
+        "’": "'",
+        "‘": "'",
+        "“": '"',
+        "”": '"',
+        "«": '"',
+        "»": '"',
+        " ": " ",
+        " ": " ",
+    }
+)
 
-    Collapses multiple spaces, strips leading/trailing whitespace and lowercases.
+
+def _normaliser_typo(texte: str) -> tuple[str, list[int]]:
+    """Normalize typographic punctuation and non-breaking spaces.
+
+    Returns the normalized text and, for each of its characters, the position
+    of the originating character in ``texte``. The ellipsis is the only
+    character that expands to three, hence the position map.
+    """
+    sortie: list[str] = []
+    positions: list[int] = []
+    for i, c in enumerate(texte):
+        rendu = "..." if c == "…" else c.translate(_TYPO)
+        sortie.append(rendu)
+        positions.extend([i] * len(rendu))
+    return "".join(sortie), positions
+
+
+def _positions_de(texte: str, motif: str) -> list[int]:
+    """Start offsets of every non-overlapping occurrence of ``motif``."""
+    trouvees: list[int] = []
+    debut = texte.find(motif)
+    while debut != -1:
+        trouvees.append(debut)
+        debut = texte.find(motif, debut + len(motif))
+    return trouvees
+
+
+def _localiser(avant: str, ancien: str, chemin: str) -> tuple[int, int]:
+    """Locate ``ancien`` in ``avant`` and return its (start, end) offsets.
+
+    An exact match wins. Otherwise the search is retried after normalizing
+    typography on both sides, and the offsets are mapped back to ``avant`` so
+    the rest of the file keeps its typography.
+    """
+    exactes = _positions_de(avant, ancien)
+    if len(exactes) == 1:
+        return exactes[0], exactes[0] + len(ancien)
+
+    if len(exactes) == 0:
+        norm_avant, pos_avant = _normaliser_typo(avant)
+        norm_ancien, _ = _normaliser_typo(ancien)
+        trouvees = _positions_de(norm_avant, norm_ancien) if norm_ancien else []
+        if len(trouvees) == 1:
+            debut = trouvees[0]
+            dernier = pos_avant[debut + len(norm_ancien) - 1]
+            return pos_avant[debut], dernier + 1
+        exactes = trouvees
+
+    if not exactes:
+        raise EditionRefusee(
+            f"{chemin} : texte introuvable — « {ancien[:60]} ». "
+            "L'agent a proposé une modification sur un texte qui n'existe pas."
+        )
+    raise EditionRefusee(
+        f"{chemin} : texte présent {len(exactes)} fois — on ne devine pas "
+        "laquelle remplacer."
+    )
+
+
+def _normaliser_section(texte: str) -> str:
+    """Normalize a section title for case-, whitespace- and typography-tolerant comparison.
+
+    Collapses multiple spaces, strips leading/trailing whitespace, lowercases
+    and flattens typographic punctuation (ticket-402).
     Applied to both the requested section and each candidate heading line.
     """
-    return re.sub(r"\s+", " ", texte.strip()).lower()
+    plat, _ = _normaliser_typo(texte)
+    return re.sub(r"\s+", " ", plat.strip()).lower()
 
 
 def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
