@@ -33,6 +33,10 @@ dev = [
 # celles que mypyc compile pour mypy (2026-10-08, ticket-385) : mypy s'installe
 # depuis ses sources, en Python pur. Plus lent, mais il démarre.
 no-binary-package = ["mypy"]
+# Même blocage pour la DLL de rpds-py 2026.9.1 (2026-10-12) : la chaîne
+# claude_agent_sdk → mcp → jsonschema → referencing → rpds ne s'importe plus.
+# 2026.6.3 passe ; un `uv lock --upgrade` ne doit pas la remplacer.
+constraint-dependencies = ["rpds-py==2026.6.3"]
 
 [build-system]
 requires = ["hatchling"]

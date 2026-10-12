@@ -12,8 +12,15 @@ dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.24.0",
     "httpx>=0.27.0",
-    "mypy>=1.13.0",
+    "mypy>=1.13.0,<1.19",
 ]
+
+[tool.uv]
+# Smart App Control (Windows) bloque des extensions compilées sans réputation :
+# mypy s'installe en Python pur (< 1.19, sans librt), et rpds-py reste sur une
+# version dont la DLL passe. Mêmes réglages que le backend de Tessera.
+no-binary-package = ["mypy"]
+constraint-dependencies = ["rpds-py==2026.6.3"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
