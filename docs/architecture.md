@@ -695,6 +695,13 @@ abandon. Une configuration permet de contourner cette vérification pour les
 projets qui souhaitent merger malgré l'absence de CI.
 
 
+Avant de conclure `none` (aucun check enregistré), la livraison vérifie que le dépôt a effectivement des workflows déclarés (`GET /repos/{repo}/actions/workflows`).
+
+- **Dépôt sans workflows** : après le délai de grâce `CI_GRACE_S` (défaut 300 s), le statut passe à achèvement (`none` = pas de CI à attendre).
+- **Dépôt avec workflows** : même après le délai de grâce, le statut reste `pending` jusqu'à `attente_ci_max_s`. C'est le cas où GitHub est lent à enregistrer les checks.
+
+Sur une erreur réseau pendant la phase 2 (`httpx.TransportError`, dont `ReadTimeout`), le CIWatcher relit l'état de la PR avant d'abandonner. Si la PR est déjà mergée (`merged=True`), le run est marqué réussi avec un journal « mergée malgré une erreur réseau ». Tout message d'erreur inclut le type de l'exception, même si son contenu est vide (ticket-405).
+
 ### Méthode de merge configurable
 
 Une PR de ticket est mergée selon la méthode déclarée dans `agents.json` du 
@@ -857,6 +864,14 @@ C'est particulièrement important pour ide-core (`git_root: ancestor`) : les dat
 ### Servage des icônes du projet
 
 `GET /api/v1/projects/{project_id}/icon` sert la première icône trouvée dans une liste de chemins fixes — `frontend/public/favicon.svg`, `frontend/public/favicon.png`, `frontend/public/icon.svg`, etc. **Aucun chemin n'est reçu de la requête** : cela prévient tout accès à un fichier arbitraire du projet. Pas de fichier trouvé → `404`.
+
+Chaque projet est associé à une icône, cherchée dans cet ordre :
+
+1. `.tessera/icon.svg` — icône personnalisée, exclue de git par le projet (pour les cas où l'application n'a pas d'icône publique : scripts, bibliothèques, services)
+2. Chemins web standards : `src/app/icon.svg`, `src/app/icon.png` (Next.js), `frontend/public/logo.svg` (React), `public/icon.svg`
+3. `favicon.svg` ou `favicon.png` à la racine (pages statiques)
+
+Pour un projet déclaré `git_root: ancestor` (qui habite un sous-dossier d'un dépôt), la recherche s'effectue aussi à la racine du dépôt qui le contient, dans le même ordre. Un projet frère sans `.tessera/icon.svg` ni chemin standard ne reçoit pas d'icône (ticket-404).
 
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
