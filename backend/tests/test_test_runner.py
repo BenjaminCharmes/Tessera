@@ -12,6 +12,7 @@ import pytest
 from tests.conftest import requires_symlinks
 
 from tessera.services.test_runner import (
+    EtapeTest,
     TestCommandNotFound,
     TestResult,
     TestRunnerService,
@@ -21,6 +22,7 @@ from tessera.services.test_runner import (
     _extract_summary_line,
     _extract_vitest_failures,
     _get_semaphore,
+    _parse_failed_step,
     reset_semaphore_for_tests,
 )
 
@@ -711,4 +713,70 @@ class TestParseOutputIntegration:
             result = await service.run_tests(python_project, test_command="uv run pytest")
 
         assert result.passed is True
+        assert result.failure_details == ""
+
+
+_PY = f'"{sys.executable}" -c'
+
+
+def _etape(texte: str, code: int) -> str:
+    """A command step that prints ``texte`` (``\n`` separates lines) and exits."""
+    script = f"import sys; print('{texte}'); sys.exit({code})"
+    return f'{_PY} "{script}"'
+
+
+class TestEtapeEnEchecDansUneChaine:
+    """Ticket-401 : le résumé et le détail viennent de l'étape qui a échoué."""
+
+    async def test_summary_names_the_failing_step_and_its_exit_code(
+        self, service: TestRunnerService, tmp_path: Path
+    ) -> None:
+        premiere = _etape("Tests  171 passed (171)", 0)
+        seconde = _etape("1 failed, 455 passed in 3.21s", 1)
+
+        result = await service.run_tests(tmp_path, test_command=f"{premiere} && {seconde}")
+
+        assert result.passed is False
+        assert "1 failed, 455 passed" in result.output_summary
+        assert "exit 1" in result.output_summary
+        assert "1 failed, 455 passed in 3.21s" in result.output_summary
+        assert result.etapes[1].commande in result.output_summary
+        assert "171 passed" not in result.output_summary
+
+    def test_pytest_quiet_summary_line_is_recognised(self) -> None:
+        summary = _extract_summary_line("F\n1 failed, 455 passed in 3.21s\n")
+        assert summary == "1 failed, 455 passed in 3.21s"
+
+    def test_pytest_quiet_summary_wins_over_vitest_line(self) -> None:
+        output = "Tests  171 passed (171)\n1 failed, 455 passed in 3.21s"
+        assert _extract_summary_line(output) == "1 failed, 455 passed in 3.21s"
+
+    async def test_unstructured_failure_keeps_its_tail_and_no_earlier_line(
+        self, service: TestRunnerService, tmp_path: Path
+    ) -> None:
+        premiere = _etape("ligne-de-la-premiere-etape", 0)
+        lint = _etape("src/a.ts:3 no-unused-vars", 1)
+
+        result = await service.run_tests(tmp_path, test_command=f"{premiere} && {lint}")
+
+        assert "src/a.ts:3 no-unused-vars" in result.failure_details
+        assert "ligne-de-la-premiere-etape" not in result.failure_details
+
+    def test_failure_details_fallback_is_capped_to_the_last_sixty_lines(self) -> None:
+        sortie = "\n".join(f"ligne {i}" for i in range(100))
+        resultat = _parse_failed_step(EtapeTest("lint", 1), sortie, 0, True)
+        lignes = resultat.failure_details.splitlines()
+        assert len(lignes) == 60
+        assert lignes[-1] == "ligne 99"
+
+    async def test_all_steps_green_keeps_the_current_summary(
+        self, service: TestRunnerService, tmp_path: Path
+    ) -> None:
+        premiere = _etape("Tests  171 passed (171)", 0)
+        seconde = _etape("seconde etape terminee", 0)
+
+        result = await service.run_tests(tmp_path, test_command=f"{premiere} && {seconde}")
+
+        assert result.passed is True
+        assert result.output_summary == "Tests  171 passed (171)"
         assert result.failure_details == ""
