@@ -236,6 +236,17 @@ Si un projet déclare un service, sa carte affiche un bouton « Lancer » dans s
 - Pendant l'appel, le bouton est grisé
 - Un échec affiche un message court en rouge sous le bouton ; le bouton reste cliquable pour réessayer
 
+### Lancer une file depuis la carte d'un projet
+
+Tu vois un bouton **« File (N) »** sur une carte si le projet a au moins un ticket « à faire ». Clique dessus pour envoyer tous les tickets du projet dans le pipeline.
+
+Une confirmation s'affiche sur la carte : « Lancer N tickets ? » Clique **« Lancer »** pour poursuivre.
+
+- Les tickets lancés sont ceux au statut « à faire », dans l'ordre de leur id.
+- Quand tu cliques, l'IDE reste dans la vue d'ensemble — tu n'entres pas dans le projet.
+- Si un run tourne déjà sur ce projet, le bouton est grisé et tu vois l'infobulle « Un run est en cours ».
+- Si le lancement échoue (par exemple, un autre run a démarré pendant que tu confirmais), un message d'erreur court s'affiche en rouge.
+
 ### Sélectionner un projet
 
 Clique sur une carte pour la sélectionner. La zone centrale passe au Kanban de ce projet, comme si tu l'avais choisi dans la barre latérale.
