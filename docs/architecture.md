@@ -1027,6 +1027,22 @@ Deux étapes complètent la protection hors du pipeline :
 En local, une liste vide désactive le contrôle. En CI, son absence bloque le
 merge — c'est intentionnel.
 
+
+## Gestion des signalements en attente (ticket-421)
+
+Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu'un run ide-core est actif, il n'est pas écrit immédiatement dans l'arbre. Cela évite qu'il soit emporté dans le commit du run en cours — ce qui poluerait le diff réel avec une métadonnée Tessera.
+
+**Flux** :
+
+1. Requête `POST /api/v1/signalements` reçue
+2. Vérification : `RUN_REGISTRY.projet_occupe("ide-core")` ?
+   - **Oui** : le signalement est écrit dans `signalements_en_attente.json` (à côté de la base SQLite, sous `settings.ide_db_path`) ; réponse **202** avec `{ "en_attente": true, "position": n }`
+   - **Non** : comportement standard, ticket créé dans `tickets/todo/` ; réponse **201**
+3. À la fermeture du run ide-core (évènement de fin ou appel `RUN_REGISTRY.fermer`), les signalements en attente sont convertis en tickets et écrits, en ordre d'arrivée, chacun recevant un numéro distinct
+4. Fichier `signalements_en_attente.json` vidé
+
+L'ordre est garanti : deux signalements reçoivent des `position` croissantes et sont écrits dans cet ordre.
+
 ## Validation des identifiants de projet (ticket-370)
 
 Toutes les routes contenant un paramètre `project_id` valident cet identifiant pour assurer que le chemin du projet reste conforme au dossier des projets configuré. Un `project_id` invalide — contenant `.`, `..`, `/`, `\` ou tout caractère ne correspondant pas au pattern `^[A-Za-z0-9][A-Za-z0-9._-]*$` — retourne une `404` sans jamais accéder au disque.

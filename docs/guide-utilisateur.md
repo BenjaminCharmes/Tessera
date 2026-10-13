@@ -1349,6 +1349,15 @@ Un clic crée un ticket dans ide-core, associé au projet d'où tu signales. Tu 
 
 Si l'envoi échoue (pas de connexion au backend), tu vois un message d'erreur. Ton texte reste en place — tu peux corriger et renvoyer sans rien perdre.
 
+
+#### Quand un run ide-core est en cours
+
+Si un signalement arrive pendant qu'une file ide-core tourne, il n'est pas converti en ticket immédiatement : il attend dans une file d'attente temporaire. L'interface affiche « En attente (position : 2) » au lieu d'un numéro de ticket. Le signalement devient un ticket normal dès que le run de ide-core se termine et se fusionne.
+
+
+- **Défaut** : le signalement devient immédiatement un ticket dans ide-core.
+- **Si un run ide-core tourne** : le signalement est mis en attente hors du dépôt. Il deviendra un ticket une fois le run terminé, protégeant ainsi l'intégrité du travail en cours.
+
 ### Les tickets ne sont visibles que dans ide-core
 
 Les signalements créés ne remontent pas dans une liste locale. Tu les lis dans le Kanban d'ide-core, comme n'importe quel autre ticket de ce projet.
