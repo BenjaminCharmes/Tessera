@@ -118,6 +118,7 @@ export default function ProjetsView({
           if (complet) onSelectProject(complet);
         }}
         onChangerCategorie={(c) => void changerCategorie(projet, c)}
+        onServicesChange={refresh}
       />
     );
   }
