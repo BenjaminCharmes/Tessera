@@ -950,6 +950,27 @@ Chaque carte de projet affiche un bouton de contrôle de service (« Lancer » o
 
 Le rechargement de la vue d'ensemble (`/api/v1/projects/overview`) après succès tient les états à jour en cas de lancements parallèles depuis plusieurs sessions.
 
+### Détection des services locaux (ticket-416)
+
+Tessera détecte et peut arrêter les apps de projet qui tournent localement, qu'elles soient lancées par l'IDE ou manuellement, pour libérer les ressources.
+
+L'endpoint `GET /api/v1/services/running` énumère chaque app avec les champs :
+
+- `project_id`, `project_name` : projet auquel elle appartient
+- `nom`, `pid` : nom du service et identifiant de processus
+- `origine: "tessera" | "externe"` : lancée par l'IDE ou détectée en dehors
+- `ports: [int]` : ports écoutés
+- `demarre_a` : timestamp de lancement
+- `memoire_mo` : consommation mémoire RSS en Mo
+
+**Services `tessera`** — enregistrés dans `PROCESS_REGISTRY` (lancés par l'IDE). Mémoire incluant les descendants du processus.
+
+**Services `externe`** — processus écoutant un port déclaré par un projet (`--port N` dans une commande d'`agents.json`, ou `server.port` dans `vite.config.ts`) mais lancés en dehors de l'IDE. Détection cherche tous les ports du projet, exclut 8100 (backend Tessera) et 5173 (frontend Vite).
+
+Mesure de mémoire : `psutil` si disponible (le backend le teste au startup) ; sinon repli sur `netstat -ano` + `tasklist` sous Windows, `ss` + `ps` ailleurs — interface unique derrière un mock testable (ADR-031).
+
+L'endpoint `POST /api/v1/services/running/{pid}/stop` arrête l'arbre de processus, seulement si ce pid figure dans l'inventaire courant (404 sinon). Services `tessera` passent par `PROCESS_REGISTRY.arreter` ; services externes sont tués directement.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

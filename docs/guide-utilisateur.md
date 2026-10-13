@@ -236,6 +236,20 @@ Si un projet déclare un service, sa carte affiche un bouton « Lancer » dans s
 - Pendant l'appel, le bouton est grisé
 - Un échec affiche un message court en rouge sous le bouton ; le bouton reste cliquable pour réessayer
 
+La vue Projets affiche en temps réel un inventaire de toutes les apps qui tournent sur ta machine. Chaque app affiche :
+
+- Son nom et le projet auquel elle appartient
+- Son identifiant de processus (PID)
+- Les ports qu'elle écoute
+- Sa consommation mémoire (incluant tous ses processus enfants)
+- Son origine : **Tessera** (lancée par l'IDE) ou **externe** (lancée en dehors de l'IDE)
+
+Le backend Tessera lui-même (port 8100) et son interface web (port 5173) sont exclus de cet inventaire.
+
+Pour arrêter une app, clique sur **Arrêter** à côté. L'IDE ferme le processus et tous ses descendants. Si elle a été lancée par Tessera, elle ne relancera pas automatiquement.
+
+Une app **externe** est une application que tu as démarrée en dehors de l'IDE — par exemple une API, un serveur, ou une interface web — qui écoute un port connu d'un projet. L'IDE la détecte automatiquement et te permet de l'arrêter directement depuis la vue Projets. C'est utile quand tu as oublié une app en train de tourner — tu vois sa consommation mémoire et tu peux la fermer en un clic.
+
 ### Lancer une file depuis la carte d'un projet
 
 Tu vois un bouton **« File (N) »** sur une carte si le projet a au moins un ticket « à faire ». Clique dessus pour envoyer tous les tickets du projet dans le pipeline.
@@ -260,6 +274,14 @@ Un clic démarre ou arrête l'app sans quitter la vue Projets ni sélectionner l
 En cas d'erreur, un message court s'affiche sous le bouton en rouge. La carte reste cliquable — tu peux relancer.
 
 Aucun bouton n'apparaît si le projet n'a pas d'app.
+
+Si un projet déclare un service (une API, une interface web, un outil), tu vois un bouton de contrôle sur sa carte.
+
+**Démarrer** lance l'app. L'IDE affiche la sortie en console pour que tu voies le démarrage en cours. Le bouton devient **Arrêter**. Tu peux le reclicquer pour fermer l'app.
+
+Si tu essaies de relancer une app qui est en train de démarrer, l'IDE attend qu'elle soit prête, puis la redémarre — sans risque de lancement double.
+
+Les apps lancées par Tessera pendant un run du pipeline apparaissent aussi dans l'inventaire global avec l'origine **Tessera**.
 
 ### Changer la catégorie d'un projet
 
