@@ -1,4 +1,6 @@
 """Endpoint POST /api/v1/signalements — ticket-407."""
+import json
+from collections.abc import Iterator
 from pathlib import Path
 
 import httpx
@@ -7,6 +9,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
+from tessera.services.run_registry import RUN_REGISTRY, RunActif
 
 
 @pytest.fixture(autouse=True)
@@ -119,3 +122,83 @@ def test_router_is_mounted_under_api_v1() -> None:
     paths = app.openapi()["paths"]
 
     assert "post" in paths["/api/v1/signalements"]
+
+
+# -- ticket-421 : un signalement n'atterrit pas dans un arbre occupé ----------
+
+
+@pytest.fixture
+def attente(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    monkeypatch.setattr(settings, "ide_db_path", tmp_path / "data" / "tessera.db")
+    return tmp_path / "data" / "signalements_en_attente.json"
+
+
+@pytest.fixture
+def run_ide_core() -> Iterator[RunActif]:
+    run = RUN_REGISTRY.ouvrir("ide-core", "ticket-001")
+    yield run
+    RUN_REGISTRY.fermer(run.run_id)
+
+
+def test_report_during_a_run_is_202_and_writes_no_ticket(
+    workspace: Path, attente: Path, run_ide_core: RunActif
+) -> None:
+    resp = _envoyer()
+
+    assert resp.status_code == 202
+    assert resp.json() == {"en_attente": True, "position": 1}
+    assert _tickets(workspace, "ide-core") == []
+    assert attente.is_file()
+
+
+def test_queued_report_becomes_a_todo_ticket_when_the_run_closes(
+    workspace: Path, attente: Path
+) -> None:
+    run = RUN_REGISTRY.ouvrir("ide-core", "ticket-001")
+    _envoyer(titre="Arrive pendant le run")
+
+    RUN_REGISTRY.fermer(run.run_id)
+
+    tickets = _tickets(workspace, "ide-core")
+    assert len(tickets) == 1
+    assert "arrive-pendant-le-run" in tickets[0].name
+    assert "status: todo" in tickets[0].read_text(encoding="utf-8")
+    assert json.loads(attente.read_text(encoding="utf-8")) == []
+
+
+def test_two_queued_reports_are_written_in_arrival_order(
+    workspace: Path, attente: Path
+) -> None:
+    run = RUN_REGISTRY.ouvrir("ide-core", "ticket-001")
+    assert _envoyer(titre="Premier").json()["position"] == 1
+    assert _envoyer(titre="Second").json()["position"] == 2
+
+    RUN_REGISTRY.fermer(run.run_id)
+
+    tickets = _tickets(workspace, "ide-core")
+    assert len(tickets) == 2
+    ids = [t.name.split("-")[1] for t in tickets]
+    assert len(set(ids)) == 2
+    assert "premier" in tickets[0].name
+    assert "second" in tickets[1].name
+
+
+def test_report_without_a_run_is_still_201_and_queues_nothing(
+    workspace: Path, attente: Path
+) -> None:
+    resp = _envoyer()
+
+    assert resp.status_code == 201
+    assert len(_tickets(workspace, "ide-core")) == 1
+    assert not attente.exists()
+
+
+def test_closing_another_project_run_keeps_the_queue(
+    workspace: Path, attente: Path, run_ide_core: RunActif
+) -> None:
+    _envoyer()
+    autre = RUN_REGISTRY.ouvrir("mon-projet", "ticket-002")
+    RUN_REGISTRY.fermer(autre.run_id)
+
+    assert _tickets(workspace, "ide-core") == []
+    assert len(json.loads(attente.read_text(encoding="utf-8"))) == 1

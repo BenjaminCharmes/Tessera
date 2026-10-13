@@ -217,6 +217,10 @@ class TicketService:
         return self._parse(dest)
 
     async def create_ticket(self, ticket: Ticket) -> Ticket:
+        return self.create_ticket_sync(ticket)
+
+    def create_ticket_sync(self, ticket: Ticket) -> Ticket:
+        """Write ``ticket`` under ``todo/``; usable where no event loop is awaited."""
         ticket_id = ticket.id if ticket.id else self._next_id()
         created = ticket.created or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
