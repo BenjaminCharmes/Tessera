@@ -43,6 +43,20 @@ class Livraison:
     conflits: tuple[str, ...] = ()
     pr_number: int | None = None
     merged: bool = False
+    #: Vrai quand la phase 1 a levé **après** l'ouverture de la PR : `arret`
+    #: porte alors une cause, mais la PR est bien ouverte et doit passer à la
+    #: phase 2. Les autres arrêts avec PR (conflit résolu, ADR-033) restent
+    #: sans surveillance. (ticket-415)
+    pr_orpheline: bool = False
+
+
+class LivraisonInterrompue(Exception):
+    """Phase 1 failed after the PR was opened; carries its number and cause."""
+
+    def __init__(self, pr_number: int, cause: Exception) -> None:
+        super().__init__(f"PR #{pr_number} ouverte, puis {type(cause).__name__}")
+        self.pr_number = pr_number
+        self.cause = cause
 
 
 class _Git(Protocol):
@@ -218,6 +232,25 @@ class LivraisonService:
         etapes.append(f"PR #{pr_number} ouverte")
         durees_ms.append(pr_ms)
 
+        # La PR existe : toute exception à partir d'ici porte son numéro, pour
+        # que la phase 2 puisse quand même la reprendre (ticket-415).
+        try:
+            return await self._apres_ouverture(
+                ticket_id, pr_number, branch, tuple(etapes), tuple(durees_ms), resolus
+            )
+        except Exception as exc:  # noqa: BLE001 — relevée avec le numéro de PR
+            raise LivraisonInterrompue(pr_number, exc) from exc
+
+    async def _apres_ouverture(
+        self,
+        ticket_id: str,
+        pr_number: int,
+        branch: str,
+        etapes: tuple[str, ...],
+        durees_ms: tuple[float, ...],
+        resolus: list[str],
+    ) -> Livraison:
+        """What follows the PR opening: ticket note, then the verdict of phase 1."""
         # Enregistre le pr_number dans le ticket, commite et pousse **avant**
         # tout merge : garantit qu'aucun commit n'est laissé sur la branche
         # locale après que la PR a été mergée (ticket-270).

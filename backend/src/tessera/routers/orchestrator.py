@@ -18,7 +18,7 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
 from tessera.services.livraison_possible import raison_de_refus_livraison
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
@@ -49,6 +49,7 @@ from tessera.services.project_loader import (
 )
 from tessera.utils.project_id import validate_project_id
 from tessera.services.ticket_service import TicketService
+from tessera.utils.exceptions import decrire_exception
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -338,6 +339,31 @@ def _documenteur(
     return documenter
 
 
+def _livraison_interrompue(exc: Exception) -> Livraison:
+    """Turn an exception of phase 1 into a Livraison that names its cause.
+
+    Si la PR était déjà ouverte (`LivraisonInterrompue`), son numéro est gardé
+    et la livraison est marquée pour la phase 2 : la PR ne reste pas orpheline.
+    """
+    cause = exc.cause if isinstance(exc, LivraisonInterrompue) else exc
+    motif = decrire_exception(cause)
+    _logger.warning(
+        "livraison_echouee",
+        exc_info=cause,
+        extra={"erreur": motif, "pr": getattr(exc, "pr_number", None)},
+    )
+    arret = f"Livraison interrompue : {motif}"
+    if not isinstance(exc, LivraisonInterrompue):
+        return Livraison(arret=arret)
+    return Livraison(
+        etapes=(f"PR #{exc.pr_number} ouverte",),
+        durees_ms=(0.0,),
+        arret=arret,
+        pr_number=exc.pr_number,
+        pr_orpheline=True,
+    )
+
+
 async def _sync_apres_livraison(
     livraison: Livraison,
     espace: GitWorkspaceService | None,
@@ -377,13 +403,17 @@ async def _sync_apres_livraison(
     raison = await espace.sync_base_depuis_distant(base_branch)
     if raison is None:
         return livraison
+    # Une PR orpheline garde la cause de son interruption : la raison de la
+    # sync s'y ajoute au lieu de l'effacer (ticket-415).
+    arret = f"{livraison.arret} ; {raison}" if livraison.pr_orpheline else raison
     return Livraison(
         etapes=livraison.etapes,
         durees_ms=livraison.durees_ms,
-        arret=raison,
+        arret=arret,
         conflits=livraison.conflits,
         pr_number=livraison.pr_number,
         merged=livraison.merged,
+        pr_orpheline=livraison.pr_orpheline,
     )
 
 
@@ -478,8 +508,7 @@ def _livreur(
                 approuve=result.approved,
             )
         except Exception as exc:  # noqa: BLE001 — voir la docstring
-            _logger.warning("livraison_echouee", extra={"erreur": str(exc)})
-            livraison = Livraison(arret=f"Livraison interrompue : {exc}")
+            livraison = _livraison_interrompue(exc)
         # Syncing is always attempted so the next ticket forks from origin/<base>
         # regardless of whether this phase 1 succeeded or failed (ADR-051).
         livraison = await _sync_apres_livraison(livraison, espace, politique, base_branch)

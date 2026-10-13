@@ -256,9 +256,11 @@ class Orchestrator:
         # retourne immédiatement (crée une tâche asyncio), ce qui permet à
         # `run_pipeline` de rendre la main et au verrou de se libérer avant
         # que `ci_merge_done` soit émis.
+        # Une PR dont la phase 1 a levé après l'ouverture (`pr_orpheline`) est
+        # surveillée malgré son `arret` ; un conflit résolu ne l'est jamais.
         if (
             livraison.pr_number is not None
-            and livraison.arret is None
+            and (livraison.arret is None or livraison.pr_orpheline)
             and self._surveiller is not None
         ):
             await self._surveiller(project_id, ticket_id, livraison.pr_number, on_event)

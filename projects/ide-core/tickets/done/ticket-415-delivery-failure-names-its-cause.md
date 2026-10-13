@@ -1,15 +1,16 @@
 ---
-id: ticket-415
-title: "A delivery that fails after opening its PR names its cause and still hands the PR to the CI watcher"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-415
 plan: true
+pr_number: 404
+priority: high
+status: done
+title: A delivery that fails after opening its PR names its cause and still hands
+  the PR to the CI watcher
+type: fix
 ---
 
 # ticket-415 — Une livraison qui échoue dit pourquoi, et ne lâche pas sa PR

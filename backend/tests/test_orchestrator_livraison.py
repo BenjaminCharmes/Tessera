@@ -246,6 +246,58 @@ async def test_run_approuve_appelle_livrer_phase_1_puis_surveiller(
     assert surveilles == [("proj", "ticket-001", 7)]
 
 
+async def test_pr_orpheline_est_confiee_a_la_surveillance_malgre_son_arret(
+    tmp_path: Path,
+) -> None:
+    """Une phase 1 qui a levé après l'ouverture de la PR passe quand même en phase 2."""
+    surveilles: list[tuple[str, str, int]] = []
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(
+            pr_number=13,
+            arret="Livraison interrompue : TimeoutError",
+            pr_orpheline=True,
+        )
+
+    async def _surveiller(
+        project_id: str, ticket_id: str, pr_number: int, on_event: Any
+    ) -> None:
+        surveilles.append((project_id, ticket_id, pr_number))
+
+    orch = _construire_avec_surveiller(
+        tmp_path, [_resultat("ticket-001")], _livrer, surveiller=_surveiller
+    )
+
+    await orch.run_pipeline("proj", "ticket-001", _rien)
+
+    assert surveilles == [("proj", "ticket-001", 13)]
+
+
+async def test_conflit_resolu_reste_sans_surveillance(tmp_path: Path) -> None:
+    """ADR-033 : une PR avec arret mais sans `pr_orpheline` n'est jamais surveillée."""
+    surveilles: list[int] = []
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(
+            pr_number=13,
+            conflits=("src/app.py",),
+            arret="Conflit résolu sur src/app.py : la PR #13 est ouverte, à relire.",
+        )
+
+    async def _surveiller(
+        project_id: str, ticket_id: str, pr_number: int, on_event: Any
+    ) -> None:
+        surveilles.append(pr_number)
+
+    orch = _construire_avec_surveiller(
+        tmp_path, [_resultat("ticket-001")], _livrer, surveiller=_surveiller
+    )
+
+    await orch.run_pipeline("proj", "ticket-001", _rien)
+
+    assert surveilles == []
+
+
 async def test_surveiller_non_appele_sans_pr(tmp_path: Path) -> None:
     """Pas de surveillance quand la phase 1 n'a pas ouvert de PR."""
     surveilles: list[str] = []
