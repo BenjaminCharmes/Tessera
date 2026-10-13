@@ -5,7 +5,7 @@ depends_on:
 - ticket-407
 estimated_days: 0.5
 id: ticket-408
-pr_number: null
+pr_number: 389
 priority: high
 status: done
 title: A Report button in the project header sends a Tessera bug or idea to ide-core
