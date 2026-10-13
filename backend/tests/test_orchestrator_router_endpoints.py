@@ -433,6 +433,80 @@ def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
     assert "injoignable" in (livraison.arret or "")
 
 
+def test_une_exception_sans_message_nomme_son_type_dans_l_arret(
+    workspace: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    # Le 2026-10-13, « Livraison interrompue : » s'est écrit sans motif : un
+    # `TimeoutError()` n'a pas de message. (ticket-415)
+    from tessera.routers.orchestrator import _livreur
+
+    async def _livrer(self: object, **kwargs: object) -> object:
+        raise TimeoutError()
+
+    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+
+    with caplog.at_level("WARNING"):
+        livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+
+    assert "TimeoutError" in (livraison.arret or "")
+    assert livraison.pr_number is None
+    assert livraison.pr_orpheline is False
+    journal = [r for r in caplog.records if r.getMessage() == "livraison_echouee"]
+    assert len(journal) == 1
+    assert journal[0].exc_info is not None
+    assert journal[0].exc_info[0] is TimeoutError
+
+
+def test_une_exception_apres_la_pr_garde_son_numero(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # La PR #13 de curio était ouverte, mais la livraison ne le savait plus :
+    # la phase 2 n'est jamais partie. (ticket-415)
+    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livraison import LivraisonInterrompue
+
+    async def _livrer(self: object, **kwargs: object) -> object:
+        raise LivraisonInterrompue(13, TimeoutError())
+
+    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+
+    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+
+    assert livraison.pr_number == 13
+    assert livraison.pr_orpheline is True
+    assert "PR #13 ouverte" in livraison.etapes
+    assert len(livraison.durees_ms) == len(livraison.etapes)
+    assert "TimeoutError" in (livraison.arret or "")
+    assert "LivraisonInterrompue" not in (livraison.arret or "")
+
+
+def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livraison import LivraisonInterrompue
+
+    async def _livrer(self: object, **kwargs: object) -> object:
+        raise LivraisonInterrompue(13, TimeoutError())
+
+    class _Espace:
+        async def sync_base_depuis_distant(self, base: str) -> str:
+            return "base non alignée"
+
+    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+
+    livraison = asyncio.run(
+        _livreur("mon-projet", espace=_Espace())(_approved())  # type: ignore[arg-type]
+    )
+
+    assert livraison.pr_orpheline is True
+    assert livraison.pr_number == 13
+    assert "TimeoutError" in (livraison.arret or "")
+    assert "base non alignée" in (livraison.arret or "")
+
+
 def _livrer_la_pr(numero: int) -> object:
     from tessera.services.livraison import Livraison
 

@@ -570,3 +570,43 @@ async def test_phase_2_autonomy_pr_ne_merge_pas(tmp_path: Path) -> None:
     assert phase2.merged is False
     assert workflow.merges == []
     assert phase2.arret is None
+
+
+async def test_phase_1_exception_apres_la_pr_porte_son_numero(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Une exception levée une fois la PR ouverte garde son numéro (ticket-415)."""
+    from tessera.services.livraison import LivraisonInterrompue
+
+    svc, _git, _workflow = _service(tmp_path, "pr")
+
+    async def _callback_en_echec(ticket_id: str, pr: int, branch: str) -> None:
+        raise RuntimeError("push refusé")
+
+    class _JournalCasse:
+        def warning(self, *args: object, **kwargs: object) -> None:
+            raise OSError("journal indisponible")
+
+    svc._post_pr_callback = _callback_en_echec  # type: ignore[assignment]
+    monkeypatch.setattr("tessera.services.livraison._logger", _JournalCasse())
+
+    with pytest.raises(LivraisonInterrompue) as info:
+        await _phase_1(svc)
+
+    assert info.value.pr_number == 7
+    assert isinstance(info.value.cause, OSError)
+
+
+async def test_phase_1_exception_avant_la_pr_n_est_pas_enveloppee(
+    tmp_path: Path,
+) -> None:
+    """Sans PR ouverte, l'exception d'origine remonte telle quelle."""
+
+    class _OuvertureMuette(_FauxWorkflow):
+        async def open_pull_request(self, **kwargs: object) -> object:
+            raise TimeoutError()
+
+    svc, _git, _workflow = _service(tmp_path, "pr", workflow=_OuvertureMuette())
+
+    with pytest.raises(TimeoutError):
+        await _phase_1(svc)
