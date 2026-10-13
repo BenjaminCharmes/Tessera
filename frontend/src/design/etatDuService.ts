@@ -27,12 +27,20 @@ export function etatDuService(service: ServiceActif): EtatDuService {
   return service.pid === null ? "jamais-lance" : "arrete";
 }
 
+/**
+ * Un code de sortie Windows arrive non signé : `taskkill` ou un arrêt brutal
+ * donnent 4294967295, qui n'est que -1 lu sur 32 bits.
+ */
+export function codeDeSortieLisible(code: number): number {
+  return code > 0x7fffffff ? code - 0x100000000 : code;
+}
+
 export function libelleDeLEtat(service: ServiceActif): string {
   switch (etatDuService(service)) {
     case "en-cours":
       return "en cours";
     case "echoue":
-      return `arrêté — code ${service.code_de_sortie}`;
+      return `arrêté — code ${codeDeSortieLisible(service.code_de_sortie ?? 0)}`;
     case "jamais-lance":
       return "pas lancé par l'IDE";
     default:

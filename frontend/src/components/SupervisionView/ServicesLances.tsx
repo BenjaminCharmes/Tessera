@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { adressesDansLaSortie } from "./adresse";
 import AdresseDuService from "./AdresseDuService";
-import { classeDeLEtat, etatDuService } from "../../design/etatDuService";
+import {
+  classeDeLEtat,
+  codeDeSortieLisible,
+  etatDuService,
+} from "../../design/etatDuService";
 import type { ServiceActif } from "../../types/api";
 
 /**
@@ -56,7 +60,7 @@ export default function ServicesLances({
   return (
     <section
       aria-label="Services lancés"
-      className="space-y-1.5 border-b border-zinc-800 px-3 py-2"
+      className="flex flex-wrap items-start gap-1.5 border-b border-zinc-800 px-3 py-2"
     >
       {services.map((service) => {
         const lignes = lignesDe(service, sortieDe);
@@ -72,7 +76,13 @@ export default function ServicesLances({
         // rendus après toutes les puces, donc loin du service auquel ils
         // appartenaient (ticket-155).
         return (
-          <div key={cle(service)} className="rounded-sm bg-zinc-900/40">
+          <div
+            key={cle(service)}
+            data-service={cle(service)}
+            // Côte à côte au repos ; une sortie dépliée prend toute la
+            // largeur, sinon elle serait illisible dans une puce.
+            className={`rounded-sm bg-zinc-900/40 ${ouvert ? "basis-full" : ""}`}
+          >
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 p-1">
               <button
                 type="button"
@@ -82,7 +92,9 @@ export default function ServicesLances({
                 className={`rounded-sm px-2 py-0.5 text-micro transition-colors hover:brightness-125 ${classeDeLEtat(service)}`}
               >
                 {service.nom}
-                {echoue ? ` · code ${service.code_de_sortie}` : ""}
+                {echoue
+                  ? ` · code ${codeDeSortieLisible(service.code_de_sortie ?? 0)}`
+                  : ""}
               </button>
 
               {adresses.map((adresse) => (
