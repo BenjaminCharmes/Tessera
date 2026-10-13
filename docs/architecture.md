@@ -438,6 +438,26 @@ Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le s
 | `POST` | `/api/v1/orchestrator/run-autonomous` | Mode autonome (N tickets en séquence) |
 | `WS` | `/api/v1/orchestrator/stream/{project_id}` | Stream des OrchestratorEvents + sauvegarde en DB |
 
+
+#### Validation de configuration avant le run
+
+Avant de lancer le pipeline sur un projet (`POST /orchestrator/run`), l'orchestrateur
+vérifie que le projet est configurable pour sa stratégie de livraison :
+
+- **Projet `autonomy: pr` ou `merge`** : exige à la fois `github_remote` (déclaré dans
+  `agents.json` du projet) et `GITHUB_TOKEN` (variable d'environnement du backend).
+- **Projet `autonomy: commit`** : aucune exigence GitHub — les changements restent locaux.
+
+Si la vérification échoue — `github_remote` manquant, ou `GITHUB_TOKEN` absent — le serveur
+rejette la requête avec un code **422**. Le message indique ce qui manque et comment
+corriger (« ajoute `github_remote` dans agents.json » / « renseigne GITHUB_TOKEN »).
+
+Le projet **n'est pas réservé** après ce refus : une tentative suivante, après correction,
+s'exécutera normalement.
+
+Cette vérification est une optimisation (ticket-413) : elle évite de dépenser un run complet
+à découvrir à la livraison qu'on ne peut rien pousser.
+
 ## Flux d'un ticket
 
 ```
