@@ -1,14 +1,14 @@
 ---
-id: ticket-407
-title: "Any project can report a Tessera bug or idea, which lands as an ide-core ticket"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-407
+pr_number: 388
+priority: high
+status: done
+title: Any project can report a Tessera bug or idea, which lands as an ide-core ticket
+type: feat
 ---
 
 # ticket-407 — Un signalement depuis un projet devient un ticket ide-core
