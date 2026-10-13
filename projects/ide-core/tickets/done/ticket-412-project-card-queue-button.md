@@ -1,14 +1,15 @@
 ---
-id: ticket-412
-title: "Each project card in the Projects view can launch the queue of its to-do tickets, after a confirmation"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-412
+pr_number: null
+priority: medium
+status: done
+title: Each project card in the Projects view can launch the queue of its to-do tickets,
+  after a confirmation
+type: feat
 ---
 
 # ticket-412 — Lancer la file d'un projet depuis sa carte

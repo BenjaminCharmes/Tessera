@@ -41,6 +41,7 @@ function afficher(p: ProjectOverview, onSelect = vi.fn(), onServicesChange = vi.
       onSelect={onSelect}
       onChangerCategorie={vi.fn()}
       onServicesChange={onServicesChange}
+      onFileLancee={vi.fn()}
     />,
   );
   return { onSelect, onServicesChange };

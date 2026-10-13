@@ -119,6 +119,7 @@ export default function ProjetsView({
         }}
         onChangerCategorie={(c) => void changerCategorie(projet, c)}
         onServicesChange={refresh}
+        onFileLancee={refresh}
       />
     );
   }
