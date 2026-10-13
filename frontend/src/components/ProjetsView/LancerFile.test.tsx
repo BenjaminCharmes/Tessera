@@ -61,6 +61,7 @@ function afficher(p: ProjectOverview, surSelection = vi.fn(), surLancee = vi.fn(
       onSelect={surSelection}
       onChangerCategorie={vi.fn()}
       onFileLancee={surLancee}
+      onServicesChange={vi.fn()}
     />,
   );
 }
