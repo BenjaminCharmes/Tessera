@@ -214,6 +214,32 @@ async def test_agents_json_declares_every_pipeline_role(workspace: Path) -> None
     assert "cd " not in data["pipeline"]["test_command"]
 
 
+async def test_created_project_has_mockup_readme(workspace: Path) -> None:
+    """The new project ships design/maquette/README.md, saying that the structure
+    is authoritative and that colours become tokens."""
+    with patch(_PATCH_GIT, new_callable=AsyncMock) as m:
+        m.return_value = _GIT_OK
+        await create_project_from_template(
+            workspace, "mon-projet", "Mon Projet", _TEMPLATE_DIR
+        )
+
+    readme = workspace / "mon-projet" / "design" / "maquette" / "README.md"
+    assert readme.is_file()
+    text = readme.read_text(encoding="utf-8")
+    assert "fait foi" in text
+    assert "tokens" in text
+
+
+def test_design_skill_puts_mockup_before_charter() -> None:
+    """The design-ui skill has a mockup section placed before the charter one."""
+    skill = (
+        _REPO_ROOT / "agents" / "plugin" / "skills" / "design-ui" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    assert "## 0. Maquette d'abord" in skill
+    assert skill.index("Maquette d'abord") < skill.index("Charte d'abord")
+    assert "design/maquette/" in skill
+
+
 def test_template_and_backend_pin_packages_blocked_by_smart_app_control() -> None:
     """mypy (< 1.19, pure Python) and rpds-py 2026.6.3 are pinned in Tessera's
     backend and in the template, so a new project does not inherit DLLs that
