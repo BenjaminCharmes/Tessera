@@ -13,6 +13,7 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.services.git_attributes import declare_union_merge
 from tessera.services.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
 
@@ -115,17 +116,36 @@ def _union_lines(base: str, theirs: str) -> str:
     return "".join(base_lines + extra)
 
 
-def _union_json_lists(base_text: str, theirs_text: str) -> str | None:
-    """Union of two JSON array versions, base items first, no duplicates.
+def _liste_documentes(valeur: object) -> list[object] | None:
+    """The id list of a ``documentation.json`` version, None if unrecognised.
 
-    Returns None when either side is not a valid JSON array.
+    Accepts a bare JSON array, or the real marker format
+    ``{"documentes": [...]}`` written by ``marquer_documente`` (ticket-418).
+    """
+    if isinstance(valeur, list):
+        return valeur
+    if isinstance(valeur, dict) and set(valeur) == {"documentes"}:
+        interne = valeur["documentes"]
+        return interne if isinstance(interne, list) else None
+    return None
+
+
+def _union_json_lists(base_text: str, theirs_text: str) -> str | None:
+    """Union of two ``documentation.json`` versions, no duplicates.
+
+    Base items come first. A bare array stays an array; the
+    ``{"documentes": [...]}`` marker stays a marker, ids sorted as
+    ``marquer_documente`` writes them. Returns None when either side is
+    neither (invalid JSON, legacy ``dernier_ticket``, extra keys).
     """
     try:
-        base_list = json.loads(base_text)
-        theirs_list = json.loads(theirs_text)
+        base_value = json.loads(base_text)
+        theirs_value = json.loads(theirs_text)
     except (json.JSONDecodeError, ValueError):
         return None
-    if not isinstance(base_list, list) or not isinstance(theirs_list, list):
+    base_list = _liste_documentes(base_value)
+    theirs_list = _liste_documentes(theirs_value)
+    if base_list is None or theirs_list is None:
         return None
     seen: set[str] = set()
     result: list[object] = []
@@ -134,6 +154,9 @@ def _union_json_lists(base_text: str, theirs_text: str) -> str | None:
         if key not in seen:
             seen.add(key)
             result.append(item)
+    if isinstance(base_value, dict) or isinstance(theirs_value, dict):
+        envelope = {"documentes": sorted(result, key=str)}
+        return json.dumps(envelope, ensure_ascii=False, indent=2) + "\n"
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
@@ -414,6 +437,7 @@ class GitWorkspaceService:
         from each other.
         """
         await self._ensure_own_repository()
+        await self._declarer_union_journal()
         if self._base_ref is None:
             self._base_ref = (await self._run("rev-parse", "HEAD")).strip()
         self._preexisting_untracked = await self._untracked_files()
@@ -441,6 +465,24 @@ class GitWorkspaceService:
             await self._run("checkout", "-b", branch_name, self._base_ref)
             self._fork_point = self._base_ref
         return branch_name
+
+    async def _declarer_union_journal(self) -> None:
+        """Déclare le journal du pipeline en fusion `union`, localement (ticket-418).
+
+        Écrit dans `.git/info/attributes` du dépôt, jamais dans le dépôt
+        versionné. Le motif est relatif à la racine du dépôt : sous
+        `git_root: ancestor`, il porte le préfixe du projet. Un échec ne
+        bloque pas le run — le rebase retombe sur la résolution en union.
+        """
+        try:
+            prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+            brut = (await self._run("rev-parse", "--git-path", "info/attributes")).strip()
+            chemin = Path(brut)
+            if not chemin.is_absolute():
+                chemin = self._project_path / chemin
+            declare_union_merge(chemin, f"{prefixe}{_JOURNAL_PIPELINE}")
+        except (GitCommandError, OSError) as exc:
+            _logger.warning("union_journal_non_declaree", extra={"erreur": str(exc)})
 
     async def _rejouer_branche_en_retard(self, branch_name: str) -> None:
         """Rebase ``branch_name`` (already checked out) on the current base ref.
