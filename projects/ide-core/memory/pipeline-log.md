@@ -2454,3 +2454,14 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 12:55:30 UTC — [ticket-415] validateur: APPROVED — Tous les critères sont implémentés et testés. Un utilitaire `decrire_exception() (56812ms)
 - 2026-10-13 12:55:30 UTC — [ticket-415] APPROVED après 1 tour(s)
 - 2026-10-13 12:56:56 UTC — [ticket-415] documentation: 1 fichier(s) (82171ms)
+- 2026-10-13 12:57:28 UTC — [ide-core] ticket-415 PR #404 confiée au CIWatcher
+- 2026-10-13 12:57:36 UTC — [ticket-418] branche ticket-418-append-only-pipeline-files-no-longer-stop-a-deliv
+- 2026-10-13 12:57:37 UTC — [ticket-418] tour 1 — codeur démarré
+- 2026-10-13 13:02:10 UTC — [ticket-418] tour 1 — codeur terminé (273047ms)
+- 2026-10-13 13:06:38 UTC — [ticket-418] testeur: OK (exit 0)
+- 2026-10-13 13:07:51 UTC — [ticket-418] securite: PASS — Audit complet des nouveaux fichiers et modifications apportés. Aucune vulnérabil (72390ms)
+- 2026-10-13 13:07:51 UTC — [ticket-418] tour 1 — reviewer démarré
+- 2026-10-13 13:08:16 UTC — [ticket-418] tour 1 — reviewer terminé (25046ms)
+- 2026-10-13 13:08:24 UTC — [ticket-418] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (32969ms)
+- 2026-10-13 13:08:24 UTC — [ticket-418] APPROVED après 1 tour(s)
+- 2026-10-13 13:10:48 UTC — [ticket-418] documentation: 2 fichier(s) (141484ms)

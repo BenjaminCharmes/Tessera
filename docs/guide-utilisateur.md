@@ -736,6 +736,12 @@ s'arrête et t'affiche l'erreur.
 
 Dans une file, quand plusieurs tickets tournent d'affilée, chacun enregistre ses changements au journal du pipeline et à la documentation. Autrefois, tu devais arrêter la file quand le ticket suivant heurtait un conflit sur ces fichiers. Depuis, l'IDE les fusionne automatiquement—la file continue sans interruption. S'il y a aussi un conflit sur d'autres fichiers, tu dois approuver la résolution.
 
+
+
+Les conflits du journal (`memory/pipeline-log.md`) et de la documentation (`memory/documentation.json`) sont résolus automatiquement en union — Tessera garde les ajouts des deux côtés. C'est utile quand plusieurs tickets sont livrés en parallèle et chacun ajoute ses logs et ses ids.
+
+Les autres conflits restent bloquants et demandent une approbation.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
