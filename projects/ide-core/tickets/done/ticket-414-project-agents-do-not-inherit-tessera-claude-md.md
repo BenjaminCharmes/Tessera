@@ -1,14 +1,15 @@
 ---
-id: ticket-414
-title: "Agents working on a hosted project no longer inherit Tessera's own CLAUDE.md rules"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-414
+pr_number: 403
+priority: high
+status: done
+title: Agents working on a hosted project no longer inherit Tessera's own CLAUDE.md
+  rules
+type: fix
 ---
 
 # ticket-414 — Les agents d'un projet n'héritent plus du CLAUDE.md de Tessera

@@ -56,6 +56,12 @@ planificateur, project-analyzer, agent-creator, project-creator, doc-technique,
 doc-fonctionnelle) qui
 écrivent eux-mêmes leurs fichiers en Python.
 
+### Isolation du contexte CLAUDE.md pour les projets hébergés
+
+Les projets situés sous `projects/` ne doivent lire que leurs propres consignes dans `CLAUDE.md`, pas celles de Tessera. Seul le projet bootstrap `projects/ide-core/` — qui définit l'IDE lui-même — hérite du `CLAUDE.md` racine et de ses dépendances (`@`-imports).
+
+Lors de la création des `ClaudeAgentOptions` (fournisseur Agent SDK), le service exclut les CLAUDE.md ancêtres pour tout projet hébergé qui n'est pas un projet `ancestor`. L'exclusion est posée via le paramètre `claudeMdExcludes` (liste de chemins) dans les `settings` de l'agent. Cette isolation évite que les consignes système — `STATIC_TOKEN`, termes interdits, limites de budget — contaminent le contexte d'un projet autonome ayant ses propres règles.
+
 ### Shell des agents (Windows — ticket-319)
 
 Sous Windows, Claude Code n'active `Bash` que s'il trouve Git Bash à un emplacement standard.

@@ -2431,3 +2431,13 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 12:01:27 UTC — [ticket-412] APPROVED après 1 tour(s)
 - 2026-10-13 12:03:11 UTC — [ticket-412] documentation: 1 fichier(s) (99969ms)
 - 2026-10-13 12:04:02 UTC — [ticket-412] livraison: arrêt — Conflit avec develop sur : frontend/src/components/ProjetsView/ProjetCarte.tsx, frontend/src/compone
+- 2026-10-13 12:32:33 UTC — [ticket-414] branche ticket-414-agents-working-on-a-hosted-project-no-longer-inhe
+- 2026-10-13 12:32:34 UTC — [ticket-414] tour 1 — codeur démarré
+- 2026-10-13 12:33:47 UTC — [ticket-414] tour 1 — codeur terminé (73640ms)
+- 2026-10-13 12:40:00 UTC — [ticket-414] testeur: OK (exit 0)
+- 2026-10-13 12:40:26 UTC — [ticket-414] securite: PASS — Aucune vulnérabilité critique ou majeure introduite. Le diff ajoute deux fonctio (26139ms)
+- 2026-10-13 12:40:27 UTC — [ticket-414] tour 1 — reviewer démarré
+- 2026-10-13 12:40:55 UTC — [ticket-414] tour 1 — reviewer terminé (28610ms)
+- 2026-10-13 12:43:51 UTC — [ticket-414] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (204453ms)
+- 2026-10-13 12:43:51 UTC — [ticket-414] APPROVED après 1 tour(s)
+- 2026-10-13 12:45:05 UTC — [ticket-414] documentation: 1 fichier(s) (70827ms)
