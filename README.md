@@ -104,7 +104,9 @@ section « ce que ça ne fait pas ». L'IDE mange sa propre cuisine, ce qui forc
 
 ## Contribuer
 
-Les rapports de bug sont ce qui aide le plus. Avant d'écrire du code, lisez
+Les rapports de bug sont ce qui aide le plus. Vous pouvez signaler un bug ou
+une idée directement depuis l'IDE via le bouton « Signaler » de l'en-tête du
+projet, ou ouvrir une issue sur GitHub. Avant d'écrire du code, lisez
 [CONTRIBUTING.md](CONTRIBUTING.md) — en particulier le premier paragraphe sur
 la licence.
 
