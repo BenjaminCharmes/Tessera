@@ -1,14 +1,15 @@
 ---
-id: ticket-409
-title: "A project created from the template starts on its declared base branch, ignores its build output, and describes its real agents and stack"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-409
+pr_number: 394
+priority: high
+status: done
+title: A project created from the template starts on its declared base branch, ignores
+  its build output, and describes its real agents and stack
+type: fix
 ---
 
 # ticket-409 — Un projet issu du gabarit est cohérent avec son propre manifeste

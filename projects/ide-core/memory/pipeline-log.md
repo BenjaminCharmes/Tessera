@@ -2373,3 +2373,14 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 07:36:43 UTC — [ticket-408] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le composant SignalementModal es (153641ms)
 - 2026-10-13 07:36:43 UTC — [ticket-408] APPROVED après 1 tour(s)
 - 2026-10-13 07:38:58 UTC — [ticket-408] documentation: 3 fichier(s) (132155ms)
+- 2026-10-13 07:39:12 UTC — [ide-core] ticket-408 PR #389 confiée au CIWatcher
+- 2026-10-13 08:44:13 UTC — [ticket-409] branche ticket-409-a-project-created-from-the-template-starts-on-its
+- 2026-10-13 08:44:13 UTC — [ticket-409] tour 1 — codeur démarré
+- 2026-10-13 08:45:35 UTC — [ticket-409] tour 1 — codeur terminé (81953ms)
+- 2026-10-13 08:49:58 UTC — [ticket-409] testeur: OK (exit 0)
+- 2026-10-13 08:51:09 UTC — [ticket-409] securite: PASS — No CRITICAL or HIGH vulnerabilities introduced by this diff. The diff adds optio (71422ms)
+- 2026-10-13 08:51:09 UTC — [ticket-409] tour 1 — reviewer démarré
+- 2026-10-13 08:51:45 UTC — [ticket-409] tour 1 — reviewer terminé (35344ms)
+- 2026-10-13 08:54:34 UTC — [ticket-409] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (204188ms)
+- 2026-10-13 08:54:34 UTC — [ticket-409] APPROVED après 1 tour(s)
+- 2026-10-13 08:55:41 UTC — [ticket-409] documentation: 0 fichier(s) (62358ms)

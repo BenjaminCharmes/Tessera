@@ -107,18 +107,26 @@ async def git_status(project_path: Path) -> GitStatus:
     return GitStatus(is_own_repository=True, has_commits=has_commits, remote_url=remote)
 
 
-async def init_repository(project_path: Path) -> GitStatus:
+async def init_repository(
+    project_path: Path, initial_branch: str | None = None
+) -> GitStatus:
     """Initialise un dépôt et y commite l'état courant. Sans effet s'il existe.
 
     Le premier commit compte : sans lui, tout le contenu existant du projet
     apparaîtrait au pipeline comme des modifications non suivies, et finirait
     balayé dans le commit du premier ticket.
+
+    `initial_branch` fixe la branche de naissance (`git init -b`) ; sans elle,
+    git applique `init.defaultBranch` de la machine.
     """
     status = await git_status(project_path)
     if status.is_own_repository:
         return status
 
-    code, _, err = await _run(project_path, "init", "-q")
+    init_args = ["init", "-q"]
+    if initial_branch:
+        init_args += ["-b", initial_branch]
+    code, _, err = await _run(project_path, *init_args)
     if code != 0:
         raise GitLinkError(f"Impossible d'initialiser un dépôt git : {err.strip()}")
 
