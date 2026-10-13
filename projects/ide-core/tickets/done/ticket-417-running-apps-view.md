@@ -5,7 +5,7 @@ depends_on:
 - ticket-416
 estimated_days: 1
 id: ticket-417
-pr_number: null
+pr_number: 408
 priority: high
 status: done
 title: A Running view lists the project apps alive on the machine, their memory, and
