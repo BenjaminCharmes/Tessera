@@ -811,6 +811,23 @@ tant qu'elle n'aura pas mergé.
 **Divergence** : Si la branche locale et distante divergent hors d'une avance
 rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
 
+### Réalignement de la base locale après merge du CIWatcher (ticket-420)
+
+Après qu'un run autonome soit mergé par le `CIWatcher` (`services/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
+
+**Condition** : le réalignement ne s'effectue que si :
+- Aucun run n'occupe actuellement le projet (`RUN_REGISTRY.projet_occupe()` retourne faux)
+- L'arbre local est sur la branche de base configurée
+- Les seules modifications locales portent sur `memory/pipeline-log.md`
+
+**Procédure** :
+1. Extraire les lignes du journal non encore commitées
+2. `git checkout -- memory/pipeline-log.md` pour nettoyer le journal
+3. `git pull --ff-only` pour aligner l'arbre sur le distant
+4. Réécrire les lignes du journal qui n'y sont pas déjà présentes
+
+**Cas d'erreur** : tout échec du réalignement (autre branche, autre fichier modifié, pull impossible, dépôt sur une autre branche) est journalisé avec raison (`realignement_ignore`) mais n'affecte pas l'état du run — `merged` reste vrai. Aucun fichier n'est modifié en cas d'erreur.
+
 ### État du dépôt après livraison (ticket-378)
 
 Après la livraison d'un run, le dépôt local finit dans un état garanti :

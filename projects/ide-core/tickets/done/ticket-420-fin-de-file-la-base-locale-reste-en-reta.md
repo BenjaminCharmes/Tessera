@@ -3,8 +3,9 @@ agent: codeur
 created: '2026-10-13'
 depends_on: []
 id: ticket-420
+pr_number: 411
 priority: high
-status: todo
+status: done
 title: 'Fin de file : la base locale reste en retard d''un commit et le journal reste
   sale après le merge du dernier ticket'
 type: fix

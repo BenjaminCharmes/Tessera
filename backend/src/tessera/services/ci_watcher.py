@@ -36,6 +36,8 @@ import httpx
 from tessera.models.ticket import TicketStatus
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
+from tessera.services.realignement_base import Realignement, realigner_base
+from tessera.services.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -72,6 +74,9 @@ class CIWatcher:
         # Résultats de merge : True = mergé, False = bloqué/échoué.
         # Clé : "project_id:ticket_id".
         self._resultats_merge: dict[str, bool] = {}
+        # Réalignement de la base demandé par surveiller (ticket-422).
+        # Clé : "project_id:ticket_id".
+        self._realignements: dict[str, Realignement] = {}
         # Borne temporelle de la phase 2 entière. Paramétrable pour les tests.
         self._timeout_phase2_s = timeout_phase2_s
 
@@ -88,6 +93,7 @@ class CIWatcher:
         on_event: EventCallback,
         pipeline_log_path: Path | None = None,
         etat_pr: EtatPr | None = None,
+        realignement: Realignement | None = None,
     ) -> None:
         """Start watching `pr_number` for `ticket_id` in the background.
 
@@ -98,7 +104,11 @@ class CIWatcher:
         The ticket file in the working tree is never modified (ticket-392).
         `etat_pr` lets the watcher re-read the PR after a network error
         (ticket-405); without it, a network error is a failure.
+        `realignement` asks for the local base to be fast-forwarded once the
+        PR is merged, when no run holds the project (ticket-422).
         """
+        if realignement is not None:
+            self._realignements[f"{project_id}:{ticket_id}"] = realignement
         # Le ticket est en attente dès l'inscription, même avant que le
         # sémaphore soit acquis : `en_attente` doit le lister pendant l'attente
         # de CI **et** pendant l'attente du sémaphore.
@@ -227,6 +237,7 @@ class CIWatcher:
             self._en_attente.get(project_id, set()).discard(ticket_id)
             # Signaler les éventuels appelants d'`attendre_merge`.
             cle = f"{project_id}:{ticket_id}"
+            self._realignements.pop(cle, None)
             evt = self._events_merge.pop(cle, None)
             if evt is not None:
                 evt.set()
@@ -342,6 +353,24 @@ class CIWatcher:
             "ci_merge_done",
             extra={"project": project_id, "ticket": ticket_id, "pr": pr_number},
         )
+        await self._realigner_si_libre(project_id, ticket_id)
+
+    async def _realigner_si_libre(self, project_id: str, ticket_id: str) -> None:
+        """Fast-forward the local base unless a run holds the project (ticket-422).
+
+        Après l'événement : un échec ou une lenteur du réalignement ne change
+        rien au merge, déjà annoncé.
+        """
+        cible = self._realignements.get(f"{project_id}:{ticket_id}")
+        if cible is None:
+            return
+        if RUN_REGISTRY.projet_occupe(project_id):
+            _logger.info(
+                "realignement_ignore",
+                extra={"project": project_id, "raison": "un run occupe le projet"},
+            )
+            return
+        await realigner_base(cible.racine, cible.base_branch, project_id)
 
     async def _pr_mergee(self, etat_pr: EtatPr | None, pr_number: int) -> bool:
         """Re-read the PR; False when it cannot be read or is not merged."""
