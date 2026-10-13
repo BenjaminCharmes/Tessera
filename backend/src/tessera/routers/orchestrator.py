@@ -19,6 +19,7 @@ from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison_possible import raison_de_refus_livraison
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.pipeline_plan import ROLE_PLAN
@@ -616,6 +617,12 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
     ticket_svc = TicketService(project_path, request.project_id)
     initial_ticket_id = _ticket_initial(request)
     ticket_titre = await _lire_titre(ticket_svc, initial_ticket_id)
+
+    # Refus d'emblée, avant toute réservation : le projet reste libre
+    # (ticket-413).
+    refus = raison_de_refus_livraison(project_path, settings.github_token)
+    if refus:
+        raise HTTPException(status_code=422, detail=refus)
 
     try:
         run = RUN_REGISTRY.ouvrir(
