@@ -5,6 +5,23 @@ description: Use when creating or modifying any user interface — screens, comp
 
 # Design d'interface
 
+## 0. Maquette d'abord
+
+Si `design/maquette/` contient des écrans (fichiers `.dc.html`), la maquette
+**fait foi** : lis-la avant la charte et reproduis-la au lieu d'inventer.
+
+- Elle décide de la structure, de l'ordre des blocs, des tailles, des
+  espacements et des états.
+- Chaque couleur en dur de la maquette devient le token correspondant de la
+  charte (§1) ; aucune valeur brute n'entre dans le code (§2).
+- Les textes d'exemple sont des données, pas du contenu à recopier.
+- Un `.dc.html` se lit comme du HTML à styles en ligne. Les balises `<x-dc>`,
+  `<sc-for>`, `<sc-if>` et les valeurs `{{ valeur }}` sont propres à l'éditeur
+  de maquettes : ce sont des boucles, des conditions et des données d'exemple.
+
+Sans écran dans `design/maquette/` (le dossier ne porte que son README), passe
+au §1.
+
 ## 1. Charte d'abord
 
 Avant d'écrire la moindre ligne d'UI, cherche la charte du projet :

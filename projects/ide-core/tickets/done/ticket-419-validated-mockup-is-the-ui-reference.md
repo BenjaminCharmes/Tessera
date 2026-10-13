@@ -1,14 +1,15 @@
 ---
-id: ticket-419
-title: "A validated mockup in design/maquette becomes the UI reference the coder reproduces, for every project"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-419
+pr_number: 415
+priority: medium
+status: done
+title: A validated mockup in design/maquette becomes the UI reference the coder reproduces,
+  for every project
+type: feat
 ---
 
 # ticket-419 — Une maquette validée devient la référence d'interface
