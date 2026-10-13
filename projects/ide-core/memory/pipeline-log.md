@@ -2441,3 +2441,15 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 12:43:51 UTC — [ticket-414] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (204453ms)
 - 2026-10-13 12:43:51 UTC — [ticket-414] APPROVED après 1 tour(s)
 - 2026-10-13 12:45:05 UTC — [ticket-414] documentation: 1 fichier(s) (70827ms)
+- 2026-10-13 12:45:20 UTC — [ide-core] ticket-414 PR #403 confiée au CIWatcher
+- 2026-10-13 12:45:22 UTC — [ticket-415] branche ticket-415-a-delivery-that-fails-after-opening-its-pr-names
+- 2026-10-13 12:46:08 UTC — [ticket-415] plan rendu (45030ms)
+- 2026-10-13 12:46:08 UTC — [ticket-415] tour 1 — codeur démarré
+- 2026-10-13 12:48:32 UTC — [ticket-415] tour 1 — codeur terminé (144188ms)
+- 2026-10-13 12:49:15 UTC — [ticket-414] livraison: PR #403 mergée malgré une erreur réseau (ReadTimeout)
+- 2026-10-13 12:53:55 UTC — [ticket-415] testeur: OK (exit 0)
+- 2026-10-13 12:54:33 UTC — [ticket-415] securite: PASS — Aucune vulnérabilité de sécurité détectée. Ce diff effectue une refactorisation  (37655ms)
+- 2026-10-13 12:54:33 UTC — [ticket-415] tour 1 — reviewer démarré
+- 2026-10-13 12:54:55 UTC — [ticket-415] tour 1 — reviewer terminé (22094ms)
+- 2026-10-13 12:55:30 UTC — [ticket-415] validateur: APPROVED — Tous les critères sont implémentés et testés. Un utilitaire `decrire_exception() (56812ms)
+- 2026-10-13 12:55:30 UTC — [ticket-415] APPROVED après 1 tour(s)
