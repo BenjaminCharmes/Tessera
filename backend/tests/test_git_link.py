@@ -72,6 +72,30 @@ async def test_init_cree_un_depot_avec_un_premier_commit(project: Path) -> None:
     assert "main.py" in await _git(project, "ls-tree", "-r", "--name-only", "HEAD")
 
 
+async def test_init_honours_the_requested_initial_branch(
+    project: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = tmp_path / "gitconfig"
+    config.write_text("[init]\n\tdefaultBranch = master\n", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
+
+    await init_repository(project, initial_branch="main")
+
+    assert (await _git(project, "symbolic-ref", "--short", "HEAD")).strip() == "main"
+
+
+async def test_init_without_branch_keeps_the_machine_default(
+    project: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = tmp_path / "gitconfig"
+    config.write_text("[init]\n\tdefaultBranch = trunk\n", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
+
+    await init_repository(project)
+
+    assert (await _git(project, "symbolic-ref", "--short", "HEAD")).strip() == "trunk"
+
+
 async def test_init_sur_un_depot_existant_ne_le_touche_pas(project: Path) -> None:
     await _git(project, "init", "-q")
     await _git(project, "config", "user.email", "t@t.local")

@@ -9,9 +9,13 @@ from tessera.models.project import ProjectCreate, ProjectFromTemplateResult
 from tessera.services.git_link import init_repository
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT, MODELE_PRODUCTION
+from tessera.services.template_claude_md import write_claude_md
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
+
+# Branche de base : écrite dans agents.json et donnée à `git init -b`.
+_BASE_BRANCH = "main"
 
 # Répertoire du gabarit, ancré sur la racine du dépôt.
 _TEMPLATE_DIR = _REPO_ROOT / "templates" / "fastapi-react"
@@ -140,7 +144,7 @@ def _build_agents_json(project_id: str, backend_port: int, frontend_port: int) -
         "artifacts": "tracked",
         "autonomy": "merge",
         "merge_without_ci": True,
-        "base_branch": "main",
+        "base_branch": _BASE_BRANCH,
         "agents": agents,
         "services": [
             {
@@ -214,10 +218,15 @@ async def create_project_from_template(
         encoding="utf-8",
     )
 
-    # Initialisation du dépôt git (lit artifacts: tracked depuis agents.json).
+    # Le CLAUDE.md générique de create_project ignore agents et stack : on le
+    # réécrit d'après le manifeste qui vient d'être posé.
+    write_claude_md(project_path, name, backend_port, frontend_port)
+
+    # Initialisation du dépôt git (lit artifacts: tracked depuis agents.json),
+    # sur la branche de base déclarée dans le manifeste.
     git_ready = False
     try:
-        await init_repository(project_path)
+        await init_repository(project_path, initial_branch=_BASE_BRANCH)
         git_ready = True
     except Exception as exc:
         _logger.warning(
