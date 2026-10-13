@@ -210,6 +210,15 @@ class ProcessRegistry:
         """
         return list(self._services.get(project_id, []))
 
+    def vivants(self) -> list[Service]:
+        """Les services en cours, tous projets confondus (ticket-416)."""
+        return [
+            service
+            for services in self._services.values()
+            for service in services
+            if service.en_cours
+        ]
+
     def instantane(self) -> list[dict[str, Any]]:
         return [
             service.en_dict()
