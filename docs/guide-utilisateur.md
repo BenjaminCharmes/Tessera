@@ -221,6 +221,13 @@ Chaque carte affiche :
 
 Le projet actuellement actif est marqué d'une barre violette sur la gauche.
 
+Chaque carte affiche aussi deux badges sur les services du projet :
+
+- Un badge te dit si le projet a une application à lancer.
+- Un badge te dit si cette application tourne actuellement sur ta machine.
+
+Cela te permet de voir rapidement quel projet peut être lancé et lequel tourne déjà, sans ouvrir sa fiche.
+
 ### Sélectionner un projet
 
 Clique sur une carte pour la sélectionner. La zone centrale passe au Kanban de ce projet, comme si tu l'avais choisi dans la barre latérale.
