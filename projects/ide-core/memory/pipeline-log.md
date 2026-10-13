@@ -2480,3 +2480,14 @@ Analyse :
 - 2026-10-13 13:23:52 UTC — [ticket-416] tour 1 — reviewer terminé (35969ms)
 - 2026-10-13 13:23:52 UTC — [ticket-416] APPROVED après 1 tour(s)
 - 2026-10-13 13:27:54 UTC — [ticket-416] documentation: 3 fichier(s) (238514ms)
+- 2026-10-13 13:32:21 UTC — [ide-core] ticket-416 : base réalignée sur develop
+- 2026-10-13 13:32:21 UTC — [ide-core] ticket-416 PR #406 confiée au CIWatcher
+- 2026-10-13 13:32:23 UTC — [ticket-417] branche ticket-417-a-running-view-lists-the-project-apps-alive-on-th
+- 2026-10-13 13:32:24 UTC — [ticket-417] tour 1 — codeur démarré
+- 2026-10-13 13:36:26 UTC — [ticket-417] tour 1 — codeur terminé (242687ms)
+- 2026-10-13 13:41:17 UTC — [ticket-417] testeur: OK (exit 0)
+- 2026-10-13 13:41:54 UTC — [ticket-417] securite: PASS — Audit complet du diff frontend — aucune vulnérabilité détectée. Le code ajoute u (36234ms)
+- 2026-10-13 13:41:54 UTC — [ticket-417] tour 1 — reviewer démarré
+- 2026-10-13 13:42:25 UTC — [ticket-417] tour 1 — reviewer terminé (31390ms)
+- 2026-10-13 13:46:13 UTC — [ticket-417] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (259202ms)
+- 2026-10-13 13:46:13 UTC — [ticket-417] APPROVED après 1 tour(s)
