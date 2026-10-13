@@ -6,6 +6,7 @@ import { lienDuDepot } from "../../lib/lienDuDepot";
 import type { ProjectOverview } from "../../types/api";
 import { dateExacte, ilYa } from "./dates";
 import BoutonServices from "./BoutonServices";
+import LancerFile from "./LancerFile";
 import MenuCategorie from "./MenuCategorie";
 
 interface ProjetCarteProps {
@@ -17,6 +18,8 @@ interface ProjetCarteProps {
   onChangerCategorie: (categorie: string) => void;
   /** Les services du projet viennent d'être lancés ou arrêtés. */
   onServicesChange: () => void;
+  /** La file du projet vient de partir : la vue d'ensemble est à relire. */
+  onFileLancee: () => void;
 }
 
 /** Carré d'icône : l'icône du projet, ou à défaut son initiale. */
@@ -106,6 +109,7 @@ export default function ProjetCarte({
   onSelect,
   onChangerCategorie,
   onServicesChange,
+  onFileLancee,
 }: ProjetCarteProps) {
   function surClavier(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "Enter" && e.target === e.currentTarget) onSelect();
@@ -158,6 +162,7 @@ export default function ProjetCarte({
         <Compteurs projet={projet} />
         <BoutonServices projet={projet} onChange={onServicesChange} />
       </div>
+      <LancerFile projet={projet} onLancee={onFileLancee} />
     </article>
   );
 }
