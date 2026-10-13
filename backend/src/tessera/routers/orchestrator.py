@@ -20,6 +20,7 @@ from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
 from tessera.services.livraison_possible import raison_de_refus_livraison
+from tessera.services.realignement_base import Realignement
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.pipeline_plan import ROLE_PLAN
@@ -578,6 +579,7 @@ def _surveillance_pour(
             on_event,
             pipeline_log_path=pipeline_log_path_ci,
             etat_pr=service.pr_state,
+            realignement=Realignement(project_path, base_branch),
         )
 
     return surveiller
