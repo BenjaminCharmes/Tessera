@@ -2517,3 +2517,15 @@ Analyse :
 - 2026-10-13 14:22:24 UTC — [ticket-420] validateur: APPROVED — Tous les critères d'acceptation sont satisfait. Les tests couvrent correctement  (258250ms)
 - 2026-10-13 14:22:24 UTC — [ticket-420] APPROVED après 2 tour(s)
 - 2026-10-13 14:23:42 UTC — [ticket-420] documentation: 1 fichier(s) (75343ms)
+- 2026-10-13 14:23:58 UTC — [ide-core] ticket-420 PR #411 confiée au CIWatcher
+- 2026-10-13 14:24:01 UTC — [ticket-421] branche ticket-421-a-report-sent-while-an-ide-core-run-is-active-wai
+- 2026-10-13 14:24:02 UTC — [ticket-421] tour 1 — codeur démarré
+- 2026-10-13 14:26:13 UTC — [ticket-421] tour 1 — codeur terminé (131077ms)
+- 2026-10-13 14:31:34 UTC — [ticket-421] testeur: OK (exit 0)
+- 2026-10-13 14:33:07 UTC — [ticket-421] securite: PASS — Audit complet du diff — aucune vulnérabilité CRITICAL ou HIGH détectée.
+
+Analyse (93125ms)
+- 2026-10-13 14:33:07 UTC — [ticket-421] tour 1 — reviewer démarré
+- 2026-10-13 14:33:44 UTC — [ticket-421] tour 1 — reviewer terminé (36561ms)
+- 2026-10-13 14:36:40 UTC — [ticket-421] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (213171ms)
+- 2026-10-13 14:36:40 UTC — [ticket-421] APPROVED après 1 tour(s)
