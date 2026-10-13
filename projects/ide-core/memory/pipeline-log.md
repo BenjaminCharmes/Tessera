@@ -2465,3 +2465,18 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 13:08:24 UTC — [ticket-418] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (32969ms)
 - 2026-10-13 13:08:24 UTC — [ticket-418] APPROVED après 1 tour(s)
 - 2026-10-13 13:10:48 UTC — [ticket-418] documentation: 2 fichier(s) (141484ms)
+- 2026-10-13 13:11:03 UTC — [ide-core] ticket-418 PR #405 confiée au CIWatcher
+- 2026-10-13 13:11:06 UTC — [ticket-416] branche ticket-416-one-endpoint-lists-every-project-app-running-loca
+- 2026-10-13 13:12:11 UTC — [ticket-416] plan rendu (64811ms)
+- 2026-10-13 13:12:11 UTC — [ticket-416] tour 1 — codeur démarré
+- 2026-10-13 13:17:05 UTC — [ticket-416] tour 1 — codeur terminé (294282ms)
+- 2026-10-13 13:22:45 UTC — [ticket-416] testeur: OK (exit 0)
+- 2026-10-13 13:23:16 UTC — [ticket-416] securite: PASS — Aucune vulnérabilité de sécurité détectée dans ce diff.
+
+Analyse :
+- **Contrôle  (30655ms)
+- 2026-10-13 13:23:16 UTC — [ticket-416] tour 1 — reviewer démarré
+- 2026-10-13 13:23:43 UTC — [ticket-416] validateur: APPROVED — Tous les critères sont satisfaits. Le code introduit une interface testable (`So (26733ms)
+- 2026-10-13 13:23:52 UTC — [ticket-416] tour 1 — reviewer terminé (35969ms)
+- 2026-10-13 13:23:52 UTC — [ticket-416] APPROVED après 1 tour(s)
+- 2026-10-13 13:27:54 UTC — [ticket-416] documentation: 3 fichier(s) (238514ms)

@@ -95,6 +95,13 @@ en interactif quand le backend tourne.
 | `POST` | `/api/v1/orchestrator/run` | Run Pipeline |
 | `POST` | `/api/v1/orchestrator/run-autonomous` | Run Autonomous |
 
+### Services
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/api/v1/services/running` | List Running Services |
+| `POST` | `/api/v1/services/running/{pid}/stop` | Stop Service |
+
 ### Fichiers
 
 | Méthode | Endpoint | Description |

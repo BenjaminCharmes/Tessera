@@ -1,15 +1,16 @@
 ---
-id: ticket-416
-title: "One endpoint lists every project app running locally, launched by Tessera or by hand, with its ports and memory"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 1
-created: 2026-10-13
+id: ticket-416
 plan: true
+pr_number: 406
+priority: high
+status: done
+title: One endpoint lists every project app running locally, launched by Tessera or
+  by hand, with its ports and memory
+type: feat
 ---
 
 # ticket-416 — Inventaire des apps de projet qui tournent en local
