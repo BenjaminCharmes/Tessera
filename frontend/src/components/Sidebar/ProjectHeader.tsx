@@ -1,5 +1,7 @@
+import { useState } from "react";
 import BoutonServices from "./BoutonServices";
 import SelecteurDeProjet from "./SelecteurDeProjet";
+import SignalementModal from "./SignalementModal";
 import type { UseServicesResult } from "../../hooks/useServices";
 import { BAND } from "../../design/layout";
 import type { Project } from "../../types/api";
@@ -33,6 +35,9 @@ interface ProjectHeaderProps {
   onSelectProject?: (project: Project) => void;
 }
 
+/** Le projet qui reçoit les signalements : y signaler depuis lui-même n'a pas de sens. */
+const PROJET_CIBLE_DES_SIGNALEMENTS = "ide-core";
+
 /** `vscode://file/` attend des séparateurs POSIX, y compris sous Windows. */
 function lienVSCode(chemin: string): string {
   return `vscode://file/${chemin.replace(/\\/g, "/")}`;
@@ -46,6 +51,8 @@ export default function ProjectHeader({
   onOuvrirLesServices,
   onSelectProject,
 }: ProjectHeaderProps) {
+  const [signalementOuvert, setSignalementOuvert] = useState(false);
+
   if (!project) {
     return (
       <header className={`${BAND} border-b border-zinc-800 px-3`}>
@@ -109,7 +116,22 @@ export default function ProjectHeader({
         >
           Git
         </button>
+        {project.id !== PROJET_CIBLE_DES_SIGNALEMENTS ? (
+          <button
+            type="button"
+            onClick={() => setSignalementOuvert(true)}
+            className="whitespace-nowrap rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
+          >
+            Signaler
+          </button>
+        ) : null}
       </div>
+      {signalementOuvert ? (
+        <SignalementModal
+          project={project}
+          onClose={() => setSignalementOuvert(false)}
+        />
+      ) : null}
     </header>
   );
 }

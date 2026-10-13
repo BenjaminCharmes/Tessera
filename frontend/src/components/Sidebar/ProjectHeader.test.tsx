@@ -52,6 +52,27 @@ describe("ProjectHeader", () => {
     expect(screen.queryByRole("link", { name: /VSCode/i })).not.toBeInTheDocument();
   });
 
+  it("offers the Report button on any project", async () => {
+    render(<ProjectHeader project={projet} gitOuvert={false} onBasculerGit={() => {}} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Signaler" }));
+
+    expect(screen.getByRole("dialog", { name: /Signaler/i })).toBeInTheDocument();
+  });
+
+  it("hides the Report button on ide-core, which receives the reports", () => {
+    render(
+      <ProjectHeader
+        project={{ ...projet, id: "ide-core", name: "ide-core" }}
+        gitOuvert={false}
+        onBasculerGit={() => {}}
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: "Signaler" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Git" })).toBeInTheDocument();
+  });
+
   it("survit a un projet sans chemin au lieu d'emporter la sidebar", () => {
     // Panne vecue (E2E flow 4 et 5) : `lienVSCode(undefined)` levait une
     // TypeError, que l'ErrorBoundary transformait en « Une erreur inattendue

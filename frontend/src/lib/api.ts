@@ -33,6 +33,7 @@ import type {
   MergeResponse,
   OpenPrResponse,
   Project,
+  SignalementPayload,
   ProjectOverview,
   ProjectUsage,
   RecentRun,
@@ -304,3 +305,8 @@ export const api = {
       post("/agents/create-agent", { conversation }),
   },
 };
+
+/** Signale un défaut ou une idée sur Tessera : renvoie le ticket créé dans ide-core (ticket-408). */
+export function signalerATessera(payload: SignalementPayload): Promise<Ticket> {
+  return post<Ticket>("/signalements", payload);
+}
