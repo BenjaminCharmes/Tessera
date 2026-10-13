@@ -5,7 +5,7 @@ depends_on:
 - ticket-410
 estimated_days: 0.5
 id: ticket-411
-pr_number: null
+pr_number: 399
 priority: medium
 status: done
 title: Each project card in the Projects view can start or stop the project's app
