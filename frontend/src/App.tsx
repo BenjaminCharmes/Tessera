@@ -31,6 +31,7 @@ export default function App() {
           activePanel={cockpit.panel}
           onChangePanel={cockpit.setPanel}
           runsActifs={cockpit.navRail.runsActifs}
+          appsEnCours={cockpit.navRail.appsEnCours}
           alerte={cockpit.navRail.alerte}
         />
       </div>

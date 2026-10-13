@@ -1,14 +1,16 @@
 ---
-id: ticket-417
-title: "A Running view lists the project apps alive on the machine, their memory, and stops the forgotten ones"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-416"]
-estimated_days: 1
 created: 2026-10-13
+depends_on:
+- ticket-416
+estimated_days: 1
+id: ticket-417
+pr_number: 408
+priority: high
+status: done
+title: A Running view lists the project apps alive on the machine, their memory, and
+  stops the forgotten ones
+type: feat
 ---
 
 # ticket-417 — Vue « En cours » : les apps qui tournent

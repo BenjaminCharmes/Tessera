@@ -257,7 +257,13 @@ export const IconChat = (p: IconProps) => (
   </Icon>
 );
 
-export const IconSend = (p: IconProps) => (
+export const IconActivity = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3 12h4l3-7 4 14 3-7h4" />
+  </Icon>
+);
+
+export const IconSend =(p: IconProps) => (
   <Icon {...p}>
     <path d="M22 2L11 13" />
     <path d="M22 2L15 22L11 13L2 9z" />

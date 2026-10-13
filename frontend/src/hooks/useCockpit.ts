@@ -5,6 +5,7 @@ import { useRuns } from "./useRuns";
 import { useToast } from "./useToast";
 import { useProjects } from "./useProjects";
 import { useServices } from "./useServices";
+import { useAppsEnCours } from "./useAppsEnCours";
 import { useSupervision } from "./useSupervision";
 import { useRunActif } from "./useRunActif";
 import { parmi, useEtatPersistant } from "./useEtatPersistant";
@@ -197,6 +198,8 @@ export function useCockpit() {
     ouvrirProjet,
   );
   const services = useServices(project?.id ?? null, supervision.signalServices);
+  // Au niveau du cockpit : la pastille compte les apps même vue fermée (ticket-417).
+  const appsEnCours = useAppsEnCours();
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
   // bloque un humain, un run bloqué demande une décision. L'activité est le
@@ -293,6 +296,7 @@ export function useCockpit() {
     setPanel,
     navRail: {
       runsActifs: supervision.runs.length,
+      appsEnCours: appsEnCours.apps?.length ?? 0,
       alerte: alerteDeSupervision,
     },
     sidebar: {
@@ -430,6 +434,7 @@ export function useCockpit() {
       conversationId,
       supervision,
       servicesDuProjet: services.services,
+      appsEnCours,
       agentSelectionne,
       stream,
       byStatus: filtrage.byStatus,

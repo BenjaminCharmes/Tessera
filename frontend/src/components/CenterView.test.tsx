@@ -33,6 +33,9 @@ vi.mock("./KanbanView", () => ({
 vi.mock("./ProjetsView", () => ({
   default: () => <div data-testid="projets-view">ProjetsView</div>,
 }));
+vi.mock("./EnCoursView", () => ({
+  default: () => <div data-testid="en-cours-view">EnCoursView</div>,
+}));
 
 const STATUTS: TicketStatus[] = [
   "todo",
@@ -57,6 +60,13 @@ const baseProps = {
   conversationId: "",
   supervision: {} as unknown as ReturnType<typeof useSupervision>,
   servicesDuProjet: [],
+  appsEnCours: {
+    apps: [],
+    lueA: 0,
+    erreur: null,
+    arreter: vi.fn(),
+    rafraichir: vi.fn(),
+  },
   agentSelectionne: null,
   stream: {} as unknown as ReturnType<typeof useRunActif>,
   byStatus,
@@ -119,6 +129,12 @@ describe("CenterView", () => {
       />,
     );
     expect(await screen.findByTestId("diff-view")).toBeInTheDocument();
+  });
+
+  it("renders EnCoursView when panel is running", () => {
+    render(<CenterView {...baseProps} panel="running" vueCentre="kanban" />);
+    expect(screen.getByTestId("en-cours-view")).toBeInTheDocument();
+    expect(screen.queryByTestId("kanban-view")).not.toBeInTheDocument();
   });
 
   it("renders ProjetsView when panel is projects", () => {

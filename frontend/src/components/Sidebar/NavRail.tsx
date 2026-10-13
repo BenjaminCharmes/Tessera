@@ -3,6 +3,7 @@ import type { AlerteDeSupervision, SidebarPanel } from "./panels";
 import Pastille from "./Pastille";
 import { BAND } from "../../design/layout";
 import {
+  IconActivity,
   IconChart,
   IconChat,
   IconFolder,
@@ -35,6 +36,8 @@ interface NavRailProps {
    * serait faux.
    */
   runsActifs?: number;
+  /** Combien d'apps de projet tournent sur la machine (ticket-417). */
+  appsEnCours?: number;
   /** Ce qui mérite d'être vu avant le reste, quand c'est le cas. */
   alerte?: AlerteDeSupervision;
 }
@@ -47,6 +50,7 @@ interface Destination {
 
 const DESTINATIONS: Destination[] = [
   { panel: "projects", label: "Projets", icon: <IconLayers size={20} /> },
+  { panel: "running", label: "En cours", icon: <IconActivity size={20} /> },
   { panel: "tickets", label: "Tickets", icon: <IconList size={20} /> },
   { panel: "files", label: "Fichiers", icon: <IconFolder size={20} /> },
   { panel: "history", label: "Historique", icon: <IconHistory size={20} /> },
@@ -64,6 +68,7 @@ export default function NavRail({
   activePanel,
   onChangePanel,
   runsActifs = 0,
+  appsEnCours = 0,
   alerte = null,
 }: NavRailProps) {
   return (
@@ -106,6 +111,9 @@ export default function NavRail({
           >
             {panel === "supervision" ? (
               <Pastille nombre={runsActifs} alerte={alerte} />
+            ) : null}
+            {panel === "running" ? (
+              <Pastille nombre={appsEnCours} unite="app" />
             ) : null}
             {icon}
             <span className="w-full text-center text-micro leading-none">

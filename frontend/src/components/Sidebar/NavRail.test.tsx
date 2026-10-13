@@ -18,10 +18,40 @@ describe("NavRail", () => {
     expect(nom.className).not.toMatch(/text-violet-/);
   });
 
-  it("rend toujours les huit destinations sans regression", () => {
+  it("rend les neuf destinations sans regression", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(8);
+    expect(tabs).toHaveLength(9);
+  });
+
+  it("place En cours juste apres Projets", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const noms = screen.getAllByRole("tab").map((t) => t.textContent);
+    expect(noms[0]).toMatch(/Projets/);
+    expect(noms[1]).toMatch(/En cours/);
+    expect(noms[2]).toMatch(/Tickets/);
+  });
+
+  it("remonte la destination En cours", async () => {
+    const onChangePanel = vi.fn();
+    render(<NavRail activePanel="projects" onChangePanel={onChangePanel} />);
+    await userEvent.click(screen.getByRole("tab", { name: /En cours/ }));
+    expect(onChangePanel).toHaveBeenCalledWith<[SidebarPanel]>("running");
+  });
+
+  it("porte le nombre d'apps sur En cours", () => {
+    render(
+      <NavRail activePanel="projects" onChangePanel={() => {}} appsEnCours={4} />,
+    );
+    expect(screen.getByLabelText("4 apps en cours")).toHaveTextContent("4");
+  });
+
+  it("n'affiche aucune pastille d'apps quand aucune ne tourne", () => {
+    render(
+      <NavRail activePanel="projects" onChangePanel={() => {}} appsEnCours={0} />,
+    );
+    expect(screen.queryByLabelText(/app/)).not.toBeInTheDocument();
+    expect(screen.queryByText("0")).not.toBeInTheDocument();
   });
 
   it("propose une entree Chat", () => {
