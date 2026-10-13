@@ -8,10 +8,12 @@ import type { Project, ProjectOverview } from "../../types/api";
 vi.mock("../../lib/api", () => ({
   api: {
     projects: { overview: vi.fn(), setCategory: vi.fn() },
+    services: { start: vi.fn(), stop: vi.fn() },
   },
 }));
 
 const overview = vi.mocked(api.projects.overview);
+const startServices = vi.mocked(api.services.start);
 const setCategory = vi.mocked(api.projects.setCategory);
 
 function vue(id: string, nom: string, extra: Partial<ProjectOverview> = {}): ProjectOverview {
@@ -202,6 +204,20 @@ describe("ProjetsView", () => {
 
     expect(setCategory).toHaveBeenCalledWith("serpent", "Outils");
     await waitFor(() => expect(overview).toHaveBeenCalledTimes(2));
+  });
+
+  it("reloads the overview after a successful start from a card", async () => {
+    startServices.mockResolvedValue({ services: [] });
+    const surSelection = vi.fn();
+    afficher([vue("serpent", "Serpent", { services_declares: true })], surSelection);
+    const carte = await screen.findByRole("article", { name: "Serpent" });
+    expect(overview).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(within(carte).getByRole("button", { name: "Lancer" }));
+
+    expect(startServices).toHaveBeenCalledWith("serpent");
+    await waitFor(() => expect(overview).toHaveBeenCalledTimes(2));
+    expect(surSelection).not.toHaveBeenCalled();
   });
 
   it("creates a new category and removes one from the menu without selecting the project", async () => {

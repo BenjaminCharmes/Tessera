@@ -1,14 +1,16 @@
 ---
-id: ticket-411
-title: "Each project card in the Projects view can start or stop the project's app without leaving the view"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-410"]
-estimated_days: 0.5
 created: 2026-10-13
+depends_on:
+- ticket-410
+estimated_days: 0.5
+id: ticket-411
+pr_number: 399
+priority: medium
+status: done
+title: Each project card in the Projects view can start or stop the project's app
+  without leaving the view
+type: feat
 ---
 
 # ticket-411 — Démarrer l'app d'un projet depuis sa carte

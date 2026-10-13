@@ -914,6 +914,18 @@ Contrairement aux autres champs de `ProjectOverview`, ces deux états ne sont **
 
 Cette absence de cache garantit qu'une nouvelle requête `GET /api/v1/projects/overview` reflète immédiatement les changements : un service démarré entre deux appels apparaît aussitôt, de même qu'un arrêt.
 
+### Contrôle des services depuis les cartes (ticket-411)
+
+Chaque carte de projet affiche un bouton de contrôle de service (« Lancer » ou « Arrêter ») si le projet déclare un service (`services_declares`). Le clic appelle `api.services.start` ou `api.services.stop` sans naviguer, puis relit la vue d'ensemble pour refléter le nouvel état.
+
+**Invariants d'interaction** :
+- Le clic sur le bouton **n'appelle pas** `onSelect` : `stopPropagation` bloque la sélection de la carte et la navigation
+- Le bouton est désactivé pendant l'appel API
+- Un échec affiche un message court sous le bouton en rouge (ADR-026) et laisse le bouton réactivé
+- Pas de bouton si `services_declares` est faux
+
+Le rechargement de la vue d'ensemble (`/api/v1/projects/overview`) après succès tient les états à jour en cas de lancements parallèles depuis plusieurs sessions.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

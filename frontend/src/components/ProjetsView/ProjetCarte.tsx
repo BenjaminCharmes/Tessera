@@ -5,6 +5,7 @@ import { withTokenQuery } from "../../lib/auth";
 import { lienDuDepot } from "../../lib/lienDuDepot";
 import type { ProjectOverview } from "../../types/api";
 import { dateExacte, ilYa } from "./dates";
+import BoutonServices from "./BoutonServices";
 import MenuCategorie from "./MenuCategorie";
 
 interface ProjetCarteProps {
@@ -14,6 +15,8 @@ interface ProjetCarteProps {
   categories: string[];
   onSelect: () => void;
   onChangerCategorie: (categorie: string) => void;
+  /** Les services du projet viennent d'être lancés ou arrêtés. */
+  onServicesChange: () => void;
 }
 
 /** Carré d'icône : l'icône du projet, ou à défaut son initiale. */
@@ -102,6 +105,7 @@ export default function ProjetCarte({
   categories,
   onSelect,
   onChangerCategorie,
+  onServicesChange,
 }: ProjetCarteProps) {
   function surClavier(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "Enter" && e.target === e.currentTarget) onSelect();
@@ -150,7 +154,10 @@ export default function ProjetCarte({
       )}
       <LienDepot projet={projet} />
       <Dates projet={projet} />
-      <Compteurs projet={projet} />
+      <div className="flex items-start justify-between gap-2">
+        <Compteurs projet={projet} />
+        <BoutonServices projet={projet} onChange={onServicesChange} />
+      </div>
     </article>
   );
 }
