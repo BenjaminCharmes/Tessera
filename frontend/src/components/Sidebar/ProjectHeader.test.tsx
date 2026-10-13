@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProjectHeader from "./ProjectHeader";
 import type { Project } from "../../types/api";
@@ -25,6 +25,17 @@ describe("ProjectHeader", () => {
     expect(screen.getByText("Lyra")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /VSCode/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Git" })).toBeInTheDocument();
+  });
+
+  it("keeps the project name on its own row, apart from the actions", () => {
+    // Quatre boutons sur une colonne de 280 px tronquaient le nom en « A… » :
+    // le nom garde sa ligne, les actions passent sur la suivante.
+    render(<ProjectHeader project={projet} gitOuvert={false} onBasculerGit={() => {}} />);
+
+    const actions = screen.getByRole("toolbar", { name: "Actions du projet" });
+    expect(within(actions).getByRole("button", { name: "Git" })).toBeInTheDocument();
+    expect(within(actions).queryByText("Lyra")).not.toBeInTheDocument();
+    expect(screen.getByText("Lyra")).toBeInTheDocument();
   });
 
   it("ouvre le projet dans VSCode par son chemin sur le disque", () => {
