@@ -2418,3 +2418,14 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 09:45:00 UTC — [ticket-411] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les comporte (138609ms)
 - 2026-10-13 09:45:00 UTC — [ticket-411] APPROVED après 1 tour(s)
 - 2026-10-13 09:46:20 UTC — [ticket-411] documentation: 3 fichier(s) (76953ms)
+- 2026-10-13 09:46:35 UTC — [ide-core] ticket-411 PR #399 confiée au CIWatcher
+- 2026-10-13 09:46:37 UTC — [ticket-412] branche ticket-412-each-project-card-in-the-projects-view-can-launch
+- 2026-10-13 09:46:38 UTC — [ticket-412] tour 1 — codeur démarré
+- 2026-10-13 09:48:20 UTC — [ticket-412] tour 1 — codeur terminé (102203ms)
+- 2026-10-13 11:54:31 UTC — [ticket-412] testeur: délai dépassé, suite relancée
+- 2026-10-13 12:00:08 UTC — [ticket-412] testeur: OK (exit 0)
+- 2026-10-13 12:00:40 UTC — [ticket-412] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Le code utilise TypeScript stri (32250ms)
+- 2026-10-13 12:00:40 UTC — [ticket-412] tour 1 — reviewer démarré
+- 2026-10-13 12:00:59 UTC — [ticket-412] tour 1 — reviewer terminé (18844ms)
+- 2026-10-13 12:01:27 UTC — [ticket-412] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests explicites et bien f (46764ms)
+- 2026-10-13 12:01:27 UTC — [ticket-412] APPROVED après 1 tour(s)
