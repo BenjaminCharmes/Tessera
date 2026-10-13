@@ -1175,6 +1175,36 @@ Si le backend s'arrête avant de finaliser la livraison d'un ticket approuvé, a
 
 **Attention** : un fichier créé accidentellement par toi pendant le run — un brouillon, un `.tmp` — sera aussi restauré dans la branche. Il sera visible dans la PR ; nettoie-le avant de merger.
 
+## 13. Signaler un problème ou une idée sur Tessera
+
+Quand tu trouves un dysfonctionnement dans l'IDE ou une suggestion pour l'améliorer, tu peux le signaler directement depuis n'importe quel projet — sans quitter l'IDE, sans naviguer jusqu'à ide-core.
+
+### Accéder au formulaire
+
+En haut de chaque projet (dans l'en-tête du sidebar), à côté des boutons Services, VSCode et Git, tu trouves le bouton **Signaler**. Un clic l'ouvre.
+
+Ce bouton n'apparaît que si tu as un projet ouvert. Il est volontairement absent quand tu consultes ide-core lui-même.
+
+### Remplir le signalement
+
+La modale te demande :
+
+- **Nature** : Bug (dysfonctionnement observé) ou Idée (suggestion d'amélioration)
+- **Titre** : un résumé court et explicite
+- **Description** : le contexte, les étapes pour reproduire (si c'est un bug), ou la suggestion détaillée
+
+Le bouton d'envoi reste grisé tant que le titre ou la description sont vides.
+
+### Après l'envoi
+
+Un clic crée un ticket dans ide-core, associé au projet d'où tu signales. Tu vois tout de suite le numéro du ticket : **Signalé : ticket-NNN**.
+
+Si l'envoi échoue (pas de connexion au backend), tu vois un message d'erreur. Ton texte reste en place — tu peux corriger et renvoyer sans rien perdre.
+
+### Les tickets ne sont visibles que dans ide-core
+
+Les signalements créés ne remontent pas dans une liste locale. Tu les lis dans le Kanban d'ide-core, comme n'importe quel autre ticket de ce projet.
+
 ## Pour aller plus loin
 
 - [`architecture.md`](architecture.md) — comment Tessera est construit

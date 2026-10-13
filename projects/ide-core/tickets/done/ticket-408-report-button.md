@@ -1,14 +1,15 @@
 ---
-id: ticket-408
-title: "A Report button in the project header sends a Tessera bug or idea to ide-core"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-407"]
-estimated_days: 0.5
 created: 2026-10-13
+depends_on:
+- ticket-407
+estimated_days: 0.5
+id: ticket-408
+pr_number: 389
+priority: high
+status: done
+title: A Report button in the project header sends a Tessera bug or idea to ide-core
+type: feat
 ---
 
 # ticket-408 — Bouton « Signaler » dans l'en-tête de projet
