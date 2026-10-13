@@ -55,20 +55,42 @@ function Invoke-Setup {
     try { & npm install } finally { Pop-Location }
 }
 
+function Get-ProcessusTessera {
+    # Le worker `uvicorn --reload` orphelin est le piege principal : tuer le
+    # parent laisse l'enfant vivant, qui garde le port 8100. Mais le filtre
+    # ne doit viser que Tessera (ticket-423) : la selection est faite par
+    # scripts/arreter_tessera.py (testee), ce script ne fait que lister et tuer.
+    $processus = @(Get-CimInstance Win32_Process |
+            Where-Object { $_.Name -in 'python.exe', 'node.exe' } |
+            ForEach-Object { @{ pid = [int]$_.ProcessId; nom = $_.Name; commande = [string]$_.CommandLine } })
+    $ecoutes = @{}
+    foreach ($port in 8100, 5173) {
+        $ecoutes["$port"] = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue |
+                ForEach-Object { [int]$_.OwningProcess })
+    }
+    $entree = ConvertTo-Json -Compress -Depth 4 -InputObject @{ processus = $processus; ecoutes = $ecoutes }
+    $ancien = $OutputEncoding
+    $OutputEncoding = [Text.UTF8Encoding]::new($false)
+    Push-Location (Join-Path $Root 'backend')
+    try { $sortie = $entree | & uv run python (Join-Path $PSScriptRoot 'arreter_tessera.py') $Root }
+    finally { Pop-Location; $OutputEncoding = $ancien }
+    if ($LASTEXITCODE -ne 0) { throw "arreter_tessera.py a echoue (code $LASTEXITCODE)" }
+    $json = [string]::Join('', $sortie)
+    if ([string]::IsNullOrWhiteSpace($json)) { return @() }
+    # Windows PowerShell 5.1 ne deroule pas un tableau JSON : `[]` revient comme
+    # un objet unique (un tableau vide), d'ou une iteration a vide. Le passage
+    # par le pipeline le deroule dans les deux versions ; le filtre ecarte tout
+    # element sans PID.
+    return @(ConvertFrom-Json $json | ForEach-Object { $_ } | Where-Object { $null -ne $_ -and $null -ne $_.pid })
+}
+
 function Stop-Tessera {
-    # Le worker `uvicorn --reload` orphelin est le piège principal : tuer le
-    # parent laisse l'enfant vivant, qui garde le port 8100 et sert le code de
-    # son dernier rechargement. On cible donc la ligne de commande, pas un PID.
     $stopped = 0
-    foreach ($spec in @(
-            @{ Name = 'python.exe'; Match = '*uvicorn*' },
-            @{ Name = 'node.exe'; Match = '*vite*' })) {
-        Get-CimInstance Win32_Process -Filter "Name='$($spec.Name)'" |
-            Where-Object { $_.CommandLine -like $spec.Match } |
-            ForEach-Object {
-                Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
-                $stopped++
-            }
+    foreach ($p in Get-ProcessusTessera) {
+        if ($p.pid -eq $PID) { continue }
+        Stop-Process -Id $p.pid -Force -ErrorAction SilentlyContinue
+        Write-Host "-> arrete PID $($p.pid) ($($p.nom)) : $($p.debut)"
+        $stopped++
     }
     Write-Host "-> $stopped processus arrete(s)"
 
