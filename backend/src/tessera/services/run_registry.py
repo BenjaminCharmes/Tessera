@@ -10,13 +10,16 @@ En mémoire du process, comme le verrou dont il reprend le rôle : un backend
 local n'a pas de second process à protéger (ADR-038).
 """
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
 from tessera.services import eveil
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 
 class RunAlreadyInProgress(Exception):
@@ -129,6 +132,7 @@ class RunRegistry:
 
     def __init__(self) -> None:
         self._runs: dict[str, RunActif] = {}
+        self._rappels_de_fermeture: list[Callable[[str], None]] = []
 
     # -- lecture ---------------------------------------------------------
 
@@ -199,10 +203,24 @@ class RunRegistry:
             eveil.retenir()
         return run
 
+    def sur_fermeture(self, rappel: Callable[[str], None]) -> None:
+        """Register ``rappel(project_id)``, called each time a run is closed."""
+        self._rappels_de_fermeture.append(rappel)
+
     def fermer(self, run_id: str) -> None:
-        self._runs.pop(run_id, None)
+        run = self._runs.pop(run_id, None)
         if not self._runs:
             eveil.relacher()
+        if run is not None:
+            self._notifier_fermeture(run.project_id)
+
+    def _notifier_fermeture(self, project_id: str) -> None:
+        """Run the close callbacks; one failing never prevents the others."""
+        for rappel in self._rappels_de_fermeture:
+            try:
+                rappel(project_id)
+            except Exception:  # noqa: BLE001 — la fermeture d'un run ne doit jamais échouer
+                _logger.warning("rappel_de_fermeture_en_echec", exc_info=True)
 
     @asynccontextmanager
     async def acquire(

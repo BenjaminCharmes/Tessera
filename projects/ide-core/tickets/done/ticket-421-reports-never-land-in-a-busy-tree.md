@@ -1,14 +1,15 @@
 ---
-id: ticket-421
-title: "A report sent while an ide-core run is active waits outside the tree, and is written once the project is free"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-421
+pr_number: 414
+priority: medium
+status: done
+title: A report sent while an ide-core run is active waits outside the tree, and is
+  written once the project is free
+type: fix
 ---
 
 # ticket-421 — Un signalement n'atterrit jamais dans un arbre occupé par un run

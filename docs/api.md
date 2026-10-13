@@ -67,6 +67,13 @@ en interactif quand le backend tourne.
 |---------|----------|-------------|
 | `POST` | `/api/v1/signalements` | Report Tessera Bug or Idea |
 
+L'endpoint accepte un signalement (bug ou idée) sur Tessera. Il crée automatiquement un ticket dans le projet `ide-core`.
+
+**Réponse selon le contexte** :
+
+- **Projet `ide-core` libre** (aucun run en cours) : le signalement est écrit immédiatement dans `tickets/todo/`. Réponse `201 Created`.
+- **Un run `ide-core` actif** : le signalement attend dans une file hors du dépôt (`signalements_en_attente.json`). Réponse `202 Accepted` avec `{ "en_attente": true, "position": n }`. Une fois le run fusionné, les signalements en attente sont écrits en ordre d'arrivée.
+
 ### Chat
 
 | Méthode | Endpoint | Description |
