@@ -17,6 +17,8 @@ import SupervisionView from "./SupervisionView";
 import RunView from "./RunView";
 import KanbanView from "./KanbanView";
 import ProjetsView from "./ProjetsView";
+import EnCoursView from "./EnCoursView";
+import type { UseAppsEnCoursResult } from "../hooks/useAppsEnCours";
 
 // Vues lourdes — chargées à la demande, après le premier rendu du cockpit
 // (ticket-355). DiffView et Editor tirent Monaco ; les garder lazy réduit le
@@ -42,6 +44,8 @@ interface CenterViewProps {
   conversationId: string;
   supervision: ReturnType<typeof useSupervision>;
   servicesDuProjet: ServiceActif[];
+  /** Les apps de projet vivantes sur la machine (ticket-417). */
+  appsEnCours: UseAppsEnCoursResult;
   agentSelectionne: string | null;
   stream: ReturnType<typeof useRunActif>;
   byStatus: Record<TicketStatus, Ticket[]>;
@@ -94,6 +98,7 @@ export default function CenterView({
   conversationId,
   supervision,
   servicesDuProjet,
+  appsEnCours,
   agentSelectionne,
   stream,
   byStatus,
@@ -135,6 +140,8 @@ export default function CenterView({
         services={servicesDuProjet}
       />
     );
+  } else if (panel === "running") {
+    content = <EnCoursView appsEnCours={appsEnCours} />;
   } else if (panel === "projects") {
     // Choisir un projet se fait en les voyant : une carte chacun (ticket-399).
     content = (

@@ -175,6 +175,20 @@ export interface RunRequest {
   depuis_github?: boolean;
 }
 
+/** Une app de projet qui tourne sur la machine (ticket-416). */
+export interface AppEnCours {
+  project_id: string;
+  project_name: string;
+  nom: string;
+  /** `tessera` : lancée par le registre ; `externe` : lancée à la main. */
+  origine: "tessera" | "externe";
+  pid: number;
+  ports: number[];
+  /** ISO 8601, `null` quand la sonde ne connaît pas l'heure de démarrage. */
+  demarre_a: string | null;
+  memoire_mo: number;
+}
+
 /** Un service lance pour un projet (ticket-137). */
 export interface ServiceActif {
   nom: string;

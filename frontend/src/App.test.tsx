@@ -17,6 +17,7 @@ vi.mock("./components/RunView", () => ({ default: () => null }));
 vi.mock("./components/Editor", () => ({ default: () => null }));
 vi.mock("./components/KanbanView", () => ({ default: () => null }));
 vi.mock("./components/ProjetsView", () => ({ default: () => null }));
+vi.mock("./components/EnCoursView", () => ({ default: () => null }));
 vi.mock("./components/DiffView", () => ({ default: () => null }));
 vi.mock("./components/BottomPanel", () => ({ default: () => null }));
 vi.mock("./components/Toast", () => ({ default: () => null }));
@@ -126,6 +127,16 @@ vi.mock("./hooks/useProjects", () => ({
 
 vi.mock("./hooks/useServices", () => ({
   useServices: () => ({ services: [], enCours: false }),
+}));
+
+vi.mock("./hooks/useAppsEnCours", () => ({
+  useAppsEnCours: () => ({
+    apps: [],
+    lueA: 0,
+    erreur: null,
+    arreter: vi.fn(),
+    rafraichir: vi.fn(),
+  }),
 }));
 
 vi.mock("./hooks/useProjetMemorise", () => ({

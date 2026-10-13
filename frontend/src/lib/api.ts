@@ -1,4 +1,5 @@
 import type {
+  AppEnCours,
   AgentDetail,
   ProjectAgents,
   AgentSettingsPatch,
@@ -185,6 +186,11 @@ export const api = {
       post(`/projects/${projectId}/services/start`, {}),
     stop: (projectId: string): Promise<{ arretes: number }> =>
       post(`/projects/${projectId}/services/stop`, {}),
+    /** Les apps vivantes de tous les projets — ticket-416. */
+    running: (): Promise<AppEnCours[]> => request("/services/running"),
+    /** Arrête une app de l'inventaire courant ; 404 pour tout autre pid. */
+    stopRunning: (pid: number): Promise<{ pid: number; arretes: number }> =>
+      post(`/services/running/${pid}/stop`, {}),
   },
   runs: {
     list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>
