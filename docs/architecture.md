@@ -971,6 +971,27 @@ Mesure de mémoire : `psutil` si disponible (le backend le teste au startup) ; s
 
 L'endpoint `POST /api/v1/services/running/{pid}/stop` arrête l'arbre de processus, seulement si ce pid figure dans l'inventaire courant (404 sinon). Services `tessera` passent par `PROCESS_REGISTRY.arreter` ; services externes sont tués directement.
 
+### Vue « En cours » (ticket-417)
+
+La vue « En cours » supervise les services de projet actifs sur la machine, exposant
+les endpoints d'arrêt implémentés par ticket-416 (`GET /api/v1/services/running` et
+`POST /api/v1/services/running/{pid}/stop`).
+
+**Polling autonome** : la liste se met à jour toutes les 10 secondes tant que la vue
+est visible. Ce polling est suspendu quand l'utilisateur quitte la vue (gestion de
+visibilité fenêtre, ticket-356), réduisant la charge en arrière-plan.
+
+**Affichage et tri** : en tête, le total de mémoire consommée par tous les services.
+La liste, groupée par projet et triée par mémoire décroissante, affiche par service :
+le nom du projet et du service, son origine (Tessera ou externe), ses ports en liens,
+sa durée et sa consommation mémoire, plus un bouton d'arrêt.
+
+**Arrêt sélectif** : un service lancé par l'IDE (Tessera) s'arrête immédiatement.
+Un service externe demande une confirmation avant d'être tué, afin d'éviter une
+interruption accidentelle. Après l'arrêt, la liste est rechargée.
+
+**États** : vide (aucune app active), chargement (récupération en cours), ou erreur.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

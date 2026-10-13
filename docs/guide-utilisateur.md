@@ -302,6 +302,90 @@ La liste se recharge, et la barre latérale s'actualise.
 
 Si tu cherches « api » et que tu tris par activité récente, puis que tu reviens à l'onglet Kanban et au Projets, tu retrouves les mêmes réglages.
 
+## 2 ter. Surveiller les services
+
+### Ouvrir la vue En cours
+
+Tu cliques sur « En cours » dans la barre latérale, juste sous « Projets ».
+
+Une pastille affiche le nombre d'apps vivantes — elle disparaît quand ce nombre 
+vaut 0.
+
+### Ce que tu vois
+
+En tête, la mémoire totale consommée par toutes les apps.
+
+Chaque app apparaît sur une ligne, groupée par projet, triée par mémoire 
+décroissante (la plus gourmande d'abord). Pour chaque app tu vois son nom et 
+celui de son projet, son origine (« Tessera » ou « Lancé à la main »), ses 
+ports affichés en bleu et cliquables, la durée depuis son démarrage, sa mémoire 
+en Mo, et un bouton « Arrêter ».
+
+### Arrêter une app
+
+Tu cliques sur « Arrêter ».
+
+- **App lancée par l'IDE** : elle s'arrête immédiatement.
+- **App lancée à la main** : une confirmation s'affiche d'abord.
+
+La liste se met à jour aussitôt après.
+
+### Mise à jour automatique
+
+La vue se réactualise toutes les 10 secondes tant qu'elle est visible. 
+Elle s'arrête si tu navigues ailleurs.
+
+### États de la vue
+
+- **Vide** : « Aucune app de projet ne tourne » — c'est normal, aucune app n'a 
+  été lancée.
+- **Chargement** : la liste est en cours de lecture.
+- **Erreur** : quelque chose a échoué ; l'écran affiche le message.
+
+## 2 ter. Vue « En cours »
+
+La destination « En cours » vous permet de superviser toutes les apps de projet
+en cours d'exécution sur votre machine — sans avoir à passer par chaque projet
+pour voir qui tourne et qui consomme de la mémoire.
+
+### Accéder à la vue
+
+Dans la barre latérale (NavRail), cliquez sur « En cours », juste après « Projets ».
+Une pastille affiche le nombre d'apps actives (absente si aucune ne tourne).
+
+### Ce que vous voyez
+
+**En tête** : la mémoire totale consommée par l'ensemble des services.
+
+**Puis, par projet** : la liste des apps groupées et triées par mémoire décroissante.
+Pour chaque app, vous voyez :
+
+- **Nom du projet et du service**
+- **Origine** : « Tessera » si lancée par l'IDE, « Lancé à la main » sinon
+- **Ports** : affichés en liens cliquables (`http://localhost:8100`, etc.)
+- **Durée** : depuis combien de temps elle tourne
+- **Mémoire** : consommation en Mo
+- **Bouton Arrêter**
+
+### Arrêter une app
+
+Un clic sur « Arrêter » :
+- Pour une app lancée par Tessera → arrêt immédiat
+- Pour une app externe → demande une confirmation d'abord (« Arrêter le processus N ? »)
+
+Après l'arrêt, la liste est rechargée automatiquement.
+
+### Rafraîchissement
+
+La liste se met à jour toutes les 10 secondes tant que vous restez sur cette vue.
+Si vous la quittez, le rafraîchissement s'arrête pour économiser les ressources.
+
+### États
+
+- **Vide** : « Aucune app de projet ne tourne »
+- **Chargement** : récupération de la liste en cours
+- **Erreur** : un problème a empêché le chargement (vérifiez votre connexion)
+
 ## 3. Écrire des tickets
 
 Un ticket est un **fichier Markdown**. Pas de base de données propriétaire : tu peux
