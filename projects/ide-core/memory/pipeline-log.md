@@ -2492,3 +2492,27 @@ Analyse :
 - 2026-10-13 13:46:13 UTC — [ticket-417] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (259202ms)
 - 2026-10-13 13:46:13 UTC — [ticket-417] APPROVED après 1 tour(s)
 - 2026-10-13 13:49:52 UTC — [ticket-417] documentation: 3 fichier(s) (215828ms)
+- 2026-10-13 13:50:06 UTC — [ide-core] ticket-417 PR #408 confiée au CIWatcher
+- 2026-10-13 13:57:02 UTC — [ticket-420] branche ticket-420-fin-de-file-la-base-locale-reste-en-retard-d-un-c
+- 2026-10-13 13:57:02 UTC — [ticket-420] tour 1 — codeur démarré
+- 2026-10-13 13:59:48 UTC — [ticket-420] tour 1 — codeur terminé (165311ms)
+- 2026-10-13 14:05:35 UTC — [ticket-420] testeur: OK (exit 0)
+- 2026-10-13 14:06:26 UTC — [ticket-420] securite: PASS — Audit de sécurité du ticket réalignement_base (ticket-422) — aucune vulnérabilit (50688ms)
+- 2026-10-13 14:06:26 UTC — [ticket-420] tour 1 — reviewer démarré
+- 2026-10-13 14:07:10 UTC — [ticket-420] tour 1 — reviewer terminé (43640ms)
+- 2026-10-13 14:09:41 UTC — [ticket-420] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente le réalignem (195297ms)
+- 2026-10-13 14:09:41 UTC — [ticket-420] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **Le réalignement ne se déclenche jamais su
+- 2026-10-13 14:09:41 UTC — [ticket-420] tour 2 — codeur démarré
+- 2026-10-13 14:11:11 UTC — [ticket-420] tour 2 — codeur terminé (89703ms)
+- 2026-10-13 14:17:27 UTC — [ticket-420] testeur: OK (exit 0)
+- 2026-10-13 14:18:06 UTC — [ticket-420] securite: PASS — Aucune vulnérabilité bloquante détectée. L'analyse couvre :
+
+✓ **Injection de co (39030ms)
+- 2026-10-13 14:18:06 UTC — [ticket-420] tour 2 — reviewer démarré
+- 2026-10-13 14:18:29 UTC — [ticket-420] tour 2 — reviewer terminé (23375ms)
+- 2026-10-13 14:22:24 UTC — [ticket-420] validateur: APPROVED — Tous les critères d'acceptation sont satisfait. Les tests couvrent correctement  (258250ms)
+- 2026-10-13 14:22:24 UTC — [ticket-420] APPROVED après 2 tour(s)
