@@ -158,7 +158,7 @@ export default function ProjetCarte({
       )}
       <LienDepot projet={projet} />
       <Dates projet={projet} />
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-center justify-between gap-2">
         <Compteurs projet={projet} />
         <BoutonServices projet={projet} onChange={onServicesChange} />
       </div>
