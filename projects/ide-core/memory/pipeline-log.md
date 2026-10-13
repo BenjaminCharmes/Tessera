@@ -2430,3 +2430,4 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 12:01:27 UTC — [ticket-412] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests explicites et bien f (46764ms)
 - 2026-10-13 12:01:27 UTC — [ticket-412] APPROVED après 1 tour(s)
 - 2026-10-13 12:03:11 UTC — [ticket-412] documentation: 1 fichier(s) (99969ms)
+- 2026-10-13 12:04:02 UTC — [ticket-412] livraison: arrêt — Conflit avec develop sur : frontend/src/components/ProjetsView/ProjetCarte.tsx, frontend/src/compone
