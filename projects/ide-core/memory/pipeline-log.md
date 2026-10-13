@@ -2406,3 +2406,14 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 09:27:37 UTC — [ticket-410] validateur: APPROVED — Tous les critères sont satisfaits. Les trois tests vérifient la logique métier c (66530ms)
 - 2026-10-13 09:27:37 UTC — [ticket-410] APPROVED après 1 tour(s)
 - 2026-10-13 09:29:31 UTC — [ticket-410] documentation: 2 fichier(s) (110827ms)
+- 2026-10-13 09:34:38 UTC — [ide-core] ticket-410 : base réalignée sur develop
+- 2026-10-13 09:34:38 UTC — [ide-core] ticket-410 PR #397 confiée au CIWatcher
+- 2026-10-13 09:34:40 UTC — [ticket-411] branche ticket-411-each-project-card-in-the-projects-view-can-start
+- 2026-10-13 09:34:41 UTC — [ticket-411] tour 1 — codeur démarré
+- 2026-10-13 09:36:07 UTC — [ticket-411] tour 1 — codeur terminé (86656ms)
+- 2026-10-13 09:42:19 UTC — [ticket-411] testeur: OK (exit 0)
+- 2026-10-13 09:42:41 UTC — [ticket-411] securite: PASS — Aucune vulnérabilité détectée dans ce diff. Le nouveau composant BoutonServices  (22468ms)
+- 2026-10-13 09:42:42 UTC — [ticket-411] tour 1 — reviewer démarré
+- 2026-10-13 09:43:02 UTC — [ticket-411] tour 1 — reviewer terminé (20452ms)
+- 2026-10-13 09:45:00 UTC — [ticket-411] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les comporte (138609ms)
+- 2026-10-13 09:45:00 UTC — [ticket-411] APPROVED après 1 tour(s)
