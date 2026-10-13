@@ -62,31 +62,35 @@ export default function ProjectHeader({
   }
 
   return (
-    <header
-      className={`${BAND} justify-between gap-2 border-b border-zinc-800 px-3`}
-    >
-      {/* Une seule ligne : l'en-tête doit tenir dans la bande commune pour
-          s'aligner avec celles du centre et de la colonne de droite. Le
-          chemin complet passe en infobulle plutôt qu'en seconde ligne. */}
-      {/* Le nom est le déclencheur : changer de projet n'ajoute aucun bouton
-          à une rangée qui porte déjà « Lancer », « VSCode » et « Git »
-          (ticket-174). Sans `onSelectProject` — les vues qui n'en ont pas —
-          il reste un titre. */}
-      {onSelectProject ? (
-        <SelecteurDeProjet
-          project={project}
-          onSelectProject={onSelectProject}
-        />
-      ) : (
-        <h2
-          className="truncate text-sm font-medium text-zinc-100"
-          title={`${project.id} — ${project.path ?? ""}`}
-        >
-          {project.name}
-        </h2>
-      )}
+    <header className="shrink-0 border-b border-zinc-800">
+      {/* Deux lignes : quatre boutons sur la même rangée que le nom le
+          tronquaient en « A… » dans une colonne de 280 px. La première ligne
+          reste la bande commune, alignée avec celles du centre et de la
+          colonne de droite ; les actions passent dessous. */}
+      <div className={`${BAND} px-3`}>
+        {/* Le nom est le déclencheur : changer de projet n'ajoute aucun
+            bouton à la rangée d'actions (ticket-174). Sans `onSelectProject`
+            — les vues qui n'en ont pas — il reste un titre. */}
+        {onSelectProject ? (
+          <SelecteurDeProjet
+            project={project}
+            onSelectProject={onSelectProject}
+          />
+        ) : (
+          <h2
+            className="truncate text-sm font-medium text-zinc-100"
+            title={`${project.id} — ${project.path ?? ""}`}
+          >
+            {project.name}
+          </h2>
+        )}
+      </div>
 
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div
+        role="toolbar"
+        aria-label="Actions du projet"
+        className="flex flex-wrap items-center gap-1.5 px-3 pb-2"
+      >
         {services && !project.fait_tourner_l_ide ? (
           <BoutonServices
             services={services}
