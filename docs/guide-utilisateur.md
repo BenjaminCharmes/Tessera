@@ -228,9 +228,27 @@ Chaque carte affiche aussi deux badges sur les services du projet :
 
 Cela te permet de voir rapidement quel projet peut être lancé et lequel tourne déjà, sans ouvrir sa fiche.
 
+### Contrôler les services depuis la vue Projets
+
+Si un projet déclare un service, sa carte affiche un bouton « Lancer » dans sa rangée basse. Clique-le pour démarrer l'app du projet **sans quitter la vue Projets** — pas besoin d'ouvrir les tickets pour changer l'état d'un service.
+
+- Le bouton devient « Arrêter » si le service est actif
+- Pendant l'appel, le bouton est grisé
+- Un échec affiche un message court en rouge sous le bouton ; le bouton reste cliquable pour réessayer
+
 ### Sélectionner un projet
 
 Clique sur une carte pour la sélectionner. La zone centrale passe au Kanban de ce projet, comme si tu l'avais choisi dans la barre latérale.
+
+### Démarrer ou arrêter l'app d'une carte de projet
+
+Quand un projet déclare une app, tu vois un bouton **Lancer** (ou **Arrêter** si elle tourne déjà) au bas de la carte.
+
+Un clic démarre ou arrête l'app sans quitter la vue Projets ni sélectionner la carte — pratique pour lancer plusieurs projets d'affilée. Pendant l'appel, le bouton se désactive ; la carte se rafraîchit pour afficher le nouvel état.
+
+En cas d'erreur, un message court s'affiche sous le bouton en rouge. La carte reste cliquable — tu peux relancer.
+
+Aucun bouton n'apparaît si le projet n'a pas d'app.
 
 ### Changer la catégorie d'un projet
 
