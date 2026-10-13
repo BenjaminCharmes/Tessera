@@ -4,7 +4,7 @@ created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-421
-pr_number: null
+pr_number: 414
 priority: medium
 status: done
 title: A report sent while an ide-core run is active waits outside the tree, and is
