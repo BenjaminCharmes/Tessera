@@ -844,6 +844,14 @@ Cette mécanique prévient les conflits causés par plusieurs tickets qui rééc
 
 Pour les projets avec une vraie CI, le comportement reste inchangé : le ticket suivant démarre sans attendre le merge (ADR-051) et n'attend que ses dépendances explicites (`depends_on`).
 
+### Capture et dénomination des exceptions (ticket-415)
+
+Quand une exception survient durant la phase 1 de livraison, elle doit être nommée lisiblement — y compris les exceptions sans message (`asyncio.TimeoutError`, `CancelledError` relayée, erreurs réseau). L'utilitaire `decrire_exception()` renvoie le message de l'exception s'il n'est pas vide, sinon son type (`TimeoutError`), toujours préfixé du type quand le message seul ne le contient pas.
+
+La journalisation (`livraison_echouee`) inclut la pile complète (`exc_info=True`) pour aider au diagnostic.
+
+**Cas critique** : une exception survient **après** l'ouverture de la PR. Le numéro de PR n'est jamais perdu — la `Livraison` le porte même en cas d'erreur, et la phase 2 (attente CI, merge) est confiée au `CIWatcher` comme pour une livraison réussie. Les PRs orphelines — ouvertes mais jamais relancées — ne peuvent donc plus se produire.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).
