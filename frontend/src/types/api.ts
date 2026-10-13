@@ -244,6 +244,17 @@ export interface TicketCreate {
   depends_on?: string[];
 }
 
+/** Corps de `POST /signalements` (ticket-407) : un défaut ou une idée sur Tessera. */
+export type SignalementNature = "bug" | "idee";
+
+export interface SignalementPayload {
+  projet: string;
+  nature: SignalementNature;
+  titre: string;
+  description: string;
+  contexte?: string;
+}
+
 export interface PipelineResult {
   ticket_id: string;
   final_status: TicketStatus;

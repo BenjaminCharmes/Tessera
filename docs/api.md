@@ -61,6 +61,12 @@ en interactif quand le backend tourne.
 | `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/open-pr` | Open Pull Request For Ticket |
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/pr-status` | Get Pr Status |
 
+### Signalements
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `POST` | `/api/v1/signalements` | Report Tessera Bug or Idea |
+
 ### Chat
 
 | Méthode | Endpoint | Description |

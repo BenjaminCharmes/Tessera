@@ -87,6 +87,14 @@ Cette page résume les grandes étapes.
 | Suivi par ticket, push et ouverture de PR — **jamais de merge** (ADR-022) | ✅ |
 | Un projet doit être la racine de son propre dépôt (ADR-024) | ✅ |
 
+### Phase 11 — Feedback et signalements ✅
+
+| Feature | Status |
+|---------|---------|
+| Signalement des bugs/idées Tessera depuis l'IDE | ✅ |
+| Modale de signalement (Bug/Idée, titre, description) | ✅ |
+| Création automatique de ticket dans ide-core | ✅ |
+
 ### Phase 10 — Cockpit, dialogue et intégrité ✅
 
 | Feature | Status |

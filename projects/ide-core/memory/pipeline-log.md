@@ -2350,3 +2350,26 @@ Le diff refactorise  (32359ms)
 - 2026-10-12 16:24:51 UTC — [ticket-406] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour  (187641ms)
 - 2026-10-12 16:24:51 UTC — [ticket-406] APPROVED après 1 tour(s)
 - 2026-10-12 16:26:52 UTC — [ticket-406] documentation: 1 fichier(s) (118530ms)
+- 2026-10-12 16:27:05 UTC — [ide-core] ticket-406 PR #385 confiée au CIWatcher
+- 2026-10-13 07:12:37 UTC — [ticket-407] branche ticket-407-any-project-can-report-a-tessera-bug-or-idea-whic
+- 2026-10-13 07:12:38 UTC — [ticket-407] tour 1 — codeur démarré
+- 2026-10-13 07:14:23 UTC — [ticket-407] tour 1 — codeur terminé (105625ms)
+- 2026-10-13 07:18:44 UTC — [ticket-407] testeur: OK (exit 0)
+- 2026-10-13 07:19:20 UTC — [ticket-407] securite: PASS — Audit complet du nouveau endpoint `/signalements` et de son router. Aucune vulné (35577ms)
+- 2026-10-13 07:19:20 UTC — [ticket-407] tour 1 — reviewer démarré
+- 2026-10-13 07:19:40 UTC — [ticket-407] tour 1 — reviewer terminé (20297ms)
+- 2026-10-13 07:21:30 UTC — [ticket-407] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (130280ms)
+- 2026-10-13 07:21:30 UTC — [ticket-407] APPROVED après 1 tour(s)
+- 2026-10-13 07:22:59 UTC — [ticket-407] documentation: 1 fichier(s) (85718ms)
+- 2026-10-13 07:27:27 UTC — [ide-core] ticket-407 : base réalignée sur develop
+- 2026-10-13 07:27:27 UTC — [ide-core] ticket-407 PR #388 confiée au CIWatcher
+- 2026-10-13 07:27:29 UTC — [ticket-408] branche ticket-408-a-report-button-in-the-project-header-sends-a-tes
+- 2026-10-13 07:27:30 UTC — [ticket-408] tour 1 — codeur démarré
+- 2026-10-13 07:29:00 UTC — [ticket-408] tour 1 — codeur terminé (90141ms)
+- 2026-10-13 07:33:25 UTC — [ticket-408] testeur: OK (exit 0)
+- 2026-10-13 07:34:10 UTC — [ticket-408] securite: PASS — Aucune vulnérabilité critique ou haute détectée dans ce diff. Le code ajoute une (44907ms)
+- 2026-10-13 07:34:10 UTC — [ticket-408] tour 1 — reviewer démarré
+- 2026-10-13 07:34:27 UTC — [ticket-408] tour 1 — reviewer terminé (17594ms)
+- 2026-10-13 07:36:43 UTC — [ticket-408] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le composant SignalementModal es (153641ms)
+- 2026-10-13 07:36:43 UTC — [ticket-408] APPROVED après 1 tour(s)
+- 2026-10-13 07:38:58 UTC — [ticket-408] documentation: 3 fichier(s) (132155ms)
