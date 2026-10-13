@@ -1,4 +1,5 @@
 import asyncio
+import json
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import aclosing
 from pathlib import Path
@@ -40,7 +41,10 @@ async def _sdk_gen(
         yield msg
 
 from tessera.services.providers.git_guard import hook_refus_git
-from tessera.services.providers.perimetre import hook_refus_hors_perimetre
+from tessera.services.providers.perimetre import (
+    hook_refus_hors_perimetre,
+    racine_autorisee,
+)
 from tessera.services.providers.ask_user import (
     ASK_USER_SERVER_NAME,
     ASK_USER_TOOL_NAME,
@@ -63,7 +67,55 @@ _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 # Ne jamais le résoudre depuis le cwd d'un projet : il vit dans le dépôt
 # de l'IDE, pas dans celui du projet qui déclare le skill.
 # backend/src/tessera/services/providers/ → parents[5] = racine du dépôt
-_TESSERA_PLUGIN_PATH: Path = Path(__file__).resolve().parents[5] / "agents" / "plugin"
+_REPO_ROOT: Path = Path(__file__).resolve().parents[5]
+_TESSERA_PLUGIN_PATH: Path = _REPO_ROOT / "agents" / "plugin"
+
+# Les fichiers de consignes que Claude Code charge dans chaque dossier ancêtre.
+_FICHIERS_CONSIGNES = ("CLAUDE.md", "CLAUDE.local.md")
+
+
+def claude_md_ancetres_a_exclure(
+    cwd: Path, racine: Path, ancestor: bool
+) -> list[str]:
+    """Lists the ancestor CLAUDE files a hosted project must not inherit.
+
+    Claude Code walks up from ``cwd`` and loads every ``CLAUDE.md`` it meets, so
+    the IDE's own rules would leak into each project nested under ``racine``
+    (ticket-414). Returns the ``CLAUDE.md`` and ``CLAUDE.local.md`` of every
+    directory from ``racine`` down to ``cwd``'s parent, as absolute ``/`` paths.
+    Empty when the project is ``ancestor`` (it needs those rules) or when
+    ``cwd`` is not strictly under ``racine``.
+    """
+    if ancestor:
+        return []
+    projet = cwd.resolve()
+    depart = racine.resolve()
+    if projet == depart or not projet.is_relative_to(depart):
+        return []
+    dossiers = [p for p in projet.parents if p.is_relative_to(depart)]
+    return [
+        (dossier / nom).as_posix()
+        for dossier in reversed(dossiers)
+        for nom in _FICHIERS_CONSIGNES
+    ]
+
+
+def _reglages_sans_consignes_ancetres(
+    cwd: Path | None, racine_ecriture: Path | None
+) -> str | None:
+    """The ``settings`` JSON excluding Tessera's CLAUDE files, or ``None``.
+
+    Un projet est « ancestor » quand sa racine d'écriture n'est pas son propre
+    dossier : on réutilise donc celle que le run a figée (ticket-119).
+    """
+    if cwd is None:
+        return None
+    racine = racine_ecriture if racine_ecriture is not None else racine_autorisee(cwd)
+    ancestor = racine.resolve() != cwd.resolve()
+    exclus = claude_md_ancetres_a_exclure(cwd, _REPO_ROOT, ancestor)
+    if not exclus:
+        return None
+    return json.dumps({"claudeMdExcludes": exclus})
 
 
 def _build_options(
@@ -149,6 +201,8 @@ def _build_options(
         tools=effective_tools,
         allowed_tools=effective_tools,
         setting_sources=["project"],
+        # Un projet hébergé ne lit pas les CLAUDE.md de Tessera (ticket-414).
+        settings=_reglages_sans_consignes_ancetres(cwd, racine_ecriture),
         include_partial_messages=True,
         max_turns=max_turns,
         max_budget_usd=max_budget_usd,
