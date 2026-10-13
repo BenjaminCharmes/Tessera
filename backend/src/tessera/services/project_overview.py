@@ -72,6 +72,8 @@ class ProjectOverview(BaseModel):
     tickets: TicketCounts
     run_actif: bool = False
     icon: bool = False
+    services_declares: bool = False
+    services_en_cours: bool = False
 
 
 class _Calcul(BaseModel):
@@ -234,9 +236,16 @@ async def _calcul_en_cache(project_path: Path) -> _Calcul:
     return calcul
 
 
-async def build_overview(project: Project, *, run_actif: bool) -> ProjectOverview:
-    """La carte d'un projet. `run_actif` et `icon` se lisent à chaque appel :
-    ils bougent sans toucher ni le dépôt ni les tickets."""
+async def build_overview(
+    project: Project,
+    *,
+    run_actif: bool,
+    services_declares: bool = False,
+    services_en_cours: bool = False,
+) -> ProjectOverview:
+    """La carte d'un projet. `run_actif`, `icon` et l'état des services se
+    lisent à chaque appel : ils bougent sans toucher ni le dépôt ni les
+    tickets, le cache ne doit donc pas les figer."""
     calcul = await _calcul_en_cache(project.path)
     return ProjectOverview(
         id=project.id,
@@ -249,4 +258,6 @@ async def build_overview(project: Project, *, run_actif: bool) -> ProjectOvervie
         tickets=calcul.tickets,
         run_actif=run_actif,
         icon=find_icon(project.path) is not None,
+        services_declares=services_declares,
+        services_en_cours=services_en_cours,
     )

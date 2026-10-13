@@ -2395,3 +2395,14 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 09:17:11 UTC — [ticket-413] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre une implémentation complète :  (21813ms)
 - 2026-10-13 09:17:11 UTC — [ticket-413] APPROVED après 1 tour(s)
 - 2026-10-13 09:18:48 UTC — [ticket-413] documentation: 1 fichier(s) (94655ms)
+- 2026-10-13 09:19:06 UTC — [ide-core] ticket-413 PR #396 confiée au CIWatcher
+- 2026-10-13 09:19:09 UTC — [ticket-410] branche ticket-410-the-projects-overview-tells-for-each-project-whet
+- 2026-10-13 09:19:09 UTC — [ticket-410] tour 1 — codeur démarré
+- 2026-10-13 09:20:38 UTC — [ticket-410] tour 1 — codeur terminé (88344ms)
+- 2026-10-13 09:26:00 UTC — [ticket-410] testeur: OK (exit 0)
+- 2026-10-13 09:26:31 UTC — [ticket-410] securite: PASS — Le diff ajoute deux champs booléens (`services_declares` et `services_en_cours`) (30405ms)
+- 2026-10-13 09:26:31 UTC — [ticket-410] tour 1 — reviewer démarré
+- 2026-10-13 09:26:48 UTC — [ticket-410] tour 1 — reviewer terminé (17000ms)
+- 2026-10-13 09:27:37 UTC — [ticket-410] validateur: APPROVED — Tous les critères sont satisfaits. Les trois tests vérifient la logique métier c (66530ms)
+- 2026-10-13 09:27:37 UTC — [ticket-410] APPROVED après 1 tour(s)
+- 2026-10-13 09:29:31 UTC — [ticket-410] documentation: 2 fichier(s) (110827ms)

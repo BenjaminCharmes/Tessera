@@ -901,6 +901,19 @@ Chaque projet est associé à une icône, cherchée dans cet ordre :
 
 Pour un projet déclaré `git_root: ancestor` (qui habite un sous-dossier d'un dépôt), la recherche s'effectue aussi à la racine du dépôt qui le contient, dans le même ordre. Un projet frère sans `.tessera/icon.svg` ni chemin standard ne reçoit pas d'icône (ticket-404).
 
+### Caching des services (ticket-410)
+
+Chaque carte de projet dans la vue d'ensemble affiche deux états :
+- `services_declares` : le projet a-t-il déclaré des services dans `agents.json` ?
+- `services_en_cours` : au moins un de ces services est-il en cours d'exécution ?
+
+Contrairement aux autres champs de `ProjectOverview`, ces deux états ne sont **jamais cachés** : ils sont calculés à chaque appel sur l'état réel :
+
+- `services_declares` lit `load_services_config` à la racine du projet
+- `services_en_cours` interroge `PROCESS_REGISTRY` pour y chercher un service vivant du projet
+
+Cette absence de cache garantit qu'une nouvelle requête `GET /api/v1/projects/overview` reflète immédiatement les changements : un service démarré entre deux appels apparaît aussitôt, de même qu'un arrêt.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`

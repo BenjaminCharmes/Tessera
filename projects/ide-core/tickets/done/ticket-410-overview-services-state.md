@@ -1,14 +1,15 @@
 ---
-id: ticket-410
-title: "The projects overview tells, for each project, whether it declares services and whether they are running"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-410
+pr_number: 397
+priority: medium
+status: done
+title: The projects overview tells, for each project, whether it declares services
+  and whether they are running
+type: feat
 ---
 
 # ticket-410 — La vue d'ensemble des projets porte l'état de leurs services

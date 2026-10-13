@@ -104,6 +104,10 @@ export interface ProjectOverview {
   run_actif: boolean;
   /** Le projet porte une icône servie par `/projects/{id}/icon`. */
   icon: boolean;
+  /** `agents.json` déclare au moins un service lançable. */
+  services_declares: boolean;
+  /** Au moins un service du projet tourne en ce moment. */
+  services_en_cours: boolean;
 }
 
 export interface Ticket {
