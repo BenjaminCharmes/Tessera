@@ -711,6 +711,16 @@ pointe d'origine de la branche du ticket, **sans perdre ce qui était commité**
 Après l'échec, `.git/rebase-merge` n'existe plus : l'arbre est propre pour le
 ticket suivant, même en mode file.
 
+#### Résolution automatique pour fichiers d'ajout seul (ticket-418)
+
+Deux fichiers où chaque run ne fait que ajouter des entrées ne bloquent plus une livraison sur conflit de rebase :
+
+- **`memory/pipeline-log.md`** : le service de préparation de l'espace git (avant chaque run) configure `merge=union` pour ce fichier dans `.git/info/attributes` du dépôt du projet. Ce paramètre reste en `.git/`, jamais versionné (configuration locale propre à chaque clone, voir ADR-021). Le pilote d'union natif à git résout automatiquement les conflits par concaténation ligne à ligne.
+
+- **`memory/documentation.json`** : si c'est le seul fichier en conflit lors du rebase, il est résolu mécaniquement en prenant l'union des listes d'identifiants de run (JSON parcouru et réécrit en mémoire), puis le rebase continue.
+
+Si d'autres fichiers sont en conflit, c'est un scénario complexe : le rebase s'arrête, la branche reste intacte, et un agent tente la résolution de ces ambiguïtés intrinsèques, toujours relue avant approbation (voir ADR-033). Cette automatisation élimine les blocages sur des fichiers où l'ajout séquentiel de deux branches ne crée aucune ambiguïté.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
