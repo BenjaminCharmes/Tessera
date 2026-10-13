@@ -1,14 +1,15 @@
 ---
-id: ticket-413
-title: "A run on a project that delivers on its own is refused upfront when GitHub is not configured for it"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-413
+pr_number: 396
+priority: high
+status: done
+title: A run on a project that delivers on its own is refused upfront when GitHub
+  is not configured for it
+type: fix
 ---
 
 # ticket-413 — Refuser d'emblée un run qui ne pourra pas être livré

@@ -2384,3 +2384,14 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 08:54:34 UTC — [ticket-409] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (204188ms)
 - 2026-10-13 08:54:34 UTC — [ticket-409] APPROVED après 1 tour(s)
 - 2026-10-13 08:55:41 UTC — [ticket-409] documentation: 0 fichier(s) (62358ms)
+- 2026-10-13 08:55:55 UTC — [ide-core] ticket-409 PR #394 confiée au CIWatcher
+- 2026-10-13 09:08:06 UTC — [ticket-413] branche ticket-413-a-run-on-a-project-that-delivers-on-its-own-is-re
+- 2026-10-13 09:08:06 UTC — [ticket-413] tour 1 — codeur démarré
+- 2026-10-13 09:09:21 UTC — [ticket-413] tour 1 — codeur terminé (74969ms)
+- 2026-10-13 09:15:59 UTC — [ticket-413] testeur: OK (exit 0)
+- 2026-10-13 09:16:49 UTC — [ticket-413] securite: PASS — Audit de sécurité complet : aucune vulnérabilité détectée dans le diff. Le code  (49936ms)
+- 2026-10-13 09:16:49 UTC — [ticket-413] tour 1 — reviewer démarré
+- 2026-10-13 09:17:10 UTC — [ticket-413] tour 1 — reviewer terminé (20093ms)
+- 2026-10-13 09:17:11 UTC — [ticket-413] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre une implémentation complète :  (21813ms)
+- 2026-10-13 09:17:11 UTC — [ticket-413] APPROVED après 1 tour(s)
+- 2026-10-13 09:18:48 UTC — [ticket-413] documentation: 1 fichier(s) (94655ms)
