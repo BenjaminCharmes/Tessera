@@ -59,6 +59,7 @@ from tessera.services.git_link import (
 from tessera.services.cost_calculator import modeles_connus
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.project_overview import ProjectOverview, build_overview, find_icon
+from tessera.services.process_registry import PROCESS_REGISTRY
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.models.agent import FallbackConfig
 from tessera.routers.dependencies import require_valid_project_id
@@ -71,6 +72,7 @@ from tessera.services.project_loader import (
     ProjectLoader,
     load_agents_config,
     load_pipeline_config,
+    load_services_config,
     set_agent_model,
     set_agent_provider,
     set_pipeline_settings,
@@ -114,7 +116,14 @@ async def get_projects_overview() -> list[ProjectOverview]:
     return list(
         await asyncio.gather(
             *(
-                build_overview(p, run_actif=RUN_REGISTRY.projet_occupe(p.id))
+                build_overview(
+                    p,
+                    run_actif=RUN_REGISTRY.projet_occupe(p.id),
+                    services_declares=bool(load_services_config(p.path)),
+                    services_en_cours=any(
+                        s.en_cours for s in PROCESS_REGISTRY.services_de(p.id)
+                    ),
+                )
                 for p in projets
             )
         )

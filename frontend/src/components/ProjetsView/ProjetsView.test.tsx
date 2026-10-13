@@ -26,6 +26,8 @@ function vue(id: string, nom: string, extra: Partial<ProjectOverview> = {}): Pro
     tickets: { todo: 2, in_progress: 1, in_review: 0, blocked: 3, done: 4 },
     run_actif: false,
     icon: false,
+    services_declares: false,
+    services_en_cours: false,
     ...extra,
   };
 }
