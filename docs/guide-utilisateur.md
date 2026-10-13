@@ -1111,6 +1111,18 @@ Cette charte garantit une cohérence dans le temps : chaque ticket UI la respect
 **Sur les projets existants**, cette direction n'est pas active par défaut. Tu peux l'ajouter en éditant `agents.json` : ajoute `"tessera:design-ui"` dans la clé `skills` du codeur et de l'architect.
 
 
+#### Maquette d'interface — source de vérité visuelle
+
+Si ton projet a une maquette, elle devient la source de vérité pour tout changement d'interface. Les agents reproduisent fidèlement sa structure, ses espacements, ses tailles et ses états — au lieu d'inventer une mise en page ou de refondre l'UI à chaque ticket.
+
+**Créer une maquette** : tu la fais manuellement, hors du pipeline, seul(e) ou avec un designer, en utilisant l'éditeur de maquettes de Claude (artifacts). Sauvegarde-la en HTML dans `design/maquette/` — un ou plusieurs fichiers `.dc.html` par écran. L'éditeur génère le texte ; tu peux le versionner tel quel.
+
+**Impact sur la charte** : ta charte `memory/design.md` se construit sur les couleurs et les patterns de la maquette. Quand un agent reproduit l'interface, il utilise les tokens de charte plutôt que des couleurs en dur.
+
+**C'est optionnel** : un projet sans maquette marche aussi bien. L'agent propose une charte visuelle neuve — utile pour des chores ou des projets minimalistes. Tu peux ajouter une maquette plus tard.
+
+Un projet créé depuis le gabarit FastAPI + React a un dossier `design/maquette/` vide et un `README.md` expliquant comment charger une maquette.
+
 ### Ce que le testeur attrape
 
 Le testeur lance les mêmes outils que ta CI : `pytest` et `mypy` pour Python, `tsc` pour TypeScript, puis `eslint` et `vitest` pour le frontend. Un ticket n'échouera plus soudain en CI sur une erreur de typage ou de lint — le pipeline les détecte tous maintenant, avant même que la PR soit ouverte.

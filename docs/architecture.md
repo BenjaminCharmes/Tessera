@@ -1466,3 +1466,16 @@ POST /orchestrator/run { project_id, ticket_id }
 > suivant. Seul un ticket **approuvé** fait avancer la ref de base, de sorte
 > qu'un plan de tickets séquentiels s'empile correctement sans jamais hériter
 > du travail rejeté d'un ticket précédent.
+## Design et maquettes
+
+Chaque projet peut déclarer une maquette d'interface validée dans `design/maquette/` (fichiers `.dc.html` exportés depuis l'éditeur Claude Design). Quand la maquette existe, elle fait autorité pour :
+
+- **Structure** : ordre des composants, hiérarchie visuelle
+- **Espacements** : tailles, marges, padding
+- **États** : hover, focus, disabled, et autres variantes
+- **Couleurs** : chaque teinte définie dans la maquette devient un token de la charte CSS (`memory/design.md`)
+
+Les textes affichés dans la maquette sont des données fictives, jamais du contenu à recopier. Les agents (codeur en premier, reviewer en validation) reproduisent d'abord la structure et les espacements de la maquette, puis y appliquent la charte de couleurs et typographie.
+
+Le gabarit `fastapi-react` inclut un dossier `design/maquette/` avec un `README.md` qui explique ce rôle. Les nouveaux projets créés depuis ce gabarit ont donc la structure prête.
+
