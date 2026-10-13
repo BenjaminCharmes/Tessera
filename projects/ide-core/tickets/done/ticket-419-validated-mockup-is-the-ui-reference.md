@@ -4,7 +4,7 @@ created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-419
-pr_number: null
+pr_number: 415
 priority: medium
 status: done
 title: A validated mockup in design/maquette becomes the UI reference the coder reproduces,
