@@ -4,7 +4,7 @@ created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-414
-pr_number: null
+pr_number: 403
 priority: high
 status: done
 title: Agents working on a hosted project no longer inherit Tessera's own CLAUDE.md
