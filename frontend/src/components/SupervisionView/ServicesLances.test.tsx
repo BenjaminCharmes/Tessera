@@ -109,3 +109,22 @@ describe("ServicesLances — plusieurs sorties (ticket-149)", () => {
     expect(screen.getByLabelText("Sortie de frontend")).toBeInTheDocument();
   });
 });
+
+describe("ServicesLances — en ligne", () => {
+  it("lays the services out side by side, and gives an opened one the full width", async () => {
+    render(
+      <ServicesLances
+        services={[service({ nom: "backend" }), service({ nom: "frontend" })]}
+        sortieDe={() => ["pret"]}
+      />,
+    );
+
+    const bande = screen.getByRole("region", { name: "Services lancés" });
+    expect(bande.className).toContain("flex-wrap");
+
+    await userEvent.click(screen.getByRole("button", { name: "backend" }));
+    const bloc = screen.getByLabelText("Sortie de backend").closest("[data-service]");
+    expect(bloc?.className).toContain("basis-full");
+  });
+});
+
