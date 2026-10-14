@@ -2617,3 +2617,13 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 08:56:36 UTC — [ticket-426] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés pour v (108375ms)
 - 2026-10-14 08:56:36 UTC — [ticket-426] APPROVED après 1 tour(s)
 - 2026-10-14 08:58:45 UTC — [ticket-426] documentation: 0 fichier(s) (126125ms)
+- 2026-10-14 08:59:03 UTC — [ide-core] ticket-426 PR #423 confiée au CIWatcher
+- 2026-10-14 08:59:06 UTC — [ticket-427] branche ticket-427-the-history-tab-shows-the-selected-run-in-the-cen
+- 2026-10-14 08:59:06 UTC — [ticket-427] tour 1 — codeur démarré
+- 2026-10-14 09:02:52 UTC — [ticket-427] tour 1 — codeur terminé (226188ms)
+- 2026-10-14 09:09:07 UTC — [ticket-427] testeur: OK (exit 0)
+- 2026-10-14 09:09:51 UTC — [ticket-427] securite: PASS — Analyse complète du diff : 10 fichiers modifiés/créés pour l'ajout d'un onglet H (44000ms)
+- 2026-10-14 09:09:51 UTC — [ticket-427] tour 1 — reviewer démarré
+- 2026-10-14 09:10:14 UTC — [ticket-427] tour 1 — reviewer terminé (23421ms)
+- 2026-10-14 09:15:18 UTC — [ticket-427] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests dans `HistoriqueView. (327281ms)
+- 2026-10-14 09:15:18 UTC — [ticket-427] APPROVED après 1 tour(s)
