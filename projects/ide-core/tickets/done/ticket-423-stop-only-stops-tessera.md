@@ -1,14 +1,15 @@
 ---
-id: ticket-423
-title: "Stopping Tessera only stops Tessera's own server processes, never other projects' apps"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-423
+pr_number: 416
+priority: critical
+status: done
+title: Stopping Tessera only stops Tessera's own server processes, never other projects'
+  apps
+type: fix
 ---
 
 # ticket-423 — `tessera.ps1 stop` n'arrête que Tessera

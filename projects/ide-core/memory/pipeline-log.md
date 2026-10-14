@@ -2541,3 +2541,26 @@ Analyse (93125ms)
 - 2026-10-13 14:48:10 UTC — [ticket-419] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le fichier SKILL.md contient bi (111500ms)
 - 2026-10-13 14:48:10 UTC — [ticket-419] APPROVED après 1 tour(s)
 - 2026-10-13 14:52:35 UTC — [ticket-419] documentation: 2 fichier(s) (261829ms) — après tour de correction
+- 2026-10-13 14:52:50 UTC — [ide-core] ticket-419 PR #415 confiée au CIWatcher
+- 2026-10-13 14:58:10 UTC — [ticket-423] branche ticket-423-stopping-tessera-only-stops-tessera-s-own-server
+- 2026-10-13 14:58:10 UTC — [ticket-423] tour 1 — codeur démarré
+- 2026-10-13 14:59:37 UTC — [ticket-423] tour 1 — codeur terminé (87420ms)
+- 2026-10-13 15:04:45 UTC — [ticket-423] testeur: OK (exit 0)
+- 2026-10-13 15:05:35 UTC — [ticket-423] securite: PASS — Audit complet du diff : ajout d'un script de sélection de processus Tessera (`sc (49859ms)
+- 2026-10-13 15:05:35 UTC — [ticket-423] tour 1 — reviewer démarré
+- 2026-10-13 15:06:19 UTC — [ticket-423] tour 1 — reviewer terminé (43328ms)
+- 2026-10-13 15:08:07 UTC — [ticket-423] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas dema (151984ms)
+- 2026-10-13 15:08:07 UTC — [ticket-423] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **`scripts/tessera.ps1`, l. 78 et 83 : sous
+- 2026-10-13 15:08:07 UTC — [ticket-423] tour 2 — codeur démarré
+- 2026-10-13 15:08:26 UTC — [ticket-423] tour 2 — codeur terminé (18703ms)
+- 2026-10-13 15:13:29 UTC — [ticket-423] testeur: OK (exit 0)
+- 2026-10-13 15:14:05 UTC — [ticket-423] securite: PASS — Audit de sécurité complet : aucune vulnérabilité CRITICAL ou HIGH détectée dans  (36155ms)
+- 2026-10-13 15:14:05 UTC — [ticket-423] tour 2 — reviewer démarré
+- 2026-10-13 15:14:29 UTC — [ticket-423] tour 2 — reviewer terminé (23063ms)
+- 2026-10-13 15:16:49 UTC — [ticket-423] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas dema (163296ms)
+- 2026-10-13 15:16:49 UTC — [ticket-423] APPROVED après 2 tour(s)
+- 2026-10-13 15:17:40 UTC — [ticket-423] documentation: 0 fichier(s) (48172ms)
