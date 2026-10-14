@@ -17,6 +17,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
+| `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows); `~/.local/state/tessera` (macOS/Linux) | Dossier hors du dépôt pour l'état persistant de l'IDE (signalements en attente). Créé au besoin |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |
@@ -27,6 +28,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `ATTENTE_MERGE_MAX_S` | | `600` | Pour les projets avec `merge_without_ci: true`, délai maximum d'attente du merge du ticket précédent avant de lancer le ticket suivant d'une file (en secondes, ticket-382) |
 | `CI_GRACE_S` | | `300` | Délai de grâce avant de conclure que les checks CI ne s'enregistreront pas (`none` → achèvement). Si des workflows sont déclarés dans le dépôt, le statut reste `pending` jusqu'à `attente_ci_max_s` (ticket-405) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
+| `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows) ou `~/.local/state/tessera` (autres) | Répertoire pour les fichiers d'état en dehors du dépôt : signalements en attente, etc. Créé au démarrage s'il n'existe pas. |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | URL du serveur Ollama pour les modèles locaux (rôles de jugement uniquement) |
 | `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama. Au-delà, les requêtes attendent leur créneau |

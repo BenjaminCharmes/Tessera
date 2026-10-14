@@ -72,7 +72,7 @@ L'endpoint accepte un signalement (bug ou idée) sur Tessera. Il crée automatiq
 **Réponse selon le contexte** :
 
 - **Projet `ide-core` libre** (aucun run en cours) : le signalement est écrit immédiatement dans `tickets/todo/`. Réponse `201 Created`.
-- **Un run `ide-core` actif** : le signalement attend dans une file hors du dépôt (`signalements_en_attente.json`). Réponse `202 Accepted` avec `{ "en_attente": true, "position": n }`. Une fois le run fusionné, les signalements en attente sont écrits en ordre d'arrivée.
+- **Un run `ide-core` actif** : le signalement attend dans une file en dehors du dépôt (répertoire `IDE_STATE_DIR`, fichier `signalements_en_attente.json`). Réponse `202 Accepted` avec `{ "en_attente": true, "position": n }`. Une fois le run fusionné, les signalements en attente sont écrits en ordre d'arrivée.
 
 ### Chat
 
