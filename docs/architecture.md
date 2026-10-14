@@ -550,6 +550,20 @@ Cette vérification est une optimisation (ticket-413) : elle évite de dépenser
 L'enregistrement du pipeline écrit « testeur: délai dépassé, suite relancée » dans le `pipeline-log.md` à chaque relance.
 
 
+### Audit de sécurité
+
+L'agent sécurité audite le diff avant la revue. Selon ADR-039, une réponse JSON invalide bloque toujours le run — aucun repli n'est possible pour le jugement de sécurité.
+
+**Robustesse en cas de réponse invalide** (ticket-436) :
+
+Quand le modèle rend un JSON non-valide du premier coup, l'IDE lui redemande une seule fois avec une consigne explicite : « Ta réponse précédente n'était pas un JSON valide ; réponds uniquement par l'objet JSON demandé. »
+
+- Si la deuxième réponse est valide → elle fait foi, l'audit rend son verdict (PASS ou BLOCK)
+- Si les deux réponses sont invalides → audit BLOCK avec motif indiquant deux réponses illisibles
+- Exception du provider (timeout, erreur réseau) → pas de seconde tentative ; ADR-046 gère le fallback
+
+Journal : `security_auditor_invalid_json` enregistre le numéro de tentative (1 ou 2) pour chaque réponse invalide.
+
 ### Résultats des tests et extraction d'erreurs (ticket-393)
 
 Quand les tests échouent, `test_runner.py` extrait :

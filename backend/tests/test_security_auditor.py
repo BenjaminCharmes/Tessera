@@ -437,6 +437,80 @@ async def test_pass_verdict_survives_unescaped_backslash_in_summary(
     assert result.verdict == "PASS"
 
 
+_PASS_JSON = json.dumps({"issues": [], "verdict": "PASS", "summary": "ok"})
+
+
+class _SequencedProvider(FakeProvider):
+    """Answers with each queued reply in turn; an Exception item is raised."""
+
+    def __init__(self, replies: list[str | Exception]) -> None:
+        super().__init__()
+        self._replies = replies
+
+    async def complete(self, **kwargs):  # type: ignore[override]
+        reply = self._replies[len(self.calls)]
+        if isinstance(reply, Exception):
+            self.calls.append({"mode": "complete", **kwargs})
+            raise reply
+        self.set_content(reply)
+        return await super().complete(**kwargs)
+
+
+class TestUnreadableAnswerRetried:
+    """Tests for ticket-436 — an unreadable answer is asked again once."""
+
+    async def test_unreadable_then_pass_gives_pass_in_two_calls(self, tmp_path: Path) -> None:
+        provider = _SequencedProvider(["not json at all", _PASS_JSON])
+        service = SecurityAuditorService(provider, Path("agents/prompts"))
+
+        result = await service.audit("code", tmp_path)
+
+        assert result.verdict == "PASS"
+        assert result.reason == ""
+        assert len(provider.calls) == 2
+
+    async def test_second_attempt_carries_the_reminder(self, tmp_path: Path) -> None:
+        provider = _SequencedProvider(["nope", _PASS_JSON])
+        service = SecurityAuditorService(provider, Path("agents/prompts"))
+
+        await service.audit("code", tmp_path)
+
+        users = [c["user"] for c in provider.calls]
+        assert "n'était pas un JSON valide" not in users[0]
+        assert "n'était pas un JSON valide" in users[-1]
+
+    async def test_two_unreadable_answers_block_and_say_so(self, tmp_path: Path) -> None:
+        provider = _SequencedProvider(["nope", "still nope"])
+        service = SecurityAuditorService(provider, Path("agents/prompts"))
+
+        result = await service.audit("code", tmp_path)
+
+        assert result.verdict == "BLOCK"
+        assert "deux tentatives" in result.reason
+        assert result.reason in result.summary
+
+    async def test_provider_exception_blocks_without_second_attempt(
+        self, tmp_path: Path
+    ) -> None:
+        provider = _SequencedProvider([Exception("Network error")])
+        service = SecurityAuditorService(provider, Path("agents/prompts"))
+
+        result = await service.audit("code", tmp_path)
+
+        assert result.verdict == "BLOCK"
+        assert "Network error" in result.reason
+        assert len(provider.calls) == 1
+
+    async def test_readable_first_answer_costs_a_single_call(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        provider.set_content(_PASS_JSON)
+
+        await service.audit("code", tmp_path)
+
+        assert len(provider.calls) == 1
+
+
 async def test_a_whole_branch_diff_reaches_the_auditor_intact(
     service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
 ) -> None:

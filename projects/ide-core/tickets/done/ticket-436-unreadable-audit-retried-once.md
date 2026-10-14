@@ -1,14 +1,14 @@
 ---
-id: ticket-436
-title: "An unreadable security audit answer is asked again once before the run is blocked"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-436
+pr_number: 433
+priority: medium
+status: done
+title: An unreadable security audit answer is asked again once before the run is blocked
+type: fix
 ---
 
 # ticket-436 — Une réponse d'audit illisible est redemandée une fois
