@@ -2603,3 +2603,16 @@ Le ticket in (38094ms)
 - 2026-10-14 08:27:33 UTC — [ticket-425] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés ou mod (150733ms)
 - 2026-10-14 08:27:33 UTC — [ticket-425] APPROVED après 1 tour(s)
 - 2026-10-14 08:29:01 UTC — [ticket-425] documentation: 1 fichier(s) (83936ms)
+- 2026-10-14 08:29:16 UTC — [ide-core] ticket-425 PR #422 confiée au CIWatcher
+- 2026-10-14 08:36:03 UTC — [ticket-425] livraison: arrêt — PR #422 non mergée : CI failing : la PR #422 reste ouverte.
+- 2026-10-14 08:47:36 UTC — [ticket-426] branche ticket-426-the-navigation-rail-is-grouped-into-pilotage-proj
+- 2026-10-14 08:47:37 UTC — [ticket-426] tour 1 — codeur démarré
+- 2026-10-14 08:49:16 UTC — [ticket-426] tour 1 — codeur terminé (99109ms)
+- 2026-10-14 08:54:26 UTC — [ticket-426] testeur: OK (exit 0)
+- 2026-10-14 08:54:47 UTC — [ticket-426] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée.
+
+Ce diff porte exclusivement  (21530ms)
+- 2026-10-14 08:54:47 UTC — [ticket-426] tour 1 — reviewer démarré
+- 2026-10-14 08:55:07 UTC — [ticket-426] tour 1 — reviewer terminé (19875ms)
+- 2026-10-14 08:56:36 UTC — [ticket-426] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés pour v (108375ms)
+- 2026-10-14 08:56:36 UTC — [ticket-426] APPROVED après 1 tour(s)
