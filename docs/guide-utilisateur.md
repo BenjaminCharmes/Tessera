@@ -898,6 +898,18 @@ Quand revue et validation sont parallèles, leurs événements s'entrelaçent da
 
 Une carte **TESTEUR** s'ajoute au fil après chaque passage du codeur. Elle porte le résumé des résultats — `1 error in 2.32s` ou `all pass` — et, dépliée, le détail des erreurs. Si la suite est rouge, elle t'explique : **« retour au codeur, sans revue »** — c'est pourquoi l'étape Tests est rouge et que l'audit de sécurité et la revue ne tourneront pas ce tour.
 
+
+#### Approuvés et arrêtés
+
+Une file affiche les tickets en quatre groupes :
+
+- **Approuvés** : tickets livrés (tous les rôles ont approuvé)
+- **Arrêtés** : tickets bloqués (non approuvés), chacun avec son motif short : « testeur: délai dépassé », « reviewer: refusé », etc.
+- **Restants** : tickets non encore lancés
+- **Courant** : le ticket en traitement
+
+Si un ticket est arrêté, son motif te guide pour le corriger et le relancer.
+
 ### Runs récents — chercher et afficher plus
 
 Dans le cockpit ou l'onglet Supervision, une carte « Runs récents » affiche les dix derniers runs. Tu peux :
