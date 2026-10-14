@@ -18,6 +18,8 @@ import RunView from "./RunView";
 import KanbanView from "./KanbanView";
 import ProjetsView from "./ProjetsView";
 import EnCoursView from "./EnCoursView";
+import HistoriqueView from "./HistoriqueView";
+import type { HistoriqueProps } from "./HistoriqueView";
 import type { UseAppsEnCoursResult } from "../hooks/useAppsEnCours";
 
 // Vues lourdes — chargées à la demande, après le premier rendu du cockpit
@@ -47,6 +49,8 @@ interface CenterViewProps {
   /** Les apps de projet vivantes sur la machine (ticket-417). */
   appsEnCours: UseAppsEnCoursResult;
   agentSelectionne: string | null;
+  /** Les runs du projet et celui qu'on regarde, pour l'onglet Historique (ticket-427). */
+  historique: HistoriqueProps;
   stream: ReturnType<typeof useRunActif>;
   byStatus: Record<TicketStatus, Ticket[]>;
   running: Set<string>;
@@ -100,6 +104,7 @@ export default function CenterView({
   servicesDuProjet,
   appsEnCours,
   agentSelectionne,
+  historique,
   stream,
   byStatus,
   running,
@@ -151,6 +156,10 @@ export default function CenterView({
         onSelectProject={onSelectProject}
       />
     );
+  } else if (panel === "history") {
+    // Les runs ont leur propre vue : sans elle, l'onglet retombait sur la
+    // liste des tickets (ticket-427).
+    content = <HistoriqueView {...historique} project={project} />;
   } else if (panel === "agents") {
     content = <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />;
   } else if (panel === "usage") {

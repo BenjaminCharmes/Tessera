@@ -9,6 +9,10 @@ interface RunHistoryProps {
   loading: boolean;
   error: string | null;
   onSelectTicket?: (ticketId: string) => void;
+  /** Le run regardé au centre (ticket-427). */
+  selectedRunId?: string | null;
+  /** Un clic sur un run le montre au centre (ticket-427). */
+  onSelectRun?: (runId: string) => void;
 }
 
 function formatDuration(startedAt: string, finishedAt: string | null): string {
@@ -47,16 +51,24 @@ function StatusIcon({
 interface RunRowProps {
   run: PipelineRun;
   onSelectTicket?: (ticketId: string) => void;
+  selected: boolean;
+  onSelectRun?: (runId: string) => void;
 }
 
-function RunRow({ run, onSelectTicket }: RunRowProps) {
+function RunRow({ run, onSelectTicket, selected, onSelectRun }: RunRowProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="border-b border-zinc-800">
       <button
-        onClick={() => setExpanded((v) => !v)}
-        className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-zinc-800 transition-colors"
+        onClick={() => {
+          onSelectRun?.(run.id);
+          setExpanded((v) => !v);
+        }}
+        aria-pressed={selected}
+        className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-zinc-800 transition-colors ${
+          selected ? "bg-zinc-800" : ""
+        }`}
       >
         <StatusIcon approved={run.approved} finalStatus={run.final_status} />
         <span className="flex-1 min-w-0 text-mini font-mono text-zinc-300 truncate">
@@ -124,6 +136,8 @@ export default function RunHistory({
   loading,
   error,
   onSelectTicket,
+  selectedRunId = null,
+  onSelectRun,
 }: RunHistoryProps) {
   if (loading) {
     return (
@@ -153,7 +167,13 @@ export default function RunHistory({
       </div>
       <div className="flex-1 overflow-y-auto">
         {runs.map((run) => (
-          <RunRow key={run.id} run={run} onSelectTicket={onSelectTicket} />
+          <RunRow
+            key={run.id}
+            run={run}
+            onSelectTicket={onSelectTicket}
+            selected={run.id === selectedRunId}
+            onSelectRun={onSelectRun}
+          />
         ))}
       </div>
     </div>

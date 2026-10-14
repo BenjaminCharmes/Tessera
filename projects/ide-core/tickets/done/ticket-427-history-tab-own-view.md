@@ -1,14 +1,16 @@
 ---
-id: ticket-427
-title: "The History tab shows the selected run in the centre, or a filterable table of all runs, instead of the tickets list"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-425"]
-estimated_days: 1
 created: 2026-10-14
+depends_on:
+- ticket-425
+estimated_days: 1
+id: ticket-427
+pr_number: 424
+priority: high
+status: done
+title: The History tab shows the selected run in the centre, or a filterable table
+  of all runs, instead of the tickets list
+type: feat
 ---
 
 # ticket-427 — Onglet Historique : sa propre vue

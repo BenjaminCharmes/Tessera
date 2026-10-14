@@ -1239,6 +1239,28 @@ Une optimisation de ticket-365 raffine le mécanisme précédent. Quand la PR pa
 
 Cette optimisation élimine les appels redondants sur les cartes dont la PR est réglée depuis longtemps.
 
+## Vue Historique (ticket-427)
+
+Chaque onglet du cockpit affiche une vue différente au centre : Tickets, Agents, Usage, Chat, ou Historique.
+
+`CenterView.tsx` route vers le composant approprié selon le panneau actif (`panel`). L'onglet **Historique** rend `HistoriqueView`, qui remplace la liste de tickets pour montrer l'historique des runs du projet.
+
+### Structure de HistoriqueView
+
+La vue Historique offre deux modes, sélectionnables via un en-tête avec deux boutons :
+
+1. **Détail du run** (défaut) : affiche le détail du run sélectionné ou le plus récent. Affiche le ticket, son titre, le verdict du run, le nombre de tours, et le fil complet du run rendu par `RunHistorique` (ticket-281). Sans run sélectionné : le plus récent ; sans aucun run : l'état vide.
+
+2. **Tous les runs** : tableau filtrable de tous les runs du projet. Colonnes : ticket, titre, verdict, nombre de tours, coût, date. Filtres : « Tous », « Approuvés », « Refusés ou bloqués ». Le filtre « Plusieurs tours » garde seulement les runs avec `rounds > 1`. Un clic sur une ligne ouvre le détail de ce run.
+
+### Interaction avec la colonne de gauche
+
+La colonne de gauche (`RunHistory.tsx`) liste les runs du projet. Un clic sur un run **sélectionne ce run** dans l'état du cockpit (à côté du ticket sélectionné), ce qui met à jour `HistoriqueView` pour afficher son détail. Le sélecteur de run est distinct du sélecteur de ticket.
+
+### Couleurs et statuts
+
+Les verdicts des runs sont colorés selon ADR-026 : vert approuvé, ambre plusieurs tours, rouge refusé ou bloqué.
+
 ## Structure des fichiers de tickets
 
 ```

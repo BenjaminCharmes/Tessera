@@ -137,6 +137,9 @@ export function useCockpit() {
   // ordonner (ticket-074).
   const [selection, setSelection] = useState<string[]>([]);
   const [agentSelectionne, setAgentSelectionne] = useState<string | null>(null);
+  // Le run regardé dans l'onglet Historique, à côté du ticket sélectionné
+  // (ticket-427). Null : le plus récent du projet.
+  const [runSelectionne, setRunSelectionne] = useState<string | null>(null);
   // La période et la portée des statistiques vivent ici pour que la colonne
   // latérale les contrôle et que StatsView les reçoive en props (ticket-253).
   const [statsDays, setStatsDays] = useState<StatsPeriod>(30);
@@ -400,7 +403,13 @@ export function useCockpit() {
         },
         onChangeStatus: handleChangeStatus,
       },
-      runs: { liste: runs.runs, loading: runs.loading, error: runs.error },
+      runs: {
+        liste: runs.runs,
+        loading: runs.loading,
+        error: runs.error,
+        selectionne: runSelectionne,
+        onSelect: setRunSelectionne,
+      },
       usage: {
         days: statsDays,
         setDays: setStatsDays,
@@ -441,6 +450,14 @@ export function useCockpit() {
       servicesDuProjet: services.services,
       appsEnCours,
       agentSelectionne,
+      historique: {
+        runs: runs.runs,
+        loading: runs.loading,
+        error: runs.error,
+        runSelectionne,
+        onSelectRun: setRunSelectionne,
+        tickets: tickets.tickets,
+      },
       stream,
       byStatus: filtrage.byStatus,
       filtres,
