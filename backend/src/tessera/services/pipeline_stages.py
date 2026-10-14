@@ -31,6 +31,7 @@ from tessera.services.pipeline_outcomes import finish_security_block, finish_tim
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
 from tessera.services.security_auditor import SecurityAuditResult
+from tessera.services.validator_cited_files import format_cited_files_log
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -706,6 +707,10 @@ async def run_validation(
             for c in validation.criteria
         ],
     )
+    if validation.cited_files is not None:
+        cited_line = format_cited_files_log(validation.cited_files)
+        if cited_line:
+            orch._log(f"[{run.ticket_id}] {cited_line}")
     orch._log(
         f"[{run.ticket_id}] validateur: {validation.verdict} — "
         f"{validation.feedback[:80]} ({validation_ms}ms)"
