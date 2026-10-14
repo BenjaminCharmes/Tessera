@@ -50,6 +50,8 @@ interface CenterViewProps {
   /** Les apps de projet vivantes sur la machine (ticket-417). */
   appsEnCours: UseAppsEnCoursResult;
   agentSelectionne: string | null;
+  /** Choisit un rôle depuis le tableau « Comparer » de l'onglet Agents (ticket-429). */
+  onSelectAgent?: (role: string) => void;
   /** Les runs du projet et celui qu'on regarde, pour l'onglet Historique (ticket-427). */
   historique: HistoriqueProps;
   stream: ReturnType<typeof useRunActif>;
@@ -109,6 +111,7 @@ export default function CenterView({
   servicesDuProjet,
   appsEnCours,
   agentSelectionne,
+  onSelectAgent,
   historique,
   stream,
   byStatus,
@@ -181,7 +184,13 @@ export default function CenterView({
       />
     );
   } else if (panel === "agents") {
-    content = <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />;
+    content = (
+      <AgentDetail
+        role={agentSelectionne}
+        projectId={project?.id ?? null}
+        onSelectRole={onSelectAgent}
+      />
+    );
   } else if (panel === "usage") {
     // La période et la portée viennent de la colonne latérale (ticket-253).
     content = <StatsView projectId={statsProjectId} days={statsDays} />;

@@ -2640,3 +2640,13 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 09:33:58 UTC — [ticket-428] APPROVED après 1 tour(s)
 - 2026-10-14 09:36:50 UTC — [ticket-428] documentation: 1 fichier(s) (169593ms)
 - 2026-10-14 09:37:26 UTC — [ticket-428] livraison: arrêt — Conflit avec develop sur : frontend/src/components/CenterView.test.tsx, frontend/src/components/Cent
+- 2026-10-14 09:37:33 UTC — [ticket-429] branche ticket-429-the-agents-tab-shows-a-role-sheet-with-its-30-day
+- 2026-10-14 09:37:33 UTC — [ticket-429] tour 1 — codeur démarré
+- 2026-10-14 09:43:53 UTC — [ticket-429] tour 1 — codeur terminé (379360ms)
+- 2026-10-14 09:53:32 UTC — [ticket-429] testeur: OK (exit 0)
+- 2026-10-14 09:54:05 UTC — [ticket-429] securite: PASS — Refactoring de composants frontend — extraction de logique et création de nouvea (32672ms)
+- 2026-10-14 09:54:05 UTC — [ticket-429] tour 1 — reviewer démarré
+- 2026-10-14 09:54:30 UTC — [ticket-429] tour 1 — reviewer terminé (25264ms)
+- 2026-10-14 09:55:38 UTC — [ticket-429] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le refactoring de `AgentDetail` (93109ms)
+- 2026-10-14 09:55:38 UTC — [ticket-429] APPROVED après 1 tour(s)
+- 2026-10-14 09:58:13 UTC — [ticket-429] documentation: 1 fichier(s) (129218ms)

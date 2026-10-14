@@ -456,6 +456,7 @@ export function useCockpit() {
       servicesDuProjet: services.services,
       appsEnCours,
       agentSelectionne,
+      onSelectAgent: setAgentSelectionne,
       historique: {
         runs: runs.runs,
         loading: runs.loading,

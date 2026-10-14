@@ -8,6 +8,11 @@ import { api } from "../../lib/api";
 
 const detail = vi.mocked(api.agents.detail);
 
+// La fiche lit la description du rôle dans le registre (ticket-429).
+beforeEach(() => {
+  vi.mocked(api.agents.list).mockResolvedValue([]);
+});
+
 describe("AgentDetail", () => {
   beforeEach(() => {
     detail.mockReset();
@@ -77,7 +82,7 @@ describe("AgentDetail — édition du prompt", () => {
     });
 
     render(<AgentDetail role="codeur" />);
-    await screen.findByText(/Tu implémentes/);
+    await screen.findAllByText(/Tu implémentes/); // la phrase du rôle reprend la 1re ligne du prompt (ticket-429)
 
     await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
     const champ = screen.getByRole("textbox");
@@ -100,7 +105,7 @@ describe("AgentDetail — édition du prompt", () => {
     });
 
     render(<AgentDetail role="codeur" />);
-    await screen.findByText(/Tu implémentes/);
+    await screen.findAllByText(/Tu implémentes/); // la phrase du rôle reprend la 1re ligne du prompt (ticket-429)
 
     await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
     await userEvent.clear(screen.getByRole("textbox"));
@@ -124,7 +129,7 @@ describe("AgentDetail — confirmation avant enregistrement (ticket-226)", () =>
     });
 
     render(<AgentDetail role="codeur" />);
-    await screen.findByText(/ligne un/);
+    await screen.findAllByText(/ligne un/); // la phrase du rôle reprend la 1re ligne du prompt (ticket-429)
 
     await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
     const champ = screen.getByRole("textbox");
@@ -150,7 +155,7 @@ describe("AgentDetail — confirmation avant enregistrement (ticket-226)", () =>
     });
 
     render(<AgentDetail role="codeur" />);
-    await screen.findByText(/ancien prompt/);
+    await screen.findAllByText(/ancien prompt/); // la phrase du rôle reprend la 1re ligne du prompt (ticket-429)
 
     await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
     const champ = screen.getByRole("textbox");
@@ -170,7 +175,7 @@ describe("AgentDetail — confirmation avant enregistrement (ticket-226)", () =>
     });
 
     render(<AgentDetail role="codeur" />);
-    await screen.findByText(/ancien prompt/);
+    await screen.findAllByText(/ancien prompt/); // la phrase du rôle reprend la 1re ligne du prompt (ticket-429)
 
     await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
     const champ = screen.getByRole("textbox");
@@ -194,7 +199,7 @@ describe("AgentDetail — confirmation avant enregistrement (ticket-226)", () =>
     });
 
     render(<AgentDetail role="codeur" />);
-    await screen.findByText(/prompt inchangé/);
+    await screen.findAllByText(/prompt inchangé/); // la phrase du rôle reprend la 1re ligne du prompt (ticket-429)
 
     await userEvent.click(screen.getByRole("tab", { name: "Modifier" }));
     // On ne modifie rien : le brouillon est identique au prompt enregistré.

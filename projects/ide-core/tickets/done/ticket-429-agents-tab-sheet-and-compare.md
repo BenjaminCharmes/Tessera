@@ -1,14 +1,15 @@
 ---
-id: ticket-429
-title: "The Agents tab shows a role sheet with its 30-day figures and last verdicts, and a view comparing every role"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 1
-created: 2026-10-14
+id: ticket-429
+pr_number: 426
+priority: medium
+status: done
+title: The Agents tab shows a role sheet with its 30-day figures and last verdicts,
+  and a view comparing every role
+type: feat
 ---
 
 # ticket-429 — Onglet Agents : fiche d'un rôle et comparaison
