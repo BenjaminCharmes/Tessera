@@ -173,12 +173,18 @@ export default function ProjetCarte({
         <p className="line-clamp-3 text-xs text-zinc-400">{projet.description}</p>
       )}
       <LienDepot projet={projet} />
-      <Dates projet={projet} />
-      <div className="flex items-center justify-between gap-2">
-        <Compteurs projet={projet} />
-        <BoutonServices projet={projet} onChange={onServicesChange} />
+      {/* Les cartes d'une rangée ont la même hauteur : le pied est poussé en
+          bas pour que dates et compteurs s'alignent d'une carte à l'autre,
+          quelle que soit la longueur de la description. `min-h-6` garde à la
+          rangée des compteurs la hauteur du bouton Lancer, même sans lui. */}
+      <div data-testid="pied-de-carte" className="mt-auto flex flex-col gap-2">
+        <Dates projet={projet} />
+        <div className="flex min-h-6 items-center justify-between gap-2">
+          <Compteurs projet={projet} />
+          <BoutonServices projet={projet} onChange={onServicesChange} />
+        </div>
+        <LancerFile projet={projet} onLancee={onFileLancee} />
       </div>
-      <LancerFile projet={projet} onLancee={onFileLancee} />
     </article>
   );
 }
