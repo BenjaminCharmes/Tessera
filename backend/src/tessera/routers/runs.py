@@ -35,9 +35,11 @@ async def get_status(run_id: str) -> RunStatus:
     """Where a run stands, by the id ``POST /orchestrator/run`` handed back.
 
     A live run is read from the registry (current ticket, tickets done and
-    left). A finished one is read from ``pipeline_runs``: ``faits`` are the
-    tickets the queue played (a ticket skipped because already done leaves no
-    row), ``restants`` those the last ``queue_progress`` still announced.
+    left). A finished one is read from ``pipeline_runs``: ``approuves`` and
+    ``arretes`` split the tickets the queue played (a ticket skipped because
+    already done leaves no row) by how they ended, ``restants`` holds those cut
+    before any result plus those the last ``queue_progress`` still announced.
+    ``faits`` is deprecated: ``approuves`` followed by the ``arretes`` tickets.
     ``statut`` is ``en cours``, ``terminé`` or ``interrompu``.
 
     Returns 404 when the id is unknown, which includes a run that could not be

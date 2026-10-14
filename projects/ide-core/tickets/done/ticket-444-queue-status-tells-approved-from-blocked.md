@@ -1,14 +1,15 @@
 ---
-id: ticket-444
-title: "A queue's status tells the approved tickets from the ones that ended without approval"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-444
+pr_number: 449
+priority: medium
+status: done
+title: A queue's status tells the approved tickets from the ones that ended without
+  approval
+type: fix
 ---
 
 # ticket-444 — Le statut d'une file distingue l'approuvé du bloqué

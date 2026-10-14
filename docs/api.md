@@ -157,7 +157,9 @@ est inconnu.
   "mode": "queue",
   "statut": "en cours",
   "ticket_courant": "ticket-002",
-  "faits": ["ticket-001"],
+  "approuves": ["ticket-001"],
+  "arretes": [{"ticket_id": "ticket-002", "motif": "testeur: délai dépassé deux fois"}],
+  "faits": ["ticket-001", "ticket-002"],
   "restants": ["ticket-003"],
   "debut": "2026-10-14T10:00:00+00:00",
   "fin": null
@@ -167,10 +169,20 @@ est inconnu.
 - `statut` vaut `en cours`, `terminé` ou `interrompu`. Une file arrêtée sur
   budget, sur limite de session ou sur un ticket non approuvé, ou dont le
   dernier ticket est `blocked`, est `interrompu`.
-- Run vivant : `ticket_courant`, `faits` et `restants` suivent la file en
-  temps réel. Run terminé : `ticket_courant` est `null`, `faits` liste les
-  tickets que la file a joués (un ticket sauté parce qu'il était déjà
-  `done` n'y figure pas) et `restants` ceux que la dernière annonce de
+- `approuves` : les tickets dont la fin est approuvée. `arretes` : ceux qui se
+  sont arrêtés — bloqués, non approuvés, interrompus par un redémarrage — avec
+  leur `motif` court (première ligne de la cause, `null` quand elle est
+  inconnue). `restants` : ceux qui n'ont rien rendu et se relancent tels quels,
+  y compris un ticket coupé par la limite de session ou le plafond par ticket
+  (resté `todo`).
+- `faits` est **déprécié** : il vaut toujours `approuves` suivi des tickets de
+  `arretes`, sans rien d'autre. Il reste pour ne pas casser les appelants
+  existants, mais ne dit pas ce qui est livré : lire `approuves`.
+- Run vivant : `ticket_courant`, `approuves` et `restants` suivent la file en
+  temps réel (`arretes` est vide : une file s'arrête au premier ticket non
+  approuvé). Run terminé : `ticket_courant` est `null`, les tickets sont ceux
+  que la file a joués (un ticket sauté parce qu'il était déjà `done` n'y
+  figure pas) et `restants` s'ajoute à ce que la dernière annonce de
   progression laissait en attente.
 - `404` si l'identifiant est inconnu. Les files lancées avant ce suivi gardent
   un identifiant de lancement introuvable ; leurs lignes restent lisibles par

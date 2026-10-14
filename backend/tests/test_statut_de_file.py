@@ -43,9 +43,12 @@ class _FileDoublee:
                     },
                 )
             )
-            await create_run(
+            enfant = await create_run(
                 settings.ide_db_path, project_id, ticket_id,
                 parent_run_id=envelope_run_id,
+            )
+            await finish_run(
+                settings.ide_db_path, enfant, rounds=1, approved=True, final_status="done"
             )
             resultats.append(
                 PipelineResult(
@@ -108,7 +111,9 @@ def test_status_of_a_finished_queue_lists_the_tickets_it_played(
     assert corps["statut"] == "terminé"
     assert corps["mode"] == "queue"
     assert corps["project_id"] == "projet-file"
-    assert corps["faits"] == ["ticket-001", "ticket-002", "ticket-003"]
+    assert corps["approuves"] == ["ticket-001", "ticket-002", "ticket-003"]
+    assert corps["arretes"] == []
+    assert corps["faits"] == corps["approuves"]
     assert corps["restants"] == []
     assert corps["fin"] is not None
 
@@ -130,6 +135,8 @@ def test_status_of_a_live_queue_gives_current_done_and_left() -> None:
     corps = reponse.json()
     assert corps["statut"] == "en cours"
     assert corps["ticket_courant"] == "ticket-002"
+    assert corps["approuves"] == ["ticket-001"]
+    assert corps["arretes"] == []
     assert corps["faits"] == ["ticket-001"]
     assert corps["restants"] == ["ticket-003", "ticket-004"]
     assert corps["fin"] is None
@@ -138,7 +145,8 @@ def test_status_of_a_live_queue_gives_current_done_and_left() -> None:
 async def test_status_of_a_queue_stopped_early_is_interrupted() -> None:
     db = settings.ide_db_path
     enveloppe = await create_run(db, "projet-file", "queue", mode="queue")
-    await create_run(db, "projet-file", "ticket-001", parent_run_id=enveloppe)
+    enfant = await create_run(db, "projet-file", "ticket-001", parent_run_id=enveloppe)
+    await finish_run(db, enfant, rounds=1, approved=True, final_status="done")
     await save_event(
         db, enveloppe, "queue_progress", None,
         {"index": 1, "restants": ["ticket-002"], "faits": []}, _TS,
@@ -149,7 +157,7 @@ async def test_status_of_a_queue_stopped_early_is_interrupted() -> None:
     corps = TestClient(app).get(f"/api/v1/runs/{enveloppe}").json()
 
     assert corps["statut"] == "interrompu"
-    assert corps["faits"] == ["ticket-001"]
+    assert corps["approuves"] == ["ticket-001"]
     assert corps["restants"] == ["ticket-002"]
 
 

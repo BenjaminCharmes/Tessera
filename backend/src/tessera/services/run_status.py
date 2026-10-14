@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 import aiosqlite
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
 from tessera.services.run_registry import RunActif
 
@@ -21,17 +21,41 @@ INTERROMPU = "interrompu"
 _FINAUX_INTERROMPUS = frozenset({"interrupted", "blocked"})
 
 
+#: Longueur maximale du motif rendu : la cause complète vit dans l'historique.
+_MOTIF_MAX = 200
+
+
+class TicketArrete(BaseModel):
+    """A ticket the queue played that did not end approved — ticket-444."""
+
+    ticket_id: str
+    motif: str | None = None
+
+
 class RunStatus(BaseModel):
-    """What ``GET /runs/{run_id}`` answers."""
+    """What ``GET /runs/{run_id}`` answers.
+
+    ``approuves`` ended approved; ``arretes`` stopped (blocked, unapproved,
+    interrupted); ``restants`` have not produced a result and can be launched
+    again. ``faits`` is deprecated: always ``approuves`` followed by the
+    tickets of ``arretes``.
+    """
 
     project_id: str
     mode: str
     statut: str
     ticket_courant: str | None = None
-    faits: list[str]
+    approuves: list[str]
+    arretes: list[TicketArrete]
     restants: list[str]
     debut: str
     fin: str | None = None
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def faits(self) -> list[str]:
+        """Deprecated: ``approuves`` + the tickets of ``arretes``."""
+        return [*self.approuves, *(a.ticket_id for a in self.arretes)]
 
 
 def statut_d_un_run_termine(final_status: str | None, restants: list[str]) -> str:
@@ -53,7 +77,10 @@ def statut_d_un_run_vivant(run: RunActif) -> RunStatus:
         mode=run.mode,
         statut=EN_COURS,
         ticket_courant=run.ticket_id,
-        faits=list(run.file_faits),
+        # Une file s'arrête au premier ticket non approuvé : tant qu'elle
+        # tourne, ce qu'elle a laissé derrière elle est approuvé.
+        approuves=list(run.file_faits),
+        arretes=[],
         restants=list(run.file_restants),
         debut=run.demarre_a.isoformat(),
     )
@@ -75,14 +102,55 @@ async def _derniers_restants(db: aiosqlite.Connection, run_id: str) -> list[str]
     return [str(t) for t in restants]
 
 
-async def _tickets_faits(db: aiosqlite.Connection, run_id: str) -> list[str]:
-    """Tickets the queue played: the envelope's children, in start order."""
+def _motif_court(arret: str | None) -> str | None:
+    """First line of the stop cause, cut to a readable length."""
+    if not arret or not arret.strip():
+        return None
+    ligne = arret.strip().splitlines()[0]
+    return ligne if len(ligne) <= _MOTIF_MAX else ligne[: _MOTIF_MAX - 1] + "…"
+
+
+class _Classement(BaseModel):
+    """The envelope's children sorted by how they ended."""
+
+    approuves: list[str] = []
+    arretes: list[TicketArrete] = []
+    coupes: list[str] = []
+    en_cours: str | None = None
+
+
+def classer_les_tickets(lignes: list[aiosqlite.Row], file_finie: bool) -> _Classement:
+    """Sort child rows: approved, stopped, or cut before any result (`todo`).
+
+    A row without an end under a finished queue is stopped, never approved;
+    under a queue still open it is the current ticket.
+    """
+    # Un ticket resté `todo` sans approbation (limite de session, plafond par
+    # ticket) n'est pas arrêté : il se relance tel quel, donc il reste à faire.
+    c = _Classement()
+    for ligne in lignes:
+        ticket = str(ligne["ticket_id"])
+        if ligne["finished_at"] is None and not file_finie:
+            c.en_cours = ticket
+        elif ligne["finished_at"] is None:
+            c.arretes.append(TicketArrete(ticket_id=ticket, motif="no outcome recorded"))
+        elif ligne["approved"]:
+            c.approuves.append(ticket)
+        elif ligne["final_status"] == "todo":
+            c.coupes.append(ticket)
+        else:
+            c.arretes.append(TicketArrete(ticket_id=ticket, motif=_motif_court(ligne["arret"])))
+    return c
+
+
+async def _tickets_joues(db: aiosqlite.Connection, run_id: str) -> list[aiosqlite.Row]:
+    """The envelope's children, in start order."""
     async with db.execute(
-        "SELECT ticket_id FROM pipeline_runs WHERE parent_run_id=?"
-        " ORDER BY started_at, rowid",
+        "SELECT ticket_id, approved, final_status, arret, finished_at"
+        " FROM pipeline_runs WHERE parent_run_id=? ORDER BY started_at, rowid",
         (run_id,),
     ) as cursor:
-        return [str(ligne[0]) for ligne in await cursor.fetchall()]
+        return list(await cursor.fetchall())
 
 
 async def statut_en_base(db_path: Path | str, run_id: str) -> RunStatus | None:
@@ -97,18 +165,19 @@ async def statut_en_base(db_path: Path | str, run_id: str) -> RunStatus | None:
             row = await cursor.fetchone()
         if row is None:
             return None
-        faits = await _tickets_faits(db, run_id)
-        restants = await _derniers_restants(db, run_id)
+        lignes = await _tickets_joues(db, run_id)
+        annonces = await _derniers_restants(db, run_id)
 
-    if row["finished_at"] is None:
-        statut = EN_COURS
-    else:
-        statut = statut_d_un_run_termine(row["final_status"], restants)
+    fini = row["finished_at"] is not None
+    classement = classer_les_tickets(lignes, fini)
+    restants = [*classement.coupes, *(t for t in annonces if t not in classement.coupes)]
     return RunStatus(
         project_id=row["project_id"],
         mode=row["mode"] or "single",
-        statut=statut,
-        faits=faits,
+        statut=statut_d_un_run_termine(row["final_status"], restants) if fini else EN_COURS,
+        ticket_courant=classement.en_cours,
+        approuves=classement.approuves,
+        arretes=classement.arretes,
         restants=restants,
         debut=row["started_at"],
         fin=row["finished_at"],
