@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ProjectOverview } from "../../types/api";
+import Button from "../../design/ui/Button";
 import Spinner from "./Spinner";
 
 /** Au-delà, la section « Arrêtés » démarre repliée. */
@@ -40,16 +41,15 @@ export default function ProjetsArretes({ projets, enLancement, onLancer }: Proje
               className="flex items-center justify-between border-t border-zinc-800 px-3 py-2 text-sm first:border-t-0"
             >
               <span className="font-medium text-zinc-100">{projet.name}</span>
-              <button
-                type="button"
+              <Button
+                taille="compact"
                 disabled={enLancement(projet.id)}
                 onClick={() => onLancer(projet.id)}
                 aria-label={`Lancer ${projet.name}`}
-                className="flex items-center gap-1.5 rounded-sm bg-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-600 disabled:opacity-60"
               >
                 {enLancement(projet.id) && <Spinner />}
                 {enLancement(projet.id) ? "Lancement…" : "Lancer"}
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

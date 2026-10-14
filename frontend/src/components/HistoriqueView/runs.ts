@@ -1,3 +1,4 @@
+import type { EtatPastille } from "../../design/ui/StatusPill";
 import type { PipelineRun } from "../../types/api";
 
 /** Where a run stands, from the point of view of the History tab. */
@@ -70,6 +71,19 @@ export function classeDuVerdict(run: PipelineRun): string {
   if (etat === "interrompu") return "text-zinc-400";
   if (etat !== "approuve") return "text-red-400";
   return (run.rounds ?? 0) > 1 ? "text-amber-400" : "text-green-400";
+}
+
+/**
+ * The pill state of a verdict, per the charter: approved is green (amber when
+ * it took several rounds), running is blue, anything else is red.
+ */
+export function pastilleDuRun(run: PipelineRun): EtatPastille {
+  const etat = etatDuRun(run);
+  if (etat === "en-cours") return "en-cours";
+  // Un run interrompu (veille, redémarrage) n'a pas échoué : neutre (ticket-443).
+  if (etat === "interrompu") return "neutre";
+  if (etat !== "approuve") return "echec";
+  return (run.rounds ?? 0) > 1 ? "attention" : "reussi";
 }
 
 export function libelleDesTours(rounds: number | null): string {

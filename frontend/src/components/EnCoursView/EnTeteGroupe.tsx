@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { GroupeDeProjet } from "./format";
+import Button from "../../design/ui/Button";
 import Spinner from "./Spinner";
 
 interface EnTeteGroupeProps {
@@ -8,8 +9,6 @@ interface EnTeteGroupeProps {
   enArret: boolean;
   onArreterProjet: () => void;
 }
-
-const BOUTON = "rounded-sm px-2 py-1 text-xs";
 
 /**
  * Le nom du projet et « Arrêter le projet » — ticket-424.
@@ -33,32 +32,24 @@ export default function EnTeteGroupe({ groupe, enArret, onArreterProjet }: EnTet
           <span>
             Arrêter aussi les processus lancés à la main ({externes.map((a) => a.pid).join(", ")}) ?
           </span>
-          <button
-            type="button"
-            onClick={lancer}
-            className={`${BOUTON} bg-red-500/20 text-red-200 hover:bg-red-500/30`}
-          >
+          <Button variante="arret" taille="compact" onClick={lancer}>
             Confirmer l&apos;arrêt du projet
-          </button>
-          <button
-            type="button"
-            onClick={() => setConfirmation(false)}
-            className={`${BOUTON} bg-zinc-700 text-zinc-200 hover:bg-zinc-600`}
-          >
+          </Button>
+          <Button variante="discret" taille="compact" onClick={() => setConfirmation(false)}>
             Annuler l&apos;arrêt du projet
-          </button>
+          </Button>
         </span>
       ) : (
-        <button
-          type="button"
+        <Button
+          variante="arret"
+          taille="compact"
           disabled={enArret}
           onClick={() => (externes.length > 0 ? setConfirmation(true) : lancer())}
           aria-label={`Arrêter le projet ${groupe.project_name}`}
-          className={`${BOUTON} flex items-center gap-1.5 bg-zinc-700 text-zinc-200 hover:bg-zinc-600 disabled:opacity-60`}
         >
           {enArret && <Spinner />}
           {enArret ? "Arrêt…" : "Arrêter le projet"}
-        </button>
+        </Button>
       )}
     </div>
   );

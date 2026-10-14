@@ -36,7 +36,7 @@ function AgentRow({
         type="button"
         onClick={() => onSelect?.(agent.role)}
         title={agent.prompt_preview || undefined}
-        className={`min-w-0 flex-1 truncate text-left font-mono text-mini transition-colors ${
+        className={`min-w-0 flex-1 truncate text-left text-mini transition-colors ${
           selectionne ? "text-zinc-100" : "text-zinc-200 hover:text-zinc-100"
         }`}
       >

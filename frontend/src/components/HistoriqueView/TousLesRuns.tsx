@@ -1,7 +1,7 @@
 import { useState } from "react";
+import StatusPill from "../../design/ui/StatusPill";
 import type { PipelineRun, Ticket } from "../../types/api";
 import {
-  classeDuVerdict,
   etatDuRun,
   FILTRES,
   filtrerRuns,
@@ -10,6 +10,7 @@ import {
   libelleDeLEtat,
   libelleDesTours,
   runsDeTicket,
+  pastilleDuRun,
   triParDate,
 } from "./runs";
 import StatusPill from "../../design/ui/StatusPill";
@@ -76,12 +77,11 @@ export default function TousLesRuns({ runs, tickets, onOpen }: TousLesRunsProps)
           >
             <span className="truncate font-mono">{run.ticket_id}</span>
             <span className="truncate">{titres.get(run.ticket_id) ?? "—"}</span>
-            <span className={classeDuVerdict(run)}>
-              {etatDuRun(run) === "interrompu" ? (
-                <StatusPill etat="neutre" libelle={libelleDeLEtat("interrompu")} />
-              ) : (
-                libelleDeLEtat(etatDuRun(run))
-              )}
+            <span>
+              <StatusPill
+                etat={pastilleDuRun(run)}
+                libelle={libelleDeLEtat(etatDuRun(run))}
+              />
             </span>
             <span className="text-zinc-400">{libelleDesTours(run.rounds)}</span>
             <span className="font-mono text-zinc-400">{formatCout(run.total_cost_usd)}</span>

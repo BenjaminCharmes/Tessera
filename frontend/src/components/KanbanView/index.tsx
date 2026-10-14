@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { IconCross } from "../../design/icons";
+import Button from "../../design/ui/Button";
+import StatusPill from "../../design/ui/StatusPill";
 import KanbanColumn from "./KanbanColumn";
 import QueueBar from "../Sidebar/QueueBar";
 import { useBlockedArrets } from "../../hooks/useBlockedArrets";
@@ -114,19 +116,17 @@ export default function KanbanView({
             Filtres :{" "}
             <span className="text-zinc-300">{labelsDesFiltres(filtres).join(" · ")}</span>
           </span>
-          <span
-            className="text-xs text-amber-400"
-            data-testid="kanban-filtre-compte"
-          >
-            {retenus} ticket{retenus !== 1 ? "s" : ""} sur {total}
+          <span data-testid="kanban-filtre-compte">
+            <StatusPill
+              etat="attention"
+              libelle={`${retenus} ticket${retenus !== 1 ? "s" : ""} sur ${total}`}
+            />
           </span>
-          <button
-            type="button"
-            onClick={onClearFiltres}
-            className="ml-auto text-xs text-zinc-500 hover:text-zinc-300"
-          >
-            Effacer les filtres
-          </button>
+          <span className="ml-auto">
+            <Button variante="discret" taille="compact" onClick={onClearFiltres}>
+              Effacer les filtres
+            </Button>
+          </span>
         </div>
       )}
       <div className="flex-1 flex overflow-x-auto overflow-y-hidden">
@@ -152,8 +152,11 @@ export default function KanbanView({
           className="border-t border-zinc-700 px-4 py-2"
           data-testid="kanban-unreadable"
         >
-          <p className="text-xs text-red-400 font-medium mb-1">
-            {unreadable.length} fichier{unreadable.length > 1 ? "s" : ""} illisible{unreadable.length > 1 ? "s" : ""}
+          <p className="mb-1">
+            <StatusPill
+              etat="echec"
+              libelle={`${unreadable.length} fichier${unreadable.length > 1 ? "s" : ""} illisible${unreadable.length > 1 ? "s" : ""}`}
+            />
           </p>
           <ul className="space-y-0.5">
             {unreadable.map((u) => (

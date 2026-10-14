@@ -5,6 +5,7 @@ import {
   IconQueue,
 } from "../../design/icons";
 import { memo } from "react";
+import StatusPill, { type EtatPastille } from "../../design/ui/StatusPill";
 import { MIME_TICKET, transitionsManuelles } from "../../lib/transitionsManuelles";
 import type {
   PRStatus,
@@ -22,14 +23,25 @@ const STATUS_STYLE: Record<TicketStatus, string> = {
   cancelled: "bg-zinc-800 text-zinc-400",
 };
 
-const PRIORITY_STYLE: Record<TicketPriority, string> = {
-  critical: "bg-red-900 text-red-300",
-  high: "bg-amber-900 text-amber-300",
-  medium: "bg-zinc-700 text-zinc-400",
-  low: "bg-zinc-800 text-zinc-500",
+/** Correspondance de la charte : une priorité se lit comme un état. */
+const PRIORITY_ETAT: Record<TicketPriority, EtatPastille> = {
+  critical: "echec",
+  high: "attention",
+  medium: "neutre",
+  low: "neutre",
 };
 
-// Pas d'icône ici : `CI_STYLE` porte déjà la couleur du rôle — ambre en
+/** Le statut d'un ticket vu par `StatusPill` (select exclu, il garde son style). */
+const STATUS_ETAT: Record<TicketStatus, EtatPastille> = {
+  todo: "neutre",
+  "in-progress": "en-cours",
+  "in-review": "attention",
+  done: "reussi",
+  blocked: "echec",
+  cancelled: "neutre",
+};
+
+// Pas d'icône ici : `CI_ETAT` porte déjà la couleur du rôle — ambre en
 // attente, vert au succès, rouge à l'échec. Une émoji par-dessus répétait
 // l'information et changeait de dessin selon la machine (ticket-067).
 const CI_LABEL: Record<string, string> = {
@@ -39,11 +51,11 @@ const CI_LABEL: Record<string, string> = {
   none: "CI N/A",
 };
 
-const CI_STYLE: Record<string, string> = {
-  pending: "bg-amber-900 text-amber-300 animate-pulse",
-  passing: "bg-green-900 text-green-300",
-  failing: "bg-red-900 text-red-300",
-  none: "bg-zinc-700 text-zinc-400",
+const CI_ETAT: Record<string, EtatPastille> = {
+  pending: "attention",
+  passing: "reussi",
+  failing: "echec",
+  none: "neutre",
 };
 
 const PR_STATE_LABEL: Record<string, string> = {
@@ -176,25 +188,21 @@ const TicketCard = memo(function TicketCard({
                 ))}
               </select>
             ) : (
-              <span
-                className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${STATUS_STYLE[ticket.status]}`}
-                title={
-                  ticket.status === "blocked" && arret ? arret : undefined
-                }
-              >
-                {ticket.status}
-              </span>
+              <StatusPill
+                etat={STATUS_ETAT[ticket.status]}
+                libelle={ticket.status}
+                titre={ticket.status === "blocked" && arret ? arret : undefined}
+              />
             )}
-            <span
-              className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${PRIORITY_STYLE[ticket.priority]}`}
-            >
-              {ticket.priority}
-            </span>
+            <StatusPill
+              etat={PRIORITY_ETAT[ticket.priority]}
+              libelle={ticket.priority}
+            />
             {isRunning && runningRound != null && runningRound > 0 && (
-              <span className="text-micro px-1.5 py-0.5 rounded-sm font-medium bg-blue-900 text-blue-300 animate-pulse">
-                tour {runningRound}
-                {maxRounds != null && maxRounds > 0 ? `/${maxRounds}` : ""}
-              </span>
+              <StatusPill
+                etat="en-cours"
+                libelle={`tour ${runningRound}${maxRounds != null && maxRounds > 0 ? `/${maxRounds}` : ""}`}
+              />
             )}
             {ticket.pr_number !== null && (
               <a
@@ -213,11 +221,10 @@ const TicketCard = memo(function TicketCard({
               </a>
             )}
             {prStatus && (
-              <span
-                className={`text-micro px-1.5 py-0.5 rounded-sm font-medium ${CI_STYLE[prStatus.ci_status]}`}
-              >
-                {CI_LABEL[prStatus.ci_status]}
-              </span>
+              <StatusPill
+                etat={CI_ETAT[prStatus.ci_status]}
+                libelle={CI_LABEL[prStatus.ci_status]}
+              />
             )}
           </div>
         </div>
