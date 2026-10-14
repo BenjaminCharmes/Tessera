@@ -949,6 +949,32 @@ git merge ticket-007-ajouter-un-endpoint-de-sante
 
 ---
 
+### L'onglet Fichiers
+
+Tu y lis et modifies ton code. Il affiche l'éditeur quand un fichier est ouvert, ou une page d'accueil quand aucun n'est ouvert — jamais la liste des tickets.
+
+#### Mode Éditeur
+
+L'éditeur est Monaco : coloration syntaxe, autocomplétion, tous les outils. C'est ton espace de lecture du code que l'agent a écrit, ou d'exploration du projet pour le prochain ticket.
+
+#### Sans fichier ouvert
+
+Tu vois trois choses :
+
+- **Rechercher un fichier** — tape le nom d'un fichier, la liste se filtre à mesure. Clique pour l'ouvrir.
+- **Fichiers du dernier run** — « Touchés par le dernier run — ticket-N ». Les lignes ajoutées sont en vert, les retirées en rouge.
+- **Ouverts récemment** — tes 5 derniers fichiers, mémorisés par projet.
+
+#### Mode Diff du ticket
+
+En en-tête, un bouton te donne le choix : **Éditeur** (défaut) ou **Diff du ticket**.
+
+En mode Diff du ticket, tu vois les modifications côte à côte (ancien à gauche, nouveau à droite) du ticket sélectionné. Sans ticket sélectionné, l'interface t'invite à en choisir un.
+
+#### Raccourci Ctrl+P
+
+Quand tu es dans cet onglet, Ctrl+P met le focus sur la recherche — ta façon d'ouvrir un fichier au clavier.
+
 ## 7. Le mode autonome
 
 `POST /api/v1/orchestrator/run-autonomous` enchaîne les tickets `todo/` tout seul,

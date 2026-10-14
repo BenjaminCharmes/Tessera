@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-14
+depends_on:
+- ticket-425
+estimated_days: 1
 id: ticket-428
-title: "The Files tab shows the open file, a search and recent files when none is open, or the ticket's diff, instead of the tickets list"
-type: feat
-status: todo
 pr_number: null
 priority: high
-agent: codeur
-depends_on: ["ticket-425"]
-estimated_days: 1
-created: 2026-10-14
+status: done
+title: The Files tab shows the open file, a search and recent files when none is open,
+  or the ticket's diff, instead of the tickets list
+type: feat
 ---
 
 # ticket-428 — Onglet Fichiers : sa propre vue

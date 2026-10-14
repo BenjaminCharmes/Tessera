@@ -40,6 +40,9 @@ vi.mock("./EnCoursView", () => ({
 vi.mock("./HistoriqueView", () => ({
   default: () => <div data-testid="historique-view">HistoriqueView</div>,
 }));
+vi.mock("./FichiersView", () => ({
+  default: () => <div data-testid="fichiers-view">FichiersView</div>,
+}));
 
 const STATUTS: TicketStatus[] = [
   "todo",
@@ -89,6 +92,8 @@ const baseProps = {
   running: new Set<string>(),
   unreadable: [],
   openFilePath: null,
+  onOpenFile: vi.fn(),
+  onCloseFile: vi.fn(),
   statsDays: 7 as const,
   statsProjectId: null,
   onSelectProject: vi.fn(),
@@ -162,6 +167,12 @@ describe("CenterView", () => {
   it("renders HistoriqueView, not the tickets list, when panel is history", () => {
     render(<CenterView {...baseProps} panel="history" vueCentre="kanban" />);
     expect(screen.getByTestId("historique-view")).toBeInTheDocument();
+    expect(screen.queryByTestId("kanban-view")).not.toBeInTheDocument();
+  });
+
+  it("renders FichiersView, not the tickets list, when panel is files", () => {
+    render(<CenterView {...baseProps} panel="files" vueCentre="kanban" />);
+    expect(screen.getByTestId("fichiers-view")).toBeInTheDocument();
     expect(screen.queryByTestId("kanban-view")).not.toBeInTheDocument();
   });
 
