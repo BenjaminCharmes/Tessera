@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
+import { api } from "../../lib/api";
 import type { UseAppsEnCoursResult } from "../../hooks/useAppsEnCours";
 import type { AppEnCours } from "../../types/api";
 
@@ -32,6 +33,10 @@ function rendre(
         erreur: null,
         arreter,
         rafraichir: vi.fn(),
+        arreterProjet: vi.fn().mockResolvedValue(undefined),
+        lancer: vi.fn().mockResolvedValue(undefined),
+        enArret: () => false,
+        enLancement: () => false,
         ...over,
       }}
     />,
@@ -52,6 +57,14 @@ const TROIS = [
   }),
   app({ pid: 3, project_id: "gamma", project_name: "Gamma", nom: "docs", memoire_mo: 30 }),
 ];
+
+beforeEach(() => {
+  vi.spyOn(api.projects, "overview").mockResolvedValue([]);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("EnCoursView", () => {
   it("lists each app with its project, port links and memory, heaviest first", () => {

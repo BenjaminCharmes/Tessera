@@ -1,10 +1,13 @@
 import { useState } from "react";
 import type { AppEnCours } from "../../types/api";
 import { formaterDuree, formaterMo } from "./format";
+import Spinner from "./Spinner";
 
 interface LigneAppProps {
   app: AppEnCours;
   now: number;
+  /** L'ordre d'arrêt est parti ; le pid est encore dans l'inventaire. */
+  enArret: boolean;
   onArreter: (pid: number) => void;
 }
 
@@ -33,9 +36,23 @@ function Ports({ ports }: { ports: number[] }) {
 }
 
 /** Le bouton « Arrêter » ; une app lancée à la main demande d'abord confirmation. */
-function Arret({ app, onArreter }: Pick<LigneAppProps, "app" | "onArreter">) {
+function Arret({ app, enArret, onArreter }: Pick<LigneAppProps, "app" | "enArret" | "onArreter">) {
   const [confirmation, setConfirmation] = useState(false);
   const bouton = "rounded-sm px-2 py-1 text-xs";
+
+  if (enArret) {
+    return (
+      <button
+        type="button"
+        disabled
+        aria-label={`Arrêter ${app.nom}`}
+        className={`${bouton} flex items-center gap-1.5 bg-zinc-700 text-zinc-300 opacity-60`}
+      >
+        <Spinner />
+        Arrêt…
+      </button>
+    );
+  }
 
   if (!confirmation) {
     const arreter = () =>
@@ -75,7 +92,7 @@ function Arret({ app, onArreter }: Pick<LigneAppProps, "app" | "onArreter">) {
   );
 }
 
-export default function LigneApp({ app, now, onArreter }: LigneAppProps) {
+export default function LigneApp({ app, now, enArret, onArreter }: LigneAppProps) {
   return (
     <li className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-zinc-800 px-3 py-2 text-sm">
       <span className="min-w-32 font-medium text-zinc-100">{app.nom}</span>
@@ -87,7 +104,7 @@ export default function LigneApp({ app, now, onArreter }: LigneAppProps) {
       <span className="ml-auto tabular-nums text-zinc-200">
         {formaterMo(app.memoire_mo)}
       </span>
-      <Arret app={app} onArreter={onArreter} />
+      <Arret app={app} enArret={enArret} onArreter={onArreter} />
     </li>
   );
 }
