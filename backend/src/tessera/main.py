@@ -29,6 +29,7 @@ from tessera.routers import (
 from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.eveil import relacher as eveil_relacher
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
+from tessera.services.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.prompt_loader import MissingPromptError
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
 
@@ -50,6 +51,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     install_asyncio_exception_handler()
     warn_if_shell_missing(_GIT_BASH_PATH)
     await init_db(settings.ide_db_path)
+    # La file des signalements a quitté le dépôt (ticket-430).
+    migrer_ancien_fichier()
     # Les runs qu'un processus tué a laissés « en cours » (ticket-177).
     orphelins = await solder_les_runs_orphelins(settings.ide_db_path)
     if orphelins:

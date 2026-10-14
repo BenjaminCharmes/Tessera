@@ -1,14 +1,15 @@
 """Signalements held back while a run owns the ide-core tree — ticket-421.
 
 Un fichier apparu dans l'arbre pendant un run part dans le commit de suivi de
-ce run, puis dans sa PR. Le signalement attend donc dans un JSON à côté de la
-base, hors du dépôt, et s'écrit à la fermeture du run.
+ce run, puis dans sa PR. Le signalement attend donc dans un JSON du dossier de
+données ``settings.ide_state_dir``, hors du dépôt (ticket-430), et s'écrit à la
+fermeture du run.
 """
 import json
 from pathlib import Path
 from typing import TypedDict
 
-from tessera.config import settings
+from tessera.config import _REPO_ROOT, settings
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.services.ticket_service import TicketService
@@ -17,6 +18,9 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 NOM_FICHIER = "signalements_en_attente.json"
+
+# Emplacement d'avant le ticket-430 : à côté de la base, donc dans le dépôt.
+ANCIEN_CHEMIN = _REPO_ROOT / "backend" / NOM_FICHIER
 
 
 class SignalementEnAttente(TypedDict):
@@ -28,12 +32,12 @@ class SignalementEnAttente(TypedDict):
 
 
 def chemin_attente() -> Path:
-    """Where the queue lives: next to the database, never inside a repository."""
-    return settings.ide_db_path.parent / NOM_FICHIER
+    """Where the queue lives: the state folder, never inside a repository."""
+    return settings.ide_state_dir / NOM_FICHIER
 
 
-def _lire() -> list[SignalementEnAttente]:
-    chemin = chemin_attente()
+def _lire(chemin: Path | None = None) -> list[SignalementEnAttente]:
+    chemin = chemin or chemin_attente()
     if not chemin.is_file():
         return []
     try:
@@ -55,6 +59,28 @@ def _ecrire(entrees: list[SignalementEnAttente]) -> None:
     temporaire = chemin.with_suffix(".tmp")
     temporaire.write_text(json.dumps(entrees, ensure_ascii=False, indent=2), encoding="utf-8")
     temporaire.replace(chemin)
+
+
+def migrer_ancien_fichier(ancien: Path | None = None) -> int:
+    """Move a queue left at the old location into the current one.
+
+    Returns how many reports were carried over. Les entrées déjà présentes dans
+    le nouveau fichier ne sont pas dupliquées ; l'ancien fichier n'est supprimé
+    qu'une fois le nouveau écrit, donc un échec ne perd rien.
+    """
+    ancien = ancien or ANCIEN_CHEMIN
+    if not ancien.is_file() or ancien.resolve() == chemin_attente().resolve():
+        return 0
+    reprises = _lire(ancien)
+    if not ancien.is_file():
+        return 0  # Illisible : _lire l'a mis de côté.
+    actuelles = _lire()
+    nouvelles = [e for e in reprises if e not in actuelles]
+    # L'ancien fichier est plus ancien : ses entrées passent devant.
+    _ecrire(nouvelles + actuelles)
+    ancien.unlink()
+    _logger.info("signalements_en_attente_migres", extra={"nombre": len(nouvelles)})
+    return len(nouvelles)
 
 
 def mettre_en_attente(titre: str, type_ticket: str, corps: str) -> int:
