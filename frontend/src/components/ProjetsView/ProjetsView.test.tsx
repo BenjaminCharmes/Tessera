@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -145,6 +146,39 @@ describe("ProjetsView", () => {
 
     await userEvent.click(carte);
     expect(surSelection).toHaveBeenCalledWith(complet(DEMINEUR));
+  });
+
+  it("makes the clicked project active and stays on the projects view (ticket-425)", async () => {
+    overview.mockResolvedValue(TROIS);
+    function Hote() {
+      const [actif, setActif] = useState<Project | null>(null);
+      return (
+        <ProjetsView
+          projets={TROIS.map(complet)}
+          activeProject={actif}
+          onSelectProject={setActif}
+        />
+      );
+    }
+    render(<Hote />);
+    await userEvent.click(await screen.findByRole("article", { name: "Serpent" }));
+
+    expect(screen.getByRole("article", { name: "Serpent" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(screen.getAllByRole("article")).toHaveLength(3);
+
+    await userEvent.click(screen.getByRole("article", { name: "Démineur" }));
+
+    expect(screen.getByRole("article", { name: "Démineur" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(screen.getByRole("article", { name: "Serpent" })).not.toHaveAttribute(
+      "aria-current",
+      "true",
+    );
   });
 
   it("selects the project when Enter is pressed on the focused card", async () => {
