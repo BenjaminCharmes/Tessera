@@ -17,8 +17,12 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify')]
-    [string]$Task = 'help'
+    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets')]
+    [string]$Task = 'help',
+
+    # Identifiant du projet, pour `check-tickets`.
+    [Parameter(Position = 1)]
+    [string]$Projet = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,6 +38,7 @@ function Show-Help {
     Write-Host '  .\scripts\tessera.ps1 stop         Arrete tout, worker orphelin compris'
     Write-Host '  .\scripts\tessera.ps1 test         Suite de tests backend'
     Write-Host '  .\scripts\tessera.ps1 lint         Type-check mypy'
+    Write-Host '  .\scripts\tessera.ps1 check-tickets <id>  Verifie les tickets d un projet avant de les committer'
     Write-Host ''
 }
 
@@ -174,6 +179,17 @@ switch ($Task) {
         Write-Host 'Vert.' -ForegroundColor Green
         Write-Host 'Hors de portee ici : cargo check (Rust absent de ce poste).'
         Write-Host 'Il ne tourne en CI que si frontend/src-tauri/ a change.'
+    }
+    'check-tickets' {
+        # Sort en erreur au moindre probleme : utilisable avant un commit (ticket-433).
+        if ([string]::IsNullOrWhiteSpace($Projet)) {
+            Write-Host 'usage : .\scripts\tessera.ps1 check-tickets <id>' -ForegroundColor Red
+            exit 2
+        }
+        Push-Location (Join-Path $Root 'backend')
+        try { & uv run python -m tessera.services.ticket_check $Projet }
+        finally { Pop-Location }
+        exit $LASTEXITCODE
     }
     'lint' {
         Push-Location (Join-Path $Root 'backend')
