@@ -828,6 +828,19 @@ Sans action de ta part, la carte reste aux dix runs : elle ne fait aucun appel A
 
 La bande « Runs de ce ticket » affiche tes trois runs les plus récents, triés du plus neuf au plus vieux. Seuls les vrais runs du ticket apparaissent : les enveloppes de file — qui portent l'id du premier ticket et rejouent les événements de la file entière — sont écartées. Un bouton « Afficher les N autres » déplie le reste. La bande est bornée en hauteur et défile si besoin, afin que le ticket lui-même reste lisible même après beaucoup de runs.
 
+### Retrouver une file par son identifiant
+
+Quand tu lances une file de tickets, l'IDE te rend un identifiant unique — par exemple `92571cf0d5f64a4a8b7d3c1e0f2a9b64`. Garde-le.
+
+Avec cet identifiant, tu peux retrouver ta file à tout moment, même après redémarrage de Tessera ou plusieurs heures plus tard. Tu verras :
+
+- Le ticket en cours de traitement
+- Les tickets déjà faits
+- Les tickets encore en attente
+- L'heure de lancement et (si la file est terminée) l'heure de fin
+
+C'est plus direct que de chercher ta file dans l'historique, notamment quand plusieurs files s'étalent sur le temps.
+
 ## 5 ter. Après le run : fusion automatique
 
 Quand le run se termine approuvé, l'IDE :

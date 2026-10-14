@@ -1,15 +1,16 @@
 ---
-id: ticket-431
-title: "The run id returned when launching a queue can be followed: its events, its current ticket and the tickets left"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 1
-created: 2026-10-14
+id: ticket-431
 plan: true
+pr_number: 434
+priority: high
+status: done
+title: 'The run id returned when launching a queue can be followed: its events, its
+  current ticket and the tickets left'
+type: fix
 ---
 
 # ticket-431 — Suivre une file par l'id que l'API vient de rendre

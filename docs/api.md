@@ -102,6 +102,83 @@ L'endpoint accepte un signalement (bug ou idée) sur Tessera. Il crée automatiq
 | `POST` | `/api/v1/orchestrator/run` | Run Pipeline |
 | `POST` | `/api/v1/orchestrator/run-autonomous` | Run Autonomous |
 
+#### `POST /api/v1/orchestrator/run`
+
+Lance un run et répond sans l'attendre. Le run s'observe sur
+`WS /api/v1/orchestrator/observe`, et se suit par `GET /api/v1/runs/{run_id}`.
+
+| Champ | Type | Défaut | Rôle |
+|-------|------|--------|------|
+| `project_id` | `string` | — | Projet visé (obligatoire). |
+| `mode` | `single` \| `queue` \| `autonomous` | `single` | Un ticket, une file, ou le mode autonome. |
+| `ticket_id` | `string` | — | Le ticket à traiter. Obligatoire en `single`. |
+| `ticket_ids` | `string[]` | `[]` | Les tickets de la file, dans l'ordre. Lu en `queue`. |
+| `max_tickets` | `int` | `5` | Nombre maximal de tickets. Lu en `autonomous`. |
+| `depuis_github` | `bool` | `false` | Tire d'abord les issues `agent-ready`. Lu en `autonomous`. |
+| `budget_usd` | `float` > 0 | calculé | Plafond de dépense de la file, qui remplace le plafond par ticket × nombre de tickets. Lu en `queue`. |
+
+Exemple, une file de trois tickets :
+
+```json
+{
+  "project_id": "mon-projet",
+  "mode": "queue",
+  "ticket_ids": ["ticket-001", "ticket-002", "ticket-003"],
+  "budget_usd": 6.0
+}
+```
+
+Réponse `202` :
+
+```json
+{ "run_id": "92571cf0d5f64a4a8b7d3c1e0f2a9b64" }
+```
+
+`run_id` est l'identifiant à garder : il sert à `GET /runs/{run_id}` et à
+`GET /runs/{run_id}/events`, pendant la file comme après.
+
+Refus : `409` si le projet porte déjà un run, `422` si `ticket_id` manque en
+`single` ou si la livraison déclarée ne peut pas aboutir, `404` si le projet
+est inconnu.
+
+### Runs
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/api/v1/runs/{run_id}` | Get Status |
+| `GET` | `/api/v1/runs/{run_id}/events` | Get Events |
+
+`GET /runs/{run_id}` répond, pour un run vivant comme terminé :
+
+```json
+{
+  "project_id": "mon-projet",
+  "mode": "queue",
+  "statut": "en cours",
+  "ticket_courant": "ticket-002",
+  "faits": ["ticket-001"],
+  "restants": ["ticket-003"],
+  "debut": "2026-10-14T10:00:00+00:00",
+  "fin": null
+}
+```
+
+- `statut` vaut `en cours`, `terminé` ou `interrompu`. Une file arrêtée sur
+  budget, sur limite de session ou sur un ticket non approuvé, ou dont le
+  dernier ticket est `blocked`, est `interrompu`.
+- Run vivant : `ticket_courant`, `faits` et `restants` suivent la file en
+  temps réel. Run terminé : `ticket_courant` est `null`, `faits` liste les
+  tickets que la file a joués (un ticket sauté parce qu'il était déjà
+  `done` n'y figure pas) et `restants` ceux que la dernière annonce de
+  progression laissait en attente.
+- `404` si l'identifiant est inconnu. Les files lancées avant ce suivi gardent
+  un identifiant de lancement introuvable ; leurs lignes restent lisibles par
+  `GET /projects/{project_id}/runs`.
+
+`GET /runs/{run_id}/events` rend les évènements persistés du run, dans l'ordre
+d'émission, jetons exclus. Avec l'identifiant d'une file, il rend ceux de toute
+la file ; avec celui d'un ticket de la file, ceux de ce ticket seul.
+
 ### Services
 
 | Méthode | Endpoint | Description |

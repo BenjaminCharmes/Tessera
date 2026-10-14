@@ -11,6 +11,12 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.services.database import get_run_events
+from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.run_status import (
+    RunStatus,
+    statut_d_un_run_vivant,
+    statut_en_base,
+)
 
 router = APIRouter(prefix="/runs", tags=["runs"])
 
@@ -22,6 +28,28 @@ class RunEvent(BaseModel):
     agent: str | None = None
     data: dict[str, Any]
     timestamp: str
+
+
+@router.get("/{run_id}", response_model=RunStatus)
+async def get_status(run_id: str) -> RunStatus:
+    """Where a run stands, by the id ``POST /orchestrator/run`` handed back.
+
+    A live run is read from the registry (current ticket, tickets done and
+    left). A finished one is read from ``pipeline_runs``: ``faits`` are the
+    tickets the queue played (a ticket skipped because already done leaves no
+    row), ``restants`` those the last ``queue_progress`` still announced.
+    ``statut`` is ``en cours``, ``terminé`` or ``interrompu``.
+
+    Returns 404 when the id is unknown, which includes a run that could not be
+    persisted and has since closed.
+    """
+    vivant = RUN_REGISTRY.get(run_id)
+    if vivant is not None:
+        return statut_d_un_run_vivant(vivant)
+    statut = await statut_en_base(settings.ide_db_path, run_id)
+    if statut is None:
+        raise HTTPException(status_code=404, detail=f"Run inconnu : {run_id}")
+    return statut
 
 
 @router.get("/{run_id}/events", response_model=list[RunEvent])
