@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-440
-pr_number: null
+pr_number: 444
 priority: medium
 status: done
 title: The pipeline log at the bottom is collapsible, folded by default to one line
