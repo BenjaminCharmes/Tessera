@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-433
-pr_number: null
+pr_number: 435
 priority: medium
 status: done
 title: One command checks every ticket file of a project the way the loader reads
