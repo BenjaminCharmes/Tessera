@@ -2698,3 +2698,14 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 11:30:07 UTC — [ticket-436] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (109235ms)
 - 2026-10-14 11:30:07 UTC — [ticket-436] APPROVED après 1 tour(s)
 - 2026-10-14 11:32:08 UTC — [ticket-436] documentation: 1 fichier(s) (118046ms)
+- 2026-10-14 11:32:23 UTC — [ide-core] ticket-436 PR #433 confiée au CIWatcher
+- 2026-10-14 11:32:26 UTC — [ticket-431] branche ticket-431-the-run-id-returned-when-launching-a-queue-can-be
+- 2026-10-14 11:33:14 UTC — [ticket-431] plan rendu (47985ms)
+- 2026-10-14 11:33:14 UTC — [ticket-431] tour 1 — codeur démarré
+- 2026-10-14 11:36:28 UTC — [ticket-431] tour 1 — codeur terminé (194046ms)
+- 2026-10-14 11:42:23 UTC — [ticket-431] testeur: OK (exit 0)
+- 2026-10-14 11:43:30 UTC — [ticket-431] securite: PASS — Audit de sécurité du diff ticket-431 (suivi de runs par ID de lancement). Aucune (66719ms)
+- 2026-10-14 11:43:30 UTC — [ticket-431] tour 1 — reviewer démarré
+- 2026-10-14 11:44:04 UTC — [ticket-431] tour 1 — reviewer terminé (33750ms)
+- 2026-10-14 11:46:59 UTC — [ticket-431] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (208859ms)
+- 2026-10-14 11:46:59 UTC — [ticket-431] APPROVED après 1 tour(s)
