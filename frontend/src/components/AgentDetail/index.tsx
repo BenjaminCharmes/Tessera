@@ -1,6 +1,7 @@
 import { useState } from "react";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
+import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import Comparer from "./Comparer";
 import Fiche from "./Fiche";
 
@@ -21,9 +22,9 @@ interface AgentDetailProps {
 
 type Vue = "fiche" | "comparer";
 
-const VUES: { cle: Vue; libelle: string }[] = [
-  { cle: "fiche", libelle: "Fiche" },
-  { cle: "comparer", libelle: "Comparer" },
+const VUES: OptionVue<Vue>[] = [
+  { valeur: "fiche", libelle: "Fiche" },
+  { valeur: "comparer", libelle: "Comparer" },
 ];
 
 export default function AgentDetail({
@@ -42,27 +43,7 @@ export default function AgentDetail({
     <div className="flex h-full flex-col bg-zinc-900">
       <div className={`${BAND} justify-between gap-3 border-b border-zinc-700 px-4`}>
         <RegionTitle>Agents</RegionTitle>
-        <div
-          role="group"
-          aria-label="Vue"
-          className="flex items-center gap-0.5 rounded-sm border border-zinc-700 p-0.5"
-        >
-          {VUES.map((v) => (
-            <button
-              key={v.cle}
-              type="button"
-              aria-pressed={vue === v.cle}
-              onClick={() => setVue(v.cle)}
-              className={`rounded-sm px-2 py-0.5 text-mini transition-colors ${
-                vue === v.cle
-                  ? "bg-violet-500/15 text-zinc-100"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              {v.libelle}
-            </button>
-          ))}
-        </div>
+        <ViewSwitcher options={VUES} valeur={vue} onChange={setVue} />
       </div>
       {vue === "fiche" ? (
         <Fiche role={role} projectId={projectId} />

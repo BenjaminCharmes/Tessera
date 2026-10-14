@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
+import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import EtatVide from "./EtatVide";
 import { ticketDuDernierRun } from "./touches";
 import type { Project, Ticket, TicketStatus } from "../../types/api";
@@ -21,9 +22,9 @@ interface FichiersViewProps {
   onCloseFile: () => void;
 }
 
-const MODES: { mode: Mode; libelle: string }[] = [
-  { mode: "editeur", libelle: "Éditeur" },
-  { mode: "diff", libelle: "Diff du ticket" },
+const MODES: OptionVue<Mode>[] = [
+  { valeur: "editeur", libelle: "Éditeur" },
+  { valeur: "diff", libelle: "Diff du ticket" },
 ];
 
 /**
@@ -91,27 +92,7 @@ export default function FichiersView({
             Fermer le fichier
           </button>
         )}
-        <div
-          role="group"
-          aria-label="Vue"
-          className="flex rounded-md border border-zinc-800 bg-zinc-900 p-0.5"
-        >
-          {MODES.map(({ mode: m, libelle }) => (
-            <button
-              key={m}
-              type="button"
-              aria-pressed={mode === m}
-              onClick={() => setMode(m)}
-              className={`rounded px-3 py-1 text-xs transition-colors ${
-                mode === m
-                  ? "bg-zinc-700 text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              {libelle}
-            </button>
-          ))}
-        </div>
+        <ViewSwitcher options={MODES} valeur={mode} onChange={setMode} />
       </div>
       <Suspense
         fallback={<p className="px-4 py-3 text-xs text-zinc-500">Chargement…</p>}
