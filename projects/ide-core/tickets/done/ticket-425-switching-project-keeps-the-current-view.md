@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-425
-pr_number: null
+pr_number: 422
 priority: medium
 status: done
 title: Switching project keeps the current tab and view instead of jumping to the
