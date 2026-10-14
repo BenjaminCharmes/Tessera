@@ -1104,6 +1104,10 @@ CREATE TABLE agent_calls (
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
 
+### Isolation des tests de la base de production
+
+Les tests du backend (`pytest`) redirectent `settings.ide_db_path` vers un fichier SQLite temporaire pour chacune de leurs exécutions (fixture `autouse` dans `backend/tests/conftest.py`, ticket-422). Aucun run de test n'écrit jamais dans `backend/tessera.db`, même quand les tests lancent le serveur complet via `TestClient(app)`.
+
 ## Récupération de l'historique d'un run (ticket-280, ticket-281, ticket-327)
 
 Un run qui quitte la supervision — fermé ou au redémarrage du backend — disparaît 

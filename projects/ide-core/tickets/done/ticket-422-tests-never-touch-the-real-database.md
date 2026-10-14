@@ -1,14 +1,14 @@
 ---
-id: ticket-422
-title: "The backend test suite never writes into the real tessera.db"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-13
+id: ticket-422
+pr_number: 417
+priority: medium
+status: done
+title: The backend test suite never writes into the real tessera.db
+type: fix
 ---
 
 # ticket-422 — Les tests n'écrivent jamais dans la vraie base

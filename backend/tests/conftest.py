@@ -1,5 +1,7 @@
 """Shared pytest fixtures and environment probes."""
+import asyncio
 import os
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -110,6 +112,41 @@ def _aucun_terme_interdit_de_la_machine(monkeypatch: pytest.MonkeyPatch) -> None
 
     monkeypatch.setattr(settings, "forbidden_terms", "")
     monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+
+
+@pytest.fixture(scope="session")
+def _modele_de_base(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Schéma de la base, créé une seule fois pour toute la suite."""
+    from tessera.services.database import init_db
+
+    modele = tmp_path_factory.mktemp("modele_base") / "tessera.db"
+    asyncio.run(init_db(modele))
+    return modele
+
+
+@pytest.fixture(autouse=True)
+def _base_de_test_isolee(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path_factory: pytest.TempPathFactory,
+    _modele_de_base: Path,
+) -> Path:
+    """Point `settings.ide_db_path` at a throwaway copy of the schema — ticket-422.
+
+    Sans cela, un test qui démarre un run (`POST /orchestrator/run`) l'écrivait
+    dans `backend/tessera.db`, la base réelle : le 2026-10-13 elle contenait un
+    run ouvert pour un projet inexistant, ce qui faussait la liste des runs à
+    attendre avant un redémarrage et les statistiques. Chaque test reçoit sa
+    propre copie, dans un dossier dédié (le fichier des signalements en attente
+    vit à côté de la base). Les tests qui fixent leur base la remplacent par
+    `monkeypatch`, après cette fixture.
+    """
+    from tessera.config import settings
+
+    dossier = tmp_path_factory.mktemp("base_test")
+    base = dossier / "tessera.db"
+    shutil.copyfile(_modele_de_base, base)
+    monkeypatch.setattr(settings, "ide_db_path", base)
+    return base
 
 
 @pytest.fixture(autouse=True, scope="session")
