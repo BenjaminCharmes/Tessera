@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 1
 id: ticket-439
-pr_number: null
+pr_number: 442
 priority: high
 status: done
 title: 'Shared UI components from the charter: status pill, button variants, view
