@@ -95,3 +95,19 @@ def test_services_en_cours_is_not_frozen_by_the_cache(
     process.returncode = 0  # the service exits; nothing else changes
 
     assert _overview()["alpha"]["services_en_cours"] is False
+
+
+def test_project_running_the_ide_offers_no_launch(
+    _fresh_state: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """ide-core runs the IDE itself: launching it from the IDE makes no sense."""
+    ide = _project(_fresh_state, "ide")
+    (ide / "agents.json").write_text(
+        json.dumps({"services": [{"nom": "backend", "commande": "make dev"}]}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        "tessera.routers.projects.fait_tourner_l_ide", lambda path: path.name == "ide"
+    )
+
+    assert _overview()["ide"]["services_declares"] is False
