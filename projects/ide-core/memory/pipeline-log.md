@@ -2628,3 +2628,13 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 09:15:18 UTC — [ticket-427] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests dans `HistoriqueView. (327281ms)
 - 2026-10-14 09:15:18 UTC — [ticket-427] APPROVED après 1 tour(s)
 - 2026-10-14 09:18:11 UTC — [ticket-427] documentation: 2 fichier(s) (161156ms)
+- 2026-10-14 09:18:26 UTC — [ide-core] ticket-427 PR #424 confiée au CIWatcher
+- 2026-10-14 09:18:29 UTC — [ticket-428] branche ticket-428-the-files-tab-shows-the-open-file-a-search-and-re
+- 2026-10-14 09:18:29 UTC — [ticket-428] tour 1 — codeur démarré
+- 2026-10-14 09:22:48 UTC — [ticket-428] tour 1 — codeur terminé (259313ms)
+- 2026-10-14 09:28:01 UTC — [ticket-428] testeur: OK (exit 0)
+- 2026-10-14 09:28:32 UTC — [ticket-428] securite: PASS — Aucune vulnérabilité critique ou haute introduite par ce ticket. Le code ajoute  (30875ms)
+- 2026-10-14 09:28:32 UTC — [ticket-428] tour 1 — reviewer démarré
+- 2026-10-14 09:28:52 UTC — [ticket-428] tour 1 — reviewer terminé (19610ms)
+- 2026-10-14 09:33:58 UTC — [ticket-428] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket-428 apporte sa propre (325875ms)
+- 2026-10-14 09:33:58 UTC — [ticket-428] APPROVED après 1 tour(s)
