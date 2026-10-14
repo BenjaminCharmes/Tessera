@@ -199,6 +199,7 @@ async def create_run(
     ticket_id: str,
     mode: str = "single",
     parent_run_id: str | None = None,
+    run_id: str | None = None,
 ) -> str:
     """Insert a new pipeline run row and return its id.
 
@@ -210,8 +211,12 @@ async def create_run(
     `parent_run_id` links a per-ticket run (created inside a queue or autonomous
     run) to its envelope row. Events are stored on the envelope; this link lets
     the events endpoint filter them by ticket.
+
+    `run_id` lets the caller choose the row id (ticket-431): the launch id that
+    ``POST /orchestrator/run`` hands back becomes the row's id, so the run can be
+    followed with it. Default: a fresh uuid.
     """
-    run_id = str(uuid.uuid4())
+    run_id = run_id or str(uuid.uuid4())
     started_at = datetime.now(timezone.utc).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(

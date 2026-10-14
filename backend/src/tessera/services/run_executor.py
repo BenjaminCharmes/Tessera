@@ -158,6 +158,9 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
     elif event.type is EventType.TICKET_STATUS_CHANGED:
         run.ticket_id = event.ticket_id or run.ticket_id
     elif event.type is EventType.QUEUE_PROGRESS:
+        # Le ticket que la file annonce est le ticket courant : le statut d'une
+        # file le rend, et `ticket_status_changed` n'arrive qu'après (ticket-431).
+        run.ticket_id = event.ticket_id or run.ticket_id
         index = event.data.get("index")
         total = event.data.get("total")
         if isinstance(index, int):
@@ -266,6 +269,10 @@ async def executer(
             run.project_id,
             run.ticket_id or run.mode,
             mode=run.mode,
+            # L'id rendu au lancement porte la ligne enveloppe : c'est lui que
+            # l'appelant a en main, et lui que les endpoints de suivi cherchent
+            # (ticket-431).
+            run_id=run.run_id,
         )
         # Exposé dans l'instantané pour que le frontend puisse relire
         # les événements persistés au rechargement de page (ticket-325).
