@@ -1,7 +1,10 @@
 import type { PipelineRun } from "../../types/api";
 
 /** Where a run stands, from the point of view of the History tab. */
-export type EtatDuRun = "approuve" | "refuse" | "bloque" | "en-cours";
+export type EtatDuRun = "approuve" | "refuse" | "bloque" | "en-cours" | "interrompu";
+
+/** Cause écrite par le backend sur un run que le processus a laissé derrière lui. */
+const CAUSE_REDEMARRAGE = "backend restarted";
 
 export type FiltreRuns = "tous" | "approuves" | "refuses" | "tours";
 
@@ -12,15 +15,43 @@ export const FILTRES: { cle: FiltreRuns; libelle: string }[] = [
   { cle: "tours", libelle: "Plusieurs tours" },
 ];
 
-/** Classifies a run: approved, refused, blocked (stopped on the way) or running. */
+/**
+ * Interrupted: closed without a single finished round, by a restart rather
+ * than by a cause of its own (veille, redémarrage du backend).
+ */
+export function estInterrompu(run: PipelineRun): boolean {
+  if (run.finished_at === null || run.final_status !== "blocked") return false;
+  if ((run.rounds ?? 0) > 0) return false;
+  return !run.arret || run.arret.startsWith(CAUSE_REDEMARRAGE);
+}
+
+/**
+ * Classifies a run: approved, refused, blocked (stopped on the way),
+ * interrupted or running.
+ */
 export function etatDuRun(run: PipelineRun): EtatDuRun {
   if (run.approved === true) return "approuve";
   if (run.finished_at === null && run.final_status === null) return "en-cours";
+  if (estInterrompu(run)) return "interrompu";
   return run.final_status === "blocked" ? "bloque" : "refuse";
+}
+
+/**
+ * Keeps one row per ticket run: a queue's parent run is dropped as soon as a
+ * child points to it. A run with neither parent nor child stays.
+ */
+export function runsDeTicket(runs: readonly PipelineRun[]): PipelineRun[] {
+  const parents = new Set<string>();
+  for (const run of runs) {
+    if (run.parent_run_id) parents.add(run.parent_run_id);
+  }
+  return runs.filter((run) => !parents.has(run.id));
 }
 
 export function libelleDeLEtat(etat: EtatDuRun): string {
   switch (etat) {
+    case "interrompu":
+      return "Interrompu";
     case "approuve":
       return "Approuvé";
     case "refuse":
@@ -36,6 +67,7 @@ export function libelleDeLEtat(etat: EtatDuRun): string {
 export function classeDuVerdict(run: PipelineRun): string {
   const etat = etatDuRun(run);
   if (etat === "en-cours") return "text-blue-400";
+  if (etat === "interrompu") return "text-zinc-400";
   if (etat !== "approuve") return "text-red-400";
   return (run.rounds ?? 0) > 1 ? "text-amber-400" : "text-green-400";
 }
@@ -64,7 +96,7 @@ export function filtrerRuns(
     case "refuses": {
       return runs.filter((r) => {
         const etat = etatDuRun(r);
-        return etat === "refuse" || etat === "bloque";
+        return etat === "refuse" || etat === "bloque" || etat === "interrompu";
       });
     }
     case "tours":
@@ -83,6 +115,8 @@ export function runAffiche(
 
 export function formatDuree(run: PipelineRun): string {
   if (run.finished_at === null) return "En cours…";
+  // Un run interrompu est resté ouvert des heures : sa durée ne dit rien.
+  if (estInterrompu(run)) return "—";
   const ms = new Date(run.finished_at).getTime() - new Date(run.started_at).getTime();
   if (ms < 0) return "—";
   const secondes = Math.floor(ms / 1000);

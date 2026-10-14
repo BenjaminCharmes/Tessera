@@ -5,7 +5,7 @@ import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
 import DetailDuRun from "./DetailDuRun";
 import TousLesRuns from "./TousLesRuns";
-import { runAffiche } from "./runs";
+import { runAffiche, runsDeTicket } from "./runs";
 
 /** What the History tab needs from the cockpit (ticket-427). */
 export interface HistoriqueProps {
@@ -43,7 +43,7 @@ function Message({ children, erreur = false }: { children: string; erreur?: bool
  * them — ticket-427.
  */
 export default function HistoriqueView({
-  runs,
+  runs: tousLesRuns,
   loading,
   error,
   runSelectionne,
@@ -51,6 +51,8 @@ export default function HistoriqueView({
   tickets,
   project,
 }: HistoriqueViewProps) {
+  // Une file de tickets ne compte pas pour un run de plus : ses enfants suffisent.
+  const runs = runsDeTicket(tousLesRuns);
   const [vue, setVue] = useState<Vue>("detail");
   // Un run choisi dans la colonne ramène au détail, même depuis le tableau.
   const [selectionVue, setSelectionVue] = useState(runSelectionne);

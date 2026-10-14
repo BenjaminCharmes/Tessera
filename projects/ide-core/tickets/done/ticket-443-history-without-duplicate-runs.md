@@ -1,14 +1,15 @@
 ---
-id: ticket-443
-title: "The History list shows one row per ticket run, not the queue run and its child twice, and marks interrupted runs"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-443
+pr_number: 447
+priority: medium
+status: done
+title: The History list shows one row per ticket run, not the queue run and its child
+  twice, and marks interrupted runs
+type: fix
 ---
 
 # ticket-443 — L'Historique sans doublons

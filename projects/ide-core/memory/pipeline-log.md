@@ -2798,3 +2798,13 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 16:19:27 UTC — [ticket-441] validateur: APPROVED — Tous les critères d'acceptation reçoivent une couverture de test spécifique. Le  (50641ms)
 - 2026-10-14 16:19:27 UTC — [ticket-441] APPROVED après 1 tour(s)
 - 2026-10-14 16:21:46 UTC — [ticket-441] documentation: 1 fichier(s) (133797ms)
+- 2026-10-14 16:49:19 UTC — [ticket-443] branche ticket-443-the-history-list-shows-one-row-per-ticket-run-not
+- 2026-10-14 16:49:20 UTC — [ticket-443] tour 1 — codeur démarré
+- 2026-10-14 16:51:48 UTC — [ticket-443] tour 1 — codeur terminé (148093ms)
+- 2026-10-14 16:58:52 UTC — [ticket-443] testeur: OK (exit 0)
+- 2026-10-14 16:59:19 UTC — [ticket-443] securite: PASS — Audit complet : ce diff ajoute un nouvel état de run « interrompu » pour les run (26968ms)
+- 2026-10-14 16:59:19 UTC — [ticket-443] tour 1 — reviewer démarré
+- 2026-10-14 16:59:54 UTC — [ticket-443] tour 1 — reviewer terminé (34828ms)
+- 2026-10-14 17:01:58 UTC — [ticket-443] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests vérifient le comportem (159500ms)
+- 2026-10-14 17:01:58 UTC — [ticket-443] APPROVED après 1 tour(s)
+- 2026-10-14 17:03:19 UTC — [ticket-443] documentation: 1 fichier(s) (75625ms)
