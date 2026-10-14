@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import NavRail from "./NavRail";
 import type { SidebarPanel } from "./panels";
@@ -29,7 +29,67 @@ describe("NavRail", () => {
     const noms = screen.getAllByRole("tab").map((t) => t.textContent);
     expect(noms[0]).toMatch(/Projets/);
     expect(noms[1]).toMatch(/En cours/);
-    expect(noms[2]).toMatch(/Tickets/);
+  });
+
+  it("ordonne les neuf destinations par groupe", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const noms = screen.getAllByRole("tab").map((t) => t.textContent ?? "");
+    const attendu = [
+      "Projets",
+      "En cours",
+      "Supervision",
+      "Tickets",
+      "Fichiers",
+      "Historique",
+      "Agents",
+      "Statistiques",
+      "Chat",
+    ];
+    expect(noms).toHaveLength(attendu.length);
+    attendu.forEach((nom, i) => expect(noms[i]).toMatch(nom));
+  });
+
+  it("place chaque intitule avant les destinations de son groupe", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const ordre = (a: Node, b: Node): boolean =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const groupes: Array<[string, RegExp, RegExp]> = [
+      ["Pilotage", /Projets/, /Supervision/],
+      ["Projet", /Tickets/, /Historique/],
+      ["Outils", /Agents/, /Chat/],
+    ];
+    for (const [titre, premier, dernier] of groupes) {
+      const intitule = screen.getByText(titre);
+      expect(ordre(intitule, screen.getByRole("tab", { name: premier }))).toBe(
+        true,
+      );
+      expect(ordre(intitule, screen.getByRole("tab", { name: dernier }))).toBe(
+        true,
+      );
+    }
+  });
+
+  it("nomme chaque groupe comme une liste a part", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    for (const [titre, nombre] of [
+      ["Pilotage", 3],
+      ["Projet", 3],
+      ["Outils", 3],
+    ] as const) {
+      const liste = screen.getByRole("list", { name: titre });
+      expect(within(liste).getAllByRole("listitem")).toHaveLength(nombre);
+    }
+  });
+
+  it("marque la destination active par aria-current", () => {
+    render(<NavRail activePanel="files" onChangePanel={() => {}} />);
+    expect(screen.getByRole("tab", { name: /Fichiers/ })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("tab", { name: /Tickets/ })).not.toHaveAttribute(
+      "aria-current",
+    );
   });
 
   it("remonte la destination En cours", async () => {

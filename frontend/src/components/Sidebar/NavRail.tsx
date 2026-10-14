@@ -48,20 +48,52 @@ interface Destination {
   icon: ReactElement;
 }
 
-const DESTINATIONS: Destination[] = [
-  { panel: "projects", label: "Projets", icon: <IconLayers size={20} /> },
-  { panel: "running", label: "En cours", icon: <IconActivity size={20} /> },
-  { panel: "tickets", label: "Tickets", icon: <IconList size={20} /> },
-  { panel: "files", label: "Fichiers", icon: <IconFolder size={20} /> },
-  { panel: "history", label: "Historique", icon: <IconHistory size={20} /> },
-  { panel: "agents", label: "Agents", icon: <IconRobot size={20} /> },
+interface Groupe {
+  titre: string;
+  destinations: Destination[];
+}
+
+/**
+ * Trois groupes, par usage (ticket-426) : ce qui pilote tous les projets, ce
+ * qui concerne le projet actif, les outils.
+ */
+const GROUPES: Groupe[] = [
   {
-    panel: "supervision",
-    label: "Supervision",
-    icon: <IconRadar size={20} />,
+    titre: "Pilotage",
+    destinations: [
+      { panel: "projects", label: "Projets", icon: <IconLayers size={20} /> },
+      {
+        panel: "running",
+        label: "En cours",
+        icon: <IconActivity size={20} />,
+      },
+      {
+        panel: "supervision",
+        label: "Supervision",
+        icon: <IconRadar size={20} />,
+      },
+    ],
   },
-  { panel: "usage", label: "Statistiques", icon: <IconChart size={20} /> },
-  { panel: "chat", label: "Chat", icon: <IconChat size={20} /> },
+  {
+    titre: "Projet",
+    destinations: [
+      { panel: "tickets", label: "Tickets", icon: <IconList size={20} /> },
+      { panel: "files", label: "Fichiers", icon: <IconFolder size={20} /> },
+      {
+        panel: "history",
+        label: "Historique",
+        icon: <IconHistory size={20} />,
+      },
+    ],
+  },
+  {
+    titre: "Outils",
+    destinations: [
+      { panel: "agents", label: "Agents", icon: <IconRobot size={20} /> },
+      { panel: "usage", label: "Statistiques", icon: <IconChart size={20} /> },
+      { panel: "chat", label: "Chat", icon: <IconChat size={20} /> },
+    ],
+  },
 ];
 
 export default function NavRail({
@@ -76,7 +108,7 @@ export default function NavRail({
       role="tablist"
       aria-orientation="vertical"
       aria-label="Navigation principale"
-      className="flex h-full flex-col items-stretch gap-0.5 bg-zinc-900 px-1.5 pb-3 pt-2"
+      className="flex h-full flex-col items-stretch bg-zinc-900 px-1.5 pb-3 pt-2"
     >
       {/*
         Zone d'identité — ticket-101.
@@ -94,34 +126,50 @@ export default function NavRail({
         <img src="/favicon.svg" width={18} height={18} alt="" aria-hidden />
         <span className="text-micro leading-none text-zinc-400">Tessera</span>
       </div>
-      {DESTINATIONS.map(({ panel, label, icon }) => {
-        const actif = activePanel === panel;
-        return (
-          <button
-            key={panel}
-            type="button"
-            role="tab"
-            aria-selected={actif}
-            onClick={() => onChangePanel(panel)}
-            className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
-              actif
-                ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
-                : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
-            }`}
-          >
-            {panel === "supervision" ? (
-              <Pastille nombre={runsActifs} alerte={alerte} />
-            ) : null}
-            {panel === "running" ? (
-              <Pastille nombre={appsEnCours} unite="app" />
-            ) : null}
-            {icon}
-            <span className="w-full text-center text-micro leading-none">
-              {label}
-            </span>
-          </button>
-        );
-      })}
+      {GROUPES.map(({ titre, destinations }, index) => (
+        <div
+          key={titre}
+          className={
+            index === 0 ? "" : "mt-2 border-t border-zinc-800 pt-2"
+          }
+        >
+          <p className="px-1 pb-1 text-center text-micro uppercase leading-none tracking-wider text-zinc-600">
+            {titre}
+          </p>
+          <ul aria-label={titre} className="flex flex-col gap-0.5">
+            {destinations.map(({ panel, label, icon }) => {
+              const actif = activePanel === panel;
+              return (
+                <li key={panel} className="flex flex-col">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={actif}
+                    aria-current={actif ? "page" : undefined}
+                    onClick={() => onChangePanel(panel)}
+                    className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
+                      actif
+                        ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
+                        : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
+                    }`}
+                  >
+                    {panel === "supervision" ? (
+                      <Pastille nombre={runsActifs} alerte={alerte} />
+                    ) : null}
+                    {panel === "running" ? (
+                      <Pastille nombre={appsEnCours} unite="app" />
+                    ) : null}
+                    {icon}
+                    <span className="w-full text-center text-micro leading-none">
+                      {label}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
     </nav>
   );
 }
