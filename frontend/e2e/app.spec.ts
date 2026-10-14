@@ -17,16 +17,23 @@ test.describe("Flow 1 — Affichage des projets", () => {
 const lateral = (page: Pick<Page, "getByRole">) =>
   page.getByRole("complementary", { name: "Panneau latéral" });
 
+// Depuis le ticket-425, choisir un projet ne change plus d'onglet : on le
+// sélectionne, puis on ouvre ses tickets soi-même.
+async function ouvrirLesTicketsDe(page: Page, projet: string): Promise<void> {
+  await lateral(page).getByText(projet).click();
+  await page
+    .getByRole("tablist", { name: "Navigation principale" })
+    .getByRole("tab", { name: "Tickets" })
+    .click();
+}
+
 test.describe("Flow 2 — Sélection d'un projet → liste de tickets", () => {
-  test("cliquer sur un projet affiche ses tickets dans le panel Tickets", async ({
+  test("choisir un projet puis l'onglet Tickets affiche ses tickets", async ({
     mockedPage,
   }) => {
     await mockedPage.goto("/");
 
-    // Click the project — triggers handleSelectProject → switches to tickets panel.
-    // Depuis le ticket-399 le centre montre aussi une carte de ce projet : la
-    // région latérale lève l'ambiguïté.
-    await lateral(mockedPage).getByText("ide-core").click();
+    await ouvrirLesTicketsDe(mockedPage, "ide-core");
 
     // Only check the "todo" ticket — "done" tickets are collapsed by default
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;
@@ -67,8 +74,7 @@ test.describe("Flow 4 — Création d'un ticket", () => {
   test("créer un ticket dans un projet sélectionné", async ({ mockedPage }) => {
     await mockedPage.goto("/");
 
-    // Select project (auto-switches to tickets panel)
-    await lateral(mockedPage).getByText("ide-core").click();
+    await ouvrirLesTicketsDe(mockedPage, "ide-core");
 
     // Open create ticket modal via the + button in the Tickets panel header
     await lateral(mockedPage)
@@ -105,8 +111,7 @@ test.describe("Flow 5 — Ouverture de l'éditeur Monaco", () => {
   }) => {
     await mockedPage.goto("/");
 
-    // Select project
-    await lateral(mockedPage).getByText("ide-core").click();
+    await ouvrirLesTicketsDe(mockedPage, "ide-core");
 
     // Click on the todo ticket
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;
