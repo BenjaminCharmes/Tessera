@@ -2564,3 +2564,17 @@ Analyse (93125ms)
 - 2026-10-13 15:16:49 UTC — [ticket-423] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas dema (163296ms)
 - 2026-10-13 15:16:49 UTC — [ticket-423] APPROVED après 2 tour(s)
 - 2026-10-13 15:17:40 UTC — [ticket-423] documentation: 0 fichier(s) (48172ms)
+- 2026-10-13 15:17:56 UTC — [ide-core] ticket-423 PR #416 confiée au CIWatcher
+- 2026-10-13 15:17:59 UTC — [ticket-422] branche ticket-422-the-backend-test-suite-never-writes-into-the-real
+- 2026-10-13 15:18:00 UTC — [ticket-422] tour 1 — codeur démarré
+- 2026-10-14 06:44:04 UTC — [ticket-422] branche ticket-422-the-backend-test-suite-never-writes-into-the-real
+- 2026-10-14 06:44:04 UTC — [ticket-422] tour 1 — codeur démarré
+- 2026-10-14 06:45:47 UTC — [ticket-422] tour 1 — codeur terminé (102515ms)
+- 2026-10-14 06:50:30 UTC — [ticket-422] testeur: OK (exit 0)
+- 2026-10-14 06:50:57 UTC — [ticket-422] securite: PASS — Audit complet du diff sans vulnérabilité détectée.
+
+Le diff ajoute deux fixtures (26906ms)
+- 2026-10-14 06:50:57 UTC — [ticket-422] tour 1 — reviewer démarré
+- 2026-10-14 06:51:22 UTC — [ticket-422] tour 1 — reviewer terminé (24609ms)
+- 2026-10-14 06:54:08 UTC — [ticket-422] validateur: APPROVED — Tous les critères sont satisfaits. Le code assure que les tests n'écrivent plus  (189827ms)
+- 2026-10-14 06:54:08 UTC — [ticket-422] APPROVED après 1 tour(s)
