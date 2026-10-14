@@ -129,7 +129,7 @@ def test_router_is_mounted_under_api_v1() -> None:
 
 @pytest.fixture
 def attente(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    monkeypatch.setattr(settings, "ide_db_path", tmp_path / "data" / "tessera.db")
+    monkeypatch.setattr(settings, "ide_state_dir", tmp_path / "data")
     return tmp_path / "data" / "signalements_en_attente.json"
 
 

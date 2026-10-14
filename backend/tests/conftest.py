@@ -149,6 +149,27 @@ def _base_de_test_isolee(
     return base
 
 
+@pytest.fixture(autouse=True)
+def _dossier_de_donnees_isole(
+    monkeypatch: pytest.MonkeyPatch, tmp_path_factory: pytest.TempPathFactory
+) -> Path:
+    """Point the state folder and the legacy queue path at throwaway locations — ticket-430.
+
+    Sans cela, un test écrirait la file des signalements dans le vrai dossier de
+    données, et le démarrage de l'app (`TestClient(app)`) migrerait, puis
+    supprimerait, un vrai `backend/signalements_en_attente.json`.
+    """
+    from tessera.config import settings
+    from tessera.services import signalements_en_attente
+
+    dossier = tmp_path_factory.mktemp("etat_test")
+    monkeypatch.setattr(settings, "ide_state_dir", dossier / "etat")
+    monkeypatch.setattr(
+        signalements_en_attente, "ANCIEN_CHEMIN", dossier / "ancien" / "signalements_en_attente.json"
+    )
+    return dossier / "etat"
+
+
 @pytest.fixture(autouse=True, scope="session")
 def _pas_de_vrai_journal() -> Iterator[None]:
     """Keep the app's startup from attaching the real log file in tests.

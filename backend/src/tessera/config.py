@@ -1,3 +1,5 @@
+import os
+import sys
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -10,6 +12,14 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 # `backend/`. Un réglage pourtant présent dans `.env` était donc
 # silencieusement ignoré — même classe de bug que ticket-050.
 _ENV_FILE = str(_REPO_ROOT / ".env")
+
+
+def default_state_dir() -> Path:
+    """Return the per-user data folder, always outside the repository."""
+    if sys.platform == "win32":
+        base = os.environ.get("LOCALAPPDATA")
+        return (Path(base) if base else Path.home() / "AppData" / "Local") / "Tessera"
+    return Path.home() / ".local" / "state" / "tessera"
 
 
 class Settings(BaseSettings):
@@ -81,6 +91,11 @@ class Settings(BaseSettings):
     # entre eux avant qu'ils n'atteignent l'état publiable.
     github_base_branch: str = "develop"
     ide_db_path: Path = Path("tessera.db")
+    # Données d'exécution qui ne doivent jamais entrer dans un commit (file des
+    # signalements en attente, ticket-430). Hors du dépôt : un fichier posé dans
+    # l'arbre part dans le commit du run en cours, puis disparaît au changement
+    # de branche. Surchargeable via IDE_STATE_DIR.
+    ide_state_dir: Path = default_state_dir()
     # Fichier de log tournant (5 × 10 Mo). Ancré sur la racine du dépôt pour
     # ne pas dépendre du répertoire de lancement (ticket-330).
     ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"

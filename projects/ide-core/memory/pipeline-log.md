@@ -2660,3 +2660,18 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 10:44:41 UTC — [ticket-435] validateur: APPROVED — Les cinq critères sont satisfaits par les tests du nouveau fichier `test_inventa (397047ms)
 - 2026-10-14 10:44:41 UTC — [ticket-435] APPROVED après 1 tour(s)
 - 2026-10-14 10:48:11 UTC — [ticket-435] documentation: 2 fichier(s) (206734ms) — après tour de correction
+- 2026-10-14 10:48:33 UTC — [ide-core] ticket-435 PR #430 confiée au CIWatcher
+- 2026-10-14 10:48:37 UTC — [ticket-430] branche ticket-430-pending-reports-are-kept-outside-the-repository-s
+- 2026-10-14 10:48:37 UTC — [ticket-430] tour 1 — codeur démarré
+- 2026-10-14 10:50:37 UTC — [ticket-430] tour 1 — codeur terminé (119234ms)
+- 2026-10-14 10:52:55 UTC — [ticket-430] testeur: 1 failed, 691 passed, 20 warnings in 135.50s (0:02:15)
+- 2026-10-14 10:52:55 UTC — [ticket-430] tests rouges au tour 1
+- 2026-10-14 10:52:55 UTC — [ticket-430] tour 2 — codeur démarré
+- 2026-10-14 10:53:22 UTC — [ticket-430] tour 2 — codeur terminé (26296ms)
+- 2026-10-14 10:58:14 UTC — [ticket-430] testeur: OK (exit 0)
+- 2026-10-14 10:58:44 UTC — [ticket-430] securite: PASS — Aucune vulnérabilité de sécurité détectée. Ce diff déplace correctement un fichi (30093ms)
+- 2026-10-14 10:58:44 UTC — [ticket-430] tour 2 — reviewer démarré
+- 2026-10-14 10:59:03 UTC — [ticket-430] tour 2 — reviewer terminé (18765ms)
+- 2026-10-14 11:00:55 UTC — [ticket-430] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le chemin du fichier d'attente e (130734ms)
+- 2026-10-14 11:00:55 UTC — [ticket-430] APPROVED après 2 tour(s)
+- 2026-10-14 11:05:18 UTC — [ticket-430] documentation: 3 fichier(s) (260297ms) — après tour de correction

@@ -1,14 +1,15 @@
 ---
-id: ticket-430
-title: "Pending reports are kept outside the repository, so a run can never commit them nor a branch switch lose them"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-430
+pr_number: 431
+priority: critical
+status: done
+title: Pending reports are kept outside the repository, so a run can never commit
+  them nor a branch switch lose them
+type: fix
 ---
 
 # ticket-430 — La file d'attente des signalements vit hors du dépôt
