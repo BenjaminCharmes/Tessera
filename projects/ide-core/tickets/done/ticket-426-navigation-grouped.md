@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-426
-pr_number: null
+pr_number: 423
 priority: medium
 status: done
 title: The navigation rail is grouped into Pilotage, Projet and Outils, as in the
