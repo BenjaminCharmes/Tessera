@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-432
 plan: true
-pr_number: null
+pr_number: 436
 priority: high
 status: done
 title: Tessera captures a project's screens at phone and desktop width, light and
