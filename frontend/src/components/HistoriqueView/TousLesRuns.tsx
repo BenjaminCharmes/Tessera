@@ -13,7 +13,6 @@ import {
   pastilleDuRun,
   triParDate,
 } from "./runs";
-import StatusPill from "../../design/ui/StatusPill";
 import type { FiltreRuns } from "./runs";
 
 interface TousLesRunsProps {
