@@ -21,6 +21,7 @@ import type { SidebarPanel } from "../components/Sidebar/panels";
 import { projetsEnAttente } from "../components/Sidebar/projetsEnAttente";
 import type { Project, RunActif, OrchestratorEvent, StatsPeriod, Ticket, TicketStatus } from "../types/api";
 import { api } from "../lib/api";
+import { noterRecent } from "../lib/fichiersRecents";
 import { vueDuCentre } from "../vueDuCentre";
 import type { VueCentre } from "../vueDuCentre";
 import type { StreamState } from "./streamState";
@@ -268,6 +269,14 @@ export function useCockpit() {
     stream.clear();
   }
 
+  // Un fichier ouvert depuis l'arbre ou depuis la recherche : il est noté dans
+  // les récents du projet, d'où « Ouverts récemment » (ticket-428).
+  function handleOpenFile(path: string) {
+    if (project) noterRecent(project.id, path);
+    setOpenFilePath(path);
+    setShowKanban(false);
+  }
+
   // Le tableau est la vue *par défaut* ; choisir un ticket est explicite et
   // doit montrer ce ticket, sinon le clic ne produit rien de visible.
   function handleSelectTicket(t: Ticket) {
@@ -429,10 +438,7 @@ export function useCockpit() {
       },
       fichiers: {
         ouvert: openFilePath,
-        onOpen: (path: string) => {
-          setOpenFilePath(path);
-          setShowKanban(false);
-        },
+        onOpen: handleOpenFile,
       },
       agents: {
         selectionne: agentSelectionne,
@@ -467,6 +473,8 @@ export function useCockpit() {
       running,
       unreadable: tickets.unreadable,
       openFilePath,
+      onOpenFile: handleOpenFile,
+      onCloseFile: () => setOpenFilePath(null),
       statsDays,
       // La portée effective est "tous" quand aucun projet n'est actif.
       statsProjectId: porteeEffective === "tous" ? null : (project?.id ?? null),

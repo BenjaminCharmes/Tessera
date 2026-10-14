@@ -30,6 +30,15 @@ export function lireEtatPersistant<T>(
   }
 }
 
+/** Écrit une valeur mémorisée ; un stockage refusé est ignoré, comme à la lecture. */
+export function ecrireEtatPersistant<T>(cle: string, valeur: T): void {
+  try {
+    window.localStorage.setItem(PREFIXE + cle, JSON.stringify(valeur));
+  } catch {
+    // Stockage indisponible : la valeur ne survivra pas au rechargement.
+  }
+}
+
 export function useEtatPersistant<T>(
   cle: string,
   defaut: T,

@@ -20,6 +20,7 @@ import ProjetsView from "./ProjetsView";
 import EnCoursView from "./EnCoursView";
 import HistoriqueView from "./HistoriqueView";
 import type { HistoriqueProps } from "./HistoriqueView";
+import FichiersView from "./FichiersView";
 import type { UseAppsEnCoursResult } from "../hooks/useAppsEnCours";
 
 // Vues lourdes — chargées à la demande, après le premier rendu du cockpit
@@ -56,6 +57,10 @@ interface CenterViewProps {
   running: Set<string>;
   unreadable: TicketUnreadable[];
   openFilePath: string | null;
+  /** Ouvre un fichier du projet, depuis l'onglet Fichiers (ticket-428). */
+  onOpenFile: (path: string) => void;
+  /** Referme le fichier ouvert (ticket-428). */
+  onCloseFile: () => void;
   /** Nombre de jours de la période stats, géré par useCockpit (ticket-253). */
   statsDays: StatsPeriod;
   /** Projet cible des stats — null si portée "tous projets" (ticket-253). */
@@ -110,6 +115,8 @@ export default function CenterView({
   running,
   unreadable,
   openFilePath,
+  onOpenFile,
+  onCloseFile,
   statsDays,
   statsProjectId,
   onSelectProject,
@@ -160,6 +167,19 @@ export default function CenterView({
     // Les runs ont leur propre vue : sans elle, l'onglet retombait sur la
     // liste des tickets (ticket-427).
     content = <HistoriqueView {...historique} project={project} />;
+  } else if (panel === "files") {
+    // L'onglet Fichiers a sa propre vue (ticket-428) : il retombait sur la
+    // liste des tickets dès qu'aucun fichier n'était ouvert.
+    content = (
+      <FichiersView
+        project={project}
+        ticket={ticket}
+        byStatus={byStatus}
+        openFilePath={openFilePath}
+        onOpenFile={onOpenFile}
+        onCloseFile={onCloseFile}
+      />
+    );
   } else if (panel === "agents") {
     content = <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />;
   } else if (panel === "usage") {
