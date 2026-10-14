@@ -2639,3 +2639,4 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 09:33:58 UTC — [ticket-428] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket-428 apporte sa propre (325875ms)
 - 2026-10-14 09:33:58 UTC — [ticket-428] APPROVED après 1 tour(s)
 - 2026-10-14 09:36:50 UTC — [ticket-428] documentation: 1 fichier(s) (169593ms)
+- 2026-10-14 09:37:26 UTC — [ticket-428] livraison: arrêt — Conflit avec develop sur : frontend/src/components/CenterView.test.tsx, frontend/src/components/Cent
