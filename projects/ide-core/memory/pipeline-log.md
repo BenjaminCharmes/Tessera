@@ -2650,3 +2650,12 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 09:55:38 UTC — [ticket-429] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le refactoring de `AgentDetail` (93109ms)
 - 2026-10-14 09:55:38 UTC — [ticket-429] APPROVED après 1 tour(s)
 - 2026-10-14 09:58:13 UTC — [ticket-429] documentation: 1 fichier(s) (129218ms)
+- 2026-10-14 10:27:14 UTC — [ticket-435] branche ticket-435-the-running-view-only-attributes-an-app-to-a-proj
+- 2026-10-14 10:27:14 UTC — [ticket-435] tour 1 — codeur démarré
+- 2026-10-14 10:31:26 UTC — [ticket-435] tour 1 — codeur terminé (251264ms)
+- 2026-10-14 10:36:54 UTC — [ticket-435] testeur: OK (exit 0)
+- 2026-10-14 10:38:04 UTC — [ticket-435] securite: PASS — Le diff introduit une **amélioration de sécurité** (ticket-435) qui renforce le  (70360ms)
+- 2026-10-14 10:38:04 UTC — [ticket-435] tour 1 — reviewer démarré
+- 2026-10-14 10:38:31 UTC — [ticket-435] tour 1 — reviewer terminé (26453ms)
+- 2026-10-14 10:44:41 UTC — [ticket-435] validateur: APPROVED — Les cinq critères sont satisfaits par les tests du nouveau fichier `test_inventa (397047ms)
+- 2026-10-14 10:44:41 UTC — [ticket-435] APPROVED après 1 tour(s)
