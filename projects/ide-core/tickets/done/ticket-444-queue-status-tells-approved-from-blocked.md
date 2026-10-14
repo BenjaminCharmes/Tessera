@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-444
-pr_number: null
+pr_number: 449
 priority: medium
 status: done
 title: A queue's status tells the approved tickets from the ones that ended without
