@@ -2757,3 +2757,4 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 14:28:36 UTC — [ticket-437] validateur: fichiers cités joints : agents.json ; absents : docs/guide-utilisateur.md
 - 2026-10-14 14:28:36 UTC — [ticket-437] validateur: APPROVED — Tous les critères sont satisfaits. Le code produit implémente une sécurisation c (35515ms)
 - 2026-10-14 14:28:36 UTC — [ticket-437] APPROVED après 1 tour(s)
+- 2026-10-14 14:31:43 UTC — [ticket-437] documentation: 0 fichier(s) (183327ms)
