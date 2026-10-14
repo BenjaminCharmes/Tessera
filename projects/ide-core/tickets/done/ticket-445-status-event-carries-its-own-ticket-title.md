@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-445
-pr_number: null
+pr_number: 451
 priority: medium
 status: done
 title: A ticket status event in a queue always carries the title of its own ticket,
