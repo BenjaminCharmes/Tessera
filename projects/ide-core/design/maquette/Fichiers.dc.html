@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tessera — Fichiers</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden">
+
+  <nav aria-label="Navigation principale" style="width: 96px; flex-shrink: 0; background: #121214; border-right: 1px solid #27272a; display: flex; flex-direction: column; align-items: stretch; padding: 10px 8px; gap: 2px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 12px; color: #a1a1aa; font-size: 10px"><span style="width: 22px; height: 22px; border-radius: 5px; background: #8b5cf6"></span>Tessera</div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 6px 4px 2px">Pilotage</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5zM3 16l9 5 9-5M3 12l9 5 9-5"/></svg>Projets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px; position: relative">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>En cours<span style="position: absolute; top: 3px; right: 14px; min-width: 15px; height: 15px; border-radius: 8px; background: #1d4ed8; color: #dbeafe; font-size: 9px; display: flex; align-items: center; justify-content: center">2</span></a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Supervision</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Projet</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Tickets</a>
+    <a href="Fichiers.dc.html" aria-current="page" style="text-decoration: none; color: #f4f4f5; background: rgba(139,92,246,0.18); box-shadow: inset 0 0 0 1px rgba(139,92,246,0.45); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></svg>Fichiers</a>
+    <a href="Historique.dc.html" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg>Historique</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Outils</div>
+    <a href="Agents.dc.html" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01"/></svg>Agents</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Statistiques</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Chat</a>
+  </nav>
+
+  <aside style="width: 280px; flex-shrink: 0; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column">
+    <div style="height: 40px; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 14px">Curio — culture générale</div>
+    <div style="padding: 8px 12px; border-bottom: 1px solid #27272a"><label style="display: block"><span style="position: absolute; left: -9999px">Filtrer les fichiers</span><input type="text" placeholder="Filtrer…" style="width: 100%; box-sizing: border-box; background: #0f0f11; border: 1px solid #27272a; border-radius: 4px; padding: 5px 8px; color: #e4e4e7; font-size: 12px"></label></div>
+    <div style="padding: 8px 4px; display: flex; flex-direction: column; gap: 1px; font-size: 12px; color: #d4d4d8">
+      <div style="padding: 3px 8px; color: #a1a1aa">▾ backend</div>
+      <div style="padding: 3px 8px 3px 22px; color: #a1a1aa">▸ app</div>
+      <div style="padding: 3px 8px 3px 22px; color: #a1a1aa">▸ data</div>
+      <div style="padding: 3px 8px 3px 22px; color: #a1a1aa">▸ tests</div>
+      <div style="padding: 3px 8px; color: #a1a1aa">▸ design</div>
+      <div style="padding: 3px 8px; color: #a1a1aa">▾ frontend</div>
+      <div style="padding: 3px 8px 3px 22px; color: #a1a1aa">▾ src</div>
+      <div style="padding: 3px 8px 3px 36px; color: #a1a1aa">▸ components</div>
+      <div style="padding: 3px 8px 3px 36px; color: #a1a1aa">▾ screens</div>
+      <div style="padding: 3px 8px 3px 50px">home-screen.tsx</div>
+      <div style="padding: 3px 8px 3px 50px; display: flex; justify-content: space-between"><span>quiz-screen.tsx</span><span style="color: #fbbf24; font-size: 10px">M</span></div>
+      <div style="padding: 3px 8px 3px 50px">results-screen.tsx</div>
+      <div style="padding: 3px 8px 3px 50px">review-screen.tsx</div>
+      <div style="padding: 3px 8px 3px 36px">index.css</div>
+      <div style="padding: 3px 8px; color: #a1a1aa">▸ memory</div>
+      <div style="padding: 3px 8px; color: #a1a1aa">▸ tickets</div>
+      <div style="padding: 3px 8px">CLAUDE.md</div>
+      <div style="padding: 3px 8px">agents.json</div>
+    </div>
+  </aside>
+
+  <main style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+    <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #27272a">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Fichiers</div>
+      <div role="group" aria-label="Vue" style="display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 2px">
+        <button onClick="{{ voirEditeur }}" aria-pressed="{{ editeur }}" style="{{ styleEditeur }}">Éditeur</button>
+        <button onClick="{{ voirDiff }}" aria-pressed="{{ diff }}" style="{{ styleDiff }}">Diff du ticket</button>
+      </div>
+    </div>
+
+    <sc-if value="{{ editeur }}" hint-placeholder-val="{{ true }}">
+      <div style="flex-grow: 1; display: flex; justify-content: center; padding: 56px 32px; overflow: auto">
+        <div style="width: 640px; display: flex; flex-direction: column; gap: 28px">
+          <div>
+            <div style="font-size: 18px; font-weight: 600">Aucun fichier ouvert</div>
+            <div style="margin-top: 4px; color: #a1a1aa">Choisis un fichier dans l'arbre, ou cherche-le.</div>
+          </div>
+          <label style="display: block"><span style="position: absolute; left: -9999px">Rechercher un fichier</span>
+            <input type="text" placeholder="Rechercher un fichier dans curio…   Ctrl+P" style="width: 100%; box-sizing: border-box; height: 40px; background: #18181b; border: 1px solid #3f3f46; border-radius: 6px; padding: 0 12px; color: #e4e4e7; font-size: 13px"></label>
+          <section>
+            <div style="font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: #71717a; margin-bottom: 8px">Touchés par le dernier run — ticket-012</div>
+            <div style="border: 1px solid #27272a; border-radius: 6px; overflow: hidden">
+              <sc-for list="{{ touches }}" as="f" hint-placeholder-count="3">
+                <a href="#" style="display: flex; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid #1f1f23; color: #e4e4e7; text-decoration: none"><span style="font-family: ui-monospace, monospace; font-size: 12px">{{ f.chemin }}</span><span style="font-size: 12px"><span style="color: #4ade80">{{ f.plus }}</span>  <span style="color: #f87171">{{ f.moins }}</span></span></a>
+              </sc-for>
+            </div>
+          </section>
+          <section>
+            <div style="font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: #71717a; margin-bottom: 8px">Ouverts récemment</div>
+            <div style="display: flex; flex-direction: column">
+              <sc-for list="{{ recents }}" as="f" hint-placeholder-count="4">
+                <a href="#" style="display: flex; justify-content: space-between; padding: 7px 4px; color: #d4d4d8; text-decoration: none"><span style="font-family: ui-monospace, monospace; font-size: 12px">{{ f.chemin }}</span><span style="color: #71717a; font-size: 12px">{{ f.quand }}</span></a>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ diff }}" hint-placeholder-val="{{ false }}">
+      <div style="flex-grow: 1; display: flex; min-height: 0">
+        <div style="width: 260px; border-right: 1px solid #27272a; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px">
+          <div style="padding: 0 6px 8px; color: #a1a1aa; font-size: 12px">ticket-012 · 5 fichiers</div>
+          <sc-for list="{{ touches }}" as="f" hint-placeholder-count="3">
+            <a href="#" style="display: flex; justify-content: space-between; padding: 6px; border-radius: 4px; color: #e4e4e7; text-decoration: none; font-size: 12px; background: {{ f.fond }}"><span>{{ f.nom }}</span><span><span style="color: #4ade80">{{ f.plus }}</span> <span style="color: #f87171">{{ f.moins }}</span></span></a>
+          </sc-for>
+        </div>
+        <div style="flex-grow: 1; overflow: auto; padding: 16px; font-family: ui-monospace, monospace; font-size: 12px; line-height: 1.7">
+          <div style="color: #a1a1aa; margin-bottom: 8px">frontend/src/screens/quiz-screen.tsx</div>
+          <div style="color: #71717a">@@ -142,7 +142,12 @@</div>
+          <div style="color: #a1a1aa">        &lt;p className="text-corps"&gt;</div>
+          <div style="color: #a1a1aa">          &lt;strong&gt;{verdict}&lt;/strong&gt;</div>
+          <div style="background: rgba(74,222,128,0.10); color: #bbf7d0">+         {question.explanation ? (</div>
+          <div style="background: rgba(74,222,128,0.10); color: #bbf7d0">+           &lt;span&gt; {question.explanation}&lt;/span&gt;</div>
+          <div style="background: rgba(74,222,128,0.10); color: #bbf7d0">+         ) : null}</div>
+          <div style="background: rgba(248,113,113,0.10); color: #fecaca">-         &lt;span&gt; Canberra a été créée…&lt;/span&gt;</div>
+          <div style="color: #a1a1aa">        &lt;/p&gt;</div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { vue: 'editeur' }; }
+  renderVals() {
+    const on = 'background: #3f3f46; color: #f4f4f5; border: 0; border-radius: 4px; padding: 5px 12px; font-size: 12px; cursor: pointer';
+    const off = 'background: transparent; color: #a1a1aa; border: 0; border-radius: 4px; padding: 5px 12px; font-size: 12px; cursor: pointer';
+    const v = this.state.vue;
+    const touches = [
+      { chemin: 'frontend/src/screens/quiz-screen.tsx', nom: 'quiz-screen.tsx', plus: '+18', moins: '−4', fond: '#27272a' },
+      { chemin: 'frontend/src/screens/quiz-screen.test.tsx', nom: 'quiz-screen.test.tsx', plus: '+41', moins: '−0', fond: 'transparent' },
+      { chemin: 'backend/app/quiz_api.py', nom: 'quiz_api.py', plus: '+3', moins: '−1', fond: 'transparent' },
+      { chemin: 'backend/tests/test_quiz_api.py', nom: 'test_quiz_api.py', plus: '+12', moins: '−0', fond: 'transparent' },
+      { chemin: 'frontend/src/api.ts', nom: 'api.ts', plus: '+1', moins: '−0', fond: 'transparent' }
+    ];
+    return {
+      editeur: v === 'editeur', diff: v === 'diff',
+      styleEditeur: v === 'editeur' ? on : off, styleDiff: v === 'diff' ? on : off,
+      voirEditeur: () => this.setState({ vue: 'editeur' }),
+      voirDiff: () => this.setState({ vue: 'diff' }),
+      touches,
+      recents: [
+        { chemin: 'memory/design.md', quand: 'il y a 2 h' },
+        { chemin: 'frontend/src/index.css', quand: 'hier' },
+        { chemin: 'backend/app/session.py', quand: 'hier' },
+        { chemin: 'CLAUDE.md', quand: 'hier' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
