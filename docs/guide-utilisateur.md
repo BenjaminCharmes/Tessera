@@ -1036,6 +1036,14 @@ Tu peux filtrer ce tableau :
 
 Un clic sur une ligne du tableau ouvre son détail.
 
+#### Affichage des runs — pas de doublons
+
+Chaque ligne du tableau représente un run de ticket. Quand une file contient plusieurs tickets — un run parent et plusieurs runs enfants —, le tableau affiche une ligne par ticket de la file, jamais le run parent lui-même. Un run d'un seul ticket (pas de parent, pas d'enfants) apparaît en une seule ligne.
+
+#### Reconnaître un run interrompu
+
+Un run arrêté par une veille système, un redémarrage ou un timeout s'affiche avec le badge « interrompu » et un tiret « — » à la place de la durée. C'est un run sans tour complété : tu verras zéro tour et le badge neutre « interrompu », jamais une durée aberrante.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
