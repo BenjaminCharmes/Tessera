@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-435
-pr_number: null
+pr_number: 430
 priority: critical
 status: done
 title: The Running view only attributes an app to a project when the process really
