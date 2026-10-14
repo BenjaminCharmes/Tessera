@@ -1,4 +1,4 @@
-import { useLimites } from "../../hooks/useLimites";
+import PlafondsDeDepense from "./PlafondsDeDepense";
 import type { StatsPeriod } from "../../types/api";
 
 const PERIODS: StatsPeriod[] = [7, 30, 90];
@@ -26,8 +26,6 @@ export default function PanneauUsage({
   setPortee,
   projetActifId,
 }: PanneauUsageProps) {
-  const limites = useLimites();
-
   return (
     <div className="flex flex-col gap-4 px-3 py-3">
       {/* Bloc 1 : Période */}
@@ -92,32 +90,8 @@ export default function PanneauUsage({
         </div>
       </section>
 
-      {/* Bloc 3 : Plafonds */}
-      <section>
-        <p className="mb-1.5 text-micro text-zinc-500">Plafonds de dépense</p>
-        <dl className="space-y-1.5">
-          <div className="flex justify-between text-xs">
-            <dt className="text-zinc-400">Par run</dt>
-            <dd className="font-mono text-zinc-200">
-              {limites === null
-                ? "—"
-                : limites.run_max_budget_usd === 0
-                  ? "aucun plafond"
-                  : `$${limites.run_max_budget_usd.toFixed(2)}`}
-            </dd>
-          </div>
-          <div className="flex justify-between text-xs">
-            <dt className="text-zinc-400">Global</dt>
-            <dd className="font-mono text-zinc-200">
-              {limites === null
-                ? "—"
-                : limites.llm_max_budget_usd === 0
-                  ? "aucun plafond"
-                  : `$${limites.llm_max_budget_usd.toFixed(2)}`}
-            </dd>
-          </div>
-        </dl>
-      </section>
+      {/* Bloc 3 : Plafonds — aussi dans les Réglages (ticket-441) */}
+      <PlafondsDeDepense />
     </div>
   );
 }
