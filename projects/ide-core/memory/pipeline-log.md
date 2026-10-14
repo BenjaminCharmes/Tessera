@@ -2675,3 +2675,15 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 11:00:55 UTC — [ticket-430] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le chemin du fichier d'attente e (130734ms)
 - 2026-10-14 11:00:55 UTC — [ticket-430] APPROVED après 2 tour(s)
 - 2026-10-14 11:05:18 UTC — [ticket-430] documentation: 3 fichier(s) (260297ms) — après tour de correction
+- 2026-10-14 11:05:33 UTC — [ide-core] ticket-430 PR #431 confiée au CIWatcher
+- 2026-10-14 11:05:36 UTC — [ticket-434] branche ticket-434-the-validator-is-given-the-files-a-criterion-cite
+- 2026-10-14 11:06:18 UTC — [ticket-434] plan rendu (41609ms)
+- 2026-10-14 11:06:18 UTC — [ticket-434] tour 1 — codeur démarré
+- 2026-10-14 11:09:10 UTC — [ticket-434] tour 1 — codeur terminé (171093ms)
+- 2026-10-14 11:15:58 UTC — [ticket-434] testeur: OK (exit 0)
+- 2026-10-14 11:16:33 UTC — [ticket-434] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée. Le diff effectue un refactori (35702ms)
+- 2026-10-14 11:16:33 UTC — [ticket-434] tour 1 — reviewer démarré
+- 2026-10-14 11:17:00 UTC — [ticket-434] validateur: APPROVED — Le diff implémente complètement le ticket-434 : extraction des références de fic (26312ms)
+- 2026-10-14 11:17:01 UTC — [ticket-434] tour 1 — reviewer terminé (27952ms)
+- 2026-10-14 11:17:01 UTC — [ticket-434] APPROVED après 1 tour(s)
+- 2026-10-14 11:20:16 UTC — [ticket-434] documentation: 1 fichier(s) (192265ms)

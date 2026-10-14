@@ -1,15 +1,16 @@
 ---
-id: ticket-434
-title: "The validator is given the files a criterion cites whatever its provider, and the log says which files it received"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-434
 plan: true
+pr_number: 432
+priority: high
+status: done
+title: The validator is given the files a criterion cites whatever its provider, and
+  the log says which files it received
+type: fix
 ---
 
 # ticket-434 — Le validateur reçoit les fichiers cités, quel que soit son modèle
@@ -66,3 +67,22 @@ lu.
 ## Dépendances
 
 Aucune.
+## Conclusion du tour de plan
+
+Rejeu par la lecture, sur `projects/affut/frontend/src/charter-contrast.test.ts` :
+le fichier fait 2 106 caractères, loin sous `_CITED_FILES_MAX_CHARS` (20 000).
+Le code joint donc le fichier en entier, et `num_ctx` d'Ollama grandit avec le
+prompt : la section est arrivée au modèle. Le refus « le fichier s'appelle
+charter.test.ts » vient du modèle local, pas de la construction du message.
+Cette lecture n'a pas rejoué l'appel réel du validateur sur ce ticket.
+
+Deux défauts réels ont été corrigés : un fichier cité après épuisement du
+budget disparaissait sans trace (il est maintenant listé « non joint »), et le
+journal ne disait pas ce que le validateur avait reçu (ligne `validateur:
+fichiers cités joints : …`).
+
+## Ce que ça ne fait pas
+
+- Ne change pas le modèle du validateur d'un projet : décision de configuration.
+- Ne prouve pas par un test que Claude et le repli reçoivent le même message :
+  ils passent par la même construction, seul Ollama est simulé.
