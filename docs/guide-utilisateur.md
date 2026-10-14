@@ -616,6 +616,9 @@ Si tu as écrit un ticket `feat`, `fix` ou `refactor` sans section `## Critères
 
 Édite le ticket, ajoute ta section `## Critères d'acceptation` avec tes critères, et relance le pipeline sur le même ticket — il reprendra du validateur. Rien n'est perdu, rien ne bloque le ticket suivant.
 
+
+Vérifie le journal du pipeline : tu y trouveras une ligne `validateur: fichiers cités joints : …` qui énumère les fichiers que le validateur a reçus. Si cette ligne mentionne les fichiers qu'évoque ton critère d'acceptation, le validateur les avait en entier. Un refus ne vient donc pas d'un manque de contexte, mais de son interprétation du contenu. Cela arrive surtout avec un modèle local (Ollama) : même avec le texte complet, il peut être strict ou se tromper.
+
 ### Relancer un ticket
 
 Quand tu relances un ticket, sa branche précédente est réutilisée — tu ne perds pas le travail d'avant. Le pipeline la met à jour automatiquement si elle est en retard sur la base du projet, ce qui évite que des changements d'autres tickets n'y causent des conflits imprévus lors de la livraison.
