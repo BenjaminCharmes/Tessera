@@ -2745,3 +2745,4 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 14:06:06 UTC — [ticket-438] validateur: fichiers cités joints : aucun ; absents : python -m app.worker, .venv
 - 2026-10-14 14:06:06 UTC — [ticket-438] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté la détection des servi (87594ms)
 - 2026-10-14 14:06:06 UTC — [ticket-438] APPROVED après 1 tour(s)
+- 2026-10-14 14:10:37 UTC — [ticket-438] documentation: 1 fichier(s) (256686ms)
