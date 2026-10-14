@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
+import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
 import DetailDuRun from "./DetailDuRun";
 import TousLesRuns from "./TousLesRuns";
@@ -24,9 +25,9 @@ interface HistoriqueViewProps extends HistoriqueProps {
 
 type Vue = "detail" | "tous";
 
-const VUES: { cle: Vue; libelle: string }[] = [
-  { cle: "detail", libelle: "Détail du run" },
-  { cle: "tous", libelle: "Tous les runs" },
+const VUES: OptionVue<Vue>[] = [
+  { valeur: "detail", libelle: "Détail du run" },
+  { valeur: "tous", libelle: "Tous les runs" },
 ];
 
 function Message({ children, erreur = false }: { children: string; erreur?: boolean }) {
@@ -70,25 +71,12 @@ export default function HistoriqueView({
     <div className="flex h-full flex-col bg-zinc-900">
       <div className={`${BAND} justify-between border-b border-zinc-700 px-4`}>
         <RegionTitle>Historique</RegionTitle>
-        <div
-          role="group"
-          aria-label="Vue de l'historique"
-          className="flex gap-0.5 rounded-md border border-zinc-800 bg-zinc-900 p-0.5"
-        >
-          {VUES.map(({ cle, libelle }) => (
-            <button
-              key={cle}
-              type="button"
-              aria-pressed={vue === cle}
-              onClick={() => setVue(cle)}
-              className={`rounded-sm px-3 py-1 text-xs ${
-                vue === cle ? "bg-zinc-700 text-zinc-100" : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              {libelle}
-            </button>
-          ))}
-        </div>
+        <ViewSwitcher
+          options={VUES}
+          valeur={vue}
+          onChange={setVue}
+          label="Vue de l'historique"
+        />
       </div>
 
       {error ? (

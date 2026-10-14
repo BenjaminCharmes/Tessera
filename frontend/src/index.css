@@ -5,6 +5,9 @@
   --text-micro--line-height: 0.875rem;
   --text-mini: 0.6875rem;
   --text-mini--line-height: 1rem;
+  /* « corps » de la charte : 13 px, texte courant et boutons (ticket-439). */
+  --text-corps: 0.8125rem;
+  --text-corps--line-height: 1.25rem;
 
   /* Palette des graphiques — ticket-201. Trois teintes qui ne recoupent
      aucune couleur d'état ni le violet d'identité (ADR-047), validées sur
