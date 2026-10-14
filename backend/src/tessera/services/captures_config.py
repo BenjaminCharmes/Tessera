@@ -27,11 +27,25 @@ class Ecran:
 
 
 @dataclass(frozen=True)
+class SessionCaptures:
+    """How to open a session before capturing — never holds the token itself.
+
+    `jeton_env` names the variable to read in `fichier_env` (relative to the
+    project root) ; the value stays server-side (ticket-437).
+    """
+
+    chemin: str
+    jeton_env: str
+    fichier_env: str = ".env"
+
+
+@dataclass(frozen=True)
 class ConfigCaptures:
     """Where the project's app answers and which screens to capture."""
 
     url: str
     ecrans: tuple[Ecran, ...]
+    session: SessionCaptures | None = None
 
 
 def nom_de_fichier(nom: str) -> str:
@@ -50,6 +64,18 @@ def _ecran(brut: object) -> Ecran | None:
     return Ecran(nom=nom, chemin=chemin, clic=clic if isinstance(clic, str) else "")
 
 
+def _session(brut: dict[str, object]) -> SessionCaptures | None:
+    chemin, jeton_env = brut.get("chemin"), brut.get("jeton_env")
+    fichier_env = brut.get("fichier_env", ".env")
+    if not isinstance(chemin, str) or not chemin.startswith("/"):
+        return None
+    if not isinstance(jeton_env, str) or not jeton_env.strip():
+        return None
+    if not isinstance(fichier_env, str) or not fichier_env.strip():
+        return None
+    return SessionCaptures(chemin, jeton_env.strip(), fichier_env.strip())
+
+
 def _config(brut: object) -> ConfigCaptures | None:
     if not isinstance(brut, dict):
         return None
@@ -61,7 +87,15 @@ def _config(brut: object) -> ConfigCaptures | None:
     valides = tuple(e for e in map(_ecran, ecrans) if e is not None)
     if not valides:
         return None
-    return ConfigCaptures(url=url.rstrip("/"), ecrans=valides)
+    session = None
+    if "session" in brut:
+        # Une `session` déclarée mais illisible n'est pas ignorée : on
+        # capturerait l'écran de connexion en croyant voir l'app.
+        brut_session = brut["session"]
+        session = _session(brut_session) if isinstance(brut_session, dict) else None
+        if session is None:
+            return None
+    return ConfigCaptures(url=url.rstrip("/"), ecrans=valides, session=session)
 
 
 def load_captures_config(project_path: Path) -> ConfigCaptures | None:

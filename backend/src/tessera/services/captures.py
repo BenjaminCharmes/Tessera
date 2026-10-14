@@ -30,7 +30,7 @@ _DELAI_EXECUTEUR_S = 300.0
 #: Forme d'un nom de capture : `<nom>-<largeur>-<thème>.png`.
 MOTIF_FICHIER = re.compile(r"^[a-z0-9-]+-(390|1440)-(clair|sombre)\.png$")
 
-Executeur = Callable[[ConfigCaptures, Path], Awaitable[None]]
+Executeur = Callable[[ConfigCaptures, Path, str | None], Awaitable[None]]
 
 
 class CapturesEchouees(Exception):
@@ -68,9 +68,25 @@ async def app_repond(url: str) -> bool:
     return True
 
 
+def _charge(config: ConfigCaptures, jeton: str | None) -> bytes:
+    """Build the JSON sent on stdin ; the token travels only here."""
+    charge: dict[str, object] = {
+        "url": config.url,
+        "largeurs": list(LARGEURS),
+        "themes": list(THEMES),
+        "ecrans": [
+            {"nom": e.nom, "chemin": e.chemin, "clic": e.clic} for e in config.ecrans
+        ],
+    }
+    if config.session is not None and jeton:
+        charge["session"] = {"chemin": config.session.chemin, "jeton": jeton}
+    return json.dumps(charge).encode("utf-8")
+
+
 async def _lancer_le_script(
-    commande: list[str], config: ConfigCaptures, sortie: Path
+    commande: list[str], config: ConfigCaptures, sortie: Path, jeton: str | None
 ) -> tuple[int, str]:
+    # Le jeton n'est jamais dans les arguments : `ps` les montre à tout le monde.
     processus = await asyncio.create_subprocess_exec(
         *commande,
         str(sortie),
@@ -78,26 +94,20 @@ async def _lancer_le_script(
         stdout=asyncio.subprocess.DEVNULL,
         stderr=asyncio.subprocess.PIPE,
     )
-    charge = json.dumps(
-        {
-            "url": config.url,
-            "largeurs": list(LARGEURS),
-            "themes": list(THEMES),
-            "ecrans": [
-                {"nom": e.nom, "chemin": e.chemin, "clic": e.clic}
-                for e in config.ecrans
-            ],
-        }
-    ).encode("utf-8")
-    _, erreurs = await processus.communicate(charge)
-    return processus.returncode or 0, erreurs.decode("utf-8", "replace").strip()
+    _, erreurs = await processus.communicate(_charge(config, jeton))
+    texte = erreurs.decode("utf-8", "replace").strip()
+    if jeton:
+        texte = texte.replace(jeton, "***")
+    return processus.returncode or 0, texte
 
 
-async def executeur_playwright(config: ConfigCaptures, sortie: Path) -> None:
+async def executeur_playwright(
+    config: ConfigCaptures, sortie: Path, jeton: str | None = None
+) -> None:
     """Run `scripts/captures.mjs` without a shell, config given on stdin."""
     for commande in essais_de_commande(["node", str(_SCRIPT)]):
         try:
-            code, erreurs = await _lancer_le_script(commande, config, sortie)
+            code, erreurs = await _lancer_le_script(commande, config, sortie, jeton)
         except FileNotFoundError:
             continue
         if code != 0:
@@ -110,8 +120,12 @@ async def capturer(
     project_id: str,
     config: ConfigCaptures,
     executeur: Executeur | None = None,
+    jeton: str | None = None,
 ) -> list[str]:
-    """Capture every declared screen and return the image names, in order."""
+    """Capture every declared screen and return the image names, in order.
+
+    `jeton` is handed to the executor only ; it is never logged or returned.
+    """
     sortie = dossier_des_captures(project_id)
     sortie.mkdir(parents=True, exist_ok=True)
     attendus = noms_attendus(config)
@@ -120,7 +134,7 @@ async def capturer(
         (sortie / nom).unlink(missing_ok=True)
     try:
         lancer = executeur or executeur_playwright
-        await asyncio.wait_for(lancer(config, sortie), _DELAI_EXECUTEUR_S)
+        await asyncio.wait_for(lancer(config, sortie, jeton), _DELAI_EXECUTEUR_S)
     except asyncio.TimeoutError as exc:
         raise CapturesEchouees(
             f"Les captures n'ont pas fini en {int(_DELAI_EXECUTEUR_S)} s."
