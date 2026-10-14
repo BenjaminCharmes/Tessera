@@ -56,7 +56,11 @@ Causes :
       du projet, sans port, apparaît dans l'inventaire comme app `externe`
       du service `worker`
 - [ ] Un test vérifie qu'un processus de même commande mais hors du dossier
-      du projet n'est pas attribué
+      du projet n'est pas attribué : `python -m app.worker` existe dans
+      vigie **et** dans affut (le 2026-10-14, la « veille » d'affût a été
+      prise pour un worker de vigie) — l'appartenance se juge au dossier du
+      projet (répertoire de travail ou exécutable de son `.venv`), jamais au
+      nom du module
 - [ ] Un test vérifie qu'« Arrêter le projet » (arrêt de toutes les apps du
       groupe) inclut le service sans port
 - [ ] Un test vérifie que `services/start` ne lance pas un service déclaré
