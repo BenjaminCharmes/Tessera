@@ -5,7 +5,7 @@ depends_on:
 - ticket-425
 estimated_days: 1
 id: ticket-427
-pr_number: null
+pr_number: 424
 priority: high
 status: done
 title: The History tab shows the selected run in the centre, or a filterable table
