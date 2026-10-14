@@ -250,6 +250,39 @@ Pour arrêter une app, clique sur **Arrêter** à côté. L'IDE ferme le process
 
 Une app **externe** est une application que tu as démarrée en dehors de l'IDE — par exemple une API, un serveur, ou une interface web — qui écoute un port connu d'un projet. L'IDE la détecte automatiquement et te permet de l'arrêter directement depuis la vue Projets. C'est utile quand tu as oublié une app en train de tourner — tu vois sa consommation mémoire et tu peux la fermer en un clic.
 
+### Capturer les écrans d'un projet
+
+Pour comparer une app à sa maquette (`design/maquette/`), Tessera prend en un geste quatre captures de chaque écran : téléphone (390 px) et ordinateur (1440 px), thème clair et thème sombre.
+
+Déclare d'abord les écrans dans l'`agents.json` du projet, dans une section `captures` :
+
+```json
+"captures": {
+  "url": "http://localhost:5196",
+  "ecrans": [
+    { "nom": "accueil", "chemin": "/" },
+    { "nom": "quiz", "chemin": "/#jouer", "clic": "Jouer" }
+  ]
+}
+```
+
+- `url` : l'adresse où l'app du projet répond (`http://` ou `https://`).
+- `ecrans` : la liste des écrans. `nom` sert de nom de fichier (lettres minuscules, chiffres et tirets ; le reste est remplacé par un tiret) et `chemin` commence par `/`.
+- `clic` (facultatif) : le texte exact d'un bouton ou d'un onglet à cliquer avant la capture, pour atteindre un écran qui n'a pas d'adresse propre.
+
+Lance ensuite l'app du projet, puis demande les captures avec `POST /api/v1/projects/{id}/captures`. La réponse liste les images, nommées `<nom>-<largeur>-<thème>.png` — par exemple `accueil-390-sombre.png`. Chacune se récupère avec `GET /api/v1/projects/{id}/captures/{fichier}`.
+
+Les images sont rangées dans le dossier d'état de l'IDE, sous `captures/<projet>/`, **hors du dépôt du projet** : elles ne finissent dans aucun commit. Chaque demande remplace celles du tour précédent.
+
+Tessera répond **409** dans deux cas :
+
+- le projet ne déclare pas de section `captures` (ou elle ne contient aucun écran valide) ;
+- l'app ne répond pas à l'`url` déclarée — lance-la d'abord.
+
+Si le navigateur échoue en cours de route, la réponse est **502** et porte le message du script. La prise de vue utilise le Playwright du frontend de Tessera : `node` doit être dans le PATH, et le navigateur installé (`npx playwright install chromium` dans `frontend/`).
+
+Tessera ne compare pas les captures à la maquette : tu les regardes côte à côte.
+
 ### Lancer une file depuis la carte d'un projet
 
 Tu vois un bouton **« File (N) »** sur une carte si le projet a au moins un ticket « à faire ». Clique dessus pour envoyer tous les tickets du projet dans le pipeline.
