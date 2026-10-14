@@ -192,3 +192,17 @@ describe("AgentList — suppression", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 });
+
+describe("AgentList — composants communs (ticket-442)", () => {
+  it("writes a role name in the normal font, not in monospace", () => {
+    mockUseAgents.mockReturnValue({
+      agents: [AGENT_BUILTIN],
+      loading: false,
+      error: null,
+      refresh: vi.fn(),
+    });
+    render(<AgentList onAgentCreated={vi.fn()} />);
+
+    expect(screen.getByText("codeur").className).not.toContain("font-mono");
+  });
+});

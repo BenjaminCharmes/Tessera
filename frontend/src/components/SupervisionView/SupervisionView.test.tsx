@@ -8,6 +8,7 @@ import type { StreamState } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { OrchestratorEvent, Project, RunActif } from "../../types/api";
 import { runStore } from "../../hooks/runStore";
+import { boutonsPleins } from "../../test/boutons";
 
 vi.mock("../../lib/api", () => ({
   api: {
@@ -773,5 +774,47 @@ describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
     // run-2 (en cours) reste : le panneau Agents est toujours affiché.
     expect(screen.getByLabelText("Run ticket-002 sur portfolio")).toBeInTheDocument();
     expect(screen.getByText("Agents")).toBeInTheDocument();
+  });
+});
+
+describe("SupervisionView — composants communs (ticket-442)", () => {
+  const DEUX_EN_ATTENTE = () =>
+    supervision(
+      {
+        runs: [
+          run({ run_id: "run-1", ticket_id: "ticket-001" }),
+          run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-009" }),
+        ],
+        selection: "run-1",
+      },
+      {
+        "run-1": { pendingQuestion: "Première ?", status: "running" },
+        "run-2": { pendingQuestion: "Seconde ?", status: "running" },
+      },
+    );
+
+  it("has a single plein button even when two runs wait for an answer", () => {
+    render(<SupervisionView supervision={DEUX_EN_ATTENTE()} projects={PROJETS} />);
+
+    expect(screen.getAllByRole("button", { name: /Répondre/i }).length).toBeGreaterThanOrEqual(2);
+    expect(boutonsPleins()).toHaveLength(1);
+  });
+
+  it("draws the status of a run with the shared StatusPill", () => {
+    render(<SupervisionView supervision={DEUX_EN_ATTENTE()} projects={PROJETS} />);
+
+    const attente = screen.getAllByText("attend une réponse");
+    expect(attente[0]).toHaveAttribute("data-etat", "attention");
+  });
+
+  it("draws a failed run as an echec pill", () => {
+    render(
+      <SupervisionView
+        supervision={supervision({ runs: [run()] }, { "run-1": { status: "error" } })}
+        projects={PROJETS}
+      />,
+    );
+
+    expect(screen.getByText("bloqué")).toHaveAttribute("data-etat", "echec");
   });
 });

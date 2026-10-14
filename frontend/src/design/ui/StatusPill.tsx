@@ -10,6 +10,8 @@ interface StatusPillProps {
   etat: EtatPastille;
   /** Obligatoire : l'état se lit au mot, jamais à la couleur seule. */
   libelle: string;
+  /** Infobulle : la cause d'un état, quand on la connaît. */
+  titre?: string;
 }
 
 const CLASSES: Record<EtatPastille, string> = {
@@ -20,10 +22,11 @@ const CLASSES: Record<EtatPastille, string> = {
   neutre: "bg-zinc-500/12 text-zinc-300",
 };
 
-export default function StatusPill({ etat, libelle }: StatusPillProps) {
+export default function StatusPill({ etat, libelle, titre }: StatusPillProps) {
   return (
     <span
       data-etat={etat}
+      title={titre}
       className={`inline-flex items-center rounded px-2 py-0.5 text-mini font-medium ${CLASSES[etat]}`}
     >
       {libelle}

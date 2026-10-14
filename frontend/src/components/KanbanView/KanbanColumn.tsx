@@ -2,6 +2,7 @@ import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import { useState } from "react";
 import TicketCard from "../Sidebar/TicketCard";
+import Button from "../../design/ui/Button";
 import { MIME_TICKET, transitionPermise } from "../../lib/transitionsManuelles";
 import type { PRStatus, Ticket, TicketStatus } from "../../types/api";
 
@@ -138,12 +139,11 @@ export default function KanbanColumn({
               />
             ))}
             {hiddenCount > 0 && (
-              <button
-                onClick={() => setShowAll(true)}
-                className="w-full px-3 py-2 text-xs text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors"
-              >
-                Afficher les {hiddenCount} autres
-              </button>
+              <div className="px-3 py-2">
+                <Button variante="discret" taille="compact" onClick={() => setShowAll(true)}>
+                  Afficher les {hiddenCount} autres
+                </Button>
+              </div>
             )}
           </>
         )}

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import KanbanView from "./index";
 import type { Ticket, TicketStatus, TicketUnreadable } from "../../types/api";
+import { boutonsPleins, pastilles } from "../../test/boutons";
 import { FILTRES_VIDES, type FiltresTickets } from "../../lib/filtresTickets";
 
 const EMPTY_BY_STATUS: Record<TicketStatus, never[]> = {
@@ -236,5 +237,41 @@ describe("KanbanView — tickets illisibles (ticket-210)", () => {
     );
     expect(screen.getByText("2 fichiers illisibles")).toBeTruthy();
     expect(screen.getAllByTestId("kanban-unreadable-item")).toHaveLength(2);
+  });
+});
+
+describe("KanbanView — composants communs (ticket-442)", () => {
+  it("draws the ticket status with the shared StatusPill", () => {
+    render(
+      <KanbanView
+        byStatus={{ ...EMPTY_BY_STATUS, todo: [TODO_TICKET] }}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+      />,
+    );
+    const libelles = pastilles().map((p) => p.textContent);
+    expect(libelles).toContain("todo");
+    expect(libelles).toContain("high");
+  });
+
+  it("has at most one plein button, the queue launch", () => {
+    render(
+      <KanbanView
+        byStatus={{ ...EMPTY_BY_STATUS, todo: [TODO_TICKET] }}
+        activeTicket={null}
+        running={new Set()}
+        onSelectTicket={vi.fn()}
+        onRunPipeline={vi.fn()}
+        onToggleQueue={vi.fn()}
+        onRunQueue={vi.fn()}
+        onClearQueue={vi.fn()}
+        selection={["ticket-001"]}
+      />,
+    );
+    const pleins = boutonsPleins();
+    expect(pleins).toHaveLength(1);
+    expect(pleins[0]).toHaveTextContent("Lancer la file");
   });
 });

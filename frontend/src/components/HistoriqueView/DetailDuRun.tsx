@@ -2,7 +2,6 @@ import RunHistorique from "../StatsView/RunHistorique";
 import StatusPill from "../../design/ui/StatusPill";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
 import {
-  classeDuVerdict,
   etatDuRun,
   formatCout,
   formatDate,
@@ -10,6 +9,7 @@ import {
   libelleDeLEtat,
   libelleDesTours,
   lienPr,
+  pastilleDuRun,
 } from "./runs";
 
 interface DetailDuRunProps {
@@ -63,16 +63,10 @@ export default function DetailDuRun({ run, ticket, project }: DetailDuRunProps) 
           </h1>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
-          {etat === "interrompu" ? (
-            <StatusPill etat="neutre" libelle={libelleDeLEtat(etat)} />
-          ) : (
-            <span
-              className={`rounded-sm bg-zinc-800 px-2 py-0.5 text-xs ${classeDuVerdict(run)}`}
-            >
-              {libelleDeLEtat(etat)}
-              {run.rounds !== null && ` · ${libelleDesTours(run.rounds)}`}
-            </span>
-          )}
+          <StatusPill
+            etat={pastilleDuRun(run)}
+            libelle={`${libelleDeLEtat(etat)}${etat !== "interrompu" && run.rounds !== null ? ` · ${libelleDesTours(run.rounds)}` : ""}`}
+          />
           {ticket && <LienDeLaPr ticket={ticket} project={project} />}
         </div>
       </header>

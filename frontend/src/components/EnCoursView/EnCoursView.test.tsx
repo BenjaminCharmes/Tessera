@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
 import { api } from "../../lib/api";
 import type { UseAppsEnCoursResult } from "../../hooks/useAppsEnCours";
+import { boutonsPleins } from "../../test/boutons";
 import type { AppEnCours } from "../../types/api";
 
 function app(over: Partial<AppEnCours>): AppEnCours {
@@ -150,5 +151,27 @@ describe("EnCoursView", () => {
     rendre(TROIS, { erreur: "Arrêt impossible" });
     expect(screen.getByRole("alert")).toHaveTextContent("Arrêt impossible");
     expect(screen.getByText("front")).toBeInTheDocument();
+  });
+});
+
+describe("EnCoursView — composants communs (ticket-442)", () => {
+  it("draws Arrêter as a Button in the arret variant", () => {
+    rendre(TROIS);
+    const ligne = screen.getByText("front").closest("li") as HTMLElement;
+    const bouton = within(ligne).getByRole("button", { name: /Arrêter/ });
+
+    expect(bouton.className).toMatch(/border-red-/);
+    expect(bouton.className).not.toMatch(/(^|\s)bg-red-/);
+  });
+
+  it("draws the origin of an app with the shared StatusPill", () => {
+    rendre(TROIS);
+    expect(screen.getByText("Lancé à la main")).toHaveAttribute("data-etat", "attention");
+    expect(screen.getAllByText("Tessera")[0]).toHaveAttribute("data-etat", "en-cours");
+  });
+
+  it("has at most one plein button", () => {
+    rendre(TROIS);
+    expect(boutonsPleins().length).toBeLessThanOrEqual(1);
   });
 });

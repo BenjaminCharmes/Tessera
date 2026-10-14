@@ -4,6 +4,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import HistoriqueView from ".";
 import RunHistory from "../Sidebar/RunHistory";
+import { boutonsPleins } from "../../test/boutons";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
 
 // Le fil rejoué appelle l'API : une doublure suffit, on ne teste que le cadre.
@@ -194,5 +195,25 @@ describe("HistoriqueView", () => {
     await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
     await userEvent.click(colonne().getByText("ticket-12"));
     expect(centre().getByRole("heading", { name: "Titre douze" })).toBeInTheDocument();
+  });
+});
+
+describe("HistoriqueView — composants communs (ticket-442)", () => {
+  it("draws the verdict of the detail with the shared StatusPill", () => {
+    render(<Cockpit initial="r-deux-tours" />);
+    const verdict = centre().getByText("Approuvé · 2 tours");
+    expect(verdict).toHaveAttribute("data-etat", "attention");
+  });
+
+  it("draws each verdict of the table with the shared StatusPill", async () => {
+    render(<Cockpit />);
+    await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
+    expect(centre().getByText("Bloqué")).toHaveAttribute("data-etat", "echec");
+    expect(centre().getAllByText("Approuvé")[0]).toHaveAttribute("data-etat", "reussi");
+  });
+
+  it("has at most one plein button", () => {
+    render(<Cockpit />);
+    expect(boutonsPleins().length).toBeLessThanOrEqual(1);
   });
 });

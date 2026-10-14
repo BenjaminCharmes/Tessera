@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
 import RunCard from "./RunCard";
+import StatusPill from "../../design/ui/StatusPill";
 import ServicesLances from "./ServicesLances";
 import AgentPanel from "../AgentPanel";
 import RunHistorique from "../StatsView/RunHistorique";
@@ -93,6 +94,11 @@ export default function SupervisionView({
     return aAttend ? -1 : 1;
   });
 
+  // Un seul « Répondre » plein dans la vue : celui du premier run en attente.
+  const premierEnAttente = runsTries.find(
+    (r) => etatDe(r.run_id).pendingQuestion !== null,
+  );
+
   // `selectionne` = run affiché dans le panneau de détail.
   const selectionne = prelim;
 
@@ -125,9 +131,10 @@ export default function SupervisionView({
               onFermer={fermerLot}
             />
           )}
-          <span className="text-micro text-zinc-500">
-            {supervision.connecte ? etiquette(runs.length) : "hors ligne"}
-          </span>
+          <StatusPill
+            etat={!supervision.connecte ? "attention" : runs.length > 0 ? "en-cours" : "neutre"}
+            libelle={supervision.connecte ? etiquette(runs.length) : "hors ligne"}
+          />
         </div>
       </div>
 
@@ -159,6 +166,7 @@ export default function SupervisionView({
                     selectionner(run.run_id);
                   }}
                   plafondUsd={limites?.run_max_budget_usd ?? null}
+                  reponsePrincipale={run.run_id === premierEnAttente?.run_id}
                   onRepondre={
                     etat.pendingQuestion !== null
                       ? () => repondre(run.run_id)

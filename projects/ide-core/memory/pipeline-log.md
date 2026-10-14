@@ -2808,3 +2808,17 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 17:01:58 UTC — [ticket-443] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests vérifient le comportem (159500ms)
 - 2026-10-14 17:01:58 UTC — [ticket-443] APPROVED après 1 tour(s)
 - 2026-10-14 17:03:19 UTC — [ticket-443] documentation: 1 fichier(s) (75625ms)
+- 2026-10-14 17:03:51 UTC — [ide-core] ticket-443 PR #447 confiée au CIWatcher
+- 2026-10-14 17:03:55 UTC — [ticket-442] branche ticket-442-kanban-history-supervision-and-running-use-the-sh
+- 2026-10-14 17:03:55 UTC — [ticket-442] tour 1 — codeur démarré
+- 2026-10-14 17:08:22 UTC — [ticket-442] tour 1 — codeur terminé (267063ms)
+- 2026-10-14 17:15:01 UTC — [ticket-442] testeur: OK (exit 0)
+- 2026-10-14 17:15:28 UTC — [ticket-442] securite: PASS — Audit de sécurité — aucune vulnérabilité détectée.
+
+Ce diff refactorise l'UI pou (27266ms)
+- 2026-10-14 17:15:28 UTC — [ticket-442] tour 1 — reviewer démarré
+- 2026-10-14 17:15:54 UTC — [ticket-442] tour 1 — reviewer terminé (25750ms)
+- 2026-10-14 17:16:02 UTC — [ticket-442] validateur: APPROVED — Le diff migrе complètement les quatre vues vers les composants partagés : `Statu (33421ms)
+- 2026-10-14 17:16:02 UTC — [ticket-442] APPROVED après 1 tour(s)
+- 2026-10-14 17:17:31 UTC — [ticket-442] documentation: 0 fichier(s) (86656ms)
+- 2026-10-14 17:18:18 UTC — [ticket-442] livraison: arrêt — Conflit avec develop sur : frontend/src/components/HistoriqueView/DetailDuRun.tsx, frontend/src/comp

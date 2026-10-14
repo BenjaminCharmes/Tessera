@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-14
+depends_on:
+- ticket-439
+estimated_days: 1
 id: ticket-442
-title: "Kanban, History, Supervision and Running use the shared status pill and buttons, and monospace is kept for copyable identifiers"
-type: refactor
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-439"]
-estimated_days: 1
-created: 2026-10-14
+status: done
+title: Kanban, History, Supervision and Running use the shared status pill and buttons,
+  and monospace is kept for copyable identifiers
+type: refactor
 ---
 
 # ticket-442 — Les écrans passent aux composants communs

@@ -1,4 +1,6 @@
 import Chrono from "./Chrono";
+import Button from "../../design/ui/Button";
+import StatusPill from "../../design/ui/StatusPill";
 import CompteARebours from "../AgentPanel/CompteARebours";
 import { CLASSES_DE_BUDGET, couleurDuBudget, resumeDuCout } from "../../lib/budget";
 import type { StreamState } from "../../hooks/streamState";
@@ -25,6 +27,11 @@ interface RunCardProps {
    */
   onRepondre?: () => void;
   /**
+   * « Répondre » est l'action principale de la vue (bouton plein) : une seule
+   * carte à la fois, sinon la vue aurait plusieurs boutons pleins (ticket-442).
+   */
+  reponsePrincipale?: boolean;
+  /**
    * Ouvre la vue en lecture seule du run terminé (ticket-327).
    * Présent uniquement si le run est clos et que `run.db_run_id` est renseigné.
    */
@@ -45,6 +52,7 @@ export default function RunCard({
   onSelect,
   plafondUsd = null,
   onRepondre,
+  reponsePrincipale = false,
   onRevoir,
 }: RunCardProps) {
   const attend = etat.pendingQuestion !== null;
@@ -163,37 +171,33 @@ export default function RunCard({
           </span>
         ) : null}
 
-        {/* Bouton d'action principale pour répondre directement depuis la carte
-            (ticket-266). Fond violet = action principale (ADR-026). */}
+        {/* Répondre directement depuis la carte (ticket-266). Plein quand c'est
+            l'action principale de la vue, bordé pour les autres cartes. */}
         {attend && onRepondre ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRepondre();
-            }}
-            className="mt-2 block w-full rounded-sm bg-violet-600 px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-violet-500"
-          >
-            Répondre
-          </button>
+          <span className="mt-2 flex">
+            <Button
+              variante={reponsePrincipale ? "plein" : "borde"}
+              taille="compact"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRepondre();
+              }}
+            >
+              Répondre
+            </Button>
+          </span>
         ) : null}
 
         <span className="mt-2 flex flex-wrap items-center gap-1.5">
           {echoue ? (
-            <Etiquette classe="bg-red-500/20 text-red-200">bloqué</Etiquette>
+            <StatusPill etat="echec" libelle="bloqué" />
           ) : attend ? (
-            <Etiquette classe="bg-amber-500/20 text-amber-200">
-              attend une réponse
-            </Etiquette>
+            <StatusPill etat="attention" libelle="attend une réponse" />
           ) : (
-            <Etiquette classe="bg-blue-500/20 text-blue-200">
-              {etat.currentAgent ?? "en cours"}
-            </Etiquette>
+            <StatusPill etat="en-cours" libelle={etat.currentAgent ?? "en cours"} />
           )}
           {etat.currentRound > 0 && !estUnChat ? (
-            <Etiquette classe="bg-zinc-800 text-zinc-400">
-              tour {etat.currentRound}
-            </Etiquette>
+            <StatusPill etat="neutre" libelle={`tour ${etat.currentRound}`} />
           ) : null}
           {run.cout_usd > 0 || (run.outils ?? 0) > 0 ? (
             <Etiquette classe={CLASSES_DE_BUDGET[couleurDuBudget(run.cout_usd, plafondUsd)]}>
@@ -208,17 +212,17 @@ export default function RunCard({
         {etat.livraisonPrNumber !== null ? (
           <span className="mt-1.5 block">
             {etat.ciMerge === null ? (
-              <Etiquette classe="bg-amber-500/20 text-amber-200">
-                PR #{etat.livraisonPrNumber} — en attente de CI
-              </Etiquette>
+              <StatusPill
+                etat="attention"
+                libelle={`PR #${etat.livraisonPrNumber} — en attente de CI`}
+              />
             ) : etat.ciMerge.merged ? (
-              <Etiquette classe="bg-green-500/20 text-green-200">
-                PR #{etat.livraisonPrNumber} mergée
-              </Etiquette>
+              <StatusPill etat="reussi" libelle={`PR #${etat.livraisonPrNumber} mergée`} />
             ) : (
-              <Etiquette classe="bg-red-500/20 text-red-200">
-                {etat.ciMerge.arret ?? `PR #${etat.livraisonPrNumber} bloquée`}
-              </Etiquette>
+              <StatusPill
+                etat="echec"
+                libelle={etat.ciMerge.arret ?? `PR #${etat.livraisonPrNumber} bloquée`}
+              />
             )}
           </span>
         ) : null}
@@ -226,16 +230,17 @@ export default function RunCard({
         {/* Bouton d'accès à la vue en lecture seule — ticket-327.
             Visible uniquement quand le run est clos et que son id en base est connu. */}
         {etat.runClosed && run.db_run_id && onRevoir ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRevoir();
-            }}
-            className="mt-2 block w-full rounded-sm bg-zinc-700 px-2 py-1 text-xs text-zinc-100 transition-colors hover:bg-zinc-600"
-          >
-            Revoir le run
-          </button>
+          <span className="mt-2 flex">
+            <Button
+              taille="compact"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRevoir();
+              }}
+            >
+              Revoir le run
+            </Button>
+          </span>
         ) : null}
       </span>
     </div>

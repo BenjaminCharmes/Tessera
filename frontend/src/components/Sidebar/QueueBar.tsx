@@ -1,3 +1,5 @@
+import Button from "../../design/ui/Button";
+
 /**
  * La file de tickets sélectionnés (ticket-074).
  *
@@ -35,21 +37,12 @@ export default function QueueBar({
         {selection.join(", ")}
       </p>
       <div className="flex items-center gap-1.5">
-        <button
-          type="button"
-          onClick={onRun}
-          disabled={enCours}
-          className="rounded-sm border border-violet-500/50 bg-violet-500/15 px-2 py-1 text-mini text-zinc-100 transition-colors hover:border-violet-400 disabled:opacity-50"
-        >
+        <Button variante="plein" taille="compact" onClick={onRun} disabled={enCours}>
           Lancer la file
-        </button>
-        <button
-          type="button"
-          onClick={onClear}
-          className="rounded-sm px-2 py-1 text-mini text-zinc-500 transition-colors hover:text-zinc-300"
-        >
+        </Button>
+        <Button variante="discret" taille="compact" onClick={onClear}>
           Vider
-        </button>
+        </Button>
       </div>
       <p className="mt-1.5 text-micro text-zinc-600">
         Un ticket non approuvé arrête la file.
