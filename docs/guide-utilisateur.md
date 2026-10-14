@@ -406,6 +406,9 @@ Pour chaque app, vous voyez :
 - **Mémoire** : consommation en Mo
 - **Bouton Arrêter**
 
+
+**Les services sans port** — Chaque service écoute normalement un port réseau, affiché sous forme de lien (« 8000 », « 5173 »). Un service sans serveur réseau — par exemple `python -m app.worker` lancé sans option `--port` — n'a rien à écouter : tu vois « — » à la place du lien.
+
 ### Arrêter une app
 
 Un clic sur « Arrêter » :
@@ -433,6 +436,9 @@ Le bouton « Arrêter » par app seul lance l'arrêt sans confirmation — il ar
 
 Après arrêt complet, le projet disparaît de l'inventaire.
 
+
+« Arrêter le projet » arrête tous les services du projet, y compris ceux sans port. L'IDE les repère grâce à leur répertoire de travail : un `python -m app.worker` lancé dans un dossier concurrent ne sera pas arrêté.
+
 ### Feedback pendant l'arrêt
 
 Dès que tu cliques, la ligne passe en « Arrêt… » avec un spinner. Les boutons se désactivent pour t'empêcher de lancer deux arrêts en même temps. Tessera cherche plus souvent si le projet a disparu, pour que tu voies la fin au plus tôt.
@@ -447,6 +453,9 @@ Cliquer sur ce bouton montre « Lancement… » en attente (jusqu'à 30 s). Une 
 
 La section est repliée par défaut si le groupe compte plus de 5 projets — tu peux la déplier.
 
+
+
+« Lancer » ne redémarre pas un service déjà en cours. Si le service s'était relancé avant le clic ou si l'arrêt était incomplet, « Lancer » détecte son processus et le laisse tourner.
 
 ### Applications externes et attribution au projet
 

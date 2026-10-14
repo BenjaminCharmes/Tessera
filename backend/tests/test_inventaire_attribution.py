@@ -48,7 +48,10 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         json.dumps(
             {
                 "project_id": "mon-projet",
-                "services": [{"nom": "api", "commande": "uvicorn x:app --port 8026"}],
+                "services": [
+                    {"nom": "api", "commande": "uvicorn x:app --port 8026"},
+                    {"nom": "worker", "commande": "python -m app.worker"},
+                ],
             }
         ),
         encoding="utf-8",
@@ -172,6 +175,58 @@ def test_project_running_the_ide_has_no_external_app(
 
     assert _lister(client) == []
     assert client.get("/api/v1/services/running/avertissements").json() == []
+
+
+def _worker(dossier: Path) -> str:
+    """La commande d'un worker lancé avec l'interpréteur du `.venv` de `dossier`."""
+    return f'"{dossier / ".venv" / "Scripts" / "python.exe"}" -m app.worker'
+
+
+def test_portless_worker_of_the_project_is_an_external_app(
+    client: TestClient, workspace: Path
+) -> None:
+    commande = _worker(workspace / "mon-projet")
+    _sonde(FausseSonde(procs={555: _proc(1, commande)}))
+
+    apps = _lister(client)
+
+    assert [(a["origine"], a["nom"], a["pid"], a["ports"]) for a in apps] == [
+        ("externe", "worker", 555, [])
+    ]
+
+
+def test_same_command_outside_the_project_is_not_attributed(
+    client: TestClient, workspace: Path
+) -> None:
+    # Le même `python -m app.worker` tourne pour un autre projet : le nom du
+    # module ne prouve rien, seul le dossier compte.
+    commande = _worker(workspace.parent / "autre-projet")
+    _sonde(FausseSonde(procs={555: _proc(1, commande)}))
+
+    assert _lister(client) == []
+
+
+def test_portless_worker_and_its_child_are_one_app(
+    client: TestClient, workspace: Path
+) -> None:
+    commande = _worker(workspace / "mon-projet")
+    _sonde(FausseSonde(procs={555: _proc(1, commande), 556: _proc(555, commande)}))
+
+    assert [a["pid"] for a in _lister(client)] == [555]
+
+
+def test_child_of_a_port_app_is_not_counted_as_a_worker(
+    client: TestClient, workspace: Path
+) -> None:
+    api = f'python "{workspace / "mon-projet" / "api.py"}"'
+    enfant = _worker(workspace / "mon-projet")
+    _sonde(
+        FausseSonde(
+            ports={8026: 10}, procs={10: _proc(1, api), 11: _proc(10, enfant)}
+        )
+    )
+
+    assert [(a["nom"], a["pid"]) for a in _lister(client)] == [("api", 10)]
 
 
 def test_sibling_folder_with_the_same_prefix_is_not_the_project(

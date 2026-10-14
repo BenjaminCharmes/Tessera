@@ -2733,3 +2733,16 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 12:18:58 UTC — [ticket-432] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff contient un système com (29500ms)
 - 2026-10-14 12:18:58 UTC — [ticket-432] APPROVED après 1 tour(s)
 - 2026-10-14 12:22:25 UTC — [ticket-432] documentation: 0 fichier(s) (204562ms)
+- 2026-10-14 12:22:46 UTC — [ide-core] ticket-432 PR #436 confiée au CIWatcher
+- 2026-10-14 13:48:48 UTC — [ticket-438] branche ticket-438-the-running-view-also-finds-a-project-s-declared
+- 2026-10-14 13:49:48 UTC — [ticket-438] plan rendu (59469ms)
+- 2026-10-14 13:49:48 UTC — [ticket-438] tour 1 — codeur démarré
+- 2026-10-14 13:54:24 UTC — [ticket-438] tour 1 — codeur terminé (276125ms)
+- 2026-10-14 14:02:57 UTC — [ticket-438] testeur: OK (exit 0)
+- 2026-10-14 14:04:38 UTC — [ticket-438] securite: PASS — Le diff introduit une nouvelle fonctionnalité de détection des services déclarés (101484ms)
+- 2026-10-14 14:04:38 UTC — [ticket-438] tour 1 — reviewer démarré
+- 2026-10-14 14:05:07 UTC — [ticket-438] tour 1 — reviewer terminé (29203ms)
+- 2026-10-14 14:06:06 UTC — [ticket-438] validateur: fichiers cités joints : aucun ; absents : python -m app.worker, .venv
+- 2026-10-14 14:06:06 UTC — [ticket-438] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté la détection des servi (87594ms)
+- 2026-10-14 14:06:06 UTC — [ticket-438] APPROVED après 1 tour(s)
+- 2026-10-14 14:10:37 UTC — [ticket-438] documentation: 1 fichier(s) (256686ms)

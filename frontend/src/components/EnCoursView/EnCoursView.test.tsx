@@ -85,6 +85,14 @@ describe("EnCoursView", () => {
     );
   });
 
+  it("shows a dash instead of a link for an app without a port", () => {
+    rendre([app({ pid: 5, nom: "worker", origine: "externe", ports: [] })]);
+    const ligne = screen.getByText("worker").closest("li") as HTMLElement;
+
+    expect(within(ligne).getByText("—")).toBeInTheDocument();
+    expect(within(ligne).queryByRole("link")).not.toBeInTheDocument();
+  });
+
   it("shows the sum of the apps as total memory", () => {
     rendre(TROIS);
     expect(screen.getByText(/Mémoire totale : 630,5 Mo/)).toBeInTheDocument();

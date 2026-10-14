@@ -1,15 +1,16 @@
 ---
-id: ticket-438
-title: "The Running view also finds a project's declared services that listen on no port, and Launch refuses when the project already runs"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 1
-created: 2026-10-14
+id: ticket-438
 plan: true
+pr_number: 440
+priority: high
+status: done
+title: The Running view also finds a project's declared services that listen on no
+  port, and Launch refuses when the project already runs
+type: fix
 ---
 
 # ticket-438 — Les services sans port sont vus, et « Lancer » ne double rien

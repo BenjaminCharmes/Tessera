@@ -2,7 +2,8 @@
 
 Deux origines. `tessera` : un service que le registre a lancé, en mémoire du
 backend. `externe` : un processus lancé à la main qui écoute un port qu'un
-projet **déclare** (commande de service, `vite.config.ts`). Un processus
+projet **déclare** (commande de service, `vite.config.ts`), ou un service
+déclaré sans port que sa ligne de commande désigne (ticket-438). Un processus
 n'est compté qu'une fois, même quand il écoute deux ports ou qu'il est le
 descendant d'un service `tessera`.
 
@@ -14,43 +15,21 @@ import asyncio
 from pathlib import Path
 
 from tessera.models.inventaire import AppEnCours, Inventaire, PortOccupe
+from tessera.services.arbre_de_processus import Enfants
+from tessera.services.arbre_de_processus import arbre as _arbre
+from tessera.services.arbre_de_processus import enfants_par_parent as _enfants
+from tessera.services.arbre_de_processus import memoire_mo as _memoire_mo
 from tessera.services.attribution_processus import appartient_au_projet
 from tessera.services.ports_declares import ports_du_projet
 from tessera.services.process_registry import PROCESS_REGISTRY, Service
 from tessera.services.project_loader import fait_tourner_l_ide, list_projects
+from tessera.services.services_sans_port import processus_sans_port
 from tessera.services.sonde_systeme import InfoProcessus, SondeSysteme
 
 #: Le backend de Tessera et son frontend : l'IDE ne s'inventorie pas lui-même.
 #: Les mêmes numéros existent dans `doctor.py` ; les centraliser dépasse
 #: ce ticket.
 PORTS_DE_TESSERA = frozenset({8100, 5173})
-
-Enfants = dict[int, list[int]]
-
-
-def _enfants(procs: dict[int, InfoProcessus]) -> Enfants:
-    enfants: Enfants = {}
-    for pid, info in procs.items():
-        enfants.setdefault(info.ppid, []).append(pid)
-    return enfants
-
-
-def _arbre(pid: int, enfants: Enfants) -> set[int]:
-    """Le pid et toute sa descendance."""
-    vus: set[int] = set()
-    a_voir = [pid]
-    while a_voir:
-        courant = a_voir.pop()
-        if courant in vus:
-            continue
-        vus.add(courant)
-        a_voir.extend(enfants.get(courant, []))
-    return vus
-
-
-def _memoire_mo(arbre: set[int], procs: dict[int, InfoProcessus]) -> float:
-    total = sum(procs[p].memoire_mo for p in arbre if p in procs)
-    return round(total, 1)
 
 
 def _app_tessera(
@@ -103,6 +82,27 @@ def _app_externe(
     )
 
 
+def _apps_sans_port(
+    projets: dict[str, str],
+    workspace: Path,
+    procs: dict[int, InfoProcessus],
+    enfants: Enfants,
+    deja: set[int],
+) -> list[AppEnCours]:
+    """Les services déclarés sans port, trouvés par leur ligne de commande."""
+    trouvees: list[AppEnCours] = []
+    for project_id, nom_du_projet in projets.items():
+        racine = workspace / project_id
+        if fait_tourner_l_ide(racine):
+            continue
+        for nom, pid in processus_sans_port(racine, procs, deja):
+            deja.add(pid)
+            trouvees.append(
+                _app_externe(project_id, nom_du_projet, nom, pid, procs, enfants)
+            )
+    return trouvees
+
+
 def _apps_externes(
     projets: dict[str, str],
     workspace: Path,
@@ -112,6 +112,25 @@ def _apps_externes(
     pris: set[int],
 ) -> tuple[list[AppEnCours], list[PortOccupe]]:
     """Les apps lancées à la main, et les ports déclarés pris par un étranger."""
+    par_pid, etrangers = _apps_par_port(
+        projets, workspace, ecouteurs, procs, enfants, pris
+    )
+    # Ce qui est déjà compté, avec sa descendance, ne l'est pas une seconde fois.
+    deja = set(pris)
+    for pid in par_pid:
+        deja |= _arbre(pid, enfants)
+    sans_port = _apps_sans_port(projets, workspace, procs, enfants, deja)
+    return [*par_pid.values(), *sans_port], etrangers
+
+
+def _apps_par_port(
+    projets: dict[str, str],
+    workspace: Path,
+    ecouteurs: dict[int, int],
+    procs: dict[int, InfoProcessus],
+    enfants: Enfants,
+    pris: set[int],
+) -> tuple[dict[int, AppEnCours], list[PortOccupe]]:
     par_pid: dict[int, AppEnCours] = {}
     etrangers: list[PortOccupe] = []
     for project_id, nom_du_projet in projets.items():
@@ -133,7 +152,7 @@ def _apps_externes(
             par_pid[pid].ports.append(port)
     for app in par_pid.values():
         app.ports.sort()
-    return list(par_pid.values()), etrangers
+    return par_pid, etrangers
 
 
 async def inventaire(sonde: SondeSysteme, workspace: Path) -> list[AppEnCours]:

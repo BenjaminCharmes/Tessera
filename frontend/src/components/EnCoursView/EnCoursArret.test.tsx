@@ -87,6 +87,23 @@ describe("Stopping a whole project", () => {
     expect(arreterPid).toHaveBeenCalledWith(2);
   });
 
+  it("also stops an external app that listens on no port", async () => {
+    vi.spyOn(api.services, "stop").mockResolvedValue({ arretes: 1 });
+    const arreterPid = vi
+      .spyOn(api.services, "stopRunning")
+      .mockResolvedValue({ pid: 7, arretes: 1 });
+    await monter([
+      app({ pid: 1, nom: "front" }),
+      app({ pid: 7, nom: "worker", origine: "externe", ports: [] }),
+    ]);
+
+    await userEvent.click(screen.getByRole("button", { name: "Arrêter le projet Alpha" }));
+    await userEvent.click(screen.getByRole("button", { name: /Confirmer l.arrêt du projet/ }));
+
+    expect(arreterPid).toHaveBeenCalledTimes(1);
+    expect(arreterPid).toHaveBeenCalledWith(7);
+  });
+
   it("stops a group made of Tessera services only, without asking", async () => {
     const arreterServices = vi.spyOn(api.services, "stop").mockResolvedValue({ arretes: 1 });
     const arreterPid = vi.spyOn(api.services, "stopRunning");

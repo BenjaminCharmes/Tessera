@@ -73,6 +73,9 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 @pytest.fixture(autouse=True)
 def _arreter_tout() -> Iterator[None]:
+    # `services/start` interroge la sonde (ticket-438) : par défaut, une machine
+    # vide, pour ne jamais lancer la vraie sonde ni voir les processus du poste.
+    app.dependency_overrides[get_sonde] = lambda: FausseSonde()
     yield
     asyncio.run(PROCESS_REGISTRY.tout_arreter())
     app.dependency_overrides.clear()
@@ -250,6 +253,30 @@ def test_stop_listed_external_pid_kills_its_tree(
 
     assert resp.status_code == 200
     assert appels == [4242]
+
+
+def test_stop_of_a_portless_service_kills_its_tree(
+    client: TestClient, workspace: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # « Arrêter le projet » arrête chaque app du groupe : le worker sans port
+    # doit y être autorisé, comme un serveur qui écoute (ticket-438).
+    _declarer(
+        workspace / "mon-projet", [{"nom": "worker", "commande": "python -m app.worker"}]
+    )
+    appels: list[int] = []
+
+    async def _tuer(pid: int) -> bool:
+        appels.append(pid)
+        return True
+
+    monkeypatch.setattr(services_running, "tuer_l_arbre", _tuer)
+    commande = f'"{workspace / "mon-projet" / ".venv" / "python.exe"}" -m app.worker'
+    _sonde(FausseSonde(procs={555: _info(1, 1.0, commande)}))
+
+    resp = client.post("/api/v1/services/running/555/stop")
+
+    assert resp.status_code == 200
+    assert appels == [555]
 
 
 def test_stop_tessera_service_goes_through_the_registry(

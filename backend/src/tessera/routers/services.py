@@ -9,7 +9,10 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException
 
 from tessera.config import settings
+from tessera.routers.services_running import get_sonde
 from tessera.services.event_hub import EVENT_HUB
+from tessera.services.inventaire_apps import inventaire
+from tessera.services.sonde_systeme import SondeSysteme
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.process_registry import (
     PROCESS_REGISTRY,
@@ -66,8 +69,35 @@ async def _publier_la_fin(service: Service) -> None:
     )
 
 
+async def _refuser_si_deja_lance_hors_de_tessera(
+    project_id: str, noms_declares: set[str], sonde: SondeSysteme
+) -> None:
+    """409 qui nomme le service et son pid si une app `externe` du projet tourne.
+
+    Rien n'est lancé : un démarrage partiel laisserait un projet à moitié
+    levé (ticket-137), et le doublon d'un worker se bloque sur le verrou du
+    premier (ticket-438). Les apps `tessera` restent gérées par le registre.
+    """
+    for app in await inventaire(sonde, settings.ide_workspace_dir):
+        if (
+            app.project_id == project_id
+            and app.origine == "externe"
+            and app.nom in noms_declares
+        ):
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    f"Le service « {app.nom} » du projet « {project_id} » "
+                    f"tourne déjà hors de Tessera (pid {app.pid}). "
+                    "Arrête-le avant de lancer le projet."
+                ),
+            )
+
+
 @router.post("/{project_id}/services/start")
-async def demarrer(project_id: str) -> dict[str, object]:
+async def demarrer(
+    project_id: str, sonde: SondeSysteme = Depends(get_sonde)
+) -> dict[str, object]:
     racine = _racine(project_id)
     declares = load_services_config(racine)
     if not declares:
@@ -79,6 +109,9 @@ async def demarrer(project_id: str) -> dict[str, object]:
                 'entrée portant {"nom": "...", "commande": "..."}.'
             ),
         )
+    await _refuser_si_deja_lance_hors_de_tessera(
+        project_id, {d["nom"] for d in declares}, sonde
+    )
 
     demarres: list[dict[str, object]] = []
     try:
