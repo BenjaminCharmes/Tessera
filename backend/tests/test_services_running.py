@@ -39,8 +39,15 @@ class FausseSonde:
         return self.procs
 
 
-def _info(ppid: int, memoire_mo: float) -> InfoProcessus:
-    return InfoProcessus(ppid=ppid, memoire_mo=memoire_mo, demarre_a=None)
+def _info(ppid: int, memoire_mo: float, commande: str = "") -> InfoProcessus:
+    return InfoProcessus(
+        ppid=ppid, memoire_mo=memoire_mo, demarre_a=None, commande=commande
+    )
+
+
+def _du_projet(workspace: Path) -> str:
+    """Une ligne de commande qui désigne un fichier du projet (ticket-435)."""
+    return f'python "{workspace / "mon-projet" / "api.py"}"'
 
 
 def _declarer(projet: Path, services: list[dict[str, str]]) -> None:
@@ -119,7 +126,11 @@ def test_process_on_declared_port_is_listed_as_external(
         workspace / "mon-projet",
         [{"nom": "api", "commande": "uvicorn x:app --port 8026"}],
     )
-    _sonde(FausseSonde(ports={8026: 4242}, procs={4242: _info(1, 80.0)}))
+    _sonde(
+        FausseSonde(
+            ports={8026: 4242}, procs={4242: _info(1, 80.0, _du_projet(workspace))}
+        )
+    )
 
     apps = _lister(client)
 
@@ -148,7 +159,12 @@ def test_process_on_two_ports_is_listed_once(
             {"nom": "admin", "commande": "y --port 8027"},
         ],
     )
-    _sonde(FausseSonde(ports={8026: 4242, 8027: 4242}, procs={4242: _info(1, 1.0)}))
+    _sonde(
+        FausseSonde(
+            ports={8026: 4242, 8027: 4242},
+            procs={4242: _info(1, 1.0, _du_projet(workspace))},
+        )
+    )
 
     apps = _lister(client)
 
@@ -224,7 +240,11 @@ def test_stop_listed_external_pid_kills_its_tree(
         return True
 
     monkeypatch.setattr(services_running, "tuer_l_arbre", _tuer)
-    _sonde(FausseSonde(ports={8026: 4242}, procs={4242: _info(1, 1.0)}))
+    _sonde(
+        FausseSonde(
+            ports={8026: 4242}, procs={4242: _info(1, 1.0, _du_projet(workspace))}
+        )
+    )
 
     resp = client.post("/api/v1/services/running/4242/stop")
 

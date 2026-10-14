@@ -5,16 +5,19 @@ backend. `externe` : un processus lancé à la main qui écoute un port qu'un
 projet **déclare** (commande de service, `vite.config.ts`). Un processus
 n'est compté qu'une fois, même quand il écoute deux ports ou qu'il est le
 descendant d'un service `tessera`.
+
+Une app `externe` n'est attribuée à un projet que si son processus lui
+appartient (`attribution_processus`, ticket-435) ; un port déclaré occupé par
+un étranger ressort en avertissement, sans pid.
 """
 import asyncio
 from pathlib import Path
-from typing import Literal
 
-from pydantic import BaseModel
-
+from tessera.models.inventaire import AppEnCours, Inventaire, PortOccupe
+from tessera.services.attribution_processus import appartient_au_projet
 from tessera.services.ports_declares import ports_du_projet
 from tessera.services.process_registry import PROCESS_REGISTRY, Service
-from tessera.services.project_loader import list_projects
+from tessera.services.project_loader import fait_tourner_l_ide, list_projects
 from tessera.services.sonde_systeme import InfoProcessus, SondeSysteme
 
 #: Le backend de Tessera et son frontend : l'IDE ne s'inventorie pas lui-même.
@@ -23,19 +26,6 @@ from tessera.services.sonde_systeme import InfoProcessus, SondeSysteme
 PORTS_DE_TESSERA = frozenset({8100, 5173})
 
 Enfants = dict[int, list[int]]
-
-
-class AppEnCours(BaseModel):
-    """One running app of a project."""
-
-    project_id: str
-    project_name: str
-    nom: str
-    origine: Literal["tessera", "externe"]
-    pid: int
-    ports: list[int]
-    demarre_a: str | None
-    memoire_mo: float
 
 
 def _enfants(procs: dict[int, InfoProcessus]) -> Enfants:
@@ -120,12 +110,21 @@ def _apps_externes(
     procs: dict[int, InfoProcessus],
     enfants: Enfants,
     pris: set[int],
-) -> list[AppEnCours]:
+) -> tuple[list[AppEnCours], list[PortOccupe]]:
+    """Les apps lancées à la main, et les ports déclarés pris par un étranger."""
     par_pid: dict[int, AppEnCours] = {}
+    etrangers: list[PortOccupe] = []
     for project_id, nom_du_projet in projets.items():
-        for port, nom in ports_du_projet(workspace / project_id).items():
+        racine = workspace / project_id
+        # Le projet qui fait tourner l'IDE : ses ports sont ceux de Tessera.
+        if fait_tourner_l_ide(racine):
+            continue
+        for port, nom in ports_du_projet(racine).items():
             pid = ecouteurs.get(port)
             if port in PORTS_DE_TESSERA or pid is None or pid in pris:
+                continue
+            if not appartient_au_projet(pid, racine, procs):
+                etrangers.append(PortOccupe.de(project_id, nom_du_projet, nom, port))
                 continue
             if pid not in par_pid:
                 par_pid[pid] = _app_externe(
@@ -134,11 +133,16 @@ def _apps_externes(
             par_pid[pid].ports.append(port)
     for app in par_pid.values():
         app.ports.sort()
-    return list(par_pid.values())
+    return list(par_pid.values()), etrangers
 
 
 async def inventaire(sonde: SondeSysteme, workspace: Path) -> list[AppEnCours]:
     """Every app of every project that is alive right now, each counted once."""
+    return (await inventaire_complet(sonde, workspace)).apps
+
+
+async def inventaire_complet(sonde: SondeSysteme, workspace: Path) -> Inventaire:
+    """The apps, plus the declared ports that a foreign program occupies."""
     ecouteurs, procs = await asyncio.gather(sonde.ecouteurs(), sonde.processus())
     projets = await asyncio.to_thread(list_projects, workspace)
     noms = {p.id: p.name for p in projets}
@@ -162,5 +166,11 @@ async def inventaire(sonde: SondeSysteme, workspace: Path) -> list[AppEnCours]:
         )
         if app is not None:
             apps.append(app)
-    apps.extend(_apps_externes(noms, workspace, ecouteurs, procs, enfants, pris))
-    return sorted(apps, key=lambda a: (a.project_id, a.nom))
+    externes, etrangers = _apps_externes(
+        noms, workspace, ecouteurs, procs, enfants, pris
+    )
+    apps.extend(externes)
+    return Inventaire(
+        apps=sorted(apps, key=lambda a: (a.project_id, a.nom)),
+        ports_occupes=sorted(etrangers, key=lambda o: (o.project_id, o.port)),
+    )
