@@ -395,6 +395,16 @@ arbitraire ou d'un glyphe utilisé comme affordance.
 
 Ce système est imposé aux agents créant une interface via le skill `tessera:design-ui`, chargé par défaut par le codeur et l'architect : toute UI doit partir d'une charte déclarée (couleurs, typographie, espacement), et n'en sortir sur aucune valeur.
 
+#### Composants UI partagés
+
+Le frontend centralise les composants visuels dans `frontend/src/design/ui/`, pour respecter la charte et les familles de couleurs d'ADR-026 :
+- `StatusPill.tsx` : pastilles d'état (en-cours, reussi, attention, echec, neutre)
+- `Button.tsx` : boutons avec variantes plein/borde/discret/arret, tailles normal/compact
+- `ViewSwitcher.tsx` : sélecteur horizontal de vue
+- `ViewState.tsx` : états composites (vide, chargement, erreur)
+
+Les trois sélecteurs de vue du frontend (Historique, Fichiers, Agents) utilisent `ViewSwitcher`, éliminant les copies locales et garantissant la cohérence visuelle.
+
 ### Limite de silence des agents (ticket-381)
 
 Un processus d'agent qui n'émet aucun message pendant plus de `AGENT_SILENCE_MAX_S` secondes (défaut : 1200 s, soit 20 min) est interrompu.
