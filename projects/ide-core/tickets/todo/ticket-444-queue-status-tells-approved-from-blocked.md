@@ -42,6 +42,10 @@ livré.
       avec son motif
 - [ ] Un test vérifie qu'un ticket interrompu (redémarrage) est dans
       `arretes`
+- [ ] Un test vérifie qu'un ticket coupé avant d'avoir produit un commit
+      (limite de session, `session_limit` : resté `todo`, sans commit) est
+      dans `restants`, ni dans `approuves` ni dans `arretes` — cas signalé
+      par affût le 2026-10-14 sur le ticket-073
 - [ ] Un test vérifie que `faits` vaut toujours l'union des deux listes
 - [ ] `docs/api.md` décrit `approuves`, `arretes` et la dépréciation de `faits`
 
