@@ -2674,3 +2674,4 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 10:59:03 UTC — [ticket-430] tour 2 — reviewer terminé (18765ms)
 - 2026-10-14 11:00:55 UTC — [ticket-430] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le chemin du fichier d'attente e (130734ms)
 - 2026-10-14 11:00:55 UTC — [ticket-430] APPROVED après 2 tour(s)
+- 2026-10-14 11:05:18 UTC — [ticket-430] documentation: 3 fichier(s) (260297ms) — après tour de correction
