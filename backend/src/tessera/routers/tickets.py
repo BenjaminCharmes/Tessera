@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import Literal
 
@@ -24,6 +25,7 @@ from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.sync_map import SyncMapService
+from tessera.services.ticket_check import Probleme, verifier_tickets
 from tessera.services.ticket_service import TicketService
 
 router = APIRouter(
@@ -90,6 +92,14 @@ async def create_tickets_batch(project_id: str, body: TicketBatchCreate) -> Tick
 @router.get("/{project_id}/tickets/archive", response_model=list[Ticket])
 async def list_archived_tickets(project_id: str) -> list[Ticket]:
     return await _svc(project_id).list_archived_tickets()
+
+
+@router.get("/{project_id}/tickets/check", response_model=list[Probleme])
+async def check_tickets(project_id: str) -> list[Probleme]:
+    """Les défauts des fichiers de tickets du projet ; liste vide si tout va bien."""
+    return await asyncio.to_thread(
+        verifier_tickets, settings.ide_workspace_dir / project_id
+    )
 
 
 @router.get("/{project_id}/tickets/{ticket_id}", response_model=Ticket)

@@ -1320,6 +1320,24 @@ Les critères d'acceptation d'un ticket sont extraits du corps Markdown par le s
 
 Chaque ligne non vide de la liste de critères devient un critère distinct. Un critère dont le texte cite le titre (ex. « Vérifier `## Critères d'acceptation` en début de ligne ») reste lisible et est compté normalement. Cette règle évite les faux positifs où une citation du titre de section dans le contexte ou la prose aurait fermé prématurément la section avant les vrais critères.
 
+### Validation des tickets avant commit (ticket-433)
+
+La fonction `verifier_tickets(racine_projet)` exécute les mêmes validations que `TicketService` au chargement, et renvoie une liste de problèmes — ou une liste vide si tous les tickets sont valides.
+
+Elle signale :
+- Un champ hors enum (ex. `type: invalid`) avec le chemin du fichier et le nom du champ
+- Un fichier rangé dans le dossier qui ne correspond pas à son `status` (ex. `status: done` dans `todo/`)
+- Deux fichiers portant le même `id`
+
+Un `created` lu par YAML comme une date (ex. `2026-10-14`) est accepté.
+
+Trois interfaces la proposent :
+- **Endpoint** : `GET /api/v1/projects/{id}/tickets/check` renvoie `{ "valides": true, "problemes": [] }`
+- **Commande Make** : `make check-tickets PROJET=<id>`
+- **Script PowerShell** : `.\scripts\tessera.ps1 check-tickets <id>`
+
+Elle s'intègre dans le workflow de vérification avant commit : si elle signale un problème, la branche locale n'est pas committée.
+
 ## Chat conversationnel (ticket-048, 225)
 
 Une conversation libre sur un projet, distincte du pipeline : l'agent a le

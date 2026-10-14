@@ -1,14 +1,15 @@
 ---
-id: ticket-433
-title: "One command checks every ticket file of a project the way the loader reads it, and names the file and field that fail"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-433
+pr_number: 435
+priority: medium
+status: done
+title: One command checks every ticket file of a project the way the loader reads
+  it, and names the file and field that fail
+type: feat
 ---
 
 # ticket-433 — Valider les tickets d'un projet avant de les committer
