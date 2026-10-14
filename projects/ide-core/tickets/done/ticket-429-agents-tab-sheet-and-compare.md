@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 1
 id: ticket-429
-pr_number: null
+pr_number: 426
 priority: medium
 status: done
 title: The Agents tab shows a role sheet with its 30-day figures and last verdicts,
