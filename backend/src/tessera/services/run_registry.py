@@ -47,6 +47,10 @@ class RunActif:
     #: Titre lisible du ticket en cours — absent tant qu'il n'a pas pu être lu
     #: ou que le run n'a pas encore de ticket (autonome) (ticket-286).
     ticket_titre: str | None = None
+    #: Le ticket auquel `ticket_titre` se rapporte. Le titre est relu dès que
+    #: `ticket_id` en diffère, quel que soit l'évènement qui a fait changer de
+    #: ticket (ticket-445). Déduit de `ticket_id` quand le run naît avec son titre.
+    ticket_titre_de: str | None = None
     #: Identifiant en base (table `pipeline_runs`) — positionné dès que la
     #: ligne existe, pour que le frontend puisse relire les événements persistés
     #: au rechargement de page (ticket-325).
@@ -97,6 +101,11 @@ class RunActif:
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+
+    def __post_init__(self) -> None:
+        # Un run créé avec son titre le tient pour celui de son ticket courant.
+        if self.ticket_titre is not None and self.ticket_titre_de is None:
+            self.ticket_titre_de = self.ticket_id
 
     def en_dict(self) -> dict[str, Any]:
         """Serialisable view — the dialogue channel is deliberately left out."""

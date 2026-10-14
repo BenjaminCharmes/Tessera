@@ -1,14 +1,15 @@
 ---
-id: ticket-445
-title: "A ticket status event in a queue always carries the title of its own ticket, never the previous one's"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-445
+pr_number: 451
+priority: medium
+status: done
+title: A ticket status event in a queue always carries the title of its own ticket,
+  never the previous one's
+type: fix
 ---
 
 # ticket-445 — Un évènement de statut porte le titre de son propre ticket

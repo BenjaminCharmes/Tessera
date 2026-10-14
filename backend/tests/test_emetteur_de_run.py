@@ -159,3 +159,69 @@ async def test_le_titre_n_est_relu_qu_une_fois_par_ticket() -> None:
     # Les trois événements portent tous le titre.
     recus = abonne.vider()
     assert all(e.data.get("ticket_titre") == "Titre de ticket-002" for e in recus)
+
+
+async def test_le_statut_apres_un_evenement_non_statut_porte_le_titre_du_nouveau_ticket() -> None:
+    # Ticket-445 : un queue_progress fait passer le run au ticket B ; le
+    # ticket_status_changed qui suit trouvait l'id inchangé et gardait le titre de A.
+    hub = EventHub()
+    abonne = hub.subscribe()
+    appels: list[str] = []
+
+    async def getter(tid: str) -> str | None:
+        appels.append(tid)
+        return f"Titre de {tid}"
+
+    run = RunActif(
+        run_id="run-1", project_id="p", ticket_id="ticket-070", ticket_titre="Titre de ticket-070"
+    )
+    envoyer = emetteur(hub, run, None, titre_getter=getter)
+    await envoyer(
+        OrchestratorEvent(
+            type=EventType.QUEUE_PROGRESS, ticket_id="ticket-073", data={"index": 4, "total": 5}
+        )
+    )
+    await envoyer(_event_ticket_status("ticket-073"))
+
+    recus = abonne.vider()
+    assert recus[-1].data.get("ticket_titre") == "Titre de ticket-073"
+    assert run.ticket_titre_de == "ticket-073"
+    assert appels == ["ticket-073"]
+
+
+async def test_le_titre_est_relu_une_fois_par_ticket_meme_apres_un_evenement_non_statut() -> None:
+    hub = EventHub()
+    appels: list[str] = []
+
+    async def getter(tid: str) -> str | None:
+        appels.append(tid)
+        return f"Titre de {tid}"
+
+    run = RunActif(run_id="run-1", project_id="p", ticket_id="ticket-001")
+    envoyer = emetteur(hub, run, None, titre_getter=getter)
+    await envoyer(
+        OrchestratorEvent(type=EventType.QUEUE_PROGRESS, ticket_id="ticket-002", data={})
+    )
+    for _ in range(3):
+        await envoyer(_event_ticket_status("ticket-002"))
+    await envoyer(_event_ticket_status("ticket-003"))
+    await envoyer(_event_ticket_status("ticket-003"))
+
+    assert appels == ["ticket-002", "ticket-003"]
+
+
+async def test_une_lecture_de_titre_ratee_n_est_pas_retentee_a_chaque_evenement() -> None:
+    hub = EventHub()
+    appels: list[str] = []
+
+    async def getter(tid: str) -> str | None:
+        appels.append(tid)
+        raise RuntimeError("illisible")
+
+    run = RunActif(run_id="run-1", project_id="p", ticket_id="ticket-001")
+    envoyer = emetteur(hub, run, None, titre_getter=getter)
+    for _ in range(3):
+        await envoyer(_event_ticket_status("ticket-002"))
+
+    assert appels == ["ticket-002"]
+    assert run.ticket_titre is None

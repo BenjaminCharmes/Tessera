@@ -2833,3 +2833,14 @@ Ce diff refactorise l'UI pou (27266ms)
 - 2026-10-14 17:33:01 UTC — [ticket-444] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la séparatio (169608ms)
 - 2026-10-14 17:33:01 UTC — [ticket-444] APPROVED après 1 tour(s)
 - 2026-10-14 17:36:04 UTC — [ticket-444] documentation: 1 fichier(s) (179766ms)
+- 2026-10-14 17:36:24 UTC — [ide-core] ticket-444 PR #449 confiée au CIWatcher
+- 2026-10-14 17:43:53 UTC — [ticket-445] branche ticket-445-a-ticket-status-event-in-a-queue-always-carries-t
+- 2026-10-14 17:43:55 UTC — [ticket-445] tour 1 — codeur démarré
+- 2026-10-14 17:45:56 UTC — [ticket-445] tour 1 — codeur terminé (120656ms)
+- 2026-10-14 17:51:44 UTC — [ticket-445] testeur: OK (exit 0)
+- 2026-10-14 17:51:59 UTC — [ticket-445] securite: PASS — Audit de sécurité du diff pour le ticket-445 (ticket_titre_de) : aucune vulnérab (14641ms)
+- 2026-10-14 17:51:59 UTC — [ticket-445] tour 1 — reviewer démarré
+- 2026-10-14 17:52:14 UTC — [ticket-445] tour 1 — reviewer terminé (15796ms)
+- 2026-10-14 17:53:19 UTC — [ticket-445] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (80781ms)
+- 2026-10-14 17:53:19 UTC — [ticket-445] APPROVED après 1 tour(s)
+- 2026-10-14 17:54:07 UTC — [ticket-445] documentation: 0 fichier(s) (43514ms)

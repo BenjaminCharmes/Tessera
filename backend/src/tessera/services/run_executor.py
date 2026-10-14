@@ -97,21 +97,23 @@ def emetteur(
     async def envoyer(event: OrchestratorEvent) -> None:
         event.run_id = run.run_id
         event.project_id = run.project_id
-        ancien_ticket_id = run.ticket_id
         _suivre(run, event)
         # Tout ticket_status_changed porte ticket_titre dès que le run le connaît.
-        # Le titre n'est relu sur disque qu'au changement de ticket (ticket-324).
+        # Le titre n'est relu sur disque qu'une fois par ticket (ticket-324) :
+        # on compare au ticket du titre en cache, pas à celui d'avant cet
+        # évènement, qu'un autre type d'évènement a pu faire changer (ticket-445).
         if (
             titre_getter is not None
             and event.type is EventType.TICKET_STATUS_CHANGED
             and run.ticket_id
         ):
-            if run.ticket_id != ancien_ticket_id:
-                # Le ticket vient de changer : relire depuis le disque.
+            if run.ticket_id != run.ticket_titre_de:
                 try:
                     run.ticket_titre = await titre_getter(run.ticket_id)
                 except Exception:  # noqa: BLE001
                     run.ticket_titre = None
+                # Même une lecture ratée est notée : pas de relecture à chaque évènement.
+                run.ticket_titre_de = run.ticket_id
             if run.ticket_titre is not None:
                 event.data["ticket_titre"] = run.ticket_titre
         await hub.publish(event)
