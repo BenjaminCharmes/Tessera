@@ -358,6 +358,28 @@ La liste se recharge, et la barre latérale s'actualise.
 
 Si tu cherches « api » et que tu tris par activité récente, puis que tu reviens à l'onglet Kanban et au Projets, tu retrouves les mêmes réglages.
 
+
+### Accéder aux réglages
+
+Les réglages globaux de l'IDE se trouvent dans un panneau accessible via un bouton en bas du rail de navigation (icône engrenage). Clic dessus ouvre un panneau où tu peux :
+
+- **Autoriser ou désactiver les notifications** : par défaut, les notifications du navigateur sont désactivées. Tu dois les autoriser dans les réglages du site pour que Tessera puisse t'avertir.
+- **Consulter et modifier tes plafonds de dépense** : dépense maximale par ticket et par file.
+
+Ces réglages sont globaux — ils s'appliquent à tous tes projets, pas seulement au projet actif.
+
+#### L'en-tête de colonne allégé
+
+L'en-tête de colonne montre dorénavant uniquement ce qui concerne le projet actif :
+
+- Le **sélecteur de projet** (dropdown avec le nom du projet)
+- Une **pastille bleue** quand un run tourne sur ce projet
+- La **ligne d'actions** : Services, VSCode, Git, Signaler
+
+L'infobulle du sélecteur te dit « ce projet fait tourner l'IDE ».
+
+Le panneau « Pipeline » du projet reste accessible depuis l'onglet Agents ou Tickets quand tu en as besoin.
+
 ## 2 ter bis. Surveiller les services
 
 ### Ouvrir la vue En cours

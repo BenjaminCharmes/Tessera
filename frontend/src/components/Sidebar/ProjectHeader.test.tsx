@@ -84,6 +84,45 @@ describe("ProjectHeader", () => {
     expect(screen.getByRole("button", { name: "Git" })).toBeInTheDocument();
   });
 
+  it("shows the running pill only while a run is going on this project", () => {
+    const { rerender } = render(
+      <ProjectHeader project={projet} gitOuvert={false} onBasculerGit={() => {}} />,
+    );
+    expect(screen.queryByText("run en cours")).not.toBeInTheDocument();
+
+    rerender(
+      <ProjectHeader
+        project={projet}
+        gitOuvert={false}
+        onBasculerGit={() => {}}
+        runEnCours
+      />,
+    );
+    expect(screen.getByText("run en cours")).toBeInTheDocument();
+  });
+
+  it("carries 'fait tourner l'IDE' in the title of the project name", () => {
+    render(
+      <ProjectHeader
+        project={{ ...projet, fait_tourner_l_ide: true }}
+        gitOuvert={false}
+        onBasculerGit={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Lyra")).toHaveAttribute(
+      "title",
+      expect.stringContaining("fait tourner l'IDE"),
+    );
+    expect(screen.queryByText(/fait tourner l'IDE/)).not.toBeInTheDocument();
+  });
+
+  it("leaves the title free of that sentence on an ordinary project", () => {
+    render(<ProjectHeader project={projet} gitOuvert={false} onBasculerGit={() => {}} />);
+
+    expect(screen.getByText("Lyra").getAttribute("title")).not.toMatch(/fait tourner/);
+  });
+
   it("survit a un projet sans chemin au lieu d'emporter la sidebar", () => {
     // Panne vecue (E2E flow 4 et 5) : `lienVSCode(undefined)` levait une
     // TypeError, que l'ErrorBoundary transformait en « Une erreur inattendue

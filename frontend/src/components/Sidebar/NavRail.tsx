@@ -1,6 +1,8 @@
 import type { ReactElement } from "react";
 import type { AlerteDeSupervision, SidebarPanel } from "./panels";
 import Pastille from "./Pastille";
+import BoutonReglages from "./BoutonReglages";
+import type { ReglageDesNotifications } from "./ReglageNotifications";
 import { BAND } from "../../design/layout";
 import {
   IconActivity,
@@ -40,6 +42,8 @@ interface NavRailProps {
   appsEnCours?: number;
   /** Ce qui mérite d'être vu avant le reste, quand c'est le cas. */
   alerte?: AlerteDeSupervision;
+  /** Le réglage des notifications système, ouvert par « Réglages » (ticket-441). */
+  notifications?: ReglageDesNotifications;
 }
 
 interface Destination {
@@ -102,74 +106,79 @@ export default function NavRail({
   runsActifs = 0,
   appsEnCours = 0,
   alerte = null,
+  notifications,
 }: NavRailProps) {
   return (
-    <nav
-      role="tablist"
-      aria-orientation="vertical"
-      aria-label="Navigation principale"
-      className="flex h-full flex-col items-stretch bg-zinc-900 px-1.5 pb-3 pt-2"
-    >
-      {/*
-        Zone d'identité — ticket-101.
-        ADR-026 : l'accent d'identité est une barre, jamais la couleur d'un
-        mot. Le violet porte la marque (SVG), le nom se rend en neutre (zinc).
-      */}
-      <div
-        className={`${BAND} mb-1 flex-col justify-center gap-0.5 border-b border-zinc-800`}
+    <div className="flex h-full flex-col bg-zinc-900">
+      <nav
+        role="tablist"
+        aria-orientation="vertical"
+        aria-label="Navigation principale"
+        className="flex min-h-0 flex-1 flex-col items-stretch px-1.5 pt-2"
       >
         {/*
-          La marque vient du favicon plutôt que d'un SVG recopié ici : deux
-          dessins d'une même marque finissent toujours par diverger, et c'est
-          celui qu'on ne regarde pas qui dérive.
+          Zone d'identité — ticket-101.
+          ADR-026 : l'accent d'identité est une barre, jamais la couleur d'un
+          mot. Le violet porte la marque (SVG), le nom se rend en neutre (zinc).
         */}
-        <img src="/favicon.svg" width={18} height={18} alt="" aria-hidden />
-        <span className="text-micro leading-none text-zinc-400">Tessera</span>
-      </div>
-      {GROUPES.map(({ titre, destinations }, index) => (
         <div
-          key={titre}
-          className={
-            index === 0 ? "" : "mt-2 border-t border-zinc-800 pt-2"
-          }
+          className={`${BAND} mb-1 flex-col justify-center gap-0.5 border-b border-zinc-800`}
         >
-          <p className="px-1 pb-1 text-center text-micro uppercase leading-none tracking-wider text-zinc-600">
-            {titre}
-          </p>
-          <ul aria-label={titre} className="flex flex-col gap-0.5">
-            {destinations.map(({ panel, label, icon }) => {
-              const actif = activePanel === panel;
-              return (
-                <li key={panel} className="flex flex-col">
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={actif}
-                    aria-current={actif ? "page" : undefined}
-                    onClick={() => onChangePanel(panel)}
-                    className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
-                      actif
-                        ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
-                        : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
-                    }`}
-                  >
-                    {panel === "supervision" ? (
-                      <Pastille nombre={runsActifs} alerte={alerte} />
-                    ) : null}
-                    {panel === "running" ? (
-                      <Pastille nombre={appsEnCours} unite="app" />
-                    ) : null}
-                    {icon}
-                    <span className="w-full text-center text-micro leading-none">
-                      {label}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          {/*
+            La marque vient du favicon plutôt que d'un SVG recopié ici : deux
+            dessins d'une même marque finissent toujours par diverger, et c'est
+            celui qu'on ne regarde pas qui dérive.
+          */}
+          <img src="/favicon.svg" width={18} height={18} alt="" aria-hidden />
+          <span className="text-micro leading-none text-zinc-400">Tessera</span>
         </div>
-      ))}
-    </nav>
+        {GROUPES.map(({ titre, destinations }, index) => (
+          <div
+            key={titre}
+            className={
+              index === 0 ? "" : "mt-2 border-t border-zinc-800 pt-2"
+            }
+          >
+            <p className="px-1 pb-1 text-center text-micro uppercase leading-none tracking-wider text-zinc-600">
+              {titre}
+            </p>
+            <ul aria-label={titre} className="flex flex-col gap-0.5">
+              {destinations.map(({ panel, label, icon }) => {
+                const actif = activePanel === panel;
+                return (
+                  <li key={panel} className="flex flex-col">
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={actif}
+                      aria-current={actif ? "page" : undefined}
+                      onClick={() => onChangePanel(panel)}
+                      className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
+                        actif
+                          ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
+                          : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
+                      }`}
+                    >
+                      {panel === "supervision" ? (
+                        <Pastille nombre={runsActifs} alerte={alerte} />
+                      ) : null}
+                      {panel === "running" ? (
+                        <Pastille nombre={appsEnCours} unite="app" />
+                      ) : null}
+                      {icon}
+                      <span className="w-full text-center text-micro leading-none">
+                        {label}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </nav>
+      {/* Hors du `tablist` : ce n'est pas une destination, c'est un réglage. */}
+      <BoutonReglages notifications={notifications} />
+    </div>
   );
 }

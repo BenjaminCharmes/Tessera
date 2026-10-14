@@ -3,6 +3,7 @@ import { IconChevronDown } from "../../design/icons";
 import { useProjects } from "../../hooks/useProjects";
 import type { Project } from "../../types/api";
 import RemoveProjectModal from "./RemoveProjectModal";
+import { titreDuProjet } from "./titreDuProjet";
 
 /**
  * Changer de projet sans quitter la vue courante — ticket-174.
@@ -55,7 +56,7 @@ export default function SelecteurDeProjet({
         onClick={() => setOuvert((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={ouvert}
-        title={`${project.id} — ${project.path ?? ""}`}
+        title={titreDuProjet(project)}
         className="flex min-w-0 max-w-full items-center gap-1 truncate text-sm font-medium text-zinc-100 transition-colors hover:text-zinc-50"
       >
         <span className="truncate">{project.name}</span>

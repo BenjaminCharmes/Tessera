@@ -315,6 +315,11 @@ export function useCockpit() {
       runsActifs: supervision.runs.length,
       appsEnCours: appsEnCours.apps?.length ?? 0,
       alerte: alerteDeSupervision,
+      notifications: {
+        active: notifications.active,
+        etat: notifications.etat,
+        onChange: notifications.setActive,
+      },
     },
     sidebar: {
       projet: {
@@ -322,11 +327,6 @@ export function useCockpit() {
         enAttente,
         services,
         sortieDeService: supervision.sortieDuService,
-        notifications: {
-          active: notifications.active,
-          etat: notifications.etat,
-          onChange: notifications.setActive,
-        },
         onSelect: handleSelectProject,
         onCreated: (p: Project) => addToast(`Projet « ${p.name} » créé`, "success"),
       },

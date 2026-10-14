@@ -1,14 +1,15 @@
 ---
-id: ticket-441
-title: "Settings move behind a button at the bottom of the rail, and the column header keeps only the project, its run state and its actions"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-441
+pr_number: 445
+priority: medium
+status: done
+title: Settings move behind a button at the bottom of the rail, and the column header
+  keeps only the project, its run state and its actions
+type: feat
 ---
 
 # ticket-441 — Réglages dans le rail, en-tête de colonne allégé

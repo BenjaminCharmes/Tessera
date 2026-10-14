@@ -2,6 +2,8 @@ import { useState } from "react";
 import BoutonServices from "./BoutonServices";
 import SelecteurDeProjet from "./SelecteurDeProjet";
 import SignalementModal from "./SignalementModal";
+import { titreDuProjet } from "./titreDuProjet";
+import StatusPill from "../../design/ui/StatusPill";
 import type { UseServicesResult } from "../../hooks/useServices";
 import { BAND } from "../../design/layout";
 import type { Project } from "../../types/api";
@@ -33,6 +35,8 @@ interface ProjectHeaderProps {
   onOuvrirLesServices?: () => void;
   /** Change de projet depuis l'en-tête (ticket-174). Absent : le nom reste un titre. */
   onSelectProject?: (project: Project) => void;
+  /** Un run tourne sur ce projet : une pastille le dit à côté du nom (ticket-441). */
+  runEnCours?: boolean;
 }
 
 /** Le projet qui reçoit les signalements : y signaler depuis lui-même n'a pas de sens. */
@@ -50,6 +54,7 @@ export default function ProjectHeader({
   services,
   onOuvrirLesServices,
   onSelectProject,
+  runEnCours = false,
 }: ProjectHeaderProps) {
   const [signalementOuvert, setSignalementOuvert] = useState(false);
 
@@ -67,7 +72,7 @@ export default function ProjectHeader({
           tronquaient en « A… » dans une colonne de 280 px. La première ligne
           reste la bande commune, alignée avec celles du centre et de la
           colonne de droite ; les actions passent dessous. */}
-      <div className={`${BAND} px-3`}>
+      <div className={`${BAND} gap-2 px-3`}>
         {/* Le nom est le déclencheur : changer de projet n'ajoute aucun
             bouton à la rangée d'actions (ticket-174). Sans `onSelectProject`
             — les vues qui n'en ont pas — il reste un titre. */}
@@ -79,11 +84,17 @@ export default function ProjectHeader({
         ) : (
           <h2
             className="truncate text-sm font-medium text-zinc-100"
-            title={`${project.id} — ${project.path ?? ""}`}
+            title={titreDuProjet(project)}
           >
             {project.name}
           </h2>
         )}
+        {/* Un mot, pas seulement une couleur : l'état se lit sans la teinte. */}
+        {runEnCours ? (
+          <span className="shrink-0">
+            <StatusPill etat="en-cours" libelle="run en cours" />
+          </span>
+        ) : null}
       </div>
 
       <div

@@ -3,7 +3,7 @@ import ProjectHeader from "./ProjectHeader";
 import PanneauUsage from "./PanneauUsage";
 import type { UseServicesResult } from "../../hooks/useServices";
 import type { FiltresTickets } from "../../lib/filtresTickets";
-import type { ReglageDesNotifications } from "./PanneauxDuProjet";
+import SectionPipeline from "./SectionPipeline";
 import FileTree from "../FileTree";
 import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
@@ -37,8 +37,6 @@ export interface ProjetSidebar {
   services?: UseServicesResult;
   /** La sortie d'un service, pour le panneau du projet (ticket-147). */
   sortieDeService?: (projectId: string, nom: string) => string[];
-  /** Le réglage des notifications système (ticket-192). */
-  notifications?: ReglageDesNotifications;
   onSelect: (project: Project) => void;
   onCreated?: (project: Project) => void;
 }
@@ -150,6 +148,7 @@ export default function Sidebar({
         services={projet.services}
         onOuvrirLesServices={() => setServicesOuverts(true)}
         onSelectProject={projet.onSelect}
+        runEnCours={tickets.running.size > 0}
       />
 
       <PanneauxDuProjet
@@ -158,9 +157,15 @@ export default function Sidebar({
         servicesOuverts={servicesOuverts}
         services={projet.services}
         sortieDeService={projet.sortieDeService}
-        runEnCours={tickets.running.size > 0}
-        notifications={projet.notifications}
       />
+
+      {/* Le réglage du pipeline reste là où il sert (ticket-441). */}
+      {projet.actif && (panel === "agents" || panel === "tickets") ? (
+        <SectionPipeline
+          projectId={projet.actif.id}
+          runEnCours={tickets.running.size > 0}
+        />
+      ) : null}
 
       <div className="flex-1 overflow-y-auto">
         {panel === "projects" && (

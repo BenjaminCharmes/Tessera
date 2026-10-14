@@ -2787,3 +2787,14 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 16:04:09 UTC — [ticket-440] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre une implémentation complète du (27140ms)
 - 2026-10-14 16:04:09 UTC — [ticket-440] APPROVED après 2 tour(s)
 - 2026-10-14 16:05:58 UTC — [ticket-440] documentation: 1 fichier(s) (104984ms)
+- 2026-10-14 16:06:19 UTC — [ide-core] ticket-440 PR #444 confiée au CIWatcher
+- 2026-10-14 16:06:23 UTC — [ticket-441] branche ticket-441-settings-move-behind-a-button-at-the-bottom-of-th
+- 2026-10-14 16:06:24 UTC — [ticket-441] tour 1 — codeur démarré
+- 2026-10-14 16:11:00 UTC — [ticket-441] tour 1 — codeur terminé (276296ms)
+- 2026-10-14 16:18:15 UTC — [ticket-441] testeur: OK (exit 0)
+- 2026-10-14 16:18:36 UTC — [ticket-441] securite: PASS — Aucune vulnérabilité détectée. Ce diff est une refactorisation UI (ticket-441) : (21703ms)
+- 2026-10-14 16:18:36 UTC — [ticket-441] tour 1 — reviewer démarré
+- 2026-10-14 16:19:07 UTC — [ticket-441] tour 1 — reviewer terminé (30765ms)
+- 2026-10-14 16:19:27 UTC — [ticket-441] validateur: APPROVED — Tous les critères d'acceptation reçoivent une couverture de test spécifique. Le  (50641ms)
+- 2026-10-14 16:19:27 UTC — [ticket-441] APPROVED après 1 tour(s)
+- 2026-10-14 16:21:46 UTC — [ticket-441] documentation: 1 fichier(s) (133797ms)

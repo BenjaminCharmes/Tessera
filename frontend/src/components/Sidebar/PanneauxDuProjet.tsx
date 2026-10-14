@@ -1,16 +1,5 @@
-import { IconChevronDown, IconChevronRight } from "../../design/icons";
 import GitLinkPanel from "./GitLinkPanel";
 import PanneauServices from "./PanneauServices";
-import PanneauPipeline from "./PanneauPipeline";
-import ReglageNotifications from "./ReglageNotifications";
-import type { EtatDesNotifications } from "../../hooks/useNotificationsSysteme";
-
-export interface ReglageDesNotifications {
-  active: boolean;
-  etat: EtatDesNotifications;
-  onChange: (v: boolean) => void;
-}
-import { useState } from "react";
 import type { UseServicesResult } from "../../hooks/useServices";
 import type { Project } from "../../types/api";
 
@@ -20,6 +9,10 @@ import type { Project } from "../../types/api";
  * Deux panneaux qui suivent le même motif : ouverts par leur bouton, bornés
  * en hauteur, refermés le reste du temps. Extraits de `Sidebar` quand le
  * second l'a fait dépasser deux cents lignes.
+ *
+ * Le réglage des notifications est parti dans le rail et le réglage du
+ * pipeline dans les onglets qui s'en servent (ticket-441) : ni l'un ni l'autre
+ * ne concerne le projet actif en tant que tel.
  */
 interface PanneauxDuProjetProps {
   project: Project | null;
@@ -27,9 +20,6 @@ interface PanneauxDuProjetProps {
   servicesOuverts: boolean;
   services?: UseServicesResult;
   sortieDeService?: (projectId: string, nom: string) => string[];
-  /** Un run tourne sur ce projet : le pipeline se règle en lecture seule (ticket-196). */
-  runEnCours?: boolean;
-  notifications?: ReglageDesNotifications;
 }
 
 export default function PanneauxDuProjet({
@@ -38,44 +28,13 @@ export default function PanneauxDuProjet({
   servicesOuverts,
   services,
   sortieDeService,
-  runEnCours = false,
-  notifications,
 }: PanneauxDuProjetProps) {
-  const [pipelineOuvert, setPipelineOuvert] = useState(false);
   if (!project) return null;
 
   return (
     <>
-      {notifications && (
-        <ReglageNotifications
-          active={notifications.active}
-          etat={notifications.etat}
-          onChange={notifications.onChange}
-        />
-      )}
-      <button
-        type="button"
-        onClick={() => setPipelineOuvert((v) => !v)}
-        aria-expanded={pipelineOuvert}
-        className="flex w-full items-center gap-1.5 px-3 py-1 text-left text-mini text-zinc-500 hover:text-zinc-300"
-      >
-        {/* Sans chevron, ce libellé gris ne se lisait pas comme un bouton
-            (ticket-205). Même affordance que les listes repliables du chat. */}
-        {pipelineOuvert ? (
-          <IconChevronDown size={12} />
-        ) : (
-          <IconChevronRight size={12} />
-        )}
-        Pipeline
-      </button>
-      {pipelineOuvert && (
-        <PanneauPipeline projectId={project.id} runEnCours={runEnCours} />
-      )}
       {/* Sous l'en-tête, là où l'on vient de cliquer : c'est le reproche fait
           au premier usage — le retour arrivait dans une autre vue. */}
-      {/* Le projet qui fait tourner l'IDE n'a pas de bouton : sans
-          ouverture d'office, rien n'expliquerait cette absence
-          (ticket-152). */}
       {/* Ouvert aussi dès qu'un service vit ou vient de mourir : après un
           rechargement, `servicesOuverts` repart à faux et le seul clic qui
           rouvrait le panneau arrêtait le service (ticket-155). */}
@@ -83,19 +42,18 @@ export default function PanneauxDuProjet({
           atteignable par personne, le seul geste qui ouvrait ce panneau étant
           le bouton de lancement — que ces projets n'ont pas (ticket-156). */}
       {(servicesOuverts ||
-        project.fait_tourner_l_ide ||
         services?.declare === false ||
         services?.enCours ||
         services?.enEchec) &&
       services &&
-      sortieDeService ? (
+      sortieDeService &&
+      !project.fait_tourner_l_ide ? (
         <div className="max-h-72 overflow-y-auto overflow-x-hidden border-b border-zinc-800">
           <PanneauServices
             services={services}
             sortieDe={sortieDeService}
             projectId={project.id}
             cheminDuProjet={project.path ?? null}
-            faitTournerLIde={project.fait_tourner_l_ide ?? false}
           />
         </div>
       ) : null}
