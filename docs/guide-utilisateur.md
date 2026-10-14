@@ -308,7 +308,7 @@ La liste se recharge, et la barre latérale s'actualise.
 
 Si tu cherches « api » et que tu tris par activité récente, puis que tu reviens à l'onglet Kanban et au Projets, tu retrouves les mêmes réglages.
 
-## 2 ter. Surveiller les services
+## 2 ter bis. Surveiller les services
 
 ### Ouvrir la vue En cours
 
@@ -413,6 +413,15 @@ Au-dessous de l'inventaire en cours, une section « Arrêtés » regroupe les pr
 Cliquer sur ce bouton montre « Lancement… » en attente (jusqu'à 30 s). Une fois ses apps redémarrées, le projet réapparaît dans la liste.
 
 La section est repliée par défaut si le groupe compte plus de 5 projets — tu peux la déplier.
+
+
+### Applications externes et attribution au projet
+
+Une app n'est attribuée à un projet que si le processus (ou son parent direct) exécute depuis le dossier du projet ou possède un répertoire de travail situé sous ce dossier. Les chemins sont résolus (symlinks suivis) et la casse ignorée sous Windows.
+
+Si un port déclaré par le projet est occupé par un processus **étranger** — dont la ligne de commande et le répertoire ne sont pas sous le dossier du projet — ce processus n'est pas une app du projet. Il apparaît comme un **avertissement** : « port 8000 déclaré, occupé par un autre programme », sans bouton « Arrêter ». Tu ne peux pas l'arrêter depuis la vue « En cours ».
+
+Le projet qui fait tourner l'IDE lui-même n'a jamais d'app externe dans son inventaire.
 
 ## 3. Écrire des tickets
 
