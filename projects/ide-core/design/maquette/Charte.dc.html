@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tessera — charte</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1180px; box-sizing: border-box; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; padding: 40px 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 48px; align-content: start">
+
+  <section>
+    <h2 style="margin: 0 0 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; display: flex; align-items: center; gap: 8px"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Couleurs — un rôle chacune</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{ couleurs }}" as="c" hint-placeholder-count="12">
+        <div style="border: 1px solid #27272a; border-radius: 6px; overflow: hidden">
+          <div style="height: 34px; background: {{ c.hex }}"></div>
+          <div style="padding: 6px 8px"><div style="font-weight: 500">{{ c.nom }}</div><div style="color: #a1a1aa; font-size: 11px">{{ c.role }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin: 10px 0 0; color: #a1a1aa; line-height: 1.5">Violet = identité et interaction (onglet actif, barre de titre, projet actif), jamais un état. États : bleu en cours, vert réussi, ambre attention, rouge échec. Rien d'autre.</p>
+  </section>
+
+  <section>
+    <h2 style="margin: 0 0 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; display: flex; align-items: center; gap: 8px"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Texte — six tailles, pas une de plus</h2>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 120px; color: #71717a; font-size: 11px">titre-vue · 20/600</span><span style="font-size: 20px; font-weight: 600">Détail du run ticket-424</span></div>
+      <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 120px; color: #71717a; font-size: 11px">chiffre · 18/600</span><span style="font-size: 18px; font-weight: 600">566 $</span></div>
+      <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 120px; color: #71717a; font-size: 11px">corps · 13/400</span><span style="font-size: 13px">Texte courant, lignes de liste, boutons.</span></div>
+      <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 120px; color: #71717a; font-size: 11px">bande · 12/600 MAJ</span><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase">Historique</span></div>
+      <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 120px; color: #71717a; font-size: 11px">legende · 11/400</span><span style="font-size: 11px; color: #a1a1aa">il y a 2 h · 1 tour · 13 min</span></div>
+      <div style="display: flex; align-items: baseline; gap: 16px"><span style="width: 120px; color: #71717a; font-size: 11px">code · 12 mono</span><span style="font-size: 12px; font-family: ui-monospace, monospace">ticket-424 · PR #418</span></div>
+    </div>
+    <p style="margin: 12px 0 0; color: #a1a1aa; line-height: 1.5">Monospace seulement pour ce qui se copie : ids de ticket, branches, chemins, commandes, journal. Pas pour les noms de rôles ni de projets.</p>
+  </section>
+
+  <section>
+    <h2 style="margin: 0 0 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; display: flex; align-items: center; gap: 8px"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Boutons et sélecteur de vue</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+      <button style="height: 30px; padding: 0 12px; border-radius: 5px; border: 0; background: #7c3aed; color: #f5f3ff; font-size: 13px; font-weight: 500">Lancer la file</button>
+      <button style="height: 30px; padding: 0 12px; border-radius: 5px; border: 1px solid #3f3f46; background: #18181b; color: #e4e4e7; font-size: 13px">Ouvrir dans VSCode</button>
+      <button style="height: 30px; padding: 0 12px; border-radius: 5px; border: 1px solid rgba(248,113,113,0.45); background: transparent; color: #fca5a5; font-size: 13px">Arrêter</button>
+      <button style="height: 30px; padding: 0 10px; border-radius: 5px; border: 0; background: transparent; color: #a1a1aa; font-size: 13px">Annuler</button>
+      <div role="group" aria-label="Vue" style="display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 2px">
+        <button aria-pressed="true" style="background: #3f3f46; color: #f4f4f5; border: 0; border-radius: 4px; padding: 5px 12px; font-size: 12px">Liste</button>
+        <button aria-pressed="false" style="background: transparent; color: #a1a1aa; border: 0; border-radius: 4px; padding: 5px 12px; font-size: 12px">Tableau</button>
+      </div>
+    </div>
+    <p style="margin: 12px 0 0; color: #a1a1aa; line-height: 1.5">Un seul bouton plein (violet) par vue : l'action principale. Les autres sont bordés ou discrets. Un arrêt est bordé de rouge, jamais plein. Toute alternative de vue utilise ce sélecteur, à droite de la bande.</p>
+  </section>
+
+  <section>
+    <h2 style="margin: 0 0 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; display: flex; align-items: center; gap: 8px"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Pastilles d'état</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <span style="padding: 2px 8px; border-radius: 4px; background: rgba(96,165,250,0.14); color: #93c5fd; font-size: 12px">en cours</span>
+      <span style="padding: 2px 8px; border-radius: 4px; background: rgba(74,222,128,0.12); color: #86efac; font-size: 12px">approuvé</span>
+      <span style="padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.12); color: #fcd34d; font-size: 12px">2 tours</span>
+      <span style="padding: 2px 8px; border-radius: 4px; background: rgba(248,113,113,0.12); color: #fca5a5; font-size: 12px">bloqué</span>
+      <span style="padding: 2px 8px; border-radius: 4px; background: #27272a; color: #a1a1aa; font-size: 12px">à faire</span>
+      <span style="padding: 2px 8px; border-radius: 4px; background: #27272a; color: #a1a1aa; font-size: 12px">lancé à la main</span>
+    </div>
+    <p style="margin: 12px 0 0; color: #a1a1aa; line-height: 1.5">Même forme partout (Kanban, Historique, Supervision, En cours) : fond teinté à 12 %, texte clair de la même famille, rayon 4 px. Un état ne se dit jamais par la couleur seule : toujours un mot.</p>
+  </section>
+
+  <section>
+    <h2 style="margin: 0 0 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; display: flex; align-items: center; gap: 8px"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Listes et tableaux</h2>
+    <div style="border: 1px solid #27272a; border-radius: 6px; overflow: hidden">
+      <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 90px 70px; gap: 12px; padding: 8px 12px; background: #18181b; color: #71717a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px"><span>Ticket</span><span>Titre</span><span>État</span><span style="text-align: right">Coût</span></div>
+      <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 90px 70px; gap: 12px; padding: 9px 12px; border-top: 1px solid #1f1f23; background: #27272a"><span style="font-family: ui-monospace, monospace; font-size: 12px">ticket-424</span><span>La vue « En cours » arrête un projet entier</span><span style="color: #86efac">approuvé</span><span style="text-align: right; color: #a1a1aa">[COÛT]</span></div>
+      <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 90px 70px; gap: 12px; padding: 9px 12px; border-top: 1px solid #1f1f23"><span style="font-family: ui-monospace, monospace; font-size: 12px">ticket-423</span><span>tessera.ps1 stop n’arrête que Tessera</span><span style="color: #fcd34d">2 tours</span><span style="text-align: right; color: #a1a1aa">[COÛT]</span></div>
+    </div>
+    <p style="margin: 12px 0 0; color: #a1a1aa; line-height: 1.5">Lignes de 36 px, en-tête en légende majuscule, filet zinc-800, ligne choisie sur fond zinc-800 (pas de bordure violette dans une liste). Les montants s'alignent à droite.</p>
+  </section>
+
+  <section>
+    <h2 style="margin: 0 0 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; display: flex; align-items: center; gap: 8px"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>États vide, chargement, erreur</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+      <div style="border: 1px dashed #3f3f46; border-radius: 6px; padding: 16px; text-align: left"><div style="font-weight: 500">Aucun run sur ce projet</div><div style="color: #a1a1aa; margin-top: 4px; font-size: 12px">Lance un ticket depuis l'onglet Tickets.</div></div>
+      <div style="border: 1px solid #27272a; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 8px"><div style="height: 10px; width: 70%; background: #27272a; border-radius: 3px"></div><div style="height: 10px; width: 50%; background: #27272a; border-radius: 3px"></div><div style="height: 10px; width: 60%; background: #27272a; border-radius: 3px"></div></div>
+      <div style="border: 1px solid rgba(248,113,113,0.35); border-radius: 6px; padding: 16px"><div style="color: #fca5a5; font-weight: 500">Lecture impossible</div><div style="color: #a1a1aa; margin-top: 4px; font-size: 12px">Le backend ne répond pas.</div><button style="margin-top: 8px; height: 26px; padding: 0 10px; border-radius: 5px; border: 1px solid #3f3f46; background: #18181b; color: #e4e4e7; font-size: 12px">Réessayer</button></div>
+    </div>
+    <p style="margin: 12px 0 0; color: #a1a1aa; line-height: 1.5">Un vide dit quoi faire ensuite. Un chargement montre la forme du contenu, pas un texte « Chargement… ». Une erreur offre toujours une sortie.</p>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      couleurs: [
+        { nom: 'fond', hex: '#0f0f11', role: 'centre des vues' },
+        { nom: 'rail', hex: '#121214', role: 'navigation' },
+        { nom: 'surface', hex: '#18181b', role: 'colonne, tuiles, en-têtes de tableau' },
+        { nom: 'surface-haute', hex: '#27272a', role: 'ligne choisie, champs, filets forts' },
+        { nom: 'trait', hex: '#3f3f46', role: 'bordures de contrôles' },
+        { nom: 'texte', hex: '#e4e4e7', role: 'texte principal' },
+        { nom: 'texte-doux', hex: '#a1a1aa', role: 'secondaire, légendes' },
+        { nom: 'identité', hex: '#8b5cf6', role: 'onglet actif, barre de titre' },
+        { nom: 'en cours', hex: '#60a5fa', role: 'run, service vivant' },
+        { nom: 'réussi', hex: '#4ade80', role: 'approuvé, mergé, tests ok' },
+        { nom: 'attention', hex: '#fbbf24', role: 'plusieurs tours, avertissement' },
+        { nom: 'échec', hex: '#f87171', role: 'bloqué, refusé, erreur' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
