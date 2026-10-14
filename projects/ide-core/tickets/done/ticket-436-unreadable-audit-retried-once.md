@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-436
-pr_number: null
+pr_number: 433
 priority: medium
 status: done
 title: An unreadable security audit answer is asked again once before the run is blocked
