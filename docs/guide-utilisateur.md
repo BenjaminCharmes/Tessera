@@ -386,6 +386,28 @@ Si vous la quittez, le rafraîchissement s'arrête pour économiser les ressourc
 - **Chargement** : récupération de la liste en cours
 - **Erreur** : un problème a empêché le chargement (vérifiez votre connexion)
 
+### Arrêter un projet entier
+
+Un bouton dans l'en-tête du groupe arrête toutes les apps du projet en un clic : d'abord les services Tessera, puis chaque app lancée à la main (identifiées par pid externe). S'il y a une app externe, une confirmation en affiche le(s) pid(s) avant d'aller plus loin.
+
+Le bouton « Arrêter » par app seul lance l'arrêt sans confirmation — il arrête l'app individuelle, pas le groupe.
+
+Après arrêt complet, le projet disparaît de l'inventaire.
+
+### Feedback pendant l'arrêt
+
+Dès que tu cliques, la ligne passe en « Arrêt… » avec un spinner. Les boutons se désactivent pour t'empêcher de lancer deux arrêts en même temps. Tessera cherche plus souvent si le projet a disparu, pour que tu voies la fin au plus tôt.
+
+Si après 30 secondes un pid n'a toujours pas disparu, un message d'erreur s'affiche — l'app refuse peut-être de s'arrêter. Les boutons redeviennent cliquables ; tu peux relancer le projet ou l'arrêter à la main.
+
+### Relancer un projet arrêté
+
+Au-dessous de l'inventaire en cours, une section « Arrêtés » regroupe les projets qui déclaraient des services au lancement mais n'en tournent plus. Un bouton « Lancer » redémarre leurs services configurés.
+
+Cliquer sur ce bouton montre « Lancement… » en attente (jusqu'à 30 s). Une fois ses apps redémarrées, le projet réapparaît dans la liste.
+
+La section est repliée par défaut si le groupe compte plus de 5 projets — tu peux la déplier.
+
 ## 3. Écrire des tickets
 
 Un ticket est un **fichier Markdown**. Pas de base de données propriétaire : tu peux
