@@ -876,6 +876,45 @@ Les conflits du journal (`memory/pipeline-log.md`) et de la documentation (`memo
 
 Les autres conflits restent bloquants et demandent une approbation.
 
+## 5 quart. L'onglet Historique
+
+Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.
+
+### Deux vues : détail et tableau
+
+Un sélecteur en en-tête te bascule entre :
+
+- **Détail du run** (par défaut) : affiche un run unique et tous ses détails
+- **Tous les runs** : affiche un tableau de tous les runs avec filtres optionnels
+
+### Détail d'un run
+
+En ouvrant l'onglet Historique, c'est d'abord la vue **Détail du run** qui s'affiche au centre. Tu y vois :
+
+- L'identifiant et la date du ticket
+- Son titre
+- Le verdict (approuvé, refusé, bloqué) et le nombre de tours de la chaîne
+- Un lien vers la pull request si elle a été ouverte
+- Une rangée de chiffres clés : durée, coût, nombre de tours
+- Le fil complet du run avec tous les événements et messages
+
+**Sélection d'un run** : tu choisis quel run afficher en cliquant sur son entrée dans la colonne de gauche. Si aucun n'est sélectionné, le plus récent s'affiche.
+
+**Aucun run** : si ton projet n'en a pas encore, le centre affiche « Aucun run sur ce projet ».
+
+### Tous les runs : tableau et filtres
+
+Bascule vers **Tous les runs** pour voir un tableau listant chaque run du projet : ticket, titre, verdict, tours, coût, date.
+
+Tu peux filtrer ce tableau :
+
+- **Tous** : chaque run sans limite
+- **Approuvés** : les runs dont la chaîne a approuvé le travail
+- **Refusés ou bloqués** : les runs stoppés ou rejetés
+- **Plusieurs tours** : les runs avec plus d'un tour de révision
+
+Un clic sur une ligne du tableau ouvre son détail.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du
