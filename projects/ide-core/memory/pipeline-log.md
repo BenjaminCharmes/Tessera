@@ -2579,3 +2579,16 @@ Le diff ajoute deux fixtures (26906ms)
 - 2026-10-14 06:54:08 UTC — [ticket-422] validateur: APPROVED — Tous les critères sont satisfaits. Le code assure que les tests n'écrivent plus  (189827ms)
 - 2026-10-14 06:54:08 UTC — [ticket-422] APPROVED après 1 tour(s)
 - 2026-10-14 06:55:11 UTC — [ticket-422] documentation: 1 fichier(s) (59390ms)
+- 2026-10-14 06:55:25 UTC — [ide-core] ticket-422 PR #417 confiée au CIWatcher
+- 2026-10-14 06:55:28 UTC — [ticket-424] branche ticket-424-the-running-view-stops-a-whole-project-at-once-sh
+- 2026-10-14 06:55:29 UTC — [ticket-424] tour 1 — codeur démarré
+- 2026-10-14 06:59:26 UTC — [ticket-424] tour 1 — codeur terminé (236874ms)
+- 2026-10-14 07:04:06 UTC — [ticket-424] testeur: OK (exit 0)
+- 2026-10-14 07:04:45 UTC — [ticket-424] securite: PASS — Audit complet du diff : aucune vulnérabilité de sécurité détectée.
+
+Le ticket in (38094ms)
+- 2026-10-14 07:04:45 UTC — [ticket-424] tour 1 — reviewer démarré
+- 2026-10-14 07:05:13 UTC — [ticket-424] tour 1 — reviewer terminé (28187ms)
+- 2026-10-14 07:09:13 UTC — [ticket-424] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests unitaires fournis (268640ms)
+- 2026-10-14 07:09:13 UTC — [ticket-424] APPROVED après 1 tour(s)
+- 2026-10-14 07:12:05 UTC — [ticket-424] documentation: 1 fichier(s) (167547ms)

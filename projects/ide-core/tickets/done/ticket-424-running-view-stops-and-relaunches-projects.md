@@ -1,14 +1,15 @@
 ---
-id: ticket-424
-title: "The Running view stops a whole project at once, shows a spinner until it is gone, and can relaunch it"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-13
 depends_on: []
 estimated_days: 1
-created: 2026-10-13
+id: ticket-424
+pr_number: 418
+priority: medium
+status: done
+title: The Running view stops a whole project at once, shows a spinner until it is
+  gone, and can relaunch it
+type: feat
 ---
 
 # ticket-424 — Vue « En cours » : arrêter un projet entier, attendre, relancer
