@@ -1,14 +1,15 @@
 ---
-id: ticket-426
-title: "The navigation rail is grouped into Pilotage, Projet and Outils, as in the validated mockup"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-426
+pr_number: 423
+priority: medium
+status: done
+title: The navigation rail is grouped into Pilotage, Projet and Outils, as in the
+  validated mockup
+type: feat
 ---
 
 # ticket-426 — Navigation regroupée : Pilotage, Projet, Outils
