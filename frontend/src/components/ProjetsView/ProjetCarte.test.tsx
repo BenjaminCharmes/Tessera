@@ -33,7 +33,7 @@ function projet(extra: Partial<ProjectOverview> = {}): ProjectOverview {
 }
 
 function afficher(p: ProjectOverview, onSelect = vi.fn(), onServicesChange = vi.fn()) {
-  render(
+  const rendu = render(
     <ProjetCarte
       projet={p}
       actif={false}
@@ -44,7 +44,7 @@ function afficher(p: ProjectOverview, onSelect = vi.fn(), onServicesChange = vi.
       onFileLancee={vi.fn()}
     />,
   );
-  return { onSelect, onServicesChange };
+  return { onSelect, onServicesChange, unmount: rendu.unmount };
 }
 
 beforeEach(() => {
@@ -103,5 +103,24 @@ describe("ProjetCarte services button", () => {
 
     finir({ services: [] });
     await waitFor(() => expect(screen.getByRole("button", { name: "Lancer" })).toBeEnabled());
+  });
+});
+
+describe("ProjetCarte services state", () => {
+  it("marks the card of a project whose app is running", () => {
+    afficher(projet({ services_declares: true, services_en_cours: true }));
+
+    const carte = screen.getByRole("article");
+    expect(carte.dataset.services).toBe("en-cours");
+    expect(carte.className).toContain("border-blue-500/60");
+  });
+
+  it("marks a launchable project apart from one with nothing to launch", () => {
+    const { unmount } = afficher(projet({ services_declares: true, services_en_cours: false }));
+    expect(screen.getByRole("article").dataset.services).toBe("a-l-arret");
+    unmount();
+
+    afficher(projet({ services_declares: false }));
+    expect(screen.getByRole("article").dataset.services).toBeUndefined();
   });
 });

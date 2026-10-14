@@ -22,6 +22,12 @@ interface ProjetCarteProps {
   onFileLancee: () => void;
 }
 
+/** L'état de l'app du projet, pour la carte ; `undefined` sans rien à lancer. */
+function etatServices(projet: ProjectOverview): string | undefined {
+  if (projet.services_en_cours) return "en-cours";
+  return projet.services_declares ? "a-l-arret" : undefined;
+}
+
 /** Carré d'icône : l'icône du projet, ou à défaut son initiale. */
 function Icone({ projet }: { projet: ProjectOverview }) {
   const [cassee, setCassee] = useState(false);
@@ -122,9 +128,19 @@ export default function ProjetCarte({
       aria-current={actif ? "true" : undefined}
       onClick={onSelect}
       onKeyDown={surClavier}
-      className={`flex cursor-pointer flex-col gap-2 rounded-sm border border-zinc-800 bg-zinc-900 p-3 outline-hidden transition-colors hover:bg-zinc-800/60 focus-visible:border-zinc-500 ${
-        // Au repos, la bordure fait le tour de la carte ; le projet actif
-        // seul reçoit la barre violette, plus épaisse (ADR-026 : identité).
+      data-services={etatServices(projet)}
+      className={`flex cursor-pointer flex-col gap-2 rounded-sm border bg-zinc-900 p-3 outline-hidden transition-colors hover:bg-zinc-800/60 focus-visible:border-zinc-500 ${
+        // L'app qui tourne se voit de loin : bordure bleue (ADR-026 : `blue`
+        // pour l'activité). Lançable mais à l'arrêt : bordure plus claire que
+        // celle d'un projet sans rien à lancer.
+        projet.services_en_cours
+          ? "border-blue-500/60"
+          : projet.services_declares
+            ? "border-zinc-700"
+            : "border-zinc-800"
+      } ${
+        // Le projet actif seul reçoit la barre violette, plus épaisse
+        // (ADR-026 : identité).
         actif ? "border-l-2 border-l-violet-500" : ""
       }`}
     >

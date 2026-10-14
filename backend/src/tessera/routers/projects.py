@@ -70,6 +70,7 @@ from tessera.services.project_loader import (
     AgentAbsentDuProjet,
     ModeleInconnu,
     ProjectLoader,
+    fait_tourner_l_ide,
     load_agents_config,
     load_pipeline_config,
     load_services_config,
@@ -119,7 +120,10 @@ async def get_projects_overview() -> list[ProjectOverview]:
                 build_overview(
                     p,
                     run_actif=RUN_REGISTRY.projet_occupe(p.id),
-                    services_declares=bool(load_services_config(p.path)),
+                    # Le projet qui fait tourner l'IDE n'a rien à lancer depuis
+                    # l'IDE : ce serait un second backend sur un port pris.
+                    services_declares=bool(load_services_config(p.path))
+                    and not fait_tourner_l_ide(p.path),
                     services_en_cours=any(
                         s.en_cours for s in PROCESS_REGISTRY.services_de(p.id)
                     ),
