@@ -25,8 +25,9 @@ _OCTETS_PAR_MO = 1024 * 1024
 
 _POWERSHELL = (
     "Get-CimInstance Win32_Process | Where-Object { $_.CreationDate } | "
-    "ForEach-Object { '{0},{1},{2},{3}' -f $_.ProcessId, $_.ParentProcessId, "
-    "$_.WorkingSetSize, $_.CreationDate.ToUniversalTime().ToString('o') }"
+    "ForEach-Object { '{0},{1},{2},{3},{4}' -f $_.ProcessId, $_.ParentProcessId, "
+    "$_.WorkingSetSize, $_.CreationDate.ToUniversalTime().ToString('o'), "
+    "(($_.CommandLine -replace '[\\r\\n]+', ' ')) }"
 )
 _PORT_NETSTAT = re.compile(r":(\d+)$")
 _PID_SS = re.compile(r"pid=(\d+)")
@@ -39,6 +40,8 @@ class InfoProcessus:
     ppid: int
     memoire_mo: float
     demarre_a: datetime | None
+    #: Ligne de commande complète ; vide quand l'OS ne la donne pas.
+    commande: str = ""
 
 
 class SondeSysteme(Protocol):
@@ -99,11 +102,15 @@ def lire_ss(sortie: str) -> dict[int, int]:
 
 
 def lire_powershell(sortie: str) -> dict[int, InfoProcessus]:
-    """Parse `pid,ppid,working_set_bytes,iso_creation_date` lines."""
+    """Parse `pid,ppid,working_set_bytes,iso_creation_date[,command_line]` lines.
+
+    La ligne de commande vient en dernier et peut elle-même contenir des
+    virgules : on ne coupe que les quatre premières.
+    """
     processus: dict[int, InfoProcessus] = {}
     for ligne in sortie.splitlines():
-        champs = ligne.strip().split(",")
-        if len(champs) != 4 or not all(c.isdigit() for c in champs[:3]):
+        champs = ligne.strip().split(",", 4)
+        if len(champs) < 4 or not all(c.isdigit() for c in champs[:3]):
             continue
         try:
             demarre_a: datetime | None = datetime.fromisoformat(champs[3])
@@ -113,20 +120,25 @@ def lire_powershell(sortie: str) -> dict[int, InfoProcessus]:
             ppid=int(champs[1]),
             memoire_mo=int(champs[2]) / _OCTETS_PAR_MO,
             demarre_a=demarre_a,
+            commande=champs[4].strip() if len(champs) == 5 else "",
         )
     return processus
 
 
 def lire_ps(sortie: str) -> dict[int, InfoProcessus]:
-    """Parse `ps -eo pid=,ppid=,rss=,lstart=` (RSS in KiB, local time)."""
+    """Parse `ps -eo pid=,ppid=,rss=,lstart=,args=` (RSS in KiB, local time).
+
+    `lstart` occupe toujours cinq mots (« Tue Oct 13 08:00:00 2026 ») : tout ce
+    qui suit est la ligne de commande.
+    """
     processus: dict[int, InfoProcessus] = {}
     for ligne in sortie.splitlines():
-        champs = ligne.split(None, 3)
-        if len(champs) != 4 or not all(c.isdigit() for c in champs[:3]):
+        champs = ligne.split(None, 8)
+        if len(champs) < 8 or not all(c.isdigit() for c in champs[:3]):
             continue
         try:
             demarre_a: datetime | None = datetime.strptime(
-                champs[3].strip(), "%a %b %d %H:%M:%S %Y"
+                " ".join(champs[3:8]), "%a %b %d %H:%M:%S %Y"
             ).astimezone()
         except ValueError:
             demarre_a = None
@@ -134,6 +146,7 @@ def lire_ps(sortie: str) -> dict[int, InfoProcessus]:
             ppid=int(champs[1]),
             memoire_mo=int(champs[2]) / 1024,
             demarre_a=demarre_a,
+            commande=champs[8].strip() if len(champs) == 9 else "",
         )
     return processus
 
@@ -154,6 +167,6 @@ class SondeReelle:
             )
             return lire_powershell(sortie)
         sortie = await asyncio.to_thread(
-            _executer, ["ps", "-eo", "pid=,ppid=,rss=,lstart="]
+            _executer, ["ps", "-eo", "pid=,ppid=,rss=,lstart=,args="]
         )
         return lire_ps(sortie)

@@ -9,7 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from tessera.config import settings
 from tessera.services.groupe_de_processus import tuer_l_arbre
-from tessera.services.inventaire_apps import AppEnCours, inventaire
+from tessera.models.inventaire import AppEnCours, PortOccupe
+from tessera.services.inventaire_apps import inventaire, inventaire_complet
 from tessera.services.process_registry import PROCESS_REGISTRY
 from tessera.services.sonde_systeme import SondeReelle, SondeSysteme
 
@@ -26,6 +27,14 @@ async def lister_les_apps(
     sonde: SondeSysteme = Depends(get_sonde),
 ) -> list[AppEnCours]:
     return await inventaire(sonde, settings.ide_workspace_dir)
+
+
+@router.get("/running/avertissements", response_model=list[PortOccupe])
+async def lister_les_ports_occupes(
+    sonde: SondeSysteme = Depends(get_sonde),
+) -> list[PortOccupe]:
+    """Declared ports held by a foreign program: shown, never stoppable."""
+    return (await inventaire_complet(sonde, settings.ide_workspace_dir)).ports_occupes
 
 
 @router.post("/running/{pid}/stop")

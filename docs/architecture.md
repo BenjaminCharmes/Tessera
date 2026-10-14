@@ -988,6 +988,14 @@ Mesure de mémoire : `psutil` si disponible (le backend le teste au startup) ; s
 
 L'endpoint `POST /api/v1/services/running/{pid}/stop` arrête l'arbre de processus, seulement si ce pid figure dans l'inventaire courant (404 sinon). Services `tessera` passent par `PROCESS_REGISTRY.arreter` ; services externes sont tués directement.
 
+#### Attribution aux projets (ticket-435)
+
+Une app externe n'est attribuée au projet que si son processus (ou parent direct) s'exécute sous le dossier du projet — chemins résolus, casse Windows ignorée.
+
+Un port déclaré occupé par un processus étranger apparaît comme avertissement, sans pid arrêtable. L'endpoint `POST /services/running/{pid}/stop` refuse (404) pour ces avertissements.
+
+Le projet qui fait tourner l'IDE n'a jamais d'app externe.
+
 ### Vue « En cours » (ticket-417)
 
 La vue « En cours » supervise les services de projet actifs sur la machine, exposant

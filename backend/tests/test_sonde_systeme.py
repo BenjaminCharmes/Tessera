@@ -54,6 +54,27 @@ def test_ps_lines_give_memory_in_mb_and_start() -> None:
     assert procs[321].demarre_a is not None
 
 
+def test_powershell_command_line_keeps_its_commas() -> None:
+    sortie = "1234,10,1048576,2026-10-13T08:00:00.0000000Z,node a.js --x=1,2\n"
+
+    assert lire_powershell(sortie)[1234].commande == "node a.js --x=1,2"
+
+
+def test_powershell_line_without_command_gives_an_empty_one() -> None:
+    sortie = "1234,10,1048576,2026-10-13T08:00:00.0000000Z,\n"
+
+    assert lire_powershell(sortie)[1234].commande == ""
+
+
+def test_ps_command_line_follows_the_start_date() -> None:
+    sortie = "  321   1  2048 Tue Oct 13 08:00:00 2026 /usr/bin/node /srv/app.js\n"
+
+    procs = lire_ps(sortie)
+
+    assert procs[321].commande == "/usr/bin/node /srv/app.js"
+    assert procs[321].demarre_a is not None
+
+
 def test_real_probe_never_raises() -> None:
     sonde = SondeReelle()
 

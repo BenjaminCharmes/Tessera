@@ -1,14 +1,15 @@
 ---
-id: ticket-435
-title: "The Running view only attributes an app to a project when the process really belongs to it, never on a port alone"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-435
+pr_number: 430
+priority: critical
+status: done
+title: The Running view only attributes an app to a project when the process really
+  belongs to it, never on a port alone
+type: fix
 ---
 
 # ticket-435 — « En cours » n'attribue jamais à un projet une app qui n'est pas la sienne
