@@ -37,6 +37,10 @@ vi.mock("./EnCoursView", () => ({
   default: () => <div data-testid="en-cours-view">EnCoursView</div>,
 }));
 
+vi.mock("./HistoriqueView", () => ({
+  default: () => <div data-testid="historique-view">HistoriqueView</div>,
+}));
+
 const STATUTS: TicketStatus[] = [
   "todo",
   "in-progress",
@@ -72,6 +76,14 @@ const baseProps = {
     enLancement: () => false,
   },
   agentSelectionne: null,
+  historique: {
+    runs: [],
+    loading: false,
+    error: null,
+    runSelectionne: null,
+    onSelectRun: vi.fn(),
+    tickets: [],
+  },
   stream: {} as unknown as ReturnType<typeof useRunActif>,
   byStatus,
   running: new Set<string>(),
@@ -144,6 +156,12 @@ describe("CenterView", () => {
   it("renders ProjetsView when panel is projects", () => {
     render(<CenterView {...baseProps} panel="projects" vueCentre="kanban" />);
     expect(screen.getByTestId("projets-view")).toBeInTheDocument();
+    expect(screen.queryByTestId("kanban-view")).not.toBeInTheDocument();
+  });
+
+  it("renders HistoriqueView, not the tickets list, when panel is history", () => {
+    render(<CenterView {...baseProps} panel="history" vueCentre="kanban" />);
+    expect(screen.getByTestId("historique-view")).toBeInTheDocument();
     expect(screen.queryByTestId("kanban-view")).not.toBeInTheDocument();
   });
 

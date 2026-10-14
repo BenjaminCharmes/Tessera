@@ -80,6 +80,9 @@ export interface RunsSidebar {
   liste: PipelineRun[];
   loading: boolean;
   error: string | null;
+  /** Le run regardé au centre, null tant qu'aucun n'est choisi (ticket-427). */
+  selectionne?: string | null;
+  onSelect?: (runId: string) => void;
 }
 
 export interface UsageSidebar {
@@ -218,6 +221,8 @@ export default function Sidebar({
             loading={runs.loading}
             error={runs.error}
             onSelectTicket={tickets.onSelectById}
+            selectedRunId={runs.selectionne ?? null}
+            onSelectRun={runs.onSelect}
           />
         )}
         {panel === "agents" && (
