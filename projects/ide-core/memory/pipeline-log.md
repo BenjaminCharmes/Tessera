@@ -2822,3 +2822,13 @@ Ce diff refactorise l'UI pou (27266ms)
 - 2026-10-14 17:16:02 UTC — [ticket-442] APPROVED après 1 tour(s)
 - 2026-10-14 17:17:31 UTC — [ticket-442] documentation: 0 fichier(s) (86656ms)
 - 2026-10-14 17:18:18 UTC — [ticket-442] livraison: arrêt — Conflit avec develop sur : frontend/src/components/HistoriqueView/DetailDuRun.tsx, frontend/src/comp
+- 2026-10-14 17:18:30 UTC — [ticket-444] branche ticket-444-a-queue-s-status-tells-the-approved-tickets-from
+- 2026-10-14 17:18:31 UTC — [ticket-444] tour 1 — codeur démarré
+- 2026-10-14 17:20:29 UTC — [ticket-444] tour 1 — codeur terminé (118187ms)
+- 2026-10-14 17:29:40 UTC — [ticket-444] testeur: OK (exit 0)
+- 2026-10-14 17:30:12 UTC — [ticket-444] securite: PASS — Aucune vulnérabilité critique ou haute détectée dans ce diff. Les changements co (31843ms)
+- 2026-10-14 17:30:12 UTC — [ticket-444] tour 1 — reviewer démarré
+- 2026-10-14 17:30:43 UTC — [ticket-444] tour 1 — reviewer terminé (31219ms)
+- 2026-10-14 17:33:01 UTC — [ticket-444] validateur: fichiers cités joints : aucun ; absents : docs/api.md
+- 2026-10-14 17:33:01 UTC — [ticket-444] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la séparatio (169608ms)
+- 2026-10-14 17:33:01 UTC — [ticket-444] APPROVED après 1 tour(s)
