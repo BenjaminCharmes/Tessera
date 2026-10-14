@@ -1,6 +1,7 @@
-import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
+import { IconChevronDown } from "../../design/icons";
 import { useEffect, useRef } from "react";
+import { useEtatPersistant } from "../../hooks/useEtatPersistant";
 import type { OrchestratorEvent } from "../../types/api";
 
 interface BottomPanelProps {
@@ -122,31 +123,76 @@ function eventToLine(ev: OrchestratorEvent): string | null {
   }
 }
 
+const EVENEMENTS_DE_FIN: readonly OrchestratorEvent["type"][] = [
+  "pipeline_done",
+  "run_closed",
+  "error",
+];
+
+/** Un run est en cours tant que le dernier événement n'est pas une fin. */
+function runEnCours(events: OrchestratorEvent[]): boolean {
+  const dernier = events[events.length - 1];
+  return dernier !== undefined && !EVENEMENTS_DE_FIN.includes(dernier.type);
+}
+
 export default function BottomPanel({ events, projetLabel }: BottomPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [deplie, setDeplie] = useEtatPersistant<boolean>(
+    "journal-deplie",
+    false,
+    (v): v is boolean => typeof v === "boolean",
+  );
   const lines = events.map(eventToLine).filter((l): l is string => l !== null);
+  const derniere = lines[lines.length - 1];
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [lines.length]);
+    if (deplie) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [lines.length, deplie]);
 
   return (
-    <div className="h-full flex flex-col bg-zinc-950 border-t border-zinc-700">
-      <div className={`${BAND} gap-4 border-b border-zinc-700 px-4`}>
-        <RegionTitle>Pipeline log{projetLabel ? ` — ${projetLabel}` : ""}</RegionTitle>
-      </div>
-      <div className="flex-1 overflow-y-auto px-4 py-2 text-xs font-mono">
-        {lines.length === 0 ? (
-          <span className="text-zinc-700">— en attente d'un pipeline —</span>
-        ) : (
-          lines.map((line, i) => (
-            <div key={i} className="text-zinc-400 leading-5">
-              {line}
-            </div>
-          ))
+    <div
+      className={`flex flex-col bg-zinc-950 border-t border-zinc-700 ${
+        deplie ? "h-[180px]" : "h-8"
+      }`}
+    >
+      <button
+        type="button"
+        aria-expanded={deplie}
+        onClick={() => setDeplie((d) => !d)}
+        className={`flex shrink-0 w-full items-center gap-3 px-4 text-left hover:bg-zinc-900 ${
+          deplie ? "h-10 border-b border-zinc-700" : "h-8"
+        }`}
+      >
+        <RegionTitle>Journal{projetLabel ? ` — ${projetLabel}` : ""}</RegionTitle>
+        {runEnCours(events) && (
+          <span
+            role="img"
+            aria-label="Run en cours"
+            className="h-2 w-2 shrink-0 rounded-full bg-blue-500"
+          />
         )}
-        <div ref={bottomRef} />
-      </div>
+        <span className="min-w-0 flex-1 truncate text-xs font-mono text-zinc-400">
+          {deplie ? "" : (derniere ?? "— en attente d'un pipeline —")}
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-1 text-xs text-zinc-400">
+          {deplie ? "Réduire" : "Déplier"}
+          <IconChevronDown size={14} className={deplie ? "" : "rotate-180"} />
+        </span>
+      </button>
+      {deplie && (
+        <div className="flex-1 overflow-y-auto px-4 py-2 text-xs font-mono">
+          {lines.length === 0 ? (
+            <span className="text-zinc-700">— en attente d'un pipeline —</span>
+          ) : (
+            lines.map((line, i) => (
+              <div key={i} className="text-zinc-400 leading-5">
+                {line}
+              </div>
+            ))
+          )}
+          <div ref={bottomRef} />
+        </div>
+      )}
     </div>
   );
 }

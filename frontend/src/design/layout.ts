@@ -22,5 +22,7 @@ export const BAND = "flex h-10 shrink-0 items-center";
 export const GRILLE_COCKPIT = {
   display: "grid",
   gridTemplateColumns: "100px 280px 1fr",
-  gridTemplateRows: "1fr 180px",
+  // Dernière rangée en `auto` : le panneau du bas fixe lui-même sa hauteur
+  // (32 px replié, 180 px déplié — ticket-440).
+  gridTemplateRows: "1fr auto",
 } as const;

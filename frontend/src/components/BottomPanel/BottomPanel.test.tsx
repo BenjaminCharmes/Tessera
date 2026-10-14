@@ -1,10 +1,18 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import BottomPanel from "./index";
 import type { OrchestratorEvent } from "../../types/api";
 
+const CLE_JOURNAL = "tessera.ui.journal-deplie";
+
 beforeAll(() => {
   window.HTMLElement.prototype.scrollIntoView = () => {};
+});
+
+// Les tests de formatage lisent le journal complet : on le déplie d'office.
+// Le comportement replié a son propre bloc plus bas, qui repart d'un stockage vide.
+beforeEach(() => {
+  window.localStorage.setItem(CLE_JOURNAL, "true");
 });
 
 function makeEvent(
@@ -218,13 +226,83 @@ describe("BottomPanel — test_result et validation_done (ticket-279)", () => {
 describe("BottomPanel — suivi d'un autre projet (ticket-283)", () => {
   it("affiche le projet dans le titre quand projetLabel est fourni", () => {
     render(<BottomPanel events={[]} projetLabel="mon-projet" />);
-    expect(screen.getByText(/Pipeline log.*mon-projet/)).toBeTruthy();
+    expect(screen.getByText(/Journal.*mon-projet/)).toBeTruthy();
   });
 
   it("n'affiche pas de suffixe sans projetLabel", () => {
     render(<BottomPanel events={[]} />);
     // Le titre ne comporte pas de tiret ni de nom de projet
-    expect(screen.getByText("Pipeline log")).toBeTruthy();
+    expect(screen.getByText("Journal")).toBeTruthy();
+  });
+});
+
+describe("BottomPanel — journal repliable (ticket-440)", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  const deuxEvenements = [
+    makeEvent("agent_started", { round: 1 }, { agent: "codeur" }),
+    makeEvent("agent_done", {}, { agent: "reviewer" }),
+  ];
+
+  it("est replié par défaut et montre le dernier événement", () => {
+    render(<BottomPanel events={deuxEvenements} />);
+    const bouton = screen.getByRole("button", { expanded: false });
+    expect(bouton.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByText(/reviewer.*terminé/)).toBeTruthy();
+    expect(screen.queryByText(/codeur.*démarré/)).toBeNull();
+    expect(screen.getByText(/Déplier/)).toBeTruthy();
+  });
+
+  it("dit qu'il attend un pipeline quand il est vide et replié", () => {
+    render(<BottomPanel events={[]} />);
+    expect(screen.getByText(/en attente/i)).toBeTruthy();
+  });
+
+  it("se déplie au clic sur la barre, puis se replie", () => {
+    render(<BottomPanel events={deuxEvenements} />);
+    const bouton = screen.getByRole("button");
+    fireEvent.click(bouton);
+    expect(bouton.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText(/codeur.*démarré/)).toBeTruthy();
+    expect(screen.getByText(/Réduire/)).toBeTruthy();
+    fireEvent.click(bouton);
+    expect(bouton.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByText(/codeur.*démarré/)).toBeNull();
+  });
+
+  it("mémorise l'état dans le stockage local", () => {
+    render(<BottomPanel events={[]} />);
+    fireEvent.click(screen.getByRole("button"));
+    expect(window.localStorage.getItem(CLE_JOURNAL)).toBe("true");
+  });
+
+  it("relit l'état déplié depuis le stockage local", () => {
+    window.localStorage.setItem(CLE_JOURNAL, "true");
+    render(<BottomPanel events={deuxEvenements} />);
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText(/codeur.*démarré/)).toBeTruthy();
+  });
+
+  it("retombe sur replié quand la valeur mémorisée est illisible", () => {
+    window.localStorage.setItem(CLE_JOURNAL, "{pas du json");
+    render(<BottomPanel events={[]} />);
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("montre une pastille quand un run est en cours", () => {
+    render(<BottomPanel events={[makeEvent("agent_started", { round: 1 }, { agent: "codeur" })]} />);
+    expect(screen.getByRole("img", { name: "Run en cours" })).toBeTruthy();
+  });
+
+  it("n'affiche pas de pastille une fois le pipeline terminé", () => {
+    render(
+      <BottomPanel
+        events={[makeEvent("pipeline_done", { approved: true, final_status: "done" })]}
+      />,
+    );
+    expect(screen.queryByRole("img", { name: "Run en cours" })).toBeNull();
   });
 });
 
