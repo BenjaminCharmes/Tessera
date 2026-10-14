@@ -2721,3 +2721,15 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 12:02:22 UTC — [ticket-433] tour 1 — reviewer terminé (36734ms)
 - 2026-10-14 12:02:22 UTC — [ticket-433] APPROVED après 1 tour(s)
 - 2026-10-14 12:06:34 UTC — [ticket-433] documentation: 3 fichier(s) (233203ms)
+- 2026-10-14 12:06:50 UTC — [ide-core] ticket-433 PR #435 confiée au CIWatcher
+- 2026-10-14 12:06:53 UTC — [ticket-432] branche ticket-432-tessera-captures-a-project-s-screens-at-phone-and
+- 2026-10-14 12:07:56 UTC — [ticket-432] plan rendu (62750ms)
+- 2026-10-14 12:07:56 UTC — [ticket-432] tour 1 — codeur démarré
+- 2026-10-14 12:12:20 UTC — [ticket-432] tour 1 — codeur terminé (263765ms)
+- 2026-10-14 12:17:35 UTC — [ticket-432] testeur: OK (exit 0)
+- 2026-10-14 12:18:28 UTC — [ticket-432] securite: PASS — Audit de sécurité complet des captures de projet (ticket-432). Aucune vulnérabil (53467ms)
+- 2026-10-14 12:18:28 UTC — [ticket-432] tour 1 — reviewer démarré
+- 2026-10-14 12:18:56 UTC — [ticket-432] tour 1 — reviewer terminé (27750ms)
+- 2026-10-14 12:18:58 UTC — [ticket-432] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff contient un système com (29500ms)
+- 2026-10-14 12:18:58 UTC — [ticket-432] APPROVED après 1 tour(s)
+- 2026-10-14 12:22:25 UTC — [ticket-432] documentation: 0 fichier(s) (204562ms)

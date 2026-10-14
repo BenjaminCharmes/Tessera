@@ -14,6 +14,7 @@ from tessera.services.shell_detection import agent_shell_ok, resolve_git_bash, w
 from tessera.routers import (
     agent_admin,
     agents,
+    captures as captures_router,
     chat,
     fs,
     observation,
@@ -112,6 +113,7 @@ app.include_router(orchestrator.router, prefix="/api/v1")
 app.include_router(observation.router, prefix="/api/v1")
 app.include_router(services_router.router, prefix="/api/v1")
 app.include_router(services_running.router, prefix="/api/v1")
+app.include_router(captures_router.router, prefix="/api/v1")
 app.include_router(agent_admin.router, prefix="/api/v1")
 app.include_router(fs.router, prefix="/api/v1")
 app.include_router(usage.router, prefix="/api/v1")

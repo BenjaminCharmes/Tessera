@@ -1,15 +1,16 @@
 ---
-id: ticket-432
-title: "Tessera captures a project's screens at phone and desktop width, light and dark, to compare them with the mockup"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 1
-created: 2026-10-14
+id: ticket-432
 plan: true
+pr_number: 436
+priority: high
+status: done
+title: Tessera captures a project's screens at phone and desktop width, light and
+  dark, to compare them with the mockup
+type: feat
 ---
 
 # ticket-432 — Capturer les écrans d'un projet
