@@ -900,6 +900,21 @@ Avec cet identifiant, tu peux retrouver ta file à tout moment, même après red
 
 C'est plus direct que de chercher ta file dans l'historique, notamment quand plusieurs files s'étalent sur le temps.
 
+
+### Le journal du pipeline en bas
+
+Le journal du pipeline s'affiche en bas de l'écran. Pour te laisser plus de place, il est **replié par défaut** ; tu peux le déplier quand tu veux voir tous les évènements.
+
+**Panneau replié (par défaut)** — une barre de 32 px affichant :
+- le mot « JOURNAL »
+- une **pastille bleue** si un run tourne actuellement
+- **le dernier évènement**, tronqué sur une ligne
+- le bouton « Déplier ▴ »
+
+Un clic sur la barre déplie le journal à 180 px, affichant la liste complète des évènements. Le bouton devient « Réduire ▾ ».
+
+**L'état du panneau persiste** — le navigateur sauvegarde si tu l'as laissé replié ou déplié, tu le retrouves dans le même état quand tu reviens.
+
 ## 5 ter. Après le run : fusion automatique
 
 Quand le run se termine approuvé, l'IDE :

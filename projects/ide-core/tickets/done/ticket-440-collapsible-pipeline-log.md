@@ -1,14 +1,15 @@
 ---
-id: ticket-440
-title: "The pipeline log at the bottom is collapsible, folded by default to one line with the latest event"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-14
+id: ticket-440
+pr_number: 444
+priority: medium
+status: done
+title: The pipeline log at the bottom is collapsible, folded by default to one line
+  with the latest event
+type: feat
 ---
 
 # ticket-440 — Le journal du pipeline se replie
