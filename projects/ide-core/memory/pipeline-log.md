@@ -2592,3 +2592,14 @@ Le ticket in (38094ms)
 - 2026-10-14 07:09:13 UTC — [ticket-424] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests unitaires fournis (268640ms)
 - 2026-10-14 07:09:13 UTC — [ticket-424] APPROVED après 1 tour(s)
 - 2026-10-14 07:12:05 UTC — [ticket-424] documentation: 1 fichier(s) (167547ms)
+- 2026-10-14 07:12:19 UTC — [ide-core] ticket-424 PR #418 confiée au CIWatcher
+- 2026-10-14 08:14:51 UTC — [ticket-425] branche ticket-425-switching-project-keeps-the-current-tab-and-view
+- 2026-10-14 08:14:52 UTC — [ticket-425] tour 1 — codeur démarré
+- 2026-10-14 08:16:39 UTC — [ticket-425] tour 1 — codeur terminé (107609ms)
+- 2026-10-14 08:24:47 UTC — [ticket-425] testeur: OK (exit 0)
+- 2026-10-14 08:25:03 UTC — [ticket-425] securite: PASS — Diff composé uniquement de tests unitaires et d'une refactorisation logique méti (15358ms)
+- 2026-10-14 08:25:03 UTC — [ticket-425] tour 1 — reviewer démarré
+- 2026-10-14 08:25:24 UTC — [ticket-425] tour 1 — reviewer terminé (21561ms)
+- 2026-10-14 08:27:33 UTC — [ticket-425] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés ou mod (150733ms)
+- 2026-10-14 08:27:33 UTC — [ticket-425] APPROVED après 1 tour(s)
+- 2026-10-14 08:29:01 UTC — [ticket-425] documentation: 1 fichier(s) (83936ms)

@@ -39,8 +39,8 @@ function makeRun(runId: string, projectId: string): RunActif {
   };
 }
 
-// Acceptance criteria from ticket-271: switching project must preserve the
-// active panel, except when coming from the projects list which opens tickets.
+// Acceptance criteria from ticket-271 and ticket-425: switching project must
+// preserve the active panel, including the projects list.
 describe("panelAfterProjectSwitch", () => {
   it("keeps the usage panel when changing project", () => {
     expect(panelAfterProjectSwitch("usage")).toBe("usage");
@@ -50,8 +50,8 @@ describe("panelAfterProjectSwitch", () => {
     expect(panelAfterProjectSwitch("chat")).toBe("chat");
   });
 
-  it("switches to tickets when the projects panel is active", () => {
-    expect(panelAfterProjectSwitch("projects")).toBe("tickets");
+  it("keeps the projects panel when changing project", () => {
+    expect(panelAfterProjectSwitch("projects")).toBe("projects");
   });
 
   it("keeps every other panel unchanged", () => {

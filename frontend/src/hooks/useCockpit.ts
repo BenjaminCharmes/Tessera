@@ -27,14 +27,17 @@ import type { StreamState } from "./streamState";
 import { useListeRuns } from "./runStore";
 
 /**
- * Returns the panel to activate when the user selects a project from the
- * selector. Coming from the projects list always opens tickets; any other
- * panel stays — the user was already where they wanted to be (ticket-271).
+ * Returns the panel to activate when the user selects a project, from a card,
+ * the selector or the list. The current panel always stays: the user was
+ * already where they wanted to be, and chaining several projects must not
+ * send them back to the tickets each time (ticket-271, ticket-425).
+ *
+ * Kept as a named function so an exception can be added in one place.
  */
 export function panelAfterProjectSwitch(
   current: SidebarPanel,
 ): SidebarPanel {
-  return current === "projects" ? "tickets" : current;
+  return current;
 }
 
 /**
@@ -255,7 +258,9 @@ export function useCockpit() {
     setProject(p);
     memoriser(p?.id ?? null);
     setPanel(panelAfterProjectSwitch(panel));
-    setShowKanban(true);
+    // `showKanban` n'est pas touché : la vue du centre reste celle que
+    // l'utilisateur avait choisie (ticket-425). Le fichier ouvert, lui, est
+    // celui de l'ancien projet : il se ferme.
     setOpenFilePath(null);
     stream.clear();
   }

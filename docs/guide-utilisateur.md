@@ -265,6 +265,12 @@ Une confirmation s'affiche sur la carte : « Lancer N tickets ? » Clique **« L
 
 Clique sur une carte pour la sélectionner. La zone centrale passe au Kanban de ce projet, comme si tu l'avais choisi dans la barre latérale.
 
+Quand tu cliques sur une carte de projet, le projet est sélectionné (barre violette, colonne de gauche à jour) et tu restes sur la vue Projets — tu n'es pas renvoyé à la liste des tickets. Changer de projet n'interrompt pas ta tâche de lecture ou de navigation.
+
+L'onglet que tu consultais avant le changement se maintient : si tu regardais un tableau Kanban, tu vois le tableau du nouveau projet ; si tu consultais la liste, tu vois la liste du nouveau projet.
+
+Le fichier ouvert se ferme ; le flux du run affiché réinitialise.
+
 ### Démarrer ou arrêter l'app d'une carte de projet
 
 Quand un projet déclare une app, tu vois un bouton **Lancer** (ou **Arrêter** si elle tourne déjà) au bas de la carte.
