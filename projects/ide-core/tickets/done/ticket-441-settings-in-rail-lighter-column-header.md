@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-441
-pr_number: null
+pr_number: 445
 priority: medium
 status: done
 title: Settings move behind a button at the bottom of the rail, and the column header
