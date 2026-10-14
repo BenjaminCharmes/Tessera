@@ -154,6 +154,41 @@ describe("HistoriqueView", () => {
     );
   });
 
+  it("shows one row per ticket for a queue, in the column and in the table", async () => {
+    const file = run("r-file", "ticket-10", { started_at: "2026-10-14T06:00:00Z" });
+    const enfants = [
+      run("r-e1", "ticket-10", { parent_run_id: "r-file" }),
+      run("r-e2", "ticket-11", { parent_run_id: "r-file" }),
+    ];
+    render(<Cockpit runs={[file, ...enfants]} />);
+    expect(colonne().getAllByText(/^ticket-1\d$/)).toHaveLength(2);
+    await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
+    expect(centre().getAllByText(/^ticket-1\d$/)).toHaveLength(2);
+  });
+
+  it("shows a single-ticket run once", async () => {
+    render(<Cockpit runs={[run("r-seul", "ticket-10", { parent_run_id: null })]} />);
+    await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
+    expect(centre().getAllByText("ticket-10")).toHaveLength(1);
+  });
+
+  it("shows an interrupted run as such, with a dash for the duration", async () => {
+    const interrompu = run("r-int", "ticket-10", {
+      approved: false,
+      final_status: "blocked",
+      rounds: 0,
+      finished_at: "2026-10-15T07:00:00Z",
+      arret: "backend restarted: the run's process is gone",
+    });
+    render(<Cockpit runs={[interrompu]} />);
+    expect(centre().getByText("Interrompu")).toBeInTheDocument();
+    expect(centre().getByText("Durée").nextElementSibling).toHaveTextContent("—");
+    expect(centre().queryByText(/min/)).not.toBeInTheDocument();
+
+    await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
+    expect(centre().getByText("Interrompu")).toBeInTheDocument();
+  });
+
   it("goes back to the detail when a run is picked in the column from the table", async () => {
     render(<Cockpit />);
     await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));

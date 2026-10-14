@@ -7,6 +7,7 @@ import {
   formatDuree,
   lienPr,
   runAffiche,
+  runsDeTicket,
 } from "./runs";
 
 function run(id: string, extra: Partial<PipelineRun> = {}): PipelineRun {
@@ -55,6 +56,34 @@ describe("runs helpers", () => {
     expect(formatDuree(run("a", { finished_at: null }))).toBe("En cours…");
     expect(formatCout(0)).toBe("—");
     expect(formatCout(1.234)).toBe("$1.23");
+  });
+
+  it("drops a queue's parent run and keeps one row per ticket", () => {
+    const file = run("file", { parent_run_id: null });
+    const enfants = [
+      run("a", { parent_run_id: "file" }),
+      run("b", { parent_run_id: "file" }),
+    ];
+    expect(runsDeTicket([file, ...enfants]).map((r) => r.id)).toEqual(["a", "b"]);
+  });
+
+  it("keeps a single-ticket run with neither parent nor child", () => {
+    expect(runsDeTicket([run("seul", { parent_run_id: null }), run("x")])).toHaveLength(2);
+  });
+
+  it("flags a run closed without a round as interrupted, with no duration", () => {
+    const interrompu = run("i", {
+      approved: false,
+      final_status: "blocked",
+      rounds: 0,
+      arret: "backend restarted: the run's process is gone",
+      finished_at: "2026-10-14T22:25:00Z",
+    });
+    expect(etatDuRun(interrompu)).toBe("interrompu");
+    expect(formatDuree(interrompu)).toBe("—");
+    // Un blocage avec sa propre cause, ou après un tour, n'est pas une interruption.
+    expect(etatDuRun({ ...interrompu, arret: "tests failed" })).toBe("bloque");
+    expect(etatDuRun({ ...interrompu, rounds: 1 })).toBe("bloque");
   });
 
   it("builds a pull request link for GitHub remotes only", () => {

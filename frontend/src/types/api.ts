@@ -294,6 +294,8 @@ export interface PipelineRun {
   total_cost_usd: number;
   /** La cause d'un blocage, quand il y en a eu une (ticket-218). */
   arret?: string | null;
+  /** Le run de la file qui porte ce run de ticket, absent pour un run seul. */
+  parent_run_id?: string | null;
 }
 
 export interface TicketUsage {

@@ -3,6 +3,7 @@ import RegionTitle from "../../design/RegionTitle";
 import { IconBlocked, IconCheck, IconDot } from "../../design/icons";
 import { useState } from "react";
 import type { PipelineRun } from "../../types/api";
+import { estInterrompu, runsDeTicket } from "../HistoriqueView/runs";
 
 interface RunHistoryProps {
   runs: PipelineRun[];
@@ -74,13 +75,16 @@ function RunRow({ run, onSelectTicket, selected, onSelectRun }: RunRowProps) {
         <span className="flex-1 min-w-0 text-mini font-mono text-zinc-300 truncate">
           {run.ticket_id}
         </span>
+        {estInterrompu(run) && (
+          <span className="shrink-0 text-micro text-zinc-400">Interrompu</span>
+        )}
         <span className="shrink-0 text-micro text-zinc-500">
           {run.rounds != null
             ? `${run.rounds} tour${run.rounds > 1 ? "s" : ""}`
             : "—"}
         </span>
         <span className="shrink-0 text-micro text-zinc-500 ml-1">
-          {formatDuration(run.started_at, run.finished_at)}
+          {estInterrompu(run) ? "—" : formatDuration(run.started_at, run.finished_at)}
         </span>
       </button>
 
@@ -132,13 +136,15 @@ function RunRow({ run, onSelectTicket, selected, onSelectRun }: RunRowProps) {
 }
 
 export default function RunHistory({
-  runs,
+  runs: tousLesRuns,
   loading,
   error,
   onSelectTicket,
   selectedRunId = null,
   onSelectRun,
 }: RunHistoryProps) {
+  // Une ligne par run de ticket : le run d'une file n'a pas la sienne.
+  const runs = runsDeTicket(tousLesRuns);
   if (loading) {
     return (
       <div className="p-4 text-zinc-500 text-xs">Chargement des runs…</div>

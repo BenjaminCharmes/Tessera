@@ -9,8 +9,10 @@ import {
   formatDate,
   libelleDeLEtat,
   libelleDesTours,
+  runsDeTicket,
   triParDate,
 } from "./runs";
+import StatusPill from "../../design/ui/StatusPill";
 import type { FiltreRuns } from "./runs";
 
 interface TousLesRunsProps {
@@ -26,7 +28,7 @@ const COLONNES =
 /** Every run of the project as a filterable table (ticket-427). */
 export default function TousLesRuns({ runs, tickets, onOpen }: TousLesRunsProps) {
   const [filtre, setFiltre] = useState<FiltreRuns>("tous");
-  const lignes = filtrerRuns(triParDate(runs), filtre);
+  const lignes = filtrerRuns(triParDate(runsDeTicket(runs)), filtre);
   const titres = new Map(tickets.map((t) => [t.id, t.title]));
 
   return (
@@ -74,7 +76,13 @@ export default function TousLesRuns({ runs, tickets, onOpen }: TousLesRunsProps)
           >
             <span className="truncate font-mono">{run.ticket_id}</span>
             <span className="truncate">{titres.get(run.ticket_id) ?? "—"}</span>
-            <span className={classeDuVerdict(run)}>{libelleDeLEtat(etatDuRun(run))}</span>
+            <span className={classeDuVerdict(run)}>
+              {etatDuRun(run) === "interrompu" ? (
+                <StatusPill etat="neutre" libelle={libelleDeLEtat("interrompu")} />
+              ) : (
+                libelleDeLEtat(etatDuRun(run))
+              )}
+            </span>
             <span className="text-zinc-400">{libelleDesTours(run.rounds)}</span>
             <span className="font-mono text-zinc-400">{formatCout(run.total_cost_usd)}</span>
             <span className="text-zinc-400">{formatDate(run.started_at)}</span>
