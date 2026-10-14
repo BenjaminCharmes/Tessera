@@ -124,3 +124,23 @@ describe("ProjetCarte services state", () => {
     expect(screen.getByRole("article").dataset.services).toBeUndefined();
   });
 });
+
+describe("ProjetCarte footer", () => {
+  it("pins the dates and counters to the bottom, whatever the text above", () => {
+    // Les cartes d'une rangée ont la même hauteur : sans pied poussé en bas,
+    // « Créé… » et les compteurs flottaient à mi-hauteur sur une carte à la
+    // description courte ou sans bouton Lancer.
+    afficher(projet({ services_declares: false }));
+
+    const pied = screen.getByTestId("pied-de-carte");
+    expect(pied).toHaveClass("mt-auto");
+    expect(pied).toHaveTextContent(/Créé/);
+    expect(pied).toHaveTextContent(/À faire/);
+  });
+
+  it("keeps the counters row as tall with or without the Lancer button", () => {
+    afficher(projet({ services_declares: false }));
+
+    expect(screen.getByText(/À faire/).closest("ul")?.parentElement).toHaveClass("min-h-6");
+  });
+});
