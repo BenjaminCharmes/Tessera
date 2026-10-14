@@ -2832,3 +2832,4 @@ Ce diff refactorise l'UI pou (27266ms)
 - 2026-10-14 17:33:01 UTC — [ticket-444] validateur: fichiers cités joints : aucun ; absents : docs/api.md
 - 2026-10-14 17:33:01 UTC — [ticket-444] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la séparatio (169608ms)
 - 2026-10-14 17:33:01 UTC — [ticket-444] APPROVED après 1 tour(s)
+- 2026-10-14 17:36:04 UTC — [ticket-444] documentation: 1 fichier(s) (179766ms)
