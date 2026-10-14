@@ -4,7 +4,7 @@ created: 2026-10-14
 depends_on: []
 estimated_days: 0.5
 id: ticket-443
-pr_number: null
+pr_number: 447
 priority: medium
 status: done
 title: The History list shows one row per ticket run, not the queue run and its child
