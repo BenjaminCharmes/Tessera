@@ -69,7 +69,9 @@ def executeur_simule(monkeypatch: pytest.MonkeyPatch) -> list[Path]:
     """Écrit un PNG par nom attendu et retient les dossiers de sortie reçus."""
     sorties: list[Path] = []
 
-    async def _executeur(config: ConfigCaptures, sortie: Path) -> None:
+    async def _executeur(
+        config: ConfigCaptures, sortie: Path, jeton: str | None
+    ) -> None:
         sorties.append(sortie)
         for nom in captures.noms_attendus(config):
             (sortie / nom).write_bytes(b"\x89PNG\r\n\x1a\n")
@@ -187,7 +189,9 @@ def test_app_that_does_not_answer_gives_409(
 def test_failing_executor_answers_502_with_its_message(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    async def _echec(config: ConfigCaptures, sortie: Path) -> None:
+    async def _echec(
+        config: ConfigCaptures, sortie: Path, jeton: str | None
+    ) -> None:
         raise captures.CapturesEchouees("navigateur introuvable")
 
     monkeypatch.setattr(captures, "executeur_playwright", _echec)
@@ -202,7 +206,9 @@ def test_failing_executor_answers_502_with_its_message(
 def test_executor_that_writes_nothing_is_a_failure(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    async def _paresseux(config: ConfigCaptures, sortie: Path) -> None:
+    async def _paresseux(
+        config: ConfigCaptures, sortie: Path, jeton: str | None
+    ) -> None:
         return None
 
     monkeypatch.setattr(captures, "executeur_playwright", _paresseux)

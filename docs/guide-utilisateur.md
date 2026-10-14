@@ -274,9 +274,26 @@ Lance ensuite l'app du projet, puis demande les captures avec `POST /api/v1/proj
 
 Les images sont rangées dans le dossier d'état de l'IDE, sous `captures/<projet>/`, **hors du dépôt du projet** : elles ne finissent dans aucun commit. Chaque demande remplace celles du tour précédent.
 
-Tessera répond **409** dans deux cas :
+#### Une app qui exige un jeton
+
+Si l'app affiche « Jeton d'accès requis » tant qu'on n'a pas ouvert de session, ajoute une clé `session` à la section `captures` :
+
+```json
+"session": { "chemin": "/api/session", "jeton_env": "ACCESS_TOKEN", "fichier_env": "backend/.env" }
+```
+
+- `chemin` : la route qui échange le jeton contre un cookie de session. Elle reçoit un `POST` avec le corps `{"token": "<jeton>"}`. Commence par `/`.
+- `jeton_env` : le nom de la variable qui porte le jeton.
+- `fichier_env` (facultatif, `.env` par défaut) : le fichier qui la contient, relatif à la racine du projet. Un chemin qui en sort est refusé.
+
+Tessera lit le jeton **côté serveur**, dans ce fichier, et le transmet au script par son entrée standard : il n'apparaît ni dans `agents.json`, ni dans la réponse de `POST …/captures`, ni dans les journaux, ni dans la ligne de commande du processus. Le script ouvre la session dans le navigateur, puis prend les captures. Sans clé `session`, rien ne change.
+
+Une clé `session` présente mais incomplète rend toute la section `captures` inutilisable (409 « ne déclare aucune capture ») : mieux vaut un refus que des captures de l'écran de connexion.
+
+Tessera répond **409** dans ces cas :
 
 - le projet ne déclare pas de section `captures` (ou elle ne contient aucun écran valide) ;
+- la `session` est déclarée mais la variable est absente ou vide dans le fichier indiqué — la capture n'est alors pas lancée ;
 - l'app ne répond pas à l'`url` déclarée — lance-la d'abord.
 
 Si le navigateur échoue en cours de route, la réponse est **502** et porte le message du script. La prise de vue utilise le Playwright du frontend de Tessera : `node` doit être dans le PATH, et le navigateur installé (`npx playwright install chromium` dans `frontend/`).

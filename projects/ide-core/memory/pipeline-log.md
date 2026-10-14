@@ -2746,3 +2746,15 @@ Ce diff porte exclusivement  (21530ms)
 - 2026-10-14 14:06:06 UTC — [ticket-438] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté la détection des servi (87594ms)
 - 2026-10-14 14:06:06 UTC — [ticket-438] APPROVED après 1 tour(s)
 - 2026-10-14 14:10:37 UTC — [ticket-438] documentation: 1 fichier(s) (256686ms)
+- 2026-10-14 14:11:00 UTC — [ide-core] ticket-438 PR #440 confiée au CIWatcher
+- 2026-10-14 14:11:04 UTC — [ticket-437] branche ticket-437-screen-captures-can-open-a-session-on-a-project-t
+- 2026-10-14 14:11:05 UTC — [ticket-437] tour 1 — codeur démarré
+- 2026-10-14 14:16:38 UTC — [ticket-437] tour 1 — codeur terminé (333266ms)
+- 2026-10-14 14:25:56 UTC — [ticket-437] testeur: OK (exit 0)
+- 2026-10-14 14:28:00 UTC — [ticket-437] securite: PASS — Audit de sécurité du diff captures avec session (ticket-437). Le nouveau code in (123889ms)
+- 2026-10-14 14:28:00 UTC — [ticket-437] tour 1 — reviewer démarré
+- 2026-10-14 14:28:30 UTC — [ticket-437] tour 1 — reviewer terminé (29735ms)
+- 2026-10-14 14:28:36 UTC — [ticket-437] validateur: fichiers cités joints : agents.json ; absents : docs/guide-utilisateur.md
+- 2026-10-14 14:28:36 UTC — [ticket-437] validateur: APPROVED — Tous les critères sont satisfaits. Le code produit implémente une sécurisation c (35515ms)
+- 2026-10-14 14:28:36 UTC — [ticket-437] APPROVED après 1 tour(s)
+- 2026-10-14 14:31:43 UTC — [ticket-437] documentation: 0 fichier(s) (183327ms)

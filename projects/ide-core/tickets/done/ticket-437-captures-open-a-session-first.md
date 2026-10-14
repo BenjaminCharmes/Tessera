@@ -2,12 +2,13 @@
 agent: codeur
 created: '2026-10-14'
 depends_on: []
-id: ticket-437
-priority: medium
-pr_number: null
 estimated_days: 0.5
-status: todo
-title: "Screen captures can open a session on a project that requires a token, without the token ever leaving the server"
+id: ticket-437
+pr_number: 441
+priority: medium
+status: done
+title: Screen captures can open a session on a project that requires a token, without
+  the token ever leaving the server
 type: feat
 ---
 

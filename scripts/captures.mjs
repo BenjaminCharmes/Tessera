@@ -17,12 +17,26 @@ const { chromium } = require("@playwright/test");
 const HAUTEUR = { 390: 844, 1440: 900 };
 const SCHEMA = { clair: "light", sombre: "dark" };
 
+// Échange le jeton contre le cookie de session, dans le contexte du navigateur :
+// le cookie y reste pour les captures. Le jeton arrive par stdin (jamais en
+// argument) et n'est écrit nulle part, pas même dans un message d'erreur.
+async function ouvrirLaSession(contexte, config) {
+  if (!config.session) return;
+  const reponse = await contexte.request.post(config.url + config.session.chemin, {
+    data: { token: config.session.jeton },
+  });
+  if (!reponse.ok()) {
+    throw new Error(`L'ouverture de session a échoué (HTTP ${reponse.status()}).`);
+  }
+}
+
 async function capturer(navigateur, config, sortie, largeur, theme, ecran) {
   const contexte = await navigateur.newContext({
     viewport: { width: largeur, height: HAUTEUR[largeur] ?? 900 },
     colorScheme: SCHEMA[theme],
   });
   try {
+    await ouvrirLaSession(contexte, config);
     const page = await contexte.newPage();
     await page.goto(config.url + ecran.chemin, { waitUntil: "networkidle" });
     if (ecran.clic) {
