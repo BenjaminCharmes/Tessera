@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-434
 plan: true
-pr_number: null
+pr_number: 432
 priority: high
 status: done
 title: The validator is given the files a criterion cites whatever its provider, and
