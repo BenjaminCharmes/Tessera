@@ -16,6 +16,10 @@ _PROMPT_FILE = "securite.md"
 # à 16 000 caractères, la fin passait sans audit (ticket-221). ~30 000 tokens,
 # bien en deçà de la fenêtre des modèles servis.
 _CODE_MAX_CHARS = 120_000
+_RETRY_HINT = (
+    "Ta réponse précédente n'était pas un JSON valide ; "
+    "réponds uniquement par l'objet JSON demandé."
+)
 
 Severity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
 _SEVERITIES: dict[str, Severity] = {
@@ -75,21 +79,33 @@ class SecurityAuditorService:
         system_prompt = self._load_system_prompt()
         user_message = f"## Code à auditer\n{code_diff[:_CODE_MAX_CHARS]}"
 
-        try:
-            result = await self._provider.complete(
-                system=system_prompt,
-                user=user_message,
-                model=self._model,
-                max_tokens=_MAX_TOKENS,
-            )
-        except Exception as exc:
-            # Échoue fermé : un audit qui n'a pas eu lieu n'a rien approuvé.
-            # Le run se bloque quand le provider tombe, c'est voulu ; le
-            # `reason` doit le dire à l'écran (ticket-122).
-            _logger.warning("security_auditor_llm_failed", extra={"error": str(exc)})
-            return _blocked(f"Audit sécurité indisponible : {exc}")
+        for attempt in (1, 2):
+            # Ticket-436 : une réponse illisible est redemandée une seule fois,
+            # avec une consigne de plus ; la seconde illisible bloque.
+            message = user_message if attempt == 1 else f"{user_message}\n\n{_RETRY_HINT}"
+            try:
+                result = await self._provider.complete(
+                    system=system_prompt,
+                    user=message,
+                    model=self._model,
+                    max_tokens=_MAX_TOKENS,
+                )
+            except Exception as exc:
+                # Échoue fermé : un audit qui n'a pas eu lieu n'a rien approuvé.
+                # Le run se bloque quand le provider tombe, c'est voulu ; le
+                # `reason` doit le dire à l'écran (ticket-122). Aucune seconde
+                # tentative : le repli d'ADR-046 s'en charge.
+                _logger.warning("security_auditor_llm_failed", extra={"error": str(exc)})
+                return _blocked(f"Audit sécurité indisponible : {exc}")
 
-        return self._parse_response(result.content)
+            parsed = self._parse_response(result.content, attempt)
+            if parsed is not None:
+                return parsed
+
+        return _blocked(
+            "Réponse de l'auditeur sécurité illisible (JSON attendu) "
+            "après deux tentatives."
+        )
 
     def _load_system_prompt(self) -> str:
         prompt_path = self._prompts_dir / _PROMPT_FILE
@@ -97,11 +113,15 @@ class SecurityAuditorService:
             return prompt_path.read_text(encoding="utf-8")
         return "Audit code for security vulnerabilities. Respond with JSON."
 
-    def _parse_response(self, raw: str) -> SecurityAuditResult:
+    def _parse_response(self, raw: str, attempt: int = 1) -> SecurityAuditResult | None:
+        """Parse the auditor answer; return None when it holds no readable JSON."""
         parsed = extract_json(raw, required_key="verdict")
         if not parsed:
-            _logger.warning("security_auditor_invalid_json", extra={"raw": raw[:200]})
-            return _blocked("Réponse de l'auditeur sécurité illisible (JSON attendu).")
+            _logger.warning(
+                "security_auditor_invalid_json",
+                extra={"raw": raw[:200], "attempt": attempt},
+            )
+            return None
 
         # Seul "PASS" explicite est accepté ; toute autre valeur ferme l'audit
         # (ADR-039 : l'audit échoue fermé si la réponse est ambiguë).
