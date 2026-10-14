@@ -1222,6 +1222,25 @@ Le testeur lance les mêmes outils que ta CI : `pytest` et `mypy` pour Python, `
 
 Si tes critères de test chaînent plusieurs étapes avec l'opérateur `&&` (par exemple, `npm run build && npm run test`), le testeur les lance une à une et s'arrête à la première qui échoue. C'est le seul opérateur supporté : `|`, `||`, `;`, `>`, `&` et les redirections sont refusés avec un message d'erreur.
 
+
+### Observer les coûts et performances des rôles
+
+L'onglet **Agents** te montre comment ton pipeline travaille et ce qu'il coûte.
+
+Tu peux choisir entre deux vues : **Fiche** (la défaut) ou **Comparer**.
+
+#### Fiche d'un rôle
+
+La vue **Fiche** affiche le détail complet d'un rôle :
+- **À gauche** : une phrase sur ce que ce rôle fait (extrait de sa description, ou première ligne du prompt), le prompt système intégral qu'il voit, et ses derniers verdicts quand il en produit (reviewer, validateur, sécurité).
+- **À droite** : le modèle qu'il utilise (ex: Sonnet 5.5), le modèle de secours si le premier n'est pas dispo, et sur **les 30 derniers jours** du projet actif : nombre d'appels et coût total en dollars. S'il n'a pas travaillé pendant cette période, tu vois « — » au lieu d'un montant.
+
+#### Comparer les rôles
+
+La vue **Comparer** affiche tous les rôles actifs du projet dans un tableau : rôle, modèle, appels (30 jours), coût. Un clic sur une ligne bascule à la **Fiche** de ce rôle.
+
+Ça te permet de voir d'un coup d'œil quel rôle consomme le plus ou est sollicité différemment que prévu.
+
 ## 10. Intégration GitHub
 
 Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
