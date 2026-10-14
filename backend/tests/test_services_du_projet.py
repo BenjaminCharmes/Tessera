@@ -14,6 +14,7 @@ import os
 import json
 import sys
 from collections.abc import Iterator
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pytest
@@ -21,8 +22,10 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
+from tessera.routers.services_running import get_sonde
 from tessera.services.database import init_db
 from tessera.services.process_registry import PROCESS_REGISTRY
+from tessera.services.sonde_systeme import InfoProcessus
 
 #: Un « service » qui vit assez longtemps pour être observé puis arrêté, sans
 #: dépendre de rien d'installé sur la machine de test.
@@ -58,10 +61,27 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return ws
 
 
+@dataclass
+class FausseSonde:
+    """Une machine décrite à la main : ports en écoute et processus."""
+
+    procs: dict[int, InfoProcessus] = field(default_factory=dict)
+
+    async def ecouteurs(self) -> dict[int, int]:
+        return {}
+
+    async def processus(self) -> dict[int, InfoProcessus]:
+        return self.procs
+
+
 @pytest.fixture(autouse=True)
 def _arreter_tout() -> Iterator[None]:
+    # `services/start` interroge la sonde (ticket-438) : par défaut, une machine
+    # vide, sans le coût ni les processus de la vraie.
+    app.dependency_overrides[get_sonde] = lambda: FausseSonde()
     yield
     asyncio.run(PROCESS_REGISTRY.tout_arreter())
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
@@ -139,6 +159,32 @@ def test_arreter_termine_le_processus_et_le_retire(
     assert [s["nom"] for s in listing] == ["api"]
     assert listing[0]["en_cours"] is False
     assert listing[0]["pid"] is not None
+
+
+def test_start_refuses_a_service_already_running_outside_tessera(
+    client: TestClient, workspace: Path
+) -> None:
+    # Un worker lancé à la main, sans port : un second démarrerait un doublon
+    # bloqué par le verrou du premier (ticket-438).
+    projet = workspace / "mon-projet"
+    _manifeste(
+        projet,
+        [
+            {"nom": "api", "commande": _DORMEUR},
+            {"nom": "worker", "commande": "python -m app.worker"},
+        ],
+    )
+    commande = f'"{projet / ".venv" / "python.exe"}" -m app.worker'
+    procs = {4242: InfoProcessus(ppid=1, memoire_mo=1.0, demarre_a=None, commande=commande)}
+    app.dependency_overrides[get_sonde] = lambda: FausseSonde(procs)
+
+    resp = client.post("/api/v1/projects/mon-projet/services/start")
+
+    assert resp.status_code == 409
+    assert "worker" in resp.json()["detail"]
+    assert "4242" in resp.json()["detail"]
+    # Rien n'a été lancé, pas même `api` qui précède `worker` dans le manifeste.
+    assert PROCESS_REGISTRY.services_de("mon-projet") == []
 
 
 # --------------------------------------------------------------------------
