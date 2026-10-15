@@ -2890,3 +2890,18 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 08:45:17 UTC — [ticket-448] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent correctement (97530ms)
 - 2026-10-15 08:45:17 UTC — [ticket-448] APPROVED après 1 tour(s)
 - 2026-10-15 08:47:36 UTC — [ticket-448] documentation: 1 fichier(s) (136172ms) — après tour de correction
+- 2026-10-15 08:47:49 UTC — [ide-core] ticket-448 PR #456 confiée au CIWatcher
+- 2026-10-15 08:47:52 UTC — [ticket-447] branche ticket-447-a-mise-en-ligne-skill-gives-agents-the-launch-che
+- 2026-10-15 08:47:52 UTC — [ticket-447] tour 1 — codeur démarré
+- 2026-10-15 08:49:05 UTC — [ticket-447] tour 1 — codeur terminé (72969ms)
+- 2026-10-15 08:54:27 UTC — [ticket-447] testeur: 1 failed, 2072 passed, 20 warnings in 318.57s (0:05:18)
+- 2026-10-15 08:54:27 UTC — [ticket-447] tests rouges au tour 1
+- 2026-10-15 08:54:27 UTC — [ticket-447] tour 2 — codeur démarré
+- 2026-10-15 08:55:34 UTC — [ticket-447] tour 2 — codeur terminé (66609ms)
+- 2026-10-15 09:02:37 UTC — [ticket-447] testeur: OK (exit 0)
+- 2026-10-15 09:02:55 UTC — [ticket-447] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un skill de documentation (SKILL.m (17905ms)
+- 2026-10-15 09:02:55 UTC — [ticket-447] tour 2 — reviewer démarré
+- 2026-10-15 09:03:32 UTC — [ticket-447] tour 2 — reviewer terminé (36280ms)
+- 2026-10-15 09:07:21 UTC — [ticket-447] validateur: fichiers cités joints : agents/plugin/skills/mise-en-ligne/SKILL.md
+- 2026-10-15 09:07:21 UTC — [ticket-447] validateur: APPROVED — Tous les critères sont satisfaits. Le fichier SKILL.md est correctement créé ave (265328ms)
+- 2026-10-15 09:07:21 UTC — [ticket-447] APPROVED après 2 tour(s)
