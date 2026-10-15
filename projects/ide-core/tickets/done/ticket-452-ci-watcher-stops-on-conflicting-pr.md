@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-452
 plan: true
-pr_number: null
+pr_number: 466
 priority: high
 status: done
 title: The CI watcher stops with a message when a watched PR is in conflict
