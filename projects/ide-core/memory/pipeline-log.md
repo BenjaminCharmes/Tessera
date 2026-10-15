@@ -2844,3 +2844,37 @@ Ce diff refactorise l'UI pou (27266ms)
 - 2026-10-14 17:53:19 UTC — [ticket-445] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (80781ms)
 - 2026-10-14 17:53:19 UTC — [ticket-445] APPROVED après 1 tour(s)
 - 2026-10-14 17:54:07 UTC — [ticket-445] documentation: 0 fichier(s) (43514ms)
+- 2026-10-14 17:54:23 UTC — [ide-core] ticket-445 PR #451 confiée au CIWatcher
+- 2026-10-15 07:53:37 UTC — [ticket-446] branche ticket-446-a-run-s-commit-never-untracks-a-file-the-reposito
+- 2026-10-15 07:53:37 UTC — [ticket-446] tour 1 — codeur démarré
+- 2026-10-15 07:55:08 UTC — [ticket-446] tour 1 — codeur terminé (90936ms)
+- 2026-10-15 08:01:09 UTC — [ticket-446] testeur: OK (exit 0)
+- 2026-10-15 08:01:34 UTC — [ticket-446] securite: PASS — Audit de sécurité du diff ticket-446 : aucune vulnérabilité détectée.
+
+Le change (25422ms)
+- 2026-10-15 08:01:34 UTC — [ticket-446] tour 1 — reviewer démarré
+- 2026-10-15 08:01:54 UTC — [ticket-446] tour 1 — reviewer terminé (19766ms)
+- 2026-10-15 08:04:31 UTC — [ticket-446] validateur: fichiers cités joints : CLAUDE.md ; absents : git_workspace.py, git ls-files CLAUDE.md, test_run_interrompu_arbre_propre.py
+- 2026-10-15 08:04:31 UTC — [ticket-446] validateur: CHANGES_REQUESTED — Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage (176234ms)
+- 2026-10-15 08:04:31 UTC — [ticket-446] CHANGES_REQUESTED tour 1: Validateur : Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage_ignoré
+- 2026-10-15 08:04:31 UTC — [ticket-446] tour 2 — codeur démarré
+- 2026-10-15 08:04:45 UTC — [ticket-446] tour 2 — codeur terminé (14703ms)
+- 2026-10-15 08:09:22 UTC — [ticket-446] testeur: OK (exit 0)
+- 2026-10-15 08:09:41 UTC — [ticket-446] securite: PASS — Audit de sécurité complet : aucune vulnérabilité détectée.
+
+Le diff modifie `_pu (19375ms)
+- 2026-10-15 08:09:41 UTC — [ticket-446] tour 2 — reviewer démarré
+- 2026-10-15 08:10:00 UTC — [ticket-446] tour 2 — reviewer terminé (19077ms)
+- 2026-10-15 08:12:19 UTC — [ticket-446] validateur: fichiers cités joints : CLAUDE.md ; absents : git_workspace.py, git ls-files CLAUDE.md, test_run_interrompu_arbre_propre.py
+- 2026-10-15 08:12:19 UTC — [ticket-446] validateur: CHANGES_REQUESTED — Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage (157359ms)
+- 2026-10-15 08:12:19 UTC — [ticket-446] CHANGES_REQUESTED tour 2: Validateur : Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage_ignoré
+- 2026-10-15 08:12:19 UTC — [ticket-446] tour 3 — codeur démarré
+- 2026-10-15 08:12:45 UTC — [ticket-446] tour 3 — codeur terminé (26421ms)
+- 2026-10-15 08:17:37 UTC — [ticket-446] testeur: OK (exit 0)
+- 2026-10-15 08:18:03 UTC — [ticket-446] securite: PASS — Audit de sécurité du diff ticket-446 (protection des fichiers suivis lors de la  (25484ms)
+- 2026-10-15 08:18:03 UTC — [ticket-446] tour 3 — reviewer démarré
+- 2026-10-15 08:18:33 UTC — [ticket-446] tour 3 — reviewer terminé (29594ms)
+- 2026-10-15 08:20:48 UTC — [ticket-446] validateur: fichiers cités joints : CLAUDE.md ; absents : git_workspace.py, git ls-files CLAUDE.md, test_run_interrompu_arbre_propre.py
+- 2026-10-15 08:20:48 UTC — [ticket-446] validateur: CHANGES_REQUESTED — Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage (165546ms)
+- 2026-10-15 08:20:48 UTC — [ticket-446] CHANGES_REQUESTED tour 3: Validateur : Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage_ignoré
+- 2026-10-15 08:20:49 UTC — [ticket-446] BLOCKED après 3 tour(s) sans approbation
