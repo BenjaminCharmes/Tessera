@@ -1481,8 +1481,12 @@ def _espace_git_double(ordre: list[str], branche_courante: str = "develop") -> A
         ordre.append("create_branch")
         return f"{ticket_id}-slug"
 
+    async def _retour(base: str) -> None:
+        ordre.append(f"checkout:{base}")
+
     git_ws.sync_base_depuis_distant.side_effect = _sync
     git_ws.create_branch.side_effect = _creer
+    git_ws.retourner_sur_base.side_effect = _retour
     return git_ws
 
 
@@ -1551,7 +1555,7 @@ async def test_aucun_realignement_sans_espace_git_ni_branche_de_base(
     assert await stages.create_branch(sans_espace, _run_de_depart()) is None
 
 
-async def test_aucun_realignement_quand_l_arbre_n_est_pas_sur_la_base(
+async def test_l_arbre_reste_sur_une_branche_de_ticket_revient_sur_la_base_avant_le_realignement(
     tmp_path: Path,
 ) -> None:
     from tessera.services import pipeline_stages as stages
@@ -1562,5 +1566,39 @@ async def test_aucun_realignement_quand_l_arbre_n_est_pas_sur_la_base(
 
     assert await stages.create_branch(orch, _run_de_depart()) is None
 
+    assert ordre == ["checkout:develop", "sync:develop", "create_branch"]
+
+
+async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_stages as stages
+    from tessera.services.git_workspace import GitCommandError
+
+    ordre: list[str] = []
+    git_ws = _espace_git_double(ordre, branche_courante="ticket-000-ancien")
+    git_ws.retourner_sur_base.side_effect = GitCommandError(
+        command=["git", "checkout", "develop"], returncode=1, stderr="refused"
+    )
+    orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
+    run = _run_de_depart()
+
+    assert await stages.create_branch(orch, run) is None
+
     git_ws.sync_base_depuis_distant.assert_not_called()
-    assert ordre == ["create_branch"]
+    assert run.branch == "ticket-001-slug"
+    journal = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
+    assert "base non réalignée" in journal
+
+
+async def test_le_depart_sur_la_base_ne_commite_pas_la_tenue_de_livres(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_stages as stages
+
+    git_ws = _espace_git_double([], branche_courante="develop")
+    orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
+
+    assert await stages.create_branch(orch, _run_de_depart()) is None
+
+    git_ws.commit_bookkeeping.assert_not_called()
