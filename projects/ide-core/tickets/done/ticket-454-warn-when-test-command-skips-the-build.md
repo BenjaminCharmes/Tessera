@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
 id: ticket-454
-pr_number: null
+pr_number: 470
 priority: medium
 status: done
 title: A run warns when the project has a build script that its test_command never
