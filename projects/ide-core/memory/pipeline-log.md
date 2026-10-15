@@ -2951,3 +2951,13 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 09:57:43 UTC — [ticket-450] CHANGES_REQUESTED tour 3: Validateur : Les quatre premiers critères sont satisfaits par les tests et le code fourni. Le dernie
 - 2026-10-15 09:57:43 UTC — [ticket-450] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-15 09:57:46 UTC — [ide-core] file interrompue : ticket-450 non approuvé
+- 2026-10-15 11:08:52 UTC — [ticket-451] branche ticket-451-a-queue-waits-for-the-real-merge-of-a-dependency
+- 2026-10-15 11:10:02 UTC — [ticket-451] plan rendu (69686ms)
+- 2026-10-15 11:10:02 UTC — [ticket-451] tour 1 — codeur démarré
+- 2026-10-15 11:13:51 UTC — [ticket-451] tour 1 — codeur terminé (228625ms)
+- 2026-10-15 11:19:42 UTC — [ticket-451] testeur: OK (exit 0)
+- 2026-10-15 11:21:39 UTC — [ticket-451] securite: PASS — Un potentiel path traversal détecté dans la nouvelle fonction `_lecteur_etat_pr` (116733ms)
+- 2026-10-15 11:21:39 UTC — [ticket-451] tour 1 — reviewer démarré
+- 2026-10-15 11:22:15 UTC — [ticket-451] tour 1 — reviewer terminé (36436ms)
+- 2026-10-15 11:26:05 UTC — [ticket-451] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests couvrent les cas de f (266280ms)
+- 2026-10-15 11:26:05 UTC — [ticket-451] APPROVED après 1 tour(s)
