@@ -2999,3 +2999,4 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 12:22:56 UTC — [ticket-453] validateur: fichiers cités joints : agents.json
 - 2026-10-15 12:22:56 UTC — [ticket-453] validateur: APPROVED — Les deux critères sont satisfaits. Le code inclut un nouveau test qui reproduit  (234219ms)
 - 2026-10-15 12:22:56 UTC — [ticket-453] APPROVED après 1 tour(s)
+- 2026-10-15 12:26:20 UTC — [ticket-453] documentation: 3 fichier(s) (199312ms)
