@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
 id: ticket-447
-pr_number: null
+pr_number: 458
 priority: medium
 status: done
 title: A mise-en-ligne skill gives agents the launch checklist of a project served
