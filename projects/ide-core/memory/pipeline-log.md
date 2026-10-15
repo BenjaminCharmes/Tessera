@@ -2950,3 +2950,4 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 09:57:43 UTC — [ticket-450] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits par les tests et le code fourni. Le (155359ms)
 - 2026-10-15 09:57:43 UTC — [ticket-450] CHANGES_REQUESTED tour 3: Validateur : Les quatre premiers critères sont satisfaits par les tests et le code fourni. Le dernie
 - 2026-10-15 09:57:43 UTC — [ticket-450] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-15 09:57:46 UTC — [ide-core] file interrompue : ticket-450 non approuvé
