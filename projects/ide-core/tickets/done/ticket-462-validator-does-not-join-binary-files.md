@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.25
 id: ticket-462
-pr_number: null
+pr_number: 480
 priority: high
 status: done
 title: The validator is told a cited binary file exists instead of receiving its bytes
