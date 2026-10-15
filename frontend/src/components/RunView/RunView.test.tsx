@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RunView from "./index";
+import { OuvrirTicketContext } from "../../hooks/useOuvrirTicket";
+import type { OuvrirTicket } from "../../hooks/useOuvrirTicket";
 import type { UseRunActifResult, PassageAgent } from "../../hooks/streamState";
 
 function flux(over: Partial<UseRunActifResult> = {}) {
@@ -120,5 +122,41 @@ describe("RunView — fil chronologique (ticket-222)", () => {
     // Aucun libellé "Tour 1 — CODEUR" ni "Tour 1 — REVIEWER" dans les en-têtes.
     expect(screen.queryByText(/Tour 1\s*[—–]\s*CODEUR/i)).toBeNull();
     expect(screen.queryByText(/Tour 1\s*[—–]\s*REVIEWER/i)).toBeNull();
+  });
+});
+
+describe("RunView — le numéro du ticket ouvre le ticket (ticket-460)", () => {
+  function rendreAvecAction(projectId: string | null) {
+    const ouvrir = vi.fn<OuvrirTicket>().mockResolvedValue("ok");
+    render(
+      <OuvrirTicketContext.Provider value={ouvrir}>
+        <RunView stream={flux()} projectId={projectId} />
+      </OuvrirTicketContext.Provider>,
+    );
+    return ouvrir;
+  }
+
+  it("opens the ticket of the run from the header", async () => {
+    const ouvrir = rendreAvecAction("p1");
+
+    await userEvent.click(screen.getByRole("button", { name: "ticket-001" }));
+
+    expect(ouvrir).toHaveBeenCalledWith("p1", "ticket-001");
+  });
+
+  it("is activated by Enter", async () => {
+    const ouvrir = rendreAvecAction("p1");
+
+    screen.getByRole("button", { name: "ticket-001" }).focus();
+    await userEvent.keyboard("{Enter}");
+
+    expect(ouvrir).toHaveBeenCalledWith("p1", "ticket-001");
+  });
+
+  it("keeps the id as plain text without a project", () => {
+    rendreAvecAction(null);
+
+    expect(screen.queryByRole("button", { name: "ticket-001" })).toBeNull();
+    expect(screen.getByText("ticket-001")).toBeInTheDocument();
   });
 });

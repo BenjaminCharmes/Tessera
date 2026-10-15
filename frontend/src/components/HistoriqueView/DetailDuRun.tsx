@@ -1,5 +1,6 @@
 import RunHistorique from "../StatsView/RunHistorique";
 import StatusPill from "../../design/ui/StatusPill";
+import LienTicket from "../../design/ui/LienTicket";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
 import {
   etatDuRun,
@@ -56,7 +57,8 @@ export default function DetailDuRun({ run, ticket, project }: DetailDuRunProps) 
       <header className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="font-mono text-xs text-zinc-400">
-            {run.ticket_id} · run du {formatDate(run.started_at)}
+            <LienTicket projectId={project?.id ?? null} ticketId={run.ticket_id} /> · run du{" "}
+            {formatDate(run.started_at)}
           </div>
           <h1 className="mt-1 text-xl font-semibold text-zinc-100">
             {ticket?.title ?? run.ticket_id}

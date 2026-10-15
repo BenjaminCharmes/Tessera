@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
 import { GRILLE_COCKPIT } from "./design/layout";
 import { useCockpit } from "./hooks/useCockpit";
+import { OuvrirTicketContext } from "./hooks/useOuvrirTicket";
 
 /**
  * La composition du cockpit — rien d'autre (ticket-252).
@@ -18,6 +19,7 @@ export default function App() {
   const cockpit = useCockpit();
 
   return (
+    <OuvrirTicketContext.Provider value={cockpit.ouvrirTicket}>
     <div
       className="h-screen overflow-hidden bg-zinc-900 text-zinc-100"
       style={GRILLE_COCKPIT}
@@ -72,5 +74,6 @@ export default function App() {
 
       <ToastContainer toasts={cockpit.toasts} onDismiss={cockpit.fermerToast} />
     </div>
+    </OuvrirTicketContext.Provider>
   );
 }

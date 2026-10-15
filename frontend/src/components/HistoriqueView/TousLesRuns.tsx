@@ -1,5 +1,6 @@
 import { useState } from "react";
 import StatusPill from "../../design/ui/StatusPill";
+import LienTicket from "../../design/ui/LienTicket";
 import type { PipelineRun, Ticket } from "../../types/api";
 import {
   etatDuRun,
@@ -18,6 +19,8 @@ import type { FiltreRuns } from "./runs";
 interface TousLesRunsProps {
   runs: PipelineRun[];
   tickets: Ticket[];
+  /** Le projet des runs, pour que le numéro du ticket ouvre son détail (ticket-460). */
+  projectId: string | null;
   /** Opens the detail of the clicked run. */
   onOpen: (runId: string) => void;
 }
@@ -26,7 +29,12 @@ const COLONNES =
   "grid grid-cols-[110px_minmax(0,1fr)_110px_80px_80px_110px] gap-3 px-3";
 
 /** Every run of the project as a filterable table (ticket-427). */
-export default function TousLesRuns({ runs, tickets, onOpen }: TousLesRunsProps) {
+export default function TousLesRuns({
+  runs,
+  tickets,
+  projectId,
+  onOpen,
+}: TousLesRunsProps) {
   const [filtre, setFiltre] = useState<FiltreRuns>("tous");
   const lignes = filtrerRuns(triParDate(runsDeTicket(runs)), filtre);
   const titres = new Map(tickets.map((t) => [t.id, t.title]));
@@ -68,24 +76,32 @@ export default function TousLesRuns({ runs, tickets, onOpen }: TousLesRunsProps)
           </p>
         )}
         {lignes.map((run) => (
-          <button
+          <div
             key={run.id}
-            type="button"
-            onClick={() => onOpen(run.id)}
-            className={`${COLONNES} w-full border-t border-zinc-800 py-2 text-left text-xs text-zinc-200 hover:bg-zinc-800`}
+            className={`${COLONNES} items-center border-t border-zinc-800 py-2 text-xs text-zinc-200 hover:bg-zinc-800`}
           >
-            <span className="truncate font-mono">{run.ticket_id}</span>
-            <span className="truncate">{titres.get(run.ticket_id) ?? "—"}</span>
-            <span>
-              <StatusPill
-                etat={pastilleDuRun(run)}
-                libelle={libelleDeLEtat(etatDuRun(run))}
-              />
+            {/* Le numéro ouvre le ticket, le reste de la ligne ouvre le run :
+                deux actions, donc deux boutons côte à côte, jamais imbriqués. */}
+            <span className="truncate font-mono">
+              <LienTicket projectId={projectId} ticketId={run.ticket_id} />
             </span>
-            <span className="text-zinc-400">{libelleDesTours(run.rounds)}</span>
-            <span className="font-mono text-zinc-400">{formatCout(run.total_cost_usd)}</span>
-            <span className="text-zinc-400">{formatDate(run.started_at)}</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => onOpen(run.id)}
+              className="col-span-5 grid grid-cols-subgrid items-center text-left"
+            >
+              <span className="truncate">{titres.get(run.ticket_id) ?? "—"}</span>
+              <span>
+                <StatusPill
+                  etat={pastilleDuRun(run)}
+                  libelle={libelleDeLEtat(etatDuRun(run))}
+                />
+              </span>
+              <span className="text-zinc-400">{libelleDesTours(run.rounds)}</span>
+              <span className="font-mono text-zinc-400">{formatCout(run.total_cost_usd)}</span>
+              <span className="text-zinc-400">{formatDate(run.started_at)}</span>
+            </button>
+          </div>
         ))}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
+import LienTicket from "../../design/ui/LienTicket";
 import PipelineSummary from "../AgentPanel/PipelineSummary";
 import { resumeDuCout } from "../../lib/budget";
 import FilDuRun from "../FilDuRun";
@@ -15,9 +16,11 @@ import type { UseRunActifResult } from "../../hooks/streamState";
  */
 interface RunViewProps {
   stream: UseRunActifResult;
+  /** Le projet du run, pour que le numéro du ticket ouvre son détail (ticket-460). */
+  projectId?: string | null;
 }
 
-export default function RunView({ stream }: RunViewProps) {
+export default function RunView({ stream, projectId }: RunViewProps) {
   const { entries, currentRound, lastResult, queue } = stream;
 
   return (
@@ -31,7 +34,9 @@ export default function RunView({ stream }: RunViewProps) {
             </span>
           )}
           {stream.ticketId && (
-            <span className="font-mono text-zinc-500">{stream.ticketId}</span>
+            <span className="font-mono text-zinc-500">
+              <LienTicket projectId={projectId ?? null} ticketId={stream.ticketId} />
+            </span>
           )}
           {currentRound > 0 && <span>Tour {currentRound}</span>}
           {(stream.coutUsd > 0 || stream.outils > 0) && (

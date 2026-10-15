@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import RunCard from "./RunCard";
+import { OuvrirTicketContext } from "../../hooks/useOuvrirTicket";
+import type { OuvrirTicket } from "../../hooks/useOuvrirTicket";
 import { INITIAL } from "../../hooks/streamState";
 import type { RunActif } from "../../types/api";
 
@@ -68,8 +71,10 @@ describe("RunCard — la file se déplie (ticket-179)", () => {
 
     await userEvent.click(screen.getByText("la file"));
 
-    expect(screen.getByText(/fait · ticket-001/)).toBeInTheDocument();
-    expect(screen.getByText(/ensuite · ticket-005/)).toBeInTheDocument();
+    const fait = screen.getByText("ticket-001", { selector: "button" });
+    const ensuite = screen.getByText("ticket-005", { selector: "button" });
+    expect(fait.parentElement).toHaveTextContent("fait · ticket-001");
+    expect(ensuite.parentElement).toHaveTextContent("ensuite · ticket-005");
   });
 
   it("est repliée par défaut", () => {
@@ -102,7 +107,7 @@ describe("RunCard — titre du ticket (ticket-286)", () => {
   it("n'affiche pas de ligne de titre si le titre est absent", () => {
     rendre(run({ ticket_titre: undefined }));
     // Le ticket_id est affiché mais pas de ligne de titre supplémentaire
-    expect(screen.getByText("ticket-004")).toBeInTheDocument();
+    expect(screen.getAllByText("ticket-004").length).toBeGreaterThan(0);
     expect(screen.queryByTitle(/./)).toBeNull();
   });
 });
@@ -269,5 +274,56 @@ describe("RunCard — Revoir le run (ticket-327)", () => {
       />,
     );
     expect(screen.queryByRole("button", { name: /Revoir le run/ })).toBeNull();
+  });
+});
+
+describe("RunCard — un numéro de ticket ouvre le ticket (ticket-460)", () => {
+  function rendreAvecAction(r: RunActif, onSelect = vi.fn()) {
+    const ouvrir = vi.fn<OuvrirTicket>().mockResolvedValue("ok");
+    render(
+      <OuvrirTicketContext.Provider value={ouvrir}>
+        <RunCard run={r} etat={INITIAL} selectionne={false} onSelect={onSelect} />
+      </OuvrirTicketContext.Provider>,
+    );
+    return { ouvrir, onSelect };
+  }
+
+  it("opens a queued ticket of the run's project on click, without selecting the run", async () => {
+    const { ouvrir, onSelect } = rendreAvecAction(run());
+
+    await userEvent.click(screen.getByText("ticket-005", { selector: "button" }));
+
+    expect(ouvrir).toHaveBeenCalledWith("demineur", "ticket-005");
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("opens the done and the running tickets of the queue too", async () => {
+    const { ouvrir } = rendreAvecAction(run({ file_faits: ["ticket-003"] }));
+
+    await userEvent.click(screen.getByText("ticket-003", { selector: "button" }));
+    const [, enCours] = screen.getAllByText("ticket-004", { selector: "button" });
+    await userEvent.click(enCours);
+
+    expect(ouvrir).toHaveBeenNthCalledWith(1, "demineur", "ticket-003");
+    expect(ouvrir).toHaveBeenNthCalledWith(2, "demineur", "ticket-004");
+  });
+
+  it("opens the ticket of the card header on Enter, without selecting the run", async () => {
+    const { ouvrir, onSelect } = rendreAvecAction(run());
+    const [entete] = screen.getAllByText("ticket-004", { selector: "button" });
+
+    entete.focus();
+    await userEvent.keyboard("{Enter}");
+
+    expect(ouvrir).toHaveBeenCalledWith("demineur", "ticket-004");
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("selects the run when the card is clicked elsewhere than on a ticket", async () => {
+    const { onSelect } = rendreAvecAction(run());
+
+    await userEvent.click(screen.getByText("demineur"));
+
+    expect(onSelect).toHaveBeenCalledOnce();
   });
 });
