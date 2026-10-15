@@ -3049,3 +3049,12 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-15 13:41:51 UTC — [ticket-459] validateur: APPROVED — Tous les critères sont satisfaits. Le code insère un .gitkeep dans chaque dossie (98110ms)
 - 2026-10-15 13:41:51 UTC — [ticket-459] APPROVED après 1 tour(s)
 - 2026-10-15 13:42:37 UTC — [ticket-459] documentation: 0 fichier(s) (43234ms)
+- 2026-10-15 14:00:47 UTC — [ticket-456] branche ticket-456-an-interrupted-queue-s-parent-run-reports-the-int
+- 2026-10-15 14:00:47 UTC — [ticket-456] tour 1 — codeur démarré
+- 2026-10-15 14:05:00 UTC — [ticket-456] tour 1 — codeur terminé (252750ms)
+- 2026-10-15 14:11:06 UTC — [ticket-456] testeur: OK (exit 0)
+- 2026-10-15 14:11:31 UTC — [ticket-456] securite: PASS — Pas de vulnérabilités détectées. Le diff ajoute un tracking de raison d'interrup (25094ms)
+- 2026-10-15 14:11:31 UTC — [ticket-456] tour 1 — reviewer démarré
+- 2026-10-15 14:11:50 UTC — [ticket-456] tour 1 — reviewer terminé (19281ms)
+- 2026-10-15 14:14:19 UTC — [ticket-456] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent explicitemen (168218ms)
+- 2026-10-15 14:14:19 UTC — [ticket-456] APPROVED après 1 tour(s)
