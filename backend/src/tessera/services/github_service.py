@@ -239,7 +239,7 @@ class GitHubService:
             resp.raise_for_status()
 
     async def get_ci_status(self, sha: str) -> CiStatus:
-        """Public CI check-runs query — used by the bulk PR status service."""
+        """Public CI query — used by the bulk PR status service."""
         return await self._get_ci_status(sha)
 
     async def list_pull_requests(self, needed: set[int]) -> dict[int, PRListEntry]:
@@ -292,13 +292,42 @@ class GitHubService:
     async def _lire_ci(self, sha: str) -> tuple[CiStatus, int | None]:
         """Read the CI of a commit: its state, and the HTTP code when unreadable.
 
-        A 403 or 404 on `check-runs` means the token lacks the Checks
-        permission: that is `unreadable`, not `none` (ticket-449). Any other
+        Reads the workflow runs first: a fine-grained token can (ticket-450).
+        Only a 403 or 404 there falls back on `check-runs`; when both are
+        refused the CI is `unreadable`, not `none` (ticket-449). Any other
         non-200 answer keeps the former `none`.
         """
-        url = f"{_BASE}/repos/{self._repo}/commits/{sha}/check-runs"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
+            runs_url = f"{_BASE}/repos/{self._repo}/actions/runs"
+            resp = await client.get(
+                runs_url, headers=self._headers, params={"head_sha": sha}
+            )
+            if resp.status_code not in (403, 404):
+                return self._etat_des_workflow_runs(resp)
+            checks_url = f"{_BASE}/repos/{self._repo}/commits/{sha}/check-runs"
+            resp = await client.get(checks_url, headers=self._headers)
+        return self._etat_des_check_runs(resp)
+
+    @staticmethod
+    def _etat_des_workflow_runs(resp: httpx.Response) -> tuple[CiStatus, int | None]:
+        """Turn an `actions/runs` answer into a CI state."""
+        if resp.status_code != 200:
+            return "none", None
+        runs: list[dict[str, Any]] = resp.json().get("workflow_runs", [])
+        if not runs:
+            return "none", None
+        if any(r.get("status") != "completed" for r in runs):
+            return "pending", None
+        conclusions = [r.get("conclusion") for r in runs]
+        if "action_required" in conclusions:
+            return "pending", None
+        if any(c in ("failure", "timed_out", "cancelled") for c in conclusions):
+            return "failing", None
+        return "passing", None
+
+    @staticmethod
+    def _etat_des_check_runs(resp: httpx.Response) -> tuple[CiStatus, int | None]:
+        """Turn a `check-runs` answer into a CI state."""
         if resp.status_code in (403, 404):
             return "unreadable", resp.status_code
         if resp.status_code != 200:
