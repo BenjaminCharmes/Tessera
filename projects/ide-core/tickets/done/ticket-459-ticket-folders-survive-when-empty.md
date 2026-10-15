@@ -1,14 +1,14 @@
 ---
-id: ticket-459
-title: "Ticket status folders stay in git when they are empty"
-type: chore
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-15
+id: ticket-459
+pr_number: 473
+priority: low
+status: done
+title: Ticket status folders stay in git when they are empty
+type: chore
 ---
 
 # ticket-459 — Les dossiers de statut survivent vides

@@ -3034,3 +3034,18 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 13:49:52 UTC — [ticket-458] testeur: OK (exit 0)
 - 2026-10-15 13:51:21 UTC — [ticket-458] securite: BLOCK — A path traversal vulnerability is introduced by the new `pipeline_log_path` para (89015ms)
 - 2026-10-15 13:51:24 UTC — [ide-core] file interrompue : ticket-458 non approuvé
+- 2026-10-15 13:15:31 UTC — [ide-core] ticket-455 PR #471 confiée au CIWatcher
+- 2026-10-15 13:16:04 UTC — [ticket-455] livraison: arrêt — PR #471 non mergée : erreur inattendue : HTTPStatusError: Server error '503 Service Unavailable' for url 'https://api.github.com/repos/BenjaminCharmes/Tessera/pulls/471'
+For more information check: https://developer.mozil
+- 2026-10-15 13:32:38 UTC — [ticket-459] branche ticket-459-ticket-status-folders-stay-in-git-when-they-are-e
+- 2026-10-15 13:32:38 UTC — [ticket-459] tour 1 — codeur démarré
+- 2026-10-15 13:34:06 UTC — [ticket-459] tour 1 — codeur terminé (87938ms)
+- 2026-10-15 13:40:00 UTC — [ticket-459] testeur: OK (exit 0)
+- 2026-10-15 13:40:12 UTC — [ticket-459] securite: PASS — Aucune vulnérabilité détectée.
+
+Le diff ajoute deux tests unitaires et cinq fich (12640ms)
+- 2026-10-15 13:40:12 UTC — [ticket-459] tour 1 — reviewer démarré
+- 2026-10-15 13:40:44 UTC — [ticket-459] tour 1 — reviewer terminé (31375ms)
+- 2026-10-15 13:41:51 UTC — [ticket-459] validateur: APPROVED — Tous les critères sont satisfaits. Le code insère un .gitkeep dans chaque dossie (98110ms)
+- 2026-10-15 13:41:51 UTC — [ticket-459] APPROVED après 1 tour(s)
+- 2026-10-15 13:42:37 UTC — [ticket-459] documentation: 0 fichier(s) (43234ms)
