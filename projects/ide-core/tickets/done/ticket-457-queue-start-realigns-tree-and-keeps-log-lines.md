@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-457
 plan: true
-pr_number: null
+pr_number: 476
 priority: high
 status: done
 title: Starting a run puts the tree back on the base branch and keeps the uncommitted
