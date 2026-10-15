@@ -140,7 +140,7 @@ export interface TicketListResponse {
 
 export interface PRStatus {
   state: "open" | "closed" | "merged";
-  ci_status: "pending" | "passing" | "failing" | "none";
+  ci_status: "pending" | "passing" | "failing" | "none" | "unreadable";
   pr_url: string;
   pr_number: number;
 }

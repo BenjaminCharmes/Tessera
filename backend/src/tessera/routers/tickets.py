@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
-from tessera.services.github_service import GitHubService, PRStatus
+from tessera.services.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
 from tessera.services.database import list_runs, list_runs_for_ticket
 from tessera.services.pr_status_cache import get_cached_status
@@ -154,7 +154,7 @@ class CreatePrResponse(BaseModel):
 
 class PrStatusResponse(BaseModel):
     state: Literal["open", "closed", "merged"]
-    ci_status: Literal["pending", "passing", "failing", "none"]
+    ci_status: CiStatus
     pr_url: str
     pr_number: int
 
@@ -165,7 +165,7 @@ class PrStatusEntry(BaseModel):
     ticket_id: str
     pr_number: int
     state: Literal["open", "closed", "merged"]
-    ci_status: Literal["pending", "passing", "failing", "none"]
+    ci_status: CiStatus
     pr_url: str
 
 
