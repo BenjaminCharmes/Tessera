@@ -1,14 +1,14 @@
 ---
-id: ticket-456
-title: "An interrupted queue's parent run reports the interruption instead of done"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-15
+id: ticket-456
+pr_number: 475
+priority: high
+status: done
+title: An interrupted queue's parent run reports the interruption instead of done
+type: fix
 ---
 
 # ticket-456 — Le run parent d'une file interrompue ne se dit pas réussi

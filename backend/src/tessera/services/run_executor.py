@@ -321,7 +321,34 @@ async def executer(
         # l'orchestrateur, donc avant ce `finally` — mais elle tombe de
         # plusieurs millisecondes à presque rien.
         registry.fermer(run.run_id)
-        await _clore(run, run_id_en_base, resultats, echec, envoyer)
+        await _clore(
+            run, run_id_en_base, resultats, echec, envoyer,
+            interruption=_interruption_de(orchestrator),
+        )
+
+
+def _interruption_de(orchestrator: Any) -> str | None:
+    """The reason a queue stopped early, when the orchestrator kept one."""
+    raison = getattr(orchestrator, "interruption", None)
+    return raison if isinstance(raison, str) and raison else None
+
+
+def _issue(
+    dernier: PipelineResult | None, echec: str | None, interruption: str | None
+) -> tuple[bool, str, str | None]:
+    """`approved`, `final_status` and `arret` of the envelope row.
+
+    Le run parent ne se lit pas sur son dernier ticket seul : une file arrêtée
+    sur « non mergé » finit sur un ticket approuvé, et passait pour réussie
+    (ticket-456). Une interruption l'emporte donc, et garde sa raison.
+    """
+    arret = (dernier.arret if dernier else None) or echec
+    if interruption is None:
+        if dernier is None:
+            return False, "interrupted", arret
+        return dernier.approved, dernier.final_status.value, arret
+    detail = f"{interruption} ; {arret}" if arret else interruption
+    return False, "interrupted", detail
 
 
 async def _clore(
@@ -330,16 +357,21 @@ async def _clore(
     resultats: list[PipelineResult],
     echec: str | None,
     envoyer: EventCallback,
+    interruption: str | None = None,
 ) -> None:
     dernier = resultats[-1] if resultats else None
+    approved, final_status, arret = _issue(dernier, echec, interruption)
     if run_id_en_base is not None:
         try:
             await finish_run(
                 settings.ide_db_path,
                 run_id_en_base,
                 dernier.rounds if dernier else 0,
-                dernier.approved if dernier else False,
-                dernier.final_status.value if dernier else "interrupted",
+                approved,
+                final_status,
+                # Seule l'interruption s'enregistre sur la ligne enveloppe : le
+                # reste se lit déjà sur les lignes des tickets (ticket-456).
+                arret if interruption else None,
             )
         except Exception as exc:  # noqa: BLE001
             _logger.warning("run_non_clos", extra={"erreur": str(exc)})
@@ -363,14 +395,12 @@ async def _clore(
             type=EventType.RUN_CLOSED,
             ticket_id=dernier.ticket_id if dernier else (run.ticket_id or ""),
             data={
-                "approved": dernier.approved if dernier else False,
+                "approved": approved,
                 "rounds": dernier.rounds if dernier else 0,
-                "final_status": (
-                    dernier.final_status.value if dernier else "interrupted"
-                ),
+                "final_status": final_status,
                 "branch": dernier.branch if dernier else None,
                 "commit_sha": dernier.commit_sha if dernier else None,
-                "arret": (dernier.arret if dernier else None) or echec,
+                "arret": arret,
                 "resultats": len(resultats),
                 "db_run_id": run_id_en_base,
             },

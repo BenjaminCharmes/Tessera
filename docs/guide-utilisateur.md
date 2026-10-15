@@ -762,6 +762,8 @@ Quand tu vois la ligne « testeur: en attente d'un créneau de test » dans le l
 
 Une file arrêtée par une exception (timeout, saturation de ressources, etc.) écrit une ligne dans le journal du pipeline : `[projet] file interrompue : motif de l'erreur`. Tu peux voir l'arrêt immédiatement dans l'IDE, au même endroit que les autres interruptions (refus d'audit, dépassement de budget, limite de session). Tu n'as pas besoin de chercher dans les logs du serveur.
 
+Une file qui s'arrête prématurément — sur budget, ticket non approuvé, ou autre raison — est rapportée avec un statut `interrompu` (jamais `done`). La raison exacte est incluse, ce qui t'aide à comprendre ce qui s'est passé et comment relancer si tu le souhaites.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -948,6 +950,8 @@ Le journal du pipeline s'affiche en bas de l'écran. Pour te laisser plus de pla
 Un clic sur la barre déplie le journal à 180 px, affichant la liste complète des évènements. Le bouton devient « Réduire ▾ ».
 
 **L'état du panneau persiste** — le navigateur sauvegarde si tu l'as laissé replié ou déplié, tu le retrouves dans le même état quand tu reviens.
+
+Quand le CIWatcher merge une PR après une CI verte, cet événement s'écrit dans le journal du pipeline du projet (`memory/pipeline-log.md`). Tu y vois une ligne : `[projet] ticket-XXX PR #N mergée (CI verte)`. Le journal devient donc ta source de vérité pour connaître ce qui a été livré, sans relancer l'IDE ni interroger GitHub.
 
 ## 5 ter. Après le run : fusion automatique
 

@@ -108,6 +108,9 @@ class Orchestrator:
         # True quand run_queue est en cours : oriente l'issue du contrôle de
         # budget entre deux tours (todo vs blocked, ticket-386).
         self._in_queue = False
+        # Raison de la dernière interruption de file, sans le préfixe du
+        # projet. L'exécuteur la lit pour que le run parent la garde (ticket-456).
+        self._interruption: str | None = None
         # Le quota d'abonnement est la ressource réellement finie en mode
         # `agent_sdk` : la dépense estimée de ticket-052 ne la mesure pas.
         self._quota_tracker = quota_tracker
@@ -543,17 +546,19 @@ class Orchestrator:
         results: list[PipelineResult] = []
 
         self._in_queue = True
+        self._interruption = None
         for index, ticket_id in enumerate(ticket_ids, start=1):
             # Comme pour le budget et le quota, on vérifie **entre** deux
             # tickets : s'arrêter au milieu de l'un laisserait son travail non
             # commité (ADR-018, ADR-020).
             if dialogue is not None and dialogue.stop_requested:
-                self._log(f"[{project_id}] file interrompue : arrêt demandé")
+                self._interrompre(project_id, "arrêt demandé")
                 break
             if effective_budget > 0 and self._spent_usd >= effective_budget:
-                self._log(
-                    f"[{project_id}] file interrompue : plafond de dépense"
-                    f" ({self._spent_usd:.2f} $ / {effective_budget:.2f} $)"
+                self._interrompre(
+                    project_id,
+                    "plafond de dépense"
+                    f" ({self._spent_usd:.2f} $ / {effective_budget:.2f} $)",
                 )
                 await callback(
                     OrchestratorEvent(
@@ -614,9 +619,9 @@ class Orchestrator:
                         # Plafond par ticket atteint entre deux tours : le ticket
                         # a déjà loggé la raison dans finish_budget_exhausted_in_queue.
                         # On arrête la file sans émettre de session_limit (ticket-386).
-                        self._log(
-                            f"[{project_id}] file interrompue : {ticket_id}"
-                            f" — budget ({arret[:80]})"
+                        self._interrompre(
+                            project_id,
+                            f"{ticket_id} — budget ({arret[:80]})",
                         )
                         await callback(
                             OrchestratorEvent(
@@ -636,8 +641,8 @@ class Orchestrator:
                         # s'arrête proprement avant le ticket suivant.
                         reset_time = extract_reset_time_from_arret(result.arret)
                         reset_info = f" (reprise : {reset_time})" if reset_time else ""
-                        self._log(
-                            f"[{project_id}] file interrompue : limite de session{reset_info}"
+                        self._interrompre(
+                            project_id, f"limite de session{reset_info}"
                         )
                         await callback(
                             OrchestratorEvent(
@@ -654,9 +659,7 @@ class Orchestrator:
                             )
                         )
                 else:
-                    self._log(
-                        f"[{project_id}] file interrompue : {ticket_id} non approuvé"
-                    )
+                    self._interrompre(project_id, f"{ticket_id} non approuvé")
                 break
 
             # Si la PR de ce ticket est ouverte et attend la CI :
@@ -690,9 +693,7 @@ class Orchestrator:
                             etat_pr=self._etat_pr,
                         )
                         if merge is False:
-                            self._log(
-                                f"[{project_id}] file interrompue : {ticket_id} non mergé"
-                            )
+                            self._interrompre(project_id, f"{ticket_id} non mergé")
                             break
                         if merge:
                             # Le ticket suivant en dépend : il doit partir de la
@@ -742,10 +743,7 @@ class Orchestrator:
                     results[-1] = results[-1].model_copy(
                         update={"livraison": livraison_bloquee}
                     )
-                    self._log(
-                        f"[{project_id}] file interrompue : {ticket_id}"
-                        " n'a pas été livré"
-                    )
+                    self._interrompre(project_id, f"{ticket_id} n'a pas été livré")
                     break
 
         self._in_queue = False
@@ -1015,6 +1013,16 @@ class Orchestrator:
         if branche_courante is None:
             return False
         return bool(await branche_courante() == self._base_branch)
+
+    @property
+    def interruption(self) -> str | None:
+        """Why the last queue stopped early (``file interrompue : …``), if it did."""
+        return self._interruption
+
+    def _interrompre(self, project_id: str, raison: str) -> None:
+        """Log the queue interruption and keep its reason for the parent run."""
+        self._interruption = f"file interrompue : {raison}"
+        self._log(f"[{project_id}] {self._interruption}")
 
     def _log(self, message: str) -> None:
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
