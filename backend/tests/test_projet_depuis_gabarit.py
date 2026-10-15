@@ -257,3 +257,17 @@ def test_template_and_backend_pin_packages_blocked_by_smart_app_control() -> Non
         assert uv["no-binary-package"] == ["mypy"], chemin
         assert "rpds-py==2026.6.3" in uv["constraint-dependencies"], chemin
         assert "mypy>=1.13.0,<1.19" in texte or "<1.19" in texte, chemin
+
+
+@pytest.mark.parametrize(
+    "status_dir", ["todo", "in-progress", "in-review", "done", "blocked"]
+)
+async def test_template_project_keeps_status_folders_with_gitkeep(
+    workspace: Path, status_dir: str
+) -> None:
+    """Chaque dossier de statut porte un .gitkeep : un dossier vide ne vit pas dans git."""
+    with patch(_PATCH_GIT, new_callable=AsyncMock) as m:
+        m.return_value = _GIT_OK
+        await create_project_from_template(workspace, "mon-projet", "Mon Projet", _TEMPLATE_DIR)
+
+    assert (workspace / "mon-projet" / "tickets" / status_dir / ".gitkeep").is_file()
