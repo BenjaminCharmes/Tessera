@@ -2918,3 +2918,35 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 09:22:43 UTC — [ticket-449] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés avec succès. Le code implémente (170781ms)
 - 2026-10-15 09:22:43 UTC — [ticket-449] APPROVED après 1 tour(s)
 - 2026-10-15 09:25:11 UTC — [ticket-449] documentation: 1 fichier(s) (145406ms)
+- 2026-10-15 09:25:27 UTC — [ide-core] ticket-449 PR #460 confiée au CIWatcher
+- 2026-10-15 09:30:53 UTC — [ticket-450] branche ticket-450-the-ci-verdict-is-read-from-workflow-runs-which-a
+- 2026-10-15 09:30:54 UTC — [ticket-450] tour 1 — codeur démarré
+- 2026-10-15 09:32:36 UTC — [ticket-450] tour 1 — codeur terminé (102406ms)
+- 2026-10-15 09:37:19 UTC — [ticket-450] testeur: OK (exit 0)
+- 2026-10-15 09:37:55 UTC — [ticket-450] securite: PASS — Aucune vulnérabilité détectée. Le diff améliore la gestion de l'authentification (35890ms)
+- 2026-10-15 09:37:55 UTC — [ticket-450] tour 1 — reviewer démarré
+- 2026-10-15 09:38:20 UTC — [ticket-450] tour 1 — reviewer terminé (24890ms)
+- 2026-10-15 09:40:14 UTC — [ticket-450] validateur: fichiers cités joints : aucun ; absents : backend/src/tessera/services/livraison.py
+- 2026-10-15 09:40:14 UTC — [ticket-450] validateur: CHANGES_REQUESTED — Les tests pour les critères 1 à 4 sont tous présents et couvrent correctement le (138891ms)
+- 2026-10-15 09:40:14 UTC — [ticket-450] CHANGES_REQUESTED tour 1: Validateur : Les tests pour les critères 1 à 4 sont tous présents et couvrent correctement les cas d
+- 2026-10-15 09:40:14 UTC — [ticket-450] tour 2 — codeur démarré
+- 2026-10-15 09:40:30 UTC — [ticket-450] tour 2 — codeur terminé (15702ms)
+- 2026-10-15 09:45:50 UTC — [ticket-450] testeur: OK (exit 0)
+- 2026-10-15 09:46:36 UTC — [ticket-450] securite: PASS — Ce diff refactorise le service d'interrogation de la CI GitHub pour supporter le (45375ms)
+- 2026-10-15 09:46:36 UTC — [ticket-450] tour 2 — reviewer démarré
+- 2026-10-15 09:46:57 UTC — [ticket-450] tour 2 — reviewer terminé (20735ms)
+- 2026-10-15 09:49:00 UTC — [ticket-450] validateur: fichiers cités joints : aucun ; absents : backend/src/tessera/services/livraison.py
+- 2026-10-15 09:49:00 UTC — [ticket-450] validateur: CHANGES_REQUESTED — Les tests couvrent efficacement les critères 1 à 4 avec des scénarios bien défin (144515ms)
+- 2026-10-15 09:49:00 UTC — [ticket-450] CHANGES_REQUESTED tour 2: Validateur : Les tests couvrent efficacement les critères 1 à 4 avec des scénarios bien définis et v
+- 2026-10-15 09:49:00 UTC — [ticket-450] tour 3 — codeur démarré
+- 2026-10-15 09:49:19 UTC — [ticket-450] tour 3 — codeur terminé (18452ms)
+- 2026-10-15 09:54:33 UTC — [ticket-450] testeur: OK (exit 0)
+- 2026-10-15 09:55:08 UTC — [ticket-450] securite: PASS — Audit complet du diff — aucune vulnérabilité de sécurité détectée.
+
+**Modificati (34968ms)
+- 2026-10-15 09:55:08 UTC — [ticket-450] tour 3 — reviewer démarré
+- 2026-10-15 09:55:29 UTC — [ticket-450] tour 3 — reviewer terminé (21265ms)
+- 2026-10-15 09:57:43 UTC — [ticket-450] validateur: fichiers cités joints : aucun ; absents : backend/src/tessera/services/livraison.py
+- 2026-10-15 09:57:43 UTC — [ticket-450] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits par les tests et le code fourni. Le (155359ms)
+- 2026-10-15 09:57:43 UTC — [ticket-450] CHANGES_REQUESTED tour 3: Validateur : Les quatre premiers critères sont satisfaits par les tests et le code fourni. Le dernie
+- 2026-10-15 09:57:43 UTC — [ticket-450] BLOCKED après 3 tour(s) sans approbation
