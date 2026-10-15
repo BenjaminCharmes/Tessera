@@ -947,6 +947,10 @@ class GitWorkspaceService:
 
         Les artefacts de tenue de livres (`_ORCHESTRATOR_ARTIFACT_PATHS`) sont
         gérés par `commit_bookkeeping` et sont donc exclus ici.
+
+        Un fichier déjà présent dans `HEAD` reste dans l'index : le dépôt le
+        suivait avant la règle d'exclusion, et son retrait se décide, il ne
+        se fait pas en silence dans le commit d'un run (ticket-446).
         """
         try:
             out = await self._run(
@@ -955,9 +959,10 @@ class GitWorkspaceService:
         except GitCommandError as exc:
             _logger.warning("staged_ignored_list_failed", extra={"error": str(exc)})
             return
+        suivis = await self._chemins_dans_head()
         to_remove = [
             p for p in out.splitlines()
-            if p and not any(
+            if p and p not in suivis and not any(
                 p.startswith(a.rstrip("/")) for a in _ORCHESTRATOR_ARTIFACT_PATHS
             )
         ]
@@ -970,6 +975,18 @@ class GitWorkspaceService:
                 "staged_ignored_cleanup_failed",
                 extra={"error": str(exc), "paths": to_remove},
             )
+
+    async def _chemins_dans_head(self) -> frozenset[str]:
+        """Chemins du commit `HEAD`, dans la même notation que `ls-files`.
+
+        Vide sur un dépôt sans commit : la purge garde alors son comportement
+        d'origine.
+        """
+        try:
+            out = await self._run("ls-tree", "-r", "--name-only", "HEAD")
+        except GitCommandError:
+            return frozenset()
+        return frozenset(p for p in out.splitlines() if p)
 
     async def retourner_sur_base(self, base_branch: str) -> None:
         """Check out the base branch after a delivered run (ticket-378).
