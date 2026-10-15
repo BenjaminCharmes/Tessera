@@ -520,6 +520,43 @@ async def test_phase2_echouee_emet_blocked_et_ecrit_log(
     assert "ticket-007" in log_content
 
 
+# ---------------------------------------------------------------------------
+# Merge réussi → ligne « mergée » dans le pipeline log — ticket-458
+# ---------------------------------------------------------------------------
+
+
+async def test_merge_reussi_ecrit_la_ligne_mergee_au_journal(tmp_path: Path) -> None:
+    """A successful merge writes `[project] ticket PR #N mergée (CI verte)`."""
+    log_path = tmp_path / "memory" / "pipeline-log.md"
+    watcher = CIWatcher()
+
+    await watcher.surveiller(
+        "proj", "ticket-001", 42, _phase2_success, _rien,
+        pipeline_log_path=log_path,
+    )
+    await asyncio.sleep(0.1)
+
+    lignes = log_path.read_text(encoding="utf-8").splitlines()
+    assert len(lignes) == 1
+    assert lignes[0].endswith("[proj] ticket-001 PR #42 mergée (CI verte)")
+
+
+async def test_echec_n_ecrit_pas_la_ligne_mergee(tmp_path: Path) -> None:
+    """A failed merge writes the blocking line, never the success line."""
+    log_path = tmp_path / "memory" / "pipeline-log.md"
+    watcher = CIWatcher()
+
+    await watcher.surveiller(
+        "proj", "ticket-007", 10, _phase2_red_ci, _rien,
+        pipeline_log_path=log_path,
+    )
+    await asyncio.sleep(0.1)
+
+    contenu = log_path.read_text(encoding="utf-8")
+    assert "non mergée" in contenu
+    assert "mergée (CI verte)" not in contenu
+
+
 async def test_phase2_echouee_attendre_merge_retourne_false() -> None:
     """attendre_merge returns False after a failed phase 2."""
     watcher = CIWatcher()

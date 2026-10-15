@@ -1,14 +1,14 @@
 ---
-id: ticket-458
-title: "The CI watcher writes a pipeline-log line when it merges a PR"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-15
+id: ticket-458
+pr_number: null
+priority: medium
+status: done
+title: The CI watcher writes a pipeline-log line when it merges a PR
+type: feat
 ---
 
 # ticket-458 — Le CIWatcher écrit « PR #N mergée » dans le journal
@@ -33,6 +33,6 @@ Sur un merge réussi, écrire dans le `pipeline-log.md` du projet :
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie qu'un merge réussi par le CIWatcher écrit une ligne
+- [x] Un test vérifie qu'un merge réussi par le CIWatcher écrit une ligne
       qui contient le ticket, « PR #N » et « mergée »
-- [ ] Un test vérifie qu'un échec n'écrit pas cette ligne
+- [x] Un test vérifie qu'un échec n'écrit pas cette ligne
