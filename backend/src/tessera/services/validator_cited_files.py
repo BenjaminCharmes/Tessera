@@ -5,9 +5,12 @@ Split out of ``validator.py`` (ticket-316, ticket-434): the section builder
 now also returns a report of what was joined, so the pipeline log can say
 what the validator actually received.
 """
+import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from tessera.services.politique_run import PolitiqueRun
 
 # Max size of the cited-files section -- all entries combined.
 # Beyond this the current file is truncated (ticket-316).
@@ -45,6 +48,8 @@ def extract_file_refs(criteria: list[str]) -> list[str]:
 
     Picks up any backtick-quoted token that looks like a file path (has an
     extension), after stripping a trailing ``:N`` line-number suffix.
+    A token containing a space is a command (``git ls-files CLAUDE.md``),
+    not a file name, and is ignored.
     Preserves insertion order and deduplicates.
     """
     seen: set[str] = set()
@@ -52,6 +57,8 @@ def extract_file_refs(criteria: list[str]) -> list[str]:
     for criterion in criteria:
         for m in _BACKTICK_REF.finditer(criterion):
             candidate = _LINE_SUFFIX.sub("", m.group(1).strip())
+            if " " in candidate:
+                continue
             if _FILE_EXTENSION.search(candidate):
                 if candidate not in seen:
                     seen.add(candidate)
@@ -59,38 +66,67 @@ def extract_file_refs(criteria: list[str]) -> list[str]:
     return refs
 
 
-def _find_file_in_project(ref: str, project_root: Path) -> Path | None:
-    """Resolve a file reference against the project root.
+def _search_root(project_root: Path) -> Path:
+    """The folder cited files are searched under.
 
-    Tries the reference as a relative path first, then falls back to a
-    recursive search by filename, skipping common non-source directories.
+    The project folder, or the git repository that contains it when the
+    project declares ``git_root: ancestor`` (ADR-028): the bootstrap project
+    keeps its code in ``backend/`` and ``frontend/``, above its own folder.
     """
+    return PolitiqueRun.lire(project_root).racine_ecriture(project_root)
+
+
+def _find_in_root(ref: str, root: Path) -> Path | None:
+    """Resolve ``ref`` under ``root``, never outside of it."""
     # Un critère vient d'un ticket, qui peut venir d'une issue GitHub : sans
     # cette borne, `../../.env` ou un chemin absolu ferait joindre au message
     # du validateur un fichier hors du projet (audit sécurité du ticket-316).
-    racine = project_root.resolve()
+    racine = root.resolve()
 
-    def _dans_le_projet(chemin: Path) -> bool:
+    def _dans_la_racine(chemin: Path) -> bool:
         try:
             chemin.resolve().relative_to(racine)
         except ValueError:
             return False
         return True
 
-    if Path(ref).is_absolute():
-        return None
-    candidate = project_root / ref
-    if candidate.is_file() and _dans_le_projet(candidate):
+    candidate = root / ref
+    if candidate.is_file() and _dans_la_racine(candidate):
         return candidate
     name = Path(ref).name
     if not name or name in (".", ".."):
         return None
-    for found in project_root.rglob(name):
-        if any(part in _EXCLUDED_DIRS for part in found.parts):
-            continue
-        if found.is_file() and _dans_le_projet(found):
-            return found
+    # os.walk élague les dossiers exclus : au niveau du dépôt, `node_modules`
+    # compte des dizaines de milliers de fichiers qu'un rglob parcourrait.
+    for dossier, sous_dossiers, fichiers in os.walk(root):
+        sous_dossiers[:] = [d for d in sous_dossiers if d not in _EXCLUDED_DIRS]
+        if name in fichiers:
+            found = Path(dossier) / name
+            if _dans_la_racine(found):
+                return found
     return None
+
+
+def _find_file_in_project(ref: str, project_root: Path) -> Path | None:
+    """Resolve a file reference against the project, then its git repository.
+
+    Tries the reference as a relative path first, then falls back to a
+    recursive search by filename, skipping common non-source directories.
+    The project folder is searched first; a ``git_root: ancestor`` project
+    then gets the repository that contains it, with the same bound.
+    """
+    # Un segment `..` est refusé d'emblée : sous un projet `ancestor`, la
+    # racine est le dépôt, et `../../.env` y désignerait le `.env` du dépôt,
+    # donc à l'intérieur de la borne.
+    if Path(ref).is_absolute() or ".." in Path(ref).parts:
+        return None
+    found = _find_in_root(ref, project_root)
+    if found is not None:
+        return found
+    racine = _search_root(project_root)
+    if racine == project_root.resolve():
+        return None
+    return _find_in_root(ref, racine)
 
 
 def _read_entry(
