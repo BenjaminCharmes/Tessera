@@ -48,6 +48,18 @@ async def test_list_tickets_empty(tmp_path: Path) -> None:
     assert result == []
 
 
+async def test_list_tickets_ignores_gitkeep_only_folders(tmp_path: Path) -> None:
+    """A status folder holding only .gitkeep yields zero tickets and no error."""
+    for status_dir in ("todo", "in-progress", "in-review", "done", "blocked"):
+        folder = tmp_path / "tickets" / status_dir
+        folder.mkdir(parents=True)
+        (folder / ".gitkeep").touch()
+
+    svc = _svc(tmp_path)
+
+    assert await svc.list_tickets() == []
+
+
 async def test_list_tickets_returns_all(tmp_path: Path) -> None:
     _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
     _write_ticket(tmp_path / "tickets/done/ticket-002-b.md", "ticket-002", status="done")
