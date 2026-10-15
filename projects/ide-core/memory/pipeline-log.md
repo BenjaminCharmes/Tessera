@@ -3033,3 +3033,4 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 13:44:16 UTC — [ticket-458] tour 1 — codeur terminé (79484ms)
 - 2026-10-15 13:49:52 UTC — [ticket-458] testeur: OK (exit 0)
 - 2026-10-15 13:51:21 UTC — [ticket-458] securite: BLOCK — A path traversal vulnerability is introduced by the new `pipeline_log_path` para (89015ms)
+- 2026-10-15 13:51:24 UTC — [ide-core] file interrompue : ticket-458 non approuvé
