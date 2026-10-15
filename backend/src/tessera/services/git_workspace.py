@@ -13,6 +13,7 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.services import journal_en_attente
 from tessera.services.git_attributes import declare_union_merge
 from tessera.services.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
@@ -830,9 +831,10 @@ class GitWorkspaceService:
     async def _avancer_base_active(self, cible: str) -> str | None:
         """Fast-forward the checked-out base branch to ``cible``, files included.
 
-        Uncommitted pipeline-log lines are set aside and appended back after
-        the fast-forward: the merged ticket's commit carries its own log
-        lines, so a plain merge would refuse to overwrite the file. Any other
+        Uncommitted pipeline-log lines are set aside and written back after
+        the fast-forward, each one once only (ticket-457): the merged ticket's
+        commit carries its own log lines, so a plain merge would refuse to
+        overwrite the file, and some lines may already be in it. Any other
         local change makes ``merge --ff-only`` refuse, and the sync is skipped
         rather than forced (ADR-022).
         """
@@ -852,9 +854,7 @@ class GitWorkspaceService:
             raison = None
         except GitCommandError as exc:
             raison = f"avance rapide de la base refusée : {exc.stderr.strip()}"
-        if lignes:
-            with (self._project_path / journal).open("a", encoding="utf-8") as f:
-                f.write("\n".join(lignes) + "\n")
+        journal_en_attente.reecrire(self._project_path, lignes)
         return raison
 
     # ------------------------------------------------------------------

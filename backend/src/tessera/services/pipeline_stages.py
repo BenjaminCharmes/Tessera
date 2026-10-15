@@ -146,10 +146,12 @@ async def _realigner_base_au_depart(orch: "Orchestrator") -> Optional[str]:
 
     The last ticket of a queue is merged by the CIWatcher after the run is
     over, so nobody realigns the base behind it: the next run would fork from
-    a base that lags the remote. Does nothing unless a git workspace and a base
-    branch are known and the tree is on that base. Returns the refusal reason,
-    or ``None`` when the base was realigned or nothing was attempted — a
-    refusal never stops the run.
+    a base that lags the remote. A tree left on the previous ticket's branch is
+    first put back on the base (ticket-457): the pending log lines were already
+    set aside by the caller, so the checkout is not in their way. Does nothing
+    unless a git workspace and a base branch are known. Returns the refusal
+    reason, or ``None`` when the base was realigned or nothing was attempted —
+    a refusal (checkout included) never stops the run.
     """
     # getattr : les doubles d'orchestrateur des tests d'étape n'ont pas de base.
     base: Optional[str] = getattr(orch, "_base_branch", None)
@@ -157,11 +159,25 @@ async def _realigner_base_au_depart(orch: "Orchestrator") -> Optional[str]:
         return None
     try:
         if not await orch._sur_la_base():
-            return None
+            await orch._git_workspace.retourner_sur_base(base)
         return await orch._git_workspace.sync_base_depuis_distant(base)
     except GitWorkspaceError as exc:
         _logger.warning("realignement_debut_de_run_echoue", extra={"error": str(exc)})
         return str(exc)
+
+
+async def _depart_sur_la_base(orch: "Orchestrator") -> bool:
+    """True when the tree is on the base branch at the point of forking.
+
+    Bookkeeping must not be committed there: a local commit would make the
+    base diverge from the remote (no direct commit on develop or main).
+    """
+    if orch._git_workspace is None or getattr(orch, "_base_branch", None) is None:
+        return False
+    try:
+        return await orch._sur_la_base()
+    except GitWorkspaceError:
+        return False
 
 
 async def _basculer(
@@ -180,8 +196,11 @@ async def _basculer(
     # are logged but not fatal: the following branch creation attempt may
     # still succeed, and a missing bookkeeping commit is better than a
     # blocked pipeline when git is not fully configured.
+    # Pas sur la base : un commit local la ferait diverger du distant. Les
+    # modifications de `tickets/` suivent alors la branche du ticket (ticket-457).
     try:
-        await orch._git_workspace.commit_bookkeeping()
+        if not await _depart_sur_la_base(orch):
+            await orch._git_workspace.commit_bookkeeping()
     except GitWorkspaceError as exc:
         _logger.warning("bookkeeping_before_branch_failed", extra={"error": str(exc)})
 

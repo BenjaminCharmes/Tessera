@@ -1,15 +1,16 @@
 ---
-id: ticket-457
-title: "Starting a run puts the tree back on the base branch and keeps the uncommitted log lines"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 1
+id: ticket-457
 plan: true
-created: 2026-10-15
+pr_number: 476
+priority: high
+status: done
+title: Starting a run puts the tree back on the base branch and keeps the uncommitted
+  log lines
+type: fix
 ---
 
 # ticket-457 — Un run repart de la base sans geste à la main

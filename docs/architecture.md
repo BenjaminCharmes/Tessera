@@ -627,6 +627,24 @@ Depuis le ticket-388, une erreur de limite de session provoque :
 
 Contrairement à `blocked`, `todo` ne bloque pas le projet. La file peut reprendre après l'heure indiquée. Aucun ticket n'est abîmé.
 
+## Réalignement automatique du workspace avant un run (ticket-457)
+
+Avant le lancement du pipeline, l'orchestrateur prépare l'arbre de travail si l'une des conditions est remplie :
+- L'arbre n'est pas sur la branche de base du projet, OU
+- Seul `memory/pipeline-log.md` porte des modifications non commitees
+
+**Procédure** :
+1. Sauvegarder les lignes non commitees du journal de pipeline
+2. Revenir à la branche de base (reset hard)
+3. Réaligner la branche locale sur le distant (`git pull --ff-only`)
+4. Réappliquer les lignes sauvegardées du journal (union, sans doublon)
+
+**Garanties** :
+- Toute ligne du journal écrite précédemment reste présente une seule fois
+- Tout autre fichier modifié bloque le départ du run — pas de nettoyage auto
+
+**Contexte** : Après un run approuvé, la livraison en phase 2 (confiée au CIWatcher) écrit des lignes dans le journal *après* le commit de tenue de livres. Sans ce mécanisme, l'arbre resterait modifié, et le prochain run ne pourrait ni revenir à la base (arbre non propre) ni se réaligner (modifications bloquent le pull). Les tickets 378 et 406 ne couvraient que le cas où l'arbre était resté sur la branche de ticket — pas celui-ci.
+
 ## Documentation par lot (ADR-035, ticket-292)
 
 Après approbation, le pipeline met à jour la documentation technique et fonctionnelle 

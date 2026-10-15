@@ -3059,3 +3059,16 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-15 14:14:19 UTC — [ticket-456] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent explicitemen (168218ms)
 - 2026-10-15 14:14:19 UTC — [ticket-456] APPROVED après 1 tour(s)
 - 2026-10-15 14:19:47 UTC — [ticket-456] documentation: 1 fichier(s) (322905ms) — après tour de correction
+- 2026-10-15 14:20:03 UTC — [ide-core] ticket-456 PR #475 confiée au CIWatcher
+- 2026-10-15 14:20:06 UTC — [ticket-457] branche ticket-457-starting-a-run-puts-the-tree-back-on-the-base-bra
+- 2026-10-15 14:21:33 UTC — [ticket-457] plan rendu (87078ms)
+- 2026-10-15 14:21:33 UTC — [ticket-457] tour 1 — codeur démarré
+- 2026-10-15 14:27:20 UTC — [ticket-457] tour 1 — codeur terminé (346250ms)
+- 2026-10-15 14:34:21 UTC — [ticket-457] testeur: OK (exit 0)
+- 2026-10-15 14:35:21 UTC — [ticket-457] securite: PASS — Diff d'amélioration d'orchestration git (ticket-457). Aucune vulnérabilité intro (59687ms)
+- 2026-10-15 14:35:21 UTC — [ticket-457] tour 1 — reviewer démarré
+- 2026-10-15 14:36:02 UTC — [ticket-457] tour 1 — reviewer terminé (41014ms)
+- 2026-10-15 14:41:20 UTC — [ticket-457] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-15 14:41:20 UTC — [ticket-457] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute un nouveau modul (359405ms)
+- 2026-10-15 14:41:20 UTC — [ticket-457] APPROVED après 1 tour(s)
+- 2026-10-15 14:42:46 UTC — [ticket-457] documentation: 1 fichier(s) (81421ms)
