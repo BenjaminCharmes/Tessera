@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
 id: ticket-455
-pr_number: null
+pr_number: 471
 priority: high
 status: done
 title: A PR opened despite a lost response is found again and handed to the CI watcher
