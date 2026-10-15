@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
 id: ticket-456
-pr_number: null
+pr_number: 475
 priority: high
 status: done
 title: An interrupted queue's parent run reports the interruption instead of done
