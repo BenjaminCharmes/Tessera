@@ -84,6 +84,7 @@ class Orchestrator:
         base_branch: Optional[str] = None,
         merge_without_ci: bool = False,
         attente_merge_max_s: float = 600.0,
+        etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
     ) -> None:
         self._runner = runner
         self._ticket_svc = ticket_service
@@ -143,6 +144,10 @@ class Orchestrator:
         # Durée maximale d'attente du merge en secondes. Passé ce délai, la file
         # continue sans réalignement plutôt que de bloquer indéfiniment.
         self._attente_merge_max_s = attente_merge_max_s
+        # Relit l'état d'une PR (« merged », « open »…). Donné à `attendre_merge`
+        # pour qu'un ticket que le watcher n'a pas inscrit ne passe pas pour
+        # mergé : sans lecteur, il ne l'est pas (ADR-039).
+        self._etat_pr = etat_pr
 
     @property
     def quota(self) -> Optional["QuotaTracker"]:
@@ -653,7 +658,9 @@ class Orchestrator:
                         # réaligner la base distante avant la création de la
                         # branche du ticket suivant (ticket-382).
                         # Sans ticket restant, l'attente n'apporte rien.
-                        await self._attendre_merge_et_syncer(project_id, ticket_id)
+                        await self._attendre_merge_et_syncer(
+                            project_id, ticket_id, result.livraison.pr_number
+                        )
                     else:
                         merge = await _attendre_si_dependant(
                             self._ticket_svc,
@@ -661,6 +668,8 @@ class Orchestrator:
                             project_id,
                             ticket_id,
                             restants,
+                            pr_number=result.livraison.pr_number,
+                            etat_pr=self._etat_pr,
                         )
                         if merge is False:
                             self._log(
@@ -672,9 +681,19 @@ class Orchestrator:
                             # base qui contient ce merge, pas de la base locale
                             # d'avant (ticket-403 — le 400 était parti sans le 399).
                             await self._realigner_base(project_id, ticket_id)
+                        # `surveiller` n'a été appelé que pour une PR sans arrêt
+                        # (ou orpheline) : sinon, personne ne la surveille.
+                        surveillee = (
+                            result.livraison.arret is None
+                            or result.livraison.pr_orpheline
+                        )
                         self._log(
                             f"[{project_id}] {ticket_id} PR #{result.livraison.pr_number}"
-                            " confiée au CIWatcher"
+                            + (
+                                " confiée au CIWatcher"
+                                if surveillee
+                                else " non surveillée (livraison arrêtée)"
+                            )
                         )
                 else:
                     livraison_bloquee = await _trouver_bloquant(
@@ -867,6 +886,7 @@ class Orchestrator:
         self,
         project_id: str,
         ticket_id: str,
+        pr_number: int | None = None,
     ) -> None:
         """Wait for the merge then realign the local base from the remote.
 
@@ -878,7 +898,9 @@ class Orchestrator:
         assert self._ci_watcher is not None
         try:
             merged = await asyncio.wait_for(
-                self._ci_watcher.attendre_merge(project_id, ticket_id),
+                self._ci_watcher.attendre_merge(
+                    project_id, ticket_id, pr_number=pr_number, etat_pr=self._etat_pr
+                ),
                 timeout=self._attente_merge_max_s,
             )
         except asyncio.TimeoutError:
@@ -1002,12 +1024,16 @@ async def _attendre_si_dependant(
     project_id: str,
     ticket_id: str,
     restants: list[str],
+    pr_number: int | None = None,
+    etat_pr: Callable[[int], Awaitable[str]] | None = None,
 ) -> bool | None:
     """Await the CI merge for ``ticket_id`` if a remaining ticket depends on it.
 
     Walks ``restants`` to find the first ticket that declares ``ticket_id``
     in its ``depends_on``. When found, suspends until ``CIWatcher`` signals
     that ``ticket_id`` is no longer in the waiting set (merged or blocked).
+    ``pr_number`` and ``etat_pr`` let the watcher re-read a PR it never
+    registered, instead of assuming it merged.
 
     Returns None when no remaining ticket depends on it (nothing awaited),
     True when it merged (the caller realigns the base, ticket-403), and False
@@ -1016,7 +1042,11 @@ async def _attendre_si_dependant(
     for tid_dep in restants:
         ticket_dep = await ticket_svc.get_ticket(tid_dep)
         if ticket_dep is not None and ticket_id in ticket_dep.depends_on:
-            return bool(await ci_watcher.attendre_merge(project_id, ticket_id))
+            return bool(
+                await ci_watcher.attendre_merge(
+                    project_id, ticket_id, pr_number=pr_number, etat_pr=etat_pr
+                )
+            )
     return None
 
 

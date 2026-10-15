@@ -1,15 +1,15 @@
 ---
-id: ticket-451
-title: "A queue waits for the real merge of a dependency, never for a default answer"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 1
+id: ticket-451
 plan: true
-created: 2026-10-15
+pr_number: 464
+priority: high
+status: done
+title: A queue waits for the real merge of a dependency, never for a default answer
+type: fix
 ---
 
 # ticket-451 — L'attente d'une dépendance échoue fermée

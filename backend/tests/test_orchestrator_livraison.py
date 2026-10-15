@@ -388,7 +388,9 @@ async def test_ticket_dependant_attend_le_merge_avant_de_demarrer(
         def en_attente(self, project_id: str) -> tuple[str, ...]:
             return ("ticket-001",)
 
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             await gate.wait()
             return True  # merge succeeded
 
@@ -455,7 +457,9 @@ async def test_ticket_sans_dependance_demarre_sans_attendre(
     departs: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> None:
             # Ne doit jamais être appelé pour un ticket sans dépendance.
             raise AssertionError(f"attendre_merge appelé pour {ticket_id}")
 
@@ -503,7 +507,9 @@ async def test_livraison_sans_pr_ne_bloque_pas_le_ticket_suivant(
     departs: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> None:
             raise AssertionError("attendre_merge ne doit pas être appelé")
 
     def _make_ticket(tid: str) -> Ticket:
@@ -848,7 +854,9 @@ async def test_file_s_arrete_quand_dependance_non_mergee(
     from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
 
     class _FakeCIWatcherFail:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             return False  # merge failed
 
     def _make_ticket(tid: str, depends_on: list[str]) -> Ticket:
@@ -902,7 +910,9 @@ async def test_ticket_independant_continue_quand_dependance_non_mergee(
     from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
 
     class _FakeCIWatcherFail:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             return False  # merge failed — but caller should never reach this
 
     def _make_ticket(tid: str) -> Ticket:
@@ -983,7 +993,9 @@ async def test_merge_without_ci_attend_le_merge_avant_ticket_suivant(
     departs: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             await gate.wait()
             return True
 
@@ -1035,7 +1047,9 @@ async def test_sans_merge_without_ci_ticket_independant_demarre_sans_attendre(
     from unittest.mock import AsyncMock
 
     class _FakeCIWatcherNeverResolves:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             raise AssertionError("attendre_merge ne doit pas être appelé")
 
     def _make_ticket(tid: str) -> Ticket:
@@ -1075,7 +1089,9 @@ async def test_merge_without_ci_sync_base_depuis_distant_appele(
     from unittest.mock import AsyncMock
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             return True  # merge immédiat
 
     def _make_ticket(tid: str) -> Ticket:
@@ -1292,7 +1308,9 @@ async def test_merge_without_ci_timeout_continue_et_log(
     from unittest.mock import AsyncMock
 
     class _FakeCIWatcherBlocking:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             # Ne se résout jamais — simule un merge qui tarde.
             await asyncio.Event().wait()
             return True  # jamais atteint
@@ -1373,7 +1391,9 @@ async def test_le_ticket_dependant_part_de_la_base_realignee_apres_le_merge(
     ordre: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             ordre.append(f"merge:{ticket_id}")
             return True
 

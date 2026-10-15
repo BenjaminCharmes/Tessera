@@ -276,6 +276,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         livrer=_livreur(project_id, runner, politique, espace=git_workspace),
         surveiller=_surveillance_pour(project_id, runner, politique, espace=git_workspace),
         ci_watcher=CI_WATCHER,
+        etat_pr=_lecteur_etat_pr(project_id, politique),
         documenter=_documenteur(project_id, politique),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
@@ -583,6 +584,33 @@ def _surveillance_pour(
         )
 
     return surveiller
+
+
+def _lecteur_etat_pr(
+    project_id: str, politique: PolitiqueRun | None = None
+) -> Callable[[int], Awaitable[str]]:
+    """Fabrique la relecture de l'état d'une PR, donnée à la file.
+
+    La file s'en sert quand le watcher n'a pas inscrit le ticket dont dépend
+    le suivant : elle relit la PR au lieu de la supposer mergée. Sans dépôt
+    GitHub déclaré, la relecture rend `unknown`, donc « pas mergé ».
+    """
+    project_path = settings.ide_workspace_dir / project_id
+    project = load_project(project_path)
+    github = None
+    if project.github_remote and settings.github_token:
+        github = GitHubService(token=settings.github_token, repo=project.github_remote)
+    base_branch = (
+        politique.base_branch if politique else None
+    ) or settings.github_base_branch
+    workflow = GitHubWorkflowService(
+        git_workspace=GitWorkspaceService(project_path, politique=politique),
+        github=github,
+        base_branch=base_branch,
+        project_path=project_path,
+        politique=politique,
+    )
+    return workflow.pr_state
 
 
 #: Les tâches de run en vol. Sans référence forte, asyncio peut collecter
