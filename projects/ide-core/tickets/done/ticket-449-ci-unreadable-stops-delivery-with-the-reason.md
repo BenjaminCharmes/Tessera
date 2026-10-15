@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
 id: ticket-449
-pr_number: null
+pr_number: 460
 priority: high
 status: done
 title: A CI the token cannot read stops the delivery at once, naming the missing permission
