@@ -68,6 +68,8 @@ class _GitHub(Protocol):
 
     async def get_pull_request_status(self, pr_number: int) -> Any: ...
 
+    async def find_open_pull_request(self, branch: str) -> int | None: ...
+
     async def get_pull_request_state(self, pr_number: int) -> str: ...
 
     async def has_workflows(self) -> bool: ...
@@ -292,6 +294,15 @@ class GitHubWorkflowService:
         if getattr(statut, "mergeable_state", None) == "dirty":
             return "conflicting"
         return str(getattr(statut, "ci_status", "none"))
+
+    async def pr_ouverte_de(self, branch: str) -> int | None:
+        """Le numéro de la PR ouverte portée par `branch`, ou `None` (ticket-455).
+
+        Sans GitHub configuré, `None` : il n'y a rien à retrouver.
+        """
+        if self._github is None:
+            return None
+        return await self._github.find_open_pull_request(branch)
 
     async def has_workflows(self) -> bool:
         """Le dépôt déclare-t-il au moins un workflow ? Sans GitHub : non."""

@@ -811,6 +811,12 @@ après le merge : la branche du ticket ne reçoit pas de commit une fois fusionn
 
 Le CIWatcher lit le statut `mergeable_state` de la PR pendant l'attente de CI. Si ce statut devient `dirty` (la PR a un conflit avec la base), la surveillance s'arrête immédiatement avec une ligne d'arrêt dans `memory/pipeline-log.md`. Le ticket passe en échec, et les dépendants qui l'attendent le reçoivent aussi en échec (ticket-452).
 
+#### Récupération d'une PR créée malgré une erreur réseau (ticket-455)
+
+Quand l'appel d'ouverture de la PR échoue avec une erreur de transport (`httpx.TransportError`, notamment `ReadTimeout`), Tessera ne connaît pas le numéro de la PR créée — la livraison s'arrête sans pouvoir la confier au CIWatcher.
+
+Pour récupérer cette PR orpheline, la phase 1 cherche une PR ouverte dont la branche de tête est celle du run courant (`GET /pulls?head=<owner>:<branche>&state=open`). Si elle existe, elle est traitée comme une `LivraisonInterrompue` avec `pr_orpheline=True` : elle passe au CIWatcher pour le suivi du statut CI. Si la recherche elle-même échoue ou qu'aucune PR n'est trouvée, l'arrêt d'origine est conservé sans nouvelle erreur.
+
 ### Attente du statut mergeable avant le merge
 
 Avant d'appeler l'endpoint de merge, `GitHubService` vérifie que la PR est 

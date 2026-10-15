@@ -1017,6 +1017,11 @@ Lors de la livraison, si le rebase génère un conflit, Tessera tente automatiqu
 
 Si cet agent ne peut pas intervenir, la ligne d'arrêt t'en informe clairement : « résolveur non tenté : [raison] ». Le conflit reste alors non résolu dans la branche, qui ne sera jamais poussée. Tu peux arbitrer le conflit en local avant de relancer.
 
+
+### Erreur réseau lors de l'ouverture de la PR
+
+Si la réponse du serveur GitHub se perd lors de l'ouverture de la PR (timeout réseau), Tessera interroge GitHub pour retrouver la PR par sa branche et la confie au CIWatcher. Tu n'as rien à faire ; le workflow continue normalement et l'arbre reste propre.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.

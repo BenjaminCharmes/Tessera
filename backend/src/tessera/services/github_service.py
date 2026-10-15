@@ -155,6 +155,23 @@ class GitHubService:
         data = resp.json()
         return int(data["number"]), str(data["html_url"])
 
+    async def find_open_pull_request(self, branch: str) -> int | None:
+        """Number of the open PR whose head branch is `branch`, or None — ticket-455.
+
+        GitHub filters `head` as `<owner>:<branch>`; the owner is the one of the
+        repository, since a run's branch is always pushed to it.
+        """
+        owner = self._repo.split("/", 1)[0]
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        params: dict[str, str | int] = {
+            "head": f"{owner}:{branch}", "state": "open", "per_page": 1,
+        }
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._headers, params=params)
+            resp.raise_for_status()
+        items: list[dict[str, Any]] = resp.json()
+        return int(items[0]["number"]) if items else None
+
     async def get_pull_request_status(self, pr_number: int) -> PRStatus:
         """Retourne le statut d'une PR avec son état CI agrégé."""
         url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"

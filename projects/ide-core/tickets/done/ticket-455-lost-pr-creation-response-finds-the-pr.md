@@ -1,14 +1,14 @@
 ---
-id: ticket-455
-title: "A PR opened despite a lost response is found again and handed to the CI watcher"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-15
+id: ticket-455
+pr_number: 471
+priority: high
+status: done
+title: A PR opened despite a lost response is found again and handed to the CI watcher
+type: fix
 ---
 
 # ticket-455 — Une PR ouverte malgré une réponse perdue est retrouvée
