@@ -107,6 +107,9 @@ class CIWatcher:
         `realignement` asks for the local base to be fast-forwarded once the
         PR is merged, when no run holds the project (ticket-422).
         """
+        # Un résultat d'une surveillance précédente du même ticket serait relu
+        # comme celui de cette PR-ci.
+        self._resultats_merge.pop(f"{project_id}:{ticket_id}", None)
         if realignement is not None:
             self._realignements[f"{project_id}:{ticket_id}"] = realignement
         # Le ticket est en attente dès l'inscription, même avant que le
@@ -128,24 +131,38 @@ class CIWatcher:
         """Ticket ids whose PR is open and waiting for CI or merge."""
         return tuple(self._en_attente.get(project_id, set()))
 
-    async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+    async def attendre_merge(
+        self,
+        project_id: str,
+        ticket_id: str,
+        pr_number: int | None = None,
+        etat_pr: EtatPr | None = None,
+    ) -> bool:
         """Wait until the ticket is no longer waiting for CI or merge.
 
         Returns True if the ticket was merged, False if it was blocked or failed.
-        Returns True immediately when the ticket was never registered (safe
-        default — not applicable to this queue).
+
+        A ticket that is not registered and has no recorded result is unknown
+        to the watcher. When the caller gives its `pr_number`, the PR is re-read
+        through `etat_pr` and only a ``merged`` PR counts as merged — fails
+        closed (ADR-039): a missing reader, an error or an unknown state is
+        False. Without a PR number there is nothing to wait for: True.
 
         Safe to call from a queue loop: a dependent ticket suspends here until
         the background task signals completion.
         """
         cle = f"{project_id}:{ticket_id}"
         if ticket_id not in self._en_attente.get(project_id, set()):
-            # Already finished or never registered — return recorded result.
-            return self._resultats_merge.get(cle, True)
+            if cle in self._resultats_merge:
+                return self._resultats_merge[cle]
+            if pr_number is None:
+                return True
+            return await self._pr_mergee(etat_pr, pr_number)
         if cle not in self._events_merge:
             self._events_merge[cle] = asyncio.Event()
         await self._events_merge[cle].wait()
-        return self._resultats_merge.get(cle, True)
+        # Sans résultat enregistré, la tâche a été annulée : pas mergé.
+        return self._resultats_merge.get(cle, False)
 
     async def arreter(self) -> None:
         """Cancel all running tasks and wait for them to finish.

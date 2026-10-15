@@ -219,6 +219,64 @@ async def test_attendre_merge_retourne_immediatement_si_deja_fini() -> None:
     await watcher.attendre_merge("proj", "ticket-001")  # no hang
 
 
+async def test_attendre_merge_non_inscrit_sans_pr_retourne_true() -> None:
+    """Without a PR number there is nothing to wait for: True, as before."""
+    assert await CIWatcher().attendre_merge("proj", "ticket-001") is True
+
+
+async def test_attendre_merge_non_inscrit_pr_ouverte_ne_retourne_pas_true() -> None:
+    """An unregistered ticket whose PR is still open is not merged."""
+    watcher = CIWatcher()
+    merge = await watcher.attendre_merge(
+        "proj", "ticket-001", pr_number=14, etat_pr=_lecture_pr("open")
+    )
+    assert merge is False
+
+
+async def test_attendre_merge_non_inscrit_pr_mergee_retourne_true() -> None:
+    """An unregistered ticket whose PR is merged counts as merged."""
+    watcher = CIWatcher()
+    merge = await watcher.attendre_merge(
+        "proj", "ticket-001", pr_number=14, etat_pr=_lecture_pr("merged")
+    )
+    assert merge is True
+
+
+async def test_attendre_merge_non_inscrit_sans_lecteur_echoue_ferme() -> None:
+    """No way to read the PR: fails closed, it is not merged."""
+    merge = await CIWatcher().attendre_merge("proj", "ticket-001", pr_number=14)
+    assert merge is False
+
+
+async def test_attendre_merge_non_inscrit_lecture_en_erreur_echoue_ferme() -> None:
+    """A reader that raises is not a proof of merge."""
+
+    async def lire(pr_number: int) -> str:
+        raise httpx.ReadTimeout("")
+
+    merge = await CIWatcher().attendre_merge(
+        "proj", "ticket-001", pr_number=14, etat_pr=lire
+    )
+    assert merge is False
+
+
+async def test_surveiller_purge_le_resultat_d_une_surveillance_precedente() -> None:
+    """A stale merged result is never read back as the new PR's outcome."""
+    watcher = CIWatcher()
+    gate = asyncio.Event()
+
+    async def phase2_bloquante(pr_number: int) -> Livraison:
+        await gate.wait()
+        return Livraison(pr_number=pr_number, merged=False, arret="CI rouge")
+
+    watcher._resultats_merge["proj:ticket-001"] = True
+    await watcher.surveiller("proj", "ticket-001", 2, phase2_bloquante, _rien)
+    gate.set()
+    await asyncio.sleep(0.05)
+
+    assert await watcher.attendre_merge("proj", "ticket-001") is False
+
+
 async def test_attendre_merge_suspend_jusqu_a_la_fin() -> None:
     """attendre_merge suspends the caller until ci_merge_done is emitted."""
     watcher = CIWatcher()
