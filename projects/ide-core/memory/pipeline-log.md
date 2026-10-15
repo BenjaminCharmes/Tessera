@@ -2987,3 +2987,16 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 11:58:38 UTC — [ticket-452] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code intègre la lecture de ` (336594ms)
 - 2026-10-15 11:58:38 UTC — [ticket-452] APPROVED après 2 tour(s)
 - 2026-10-15 12:02:20 UTC — [ticket-452] documentation: 3 fichier(s) (213235ms)
+- 2026-10-15 12:03:17 UTC — [ide-core] ticket-452 PR #466 confiée au CIWatcher
+- 2026-10-15 12:03:28 UTC — [ticket-453] branche ticket-453-a-rebase-conflict-at-delivery-is-handed-to-the-co
+- 2026-10-15 12:04:25 UTC — [ticket-453] plan rendu (55030ms)
+- 2026-10-15 12:04:25 UTC — [ticket-453] tour 1 — codeur démarré
+- 2026-10-15 12:08:38 UTC — [ticket-453] tour 1 — codeur terminé (253797ms)
+- 2026-10-15 12:17:48 UTC — [ticket-453] testeur: OK (exit 0)
+- 2026-10-15 12:19:01 UTC — [ticket-453] securite: PASS — Deux problèmes LOW detectés : (1) le stderr de git est exposé sans sanitization, (73485ms)
+- 2026-10-15 12:19:01 UTC — [ticket-453] tour 1 — reviewer démarré
+- 2026-10-15 12:19:23 UTC — [ticket-453] tour 1 — reviewer terminé (21905ms)
+- 2026-10-15 12:22:56 UTC — [ticket-453] validateur: fichiers cités joints : agents.json
+- 2026-10-15 12:22:56 UTC — [ticket-453] validateur: APPROVED — Les deux critères sont satisfaits. Le code inclut un nouveau test qui reproduit  (234219ms)
+- 2026-10-15 12:22:56 UTC — [ticket-453] APPROVED après 1 tour(s)
+- 2026-10-15 12:26:20 UTC — [ticket-453] documentation: 3 fichier(s) (199312ms)

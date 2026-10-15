@@ -1,15 +1,16 @@
 ---
-id: ticket-453
-title: "A rebase conflict at delivery is handed to the conflict resolver, or says why not"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
+id: ticket-453
 plan: true
-created: 2026-10-15
+pr_number: 467
+priority: medium
+status: done
+title: A rebase conflict at delivery is handed to the conflict resolver, or says why
+  not
+type: fix
 ---
 
 # ticket-453 — Un conflit de rebase passe au résolveur, ou dit pourquoi pas

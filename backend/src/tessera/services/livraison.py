@@ -202,15 +202,15 @@ class LivraisonService:
         rebase_ms = (time.monotonic() - t0) * 1000
 
         if conflits:
+            if resolus:
+                # La tentative figure au journal même quand elle échoue.
+                etapes.append("résolveur tenté : " + ", ".join(resolus))
+                durees_ms.append(rebase_ms)
             return Livraison(
                 etapes=tuple(etapes),
                 durees_ms=tuple(durees_ms),
                 conflits=conflits,
-                arret=(
-                    f"Conflit avec {self._base_branch} sur : "
-                    + ", ".join(conflits)
-                    + ". La branche est restée intacte, à toi de trancher."
-                ),
+                arret=self._arret_conflit(conflits, resolus),
             )
         etapes.append(f"rebase sur {self._base_branch}")
         durees_ms.append(rebase_ms)
@@ -424,6 +424,25 @@ class LivraisonService:
             etapes=tuple(etapes), durees_ms=tuple(durees_ms),
             pr_number=pr_number, merged=True,
         )
+
+    def _arret_conflit(self, conflits: tuple[str, ...], resolus: list[str]) -> str:
+        """The stop line of an unresolved conflict, saying what the resolver did.
+
+        Sans cela, un résolveur jamais appelé et un résolveur tenté en échec
+        donnent la même ligne (ticket-453).
+        """
+        message = f"Conflit avec {self._base_branch} sur : " + ", ".join(conflits)
+        if self._resolveur is None:
+            message += " — résolveur non tenté : aucun résolveur câblé sur cette livraison"
+        elif resolus:
+            raison = getattr(self._git, "raison_resolveur", None)
+            message += (
+                f" — résolveur tenté sur {', '.join(resolus)}, sans succès"
+                + (f" : {raison}" if isinstance(raison, str) and raison else "")
+            )
+        else:
+            message += " — résolveur non tenté : le rebase ne l'a pas appelé"
+        return message + ". La branche est restée intacte, à toi de trancher."
 
     def _arret_ci_illisible(self, pr_number: int) -> str:
         """Le message d'arrêt quand le jeton ne peut pas lire la CI (ticket-449)."""
