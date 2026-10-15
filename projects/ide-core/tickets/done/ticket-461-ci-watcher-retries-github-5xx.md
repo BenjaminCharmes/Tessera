@@ -1,14 +1,14 @@
 ---
-id: ticket-461
-title: "The CI watcher retries a GitHub 5xx instead of giving up the merge"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-15
+id: ticket-461
+pr_number: 478
+priority: medium
+status: done
+title: The CI watcher retries a GitHub 5xx instead of giving up the merge
+type: fix
 ---
 
 # ticket-461 — Un 5xx de GitHub se réessaie

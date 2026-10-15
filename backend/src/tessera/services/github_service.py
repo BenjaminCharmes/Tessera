@@ -6,6 +6,7 @@ from typing import Any, Literal
 import httpx
 
 from tessera.config import settings
+from tessera.services.github_retry import reessayer_5xx
 from pydantic import BaseModel
 
 
@@ -65,13 +66,29 @@ class RepositoryInfo:
 
 
 class GitHubService:
-    def __init__(self, token: str, repo: str) -> None:
+    def __init__(
+        self,
+        token: str,
+        repo: str,
+        dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
+    ) -> None:
         self._repo = repo
         self._headers = {
             "Authorization": f"Bearer {token}",
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
         }
+        # Attente entre deux essais d'un 5xx (ticket-461) ; injectable en test.
+        self._dormir = dormir
+
+    async def _requete(
+        self, client: httpx.AsyncClient, methode: str, url: str, **kwargs: Any
+    ) -> httpx.Response:
+        """Send one request, retrying a 502, 503 or 504 (ticket-461)."""
+        return await reessayer_5xx(
+            lambda: client.request(methode, url, headers=self._headers, **kwargs),
+            self._dormir,
+        )
 
     async def list_agent_ready_issues(self) -> list[GitHubIssue]:
         url = f"{_BASE}/repos/{self._repo}/issues"
@@ -176,7 +193,7 @@ class GitHubService:
         """Retourne le statut d'une PR avec son état CI agrégé."""
         url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
+            resp = await self._requete(client, "GET", url)
             resp.raise_for_status()
         pr_data = resp.json()
 
@@ -206,7 +223,7 @@ class GitHubService:
         """Read only the state of a PR, without querying its CI — ticket-405."""
         url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
+            resp = await self._requete(client, "GET", url)
             resp.raise_for_status()
         pr_data = resp.json()
         if pr_data.get("merged"):
@@ -257,7 +274,7 @@ class GitHubService:
         if commit_title is not None:
             payload["commit_title"] = commit_title
         async with httpx.AsyncClient() as client:
-            resp = await client.put(url, headers=self._headers, json=payload)
+            resp = await self._requete(client, "PUT", url, json=payload)
             resp.raise_for_status()
 
     async def get_ci_status(self, sha: str) -> CiStatus:
@@ -321,13 +338,13 @@ class GitHubService:
         """
         async with httpx.AsyncClient() as client:
             runs_url = f"{_BASE}/repos/{self._repo}/actions/runs"
-            resp = await client.get(
-                runs_url, headers=self._headers, params={"head_sha": sha}
+            resp = await self._requete(
+                client, "GET", runs_url, params={"head_sha": sha}
             )
             if resp.status_code not in (403, 404):
                 return self._etat_des_workflow_runs(resp)
             checks_url = f"{_BASE}/repos/{self._repo}/commits/{sha}/check-runs"
-            resp = await client.get(checks_url, headers=self._headers)
+            resp = await self._requete(client, "GET", checks_url)
         return self._etat_des_check_runs(resp)
 
     @staticmethod
@@ -372,7 +389,7 @@ class GitHubService:
         """
         url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
+            resp = await self._requete(client, "GET", url)
             resp.raise_for_status()
         raw = resp.json().get("mergeable")
         if raw is None:

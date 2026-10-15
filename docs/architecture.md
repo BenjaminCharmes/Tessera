@@ -835,6 +835,10 @@ Quand l'appel d'ouverture de la PR échoue avec une erreur de transport (`httpx.
 
 Pour récupérer cette PR orpheline, la phase 1 cherche une PR ouverte dont la branche de tête est celle du run courant (`GET /pulls?head=<owner>:<branche>&state=open`). Si elle existe, elle est traitée comme une `LivraisonInterrompue` avec `pr_orpheline=True` : elle passe au CIWatcher pour le suivi du statut CI. Si la recherche elle-même échoue ou qu'aucune PR n'est trouvée, l'arrêt d'origine est conservé sans nouvelle erreur.
 
+#### Retry automatique pour les indisponibilités GitHub
+
+Lors de la lecture du statut CI ou du merge d'une PR, une indisponibilité passagère de GitHub (502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout) n'arrête plus le run. Le CIWatcher réessaye jusqu'à trois fois avec une attente croissante (1 s, 2 s, 4 s) avant abandon définitif. Les erreurs 4xx (403 Forbidden, 404 Not Found…) ne déclenchent pas de retry — elles reflètent une vraie permission manquante ou une ressource disparue (ticket-461).
+
 ### Attente du statut mergeable avant le merge
 
 Avant d'appeler l'endpoint de merge, `GitHubService` vérifie que la PR est 
