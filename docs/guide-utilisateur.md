@@ -953,6 +953,14 @@ Un clic sur la barre déplie le journal à 180 px, affichant la liste complète 
 
 Quand le CIWatcher merge une PR après une CI verte, cet événement s'écrit dans le journal du pipeline du projet (`memory/pipeline-log.md`). Tu y vois une ligne : `[projet] ticket-XXX PR #N mergée (CI verte)`. Le journal devient donc ta source de vérité pour connaître ce qui a été livré, sans relancer l'IDE ni interroger GitHub.
 
+### Cliquer sur un ticket pour l'ouvrir
+
+Partout où tu vois un numéro de ticket dans Tessera — dans une file en cours (Supervision), dans l'en-tête d'un run, dans l'Historique — tu peux cliquer dessus pour ouvrir son détail dans l'onglet Tickets.
+
+Si le ticket appartient à un autre projet, tu passes automatiquement sur ce projet avant d'ouvrir le détail.
+
+Un ticket introuvable (supprimé ou renommé depuis) affiche un message au lieu d'une erreur.
+
 ## 5 ter. Après le run : fusion automatique
 
 Quand le run se termine approuvé, l'IDE :
