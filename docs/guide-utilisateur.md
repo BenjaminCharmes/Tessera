@@ -1011,6 +1011,12 @@ Les conflits du journal (`memory/pipeline-log.md`) et de la documentation (`memo
 
 Les autres conflits restent bloquants et demandent une approbation.
 
+### Conflits de rebase et résolution automatique
+
+Lors de la livraison, si le rebase génère un conflit, Tessera tente automatiquement de le résoudre avec un agent spécialisé. Son travail est relu avant publication.
+
+Si cet agent ne peut pas intervenir, la ligne d'arrêt t'en informe clairement : « résolveur non tenté : [raison] ». Le conflit reste alors non résolu dans la branche, qui ne sera jamais poussée. Tu peux arbitrer le conflit en local avant de relancer.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.

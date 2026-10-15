@@ -751,6 +751,12 @@ Deux fichiers où chaque run ne fait que ajouter des entrées ne bloquent plus u
 
 Si d'autres fichiers sont en conflit, c'est un scénario complexe : le rebase s'arrête, la branche reste intacte, et un agent tente la résolution de ces ambiguïtés intrinsèques, toujours relue avant approbation (voir ADR-033). Cette automatisation élimine les blocages sur des fichiers où l'ajout séquentiel de deux branches ne crée aucune ambiguïté.
 
+#### Appel du résolveur-conflit pour les conflits complexes
+
+Quand l'auto-résolution échoue (fichiers modifiés des deux côtés, structures complexes), l'orchestrateur appelle le `resolveur-conflit` — un agent spécialisé en résolution de conflits (ADR-033) — **s'il est déclaré dans `agents.json` du projet**.
+
+Si le résolveur n'est pas déclaré ou ne peut pas tenter, la ligne d'arrêt affiche : « résolveur non tenté : [raison] ». L'utilisateur peut alors ajouter le rôle dans `agents.json` et relancer le run.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
