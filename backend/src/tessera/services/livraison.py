@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
 
+import httpx
+
 from tessera.config import settings
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.git_workspace import GitCommandError
@@ -81,6 +83,7 @@ class _Workflow(Protocol):
     ) -> Any: ...
     async def etat_ci(self, pr_number: int) -> str: ...
     async def has_workflows(self) -> bool: ...
+    async def pr_ouverte_de(self, branch: str) -> int | None: ...
     async def pr_state(self, pr_number: int) -> str: ...
     async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool: ...
 
@@ -220,13 +223,20 @@ class LivraisonService:
             durees_ms.append(0.0)
 
         t0 = time.monotonic()
-        resultat = await self._workflow.open_pull_request(
-            branch=branch,
-            ticket_id=ticket_id,
-            ticket_title=ticket_title,
-            ticket_body=ticket_body,
-            ticket_type=ticket_type,
-        )
+        try:
+            resultat = await self._workflow.open_pull_request(
+                branch=branch,
+                ticket_id=ticket_id,
+                ticket_title=ticket_title,
+                ticket_body=ticket_body,
+                ticket_type=ticket_type,
+            )
+        except httpx.TransportError as exc:
+            # La réponse a pu se perdre alors que la PR s'ouvrait (ticket-455).
+            pr_perdue = await self._pr_ouverte_malgre(branch)
+            if pr_perdue is None:
+                raise
+            raise LivraisonInterrompue(pr_perdue, exc) from exc
         pr_ms = (time.monotonic() - t0) * 1000
         pr_number = int(resultat.pr_number)
         etapes.append(f"PR #{pr_number} ouverte")
@@ -240,6 +250,17 @@ class LivraisonService:
             )
         except Exception as exc:  # noqa: BLE001 — relevée avec le numéro de PR
             raise LivraisonInterrompue(pr_number, exc) from exc
+
+    async def _pr_ouverte_malgre(self, branch: str) -> int | None:
+        """Look for a PR already open on `branch` after a transport error.
+
+        Never raises: a failing search keeps the original stop (ticket-455).
+        """
+        try:
+            return await self._workflow.pr_ouverte_de(branch)
+        except Exception as exc:  # noqa: BLE001 — la recherche ne masque pas l'erreur d'origine
+            _logger.warning("recherche_pr_perdue_echouee", extra={"erreur": str(exc)})
+            return None
 
     async def _apres_ouverture(
         self,
