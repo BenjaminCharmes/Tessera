@@ -341,7 +341,9 @@ class CIWatcher:
                 extra={"project": project_id, "ticket": ticket_id, "pr": pr_number},
             )
         else:
-            await self._emettre_succes(project_id, ticket_id, pr_number, on_event)
+            await self._emettre_succes(
+                project_id, ticket_id, pr_number, on_event, pipeline_log_path
+            )
 
     async def _emettre_succes(
         self,
@@ -349,9 +351,14 @@ class CIWatcher:
         ticket_id: str,
         pr_number: int,
         on_event: EventCallback,
+        pipeline_log_path: Path | None = None,
     ) -> None:
-        """Emit ci_merge_done(merged=True) and record the success."""
+        """Emit ci_merge_done(merged=True) and record the success.
+
+        With a `pipeline_log_path`, the merge is also written to the log.
+        """
         self._resultats_merge[f"{project_id}:{ticket_id}"] = True
+        self._ecrire_log_merge(pipeline_log_path, project_id, ticket_id, pr_number)
         await on_event(
             OrchestratorEvent(
                 type=EventType.CI_MERGE_DONE,
@@ -443,8 +450,27 @@ class CIWatcher:
         """Append one timestamped line for `ticket_id` to the pipeline log."""
         if pipeline_log_path is None:
             return
+        self._ajouter_au_log(pipeline_log_path, f"[{ticket_id}] {message}")
+
+    def _ecrire_log_merge(
+        self,
+        pipeline_log_path: Path | None,
+        project_id: str,
+        ticket_id: str,
+        pr_number: int,
+    ) -> None:
+        """Append `[project] ticket PR #N mergée (CI verte)` to the pipeline log."""
+        self._ajouter_au_log(
+            pipeline_log_path,
+            f"[{project_id}] {ticket_id} PR #{pr_number} mergée (CI verte)",
+        )
+
+    def _ajouter_au_log(self, pipeline_log_path: Path | None, texte: str) -> None:
+        """Append one timestamped line to the pipeline log; never raises."""
+        if pipeline_log_path is None:
+            return
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-        line = f"- {ts} — [{ticket_id}] {message}\n"
+        line = f"- {ts} — {texte}\n"
         try:
             pipeline_log_path.parent.mkdir(parents=True, exist_ok=True)
             with pipeline_log_path.open("a", encoding="utf-8") as f:
