@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-451
 plan: true
-pr_number: null
+pr_number: 464
 priority: high
 status: done
 title: A queue waits for the real merge of a dependency, never for a default answer
