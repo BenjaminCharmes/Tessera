@@ -1,14 +1,15 @@
 ---
-id: ticket-447
-title: "A mise-en-ligne skill gives agents the launch checklist of a project served online"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-15
+id: ticket-447
+pr_number: 458
+priority: medium
+status: done
+title: A mise-en-ligne skill gives agents the launch checklist of a project served
+  online
+type: feat
 ---
 
 # ticket-447 — Skill `mise-en-ligne` pour les projets servis en ligne
