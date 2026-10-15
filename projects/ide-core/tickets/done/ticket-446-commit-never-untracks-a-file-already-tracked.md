@@ -6,7 +6,7 @@ estimated_days: 0.5
 id: ticket-446
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: A run's commit never untracks a file the repository already tracked
 type: fix
 ---
@@ -46,14 +46,14 @@ présent dans le commit de base reste dans l'index. Sur un dépôt sans commit
 
 ## Critères d'acceptation
 
-- [ ] `_purger_stage_ignoré` dans `git_workspace.py` ne passe à
+- [x] `_purger_stage_ignoré` dans `git_workspace.py` ne passe à
       `git rm --cached` aucun chemin présent dans `HEAD`
-- [ ] Un test crée un dépôt qui suit `CLAUDE.md`, ajoute `CLAUDE.md` à
+- [x] Un test crée un dépôt qui suit `CLAUDE.md`, ajoute `CLAUDE.md` à
       `.git/info/exclude`, appelle la purge, et vérifie que
       `git ls-files CLAUDE.md` le liste toujours
-- [ ] Un test vérifie qu'un fichier nouvellement stagé et couvert par
+- [x] Un test vérifie qu'un fichier nouvellement stagé et couvert par
       `.gitignore` est toujours retiré de l'index
-- [ ] Les tests existants de `test_run_interrompu_arbre_propre.py` sont
+- [x] Les tests existants de `test_run_interrompu_arbre_propre.py` sont
       inchangés
 
 ## Ce que ça ne fait pas
