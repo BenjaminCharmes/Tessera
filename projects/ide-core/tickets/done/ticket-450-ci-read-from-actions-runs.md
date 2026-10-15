@@ -7,7 +7,7 @@ estimated_days: 0.5
 id: ticket-450
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: The CI verdict is read from workflow runs, which a fine-grained token can read
 type: fix
 ---
@@ -50,14 +50,14 @@ CI verte avec ce jeton.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie que des runs `completed`/`success` sur le SHA donnent
+- [x] Un test vérifie que des runs `completed`/`success` sur le SHA donnent
       `"passing"` sans appeler `check-runs`
-- [ ] Un test vérifie qu'un run `in_progress` donne `"pending"`, et un run
+- [x] Un test vérifie qu'un run `in_progress` donne `"pending"`, et un run
       `completed`/`failure` donne `"failing"`
-- [ ] Un test vérifie qu'un 403 sur `actions/runs` suivi d'un 200 sur
+- [x] Un test vérifie qu'un 403 sur `actions/runs` suivi d'un 200 sur
       `check-runs` garde le verdict de `check-runs`
-- [ ] Un test vérifie qu'un 403 sur les deux donne `"unreadable"`
-- [ ] Le message d'arrêt de `backend/src/tessera/services/livraison.py`
+- [x] Un test vérifie qu'un 403 sur les deux donne `"unreadable"`
+- [x] Le message d'arrêt de `backend/src/tessera/services/livraison.py`
       contient « Actions » et « Commit statuses », et plus « Checks »
 
 ## Ce que ça ne fait pas
