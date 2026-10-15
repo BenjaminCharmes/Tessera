@@ -3027,3 +3027,9 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 13:13:02 UTC — [ticket-455] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente une logique (149921ms)
 - 2026-10-15 13:13:02 UTC — [ticket-455] APPROVED après 1 tour(s)
 - 2026-10-15 13:15:06 UTC — [ticket-455] documentation: 2 fichier(s) (119311ms)
+- 2026-10-15 13:42:53 UTC — [ide-core] ticket-459 PR #473 confiée au CIWatcher
+- 2026-10-15 13:42:56 UTC — [ticket-458] branche ticket-458-the-ci-watcher-writes-a-pipeline-log-line-when-it
+- 2026-10-15 13:42:56 UTC — [ticket-458] tour 1 — codeur démarré
+- 2026-10-15 13:44:16 UTC — [ticket-458] tour 1 — codeur terminé (79484ms)
+- 2026-10-15 13:49:52 UTC — [ticket-458] testeur: OK (exit 0)
+- 2026-10-15 13:51:21 UTC — [ticket-458] securite: BLOCK — A path traversal vulnerability is introduced by the new `pipeline_log_path` para (89015ms)
