@@ -3085,3 +3085,13 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-15 15:01:33 UTC — [ticket-460] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute un composant `Li (357655ms)
 - 2026-10-15 15:01:33 UTC — [ticket-460] APPROVED après 1 tour(s)
 - 2026-10-15 15:03:05 UTC — [ticket-460] documentation: 1 fichier(s) (87375ms)
+- 2026-10-15 15:03:26 UTC — [ide-core] ticket-460 PR #477 confiée au CIWatcher
+- 2026-10-15 15:03:29 UTC — [ticket-461] branche ticket-461-the-ci-watcher-retries-a-github-5xx-instead-of-gi
+- 2026-10-15 15:03:30 UTC — [ticket-461] tour 1 — codeur démarré
+- 2026-10-15 15:05:20 UTC — [ticket-461] tour 1 — codeur terminé (110344ms)
+- 2026-10-15 15:11:21 UTC — [ticket-461] testeur: OK (exit 0)
+- 2026-10-15 15:11:55 UTC — [ticket-461] securite: PASS — Audit de sécurité complet sur le diff de ticket-461 (retry GitHub 5xx). Aucune v (33313ms)
+- 2026-10-15 15:11:55 UTC — [ticket-461] tour 1 — reviewer démarré
+- 2026-10-15 15:12:21 UTC — [ticket-461] tour 1 — reviewer terminé (26328ms)
+- 2026-10-15 15:13:47 UTC — [ticket-461] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas de 5 (112360ms)
+- 2026-10-15 15:13:47 UTC — [ticket-461] APPROVED après 1 tour(s)
