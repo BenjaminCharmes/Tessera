@@ -801,6 +801,10 @@ dans le fichier du ticket et commité **avant** le merge de la PR, garantissant 
 le `pr_number` remonte à la branche de base lors du merge. Aucun suivi n'est écrit
 après le merge : la branche du ticket ne reçoit pas de commit une fois fusionnée.
 
+#### Détection des PR non fusionables
+
+Le CIWatcher lit le statut `mergeable_state` de la PR pendant l'attente de CI. Si ce statut devient `dirty` (la PR a un conflit avec la base), la surveillance s'arrête immédiatement avec une ligne d'arrêt dans `memory/pipeline-log.md`. Le ticket passe en échec, et les dépendants qui l'attendent le reçoivent aussi en échec (ticket-452).
+
 ### Attente du statut mergeable avant le merge
 
 Avant d'appeler l'endpoint de merge, `GitHubService` vérifie que la PR est 

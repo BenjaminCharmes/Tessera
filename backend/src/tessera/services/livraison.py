@@ -340,6 +340,16 @@ class LivraisonService:
                 pr_number=pr_number,
                 arret=self._arret_ci_illisible(pr_number),
             )
+        if ci == "conflicting":
+            return Livraison(
+                etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
+                pr_number=pr_number,
+                arret=(
+                    f"PR #{pr_number} en conflit avec {self._base_branch} : "
+                    "à rebaser. La PR reste ouverte."
+                ),
+            )
         if ci != "passing":
             return Livraison(
                 etapes=tuple(etapes),
@@ -440,6 +450,8 @@ class LivraisonService:
         exist their checks are merely late, and `none` stays `pending` until
         the wait bound (ticket-405).
         `failing` always stops the wait immediately, even during grace.
+        `conflicting` (the PR conflicts with its base) is final too: no CI
+        verdict makes a conflicting PR mergeable (ticket-452).
         """
         ecoule = 0.0
         workflows_declares = False
