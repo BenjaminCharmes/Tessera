@@ -292,6 +292,10 @@ Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
 s'en distingue.
 
+#### Préservation des fichiers suivis lors de l'exclusion en mode local (ticket-446)
+
+Le mode `local` pour les artefacts écrit les règles d'exclusion dans `.git/info/exclude` (ADR-021, ADR-023). Avant de commiter, la purge des fichiers stagés mais ignorés (`_purger_stage_ignoré` dans `git_workspace.py`) s'est compliquée : elle vérifie maintenant qu'un fichier n'existe pas dans `HEAD` avant de le retirer de l'index. Un fichier suivi par le dépôt initial reste suivi, même s'il est marqué ignoré après coup. Sur un dépôt sans commit (`HEAD` absent), la purge agit comme avant.
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
@@ -600,6 +604,8 @@ actuel au message du validateur, dans une section distincte du diff. Cette secti
 
 Le prompt du validateur (`agents/prompts/validateur.md`) l'instruit sur cette section 
 et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas être refusé.
+
+Les fichiers cités dans les critères d'acceptation (entre backticks) sont trouvés et joints au validateur pour qu'il puisse vérifier le travail. Pour un projet déclaré `git_root: ancestor` (comme ide-core), la recherche s'étend au dépôt git qui contient le projet, pas seulement à son dossier (ticket-448). Les garde-fous restent en place : aucun chemin absolu, aucun fichier hors de la racine du dépôt. Les textes entre backticks qui contiennent une espace (p. ex. `git ls-files CLAUDE.md`) sont ignorés, ce qui évite de confondre des commandes avec des noms de fichiers.
 
 ## Synchronisation de la base au démarrage
 

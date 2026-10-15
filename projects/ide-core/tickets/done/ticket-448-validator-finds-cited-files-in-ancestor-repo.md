@@ -1,14 +1,15 @@
 ---
-id: ticket-448
-title: "The validator finds a cited file anywhere in the repository of a git_root ancestor project"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-15
+id: ticket-448
+pr_number: 456
+priority: medium
+status: done
+title: The validator finds a cited file anywhere in the repository of a git_root ancestor
+  project
+type: fix
 ---
 
 # ticket-448 — Le validateur trouve un fichier cité dans le dépôt ancêtre
