@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
 id: ticket-448
-pr_number: null
+pr_number: 456
 priority: medium
 status: done
 title: The validator finds a cited file anywhere in the repository of a git_root ancestor
