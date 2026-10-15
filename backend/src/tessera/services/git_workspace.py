@@ -406,6 +406,11 @@ class GitWorkspaceService:
         # previously created ticket branch — otherwise ticket N would carry
         # ticket N-1's commits (isolation-by-branch relies on this).
         self._base_ref: str | None = None
+        # Pourquoi la dernière tentative du résolveur a échoué (ticket-453).
+        # `rejouer_sur` rend seulement les fichiers en conflit : sans ceci, un
+        # résolveur tenté et en échec produit le même arrêt qu'un résolveur
+        # jamais appelé.
+        self.raison_resolveur: str | None = None
         # Untracked files already sitting in the tree when the run started.
         # They were not produced by the coder, so `commit_all`'s blanket
         # `git add -A` must not sweep them into the ticket's commit (that is
@@ -1078,6 +1083,7 @@ class GitWorkspaceService:
         dessus, et l'utilisateur hériterait d'un dépôt qu'il n'a pas choisi.
         """
         await self._ensure_own_repository()
+        self.raison_resolveur = None
         if not await self._ref_existe(base):
             raise BaseIntrouvable(base)
 
@@ -1364,35 +1370,50 @@ class GitWorkspaceService:
     ) -> bool:
         """Laisse le résolveur réécrire les fichiers, puis poursuit le rebase.
 
-        Rend `False` dès que quoi que ce soit ne va pas. L'appelant annule :
-        aucun état intermédiaire n'a besoin d'être compris ici.
+        Rend `False` dès que quoi que ce soit ne va pas, et pose la cause dans
+        `raison_resolveur`. L'appelant annule : aucun état intermédiaire n'a
+        besoin d'être compris ici.
         """
+        self.raison_resolveur = None
         try:
             await resolveur(conflits)
-        except Exception:  # noqa: BLE001 — un résolveur qui échoue fait annuler
+        except Exception as exc:  # noqa: BLE001 — un résolveur qui échoue fait annuler
             _logger.warning("resolveur_en_echec", extra={"fichiers": conflits})
+            self.raison_resolveur = f"le résolveur a levé {type(exc).__name__}"
             return False
 
-        for chemin in conflits:
-            fichier = self._project_path / chemin
-            if not fichier.is_file():
-                return False
-            # Un fichier qui garde ses marqueurs compile rarement et se relit
-            # encore moins : le committer serait pire que ne rien faire.
-            if _MARQUEUR_CONFLIT in fichier.read_text(encoding="utf-8", errors="replace"):
-                _logger.warning("marqueurs_restants", extra={"fichier": chemin})
-                return False
+        self.raison_resolveur = self._raison_fichiers_resolus(conflits)
+        if self.raison_resolveur is not None:
+            return False
 
         try:
             await self._run("add", "--", *conflits)
             if await self._fichiers_en_conflit():
+                self.raison_resolveur = "des conflits subsistent après la résolution"
                 return False
             await self._run(
                 "-c", "core.editor=true", "rebase", "--continue"
             )
-        except GitCommandError:
+        except GitCommandError as exc:
+            self.raison_resolveur = (
+                "git a refusé de poursuivre le rebase : "
+                + (exc.stderr.strip() or str(exc))
+            )
             return False
         return True
+
+    def _raison_fichiers_resolus(self, conflits: tuple[str, ...]) -> str | None:
+        """Pourquoi les fichiers laissés par le résolveur ne sont pas livrables."""
+        for chemin in conflits:
+            fichier = self._project_path / chemin
+            if not fichier.is_file():
+                return f"fichier introuvable après résolution : {chemin}"
+            # Un fichier qui garde ses marqueurs compile rarement et se relit
+            # encore moins : le committer serait pire que ne rien faire.
+            if _MARQUEUR_CONFLIT in fichier.read_text(encoding="utf-8", errors="replace"):
+                _logger.warning("marqueurs_restants", extra={"fichier": chemin})
+                return f"marqueurs de conflit restants dans {chemin}"
+        return None
 
     async def _fichiers_en_conflit(self) -> tuple[str, ...]:
         sortie = await self._run("diff", "--name-only", "--diff-filter=U")
