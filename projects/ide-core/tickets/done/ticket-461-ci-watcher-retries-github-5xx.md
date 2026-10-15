@@ -4,7 +4,7 @@ created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
 id: ticket-461
-pr_number: null
+pr_number: 478
 priority: medium
 status: done
 title: The CI watcher retries a GitHub 5xx instead of giving up the merge
