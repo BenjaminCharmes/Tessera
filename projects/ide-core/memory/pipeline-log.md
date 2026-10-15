@@ -3072,3 +3072,15 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-15 14:41:20 UTC — [ticket-457] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute un nouveau modul (359405ms)
 - 2026-10-15 14:41:20 UTC — [ticket-457] APPROVED après 1 tour(s)
 - 2026-10-15 14:42:46 UTC — [ticket-457] documentation: 1 fichier(s) (81421ms)
+- 2026-10-15 14:43:07 UTC — [ide-core] ticket-457 PR #476 confiée au CIWatcher
+- 2026-10-15 14:43:10 UTC — [ticket-460] branche ticket-460-every-ticket-id-shown-in-the-app-opens-that-ticke
+- 2026-10-15 14:44:29 UTC — [ticket-460] plan rendu (79093ms)
+- 2026-10-15 14:44:29 UTC — [ticket-460] tour 1 — codeur démarré
+- 2026-10-15 14:49:23 UTC — [ticket-460] tour 1 — codeur terminé (293530ms)
+- 2026-10-15 14:55:04 UTC — [ticket-460] testeur: OK (exit 0)
+- 2026-10-15 14:55:35 UTC — [ticket-460] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff introduit une fonctionnalité  (31062ms)
+- 2026-10-15 14:55:35 UTC — [ticket-460] tour 1 — reviewer démarré
+- 2026-10-15 14:56:10 UTC — [ticket-460] tour 1 — reviewer terminé (34890ms)
+- 2026-10-15 15:01:33 UTC — [ticket-460] validateur: fichiers cités joints : RunCard.tsx, TousLesRuns.tsx, RunView/index.tsx
+- 2026-10-15 15:01:33 UTC — [ticket-460] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute un composant `Li (357655ms)
+- 2026-10-15 15:01:33 UTC — [ticket-460] APPROVED après 1 tour(s)
