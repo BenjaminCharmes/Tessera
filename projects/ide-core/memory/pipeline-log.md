@@ -2878,3 +2878,4 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 08:20:48 UTC — [ticket-446] validateur: CHANGES_REQUESTED — Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage (165546ms)
 - 2026-10-15 08:20:48 UTC — [ticket-446] CHANGES_REQUESTED tour 3: Validateur : Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage_ignoré
 - 2026-10-15 08:20:49 UTC — [ticket-446] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-15 08:20:51 UTC — [ide-core] file interrompue : ticket-446 non approuvé
