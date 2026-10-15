@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-453
 plan: true
-pr_number: null
+pr_number: 467
 priority: medium
 status: done
 title: A rebase conflict at delivery is handed to the conflict resolver, or says why
