@@ -96,7 +96,9 @@ async def test_une_ci_illisible_arrete_la_livraison_sans_merger(
     assert workflow.merges == []
     assert livraison.merged is False
     assert livraison.pr_number == 7
-    assert "Checks" in (livraison.arret or "")
+    assert "Actions" in (livraison.arret or "")
+    assert "Commit statuses" in (livraison.arret or "")
+    assert "Checks" not in (livraison.arret or "")
     assert "403" in (livraison.arret or "")
 
 
@@ -107,7 +109,7 @@ async def test_une_ci_illisible_sans_code_connu_nomme_quand_meme_la_permission(
 
     livraison = await svc.livrer_phase_2(7, ticket_id="ticket-001")
 
-    assert "Checks" in (livraison.arret or "")
+    assert "Actions" in (livraison.arret or "")
     assert "HTTP" not in (livraison.arret or "")
 
 

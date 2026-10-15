@@ -421,8 +421,8 @@ class LivraisonService:
         precision = f" (HTTP {code})" if isinstance(code, int) else ""
         return (
             "Le jeton GitHub de Tessera ne peut pas lire la CI de ce dépôt"
-            f"{precision} : il lui faut les permissions Checks, Commit "
-            f"statuses et Actions en lecture. La PR #{pr_number} reste "
+            f"{precision} : il lui faut les permissions Actions et Commit "
+            f"statuses en lecture. La PR #{pr_number} reste "
             "ouverte, rien n'est mergé."
         )
 
