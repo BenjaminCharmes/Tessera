@@ -36,6 +36,8 @@ class _OrchestrateurFile:
         self._git_workspace = None
         self._base_branch = None
         self._nettoyer_apres_file = Orchestrator._nettoyer_apres_file.__get__(self)  # type: ignore[attr-defined]
+        self._interruption: str | None = None
+        self._interrompre = Orchestrator._interrompre.__get__(self)  # type: ignore[attr-defined]
 
     async def run_pipeline(
         self, project_id, ticket_id, on_event, run_id=None, dialogue=None,
