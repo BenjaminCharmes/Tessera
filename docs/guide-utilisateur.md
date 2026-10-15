@@ -1382,6 +1382,47 @@ La vue **Comparer** affiche tous les rôles actifs du projet dans un tableau : r
 
 Ça te permet de voir d'un coup d'œil quel rôle consomme le plus ou est sollicité différemment que prévu.
 
+### Skills spécialisés
+
+Certains domaines ont des **skills** — des guides que les agents appliquent automatiquement quand c'est pertinent.
+
+#### Skill `mise-en-ligne` pour les sites servis en ligne
+
+Si ton projet est un site web, une PWA ou une application SaaS, les agents ont une checklist de mise en ligne couvrant une vingtaine de points essentiels souvent oubliés avant le lancement.
+
+**Points clés :**
+
+- Page 404 fonctionnelle et lisible
+- CTA visible au-dessus du pli, collant en bas sur mobile
+- Titre et meta description pertinents par page
+- Image Open Graph présente
+- Favicons sur tous les appareils
+- `robots.txt` et `sitemap.xml` accessibles
+- Alt descriptif sur chaque image
+- Responsive : fonctionnel à partir de 375 px (width mobile min)
+- États de chargement et d'erreur clairs
+- Politique de confidentialité, mentions légales, adresse de contact
+- Page de remerciement après chaque formulaire
+
+**Consentement et traceurs :**
+
+Tu n'as besoin d'un bandeau cookies que si tu utilises un traceur qui l'exige. Une mesure d'audience exemptée de consentement — Plausible, Umami, GoatCounter — dispense du bandeau. Sinon, ajoute `vanilla-cookieconsent`.
+
+**Textes juridiques :**
+
+Les agents proposent des gabarits marqués « À_REMPLACER ». Tu dois les relire et les valider toi-même : aucun agent ne peut les remplir définitivement.
+
+**Implémentation selon ta stack :**
+
+- React 19 + Vite : titres et meta dynamiques nativement, sans `react-helmet-async`
+- Next.js : couvre `metadata`, `sitemap.ts`, `robots.ts`, `opengraph-image`, `not-found.tsx`
+
+**Performance :**
+
+Une fois déployé en production, une mesure Lighthouse CI valide vraiment sur l'URL réelle. Avant cela, un test Playwright vérifie : 404, robots.txt, sitemap.xml, og:image, CTA visible, aucune requête vers un traceur avant consentement.
+
+Les agents utilisent ce guide pour trouver les points manquants et te proposer les corrections.
+
 ## 10. Intégration GitHub
 
 Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :
