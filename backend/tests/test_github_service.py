@@ -450,11 +450,43 @@ async def test_get_pr_status_ci_none_when_checks_endpoint_fails() -> None:
         return_value=httpx.Response(200, json=_pr_payload())
     )
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
-        return_value=httpx.Response(404, json={"message": "Not Found"})
+        return_value=httpx.Response(500, json={"message": "Server Error"})
     )
     svc = _make_service()
     status = await svc.get_pull_request_status(15)
     assert status.ci_status == "none"
+    assert status.ci_http_status is None
+
+
+@respx.mock
+async def test_get_pr_status_ci_unreadable_on_403() -> None:
+    # Le jeton n'a pas la permission Checks : ce n'est pas « pas de CI ».
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(
+            403, json={"message": "Resource not accessible by personal access token"}
+        )
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.ci_status == "unreadable"
+    assert status.ci_http_status == 403
+    assert await svc.get_ci_status("abc123") == "unreadable"
+
+
+@respx.mock
+async def test_get_pr_status_ci_unreadable_on_404() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(404, json={"message": "Not Found"})
+    )
+    status = await _make_service().get_pull_request_status(15)
+    assert status.ci_status == "unreadable"
+    assert status.ci_http_status == 404
 
 
 @respx.mock

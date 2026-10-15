@@ -333,6 +333,13 @@ class LivraisonService:
                     "ouverte."
                 ),
             )
+        if ci == "unreadable":
+            return Livraison(
+                etapes=tuple(etapes),
+                durees_ms=tuple(durees_ms),
+                pr_number=pr_number,
+                arret=self._arret_ci_illisible(pr_number),
+            )
         if ci != "passing":
             return Livraison(
                 etapes=tuple(etapes),
@@ -408,8 +415,22 @@ class LivraisonService:
             pr_number=pr_number, merged=True,
         )
 
+    def _arret_ci_illisible(self, pr_number: int) -> str:
+        """Le message d'arrêt quand le jeton ne peut pas lire la CI (ticket-449)."""
+        code = getattr(self._workflow, "code_http_ci", None)
+        precision = f" (HTTP {code})" if isinstance(code, int) else ""
+        return (
+            "Le jeton GitHub de Tessera ne peut pas lire la CI de ce dépôt"
+            f"{precision} : il lui faut les permissions Checks, Commit "
+            f"statuses et Actions en lecture. La PR #{pr_number} reste "
+            "ouverte, rien n'est mergé."
+        )
+
     async def _attendre_la_ci(self, pr_number: int) -> str:
         """Poll CI until a verdict, or until the wait bound.
+
+        `unreadable` (the token cannot read the CI) is a final verdict like
+        `failing`: waiting would never make it readable (ticket-449).
 
         `none` is treated as `pending` during the grace period: GitHub
         registers checks only after the PR is opened, so an immediate poll

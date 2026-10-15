@@ -1,14 +1,14 @@
 ---
-id: ticket-449
-title: "A CI the token cannot read stops the delivery at once, naming the missing permission"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-15
+id: ticket-449
+pr_number: 460
+priority: high
+status: done
+title: A CI the token cannot read stops the delivery at once, naming the missing permission
+type: fix
 ---
 
 # ticket-449 — Une CI illisible arrête la livraison tout de suite, avec la vraie raison

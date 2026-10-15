@@ -2906,3 +2906,15 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 09:07:21 UTC — [ticket-447] validateur: APPROVED — Tous les critères sont satisfaits. Le fichier SKILL.md est correctement créé ave (265328ms)
 - 2026-10-15 09:07:21 UTC — [ticket-447] APPROVED après 2 tour(s)
 - 2026-10-15 09:10:01 UTC — [ticket-447] documentation: 1 fichier(s) (156608ms)
+- 2026-10-15 09:10:21 UTC — [ide-core] ticket-447 PR #458 confiée au CIWatcher
+- 2026-10-15 09:11:22 UTC — [ticket-449] branche ticket-449-a-ci-the-token-cannot-read-stops-the-delivery-at
+- 2026-10-15 09:11:23 UTC — [ticket-449] tour 1 — codeur démarré
+- 2026-10-15 09:13:47 UTC — [ticket-449] tour 1 — codeur terminé (143436ms)
+- 2026-10-15 09:19:23 UTC — [ticket-449] testeur: OK (exit 0)
+- 2026-10-15 09:19:52 UTC — [ticket-449] securite: PASS — Audit complet : aucune vulnérabilité détectée dans ce diff. Le changement introd (28702ms)
+- 2026-10-15 09:19:52 UTC — [ticket-449] tour 1 — reviewer démarré
+- 2026-10-15 09:20:17 UTC — [ticket-449] tour 1 — reviewer terminé (24936ms)
+- 2026-10-15 09:22:43 UTC — [ticket-449] validateur: fichiers cités joints : aucun ; absents : github_service.py
+- 2026-10-15 09:22:43 UTC — [ticket-449] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés avec succès. Le code implémente (170781ms)
+- 2026-10-15 09:22:43 UTC — [ticket-449] APPROVED après 1 tour(s)
+- 2026-10-15 09:25:11 UTC — [ticket-449] documentation: 1 fichier(s) (145406ms)

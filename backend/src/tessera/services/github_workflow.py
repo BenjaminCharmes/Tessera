@@ -155,6 +155,9 @@ class GitHubWorkflowService:
         # l'appelant ne le fournit pas : aucun appelant ne le passait, et le
         # contrôle ne tournait donc jamais (ticket-206).
         self._termes = termes if termes is not None else TermesInterditsService()
+        # Code HTTP du dernier refus de lecture de la CI (ticket-449) : la
+        # livraison le cite quand l'état vaut `unreadable`.
+        self.code_http_ci: int | None = None
 
     def _niveau(self) -> NiveauAutonomie:
         """Le niveau qui vaut pour cet appel : figé s'il l'a été, lu sinon."""
@@ -270,7 +273,8 @@ class GitHubWorkflowService:
         return entree.issue if entree else None
 
     async def etat_ci(self, pr_number: int) -> str:
-        """L'état agrégé de la CI de la PR : passing, failing, pending, none.
+        """L'état agrégé de la CI de la PR : passing, failing, pending, none,
+        unreadable (le jeton ne peut pas la lire, code dans `code_http_ci`).
 
         Sans GitHub configuré, `none` : aucune CI n'est observable, et
         l'absence de signal n'est pas un signal favorable.
@@ -278,6 +282,8 @@ class GitHubWorkflowService:
         if self._github is None:
             return "none"
         statut = await self._github.get_pull_request_status(pr_number)
+        code = getattr(statut, "ci_http_status", None)
+        self.code_http_ci = code if isinstance(code, int) else None
         return str(getattr(statut, "ci_status", "none"))
 
     async def has_workflows(self) -> bool:

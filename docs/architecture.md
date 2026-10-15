@@ -776,6 +776,14 @@ Avant de conclure `none` (aucun check enregistré), la livraison vérifie que le
 
 Sur une erreur réseau pendant la phase 2 (`httpx.TransportError`, dont `ReadTimeout`), le CIWatcher relit l'état de la PR avant d'abandonner. Si la PR est déjà mergée (`merged=True`), le run est marqué réussi avec un journal « mergée malgré une erreur réseau ». Tout message d'erreur inclut le type de l'exception, même si son contenu est vide (ticket-405).
 
+### Arrêt sur permissions insuffisantes pour la CI
+
+Quand le jeton GitHub ne peut pas accéder aux check-runs du dépôt (réponse HTTP 403 ou 404 sur l'endpoint `check-runs`), la livraison s'arrête immédiatement avec un message qui nomme les permissions manquantes, au lieu d'attendre le délai complet de CI.
+
+`_get_ci_status` (github_service.py) rend l'état `"unreadable"` dans ce cas. `_attendre_la_ci` le reconnaît et l'arrête aussitôt, sans délai. La PR reste ouverte (ADR-030 : aucun merge sans CI lue). Une fois les permissions ajoutées au jeton, l'agent peut relancer le run.
+
+`CIWatcher` applique la même logique quand il surveille le statut après l'ouverture de la PR.
+
 ### Méthode de merge configurable
 
 Une PR de ticket est mergée selon la méthode déclarée dans `agents.json` du 

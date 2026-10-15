@@ -28,12 +28,19 @@ class GitHubIssue(BaseModel):
     labels: list[str]
 
 
+#: `unreadable` : le jeton ne peut pas lire la CI (HTTP 403/404), ce qui n'est
+#: pas « pas de CI » — ticket-449.
+CiStatus = Literal["pending", "passing", "failing", "none", "unreadable"]
+
+
 @dataclass
 class PRStatus:
     state: Literal["open", "closed", "merged"]
-    ci_status: Literal["pending", "passing", "failing", "none"]
+    ci_status: CiStatus
     pr_url: str
     pr_number: int
+    # Code HTTP du refus quand `ci_status` vaut `unreadable`, sinon None.
+    ci_http_status: int | None = None
 
 
 @dataclass
@@ -161,13 +168,14 @@ class GitHubService:
             state = "open"
 
         head_sha: str = pr_data["head"]["sha"]
-        ci_status = await self._get_ci_status(head_sha)
+        ci_status, http_status = await self._lire_ci(head_sha)
 
         return PRStatus(
             state=state,
             ci_status=ci_status,
             pr_url=str(pr_data["html_url"]),
             pr_number=pr_number,
+            ci_http_status=http_status,
         )
 
     async def get_pull_request_state(
@@ -230,9 +238,7 @@ class GitHubService:
             resp = await client.put(url, headers=self._headers, json=payload)
             resp.raise_for_status()
 
-    async def get_ci_status(
-        self, sha: str
-    ) -> Literal["pending", "passing", "failing", "none"]:
+    async def get_ci_status(self, sha: str) -> CiStatus:
         """Public CI check-runs query — used by the bulk PR status service."""
         return await self._get_ci_status(sha)
 
@@ -280,23 +286,32 @@ class GitHubService:
             page += 1
         return found
 
-    async def _get_ci_status(
-        self, sha: str
-    ) -> Literal["pending", "passing", "failing", "none"]:
+    async def _get_ci_status(self, sha: str) -> CiStatus:
+        return (await self._lire_ci(sha))[0]
+
+    async def _lire_ci(self, sha: str) -> tuple[CiStatus, int | None]:
+        """Read the CI of a commit: its state, and the HTTP code when unreadable.
+
+        A 403 or 404 on `check-runs` means the token lacks the Checks
+        permission: that is `unreadable`, not `none` (ticket-449). Any other
+        non-200 answer keeps the former `none`.
+        """
         url = f"{_BASE}/repos/{self._repo}/commits/{sha}/check-runs"
         async with httpx.AsyncClient() as client:
             resp = await client.get(url, headers=self._headers)
-            if resp.status_code != 200:
-                return "none"
+        if resp.status_code in (403, 404):
+            return "unreadable", resp.status_code
+        if resp.status_code != 200:
+            return "none", None
         runs: list[dict[str, Any]] = resp.json().get("check_runs", [])
         if not runs:
-            return "none"
+            return "none", None
         conclusions = [r.get("conclusion") for r in runs]
         if any(c in (None, "action_required") for c in conclusions):
-            return "pending"
+            return "pending", None
         if any(c in ("failure", "timed_out", "cancelled") for c in conclusions):
-            return "failing"
-        return "passing"
+            return "failing", None
+        return "passing", None
 
     async def _lire_mergeabilite(self, pr_number: int) -> bool | None:
         """Read the 'mergeable' field of a pull request.

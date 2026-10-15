@@ -49,6 +49,7 @@ const CI_LABEL: Record<string, string> = {
   passing: "CI verte",
   failing: "CI en échec",
   none: "CI N/A",
+  unreadable: "CI illisible",
 };
 
 const CI_ETAT: Record<string, EtatPastille> = {
@@ -56,6 +57,7 @@ const CI_ETAT: Record<string, EtatPastille> = {
   passing: "reussi",
   failing: "echec",
   none: "neutre",
+  unreadable: "attention",
 };
 
 const PR_STATE_LABEL: Record<string, string> = {
