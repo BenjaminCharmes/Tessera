@@ -274,7 +274,12 @@ class GitHubWorkflowService:
 
     async def etat_ci(self, pr_number: int) -> str:
         """L'état agrégé de la CI de la PR : passing, failing, pending, none,
-        unreadable (le jeton ne peut pas la lire, code dans `code_http_ci`).
+        unreadable (le jeton ne peut pas la lire, code dans `code_http_ci`),
+        conflicting (la PR est en conflit avec sa base, ticket-452).
+
+        `conflicting` prime sur tout état de CI : une PR qu'on ne peut pas
+        fusionner n'a plus rien à attendre. Seul `dirty` le déclenche ;
+        `unknown` (calcul en cours côté GitHub) ne change rien.
 
         Sans GitHub configuré, `none` : aucune CI n'est observable, et
         l'absence de signal n'est pas un signal favorable.
@@ -284,6 +289,8 @@ class GitHubWorkflowService:
         statut = await self._github.get_pull_request_status(pr_number)
         code = getattr(statut, "ci_http_status", None)
         self.code_http_ci = code if isinstance(code, int) else None
+        if getattr(statut, "mergeable_state", None) == "dirty":
+            return "conflicting"
         return str(getattr(statut, "ci_status", "none"))
 
     async def has_workflows(self) -> bool:

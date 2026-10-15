@@ -598,6 +598,35 @@ async def test_get_pr_status_ci_unreadable_on_404() -> None:
 
 
 @respx.mock
+async def test_get_pr_status_reads_mergeable_state() -> None:
+    # ticket-452 : une PR en conflit avec sa base est `dirty`.
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(
+            200, json={**_pr_payload(), "mergeable_state": "dirty"}
+        )
+    )
+    _actions_refuse()
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json={"check_runs": []})
+    )
+    status = await _make_service().get_pull_request_status(15)
+    assert status.mergeable_state == "dirty"
+
+
+@respx.mock
+async def test_get_pr_status_mergeable_state_absent_is_none() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    _actions_refuse()
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json={"check_runs": []})
+    )
+    status = await _make_service().get_pull_request_status(15)
+    assert status.mergeable_state is None
+
+
+@respx.mock
 async def test_get_pr_status_raises_on_pr_not_found() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(404, json={"message": "Not Found"})

@@ -41,6 +41,9 @@ class PRStatus:
     pr_number: int
     # Code HTTP du refus quand `ci_status` vaut `unreadable`, sinon None.
     ci_http_status: int | None = None
+    # `mergeable_state` de GitHub (`dirty` : conflit avec la base). Absent
+    # quand GitHub ne l'a pas encore calculé — ticket-452.
+    mergeable_state: str | None = None
 
 
 @dataclass
@@ -169,6 +172,7 @@ class GitHubService:
 
         head_sha: str = pr_data["head"]["sha"]
         ci_status, http_status = await self._lire_ci(head_sha)
+        mergeable_state = pr_data.get("mergeable_state")
 
         return PRStatus(
             state=state,
@@ -176,6 +180,7 @@ class GitHubService:
             pr_url=str(pr_data["html_url"]),
             pr_number=pr_number,
             ci_http_status=http_status,
+            mergeable_state=str(mergeable_state) if mergeable_state else None,
         )
 
     async def get_pull_request_state(
