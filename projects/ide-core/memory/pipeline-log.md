@@ -3096,3 +3096,15 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-15 15:13:47 UTC — [ticket-461] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas de 5 (112360ms)
 - 2026-10-15 15:13:47 UTC — [ticket-461] APPROVED après 1 tour(s)
 - 2026-10-15 15:14:41 UTC — [ticket-461] documentation: 1 fichier(s) (48782ms)
+- 2026-10-15 15:14:58 UTC — [ide-core] ticket-461 PR #478 confiée au CIWatcher
+- 2026-10-15 15:35:13 UTC — [ticket-462] branche ticket-462-the-validator-is-told-a-cited-binary-file-exists
+- 2026-10-15 15:35:14 UTC — [ticket-462] tour 1 — codeur démarré
+- 2026-10-15 15:36:35 UTC — [ticket-462] tour 1 — codeur terminé (80796ms)
+- 2026-10-15 15:41:39 UTC — [ticket-462] testeur: OK (exit 0)
+- 2026-10-15 15:42:13 UTC — [ticket-462] securite: PASS — Audit terminé. Le diff ajoute une détection de fichiers binaires et améliore la  (33640ms)
+- 2026-10-15 15:42:13 UTC — [ticket-462] tour 1 — reviewer démarré
+- 2026-10-15 15:42:29 UTC — [ticket-462] tour 1 — reviewer terminé (16828ms)
+- 2026-10-15 15:42:47 UTC — [ticket-462] validateur: fichiers cités joints : aucun ; absents : .png
+- 2026-10-15 15:42:47 UTC — [ticket-462] validateur: APPROVED — Tous les critères sont couverts par des tests qui passent (exit 0). Le code déte (34264ms)
+- 2026-10-15 15:42:47 UTC — [ticket-462] APPROVED après 1 tour(s)
+- 2026-10-15 15:44:08 UTC — [ticket-462] documentation: 0 fichier(s) (78234ms)

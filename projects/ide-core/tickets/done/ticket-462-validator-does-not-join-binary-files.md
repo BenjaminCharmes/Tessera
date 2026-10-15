@@ -1,14 +1,14 @@
 ---
-id: ticket-462
-title: "The validator is told a cited binary file exists instead of receiving its bytes"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-15
+id: ticket-462
+pr_number: 480
+priority: high
+status: done
+title: The validator is told a cited binary file exists instead of receiving its bytes
+type: fix
 ---
 
 # ticket-462 — Un fichier binaire cité n'est pas joint comme du texte
