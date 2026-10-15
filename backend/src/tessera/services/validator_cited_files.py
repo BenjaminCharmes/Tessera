@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.politique_run import PolitiqueRun
+from tessera.services.validator_binary import is_binary_file
 
 # Max size of the cited-files section -- all entries combined.
 # Beyond this the current file is truncated (ticket-316).
@@ -132,9 +133,15 @@ def _find_file_in_project(ref: str, project_root: Path) -> Path | None:
 def _read_entry(
     ref: str, found: Path, budget: int, report: CitedFilesReport
 ) -> str:
-    """Read one found file into a section entry, truncating at ``budget``."""
-    raw = found.read_text(encoding="utf-8", errors="replace")
+    """Read one found file into a section entry, truncating at ``budget``.
+
+    A binary file is attested (present, with its size) rather than read.
+    """
     report.joined.append(ref)
+    if is_binary_file(found):
+        size = found.stat().st_size
+        return f"### {ref}\n*(fichier binaire présent, {size} octets)*"
+    raw = found.read_text(encoding="utf-8", errors="replace")
     if len(raw) > budget:
         report.truncated.append(ref)
         raw = raw[:budget] + f"\n[... {len(raw) - budget} caractères tronqués]"
