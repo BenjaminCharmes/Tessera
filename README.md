@@ -35,6 +35,11 @@ le journal (`memory/pipeline-log.md`) et la liste de documentation
 (`memory/documentation.json`) — sont résolus automatiquement en union. Les autres
 sont tentés par un agent, et leur résolution est toujours relue.
 
+Si une PR devient non fusionnable pendant l'attente de CI (état `dirty`, ou
+conflits détectés), le CIWatcher arrête la surveillance avec un message dans le
+pipeline. Le ticket passe en échec, et les dépendants qui l'attendent le reçoivent
+en échec.
+
 ## Démarrer
 
 Il vous faut Python 3.11+, [uv](https://docs.astral.sh/uv/), Node 24, et un

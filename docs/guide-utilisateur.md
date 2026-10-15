@@ -999,6 +999,8 @@ et une ligne de log dans `memory/pipeline-log.md` explique pourquoi.
 Les tickets dépendants d'un ticket bloqué refusent de démarrer — la file
 s'arrête et t'affiche l'erreur.
 
+Pendant l'attente de CI, si une PR devient non-fusionnable — par exemple à cause d'un conflit avec une autre branche — l'IDE arrête la surveillance aussitôt. Tu verras une ligne dans le journal `pipeline-log.md` signalant le problème : « PR #N en conflit avec <branche> » par exemple. Les tickets dépendants passent en échec.
+
 ### Conflits sur le journal fusionnés automatiquement
 
 Dans une file, quand plusieurs tickets tournent d'affilée, chacun enregistre ses changements au journal du pipeline et à la documentation. Autrefois, tu devais arrêter la file quand le ticket suivant heurtait un conflit sur ces fichiers. Depuis, l'IDE les fusionne automatiquement—la file continue sans interruption. S'il y a aussi un conflit sur d'autres fichiers, tu dois approuver la résolution.
