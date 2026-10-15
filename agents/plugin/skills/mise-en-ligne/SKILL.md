@@ -118,6 +118,11 @@ peut juger :
 Cette spec porte les points 1, 2, 5, 7, 8 et 17. Les autres restent à la
 relecture humaine : dis lesquels dans ton rapport.
 
+**Mets le build dans le `test_command` du projet** (`npm --prefix frontend run
+build`, ou `next build`) : une erreur qui ne casse qu'au build — bundler, typage
+du framework, asset invalide — traverse sinon tous les contrôles et ne se voit
+qu'en CI. Tessera avertit dans `pipeline-log.md` quand il manque.
+
 **Lighthouse CI** ne se met en place qu'**après un premier déploiement**, et
 contre l'URL réelle : contre un serveur local, ses scores ne disent rien de
 la production.

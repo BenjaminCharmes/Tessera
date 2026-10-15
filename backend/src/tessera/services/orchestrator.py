@@ -24,6 +24,7 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
+from tessera.services.build_warning import build_warnings
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
@@ -355,6 +356,7 @@ class Orchestrator:
         stages.take_artifact_snapshot(self, run)
         await set_status(self, run, TicketStatus.in_progress)
         run.carte_du_depot = await self._carte()
+        self._avertir_du_build(ticket_id)
         # Avant le premier tour, et seulement si le ticket le déclare. Ne lève
         # jamais : un plan manqué laisse le run tel qu'avant ticket-243.
         await run_plan(self, run)
@@ -373,6 +375,22 @@ class Orchestrator:
                 reset_time = extract_reset_time(msg)
                 return await outcomes.finish_session_limit(self, run, exc, reset_time)
             return await outcomes.finish_interrupted(self, run, exc)
+
+    def _avertir_du_build(self, ticket_id: str) -> None:
+        """Journalise un test_command qui ne lance pas le build (ticket-454).
+
+        Ne lève jamais et ne bloque rien : un avertissement manqué laisse le
+        run tel qu'avant le ticket.
+        """
+        if self._project_path is None:
+            return
+        try:
+            avertissements = build_warnings(self._project_path, self._test_command)
+        except Exception as exc:  # noqa: BLE001 — une aide ne doit pas coûter le run
+            _logger.warning("build_warning_failed", extra={"error": str(exc)})
+            return
+        for message in avertissements:
+            self._log(f"[{ticket_id}] {message}")
 
     async def _carte(self) -> str:
         """The repository map, or nothing: an aid must never cost the run."""
