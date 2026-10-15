@@ -3000,3 +3000,18 @@ Le diff modifie `_pu (19375ms)
 - 2026-10-15 12:22:56 UTC — [ticket-453] validateur: APPROVED — Les deux critères sont satisfaits. Le code inclut un nouveau test qui reproduit  (234219ms)
 - 2026-10-15 12:22:56 UTC — [ticket-453] APPROVED après 1 tour(s)
 - 2026-10-15 12:26:20 UTC — [ticket-453] documentation: 3 fichier(s) (199312ms)
+- 2026-10-15 12:26:43 UTC — [ide-core] ticket-453 PR #467 confiée au CIWatcher
+- 2026-10-15 12:27:54 UTC — [ticket-454] branche ticket-454-a-run-warns-when-the-project-has-a-build-script-t
+- 2026-10-15 12:27:54 UTC — [ticket-454] tour 1 — codeur démarré
+- 2026-10-15 12:29:41 UTC — [ticket-454] tour 1 — codeur terminé (106235ms)
+- 2026-10-15 12:41:14 UTC — [ticket-454] testeur: ❯ Timeout.<anonymous> node_modules/vitest/dist/chunks/index.DpLw24bj.js:11035:58
+- 2026-10-15 12:41:14 UTC — [ticket-454] tests rouges au tour 1
+- 2026-10-15 12:41:14 UTC — [ticket-454] tour 2 — codeur démarré
+- 2026-10-15 12:41:55 UTC — [ticket-454] tour 2 — codeur terminé (40844ms)
+- 2026-10-15 12:51:13 UTC — [ticket-454] testeur: OK (exit 0)
+- 2026-10-15 12:51:42 UTC — [ticket-454] securite: PASS — Aucune vulnérabilité détectée. Ce diff ajoute un utilitaire défensif (`build_war (29453ms)
+- 2026-10-15 12:51:42 UTC — [ticket-454] tour 2 — reviewer démarré
+- 2026-10-15 12:52:04 UTC — [ticket-454] tour 2 — reviewer terminé (21187ms)
+- 2026-10-15 12:54:59 UTC — [ticket-454] validateur: fichiers cités joints : package.json, agents/plugin/skills/mise-en-ligne/SKILL.md ; absents : scripts.build
+- 2026-10-15 12:54:59 UTC — [ticket-454] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas atte (196422ms)
+- 2026-10-15 12:54:59 UTC — [ticket-454] APPROVED après 2 tour(s)
