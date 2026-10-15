@@ -5,6 +5,8 @@ import userEvent from "@testing-library/user-event";
 import HistoriqueView from ".";
 import RunHistory from "../Sidebar/RunHistory";
 import { boutonsPleins } from "../../test/boutons";
+import { OuvrirTicketContext } from "../../hooks/useOuvrirTicket";
+import type { OuvrirTicket } from "../../hooks/useOuvrirTicket";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
 
 // Le fil rejoué appelle l'API : une doublure suffit, on ne teste que le cadre.
@@ -146,7 +148,7 @@ describe("HistoriqueView", () => {
   it("opens the detail of the clicked table row", async () => {
     render(<Cockpit />);
     await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
-    await userEvent.click(centre().getByText("ticket-10"));
+    await userEvent.click(centre().getByText("Titre dix"));
     expect(centre().getByRole("heading", { name: "Titre dix" })).toBeInTheDocument();
     expect(centre().getByText("Bloqué · 3 tours")).toBeInTheDocument();
     expect(centre().getByRole("button", { name: "Détail du run" })).toHaveAttribute(
@@ -215,5 +217,64 @@ describe("HistoriqueView — composants communs (ticket-442)", () => {
   it("has at most one plein button", () => {
     render(<Cockpit />);
     expect(boutonsPleins().length).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("HistoriqueView — un numéro de ticket ouvre le ticket (ticket-460)", () => {
+  function avecAction() {
+    const ouvrir = vi.fn<OuvrirTicket>().mockResolvedValue("ok");
+    return {
+      ouvrir,
+      enveloppe: (initial: string | null = null) => (
+        <OuvrirTicketContext.Provider value={ouvrir}>
+          <Cockpit initial={initial} />
+        </OuvrirTicketContext.Provider>
+      ),
+    };
+  }
+
+  it("opens the ticket of a table row, and keeps the table", async () => {
+    const { ouvrir, enveloppe } = avecAction();
+    render(enveloppe());
+    await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
+
+    await userEvent.click(centre().getByRole("button", { name: "ticket-10" }));
+
+    expect(ouvrir).toHaveBeenCalledWith("p1", "ticket-10");
+    expect(centre().getByRole("button", { name: "Tous les runs" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("opens the ticket from the keyboard on a table row", async () => {
+    const { ouvrir, enveloppe } = avecAction();
+    render(enveloppe());
+    await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
+
+    centre().getByRole("button", { name: "ticket-11" }).focus();
+    await userEvent.keyboard("{Enter}");
+
+    expect(ouvrir).toHaveBeenCalledWith("p1", "ticket-11");
+  });
+
+  it("still opens the run when the rest of the row is clicked", async () => {
+    const { ouvrir, enveloppe } = avecAction();
+    render(enveloppe());
+    await userEvent.click(centre().getByRole("button", { name: "Tous les runs" }));
+
+    await userEvent.click(centre().getByText("Titre douze"));
+
+    expect(ouvrir).not.toHaveBeenCalled();
+    expect(centre().getByRole("heading", { name: "Titre douze" })).toBeInTheDocument();
+  });
+
+  it("opens the ticket from the header of the run detail", async () => {
+    const { ouvrir, enveloppe } = avecAction();
+    render(enveloppe("r-deux-tours"));
+
+    await userEvent.click(centre().getByRole("button", { name: "ticket-12" }));
+
+    expect(ouvrir).toHaveBeenCalledWith("p1", "ticket-12");
   });
 });

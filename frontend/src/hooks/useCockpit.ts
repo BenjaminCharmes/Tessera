@@ -26,6 +26,7 @@ import { vueDuCentre } from "../vueDuCentre";
 import type { VueCentre } from "../vueDuCentre";
 import type { StreamState } from "./streamState";
 import { useListeRuns } from "./runStore";
+import { useActionOuvrirTicket } from "./useOuvrirTicket";
 
 /**
  * Returns the panel to activate when the user selects a project, from a card,
@@ -286,6 +287,19 @@ export function useCockpit() {
     setShowDiff(false);
   }
 
+  // Un numéro de ticket cliqué n'importe où ouvre son détail (ticket-460).
+  // Le run en cours garde le centre tant qu'on ne le lui reprend pas.
+  const ouvrirTicket = useActionOuvrirTicket({
+    projets,
+    projetActifId: project?.id ?? null,
+    selectionnerProjet: handleSelectProject,
+    selectionnerTicket: handleSelectTicket,
+    afficherLesTickets: () => {
+      setPanel("tickets");
+      setRunAuPremierPlan(false);
+    },
+  });
+
   // Le ticket porte un `pr_number` : la liste se relit pour le montrer
   // (ticket-123). Un statut posé à la main (ticket-194) : le backend déplace
   // le fichier et publie l'événement ; on relit sans attendre le sondage.
@@ -311,6 +325,7 @@ export function useCockpit() {
   return {
     panel,
     setPanel,
+    ouvrirTicket,
     navRail: {
       runsActifs: supervision.runs.length,
       appsEnCours: appsEnCours.apps?.length ?? 0,

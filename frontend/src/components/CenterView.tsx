@@ -195,7 +195,7 @@ export default function CenterView({
     // La période et la portée viennent de la colonne latérale (ticket-253).
     content = <StatsView projectId={statsProjectId} days={statsDays} />;
   } else if (vueCentre === "run") {
-    content = <RunView stream={stream} />;
+    content = <RunView stream={stream} projectId={project?.id ?? null} />;
   } else if (vueCentre === "diff" && project && ticket) {
     content = <DiffView projectId={project.id} ticketId={ticket.id} />;
   } else if (vueCentre === "kanban") {

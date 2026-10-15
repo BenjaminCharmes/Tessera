@@ -1,6 +1,7 @@
 import Chrono from "./Chrono";
 import Button from "../../design/ui/Button";
 import StatusPill from "../../design/ui/StatusPill";
+import LienTicket from "../../design/ui/LienTicket";
 import CompteARebours from "../AgentPanel/CompteARebours";
 import { CLASSES_DE_BUDGET, couleurDuBudget, resumeDuCout } from "../../lib/budget";
 import type { StreamState } from "../../hooks/streamState";
@@ -105,7 +106,11 @@ export default function RunCard({
 
         <span className="mt-1 flex items-baseline justify-between gap-2">
           <span className="truncate text-xs text-zinc-400">
-            {estUnChat ? "conversation" : (run.ticket_id ?? "—")}
+            {estUnChat || !run.ticket_id ? (
+              estUnChat ? "conversation" : "—"
+            ) : (
+              <LienTicket projectId={run.project_id} ticketId={run.ticket_id} />
+            )}
           </span>
           <span className="shrink-0 text-micro tabular-nums text-zinc-500">
             <Chrono
@@ -143,15 +148,20 @@ export default function RunCard({
               <span className="mt-1 block space-y-0.5">
                 {(run.file_faits ?? []).map((t) => (
                   <span key={t} className="block truncate text-zinc-600">
-                    fait · {t}
+                    fait · <LienTicket projectId={run.project_id} ticketId={t} />
                   </span>
                 ))}
                 <span className="block truncate text-zinc-300">
-                  en cours · {run.ticket_id ?? "—"}
+                  en cours ·{" "}
+                  {run.ticket_id ? (
+                    <LienTicket projectId={run.project_id} ticketId={run.ticket_id} />
+                  ) : (
+                    "—"
+                  )}
                 </span>
                 {(run.file_restants ?? []).map((t) => (
                   <span key={t} className="block truncate text-zinc-500">
-                    ensuite · {t}
+                    ensuite · <LienTicket projectId={run.project_id} ticketId={t} />
                   </span>
                 ))}
               </span>

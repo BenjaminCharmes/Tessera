@@ -1,15 +1,16 @@
 ---
-id: ticket-460
-title: "Every ticket id shown in the app opens that ticket's detail in the Tickets tab"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-15
 depends_on: []
 estimated_days: 1
+id: ticket-460
 plan: true
-created: 2026-10-15
+pr_number: 477
+priority: medium
+status: done
+title: Every ticket id shown in the app opens that ticket's detail in the Tickets
+  tab
+type: feat
 ---
 
 # ticket-460 — Un numéro de ticket ouvre le ticket, partout

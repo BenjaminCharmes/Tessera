@@ -90,7 +90,12 @@ export default function HistoriqueView({
       ) : vue === "detail" ? (
         <DetailDuRun run={run} ticket={ticket} project={project} />
       ) : (
-        <TousLesRuns runs={runs} tickets={tickets} onOpen={ouvrir} />
+        <TousLesRuns
+          runs={runs}
+          tickets={tickets}
+          projectId={project?.id ?? null}
+          onOpen={ouvrir}
+        />
       )}
     </div>
   );
