@@ -3084,3 +3084,4 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-15 15:01:33 UTC — [ticket-460] validateur: fichiers cités joints : RunCard.tsx, TousLesRuns.tsx, RunView/index.tsx
 - 2026-10-15 15:01:33 UTC — [ticket-460] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute un composant `Li (357655ms)
 - 2026-10-15 15:01:33 UTC — [ticket-460] APPROVED après 1 tour(s)
+- 2026-10-15 15:03:05 UTC — [ticket-460] documentation: 1 fichier(s) (87375ms)
