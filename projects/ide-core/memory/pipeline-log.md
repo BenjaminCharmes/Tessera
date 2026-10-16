@@ -3483,3 +3483,4 @@ Points posit (58359ms)
 - 2026-10-16 18:55:06 UTC — [ticket-486] branche ticket-486-the-ci-watcher-blocked-ticket-test-waits-for-its
 - 2026-10-16 18:55:06 UTC — [ticket-486] tour 1 — codeur démarré
 - 2026-10-16 18:55:08 UTC — [ticket-486] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your weekly limit · resets 3pm (Europe/Paris) (exit code: 1)
+- 2026-10-16 18:55:12 UTC — [ide-core] file interrompue : ticket-486 non approuvé
