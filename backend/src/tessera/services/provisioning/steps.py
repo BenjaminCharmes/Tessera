@@ -43,6 +43,8 @@ class DnsRecord:
     type: str
     name: str
     content: str
+    #: Only meaningful for MX records.
+    priority: Optional[int] = None
 
 
 class EnvWriter(Protocol):

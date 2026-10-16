@@ -11,6 +11,8 @@ from tessera.services.provisioning.online_config import (
     load_online_config,
 )
 from tessera.services.provisioning.plan import ProvisioningPlan
+from tessera.services.provisioning.resend import ResendClient
+from tessera.services.provisioning.resend_steps import ResendDomainStep, ResendVerifyStep
 from tessera.services.provisioning.vercel import VercelClient, VercelEnvWriter
 from tessera.services.provisioning.vercel_steps import (
     VercelProjectStep,
@@ -34,6 +36,9 @@ __all__ = [
     "ProvisioningContext",
     "ProvisioningPlan",
     "ProvisioningStep",
+    "ResendClient",
+    "ResendDomainStep",
+    "ResendVerifyStep",
     "ServiceError",
     "StepResult",
     "StepState",
