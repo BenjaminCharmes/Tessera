@@ -1738,3 +1738,43 @@ Chaque étape émet `provisioning_step` (`nom`, `etat` : `done`, `skipped`,
 verrou par projet, distinct de `RunLock` (la mise en ligne ne touche pas à
 l'arbre), refuse une seconde mise en ligne simultanée avec un 409.
 
+### Moteur de provisioning (ticket-465)
+
+Package `services/provisioning/` : orchestrateur des étapes de mise en ligne, exécutées dans l'ordre déclaré dans le bloc `online` d'`agents.json`.
+
+**Principes généraux**
+
+- Aucun fichier d'état : le **monde est la source de vérité**. Les services eux-mêmes (via leurs API publiques) disent ce qui existe. Chaque relaunch relit tout.
+- Chaque étape lit d'abord (`inspect`) pour déterminer s'il faut agir, puis crée le manquant (`apply`).
+- Un échec (`failed`) ou demande d'intervention humaine (`needs_human`) arrête la suite sans annuler ce qui est déjà fait : idempotence garantie.
+
+**Architecture**
+
+- `StepState` (enum) : `todo`, `done`, `skipped`, `pending`, `manual`, `needs_human`, `failed`
+- `StepResult` : état + détail (nom de ressource, instruction — jamais un secret)
+- `ProvisioningStep` (Protocol) :
+  - `name` — identifiant unique
+  - `inspect(ctx)` — lit le monde, retourne un `StepResult` (lecture seule)
+  - `apply(ctx)` — crée ce qui manque (jamais appelé en `dry_run`)
+- `ProvisioningContext` : paramètres partagés (project_id, OnlineConfig, env_writer, DNS voulu, envs modifiés, DNS publié)
+- `OnlineConfig` (Pydantic v2) : lit le bloc `online` d'`agents.json` (domaine, ressources, configuration Stripe)
+- `ProvisioningPlan.run(ctx, dry_run)` :
+  - `dry_run = true` → rend `todo` pour ce qui manque, n'appelle jamais `apply`
+  - Si `skipped` → passe à la suivante
+  - Sinon : appelle `apply`, continue
+  - Si `failed` ou `needs_human` → arrête les suivantes (laisse au statut `todo`)
+- `ServiceError(service, status, code)` : message limité au statut HTTP et au code d'erreur de l'API, jamais le corps de la réponse (qui peut contenir un secret)
+
+**Observation**
+
+Chaque appel à `inspect` ou `apply` émet un événement `provisioning_step` sur le WebSocket (ADR-041) :
+
+- `step` — nom de l'étape
+- `state` — le StepState obtenu
+- `detail` — instruction ou nom de ressource créée
+- **Invariant** : aucun secret du registre (`SecretRegistry`, ticket-464) ne figure dans `detail`
+
+**Branchement des services**
+
+Les tickets 466–470 implémentent chacun un `ProvisioningStep` pour un service (domaine, DNS, email, paiement…) et s'y branchent.
+
