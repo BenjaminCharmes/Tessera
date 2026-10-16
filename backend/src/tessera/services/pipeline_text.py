@@ -66,6 +66,45 @@ def _extract_criteria(ticket_body: str) -> list[str]:
     return criteria
 
 
+OBJECTION_MAX_CHARS = 4000
+_TRUNCATION_MARK = "\n[…] tronqué"
+
+
+def _truncate_objection(text: str) -> str:
+    """Cap an objection at `OBJECTION_MAX_CHARS`, flagging the cut."""
+    if len(text) <= OBJECTION_MAX_CHARS:
+        return text
+    return text[:OBJECTION_MAX_CHARS] + _TRUNCATION_MARK
+
+
+def _first_line(text: str) -> str:
+    """The first non-blank line of `text`, stripped; empty when there is none."""
+    for line in text.splitlines():
+        if line.strip():
+            return line.strip()
+    return ""
+
+
+def _compose_feedback(
+    rev_approved: bool,
+    rev_reason: str,
+    raw_verdict: str,
+    val_approved: bool,
+    val_reason: str,
+) -> str:
+    """The feedback handed back to the coder after a refused round.
+
+    Names the author when both refuse: the coder sees a single feedback at the
+    next round and must know who objects to what.
+    """
+    parts: list[str] = []
+    if not rev_approved:
+        parts.append(f"Reviewer : {_truncate_objection(rev_reason or raw_verdict)}")
+    if not val_approved:
+        parts.append(f"Validateur : {val_reason}")
+    return "\n\n".join(parts) if parts else _truncate_objection(raw_verdict)
+
+
 _APPROVED_WORD = re.compile(r"\bAPPROVED\b")
 _APPROVED_LEADING = re.compile(r"APPROVED\b")
 # Ce qui entoure un verdict sans en changer le sens : `**APPROVED**`,
@@ -101,10 +140,16 @@ def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
     « this should not be approved » n'approuve rien (ticket-122).
     """
     lines = content.splitlines()
-    for line in lines:
+    for index, line in enumerate(lines):
         verdict = _verdict_line(line)
-        if verdict is not None:
-            return verdict
+        if verdict is None:
+            continue
+        approved, reason = verdict
+        # Le verdict seul sur sa ligne ne porte aucune raison : elle est dans
+        # le texte qui suit, et c'est ce que le codeur doit lire (ticket-474).
+        if not approved and not reason:
+            reason = "\n".join(lines[index + 1:]).strip()
+        return approved, reason
     for line in lines:
         if "CHANGES_REQUESTED" in line.upper():
             reason = line.split(":", 1)[-1].strip() if ":" in line else ""
