@@ -3247,3 +3247,5 @@ Points posit (58359ms)
 - 2026-10-16 12:43:11 UTC — [ticket-474] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement le comporteme (150969ms)
 - 2026-10-16 12:43:11 UTC — [ticket-474] APPROVED après 1 tour(s)
 - 2026-10-16 12:44:20 UTC — [ticket-474] documentation: 1 fichier(s) (63063ms)
+- 2026-10-16 12:45:58 UTC — [ticket-474] livraison: résolveur tenté : docs/architecture.md (78922ms)
+- 2026-10-16 12:45:58 UTC — [ticket-474] livraison: arrêt — Conflit avec develop sur : docs/architecture.md — résolveur tenté sur docs/architecture.md, sans suc
