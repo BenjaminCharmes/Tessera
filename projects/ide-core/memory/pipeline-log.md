@@ -3277,3 +3277,4 @@ Points posit (58359ms)
 - 2026-10-16 12:58:26 UTC — [ticket-473] testeur: 8 errors in 36.67s
 - 2026-10-16 12:58:26 UTC — [ticket-473] tests rouges au tour 3
 - 2026-10-16 12:58:26 UTC — [ticket-473] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-16 12:58:33 UTC — [ide-core] file interrompue : ticket-473 non approuvé
