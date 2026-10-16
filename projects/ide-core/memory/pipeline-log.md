@@ -3262,3 +3262,4 @@ Points posit (58359ms)
 - 2026-10-16 12:24:26 UTC — [ticket-476] validateur: fichiers cités joints : CLAUDE.md
 - 2026-10-16 12:24:26 UTC — [ticket-476] validateur: APPROVED — Tous les critères sont satisfaits. Le code détecte correctement les critères imp (350578ms)
 - 2026-10-16 12:24:26 UTC — [ticket-476] APPROVED après 2 tour(s)
+- 2026-10-16 12:28:33 UTC — [ticket-476] documentation: 3 fichier(s) (241922ms)
