@@ -3277,3 +3277,18 @@ Points posit (58359ms)
 - 2026-10-16 12:24:26 UTC — [ticket-476] validateur: APPROVED — Tous les critères sont satisfaits. Le code détecte correctement les critères imp (350578ms)
 - 2026-10-16 12:24:26 UTC — [ticket-476] APPROVED après 2 tour(s)
 - 2026-10-16 12:28:33 UTC — [ticket-476] documentation: 3 fichier(s) (241922ms)
+- 2026-10-16 12:46:16 UTC — [ticket-473] branche ticket-473-a-failed-test-step-reports-its-first-error-line-n
+- 2026-10-16 12:46:17 UTC — [ticket-473] tour 1 — codeur démarré
+- 2026-10-16 12:49:30 UTC — [ticket-473] tour 1 — codeur terminé (192655ms)
+- 2026-10-16 12:53:22 UTC — [ticket-473] testeur: 8 errors in 135.14s (0:02:15)
+- 2026-10-16 12:53:22 UTC — [ticket-473] tests rouges au tour 1
+- 2026-10-16 12:53:22 UTC — [ticket-473] tour 2 — codeur démarré
+- 2026-10-16 12:53:54 UTC — [ticket-473] tour 2 — codeur terminé (32327ms)
+- 2026-10-16 12:56:00 UTC — [ticket-473] testeur: 8 errors in 6.79s
+- 2026-10-16 12:56:00 UTC — [ticket-473] tests rouges au tour 2
+- 2026-10-16 12:56:00 UTC — [ticket-473] tour 3 — codeur démarré
+- 2026-10-16 12:56:19 UTC — [ticket-473] tour 3 — codeur terminé (19235ms)
+- 2026-10-16 12:58:26 UTC — [ticket-473] testeur: 8 errors in 36.67s
+- 2026-10-16 12:58:26 UTC — [ticket-473] tests rouges au tour 3
+- 2026-10-16 12:58:26 UTC — [ticket-473] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-16 12:58:33 UTC — [ide-core] file interrompue : ticket-473 non approuvé

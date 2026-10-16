@@ -1,14 +1,15 @@
 ---
-id: ticket-473
-title: "A failed test step reports its first error line, not only the package manager's ELIFECYCLE"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-473
+pr_number: null
+priority: medium
+status: done
+title: A failed test step reports its first error line, not only the package manager's
+  ELIFECYCLE
+type: fix
 ---
 
 # ticket-473 — Le testeur remonte la vraie ligne d'erreur
@@ -47,12 +48,12 @@ résumé reconnue (pytest, vitest), les dernières lignes de la sortie
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie qu'une sortie contenant « 'pnpm' n'est pas reconnu »
+- [x] Un test vérifie qu'une sortie contenant « 'pnpm' n'est pas reconnu »
       puis « ELIFECYCLE » donne un détail qui commence par la ligne « n'est
       pas reconnu »
-- [ ] Le même test vérifie que la phrase sur corepack et
+- [x] Le même test vérifie que la phrase sur corepack et
       node_modules/.bin est présente
-- [ ] Un test vérifie que `command not found` (sortie Unix) est traité de
+- [x] Un test vérifie que `command not found` (sortie Unix) est traité de
       même
-- [ ] Un test vérifie qu'une sortie pytest garde son extraction structurée
+- [x] Un test vérifie qu'une sortie pytest garde son extraction structurée
       actuelle

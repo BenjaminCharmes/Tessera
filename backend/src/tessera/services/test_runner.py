@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.commande_chainee import decouper
+from tessera.services.erreur_de_sortie import detail_avec_erreur
 from tessera.services.lancement import essais_de_commande
 from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
 from tessera.utils.logger import get_logger
@@ -336,7 +337,11 @@ def _parse_failed_step(
     if not result.failure_details:
         # Une étape lint ou tsc n'a ni bandeau pytest ni ligne vitest :
         # la fin de sa sortie est ce qui explique l'échec.
-        result.failure_details = "\n".join(sortie.splitlines()[-_LIGNES_DE_QUEUE:])
+        # La cause réelle (commande introuvable, module absent) est souvent bien
+        # avant la dernière ligne, qui n'est que celle du gestionnaire de paquets
+        # (ticket-473) : on la place en tête.
+        queue = "\n".join(sortie.splitlines()[-_LIGNES_DE_QUEUE:])
+        result.failure_details = detail_avec_erreur(sortie, queue)
     return result
 
 
