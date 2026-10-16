@@ -3159,3 +3159,15 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 09:32:03 UTC — [ticket-465] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code introduit un moteur de  (41703ms)
 - 2026-10-16 09:32:03 UTC — [ticket-465] APPROVED après 1 tour(s)
 - 2026-10-16 09:34:31 UTC — [ticket-465] documentation: 1 fichier(s) (142718ms)
+- 2026-10-16 09:40:57 UTC — [ide-core] ticket-465 PR #487 mergée (CI verte)
+- 2026-10-16 09:40:59 UTC — [ide-core] ticket-465 : base réalignée sur develop
+- 2026-10-16 09:40:59 UTC — [ide-core] ticket-465 PR #487 confiée au CIWatcher
+- 2026-10-16 09:41:01 UTC — [ticket-466] branche ticket-466-the-vercel-step-finds-or-creates-the-project-link
+- 2026-10-16 09:41:01 UTC — [ticket-466] tour 1 — codeur démarré
+- 2026-10-16 09:46:30 UTC — [ticket-466] tour 1 — codeur terminé (328922ms)
+- 2026-10-16 09:54:39 UTC — [ticket-466] testeur: OK (exit 0)
+- 2026-10-16 09:55:50 UTC — [ticket-466] securite: PASS — Audit complet de l'intégration Vercel (ticket-466) : sécurité robuste, pas de vu (71218ms)
+- 2026-10-16 09:55:50 UTC — [ticket-466] tour 1 — reviewer démarré
+- 2026-10-16 09:56:15 UTC — [ticket-466] validateur: APPROVED — Tous les critères sont satisfaits. Les tests couvrent l'intégralité du comportem (24405ms)
+- 2026-10-16 09:56:25 UTC — [ticket-466] tour 1 — reviewer terminé (34563ms)
+- 2026-10-16 09:56:25 UTC — [ticket-466] APPROVED après 1 tour(s)
