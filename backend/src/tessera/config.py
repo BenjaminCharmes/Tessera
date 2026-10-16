@@ -1,7 +1,9 @@
 import os
 import sys
 from pathlib import Path
+from typing import ClassVar
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Racine du dépôt : backend/src/tessera/config.py -> remonter de 4 niveaux.
@@ -12,6 +14,18 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 # `backend/`. Un réglage pourtant présent dans `.env` était donc
 # silencieusement ignoré — même classe de bug que ticket-050.
 _ENV_FILE = str(_REPO_ROOT / ".env")
+
+# Les jetons de mise en ligne (ADR-053) : noms des champs de `Settings`. La
+# variable d'environnement est le même nom en majuscules. `VERCEL_TEAM_ID`
+# n'en fait pas partie : un identifiant d'équipe n'est pas un secret.
+CHAMPS_JETONS: tuple[str, ...] = (
+    "vercel_token",
+    "neon_api_key",
+    "resend_api_key",
+    "stripe_api_key",
+    "cloudflare_api_token",
+)
+VARIABLES_JETONS: tuple[str, ...] = tuple(champ.upper() for champ in CHAMPS_JETONS)
 
 
 def default_state_dir() -> Path:
@@ -24,6 +38,20 @@ def default_state_dir() -> Path:
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=_ENV_FILE, env_file_encoding="utf-8")
+
+    # Le `.env` de Tessera, que le hook de lecture refuse aux agents (ADR-053).
+    env_file: ClassVar[Path] = Path(_ENV_FILE)
+
+    # Jetons de mise en ligne (ADR-053). `SecretStr` : ni `repr` ni `model_dump`
+    # ne montrent la valeur. Vides : la mise en ligne reste inactive. Portée
+    # minimale et expiration : voir `.env.example`.
+    vercel_token: SecretStr = SecretStr("")
+    neon_api_key: SecretStr = SecretStr("")
+    resend_api_key: SecretStr = SecretStr("")
+    stripe_api_key: SecretStr = SecretStr("")
+    cloudflare_api_token: SecretStr = SecretStr("")
+    # Identifiant d'équipe Vercel : pas un secret.
+    vercel_team_id: str = ""
 
     # Optionnel : vide lorsque le provider est `agent_sdk` (auth par abonnement).
     anthropic_api_key: str = ""
@@ -141,6 +169,11 @@ class Settings(BaseSettings):
     # Utilise SetThreadExecutionState sous Windows ; no-op ailleurs.
     # Désactivable si un outil externe gère déjà la veille.
     keep_awake_during_runs: bool = True
+
+    def valeurs_des_jetons(self) -> list[str]:
+        """Return the non-empty values of the online-service tokens (ADR-053)."""
+        valeurs = (getattr(self, champ).get_secret_value() for champ in CHAMPS_JETONS)
+        return [valeur for valeur in valeurs if valeur]
 
 
 settings = Settings()

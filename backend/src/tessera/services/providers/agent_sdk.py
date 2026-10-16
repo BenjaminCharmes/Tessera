@@ -40,6 +40,8 @@ async def _sdk_gen(
     async for msg in query(prompt=prompt, options=options):
         yield msg
 
+from tessera.config import VARIABLES_JETONS
+from tessera.services.providers.garde_jetons import hook_refus_env_tessera
 from tessera.services.providers.git_guard import hook_refus_git
 from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
@@ -183,7 +185,10 @@ def _build_options(
     # On la neutralise explicitement pour le sous-process du SDK ; la clef
     # reste disponible pour `AnthropicApiProvider`, qui est le seul à devoir
     # l'utiliser.
+    # Même traitement pour les jetons de mise en ligne (ADR-053) : un jeton
+    # exporté dans le shell qui a lancé le backend serait hérité par le CLI.
     env: dict[str, str] = {"ANTHROPIC_API_KEY": ""}
+    env.update({variable: "" for variable in VARIABLES_JETONS})
     # Sous Windows, le SDK n'active `Bash` que si cette variable pointe vers
     # un bash.exe. Sans elle, l'outil disparaît en silence (ticket-319).
     if git_bash_path:
@@ -218,6 +223,12 @@ def _build_options(
         hooks={
             "PreToolUse": [
                 HookMatcher(matcher="Bash", hooks=[hook_refus_git]),
+                # Le `.env` de Tessera porte les jetons de mise en ligne, et
+                # ADR-031 laisse lire hors du projet (ADR-053, ticket-464).
+                HookMatcher(
+                    matcher="Read|Glob|Grep|Bash",
+                    hooks=[hook_refus_env_tessera(cwd)],
+                ),
                 # `cwd` place l'agent dans le projet, il ne l'y enferme pas :
                 # rien n'empêchait un `Write` vers le dépôt du client d'à côté
                 # (ticket-085).

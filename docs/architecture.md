@@ -1638,6 +1638,14 @@ l'expose.
 - La porte de push (ADR-048) traite les valeurs des jetons configurés comme des
   termes interdits : un jeton ajouté dans un diff arrête le push.
 
+Cinq jetons gèrent l'accès aux services de mise en ligne : `VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`, `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`. Chacun est un champ `SecretStr` dans `config.Settings`, vide par défaut.
+
+Le backend seul les lit et les stocke. Aucun agent ne les reçoit, aucun log ne les montre, aucun push ne les emporte. Les valeurs sont masquées dans les logs par `SecretRegistry`, et l'agent SDK vide ces variables de son environnement avant chaque appel.
+
+Un hook `PreToolUse` refuse les outils `Read`, `Glob`, `Grep` et `Bash` qui tenteraient d'accéder au `.env` de Tessera (à la racine du dépôt). Pour `Bash`, le repérage lexical détecte les chemins ; il attrape une erreur, pas une évasion — voir ADR-031.
+
+**Portée minimale et expiration** : chaque jeton doit être créé avec les permissions strictement nécessaires à son service (déployer pour Vercel, migrer pour Neon, etc.) et configuré avec une date d'expiration — la plupart des fournisseurs la supportent. Sans expiration, les jetons entrent dans `FORBIDDEN_TERMS` au moment du push, et le diff s'arrête si la valeur y apparaît (ADR-048, ADR-050).
+
 ### Portée minimale
 
 | Service | Jeton | Limite |

@@ -30,6 +30,11 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
 | `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows) ou `~/.local/state/tessera` (autres) | Répertoire pour les fichiers d'état en dehors du dépôt : signalements en attente, etc. Créé au démarrage s'il n'existe pas. |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
+| `VERCEL_TOKEN` | | `""` | Jeton Vercel pour déployer. Portée minimale : `read` sur les projects, `write` sur les deployments. À définir avec une date d'expiration. |
+| `NEON_API_KEY` | | `""` | Clef API Neon pour les migrations de base. Portée minimale : `read_only` sur les branches. À définir avec une date d'expiration. |
+| `RESEND_API_KEY` | | `""` | Clef API Resend pour les e-mails transactionnels. Portée minimale : `sending_access`. À définir avec une date d'expiration. |
+| `STRIPE_API_KEY` | | `""` | Clef API Stripe (secrète). Portée minimale : permissions de paiement. À définir avec une date d'expiration. |
+| `CLOUDFLARE_API_TOKEN` | | `""` | Jeton Cloudflare pour la gestion des domaines et du cache. Portée minimale : droits sur la zone. À définir avec une date d'expiration. |
 | `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | URL du serveur Ollama pour les modèles locaux (rôles de jugement uniquement) |
 | `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama. Au-delà, les requêtes attendent leur créneau |
 | `OLLAMA_SLOT_WAIT_S` | | `30` | Délai maximum d'attente pour un créneau chez le serveur Ollama avant basculement sur le repli (en secondes) |
