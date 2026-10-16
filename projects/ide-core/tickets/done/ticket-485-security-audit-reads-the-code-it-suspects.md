@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-485
 plan: true
-pr_number: null
+pr_number: 507
 priority: high
 status: done
 title: The security audit can read the project's code before it blocks on a sink outside
