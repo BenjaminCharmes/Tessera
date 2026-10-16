@@ -3301,3 +3301,4 @@ Points posit (58359ms)
 - 2026-10-16 13:23:12 UTC — [ticket-487] tour 2 — codeur terminé (77234ms)
 - 2026-10-16 13:29:24 UTC — [ticket-487] testeur: OK (exit 0)
 - 2026-10-16 13:30:55 UTC — [ticket-487] securite: BLOCK — Une vulnérabilité HIGH de type Path Traversal est introduite par ce ticket : la  (91420ms)
+- 2026-10-16 13:30:59 UTC — [ide-core] file interrompue : ticket-487 non approuvé
