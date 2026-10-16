@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 1
 id: ticket-463
-pr_number: null
+pr_number: 482
 priority: high
 status: done
 title: Design how Tessera provisions a project online (Vercel, Neon, Resend, Stripe,
