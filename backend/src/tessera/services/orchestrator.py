@@ -32,6 +32,7 @@ from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_plan import run_plan
+from tessera.services.pipeline_text import _compose_feedback, _first_line
 from tessera.services.session_limit import (
     extract_reset_time,
     extract_reset_time_from_arret,
@@ -465,19 +466,15 @@ class Orchestrator:
             if approved:
                 return await outcomes.finish_approved(self, run)
 
-            # Nommer l'auteur quand les deux refusent : le codeur voit un seul
-            # feedback au tour suivant, et il doit savoir qui objecte quoi.
-            feedback_parts: list[str] = []
-            if not rev_approved:
-                rev_feedback = rev_reason or raw_verdict[:500]
-                feedback_parts.append(f"Reviewer : {rev_feedback}")
-            if not val_approved:
-                feedback_parts.append(f"Validateur : {val_reason}")
-            feedback = "\n\n".join(feedback_parts) if feedback_parts else raw_verdict[:500]
-
+            feedback = _compose_feedback(
+                rev_approved, rev_reason, raw_verdict, val_approved, val_reason
+            )
             run.review_feedback.append(feedback)
+            # Le journal montre la première raison, pas le mot du verdict
+            # (ticket-474) ; le codeur, lui, reçoit l'objection entière.
             self._log(
-                f"[{ticket_id}] CHANGES_REQUESTED tour {round_num}: {feedback[:100]}"
+                f"[{ticket_id}] CHANGES_REQUESTED tour {round_num}: "
+                f"{_first_line(feedback)[:200]}"
             )
 
         return await outcomes.finish_rounds_exhausted(self, run)
