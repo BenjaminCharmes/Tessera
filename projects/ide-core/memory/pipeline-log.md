@@ -3172,3 +3172,14 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 09:56:25 UTC — [ticket-466] tour 1 — reviewer terminé (34563ms)
 - 2026-10-16 09:56:25 UTC — [ticket-466] APPROVED après 1 tour(s)
 - 2026-10-16 09:59:42 UTC — [ticket-466] documentation: 3 fichier(s) (188327ms)
+- 2026-10-16 10:20:20 UTC — [ide-core] ticket-467 PR #490 confiée au CIWatcher
+- 2026-10-16 10:20:22 UTC — [ticket-468] branche ticket-468-the-resend-steps-find-or-create-the-sending-domai
+- 2026-10-16 10:20:23 UTC — [ticket-468] tour 1 — codeur démarré
+- 2026-10-16 10:23:36 UTC — [ticket-468] tour 1 — codeur terminé (193108ms)
+- 2026-10-16 10:24:59 UTC — [ide-core] ticket-467 PR #490 mergée (CI verte)
+- 2026-10-16 10:28:46 UTC — [ticket-468] testeur: OK (exit 0)
+- 2026-10-16 10:29:34 UTC — [ticket-468] securite: PASS — Code de provisioning Resend (domaines, clés API, vérification DNS) sans vulnérab (47531ms)
+- 2026-10-16 10:29:34 UTC — [ticket-468] tour 1 — reviewer démarré
+- 2026-10-16 10:30:00 UTC — [ticket-468] tour 1 — reviewer terminé (26156ms)
+- 2026-10-16 10:33:01 UTC — [ticket-468] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (207281ms)
+- 2026-10-16 10:33:01 UTC — [ticket-468] APPROVED après 1 tour(s)
