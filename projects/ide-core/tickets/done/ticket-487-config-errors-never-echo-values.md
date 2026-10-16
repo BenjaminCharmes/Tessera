@@ -6,7 +6,7 @@ estimated_days: 0.25
 id: ticket-487
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: A configuration error names the faulty variable but never echoes its value
 type: fix
 ---
@@ -41,8 +41,8 @@ même erreur part dans les logs, et le backend ne démarre pas.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie que l'erreur levée pour une variable inconnue de
+- [x] Un test vérifie que l'erreur levée pour une variable inconnue de
       valeur `sk_test_secret123` ne contient pas `secret123`
-- [ ] Un test vérifie que le message reformulé contient le nom de la variable
-- [ ] Un test vérifie qu'une valeur invalide d'une variable connue n'est pas
+- [x] Un test vérifie que le message reformulé contient le nom de la variable
+- [x] Un test vérifie qu'une valeur invalide d'une variable connue n'est pas
       recopiée non plus
