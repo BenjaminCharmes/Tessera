@@ -130,6 +130,34 @@ async def test_missing_project_is_created_with_the_github_remote() -> None:
     assert corps == {"name": "demo", "gitRepository": {"type": "github", "repo": "owner/demo"}}
 
 
+async def test_repo_not_found_asks_to_install_the_vercel_github_app() -> None:
+    fake = FakeVercel()
+    base = fake.__call__
+
+    def refuse(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST" and request.url.path == "/v11/projects":
+            return httpx.Response(400, json={"error": {"code": "repo_not_found"}})
+        return base(request)
+
+    client = VercelClient(_TOKEN, "", httpx.MockTransport(refuse))
+    result = await VercelProjectStep(client).apply(_ctx(client))
+    assert result.state is StepState.NEEDS_HUMAN
+    assert "github.com/apps/vercel" in result.detail
+    assert "owner/demo" in result.detail
+    assert fake.calls("POST", "/v10/projects/demo/domains") == []
+
+
+async def test_other_project_creation_errors_still_raise() -> None:
+    def refuse(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            return httpx.Response(403, json={"error": {"code": "forbidden"}})
+        return httpx.Response(404, json={"error": {"code": "not_found"}})
+
+    client = VercelClient(_TOKEN, "", httpx.MockTransport(refuse))
+    with pytest.raises(ServiceError):
+        await VercelProjectStep(client).apply(_ctx(client))
+
+
 async def test_project_without_remote_is_created_unlinked() -> None:
     fake = FakeVercel()
     client = _client(fake)

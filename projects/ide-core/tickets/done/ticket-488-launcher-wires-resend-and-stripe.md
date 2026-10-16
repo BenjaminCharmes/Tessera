@@ -1,14 +1,15 @@
 ---
-id: ticket-488
-title: "Putting a project online runs its Resend and Stripe steps, and a Vercel repo_not_found says what to install"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-488
+pr_number: 506
+priority: critical
+status: done
+title: Putting a project online runs its Resend and Stripe steps, and a Vercel repo_not_found
+  says what to install
+type: fix
 ---
 
 # ticket-488 — La mise en ligne lance aussi Resend et Stripe
