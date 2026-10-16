@@ -579,6 +579,18 @@ Si tu omets cette section, le pipeline refuse le ticket — le message te demand
 
 Chaque critère se note en ligne séparée pour que le validateur puisse les vérifier un par un :
 
+### Fichiers qu'un agent ne peut pas modifier
+
+Certains fichiers définissent le projet lui-même et restent hors d'atteinte des agents : `CLAUDE.md`, `CLAUDE.local.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/`.
+
+Si un critère d'acceptation exige d'en modifier un — par exemple « Ajoute une section dans `CLAUDE.md` » — le run **ne démarre pas**. Il s'arrête avant le codeur avec un message explicite :
+
+> Le critère 2 demande d'écrire `CLAUDE.md`, que le pipeline refuse aux agents : à faire à la main.
+
+Reformule le critère pour qu'il ignore ces fichiers, ou fais la modification à la main d'abord, puis relance le run.
+
+**Note** : un critère qui cite juste le fichier (« d'après `CLAUDE.md`, ... ») marche normalement.
+
     ## Critères d'acceptation
     
     - [ ] La fonction `trier()` retourne une liste triée en ordre croissant
