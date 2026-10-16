@@ -65,7 +65,10 @@ async def test_build_orchestrator_validator_et_security_auditor_sans_outils(
     assert orchestrator._validator is not None
     assert orchestrator._security_auditor is not None
     assert orchestrator._validator._provider._allowed_tools == []
-    assert orchestrator._security_auditor._provider._allowed_tools == []
+    # Ticket-485: the audit reads the project, it never writes to it.
+    audit_tools = orchestrator._security_auditor._provider._allowed_tools
+    assert audit_tools == ["Read", "Glob", "Grep"]
+    assert not {"Write", "Edit", "Bash"} & set(audit_tools)
     # The coder/reviewer runner keeps the full toolset.
     assert orchestrator._runner._provider._allowed_tools == [
         "Read", "Write", "Edit", "Bash", "Glob", "Grep",
@@ -139,6 +142,23 @@ def test_le_plan_recoit_son_propre_budget_de_tours() -> None:
     assert _tours_du_role(ROLE_PLAN) == settings.llm_max_turns_plan
 
 
+async def test_l_audit_securite_est_borne_au_projet_et_compte_une_fois(
+    tmp_path: Path,
+) -> None:
+    # Ticket-485 : la racine du provider d'audit est le projet, et il reste
+    # enveloppé par `ProviderEnregistrant` (un seul enregistrement des coûts).
+    from tessera.services.providers.enregistrant import ProviderEnregistrant
+
+    _make_project_with_pipeline(tmp_path, "mon-projet")
+
+    orchestrator = await _build_orchestrator("mon-projet")
+
+    assert orchestrator._security_auditor is not None
+    audit_provider = orchestrator._security_auditor._provider
+    assert isinstance(audit_provider, ProviderEnregistrant)
+    assert audit_provider.racine_ecriture.resolve() == (tmp_path / "mon-projet").resolve()
+
+
 def test_le_reviewer_garde_son_budget_reduit() -> None:
     # Le reviewer a le diff dans son prompt : dix tours suffisent à regarder
     # autour. Ce budget ne doit pas changer avec ticket-297 (ticket-199).
@@ -149,6 +169,11 @@ def test_le_codeur_n_a_pas_de_budget_specifique() -> None:
     # Les autres rôles obtiennent None : provider_pour_role applique alors
     # settings.llm_max_turns (30).
     assert _tours_du_role("codeur") is None
+
+
+def test_l_audit_securite_a_un_budget_borne() -> None:
+    # L'audit relit comme le reviewer (ticket-485) : pas les 30 tours par défaut.
+    assert _tours_du_role("securite") == settings.llm_max_turns_reviewer
 
 
 def test_plan_et_reviewer_ont_des_budgets_distincts() -> None:

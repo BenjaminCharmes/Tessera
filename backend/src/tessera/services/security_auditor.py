@@ -89,6 +89,9 @@ class SecurityAuditorService:
                     user=message,
                     model=self._model,
                     max_tokens=_MAX_TOKENS,
+                    # Ticket-485 : l'audit lit le code hors diff avant de
+                    # bloquer ; `cwd` le place dans le projet.
+                    cwd=project_path.resolve(),
                 )
             except Exception as exc:
                 # Échoue fermé : un audit qui n'a pas eu lieu n'a rien approuvé.

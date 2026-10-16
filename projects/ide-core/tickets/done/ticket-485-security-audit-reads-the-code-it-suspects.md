@@ -1,15 +1,16 @@
 ---
-id: ticket-485
-title: "The security audit can read the project's code before it blocks on a sink outside the diff"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
+id: ticket-485
 plan: true
-created: 2026-10-16
+pr_number: 507
+priority: high
+status: done
+title: The security audit can read the project's code before it blocks on a sink outside
+  the diff
+type: feat
 ---
 
 # ticket-485 — L'audit de sécurité lit le code qu'il soupçonne

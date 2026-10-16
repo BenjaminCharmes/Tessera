@@ -72,7 +72,8 @@ def _tours_du_role(role: str) -> int | None:
     """
     if role == ROLE_PLAN:
         return settings.llm_max_turns_plan
-    if role == "reviewer":
+    if role in ("reviewer", "securite"):
+        # L'audit relit comme le reviewer (ticket-485) : même budget borné.
         return settings.llm_max_turns_reviewer
     return None
 
@@ -214,6 +215,16 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         )
         return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
 
+    def _en_lecture(role: str) -> LLMProvider:
+        # Lecture seule, enregistré comme `_sans_outils` : l'audit appelle le
+        # provider directement, `AgentRunner` ne le compte pas (ticket-485).
+        inner = provider_pour_role(
+            project_path, role, tools=OUTILS_DE_RELECTURE,
+            racine_ecriture=racine_ecriture, project_id=project_id,
+            max_turns=_tours_du_role(role),
+        )
+        return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
+
     try:
         agent_configs = load_agents_config(project_path)
         provider = _par_role("codeur")
@@ -240,7 +251,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     )
     security_auditor = (
         SecurityAuditorService(
-            _sans_outils("securite"), settings.ide_prompts_dir,
+            _en_lecture("securite"), settings.ide_prompts_dir,
             model=modele_du_role(project_path, "securite"),
         )
         if pipeline_cfg.securite_enabled
