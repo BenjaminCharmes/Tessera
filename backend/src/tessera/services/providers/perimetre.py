@@ -32,6 +32,7 @@ from tessera.services.providers.chemins_proteges import (
     motif_de_protection,
     refus_de_protection,
 )
+from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.redirections_bash import (
     cibles_ecrites,
     cibles_interpreteur_ecriture,
@@ -117,6 +118,7 @@ def hors_perimetre(
 def hook_refus_hors_perimetre(
     project_path: Path | None,
     racine: Path | None = None,
+    journal: JournalDesRefus | None = None,
 ) -> Callable[[HookInput, str | None, HookContext], Awaitable[HookJSONOutput]]:
     """Fabrique le hook `PreToolUse` qui enferme les écritures dans le projet.
 
@@ -127,6 +129,9 @@ def hook_refus_hors_perimetre(
     même hook sert à chaque écriture d'un agent, et relire `agents.json` à
     chacune d'elles laisserait un codeur élargir son propre périmètre en
     cours de run (ticket-119).
+
+    Chaque refus est aussi noté dans `journal`, s'il y en a un : c'est ce qui
+    permet au reviewer et au validateur de le savoir (ticket-476).
     """
     racine_figee = (
         racine
@@ -156,6 +161,7 @@ def hook_refus_hors_perimetre(
                     noms[0],
                     project_path,
                     INTERPRETE_PROTEGE_REFUS,
+                    journal,
                 )
         elif outil in _OUTILS_QUI_ECRIVENT:
             chemin = str(entrees.get("file_path", ""))
@@ -167,7 +173,8 @@ def hook_refus_hors_perimetre(
         for cible in cibles:
             if hors_perimetre(cible, project_path, racine):
                 return _refus(
-                    "ecriture_hors_perimetre_refusee", cible, project_path, ECRITURE_REFUS
+                    "ecriture_hors_perimetre_refusee", cible, project_path,
+                    ECRITURE_REFUS, journal,
                 )
             # Dans le projet, mais porteur de ses règles : `agents.json`, `.git/`,
             # `.claude/settings*.json`, `.github/workflows/` (ticket-119).
@@ -178,6 +185,7 @@ def hook_refus_hors_perimetre(
                     cible,
                     project_path,
                     refus_de_protection(motif),
+                    journal,
                 )
         return {}
 
@@ -185,8 +193,14 @@ def hook_refus_hors_perimetre(
 
 
 def _refus(
-    evenement: str, chemin: str, project_path: Path, raison: str
+    evenement: str,
+    chemin: str,
+    project_path: Path,
+    raison: str,
+    journal: JournalDesRefus | None = None,
 ) -> HookJSONOutput:
+    if journal is not None:
+        journal.noter(chemin, raison)
     _logger.warning(
         evenement, extra={"chemin": chemin[:200], "projet": str(project_path)}
     )

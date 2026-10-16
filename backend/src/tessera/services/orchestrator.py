@@ -31,6 +31,7 @@ from tessera.utils.logger import get_logger
 from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
+from tessera.services.pipeline_critere_protege import arret_critere_protege
 from tessera.services.pipeline_plan import run_plan
 from tessera.services.session_limit import (
     extract_reset_time,
@@ -39,6 +40,7 @@ from tessera.services.session_limit import (
 )
 
 if TYPE_CHECKING:
+    from tessera.services.providers.refus_garde import JournalDesRefus
     from tessera.services.carte_du_depot import CarteDuDepot
     from tessera.services.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder
@@ -86,7 +88,11 @@ class Orchestrator:
         merge_without_ci: bool = False,
         attente_merge_max_s: float = 600.0,
         etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
+        journal_refus: Optional["JournalDesRefus"] = None,
     ) -> None:
+        # Les écritures que le garde-fou refuse pendant un tour : le pipeline
+        # les passe au reviewer et au validateur (ticket-476).
+        self._journal_refus = journal_refus
         self._runner = runner
         self._ticket_svc = ticket_service
         self._project_context = project_context
@@ -358,6 +364,12 @@ class Orchestrator:
             return refused
         stages.take_artifact_snapshot(self, run)
         await set_status(self, run, TicketStatus.in_progress)
+        # Un critère qui exige un fichier que le pipeline refuse aux agents ne
+        # sera jamais satisfait : inutile de payer trois tours pour l'apprendre
+        # (ticket-476).
+        refused = await arret_critere_protege(self, run)
+        if refused is not None:
+            return refused
         run.carte_du_depot = await self._carte()
         self._avertir_du_build(ticket_id)
         # Avant le premier tour, et seulement si le ticket le déclare. Ne lève

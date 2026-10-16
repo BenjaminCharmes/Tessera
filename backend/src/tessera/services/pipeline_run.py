@@ -80,6 +80,9 @@ class PipelineRun:
     # Transmis au reviewer et au validateur uniquement — jamais à l'audit
     # sécurité (code uniquement) et jamais dans un commit (ticket-274).
     artifact_diff: str = ""
+    # Les écritures que le garde-fou a refusées au codeur ce tour-ci, déjà mises
+    # en forme pour le reviewer et le validateur (ticket-476). Vide : aucun refus.
+    refus_du_tour: str = ""
 
     @property
     def stop_requested(self) -> bool:
@@ -98,6 +101,7 @@ class PipelineRun:
         self.security_context = ""
         self.contexte_du_tour = ""
         self.artifact_diff = ""
+        self.refus_du_tour = ""
 
 
 async def emit(run: PipelineRun, event_type: EventType, **data: Any) -> None:
