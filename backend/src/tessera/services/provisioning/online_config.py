@@ -18,8 +18,17 @@ _DOMAINE = re.compile(
 )
 
 
+_VARIABLE = re.compile(r"^[A-Z_][A-Z0-9_]*$")
+
+
 class OnlineConfigError(ValueError):
     """The ``online`` block is invalid; the message names each field."""
+
+
+def _nom_variable(nom: str) -> str:
+    if not _VARIABLE.match(nom):
+        raise ValueError(f"{nom!r} is not an environment variable name such as MY_SECRET")
+    return nom
 
 
 class StripeConfig(BaseModel):
@@ -50,6 +59,24 @@ class OnlineConfig(BaseModel):
     domain: str
     resources: list[Resource] = Field(default_factory=list)
     stripe: Optional[StripeConfig] = Field(default=None, validate_default=True)
+    #: Secrets aléatoires à poser ; ``None`` laisse le défaut de l'étape Variables.
+    generate: Optional[list[str]] = None
+    #: Variables calculées ; ``{domain}`` est remplacé par le domaine déclaré.
+    derive: dict[str, str] = Field(default_factory=dict)
+
+    @field_validator("generate")
+    @classmethod
+    def _generate_valide(cls, valeur: Optional[list[str]]) -> Optional[list[str]]:
+        for nom in valeur or []:
+            _nom_variable(nom)
+        return valeur
+
+    @field_validator("derive")
+    @classmethod
+    def _derive_valide(cls, valeur: dict[str, str]) -> dict[str, str]:
+        for nom in valeur:
+            _nom_variable(nom)
+        return valeur
 
     @field_validator("domain")
     @classmethod

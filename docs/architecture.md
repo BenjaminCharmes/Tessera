@@ -1729,6 +1729,23 @@ agents (ADR-027) :
 `product` et `price_cents` sont facultatifs — un projet qui passe son prix en
 ligne à Stripe n'a besoin ni de l'un ni de l'autre.
 
+Deux clés facultatives règlent l'étape Variables :
+
+```json
+"online": {
+  "domain": "kadoomi.com",
+  "generate": ["BETTER_AUTH_SECRET", "CRON_SECRET"],
+  "derive": {"BETTER_AUTH_URL": "https://{domain}"}
+}
+```
+
+`generate` liste les secrets aléatoires (`secrets.token_urlsafe(32)`) ; sans
+elle, le défaut reste `SESSION_SECRET` et `CRON_SECRET`. `derive` associe un nom
+à une valeur calculée, `{domain}` étant remplacé par le domaine déclaré.
+Dans les deux cas, une variable déjà présente dans Vercel n'est jamais
+réécrite ; `NEXT_PUBLIC_APP_URL` reste posée comme avant. Une valeur générée
+n'apparaît dans aucun log ni retour d'API.
+
 Absent : pas de bouton, pas d'endpoint utile. Une ressource non listée n'est ni
 créée ni contrôlée. Le nom du projet Vercel, de la base et de la clé Resend est
 l'identifiant du projet.
@@ -1741,8 +1758,9 @@ l'identifiant du projet.
    écrite dans Vercel. Sans `NEON_API_KEY` (compte géré par l'intégration
    Vercel), l'étape passe `manual` : elle vérifie seulement que `DATABASE_URL`
    existe dans Vercel.
-3. **Variables** : celles que Tessera sait produire (`NEXT_PUBLIC_APP_URL`,
-   `SESSION_SECRET`, `CRON_SECRET` générés), posées **seulement si absentes**.
+3. **Variables** : `NEXT_PUBLIC_APP_URL`, les secrets de `generate` (défaut
+   `SESSION_SECRET`, `CRON_SECRET`) et les valeurs de `derive`, posés
+   **seulement si absents**.
 4. **Domaine Resend** : trouvé ou créé ; ses enregistrements DNS sont
    collectés, une clé d'envoi dédiée est créée et écrite dans Vercel.
 5. **DNS** : les enregistrements demandés par Vercel et Resend sont publiés

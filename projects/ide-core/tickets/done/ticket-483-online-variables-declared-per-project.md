@@ -1,14 +1,15 @@
 ---
-id: ticket-483
-title: "A project declares which variables provisioning generates and which it derives from the domain"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-483
+pr_number: 508
+priority: high
+status: done
+title: A project declares which variables provisioning generates and which it derives
+  from the domain
+type: feat
 ---
 
 # ticket-483 — Variables générées et dérivées déclarées par projet

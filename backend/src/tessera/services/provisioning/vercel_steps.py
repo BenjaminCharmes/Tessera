@@ -103,9 +103,17 @@ class VercelVariablesStep:
         self._client = client
         self._registry = registry
 
+    @staticmethod
+    def _generated(ctx: ProvisioningContext) -> tuple[str, ...]:
+        """Secrets to generate: the project's own list, else the default pair."""
+        if ctx.online.generate is None:
+            return GENERATED_VARIABLES
+        return tuple(ctx.online.generate)
+
     async def _missing(self, ctx: ProvisioningContext) -> list[str]:
-        voulues = [APP_URL_VARIABLE, *GENERATED_VARIABLES]
-        return [nom for nom in voulues if not await ctx.env_writer.has_env(nom)]
+        voulues = [APP_URL_VARIABLE, *self._generated(ctx), *ctx.online.derive]
+        uniques = list(dict.fromkeys(voulues))
+        return [nom for nom in uniques if not await ctx.env_writer.has_env(nom)]
 
     async def inspect(self, ctx: ProvisioningContext) -> StepResult:
         """List the missing variables by name; values are never read."""
@@ -123,8 +131,9 @@ class VercelVariablesStep:
         ecrites: list[str] = []
         for nom in await self._missing(ctx):
             valeur = self._value_for(nom, ctx)
-            # Inscrit avant l'envoi : une erreur ou un log ne doit pas pouvoir le citer.
-            self._registry.register(valeur)
+            if nom not in ctx.online.derive and nom != APP_URL_VARIABLE:
+                # Inscrit avant l'envoi : une erreur ou un log ne doit pas pouvoir le citer.
+                self._registry.register(valeur)
             await ctx.env_writer.set_env(nom, valeur)
             ctx.changed_env.add(nom)
             ecrites.append(nom)
@@ -133,6 +142,9 @@ class VercelVariablesStep:
 
     @staticmethod
     def _value_for(nom: str, ctx: ProvisioningContext) -> str:
+        modele = ctx.online.derive.get(nom)
+        if modele is not None:
+            return modele.replace("{domain}", ctx.online.domain)
         if nom == APP_URL_VARIABLE:
             return f"https://{ctx.online.domain}"
         return secrets.token_urlsafe(32)
