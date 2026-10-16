@@ -3172,3 +3172,16 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 09:56:25 UTC — [ticket-466] tour 1 — reviewer terminé (34563ms)
 - 2026-10-16 09:56:25 UTC — [ticket-466] APPROVED après 1 tour(s)
 - 2026-10-16 09:59:42 UTC — [ticket-466] documentation: 3 fichier(s) (188327ms)
+- 2026-10-16 10:04:21 UTC — [ide-core] ticket-466 PR #489 mergée (CI verte)
+- 2026-10-16 10:04:22 UTC — [ide-core] ticket-466 : base réalignée sur develop
+- 2026-10-16 10:04:22 UTC — [ide-core] ticket-466 PR #489 confiée au CIWatcher
+- 2026-10-16 10:04:25 UTC — [ticket-467] branche ticket-467-the-database-step-finds-or-creates-the-neon-proje
+- 2026-10-16 10:04:25 UTC — [ticket-467] tour 1 — codeur démarré
+- 2026-10-16 10:07:10 UTC — [ticket-467] tour 1 — codeur terminé (164702ms)
+- 2026-10-16 10:14:59 UTC — [ticket-467] testeur: OK (exit 0)
+- 2026-10-16 10:15:37 UTC — [ticket-467] securite: PASS — Audit de sécurité complet sur les fichiers ajoutés (neon.py, neon_steps.py, test (37952ms)
+- 2026-10-16 10:15:37 UTC — [ticket-467] tour 1 — reviewer démarré
+- 2026-10-16 10:16:08 UTC — [ticket-467] tour 1 — reviewer terminé (31030ms)
+- 2026-10-16 10:16:08 UTC — [ticket-467] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests qui passent. Le code (31139ms)
+- 2026-10-16 10:16:08 UTC — [ticket-467] APPROVED après 1 tour(s)
+- 2026-10-16 10:20:04 UTC — [ticket-467] documentation: 2 fichier(s) (232031ms)
