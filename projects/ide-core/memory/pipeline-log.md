@@ -3340,3 +3340,17 @@ Points posit (58359ms)
 - 2026-10-16 14:58:34 UTC — [ticket-483] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les fonction (125687ms)
 - 2026-10-16 14:58:34 UTC — [ticket-483] APPROVED après 1 tour(s)
 - 2026-10-16 15:02:16 UTC — [ticket-483] documentation: 0 fichier(s) (216828ms)
+- 2026-10-16 18:35:01 UTC — [ticket-475] branche ticket-475-a-dotted-identifier-in-a-criterion-is-not-taken-f
+- 2026-10-16 18:35:01 UTC — [ticket-475] tour 1 — codeur démarré
+- 2026-10-16 18:36:33 UTC — [ticket-475] tour 1 — codeur terminé (92218ms)
+- 2026-10-16 18:41:34 UTC — [ticket-475] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-16 18:41:34 UTC — [ticket-475] tests rouges au tour 1
+- 2026-10-16 18:41:34 UTC — [ticket-475] tour 2 — codeur démarré
+- 2026-10-16 18:42:16 UTC — [ticket-475] tour 2 — codeur terminé (41500ms)
+- 2026-10-16 18:47:21 UTC — [ticket-475] testeur: OK (exit 0)
+- 2026-10-16 18:49:56 UTC — [ticket-475] securite: PASS — No security vulnerabilities introduced. The refactoring improves security by red (154984ms)
+- 2026-10-16 18:49:56 UTC — [ticket-475] tour 2 — reviewer démarré
+- 2026-10-16 18:50:21 UTC — [ticket-475] tour 2 — reviewer terminé (24515ms)
+- 2026-10-16 18:52:31 UTC — [ticket-475] validateur: fichiers cités joints : brand.ts, src/lib/brand.ts, prisma/schema.prisma ; absents : BRAND.name
+- 2026-10-16 18:52:31 UTC — [ticket-475] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Les tests ont été ajoutés pour  (155172ms)
+- 2026-10-16 18:52:31 UTC — [ticket-475] APPROVED après 2 tour(s)
