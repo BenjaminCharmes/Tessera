@@ -1,7 +1,7 @@
 """The contract of a provisioning step — ticket-465."""
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Protocol
+from typing import Optional, Protocol
 
 from tessera.services.provisioning.online_config import OnlineConfig
 
@@ -64,6 +64,8 @@ class ProvisioningContext:
     project_id: str
     online: OnlineConfig
     env_writer: EnvWriter
+    #: 'owner/repo' of the project, ``None`` when it has no remote.
+    github_remote: Optional[str] = None
     wanted_dns: list[DnsRecord] = field(default_factory=list)
     changed_env: set[str] = field(default_factory=set)
     dns_published: bool = False

@@ -31,6 +31,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows) ou `~/.local/state/tessera` (autres) | Répertoire pour les fichiers d'état en dehors du dépôt : signalements en attente, etc. Créé au démarrage s'il n'existe pas. |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `VERCEL_TOKEN` | | `""` | Jeton Vercel pour déployer. Portée minimale : `read` sur les projects, `write` sur les deployments. À définir avec une date d'expiration. |
+| `VERCEL_TEAM_ID` | | `""` | Identifiant du team Vercel (trouvé dans les settings du team). Utilisé par le client Vercel pour créer ou chercher des projets. |
 | `NEON_API_KEY` | | `""` | Clef API Neon pour les migrations de base. Portée minimale : `read_only` sur les branches. À définir avec une date d'expiration. |
 | `RESEND_API_KEY` | | `""` | Clef API Resend pour les e-mails transactionnels. Portée minimale : `sending_access`. À définir avec une date d'expiration. |
 | `STRIPE_API_KEY` | | `""` | Clef API Stripe (secrète). Portée minimale : permissions de paiement. À définir avec une date d'expiration. |
