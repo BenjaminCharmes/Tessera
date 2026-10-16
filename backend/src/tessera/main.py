@@ -20,6 +20,7 @@ from tessera.routers import (
     observation,
     orchestrator,
     projects,
+    provisioning as provisioning_router,
     runs,
     services as services_router,
     services_running,
@@ -106,6 +107,7 @@ app.add_middleware(
 app.add_middleware(StaticTokenMiddleware)
 
 app.include_router(projects.router, prefix="/api/v1")
+app.include_router(provisioning_router.router, prefix="/api/v1")
 app.include_router(tickets.router, prefix="/api/v1/projects")
 app.include_router(chat.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
