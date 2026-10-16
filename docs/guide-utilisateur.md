@@ -1448,6 +1448,18 @@ Une fois déployé en production, une mesure Lighthouse CI valide vraiment sur l
 
 Les agents utilisent ce guide pour trouver les points manquants et te proposer les corrections.
 
+Le skill configure automatiquement ton site sur Vercel : création du projet, domaine, variables d'environnement, redéploiement.
+
+Renseigne d'abord `VERCEL_TOKEN` dans `.env` (portée minimale : `read` sur projects, `write` sur deployments).
+
+**Ce qu'il fait** :
+- Crée ton projet Vercel s'il manque, sinon le réutilise
+- Ajoute le domaine personnalisé si tu en as déclaré un
+- Écrit les variables d'environnement `NEXT_PUBLIC_APP_URL`, `SESSION_SECRET`, `CRON_SECRET` si absentes — jamais de réécriture
+- Redéploie uniquement si une variable a été écrite
+
+**Si le jeton manque** — l'étape s'arrête en `needs_human`, en attendant que tu renseigues `VERCEL_TOKEN`.
+
 ## 10. Intégration GitHub
 
 Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :

@@ -1778,3 +1778,13 @@ Chaque appel à `inspect` ou `apply` émet un événement `provisioning_step` su
 
 Les tickets 466–470 implémentent chacun un `ProvisioningStep` pour un service (domaine, DNS, email, paiement…) et s'y branchent.
 
+### Client Vercel (ticket-466)
+
+Trois étapes coordonnées pour provisionner un projet Vercel :
+
+1. **`vercel_project`** : trouve ou crée un projet par son nom, ajoute le domaine s'il manque, et verse les enregistrements DNS attendus dans `ctx.wanted_dns`.
+2. **`variables`** : pose les variables d'environnement (`NEXT_PUBLIC_APP_URL`, `SESSION_SECRET`, `CRON_SECRET`) si elles sont absentes, en type `sensitive` sauf la variable publique. **Aucune variable existante n'est jamais réécrite** — c'est une garantie de sécurité (ADR-053).
+3. **`redeploy`** : redéploie le dernier déploiement si une variable a été écrite (si `ctx.changed_env` n'est pas vide).
+
+Idempotence garantie : rejouer le passage ne change rien si le projet, le domaine et les variables sont déjà en place. Les jetons et valeurs sensibles ne sont jamais loggés ni inclus dans les erreurs.
+
