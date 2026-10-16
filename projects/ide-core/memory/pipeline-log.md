@@ -3235,3 +3235,14 @@ Points posit (58359ms)
 - 2026-10-16 11:25:16 UTC — [ticket-471] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (259265ms)
 - 2026-10-16 11:25:16 UTC — [ticket-471] APPROVED après 1 tour(s)
 - 2026-10-16 11:27:23 UTC — [ticket-471] documentation: 2 fichier(s) (120358ms)
+- 2026-10-16 12:29:01 UTC — [ide-core] ticket-476 PR #497 confiée au CIWatcher
+- 2026-10-16 12:29:03 UTC — [ticket-474] branche ticket-474-the-coder-receives-the-reviewer-s-whole-objection
+- 2026-10-16 12:29:04 UTC — [ticket-474] tour 1 — codeur démarré
+- 2026-10-16 12:31:16 UTC — [ticket-474] tour 1 — codeur terminé (132000ms)
+- 2026-10-16 12:33:22 UTC — [ticket-476] livraison: arrêt — PR #497 non mergée : CI failing : la PR #497 reste ouverte.
+- 2026-10-16 12:40:03 UTC — [ticket-474] testeur: OK (exit 0)
+- 2026-10-16 12:40:40 UTC — [ticket-474] securite: PASS — Refactoring de traitement de texte sans vulnérabilité détectée. Les trois nouvel (37062ms)
+- 2026-10-16 12:40:40 UTC — [ticket-474] tour 1 — reviewer démarré
+- 2026-10-16 12:41:06 UTC — [ticket-474] tour 1 — reviewer terminé (26171ms)
+- 2026-10-16 12:43:11 UTC — [ticket-474] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement le comporteme (150969ms)
+- 2026-10-16 12:43:11 UTC — [ticket-474] APPROVED après 1 tour(s)
