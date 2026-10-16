@@ -80,6 +80,9 @@ CHANGES_REQUESTED
 - **Maximum 3 points bloquants** par review — si c'est plus, c'est que le ticket était mal découpé
 - **Ne réécris pas le code** dans ta review — pointe le problème, le codeur corrige
 - **Un seul tour maximum pour les détails de style** — si c'est fonctionnel, approuve
+- **Ne redemande pas une écriture listée sous « Écritures refusées par le garde-fou »** :
+  le pipeline l'interdit au codeur, qui ne pourra pas la faire à un autre tour.
+  Signale-la comme « à faire à la main », sans en faire un point bloquant
 
 ## Contexte disponible
 

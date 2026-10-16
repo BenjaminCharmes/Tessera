@@ -11,6 +11,7 @@ from tessera.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.shell_detection import resolve_git_bash
 
 __all__ = [
@@ -34,6 +35,7 @@ def get_provider(
     tools: list[str] | None = None,
     racine_ecriture: Path | None = None,
     skills: list[str] | None = None,
+    journal_refus: JournalDesRefus | None = None,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -61,6 +63,9 @@ def get_provider(
 
     ``skills`` names the skills the role may load (ticket-242); only the SDK
     provider has a `Skill` tool to give.
+
+    ``journal_refus`` collects the writes the guard refuses (ticket-476); only
+    the SDK provider has a guard to feed it.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -73,6 +78,8 @@ def get_provider(
             kwargs["max_budget_usd"] = max_budget_usd
         if skills:
             kwargs["skills"] = list(skills)
+        if journal_refus is not None:
+            kwargs["journal_refus"] = journal_refus
         if tools is not None:
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:

@@ -28,6 +28,10 @@ Trois choix le distinguent d'un assistant de code classique :
   suivant.
 - **Vous décidez jusqu'où il va.** Chaque projet déclare son niveau : s'arrêter
   au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
+- **Les fichiers sensibles restent protégés.** Les agents ne peuvent pas
+  modifier les règles de votre IDE (`CLAUDE.md`, `agents.json`, `.github/workflows/`,
+  `.git/`) ni sa configuration locale (`.claude/`). Si un ticket exige une telle
+  modification, le run s'arrête avant le premier tour avec un message clair.
 
 Après un run approuvé, la livraison enchaîne seule jusqu'où le projet
 l'autorise : rebase, PR, attente de CI, merge. Certains conflits simples — dans

@@ -3249,3 +3249,31 @@ Points posit (58359ms)
 - 2026-10-16 12:44:20 UTC — [ticket-474] documentation: 1 fichier(s) (63063ms)
 - 2026-10-16 12:45:58 UTC — [ticket-474] livraison: résolveur tenté : docs/architecture.md (78922ms)
 - 2026-10-16 12:45:58 UTC — [ticket-474] livraison: arrêt — Conflit avec develop sur : docs/architecture.md — résolveur tenté sur docs/architecture.md, sans suc
+- 2026-10-16 11:27:41 UTC — [ide-core] ticket-471 PR #494 confiée au CIWatcher
+- 2026-10-16 11:32:10 UTC — [ide-core] ticket-471 PR #494 mergée (CI verte)
+- 2026-10-16 11:47:41 UTC — [ticket-476] branche ticket-476-a-criterion-that-needs-a-protected-file-stops-the
+- 2026-10-16 11:49:41 UTC — [ticket-476] plan rendu (119250ms)
+- 2026-10-16 11:49:41 UTC — [ticket-476] tour 1 — codeur démarré
+- 2026-10-16 11:56:23 UTC — [ticket-476] tour 1 — codeur terminé (401843ms)
+- 2026-10-16 11:56:24 UTC — [ticket-476] testeur: en attente d'un créneau de test
+- 2026-10-16 12:05:22 UTC — [ticket-476] testeur: OK (exit 0)
+- 2026-10-16 12:06:02 UTC — [ticket-476] securite: PASS — Audit complet du diff ticket-476 : ajout d'un système pour détecter et signaler  (39905ms)
+- 2026-10-16 12:06:02 UTC — [ticket-476] tour 1 — reviewer démarré
+- 2026-10-16 12:06:31 UTC — [ticket-476] validateur: fichiers cités joints : CLAUDE.md
+- 2026-10-16 12:06:31 UTC — [ticket-476] validateur: APPROVED — Tous les critères sont satisfaits. La détection des critères impossibles est com (28921ms)
+- 2026-10-16 12:06:59 UTC — [ticket-476] tour 1 — reviewer terminé (56592ms)
+- 2026-10-16 12:06:59 UTC — [ticket-476] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **La détection bloque des critères qui ne f
+- 2026-10-16 12:06:59 UTC — [ticket-476] tour 2 — codeur démarré
+- 2026-10-16 12:10:28 UTC — [ticket-476] tour 2 — codeur terminé (209469ms)
+- 2026-10-16 12:17:35 UTC — [ticket-476] testeur: OK (exit 0)
+- 2026-10-16 12:18:36 UTC — [ticket-476] securite: PASS — Le diff introduit une feature pour bloquer les runs avant le codeur si un critèr (60859ms)
+- 2026-10-16 12:18:36 UTC — [ticket-476] tour 2 — reviewer démarré
+- 2026-10-16 12:19:09 UTC — [ticket-476] tour 2 — reviewer terminé (33234ms)
+- 2026-10-16 12:24:26 UTC — [ticket-476] validateur: fichiers cités joints : CLAUDE.md
+- 2026-10-16 12:24:26 UTC — [ticket-476] validateur: APPROVED — Tous les critères sont satisfaits. Le code détecte correctement les critères imp (350578ms)
+- 2026-10-16 12:24:26 UTC — [ticket-476] APPROVED après 2 tour(s)
+- 2026-10-16 12:28:33 UTC — [ticket-476] documentation: 3 fichier(s) (241922ms)

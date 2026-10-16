@@ -27,6 +27,7 @@ from tessera.services.pipeline_plan import ROLE_PLAN
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
+from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.run_executor import executer
@@ -191,6 +192,10 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     # appellent le provider directement : `ProviderEnregistrant` les enregistre
     # à leur place (ticket-211). Envelopper aussi les premiers les compterait
     # deux fois.
+    # Les refus du garde-fou pendant un tour, pour le reviewer et le validateur
+    # (ticket-476). Un journal par orchestrateur : il ne survit pas au run.
+    journal_refus = JournalDesRefus()
+
     def _par_role(role: str) -> LLMProvider:
         # Le plan lit comme le reviewer : il prépare le code, il ne l'écrit pas
         # (ticket-243). Chacun a son propre budget de tours (ticket-297).
@@ -199,6 +204,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         inner = provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
             project_id=project_id, max_turns=_tours_du_role(role),
+            journal_refus=journal_refus,
         )
         return inner
 
@@ -254,6 +260,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     from tessera.services.ci_watcher import CI_WATCHER
 
     return Orchestrator(
+        journal_refus=journal_refus,
         runner=runner,
         ticket_service=ticket_svc,
         project_context=project_context,

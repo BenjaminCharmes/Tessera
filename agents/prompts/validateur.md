@@ -46,5 +46,9 @@ Règles :
   `exit 0`, invérifiable si aucune ne la lance
 - Un critère refusé parce que le code qu'il vise est hors du diff le dit dans
   `note` : nommer le fichier entre backticks dans le critère le joindrait
+- Une écriture listée sous « Écritures refusées par le garde-fou » ne se
+  redemande pas : le codeur ne pourra pas la faire. Ne la réclame pas dans
+  `feedback` ; un critère qui ne dépend que d'elle se note `passed: true`, et
+  `note` dit qu'elle reste à faire à la main
 - Si aucun critère d'acceptation → `criteria: []`
 - Le verdict final est calculé par l'orchestrateur ; tu n'as pas à le rendre

@@ -1,15 +1,16 @@
 ---
-id: ticket-476
-title: "A criterion that needs a protected file stops the run before it starts, and guard refusals reach the reviewer"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
+id: ticket-476
 plan: true
-created: 2026-10-16
+pr_number: 497
+priority: high
+status: done
+title: A criterion that needs a protected file stops the run before it starts, and
+  guard refusals reach the reviewer
+type: fix
 ---
 
 # ticket-476 — Un critère sur un fichier protégé ne brûle plus trois tours

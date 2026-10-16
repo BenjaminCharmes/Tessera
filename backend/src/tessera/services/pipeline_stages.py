@@ -29,6 +29,7 @@ from tessera.services.pipeline_events import (
 )
 from tessera.services.pipeline_outcomes import finish_security_block, finish_timeout_expired
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
+from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
 from tessera.services.security_auditor import SecurityAuditResult
 from tessera.services.validator_cited_files import format_cited_files_log
@@ -398,6 +399,8 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
             f"{run.carte_du_depot}\n\n{context}"
         )
 
+    # Ce qu'un rôle antérieur (le plan) aurait refusé n'est pas le tour du codeur.
+    refus_du_tour(orch)
     codeur_result = await orch._runner.run(
         role=role,
         ticket=run.ticket,
@@ -430,6 +433,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
         f"({codeur_result.duration_ms}ms)"
     )
 
+    run.refus_du_tour = refus_du_tour(orch)
     run.reviewed_code = await _capture_diff(orch, run, codeur_result.content)
     _capture_artifact_diff(orch, run)
     await set_status(orch, run, TicketStatus.in_review)
@@ -642,6 +646,7 @@ async def run_review(
         context
         + f"\n\n## Code produit par le codeur (tour {run.round_num})\n{run.reviewed_code}"
         + run.artifact_diff
+        + run.refus_du_tour
         + run.test_context
         + run.security_context
     )
@@ -696,6 +701,9 @@ async def run_validation(
         return True, ""
     await emit(run, EventType.VALIDATION_STARTED)
     t0 = time.monotonic()
+    # Transmis seulement quand il y a un refus : un validateur qui ne connaît
+    # pas ce paramètre est appelé comme avant ticket-476.
+    extra = {"refus": run.refus_du_tour} if run.refus_du_tour else {}
     try:
         validation = await orch._validator.validate(
             criteria=_extract_criteria(run.ticket.body),
@@ -703,6 +711,7 @@ async def run_validation(
             test_result=run.test_result,
             project_root=orch._project_path,
             ticket_type=run.ticket.type,
+            **extra,
         )
     except Exception as exc:
         # Échoue fermé, comme l'audit : une validation qui n'a pas eu lieu
