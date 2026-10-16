@@ -3125,3 +3125,23 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 08:23:42 UTC — [ticket-463] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-053 fixe complètement la stratégie de g (335875ms)
 - 2026-10-16 08:23:42 UTC — [ticket-463] APPROVED après 2 tour(s)
 - 2026-10-16 08:26:10 UTC — [ticket-463] documentation: 0 fichier(s) (144327ms)
+- 2026-10-16 08:26:27 UTC — [ide-core] ticket-463 PR #482 confiée au CIWatcher
+- 2026-10-16 08:31:22 UTC — [ide-core] ticket-463 PR #482 mergée (CI verte)
+- 2026-10-16 08:32:02 UTC — [ticket-464] branche ticket-464-online-service-tokens-are-read-by-the-backend-onl
+- 2026-10-16 08:32:02 UTC — [ticket-464] tour 1 — codeur démarré
+- 2026-10-16 08:38:40 UTC — [ticket-464] tour 1 — codeur terminé (397734ms)
+- 2026-10-16 08:45:40 UTC — [ticket-464] testeur: 1 failed, 1137 passed, 20 warnings in 415.94s (0:06:55)
+- 2026-10-16 08:45:40 UTC — [ticket-464] tests rouges au tour 1
+- 2026-10-16 08:45:40 UTC — [ticket-464] tour 2 — codeur démarré
+- 2026-10-16 08:46:17 UTC — [ticket-464] tour 2 — codeur terminé (37594ms)
+- 2026-10-16 08:55:42 UTC — [ticket-464] testeur: Tests  1236 passed (1236)
+- 2026-10-16 08:55:42 UTC — [ticket-464] tests rouges au tour 2
+- 2026-10-16 08:55:42 UTC — [ticket-464] tour 3 — codeur démarré
+- 2026-10-16 08:57:34 UTC — [ticket-464] tour 3 — codeur terminé (112015ms)
+- 2026-10-16 09:04:32 UTC — [ticket-464] testeur: OK (exit 0)
+- 2026-10-16 09:05:08 UTC — [ticket-464] securite: PASS — Aucune vulnérabilité détectée dans ce diff. Le ticket implémente une protection  (36484ms)
+- 2026-10-16 09:05:09 UTC — [ticket-464] tour 3 — reviewer démarré
+- 2026-10-16 09:05:54 UTC — [ticket-464] tour 3 — reviewer terminé (45032ms)
+- 2026-10-16 09:06:28 UTC — [ticket-464] validateur: fichiers cités joints : .env ; absents : Livraison.arret
+- 2026-10-16 09:06:28 UTC — [ticket-464] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : le code implémente les cinq je (80015ms)
+- 2026-10-16 09:06:28 UTC — [ticket-464] APPROVED après 3 tour(s)
