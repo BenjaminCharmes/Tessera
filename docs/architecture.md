@@ -1607,3 +1607,126 @@ Les textes affichés dans la maquette sont des données fictives, jamais du cont
 
 Le gabarit `fastapi-react` inclut un dossier `design/maquette/` avec un `README.md` qui explique ce rôle. Les nouveaux projets créés depuis ce gabarit ont donc la structure prête.
 
+## Mise en ligne (ADR-053, ticket-463)
+
+> Conçue, pas encore construite : les tickets 464 à 472 la réalisent.
+
+Tessera crée et relie les ressources en ligne d'un projet — Vercel, base de
+données, Resend, Stripe, DNS Cloudflare — sur une **action explicite de
+l'utilisateur** (`POST /api/v1/projects/{id}/provision`, puis un bouton « Mettre
+en ligne »). Aucun agent du pipeline ne la lance, et aucun outil d'agent ne
+l'expose.
+
+### Garde des jetons
+
+- Les jetons (`VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`,
+  `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`) se lisent dans le `.env` de Tessera,
+  par le backend seul (`config.Settings`). Ils ne sont jamais transmis à un
+  sous-processus agent : `agent_sdk` les vide dans l'environnement du CLI, comme
+  `ANTHROPIC_API_KEY`.
+- Un hook `PreToolUse` refuse à `Read`, `Glob`, `Grep` et `Bash` le `.env` de
+  Tessera (le chemin de `Settings.env_file`). Comme le contrôle d'écriture
+  d'ADR-031, il attrape une erreur, pas une évasion : le vrai plafond d'un jeton
+  est sa portée, pas ce hook.
+- Un secret reçu d'une API (clé Resend, `whsec_…` Stripe, URL de base) passe
+  **d'une API à l'autre** : il est écrit dans une variable Vercel de type
+  `sensitive` et n'est ni stocké, ni loggé, ni renvoyé. Les événements de la
+  mise en ligne ne portent que des noms d'étapes et des états.
+- Le masquage des logs porte sur les valeurs des jetons configurés et sur tout
+  secret reçu pendant l'appel. Une erreur de service se réduit au statut HTTP et
+  au code d'erreur de l'API, jamais à son corps (qui peut répéter la valeur).
+- La porte de push (ADR-048) traite les valeurs des jetons configurés comme des
+  termes interdits : un jeton ajouté dans un diff arrête le push.
+
+### Portée minimale
+
+| Service | Jeton | Limite |
+|---|---|---|
+| Stripe | clé restreinte | produits, prix, webhooks en écriture ; **mode test** par défaut |
+| Vercel | jeton de compte | expiration obligatoire ; équipe limitée au scope du compte |
+| Cloudflare | jeton d'API | `Zone.DNS` en édition, sur la seule zone du projet |
+| Resend | clé d'API | création de domaines et de clés d'envoi |
+| Neon | clé d'API | projets du compte |
+
+Le mode réel de Stripe n'est jamais activé par Tessera : il suppose une clé
+restreinte `live`, posée à la main, et une déclaration explicite
+(`"stripe": {"mode": "live"}`).
+
+### Déclaration par projet
+
+Dans `agents.json`, un bloc `online` (distinct de `services`, qui désigne les
+commandes locales d'ADR-042) ; `agents.json` reste interdit en écriture aux
+agents (ADR-027) :
+
+```json
+"online": {
+  "domain": "pronosti.fr",
+  "resources": ["vercel", "database", "resend", "dns", "stripe"],
+  "stripe": {
+    "webhook_path": "/api/stripe/webhook",
+    "events": ["checkout.session.completed"],
+    "product": "Publication d'un événement",
+    "price_cents": 990
+  }
+}
+```
+
+`webhook_path` et `events` sont obligatoires dès que `stripe` est listé : les
+événements dépendent du code du projet, Tessera ne les devine pas.
+`product` et `price_cents` sont facultatifs — un projet qui passe son prix en
+ligne à Stripe n'a besoin ni de l'un ni de l'autre.
+
+Absent : pas de bouton, pas d'endpoint utile. Une ressource non listée n'est ni
+créée ni contrôlée. Le nom du projet Vercel, de la base et de la clé Resend est
+l'identifiant du projet.
+
+### Étapes, dans l'ordre
+
+1. **Projet Vercel** : trouvé par son nom, sinon créé et relié au dépôt
+   `github_remote` ; le domaine est ajouté au projet.
+2. **Base** : projet Neon trouvé par son nom, sinon créé ; `DATABASE_URL`
+   écrite dans Vercel. Sans `NEON_API_KEY` (compte géré par l'intégration
+   Vercel), l'étape passe `manual` : elle vérifie seulement que `DATABASE_URL`
+   existe dans Vercel.
+3. **Variables** : celles que Tessera sait produire (`NEXT_PUBLIC_APP_URL`,
+   `SESSION_SECRET`, `CRON_SECRET` générés), posées **seulement si absentes**.
+4. **Domaine Resend** : trouvé ou créé ; ses enregistrements DNS sont
+   collectés, une clé d'envoi dédiée est créée et écrite dans Vercel.
+5. **DNS** : les enregistrements demandés par Vercel et Resend sont publiés
+   dans la zone Cloudflare. Sans Cloudflare déclaré, ils sont listés pour
+   l'utilisateur (`manual`).
+6. **Vérification Resend** : déclenchée après les DNS ; `pending` n'est pas un
+   échec, une relance la relit.
+7. **Stripe** : produit (trouvé par `metadata.tessera_project`) et prix (par
+   `lookup_key`) s'ils sont déclarés, webhook (par URL) toujours ; le secret du
+   webhook va dans Vercel.
+8. **Redéploiement** : seulement si une variable a été écrite pendant la
+   relance.
+
+### Reprise et idempotence
+
+Aucun état local n'est écrit : **le monde est la source de vérité**. Chaque
+relance lit d'abord chaque service (`inspect`), puis ne crée que ce qui
+manque (`apply`). Une variable Vercel `sensitive` ne se relit pas : on n'en
+contrôle que le nom, et on n'écrase jamais une valeur existante.
+
+Une ressource trouvée en double refuse l'étape. Un secret qui n'est montré
+qu'à la création (clé Resend, `whsec_…`) trouvé **sans** sa variable Vercel est
+perdu : l'étape s'arrête en `needs_human` et nomme la ressource à supprimer
+dans le tableau de bord, puis la relance la recrée. Tessera ne supprime jamais.
+Une étape en échec arrête les suivantes ; les étapes déjà faites restent faites.
+
+### Ce qui reste humain
+
+Création des comptes, achat du domaine, activation du mode réel Stripe, et la
+clé Stripe du **site** : l'API Stripe ne crée pas de clé, `STRIPE_SECRET_KEY`
+du projet se pose donc à la main dans Vercel. Tessera en vérifie le nom
+(`needs_human` s'il manque), jamais la valeur.
+
+### Observation
+
+Chaque étape émet `provisioning_step` (`nom`, `etat` : `done`, `skipped`,
+`pending`, `manual`, `needs_human`, `failed` ; `todo` en lecture seule) sur le canal d'ADR-041. Un
+verrou par projet, distinct de `RunLock` (la mise en ligne ne touche pas à
+l'arbre), refuse une seconde mise en ligne simultanée avec un 409.
+

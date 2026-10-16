@@ -3108,3 +3108,20 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-15 15:42:47 UTC — [ticket-462] validateur: APPROVED — Tous les critères sont couverts par des tests qui passent (exit 0). Le code déte (34264ms)
 - 2026-10-15 15:42:47 UTC — [ticket-462] APPROVED après 1 tour(s)
 - 2026-10-15 15:44:08 UTC — [ticket-462] documentation: 0 fichier(s) (78234ms)
+- 2026-10-15 15:44:23 UTC — [ide-core] ticket-462 PR #480 confiée au CIWatcher
+- 2026-10-15 15:48:47 UTC — [ide-core] ticket-462 PR #480 mergée (CI verte)
+- 2026-10-16 07:58:39 UTC — [ticket-463] branche ticket-463-design-how-tessera-provisions-a-project-online-ve
+- 2026-10-16 07:58:39 UTC — [ticket-463] tour 1 — codeur démarré
+- 2026-10-16 08:04:16 UTC — [ticket-463] tour 1 — architect terminé (336608ms)
+- 2026-10-16 08:11:09 UTC — [ticket-463] testeur: 1 failed, 2307 passed, 20 warnings in 406.39s (0:06:46)
+- 2026-10-16 08:11:09 UTC — [ticket-463] tests rouges au tour 1
+- 2026-10-16 08:11:09 UTC — [ticket-463] tour 2 — codeur démarré
+- 2026-10-16 08:11:34 UTC — [ticket-463] tour 2 — architect terminé (24952ms)
+- 2026-10-16 08:17:43 UTC — [ticket-463] testeur: OK (exit 0)
+- 2026-10-16 08:18:06 UTC — [ticket-463] securite: PASS — Ce diff contient uniquement de la documentation Markdown (architecture.md, contr (23202ms)
+- 2026-10-16 08:18:06 UTC — [ticket-463] tour 2 — reviewer démarré
+- 2026-10-16 08:18:33 UTC — [ticket-463] tour 2 — reviewer terminé (26922ms)
+- 2026-10-16 08:23:42 UTC — [ticket-463] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : docs/architecture.md
+- 2026-10-16 08:23:42 UTC — [ticket-463] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-053 fixe complètement la stratégie de g (335875ms)
+- 2026-10-16 08:23:42 UTC — [ticket-463] APPROVED après 2 tour(s)
+- 2026-10-16 08:26:10 UTC — [ticket-463] documentation: 0 fichier(s) (144327ms)

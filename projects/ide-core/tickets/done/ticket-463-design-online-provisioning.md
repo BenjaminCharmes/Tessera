@@ -1,14 +1,15 @@
 ---
-id: ticket-463
-title: "Design how Tessera provisions a project online (Vercel, Neon, Resend, Stripe, Cloudflare) without exposing its tokens"
-type: design
-status: todo
-pr_number: null
-priority: high
 agent: architect
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
-created: 2026-10-16
+id: ticket-463
+pr_number: 482
+priority: high
+status: done
+title: Design how Tessera provisions a project online (Vercel, Neon, Resend, Stripe,
+  Cloudflare) without exposing its tokens
+type: design
 ---
 
 # ticket-463 — Concevoir la mise en ligne d'un projet par Tessera
