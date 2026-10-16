@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
 id: ticket-483
-pr_number: null
+pr_number: 508
 priority: high
 status: done
 title: A project declares which variables provisioning generates and which it derives
