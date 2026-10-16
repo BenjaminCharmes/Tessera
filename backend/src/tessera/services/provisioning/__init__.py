@@ -10,6 +10,8 @@ from tessera.services.provisioning.online_config import (
     StripeConfig,
     load_online_config,
 )
+from tessera.services.provisioning.neon import NeonClient
+from tessera.services.provisioning.neon_steps import DatabaseStep
 from tessera.services.provisioning.plan import ProvisioningPlan
 from tessera.services.provisioning.vercel import VercelClient, VercelEnvWriter
 from tessera.services.provisioning.vercel_steps import (
@@ -27,8 +29,10 @@ from tessera.services.provisioning.steps import (
 )
 
 __all__ = [
+    "DatabaseStep",
     "DnsRecord",
     "EnvWriter",
+    "NeonClient",
     "OnlineConfig",
     "OnlineConfigError",
     "ProvisioningContext",
