@@ -3146,3 +3146,15 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 09:06:28 UTC — [ticket-464] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : le code implémente les cinq je (80015ms)
 - 2026-10-16 09:06:28 UTC — [ticket-464] APPROVED après 3 tour(s)
 - 2026-10-16 09:11:55 UTC — [ticket-464] documentation: 2 fichier(s) (318405ms) — après tour de correction
+- 2026-10-16 09:16:28 UTC — [ide-core] ticket-464 PR #485 mergée (CI verte)
+- 2026-10-16 09:16:30 UTC — [ide-core] ticket-464 : base réalignée sur develop
+- 2026-10-16 09:16:30 UTC — [ide-core] ticket-464 PR #485 confiée au CIWatcher
+- 2026-10-16 09:16:32 UTC — [ticket-465] branche ticket-465-a-provisioning-plan-runs-ordered-steps-re-reads-t
+- 2026-10-16 09:16:32 UTC — [ticket-465] tour 1 — codeur démarré
+- 2026-10-16 09:20:23 UTC — [ticket-465] tour 1 — codeur terminé (230438ms)
+- 2026-10-16 09:30:46 UTC — [ticket-465] testeur: OK (exit 0)
+- 2026-10-16 09:31:21 UTC — [ticket-465] securite: PASS — Audit de sécurité du module de provisioning (ticket-465) : aucune vulnérabilité  (34390ms)
+- 2026-10-16 09:31:21 UTC — [ticket-465] tour 1 — reviewer démarré
+- 2026-10-16 09:31:49 UTC — [ticket-465] tour 1 — reviewer terminé (28391ms)
+- 2026-10-16 09:32:03 UTC — [ticket-465] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code introduit un moteur de  (41703ms)
+- 2026-10-16 09:32:03 UTC — [ticket-465] APPROVED après 1 tour(s)
