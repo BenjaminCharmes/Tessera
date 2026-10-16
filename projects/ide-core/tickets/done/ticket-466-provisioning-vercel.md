@@ -5,6 +5,7 @@ depends_on:
 - ticket-465
 estimated_days: 1.5
 id: ticket-466
+pr_number: 489
 priority: medium
 status: done
 title: The Vercel step finds or creates the project, links its repository, adds the
