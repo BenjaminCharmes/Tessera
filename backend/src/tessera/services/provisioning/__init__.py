@@ -11,6 +11,12 @@ from tessera.services.provisioning.online_config import (
     load_online_config,
 )
 from tessera.services.provisioning.plan import ProvisioningPlan
+from tessera.services.provisioning.vercel import VercelClient, VercelEnvWriter
+from tessera.services.provisioning.vercel_steps import (
+    VercelProjectStep,
+    VercelRedeployStep,
+    VercelVariablesStep,
+)
 from tessera.services.provisioning.steps import (
     DnsRecord,
     EnvWriter,
@@ -32,5 +38,10 @@ __all__ = [
     "StepResult",
     "StepState",
     "StripeConfig",
+    "VercelClient",
+    "VercelEnvWriter",
+    "VercelProjectStep",
+    "VercelRedeployStep",
+    "VercelVariablesStep",
     "load_online_config",
 ]
