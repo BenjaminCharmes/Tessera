@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
 id: ticket-488
-pr_number: null
+pr_number: 506
 priority: critical
 status: done
 title: Putting a project online runs its Resend and Stripe steps, and a Vercel repo_not_found
