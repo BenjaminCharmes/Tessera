@@ -578,6 +578,23 @@ Quand le modèle rend un JSON non-valide du premier coup, l'IDE lui redemande un
 
 Journal : `security_auditor_invalid_json` enregistre le numéro de tentative (1 ou 2) pour chaque réponse invalide.
 
+
+L'agent de sécurité (`securite`) analyse le diff de chaque run pour détecter des failles OWASP — injections SQL, path traversal, SSRF, authentification — avant le reviewer.
+
+#### Outils de relecture
+
+Comme le reviewer, l'agent a accès aux outils de relecture du projet (`Read`, `Glob`, `Grep`) et est borné au projet (ADR-031). Il n'a ni `Write`, `Edit` ni `Bash` : il observe sans modifier.
+
+#### Lecture du code hors diff
+
+Avant de bloquer un run sur une faille qui passerait par du code absent du diff — par exemple une URL arrivant à une fonction `request()` sans garde —, l'audit lit ce code pour vérifier si les protections existent déjà. Si l'audit ne trouve pas la garde soupçonnée manquante, il la cite dans son verdict ou confirme son absence.
+
+Cela réduit les faux positifs : un nouveau flux HTTP vers une fonction qui refuse déjà les IP privées n'est pas une faille (ticket-485).
+
+#### Verdict fermé
+
+En cas d'erreur du provider ou réponse illisible, le run s'arrête sur BLOCK. C'est une règle de sécurité (ADR-039) : un doute = arrêt.
+
 ### Résultats des tests et extraction d'erreurs (ticket-393)
 
 Quand les tests échouent, `test_runner.py` extrait :
