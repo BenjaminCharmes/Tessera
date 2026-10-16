@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mettre en ligne — détail d'une étape</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden">
+
+  <nav aria-label="Navigation principale" style="width: 96px; flex-shrink: 0; background: #121214; border-right: 1px solid #27272a; display: flex; flex-direction: column; padding: 10px 8px; gap: 2px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 12px; color: #a1a1aa; font-size: 10px"><span style="width: 22px; height: 22px; border-radius: 5px; background: #8b5cf6"></span>Tessera</div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 6px 4px 2px">Pilotage</div>
+    <a href="#" aria-current="page" style="text-decoration: none; color: #f4f4f5; background: rgba(139,92,246,0.18); box-shadow: inset 0 0 0 1px rgba(139,92,246,0.45); font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Projets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">En cours</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Supervision</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Projet</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Tickets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Fichiers</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Historique</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Outils</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Agents</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Statistiques</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Chat</a>
+  </nav>
+
+  <aside style="width: 420px; flex-shrink: 0; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column">
+    <div style="height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #27272a">
+      <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Mise en ligne</span>
+      <span style="color: #71717a; font-size: 11px">5 sur 10 en place</span>
+    </div>
+    <div style="padding: 10px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #27272a">
+      <span style="font-size: 14px; font-weight: 600; color: #f4f4f5">Guessimo</span>
+      <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; color: #a1a1aa">guessimo.com</span>
+      <span style="padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.12); color: #fcd34d; font-size: 11px">Stripe test</span>
+    </div>
+    <ol style="margin: 0; padding: 0; list-style: none; overflow: auto">
+      <sc-for list="{{ etapes }}" as="e" hint-placeholder-count="10">
+        <li>
+          <button aria-current="{{ e.courant }}" style="width: 100%; height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 0; border-bottom: 1px solid #27272a; background: {{ e.fondLigne }}; color: #e4e4e7; font-size: 13px; text-align: left">
+            <span style="width: 18px; color: #71717a; font-size: 12px">{{ e.num }}</span>
+            <span style="flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ e.nom }}</span>
+            <span style="padding: 2px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap; background: {{ e.fond }}; color: {{ e.texte }}">{{ e.libelle }}</span>
+          </button>
+        </li>
+      </sc-for>
+    </ol>
+  </aside>
+
+  <main style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+    <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #27272a">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Ce qui t'attend</div>
+      <span style="color: #71717a; font-size: 11px">Relu il y a 40 s</span>
+    </div>
+
+    <div style="flex-grow: 1; min-height: 0; overflow: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px">
+
+      <section aria-labelledby="t-dns" style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <h1 id="t-dns" style="margin: 0; font-size: 20px; font-weight: 600; color: #f4f4f5">5 · DNS</h1>
+          <span style="padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.12); color: #fcd34d; font-size: 11px">à faire à la main</span>
+        </div>
+        <p style="margin: 0; color: #a1a1aa; line-height: 1.5; max-width: 760px">La zone <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; color: #e4e4e7">guessimo.com</span> n'est pas dans le compte Cloudflare de Tessera. Pose ces enregistrements chez ton registrar ; la vérification Resend (étape 6) les lira à la prochaine relance.</p>
+        <div style="border: 1px solid #27272a; border-radius: 6px; overflow: hidden">
+          <div style="display: grid; grid-template-columns: 72px 170px minmax(0, 1fr) 80px 90px 76px; align-items: center; height: 32px; padding: 0 12px; background: #18181b; border-bottom: 1px solid #27272a; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: #a1a1aa">
+            <span>Type</span><span>Nom</span><span>Valeur</span><span style="text-align: right; padding-right: 16px">Priorité</span><span>Pour</span><span></span>
+          </div>
+          <sc-for list="{{ dns }}" as="r" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 72px 170px minmax(0, 1fr) 80px 90px 76px; align-items: center; height: 36px; padding: 0 12px; border-bottom: 1px solid #27272a; font-size: 12px">
+              <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; color: #e4e4e7">{{ r.type }}</span>
+              <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; color: #e4e4e7">{{ r.nom }}</span>
+              <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; color: #d4d4d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 12px">{{ r.valeur }}</span>
+              <span style="color: #a1a1aa; text-align: right; padding-right: 16px">{{ r.prio }}</span>
+              <span style="color: #a1a1aa">{{ r.pour }}</span>
+              <button aria-label="Copier l'enregistrement {{ r.type }} {{ r.nom }}" style="justify-self: end; height: 24px; padding: 0 8px; border-radius: 5px; border: 1px solid #3f3f46; background: transparent; color: #e4e4e7; font-size: 11px">Copier</button>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section aria-labelledby="t-cle" style="display: flex; flex-direction: column; gap: 12px; padding-top: 20px; border-top: 1px solid #27272a">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <h2 id="t-cle" style="margin: 0; font-size: 16px; font-weight: 600; color: #f4f4f5">7 · Clé Stripe du site</h2>
+          <span style="padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.20); color: #fde68a; font-size: 11px">ton action requise</span>
+        </div>
+        <p style="margin: 0; color: #a1a1aa; line-height: 1.5; max-width: 760px">Le site a besoin de sa propre clé Stripe, et l'API Stripe ne sait pas en créer. Tessera vérifie que la variable existe, jamais sa valeur.</p>
+        <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; max-width: 760px">
+          <li style="display: flex; gap: 10px; align-items: baseline"><span style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 10px; background: #27272a; color: #d4d4d8; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">1</span><span style="line-height: 1.5">Dans Stripe, en <strong style="font-weight: 600">mode test</strong> : Développeurs › Clés API › Créer une clé restreinte, nommée <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px">guessimo-site</span>.</span></li>
+          <li style="display: flex; gap: 10px; align-items: baseline"><span style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 10px; background: #27272a; color: #d4d4d8; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">2</span><span style="line-height: 1.5">Dans Vercel, projet <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px">guessimo</span> › Settings › Environment Variables : ajoute <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px">STRIPE_SECRET_KEY</span>, type Sensitive, pour Production et Preview.</span></li>
+          <li style="display: flex; gap: 10px; align-items: baseline"><span style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 10px; background: #27272a; color: #d4d4d8; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">3</span><span style="line-height: 1.5">Reviens ici et relance : seules les étapes qui manquent sont rejouées.</span></li>
+        </ol>
+      </section>
+    </div>
+
+    <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 24px; border-top: 1px solid #27272a; background: #18181b">
+      <span style="color: #a1a1aa; font-size: 12px">La relance relit chaque service et ne crée que ce qui manque. Ce qui est fait reste fait.</span>
+      <div style="display: flex; gap: 8px">
+        <button style="height: 30px; padding: 0 12px; border-radius: 5px; border: 1px solid #3f3f46; background: transparent; color: #e4e4e7; font-size: 13px">Ouvrir Stripe</button>
+        <button style="height: 30px; padding: 0 14px; border-radius: 5px; border: 0; background: #7c3aed; color: #ffffff; font-size: 13px; font-weight: 500">Relancer</button>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const etats = {
+      todo:        { libelle: 'à faire',            fond: 'rgba(161,161,170,0.12)', texte: '#d4d4d8' },
+      done:        { libelle: 'fait',               fond: 'rgba(74,222,128,0.12)',  texte: '#86efac' },
+      skipped:     { libelle: 'déjà là',            fond: 'rgba(74,222,128,0.06)',  texte: '#bbf7d0' },
+      pending:     { libelle: 'en cours',           fond: 'rgba(96,165,250,0.14)',  texte: '#93c5fd' },
+      manual:      { libelle: 'à faire à la main',  fond: 'rgba(251,191,36,0.12)',  texte: '#fcd34d' },
+      needs_human: { libelle: 'ton action requise', fond: 'rgba(251,191,36,0.20)',  texte: '#fde68a' },
+      failed:      { libelle: 'échec',              fond: 'rgba(248,113,113,0.12)', texte: '#fca5a5' }
+    };
+    const liste = [
+      ['Projet Vercel', 'skipped'], ['Base Neon', 'done'], ['Variables', 'done'],
+      ['Domaine Resend', 'done'], ['DNS', 'manual'], ['Vérification Resend', 'pending'],
+      ['Clé Stripe du site', 'needs_human'], ['Stripe — produit et prix', 'done'],
+      ['Stripe — webhook', 'failed'], ['Redéploiement', 'todo']
+    ];
+    return {
+      etapes: liste.map((l, i) => {
+        const s = etats[l[1]];
+        const courant = i === 4;
+        return { num: i + 1, nom: l[0], libelle: s.libelle, fond: s.fond, texte: s.texte,
+                 fondLigne: courant ? '#27272a' : 'transparent', courant: courant ? 'true' : 'false' };
+      }),
+      dns: [
+        { type: 'A', nom: '@', valeur: '76.76.21.21', prio: '—', pour: 'Vercel' },
+        { type: 'CNAME', nom: 'www', valeur: 'cname.vercel-dns.com', prio: '—', pour: 'Vercel' },
+        { type: 'MX', nom: 'send', valeur: 'feedback-smtp.eu-west-1.amazonses.com', prio: '10', pour: 'Resend' },
+        { type: 'TXT', nom: 'send', valeur: 'v=spf1 include:amazonses.com ~all', prio: '—', pour: 'Resend' },
+        { type: 'TXT', nom: 'resend._domainkey', valeur: 'p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDk3x7…', prio: '—', pour: 'Resend' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

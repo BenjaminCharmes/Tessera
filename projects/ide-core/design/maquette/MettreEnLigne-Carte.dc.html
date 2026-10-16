@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mettre en ligne — carte et confirmation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden">
+
+  <nav aria-label="Navigation principale" style="width: 96px; flex-shrink: 0; background: #121214; border-right: 1px solid #27272a; display: flex; flex-direction: column; padding: 10px 8px; gap: 2px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 12px; color: #a1a1aa; font-size: 10px"><span style="width: 22px; height: 22px; border-radius: 5px; background: #8b5cf6"></span>Tessera</div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 6px 4px 2px">Pilotage</div>
+    <a href="#" aria-current="page" style="text-decoration: none; color: #f4f4f5; background: rgba(139,92,246,0.18); box-shadow: inset 0 0 0 1px rgba(139,92,246,0.45); font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Projets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">En cours</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Supervision</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Projet</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Tickets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Fichiers</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Historique</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Outils</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Agents</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Statistiques</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Chat</a>
+  </nav>
+
+  <main style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+    <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #27272a">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Projets</div>
+      <span style="color: #71717a; font-size: 11px">6 projets</span>
+    </div>
+
+    <div style="padding: 16px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+
+      <article aria-label="Guessimo" style="display: flex; flex-direction: column; gap: 8px; background: #18181b; border: 1px solid #3f3f46; border-radius: 4px; padding: 12px">
+        <div style="display: flex; align-items: flex-start; gap: 12px">
+          <span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 4px; background: #27272a; color: #d4d4d8; font-size: 16px; font-weight: 500; display: flex; align-items: center; justify-content: center">G</span>
+          <div style="min-width: 0; flex-grow: 1">
+            <h3 style="margin: 0; font-size: 14px; font-weight: 500; color: #f4f4f5">Guessimo</h3>
+            <p style="margin: 2px 0 0; font-size: 11px; color: #71717a">guessimo · Jeux</p>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 12px; color: #a1a1aa; line-height: 1.45">Devine le prix d'un objet du quotidien en cinq essais. Une partie par jour, un classement entre amis.</p>
+        <p style="margin: 0; display: flex; gap: 12px; font-size: 11px; color: #71717a"><span>Créé il y a 9 jours</span><span>Activité il y a 2 h</span></p>
+        <ul style="margin: 0; padding: 0; list-style: none; display: flex; gap: 12px; font-size: 11px">
+          <li style="color: #a1a1aa">À faire <span style="font-weight: 500">3</span></li>
+          <li style="color: #60a5fa">En cours <span style="font-weight: 500">0</span></li>
+          <li style="color: #f87171">Bloqués <span style="font-weight: 500">0</span></li>
+          <li style="color: #4ade80">Faits <span style="font-weight: 500">14</span></li>
+        </ul>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid #27272a; padding-top: 8px">
+          <span style="font-size: 11px; color: #71717a">Pas encore en ligne</span>
+          <button style="height: 26px; padding: 0 10px; border-radius: 5px; border: 1px solid #3f3f46; background: #27272a; color: #e4e4e7; font-size: 12px; display: flex; align-items: center; gap: 6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+            Mettre en ligne
+          </button>
+        </div>
+      </article>
+
+      <sc-for list="{{ autres }}" as="p" hint-placeholder-count="5">
+        <article aria-label="{{ p.nom }}" style="display: flex; flex-direction: column; gap: 8px; background: #18181b; border: 1px solid #27272a; border-radius: 4px; padding: 12px">
+          <div style="display: flex; align-items: flex-start; gap: 12px">
+            <span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 4px; background: #27272a; color: #d4d4d8; font-size: 16px; font-weight: 500; display: flex; align-items: center; justify-content: center">{{ p.initiale }}</span>
+            <div style="min-width: 0; flex-grow: 1">
+              <h3 style="margin: 0; font-size: 14px; font-weight: 500; color: #f4f4f5">{{ p.nom }}</h3>
+              <p style="margin: 2px 0 0; font-size: 11px; color: #71717a">{{ p.id }} · {{ p.cat }}</p>
+            </div>
+          </div>
+          <p style="margin: 0; font-size: 12px; color: #a1a1aa; line-height: 1.45">{{ p.desc }}</p>
+          <p style="margin: 0; display: flex; gap: 12px; font-size: 11px; color: #71717a"><span>{{ p.cree }}</span><span>{{ p.activite }}</span></p>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; gap: 12px; font-size: 11px">
+            <li style="color: #a1a1aa">À faire <span style="font-weight: 500">{{ p.todo }}</span></li>
+            <li style="color: #60a5fa">En cours <span style="font-weight: 500">0</span></li>
+            <li style="color: #f87171">Bloqués <span style="font-weight: 500">0</span></li>
+            <li style="color: #4ade80">Faits <span style="font-weight: 500">{{ p.faits }}</span></li>
+          </ul>
+        </article>
+      </sc-for>
+    </div>
+  </main>
+
+  <div style="position: absolute; inset: 0; background: rgba(9,9,11,0.72); display: flex; align-items: center; justify-content: center">
+    <div role="dialog" aria-modal="true" aria-labelledby="titre-confirm" style="width: 480px; background: #18181b; border: 1px solid #3f3f46; border-radius: 8px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); overflow: hidden">
+      <div style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid #27272a; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Mettre en ligne</div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="titre-confirm" style="margin: 0; font-size: 20px; font-weight: 600; color: #f4f4f5">Mettre Guessimo en ligne ?</h2>
+        <dl style="margin: 0; display: grid; grid-template-columns: 96px 1fr; row-gap: 10px; align-items: center">
+          <dt style="color: #a1a1aa; font-size: 11px">Domaine</dt>
+          <dd style="margin: 0; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 13px; color: #f4f4f5">guessimo.com</dd>
+          <dt style="color: #a1a1aa; font-size: 11px">Paiements</dt>
+          <dd style="margin: 0; display: flex; align-items: center; gap: 8px"><span style="padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.12); color: #fcd34d; font-size: 11px">Stripe test</span><span style="color: #a1a1aa; font-size: 12px">aucun vrai paiement</span></dd>
+          <dt style="color: #a1a1aa; font-size: 11px">Services</dt>
+          <dd style="margin: 0; color: #e4e4e7">Vercel, Neon, Resend, Cloudflare, Stripe</dd>
+        </dl>
+        <ul style="margin: 0; padding: 12px; list-style: none; display: flex; flex-direction: column; gap: 6px; background: #0f0f11; border: 1px solid #27272a; border-radius: 6px; color: #a1a1aa; font-size: 12px; line-height: 1.45">
+          <li>Tessera crée ce qui manque et garde ce qui existe. Il ne supprime rien.</li>
+          <li>Les jetons restent dans le backend : aucun agent ne les voit.</li>
+          <li>Le mode réel de Stripe ne s'active qu'à la main.</li>
+        </ul>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid #27272a">
+        <button style="height: 30px; padding: 0 12px; border-radius: 5px; border: 0; background: transparent; color: #a1a1aa; font-size: 13px">Annuler</button>
+        <button style="height: 30px; padding: 0 14px; border-radius: 5px; border: 0; background: #7c3aed; color: #ffffff; font-size: 13px; font-weight: 500">Mettre en ligne</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      autres: [
+        { nom: 'Curio', initiale: 'C', id: 'curio', cat: 'Jeux', desc: 'Quiz de culture générale, 1 896 questions en français.', cree: 'Créé il y a 3 jours', activite: 'Activité il y a 5 h', todo: 2, faits: 8 },
+        { nom: 'Serpent', initiale: 'S', id: 'serpent', cat: 'Jeux', desc: 'Le jeu du serpent, au clavier et au doigt.', cree: 'Créé il y a 11 jours', activite: 'Activité il y a 4 jours', todo: 0, faits: 9 },
+        { nom: 'Vigie', initiale: 'V', id: 'vigie', cat: 'Outils', desc: 'Veille des offres et des sources, triées chaque matin.', cree: 'Créé il y a 3 semaines', activite: 'Activité hier', todo: 4, faits: 13 },
+        { nom: 'Carrière', initiale: 'C', id: 'carriere-app', cat: 'Perso', desc: 'Dossier de carrière : missions, compétences, relevés.', cree: 'Créé il y a 1 mois', activite: 'Activité il y a 2 jours', todo: 1, faits: 21 },
+        { nom: 'ide-core', initiale: 'I', id: 'ide-core', cat: 'Tessera', desc: "L'IDE lui-même : tickets, mémoire et décisions.", cree: 'Créé il y a 2 mois', activite: 'Activité il y a 4 min', todo: 9, faits: 418 }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
