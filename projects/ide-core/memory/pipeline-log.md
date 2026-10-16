@@ -3124,3 +3124,4 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 08:23:42 UTC — [ticket-463] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : docs/architecture.md
 - 2026-10-16 08:23:42 UTC — [ticket-463] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-053 fixe complètement la stratégie de g (335875ms)
 - 2026-10-16 08:23:42 UTC — [ticket-463] APPROVED après 2 tour(s)
+- 2026-10-16 08:26:10 UTC — [ticket-463] documentation: 0 fichier(s) (144327ms)
