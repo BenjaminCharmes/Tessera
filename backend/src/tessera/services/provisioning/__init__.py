@@ -3,6 +3,8 @@
 The world (the services themselves) is the source of truth: nothing is stored
 locally, a relaunch reads every service again and only creates what is missing.
 """
+from tessera.services.provisioning.cloudflare import CloudflareClient
+from tessera.services.provisioning.cloudflare_steps import DnsStep
 from tessera.services.provisioning.errors import ServiceError
 from tessera.services.provisioning.online_config import (
     OnlineConfig,
@@ -10,9 +12,13 @@ from tessera.services.provisioning.online_config import (
     StripeConfig,
     load_online_config,
 )
+from tessera.services.provisioning.neon import NeonClient
+from tessera.services.provisioning.neon_steps import DatabaseStep
 from tessera.services.provisioning.plan import ProvisioningPlan
 from tessera.services.provisioning.resend import ResendClient
 from tessera.services.provisioning.resend_steps import ResendDomainStep, ResendVerifyStep
+from tessera.services.provisioning.stripe_client import StripeClient
+from tessera.services.provisioning.stripe_step import StripeStep
 from tessera.services.provisioning.vercel import VercelClient, VercelEnvWriter
 from tessera.services.provisioning.vercel_steps import (
     VercelProjectStep,
@@ -29,8 +35,12 @@ from tessera.services.provisioning.steps import (
 )
 
 __all__ = [
+    "CloudflareClient",
+    "DatabaseStep",
     "DnsRecord",
+    "DnsStep",
     "EnvWriter",
+    "NeonClient",
     "OnlineConfig",
     "OnlineConfigError",
     "ProvisioningContext",
@@ -42,7 +52,9 @@ __all__ = [
     "ServiceError",
     "StepResult",
     "StepState",
+    "StripeClient",
     "StripeConfig",
+    "StripeStep",
     "VercelClient",
     "VercelEnvWriter",
     "VercelProjectStep",

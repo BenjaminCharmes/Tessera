@@ -3186,3 +3186,38 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 10:35:44 UTC — [ticket-468] documentation: 1 fichier(s) (159094ms) — après tour de correction
 - 2026-10-16 10:36:15 UTC — [ticket-468] livraison: résolveur tenté : docs/architecture.md (23515ms)
 - 2026-10-16 10:36:15 UTC — [ticket-468] livraison: arrêt — Conflit avec develop sur : docs/architecture.md — résolveur tenté sur docs/architecture.md, sans suc
+- 2026-10-16 10:04:21 UTC — [ide-core] ticket-466 PR #489 mergée (CI verte)
+- 2026-10-16 10:04:22 UTC — [ide-core] ticket-466 : base réalignée sur develop
+- 2026-10-16 10:04:22 UTC — [ide-core] ticket-466 PR #489 confiée au CIWatcher
+- 2026-10-16 10:04:25 UTC — [ticket-467] branche ticket-467-the-database-step-finds-or-creates-the-neon-proje
+- 2026-10-16 10:04:25 UTC — [ticket-467] tour 1 — codeur démarré
+- 2026-10-16 10:07:10 UTC — [ticket-467] tour 1 — codeur terminé (164702ms)
+- 2026-10-16 10:14:59 UTC — [ticket-467] testeur: OK (exit 0)
+- 2026-10-16 10:15:37 UTC — [ticket-467] securite: PASS — Audit de sécurité complet sur les fichiers ajoutés (neon.py, neon_steps.py, test (37952ms)
+- 2026-10-16 10:15:37 UTC — [ticket-467] tour 1 — reviewer démarré
+- 2026-10-16 10:16:08 UTC — [ticket-467] tour 1 — reviewer terminé (31030ms)
+- 2026-10-16 10:16:08 UTC — [ticket-467] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests qui passent. Le code (31139ms)
+- 2026-10-16 10:16:08 UTC — [ticket-467] APPROVED après 1 tour(s)
+- 2026-10-16 10:20:04 UTC — [ticket-467] documentation: 2 fichier(s) (232031ms)
+- 2026-10-16 10:36:19 UTC — [ticket-469] branche ticket-469-the-dns-step-publishes-the-records-other-steps-as
+- 2026-10-16 10:36:19 UTC — [ticket-469] tour 1 — codeur démarré
+- 2026-10-16 10:39:05 UTC — [ticket-469] tour 1 — codeur terminé (165577ms)
+- 2026-10-16 10:44:17 UTC — [ticket-469] testeur: OK (exit 0)
+- 2026-10-16 10:45:28 UTC — [ticket-469] securite: PASS — Les deux nouveaux fichiers `cloudflare.py` et `cloudflare_steps.py` implémentent (71375ms)
+- 2026-10-16 10:45:28 UTC — [ticket-469] tour 1 — reviewer démarré
+- 2026-10-16 10:45:55 UTC — [ticket-469] tour 1 — reviewer terminé (26219ms)
+- 2026-10-16 10:48:37 UTC — [ticket-469] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les cas de fi (188922ms)
+- 2026-10-16 10:48:37 UTC — [ticket-469] APPROVED après 1 tour(s)
+- 2026-10-16 10:51:50 UTC — [ticket-469] documentation: 2 fichier(s) (187639ms)
+- 2026-10-16 10:52:06 UTC — [ide-core] ticket-469 PR #491 confiée au CIWatcher
+- 2026-10-16 10:52:08 UTC — [ticket-470] branche ticket-470-the-stripe-step-works-in-test-mode-unless-the-pro
+- 2026-10-16 10:52:09 UTC — [ticket-470] tour 1 — codeur démarré
+- 2026-10-16 10:56:45 UTC — [ticket-470] tour 1 — codeur terminé (276656ms)
+- 2026-10-16 10:56:46 UTC — [ide-core] ticket-469 PR #491 mergée (CI verte)
+- 2026-10-16 11:02:09 UTC — [ticket-470] testeur: OK (exit 0)
+- 2026-10-16 11:02:51 UTC — [ticket-470] securite: PASS — Aucune vulnérabilité critique ni haute gravité détectée. Le code introduit (Stri (42578ms)
+- 2026-10-16 11:02:51 UTC — [ticket-470] tour 1 — reviewer démarré
+- 2026-10-16 11:03:18 UTC — [ticket-470] tour 1 — reviewer terminé (26671ms)
+- 2026-10-16 11:08:20 UTC — [ticket-470] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code fournit un client Strip (328890ms)
+- 2026-10-16 11:08:20 UTC — [ticket-470] APPROVED après 1 tour(s)
+- 2026-10-16 11:10:06 UTC — [ticket-470] documentation: 0 fichier(s) (99390ms)

@@ -1460,6 +1460,37 @@ Renseigne d'abord `VERCEL_TOKEN` dans `.env` (portée minimale : `read` sur proj
 
 **Si le jeton manque** — l'étape s'arrête en `needs_human`, en attendant que tu renseigues `VERCEL_TOKEN`.
 
+
+Le skill `mise-en-ligne` prépare ton app pour le web : Vercel pour l'hébergement, Neon pour la base de données.
+
+Tu n'as rien à configurer — Tessera crée tout automatiquement :
+- Un projet Vercel (s'il n'existe pas)
+- Une base de données PostgreSQL (s'il n'existe pas)
+- L'URL de la base est injectée dans Vercel sous le nom `DATABASE_URL`
+
+Après, ton app peut se connecter à sa base dès son déploiement.
+
+**Le schéma de la base (tables, index, etc.), c'est à toi** — à ta première migration, avec un script SQL ou ton ORM.
+
+**Si quelque chose existe déjà** :
+- Base Neon du même nom → Tessera la réutilise (pas de recréation)
+- `DATABASE_URL` dans Vercel → Tessera saute l'étape de base de données
+- Deux bases du même nom → Erreur, à toi de nettoyer
+
+**Sans clé API Neon** :
+Configure `NEON_API_KEY` dans `.env` pour que la création soit automatique. Sans elle, tu dois copier-coller `DATABASE_URL` toi-même.
+
+
+**Enregistrements DNS (Cloudflare)**
+
+Quand tu mets un site en ligne, Vercel et Resend te demandent des enregistrements DNS. L'IDE les crée automatiquement chez Cloudflare, à condition que la zone existe déjà — l'achat du domaine et son ajout à Cloudflare restent humains.
+
+Tu n'as qu'à renseigner `CLOUDFLARE_API_TOKEN` (avec les droits d'édition sur ta zone) et à déclarer la zone dans la configuration du projet.
+
+S'il manque un enregistrement et que tu as les droits, l'IDE le crée. Si tu en as modifié un manuellement (même type et nom, contenu différent), l'IDE s'arrête et te le signale — il n'écrase jamais. Si la zone n'existe pas chez Cloudflare ou que le jeton manque, l'IDE te donne la liste de ce que tu dois créer à la main.
+
+L'IDE n'efface jamais d'enregistrement, même s'il n'en a pas besoin.
+
 ## 10. Intégration GitHub
 
 Renseigne `GITHUB_TOKEN` et `GITHUB_REPO` dans `.env` pour débloquer :

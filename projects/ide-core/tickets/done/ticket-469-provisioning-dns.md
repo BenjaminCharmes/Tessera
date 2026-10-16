@@ -5,8 +5,9 @@ depends_on:
 - ticket-465
 estimated_days: 1
 id: ticket-469
+pr_number: 491
 priority: medium
-status: todo
+status: done
 title: The DNS step publishes the records other steps asked for in the Cloudflare
   zone, never overwriting or deleting one
 type: feat

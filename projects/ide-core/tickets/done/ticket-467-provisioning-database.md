@@ -5,8 +5,9 @@ depends_on:
 - ticket-466
 estimated_days: 1
 id: ticket-467
+pr_number: 490
 priority: medium
-status: todo
+status: done
 title: The database step finds or creates the Neon project and hands its connection
   URL to Vercel without ever returning it
 type: feat
