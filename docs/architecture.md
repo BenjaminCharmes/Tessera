@@ -1822,3 +1822,25 @@ L'idempotence est garantie : un relancement immédiat ou après redémarrage ret
 
 L'étape ne supprime jamais de base, ne migre pas de schéma — c'est du ressort du projet lors de son déploiement.
 
+
+### Client Cloudflare (ticket-469)
+
+Gère les enregistrements DNS de la zone du projet. Le jeton `CLOUDFLARE_API_TOKEN` est limité à `Zone.DNS` en édition sur la seule zone du projet (ADR-053).
+
+La zone est identifiée via `online.domain` dans la configuration de mise en ligne. L'achat du domaine et son ajout à Cloudflare restent humains. Les enregistrements DNS sont publics : leur nom, type et contenu peuvent être documentés sans restriction d'accès.
+
+### Étape DNS (ticket-469)
+
+Publie dans la zone Cloudflare les enregistrements demandés par les étapes antérieures (Vercel, Resend), listés dans `ctx.wanted_dns`.
+
+**Comportement** :
+- Chaque enregistrement est créé s'il n'existe pas à l'identique (type, nom, contenu)
+- Les enregistrements identiques sont ignorés
+- Aucun enregistrement n'est jamais modifié ou supprimé (pas d'appel DELETE)
+- Deux enregistrements de même type et nom mais contenu différent déclenchent `needs_human` ; l'étape n'effectue aucune écriture
+
+**Résultats possibles** :
+- Succès : tous les enregistrements demandés existent (`ctx.dns_published = true`)
+- `needs_human` : conflit détecté (même type/nom, contenu différent)
+- `manual` : `CLOUDFLARE_API_TOKEN` absent ou `dns` non déclaré dans `online.resources` ; l'étape liste les enregistrements à ajouter manuellement
+
