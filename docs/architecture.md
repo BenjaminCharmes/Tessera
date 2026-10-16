@@ -607,6 +607,16 @@ et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas �
 
 Les fichiers cités dans les critères d'acceptation (entre backticks) sont trouvés et joints au validateur pour qu'il puisse vérifier le travail. Pour un projet déclaré `git_root: ancestor` (comme ide-core), la recherche s'étend au dépôt git qui contient le projet, pas seulement à son dossier (ticket-448). Les garde-fous restent en place : aucun chemin absolu, aucun fichier hors de la racine du dépôt. Les textes entre backticks qui contiennent une espace (p. ex. `git ls-files CLAUDE.md`) sont ignorés, ce qui évite de confondre des commandes avec des noms de fichiers.
 
+### Feedback du reviewer au codeur (ticket-474, ADR-009)
+
+Après chaque passe du reviewer, le retour au codeur comprend le verdict et une raison détaillée.
+
+**Extraction de la raison** : Le reviewer énonce son verdict seul sur sa ligne (ADR-009 — APPROVED, CHANGES_REQUESTED, etc.). La raison est le texte qui suit cette ligne ; s'il n'y a rien, la raison reste vide.
+
+**Limitation de longueur** : Le retour stocké en `run.review_feedback` est limité à 4 000 caractères (augmenté depuis 500 en ticket-474 pour capturer les objections complètes). Au-delà, le texte est suffixé par « [...] tronqué ».
+
+**Affichage dans le journal** : La ligne du pipeline affiche la première ligne non vide de la raison, pas le verdict seul. Cela permet au codeur de voir d'un coup d'œil la substance de l'objection — « interface manque un bouton » plutôt que juste « CHANGES_REQUESTED ».
+
 ## Synchronisation de la base au démarrage
 
 Au début de chaque run, avant la création de la branche, si un espace git et une branche de base sont connus et que l'arbre se trouve sur la base, l'orchestrateur appelle `sync_base_depuis_distant(base_branch)` (ticket-406). Cette fonction met les lignes de journal non commitées de côté, avance la base par `merge --ff-only` depuis le distant, puis réécrit les lignes à la suite.
