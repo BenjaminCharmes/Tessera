@@ -8,6 +8,13 @@ from pathlib import Path
 import pytest
 from collections.abc import Iterator
 
+# Avant tout import de `tessera` : `settings` se construit à l'import et lirait
+# sinon le vrai `.env`. Une variable inconnue qui y traîne (cas du ticket-487)
+# ferait échouer la collecte de toute la suite. Le fichier pointé n'existe pas.
+os.environ.setdefault(
+    "IDE_ENV_FILE", str(Path(tempfile.gettempdir()) / "tessera-tests-absent.env")
+)
+
 
 def _symlinks_available() -> bool:
     """True when this process may actually create a directory symlink.
