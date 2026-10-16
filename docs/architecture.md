@@ -1788,3 +1788,37 @@ Trois étapes coordonnées pour provisionner un projet Vercel :
 
 Idempotence garantie : rejouer le passage ne change rien si le projet, le domaine et les variables sont déjà en place. Les jetons et valeurs sensibles ne sont jamais loggés ni inclus dans les erreurs.
 
+### Client Neon (ticket-467)
+
+Le client Neon crée ou cherche un projet PostgreSQL chez Neon via l'API `https://api.neon.tech`. Localisation : `services/provisioning/neon.py`.
+
+Même discipline d'erreurs et de logs que le client Vercel. Trois opérations :
+1. **Chercher** un projet par nom (identifiant du projet)
+2. **Créer** s'il n'existe pas
+3. **Lire l'URI** de connexion et la passer à `env_writer.set_env("DATABASE_URL", …)` pour inscription dans `SecretRegistry`
+
+L'URI de connexion n'apparaît jamais dans les logs, les événements, ni dans le corps d'une `ServiceError`. Seul le statut de l'opération est rapporté.
+
+La docstring cite les pages de documentation Neon : projets, branches, URI de connexion.
+
+### Étape database (ticket-467)
+
+L'étape `database` du provisioning assure qu'un projet a une base de données PostgreSQL chez Neon et que `DATABASE_URL` est inscrit dans Vercel.
+
+Flux :
+1. Vérifier si `DATABASE_URL` existe dans Vercel
+2. Si oui → retour `skipped`, sans appel à Neon
+3. Si non, chercher un projet Neon portant le nom du projet Tessera
+4. Si trouvé → lire l'URI ; si absent → créer, puis lire l'URI
+5. Écrire `DATABASE_URL` dans Vercel → retour `done`
+
+Cas particuliers :
+- **Deux projets Neon portent le même nom** → collision détectée, rien n'est créé, retour `failed`
+- **`NEON_API_KEY` vide** (clef API non renseignée) :
+  - `DATABASE_URL` existe dans Vercel → retour `manual` (base fournie manuellement)
+  - `DATABASE_URL` n'existe pas → retour `needs_human` avec instruction d'en fournir une ou de renseigner `NEON_API_KEY`
+
+L'idempotence est garantie : un relancement immédiat ou après redémarrage retrouve la même base et ne la recrée pas.
+
+L'étape ne supprime jamais de base, ne migre pas de schéma — c'est du ressort du projet lors de son déploiement.
+
