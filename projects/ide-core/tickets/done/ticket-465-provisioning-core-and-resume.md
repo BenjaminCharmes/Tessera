@@ -5,6 +5,7 @@ depends_on:
 - ticket-464
 estimated_days: 1.5
 id: ticket-465
+pr_number: 487
 priority: high
 status: done
 title: A provisioning plan runs ordered steps, re-reads the world on every relaunch
