@@ -1,14 +1,15 @@
 ---
-id: ticket-474
-title: "The coder receives the reviewer's whole objection, and the log shows its first reason"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-474
+pr_number: null
+priority: high
+status: done
+title: The coder receives the reviewer's whole objection, and the log shows its first
+  reason
+type: fix
 ---
 
 # ticket-474 — Le codeur reçoit toute l'objection du reviewer
