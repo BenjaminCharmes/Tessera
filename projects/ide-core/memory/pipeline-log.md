@@ -3327,3 +3327,15 @@ Points posit (58359ms)
 - 2026-10-16 14:45:06 UTC — [ticket-485] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code modifié permet à l'audi (130812ms)
 - 2026-10-16 14:45:06 UTC — [ticket-485] APPROVED après 1 tour(s)
 - 2026-10-16 14:47:14 UTC — [ticket-485] documentation: 1 fichier(s) (123186ms)
+- 2026-10-16 14:47:37 UTC — [ide-core] ticket-485 PR #507 confiée au CIWatcher
+- 2026-10-16 14:47:40 UTC — [ticket-483] branche ticket-483-a-project-declares-which-variables-provisioning-g
+- 2026-10-16 14:47:41 UTC — [ticket-483] tour 1 — codeur démarré
+- 2026-10-16 14:49:29 UTC — [ticket-483] tour 1 — codeur terminé (107844ms)
+- 2026-10-16 14:51:47 UTC — [ide-core] ticket-485 PR #507 mergée (CI verte)
+- 2026-10-16 14:55:10 UTC — [ticket-483] testeur: OK (exit 0)
+- 2026-10-16 14:56:27 UTC — [ticket-483] securite: PASS — Deux problèmes de validation insuffisante détectés (MEDIUM et LOW), aucun critiq (76750ms)
+- 2026-10-16 14:56:27 UTC — [ticket-483] tour 1 — reviewer démarré
+- 2026-10-16 14:56:50 UTC — [ticket-483] tour 1 — reviewer terminé (22734ms)
+- 2026-10-16 14:58:34 UTC — [ticket-483] validateur: fichiers cités joints : aucun ; absents : https://kadoomi.com, kadoomi.com
+- 2026-10-16 14:58:34 UTC — [ticket-483] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les fonction (125687ms)
+- 2026-10-16 14:58:34 UTC — [ticket-483] APPROVED après 1 tour(s)
