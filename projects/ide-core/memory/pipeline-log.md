@@ -3195,3 +3195,15 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 10:48:37 UTC — [ticket-469] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les cas de fi (188922ms)
 - 2026-10-16 10:48:37 UTC — [ticket-469] APPROVED après 1 tour(s)
 - 2026-10-16 10:51:50 UTC — [ticket-469] documentation: 2 fichier(s) (187639ms)
+- 2026-10-16 10:52:06 UTC — [ide-core] ticket-469 PR #491 confiée au CIWatcher
+- 2026-10-16 10:52:08 UTC — [ticket-470] branche ticket-470-the-stripe-step-works-in-test-mode-unless-the-pro
+- 2026-10-16 10:52:09 UTC — [ticket-470] tour 1 — codeur démarré
+- 2026-10-16 10:56:45 UTC — [ticket-470] tour 1 — codeur terminé (276656ms)
+- 2026-10-16 10:56:46 UTC — [ide-core] ticket-469 PR #491 mergée (CI verte)
+- 2026-10-16 11:02:09 UTC — [ticket-470] testeur: OK (exit 0)
+- 2026-10-16 11:02:51 UTC — [ticket-470] securite: PASS — Aucune vulnérabilité critique ni haute gravité détectée. Le code introduit (Stri (42578ms)
+- 2026-10-16 11:02:51 UTC — [ticket-470] tour 1 — reviewer démarré
+- 2026-10-16 11:03:18 UTC — [ticket-470] tour 1 — reviewer terminé (26671ms)
+- 2026-10-16 11:08:20 UTC — [ticket-470] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code fournit un client Strip (328890ms)
+- 2026-10-16 11:08:20 UTC — [ticket-470] APPROVED après 1 tour(s)
+- 2026-10-16 11:10:06 UTC — [ticket-470] documentation: 0 fichier(s) (99390ms)

@@ -5,8 +5,9 @@ depends_on:
 - ticket-466
 estimated_days: 1.5
 id: ticket-470
+pr_number: 493
 priority: medium
-status: todo
+status: done
 title: The Stripe step works in test mode unless the project declares live, and finds
   or creates the product, price and webhook
 type: feat

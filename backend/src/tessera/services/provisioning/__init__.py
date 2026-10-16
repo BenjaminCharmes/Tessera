@@ -15,6 +15,8 @@ from tessera.services.provisioning.online_config import (
 from tessera.services.provisioning.neon import NeonClient
 from tessera.services.provisioning.neon_steps import DatabaseStep
 from tessera.services.provisioning.plan import ProvisioningPlan
+from tessera.services.provisioning.stripe_client import StripeClient
+from tessera.services.provisioning.stripe_step import StripeStep
 from tessera.services.provisioning.vercel import VercelClient, VercelEnvWriter
 from tessera.services.provisioning.vercel_steps import (
     VercelProjectStep,
@@ -45,7 +47,9 @@ __all__ = [
     "ServiceError",
     "StepResult",
     "StepState",
+    "StripeClient",
     "StripeConfig",
+    "StripeStep",
     "VercelClient",
     "VercelEnvWriter",
     "VercelProjectStep",
