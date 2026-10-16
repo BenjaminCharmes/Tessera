@@ -3479,3 +3479,7 @@ Points posit (58359ms)
 - 2026-10-18 08:02:13 UTC — [ticket-498] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une reconnai (123797ms)
 - 2026-10-18 08:02:13 UTC — [ticket-498] APPROVED après 1 tour(s)
 - 2026-10-18 08:05:08 UTC — [ticket-498] documentation: 1 fichier(s) (171202ms)
+- 2026-10-16 18:55:04 UTC — [ide-core] ticket-475 PR #510 confiée au CIWatcher
+- 2026-10-16 18:55:06 UTC — [ticket-486] branche ticket-486-the-ci-watcher-blocked-ticket-test-waits-for-its
+- 2026-10-16 18:55:06 UTC — [ticket-486] tour 1 — codeur démarré
+- 2026-10-16 18:55:08 UTC — [ticket-486] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your weekly limit · resets 3pm (Europe/Paris) (exit code: 1)

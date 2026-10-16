@@ -1,14 +1,15 @@
 ---
-id: ticket-486
-title: "The CI watcher blocked-ticket test waits for its event instead of sleeping 50 ms"
-type: test
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-16
+id: ticket-486
+pr_number: null
+priority: medium
+status: blocked
+title: The CI watcher blocked-ticket test waits for its event instead of sleeping
+  50 ms
+type: test
 ---
 
 # ticket-486 — Un test du CIWatcher attend son événement
