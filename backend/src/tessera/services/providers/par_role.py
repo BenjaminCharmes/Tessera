@@ -13,6 +13,7 @@ from tessera.services.project_loader import load_agents_config
 from tessera.services.providers import get_provider
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
+from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.repli import ProviderAvecRepli
 
 #: Ce qu'un rôle déclaré `web` reçoit en plus (ticket-245).
@@ -61,6 +62,7 @@ def provider_pour_role(
     racine_ecriture: Path | None = None,
     project_id: str | None = None,
     max_turns: int | None = None,
+    journal_refus: JournalDesRefus | None = None,
 ) -> LLMProvider:
     """Builds the provider `role` declares, wrapped in its fallback if any.
 
@@ -74,11 +76,16 @@ def provider_pour_role(
     nom = config.provider if config is not None else settings.llm_provider
     tours = max_turns if max_turns is not None else settings.llm_max_turns
     skills = config.skills if config is not None else []
+    # Transmis seulement quand il y en a un : un appel sans journal reste
+    # identique à ce qu'il était avant ticket-476.
+    journal: dict[str, JournalDesRefus] = (
+        {"journal_refus": journal_refus} if journal_refus is not None else {}
+    )
     principal = get_provider(
         nom, settings.anthropic_api_key,
         max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-        skills=skills,
+        skills=skills, **journal,
     )
     if config is None or config.fallback is None:
         return principal
@@ -86,7 +93,7 @@ def provider_pour_role(
         config.fallback.provider, settings.anthropic_api_key,
         max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-        skills=skills,
+        skills=skills, **journal,
     )
     return ProviderAvecRepli(
         principal, repli, modele_repli=config.fallback.model, role=role, project_id=project_id

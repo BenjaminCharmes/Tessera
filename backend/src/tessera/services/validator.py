@@ -77,6 +77,7 @@ class ValidatorService:
         test_result: "TestResult | None",
         project_root: Path | None = None,
         ticket_type: str | None = None,
+        refus: str = "",
     ) -> ValidationResult:
         if not criteria:
             # Un ticket de code sans critère ne peut pas être validé : rien
@@ -104,7 +105,7 @@ class ValidatorService:
 
         system_prompt = self._load_system_prompt()
         user_message, cited_files = self._build_user_message(
-            criteria, code_produced, test_result, project_root
+            criteria, code_produced, test_result, project_root, refus
         )
 
         try:
@@ -142,6 +143,7 @@ class ValidatorService:
         code_produced: str,
         test_result: "TestResult | None",
         project_root: Path | None = None,
+        refus: str = "",
     ) -> tuple[str, CitedFilesReport]:
         # Number the criteria so the LLM can return an `index`.
         criteria_block = "\n".join(
@@ -172,6 +174,8 @@ class ValidatorService:
         message = (
             f"## Critères d'acceptation\n{criteria_block}\n\n"
             f"## Code produit\n{code_produced[:_CODE_MAX_CHARS]}"
+            # Hors de la coupe : un refus tronqué avec le code ne dirait rien.
+            + refus
             + test_block
             + cited_block
         )

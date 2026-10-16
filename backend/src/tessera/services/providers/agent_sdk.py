@@ -47,6 +47,7 @@ from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
     racine_autorisee,
 )
+from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.ask_user import (
     ASK_USER_SERVER_NAME,
     ASK_USER_TOOL_NAME,
@@ -133,6 +134,7 @@ def _build_options(
     resume: str | None = None,
     skills: list[str] | None = None,
     git_bash_path: str | None = None,
+    journal_refus: JournalDesRefus | None = None,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
 
@@ -234,7 +236,9 @@ def _build_options(
                 # (ticket-085).
                 HookMatcher(
                     matcher="Write|Edit|NotebookEdit|Bash",
-                    hooks=[hook_refus_hors_perimetre(cwd, racine=racine_ecriture)],
+                    hooks=[hook_refus_hors_perimetre(
+                            cwd, racine=racine_ecriture, journal=journal_refus
+                        )],
                 ),
             ]
         },
@@ -290,7 +294,11 @@ class ClaudeAgentSDKProvider:
         skills: list[str] | None = None,
         git_bash_path: str | None = None,
         silence_max_s: float | None = None,
+        journal_refus: JournalDesRefus | None = None,
     ) -> None:
+        # Là où les refus du garde-fou s'accumulent pour le reviewer et le
+        # validateur (ticket-476). None : personne ne les lira.
+        self._journal_refus = journal_refus
         self._max_turns = max_turns
         self._skills = list(skills) if skills else []
         self._max_budget_usd = max_budget_usd
@@ -391,6 +399,7 @@ class ClaudeAgentSDKProvider:
             allowed_tools=self._allowed_tools, ask_user=ask_user,
             racine_ecriture=self.racine_ecriture, resume=resume,
             skills=self._skills, git_bash_path=self._git_bash_path,
+            journal_refus=self._journal_refus,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None

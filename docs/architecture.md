@@ -607,6 +607,24 @@ et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas �
 
 Les fichiers cités dans les critères d'acceptation (entre backticks) sont trouvés et joints au validateur pour qu'il puisse vérifier le travail. Pour un projet déclaré `git_root: ancestor` (comme ide-core), la recherche s'étend au dépôt git qui contient le projet, pas seulement à son dossier (ticket-448). Les garde-fous restent en place : aucun chemin absolu, aucun fichier hors de la racine du dépôt. Les textes entre backticks qui contiennent une espace (p. ex. `git ls-files CLAUDE.md`) sont ignorés, ce qui évite de confondre des commandes avec des noms de fichiers.
 
+## Protection des fichiers sensibles et validation pré-run
+
+Certains fichiers sont critiques pour le fonctionnement de l'IDE et ne peuvent jamais être modifiés par les agents : `CLAUDE.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/` (et `CLAUDE.local.md`).
+
+### Validation pré-run des critères impossibles
+
+Avant le premier tour, l'orchestrateur vérifie qu'aucun critère d'acceptation ne demande une modification impossible.
+
+Un critère qui cite un fichier protégé (entre backticks) **avec un verbe d'écriture** (modifier, ajouter, créer, supprimer, contient, etc.) déclenche un blocage. Le run s'arrête en statut `blocked` avant d'appeler le codeur, avec le message : « le critère N demande d'écrire `<chemin>`, que le pipeline refuse aux agents : à faire à la main ».
+
+En revanche, un critère qui cite un fichier protégé uniquement en lecture (« d'après `CLAUDE.md` ») ne bloque pas le run.
+
+### Propagation des refus du garde-fou
+
+Pendant un tour, si le garde-fou refuse une écriture sur un fichier protégé, le refus est collecté (chemin + raison) et transmis au reviewer et au validateur avec le diff, sous le titre « Écritures refusées par le garde-fou pendant ce tour ».
+
+Cela permet aux deux rôles de reconnaître une tentative que le pipeline interdit et de ne pas redemander sa correction.
+
 ## Synchronisation de la base au démarrage
 
 Au début de chaque run, avant la création de la branche, si un espace git et une branche de base sont connus et que l'arbre se trouve sur la base, l'orchestrateur appelle `sync_base_depuis_distant(base_branch)` (ticket-406). Cette fonction met les lignes de journal non commitées de côté, avance la base par `merge --ff-only` depuis le distant, puis réécrit les lignes à la suite.
