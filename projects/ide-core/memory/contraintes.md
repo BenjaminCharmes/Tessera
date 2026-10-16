@@ -12,7 +12,8 @@ son ADR source. La justification et l'histoire complète vivent dans
   bloque `Write`, `Edit`, `NotebookEdit` et les redirections Bash simples
   (`>`, `>>`, `tee`) vers tout chemin hors du dossier du projet — ou du
   dépôt ancêtre pour les projets qui déclarent `git_root: ancestor`.
-  Lire hors du projet reste permis. (ADR-031)
+  Lire hors du projet reste permis, sauf le `.env` de Tessera. (ADR-031,
+  ADR-053)
 - **Ne jamais émettre une commande git ou `gh` en écriture.** Le hook
   `PreToolUse` refuse toute tournure — chemin, casse, enveloppe, alias.
   Le git en lecture reste permis. `agents.json`, `.git/`,
@@ -116,6 +117,10 @@ son ADR source. La justification et l'histoire complète vivent dans
 - **Avant tout push, vérifier le diff ajouté, les messages de commit et
   les auteurs contre `FORBIDDEN_TERMS`.** Un projet déclare
   `"confidentiality": "professional"` pour s'exempter. (ADR-048)
+- **Un jeton de service en ligne (Vercel, Stripe, Resend, Cloudflare) ne
+  quitte pas le `.env` de Tessera.** Un agent ne le reçoit pas, ne lit pas ce
+  fichier et ne crée aucune ressource en ligne : seule une action de
+  l'utilisateur le fait. (ADR-053)
 - **Les termes interdits sont arrêtés à trois portes :** push pipeline,
   hook `pre-push`, CI sur chaque PR. Une porte qui ne peut pas juger
   refuse. (ADR-050)
