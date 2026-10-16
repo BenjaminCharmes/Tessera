@@ -27,3 +27,10 @@ comme référence.
   (`memory/design.md`, `@theme` de `index.css`). Aucune valeur en dur n'entre
   dans le code.
 - **Les textes d'exemple sont des données**, pas du contenu à recopier.
+
+## Écrans par fonction
+
+- **Mettre en ligne** (ticket-472) : `MettreEnLigne-Carte.dc.html` (bouton sur
+  la carte et confirmation), `MettreEnLigne-Deroule.dc.html` (étapes et leurs
+  sept états), `MettreEnLigne-Detail.dc.html` (enregistrements DNS, clé à créer,
+  Relancer) — https://claude.ai/artifact/7eKZunqERW8gtL3oNS6DzT
