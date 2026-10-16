@@ -1799,6 +1799,15 @@ Trois étapes coordonnées pour provisionner un projet Vercel :
 
 Idempotence garantie : rejouer le passage ne change rien si le projet, le domaine et les variables sont déjà en place. Les jetons et valeurs sensibles ne sont jamais loggés ni inclus dans les erreurs.
 
+### Étapes Resend (ticket-468)
+
+Deux étapes de configuration du domaine d'envoi dans l'API Resend, servant à la livraison des e-mails transactionnels.
+
+**`resend_domain`** : cherche ou crée un domaine d'envoi dans Resend. À la création, l'API retourne ses enregistrements DNS (DKIM, SPF, DMARC) que l'étape range dans `ctx.wanted_dns` pour que le DNS soit publié avant vérification. Crée aussi une clé d'API limitée au domaine seul, nommée d'après le projet, et l'écrit dans Vercel sous `RESEND_API_KEY`. Idempotente : un domaine existant n'est pas recréé. Cas particulier : si une clé existe sans variable Vercel, l'étape rend `needs_human`, nomme la clé à supprimer, et n'émet aucun appel de suppression.
+
+**`resend_verify`** : après publication du DNS, lance la vérification du domaine (`POST /domains/{id}/verify`). N'agit que si `ctx.dns_published` est vrai. Les statuts du domaine rendent : `verified` → `done`, en attente → `pending`, `failed` → `failed`.
+
+L'ordre global est : domaine créé et enregistrements récupérés, DNS publié (ticket-469), puis vérification lancée. Dépend de ticket-466 (Vercel) et ticket-469 (DNS).
 ### Client Neon (ticket-467)
 
 Le client Neon crée ou cherche un projet PostgreSQL chez Neon via l'API `https://api.neon.tech`. Localisation : `services/provisioning/neon.py`.

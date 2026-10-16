@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-468
 priority: medium
-status: todo
+status: done
 title: The Resend steps find or create the sending domain and a dedicated key, then
   verify the domain once its DNS records are published
 type: feat
