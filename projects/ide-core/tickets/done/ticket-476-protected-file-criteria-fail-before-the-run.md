@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-476
 plan: true
-pr_number: null
+pr_number: 497
 priority: high
 status: done
 title: A criterion that needs a protected file stops the run before it starts, and
