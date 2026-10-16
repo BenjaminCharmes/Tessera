@@ -5,7 +5,9 @@ ever deleted, and a variable that exists is never rewritten (a ``sensitive``
 one cannot be read back, so its value is unknown).
 """
 import secrets
+from typing import Optional
 
+from tessera.services.provisioning.errors import ServiceError
 from tessera.services.provisioning.steps import (
     ProvisioningContext,
     StepResult,
@@ -24,10 +26,22 @@ _logger = get_logger(__name__)
 
 APP_URL_VARIABLE = f"{PUBLIC_PREFIX}APP_URL"
 GENERATED_VARIABLES: tuple[str, ...] = ("SESSION_SECRET", "CRON_SECRET")
+#: Code d'erreur de Vercel quand son application GitHub ne voit pas le dépôt.
+REPO_NOT_FOUND = "repo_not_found"
 
 _NO_TOKEN = StepResult(
     StepState.NEEDS_HUMAN, "VERCEL_TOKEN is not set in the Tessera .env; nothing was sent"
 )
+
+
+def _repo_access_missing(repo: Optional[str]) -> StepResult:
+    """Tell the user how to give Vercel's GitHub application access to the repository."""
+    cible = repo or "du projet"
+    return StepResult(
+        StepState.NEEDS_HUMAN,
+        f"Vercel n'a pas accès au dépôt {cible} : installe l'application GitHub "
+        "de Vercel (github.com/apps/vercel) sur ce dépôt, puis relance",
+    )
 
 
 class VercelProjectStep:
@@ -58,7 +72,12 @@ class VercelProjectStep:
         nom = vercel_name(ctx.project_id)
         faits: list[str] = []
         if await self._client.get_project(nom) is None:
-            await self._client.create_project(nom, ctx.github_remote)
+            try:
+                await self._client.create_project(nom, ctx.github_remote)
+            except ServiceError as erreur:
+                if erreur.code != REPO_NOT_FOUND:
+                    raise
+                return _repo_access_missing(ctx.github_remote)
             faits.append("project created")
         domaine = await self._client.get_domain(nom, ctx.online.domain)
         if domaine is None:

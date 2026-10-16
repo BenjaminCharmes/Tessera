@@ -338,8 +338,29 @@ def test_both_routes_require_the_bearer_token_when_static_token_is_set(
 
 
 def _names(resources: list[str]) -> list[str]:
-    online = OnlineConfig.model_validate({"domain": "example.com", "resources": resources})
+    bloc: dict[str, object] = {"domain": "example.com", "resources": resources}
+    if "stripe" in resources:
+        bloc["stripe"] = {"webhook_path": "/api/stripe", "events": ["checkout.session.completed"]}
+    online = OnlineConfig.model_validate(bloc)
     return [step.name for step in build_setup("mon-projet", online, "me/repo").steps]
+
+
+def test_plan_with_resend_and_stripe_follows_the_declared_order() -> None:
+    assert _names(["vercel", "database", "resend", "dns", "stripe"]) == [
+        "vercel_project",
+        "database",
+        "variables",
+        "resend_domain",
+        "stripe",
+        "dns",
+        "resend_verify",
+        "redeploy",
+    ]
+
+
+def test_plan_without_resend_nor_stripe_has_neither_step() -> None:
+    noms = _names(["vercel", "database", "dns"])
+    assert not any(nom.startswith("resend") or nom == "stripe" for nom in noms)
 
 
 def test_plan_follows_the_dependency_order() -> None:

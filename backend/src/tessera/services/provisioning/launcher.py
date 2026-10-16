@@ -18,7 +18,11 @@ from tessera.services.provisioning.neon import NeonClient
 from tessera.services.provisioning.neon_steps import DatabaseStep
 from tessera.services.provisioning.online_config import OnlineConfig
 from tessera.services.provisioning.plan import ProvisioningPlan
+from tessera.services.provisioning.resend import ResendClient
+from tessera.services.provisioning.resend_steps import ResendDomainStep, ResendVerifyStep
 from tessera.services.provisioning.steps import ProvisioningContext, ProvisioningStep
+from tessera.services.provisioning.stripe_client import StripeClient
+from tessera.services.provisioning.stripe_step import StripeStep
 from tessera.services.provisioning.vercel import VercelClient, VercelEnvWriter
 from tessera.services.provisioning.vercel_steps import (
     VercelProjectStep,
@@ -74,17 +78,7 @@ class ProvisioningSetup:
 SetupFactory = Callable[[str, OnlineConfig, Optional[str]], ProvisioningSetup]
 
 
-def build_setup(
-    project_id: str, online: OnlineConfig, github_remote: Optional[str]
-) -> ProvisioningSetup:
-    """Build the ordered steps from ``online.resources`` and the Tessera tokens.
-
-    The order is the dependency order: the Vercel project first (the variables
-    live in it), then the database that writes ``DATABASE_URL`` there, then the
-    app variables, then DNS — after every step that asks for a record — and the
-    redeploy last, once every variable of the run is written.
-    """
-    vercel = VercelClient.from_settings(settings)
+def _build_steps(online: OnlineConfig, vercel: VercelClient) -> list[ProvisioningStep]:
     steps: list[ProvisioningStep] = []
     if online.wants("vercel"):
         steps.append(VercelProjectStep(vercel))
@@ -92,9 +86,33 @@ def build_setup(
         steps.append(DatabaseStep(NeonClient.from_settings(settings)))
     if online.wants("vercel"):
         steps.append(VercelVariablesStep(vercel))
+    resend = ResendClient.from_settings(settings) if online.wants("resend") else None
+    if resend is not None:
+        steps.append(ResendDomainStep(resend))
+    if online.wants("stripe"):
+        steps.append(StripeStep(StripeClient.from_settings(settings)))
     steps.append(DnsStep(CloudflareClient.from_settings(settings)))
+    if resend is not None:
+        steps.append(ResendVerifyStep(resend))
     if online.wants("vercel"):
         steps.append(VercelRedeployStep(vercel))
+    return steps
+
+
+def build_setup(
+    project_id: str, online: OnlineConfig, github_remote: Optional[str]
+) -> ProvisioningSetup:
+    """Build the ordered steps from ``online.resources`` and the Tessera tokens.
+
+    The order is the dependency order: the Vercel project first (the variables
+    live in it), then the database that writes ``DATABASE_URL`` there, then the
+    app variables, then the Resend domain and Stripe (both ask for records or
+    write variables), then DNS — after every step that asks for a record — the
+    Resend verification once the records exist, and the redeploy last, once
+    every variable of the run is written.
+    """
+    vercel = VercelClient.from_settings(settings)
+    steps = _build_steps(online, vercel)
     context = ProvisioningContext(
         project_id=project_id,
         online=online,
