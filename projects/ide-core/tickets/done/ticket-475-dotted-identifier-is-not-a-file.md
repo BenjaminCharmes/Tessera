@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 0.25
 id: ticket-475
-pr_number: null
+pr_number: 510
 priority: medium
 status: done
 title: A dotted identifier in a criterion is not taken for a cited file
