@@ -75,6 +75,9 @@ class EventType(str, Enum):
     #: question en cours, « deposited » si elle a été déposée en boîte aux
     #: lettres faute de question en attente.
     ANSWER_ACK = "answer_ack"
+    #: Une étape de la mise en ligne a rendu son état (ticket-465). Ne porte
+    #: que le nom de l'étape, son état et un détail sans secret (ADR-053).
+    PROVISIONING_STEP = "provisioning_step"
 
 
 class OrchestratorEvent(BaseModel):
