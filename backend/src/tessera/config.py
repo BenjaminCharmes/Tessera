@@ -3,8 +3,10 @@ import sys
 from pathlib import Path
 from typing import ClassVar
 
-from pydantic import SecretStr
+from pydantic import SecretStr, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from tessera.config_errors import ConfigurationError, describe_validation_error
 
 # Racine du dépôt : backend/src/tessera/config.py -> remonter de 4 niveaux.
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -14,6 +16,12 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 # `backend/`. Un réglage pourtant présent dans `.env` était donc
 # silencieusement ignoré — même classe de bug que ticket-050.
 _ENV_FILE = str(_REPO_ROOT / ".env")
+
+# Fichier réellement lu par `Settings`. `IDE_ENV_FILE` le remplace : la suite de
+# tests le pointe vers un fichier absent, pour qu'une variable égarée dans le
+# `.env` du développeur ne fasse pas échouer toute la collecte. `_ENV_FILE`
+# reste le vrai `.env`, celui que le hook de lecture protège (ADR-053).
+_SETTINGS_ENV_FILE = os.environ.get("IDE_ENV_FILE") or _ENV_FILE
 
 # Les jetons de mise en ligne (ADR-053) : noms des champs de `Settings`. La
 # variable d'environnement est le même nom en majuscules. `VERCEL_TEAM_ID`
@@ -37,7 +45,11 @@ def default_state_dir() -> Path:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=_ENV_FILE, env_file_encoding="utf-8")
+    # `hide_input_in_errors` : pydantic recopie sinon la valeur fautive dans le
+    # message (`input_value='sk_test_…'`), donc un jeton dans les logs.
+    model_config = SettingsConfigDict(
+        env_file=_SETTINGS_ENV_FILE, env_file_encoding="utf-8", hide_input_in_errors=True
+    )
 
     # Le `.env` de Tessera, que le hook de lecture refuse aux agents (ADR-053).
     env_file: ClassVar[Path] = Path(_ENV_FILE)
@@ -176,4 +188,21 @@ class Settings(BaseSettings):
         return [valeur for valeur in valeurs if valeur]
 
 
-settings = Settings()
+def load_settings(env_file: Path | None = None) -> Settings:
+    """Build the settings, turning a validation error into a value-free one.
+
+    `env_file` replaces the default `.env`; it exists for tests.
+    """
+    try:
+        if env_file is None:
+            return Settings()
+        # `_env_file` est un argument d'init de pydantic-settings que le plugin
+        # mypy du projet ne connaît pas.
+        return Settings(_env_file=env_file)  # type: ignore[call-arg]
+    except ValidationError as error:
+        # `from None` : l'exception d'origine ne doit pas réapparaître dans la
+        # trace chaînée.
+        raise ConfigurationError(describe_validation_error(error)) from None
+
+
+settings = load_settings()
