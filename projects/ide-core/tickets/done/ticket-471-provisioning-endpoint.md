@@ -5,8 +5,9 @@ depends_on:
 - ticket-465
 estimated_days: 1
 id: ticket-471
+pr_number: 494
 priority: medium
-status: todo
+status: done
 title: A project is put online by an explicit request, and its per-step state can
   be read without writing anything
 type: feat

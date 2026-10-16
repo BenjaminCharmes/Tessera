@@ -3207,3 +3207,17 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 11:08:20 UTC — [ticket-470] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code fournit un client Strip (328890ms)
 - 2026-10-16 11:08:20 UTC — [ticket-470] APPROVED après 1 tour(s)
 - 2026-10-16 11:10:06 UTC — [ticket-470] documentation: 0 fichier(s) (99390ms)
+- 2026-10-16 11:10:21 UTC — [ide-core] ticket-470 PR #493 confiée au CIWatcher
+- 2026-10-16 11:10:23 UTC — [ticket-471] branche ticket-471-a-project-is-put-online-by-an-explicit-request-an
+- 2026-10-16 11:10:24 UTC — [ticket-471] tour 1 — codeur démarré
+- 2026-10-16 11:13:58 UTC — [ticket-471] tour 1 — codeur terminé (214452ms)
+- 2026-10-16 11:15:00 UTC — [ide-core] ticket-470 PR #493 mergée (CI verte)
+- 2026-10-16 11:19:58 UTC — [ticket-471] testeur: OK (exit 0)
+- 2026-10-16 11:20:56 UTC — [ticket-471] securite: PASS — Audit complet : aucune vulnérabilité OWASP Top 10 ou CVE détectée.
+
+Points posit (58359ms)
+- 2026-10-16 11:20:56 UTC — [ticket-471] tour 1 — reviewer démarré
+- 2026-10-16 11:21:32 UTC — [ticket-471] tour 1 — reviewer terminé (35578ms)
+- 2026-10-16 11:25:16 UTC — [ticket-471] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (259265ms)
+- 2026-10-16 11:25:16 UTC — [ticket-471] APPROVED après 1 tour(s)
+- 2026-10-16 11:27:23 UTC — [ticket-471] documentation: 2 fichier(s) (120358ms)

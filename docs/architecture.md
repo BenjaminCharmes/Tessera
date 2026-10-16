@@ -1738,6 +1738,17 @@ Chaque étape émet `provisioning_step` (`nom`, `etat` : `done`, `skipped`,
 verrou par projet, distinct de `RunLock` (la mise en ligne ne touche pas à
 l'arbre), refuse une seconde mise en ligne simultanée avec un 409.
 
+### Endpoints de provisioning
+
+Les deux points d'entrée HTTP du plan :
+
+- **`POST /api/v1/projects/{project_id}/provision`** : déclenche le plan en tâche de fond. Répond `202` sans attendre. Le plan s'observe sur `WS /api/v1/orchestrator/observe` (ADR-041). L'authentification exige `STATIC_TOKEN` si elle est renseignée.
+- **`GET /api/v1/projects/{project_id}/provision`** : lit l'état du plan via `dry_run=True` — chaque étape appelle `inspect`, aucune `apply`. Utile pour vérifier l'état sans risque.
+
+Le verrou de mise en ligne est distinct de `RunLock` : le même projet ne peut pas lancer deux provisioning en même temps. Une étape qui lève une exception libère le verrou et devient un événement `failed`. La réponse HTTP ne porte aucune trace d'appel ni de jeton (ADR-053).
+
+Aucun module du pipeline (routers, services d'orchestration), du chat ni des agents n'importe `services.provisioning` : le provisioning reste isolé et utile seulement à l'utilisateur.
+
 ### Moteur de provisioning (ticket-465)
 
 Package `services/provisioning/` : orchestrateur des étapes de mise en ligne, exécutées dans l'ordre déclaré dans le bloc `online` d'`agents.json`.

@@ -199,6 +199,36 @@ la file ; avec celui d'un ticket de la file, ceux de ce ticket seul.
 | `GET` | `/api/v1/services/running` | List Running Services |
 | `POST` | `/api/v1/services/running/{pid}/stop` | Stop Service |
 
+### Provisioning
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `POST` | `/api/v1/projects/{project_id}/provision` | Start Provision Plan |
+| `GET` | `/api/v1/projects/{project_id}/provision` | Get Provision Status |
+
+#### `POST /api/v1/projects/{project_id}/provision`
+
+Lance le plan de mise en ligne du projet. Réponse `202` : le plan s'exécute en tâche de fond.
+
+Erreurs :
+- `404` : projet inconnu
+- `409` : une mise en ligne du projet est déjà en cours
+- `422` : le projet n'a pas de bloc `online` dans sa configuration
+
+Authentification : si `STATIC_TOKEN` est renseigné, exige `Authorization: Bearer <token>`.
+
+#### `GET /api/v1/projects/{project_id}/provision`
+
+Lit l'état du plan de mise en ligne sans rien modifier. Chaque étape est inspectée (`dry_run=True`), jamais appliquée.
+
+Réponse : liste des étapes avec leur état (`pending`, `running`, `done`, `failed`) et détails.
+
+Erreurs :
+- `404` : projet inconnu
+- `422` : le projet n'a pas de bloc `online`
+
+Authentification : si `STATIC_TOKEN` est renseigné, exige `Authorization: Bearer <token>`.
+
 ### Fichiers
 
 | Méthode | Endpoint | Description |
