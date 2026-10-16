@@ -3,6 +3,8 @@
 The world (the services themselves) is the source of truth: nothing is stored
 locally, a relaunch reads every service again and only creates what is missing.
 """
+from tessera.services.provisioning.cloudflare import CloudflareClient
+from tessera.services.provisioning.cloudflare_steps import DnsStep
 from tessera.services.provisioning.errors import ServiceError
 from tessera.services.provisioning.online_config import (
     OnlineConfig,
@@ -29,8 +31,10 @@ from tessera.services.provisioning.steps import (
 )
 
 __all__ = [
+    "CloudflareClient",
     "DatabaseStep",
     "DnsRecord",
+    "DnsStep",
     "EnvWriter",
     "NeonClient",
     "OnlineConfig",
