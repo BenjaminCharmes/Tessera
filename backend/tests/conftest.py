@@ -114,6 +114,31 @@ def _aucun_terme_interdit_de_la_machine(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
 
 
+@pytest.fixture(autouse=True)
+def _aucun_jeton_de_mise_en_ligne_de_la_machine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Iterator[None]:
+    """Neither the real tokens nor a registered secret leak between tests (ADR-053).
+
+    Les jetons de `.env` alimentent le registre des secrets et le contrôle de
+    push : sans cette fixture, un test passerait ou échouerait selon la machine.
+    """
+    from pydantic import SecretStr
+
+    from tessera.config import CHAMPS_JETONS, VARIABLES_JETONS, settings
+    from tessera.utils.secrets import SECRETS
+
+    for champ in CHAMPS_JETONS:
+        monkeypatch.setattr(settings, champ, SecretStr(""))
+    for variable in VARIABLES_JETONS:
+        monkeypatch.delenv(variable, raising=False)
+    avant = SECRETS.valeurs()
+    SECRETS.clear()
+    yield
+    SECRETS.clear()
+    SECRETS.register_all(avant)
+
+
 @pytest.fixture(scope="session")
 def _modele_de_base(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Schéma de la base, créé une seule fois pour toute la suite."""

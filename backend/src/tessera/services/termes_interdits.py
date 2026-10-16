@@ -87,6 +87,7 @@ class TermesInterditsService:
         # l'environnement : lire `os.environ` seul laissait le service inactif
         # en production. Une variable d'environnement explicite garde la main.
         from tessera.config import settings
+        from tessera.utils.secrets import SECRETS
 
         raw = os.environ.get("FORBIDDEN_TERMS") or settings.forbidden_terms
         self._termes: list[str] = [
@@ -97,11 +98,20 @@ class TermesInterditsService:
             re.compile(r"\b" + re.escape(terme) + r"\b")
             for terme in self._termes
         ]
+        # Les jetons de mise en ligne configurés, et tout secret reçu d'une API
+        # pendant l'exécution, sont des termes interdits (ADR-053). Sans bornes
+        # de mot : un secret collé à d'autres caractères reste un secret.
+        secrets = {*settings.valeurs_des_jetons(), *SECRETS.valeurs()}
+        self._patterns += [
+            re.compile(re.escape(_normaliser(secret)))
+            for secret in sorted(secrets)
+            if _normaliser(secret).strip()
+        ]
 
     @property
     def actif(self) -> bool:
-        """False quand FORBIDDEN_TERMS est vide ou absent."""
-        return bool(self._termes)
+        """False quand ni FORBIDDEN_TERMS ni un jeton configuré n'existe."""
+        return bool(self._patterns)
 
     def _contient_terme(self, texte: str) -> bool:
         normalise = _normaliser(texte)
@@ -123,7 +133,7 @@ class TermesInterditsService:
         Une seule violation par fichier et par commit : l'objectif est de
         bloquer, pas d'inventorier.
         """
-        if not self._termes:
+        if not self._patterns:
             return []
 
         violations: list[ViolationTerme] = []
