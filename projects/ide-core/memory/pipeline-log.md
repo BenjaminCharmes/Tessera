@@ -3185,3 +3185,12 @@ Le diff ajoute deux tests unitaires et cinq fich (12640ms)
 - 2026-10-16 10:16:08 UTC — [ticket-467] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests qui passent. Le code (31139ms)
 - 2026-10-16 10:16:08 UTC — [ticket-467] APPROVED après 1 tour(s)
 - 2026-10-16 10:20:04 UTC — [ticket-467] documentation: 2 fichier(s) (232031ms)
+- 2026-10-16 10:36:19 UTC — [ticket-469] branche ticket-469-the-dns-step-publishes-the-records-other-steps-as
+- 2026-10-16 10:36:19 UTC — [ticket-469] tour 1 — codeur démarré
+- 2026-10-16 10:39:05 UTC — [ticket-469] tour 1 — codeur terminé (165577ms)
+- 2026-10-16 10:44:17 UTC — [ticket-469] testeur: OK (exit 0)
+- 2026-10-16 10:45:28 UTC — [ticket-469] securite: PASS — Les deux nouveaux fichiers `cloudflare.py` et `cloudflare_steps.py` implémentent (71375ms)
+- 2026-10-16 10:45:28 UTC — [ticket-469] tour 1 — reviewer démarré
+- 2026-10-16 10:45:55 UTC — [ticket-469] tour 1 — reviewer terminé (26219ms)
+- 2026-10-16 10:48:37 UTC — [ticket-469] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les cas de fi (188922ms)
+- 2026-10-16 10:48:37 UTC — [ticket-469] APPROVED après 1 tour(s)
