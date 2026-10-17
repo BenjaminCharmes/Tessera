@@ -10,6 +10,7 @@ from pathlib import Path
 from tessera.services.commande_chainee import decouper
 from tessera.services.erreur_de_sortie import detail_avec_erreur
 from tessera.services.lancement import essais_de_commande
+from tessera.services.outil_introuvable import outil_introuvable
 from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
 from tessera.utils.logger import get_logger
 
@@ -242,6 +243,9 @@ class TestRunnerService:
                 result = _parse_failed_step(
                     etapes[-1], sorties[-1].strip(), duration_ms, len(etapes_args) > 1
                 )
+                outil = outil_introuvable(sorties[-1], dossier, project_path)
+                if outil:
+                    _marquer_panne_d_environnement(result, etapes[-1], outil)
             else:
                 result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
             result.etapes = etapes
@@ -316,6 +320,26 @@ class TestRunnerService:
         stdout = stdout_bytes.decode("utf-8", errors="replace")
         stderr = stderr_bytes.decode("utf-8", errors="replace")
         return proc.returncode or 0, (stdout + "\n" + stderr).strip()
+
+
+def _marquer_panne_d_environnement(
+    result: TestResult, etape: EtapeTest, outil: str
+) -> None:
+    """Turn a red step into an environment failure: the tool, not the code, is missing.
+
+    Le détail de l'échec reste : c'est la sortie qui prouve le diagnostic
+    (ticket-496).
+    """
+    _logger.warning(
+        "test_runner_outil_introuvable", extra={"outil": outil, "etape": etape.commande}
+    )
+    result.demarree = False
+    result.output_summary = (
+        f"étape `{etape.commande}` — panne d'environnement : outil `{outil}` "
+        "introuvable. Réinstaller les dépendances du projet. "
+        "Ce n'est pas un test en échec."
+    )
+    result.errors = [result.output_summary]
 
 
 def _parse_failed_step(
