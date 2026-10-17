@@ -3409,3 +3409,17 @@ Points posit (58359ms)
 - 2026-10-17 12:13:48 UTC — [ticket-496] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le code reconnaît (151859ms)
 - 2026-10-17 12:13:48 UTC — [ticket-496] APPROVED après 1 tour(s)
 - 2026-10-17 12:15:49 UTC — [ticket-496] documentation: 2 fichier(s) (114265ms)
+- 2026-10-17 12:24:16 UTC — [ide-core] ticket-496 PR #517 mergée (CI verte)
+- 2026-10-17 18:16:11 UTC — [ticket-499] branche ticket-499-neon-calls-carry-the-organization-id-so-provision
+- 2026-10-17 18:16:12 UTC — [ticket-499] tour 1 — codeur démarré
+- 2026-10-17 18:18:24 UTC — [ticket-499] tour 1 — codeur terminé (132593ms)
+- 2026-10-17 18:23:05 UTC — [ticket-499] testeur: 1 failed, 1225 passed, 28 warnings in 278.31s (0:04:38)
+- 2026-10-17 18:23:05 UTC — [ticket-499] tests rouges au tour 1
+- 2026-10-17 18:23:05 UTC — [ticket-499] tour 2 — codeur démarré
+- 2026-10-17 18:23:59 UTC — [ticket-499] tour 2 — codeur terminé (54235ms)
+- 2026-10-17 18:30:57 UTC — [ticket-499] testeur: OK (exit 0)
+- 2026-10-17 18:33:27 UTC — [ticket-499] securite: PASS — **No vulnerabilities detected.** This diff introduces security improvements for  (150156ms)
+- 2026-10-17 18:33:27 UTC — [ticket-499] tour 2 — reviewer démarré
+- 2026-10-17 18:34:00 UTC — [ticket-499] tour 2 — reviewer terminé (32969ms)
+- 2026-10-17 18:34:01 UTC — [ticket-499] validateur: APPROVED — Tous les critères sont satisfaits. Le nouveau fichier `test_provisioning_neon_or (33750ms)
+- 2026-10-17 18:34:01 UTC — [ticket-499] APPROVED après 2 tour(s)
