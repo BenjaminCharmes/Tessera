@@ -1,14 +1,14 @@
 ---
-id: ticket-475
-title: "A dotted identifier in a criterion is not taken for a cited file"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-16
+id: ticket-475
+pr_number: 510
+priority: medium
+status: done
+title: A dotted identifier in a criterion is not taken for a cited file
+type: fix
 ---
 
 # ticket-475 — Un identifiant pointé n'est pas un fichier cité

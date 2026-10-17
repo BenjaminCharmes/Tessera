@@ -12,6 +12,7 @@ from pathlib import Path
 
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.validator_binary import is_binary_file
+from tessera.services.validator_file_extensions import looks_like_file
 
 # Max size of the cited-files section -- all entries combined.
 # Beyond this the current file is truncated (ticket-316).
@@ -23,8 +24,6 @@ _EXCLUDED_DIRS = {".venv", "node_modules", ".git", "__pycache__", "dist", "build
 _BACKTICK_REF = re.compile(r"`([^`\n]+)`")
 # Trailing line-number suffix, e.g. ":44" in "BillingTab.test.tsx:44".
 _LINE_SUFFIX = re.compile(r":\d+$")
-# Recognised file extension (1-6 letters).
-_FILE_EXTENSION = re.compile(r"\.[a-zA-Z]{1,6}$")
 
 
 @dataclass
@@ -47,8 +46,10 @@ class CitedFilesReport:
 def extract_file_refs(criteria: list[str]) -> list[str]:
     """Extract file references from acceptance criteria.
 
-    Picks up any backtick-quoted token that looks like a file path (has an
-    extension), after stripping a trailing ``:N`` line-number suffix.
+    Picks up any backtick-quoted token that looks like a file path (contains
+    a ``/`` or ends with a known file extension), after stripping a trailing
+    ``:N`` line-number suffix. A dotted identifier (``BRAND.name``) is not a
+    file.
     A token containing a space is a command (``git ls-files CLAUDE.md``),
     not a file name, and is ignored.
     Preserves insertion order and deduplicates.
@@ -60,10 +61,9 @@ def extract_file_refs(criteria: list[str]) -> list[str]:
             candidate = _LINE_SUFFIX.sub("", m.group(1).strip())
             if " " in candidate:
                 continue
-            if _FILE_EXTENSION.search(candidate):
-                if candidate not in seen:
-                    seen.add(candidate)
-                    refs.append(candidate)
+            if looks_like_file(candidate) and candidate not in seen:
+                seen.add(candidate)
+                refs.append(candidate)
     return refs
 
 

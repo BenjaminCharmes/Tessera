@@ -579,6 +579,8 @@ Si tu omets cette section, le pipeline refuse le ticket — le message te demand
 
 Chaque critère se note en ligne séparée pour que le validateur puisse les vérifier un par un :
 
+Quand tu cites des fichiers entre backticks dans tes critères d'acceptation, l'IDE les cherche pour confirmer qu'ils existent. Un chemin comme `src/Button.tsx` ou une extension reconnue (`button.tsx`) sont vérifiés. Un nom de propriété comme `BRAND.name` ou `settings.github_token` n'est pas un fichier et n'est pas cherché — l'IDE l'ignore.
+
 ### Fichiers qu'un agent ne peut pas modifier
 
 Certains fichiers définissent le projet lui-même et restent hors d'atteinte des agents : `CLAUDE.md`, `CLAUDE.local.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/`.
