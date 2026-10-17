@@ -25,9 +25,15 @@ _URI = f"postgresql://owner:{_PASSWORD}@ep-demo.neon.tech/neondb?sslmode=require
 class FakeNeon:
     """A minimal Neon: projects by name, every request recorded."""
 
-    def __init__(self, projects: tuple[str, ...] = (), uri_on_create: bool = True) -> None:
+    def __init__(
+        self,
+        projects: tuple[str, ...] = (),
+        uri_on_create: bool = True,
+        orgs: tuple[str, ...] = (),
+    ) -> None:
         self.projects = {f"prj_{i}": name for i, name in enumerate(projects)}
         self.uri_on_create = uri_on_create
+        self.orgs = orgs
         self.requests: list[httpx.Request] = []
 
     def calls(self, method: str, path: str) -> list[httpx.Request]:
@@ -36,6 +42,8 @@ class FakeNeon:
     def __call__(self, request: httpx.Request) -> httpx.Response:
         self.requests.append(request)
         path = request.url.path.removeprefix("/api/v2")
+        if request.method == "GET" and path == "/users/me/organizations":
+            return httpx.Response(200, json={"organizations": [{"id": o} for o in self.orgs]})
         if request.method == "GET" and path == "/projects":
             needle = request.url.params["search"]
             found = [{"id": i, "name": n} for i, n in self.projects.items() if needle in n]
@@ -77,8 +85,8 @@ class FakeEnv:
         self.writes.append(name)
 
 
-def _client(fake: FakeNeon, key: str = _KEY) -> NeonClient:
-    return NeonClient(key, httpx.MockTransport(fake))
+def _client(fake: FakeNeon, key: str = _KEY, org_id: str = "") -> NeonClient:
+    return NeonClient(key, httpx.MockTransport(fake), org_id)
 
 
 def _ctx(env: FakeEnv) -> ProvisioningContext:
@@ -165,7 +173,7 @@ async def test_without_key_the_step_needs_a_human_with_the_instruction() -> None
 
 
 async def test_service_error_does_not_repeat_the_uri_from_a_response_body() -> None:
-    echo = f"cannot use {_URI} with {_PASSWORD}"
+    echo = f"cannot use {_URI} with key {_KEY}"
 
     def refuse(request: httpx.Request) -> httpx.Response:
         return httpx.Response(422, json={"code": "invalid", "message": echo})
@@ -174,7 +182,8 @@ async def test_service_error_does_not_repeat_the_uri_from_a_response_body() -> N
     with pytest.raises(ServiceError) as erreur:
         await client.connection_uri("prj_0")
     texte = str(erreur.value) + repr(erreur.value.args)
-    assert "HTTP 422" in texte and _PASSWORD not in texte and _KEY not in texte
+    assert "HTTP 422" in texte and "cannot use" in texte
+    assert _PASSWORD not in texte and _URI not in texte and _KEY not in texte
 
 
 async def test_network_failure_becomes_a_service_error_without_detail() -> None:

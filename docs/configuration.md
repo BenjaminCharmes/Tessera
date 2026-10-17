@@ -34,6 +34,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `VERCEL_TOKEN` | | `""` | Jeton Vercel pour déployer. Portée minimale : `read` sur les projects, `write` sur les deployments. À définir avec une date d'expiration. |
 | `VERCEL_TEAM_ID` | | `""` | Identifiant du team Vercel (trouvé dans les settings du team). Utilisé par le client Vercel pour créer ou chercher des projets. |
 | `NEON_API_KEY` | | `""` | Clef API Neon pour les migrations de base. Portée minimale : `read_only` sur les branches. À définir avec une date d'expiration. |
+| `NEON_ORG_ID` | | `""` | Identifiant de l'organisation Neon qui porte les projets. Vide : lu sur le compte s'il n'a qu'une organisation ; avec plusieurs, l'étape « base » demande de le renseigner. |
 | `RESEND_API_KEY` | | `""` | Clef API Resend pour les e-mails transactionnels. Portée minimale : `sending_access`. À définir avec une date d'expiration. |
 | `STRIPE_API_KEY` | | `""` | Clef API Stripe (secrète). Portée minimale : permissions de paiement. À définir avec une date d'expiration. |
 | `CLOUDFLARE_API_TOKEN` | | `""` | Jeton Cloudflare pour la gestion des domaines et du cache. Portée minimale : droits sur la zone. À définir avec une date d'expiration. |
