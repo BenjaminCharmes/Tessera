@@ -37,6 +37,7 @@ export type EventType =
   | "commit_created"
   | "quota_updated"
   | "provider_fallback"
+  | "security_audit_fallback"
   | "queue_progress"
   | "livraison_done"
   | "pipeline_done"

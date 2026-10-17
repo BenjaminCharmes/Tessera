@@ -72,9 +72,11 @@ def _tours_du_role(role: str) -> int | None:
     """
     if role == ROLE_PLAN:
         return settings.llm_max_turns_plan
-    if role in ("reviewer", "securite"):
-        # L'audit relit comme le reviewer (ticket-485) : même budget borné.
+    if role == "reviewer":
         return settings.llm_max_turns_reviewer
+    if role == "securite":
+        # L'audit lit hors du diff (ticket-485) : budget propre (ticket-495).
+        return settings.llm_max_turns_securite
     return None
 
 
@@ -253,6 +255,8 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         SecurityAuditorService(
             _en_lecture("securite"), settings.ide_prompts_dir,
             model=modele_du_role(project_path, "securite"),
+            max_turns=_tours_du_role("securite"),
+            diff_only_provider=_sans_outils("securite"),
         )
         if pipeline_cfg.securite_enabled
         else None
