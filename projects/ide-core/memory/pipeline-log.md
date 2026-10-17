@@ -3397,3 +3397,15 @@ Points posit (58359ms)
 - 2026-10-17 11:58:27 UTC — [ticket-489] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés par les tests. L (231015ms)
 - 2026-10-17 11:58:27 UTC — [ticket-489] APPROVED après 1 tour(s)
 - 2026-10-17 12:00:21 UTC — [ticket-489] documentation: 0 fichier(s) (110140ms)
+- 2026-10-17 12:00:37 UTC — [ide-core] ticket-489 PR #515 confiée au CIWatcher
+- 2026-10-17 12:00:40 UTC — [ticket-496] branche ticket-496-a-test-step-whose-tool-cannot-be-found-is-reporte
+- 2026-10-17 12:00:40 UTC — [ticket-496] tour 1 — codeur démarré
+- 2026-10-17 12:03:10 UTC — [ticket-496] tour 1 — codeur terminé (149655ms)
+- 2026-10-17 12:05:20 UTC — [ide-core] ticket-489 PR #515 mergée (CI verte)
+- 2026-10-17 12:10:12 UTC — [ticket-496] testeur: OK (exit 0)
+- 2026-10-17 12:11:16 UTC — [ticket-496] securite: PASS — Aucune vulnérabilité détectée. Le module outil_introuvable reconnaît les outils  (63984ms)
+- 2026-10-17 12:11:16 UTC — [ticket-496] tour 1 — reviewer démarré
+- 2026-10-17 12:11:50 UTC — [ticket-496] tour 1 — reviewer terminé (33375ms)
+- 2026-10-17 12:13:48 UTC — [ticket-496] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le code reconnaît (151859ms)
+- 2026-10-17 12:13:48 UTC — [ticket-496] APPROVED après 1 tour(s)
+- 2026-10-17 12:15:49 UTC — [ticket-496] documentation: 2 fichier(s) (114265ms)

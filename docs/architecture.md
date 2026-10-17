@@ -612,6 +612,20 @@ Quand les tests échouent, `test_runner.py` extrait :
 
 Le prompt du codeur (tour suivant) reçoit `failure_details`, remplaçant une liste brute. Le journal n'affiche que le résumé. Cela concentre l'attention sur le test échoué même quand des centaines passent.
 
+
+#### Distinction panne d'environnement vs test en échec (ticket-496)
+
+Quand une étape de test échoue, le système distingue maintenant une **panne d'environnement** (outil introuvable) d'un **test réellement en échec** (code du projet en cause).
+
+Le module `outil_introuvable.py` reconnaît dans la sortie d'une étape les erreurs suivantes comme des pannes d'environnement :
+
+- Commande shell non trouvée : `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL` avec `Command "<x>" not found`, ou messages `sh: <x>: command not found` / `<x>: not found` / `'<x>' is not recognized as an internal or external command`
+- Module Node absent ou lien périmé : `Cannot find module '…/node_modules/…'` quand le chemin cité est sous `node_modules`, n'existe pas ou pointe hors du dossier du projet (exemple : liens cassés après un renommage)
+
+Un `Cannot find module` sur un fichier du projet lui-même (hors `node_modules`) reste un test en échec : le code en est responsable.
+
+Une étape reconnue comme panne d'environnement produit un `TestResult` avec `demarree=False` et un message : « panne d'environnement, outil `<x>` introuvable, réinstaller les dépendances du projet ». Ce n'est pas un test rouge : le codeur n'y peut rien, et le lancement du run s'arrête sans approuver le ticket.
+
 ### Validation et fichiers cités (ticket-316)
 
 Le validateur vérifie chaque critère d'acceptation du ticket. Un critère peut être 

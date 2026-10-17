@@ -1646,6 +1646,15 @@ du projet, avec un timeout de 120 s.
 ---
 
 
+**Panne d'environnement vs. test échoué**
+
+Le testeur peut s'arrêter sur deux raisons différentes :
+
+- **Panne d'environnement** : un outil que l'étape appelle (tsc, vitest, next…) n'a pu démarrer. Le message le nomme. C'est généralement `node_modules` cassé — un lien symbolique mort (fréquent après un renommage de dossier), des dépendances manquantes ou mal installées. **Tu ne dois pas corriger le code.** Réinstalle les dépendances (`pnpm install --frozen-lockfile` ou `npm install`) depuis la racine du projet, puis relance le ticket.
+- **Test échoué** : un test a démarré normalement mais a échoué, ce qui signale une erreur dans le code à corriger.
+
+Le message du testeur l'indique clairement : il dit « panne d'environnement » si c'est une absence d'outil, ou affiche le test cassé sinon.
+
 ### La PR s'est ouverte mais le ticket passe en `blocked`
 
 Tu vois la PR ouverte sur GitHub, mais le ticket passe en `blocked` — la phase 2 de la livraison (attente CI, merge) a échoué. La raison est indiquée : conflit de rebase, CI rouge, ou délai dépassé.

@@ -1,14 +1,15 @@
 ---
-id: ticket-496
-title: "A test step whose tool cannot be found is reported as an environment failure, not as failing code"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-17
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-17
+id: ticket-496
+pr_number: 517
+priority: medium
+status: done
+title: A test step whose tool cannot be found is reported as an environment failure,
+  not as failing code
+type: fix
 ---
 
 # ticket-496 — Un outil introuvable est une panne d'environnement, pas un test rouge
