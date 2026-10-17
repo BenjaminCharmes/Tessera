@@ -1,14 +1,15 @@
 ---
-id: ticket-489
-title: "Putting a project online triggers its first production deployment when Vercel has none"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-489
+pr_number: null
+priority: high
+status: todo
+title: Putting a project online triggers its first production deployment when Vercel
+  has none
+type: fix
 ---
 
 # ticket-489 — Premier déploiement quand Vercel n'en a aucun

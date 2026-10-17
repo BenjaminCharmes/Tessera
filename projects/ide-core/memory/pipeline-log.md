@@ -3381,3 +3381,7 @@ Points posit (58359ms)
 - 2026-10-17 07:39:07 UTC — [ticket-491] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code modifie le comportemen (93625ms)
 - 2026-10-17 07:39:07 UTC — [ticket-491] APPROVED après 1 tour(s)
 - 2026-10-17 07:39:13 UTC — [ticket-491] documentation: échec — Claude Code returned an error result: You've hit your session limit · resets 1:2
+- 2026-10-17 07:39:26 UTC — [ide-core] ticket-491 PR #514 confiée au CIWatcher
+- 2026-10-17 07:39:29 UTC — [ticket-489] branche ticket-489-putting-a-project-online-triggers-its-first-produ
+- 2026-10-17 07:39:29 UTC — [ticket-489] tour 1 — codeur démarré
+- 2026-10-17 07:39:32 UTC — [ticket-489] INTERROMPU par limite de session (reprise : 1:20pm (Europe/Paris))
