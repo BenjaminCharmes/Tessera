@@ -4,7 +4,7 @@ created: 2026-10-17
 depends_on: []
 estimated_days: 0.5
 id: ticket-496
-pr_number: null
+pr_number: 517
 priority: medium
 status: done
 title: A test step whose tool cannot be found is reported as an environment failure,
