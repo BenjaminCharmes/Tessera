@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-477
 plan: true
-pr_number: null
+pr_number: 519
 priority: high
 status: done
 title: A run is refused before its first ticket when delivery or tests cannot work
