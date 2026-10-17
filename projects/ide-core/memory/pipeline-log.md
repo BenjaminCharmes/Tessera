@@ -3385,3 +3385,4 @@ Points posit (58359ms)
 - 2026-10-17 07:39:29 UTC — [ticket-489] branche ticket-489-putting-a-project-online-triggers-its-first-produ
 - 2026-10-17 07:39:29 UTC — [ticket-489] tour 1 — codeur démarré
 - 2026-10-17 07:39:32 UTC — [ticket-489] INTERROMPU par limite de session (reprise : 1:20pm (Europe/Paris))
+- 2026-10-17 07:39:36 UTC — [ide-core] file interrompue : limite de session (reprise : 1:20pm (Europe/Paris))
