@@ -3430,3 +3430,15 @@ Points posit (58359ms)
 - 2026-10-17 12:16:15 UTC — [ticket-477] tour 1 — codeur démarré
 - 2026-10-17 12:16:19 UTC — [ticket-477] INTERROMPU par limite de session (reprise : 6:20pm (Europe/Paris))
 - 2026-10-17 12:16:23 UTC — [ide-core] file interrompue : limite de session (reprise : 6:20pm (Europe/Paris))
+- 2026-10-17 18:35:30 UTC — [ide-core] ticket-499 PR #518 confiée au CIWatcher
+- 2026-10-17 18:35:33 UTC — [ticket-477] branche ticket-477-a-run-is-refused-before-its-first-ticket-when-del
+- 2026-10-17 18:36:38 UTC — [ticket-477] plan rendu (64125ms)
+- 2026-10-17 18:36:38 UTC — [ticket-477] tour 1 — codeur démarré
+- 2026-10-17 18:38:23 UTC — [ticket-477] tour 1 — codeur terminé (105485ms)
+- 2026-10-17 18:40:09 UTC — [ide-core] ticket-499 PR #518 mergée (CI verte)
+- 2026-10-17 18:45:31 UTC — [ticket-477] testeur: OK (exit 0)
+- 2026-10-17 18:47:38 UTC — [ticket-477] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le champ `force` permet intentio (127328ms)
+- 2026-10-17 18:47:38 UTC — [ticket-477] tour 1 — reviewer démarré
+- 2026-10-17 18:48:02 UTC — [ticket-477] tour 1 — reviewer terminé (24061ms)
+- 2026-10-17 18:48:03 UTC — [ticket-477] validateur: APPROVED — Tous les critères sont couverts par des tests spécifiques et documentés dans `te (24750ms)
+- 2026-10-17 18:48:03 UTC — [ticket-477] APPROVED après 1 tour(s)
