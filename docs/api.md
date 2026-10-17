@@ -117,6 +117,7 @@ Lance un run et répond sans l'attendre. Le run s'observe sur
 | `max_tickets` | `int` | `5` | Nombre maximal de tickets. Lu en `autonomous`. |
 | `depuis_github` | `bool` | `false` | Tire d'abord les issues `agent-ready`. Lu en `autonomous`. |
 | `budget_usd` | `float` > 0 | calculé | Plafond de dépense de la file, qui remplace le plafond par ticket × nombre de tickets. Lu en `queue`. |
+| `force` | `bool` | `false` | Contourne les validations pré-run (`autonomy`, `test_command`, `github_remote`). Permet un démarrage même si des critères manquent. |
 
 Exemple, une file de trois tickets :
 
@@ -138,9 +139,16 @@ Réponse `202` :
 `run_id` est l'identifiant à garder : il sert à `GET /runs/{run_id}` et à
 `GET /runs/{run_id}/events`, pendant la file comme après.
 
-Refus : `409` si le projet porte déjà un run, `422` si `ticket_id` manque en
-`single` ou si la livraison déclarée ne peut pas aboutir, `404` si le projet
-est inconnu.
+Réponses d'erreur :
+
+- **`422` (Unprocessable Entity)** : validations pré-run échouées — le run refuse de démarrer pour éviter un ticket coinçé après coûts importants. Vérifie :
+  - `autonomy >= pr` sans `github_remote` : impossible de créer une PR ;
+  - `autonomy: merge`, sans `.github/workflows/*.yml` et sans `merge_without_ci: true` : aucune CI déclarée et merge exige une CI verte ;
+  - `test_command` déclaré : le premier mot de chaque segment `&&` doit être trouvable (commande système ou chemin existant), sinon refus avec le nom manquant.
+  
+  La réponse liste les critères non satisfaits. Passer `force: true` contourne ces vérifications.
+- **`409` Conflict** : le projet porte déjà un run en cours.
+- **`404` Not Found** : le projet est inconnu.
 
 ### Runs
 
