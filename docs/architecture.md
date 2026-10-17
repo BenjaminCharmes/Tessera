@@ -595,6 +595,14 @@ Cela réduit les faux positifs : un nouveau flux HTTP vers une fonction qui refu
 
 En cas d'erreur du provider ou réponse illisible, le run s'arrête sur BLOCK. C'est une règle de sécurité (ADR-039) : un doute = arrêt.
 
+#### Budget et repli sur le diff seul
+
+Depuis le ticket-495, l'audit de sécurité dispose d'un budget propre, `LLM_MAX_TURNS_SECURITE` (défaut 30 tours), distinct du plafond global. Le prompt annonce ce budget au modèle : « Tu disposes d'au plus N lectures. Lis d'abord ce qui peut changer un BLOCK en PASS ; garde le dernier tour pour ton verdict. »
+
+Si l'appel avec outils épuise le budget avant de rendre un verdict, `SecurityAuditorService` retombe sur un **second appel sans outil**, sur le diff seul — la stratégie d'avant le ticket-485. Un événement `security_audit_fallback` le signale. Si ce second appel échoue, le verdict reste `BLOCK` (ADR-039).
+
+Cette approche empêche un gros diff de bloquer la file sur une limite de tours : l'audit conclut avec ce qu'il a lu, ou revient à sa forme minimale.
+
 ### Résultats des tests et extraction d'erreurs (ticket-393)
 
 Quand les tests échouent, `test_runner.py` extrait :
