@@ -3369,3 +3369,14 @@ Points posit (58359ms)
 - 2026-10-17 07:26:07 UTC — [ticket-495] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente un budget pr (162422ms)
 - 2026-10-17 07:26:07 UTC — [ticket-495] APPROVED après 2 tour(s)
 - 2026-10-17 07:27:33 UTC — [ticket-495] documentation: 2 fichier(s) (82186ms)
+- 2026-10-17 07:27:49 UTC — [ide-core] ticket-495 PR #513 confiée au CIWatcher
+- 2026-10-17 07:27:52 UTC — [ticket-491] branche ticket-491-the-stripe-step-with-a-key-of-the-wrong-type-asks
+- 2026-10-17 07:27:52 UTC — [ticket-491] tour 1 — codeur démarré
+- 2026-10-17 07:29:26 UTC — [ticket-491] tour 1 — codeur terminé (94139ms)
+- 2026-10-17 07:32:32 UTC — [ide-core] ticket-495 PR #513 mergée (CI verte)
+- 2026-10-17 07:35:37 UTC — [ticket-491] testeur: OK (exit 0)
+- 2026-10-17 07:37:33 UTC — [ticket-491] securite: PASS — Refactorisation logique et sécurisée du contrôle de flux pour les étapes de prov (116266ms)
+- 2026-10-17 07:37:33 UTC — [ticket-491] tour 1 — reviewer démarré
+- 2026-10-17 07:38:04 UTC — [ticket-491] tour 1 — reviewer terminé (30922ms)
+- 2026-10-17 07:39:07 UTC — [ticket-491] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code modifie le comportemen (93625ms)
+- 2026-10-17 07:39:07 UTC — [ticket-491] APPROVED après 1 tour(s)
