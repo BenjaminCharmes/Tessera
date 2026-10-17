@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
 id: ticket-491
-pr_number: null
+pr_number: 514
 priority: high
 status: done
 title: The Stripe step with a key of the wrong type asks the human and lets the rest
