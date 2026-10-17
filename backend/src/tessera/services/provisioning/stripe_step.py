@@ -99,14 +99,24 @@ class StripeStep:
         if mode == config.mode:
             return None
         if mode == "unknown":
-            return StepResult(
-                StepState.FAILED,
-                "STRIPE_API_KEY is neither a test nor a live key; nothing was sent",
-            )
+            return self._unusable_key()
         return StepResult(
             StepState.FAILED,
             f"STRIPE_API_KEY is a {mode} key but online.stripe.mode is '{config.mode}'; "
             "nothing was sent. Live mode is declared in agents.json, never implied",
+        )
+
+    @staticmethod
+    def _unusable_key() -> StepResult:
+        # Comme une clé absente : l'humain corrige, le reste du plan tourne.
+        return StepResult(
+            StepState.NEEDS_HUMAN,
+            "STRIPE_API_KEY is neither a test nor a live secret key; nothing was sent. "
+            "Expected a restricted test key (rk_test_...) or a secret test key (sk_test_...), "
+            "created in Stripe > Developers > API keys. A pk_ key is the publishable key, "
+            "which only the browser uses. The key is read again only when the Tessera "
+            "backend restarts",
+            blocks_plan=False,
         )
 
     @staticmethod
@@ -130,6 +140,7 @@ class StripeStep:
             "STRIPE_API_KEY is not set in the Tessera .env. Create the webhook of "
             f"'{ctx.project_id}' yourself and add {WEBHOOK_VARIABLE} to the Vercel project, "
             "or set a restricted key and relaunch",
+            blocks_plan=False,
         )
 
     async def _product_and_price(

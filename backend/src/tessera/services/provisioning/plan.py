@@ -6,7 +6,6 @@ from typing import Optional
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.provisioning.errors import ServiceError
 from tessera.services.provisioning.steps import (
-    STOPPING_STATES,
     ProvisioningContext,
     ProvisioningStep,
     StepResult,
@@ -45,7 +44,7 @@ class ProvisioningPlan:
         self._secrets = secrets
 
     async def run(self, ctx: ProvisioningContext, dry_run: bool = False) -> list[StepOutcome]:
-        """Inspect then apply each step; stop after ``failed`` or ``needs_human``.
+        """Inspect then apply each step; stop after ``failed`` or a blocking ``needs_human``.
 
         ``dry_run`` never calls ``apply``: what is missing is reported ``todo``.
         What an earlier step did stays done — nothing is undone.
@@ -55,7 +54,7 @@ class ProvisioningPlan:
             resultat = self._masquer(await self._run_step(step, ctx, dry_run))
             sorties.append(StepOutcome(step.name, resultat))
             await self._publish(ctx, step.name, resultat)
-            if resultat.state in STOPPING_STATES:
+            if resultat.stops_plan:
                 break
         return sorties
 
@@ -72,7 +71,9 @@ class ProvisioningPlan:
     def _masquer(self, resultat: StepResult) -> StepResult:
         # Le détail ne doit jamais porter un secret ; si une étape se trompe,
         # le masque tient la ligne avant qu'il sorte du plan.
-        return StepResult(resultat.state, self._secrets.mask(resultat.detail))
+        return StepResult(
+            resultat.state, self._secrets.mask(resultat.detail), resultat.blocks_plan
+        )
 
     async def _guarded(
         self,

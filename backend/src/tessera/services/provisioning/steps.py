@@ -22,18 +22,21 @@ class StepState(StrEnum):
     FAILED = "failed"
 
 
-#: States that stop the steps after them.
-STOPPING_STATES: frozenset[StepState] = frozenset(
-    {StepState.FAILED, StepState.NEEDS_HUMAN}
-)
-
-
 @dataclass(frozen=True)
 class StepResult:
     """Outcome of one step; ``detail`` never holds a secret value."""
 
     state: StepState
     detail: str = ""
+    #: ``False`` lets a ``needs_human`` leave the next steps to run; ``failed`` always stops.
+    blocks_plan: bool = True
+
+    @property
+    def stops_plan(self) -> bool:
+        """Tell whether the steps after this result must not run."""
+        if self.state is StepState.FAILED:
+            return True
+        return self.state is StepState.NEEDS_HUMAN and self.blocks_plan
 
 
 @dataclass(frozen=True)
