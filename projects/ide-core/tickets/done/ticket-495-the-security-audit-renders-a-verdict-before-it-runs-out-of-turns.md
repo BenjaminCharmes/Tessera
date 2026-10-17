@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
 id: ticket-495
-pr_number: null
+pr_number: 513
 priority: high
 status: done
 title: The security audit renders a verdict before it runs out of tool turns, and
