@@ -14,7 +14,12 @@ sections:
 
 The connection URI holds the database password. It is returned to the caller
 and never logged: the request log carries the method, the path and the status,
-and a failure only carries the HTTP status and the API's error code.
+and a failure carries the HTTP status, the API's error code and its ``message``
+field (URLs and the key removed, bounded) — never a header.
+
+An account attached to an organization needs ``org_id`` on the project calls
+(ticket-499): it comes from ``NEON_ORG_ID``, or from
+``GET /users/me/organizations`` when the account has exactly one.
 """
 from dataclasses import dataclass, field
 from typing import Optional
@@ -45,21 +50,46 @@ class NeonProject:
     uri: str = field(default="", repr=False)
 
 
+class AmbiguousOrganization(Exception):
+    """The account has several organizations and ``NEON_ORG_ID`` does not pick one."""
+
+
 class NeonClient:
     """The few Neon calls the database step needs; nothing deletes."""
 
     def __init__(
-        self, api_key: str, transport: Optional[httpx.AsyncBaseTransport] = None
+        self,
+        api_key: str,
+        transport: Optional[httpx.AsyncBaseTransport] = None,
+        org_id: str = "",
     ) -> None:
         self._api_key = api_key
         self._transport = transport
+        # None : pas encore résolu ; "" : compte personnel, aucun org_id à envoyer.
+        self._org_id: Optional[str] = org_id.strip() or None
 
     @classmethod
     def from_settings(
         cls, settings: Settings, transport: Optional[httpx.AsyncBaseTransport] = None
     ) -> "NeonClient":
-        """Build the client from the key of ``Settings``."""
-        return cls(settings.neon_api_key.get_secret_value(), transport)
+        """Build the client from the key and the organization of ``Settings``."""
+        return cls(settings.neon_api_key.get_secret_value(), transport, settings.neon_org_id)
+
+    async def organization(self) -> str:
+        """Return the ``org_id`` to send (empty for a personal account).
+
+        Raises ``AmbiguousOrganization`` when the account has several and none
+        is configured. The answer is read once per client.
+        """
+        if self._org_id is not None:
+            return self._org_id
+        corps = as_dict(await self._send("GET", "/users/me/organizations"))
+        ids = [as_str(as_dict(o).get("id")) for o in as_list(corps.get("organizations"))]
+        ids = [identifiant for identifiant in ids if identifiant]
+        if len(ids) > 1:
+            raise AmbiguousOrganization
+        self._org_id = ids[0] if ids else ""
+        return self._org_id
 
     @property
     def configured(self) -> bool:
@@ -89,7 +119,13 @@ class NeonClient:
             extra={"method": method, "path": path, "status": reponse.status_code},
         )
         if reponse.status_code >= 400:
-            raise ServiceError.from_response(SERVICE, reponse.status_code, reponse.content)
+            raise ServiceError.from_response(
+                SERVICE,
+                reponse.status_code,
+                reponse.content,
+                with_reason=True,
+                redact=(self._api_key,),
+            )
         try:
             return reponse.json()
         except ValueError:
@@ -99,8 +135,11 @@ class NeonClient:
         """Return the ids of every project named exactly ``name`` (usually 0 or 1)."""
         trouves: list[str] = []
         curseur = ""
+        org_id = await self.organization()
         for _ in range(_MAX_PAGES):
             params = {"search": name, "limit": str(_PAGE_SIZE)}
+            if org_id:
+                params["org_id"] = org_id
             if curseur:
                 params["cursor"] = curseur
             corps = as_dict(await self._send("GET", "/projects", params=params))
@@ -114,7 +153,11 @@ class NeonClient:
 
     async def create_project(self, name: str) -> NeonProject:
         """Create a project; its connection URI comes back with it when available."""
-        corps = as_dict(await self._send("POST", "/projects", body={"project": {"name": name}}))
+        projet: dict[str, object] = {"name": name}
+        org_id = await self.organization()
+        if org_id:
+            projet["org_id"] = org_id
+        corps = as_dict(await self._send("POST", "/projects", body={"project": projet}))
         identifiant = as_str(as_dict(corps.get("project")).get("id"))
         if not identifiant:
             raise ServiceError(SERVICE, 200, "unreadable")

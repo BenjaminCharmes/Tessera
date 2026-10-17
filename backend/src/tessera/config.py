@@ -64,6 +64,9 @@ class Settings(BaseSettings):
     cloudflare_api_token: SecretStr = SecretStr("")
     # Identifiant d'équipe Vercel : pas un secret.
     vercel_team_id: str = ""
+    # Identifiant d'organisation Neon : pas un secret. Vide, le client le lit
+    # sur le compte quand celui-ci n'a qu'une organisation (ticket-499).
+    neon_org_id: str = ""
 
     # Optionnel : vide lorsque le provider est `agent_sdk` (auth par abonnement).
     anthropic_api_key: str = ""

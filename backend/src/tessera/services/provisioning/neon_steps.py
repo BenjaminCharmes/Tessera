@@ -7,7 +7,7 @@ in a result detail, a log or an event, and it is never returned to the caller.
 from typing import Optional
 from urllib.parse import unquote, urlsplit
 
-from tessera.services.provisioning.neon import NeonClient
+from tessera.services.provisioning.neon import AmbiguousOrganization, NeonClient
 from tessera.services.provisioning.steps import (
     ProvisioningContext,
     StepResult,
@@ -73,6 +73,14 @@ class DatabaseStep:
             return self._without_key(ctx, presente)
         if presente:
             return StepResult(StepState.SKIPPED, f"{URL_VARIABLE} is already set in Vercel")
+        try:
+            await self._client.organization()
+        except AmbiguousOrganization:
+            return StepResult(
+                StepState.NEEDS_HUMAN,
+                "the Neon account has several organizations; set NEON_ORG_ID in the "
+                "Tessera .env to the one that should hold the project, then relaunch",
+            )
         return None
 
     @staticmethod

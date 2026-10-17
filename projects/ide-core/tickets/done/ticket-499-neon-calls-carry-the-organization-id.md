@@ -1,14 +1,15 @@
 ---
-id: ticket-499
-title: "Neon calls carry the organization id, so provisioning finds and creates databases in an organization-owned account"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-17
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-17
+id: ticket-499
+pr_number: 518
+priority: high
+status: done
+title: Neon calls carry the organization id, so provisioning finds and creates databases
+  in an organization-owned account
+type: fix
 ---
 
 # ticket-499 — Les appels Neon portent l'id d'organisation
