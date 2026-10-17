@@ -71,6 +71,8 @@ class ProvisioningContext:
     env_writer: EnvWriter
     #: 'owner/repo' of the project, ``None`` when it has no remote.
     github_remote: Optional[str] = None
+    #: Branche que Vercel déploie en production ; vide : celle des réglages.
+    base_branch: str = ""
     wanted_dns: list[DnsRecord] = field(default_factory=list)
     changed_env: set[str] = field(default_factory=set)
     dns_published: bool = False

@@ -83,7 +83,7 @@ class FakeVercel:
             self.envs.append(str(self.body(request)["key"]))
             return httpx.Response(200, json={})
         if key == "GET" and path == "/v6/deployments":
-            found = [{"uid": "dpl_1"}] if self.deployed else []
+            found = [{"uid": "dpl_1", "state": "READY"}] if self.deployed else []
             return httpx.Response(200, json={"deployments": found})
         if key == "POST" and path == "/v13/deployments":
             return httpx.Response(200, json={})
@@ -291,17 +291,7 @@ async def test_redeploy_is_skipped_when_nothing_was_written() -> None:
     client = _client(fake)
     step = VercelRedeployStep(client)
     assert (await step.inspect(_ctx(client))).state is StepState.SKIPPED
-    assert fake.requests == []
-
-
-async def test_redeploy_without_production_deployment_is_skipped() -> None:
-    fake = FakeVercel(project=True, deployed=False)
-    client = _client(fake)
-    ctx = _ctx(client)
-    ctx.changed_env.add("SESSION_SECRET")
-    result = await VercelRedeployStep(client).apply(ctx)
-    assert result.state is StepState.SKIPPED
-    assert fake.calls("POST", "/v13/deployments") == []
+    assert [r.method for r in fake.requests] == ["GET", "GET"]
 
 
 # ------------------------------------------------------------------

@@ -11,8 +11,8 @@ Written against the Vercel REST API reference
 - Environment variables: list (``GET /v10/projects/{id}/env``) and create
   (``POST /v10/projects/{id}/env``). A ``sensitive`` variable is never returned
   with its value, so only its name is known — hence "write only if absent";
-- Deployments: list (``GET /v6/deployments``) and redeploy
-  (``POST /v13/deployments`` with ``deploymentId``).
+- Deployments: list (``GET /v6/deployments``), redeploy (``POST /v13/deployments``
+  with ``deploymentId``) and create the first one (same route, ``gitSource``).
 
 Every call goes through `httpx`. The ``Authorization`` header is built per
 request and appears in no log and no error: a failure only carries the HTTP
@@ -27,6 +27,7 @@ from tessera.config import Settings
 from tessera.services.provisioning.errors import ServiceError
 from tessera.services.provisioning.jsonview import as_dict, as_list, as_str
 from tessera.services.provisioning.steps import DnsRecord
+from tessera.services.provisioning.vercel_deployments import VercelDeployment, deployment_from
 from tessera.services.provisioning.vercel_dns import VercelDomain, domain_from, records_from_config
 from tessera.utils.logger import get_logger
 
@@ -166,6 +167,29 @@ class VercelClient:
         reponse = await self._send("GET", "/v6/deployments", params=params)
         premier = as_dict(next(iter(as_list(as_dict(reponse.json()).get("deployments"))), None))
         return as_str(premier.get("uid")) or None
+
+    async def latest_deployment(self, project_id: str) -> Optional[VercelDeployment]:
+        """Return the newest production deployment in any state, ``None`` if there is none."""
+        params = {"projectId": project_id, "target": "production", "limit": "1"}
+        reponse = await self._send("GET", "/v6/deployments", params=params)
+        premier = next(iter(as_list(as_dict(reponse.json()).get("deployments"))), None)
+        return deployment_from(premier)
+
+    async def create_deployment(self, project: str, repo_id: int, ref: str) -> VercelDeployment:
+        """Deploy the branch ``ref`` of a GitHub repository to production.
+
+        ``skipAutoDetectionConfirmation`` is needed for a new project: without
+        it Vercel answers 400 ``missing_project_settings``.
+        """
+        corps: dict[str, object] = {
+            "name": project,
+            "target": "production",
+            "gitSource": {"type": "github", "repoId": repo_id, "ref": ref},
+        }
+        reponse = await self._send(
+            "POST", "/v13/deployments", params={"skipAutoDetectionConfirmation": "1"}, body=corps
+        )
+        return deployment_from(reponse.json()) or VercelDeployment("", "QUEUED")
 
     async def redeploy(self, project: str, deployment_id: str) -> None:
         """Redeploy a deployment to production."""

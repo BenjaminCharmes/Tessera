@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.models.project import Project
 from tessera.routers.dependencies import require_valid_project_id
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.project_loader import load_project
 from tessera.services.provisioning.launcher import (
     PROVISIONING_LOCK,
@@ -75,7 +76,11 @@ def _build(
     factory: SetupFactory, project: Project, online: OnlineConfig
 ) -> ProvisioningSetup:
     try:
-        return factory(project.id, online, project.github_remote)
+        setup = factory(project.id, online, project.github_remote)
+        # Vercel déploie la branche de base du projet, celle de sa politique de run.
+        politique = PolitiqueRun.lire(Path(project.path))
+        setup.context.base_branch = politique.base_branch or settings.github_base_branch
+        return setup
     except Exception as erreur:
         # Ni message ni trace : la construction lit les jetons.
         _logger.error(
