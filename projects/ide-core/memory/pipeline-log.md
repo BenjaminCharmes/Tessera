@@ -3429,3 +3429,4 @@ Points posit (58359ms)
 - 2026-10-17 12:16:15 UTC — [ticket-477] plan : échec, le run continue sans (Claude Code returned an error result: You've hit your session limit · resets 6:20pm (Europe/Paris) (exit code: 1))
 - 2026-10-17 12:16:15 UTC — [ticket-477] tour 1 — codeur démarré
 - 2026-10-17 12:16:19 UTC — [ticket-477] INTERROMPU par limite de session (reprise : 6:20pm (Europe/Paris))
+- 2026-10-17 12:16:23 UTC — [ide-core] file interrompue : limite de session (reprise : 6:20pm (Europe/Paris))
