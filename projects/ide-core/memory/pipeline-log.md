@@ -3465,3 +3465,4 @@ Points posit (58359ms)
 - 2026-10-17 18:54:21 UTC — [ide-core] ticket-477 PR #519 mergée (CI verte)
 - 2026-10-17 18:59:56 UTC — [ticket-498] testeur: OK (exit 0)
 - 2026-10-17 19:00:00 UTC — [ticket-498] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (3561ms)
+- 2026-10-17 19:00:04 UTC — [ide-core] file interrompue : ticket-498 non approuvé
