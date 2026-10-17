@@ -3457,3 +3457,11 @@ Points posit (58359ms)
 - 2026-10-18 07:49:28 UTC — [ticket-500] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (105969ms)
 - 2026-10-18 07:49:28 UTC — [ticket-500] APPROVED après 2 tour(s)
 - 2026-10-18 07:51:40 UTC — [ticket-500] documentation: 1 fichier(s) (128531ms)
+- 2026-10-17 18:50:31 UTC — [ide-core] ticket-477 PR #519 confiée au CIWatcher
+- 2026-10-17 18:50:33 UTC — [ticket-498] branche ticket-498-an-agent-call-cut-by-an-exhausted-subscription-qu
+- 2026-10-17 18:51:19 UTC — [ticket-498] plan rendu (45625ms)
+- 2026-10-17 18:51:19 UTC — [ticket-498] tour 1 — codeur démarré
+- 2026-10-17 18:53:34 UTC — [ticket-498] tour 1 — codeur terminé (134641ms)
+- 2026-10-17 18:54:21 UTC — [ide-core] ticket-477 PR #519 mergée (CI verte)
+- 2026-10-17 18:59:56 UTC — [ticket-498] testeur: OK (exit 0)
+- 2026-10-17 19:00:00 UTC — [ticket-498] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (3561ms)
