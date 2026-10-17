@@ -19,7 +19,7 @@ from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
-from tessera.services.livraison_possible import raison_de_refus_livraison
+from tessera.services.controles_depart import manques_avant_depart
 from tessera.services.realignement_base import Realignement
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
@@ -102,6 +102,9 @@ class RunRequest(BaseModel):
     #: voudrait dire « sans plafond » et permettrait à tout appelant de
     #: lever la borne. None : calcul par défaut. Ignoré hors mode file.
     budget_usd: float | None = Field(default=None, gt=0)
+    #: Passe outre les manques relevés avant le départ (ticket-477) : ils sont
+    #: journalisés, le run démarre quand même.
+    force: bool = False
 
     @field_validator("project_id")
     @classmethod
@@ -701,9 +704,16 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
 
     # Refus d'emblée, avant toute réservation : le projet reste libre
     # (ticket-413).
-    refus = raison_de_refus_livraison(project_path, settings.github_token)
-    if refus:
-        raise HTTPException(status_code=422, detail=refus)
+    # Les manques se listent tous ; `force` laisse passer en les journalisant
+    # (ticket-477).
+    manques = manques_avant_depart(project_path, settings.github_token)
+    if manques and not request.force:
+        raise HTTPException(status_code=422, detail=" ; ".join(manques))
+    if manques:
+        _logger.warning(
+            "depart_force",
+            extra={"project_id": request.project_id, "manques": manques},
+        )
 
     try:
         run = RUN_REGISTRY.ouvrir(

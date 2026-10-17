@@ -1720,6 +1720,25 @@ Si le backend s'arrête avant de finaliser la livraison d'un ticket approuvé, a
 
 **Attention** : un fichier créé accidentellement par toi pendant le run — un brouillon, un `.tmp` — sera aussi restauré dans la branche. Il sera visible dans la PR ; nettoie-le avant de merger.
 
+### Un run refuse de démarrer (erreur 422)
+
+Avant de lancer, Tessera vérifie que tu peux aller jusqu'au bout de la livraison et des tests.
+
+**Vérifications pré-run :**
+
+- **`github_remote` absent** : tu veux créer une PR (`autonomy: pr` ou plus), mais ton projet n'est pas lié à un dépôt GitHub.
+- **CI absente** : tu veux fusionner (`autonomy: merge`), tu n'as aucun fichier `.github/workflows/*.yml` et tu n'as pas déclaré `merge_without_ci: true`.
+- **Commande manquante** : ton `test_command` demande une commande (`pytest`, `npm test`, `cargo test`…) qui n'existe pas sur ta machine — le message énumère laquelle.
+
+**Solutions :**
+
+L'erreur énumère exactement ce qui manque. Ajoute-le :
+- Renseigne `github_remote` pour lier à GitHub.
+- Crée un workflow GitHub Actions, ou pose `merge_without_ci: true` dans la configuration du projet.
+- Installe ou corrige la commande de test.
+
+Après correction, relance. Si tu veux contourner ces vérifications — par exemple pour tester un ticket sans le livrer — passe `force: true` au lancement (détail en fonction du mode de requête utilisé).
+
 ## 13. Signaler un problème ou une idée sur Tessera
 
 Quand tu trouves un dysfonctionnement dans l'IDE ou une suggestion pour l'améliorer, tu peux le signaler directement depuis n'importe quel projet — sans quitter l'IDE, sans naviguer jusqu'à ide-core.
