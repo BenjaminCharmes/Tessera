@@ -13,6 +13,7 @@ from tessera.services.provisioning import (
     ProvisioningContext,
     ProvisioningPlan,
     ServiceError,
+    StepResult,
     StepState,
     StripeClient,
     StripeConfig,
@@ -125,12 +126,64 @@ async def test_live_key_passes_when_the_project_declares_live_mode() -> None:
     assert result.state is StepState.DONE and env.writes == ["STRIPE_WEBHOOK_SECRET"]
 
 
-async def test_test_key_with_live_mode_and_unknown_key_fail_without_request() -> None:
-    for key, mode in ((_TEST_KEY, "live"), ("nonsense", "test")):
-        fake, env = FakeStripe(), FakeEnv()
-        result = await _step(_client(fake, key)).apply(_ctx(env, mode=mode))
-        assert result.state is StepState.FAILED
-        assert fake.requests == [] and env.writes == []
+async def test_test_key_with_live_mode_fails_without_request() -> None:
+    fake, env = FakeStripe(), FakeEnv()
+    result = await _step(_client(fake, _TEST_KEY)).apply(_ctx(env, mode="live"))
+    assert result.state is StepState.FAILED
+    assert fake.requests == [] and env.writes == []
+
+
+async def test_publishable_key_needs_a_human_naming_the_expected_keys_without_the_value() -> None:
+    publishable = "pk_test_Zz11Yy22Xx33Ww44"
+    fake, env = FakeStripe(), FakeEnv()
+    step = _step(_client(fake, publishable))
+    for result in (await step.inspect(_ctx(env)), await step.apply(_ctx(env))):
+        assert result.state is StepState.NEEDS_HUMAN
+        assert "rk_test_" in result.detail and "pk_" in result.detail
+        assert "restart" in result.detail
+        assert publishable not in result.detail and "Zz11Yy22" not in result.detail
+    assert fake.requests == [] and env.writes == []
+
+
+class _Later:
+    """A step after Stripe, to see whether the plan reaches it."""
+
+    name = "later"
+
+    def __init__(self) -> None:
+        self.applied = False
+
+    async def inspect(self, ctx: ProvisioningContext) -> StepResult:
+        return StepResult(StepState.TODO, "missing")
+
+    async def apply(self, ctx: ProvisioningContext) -> StepResult:
+        self.applied = True
+        return StepResult(StepState.DONE, "later done")
+
+
+@pytest.mark.parametrize("key", ["pk_test_Zz11Yy22Xx33Ww44", ""])
+async def test_unusable_or_absent_key_lets_the_next_steps_run(key: str) -> None:
+    later = _Later()
+    plan = ProvisioningPlan([_step(_client(FakeStripe(), key)), later])
+
+    outcomes = await plan.run(_ctx(FakeEnv()))
+
+    assert [o.step for o in outcomes] == ["stripe", "later"]
+    assert outcomes[0].result.state is StepState.NEEDS_HUMAN
+    assert outcomes[1].result.state is StepState.DONE and later.applied
+
+
+async def test_network_error_stays_failed_and_stops_the_plan() -> None:
+    def broken(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("unreachable")
+
+    later = _Later()
+    stripe = StripeStep(StripeClient(_TEST_KEY, httpx.MockTransport(broken)), SecretRegistry())
+
+    outcomes = await ProvisioningPlan([stripe, later]).run(_ctx(FakeEnv()))
+
+    assert [o.step for o in outcomes] == ["stripe"]
+    assert outcomes[0].result.state is StepState.FAILED and not later.applied
 
 
 async def test_existing_product_and_price_are_neither_recreated_nor_modified() -> None:
@@ -218,6 +271,7 @@ async def test_without_key_the_step_is_manual_or_needs_a_human() -> None:
     assert (await _step(_client(fake, " ")).apply(_ctx(present))).state is StepState.MANUAL
     result = await _step(_client(fake, "")).apply(_ctx(FakeEnv()))
     assert result.state is StepState.NEEDS_HUMAN and "STRIPE_API_KEY" in result.detail
+    assert not result.stops_plan
     assert fake.requests == []
 
 

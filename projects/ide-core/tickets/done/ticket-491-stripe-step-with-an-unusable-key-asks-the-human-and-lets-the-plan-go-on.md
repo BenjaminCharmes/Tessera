@@ -1,14 +1,15 @@
 ---
-id: ticket-491
-title: "The Stripe step with a key of the wrong type asks the human and lets the rest of the plan run"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-491
+pr_number: 514
+priority: high
+status: done
+title: The Stripe step with a key of the wrong type asks the human and lets the rest
+  of the plan run
+type: fix
 ---
 
 # ticket-491 — Une clé Stripe du mauvais type ne bloque pas le reste de la mise en ligne
