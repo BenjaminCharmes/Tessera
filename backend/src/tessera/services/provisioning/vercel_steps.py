@@ -1,6 +1,7 @@
-"""The three Vercel steps: project and domain, variables, redeploy — ticket-466.
+"""The Vercel steps: project and domain, variables — ticket-466.
 
-Each step reads before it writes and only creates what is missing. Nothing is
+The deployment step lives in ``vercel_deploy_step`` (ticket-489) and is
+re-exported here. Each step reads before it writes and only creates what is missing. Nothing is
 ever deleted, and a variable that exists is never rewritten (a ``sensitive``
 one cannot be read back, so its value is unknown).
 """
@@ -17,6 +18,9 @@ from tessera.services.provisioning.vercel import (
     PUBLIC_PREFIX,
     VercelClient,
     vercel_name,
+)
+from tessera.services.provisioning.vercel_deploy_step import (
+    VercelRedeployStep as VercelRedeployStep,
 )
 from tessera.services.provisioning.vercel_dns import VercelDomain
 from tessera.utils.logger import get_logger
@@ -148,36 +152,3 @@ class VercelVariablesStep:
         if nom == APP_URL_VARIABLE:
             return f"https://{ctx.online.domain}"
         return secrets.token_urlsafe(32)
-
-
-class VercelRedeployStep:
-    """Redeploy production once, only if a variable was written during this run."""
-
-    name = "redeploy"
-
-    def __init__(self, client: VercelClient) -> None:
-        self._client = client
-
-    async def inspect(self, ctx: ProvisioningContext) -> StepResult:
-        """Nothing written during the run: nothing to redeploy."""
-        if not self._client.configured:
-            return _NO_TOKEN
-        if not ctx.changed_env:
-            return StepResult(StepState.SKIPPED, "no variable was written")
-        return StepResult(StepState.TODO, "variables written: a redeploy is needed")
-
-    async def apply(self, ctx: ProvisioningContext) -> StepResult:
-        """Redeploy the latest production deployment, if there is one."""
-        if not self._client.configured:
-            return _NO_TOKEN
-        nom = vercel_name(ctx.project_id)
-        projet = await self._client.get_project(nom)
-        identifiant = projet.get("id") if projet else None
-        deploiement = None
-        if isinstance(identifiant, str):
-            deploiement = await self._client.latest_production_deployment(identifiant)
-        if deploiement is None:
-            # Pas encore de production : le premier déploiement lira les variables.
-            return StepResult(StepState.SKIPPED, "no production deployment to redeploy yet")
-        await self._client.redeploy(nom, deploiement)
-        return StepResult(StepState.DONE, "production redeployed")

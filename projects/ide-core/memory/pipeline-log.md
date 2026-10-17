@@ -3381,3 +3381,19 @@ Points posit (58359ms)
 - 2026-10-17 07:39:07 UTC — [ticket-491] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code modifie le comportemen (93625ms)
 - 2026-10-17 07:39:07 UTC — [ticket-491] APPROVED après 1 tour(s)
 - 2026-10-17 07:39:13 UTC — [ticket-491] documentation: échec — Claude Code returned an error result: You've hit your session limit · resets 1:2
+- 2026-10-17 07:39:26 UTC — [ide-core] ticket-491 PR #514 confiée au CIWatcher
+- 2026-10-17 07:39:29 UTC — [ticket-489] branche ticket-489-putting-a-project-online-triggers-its-first-produ
+- 2026-10-17 07:39:29 UTC — [ticket-489] tour 1 — codeur démarré
+- 2026-10-17 07:39:32 UTC — [ticket-489] INTERROMPU par limite de session (reprise : 1:20pm (Europe/Paris))
+- 2026-10-17 07:39:36 UTC — [ide-core] file interrompue : limite de session (reprise : 1:20pm (Europe/Paris))
+- 2026-10-17 07:44:04 UTC — [ide-core] ticket-491 PR #514 mergée (CI verte)
+- 2026-10-17 11:38:45 UTC — [ticket-489] branche ticket-489-putting-a-project-online-triggers-its-first-produ
+- 2026-10-17 11:38:46 UTC — [ticket-489] tour 1 — codeur démarré
+- 2026-10-17 11:43:39 UTC — [ticket-489] tour 1 — codeur terminé (293531ms)
+- 2026-10-17 11:49:31 UTC — [ticket-489] testeur: OK (exit 0)
+- 2026-10-17 11:54:36 UTC — [ticket-489] securite: PASS — Aucune vulnérabilité détectée. Le code suit les bonnes pratiques de sécurité pou (305125ms)
+- 2026-10-17 11:54:36 UTC — [ticket-489] tour 1 — reviewer démarré
+- 2026-10-17 11:55:15 UTC — [ticket-489] tour 1 — reviewer terminé (39171ms)
+- 2026-10-17 11:58:27 UTC — [ticket-489] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés par les tests. L (231015ms)
+- 2026-10-17 11:58:27 UTC — [ticket-489] APPROVED après 1 tour(s)
+- 2026-10-17 12:00:21 UTC — [ticket-489] documentation: 0 fichier(s) (110140ms)
