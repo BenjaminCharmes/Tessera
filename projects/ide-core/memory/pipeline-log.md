@@ -3424,3 +3424,8 @@ Points posit (58359ms)
 - 2026-10-17 18:34:01 UTC — [ticket-499] validateur: APPROVED — Tous les critères sont satisfaits. Le nouveau fichier `test_provisioning_neon_or (33750ms)
 - 2026-10-17 18:34:01 UTC — [ticket-499] APPROVED après 2 tour(s)
 - 2026-10-17 18:35:15 UTC — [ticket-499] documentation: 0 fichier(s) (69656ms)
+- 2026-10-17 12:16:09 UTC — [ide-core] ticket-496 PR #517 confiée au CIWatcher
+- 2026-10-17 12:16:12 UTC — [ticket-477] branche ticket-477-a-run-is-refused-before-its-first-ticket-when-del
+- 2026-10-17 12:16:15 UTC — [ticket-477] plan : échec, le run continue sans (Claude Code returned an error result: You've hit your session limit · resets 6:20pm (Europe/Paris) (exit code: 1))
+- 2026-10-17 12:16:15 UTC — [ticket-477] tour 1 — codeur démarré
+- 2026-10-17 12:16:19 UTC — [ticket-477] INTERROMPU par limite de session (reprise : 6:20pm (Europe/Paris))

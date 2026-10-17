@@ -1,15 +1,15 @@
 ---
-id: ticket-477
-title: "A run is refused before its first ticket when delivery or tests cannot work"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
+id: ticket-477
 plan: true
-created: 2026-10-16
+pr_number: null
+priority: high
+status: todo
+title: A run is refused before its first ticket when delivery or tests cannot work
+type: feat
 ---
 
 # ticket-477 — Contrôles avant le départ d'une file
