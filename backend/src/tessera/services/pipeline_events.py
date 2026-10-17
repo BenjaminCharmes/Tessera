@@ -36,6 +36,9 @@ class EventType(str, Enum):
     #: cet événement, rien à l'écran ne distingue un audit sur le modèle
     #: prévu d'un audit sur son remplaçant.
     PROVIDER_FALLBACK = "provider_fallback"
+    #: L'audit avec outils a épuisé ses tours : un second appel, sur le diff
+    #: seul, a servi (ticket-495). `reason` dit pourquoi.
+    SECURITY_AUDIT_FALLBACK = "security_audit_fallback"
     QUEUE_PROGRESS = "queue_progress"
     #: Ce que la livraison a fait du commit du run (ticket-083).
     LIVRAISON_DONE = "livraison_done"

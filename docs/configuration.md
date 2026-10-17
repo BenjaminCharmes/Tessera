@@ -8,6 +8,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `ANTHROPIC_API_KEY` | si `anthropic_api` | — | Clef API Anthropic — inutile en mode `agent_sdk` |
 | `LLM_MAX_TURNS` | | `30` | Plafond d'allers-retours outil pour un agent (défaut global) |
 | `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'actions du reviewer dans la boucle de révision |
+| `LLM_MAX_TURNS_SECURITE` | | `30` | Plafond d'allers-retours outil pour l'audit de sécurité (lecture du projet hors diff) |
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'actions du tour de cadrage (planification de tickets) |
 | `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'allers-retours outil pour le reviewer (lecture et critique du diff) |
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'allers-retours outil pour le tour de plan (lecture seule) |

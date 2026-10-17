@@ -1,14 +1,15 @@
 ---
-id: ticket-495
-title: "The security audit renders a verdict before it runs out of tool turns, and falls back to the diff alone when it does"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-495
+pr_number: 513
+priority: high
+status: done
+title: The security audit renders a verdict before it runs out of tool turns, and
+  falls back to the diff alone when it does
+type: fix
 ---
 
 # ticket-495 — L'audit de sécurité rend un verdict avant d'épuiser ses tours

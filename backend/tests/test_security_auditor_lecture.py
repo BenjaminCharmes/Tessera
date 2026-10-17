@@ -46,6 +46,86 @@ async def test_unreadable_answer_after_reading_still_blocks(tmp_path: Path) -> N
     assert result.reason
 
 
+_PASS = '{"issues": [], "verdict": "PASS", "summary": "ok"}'
+_TURN_LIMIT = "Reached maximum number of turns (20)"
+
+
+class _FailingProvider(FakeProvider):
+    """Fails every call with the given error."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__()
+        self._message = message
+
+    async def complete(self, **kwargs: Any) -> Any:  # type: ignore[override]
+        self.calls.append(kwargs)
+        raise RuntimeError(self._message)
+
+
+async def test_prompt_budget_comes_from_the_setting(tmp_path: Path) -> None:
+    provider = FakeProvider(content=_PASS)
+    service = SecurityAuditorService(provider, _PROMPTS, max_turns=42)
+
+    await service.audit("+x = 1", tmp_path)
+
+    system = provider.calls[0]["system"]
+    assert "au plus 42 lectures" in system
+    assert "garde le dernier tour pour ton verdict" in system
+    assert "summary" in system
+
+
+async def test_turn_limit_retries_once_on_the_diff_alone(tmp_path: Path) -> None:
+    tools = _FailingProvider(_TURN_LIMIT)
+    diff_only = FakeProvider(content=_PASS)
+    service = SecurityAuditorService(
+        tools, _PROMPTS, max_turns=20, diff_only_provider=diff_only
+    )
+
+    result = await service.audit("+x = 1", tmp_path)
+
+    assert result.verdict == "PASS"
+    assert len(tools.calls) == 1
+    assert len(diff_only.calls) == 1
+    assert "au plus 20 lectures" in tools.calls[0]["system"]
+    assert "au plus" not in diff_only.calls[0]["system"]
+    assert "maximum number of turns" in result.fallback_reason
+
+
+async def test_two_failures_in_a_row_block(tmp_path: Path) -> None:
+    service = SecurityAuditorService(
+        _FailingProvider(_TURN_LIMIT), _PROMPTS,
+        diff_only_provider=_FailingProvider("provider down"),
+    )
+
+    result = await service.audit("+x = 1", tmp_path)
+
+    assert result.verdict == "BLOCK"
+    assert "provider down" in result.reason
+    assert result.fallback_reason
+
+
+async def test_another_error_does_not_fall_back(tmp_path: Path) -> None:
+    diff_only = FakeProvider(content=_PASS)
+    service = SecurityAuditorService(
+        _FailingProvider("Read tool unavailable"), _PROMPTS, diff_only_provider=diff_only
+    )
+
+    result = await service.audit("+x = 1", tmp_path)
+
+    assert result.verdict == "BLOCK"
+    assert diff_only.calls == []
+    assert result.fallback_reason == ""
+
+
+async def test_turn_limit_without_a_fallback_provider_blocks(tmp_path: Path) -> None:
+    service = SecurityAuditorService(_FailingProvider(_TURN_LIMIT), _PROMPTS)
+
+    result = await service.audit("+x = 1", tmp_path)
+
+    assert result.verdict == "BLOCK"
+    assert "maximum number of turns" in result.reason
+
+
 @pytest.fixture
 def prompt() -> str:
     # Espaces normalisés : un retour à la ligne dans le prompt ne casse rien.

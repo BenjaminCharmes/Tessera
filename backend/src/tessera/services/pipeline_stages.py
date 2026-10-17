@@ -603,6 +603,10 @@ async def run_security_audit(
         )
     audit_ms = int((time.monotonic() - t0) * 1000)
 
+    if audit.fallback_reason:
+        await emit(
+            run, EventType.SECURITY_AUDIT_FALLBACK, reason=audit.fallback_reason
+        )
     await emit(
         run,
         EventType.SECURITY_AUDIT_DONE,

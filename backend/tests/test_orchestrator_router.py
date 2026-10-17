@@ -171,9 +171,12 @@ def test_le_codeur_n_a_pas_de_budget_specifique() -> None:
     assert _tours_du_role("codeur") is None
 
 
-def test_l_audit_securite_a_un_budget_borne() -> None:
-    # L'audit relit comme le reviewer (ticket-485) : pas les 30 tours par défaut.
-    assert _tours_du_role("securite") == settings.llm_max_turns_reviewer
+def test_l_audit_securite_a_son_propre_budget() -> None:
+    # Ticket-495 : l'audit ne partage plus le budget du reviewer, qu'un gros
+    # diff épuisait sans verdict.
+    assert _tours_du_role("securite") == settings.llm_max_turns_securite
+    assert _tours_du_role("reviewer") == settings.llm_max_turns_reviewer
+    assert settings.llm_max_turns_securite != settings.llm_max_turns_reviewer
 
 
 def test_plan_et_reviewer_ont_des_budgets_distincts() -> None:

@@ -541,6 +541,33 @@ async def test_une_panne_de_l_auditeur_bloque_le_run() -> None:
     assert [e.type for e in events][-1] is EventType.PIPELINE_DONE
 
 
+class _AuditeurEnRepli:
+    async def audit(self, code_diff: str, project_path: Path) -> object:
+        from tessera.services.security_auditor import SecurityAuditResult
+
+        return SecurityAuditResult(
+            issues=[], verdict="PASS", summary="ok", fallback_reason="tours épuisés"
+        )
+
+
+async def test_un_repli_de_l_audit_emet_son_evenement() -> None:
+    # Ticket-495 : le verdict vient du diff seul, l'écran doit le savoir.
+    events: list[OrchestratorEvent] = []
+    run = _run(events)
+    run.reviewed_code = "diff"
+    orch = _Orch(_security_auditor=_AuditeurEnRepli(), _project_path=Path("."))
+
+    result = await stages.run_security_audit(orch, run)
+
+    assert result is None
+    types = [e.type for e in events]
+    assert types.index(EventType.SECURITY_AUDIT_FALLBACK) < types.index(
+        EventType.SECURITY_AUDIT_DONE
+    )
+    fallback = next(e for e in events if e.type == EventType.SECURITY_AUDIT_FALLBACK)
+    assert fallback.data["reason"] == "tours épuisés"
+
+
 async def test_une_panne_du_validateur_demande_des_changements() -> None:
     # Même raisonnement : l'exception valait approbation.
     events: list[OrchestratorEvent] = []

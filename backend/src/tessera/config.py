@@ -86,6 +86,10 @@ class Settings(BaseSettings):
     # qu'on lui a collé, c'est un budget de codeur donné à un lecteur
     # (ticket-199).
     llm_max_turns_reviewer: int = 10
+    # L'audit lit le projet hors du diff (ticket-485) et un gros diff y passe
+    # plus de tours qu'une relecture : à dix, puis vingt, il épuisait sa limite
+    # sans rendre de verdict (ticket-495). Budget propre, annoncé à l'auditeur.
+    llm_max_turns_securite: int = 30
     # Le plan lit les services pour décider d'une approche : il n'a pas le
     # diff dans son prompt et doit découvrir la base de code. Dix tours
     # échouaient systématiquement sur les tickets de taille ordinaire

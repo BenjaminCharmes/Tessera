@@ -49,6 +49,10 @@ class SecurityAuditResult:
     # provider en panne, réponse illisible, faille HIGH ignorée. Vide sur un
     # verdict rendu normalement. Part dans l'événement, donc à l'écran.
     reason: str = ""
+    # Non vide quand l'audit avec outils a épuisé ses tours et que le verdict
+    # vient du second appel, sur le diff seul (ticket-495). L'étape en fait un
+    # événement `security_audit_fallback`.
+    fallback_reason: str = ""
 
     @property
     def has_critical(self) -> bool:
@@ -63,44 +67,83 @@ class SecurityAuditResult:
 
 class SecurityAuditorService:
     def __init__(
-        self, provider: LLMProvider, prompts_dir: Path, model: str | None = None
+        self,
+        provider: LLMProvider,
+        prompts_dir: Path,
+        model: str | None = None,
+        max_turns: int | None = None,
+        diff_only_provider: LLMProvider | None = None,
     ) -> None:
         self._provider = provider
         self._prompts_dir = prompts_dir
         # Le modèle vient du manifeste du projet quand il déclare ce rôle
         # (ticket-188) ; sinon le défaut d'avant, rien ne change.
         self._model = model or _MODEL
+        # Le budget de tours annoncé à l'auditeur (ticket-495), et le provider
+        # sans outil du second essai si ce budget s'épuise. Sans lui, pas de
+        # repli : la limite de tours bloque comme toute indisponibilité.
+        self._max_turns = max_turns
+        self._diff_only_provider = diff_only_provider
 
     async def audit(
         self,
         code_diff: str,
         project_path: Path,
     ) -> SecurityAuditResult:
-        system_prompt = self._load_system_prompt()
+        base_prompt = self._load_system_prompt()
         user_message = f"## Code à auditer\n{code_diff[:_CODE_MAX_CHARS]}"
+        system_prompt = base_prompt
+        if self._max_turns is not None:
+            system_prompt = f"{base_prompt}\n\n{_budget_note(self._max_turns)}"
+        try:
+            return await self._ask(self._provider, system_prompt, user_message, project_path)
+        except Exception as exc:
+            # Échoue fermé : un audit qui n'a pas eu lieu n'a rien approuvé.
+            # Le run se bloque quand le provider tombe, c'est voulu ; le
+            # `reason` doit le dire à l'écran (ticket-122). Seule la limite de
+            # tours a un second essai ; le repli d'ADR-046 couvre le reste.
+            _logger.warning("security_auditor_llm_failed", extra={"error": str(exc)})
+            if self._diff_only_provider is None or not _is_turn_limit(exc):
+                return _blocked(f"Audit sécurité indisponible : {exc}")
+            return await self._audit_diff_only(
+                self._diff_only_provider, base_prompt, user_message, project_path, exc
+            )
 
+    async def _audit_diff_only(
+        self,
+        provider: LLMProvider,
+        system_prompt: str,
+        user_message: str,
+        project_path: Path,
+        cause: Exception,
+    ) -> SecurityAuditResult:
+        """Second and last try: no tool, the diff alone, as before ticket-485."""
+        fallback_reason = f"Limite de tours atteinte ({cause}) ; audit refait sur le diff seul."
+        try:
+            result = await self._ask(provider, system_prompt, user_message, project_path)
+        except Exception as exc:
+            _logger.warning("security_auditor_fallback_failed", extra={"error": str(exc)})
+            result = _blocked(f"Audit sécurité indisponible : {exc}")
+        result.fallback_reason = fallback_reason
+        return result
+
+    async def _ask(
+        self, provider: LLMProvider, system_prompt: str, user_message: str, project_path: Path
+    ) -> SecurityAuditResult:
+        """Calls ``provider`` and parses the verdict; provider errors propagate."""
         for attempt in (1, 2):
             # Ticket-436 : une réponse illisible est redemandée une seule fois,
             # avec une consigne de plus ; la seconde illisible bloque.
             message = user_message if attempt == 1 else f"{user_message}\n\n{_RETRY_HINT}"
-            try:
-                result = await self._provider.complete(
-                    system=system_prompt,
-                    user=message,
-                    model=self._model,
-                    max_tokens=_MAX_TOKENS,
-                    # Ticket-485 : l'audit lit le code hors diff avant de
-                    # bloquer ; `cwd` le place dans le projet.
-                    cwd=project_path.resolve(),
-                )
-            except Exception as exc:
-                # Échoue fermé : un audit qui n'a pas eu lieu n'a rien approuvé.
-                # Le run se bloque quand le provider tombe, c'est voulu ; le
-                # `reason` doit le dire à l'écran (ticket-122). Aucune seconde
-                # tentative : le repli d'ADR-046 s'en charge.
-                _logger.warning("security_auditor_llm_failed", extra={"error": str(exc)})
-                return _blocked(f"Audit sécurité indisponible : {exc}")
-
+            result = await provider.complete(
+                system=system_prompt,
+                user=message,
+                model=self._model,
+                max_tokens=_MAX_TOKENS,
+                # Ticket-485 : l'audit lit le code hors diff avant de
+                # bloquer ; `cwd` le place dans le projet.
+                cwd=project_path.resolve(),
+            )
             parsed = self._parse_response(result.content, attempt)
             if parsed is not None:
                 return parsed
@@ -165,6 +208,21 @@ class SecurityAuditorService:
             result.reason = f"Faille {worst} relevée malgré un verdict PASS."
             result.summary = f"{result.reason} {result.summary}".strip()
         return result
+
+
+def _budget_note(max_turns: int) -> str:
+    """The turn budget told to the auditor, taken from the setting (ticket-495)."""
+    return (
+        f"Tu disposes d'au plus {max_turns} lectures. Lis d'abord ce qui peut "
+        "changer un BLOCK en PASS ; garde le dernier tour pour ton verdict. "
+        "Un point que tu n'as pas pu vérifier se signale dans `summary`, "
+        "il ne bloque pas."
+    )
+
+
+def _is_turn_limit(exc: Exception) -> bool:
+    """True when the SDK stopped the call on its turn limit."""
+    return "maximum number of turns" in str(exc).lower()
 
 
 def _blocked(reason: str) -> SecurityAuditResult:
