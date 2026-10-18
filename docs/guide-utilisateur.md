@@ -593,6 +593,11 @@ Reformule le critère pour qu'il ignore ces fichiers, ou fais la modification à
 
 **Note** : un critère qui cite juste le fichier (« d'après `CLAUDE.md`, ... ») marche normalement.
 
+
+Ton script de vérification est aussi protégé en écriture. Si ton projet déclare `test_command` et désigne un fichier sur disque (par exemple `../scripts/verifier.py`), aucun agent ne peut le modifier — tu verras la tentative refusée avec un message clair. L'idée est d'empêcher un ticket d'affaiblir le test qui doit le juger.
+
+Quand un ticket modifie la configuration des tests — `conftest.py`, `vitest.config.ts`, `eslint.config.js`, la clé `scripts` de `package.json`, ou les sections `[tool.pytest*]` et `[tool.mypy]` de `pyproject.toml` —, le reviewer en reçoit un avertissement au début de son message. À lui de vérifier qu'aucune étape de vérification n'a été retirée ou désactivée.
+
     ## Critères d'acceptation
     
     - [ ] La fonction `trier()` retourne une liste triée en ordre croissant
