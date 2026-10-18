@@ -1,6 +1,9 @@
 """Enchainer une selection de tickets — ticket-074."""
+import pytest
+
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.dialogue import DialogueChannel
+from tessera.services.file_vivante import FileFermee, FileVivante, fermer_si_vivante
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
@@ -141,3 +144,71 @@ async def test_la_file_saute_un_ticket_deja_termine() -> None:
     await orch.run_queue("projet", ["ticket-001", "ticket-002", "ticket-003", "ticket-004"], on_event)
 
     assert orch.lances == ["ticket-001", "ticket-004"]
+
+
+class _OrchestrateurQuiAjoute(_OrchestrateurFile):
+    """Pose un ticket dans la file pendant le premier ticket (ticket-478)."""
+
+    def __init__(self, file: FileVivante, ajout: str) -> None:
+        super().__init__()
+        self._file = file
+        self._ajout = ajout
+
+    async def run_pipeline(self, project_id, ticket_id, on_event, run_id=None,
+                           dialogue=None, envelope_run_id=None) -> PipelineResult:
+        if not self.lances:
+            self._file.ajouter([self._ajout])
+        return await super().run_pipeline(project_id, ticket_id, on_event)
+
+
+async def test_un_ticket_ajoute_pendant_la_file_passe_apres_les_tickets_d_origine() -> None:
+    file = FileVivante(["ticket-001", "ticket-002"])
+    orch = _OrchestrateurQuiAjoute(file, "ticket-003")
+    collectes, on_event = await _events()
+
+    resultats = await orch.run_queue("p", file, on_event)
+
+    assert orch.lances == ["ticket-001", "ticket-002", "ticket-003"]
+    assert len(resultats) == 3
+    progression = [e for e in collectes if e.type is EventType.QUEUE_PROGRESS]
+    # Le premier événement part avant l'ajout ; les suivants voient la file grandie.
+    assert [e.data["total"] for e in progression] == [2, 3, 3]
+
+
+async def test_la_file_se_ferme_quand_la_boucle_a_fini() -> None:
+    file = FileVivante(["ticket-001"])
+    orch = _OrchestrateurFile()
+    _, on_event = await _events()
+
+    await orch.run_queue("p", file, on_event)
+
+    assert file.ouverte is False
+    with pytest.raises(FileFermee):
+        file.ajouter(["ticket-009"])
+
+
+async def test_la_file_se_ferme_aussi_sur_un_ticket_bloque() -> None:
+    file = FileVivante(["ticket-001", "ticket-002"])
+    orch = _OrchestrateurFile(echecs={"ticket-001"})
+    _, on_event = await _events()
+
+    await orch.run_queue("p", file, on_event)
+
+    assert file.ouverte is False
+
+
+def test_ajouter_ignore_un_ticket_deja_dans_la_file() -> None:
+    file = FileVivante(["ticket-001"])
+
+    ajoutes = file.ajouter(["ticket-001", "ticket-002", "ticket-002"])
+
+    assert ajoutes == ["ticket-002"]
+    assert list(file) == ["ticket-001", "ticket-002"]
+
+
+def test_fermer_si_vivante_laisse_une_liste_simple_intacte() -> None:
+    simple = ["ticket-001"]
+
+    fermer_si_vivante(simple)
+
+    assert simple == ["ticket-001"]

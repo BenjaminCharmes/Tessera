@@ -30,6 +30,7 @@ from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.resolveur_conflit import ResolveurConflitService
+from tessera.services.file_vivante import FileFermee, FileVivante, trier_ajouts
 from tessera.services.run_executor import executer
 from tessera.services.run_lock import RUN_LOCK
 from tessera.services.run_registry import RUN_REGISTRY, RunAlreadyInProgress
@@ -743,6 +744,11 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
     except RunAlreadyInProgress as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 
+    # La file d'un run `queue` reste ouverte aux ajouts pendant qu'il tourne
+    # (ticket-478) ; le registre la porte pour que l'endpoint la retrouve.
+    file = FileVivante(request.ticket_ids) if request.mode == "queue" else None
+    run.file = file
+
     try:
         orchestrator = await _build_orchestrator(request.project_id)
         if request.mode == "autonomous" and request.depuis_github:
@@ -764,7 +770,7 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             orchestrator,
             EVENT_HUB,
             RUN_REGISTRY,
-            ticket_ids=request.ticket_ids,
+            ticket_ids=file if file is not None else request.ticket_ids,
             max_tickets=request.max_tickets,
             titre_getter=titre_getter,
             budget_usd=request.budget_usd,
@@ -773,6 +779,44 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
     _TACHES.add(tache)
     tache.add_done_callback(_TACHES.discard)
     return RunStarted(run_id=run.run_id)
+
+
+class AppendRequest(BaseModel):
+    ticket_ids: list[str] = Field(min_length=1)
+
+
+class AppendResult(BaseModel):
+    """What an append did: added at the end, left alone, or refused with a reason."""
+
+    ajoutes: list[str]
+    ignores: dict[str, str]
+    refuses: dict[str, str]
+
+
+@router.post("/runs/{run_id}/append", response_model=AppendResult)
+async def append_to_run(run_id: str, request: AppendRequest) -> AppendResult:
+    """Add tickets to the end of a queue that is still running (ticket-478).
+
+    409 quand le run est terminé ou inconnu, n'est pas une file, ou a fini de
+    lire sa liste : un ajout n'y serait jamais exécuté.
+    """
+    run = RUN_REGISTRY.get(run_id)
+    if run is None or run.file is None or not run.file.ouverte:
+        raise HTTPException(
+            status_code=409,
+            detail="Ce run n'est pas une file en cours : aucun ticket ne peut y être ajouté.",
+        )
+    file = run.file
+    ticket_svc = TicketService(
+        settings.ide_workspace_dir / run.project_id, run.project_id
+    )
+    acceptes, ignores, refuses = await trier_ajouts(file, ticket_svc, request.ticket_ids)
+    try:
+        # Aucun `await` entre le contrôle d'ouverture de `ajouter` et l'ajout.
+        ajoutes = file.ajouter(acceptes)
+    except FileFermee as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return AppendResult(ajoutes=ajoutes, ignores=ignores, refuses=refuses)
 
 
 async def _tirer_les_issues(project_id: str) -> int:
