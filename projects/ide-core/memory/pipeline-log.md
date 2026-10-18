@@ -3685,3 +3685,23 @@ Points posit (58359ms)
 - 2026-10-19 08:11:29 UTC — [ticket-504] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (161015ms)
 - 2026-10-19 08:11:29 UTC — [ticket-504] APPROVED après 1 tour(s)
 - 2026-10-19 08:14:34 UTC — [ticket-504] documentation: 3 fichier(s) (180858ms)
+- 2026-10-18 19:39:33 UTC — [ide-core] ticket-490 PR #534 confiée au CIWatcher
+- 2026-10-18 19:39:37 UTC — [ticket-492] branche ticket-492-an-approval-is-bound-to-the-commit-it-reviewed-an
+- 2026-10-18 19:39:37 UTC — [ticket-492] tour 1 — codeur démarré
+- 2026-10-18 19:44:28 UTC — [ide-core] ticket-490 PR #534 mergée (CI verte)
+- 2026-10-18 19:52:17 UTC — [ticket-492] tour 1 — codeur terminé (760077ms)
+- 2026-10-18 19:58:07 UTC — [ticket-492] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-18 19:58:07 UTC — [ticket-492] tests rouges au tour 1
+- 2026-10-18 19:58:07 UTC — [ticket-492] tour 2 — codeur démarré
+- 2026-10-18 19:59:27 UTC — [ticket-492] tour 2 — codeur terminé (79608ms)
+- 2026-10-18 20:05:13 UTC — [ticket-492] testeur: OK (exit 0)
+- 2026-10-18 20:07:33 UTC — [ticket-492] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Le code implémente correctement (139452ms)
+- 2026-10-18 20:07:33 UTC — [ticket-492] tour 2 — reviewer démarré
+- 2026-10-18 20:08:38 UTC — [ticket-492] tour 2 — reviewer terminé (65671ms)
+- 2026-10-18 20:13:11 UTC — [ticket-492] validateur: fichiers cités joints : memory/contraintes.md
+- 2026-10-18 20:13:11 UTC — [ticket-492] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un système complet : enreg (337858ms)
+- 2026-10-18 20:13:11 UTC — [ticket-492] CHANGES_REQUESTED tour 2: Reviewer : ## Problèmes bloquants
+- 2026-10-18 20:13:11 UTC — [ticket-492] tour 3 — codeur démarré
+- 2026-10-18 20:18:28 UTC — [ticket-492] tour 3 — codeur terminé (317250ms)
+- 2026-10-18 20:24:20 UTC — [ticket-492] testeur: OK (exit 0)
+- 2026-10-18 20:25:43 UTC — [ticket-492] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (83514ms)
