@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-480
 plan: true
-pr_number: null
+pr_number: 529
 priority: medium
 status: done
 title: After a run, the base branch pulls cleanly and leftover untracked files are
