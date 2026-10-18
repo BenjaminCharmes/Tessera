@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
 id: ticket-490
-pr_number: null
+pr_number: 534
 priority: medium
 status: done
 title: The verification script a run is judged by is write-protected, and a diff that
