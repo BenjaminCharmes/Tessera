@@ -694,6 +694,31 @@ Depuis le ticket-388, une erreur de limite de session provoque :
 
 Contrairement à `blocked`, `todo` ne bloque pas le projet. La file peut reprendre après l'heure indiquée. Aucun ticket n'est abîmé.
 
+
+## Gestion du quota d'abonnement (ticket-498)
+
+Quand l'appel d'un agent échoue parce que le quota d'abonnement Claude est épuisé, l'orchestrateur le reconnaît et l'enregistre distinctement d'un autre `ProcessError`.
+
+### Reconnaissance de l'épuisement
+
+L'orchestrateur reconnaît un épuisement du quota si :
+- Le `QuotaSnapshot` récent indique le statut `rejected`, ou
+- Le message d'erreur de l'appel contient un terme indiquant une limite d'usage (`usage limit`, `rate limit`, `allowance`), ou
+- C'est un `ProcessError` à `stderr` vide alors que le dernier snapshot indiquait `allowed_warning`.
+
+### Arrêt et reprise
+
+Lors de l'épuisement du quota :
+- La ligne du journal enregistre « quota épuisé — reprise vers <HH:MM UTC> » (heure lue depuis le snapshot si disponible, sinon « heure inconnue »)
+- Le ticket revient en `todo` sur sa branche, avec son travail déjà commité (en cohérence avec ADR-037)
+- La file s'arrête immédiatement avec le message « file interrompue : quota épuisé »
+
+Tout autre `ProcessError` (crash du SDK, erreur réseau, etc.) conserve le traitement standard : propagation de l'erreur et passage du ticket en état d'échec.
+
+### Hors scope
+
+Ce mécanisme ne relance pas la file automatiquement quand le quota se rétablit, et ne change pas les seuils du mode autonome (ADR-020).
+
 ## Réalignement automatique du workspace avant un run (ticket-457)
 
 Avant le lancement du pipeline, l'orchestrateur prépare l'arbre de travail si l'une des conditions est remplie :

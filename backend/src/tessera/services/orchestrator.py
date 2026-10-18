@@ -34,6 +34,7 @@ from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_critere_protege import arret_critere_protege
 from tessera.services.pipeline_plan import run_plan
 from tessera.services.pipeline_text import _compose_feedback, _first_line
+from tessera.services.quota_exhaustion import is_quota_exhausted, resume_label
 from tessera.services.session_limit import (
     extract_reset_time,
     extract_reset_time_from_arret,
@@ -390,6 +391,14 @@ class Orchestrator:
             if is_session_limit(msg):
                 reset_time = extract_reset_time(msg)
                 return await outcomes.finish_session_limit(self, run, exc, reset_time)
+            # Quota épuisé pendant l'appel (ticket-498) : le CLI ne laisse
+            # sinon qu'un ProcessError à stderr vide.
+            tracker = self._quota_tracker
+            snapshot = tracker.snapshot if tracker is not None else None
+            if is_quota_exhausted(exc, snapshot):
+                return await outcomes.finish_quota_exhausted(
+                    self, run, exc, resume_label(snapshot)
+                )
             return await outcomes.finish_interrupted(self, run, exc)
 
     def _avertir_du_build(self, ticket_id: str) -> None:
@@ -638,6 +647,23 @@ class Orchestrator:
                                 ticket_id=ticket_id,
                                 data={
                                     "raison": "budget",
+                                    "index": index,
+                                    "total": len(ticket_ids),
+                                    "restants": list(ticket_ids[index:]),
+                                    "faits": list(ticket_ids[: index - 1]),
+                                },
+                            )
+                        )
+                    elif arret.startswith("quota_exhausted"):
+                        # Quota d'abonnement épuisé en plein ticket (ticket-498) :
+                        # le ticket est en todo, le journal a déjà dit l'heure.
+                        self._interrompre(project_id, "quota épuisé")
+                        await callback(
+                            OrchestratorEvent(
+                                type=EventType.QUEUE_PROGRESS,
+                                ticket_id=ticket_id,
+                                data={
+                                    "raison": "quota_exhausted",
                                     "index": index,
                                     "total": len(ticket_ids),
                                     "restants": list(ticket_ids[index:]),

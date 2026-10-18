@@ -1,15 +1,16 @@
 ---
-id: ticket-498
-title: "An agent call cut by an exhausted subscription quota is logged as such, and stops the queue instead of blocking the ticket"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-17
 depends_on: []
 estimated_days: 1
-created: 2026-10-17
+id: ticket-498
 plan: true
+pr_number: 523
+priority: medium
+status: done
+title: An agent call cut by an exhausted subscription quota is logged as such, and
+  stops the queue instead of blocking the ticket
+type: fix
 ---
 
 # ticket-498 — Un quota épuisé se dit « quota épuisé », pas « ProcessError »
