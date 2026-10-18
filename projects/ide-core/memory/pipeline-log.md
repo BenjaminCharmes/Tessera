@@ -3599,3 +3599,13 @@ Points posit (58359ms)
 - 2026-10-18 14:52:36 UTC — [ticket-478] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent efficacement (172906ms)
 - 2026-10-18 14:52:36 UTC — [ticket-478] APPROVED après 1 tour(s)
 - 2026-10-18 14:57:11 UTC — [ticket-478] documentation: 1 fichier(s) (269906ms)
+- 2026-10-18 14:57:30 UTC — [ide-core] ticket-478 PR #530 confiée au CIWatcher
+- 2026-10-18 14:57:33 UTC — [ticket-479] branche ticket-479-new-tickets-can-be-proposed-to-a-project-while-a
+- 2026-10-18 14:58:55 UTC — [ticket-479] plan rendu (82141ms)
+- 2026-10-18 14:58:55 UTC — [ticket-479] tour 1 — codeur démarré
+- 2026-10-18 15:02:25 UTC — [ide-core] ticket-478 PR #530 mergée (CI verte)
+- 2026-10-18 15:06:05 UTC — [ticket-479] tour 1 — codeur terminé (430000ms)
+- 2026-10-18 15:11:22 UTC — [ticket-479] testeur: OK (exit 0)
+- 2026-10-18 15:14:14 UTC — [ticket-479] securite: PASS — Aucune vulnérabilité de sécurité introduite. Le code implémente une proposition  (171438ms)
+- 2026-10-18 15:14:14 UTC — [ticket-479] tour 1 — reviewer démarré
+- 2026-10-18 15:14:29 UTC — [ticket-479] INTERROMPU par limite de session (reprise : 7:20pm (Europe/Paris))
