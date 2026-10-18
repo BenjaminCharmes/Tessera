@@ -302,6 +302,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         surveiller=_surveillance_pour(project_id, runner, politique, espace=git_workspace),
         ci_watcher=CI_WATCHER,
         etat_pr=_lecteur_etat_pr(project_id, politique),
+        pr_mergee_de_branche=_chercheur_pr_mergee(project_id, politique),
         documenter=_documenteur(project_id, politique),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
@@ -620,6 +621,24 @@ def _lecteur_etat_pr(
     le suivant : elle relit la PR au lieu de la supposer mergée. Sans dépôt
     GitHub déclaré, la relecture rend `unknown`, donc « pas mergé ».
     """
+    return _workflow_de_lecture(project_id, politique).pr_state
+
+
+def _chercheur_pr_mergee(
+    project_id: str, politique: PolitiqueRun | None = None
+) -> Callable[[str], Awaitable[int | None]]:
+    """Fabrique la recherche d'une PR mergée par préfixe de branche (ticket-482).
+
+    Sans dépôt GitHub déclaré, la recherche ne trouve rien : le ticket reste
+    bloqué.
+    """
+    return _workflow_de_lecture(project_id, politique).pr_mergee_de_branche
+
+
+def _workflow_de_lecture(
+    project_id: str, politique: PolitiqueRun | None
+) -> GitHubWorkflowService:
+    """Le service GitHub dont l'orchestrateur ne se sert qu'en lecture."""
     project_path = settings.ide_workspace_dir / project_id
     project = load_project(project_path)
     github = None
@@ -628,14 +647,13 @@ def _lecteur_etat_pr(
     base_branch = (
         politique.base_branch if politique else None
     ) or settings.github_base_branch
-    workflow = GitHubWorkflowService(
+    return GitHubWorkflowService(
         git_workspace=GitWorkspaceService(project_path, politique=politique),
         github=github,
         base_branch=base_branch,
         project_path=project_path,
         politique=politique,
     )
-    return workflow.pr_state
 
 
 #: Les tâches de run en vol. Sans référence forte, asyncio peut collecter
