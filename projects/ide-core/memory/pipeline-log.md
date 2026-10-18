@@ -3628,3 +3628,15 @@ Points posit (58359ms)
 - 2026-10-18 19:12:14 UTC — [ticket-479] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par des tests explicites et de c (332031ms)
 - 2026-10-18 19:12:14 UTC — [ticket-479] APPROVED après 2 tour(s)
 - 2026-10-18 19:15:42 UTC — [ticket-479] documentation: 3 fichier(s) (203562ms)
+- 2026-10-18 19:15:59 UTC — [ide-core] ticket-479 PR #533 confiée au CIWatcher
+- 2026-10-18 19:16:03 UTC — [ticket-490] branche ticket-490-the-verification-script-a-run-is-judged-by-is-wri
+- 2026-10-18 19:16:03 UTC — [ticket-490] tour 1 — codeur démarré
+- 2026-10-18 19:20:53 UTC — [ide-core] ticket-479 PR #533 mergée (CI verte)
+- 2026-10-18 19:21:03 UTC — [ticket-490] tour 1 — codeur terminé (299703ms)
+- 2026-10-18 19:27:46 UTC — [ticket-490] testeur: OK (exit 0)
+- 2026-10-18 19:29:50 UTC — [ticket-490] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une protection robuste du script d (124734ms)
+- 2026-10-18 19:29:51 UTC — [ticket-490] tour 1 — reviewer démarré
+- 2026-10-18 19:30:20 UTC — [ticket-490] tour 1 — reviewer terminé (29765ms)
+- 2026-10-18 19:35:20 UTC — [ticket-490] validateur: fichiers cités joints : scripts/verifier.py, conftest.py, vitest.config.ts, memory/contraintes.md (tronqué)
+- 2026-10-18 19:35:20 UTC — [ticket-490] validateur: APPROVED — Le diff implémente intégralement le ticket : le script de vérification se refuse (329578ms)
+- 2026-10-18 19:35:20 UTC — [ticket-490] APPROVED après 1 tour(s)
