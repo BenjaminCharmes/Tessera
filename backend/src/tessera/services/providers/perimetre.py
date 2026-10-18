@@ -37,6 +37,7 @@ from tessera.services.providers.redirections_bash import (
     cibles_ecrites,
     cibles_interpreteur_ecriture,
 )
+from tessera.services.providers.script_verification import script_de_verification
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -140,6 +141,10 @@ def hook_refus_hors_perimetre(
         if project_path is not None
         else None
     )
+    # Le script que `test_command` lance est figé comme la racine : lu à chaque
+    # écriture, il suivrait ce qu'un codeur aurait écrit dans `agents.json`
+    # (ticket-490).
+    script = script_de_verification(project_path) if project_path is not None else None
 
     async def hook(
         entree: HookInput, tool_use_id: str | None, contexte: HookContext
@@ -178,7 +183,7 @@ def hook_refus_hors_perimetre(
                 )
             # Dans le projet, mais porteur de ses règles : `agents.json`, `.git/`,
             # `.claude/settings*.json`, `.github/workflows/` (ticket-119).
-            motif = motif_de_protection(cible, project_path, racine)
+            motif = motif_de_protection(cible, project_path, racine, script)
             if motif is not None:
                 return _refus(
                     "ecriture_protegee_refusee",
