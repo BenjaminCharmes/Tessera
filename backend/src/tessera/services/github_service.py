@@ -270,6 +270,14 @@ class GitHubService:
             return "merged"
         return "closed" if pr_data["state"] == "closed" else "open"
 
+    async def get_pull_request_head_sha(self, pr_number: int) -> str:
+        """The SHA of the head commit of a PR — ticket-492."""
+        url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
+        async with httpx.AsyncClient() as client:
+            resp = await self._requete(client, "GET", url)
+            resp.raise_for_status()
+        return str(resp.json()["head"]["sha"])
+
     async def has_workflows(self) -> bool:
         """Whether the repository declares at least one GitHub Actions workflow.
 
@@ -293,8 +301,12 @@ class GitHubService:
         pr_number: int,
         method: str = "squash",
         commit_title: str | None = None,
+        sha: str | None = None,
     ) -> None:
         """Merge la PR avec la méthode déclarée par le projet — ticket-265.
+
+        Avec `sha`, GitHub refuse (409) si la tête de la PR n'est plus ce
+        commit : le contrôle et le merge ne font qu'un geste (ticket-492).
 
         `method` vaut `squash` par défaut, ce qui correspond à la convention
         ticket → develop de ce dépôt (CLAUDE.md, section Git). La PR de
@@ -313,6 +325,8 @@ class GitHubService:
         payload: dict[str, str] = {"merge_method": method}
         if commit_title is not None:
             payload["commit_title"] = commit_title
+        if sha is not None:
+            payload["sha"] = sha
         async with httpx.AsyncClient() as client:
             resp = await self._requete(client, "PUT", url, json=payload)
             resp.raise_for_status()
@@ -445,8 +459,11 @@ class GitHubService:
         intervalle_s: float = 5.0,
         intervalle_max_s: float = 30.0,
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
+        sha: str | None = None,
     ) -> None:
         """Merge the PR after verifying GitHub has computed mergeability.
+
+        `sha`, when given, is the head the merge is bound to (ticket-492).
 
         Polls the PR until `mergeable` is non-null (up to
         `attente_fusionnabilite_max_s` seconds). The polling interval grows
@@ -494,14 +511,14 @@ class GitHubService:
         # state can lag behind the field it just returned.
         try:
             await self.merge_pull_request(
-                pr_number, method=method, commit_title=commit_title
+                pr_number, method=method, commit_title=commit_title, sha=sha
             )
         except httpx.HTTPStatusError as exc:
             if exc.response.status_code != 405:
                 raise
             await dormir(intervalle_s)
             await self.merge_pull_request(
-                pr_number, method=method, commit_title=commit_title
+                pr_number, method=method, commit_title=commit_title, sha=sha
             )
 
     async def get_repository_info(self) -> RepositoryInfo:

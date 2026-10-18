@@ -28,6 +28,7 @@ Shutdown: call arreter() to cancel all running tasks without raising exceptions.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -48,6 +49,21 @@ _TIMEOUT_PHASE2_S = 1200.0
 
 #: Relit l'état d'une PR : « open », « closed », « merged » ou « unknown ».
 EtatPr = Callable[[int], Awaitable[str]]
+
+#: Relit le SHA de tête d'une PR ; `None` quand il ne peut pas être connu.
+TetePr = Callable[[int], Awaitable[str | None]]
+
+
+@dataclass(frozen=True)
+class ControleTete:
+    """What the watcher checks before merging: the PR head is the pushed commit.
+
+    `pushed_sha` is `None` when the delivery could not record it — the watcher
+    then refuses to merge (ticket-492).
+    """
+
+    pushed_sha: str | None
+    lire_tete: TetePr
 
 
 def decrire_exception(exc: BaseException) -> str:
@@ -94,6 +110,7 @@ class CIWatcher:
         pipeline_log_path: Path | None = None,
         etat_pr: EtatPr | None = None,
         realignement: Realignement | None = None,
+        controle_tete: ControleTete | None = None,
     ) -> None:
         """Start watching `pr_number` for `ticket_id` in the background.
 
@@ -106,6 +123,8 @@ class CIWatcher:
         (ticket-405); without it, a network error is a failure.
         `realignement` asks for the local base to be fast-forwarded once the
         PR is merged, when no run holds the project (ticket-422).
+        `controle_tete` makes the watcher refuse to merge a PR whose head is
+        no longer the pushed commit (ticket-492).
         """
         # Un résultat d'une surveillance précédente du même ticket serait relu
         # comme celui de cette PR-ci.
@@ -120,7 +139,7 @@ class CIWatcher:
         task = asyncio.create_task(
             self._surveiller_impl(
                 project_id, ticket_id, pr_number, livraison_phase_2, on_event,
-                pipeline_log_path, etat_pr,
+                pipeline_log_path, etat_pr, controle_tete,
             ),
             name=f"ci-watcher:{project_id}:{ticket_id}",
         )
@@ -193,6 +212,7 @@ class CIWatcher:
         on_event: EventCallback,
         pipeline_log_path: Path | None,
         etat_pr: EtatPr | None = None,
+        controle_tete: ControleTete | None = None,
     ) -> None:
         sem = self._semaphore_du_projet(project_id)
         try:
@@ -202,7 +222,7 @@ class CIWatcher:
                     await asyncio.wait_for(
                         self._livrer_et_emettre(
                             project_id, ticket_id, pr_number, livraison_phase_2,
-                            on_event, pipeline_log_path,
+                            on_event, pipeline_log_path, controle_tete,
                         ),
                         timeout=self._timeout_phase2_s,
                     )
@@ -306,7 +326,17 @@ class CIWatcher:
         livraison_phase_2: Callable[[int], Awaitable[Livraison]],
         on_event: EventCallback,
         pipeline_log_path: Path | None,
+        controle_tete: ControleTete | None = None,
     ) -> None:
+        arret_tete = await self._tete_changee(controle_tete, pr_number)
+        if arret_tete is not None:
+            # La branche a bougé depuis le push : ce qui serait mergé n'est pas
+            # ce que le reviewer a lu. La PR reste ouverte (ticket-492).
+            await self._emettre_echec(
+                project_id, ticket_id, pr_number, arret_tete, on_event,
+                pipeline_log_path,
+            )
+            return
         livraison = await livraison_phase_2(pr_number)
 
         if not livraison.merged:
@@ -344,6 +374,38 @@ class CIWatcher:
             await self._emettre_succes(
                 project_id, ticket_id, pr_number, on_event, pipeline_log_path
             )
+
+    async def _tete_changee(
+        self, controle: ControleTete | None, pr_number: int
+    ) -> str | None:
+        """The stop line when the PR head is not the pushed commit, else None.
+
+        Fails closed (ADR-039): an unknown pushed commit, an unreadable head or
+        a missing one all refuse the merge.
+        """
+        if controle is None:
+            return None
+        if controle.pushed_sha is None:
+            return (
+                f"commit poussé inconnu : la PR #{pr_number} n'est pas mergée, "
+                "elle reste ouverte"
+            )
+        try:
+            tete = await controle.lire_tete(pr_number)
+        except Exception as exc:  # noqa: BLE001 — une tête illisible refuse le merge
+            return (
+                f"tête de la PR #{pr_number} illisible "
+                f"({decrire_exception(exc)}) : elle reste ouverte"
+            )
+        if tete is None:
+            return f"tête de la PR #{pr_number} inconnue : elle reste ouverte"
+        if tete == controle.pushed_sha:
+            return None
+        return (
+            f"la tête de la PR #{pr_number} n'est plus le commit poussé : "
+            f"{tete[:7]} au lieu de {controle.pushed_sha[:7]}. "
+            "La PR reste ouverte."
+        )
 
     async def _emettre_succes(
         self,

@@ -10,6 +10,7 @@ from pathlib import Path
 
 from tessera.services.database import create_run, finish_run
 from tessera.services.pipeline_events import PipelineResult
+from tessera.services.sha_approbation import noter_approbation
 
 #: Le statut écrit en base quand le run n'a pas rendu de résultat : la même
 #: valeur que le stream single utilise depuis ticket-079.
@@ -41,6 +42,10 @@ class RunRecorder:
             self._db_path, project_id, ticket_id,
             mode="single", parent_run_id=parent_run_id,
         )
+
+    async def noter_approbation(self, run_id: str, sha: str) -> None:
+        """Record the head of the branch the run was approved on (ticket-492)."""
+        await noter_approbation(self._db_path, run_id, sha)
 
     async def clore(self, run_id: str, resultat: PipelineResult | None) -> None:
         """Close the row — with the result, or as interrupted when there is none."""

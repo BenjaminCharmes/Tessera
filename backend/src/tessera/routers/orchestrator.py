@@ -18,7 +18,9 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
+from tessera.services.ci_watcher import ControleTete, TetePr
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
+from tessera.services.sha_approbation import noter_poussee, sha_pousse_du_ticket
 from tessera.services.controles_depart import manques_avant_depart
 from tessera.services.realignement_base import Realignement
 from tessera.services.politique_run import PolitiqueRun
@@ -448,6 +450,8 @@ async def _sync_apres_livraison(
         pr_number=livraison.pr_number,
         merged=livraison.merged,
         pr_orpheline=livraison.pr_orpheline,
+        pushed_sha=livraison.pushed_sha,
+        branche_modifiee=livraison.branche_modifiee,
     )
 
 
@@ -540,15 +544,43 @@ def _livreur(
                 ticket_type=ticket.type.value if ticket else "",
                 branch=result.branch,
                 approuve=result.approved,
+                approved_sha=result.approved_sha,
             )
         except Exception as exc:  # noqa: BLE001 — voir la docstring
             livraison = _livraison_interrompue(exc)
+        await _noter_sha_pousse(result, livraison)
         # Syncing is always attempted so the next ticket forks from origin/<base>
         # regardless of whether this phase 1 succeeded or failed (ADR-051).
         livraison = await _sync_apres_livraison(livraison, espace, politique, base_branch)
         return livraison
 
     return livrer
+
+
+async def _noter_sha_pousse(result: PipelineResult, livraison: Livraison) -> None:
+    """Record the pushed head on the run's row, for the watcher (ticket-492).
+
+    Un échec d'écriture est journalisé : le watcher, sans SHA poussé, refusera
+    de merger — la PR reste ouverte, rien ne part sous une approbation périmée.
+    """
+    if livraison.pushed_sha is None or result.run_id is None:
+        return
+    try:
+        await noter_poussee(settings.ide_db_path, result.run_id, livraison.pushed_sha)
+    except Exception as exc:  # noqa: BLE001
+        _logger.warning("pushed_sha_non_note", extra={"erreur": str(exc)})
+
+
+async def _controle_tete_de(
+    project_id: str, ticket_id: str, lire_tete: TetePr
+) -> ControleTete:
+    """The check the watcher makes before merging a PR (ticket-492)."""
+    try:
+        pushed = await sha_pousse_du_ticket(settings.ide_db_path, project_id, ticket_id)
+    except Exception as exc:  # noqa: BLE001 — sans SHA, le watcher refuse de merger
+        _logger.warning("pushed_sha_illisible", extra={"erreur": str(exc)})
+        pushed = None
+    return ControleTete(pushed_sha=pushed, lire_tete=lire_tete)
 
 
 def _surveillance_pour(
@@ -604,15 +636,23 @@ def _surveillance_pour(
         on_event: "_CB",
     ) -> None:
         """Start CI watching for pr_number in a background task."""
+        controle = await _controle_tete_de(p_id, ticket_id, service.tete_pr)
+
+        async def phase_2(pr: int) -> Livraison:
+            # Le merge est lié au commit poussé : une tête qui bouge pendant
+            # l'attente de la CI ne part jamais sur la base (ticket-492).
+            return await service.livrer_phase_2(pr, sha_attendu=controle.pushed_sha)
+
         await CI_WATCHER.surveiller(
             p_id,
             ticket_id,
             pr_number,
-            service.livrer_phase_2,
+            phase_2,
             on_event,
             pipeline_log_path=pipeline_log_path_ci,
             etat_pr=service.pr_state,
             realignement=Realignement(project_path, base_branch),
+            controle_tete=controle,
         )
 
     return surveiller

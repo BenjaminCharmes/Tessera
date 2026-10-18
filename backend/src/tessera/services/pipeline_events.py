@@ -117,6 +117,12 @@ class PipelineResult(BaseModel):
     #: erreur serveur : sans ce champ, la cause ne serait lisible que dans
     #: les logs du backend, là où l'utilisateur de l'IDE ne va pas.
     arret: str | None = None
+    #: Tête (SHA complet) de la branche du run au moment où il a été approuvé :
+    #: la livraison n'accepte, depuis ce commit, que du rangement du pipeline
+    #: (ticket-492). `None` sur un run non approuvé.
+    approved_sha: str | None = None
+    #: Ligne `pipeline_runs` du run, pour y noter le SHA poussé (ticket-492).
+    run_id: str | None = None
 
 
 EventCallback = Callable[[OrchestratorEvent], Awaitable[None]]

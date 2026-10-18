@@ -1108,6 +1108,61 @@ class GitWorkspaceService:
         """
         await self._run("push", "--set-upstream", "origin", branch_name)
 
+    async def head_sha(self) -> str:
+        """Full SHA of the branch head (ticket-492). A failure raises."""
+        return (await self._run("rev-parse", "HEAD")).strip()
+
+    async def sha_distant(self, branch: str) -> str | None:
+        """Full SHA of `origin/<branch>` as last pushed, or None when unknown."""
+        try:
+            sortie = await self._run(
+                "rev-parse", "--verify", "--quiet", f"refs/remotes/origin/{branch}"
+            )
+        except GitCommandError:
+            return None
+        return sortie.strip() or None
+
+    async def commits_hors_rangement(self, depuis: str) -> list[str]:
+        """SHAs added after `depuis` that are not the pipeline's own bookkeeping.
+
+        A commit is bookkeeping when it has one parent and its diff touches only
+        `tickets/` and `memory/pipeline-log.md` of the project (ticket-492).
+        A head that no longer descends from `depuis` — reset, rewritten history
+        — is reported as the head itself: nothing can be said of what lies
+        between. A failure raises, so the caller fails closed.
+        """
+        if not await self._descend_de(depuis):
+            return [await self.head_sha()]
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip()
+        journal = await self._run("log", "--reverse", "--format=%H %P", f"{depuis}..HEAD")
+        hors_rangement: list[str] = []
+        for ligne in journal.splitlines():
+            sha, *parents = ligne.split()
+            if len(parents) != 1 or not await self._est_rangement(sha, prefixe):
+                hors_rangement.append(sha)
+        return hors_rangement
+
+    async def _descend_de(self, ancetre: str) -> bool:
+        """True when `ancetre` is an ancestor of HEAD (or HEAD itself)."""
+        try:
+            await self._run("merge-base", "--is-ancestor", ancetre, "HEAD")
+        except GitCommandError as exc:
+            if exc.returncode == 1:
+                return False
+            raise
+        return True
+
+    async def _est_rangement(self, sha: str, prefixe: str) -> bool:
+        """True when the commit touches only Tessera's bookkeeping paths."""
+        sortie = await self._run(
+            "diff-tree", "--no-commit-id", "--name-only", "-r", "--root", sha
+        )
+        for chemin in sortie.splitlines():
+            relatif = _relatif_au_projet(chemin, prefixe)
+            if relatif is None or not _is_orchestrator_artifact_path(relatif):
+                return False
+        return True
+
     async def commits_depuis_base(self, base: str, branch: str) -> list[CommitInfo]:
         """Short SHA, message and author of each commit between base and branch.
 

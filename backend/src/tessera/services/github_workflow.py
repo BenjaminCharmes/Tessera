@@ -76,6 +76,8 @@ class _GitHub(Protocol):
 
     async def get_pull_request_state(self, pr_number: int) -> str: ...
 
+    async def get_pull_request_head_sha(self, pr_number: int) -> str: ...
+
     async def has_workflows(self) -> bool: ...
 
     async def merge_pull_request(
@@ -91,6 +93,8 @@ class _GitHub(Protocol):
         method: str = "squash",
         commit_title: str | None = None,
         attente_fusionnabilite_max_s: float = 300.0,
+        *,
+        sha: str | None = None,
     ) -> None: ...
 
 
@@ -331,8 +335,19 @@ class GitHubWorkflowService:
             return "unknown"
         return str(await self._github.get_pull_request_state(pr_number))
 
-    async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool:
+    async def tete_pr(self, pr_number: int) -> str | None:
+        """Le SHA de tête de la PR, ou `None` sans GitHub (ticket-492)."""
+        if self._github is None:
+            return None
+        return await self._github.get_pull_request_head_sha(pr_number)
+
+    async def merge_si_la_ci_est_verte(
+        self, pr_number: int, sha_attendu: str | None = None
+    ) -> bool:
         """Merge la PR **si** le projet l'autorise et **si** la CI est verte.
+
+        Avec `sha_attendu`, le merge est lié à ce commit : GitHub le refuse si
+        la tête de la PR a bougé entre-temps (ticket-492).
 
         ADR-022 interdisait tout merge. Elle devient conditionnelle (ADR-029) :
         la declaration du projet dit que l'utilisateur renonce a sa relecture
@@ -370,11 +385,14 @@ class GitHubWorkflowService:
         merge_method = "squash"
         if self._politique is not None:
             merge_method = self._politique.merge_method
+        # `sha` ne part que s'il est demandé : sans lui, l'appel reste celui d'avant.
+        lie_au_sha: dict[str, str] = {} if sha_attendu is None else {"sha": sha_attendu}
         try:
             await self._github.merge_quand_fusionnable(
                 pr_number,
                 method=merge_method,
                 attente_fusionnabilite_max_s=settings.attente_fusionnabilite_max_s,
+                **lie_au_sha,
             )
         except (MergeabiliteTimeoutError, PRNonFusionnableError) as exc:
             _logger.warning(
