@@ -3443,3 +3443,17 @@ Points posit (58359ms)
 - 2026-10-17 18:48:03 UTC — [ticket-477] validateur: APPROVED — Tous les critères sont couverts par des tests spécifiques et documentés dans `te (24750ms)
 - 2026-10-17 18:48:03 UTC — [ticket-477] APPROVED après 1 tour(s)
 - 2026-10-17 18:50:14 UTC — [ticket-477] documentation: 2 fichier(s) (127140ms)
+- 2026-10-18 07:34:57 UTC — [ticket-500] branche ticket-500-when-neon-refuses-to-create-a-project-in-a-vercel
+- 2026-10-18 07:34:58 UTC — [ticket-500] tour 1 — codeur démarré
+- 2026-10-18 07:36:25 UTC — [ticket-500] tour 1 — codeur terminé (86907ms)
+- 2026-10-18 07:40:31 UTC — [ticket-500] testeur: 1 failed, 1185 passed, 28 warnings in 244.07s (0:04:04)
+- 2026-10-18 07:40:31 UTC — [ticket-500] tests rouges au tour 1
+- 2026-10-18 07:40:31 UTC — [ticket-500] tour 2 — codeur démarré
+- 2026-10-18 07:40:59 UTC — [ticket-500] tour 2 — codeur terminé (27812ms)
+- 2026-10-18 07:46:02 UTC — [ticket-500] testeur: OK (exit 0)
+- 2026-10-18 07:47:42 UTC — [ticket-500] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code respecte l'ADR-053 (secrets n (99202ms)
+- 2026-10-18 07:47:42 UTC — [ticket-500] tour 2 — reviewer démarré
+- 2026-10-18 07:47:59 UTC — [ticket-500] tour 2 — reviewer terminé (17218ms)
+- 2026-10-18 07:49:28 UTC — [ticket-500] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (105969ms)
+- 2026-10-18 07:49:28 UTC — [ticket-500] APPROVED après 2 tour(s)
+- 2026-10-18 07:51:40 UTC — [ticket-500] documentation: 1 fichier(s) (128531ms)

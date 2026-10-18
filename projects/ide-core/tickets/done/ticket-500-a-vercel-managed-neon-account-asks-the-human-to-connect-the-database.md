@@ -1,14 +1,15 @@
 ---
-id: ticket-500
-title: "When Neon refuses to create a project in a Vercel-managed organization, the database step asks the human to connect it from Vercel"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-18
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-18
+id: ticket-500
+pr_number: 522
+priority: high
+status: done
+title: When Neon refuses to create a project in a Vercel-managed organization, the
+  database step asks the human to connect it from Vercel
+type: fix
 ---
 
 # ticket-500 — Une organisation Neon gérée par Vercel : la base se branche depuis Vercel

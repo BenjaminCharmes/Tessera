@@ -1778,6 +1778,28 @@ Si un signalement arrive pendant qu'une file ide-core tourne, il n'est pas conve
 
 Les signalements créés ne remontent pas dans une liste locale. Tu les lis dans le Kanban d'ide-core, comme n'importe quel autre ticket de ce projet.
 
+## 14. Mise en ligne d'un projet
+
+Tu peux configurer l'IDE pour mettre en ligne ton projet : créer une base de données, configurer le domaine et ses enregistrements DNS, et déployer sur un hébergeur.
+
+Le bloc `online` de ta configuration déclare les services à configurer (Neon pour la base, Resend pour l'email, Cloudflare pour le DNS, Vercel pour le déploiement). L'IDE exécute alors un plan d'étapes : créer la base, vérifier Resend, publier le DNS, puis déployer.
+
+### Organisation Neon gérée par Vercel
+
+Si ton compte Neon est lié à Vercel, il se peut que ton organisation Neon soit **gérée par Vercel**. Tu le vois dans les paramètres Neon : le champ `managed_by` affiche `"vercel"`. Dans ce cas, tu ne crées pas de bases via l'API de Neon — tu les crées depuis le tableau de bord Vercel.
+
+L'IDE le détecte au moment du provisioning. L'étape « Base Neon » s'arrête avec une instruction claire au lieu d'un échec :
+
+> Organisation Neon gérée par Vercel : dans Vercel, projet *<id>* › Storage › Create Database › Neon, en reliant Production et Preview. La relance lira DATABASE_URL.
+
+Tu procèdes ainsi :
+1. Va dans ton projet Vercel
+2. Clique sur **Storage › Create Database › Neon**
+3. Relie les branches **Production** et **Preview**
+4. Reviens relancer l'étape dans l'IDE
+
+Elle lira alors `DATABASE_URL` depuis Vercel et continuera comme prévu.
+
 ## Pour aller plus loin
 
 - [`architecture.md`](architecture.md) — comment Tessera est construit
