@@ -751,6 +751,23 @@ Avant le lancement du pipeline, l'orchestrateur prépare l'arbre de travail si l
 
 **Contexte** : Après un run approuvé, la livraison en phase 2 (confiée au CIWatcher) écrit des lignes dans le journal *après* le commit de tenue de livres. Sans ce mécanisme, l'arbre resterait modifié, et le prochain run ne pourrait ni revenir à la base (arbre non propre) ni se réaligner (modifications bloquent le pull). Les tickets 378 et 406 ne couvraient que le cas où l'arbre était resté sur la branche de ticket — pas celui-ci.
 
+### Reconnaissance des tickets bloqués livrés manuellement (ticket-482)
+
+Quand un ticket passe en `blocked` après trois tours infructueux du pipeline, mais que sa PR est ensuite mergée manuellement (hors du pipeline), le ticket reste marqué `blocked` en tant que trace historique. Le réalignement de la base détecte ce cas et le range automatiquement en `done/`.
+
+**Mécanique** :
+- Au réalignement de la base (ticket-457) ou au départ d'une file
+- Pour chaque ticket en `blocked/`
+- Chercher une PR mergée dont la branche commence par `<ticket-id>-`
+- Si elle existe :
+  - Déplacer le ticket dans `done/`
+  - Passer son `status` à `done`
+  - Renseigner son `pr_number`
+  - Inclure ce déplacement dans le commit de tenue de livres du run suivant
+  - Journaliser : « ticket-N rangé en done : PR #M mergée »
+
+Cas d'usage : un ticket bloqué après le pipeline, livré manuellement, est reconnu lors de la prochaine synchronisation sans intervention manuelle.
+
 ## Documentation par lot (ADR-035, ticket-292)
 
 Après approbation, le pipeline met à jour la documentation technique et fonctionnelle 
