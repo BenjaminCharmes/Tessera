@@ -104,6 +104,22 @@ async def test_identical_record_is_ignored_and_missing_one_is_created_unproxied(
     assert ctx.dns_published is True
 
 
+async def test_mx_record_is_created_with_its_priority() -> None:
+    fake = FakeCloudflare()
+    mx = DnsRecord("MX", "send.example.com", "feedback-smtp.us-east-1.amazonses.com", 10)
+    result = await _step(fake).apply(_ctx(mx))
+    assert result.state is StepState.DONE
+    creations = [json.loads(r.content) for r in fake.calls("POST")]
+    assert creations[0]["type"] == "MX" and creations[0]["priority"] == 10
+
+
+async def test_record_without_priority_sends_no_priority_field() -> None:
+    fake = FakeCloudflare()
+    await _step(fake).apply(_ctx(_A))
+    creations = [json.loads(r.content) for r in fake.calls("POST")]
+    assert "priority" not in creations[0]
+
+
 async def test_same_type_and_name_with_another_content_needs_a_human_without_writing() -> None:
     fake = FakeCloudflare(records=(_record("A", "example.com", "203.0.113.7"),))
     ctx = _ctx(_A, _TXT)

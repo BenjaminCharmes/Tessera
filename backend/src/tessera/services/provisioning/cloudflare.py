@@ -134,6 +134,9 @@ class CloudflareClient:
             "ttl": _TTL_AUTO,
             "proxied": False,
         }
+        # Cloudflare refuse un MX sans priorité (ticket-501).
+        if record.priority is not None:
+            corps["priority"] = record.priority
         await self._send("POST", f"/zones/{quote(zone_id, safe='')}/dns_records", body=corps)
 
 
