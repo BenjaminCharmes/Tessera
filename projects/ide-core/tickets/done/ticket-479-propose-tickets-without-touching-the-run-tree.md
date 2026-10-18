@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-479
 plan: true
-pr_number: null
+pr_number: 533
 priority: medium
 status: done
 title: New tickets can be proposed to a project while a run holds its tree
