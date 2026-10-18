@@ -3526,3 +3526,5 @@ Points posit (58359ms)
 - 2026-10-18 08:23:00 UTC — [ticket-497] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (269827ms)
 - 2026-10-18 08:23:00 UTC — [ticket-497] APPROVED après 1 tour(s)
 - 2026-10-18 08:25:22 UTC — [ticket-497] documentation: 2 fichier(s) (138327ms)
+- 2026-10-18 08:25:58 UTC — [ticket-497] livraison: résolveur tenté : backend/src/tessera/services/orchestrator.py (29609ms)
+- 2026-10-18 08:25:58 UTC — [ticket-497] livraison: arrêt — Conflit avec develop sur : backend/src/tessera/services/orchestrator.py — résolveur tenté sur backen
