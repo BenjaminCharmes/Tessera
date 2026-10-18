@@ -444,6 +444,14 @@ Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le s
 | `GET` | `/api/v1/projects/{id}/tickets/{tid}` | Détail d'un ticket |
 | `PATCH` | `/api/v1/projects/{id}/tickets/{tid}/status` | Déplace le ticket dans le bon dossier |
 
+#### Proposition de tickets en parallèle d'un run (ticket-479)
+
+Un endpoint `POST /api/v1/projects/{id}/tickets/propose` permet aux sessions de créer de nouveaux tickets pendant qu'un run occupe l'arbre d'un projet, sans créer manuellement de worktree ou de PR.
+
+Le processus crée un worktree temporaire depuis la base distante, écrit les nouveaux tickets dans `tickets/todo/`, les commite et les pousse. L'IDE ouvre une PR et la merge immédiatement si le projet est en `autonomy: merge`, sinon la laisse ouverte. Le worktree est supprimé à la fin, même en cas d'erreur.
+
+Chaque frontmatter est validé avec le même modèle que le chargement ordinaire. Une validation échouée refuse l'opération en 422 sans rien pousser. L'arbre principal du projet reste intact pendant toute l'opération.
+
 ### Agents
 | Méthode | Route | Description |
 |---------|-------|-------------|

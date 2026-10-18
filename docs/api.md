@@ -51,6 +51,7 @@ en interactif quand le backend tourne.
 | `GET` | `/api/v1/projects/{project_id}/tickets/archive` | List Archived Tickets |
 | `POST` | `/api/v1/projects/{project_id}/tickets/batch` | Create Tickets Batch |
 | `GET` | `/api/v1/projects/{project_id}/tickets/check` | Check Ticket Validity |
+| `POST` | `/api/v1/projects/{project_id}/tickets/propose` | Propose Tickets |
 | `GET` | `/api/v1/projects/{project_id}/pr-statuses` | List PR Statuses For Project |
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Get Ticket |
 | `PATCH` | `/api/v1/projects/{project_id}/tickets/{ticket_id}` | Update Ticket Status |
@@ -61,6 +62,25 @@ en interactif quand le backend tourne.
 | `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/merge-pr` | Merge Pull Request For Ticket |
 | `POST` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/open-pr` | Open Pull Request For Ticket |
 | `GET` | `/api/v1/projects/{project_id}/tickets/{ticket_id}/pr-status` | Get Pr Status |
+
+#### `POST /api/v1/projects/{project_id}/tickets/propose`
+
+Permet de créer de nouveaux tickets sur un projet pendant qu'un run occupe son arbre.
+
+Accepte un ou plusieurs fichiers de ticket (nom et contenu) :
+- Valide chaque frontmatter avec le même modèle que le chargement des tickets
+- Crée un worktree temporaire depuis la base distante
+- Écrit les fichiers dans `tickets/todo/`, puis commite et pousse une branche
+- Ouvre la PR vers la base et la merge si le projet est configuré en `autonomy: merge`
+- Supprime le worktree même en cas d'erreur
+
+L'arbre principal du projet reste intact pendant toute l'opération.
+
+**Réponses** :
+- `201 Created` : un ou plusieurs tickets créés et proposés
+- `422 Unprocessable Entity` : frontmatter invalide, aucun changement poussé
+- `409 Conflict` : l'arbre du projet est indisponible
+- `404 Not Found` : le projet est inconnu
 
 ### Signalements
 
