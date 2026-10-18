@@ -404,29 +404,67 @@ class TicketService:
         return _ticket_cache[key]
 
     def _parse(self, path: Path) -> Ticket:
-        post = frontmatter.load(str(path))
-        # Frontmatter metadata is arbitrary YAML: every field is coerced to
-        # the model's own type here, at the parsing boundary, so an invalid
-        # ticket file fails loudly instead of producing a half-typed Ticket.
-        meta: dict[str, Any] = dict(post.metadata)
-        raw_pr_number = meta.get("pr_number")
-        return Ticket(
-            id=str(meta["id"]),
-            title=str(meta["title"]),
-            type=TicketType(meta["type"]),
-            status=_status_from_folder(path, meta),
-            priority=TicketPriority(meta["priority"]),
-            agent=str(meta["agent"]),
-            depends_on=_normalize_depends_on(meta.get("depends_on")),
-            created=str(meta.get("created", "")),
-            github_issue_url=str(meta["github_issue_url"])
-            if meta.get("github_issue_url")
-            else None,
-            pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
-            # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
-            plan=meta.get("plan") is True,
-            light=meta.get("light") is True,
-            body=str(post.content),
-            project_id=self._project_id,
-            file_path=str(path),
+        return _ticket_from_post(frontmatter.load(str(path)), path, self._project_id)
+
+
+def _ticket_from_post(post: frontmatter.Post, path: Path, project_id: str) -> Ticket:
+    """Build a `Ticket` from a parsed file; the single parsing rule for tickets.
+
+    Frontmatter metadata is arbitrary YAML: every field is coerced to the
+    model's own type here, at the parsing boundary, so an invalid ticket file
+    fails loudly instead of producing a half-typed Ticket.
+    """
+    meta: dict[str, Any] = dict(post.metadata)
+    raw_pr_number = meta.get("pr_number")
+    return Ticket(
+        id=str(meta["id"]),
+        title=str(meta["title"]),
+        type=TicketType(meta["type"]),
+        status=_status_from_folder(path, meta),
+        priority=TicketPriority(meta["priority"]),
+        agent=str(meta["agent"]),
+        depends_on=_normalize_depends_on(meta.get("depends_on")),
+        created=str(meta.get("created", "")),
+        github_issue_url=str(meta["github_issue_url"])
+        if meta.get("github_issue_url")
+        else None,
+        pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
+        # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
+        plan=meta.get("plan") is True,
+        light=meta.get("light") is True,
+        body=str(post.content),
+        project_id=project_id,
+        file_path=str(path),
+    )
+
+
+#: Un nom de fichier de ticket : l'identifiant, puis éventuellement un slug.
+#: Aucun séparateur de chemin ni point : le nom vient d'une requête.
+_TICKET_FILE_RE = re.compile(r"^(ticket-\d+)(?:-[\w-]+)?\.md$")
+
+
+def validate_ticket(name: str, content: str) -> Ticket:
+    """Parse a ticket file the way loading does, or raise `ValueError`.
+
+    The same rule as `TicketService._parse`, so a ticket refused here would
+    also be unreadable once on disk (ticket-479). The file is judged as if it
+    sat in `todo/`; the id in the frontmatter must match the one in the name.
+    """
+    matched = _TICKET_FILE_RE.match(name)
+    if matched is None:
+        raise ValueError(
+            f"Nom de fichier refusé : {name!r} (attendu : ticket-<n>[-slug].md)"
         )
+    try:
+        ticket = _ticket_from_post(
+            frontmatter.loads(content), Path("todo") / name, ""
+        )
+    except KeyError as exc:
+        raise ValueError(f"{name} : champ de frontmatter manquant : {exc.args[0]}") from exc
+    except Exception as exc:  # noqa: BLE001 — YAML, enum ou modèle : un seul refus
+        raise ValueError(f"{name} : frontmatter invalide : {exc}") from exc
+    if ticket.id != matched.group(1):
+        raise ValueError(
+            f"{name} : l'id du frontmatter ({ticket.id}) ne correspond pas au nom du fichier"
+        )
+    return ticket
