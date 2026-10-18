@@ -49,6 +49,44 @@ async def mettre_de_cote(racine: Path) -> list[str]:
     return lignes if code == 0 else []
 
 
+async def journal_non_suivi(racine: Path) -> bool:
+    """True when the log exists, is neither tracked nor ignored by git."""
+    if not (racine / _JOURNAL).is_file():
+        return False
+    chemin = _JOURNAL.as_posix()
+    code, _ = await _git(racine, "ls-files", "--error-unmatch", "--", chemin)
+    if code == 0:
+        return False
+    # Ignoré (mode `local`, ADR-021) : git l'écrase sans refuser, rien à faire.
+    code, _ = await _git(racine, "check-ignore", "-q", "--", chemin)
+    return code != 0
+
+
+async def mettre_de_cote_non_suivi(racine: Path, ref_distante: str) -> list[str]:
+    """Return the lines of an untracked log that ``ref_distante`` also tracks, and delete it.
+
+    The merge brings its own copy of the log, and git refuses to overwrite an
+    untracked file (ticket-480). Nothing is touched — an empty list comes back
+    — unless the log is untracked, not ignored, and present on the remote ref.
+    ``ref_distante`` is relative to the project folder (``<ref>:./path``), so
+    ``git_root: ancestor`` works too.
+    """
+    if not await journal_non_suivi(racine):
+        return []
+    chemin = _JOURNAL.as_posix()
+    code, _ = await _git(racine, "cat-file", "-e", f"{ref_distante}:./{chemin}")
+    if code != 0:
+        return []
+    journal = racine / _JOURNAL
+    lignes = [
+        ligne
+        for ligne in journal.read_text(encoding="utf-8", errors="replace").splitlines()
+        if ligne.strip()
+    ]
+    journal.unlink()
+    return lignes
+
+
 def reecrire(racine: Path, lignes: list[str]) -> None:
     """Append ``lignes`` to the log, skipping any line it already holds."""
     if not lignes:

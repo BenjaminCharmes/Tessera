@@ -1,15 +1,16 @@
 ---
-id: ticket-480
-title: "After a run, the base branch pulls cleanly and leftover untracked files are reported"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
+id: ticket-480
 plan: true
-created: 2026-10-16
+pr_number: 529
+priority: medium
+status: done
+title: After a run, the base branch pulls cleanly and leftover untracked files are
+  reported
+type: fix
 ---
 
 # ticket-480 — Un pull propre après le premier run d'un projet

@@ -1038,6 +1038,16 @@ Après la livraison d'un run, le dépôt local finit dans un état garanti :
 Cela permet d'enchaîner plusieurs runs sans accumulation d'état en attente de nettoyage manuel.
 
 
+
+#### Gestion des fichiers non suivis après livraison (ticket-480)
+
+Après le merge d'une PR, le workspace se réaligne sur la branche de base. Deux cas spéciaux évitent les blocages :
+
+- **`memory/pipeline-log.md` non suivi localement mais présent distamment** : ses lignes locales sont mises de côté avant pull, puis réintégrées en union. Le pull passe sans refus.
+- **Fichiers non suivis et non ignorés laissés par le run** : listés au journal du pipeline, sans être supprimés.
+
+Résultat : `git pull` ne refuse jamais, et le workspace est propre pour le ticket suivant.
+
 ### Finalisation de tous les runs et journalisation des défaillances (tickets-377, 390)
 
 Après ticket-378, les tickets-377 et 390 étendent le nettoyage et la journalisation à tous les runs.

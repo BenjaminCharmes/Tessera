@@ -3565,3 +3565,24 @@ Points posit (58359ms)
 - 2026-10-18 14:00:47 UTC — [ticket-482] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests vérifient que les ti (120485ms)
 - 2026-10-18 14:00:47 UTC — [ticket-482] APPROVED après 2 tour(s)
 - 2026-10-18 14:03:13 UTC — [ticket-482] documentation: 2 fichier(s) (141532ms)
+- 2026-10-18 14:03:31 UTC — [ide-core] ticket-482 PR #528 confiée au CIWatcher
+- 2026-10-18 14:03:33 UTC — [ticket-480] branche ticket-480-after-a-run-the-base-branch-pulls-cleanly-and-lef
+- 2026-10-18 14:04:33 UTC — [ticket-480] plan rendu (59063ms)
+- 2026-10-18 14:04:33 UTC — [ticket-480] tour 1 — codeur démarré
+- 2026-10-18 14:08:09 UTC — [ide-core] ticket-482 PR #528 mergée (CI verte)
+- 2026-10-18 14:11:31 UTC — [ticket-480] tour 1 — codeur terminé (417828ms)
+- 2026-10-18 14:16:57 UTC — [ticket-480] testeur: OK (exit 0)
+- 2026-10-18 14:19:31 UTC — [ticket-480] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code gère les chemins et les  (153421ms)
+- 2026-10-18 14:19:31 UTC — [ticket-480] tour 1 — reviewer démarré
+- 2026-10-18 14:20:15 UTC — [ticket-480] tour 1 — reviewer terminé (44093ms)
+- 2026-10-18 14:21:46 UTC — [ticket-480] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente correctement (134813ms)
+- 2026-10-18 14:21:46 UTC — [ticket-480] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-18 14:21:46 UTC — [ticket-480] tour 2 — codeur démarré
+- 2026-10-18 14:24:13 UTC — [ticket-480] tour 2 — codeur terminé (147109ms)
+- 2026-10-18 14:29:42 UTC — [ticket-480] testeur: OK (exit 0)
+- 2026-10-18 14:32:46 UTC — [ticket-480] securite: PASS — Aucune vulnérabilité critique ou haute introduite par ce ticket. Le code gère le (183578ms)
+- 2026-10-18 14:32:46 UTC — [ticket-480] tour 2 — reviewer démarré
+- 2026-10-18 14:33:10 UTC — [ticket-480] tour 2 — reviewer terminé (23968ms)
+- 2026-10-18 14:35:06 UTC — [ticket-480] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests couvrent correctement (140733ms)
+- 2026-10-18 14:35:06 UTC — [ticket-480] APPROVED après 2 tour(s)
+- 2026-10-18 14:37:42 UTC — [ticket-480] documentation: 1 fichier(s) (150483ms) — après tour de correction
