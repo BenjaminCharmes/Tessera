@@ -720,6 +720,21 @@ Quand tu relances un ticket, sa branche précédente est réutilisée — tu ne 
 
 Si le rebasage échoue, l'ancienne branche est renommée `stale/<ancien-nom>` pour que tu ne la perdes pas, et une branche neuve est créée à partir de la base actuelle. Le codeur repartira d'une base propre.
 
+
+### Reprendre un run sur une branche déjà travaillée
+
+Quand tu arrêtes et relances un run (quota épuisé, interruption, redémarrage d'une session), le ticket peut reprendre sur une branche qui porte déjà du travail : des commits ont été faits au-delà de son point de départ.
+
+**Si le projet a un testeur actif**, Tessera optimise cette reprise :
+- Le testeur s'exécute d'abord pour valider le travail
+- Tests verts → la branche passe directement à l'audit, la revue, le validateur — le codeur n'est pas réappelé
+- Tests rouges, erreur d'environnement ou délai dépassé → le codeur reprend son travail, avec le résultat des tests dans sa réponse
+
+**Si le projet n'a pas de testeur** :
+- Le codeur est appelé normalement : sans tests, rien ne prouve que le travail existant tient
+
+Un refus du reviewer ou du validateur renvoie toujours au codeur comme d'habitude. Seul le premier tour peut être sauté si les tests passent.
+
 ### Quand des tests échouent
 
 Quand des tests échouent, le **résumé du test** affiché dans le journal est clair et lisible — « 1 failed, 455 passed » au lieu d'une ligne de warning confuse. Le codeur reçoit aussi le **détail de chaque échec** — le nom du test et l'assertion qui a échoué — pour corriger en un seul tour.
