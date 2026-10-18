@@ -869,6 +869,11 @@ class GitWorkspaceService:
             ]
             if lignes:
                 await self._run("checkout", "HEAD", "--", journal)
+        # Journal non suivi ici, suivi sur la base distante (ticket-480) :
+        # `diff HEAD` ne le voit pas, mais le merge refuserait de l'écraser.
+        lignes += await journal_en_attente.mettre_de_cote_non_suivi(
+            self._project_path, cible
+        )
         try:
             await self._run("merge", "--ff-only", "-q", cible)
             raison = None
@@ -1030,6 +1035,20 @@ class GitWorkspaceService:
         """Paths git reports as untracked (respecting .gitignore), as a tuple."""
         listing = await self._run("ls-files", "--others", "--exclude-standard")
         return tuple(path for path in listing.splitlines() if path)
+
+    async def fichiers_non_suivis_laisses(self) -> tuple[str, ...]:
+        """Untracked, non-ignored files that appeared since the run started.
+
+        Read-only (ticket-480): nothing is deleted, the caller only reports
+        them. Files already untracked at run start are not the run's doing.
+        """
+        presents = await self._untracked_files()
+        return tuple(
+            chemin
+            for chemin in presents
+            if chemin not in self._preexisting_untracked
+            and chemin != _JOURNAL_PIPELINE
+        )
 
     async def push_branch(self, branch_name: str) -> None:
         """Pousse `branch_name` sur `origin`, en suivi de branche.

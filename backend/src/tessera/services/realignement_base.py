@@ -67,7 +67,9 @@ async def _raison_de_refus(racine: Path, base_branch: str) -> str | None:
     if code != 0:
         return "position du projet dans le dépôt illisible"
     journal = prefixe.strip() + _JOURNAL
-    code, sortie, _ = await _git(racine, "status", "--porcelain", "--", ".")
+    # `-uall` : un dossier non suivi qui ne contient que le journal doit se
+    # lire `?? memory/pipeline-log.md`, pas `?? memory/` (ticket-480).
+    code, sortie, _ = await _git(racine, "status", "--porcelain", "-uall", "--", ".")
     if code != 0:
         return "état de l'arbre illisible"
     autres = [
@@ -102,9 +104,27 @@ async def realigner_base(racine: Path, base_branch: str, project_id: str) -> boo
     return True
 
 
+async def _mettre_de_cote_non_suivi(racine: Path, base_branch: str) -> list[str]:
+    """Lines of an untracked log that the remote base tracks (ticket-480).
+
+    Le `fetch` ne se fait que si le journal est non suivi : le cas courant
+    (journal suivi) ne paie rien de plus. Un fetch qui échoue n'est pas une
+    erreur ici : le `pull` qui suit refuse pour la même raison.
+    """
+    if not await journal_en_attente.journal_non_suivi(racine):
+        return []
+    code, _, _ = await _git(racine, "fetch", "origin", base_branch)
+    if code != 0:
+        return []
+    return await journal_en_attente.mettre_de_cote_non_suivi(
+        racine, f"origin/{base_branch}"
+    )
+
+
 async def _avancer(racine: Path, base_branch: str) -> str | None:
     """Set the log aside, pull --ff-only, write the log back; the refusal or None."""
     lignes = await journal_en_attente.mettre_de_cote(racine)
+    lignes += await _mettre_de_cote_non_suivi(racine, base_branch)
     try:
         code, _, err = await _git(racine, "pull", "--ff-only", "origin", base_branch)
     finally:

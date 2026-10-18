@@ -58,6 +58,9 @@ if TYPE_CHECKING:
 
 _logger = get_logger(__name__)
 
+# Nombre de fichiers non suivis nommés dans une ligne de journal (ticket-480).
+_MAX_FICHIERS_SIGNALES = 10
+
 _PRIORITY_ORDER: dict[TicketPriority, int] = {
     TicketPriority.critical: 0,
     TicketPriority.high: 1,
@@ -237,6 +240,10 @@ class Orchestrator:
             run_id=run_id, dialogue=dialogue,
             envelope_run_id=envelope_run_id,
         )
+        # Signalé ici, pour un run approuvé comme bloqué, avant que le ticket
+        # suivant ne refasse l'état de référence des fichiers non suivis
+        # (`create_branch`) et ne les range parmi les fichiers déjà présents.
+        await self._signaler_fichiers_non_suivis(ticket_id)
         if not resultat.approved:
             return resultat
 
@@ -1045,6 +1052,34 @@ class Orchestrator:
             await self._git_workspace.retourner_sur_base(self._base_branch)
         except Exception as exc:  # noqa: BLE001
             _logger.warning("livraison_checkout_base_failed", extra={"error": str(exc)})
+
+    async def _signaler_fichiers_non_suivis(self, etiquette: str) -> None:
+        """Log the untracked files a run left in the tree; delete nothing (ticket-480).
+
+        Un client généré (Prisma, par exemple) reste non suivi après un run
+        bloqué : la ligne de journal dit lesquels, pour qu'on décide de les
+        ignorer. Une erreur ici est journalisée et avalée.
+        """
+        if self._git_workspace is None:
+            return
+        # getattr : les doubles d'espace de travail des tests n'ont pas cette méthode.
+        lister = getattr(self._git_workspace, "fichiers_non_suivis_laisses", None)
+        if lister is None:
+            return
+        try:
+            fichiers = list(await lister())
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("fichiers_non_suivis_illisibles", extra={"error": str(exc)})
+            return
+        if not fichiers:
+            return
+        vus = ", ".join(str(f) for f in fichiers[:_MAX_FICHIERS_SIGNALES])
+        if len(fichiers) > _MAX_FICHIERS_SIGNALES:
+            vus += f" et {len(fichiers) - _MAX_FICHIERS_SIGNALES} autres"
+        self._log(
+            f"[{etiquette}] fichiers non suivis laissés par le run : {vus} "
+            "(à ignorer dans .gitignore ?)"
+        )
 
     async def _nettoyer_apres_file(self) -> None:
         """Commit remaining log lines and return to the base branch after a queue.
