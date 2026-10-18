@@ -3640,3 +3640,4 @@ Points posit (58359ms)
 - 2026-10-18 19:35:20 UTC — [ticket-490] validateur: fichiers cités joints : scripts/verifier.py, conftest.py, vitest.config.ts, memory/contraintes.md (tronqué)
 - 2026-10-18 19:35:20 UTC — [ticket-490] validateur: APPROVED — Le diff implémente intégralement le ticket : le script de vérification se refuse (329578ms)
 - 2026-10-18 19:35:20 UTC — [ticket-490] APPROVED après 1 tour(s)
+- 2026-10-18 19:39:15 UTC — [ticket-490] documentation: 3 fichier(s) (230453ms) — après tour de correction
