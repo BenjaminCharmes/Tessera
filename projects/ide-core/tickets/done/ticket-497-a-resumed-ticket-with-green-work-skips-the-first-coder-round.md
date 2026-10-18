@@ -1,15 +1,16 @@
 ---
-id: ticket-497
-title: "A resumed ticket whose branch already carries work runs the tests first, and goes straight to review when they pass"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-17
 depends_on: []
 estimated_days: 1
-created: 2026-10-17
+id: ticket-497
 plan: true
+pr_number: null
+priority: medium
+status: done
+title: A resumed ticket whose branch already carries work runs the tests first, and
+  goes straight to review when they pass
+type: feat
 ---
 
 # ticket-497 — Un ticket repris sur une branche déjà travaillée ne rejoue pas le codeur

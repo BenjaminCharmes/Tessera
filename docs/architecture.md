@@ -656,6 +656,20 @@ Après chaque passe du reviewer, le retour au codeur comprend le verdict et une 
 
 **Affichage dans le journal** : La ligne du pipeline affiche la première ligne non vide de la raison, pas le verdict seul. Cela permet au codeur de voir d'un coup d'œil la substance de l'objection — « interface manque un bouton » plutôt que juste « CHANGES_REQUESTED ».
 
+### Détection de travail existant et optimisation du démarrage (ticket-497)
+
+Quand un run reprend un ticket (redémarrage après interruption, quota épuisé ou autre raison), le pipeline détecte si la branche porte déjà des commits au-delà de son point de départ (`_fork_point`). Si c'est le cas, il optimise le démarrage avant de relancer le codeur :
+
+**Avec testeur actif** : Le pipeline lance d'abord le testeur sur l'arbre existant.
+- **Tests verts** : Saut du premier tour du codeur, enchaînement direct vers l'audit de sécurité, la revue et la validation — comme après un tour de codeur normal.
+- **Tests rouges, panne d'environnement ou délai dépassé** : Reprise du déroulé habituel (codeur en premier), avec les résultats du test dans son prompt.
+
+**Sans testeur** : Reprise du déroulé habituel (codeur en premier).
+
+Un refus de la revue ou du validateur renvoie au codeur comme d'habitude : cette optimisation n'affecte que le choix de la première étape.
+
+L'événement `run_resumed_from_existing_work` (ticket, commits repris, verdict des tests) est émis et tracé dans `pipeline-log.md`.
+
 ## Protection des fichiers sensibles et validation pré-run
 
 Certains fichiers sont critiques pour le fonctionnement de l'IDE et ne peuvent jamais être modifiés par les agents : `CLAUDE.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/` (et `CLAUDE.local.md`).

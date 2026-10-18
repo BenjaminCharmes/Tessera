@@ -51,6 +51,7 @@ export type EventType =
   | "ci_merge_done"
   | "answer_ack"
   | "provisioning_step"
+  | "run_resumed_from_existing_work"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */

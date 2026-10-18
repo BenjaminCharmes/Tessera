@@ -500,9 +500,16 @@ def _role_qui_produit(type_de_ticket: "TicketType") -> AgentRole:
 
 
 async def run_tests(
-    orch: "Orchestrator", run: PipelineRun
+    orch: "Orchestrator", run: PipelineRun, *, reprise: bool = False
 ) -> "bool | PipelineResult":
     """Lance la suite de tests du projet.
+
+    ``reprise`` marque le contrôle d'un travail repris avant le codeur
+    (ticket-497) : il faut alors une preuve, pas une absence d'échec. Un délai
+    dépassé deux fois, une commande introuvable ou une panne du lanceur rendent
+    ``False`` — jamais ``True``, qui ferait passer une panne pour un vert — et
+    ne terminent pas le run : le codeur reprend, comme si les tests étaient
+    rouges.
 
     Rend ``False`` quand les tests sont rouges (le codeur reprend).
     Rend ``True`` quand les tests passent, ou quand il n'y a pas de testeur.
@@ -538,6 +545,8 @@ async def run_tests(
                 orch._project_path, test_command=orch._test_command
             )
             if result.expiree:
+                if reprise:
+                    return False
                 return await finish_timeout_expired(orch, run)
 
         run.test_result = result
@@ -570,7 +579,7 @@ async def run_tests(
         # Le lanceur lui-même a échoué : on ne transforme pas sa panne en
         # échec du ticket, sinon une commande mal configurée bloquerait tout.
         _logger.warning("test_runner_failed", extra={"error": str(exc)})
-    return True
+    return not reprise
 
 
 # ------------------------------------------------------------------

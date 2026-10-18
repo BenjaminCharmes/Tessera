@@ -4,6 +4,10 @@ Split out of `orchestrator.py` so they can be read and tested on their own —
 none of them touch git, the ticket store or the agents.
 """
 import re
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from tessera.services.pipeline_run import PipelineRun
 
 _CRITERIA_HEADING = re.compile(r"##\s*(critères|acceptance criteria)", re.IGNORECASE)
 _CRITERIA_ITEM = re.compile(r"\s*-\s*\[[ xX]?\]\s*(.+)")
@@ -157,3 +161,19 @@ def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
     if any(_APPROVED_WORD.search(line) for line in lines):
         return True, ""
     return False, content[:200]
+
+
+def _echec_de_tests(run: "PipelineRun") -> str:
+    """Ce que le codeur lit au tour suivant : le fait, puis les erreurs.
+
+    Sans les erreurs, le second tour recommence à l'aveugle et produit
+    souvent la même chose.
+    """
+    resultat = run.test_result
+    if resultat is None:
+        return "Les tests du projet ont échoué. Corrige-les avant toute chose."
+    erreurs = "\n".join(resultat.errors[:10])
+    return (
+        "Les tests du projet échouent — corrige-les avant toute autre chose.\n"
+        f"{resultat.output_summary}\n{erreurs}"
+    )

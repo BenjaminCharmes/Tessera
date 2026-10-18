@@ -433,6 +433,10 @@ class GitWorkspaceService:
         # commits on the branch, not only the uncommitted work of the current
         # turn.
         self._fork_point: str | None = None
+        # Commits que la branche reprise porte au-delà de `_fork_point`
+        # (ticket-497). 0 sur une branche neuve : le pipeline s'en sert pour
+        # décider de vérifier le travail existant avant de rappeler le codeur.
+        self.commits_repris: int = 0
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         """Create `ticket-<id>-<slug>` and switch to it; idempotent if it already exists.
@@ -451,6 +455,7 @@ class GitWorkspaceService:
 
         branch_name = _branch_name(ticket_id, slug)
 
+        self.commits_repris = 0
         exists = await self._branch_exists(branch_name)
         if exists:
             await self._run("checkout", branch_name)
@@ -467,10 +472,25 @@ class GitWorkspaceService:
                 and self._fork_point != self._base_ref
             ):
                 await self._rejouer_branche_en_retard(branch_name)
+            self.commits_repris = await self._compter_commits_depuis_depart()
         else:
             await self._run("checkout", "-b", branch_name, self._base_ref)
             self._fork_point = self._base_ref
         return branch_name
+
+    async def _compter_commits_depuis_depart(self) -> int:
+        """Commits de HEAD au-delà de ``_fork_point`` ; 0 si le point est inconnu.
+
+        Après un renommage ``stale/``, ``_fork_point`` est la base et HEAD
+        aussi : le compte tombe à 0 sans cas particulier.
+        """
+        if self._fork_point is None:
+            return 0
+        try:
+            sortie = await self._run("rev-list", "--count", f"{self._fork_point}..HEAD")
+            return int(sortie.strip())
+        except (GitCommandError, ValueError):
+            return 0
 
     async def _declarer_union_journal(self) -> None:
         """Déclare le journal du pipeline en fusion `union`, localement (ticket-418).

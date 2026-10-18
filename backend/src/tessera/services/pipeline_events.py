@@ -81,6 +81,10 @@ class EventType(str, Enum):
     #: Une étape de la mise en ligne a rendu son état (ticket-465). Ne porte
     #: que le nom de l'étape, son état et un détail sans secret (ADR-053).
     PROVISIONING_STEP = "provisioning_step"
+    #: Le ticket reprend une branche qui porte déjà des commits (ticket-497) :
+    #: les tests ont tourné avant le codeur. `commits` est le nombre de commits
+    #: repris, `verdict` vaut « green » (le codeur est sauté) ou « red ».
+    RUN_RESUMED_FROM_EXISTING_WORK = "run_resumed_from_existing_work"
 
 
 class OrchestratorEvent(BaseModel):

@@ -3513,3 +3513,18 @@ Points posit (58359ms)
 - 2026-10-18 08:57:24 UTC — [ticket-486] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour su (167766ms)
 - 2026-10-18 08:57:24 UTC — [ticket-486] APPROVED après 3 tour(s)
 - 2026-10-18 08:57:52 UTC — [ticket-486] documentation: 0 fichier(s) (23281ms)
+- 2026-10-18 08:05:25 UTC — [ide-core] ticket-498 PR #523 confiée au CIWatcher
+- 2026-10-18 08:05:27 UTC — [ticket-497] branche ticket-497-a-resumed-ticket-whose-branch-already-carries-wor
+- 2026-10-18 08:06:37 UTC — [ticket-497] plan rendu (69406ms)
+- 2026-10-18 08:06:37 UTC — [ticket-497] tour 1 — codeur démarré
+- 2026-10-18 08:10:03 UTC — [ide-core] ticket-498 PR #523 mergée (CI verte)
+- 2026-10-18 08:10:39 UTC — [ticket-497] tour 1 — codeur terminé (241921ms)
+- 2026-10-18 08:16:13 UTC — [ticket-497] testeur: OK (exit 0)
+- 2026-10-18 08:18:30 UTC — [ticket-497] securite: PASS — Audit complet du ticket-497 : refactorisation de la logique de reprise de branch (136577ms)
+- 2026-10-18 08:18:30 UTC — [ticket-497] tour 1 — reviewer démarré
+- 2026-10-18 08:19:03 UTC — [ticket-497] tour 1 — reviewer terminé (33717ms)
+- 2026-10-18 08:23:00 UTC — [ticket-497] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (269827ms)
+- 2026-10-18 08:23:00 UTC — [ticket-497] APPROVED après 1 tour(s)
+- 2026-10-18 08:25:22 UTC — [ticket-497] documentation: 2 fichier(s) (138327ms)
+- 2026-10-18 08:25:58 UTC — [ticket-497] livraison: résolveur tenté : backend/src/tessera/services/orchestrator.py (29609ms)
+- 2026-10-18 08:25:58 UTC — [ticket-497] livraison: arrêt — Conflit avec develop sur : backend/src/tessera/services/orchestrator.py — résolveur tenté sur backen
