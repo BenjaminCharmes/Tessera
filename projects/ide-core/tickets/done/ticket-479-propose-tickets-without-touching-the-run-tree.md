@@ -1,15 +1,15 @@
 ---
-id: ticket-479
-title: "New tickets can be proposed to a project while a run holds its tree"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
+id: ticket-479
 plan: true
-created: 2026-10-16
+pr_number: 533
+priority: medium
+status: done
+title: New tickets can be proposed to a project while a run holds its tree
+type: feat
 ---
 
 # ticket-479 — Proposer des tickets sans toucher l'arbre d'un run

@@ -768,6 +768,31 @@ Tu es sur l'écran du run (voir [Lire ce qui se passe](#5-lire-ce-qui-se-passe) 
 
 Tu vois le motif : doublon, déjà fait, ou dépendance manquante. Le run n'est pas modifié. Corrige le problème et réessaye.
 
+## 4 ter. Proposer des tickets en arrière-plan
+
+Pendant qu'un run est en cours, tu peux proposer de nouveaux tickets sans attendre la fin du run. Ils seront intégrés immédiatement, indépendamment du run actuel.
+
+### Quand c'est utile
+
+Un run travaille sur `ticket-001`. Tu te rends compte qu'il faut aussi traiter `ticket-002`. Tu ne peux pas créer `ticket-002` sur la même branche (elle est occupée par le run). Tu le proposes à la place — il sera créé sur une branche séparée et fusionné automatiquement.
+
+### Comment faire
+
+Depuis le volet de création de ticket du projet :
+1. Remplis le ticket (frontmatter + corps)
+2. Clique sur **Proposer** au lieu de **Créer**
+3. Le ticket est validé et créé immédiatement, sans attendre
+
+Si le frontmatter est invalide, la création refuse.
+
+### Ce qui se passe
+
+L'IDE ajoute le ticket sur une branche séparée, ouvre une PR et la fusionne (ou la laisse en attente selon la configuration du projet). Le run actuel n'est pas affecté.
+
+### Limites
+
+Tu ne peux pas proposer un ticket qui touche à `CLAUDE.md`, `agents.json`, `.github/workflows/`, ou `.claude/` — ces fichiers sont protégés. La proposition sera refusée sans rien pousser.
+
 ## 5. Lire ce qui se passe
 
 Le panneau **Agent Stream** montre le déroulé en direct via WebSocket : quel agent

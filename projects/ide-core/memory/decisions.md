@@ -484,3 +484,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : seule une action de l'utilisateur crée les ressources en ligne d'un projet (Vercel, base, Resend, Stripe, Cloudflare), jamais un agent. Les jetons ne vivent que dans le `.env` de Tessera : aucun agent ne les reçoit ni ne lit ce fichier (amende ADR-031), aucun dépôt, ticket, journal ou réponse d'API ne les porte, les logs les masquent. Portée minimale : Stripe restreinte et en test, Vercel expirant, Cloudflare limité à la zone DNS. Relancer complète l'existant, sans doublon. Restent humains : comptes, achat du domaine, mode réel Stripe.
 **Raison** : un jeton Vercel ouvre tout le compte, et ADR-031 laisse lire hors du projet : un agent lirait le `.env`.
 **Alternative rejetée** : un agent qui déploie avec le jeton — le contrôle de `Bash` attrape une erreur, pas une évasion (ADR-031).
+
+---
+
+## ADR-054 — Proposer des tickets passe par un worktree temporaire, et le CIWatcher merge
+
+**Date** : 2026-10-18
+**Décision** : `POST /api/v1/projects/{id}/tickets/propose` valide le lot avant la configuration GitHub, puis écrit dans un worktree temporaire créé depuis `origin/<base>` : commit, push, PR vers la base, worktree supprimé même si le push échoue. L'arbre principal n'est jamais touché ; le `fetch` ne met à jour que `refs/remotes/origin/<base>`. Le merge n'a pas lieu dans la requête : en `autonomy: merge`, la PR est remise au `CIWatcher`, sinon elle reste ouverte.
+**Raison** : la route sert quand un run tient l'arbre. Une requête HTTP n'attend pas une CI (ADR-051).
+**Alternative rejetée** : merge synchrone dans la requête — bloque sur la CI (ADR-029).

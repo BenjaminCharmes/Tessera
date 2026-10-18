@@ -3599,3 +3599,32 @@ Points posit (58359ms)
 - 2026-10-18 14:52:36 UTC — [ticket-478] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent efficacement (172906ms)
 - 2026-10-18 14:52:36 UTC — [ticket-478] APPROVED après 1 tour(s)
 - 2026-10-18 14:57:11 UTC — [ticket-478] documentation: 1 fichier(s) (269906ms)
+- 2026-10-18 14:57:30 UTC — [ide-core] ticket-478 PR #530 confiée au CIWatcher
+- 2026-10-18 14:57:33 UTC — [ticket-479] branche ticket-479-new-tickets-can-be-proposed-to-a-project-while-a
+- 2026-10-18 14:58:55 UTC — [ticket-479] plan rendu (82141ms)
+- 2026-10-18 14:58:55 UTC — [ticket-479] tour 1 — codeur démarré
+- 2026-10-18 15:02:25 UTC — [ide-core] ticket-478 PR #530 mergée (CI verte)
+- 2026-10-18 15:06:05 UTC — [ticket-479] tour 1 — codeur terminé (430000ms)
+- 2026-10-18 15:11:22 UTC — [ticket-479] testeur: OK (exit 0)
+- 2026-10-18 15:14:14 UTC — [ticket-479] securite: PASS — Aucune vulnérabilité de sécurité introduite. Le code implémente une proposition  (171438ms)
+- 2026-10-18 15:14:14 UTC — [ticket-479] tour 1 — reviewer démarré
+- 2026-10-18 15:14:29 UTC — [ticket-479] INTERROMPU par limite de session (reprise : 7:20pm (Europe/Paris))
+- 2026-10-18 15:14:33 UTC — [ide-core] file interrompue : limite de session (reprise : 7:20pm (Europe/Paris))
+- 2026-10-18 15:17:39 UTC — [ticket-479] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests fournis. Les fonc (204687ms)
+- 2026-10-18 18:38:49 UTC — [ticket-479] branche ticket-479-new-tickets-can-be-proposed-to-a-project-while-a
+- 2026-10-18 18:39:49 UTC — [ticket-479] plan rendu (60265ms)
+- 2026-10-18 18:46:19 UTC — [ticket-479] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-18 18:46:19 UTC — [ticket-479] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-10-18 18:46:19 UTC — [ticket-479] tour 1 — codeur démarré
+- 2026-10-18 18:49:00 UTC — [ticket-479] tour 1 — codeur terminé (160578ms)
+- 2026-10-18 18:56:22 UTC — [ticket-479] testeur: 1 failed, 1959 passed, 28 warnings in 439.46s (0:07:19)
+- 2026-10-18 18:56:22 UTC — [ticket-479] tests rouges au tour 1
+- 2026-10-18 18:56:22 UTC — [ticket-479] tour 2 — codeur démarré
+- 2026-10-18 18:56:57 UTC — [ticket-479] tour 2 — codeur terminé (34047ms)
+- 2026-10-18 19:05:00 UTC — [ticket-479] testeur: OK (exit 0)
+- 2026-10-18 19:06:42 UTC — [ticket-479] securite: PASS — Aucune vulnérabilité critique ou haute sécurité introduite par ce ticket. La rou (101639ms)
+- 2026-10-18 19:06:42 UTC — [ticket-479] tour 2 — reviewer démarré
+- 2026-10-18 19:07:21 UTC — [ticket-479] tour 2 — reviewer terminé (38905ms)
+- 2026-10-18 19:12:14 UTC — [ticket-479] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par des tests explicites et de c (332031ms)
+- 2026-10-18 19:12:14 UTC — [ticket-479] APPROVED après 2 tour(s)
+- 2026-10-18 19:15:42 UTC — [ticket-479] documentation: 3 fichier(s) (203562ms)

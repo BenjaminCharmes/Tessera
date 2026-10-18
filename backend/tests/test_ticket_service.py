@@ -9,7 +9,11 @@ import frontmatter  # type: ignore[import-untyped]
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.ticket_service import TicketService, _normalize_depends_on
+from tessera.services.ticket_service import (
+    TicketService,
+    _normalize_depends_on,
+    validate_ticket,
+)
 
 
 def _svc(project_path: Path) -> TicketService:
@@ -657,3 +661,39 @@ async def test_le_dossier_fait_foi_sur_le_statut(tmp_path: Path) -> None:
 
     assert await svc.list_tickets(TicketStatus.todo) == []
     assert [t.id for t in await svc.list_tickets(TicketStatus.done)] == ["ticket-017"]
+
+
+# ------------------------------------------------------------------
+# validate_ticket — ticket-479
+# ------------------------------------------------------------------
+
+_VALID = (
+    "---\nid: ticket-010\ntitle: Demo\ntype: chore\nstatus: todo\n"
+    "priority: medium\nagent: codeur\n---\n\nCorps.\n"
+)
+
+
+def test_validate_ticket_accepts_a_loadable_file() -> None:
+    ticket = validate_ticket("ticket-010-demo.md", _VALID)
+    assert (ticket.id, ticket.type, ticket.status) == (
+        "ticket-010", TicketType.chore, TicketStatus.todo,
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "content", "fragment"),
+    [
+        ("ticket-010-demo.md", _VALID.replace("type: chore", "type: inconnu"), "frontmatter invalide"),
+        ("ticket-010-demo.md", _VALID.replace("agent: codeur\n", ""), "agent"),
+        ("ticket-010-demo.md", "pas de frontmatter", "manquant"),
+        ("ticket-011-demo.md", _VALID, "ne correspond pas"),
+        ("../ticket-010.md", _VALID, "Nom de fichier"),
+        ("ticket-010/../x.md", _VALID, "Nom de fichier"),
+        ("notes.md", _VALID, "Nom de fichier"),
+    ],
+)
+def test_validate_ticket_refuses_what_loading_would_refuse(
+    name: str, content: str, fragment: str
+) -> None:
+    with pytest.raises(ValueError, match=fragment):
+        validate_ticket(name, content)
