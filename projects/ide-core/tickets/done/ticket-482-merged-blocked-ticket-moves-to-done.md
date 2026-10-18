@@ -1,15 +1,15 @@
 ---
-id: ticket-482
-title: "A blocked ticket whose branch was merged by hand is moved to done"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
+id: ticket-482
 plan: true
-created: 2026-10-16
+pr_number: 528
+priority: medium
+status: done
+title: A blocked ticket whose branch was merged by hand is moved to done
+type: fix
 ---
 
 # ticket-482 — Un ticket bloqué livré à la main passe en `done`

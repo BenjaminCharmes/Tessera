@@ -70,6 +70,10 @@ class _GitHub(Protocol):
 
     async def find_open_pull_request(self, branch: str) -> int | None: ...
 
+    async def find_merged_pull_request(
+        self, prefix: str, base: str | None = None
+    ) -> int | None: ...
+
     async def get_pull_request_state(self, pr_number: int) -> str: ...
 
     async def has_workflows(self) -> bool: ...
@@ -303,6 +307,17 @@ class GitHubWorkflowService:
         if self._github is None:
             return None
         return await self._github.find_open_pull_request(branch)
+
+    async def pr_mergee_de_branche(self, prefix: str) -> int | None:
+        """Le numéro d'une PR mergée dans la base depuis `prefix…`, ou `None` (ticket-482).
+
+        Sans GitHub configuré, `None` : il n'y a rien à retrouver.
+        """
+        if self._github is None:
+            return None
+        return await self._github.find_merged_pull_request(
+            prefix, self._base_branch
+        )
 
     async def has_workflows(self) -> bool:
         """Le dépôt déclare-t-il au moins un workflow ? Sans GitHub : non."""

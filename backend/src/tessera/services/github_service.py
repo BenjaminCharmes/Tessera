@@ -20,6 +20,19 @@ class PRNonFusionnableError(Exception):
 
 _BASE = "https://api.github.com"
 
+# Lecture des PR fermées : trois pages de cent, les plus récemment mises à jour.
+_TAILLE_PAGE = 100
+_PAGES_PR_FERMEES = 3
+
+
+def _est_mergee_de(item: dict[str, Any], prefix: str, base: str | None) -> bool:
+    """True when the listed PR was merged from a branch starting with `prefix`."""
+    if not item.get("merged_at"):
+        return False
+    if not str(item.get("head", {}).get("ref", "")).startswith(prefix):
+        return False
+    return base is None or item.get("base", {}).get("ref") == base
+
 
 class GitHubIssue(BaseModel):
     number: int
@@ -188,6 +201,33 @@ class GitHubService:
             resp.raise_for_status()
         items: list[dict[str, Any]] = resp.json()
         return int(items[0]["number"]) if items else None
+
+    async def find_merged_pull_request(
+        self, prefix: str, base: str | None = None
+    ) -> int | None:
+        """Number of a merged PR whose head branch starts with `prefix`, or None.
+
+        The prefix carries its dash (`ticket-48-`), so `ticket-48-` never
+        matches `ticket-482-…`. Only the most recently updated closed PRs are
+        read (three pages): a ticket delivered by hand was delivered recently.
+        With `base`, a PR merged into another branch does not count — ticket-482.
+        """
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        async with httpx.AsyncClient() as client:
+            for page in range(1, _PAGES_PR_FERMEES + 1):
+                params: dict[str, str | int] = {
+                    "state": "closed", "sort": "updated", "direction": "desc",
+                    "per_page": _TAILLE_PAGE, "page": page,
+                }
+                resp = await self._requete(client, "GET", url, params=params)
+                resp.raise_for_status()
+                items: list[dict[str, Any]] = resp.json()
+                for item in items:
+                    if _est_mergee_de(item, prefix, base):
+                        return int(item["number"])
+                if len(items) < _TAILLE_PAGE:
+                    break
+        return None
 
     async def get_pull_request_status(self, pr_number: int) -> PRStatus:
         """Retourne le statut d'une PR avec son état CI agrégé."""

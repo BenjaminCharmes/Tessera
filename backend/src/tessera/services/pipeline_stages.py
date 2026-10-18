@@ -28,6 +28,7 @@ from tessera.services.pipeline_events import (
     PipelineResult,
 )
 from tessera.services.pipeline_outcomes import finish_security_block, finish_timeout_expired
+from tessera.services.pipeline_rangement import ranger_les_bloques_livres
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
@@ -193,6 +194,10 @@ async def _basculer(
     # l'arbre est donc propre pour l'avance rapide de la base (ticket-406).
     raison_base = await _realigner_base_au_depart(orch)
 
+    # Les tickets bloqués puis livrés à la main passent en `done` sur la base
+    # réalignée, avant le commit de tenue de livres qui les emporte (ticket-482).
+    lignes_rangement = await ranger_les_bloques_livres(orch, run.ticket_id)
+
     # Commit pending bookkeeping before the branch switch.  Failures here
     # are logged but not fatal: the following branch creation attempt may
     # still succeed, and a missing bookkeeping commit is better than a
@@ -237,6 +242,8 @@ async def _basculer(
         # tenue de livres partirait en commit sur la base locale.
         if raison_base is not None:
             orch._log(f"[{run.ticket_id}] base non réalignée — {raison_base}")
+        for ligne in lignes_rangement:
+            orch._log(ligne)
     except NotAGitRepository:
         # Un projet sans dépôt git reste utilisable : on continue sans
         # garde-fou de branche plutôt que d'interrompre le pipeline.

@@ -3539,3 +3539,29 @@ Points posit (58359ms)
 - 2026-10-18 13:31:02 UTC — [ticket-502] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute automatiquement  (104327ms)
 - 2026-10-18 13:31:02 UTC — [ticket-502] APPROVED après 1 tour(s)
 - 2026-10-18 13:33:03 UTC — [ticket-502] documentation: 2 fichier(s) (116578ms)
+- 2026-10-18 08:58:08 UTC — [ide-core] ticket-486 PR #525 confiée au CIWatcher
+- 2026-10-18 08:58:10 UTC — [ticket-482] branche ticket-482-a-blocked-ticket-whose-branch-was-merged-by-hand
+- 2026-10-18 08:59:26 UTC — [ticket-482] plan rendu (75500ms)
+- 2026-10-18 08:59:26 UTC — [ticket-482] tour 1 — codeur démarré
+- 2026-10-18 08:59:32 UTC — [ticket-482] INTERROMPU par limite de session (reprise : 1:50pm (Europe/Paris))
+- 2026-10-18 08:59:36 UTC — [ide-core] file interrompue : limite de session (reprise : 1:50pm (Europe/Paris))
+- 2026-10-18 13:33:18 UTC — [ide-core] ticket-502 PR #527 confiée au CIWatcher
+- 2026-10-18 13:33:22 UTC — [ticket-482] branche ticket-482-a-blocked-ticket-whose-branch-was-merged-by-hand
+- 2026-10-18 13:34:15 UTC — [ticket-482] plan rendu (53360ms)
+- 2026-10-18 13:37:43 UTC — [ide-core] ticket-502 PR #527 mergée (CI verte)
+- 2026-10-18 13:40:35 UTC — [ticket-482] testeur: OK (exit 0)
+- 2026-10-18 13:40:35 UTC — [ticket-482] branche reprise (2 commit(s)) — tests green, codeur sauté
+- 2026-10-18 13:40:56 UTC — [ticket-482] securite: PASS — Aucun diff git fourni pour l'audit. Veuillez fournir le code à analyser. (19453ms)
+- 2026-10-18 13:40:56 UTC — [ticket-482] tour 1 — reviewer démarré
+- 2026-10-18 13:42:32 UTC — [ticket-482] tour 1 — reviewer terminé (95593ms)
+- 2026-10-18 13:42:44 UTC — [ticket-482] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests vérifient que les ti (107594ms)
+- 2026-10-18 13:42:44 UTC — [ticket-482] CHANGES_REQUESTED tour 1: Reviewer : le diff fourni est vide.CHANGES_REQUESTED
+- 2026-10-18 13:42:44 UTC — [ticket-482] tour 2 — codeur démarré
+- 2026-10-18 13:50:42 UTC — [ticket-482] tour 2 — codeur terminé (478672ms)
+- 2026-10-18 13:56:02 UTC — [ticket-482] testeur: OK (exit 0)
+- 2026-10-18 13:58:46 UTC — [ticket-482] securite: PASS — Aucune vulnérabilité de sécurité détectée. La fonctionnalité ticket-482 qui dépl (164500ms)
+- 2026-10-18 13:58:46 UTC — [ticket-482] tour 2 — reviewer démarré
+- 2026-10-18 13:59:15 UTC — [ticket-482] tour 2 — reviewer terminé (28327ms)
+- 2026-10-18 14:00:47 UTC — [ticket-482] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests vérifient que les ti (120485ms)
+- 2026-10-18 14:00:47 UTC — [ticket-482] APPROVED après 2 tour(s)
+- 2026-10-18 14:03:13 UTC — [ticket-482] documentation: 2 fichier(s) (141532ms)

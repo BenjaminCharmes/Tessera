@@ -1063,6 +1063,11 @@ Si cet agent ne peut pas intervenir, la ligne d'arrêt t'en informe clairement :
 
 Si la réponse du serveur GitHub se perd lors de l'ouverture de la PR (timeout réseau), Tessera interroge GitHub pour retrouver la PR par sa branche et la confie au CIWatcher. Tu n'as rien à faire ; le workflow continue normalement et l'arbre reste propre.
 
+
+### Quand tu mèrges une PR bloquée
+
+Si un ticket reste `blocked` mais que tu mèrges sa PR manuellement (sur GitHub ou en ligne de commande), Tessera le détecte au prochain lancement de file ou de run autonome. Le ticket passe automatiquement en `done/` avec son `pr_number` renseigné. Tu verras une ligne de journal : « ticket-XXX rangé en done : PR #YYY mergée ».
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.

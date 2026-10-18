@@ -96,7 +96,11 @@ class Orchestrator:
         attente_merge_max_s: float = 600.0,
         etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
         journal_refus: Optional["JournalDesRefus"] = None,
+        pr_mergee_de_branche: Optional[Callable[[str], Awaitable[int | None]]] = None,
     ) -> None:
+        # Retrouve la PR mergée d'une branche `<préfixe>…` : un ticket bloqué
+        # livré à la main passe en `done` au départ du run (ticket-482).
+        self._pr_mergee_de_branche = pr_mergee_de_branche
         # Les écritures que le garde-fou refuse pendant un tour : le pipeline
         # les passe au reviewer et au validateur (ticket-476).
         self._journal_refus = journal_refus
