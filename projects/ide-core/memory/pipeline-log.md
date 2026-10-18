@@ -3544,3 +3544,4 @@ Points posit (58359ms)
 - 2026-10-18 08:59:26 UTC — [ticket-482] plan rendu (75500ms)
 - 2026-10-18 08:59:26 UTC — [ticket-482] tour 1 — codeur démarré
 - 2026-10-18 08:59:32 UTC — [ticket-482] INTERROMPU par limite de session (reprise : 1:50pm (Europe/Paris))
+- 2026-10-18 08:59:36 UTC — [ide-core] file interrompue : limite de session (reprise : 1:50pm (Europe/Paris))
