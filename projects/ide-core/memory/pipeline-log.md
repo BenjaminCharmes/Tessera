@@ -3528,3 +3528,14 @@ Points posit (58359ms)
 - 2026-10-18 08:25:22 UTC — [ticket-497] documentation: 2 fichier(s) (138327ms)
 - 2026-10-18 08:25:58 UTC — [ticket-497] livraison: résolveur tenté : backend/src/tessera/services/orchestrator.py (29609ms)
 - 2026-10-18 08:25:58 UTC — [ticket-497] livraison: arrêt — Conflit avec develop sur : backend/src/tessera/services/orchestrator.py — résolveur tenté sur backen
+- 2026-10-18 09:02:14 UTC — [ide-core] ticket-486 PR #525 mergée (CI verte)
+- 2026-10-18 13:20:36 UTC — [ticket-502] branche ticket-502-putting-a-project-online-also-serves-www-redirect
+- 2026-10-18 13:20:37 UTC — [ticket-502] tour 1 — codeur démarré
+- 2026-10-18 13:22:31 UTC — [ticket-502] tour 1 — codeur terminé (114375ms)
+- 2026-10-18 13:27:20 UTC — [ticket-502] testeur: OK (exit 0)
+- 2026-10-18 13:29:18 UTC — [ticket-502] securite: PASS — Aucune vulnérabilité de sécurité détectée. Les domaines sont validés par regex s (118312ms)
+- 2026-10-18 13:29:18 UTC — [ticket-502] tour 1 — reviewer démarré
+- 2026-10-18 13:29:42 UTC — [ticket-502] tour 1 — reviewer terminé (24296ms)
+- 2026-10-18 13:31:02 UTC — [ticket-502] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute automatiquement  (104327ms)
+- 2026-10-18 13:31:02 UTC — [ticket-502] APPROVED après 1 tour(s)
+- 2026-10-18 13:33:03 UTC — [ticket-502] documentation: 2 fichier(s) (116578ms)

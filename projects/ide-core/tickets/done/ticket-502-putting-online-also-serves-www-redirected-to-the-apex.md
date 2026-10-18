@@ -1,14 +1,14 @@
 ---
-id: ticket-502
-title: "Putting a project online also serves www, redirected to the apex domain"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-18
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-18
+id: ticket-502
+pr_number: 527
+priority: medium
+status: done
+title: Putting a project online also serves www, redirected to the apex domain
+type: feat
 ---
 
 # ticket-502 — La mise en ligne sert aussi www, redirigé vers le domaine nu

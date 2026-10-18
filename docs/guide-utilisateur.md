@@ -1815,6 +1815,12 @@ Tu procèdes ainsi :
 
 Elle lira alors `DATABASE_URL` depuis Vercel et continuera comme prévu.
 
+### Domaine www
+
+Quand tu mets un projet en ligne, l'IDE configure automatiquement le sous-domaine `www` pour rediriger vers le domaine nu. Si tu publies sur `example.com`, l'IDE ajoute `www.example.com` qui redirige vers `example.com` — aucune action manuelle. L'enregistrement DNS et la configuration chez Vercel sont faits automatiquement.
+
+Si tu as déjà un `www` avec une autre configuration, l'IDE le laisse inchangé.
+
 ## Pour aller plus loin
 
 - [`architecture.md`](architecture.md) — comment Tessera est construit
