@@ -3466,3 +3466,15 @@ Points posit (58359ms)
 - 2026-10-17 18:59:56 UTC — [ticket-498] testeur: OK (exit 0)
 - 2026-10-17 19:00:00 UTC — [ticket-498] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (3561ms)
 - 2026-10-17 19:00:04 UTC — [ide-core] file interrompue : ticket-498 non approuvé
+- 2026-10-18 07:51:56 UTC — [ide-core] ticket-500 PR #522 confiée au CIWatcher
+- 2026-10-18 07:52:00 UTC — [ticket-498] branche ticket-498-an-agent-call-cut-by-an-exhausted-subscription-qu
+- 2026-10-18 07:52:36 UTC — [ticket-498] plan rendu (36092ms)
+- 2026-10-18 07:52:36 UTC — [ticket-498] tour 1 — codeur démarré
+- 2026-10-18 07:53:35 UTC — [ticket-498] tour 1 — codeur terminé (59000ms)
+- 2026-10-18 07:56:50 UTC — [ide-core] ticket-500 PR #522 mergée (CI verte)
+- 2026-10-18 07:58:44 UTC — [ticket-498] testeur: OK (exit 0)
+- 2026-10-18 08:00:09 UTC — [ticket-498] securite: PASS — Le code ajoute une gestion robuste pour détecter et gérer l'épuisement du quota  (84984ms)
+- 2026-10-18 08:00:09 UTC — [ticket-498] tour 1 — reviewer démarré
+- 2026-10-18 08:00:41 UTC — [ticket-498] tour 1 — reviewer terminé (31764ms)
+- 2026-10-18 08:02:13 UTC — [ticket-498] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une reconnai (123797ms)
+- 2026-10-18 08:02:13 UTC — [ticket-498] APPROVED après 1 tour(s)
