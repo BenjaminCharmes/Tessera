@@ -17,6 +17,7 @@ from tessera.services.ticket_proposal import (
     ProposalRefused,
     ProposalRequest,
     propose_tickets,
+    validate_batch,
 )
 
 router = APIRouter(
@@ -57,13 +58,20 @@ async def propose_tickets_to_project(
         project = await ProjectLoader(settings.ide_workspace_dir).load_project(project_id)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    files = tuple((t.name, t.content) for t in body.tickets)
+    # Le lot d'abord : un ticket invalide reçoit son 422 de frontmatter,
+    # pas l'erreur de configuration GitHub.
+    try:
+        validate_batch(files)
+    except ProposalRefused as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     github = _require_github_service(project.github_remote)
     project_path = settings.ide_workspace_dir / project_id
     policy = PolitiqueRun.lire(project_path)
     request = ProposalRequest(
         project_id=project_id,
         project_path=project_path,
-        files=tuple((t.name, t.content) for t in body.tickets),
+        files=files,
         policy=policy,
         github=github,
         base_branch=policy.base_branch or settings.github_base_branch,

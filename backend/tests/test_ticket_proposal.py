@@ -159,6 +159,23 @@ def test_invalid_frontmatter_is_refused_with_422_and_nothing_pushed(
     assert calls == []
 
 
+def test_invalid_frontmatter_is_refused_before_the_github_check(
+    workspace: Path,
+) -> None:
+    env = _build(workspace)
+    (env.project / "agents.json").write_text(
+        json.dumps({"artifacts": "tracked"}), encoding="utf-8"
+    )
+    name, content = _ticket(10, type_="inconnu")
+    response = TestClient(app).post(
+        "/api/v1/projects/mon-projet/tickets/propose",
+        json={"tickets": [{"name": name, "content": content}]},
+    )
+    assert response.status_code == 422
+    assert "ticket-010-demo.md" in response.json()["detail"]
+    assert "github_remote" not in response.json()["detail"]
+
+
 def test_valid_proposal_through_the_api_opens_the_pr(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
