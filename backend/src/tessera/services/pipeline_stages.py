@@ -20,6 +20,10 @@ from typing import TYPE_CHECKING, Any, Optional
 from tessera.models.agent import AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
+from tessera.services.config_tests_touchee import (
+    avertissement_config_tests,
+    fichiers_de_config_touches,
+)
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services import journal_en_attente
 from tessera.services.pipeline_events import (
@@ -655,6 +659,23 @@ async def run_security_audit(
 # ------------------------------------------------------------------
 
 
+def _avertissement_config_tests(orch: "Orchestrator", run: PipelineRun) -> str:
+    """Warning opening the reviewer's message when the diff touches test config.
+
+    Returns an empty string when it does not. The line in the pipeline log
+    names the files, so the signal outlives the reviewer's answer (ticket-490).
+    """
+    chemin = orch._project_path
+    racines = [chemin.resolve(), *chemin.resolve().parents] if chemin else []
+    fichiers = fichiers_de_config_touches(run.reviewed_code, racines)
+    if fichiers:
+        orch._log(
+            f"[{run.ticket_id}] configuration des tests modifiée : "
+            + ", ".join(fichiers)
+        )
+    return avertissement_config_tests(fichiers)
+
+
 async def run_review(
     orch: "Orchestrator", run: PipelineRun, context: str
 ) -> tuple[bool, str, str]:
@@ -663,7 +684,8 @@ async def run_review(
     ticket_id = run.ticket_id
 
     review_context = (
-        context
+        _avertissement_config_tests(orch, run)
+        + context
         + f"\n\n## Code produit par le codeur (tour {run.round_num})\n{run.reviewed_code}"
         + run.artifact_diff
         + run.refus_du_tour

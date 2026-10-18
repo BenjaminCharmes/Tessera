@@ -1,14 +1,15 @@
 ---
-id: ticket-490
-title: "The verification script a run is judged by is write-protected, and a diff that touches test configuration is flagged to the reviewer"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-16
+id: ticket-490
+pr_number: 534
+priority: medium
+status: done
+title: The verification script a run is judged by is write-protected, and a diff that
+  touches test configuration is flagged to the reviewer
+type: fix
 ---
 
 # ticket-490 — Le script de vérification n'est pas modifiable par le run qu'il juge

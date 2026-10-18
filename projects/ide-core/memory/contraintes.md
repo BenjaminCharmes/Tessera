@@ -19,6 +19,12 @@ son ADR source. La justification et l'histoire complète vivent dans
   Le git en lecture reste permis. `agents.json`, `.git/`,
   `.claude/settings*.json` et `.github/workflows/` se refusent aussi en
   écriture. (ADR-027)
+- **Le script que `test_command` lance se refuse en écriture**, comme
+  `agents.json` : le premier argument qui désigne un fichier existant, résolu
+  depuis `pipeline.test_cwd`. Un diff qui touche la configuration des tests
+  (`conftest.py`, `[tool.pytest*]`, `[tool.mypy]`, `vitest.config.*`,
+  `eslint.config.*`, `tsconfig*.json`, `scripts` de `package.json`) s'ouvre,
+  pour le reviewer, sur un avertissement qui les nomme. (ADR-027)
 - **Avant toute création de branche, vérifier que `git rev-parse
   --show-toplevel` renvoie exactement le dossier du projet.** Sinon,
   lever `NotAGitRepository`. Exception déclarée : `git_root: ancestor`

@@ -30,7 +30,10 @@ Trois choix le distinguent d'un assistant de code classique :
   au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
 - **Les fichiers sensibles restent protégés.** Les agents ne peuvent pas
   modifier les règles de votre IDE (`CLAUDE.md`, `agents.json`, `.github/workflows/`,
-  `.git/`) ni sa configuration locale (`.claude/`). Si un ticket exige une telle
+  `.git/`) ni sa configuration locale (`.claude/`). Le script de vérification
+  (celui de `test_command`) est aussi protégé : un codeur ne peut pas affaiblir
+  la vérification qui juge son code. Un diff qui touche la configuration des
+  tests est signalé au reviewer pour vérification. Si un ticket exige une telle
   modification, le run s'arrête avant le premier tour avec un message clair.
 
 Après un run approuvé, la livraison enchaîne seule jusqu'où le projet

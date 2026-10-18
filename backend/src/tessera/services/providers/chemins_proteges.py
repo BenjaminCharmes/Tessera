@@ -20,6 +20,8 @@ réel doit comprendre le refus, pas le contourner.
 from fnmatch import fnmatch
 from pathlib import Path
 
+from tessera.services.providers.script_verification import motif_du_script
+
 #: Ce que l'agent lit quand on lui refuse un chemin protégé.
 PROTECTION_REFUS = (
     "Écriture refusée : ce fichier porte les règles qui bornent ce run, et un "
@@ -38,7 +40,12 @@ _CONSIGNES = {"CLAUDE.md", "CLAUDE.local.md"}
 _DOSSIERS_CLI = {"skills", "commands", "agents"}
 
 
-def motif_de_protection(chemin: str, project_path: Path, racine: Path) -> str | None:
+def motif_de_protection(
+    chemin: str,
+    project_path: Path,
+    racine: Path,
+    script: Path | None = None,
+) -> str | None:
     """Pourquoi `chemin` est protégé, ou None s'il ne l'est pas.
 
     `racine` est celle sous laquelle l'agent a le droit d'écrire — le projet,
@@ -46,6 +53,9 @@ def motif_de_protection(chemin: str, project_path: Path, racine: Path) -> str | 
     relatifs s'y résolvent. Le `.git/` et le `.github/` d'un projet
     `ancestor` sont à la racine du dépôt, pas du projet : on regarde donc
     tous les segments, pas seulement le premier.
+
+    `script` est le fichier que `test_command` exécute, déjà résolu (ticket-490) :
+    le run ne réécrit pas la vérification qui le juge.
     """
     try:
         cible = Path(chemin)
@@ -57,6 +67,10 @@ def motif_de_protection(chemin: str, project_path: Path, racine: Path) -> str | 
 
     if cible == (project_path / _MANIFESTE).resolve():
         return "`agents.json` déclare l'autonomie, la racine git et les artefacts du projet"
+
+    motif_script = motif_du_script(cible, script)
+    if motif_script is not None:
+        return motif_script
 
     # Un `CLAUDE.md` réécrit pendant un run devient la consigne de tous les
     # agents suivants, sans ticket pour l'autoriser (règle 5 de CLAUDE.md).

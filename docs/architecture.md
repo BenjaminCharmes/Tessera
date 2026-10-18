@@ -696,6 +696,24 @@ Pendant un tour, si le garde-fou refuse une écriture sur un fichier protégé, 
 
 Cela permet aux deux rôles de reconnaître une tentative que le pipeline interdit et de ne pas redemander sa correction.
 
+### Script de vérification et modifications de configuration (ticket-490)
+
+Le script désigné par `test_command` — par exemple `../scripts/verifier.py` sur
+ide-core — est identifié au démarrage du run et protégé contre l'écriture. Le
+hook `PreToolUse` refuse toute modification avec un message explicite. Si
+`test_command` ne nomme qu'une commande (`npm test`, `uv run pytest`), aucune
+protection supplémentaire n'est activée.
+
+Un diff qui modifie la configuration des tests — `conftest.py`, les sections
+`[tool.pytest*]` ou `[tool.mypy]` de `pyproject.toml`, `vitest.config.*`,
+`eslint.config.*`, `tsconfig*.json`, ou la clé `scripts` de `package.json` —
+est signalé au reviewer au début de son message, avec une ligne dans
+`pipeline-log.md`. Le reviewer doit vérifier que la modification ne rend pas la
+vérification plus faible.
+
+**Ce qui n'est pas fait** : le commit n'est jamais refusé même si la
+vérification s'affaiblit — c'est le rôle du reviewer et du validateur.
+
 ## Synchronisation de la base au démarrage
 
 Au début de chaque run, avant la création de la branche, si un espace git et une branche de base sont connus et que l'arbre se trouve sur la base, l'orchestrateur appelle `sync_base_depuis_distant(base_branch)` (ticket-406). Cette fonction met les lignes de journal non commitées de côté, avance la base par `merge --ff-only` depuis le distant, puis réécrit les lignes à la suite.
