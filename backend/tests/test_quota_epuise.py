@@ -13,7 +13,9 @@ from tessera.models.ticket import TicketStatus
 from tessera.services import pipeline_outcomes as outcomes
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.quota_exhaustion import is_quota_exhausted, resume_label
-from tessera.services.quota_tracker import QuotaSnapshot, QuotaStatus
+from tessera.services.orchestrator import Orchestrator
+from tessera.services.quota_tracker import QuotaSnapshot, QuotaStatus, QuotaTracker
+from tests.test_orchestrator import _FakeGit, _make_orchestrator, _make_ticket, _noop
 from tests.test_limite_de_session import _Orch, _OrchFile, _collect_events, _run
 
 _EMPTY_STDERR_MSG = "Command failed with exit code 1"
@@ -135,3 +137,54 @@ async def test_queue_stops_on_quota_exhausted_without_launching_next(
         and e.data.get("raison") == "quota_exhausted"
     ]
     assert progress, "un QUEUE_PROGRESS quota_exhausted doit être émis"
+
+
+class _RunnerQuiEchoue:
+    """Runner dont chaque appel d'agent échoue avec l'exception donnée."""
+
+    def __init__(self, exc: BaseException) -> None:
+        self._exc = exc
+
+    async def run(self, **kwargs: object) -> None:
+        raise self._exc
+
+
+def _orchestrateur_qui_echoue(
+    tmp_path: Path, snapshot: QuotaSnapshot | None
+) -> Orchestrator:
+    tracker = QuotaTracker()
+    tracker.record(snapshot)
+    return _make_orchestrator(
+        tmp_path,
+        runner=_RunnerQuiEchoue(_process_error()),  # type: ignore[arg-type]
+        git_workspace=_FakeGit(),
+        project_path=tmp_path,
+        tickets=[_make_ticket()],
+        quota_tracker=tracker,
+    )
+
+
+async def test_pipeline_maps_process_error_after_rejected_snapshot_to_todo(
+    tmp_path: Path,
+) -> None:
+    orch = _orchestrateur_qui_echoue(tmp_path, _snapshot("rejected"))
+
+    result = await orch.run_pipeline("proj", "ticket-001", _noop)
+
+    assert result.final_status is TicketStatus.todo
+    assert result.approved is False
+    assert result.arret == "quota_exhausted (reprise : 07:38 UTC)"
+    log = (tmp_path / "memory" / "pipeline-log.md").read_text(encoding="utf-8")
+    assert "quota épuisé" in log
+    assert "07:38 UTC" in log
+
+
+async def test_pipeline_keeps_ordinary_process_error_blocked(tmp_path: Path) -> None:
+    orch = _orchestrateur_qui_echoue(tmp_path, _snapshot("allowed"))
+
+    result = await orch.run_pipeline("proj", "ticket-001", _noop)
+
+    assert result.final_status is TicketStatus.blocked
+    assert not (result.arret or "").startswith("quota_exhausted")
+    log = (tmp_path / "memory" / "pipeline-log.md").read_text(encoding="utf-8")
+    assert "quota épuisé" not in log
