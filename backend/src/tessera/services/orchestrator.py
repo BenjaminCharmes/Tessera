@@ -33,8 +33,13 @@ from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_critere_protege import arret_critere_protege
 from tessera.services.pipeline_plan import run_plan
-from tessera.services.pipeline_text import _compose_feedback, _first_line
+from tessera.services.pipeline_text import (
+    _compose_feedback,
+    _echec_de_tests,
+    _first_line,
+)
 from tessera.services.quota_exhaustion import is_quota_exhausted, resume_label
+from tessera.services.pipeline_reprise import reprendre_sans_codeur, verifier_travail_repris
 from tessera.services.session_limit import (
     extract_reset_time,
     extract_reset_time_from_arret,
@@ -441,6 +446,11 @@ class Orchestrator:
                 return await outcomes.finish_budget_exhausted(self, run)
 
             run.start_round(round_num)
+            # Sur une branche reprise, les tests passent avant le codeur : un
+            # travail déjà vert va droit à l'audit (ticket-497). Le contrôle
+            # précède `build_context`, pour que des tests rouges arrivent dans
+            # le prompt du codeur.
+            reprise_verte = round_num == 1 and await verifier_travail_repris(self, run)
             context = stages.build_context(self, run)
 
             # L'arrêt est vérifié **entre** les étapes, jamais au milieu de
@@ -449,22 +459,10 @@ class Orchestrator:
             if run.stop_requested:
                 return await outcomes.finish_stopped(self, run)
 
-            await stages.run_coder(self, run, context)
-
-            if run.stop_requested:
-                return await outcomes.finish_stopped(self, run)
-
-            # Une suite rouge renvoie au codeur sans passer par la revue :
-            # un reviewer n'a pas à arbitrer un fait déjà établi, et l'appel
-            # est économisé (ticket-098).
-            # Deux expirations de suite terminent le run en blocked sans
-            # repasser par le codeur (ticket-349).
-            tests_result = await stages.run_tests(self, run)
-            if not isinstance(tests_result, bool):
-                return tests_result
-            if not tests_result:
-                run.review_feedback.append(_echec_de_tests(run))
-                self._log(f"[{ticket_id}] tests rouges au tour {round_num}")
+            produit = await self._produire_et_tester(run, context, reprise_verte)
+            if isinstance(produit, PipelineResult):
+                return produit
+            if not produit:
                 continue
 
             blocked = await stages.run_security_audit(self, run)
@@ -499,6 +497,39 @@ class Orchestrator:
             )
 
         return await outcomes.finish_rounds_exhausted(self, run)
+
+    async def _produire_et_tester(
+        self, run: PipelineRun, context: str, reprise_verte: bool
+    ) -> "PipelineResult | bool":
+        """Le tour de codeur puis les tests ; ``reprise_verte`` saute les deux.
+
+        Rend un ``PipelineResult`` quand le run se termine ici, ``False`` quand
+        les tests sont rouges (le tour suivant reprend), ``True`` pour passer
+        à l'audit.
+        """
+        if reprise_verte:
+            await reprendre_sans_codeur(self, run)
+            if run.stop_requested:
+                return await outcomes.finish_stopped(self, run)
+            return True
+
+        await stages.run_coder(self, run, context)
+
+        if run.stop_requested:
+            return await outcomes.finish_stopped(self, run)
+
+        # Une suite rouge renvoie au codeur sans passer par la revue :
+        # un reviewer n'a pas à arbitrer un fait déjà établi, et l'appel
+        # est économisé (ticket-098).
+        # Deux expirations de suite terminent le run en blocked sans
+        # repasser par le codeur (ticket-349).
+        tests_result = await stages.run_tests(self, run)
+        if not isinstance(tests_result, bool):
+            return tests_result
+        if not tests_result:
+            run.review_feedback.append(_echec_de_tests(run))
+            self._log(f"[{run.ticket_id}] tests rouges au tour {run.round_num}")
+        return tests_result
 
     async def pick_next_ticket(self, project_id: str) -> Optional[Ticket]:
         todos = await self._ticket_svc.list_tickets(status=TicketStatus.todo)
@@ -1166,19 +1197,3 @@ async def _trouver_bloquant_sans_pr(
                 )
             )
     return None
-
-
-def _echec_de_tests(run: "PipelineRun") -> str:
-    """Ce que le codeur lit au tour suivant : le fait, puis les erreurs.
-
-    Sans les erreurs, le second tour recommence à l'aveugle et produit
-    souvent la même chose.
-    """
-    resultat = run.test_result
-    if resultat is None:
-        return "Les tests du projet ont échoué. Corrige-les avant toute chose."
-    erreurs = "\n".join(resultat.errors[:10])
-    return (
-        "Les tests du projet échouent — corrige-les avant toute autre chose.\n"
-        f"{resultat.output_summary}\n{erreurs}"
-    )
