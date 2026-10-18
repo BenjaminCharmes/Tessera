@@ -3585,3 +3585,4 @@ Points posit (58359ms)
 - 2026-10-18 14:33:10 UTC — [ticket-480] tour 2 — reviewer terminé (23968ms)
 - 2026-10-18 14:35:06 UTC — [ticket-480] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests couvrent correctement (140733ms)
 - 2026-10-18 14:35:06 UTC — [ticket-480] APPROVED après 2 tour(s)
+- 2026-10-18 14:37:42 UTC — [ticket-480] documentation: 1 fichier(s) (150483ms) — après tour de correction
