@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-478
 plan: true
-pr_number: null
+pr_number: 530
 priority: medium
 status: done
 title: Tickets can be appended to a queue that is already running
