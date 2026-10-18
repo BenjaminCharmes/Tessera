@@ -67,6 +67,8 @@ class NeonClient:
         self._transport = transport
         # None : pas encore résolu ; "" : compte personnel, aucun org_id à envoyer.
         self._org_id: Optional[str] = org_id.strip() or None
+        # {org_id: managed_by} ; None tant que la liste des organisations n'est pas lue.
+        self._managed: Optional[dict[str, str]] = None
 
     @classmethod
     def from_settings(
@@ -83,13 +85,32 @@ class NeonClient:
         """
         if self._org_id is not None:
             return self._org_id
-        corps = as_dict(await self._send("GET", "/users/me/organizations"))
-        ids = [as_str(as_dict(o).get("id")) for o in as_list(corps.get("organizations"))]
-        ids = [identifiant for identifiant in ids if identifiant]
-        if len(ids) > 1:
+        gerees = await self._read_organizations()
+        if len(gerees) > 1:
             raise AmbiguousOrganization
-        self._org_id = ids[0] if ids else ""
+        self._managed = gerees
+        self._org_id = next(iter(gerees), "")
         return self._org_id
+
+    async def managed_by_vercel(self) -> bool:
+        """Tell whether the chosen organization is managed by Vercel (projects made there)."""
+        org_id = await self.organization()
+        if not org_id:
+            return False
+        if self._managed is None:
+            # NEON_ORG_ID donné : la liste n'a pas été lue. Illisible, on ne présume rien.
+            try:
+                self._managed = await self._read_organizations()
+            except ServiceError:
+                self._managed = {}
+        return self._managed.get(org_id) == "vercel"
+
+    async def _read_organizations(self) -> dict[str, str]:
+        """Return ``{org_id: managed_by}`` for every organization of the account."""
+        corps = as_dict(await self._send("GET", "/users/me/organizations"))
+        liste = [as_dict(o) for o in as_list(corps.get("organizations"))]
+        gerees = {as_str(o.get("id")): as_str(o.get("managed_by")) for o in liste}
+        return {identifiant: par for identifiant, par in gerees.items() if identifiant}
 
     @property
     def configured(self) -> bool:

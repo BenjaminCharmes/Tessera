@@ -49,6 +49,8 @@ class DatabaseStep:
             return self._ambiguous(ctx)
         if ids:
             return StepResult(StepState.TODO, f"Neon project exists, {URL_VARIABLE} is missing")
+        if await self._client.managed_by_vercel():
+            return self._from_vercel(ctx)
         return StepResult(StepState.TODO, "Neon project is missing")
 
     async def apply(self, ctx: ProvisioningContext) -> StepResult:
@@ -61,6 +63,8 @@ class DatabaseStep:
             return self._ambiguous(ctx)
         if ids:
             uri, fait = await self._client.connection_uri(ids[0]), "Neon project found"
+        elif await self._client.managed_by_vercel():
+            return self._from_vercel(ctx)
         else:
             uri, fait = await self._create(ctx), "Neon project created"
         await self._hand_over(ctx, uri)
@@ -95,6 +99,16 @@ class DatabaseStep:
             "NEON_API_KEY is not set in the Tessera .env. Create the Neon project "
             f"'{ctx.project_id}' yourself and add {URL_VARIABLE} to the Vercel project, "
             "or set the key and relaunch",
+        )
+
+    @staticmethod
+    def _from_vercel(ctx: ProvisioningContext) -> StepResult:
+        # Neon refuse la création par API dans une organisation gérée par Vercel.
+        return StepResult(
+            StepState.NEEDS_HUMAN,
+            f"Neon organization managed by Vercel: in Vercel, project {ctx.project_id} "
+            "› Storage › Create Database › Neon, linking Production and Preview. "
+            f"The relaunch will read {URL_VARIABLE}.",
         )
 
     @staticmethod
