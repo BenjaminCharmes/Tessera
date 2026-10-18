@@ -744,6 +744,30 @@ Au lieu de tourner à l'aveugle plusieurs fois, tu remarques que les tickets pro
 
 Quand une commande de test enchaîne plusieurs outils (vitest suivi de pytest, par exemple), le rapport affiche l'étape qui a échoué — avec sa propre sortie. Tu vois immédiatement la raison du blocage, au lieu d'être trompé par le résumé d'une étape précédente qui avait réussi.
 
+
+## 4 bis. Ajouter des tickets à une file en cours
+
+Pendant qu'une file s'exécute, tu peux ajouter des tickets supplémentaires sans attendre la fin — ils seront exécutés après les tickets actuellement en attente.
+
+### Quand c'est utile
+
+Tu lances une file de trois tickets. Pendant qu'elle tourne, tu découvres deux nouveaux tickets liés à traiter immédiatement. Plutôt que d'attendre la fin et d'en lancer une seconde, tu les ajoutes à la file en cours. Cela évite un double lancement et garde une trace claire — un seul run pour l'ensemble.
+
+### Comment ajouter des tickets
+
+Tu es sur l'écran du run (voir [Lire ce qui se passe](#5-lire-ce-qui-se-passe) plus loin). Tu vois une action pour ajouter des tickets à la file en cours. Tu donnes les ticket IDs séparés par des virgules. Ils s'exécutent après les tickets actuels, dans l'ordre indiqué.
+
+### Ce qui ne peut pas être ajouté
+
+- **Un ticket déjà dans la file** : on ne duplique pas un ticket.
+- **Un ticket déjà fait** : s'il est `done`, il a déjà été livré — pas besoin de le relancer.
+- **Un ticket avec dépendance manquante** : si un ticket que tu ajoutes dépend d'un autre, celui-ci doit être livré ou dans la file actuelle. Sinon, le run refuse l'ajout et explique quelle dépendance manque.
+- **Une file terminée** : seules les files `en cours` acceptent des ajouts. Quand elle s'arrête, même partiellement approuvée, c'est fini — lance une nouvelle file.
+
+### Si l'ajout échoue
+
+Tu vois le motif : doublon, déjà fait, ou dépendance manquante. Le run n'est pas modifié. Corrige le problème et réessaye.
+
 ## 5. Lire ce qui se passe
 
 Le panneau **Agent Stream** montre le déroulé en direct via WebSocket : quel agent
