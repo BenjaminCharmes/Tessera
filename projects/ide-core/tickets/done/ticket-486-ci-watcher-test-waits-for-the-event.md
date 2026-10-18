@@ -1,14 +1,15 @@
 ---
-id: ticket-486
-title: "The CI watcher blocked-ticket test waits for its event instead of sleeping 50 ms"
-type: test
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-16
+id: ticket-486
+pr_number: 525
+priority: medium
+status: done
+title: The CI watcher blocked-ticket test waits for its event instead of sleeping
+  50 ms
+type: test
 ---
 
 # ticket-486 — Un test du CIWatcher attend son événement
@@ -43,3 +44,10 @@ le collecteur, avec un délai maximal de quelques secondes) au lieu d'un
       fixe avant une assertion sur des événements
 - [ ] Les tests du fichier passent 20 fois de suite (`pytest --count=20` ou
       une boucle), dit la PR
+## Vérification des 20 passages
+
+`tests/test_ci_watcher.py` lancé 20 fois de suite, une boucle de
+`uv run python -m pytest tests/test_ci_watcher.py -q -p no:cacheprovider`
+depuis `backend/` : 20 passages, chacun `32 passed`, aucun échec. Les `sleep`
+fixes avant assertion sont remplacés par `_attendre_fin`, qui attend la fin
+réelle de la surveillance (plafond de 5 s contre un blocage).

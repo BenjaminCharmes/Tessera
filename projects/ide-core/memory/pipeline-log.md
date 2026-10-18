@@ -3479,3 +3479,37 @@ Points posit (58359ms)
 - 2026-10-18 08:02:13 UTC — [ticket-498] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une reconnai (123797ms)
 - 2026-10-18 08:02:13 UTC — [ticket-498] APPROVED après 1 tour(s)
 - 2026-10-18 08:05:08 UTC — [ticket-498] documentation: 1 fichier(s) (171202ms)
+- 2026-10-16 18:55:04 UTC — [ide-core] ticket-475 PR #510 confiée au CIWatcher
+- 2026-10-16 18:55:06 UTC — [ticket-486] branche ticket-486-the-ci-watcher-blocked-ticket-test-waits-for-its
+- 2026-10-16 18:55:06 UTC — [ticket-486] tour 1 — codeur démarré
+- 2026-10-16 18:55:08 UTC — [ticket-486] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your weekly limit · resets 3pm (Europe/Paris) (exit code: 1)
+- 2026-10-16 18:55:12 UTC — [ide-core] file interrompue : ticket-486 non approuvé
+- 2026-10-18 08:26:03 UTC — [ticket-486] branche ticket-486-the-ci-watcher-blocked-ticket-test-waits-for-its
+- 2026-10-18 08:26:03 UTC — [ticket-486] tour 1 — codeur démarré
+- 2026-10-18 08:28:56 UTC — [ticket-486] tour 1 — codeur terminé (173016ms)
+- 2026-10-18 08:34:05 UTC — [ticket-486] testeur: OK (exit 0)
+- 2026-10-18 08:34:33 UTC — [ticket-486] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff améliore la fiabilité des tes (28297ms)
+- 2026-10-18 08:34:33 UTC — [ticket-486] tour 1 — reviewer démarré
+- 2026-10-18 08:35:03 UTC — [ticket-486] tour 1 — reviewer terminé (29875ms)
+- 2026-10-18 08:37:20 UTC — [ticket-486] validateur: fichiers cités joints : backend/tests/test_ci_watcher.py (tronqué)
+- 2026-10-18 08:37:20 UTC — [ticket-486] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests n'utilisent plus `asyncio. (166515ms)
+- 2026-10-18 08:37:20 UTC — [ticket-486] CHANGES_REQUESTED tour 1: Validateur : Les deux premiers critères sont respectés : les tests n'utilisent plus `asyncio.sleep` fixe et ils attendent explicitement la fin des opérations via une fonction `_attendre_fin` avec un t
+- 2026-10-18 08:37:20 UTC — [ticket-486] tour 2 — codeur démarré
+- 2026-10-18 08:39:05 UTC — [ticket-486] tour 2 — codeur terminé (104921ms)
+- 2026-10-18 08:44:16 UTC — [ticket-486] testeur: OK (exit 0)
+- 2026-10-18 08:44:39 UTC — [ticket-486] securite: PASS — Refactoring de tests pour remplacer les délais arbitraires par des attentes déte (23032ms)
+- 2026-10-18 08:44:39 UTC — [ticket-486] tour 2 — reviewer démarré
+- 2026-10-18 08:45:28 UTC — [ticket-486] tour 2 — reviewer terminé (48702ms)
+- 2026-10-18 08:47:58 UTC — [ticket-486] validateur: fichiers cités joints : backend/tests/test_ci_watcher.py (tronqué)
+- 2026-10-18 08:47:58 UTC — [ticket-486] validateur: CHANGES_REQUESTED — Les deux premiers critères sont satisfaits : le code n'utilise plus `asyncio.sle (198797ms)
+- 2026-10-18 08:47:58 UTC — [ticket-486] CHANGES_REQUESTED tour 2: Validateur : Les deux premiers critères sont satisfaits : le code n'utilise plus `asyncio.sleep` fixes et tous les tests attendent explicitement la fin des opérations via une fonction `_attendre_fin` 
+- 2026-10-18 08:47:58 UTC — [ticket-486] tour 3 — codeur démarré
+- 2026-10-18 08:48:17 UTC — [ticket-486] tour 3 — codeur terminé (19125ms)
+- 2026-10-18 08:54:06 UTC — [ticket-486] testeur: OK (exit 0)
+- 2026-10-18 08:54:36 UTC — [ticket-486] securite: PASS — Diff refonctorisant les tests de CIWatcher : remplacement de `asyncio.sleep()` p (30156ms)
+- 2026-10-18 08:54:36 UTC — [ticket-486] tour 3 — reviewer démarré
+- 2026-10-18 08:55:18 UTC — [ticket-486] tour 3 — reviewer terminé (42250ms)
+- 2026-10-18 08:57:24 UTC — [ticket-486] validateur: fichiers cités joints : backend/tests/test_ci_watcher.py (tronqué)
+- 2026-10-18 08:57:24 UTC — [ticket-486] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour su (167766ms)
+- 2026-10-18 08:57:24 UTC — [ticket-486] APPROVED après 3 tour(s)
+- 2026-10-18 08:57:52 UTC — [ticket-486] documentation: 0 fichier(s) (23281ms)

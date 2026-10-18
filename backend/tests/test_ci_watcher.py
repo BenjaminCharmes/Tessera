@@ -61,6 +61,22 @@ def _collecteur() -> tuple[
     return events, collect
 
 
+_PLAFOND_S = 5.0
+
+
+async def _attendre_fin(
+    watcher: CIWatcher, ticket_id: str = "ticket-001", project_id: str = "proj"
+) -> bool:
+    """Wait for the watch of a ticket to end, with a ceiling instead of a delay.
+
+    The event is set after the last emission, so every event is collected
+    once this returns. The ceiling only turns a hang into a failure.
+    """
+    return await asyncio.wait_for(
+        watcher.attendre_merge(project_id, ticket_id), timeout=_PLAFOND_S
+    )
+
+
 # ---------------------------------------------------------------------------
 # Sérialisation par projet
 # ---------------------------------------------------------------------------
@@ -83,11 +99,11 @@ async def test_seconde_livraison_meme_projet_attend_la_premiere() -> None:
     await watcher.surveiller("proj", "ticket-002", 2, phase2_sequentielle, collect)
 
     # Pendant l'attente, les deux tickets sont inscrits.
-    await asyncio.sleep(0)
     assert set(watcher.en_attente("proj")) == {"ticket-001", "ticket-002"}
 
     gate.set()
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher, "ticket-001")
+    await _attendre_fin(watcher, "ticket-002")
 
     # Ordre séquentiel : ticket-001 avant ticket-002.
     assert ordre == ["pr1", "pr2"]
@@ -117,7 +133,8 @@ async def test_deux_projets_differents_ne_s_attendent_pas() -> None:
     await watcher.surveiller("proj-a", "ticket-001", 1, _faire_phase2("proj-a"), _rien)
     await watcher.surveiller("proj-b", "ticket-002", 2, _faire_phase2("proj-b"), _rien)
 
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher, "ticket-001", "proj-a")
+    await _attendre_fin(watcher, "ticket-002", "proj-b")
 
     # Les deux ont tourné en même temps (concurrence maximale = 2).
     assert max(max_concurrence) == 2
@@ -134,7 +151,7 @@ async def test_ci_verte_emet_ci_merge_done_merged_true() -> None:
     events, collect = _collecteur()
 
     await watcher.surveiller("proj", "ticket-001", 42, _phase2_success, collect)
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher)
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert len(done) == 1
@@ -156,7 +173,7 @@ async def test_ci_rouge_emet_ticket_blocked_et_ci_merge_done_merged_false() -> N
     events, collect = _collecteur()
 
     await watcher.surveiller("proj", "ticket-001", 7, _phase2_red_ci, collect)
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher)
 
     status_events = [e for e in events if e.type is EventType.TICKET_STATUS_CHANGED]
     assert len(status_events) == 1
@@ -185,13 +202,12 @@ async def test_en_attente_liste_le_ticket_pendant_l_attente_puis_plus_apres() ->
         return Livraison(pr_number=pr_number, merged=True)
 
     await watcher.surveiller("proj", "ticket-001", 1, phase2_bloquante, _rien)
-    await asyncio.sleep(0)
 
     # Pendant l'attente : listé.
     assert "ticket-001" in watcher.en_attente("proj")
 
     gate.set()
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher)
 
     # Après ci_merge_done : retiré.
     assert "ticket-001" not in watcher.en_attente("proj")
@@ -272,9 +288,8 @@ async def test_surveiller_purge_le_resultat_d_une_surveillance_precedente() -> N
     watcher._resultats_merge["proj:ticket-001"] = True
     await watcher.surveiller("proj", "ticket-001", 2, phase2_bloquante, _rien)
     gate.set()
-    await asyncio.sleep(0.05)
 
-    assert await watcher.attendre_merge("proj", "ticket-001") is False
+    assert await _attendre_fin(watcher) is False
 
 
 async def test_attendre_merge_suspend_jusqu_a_la_fin() -> None:
@@ -288,7 +303,6 @@ async def test_attendre_merge_suspend_jusqu_a_la_fin() -> None:
         return Livraison(pr_number=pr_number, merged=True)
 
     await watcher.surveiller("proj", "ticket-001", 1, phase2_bloquante, _rien)
-    await asyncio.sleep(0)
 
     assert "ticket-001" in watcher.en_attente("proj")
 
@@ -297,17 +311,16 @@ async def test_attendre_merge_suspend_jusqu_a_la_fin() -> None:
         termine.append(True)
 
     tache = asyncio.create_task(_attendre())
-    await asyncio.sleep(0)
+    await asyncio.sleep(0)  # simple cession : laisse la tâche démarrer
 
     # Pas encore terminé.
     assert termine == []
 
     gate.set()
-    await asyncio.sleep(0.05)
+    await asyncio.wait_for(tache, timeout=_PLAFOND_S)
 
     # Terminé après que la gate a été levée.
     assert termine == [True]
-    await tache
 
 
 async def test_attendre_merge_deux_appelants() -> None:
@@ -321,7 +334,6 @@ async def test_attendre_merge_deux_appelants() -> None:
         return Livraison(pr_number=pr_number, merged=True)
 
     await watcher.surveiller("proj", "ticket-001", 1, phase2_bloquante, _rien)
-    await asyncio.sleep(0)
 
     async def _attendre(n: int) -> None:
         await watcher.attendre_merge("proj", "ticket-001")
@@ -329,16 +341,14 @@ async def test_attendre_merge_deux_appelants() -> None:
 
     t1 = asyncio.create_task(_attendre(1))
     t2 = asyncio.create_task(_attendre(2))
-    await asyncio.sleep(0)
+    await asyncio.sleep(0)  # simple cession : laisse les tâches démarrer
 
     assert termines == []
 
     gate.set()
-    await asyncio.sleep(0.05)
+    await asyncio.wait_for(asyncio.gather(t1, t2), timeout=_PLAFOND_S)
 
     assert sorted(termines) == [1, 2]
-    await t1
-    await t2
 
 
 async def test_arret_annule_les_taches_sans_lever() -> None:
@@ -375,9 +385,9 @@ async def test_exception_emet_ci_merge_done_avec_arret() -> None:
         raise RuntimeError("connexion refusée")
 
     await watcher.surveiller("proj", "ticket-001", 7, phase2_qui_explose, collect)
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher)
 
-    done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
+    done =[e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert len(done) == 1
     assert done[0].data["merged"] is False
     assert "connexion refusée" in done[0].data["arret"]
@@ -394,7 +404,7 @@ async def test_exception_passe_le_ticket_en_blocked() -> None:
         raise RuntimeError("boom")
 
     await watcher.surveiller("proj", "ticket-001", 7, phase2_qui_explose, collect)
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher)
 
     status_events = [e for e in events if e.type is EventType.TICKET_STATUS_CHANGED]
     assert len(status_events) == 1
@@ -415,7 +425,7 @@ async def test_timeout_emet_ci_merge_done_avec_arret_delai_depasse() -> None:
         return Livraison(pr_number=pr_number, merged=True)
 
     await watcher.surveiller("proj", "ticket-001", 5, phase2_infinie, collect)
-    await asyncio.sleep(0.15)
+    await _attendre_fin(watcher)
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert len(done) == 1
@@ -479,7 +489,7 @@ async def test_phase2_echouee_ne_deplace_pas_les_fichiers_tickets(
         "proj", "ticket-007", 10, _phase2_red_ci, _rien,
         pipeline_log_path=log_path,
     )
-    await asyncio.sleep(0.1)
+    await _attendre_fin(watcher, "ticket-007")
 
     # Aucun fichier ne doit avoir été déplacé ni créé dans tickets/.
     all_ticket_files = list((tmp_path / "tickets").rglob("*.md"))
@@ -504,7 +514,7 @@ async def test_phase2_echouee_emet_blocked_et_ecrit_log(
         "proj", "ticket-007", 10, _phase2_red_ci, collect,
         pipeline_log_path=log_path,
     )
-    await asyncio.sleep(0.1)
+    await _attendre_fin(watcher, "ticket-007")
 
     # L'événement ticket_status_changed(blocked) doit être émis.
     status_events = [e for e in events if e.type is EventType.TICKET_STATUS_CHANGED]
@@ -534,7 +544,7 @@ async def test_merge_reussi_ecrit_la_ligne_mergee_au_journal(tmp_path: Path) -> 
         "proj", "ticket-001", 42, _phase2_success, _rien,
         pipeline_log_path=log_path,
     )
-    await asyncio.sleep(0.1)
+    await _attendre_fin(watcher)
 
     lignes = log_path.read_text(encoding="utf-8").splitlines()
     assert len(lignes) == 1
@@ -550,7 +560,7 @@ async def test_echec_n_ecrit_pas_la_ligne_mergee(tmp_path: Path) -> None:
         "proj", "ticket-007", 10, _phase2_red_ci, _rien,
         pipeline_log_path=log_path,
     )
-    await asyncio.sleep(0.1)
+    await _attendre_fin(watcher, "ticket-007")
 
     contenu = log_path.read_text(encoding="utf-8")
     assert "non mergée" in contenu
@@ -562,7 +572,7 @@ async def test_phase2_echouee_attendre_merge_retourne_false() -> None:
     watcher = CIWatcher()
 
     await watcher.surveiller("proj", "ticket-007", 10, _phase2_red_ci, _rien)
-    await asyncio.sleep(0.1)
+    await _attendre_fin(watcher, "ticket-007")
 
     result = await watcher.attendre_merge("proj", "ticket-007")
     assert result is False, (
@@ -596,7 +606,7 @@ async def test_read_timeout_puis_pr_mergee_est_un_succes(tmp_path: Path) -> None
         "proj", "ticket-006", 8, _phase2_read_timeout, collect,
         pipeline_log_path=log_path, etat_pr=_lecture_pr("merged"),
     )
-    await asyncio.sleep(0.1)
+    await _attendre_fin(watcher, "ticket-006")
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert len(done) == 1
@@ -619,7 +629,7 @@ async def test_read_timeout_pr_encore_ouverte_reste_un_echec() -> None:
         "proj", "ticket-006", 8, _phase2_read_timeout, collect,
         etat_pr=_lecture_pr("open"),
     )
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher, "ticket-006")
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert len(done) == 1
@@ -639,7 +649,7 @@ async def test_read_timeout_relecture_impossible_reste_un_echec() -> None:
         "proj", "ticket-006", 8, _phase2_read_timeout, collect,
         etat_pr=lecture_en_panne,
     )
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher, "ticket-006")
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert len(done) == 1
@@ -652,7 +662,7 @@ async def test_erreur_reseau_sans_relecture_reste_un_echec() -> None:
     events, collect = _collecteur()
 
     await watcher.surveiller("proj", "ticket-006", 8, _phase2_read_timeout, collect)
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher, "ticket-006")
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert done[0].data["merged"] is False
@@ -670,7 +680,7 @@ async def test_exception_a_message_vide_nomme_son_type_dans_le_journal(
         "proj", "ticket-006", 8, _phase2_read_timeout, collect,
         pipeline_log_path=log_path,
     )
-    await asyncio.sleep(0.1)
+    await _attendre_fin(watcher, "ticket-006")
 
     contenu = log_path.read_text(encoding="utf-8")
     assert "erreur inattendue : ReadTimeout" in contenu
@@ -687,7 +697,7 @@ async def test_exception_non_reseau_a_message_vide_nomme_son_type() -> None:
         raise RuntimeError()
 
     await watcher.surveiller("proj", "ticket-006", 8, phase2_vide, collect)
-    await asyncio.sleep(0.05)
+    await _attendre_fin(watcher, "ticket-006")
 
     done = [e for e in events if e.type is EventType.CI_MERGE_DONE]
     assert done[0].data["arret"] == "erreur inattendue : RuntimeError"
