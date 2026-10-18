@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-498
 plan: true
-pr_number: null
+pr_number: 523
 priority: medium
 status: done
 title: An agent call cut by an exhausted subscription quota is logged as such, and
