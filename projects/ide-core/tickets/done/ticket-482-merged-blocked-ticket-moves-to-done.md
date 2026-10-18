@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-482
 plan: true
-pr_number: null
+pr_number: 528
 priority: medium
 status: done
 title: A blocked ticket whose branch was merged by hand is moved to done
