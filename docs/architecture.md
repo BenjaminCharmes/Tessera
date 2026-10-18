@@ -1923,6 +1923,16 @@ Trois étapes coordonnées pour provisionner un projet Vercel :
 
 Idempotence garantie : rejouer le passage ne change rien si le projet, le domaine et les variables sont déjà en place. Les jetons et valeurs sensibles ne sont jamais loggés ni inclus dans les erreurs.
 
+### Domaine www et redirection (ticket-502)
+
+La mise en ligne ajoute automatiquement le domaine `www.<domaine>` au projet Vercel avec une redirection 308 vers le domaine principal (`<domaine>`). Cela évite que les visiteurs qui tapent `https://www.example.com` ne trouvent une page d'erreur NXDOMAIN.
+
+L'étape `vercel_project` :
+- Crée le domaine `www.<domaine>` s'il n'existe pas, avec `redirect` pointant vers `<domaine>` et `redirectStatusCode: 308`
+- N'ajoute rien si le domaine déclaré commence déjà par `www.` (pas de `www.www.example.com`)
+- Ajoute la recommandation DNS de Vercel pour le domaine `www` à `ctx.wanted_dns`, comme pour l'apex
+- Laisse intouché un domaine `www` déjà configuré manuellement avec une autre cible
+
 ### Étapes Resend (ticket-468)
 
 Deux étapes de configuration du domaine d'envoi dans l'API Resend, servant à la livraison des e-mails transactionnels.
