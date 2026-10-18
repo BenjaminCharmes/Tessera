@@ -30,9 +30,12 @@ class FakeVercel:
     """A minimal Vercel: state in attributes, every request recorded."""
 
     def __init__(self, project: bool = False, domain: bool = False, envs: tuple[str, ...] = (),
-                 verified: bool = False, deployed: bool = True) -> None:
+                 verified: bool = False, deployed: bool = True,
+                 www: bool | None = None) -> None:
         self.project, self.domain, self.verified = project, domain, verified
         self.envs, self.deployed = list(envs), deployed
+        # Sans précision, www suit le domaine : il est là quand le domaine l'est.
+        self.www = domain if www is None else www
         self.requests: list[httpx.Request] = []
 
     def calls(self, method: str, prefix: str) -> list[httpx.Request]:
@@ -65,8 +68,17 @@ class FakeVercel:
         if path == "/v9/projects/demo/domains/example.com":
             return httpx.Response(200, json=self._domain_payload()) if self.domain else self._absent()
         if key == "POST" and path == "/v10/projects/demo/domains":
+            if self.body(request)["name"] == "www.example.com":
+                self.www = True
+                return httpx.Response(200, json={"name": "www.example.com", "verified": True})
             self.domain = True
             return httpx.Response(200, json=self._domain_payload())
+        if path == "/v9/projects/demo/domains/www.example.com":
+            return httpx.Response(200, json={"verified": True}) if self.www else self._absent()
+        if path == "/v6/domains/www.example.com/config":
+            return httpx.Response(200, json={
+                "misconfigured": not self.verified,
+                "recommendedCNAME": [{"rank": 1, "value": "cname.vercel-dns.com."}]})
         if path == "/v6/domains/example.com/config":
             return httpx.Response(200, json={
                 "misconfigured": not self.verified,
@@ -180,6 +192,7 @@ async def test_missing_domain_is_added_and_dns_records_are_requested() -> None:
     assert ctx.wanted_dns == [
         DnsRecord("TXT", "_vercel.example.com", "vc-domain-verify=abc"),
         DnsRecord("A", "example.com", "76.76.21.21"),
+        DnsRecord("CNAME", "www.example.com", "cname.vercel-dns.com"),
     ]
 
 
@@ -190,7 +203,8 @@ async def test_dns_records_are_not_requested_twice() -> None:
     await VercelProjectStep(client).inspect(ctx)
     await VercelProjectStep(client).inspect(ctx)
     assert ctx.wanted_dns.count(DnsRecord("A", "example.com", "76.76.21.21")) == 1
-    assert len(ctx.wanted_dns) == 2
+    assert ctx.wanted_dns.count(DnsRecord("CNAME", "www.example.com", "cname.vercel-dns.com")) == 1
+    assert len(ctx.wanted_dns) == 3
 
 
 def test_subdomain_asks_for_a_cname_and_apex_for_an_a_record() -> None:

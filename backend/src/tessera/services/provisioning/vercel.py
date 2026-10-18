@@ -127,10 +127,16 @@ class VercelClient:
         reponse = await self._send_or_absent("GET", chemin)
         return None if reponse is None else domain_from(domain, as_dict(reponse.json()))
 
-    async def add_domain(self, project: str, domain: str) -> VercelDomain:
-        """Attach a domain to the project."""
+    async def add_domain(
+        self, project: str, domain: str, redirect_to: Optional[str] = None
+    ) -> VercelDomain:
+        """Attach a domain to the project, redirecting it (308) to ``redirect_to`` if given."""
         chemin = f"/v10/projects/{quote(project, safe='')}/domains"
-        reponse = await self._send("POST", chemin, body={"name": domain})
+        corps: dict[str, object] = {"name": domain}
+        if redirect_to:
+            corps["redirect"] = redirect_to
+            corps["redirectStatusCode"] = 308
+        reponse = await self._send("POST", chemin, body=corps)
         return domain_from(domain, as_dict(reponse.json()))
 
     async def domain_config(self, domain: str) -> list[DnsRecord]:

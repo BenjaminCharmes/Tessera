@@ -48,6 +48,11 @@ def _repo_access_missing(repo: Optional[str]) -> StepResult:
     )
 
 
+def www_of(domain: str) -> Optional[str]:
+    """Return ``www.<domain>``, or ``None`` when the domain already starts with ``www.``."""
+    return None if domain.startswith("www.") else f"www.{domain}"
+
+
 class VercelProjectStep:
     """Find or create the project, attach the domain, ask for its DNS records."""
 
@@ -67,6 +72,12 @@ class VercelProjectStep:
         if domaine is None:
             return StepResult(StepState.TODO, f"domain {ctx.online.domain} is not attached")
         await self._ask_dns(ctx, domaine)
+        www = www_of(ctx.online.domain)
+        if www is not None:
+            presente = await self._client.get_domain(nom, www)
+            if presente is None:
+                return StepResult(StepState.TODO, f"domain {www} is not attached")
+            await self._ask_dns(ctx, presente)
         return StepResult(StepState.SKIPPED, "project and domain are in place")
 
     async def apply(self, ctx: ProvisioningContext) -> StepResult:
@@ -88,11 +99,26 @@ class VercelProjectStep:
             domaine = await self._client.add_domain(nom, ctx.online.domain)
             faits.append(f"domain {ctx.online.domain} attached")
         await self._ask_dns(ctx, domaine)
+        faits += await self._ensure_www(ctx, nom)
         return StepResult(StepState.DONE, ", ".join(faits) or "nothing to create")
+
+    async def _ensure_www(self, ctx: ProvisioningContext, nom: str) -> list[str]:
+        """Attach ``www.<domain>`` redirected to the apex if absent; ask for its DNS record."""
+        www = www_of(ctx.online.domain)
+        if www is None:
+            return []
+        faits: list[str] = []
+        # Un www déjà présent n'est ni recréé ni modifié, quelle que soit sa cible.
+        presente = await self._client.get_domain(nom, www)
+        if presente is None:
+            presente = await self._client.add_domain(nom, www, redirect_to=ctx.online.domain)
+            faits.append(f"domain {www} attached, redirecting to {ctx.online.domain}")
+        await self._ask_dns(ctx, presente)
+        return faits
 
     async def _ask_dns(self, ctx: ProvisioningContext, domaine: VercelDomain) -> None:
         demandes = [] if domaine.verified else list(domaine.verification)
-        demandes += await self._client.domain_config(ctx.online.domain)
+        demandes += await self._client.domain_config(domaine.name)
         for enregistrement in demandes:
             if enregistrement not in ctx.wanted_dns:
                 ctx.wanted_dns.append(enregistrement)
