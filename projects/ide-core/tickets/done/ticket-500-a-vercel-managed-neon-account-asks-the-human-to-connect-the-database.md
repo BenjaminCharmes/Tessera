@@ -4,7 +4,7 @@ created: 2026-10-18
 depends_on: []
 estimated_days: 0.5
 id: ticket-500
-pr_number: null
+pr_number: 522
 priority: high
 status: done
 title: When Neon refuses to create a project in a Vercel-managed organization, the
