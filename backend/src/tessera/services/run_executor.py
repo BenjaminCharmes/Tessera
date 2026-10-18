@@ -295,7 +295,9 @@ async def executer(
             )
         elif run.mode == "queue":
             resultats = await orchestrator.run_queue(
-                run.project_id, ticket_ids or [], envoyer, run.dialogue,
+                run.project_id,
+                ticket_ids if ticket_ids is not None else [],
+                envoyer, run.dialogue,
                 envelope_run_id=run_id_en_base,
                 budget_override_usd=budget_usd,
             )
@@ -320,6 +322,10 @@ async def executer(
         # disparaît pas tout à fait — `pipeline_done` est publié par
         # l'orchestrateur, donc avant ce `finally` — mais elle tombe de
         # plusieurs millisecondes à presque rien.
+        # Une exception dans la file ne passe pas par la fermeture de
+        # `run_queue` : sans ceci, un ajout tardif rendrait 200 pour rien.
+        if run.file is not None:
+            run.file.fermer()
         registry.fermer(run.run_id)
         await _clore(
             run, run_id_en_base, resultats, echec, envoyer,

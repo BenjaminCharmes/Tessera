@@ -1,15 +1,15 @@
 ---
-id: ticket-478
-title: "Tickets can be appended to a queue that is already running"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
+id: ticket-478
 plan: true
-created: 2026-10-16
+pr_number: 530
+priority: medium
+status: done
+title: Tickets can be appended to a queue that is already running
+type: feat
 ---
 
 # ticket-478 — Ajouter des tickets à une file en cours

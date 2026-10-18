@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from tessera.services import eveil
+from tessera.services.file_vivante import FileVivante
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -93,6 +94,10 @@ class RunActif:
     #: observateur de répondre à un agent qui pose une question (ADR-025),
     #: au lieu du seul onglet qui a lancé le run.
     dialogue: Any = None
+    #: La file vivante d'un run en mode `queue` : c'est elle que
+    #: `POST /runs/{run_id}/append` complète pendant que le run tourne
+    #: (ticket-478). Hors de `en_dict()`, comme le dialogue.
+    file: FileVivante | None = None
     #: Étapes actuellement en cours sur ce run — renseigné par `run_executor`
     #: quand le reviewer et le validateur tournent en parallèle (ticket-289).
     #: ``"revue"`` et ``"validation"`` peuvent coexister ; ``etape`` garde la

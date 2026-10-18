@@ -3586,3 +3586,16 @@ Points posit (58359ms)
 - 2026-10-18 14:35:06 UTC — [ticket-480] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests couvrent correctement (140733ms)
 - 2026-10-18 14:35:06 UTC — [ticket-480] APPROVED après 2 tour(s)
 - 2026-10-18 14:37:42 UTC — [ticket-480] documentation: 1 fichier(s) (150483ms) — après tour de correction
+- 2026-10-18 14:38:00 UTC — [ide-core] ticket-480 PR #529 confiée au CIWatcher
+- 2026-10-18 14:38:03 UTC — [ticket-478] branche ticket-478-tickets-can-be-appended-to-a-queue-that-is-alread
+- 2026-10-18 14:38:54 UTC — [ticket-478] plan rendu (50969ms)
+- 2026-10-18 14:38:54 UTC — [ticket-478] tour 1 — codeur démarré
+- 2026-10-18 14:42:19 UTC — [ticket-478] tour 1 — codeur terminé (204187ms)
+- 2026-10-18 14:42:39 UTC — [ide-core] ticket-480 PR #529 mergée (CI verte)
+- 2026-10-18 14:47:57 UTC — [ticket-478] testeur: OK (exit 0)
+- 2026-10-18 14:49:43 UTC — [ticket-478] securite: PASS — Aucune vulnérabilité OWASP Top 10 détectée. Le nouvel endpoint `POST /orchestrat (106687ms)
+- 2026-10-18 14:49:44 UTC — [ticket-478] tour 1 — reviewer démarré
+- 2026-10-18 14:50:23 UTC — [ticket-478] tour 1 — reviewer terminé (39141ms)
+- 2026-10-18 14:52:36 UTC — [ticket-478] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent efficacement (172906ms)
+- 2026-10-18 14:52:36 UTC — [ticket-478] APPROVED après 1 tour(s)
+- 2026-10-18 14:57:11 UTC — [ticket-478] documentation: 1 fichier(s) (269906ms)

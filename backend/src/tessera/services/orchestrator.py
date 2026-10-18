@@ -16,6 +16,7 @@ from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
+from tessera.services.file_vivante import fermer_si_vivante
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import (
@@ -607,7 +608,14 @@ class Orchestrator:
 
         self._in_queue = True
         self._interruption = None
+        # `ticket_ids` peut grandir pendant la boucle (ticket-478) : l'itérateur
+        # d'une liste relit sa longueur à chaque pas, et `total`, `restants` et
+        # `faits` se calculent sur la liste courante.
         for index, ticket_id in enumerate(ticket_ids, start=1):
+            if budget_override_usd is None and self._run_max_budget_usd > 0:
+                # Le plafond suit la longueur courante : les tickets ajoutés
+                # en route ont chacun droit au leur.
+                effective_budget = self._run_max_budget_usd * len(ticket_ids)
             # Comme pour le budget et le quota, on vérifie **entre** deux
             # tickets : s'arrêter au milieu de l'un laisserait son travail non
             # commité (ADR-018, ADR-020).
@@ -823,6 +831,9 @@ class Orchestrator:
                     self._interrompre(project_id, f"{ticket_id} n'a pas été livré")
                     break
 
+        # Fermer **avant** le premier `await` suivant : un ajout qui passerait
+        # entre la fin de la lecture et ici rendrait 200 sans jamais s'exécuter.
+        fermer_si_vivante(ticket_ids)
         self._in_queue = False
         await self._nettoyer_apres_file()
         return results
