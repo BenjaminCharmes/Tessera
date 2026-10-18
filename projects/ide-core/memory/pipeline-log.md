@@ -3705,3 +3705,4 @@ Points posit (58359ms)
 - 2026-10-18 20:18:28 UTC — [ticket-492] tour 3 — codeur terminé (317250ms)
 - 2026-10-18 20:24:20 UTC — [ticket-492] testeur: OK (exit 0)
 - 2026-10-18 20:25:43 UTC — [ticket-492] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (83514ms)
+- 2026-10-18 20:25:48 UTC — [ide-core] file interrompue : ticket-492 non approuvé
