@@ -4060,3 +4060,32 @@ Points posit (58359ms)
 - 2026-10-19 20:57:22 UTC — [ticket-521] tour 1 — reviewer terminé (26484ms)
 - 2026-10-19 20:57:22 UTC — [ticket-521] APPROVED après 1 tour(s)
 - 2026-10-19 20:59:21 UTC — [ticket-521] documentation: 1 fichier(s) (113500ms) — après tour de correction
+- 2026-10-19 21:05:12 UTC — [ide-core] ticket-521 PR #578 mergée (CI verte)
+- 2026-10-19 21:05:21 UTC — [ide-core] ticket-521 : base réalignée sur develop
+- 2026-10-19 21:05:21 UTC — [ide-core] ticket-521 PR #578 confiée au CIWatcher
+- 2026-10-19 21:05:30 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 21:05:30 UTC — [ticket-522] tour 1 — codeur démarré
+- 2026-10-19 21:13:49 UTC — [ticket-522] tour 1 — codeur terminé (499421ms)
+- 2026-10-19 21:20:52 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:25:13 UTC — [ticket-522] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le module run_worktree.py implém (261781ms)
+- 2026-10-19 21:25:13 UTC — [ticket-522] tour 1 — reviewer démarré
+- 2026-10-19 21:25:40 UTC — [ticket-522] tour 1 — reviewer terminé (26718ms)
+- 2026-10-19 21:27:23 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (129828ms)
+- 2026-10-19 21:27:23 UTC — [ticket-522] CHANGES_REQUESTED tour 1: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni, car il néces
+- 2026-10-19 21:27:23 UTC — [ticket-522] tour 2 — codeur démarré
+- 2026-10-19 21:28:15 UTC — [ticket-522] tour 2 — codeur terminé (51609ms)
+- 2026-10-19 21:35:16 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:36:42 UTC — [ticket-522] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une configuration git légitime (`c (85750ms)
+- 2026-10-19 21:36:42 UTC — [ticket-522] tour 2 — reviewer démarré
+- 2026-10-19 21:37:09 UTC — [ticket-522] tour 2 — reviewer terminé (27641ms)
+- 2026-10-19 21:38:50 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (128515ms)
+- 2026-10-19 21:38:50 UTC — [ticket-522] CHANGES_REQUESTED tour 2: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni, car il néces
+- 2026-10-19 21:38:50 UTC — [ticket-522] tour 3 — codeur démarré
+- 2026-10-19 21:39:13 UTC — [ticket-522] tour 3 — codeur terminé (23046ms)
+- 2026-10-19 21:46:57 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:49:16 UTC — [ticket-522] securite: PASS — No CRITICAL or HIGH vulnerabilities detected that would block this ticket. The p (138765ms)
+- 2026-10-19 21:49:16 UTC — [ticket-522] tour 3 — reviewer démarré
+- 2026-10-19 21:49:37 UTC — [ticket-522] tour 3 — reviewer terminé (20796ms)
+- 2026-10-19 21:51:22 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (126656ms)
+- 2026-10-19 21:51:22 UTC — [ticket-522] CHANGES_REQUESTED tour 3: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni car il nécess
+- 2026-10-19 21:51:23 UTC — [ticket-522] BLOCKED après 3 tour(s) sans approbation
