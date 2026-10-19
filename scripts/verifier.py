@@ -68,6 +68,13 @@ BACKEND_STEPS: list[Step] = [
         cmd=[_PYTHON, "-m", "mypy", "src/"],
         cwd=BACKEND_DIR,
     ),
+    # La CI tourne sous Linux : un attribut propre à Windows (`stat.FILE_ATTRIBUTE_…`,
+    # `os.killpg` dans l'autre sens) passe le mypy local et casse la CI, après la revue.
+    Step(
+        name="mypy-linux",
+        cmd=[_PYTHON, "-m", "mypy", "--platform", "linux", "src/"],
+        cwd=BACKEND_DIR,
+    ),
 ]
 
 FRONTEND_STEPS: list[Step] = [
