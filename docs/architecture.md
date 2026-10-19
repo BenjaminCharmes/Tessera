@@ -958,6 +958,19 @@ L'approbation lie le verdict du reviewer et du validateur à un commit précis (
 
 **Phase 2 (au merge)** : `CIWatcher` vérifie que la tête de la PR est toujours `pushed_sha`. Un changement (rebase de la CI, push externe) met le ticket en `blocked`. Les rebases du pipeline lui-même mettent `pushed_sha` à jour.
 
+
+#### Fallback sur git ls-remote pour les clones single-branch (ticket-517)
+
+Lors du clonage d'un dépôt, si le refspec de `remote.origin.fetch` ne suit que la branche principale (ex : `+refs/heads/main:refs/remotes/origin/main`), les branches de ticket poussées ne créent pas de références `refs/remotes/origin/<branche>` en local.
+
+Le CIWatcher vérifie que la PR à merger contient le commit réel qui a été poussé. Pour cela, `GitWorkspaceService.sha_distant()` retrouve le SHA de la branche distante :
+
+1. Il tente d'abord `git rev-parse refs/remotes/origin/<branche>` (référence locale, rapide)
+2. Si la référence n'existe pas, il bascule sur `git ls-remote origin refs/heads/<branche>` (appel réseau, fiable)
+3. Si le distant est injoignable, il renvoie `None` et le merge reste fermé (ADR-039)
+
+Lors du clonage, `git_clone.py` rétablit un refspec complet (`+refs/heads/*:refs/remotes/origin/*`) pour éviter ce problème. Un dépôt dont le refspec reste réduit est signalé dans les logs du backend avec son projet en cause.
+
 ### Garanties de la phase 2 (ticket-328)
 
 La phase 2 opère en arrière-plan, sans intervention humaine jusqu'au verdict final.

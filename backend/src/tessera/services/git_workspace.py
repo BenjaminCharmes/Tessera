@@ -1119,14 +1119,43 @@ class GitWorkspaceService:
         return (await self._run("rev-parse", "HEAD")).strip()
 
     async def sha_distant(self, branch: str) -> str | None:
-        """Full SHA of `origin/<branch>` as last pushed, or None when unknown."""
+        """Full SHA of `origin/<branch>` as last pushed, or None when unknown.
+
+        The local remote-tracking ref is read first. A clone that follows a
+        single branch has no such ref for a pushed ticket branch: the remote
+        is then asked directly (ticket-517). Any failure gives None, so the
+        CI watcher stays closed (ADR-039).
+        """
         try:
             sortie = await self._run(
                 "rev-parse", "--verify", "--quiet", f"refs/remotes/origin/{branch}"
             )
         except GitCommandError:
+            return await self._sha_lu_sur_le_distant(branch)
+        return sortie.strip() or await self._sha_lu_sur_le_distant(branch)
+
+    async def _sha_lu_sur_le_distant(self, branch: str) -> str | None:
+        """Head of `refs/heads/<branch>` on `origin` via `ls-remote`, or None."""
+        ref = f"refs/heads/{branch}"
+        try:
+            sortie = await self._run("ls-remote", "origin", ref)
+        except GitCommandError as exc:
+            _logger.warning(
+                "sha_distant_ls_remote_echoue",
+                extra={"branche": branch, "erreur": exc.stderr.strip()},
+            )
             return None
-        return sortie.strip() or None
+        for ligne in sortie.splitlines():
+            sha, _, nom = ligne.partition("\t")
+            if nom.strip() == ref and sha:
+                # Branche poussée mais sans référence locale : le refspec du
+                # remote ne couvre pas `refs/heads/*`.
+                _logger.warning(
+                    "refspec_reduit",
+                    extra={"projet": self._project_path.name, "branche": branch},
+                )
+                return sha.strip()
+        return None
 
     async def commits_hors_rangement(self, depuis: str) -> list[str]:
         """SHAs added after `depuis` that are not the pipeline's own bookkeeping.

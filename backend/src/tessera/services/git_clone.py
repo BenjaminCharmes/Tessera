@@ -93,7 +93,10 @@ class GitCloneService:
 
     async def _run_clone(self, url: str, dest: Path) -> None:
         proc = await asyncio.create_subprocess_exec(
-            "git", "clone", "--depth=1", url, str(dest),
+            # `--depth` implique `--single-branch` : le refspec se réduisait à
+            # la seule branche clonée, et un push de la branche du ticket ne
+            # laissait aucune référence `origin/<branche>` (ticket-517).
+            "git", "clone", "--depth=1", "--no-single-branch", url, str(dest),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )

@@ -1,14 +1,15 @@
 ---
-id: ticket-517
-title: "The pushed commit is read from the remote even when the clone tracks only main, so an approved PR is merged"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-517
+pr_number: 571
+priority: high
+status: done
+title: The pushed commit is read from the remote even when the clone tracks only main,
+  so an approved PR is merged
+type: fix
 ---
 
 # ticket-517 — Le commit poussé se lit même quand le clone ne suit que `main`
