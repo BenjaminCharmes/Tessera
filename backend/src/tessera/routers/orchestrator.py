@@ -30,7 +30,12 @@ from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.resolveur_conflit import ResolveurConflitService
-from tessera.services.file_vivante import FileFermee, FileVivante, trier_ajouts
+from tessera.services.file_vivante import (
+    FileFermee,
+    FileVivante,
+    lecteur_sur_la_base,
+    trier_ajouts,
+)
 from tessera.services.run_executor import executer
 from tessera.services.run_lock import RUN_LOCK
 from tessera.services.run_registry import RUN_REGISTRY, RunAlreadyInProgress
@@ -807,10 +812,17 @@ async def append_to_run(run_id: str, request: AppendRequest) -> AppendResult:
             detail="Ce run n'est pas une file en cours : aucun ticket ne peut y être ajouté.",
         )
     file = run.file
-    ticket_svc = TicketService(
-        settings.ide_workspace_dir / run.project_id, run.project_id
+    project_path = settings.ide_workspace_dir / run.project_id
+    ticket_svc = TicketService(project_path, run.project_id)
+    # Un ticket mergé après le lancement n'est que sur la base distante : on
+    # la lit sans toucher à l'arbre du run (ticket-504).
+    repli = lecteur_sur_la_base(
+        GitWorkspaceService(project_path, politique=PolitiqueRun.lire(project_path)),
+        run.project_id,
     )
-    acceptes, ignores, refuses = await trier_ajouts(file, ticket_svc, request.ticket_ids)
+    acceptes, ignores, refuses = await trier_ajouts(
+        file, ticket_svc, request.ticket_ids, repli
+    )
     try:
         # Aucun `await` entre le contrôle d'ouverture de `ajouter` et l'ajout.
         ajoutes = file.ajouter(acceptes)

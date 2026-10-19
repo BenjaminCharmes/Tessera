@@ -389,6 +389,19 @@ def _dossier_sans_hooks() -> Path:
     return dossier
 
 
+def _chemin_du_ticket(listing: str, ticket_id: str) -> str | None:
+    """The first path of ``listing`` named ``<ticket_id>[-slug].md``, or None.
+
+    Motif strict : ``ticket-50`` ne doit pas retrouver ``ticket-503-...md``.
+    """
+    motif = re.compile(rf"^{re.escape(ticket_id)}(?:-[\w-]+)?\.md$")
+    for ligne in listing.splitlines():
+        chemin = ligne.strip()
+        if chemin and motif.match(Path(chemin).name):
+            return chemin
+    return None
+
+
 class GitWorkspaceService:
     """Drives git on a single workspace project, never on Tessera itself."""
 
@@ -632,6 +645,37 @@ class GitWorkspaceService:
             return True
 
         return False
+
+    async def lire_ticket_sur_la_base(self, ticket_id: str) -> tuple[str, str] | None:
+        """Read a ticket file from ``origin/<base>`` without touching the tree.
+
+        Returns ``(path from the repository root, content)``, or None when no
+        base is declared, the fetch fails, or the base holds no such ticket
+        (ticket-504). Read-only on purpose: no checkout, no ``update-ref``, no
+        file written. ``--no-write-fetch-head`` keeps a concurrent fetch from
+        overwriting the ``FETCH_HEAD`` that ``initialiser_base_ref`` reads right
+        after its own.
+        """
+        base = self._politique.base_branch if self._politique is not None else None
+        if not base:
+            return None
+        try:
+            await self._run("fetch", "--no-write-fetch-head", "origin", base)
+            prefix = (await self._run("rev-parse", "--show-prefix")).strip()
+            ref = f"refs/remotes/origin/{base}"
+            listing = await self._run(
+                "ls-tree", "--full-tree", "-r", "--name-only", ref, "--", f"{prefix}tickets/"
+            )
+            chemin = _chemin_du_ticket(listing, ticket_id)
+            if chemin is None:
+                return None
+            return chemin, await self._run("show", f"{ref}:{chemin}")
+        except GitCommandError as exc:
+            _logger.info(
+                "ticket_sur_la_base_illisible",
+                extra={"ticket_id": ticket_id, "erreur": exc.stderr.strip()},
+            )
+            return None
 
     async def advance_base_ref(self) -> None:
         """Move the base ref to the current HEAD, so the next ticket builds on it.

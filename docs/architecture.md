@@ -452,6 +452,14 @@ Le processus crée un worktree temporaire depuis la base distante, écrit les no
 
 Chaque frontmatter est validé avec le même modèle que le chargement ordinaire. Une validation échouée refuse l'opération en 422 sans rien pousser. L'arbre principal du projet reste intact pendant toute l'opération.
 
+#### Ajout de tickets à une file en cours (ticket-504)
+
+Un ticket peut être ajouté à une file pendant qu'elle tourne via `POST /api/v1/runs/{run_id}/append`. Quand un ticket vient d'être mergé sur la branche de base (pull request intégrée), l'endpoint l'accepte sans l'exiger sur l'arbre de travail du run.
+
+La lecture du ticket se fait par `git show origin/<base>:<chemin>` après un `fetch`, sans modifier l'arbre du run ni le changer de branche (ADR-018). Le ticket absent de `origin/<base>` reste refusé (« ticket introuvable »).
+
+La branche du ticket ajouté part toujours d'une base à jour (fetch puis départ de `origin/<base>`), ce que le ticket-480 garantit en fin de run.
+
 ### Agents
 | Méthode | Route | Description |
 |---------|-------|-------------|

@@ -176,6 +176,7 @@ Réponses d'erreur :
 |---------|----------|-------------|
 | `GET` | `/api/v1/runs/{run_id}` | Get Status |
 | `GET` | `/api/v1/runs/{run_id}/events` | Get Events |
+| `POST` | `/api/v1/runs/{run_id}/append` | Append Ticket To Queue |
 
 `GET /runs/{run_id}` répond, pour un run vivant comme terminé :
 
@@ -219,6 +220,26 @@ Réponses d'erreur :
 `GET /runs/{run_id}/events` rend les évènements persistés du run, dans l'ordre
 d'émission, jetons exclus. Avec l'identifiant d'une file, il rend ceux de toute
 la file ; avec celui d'un ticket de la file, ceux de ce ticket seul.
+
+#### `POST /api/v1/runs/{run_id}/append`
+
+Ajoute un ticket à une file en cours.
+
+**Paramètres du body** :
+- `ticket_id` : identifiant du ticket à ajouter
+
+**Comportement** :
+- Lit le ticket depuis `origin/<base>` (après `fetch`), sans modifier l'arbre de travail du run
+- Accepte les tickets présents sur la branche de base distante, même s'ils viennent d'être mergés pendant que la file tourne
+- Refuse les tickets absents de l'arbre local et de `origin/<base>` (réponse : `{"refuses": {"ticket-XXX": "ticket introuvable"}}`)
+
+**Réponses** :
+- `200 OK` : `{ "appended": ["ticket-XXX"], "refuses": {} }`
+- `400 Bad Request` : ticket absent ou format invalide
+- `404 Not Found` : run inconnu ou pas en cours
+- `409 Conflict` : le projet a un autre run actif
+
+L'arbre de travail du run n'est ni modifié ni changé de branche pendant l'opération.
 
 ### Services
 

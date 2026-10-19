@@ -1,15 +1,16 @@
 ---
-id: ticket-504
-title: "A ticket merged into the base branch while a queue runs can be appended to that queue"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-18
 depends_on: []
 estimated_days: 1
-created: 2026-10-18
+id: ticket-504
 plan: true
+pr_number: 539
+priority: medium
+status: done
+title: A ticket merged into the base branch while a queue runs can be appended to
+  that queue
+type: fix
 ---
 
 # ticket-504 — Un ticket mergé pendant une file peut y être ajouté

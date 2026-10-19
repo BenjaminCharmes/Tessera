@@ -8,8 +8,11 @@ reads it again at every step, the router appends to it.
 Tout se passe dans la boucle asyncio unique : aucun verrou, à condition qu'il
 n'y ait pas d'`await` entre le contrôle d'ouverture et l'ajout.
 """
-from tessera.models.ticket import TicketStatus
-from tessera.services.ticket_service import TicketService
+from collections.abc import Awaitable, Callable
+from typing import Protocol
+
+from tessera.models.ticket import Ticket, TicketStatus
+from tessera.services.ticket_service import TicketService, ticket_depuis_contenu
 
 _TERMINES = (TicketStatus.done, TicketStatus.cancelled)
 
@@ -53,15 +56,55 @@ def fermer_si_vivante(ticket_ids: list[str]) -> None:
         ticket_ids.fermer()
 
 
+LecteurDeRepli = Callable[[str], Awaitable[Ticket | None]]
+
+
+class _LecteurSurLaBase(Protocol):
+    async def lire_ticket_sur_la_base(self, ticket_id: str) -> tuple[str, str] | None: ...
+
+
+def lecteur_sur_la_base(workspace: _LecteurSurLaBase, project_id: str) -> LecteurDeRepli:
+    """A fallback reader of tickets on ``origin/<base>`` (ticket-504).
+
+    Un ticket écrit après le lancement de la file n'est jamais dans l'arbre du
+    run, qui est sur la branche du ticket en cours : il n'est que sur la base.
+    Contenu illisible : None, donc le ticket reste refusé.
+    """
+
+    async def lire(ticket_id: str) -> Ticket | None:
+        lu = await workspace.lire_ticket_sur_la_base(ticket_id)
+        if lu is None:
+            return None
+        try:
+            return ticket_depuis_contenu(lu[0], lu[1], project_id)
+        except ValueError:
+            return None
+
+    return lire
+
+
+async def _lire(
+    ticket_svc: TicketService, repli: LecteurDeRepli | None, ticket_id: str
+) -> Ticket | None:
+    """The ticket from the work tree, else from the fallback reader if any."""
+    ticket = await ticket_svc.get_ticket(ticket_id)
+    if ticket is None and repli is not None:
+        return await repli(ticket_id)
+    return ticket
+
+
 async def trier_ajouts(
-    file: FileVivante, ticket_svc: TicketService, ticket_ids: list[str]
+    file: FileVivante,
+    ticket_svc: TicketService,
+    ticket_ids: list[str],
+    repli: LecteurDeRepli | None = None,
 ) -> tuple[list[str], dict[str, str], dict[str, str]]:
     """Split the requested ids into (to add, ignored, refused).
 
     Ignoré : déjà dans la file, ou déjà terminé. Refusé : introuvable, ou
     une dépendance qui n'est ni dans la file ni terminée. Un ticket accepté
     plus haut dans la même demande compte comme dans la file pour les
-    suivants.
+    suivants. `repli` lit un ticket absent de l'arbre (ticket-504).
     """
     acceptes: list[str] = []
     ignores: dict[str, str] = {}
@@ -70,14 +113,14 @@ async def trier_ajouts(
         if ticket_id in file or ticket_id in acceptes:
             ignores[ticket_id] = "déjà dans la file"
             continue
-        ticket = await ticket_svc.get_ticket(ticket_id)
+        ticket = await _lire(ticket_svc, repli, ticket_id)
         if ticket is None:
             refuses[ticket_id] = "ticket introuvable"
         elif ticket.status in _TERMINES:
             ignores[ticket_id] = "déjà terminé"
         else:
             manquante = await _dependance_manquante(
-                file, ticket_svc, ticket.depends_on, acceptes
+                file, ticket_svc, ticket.depends_on, acceptes, repli
             )
             if manquante is None:
                 acceptes.append(ticket_id)
@@ -91,12 +134,13 @@ async def _dependance_manquante(
     ticket_svc: TicketService,
     depends_on: list[str],
     acceptes: list[str],
+    repli: LecteurDeRepli | None = None,
 ) -> str | None:
     """The first dependency neither queued nor done, or None when all are met."""
     for dep in depends_on:
         if dep in file or dep in acceptes:
             continue
-        ticket_dep = await ticket_svc.get_ticket(dep)
+        ticket_dep = await _lire(ticket_svc, repli, dep)
         if ticket_dep is None or ticket_dep.status != TicketStatus.done:
             return dep
     return None
