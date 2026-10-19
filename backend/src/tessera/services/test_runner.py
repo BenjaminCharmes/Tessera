@@ -1,4 +1,5 @@
 import asyncio
+import os
 import shlex
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
@@ -9,6 +10,7 @@ from pathlib import Path
 
 from tessera.services.commande_chainee import decouper
 from tessera.services.erreur_de_sortie import detail_avec_erreur
+from tessera.services.groupe_d_etape import GroupeDEtape
 from tessera.services.lancement import essais_de_commande
 from tessera.services.outil_introuvable import outil_introuvable
 from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
@@ -168,6 +170,9 @@ class TestRunnerService:
                     cwd=dossier,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
+                    # Unix : l'étape chef de son groupe, pour tuer son arbre
+                    # (ticket-507). Windows a le job, et ignore ce drapeau.
+                    start_new_session=os.name != "nt",
                 )
             except FileNotFoundError as exc:
                 derniere = exc
@@ -258,21 +263,39 @@ class TestRunnerService:
 
         ``timeout`` bounds the whole command, not each step: what earlier
         steps used is taken from what this one may use.
+
+        Each step has its own process group, closed when the step ends — even
+        green, so no descendant outlives it (ticket-507).
         """
+        groupe = GroupeDEtape()
+        try:
+            return await self._executer_dans(groupe, args, dossier, cmd, timeout, start)
+        finally:
+            groupe.fermer()
+
+    async def _executer_dans(
+        self,
+        groupe: GroupeDEtape,
+        args: list[str],
+        dossier: Path,
+        cmd: str,
+        timeout: int,
+        start: float,
+    ) -> "tuple[int, str] | TestResult":
+        """Run one step inside ``groupe``; see ``_executer``."""
         restant = max(float(timeout) - (time.monotonic() - start), 0.0)
         try:
             proc = await self._lancer(args, dossier)
+            groupe.rattacher(proc.pid)
             stdout_bytes, stderr_bytes = await asyncio.wait_for(
                 proc.communicate(), timeout=restant
             )
         except asyncio.TimeoutError:
-            # `kill()` sans `wait()` laisse un zombie et un transport que
-            # asyncio ferme en se plaignant (ticket-122).
-            try:
-                proc.kill()
-                await proc.wait()
-            except Exception:
-                pass
+            # Tuer le seul processus direct laissait ses petits-enfants garder
+            # les tubes ouverts, et `wait()` ne revenait plus : on tue l'arbre
+            # (ticket-507), et l'attente est bornée. `kill()` sans `wait()`
+            # laisserait un zombie (ticket-122).
+            await groupe.terminer(proc)
             duration_ms = int((time.monotonic() - start) * 1000)
             _logger.warning("test_runner_timeout", extra={"cmd": cmd, "timeout": timeout})
             return TestResult(
