@@ -443,6 +443,19 @@ def _ticket_from_post(post: frontmatter.Post, path: Path, project_id: str) -> Ti
 _TICKET_FILE_RE = re.compile(r"^(ticket-\d+)(?:-[\w-]+)?\.md$")
 
 
+def ticket_depuis_contenu(chemin: str, contenu: str, project_id: str) -> Ticket:
+    """Build a `Ticket` from file content read elsewhere than the work tree.
+
+    Contrairement à `validate_ticket`, le dossier du chemin (`todo/`, `done/`…)
+    décide du statut : un ticket livré sur la base n'est pas jugé « à faire ».
+    Raises `ValueError` when the content is not a readable ticket (ticket-504).
+    """
+    try:
+        return _ticket_from_post(frontmatter.loads(contenu), Path(chemin), project_id)
+    except Exception as exc:  # noqa: BLE001 — YAML, enum ou modèle : un seul refus
+        raise ValueError(f"{chemin} : ticket illisible : {exc}") from exc
+
+
 def validate_ticket(name: str, content: str) -> Ticket:
     """Parse a ticket file the way loading does, or raise `ValueError`.
 
