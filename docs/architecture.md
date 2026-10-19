@@ -631,6 +631,10 @@ Pour éviter que des petits-enfants orphelins ne gardent les tubes ouverts et ne
 
 3. Aucune attente non bornée ne persiste après un timeout : chaque groupe est créé au lancement de l'étape, jamais réutilisé, et fermé à la fin pour le nettoyer.
 
+#### Commandes sans entrée standard (ticket-512)
+
+Chaque lancement de commande non-interactive du pipeline (`test_runner.py`, vérifications, services) reçoit `stdin=asyncio.subprocess.DEVNULL`. Cela ferme immédiatement l'entrée standard du processus, empêchant tout blocage si une dépendance ou script tente une interaction utilisateur — par exemple `pnpm install` qui appelle `prisma generate` en postinstall.
+
 ### Audit de sécurité
 
 L'agent sécurité audite le diff avant la revue. Selon ADR-039, une réponse JSON invalide bloque toujours le run — aucun repli n'est possible pour le jugement de sécurité.
