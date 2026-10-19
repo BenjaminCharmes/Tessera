@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 1
 id: ticket-492
-pr_number: null
+pr_number: 540
 priority: medium
 status: done
 title: An approval is bound to the commit it reviewed, and nothing else gets merged
