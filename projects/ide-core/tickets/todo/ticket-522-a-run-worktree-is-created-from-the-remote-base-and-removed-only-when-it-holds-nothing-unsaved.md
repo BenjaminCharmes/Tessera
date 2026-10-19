@@ -70,7 +70,7 @@ local (dépôt nu) :
 ## Critères d'acceptation
 - [ ] Les neuf tests ci-dessus existent et passent
 - [ ] `run_git` n'est pas dupliqué ; les tests existants de `temporary_worktree` et `git_workspace` passent
-- [ ] Aucun appel depuis le pipeline : le branchement est le ticket-519
+- [ ] Le diff ne modifie ni `backend/src/tessera/services/pipeline_stages.py` ni `backend/src/tessera/services/orchestrator.py` : le branchement est le ticket-519
 
 ## Dépendances
 Aucune.

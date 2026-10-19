@@ -61,7 +61,7 @@ def retirer_les_liens(racine: Path) -> list[Path]: ...
 
 ## Critères d'acceptation
 - [ ] Les huit tests ci-dessus existent et passent
-- [ ] Aucun chemin de suppression n'atteint `rmtree` ou `worktree remove` avant `retirer_les_liens`
+- [ ] Un test vérifie, avec des doubles qui notent l'ordre des appels, que chaque fonction de suppression du module appelle `retirer_les_liens` avant `rmtree` ou `worktree remove`
 - [ ] Le `.env` de Tessera ne peut être ni copié ni lié (déjà filtré par le ticket-521 ; un test de bout en bout le confirme)
 
 ## Dépendances
