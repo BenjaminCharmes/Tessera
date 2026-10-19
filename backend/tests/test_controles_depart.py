@@ -150,3 +150,72 @@ def test_unreadable_test_command_is_a_gap(workspace: Path) -> None:
 
 def test_unknown_folder_has_no_gap(workspace: Path) -> None:
     assert manques_avant_depart(workspace / "absent", "") == []
+
+
+def _projet_a_worktree(
+    workspace: Path, declaration: dict[str, object], test_command: str
+) -> tuple[Path, Path]:
+    """A checkout project and its worktree twin, both under a repository root."""
+    config = {
+        "git_root": "ancestor",
+        "artifacts": "tracked",
+        "pipeline": {"test_command": test_command},
+        "worktree": declaration,
+    }
+    depot = workspace / "depot"
+    (depot / ".git").mkdir(parents=True)
+    projet = _projet(depot / "projects", config, nom="p")
+    jumeau = workspace / "wt" / "projects" / "p"
+    jumeau.mkdir(parents=True)
+    (jumeau / "agents.json").write_text(json.dumps(config), encoding="utf-8")
+    return projet, workspace / "wt"
+
+
+def test_unknown_first_word_of_the_effective_command_is_a_gap(workspace: Path) -> None:
+    projet, wt = _projet_a_worktree(
+        workspace, {"test_command": "outil-introuvable-524 -q"}, "echo ok"
+    )
+
+    manques = manques_avant_depart(projet, "ghp_exemple", racine_worktree=wt)
+
+    assert manques == ["commande de test introuvable : `outil-introuvable-524`"]
+
+
+def test_unknown_word_of_the_unused_command_is_not_a_gap(workspace: Path) -> None:
+    projet, wt = _projet_a_worktree(
+        workspace, {"test_command": "./outil-524.sh"}, "commande-bidon-524"
+    )
+    (wt / "projects" / "p" / "outil-524.sh").write_text("exit 0\n", encoding="utf-8")
+
+    assert manques_avant_depart(projet, "ghp_exemple", racine_worktree=wt) == []
+    # Sans worktree, c'est la commande du projet qui se vérifie, comme avant.
+    sans = manques_avant_depart(projet, "ghp_exemple")
+    assert sans == ["commande de test introuvable : `commande-bidon-524`"]
+
+
+def test_the_first_word_is_resolved_inside_the_worktree_not_the_checkout(
+    workspace: Path,
+) -> None:
+    projet, wt = _projet_a_worktree(workspace, {"test_command": "./outil-524.sh"}, "echo ok")
+    (projet / "outil-524.sh").write_text("exit 0\n", encoding="utf-8")
+
+    manques = manques_avant_depart(projet, "ghp_exemple", racine_worktree=wt)
+
+    assert manques == ["commande de test introuvable : `./outil-524.sh`"]
+
+
+def test_a_placeholder_in_the_first_word_resolves_to_the_worktree(workspace: Path) -> None:
+    projet, wt = _projet_a_worktree(
+        workspace, {"test_command": "{worktree}/projects/p/outil-524.sh"}, "echo ok"
+    )
+    (wt / "projects" / "p" / "outil-524.sh").write_text("exit 0\n", encoding="utf-8")
+
+    assert manques_avant_depart(projet, "ghp_exemple", racine_worktree=wt) == []
+
+
+def test_an_unknown_placeholder_is_a_gap_naming_it(workspace: Path) -> None:
+    projet, wt = _projet_a_worktree(workspace, {"test_command": "{depot}/python"}, "echo ok")
+
+    manques = manques_avant_depart(projet, "ghp_exemple", racine_worktree=wt)
+
+    assert len(manques) == 1 and "{depot}" in manques[0]

@@ -1,14 +1,15 @@
 ---
-id: ticket-524
-title: "Test commands run in a worktree with the declared interpreter and environment"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: ["ticket-521"]
-estimated_days: 0.5
 created: 2026-10-19
-pr_number: null
+depends_on:
+- ticket-521
+estimated_days: 0.5
+id: ticket-524
+pr_number: 585
+priority: medium
+status: done
+title: Test commands run in a worktree with the declared interpreter and environment
+type: feat
 ---
 
 # ticket-524 — Les tests tournent dans le worktree, avec l'interpréteur déclaré

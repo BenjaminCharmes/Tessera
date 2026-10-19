@@ -1,7 +1,7 @@
 import asyncio
 import os
 import shlex
-from collections.abc import AsyncGenerator, Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
 from typing import Any
 import time
@@ -143,16 +143,26 @@ class EtapeCoupee:
 
 
 class TestRunnerService:
-    def __init__(self, cwd: str | None = None, timeout: int | None = None) -> None:
+    def __init__(
+        self,
+        cwd: str | None = None,
+        timeout: int | None = None,
+        env: Mapping[str, str] | None = None,
+    ) -> None:
         """``cwd`` and ``timeout`` come from the project's pipeline config.
 
         Les tests d'ide-core vivent dans `../../backend`, et la suite dure plus
         que le délai par défaut : sans ces deux réglages, le testeur ne pouvait
         être activé sur aucun projet dont les tests ne sont pas à sa racine
         (ticket-241).
+
+        ``env`` est fusionné par-dessus l'environnement hérité, à chaque
+        étape : c'est ainsi qu'un worktree pointe `PYTHONPATH` sur ses sources
+        (ticket-524). Sans lui, l'environnement hérité passe tel quel.
         """
         self._cwd = cwd
         self._timeout = timeout if timeout is not None else _DEFAULT_TIMEOUT
+        self._env = dict(env) if env else None
 
     def detect_test_command(
         self,
@@ -185,6 +195,8 @@ class TestRunnerService:
                 return await asyncio.create_subprocess_exec(
                     *tentative,
                     cwd=dossier,
+                    # `None` : le processus hérite de l'environnement du backend.
+                    env={**os.environ, **self._env} if self._env else None,
                     # Entrée fermée : une commande de test n'est jamais
                     # interactive, et l'entrée héritée du backend (console
                     # Windows) laissait un postinstall attendre une saisie

@@ -327,6 +327,44 @@ Un worktree neuf est peuplé avant tout lancement : ses entrées déclarées (fi
 
 Implémentation : `services/run_worktree_populate.py` (ticket-523, ADR-056).
 
+#### Exécution des commandes dans le worktree (ticket-524)
+
+Quand un projet déclare `worktree` dans `agents.json`, ses tests tournent en
+isolation dans le worktree. L'IDE n'y installe pas `uv` (ticket-512, WDAC) :
+les commandes doivent utiliser l'interpréteur du `.venv` principal, avec
+`PYTHONPATH` pointé sur le worktree.
+
+Deux fonctions pures résolvent la commande et l'environnement effectifs :
+
+- `commande_effective(politique, racine_worktree, depot) -> str | None` :
+  lit `worktree.test_command` s'il est déclaré, sinon `test_command` (hors
+  worktree). Remplace les placeholders `{worktree}` (chemin absolu du
+  worktree) et `{repo}` (racine du dépôt). Un placeholder inconnu est refusé
+  avec raison ; `None` signale l'absence de commande.
+
+- `environnement_effectif(config, racine_worktree, depot) -> dict[str, str]` :
+  même résolution des placeholders, pour la déclaration optionnelle
+  `worktree.env`.
+
+`TestRunnerService.__init__` reçoit `env: Mapping[str, str] | None = None`.
+Injecté à chaque lancement, cet `env` est fusionné **par-dessus** `os.environ` —
+ses valeurs surchargent les variables système. Sans `env`, le comportement est
+inchangé.
+
+La commande effective est résolue depuis le `test_cwd` du projet déclaré dans
+le worktree (`agents.json`, clé `worktree.test_cwd`) : son premier mot doit
+être trouvable comme commande système ou chemin existant depuis ce répertoire.
+`controles_depart` vérifie désormais la commande effective, pas la déclarée —
+ce qui permet de valider en amont que le test est lançable.
+
+Le script de test reste protégé en écriture (ADR-027). Un diff qui le modifie
+est signalé au reviewer ; un test confirme qu'il se refuse en écriture quand
+il est dans le worktree.
+
+Le branchement — création effective des worktrees — est ticket-519. Ce ticket
+prépare les fonctions pures et les modifications de service, sans créer
+aucun worktree.
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.

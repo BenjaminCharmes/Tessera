@@ -37,14 +37,22 @@ def _pipeline(project_path: Path) -> dict[str, object]:
     return section if isinstance(section, dict) else {}
 
 
-def script_de_verification(project_path: Path) -> Path | None:
+def script_de_verification(
+    project_path: Path, commande_effective: str | None = None
+) -> Path | None:
     """Le fichier que `test_command` exécute, ou None si elle n'en désigne aucun.
 
     Le premier argument qui est un fichier existant, cherché depuis
     `pipeline.test_cwd` (le dossier du projet à défaut).
+
+    Dans un worktree, `commande_effective` remplace le `test_command` du
+    manifeste, et `project_path` est le dossier du projet **dans le worktree** :
+    le script protégé est celui que le run lance vraiment (ticket-524).
     """
     pipeline = _pipeline(project_path)
-    commande = pipeline.get("test_command")
+    commande = (
+        commande_effective if commande_effective is not None else pipeline.get("test_command")
+    )
     cwd = pipeline.get("test_cwd")
     if not isinstance(commande, str) or not commande.strip():
         return None
