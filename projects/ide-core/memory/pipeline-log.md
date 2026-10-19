@@ -3747,3 +3747,14 @@ Points posit (58359ms)
 - 2026-10-19 09:34:11 UTC — [ticket-484] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (291922ms)
 - 2026-10-19 09:34:11 UTC — [ticket-484] APPROVED après 1 tour(s)
 - 2026-10-19 09:37:53 UTC — [ticket-484] documentation: 0 fichier(s) (217593ms) — après tour de correction — refusé : doc-technique : README.md : texte introuvable — « Certains conflits simples — dans le journal (`memory/pipelin ». L'agent a proposé une modification sur un text — refusé : doc-fonctionnelle : README.md : texte introuvable — « Après un run approuvé, seul le commit que le reviewer et le  ». L'agent a proposé une modification sur un 
+- 2026-10-19 09:38:06 UTC — [ide-core] ticket-484 PR #542 confiée au CIWatcher
+- 2026-10-19 09:38:09 UTC — [ticket-481] branche ticket-481-a-project-whose-agents-json-project-id-differs-fr
+- 2026-10-19 09:38:09 UTC — [ticket-481] tour 1 — codeur démarré
+- 2026-10-19 09:41:28 UTC — [ticket-481] tour 1 — codeur terminé (198421ms)
+- 2026-10-19 09:43:24 UTC — [ide-core] ticket-484 PR #542 mergée (CI verte)
+- 2026-10-19 09:54:47 UTC — [ticket-481] testeur: OK (exit 0)
+- 2026-10-19 09:57:17 UTC — [ticket-481] securite: PASS — Le diff ajoute une détection des mismatches entre `project_id` déclaré et le nom (149389ms)
+- 2026-10-19 09:57:17 UTC — [ticket-481] tour 1 — reviewer démarré
+- 2026-10-19 09:57:34 UTC — [ticket-481] tour 1 — reviewer terminé (17077ms)
+- 2026-10-19 09:57:35 UTC — [ticket-481] validateur: APPROVED — Les trois critères sont pleinement satisfaits : le test `test_warns_when_project (17578ms)
+- 2026-10-19 09:57:35 UTC — [ticket-481] APPROVED après 1 tour(s)
