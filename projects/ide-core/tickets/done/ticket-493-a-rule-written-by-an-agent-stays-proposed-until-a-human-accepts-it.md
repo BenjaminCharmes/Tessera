@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 1
 id: ticket-493
-pr_number: null
+pr_number: 541
 priority: medium
 status: done
 title: A constraint written by an agent stays proposed, and reaches no agent until
