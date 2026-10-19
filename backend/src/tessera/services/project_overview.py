@@ -74,6 +74,7 @@ class ProjectOverview(BaseModel):
     icon: bool = False
     services_declares: bool = False
     services_en_cours: bool = False
+    avertissements: list[str] = []
 
 
 class _Calcul(BaseModel):
@@ -260,4 +261,5 @@ async def build_overview(
         icon=find_icon(project.path) is not None,
         services_declares=services_declares,
         services_en_cours=services_en_cours,
+        avertissements=list(project.avertissements),
     )

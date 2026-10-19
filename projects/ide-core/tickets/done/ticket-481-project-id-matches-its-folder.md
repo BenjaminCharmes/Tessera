@@ -1,14 +1,15 @@
 ---
-id: ticket-481
-title: "A project whose agents.json project_id differs from its folder name is flagged at load"
-type: fix
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-16
+id: ticket-481
+pr_number: 545
+priority: low
+status: done
+title: A project whose agents.json project_id differs from its folder name is flagged
+  at load
+type: fix
 ---
 
 # ticket-481 — Un `project_id` qui ne suit pas le dossier est signalé

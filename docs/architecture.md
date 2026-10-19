@@ -1326,6 +1326,12 @@ La validation est centralisée dans `backend/src/tessera/services/project_loader
 
 Cette approche centralise la prévention des path traversals pour l'ensemble des routes via une seule décision.
 
+### Cohérence du project_id avec le dossier (ticket-481)
+
+Au chargement d'un projet, si `project_id` dans `agents.json` diffère du nom du dossier du projet, un avertissement est journalisé et ajouté au champ `avertissements` de `ProjectOverview`. Le nom du dossier reste l'identifiant unique du projet dans toutes les requêtes API.
+
+Cela prévient les problèmes de renommage : un projet renommé (dossier, historique git) dont `project_id` n'a pas été mis à jour sera détecté et signalé.
+
 ## Couche SQLite (ticket-015)
 
 SQLite est une couche **cache/historique** — les fichiers Markdown restent la source de vérité (ADR-003).

@@ -12,6 +12,9 @@ from tessera.services.providers.noms import (
     PROVIDERS_CONNUS,
     ProviderInconnu,
 )
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 # ------------------------------------------------------------------
 # Project-id validation — ticket-370
@@ -82,9 +85,32 @@ def load_project(project_path: Path) -> Project:
         github_forge=github_forge,
         category=_load_category(project_path),
         fait_tourner_l_ide=fait_tourner_l_ide(project_path),
+        avertissements=_avertissements_du_manifeste(project_path),
     )
     _project_cache[key] = project
     return project
+
+
+def _avertissements_du_manifeste(project_path: Path) -> list[str]:
+    """Signale un `project_id` d'`agents.json` qui ne suit pas le dossier.
+
+    Le nom du dossier reste l'identifiant : le manifeste ne le change pas, il
+    est seulement signalé (ticket-481). `agents.json` étant interdit aux
+    agents, la correction revient à l'humain.
+    """
+    declare = _chaine_declaree(project_path, "project_id")
+    if declare is None or declare == project_path.name:
+        return []
+    message = (
+        f"agents.json déclare project_id « {declare} » mais le dossier "
+        f"s'appelle « {project_path.name} » : l'identifiant retenu est "
+        f"« {project_path.name} »."
+    )
+    _logger.warning(
+        "project_id_mismatch",
+        extra={"folder": project_path.name, "declared": declare},
+    )
+    return [message]
 
 
 def list_projects(workspace: Path) -> list[Project]:
