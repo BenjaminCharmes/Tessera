@@ -120,8 +120,12 @@ def hook_refus_hors_perimetre(
     project_path: Path | None,
     racine: Path | None = None,
     journal: JournalDesRefus | None = None,
+    commande_effective: str | None = None,
 ) -> Callable[[HookInput, str | None, HookContext], Awaitable[HookJSONOutput]]:
     """Fabrique le hook `PreToolUse` qui enferme les écritures dans le projet.
+
+    `commande_effective` est la commande de test d'un worktree, déjà résolue :
+    c'est son script qui se protège, plutôt que celui du manifeste (ticket-524).
 
     Sans projet — les services texte→JSON tournent sans contexte et sans
     outils — le hook laisse tout passer : il n'y a pas de périmètre à tenir.
@@ -144,7 +148,11 @@ def hook_refus_hors_perimetre(
     # Le script que `test_command` lance est figé comme la racine : lu à chaque
     # écriture, il suivrait ce qu'un codeur aurait écrit dans `agents.json`
     # (ticket-490).
-    script = script_de_verification(project_path) if project_path is not None else None
+    script = (
+        script_de_verification(project_path, commande_effective)
+        if project_path is not None
+        else None
+    )
 
     async def hook(
         entree: HookInput, tool_use_id: str | None, contexte: HookContext

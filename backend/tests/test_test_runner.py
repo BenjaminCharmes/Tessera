@@ -780,3 +780,75 @@ class TestEtapeEnEchecDansUneChaine:
         assert result.passed is True
         assert result.output_summary == "Tests  171 passed (171)"
         assert result.failure_details == ""
+
+
+def _exige(variable: str, valeur: str) -> str:
+    """A step that exits 0 only when ``variable`` equals ``valeur`` in its environment."""
+    script = (
+        f"import os, sys; sys.exit(0 if os.environ.get('{variable}') == '{valeur}' else 3)"
+    )
+    return f'{_PY} "{script}"'
+
+
+class TestEnvironnementDeclare:
+    """Ticket-524 : `env` se fusionne par-dessus l'environnement hérité."""
+
+    async def test_a_step_sees_the_declared_variable(self, tmp_path: Path) -> None:
+        runner = TestRunnerService(env={"TESSERA_524_VAR": "valeur"})
+
+        result = await runner.run_tests(
+            tmp_path, test_command=_exige("TESSERA_524_VAR", "valeur"), timeout=30
+        )
+
+        assert result.passed is True
+
+    async def test_every_step_of_a_chain_sees_it(self, tmp_path: Path) -> None:
+        runner = TestRunnerService(env={"TESSERA_524_VAR": "valeur"})
+        etape = _exige("TESSERA_524_VAR", "valeur")
+
+        result = await runner.run_tests(
+            tmp_path, test_command=f"{etape} && {etape}", timeout=30
+        )
+
+        assert result.passed is True
+        assert len(result.etapes) == 2
+
+    async def test_declared_value_wins_and_the_rest_is_inherited(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("TESSERA_524_VAR", "herite")
+        monkeypatch.setenv("TESSERA_524_AUTRE", "intact")
+        runner = TestRunnerService(env={"TESSERA_524_VAR": "valeur"})
+
+        surcharge = await runner.run_tests(
+            tmp_path, test_command=_exige("TESSERA_524_VAR", "valeur"), timeout=30
+        )
+        herite = await runner.run_tests(
+            tmp_path, test_command=_exige("TESSERA_524_AUTRE", "intact"), timeout=30
+        )
+
+        assert surcharge.passed is True
+        assert herite.passed is True
+
+    async def test_without_env_the_inherited_environment_is_unchanged(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("TESSERA_524_VAR", "herite")
+
+        result = await TestRunnerService().run_tests(
+            tmp_path, test_command=_exige("TESSERA_524_VAR", "herite"), timeout=30
+        )
+
+        assert result.passed is True
+
+    async def test_without_env_the_process_gets_no_environment_argument(
+        self, tmp_path: Path
+    ) -> None:
+        proc = MagicMock()
+        proc.returncode = 0
+        proc.communicate = AsyncMock(return_value=(b"1 passed", b""))
+
+        with patch("asyncio.create_subprocess_exec", return_value=proc) as lance:
+            await TestRunnerService().run_tests(tmp_path, test_command="make test")
+
+        assert lance.call_args.kwargs["env"] is None
