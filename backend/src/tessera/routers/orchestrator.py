@@ -31,6 +31,7 @@ from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.refus_garde import JournalDesRefus
+from tessera.services.journal_pipeline import journal_vers
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.file_vivante import (
@@ -224,9 +225,12 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         )
         return inner
 
+    journal_repli = journal_vers(project_path / "memory" / "pipeline-log.md")
+
     def _sans_outils(role: str) -> LLMProvider:
         inner = provider_pour_role(
-            project_path, role, allow_tools=False, project_id=project_id
+            project_path, role, allow_tools=False, project_id=project_id,
+            journal_repli=journal_repli,
         )
         return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
 
@@ -236,7 +240,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         inner = provider_pour_role(
             project_path, role, tools=OUTILS_DE_RELECTURE,
             racine_ecriture=racine_ecriture, project_id=project_id,
-            max_turns=_tours_du_role(role),
+            max_turns=_tours_du_role(role), journal_repli=journal_repli,
         )
         return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
 
@@ -345,7 +349,10 @@ def _documenteur(
         # Deux rôles, chacun son provider et son modèle (ticket-188).
         # Enveloppé pour que les appels de documentation entrent dans
         # `agent_calls` comme les autres (ticket-211).
-        inner = provider_pour_role(project_path, role, allow_tools=False, project_id=project_id)
+        inner = provider_pour_role(
+            project_path, role, allow_tools=False, project_id=project_id,
+            journal_repli=journal_vers(project_path / "memory" / "pipeline-log.md"),
+        )
         return (
             ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path),
             modele_du_role(project_path, role),

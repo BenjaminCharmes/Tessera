@@ -59,6 +59,7 @@ from tessera.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from tessera.services.providers.duree_max import borner
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
@@ -296,7 +297,11 @@ class ClaudeAgentSDKProvider:
         git_bash_path: str | None = None,
         silence_max_s: float | None = None,
         journal_refus: JournalDesRefus | None = None,
+        duree_max_s: float | None = None,
     ) -> None:
+        # Durée totale d'un appel (ticket-518) ; None : pas de borne, comme
+        # pour le codeur, dont un tour légitime dure longtemps.
+        self._duree_max_s = duree_max_s
         # Là où les refus du garde-fou s'accumulent pour le reviewer et le
         # validateur (ticket-476). None : personne ne les lira.
         self._journal_refus = journal_refus
@@ -382,7 +387,17 @@ class ClaudeAgentSDKProvider:
             )
             return await self._run(**kwargs)
 
-    async def _run(
+    async def _run(self, **kwargs: Any) -> ProviderResult:
+        """One SDK call, within the total duration the provider was given.
+
+        La borne enveloppe aussi la fermeture du générateur : `wait_for`
+        attend l'annulation de `__anext__`, et sur un CLI figé rien d'autre
+        ne la limitait (ticket-518).
+        """
+        async with borner(self._duree_max_s):
+            return await self._executer(**kwargs)
+
+    async def _executer(
         self,
         *,
         system: str,
@@ -411,10 +426,14 @@ class ClaudeAgentSDKProvider:
         async with aclosing(_sdk_gen(prompt=user, options=options)) as gen:
             while True:
                 try:
-                    message = await asyncio.wait_for(
-                        gen.__anext__(), timeout=silence_timeout
-                    )
-                except asyncio.TimeoutError:
+                    # `asyncio.timeout` plutôt que `wait_for` : sous Python 3.11,
+                    # `wait_for` rend le résultat et avale l'annulation quand
+                    # son tâche interne vient de finir. Avec un flux qui émet
+                    # sans cesse, la durée maximale était alors perdue et
+                    # l'appel ne finissait jamais (ticket-518).
+                    async with asyncio.timeout(silence_timeout):
+                        message = await gen.__anext__()
+                except TimeoutError:
                     _logger.warning(
                         "agent_silencieux_arrete",
                         extra={"model": model, "silence_s": self._silence_max_s},

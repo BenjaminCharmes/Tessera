@@ -16,6 +16,7 @@ from tessera.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from tessera.services.providers.enregistrant import ticket_courant
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.utils.logger import get_logger
 
@@ -40,7 +41,11 @@ class ProviderAvecRepli:
         modele_repli: str,
         role: str,
         project_id: str | None,
+        journal: Callable[[str], None] | None = None,
     ) -> None:
+        # Où le passage au repli s'écrit pour un humain (ticket-518) : le log
+        # du backend part sur la console, et l'événement n'a pas d'historique.
+        self._journal = journal
         self._principal = principal
         self._repli = repli
         self._modele_repli = modele_repli
@@ -120,6 +125,7 @@ class ProviderAvecRepli:
                 "utilise": self._repli.name, "error": str(cause),
             },
         )
+        self._ecrire_au_journal(cause)
         try:
             await EVENT_HUB.publish(
                 OrchestratorEvent(
@@ -137,6 +143,23 @@ class ProviderAvecRepli:
             )
         except Exception as exc:  # noqa: BLE001 — un émetteur qui lève n'arrête rien (ADR-038)
             _logger.warning("provider_fallback_emit_failed", extra={"error": str(exc)})
+
+
+    def _ecrire_au_journal(self, cause: ProviderIndisponible) -> None:
+        """Writes `[ticket] role: repli vers provider/modèle — cause`, when a
+        journal is wired and a ticket is running. Never raises."""
+        ticket = ticket_courant()
+        if self._journal is None or not ticket:
+            return
+        raison = " ".join(str(cause).split())[:300]
+        message = (
+            f"[{ticket}] {self._role}: repli vers "
+            f"{self._repli.name}/{self._modele_repli} — {raison}"
+        )
+        try:
+            self._journal(message)
+        except Exception as exc:  # noqa: BLE001 — un journal qui échoue n'arrête rien
+            _logger.warning("provider_fallback_journal_failed", extra={"error": str(exc)})
 
 
 #: Ce que la fabrique par rôle rend : un provider, éventuellement enveloppé.

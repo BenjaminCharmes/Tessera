@@ -104,6 +104,12 @@ class Settings(BaseSettings):
     # dérapage, il empêche le travail. Le dépassement est désormais rattrapé
     # (ADR-037), donc l'atteindre coûte un run bloqué, plus un arbre sale.
     llm_max_budget_usd: float = 2.0
+    # Durée totale maximale d'un appel de rôle texte — validateur, audit,
+    # documentation —, attente de créneau comprise (ticket-518). Les bornes
+    # d'Ollama (lecture) et du SDK (silence) sont relatives : un flux qui
+    # continue d'émettre n'y a pas de fin. Dépassée, l'appel lève
+    # `ProviderIndisponible` et le repli joue. 0 désactive la borne.
+    llm_duree_max_role_texte_s: float = 900.0
 
     # Au-delà, un agent qui a posé une question reprend seul en énonçant son
     # hypothèse (ticket-066). Le délai existe parce qu'un run suspendu tient

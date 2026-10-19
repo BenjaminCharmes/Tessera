@@ -13,6 +13,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'allers-retours outil pour le reviewer (lecture et critique du diff) |
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'allers-retours outil pour le tour de plan (lecture seule) |
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
+| `LLM_DUREE_MAX_ROLE_TEXTE_S` | | `900` | Durée totale maximale d'un appel de rôle texte (validateur, sécurité, documentation), attente de créneau Ollama comprise (en secondes, `0` = aucune borne, ticket-518). Dépassée, l'appel est indisponible : le repli joue, et la ligne `<rôle>: repli vers …` s'écrit dans `pipeline-log.md` |
 | `AGENT_SILENCE_MAX_S` | | `1200` | Délai maximum sans message du flux d'un agent avant interruption du processus (en secondes, ticket-381) |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond de dépense d'un run autonome (`0` = aucun). En mode file, le plafond est multiplié par le nombre de tickets, sauf si la requête fixe `budget_usd` |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |

@@ -36,6 +36,7 @@ def get_provider(
     racine_ecriture: Path | None = None,
     skills: list[str] | None = None,
     journal_refus: JournalDesRefus | None = None,
+    duree_max_s: float | None = None,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -66,6 +67,9 @@ def get_provider(
 
     ``journal_refus`` collects the writes the guard refuses (ticket-476); only
     the SDK provider has a guard to feed it.
+
+    ``duree_max_s`` caps the total duration of one call (ticket-518), for the
+    SDK and Ollama providers; ``anthropic_api`` ignores it. ``None``: no cap.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -80,6 +84,8 @@ def get_provider(
             kwargs["skills"] = list(skills)
         if journal_refus is not None:
             kwargs["journal_refus"] = journal_refus
+        if duree_max_s is not None:
+            kwargs["duree_max_s"] = duree_max_s
         if tools is not None:
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:
@@ -102,7 +108,7 @@ def get_provider(
         # la boucle agentique reste au SDK (ticket-189).
         from tessera.services.providers.ollama import OllamaProvider
 
-        return OllamaProvider(settings.ollama_base_url)
+        return OllamaProvider(settings.ollama_base_url, duree_max_s=duree_max_s)
     raise ValueError(
         f"Provider LLM inconnu : {resolved!r}. "
         "Valeurs acceptées : 'agent_sdk', 'anthropic_api', 'ollama'."
