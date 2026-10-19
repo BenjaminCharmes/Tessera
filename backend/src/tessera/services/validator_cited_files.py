@@ -11,6 +11,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.politique_run import PolitiqueRun
+from tessera.services.validator_cited_dirs import (
+    list_folder_files,
+    looks_like_folder,
+    render_folder_entry,
+    resolve_folder,
+)
 from tessera.services.validator_binary import is_binary_file
 from tessera.services.validator_file_extensions import looks_like_file
 
@@ -38,6 +44,8 @@ class CitedFilesReport:
     absent: list[str] = field(default_factory=list)
     # References left out because the budget was already spent.
     omitted: list[str] = field(default_factory=list)
+    # Subset of ``joined`` that are folders, with their number of files.
+    folders: dict[str, int] = field(default_factory=dict)
 
     def is_empty(self) -> bool:
         return not (self.joined or self.absent or self.omitted)
@@ -61,7 +69,8 @@ def extract_file_refs(criteria: list[str]) -> list[str]:
             candidate = _LINE_SUFFIX.sub("", m.group(1).strip())
             if " " in candidate:
                 continue
-            if looks_like_file(candidate) and candidate not in seen:
+            est_cite = looks_like_file(candidate) or looks_like_folder(candidate)
+            if est_cite and candidate not in seen:
                 seen.add(candidate)
                 refs.append(candidate)
     return refs
@@ -130,6 +139,30 @@ def _find_file_in_project(ref: str, project_root: Path) -> Path | None:
     return _find_in_root(ref, racine)
 
 
+def _find_folder_in_project(ref: str, project_root: Path) -> Path | None:
+    """Resolve a folder reference: the project folder, then its repository."""
+    found = resolve_folder(ref, project_root)
+    if found is not None:
+        return found
+    racine = _search_root(project_root)
+    if racine == project_root.resolve():
+        return None
+    return resolve_folder(ref, racine)
+
+
+def _folder_entry(
+    ref: str, folder: Path, budget: int, report: CitedFilesReport
+) -> str:
+    """List one cited folder into a section entry, cut at ``budget``."""
+    files = list_folder_files(ref, folder)
+    entry, cut = render_folder_entry(ref, files, budget)
+    report.joined.append(ref)
+    report.folders[ref] = len(files)
+    if cut:
+        report.truncated.append(ref)
+    return entry
+
+
 def _read_entry(
     ref: str, found: Path, budget: int, report: CitedFilesReport
 ) -> str:
@@ -169,7 +202,16 @@ def build_cited_files_section(
             report.omitted.append(ref)
             entries.append(f"### {ref}\n*(non joint : budget épuisé)*")
             continue
-        found = _find_file_in_project(ref, project_root)
+        folder = _find_folder_in_project(ref, project_root)
+        if folder is not None:
+            entry = _folder_entry(ref, folder, budget, report)
+            budget -= len(entry)
+            entries.append(entry)
+            continue
+        # Un `/` final désigne un dossier : jamais cherché comme un fichier.
+        found = (
+            None if ref.endswith("/") else _find_file_in_project(ref, project_root)
+        )
         if found is None:
             report.absent.append(ref)
             entry = f"### {ref}\n*(absent du dépôt)*"
@@ -186,6 +228,15 @@ def build_cited_files_section(
     return "\n\n" + header + "\n\n".join(entries), report
 
 
+def _log_label(ref: str, report: CitedFilesReport) -> str:
+    """``ref`` as the journal names it: folder count and cut marks included."""
+    cut = ref in report.truncated
+    if ref in report.folders:
+        marks = f"dossier, {report.folders[ref]} fichiers"
+        return f"{ref} ({marks}, tronqué)" if cut else f"{ref} ({marks})"
+    return f"{ref} (tronqué)" if cut else ref
+
+
 def format_cited_files_log(report: CitedFilesReport) -> str:
     """One journal line: ``validateur: fichiers cités joints : a, b (tronqué) ; absents : c``.
 
@@ -193,10 +244,7 @@ def format_cited_files_log(report: CitedFilesReport) -> str:
     """
     if report.is_empty():
         return ""
-    joined = ", ".join(
-        f"{ref} (tronqué)" if ref in report.truncated else ref
-        for ref in report.joined
-    )
+    joined = ", ".join(_log_label(ref, report) for ref in report.joined)
     segments = [f"fichiers cités joints : {joined or 'aucun'}"]
     if report.absent:
         segments.append("absents : " + ", ".join(report.absent))
