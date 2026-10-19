@@ -106,6 +106,12 @@ déjà vrai dans un CSS que le run ne touche pas, se refuse ;
 « `main.css` donne `overflow-x: auto` à la grille » se vérifie (démineur,
 ticket-033).
 
+**Pas de numéro d'ADR ni de ticket figé dans un critère.** « ADR-012 est
+écrit » se refuse dès qu'un autre ticket de la file a pris ce numéro avant :
+le 19/10, le ticket-032 de Kadoomi a posé ADR-013 à juste titre, et le
+validateur l'a refusé. Écrire « une ADR au prochain numéro libre de
+`memory/decisions.md` décrit … ».
+
 ## Portée
 
 Un ticket = **un changement cohérent**. Si les critères d'acceptation couvrent
