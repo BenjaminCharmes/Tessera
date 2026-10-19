@@ -4094,3 +4094,4 @@ Points posit (58359ms)
 - 2026-10-19 22:03:15 UTC — [ticket-522] testeur: OK (exit 0)
 - 2026-10-19 22:03:15 UTC — [ticket-522] branche reprise (3 commit(s)) — tests green, codeur sauté
 - 2026-10-19 22:06:15 UTC — [ticket-522] securite: BLOCK — **Path Traversal CRITIQUE** : Le module n'est pas appelé en production (intégrat (178328ms)
+- 2026-10-19 22:06:19 UTC — [ide-core] file interrompue : ticket-522 non approuvé
