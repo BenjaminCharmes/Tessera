@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-492
 pr_number: null
 priority: medium
-status: blocked
+status: todo
 title: An approval is bound to the commit it reviewed, and nothing else gets merged
   under it
 type: feat
