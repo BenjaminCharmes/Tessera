@@ -195,6 +195,7 @@ class AgentRunner:
             duration_ms=duration_ms,
             cost_usd=cost_usd,
             session_id=provider_result.session_id,
+            outils_refuses=list(provider_result.outils_refuses),
         )
 
     def _provider_pour(self, role: str) -> LLMProvider:

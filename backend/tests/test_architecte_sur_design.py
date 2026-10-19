@@ -66,6 +66,7 @@ async def _lance(
             model = "m"
             suggested_status = None
             session_id = None
+            outils_refuses: list[str] = []
 
         return _R()
 

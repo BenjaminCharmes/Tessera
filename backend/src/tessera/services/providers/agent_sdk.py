@@ -47,6 +47,7 @@ from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
     racine_autorisee,
 )
+from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.ask_user import (
     ASK_USER_SERVER_NAME,
@@ -403,6 +404,7 @@ class ClaudeAgentSDKProvider:
         )
         chunks: list[str] = []
         result: ResultMessage | None = None
+        refus_cli = ReleveDesRefusCli()
         # None → pas de borne (0 ou négatif désactive également).
         silence_timeout: float | None = self._silence_max_s if self._silence_max_s > 0 else None
 
@@ -423,6 +425,7 @@ class ClaudeAgentSDKProvider:
                 except StopAsyncIteration:
                     break
 
+                refus_cli.observer(message)
                 if isinstance(message, RateLimitEvent):
                     # L'état du quota d'abonnement : la seule mesure de la
                     # ressource réellement finie en mode abonnement. Un provider
@@ -460,4 +463,5 @@ class ClaudeAgentSDKProvider:
             cost_usd=result.total_cost_usd,
             provider_name=self.name,
             session_id=getattr(result, "session_id", None) or None,
+            outils_refuses=refus_cli.outils_refuses,
         )

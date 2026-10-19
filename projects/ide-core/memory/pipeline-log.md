@@ -3852,3 +3852,22 @@ Points posit (58359ms)
 - 2026-10-19 13:57:41 UTC — [ticket-512] validateur: APPROVED — Tous les critères sont respectés. Le code modifie correctement le lancement des  (155640ms)
 - 2026-10-19 13:57:41 UTC — [ticket-512] APPROVED après 1 tour(s)
 - 2026-10-19 13:59:19 UTC — [ticket-512] documentation: 1 fichier(s) (91390ms)
+- 2026-10-19 13:59:43 UTC — [ide-core] ticket-512 PR #560 confiée au CIWatcher
+- 2026-10-19 13:59:51 UTC — [ticket-515] branche ticket-515-tool-calls-rejected-by-the-cli-in-a-resumed-coder
+- 2026-10-19 14:01:08 UTC — [ticket-515] plan rendu (76375ms)
+- 2026-10-19 14:01:08 UTC — [ticket-515] tour 1 — codeur démarré
+- 2026-10-19 14:03:48 UTC — [ticket-515] tour 1 — codeur terminé (159219ms)
+- 2026-10-19 14:05:02 UTC — [ide-core] ticket-512 PR #560 mergée (CI verte)
+- 2026-10-19 14:11:03 UTC — [ticket-515] branche ticket-515-tool-calls-rejected-by-the-cli-in-a-resumed-coder
+- 2026-10-19 14:11:39 UTC — [ticket-515] plan rendu (35359ms)
+- 2026-10-19 14:20:00 UTC — [ticket-515] testeur: 1 failed, 2050 passed, 40 warnings in 499.38s (0:08:19)
+- 2026-10-19 14:20:00 UTC — [ticket-515] branche reprise (1 commit(s)) — tests red, codeur en premier
+- 2026-10-19 14:20:00 UTC — [ticket-515] tour 1 — codeur démarré
+- 2026-10-19 14:20:43 UTC — [ticket-515] tour 1 — codeur terminé (42796ms)
+- 2026-10-19 14:34:07 UTC — [ticket-515] testeur: OK (exit 0)
+- 2026-10-19 14:35:23 UTC — [ticket-515] securite: PASS — La fonctionnalité de tracking des refus du CLI utilise une source de données fia (75671ms)
+- 2026-10-19 14:35:23 UTC — [ticket-515] tour 1 — reviewer démarré
+- 2026-10-19 14:35:43 UTC — [ticket-515] tour 1 — reviewer terminé (19688ms)
+- 2026-10-19 14:36:34 UTC — [ticket-515] validateur: APPROVED — Tous les critères sont satisfaits. Le plan établit clairement que la cause profo (71406ms)
+- 2026-10-19 14:36:34 UTC — [ticket-515] APPROVED après 1 tour(s)
+- 2026-10-19 14:39:17 UTC — [ticket-515] documentation: 2 fichier(s) (157172ms)

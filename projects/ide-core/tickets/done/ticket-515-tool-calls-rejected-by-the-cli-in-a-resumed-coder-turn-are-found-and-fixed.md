@@ -1,15 +1,16 @@
 ---
-id: ticket-515
-title: "Tool calls rejected by the CLI in a resumed coder turn are diagnosed, logged and no longer cost a round"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 1
+id: ticket-515
 plan: true
-created: 2026-10-19
+pr_number: 561
+priority: high
+status: done
+title: Tool calls rejected by the CLI in a resumed coder turn are diagnosed, logged
+  and no longer cost a round
+type: fix
 ---
 
 # ticket-515 — Des appels d'outils refusés par le CLI dans un tour de codeur repris
@@ -67,3 +68,21 @@ Un jour.
 ## Risques
 Cause peut-être côté CLI embarqué (version du SDK) : dans ce cas, le
 journal du critère 3 reste le livrable minimal, et la cause est documentée.
+## Ce que ça ne fait pas
+
+La cause n'est pas corrigée : elle n'est pas établie. Hypothèses écartées :
+
+- **Options différentes sur un tour repris.** `_run_ou_reprendre` rappelle
+  `_run(resume=session, **kwargs)` avec les mêmes arguments, et `_build_options`
+  ne bifurque pas sur `resume` : `cwd`, `allowed_tools`, `tools`,
+  `permission_mode` et `settings` sont identiques. Un test le verrouille.
+- **Refus du garde de Tessera.** Ses refus arrivent sous la forme
+  `PreToolUse:<outil> hook error`, et Tessera n'appelle jamais `interrupt()`.
+- **Outil hors auto-approbation.** Douteuse : la transcription (ligne 378)
+  porte `toolDenialKind: "cancelled"`, avec 35 ms entre le `tool_use` et le
+  `tool_result`. L'outil a été annulé côté CLI (2.1.281) au démarrage du tour
+  repris, pas refusé faute de permission. Piste non prouvée.
+
+Livré : le refus du CLI s'écrit au journal (`codeur: outil <nom> refusé par le
+CLI`). Ni relance du tour ni correction de fond : à rouvrir quand la cause sera
+reproduite.
