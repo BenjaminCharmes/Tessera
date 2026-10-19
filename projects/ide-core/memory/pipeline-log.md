@@ -3672,3 +3672,15 @@ Points posit (58359ms)
 - 2026-10-19 07:50:57 UTC — [ticket-505] validateur: APPROVED — Les tests ont été implémentés et couvrent correctement les quatre critères d'acc (159125ms)
 - 2026-10-19 07:50:57 UTC — [ticket-505] APPROVED après 1 tour(s)
 - 2026-10-19 07:53:36 UTC — [ticket-505] documentation: 2 fichier(s) (153188ms)
+- 2026-10-19 07:53:55 UTC — [ide-core] ticket-505 PR #537 confiée au CIWatcher
+- 2026-10-19 07:53:58 UTC — [ticket-504] branche ticket-504-a-ticket-merged-into-the-base-branch-while-a-queu
+- 2026-10-19 07:55:26 UTC — [ticket-504] plan rendu (88014ms)
+- 2026-10-19 07:55:26 UTC — [ticket-504] tour 1 — codeur démarré
+- 2026-10-19 07:58:50 UTC — [ide-core] ticket-505 PR #537 mergée (CI verte)
+- 2026-10-19 07:59:05 UTC — [ticket-504] tour 1 — codeur terminé (218750ms)
+- 2026-10-19 08:06:07 UTC — [ticket-504] testeur: OK (exit 0)
+- 2026-10-19 08:08:48 UTC — [ticket-504] securite: PASS — Ticket-504 introduces a read-only fallback reader for tickets merged on the remo (160922ms)
+- 2026-10-19 08:08:48 UTC — [ticket-504] tour 1 — reviewer démarré
+- 2026-10-19 08:09:33 UTC — [ticket-504] tour 1 — reviewer terminé (45219ms)
+- 2026-10-19 08:11:29 UTC — [ticket-504] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (161015ms)
+- 2026-10-19 08:11:29 UTC — [ticket-504] APPROVED après 1 tour(s)
