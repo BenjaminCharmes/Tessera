@@ -1833,6 +1833,18 @@ L'erreur énumère exactement ce qui manque. Ajoute-le :
 
 Après correction, relance. Si tu veux contourner ces vérifications — par exemple pour tester un ticket sans le livrer — passe `force: true` au lancement (détail en fonction du mode de requête utilisé).
 
+### L'IDE signale un avertissement : « project_id différent du dossier »
+
+Quand tu ouvres un projet, l'IDE vérifie que le `project_id` déclaré dans `agents.json` correspond au nom du dossier qui le contient. Si ce n'est pas le cas — par exemple après un renommage du dossier — tu vois un avertissement dans la vue d'ensemble du projet.
+
+C'est normal et inoffensif, mais tu dois corriger : ouvre `agents.json` du projet et change `"project_id"` pour qu'il corresponde au nom du dossier. Tu peux aussi omettre le champ entièrement ; l'IDE utilisera le nom du dossier par défaut.
+
+Exemple :
+- Avant : dossier `devinoo`, mais `"project_id": "make-your-call"` → avertissement ⚠️
+- Après : dossier `devinoo`, et `"project_id": "devinoo"` → pas d'avertissement ✅
+
+L'avertissement disparaît une fois que tu as corrigé `agents.json` et relancé l'IDE.
+
 ## 13. Signaler un problème ou une idée sur Tessera
 
 Quand tu trouves un dysfonctionnement dans l'IDE ou une suggestion pour l'améliorer, tu peux le signaler directement depuis n'importe quel projet — sans quitter l'IDE, sans naviguer jusqu'à ide-core.
