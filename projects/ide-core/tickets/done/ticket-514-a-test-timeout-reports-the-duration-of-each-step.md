@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-514
-pr_number: null
+pr_number: 565
 priority: medium
 status: done
 title: A test timeout reports how long each step took, so the step that overran is
