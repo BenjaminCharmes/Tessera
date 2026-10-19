@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 0.25
 id: ticket-481
-pr_number: null
+pr_number: 545
 priority: low
 status: done
 title: A project whose agents.json project_id differs from its folder name is flagged
