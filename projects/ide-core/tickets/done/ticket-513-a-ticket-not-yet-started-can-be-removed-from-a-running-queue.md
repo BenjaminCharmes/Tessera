@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 1
 id: ticket-513
-pr_number: null
+pr_number: 566
 priority: medium
 status: done
 title: A ticket not yet started can be removed from a running queue
