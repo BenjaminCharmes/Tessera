@@ -3962,3 +3962,15 @@ Points posit (58359ms)
 - 2026-10-19 18:08:43 UTC — [ticket-506] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés. Le code modifie (160015ms)
 - 2026-10-19 18:08:43 UTC — [ticket-506] APPROVED après 1 tour(s)
 - 2026-10-19 18:10:06 UTC — [ticket-506] documentation: 2 fichier(s) (77828ms)
+- 2026-10-19 18:10:23 UTC — [ide-core] ticket-506 PR #570 confiée au CIWatcher
+- 2026-10-19 18:10:26 UTC — [ticket-517] branche ticket-517-the-pushed-commit-is-read-from-the-remote-even-wh
+- 2026-10-19 18:10:26 UTC — [ticket-517] tour 1 — codeur démarré
+- 2026-10-19 18:13:38 UTC — [ticket-517] tour 1 — codeur terminé (191375ms)
+- 2026-10-19 18:15:07 UTC — [ide-core] ticket-506 PR #570 mergée (CI verte)
+- 2026-10-19 18:21:18 UTC — [ticket-517] testeur: OK (exit 0)
+- 2026-10-19 18:23:22 UTC — [ticket-517] securite: PASS — Le diff ajoute une capacité de fallback pour lire le SHA du distant via `git ls- (124061ms)
+- 2026-10-19 18:23:22 UTC — [ticket-517] tour 1 — reviewer démarré
+- 2026-10-19 18:23:42 UTC — [ticket-517] validateur: fichiers cités joints : git_workspace.py (tronqué) ; non joints (budget épuisé) : git_clone.py
+- 2026-10-19 18:23:42 UTC — [ticket-517] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre l'ajout de `--no-single-branch (20188ms)
+- 2026-10-19 18:23:54 UTC — [ticket-517] tour 1 — reviewer terminé (31390ms)
+- 2026-10-19 18:23:54 UTC — [ticket-517] APPROVED après 1 tour(s)
