@@ -4100,3 +4100,13 @@ Points posit (58359ms)
 - 2026-10-19 22:17:57 UTC — [ticket-522] branche reprise (6 commit(s)) — tests green, codeur sauté
 - 2026-10-19 22:20:44 UTC — [ticket-522] securite: BLOCK — Une vulnérabilité HIGH de path traversal a été introduite dans `run_worktree.py` (165859ms)
 - 2026-10-19 22:20:48 UTC — [ide-core] file interrompue : ticket-522 non approuvé
+- 2026-10-19 22:25:57 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 22:32:54 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 22:32:54 UTC — [ticket-522] branche reprise (10 commit(s)) — tests green, codeur sauté
+- 2026-10-19 22:34:00 UTC — [ticket-522] securite: PASS — Audit complet du diff : zéro vulnérabilité introduite. Le module `run_worktree.p (64469ms)
+- 2026-10-19 22:34:00 UTC — [ticket-522] tour 1 — reviewer démarré
+- 2026-10-19 22:34:26 UTC — [ticket-522] tour 1 — reviewer terminé (25719ms)
+- 2026-10-19 22:39:00 UTC — [ticket-522] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-19 22:39:28 UTC — [ticket-522] validateur: fichiers cités joints : utils/project_id.py, backend/src/tessera/services/pipeline_stages.py (tronqué) ; absents : ../x ; non joints (budget épuisé) : backend/src/tessera/services/orchestrator.py
+- 2026-10-19 22:39:28 UTC — [ticket-522] validateur: APPROVED — Tous les critères sont satisfaits. Le module `run_worktree.py` est implémenté av (328110ms)
+- 2026-10-19 22:39:28 UTC — [ticket-522] APPROVED après 1 tour(s)
