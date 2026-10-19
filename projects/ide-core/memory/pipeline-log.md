@@ -3998,3 +3998,22 @@ Points posit (58359ms)
 - 2026-10-19 19:17:22 UTC — [ticket-518] CHANGES_REQUESTED tour 3: Validateur : L'implémentation couvre cinq des six critères : durée maximale bornée pour Ollama et agent_sdk, prise en compte de l'attente de créneaux, trace du repli en journal, et tests existants pas
 - 2026-10-19 19:17:22 UTC — [ticket-518] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-19 19:17:27 UTC — [ide-core] file interrompue : ticket-518 non approuvé
+- 2026-10-19 19:22:31 UTC — [ticket-518] branche ticket-518-a-validator-security-or-documentation-call-has-a
+- 2026-10-19 19:24:17 UTC — [ticket-518] plan rendu (105156ms)
+- 2026-10-19 19:30:44 UTC — [ticket-518] testeur: OK (exit 0)
+- 2026-10-19 19:30:44 UTC — [ticket-518] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-19 19:33:19 UTC — [ticket-518] securite: PASS — Audit complet du diff ticket-518 : aucune vulnérabilité OWASP détectée. Le code  (153031ms)
+- 2026-10-19 19:33:19 UTC — [ticket-518] tour 1 — reviewer démarré
+- 2026-10-19 19:33:55 UTC — [ticket-518] tour 1 — reviewer terminé (35546ms)
+- 2026-10-19 19:39:01 UTC — [ticket-518] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : providers/
+- 2026-10-19 19:39:01 UTC — [ticket-518] validateur: CHANGES_REQUESTED — Les 5 premiers critères (implémentation de la durée maximale, tests des provider (341719ms)
+- 2026-10-19 19:39:01 UTC — [ticket-518] CHANGES_REQUESTED tour 1: Validateur : Les 5 premiers critères (implémentation de la durée maximale, tests des providers Ollama et SDK, journal de repli) sont bien couverts par le diff, validé par exit 0. Seul le diagnostic de
+- 2026-10-19 19:39:01 UTC — [ticket-518] tour 2 — codeur démarré
+- 2026-10-19 19:42:50 UTC — [ticket-518] tour 2 — codeur terminé (228781ms)
+- 2026-10-19 19:50:49 UTC — [ticket-518] testeur: OK (exit 0)
+- 2026-10-19 19:53:10 UTC — [ticket-518] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente une limite de durée totale pou (141516ms)
+- 2026-10-19 19:53:10 UTC — [ticket-518] tour 2 — reviewer démarré
+- 2026-10-19 19:53:32 UTC — [ticket-518] tour 2 — reviewer terminé (22172ms)
+- 2026-10-19 19:58:52 UTC — [ticket-518] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : providers/
+- 2026-10-19 19:58:52 UTC — [ticket-518] validateur: APPROVED — Le diff implémente une borne de durée totale par appel pour les rôles texte (val (341328ms)
+- 2026-10-19 19:58:52 UTC — [ticket-518] APPROVED après 2 tour(s)
