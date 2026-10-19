@@ -1148,6 +1148,14 @@ Entre le moment où tu approuves et le moment du merge, la branche du ticket peu
 
 Ce verrouillage garantit que tes approbations restent valides jusqu'au merge.
 
+### Continuité après un redémarrage du backend
+
+Après un redémarrage du backend, ta PR approuvée continue d'être surveillée automatiquement. Si la CI devient verte, le merge s'enchaîne sans intervention. Si la PR a déjà été mergée pendant l'interruption, le ticket passe automatiquement en `done`.
+
+Note : les PR de résolution de conflit (quand Tessera corrige un conflit de rebase) ne sont pas reprises après redémarrage, car elles exigent une relecture avant merge.
+
+Chaque reprise est notée dans le journal du pipeline (`memory/pipeline-log.md`).
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.
