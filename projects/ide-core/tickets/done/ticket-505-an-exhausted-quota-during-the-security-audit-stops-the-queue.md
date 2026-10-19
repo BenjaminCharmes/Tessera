@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-505
-pr_number: null
+pr_number: 537
 priority: high
 status: done
 title: An exhausted quota during the security audit stops the queue as a quota stop,
