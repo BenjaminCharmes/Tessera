@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 1
 id: ticket-507
-pr_number: null
+pr_number: 548
 priority: high
 status: done
 title: A test command that times out is killed with its whole process tree, so the
