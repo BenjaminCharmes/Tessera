@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.commande_chainee import decouper
+from tessera.services.detail_du_delai import detail_du_delai
 from tessera.services.erreur_de_sortie import detail_avec_erreur
 from tessera.services.groupe_d_etape import GroupeDEtape
 from tessera.services.lancement import essais_de_commande
@@ -115,6 +116,12 @@ class TestResult:
     #: validateur lit pour juger « typecheck, lint et build passent »
     #: (ticket-337).
     etapes: list["EtapeTest"] = field(default_factory=list)
+    #: Quand ``expiree`` : l'étape en cours à la coupure et ce qu'elle avait
+    #: déjà consommé. Elle n'est pas dans ``etapes``, qui ne garde que les
+    #: étapes terminées avec un code de sortie (ticket-514).
+    etape_coupee: "EtapeCoupee | None" = None
+    #: Le délai global, en secondes, qui a expiré (0 tant qu'il n'a pas expiré).
+    delai_s: float = 0.0
 
 
 @dataclass
@@ -123,6 +130,16 @@ class EtapeTest:
 
     commande: str
     code: int
+    #: Durée de l'étape, du lancement à la fin du processus (ticket-514).
+    duree_ms: int = 0
+
+
+@dataclass
+class EtapeCoupee:
+    """The step that was running when the global timeout expired."""
+
+    commande: str
+    duree_ms: int
 
 
 class TestRunnerService:
@@ -236,12 +253,20 @@ class TestRunnerService:
             sorties: list[str] = []
             code = 0
             for args in etapes_args:
+                debut_etape = time.monotonic()
                 issue = await self._executer(args, dossier, cmd, timeout, start)
+                duree_etape_ms = int((time.monotonic() - debut_etape) * 1000)
                 if isinstance(issue, TestResult):
                     issue.etapes = etapes
+                    if issue.expiree:
+                        _noter_la_coupure(issue, args, duree_etape_ms, timeout)
                     return issue
                 code, sortie = issue
-                etapes.append(EtapeTest(commande=shlex.join(args), code=code))
+                etapes.append(
+                    EtapeTest(
+                        commande=shlex.join(args), code=code, duree_ms=duree_etape_ms
+                    )
+                )
                 sorties.append(sortie)
                 if code != 0:
                     break
@@ -348,6 +373,21 @@ class TestRunnerService:
         stdout = stdout_bytes.decode("utf-8", errors="replace")
         stderr = stderr_bytes.decode("utf-8", errors="replace")
         return proc.returncode or 0, (stdout + "\n" + stderr).strip()
+
+
+def _noter_la_coupure(
+    result: TestResult, args: list[str], duree_ms: int, timeout: float
+) -> None:
+    """Record on an expired ``result`` which step was cut, and for how long it ran.
+
+    Le détail des étapes (terminées puis coupée) rejoint le résumé : c'est ce
+    que le journal et le codeur lisent (ticket-514).
+    """
+    result.etape_coupee = EtapeCoupee(commande=shlex.join(args), duree_ms=duree_ms)
+    result.delai_s = float(timeout)
+    detail = detail_du_delai(result)
+    if detail:
+        result.output_summary = f"{result.output_summary}\nÉtapes : {detail}"
 
 
 def _marquer_panne_d_environnement(

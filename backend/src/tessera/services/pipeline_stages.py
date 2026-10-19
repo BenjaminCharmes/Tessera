@@ -24,6 +24,7 @@ from tessera.services.config_tests_touchee import (
     avertissement_config_tests,
     fichiers_de_config_touches,
 )
+from tessera.services.detail_du_delai import detail_du_delai, ligne_de_delai
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services import journal_en_attente
 from tessera.services.pipeline_events import (
@@ -43,6 +44,7 @@ from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
     from tessera.services.orchestrator import Orchestrator
+    from tessera.services.test_runner import TestResult
 
 _logger = get_logger(__name__)
 
@@ -524,6 +526,18 @@ def _role_qui_produit(type_de_ticket: "TicketType") -> AgentRole:
 # ------------------------------------------------------------------
 
 
+def _noter_le_delai(orch: "Orchestrator", run: PipelineRun, result: "TestResult") -> None:
+    """Log a timeout with its step durations and hand the same list to the coder.
+
+    Le résumé du résultat porte déjà la liste des étapes (``TestRunnerService``) :
+    ``test_context`` la reprend une seule fois. Le codeur ne la lit que par
+    ``verifier_travail_repris``, qui la copie dans ses retours (ticket-514).
+    """
+    orch._log(f"[{run.ticket_id}] testeur: {ligne_de_delai(result)}")
+    if detail_du_delai(result):
+        run.test_context = f"\n\n## Résultats des tests ⏱\n{result.output_summary}\n"
+
+
 async def run_tests(
     orch: "Orchestrator", run: PipelineRun, *, reprise: bool = False
 ) -> "bool | PipelineResult":
@@ -566,10 +580,12 @@ async def run_tests(
             orch._log(
                 f"[{run.ticket_id}] testeur: délai dépassé, suite relancée"
             )
+            _noter_le_delai(orch, run, result)
             result = await orch._test_runner.run_tests(
                 orch._project_path, test_command=orch._test_command
             )
             if result.expiree:
+                _noter_le_delai(orch, run, result)
                 if reprise:
                     return False
                 return await finish_timeout_expired(orch, run)

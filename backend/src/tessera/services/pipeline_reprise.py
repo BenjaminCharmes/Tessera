@@ -34,6 +34,17 @@ def _commits_repris(orch: "Orchestrator") -> int:
     return valeur if isinstance(valeur, int) else 0
 
 
+def _retour_sans_resultat(run: PipelineRun) -> str:
+    """The feedback for tests that did not finish, with the step durations if known.
+
+    Un délai dépassé laisse sa liste d'étapes dans ``run.test_context`` ; sans la
+    reprendre ici, elle serait effacée avant que le codeur ne la lise
+    (ticket-514).
+    """
+    detail = run.test_context.strip()
+    return f"{_TESTS_SANS_RESULTAT}\n\n{detail}" if detail else _TESTS_SANS_RESULTAT
+
+
 async def verifier_travail_repris(orch: "Orchestrator", run: PipelineRun) -> bool:
     """Lance les tests sur une branche reprise ; ``True`` si le codeur peut être sauté.
 
@@ -58,7 +69,7 @@ async def verifier_travail_repris(orch: "Orchestrator", run: PipelineRun) -> boo
     )
     if not vert:
         run.review_feedback.append(
-            _echec_de_tests(run) if run.test_result is not None else _TESTS_SANS_RESULTAT
+            _echec_de_tests(run) if run.test_result is not None else _retour_sans_resultat(run)
         )
         # Ce résultat date d'avant le codeur : le tour qui suit lance ses propres
         # tests, et un résultat périmé ne doit pas survivre à leur absence.
