@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-517
-pr_number: null
+pr_number: 571
 priority: high
 status: done
 title: The pushed commit is read from the remote even when the clone tracks only main,
