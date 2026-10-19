@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-515
 plan: true
-pr_number: null
+pr_number: 561
 priority: high
 status: done
 title: Tool calls rejected by the CLI in a resumed coder turn are diagnosed, logged
