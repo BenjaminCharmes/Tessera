@@ -4017,3 +4017,4 @@ Points posit (58359ms)
 - 2026-10-19 19:58:52 UTC — [ticket-518] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : providers/
 - 2026-10-19 19:58:52 UTC — [ticket-518] validateur: APPROVED — Le diff implémente une borne de durée totale par appel pour les rôles texte (val (341328ms)
 - 2026-10-19 19:58:52 UTC — [ticket-518] APPROVED après 2 tour(s)
+- 2026-10-19 20:01:54 UTC — [ticket-518] documentation: 2 fichier(s) (177266ms)
