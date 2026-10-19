@@ -4,7 +4,7 @@ created: 2026-10-16
 depends_on: []
 estimated_days: 1
 id: ticket-494
-pr_number: null
+pr_number: 567
 priority: medium
 status: done
 title: Design how each run works in its own worktree, so no run ever writes where
