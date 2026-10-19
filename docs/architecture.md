@@ -312,6 +312,10 @@ Si la copie de travail est sur une autre branche, aucune action n'est prise. Les
 
 Quand une branche de ticket est reprise au démarrage, sa fiche est validée. Si le ticket a été déplacé de `tickets/todo/` vers `tickets/in-progress/` ou `tickets/in-review/` mais que ce déplacement n'a pas été committé (fichier non suivi), la reprise ajoute explicitement le fichier au commit « unapproved work ». Seule la fiche du ticket est ajoutée ; aucun autre fichier non suivi ne peut y entrer.
 
+### Diagnostic des refus d'outils lors de reprises de session (ticket-515)
+
+Quand un agent reprend sa session SDK (ex. tour 2 d'un codeur après interruption du tour 1), les options de l'SDK (`cwd`, `allowed_tools`, `permission_mode`) conservent leurs valeurs initiales. Les refus du CLI pour les appels d'outils sont diagnostiqués et loggés dans `memory/pipeline-log.md` sous la forme `codeur: outil <nom> refusé par le CLI`, ce qui permet de distinguer un refus du CLI lui-même d'un refus du garde-fou de Tessera (message `PreToolUse:<outil> hook error`).
+
 ### Récupération des fichiers neufs et gestion des tickets approuvés (ticket-389)
 
 Lors d'une reprise au démarrage, deux garanties préviennent la perte de travail :

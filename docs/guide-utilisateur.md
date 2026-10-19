@@ -1868,6 +1868,16 @@ Exemple :
 
 L'avertissement disparaît une fois que tu as corrigé `agents.json` et relancé l'IDE.
 
+### Un agent refusé par le CLI : « The user doesn't want to take this action »
+
+Tu vois dans le journal du pipeline : `codeur: outil <nom> refusé par le CLI`
+
+Cela signifie que le CLI embarqué a refusé un appel d'outil du codeur, avec le message exact : « The user doesn't want to take this action right now. STOP what you are doing and wait for the user to tell you how to proceed. »
+
+La cause n'est pas établie — cela peut être un problème de permissions du CLI embarqué, ou un comportement inattendu. Le tour s'est arrêté sans progrès, et l'agent n'a rien produit dans ce tour.
+
+Pour l'instant, il n'y a pas de correction automatique. Tu dois relancer le ticket. Si le problème reproduit régulièrement, note le `run_id` et signale-le sur Tessera via la section 13 « Signaler un problème ou une idée sur Tessera ».
+
 ## 13. Signaler un problème ou une idée sur Tessera
 
 Quand tu trouves un dysfonctionnement dans l'IDE ou une suggestion pour l'améliorer, tu peux le signaler directement depuis n'importe quel projet — sans quitter l'IDE, sans naviguer jusqu'à ide-core.
