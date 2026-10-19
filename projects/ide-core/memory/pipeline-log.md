@@ -3827,3 +3827,4 @@ Points posit (58359ms)
 - 2026-10-19 13:01:39 UTC — [ticket-510] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
 - 2026-10-19 13:01:39 UTC — [ticket-510] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la reprise de (329687ms)
 - 2026-10-19 13:01:39 UTC — [ticket-510] APPROVED après 1 tour(s)
+- 2026-10-19 13:05:46 UTC — [ticket-510] documentation: 2 fichier(s) (242844ms) — après tour de correction
