@@ -679,9 +679,12 @@ def surveillance_de_reprise(
     La même fabrique que la livraison : une PR reprise passe par `surveiller`
     avec ses règles — CI verte, `merge_without_ci`, tête inchangée.
     """
+    lecture = _workflow_de_lecture(project_id, politique)
     return SurveillanceProjet(
-        etat_pr=_lecteur_etat_pr(project_id, politique),
+        etat_pr=lecture.pr_state,
         surveiller=_surveillance_pour(project_id, politique=politique),
+        prs_ouvertes=lecture.prs_ouvertes,
+        base_branch=lecture.base_branch,
     )
 
 

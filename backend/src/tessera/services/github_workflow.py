@@ -26,7 +26,11 @@ from tessera.services.autonomie import (
     lire_niveau,
     niveau_peut_merger,
 )
-from tessera.services.github_service import MergeabiliteTimeoutError, PRNonFusionnableError
+from tessera.services.github_service import (
+    MergeabiliteTimeoutError,
+    PRNonFusionnableError,
+    PrOuverte,
+)
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.sync_map import SyncMapService
 from tessera.services.termes_interdits import (
@@ -73,6 +77,8 @@ class _GitHub(Protocol):
     async def find_merged_pull_request(
         self, prefix: str, base: str | None = None
     ) -> int | None: ...
+
+    async def find_open_pull_requests(self, base: str) -> list[PrOuverte]: ...
 
     async def get_pull_request_state(self, pr_number: int) -> str: ...
 
@@ -311,6 +317,20 @@ class GitHubWorkflowService:
         if self._github is None:
             return None
         return await self._github.find_open_pull_request(branch)
+
+    async def prs_ouvertes(self) -> list[PrOuverte]:
+        """Les PR ouvertes vers la base du projet (ticket-516).
+
+        Sans GitHub configuré, aucune : il n'y a rien à retrouver.
+        """
+        if self._github is None:
+            return []
+        return await self._github.find_open_pull_requests(self._base_branch)
+
+    @property
+    def base_branch(self) -> str:
+        """La branche de base des PR de ce projet."""
+        return self._base_branch
 
     async def pr_mergee_de_branche(self, prefix: str) -> int | None:
         """Le numéro d'une PR mergée dans la base depuis `prefix…`, ou `None` (ticket-482).

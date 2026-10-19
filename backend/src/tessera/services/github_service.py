@@ -69,6 +69,24 @@ class PRListEntry:
     head_sha: str
 
 
+@dataclass(frozen=True)
+class PrOuverte:
+    """An open pull request: its number, head branch and base branch — ticket-516."""
+
+    number: int
+    branche: str
+    base: str
+
+
+def _pr_ouverte_de(item: dict[str, Any]) -> PrOuverte:
+    """Build a `PrOuverte` from one entry of the PR listing."""
+    return PrOuverte(
+        number=int(item["number"]),
+        branche=str(item.get("head", {}).get("ref", "")),
+        base=str(item.get("base", {}).get("ref", "")),
+    )
+
+
 @dataclass
 class RepositoryInfo:
     """Ce qu'il faut savoir d'un dépôt distant avant d'y attacher un projet."""
@@ -228,6 +246,28 @@ class GitHubService:
                 if len(items) < _TAILLE_PAGE:
                     break
         return None
+
+    async def find_open_pull_requests(self, base: str) -> list[PrOuverte]:
+        """Every open PR whose base branch is `base` — ticket-516.
+
+        Reads up to three pages of a hundred; a PR into another base is dropped
+        even if GitHub returned it.
+        """
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        trouvees: list[PrOuverte] = []
+        async with httpx.AsyncClient() as client:
+            for page in range(1, _PAGES_PR_FERMEES + 1):
+                params: dict[str, str | int] = {
+                    "state": "open", "base": base,
+                    "per_page": _TAILLE_PAGE, "page": page,
+                }
+                resp = await self._requete(client, "GET", url, params=params)
+                resp.raise_for_status()
+                items: list[dict[str, Any]] = resp.json()
+                trouvees.extend(_pr_ouverte_de(item) for item in items)
+                if len(items) < _TAILLE_PAGE:
+                    break
+        return [pr for pr in trouvees if pr.base == base]
 
     async def get_pull_request_status(self, pr_number: int) -> PRStatus:
         """Retourne le statut d'une PR avec son état CI agrégé."""
