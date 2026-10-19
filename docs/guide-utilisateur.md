@@ -753,6 +753,9 @@ Au lieu de tourner à l'aveugle plusieurs fois, tu remarques que les tickets pro
 Quand une commande de test enchaîne plusieurs outils (vitest suivi de pytest, par exemple), le rapport affiche l'étape qui a échoué — avec sa propre sortie. Tu vois immédiatement la raison du blocage, au lieu d'être trompé par le résumé d'une étape précédente qui avait réussi.
 
 
+
+Si un test expire (dépassement de `test_timeout_s`), tous ses processus enfants — même ceux qui tournent toujours en arrière-plan — sont arrêtés immédiatement. Le run reprend son cours au lieu d'attendre indéfiniment.
+
 ## 4 bis. Ajouter des tickets à une file en cours
 
 Pendant qu'une file s'exécute, tu peux ajouter des tickets supplémentaires sans attendre la fin — ils seront exécutés après les tickets actuellement en attente.
@@ -1122,6 +1125,9 @@ Lors de la livraison, si le rebase génère un conflit, Tessera tente automatiqu
 
 Si cet agent ne peut pas intervenir, la ligne d'arrêt t'en informe clairement : « résolveur non tenté : [raison] ». Le conflit reste alors non résolu dans la branche, qui ne sera jamais poussée. Tu peux arbitrer le conflit en local avant de relancer.
 
+
+
+Quand deux tickets ajoutent chacun uniquement des modèles ou types au même `schema.prisma`, sans modification de bloc existant, Tessera fusionne les deux — tu n'as rien à faire. De même, si deux migrations Prisma ont le même numéro, celle du ticket est renommée au numéro libre suivant.
 
 ### Erreur réseau lors de l'ouverture de la PR
 

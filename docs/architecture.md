@@ -588,6 +588,23 @@ Cette vérification est une optimisation (ticket-413) : elle évite de dépenser
 L'enregistrement du pipeline écrit « testeur: délai dépassé, suite relancée » dans le `pipeline-log.md` à chaque relance.
 
 
+#### Destruction d'arbres de processus à l'expiration (ticket-507)
+
+Quand une étape de test dépasse le délai `test_timeout_s`, l'étape expire et reprend immédiatement en rendant `expiree=True`, sans attendre la fin des processus enfants.
+
+Pour éviter que des petits-enfants orphelins ne gardent les tubes ouverts et ne bloquent indéfiniment :
+
+1. Chaque étape lancée par `_executer` est attachée à un groupe de processus neuf :
+   - **Windows** : création d'un job (`creer_groupe`), où l'étape s'exécute, et tous les enfants en héritent
+   - **Unix** : lancement avec `start_new_session=True`, qui crée une session neuve avec son propre groupe de processus
+
+2. À l'expiration du délai :
+   - Destruction immédiate du groupe entier (fermer le job Windows, ou `tuer_l_arbre` sous Unix)
+   - Attente bornée (quelques secondes) de la fin du processus direct
+   - Passé ce délai, l'étape rend son résultat sans attendre plus longtemps
+
+3. Aucune attente non bornée ne persiste après un timeout : chaque groupe est créé au lancement de l'étape, jamais réutilisé, et fermé à la fin pour le nettoyer.
+
 ### Audit de sécurité
 
 L'agent sécurité audite le diff avant la revue. Selon ADR-039, une réponse JSON invalide bloque toujours le run — aucun repli n'est possible pour le jugement de sécurité.
@@ -946,6 +963,16 @@ Deux fichiers où chaque run ne fait que ajouter des entrées ne bloquent plus u
 - **`memory/documentation.json`** : si c'est le seul fichier en conflit lors du rebase, il est résolu mécaniquement en prenant l'union des listes d'identifiants de run (JSON parcouru et réécrit en mémoire), puis le rebase continue.
 
 Si d'autres fichiers sont en conflit, c'est un scénario complexe : le rebase s'arrête, la branche reste intacte, et un agent tente la résolution de ces ambiguïtés intrinsèques, toujours relue avant approbation (voir ADR-033). Cette automatisation élimine les blocages sur des fichiers où l'ajout séquentiel de deux branches ne crée aucune ambiguïté.
+
+#### Résolution mécanique pour schémas Prisma et migrations en collision (ticket-484)
+
+Avant d'appeler le résolveur-conflit, deux cas d'ajouts strictement additifs sont résolus mécaniquement :
+
+1. **Schéma Prisma (`.prisma`)** : quand aucun côté ne modifie un bloc existant mais ajoute seulement des blocs complets (`model`, `enum`, `type`), ils sont fusionnés dans l'ordre base puis ticket, en réparant l'accolade partagée pour un schéma valide sans marque de conflit.
+
+2. **Migrations en collision** : après le rebase, si deux dossiers de `prisma/migrations/` portent le même préfixe numérique, celui du ticket est renommé au numéro libre suivant et journalisé. Cette détection s'adapte aux horodatages utilisés par certains projets à la place des numéros séquentiels.
+
+Si le conflit modifie un bloc existant ou s'applique à un autre type de fichier, le résolveur-conflit est appelé normalement.
 
 #### Appel du résolveur-conflit pour les conflits complexes
 

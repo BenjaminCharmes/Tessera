@@ -1,14 +1,15 @@
 ---
-id: ticket-507
-title: "A test command that times out is killed with its whole process tree, so the run never waits on a surviving grandchild"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 1
-created: 2026-10-19
+id: ticket-507
+pr_number: 548
+priority: high
+status: done
+title: A test command that times out is killed with its whole process tree, so the
+  run never waits on a surviving grandchild
+type: fix
 ---
 
 # ticket-507 — Une commande de test expirée est tuée avec tout son arbre de processus
