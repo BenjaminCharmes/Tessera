@@ -1187,6 +1187,18 @@ class GitWorkspaceService:
             raise
         return True
 
+    async def est_ancetre(self, ancetre: str, descendant: str) -> bool | None:
+        """True when `ancetre` is an ancestor of `descendant` (ticket-527).
+
+        `None` when it cannot be told — a commit unknown to this clone, or any
+        other git failure — so the caller can wait instead of concluding.
+        """
+        try:
+            await self._run("merge-base", "--is-ancestor", ancetre, descendant)
+        except GitCommandError as exc:
+            return False if exc.returncode == 1 else None
+        return True
+
     async def _est_rangement(self, sha: str, prefixe: str) -> bool:
         """True when the commit touches only Tessera's bookkeeping paths."""
         sortie = await self._run(

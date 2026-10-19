@@ -54,16 +54,35 @@ EtatPr = Callable[[int], Awaitable[str]]
 TetePr = Callable[[int], Awaitable[str | None]]
 
 
+#: Dit si le premier SHA est un ancêtre du second : `True`, `False`, ou `None`
+#: quand l'ascendance ne peut pas se vérifier (commit inconnu localement…).
+EstAncetre = Callable[[str, str], Awaitable[bool | None]]
+
+#: Fenêtre de relecture par défaut : 4 relectures espacées de 15 s, soit
+#: 5 lectures sur 60 s en comptant la première (ticket-527).
+_RELECTURES_TETE = 4
+_INTERVALLE_RELECTURE_TETE_S = 15.0
+
+
 @dataclass(frozen=True)
 class ControleTete:
     """What the watcher checks before merging: the PR head is the pushed commit.
 
     `pushed_sha` is `None` when the delivery could not record it — the watcher
     then refuses to merge (ticket-492).
+
+    GitHub may still show the previous commit a few seconds after a push. When
+    the head read is an ancestor of `pushed_sha` — or when that cannot be
+    checked — the head is read again up to `relectures` times, `intervalle_s`
+    apart, before the merge is refused (ticket-527). A head that is not an
+    ancestor refuses at once.
     """
 
     pushed_sha: str | None
     lire_tete: TetePr
+    est_ancetre: EstAncetre | None = None
+    relectures: int = _RELECTURES_TETE
+    intervalle_s: float = _INTERVALLE_RELECTURE_TETE_S
 
 
 def decrire_exception(exc: BaseException) -> str:
@@ -390,20 +409,63 @@ class CIWatcher:
                 f"commit poussé inconnu : la PR #{pr_number} n'est pas mergée, "
                 "elle reste ouverte"
             )
+        tete, arret = await self._lire_tete(controle, pr_number)
+        if tete is None:
+            return arret
+        if tete == controle.pushed_sha:
+            return None
+        if not await self._tete_en_retard(controle, controle.pushed_sha, tete):
+            return self._arret_tete_changee(pr_number, tete, controle.pushed_sha)
+        # Une tête en retard n'est pas une tête changée : GitHub rattrape le
+        # push. On relit sur la fenêtre, sans jamais merger une autre tête.
+        for _ in range(controle.relectures):
+            await asyncio.sleep(controle.intervalle_s)
+            tete, arret = await self._lire_tete(controle, pr_number)
+            if tete is None:
+                return arret
+            if tete == controle.pushed_sha:
+                return None
+        return self._arret_tete_changee(pr_number, tete, controle.pushed_sha)
+
+    async def _lire_tete(
+        self, controle: ControleTete, pr_number: int
+    ) -> tuple[str | None, str | None]:
+        """Read the PR head: `(sha, None)`, or `(None, stop line)` when unknown."""
         try:
             tete = await controle.lire_tete(pr_number)
         except Exception as exc:  # noqa: BLE001 — une tête illisible refuse le merge
-            return (
+            return None, (
                 f"tête de la PR #{pr_number} illisible "
                 f"({decrire_exception(exc)}) : elle reste ouverte"
             )
         if tete is None:
-            return f"tête de la PR #{pr_number} inconnue : elle reste ouverte"
-        if tete == controle.pushed_sha:
-            return None
+            return None, f"tête de la PR #{pr_number} inconnue : elle reste ouverte"
+        return tete, None
+
+    async def _tete_en_retard(
+        self, controle: ControleTete, pushed_sha: str, tete: str
+    ) -> bool:
+        """True when `tete` may just be behind `pushed_sha` and is worth re-reading.
+
+        Fails towards waiting, never towards merging: an ancestry that cannot be
+        checked only delays the refusal (ADR-039).
+        """
+        if controle.est_ancetre is None:
+            return True
+        try:
+            ancetre = await controle.est_ancetre(tete, pushed_sha)
+        except Exception as exc:  # noqa: BLE001 — ascendance invérifiable : on relit
+            _logger.warning(
+                "ci_watcher_ascendance_illisible",
+                extra={"erreur": decrire_exception(exc)},
+            )
+            return True
+        return ancetre is None or ancetre
+
+    def _arret_tete_changee(self, pr_number: int, tete: str, pushed_sha: str) -> str:
         return (
             f"la tête de la PR #{pr_number} n'est plus le commit poussé : "
-            f"{tete[:7]} au lieu de {controle.pushed_sha[:7]}. "
+            f"{tete[:7]} au lieu de {pushed_sha[:7]}. "
             "La PR reste ouverte."
         )
 

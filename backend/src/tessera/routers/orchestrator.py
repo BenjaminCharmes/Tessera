@@ -18,7 +18,7 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
-from tessera.services.ci_watcher import ControleTete, TetePr
+from tessera.services.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
 from tessera.services.sha_approbation import noter_poussee, sha_pousse_du_ticket
 from tessera.services.controles_depart import manques_avant_depart
@@ -581,15 +581,18 @@ async def _noter_sha_pousse(result: PipelineResult, livraison: Livraison) -> Non
 
 
 async def _controle_tete_de(
-    project_id: str, ticket_id: str, lire_tete: TetePr
+    project_id: str,
+    ticket_id: str,
+    lire_tete: TetePr,
+    est_ancetre: EstAncetre | None = None,
 ) -> ControleTete:
-    """The check the watcher makes before merging a PR (ticket-492)."""
+    """The check the watcher makes before merging a PR (ticket-492, 527)."""
     try:
         pushed = await sha_pousse_du_ticket(settings.ide_db_path, project_id, ticket_id)
     except Exception as exc:  # noqa: BLE001 — sans SHA, le watcher refuse de merger
         _logger.warning("pushed_sha_illisible", extra={"erreur": str(exc)})
         pushed = None
-    return ControleTete(pushed_sha=pushed, lire_tete=lire_tete)
+    return ControleTete(pushed_sha=pushed, lire_tete=lire_tete, est_ancetre=est_ancetre)
 
 
 def _surveillance_pour(
@@ -645,7 +648,10 @@ def _surveillance_pour(
         on_event: "_CB",
     ) -> None:
         """Start CI watching for pr_number in a background task."""
-        controle = await _controle_tete_de(p_id, ticket_id, service.tete_pr)
+        controle = await _controle_tete_de(
+            p_id, ticket_id, service.tete_pr,
+            GitWorkspaceService(project_path, politique=politique).est_ancetre,
+        )
 
         async def phase_2(pr: int) -> Livraison:
             # Le merge est lié au commit poussé : une tête qui bouge pendant
