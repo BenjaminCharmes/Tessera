@@ -63,6 +63,15 @@ class OnlineConfig(BaseModel):
     generate: Optional[list[str]] = None
     #: Variables calculées ; ``{domain}`` est remplacé par le domaine déclaré.
     derive: dict[str, str] = Field(default_factory=dict)
+    #: Route du projet qui lit la base et rend 200 ; ``None`` : seule la racine est contrôlée.
+    health_path: Optional[str] = None
+
+    @field_validator("health_path")
+    @classmethod
+    def _health_path_valide(cls, valeur: Optional[str]) -> Optional[str]:
+        if valeur is not None and not valeur.startswith("/"):
+            raise ValueError("must start with '/'")
+        return valeur
 
     @field_validator("generate")
     @classmethod

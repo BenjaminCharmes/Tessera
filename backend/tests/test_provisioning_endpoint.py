@@ -355,6 +355,7 @@ def test_plan_with_resend_and_stripe_follows_the_declared_order() -> None:
         "dns",
         "resend_verify",
         "redeploy",
+        "health_check",
     ]
 
 
@@ -370,6 +371,7 @@ def test_plan_follows_the_dependency_order() -> None:
         "variables",
         "dns",
         "redeploy",
+        "health_check",
     ]
 
 

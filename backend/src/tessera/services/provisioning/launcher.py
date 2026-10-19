@@ -14,6 +14,7 @@ from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.provisioning.cloudflare import CloudflareClient
 from tessera.services.provisioning.cloudflare_steps import DnsStep
+from tessera.services.provisioning.health_step import HealthCheckStep
 from tessera.services.provisioning.neon import NeonClient
 from tessera.services.provisioning.neon_steps import DatabaseStep
 from tessera.services.provisioning.online_config import OnlineConfig
@@ -96,6 +97,7 @@ def _build_steps(online: OnlineConfig, vercel: VercelClient) -> list[Provisionin
         steps.append(ResendVerifyStep(resend))
     if online.wants("vercel"):
         steps.append(VercelRedeployStep(vercel))
+        steps.append(HealthCheckStep())
     return steps
 
 
@@ -108,8 +110,8 @@ def build_setup(
     live in it), then the database that writes ``DATABASE_URL`` there, then the
     app variables, then the Resend domain and Stripe (both ask for records or
     write variables), then DNS — after every step that asks for a record — the
-    Resend verification once the records exist, and the redeploy last, once
-    every variable of the run is written.
+    Resend verification once the records exist, the redeploy once every variable
+    of the run is written, and the health check last, once the site is deployed.
     """
     vercel = VercelClient.from_settings(settings)
     steps = _build_steps(online, vercel)

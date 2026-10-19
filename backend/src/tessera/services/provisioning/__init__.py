@@ -6,6 +6,7 @@ locally, a relaunch reads every service again and only creates what is missing.
 from tessera.services.provisioning.cloudflare import CloudflareClient
 from tessera.services.provisioning.cloudflare_steps import DnsStep
 from tessera.services.provisioning.errors import ServiceError
+from tessera.services.provisioning.health_step import HealthCheckStep
 from tessera.services.provisioning.online_config import (
     OnlineConfig,
     OnlineConfigError,
@@ -40,6 +41,7 @@ __all__ = [
     "DnsRecord",
     "DnsStep",
     "EnvWriter",
+    "HealthCheckStep",
     "NeonClient",
     "OnlineConfig",
     "OnlineConfigError",
