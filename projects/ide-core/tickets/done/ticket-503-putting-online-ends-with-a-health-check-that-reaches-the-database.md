@@ -1,14 +1,15 @@
 ---
-id: ticket-503
-title: "Putting a project online ends with a declared health check that reaches the database"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-18
 depends_on: []
 estimated_days: 1
-created: 2026-10-18
+id: ticket-503
+pr_number: 536
+priority: high
+status: done
+title: Putting a project online ends with a declared health check that reaches the
+  database
+type: feat
 ---
 
 # ticket-503 — La mise en ligne finit par un contrôle de santé qui touche la base

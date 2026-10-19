@@ -664,9 +664,15 @@ def test_arreter_ne_laisse_aucun_descendant(
     assert enfants, "le service n'a pas engendré d'enfant : test sans objet"
 
     client.post("/api/v1/projects/mon-projet/services/stop")
-    time.sleep(2)
-
+    # Windows termine un processus tué de façon asynchrone, et la suite entière
+    # charge la machine : on attend la disparition au lieu d'un délai fixe. Un
+    # vrai survivant épuise l'échéance et fait échouer le test.
+    echeance = time.monotonic() + 15
     survivants = [pid for pid in enfants if _pid_vivant(pid)]
+    while survivants and time.monotonic() < echeance:
+        time.sleep(0.5)
+        survivants = [pid for pid in survivants if _pid_vivant(pid)]
+
     assert survivants == [], f"descendants survivants : {survivants}"
 
 

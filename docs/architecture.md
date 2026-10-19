@@ -1860,6 +1860,21 @@ Dans les deux cas, une variable déjà présente dans Vercel n'est jamais
 réécrite ; `NEXT_PUBLIC_APP_URL` reste posée comme avant. Une valeur générée
 n'apparaît dans aucun log ni retour d'API.
 
+Une clé facultative règle le contrôle final :
+
+```json
+"online": {
+  "domain": "kadoomi.com",
+  "health_path": "/api/health"
+}
+```
+
+`health_path` désigne une route du projet qui lit au moins une table et rend
+200 si tout va bien. Elle doit commencer par `/`. Tessera ne l'écrit pas, et
+n'applique pas les migrations : c'est le build du projet qui le fait. Sans
+`health_path`, l'étape `health_check` contrôle seulement `https://<domaine>/`
+et le dit dans son détail (`database not checked: declare health_path`).
+
 Absent : pas de bouton, pas d'endpoint utile. Une ressource non listée n'est ni
 créée ni contrôlée. Le nom du projet Vercel, de la base et de la clé Resend est
 l'identifiant du projet.
@@ -1887,6 +1902,11 @@ l'identifiant du projet.
    webhook va dans Vercel.
 8. **Redéploiement** : seulement si une variable a été écrite pendant la
    relance.
+9. **Contrôle de santé** (`health_check`, avec `vercel`) : `GET
+   https://<domaine><health_path>`, six essais espacés de 10 s le temps que le
+   déploiement réponde. 200 : `done` ; autre statut ou délai dépassé : `failed`,
+   avec le statut et les 200 premiers caractères de la réponse. Une base vide
+   ou injoignable se voit donc le jour même.
 
 ### Reprise et idempotence
 
