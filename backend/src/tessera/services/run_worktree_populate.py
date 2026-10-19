@@ -29,11 +29,15 @@ if sys.platform == "win32":
 
 _logger = get_logger(__name__)
 
+#: `stat.FILE_ATTRIBUTE_REPARSE_POINT` n'existe que sous Windows : `getattr`, sinon
+#: le mypy de la CI (Linux) refuse ce que le mypy local (win32) accepte.
+_REPARSE_POINT = int(getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400))
+
 
 def _est_un_lien(chemin: Path) -> bool:
     """True for a symlink or a junction, judged on the entry itself, never its target."""
     attributs = int(getattr(os.lstat(chemin), "st_file_attributes", 0))
-    return chemin.is_symlink() or bool(attributs & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+    return chemin.is_symlink() or bool(attributs & _REPARSE_POINT)
 
 
 def _delier(chemin: Path) -> bool:
