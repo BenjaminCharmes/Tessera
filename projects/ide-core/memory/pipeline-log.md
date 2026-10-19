@@ -4089,3 +4089,4 @@ Points posit (58359ms)
 - 2026-10-19 21:51:22 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (126656ms)
 - 2026-10-19 21:51:22 UTC — [ticket-522] CHANGES_REQUESTED tour 3: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni car il nécess
 - 2026-10-19 21:51:23 UTC — [ticket-522] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-19 21:51:27 UTC — [ide-core] file interrompue : ticket-522 non approuvé
