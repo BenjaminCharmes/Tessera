@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Literal
 
 from tessera.services.providers.base import LLMProvider
+from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.utils.json_extract import extract_json
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
@@ -103,6 +104,10 @@ class SecurityAuditorService:
             # `reason` doit le dire à l'écran (ticket-122). Seule la limite de
             # tours a un second essai ; le repli d'ADR-046 couvre le reste.
             _logger.warning("security_auditor_llm_failed", extra={"error": str(exc)})
+            # Un quota épuisé n'est pas un verdict : l'orchestrateur le traite
+            # comme un arrêt de quota (ticket-505).
+            if is_quota_exhausted(exc, None):
+                raise
             if self._diff_only_provider is None or not _is_turn_limit(exc):
                 return _blocked(f"Audit sécurité indisponible : {exc}")
             return await self._audit_diff_only(
@@ -123,6 +128,8 @@ class SecurityAuditorService:
             result = await self._ask(provider, system_prompt, user_message, project_path)
         except Exception as exc:
             _logger.warning("security_auditor_fallback_failed", extra={"error": str(exc)})
+            if is_quota_exhausted(exc, None):
+                raise
             result = _blocked(f"Audit sécurité indisponible : {exc}")
         result.fallback_reason = fallback_reason
         return result
