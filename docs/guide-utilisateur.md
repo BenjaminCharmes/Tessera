@@ -710,6 +710,9 @@ en `blocked/` et le reviewer n'est même pas appelé.
 
 L'audit de sécurité vérifie uniquement les lignes que tu ajoutes. Si tu modifies un fichier qui contient déjà une faille de sécurité, elle ne t'arrête pas : elle est signalée au reviewer, mais n'a pas d'effet sur ton ticket. Tu n'es responsable que du code que tu écris.
 
+
+**Attention** : un quota d'abonnement épuisé pendant l'audit ne cause pas un blocage d'audit — c'est un arrêt de file pour quota. La file s'interrompt gracieusement, le ticket repasse en `todo`, et le journal affiche « quota épuisé — reprise vers HH:MM ». Seuls les vrais problèmes de sécurité détectés dans le code causent un vrai blocage ici.
+
 ### Si le validateur refuse
 
 Si tu as écrit un ticket `feat`, `fix` ou `refactor` sans section `## Critères d'acceptation`, le validateur refuse et te demande d'en ajouter une. C'est voulu : rien ne peut être validé sans critères d'acceptation.
@@ -846,6 +849,11 @@ Quand tu vois la ligne « testeur: en attente d'un créneau de test » dans le l
 Une file arrêtée par une exception (timeout, saturation de ressources, etc.) écrit une ligne dans le journal du pipeline : `[projet] file interrompue : motif de l'erreur`. Tu peux voir l'arrêt immédiatement dans l'IDE, au même endroit que les autres interruptions (refus d'audit, dépassement de budget, limite de session). Tu n'as pas besoin de chercher dans les logs du serveur.
 
 Une file qui s'arrête prématurément — sur budget, ticket non approuvé, ou autre raison — est rapportée avec un statut `interrompu` (jamais `done`). La raison exacte est incluse, ce qui t'aide à comprendre ce qui s'est passé et comment relancer si tu le souhaites.
+
+
+#### Arrêt pour quota épuisé
+
+Quand le quota Claude de ton abonnement s'épuise, la file s'arrête gracieusement — y compris si c'est pendant l'audit de sécurité. Le journal affiche « quota épuisé — reprise vers HH:MM » (heure locale estimée), le ticket courant repasse en `todo`, et tu peux relancer la file une fois ton quota renouvelé. Ce n'est jamais un blocage d'agent : c'est un arrêt normal de ressource.
 
 ## 5 bis. Se repérer dans l'écran
 
