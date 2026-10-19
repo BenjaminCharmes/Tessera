@@ -345,6 +345,18 @@ def asker_for(run: PipelineRun) -> Optional[Callable[[str], Awaitable[str]]]:
 # ------------------------------------------------------------------
 
 
+def journaliser_refus_cli(
+    orch: "Orchestrator", ticket_id: str, role: AgentRole, outils: list[str]
+) -> None:
+    """Writes one journal line per tool the embedded CLI refused (ticket-515).
+
+    Sans cette ligne le refus restait invisible : le tour finissait « normalement »
+    alors que l'agent s'était arrêté sur un outil qu'on ne lui avait pas laissé.
+    """
+    for nom in outils:
+        orch._log(f"[{ticket_id}] {role.value}: outil {nom} refusé par le CLI")
+
+
 async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> None:
     """Run the coder, then capture what it actually wrote to disk."""
     # Un ticket `design` ne demande pas du code mais une décision, et
@@ -425,6 +437,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     )
     if codeur_result.session_id is not None:
         run.session_codeur = codeur_result.session_id
+    journaliser_refus_cli(orch, ticket_id, role, codeur_result.outils_refuses)
     orch.record_spend(codeur_result.cost_usd)
     await run.on_event(
         OrchestratorEvent(

@@ -3852,3 +3852,9 @@ Points posit (58359ms)
 - 2026-10-19 13:57:41 UTC — [ticket-512] validateur: APPROVED — Tous les critères sont respectés. Le code modifie correctement le lancement des  (155640ms)
 - 2026-10-19 13:57:41 UTC — [ticket-512] APPROVED après 1 tour(s)
 - 2026-10-19 13:59:19 UTC — [ticket-512] documentation: 1 fichier(s) (91390ms)
+- 2026-10-19 13:59:43 UTC — [ide-core] ticket-512 PR #560 confiée au CIWatcher
+- 2026-10-19 13:59:51 UTC — [ticket-515] branche ticket-515-tool-calls-rejected-by-the-cli-in-a-resumed-coder
+- 2026-10-19 14:01:08 UTC — [ticket-515] plan rendu (76375ms)
+- 2026-10-19 14:01:08 UTC — [ticket-515] tour 1 — codeur démarré
+- 2026-10-19 14:03:48 UTC — [ticket-515] tour 1 — codeur terminé (159219ms)
+- 2026-10-19 14:05:02 UTC — [ide-core] ticket-512 PR #560 mergée (CI verte)

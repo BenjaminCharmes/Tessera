@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
@@ -27,6 +27,9 @@ class ProviderResult:
     # Le modèle qui a réellement répondu, quand ce n'est pas celui demandé —
     # un repli (ticket-188). Vide sinon : l'appelant garde le sien.
     model: str = ""
+    # Les outils que le CLI a refusés pendant l'appel, dans l'ordre (ticket-515).
+    # Seul le SDK en relève ; vide pour les autres.
+    outils_refuses: list[str] = field(default_factory=list)
 
 
 @runtime_checkable

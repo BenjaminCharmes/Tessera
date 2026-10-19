@@ -94,6 +94,9 @@ class AgentResult(BaseModel):
     # La conversation du provider, à reprendre au tour suivant (ticket-187).
     # None quand le provider n'en rend pas : le tour suivant repart à froid.
     session_id: str | None = None
+    # Les outils que le CLI a refusés pendant l'appel (ticket-515), pour que
+    # l'étape les écrive au journal.
+    outils_refuses: list[str] = Field(default_factory=list)
 
 
 class AgentRunRequest(BaseModel):
