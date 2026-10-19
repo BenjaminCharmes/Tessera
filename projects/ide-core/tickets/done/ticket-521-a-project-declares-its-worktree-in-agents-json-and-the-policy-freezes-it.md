@@ -1,14 +1,15 @@
 ---
-id: ticket-521
-title: "A project declares its worktree in agents.json, and the run policy freezes it"
-type: feat
-status: todo
-priority: medium
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
-pr_number: null
+id: ticket-521
+pr_number: 578
+priority: medium
+status: done
+title: A project declares its worktree in agents.json, and the run policy freezes
+  it
+type: feat
 ---
 
 # ticket-521 — Le projet déclare son worktree, la politique du run le fige

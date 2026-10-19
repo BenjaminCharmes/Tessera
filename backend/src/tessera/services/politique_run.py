@@ -20,7 +20,9 @@ from typing import Literal
 
 from tessera.services.artifacts import ArtifactMode, read_artifact_mode
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
+from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.project_loader import load_pipeline_config
+from tessera.services.worktree_politique import lire_worktree
 
 #: Méthodes de merge acceptées par GitHub.
 MergeMethod = Literal["squash", "merge", "rebase"]
@@ -58,6 +60,10 @@ class PolitiqueRun:
     #: Absente ou inconnue dans agents.json : `squash`. Le défaut protège :
     #: squash est la convention de ce dépôt (CLAUDE.md, section Git).
     merge_method: MergeMethod = "squash"
+    #: Le worktree que le projet déclare (ADR-056, ticket-521). `None` : clef
+    #: absente, illisible, mal typée, ou projet en `artifacts: local` — le run
+    #: reste dans le checkout. Rien ne le consomme encore.
+    worktree: ConfigWorktree | None = None
 
     @classmethod
     def lire(cls, project_path: Path) -> "PolitiqueRun":
@@ -66,15 +72,19 @@ class PolitiqueRun:
         Réutilise les lecteurs existants plutôt que d'en écrire un cinquième :
         chacun porte son défaut fermé et son traitement du fichier illisible.
         """
+        git_root = _lire_git_root(project_path)
+        artifacts = read_artifact_mode(project_path)
+        racine_depot = cls(git_root=git_root).racine_ecriture(project_path)
         return cls(
             autonomy=lire_niveau(project_path),
-            git_root=_lire_git_root(project_path),
-            artifacts=read_artifact_mode(project_path),
+            git_root=git_root,
+            artifacts=artifacts,
             test_command=load_pipeline_config(project_path).test_command,
             base_branch=_lire_chaine(project_path, "base_branch"),
             merge_without_ci=_lire_booleen(project_path, "merge_without_ci"),
             confidentialite=_lire_chaine(project_path, "confidentiality"),
             merge_method=_lire_merge_method(project_path),
+            worktree=lire_worktree(project_path, racine_depot, artifacts),
         )
 
     @property

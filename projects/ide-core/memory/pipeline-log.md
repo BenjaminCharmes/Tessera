@@ -4047,3 +4047,16 @@ Points posit (58359ms)
 - 2026-10-19 20:39:54 UTC — [ticket-527] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (275985ms)
 - 2026-10-19 20:39:54 UTC — [ticket-527] APPROVED après 1 tour(s)
 - 2026-10-19 20:42:37 UTC — [ticket-527] documentation: 2 fichier(s) (157688ms)
+- 2026-10-19 20:42:57 UTC — [ide-core] ticket-527 PR #577 confiée au CIWatcher
+- 2026-10-19 20:43:00 UTC — [ticket-521] branche ticket-521-a-project-declares-its-worktree-in-agents-json-an
+- 2026-10-19 20:43:01 UTC — [ticket-521] tour 1 — codeur démarré
+- 2026-10-19 20:46:13 UTC — [ticket-521] tour 1 — codeur terminé (192610ms)
+- 2026-10-19 20:48:13 UTC — [ide-core] ticket-527 PR #577 mergée (CI verte)
+- 2026-10-19 20:54:54 UTC — [ticket-521] testeur: OK (exit 0)
+- 2026-10-19 20:56:56 UTC — [ticket-521] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente correctement la validation des (121860ms)
+- 2026-10-19 20:56:56 UTC — [ticket-521] tour 1 — reviewer démarré
+- 2026-10-19 20:56:56 UTC — [ticket-521] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-19 20:57:21 UTC — [ticket-521] validateur: APPROVED — Le ticket-521 est complètement validé. La lecture et la validation de la clé `wo (25358ms)
+- 2026-10-19 20:57:22 UTC — [ticket-521] tour 1 — reviewer terminé (26484ms)
+- 2026-10-19 20:57:22 UTC — [ticket-521] APPROVED après 1 tour(s)
+- 2026-10-19 20:59:21 UTC — [ticket-521] documentation: 1 fichier(s) (113500ms) — après tour de correction

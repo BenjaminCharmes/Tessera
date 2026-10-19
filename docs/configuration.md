@@ -20,6 +20,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
 | `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows); `~/.local/state/tessera` (macOS/Linux) | Dossier hors du dépôt pour l'état persistant de l'IDE (signalements en attente). Créé au besoin |
+| `IDE_WORKTREES_DIR` | | `~/.tessera/worktrees` | Racine des worktrees de run, `<projet>/<ticket>` dessous (ADR-056). Hors de tout dépôt ; la garder courte, Windows limitant la longueur des chemins. Ne sert qu'aux projets qui déclarent `worktree` dans `agents.json` |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |

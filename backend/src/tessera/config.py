@@ -149,6 +149,10 @@ class Settings(BaseSettings):
     # l'arbre part dans le commit du run en cours, puis disparaît au changement
     # de branche. Surchargeable via IDE_STATE_DIR.
     ide_state_dir: Path = default_state_dir()
+    # Racine des worktrees de run (ADR-056, ticket-521) : un dossier par projet
+    # et par ticket. Hors de tout dépôt — rien à exclure, rien qu'un `git add`
+    # balaie — et court, à cause des chemins longs de Windows.
+    ide_worktrees_dir: Path = Path.home() / ".tessera" / "worktrees"
     # Fichier de log tournant (5 × 10 Mo). Ancré sur la racine du dépôt pour
     # ne pas dépendre du répertoire de lancement (ticket-330).
     ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"
