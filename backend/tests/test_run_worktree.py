@@ -8,6 +8,7 @@ import pytest
 from tessera.config import settings
 from tessera.services.run_worktree import (
     BrancheDejaExtraite,
+    CheminRefuse,
     RunWorktree,
     TravailNonSauve,
     WorktreeOccupe,
@@ -184,3 +185,47 @@ async def test_creer_leaves_the_checkout_on_its_branch_with_its_tree_untouched(
     assert _git(checkout, "rev-parse", "--abbrev-ref", "HEAD") == "develop"
     assert _git(checkout, "rev-parse", "HEAD") == avant
     assert _git(checkout, "status", "--porcelain") == ""
+
+
+@pytest.mark.parametrize(
+    ("project_id", "ticket_id"),
+    [("../x", "ticket-1"), ("demo", "../ticket-1"), ("demo", "ticket-1/../../x"),
+     ("/abs", "ticket-1"), ("demo", "C:x"), ("..", "ticket-1"), ("demo", "1")],
+)
+async def test_creer_refuses_an_id_that_could_leave_the_worktrees_folder(
+    checkout: Path, project_id: str, ticket_id: str
+) -> None:
+    with pytest.raises(CheminRefuse):
+        await creer(checkout, checkout, project_id, ticket_id, BRANCHE, "develop")
+    assert not settings.ide_worktrees_dir.exists() or not any(settings.ide_worktrees_dir.iterdir())
+
+
+async def test_creer_refuses_a_symlink_that_leads_outside(
+    checkout: Path, tmp_path: Path
+) -> None:
+    dehors = tmp_path / "dehors"
+    dehors.mkdir()
+    settings.ide_worktrees_dir.mkdir(parents=True)
+    try:
+        (settings.ide_worktrees_dir / "demo").symlink_to(dehors, target_is_directory=True)
+    except OSError:
+        pytest.skip("symlinks unavailable on this machine")
+    with pytest.raises(CheminRefuse):
+        await _creer(checkout)
+    assert list(dehors.iterdir()) == []
+
+
+async def test_creer_refuses_a_branch_that_reads_as_an_option(checkout: Path) -> None:
+    with pytest.raises(CheminRefuse):
+        await _creer(checkout, branche="--force")
+
+
+async def test_supprimer_refuses_a_root_outside_the_worktrees_folder(
+    checkout: Path, tmp_path: Path
+) -> None:
+    ailleurs = tmp_path / "ailleurs"
+    ailleurs.mkdir()
+    (ailleurs / "garde.txt").write_text("ne pas effacer", encoding="utf-8")
+    with pytest.raises(CheminRefuse):
+        await supprimer(RunWorktree(racine=ailleurs, projet=ailleurs, branche=BRANCHE), checkout)
+    assert (ailleurs / "garde.txt").exists()

@@ -5,6 +5,7 @@ gone when the request ends), this one is checked out on the ticket branch and
 outlives the request. It is created from `origin/<base>`, resumed when a run
 left it behind clean, and never removed while it holds unsaved work.
 """
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,12 +13,17 @@ from tessera.config import settings
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
 from tessera.services.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
+from tessera.utils.project_id import validate_project_id
 
 _logger = get_logger(__name__)
 
 
 class WorktreeError(GitWorkspaceError):
     """Base class for the errors of a run worktree."""
+
+
+class CheminRefuse(WorktreeError):
+    """An id or a resolved path would put the worktree outside its folder."""
 
 
 class WorktreeOccupe(WorktreeError):
@@ -54,6 +60,31 @@ class RunWorktree:
     racine: Path
     projet: Path
     branche: str
+
+
+_TICKET_ID_RE = re.compile(r"ticket-[0-9]+")
+
+
+def _sous_le_dossier(racine: Path) -> Path:
+    """`racine` resolved, or `CheminRefuse` when it leaves `ide_worktrees_dir`.
+
+    Résolu : un lien symbolique posé dans le dossier des worktrees ne doit pas
+    mener une écriture, ou une suppression, ailleurs sur le disque.
+    """
+    dossier = settings.ide_worktrees_dir.resolve()
+    resolue = racine.resolve()
+    if resolue == dossier or not resolue.is_relative_to(dossier):
+        raise CheminRefuse(f"{racine} n'est pas sous {dossier} : rien n'est écrit ni supprimé.")
+    return resolue
+
+
+def _racine_sure(project_id: str, ticket_id: str) -> Path:
+    """The worktree root of a ticket, built only from validated ids."""
+    if not validate_project_id(project_id):
+        raise CheminRefuse(f"Identifiant de projet refusé : {project_id!r}.")
+    if not _TICKET_ID_RE.fullmatch(ticket_id):
+        raise CheminRefuse(f"Identifiant de ticket refusé : {ticket_id!r}.")
+    return _sous_le_dossier(settings.ide_worktrees_dir / project_id / ticket_id)
 
 
 def retirer_les_liens(racine: Path) -> None:
@@ -122,9 +153,12 @@ async def creer(
 
     The checkout of `depot` is neither read nor moved. Raises `BrancheDejaExtraite`
     when another working tree holds the branch, `WorktreeOccupe` when the folder
-    is there but is not a clean worktree of it. Nothing is ever forced.
+    is there but is not a clean worktree of it, `CheminRefuse` when an id is not
+    valid or the root would leave `ide_worktrees_dir`. Nothing is ever forced.
     """
-    racine = settings.ide_worktrees_dir / project_id / ticket_id
+    racine = _racine_sure(project_id, ticket_id)
+    if branche.startswith("-"):
+        raise CheminRefuse(f"Nom de branche refusé : {branche!r}.")
     projet = await _projet_dans(racine, depot, project_path)
     await run_git(depot, "fetch", "origin", base)
     extraites = await _extraites(depot)
@@ -142,7 +176,9 @@ async def supprimer(wt: RunWorktree, depot: Path) -> None:
     """Remove the worktree, unless it holds unsaved work (`TravailNonSauve`).
 
     Never `--force` on a dirty tree: what was not committed is what nobody saved.
+    A root outside `ide_worktrees_dir` raises `CheminRefuse` before anything is touched.
     """
+    _sous_le_dossier(wt.racine)
     if wt.racine.exists():
         etat = await _etat(wt.racine)
         if etat:
