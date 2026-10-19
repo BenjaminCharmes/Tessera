@@ -70,6 +70,7 @@ local (dépôt nu) :
 ## Critères d'acceptation
 - [ ] Les neuf tests ci-dessus existent et passent
 - [ ] `run_git` n'est pas dupliqué ; les tests existants de `temporary_worktree` et `git_workspace` passent
+- [ ] `creer` refuse un `project_id` ou un `ticket_id` qui n'est pas un identifiant valide (motif de `utils/project_id.py` pour le projet, `ticket-NNN` pour le ticket), et vérifie que la racine résolue reste sous `settings.ide_worktrees_dir`, avant toute écriture ; `supprimer` refait cette vérification avant toute suppression. Des tests couvrent `../x`, un chemin absolu et un lien symbolique qui sort du dossier (audit sécurité du 19/10 22:06 : traversée de chemin CRITICAL sur `racine = settings.ide_worktrees_dir / project_id / ticket_id`)
 - [ ] Le diff ne modifie ni `backend/src/tessera/services/pipeline_stages.py` ni `backend/src/tessera/services/orchestrator.py` : le branchement est le ticket-519
 
 ## Dépendances
