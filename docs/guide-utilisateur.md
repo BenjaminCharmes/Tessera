@@ -772,6 +772,8 @@ Tu es sur l'écran du run (voir [Lire ce qui se passe](#5-lire-ce-qui-se-passe) 
 - **Un ticket avec dépendance manquante** : si un ticket que tu ajoutes dépend d'un autre, celui-ci doit être livré ou dans la file actuelle. Sinon, le run refuse l'ajout et explique quelle dépendance manque.
 - **Une file terminée** : seules les files `en cours` acceptent des ajouts. Quand elle s'arrête, même partiellement approuvée, c'est fini — lance une nouvelle file.
 
+Un ticket inexistant. Les tickets que tu viens de merger sur ta branche de base sont trouvés et acceptés normalement, même si le run n'a pas encore mis à jour son arbre de travail.
+
 ### Si l'ajout échoue
 
 Tu vois le motif : doublon, déjà fait, ou dépendance manquante. Le run n'est pas modifié. Corrige le problème et réessaye.
