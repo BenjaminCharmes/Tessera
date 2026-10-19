@@ -65,6 +65,10 @@ class PipelineRun:
     # pour calculer le diff d'artefacts à la fin de chaque tour (ticket-274).
     # None quand aucun chemin de projet n'est configuré.
     artifact_snapshot: dict[str, str] | None = None
+    # Problèmes de fiches déjà présents avant le premier agent (ticket-526) : un
+    # défaut ancien ne renvoie pas un tour qui n'y touche pas. Valeurs de
+    # `pipeline_tickets._cle`.
+    problemes_tickets_initiaux: frozenset[str] = frozenset()
 
     # --- remis à zéro à chaque tour ---
     round_num: int = 0

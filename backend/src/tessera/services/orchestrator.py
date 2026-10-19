@@ -36,6 +36,7 @@ from tessera.services.pipeline_contraintes import arret_contraintes_hors_propose
 from tessera.services.pipeline_critere_protege import arret_critere_protege
 from tessera.services.pipeline_approbation import suivre_documentation, tete_de_branche
 from tessera.services.pipeline_plan import run_plan
+from tessera.services.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
 from tessera.services.pipeline_text import (
     _compose_feedback,
     _echec_de_tests,
@@ -418,6 +419,7 @@ class Orchestrator:
         if refused is not None:
             return refused
         stages.take_artifact_snapshot(self, run)
+        await relever_etat_initial(self, run)
         await set_status(self, run, TicketStatus.in_progress)
         # Un critère qui exige un fichier que le pipeline refuse aux agents ne
         # sera jamais satisfait : inutile de payer trois tours pour l'apprendre
@@ -571,6 +573,11 @@ class Orchestrator:
         refused = await arret_contraintes_hors_proposees(self, run)
         if refused is not None:
             return refused
+
+        # Une fiche de ticket en défaut (identifiant en double…) renvoie le
+        # tour au producteur avant les tests (ticket-526).
+        if await renvoyer_si_problemes(self, run):
+            return False
 
         # Une suite rouge renvoie au codeur sans passer par la revue :
         # un reviewer n'a pas à arbitrer un fait déjà établi, et l'appel

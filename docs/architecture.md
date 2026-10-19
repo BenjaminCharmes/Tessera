@@ -810,6 +810,20 @@ Un refus de la revue ou du validateur renvoie au codeur comme d'habitude : cette
 
 L'événement `run_resumed_from_existing_work` (ticket, commits repris, verdict des tests) est émis et tracé dans `pipeline-log.md`.
 
+### Vérification des identifiants de tickets en double (ticket-526)
+
+Après chaque tour de production (codeur ou architecte) et avant les tests, le pipeline appelle `verifier_tickets()` pour vérifier l'intégrité des tickets du projet :
+- Aucun identifiant n'est dupliqué
+- Les statuts de frontmatter (todo, in-progress, done, etc.) correspondent aux dossiers
+- Les valeurs de frontmatter sont valides
+
+Si un problème est détecté (doublon, statut incohérent, frontmatter invalide) :
+- Le tour est renvoyé au producteur sans progression dans le pipeline
+- Le contexte affiche la liste des problèmes (comme des tests échoués)
+- Une ligne de journal `[ticket-XXX] tickets: <n> problème(s) — <détail court>` s'écrit dans `pipeline-log.md`
+
+Le producteur corrige les fiches (fusion de doublons, suppression des fiches remplacées) et relance le tour. Cette vérification porte uniquement sur le diff du run, pas sur l'historique du projet : un ancien doublon hors du diff courant ne bloque pas.
+
 ## Protection des fichiers sensibles et validation pré-run
 
 Certains fichiers sont critiques pour le fonctionnement de l'IDE et ne peuvent jamais être modifiés par les agents : `CLAUDE.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/` (et `CLAUDE.local.md`).

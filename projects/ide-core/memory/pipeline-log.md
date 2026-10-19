@@ -4018,3 +4018,19 @@ Points posit (58359ms)
 - 2026-10-19 19:58:52 UTC — [ticket-518] validateur: APPROVED — Le diff implémente une borne de durée totale par appel pour les rôles texte (val (341328ms)
 - 2026-10-19 19:58:52 UTC — [ticket-518] APPROVED après 2 tour(s)
 - 2026-10-19 20:01:54 UTC — [ticket-518] documentation: 2 fichier(s) (177266ms)
+- 2026-10-19 20:02:14 UTC — [ide-core] ticket-518 PR #575 confiée au CIWatcher
+- 2026-10-19 20:02:18 UTC — [ticket-526] branche ticket-526-a-run-whose-diff-leaves-two-ticket-files-with-the
+- 2026-10-19 20:02:18 UTC — [ticket-526] tour 1 — codeur démarré
+- 2026-10-19 20:06:33 UTC — [ticket-526] tour 1 — codeur terminé (254500ms)
+- 2026-10-19 20:08:07 UTC — [ide-core] ticket-518 PR #575 mergée (CI verte)
+- 2026-10-19 20:10:13 UTC — [ticket-526] branche ticket-526-a-run-whose-diff-leaves-two-ticket-files-with-the
+- 2026-10-19 20:17:27 UTC — [ticket-526] testeur: OK (exit 0)
+- 2026-10-19 20:17:27 UTC — [ticket-526] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-19 20:20:04 UTC — [ticket-526] securite: PASS — Audit sécurité complet du diff ticket-526. Code de vérification de fiches bien c (155484ms)
+- 2026-10-19 20:20:04 UTC — [ticket-526] tour 1 — reviewer démarré
+- 2026-10-19 20:20:28 UTC — [ticket-526] tour 1 — reviewer terminé (23593ms)
+- 2026-10-19 20:20:34 UTC — [ticket-526] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-19 20:21:05 UTC — [ticket-526] validateur: fichiers cités joints : agents/prompts/architect.md
+- 2026-10-19 20:21:05 UTC — [ticket-526] validateur: APPROVED — Tous les critères sont satisfaits. Les tests couvrent les deux cas (doublon renv (61328ms)
+- 2026-10-19 20:21:05 UTC — [ticket-526] APPROVED après 1 tour(s)
+- 2026-10-19 20:23:43 UTC — [ticket-526] documentation: 1 fichier(s) (143781ms)
