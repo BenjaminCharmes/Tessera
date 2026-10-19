@@ -1,14 +1,15 @@
 ---
-id: ticket-527
-title: "A pull request head that still shows the previous commit is read again for a short while before the merge is refused"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-527
+pr_number: 577
+priority: high
+status: done
+title: A pull request head that still shows the previous commit is read again for
+  a short while before the merge is refused
+type: fix
 ---
 
 # ticket-527 — Une tête de PR lue trop tôt est relue avant de refuser le merge

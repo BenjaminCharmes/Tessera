@@ -33,7 +33,7 @@ def _tete(valeur: str | None) -> ControleTete:
     async def lire(pr_number: int) -> str | None:
         return valeur
 
-    return ControleTete(pushed_sha=_SHA_POUSSE, lire_tete=lire)
+    return ControleTete(pushed_sha=_SHA_POUSSE, lire_tete=lire, intervalle_s=0.0)
 
 
 async def _surveiller(
@@ -116,7 +116,7 @@ async def test_updated_pushed_sha_after_pipeline_rebase_merges() -> None:
     async def lire(pr_number: int) -> str | None:
         return _SHA_REBASE
 
-    ancien = ControleTete(pushed_sha=_SHA_POUSSE, lire_tete=lire)
+    ancien = ControleTete(pushed_sha=_SHA_POUSSE, lire_tete=lire, intervalle_s=0.0)
     merge_avant, _, _ = await _surveiller(ancien)
     assert merge_avant is False
 

@@ -999,6 +999,16 @@ Le CIWatcher vérifie que la PR à merger contient le commit réel qui a été p
 
 Lors du clonage, `git_clone.py` rétablit un refspec complet (`+refs/heads/*:refs/remotes/origin/*`) pour éviter ce problème. Un dépôt dont le refspec reste réduit est signalé dans les logs du backend avec son projet en cause.
 
+#### Relecture avec fenêtre de grâce pour décalage GitHub (ticket-527)
+
+Quand l'API GitHub signale une tête de PR différente du commit que le pipeline vient de pousser, il est possible que la lecture soit simplement en retard : GitHub n'a pas encore propagé le push au-delà de quelques secondes. Pour éviter de refuser prématurément une PR valide, le `CIWatcher` vérifie si la tête lue est un ancêtre du commit poussé.
+
+- **Cas 1 : la tête lue est un ancêtre du commit poussé** — c'est un retard normal. Le contrôle relira la tête jusqu'à 5 fois sur une fenêtre courte (60 s par défaut, réglable). Si à la fin de la fenêtre la tête est devenue le commit poussé, aucun refus. Si elle est restée différente, le merge est refusé avec le même message qu'avant : la PR ne peut pas avancer si la tête ne correspond pas.
+- **Cas 2 : la tête lue n'est pas un ancêtre du commit poussé** — quelqu'un a changé la cible. Le refus est immédiat, sans relecture.
+- **Cas 3 : l'ascendance ne peut pas être vérifiée** (erreur du clone, repo corrompu) — par prudence, le contrôle relira quand même pendant la fenêtre, puis refusera si la vérification reste impossible.
+
+Aucune relecture n'enchaîne un merge : elle retarde seulement le refus, et reste fermée (ADR-039) — une tête différente ne peut pas s'approuver.
+
 ### Garanties de la phase 2 (ticket-328)
 
 La phase 2 opère en arrière-plan, sans intervention humaine jusqu'au verdict final.

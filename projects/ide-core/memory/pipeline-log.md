@@ -4034,3 +4034,16 @@ Points posit (58359ms)
 - 2026-10-19 20:21:05 UTC — [ticket-526] validateur: APPROVED — Tous les critères sont satisfaits. Les tests couvrent les deux cas (doublon renv (61328ms)
 - 2026-10-19 20:21:05 UTC — [ticket-526] APPROVED après 1 tour(s)
 - 2026-10-19 20:23:43 UTC — [ticket-526] documentation: 1 fichier(s) (143781ms)
+- 2026-10-19 20:24:01 UTC — [ide-core] ticket-526 PR #576 confiée au CIWatcher
+- 2026-10-19 20:24:05 UTC — [ticket-527] branche ticket-527-a-pull-request-head-that-still-shows-the-previous
+- 2026-10-19 20:24:05 UTC — [ticket-527] tour 1 — codeur démarré
+- 2026-10-19 20:26:09 UTC — [ticket-527] tour 1 — codeur terminé (124235ms)
+- 2026-10-19 20:29:18 UTC — [ide-core] ticket-526 PR #576 mergée (CI verte)
+- 2026-10-19 20:32:45 UTC — [ticket-527] testeur: OK (exit 0)
+- 2026-10-19 20:35:18 UTC — [ticket-527] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente une vérification git sécurisée (152625ms)
+- 2026-10-19 20:35:18 UTC — [ticket-527] tour 1 — reviewer démarré
+- 2026-10-19 20:35:47 UTC — [ticket-527] tour 1 — reviewer terminé (29375ms)
+- 2026-10-19 20:39:54 UTC — [ticket-527] validateur: fichiers cités joints : ci_watcher.py (tronqué)
+- 2026-10-19 20:39:54 UTC — [ticket-527] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (275985ms)
+- 2026-10-19 20:39:54 UTC — [ticket-527] APPROVED après 1 tour(s)
+- 2026-10-19 20:42:37 UTC — [ticket-527] documentation: 2 fichier(s) (157688ms)

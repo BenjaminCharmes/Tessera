@@ -1157,6 +1157,9 @@ Entre le moment où tu approuves et le moment du merge, la branche du ticket peu
 
 Ce verrouillage garantit que tes approbations restent valides jusqu'au merge.
 
+
+Tessera retente plusieurs fois de lire la tête de la PR avant de conclure qu'elle a changé — c'est une protection contre les retards de l'API GitHub, qui peut prendre quelques secondes pour enregistrer un push. La plupart du temps, tout rentre dans l'ordre pendant cette fenêtre de relecture, et la PR se merge automatiquement. Seul un vrai changement de branche — quelqu'un a poussé un commit différent — refuse le merge immédiatement.
+
 ### Continuité après un redémarrage du backend
 
 Après un redémarrage du backend, ta PR approuvée continue d'être surveillée automatiquement. Si la CI devient verte, le merge s'enchaîne sans intervention. Si la PR a déjà été mergée pendant l'interruption, le ticket passe automatiquement en `done`.
