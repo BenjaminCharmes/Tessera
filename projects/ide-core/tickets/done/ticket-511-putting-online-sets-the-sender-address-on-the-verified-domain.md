@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-511
-pr_number: null
+pr_number: 554
 priority: high
 status: done
 title: Putting a project online sets the e-mail sender address on its verified Resend
