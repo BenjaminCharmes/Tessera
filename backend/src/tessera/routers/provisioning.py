@@ -80,6 +80,7 @@ def _build(
         # Vercel déploie la branche de base du projet, celle de sa politique de run.
         politique = PolitiqueRun.lire(Path(project.path))
         setup.context.base_branch = politique.base_branch or settings.github_base_branch
+        setup.context.project_name = project.name
         return setup
     except Exception as erreur:
         # Ni message ni trace : la construction lit les jetons.

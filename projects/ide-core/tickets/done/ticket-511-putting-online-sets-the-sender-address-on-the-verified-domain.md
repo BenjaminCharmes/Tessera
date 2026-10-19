@@ -1,14 +1,15 @@
 ---
-id: ticket-511
-title: "Putting a project online sets the e-mail sender address on its verified Resend domain"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-511
+pr_number: 554
+priority: high
+status: done
+title: Putting a project online sets the e-mail sender address on its verified Resend
+  domain
+type: fix
 ---
 
 # ticket-511 — La mise en ligne pose l'adresse d'expéditeur sur le domaine Resend vérifié

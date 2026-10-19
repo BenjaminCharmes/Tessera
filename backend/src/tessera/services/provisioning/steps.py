@@ -73,6 +73,8 @@ class ProvisioningContext:
     github_remote: Optional[str] = None
     #: Branche que Vercel déploie en production ; vide : celle des réglages.
     base_branch: str = ""
+    #: Nom affiché du projet (``Project.name``) ; vide : l'identifiant du projet.
+    project_name: str = ""
     wanted_dns: list[DnsRecord] = field(default_factory=list)
     changed_env: set[str] = field(default_factory=set)
     dns_published: bool = False
