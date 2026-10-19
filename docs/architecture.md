@@ -367,6 +367,14 @@ Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR 
 
 `adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
 
+### Contraintes proposées (ticket-493)
+
+Les règles communes à tous les agents (`memory/contraintes.md`) sont injectées réduites au rôle dans chaque appel. Depuis le ticket-493, tout run qui doit proposer une nouvelle règle ne peut l'écrire que dans la section `## Proposées` en tête du fichier. Cette section n'est jamais injectée : seul le reste du fichier l'est dans les contextes des agents.
+
+Une règle proposée n'influe donc jamais sur les agents suivants tant qu'un humain ne l'a pas acceptée — ce qui consiste simplement à la déplacer de `## Proposées` à sa section permanente. Le merge de ce déplacement suit le flux normal de livraison.
+
+Un diff qui tenterait de modifier `memory/contraintes.md` en dehors de la section proposée met le run en `blocked` à la fin du tour du codeur, avec la raison affichée. Les prompts `architect.md` et `codeur.md` précisent : « une règle nouvelle s'écrit sous `## Proposées` ». Ce mécanisme protège les consignes partagées : elles ne changent que par un acte humain volontaire, même sur un projet en `autonomy: merge`.
+
 ### Système visuel du frontend (ADR-026)
 
 `frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :
