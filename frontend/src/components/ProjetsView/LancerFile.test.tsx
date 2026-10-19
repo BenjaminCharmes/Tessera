@@ -30,6 +30,7 @@ function projet(extra: Partial<ProjectOverview> = {}): ProjectOverview {
     icon: false,
     services_declares: false,
     services_en_cours: false,
+    online_declared: false,
     ...extra,
   };
 }

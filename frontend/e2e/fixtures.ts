@@ -85,6 +85,7 @@ async function setupApiMocks(page: Page) {
         icon: false,
         services_declares: false,
         services_en_cours: false,
+        online_declared: false,
       })),
     });
   });

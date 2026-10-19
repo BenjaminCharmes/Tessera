@@ -27,6 +27,7 @@ import type {
   RunRequest,
   RunEvent,
   ServiceActif,
+  EtapeMiseEnLigne,
   ProjectCreationResult,
   TemplateCreationResult,
   PipelineRun,
@@ -191,6 +192,14 @@ export const api = {
     /** Arrête une app de l'inventaire courant ; 404 pour tout autre pid. */
     stopRunning: (pid: number): Promise<{ pid: number; arretes: number }> =>
       post(`/services/running/${pid}/stop`, {}),
+  },
+  provisioning: {
+    /** L'état de chaque étape, lu sans rien écrire — ticket-472. */
+    read: (projectId: string): Promise<EtapeMiseEnLigne[]> =>
+      request(`/projects/${projectId}/provision`),
+    /** Lance la mise en ligne ; 409 si une autre tourne déjà, 422 si le bloc est invalide. */
+    start: (projectId: string): Promise<{ project_id: string; steps: string[] }> =>
+      post(`/projects/${projectId}/provision`, {}),
   },
   runs: {
     list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>

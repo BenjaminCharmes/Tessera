@@ -5,6 +5,7 @@ import { withTokenQuery } from "../../lib/auth";
 import { lienDuDepot } from "../../lib/lienDuDepot";
 import type { ProjectOverview } from "../../types/api";
 import { dateExacte, ilYa } from "./dates";
+import BoutonMiseEnLigne from "../MiseEnLigne/BoutonMiseEnLigne";
 import BoutonServices from "./BoutonServices";
 import LancerFile from "./LancerFile";
 import MenuCategorie from "./MenuCategorie";
@@ -181,7 +182,10 @@ export default function ProjetCarte({
         <Dates projet={projet} />
         <div className="flex min-h-6 items-center justify-between gap-2">
           <Compteurs projet={projet} />
-          <BoutonServices projet={projet} onChange={onServicesChange} />
+          <div className="flex items-start gap-1.5">
+            <BoutonMiseEnLigne projet={projet} />
+            <BoutonServices projet={projet} onChange={onServicesChange} />
+          </div>
         </div>
         <LancerFile projet={projet} onLancee={onFileLancee} />
       </div>

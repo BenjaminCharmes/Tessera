@@ -3783,3 +3783,9 @@ Points posit (58359ms)
 - 2026-10-19 11:36:22 UTC — [ticket-508] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie le comportement  (161110ms)
 - 2026-10-19 11:36:22 UTC — [ticket-508] APPROVED après 1 tour(s)
 - 2026-10-19 11:38:20 UTC — [ticket-508] documentation: 0 fichier(s) (113421ms)
+- 2026-10-19 11:38:37 UTC — [ide-core] ticket-508 PR #549 confiée au CIWatcher
+- 2026-10-19 11:38:41 UTC — [ticket-472] branche ticket-472-a-project-that-declares-online-resources-gets-a-p
+- 2026-10-19 11:38:42 UTC — [ticket-472] tour 1 — codeur démarré
+- 2026-10-19 11:43:33 UTC — [ide-core] ticket-508 PR #549 mergée (CI verte)
+- 2026-10-19 11:47:19 UTC — [ticket-472] tour 1 — codeur terminé (517000ms)
+- 2026-10-19 11:56:10 UTC — [ticket-472] testeur: OK (exit 0)

@@ -17,6 +17,7 @@ from pydantic import BaseModel
 
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
+from tessera.services.online_declaration import StripeMode, read_online_declaration
 from tessera.services.ticket_service import _STATUS_DIRS
 from tessera.utils.logger import get_logger
 
@@ -74,6 +75,10 @@ class ProjectOverview(BaseModel):
     icon: bool = False
     services_declares: bool = False
     services_en_cours: bool = False
+    #: `agents.json` déclare un bloc `online` (ticket-472) : la carte offre « Mettre en ligne ».
+    online_declared: bool = False
+    online_domain: str | None = None
+    online_stripe_mode: StripeMode | None = None
     avertissements: list[str] = []
 
 
@@ -248,6 +253,7 @@ async def build_overview(
     lisent à chaque appel : ils bougent sans toucher ni le dépôt ni les
     tickets, le cache ne doit donc pas les figer."""
     calcul = await _calcul_en_cache(project.path)
+    online = read_online_declaration(project.path)
     return ProjectOverview(
         id=project.id,
         name=project.name,
@@ -261,5 +267,8 @@ async def build_overview(
         icon=find_icon(project.path) is not None,
         services_declares=services_declares,
         services_en_cours=services_en_cours,
+        online_declared=online.declared,
+        online_domain=online.domain,
+        online_stripe_mode=online.stripe_mode,
         avertissements=list(project.avertissements),
     )
