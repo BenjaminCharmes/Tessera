@@ -11,6 +11,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
+from tessera.services.run_worktree_populate import retirer_les_liens
 from tessera.services.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
 from tessera.utils.project_id import validate_project_id
@@ -53,6 +54,15 @@ class TravailNonSauve(WorktreeError):
         self.etat = etat
 
 
+class LienPersistant(WorktreeError):
+    """A link survived `retirer_les_liens`; nothing is deleted (ticket-523)."""
+
+    def __init__(self, racine: Path, liens: list[Path]) -> None:
+        noms = ", ".join(str(lien) for lien in liens)
+        super().__init__(f"Le worktree {racine} garde des liens, rien n'est effacé : {noms}")
+        self.liens = liens
+
+
 @dataclass(frozen=True)
 class RunWorktree:
     """Where a run works: the worktree root, the project inside it, the branch."""
@@ -85,10 +95,6 @@ def _racine_sure(project_id: str, ticket_id: str) -> Path:
     if not _TICKET_ID_RE.fullmatch(ticket_id):
         raise CheminRefuse(f"Identifiant de ticket refusé : {ticket_id!r}.")
     return _sous_le_dossier(settings.ide_worktrees_dir / project_id / ticket_id)
-
-
-def retirer_les_liens(racine: Path) -> None:
-    """Extension point of ticket-523: unlink what `populate` linked, before any removal."""
 
 
 async def _extraites(depot: Path) -> dict[str, Path]:
@@ -177,13 +183,17 @@ async def supprimer(wt: RunWorktree, depot: Path) -> None:
 
     Never `--force` on a dirty tree: what was not committed is what nobody saved.
     A root outside `ide_worktrees_dir` raises `CheminRefuse` before anything is touched.
+    The links come off first, before the status and before any removal: a deletion
+    must never reach the inside of one. A link that stays raises `LienPersistant`.
     """
     _sous_le_dossier(wt.racine)
     if wt.racine.exists():
+        restants = retirer_les_liens(wt.racine)
+        if restants:
+            raise LienPersistant(wt.racine, restants)
         etat = await _etat(wt.racine)
         if etat:
             raise TravailNonSauve(wt.racine, etat)
-        retirer_les_liens(wt.racine)
         await run_git(depot, "worktree", "remove", str(wt.racine))
     # Efface aussi l'enregistrement d'un worktree dont le dossier a disparu.
     await run_git(depot, "worktree", "prune")

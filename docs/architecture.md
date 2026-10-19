@@ -319,6 +319,14 @@ Validation à la lecture :
 
 Aucun comportement de run ne change : les tickets 522 et 523 consommeront cette valeur.
 
+#### Peuplement et suppression sécurisée des liens (ticket-523)
+
+Un worktree neuf est peuplé avant tout lancement : ses entrées déclarées (fichiers et dossiers) sont copiées depuis le checkout, ou liées si la configuration l'exige. Les liens sont des jonctions Windows ou symboliques ailleurs. Un lien sur un chemin suivi par git est refusé et journalisé.
+
+**Protection contre la suppression de liens traversés** : avant tout `worktree remove` ou `rmtree`, une étape retire chaque jonction et lien sans jamais en traverser l'intérieur — cela évite le bug du 14/10 où une jonction vidait le `node_modules` du dépôt principal. Sous Windows, la détection s'appuie sur l'attribut de point d'analyse (`st_file_attributes`). Si un lien subsiste après, la suppression du worktree s'arrête sans effacer le reste.
+
+Implémentation : `services/run_worktree_populate.py` (ticket-523, ADR-056).
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
