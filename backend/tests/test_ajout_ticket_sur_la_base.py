@@ -177,10 +177,39 @@ def test_appending_leaves_the_run_tree_and_branches_untouched(
     assert not (depot_du_run / _NOUVEAU).exists()
 
 
-async def test_the_reader_needs_a_declared_base(depot_du_run: Path) -> None:
+async def test_the_reader_falls_back_on_the_settings_base_without_a_declared_one(
+    depot_du_run: Path,
+) -> None:
+    # ticket-508 : ide-core ne déclare pas `base_branch`, la livraison retombe
+    # sur `settings.github_base_branch` et le lecteur aussi.
+    assert settings.github_base_branch == "develop"
     sans_base = GitWorkspaceService(depot_du_run, politique=PolitiqueRun())
 
-    assert await sans_base.lire_ticket_sur_la_base("ticket-503") is None
+    lu = await sans_base.lire_ticket_sur_la_base("ticket-503")
+
+    assert lu is not None
+    assert lu[0] == _NOUVEAU
+
+
+async def test_the_reader_without_any_policy_uses_the_settings_base(
+    depot_du_run: Path,
+) -> None:
+    espace = GitWorkspaceService(depot_du_run)
+
+    assert await espace.lire_ticket_sur_la_base("ticket-503") is not None
+
+
+async def test_a_declared_base_wins_over_the_settings_base(
+    depot_du_run: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "github_base_branch", "branche-inexistante")
+    declaree = GitWorkspaceService(
+        depot_du_run, politique=PolitiqueRun(base_branch="develop")
+    )
+    repli = GitWorkspaceService(depot_du_run, politique=PolitiqueRun())
+
+    assert await declaree.lire_ticket_sur_la_base("ticket-503") is not None
+    assert await repli.lire_ticket_sur_la_base("ticket-503") is None
 
 
 async def test_the_reader_matches_the_id_strictly(depot_du_run: Path) -> None:

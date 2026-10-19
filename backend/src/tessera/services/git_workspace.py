@@ -13,6 +13,7 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.config import settings
 from tessera.services import journal_en_attente
 from tessera.services.git_attributes import declare_union_merge
 from tessera.services.prisma_conflits import fusionner_ajouts, planifier_renumerotation
@@ -654,16 +655,16 @@ class GitWorkspaceService:
     async def lire_ticket_sur_la_base(self, ticket_id: str) -> tuple[str, str] | None:
         """Read a ticket file from ``origin/<base>`` without touching the tree.
 
-        Returns ``(path from the repository root, content)``, or None when no
-        base is declared, the fetch fails, or the base holds no such ticket
-        (ticket-504). Read-only on purpose: no checkout, no ``update-ref``, no
-        file written. ``--no-write-fetch-head`` keeps a concurrent fetch from
-        overwriting the ``FETCH_HEAD`` that ``initialiser_base_ref`` reads right
-        after its own.
+        Returns ``(path from the repository root, content)``, or None when the
+        fetch fails or the base holds no such ticket (ticket-504). The base is
+        the declared ``base_branch``, else ``settings.github_base_branch`` — the
+        same fallback as the delivery (ticket-508). Read-only on purpose: no
+        checkout, no ``update-ref``, no file written. ``--no-write-fetch-head``
+        keeps a concurrent fetch from overwriting the ``FETCH_HEAD`` that
+        ``initialiser_base_ref`` reads right after its own.
         """
-        base = self._politique.base_branch if self._politique is not None else None
-        if not base:
-            return None
+        declaree = self._politique.base_branch if self._politique is not None else None
+        base = declaree or settings.github_base_branch
         try:
             await self._run("fetch", "--no-write-fetch-head", "origin", base)
             prefix = (await self._run("rev-parse", "--show-prefix")).strip()
