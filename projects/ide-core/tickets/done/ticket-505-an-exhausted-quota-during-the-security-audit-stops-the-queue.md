@@ -1,14 +1,15 @@
 ---
-id: ticket-505
-title: "An exhausted quota during the security audit stops the queue as a quota stop, not as a blocked ticket"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-505
+pr_number: 537
+priority: high
+status: done
+title: An exhausted quota during the security audit stops the queue as a quota stop,
+  not as a blocked ticket
+type: fix
 ---
 
 # ticket-505 — Un quota épuisé pendant l'audit est un arrêt de quota, pas un ticket bloqué

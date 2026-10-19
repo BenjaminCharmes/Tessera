@@ -3660,3 +3660,15 @@ Points posit (58359ms)
 - 2026-10-19 07:30:19 UTC — [ticket-503] tour 3 — reviewer terminé (25204ms)
 - 2026-10-19 07:30:19 UTC — [ticket-503] APPROVED après 3 tour(s)
 - 2026-10-19 07:32:47 UTC — [ticket-503] documentation: 0 fichier(s) (139875ms)
+- 2026-10-19 07:33:08 UTC — [ide-core] ticket-503 PR #536 confiée au CIWatcher
+- 2026-10-19 07:33:13 UTC — [ticket-505] branche ticket-505-an-exhausted-quota-during-the-security-audit-stop
+- 2026-10-19 07:33:13 UTC — [ticket-505] tour 1 — codeur démarré
+- 2026-10-19 07:37:36 UTC — [ticket-505] tour 1 — codeur terminé (262655ms)
+- 2026-10-19 07:37:51 UTC — [ide-core] ticket-503 PR #536 mergée (CI verte)
+- 2026-10-19 07:45:23 UTC — [ticket-505] testeur: OK (exit 0)
+- 2026-10-19 07:48:18 UTC — [ticket-505] securite: PASS — Le diff améliore correctement la détection des quotas d'API épuisés sans introdu (174500ms)
+- 2026-10-19 07:48:18 UTC — [ticket-505] tour 1 — reviewer démarré
+- 2026-10-19 07:48:51 UTC — [ticket-505] tour 1 — reviewer terminé (32750ms)
+- 2026-10-19 07:50:57 UTC — [ticket-505] validateur: APPROVED — Les tests ont été implémentés et couvrent correctement les quatre critères d'acc (159125ms)
+- 2026-10-19 07:50:57 UTC — [ticket-505] APPROVED après 1 tour(s)
+- 2026-10-19 07:53:36 UTC — [ticket-505] documentation: 2 fichier(s) (153188ms)

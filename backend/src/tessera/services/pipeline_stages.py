@@ -36,6 +36,7 @@ from tessera.services.pipeline_rangement import ranger_les_bloques_livres
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
+from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.services.security_auditor import SecurityAuditResult
 from tessera.services.validator_cited_files import format_cited_files_log
 from tessera.utils.logger import get_logger
@@ -598,6 +599,17 @@ async def run_tests(
 # ------------------------------------------------------------------
 
 
+def _quota_epuise(orch: "Orchestrator", exc: BaseException) -> bool:
+    """True when ``exc`` is an exhausted quota, read with the last snapshot.
+
+    Such an exception must reach `run_pipeline`, which ends the run as a quota
+    stop (ticket-498) ; any other failure keeps the closed-fail verdict.
+    """
+    # `getattr` : les doubles d'orchestrateur des tests d'étape n'ont pas de quota.
+    tracker = getattr(orch, "quota", None)
+    return is_quota_exhausted(exc, tracker.snapshot if tracker is not None else None)
+
+
 async def run_security_audit(
     orch: "Orchestrator", run: PipelineRun
 ) -> Optional[PipelineResult]:
@@ -616,6 +628,8 @@ async def run_security_audit(
             code_diff=run.reviewed_code, project_path=orch._project_path
         )
     except Exception as exc:
+        if _quota_epuise(orch, exc):
+            raise
         _logger.warning("security_auditor_failed", extra={"error": str(exc)})
         reason = f"Audit sécurité en panne : {exc}"
         audit = SecurityAuditResult(
@@ -756,6 +770,8 @@ async def run_validation(
             **extra,
         )
     except Exception as exc:
+        if _quota_epuise(orch, exc):
+            raise
         # Échoue fermé, comme l'audit : une validation qui n'a pas eu lieu
         # n'approuve rien (ticket-122).
         _logger.warning("validator_failed", extra={"error": str(exc)})

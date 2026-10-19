@@ -611,6 +611,11 @@ Si l'appel avec outils épuise le budget avant de rendre un verdict, `SecurityAu
 
 Cette approche empêche un gros diff de bloquer la file sur une limite de tours : l'audit conclut avec ce qu'il a lu, ou revient à sa forme minimale.
 
+
+#### Quota épuisé pendant l'audit
+
+Quand une exception de quota épuisé est levée pendant l'audit de sécurité, celle-ci n'est pas convertie en verdict fermé (`BLOCK`, ADR-039), mais remontée comme arrêt de quota : le run s'arrête, le ticket est remis en `todo`, et la file s'interrompt pour reprendre ultérieurement (ticket-498, ticket-505). Le même traitement s'applique au validateur.
+
 ### Résultats des tests et extraction d'erreurs (ticket-393)
 
 Quand les tests échouent, `test_runner.py` extrait :

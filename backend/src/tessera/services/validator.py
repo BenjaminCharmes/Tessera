@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Literal, TYPE_CHECKING
 
 from tessera.services.providers.base import LLMProvider
+from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.services.validator_cited_files import (
     CitedFilesReport,
     build_cited_files_section,
@@ -119,6 +120,10 @@ class ValidatorService:
             # Same policy as unreadable JSON: a validation that did not happen
             # must not approve anything (ticket-122).
             _logger.warning("validator_llm_failed", extra={"error": str(exc)})
+            # Un quota épuisé n'est pas un verdict : l'orchestrateur le traite
+            # comme un arrêt de quota (ticket-505).
+            if is_quota_exhausted(exc, None):
+                raise
             return ValidationResult(
                 all_passed=False,
                 criteria=[],
