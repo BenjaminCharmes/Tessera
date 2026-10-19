@@ -6,7 +6,7 @@ depends_on:
 - ticket-522
 estimated_days: 0.75
 id: ticket-523
-pr_number: null
+pr_number: 583
 priority: medium
 status: done
 title: A worktree is populated from its declared entries and its links are removed
