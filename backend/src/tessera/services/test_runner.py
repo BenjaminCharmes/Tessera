@@ -168,6 +168,11 @@ class TestRunnerService:
                 return await asyncio.create_subprocess_exec(
                     *tentative,
                     cwd=dossier,
+                    # Entrée fermée : une commande de test n'est jamais
+                    # interactive, et l'entrée héritée du backend (console
+                    # Windows) laissait un postinstall attendre une saisie
+                    # sans fin (ticket-512).
+                    stdin=asyncio.subprocess.DEVNULL,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                     # Unix : l'étape chef de son groupe, pour tuer son arbre

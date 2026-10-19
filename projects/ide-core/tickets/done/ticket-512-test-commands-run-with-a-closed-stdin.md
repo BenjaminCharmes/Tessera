@@ -1,14 +1,15 @@
 ---
-id: ticket-512
-title: "Test commands run with a closed stdin, so no tool can wait for input from the backend's console"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-512
+pr_number: 560
+priority: high
+status: done
+title: Test commands run with a closed stdin, so no tool can wait for input from the
+  backend's console
+type: fix
 ---
 
 # ticket-512 — Les commandes de test tournent avec une entrée standard fermée
