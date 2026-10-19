@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-504
 plan: true
-pr_number: null
+pr_number: 539
 priority: medium
 status: done
 title: A ticket merged into the base branch while a queue runs can be appended to
