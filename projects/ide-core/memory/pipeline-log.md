@@ -3907,3 +3907,15 @@ Points posit (58359ms)
 - 2026-10-19 16:56:39 UTC — [ticket-514] validateur: APPROVED — Ticket-514 complètement satisfait. Le codeur a implémenté la mesure de durée pou (23828ms)
 - 2026-10-19 16:56:39 UTC — [ticket-514] APPROVED après 2 tour(s)
 - 2026-10-19 16:58:16 UTC — [ticket-514] documentation: 1 fichier(s) (92593ms)
+- 2026-10-19 16:58:35 UTC — [ide-core] ticket-514 PR #565 confiée au CIWatcher
+- 2026-10-19 16:58:39 UTC — [ticket-513] branche ticket-513-a-ticket-not-yet-started-can-be-removed-from-a-ru
+- 2026-10-19 16:58:39 UTC — [ticket-513] tour 1 — codeur démarré
+- 2026-10-19 17:00:56 UTC — [ticket-513] tour 1 — codeur terminé (137313ms)
+- 2026-10-19 17:03:37 UTC — [ide-core] ticket-514 PR #565 mergée (CI verte)
+- 2026-10-19 17:08:14 UTC — [ticket-513] testeur: OK (exit 0)
+- 2026-10-19 17:11:24 UTC — [ticket-513] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code introduit un nouvel endp (190266ms)
+- 2026-10-19 17:11:24 UTC — [ticket-513] tour 1 — reviewer démarré
+- 2026-10-19 17:12:02 UTC — [ticket-513] tour 1 — reviewer terminé (37811ms)
+- 2026-10-19 17:12:31 UTC — [ticket-513] validateur: fichiers cités joints : file_vivante.py, docs/api.md (tronqué)
+- 2026-10-19 17:12:31 UTC — [ticket-513] validateur: APPROVED — Tous les critères sont satisfaits. L'implémentation de `FileVivante.retirer()` e (66328ms)
+- 2026-10-19 17:12:31 UTC — [ticket-513] APPROVED après 1 tour(s)
