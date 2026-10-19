@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 1
 id: ticket-510
-pr_number: null
+pr_number: 556
 priority: medium
 status: done
 title: Pull requests left to the CI watcher are watched again after a backend restart
