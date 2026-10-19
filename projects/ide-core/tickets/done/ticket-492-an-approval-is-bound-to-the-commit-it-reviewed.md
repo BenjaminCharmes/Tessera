@@ -1,14 +1,15 @@
 ---
-id: ticket-492
-title: "An approval is bound to the commit it reviewed, and nothing else gets merged under it"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
-created: 2026-10-16
+id: ticket-492
+pr_number: 540
+priority: medium
+status: done
+title: An approval is bound to the commit it reviewed, and nothing else gets merged
+  under it
+type: feat
 ---
 
 # ticket-492 — Une approbation vaut pour un commit précis
@@ -47,6 +48,8 @@ n'est jamais mergée seule), pas les autres cas.
 - Ne relance pas une relecture automatique : un run bloqué pour cette raison
   se relit par un nouveau run, ou à la main.
 - Ne touche pas au résolveur de conflit (ADR-033), déjà couvert.
+- Une PR retrouvée après une erreur de transport (`pr_orpheline`) n'a pas de
+  `pushed_sha` : elle ne se merge plus seule (échec fermé, ADR-039).
 
 ## Critères d'acceptation
 

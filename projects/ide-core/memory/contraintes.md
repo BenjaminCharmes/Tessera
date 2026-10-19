@@ -43,6 +43,14 @@ son ADR source. La justification et l'histoire complète vivent dans
 - **Déclarer le niveau d'autonomie dans `agents.json`** (`autonomy:
   commit | pr | merge`, défaut : `commit`). Le merge n'intervient que sur
   CI verte — sauf `merge_without_ci: true`. (ADR-029, ADR-045)
+- **Une approbation vaut pour un commit précis.** `approved_sha` se note à
+  l'approbation ; avant le push, seuls des commits de rangement du pipeline
+  (`tickets/**`, `memory/pipeline-log.md`) peuvent le suivre, sinon le run est
+  `blocked` sans push. `CIWatcher` ne merge pas une PR dont la tête n'est plus
+  `pushed_sha` : ticket `blocked`, PR ouverte. La tête se relit après le
+  verdict de la CI, et le merge est lié à `pushed_sha` (champ `sha` de l'API
+  GitHub). Un SHA inconnu refuse aussi.
+  (ticket-492, ADR-039)
 - **Un run non approuvé ne se livre jamais.** Les exceptions de livraison
   restent dans `Livraison.arret` et ne font pas échouer le run. (ADR-030)
 - **Sur un conflit de rebase, `resolveur-conflit` tente.** Une résolution

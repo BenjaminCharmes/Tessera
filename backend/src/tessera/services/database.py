@@ -150,6 +150,11 @@ CREATE INDEX IF NOT EXISTS idx_ac_run_created
     pr_url     TEXT NOT NULL,
     PRIMARY KEY (repo, pr_number)
 );""",
+    # 8 — ticket-492 : le commit que le reviewer et le validateur ont lu
+    # (`approved_sha`) et celui qui est parti sur le distant (`pushed_sha`).
+    # Nullables : les runs antérieurs n'en ont pas.
+    """ALTER TABLE pipeline_runs ADD COLUMN approved_sha TEXT;
+ALTER TABLE pipeline_runs ADD COLUMN pushed_sha TEXT;""",
 ]
 
 

@@ -845,6 +845,14 @@ de commencer pendant l'attente de CI.
 Hors pipeline (appels directs depuis le chat ou l'interface), la méthode 
 `livrer()` enchaîne les deux phases pour livrer entièrement en synchrone.
 
+### Approbation et vérification du SHA du commit (ticket-492)
+
+L'approbation lie le verdict du reviewer et du validateur à un commit précis (`approved_sha`). Avant le merge, deux vérifications garantissent que seul ce commit est livré.
+
+**Phase 1 (avant push)** : les commits entre `approved_sha` et la tête doivent tous être des commits de rangement du pipeline (touchant uniquement `projects/<id>/tickets/**` et `memory/pipeline-log.md`). Tout autre commit met le run en `blocked`. Le SHA poussé est enregistré (`pushed_sha`).
+
+**Phase 2 (au merge)** : `CIWatcher` vérifie que la tête de la PR est toujours `pushed_sha`. Un changement (rebase de la CI, push externe) met le ticket en `blocked`. Les rebases du pipeline lui-même mettent `pushed_sha` à jour.
+
 ### Garanties de la phase 2 (ticket-328)
 
 La phase 2 opère en arrière-plan, sans intervention humaine jusqu'au verdict final.

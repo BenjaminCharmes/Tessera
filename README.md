@@ -36,13 +36,15 @@ Trois choix le distinguent d'un assistant de code classique :
   tests est signalé au reviewer pour vérification. Si un ticket exige une telle
   modification, le run s'arrête avant le premier tour avec un message clair.
 
-Après un run approuvé, la livraison enchaîne seule jusqu'où le projet
-l'autorise : rebase, PR, attente de CI, merge. Certains conflits simples — dans
-le journal (`memory/pipeline-log.md`) et la liste de documentation
-(`memory/documentation.json`) — sont résolus automatiquement en union. Les autres
-sont tentés par le `resolveur-conflit` — s'il est déclaré dans `agents.json` du
-projet —, et leur résolution est toujours relue. Si le résolveur n'est pas
-available, la ligne d'arrêt explique pourquoi.
+Après un run approuvé, seul le commit que le reviewer et le validateur ont lu
+est mergé : Tessera rejette d'office tout changement introduit ultérieurement
+à la branche sans relecture supplémentaire. La livraison enchaîne ensuite seule
+jusqu'où le projet l'autorise : rebase, PR, attente de CI, merge. Certains
+conflits simples — dans le journal (`memory/pipeline-log.md`) et la liste de
+documentation (`memory/documentation.json`) — sont résolus automatiquement en
+union. Les autres sont tentés par le `resolveur-conflit` — s'il est déclaré
+dans `agents.json` du projet —, et leur résolution est toujours relue. Si le
+résolveur n'est pas available, la ligne d'arrêt explique pourquoi.
 
 Si une PR devient non fusionnable pendant l'attente de CI (état `dirty`, ou
 conflits détectés), le CIWatcher arrête la surveillance avec un message dans le

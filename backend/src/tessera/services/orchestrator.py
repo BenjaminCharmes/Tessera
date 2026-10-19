@@ -33,6 +33,7 @@ from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_critere_protege import arret_critere_protege
+from tessera.services.pipeline_approbation import suivre_documentation, tete_de_branche
 from tessera.services.pipeline_plan import run_plan
 from tessera.services.pipeline_text import (
     _compose_feedback,
@@ -255,7 +256,12 @@ class Orchestrator:
         # ticket normal documente le lot entier, léger compris.
         ticket_approuve = await self._ticket_svc.get_ticket(ticket_id)
         if ticket_approuve is None or not ticket_approuve.light:
+            avant_doc = await tete_de_branche(self)
             await self._documenter_le_run(resultat, on_event)
+            # Le commit de documentation est celui du pipeline : l'approbation
+            # le suit, sans quoi la livraison le prendrait pour un intrus
+            # (ticket-492).
+            resultat = await suivre_documentation(self, resultat, avant_doc)
 
         if self._livrer is None:
             return resultat
@@ -275,6 +281,10 @@ class Orchestrator:
             self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
         if livraison.arret:
             self._log(f"[{ticket_id}] livraison: arrêt — {livraison.arret[:100]}")
+        if livraison.branche_modifiee:
+            resultat = await self._bloquer_branche_modifiee(
+                resultat, livraison, project_id, on_event
+            )
         # Commit the delivery log lines just written, then return to the base
         # branch so the working tree is clean after a delivered run (ticket-378).
         await self._finaliser_livraison(livraison)
@@ -300,6 +310,31 @@ class Orchestrator:
             await self._surveiller(project_id, ticket_id, livraison.pr_number, on_event)
 
         return resultat.model_copy(update={"livraison": livraison})
+
+    async def _bloquer_branche_modifiee(
+        self,
+        resultat: PipelineResult,
+        livraison: Livraison,
+        project_id: str,
+        on_event: EventCallback,
+    ) -> PipelineResult:
+        """Block the ticket when the branch moved since the approval (ticket-492).
+
+        Rien n'a été poussé. Comme pour une CI rouge (ticket-392), la fiche du
+        ticket n'est pas touchée : le tableau lit l'événement, le journal garde
+        la trace. Le run se relit par un nouveau run, ou à la main.
+        """
+        await on_event(
+            OrchestratorEvent(
+                type=EventType.TICKET_STATUS_CHANGED,
+                ticket_id=resultat.ticket_id,
+                project_id=project_id,
+                data={"status": TicketStatus.blocked.value},
+            )
+        )
+        return resultat.model_copy(
+            update={"final_status": TicketStatus.blocked, "arret": livraison.arret}
+        )
 
     async def _run_enregistre(
         self,

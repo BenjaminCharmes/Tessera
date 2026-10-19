@@ -18,7 +18,7 @@ import httpx
 
 from tessera.config import settings
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
-from tessera.services.git_workspace import GitCommandError
+from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
 from tessera.services.politique_run import PolitiqueRun
 from tessera.utils.logger import get_logger
 
@@ -50,6 +50,12 @@ class Livraison:
     #: phase 2. Les autres arrêts avec PR (conflit résolu, ADR-033) restent
     #: sans surveillance. (ticket-415)
     pr_orpheline: bool = False
+    #: Tête de la branche telle qu'elle est partie sur le distant : c'est elle
+    #: que le watcher compare à la tête de la PR avant de merger (ticket-492).
+    pushed_sha: str | None = None
+    #: Vrai quand la branche ne porte plus le commit que le reviewer a lu :
+    #: rien n'est poussé, le ticket est bloqué (ticket-492).
+    branche_modifiee: bool = False
 
 
 class LivraisonInterrompue(Exception):
@@ -69,6 +75,8 @@ class _Git(Protocol):
     ) -> tuple[str, ...]: ...
     async def sync_base_depuis_distant(self, base_branch: str) -> str | None: ...
     async def commit_bookkeeping(self) -> None: ...
+    async def commits_hors_rangement(self, depuis: str) -> list[str]: ...
+    async def sha_distant(self, branch: str) -> str | None: ...
 
 
 class _Workflow(Protocol):
@@ -85,7 +93,10 @@ class _Workflow(Protocol):
     async def has_workflows(self) -> bool: ...
     async def pr_ouverte_de(self, branch: str) -> int | None: ...
     async def pr_state(self, pr_number: int) -> str: ...
-    async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool: ...
+    async def tete_pr(self, pr_number: int) -> str | None: ...
+    async def merge_si_la_ci_est_verte(
+        self, pr_number: int, sha_attendu: str | None = None
+    ) -> bool: ...
 
 
 class LivraisonService:
@@ -132,12 +143,18 @@ class LivraisonService:
         ticket_type: str = "",
         branch: str | None,
         approuve: bool,
+        approved_sha: str | None = None,
     ) -> Livraison:
         """Rebase, push, and open the PR.
 
         Returns a Livraison with pr_number set on success, or arret set if
         anything prevents opening the PR (unapproved, commit level, conflict).
         The CI wait and merge are handled by livrer_phase_2.
+
+        With an `approved_sha`, every commit added since the approval must be
+        the pipeline's own bookkeeping; otherwise nothing is pushed
+        (ticket-492). The check runs before the rebase, which rewrites the
+        commits the approval was given on.
         """
         etapes: list[str] = []
         durees_ms: list[float] = []
@@ -184,6 +201,11 @@ class LivraisonService:
         # entièrement propre, sans exception, alors qu'`is_clean` tolère ces
         # chemins pour ne pas bloquer le ticket suivant (ticket-303).
         await self._git.commit_bookkeeping()
+
+        if approved_sha is not None:
+            changee = await self._branche_modifiee(approved_sha)
+            if changee is not None:
+                return changee
 
         t0 = time.monotonic()
         try:
@@ -251,6 +273,39 @@ class LivraisonService:
         except Exception as exc:  # noqa: BLE001 — relevée avec le numéro de PR
             raise LivraisonInterrompue(pr_number, exc) from exc
 
+    async def _branche_modifiee(self, approved_sha: str) -> Livraison | None:
+        """The stop when the branch moved since the approval, else None.
+
+        Fails closed (ADR-039): a branch that cannot be compared is a branch
+        that changed.
+        """
+        try:
+            intrus = await self._git.commits_hors_rangement(approved_sha)
+        except GitWorkspaceError as exc:
+            _logger.warning("comparaison_approbation_echouee", extra={"erreur": str(exc)})
+            return Livraison(
+                branche_modifiee=True,
+                arret=(
+                    "la branche n'a pas pu être comparée au commit approuvé "
+                    f"{approved_sha[:7]} : {type(exc).__name__}"
+                ),
+            )
+        if not intrus:
+            return None
+        return Livraison(
+            branche_modifiee=True,
+            arret=f"la branche a changé depuis l'approbation : {intrus[0][:7]}",
+        )
+
+    async def _sha_pousse(self, branch: str) -> str | None:
+        """The head of `branch` on the remote; None when it cannot be read."""
+        try:
+            sha = await self._git.sha_distant(branch)
+        except Exception as exc:  # noqa: BLE001 — sans lui, le watcher refuse de merger
+            _logger.warning("sha_pousse_illisible", extra={"erreur": str(exc)})
+            return None
+        return sha if isinstance(sha, str) else None
+
     async def _pr_ouverte_malgre(self, branch: str) -> int | None:
         """Look for a PR already open on `branch` after a transport error.
 
@@ -302,6 +357,7 @@ class LivraisonService:
             durees_ms=tuple(durees_ms),
             pr_number=pr_number,
             arret=None,
+            pushed_sha=await self._sha_pousse(branch),
         )
 
     async def livrer_phase_2(
@@ -309,12 +365,17 @@ class LivraisonService:
         pr_number: int,
         *,
         ticket_id: str = "",
+        sha_attendu: str | None = None,
     ) -> Livraison:
         """CI wait and merge.
 
         Called after livrer_phase_1 has opened the PR. Returns a Livraison
         with merged=True on success, or arret set if the CI fails or the
         project does not declare merge autonomy.
+
+        With a `sha_attendu` (the pushed head), the head of the PR is read
+        again after the CI verdict and the merge is bound to that commit: a
+        push made during the CI wait never reaches the base (ticket-492).
         """
         etapes: list[str] = []
         durees_ms: list[float] = []
@@ -335,7 +396,9 @@ class LivraisonService:
         if self._politique is not None and self._politique.merge_without_ci:
             etapes.append("CI : non attendue, déclarée absente")
             durees_ms.append(0.0)
-            return await self._merger(pr_number, etapes, durees_ms, ticket_id)
+            return await self._merger(
+                pr_number, etapes, durees_ms, ticket_id, sha_attendu
+            )
 
         t0 = time.monotonic()
         ci = await self._attendre_la_ci(pr_number)
@@ -379,7 +442,9 @@ class LivraisonService:
                 arret=f"CI {ci} : la PR #{pr_number} reste ouverte.",
             )
 
-        return await self._merger(pr_number, etapes, durees_ms, ticket_id)
+        return await self._merger(
+            pr_number, etapes, durees_ms, ticket_id, sha_attendu
+        )
 
     async def livrer(
         self,
@@ -426,10 +491,29 @@ class LivraisonService:
         etapes: list[str],
         durees_ms: list[float],
         ticket_id: str,
+        sha_attendu: str | None = None,
     ) -> Livraison:
-        """Le dernier maillon, commun aux deux chemins de décision."""
+        """Le dernier maillon, commun aux deux chemins de décision.
+
+        Avec `sha_attendu`, la tête de la PR se relit **ici**, après l'attente
+        de la CI, et le merge y est lié (ticket-492).
+        """
+        if sha_attendu is not None:
+            arret_tete = await self._tete_a_change(pr_number, sha_attendu)
+            if arret_tete is not None:
+                return Livraison(
+                    etapes=tuple(etapes),
+                    durees_ms=tuple(durees_ms),
+                    pr_number=pr_number,
+                    arret=arret_tete,
+                )
         t0 = time.monotonic()
-        merged = await self._workflow.merge_si_la_ci_est_verte(pr_number)
+        if sha_attendu is None:
+            merged = await self._workflow.merge_si_la_ci_est_verte(pr_number)
+        else:
+            merged = await self._workflow.merge_si_la_ci_est_verte(
+                pr_number, sha_attendu=sha_attendu
+            )
         merge_ms = (time.monotonic() - t0) * 1000
         if not merged:
             return Livraison(
@@ -444,6 +528,24 @@ class LivraisonService:
         return Livraison(
             etapes=tuple(etapes), durees_ms=tuple(durees_ms),
             pr_number=pr_number, merged=True,
+        )
+
+    async def _tete_a_change(self, pr_number: int, sha_attendu: str) -> str | None:
+        """The stop line when the PR head is not `sha_attendu`, else None.
+
+        Fails closed (ADR-039): an unreadable head refuses the merge.
+        """
+        try:
+            tete = await self._workflow.tete_pr(pr_number)
+        except Exception as exc:  # noqa: BLE001 — une tête illisible refuse le merge
+            _logger.warning("tete_pr_illisible", extra={"erreur": str(exc)})
+            tete = None
+        if tete == sha_attendu:
+            return None
+        lue = tete[:7] if tete else "inconnue"
+        return (
+            f"la tête de la PR #{pr_number} n'est plus le commit poussé : "
+            f"{lue} au lieu de {sha_attendu[:7]}. La PR reste ouverte."
         )
 
     def _arret_conflit(self, conflits: tuple[str, ...], resolus: list[str]) -> str:
@@ -517,3 +619,7 @@ class LivraisonService:
     async def pr_state(self, pr_number: int) -> str:
         """The state of a PR (open, closed, merged, unknown) — ticket-405."""
         return await self._workflow.pr_state(pr_number)
+
+    async def tete_pr(self, pr_number: int) -> str | None:
+        """The head SHA of a PR, None when it cannot be known — ticket-492."""
+        return await self._workflow.tete_pr(pr_number)

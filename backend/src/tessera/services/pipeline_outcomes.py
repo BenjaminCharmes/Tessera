@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.pipeline_approbation import noter_tete_approuvee
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline_text import _single_line, _unapproved_commit_message
@@ -208,6 +209,8 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
         approved=True,
         branch=run.branch,
         commit_sha=commit_sha,
+        approved_sha=await noter_tete_approuvee(orch, run),
+        run_id=run.run_id,
     )
 
 
