@@ -4018,3 +4018,8 @@ Points posit (58359ms)
 - 2026-10-19 19:58:52 UTC — [ticket-518] validateur: APPROVED — Le diff implémente une borne de durée totale par appel pour les rôles texte (val (341328ms)
 - 2026-10-19 19:58:52 UTC — [ticket-518] APPROVED après 2 tour(s)
 - 2026-10-19 20:01:54 UTC — [ticket-518] documentation: 2 fichier(s) (177266ms)
+- 2026-10-19 20:02:14 UTC — [ide-core] ticket-518 PR #575 confiée au CIWatcher
+- 2026-10-19 20:02:18 UTC — [ticket-526] branche ticket-526-a-run-whose-diff-leaves-two-ticket-files-with-the
+- 2026-10-19 20:02:18 UTC — [ticket-526] tour 1 — codeur démarré
+- 2026-10-19 20:06:33 UTC — [ticket-526] tour 1 — codeur terminé (254500ms)
+- 2026-10-19 20:08:07 UTC — [ide-core] ticket-518 PR #575 mergée (CI verte)

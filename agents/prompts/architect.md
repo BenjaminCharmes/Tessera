@@ -59,7 +59,11 @@ Ce que tu écris :
 - **Les interfaces**, si elles ont besoin d'un fichier : signatures, types,
   contrats entre composants, à l'endroit du dépôt où le Codeur les cherchera
 - **Un ticket de suite** pour chaque implémentation à faire, si le ticket
-  courant ne la couvre pas
+  courant ne la couvre pas. Son numéro est le **suivant le plus grand déjà
+  pris, tous dossiers confondus** (`todo`, `in-progress`, `in-review`, `done`,
+  `blocked`, `cancelled`), relu avec `Glob` juste avant d'écrire chaque fiche :
+  un numéro déjà pris renvoie ton tour. Une fiche que tu remplaces se
+  **supprime** (`rm`), elle ne reste jamais en `todo` sous un titre « remplacée »
 
 Tu travailles déjà sur une branche dédiée au run, et le commit est fait par
 Tessera une fois ton tour terminé. **Ne tente aucune commande git qui écrit**

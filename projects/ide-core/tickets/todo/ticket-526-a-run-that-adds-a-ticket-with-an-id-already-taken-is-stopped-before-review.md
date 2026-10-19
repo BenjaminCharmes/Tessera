@@ -1,14 +1,15 @@
 ---
-id: ticket-526
-title: "A run whose diff leaves two ticket files with the same id is sent back to its producer before review"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-526
+pr_number: null
+priority: medium
+status: todo
+title: A run whose diff leaves two ticket files with the same id is sent back to its
+  producer before review
+type: fix
 ---
 
 # ticket-526 — Un run qui laisse deux fiches au même identifiant repart au producteur avant la revue
