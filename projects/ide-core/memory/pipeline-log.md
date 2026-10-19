@@ -3799,3 +3799,18 @@ Points posit (58359ms)
 - 2026-10-19 12:12:37 UTC — [ticket-472] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. L'implémentation complète du bo (74703ms)
 - 2026-10-19 12:12:37 UTC — [ticket-472] APPROVED après 1 tour(s)
 - 2026-10-19 12:15:38 UTC — [ticket-472] documentation: 1 fichier(s) (146452ms)
+- 2026-10-19 12:16:06 UTC — [ide-core] ticket-472 PR #553 confiée au CIWatcher
+- 2026-10-19 12:16:13 UTC — [ticket-511] branche ticket-511-putting-a-project-online-sets-the-e-mail-sender-a
+- 2026-10-19 12:16:14 UTC — [ticket-511] tour 1 — codeur démarré
+- 2026-10-19 12:17:45 UTC — [ticket-511] tour 1 — codeur terminé (91468ms)
+- 2026-10-19 12:20:38 UTC — [ide-core] ticket-472 PR #553 mergée (CI verte)
+- 2026-10-19 12:24:22 UTC — [ticket-511] testeur: 1 failed, 1159 passed, 40 warnings in 394.58s (0:06:34)
+- 2026-10-19 12:24:22 UTC — [ticket-511] tests rouges au tour 1
+- 2026-10-19 12:24:22 UTC — [ticket-511] tour 2 — codeur démarré
+- 2026-10-19 12:25:32 UTC — [ticket-511] tour 2 — codeur terminé (69375ms)
+- 2026-10-19 12:35:10 UTC — [ticket-511] testeur: OK (exit 0)
+- 2026-10-19 12:37:08 UTC — [ticket-511] securite: PASS — Une vulnérabilité MEDIUM détectée : absence de validation de `project_name` lors (118422ms)
+- 2026-10-19 12:37:08 UTC — [ticket-511] tour 2 — reviewer démarré
+- 2026-10-19 12:37:28 UTC — [ticket-511] tour 2 — reviewer terminé (20015ms)
+- 2026-10-19 12:39:27 UTC — [ticket-511] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les cas atten (139014ms)
+- 2026-10-19 12:39:27 UTC — [ticket-511] APPROVED après 2 tour(s)
