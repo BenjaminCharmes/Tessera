@@ -4060,3 +4060,55 @@ Points posit (58359ms)
 - 2026-10-19 20:57:22 UTC — [ticket-521] tour 1 — reviewer terminé (26484ms)
 - 2026-10-19 20:57:22 UTC — [ticket-521] APPROVED après 1 tour(s)
 - 2026-10-19 20:59:21 UTC — [ticket-521] documentation: 1 fichier(s) (113500ms) — après tour de correction
+- 2026-10-19 21:05:12 UTC — [ide-core] ticket-521 PR #578 mergée (CI verte)
+- 2026-10-19 21:05:21 UTC — [ide-core] ticket-521 : base réalignée sur develop
+- 2026-10-19 21:05:21 UTC — [ide-core] ticket-521 PR #578 confiée au CIWatcher
+- 2026-10-19 21:05:30 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 21:05:30 UTC — [ticket-522] tour 1 — codeur démarré
+- 2026-10-19 21:13:49 UTC — [ticket-522] tour 1 — codeur terminé (499421ms)
+- 2026-10-19 21:20:52 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:25:13 UTC — [ticket-522] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le module run_worktree.py implém (261781ms)
+- 2026-10-19 21:25:13 UTC — [ticket-522] tour 1 — reviewer démarré
+- 2026-10-19 21:25:40 UTC — [ticket-522] tour 1 — reviewer terminé (26718ms)
+- 2026-10-19 21:27:23 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (129828ms)
+- 2026-10-19 21:27:23 UTC — [ticket-522] CHANGES_REQUESTED tour 1: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni, car il néces
+- 2026-10-19 21:27:23 UTC — [ticket-522] tour 2 — codeur démarré
+- 2026-10-19 21:28:15 UTC — [ticket-522] tour 2 — codeur terminé (51609ms)
+- 2026-10-19 21:35:16 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:36:42 UTC — [ticket-522] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une configuration git légitime (`c (85750ms)
+- 2026-10-19 21:36:42 UTC — [ticket-522] tour 2 — reviewer démarré
+- 2026-10-19 21:37:09 UTC — [ticket-522] tour 2 — reviewer terminé (27641ms)
+- 2026-10-19 21:38:50 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (128515ms)
+- 2026-10-19 21:38:50 UTC — [ticket-522] CHANGES_REQUESTED tour 2: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni, car il néces
+- 2026-10-19 21:38:50 UTC — [ticket-522] tour 3 — codeur démarré
+- 2026-10-19 21:39:13 UTC — [ticket-522] tour 3 — codeur terminé (23046ms)
+- 2026-10-19 21:46:57 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:49:16 UTC — [ticket-522] securite: PASS — No CRITICAL or HIGH vulnerabilities detected that would block this ticket. The p (138765ms)
+- 2026-10-19 21:49:16 UTC — [ticket-522] tour 3 — reviewer démarré
+- 2026-10-19 21:49:37 UTC — [ticket-522] tour 3 — reviewer terminé (20796ms)
+- 2026-10-19 21:51:22 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (126656ms)
+- 2026-10-19 21:51:22 UTC — [ticket-522] CHANGES_REQUESTED tour 3: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni car il nécess
+- 2026-10-19 21:51:23 UTC — [ticket-522] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-19 21:51:27 UTC — [ide-core] file interrompue : ticket-522 non approuvé
+- 2026-10-19 21:56:43 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 22:03:15 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 22:03:15 UTC — [ticket-522] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-19 22:06:15 UTC — [ticket-522] securite: BLOCK — **Path Traversal CRITIQUE** : Le module n'est pas appelé en production (intégrat (178328ms)
+- 2026-10-19 22:06:19 UTC — [ide-core] file interrompue : ticket-522 non approuvé
+- 2026-10-19 22:11:19 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 22:17:57 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 22:17:57 UTC — [ticket-522] branche reprise (6 commit(s)) — tests green, codeur sauté
+- 2026-10-19 22:20:44 UTC — [ticket-522] securite: BLOCK — Une vulnérabilité HIGH de path traversal a été introduite dans `run_worktree.py` (165859ms)
+- 2026-10-19 22:20:48 UTC — [ide-core] file interrompue : ticket-522 non approuvé
+- 2026-10-19 22:25:57 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 22:32:54 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 22:32:54 UTC — [ticket-522] branche reprise (10 commit(s)) — tests green, codeur sauté
+- 2026-10-19 22:34:00 UTC — [ticket-522] securite: PASS — Audit complet du diff : zéro vulnérabilité introduite. Le module `run_worktree.p (64469ms)
+- 2026-10-19 22:34:00 UTC — [ticket-522] tour 1 — reviewer démarré
+- 2026-10-19 22:34:26 UTC — [ticket-522] tour 1 — reviewer terminé (25719ms)
+- 2026-10-19 22:39:00 UTC — [ticket-522] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-19 22:39:28 UTC — [ticket-522] validateur: fichiers cités joints : utils/project_id.py, backend/src/tessera/services/pipeline_stages.py (tronqué) ; absents : ../x ; non joints (budget épuisé) : backend/src/tessera/services/orchestrator.py
+- 2026-10-19 22:39:28 UTC — [ticket-522] validateur: APPROVED — Tous les critères sont satisfaits. Le module `run_worktree.py` est implémenté av (328110ms)
+- 2026-10-19 22:39:28 UTC — [ticket-522] APPROVED après 1 tour(s)
+- 2026-10-19 22:41:43 UTC — [ticket-522] documentation: 0 fichier(s) (131061ms)
+- 2026-10-19 22:41:53 UTC — [ticket-522] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
