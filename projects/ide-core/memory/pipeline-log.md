@@ -3734,3 +3734,15 @@ Points posit (58359ms)
 - 2026-10-19 09:06:37 UTC — [ticket-493] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute une section `## Proposées` ign (345436ms)
 - 2026-10-19 09:06:37 UTC — [ticket-493] APPROVED après 1 tour(s)
 - 2026-10-19 09:09:25 UTC — [ticket-493] documentation: 2 fichier(s) (162125ms)
+- 2026-10-19 09:09:42 UTC — [ide-core] ticket-493 PR #541 confiée au CIWatcher
+- 2026-10-19 09:09:44 UTC — [ticket-484] branche ticket-484-additive-conflicts-in-a-prisma-schema-are-resolve
+- 2026-10-19 09:10:39 UTC — [ticket-484] plan rendu (54453ms)
+- 2026-10-19 09:10:39 UTC — [ticket-484] tour 1 — codeur démarré
+- 2026-10-19 09:13:49 UTC — [ide-core] ticket-493 PR #541 mergée (CI verte)
+- 2026-10-19 09:19:19 UTC — [ticket-484] tour 1 — codeur terminé (519984ms)
+- 2026-10-19 09:26:32 UTC — [ticket-484] testeur: OK (exit 0)
+- 2026-10-19 09:29:19 UTC — [ticket-484] securite: PASS — Audit de sécurité complet du ticket-484 (Prisma collision resolution) : aucune v (166922ms)
+- 2026-10-19 09:29:19 UTC — [ticket-484] tour 1 — reviewer démarré
+- 2026-10-19 09:29:58 UTC — [ticket-484] tour 1 — reviewer terminé (38875ms)
+- 2026-10-19 09:34:11 UTC — [ticket-484] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (291922ms)
+- 2026-10-19 09:34:11 UTC — [ticket-484] APPROVED après 1 tour(s)
