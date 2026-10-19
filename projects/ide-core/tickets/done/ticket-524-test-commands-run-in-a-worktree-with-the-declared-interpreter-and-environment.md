@@ -5,7 +5,7 @@ depends_on:
 - ticket-521
 estimated_days: 0.5
 id: ticket-524
-pr_number: null
+pr_number: 585
 priority: medium
 status: done
 title: Test commands run in a worktree with the declared interpreter and environment
