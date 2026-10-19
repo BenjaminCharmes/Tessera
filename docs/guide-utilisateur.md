@@ -1132,6 +1132,16 @@ Si la réponse du serveur GitHub se perd lors de l'ouverture de la PR (timeout r
 
 Si un ticket reste `blocked` mais que tu mèrges sa PR manuellement (sur GitHub ou en ligne de commande), Tessera le détecte au prochain lancement de file ou de run autonome. Le ticket passe automatiquement en `done/` avec son `pr_number` renseigné. Tu verras une ligne de journal : « ticket-XXX rangé en done : PR #YYY mergée ».
 
+### La branche a changé après approbation
+
+Entre le moment où tu approuves et le moment du merge, la branche du ticket peut se modifier de deux façons.
+
+**Les commits de rangement du pipeline** ne posent aucun problème — ce sont des ajustements internes : gestion des tickets en attente, mise à jour du journal. Tessera les reconnaît et laisse le merge s'achever.
+
+**Un commit de code nouveau**, posé par une autre session ou un développeur direct, bloque le ticket. Le journal affiche « la branche a changé depuis l'approbation ». C'est intentionnel : ce que tu as approuvé n'est plus à la tête. Tessera refuse de livrer. Pour débloquer, tu relances le ticket — une nouvelle approbation vaut pour l'état présent de la branche. Ce n'est pas un retry automatique : un blocage pour cette raison est traité comme un problème qu'il faut relancer.
+
+Ce verrouillage garantit que tes approbations restent valides jusqu'au merge.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.
