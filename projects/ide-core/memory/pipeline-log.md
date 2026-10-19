@@ -3925,3 +3925,25 @@ Points posit (58359ms)
 - 2026-10-19 13:27:33 UTC — [ticket-494] tour 1 — codeur démarré
 - 2026-10-19 13:32:46 UTC — [ide-core] ticket-509 PR #558 mergée (CI verte)
 - 2026-10-19 13:34:25 UTC — [ticket-494] tour 1 — architect terminé (411515ms)
+- 2026-10-19 17:15:56 UTC — [ide-core] ticket-513 PR #566 confiée au CIWatcher
+- 2026-10-19 17:16:00 UTC — [ticket-494] branche ticket-494-design-how-each-run-works-in-its-own-worktree-so
+- 2026-10-19 17:21:15 UTC — [ide-core] ticket-513 PR #566 mergée (CI verte)
+- 2026-10-19 17:26:10 UTC — [ticket-494] testeur: OK (exit 0)
+- 2026-10-19 17:26:10 UTC — [ticket-494] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-19 17:27:08 UTC — [ticket-494] securite: PASS — Ce diff ne contient que de la documentation et des spécifications d'architecture (56985ms)
+- 2026-10-19 17:27:08 UTC — [ticket-494] tour 1 — reviewer démarré
+- 2026-10-19 17:27:46 UTC — [ticket-494] tour 1 — reviewer terminé (38140ms)
+- 2026-10-19 17:28:48 UTC — [ticket-494] validateur: CHANGES_REQUESTED — L'ADR-056 et sa conception fixent complètement les interfaces, contraintes et ca (100250ms)
+- 2026-10-19 17:28:48 UTC — [ticket-494] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-19 17:28:48 UTC — [ticket-494] tour 2 — codeur démarré
+- 2026-10-19 17:31:16 UTC — [ticket-494] tour 2 — architect terminé (147625ms)
+- 2026-10-19 17:37:50 UTC — [ticket-494] testeur: 1 failed, 1499 passed, 56 warnings in 390.52s (0:06:30)
+- 2026-10-19 17:37:50 UTC — [ticket-494] tests rouges au tour 2
+- 2026-10-19 17:37:50 UTC — [ticket-494] tour 3 — codeur démarré
+- 2026-10-19 17:38:21 UTC — [ticket-494] tour 3 — architect terminé (31625ms)
+- 2026-10-19 17:46:05 UTC — [ticket-494] testeur: OK (exit 0)
+- 2026-10-19 17:46:36 UTC — [ticket-494] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une spécification d'architecture e (30750ms)
+- 2026-10-19 17:46:36 UTC — [ticket-494] tour 3 — reviewer démarré
+- 2026-10-19 17:47:33 UTC — [ticket-494] tour 3 — reviewer terminé (57358ms)
+- 2026-10-19 17:52:16 UTC — [ticket-494] validateur: APPROVED — Le ticket-494 satisfait ses trois critères d'acceptation : l'ADR-056 et sa spéci (340436ms)
+- 2026-10-19 17:52:16 UTC — [ticket-494] APPROVED après 3 tour(s)

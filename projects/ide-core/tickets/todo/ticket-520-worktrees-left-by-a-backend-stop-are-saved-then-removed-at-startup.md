@@ -5,7 +5,7 @@ type: feat
 status: todo
 priority: medium
 agent: codeur
-depends_on: ["ticket-516", "ticket-517"]
+depends_on: ["ticket-522", "ticket-523"]
 estimated_days: 0.5
 created: 2026-10-19
 pr_number: null
@@ -31,7 +31,7 @@ dans le lifespan, juste après `reprendre_depots_orphelins` :
   - arbre sale → ajout des modifications suivies et des fichiers non suivis non
     ignorés, commit `_unapproved_commit_message(ticket_id, "run interrupted by a
     backend stop")` (ADR-018, ADR-037) ;
-  - `retirer_les_liens` puis suppression (ticket-517) ;
+  - `retirer_les_liens` puis suppression (ticket-523) ;
   - un commit raté **laisse** le dossier et journalise (jamais détruire du
     travail non sauvé) ;
 - `git worktree prune` sur le dépôt de chaque projet, pour un enregistrement dont
@@ -55,7 +55,7 @@ Dans `backend/tests/test_runs_orphelins.py` (ou un fichier voisin) :
 - [ ] Les tests existants de `reprise_orphelin` passent sans modification de leurs assertions
 
 ## Dépendances
-Tickets 516 et 517.
+Tickets 522 et 523.
 
 ## Ce que ça ne fait pas
 Ne reprend pas la **livraison** d'un run approuvé non livré : c'est le sujet
