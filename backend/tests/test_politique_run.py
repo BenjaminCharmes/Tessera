@@ -5,10 +5,14 @@ passage du codeur : un ticket pouvait passer un projet en `merge` +
 `ancestor` dans le même run, et la livraison obéissait au fichier réécrit.
 """
 import json
+import logging
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
+from tessera.config import Settings, settings
+from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
@@ -219,6 +223,193 @@ def test_merge_method_valeur_inconnue_retombe_sur_squash(tmp_path: Path) -> None
     politique = PolitiqueRun.lire(_projet(tmp_path, {"merge_method": "fast-forward"}))
 
     assert politique.merge_method == "squash"
+
+
+# ------------------------------------------------------------------
+# Worktree déclaré (ticket-521, ADR-056)
+# ------------------------------------------------------------------
+
+
+def _avec_worktree(tmp_path: Path, worktree: object, **reste: object) -> Path:
+    """Un projet `tracked` : sans cela le worktree est refusé (artifacts local)."""
+    return _projet(tmp_path, {"artifacts": "tracked", "worktree": worktree, **reste})
+
+
+def test_sans_cle_worktree_la_politique_n_en_porte_pas(tmp_path: Path) -> None:
+    politique = PolitiqueRun.lire(_projet(tmp_path, {"artifacts": "tracked"}))
+
+    assert politique.worktree is None
+
+
+def test_une_declaration_valide_devient_une_config_worktree(tmp_path: Path) -> None:
+    projet = _avec_worktree(
+        tmp_path,
+        {
+            "populate": [
+                {"path": "CLAUDE.md", "mode": "copy"},
+                {"path": "backend/.venv", "mode": "link"},
+            ],
+            "env": {"PYTHONPATH": "{worktree}/backend/src"},
+            "test_command": "{repo}/backend/.venv/Scripts/python.exe scripts/verifier.py",
+        },
+    )
+
+    config = PolitiqueRun.lire(projet).worktree
+
+    assert config is not None
+    assert [(e.path, e.mode) for e in config.populate] == [
+        ("CLAUDE.md", "copy"),
+        ("backend/.venv", "link"),
+    ]
+    assert dict(config.env) == {"PYTHONPATH": "{worktree}/backend/src"}
+    assert config.test_command == "{repo}/backend/.venv/Scripts/python.exe scripts/verifier.py"
+
+
+def test_une_declaration_vide_donne_une_config_sans_entree(tmp_path: Path) -> None:
+    config = PolitiqueRun.lire(_avec_worktree(tmp_path, {})).worktree
+
+    assert config is not None
+    assert config.populate == ()
+    assert dict(config.env) == {}
+    assert config.test_command is None
+
+
+@pytest.mark.parametrize(
+    "refusee",
+    [
+        {"path": "a", "mode": "symlink"},
+        {"path": "a", "mode": "LINK"},
+        {"path": "a"},
+        {"mode": "copy"},
+        {"path": "/etc/passwd", "mode": "copy"},
+        {"path": "\\\\serveur\\partage", "mode": "copy"},
+        {"path": "C:/Users/x", "mode": "copy"},
+        {"path": "../dehors", "mode": "copy"},
+        {"path": "a/../../dehors", "mode": "link"},
+        {"path": "a\\..\\b", "mode": "copy"},
+        {"path": "", "mode": "copy"},
+        "backend/.venv",
+    ],
+)
+def test_une_entree_douteuse_est_retiree_et_les_autres_gardees(
+    tmp_path: Path, refusee: object
+) -> None:
+    valide = {"path": "CLAUDE.md", "mode": "copy"}
+    projet = _avec_worktree(tmp_path, {"populate": [refusee, valide]})
+
+    config = PolitiqueRun.lire(projet).worktree
+
+    assert config is not None
+    assert [e.path for e in config.populate] == ["CLAUDE.md"]
+
+
+def test_le_env_de_tessera_est_retire_sous_toutes_ses_graphies(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # ADR-053 : le copier dans un dossier où le codeur écrit le lui rendrait lisible.
+    depot = tmp_path / "depot"
+    (depot / ".git").mkdir(parents=True)
+    projet = depot / "projects" / "client"
+    projet.mkdir(parents=True)
+    monkeypatch.setattr(Settings, "env_file", depot / ".env")
+    entrees = [{"path": p, "mode": "copy"} for p in (".env", "./.env", "sous/../.env", "ok.txt")]
+    _reecrire(
+        projet,
+        {"artifacts": "tracked", "git_root": "ancestor", "worktree": {"populate": entrees}},
+    )
+
+    config = PolitiqueRun.lire(projet).worktree
+
+    assert config is not None
+    assert [e.path for e in config.populate] == ["ok.txt"]
+
+
+def test_le_env_d_un_projet_se_copie(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # Le `.env` du projet est le sien : seul celui de Tessera est protégé.
+    monkeypatch.setattr(Settings, "env_file", tmp_path / "ailleurs" / ".env")
+    projet = _avec_worktree(tmp_path, {"populate": [{"path": ".env", "mode": "copy"}]})
+
+    config = PolitiqueRun.lire(projet).worktree
+
+    assert config is not None
+    assert [e.path for e in config.populate] == [".env"]
+
+
+@pytest.mark.parametrize(
+    "declaration",
+    [
+        "oui",
+        ["CLAUDE.md"],
+        {"populate": "CLAUDE.md"},
+        {"env": ["PYTHONPATH"]},
+        {"env": {"PYTHONPATH": 1}},
+        {"test_command": 3},
+    ],
+)
+def test_une_declaration_mal_typee_donne_none(tmp_path: Path, declaration: object) -> None:
+    assert PolitiqueRun.lire(_avec_worktree(tmp_path, declaration)).worktree is None
+
+
+def test_un_agents_json_illisible_donne_none(tmp_path: Path) -> None:
+    projet = _projet(tmp_path, None)
+    (projet / "agents.json").write_text('{"worktree": {"populate": [', encoding="utf-8")
+
+    assert PolitiqueRun.lire(projet).worktree is None
+
+
+def test_un_projet_local_qui_declare_un_worktree_n_en_a_pas(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    projet = _projet(tmp_path, {"artifacts": "local", "worktree": {"populate": []}})
+
+    with caplog.at_level(logging.WARNING, logger="tessera.services.worktree_politique"):
+        politique = PolitiqueRun.lire(projet)
+
+    assert politique.worktree is None
+    assert any(r.getMessage() == "worktree_ignore" for r in caplog.records)
+    assert any(getattr(r, "raison", "") == "artifacts_local" for r in caplog.records)
+
+
+def test_un_manifeste_sans_artifacts_est_local_donc_sans_worktree(tmp_path: Path) -> None:
+    # Le défaut d'`artifacts` est `local` (ADR-023) : il ne laisse rien passer.
+    projet = _projet(tmp_path, {"worktree": {}})
+
+    assert PolitiqueRun.lire(projet).worktree is None
+
+
+def test_une_entree_retiree_est_journalisee(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    projet = _avec_worktree(tmp_path, {"populate": [{"path": "a", "mode": "symlink"}]})
+
+    with caplog.at_level(logging.WARNING, logger="tessera.services.worktree_politique"):
+        PolitiqueRun.lire(projet)
+
+    assert any(r.getMessage() == "worktree_populate_retire" for r in caplog.records)
+
+
+def test_config_worktree_est_immuable() -> None:
+    config = ConfigWorktree(populate=(EntreePopulate(path="a", mode="copy"),))
+
+    with pytest.raises(ValidationError):
+        config.test_command = "autre"  # type: ignore[misc]
+    with pytest.raises(ValidationError):
+        config.populate[0].path = "b"  # type: ignore[misc]
+
+
+def test_la_politique_lit_le_worktree_une_seule_fois(tmp_path: Path) -> None:
+    # Ce qu'un agent réécrit dans `agents.json` ne vaut qu'au run suivant.
+    projet = _avec_worktree(tmp_path, {"populate": [{"path": "a", "mode": "copy"}]})
+    politique = PolitiqueRun.lire(projet)
+
+    _reecrire(projet, {"artifacts": "tracked", "worktree": {"test_command": "rm -rf /"}})
+
+    assert politique.worktree is not None
+    assert politique.worktree.test_command is None
+
+
+def test_ide_worktrees_dir_vaut_tessera_worktrees_dans_le_dossier_personnel() -> None:
+    assert settings.ide_worktrees_dir == Path.home() / ".tessera" / "worktrees"
 
 
 def test_les_options_du_sdk_recoivent_la_racine_figee(tmp_path: Path) -> None:
