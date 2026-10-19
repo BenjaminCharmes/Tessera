@@ -4059,3 +4059,4 @@ Points posit (58359ms)
 - 2026-10-19 20:57:21 UTC — [ticket-521] validateur: APPROVED — Le ticket-521 est complètement validé. La lecture et la validation de la clé `wo (25358ms)
 - 2026-10-19 20:57:22 UTC — [ticket-521] tour 1 — reviewer terminé (26484ms)
 - 2026-10-19 20:57:22 UTC — [ticket-521] APPROVED après 1 tour(s)
+- 2026-10-19 20:59:21 UTC — [ticket-521] documentation: 1 fichier(s) (113500ms) — après tour de correction
