@@ -3798,3 +3798,4 @@ Points posit (58359ms)
 - 2026-10-19 12:12:37 UTC — [ticket-472] validateur: fichiers cités joints : projects/ide-core/design/maquette/MettreEnLigne-Carte.dc.html, agents.json
 - 2026-10-19 12:12:37 UTC — [ticket-472] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. L'implémentation complète du bo (74703ms)
 - 2026-10-19 12:12:37 UTC — [ticket-472] APPROVED après 1 tour(s)
+- 2026-10-19 12:15:38 UTC — [ticket-472] documentation: 1 fichier(s) (146452ms)
