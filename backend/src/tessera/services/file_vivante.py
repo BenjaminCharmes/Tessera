@@ -33,6 +33,8 @@ class FileVivante(list[str]):
     def __init__(self, ticket_ids: list[str] | None = None) -> None:
         super().__init__(ticket_ids or [])
         self.ouverte = True
+        # Rang (0-based) du ticket que la boucle traite ; -1 avant le premier.
+        self._position = -1
 
     def fermer(self) -> None:
         """Stop accepting additions; called once the loop has read its last id."""
@@ -48,6 +50,44 @@ class FileVivante(list[str]):
                 self.append(ticket_id)
                 ajoutes.append(ticket_id)
         return ajoutes
+
+    def marquer_position(self, index: int) -> None:
+        """Record the 1-based position the loop is handling (ticket-513)."""
+        self._position = index - 1
+
+    def retirer(
+        self, ticket_ids: list[str]
+    ) -> tuple[list[str], dict[str, str], dict[str, str]]:
+        """Remove the ids not started yet; return (removed, ignored, refused).
+
+        Refusé : le ticket en cours, ou un ticket que la boucle a déjà passé.
+        Ignoré : absent de la file. Comme `ajouter`, aucun `await` : la boucle
+        ne peut pas avancer entre le contrôle et le retrait.
+        """
+        if not self.ouverte:
+            raise FileFermee("La file a fini de lire sa liste.")
+        retires: list[str] = []
+        ignores: dict[str, str] = {}
+        refuses: dict[str, str] = {}
+        for ticket_id in ticket_ids:
+            if ticket_id not in self:
+                ignores[ticket_id] = "absent de la file"
+                continue
+            rang = self.index(ticket_id)
+            if rang == self._position:
+                refuses[ticket_id] = "en cours : utiliser stop"
+            elif rang < self._position:
+                refuses[ticket_id] = "déjà traité par la file"
+            else:
+                del self[rang]
+                retires.append(ticket_id)
+        return retires, ignores, refuses
+
+
+def marquer_position_si_vivante(ticket_ids: list[str], index: int) -> None:
+    """Tell a live queue which 1-based position the loop is on; a plain list is left alone."""
+    if isinstance(ticket_ids, FileVivante):
+        ticket_ids.marquer_position(index)
 
 
 def fermer_si_vivante(ticket_ids: list[str]) -> None:

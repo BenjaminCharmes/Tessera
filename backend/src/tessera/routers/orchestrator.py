@@ -39,6 +39,7 @@ from tessera.services.file_vivante import (
     lecteur_sur_la_base,
     trier_ajouts,
 )
+from tessera.services.reprise_outils import ecrire_log
 from tessera.services.run_executor import executer
 from tessera.services.run_lock import RUN_LOCK
 from tessera.services.run_registry import RUN_REGISTRY, RunAlreadyInProgress
@@ -887,6 +888,43 @@ async def append_to_run(run_id: str, request: AppendRequest) -> AppendResult:
     except FileFermee as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     return AppendResult(ajoutes=ajoutes, ignores=ignores, refuses=refuses)
+
+
+class RemoveRequest(BaseModel):
+    ticket_ids: list[str] = Field(min_length=1)
+
+
+class RemoveResult(BaseModel):
+    """What a removal did: taken out of the queue, absent, or refused with a reason."""
+
+    retires: list[str]
+    ignores: dict[str, str]
+    refuses: dict[str, str]
+
+
+@router.post("/runs/{run_id}/remove", response_model=RemoveResult)
+async def remove_from_run(run_id: str, request: RemoveRequest) -> RemoveResult:
+    """Take tickets not yet started out of a queue that is still running (ticket-513).
+
+    409 quand le run est terminé ou inconnu, n'est pas une file, ou a fini de
+    lire sa liste. La fiche du ticket n'est pas modifiée : retirer n'est pas
+    annuler.
+    """
+    run = RUN_REGISTRY.get(run_id)
+    if run is None or run.file is None or not run.file.ouverte:
+        raise HTTPException(
+            status_code=409,
+            detail="Ce run n'est pas une file en cours : aucun ticket ne peut en être retiré.",
+        )
+    try:
+        # Aucun `await` entre le contrôle d'ouverture et le retrait.
+        retires, ignores, refuses = run.file.retirer(request.ticket_ids)
+    except FileFermee as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    projet = settings.ide_workspace_dir / run.project_id
+    for ticket_id in retires:
+        ecrire_log(projet, f"[{run.project_id}] {ticket_id} retiré de la file")
+    return RemoveResult(retires=retires, ignores=ignores, refuses=refuses)
 
 
 async def _tirer_les_issues(project_id: str) -> int:

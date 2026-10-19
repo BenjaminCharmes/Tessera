@@ -177,6 +177,7 @@ Réponses d'erreur :
 | `GET` | `/api/v1/runs/{run_id}` | Get Status |
 | `GET` | `/api/v1/runs/{run_id}/events` | Get Events |
 | `POST` | `/api/v1/runs/{run_id}/append` | Append Ticket To Queue |
+| `POST` | `/api/v1/orchestrator/runs/{run_id}/remove` | Remove From Run |
 
 `GET /runs/{run_id}` répond, pour un run vivant comme terminé :
 
@@ -240,6 +241,36 @@ Ajoute un ticket à une file en cours.
 - `409 Conflict` : le projet a un autre run actif
 
 L'arbre de travail du run n'est ni modifié ni changé de branche pendant l'opération.
+
+#### `POST /api/v1/orchestrator/runs/{run_id}/remove`
+
+Retire d'une file en cours des tickets pas encore commencés, sans arrêter la
+file ni couper le ticket en cours.
+
+**Body** : `{ "ticket_ids": ["ticket-XXX", ...] }` (au moins un identifiant)
+
+**Réponse `200 OK`** :
+
+```json
+{
+  "retires": ["ticket-003"],
+  "ignores": {"ticket-009": "absent de la file"},
+  "refuses": {"ticket-001": "en cours : utiliser stop"}
+}
+```
+
+- `retires` : les tickets enlevés de la file ; la boucle enchaîne sur le
+  suivant sans les exécuter.
+- `refuses` : le ticket en cours (« en cours : utiliser stop ») et un ticket
+  que la file a déjà traité (« déjà traité par la file »).
+- `ignores` : un ticket absent de la file, ou répété dans la demande.
+- Chaque retrait écrit `[<projet>] ticket-XXX retiré de la file` dans
+  `memory/pipeline-log.md`.
+- La fiche du ticket n'est pas modifiée : retirer n'est pas annuler. Le ticket
+  garde son statut et peut être relancé plus tard.
+
+**Erreurs** : `409 Conflict` quand le run est inconnu ou terminé, n'est pas une
+file, ou a fini de lire sa liste.
 
 ### Services
 

@@ -16,7 +16,7 @@ from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
-from tessera.services.file_vivante import fermer_si_vivante
+from tessera.services.file_vivante import fermer_si_vivante, marquer_position_si_vivante
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import (
@@ -654,6 +654,9 @@ class Orchestrator:
         # d'une liste relit sa longueur à chaque pas, et `total`, `restants` et
         # `faits` se calculent sur la liste courante.
         for index, ticket_id in enumerate(ticket_ids, start=1):
+            # Dit à la file vivante où en est la boucle : un retrait ne touche
+            # que ce qui est après (ticket-513).
+            marquer_position_si_vivante(ticket_ids, index)
             if budget_override_usd is None and self._run_max_budget_usd > 0:
                 # Le plafond suit la longueur courante : les tickets ajoutés
                 # en route ont chacun droit au leur.
