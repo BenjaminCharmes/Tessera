@@ -650,6 +650,14 @@ Pour éviter que des petits-enfants orphelins ne gardent les tubes ouverts et ne
 
 Chaque lancement de commande non-interactive du pipeline (`test_runner.py`, vérifications, services) reçoit `stdin=asyncio.subprocess.DEVNULL`. Cela ferme immédiatement l'entrée standard du processus, empêchant tout blocage si une dépendance ou script tente une interaction utilisateur — par exemple `pnpm install` qui appelle `prisma generate` en postinstall.
 
+#### Mesure des durées par étape (ticket-514)
+
+Quand une suite de tests dépasse son délai `test_timeout_s`, le résultat ne dit plus simplement « Timeout » : il liste les étapes terminées avec leur durée en millisecondes, puis l'étape en cours au moment de la coupure avec le temps qu'elle avait déjà consommé. Cela permet d'identifier rapidement quel segment a débordé sans relancer la suite manuellement.
+
+Exemple d'affichage au journal : `testeur: délai dépassé (420 s) — install 6 s, lint 28 s, …, check:build coupé après 190 s`.
+
+Chaque `EtapeTest` porte un champ `duree_ms` renseigné pendant l'exécution.
+
 ### Audit de sécurité
 
 L'agent sécurité audite le diff avant la revue. Selon ADR-039, une réponse JSON invalide bloque toujours le run — aucun repli n'est possible pour le jugement de sécurité.

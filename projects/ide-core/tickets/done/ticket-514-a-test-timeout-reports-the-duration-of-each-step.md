@@ -1,14 +1,15 @@
 ---
-id: ticket-514
-title: "A test timeout reports how long each step took, so the step that overran is named"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-514
+pr_number: 565
+priority: medium
+status: done
+title: A test timeout reports how long each step took, so the step that overran is
+  named
+type: feat
 ---
 
 # ticket-514 — Un délai de test dépassé dit combien de temps chaque étape a pris
