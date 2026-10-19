@@ -480,6 +480,20 @@ Le repli ou l'échec fermé existant (ADR-037, ADR-039) reprend aussitôt le run
 
 Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le silence du flux. Deux cas réels qui l'ont motivé (octobre 2026) ont impliqué une veille du PC et un CLI bloqué.
 
+### Durée maximale des rôles texte (ticket-518)
+
+Les rôles texte (validateur, sécurité, documentation) ont une durée totale maximale
+par appel, réglable via `LLM_DUREE_MAX_ROLE_TEXTE_S` (défaut 900 s). Cette borne
+inclut l'attente du créneau Ollama et la génération complète de la réponse.
+
+Dès que l'appel dépasse cette durée, l'IDE lève `ProviderIndisponible` pour basculer
+sur le repli (par exemple, Claude si le fournisseur principal est Ollama). Le passage
+au repli est écrit dans `pipeline-log.md` sous la forme `<rôle>: repli vers <provider>/<modèle> — <cause>`.
+Si le repli dépasse aussi la durée maximale, il échoue fermé et le ticket passe en non approuvé (ADR-039).
+
+Ce système garantit qu'aucun appel texte ne peut geler une file. Il s'ajoute à la
+limite de silence (ticket-381) qui coupe après 1200 s sans message.
+
 ## Endpoints implémentés
 
 ### Projets
