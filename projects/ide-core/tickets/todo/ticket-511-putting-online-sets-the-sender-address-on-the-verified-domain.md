@@ -25,7 +25,7 @@ La mise en ligne crée le domaine Resend, le fait vérifier et écrit
 - Kadoomi exige `RESEND_FROM_EMAIL` : sans elle, l'envoi est sauté. Le magic
   link n'arrive jamais, et l'invitation par e-mail affiche « L'e-mail n'a pas
   pu partir pour l'instant ».
-- Devinoo retombe sur `onboarding@resend.dev`, l'adresse de test de Resend,
+- Devinoo retombe sur l'adresse de test de Resend (domaine `resend.dev`),
   qui ne livre qu'au titulaire du compte.
 
 Le bloc `online` sait déjà écrire une variable calculée depuis le domaine
