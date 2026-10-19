@@ -302,6 +302,23 @@ Chaque run s'exécute dans un `git worktree` dédié, jamais dans le checkout pr
 
 La conception (ticket-494) établit comment les worktrees naissent et disparaissent, quels fichiers sensibles (`.env`, `CLAUDE.md`, `.venv`, `node_modules`) ils héritent par copie ou lien symbolique, et comment le hook d'écriture (ADR-031) s'adapte. Les contraintes intègrent les accidents documentés : jonction `node_modules` vidant le dépôt principal, chemins longs cassant `git worktree add` sous Windows, `uv` refusé par le contrôle d'applications, outils de sécurité ne suivant pas les liens symboliques, et fichiers ignorés par git manquant à la création. Les worktrees orphelins après un redémarrage du backend sont nettoyés au démarrage suivant.
 
+#### Déclaration et validation du worktree par projet (ticket-521)
+
+Un projet déclare son worktree optionnellement dans `agents.json` sous la clé `worktree`. Cette configuration est lue **une fois** par `PolitiqueRun.lire()` au démarrage du run, avec le reste de `PolitiqueRun`, et gelée — la copie ne peut plus être modifiée pendant l'exécution (ADR-056).
+
+`ConfigWorktree` contient :
+- `populate` : liste des fichiers et dossiers à copier ou lier (`EntreePopulate` avec `path` et `mode` en `["copy", "link"]`)
+- `env` : variables d'environnement du worktree
+- `test_command` : commande de test spécifique au worktree
+
+Validation à la lecture :
+- Une entrée est retirée et journalisée si son `mode` est inconnu, son chemin est absolu, contient `..`, ou résout au `.env` de Tessera
+- Les entrées valides sont conservées
+- Un projet en `artifacts: local` qui déclare `worktree` → configuration ignorée, raison journalisée
+- Configuration absente, illisible ou mal typée → `PolitiqueRun.worktree` vaut `None`
+
+Aucun comportement de run ne change : les tickets 522 et 523 consommeront cette valeur.
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
