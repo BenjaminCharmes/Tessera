@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-526
-pr_number: null
+pr_number: 576
 priority: medium
 status: done
 title: A run whose diff leaves two ticket files with the same id is sent back to its
