@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-484
 plan: true
-pr_number: null
+pr_number: 542
 priority: medium
 status: done
 title: Additive conflicts in a Prisma schema are resolved mechanically, and colliding
