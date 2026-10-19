@@ -6,6 +6,7 @@ never receives it, so the SDK falls back to the backend process's cwd instead
 of the project's workspace directory. This pins that the runner used by the
 orchestrator gets the same ``project_path``.
 """
+import json
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ import pytest
 from tessera.config import settings
 from tessera.routers.orchestrator import _build_orchestrator, _build_project_context, _tours_du_role
 from tessera.services.pipeline_plan import ROLE_PLAN
+from tessera.services.providers.repli import ProviderAvecRepli
 
 
 @pytest.fixture(autouse=True)
@@ -73,6 +75,44 @@ async def test_build_orchestrator_validator_et_security_auditor_sans_outils(
     assert orchestrator._runner._provider._allowed_tools == [
         "Read", "Write", "Edit", "Bash", "Glob", "Grep",
     ]
+
+
+async def test_build_orchestrator_branche_le_journal_de_repli_sur_le_pipeline_log(
+    tmp_path: Path,
+) -> None:
+    # Ticket-518: validator and audit (`_sans_outils`, `_en_lecture`) write
+    # their fallback line to the project's pipeline log.
+    project_dir = tmp_path / "mon-projet"
+    (project_dir / "memory").mkdir(parents=True)
+    (project_dir / "CLAUDE.md").write_text("# Projet de test\n", encoding="utf-8")
+    agents = [
+        {
+            "role": role, "model": "q", "max_tokens": 100,
+            "prompt_file": f"agents/prompts/{role}.md", "active": True,
+            "provider": "ollama",
+            "fallback": {"provider": "agent_sdk", "model": "claude-haiku-4-5"},
+        }
+        for role in ("validateur", "securite")
+    ]
+    (project_dir / "agents.json").write_text(json.dumps({
+        "project_id": "mon-projet", "agents": agents,
+        "pipeline": {"securite_enabled": True, "validateur_enabled": True},
+    }), encoding="utf-8")
+
+    orchestrator = await _build_orchestrator("mon-projet")
+
+    assert orchestrator._validator is not None
+    assert orchestrator._security_auditor is not None
+    for nom, agent in (
+        ("validateur", orchestrator._validator),
+        ("securite", orchestrator._security_auditor),
+    ):
+        avec_repli = agent._provider._inner
+        assert isinstance(avec_repli, ProviderAvecRepli)
+        avec_repli._journal(f"[ticket-001] {nom}: repli vers x")
+    lignes = (project_dir / "memory" / "pipeline-log.md").read_text(encoding="utf-8")
+    assert "[ticket-001] validateur: repli vers x" in lignes
+    assert "[ticket-001] securite: repli vers x" in lignes
 
 
 async def test_build_orchestrator_passe_le_dossier_et_le_delai_des_tests(

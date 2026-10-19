@@ -256,6 +256,39 @@ async def test_un_passage_au_repli_ecrit_une_ligne_dans_le_journal(tmp_path: Pat
     )
 
 
+async def test_la_fabrique_par_role_transmet_le_journal_au_repli(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    # Sans ce câblage, `ProviderAvecRepli` serait construit sans journal et
+    # le repli resterait silencieux malgré tout ce qui précède.
+    def fausse(name: str | None = None, api_key: str = "", **kwargs: Any) -> FakeProvider:
+        return _Indisponible() if name == "ollama" else FakeProvider()
+
+    monkeypatch.setattr(par_role, "get_provider", fausse)
+    projet = tmp_path / "projet"
+    projet.mkdir()
+    (projet / "CLAUDE.md").write_text("# projet\n", encoding="utf-8")
+    (projet / "agents.json").write_text(json.dumps({"project_id": "projet", "agents": [{
+        "role": "validateur", "model": "q", "max_tokens": 100,
+        "prompt_file": "agents/prompts/validateur.md", "active": True,
+        "provider": "ollama",
+        "fallback": {"provider": "agent_sdk", "model": "claude-haiku-4-5"},
+    }]}), encoding="utf-8")
+    journal = tmp_path / "pipeline-log.md"
+
+    provider = provider_pour_role(
+        projet, "validateur", allow_tools=False, journal_repli=journal_vers(journal),
+    )
+    assert isinstance(provider, ProviderAvecRepli)
+    activer_enregistrement(None, "ticket-029")
+    try:
+        await provider.complete(system="s", user="u", model="q", max_tokens=10)
+    finally:
+        activer_enregistrement(None, None)
+
+    assert "[ticket-029] validateur: repli vers " in journal.read_text(encoding="utf-8")
+
+
 async def test_la_ligne_de_repli_est_ecrite_avant_l_appel_du_repli(tmp_path: Path) -> None:
     # Un repli qui gèle à son tour ne doit pas emporter la trace avec lui.
     journal = tmp_path / "pipeline-log.md"
