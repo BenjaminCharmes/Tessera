@@ -718,6 +718,14 @@ et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas �
 
 Les fichiers cités dans les critères d'acceptation (entre backticks) sont trouvés et joints au validateur pour qu'il puisse vérifier le travail. Pour un projet déclaré `git_root: ancestor` (comme ide-core), la recherche s'étend au dépôt git qui contient le projet, pas seulement à son dossier (ticket-448). Les garde-fous restent en place : aucun chemin absolu, aucun fichier hors de la racine du dépôt. Les textes entre backticks qui contiennent une espace (p. ex. `git ls-files CLAUDE.md`) sont ignorés, ce qui évite de confondre des commandes avec des noms de fichiers.
 
+#### Dossiers cités dans les critères (ticket-509)
+
+Un critère peut désormais citer un dossier entre backticks. Quand le dossier existe, le validateur joint une liste avec les noms de ses fichiers (premier niveau, sans récursion). La liste est bornée en nombre d'entrées et compte dans le plafond global des fichiers joints.
+
+Un dossier cité avec ou sans slash final (`design/maquette` ou `design/maquette/`) est traité identiquement. Un dossier absent est marqué comme absent dans le rapport de validation.
+
+Dans les journaux de pipeline, l'entrée est marquée comme dossier : « `design/maquette/` (dossier, 9 fichiers) ». Cela permet de vérifier des critères du type « la maquette existe dans `design/maquette/` » sans nommer un fichier spécifique.
+
 ### Feedback du reviewer au codeur (ticket-474, ADR-009)
 
 Après chaque passe du reviewer, le retour au codeur comprend le verdict et une raison détaillée.

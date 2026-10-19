@@ -1,14 +1,14 @@
 ---
-id: ticket-509
-title: "A folder cited in an acceptance criterion gives the validator its list of files"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-509
+pr_number: 558
+priority: medium
+status: done
+title: A folder cited in an acceptance criterion gives the validator its list of files
+type: feat
 ---
 
 # ticket-509 — Un dossier cité dans un critère joint au validateur la liste de ses fichiers

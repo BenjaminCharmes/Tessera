@@ -3828,3 +3828,16 @@ Points posit (58359ms)
 - 2026-10-19 13:01:39 UTC — [ticket-510] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la reprise de (329687ms)
 - 2026-10-19 13:01:39 UTC — [ticket-510] APPROVED après 1 tour(s)
 - 2026-10-19 13:05:46 UTC — [ticket-510] documentation: 2 fichier(s) (242844ms) — après tour de correction
+- 2026-10-19 13:06:05 UTC — [ide-core] ticket-510 PR #556 confiée au CIWatcher
+- 2026-10-19 13:06:08 UTC — [ticket-509] branche ticket-509-a-folder-cited-in-an-acceptance-criterion-gives-t
+- 2026-10-19 13:06:09 UTC — [ticket-509] tour 1 — codeur démarré
+- 2026-10-19 13:09:32 UTC — [ticket-509] tour 1 — codeur terminé (203484ms)
+- 2026-10-19 13:11:04 UTC — [ide-core] ticket-510 PR #556 mergée (CI verte)
+- 2026-10-19 13:17:35 UTC — [ticket-509] testeur: OK (exit 0)
+- 2026-10-19 13:20:00 UTC — [ticket-509] securite: PASS — No critical or high-severity vulnerabilities detected. Path traversal protection (144921ms)
+- 2026-10-19 13:20:00 UTC — [ticket-509] tour 1 — reviewer démarré
+- 2026-10-19 13:20:32 UTC — [ticket-509] tour 1 — reviewer terminé (32125ms)
+- 2026-10-19 13:24:26 UTC — [ticket-509] validateur: fichiers cités joints : validator_cited_files.py
+- 2026-10-19 13:24:26 UTC — [ticket-509] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (265500ms)
+- 2026-10-19 13:24:26 UTC — [ticket-509] APPROVED après 1 tour(s)
+- 2026-10-19 13:27:12 UTC — [ticket-509] documentation: 2 fichier(s) (154203ms)

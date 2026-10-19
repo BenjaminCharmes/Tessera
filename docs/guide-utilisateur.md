@@ -581,6 +581,15 @@ Chaque critère se note en ligne séparée pour que le validateur puisse les vé
 
 Quand tu cites des fichiers entre backticks dans tes critères d'acceptation, l'IDE les cherche pour confirmer qu'ils existent. Un chemin comme `src/Button.tsx` ou une extension reconnue (`button.tsx`) sont vérifiés. Un nom de propriété comme `BRAND.name` ou `settings.github_token` n'est pas un fichier et n'est pas cherché — l'IDE l'ignore.
 
+
+#### Dossiers cités dans les critères
+
+Tu peux citer un dossier entre backticks dans un critère — avec ou sans `/` final — par exemple « la maquette est dans `design/maquette/` ».
+
+Le validateur joindra la liste des fichiers du dossier et pourra vérifier qu'il existe et n'est pas vide. C'est pratique pour des critères comme « les assets sont à jour » : au lieu de citer chaque fichier, tu cites le dossier qui les contient.
+
+Le validateur vérifie l'existence du dossier, pas son contenu. Pour un critère de contenu (« la classe X existe »), cite le fichier spécifique plutôt que le dossier.
+
 ### Fichiers qu'un agent ne peut pas modifier
 
 Certains fichiers définissent le projet lui-même et restent hors d'atteinte des agents : `CLAUDE.md`, `CLAUDE.local.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/`.
