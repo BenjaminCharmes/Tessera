@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-521
-pr_number: null
+pr_number: 578
 priority: medium
 status: done
 title: A project declares its worktree in agents.json, and the run policy freezes
