@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-509
-pr_number: null
+pr_number: 558
 priority: medium
 status: done
 title: A folder cited in an acceptance criterion gives the validator its list of files
