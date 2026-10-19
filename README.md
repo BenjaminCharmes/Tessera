@@ -54,6 +54,12 @@ conflits détectés), le CIWatcher arrête la surveillance avec un message dans 
 pipeline. Le ticket passe en échec, et les dépendants qui l'attendent le reçoivent
 en échec.
 
+Après un redémarrage du backend, l'IDE reprend la surveillance de toute PR ouverte
+sur une branche `ticket-NNN-*` vers la `base_branch` du projet — y compris les PR
+créées manuellement. En autonomie `merge`, elles seront mergées si la CI est verte.
+Utilisez une branche temporaire (`wip/*`, `tmp/*`) plutôt qu'une branche `ticket-NNN-*`
+si vous testez une PR en attente de lancement par le pipeline.
+
 ## Démarrer
 
 Il vous faut Python 3.11+, [uv](https://docs.astral.sh/uv/), Node 24, et un

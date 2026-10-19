@@ -1165,6 +1165,10 @@ Note : les PR de résolution de conflit (quand Tessera corrige un conflit de reb
 
 Chaque reprise est notée dans le journal du pipeline (`memory/pipeline-log.md`).
 
+Après un redémarrage du backend, Tessera cherche aussi les pull requests ouvertes dans le dépôt GitHub (pour les projets en `autonomy: merge` avec un dépôt configuré). Si une PR attend sa CI, elle sera de nouveau surveillée et mergée une fois que la CI passe — même si sa fiche est restée en `todo` localement. Rien n'est perdu.
+
+Si ton projet n'a pas de dépôt GitHub ou si son autonomie est `pull`, Tessera reprend uniquement les tickets marqués `in-review` localement.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.
