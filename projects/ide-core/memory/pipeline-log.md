@@ -3815,3 +3815,15 @@ Points posit (58359ms)
 - 2026-10-19 12:39:27 UTC — [ticket-511] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les cas atten (139014ms)
 - 2026-10-19 12:39:27 UTC — [ticket-511] APPROVED après 2 tour(s)
 - 2026-10-19 12:41:06 UTC — [ticket-511] documentation: 0 fichier(s) (93110ms)
+- 2026-10-19 12:41:24 UTC — [ide-core] ticket-511 PR #554 confiée au CIWatcher
+- 2026-10-19 12:41:27 UTC — [ticket-510] branche ticket-510-pull-requests-left-to-the-ci-watcher-are-watched
+- 2026-10-19 12:41:27 UTC — [ticket-510] tour 1 — codeur démarré
+- 2026-10-19 12:44:46 UTC — [ticket-510] tour 1 — codeur terminé (198500ms)
+- 2026-10-19 12:46:06 UTC — [ide-core] ticket-511 PR #554 mergée (CI verte)
+- 2026-10-19 12:54:08 UTC — [ticket-510] testeur: OK (exit 0)
+- 2026-10-19 12:56:09 UTC — [ticket-510] securite: PASS — Aucune vulnérabilité détectée. Le code ajoute une reprise de surveillance des PR (121171ms)
+- 2026-10-19 12:56:09 UTC — [ticket-510] tour 1 — reviewer démarré
+- 2026-10-19 12:57:09 UTC — [ticket-510] tour 1 — reviewer terminé (59889ms)
+- 2026-10-19 13:01:39 UTC — [ticket-510] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-19 13:01:39 UTC — [ticket-510] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la reprise de (329687ms)
+- 2026-10-19 13:01:39 UTC — [ticket-510] APPROVED après 1 tour(s)
