@@ -5,8 +5,9 @@ depends_on:
 - ticket-471
 estimated_days: 1.5
 id: ticket-472
+pr_number: 553
 priority: medium
-status: todo
+status: done
 title: A project that declares online resources gets a Put online button with the
   state of each step, built from a validated mockup
 type: feat

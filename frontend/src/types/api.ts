@@ -92,6 +92,25 @@ export interface TicketCounts {
 }
 
 /** Ce qu'une carte de la vue Projets affiche d'un projet (ticket-398). */
+export type StripeMode = "test" | "live";
+
+/** Ce qu'une étape de mise en ligne a trouvé ou fait (ADR-053). */
+export type EtatEtape =
+  | "todo"
+  | "done"
+  | "skipped"
+  | "pending"
+  | "manual"
+  | "needs_human"
+  | "failed";
+
+/** Une étape et son état ; `detail` ne porte jamais de secret. */
+export interface EtapeMiseEnLigne {
+  step: string;
+  state: EtatEtape;
+  detail: string;
+}
+
 export interface ProjectOverview {
   id: string;
   name: string;
@@ -111,6 +130,12 @@ export interface ProjectOverview {
   services_declares: boolean;
   /** Au moins un service du projet tourne en ce moment. */
   services_en_cours: boolean;
+  /** `agents.json` déclare un bloc `online` : la carte offre « Mettre en ligne » (ticket-472). */
+  online_declared: boolean;
+  /** Le domaine déclaré, nommé par la confirmation. */
+  online_domain?: string | null;
+  /** Le mode Stripe déclaré ; `null` sans bloc `stripe`. */
+  online_stripe_mode?: StripeMode | null;
   /** Incohérences relevées au chargement (ex. `project_id` qui ne suit pas le dossier). */
   avertissements?: string[];
 }

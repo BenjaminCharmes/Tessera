@@ -3783,3 +3783,19 @@ Points posit (58359ms)
 - 2026-10-19 11:36:22 UTC — [ticket-508] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie le comportement  (161110ms)
 - 2026-10-19 11:36:22 UTC — [ticket-508] APPROVED après 1 tour(s)
 - 2026-10-19 11:38:20 UTC — [ticket-508] documentation: 0 fichier(s) (113421ms)
+- 2026-10-19 11:38:37 UTC — [ide-core] ticket-508 PR #549 confiée au CIWatcher
+- 2026-10-19 11:38:41 UTC — [ticket-472] branche ticket-472-a-project-that-declares-online-resources-gets-a-p
+- 2026-10-19 11:38:42 UTC — [ticket-472] tour 1 — codeur démarré
+- 2026-10-19 11:43:33 UTC — [ide-core] ticket-508 PR #549 mergée (CI verte)
+- 2026-10-19 11:47:19 UTC — [ticket-472] tour 1 — codeur terminé (517000ms)
+- 2026-10-19 11:56:10 UTC — [ticket-472] testeur: OK (exit 0)
+- 2026-10-19 11:58:17 UTC — [ticket-472] branche ticket-472-a-project-that-declares-online-resources-gets-a-p
+- 2026-10-19 12:08:21 UTC — [ticket-472] testeur: OK (exit 0)
+- 2026-10-19 12:08:21 UTC — [ticket-472] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-19 12:11:22 UTC — [ticket-472] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute l'interface de mise en ligne (tick (177265ms)
+- 2026-10-19 12:11:22 UTC — [ticket-472] tour 1 — reviewer démarré
+- 2026-10-19 12:12:05 UTC — [ticket-472] tour 1 — reviewer terminé (43265ms)
+- 2026-10-19 12:12:37 UTC — [ticket-472] validateur: fichiers cités joints : projects/ide-core/design/maquette/MettreEnLigne-Carte.dc.html, agents.json
+- 2026-10-19 12:12:37 UTC — [ticket-472] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. L'implémentation complète du bo (74703ms)
+- 2026-10-19 12:12:37 UTC — [ticket-472] APPROVED après 1 tour(s)
+- 2026-10-19 12:15:38 UTC — [ticket-472] documentation: 1 fichier(s) (146452ms)

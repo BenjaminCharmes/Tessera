@@ -34,6 +34,7 @@ function projet(over: Partial<ProjectOverview>): ProjectOverview {
     icon: false,
     services_declares: true,
     services_en_cours: false,
+    online_declared: false,
     ...over,
   };
 }

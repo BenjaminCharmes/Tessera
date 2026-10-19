@@ -1918,6 +1918,51 @@ Quand tu mets un projet en ligne, l'IDE configure automatiquement le sous-domain
 
 Si tu as déjà un `www` avec une autre configuration, l'IDE le laisse inchangé.
 
+### Mettre en ligne depuis l'IDE — suivi étape par étape
+
+Un projet configuré pour la mise en ligne dispose d'un bouton « Mettre en ligne ». Clique-le pour lancer et suivre chaque étape du déploiement en temps réel.
+
+#### Déclarer ton projet pour la mise en ligne
+
+Dans la configuration du projet (`agents.json`), ajoute un bloc `online` avec le domaine et les services à déployer. Dès que tu sauvegardes, l'IDE affiche le bouton « Mettre en ligne » sur la fiche du projet.
+
+#### Lancer la mise en ligne
+
+Clique le bouton. Une modale te demande de confirmer deux choses :
+- Le domaine sur lequel tu vas mettre en ligne
+- Le mode Stripe : `test` (sandbox) ou `live` (production)
+
+Revérifie (surtout le mode Stripe si tu déploies en production). Clique « Confirmer ». Le bouton se désactive pendant que les étapes s'exécutent, et tu vois la progression en temps réel.
+
+#### Les sept états d'une étape
+
+Chaque étape de la mise en ligne peut être dans l'un de ces états :
+
+- **`todo`** : en attente
+- **`pending`** : en cours
+- **`done`** : complétée
+- **`skipped`** : non applicable à ton setup
+- **`manual`** : tu dois faire une action toi-même
+- **`needs_human`** : pareil, mais lancée automatiquement
+- **`failed`** : erreur
+
+Les couleurs suivent l'ADR-026 de Tessera.
+
+#### Ce que tu dois faire : `manual` et `needs_human`
+
+Quand une étape porte l'un de ces états, tu vois un bloc de détails. Lis-le. On peut te demander :
+- **Enregistrements DNS** : crée-les chez ton registraire avec les valeurs exactes données
+- **Ressources à créer** : une redirection de domaine chez Vercel, une clé API chez Stripe, etc.
+- **Vérification** : confirme qu'une ressource est bien active avant de continuer
+
+Exécute les actions demandées et reviens si nécessaire. Aucun jeton, clé secrète ou identifiant sensible ne s'affiche dans Tessera — tu les gères par le dashboard de chaque service, comme d'habitude.
+
+#### En cas d'erreur
+
+Une étape échoue ? Tu le vois immédiatement. Un message court te dit pourquoi. Le bouton se réactive. Tu peux relancer le plan quand tu es prêt. Les étapes déjà `done` seront sautées ; seule l'étape `failed` et ses dépendantes seront rejoués.
+
+Vérifie ce qui n'a pas marché (config manquante, service indisponible, permissions insuffisantes) et relance.
+
 ## Pour aller plus loin
 
 - [`architecture.md`](architecture.md) — comment Tessera est construit
