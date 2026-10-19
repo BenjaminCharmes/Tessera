@@ -22,6 +22,7 @@ from tessera.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from tessera.services.providers.duree_max import borner
 from tessera.services.providers.noms import ProviderIndisponible
 
 #: Le défaut d'Ollama est 4 096 tokens de contexte : le diff de 16 000
@@ -130,10 +131,16 @@ class OllamaProvider:
     name = "ollama"
 
     def __init__(
-        self, base_url: str, client: httpx.AsyncClient | None = None
+        self,
+        base_url: str,
+        client: httpx.AsyncClient | None = None,
+        duree_max_s: float | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self._client = client
+        # Durée totale d'un appel, attente de créneau comprise (ticket-518).
+        # None : pas de borne — les rôles qui ne sont pas du texte seul.
+        self._duree_max_s = duree_max_s
         # Les modèles présents, lus une fois par instance : une instance vit
         # le temps d'un run, et un modèle n'y apparaît pas tout seul.
         self._modeles: set[str] | None = None
@@ -145,6 +152,10 @@ class OllamaProvider:
                 timeout=httpx.Timeout(DELAI_LECTURE_S, connect=DELAI_CONNEXION_S),
             )
         return self._client
+
+    def _ralentir(self) -> None:
+        """Marque le serveur lent : la durée totale a coupé un appel."""
+        _set_cooldown(self.base_url)
 
     async def complete(
         self,
@@ -160,20 +171,22 @@ class OllamaProvider:
         # `cwd`, `ask_user`, `session` : pas d'outils, pas de conversation à
         # reprendre — ignorés, comme dans `AnthropicApiProvider`.
         _check_cooldown(self.base_url)
-        await self._verifier_modele(model)
-        corps = _corps(system, user, model, max_tokens, stream=False)
-        # Le créneau est pris avant d'envoyer la requête : le délai de lecture
-        # httpx ne court qu'à partir de l'envoi, pas pendant l'attente du slot.
-        async with _maybe_slot(self.base_url):
-            try:
-                reponse = await self._http().post("/api/chat", json=corps)
-            except httpx.ReadTimeout as exc:
-                _set_cooldown(self.base_url)
-                raise ProviderIndisponible(
-                    f"Ollama : délai dépassé ({DELAI_LECTURE_S:.0f} s)"
-                ) from exc
-            except httpx.HTTPError as exc:
-                raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
+        async with borner(self._duree_max_s, a_l_expiration=self._ralentir):
+            await self._verifier_modele(model)
+            corps = _corps(system, user, model, max_tokens, stream=False)
+            # Le créneau est pris avant d'envoyer la requête : le délai de
+            # lecture httpx ne court qu'à partir de l'envoi, pas pendant
+            # l'attente du slot.
+            async with _maybe_slot(self.base_url):
+                try:
+                    reponse = await self._http().post("/api/chat", json=corps)
+                except httpx.ReadTimeout as exc:
+                    _set_cooldown(self.base_url)
+                    raise ProviderIndisponible(
+                        f"Ollama : délai dépassé ({DELAI_LECTURE_S:.0f} s)"
+                    ) from exc
+                except httpx.HTTPError as exc:
+                    raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
         _verifier_statut(reponse)
         donnees = reponse.json()
         return _resultat(str(donnees.get("message", {}).get("content", "")), donnees)
@@ -192,35 +205,44 @@ class OllamaProvider:
         session: str | None = None,
     ) -> ProviderResult:
         _check_cooldown(self.base_url)
-        await self._verifier_modele(model)
-        corps = _corps(system, user, model, max_tokens, stream=True)
+        async with borner(self._duree_max_s, a_l_expiration=self._ralentir):
+            await self._verifier_modele(model)
+            corps = _corps(system, user, model, max_tokens, stream=True)
+            # Le créneau est tenu pendant tout le flux : un flux interrompu
+            # (exception du consommateur ou réseau) sort du contextmanager et
+            # rend le créneau.
+            async with _maybe_slot(self.base_url):
+                contenu, dernier = await self._lire_flux(corps, on_token)
+        return _resultat(contenu, dernier)
+
+    async def _lire_flux(
+        self, corps: dict[str, Any], on_token: StreamCallback | None
+    ) -> tuple[str, dict[str, Any]]:
+        """Reads the `/api/chat` stream: the text, and the closing line."""
         fragments: list[str] = []
         dernier: dict[str, Any] = {}
-        # Le créneau est tenu pendant tout le flux : un flux interrompu (exception
-        # du consommateur ou réseau) sort du contextmanager et rend le créneau.
-        async with _maybe_slot(self.base_url):
-            try:
-                async with self._http().stream("POST", "/api/chat", json=corps) as reponse:
-                    _verifier_statut(reponse)
-                    async for ligne in reponse.aiter_lines():
-                        if not ligne.strip():
-                            continue
-                        donnees = json.loads(ligne)
-                        fragment = str(donnees.get("message", {}).get("content", ""))
-                        if fragment:
-                            fragments.append(fragment)
-                            if on_token is not None:
-                                await on_token(fragment)
-                        if donnees.get("done"):
-                            dernier = donnees
-            except httpx.ReadTimeout as exc:
-                _set_cooldown(self.base_url)
-                raise ProviderIndisponible(
-                    f"Ollama : délai dépassé ({DELAI_LECTURE_S:.0f} s)"
-                ) from exc
-            except httpx.HTTPError as exc:
-                raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
-        return _resultat("".join(fragments), dernier)
+        try:
+            async with self._http().stream("POST", "/api/chat", json=corps) as reponse:
+                _verifier_statut(reponse)
+                async for ligne in reponse.aiter_lines():
+                    if not ligne.strip():
+                        continue
+                    donnees = json.loads(ligne)
+                    fragment = str(donnees.get("message", {}).get("content", ""))
+                    if fragment:
+                        fragments.append(fragment)
+                        if on_token is not None:
+                            await on_token(fragment)
+                    if donnees.get("done"):
+                        dernier = donnees
+        except httpx.ReadTimeout as exc:
+            _set_cooldown(self.base_url)
+            raise ProviderIndisponible(
+                f"Ollama : délai dépassé ({DELAI_LECTURE_S:.0f} s)"
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
+        return "".join(fragments), dernier
 
     async def _verifier_modele(self, model: str) -> None:
         """Raises `ProviderIndisponible` when `model` is not installed.

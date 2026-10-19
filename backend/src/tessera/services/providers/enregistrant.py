@@ -48,6 +48,11 @@ def activer_enregistrement(run_id: str | None, ticket_id: str | None) -> None:
     _ctx_ticket_id.set(ticket_id)
 
 
+def ticket_courant() -> str | None:
+    """The ticket of the run in progress in this async task, or None outside one."""
+    return _ctx_ticket_id.get()
+
+
 class ProviderEnregistrant:
     """Transparent LLM provider wrapper that persists every call to ``agent_calls``.
 

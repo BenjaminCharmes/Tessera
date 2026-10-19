@@ -5,6 +5,7 @@ Les routeurs passent tous par ici : un point d'appel qui construirait le
 sien resterait sur le provider global, et le manifeste serait ignoré sans
 que rien ne le dise. Un test le vérifie.
 """
+from collections.abc import Callable
 from pathlib import Path
 
 from tessera.config import settings
@@ -18,6 +19,11 @@ from tessera.services.providers.repli import ProviderAvecRepli
 
 #: Ce qu'un rôle déclaré `web` reçoit en plus (ticket-245).
 OUTILS_WEB = ["WebFetch", "WebSearch"]
+
+#: Les rôles qui rendent du texte ou du JSON, et dont un appel a une durée
+#: totale maximale (ticket-518). Le codeur et le reviewer en sont exclus : un
+#: tour légitime de codeur dure longtemps, et c'est le silence qui le borne.
+ROLES_TEXTE = frozenset({"validateur", "securite", "doc-technique", "doc-fonctionnelle"})
 
 
 def outils_du_role(
@@ -63,6 +69,7 @@ def provider_pour_role(
     project_id: str | None = None,
     max_turns: int | None = None,
     journal_refus: JournalDesRefus | None = None,
+    journal_repli: Callable[[str], None] | None = None,
 ) -> LLMProvider:
     """Builds the provider `role` declares, wrapped in its fallback if any.
 
@@ -70,6 +77,10 @@ def provider_pour_role(
     de `settings.llm_provider`, comme avant ce ticket. Le repli reçoit les
     mêmes restrictions d'outils que le principal — un audit sans outils ne
     doit pas en gagner parce qu'Ollama est tombé.
+
+    Un rôle texte (`ROLES_TEXTE`) reçoit, pour le principal comme pour le
+    repli, une durée totale maximale par appel (ticket-518). `journal_repli`
+    reçoit la ligne que `ProviderAvecRepli` écrit quand le repli joue.
     """
     config = config_du_role(project_path, role)
     tools = outils_du_role(config, allow_tools, tools)
@@ -81,11 +92,13 @@ def provider_pour_role(
     journal: dict[str, JournalDesRefus] = (
         {"journal_refus": journal_refus} if journal_refus is not None else {}
     )
+    # Un rôle qui n'est pas du texte seul ne reçoit aucune borne (None).
+    duree = settings.llm_duree_max_role_texte_s if role in ROLES_TEXTE else None
     principal = get_provider(
         nom, settings.anthropic_api_key,
         max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-        skills=skills, **journal,
+        skills=skills, duree_max_s=duree, **journal,
     )
     if config is None or config.fallback is None:
         return principal
@@ -93,8 +106,9 @@ def provider_pour_role(
         config.fallback.provider, settings.anthropic_api_key,
         max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
         allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-        skills=skills, **journal,
+        skills=skills, duree_max_s=duree, **journal,
     )
     return ProviderAvecRepli(
-        principal, repli, modele_repli=config.fallback.model, role=role, project_id=project_id
+        principal, repli, modele_repli=config.fallback.model, role=role,
+        project_id=project_id, journal=journal_repli,
     )

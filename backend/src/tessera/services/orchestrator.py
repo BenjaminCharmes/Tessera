@@ -7,7 +7,6 @@ hard to get right.
 """
 import asyncio
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any, Optional
@@ -18,6 +17,7 @@ from tessera.services.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
 from tessera.services.file_vivante import fermer_si_vivante, marquer_position_si_vivante
 from tessera.services.providers.enregistrant import activer_enregistrement
+from tessera.services.journal_pipeline import ajouter_ligne
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import (
     EventCallback,
@@ -1186,14 +1186,7 @@ class Orchestrator:
         self._log(f"[{project_id}] {self._interruption}")
 
     def _log(self, message: str) -> None:
-        ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-        line = f"- {ts} — {message}\n"
-        try:
-            self._log_path.parent.mkdir(parents=True, exist_ok=True)
-            with self._log_path.open("a", encoding="utf-8") as f:
-                f.write(line)
-        except Exception as exc:
-            _logger.warning("pipeline_log_write_failed", extra={"error": str(exc)})
+        ajouter_ligne(self._log_path, message)
 
 
 __all__ = [
