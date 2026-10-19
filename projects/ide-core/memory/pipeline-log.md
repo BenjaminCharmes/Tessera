@@ -3841,3 +3841,13 @@ Points posit (58359ms)
 - 2026-10-19 13:24:26 UTC — [ticket-509] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (265500ms)
 - 2026-10-19 13:24:26 UTC — [ticket-509] APPROVED après 1 tour(s)
 - 2026-10-19 13:27:12 UTC — [ticket-509] documentation: 2 fichier(s) (154203ms)
+- 2026-10-19 13:42:16 UTC — [ticket-512] branche ticket-512-test-commands-run-with-a-closed-stdin-so-no-tool
+- 2026-10-19 13:42:16 UTC — [ticket-512] tour 1 — codeur démarré
+- 2026-10-19 13:43:22 UTC — [ticket-512] tour 1 — codeur terminé (65344ms)
+- 2026-10-19 13:54:19 UTC — [ticket-512] testeur: OK (exit 0)
+- 2026-10-19 13:55:06 UTC — [ticket-512] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une amélioration de sécurité : fer (46515ms)
+- 2026-10-19 13:55:06 UTC — [ticket-512] tour 1 — reviewer démarré
+- 2026-10-19 13:55:25 UTC — [ticket-512] tour 1 — reviewer terminé (19000ms)
+- 2026-10-19 13:57:41 UTC — [ticket-512] validateur: fichiers cités joints : test_runner.py (tronqué)
+- 2026-10-19 13:57:41 UTC — [ticket-512] validateur: APPROVED — Tous les critères sont respectés. Le code modifie correctement le lancement des  (155640ms)
+- 2026-10-19 13:57:41 UTC — [ticket-512] APPROVED après 1 tour(s)
