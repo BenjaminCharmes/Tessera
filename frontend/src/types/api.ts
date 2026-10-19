@@ -111,6 +111,8 @@ export interface ProjectOverview {
   services_declares: boolean;
   /** Au moins un service du projet tourne en ce moment. */
   services_en_cours: boolean;
+  /** Incohérences relevées au chargement (ex. `project_id` qui ne suit pas le dossier). */
+  avertissements?: string[];
 }
 
 export interface Ticket {
