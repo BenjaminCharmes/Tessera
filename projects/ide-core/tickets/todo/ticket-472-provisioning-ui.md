@@ -45,8 +45,9 @@ ressource à supprimer, clé à créer). Couleurs d'état d'ADR-026.
 
 ## Critères d'acceptation
 
-- [ ] La maquette « Mettre en ligne » validée existe dans
-      `projects/ide-core/design/maquette/` avant toute ligne d'interface
+- [ ] La maquette « Mettre en ligne » validée existe :
+      `projects/ide-core/design/maquette/MettreEnLigne-Carte.dc.html`
+      (posée par la PR #483, avant toute ligne d'interface)
 - [ ] Un test vérifie que le bouton n'apparaît que si `online_declared` est vrai
 - [ ] Un test vérifie que la confirmation affiche le domaine et le mode Stripe,
       et que rien n'est appelé avant la confirmation
