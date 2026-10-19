@@ -324,6 +324,32 @@ Les fichiers créés par le codeur après le `started_at` du run, mais non encor
 
 Si un run avait atteint l'état `APPROVED` (fiche marquée `done` sur sa branche) avant d'être interrompu, la reprise ne le remet pas en `todo`. Il reste `done` et un événement est enregistré dans `memory/pipeline-log.md` : `[<ticket>] approuvé mais non livré : livraison à reprendre`. La livraison n'est pas relancée automatiquement ; elle demande une action manuelle.
 
+### Reprise des PR du CIWatcher après redémarrage (ticket-510)
+
+Au démarrage du backend, après la reprise des runs orphelins, une nouvelle étape relance la surveillance des PR que le CIWatcher suivait avant un arrêt. Cette étape évite qu'une PR approuvée et verte ne reste oubliée indéfiniment après un redémarrage.
+
+**Logique**
+
+Pour chaque projet dont l'autonomie est `merge` :
+
+1. Identifier les tickets en `in-review` qui portent un `pr_number`
+2. Exclure les PR issues d'une résolution de conflit approuvée — elles ne doivent jamais se merger seules, car leur résolution doit être relue (ADR-033)
+3. Consulter l'état de chaque PR auprès de GitHub
+4. Selon le statut :
+   - **PR ouverte** : la confier de nouveau à `CIWatcher.surveiller` avec les mêmes règles qu'avant (CI verte si requise, tête de branche inchangée)
+   - **PR déjà mergée** : mettre le ticket en `done` sans nouvelle surveillance
+   - **PR fermée sans merge** : écrire une ligne d'information dans `memory/pipeline-log.md`, ne rien faire d'autre
+
+**Journalisation**
+
+Chaque PR reprise écrit une ligne au format : `[<projet>] ticket-XXX PR #N reprise par le CIWatcher après redémarrage` dans `memory/pipeline-log.md`.
+
+Une PR fermée sans merge écrit également une ligne : `[<projet>] ticket-XXX PR #N fermée sans merge, non reprise`.
+
+**Résilience**
+
+Une erreur lors de la lecture de l'état GitHub (indisponibilité du service, permissions insuffisantes) est journalisée mais n'empêche pas le démarrage du backend. La reprise s'achèvera au prochain redémarrage.
+
 ### Dialogue pendant un run (ADR-025)
 
 `DialogueChannel` porte les deux sens du dialogue sans rien savoir du

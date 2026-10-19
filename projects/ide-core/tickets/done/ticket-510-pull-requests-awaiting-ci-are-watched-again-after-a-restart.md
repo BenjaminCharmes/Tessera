@@ -1,14 +1,14 @@
 ---
-id: ticket-510
-title: "Pull requests left to the CI watcher are watched again after a backend restart"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 1
-created: 2026-10-19
+id: ticket-510
+pr_number: 556
+priority: medium
+status: done
+title: Pull requests left to the CI watcher are watched again after a backend restart
+type: feat
 ---
 
 # ticket-510 — Les PR confiées au CIWatcher sont resurveillées après un redémarrage

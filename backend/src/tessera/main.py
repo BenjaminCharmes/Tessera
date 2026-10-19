@@ -31,7 +31,9 @@ from tessera.routers import (
 )
 from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.eveil import relacher as eveil_relacher
+from tessera.services.event_hub import EVENT_HUB
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
+from tessera.services.reprise_surveillance import reprendre_surveillances
 from tessera.services.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.prompt_loader import MissingPromptError
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
@@ -43,6 +45,22 @@ _logger = get_logger(__name__)
 # avertissement dans le lifespan et se reflète dans GET /health (ticket-319).
 _GIT_BASH_PATH: str | None = resolve_git_bash(settings.claude_code_git_bash_path)
 _AGENT_SHELL_OK: bool = agent_shell_ok(_GIT_BASH_PATH)
+
+
+async def _reprendre_les_surveillances() -> None:
+    """Resume the CI watch of PR handed over before the stop (ticket-510).
+
+    Une erreur est journalisée : elle ne doit jamais empêcher le démarrage.
+    """
+    try:
+        await reprendre_surveillances(
+            settings.ide_workspace_dir,
+            settings.ide_db_path,
+            orchestrator.surveillance_de_reprise,
+            EVENT_HUB.publish,
+        )
+    except Exception:  # noqa: BLE001 — la reprise est un filet, pas une condition
+        _logger.exception("reprise_surveillances_echec")
 
 
 @asynccontextmanager
@@ -64,6 +82,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await reprendre_depots_orphelins(
             orphelins, settings.ide_db_path, settings.ide_workspace_dir
         )
+    await _reprendre_les_surveillances()
     yield
     # Les services lancés pour un projet sont des enfants de ce process et
     # s'arrêtent avec lui (ADR-042). Les terminer explicitement rend l'arrêt

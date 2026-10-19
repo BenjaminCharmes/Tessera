@@ -23,6 +23,7 @@ from tessera.services.livraison import Livraison, LivraisonInterrompue, Livraiso
 from tessera.services.sha_approbation import noter_poussee, sha_pousse_du_ticket
 from tessera.services.controles_depart import manques_avant_depart
 from tessera.services.realignement_base import Realignement
+from tessera.services.reprise_surveillance import SurveillanceProjet
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.pipeline_plan import ROLE_PLAN
@@ -668,6 +669,20 @@ def _lecteur_etat_pr(
     GitHub déclaré, la relecture rend `unknown`, donc « pas mergé ».
     """
     return _workflow_de_lecture(project_id, politique).pr_state
+
+
+def surveillance_de_reprise(
+    project_id: str, politique: PolitiqueRun
+) -> SurveillanceProjet:
+    """Ce que la reprise au démarrage utilise pour un projet (ticket-510).
+
+    La même fabrique que la livraison : une PR reprise passe par `surveiller`
+    avec ses règles — CI verte, `merge_without_ci`, tête inchangée.
+    """
+    return SurveillanceProjet(
+        etat_pr=_lecteur_etat_pr(project_id, politique),
+        surveiller=_surveillance_pour(project_id, politique=politique),
+    )
 
 
 def _chercheur_pr_mergee(
