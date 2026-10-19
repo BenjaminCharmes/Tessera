@@ -3884,3 +3884,25 @@ Points posit (58359ms)
 - 2026-10-19 14:59:45 UTC — [ticket-516] validateur: APPROVED — Ticket-516 est entièrement implémenté et fonctionnel. Le codeur a ajouté une sou (393000ms)
 - 2026-10-19 14:59:45 UTC — [ticket-516] APPROVED après 1 tour(s)
 - 2026-10-19 15:02:46 UTC — [ticket-516] documentation: 3 fichier(s) (160985ms)
+- 2026-10-19 15:03:07 UTC — [ide-core] ticket-516 PR #562 confiée au CIWatcher
+- 2026-10-19 15:03:11 UTC — [ticket-514] branche ticket-514-a-test-timeout-reports-how-long-each-step-took-so
+- 2026-10-19 15:03:11 UTC — [ticket-514] tour 1 — codeur démarré
+- 2026-10-19 15:06:57 UTC — [ticket-514] tour 1 — codeur terminé (225844ms)
+- 2026-10-19 15:07:51 UTC — [ide-core] ticket-516 PR #562 mergée (CI verte)
+- 2026-10-19 16:32:11 UTC — [ticket-514] testeur: délai dépassé, suite relancée
+- 2026-10-19 16:41:37 UTC — [ticket-514] testeur: OK (exit 0)
+- 2026-10-19 16:43:35 UTC — [ticket-514] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une fonctionnalité de rapportage d (117671ms)
+- 2026-10-19 16:43:35 UTC — [ticket-514] tour 1 — reviewer démarré
+- 2026-10-19 16:44:09 UTC — [ticket-514] tour 1 — reviewer terminé (33687ms)
+- 2026-10-19 16:44:33 UTC — [ticket-514] validateur: fichiers cités joints : test_runner.py (tronqué)
+- 2026-10-19 16:44:33 UTC — [ticket-514] validateur: APPROVED — Ticket-514 complètement satisfait. Le codeur a implémenté la mesure de durée pou (58156ms)
+- 2026-10-19 16:44:33 UTC — [ticket-514] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-19 16:44:33 UTC — [ticket-514] tour 2 — codeur démarré
+- 2026-10-19 16:46:02 UTC — [ticket-514] tour 2 — codeur terminé (88235ms)
+- 2026-10-19 16:54:16 UTC — [ticket-514] testeur: OK (exit 0)
+- 2026-10-19 16:56:15 UTC — [ticket-514] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff introduit une fonctionnalité  (118625ms)
+- 2026-10-19 16:56:15 UTC — [ticket-514] tour 2 — reviewer démarré
+- 2026-10-19 16:56:38 UTC — [ticket-514] tour 2 — reviewer terminé (22796ms)
+- 2026-10-19 16:56:39 UTC — [ticket-514] validateur: fichiers cités joints : test_runner.py (tronqué)
+- 2026-10-19 16:56:39 UTC — [ticket-514] validateur: APPROVED — Ticket-514 complètement satisfait. Le codeur a implémenté la mesure de durée pou (23828ms)
+- 2026-10-19 16:56:39 UTC — [ticket-514] APPROVED après 2 tour(s)
