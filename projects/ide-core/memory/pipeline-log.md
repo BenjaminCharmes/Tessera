@@ -3746,3 +3746,4 @@ Points posit (58359ms)
 - 2026-10-19 09:29:58 UTC — [ticket-484] tour 1 — reviewer terminé (38875ms)
 - 2026-10-19 09:34:11 UTC — [ticket-484] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (291922ms)
 - 2026-10-19 09:34:11 UTC — [ticket-484] APPROVED après 1 tour(s)
+- 2026-10-19 09:37:53 UTC — [ticket-484] documentation: 0 fichier(s) (217593ms) — après tour de correction — refusé : doc-technique : README.md : texte introuvable — « Certains conflits simples — dans le journal (`memory/pipelin ». L'agent a proposé une modification sur un text — refusé : doc-fonctionnelle : README.md : texte introuvable — « Après un run approuvé, seul le commit que le reviewer et le  ». L'agent a proposé une modification sur un 
