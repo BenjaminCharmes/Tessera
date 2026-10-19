@@ -4099,3 +4099,4 @@ Points posit (58359ms)
 - 2026-10-19 22:17:57 UTC — [ticket-522] testeur: OK (exit 0)
 - 2026-10-19 22:17:57 UTC — [ticket-522] branche reprise (6 commit(s)) — tests green, codeur sauté
 - 2026-10-19 22:20:44 UTC — [ticket-522] securite: BLOCK — Une vulnérabilité HIGH de path traversal a été introduite dans `run_worktree.py` (165859ms)
+- 2026-10-19 22:20:48 UTC — [ide-core] file interrompue : ticket-522 non approuvé
