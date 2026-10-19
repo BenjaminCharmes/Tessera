@@ -3997,3 +3997,4 @@ Points posit (58359ms)
 - 2026-10-19 19:17:22 UTC — [ticket-518] validateur: CHANGES_REQUESTED — L'implémentation couvre cinq des six critères : durée maximale bornée pour Ollam (375250ms)
 - 2026-10-19 19:17:22 UTC — [ticket-518] CHANGES_REQUESTED tour 3: Validateur : L'implémentation couvre cinq des six critères : durée maximale bornée pour Ollama et agent_sdk, prise en compte de l'attente de créneaux, trace du repli en journal, et tests existants pas
 - 2026-10-19 19:17:22 UTC — [ticket-518] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-19 19:17:27 UTC — [ide-core] file interrompue : ticket-518 non approuvé
