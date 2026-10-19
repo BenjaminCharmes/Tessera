@@ -1922,6 +1922,21 @@ Dans les deux cas, une variable déjà présente dans Vercel n'est jamais
 réécrite ; `NEXT_PUBLIC_APP_URL` reste posée comme avant. Une valeur générée
 n'apparaît dans aucun log ni retour d'API.
 
+Quand `resend` fait partie des ressources, l'étape Variables pose aussi
+`RESEND_FROM_EMAIL`, l'adresse d'expéditeur, si elle est absente de Vercel. Par
+défaut : `<Nom> <bonjour@<domaine>>`, où `<Nom>` est le nom du projet (premier
+titre de son `CLAUDE.md`, à défaut son identifiant). Pour la surcharger,
+déclarer la variable dans `derive` :
+
+```json
+"derive": {"RESEND_FROM_EMAIL": "Équipe <contact@{domain}>"}
+```
+
+La valeur de `derive` l'emporte ; une variable déjà présente n'est jamais
+réécrite, et l'inspection (dry-run) la liste parmi les variables manquantes.
+L'adresse n'est pas un secret : elle n'entre pas dans le registre des valeurs
+masquées.
+
 Une clé facultative règle le contrôle final :
 
 ```json
@@ -1950,8 +1965,8 @@ l'identifiant du projet.
    Vercel), l'étape passe `manual` : elle vérifie seulement que `DATABASE_URL`
    existe dans Vercel.
 3. **Variables** : `NEXT_PUBLIC_APP_URL`, les secrets de `generate` (défaut
-   `SESSION_SECRET`, `CRON_SECRET`) et les valeurs de `derive`, posés
-   **seulement si absents**.
+   `SESSION_SECRET`, `CRON_SECRET`), les valeurs de `derive` et, avec la
+   ressource `resend`, `RESEND_FROM_EMAIL`, posés **seulement si absents**.
 4. **Domaine Resend** : trouvé ou créé ; ses enregistrements DNS sont
    collectés, une clé d'envoi dédiée est créée et écrite dans Vercel.
 5. **DNS** : les enregistrements demandés par Vercel et Resend sont publiés

@@ -29,6 +29,10 @@ from tessera.utils.secrets import SECRETS, SecretRegistry
 _logger = get_logger(__name__)
 
 APP_URL_VARIABLE = f"{PUBLIC_PREFIX}APP_URL"
+#: Adresse d'expéditeur posée quand ``resend`` est déclaré ; ``derive`` la surcharge.
+SENDER_VARIABLE = "RESEND_FROM_EMAIL"
+#: Variables qui ne sont pas des secrets : hors du registre des valeurs masquées.
+PUBLIC_VARIABLES: tuple[str, ...] = (APP_URL_VARIABLE, SENDER_VARIABLE)
 GENERATED_VARIABLES: tuple[str, ...] = ("SESSION_SECRET", "CRON_SECRET")
 #: Code d'erreur de Vercel quand son application GitHub ne voit pas le dépôt.
 REPO_NOT_FOUND = "repo_not_found"
@@ -142,6 +146,8 @@ class VercelVariablesStep:
 
     async def _missing(self, ctx: ProvisioningContext) -> list[str]:
         voulues = [APP_URL_VARIABLE, *self._generated(ctx), *ctx.online.derive]
+        if ctx.online.wants("resend"):
+            voulues.append(SENDER_VARIABLE)
         uniques = list(dict.fromkeys(voulues))
         return [nom for nom in uniques if not await ctx.env_writer.has_env(nom)]
 
@@ -161,7 +167,7 @@ class VercelVariablesStep:
         ecrites: list[str] = []
         for nom in await self._missing(ctx):
             valeur = self._value_for(nom, ctx)
-            if nom not in ctx.online.derive and nom != APP_URL_VARIABLE:
+            if nom not in ctx.online.derive and nom not in PUBLIC_VARIABLES:
                 # Inscrit avant l'envoi : une erreur ou un log ne doit pas pouvoir le citer.
                 self._registry.register(valeur)
             await ctx.env_writer.set_env(nom, valeur)
@@ -177,4 +183,6 @@ class VercelVariablesStep:
             return modele.replace("{domain}", ctx.online.domain)
         if nom == APP_URL_VARIABLE:
             return f"https://{ctx.online.domain}"
+        if nom == SENDER_VARIABLE:
+            return f"{ctx.project_name or ctx.project_id} <bonjour@{ctx.online.domain}>"
         return secrets.token_urlsafe(32)
