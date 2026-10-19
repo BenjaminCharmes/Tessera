@@ -1,0 +1,153 @@
+"""The working folder of a run: a named worktree, outside the project checkout.
+
+ADR-056, ticket-522. Unlike `temporary_worktree.detached_worktree` (detached,
+gone when the request ends), this one is checked out on the ticket branch and
+outlives the request. It is created from `origin/<base>`, resumed when a run
+left it behind clean, and never removed while it holds unsaved work.
+"""
+from dataclasses import dataclass
+from pathlib import Path
+
+from tessera.config import settings
+from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
+from tessera.services.temporary_worktree import run_git
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
+
+
+class WorktreeError(GitWorkspaceError):
+    """Base class for the errors of a run worktree."""
+
+
+class WorktreeOccupe(WorktreeError):
+    """The worktree folder exists but is not a clean checkout of the branch."""
+
+
+class BrancheDejaExtraite(WorktreeError):
+    """Git keeps a branch in one working tree only; another one holds it."""
+
+    def __init__(self, branche: str, ou: Path) -> None:
+        super().__init__(
+            f"La branche « {branche} » est déjà extraite dans {ou}. "
+            "Rien n'est forcé : change de branche à cet endroit, puis relance."
+        )
+        self.branche = branche
+        self.ou = ou
+
+
+class TravailNonSauve(WorktreeError):
+    """The worktree holds changes nobody committed; it is left in place."""
+
+    def __init__(self, racine: Path, etat: str) -> None:
+        super().__init__(
+            f"Le worktree {racine} porte du travail non commité, il reste en place :\n{etat}"
+        )
+        self.racine = racine
+        self.etat = etat
+
+
+@dataclass(frozen=True)
+class RunWorktree:
+    """Where a run works: the worktree root, the project inside it, the branch."""
+
+    racine: Path
+    projet: Path
+    branche: str
+
+
+def retirer_les_liens(racine: Path) -> None:
+    """Extension point of ticket-523: unlink what `populate` linked, before any removal."""
+
+
+async def _extraites(depot: Path) -> dict[str, Path]:
+    """Map each branch checked out somewhere in the repository to its folder."""
+    sortie = await run_git(depot, "worktree", "list", "--porcelain")
+    par_branche: dict[str, Path] = {}
+    dossier: Path | None = None
+    for ligne in sortie.splitlines():
+        if ligne.startswith("worktree "):
+            dossier = Path(ligne.removeprefix("worktree "))
+        elif ligne.startswith("branch refs/heads/") and dossier is not None:
+            par_branche[ligne.removeprefix("branch refs/heads/")] = dossier
+    return par_branche
+
+
+def _meme_dossier(a: Path, b: Path) -> bool:
+    return a.resolve() == b.resolve()
+
+
+async def _etat(racine: Path) -> str:
+    return (await run_git(racine, "status", "--porcelain", "--untracked-files=normal")).strip()
+
+
+async def _projet_dans(racine: Path, depot: Path, project_path: Path) -> Path:
+    """The project folder inside the worktree, from its place in the repository."""
+    toplevel = Path((await run_git(depot, "rev-parse", "--show-toplevel")).strip())
+    try:
+        relatif = project_path.resolve().relative_to(toplevel.resolve())
+    except ValueError as exc:
+        raise WorktreeError(f"{project_path} n'est pas dans le dépôt {toplevel}.") from exc
+    return racine / relatif
+
+
+async def _reprendre(racine: Path, branche: str, extraites: dict[str, Path]) -> None:
+    """Accept a leftover folder only if it is this branch's worktree and holds nothing."""
+    ici = extraites.get(branche)
+    if ici is None or not _meme_dossier(ici, racine):
+        raise WorktreeOccupe(f"{racine} existe mais n'est pas le worktree de « {branche} ».")
+    if await _etat(racine):
+        raise WorktreeOccupe(f"{racine} porte des changements non commités ; il n'est pas repris.")
+    _logger.info("run_worktree_resumed", extra={"racine": str(racine), "branche": branche})
+
+
+async def _ajouter(depot: Path, racine: Path, branche: str, base: str) -> None:
+    try:
+        await run_git(depot, "rev-parse", "--verify", "--quiet", f"refs/heads/{branche}")
+    except GitCommandError:
+        await run_git(depot, "worktree", "add", "-b", branche, str(racine), f"origin/{base}")
+    else:
+        await run_git(depot, "worktree", "add", str(racine), branche)
+
+
+async def creer(
+    depot: Path,
+    project_path: Path,
+    project_id: str,
+    ticket_id: str,
+    branche: str,
+    base: str,
+) -> RunWorktree:
+    """Create, or resume, the worktree of `ticket_id` on `branche`, forked from `origin/<base>`.
+
+    The checkout of `depot` is neither read nor moved. Raises `BrancheDejaExtraite`
+    when another working tree holds the branch, `WorktreeOccupe` when the folder
+    is there but is not a clean worktree of it. Nothing is ever forced.
+    """
+    racine = settings.ide_worktrees_dir / project_id / ticket_id
+    projet = await _projet_dans(racine, depot, project_path)
+    await run_git(depot, "fetch", "origin", base)
+    extraites = await _extraites(depot)
+    ailleurs = extraites.get(branche)
+    if ailleurs is not None and not _meme_dossier(ailleurs, racine):
+        raise BrancheDejaExtraite(branche, ailleurs)
+    if racine.exists():
+        await _reprendre(racine, branche, extraites)
+    else:
+        await _ajouter(depot, racine, branche, base)
+    return RunWorktree(racine=racine, projet=projet, branche=branche)
+
+
+async def supprimer(wt: RunWorktree, depot: Path) -> None:
+    """Remove the worktree, unless it holds unsaved work (`TravailNonSauve`).
+
+    Never `--force` on a dirty tree: what was not committed is what nobody saved.
+    """
+    if wt.racine.exists():
+        etat = await _etat(wt.racine)
+        if etat:
+            raise TravailNonSauve(wt.racine, etat)
+        retirer_les_liens(wt.racine)
+        await run_git(depot, "worktree", "remove", str(wt.racine))
+    # Efface aussi l'enregistrement d'un worktree dont le dossier a disparu.
+    await run_git(depot, "worktree", "prune")

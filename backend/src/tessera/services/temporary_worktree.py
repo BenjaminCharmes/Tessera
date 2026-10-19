@@ -28,6 +28,7 @@ async def run_git(cwd: Path, *args: str) -> str:
         "git",
         "-c", f"core.hooksPath={_dossier_sans_hooks()}",
         "-c", "core.quotePath=false",
+        "-c", "core.longpaths=true",
         *args,
     ]
     proc = await asyncio.create_subprocess_exec(

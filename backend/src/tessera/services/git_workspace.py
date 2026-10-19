@@ -2185,6 +2185,8 @@ class GitWorkspaceService:
             "git",
             "-c", f"core.hooksPath={_dossier_sans_hooks()}",
             "-c", "core.quotePath=false",
+            # Chemins longs de Windows : un worktree de run vit sous un dossier profond.
+            "-c", "core.longpaths=true",
             *args,
         ]
         proc = await asyncio.create_subprocess_exec(
