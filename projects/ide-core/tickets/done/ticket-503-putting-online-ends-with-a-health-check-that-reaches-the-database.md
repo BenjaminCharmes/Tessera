@@ -4,7 +4,7 @@ created: 2026-10-18
 depends_on: []
 estimated_days: 1
 id: ticket-503
-pr_number: null
+pr_number: 536
 priority: high
 status: done
 title: Putting a project online ends with a declared health check that reaches the
