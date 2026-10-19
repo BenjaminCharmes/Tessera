@@ -1,14 +1,15 @@
 ---
-id: ticket-494
-title: "Design how each run works in its own worktree, so no run ever writes where a human session works"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
-created: 2026-10-16
+id: ticket-494
+pr_number: null
+priority: medium
+status: todo
+title: Design how each run works in its own worktree, so no run ever writes where
+  a human session works
+type: design
 ---
 
 # ticket-494 — Concevoir un dossier de travail par run

@@ -502,3 +502,11 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : `contraintes.md` porte en tête une section `## Proposées` que le chargeur n'injecte dans aucun appel d'agent. Un diff de run qui modifie ce fichier hors de cette section met le run en `blocked` à la fin du tour du codeur, raison au journal. Une règle nouvelle s'écrit sous `## Proposées`, avec son ADR ; un humain l'accepte en la déplaçant dans sa section. `decisions.md` n'est pas concerné : il n'est injecté nulle part.
 **Raison** : `contraintes.md` part dans chaque appel d'agent. Un run qui y ajoute une ligne et se merge seul sur CI verte change la consigne de tous les suivants sans relecture (ADR-053, PR #482).
 **Alternative rejetée** : une interface d'acceptation — un déplacement de texte suffit.
+
+## ADR-056 — Un run travaille dans son worktree
+
+**Date** : 2026-10-19
+**Décision** : un projet `tracked` qui déclare `worktree` dans `agents.json` exécute chaque run dans `<IDE_WORKTREES_DIR>/<projet>/<ticket>`, créé depuis `origin/<base>` avec `core.longpaths`. Ce dossier est la racine d'écriture (amende ADR-031) ; `git_root: ancestor` désigne le dépôt dont il est le worktree (amende ADR-028). `populate` copie ce qui s'édite, lie le reste s'il est ignoré par git, journalise l'absent, jamais le `.env` de Tessera. Un lien se retire avant toute suppression récursive. Le dossier disparaît au commit final, sauf travail non commité ; au démarrage, un orphelin se commite (ADR-037) puis disparaît. `RunLock` reste : la base partagée (ADR-051) impose un seul run.
+**Raison** : le 16/10 un run a sali le checkout d'une session et commité un ticket écrit à la main (#508) ; le 14/10 une jonction a vidé `node_modules`.
+**Alternative rejetée** : des gardes sur le checkout partagé — le partage nuit.
+**Détail** : `docs/superpowers/specs/2026-10-19-worktree-par-run-design.md`

@@ -3920,3 +3920,8 @@ Points posit (58359ms)
 - 2026-10-19 17:12:31 UTC — [ticket-513] validateur: APPROVED — Tous les critères sont satisfaits. L'implémentation de `FileVivante.retirer()` e (66328ms)
 - 2026-10-19 17:12:31 UTC — [ticket-513] APPROVED après 1 tour(s)
 - 2026-10-19 17:15:23 UTC — [ticket-513] documentation: 1 fichier(s) (161218ms)
+- 2026-10-19 13:27:30 UTC — [ide-core] ticket-509 PR #558 confiée au CIWatcher
+- 2026-10-19 13:27:33 UTC — [ticket-494] branche ticket-494-design-how-each-run-works-in-its-own-worktree-so
+- 2026-10-19 13:27:33 UTC — [ticket-494] tour 1 — codeur démarré
+- 2026-10-19 13:32:46 UTC — [ide-core] ticket-509 PR #558 mergée (CI verte)
+- 2026-10-19 13:34:25 UTC — [ticket-494] tour 1 — architect terminé (411515ms)
