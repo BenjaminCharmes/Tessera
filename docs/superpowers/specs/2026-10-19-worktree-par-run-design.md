@@ -1,7 +1,7 @@
 # Un worktree par run — conception
 
 Ticket-494, ADR-056. Aucun code : ce document fixe les interfaces et les
-contraintes, les tickets 515 à 520 les implémentent.
+contraintes, les tickets 519 à 525 les implémentent.
 
 ## Le problème
 
@@ -34,9 +34,9 @@ humaines. Le 16/10 :
   qu'un `git add` puisse balayer. Garder ce chemin court est un conseil de
   `docs/configuration.md`, pas une garantie : la garantie est `core.longpaths`.
 - **Dossier** : `<IDE_WORKTREES_DIR>/<project_id>/<ticket_id>`, par exemple
-  `.../ide-core/ticket-515`. Un run par ticket et par projet (voir §5) : le nom
+  `.../ide-core/ticket-519`. Un run par ticket et par projet (voir §5) : le nom
   est unique sans horodatage.
-- **Branche** : celle du ticket (`ticket-515-<slug>`), **extraite** dans le
+- **Branche** : celle du ticket (`ticket-519-<slug>`), **extraite** dans le
   worktree (`git worktree add -b <branche> <dossier> origin/<base>`, ou sans
   `-b` si la branche existe déjà : reprise d'un run, ticket-208). Git refuse une
   même branche dans deux worktrees : si un humain l'a extraite dans le checkout,
@@ -148,7 +148,7 @@ Règles, toutes fermées :
   `_ensure_own_repository` doit l'accepter sans passer par `ancestor`.
 - **`CLAUDE.md` des ancêtres** : `claude_md_ancetres_a_exclure` calcule depuis
   `_REPO_ROOT`. Un worktree est **hors** de ce dépôt : le calcul s'appuie sur
-  `racine_ecriture`, pas sur `_REPO_ROOT`. Le ticket-519 le règle.
+  `racine_ecriture`, pas sur `_REPO_ROOT`. Le ticket-525 le règle.
 - **`test_command` et `test_cwd`** : `test_cwd` est relatif au dossier du projet
   *dans le worktree*. Si `worktree.test_command` est déclaré, il remplace
   `test_command` ; `worktree.env` s'ajoute à l'environnement de la commande
@@ -185,12 +185,16 @@ pas sa décision. Quand elle se prendra, la clef du verrou passera de
 
 | Ticket | Contenu | Dépend de |
 |---|---|---|
-| 515 | `ConfigWorktree`, `PolitiqueRun.worktree`, `IDE_WORKTREES_DIR` | — |
-| 516 | `RunWorktree` : créer, reprendre, supprimer, `core.longpaths` | — |
-| 517 | `populate`, liens, suppression sûre | 515, 516 |
-| 518 | `test_command` effective et `env` dans un worktree | 515 |
-| 519 | Exécution dans le worktree : orchestrateur, hook, fin de run | 515 à 518 |
-| 520 | Reprise des worktrees orphelins au démarrage | 516, 517 |
+| 521 | `ConfigWorktree`, `PolitiqueRun.worktree`, `IDE_WORKTREES_DIR` | — |
+| 522 | `RunWorktree` : créer, reprendre, supprimer, `core.longpaths` | — |
+| 523 | `populate`, liens, suppression sûre | 521, 522 |
+| 524 | `test_command` effective et `env` dans un worktree | 521 |
+| 525 | Hook d'écriture, ADR-024 et `CLAUDE.md` d'ancêtres suivent le worktree | 521 |
+| 519 | Exécution dans le worktree : orchestrateur, fin de run | 521 à 525 |
+| 520 | Reprise des worktrees orphelins au démarrage | 522, 523 |
+
+Les numéros 515 à 518 étaient déjà pris par des tickets livrés : l'ordre
+numérique ne suit donc pas l'ordre de dépendance, seul `depends_on` fait foi.
 
 ## Ce que ça ne tranche pas
 
@@ -203,5 +207,5 @@ pas sa décision. Quand elle se prendra, la clef du verrou passera de
   claire, pas contourné. À concevoir avant d'ouvrir ce cas.
 - **Le chat** et le **parallélisme** de deux runs (§ 4 et 5).
 - **L'activation sur ide-core** : `agents.json` se refuse en écriture aux agents
-  (ADR-027). Un humain y ajoute la clé `worktree` quand les tickets 515 à 520
+  (ADR-027). Un humain y ajoute la clé `worktree` quand les tickets 519 à 525
   sont mergés.
