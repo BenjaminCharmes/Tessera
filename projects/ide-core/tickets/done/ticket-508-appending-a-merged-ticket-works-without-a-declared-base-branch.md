@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-508
-pr_number: null
+pr_number: 549
 priority: high
 status: done
 title: Appending a ticket merged on the base works when the project declares no base_branch
