@@ -3711,3 +3711,12 @@ Points posit (58359ms)
 - 2026-10-19 08:19:56 UTC — [ide-core] ticket-504 PR #539 mergée (CI verte)
 - 2026-10-19 08:23:51 UTC — [ticket-492] testeur: OK (exit 0)
 - 2026-10-19 08:23:51 UTC — [ticket-492] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-19 08:27:19 UTC — [ticket-492] branche ticket-492-an-approval-is-bound-to-the-commit-it-reviewed-an
+- 2026-10-19 08:35:39 UTC — [ticket-492] testeur: OK (exit 0)
+- 2026-10-19 08:35:39 UTC — [ticket-492] branche reprise (4 commit(s)) — tests green, codeur sauté
+- 2026-10-19 08:38:06 UTC — [ticket-492] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le changement implémente un cont (146109ms)
+- 2026-10-19 08:38:06 UTC — [ticket-492] tour 1 — reviewer démarré
+- 2026-10-19 08:38:46 UTC — [ticket-492] tour 1 — reviewer terminé (39828ms)
+- 2026-10-19 08:43:28 UTC — [ticket-492] validateur: fichiers cités joints : memory/contraintes.md
+- 2026-10-19 08:43:28 UTC — [ticket-492] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff contient quatre fichier (321921ms)
+- 2026-10-19 08:43:28 UTC — [ticket-492] APPROVED après 1 tour(s)
