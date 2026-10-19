@@ -12,6 +12,17 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
+  jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`,
+  créé depuis `origin/<base>` avec `core.longpaths` : c'est la racine
+  d'écriture du run. Les sessions humaines n'y travaillent pas. (ADR-056)
+- **Un lien de `populate` ne vise que ce que git ignore, et se retire avant
+  toute suppression récursive.** Ce qui s'édite se copie. Jamais le `.env` de
+  Tessera ; une entrée absente se journalise sans bloquer. (ADR-056, ADR-053)
+- **Un worktree qui porte du travail non commité ne se supprime pas.** Au
+  démarrage, un worktree orphelin se commite comme un run non approuvé, puis
+  se supprime. (ADR-056, ADR-037)
+
 ## Git et périmètre d'écriture
 
 - **Ne jamais écrire hors de la racine du projet.** Un hook `PreToolUse`

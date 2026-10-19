@@ -296,6 +296,12 @@ s'en distingue.
 
 Le mode `local` pour les artefacts écrit les règles d'exclusion dans `.git/info/exclude` (ADR-021, ADR-023). Avant de commiter, la purge des fichiers stagés mais ignorés (`_purger_stage_ignoré` dans `git_workspace.py`) s'est compliquée : elle vérifie maintenant qu'un fichier n'existe pas dans `HEAD` avant de le retirer de l'index. Un fichier suivi par le dépôt initial reste suivi, même s'il est marqué ignoré après coup. Sur un dépôt sans commit (`HEAD` absent), la purge agit comme avant.
 
+### Isolation des runs par worktree (ticket-494)
+
+Chaque run s'exécute dans un `git worktree` dédié, jamais dans le checkout principal. Cela isole le travail du pipeline de celui de l'utilisateur : aucun changement de branche n'affecte la session humaine, aucun commit du pipeline ne salit l'arbre de travail.
+
+La conception (ticket-494) établit comment les worktrees naissent et disparaissent, quels fichiers sensibles (`.env`, `CLAUDE.md`, `.venv`, `node_modules`) ils héritent par copie ou lien symbolique, et comment le hook d'écriture (ADR-031) s'adapte. Les contraintes intègrent les accidents documentés : jonction `node_modules` vidant le dépôt principal, chemins longs cassant `git worktree add` sous Windows, `uv` refusé par le contrôle d'applications, outils de sécurité ne suivant pas les liens symboliques, et fichiers ignorés par git manquant à la création. Les worktrees orphelins après un redémarrage du backend sont nettoyés au démarrage suivant.
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
