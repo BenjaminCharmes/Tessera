@@ -509,6 +509,19 @@ La lecture du ticket se fait par `git show origin/<base>:<chemin>` après un `fe
 
 La branche du ticket ajouté part toujours d'une base à jour (fetch puis départ de `origin/<base>`), ce que le ticket-480 garantit en fin de run.
 
+#### Retrait de tickets d'une file en cours (ticket-513)
+
+L'endpoint `POST /orchestrator/runs/{run_id}/remove` permet de retirer des tickets pas encore commencés d'une file vivante, sans arrêter la file ni interrompre le ticket en cours.
+
+Service : `FileVivante.retirer` accepte une liste de `ticket_ids`. Pour chaque ticket, elle :
+- Refuse les tickets en cours (« en cours : utiliser stop »)
+- Refuse les tickets déjà traités par la file (« déjà traité par la file »)
+- Ignore les tickets absents de la file
+
+Un ticket retiré écrit `[<projet>] ticket-XXX retiré de la file` dans `memory/pipeline-log.md`. La fiche du ticket garde son statut inchangé : retirer n'est pas annuler ; le ticket peut être relancé plus tard.
+
+Réponse : `{ "retires": [...], "ignores": {...}, "refuses": {...} }`. Erreur `409 Conflict` si le run est inconnu, terminé, ou n'est pas une file.
+
 ### Agents
 | Méthode | Route | Description |
 |---------|-------|-------------|

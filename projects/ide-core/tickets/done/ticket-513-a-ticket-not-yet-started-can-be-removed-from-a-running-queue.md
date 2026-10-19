@@ -1,14 +1,14 @@
 ---
-id: ticket-513
-title: "A ticket not yet started can be removed from a running queue"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 1
-created: 2026-10-19
+id: ticket-513
+pr_number: 566
+priority: medium
+status: done
+title: A ticket not yet started can be removed from a running queue
+type: feat
 ---
 
 # ticket-513 — Retirer d'une file en cours un ticket pas encore commencé
