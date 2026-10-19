@@ -243,6 +243,27 @@ async def test_verification_status_maps_to_a_step_state(
     assert len(fake.calls("POST", "/domains/dom_1/verify")) == 1
 
 
+@pytest.mark.parametrize("status, expected", [
+    ("not_started", StepState.TODO),
+    ("pending", StepState.PENDING),
+    ("partially_verified", StepState.PENDING),
+    ("temporary_failure", StepState.PENDING),
+    ("failed", StepState.FAILED),
+])
+async def test_inspect_reports_the_real_status_and_never_launches(
+    status: str, expected: StepState
+) -> None:
+    fake = FakeResend(domain=status)
+    ctx = _ctx(FakeVercelEnv(), dns_published=True)
+    result = await ResendVerifyStep(_client(fake)).inspect(ctx)
+    assert result.state is expected
+    if status == "not_started":
+        assert result.detail == "verification is to be launched"
+    elif expected is StepState.PENDING:
+        assert status in result.detail
+    assert fake.calls("POST", "/") == []
+
+
 async def test_verified_domain_is_not_verified_again() -> None:
     fake = FakeResend(domain="verified")
     step = ResendVerifyStep(_client(fake))
