@@ -30,11 +30,14 @@ Trois choix le distinguent d'un assistant de code classique :
   au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
 - **Les fichiers sensibles restent protégés.** Les agents ne peuvent pas
   modifier les règles de votre IDE (`CLAUDE.md`, `agents.json`, `.github/workflows/`,
-  `.git/`) ni sa configuration locale (`.claude/`). Le script de vérification
-  (celui de `test_command`) est aussi protégé : un codeur ne peut pas affaiblir
-  la vérification qui juge son code. Un diff qui touche la configuration des
-  tests est signalé au reviewer pour vérification. Si un ticket exige une telle
-  modification, le run s'arrête avant le premier tour avec un message clair.
+  `.git/`) ni sa configuration locale (`.claude/`). Ils ne peuvent pas non plus
+  modifier les contraintes communes (`memory/contraintes.md`) directement : les
+  nouvelles règles y sont proposées d'abord, en attente d'acceptation. Le script
+  de vérification (celui de `test_command`) est aussi protégé : un codeur ne peut
+  pas affaiblir la vérification qui juge son code. Un diff qui touche la
+  configuration des tests est signalé au reviewer pour vérification. Si un ticket
+  exige une telle modification, le run s'arrête avant le premier tour avec un
+  message clair.
 
 Après un run approuvé, seul le commit que le reviewer et le validateur ont lu
 est mergé : Tessera rejette d'office tout changement introduit ultérieurement

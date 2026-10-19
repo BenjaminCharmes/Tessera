@@ -1,14 +1,15 @@
 ---
-id: ticket-493
-title: "A constraint written by an agent stays proposed, and reaches no agent until a human accepts it"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
-created: 2026-10-16
+id: ticket-493
+pr_number: 541
+priority: medium
+status: done
+title: A constraint written by an agent stays proposed, and reaches no agent until
+  a human accepts it
+type: feat
 ---
 
 # ticket-493 — Une règle écrite par un agent attend l'accord humain

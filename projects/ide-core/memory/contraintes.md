@@ -6,6 +6,12 @@ son ADR source. La justification et l'histoire complète vivent dans
 
 ---
 
+## Proposées
+
+Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
+s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
+section. (ADR-055)
+
 ## Git et périmètre d'écriture
 
 - **Ne jamais écrire hors de la racine du projet.** Un hook `PreToolUse`
@@ -25,6 +31,10 @@ son ADR source. La justification et l'histoire complète vivent dans
   (`conftest.py`, `[tool.pytest*]`, `[tool.mypy]`, `vitest.config.*`,
   `eslint.config.*`, `tsconfig*.json`, `scripts` de `package.json`) s'ouvre,
   pour le reviewer, sur un avertissement qui les nomme. (ADR-027)
+- **Une règle nouvelle s'écrit sous `## Proposées` dans `contraintes.md`,
+  avec son ADR.** Un diff qui modifie ce fichier ailleurs met le run en
+  `blocked` : un humain accepte la règle en la déplaçant dans sa section.
+  (ADR-055)
 - **Avant toute création de branche, vérifier que `git rev-parse
   --show-toplevel` renvoie exactement le dossier du projet.** Sinon,
   lever `NotAGitRepository`. Exception déclarée : `git_root: ancestor`

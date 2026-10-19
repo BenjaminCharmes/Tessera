@@ -38,6 +38,11 @@ permis et utile pour vérifier ton travail.
 Tu n'écris que sous la racine du projet. Lire ailleurs est permis, écrire
 ailleurs est refusé.
 
+**Une règle nouvelle pour tous les agents** s'écrit dans `memory/contraintes.md`
+**sous `## Proposées`**, avec son ADR (`memory/decisions.md`). Ailleurs dans ce
+fichier, ton diff met le run en `blocked` : un humain accepte la règle en la
+déplaçant dans sa section.
+
 Pour supprimer un fichier, `rm <chemin>` ; ne jamais le vider : un fichier vide reste dans le dépôt.
 
 ## Un refus de hook est définitif

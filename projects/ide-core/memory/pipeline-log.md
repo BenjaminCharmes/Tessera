@@ -3721,3 +3721,16 @@ Points posit (58359ms)
 - 2026-10-19 08:43:28 UTC — [ticket-492] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff contient quatre fichier (321921ms)
 - 2026-10-19 08:43:28 UTC — [ticket-492] APPROVED après 1 tour(s)
 - 2026-10-19 08:46:15 UTC — [ticket-492] documentation: 3 fichier(s) (161750ms)
+- 2026-10-19 08:46:34 UTC — [ide-core] ticket-492 PR #540 confiée au CIWatcher
+- 2026-10-19 08:46:37 UTC — [ticket-493] branche ticket-493-a-constraint-written-by-an-agent-stays-proposed-a
+- 2026-10-19 08:46:38 UTC — [ticket-493] tour 1 — codeur démarré
+- 2026-10-19 08:51:29 UTC — [ide-core] ticket-492 PR #540 mergée (CI verte)
+- 2026-10-19 08:52:34 UTC — [ticket-493] tour 1 — codeur terminé (356327ms)
+- 2026-10-19 08:59:07 UTC — [ticket-493] testeur: OK (exit 0)
+- 2026-10-19 09:00:51 UTC — [ticket-493] securite: PASS — Audit complet sans vulnérabilité détectée. Le mécanisme de validation des règles (103750ms)
+- 2026-10-19 09:00:51 UTC — [ticket-493] tour 1 — reviewer démarré
+- 2026-10-19 09:01:51 UTC — [ticket-493] tour 1 — reviewer terminé (60015ms)
+- 2026-10-19 09:06:37 UTC — [ticket-493] validateur: fichiers cités joints : memory/contraintes.md, test_consignes_coherentes.py (tronqué)
+- 2026-10-19 09:06:37 UTC — [ticket-493] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute une section `## Proposées` ign (345436ms)
+- 2026-10-19 09:06:37 UTC — [ticket-493] APPROVED après 1 tour(s)
+- 2026-10-19 09:09:25 UTC — [ticket-493] documentation: 2 fichier(s) (162125ms)

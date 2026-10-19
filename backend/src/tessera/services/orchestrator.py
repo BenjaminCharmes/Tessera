@@ -32,6 +32,7 @@ from tessera.utils.logger import get_logger
 from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
+from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline_critere_protege import arret_critere_protege
 from tessera.services.pipeline_approbation import suivre_documentation, tete_de_branche
 from tessera.services.pipeline_plan import run_plan
@@ -564,6 +565,12 @@ class Orchestrator:
 
         if run.stop_requested:
             return await outcomes.finish_stopped(self, run)
+
+        # Une règle écrite hors `## Proposées` changerait la consigne de tous
+        # les agents suivants sans relecture : le run s'arrête là (ticket-493).
+        refused = await arret_contraintes_hors_proposees(self, run)
+        if refused is not None:
+            return refused
 
         # Une suite rouge renvoie au codeur sans passer par la revue :
         # un reviewer n'a pas à arbitrer un fait déjà établi, et l'appel
