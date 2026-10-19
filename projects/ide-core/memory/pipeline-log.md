@@ -3871,3 +3871,15 @@ Points posit (58359ms)
 - 2026-10-19 14:36:34 UTC — [ticket-515] validateur: APPROVED — Tous les critères sont satisfaits. Le plan établit clairement que la cause profo (71406ms)
 - 2026-10-19 14:36:34 UTC — [ticket-515] APPROVED après 1 tour(s)
 - 2026-10-19 14:39:17 UTC — [ticket-515] documentation: 2 fichier(s) (157172ms)
+- 2026-10-19 14:39:34 UTC — [ide-core] ticket-515 PR #561 confiée au CIWatcher
+- 2026-10-19 14:39:37 UTC — [ticket-516] branche ticket-516-the-ci-watch-resumed-after-a-restart-finds-the-pi
+- 2026-10-19 14:39:38 UTC — [ticket-516] tour 1 — codeur démarré
+- 2026-10-19 14:43:15 UTC — [ticket-516] tour 1 — codeur terminé (217045ms)
+- 2026-10-19 14:44:02 UTC — [ide-core] ticket-515 PR #561 mergée (CI verte)
+- 2026-10-19 14:51:51 UTC — [ticket-516] testeur: OK (exit 0)
+- 2026-10-19 14:53:12 UTC — [ticket-516] securite: PASS — Aucune vulnérabilité détectée. Le code ajouté suit les bonnes pratiques de sécur (80905ms)
+- 2026-10-19 14:53:12 UTC — [ticket-516] tour 1 — reviewer démarré
+- 2026-10-19 14:53:44 UTC — [ticket-516] tour 1 — reviewer terminé (32672ms)
+- 2026-10-19 14:59:45 UTC — [ticket-516] validateur: fichiers cités joints : reprise_surveillance.py, test_reprise_surveillance.py
+- 2026-10-19 14:59:45 UTC — [ticket-516] validateur: APPROVED — Ticket-516 est entièrement implémenté et fonctionnel. Le codeur a ajouté une sou (393000ms)
+- 2026-10-19 14:59:45 UTC — [ticket-516] APPROVED après 1 tour(s)
