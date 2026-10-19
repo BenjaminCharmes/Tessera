@@ -493,6 +493,28 @@ async def test_livraison_sync_base_avant_rebase(tmp_path: Path) -> None:
     assert g.rejoue == ["develop"], "rejouer_sur must follow the sync"
 
 
+async def test_livraison_journalise_une_migration_renumerotee(tmp_path: Path) -> None:
+    """A renumbered migration shows in the delivery steps (ticket-484)."""
+    git = _FauxGit()
+    git.migrations_renumerotees = (  # type: ignore[attr-defined]
+        ("prisma/migrations/0005_x", "prisma/migrations/0006_x"),
+    )
+    svc, _g, _w = _service(tmp_path, "pr", git=git)
+
+    livraison = await _livrer(svc)
+
+    assert "migration renumérotée : 0005_x → 0006_x" in livraison.etapes
+    assert len(livraison.etapes) == len(livraison.durees_ms)
+
+
+async def test_livraison_sans_renumerotation_ne_journalise_rien(tmp_path: Path) -> None:
+    svc, _g, _w = _service(tmp_path, "pr")
+
+    livraison = await _livrer(svc)
+
+    assert not any("renumérotée" in etape for etape in livraison.etapes)
+
+
 # ------------------------------------------------------------------
 # livrer_phase_1 et livrer_phase_2 — ticket-305
 # ------------------------------------------------------------------
