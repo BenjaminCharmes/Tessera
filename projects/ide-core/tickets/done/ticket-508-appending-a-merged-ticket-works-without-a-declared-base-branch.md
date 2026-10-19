@@ -1,14 +1,14 @@
 ---
-id: ticket-508
-title: "Appending a ticket merged on the base works when the project declares no base_branch"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-508
+pr_number: 549
+priority: high
+status: done
+title: Appending a ticket merged on the base works when the project declares no base_branch
+type: fix
 ---
 
 # ticket-508 — L'ajout d'un ticket mergé marche aussi sans `base_branch` déclaré

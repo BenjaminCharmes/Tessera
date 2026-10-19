@@ -3770,3 +3770,16 @@ Points posit (58359ms)
 - 2026-10-19 11:18:45 UTC — [ticket-507] validateur: APPROVED — Tous les critères sont satisfaits. Le ticket implémente correctement la gestion  (517063ms)
 - 2026-10-19 11:18:45 UTC — [ticket-507] APPROVED après 1 tour(s)
 - 2026-10-19 11:22:09 UTC — [ticket-507] documentation: 2 fichier(s) (199984ms)
+- 2026-10-19 11:22:27 UTC — [ide-core] ticket-507 PR #548 confiée au CIWatcher
+- 2026-10-19 11:22:30 UTC — [ticket-508] branche ticket-508-appending-a-ticket-merged-on-the-base-works-when
+- 2026-10-19 11:22:30 UTC — [ticket-508] tour 1 — codeur démarré
+- 2026-10-19 11:24:22 UTC — [ticket-508] tour 1 — codeur terminé (112110ms)
+- 2026-10-19 11:27:26 UTC — [ide-core] ticket-507 PR #548 mergée (CI verte)
+- 2026-10-19 11:31:25 UTC — [ticket-508] testeur: OK (exit 0)
+- 2026-10-19 11:33:41 UTC — [ticket-508] securite: PASS — Aucune vulnérabilité détectée. Le changement introduit un fallback cohérent sur  (136030ms)
+- 2026-10-19 11:33:41 UTC — [ticket-508] tour 1 — reviewer démarré
+- 2026-10-19 11:33:59 UTC — [ticket-508] tour 1 — reviewer terminé (18545ms)
+- 2026-10-19 11:36:22 UTC — [ticket-508] validateur: fichiers cités joints : git_workspace.py (tronqué) ; non joints (budget épuisé) : backend/tests/test_ajout_ticket_sur_la_base.py, test_ajout_ticket_sur_la_base.py
+- 2026-10-19 11:36:22 UTC — [ticket-508] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie le comportement  (161110ms)
+- 2026-10-19 11:36:22 UTC — [ticket-508] APPROVED après 1 tour(s)
+- 2026-10-19 11:38:20 UTC — [ticket-508] documentation: 0 fichier(s) (113421ms)
