@@ -60,8 +60,8 @@ coup, l'attente de créneau, une génération sans fin ou un CLI figé.
 - [ ] Un test vérifie qu'un appel Ollama qui continue d'émettre au-delà de la durée maximale lève `ProviderIndisponible`
 - [ ] Un test vérifie que l'attente d'un créneau Ollama compte dans cette durée maximale
 - [ ] Un test vérifie qu'un appel `agent_sdk` d'un rôle texte qui continue d'émettre au-delà de la durée maximale lève `ProviderIndisponible`
-- [ ] Un test vérifie qu'un passage au repli écrit la ligne `<rôle>: repli vers …` dans `pipeline-log.md`
-- [ ] Le plan nomme la cause des 3 800 s, ou les hypothèses écartées avec leur preuve
+- [ ] Un test vérifie qu'un passage au repli écrit la ligne `<rôle>: repli vers …` dans le journal du pipeline
+- [ ] `docs/architecture.md` a une section « Durée des appels de rôle texte » qui nomme la cause des 3 800 s du 19/10, ou les hypothèses écartées avec leur preuve
 - [ ] Les tests existants de `providers/` passent sans modification de leurs assertions
 
 ## Dépendances
