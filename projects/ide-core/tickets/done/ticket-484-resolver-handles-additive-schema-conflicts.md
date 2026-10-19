@@ -1,15 +1,16 @@
 ---
-id: ticket-484
-title: "Additive conflicts in a Prisma schema are resolved mechanically, and colliding migration numbers are renumbered"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-16
 depends_on: []
 estimated_days: 1
+id: ticket-484
 plan: true
-created: 2026-10-16
+pr_number: 542
+priority: medium
+status: done
+title: Additive conflicts in a Prisma schema are resolved mechanically, and colliding
+  migration numbers are renumbered
+type: feat
 ---
 
 # ticket-484 — Conflits additifs de schéma Prisma et migrations en collision

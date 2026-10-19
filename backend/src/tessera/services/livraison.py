@@ -239,6 +239,12 @@ class LivraisonService:
             )
         etapes.append(f"rebase sur {self._base_branch}")
         durees_ms.append(rebase_ms)
+        for ancien, nouveau in getattr(self._git, "migrations_renumerotees", ()):
+            etapes.append(
+                f"migration renumérotée : {ancien.rpartition('/')[2]}"
+                f" → {nouveau.rpartition('/')[2]}"
+            )
+            durees_ms.append(0.0)
         if resolus:
             # La résolution est incluse dans la durée du rebase ci-dessus.
             etapes.append("conflit résolu : " + ", ".join(resolus))

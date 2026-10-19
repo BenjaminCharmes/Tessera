@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 from tessera.services import journal_en_attente
 from tessera.services.git_attributes import declare_union_merge
+from tessera.services.prisma_conflits import fusionner_ajouts, planifier_renumerotation
 from tessera.services.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
 
@@ -425,6 +426,10 @@ class GitWorkspaceService:
         # résolveur tenté et en échec produit le même arrêt qu'un résolveur
         # jamais appelé.
         self.raison_resolveur: str | None = None
+        # Migrations Prisma renumérotées par le dernier `rejouer_sur`, en
+        # (ancien chemin, nouveau chemin) — `Livraison` les met au journal
+        # sans que la signature de `rejouer_sur` change (ticket-484).
+        self.migrations_renumerotees: tuple[tuple[str, str], ...] = ()
         # Untracked files already sitting in the tree when the run started.
         # They were not produced by the coder, so `commit_all`'s blanket
         # `git add -A` must not sweep them into the ticket's commit (that is
@@ -1208,6 +1213,22 @@ class GitWorkspaceService:
     ) -> tuple[str, ...]:
         """Rejoue la branche courante sur `base`. Rend les fichiers en conflit.
 
+        Un rebase abouti renumérote ensuite les migrations Prisma du ticket
+        qui prennent un numéro déjà pris par la base (ticket-484).
+        """
+        self.migrations_renumerotees = ()
+        conflits = await self._rebaser(base, resolveur)
+        if not conflits:
+            await self._renumeroter_migrations(base)
+        return conflits
+
+    async def _rebaser(
+        self,
+        base: str,
+        resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
+    ) -> tuple[str, ...]:
+        """Rejoue la branche courante sur `base`. Rend les fichiers en conflit.
+
         Une branche partie d'une base qui a depuis avancé produit une PR que
         GitHub déclare non mergeable : attendre sa CI ne mènerait nulle part.
 
@@ -1260,6 +1281,12 @@ class GitWorkspaceService:
         # automatiquement en faveur de la branche (ticket-300, ADR-033).
         if all(r is not None and _is_orchestrator_artifact_path(r) for r in relatifs):
             if await self._resoudre_conflits_artefacts(conflits):
+                return ()
+
+        # Deux ajouts de bloc au même schéma Prisma : rien n'est édité des deux
+        # côtés, inutile d'appeler un agent (ticket-484).
+        if all(r is not None and r.endswith(".prisma") for r in relatifs):
+            if await self._resoudre_prisma_en_ajouts(conflits, prefixe):
                 return ()
 
         if resolveur is None or not await self._faire_resoudre(conflits, resolveur):
@@ -1490,6 +1517,73 @@ class GitWorkspaceService:
             return True
         except GitCommandError:
             return False
+
+    async def _etage_de_conflit(self, etage: int, chemin: str) -> str:
+        """Contenu d'un étage du conflit (1 ancêtre, 2 base, 3 ticket) ; vide si absent."""
+        try:
+            return await self._run("show", f":{etage}:{chemin}")
+        except GitCommandError:
+            return ""
+
+    async def _resoudre_prisma_en_ajouts(
+        self, conflits: tuple[str, ...], prefixe: str
+    ) -> bool:
+        """Garde les blocs ajoutés des deux côtés d'un conflit `.prisma`.
+
+        Tout est calculé avant la première écriture : si un seul fichier
+        n'est pas un pur ajout, rien n'est touché et le résolveur reçoit les
+        fichiers intacts. Rend True quand le rebase s'est poursuivi.
+        """
+        fusions: dict[str, str] = {}
+        for chemin in conflits:
+            fusion = fusionner_ajouts(
+                await self._etage_de_conflit(2, chemin),
+                await self._etage_de_conflit(3, chemin),
+                await self._etage_de_conflit(1, chemin),
+            )
+            if fusion is None:
+                return False
+            fusions[chemin] = fusion
+        try:
+            for chemin, texte in fusions.items():
+                dest = self._project_path / (_relatif_au_projet(chemin, prefixe) or chemin)
+                dest.write_text(texte, encoding="utf-8", newline="")
+                await self._run("add", "--", f":/{chemin}")
+            _logger.info("prisma_ajouts_fusionnes", extra={"fichiers": list(conflits)})
+            await self._run("-c", "core.editor=true", "rebase", "--continue")
+        except GitCommandError:
+            return False
+        return True
+
+    async def _dossiers_de_migrations(self, ref: str) -> set[str]:
+        """Tous les dossiers de `ref` sous le projet, chemins relatifs au projet."""
+        sortie = await self._run("ls-tree", "-r", "-d", "--name-only", ref)
+        return set(sortie.splitlines())
+
+    async def _renumeroter_migrations(self, base: str) -> None:
+        """Renomme et commite les migrations du ticket qui collisionnent (ticket-484).
+
+        Sans collision, aucune commande git d'écriture ne part. Un échec
+        annule les renommages et laisse la branche comme le rebase l'a rendue.
+        """
+        plan = planifier_renumerotation(
+            await self._dossiers_de_migrations(base),
+            await self._dossiers_de_migrations("HEAD"),
+        )
+        if not plan:
+            return
+        try:
+            for ancien, nouveau in plan:
+                await self._run("mv", ancien, nouveau)
+            titre = "; ".join(f"{a.rpartition('/')[2]} to {n.rpartition('/')[2]}" for a, n in plan)
+            await self._run("commit", "-q", "-m", f"chore: renumber migration {titre}")
+        except GitCommandError as exc:
+            _logger.warning("migration_renumerotation_echec", extra={"erreur": str(exc)})
+            await self._run("reset", "-q", "--hard", "HEAD")
+            return
+        for ancien, nouveau in plan:
+            _logger.info("migration_renumerotee", extra={"ancien": ancien, "nouveau": nouveau})
+        self.migrations_renumerotees = tuple(plan)
 
     async def _rebase_en_cours(self) -> bool:
         """Git a-t-il un rebase à moitié appliqué sous la main ?"""
