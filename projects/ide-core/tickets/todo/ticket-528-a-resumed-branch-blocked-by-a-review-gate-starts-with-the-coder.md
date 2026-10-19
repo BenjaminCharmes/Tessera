@@ -20,7 +20,7 @@ nouveau à coup sûr.
 
 ## Contexte
 À la reprise d'une branche qui porte du travail (`verifier_travail_repris`,
-`backend/src/tessera/services/orchestrator.py`), des tests verts font sauter
+`backend/src/tessera/services/pipeline_reprise.py`), des tests verts font sauter
 le codeur (« branche reprise (N commit(s)) — tests green, codeur sauté ») et le
 run passe directement à l'audit puis à la revue. C'est juste après une coupure
 (redémarrage, quota) : le travail était bon, il n'a pas été jugé.
