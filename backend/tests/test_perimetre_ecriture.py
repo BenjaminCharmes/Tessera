@@ -8,6 +8,7 @@ from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
     racine_autorisee,
 )
+from tests.depot_worktree import lier
 
 
 def _projet(tmp_path: Path, nom: str, agents: dict[str, object] | None = None) -> Path:
@@ -256,3 +257,23 @@ async def test_le_hook_laisse_passer_une_commande_de_test(tmp_path: Path) -> Non
         assert await hook(
             {"tool_name": "Bash", "tool_input": {"command": commande}}, None, None
         ) == {}, commande
+
+
+async def test_le_hook_refuse_une_ecriture_a_travers_un_lien(tmp_path: Path) -> None:
+    # Un worktree peuplé (ticket-523) lie `node_modules` vers le checkout : le
+    # lien est en lecture seule pour les outils fichier, parce que le hook le
+    # résout et voit la sortie de la racine.
+    projet = _projet(tmp_path, "client")
+    checkout = tmp_path / "checkout" / "node_modules"
+    checkout.mkdir(parents=True)
+    lier(checkout, projet / "node_modules")
+    hook = hook_refus_hors_perimetre(projet)
+
+    sortie = await hook(
+        {"tool_name": "Write", "tool_input": {"file_path": str(projet / "node_modules" / "x.js")}},
+        None,
+        None,
+    )
+
+    assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny"
+    assert not (checkout / "x.js").exists()
