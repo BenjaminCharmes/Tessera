@@ -3975,3 +3975,25 @@ Points posit (58359ms)
 - 2026-10-19 18:23:54 UTC — [ticket-517] tour 1 — reviewer terminé (31390ms)
 - 2026-10-19 18:23:54 UTC — [ticket-517] APPROVED après 1 tour(s)
 - 2026-10-19 18:26:23 UTC — [ticket-517] documentation: 1 fichier(s) (145016ms) — après tour de correction
+- 2026-10-19 18:26:43 UTC — [ticket-517] livraison: arrêt — PR #571 non mergée : la tête de la PR #571 n'est plus le commit poussé : 9c3e03e au lieu de eab7443. La PR reste ouverte.
+- 2026-10-19 18:26:42 UTC — [ide-core] ticket-517 PR #571 confiée au CIWatcher
+- 2026-10-19 18:26:46 UTC — [ticket-518] branche ticket-518-a-validator-security-or-documentation-call-has-a
+- 2026-10-19 18:28:44 UTC — [ticket-518] plan rendu (117766ms)
+- 2026-10-19 18:28:44 UTC — [ticket-518] tour 1 — codeur démarré
+- 2026-10-19 18:50:14 UTC — [ticket-518] tour 1 — codeur terminé (1290014ms)
+- 2026-10-19 18:55:26 UTC — [ticket-518] testeur: 1 failed, 1331 passed, 56 warnings in 310.07s (0:05:10)
+- 2026-10-19 18:55:26 UTC — [ticket-518] tests rouges au tour 1
+- 2026-10-19 18:55:26 UTC — [ticket-518] tour 2 — codeur démarré
+- 2026-10-19 18:55:35 UTC — [ticket-518] tour 2 — codeur terminé (8578ms)
+- 2026-10-19 19:02:20 UTC — [ticket-518] testeur: 1 failed, 1331 passed, 56 warnings in 401.32s (0:06:41)
+- 2026-10-19 19:02:20 UTC — [ticket-518] tests rouges au tour 2
+- 2026-10-19 19:02:20 UTC — [ticket-518] tour 3 — codeur démarré
+- 2026-10-19 19:02:50 UTC — [ticket-518] tour 3 — codeur terminé (30313ms)
+- 2026-10-19 19:09:22 UTC — [ticket-518] testeur: OK (exit 0)
+- 2026-10-19 19:11:07 UTC — [ticket-518] securite: PASS — Le ticket 518 ajoute une borne de durée totale pour les rôles texte et journalis (105030ms)
+- 2026-10-19 19:11:07 UTC — [ticket-518] tour 3 — reviewer démarré
+- 2026-10-19 19:11:42 UTC — [ticket-518] tour 3 — reviewer terminé (34843ms)
+- 2026-10-19 19:17:22 UTC — [ticket-518] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : providers/
+- 2026-10-19 19:17:22 UTC — [ticket-518] validateur: CHANGES_REQUESTED — L'implémentation couvre cinq des six critères : durée maximale bornée pour Ollam (375250ms)
+- 2026-10-19 19:17:22 UTC — [ticket-518] CHANGES_REQUESTED tour 3: Validateur : L'implémentation couvre cinq des six critères : durée maximale bornée pour Ollama et agent_sdk, prise en compte de l'attente de créneaux, trace du repli en journal, et tests existants pas
+- 2026-10-19 19:17:22 UTC — [ticket-518] BLOCKED après 3 tour(s) sans approbation
