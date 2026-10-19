@@ -217,7 +217,7 @@ def test_xdist_is_a_dev_dependency() -> None:
 
 def test_backend_and_frontend_steps_are_defined() -> None:
     """BACKEND_STEPS and FRONTEND_STEPS are both non-empty with the right steps."""
-    assert {s.name for s in BACKEND_STEPS} == {"pytest", "mypy"}
+    assert {s.name for s in BACKEND_STEPS} == {"pytest", "mypy", "mypy-linux"}
     assert {s.name for s in FRONTEND_STEPS} == {"tsc", "eslint", "vitest"}
 
 
@@ -326,3 +326,9 @@ def test_run_parallel_returns_zero_when_all_pass() -> None:
     frontend = _make_steps("tsc", "eslint", "vitest")
     with patch(_PATCH, return_value=_result(0)):
         assert run_parallel(backend, frontend) == 0
+
+
+def test_mypy_also_checks_the_linux_platform_of_the_ci() -> None:
+    """A Windows-only attribute must fail here, not in CI after the review (ticket-523)."""
+    linux = next(s for s in BACKEND_STEPS if s.name == "mypy-linux")
+    assert linux.cmd[-3:] == ["--platform", "linux", "src/"]
