@@ -1,14 +1,15 @@
 ---
-id: ticket-516
-title: "The CI watch resumed after a restart finds the pipeline's open pull requests on GitHub, not in the local ticket files"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-516
+pr_number: 562
+priority: high
+status: done
+title: The CI watch resumed after a restart finds the pipeline's open pull requests
+  on GitHub, not in the local ticket files
+type: fix
 ---
 
 # ticket-516 — La reprise de surveillance trouve les PR ouvertes sur GitHub

@@ -354,6 +354,17 @@ Une PR fermée sans merge écrit également une ligne : `[<projet>] ticket-XXX P
 
 Une erreur lors de la lecture de l'état GitHub (indisponibilité du service, permissions insuffisantes) est journalisée mais n'empêche pas le démarrage du backend. La reprise s'achèvera au prochain redémarrage.
 
+
+#### Ticket-516 : récupération des PR sur GitHub
+
+Ticket-516 ajoute une deuxième source de reprise : les PR ouvertes sur GitHub
+dont la branche suit le motif `ticket-NNN-*` et cible la `base_branch`. Les deux
+sources (fiches locales `in-review` + PR GitHub) sont dédupliquées.
+
+**Attention** : en autonomie `merge`, toute PR sur `ticket-NNN-*` est mergée si
+la CI est verte — y compris les PR manuelles. Pour tester une PR sans la
+merger, utilisez une branche temporaire (`wip/*`, `tmp/*`).
+
 ### Dialogue pendant un run (ADR-025)
 
 `DialogueChannel` porte les deux sens du dialogue sans rien savoir du
