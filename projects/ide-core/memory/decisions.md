@@ -493,3 +493,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : `POST /api/v1/projects/{id}/tickets/propose` valide le lot avant la configuration GitHub, puis écrit dans un worktree temporaire créé depuis `origin/<base>` : commit, push, PR vers la base, worktree supprimé même si le push échoue. L'arbre principal n'est jamais touché ; le `fetch` ne met à jour que `refs/remotes/origin/<base>`. Le merge n'a pas lieu dans la requête : en `autonomy: merge`, la PR est remise au `CIWatcher`, sinon elle reste ouverte.
 **Raison** : la route sert quand un run tient l'arbre. Une requête HTTP n'attend pas une CI (ADR-051).
 **Alternative rejetée** : merge synchrone dans la requête — bloque sur la CI (ADR-029).
+
+---
+
+## ADR-055 — Un run n'écrit une règle commune que sous « Proposées »
+
+**Date** : 2026-10-19
+**Décision** : `contraintes.md` porte en tête une section `## Proposées` que le chargeur n'injecte dans aucun appel d'agent. Un diff de run qui modifie ce fichier hors de cette section met le run en `blocked` à la fin du tour du codeur, raison au journal. Une règle nouvelle s'écrit sous `## Proposées`, avec son ADR ; un humain l'accepte en la déplaçant dans sa section. `decisions.md` n'est pas concerné : il n'est injecté nulle part.
+**Raison** : `contraintes.md` part dans chaque appel d'agent. Un run qui y ajoute une ligne et se merge seul sur CI verte change la consigne de tous les suivants sans relecture (ADR-053, PR #482).
+**Alternative rejetée** : une interface d'acceptation — un déplacement de texte suffit.

@@ -23,6 +23,10 @@ _PORTEE = re.compile(r"^\*\*Port[ée]e\*\*\s*:\s*(.+)$", re.MULTILINE | re.IGNOR
 #: `*(role1, role2)*` seul sur sa ligne — marqueur de portée dans contraintes.md.
 _MARQUEUR_ROLE = re.compile(r"^\*\(([^)]+)\)\*$")
 
+#: Section de contraintes.md où un run peut écrire une règle nouvelle ; son
+#: contenu n'est injecté dans aucun appel d'agent (ticket-493).
+TITRE_PROPOSEES = "## Proposées"
+
 
 @dataclass(frozen=True)
 class BlocADR:
@@ -86,6 +90,31 @@ def adr_pour(contenu: str, role: str) -> str:
     return preambule(contenu).rstrip() + "\n\n" + "\n\n---\n\n".join(retenus) + "\n"
 
 
+def est_titre_proposees(ligne: str) -> bool:
+    """True if `ligne` is the `## Proposées` header (ticket-493)."""
+    return ligne.strip().casefold() == TITRE_PROPOSEES.casefold()
+
+
+def sans_proposees(contenu: str) -> str:
+    """Drop the `## Proposées` section: a proposed rule reaches no agent.
+
+    La section court de son titre au prochain `## ` ; tout le reste du fichier
+    est rendu tel quel.
+    """
+    lignes = contenu.splitlines(keepends=True)
+    retenues: list[str] = []
+    dans_proposees = False
+    for ligne in lignes:
+        if est_titre_proposees(ligne):
+            dans_proposees = True
+            continue
+        if dans_proposees and ligne.lstrip().startswith("## "):
+            dans_proposees = False
+        if not dans_proposees:
+            retenues.append(ligne)
+    return "".join(retenues)
+
+
 def contraintes_pour(contenu: str, role: str) -> str:
     """Filtre contraintes.md : garde les règles universelles et celles de `role`.
 
@@ -93,12 +122,14 @@ def contraintes_pour(contenu: str, role: str) -> str:
     court jusqu'à la prochaine section `## Header` ou au prochain marqueur.
     Les règles sans marqueur précédent sont universelles et vont à tous les rôles.
     Le marqueur lui-même n'apparaît pas dans la sortie.
+
+    La section `## Proposées` n'est jamais rendue, quel que soit le rôle.
     """
     if not contenu.strip():
         return contenu
 
     cible = role.strip().lower()
-    lignes = contenu.splitlines(keepends=True)
+    lignes = sans_proposees(contenu).splitlines(keepends=True)
     result: list[str] = []
     portee_courante: set[str] | None = None  # None = universel
 
@@ -133,7 +164,7 @@ def lire_contraintes(memory_dir: Path) -> str:
     """
     contraintes = memory_dir / "contraintes.md"
     if contraintes.exists():
-        return contraintes.read_text(encoding="utf-8")
+        return sans_proposees(contraintes.read_text(encoding="utf-8"))
     decisions = memory_dir / "decisions.md"
     return decisions.read_text(encoding="utf-8") if decisions.exists() else ""
 
