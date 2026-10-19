@@ -4,7 +4,7 @@ created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
 id: ticket-512
-pr_number: null
+pr_number: 560
 priority: high
 status: done
 title: Test commands run with a closed stdin, so no tool can wait for input from the
