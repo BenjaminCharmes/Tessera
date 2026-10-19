@@ -3949,3 +3949,16 @@ Points posit (58359ms)
 - 2026-10-19 17:52:16 UTC — [ticket-494] APPROVED après 3 tour(s)
 - 2026-10-19 17:52:21 UTC — [ticket-494] fichiers non suivis laissés par le run : tickets/todo/ticket-521-a-project-declares-its-worktree-in-agents-json-and-the-policy-freezes-it.md, tickets/todo/ticket-522-a-run-worktree-is-created-from-the-remote-base-and-removed-only-when-it-holds-nothing-unsaved.md, tickets/todo/ticket-523-a-worktree-is-populated-and-its-links-are-removed-before-anything-else.md, tickets/todo/ticket-524-test-commands-run-in-a-worktree-with-the-declared-interpreter-and-environment.md, tickets/todo/ticket-525-the-write-hook-and-the-ancestor-claude-md-follow-the-worktree.md (à ignorer dans .gitignore ?)
 - 2026-10-19 17:53:56 UTC — [ticket-494] documentation: 1 fichier(s) (94672ms)
+- 2026-10-19 17:54:17 UTC — [ide-core] ticket-494 PR #567 confiée au CIWatcher
+- 2026-10-19 17:54:21 UTC — [ticket-506] branche ticket-506-the-resend-verification-step-reports-a-verificati
+- 2026-10-19 17:54:21 UTC — [ticket-506] tour 1 — codeur démarré
+- 2026-10-19 17:55:45 UTC — [ticket-506] tour 1 — codeur terminé (83656ms)
+- 2026-10-19 17:59:00 UTC — [ide-core] ticket-494 PR #567 mergée (CI verte)
+- 2026-10-19 18:03:13 UTC — [ticket-506] testeur: OK (exit 0)
+- 2026-10-19 18:06:03 UTC — [ticket-506] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code améliore le rapportage d (169843ms)
+- 2026-10-19 18:06:04 UTC — [ticket-506] tour 1 — reviewer démarré
+- 2026-10-19 18:06:22 UTC — [ticket-506] tour 1 — reviewer terminé (18061ms)
+- 2026-10-19 18:08:43 UTC — [ticket-506] validateur: fichiers cités joints : resend_steps.py, backend/tests/test_provisioning_resend.py (tronqué)
+- 2026-10-19 18:08:43 UTC — [ticket-506] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés. Le code modifie (160015ms)
+- 2026-10-19 18:08:43 UTC — [ticket-506] APPROVED après 1 tour(s)
+- 2026-10-19 18:10:06 UTC — [ticket-506] documentation: 2 fichier(s) (77828ms)

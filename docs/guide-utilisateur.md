@@ -1979,6 +1979,15 @@ Chaque étape de la mise en ligne peut être dans l'un de ces états :
 
 Les couleurs suivent l'ADR-026 de Tessera.
 
+
+Le dry-run consulte l'état **actuel** auprès de chaque fournisseur (Resend, Vercel, Neon, etc.), sans rien modifier. L'étape de vérification de domaine chez Resend passe par plusieurs états avant d'être complètement validée :
+
+- **À lancer** : aucune demande de vérification n'a encore été soumise
+- **En attente** : la vérification a été lancée et les enregistrements DNS se propagent (MX et TXT). C'est l'état le plus courant après la première tentative. Attends que la propagation DNS complète.
+- **Échoué** : la configuration du domaine n'est pas valide, ou l'une des vérifications a été refusée — corrige et relance la vérification
+
+Si le dry-run affiche « En attente » pour le domaine, tu dois attendre la propagation DNS avant la mise en ligne. Vérifie l'état des enregistrements auprès de ton registrar ou d'un vérificateur DNS avant de relancer le dry-run.
+
 #### Ce que tu dois faire : `manual` et `needs_human`
 
 Quand une étape porte l'un de ces états, tu vois un bloc de détails. Lis-le. On peut te demander :

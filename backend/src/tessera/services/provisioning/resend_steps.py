@@ -25,7 +25,9 @@ _logger = get_logger(__name__)
 KEY_VARIABLE = "RESEND_API_KEY"
 _WAITING_DNS = "DNS records are not published yet; verification was not launched"
 
-KeyState = Literal["env_set", "orphan", "to_create"]
+_NOT_LAUNCHED = ("", "not_started")
+
+KeyState =Literal["env_set", "orphan", "to_create"]
 
 _NO_TOKEN = StepResult(
     StepState.NEEDS_HUMAN, "RESEND_API_KEY is not set in the Tessera .env; nothing was sent"
@@ -136,7 +138,10 @@ class ResendVerifyStep:
             return StepResult(StepState.SKIPPED, "domain is already verified")
         if not ctx.dns_published:
             return StepResult(StepState.PENDING, _WAITING_DNS)
-        return StepResult(StepState.TODO, "verification is to be launched")
+        if domaine.status in _NOT_LAUNCHED:
+            return StepResult(StepState.TODO, "verification is to be launched")
+        # Déjà lancée : le statut réel du domaine, comme apply le rapporte.
+        return _from_status(domaine.status)
 
     async def apply(self, ctx: ProvisioningContext) -> StepResult:
         """Launch the verification, only when the DNS records are published."""

@@ -1,14 +1,15 @@
 ---
-id: ticket-506
-title: "The Resend verification step reports a verification already under way instead of offering to launch it again"
-type: fix
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-10-19
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-19
+id: ticket-506
+pr_number: 570
+priority: low
+status: done
+title: The Resend verification step reports a verification already under way instead
+  of offering to launch it again
+type: fix
 ---
 
 # ticket-506 — L'étape resend_verify dit qu'une vérification est en cours au lieu de proposer de la relancer

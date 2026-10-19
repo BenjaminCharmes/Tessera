@@ -2172,6 +2172,17 @@ Deux étapes de configuration du domaine d'envoi dans l'API Resend, servant à l
 **`resend_verify`** : après publication du DNS, lance la vérification du domaine (`POST /domains/{id}/verify`). N'agit que si `ctx.dns_published` est vrai. Les statuts du domaine rendent : `verified` → `done`, en attente → `pending`, `failed` → `failed`.
 
 L'ordre global est : domaine créé et enregistrements récupérés, DNS publié (ticket-469), puis vérification lancée. Dépend de ticket-466 (Vercel) et ticket-469 (DNS).
+#### Inspection de l'étape de vérification Resend (ticket-506)
+
+L'inspection (`dry_run=True`) de l'étape `resend_verify` rapporte l'état réel du domaine tel que le serveur Resend le connaît, sans déclencher d'appel au serveur :
+
+- **Domaine au statut `not_started` ou sans statut** : `TODO` — la vérification doit être lancée
+- **Domaine au statut `pending`, `partially_verified`, ou `temporary_failure`** : `PENDING` — des vérifications de DNS sont en cours (MX, TXT, etc.)
+- **Domaine au statut `failed`** : `FAILED` — la vérification a échoué
+- **Domaine au statut `verified`** : `DONE` — le domaine est vérifié
+
+Ce comportement d'inspection diffère de l'application (`apply`) : l'inspection ne lit que l'état du domaine déjà connu sans le relancer, tandis que `apply` réexécute la vérification si nécessaire.
+
 ### Client Neon (ticket-467)
 
 Le client Neon crée ou cherche un projet PostgreSQL chez Neon via l'API `https://api.neon.tech`. Localisation : `services/provisioning/neon.py`.
