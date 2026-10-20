@@ -1,14 +1,19 @@
 ---
-id: ticket-519
-title: "A run executes in its worktree, and the checkout is never written"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: ["ticket-521", "ticket-522", "ticket-523", "ticket-524", "ticket-525"]
-estimated_days: 0.75
 created: 2026-10-19
-pr_number: null
+depends_on:
+- ticket-521
+- ticket-522
+- ticket-523
+- ticket-524
+- ticket-525
+estimated_days: 0.75
+id: ticket-519
+pr_number: 589
+priority: medium
+status: done
+title: A run executes in its worktree, and the checkout is never written
+type: feat
 ---
 
 # ticket-519 — Un run s'exécute dans son worktree

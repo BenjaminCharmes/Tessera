@@ -165,17 +165,22 @@ async def test_projet_is_the_root_when_the_project_is_its_own_repository(
     assert wt.projet == wt.racine
 
 
-def test_no_service_imports_run_worktree_yet() -> None:
-    # Le branchement dans le run est le ticket-519 : il retirera son module de cette liste.
+def test_only_the_run_wiring_imports_run_worktree() -> None:
+    # Le branchement dans le run est le ticket-519 : ces quatre modules, et eux seuls.
     src = Path(__file__).resolve().parent.parent / "src" / "tessera"
     # Le module et son satellite de peuplement (ticket-523) ne comptent pas comme appelants.
     propres = {src / "services" / "run_worktree.py", src / "services" / "run_worktree_populate.py"}
-    appelants = [
-        str(fichier.relative_to(src))
+    appelants = sorted(
+        fichier.relative_to(src).as_posix()
         for fichier in src.rglob("*.py")
         if fichier not in propres and "run_worktree" in fichier.read_text(encoding="utf-8")
+    )
+    assert appelants == [
+        "routers/orchestrator.py",
+        "services/orchestrator.py",
+        "services/pipeline_stages.py",
+        "services/run_dans_worktree.py",
     ]
-    assert appelants == []
 
 
 async def test_creer_leaves_the_checkout_on_its_branch_with_its_tree_untouched(

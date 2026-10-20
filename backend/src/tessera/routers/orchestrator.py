@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, field_validator
@@ -43,12 +44,24 @@ from tessera.services.file_vivante import (
 from tessera.services.reprise_outils import ecrire_log
 from tessera.services.run_executor import executer
 from tessera.services.run_lock import RUN_LOCK
-from tessera.services.run_registry import RUN_REGISTRY, RunAlreadyInProgress
+from tessera.services.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
 from tessera.services.run_recorder import RunRecorder
 from tessera.services.security_auditor import SecurityAuditorService
 from tessera.services.test_runner import TestRunnerService
 from tessera.services.validator import ValidatorService
 from tessera.services.adr import lire_contraintes
+from tessera.services.commande_effective import (
+    PlaceholderInconnu,
+    commande_effective,
+    environnement_effectif,
+)
+from tessera.services.run_dans_worktree import (
+    OrchestrateurRefuse,
+    RunRefuse,
+    ouvrir_worktree,
+    retirer_apres_echec,
+)
+from tessera.services.run_worktree import RunWorktree
 from tessera.services.orchestrator import (
     Orchestrator,
     OrchestratorEvent,
@@ -191,14 +204,22 @@ async def _build_project_context(project_id: str) -> str:
     )
 
 
-async def _build_orchestrator(project_id: str) -> Orchestrator:
+async def _build_orchestrator(
+    project_id: str,
+    wt: RunWorktree | None = None,
+    chemins_absents: tuple[str, ...] = (),
+) -> Orchestrator:
+    # Le dossier réel porte `agents.json` et la politique ; `racine_run` est
+    # là où le run lit et écrit : le même dossier, ou son pendant dans le
+    # worktree (ADR-056).
     project_path = settings.ide_workspace_dir / project_id
+    racine_run = wt.projet if wt is not None else project_path
     # La politique du run — autonomie, racine git, artefacts, commande de
     # tests — se lit **ici**, une fois, avant le premier agent, et voyage vers
     # chaque service qui en dépend. Relue au moment d'agir, elle obéirait à ce
     # qu'un codeur aurait écrit dans `agents.json` pendant le run (ticket-119).
     politique = PolitiqueRun.lire(project_path)
-    racine_ecriture = politique.racine_ecriture(project_path)
+    racine_ecriture = politique.racine_ecriture(project_path, worktree=wt)
 
     # Chaque rôle a son provider, déclaré dans le manifeste avec son repli
     # (ticket-188). Le reviewer relit : le sien est réduit à la lecture. Les
@@ -225,7 +246,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         )
         return inner
 
-    journal_repli = journal_vers(project_path / "memory" / "pipeline-log.md")
+    journal_repli = journal_vers(racine_run / "memory" / "pipeline-log.md")
 
     def _sans_outils(role: str) -> LLMProvider:
         inner = provider_pour_role(
@@ -252,18 +273,20 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
     registry = AgentRegistryService(settings.ide_prompts_dir)
 
     runner = AgentRunner(
-        provider, registry, db_path=settings.ide_db_path, project_path=project_path,
+        provider, registry, db_path=settings.ide_db_path, project_path=racine_run,
         provider_par_role=_par_role,
     )
 
     project_context = await _build_project_context(project_id)
-    ticket_svc = TicketService(project_path, project_id)
+    ticket_svc = TicketService(racine_run, project_id)
 
     pipeline_cfg = load_pipeline_config(project_path)
 
+    commande, env_tests = _tests_du_run(politique, wt, project_path)
     test_runner = (
         TestRunnerService(
-            cwd=pipeline_cfg.test_cwd, timeout=pipeline_cfg.test_timeout_s
+            cwd=pipeline_cfg.test_cwd, timeout=pipeline_cfg.test_timeout_s,
+            env=env_tests,
         )
         if pipeline_cfg.testeur_enabled
         else None
@@ -287,7 +310,7 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         else None
     )
 
-    git_workspace = GitWorkspaceService(project_path, politique=politique)
+    git_workspace = GitWorkspaceService(racine_run, politique=politique, worktree=wt)
 
     from tessera.services.ci_watcher import CI_WATCHER
 
@@ -297,13 +320,13 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         ticket_service=ticket_svc,
         project_context=project_context,
         agent_configs=agent_configs,
-        pipeline_log_path=project_path / "memory" / "pipeline-log.md",
+        pipeline_log_path=racine_run / "memory" / "pipeline-log.md",
         max_review_rounds=pipeline_cfg.max_review_rounds,
         test_runner=test_runner,
-        test_command=politique.test_command,
+        test_command=commande,
         security_auditor=security_auditor,
         validator=validator,
-        project_path=project_path,
+        project_path=racine_run,
         git_workspace=git_workspace,
         run_max_budget_usd=settings.run_max_budget_usd,
         # Le tracker vit sur le provider, qui est le seul à voir les
@@ -312,8 +335,10 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         quota_tracker=getattr(provider, "quota", None),
         # Phase 1 seulement — rebase, push, PR. Phase 2 confiée à
         # CI_WATCHER via `surveiller` (ADR-051).
-        livrer=_livreur(project_id, runner, politique, espace=git_workspace),
-        surveiller=_surveillance_pour(project_id, runner, politique, espace=git_workspace),
+        livrer=_livreur(project_id, runner, politique, espace=git_workspace, wt=wt),
+        surveiller=_surveillance_pour(
+            project_id, runner, politique, espace=git_workspace, wt=wt
+        ),
         ci_watcher=CI_WATCHER,
         etat_pr=_lecteur_etat_pr(project_id, politique),
         pr_mergee_de_branche=_chercheur_pr_mergee(project_id, politique),
@@ -322,13 +347,35 @@ async def _build_orchestrator(project_id: str) -> Orchestrator:
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
         # bootstrap travaille au-dessus de lui (ADR-028), et sa carte doit le
         # montrer (ticket-190).
-        carte_du_depot=CarteDuDepot.depuis(project_path, politique),
+        carte_du_depot=CarteDuDepot.depuis(racine_run, politique),
         # Pour retourner sur la branche de base après livraison (ticket-378).
         base_branch=(politique.base_branch if politique else None) or settings.github_base_branch,
         # Attendre le merge du ticket précédent avant le suivant (ticket-382).
         merge_without_ci=bool(politique and politique.merge_without_ci),
         attente_merge_max_s=settings.attente_merge_max_s,
+        worktree=wt,
+        depot=project_path if wt is not None else None,
+        chemins_absents=chemins_absents,
     )
+
+
+def _tests_du_run(
+    politique: PolitiqueRun, wt: RunWorktree | None, project_path: Path
+) -> tuple[str | None, dict[str, str] | None]:
+    """The test command and environment of the run: the declared ones, or the worktree's.
+
+    Un placeholder inconnu refuse le run (422) : lancer un `{faute}` littéral
+    ne dirait rien de juste.
+    """
+    if wt is None or politique.worktree is None:
+        return politique.test_command, None
+    try:
+        return (
+            commande_effective(politique, wt.racine, project_path),
+            environnement_effectif(politique.worktree, wt.racine, project_path),
+        )
+    except PlaceholderInconnu as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 def _documenteur(
@@ -469,6 +516,7 @@ def _livreur(
     runner: AgentRunner | None = None,
     politique: PolitiqueRun | None = None,
     espace: GitWorkspaceService | None = None,
+    wt: RunWorktree | None = None,
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison de phase 1 d'un projet (ADR-051).
 
@@ -483,8 +531,11 @@ def _livreur(
     ferait croire que c'est le pipeline qui a échoué. Le motif remonte dans
     `livraison.arret`, là où l'utilisateur le lira.
     """
-    project_path = settings.ide_workspace_dir / project_id
-    project = load_project(project_path)
+    dossier_reel = settings.ide_workspace_dir / project_id
+    project = load_project(dossier_reel)
+    # Dans un worktree (ADR-056), tout ce que la livraison lit ou écrit est le
+    # pendant du projet dans ce worktree.
+    project_path = wt.projet if wt is not None else dossier_reel
     github = None
     if project.github_remote and settings.github_token:
         github = GitHubService(token=settings.github_token, repo=project.github_remote)
@@ -511,7 +562,7 @@ def _livreur(
             await ticket_svc.set_pr_number(ticket_id, pr_number)
             git_espace: GitWorkspaceService
             if espace is None:
-                git_espace = GitWorkspaceService(project_path, politique=politique)
+                git_espace = GitWorkspaceService(project_path, politique=politique, worktree=wt)
             else:
                 git_espace = espace
             await git_espace.commit_bookkeeping()
@@ -520,9 +571,9 @@ def _livreur(
             _logger.warning("pr_non_notee", extra={"erreur": str(exc)})
 
     service = LivraisonService(
-        git_workspace=GitWorkspaceService(project_path, politique=politique),
+        git_workspace=GitWorkspaceService(project_path, politique=politique, worktree=wt),
         workflow=GitHubWorkflowService(
-            git_workspace=GitWorkspaceService(project_path, politique=politique),
+            git_workspace=GitWorkspaceService(project_path, politique=politique, worktree=wt),
             github=github,
             base_branch=base_branch,
             project_path=project_path,
@@ -600,12 +651,17 @@ def _surveillance_pour(
     runner: AgentRunner | None = None,
     politique: PolitiqueRun | None = None,
     espace: GitWorkspaceService | None = None,
+    wt: RunWorktree | None = None,
 ) -> Callable[[str, str, int, "EventCallback"], Awaitable[None]]:
     """Fabrique le callback `surveiller` pour l'orchestrateur (ADR-051).
 
     Retourne une coroutine qui démarre la phase 2 (attente CI + merge) en
     tâche de fond via `CI_WATCHER.surveiller`. Retourne immédiatement, sans
     attendre la fin de la CI.
+
+    Avec un worktree (ADR-056), la phase 2 ne lit ni n'écrit aucun arbre : le
+    worktree est supprimé avant qu'elle ne finisse, et le checkout n'appartient
+    pas au run. Ni réalignement de la base locale, ni ligne de journal sur disque.
     """
     from tessera.services.ci_watcher import CI_WATCHER
     from tessera.services.pipeline_events import EventCallback as _CB
@@ -639,7 +695,8 @@ def _surveillance_pour(
         ),
     )
 
-    pipeline_log_path_ci = project_path / "memory" / "pipeline-log.md"
+    pipeline_log_path_ci = None if wt is not None else project_path / "memory" / "pipeline-log.md"
+    realignement = None if wt is not None else Realignement(project_path, base_branch)
 
     async def surveiller(
         p_id: str,
@@ -666,7 +723,7 @@ def _surveillance_pour(
             on_event,
             pipeline_log_path=pipeline_log_path_ci,
             etat_pr=service.pr_state,
-            realignement=Realignement(project_path, base_branch),
+            realignement=realignement,
             controle_tete=controle,
         )
 
@@ -777,6 +834,53 @@ async def get_limits() -> Limites:
     )
 
 
+async def _preparer_orchestrateur(
+    request: RunRequest,
+    run: RunActif,
+    ticket_svc: TicketService,
+    ticket_id: str | None,
+) -> Orchestrator | RunRefuse:
+    """Build the orchestrator of a run, in its worktree when the project declares one.
+
+    Le worktree se crée ici, sous le verrou déjà pris par `RUN_REGISTRY.ouvrir`
+    et avant tout arbre jugé propre (ADR-056). Une création refusée rend un run
+    `blocked` qui n'a rien écrit ; toute autre panne libère le projet et le
+    worktree (ADR-038).
+    """
+    project_path = settings.ide_workspace_dir / request.project_id
+    wt: RunWorktree | None = None
+    try:
+        politique = PolitiqueRun.lire(project_path)
+        if politique.worktree is None or not ticket_id:
+            orchestrator = await _build_orchestrator(request.project_id)
+        else:
+            if request.mode != "single":
+                raise HTTPException(
+                    status_code=422,
+                    detail="Un projet à worktree ne se lance qu'un ticket à la fois (mode single).",
+                )
+            ticket = await ticket_svc.get_ticket(ticket_id)
+            wt, absents = await ouvrir_worktree(
+                project_path, request.project_id, ticket_id,
+                ticket.title if ticket else ticket_id, politique,
+            ) or (None, [])
+            orchestrator = await _build_orchestrator(request.project_id, wt, tuple(absents))
+        if request.mode == "autonomous" and request.depuis_github:
+            await _tirer_les_issues(request.project_id)
+        return orchestrator
+    except OrchestrateurRefuse as exc:
+        return RunRefuse(exc.arret)
+    except Exception as exc:
+        # Rien n'a démarré : libérer le projet, sinon il resterait occupé par
+        # un run qui n'existe pas.
+        RUN_REGISTRY.fermer(run.run_id)
+        if wt is not None:
+            await retirer_apres_echec(wt, project_path)
+        if isinstance(exc, HTTPException):
+            raise
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @router.post("/run", status_code=202, response_model=RunStarted)
 async def run_pipeline(request: RunRequest) -> RunStarted:
     """Start a run, and answer with its id without waiting for it to end.
@@ -826,17 +930,7 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
     file = FileVivante(request.ticket_ids) if request.mode == "queue" else None
     run.file = file
 
-    try:
-        orchestrator = await _build_orchestrator(request.project_id)
-        if request.mode == "autonomous" and request.depuis_github:
-            await _tirer_les_issues(request.project_id)
-    except Exception as exc:
-        # Rien n'a démarré : libérer le projet, sinon il resterait occupé par
-        # un run qui n'existe pas.
-        RUN_REGISTRY.fermer(run.run_id)
-        if isinstance(exc, HTTPException):
-            raise
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    orchestrator = await _preparer_orchestrateur(request, run, ticket_svc, initial_ticket_id)
 
     async def titre_getter(ticket_id: str) -> str | None:
         return await _lire_titre(ticket_svc, ticket_id)

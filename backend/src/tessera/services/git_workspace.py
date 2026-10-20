@@ -464,6 +464,40 @@ class GitWorkspaceService:
         # décider de vérifier le travail existant avant de rappeler le codeur.
         self.commits_repris: int = 0
 
+    async def adopter_worktree(self, branche: str, base_branch: str) -> str:
+        """Take over the run worktree, already on `branche` from `origin/<base>` (ADR-056).
+
+        Records what `create_branch` records, without switching anything: the
+        worktree was created on the branch, and the checkout is not touched.
+        A resumed branch that lags behind the base is rebased at delivery.
+        """
+        await self._ensure_own_repository()
+        await self._declarer_union_journal()
+        self._base_ref = await self._base_distante(base_branch)
+        self._preexisting_untracked = await self._untracked_files()
+        self._tracked_ticket_basenames = await self._list_tracked_ticket_basenames()
+        self._fork_point = await self._merge_base("HEAD") or self._base_ref
+        self.commits_repris = await self._compter_commits_depuis_depart()
+        return branche
+
+    async def _base_distante(self, base_branch: str) -> str:
+        """SHA of `origin/<base>`, else of HEAD when the remote ref is unknown."""
+        try:
+            return (await self._run("rev-parse", f"origin/{base_branch}")).strip()
+        except GitCommandError:
+            return (await self._run("rev-parse", "HEAD")).strip()
+
+    async def _sync_base_du_worktree(self, base_branch: str) -> str | None:
+        """Fetch the remote base and point `_base_ref` at it; no local ref moves."""
+        try:
+            await self._run("fetch", "origin", base_branch)
+            self._base_ref = (await self._run("rev-parse", f"origin/{base_branch}")).strip()
+        except GitCommandError as exc:
+            raison = f"fetch origin {base_branch} échoué : {exc.stderr.strip()}"
+            _logger.warning("sync_base_fetch_echoue", extra={"erreur": raison})
+            return raison
+        return None
+
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         """Create `ticket-<id>-<slug>` and switch to it; idempotent if it already exists.
 
@@ -836,7 +870,12 @@ class GitWorkspaceService:
         Returns ``None`` on success, or a human-readable reason when the sync
         was skipped (no remote configured, diverged local history). Never
         force-pushes or hard-resets (ADR-022).
+
+        In a run worktree (ADR-056) only ``_base_ref`` moves: the local base
+        branch belongs to the checkout, which this run never touches.
         """
+        if self._worktree is not None:
+            return await self._sync_base_du_worktree(base_branch)
         try:
             await self._run("fetch", "origin", base_branch)
         except GitCommandError as exc:
@@ -1080,8 +1119,12 @@ class GitWorkspaceService:
 
         Leaves the working tree on the base branch so the next ticket
         starts from a clean, known state (ADR-018). Safe to call when
-        already on the base branch — git treats it as a no-op.
+        already on the base branch — git treats it as a no-op. In a run worktree
+        (ADR-056) it does nothing: the base may be checked out elsewhere, and
+        the worktree is removed at the end of the run.
         """
+        if self._worktree is not None:
+            return
         await self._run("checkout", base_branch)
 
     async def branche_courante(self) -> str:
@@ -1266,9 +1309,12 @@ class GitWorkspaceService:
         qui prennent un numéro déjà pris par la base (ticket-484).
         """
         self.migrations_renumerotees = ()
-        conflits = await self._rebaser(base, resolveur)
+        # Dans un worktree de run, la base locale est celle du checkout : on
+        # rejoue sur le distant, que la livraison vient de rafraîchir.
+        cible = f"origin/{base}" if self._worktree is not None else base
+        conflits = await self._rebaser(cible, resolveur)
         if not conflits:
-            await self._renumeroter_migrations(base)
+            await self._renumeroter_migrations(cible)
         return conflits
 
     async def _rebaser(

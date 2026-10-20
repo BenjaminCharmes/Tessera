@@ -34,7 +34,8 @@ class RunLock:
 
     En mémoire du process : suffisant pour un backend local, sans effet
     entre deux backends qui partageraient un dépôt (ticket-121, hors
-    périmètre).
+    périmètre). Il reste par projet, même quand chaque run a son worktree :
+    deux tickets d'un projet partagent la même base (ADR-056).
     """
 
     def __init__(self, registry: RunRegistry | None = None) -> None:

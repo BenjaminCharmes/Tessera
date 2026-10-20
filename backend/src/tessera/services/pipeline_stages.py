@@ -36,6 +36,8 @@ from tessera.services.pipeline_outcomes import finish_security_block, finish_tim
 from tessera.services.pipeline_rangement import ranger_les_bloques_livres
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.providers.refus_garde import refus_du_tour
+from tessera.services.run_dans_worktree import adopter_la_branche
+from tessera.services.run_worktree import RunWorktree
 from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
 from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.services.security_auditor import SecurityAuditResult
@@ -130,6 +132,10 @@ async def create_branch(
     """
     if orch._git_workspace is None:
         return None
+    # Dans un worktree de run (ADR-056) la branche est déjà extraite : rien à
+    # basculer, rien à réaligner. isinstance : un double d'orchestrateur n'en a pas.
+    if isinstance(getattr(orch, "_worktree", None), RunWorktree):
+        return await adopter_la_branche(orch, run)
 
     racine = orch._project_path
     lignes = await journal_en_attente.mettre_de_cote(racine) if racine else []

@@ -34,6 +34,11 @@ def construire(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     repo = base / "checkout"
     repo.mkdir()
     git(repo, "init", "-b", "develop")
+    # Le code testé commite sans `-c user.*` : sans identité dans la config du
+    # dépôt (partagée par ses worktrees), `git commit` échoue sur la CI (code 128).
+    git(repo, "config", "user.name", "Test")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "commit.gpgsign", "false")
     _commit(repo, ".gitignore", "node_modules/\ncache/\nsecret.cfg\n")
     _commit(repo, "suivi.txt", "suivi")
     git(repo, "remote", "add", "origin", str(origin))
