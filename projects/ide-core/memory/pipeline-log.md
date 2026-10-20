@@ -4192,3 +4192,30 @@ Points posit (58359ms)
 - 2026-10-20 01:16:15 UTC — [ticket-525] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les quatre blocs de tests exist (223922ms)
 - 2026-10-20 01:16:15 UTC — [ticket-525] APPROVED après 1 tour(s)
 - 2026-10-20 01:17:15 UTC — [ticket-525] documentation: 1 fichier(s) (55266ms)
+- 2026-10-20 01:22:30 UTC — [ide-core] ticket-525 PR #588 mergée (CI verte)
+- 2026-10-20 01:22:32 UTC — [ide-core] ticket-525 : base réalignée sur develop
+- 2026-10-20 01:22:32 UTC — [ide-core] ticket-525 PR #588 confiée au CIWatcher
+- 2026-10-20 01:22:34 UTC — [ticket-519] branche ticket-519-a-run-executes-in-its-worktree-and-the-checkout-i
+- 2026-10-20 01:22:35 UTC — [ticket-519] tour 1 — codeur démarré
+- 2026-10-20 01:34:37 UTC — [ticket-519] tour 1 — codeur terminé (721906ms)
+- 2026-10-20 01:41:06 UTC — [ticket-519] testeur: 1 failed, 3215 passed, 56 warnings in 386.55s (0:06:26)
+- 2026-10-20 01:41:06 UTC — [ticket-519] tests rouges au tour 1
+- 2026-10-20 01:41:06 UTC — [ticket-519] tour 2 — codeur démarré
+- 2026-10-20 01:42:19 UTC — [ticket-519] tour 2 — codeur terminé (72593ms)
+- 2026-10-20 01:49:43 UTC — [ticket-519] testeur: OK (exit 0)
+- 2026-10-20 01:52:22 UTC — [ticket-519] securite: PASS — No introduced vulnerabilities detected. The worktree implementation (ADR-056) in (159139ms)
+- 2026-10-20 01:52:22 UTC — [ticket-519] tour 2 — reviewer démarré
+- 2026-10-20 01:52:52 UTC — [ticket-519] tour 2 — reviewer terminé (29625ms)
+- 2026-10-20 01:56:37 UTC — [ticket-519] validateur: fichiers cités joints : backend/src/tessera/services/run_lock.py
+- 2026-10-20 01:56:37 UTC — [ticket-519] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (254468ms)
+- 2026-10-20 01:56:37 UTC — [ticket-519] CHANGES_REQUESTED tour 2: Reviewer : ## Problèmes bloquants
+- 2026-10-20 01:56:37 UTC — [ticket-519] tour 3 — codeur démarré
+- 2026-10-20 02:00:19 UTC — [ticket-519] tour 3 — codeur terminé (222687ms)
+- 2026-10-20 02:08:14 UTC — [ticket-519] testeur: OK (exit 0)
+- 2026-10-20 02:10:39 UTC — [ticket-519] securite: PASS — Audit complet du support des worktrees (ADR-056, ticket-519). Le code ajoute un  (145000ms)
+- 2026-10-20 02:10:39 UTC — [ticket-519] tour 3 — reviewer démarré
+- 2026-10-20 02:11:07 UTC — [ticket-519] tour 3 — reviewer terminé (27717ms)
+- 2026-10-20 02:15:39 UTC — [ticket-519] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-20 02:16:45 UTC — [ticket-519] validateur: fichiers cités joints : backend/src/tessera/services/run_lock.py
+- 2026-10-20 02:16:45 UTC — [ticket-519] validateur: APPROVED — Tous les critères sont satisfaits. Les sept tests sont présents dans le diff (`t (366328ms)
+- 2026-10-20 02:16:45 UTC — [ticket-519] APPROVED après 3 tour(s)
