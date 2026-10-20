@@ -5,7 +5,7 @@ depends_on:
 - ticket-521
 estimated_days: 0.5
 id: ticket-525
-pr_number: null
+pr_number: 588
 priority: medium
 status: done
 title: The write hook and the ancestor CLAUDE.md exclusion follow the worktree
