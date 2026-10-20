@@ -409,6 +409,29 @@ Quand une branche de ticket est reprise au démarrage, sa fiche est validée. Si
 
 Quand un agent reprend sa session SDK (ex. tour 2 d'un codeur après interruption du tour 1), les options de l'SDK (`cwd`, `allowed_tools`, `permission_mode`) conservent leurs valeurs initiales. Les refus du CLI pour les appels d'outils sont diagnostiqués et loggés dans `memory/pipeline-log.md` sous la forme `codeur: outil <nom> refusé par le CLI`, ce qui permet de distinguer un refus du CLI lui-même d'un refus du garde-fou de Tessera (message `PreToolUse:<outil> hook error`).
 
+### Reprise des worktrees orphelins au démarrage (ticket-520)
+
+Quand le backend redémarre, les worktrees de run laissés en attente 
+(`<IDE_WORKTREES_DIR>/<projet>/<ticket>`) sont repris au lifespan pour préserver 
+le travail et éviter des dossiers traînants.
+
+Pour chaque worktree orphelin, la fonction `reprendre_worktrees_orphelins()` :
+
+1. **Arbre sale** : commit automatique des changements suivis et non ignorés, 
+   avec le message typé d'un run arrêté (ADR-018) — rien n'est perdu ;
+2. **Retrait des liens** : `retirer_les_liens()` (ticket-523) dissout les liens 
+   avant suppression (notamment `node_modules`) ;
+3. **Suppression** : le dossier du worktree est enlevé ;
+4. **Erreur de commit** : le dossier est laissé en place et journalisé — jamais 
+   de destruction forcée ;
+5. **Nettoyage git** : `git worktree prune` sur chaque projet retire les 
+   enregistrements dont le dossier a disparu ;
+6. **Dossier inconnu** : les dossiers non enregistrés dans aucun dépôt connu 
+   restent en place et sont journalisés.
+
+L'erreur n'empêche jamais le démarrage. Pour les projets sans worktree, 
+`reprise_orphelin` s'exécute sans modification.
+
 ### Récupération des fichiers neufs et gestion des tickets approuvés (ticket-389)
 
 Lors d'une reprise au démarrage, deux garanties préviennent la perte de travail :
