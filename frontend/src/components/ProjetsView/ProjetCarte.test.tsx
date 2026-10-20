@@ -139,6 +139,16 @@ describe("ProjetCarte footer", () => {
     expect(pied).toHaveTextContent(/À faire/);
   });
 
+  it("lets the action buttons wrap below the counters instead of overflowing the card", () => {
+    // Le 19/10, « Mettre en ligne » + « Lancer » ou « Arrêter » débordaient de
+    // la carte : la rangée ne passait jamais à la ligne.
+    afficher(projet({ services_declares: true }));
+
+    const rangee = screen.getByText(/À faire/).closest("ul")?.parentElement;
+    expect(rangee).toHaveClass("flex-wrap");
+    expect(screen.getByTestId("actions-de-carte")).toHaveClass("ml-auto", "flex-wrap");
+  });
+
   it("keeps the counters row as tall with or without the Lancer button", () => {
     afficher(projet({ services_declares: false }));
 
