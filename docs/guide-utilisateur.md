@@ -752,6 +752,22 @@ Quand tu arrêtes et relances un run (quota épuisé, interruption, redémarrage
 
 Un refus du reviewer ou du validateur renvoie toujours au codeur comme d'habitude. Seul le premier tour peut être sauté si les tests passent.
 
+#### Quand le codeur est relancé pour corriger un refus
+
+Si le dernier run s'est terminé sur un refus — audit sécurité, ou critères non satisfaits du validateur — la reprise repart du codeur **même si les tests étaient verts**. Cela évite une boucle infinie où le même code serait renvoyé aux mêmes portes qui l'ont refusé.
+
+Le codeur reçoit le motif du refus précédent en contexte pour guider sa correction.
+
+**Cas où le codeur reste sauté** : si le run a été interrompu sans verdict final (redémarrage du backend, coupure réseau), la reprise suit le même chemin qu'avant — elle saute le codeur si les tests ont été verts à sa dernière tentative.
+
+### Refus antérieur d'une porte
+
+Si ton dernier run s'est terminé par un refus (audit de sécurité, validateur ou reviewer), la relance recommence par le codeur — **même avec des tests verts**. Le motif du refus lui est fourni pour corriger le problème.
+
+C'est différent d'une simple interruption (redémarrage, coupure) : là, sans verdict, le codeur peut être sauté si les tests passaient. Mais après un refus, il faut une correction.
+
+Le journal affiche « … — refus précédent : <porte>, codeur en premier ».
+
 ### Quand des tests échouent
 
 Quand des tests échouent, le **résumé du test** affiché dans le journal est clair et lisible — « 1 failed, 455 passed » au lieu d'une ligne de warning confuse. Le codeur reçoit aussi le **détail de chaque échec** — le nom du test et l'assertion qui a échoué — pour corriger en un seul tour.

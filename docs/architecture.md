@@ -409,6 +409,16 @@ Quand une branche de ticket est reprise au démarrage, sa fiche est validée. Si
 
 Quand un agent reprend sa session SDK (ex. tour 2 d'un codeur après interruption du tour 1), les options de l'SDK (`cwd`, `allowed_tools`, `permission_mode`) conservent leurs valeurs initiales. Les refus du CLI pour les appels d'outils sont diagnostiqués et loggés dans `memory/pipeline-log.md` sous la forme `codeur: outil <nom> refusé par le CLI`, ce qui permet de distinguer un refus du CLI lui-même d'un refus du garde-fou de Tessera (message `PreToolUse:<outil> hook error`).
 
+#### Relance du codeur après refus de porte (ticket-528)
+
+Quand un run se termine sur un refus — `securite: BLOCK`, validateur `CHANGES_REQUESTED`, ou reviewer `BLOCKED après N tour(s)` — la reprise de la branche ne saute plus le codeur même si les tests passaient. Le motif du refus est lu en base (ou dans le journal) et fourni au codeur en contexte.
+
+**Invariants de la reprise** :
+- Un ticket approuvé mais non livré (fiche `done`, pas de PR) n'est jamais relancé.
+- Un run interrompu sans verdict (redémarrage du backend) saute le codeur si les tests sont verts — même comportement qu'avant ce ticket.
+
+La ligne de journal de la reprise dit pourquoi : `… — refus précédent : <porte>, codeur en premier` pour une relance forcée, ou `… — tests green, codeur sauté` pour une reprise après coupure.
+
 ### Récupération des fichiers neufs et gestion des tickets approuvés (ticket-389)
 
 Lors d'une reprise au démarrage, deux garanties préviennent la perte de travail :
