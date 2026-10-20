@@ -4182,3 +4182,12 @@ Points posit (58359ms)
 - 2026-10-20 01:00:53 UTC — [ticket-525] tour 2 — codeur terminé (242813ms)
 - 2026-10-20 01:00:54 UTC — [ticket-525] ARRÊTÉ par l'utilisateur au tour 2
 - 2026-10-20 01:00:58 UTC — [ide-core] file interrompue : ticket-525 non approuvé
+- 2026-10-20 01:01:49 UTC — [ticket-525] branche ticket-525-the-write-hook-and-the-ancestor-claude-md-exclusi
+- 2026-10-20 01:09:25 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 01:09:25 UTC — [ticket-525] branche reprise (6 commit(s)) — tests green, codeur sauté
+- 2026-10-20 01:12:31 UTC — [ticket-525] securite: PASS — Audit complet du diff ADR-056 (ticket-525). Aucune vulnérabilité détectée. Les m (184656ms)
+- 2026-10-20 01:12:31 UTC — [ticket-525] tour 1 — reviewer démarré
+- 2026-10-20 01:13:04 UTC — [ticket-525] tour 1 — reviewer terminé (32952ms)
+- 2026-10-20 01:16:15 UTC — [ticket-525] validateur: fichiers cités joints : backend/src/tessera/services/pipeline_stages.py (tronqué) ; non joints (budget épuisé) : backend/src/tessera/services/orchestrator.py
+- 2026-10-20 01:16:15 UTC — [ticket-525] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les quatre blocs de tests exist (223922ms)
+- 2026-10-20 01:16:15 UTC — [ticket-525] APPROVED après 1 tour(s)
