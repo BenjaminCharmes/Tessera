@@ -4,7 +4,7 @@ created: 2026-10-20
 depends_on: []
 estimated_days: 0.5
 id: ticket-528
-pr_number: null
+pr_number: 590
 priority: high
 status: done
 title: A resumed branch whose last run was refused by the security audit or the validator
