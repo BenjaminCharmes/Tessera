@@ -4237,3 +4237,5 @@ Points posit (58359ms)
 - 2026-10-20 02:44:27 UTC — [ticket-520] validateur: APPROVED — Les deux critères d'acceptation sont respectés. Le code inclut les sept tests de (99125ms)
 - 2026-10-20 02:44:27 UTC — [ticket-520] APPROVED après 2 tour(s)
 - 2026-10-20 02:47:48 UTC — [ticket-520] documentation: 2 fichier(s) (197281ms)
+- 2026-10-20 02:48:10 UTC — [ticket-520] livraison: résolveur tenté : backend/tests/test_run_worktree.py (14687ms)
+- 2026-10-20 02:48:10 UTC — [ticket-520] livraison: arrêt — Conflit avec develop sur : backend/tests/test_run_worktree.py — résolveur tenté sur backend/tests/te
