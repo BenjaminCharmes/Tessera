@@ -4181,3 +4181,4 @@ Points posit (58359ms)
 - 2026-10-20 00:56:50 UTC — [ticket-525] tour 2 — codeur démarré
 - 2026-10-20 01:00:53 UTC — [ticket-525] tour 2 — codeur terminé (242813ms)
 - 2026-10-20 01:00:54 UTC — [ticket-525] ARRÊTÉ par l'utilisateur au tour 2
+- 2026-10-20 01:00:58 UTC — [ide-core] file interrompue : ticket-525 non approuvé
