@@ -22,6 +22,7 @@ from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
     from tessera.services.politique_run import PolitiqueRun
+    from tessera.services.worktree_dossiers import DossiersWorktree
 
 _MAX_BRANCH_LENGTH = 60
 
@@ -408,9 +409,15 @@ class GitWorkspaceService:
     """Drives git on a single workspace project, never on Tessera itself."""
 
     def __init__(
-        self, project_path: Path, politique: "PolitiqueRun | None" = None
+        self,
+        project_path: Path,
+        politique: "PolitiqueRun | None" = None,
+        worktree: "DossiersWorktree | None" = None,
     ) -> None:
         self._project_path = project_path
+        # Le worktree du run (ADR-056) : `project_path` est alors le dossier du
+        # projet *dans* ce worktree, et ADR-024 se vérifie contre lui.
+        self._worktree = worktree
         # `git_root` décide d'où l'on stage (`.` ou `:/`). Figé par
         # l'orchestrateur avant le premier agent : lu au moment de committer,
         # il obéirait à ce qu'un codeur aurait écrit dans `agents.json` pendant
@@ -2126,9 +2133,18 @@ class GitWorkspaceService:
         Comparing the toplevel to the project path is the check that holds.
         Locale-independent: it reads a path, never stderr text.
         """
+        if self._worktree is not None:
+            return await self._is_declared_worktree()
         if self._travaille_dans_le_parent():
             return await self._is_inside_any_work_tree()
 
+        toplevel = await self._toplevel()
+        if toplevel is None:
+            return False
+        return toplevel == self._project_path.resolve()
+
+    async def _toplevel(self) -> Path | None:
+        """The resolved `--show-toplevel` of the project folder, `None` if git fails."""
         proc = await asyncio.create_subprocess_exec(
             "git", "rev-parse", "--show-toplevel",
             cwd=str(self._project_path),
@@ -2136,15 +2152,34 @@ class GitWorkspaceService:
             stderr=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
-        if proc.returncode != 0:
-            return False
-        toplevel = stdout.decode("utf-8", errors="replace").strip()
-        if not toplevel:
+        texte = stdout.decode("utf-8", errors="replace").strip()
+        if proc.returncode != 0 or not texte:
+            return None
+        try:
+            return Path(texte).resolve()
+        except OSError:
+            return None
+
+    async def _is_declared_worktree(self) -> bool:
+        """True only for the run's own linked worktree (ADR-056, ticket-525).
+
+        Dans un worktree, `--show-toplevel` renvoie la racine du worktree : le
+        contrôle d'ADR-024 y vaut sans `git_root: ancestor`. Trois choses
+        doivent tenir : le dossier du projet est celui du worktree déclaré, git
+        y voit la racine déclarée, et cette racine est un worktree *lié* — son
+        `.git` est un fichier. Un dépôt étranger a un dossier `.git` : refusé.
+        """
+        wt = self._worktree
+        if wt is None:
             return False
         try:
-            return Path(toplevel).resolve() == self._project_path.resolve()
+            if self._project_path.resolve() != wt.projet.resolve():
+                return False
+            if not (wt.racine / ".git").is_file():
+                return False
         except OSError:
             return False
+        return await self._toplevel() == wt.racine.resolve()
 
     async def _is_inside_any_work_tree(self) -> bool:
         """True si un dépôt existe, ici ou au-dessus — pour le cas déclaré."""

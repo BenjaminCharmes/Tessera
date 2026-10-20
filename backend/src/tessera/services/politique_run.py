@@ -22,6 +22,7 @@ from tessera.services.artifacts import ArtifactMode, read_artifact_mode
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.project_loader import load_pipeline_config
+from tessera.services.worktree_dossiers import DossiersWorktree
 from tessera.services.worktree_politique import lire_worktree
 
 #: Méthodes de merge acceptées par GitHub.
@@ -102,13 +103,24 @@ class PolitiqueRun:
         """True si le projet travaille dans le dépôt qui le contient (ADR-028)."""
         return self.git_root == _GIT_ROOT_ANCESTOR
 
-    def racine_ecriture(self, project_path: Path) -> Path:
+    def racine_ecriture(
+        self, project_path: Path, worktree: DossiersWorktree | None = None
+    ) -> Path:
         """Le dossier sous lequel les agents de ce run ont le droit d'écrire.
 
         Le dossier du projet, ou le dépôt qui le contient s'il l'a déclaré —
         le dépôt, pas le simple parent : `projects/` ne serait ni la bonne
         racine ni une racine qui veut dire quelque chose (ADR-031).
+
+        Avec un worktree (ADR-056), la racine est la sienne et jamais celle du
+        checkout : la racine du worktree pour un projet `ancestor`, le dossier
+        du projet dans le worktree sinon. Résolue comme les autres : un lien
+        posé dans le worktree sort de la racine, donc reste en lecture seule.
         """
+        if worktree is not None:
+            if self.dans_le_depot_parent:
+                return worktree.racine.resolve()
+            return worktree.projet.resolve()
         racine = project_path.resolve()
         if not self.dans_le_depot_parent:
             return racine
