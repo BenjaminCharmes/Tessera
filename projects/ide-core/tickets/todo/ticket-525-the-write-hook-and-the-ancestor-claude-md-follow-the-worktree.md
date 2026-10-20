@@ -44,7 +44,7 @@ calcule depuis `_REPO_ROOT`, or un worktree est **hors** de ce dépôt.
 ## Critères d'acceptation
 - [ ] Les quatre blocs de tests ci-dessus existent et passent
 - [ ] Les tests existants de ces quatre fichiers passent sans modification de leurs assertions
-- [ ] Le diff ne modifie ni `backend/src/tessera/services/pipeline_stages.py` ni `backend/src/tessera/services/orchestrator.py` : le branchement est le ticket-519
+- [ ] Le diff ne modifie ni `backend/src/tessera/services/pipeline_stages.py` ni `backend/src/tessera/services/orchestrator.py`
 
 ## Dépendances
 Ticket 521. `RunWorktree` vient du ticket-522 : s'il n'est pas mergé, le
