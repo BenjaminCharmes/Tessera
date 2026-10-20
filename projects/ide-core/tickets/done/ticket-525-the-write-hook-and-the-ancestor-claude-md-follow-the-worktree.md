@@ -1,14 +1,15 @@
 ---
-id: ticket-525
-title: "The write hook and the ancestor CLAUDE.md exclusion follow the worktree"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: ["ticket-521"]
-estimated_days: 0.5
 created: 2026-10-19
-pr_number: null
+depends_on:
+- ticket-521
+estimated_days: 0.5
+id: ticket-525
+pr_number: 588
+priority: medium
+status: done
+title: The write hook and the ancestor CLAUDE.md exclusion follow the worktree
+type: feat
 ---
 
 # ticket-525 — Le hook d'écriture et les CLAUDE.md d'ancêtres suivent le worktree
@@ -44,7 +45,7 @@ calcule depuis `_REPO_ROOT`, or un worktree est **hors** de ce dépôt.
 ## Critères d'acceptation
 - [ ] Les quatre blocs de tests ci-dessus existent et passent
 - [ ] Les tests existants de ces quatre fichiers passent sans modification de leurs assertions
-- [ ] Le diff ne modifie ni `backend/src/tessera/services/pipeline_stages.py` ni `backend/src/tessera/services/orchestrator.py`
+- [ ] Rien n'appelle encore ces chemins avec un worktree : le branchement est le ticket-519
 
 ## Dépendances
 Ticket 521. `RunWorktree` vient du ticket-522 : s'il n'est pas mergé, le

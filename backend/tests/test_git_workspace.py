@@ -5,6 +5,7 @@ import pytest
 
 import json
 
+from tessera.services.run_worktree import RunWorktree
 from tessera.services.git_workspace import (
     GitCommandError,
     GitWorkspaceService,
@@ -2247,3 +2248,60 @@ async def test_la_branche_du_ticket_part_du_commit_distant_et_garde_le_journal(
     assert await _git_out(local, "rev-parse", "HEAD") == distant
     assert (local / "code.py").is_file()
     assert ligne in journal.read_text(encoding="utf-8")
+
+
+# ------------------------------------------------------------------
+# ADR-024 dans un worktree de run — ticket-525
+# ------------------------------------------------------------------
+
+
+async def _worktree_lie(repo: Path, nom: str) -> RunWorktree:
+    racine = (repo.parent / nom).resolve()
+    await _git(repo, "worktree", "add", "-q", "-b", f"ticket-1-{nom}", str(racine))
+    return RunWorktree(racine=racine, projet=racine, branche=f"ticket-1-{nom}")
+
+
+async def test_ensure_own_repository_accepte_un_worktree_du_depot(repo: Path) -> None:
+    wt = await _worktree_lie(repo, "wt")
+
+    await GitWorkspaceService(wt.projet, worktree=wt)._ensure_own_repository()
+
+
+async def test_ensure_own_repository_accepte_un_projet_dans_le_worktree_sans_ancestor(
+    repo: Path,
+) -> None:
+    wt = await _worktree_lie(repo, "wt-sous-dossier")
+    projet = wt.racine / "projects" / "demo"
+    projet.mkdir(parents=True)
+    declare = RunWorktree(racine=wt.racine, projet=projet, branche=wt.branche)
+
+    await GitWorkspaceService(projet, worktree=declare)._ensure_own_repository()
+
+
+async def test_ensure_own_repository_refuse_un_depot_etranger(
+    repo: Path, tmp_path: Path
+) -> None:
+    etranger = tmp_path / "etranger"
+    etranger.mkdir()
+    await _git(etranger, "init", "-q")
+    wt = RunWorktree(racine=etranger.resolve(), projet=etranger.resolve(), branche="b")
+
+    with pytest.raises(NotAGitRepository):
+        await GitWorkspaceService(etranger, worktree=wt)._ensure_own_repository()
+
+
+async def test_ensure_own_repository_refuse_le_checkout_quand_un_worktree_est_declare(
+    repo: Path,
+) -> None:
+    wt = await _worktree_lie(repo, "wt-ailleurs")
+
+    with pytest.raises(NotAGitRepository):
+        await GitWorkspaceService(repo, worktree=wt)._ensure_own_repository()
+
+
+async def test_ensure_own_repository_sans_worktree_refuse_un_sous_dossier(repo: Path) -> None:
+    sous = repo / "projects" / "demo"
+    sous.mkdir(parents=True)
+
+    with pytest.raises(NotAGitRepository):
+        await GitWorkspaceService(sous)._ensure_own_repository()

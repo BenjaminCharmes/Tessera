@@ -4144,3 +4144,51 @@ Points posit (58359ms)
 - 2026-10-19 23:48:15 UTC — [ticket-524] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Les tests requis ont été implém (167500ms)
 - 2026-10-19 23:48:15 UTC — [ticket-524] APPROVED après 2 tour(s)
 - 2026-10-19 23:50:03 UTC — [ticket-524] documentation: 1 fichier(s) (103328ms)
+- 2026-10-19 23:55:17 UTC — [ide-core] ticket-524 PR #585 mergée (CI verte)
+- 2026-10-19 23:55:19 UTC — [ide-core] ticket-524 : base réalignée sur develop
+- 2026-10-19 23:55:19 UTC — [ide-core] ticket-524 PR #585 confiée au CIWatcher
+- 2026-10-19 23:55:22 UTC — [ticket-525] branche ticket-525-the-write-hook-and-the-ancestor-claude-md-exclusi
+- 2026-10-19 23:55:22 UTC — [ticket-525] tour 1 — codeur démarré
+- 2026-10-20 00:00:31 UTC — [ticket-525] tour 1 — codeur terminé (308953ms)
+- 2026-10-20 00:06:56 UTC — [ticket-525] testeur: 1 failed, 2931 passed, 56 warnings in 382.53s (0:06:22)
+- 2026-10-20 00:06:56 UTC — [ticket-525] tests rouges au tour 1
+- 2026-10-20 00:06:56 UTC — [ticket-525] tour 2 — codeur démarré
+- 2026-10-20 00:10:54 UTC — [ticket-525] tour 2 — codeur terminé (237561ms)
+- 2026-10-20 00:18:01 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 00:20:29 UTC — [ticket-525] securite: PASS — Les changements supportant ADR-056 (worktrees de run) sont sécurisés. Trois couc (148343ms)
+- 2026-10-20 00:20:29 UTC — [ticket-525] tour 2 — reviewer démarré
+- 2026-10-20 00:20:55 UTC — [ticket-525] tour 2 — reviewer terminé (25969ms)
+- 2026-10-20 00:22:56 UTC — [ticket-525] validateur: CHANGES_REQUESTED — Les tests nécessaires pour les fonctionnalités liées aux worktrees sont présents (146577ms)
+- 2026-10-20 00:22:56 UTC — [ticket-525] CHANGES_REQUESTED tour 2: Validateur : Les tests nécessaires pour les fonctionnalités liées aux worktrees sont présents et passent. Les modifications apportées au code permettent de gérer correctement les worktrees, notamment 
+- 2026-10-20 00:22:56 UTC — [ticket-525] tour 3 — codeur démarré
+- 2026-10-20 00:23:07 UTC — [ticket-525] tour 3 — codeur terminé (11766ms)
+- 2026-10-20 00:31:25 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 00:34:02 UTC — [ticket-525] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff implémente ADR-056 (worktrees (156875ms)
+- 2026-10-20 00:34:02 UTC — [ticket-525] tour 3 — reviewer démarré
+- 2026-10-20 00:34:32 UTC — [ticket-525] tour 3 — reviewer terminé (30656ms)
+- 2026-10-20 00:36:34 UTC — [ticket-525] validateur: CHANGES_REQUESTED — Les tests requis pour les fonctionnalités liées aux worktrees sont présents et p (152093ms)
+- 2026-10-20 00:36:34 UTC — [ticket-525] CHANGES_REQUESTED tour 3: Validateur : Les tests requis pour les fonctionnalités liées aux worktrees sont présents et passent. Les modifications apportées au code permettent de gérer correctement les worktrees, notamment en aj
+- 2026-10-20 00:36:34 UTC — [ticket-525] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-20 00:36:38 UTC — [ide-core] file interrompue : ticket-525 non approuvé
+- 2026-10-20 00:43:22 UTC — [ticket-525] branche ticket-525-the-write-hook-and-the-ancestor-claude-md-exclusi
+- 2026-10-20 00:51:26 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 00:51:26 UTC — [ticket-525] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-20 00:54:41 UTC — [ticket-525] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le ticket-525 ajoute le support  (194516ms)
+- 2026-10-20 00:54:41 UTC — [ticket-525] tour 1 — reviewer démarré
+- 2026-10-20 00:55:25 UTC — [ticket-525] tour 1 — reviewer terminé (43796ms)
+- 2026-10-20 00:56:50 UTC — [ticket-525] validateur: CHANGES_REQUESTED — Les tests requis sont présents et passent, et les fonctionnalités pour gérer les (128610ms)
+- 2026-10-20 00:56:50 UTC — [ticket-525] CHANGES_REQUESTED tour 1: Validateur : Les tests requis sont présents et passent, et les fonctionnalités pour gérer les worktrees ont été implémentées correctement. Cependant, le ticket-519 n'a pas encore été implémenté, donc 
+- 2026-10-20 00:56:50 UTC — [ticket-525] tour 2 — codeur démarré
+- 2026-10-20 01:00:53 UTC — [ticket-525] tour 2 — codeur terminé (242813ms)
+- 2026-10-20 01:00:54 UTC — [ticket-525] ARRÊTÉ par l'utilisateur au tour 2
+- 2026-10-20 01:00:58 UTC — [ide-core] file interrompue : ticket-525 non approuvé
+- 2026-10-20 01:01:49 UTC — [ticket-525] branche ticket-525-the-write-hook-and-the-ancestor-claude-md-exclusi
+- 2026-10-20 01:09:25 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 01:09:25 UTC — [ticket-525] branche reprise (6 commit(s)) — tests green, codeur sauté
+- 2026-10-20 01:12:31 UTC — [ticket-525] securite: PASS — Audit complet du diff ADR-056 (ticket-525). Aucune vulnérabilité détectée. Les m (184656ms)
+- 2026-10-20 01:12:31 UTC — [ticket-525] tour 1 — reviewer démarré
+- 2026-10-20 01:13:04 UTC — [ticket-525] tour 1 — reviewer terminé (32952ms)
+- 2026-10-20 01:16:15 UTC — [ticket-525] validateur: fichiers cités joints : backend/src/tessera/services/pipeline_stages.py (tronqué) ; non joints (budget épuisé) : backend/src/tessera/services/orchestrator.py
+- 2026-10-20 01:16:15 UTC — [ticket-525] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les quatre blocs de tests exist (223922ms)
+- 2026-10-20 01:16:15 UTC — [ticket-525] APPROVED après 1 tour(s)
+- 2026-10-20 01:17:15 UTC — [ticket-525] documentation: 1 fichier(s) (55266ms)

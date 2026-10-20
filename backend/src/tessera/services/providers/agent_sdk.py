@@ -105,6 +105,23 @@ def claude_md_ancetres_a_exclure(
     ]
 
 
+def _depart_des_consignes(cwd: Path, racine_ecriture: Path) -> Path:
+    """The folder from which ancestor CLAUDE files are excluded.
+
+    Le dépôt de l'IDE pour un projet qui y vit. Un worktree de run est hors de
+    ce dépôt (ADR-056) : le départ est alors la racine de son propre checkout,
+    le premier ancêtre qui porte un ``.git`` (un fichier, pour un worktree lié),
+    et à défaut la racine d'écriture reçue, qui n'exclut rien.
+    """
+    projet = cwd.resolve()
+    if projet.is_relative_to(_REPO_ROOT.resolve()):
+        return _REPO_ROOT
+    for dossier in projet.parents:
+        if (dossier / ".git").exists():
+            return dossier
+    return racine_ecriture
+
+
 def _reglages_sans_consignes_ancetres(
     cwd: Path | None, racine_ecriture: Path | None
 ) -> str | None:
@@ -117,7 +134,9 @@ def _reglages_sans_consignes_ancetres(
         return None
     racine = racine_ecriture if racine_ecriture is not None else racine_autorisee(cwd)
     ancestor = racine.resolve() != cwd.resolve()
-    exclus = claude_md_ancetres_a_exclure(cwd, _REPO_ROOT, ancestor)
+    exclus = claude_md_ancetres_a_exclure(
+        cwd, _depart_des_consignes(cwd, racine), ancestor
+    )
     if not exclus:
         return None
     return json.dumps({"claudeMdExcludes": exclus})

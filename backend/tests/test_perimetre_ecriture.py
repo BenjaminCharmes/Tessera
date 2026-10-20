@@ -8,6 +8,8 @@ from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
     racine_autorisee,
 )
+from tessera.services.politique_run import PolitiqueRun
+from tessera.services.run_worktree import RunWorktree
 from tests.depot_worktree import lier
 
 
@@ -277,3 +279,66 @@ async def test_le_hook_refuse_une_ecriture_a_travers_un_lien(tmp_path: Path) -> 
 
     assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny"
     assert not (checkout / "x.js").exists()
+
+
+# ------------------------------------------------------------------
+# Le hook suit le worktree — ticket-525
+# ------------------------------------------------------------------
+
+
+def _checkout_et_worktree(tmp_path: Path) -> tuple[Path, RunWorktree]:
+    """Un checkout (`depot/projects/client`) et le worktree du run, hors de lui."""
+    checkout = tmp_path / "depot" / "projects" / "client"
+    checkout.mkdir(parents=True)
+    racine = tmp_path / "worktrees" / "client" / "ticket-1"
+    projet = racine / "projects" / "client"
+    projet.mkdir(parents=True)
+    return checkout, RunWorktree(racine=racine, projet=projet, branche="ticket-1-demo")
+
+
+async def _ecrire(hook: object, dossier: Path) -> dict[str, object]:
+    return await hook(  # type: ignore[operator, no-any-return]
+        {"tool_name": "Write", "tool_input": {"file_path": str(dossier / "x.py")}}, None, None
+    )
+
+
+async def test_le_hook_refuse_le_checkout_et_accepte_le_worktree(tmp_path: Path) -> None:
+    checkout, wt = _checkout_et_worktree(tmp_path)
+    racine = PolitiqueRun().racine_ecriture(checkout, wt)
+    hook = hook_refus_hors_perimetre(wt.projet, racine=racine)
+
+    refus = await _ecrire(hook, checkout)
+    accepte = await _ecrire(hook, wt.projet)
+
+    assert refus["hookSpecificOutput"]["permissionDecision"] == "deny"  # type: ignore[index]
+    assert accepte == {}
+
+
+async def test_un_projet_ancestor_ecrit_dans_le_worktree_et_pas_dans_le_checkout(
+    tmp_path: Path,
+) -> None:
+    checkout, wt = _checkout_et_worktree(tmp_path)
+    racine = PolitiqueRun(git_root="ancestor").racine_ecriture(checkout, wt)
+    hook = hook_refus_hors_perimetre(wt.projet, racine=racine)
+
+    refus = await _ecrire(hook, tmp_path / "depot" / "backend")
+    accepte = await _ecrire(hook, wt.racine / "backend")
+
+    assert refus["hookSpecificOutput"]["permissionDecision"] == "deny"  # type: ignore[index]
+    assert accepte == {}
+
+
+async def test_une_ecriture_a_travers_un_lien_du_worktree_reste_refusee(tmp_path: Path) -> None:
+    # La racine du worktree est résolue comme le chemin visé : un lien vers le
+    # checkout sort de la racine.
+    checkout, wt = _checkout_et_worktree(tmp_path)
+    modules = tmp_path / "depot" / "node_modules"
+    modules.mkdir()
+    lier(modules, wt.projet / "node_modules")
+    racine = PolitiqueRun().racine_ecriture(checkout, wt)
+    hook = hook_refus_hors_perimetre(wt.projet, racine=racine)
+
+    sortie = await _ecrire(hook, wt.projet / "node_modules")
+
+    assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny"  # type: ignore[index]
+    assert not (modules / "x.py").exists()

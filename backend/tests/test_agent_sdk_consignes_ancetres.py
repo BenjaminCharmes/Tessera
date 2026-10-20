@@ -100,3 +100,40 @@ def test_options_without_cwd_carry_no_settings() -> None:
         system="sys", model="m", max_turns=1, max_budget_usd=None, cwd=None
     )
     assert options.settings is None
+
+
+def _worktree_hors_depot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """The project folder inside a linked worktree that lies outside `_REPO_ROOT`."""
+    depot = tmp_path / "depot"
+    depot.mkdir()
+    monkeypatch.setattr(agent_sdk_module, "_REPO_ROOT", depot)
+    racine = tmp_path / "worktrees" / "curio" / "ticket-1"
+    projet = racine / "projects" / "curio"
+    projet.mkdir(parents=True)
+    (racine / ".git").write_text("gitdir: ailleurs\n", encoding="utf-8")
+    return projet
+
+
+def test_worktree_outside_the_repo_excludes_from_its_own_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    projet = _worktree_hors_depot(tmp_path, monkeypatch)
+    racine = projet.parents[1]
+
+    options = _options_pour(projet, racine_ecriture=projet)
+
+    assert isinstance(options.settings, str)
+    exclus = json.loads(options.settings)["claudeMdExcludes"]
+    assert _p(racine / "CLAUDE.md") in exclus
+    assert _p(racine / "projects" / "CLAUDE.local.md") in exclus
+    assert _p(projet / "CLAUDE.md") not in exclus
+    # Rien au-dessus du worktree : ni le dossier des worktrees, ni le disque.
+    assert _p(racine.parent / "CLAUDE.md") not in exclus
+
+
+def test_ancestor_worktree_outside_the_repo_excludes_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    projet = _worktree_hors_depot(tmp_path, monkeypatch)
+
+    assert _options_pour(projet, racine_ecriture=projet.parents[1]).settings is None

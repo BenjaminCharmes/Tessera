@@ -19,6 +19,7 @@ from tessera.services.github_workflow import GitHubWorkflowService, WorkflowErro
 from tessera.services.livraison import LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
+from tessera.services.run_worktree import RunWorktree
 
 
 def _projet(tmp_path: Path, manifeste: dict[str, object] | None) -> Path:
@@ -420,3 +421,40 @@ def test_les_options_du_sdk_recoivent_la_racine_figee(tmp_path: Path) -> None:
     provider = ClaudeAgentSDKProvider(racine_ecriture=tmp_path / "depot")
 
     assert provider.racine_ecriture == tmp_path / "depot"
+
+
+# ------------------------------------------------------------------
+# racine_ecriture et worktree — ticket-525
+# ------------------------------------------------------------------
+
+
+def _worktree(tmp_path: Path) -> RunWorktree:
+    racine = tmp_path / "worktrees" / "client" / "ticket-1"
+    projet = racine / "projects" / "client"
+    projet.mkdir(parents=True)
+    return RunWorktree(racine=racine, projet=projet, branche="ticket-1-demo")
+
+
+def test_racine_ecriture_sans_worktree_est_inchangee(tmp_path: Path) -> None:
+    (tmp_path / ".git").mkdir()
+    projet = _projet(tmp_path, {})
+
+    assert PolitiqueRun().racine_ecriture(projet, None) == projet.resolve()
+    assert PolitiqueRun(git_root="ancestor").racine_ecriture(projet, None) == tmp_path.resolve()
+
+
+def test_racine_ecriture_d_un_projet_ancestor_est_la_racine_du_worktree(tmp_path: Path) -> None:
+    (tmp_path / ".git").mkdir()
+    projet = _projet(tmp_path, {})
+    wt = _worktree(tmp_path)
+
+    racine = PolitiqueRun(git_root="ancestor").racine_ecriture(projet, wt)
+
+    assert racine == wt.racine.resolve()
+
+
+def test_racine_ecriture_d_un_projet_simple_est_son_dossier_dans_le_worktree(tmp_path: Path) -> None:
+    projet = _projet(tmp_path, {})
+    wt = _worktree(tmp_path)
+
+    assert PolitiqueRun().racine_ecriture(projet, wt) == wt.projet.resolve()

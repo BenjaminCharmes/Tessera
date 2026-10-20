@@ -365,6 +365,16 @@ Le branchement — création effective des worktrees — est ticket-519. Ce tick
 prépare les fonctions pures et les modifications de service, sans créer
 aucun worktree.
 
+#### Le hook d'écriture et l'exclusion des CLAUDE.md suivent le worktree (ticket-525)
+
+Trois services du backend sont adaptés pour accepter un worktree avant que le branchement (ticket-519) ne le demande :
+
+- **`PolitiqueRun.racine_ecriture`** : en paramètre optionnel `RunWorktree`, la racine d'écriture du hook (ADR-031) désigne soit `wt.racine` (projet `ancestor`), soit `wt.projet`, au lieu de `_REPO_ROOT`.
+- **`GitWorkspaceService._ensure_own_repository`** : accepte la racine d'un worktree et valide qu'elle y appartient. `git --show-toplevel` ne doit pas exiger `git_root: ancestor`, puisque le worktree a sa propre racine.
+- **`claude_md_ancetres_a_exclure`** : calcule depuis la racine d'écriture reçue, pas depuis `_REPO_ROOT`, car un worktree en est hors par définition.
+
+Ce refactor isole la préparation du branchement : le ticket-519 ne s'occupera que du démarrage en worktree, sachant que les trois composants le soutiennent déjà.
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
