@@ -54,6 +54,9 @@ conflits détectés), le CIWatcher arrête la surveillance avec un message dans 
 pipeline. Le ticket passe en échec, et les dépendants qui l'attendent le reçoivent
 en échec.
 
+Les interruptions de run — arrêt du backend, redémarrage du système — ne perdent jamais 
+de travail : tout changement non livré est automatiquement sauvé et committé.
+
 Après un redémarrage du backend, l'IDE reprend la surveillance de toute PR ouverte
 sur une branche `ticket-NNN-*` vers la `base_branch` du projet — y compris les PR
 créées manuellement. En autonomie `merge`, elles seront mergées si la CI est verte.

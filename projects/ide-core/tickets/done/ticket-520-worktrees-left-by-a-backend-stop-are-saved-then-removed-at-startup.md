@@ -1,14 +1,16 @@
 ---
-id: ticket-520
-title: "Worktrees left by a backend stop are saved, then removed at startup"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: ["ticket-522", "ticket-523"]
-estimated_days: 0.5
 created: 2026-10-19
+depends_on:
+- ticket-522
+- ticket-523
+estimated_days: 0.5
+id: ticket-520
 pr_number: null
+priority: medium
+status: done
+title: Worktrees left by a backend stop are saved, then removed at startup
+type: feat
 ---
 
 # ticket-520 — Reprendre les worktrees orphelins au démarrage

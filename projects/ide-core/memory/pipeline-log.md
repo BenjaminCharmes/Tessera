@@ -4220,6 +4220,25 @@ Points posit (58359ms)
 - 2026-10-20 02:16:45 UTC — [ticket-519] validateur: APPROVED — Tous les critères sont satisfaits. Les sept tests sont présents dans le diff (`t (366328ms)
 - 2026-10-20 02:16:45 UTC — [ticket-519] APPROVED après 3 tour(s)
 - 2026-10-20 02:19:38 UTC — [ticket-519] documentation: 1 fichier(s) (168438ms)
+- 2026-10-20 02:19:56 UTC — [ide-core] ticket-519 PR #589 confiée au CIWatcher
+- 2026-10-20 02:19:59 UTC — [ticket-520] branche ticket-520-worktrees-left-by-a-backend-stop-are-saved-then-r
+- 2026-10-20 02:19:59 UTC — [ticket-520] tour 1 — codeur démarré
+- 2026-10-20 02:24:19 UTC — [ticket-520] tour 1 — codeur terminé (259953ms)
+- 2026-10-20 02:24:31 UTC — [ticket-519] livraison: arrêt — PR #589 non mergée : CI failing : la PR #589 reste ouverte.
+- 2026-10-20 02:31:23 UTC — [ticket-520] testeur: 1 failed, 3236 passed, 56 warnings in 420.92s (0:07:00)
+- 2026-10-20 02:31:23 UTC — [ticket-520] tests rouges au tour 1
+- 2026-10-20 02:31:23 UTC — [ticket-520] tour 2 — codeur démarré
+- 2026-10-20 02:32:41 UTC — [ticket-520] tour 2 — codeur terminé (78735ms)
+- 2026-10-20 02:40:17 UTC — [ticket-520] testeur: OK (exit 0)
+- 2026-10-20 02:42:47 UTC — [ticket-520] securite: PASS — No security vulnerabilities detected. The code properly handles path traversal p (150593ms)
+- 2026-10-20 02:42:47 UTC — [ticket-520] configuration des tests modifiée : backend/tests/conftest.py
+- 2026-10-20 02:42:47 UTC — [ticket-520] tour 2 — reviewer démarré
+- 2026-10-20 02:43:23 UTC — [ticket-520] tour 2 — reviewer terminé (35921ms)
+- 2026-10-20 02:44:27 UTC — [ticket-520] validateur: APPROVED — Les deux critères d'acceptation sont respectés. Le code inclut les sept tests de (99125ms)
+- 2026-10-20 02:44:27 UTC — [ticket-520] APPROVED après 2 tour(s)
+- 2026-10-20 02:47:48 UTC — [ticket-520] documentation: 2 fichier(s) (197281ms)
+- 2026-10-20 02:48:10 UTC — [ticket-520] livraison: résolveur tenté : backend/tests/test_run_worktree.py (14687ms)
+- 2026-10-20 02:48:10 UTC — [ticket-520] livraison: arrêt — Conflit avec develop sur : backend/tests/test_run_worktree.py — résolveur tenté sur backend/tests/te
 - 2026-10-20 02:48:14 UTC — [ticket-528] branche ticket-528-a-resumed-branch-whose-last-run-was-refused-by-th
 - 2026-10-20 02:48:14 UTC — [ticket-528] tour 1 — codeur démarré
 - 2026-10-20 02:52:20 UTC — [ticket-528] tour 1 — codeur terminé (245577ms)

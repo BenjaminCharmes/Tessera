@@ -233,4 +233,7 @@ def _pas_de_vrai_journal() -> Iterator[None]:
         # `test_runs_orphelins.py` et `test_reprise_run_orphelin.py`.
         mp.setattr(tessera.main, "solder_les_runs_orphelins", _aucun_run_solde)
         mp.setattr(tessera.main, "reprendre_depots_orphelins", _aucune_reprise)
+        # Même raison pour les worktrees : le dossier réel de l'utilisateur ne
+        # se commite ni ne se supprime depuis un `TestClient` (ticket-520).
+        mp.setattr(tessera.main, "reprendre_worktrees_orphelins", _aucune_reprise)
         yield

@@ -169,7 +169,13 @@ def test_only_the_run_wiring_imports_run_worktree() -> None:
     # Le branchement dans le run est le ticket-519 : ces quatre modules, et eux seuls.
     src = Path(__file__).resolve().parent.parent / "src" / "tessera"
     # Le module et son satellite de peuplement (ticket-523) ne comptent pas comme appelants.
-    propres = {src / "services" / "run_worktree.py", src / "services" / "run_worktree_populate.py"}
+    # La reprise au démarrage (ticket-520) retire des worktrees sans lancer de run :
+    # elle ne compte pas comme un branchement.
+    propres = {
+        src / "services" / "run_worktree.py",
+        src / "services" / "run_worktree_populate.py",
+        src / "services" / "reprise_worktrees.py",
+    }
     appelants = sorted(
         fichier.relative_to(src).as_posix()
         for fichier in src.rglob("*.py")

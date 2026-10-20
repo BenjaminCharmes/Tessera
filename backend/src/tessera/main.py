@@ -33,6 +33,7 @@ from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.eveil import relacher as eveil_relacher
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
+from tessera.services.reprise_worktrees import reprendre_worktrees_orphelins
 from tessera.services.reprise_surveillance import reprendre_surveillances
 from tessera.services.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.prompt_loader import MissingPromptError
@@ -82,6 +83,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await reprendre_depots_orphelins(
             orphelins, settings.ide_db_path, settings.ide_workspace_dir
         )
+    # Les worktrees de run qu'un arrêt a laissés : commit, puis suppression (ticket-520).
+    await reprendre_worktrees_orphelins(
+        settings.ide_workspace_dir, settings.ide_worktrees_dir
+    )
     await _reprendre_les_surveillances()
     yield
     # Les services lancés pour un projet sont des enfants de ce process et
