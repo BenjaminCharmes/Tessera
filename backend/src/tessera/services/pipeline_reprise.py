@@ -16,6 +16,7 @@ from tessera.services.pipeline_stages import (
     run_tests,
 )
 from tessera.services.pipeline_text import _echec_de_tests
+from tessera.services.refus_precedent import Refus, refus_precedent, retour_apres_refus
 
 if TYPE_CHECKING:
     from tessera.services.orchestrator import Orchestrator
@@ -45,16 +46,44 @@ def _retour_sans_resultat(run: PipelineRun) -> str:
     return f"{_TESTS_SANS_RESULTAT}\n\n{detail}" if detail else _TESTS_SANS_RESULTAT
 
 
+async def _reprendre_apres_refus(
+    orch: "Orchestrator", run: PipelineRun, commits: int, refus: Refus
+) -> None:
+    """Le run d'avant a été refusé : le codeur passe en premier, tests non lancés.
+
+    Des tests verts ne disent rien d'un refus d'audit ou de revue ; le tour de
+    codeur lance les siens, et le motif du refus part dans ses retours.
+    """
+    await emit(
+        run,
+        EventType.RUN_RESUMED_FROM_EXISTING_WORK,
+        commits=commits,
+        verdict="refused",
+        refus=refus.porte,
+    )
+    orch._log(
+        f"[{run.ticket_id}] branche reprise ({commits} commit(s)) — "
+        f"refus précédent : {refus.porte}, codeur en premier"
+    )
+    run.review_feedback.append(retour_apres_refus(refus))
+
+
 async def verifier_travail_repris(orch: "Orchestrator", run: PipelineRun) -> bool:
     """Lance les tests sur une branche reprise ; ``True`` si le codeur peut être sauté.
 
     Ne fait rien — et rend ``False`` — sur une branche neuve ou sur un projet
-    sans testeur : sans tests, rien ne prouve que le travail repris tient. Sur
-    des tests rouges, ou qui n'ont pas abouti, le résultat part dans les retours
+    sans testeur : sans tests, rien ne prouve que le travail repris tient. Après
+    le refus d'une porte au run précédent, rend ``False`` sans lancer les tests
+    (ticket-528). Sur des tests rouges, ou qui n'ont pas abouti, le résultat part dans les retours
     que lit le codeur, et le déroulé habituel reprend.
     """
     commits = _commits_repris(orch)
     if commits <= 0 or not (orch._test_runner and orch._project_path):
+        return False
+
+    refus = refus_precedent(getattr(orch, "_log_path", None), run.ticket_id)
+    if refus is not None:
+        await _reprendre_apres_refus(orch, run, commits, refus)
         return False
 
     vert = await run_tests(orch, run, reprise=True) is True
