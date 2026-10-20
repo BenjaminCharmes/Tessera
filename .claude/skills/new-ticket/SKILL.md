@@ -106,6 +106,12 @@ déjà vrai dans un CSS que le run ne touche pas, se refuse ;
 « `main.css` donne `overflow-x: auto` à la grille » se vérifie (démineur,
 ticket-033).
 
+**Pas de critère négatif sur tout le code.** « Rien n'appelle encore X » ou
+« aucun chemin n'atteint Y » ne se prouve pas sur un diff : le validateur le
+juge invérifiable et refuse, trois tours de suite (tickets 522 et 525, le
+19/10). Ramener le critère au diff (« le diff ne modifie ni `a.py` ni `b.py` »)
+ou à un test (« un test vérifie, avec des doubles, que … »).
+
 **Pas de numéro d'ADR ni de ticket figé dans un critère.** « ADR-012 est
 écrit » se refuse dès qu'un autre ticket de la file a pris ce numéro avant :
 le 19/10, le ticket-032 de Kadoomi a posé ADR-013 à juste titre, et le
