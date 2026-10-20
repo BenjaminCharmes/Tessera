@@ -9,7 +9,7 @@ depends_on:
 - ticket-525
 estimated_days: 0.75
 id: ticket-519
-pr_number: null
+pr_number: 589
 priority: medium
 status: done
 title: A run executes in its worktree, and the checkout is never written
