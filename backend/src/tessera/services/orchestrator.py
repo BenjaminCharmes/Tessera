@@ -36,6 +36,7 @@ from tessera.services.pipeline_contraintes import arret_contraintes_hors_propose
 from tessera.services.pipeline_critere_protege import arret_critere_protege
 from tessera.services.pipeline_approbation import suivre_documentation, tete_de_branche
 from tessera.services.pipeline_plan import run_plan
+from tessera.services.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
 from tessera.services.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
 from tessera.services.pipeline_text import (
     _compose_feedback,
@@ -55,6 +56,7 @@ if TYPE_CHECKING:
     from tessera.services.carte_du_depot import CarteDuDepot
     from tessera.services.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder
+    from tessera.services.run_worktree import RunWorktree
     from tessera.services.git_workspace import GitWorkspaceService
     from tessera.services.security_auditor import SecurityAuditorService
     from tessera.services.test_runner import TestRunnerService
@@ -101,6 +103,9 @@ class Orchestrator:
         base_branch: Optional[str] = None,
         merge_without_ci: bool = False,
         attente_merge_max_s: float = 600.0,
+        worktree: "RunWorktree | None" = None,
+        depot: Path | None = None,
+        chemins_absents: tuple[str, ...] = (),
         etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
         journal_refus: Optional["JournalDesRefus"] = None,
         pr_mergee_de_branche: Optional[Callable[[str], Awaitable[int | None]]] = None,
@@ -172,6 +177,12 @@ class Orchestrator:
         # Durée maximale d'attente du merge en secondes. Passé ce délai, la file
         # continue sans réalignement plutôt que de bloquer indéfiniment.
         self._attente_merge_max_s = attente_merge_max_s
+        # Le worktree du run (ADR-056) et le checkout dont il dépend : le
+        # worktree se supprime depuis le checkout, jamais depuis lui-même.
+        self._worktree = worktree
+        self._depot = depot
+        self._chemins_absents = chemins_absents
+        self._worktree_retire = False
         # Relit l'état d'une PR (« merged », « open »…). Donné à `attendre_merge`
         # pour qu'un ticket que le watcher n'a pas inscrit ne passe pas pour
         # mergé : sans lecteur, il ne l'est pas (ADR-039).
@@ -218,6 +229,30 @@ class Orchestrator:
         return next((c for c in self._agent_configs if c.role == role.value), None)
 
     async def run_pipeline(
+        self,
+        project_id: str,
+        ticket_id: str,
+        on_event: EventCallback,
+        run_id: str | None = None,
+        dialogue: DialogueChannel | None = None,
+        envelope_run_id: str | None = None,
+    ) -> PipelineResult:
+        """Run the ticket, then remove its worktree, if the project declared one.
+
+        Le worktree se supprime après le commit final et la phase 1 de
+        livraison ; sur toute exception, le même retrait s'applique (ADR-056).
+        """
+        try:
+            resultat = await self._mener_le_run(
+                project_id, ticket_id, on_event, run_id, dialogue, envelope_run_id
+            )
+            return await retirer_en_fin_de_run(self, resultat)
+        finally:
+            if self._worktree is not None and self._depot is not None and not self._worktree_retire:
+                self._worktree_retire = True
+                await retirer_apres_echec(self._worktree, self._depot)
+
+    async def _mener_le_run(
         self,
         project_id: str,
         ticket_id: str,

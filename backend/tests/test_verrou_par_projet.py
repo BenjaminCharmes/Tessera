@@ -169,3 +169,40 @@ def test_le_chat_refuse_de_lancer_sur_un_projet_deja_occupe(
     # l'orchestrateur, donc avant que l'executeur ne ferme l'entree. La
     # liberation elle-meme est verifiee sans course par
     # `test_un_run_termine_sort_de_l_instantane`.
+
+
+def test_un_projet_a_worktree_refuse_aussi_un_second_run_en_409(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    # Le verrou reste par projet : un worktree par ticket ne le desarme pas.
+    import json
+
+    from tests.depot_worktree import construire
+
+    (tmp_path / "depot").mkdir()
+    repo = construire(tmp_path / "depot", monkeypatch)
+    (repo / "CLAUDE.md").write_text("# Projet\n", encoding="utf-8")
+    (repo / "agents.json").write_text(
+        json.dumps({"artifacts": "tracked", "base_branch": "develop", "worktree": {"populate": []}}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(settings, "ide_workspace_dir", repo.parent)
+
+    async def _build(project_id: str, wt: object = None, chemins: object = ()) -> object:
+        return _OrchestrateurQuiAttend()
+
+    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+
+    with client.websocket_connect("/api/v1/orchestrator/observe") as observateur:
+        corps = {"project_id": repo.name, "ticket_id": "ticket-7"}
+        demarrage = client.post("/api/v1/orchestrator/run", json=corps)
+        assert demarrage.status_code == 202
+        _attendre(observateur, "agent_question")
+
+        refus = client.post("/api/v1/orchestrator/run", json=corps)
+        assert refus.status_code == 409
+
+        observateur.send_json(
+            {"type": "answer", "run_id": demarrage.json()["run_id"], "text": "oui"}
+        )
+        _attendre(observateur, "pipeline_done")
