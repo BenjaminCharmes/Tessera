@@ -4169,3 +4169,4 @@ Points posit (58359ms)
 - 2026-10-20 00:36:34 UTC — [ticket-525] validateur: CHANGES_REQUESTED — Les tests requis pour les fonctionnalités liées aux worktrees sont présents et p (152093ms)
 - 2026-10-20 00:36:34 UTC — [ticket-525] CHANGES_REQUESTED tour 3: Validateur : Les tests requis pour les fonctionnalités liées aux worktrees sont présents et passent. Les modifications apportées au code permettent de gérer correctement les worktrees, notamment en aj
 - 2026-10-20 00:36:34 UTC — [ticket-525] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-20 00:36:38 UTC — [ide-core] file interrompue : ticket-525 non approuvé
