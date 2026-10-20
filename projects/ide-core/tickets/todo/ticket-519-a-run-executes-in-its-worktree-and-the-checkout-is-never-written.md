@@ -56,7 +56,7 @@ de dépôt (525).
 
 ## Critères d'acceptation
 - [ ] Les sept tests ci-dessus existent et passent
-- [ ] `RunLock` est inchangé : la phrase d'ADR-038 « même arbre » devient « même base » dans le commentaire de `run_lock.py`
+- [ ] Dans `backend/src/tessera/services/run_lock.py`, le diff ne touche qu'un commentaire, où « même arbre » (ADR-038) devient « même base »
 - [ ] mypy et la suite backend passent
 
 ## Dépendances
