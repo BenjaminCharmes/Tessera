@@ -180,9 +180,11 @@ export default function ProjetCarte({
           rangée des compteurs la hauteur du bouton Lancer, même sans lui. */}
       <div data-testid="pied-de-carte" className="mt-auto flex flex-col gap-2">
         <Dates projet={projet} />
-        <div className="flex min-h-6 items-center justify-between gap-2">
+        {/* Repliable : avec « Mettre en ligne » en plus de Lancer/Arrêter, la
+            rangée débordait de la carte. Les boutons passent sous les compteurs. */}
+        <div className="flex min-h-6 flex-wrap items-center justify-between gap-2">
           <Compteurs projet={projet} />
-          <div className="flex items-start gap-1.5">
+          <div data-testid="actions-de-carte" className="ml-auto flex flex-wrap items-start justify-end gap-1.5">
             <BoutonMiseEnLigne projet={projet} />
             <BoutonServices projet={projet} onChange={onServicesChange} />
           </div>
