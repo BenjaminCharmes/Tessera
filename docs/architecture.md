@@ -375,6 +375,20 @@ Trois services du backend sont adaptés pour accepter un worktree avant que le b
 
 Ce refactor isole la préparation du branchement : le ticket-519 ne s'occupera que du démarrage en worktree, sachant que les trois composants le soutiennent déjà.
 
+#### Orchestration et cycle de vie (ticket-519)
+
+Quand un projet déclare `worktree`, le cycle de vie du run s'en trouve modifié :
+
+**Création et initialisation** : Dès l'acquisition du `RunLock` et avant `ensure_clean_tree`, le worktree est créé et peuplé de copies des fichiers du projet. À partir de ce point, tous les chemins sensibles (dépôt, configuration) sont lus sur le checkout réel, tandis que l'exécution et l'écriture se font dans le worktree isolé.
+
+**Adaptation des services** : `_build_orchestrator` reçoit le `RunWorktree` créé et adapte les chemins passés aux agents. `TicketService`, `pipeline_log_path`, `AgentRunner` et `carte_du_depot` travaillent sur `wt.projet` ; `PolitiqueRun` reste lue sur le dossier réel, mais sa `racine_ecriture` pointe le worktree. `TestRunnerService` reçoit l'environnement et la commande effective du ticket-524, et exécute les tests dans `wt.projet`.
+
+**Nettoyage** : Après le commit final du run et à la fin de la phase 1 de livraison, le worktree est supprimé. Si une exception se produit à tout moment, le nettoyage se fait dans le bloc `finally`. Un `TravailNonSauve` met le run en `blocked`, nomme le dossier dans `arret` et le préserve pour inspection manuelle.
+
+**Cas d'erreur** : Une branche déjà extraite dans le checkout, ou un worktree déjà occupé, bloquent le run immédiatement avec l'état `blocked`. Aucun commit n'a lieu, car aucun fichier n'a été écrit.
+
+La phase 2 de livraison (CIWatcher) n'a que l'API GitHub en mode worktree : aucun appel ne lit ni n'écrit l'arbre (tout ce qui lirait `retourner_sur_base` est exclu).
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
