@@ -4326,3 +4326,4 @@ Le change (99454ms)
 - 2026-10-22 12:44:46 UTC — [ticket-536] validateur: fichiers cités joints : models/worktree_config.py ; absents : worktree.env
 - 2026-10-22 12:44:46 UTC — [ticket-536] validateur: APPROVED — Tous les critères sont satisfaits. Le champ `setup` est ajouté à `ConfigWorktree (63047ms)
 - 2026-10-22 12:44:46 UTC — [ticket-536] APPROVED après 3 tour(s)
+- 2026-10-22 12:47:31 UTC — [ticket-536] documentation: 1 fichier(s) (153609ms)
