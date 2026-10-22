@@ -11,7 +11,11 @@ from tessera.agents.github_sync import GithubSyncAgent
 from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.sync_map import SyncMapService
 from tessera.services.agent_runner import AgentRunner
-from tessera.services.documentation import DocumentationService, ResultatDocumentation
+from tessera.services.documentation import (
+    ROLES_DOCUMENTATION,
+    DocumentationService,
+    ResultatDocumentation,
+)
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.carte_du_depot import CarteDuDepot
@@ -33,7 +37,11 @@ from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.journal_pipeline import journal_vers
-from tessera.services.providers.par_role import modele_du_role, provider_pour_role
+from tessera.services.providers.par_role import (
+    config_du_role,
+    modele_du_role,
+    provider_pour_role,
+)
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.file_vivante import (
     FileFermee,
@@ -378,6 +386,20 @@ def _tests_du_run(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+def _roles_de_documentation(project_path: Path) -> tuple[str, ...]:
+    """The documentation roles the project declares and keeps active (ticket-534).
+
+    Un rôle absent d'`agents.json` ou marqué `"active": false` n'est pas appelé :
+    c'est le réglage qui coupe la documentation, rôle par rôle.
+    """
+    retenus: list[str] = []
+    for role in ROLES_DOCUMENTATION:
+        config = config_du_role(project_path, role)
+        if config is not None and config.active:
+            retenus.append(role)
+    return tuple(retenus)
+
+
 def _documenteur(
     project_id: str,
     politique: PolitiqueRun | None = None,
@@ -425,6 +447,7 @@ def _documenteur(
     service = DocumentationService(
         _fournisseur("doc-technique")[0], settings.ide_prompts_dir,
         fournisseur=_fournisseur, claude_md=claude_md,
+        roles=_roles_de_documentation(project_path),
     )
 
     async def documenter() -> ResultatDocumentation:

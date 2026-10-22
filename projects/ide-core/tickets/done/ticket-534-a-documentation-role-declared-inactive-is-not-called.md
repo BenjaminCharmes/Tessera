@@ -1,14 +1,14 @@
 ---
-id: ticket-534
-title: "A documentation role declared inactive is not called"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-22
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-22
+id: ticket-534
+pr_number: 600
+priority: high
+status: done
+title: A documentation role declared inactive is not called
+type: fix
 ---
 
 # ticket-534 — Un rôle de documentation inactif n'est pas appelé

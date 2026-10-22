@@ -1084,6 +1084,17 @@ Un ticket peut se déclarer `light: true` dans son frontmatter. Les conséquence
 Cas limite : une file qui se termine sur des tickets légers les laisse sans documentation 
 jusqu'à l'appel suivant d'un agent de documentation (mode autonome, chat, nouveau run).
 
+### Sélection des rôles actifs (ticket-534)
+
+La `DocumentationService` n'appelle que les rôles de documentation déclarés **et** marqués actifs dans `agents.json` du projet. Un rôle absent d'`agents.json` ou déclaré `"active": false` n'est jamais appelé.
+
+Conséquences :
+
+- **Aucun rôle actif** → aucun fichier écrit, `memory/documentation.json` n'avance pas, aucun appel LLM.
+- **Plusieurs rôles actifs** → tous sont appelés comme avant (ticket-292).
+
+La sélection s'effectue dans `routers/orchestrator.py` (`_documenteur`), qui lit la configuration du projet sur son dossier réel.
+
 ## Livraison (ADR-029, ADR-030, ADR-051)
 
 Après approbation du pipeline, la livraison s'enchaîne automatiquement — rebase 
