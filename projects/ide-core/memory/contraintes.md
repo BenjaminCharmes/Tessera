@@ -12,6 +12,8 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+## Git et périmètre d'écriture
+
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
   jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`,
   créé depuis `origin/<base>` avec `core.longpaths` : c'est la racine
@@ -19,11 +21,6 @@ section. (ADR-055)
 - **Un lien de `populate` ne vise que ce que git ignore, et se retire avant
   toute suppression récursive.** Ce qui s'édite se copie. Jamais le `.env` de
   Tessera ; une entrée absente se journalise sans bloquer. (ADR-056, ADR-053)
-- **Un worktree qui porte du travail non commité ne se supprime pas.** Au
-  démarrage, un worktree orphelin se commite comme un run non approuvé, puis
-  se supprime. (ADR-056, ADR-037)
-
-## Git et périmètre d'écriture
 
 - **Ne jamais écrire hors de la racine du projet.** Un hook `PreToolUse`
   bloque `Write`, `Edit`, `NotebookEdit` et les redirections Bash simples
@@ -86,6 +83,9 @@ section. (ADR-055)
 
 - **Toute exception en production termine le run en `blocked` avec
   commit.** Jamais une erreur serveur, jamais un arbre sale. (ADR-037)
+- **Un worktree qui porte du travail non commité ne se supprime pas.** Au
+  démarrage, un worktree orphelin se commite comme un run non approuvé, puis
+  se supprime. (ADR-056, ADR-037)
 - **Un projet ne porte qu'un run à la fois.** `RunLock` refuse le second
   et renvoie 409. Deux projets distincts tournent en parallèle. (ADR-038)
 - **L'audit sécurité et le validateur échouent fermés.** Provider
