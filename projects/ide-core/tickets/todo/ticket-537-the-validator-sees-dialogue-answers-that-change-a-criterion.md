@@ -24,6 +24,28 @@ Run d10b5e00 (kadoomi, ticket-088, 22/10). Au tour 1, le codeur pose une questio
 
 Pistes : joindre au validateur les questions et réponses du dialogue du run ; ou laisser le codeur proposer un amendement de critère (visible dans le diff du ticket), à confirmer par l humain au dialogue.
 
+## Solution retenue (triage ide-core, 22/10)
+
+`DialogueChannel` (`services/dialogue.py`) ne garde aucune trace des échanges :
+`ask` attend une réponse, puis l'oublie. Il garde désormais la liste des
+questions posées et des réponses **humaines** reçues pendant le run (pas les
+hypothèses énoncées après un délai dépassé, ADR-025). `ValidatorService`
+(`services/validator.py`) reçoit cette liste et, si elle n'est pas vide,
+l'ajoute à son message dans une section « Décisions prises au dialogue
+pendant le run », après les critères. `agents/prompts/validateur.md` dit
+qu'un critère dont une réponse humaine a changé le sens se juge contre cette
+réponse, et qu'il faut citer la réponse dans le verdict du critère.
+
 ## Critères d'acceptation
 
-- [ ] À écrire au triage
+- [ ] `DialogueChannel` garde chaque question suivie de sa réponse humaine, dans l'ordre, et les expose ; un test le vérifie
+- [ ] Une question restée sans réponse (délai dépassé) n'entre pas dans cette liste ; un test le vérifie
+- [ ] `_build_user_message` de `services/validator.py` ajoute la section « Décisions prises au dialogue pendant le run » quand la liste n'est pas vide, et ne l'ajoute pas sinon ; un test couvre les deux cas
+- [ ] L'orchestrateur passe au validateur les échanges du canal de dialogue du run ; un test vérifie, avec des doubles, qu'une réponse reçue au tour 1 arrive dans le message du validateur
+- [ ] `agents/prompts/validateur.md` contient la règle : un critère dont une réponse humaine du dialogue a changé le sens se juge contre cette réponse, citée dans le verdict
+
+## Ce que ça ne fait pas
+
+- Ne modifie pas le fichier du ticket : le critère d'origine reste tel quel,
+  et la décision vit dans le journal du run.
+- Ne donne pas les échanges au reviewer.
