@@ -4277,3 +4277,15 @@ Points posit (58359ms)
 - 2026-10-22 09:47:10 UTC — [ticket-531] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (297561ms)
 - 2026-10-22 09:47:10 UTC — [ticket-531] APPROVED après 1 tour(s)
 - 2026-10-22 09:48:55 UTC — [ticket-531] documentation: 1 fichier(s) (100531ms)
+- 2026-10-22 09:49:16 UTC — [ide-core] ticket-531 PR #597 confiée au CIWatcher
+- 2026-10-22 09:49:19 UTC — [ticket-532] branche ticket-532-a-queue-on-a-worktree-project-is-refused-instead
+- 2026-10-22 09:49:20 UTC — [ticket-532] tour 1 — codeur démarré
+- 2026-10-22 09:52:41 UTC — [ticket-532] tour 1 — codeur terminé (201438ms)
+- 2026-10-22 09:54:23 UTC — [ide-core] ticket-531 PR #597 mergée (CI verte)
+- 2026-10-22 10:04:46 UTC — [ticket-532] testeur: OK (exit 0)
+- 2026-10-22 10:07:16 UTC — [ticket-532] securite: PASS — Aucune vulnérabilité détectée. Le diff corrige un bug d'exécution en checkout po (150328ms)
+- 2026-10-22 10:07:16 UTC — [ticket-532] tour 1 — reviewer démarré
+- 2026-10-22 10:07:35 UTC — [ticket-532] tour 1 — reviewer terminé (18531ms)
+- 2026-10-22 10:09:32 UTC — [ticket-532] validateur: fichiers cités joints : routers/orchestrator.py (tronqué)
+- 2026-10-22 10:09:32 UTC — [ticket-532] validateur: APPROVED — Tous les critères sont satisfaits. Le code modifié dans `routers/orchestrator.py (136265ms)
+- 2026-10-22 10:09:32 UTC — [ticket-532] APPROVED après 1 tour(s)
