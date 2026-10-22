@@ -4305,3 +4305,25 @@ Le change (99454ms)
 - 2026-10-22 11:48:03 UTC — [ticket-534] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les différen (192265ms)
 - 2026-10-22 11:48:03 UTC — [ticket-534] APPROVED après 1 tour(s)
 - 2026-10-22 11:51:07 UTC — [ticket-534] documentation: 1 fichier(s) (179280ms) — après tour de correction
+- 2026-10-22 11:51:25 UTC — [ide-core] ticket-534 PR #600 confiée au CIWatcher
+- 2026-10-22 11:51:28 UTC — [ticket-536] branche ticket-536-a-worktree-runs-its-declared-setup-command-before
+- 2026-10-22 11:51:29 UTC — [ticket-536] tour 1 — codeur démarré
+- 2026-10-22 11:57:13 UTC — [ide-core] ticket-534 PR #600 mergée (CI verte)
+- 2026-10-22 11:57:15 UTC — [ticket-536] tour 1 — codeur terminé (346655ms)
+- 2026-10-22 12:08:49 UTC — [ticket-536] testeur: 1 failed, 3462 passed, 57 warnings in 676.99s (0:11:16)
+- 2026-10-22 12:08:49 UTC — [ticket-536] tests rouges au tour 1
+- 2026-10-22 12:08:49 UTC — [ticket-536] tour 2 — codeur démarré
+- 2026-10-22 12:13:38 UTC — [ticket-536] tour 2 — codeur terminé (289390ms)
+- 2026-10-22 12:26:08 UTC — [ticket-536] testeur: 1 failed, 1083 passed, 56 warnings in 740.22s (0:12:20)
+- 2026-10-22 12:26:08 UTC — [ticket-536] tests rouges au tour 2
+- 2026-10-22 12:26:08 UTC — [ticket-536] tour 3 — codeur démarré
+- 2026-10-22 12:28:13 UTC — [ticket-536] tour 3 — codeur terminé (124984ms)
+- 2026-10-22 12:41:15 UTC — [ticket-536] testeur: OK (exit 0)
+- 2026-10-22 12:43:43 UTC — [ticket-536] securite: PASS — Aucune vulnérabilité détectée. Le code setup du worktree utilise correctement sh (147280ms)
+- 2026-10-22 12:43:44 UTC — [ticket-536] tour 3 — reviewer démarré
+- 2026-10-22 12:44:14 UTC — [ticket-536] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-22 12:44:18 UTC — [ticket-536] tour 3 — reviewer terminé (33593ms)
+- 2026-10-22 12:44:46 UTC — [ticket-536] validateur: fichiers cités joints : models/worktree_config.py ; absents : worktree.env
+- 2026-10-22 12:44:46 UTC — [ticket-536] validateur: APPROVED — Tous les critères sont satisfaits. Le champ `setup` est ajouté à `ConfigWorktree (63047ms)
+- 2026-10-22 12:44:46 UTC — [ticket-536] APPROVED après 3 tour(s)
+- 2026-10-22 12:47:31 UTC — [ticket-536] documentation: 1 fichier(s) (153609ms)

@@ -59,6 +59,17 @@ def commande_effective(
     return _remplacer(commande, _valeurs(racine_worktree, depot))
 
 
+def setup_effectif(config: ConfigWorktree, racine_worktree: Path, depot: Path) -> str | None:
+    """The `worktree.setup` command with placeholders resolved, `None` when not declared.
+
+    A blank command counts as not declared. Raises `PlaceholderInconnu` like
+    `commande_effective`.
+    """
+    if not config.setup or not config.setup.strip():
+        return None
+    return _remplacer(config.setup, _valeurs(racine_worktree, depot))
+
+
 def environnement_effectif(
     config: ConfigWorktree, racine_worktree: Path, depot: Path
 ) -> dict[str, str]:

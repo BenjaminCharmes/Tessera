@@ -64,8 +64,14 @@ def _valider(declaration: object, racine_depot: Path) -> ConfigWorktree | None:
     if commande is not None and not isinstance(commande, str):
         _mal_type("test_command")
         return None
+    preparation = declaration.get("setup")
+    if preparation is not None and not isinstance(preparation, str):
+        _mal_type("setup")
+        return None
     entrees = tuple(e for e in (_entree(b, racine_depot) for b in brutes) if e is not None)
-    return ConfigWorktree(populate=entrees, env=dict(env), test_command=commande)
+    return ConfigWorktree(
+        populate=entrees, env=dict(env), test_command=commande, setup=preparation
+    )
 
 
 def _mal_type(champ: str) -> None:

@@ -395,6 +395,22 @@ La phase 2 de livraison (CIWatcher) n'a que l'API GitHub en mode worktree : aucu
 
 Un projet qui déclare `worktree` dans sa configuration ne supporte que le mode `single` — un ticket à la fois, exécuté dans son propre worktree. Les modes `queue` et `autonomous` sont refusés avec une 422 (`Unprocessable Entity`), car les files devraient tourner dans des worktrees successifs (un par ticket). Cette architecture reste à concevoir (voir ADR-056, qui définit comment les worktrees isolent les runs).
 
+#### Initialisation du worktree avec commande setup (ticket-536)
+
+Un projet peut déclarer une commande d'initialisation optionnelle : `worktree.setup`
+(chaîne) dans `agents.json`. Après peuplement du worktree, cette commande tourne
+**avant le premier appel au codeur**, avec les variables d'environnement du worktree.
+
+Objectif : le codeur dispose des dépendances (types, packages) dès le premier tour,
+sans attendre que le testeur les installe.
+
+**Délai et erreurs** : respecte le délai du testeur (`pipeline.test_timeout_s`).
+En cas d'échec ou dépassement, le run passe en `blocked` avec la sortie de la commande
+— le codeur n'est pas appelé (ADR-037).
+
+**Validation** : validée à la lecture du projet par `services/worktree_politique.py`
+(ticket-521). Absente, aucune commande ne s'exécute avant le codeur.
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.

@@ -59,14 +59,16 @@ async def test_an_expired_run_names_the_cut_step_and_its_time(tmp_path: Path) ->
 
 
 async def test_an_expired_run_lists_the_steps_finished_before_the_cut(tmp_path: Path) -> None:
+    # Délai large : sous charge, un démarrage de Python dépasse 2 s, et un délai
+    # de 4 s coupait la deuxième étape rapide avant sa fin.
     result = await TestRunnerService().run_tests(
-        tmp_path, test_command=f"{_RAPIDE} && {_RAPIDE} && {_LENTE}", timeout=4
+        tmp_path, test_command=f"{_RAPIDE} && {_RAPIDE} && {_LENTE}", timeout=15
     )
 
     assert result.expiree is True
     assert len(result.etapes) == 2
     assert all(e.code == 0 and e.duree_ms >= 0 for e in result.etapes)
-    assert result.delai_s == 4.0
+    assert result.delai_s == 15.0
 
 
 def test_the_detail_lists_finished_steps_then_the_cut_one() -> None:

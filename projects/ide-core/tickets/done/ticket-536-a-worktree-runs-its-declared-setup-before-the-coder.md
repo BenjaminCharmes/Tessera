@@ -1,14 +1,14 @@
 ---
-id: ticket-536
-title: "A worktree runs its declared setup command before the coder starts"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-22
 depends_on: []
 estimated_days: 1
-created: 2026-10-22
+id: ticket-536
+pr_number: 601
+priority: medium
+status: done
+title: A worktree runs its declared setup command before the coder starts
+type: feat
 ---
 
 # ticket-536 — Un worktree lance sa préparation déclarée avant le codeur
