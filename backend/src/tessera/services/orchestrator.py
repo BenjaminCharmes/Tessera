@@ -106,6 +106,7 @@ class Orchestrator:
         worktree: "RunWorktree | None" = None,
         depot: Path | None = None,
         chemins_absents: tuple[str, ...] = (),
+        preparation: Optional[Callable[[], Awaitable[str | None]]] = None,
         etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
         journal_refus: Optional["JournalDesRefus"] = None,
         pr_mergee_de_branche: Optional[Callable[[str], Awaitable[int | None]]] = None,
@@ -182,6 +183,8 @@ class Orchestrator:
         self._worktree = worktree
         self._depot = depot
         self._chemins_absents = chemins_absents
+        # La préparation déclarée du worktree, lancée avant le codeur (ticket-536).
+        self._preparation = preparation
         self._worktree_retire = False
         # Relit l'état d'une PR (« merged », « open »…). Donné à `attendre_merge`
         # pour qu'un ticket que le watcher n'a pas inscrit ne passe pas pour

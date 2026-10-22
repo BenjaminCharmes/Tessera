@@ -69,6 +69,7 @@ from tessera.services.run_dans_worktree import (
     ouvrir_worktree,
     retirer_apres_echec,
 )
+from tessera.services.preparation_worktree import Preparation, preparation_du_run
 from tessera.services.run_worktree import RunWorktree
 from tessera.services.orchestrator import (
     Orchestrator,
@@ -364,7 +365,26 @@ async def _build_orchestrator(
         worktree=wt,
         depot=project_path if wt is not None else None,
         chemins_absents=chemins_absents,
+        preparation=_preparation_du_run(
+            politique, wt, project_path, env_tests, pipeline_cfg.test_timeout_s
+        ),
     )
+
+
+def _preparation_du_run(
+    politique: PolitiqueRun,
+    wt: RunWorktree | None,
+    project_path: Path,
+    env: dict[str, str] | None,
+    timeout: int | None,
+) -> Preparation | None:
+    """The declared `worktree.setup` of the run; an unknown placeholder refuses it (422)."""
+    try:
+        return preparation_du_run(
+            politique, wt.racine if wt is not None else None, project_path, env, timeout
+        )
+    except PlaceholderInconnu as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 def _tests_du_run(

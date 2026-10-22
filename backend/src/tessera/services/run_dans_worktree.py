@@ -18,6 +18,7 @@ from tessera.services.pipeline_events import (
 )
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.politique_run import PolitiqueRun
+from tessera.services.preparation_worktree import preparer_le_worktree
 from tessera.services.run_worktree import (
     LienPersistant,
     RunWorktree,
@@ -134,7 +135,8 @@ async def adopter_la_branche(orch: "Orchestrator", run: PipelineRun) -> Pipeline
     orch._log(f"[{run.ticket_id}] branche {run.branch} (worktree {wt.racine})")
     for chemin in orch._chemins_absents:
         orch._log(f"[{run.ticket_id}] worktree: « {chemin} » absent du checkout, non peuplé")
-    return None
+    # Avant tout agent : le codeur doit trouver les dépendances du projet (ticket-536).
+    return await preparer_le_worktree(orch, run)
 
 
 class RunRefuse:

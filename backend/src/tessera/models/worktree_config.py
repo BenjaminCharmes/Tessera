@@ -28,3 +28,6 @@ class ConfigWorktree(BaseModel):
     env: Mapping[str, str] = {}
     #: Replaces the project `test_command` inside the worktree.
     test_command: str | None = None
+    #: Runs once in the fresh worktree, before the coder (ticket-536): typically
+    #: the dependency install the coder needs to read library types.
+    setup: str | None = None
