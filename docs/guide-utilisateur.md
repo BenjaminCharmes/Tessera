@@ -806,6 +806,18 @@ Un ticket inexistant. Les tickets que tu viens de merger sur ta branche de base 
 
 Tu vois le motif : doublon, déjà fait, ou dépendance manquante. Le run n'est pas modifié. Corrige le problème et réessaye.
 
+
+### Limite : projets isolés par worktree
+
+Si ton projet est configuré pour isoler chaque run dans son propre répertoire (clé `worktree` dans `agents.json`), les files ne peuvent pas s'y lancer. Seul un ticket unique (`mode: single`) s'accepte, un à la fois.
+
+Cela veut dire :
+- Tu ne peux pas ajouter des tickets à une file en cours sur ce projet
+- Tu dois lancer chaque ticket isolément
+- L'IDE refuse l'ajout avec une erreur 422
+
+C'est une sécurité : le projet a besoin que chaque run soit complètement isolé du checkout, pour éviter les écritures par erreur là où elles ne doivent pas être.
+
 ## 4 ter. Proposer des tickets en arrière-plan
 
 Pendant qu'un run est en cours, tu peux proposer de nouveaux tickets sans attendre la fin du run. Ils seront intégrés immédiatement, indépendamment du run actuel.
@@ -1334,6 +1346,13 @@ Sur Windows, c'est actif. Sur Mac et Linux, ça n'a aucun effet — on laisse ju
 Tu peux désactiver ça si tu veux que ton PC dorme normalement, ou si un autre outil gère la veille pour toi : mets `KEEP_AWAKE_DURING_RUNS=false` dans `.env`.
 
 Ça n'empêche pas Windows Update de redémarrer le PC, ni l'écran de s'éteindre.
+
+
+### Limite : projets isolés par worktree
+
+Le mode autonome — qui lance des tickets en séquence sans intervention — ne fonctionne pas sur les projets à worktree. Seul un ticket unique (`mode: single`) peut s'y lancer pour chaque run.
+
+C'est la même sécurité que pour les files. Ces projets exigent que chaque run soit hermétiquement isolé du reste de ton arbre. Lance-les un par un avec un ticket `single`, ou retire la clé `worktree` de ta configuration si tu préfères traiter plusieurs tickets d'affilée.
 
 ## 8. Discuter avec l'agent, pendant qu'il travaille
 

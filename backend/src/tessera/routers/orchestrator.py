@@ -861,10 +861,12 @@ async def _preparer_orchestrateur(
     wt: RunWorktree | None = None
     try:
         politique = PolitiqueRun.lire(project_path)
-        if politique.worktree is None or not ticket_id:
+        if politique.worktree is None:
             orchestrator = await _build_orchestrator(request.project_id)
         else:
-            if request.mode != "single":
+            # Échoue fermé : un projet à worktree ne tourne jamais dans le
+            # checkout, file et autonome compris, `ticket_id` fourni ou non.
+            if request.mode != "single" or not ticket_id:
                 raise HTTPException(
                     status_code=422,
                     detail="Un projet à worktree ne se lance qu'un ticket à la fois (mode single).",

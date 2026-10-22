@@ -391,6 +391,10 @@ Quand un projet déclare `worktree`, le cycle de vie du run s'en trouve modifié
 
 La phase 2 de livraison (CIWatcher) n'a que l'API GitHub en mode worktree : aucun appel ne lit ni n'écrit l'arbre (tout ce qui lirait `retourner_sur_base` est exclu).
 
+#### Restriction des modes de run pour les projets à worktree (ticket-532)
+
+Un projet qui déclare `worktree` dans sa configuration ne supporte que le mode `single` — un ticket à la fois, exécuté dans son propre worktree. Les modes `queue` et `autonomous` sont refusés avec une 422 (`Unprocessable Entity`), car les files devraient tourner dans des worktrees successifs (un par ticket). Cette architecture reste à concevoir (voir ADR-056, qui définit comment les worktrees isolent les runs).
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.

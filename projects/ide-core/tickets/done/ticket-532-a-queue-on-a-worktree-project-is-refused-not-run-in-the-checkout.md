@@ -1,14 +1,14 @@
 ---
-id: ticket-532
-title: "A queue on a worktree project is refused instead of running in the checkout"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-22
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-22
+id: ticket-532
+pr_number: 598
+priority: high
+status: done
+title: A queue on a worktree project is refused instead of running in the checkout
+type: fix
 ---
 
 # ticket-532 — Une file sur un projet à worktree est refusée, pas lancée dans le checkout

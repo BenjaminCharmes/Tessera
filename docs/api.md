@@ -165,8 +165,9 @@ Réponses d'erreur :
   - `autonomy >= pr` sans `github_remote` : impossible de créer une PR ;
   - `autonomy: merge`, sans `.github/workflows/*.yml` et sans `merge_without_ci: true` : aucune CI déclarée et merge exige une CI verte ;
   - `test_command` déclaré : le premier mot de chaque segment `&&` doit être trouvable (commande système ou chemin existant), sinon refus avec le nom manquant.
+  - Un projet avec `worktree` déclaré refuse les modes `queue` et `autonomous` : seul `single` est autorisé (les files doivent tourner dans des worktrees successifs, reste à concevoir).
   
-  La réponse liste les critères non satisfaits. Passer `force: true` contourne ces vérifications.
+  La réponse liste les critères non satisfaits. Passer `force: true` contourne les validations sur `autonomy`, `test_command` et `github_remote`, mais pas la restriction worktree qui s'applique systématiquement.
 - **`409` Conflict** : le projet porte déjà un run en cours.
 - **`404` Not Found** : le projet est inconnu.
 
