@@ -4,7 +4,7 @@ created: 2026-10-22
 depends_on: []
 estimated_days: 0.5
 id: ticket-538
-pr_number: null
+pr_number: 603
 priority: low
 status: done
 title: The worktree setup step is visible in the events and the pipeline log
