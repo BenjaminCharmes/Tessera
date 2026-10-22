@@ -4251,3 +4251,15 @@ Points posit (58359ms)
 - 2026-10-20 03:04:07 UTC — [ticket-528] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (123156ms)
 - 2026-10-20 03:04:07 UTC — [ticket-528] APPROVED après 1 tour(s)
 - 2026-10-20 03:06:29 UTC — [ticket-528] documentation: 3 fichier(s) (137202ms)
+- 2026-10-20 03:06:46 UTC — [ide-core] ticket-528 PR #590 confiée au CIWatcher
+- 2026-10-20 03:12:14 UTC — [ide-core] ticket-528 PR #590 mergée (CI verte)
+- 2026-10-22 08:52:48 UTC — [ticket-530] branche ticket-530-en-mode-worktree-la-documentation-par-lot-crit-da
+- 2026-10-22 08:52:50 UTC — [ticket-530] tour 1 — codeur démarré
+- 2026-10-22 08:56:34 UTC — [ticket-530] tour 1 — codeur terminé (224186ms)
+- 2026-10-22 09:09:07 UTC — [ticket-530] testeur: OK (exit 0)
+- 2026-10-22 09:12:33 UTC — [ticket-530] securite: PASS — Le diff ajoute le paramètre `wt: RunWorktree | None` à `_documenteur()` pour écr (206625ms)
+- 2026-10-22 09:12:33 UTC — [ticket-530] tour 1 — reviewer démarré
+- 2026-10-22 09:12:51 UTC — [ticket-530] tour 1 — reviewer terminé (17546ms)
+- 2026-10-22 09:16:25 UTC — [ticket-530] validateur: fichiers cités joints : routers/orchestrator.py (tronqué)
+- 2026-10-22 09:16:25 UTC — [ticket-530] validateur: APPROVED — Tous les critères sont respectés. Le code modifie correctement la fonction `_doc (231328ms)
+- 2026-10-22 09:16:25 UTC — [ticket-530] APPROVED après 1 tour(s)
