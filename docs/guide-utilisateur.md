@@ -886,6 +886,13 @@ Pour que le ticket soit approuvé, le reviewer **et** le validateur doivent tous
 
 Quand tu vois la ligne « testeur: en attente d'un créneau de test » dans le log, cela signifie qu'un autre testeur utilise le créneau de tests (limité à `MAX_PARALLEL_TEST_RUNS` tests simultanés). Le testeur actuel attend son tour, mais cette attente n'affecte pas le timeout — seul le temps réel d'exécution du test compte.
 
+
+**La préparation du worktree (si déclarée)**
+
+Quand ton projet déclare une commande `setup` dans son `agents.json`, le worktree se prépare avant que le codeur commence. Tu vois cette étape dans le journal du pipeline : une ligne comme `[ticket-XXX] préparation: <commande> (<durée>, code <exit_code>)`. Par exemple : `[ticket-042] préparation: pnpm install (1 min 49 s, code 0)`.
+
+Si la préparation échoue, le run s'arrête — aucun agent ne commence son travail, et tu vois un message d'erreur expliquant ce qui n'a pas marché. Si tu ne déclares pas de `setup`, cette étape n'apparaît pas.
+
 ### Quand une file s'arrête
 
 Une file arrêtée par une exception (timeout, saturation de ressources, etc.) écrit une ligne dans le journal du pipeline : `[projet] file interrompue : motif de l'erreur`. Tu peux voir l'arrêt immédiatement dans l'IDE, au même endroit que les autres interruptions (refus d'audit, dépassement de budget, limite de session). Tu n'as pas besoin de chercher dans les logs du serveur.

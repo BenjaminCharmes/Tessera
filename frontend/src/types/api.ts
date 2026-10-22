@@ -52,6 +52,7 @@ export type EventType =
   | "answer_ack"
   | "provisioning_step"
   | "run_resumed_from_existing_work"
+  | "worktree_setup"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */

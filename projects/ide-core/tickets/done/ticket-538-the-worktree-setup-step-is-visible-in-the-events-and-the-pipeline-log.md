@@ -1,14 +1,14 @@
 ---
-id: ticket-538
-title: "The worktree setup step is visible in the events and the pipeline log"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-10-22
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-22
+id: ticket-538
+pr_number: 603
+priority: low
+status: done
+title: The worktree setup step is visible in the events and the pipeline log
+type: feat
 ---
 
 # ticket-538 — La préparation du worktree se voit dans les événements et le journal

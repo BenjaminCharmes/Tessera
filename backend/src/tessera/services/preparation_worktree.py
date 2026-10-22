@@ -8,6 +8,7 @@ tester's timeout. A failure ends the run `blocked` before any agent is called
 (ADR-037).
 """
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -24,8 +25,21 @@ if TYPE_CHECKING:
 
 _logger = get_logger(__name__)
 
-#: Runs the setup; the reason it failed, or `None` when it succeeded.
-Preparation = Callable[[], Awaitable[str | None]]
+
+@dataclass
+class ResultatPreparation:
+    """How the setup ended: what ran, for how long, and why it failed if it did."""
+
+    commande: str
+    duree_ms: int
+    #: Code de sortie de la dernière étape ; `None` si rien n'a démarré ou si le délai a coupé.
+    code: int | None
+    #: La raison de l'échec, `None` quand la préparation a réussi.
+    arret: str | None
+
+
+#: Runs the setup and reports how it ended.
+Preparation = Callable[[], Awaitable[ResultatPreparation]]
 
 
 def _raison_de_l_echec(commande: str, resultat: TestResult) -> str:
@@ -63,16 +77,39 @@ def preparation_du_run(
         return None
     lanceur = runner or TestRunnerService(cwd=None, timeout=timeout, env=env)
 
-    async def preparer() -> str | None:
+    async def preparer() -> ResultatPreparation:
         # La racine du worktree, pas le dossier du projet : le gestionnaire de paquets
         # y cherche son fichier de verrou.
         resultat = await lanceur.run_tests(racine, test_command=commande)
+        code = resultat.etapes[-1].code if resultat.etapes else None
         if resultat.passed:
-            return None
+            return ResultatPreparation(commande, resultat.duration_ms, code, None)
         _logger.warning("worktree_setup_echoue", extra={"commande": commande})
-        return _raison_de_l_echec(commande, resultat)
+        arret = _raison_de_l_echec(commande, resultat)
+        return ResultatPreparation(commande, resultat.duration_ms, code, arret)
 
     return preparer
+
+
+def _ligne_du_journal(ticket_id: str, resultat: ResultatPreparation) -> str:
+    """The pipeline-log line: command, outcome, exit code and duration."""
+    issue = "échec" if resultat.arret is not None else "ok"
+    code = "aucun" if resultat.code is None else str(resultat.code)
+    return (
+        f"[{ticket_id}] préparation: {issue} — `{resultat.commande}` "
+        f"(code {code}, {resultat.duree_ms} ms)"
+    )
+
+
+async def _annoncer(
+    orch: "Orchestrator", run: PipelineRun, resultat: ResultatPreparation
+) -> None:
+    """Emit `worktree_setup` and write the log line, success or failure alike."""
+    await emit(
+        run, EventType.WORKTREE_SETUP, command=resultat.commande,
+        duration_ms=resultat.duree_ms, exit_code=resultat.code,
+    )
+    orch._log(_ligne_du_journal(run.ticket_id, resultat))
 
 
 async def preparer_le_worktree(
@@ -81,7 +118,9 @@ async def preparer_le_worktree(
     """Run the declared setup; a blocked result when it fails, `None` otherwise."""
     if orch._preparation is None:
         return None
-    arret = await orch._preparation()
+    resultat = await orch._preparation()
+    await _annoncer(orch, run, resultat)
+    arret = resultat.arret
     if arret is None:
         return None
     await set_status(orch, run, TicketStatus.blocked)

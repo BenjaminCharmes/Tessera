@@ -85,6 +85,10 @@ class EventType(str, Enum):
     #: les tests ont tourné avant le codeur. `commits` est le nombre de commits
     #: repris, `verdict` vaut « green » (le codeur est sauté) ou « red ».
     RUN_RESUMED_FROM_EXISTING_WORK = "run_resumed_from_existing_work"
+    #: La préparation déclarée du worktree (`worktree.setup`) a tourné
+    #: (ticket-538). `command`, `duration_ms` et `exit_code` (`None` si la
+    #: commande n'a pas démarré ou a été coupée). Absent sans `setup` déclaré.
+    WORKTREE_SETUP = "worktree_setup"
 
 
 class OrchestratorEvent(BaseModel):
