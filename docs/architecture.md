@@ -327,6 +327,8 @@ Un worktree neuf est peuplé avant tout lancement : ses entrées déclarées (fi
 
 Implémentation : `services/run_worktree_populate.py` (ticket-523, ADR-056).
 
+Sous Windows, les chemins de plus de 260 caractères (courant avec pnpm et les arbres imbriqués de `node_modules`) levaient `WinError 3` lors de la suppression du worktree, interrompant le run même après la livraison de la PR (ticket-531). La correction applique le préfixe étendu `\?\` pour les appels système du nettoyage et rattrape les erreurs `OSError` et `GitWorkspaceError` : le résultat du run reste inchangé (livré reste livré), un avertissement `run_worktree_non_supprime` est journalisé, et le dossier peut être nettoyé au prochain démarrage (ticket-520).
+
 #### Exécution des commandes dans le worktree (ticket-524)
 
 Quand un projet déclare `worktree` dans `agents.json`, ses tests tournent en
