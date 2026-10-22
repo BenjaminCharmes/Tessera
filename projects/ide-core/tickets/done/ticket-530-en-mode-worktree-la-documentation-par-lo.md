@@ -3,8 +3,9 @@ agent: codeur
 created: '2026-10-22'
 depends_on: []
 id: ticket-530
+pr_number: 596
 priority: medium
-status: todo
+status: done
 title: En mode worktree, la documentation par lot écrit dans le checkout du projet
 type: fix
 ---
