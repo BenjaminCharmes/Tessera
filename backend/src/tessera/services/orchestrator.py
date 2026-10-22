@@ -52,6 +52,7 @@ from tessera.services.session_limit import (
 )
 
 if TYPE_CHECKING:
+    from tessera.services.preparation_worktree import Preparation
     from tessera.services.providers.refus_garde import JournalDesRefus
     from tessera.services.carte_du_depot import CarteDuDepot
     from tessera.services.quota_tracker import QuotaTracker
@@ -106,7 +107,7 @@ class Orchestrator:
         worktree: "RunWorktree | None" = None,
         depot: Path | None = None,
         chemins_absents: tuple[str, ...] = (),
-        preparation: Optional[Callable[[], Awaitable[str | None]]] = None,
+        preparation: "Optional[Preparation]" = None,
         etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
         journal_refus: Optional["JournalDesRefus"] = None,
         pr_mergee_de_branche: Optional[Callable[[str], Awaitable[int | None]]] = None,
