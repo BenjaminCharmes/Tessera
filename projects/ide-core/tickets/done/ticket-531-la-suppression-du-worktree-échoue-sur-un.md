@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-10-22'
 depends_on: []
 id: ticket-531
+pr_number: 597
 priority: medium
 status: done
 title: La suppression du worktree échoue sur un chemin de plus de 260 caractères dans
