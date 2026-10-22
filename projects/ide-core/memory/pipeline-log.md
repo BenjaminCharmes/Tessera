@@ -4327,3 +4327,15 @@ Le change (99454ms)
 - 2026-10-22 12:44:46 UTC — [ticket-536] validateur: APPROVED — Tous les critères sont satisfaits. Le champ `setup` est ajouté à `ConfigWorktree (63047ms)
 - 2026-10-22 12:44:46 UTC — [ticket-536] APPROVED après 3 tour(s)
 - 2026-10-22 12:47:31 UTC — [ticket-536] documentation: 1 fichier(s) (153609ms)
+- 2026-10-22 12:47:52 UTC — [ide-core] ticket-536 PR #601 confiée au CIWatcher
+- 2026-10-22 12:53:33 UTC — [ide-core] ticket-536 PR #601 mergée (CI verte)
+- 2026-10-22 15:37:26 UTC — [ticket-538] branche ticket-538-the-worktree-setup-step-is-visible-in-the-events
+- 2026-10-22 15:37:28 UTC — [ticket-538] tour 1 — codeur démarré
+- 2026-10-22 15:43:36 UTC — [ticket-538] tour 1 — codeur terminé (368046ms)
+- 2026-10-22 15:58:25 UTC — [ticket-538] testeur: OK (exit 0)
+- 2026-10-22 16:00:05 UTC — [ticket-538] securite: PASS — Aucune vulnérabilité détectée. Restructuration du type Preparation pour inclure  (99985ms)
+- 2026-10-22 16:00:05 UTC — [ticket-538] tour 1 — reviewer démarré
+- 2026-10-22 16:00:30 UTC — [ticket-538] tour 1 — reviewer terminé (24360ms)
+- 2026-10-22 16:02:41 UTC — [ticket-538] validateur: fichiers cités joints : services/preparation_worktree.py
+- 2026-10-22 16:02:41 UTC — [ticket-538] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le type d'événeme (155920ms)
+- 2026-10-22 16:02:41 UTC — [ticket-538] APPROVED après 1 tour(s)
