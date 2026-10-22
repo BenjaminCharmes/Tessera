@@ -49,12 +49,20 @@ Deux défauts dans `services/run_dans_worktree.py` et
   `run_worktree_non_supprime` est journalisé avec le dossier, et le worktree
   reste pour la reprise au démarrage (ticket-520).
 
+## Constat du 22/10 (nettoyage à la main)
+
+Même `git -c core.longpaths=true worktree remove` sur ce worktree a échoué
+(« Directory not empty ») : git n'arrive pas à vider `node_modules/.pnpm`.
+Seul `rmdir /s /q "\?\<chemin>"` l'a supprimé. Les jonctions de pnpm y
+pointent toutes à l'intérieur du worktree.
+
 ## Critères d'acceptation
 
 - [ ] `chemin_etendu` existe dans `services/run_worktree_populate.py` ; un test vérifie, en simulant la plateforme, qu'il préfixe `\\?\` sous Windows et rend le chemin inchangé ailleurs
 - [ ] `retirer_les_liens` passe par `chemin_etendu` pour lister, inspecter et retirer les entrées
 - [ ] Un test vérifie, avec des doubles, qu'une `OSError` levée pendant la suppression laisse `retirer_en_fin_de_run` rendre le résultat du run inchangé (même `final_status`, même `arret`)
 - [ ] Le même test, ou un autre, vérifie le même comportement pour une `GitWorkspaceError` levée par `git worktree remove`
+- [ ] Quand `git worktree remove` échoue sur un worktree propre et sans lien vers l'extérieur, `supprimer` termine la suppression du dossier par un chemin étendu (`chemin_etendu`), puis `git worktree prune` ; un test le vérifie avec des doubles
 - [ ] Dans ces deux cas, un avertissement `run_worktree_non_supprime` est journalisé avec la racine du worktree
 
 ## Ce que ça ne fait pas
