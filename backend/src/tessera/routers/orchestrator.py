@@ -342,7 +342,7 @@ async def _build_orchestrator(
         ci_watcher=CI_WATCHER,
         etat_pr=_lecteur_etat_pr(project_id, politique),
         pr_mergee_de_branche=_chercheur_pr_mergee(project_id, politique),
-        documenter=_documenteur(project_id, politique),
+        documenter=_documenteur(project_id, politique, wt),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
         # bootstrap travaille au-dessus de lui (ADR-028), et sa carte doit le
@@ -379,18 +379,28 @@ def _tests_du_run(
 
 
 def _documenteur(
-    project_id: str, politique: PolitiqueRun | None = None
+    project_id: str,
+    politique: PolitiqueRun | None = None,
+    wt: RunWorktree | None = None,
 ) -> Callable[[], Awaitable[ResultatDocumentation]]:
-    """Fabrique la mise à jour de documentation d'un projet (ticket-092).
+    """Build the documentation update of a project (ticket-092).
 
     Appelée après chaque run approuvé, sur sa branche (ticket-198), pour le
     lot des tickets livrés depuis le marqueur. Sans outils — elle lit des
     tickets et rend du JSON, elle n'a aucune raison d'écrire elle-même sur le
     disque. `README.md` et `docs/` sont cherchés à la racine d'écriture : le
     projet bootstrap documente l'IDE à la racine du dépôt (ADR-028).
+
+    Avec un worktree (ADR-056), tout ce que le run lit et écrit — tickets,
+    marqueur, journal, documentation — est celui du worktree : le checkout
+    n'est jamais écrit. La configuration (`agents.json`, `CLAUDE.md`) reste
+    lue sur le dossier réel, comme pour les autres services du run.
     """
     project_path = settings.ide_workspace_dir / project_id
-    racine_doc = (politique or PolitiqueRun.lire(project_path)).racine_ecriture(project_path)
+    dossier_run = wt.projet if wt is not None else project_path
+    racine_doc = (politique or PolitiqueRun.lire(project_path)).racine_ecriture(
+        project_path, wt
+    )
 
     def _fournisseur(role: str) -> tuple[LLMProvider, str | None]:
         # Deux rôles, chacun son provider et son modèle (ticket-188).
@@ -398,7 +408,7 @@ def _documenteur(
         # `agent_calls` comme les autres (ticket-211).
         inner = provider_pour_role(
             project_path, role, allow_tools=False, project_id=project_id,
-            journal_repli=journal_vers(project_path / "memory" / "pipeline-log.md"),
+            journal_repli=journal_vers(dossier_run / "memory" / "pipeline-log.md"),
         )
         return (
             ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path),
@@ -418,7 +428,7 @@ def _documenteur(
     )
 
     async def documenter() -> ResultatDocumentation:
-        resultat = await service.mettre_a_jour(project_path, racine_doc=racine_doc)
+        resultat = await service.mettre_a_jour(dossier_run, racine_doc=racine_doc)
         if resultat.fichiers_modifies:
             _logger.info(
                 "documentation_mise_a_jour",
