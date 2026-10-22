@@ -4304,3 +4304,4 @@ Le change (99454ms)
 - 2026-10-22 11:48:03 UTC — [ticket-534] validateur: fichiers cités joints : agents.json, memory/documentation.json
 - 2026-10-22 11:48:03 UTC — [ticket-534] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les différen (192265ms)
 - 2026-10-22 11:48:03 UTC — [ticket-534] APPROVED après 1 tour(s)
+- 2026-10-22 11:51:07 UTC — [ticket-534] documentation: 1 fichier(s) (179280ms) — après tour de correction
