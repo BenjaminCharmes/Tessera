@@ -4,7 +4,7 @@ created: 2026-10-22
 depends_on: []
 estimated_days: 0.5
 id: ticket-532
-pr_number: null
+pr_number: 598
 priority: high
 status: done
 title: A queue on a worktree project is refused instead of running in the checkout
