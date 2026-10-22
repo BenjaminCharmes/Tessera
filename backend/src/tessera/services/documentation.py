@@ -398,6 +398,7 @@ class ResultatDocumentation:
 #: à qui on demande les deux écrit un guide utilisateur plein de noms de
 #: classes, parce que c'est ce qu'il vient de lire.
 _ROLES = ("doc-technique", "doc-fonctionnelle")
+ROLES_DOCUMENTATION = _ROLES
 
 _MODELE = MODELE_JUGEMENT
 _MAX_TOKENS = 4096
@@ -417,8 +418,12 @@ class DocumentationService:
         prompts_dir: Path,
         fournisseur: "Callable[[str], tuple[LLMProvider, str | None]] | None" = None,
         claude_md: Path | None = None,
+        roles: tuple[str, ...] = _ROLES,
     ) -> None:
         self._provider = provider
+        # Les rôles à appeler : l'appelant filtre ceux que le projet coupe
+        # (ticket-534). Vide, le service ne fait rien.
+        self._roles = roles
         self._prompts_dir = prompts_dir
         # Le CLAUDE.md du projet, s'il le déclare documentable (ticket-244).
         self._claude_md = claude_md
@@ -449,6 +454,11 @@ class DocumentationService:
         tickets terminés existants et rend un résultat vide : on ne rattrape pas
         des centaines de tickets d'un coup sur un projet mature (ticket-213).
         """
+        # Aucun rôle actif : ni appel, ni marqueur — le projet a coupé la doc,
+        # et la rallumer doit rattraper ce qui s'est livré entre-temps.
+        if not self._roles:
+            return ResultatDocumentation([], [], [])
+
         racine = racine_doc or project_path
         marqueur = project_path / "memory" / _MARQUEUR
 
@@ -474,7 +484,7 @@ class DocumentationService:
         tour_de_correction = False
         brief = _brief(tickets, _contenu_documentable(racine))
 
-        for role in _ROLES:
+        for role in self._roles:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
             provider, modele = self._pour(role)
             # Seul `doc-technique` voit le CLAUDE.md, et seul lui peut l'éditer.

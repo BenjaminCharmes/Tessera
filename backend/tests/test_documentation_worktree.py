@@ -26,6 +26,11 @@ DECLARATION = {
     "artifacts": "tracked",
     "base_branch": "develop",
     "worktree": {"populate": [{"path": "cache", "mode": "copy"}]},
+    # Un rôle de documentation se déclare pour être appelé (ticket-534).
+    "agents": [
+        {"role": role, "model": "m", "max_tokens": 1, "prompt_file": f"{role}.md"}
+        for role in ("doc-technique", "doc-fonctionnelle")
+    ],
 }
 EDITION = {
     "editions": [
