@@ -9,7 +9,7 @@ import pytest
 from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
 from tessera.services import run_worktree_populate
 from tessera.services.run_worktree import LienPersistant, RunWorktree, creer, supprimer
-from tessera.services.run_worktree_populate import peupler, retirer_les_liens
+from tessera.services.run_worktree_populate import chemin_etendu, peupler, retirer_les_liens
 from tests.depot_worktree import BRANCHE, construire, git, lier
 
 _LOGGER = "tessera.services.run_worktree_populate"
@@ -111,6 +111,44 @@ def test_retirer_les_liens_never_enters_the_target_of_a_link(tmp_path: Path) -> 
     assert (cible / "temoin.txt").read_text(encoding="utf-8") == "cible"
     assert os.path.lexists(cible / "interne")
     assert (autre / "temoin.txt").read_text(encoding="utf-8") == "autre"
+
+
+def test_chemin_etendu_prefixes_the_absolute_path_on_windows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(run_worktree_populate, "_sous_windows", lambda: True)
+    attendu = "\\\\?\\" + os.path.abspath(str(tmp_path / "a" / ".." / "b"))
+    assert chemin_etendu(tmp_path / "a" / ".." / "b") == attendu
+    assert chemin_etendu(Path(attendu)) == attendu  # déjà préfixé : rien n'est doublé
+
+
+def test_chemin_etendu_leaves_the_path_unchanged_elsewhere(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(run_worktree_populate, "_sous_windows", lambda: False)
+    assert chemin_etendu(tmp_path / "a") == str(tmp_path / "a")
+
+
+def test_retirer_les_liens_goes_through_chemin_etendu_for_every_entry(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cible = tmp_path / "cible"
+    cible.mkdir()
+    racine = tmp_path / "arbre"
+    (racine / "dossier").mkdir(parents=True)
+    lier(cible, racine / "dossier" / "node_modules")
+    vus: list[Path] = []
+    reel = run_worktree_populate.chemin_etendu
+
+    def espion(chemin: Path) -> str:
+        vus.append(chemin)
+        return reel(chemin)
+
+    monkeypatch.setattr(run_worktree_populate, "chemin_etendu", espion)
+    assert retirer_les_liens(racine) == []
+    # Lister la racine, inspecter et retirer le lien : trois familles d'appels.
+    assert racine in vus and racine / "dossier" in vus
+    assert vus.count(racine / "dossier" / "node_modules") >= 2
 
 
 async def test_a_link_that_stays_stops_supprimer_and_the_worktree_remains(

@@ -34,17 +34,40 @@ _logger = get_logger(__name__)
 _REPARSE_POINT = int(getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400))
 
 
+def _sous_windows() -> bool:
+    return sys.platform == "win32"
+
+
+def chemin_etendu(chemin: Path) -> str:
+    """The path as a string Python can open past 260 characters.
+
+    On Windows: the absolute path prefixed with `\\\\?\\` (`\\\\?\\UNC\\` for a
+    network path). Elsewhere: `str(chemin)`, unchanged. `core.longpaths` only
+    covers git, not Python's own file calls (ticket-531).
+    """
+    if not _sous_windows():
+        return str(chemin)
+    if str(chemin).startswith("\\\\?\\"):
+        return str(chemin)
+    absolu = os.path.abspath(str(chemin))
+    if absolu.startswith("\\\\"):
+        return "\\\\?\\UNC\\" + absolu[2:]
+    return "\\\\?\\" + absolu
+
+
 def _est_un_lien(chemin: Path) -> bool:
     """True for a symlink or a junction, judged on the entry itself, never its target."""
-    attributs = int(getattr(os.lstat(chemin), "st_file_attributes", 0))
-    return chemin.is_symlink() or bool(attributs & _REPARSE_POINT)
+    etendu = chemin_etendu(chemin)
+    attributs = int(getattr(os.lstat(etendu), "st_file_attributes", 0))
+    return os.path.islink(etendu) or bool(attributs & _REPARSE_POINT)
 
 
 def _delier(chemin: Path) -> bool:
     """Remove one link without touching what it points at; False if it stays."""
+    etendu = chemin_etendu(chemin)
     for retrait in (os.rmdir, os.unlink):
         try:
-            retrait(chemin)
+            retrait(etendu)
         except OSError:
             continue
         return True
@@ -59,13 +82,14 @@ def retirer_les_liens(racine: Path) -> list[Path]:
     tree holds no link any more and can be removed recursively.
     """
     restants: list[Path] = []
-    with os.scandir(racine) as entrees:
-        enfants = [Path(entree.path) for entree in entrees]
+    with os.scandir(chemin_etendu(racine)) as entrees:
+        # `racine / nom`, pas `entree.path` : les chemins rendus ne portent pas le préfixe.
+        enfants = [racine / entree.name for entree in entrees]
     for enfant in enfants:
         if _est_un_lien(enfant):
             if not _delier(enfant):
                 restants.append(enfant)
-        elif enfant.is_dir():
+        elif os.path.isdir(chemin_etendu(enfant)):
             restants.extend(retirer_les_liens(enfant))
     return restants
 

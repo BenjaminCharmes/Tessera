@@ -6,12 +6,13 @@ outlives the request. It is created from `origin/<base>`, resumed when a run
 left it behind clean, and never removed while it holds unsaved work.
 """
 import re
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
-from tessera.services.run_worktree_populate import retirer_les_liens
+from tessera.services.run_worktree_populate import chemin_etendu, retirer_les_liens
 from tessera.services.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
 from tessera.utils.project_id import validate_project_id
@@ -182,6 +183,8 @@ async def supprimer(wt: RunWorktree, depot: Path) -> None:
     """Remove the worktree, unless it holds unsaved work (`TravailNonSauve`).
 
     Never `--force` on a dirty tree: what was not committed is what nobody saved.
+    When git cannot empty a clean folder (paths past 260 characters), the folder
+    is deleted with extended paths, then `git worktree prune` forgets it.
     A root outside `ide_worktrees_dir` raises `CheminRefuse` before anything is touched.
     The links come off first, before the status and before any removal: a deletion
     must never reach the inside of one. A link that stays raises `LienPersistant`.
@@ -194,6 +197,12 @@ async def supprimer(wt: RunWorktree, depot: Path) -> None:
         etat = await _etat(wt.racine)
         if etat:
             raise TravailNonSauve(wt.racine, etat)
-        await run_git(depot, "worktree", "remove", str(wt.racine))
+        try:
+            await run_git(depot, "worktree", "remove", str(wt.racine))
+        except GitCommandError as exc:
+            extra = {"racine": str(wt.racine), "erreur": str(exc)}
+            _logger.warning("run_worktree_non_supprime", extra=extra)
+            # Propre et sans lien : ce que git a laissé se supprime sans rien atteindre ailleurs.
+            shutil.rmtree(chemin_etendu(wt.racine))
     # Efface aussi l'enregistrement d'un worktree dont le dossier a disparu.
     await run_git(depot, "worktree", "prune")
