@@ -4,7 +4,7 @@ created: 2026-10-22
 depends_on: []
 estimated_days: 1
 id: ticket-536
-pr_number: null
+pr_number: 601
 priority: medium
 status: done
 title: A worktree runs its declared setup command before the coder starts
