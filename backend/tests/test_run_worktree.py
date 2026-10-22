@@ -1,4 +1,5 @@
 """Run worktree: create, resume and remove, on a throwaway repository with a local origin."""
+import logging
 import subprocess
 import sys
 from pathlib import Path
@@ -6,6 +7,8 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
+from tessera.services import run_worktree
+from tessera.services.git_workspace import GitCommandError
 from tessera.services.run_worktree import (
     BrancheDejaExtraite,
     CheminRefuse,
@@ -113,6 +116,39 @@ async def test_supprimer_removes_a_clean_worktree_and_its_registration(
     assert "ticket-1" not in _git(checkout, "worktree", "list", "--porcelain")
     # La branche, elle, reste : c'est ce que le run a produit.
     assert BRANCHE in _git(checkout, "branch", "--list", BRANCHE)
+
+
+async def test_supprimer_finishes_with_extended_paths_when_git_cannot_empty_the_folder(
+    checkout: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    wt = await _creer(checkout)
+    commandes: list[tuple[str, ...]] = []
+    etendus: list[Path] = []
+    reel_git = run_worktree.run_git
+    reel_etendu = run_worktree.chemin_etendu
+
+    async def git_qui_echoue(cwd: Path, *args: str) -> str:
+        commandes.append(args)
+        if args[:2] == ("worktree", "remove"):
+            raise GitCommandError(["git", *args], 1, "Directory not empty")
+        return await reel_git(cwd, *args)
+
+    def espion(chemin: Path) -> str:
+        etendus.append(chemin)
+        return reel_etendu(chemin)
+
+    monkeypatch.setattr(run_worktree, "run_git", git_qui_echoue)
+    monkeypatch.setattr(run_worktree, "chemin_etendu", espion)
+
+    with caplog.at_level(logging.WARNING, logger="tessera.services.run_worktree"):
+        await supprimer(wt, checkout)
+
+    assert etendus == [wt.racine]
+    assert not wt.racine.exists()
+    assert commandes[-1] == ("worktree", "prune")
+    assert "ticket-1" not in _git(checkout, "worktree", "list", "--porcelain")
+    journal = [r for r in caplog.records if r.getMessage() == "run_worktree_non_supprime"]
+    assert [r.__dict__["racine"] for r in journal] == [str(wt.racine)]
 
 
 async def test_supprimer_refuses_a_dirty_worktree_and_leaves_it(checkout: Path) -> None:

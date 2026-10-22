@@ -4264,3 +4264,16 @@ Points posit (58359ms)
 - 2026-10-22 09:16:25 UTC — [ticket-530] validateur: APPROVED — Tous les critères sont respectés. Le code modifie correctement la fonction `_doc (231328ms)
 - 2026-10-22 09:16:25 UTC — [ticket-530] APPROVED après 1 tour(s)
 - 2026-10-22 09:17:30 UTC — [ticket-530] documentation: 0 fichier(s) (58953ms)
+- 2026-10-22 09:17:54 UTC — [ide-core] ticket-530 PR #596 confiée au CIWatcher
+- 2026-10-22 09:17:58 UTC — [ticket-531] branche ticket-531-la-suppression-du-worktree-choue-sur-un-chemin-de
+- 2026-10-22 09:17:59 UTC — [ticket-531] tour 1 — codeur démarré
+- 2026-10-22 09:23:26 UTC — [ide-core] ticket-530 PR #596 mergée (CI verte)
+- 2026-10-22 09:27:16 UTC — [ticket-531] tour 1 — codeur terminé (557030ms)
+- 2026-10-22 09:39:46 UTC — [ticket-531] testeur: OK (exit 0)
+- 2026-10-22 09:42:12 UTC — [ticket-531] securite: PASS — Le diff améliore la robustesse de la suppression des worktrees avec un fallback  (145797ms)
+- 2026-10-22 09:42:12 UTC — [ticket-531] tour 1 — reviewer démarré
+- 2026-10-22 09:42:36 UTC — [ticket-531] tour 1 — reviewer terminé (23890ms)
+- 2026-10-22 09:47:10 UTC — [ticket-531] validateur: fichiers cités joints : services/run_worktree_populate.py
+- 2026-10-22 09:47:10 UTC — [ticket-531] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (297561ms)
+- 2026-10-22 09:47:10 UTC — [ticket-531] APPROVED après 1 tour(s)
+- 2026-10-22 09:48:55 UTC — [ticket-531] documentation: 1 fichier(s) (100531ms)

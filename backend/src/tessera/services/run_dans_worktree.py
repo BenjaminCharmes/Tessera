@@ -89,7 +89,9 @@ async def retirer_en_fin_de_run(
     """Remove the worktree after the final commit and the delivery's first phase.
 
     `TravailNonSauve` or `LienPersistant` put the run `blocked`, naming the folder
-    that stays. A run without worktree comes back unchanged.
+    that stays. Any other failure (`OSError`, git) is logged and the result comes
+    back unchanged: a delivered run stays delivered, and the leftover worktree is
+    taken up at startup. A run without worktree comes back unchanged.
     """
     wt = orch._worktree
     if wt is None or orch._depot is None or orch._worktree_retire:
@@ -103,6 +105,9 @@ async def retirer_en_fin_de_run(
         return resultat.model_copy(
             update={"final_status": TicketStatus.blocked, "arret": str(exc)}
         )
+    except (GitWorkspaceError, OSError) as exc:
+        extra = {"racine": str(wt.racine), "erreur": str(exc)}
+        _logger.warning("run_worktree_non_supprime", extra=extra)
     return resultat
 
 

@@ -5,12 +5,15 @@ pipeline stages are exercised through the pieces this ticket wires: opening, the
 orchestrator built on the worktree, delivery on `origin/<base>`, and removal.
 """
 import json
+import logging
 from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 
 from tessera.config import settings
+from tessera.services import run_dans_worktree
+from tessera.services.git_workspace import GitWorkspaceError
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
 from tessera.routers.orchestrator import _build_orchestrator
@@ -28,6 +31,7 @@ from tessera.services.run_dans_worktree import (
 from tessera.services.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
 
+_LOGGER = "tessera.services.run_dans_worktree"
 PROJET = "checkout"
 TICKET = "ticket-7"
 TITRE = "demo"
@@ -128,6 +132,34 @@ async def test_worktree_is_removed_after_the_run(depot: Path) -> None:
     assert not wt.racine.exists()
     assert str(wt.racine) not in git(depot, "worktree", "list")
     assert (depot / "node_modules" / "pkg" / "index.js").is_file()  # la cible d'un lien survit
+
+
+@pytest.mark.parametrize(
+    "erreur", [OSError(3, "chemin introuvable"), GitWorkspaceError("worktree remove a échoué")]
+)
+async def test_a_removal_failure_after_delivery_leaves_the_run_result_unchanged(
+    depot: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture,
+    erreur: Exception,
+) -> None:
+    orch = await _orchestrateur(depot)
+    wt = orch._worktree
+    assert wt is not None
+
+    async def panne(*_: object, **__: object) -> None:
+        raise erreur
+
+    monkeypatch.setattr(run_dans_worktree, "supprimer", panne)
+    resultat = PipelineResult(
+        ticket_id=TICKET, final_status=TicketStatus.done, rounds=1, approved=True
+    )
+
+    with caplog.at_level(logging.WARNING, logger=_LOGGER):
+        rendu = await retirer_en_fin_de_run(orch, resultat)
+
+    assert rendu == resultat  # même final_status, même arret : livré reste livré
+    journal = [r for r in caplog.records if r.getMessage() == "run_worktree_non_supprime"]
+    assert [r.__dict__["racine"] for r in journal] == [str(wt.racine)]
+    assert wt.racine.exists()  # le worktree reste pour la reprise au démarrage
 
 
 async def test_uncommitted_work_in_the_worktree_blocks_the_run_and_keeps_the_folder(depot: Path) -> None:
