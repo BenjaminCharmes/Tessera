@@ -4653,3 +4653,29 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 19:53:41 UTC — [ticket-571] CHANGES_REQUESTED tour 3: Validateur : Le minuteur indépendant de la boucle d'événements fonctionne correctement : trois tests solides couvrent le blocage avec terminaison du processus, l'annulation normale, et l'affichage de 
 - 2026-10-23 19:53:41 UTC — [ticket-571] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-23 19:53:45 UTC — [ide-core] file interrompue : ticket-571 non approuvé
+- 2026-10-23 19:56:32 UTC — [ticket-548] branche ticket-548-trivial-rebase-conflicts-are-settled-by-rules-bef
+- 2026-10-23 19:58:27 UTC — [ticket-548] plan rendu (113125ms)
+- 2026-10-23 19:58:27 UTC — [ticket-548] tour 1 — codeur démarré
+- 2026-10-23 20:10:53 UTC — [ticket-548] tour 1 — codeur terminé (746641ms)
+- 2026-10-23 20:17:24 UTC — [ticket-548] testeur: 1 failed, 1643 passed, 56 warnings in 387.15s (0:06:27)
+- 2026-10-23 20:17:24 UTC — [ticket-548] tests rouges au tour 1
+- 2026-10-23 20:17:24 UTC — [ticket-548] tour 2 — codeur démarré
+- 2026-10-23 20:18:32 UTC — [ticket-548] tour 2 — codeur terminé (68483ms)
+- 2026-10-23 20:27:28 UTC — [ticket-548] testeur: OK (exit 0)
+- 2026-10-23 20:31:50 UTC — [ticket-548] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH introduite par ce ticket. Le code est bien (261936ms)
+- 2026-10-23 20:31:50 UTC — [ticket-548] tour 2 — reviewer démarré
+- 2026-10-23 20:32:17 UTC — [ticket-548] tour 2 — reviewer terminé (27468ms)
+- 2026-10-23 20:36:09 UTC — [ticket-548] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 20:36:09 UTC — [ticket-548] validateur: CHANGES_REQUESTED — Réponse du validateur non parseable. (259562ms)
+- 2026-10-23 20:36:09 UTC — [ticket-548] CHANGES_REQUESTED tour 2: Validateur : Réponse du validateur non parseable.
+- 2026-10-23 20:36:09 UTC — [ticket-548] tour 3 — codeur démarré
+- 2026-10-23 20:36:28 UTC — [ticket-548] tour 3 — codeur terminé (18921ms)
+- 2026-10-23 20:46:52 UTC — [ticket-548] testeur: OK (exit 0)
+- 2026-10-23 20:49:27 UTC — [ticket-548] securite: PASS — Audit complet : zéro vulnérabilité critique ou haute détectée. Le code suit les  (155046ms)
+- 2026-10-23 20:49:27 UTC — [ticket-548] tour 3 — reviewer démarré
+- 2026-10-23 20:49:57 UTC — [ticket-548] tour 3 — reviewer terminé (30000ms)
+- 2026-10-23 20:54:27 UTC — [ticket-548] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 20:55:01 UTC — [ticket-548] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 20:55:01 UTC — [ticket-548] validateur: APPROVED — Tous les critères sont satisfaits. Le module `regles_conflit.py` implémente quat (333609ms)
+- 2026-10-23 20:55:01 UTC — [ticket-548] APPROVED après 3 tour(s)
+- 2026-10-23 21:00:06 UTC — [ticket-548] documentation: 0 fichier(s) (300264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « class GitWorkspaceService(GitTicketOnBase, GitSync, GitBranc » (backend/src/tessera/servic

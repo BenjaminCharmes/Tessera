@@ -20,6 +20,7 @@ from tessera.config import settings
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
 from tessera.services.livraison_arrets import arret_ci_illisible, arret_conflit
+from tessera.services.livraison_rebase import noter_ce_que_le_rebase_a_fait
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.retest_apres_rebase import RetestApresRebase
 from tessera.utils.logger import get_logger
@@ -251,12 +252,7 @@ class LivraisonService:
             )
         etapes.append(f"rebase sur {self._base_branch}")
         durees_ms.append(rebase_ms)
-        for ancien, nouveau in getattr(self._git, "migrations_renumerotees", ()):
-            etapes.append(
-                f"migration renumérotée : {ancien.rpartition('/')[2]}"
-                f" → {nouveau.rpartition('/')[2]}"
-            )
-            durees_ms.append(0.0)
+        noter_ce_que_le_rebase_a_fait(self._git, etapes, durees_ms, resolus)
         if resolus:
             # La résolution est incluse dans la durée du rebase ci-dessus.
             etapes.append("conflit résolu : " + ", ".join(resolus))

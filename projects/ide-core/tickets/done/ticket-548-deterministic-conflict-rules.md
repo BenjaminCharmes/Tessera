@@ -1,15 +1,17 @@
 ---
-id: ticket-548
-title: "Trivial rebase conflicts are settled by rules before the conflict resolver is called"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-546"]
-estimated_days: 1
 created: 2026-10-23
+depends_on:
+- ticket-546
+estimated_days: 1
+id: ticket-548
 plan: true
+pr_number: 628
+priority: medium
+status: done
+title: Trivial rebase conflicts are settled by rules before the conflict resolver
+  is called
+type: feat
 ---
 
 # ticket-548 — Règles de conflit déterministes avant `resolveur-conflit`

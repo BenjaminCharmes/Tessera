@@ -59,6 +59,10 @@ class GitCore:
         # (ancien chemin, nouveau chemin) — `Livraison` les met au journal
         # sans que la signature de `rejouer_sur` change (ticket-484).
         self.migrations_renumerotees: tuple[tuple[str, str], ...] = ()
+        # Conflits que le dernier `rejouer_sur` a réglés par règle, en
+        # (fichier, règle) : rien n'est écrit au journal pendant un rebase, c'est
+        # `Livraison` qui les y met une fois le rebase abouti (ticket-548).
+        self.regles_appliquees: tuple[tuple[str, str], ...] = ()
         # Untracked files already sitting in the tree when the run started.
         # They were not produced by the coder, so `commit_all`'s blanket
         # `git add -A` must not sweep them into the ticket's commit (that is
