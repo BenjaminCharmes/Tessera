@@ -11,6 +11,8 @@ l'étape — jamais le job du backend, tué à sa fermeture seulement.
 """
 import asyncio
 import os
+import subprocess
+import threading
 
 from tessera.services import groupe_de_processus
 from tessera.utils.logger import get_logger
@@ -31,6 +33,7 @@ class GroupeDEtape:
     def __init__(self) -> None:
         self._groupe = groupe_de_processus.creer_groupe()
         self._rattache = False
+        self._verrou = threading.Lock()
         if self._groupe is None and groupe_de_processus.groupe_disponible():
             _logger.warning("etape_sans_groupe")
 
@@ -42,12 +45,26 @@ class GroupeDEtape:
         return self._rattache
 
     def fermer(self) -> bool:
-        """Close the group, once; ``True`` when that ended a grouped tree."""
-        groupe, self._groupe = self._groupe, None
+        """Close the group, once; ``True`` when that ended a grouped tree.
+
+        Sûr depuis un thread : le minuteur d'échéance et la boucle peuvent
+        fermer le même groupe, et un seul des deux doit le faire.
+        """
+        with self._verrou:
+            groupe, self._groupe = self._groupe, None
         if groupe is None:
             return False
         ferme = groupe_de_processus.fermer_le_groupe(groupe)
         return ferme and self._rattache
+
+    def terminer_sync(self, pid: object) -> None:
+        """Kill the step's whole tree without the event loop — ticket-571.
+
+        Appelé depuis le thread du minuteur d'échéance, quand la boucle ne
+        tourne plus : aucune attente, aucun ``await``.
+        """
+        if not self.fermer():
+            _tuer_sans_groupe_sync(pid)
 
     async def terminer(self, proc: asyncio.subprocess.Process) -> None:
         """Kill the step's whole tree, then wait for its end for a bounded time."""
@@ -58,6 +75,29 @@ class GroupeDEtape:
             await asyncio.wait_for(proc.wait(), timeout=DELAI_ATTENTE_FIN_S)
         except Exception as exc:  # noqa: BLE001 — le résultat d'expiration prime
             _logger.warning("etape_fin_non_attendue", extra={"erreur": str(exc)})
+
+
+def _tuer_sans_groupe_sync(pid: object) -> None:
+    """Best-effort tree kill from a thread; never raises."""
+    if not isinstance(pid, int):
+        return
+    try:
+        if os.name == "nt":
+            subprocess.run(
+                ["taskkill", "/T", "/F", "/PID", str(pid)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=10,
+                check=False,
+            )
+            return
+        killpg = getattr(os, "killpg", None)
+        getpgid = getattr(os, "getpgid", None)
+        # Jamais notre propre groupe : il tuerait le backend.
+        if killpg is not None and getpgid is not None and getpgid(pid) != getpgid(0):
+            killpg(pid, _SIGKILL)
+    except Exception as exc:  # noqa: BLE001 — le minuteur ne doit rien lever
+        _logger.warning("arbre_non_tue", extra={"pid": pid, "erreur": str(exc)})
 
 
 async def _tuer_sans_groupe(pid: object) -> None:
