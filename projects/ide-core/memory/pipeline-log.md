@@ -4538,3 +4538,15 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 14:36:54 UTC — [ticket-568] validateur: APPROVED — Les quatre critères sont satisfaits. Le code implémente le retest après rebase v (343594ms)
 - 2026-10-23 14:36:54 UTC — [ticket-568] APPROVED après 1 tour(s)
 - 2026-10-23 14:42:45 UTC — [ticket-568] documentation: 0 fichier(s) (345702ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « Dans la phase 1 de livraison, après le rebase et avant le pu » (ticket-568) n'est ni dans 
+- 2026-10-23 17:17:14 UTC — [ticket-546] branche ticket-546-git-workspace-py-is-split-into-a-package-one-modu
+- 2026-10-23 17:18:21 UTC — [ticket-546] plan rendu (66125ms)
+- 2026-10-23 17:18:21 UTC — [ticket-546] tour 1 — codeur démarré
+- 2026-10-23 17:26:48 UTC — [ticket-546] tour 1 — codeur terminé (507030ms)
+- 2026-10-23 17:35:17 UTC — [ticket-546] testeur: OK (exit 0)
+- 2026-10-23 17:37:42 UTC — [ticket-546] securite: PASS — Refactorisation structurelle sans régression de sécurité. Le diff supprime un fi (144891ms)
+- 2026-10-23 17:37:42 UTC — [ticket-546] tour 1 — reviewer démarré
+- 2026-10-23 17:38:20 UTC — [ticket-546] tour 1 — reviewer terminé (37375ms)
+- 2026-10-23 17:42:43 UTC — [ticket-546] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 17:43:34 UTC — [ticket-546] validateur: fichiers cités joints : backend/src/tessera/services/git_workspace/ (dossier, 17 fichiers), __init__.py, backend/tests/ (dossier, 289 fichiers, tronqué), backend/tests/test_longueur_des_fichiers.py ; absents : backend/src/tessera/services/git_workspace.py, git_workspace.py
+- 2026-10-23 17:43:34 UTC — [ticket-546] validateur: APPROVED — Refactorisation réussie : le monolithe `git_workspace.py` (2294 lignes) est deve (352171ms)
+- 2026-10-23 17:43:34 UTC — [ticket-546] APPROVED après 1 tour(s)
