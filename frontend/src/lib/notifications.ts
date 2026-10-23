@@ -5,7 +5,8 @@ import type { SanteAgent } from "./santeAgent";
 /**
  * Ce qui mérite de sortir de l'IDE — ticket-192.
  *
- * Une question d'agent, un run bloqué, un run terminé. Pas chaque ticket
+ * Une question d'agent, un run bloqué, un run terminé, l'issue de la
+ * livraison (PR mergée ou non, ticket-552). Pas chaque ticket
  * approuvé d'une file : le bruit tuerait le signal. Pure, pour être testée
  * sans fenêtre : le hook lui donne l'avant et l'après, elle dit quoi dire.
  */
@@ -39,6 +40,28 @@ function devientFige(runId: string, avant: Instantane, apres: Instantane): boole
   );
 }
 
+// L'issue de la phase 2 de livraison (ADR-051) arrive après la fin du run, sous
+// un seul événement `ci_merge_done` : mergée, ou non mergée avec sa raison
+// (CI rouge, merge refusé, tête changée, délai) dans `arret`.
+function notifLivraison(run: RunActif, etat: StreamState, precedent: StreamState | undefined): Notif | null {
+  // Comparaison par référence : `ci_merge_done` crée un objet à chaque événement,
+  // et `ciMerge` n'est jamais remis à null entre deux tickets d'une file.
+  if (!etat.ciMerge || etat.ciMerge === precedent?.ciMerge) return null;
+  if (etat.ciMerge.merged) {
+    const pr = etat.livraisonPrNumber;
+    return {
+      projectId: run.project_id,
+      titre: `${nom(run)} : PR mergée`,
+      corps: pr ? `La PR #${pr} est mergée.` : "La PR est mergée.",
+    };
+  }
+  return {
+    projectId: run.project_id,
+    titre: `${nom(run)} : PR non mergée`,
+    corps: etat.ciMerge.arret ?? "La PR reste ouverte, sans raison donnée.",
+  };
+}
+
 export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue): Notif[] {
   const notifs: Notif[] = [];
 
@@ -67,6 +90,8 @@ export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue
         corps: `${etat.currentAgent ?? "L'agent"} n'a rien émis depuis plus de 3 minutes.`,
       });
     }
+    const livraison = notifLivraison(run, etat, precedent);
+    if (livraison) notifs.push(livraison);
   }
 
   const restants = new Set(apres.runs.map((r) => r.run_id));
