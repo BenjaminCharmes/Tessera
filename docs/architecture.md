@@ -1111,6 +1111,21 @@ Conséquences :
 
 La sélection s'effectue dans `routers/orchestrator.py` (`_documenteur`), qui lit la configuration du projet sur son dossier réel.
 
+### Contenu fourni aux agents de documentation
+
+Le ticket-535 définit une règle : la documentation par lot se base sur le **code livré**, non sur des spéculations.
+
+**Problème** : les agents recevaient le texte des tickets et la doc actuelle — pas le code. Cela produisait des erreurs : structures mal attribuées, versions inventées, features documentées sans code.
+
+**Solution** : les agents reçoivent le **diff livré** du lot, ce qui les force à documenter la réalité du code.
+
+Exemples d'erreurs ainsi empêchées :
+- Groupes attribués au mauvais modèle → le diff montre lequel existe
+- Versions de migrations inventées → le diff liste les vraies
+- Features sans code → le diff refuse l'affirmation
+
+Une ADR (ticket-535) formalise cette règle.
+
 ## Livraison (ADR-029, ADR-030, ADR-051)
 
 Après approbation du pipeline, la livraison s'enchaîne automatiquement — rebase 
