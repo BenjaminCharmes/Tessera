@@ -4,6 +4,7 @@ created: 2026-10-23
 depends_on:
 - ticket-541
 id: ticket-542
+pr_number: 615
 priority: high
 status: done
 title: A documentation edit must quote the code that supports it
