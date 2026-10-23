@@ -9,12 +9,13 @@ import type { ProjectOverview, Ticket } from "../../types/api";
 vi.mock("../../lib/api", () => ({
   api: {
     tickets: { list: vi.fn() },
-    orchestrator: { run: vi.fn() },
+    orchestrator: { run: vi.fn(), append: vi.fn() },
   },
 }));
 
 const list = vi.mocked(api.tickets.list);
 const run = vi.mocked(api.orchestrator.run);
+const append = vi.mocked(api.orchestrator.append);
 
 function projet(extra: Partial<ProjectOverview> = {}): ProjectOverview {
   return {
@@ -53,10 +54,16 @@ function ticket(id: string, status: Ticket["status"]): Ticket {
   };
 }
 
-function afficher(p: ProjectOverview, surSelection = vi.fn(), surLancee = vi.fn()) {
+function afficher(
+  p: ProjectOverview,
+  surSelection = vi.fn(),
+  surLancee = vi.fn(),
+  fileEnCours: string | null = null,
+) {
   render(
     <ProjetCarte
       projet={p}
+      fileEnCours={fileEnCours}
       actif={false}
       categories={[]}
       onSelect={surSelection}
@@ -78,12 +85,45 @@ describe("LancerFile", () => {
     expect(screen.queryByRole("button", { name: /^File/ })).not.toBeInTheDocument();
   });
 
-  it("disables the queue button while a run is open", () => {
+  it("disables the queue button and says why while a single-ticket run is open", () => {
     afficher(projet({ run_actif: true }));
 
     const bouton = screen.getByRole("button", { name: "File (3)" });
     expect(bouton).toBeDisabled();
     expect(bouton).toHaveAttribute("title", "Un run est en cours");
+    expect(screen.getByText("Run en cours")).toBeInTheDocument();
+  });
+
+  it("offers to append the todo tickets when a queue is already running", async () => {
+    list.mockResolvedValue({
+      tickets: [ticket("ticket-7", "todo"), ticket("ticket-3", "todo")],
+      unreadable: [],
+    });
+    append.mockResolvedValue({ ajoutes: ["ticket-3"], ignores: { "ticket-7": "déjà dans la file" }, refuses: {} });
+    const surSelection = vi.fn();
+    const surLancee = vi.fn();
+    afficher(projet({ run_actif: true }), surSelection, surLancee, "run-42");
+
+    await userEvent.click(screen.getByRole("button", { name: "Ajouter à la file (3)" }));
+    expect(screen.getByText("Ajouter 3 tickets à la file en cours ?")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Ajouter" }));
+
+    await waitFor(() => expect(surLancee).toHaveBeenCalledTimes(1));
+    expect(append).toHaveBeenCalledWith("run-42", ["ticket-3", "ticket-7"]);
+    expect(run).not.toHaveBeenCalled();
+    expect(screen.getByText("1 ajouté")).toHaveAttribute("role", "status");
+    expect(surSelection).not.toHaveBeenCalled();
+  });
+
+  it("shows the backend message when the queue can no longer take tickets", async () => {
+    list.mockResolvedValue({ tickets: [ticket("ticket-1", "todo")], unreadable: [] });
+    append.mockRejectedValue(new Error("API 409: Ce run n'est pas une file en cours"));
+    afficher(projet({ run_actif: true }), vi.fn(), vi.fn(), "run-42");
+
+    await userEvent.click(screen.getByRole("button", { name: "Ajouter à la file (3)" }));
+    await userEvent.click(screen.getByRole("button", { name: "Ajouter" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("La file en cours n'accepte plus de tickets.");
   });
 
   it("asks for confirmation on first click without launching or selecting the card", async () => {

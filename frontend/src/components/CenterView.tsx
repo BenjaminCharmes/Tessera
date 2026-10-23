@@ -164,6 +164,7 @@ export default function CenterView({
         projets={projets}
         activeProject={project}
         onSelectProject={onSelectProject}
+        runs={supervision.runs}
       />
     );
   } else if (panel === "history") {

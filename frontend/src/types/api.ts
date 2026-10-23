@@ -672,6 +672,13 @@ export interface PipelineReglages {
 export type PipelineReglagesPatch = Partial<PipelineReglages>;
 
 /** Les plafonds de dépense du backend (ticket-197). 0 = aucune borne. */
+/** Ce qu'un ajout à une file a fait — `POST /orchestrator/runs/{id}/append`. */
+export interface AjoutALaFile {
+  ajoutes: string[];
+  ignores: Record<string, string>;
+  refuses: Record<string, string>;
+}
+
 export interface Limites {
   run_max_budget_usd: number;
   llm_max_budget_usd: number;

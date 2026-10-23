@@ -1,4 +1,5 @@
 import type {
+  AjoutALaFile,
   AppEnCours,
   AgentDetail,
   ProjectAgents,
@@ -173,6 +174,12 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       }),
+    /**
+     * Ajoute des tickets au bout d'une file qui tourne (ticket-478) ; 409 si
+     * le run n'est pas une file ouverte. Un ticket déjà dans la file est ignoré.
+     */
+    append: (runId: string, ticketIds: string[]): Promise<AjoutALaFile> =>
+      post(`/orchestrator/runs/${runId}/append`, { ticket_ids: ticketIds }),
     /** Les plafonds de dépense, pour situer un coût (ticket-197). */
     limits: (): Promise<Limites> => request("/orchestrator/limits"),
   },

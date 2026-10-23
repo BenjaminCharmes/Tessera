@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../../design/ui/Button";
 import { api } from "../../lib/api";
 import type { ProjectOverview } from "../../types/api";
 
@@ -36,17 +37,17 @@ export default function BoutonServices({ projet, onChange }: BoutonServicesProps
 
   return (
     <div className="flex min-w-0 shrink-0 flex-col items-end gap-1">
-      <button
-        type="button"
+      <Button
+        taille="compact"
+        variante={projet.services_en_cours ? "arret" : "borde"}
         disabled={occupe}
         onClick={(e) => {
           e.stopPropagation();
           void basculer();
         }}
-        className="rounded-sm bg-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-600 disabled:opacity-50"
       >
         {projet.services_en_cours ? "Arrêter" : "Lancer"}
-      </button>
+      </Button>
       {echec && (
         <p role="alert" className="line-clamp-2 max-w-48 text-right text-micro text-red-400">
           {echec}

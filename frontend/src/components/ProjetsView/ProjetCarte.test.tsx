@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProjetCarte from "./ProjetCarte";
 import { api } from "../../lib/api";
@@ -139,19 +139,23 @@ describe("ProjetCarte footer", () => {
     expect(pied).toHaveTextContent(/À faire/);
   });
 
-  it("lets the action buttons wrap below the counters instead of overflowing the card", () => {
-    // Le 19/10, « Mettre en ligne » + « Lancer » ou « Arrêter » débordaient de
-    // la carte : la rangée ne passait jamais à la ligne.
-    afficher(projet({ services_declares: true }));
+  it("puts every action on one right-aligned row under the counters", () => {
+    // Le 23/10, « File » vivait sur sa propre rangée, à gauche, et les
+    // compteurs se repliaient entre les boutons (ticket-557).
+    afficher(projet({ services_declares: true, tickets: { todo: 2, in_progress: 0, in_review: 0, blocked: 0, done: 1 } }));
 
-    const rangee = screen.getByText(/À faire/).closest("ul")?.parentElement;
-    expect(rangee).toHaveClass("flex-wrap");
-    expect(screen.getByTestId("actions-de-carte")).toHaveClass("ml-auto", "flex-wrap");
+    const actions = screen.getByTestId("actions-de-carte");
+    expect(actions).toHaveClass("justify-end", "flex-wrap");
+    expect(within(actions).getByRole("button", { name: "File (2)" })).toBeInTheDocument();
+    expect(within(actions).getByRole("button", { name: "Lancer" })).toBeInTheDocument();
+    expect(actions).not.toHaveTextContent(/À faire/);
   });
 
-  it("keeps the counters row as tall with or without the Lancer button", () => {
-    afficher(projet({ services_declares: false }));
+  it("gives the card buttons the same compact size", () => {
+    afficher(projet({ services_declares: true, tickets: { todo: 2, in_progress: 0, in_review: 0, blocked: 0, done: 1 } }));
 
-    expect(screen.getByText(/À faire/).closest("ul")?.parentElement).toHaveClass("min-h-6");
+    for (const nom of ["File (2)", "Lancer"]) {
+      expect(screen.getByRole("button", { name: nom })).toHaveClass("h-[26px]");
+    }
   });
 });

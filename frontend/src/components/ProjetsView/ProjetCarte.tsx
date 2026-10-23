@@ -21,6 +21,8 @@ interface ProjetCarteProps {
   onServicesChange: () => void;
   /** La file du projet vient de partir : la vue d'ensemble est à relire. */
   onFileLancee: () => void;
+  /** Le run de la file qui tourne sur ce projet, s'il y en a une (ticket-557). */
+  fileEnCours?: string | null;
 }
 
 /** L'état de l'app du projet, pour la carte ; `undefined` sans rien à lancer. */
@@ -117,6 +119,7 @@ export default function ProjetCarte({
   onChangerCategorie,
   onServicesChange,
   onFileLancee,
+  fileEnCours = null,
 }: ProjetCarteProps) {
   function surClavier(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "Enter" && e.target === e.currentTarget) onSelect();
@@ -176,20 +179,17 @@ export default function ProjetCarte({
       <LienDepot projet={projet} />
       {/* Les cartes d'une rangée ont la même hauteur : le pied est poussé en
           bas pour que dates et compteurs s'alignent d'une carte à l'autre,
-          quelle que soit la longueur de la description. `min-h-6` garde à la
-          rangée des compteurs la hauteur du bouton Lancer, même sans lui. */}
+          quelle que soit la longueur de la description. */}
       <div data-testid="pied-de-carte" className="mt-auto flex flex-col gap-2">
         <Dates projet={projet} />
-        {/* Repliable : avec « Mettre en ligne » en plus de Lancer/Arrêter, la
-            rangée débordait de la carte. Les boutons passent sous les compteurs. */}
-        <div className="flex min-h-6 flex-wrap items-center justify-between gap-2">
-          <Compteurs projet={projet} />
-          <div data-testid="actions-de-carte" className="ml-auto flex flex-wrap items-start justify-end gap-1.5">
-            <BoutonMiseEnLigne projet={projet} />
-            <BoutonServices projet={projet} onChange={onServicesChange} />
-          </div>
+        <Compteurs projet={projet} />
+        {/* Une seule rangée d'actions, alignée à droite, qui se replie
+            proprement : File, Mettre en ligne, Lancer (ticket-557). */}
+        <div data-testid="actions-de-carte" className="flex flex-wrap items-start justify-end gap-1.5">
+          <LancerFile projet={projet} fileEnCours={fileEnCours} onLancee={onFileLancee} />
+          <BoutonMiseEnLigne projet={projet} />
+          <BoutonServices projet={projet} onChange={onServicesChange} />
         </div>
-        <LancerFile projet={projet} onLancee={onFileLancee} />
       </div>
     </article>
   );
