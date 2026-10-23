@@ -30,7 +30,7 @@ le code n'était pas en cause.
 la boucle d'événements du backend : si la boucle est bloquée (un appel
 synchrone, comme le `shutil.rmtree` du ticket-551), il ne se déclenche pas à
 l'heure. Le tour de plan cherche la cause réelle (journal du backend, autres
-appels synchrones pendant un run) et le dit dans la PR.
+appels synchrones pendant un run) et l'écrit dans son plan.
 
 ## Solution proposée
 En plus du `wait_for`, un garde-fou indépendant de la boucle : un
@@ -43,7 +43,7 @@ finit à temps.
 - [ ] Un test lance une commande qui dort plus longtemps que le délai, bloque la boucle d'événements par un appel synchrone, et vérifie que le processus est terminé au plus tard à l'échéance plus deux secondes
 - [ ] Un test vérifie que le minuteur est annulé quand la commande finit avant l'échéance
 - [ ] La ligne de `memory/pipeline-log.md` d'un délai expiré donne la durée réelle, et un test vérifie qu'elle ne dépasse pas le délai de plus de quelques secondes
-- [ ] La description de la PR dit ce qui a bloqué la boucle le 23/10, ou que la cause n'a pas été trouvée
+- [ ] Un commentaire de `services/test_runner.py`, près du minuteur, dit pourquoi le `wait_for` seul ne suffit pas (une boucle d'événements bloquée ne déclenche pas son minuteur)
 
 ## Ce que ça ne fait pas
 - Ne change pas `test_timeout_s` d'ide-core.
