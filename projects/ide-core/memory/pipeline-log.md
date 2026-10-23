@@ -4487,3 +4487,5 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 13:29:30 UTC — [ticket-545] validateur: fichiers cités joints : frontend/src/longueur-des-fichiers.test.ts, frontend/src (dossier, 8 fichiers), frontend/eslint.config.js ; absents : .ts, .tsx
 - 2026-10-23 13:29:30 UTC — [ticket-545] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le fichier `frontend/src/longueu (173953ms)
 - 2026-10-23 13:29:30 UTC — [ticket-545] APPROVED après 1 tour(s)
+- 2026-10-23 13:30:11 UTC — [ide-core] ticket-550 PR #618 mergée (CI verte)
+- 2026-10-23 13:33:54 UTC — [ticket-545] documentation: 0 fichier(s) (258765ms) — après tour de correction
