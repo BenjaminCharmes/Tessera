@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Awaitable, Callable
+from dataclasses import replace
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
@@ -25,6 +26,7 @@ from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
+from tessera.services.retest_apres_rebase import RetestApresRebase, retest_du_run
 from tessera.services.sha_approbation import noter_poussee, sha_pousse_du_ticket
 from tessera.services.controles_depart import manques_avant_depart
 from tessera.services.realignement_base import Realignement
@@ -344,7 +346,10 @@ async def _build_orchestrator(
         quota_tracker=getattr(provider, "quota", None),
         # Phase 1 seulement — rebase, push, PR. Phase 2 confiée à
         # CI_WATCHER via `surveiller` (ADR-051).
-        livrer=_livreur(project_id, runner, politique, espace=git_workspace, wt=wt),
+        livrer=_livreur(
+            project_id, runner, politique, espace=git_workspace, wt=wt,
+            retest=retest_du_run(git_workspace, wt is not None, test_runner, racine_run, commande),
+        ),
         surveiller=_surveillance_pour(
             project_id, runner, politique, espace=git_workspace, wt=wt
         ),
@@ -551,17 +556,7 @@ async def _sync_apres_livraison(
     # Une PR orpheline garde la cause de son interruption : la raison de la
     # sync s'y ajoute au lieu de l'effacer (ticket-415).
     arret = f"{livraison.arret} ; {raison}" if livraison.pr_orpheline else raison
-    return Livraison(
-        etapes=livraison.etapes,
-        durees_ms=livraison.durees_ms,
-        arret=arret,
-        conflits=livraison.conflits,
-        pr_number=livraison.pr_number,
-        merged=livraison.merged,
-        pr_orpheline=livraison.pr_orpheline,
-        pushed_sha=livraison.pushed_sha,
-        branche_modifiee=livraison.branche_modifiee,
-    )
+    return replace(livraison, arret=arret)
 
 
 def _livreur(
@@ -570,6 +565,7 @@ def _livreur(
     politique: PolitiqueRun | None = None,
     espace: GitWorkspaceService | None = None,
     wt: RunWorktree | None = None,
+    retest: RetestApresRebase | None = None,
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison de phase 1 d'un projet (ADR-051).
 
@@ -643,6 +639,7 @@ def _livreur(
             else None
         ),
         post_pr_callback=_noter_et_pousser,
+        retest=retest,
     )
 
     async def livrer(result: PipelineResult) -> Livraison:
