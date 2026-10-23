@@ -9,7 +9,7 @@ from tessera.services.git_workspace.chemins import (
     _is_orchestrator_artifact_path,
     _relatif_au_projet,
 )
-from tessera.services.git_workspace.conflits import GitConflicts
+from tessera.services.git_workspace.conflits_regles import GitConflictsRegles
 from tessera.services.git_workspace.erreurs import BaseIntrouvable, GitCommandError
 from tessera.services.git_workspace.textes import _extraire_fichiers_bloques
 from tessera.utils.logger import get_logger
@@ -18,7 +18,7 @@ from tessera.utils.logger import get_logger
 _logger = get_logger("tessera.services.git_workspace")
 
 
-class GitRebase(GitConflicts):
+class GitRebase(GitConflictsRegles):
     """Replaying a branch on its base, with abort and recovery."""
 
     async def rejouer_sur(
@@ -32,6 +32,7 @@ class GitRebase(GitConflicts):
         qui prennent un numéro déjà pris par la base (ticket-484).
         """
         self.migrations_renumerotees = ()
+        self.regles_appliquees = ()
         # Dans un worktree de run, la base locale est celle du checkout : on
         # rejoue sur le distant, que la livraison vient de rafraîchir.
         cible = f"origin/{base}" if self._worktree is not None else base
@@ -107,9 +108,34 @@ class GitRebase(GitConflicts):
             if await self._resoudre_prisma_en_ajouts(conflits, prefixe):
                 return ()
 
-        if resolveur is None or not await self._faire_resoudre(conflits, resolveur):
-            await self._annuler_rebase_robuste(sha_avant)
-            return conflits
+        return await self._regles_puis_resolveur(conflits, prefixe, resolveur, sha_avant)
+
+    async def _regles_puis_resolveur(
+        self,
+        conflits: tuple[str, ...],
+        prefixe: str,
+        resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None,
+        sha_avant: str,
+    ) -> tuple[str, ...]:
+        """Règles déterministes d'abord ; le résolveur ne reçoit que le reste (ticket-548).
+
+        Les règles ne sont notées dans `regles_appliquees` que si le rebase
+        aboutit : un rebase annulé n'a rien résolu.
+        """
+        restants, appliquees = await self._resoudre_par_regles(conflits, prefixe)
+        if restants:
+            if resolveur is None or not await self._faire_resoudre(restants, resolveur):
+                await self._annuler_rebase_robuste(sha_avant)
+                return restants
+        else:
+            try:
+                await self._run("-c", "core.editor=true", "rebase", "--continue")
+            except GitCommandError:
+                # Le commit suivant peut entrer en conflit à son tour : la liste
+                # de fichiers qu'on tient est périmée, on n'envoie rien au résolveur.
+                await self._annuler_rebase_robuste(sha_avant)
+                return conflits
+        self.regles_appliquees = appliquees
         return ()
 
     async def _ref_existe(self, ref: str) -> bool:
