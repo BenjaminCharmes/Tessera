@@ -4381,3 +4381,4 @@ Le change (99454ms)
 - 2026-10-23 09:09:47 UTC — [ticket-543] validateur: fichiers cités joints : services/documentation.py (tronqué) ; non joints (budget épuisé) : modeles_par_defaut.py, agents.json
 - 2026-10-23 09:09:47 UTC — [ticket-543] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute correctement `ROLES_REDACTION` (33436ms)
 - 2026-10-23 09:09:47 UTC — [ticket-543] APPROVED après 1 tour(s)
+- 2026-10-23 09:12:18 UTC — [ticket-543] documentation: 0 fichier(s) (126625ms)
