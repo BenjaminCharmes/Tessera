@@ -4688,3 +4688,5 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 22:12:02 UTC — [ticket-553] tour 1 — reviewer terminé (16812ms)
 - 2026-10-23 22:13:17 UTC — [ticket-553] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent correctement  (91593ms)
 - 2026-10-23 22:13:17 UTC — [ticket-553] APPROVED après 1 tour(s)
+- 2026-10-23 22:20:22 UTC — [ticket-553] documentation: 0 fichier(s) (419812ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « async def _resoudre_par_regles(
+        self, conflits: tupl » (backend/src/tessera/servic
