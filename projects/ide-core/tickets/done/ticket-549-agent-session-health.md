@@ -1,15 +1,15 @@
 ---
-id: ticket-549
-title: "An agent's health is visible: active, waiting, suspected stall"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 1
-created: 2026-10-23
+id: ticket-549
 plan: true
+pr_number: 617
+priority: medium
+status: done
+title: 'An agent''s health is visible: active, waiting, suspected stall'
+type: feat
 ---
 
 # ticket-549 — Santé visible d'un agent en cours

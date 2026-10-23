@@ -165,6 +165,8 @@ export interface StreamState {
    * Null avant tout envoi, ou après que l'agent a repris.
    */
   answerAck: "transmitted" | "deposited" | null;
+  /** Horodatage du dernier événement reçu, tokens compris (ticket-549). */
+  dernierEvenementA: string | null;
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -214,6 +216,7 @@ export const INITIAL: StreamState = {
   livraisonPrNumber: null,
   ciMerge: null,
   answerAck: null,
+  dernierEvenementA: null,
 };
 
 /**
@@ -320,7 +323,12 @@ function boundEvents(events: OrchestratorEvent[]): OrchestratorEvent[] {
   });
 }
 
+/** Applique l'événement et note quand il est arrivé, jeton d'agent compris (ticket-549). */
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
+  return { ...appliquerEvenement(s, ev), dernierEvenementA: ev.timestamp };
+}
+
+function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState {
   // agent_token ne va plus dans events ni ticketEvents (ticket-353) :
   // il ne met à jour que entries[…].tokens et currentTokens, sans alourdir
   // l'historique ni déclencher de mise à jour de l'état racine par token.

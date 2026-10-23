@@ -4436,3 +4436,16 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 10:38:47 UTC — [ticket-544] livraison: PR #616 ouverte (4547ms)
 - 2026-10-23 10:42:51 UTC — [ticket-544] livraison: arrêt — PR #616 non mergée : CI failing : la PR #616 reste ouverte.
 - 2026-10-23 10:42:51 UTC — [ide-core] file interrompue : ticket-544 non mergé
+- 2026-10-23 11:55:44 UTC — [ticket-549] branche ticket-549-an-agent-s-health-is-visible-active-waiting-suspe
+- 2026-10-23 11:56:53 UTC — [ticket-549] plan rendu (67453ms)
+- 2026-10-23 11:56:53 UTC — [ticket-549] tour 1 — codeur démarré
+- 2026-10-23 11:59:04 UTC — [ticket-549] tour 1 — codeur terminé (131078ms)
+- 2026-10-23 12:14:05 UTC — [ticket-549] testeur: OK (exit 0)
+- 2026-10-23 12:15:56 UTC — [ticket-549] securite: PASS — Aucune vulnérabilité détectée. Le code suit les bonnes pratiques React en matièr (111360ms)
+- 2026-10-23 12:15:56 UTC — [ticket-549] tour 1 — reviewer démarré
+- 2026-10-23 12:16:22 UTC — [ticket-549] tour 1 — reviewer terminé (25593ms)
+- 2026-10-23 12:16:26 UTC — [ticket-549] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-23 12:16:51 UTC — [ticket-549] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-23 12:16:51 UTC — [ticket-549] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket introduit une pastill (54485ms)
+- 2026-10-23 12:16:51 UTC — [ticket-549] APPROVED après 1 tour(s)
+- 2026-10-23 12:21:01 UTC — [ticket-549] documentation: 0 fichier(s) (238952ms)
