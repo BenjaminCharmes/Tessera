@@ -4399,3 +4399,19 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 09:46:21 UTC — [ticket-541] validateur: APPROVED — Le ticket 541 intègre avec succès la matière de code (diffs et fichiers touchés) (375047ms)
 - 2026-10-23 09:46:21 UTC — [ticket-541] APPROVED après 1 tour(s)
 - 2026-10-23 09:48:37 UTC — [ticket-541] documentation: 0 fichier(s) (118452ms)
+- 2026-10-23 09:53:31 UTC — [ide-core] ticket-541 PR #614 mergée (CI verte)
+- 2026-10-23 09:53:32 UTC — [ide-core] ticket-541 : base réalignée sur develop
+- 2026-10-23 09:53:32 UTC — [ide-core] ticket-541 PR #614 confiée au CIWatcher
+- 2026-10-23 09:53:35 UTC — [ticket-542] branche ticket-542-a-documentation-edit-must-quote-the-code-that-sup
+- 2026-10-23 09:53:35 UTC — [ticket-542] base non réalignée — git command failed (code 128): git -c core.hooksPath=C:\Users\BENJAM~1.CHA\AppData\Local\Temp\tessera-sans-hooks -c core.quotePath=false -c core.longpaths=true checkout develop
+fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
+
+- 2026-10-23 09:53:36 UTC — [ticket-542] tour 1 — codeur démarré
+- 2026-10-23 10:03:34 UTC — [ticket-542] tour 1 — codeur terminé (598765ms)
+- 2026-10-23 10:11:44 UTC — [ticket-542] testeur: OK (exit 0)
+- 2026-10-23 10:13:34 UTC — [ticket-542] securite: PASS — Le diff implémente le contrôle des preuves de documentation (ADR-057, ticket-542 (110375ms)
+- 2026-10-23 10:13:34 UTC — [ticket-542] tour 1 — reviewer démarré
+- 2026-10-23 10:14:30 UTC — [ticket-542] tour 1 — reviewer terminé (55906ms)
+- 2026-10-23 10:18:34 UTC — [ticket-542] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 10:19:41 UTC — [ticket-542] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff introduit un contrôle m (366484ms)
+- 2026-10-23 10:19:41 UTC — [ticket-542] APPROVED après 1 tour(s)
