@@ -6,7 +6,8 @@ Sous `/usage` et non `/projects` : la vue d'ensemble n'a pas de projet, et
 from fastapi import APIRouter, HTTPException, Query
 
 from tessera.config import settings
-from tessera.models.usage import RecentRun, UsageStats
+from tessera.models.usage import QuotaWindowReading, QuotaWindows, RecentRun, UsageStats
+from tessera.services.quota_registry import QUOTA_REGISTRY
 from tessera.services.usage_stats import PERIODS, recent_runs, usage_stats
 
 router = APIRouter(prefix="/usage", tags=["usage"])
@@ -23,6 +24,24 @@ async def get_usage_stats(
         # propose que trois.
         raise HTTPException(status_code=422, detail=f"days must be one of {PERIODS}")
     return await usage_stats(settings.ide_db_path, days, project_id)
+
+
+@router.get("/quota", response_model=QuotaWindows)
+async def get_quota() -> QuotaWindows:
+    """Last quota reading of each window, outside any run — ticket-558."""
+    return QuotaWindows(
+        windows={
+            window: QuotaWindowReading(
+                status=reading.snapshot.status,
+                utilization=reading.snapshot.utilization,
+                resets_at=reading.snapshot.resets_at.isoformat()
+                if reading.snapshot.resets_at
+                else None,
+                observed_at=reading.observed_at.isoformat(),
+            )
+            for window, reading in QUOTA_REGISTRY.readings().items()
+        }
+    )
 
 
 @router.get("/recent-runs", response_model=list[RecentRun])
