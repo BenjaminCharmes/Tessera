@@ -14,12 +14,16 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
 @keyframes tape{0%{transform:translateY(0)}50%{transform:translateY(1px)}100%{transform:translateY(0)}}
 @keyframes lueur{0%{opacity:1}50%{opacity:.55}100%{opacity:1}}
 @keyframes flotte{0%{transform:translateY(0)}50%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+@keyframes vapeur{0%{opacity:0;transform:translateY(0)}40%{opacity:.8}100%{opacity:0;transform:translateY(-4px)}}
 .tape{animation:tape .5s steps(2) infinite}
 .lueur{animation:lueur 1.6s ease-in-out infinite}
 .flotte{animation:flotte 1.8s ease-in-out infinite}
-@media (prefers-reduced-motion: reduce){.tape,.lueur,.flotte{animation:none}}
+.vapeur{animation:vapeur 2.2s ease-out infinite}
+@media (prefers-reduced-motion: reduce){.tape,.lueur,.flotte,.vapeur{animation:none}}
 .poste{background:none;border:0;padding:0;margin:0;cursor:pointer;font:inherit;color:inherit}
-.poste:focus-visible{outline:2px solid #8b5cf6;outline-offset:3px;border-radius:6px}
+.poste:focus-visible,.objet:focus-visible{outline:2px solid #8b5cf6;outline-offset:3px;border-radius:6px}
+.objet{background:none;border:0;padding:0;margin:0;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;align-items:center;gap:3px}
+.mono{font-family:ui-monospace,'Cascadia Code',Consolas,monospace}
 </style>
 </helmet>
 <div style="width: 1440px; height: 900px; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden">
@@ -40,98 +44,194 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
       <span style="width: 3px; height: 40px; background: #8b5cf6"></span>
       <span style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase">Supervision</span>
       <span style="flex: 1"></span>
+      <button type="button" onClick="{{basculerSon}}" aria-pressed="{{son}}" aria-label="Alerte sonore quand une question arrive" style="height: 26px; padding: 0 10px; display: flex; align-items: center; gap: 6px; border: 1px solid #3f3f46; border-radius: 6px; background: transparent; color: #a1a1aa; font: inherit; font-size: 12px; cursor: pointer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>{{sonTexte}}</button>
+      <button type="button" aria-haspopup="menu" style="height: 26px; padding: 0 10px; border: 1px solid #3f3f46; border-radius: 6px; background: transparent; color: #a1a1aa; font: inherit; font-size: 12px; cursor: pointer">Ranger par lot ▾</button>
       <div role="group" aria-label="Vue" style="display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 2px; gap: 2px">
         <button type="button" style="height: 26px; padding: 0 12px; border: 0; border-radius: 4px; background: transparent; color: #a1a1aa; font: inherit; font-size: 12px; cursor: pointer">Liste</button>
         <button type="button" aria-pressed="true" style="height: 26px; padding: 0 12px; border: 0; border-radius: 4px; background: #27272a; color: #e4e4e7; font: inherit; font-size: 12px; cursor: pointer">Bureau</button>
       </div>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-bottom: 1px solid #27272a; color: #a1a1aa; font-size: 11px">
-      <span>3 runs vivants · 1 question pour toi</span>
+    <div aria-label="Tableau du jour" style="display: flex; align-items: center; gap: 18px; padding: 8px 20px; border-bottom: 1px solid #27272a; background: #121214; font-size: 11px; color: #a1a1aa">
+      <span style="display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="1"/><path d="M8 21h8M12 17v4"/></svg>Tableau du jour</span>
+      <span>Dépense <strong style="color: #e4e4e7; font-weight: 600">4,12 $</strong></span>
+      <span style="display: flex; align-items: center; gap: 6px">Quota <span style="width: 90px; height: 6px; border-radius: 3px; background: #27272a; display: inline-block; overflow: hidden"><span style="display: block; width: 62%; height: 6px; background: #3b82f6"></span></span><strong style="color: #e4e4e7; font-weight: 600">62 %</strong> restant</span>
+      <span>5 runs vivants · 2 à la pause · 1 en réunion</span>
       <span style="flex: 1"></span>
-      <span style="display: flex; align-items: center; gap: 6px"><span style="padding: 2px 6px; border-radius: 4px; background: rgba(59,130,246,.12); color: #93c5fd">travaille</span>événement il y a moins de 30 s</span>
-      <span style="display: flex; align-items: center; gap: 6px"><span style="padding: 2px 6px; border-radius: 4px; background: rgba(161,161,170,.12); color: #d4d4d8">silencieux</span>30 s à 3 min</span>
-      <span style="display: flex; align-items: center; gap: 6px"><span style="padding: 2px 6px; border-radius: 4px; background: rgba(245,158,11,.12); color: #fcd34d">question</span>attend ta réponse</span>
-      <span style="display: flex; align-items: center; gap: 6px"><span style="padding: 2px 6px; border-radius: 4px; background: rgba(239,68,68,.12); color: #fca5a5">figé ?</span>plus de 3 min</span>
+      <span style="padding: 2px 6px; border-radius: 4px; background: rgba(59,130,246,.12); color: #93c5fd">travaille</span>
+      <span style="padding: 2px 6px; border-radius: 4px; background: rgba(161,161,170,.12); color: #d4d4d8">silencieux</span>
+      <span style="padding: 2px 6px; border-radius: 4px; background: rgba(245,158,11,.12); color: #fcd34d">question</span>
+      <span style="padding: 2px 6px; border-radius: 4px; background: rgba(239,68,68,.12); color: #fca5a5">figé ?</span>
     </div>
 
-    <div style="flex: 1; min-height: 0; overflow: auto; padding: 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-content: start">
-      <sc-for list="{{pieces}}" as="p" hint-placeholder-count="4">
-        <section aria-label="{{p.nom}}" style="{{p.styleSalle}}">
-          <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #27272a">
-            <span style="font-weight: 600">{{p.nom}}</span>
-            <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; color: #a1a1aa">{{p.ticket}}</span>
-            <span style="flex: 1"></span>
-            <span style="font-size: 11px; color: #a1a1aa">{{p.info}}</span>
-          </div>
-          <div style="position: relative; height: 150px; padding: 0 14px; background-image: linear-gradient(#18181b 0 0), repeating-linear-gradient(90deg, #1c1c20 0 24px, #18181b 24px 48px); background-size: 100% 60%, 100% 40%; background-position: top, bottom; background-repeat: no-repeat; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; align-items: end">
-            <sc-for list="{{p.postes}}" as="d" hint-placeholder-count="5">
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-bottom: 8px; opacity: {{d.opacite}}">
-                <div style="height: 22px; display: flex; align-items: flex-end">
-                  <sc-if value="{{d.bulle}}" hint-placeholder-val="{{ false }}">
-                    <span class="flotte" style="{{d.styleBulle}}">{{d.bulleTexte}}</span>
-                  </sc-if>
-                </div>
-                <button type="button" class="poste" onClick="{{d.choisir}}" aria-label="{{d.label}}" aria-pressed="{{d.choisi}}">
-                  <div style="{{d.styleCadre}}">
-                    <svg width="64" height="72" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
-                      <sc-if value="{{d.occupe}}" hint-placeholder-val="{{ true }}">
-                        <rect x="5" y="1" width="6" height="2" fill="#3f2a1d"></rect>
-                        <rect x="5" y="3" width="6" height="4" fill="#e8b98f"></rect>
-                        <rect x="6" y="4" width="1" height="1" fill="#18181b"></rect>
-                        <rect x="9" y="4" width="1" height="1" fill="#18181b"></rect>
-                        <rect x="4" y="7" width="8" height="5" fill="#8b5cf6"></rect>
-                        <g class="{{d.anim}}"><rect x="3" y="9" width="2" height="3" fill="#7c3aed"></rect><rect x="11" y="9" width="2" height="3" fill="#7c3aed"></rect></g>
-                      </sc-if>
-                      <sc-if value="{{d.vide}}" hint-placeholder-val="{{ false }}">
-                        <rect x="5" y="6" width="6" height="6" fill="#27272a"></rect>
-                      </sc-if>
-                      <rect x="1" y="12" width="14" height="2" fill="#52525b"></rect>
-                      <rect x="2" y="14" width="1" height="4" fill="#3f3f46"></rect>
-                      <rect x="13" y="14" width="1" height="4" fill="#3f3f46"></rect>
-                      <rect x="10" y="7" width="5" height="4" fill="#27272a"></rect>
-                      <rect class="{{d.animEcran}}" x="11" y="8" width="3" height="2" fill="{{d.ecran}}"></rect>
-                      <rect x="12" y="11" width="1" height="1" fill="#27272a"></rect>
-                      <sc-if value="{{d.fait}}" hint-placeholder-val="{{ false }}">
-                        <rect x="3" y="10" width="1" height="1" fill="#4ade80"></rect>
-                        <rect x="4" y="11" width="1" height="1" fill="#4ade80"></rect>
-                        <rect x="5" y="10" width="1" height="1" fill="#4ade80"></rect>
-                        <rect x="6" y="9" width="1" height="1" fill="#4ade80"></rect>
-                      </sc-if>
-                    </svg>
+    <div style="flex: 1; min-height: 0; overflow: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+        <sc-for list="{{pieces}}" as="p" hint-placeholder-count="4">
+          <section aria-label="{{p.nom}}" style="{{p.styleSalle}}">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #27272a">
+              <span style="font-weight: 600">{{p.nom}}</span>
+              <span class="mono" style="font-size: 12px; color: #a1a1aa">{{p.ticket}}</span>
+              <span style="font-size: 11px; color: #a1a1aa">{{p.chrono}}</span>
+              <span style="flex: 1"></span>
+              <span title="Livraison" style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #a1a1aa">
+                <svg width="16" height="14" viewBox="0 0 16 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="3" width="11" height="8" fill="#3f3f46"></rect><rect x="2" y="4" width="9" height="2" fill="#27272a"></rect><rect x="12" y="1" width="1" height="10" fill="#71717a"></rect><rect x="13" y="1" width="2" height="2" fill="{{p.drapeau}}"></rect><rect x="5" y="11" width="2" height="3" fill="#52525b"></rect></svg>{{p.courrier}}</span>
+            </div>
+            <div style="position: relative; height: 140px; padding: 0 10px; background-image: repeating-linear-gradient(90deg, #1c1c20 0 24px, #18181b 24px 48px); background-size: 100% 40%; background-position: bottom; background-repeat: no-repeat; display: grid; grid-template-columns: 52px repeat(5, minmax(0, 1fr)) 44px; gap: 4px; align-items: end">
+              <button type="button" class="objet" aria-label="{{p.dossiersLabel}}" style="padding-bottom: 8px">
+                <svg width="36" height="40" viewBox="0 0 12 14" shape-rendering="crispEdges" aria-hidden="true">
+                  <sc-if value="{{p.d3}}" hint-placeholder-val="{{ true }}"><rect x="2" y="4" width="8" height="2" fill="#a16207"></rect></sc-if>
+                  <sc-if value="{{p.d2}}" hint-placeholder-val="{{ true }}"><rect x="1" y="6" width="9" height="2" fill="#ca8a04"></rect></sc-if>
+                  <sc-if value="{{p.d1}}" hint-placeholder-val="{{ true }}"><rect x="2" y="8" width="8" height="2" fill="#a16207"></rect></sc-if>
+                  <rect x="0" y="10" width="12" height="2" fill="#52525b"></rect>
+                  <rect x="1" y="12" width="1" height="2" fill="#3f3f46"></rect><rect x="10" y="12" width="1" height="2" fill="#3f3f46"></rect>
+                </svg>
+                <span style="font-size: 10px; color: #a1a1aa">{{p.dossiers}}</span>
+              </button>
+              <sc-for list="{{p.postes}}" as="d" hint-placeholder-count="5">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding-bottom: 8px; opacity: {{d.opacite}}">
+                  <div style="height: 20px; display: flex; align-items: flex-end">
+                    <sc-if value="{{d.bulle}}" hint-placeholder-val="{{ false }}">
+                      <span class="flotte" style="{{d.styleBulle}}">{{d.bulleTexte}}</span>
+                    </sc-if>
                   </div>
-                </button>
-                <span style="font-size: 11px; color: #a1a1aa">{{d.role}}</span>
-              </div>
+                  <button type="button" class="poste" onClick="{{d.choisir}}" aria-label="{{d.label}}" aria-pressed="{{d.choisi}}">
+                    <div style="{{d.styleCadre}}">
+                      <svg width="56" height="63" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
+                        <sc-if value="{{d.occupe}}" hint-placeholder-val="{{ true }}">
+                          <rect x="5" y="1" width="6" height="2" fill="#3f2a1d"></rect>
+                          <rect x="5" y="3" width="6" height="4" fill="#e8b98f"></rect>
+                          <rect x="6" y="4" width="1" height="1" fill="#18181b"></rect>
+                          <rect x="9" y="4" width="1" height="1" fill="#18181b"></rect>
+                          <rect x="4" y="7" width="8" height="5" fill="#8b5cf6"></rect>
+                          <g class="{{d.anim}}"><rect x="3" y="9" width="2" height="3" fill="#7c3aed"></rect><rect x="11" y="9" width="2" height="3" fill="#7c3aed"></rect></g>
+                        </sc-if>
+                        <sc-if value="{{d.vide}}" hint-placeholder-val="{{ false }}">
+                          <rect x="5" y="6" width="6" height="6" fill="#27272a"></rect>
+                        </sc-if>
+                        <rect x="1" y="12" width="14" height="2" fill="#52525b"></rect>
+                        <rect x="2" y="14" width="1" height="4" fill="#3f3f46"></rect>
+                        <rect x="13" y="14" width="1" height="4" fill="#3f3f46"></rect>
+                        <rect x="10" y="7" width="5" height="4" fill="#27272a"></rect>
+                        <rect class="{{d.animEcran}}" x="11" y="8" width="3" height="2" fill="{{d.ecran}}"></rect>
+                        <rect x="12" y="11" width="1" height="1" fill="#27272a"></rect>
+                        <sc-if value="{{d.fait}}" hint-placeholder-val="{{ false }}">
+                          <rect x="3" y="10" width="1" height="1" fill="#4ade80"></rect>
+                          <rect x="4" y="11" width="1" height="1" fill="#4ade80"></rect>
+                          <rect x="5" y="10" width="1" height="1" fill="#4ade80"></rect>
+                          <rect x="6" y="9" width="1" height="1" fill="#4ade80"></rect>
+                        </sc-if>
+                      </svg>
+                    </div>
+                  </button>
+                  <span style="font-size: 10px; color: #a1a1aa">{{d.role}}</span>
+                </div>
+              </sc-for>
+              <button type="button" class="objet" aria-label="{{p.baieLabel}}" style="padding-bottom: 8px">
+                <svg width="30" height="54" viewBox="0 0 10 18" shape-rendering="crispEdges" aria-hidden="true">
+                  <rect x="1" y="1" width="8" height="17" fill="#27272a"></rect>
+                  <rect x="2" y="3" width="6" height="2" fill="#18181b"></rect><rect class="{{p.animBaie}}" x="6" y="3" width="1" height="1" fill="{{p.led}}"></rect>
+                  <rect x="2" y="7" width="6" height="2" fill="#18181b"></rect><rect x="6" y="7" width="1" height="1" fill="{{p.led2}}"></rect>
+                  <rect x="2" y="11" width="6" height="2" fill="#18181b"></rect>
+                </svg>
+                <span style="font-size: 10px; color: #a1a1aa">{{p.baie}}</span>
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-top: 1px solid #27272a; font-size: 11px; color: #a1a1aa">
+              <span style="{{p.stylePastille}}">{{p.etat}}</span>
+              <span style="flex: 1">{{p.detail}}</span>
+              <sc-if value="{{p.rangeable}}" hint-placeholder-val="{{ false }}">
+                <button type="button" style="height: 24px; padding: 0 10px; border: 1px solid #3f3f46; border-radius: 6px; background: transparent; color: #e4e4e7; font: inherit; font-size: 11px; cursor: pointer">Ranger</button>
+              </sc-if>
+            </div>
+          </section>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 14px">
+        <section aria-label="Salle de pause" style="background: #18181b; border: 1px solid #27272a; border-radius: 8px; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #27272a">
+            <span style="font-weight: 600">Salle de pause</span>
+            <span style="font-size: 11px; color: #a1a1aa">attend quelque chose d'extérieur : quota, CI, une dépendance</span>
+          </div>
+          <div style="height: 132px; padding: 0 14px; display: flex; align-items: flex-end; gap: 22px; background-image: repeating-linear-gradient(90deg, #1c1c20 0 24px, #18181b 24px 48px); background-size: 100% 40%; background-position: bottom; background-repeat: no-repeat">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding-bottom: 8px">
+              <svg width="42" height="66" viewBox="0 0 14 22" shape-rendering="crispEdges" aria-hidden="true">
+                <rect class="vapeur" x="6" y="1" width="1" height="2" fill="#a1a1aa"></rect><rect class="vapeur" x="8" y="2" width="1" height="2" fill="#a1a1aa"></rect>
+                <rect x="2" y="5" width="10" height="15" fill="#3f3f46"></rect>
+                <rect x="3" y="6" width="8" height="3" fill="#18181b"></rect><rect x="9" y="7" width="1" height="1" fill="#4ade80"></rect>
+                <rect x="5" y="11" width="4" height="1" fill="#18181b"></rect>
+                <rect x="6" y="14" width="2" height="2" fill="#e4e4e7"></rect>
+                <rect x="2" y="20" width="10" height="2" fill="#27272a"></rect>
+              </svg>
+              <span style="font-size: 10px; color: #a1a1aa">café</span>
+            </div>
+            <sc-for list="{{pause}}" as="a" hint-placeholder-count="2">
+              <button type="button" class="objet" onClick="{{a.choisir}}" aria-label="{{a.label}}" aria-pressed="{{a.choisi}}" style="padding-bottom: 8px">
+                <span style="{{a.styleNote}}">{{a.note}}</span>
+                <div style="{{a.styleCadre}}">
+                  <svg width="48" height="54" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
+                    <rect x="5" y="1" width="6" height="2" fill="#3f2a1d"></rect>
+                    <rect x="5" y="3" width="6" height="4" fill="#e8b98f"></rect>
+                    <rect x="6" y="4" width="1" height="1" fill="#18181b"></rect><rect x="9" y="4" width="1" height="1" fill="#18181b"></rect>
+                    <rect x="4" y="7" width="8" height="7" fill="#8b5cf6"></rect>
+                    <rect x="11" y="9" width="3" height="3" fill="#e4e4e7"></rect><rect x="14" y="10" width="1" height="1" fill="#e4e4e7"></rect>
+                    <rect x="5" y="14" width="2" height="4" fill="#3f3f46"></rect><rect x="9" y="14" width="2" height="4" fill="#3f3f46"></rect>
+                  </svg>
+                </div>
+                <span style="font-size: 10px; color: #a1a1aa">{{a.qui}}</span>
+              </button>
             </sc-for>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-top: 1px solid #27272a; font-size: 11px; color: #a1a1aa">
-            <span style="{{p.stylePastille}}">{{p.etat}}</span>
-            <span>{{p.detail}}</span>
+        </section>
+
+        <section aria-label="Salle de réunion" style="background: #18181b; border: 1px solid #78350f; border-radius: 8px; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #27272a">
+            <span style="font-weight: 600">Salle de réunion</span>
+            <span style="font-size: 11px; color: #a1a1aa">conflit de rebase</span>
+          </div>
+          <div style="height: 132px; padding: 0 14px; display: flex; align-items: flex-end; justify-content: center; gap: 4px; background-image: repeating-linear-gradient(90deg, #1c1c20 0 24px, #18181b 24px 48px); background-size: 100% 40%; background-position: bottom; background-repeat: no-repeat">
+            <button type="button" class="objet" onClick="{{choisirReunion}}" aria-label="Carrière, résolveur de conflit, PR 95, relecture humaine ensuite" aria-pressed="{{reunionChoisie}}" style="padding-bottom: 8px">
+              <span class="flotte" style="display: inline-block; padding: 1px 6px; border-radius: 9px; font-size: 11px; background: rgba(59,130,246,.12); color: #93c5fd">3 fichiers</span>
+              <div style="{{styleReunion}}">
+                <svg width="120" height="54" viewBox="0 0 40 18" shape-rendering="crispEdges" aria-hidden="true">
+                  <rect x="4" y="1" width="6" height="2" fill="#3f2a1d"></rect><rect x="4" y="3" width="6" height="4" fill="#e8b98f"></rect>
+                  <rect x="5" y="4" width="1" height="1" fill="#18181b"></rect><rect x="8" y="4" width="1" height="1" fill="#18181b"></rect>
+                  <rect x="3" y="7" width="8" height="5" fill="#8b5cf6"></rect>
+                  <rect x="2" y="12" width="36" height="2" fill="#52525b"></rect>
+                  <rect x="4" y="14" width="1" height="4" fill="#3f3f46"></rect><rect x="35" y="14" width="1" height="4" fill="#3f3f46"></rect>
+                  <rect x="14" y="9" width="5" height="3" fill="#e4e4e7"></rect><rect x="15" y="10" width="3" height="1" fill="#f87171"></rect>
+                  <rect x="21" y="9" width="5" height="3" fill="#e4e4e7"></rect><rect x="22" y="10" width="3" height="1" fill="#4ade80"></rect>
+                  <rect x="30" y="6" width="6" height="6" fill="#27272a"></rect>
+                </svg>
+              </div>
+              <span style="font-size: 10px; color: #a1a1aa">Carrière · résolveur</span>
+            </button>
           </div>
         </section>
-      </sc-for>
+      </div>
     </div>
   </main>
 
-  <aside aria-label="Ce qui t'attend" style="width: 340px; flex-shrink: 0; border-left: 1px solid #27272a; background: #18181b; display: flex; flex-direction: column">
-    <div style="height: 40px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #27272a">
+  <aside aria-label="Ce qui t'attend" style="width: 330px; flex-shrink: 0; border-left: 1px solid #27272a; background: #18181b; display: flex; flex-direction: column; overflow: auto">
+    <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #27272a">
       <span style="width: 3px; height: 40px; background: #8b5cf6"></span>
       <span style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase">À toi</span>
+      <span style="font-size: 11px; color: #a1a1aa">3</span>
     </div>
-    <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #27272a">
+    <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #27272a">
       <div style="display: flex; align-items: center; gap: 8px">
         <span style="padding: 2px 6px; border-radius: 4px; background: rgba(245,158,11,.12); color: #fcd34d; font-size: 11px">question</span>
         <span style="font-size: 11px; color: #a1a1aa">Kadoomi · validateur · il y a 2 min</span>
       </div>
       <p style="margin: 0; line-height: 1.45">Le critère 3 du ticket-106 vise-t-il aussi les listes d'un enfant archivé ?</p>
       <label for="reponse" style="font-size: 11px; color: #a1a1aa">Ta réponse</label>
-      <textarea id="reponse" rows="3" style="resize: none; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; color: #e4e4e7; font: inherit; padding: 8px">Non, seulement les profils actifs.</textarea>
-      <div style="display: flex; gap: 8px">
+      <textarea id="reponse" rows="2" style="resize: none; background: #27272a; border: 1px solid #3f3f46; border-radius: 6px; color: #e4e4e7; font: inherit; padding: 8px">Non, seulement les profils actifs.</textarea>
+      <div style="display: flex; gap: 8px; align-items: center">
         <button type="button" style="height: 30px; padding: 0 14px; border: 0; border-radius: 6px; background: #8b5cf6; color: #ffffff; font: inherit; font-weight: 600; cursor: pointer">Répondre</button>
-        <button type="button" style="height: 30px; padding: 0 12px; border: 0; background: transparent; color: #a1a1aa; font: inherit; cursor: pointer">Laisser l'agent choisir</button>
+        <button type="button" style="height: 30px; padding: 0 10px; border: 0; background: transparent; color: #a1a1aa; font: inherit; cursor: pointer">Laisser l'agent choisir</button>
       </div>
-      <span style="font-size: 11px; color: #a1a1aa">Sans réponse dans 8 min, l'agent énonce son hypothèse et continue (ADR-025).</span>
+      <span style="font-size: 11px; color: #a1a1aa">Sans réponse dans 8 min, l'agent énonce son hypothèse et continue.</span>
     </div>
     <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #27272a">
       <div style="display: flex; align-items: center; gap: 8px">
@@ -143,19 +243,26 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
         <button type="button" style="height: 30px; padding: 0 12px; border: 1px solid #7f1d1d; border-radius: 6px; background: transparent; color: #fca5a5; font: inherit; cursor: pointer">Interrompre</button>
       </div>
     </div>
+    <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #27272a">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <span style="padding: 2px 6px; border-radius: 4px; background: rgba(245,158,11,.12); color: #fcd34d; font-size: 11px">à relire</span>
+        <span style="font-size: 11px; color: #a1a1aa">Carrière · conflit résolu, PR #95</span>
+      </div>
+      <span style="font-size: 12px; line-height: 1.45">Une résolution de conflit ne se merge jamais seule : relis la PR quand le résolveur aura fini.</span>
+    </div>
 
-    <div style="height: 40px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #27272a">
+    <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #27272a">
       <span style="width: 3px; height: 40px; background: #8b5cf6"></span>
       <span style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase">Agent choisi</span>
     </div>
-    <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 10px">
       <div style="font-size: 20px; font-weight: 600">{{sel.role}}</div>
       <div style="display: flex; align-items: center; gap: 8px">
         <span style="{{sel.stylePastille}}">{{sel.etat}}</span>
         <span style="font-size: 11px; color: #a1a1aa">{{sel.projet}}</span>
       </div>
-      <dl style="margin: 0; display: grid; grid-template-columns: 110px 1fr; row-gap: 6px; font-size: 12px">
-        <dt style="color: #a1a1aa">Ticket</dt><dd style="margin: 0; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace">{{sel.ticket}}</dd>
+      <dl style="margin: 0; display: grid; grid-template-columns: 100px 1fr; row-gap: 6px; font-size: 12px">
+        <dt style="color: #a1a1aa">Ticket</dt><dd class="mono" style="margin: 0">{{sel.ticket}}</dd>
         <dt style="color: #a1a1aa">Tour</dt><dd style="margin: 0">{{sel.tour}}</dd>
         <dt style="color: #a1a1aa">Dernier signe</dt><dd style="margin: 0">{{sel.signe}}</dd>
         <dt style="color: #a1a1aa">Fait</dt><dd style="margin: 0">{{sel.action}}</dd>
@@ -173,7 +280,7 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { choisi: 'ide-core:codeur' };
+    this.state = { choisi: 'ide-core:codeur', son: true };
   }
   renderVals() {
     const ROLES = ['codeur', 'testeur', 'sécurité', 'reviewer', 'validateur'];
@@ -182,14 +289,16 @@ class Component extends DCLogic {
       attente: { mot: 'silencieux', fond: 'rgba(161,161,170,.12)', texte: '#d4d4d8', ecran: '#71717a', anim: '', bulle: '…' },
       question: { mot: 'question', fond: 'rgba(245,158,11,.12)', texte: '#fcd34d', ecran: '#fbbf24', anim: '', bulle: '?' },
       fige: { mot: 'figé ?', fond: 'rgba(239,68,68,.12)', texte: '#fca5a5', ecran: '#f87171', anim: '', bulle: '!' },
-      repos: { mot: 'au repos', fond: 'rgba(161,161,170,.12)', texte: '#d4d4d8', ecran: '#27272a', anim: '', bulle: null }
+      livre: { mot: 'livré', fond: 'rgba(34,197,94,.12)', texte: '#86efac', ecran: '#27272a', anim: '', bulle: null },
+      pause: { mot: 'en pause', fond: 'rgba(161,161,170,.12)', texte: '#d4d4d8', ecran: '#27272a', anim: '', bulle: null }
     };
     const pastille = (e) => 'padding: 2px 6px; border-radius: 4px; font-size: 11px; background: ' + e.fond + '; color: ' + e.texte;
+    const anneau = (choisi, rouge) => 'border-radius: 6px; padding: 2px; box-shadow: ' + (choisi ? '0 0 0 2px #8b5cf6' : (rouge ? '0 0 0 1px #ef4444' : 'none'));
     const projets = [
-      { nom: 'ide-core', ticket: 'ticket-540', info: 'file · 1 sur 4', etape: 0, etat: 'actif', tour: '1 sur 3', signe: 'il y a 4 s', action: 'Édite services/documentation.py', modele: 'Sonnet 5.5', detail: 'Le codeur écrit le diff borné par ticket.' },
-      { nom: 'Kadoomi', ticket: 'ticket-106', info: 'run seul · worktree', etape: 4, etat: 'question', tour: '1 sur 3', signe: 'il y a 2 min', action: 'Juge le critère 3 de 5', modele: 'qwen3-coder (local)', detail: 'Le validateur attend ta réponse.' },
-      { nom: 'Devinoo', ticket: 'ticket-091', info: 'file · 2 sur 3', etape: 1, etat: 'fige', tour: '2 sur 3', signe: 'il y a 4 min', action: 'Lance vitest (étape 5 de 6)', modele: 'commande locale', detail: 'Aucun événement depuis 4 min : le PC est peut-être sorti de veille.' },
-      { nom: 'Vigie', ticket: '', info: 'aucun run', etape: -1, etat: 'repos', tour: '', signe: '', action: '', modele: '', detail: 'Dernier run livré hier à 18 h 12.' }
+      { nom: 'ide-core', ticket: 'ticket-540', chrono: '12 min', etape: 0, etat: 'actif', tour: '1 sur 3', signe: 'il y a 4 s', action: 'Édite services/documentation.py', modele: 'Sonnet 5.5', detail: 'Le codeur écrit le diff borné par ticket.', dossiers: 3, courrier: 'pas encore de PR', drapeau: '#52525b', baie: 'API :8100', baieOn: true, baie2: true },
+      { nom: 'Kadoomi', ticket: 'ticket-106', chrono: '31 min', etape: 4, etat: 'question', tour: '1 sur 3', signe: 'il y a 2 min', action: 'Juge le critère 3 de 5', modele: 'qwen3-coder (local)', detail: 'Le validateur attend ta réponse.', dossiers: 2, courrier: 'pas encore de PR', drapeau: '#52525b', baie: 'dev :3000', baieOn: false, baie2: false },
+      { nom: 'Devinoo', ticket: 'ticket-091', chrono: '18 min', etape: 1, etat: 'fige', tour: '2 sur 3', signe: 'il y a 4 min', action: 'Lance vitest (étape 5 de 6)', modele: 'commande locale', detail: 'Aucun événement depuis 4 min : le PC sort peut-être de veille.', dossiers: 1, courrier: 'pas encore de PR', drapeau: '#52525b', baie: 'aucun', baieOn: false, baie2: false },
+      { nom: 'Vigie', ticket: 'ticket-058', chrono: 'fini à 9 h 41', etape: 5, etat: 'livre', tour: '', signe: '', action: '', modele: '', detail: 'Approuvé au 1er tour, PR mergée.', dossiers: 0, courrier: 'PR #72 mergée', drapeau: '#4ade80', baie: 'worker', baieOn: true, baie2: true, rangeable: true }
     ];
     let sel = null;
     const pieces = projets.map((p) => {
@@ -201,40 +310,68 @@ class Component extends DCLogic {
         if (occupe && choisi) {
           sel = { role: role, projet: p.nom, ticket: p.ticket, tour: p.tour, signe: p.signe, action: p.action, modele: p.modele, etat: e.mot, stylePastille: pastille(e) };
         }
-        const anneau = choisi ? '0 0 0 2px #8b5cf6' : (occupe && p.etat === 'fige' ? '0 0 0 1px #ef4444' : 'none');
         return {
-          role: role,
-          occupe: occupe,
-          vide: !occupe,
-          fait: p.etape > i,
-          opacite: p.etape < 0 ? 0.45 : (p.etape < i ? 0.5 : 1),
+          role: role, occupe: occupe, vide: !occupe, fait: p.etape > i,
+          opacite: p.etape < i ? 0.5 : 1,
           ecran: occupe ? e.ecran : (p.etape > i ? '#3f3f46' : '#1f1f23'),
           anim: occupe ? e.anim : '',
           animEcran: occupe && p.etat === 'actif' ? 'lueur' : '',
-          bulle: occupe && !!e.bulle,
-          bulleTexte: e.bulle || '',
+          bulle: occupe && !!e.bulle, bulleTexte: e.bulle || '',
           styleBulle: 'display: inline-block; min-width: 18px; padding: 1px 6px; border-radius: 9px; font-size: 12px; font-weight: 600; text-align: center; background: ' + e.fond + '; color: ' + e.texte,
-          styleCadre: 'border-radius: 6px; padding: 2px; box-shadow: ' + anneau,
+          styleCadre: anneau(choisi, occupe && p.etat === 'fige'),
           label: role + (occupe ? ', ' + e.mot : (p.etape > i ? ', fait' : ', libre')) + ', ' + p.nom,
           choisi: choisi,
           choisir: () => { if (occupe) this.setState({ choisi: cle }); }
         };
       });
+      const bord = p.etat === 'fige' ? '#7f1d1d' : (p.etat === 'question' ? '#78350f' : (p.etat === 'livre' ? '#14532d' : '#27272a'));
       return {
-        nom: p.nom,
-        ticket: p.ticket,
-        info: p.info,
-        etat: e.mot,
-        detail: p.detail,
+        nom: p.nom, ticket: p.ticket, chrono: p.chrono, etat: e.mot, detail: p.detail,
         stylePastille: pastille(e),
-        styleSalle: 'background: #18181b; border: 1px solid ' + (p.etat === 'fige' ? '#7f1d1d' : (p.etat === 'question' ? '#78350f' : '#27272a')) + '; border-radius: 8px; overflow: hidden',
-        postes: postes
+        styleSalle: 'background: #18181b; border: 1px solid ' + bord + '; border-radius: 8px; overflow: hidden',
+        postes: postes,
+        dossiers: p.dossiers === 0 ? 'file vide' : p.dossiers + ' en attente',
+        dossiersLabel: p.dossiers + ' tickets en attente dans la file de ' + p.nom,
+        d1: p.dossiers >= 1, d2: p.dossiers >= 2, d3: p.dossiers >= 3,
+        courrier: p.courrier, drapeau: p.drapeau,
+        baie: p.baie, baieLabel: 'Services de ' + p.nom + ' : ' + p.baie + (p.baieOn ? ', en marche' : ', arrêté'),
+        led: p.baieOn ? '#4ade80' : '#3f3f46', led2: p.baie2 ? '#4ade80' : '#3f3f46', animBaie: p.baieOn ? 'lueur' : '',
+        rangeable: !!p.rangeable
       };
     });
-    if (!sel) {
-      sel = { role: 'Aucun agent choisi', projet: 'Clique un agent au travail', ticket: '—', tour: '—', signe: '—', action: '—', modele: '—', etat: 'au repos', stylePastille: pastille(ETATS.repos) };
+    const enPause = [
+      { cle: 'Affût:reviewer', qui: 'Affût · reviewer', note: 'quota · reprise 14 h', ticket: 'ticket-061', action: 'Attend le retour du quota', signe: 'il y a 6 min' },
+      { cle: 'Curio:livraison', qui: 'Curio · livraison', note: 'CI · 3 min', ticket: 'ticket-019', action: 'Attend la CI de la PR #41', signe: 'il y a 20 s' }
+    ];
+    const pause = enPause.map((a) => {
+      const choisi = this.state.choisi === a.cle;
+      if (choisi) {
+        sel = { role: a.qui.split(' · ')[1], projet: a.qui.split(' · ')[0], ticket: a.ticket, tour: '—', signe: a.signe, action: a.action, modele: '—', etat: 'en pause', stylePastille: pastille(ETATS.pause) };
+      }
+      return {
+        qui: a.qui, note: a.note, choisi: choisi,
+        label: a.qui + ', en pause : ' + a.note,
+        styleNote: 'display: inline-block; padding: 1px 6px; border-radius: 9px; font-size: 10px; background: #27272a; color: #d4d4d8',
+        styleCadre: anneau(choisi, false),
+        choisir: () => this.setState({ choisi: a.cle })
+      };
+    });
+    const reunionChoisie = this.state.choisi === 'Carrière:résolveur';
+    if (reunionChoisie) {
+      sel = { role: 'résolveur de conflit', projet: 'Carrière', ticket: 'ticket-095', tour: '—', signe: 'il y a 9 s', action: 'Résout 3 fichiers en conflit sur develop', modele: 'Sonnet 5.5', etat: 'travaille', stylePastille: pastille(ETATS.actif) };
     }
-    return { pieces: pieces, sel: sel };
+    if (!sel) {
+      sel = { role: 'Aucun agent choisi', projet: 'Clique un agent', ticket: '—', tour: '—', signe: '—', action: '—', modele: '—', etat: 'en pause', stylePastille: pastille(ETATS.pause) };
+    }
+    return {
+      pieces: pieces, pause: pause, sel: sel,
+      reunionChoisie: reunionChoisie,
+      styleReunion: anneau(reunionChoisie, false),
+      choisirReunion: () => this.setState({ choisi: 'Carrière:résolveur' }),
+      son: this.state.son,
+      sonTexte: this.state.son ? 'Son activé' : 'Son coupé',
+      basculerSon: () => this.setState({ son: !this.state.son })
+    };
   }
 }
 </script>
