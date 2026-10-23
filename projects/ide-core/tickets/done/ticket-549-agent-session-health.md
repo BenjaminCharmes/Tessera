@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-549
 plan: true
-pr_number: null
+pr_number: 617
 priority: medium
 status: done
 title: 'An agent''s health is visible: active, waiting, suspected stall'
