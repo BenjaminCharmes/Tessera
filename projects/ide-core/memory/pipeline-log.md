@@ -4449,3 +4449,28 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 12:16:51 UTC — [ticket-549] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket introduit une pastill (54485ms)
 - 2026-10-23 12:16:51 UTC — [ticket-549] APPROVED après 1 tour(s)
 - 2026-10-23 12:21:01 UTC — [ticket-549] documentation: 0 fichier(s) (238952ms)
+- 2026-10-23 12:27:05 UTC — [ide-core] ticket-549 PR #617 mergée (CI verte)
+- 2026-10-23 12:27:07 UTC — [ide-core] ticket-549 : base réalignée sur develop
+- 2026-10-23 12:27:07 UTC — [ide-core] ticket-549 PR #617 confiée au CIWatcher
+- 2026-10-23 12:27:10 UTC — [ticket-550] branche ticket-550-design-of-the-office-view-that-replaces-supervisi
+- 2026-10-23 12:28:51 UTC — [ticket-550] plan rendu (99796ms)
+- 2026-10-23 12:28:51 UTC — [ticket-550] tour 1 — codeur démarré
+- 2026-10-23 12:36:40 UTC — [ticket-550] tour 1 — architect terminé (469610ms)
+- 2026-10-23 12:47:06 UTC — [ticket-550] testeur: OK (exit 0)
+- 2026-10-23 12:48:10 UTC — [ticket-550] securite: PASS — Aucune vulnérabilité détectée. Ce diff contient uniquement de la documentation d (64000ms)
+- 2026-10-23 12:48:10 UTC — [ticket-550] tour 1 — reviewer démarré
+- 2026-10-23 12:48:54 UTC — [ticket-550] tour 1 — reviewer terminé (43717ms)
+- 2026-10-23 12:53:10 UTC — [ticket-550] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 12:53:44 UTC — [ticket-550] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : design/maquette/Bureau.dc.html, design/maquette/Bureau-Compact.dc.html
+- 2026-10-23 12:53:44 UTC — [ticket-550] validateur: APPROVED — Conception complète et conforme. L'ADR-058 articule bien le remplacement de Supe (333890ms)
+- 2026-10-23 12:53:44 UTC — [ticket-550] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-23 12:53:44 UTC — [ticket-550] tour 2 — codeur démarré
+- 2026-10-23 12:54:30 UTC — [ticket-550] tour 2 — architect terminé (46562ms)
+- 2026-10-23 13:05:39 UTC — [ticket-550] testeur: OK (exit 0)
+- 2026-10-23 13:06:25 UTC — [ticket-550] securite: PASS — Diff composé uniquement de documentation (spécification, contraintes, décision a (45469ms)
+- 2026-10-23 13:06:25 UTC — [ticket-550] tour 2 — reviewer démarré
+- 2026-10-23 13:06:45 UTC — [ticket-550] tour 2 — reviewer terminé (19906ms)
+- 2026-10-23 13:11:25 UTC — [ticket-550] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 13:12:13 UTC — [ticket-550] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : design/maquette/Bureau.dc.html, design/maquette/Bureau-Compact.dc.html
+- 2026-10-23 13:12:13 UTC — [ticket-550] validateur: APPROVED — La conception complète du Bureau est livrée et conforme. L'ADR-058 clarifie le r (348405ms)
+- 2026-10-23 13:12:13 UTC — [ticket-550] APPROVED après 2 tour(s)
