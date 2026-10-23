@@ -12,15 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Une édition de documentation cite le code livré qui la fonde.** Un
-  nombre, un numéro d'ADR ou un nom absent du diff et des fichiers fournis
-  n'entre pas dans la doc ; le texte d'un ticket dit l'intention, pas les
-  faits. (ADR-057)
-- **Rien n'est décoratif dans le Bureau.** Chaque sprite, objet ou bulle rend
-  un état que le store de run ou l'API fournit ; sans donnée, on ne le
-  dessine pas. Les sprites vivent sous `design/bureau/`, leurs tons sont des
-  jetons `--sprite-*` du `@theme`, jamais une famille CSS brute. (ADR-058)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
@@ -182,6 +173,19 @@ section. (ADR-055)
   `design/charts/`, jamais les familles CSS en brut. (ADR-047)
 - **L'app Tauri n'expose aucune permission `fs:*` ou `shell:*`.** Le
   frontend passe toujours par `routers/fs.py`. (ADR-040)
+- **Rien n'est décoratif dans le Bureau.** Chaque sprite, objet ou bulle rend
+  un état que le store de run ou l'API fournit ; sans donnée, on ne le
+  dessine pas. Les sprites vivent sous `design/bureau/`, leurs tons sont des
+  jetons `--sprite-*` du `@theme`, jamais une famille CSS brute. (ADR-058)
+
+## Documentation
+
+*(doc-technique, doc-fonctionnelle)*
+
+- **Une édition de documentation cite le code livré qui la fonde.** Un
+  nombre, un numéro d'ADR ou un nom absent du diff et des fichiers fournis
+  n'entre pas dans la doc ; le texte d'un ticket dit l'intention, pas les
+  faits. (ADR-057)
 
 ## Langue
 
