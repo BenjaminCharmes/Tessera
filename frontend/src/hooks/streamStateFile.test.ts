@@ -28,6 +28,26 @@ function apresLePremierTicket() {
   return s;
 }
 
+describe("applyEvent — dernierEvenementA (ticket-549)", () => {
+  it("records the timestamp of any event", () => {
+    const s = applyEvent(INITIAL, ev({ type: "agent_started", timestamp: "2026-10-23T10:00:00.000Z" }));
+
+    expect(s.dernierEvenementA).toBe("2026-10-23T10:00:00.000Z");
+  });
+
+  it("is updated by an agent_token without touching events", () => {
+    const avant = applyEvent(INITIAL, ev({ type: "agent_started", timestamp: "2026-10-23T10:00:00.000Z" }));
+
+    const apres = applyEvent(
+      avant,
+      ev({ type: "agent_token", data: { token: "abc" }, timestamp: "2026-10-23T10:02:00.000Z" }),
+    );
+
+    expect(apres.dernierEvenementA).toBe("2026-10-23T10:02:00.000Z");
+    expect(apres.events).toEqual(avant.events);
+  });
+});
+
 describe("applyEvent — un ticket de file n'hérite pas du précédent (ticket-180)", () => {
   it("remet les entries à zéro pour le nouveau ticket", () => {
     // Le bloc reviewer de ticket-012 restait affiché sous le codeur de

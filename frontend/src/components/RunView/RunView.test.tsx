@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RunView from "./index";
@@ -76,6 +76,44 @@ describe("RunView", () => {
     render(<RunView stream={flux({ queue: { index: 2, total: 3 } })} />);
 
     expect(screen.getByText(/File : 2\/3/)).toBeInTheDocument();
+  });
+});
+
+describe("RunView — santé de l'agent (ticket-549)", () => {
+  const MAINTENANT = new Date("2026-10-23T10:00:00.000Z");
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(MAINTENANT);
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("shows a stall suspicion after 181 seconds of silence", () => {
+    const dernier = new Date(MAINTENANT.getTime() - 181_000).toISOString();
+
+    render(<RunView stream={flux({ dernierEvenementA: dernier })} />);
+
+    expect(screen.getByText("figé ?")).toBeInTheDocument();
+  });
+
+  it("shows no pill once the run is done", () => {
+    render(<RunView stream={flux({ status: "done" })} />);
+
+    expect(screen.queryByText("travaille")).toBeNull();
+  });
+
+  it("shows no pill once the run is closed", () => {
+    render(<RunView stream={flux({ runClosed: true })} />);
+
+    expect(screen.queryByText("travaille")).toBeNull();
+  });
+
+  it("treats a missing timestamp as an active agent", () => {
+    render(<RunView stream={flux()} />);
+
+    expect(screen.getByText("travaille")).toBeInTheDocument();
   });
 });
 

@@ -4,6 +4,7 @@ import LienTicket from "../../design/ui/LienTicket";
 import PipelineSummary from "../AgentPanel/PipelineSummary";
 import { resumeDuCout } from "../../lib/budget";
 import FilDuRun from "../FilDuRun";
+import PastilleSante from "./PastilleSante";
 import type { UseRunActifResult } from "../../hooks/streamState";
 
 /**
@@ -46,6 +47,12 @@ export default function RunView({ stream, projectId }: RunViewProps) {
           )}
           {stream.currentAgent && (
             <span className="text-blue-300">{stream.currentAgent.toUpperCase()}</span>
+          )}
+          {stream.status === "running" && !stream.runClosed && (
+            <PastilleSante
+              dernierEvenementA={stream.dernierEvenementA}
+              pendingQuestion={stream.pendingQuestion}
+            />
           )}
         </div>
       </div>
