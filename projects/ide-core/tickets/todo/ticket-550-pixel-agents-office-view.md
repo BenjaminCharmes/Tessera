@@ -37,7 +37,7 @@ et où chaque objet de la pièce montre un état réel de Tessera.
 | Baie de serveur | services déclarés du projet, vivants ou arrêtés |
 | Salle de pause, machine à café | attente extérieure : quota épuisé (heure de reprise), CI de la phase 2 (`CIWatcher`), `depends_on` |
 | Salle de réunion | conflit de rebase confié à `resolveur-conflit`, puis relecture humaine (ADR-033) |
-| Tableau du jour | dépense du jour, quota restant |
+| Tableau du jour | dépense du jour ; quota de **session** (5 h) et de la **semaine**, chacun avec son heure de reprise |
 | Colonne « À toi » | questions en attente (réponse sur place), agents figés, PR à relire |
 | Alerte sonore | une question arrive ; activable, coupée par défaut à trancher |
 | Mode compact | au-delà de 6 projets : une rangée par projet |
@@ -49,7 +49,9 @@ https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE
 
 ## À trancher par la conception
 - Pour chaque élément du tableau, la donnée de l'API qui l'alimente, et ce
-  qui manque côté backend (heure de reprise du quota, phase CI d'un run,
+  qui manque côté backend : quota par fenêtre (`QuotaTracker` ne garde
+  qu'un relevé, toutes fenêtres confondues, alors que le SDK distingue
+  `rate_limit_type` session et semaine), phase CI d'un run,
   tickets restants d'une file vivante — l'état `restants` de
   `GET /runs/<id>` n'inclut pas les tickets ajoutés par `append`).
 - Rendu des sprites (SVG en pixels, comme la maquette, ou canvas), coût dans
