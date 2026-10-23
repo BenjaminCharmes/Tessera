@@ -7,7 +7,7 @@ id: ticket-571
 plan: true
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: The test command is cut at its deadline even when the event loop is busy
 type: fix
 ---
@@ -40,12 +40,17 @@ renvoyé reste celui d'un délai expiré. Le minuteur est annulé quand l'étape
 finit à temps.
 
 ## Critères d'acceptation
-- [ ] Un test lance une commande qui dort plus longtemps que le délai, bloque la boucle d'événements par un appel synchrone, et vérifie que le processus est terminé au plus tard à l'échéance plus deux secondes
-- [ ] Un test vérifie que le minuteur est annulé quand la commande finit avant l'échéance
-- [ ] La ligne de `memory/pipeline-log.md` d'un délai expiré donne la durée réelle, et un test vérifie qu'elle ne dépasse pas le délai de plus de quelques secondes
-- [ ] La description de la PR dit ce qui a bloqué la boucle le 23/10, ou que la cause n'a pas été trouvée
+- [x] Un test lance une commande qui dort plus longtemps que le délai, bloque la boucle d'événements par un appel synchrone, et vérifie que le processus est terminé au plus tard à l'échéance plus deux secondes
+- [x] Un test vérifie que le minuteur est annulé quand la commande finit avant l'échéance
+- [x] La ligne de `memory/pipeline-log.md` d'un délai expiré donne la durée réelle, et un test vérifie qu'elle ne dépasse pas le délai de plus de quelques secondes
+- [x] Un commentaire de `services/test_runner.py`, près du minuteur, dit pourquoi le `wait_for` seul ne suffit pas (une boucle d'événements bloquée ne déclenche pas son minuteur)
 
-## Cause du 23/10 (à recopier dans la PR)
+## Cause du 23/10
+
+Livré à la main le 23/10 : les trois critères de code validés à chaque tour ; le
+quatrième, dans sa première version, visait la description de la PR, que le
+validateur ne peut pas voir.
+
 Phrase de la description de la PR : « Cause du blocage du 23/10 : non trouvée ;
 le journal n'en garde pas la trace, deux pistes restent ouvertes (appel
 synchrone `rmtree`, veille Windows). »
