@@ -33,12 +33,13 @@ _TEST_COMMAND = (
     " && uv --directory backend run python -m pytest -q"
 )
 
-# Rôles des projets créés depuis le gabarit : production sur Sonnet, jugement
-# et documentation sur Haiku via l'abonnement (configuration de vigie).
+# Rôles des projets créés depuis le gabarit : production et documentation sur
+# Sonnet (ADR-057), jugement sur Haiku via l'abonnement (configuration de vigie).
 _MODELE_PRODUCTION = MODELE_PRODUCTION
 _MODELE_JUGEMENT = MODELE_JUGEMENT
 _ROLES_PRODUCTION = ["codeur", "architect", "reviewer"]
-_ROLES_JUGEMENT = ["securite", "validateur", "doc-technique", "doc-fonctionnelle"]
+_ROLES_JUGEMENT = ["securite", "validateur"]
+_ROLES_DOCUMENTATION = ["doc-technique", "doc-fonctionnelle"]
 _ROLES_AVEC_SKILL_DESIGN = {"codeur", "architect"}
 
 
@@ -128,16 +129,19 @@ def _build_agents_json(project_id: str, backend_port: int, frontend_port: int) -
         }
         for role in _ROLES_PRODUCTION
     ]
+    modeles_texte = [
+        (role, _MODELE_JUGEMENT) for role in _ROLES_JUGEMENT
+    ] + [(role, _MODELE_PRODUCTION) for role in _ROLES_DOCUMENTATION]
     agents += [
         {
             "role": role,
-            "model": _MODELE_JUGEMENT,
+            "model": modele,
             "max_tokens": 4096,
             "prompt_file": f"agents/prompts/{role}.md",
             "active": True,
             "provider": "agent_sdk",
         }
-        for role in _ROLES_JUGEMENT
+        for role, modele in modeles_texte
     ]
     data: dict[str, object] = {
         "project_id": project_id,

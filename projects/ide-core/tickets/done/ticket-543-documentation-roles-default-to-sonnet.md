@@ -1,12 +1,13 @@
 ---
-id: ticket-543
-title: "Documentation roles default to Sonnet"
-type: chore
-status: todo
-priority: medium
 agent: codeur
-depends_on: []
 created: 2026-10-23
+depends_on: []
+id: ticket-543
+pr_number: 611
+priority: medium
+status: done
+title: Documentation roles default to Sonnet
+type: chore
 ---
 
 ## Objectif
