@@ -34,7 +34,7 @@ from pathlib import Path
 
 from tessera.services import documentation_claude_md as claude_md_doc
 from tessera.services.providers.base import LLMProvider
-from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
+from tessera.services.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -400,7 +400,7 @@ class ResultatDocumentation:
 _ROLES = ("doc-technique", "doc-fonctionnelle")
 ROLES_DOCUMENTATION = _ROLES
 
-_MODELE = MODELE_JUGEMENT
+_MODELE = MODELE_PRODUCTION
 _MAX_TOKENS = 4096
 
 
