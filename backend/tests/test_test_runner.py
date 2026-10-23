@@ -16,14 +16,16 @@ from tessera.services.test_runner import (
     TestCommandNotFound,
     TestResult,
     TestRunnerService,
-    _extract_failure_details,
-    _extract_pytest_failures_section,
-    _extract_pytest_short_summary,
-    _extract_summary_line,
-    _extract_vitest_failures,
     _get_semaphore,
     _parse_failed_step,
     reset_semaphore_for_tests,
+)
+from tessera.services.sortie_de_test import (
+    extract_failure_details as _extract_failure_details,
+    extract_pytest_failures_section as _extract_pytest_failures_section,
+    extract_pytest_short_summary as _extract_pytest_short_summary,
+    extract_summary_line as _extract_summary_line,
+    extract_vitest_failures as _extract_vitest_failures,
 )
 
 

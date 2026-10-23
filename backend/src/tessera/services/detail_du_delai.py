@@ -49,7 +49,14 @@ def detail_du_delai(result: "TestResult") -> str:
 
 
 def ligne_de_delai(result: "TestResult") -> str:
-    """The pipeline-log text of a timeout: limit, then the step detail when known."""
+    """The pipeline-log text of a timeout: limit, real duration, then the step detail.
+
+    La durée réelle, quand elle est connue, est ce qui montre une coupure
+    tardive : « 1500 s » de limite et « 2597 s » mesurées disent que la boucle
+    n'a pas tenu l'échéance (ticket-571).
+    """
     entete = f"délai dépassé ({result.delai_s:.0f} s)"
+    if result.duration_ms > 0:
+        entete = f"délai dépassé ({result.delai_s:.0f} s, durée réelle {_secondes(result.duration_ms)})"
     detail = detail_du_delai(result)
     return f"{entete} — {detail}" if detail else entete
