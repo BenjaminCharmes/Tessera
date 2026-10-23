@@ -4764,3 +4764,5 @@ Le diff ajoute :
 - 2026-10-23 23:23:49 UTC — [ticket-558] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers)
 - 2026-10-23 23:23:49 UTC — [ticket-558] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (149062ms)
 - 2026-10-23 23:23:49 UTC — [ticket-558] APPROVED après 1 tour(s)
+- 2026-10-23 23:31:22 UTC — [ticket-558] documentation: 0 fichier(s) (449171ms) — après tour de correction — refusé : doc-technique : README.md : règle « preuve » — l'extrait « class GitConflictsRegles(GitConflicts):
+    """Rules applied » (backend/src/tessera/services/git_work
