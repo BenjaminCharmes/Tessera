@@ -4550,3 +4550,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 17:43:34 UTC — [ticket-546] validateur: fichiers cités joints : backend/src/tessera/services/git_workspace/ (dossier, 17 fichiers), __init__.py, backend/tests/ (dossier, 289 fichiers, tronqué), backend/tests/test_longueur_des_fichiers.py ; absents : backend/src/tessera/services/git_workspace.py, git_workspace.py
 - 2026-10-23 17:43:34 UTC — [ticket-546] validateur: APPROVED — Refactorisation réussie : le monolithe `git_workspace.py` (2294 lignes) est deve (352171ms)
 - 2026-10-23 17:43:34 UTC — [ticket-546] APPROVED après 1 tour(s)
+- 2026-10-23 17:50:38 UTC — [ticket-546] documentation: 0 fichier(s) (418812ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — guillemets « tests relancés après rebase : rouges » n'est ni dans le texte remplacé, ni dans
