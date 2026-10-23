@@ -3,7 +3,7 @@ import { api } from "../../lib/api";
 import { notifierProjetsModifies } from "../../hooks/useProjects";
 import { useEtatPersistant } from "../../hooks/useEtatPersistant";
 import { useResource } from "../../hooks/useResource";
-import type { Project, ProjectOverview } from "../../types/api";
+import type { Project, ProjectOverview, RunActif } from "../../types/api";
 import { grouperParCategorie } from "../Sidebar/grouperParCategorie";
 import EnTeteDeCategorie from "../Sidebar/EnTeteDeCategorie";
 import { useCategoriesRepliees } from "../../hooks/useCategoriesRepliees";
@@ -25,6 +25,8 @@ interface ProjetsViewProps {
   projets: Project[];
   activeProject: Project | null;
   onSelectProject: (project: Project) => void;
+  /** Les runs vivants : une file en cours accepte des tickets depuis la carte (ticket-557). */
+  runs?: RunActif[];
 }
 
 const AUCUN: ProjectOverview[] = [];
@@ -74,6 +76,7 @@ export default function ProjetsView({
   projets,
   activeProject,
   onSelectProject,
+  runs = [],
 }: ProjetsViewProps) {
   const { data, loading, error, refresh } = useResource(lireVueDEnsemble, AUCUN);
   const [memorises, setFiltres] = useEtatPersistant<FiltresProjets>(
@@ -120,6 +123,9 @@ export default function ProjetsView({
         onChangerCategorie={(c) => void changerCategorie(projet, c)}
         onServicesChange={refresh}
         onFileLancee={refresh}
+        fileEnCours={
+          runs.find((r) => r.project_id === projet.id && r.mode === "queue")?.run_id ?? null
+        }
       />
     );
   }
