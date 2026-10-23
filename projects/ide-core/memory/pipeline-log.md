@@ -4432,3 +4432,5 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 10:36:06 UTC — [ticket-544] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le test vérifie bien que les fic (155468ms)
 - 2026-10-23 10:36:06 UTC — [ticket-544] APPROVED après 1 tour(s)
 - 2026-10-23 10:38:31 UTC — [ticket-544] documentation: 0 fichier(s) (139233ms) — après tour de correction
+- 2026-10-23 10:38:47 UTC — [ticket-544] livraison: rebase sur develop (828ms)
+- 2026-10-23 10:38:47 UTC — [ticket-544] livraison: PR #616 ouverte (4547ms)
