@@ -53,7 +53,7 @@ https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE
   qu'un relevé, toutes fenêtres confondues, alors que le SDK distingue
   `rate_limit_type` session et semaine), phase CI d'un run,
   tickets restants d'une file vivante — l'état `restants` de
-  `GET /runs/<id>` n'inclut pas les tickets ajoutés par `append`).
+  `GET /runs/<id>` n'inclut pas les tickets ajoutés par `append`.
 - Rendu des sprites (SVG en pixels, comme la maquette, ou canvas), coût dans
   Tauri avec dix agents, `prefers-reduced-motion`.
 - Découpage : `SupervisionView` est déjà au-dessus de 200 lignes ; le Bureau
