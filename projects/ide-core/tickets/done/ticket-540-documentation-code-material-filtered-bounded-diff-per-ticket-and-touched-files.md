@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-23
 depends_on: []
 id: ticket-540
+pr_number: 608
 priority: high
 status: done
 title: 'Documentation code material: a filtered, bounded diff per ticket, and the
