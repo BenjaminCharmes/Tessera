@@ -34,3 +34,7 @@ comme référence.
   la carte et confirmation), `MettreEnLigne-Deroule.dc.html` (étapes et leurs
   sept états), `MettreEnLigne-Detail.dc.html` (enregistrements DNS, clé à créer,
   Relancer) — https://claude.ai/artifact/7eKZunqERW8gtL3oNS6DzT
+- **Bureau des agents** (tickets 549, 550) : `Bureau.dc.html` — vue Bureau de
+  Supervision, une pièce par projet, un poste par étape du pipeline, la
+  colonne « À toi » (questions, agents figés) —
+  https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE
