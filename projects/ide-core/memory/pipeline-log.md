@@ -4679,3 +4679,31 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 20:55:01 UTC — [ticket-548] validateur: APPROVED — Tous les critères sont satisfaits. Le module `regles_conflit.py` implémente quat (333609ms)
 - 2026-10-23 20:55:01 UTC — [ticket-548] APPROVED après 3 tour(s)
 - 2026-10-23 21:00:06 UTC — [ticket-548] documentation: 0 fichier(s) (300264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « class GitWorkspaceService(GitTicketOnBase, GitSync, GitBranc » (backend/src/tessera/servic
+- 2026-10-23 21:10:12 UTC — [ide-core] ticket-548 PR #628 confiée au CIWatcher
+- 2026-10-23 21:10:15 UTC — [ticket-552] branche ticket-552-a-merged-pr-a-red-ci-or-a-refused-merge-is-notifi
+- 2026-10-23 21:11:18 UTC — [ticket-552] plan rendu (61578ms)
+- 2026-10-23 21:11:18 UTC — [ticket-552] tour 1 — codeur démarré
+- 2026-10-23 21:12:04 UTC — [ticket-552] tour 1 — codeur terminé (46296ms)
+- 2026-10-23 21:14:06 UTC — [ide-core] ticket-548 PR #628 mergée (CI verte)
+- 2026-10-23 21:22:26 UTC — [ticket-552] testeur: OK (exit 0)
+- 2026-10-23 21:24:14 UTC — [ticket-552] securite: PASS — Pas de vulnérabilité détectée. Le code ajouté crée une fonction `notifLivraison` (107687ms)
+- 2026-10-23 21:24:14 UTC — [ticket-552] tour 1 — reviewer démarré
+- 2026-10-23 21:24:41 UTC — [ticket-552] tour 1 — reviewer terminé (27796ms)
+- 2026-10-23 21:27:29 UTC — [ticket-552] validateur: fichiers cités joints : streamState.ts (tronqué) ; non joints (budget épuisé) : lib/notifications.ts
+- 2026-10-23 21:27:29 UTC — [ticket-552] validateur: CHANGES_REQUESTED — Le critère 2 et 4 sont respectés. Le code ajoute la gestion des notifications po (194921ms)
+- 2026-10-23 21:27:29 UTC — [ticket-552] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-23 21:27:29 UTC — [ticket-552] tour 2 — codeur démarré
+- 2026-10-23 21:28:09 UTC — [ticket-552] tour 2 — codeur terminé (40764ms)
+- 2026-10-23 21:38:38 UTC — [ticket-552] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-23 21:38:38 UTC — [ticket-552] tests rouges au tour 2
+- 2026-10-23 21:38:38 UTC — [ticket-552] tour 3 — codeur démarré
+- 2026-10-23 21:39:22 UTC — [ticket-552] tour 3 — codeur terminé (43453ms)
+- 2026-10-23 21:50:05 UTC — [ticket-552] testeur: OK (exit 0)
+- 2026-10-23 21:52:19 UTC — [ticket-552] securite: PASS — Aucune vulnérabilité détectée. Le code ajoute des notifications sur l'issue de l (134125ms)
+- 2026-10-23 21:52:19 UTC — [ticket-552] tour 3 — reviewer démarré
+- 2026-10-23 21:52:37 UTC — [ticket-552] tour 3 — reviewer terminé (17436ms)
+- 2026-10-23 21:55:53 UTC — [ticket-552] validateur: fichiers cités joints : streamState.ts (tronqué) ; non joints (budget épuisé) : lib/notifications.ts
+- 2026-10-23 21:55:53 UTC — [ticket-552] validateur: CHANGES_REQUESTED — Les critères 2 et 4 sont respectés avec des tests correspondants. Le critère 1 n (213421ms)
+- 2026-10-23 21:55:53 UTC — [ticket-552] CHANGES_REQUESTED tour 3: Validateur : Les critères 2 et 4 sont respectés avec des tests correspondants. Le critère 1 n'est pas satisfait car `streamState.ts` n'est pas modifié pour gérer `ci_merge_blocked` et `ci_watcher_bloc
+- 2026-10-23 21:55:53 UTC — [ticket-552] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 21:55:57 UTC — [ide-core] file interrompue : ticket-552 non approuvé
