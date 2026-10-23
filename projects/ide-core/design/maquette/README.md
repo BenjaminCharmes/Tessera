@@ -40,3 +40,6 @@ comme référence.
   salle de réunion, tableau du jour, colonne « À toi » ;
   `Bureau-Compact.dc.html` — au-delà de 6 projets, une rangée par projet —
   https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE
+- **Notifications** (ticket-554) : `Notifications.dc.html` — la cloche du
+  rail, historique du jour et réglages par événement (système, son) —
+  https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE
