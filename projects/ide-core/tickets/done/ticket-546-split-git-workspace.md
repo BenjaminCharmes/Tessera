@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1.5
 id: ticket-546
 plan: true
-pr_number: null
+pr_number: 625
 priority: high
 status: done
 title: git_workspace.py is split into a package, one module per concern
