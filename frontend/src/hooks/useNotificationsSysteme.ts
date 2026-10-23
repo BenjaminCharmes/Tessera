@@ -20,8 +20,16 @@ import type { UseSupervisionResult } from "./useSupervision";
  *
  * Le réglage est mémorisé par onglet (ticket-193). Une permission refusée
  * par le navigateur ne se redemande plus : `etat` le dit pour que l'écran
- * distingue « coupé » de « bloqué ». Le plugin, lui, n'a pas de clic : la
- * fenêtre ne se ramène pas au premier plan depuis une notification desktop.
+ * distingue « coupé » de « bloqué ».
+ *
+ * Pas de clic côté desktop (ticket-556), vérifié sur
+ * `@tauri-apps/plugin-notification` 2.5.0 : `onAction` et
+ * `onNotificationReceived` y sont documentés « only emitted on mobile », et
+ * `onAction` exige en plus un type d'action posé par `registerActionTypes`,
+ * lui aussi mobile. Aucune API 2.x ne donne donc le clic d'une notification
+ * desktop : la fenêtre ne se ramène pas au premier plan, et la branche Tauri
+ * de `envoyer` n'appelle pas `ouvrir`. À reprendre si une version ultérieure
+ * ajoute un clic desktop.
  */
 export type EtatDesNotifications = "actives" | "coupees" | "bloquees" | "indisponibles";
 
