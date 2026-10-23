@@ -1,14 +1,14 @@
 ---
-id: ticket-544
-title: "A backend file can no longer grow past its ceiling"
-type: test
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-23
+id: ticket-544
+pr_number: 616
+priority: high
+status: done
+title: A backend file can no longer grow past its ceiling
+type: test
 ---
 
 # ticket-544 — Un cliquet sur la longueur des fichiers backend
