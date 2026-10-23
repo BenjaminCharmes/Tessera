@@ -1,15 +1,16 @@
 ---
-id: ticket-546
-title: "git_workspace.py is split into a package, one module per concern"
-type: refactor
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-544"]
-estimated_days: 1.5
 created: 2026-10-23
+depends_on:
+- ticket-544
+estimated_days: 1.5
+id: ticket-546
 plan: true
+pr_number: 625
+priority: high
+status: done
+title: git_workspace.py is split into a package, one module per concern
+type: refactor
 ---
 
 # ticket-546 — Découper `git_workspace.py`

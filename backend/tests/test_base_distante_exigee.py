@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import git_workspace as gw
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
+from tessera.services.git_workspace import base as gw
 from tessera.services.politique_run import PolitiqueRun
 
 
