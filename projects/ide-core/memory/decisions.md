@@ -510,3 +510,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : le 16/10 un run a sali le checkout d'une session et commité un ticket écrit à la main (#508) ; le 14/10 une jonction a vidé `node_modules`.
 **Alternative rejetée** : des gardes sur le checkout partagé — le partage nuit.
 **Détail** : `docs/superpowers/specs/2026-10-19-worktree-par-run-design.md`
+
+---
+
+## ADR-057 — La doc par lot se lit dans le code livré
+
+**Date** : 2026-10-23
+**Portée** : architect, codeur
+**Décision** : amende ADR-035. `doc-technique` et `doc-fonctionnelle` reçoivent, en plus des tickets, le diff livré de chaque ticket (borné) et le contenu des fichiers qu'il touche. Chaque édition cite un extrait de ce code, recopié ; les nombres, ADR et noms qu'elle introduit doivent y figurer, sinon elle est refusée. Le lot tient en 5 tickets, les plus anciens d'abord ; un ticket sans diff retrouvable n'est pas documenté, et le journal le dit. Une édition ne réécrit qu'un volume borné. Le modèle par défaut des deux rôles est Sonnet.
+**Raison** : le 22/10, Haiku a deviné noms, numéros et chiffres que seul le code porte ; deux lots ont été jetés.
+**Alternative rejetée** : un outil `Read` — ces rôles n'ont pas d'outils, et un modèle qui explore coûte sans rien prouver.
+**Détail** : `docs/superpowers/specs/2026-10-23-documentation-depuis-le-code-design.md`
