@@ -4,7 +4,7 @@ created: 2026-10-23
 depends_on: []
 estimated_days: 0.5
 id: ticket-545
-pr_number: null
+pr_number: 620
 priority: medium
 status: done
 title: A frontend file can no longer grow past its ceiling
