@@ -58,7 +58,11 @@ def _noeuds_de_suppression(fonction: ast.FunctionDef | ast.AsyncFunctionDef) -> 
             continue
         nom = noeud.func.attr if isinstance(noeud.func, ast.Attribute) else ""
         porte_remove = any(isinstance(a, ast.Constant) and a.value == "remove" for a in noeud.args)
-        if nom == "rmtree" or porte_remove:
+        # `asyncio.to_thread(shutil.rmtree, …)` supprime aussi (ticket-551).
+        delegue = nom == "to_thread" and any(
+            isinstance(a, ast.Attribute) and a.attr == "rmtree" for a in noeud.args[:1]
+        )
+        if nom == "rmtree" or porte_remove or delegue:
             lignes.append(noeud.lineno)
     return lignes
 
@@ -69,6 +73,13 @@ def _lignes_de_liens(fonction: ast.FunctionDef | ast.AsyncFunctionDef) -> list[i
         if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
         and n.func.id == "retirer_les_liens"
     ]
+
+
+def test_a_delegated_rmtree_counts_as_a_deletion() -> None:
+    source = "async def f():\n    await asyncio.to_thread(shutil.rmtree, x)\n"
+    fonction = ast.parse(source).body[0]
+    assert isinstance(fonction, ast.AsyncFunctionDef)
+    assert _noeuds_de_suppression(fonction) == [2]
 
 
 def test_every_function_that_deletes_unlinks_first() -> None:

@@ -5,6 +5,7 @@ gone when the request ends), this one is checked out on the ticket branch and
 outlives the request. It is created from `origin/<base>`, resumed when a run
 left it behind clean, and never removed while it holds unsaved work.
 """
+import asyncio
 import re
 import shutil
 from dataclasses import dataclass
@@ -203,6 +204,7 @@ async def supprimer(wt: RunWorktree, depot: Path) -> None:
             extra = {"racine": str(wt.racine), "erreur": str(exc)}
             _logger.warning("run_worktree_non_supprime", extra=extra)
             # Propre et sans lien : ce que git a laissé se supprime sans rien atteindre ailleurs.
-            shutil.rmtree(chemin_etendu(wt.racine))
+            # Hors de la boucle : un node_modules prend des minutes et gelait le backend (ticket-551).
+            await asyncio.to_thread(shutil.rmtree, chemin_etendu(wt.racine))
     # Efface aussi l'enregistrement d'un worktree dont le dossier a disparu.
     await run_git(depot, "worktree", "prune")
