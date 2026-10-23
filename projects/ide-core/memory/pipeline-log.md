@@ -4706,3 +4706,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 21:55:53 UTC — [ticket-552] validateur: CHANGES_REQUESTED — Les critères 2 et 4 sont respectés avec des tests correspondants. Le critère 1 n (213421ms)
 - 2026-10-23 21:55:53 UTC — [ticket-552] CHANGES_REQUESTED tour 3: Validateur : Les critères 2 et 4 sont respectés avec des tests correspondants. Le critère 1 n'est pas satisfait car `streamState.ts` n'est pas modifié pour gérer `ci_merge_blocked` et `ci_watcher_bloc
 - 2026-10-23 21:55:53 UTC — [ticket-552] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 21:55:57 UTC — [ide-core] file interrompue : ticket-552 non approuvé
