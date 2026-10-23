@@ -1,14 +1,15 @@
 ---
+agent: codeur
+created: 2026-10-23
+depends_on:
+- ticket-549
+estimated_days: 0.25
 id: ticket-553
-title: "An agent suspected of being stalled is notified"
-type: feat
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-549"]
-estimated_days: 0.25
-created: 2026-10-23
+status: done
+title: An agent suspected of being stalled is notified
+type: feat
 ---
 
 # ticket-553 — Un agent figé est notifié

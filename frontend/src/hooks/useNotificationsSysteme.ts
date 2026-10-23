@@ -6,7 +6,9 @@ import {
   sendNotification,
 } from "@tauri-apps/plugin-notification";
 import { notificationsPour, type Instantane, type Notif } from "../lib/notifications";
+import { santeAgent, type SanteAgent } from "../lib/santeAgent";
 import { useEtatPersistant } from "./useEtatPersistant";
+import { useMaintenant } from "./useMaintenant";
 import type { UseSupervisionResult } from "./useSupervision";
 
 /**
@@ -84,11 +86,20 @@ export function useNotificationsSysteme(
   );
   const precedent = useRef<Instantane>({ runs: [], etats: {} });
   const { runs, etatDe } = supervision;
+  // La santé dépend du temps : sans tick, un agent muet ne changerait jamais d'état.
+  const maintenant = useMaintenant();
 
   useEffect(() => {
     const etats: Record<string, ReturnType<typeof etatDe>> = {};
-    for (const r of runs) etats[r.run_id] = etatDe(r.run_id);
-    const courant: Instantane = { runs, etats };
+    const sante: Record<string, SanteAgent> = {};
+    for (const r of runs) {
+      const etat = etatDe(r.run_id);
+      etats[r.run_id] = etat;
+      if (etat.status === "running") {
+        sante[r.run_id] = santeAgent(etat.dernierEvenementA, maintenant, etat.pendingQuestion);
+      }
+    }
+    const courant: Instantane = { runs, etats, sante };
     const avant = precedent.current;
     precedent.current = courant;
 
@@ -98,7 +109,7 @@ export function useNotificationsSysteme(
       // Une notification qui ne part pas ne casse rien.
       void envoyer(n, ouvrir).catch(() => undefined);
     }
-  }, [runs, etatDe, active, projetActif, ouvrir]);
+  }, [runs, etatDe, maintenant, active, projetActif, ouvrir]);
 
   return { active, setActive, etat: etatDesNotifications(active) };
 }
