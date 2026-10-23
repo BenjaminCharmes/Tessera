@@ -32,6 +32,7 @@ from tessera.services.github_service import (
     PrOuverte,
 )
 from tessera.services.politique_run import PolitiqueRun
+from tessera.services.secrets_diff import refus_secrets
 from tessera.services.sync_map import SyncMapService
 from tessera.services.termes_interdits import (
     CommitInfo,
@@ -224,6 +225,9 @@ class GitHubWorkflowService:
             )
 
         await self._verifier_termes_interdits(branch)
+        diff = await self._git.diff_de_branche(self._base_branch, branch)
+        if refus := refus_secrets(diff):
+            raise WorkflowError(refus)
 
         await self._git.push_branch(branch)
 
@@ -246,7 +250,6 @@ class GitHubWorkflowService:
         )
         return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
 
-
     async def _verifier_termes_interdits(self, branch: str) -> None:
         """Bloque le push si un terme interdit est trouvé — ADR-048.
 
@@ -267,10 +270,7 @@ class GitHubWorkflowService:
         diff = await self._git.diff_de_branche(self._base_branch, branch)
         lignes_ajoutees = [l for l in diff.splitlines() if l.startswith("+")]
         commits = await self._git.commits_depuis_base(self._base_branch, branch)
-        violations = self._termes.verifier(
-            lignes_ajoutees=lignes_ajoutees,
-            commits=commits,
-        )
+        violations = self._termes.verifier(lignes_ajoutees=lignes_ajoutees, commits=commits)
         if violations:
             sources = ", ".join(v.source for v in violations)
             raise WorkflowError(
