@@ -4522,3 +4522,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 14:03:51 UTC — [ticket-547] validateur: fichiers cités joints : backend/src/tessera/services/secrets_diff.py
 - 2026-10-23 14:03:51 UTC — [ticket-547] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (200187ms)
 - 2026-10-23 14:03:51 UTC — [ticket-547] APPROVED après 2 tour(s)
+- 2026-10-23 14:11:48 UTC — [ticket-547] documentation: 2 fichier(s) (471125ms) — après tour de correction
