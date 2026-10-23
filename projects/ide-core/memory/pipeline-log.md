@@ -4707,3 +4707,33 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 21:55:53 UTC — [ticket-552] CHANGES_REQUESTED tour 3: Validateur : Les critères 2 et 4 sont respectés avec des tests correspondants. Le critère 1 n'est pas satisfait car `streamState.ts` n'est pas modifié pour gérer `ci_merge_blocked` et `ci_watcher_bloc
 - 2026-10-23 21:55:53 UTC — [ticket-552] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-23 21:55:57 UTC — [ide-core] file interrompue : ticket-552 non approuvé
+- 2026-10-23 22:21:05 UTC — [ticket-556] branche ticket-556-clicking-a-desktop-notification-brings-tessera-fo
+- 2026-10-23 22:21:28 UTC — [ticket-556] plan rendu (21656ms)
+- 2026-10-23 22:21:28 UTC — [ticket-556] tour 1 — codeur démarré
+- 2026-10-23 22:21:57 UTC — [ticket-556] tour 1 — codeur terminé (28906ms)
+- 2026-10-23 22:32:43 UTC — [ticket-556] testeur: OK (exit 0)
+- 2026-10-23 22:33:51 UTC — [ticket-556] securite: PASS — Le diff modifie uniquement la documentation (commentaires JSDoc) sans changement (68171ms)
+- 2026-10-23 22:33:51 UTC — [ticket-556] tour 1 — reviewer démarré
+- 2026-10-23 22:34:11 UTC — [ticket-556] tour 1 — reviewer terminé (19563ms)
+- 2026-10-23 22:35:37 UTC — [ticket-556] validateur: fichiers cités joints : src-tauri/capabilities/default.json
+- 2026-10-23 22:35:37 UTC — [ticket-556] validateur: CHANGES_REQUESTED — Le critère 1 est satisfait : le code indique clairement qu'aucune API 2.x du plu (105843ms)
+- 2026-10-23 22:35:37 UTC — [ticket-556] CHANGES_REQUESTED tour 1: Validateur : Le critère 1 est satisfait : le code indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics. Le critère 3 est également respecté : aucune permission i
+- 2026-10-23 22:35:37 UTC — [ticket-556] tour 2 — codeur démarré
+- 2026-10-23 22:35:54 UTC — [ticket-556] tour 2 — codeur terminé (17203ms)
+- 2026-10-23 22:46:46 UTC — [ticket-556] testeur: OK (exit 0)
+- 2026-10-23 22:47:15 UTC — [ticket-556] securite: PASS — Modification documentaire uniquement. Aucun code fonctionnel n'est ajouté ni mod (28281ms)
+- 2026-10-23 22:47:15 UTC — [ticket-556] tour 2 — reviewer démarré
+- 2026-10-23 22:47:30 UTC — [ticket-556] tour 2 — reviewer terminé (15688ms)
+- 2026-10-23 22:48:53 UTC — [ticket-556] validateur: fichiers cités joints : src-tauri/capabilities/default.json
+- 2026-10-23 22:48:53 UTC — [ticket-556] validateur: CHANGES_REQUESTED — Le critère 1 est satisfait car le code indique clairement qu'aucune API 2.x du p (98296ms)
+- 2026-10-23 22:48:53 UTC — [ticket-556] CHANGES_REQUESTED tour 2: Validateur : Le critère 1 est satisfait car le code indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics. Le critère 3 est également respecté, avec un fichier de
+- 2026-10-23 22:48:53 UTC — [ticket-556] tour 3 — codeur démarré
+- 2026-10-23 22:49:37 UTC — [ticket-556] tour 3 — codeur terminé (44046ms)
+- 2026-10-23 23:00:39 UTC — [ticket-556] testeur: OK (exit 0)
+- 2026-10-23 23:01:50 UTC — [ticket-556] securite: PASS — Le diff ajoute un test de régression qui valide qu'une notification desktop Taur (71061ms)
+- 2026-10-23 23:01:50 UTC — [ticket-556] tour 3 — reviewer démarré
+- 2026-10-23 23:02:05 UTC — [ticket-556] tour 3 — reviewer terminé (14844ms)
+- 2026-10-23 23:03:33 UTC — [ticket-556] validateur: fichiers cités joints : src-tauri/capabilities/default.json
+- 2026-10-23 23:03:33 UTC — [ticket-556] validateur: CHANGES_REQUESTED — Le ticket est correctement traité : il indique clairement qu'aucune API 2.x du p (103468ms)
+- 2026-10-23 23:03:33 UTC — [ticket-556] CHANGES_REQUESTED tour 3: Validateur : Le ticket est correctement traité : il indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics desktop. Le test vérifie cette absence d'action, et le f
+- 2026-10-23 23:03:33 UTC — [ticket-556] BLOCKED après 3 tour(s) sans approbation
