@@ -1,14 +1,14 @@
 ---
-id: ticket-558
-title: "A quota reading is kept per window and can be read outside a run"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 1
-created: 2026-10-23
+id: ticket-558
+pr_number: 632
+priority: medium
+status: done
+title: A quota reading is kept per window and can be read outside a run
+type: feat
 ---
 
 # ticket-558 — Un relevé de quota par fenêtre, lisible hors d'un run

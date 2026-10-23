@@ -2,6 +2,21 @@
 from pydantic import BaseModel
 
 
+class QuotaWindowReading(BaseModel):
+    """Last reading of one rate-limit window — ticket-558."""
+
+    status: str
+    utilization: float
+    resets_at: str | None = None
+    observed_at: str
+
+
+class QuotaWindows(BaseModel):
+    """Readings by window (`five_hour`, `seven_day`, `unknown`…); empty when nothing is known."""
+
+    windows: dict[str, QuotaWindowReading] = {}
+
+
 class UsageTotals(BaseModel):
     runs: int = 0
     calls: int = 0
