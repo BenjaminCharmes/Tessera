@@ -18,7 +18,10 @@ from tests.test_providers_base import FakeProvider
 PROJET = "demo"
 ROLES = ("doc-technique", "doc-fonctionnelle")
 EDITION = json.dumps(
-    {"editions": [{"fichier": "README.md", "ancien": "Avant.", "nouveau": "Après."}]}
+    {"editions": [{
+        "fichier": "README.md", "ancien": "Avant.", "nouveau": "Après.",
+        "preuve": [{"fichier": "src/ticket-2.py", "extrait": "code de ticket-2"}],
+    }]}
 )
 MARQUEUR = json.dumps({"documentes": ["ticket-1"]})
 

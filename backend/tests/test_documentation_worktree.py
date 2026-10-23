@@ -36,7 +36,10 @@ DECLARATION = {
 }
 EDITION = {
     "editions": [
-        {"fichier": "README.md", "ancien": "Texte ancien.", "nouveau": "Texte nouveau."}
+        {
+            "fichier": "README.md", "ancien": "Texte ancien.", "nouveau": "Texte nouveau.",
+            "preuve": [{"fichier": "src/ticket-2.py", "extrait": "code de ticket-2"}],
+        }
     ]
 }
 README_AVANT = "# Projet\n\nTexte ancien.\n"
