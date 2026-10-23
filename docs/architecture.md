@@ -1634,6 +1634,29 @@ En local, une liste vide désactive le contrôle. En CI, son absence bloque le
 merge — c'est intentionnel.
 
 
+## Détection de secrets dans les diffs (ticket-547)
+
+Avant de pousser une branche, `GitHubWorkflowService.open_pull_request()` vérifie que les lignes ajoutées ne contiennent pas de secrets reconnaissables — jetons, clés, identifiants. La détection est **déterministe**, sans appel LLM.
+
+**Motifs reconnus** :
+- Clés d'accès AWS : `AKIA[0-9A-Z]{16}`
+- Jetons GitHub et GitLab : `gh[pousr]_[A-Za-z0-9]{36,}`, `github_pat_`, `glpat-`
+- Clés Anthropic : `sk-ant-[A-Za-z0-9_-]{20,}`
+- Clés Stripe : `sk_live_`
+- Clés privées : `-----BEGIN ... PRIVATE KEY-----`
+- Identifiants en URL : `://user:password@`
+- Fichiers sensibles (ajout) : `.env`, `*.pem`, `id_rsa`
+
+**Scope** : seules les lignes ajoutées (signe `+` en diff) sont vérifiées. Suppressions et contexte sont ignorés.
+
+**Exclusions** : le placeholder `sk-ant-...` ne déclenche pas d'alerte, ni une chaîne trop courte.
+
+**Rapport** : les violations nomment le fichier, la ligne et le type de secret, jamais la valeur. Exemple : `src/app.py:2 (aws-access-key)`.
+
+**Refus** : si une violation est détectée, le push est refusé avec un `WorkflowError`. La restriction s'applique quel que soit le niveau de confidentialité du run.
+
+Cette détection est la deuxième porte de l'ADR-050, après le hook `pre-push` et avant la CI GitHub.
+
 ## Gestion des signalements en attente (ticket-421)
 
 Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu'un run ide-core est actif, il n'est pas écrit immédiatement dans l'arbre. Cela évite qu'il soit emporté dans le commit du run en cours — ce qui poluerait le diff réel avec une métadonnée Tessera.

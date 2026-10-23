@@ -1927,6 +1927,16 @@ La cause n'est pas établie — cela peut être un problème de permissions du C
 
 Pour l'instant, il n'y a pas de correction automatique. Tu dois relancer le ticket. Si le problème reproduit régulièrement, note le `run_id` et signale-le sur Tessera via la section 13 « Signaler un problème ou une idée sur Tessera ».
 
+### Le push est refusé : secret détecté
+
+Avant d'ouvrir une pull request, Tessera scanne le diff ajouté pour détecter les secrets reconnaissables. Si un secret est trouvé, le push est refusé — le message d'erreur nomme le fichier et la ligne, mais jamais la valeur du secret.
+
+Les secrets détectés incluent clés AWS, tokens GitHub/GitLab/Anthropic, clés privées (fichiers `.pem`, `id_rsa`), identifiants dans une URL (`user:password@host`), et l'ajout de fichiers de configuration (`.env`, `*.pem`, `id_rsa`).
+
+Ce contrôle s'applique quel que soit le réglage `confidentialite` du projet.
+
+Si c'est un faux positif — une URL de documentation, une chaîne placeholder — supprime la ligne et relance le pipeline.
+
 ## 13. Signaler un problème ou une idée sur Tessera
 
 Quand tu trouves un dysfonctionnement dans l'IDE ou une suggestion pour l'améliorer, tu peux le signaler directement depuis n'importe quel projet — sans quitter l'IDE, sans naviguer jusqu'à ide-core.
