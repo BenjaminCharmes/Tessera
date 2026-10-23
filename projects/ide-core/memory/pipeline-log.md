@@ -4354,3 +4354,15 @@ Le change (99454ms)
 - 2026-10-23 07:19:11 UTC — [ticket-535] APPROVED après 1 tour(s)
 - 2026-10-23 07:19:16 UTC — [ticket-535] fichiers non suivis laissés par le run : tickets/todo/ticket-540-documentation-code-material-filtered-bounded-diff-per-ticket-and-touched-files.md, tickets/todo/ticket-541-the-documentation-batch-reads-the-delivered-code-oldest-tickets-first.md, tickets/todo/ticket-542-a-documentation-edit-must-quote-the-code-that-supports-it.md, tickets/todo/ticket-543-documentation-roles-default-to-sonnet.md (à ignorer dans .gitignore ?)
 - 2026-10-23 07:21:10 UTC — [ticket-535] documentation: 1 fichier(s) (114218ms)
+- 2026-10-23 07:26:59 UTC — [ide-core] ticket-535 PR #606 mergée (CI verte)
+- 2026-10-23 08:07:35 UTC — [ticket-540] branche ticket-540-documentation-code-material-a-filtered-bounded-di
+- 2026-10-23 08:07:37 UTC — [ticket-540] tour 1 — codeur démarré
+- 2026-10-23 08:22:07 UTC — [ticket-540] tour 1 — codeur terminé (869594ms)
+- 2026-10-23 08:37:52 UTC — [ticket-540] testeur: OK (exit 0)
+- 2026-10-23 08:40:16 UTC — [ticket-540] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code introduit deux nouveaux modul (143686ms)
+- 2026-10-23 08:40:16 UTC — [ticket-540] tour 1 — reviewer démarré
+- 2026-10-23 08:40:46 UTC — [ticket-540] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-23 08:40:58 UTC — [ticket-540] tour 1 — reviewer terminé (41296ms)
+- 2026-10-23 08:42:13 UTC — [ticket-540] validateur: fichiers cités joints : services/documentation_code.py, tickets/ (dossier, 0 fichiers), memory/ (dossier, 8 fichiers), agents.json, README.md, docs/ (dossier, 6 fichiers), projects/ (dossier, 0 fichiers), backend/ (dossier, 8 fichiers)
+- 2026-10-23 08:42:13 UTC — [ticket-540] validateur: APPROVED — Le codeur a livré une implémentation complète et bien testée du ticket-540 : deu (116640ms)
+- 2026-10-23 08:42:13 UTC — [ticket-540] APPROVED après 1 tour(s)
