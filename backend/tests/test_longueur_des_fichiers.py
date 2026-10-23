@@ -17,7 +17,6 @@ PLAFONDS: dict[str, int] = {
     "services/database.py": 772,
     # 714 : le ticket-542, mergé dans la même file avant ce cliquet, y a ajouté une ligne.
     "services/documentation.py": 714,
-    "services/git_workspace.py": 2294,
     "services/github_service.py": 592,
     "services/github_workflow.py": 520,
     "services/livraison.py": 626,
