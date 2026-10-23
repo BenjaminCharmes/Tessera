@@ -4737,3 +4737,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 23:03:33 UTC — [ticket-556] validateur: CHANGES_REQUESTED — Le ticket est correctement traité : il indique clairement qu'aucune API 2.x du p (103468ms)
 - 2026-10-23 23:03:33 UTC — [ticket-556] CHANGES_REQUESTED tour 3: Validateur : Le ticket est correctement traité : il indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics desktop. Le test vérifie cette absence d'action, et le f
 - 2026-10-23 23:03:33 UTC — [ticket-556] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 23:03:38 UTC — [ide-core] file interrompue : ticket-556 non approuvé
