@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-535
 plan: true
-pr_number: null
+pr_number: 606
 priority: high
 status: done
 title: Batch documentation is written from the delivered code, not guessed from tickets
