@@ -4551,3 +4551,69 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 17:43:34 UTC — [ticket-546] validateur: APPROVED — Refactorisation réussie : le monolithe `git_workspace.py` (2294 lignes) est deve (352171ms)
 - 2026-10-23 17:43:34 UTC — [ticket-546] APPROVED après 1 tour(s)
 - 2026-10-23 17:50:38 UTC — [ticket-546] documentation: 0 fichier(s) (418812ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — guillemets « tests relancés après rebase : rouges » n'est ni dans le texte remplacé, ni dans
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-548 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-552 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-553 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-556 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-558 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-559 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-560 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-561 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-562 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-23 18:02:48 UTC — [ide-core] ticket-546 PR #625 mergée (CI verte)
+- 2026-10-23 18:02:50 UTC — [ide-core] ticket-546 : base réalignée sur develop
+- 2026-10-23 18:02:50 UTC — [ide-core] ticket-546 PR #625 confiée au CIWatcher
+- 2026-10-23 18:02:52 UTC — [ticket-571] branche ticket-571-the-test-command-is-cut-at-its-deadline-even-when
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-548 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-552 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-553 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-556 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-558 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-559 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-560 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-561 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-562 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-23 18:03:47 UTC — [ticket-571] plan rendu (54281ms)
+- 2026-10-23 18:03:47 UTC — [ticket-571] tour 1 — codeur démarré
+- 2026-10-23 18:09:03 UTC — [ticket-571] tour 1 — codeur terminé (315343ms)
+- 2026-10-23 18:15:21 UTC — [ticket-571] testeur: 1 failed, 1641 passed, 64 warnings in 375.64s (0:06:15)
+- 2026-10-23 18:15:21 UTC — [ticket-571] tests rouges au tour 1
+- 2026-10-23 18:15:21 UTC — [ticket-571] tour 2 — codeur démarré
+- 2026-10-23 18:17:23 UTC — [ticket-571] tour 2 — codeur terminé (122110ms)
+- 2026-10-23 18:25:00 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 18:27:13 UTC — [ticket-571] securite: PASS — Ticket-571: Timeout handling refactor is secure. Thread-safe implementation with (133483ms)
+- 2026-10-23 18:27:14 UTC — [ticket-571] tour 2 — reviewer démarré
+- 2026-10-23 18:28:05 UTC — [ticket-571] tour 2 — reviewer terminé (51781ms)
+- 2026-10-23 18:32:14 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 18:32:53 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 18:32:53 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Les trois premiers critères sont bien satisfaits : le minuteur indépendant de la (339296ms)
+- 2026-10-23 18:32:53 UTC — [ticket-571] CHANGES_REQUESTED tour 2: Validateur : Les trois premiers critères sont bien satisfaits : le minuteur indépendant de la boucle tue la commande à l'échéance (test de blocage), s'annule quand elle finit à temps (test du cancel),
+- 2026-10-23 18:32:53 UTC — [ticket-571] tour 3 — codeur démarré
+- 2026-10-23 18:33:13 UTC — [ticket-571] tour 3 — codeur terminé (19750ms)
+- 2026-10-23 18:41:47 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 18:43:46 UTC — [ticket-571] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit un minuteur thread-safe pour tu (118000ms)
+- 2026-10-23 18:43:46 UTC — [ticket-571] tour 3 — reviewer démarré
+- 2026-10-23 18:44:21 UTC — [ticket-571] tour 3 — reviewer terminé (35890ms)
+- 2026-10-23 18:48:46 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 18:50:27 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 18:50:27 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Les trois premiers critères sont excellemment satisfaits : le minuteur indépenda (401328ms)
+- 2026-10-23 18:50:27 UTC — [ticket-571] CHANGES_REQUESTED tour 3: Validateur : Les trois premiers critères sont excellemment satisfaits : le minuteur indépendant de la boucle tue la commande à l'échéance même quand la boucle est bloquée (test de synchrone), s'annule
+- 2026-10-23 18:50:27 UTC — [ticket-571] BLOCKED après 3 tour(s) sans approbation
