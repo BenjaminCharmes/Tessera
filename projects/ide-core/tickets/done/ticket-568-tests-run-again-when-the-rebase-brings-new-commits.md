@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-568
 plan: true
-pr_number: null
+pr_number: 623
 priority: high
 status: done
 title: The tests run again before the push when the rebase brought new base commits
