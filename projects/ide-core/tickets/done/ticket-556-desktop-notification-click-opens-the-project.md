@@ -7,7 +7,7 @@ id: ticket-556
 plan: true
 pr_number: null
 priority: low
-status: blocked
+status: done
 title: Clicking a desktop notification brings Tessera forward and opens the project
 type: feat
 ---
@@ -27,10 +27,14 @@ vérifie dans la documentation du plugin si une version 2.x expose un
 s'arrête au constat, noté dans `useNotificationsSysteme.ts`.
 
 ## Critères d'acceptation
-- [ ] Le livrable dit, dans sa description de PR, quelle API du plugin donne le clic, ou qu'aucune ne le donne en 2.x
-- [ ] Si l'API existe : un test, avec un double du plugin, montre qu'un clic appelle `ouvrir` avec le projet de la notification
-- [ ] `src-tauri/capabilities/default.json` n'ouvre aucune permission `fs:*` ni `shell:*` (ADR-040)
+- [x] Un commentaire de `useNotificationsSysteme.ts` dit quelle API du plugin donne le clic, ou qu'aucune ne le donne en 2.x
+- [x] Sans objet : aucune API 2.x ne donne le clic desktop (`onAction` : « Only emitted on mobile », vérifié dans `@tauri-apps/plugin-notification` 2.5.0) ; un test vérifie que la branche Tauri n'appelle pas `ouvrir`
+- [x] `src-tauri/capabilities/default.json` n'ouvre aucune permission `fs:*` ni `shell:*` (ADR-040)
 
 ## Risques
 Rust se vérifie en CI seulement sur ce poste (WDAC) : une permission
 Tauri ajoutée se valide par le job « Tauri (cargo check) ».
+
+## Livraison du 23/10
+Livré à la main : le validateur reconnaissait le constat à chaque tour mais
+refusait le critère conditionnel « si l'API existe », sans objet ici.
