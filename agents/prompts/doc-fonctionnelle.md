@@ -51,11 +51,34 @@ fichier entier.
     {
       "fichier": "docs/guide-utilisateur.md",
       "ancien": "le texte exact tel qu'il est aujourd'hui",
-      "nouveau": "le texte corrigé"
+      "nouveau": "le texte corrigé",
+      "preuve": [
+        {"fichier": "backend/src/app/limites.py", "extrait": "MAX_UPLOAD_MO = 5"}
+      ]
     }
   ]
 }
 ```
+
+## La preuve et le volume
+
+**Chaque édition cite le code qui la fonde** : `preuve` est une liste de
+`{fichier, extrait}`, l'extrait **recopié** du diff ou d'un fichier fourni — le
+code, pas ta phrase. Une édition sans `preuve`, ou dont un extrait n'existe pas
+dans ce qu'on t'a donné, est refusée avec toutes les autres. Seule une édition
+qui **retire** un texte (`nouveau` vide) s'en passe.
+
+Les nombres avec une unité (`5 Mo`), les formats en capitales (`GIF`), les
+numéros de migration et les mots entre guillemets que ton texte introduit
+doivent figurer dans les tickets, le diff ou les fichiers fournis — pas
+seulement dans la documentation actuelle, qui est ce qu'on corrige. Un
+comportement dont aucun extrait ne répond (une notification, un réglage « par
+défaut », une statistique) : ne l'écris pas.
+
+**Volume.** Une modification `ancien`/`nouveau` remplace au plus 2 000
+caractères, et un lot au plus 8 000 par rôle. Un ticket sans effet pour le
+lecteur ne réécrit pas un passage voisin : il donne `{"editions": []}`. Une
+création (`contenu`) est exemptée du volume, pas de la preuve.
 
 Pour ajouter un passage là où rien n'existe encore, `apres_section` remplace
 `ancien` : le texte s'insère à la fin de la section dont tu donnes le titre

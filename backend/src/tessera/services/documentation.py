@@ -33,6 +33,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services import documentation_claude_md as claude_md_doc
+from tessera.services.documentation_base import EditionRefusee
+from tessera.services.documentation_base import normaliser_typo as _normaliser_typo
 from tessera.services.documentation_code import (
     FournisseurMatiere,
     MatiereCode,
@@ -40,6 +42,7 @@ from tessera.services.documentation_code import (
     bloc_fichiers,
     matiere_du_lot,
 )
+from tessera.services.documentation_preuve import ControleDePreuve, fichiers_de_la_matiere
 from tessera.services.providers.base import LLMProvider
 from tessera.services.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.utils.logger import get_logger
@@ -69,10 +72,6 @@ _PLAFOND = 5
 _BORNE_DOC = 60_000
 
 
-class EditionRefusee(Exception):
-    """Une modification proposée ne s'applique pas. Rien n'a été écrit."""
-
-
 @dataclass(frozen=True)
 class TicketADocumenter:
     id: str
@@ -88,7 +87,11 @@ def _documentable(chemin: str) -> bool:
 
 
 def appliquer_editions(
-    racine: Path, editions: list[dict[str, object]], claude_md: Path | None = None
+    racine: Path,
+    editions: list[dict[str, object]],
+    claude_md: Path | None = None,
+    matiere: MatiereCode | None = None,
+    tickets: str = "",
 ) -> list[str]:
     """Applique toutes les modifications, ou aucune.
 
@@ -101,8 +104,15 @@ def appliquer_editions(
     Une édition ``contenu`` crée un fichier absent (ticket-342) : sans elle, un
     guide qui n'existe pas encore ne pouvait jamais naître. Elle n'écrase
     jamais un fichier existant.
+
+    ``matiere`` et ``tickets`` sont ce que l'agent a lu : le code livré et le
+    texte des tickets. Avec elle, chaque édition doit citer le code qui la fonde
+    et ses jetons vérifiables doivent y figurer (ticket-542, ADR-057). Sans
+    elle, rien n'est contrôlé : seul le service sait ce que l'agent a reçu, et
+    il la passe toujours.
     """
     resultat: dict[Path, str] = {}
+    controle = None if matiere is None else ControleDePreuve(matiere, tickets)
 
     for edition in editions:
         chemin = str(edition.get("fichier", ""))
@@ -115,6 +125,9 @@ def appliquer_editions(
             )
         else:
             fichier = racine / chemin
+
+        if controle is not None:
+            controle.verifier(edition, chemin)
 
         if "contenu" in edition:
             if fichier in resultat or fichier.exists():
@@ -172,38 +185,6 @@ def _remplacer(avant: str, edition: dict[str, object], chemin: str) -> str:
             "contrat existe pour empêcher."
         )
     return apres
-
-
-#: Typographie française ramenée à son équivalent ASCII (ticket-402). Chaque
-#: caractère devient exactement un caractère : les positions se correspondent.
-_TYPO = str.maketrans(
-    {
-        "’": "'",
-        "‘": "'",
-        "“": '"',
-        "”": '"',
-        "«": '"',
-        "»": '"',
-        " ": " ",
-        " ": " ",
-    }
-)
-
-
-def _normaliser_typo(texte: str) -> tuple[str, list[int]]:
-    """Normalize typographic punctuation and non-breaking spaces.
-
-    Returns the normalized text and, for each of its characters, the position
-    of the originating character in ``texte``. The ellipsis is the only
-    character that expands to three, hence the position map.
-    """
-    sortie: list[str] = []
-    positions: list[int] = []
-    for i, c in enumerate(texte):
-        rendu = "..." if c == "…" else c.translate(_TYPO)
-        sortie.append(rendu)
-        positions.extend([i] * len(rendu))
-    return "".join(sortie), positions
 
 
 def _positions_de(texte: str, motif: str) -> list[int]:
@@ -516,6 +497,10 @@ class DocumentationService:
         refus: list[str] = []
         tour_de_correction = False
         brief = _brief(tickets, matiere, _contenu_documentable(racine))
+        # Le texte des tickets sert au contrôle des jetons : un numéro d'ADR
+        # qu'un ticket cite n'est pas inventé (ticket-542).
+        intentions = "\n".join(f"{t.titre}\n{t.corps}" for t in tickets)
+        fichiers = fichiers_de_la_matiere(matiere)
 
         for role in self._roles:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
@@ -533,7 +518,9 @@ class DocumentationService:
             if not editions:
                 continue
             try:
-                modifies.extend(appliquer_editions(racine, editions, claude_md=claude_md))
+                modifies.extend(
+                    appliquer_editions(racine, editions, claude_md, matiere, intentions)
+                )
             except EditionRefusee as exc:
                 # Tour de correction (ticket-395) : rappeler l'agent une seule fois
                 # avec le motif du refus et les titres des fichiers visés.
@@ -542,7 +529,9 @@ class DocumentationService:
                 titres = _titres_fichiers_vises(racine, editions)
                 reponse2 = await provider.complete(
                     system=systeme,
-                    user=_brief_correction(user, str(reponse.content), motif, titres),
+                    user=_brief_correction(
+                        user, str(reponse.content), motif, titres, fichiers
+                    ),
                     model=modele,
                     max_tokens=_MAX_TOKENS,
                 )
@@ -550,7 +539,9 @@ class DocumentationService:
                 if not editions2:
                     continue
                 try:
-                    modifies.extend(appliquer_editions(racine, editions2, claude_md=claude_md))
+                    modifies.extend(
+                        appliquer_editions(racine, editions2, claude_md, matiere, intentions)
+                    )
                 except EditionRefusee as exc2:
                     # Deuxième refus : comportement courant (ticket-395).
                     _logger.warning(
@@ -681,8 +672,13 @@ def _brief_correction(
     reponse_precedente: str,
     motif_refus: str,
     titres_fichiers: str,
+    fichiers_matiere: list[str] | None = None,
 ) -> str:
-    """Message for the one-shot corrective round (ticket-395)."""
+    """Message for the one-shot corrective round (ticket-395).
+
+    ``fichiers_matiere`` lists the files the agent was given: a ``preuve`` can
+    only cite one of them (ticket-542).
+    """
     parties: list[str] = [
         user_original,
         "\n\n---\n\nTa réponse précédente a été refusée.\n\n"
@@ -691,6 +687,11 @@ def _brief_correction(
     if titres_fichiers:
         parties.append(
             "\n\nTitres Markdown des fichiers visés (liste exhaustive) :" + titres_fichiers
+        )
+    if fichiers_matiere:
+        parties.append(
+            "\n\nFichiers du code fourni, où une preuve peut puiser : "
+            + ", ".join(fichiers_matiere)
         )
     parties.append("\n\nPropose une nouvelle liste d'éditions corrigée.")
     return "".join(parties)

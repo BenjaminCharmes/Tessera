@@ -20,6 +20,10 @@ from tests.matiere_factice import matiere_factice
 # ------------------------------------------------------------------
 
 
+#: Un extrait du diff que `matiere_factice` fournit pour `ticket-001`.
+PREUVE = [{"fichier": "src/ticket-001.py", "extrait": "code de ticket-001"}]
+
+
 def _doc(tmp_path: Path, nom: str, contenu: str) -> Path:
     (tmp_path / "docs").mkdir(exist_ok=True)
     chemin = tmp_path / "docs" / nom
@@ -446,6 +450,7 @@ async def test_les_editions_proposees_sont_appliquees(tmp_path: Path) -> None:
                     "fichier": "docs/architecture.md",
                     "ancien": "deux agents",
                     "nouveau": "six agents",
+                    "preuve": PREUVE,
                 }
             ]
         }
@@ -469,7 +474,8 @@ async def test_une_edition_refusee_ne_casse_pas_la_mise_a_jour(tmp_path: Path) -
         {"editions": [{"fichier": "docs/architecture.md", "ancien": "absent", "nouveau": "x"}]}
     )
     bonne = json.dumps(
-        {"editions": [{"fichier": "docs/guide-utilisateur.md", "ancien": "vieux", "nouveau": "neuf"}]}
+        {"editions": [{"fichier": "docs/guide-utilisateur.md", "ancien": "vieux", "nouveau": "neuf",
+          "preuve": PREUVE}]}
     )
     # doc-technique reçoit mauvaise (1er tour) puis mauvaise (correction) ;
     # doc-fonctionnelle reçoit bonne.
@@ -701,6 +707,7 @@ async def test_tour_de_correction_applique_si_deuxieme_reponse_valide(
                     "fichier": "docs/architecture.md",
                     "apres_section": "## Section absente",
                     "texte": "ajout",
+                    "preuve": PREUVE,
                 }
             ]
         }
@@ -712,6 +719,7 @@ async def test_tour_de_correction_applique_si_deuxieme_reponse_valide(
                     "fichier": "docs/architecture.md",
                     "apres_section": "## Section existante",
                     "texte": "ajout",
+                    "preuve": PREUVE,
                 }
             ]
         }
@@ -741,6 +749,7 @@ async def test_tour_de_correction_second_appel_contient_motif_et_titres(
                     "fichier": "docs/architecture.md",
                     "apres_section": "## Section absente",
                     "texte": "ajout",
+                    "preuve": PREUVE,
                 }
             ]
         }

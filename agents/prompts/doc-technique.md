@@ -38,16 +38,41 @@ texte que tu as lu, par un texte nouveau :
     {
       "fichier": "docs/architecture.md",
       "ancien": "le texte exact tel qu'il est aujourd'hui",
-      "nouveau": "le texte corrigé"
+      "nouveau": "le texte corrigé",
+      "preuve": [
+        {"fichier": "backend/src/app/limites.py", "extrait": "MAX_UPLOAD_MO = 5"}
+      ]
     },
     {
       "fichier": "docs/architecture.md",
       "apres_section": "## Pipeline",
-      "texte": "### Livraison\n\nAprès un run approuvé…"
+      "texte": "### Livraison\n\nAprès un run approuvé…",
+      "preuve": [
+        {"fichier": "backend/src/app/livraison.py", "extrait": "async def livrer("}
+      ]
     }
   ]
 }
 ```
+
+## La preuve et le volume
+
+**Chaque édition cite le code qui la fonde** : `preuve` est une liste de
+`{fichier, extrait}`, l'extrait **recopié** du diff ou d'un fichier fourni. Une
+édition sans `preuve`, ou dont un extrait n'existe pas dans ce qu'on t'a donné,
+est refusée avec toutes les autres. Seule une édition qui **retire** un texte
+(`nouveau` vide) s'en passe.
+
+Les nombres avec une unité (`5 Mo`), les `ADR-N`, les `ticket-N`, les numéros
+de migration, les formats en capitales (`GIF`) et les mots entre guillemets que
+ton texte introduit doivent figurer dans les tickets, le diff ou les fichiers
+fournis — pas seulement dans la documentation actuelle, qui est ce qu'on
+corrige. Un fait dont aucun extrait ne répond : ne l'écris pas.
+
+**Volume.** Une modification `ancien`/`nouveau` remplace au plus 2 000
+caractères, et un lot au plus 8 000 par rôle. Au-delà, c'est refusé : fais
+des retouches ciblées, pas une réécriture. Une création (`contenu`) est
+exemptée du volume, pas de la preuve.
 
 Un fichier qui n'apparaît pas dans le contenu fourni n'existe pas encore :
 `ancien` et `apres_section` y seraient refusés. Crée-le en donnant son texte

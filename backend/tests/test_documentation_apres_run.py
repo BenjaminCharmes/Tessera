@@ -311,7 +311,7 @@ async def test_en_git_root_ancestor_les_editions_visent_la_racine_du_depot(tmp_p
     prompts.mkdir()
     for role in ("doc-technique", "doc-fonctionnelle"):
         (prompts / f"{role}.md").write_text("doc", encoding="utf-8")
-    edition = '{"editions": [{"fichier": "README.md", "ancien": "Ancien texte.", "nouveau": "Nouveau texte."}]}'
+    edition = '{"editions": [{"fichier": "README.md", "ancien": "Ancien texte.", "nouveau": "Nouveau texte.", "preuve": [{"fichier": "src/ticket-001.py", "extrait": "code de ticket-001"}]}]}'
     svc = DocumentationService(FakeProvider(content=edition), prompts, matiere=matiere_factice())
 
     resultat = await svc.mettre_a_jour(projet, racine_doc=depot)
