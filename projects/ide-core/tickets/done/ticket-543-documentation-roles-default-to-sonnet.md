@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-23
 depends_on: []
 id: ticket-543
+pr_number: 611
 priority: medium
 status: done
 title: Documentation roles default to Sonnet
