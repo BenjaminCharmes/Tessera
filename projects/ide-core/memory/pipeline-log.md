@@ -4489,3 +4489,37 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 13:29:30 UTC — [ticket-545] APPROVED après 1 tour(s)
 - 2026-10-23 13:30:11 UTC — [ide-core] ticket-550 PR #618 mergée (CI verte)
 - 2026-10-23 13:33:54 UTC — [ticket-545] documentation: 0 fichier(s) (258765ms) — après tour de correction
+- 2026-10-23 13:34:15 UTC — [ide-core] ticket-545 PR #620 confiée au CIWatcher
+- 2026-10-23 13:34:19 UTC — [ticket-547] branche ticket-547-a-push-is-refused-when-the-added-lines-carry-a-re
+- 2026-10-23 13:34:20 UTC — [ticket-547] tour 1 — codeur démarré
+- 2026-10-23 13:39:08 UTC — [ticket-547] tour 1 — codeur terminé (288219ms)
+- 2026-10-23 13:39:47 UTC — [ide-core] ticket-545 PR #620 mergée (CI verte)
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-546 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-548 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-552 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-553 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-556 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-558 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-559 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-560 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-561 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-562 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-23 13:46:23 UTC — [ticket-547] testeur: 1 failed, 1700 passed, 56 warnings in 431.94s (0:07:11)
+- 2026-10-23 13:46:23 UTC — [ticket-547] tests rouges au tour 1
+- 2026-10-23 13:46:24 UTC — [ticket-547] tour 2 — codeur démarré
+- 2026-10-23 13:47:48 UTC — [ticket-547] tour 2 — codeur terminé (84202ms)
+- 2026-10-23 13:56:14 UTC — [ticket-547] testeur: OK (exit 0)
+- 2026-10-23 14:00:31 UTC — [ticket-547] securite: PASS — Aucune vulnérabilité introduite. Le contrôle de secrets s'appuie sur des pattern (256250ms)
+- 2026-10-23 14:00:31 UTC — [ticket-547] tour 2 — reviewer démarré
+- 2026-10-23 14:00:49 UTC — [ticket-547] tour 2 — reviewer terminé (18640ms)
+- 2026-10-23 14:03:51 UTC — [ticket-547] validateur: fichiers cités joints : backend/src/tessera/services/secrets_diff.py
+- 2026-10-23 14:03:51 UTC — [ticket-547] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (200187ms)
+- 2026-10-23 14:03:51 UTC — [ticket-547] APPROVED après 2 tour(s)
+- 2026-10-23 14:11:48 UTC — [ticket-547] documentation: 2 fichier(s) (471125ms) — après tour de correction

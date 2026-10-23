@@ -1,14 +1,14 @@
 ---
-id: ticket-547
-title: "A push is refused when the added lines carry a recognisable secret"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-23
+id: ticket-547
+pr_number: 622
+priority: high
+status: done
+title: A push is refused when the added lines carry a recognisable secret
+type: feat
 ---
 
 # ticket-547 — Contrôle déterministe des secrets avant le push
