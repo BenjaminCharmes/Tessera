@@ -4431,3 +4431,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 10:36:06 UTC — [ticket-544] validateur: fichiers cités joints : backend/tests/test_longueur_des_fichiers.py, backend/src/tessera (dossier, 6 fichiers)
 - 2026-10-23 10:36:06 UTC — [ticket-544] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le test vérifie bien que les fic (155468ms)
 - 2026-10-23 10:36:06 UTC — [ticket-544] APPROVED après 1 tour(s)
+- 2026-10-23 10:38:31 UTC — [ticket-544] documentation: 0 fichier(s) (139233ms) — après tour de correction
