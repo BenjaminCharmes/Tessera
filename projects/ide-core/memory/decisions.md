@@ -521,3 +521,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : le 22/10, Haiku a deviné noms, numéros et chiffres que seul le code porte ; deux lots ont été jetés.
 **Alternative rejetée** : un outil `Read` — ces rôles n'ont pas d'outils, et un modèle qui explore coûte sans rien prouver.
 **Détail** : `docs/superpowers/specs/2026-10-23-documentation-depuis-le-code-design.md`
+
+---
+
+## ADR-058 — Le Bureau remplace Supervision, et rien n'y est décoratif
+
+**Date** : 2026-10-23
+**Décision** : la vue Bureau devient la vue par défaut de Supervision ; elle garde toutes ses fonctions (cartes, fil, rangement, services) et la vue Liste reste dans le sélecteur. Chaque sprite, objet ou bulle rend un état réel que le store de run ou l'API fournit déjà ; sans donnée, rien n'est dessiné avant son ticket backend. Les sprites sont des SVG inline en pixels, sous `design/bureau/`, animés par `transform` et `opacity`, coupés par `prefers-reduced-motion`. Au-delà de 6 projets avec un run : une rangée par projet.
+**Raison** : la Liste reste nécessaire au clavier et au lecteur d'écran ; un décor qui ment sur l'état ruine la confiance dans la vue.
+**Alternative rejetée** : canvas — il ne se teste pas avec Testing Library et un lecteur d'écran ne le lit pas.
+**Détail** : `docs/superpowers/specs/2026-10-23-vue-bureau-design.md`
