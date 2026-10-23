@@ -1,14 +1,14 @@
 ---
-id: ticket-545
-title: "A frontend file can no longer grow past its ceiling"
-type: test
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-23
+id: ticket-545
+pr_number: 620
+priority: medium
+status: done
+title: A frontend file can no longer grow past its ceiling
+type: test
 ---
 
 # ticket-545 — Un cliquet sur la longueur des fichiers frontend
