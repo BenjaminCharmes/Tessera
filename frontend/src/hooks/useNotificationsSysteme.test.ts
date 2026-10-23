@@ -115,4 +115,20 @@ describe("useNotificationsSysteme — dans l'app desktop (ticket-200)", () => {
     expect(vi.mocked(sendNotification).mock.calls[0][0]).toMatchObject({ body: "On casse l'API ?" });
     expect(creees).toHaveLength(0);
   });
+
+  // Pas de clic desktop en 2.5.0 (ticket-556) : on fige l'état pour qu'un
+  // changement du plugin se voie ici, pas par un projet qui ne s'ouvre pas.
+  it("sends a desktop notification without an action type and never opens the project by itself", async () => {
+    const ouvrir = vi.fn();
+    const { rerender } = renderHook(
+      ({ etat }: { etat: StreamState }) => useNotificationsSysteme(supervision(etat), "ide-core", ouvrir),
+      { initialProps: { etat: { ...INITIAL, status: "running" } } },
+    );
+    rerender({ etat: { ...INITIAL, status: "running", pendingQuestion: "?" } });
+
+    await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(1));
+    const options = vi.mocked(sendNotification).mock.calls[0][0];
+    expect(options).not.toHaveProperty("actionTypeId");
+    expect(ouvrir).not.toHaveBeenCalled();
+  });
 });
