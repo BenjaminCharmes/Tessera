@@ -4678,3 +4678,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 20:55:01 UTC — [ticket-548] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
 - 2026-10-23 20:55:01 UTC — [ticket-548] validateur: APPROVED — Tous les critères sont satisfaits. Le module `regles_conflit.py` implémente quat (333609ms)
 - 2026-10-23 20:55:01 UTC — [ticket-548] APPROVED après 3 tour(s)
+- 2026-10-23 21:00:06 UTC — [ticket-548] documentation: 0 fichier(s) (300264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « class GitWorkspaceService(GitTicketOnBase, GitSync, GitBranc » (backend/src/tessera/servic
