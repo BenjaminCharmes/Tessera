@@ -4537,3 +4537,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 14:36:54 UTC — [ticket-568] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
 - 2026-10-23 14:36:54 UTC — [ticket-568] validateur: APPROVED — Les quatre critères sont satisfaits. Le code implémente le retest après rebase v (343594ms)
 - 2026-10-23 14:36:54 UTC — [ticket-568] APPROVED après 1 tour(s)
+- 2026-10-23 14:42:45 UTC — [ticket-568] documentation: 0 fichier(s) (345702ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « Dans la phase 1 de livraison, après le rebase et avant le pu » (ticket-568) n'est ni dans 
