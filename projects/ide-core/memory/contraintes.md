@@ -12,6 +12,11 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Une édition de documentation cite le code livré qui la fonde.** Un
+  nombre, un numéro d'ADR ou un nom absent du diff et des fichiers fournis
+  n'entre pas dans la doc ; le texte d'un ticket dit l'intention, pas les
+  faits. (ADR-057)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,

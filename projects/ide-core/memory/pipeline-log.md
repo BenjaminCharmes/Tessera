@@ -4340,3 +4340,17 @@ Le change (99454ms)
 - 2026-10-22 16:02:41 UTC — [ticket-538] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le type d'événeme (155920ms)
 - 2026-10-22 16:02:41 UTC — [ticket-538] APPROVED après 1 tour(s)
 - 2026-10-22 16:05:30 UTC — [ticket-538] documentation: 1 fichier(s) (163609ms)
+- 2026-10-23 06:57:46 UTC — [ticket-535] branche ticket-535-batch-documentation-is-written-from-the-delivered
+- 2026-10-23 06:59:12 UTC — [ticket-535] plan rendu (84889ms)
+- 2026-10-23 06:59:12 UTC — [ticket-535] tour 1 — codeur démarré
+- 2026-10-23 07:02:45 UTC — [ticket-535] tour 1 — architect terminé (213093ms)
+- 2026-10-23 07:13:08 UTC — [ticket-535] testeur: OK (exit 0)
+- 2026-10-23 07:13:39 UTC — [ticket-535] securite: PASS — Aucune vulnérabilité détectée. Ce diff contient uniquement de la documentation d (30422ms)
+- 2026-10-23 07:13:39 UTC — [ticket-535] tour 1 — reviewer démarré
+- 2026-10-23 07:14:04 UTC — [ticket-535] tour 1 — reviewer terminé (25187ms)
+- 2026-10-23 07:18:39 UTC — [ticket-535] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 07:19:11 UTC — [ticket-535] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-23 07:19:11 UTC — [ticket-535] validateur: APPROVED — La conception est complète et bien structurée. ADR-057 décrit précisément ce que (332155ms)
+- 2026-10-23 07:19:11 UTC — [ticket-535] APPROVED après 1 tour(s)
+- 2026-10-23 07:19:16 UTC — [ticket-535] fichiers non suivis laissés par le run : tickets/todo/ticket-540-documentation-code-material-filtered-bounded-diff-per-ticket-and-touched-files.md, tickets/todo/ticket-541-the-documentation-batch-reads-the-delivered-code-oldest-tickets-first.md, tickets/todo/ticket-542-a-documentation-edit-must-quote-the-code-that-supports-it.md, tickets/todo/ticket-543-documentation-roles-default-to-sonnet.md (à ignorer dans .gitignore ?)
+- 2026-10-23 07:21:10 UTC — [ticket-535] documentation: 1 fichier(s) (114218ms)

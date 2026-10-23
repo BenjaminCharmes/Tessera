@@ -1,15 +1,16 @@
 ---
-id: ticket-535
-title: "Batch documentation is written from the delivered code, not guessed from tickets"
-type: design
-status: todo
-pr_number: null
-priority: high
 agent: architect
-depends_on: ["ticket-534"]
-estimated_days: 1
 created: 2026-10-22
+depends_on:
+- ticket-534
+estimated_days: 1
+id: ticket-535
 plan: true
+pr_number: 606
+priority: high
+status: done
+title: Batch documentation is written from the delivered code, not guessed from tickets
+type: design
 ---
 
 # ticket-535 — La doc par lot s'écrit depuis le code livré
