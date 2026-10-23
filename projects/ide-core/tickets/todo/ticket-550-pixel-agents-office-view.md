@@ -35,11 +35,13 @@ vue doit faire ressortir ce qui demande une action humaine.
   DOM, coût dans Tauri quand dix agents tournent, mouvement réduit
   (`prefers-reduced-motion`).
 - Couleurs : charte de l'ADR-026 (états) et `violet` réservé à l'identité.
-- Maquette Artifact Design avant tout ticket d'implémentation.
+- Maquette faite le 23/10 : `design/maquette/Bureau.dc.html`
+  (https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE). La conception part
+  d'elle et dit ce qu'elle change.
 
 ## Critères d'acceptation
 - [ ] Une ADR au prochain numéro libre de `memory/decisions.md` décrit la vue retenue, ou pourquoi elle est écartée
-- [ ] Le livrable cite la maquette (lien ou fichier sous `design/maquette/`)
+- [ ] Le livrable cite `design/maquette/Bureau.dc.html` et liste, écran par écran, les données de l'API qui alimentent chaque élément
 - [ ] Le livrable liste les tickets d'implémentation qui en découlent, chacun avec ses critères vérifiables
 
 ## Ce que ça ne fait pas

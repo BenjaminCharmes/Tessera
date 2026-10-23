@@ -37,8 +37,8 @@ comme un badge dans la vue du run, avec les couleurs d'état de l'ADR-026
 ## Critères d'acceptation
 - [ ] Une fonction pure du frontend rend l'état, avec un test par seuil (29 s actif, 31 s attente, 181 s blocage suspecté)
 - [ ] Un test montre qu'une question en attente rend `question` quel que soit le temps écoulé
-- [ ] La vue du run affiche un badge d'état, et un test React Testing Library le vérifie pour `blocage_suspecte`
-- [ ] Le badge n'utilise que `green`, `amber`, `red` et `blue`
+- [ ] La vue du run affiche une pastille d'état, et un test React Testing Library le vérifie pour `blocage_suspecte`
+- [ ] La pastille rend « travaille » en `blue`, « silencieux » en `zinc`, « question » en `amber` et « figé ? » en `red`, et un test le vérifie
 - [ ] Le diff ne modifie aucun fichier de `backend/`
 
 ## Ce que ça ne fait pas
