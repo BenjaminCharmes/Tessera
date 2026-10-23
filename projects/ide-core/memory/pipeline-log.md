@@ -4367,3 +4367,17 @@ Le change (99454ms)
 - 2026-10-23 08:42:13 UTC — [ticket-540] validateur: APPROVED — Le codeur a livré une implémentation complète et bien testée du ticket-540 : deu (116640ms)
 - 2026-10-23 08:42:13 UTC — [ticket-540] APPROVED après 1 tour(s)
 - 2026-10-23 08:43:17 UTC — [ticket-540] documentation: 1 fichier(s) (50421ms)
+- 2026-10-23 08:49:39 UTC — [ide-core] ticket-540 PR #608 mergée (CI verte)
+- 2026-10-23 08:49:45 UTC — [ide-core] ticket-540 : base réalignée sur develop
+- 2026-10-23 08:49:45 UTC — [ide-core] ticket-540 PR #608 confiée au CIWatcher
+- 2026-10-23 08:50:01 UTC — [ticket-543] branche ticket-543-documentation-roles-default-to-sonnet
+- 2026-10-23 08:50:06 UTC — [ticket-543] tour 1 — codeur démarré
+- 2026-10-23 08:53:18 UTC — [ticket-543] tour 1 — codeur terminé (192000ms)
+- 2026-10-23 09:08:21 UTC — [ticket-543] testeur: OK (exit 0)
+- 2026-10-23 09:09:13 UTC — [ticket-543] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie simplement la configuration des m (52422ms)
+- 2026-10-23 09:09:13 UTC — [ticket-543] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-23 09:09:13 UTC — [ticket-543] tour 1 — reviewer démarré
+- 2026-10-23 09:09:28 UTC — [ticket-543] tour 1 — reviewer terminé (15047ms)
+- 2026-10-23 09:09:47 UTC — [ticket-543] validateur: fichiers cités joints : services/documentation.py (tronqué) ; non joints (budget épuisé) : modeles_par_defaut.py, agents.json
+- 2026-10-23 09:09:47 UTC — [ticket-543] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute correctement `ROLES_REDACTION` (33436ms)
+- 2026-10-23 09:09:47 UTC — [ticket-543] APPROVED après 1 tour(s)
