@@ -133,6 +133,41 @@ async def test_un_commit_de_cloture_n_est_pas_pris_pour_le_travail(
     assert "x = 3" in resultat.diff, "le diff rendu est celui de la cloture"
 
 
+async def _branche_depuis_develop(depot: Path) -> None:
+    """`develop` is ahead of `main`; the ticket branch is cut from `develop`
+    and stays checked out, as the run's own ticket does."""
+    await _git(depot, "checkout", "-q", "-b", "develop")
+    (depot / "dev.py").write_text("d = 1\n", encoding="utf-8")
+    await _git(depot, "add", "dev.py")
+    await _git(depot, "commit", "-qm", "chore: develop moves on")
+    await _git(depot, "checkout", "-q", "-b", "ticket-005-x")
+    (depot / "app.py").write_text("x = 5\n", encoding="utf-8")
+    await _git(depot, "commit", "-qam", "feat: ticket-005 — x")
+
+
+async def test_an_explicit_base_replaces_main_for_the_ticket_on_its_branch(
+    depot: Path,
+) -> None:
+    # Sur sa branche, la reference etait `main` : avec une base `develop`, le
+    # diff contenait tout ce que `develop` a de plus.
+    await _branche_depuis_develop(depot)
+
+    resultat = await diff_du_ticket(depot, "ticket-005", base="develop")
+
+    assert resultat.files == ["app.py"]
+    assert "dev.py" not in resultat.diff
+
+
+async def test_without_a_base_the_history_screen_keeps_its_behaviour(
+    depot: Path,
+) -> None:
+    await _branche_depuis_develop(depot)
+
+    resultat = await diff_du_ticket(depot, "ticket-005")
+
+    assert resultat.files == ["app.py", "dev.py"]
+
+
 async def test_un_ticket_jamais_lance_n_a_ni_branche_ni_commit(depot: Path) -> None:
     resultat = await diff_du_ticket(depot, "ticket-999")
 
