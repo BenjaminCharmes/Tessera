@@ -4751,3 +4751,16 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 23:03:33 UTC — [ticket-556] CHANGES_REQUESTED tour 3: Validateur : Le ticket est correctement traité : il indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics desktop. Le test vérifie cette absence d'action, et le f
 - 2026-10-23 23:03:33 UTC — [ticket-556] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-23 23:03:38 UTC — [ide-core] file interrompue : ticket-556 non approuvé
+- 2026-10-23 23:06:19 UTC — [ticket-558] branche ticket-558-a-quota-reading-is-kept-per-window-and-can-be-rea
+- 2026-10-23 23:06:19 UTC — [ticket-558] tour 1 — codeur démarré
+- 2026-10-23 23:09:59 UTC — [ticket-558] tour 1 — codeur terminé (219813ms)
+- 2026-10-23 23:20:10 UTC — [ticket-558] testeur: OK (exit 0)
+- 2026-10-23 23:21:19 UTC — [ticket-558] securite: PASS — Aucune vulnérabilité détectée.
+
+Le diff ajoute :
+1. Deux modèles Pydantic (`Quot (69656ms)
+- 2026-10-23 23:21:19 UTC — [ticket-558] tour 1 — reviewer démarré
+- 2026-10-23 23:21:38 UTC — [ticket-558] tour 1 — reviewer terminé (18469ms)
+- 2026-10-23 23:23:49 UTC — [ticket-558] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers)
+- 2026-10-23 23:23:49 UTC — [ticket-558] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (149062ms)
+- 2026-10-23 23:23:49 UTC — [ticket-558] APPROVED après 1 tour(s)
