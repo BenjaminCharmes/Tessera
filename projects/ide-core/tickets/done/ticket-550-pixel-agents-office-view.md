@@ -1,15 +1,17 @@
 ---
-id: ticket-550
-title: "Design of the office view that replaces Supervision, where each running agent is a character"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
-depends_on: ["ticket-549"]
-estimated_days: 1
 created: 2026-10-23
+depends_on:
+- ticket-549
+estimated_days: 1
+id: ticket-550
 plan: true
+pr_number: 618
+priority: medium
+status: done
+title: Design of the office view that replaces Supervision, where each running agent
+  is a character
+type: design
 ---
 
 # ticket-550 — Conception de la vue « Bureau », qui remplace Supervision

@@ -16,6 +16,10 @@ section. (ADR-055)
   nombre, un numéro d'ADR ou un nom absent du diff et des fichiers fournis
   n'entre pas dans la doc ; le texte d'un ticket dit l'intention, pas les
   faits. (ADR-057)
+- **Rien n'est décoratif dans le Bureau.** Chaque sprite, objet ou bulle rend
+  un état que le store de run ou l'API fournit ; sans donnée, on ne le
+  dessine pas. Les sprites vivent sous `design/bureau/`, leurs tons sont des
+  jetons `--sprite-*` du `@theme`, jamais une famille CSS brute. (ADR-058)
 
 ## Git et périmètre d'écriture
 

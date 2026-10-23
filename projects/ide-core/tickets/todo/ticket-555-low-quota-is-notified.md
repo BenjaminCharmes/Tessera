@@ -6,7 +6,7 @@ status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: ["ticket-550"]
+depends_on: ["ticket-550", "ticket-558"]
 estimated_days: 0.25
 created: 2026-10-23
 ---
