@@ -4618,3 +4618,37 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 18:50:27 UTC — [ticket-571] CHANGES_REQUESTED tour 3: Validateur : Les trois premiers critères sont excellemment satisfaits : le minuteur indépendant de la boucle tue la commande à l'échéance même quand la boucle est bloquée (test de synchrone), s'annule
 - 2026-10-23 18:50:27 UTC — [ticket-571] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-23 18:50:31 UTC — [ide-core] file interrompue : ticket-571 non approuvé
+- 2026-10-23 18:57:16 UTC — [ticket-571] branche ticket-571-the-test-command-is-cut-at-its-deadline-even-when
+- 2026-10-23 18:58:06 UTC — [ticket-571] plan rendu (48875ms)
+- 2026-10-23 18:58:06 UTC — [ticket-571] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-10-23 18:58:06 UTC — [ticket-571] tour 1 — codeur démarré
+- 2026-10-23 19:01:14 UTC — [ticket-571] tour 1 — codeur terminé (187311ms)
+- 2026-10-23 19:10:07 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 19:11:51 UTC — [ticket-571] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH introduite. Le code ajoute un minuteur ind (103812ms)
+- 2026-10-23 19:11:51 UTC — [ticket-571] tour 1 — reviewer démarré
+- 2026-10-23 19:12:28 UTC — [ticket-571] tour 1 — reviewer terminé (36828ms)
+- 2026-10-23 19:16:51 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 19:17:37 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 19:17:37 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Le code implémente un minuteur indépendant de la boucle d'événements qui tue les (345936ms)
+- 2026-10-23 19:17:37 UTC — [ticket-571] CHANGES_REQUESTED tour 1: Validateur : Le code implémente un minuteur indépendant de la boucle d'événements qui tue les processus à leur échéance, couvert par trois tests solides (boucle bloquée, annulation normale, ligne de l
+- 2026-10-23 19:17:37 UTC — [ticket-571] tour 2 — codeur démarré
+- 2026-10-23 19:18:02 UTC — [ticket-571] tour 2 — codeur terminé (25156ms)
+- 2026-10-23 19:27:40 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 19:29:17 UTC — [ticket-571] securite: PASS — Refactoring de test_runner.py avec ajout d'un minuteur indépendant de la boucle  (96531ms)
+- 2026-10-23 19:29:17 UTC — [ticket-571] tour 2 — reviewer démarré
+- 2026-10-23 19:29:51 UTC — [ticket-571] tour 2 — reviewer terminé (34750ms)
+- 2026-10-23 19:34:17 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 19:35:24 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 19:35:24 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Le code implémente un minuteur indépendant de la boucle d'événements (ticket-571 (367313ms)
+- 2026-10-23 19:35:24 UTC — [ticket-571] CHANGES_REQUESTED tour 2: Validateur : Le code implémente un minuteur indépendant de la boucle d'événements (ticket-571) couvert par trois tests solides : blocage de la boucle et terminaison du processus, annulation du minuteu
+- 2026-10-23 19:35:24 UTC — [ticket-571] tour 3 — codeur démarré
+- 2026-10-23 19:35:40 UTC — [ticket-571] tour 3 — codeur terminé (15750ms)
+- 2026-10-23 19:45:17 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 19:46:57 UTC — [ticket-571] securite: PASS — Audit de ticket-571 : refactorisation du lanceur de tests avec minuteur indépend (100578ms)
+- 2026-10-23 19:46:57 UTC — [ticket-571] tour 3 — reviewer démarré
+- 2026-10-23 19:47:27 UTC — [ticket-571] tour 3 — reviewer terminé (29655ms)
+- 2026-10-23 19:51:57 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 19:53:41 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 19:53:41 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Le minuteur indépendant de la boucle d'événements fonctionne correctement : troi (403562ms)
+- 2026-10-23 19:53:41 UTC — [ticket-571] CHANGES_REQUESTED tour 3: Validateur : Le minuteur indépendant de la boucle d'événements fonctionne correctement : trois tests solides couvrent le blocage avec terminaison du processus, l'annulation normale, et l'affichage de 
+- 2026-10-23 19:53:41 UTC — [ticket-571] BLOCKED après 3 tour(s) sans approbation
