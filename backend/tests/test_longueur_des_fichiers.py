@@ -9,7 +9,7 @@ PLAFOND_GENERAL = 300
 # un découpage baisse l'entrée (ou la retire sous 300 lignes), jamais l'inverse.
 PLAFONDS: dict[str, int] = {
     "routers/chat.py": 378,
-    "routers/orchestrator.py": 1118,
+    "routers/orchestrator.py": 1115,
     "routers/projects.py": 826,
     "routers/tickets.py": 563,
     "services/agent_runner.py": 304,
@@ -20,7 +20,7 @@ PLAFONDS: dict[str, int] = {
     "services/git_workspace.py": 2294,
     "services/github_service.py": 592,
     "services/github_workflow.py": 520,
-    "services/livraison.py": 631,
+    "services/livraison.py": 626,
     "services/orchestrator.py": 1341,
     "services/pipeline_outcomes.py": 490,
     "services/pipeline_stages.py": 842,

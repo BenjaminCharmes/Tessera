@@ -4523,3 +4523,18 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 14:03:51 UTC — [ticket-547] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (200187ms)
 - 2026-10-23 14:03:51 UTC — [ticket-547] APPROVED après 2 tour(s)
 - 2026-10-23 14:11:48 UTC — [ticket-547] documentation: 2 fichier(s) (471125ms) — après tour de correction
+- 2026-10-23 14:12:09 UTC — [ide-core] ticket-547 PR #622 confiée au CIWatcher
+- 2026-10-23 14:12:11 UTC — [ticket-568] branche ticket-568-the-tests-run-again-before-the-push-when-the-reba
+- 2026-10-23 14:13:28 UTC — [ticket-568] plan rendu (76061ms)
+- 2026-10-23 14:13:28 UTC — [ticket-568] tour 1 — codeur démarré
+- 2026-10-23 14:17:42 UTC — [ide-core] ticket-547 PR #622 mergée (CI verte)
+- 2026-10-23 14:19:43 UTC — [ticket-568] tour 1 — codeur terminé (374843ms)
+- 2026-10-23 14:29:21 UTC — [ticket-568] testeur: OK (exit 0)
+- 2026-10-23 14:31:11 UTC — [ticket-568] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le diff ajoute une fonctionnalit (109967ms)
+- 2026-10-23 14:31:11 UTC — [ticket-568] tour 1 — reviewer démarré
+- 2026-10-23 14:31:37 UTC — [ticket-568] tour 1 — reviewer terminé (26625ms)
+- 2026-10-23 14:36:11 UTC — [ticket-568] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 14:36:54 UTC — [ticket-568] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 14:36:54 UTC — [ticket-568] validateur: APPROVED — Les quatre critères sont satisfaits. Le code implémente le retest après rebase v (343594ms)
+- 2026-10-23 14:36:54 UTC — [ticket-568] APPROVED après 1 tour(s)
+- 2026-10-23 14:42:45 UTC — [ticket-568] documentation: 0 fichier(s) (345702ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « Dans la phase 1 de livraison, après le rebase et avant le pu » (ticket-568) n'est ni dans 

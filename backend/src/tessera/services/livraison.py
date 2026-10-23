@@ -19,7 +19,9 @@ import httpx
 from tessera.config import settings
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
+from tessera.services.livraison_arrets import arret_ci_illisible, arret_conflit
 from tessera.services.politique_run import PolitiqueRun
+from tessera.services.retest_apres_rebase import RetestApresRebase
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -113,6 +115,7 @@ class LivraisonService:
         resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
         politique: PolitiqueRun | None = None,
         post_pr_callback: Callable[[str, int, str], Awaitable[None]] | None = None,
+        retest: RetestApresRebase | None = None,
     ) -> None:
         self._git = git_workspace
         self._workflow = workflow
@@ -133,6 +136,8 @@ class LivraisonService:
         # pr_number dans le ticket, commite et pousse, de sorte qu'aucun
         # commit ne soit laissé sur la branche après le merge (ticket-270).
         self._post_pr_callback = post_pr_callback
+        # Rejoue les tests quand le rebase ramène des commits (ticket-568).
+        self._retest = retest
 
     async def livrer_phase_1(
         self,
@@ -207,6 +212,10 @@ class LivraisonService:
             if changee is not None:
                 return changee
 
+        # Avant le rebase : après lui, la base est toujours ancêtre de HEAD.
+        retest = self._retest
+        avancee = retest is not None and await retest.base_a_avance(self._base_branch)
+
         t0 = time.monotonic()
         try:
             conflits = await self._git.rejouer_sur(
@@ -235,7 +244,10 @@ class LivraisonService:
                 etapes=tuple(etapes),
                 durees_ms=tuple(durees_ms),
                 conflits=conflits,
-                arret=self._arret_conflit(conflits, resolus),
+                arret=arret_conflit(
+                    self._base_branch, conflits, resolus, self._resolveur is not None,
+                    getattr(self._git, "raison_resolveur", None),
+                ),
             )
         etapes.append(f"rebase sur {self._base_branch}")
         durees_ms.append(rebase_ms)
@@ -249,6 +261,17 @@ class LivraisonService:
             # La résolution est incluse dans la durée du rebase ci-dessus.
             etapes.append("conflit résolu : " + ", ".join(resolus))
             durees_ms.append(0.0)
+
+        # Un rouge ne pousse rien : le travail passait sur l'ancienne base
+        # (ticket-568). Ni reviewer ni validateur, le diff n'a pas changé.
+        jugement = await retest.juger(self._base_branch) if retest and avancee else None
+        if jugement is not None:
+            etapes.append(jugement.etape)
+            durees_ms.append(jugement.duree_ms)
+            if jugement.arret is not None:
+                return Livraison(
+                    etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=jugement.arret
+                )
 
         t0 = time.monotonic()
         try:
@@ -428,7 +451,9 @@ class LivraisonService:
                 etapes=tuple(etapes),
                 durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
-                arret=self._arret_ci_illisible(pr_number),
+                arret=arret_ci_illisible(
+                    getattr(self._workflow, "code_http_ci", None), pr_number
+                ),
             )
         if ci == "conflicting":
             return Livraison(
@@ -552,36 +577,6 @@ class LivraisonService:
         return (
             f"la tête de la PR #{pr_number} n'est plus le commit poussé : "
             f"{lue} au lieu de {sha_attendu[:7]}. La PR reste ouverte."
-        )
-
-    def _arret_conflit(self, conflits: tuple[str, ...], resolus: list[str]) -> str:
-        """The stop line of an unresolved conflict, saying what the resolver did.
-
-        Sans cela, un résolveur jamais appelé et un résolveur tenté en échec
-        donnent la même ligne (ticket-453).
-        """
-        message = f"Conflit avec {self._base_branch} sur : " + ", ".join(conflits)
-        if self._resolveur is None:
-            message += " — résolveur non tenté : aucun résolveur câblé sur cette livraison"
-        elif resolus:
-            raison = getattr(self._git, "raison_resolveur", None)
-            message += (
-                f" — résolveur tenté sur {', '.join(resolus)}, sans succès"
-                + (f" : {raison}" if isinstance(raison, str) and raison else "")
-            )
-        else:
-            message += " — résolveur non tenté : le rebase ne l'a pas appelé"
-        return message + ". La branche est restée intacte, à toi de trancher."
-
-    def _arret_ci_illisible(self, pr_number: int) -> str:
-        """Le message d'arrêt quand le jeton ne peut pas lire la CI (ticket-449)."""
-        code = getattr(self._workflow, "code_http_ci", None)
-        precision = f" (HTTP {code})" if isinstance(code, int) else ""
-        return (
-            "Le jeton GitHub de Tessera ne peut pas lire la CI de ce dépôt"
-            f"{precision} : il lui faut les permissions Actions et Commit "
-            f"statuses en lecture. La PR #{pr_number} reste "
-            "ouverte, rien n'est mergé."
         )
 
     async def _attendre_la_ci(self, pr_number: int) -> str:

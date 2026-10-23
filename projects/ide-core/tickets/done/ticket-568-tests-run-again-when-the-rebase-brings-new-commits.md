@@ -1,15 +1,15 @@
 ---
-id: ticket-568
-title: "The tests run again before the push when the rebase brought new base commits"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-23
+id: ticket-568
 plan: true
+pr_number: 623
+priority: high
+status: done
+title: The tests run again before the push when the rebase brought new base commits
+type: feat
 ---
 
 # ticket-568 — Les tests repassent quand le rebase a ramené des commits
