@@ -600,3 +600,21 @@ def test_contraintes_md_tient_sous_12000_caracteres() -> None:
     assert taille <= 12_000, (
         f"contraintes.md : {taille} caractères pour 12 000 permis"
     )
+
+
+@pytest.mark.parametrize("role", ["doc-technique", "doc-fonctionnelle"])
+def test_prompts_de_documentation_decrivent_ce_que_le_brief_donne(role: str) -> None:
+    """The documentation prompts match the four blocks `_brief` sends (ticket-541).
+
+    Le prompt disait « Pas les diffs » et « n'invente rien qui ne soit pas dans
+    les tickets » au moment où le brief a commencé à livrer le diff : l'agent
+    recevait des diffs qu'on lui disait de ne pas lire.
+    """
+    texte = _lire(f"agents/prompts/{role}.md")
+
+    assert "Pas les diffs" not in texte
+    assert "N'invente rien qui ne soit pas dans les tickets" not in texte
+    for bloc in ("Les tickets", "Le diff de chaque ticket", "Les fichiers touchés", "Le contenu actuel"):
+        assert bloc in texte, f"{role} : le bloc « {bloc} » n'est pas décrit"
+    assert "ni dans le diff ni dans les fichiers touchés" in texte
+    assert '{"editions": []}' in texte

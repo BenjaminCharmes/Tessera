@@ -13,10 +13,12 @@ import pytest
 
 from tessera.config import settings
 from tessera.routers import orchestrator as routeur
+from tessera.services import documentation
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.run_dans_worktree import ouvrir_worktree
 from tessera.services.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
+from tests.matiere_factice import matiere_factice
 from tests.test_providers_base import FakeProvider
 
 PROJET = "checkout"
@@ -73,6 +75,8 @@ def depot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(settings, "ide_workspace_dir", repo.parent)
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
     monkeypatch.setattr(routeur, "provider_pour_role", _fournisseurs_factices)
+    # Le diff d'un ticket se prend sur sa branche : ces tickets n'en ont pas.
+    monkeypatch.setattr(documentation, "matiere_du_lot", matiere_factice())
     return repo
 
 

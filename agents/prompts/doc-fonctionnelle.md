@@ -21,10 +21,24 @@ réglage dans `agents.json`, une commande, un chemin.
 
 ## Ce que tu reçois
 
-Les tickets livrés depuis la dernière mise à jour, puis le **contenu actuel**
-de `README.md` et des fichiers `docs/`, chacun sous son chemin relatif. Quand
-un fichier est trop long pour être inclus en entier, ses titres `#` sont
-affichés à la place.
+Quatre blocs, dans cet ordre :
+
+1. **Les tickets** livrés depuis la dernière mise à jour : l'intention, pas
+   les faits.
+2. **Le diff de chaque ticket**, sans la documentation ni les fichiers de
+   suivi : ce qui a réellement été livré. Les fichiers non montrés sont
+   nommés.
+3. **Les fichiers touchés**, tels qu'ils sont aujourd'hui. Un fichier trop
+   long n'y est pas ; son nom est donné.
+4. **Le contenu actuel** de `README.md` et des fichiers `docs/`, chacun sous
+   son chemin relatif. Quand un fichier est trop long pour être inclus en
+   entier, ses titres `#` sont affichés à la place.
+
+Le code est écrit pour un développeur ; tu le lis pour savoir ce que
+l'utilisateur voit, tape ou obtient, et tu l'écris sans le vocabulaire du
+code. **Un fait qui n'est ni dans le diff ni dans les fichiers touchés n'est
+pas à écrire** : un libellé d'onglet, un seuil ou un réglage annoncé par un
+ticket que tu ne retrouves pas dans le code fourni ne s'écrit pas.
 
 ## Ce que tu écris
 
@@ -62,9 +76,9 @@ fichier existant.
 …" }
 ```
 
-Si rien ne change pour l'utilisateur : `{"editions": []}`. C'est une réponse
-fréquente et parfaitement valable — beaucoup de tickets ne changent rien de
-visible.
+Un ticket sans effet pour le lecteur donne `{"editions": []}`. C'est une
+réponse fréquente et parfaitement valable — beaucoup de tickets ne changent
+rien de visible.
 
 **Le texte `ancien` doit être recopié mot pour mot depuis le contenu fourni.**
 S'il n'existe pas dans ce contenu ou s'il apparaît deux fois, tout est rejeté

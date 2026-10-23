@@ -41,6 +41,7 @@ from tessera.services.providers.par_role import modele_du_role, provider_pour_ro
 from tessera.services.providers.repli import ProviderAvecRepli
 from tessera.services.security_auditor import SecurityAuditorService
 from tessera.services.validator import ValidatorService
+from tests.matiere_factice import matiere_factice
 from tests.test_agent_runner import _make_ticket, _runner
 from tests.test_providers_base import FakeProvider
 
@@ -349,7 +350,10 @@ async def test_la_documentation_prend_provider_et_modele_par_role(tmp_path: Path
     def fournisseur(role: str) -> tuple[FakeProvider, str]:
         return (technique, "qwen") if role == "doc-technique" else (fonctionnel, "claude-haiku-4-5")
 
-    svc = DocumentationService(FakeProvider(), _prompts(tmp_path), fournisseur=fournisseur)
+    svc = DocumentationService(
+        FakeProvider(), _prompts(tmp_path), fournisseur=fournisseur,
+        matiere=matiere_factice(),
+    )
     await svc.mettre_a_jour(projet)
 
     assert technique.calls and technique.calls[0]["model"] == "qwen"

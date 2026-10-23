@@ -1050,6 +1050,13 @@ class Orchestrator:
             f" ({doc_ms}ms){correction}{motifs}"
         )
         tickets = list(getattr(doc, "tickets", []) or [])
+        # Un ticket sans diff retrouvable n'est pas documenté : le journal le
+        # dit, ticket par ticket (ticket-541).
+        ecartes = list(getattr(doc, "ecartes", []) or [])
+        for ecarte in ecartes:
+            self._log(
+                f"[{ecarte}] documentation: pas de diff retrouvable, non documenté"
+            )
         tronque = bool(getattr(doc, "tronque", False))
         marqueur_ecrit = bool(getattr(doc, "marqueur_ecrit", False))
         # Commiter si des fichiers de doc ont changé **ou** si le marqueur a
@@ -1063,7 +1070,7 @@ class Orchestrator:
             except Exception as exc:  # noqa: BLE001
                 _logger.warning("documentation_commit_echoue", extra={"erreur": str(exc)})
                 refus.append(f"commit : {exc}")
-        if fichiers or refus or tronque:
+        if fichiers or refus or tronque or ecartes:
             await on_event(
                 OrchestratorEvent(
                     type=EventType.DOC_UPDATED,
@@ -1073,6 +1080,7 @@ class Orchestrator:
                         "refus": refus,
                         "tickets": tickets,
                         "tronque": tronque,
+                        "ecartes": ecartes,
                     },
                 )
             )

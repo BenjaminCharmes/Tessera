@@ -11,6 +11,8 @@ import pytest
 
 from tessera.config import settings
 from tessera.routers import orchestrator as routeur
+from tessera.services import documentation
+from tests.matiere_factice import matiere_factice
 from tests.test_providers_base import FakeProvider
 
 PROJET = "demo"
@@ -59,6 +61,8 @@ def fournisseurs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, F
     monkeypatch.setattr(
         routeur, "provider_pour_role", lambda _chemin, role, **_: doubles[role]
     )
+    # Le diff d'un ticket se prend sur sa branche : ces tickets n'en ont pas.
+    monkeypatch.setattr(documentation, "matiere_du_lot", matiere_factice())
     return doubles
 
 

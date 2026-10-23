@@ -33,6 +33,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services import documentation_claude_md as claude_md_doc
+from tessera.services.documentation_code import (
+    FournisseurMatiere,
+    MatiereCode,
+    bloc_diffs,
+    bloc_fichiers,
+    matiere_du_lot,
+)
 from tessera.services.providers.base import LLMProvider
 from tessera.services.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.utils.logger import get_logger
@@ -50,10 +57,12 @@ _DOCUMENTABLE = ("README.md", "docs/")
 _PART_MINIMALE = 0.5
 
 #: Nombre maximum de tickets traités en un seul lot (ticket-213). Au-delà,
-#: on garde les N plus récents (les plus grands identifiants) et l'événement
-#: le signale — un lot démesuré épuise le contexte du provider avant même
-#: que le premier agent ait commencé à réfléchir.
-_PLAFOND = 10
+#: on garde les N plus anciens (les plus petits identifiants) et l'événement
+#: le signale : les autres restent hors du marqueur et ouvrent le lot suivant.
+#: Un lot démesuré épuise le contexte du provider, et chaque ticket y apporte
+#: son diff (ticket-541) ; garder les plus récents laissait un trou dans
+#: l'historique documenté que personne ne rattrapait.
+_PLAFOND = 5
 
 #: Volume total de documentation inclus dans le message (en caractères).
 #: Au-delà, un fichier est représenté par ses seuls titres Markdown.
@@ -392,6 +401,9 @@ class ResultatDocumentation:
     marqueur_ecrit: bool = False
     #: True si au moins un agent a nécessité un tour de correction (ticket-395).
     tour_de_correction: bool = False
+    #: Tickets retirés du lot faute de diff retrouvable : marqués documentés,
+    #: jamais lus par un agent (ticket-541).
+    ecartes: list[str] = field(default_factory=list)
 
 
 #: Les deux lectures d'une même livraison. Deux rôles et pas un seul : un agent
@@ -419,8 +431,14 @@ class DocumentationService:
         fournisseur: "Callable[[str], tuple[LLMProvider, str | None]] | None" = None,
         claude_md: Path | None = None,
         roles: tuple[str, ...] = _ROLES,
+        base: str | None = None,
+        matiere: FournisseurMatiere | None = None,
     ) -> None:
         self._provider = provider
+        # La base déclarée du projet et la source de la matière de code : le
+        # diff de chaque ticket se prend contre elle (ticket-541).
+        self._base = base
+        self._matiere = matiere
         # Les rôles à appeler : l'appelant filtre ceux que le projet coupe
         # (ticket-534). Vide, le service ne fait rien.
         self._roles = roles
@@ -474,15 +492,30 @@ class DocumentationService:
         if not tickets:
             return ResultatDocumentation([], [], [])
 
-        # Plafond : on ne garde que les N plus récents (ticket-213).
+        # Plafond : on garde les N plus anciens ; les autres ouvrent le lot
+        # suivant, le marqueur ne les ayant pas vus (ticket-541).
         tronque = len(tickets) > _PLAFOND
-        if tronque:
-            tickets = tickets[-_PLAFOND:]
+        tickets = tickets[:_PLAFOND]
+
+        fournir = self._matiere or matiere_du_lot
+        matiere = await fournir(
+            racine, project_path, [t.id for t in tickets], self._base
+        )
+        ecartes = matiere.sans_diff
+        if ecartes:
+            # Sans diff, rien à documenter : le ticket ne reviendra pas dans
+            # le lot suivant. L'orchestrateur en journalise chaque ligne.
+            marquer_documente(project_path, ecartes)
+            tickets = [t for t in tickets if t.id not in ecartes]
+        if not tickets:
+            return ResultatDocumentation(
+                [], [], [], tronque=tronque, marqueur_ecrit=True, ecartes=ecartes
+            )
 
         modifies: list[str] = []
         refus: list[str] = []
         tour_de_correction = False
-        brief = _brief(tickets, _contenu_documentable(racine))
+        brief = _brief(tickets, matiere, _contenu_documentable(racine))
 
         for role in self._roles:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
@@ -529,7 +562,7 @@ class DocumentationService:
         # si aucune édition n'a été proposée. S'il n'y a que des refus, on
         # réessaiera au prochain run (ticket-213).
         toutes_refusees = not modifies and bool(refus)
-        marqueur_ecrit = False
+        marqueur_ecrit = bool(ecartes)
         if not toutes_refusees:
             marquer_documente(project_path, [t.id for t in tickets])
             marqueur_ecrit = True
@@ -541,6 +574,7 @@ class DocumentationService:
             tronque=tronque,
             marqueur_ecrit=marqueur_ecrit,
             tour_de_correction=tour_de_correction,
+            ecartes=ecartes,
         )
 
 
@@ -591,13 +625,17 @@ def _contenu_documentable(racine: Path, borne: int = _BORNE_DOC) -> str:
     return "\n---\nDocumentation actuelle :\n" + "".join(morceaux)
 
 
-def _brief(tickets: list[TicketADocumenter], contenu_doc: str = "") -> str:
-    """Ce que les agents reçoivent : les tickets, puis la documentation actuelle.
+def _brief(
+    tickets: list[TicketADocumenter], matiere: MatiereCode, contenu_doc: str = ""
+) -> str:
+    """Ce que les agents reçoivent, dans cet ordre : quatre blocs.
 
-    Un diff dit ce qui a bougé ligne à ligne ; un ticket dit ce que le produit
-    fait de plus. C'est la seconde chose qu'on documente, et elle tient en
-    dix fois moins de tokens.  La documentation actuelle permet à l'agent de
-    copier mot pour mot l'ancien texte qu'il souhaite remplacer.
+    1. les tickets (l'intention) ; 2. le diff livré de chaque ticket ;
+    3. le contenu actuel des fichiers que ces diffs touchent ; 4. la
+    documentation actuelle, que l'agent recopie mot pour mot pour remplacer un
+    texte. Un ticket dit ce qu'on voulait, le code dit ce qui existe : un
+    nombre ou un nom absent des deux blocs de code n'est pas à écrire
+    (ADR-057).
     """
     morceaux = [
         "Tickets livrés depuis la dernière mise à jour de la documentation :",
@@ -605,8 +643,8 @@ def _brief(tickets: list[TicketADocumenter], contenu_doc: str = "") -> str:
     ]
     for ticket in tickets:
         morceaux.append(f"## {ticket.id} — {ticket.titre}\n\n{ticket.corps}\n")
-    if contenu_doc:
-        morceaux.append(contenu_doc)
+    suite = (bloc_diffs(matiere), bloc_fichiers(matiere), contenu_doc)
+    morceaux.extend(bloc for bloc in suite if bloc)
     return "\n".join(morceaux)
 
 

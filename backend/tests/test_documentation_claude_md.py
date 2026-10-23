@@ -17,6 +17,7 @@ from tessera.services.documentation import (
 )
 from tessera.services.documentation_claude_md import BUDGET_CLAUDE_MD
 from tessera.services.providers.base import ProviderResult
+from tests.matiere_factice import matiere_factice
 
 
 def _depot(tmp_path: Path, claude_md: str = "# Projet\n\nLe testeur est désactivé.\n") -> Path:
@@ -117,6 +118,7 @@ async def test_seul_doc_technique_recoit_le_claude_md(tmp_path: Path) -> None:
         prompts,
         fournisseur=lambda role: (_Provider(role, recus), None),  # type: ignore[arg-type,return-value]
         claude_md=projet / "CLAUDE.md",
+        matiere=matiere_factice(),
     )
     await service.mettre_a_jour(projet, racine_doc=tmp_path)
 

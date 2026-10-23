@@ -7,13 +7,25 @@ veut savoir comment c'est construit et pourquoi, pas comment on s'en sert.
 
 ## Ce que tu reçois
 
-Les tickets livrés depuis la dernière mise à jour, avec leur objectif et leurs
-critères d'acceptation. Pas les diffs : ce qui compte est ce qui a changé pour
-le produit, pas ligne à ligne.
+Quatre blocs, dans cet ordre :
 
-Après les tickets, tu reçois le **contenu actuel** de `README.md` et des
-fichiers `docs/`, chacun sous son chemin relatif. Quand un fichier est trop
-long pour être inclus en entier, ses titres `#` sont affichés à la place.
+1. **Les tickets** livrés depuis la dernière mise à jour, avec leur objectif et
+   leurs critères d'acceptation. Ils disent l'intention, pas les faits : ni un
+   nombre, ni un nom, ni un libellé exact.
+2. **Le diff de chaque ticket**, sans la documentation ni les fichiers de
+   suivi (`tickets/`, `memory/`). C'est ce qui a réellement été livré. Un
+   diff coupé le dit : les fichiers non montrés sont nommés.
+3. **Les fichiers touchés**, tels qu'ils sont aujourd'hui, du plus modifié au
+   moins modifié. Un fichier trop long n'y est pas ; son nom est donné, et tu
+   ne le connais que par ses hunks.
+4. **Le contenu actuel** de `README.md` et des fichiers `docs/`, chacun sous
+   son chemin relatif. Quand un fichier est trop long pour être inclus en
+   entier, ses titres `#` sont affichés à la place.
+
+**Un fait qui n'est ni dans le diff ni dans les fichiers touchés n'est pas à
+écrire.** Si un ticket annonce un seuil, un nom ou un comportement que tu ne
+retrouves pas dans le code fourni, ne le reprends pas : le ticket était une
+intention, le code est ce qui existe.
 
 ## Ce que tu écris
 
@@ -48,7 +60,9 @@ fichier existant.
 …" }
 ```
 
-Si rien ne mérite d'être écrit : `{"editions": []}`.
+Si rien ne mérite d'être écrit : `{"editions": []}`. C'est la bonne réponse
+pour un ticket dont le diff ne change rien pour le lecteur (correctif,
+refactor à comportement égal, test seul).
 
 **Le texte `ancien` doit être recopié mot pour mot depuis le contenu fourni.**
 S'il n'existe pas dans ce contenu, s'il apparaît deux fois, ou si la
@@ -89,4 +103,5 @@ concurrence toutes les autres.
 - Ne renvoie **jamais** vers un ADR par son numéro seul : le lecteur ne l'a pas
   sous les yeux. Dis la règle, puis cite l'ADR.
 - Préserve la langue et le ton existants.
-- N'invente rien qui ne soit pas dans les tickets qu'on te donne.
+- N'écris rien dont tu ne trouves pas la trace dans les diffs et les fichiers
+  touchés qu'on te donne.
