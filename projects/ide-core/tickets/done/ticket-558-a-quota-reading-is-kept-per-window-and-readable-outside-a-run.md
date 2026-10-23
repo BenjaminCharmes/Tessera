@@ -4,7 +4,7 @@ created: 2026-10-23
 depends_on: []
 estimated_days: 1
 id: ticket-558
-pr_number: null
+pr_number: 632
 priority: medium
 status: done
 title: A quota reading is kept per window and can be read outside a run
