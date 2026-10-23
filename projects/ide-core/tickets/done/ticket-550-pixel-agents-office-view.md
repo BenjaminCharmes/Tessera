@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-550
 plan: true
-pr_number: null
+pr_number: 618
 priority: medium
 status: done
 title: Design of the office view that replaces Supervision, where each running agent
