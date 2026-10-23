@@ -4652,3 +4652,4 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 19:53:41 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Le minuteur indépendant de la boucle d'événements fonctionne correctement : troi (403562ms)
 - 2026-10-23 19:53:41 UTC — [ticket-571] CHANGES_REQUESTED tour 3: Validateur : Le minuteur indépendant de la boucle d'événements fonctionne correctement : trois tests solides couvrent le blocage avec terminaison du processus, l'annulation normale, et l'affichage de 
 - 2026-10-23 19:53:41 UTC — [ticket-571] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 19:53:45 UTC — [ide-core] file interrompue : ticket-571 non approuvé
