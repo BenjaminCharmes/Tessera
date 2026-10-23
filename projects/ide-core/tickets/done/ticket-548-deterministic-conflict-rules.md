@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-548
 plan: true
-pr_number: null
+pr_number: 628
 priority: medium
 status: done
 title: Trivial rebase conflicts are settled by rules before the conflict resolver
