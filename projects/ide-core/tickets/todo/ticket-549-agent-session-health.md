@@ -31,8 +31,9 @@ L'état se calcule côté frontend, à partir de l'horodatage du dernier
 backend. Une fonction pure (dernier événement, maintenant, question en
 attente) → `actif | attente | blocage_suspecte | question`. Une question
 d'agent en attente (ADR-025) prime : ce n'est pas un blocage. L'état s'affiche
-comme un badge dans la vue du run, avec les couleurs d'état de l'ADR-026
-(`green`, `amber`, `red`, `blue` pour la question).
+comme une pastille dans la vue du run, avec les mots et couleurs de la
+maquette `design/maquette/Bureau.dc.html` : « travaille » `blue`,
+« silencieux » `zinc`, « question » `amber`, « figé ? » `red`.
 
 ## Critères d'acceptation
 - [ ] Une fonction pure du frontend rend l'état, avec un test par seuil (29 s actif, 31 s attente, 181 s blocage suspecté)
