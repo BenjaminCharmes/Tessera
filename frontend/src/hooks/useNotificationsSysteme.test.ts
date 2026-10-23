@@ -47,6 +47,27 @@ describe("useNotificationsSysteme", () => {
     expect(creees[0].titre).toMatch(/question/);
   });
 
+  it("previent une fois quand un agent muet depasse trois minutes", () => {
+    vi.useFakeTimers();
+    try {
+      const dernier = new Date(Date.now() - 10_000).toISOString();
+      const etat: StreamState = { ...INITIAL, status: "running", dernierEvenementA: dernier };
+      renderHook(() => useNotificationsSysteme(supervision(etat), "ide-core", vi.fn()));
+      expect(creees).toHaveLength(0);
+
+      act(() => vi.advanceTimersByTime(120_000));
+      expect(creees).toHaveLength(0);
+      act(() => vi.advanceTimersByTime(60_000));
+      expect(creees).toHaveLength(1);
+      expect(creees[0].titre).toMatch(/figé/);
+
+      act(() => vi.advanceTimersByTime(120_000));
+      expect(creees).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("respecte le reglage coupe, qui survit a un rechargement", () => {
     const premier = renderHook(() => useNotificationsSysteme(supervision({ ...INITIAL, status: "running" }), null, vi.fn()));
     act(() => premier.result.current.setActive(false));

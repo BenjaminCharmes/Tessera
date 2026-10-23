@@ -1,5 +1,6 @@
 import type { RunActif } from "../types/api";
 import type { StreamState } from "../hooks/streamState";
+import type { SanteAgent } from "./santeAgent";
 
 /**
  * Ce qui mérite de sortir de l'IDE — ticket-192.
@@ -23,10 +24,19 @@ export interface Vue {
 export interface Instantane {
   runs: RunActif[];
   etats: Record<string, StreamState>;
+  /** Santé de chaque run en cours (ticket-553). Absente : aucun run n'est suspecté. */
+  sante?: Record<string, SanteAgent>;
 }
 
 function nom(run: RunActif): string {
   return run.ticket_id ? `${run.project_id} · ${run.ticket_id}` : run.project_id;
+}
+
+/** Une seule notification par passage : tant que l'agent reste « figé ? », rien de plus. */
+function devientFige(runId: string, avant: Instantane, apres: Instantane): boolean {
+  return (
+    apres.sante?.[runId] === "blocage_suspecte" && avant.sante?.[runId] !== "blocage_suspecte"
+  );
 }
 
 export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue): Notif[] {
@@ -48,6 +58,13 @@ export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue
         projectId: run.project_id,
         titre: `${nom(run)} : run bloqué`,
         corps: etat.errorMessage ?? "Le run s'est arrêté sans approbation.",
+      });
+    }
+    if (devientFige(run.run_id, avant, apres)) {
+      notifs.push({
+        projectId: run.project_id,
+        titre: `${nom(run)} : un agent semble figé`,
+        corps: `${etat.currentAgent ?? "L'agent"} n'a rien émis depuis plus de 3 minutes.`,
       });
     }
   }

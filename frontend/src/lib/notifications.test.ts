@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { notificationsPour, type Instantane } from "./notifications";
-import { INITIAL } from "../hooks/streamState";
+import { INITIAL, type StreamState } from "../hooks/streamState";
+import type { SanteAgent } from "./santeAgent";
 import type { RunActif } from "../types/api";
 
 function run(id: string, project = "demineur"): RunActif {
@@ -52,6 +53,45 @@ describe("notificationsPour", () => {
     );
     expect(fini[0].titre).toBe("demineur · ticket-004 : terminé");
     expect(fini[0].corps).toBe("ticket-004 approuvé en 2 tours");
+  });
+
+  describe("agent figé (ticket-553)", () => {
+    function instantane(sante: SanteAgent): Instantane {
+      const etat: StreamState = { ...INITIAL, status: "running", currentAgent: "codeur" };
+      return { runs: [run("r1")], etats: { r1: etat }, sante: { r1: sante } };
+    }
+
+    it("annonce le passage de silencieux à figé", () => {
+      const notifs = notificationsPour(instantane("attente"), instantane("blocage_suspecte"), AILLEURS);
+      expect(notifs).toHaveLength(1);
+      expect(notifs[0].titre).toBe("demineur · ticket-004 : un agent semble figé");
+      expect(notifs[0].corps).toMatch(/codeur/);
+    });
+
+    it("ne prévient qu'une fois tant que l'agent reste figé", () => {
+      const fige = instantane("blocage_suspecte");
+      expect(notificationsPour(fige, fige, AILLEURS)).toEqual([]);
+    });
+
+    it("prévient de nouveau quand l'agent a repris puis se fige encore", () => {
+      const premiere = notificationsPour(instantane("attente"), instantane("blocage_suspecte"), AILLEURS);
+      const reprise = notificationsPour(instantane("blocage_suspecte"), instantane("actif"), AILLEURS);
+      const seconde = notificationsPour(instantane("actif"), instantane("blocage_suspecte"), AILLEURS);
+      expect(premiere).toHaveLength(1);
+      expect(reprise).toEqual([]);
+      expect(seconde).toHaveLength(1);
+    });
+
+    it("se tait quand le projet est affiché et la fenêtre visible", () => {
+      const avant = instantane("attente");
+      const apres = instantane("blocage_suspecte");
+      expect(notificationsPour(avant, apres, { projetActif: "demineur", visible: true })).toEqual([]);
+      expect(notificationsPour(avant, apres, { projetActif: "demineur", visible: false })).toHaveLength(1);
+    });
+
+    it("ne dit rien d'un instantané sans santé", () => {
+      expect(notificationsPour(VIDE, { runs: [run("r1")], etats: { r1: INITIAL } }, AILLEURS)).toEqual([]);
+    });
   });
 
   it("se tait quand la fenêtre est visible et le projet affiché", () => {
