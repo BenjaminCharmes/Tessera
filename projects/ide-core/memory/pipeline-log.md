@@ -4434,3 +4434,5 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 10:38:31 UTC — [ticket-544] documentation: 0 fichier(s) (139233ms) — après tour de correction
 - 2026-10-23 10:38:47 UTC — [ticket-544] livraison: rebase sur develop (828ms)
 - 2026-10-23 10:38:47 UTC — [ticket-544] livraison: PR #616 ouverte (4547ms)
+- 2026-10-23 10:42:51 UTC — [ticket-544] livraison: arrêt — PR #616 non mergée : CI failing : la PR #616 reste ouverte.
+- 2026-10-23 10:42:51 UTC — [ide-core] file interrompue : ticket-544 non mergé
