@@ -4679,3 +4679,12 @@ fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
 - 2026-10-23 20:55:01 UTC — [ticket-548] validateur: APPROVED — Tous les critères sont satisfaits. Le module `regles_conflit.py` implémente quat (333609ms)
 - 2026-10-23 20:55:01 UTC — [ticket-548] APPROVED après 3 tour(s)
 - 2026-10-23 21:00:06 UTC — [ticket-548] documentation: 0 fichier(s) (300264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « class GitWorkspaceService(GitTicketOnBase, GitSync, GitBranc » (backend/src/tessera/servic
+- 2026-10-23 21:57:28 UTC — [ticket-553] branche ticket-553-an-agent-suspected-of-being-stalled-is-notified
+- 2026-10-23 21:57:29 UTC — [ticket-553] tour 1 — codeur démarré
+- 2026-10-23 21:59:07 UTC — [ticket-553] tour 1 — codeur terminé (97625ms)
+- 2026-10-23 22:10:29 UTC — [ticket-553] testeur: OK (exit 0)
+- 2026-10-23 22:11:45 UTC — [ticket-553] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une détection de freeze d'agent (t (75609ms)
+- 2026-10-23 22:11:45 UTC — [ticket-553] tour 1 — reviewer démarré
+- 2026-10-23 22:12:02 UTC — [ticket-553] tour 1 — reviewer terminé (16812ms)
+- 2026-10-23 22:13:17 UTC — [ticket-553] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent correctement  (91593ms)
+- 2026-10-23 22:13:17 UTC — [ticket-553] APPROVED après 1 tour(s)
