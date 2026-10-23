@@ -440,9 +440,8 @@ def _documenteur(
     """
     project_path = settings.ide_workspace_dir / project_id
     dossier_run = wt.projet if wt is not None else project_path
-    racine_doc = (politique or PolitiqueRun.lire(project_path)).racine_ecriture(
-        project_path, wt
-    )
+    politique = politique or PolitiqueRun.lire(project_path)
+    racine_doc = politique.racine_ecriture(project_path, wt)
 
     def _fournisseur(role: str) -> tuple[LLMProvider, str | None]:
         # Deux rôles, chacun son provider et son modèle (ticket-188).
@@ -468,6 +467,7 @@ def _documenteur(
         _fournisseur("doc-technique")[0], settings.ide_prompts_dir,
         fournisseur=_fournisseur, claude_md=claude_md,
         roles=_roles_de_documentation(project_path),
+        base=politique.base_branch,
     )
 
     async def documenter() -> ResultatDocumentation:

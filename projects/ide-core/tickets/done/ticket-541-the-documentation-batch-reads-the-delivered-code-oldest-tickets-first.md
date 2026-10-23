@@ -1,13 +1,14 @@
 ---
-id: ticket-541
-title: "The documentation batch reads the delivered code, oldest tickets first"
-type: feat
-status: todo
-priority: high
 agent: codeur
+created: 2026-10-23
 depends_on:
 - ticket-540
-created: 2026-10-23
+id: ticket-541
+pr_number: 614
+priority: high
+status: done
+title: The documentation batch reads the delivered code, oldest tickets first
+type: feat
 ---
 
 ## Objectif

@@ -6,8 +6,9 @@ des tickets : le diff livré de chaque ticket, puis le contenu des fichiers que
 ces diffs touchent. Tout est borné, et tout ce qui est coupé se nomme : un
 agent qui ne sait pas ce qu'il n'a pas vu en déduit des faits.
 
-Il ne change ni `_brief`, ni les prompts (ticket-541).
+Le brief (`documentation._brief`) l'assemble avec les tickets (ticket-541).
 """
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -134,3 +135,33 @@ async def matiere_du_lot(
         _cumuler(changes, sections)
     fichiers, fichiers_non_montres = _contenus(racine_depot, changes)
     return MatiereCode(diffs, fichiers, fichiers_non_montres, sans_diff)
+
+
+#: Ce que le service appelle pour obtenir la matière : `matiere_du_lot`, ou un
+#: substitut quand le dépôt n'est pas celui d'un vrai run.
+FournisseurMatiere = Callable[[Path, Path, list[str], str | None], Awaitable[MatiereCode]]
+
+
+def bloc_diffs(matiere: MatiereCode) -> str:
+    """The delivered diff of each ticket, one titled block per ticket (ticket-541)."""
+    if not matiere.diffs:
+        return ""
+    morceaux = ["\n---\nDiff livré de chaque ticket (hors documentation) :\n"]
+    for diff in matiere.diffs:
+        morceaux.append(f"\n### {diff.ticket_id}\n\n```diff\n{diff.diff.rstrip()}\n```\n")
+    return "".join(morceaux)
+
+
+def bloc_fichiers(matiere: MatiereCode) -> str:
+    """The current content of the touched files, and the names of those left out."""
+    if not matiere.fichiers and not matiere.fichiers_non_montres:
+        return ""
+    morceaux = ["\n---\nFichiers touchés par ces diffs (contenu actuel) :\n"]
+    for fichier in matiere.fichiers:
+        morceaux.append(f"\n### {fichier.chemin}\n\n```\n{fichier.contenu.rstrip()}\n```\n")
+    if matiere.fichiers_non_montres:
+        noms = ", ".join(matiere.fichiers_non_montres)
+        morceaux.append(
+            f"\n[contenu non fourni — lisible dans les diffs seulement : {noms}]\n"
+        )
+    return "".join(morceaux)

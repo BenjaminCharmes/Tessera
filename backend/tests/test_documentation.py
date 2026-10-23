@@ -11,6 +11,8 @@ from tessera.services.documentation import (
     marquer_documente,
     _PLAFOND,
 )
+from tessera.services.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
+from tests.matiere_factice import matiere_factice
 
 
 # ------------------------------------------------------------------
@@ -265,7 +267,9 @@ class _FauxProvider:
         return _R()
 
 
-def _service(tmp_path: Path, reponses: list[str]):  # type: ignore[no-untyped-def]
+def _service(  # type: ignore[no-untyped-def]
+    tmp_path: Path, reponses: list[str], sans_diff: tuple[str, ...] = ()
+):
     from tessera.services.documentation import DocumentationService
 
     prompts = tmp_path / "prompts"
@@ -273,7 +277,10 @@ def _service(tmp_path: Path, reponses: list[str]):  # type: ignore[no-untyped-de
     for role in ("doc-technique", "doc-fonctionnelle"):
         (prompts / f"{role}.md").write_text(f"prompt {role}", encoding="utf-8")
     provider = _FauxProvider(reponses)
-    return DocumentationService(provider, prompts), provider  # type: ignore[arg-type]
+    service = DocumentationService(
+        provider, prompts, matiere=matiere_factice(sans_diff)  # type: ignore[arg-type]
+    )
+    return service, provider
 
 
 def _avec_marqueur(tmp_path: Path) -> None:
@@ -303,8 +310,9 @@ async def test_sans_marqueur_le_service_initialise_sans_appel_provider(
 
 
 async def test_plafond_de_tickets_par_lot(tmp_path: Path) -> None:
-    """15 tickets à documenter → le brief n'en contient que _PLAFOND, tronque=True."""
-    n_tickets = _PLAFOND + 5
+    """15 tickets à documenter → le lot garde les _PLAFOND plus anciens, tronque=True."""
+    assert _PLAFOND == 5
+    n_tickets = _PLAFOND + 10
     for n in range(1, n_tickets + 1):
         _ticket(tmp_path, f"ticket-{n:03d}")
     _avec_marqueur(tmp_path)
@@ -313,16 +321,31 @@ async def test_plafond_de_tickets_par_lot(tmp_path: Path) -> None:
     resultat = await svc.mettre_a_jour(tmp_path)
 
     assert resultat.tronque is True
-    assert len(resultat.tickets) == _PLAFOND
-    # Le brief n'inclut que les _PLAFOND tickets les plus récents
+    assert resultat.tickets == [f"ticket-{n:03d}" for n in range(1, _PLAFOND + 1)]
     user_content = str(provider.appels[0]["user"])
-    # Les premiers tickets (hors plafond) ne sont pas dans le brief
-    assert "ticket-001" not in user_content
+    assert "ticket-001" in user_content
+    # Les tickets au-delà du plafond ne sont pas dans le brief
+    assert "ticket-006" not in user_content
 
 
-async def test_un_lot_de_dix_tickets_fait_deux_appels(tmp_path: Path) -> None:
-    # Le point du ticket : documenter par lot, pas par ticket. Dix tickets
-    # documentés un par un, ce sont vingt appels ; ici il y en a deux.
+async def test_sept_tickets_en_attente_cinq_documentes_deux_restent(tmp_path: Path) -> None:
+    """Le lot garde les plus anciens : les deux derniers restent hors du marqueur."""
+    for n in range(1, 8):
+        _ticket(tmp_path, f"ticket-{n:03d}")
+    _avec_marqueur(tmp_path)
+    svc, _ = _service(tmp_path, ['{"editions": []}', '{"editions": []}'])
+
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    assert resultat.tickets == [f"ticket-{n:03d}" for n in range(1, 6)]
+    marqueur = json.loads((tmp_path / "memory" / "documentation.json").read_text(encoding="utf-8"))
+    assert marqueur["documentes"] == [f"ticket-{n:03d}" for n in range(1, 6)]
+    assert [t.id for t in tickets_a_documenter(tmp_path)] == ["ticket-006", "ticket-007"]
+
+
+async def test_un_lot_plein_fait_deux_appels(tmp_path: Path) -> None:
+    # Le point du ticket : documenter par lot, pas par ticket. Cinq tickets
+    # documentés un par un, ce sont dix appels ; ici il y en a deux.
     for n in range(1, 11):
         _ticket(tmp_path, f"ticket-{n:03d}")
     _doc(tmp_path, "architecture.md", "# Archi\n\nancien texte\n")
@@ -333,6 +356,71 @@ async def test_un_lot_de_dix_tickets_fait_deux_appels(tmp_path: Path) -> None:
     await svc.mettre_a_jour(tmp_path)
 
     assert len(provider.appels) == 2
+
+
+async def test_un_ticket_sans_diff_est_ecarte_et_marque_documente(tmp_path: Path) -> None:
+    for n in (1, 2, 3):
+        _ticket(tmp_path, f"ticket-{n:03d}")
+    _avec_marqueur(tmp_path)
+    svc, provider = _service(
+        tmp_path, ['{"editions": []}', '{"editions": []}'], sans_diff=("ticket-002",)
+    )
+
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    assert resultat.ecartes == ["ticket-002"]
+    assert resultat.tickets == ["ticket-001", "ticket-003"]
+    assert resultat.marqueur_ecrit is True
+    brief = str(provider.appels[0]["user"])
+    assert "ticket-002" not in brief
+    assert tickets_a_documenter(tmp_path) == []
+
+
+async def test_un_lot_sans_aucun_diff_n_appelle_aucun_agent(tmp_path: Path) -> None:
+    _ticket(tmp_path, "ticket-001")
+    _ticket(tmp_path, "ticket-002")
+    _avec_marqueur(tmp_path)
+    svc, provider = _service(tmp_path, [], sans_diff=("ticket-001", "ticket-002"))
+
+    resultat = await svc.mettre_a_jour(tmp_path)
+
+    assert provider.appels == []
+    assert resultat.ecartes == ["ticket-001", "ticket-002"]
+    assert resultat.tickets == []
+    assert resultat.marqueur_ecrit is True
+    assert tickets_a_documenter(tmp_path) == []
+
+
+def test_le_brief_donne_tickets_diffs_fichiers_puis_documentation_dans_cet_ordre() -> None:
+    from tessera.services.documentation import TicketADocumenter, _brief
+
+    tickets = [TicketADocumenter("ticket-001", "Titre un", "Corps du ticket un")]
+    matiere = MatiereCode(
+        diffs=[DiffDeTicket("ticket-001", "+ligne du diff un", ["src/a.py"])],
+        fichiers=[FichierLivre("src/a.py", "contenu du fichier a")],
+        fichiers_non_montres=["src/gros.py"],
+    )
+
+    brief = _brief(tickets, matiere, "\n---\nDocumentation actuelle :\ntexte de doc")
+
+    reperes = [
+        "Corps du ticket un",
+        "+ligne du diff un",
+        "contenu du fichier a",
+        "texte de doc",
+    ]
+    positions = [brief.index(r) for r in reperes]
+    assert positions == sorted(positions)
+    assert "src/gros.py" in brief
+
+
+def test_le_brief_sans_matiere_de_code_reste_valide() -> None:
+    from tessera.services.documentation import TicketADocumenter, _brief
+
+    brief = _brief([TicketADocumenter("ticket-001", "T", "Corps")], MatiereCode())
+
+    assert "Corps" in brief
+    assert "Diff livré" not in brief
 
 
 async def test_les_deux_agents_recoivent_les_memes_tickets(tmp_path: Path) -> None:

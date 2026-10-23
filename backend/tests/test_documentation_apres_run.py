@@ -13,6 +13,7 @@ from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
 from tessera.services.documentation import DocumentationService, ResultatDocumentation
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tests.matiere_factice import matiere_factice
 from tests.test_orchestrator import (
     _FakeGit,
     _make_agent_result,
@@ -178,7 +179,9 @@ async def test_integration_quinze_tickets_tronque_event(tmp_path: Path) -> None:
     project_path, prompts = _init_projet(tmp_path, _PLAFOND + 5)  # 15 tickets
     _avec_marqueur_vide(project_path)
 
-    svc = DocumentationService(FakeProvider(content='{"editions": []}'), prompts)
+    svc = DocumentationService(
+        FakeProvider(content='{"editions": []}'), prompts, matiere=matiere_factice()
+    )
 
     orc = _make_orchestrator(tmp_path, runner=_runner(), git_workspace=_FakeGit())
     orc._documenter = lambda: svc.mettre_a_jour(project_path)
@@ -194,6 +197,36 @@ async def test_integration_quinze_tickets_tronque_event(tmp_path: Path) -> None:
     assert len(doc_events) == 1
     assert doc_events[0].data["tronque"] is True
     assert len(doc_events[0].data["tickets"]) == _PLAFOND
+
+
+async def test_integration_tickets_sans_diff_listes_dans_l_evenement_et_le_journal(
+    tmp_path: Path,
+) -> None:
+    """Un ticket sans diff retrouvable : une ligne de journal, et l'événement le liste."""
+    project_path, prompts = _init_projet(tmp_path, 3)
+    _avec_marqueur_vide(project_path)
+    provider = FakeProvider(content='{"editions": []}')
+    svc = DocumentationService(
+        provider, prompts, matiere=matiere_factice(sans_diff=("ticket-002",))
+    )
+    orc = _make_orchestrator(tmp_path, runner=_runner(), git_workspace=_FakeGit())
+    orc._documenter = lambda: svc.mettre_a_jour(project_path)
+    lignes: list[str] = []
+    orc._log = lignes.append  # type: ignore[method-assign]
+    events: list[OrchestratorEvent] = []
+
+    async def capture(ev: OrchestratorEvent) -> None:
+        events.append(ev)
+
+    await orc.run_pipeline("proj", "ticket-001", capture)
+
+    doc_events = [e for e in events if e.type is EventType.DOC_UPDATED]
+    assert len(doc_events) == 1
+    assert doc_events[0].data["ecartes"] == ["ticket-002"]
+    assert doc_events[0].data["tickets"] == ["ticket-001", "ticket-003"]
+    journal = [l for l in lignes if "pas de diff retrouvable, non documenté" in l]
+    assert len(journal) == 1
+    assert "ticket-002" in journal[0]
 
 
 async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path: Path) -> None:
@@ -217,7 +250,9 @@ async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path:
     project_path, prompts = _init_projet(tmp_path, 1)
     _avec_marqueur_vide(project_path)
 
-    svc = DocumentationService(_RaisingProvider(), prompts)  # type: ignore[arg-type]
+    svc = DocumentationService(
+        _RaisingProvider(), prompts, matiere=matiere_factice()  # type: ignore[arg-type]
+    )
 
     orc = _make_orchestrator(tmp_path, runner=_runner(), git_workspace=_FakeGit())
     orc._documenter = lambda: svc.mettre_a_jour(project_path)
@@ -277,7 +312,7 @@ async def test_en_git_root_ancestor_les_editions_visent_la_racine_du_depot(tmp_p
     for role in ("doc-technique", "doc-fonctionnelle"):
         (prompts / f"{role}.md").write_text("doc", encoding="utf-8")
     edition = '{"editions": [{"fichier": "README.md", "ancien": "Ancien texte.", "nouveau": "Nouveau texte."}]}'
-    svc = DocumentationService(FakeProvider(content=edition), prompts)
+    svc = DocumentationService(FakeProvider(content=edition), prompts, matiere=matiere_factice())
 
     resultat = await svc.mettre_a_jour(projet, racine_doc=depot)
 
