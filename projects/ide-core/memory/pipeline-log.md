@@ -4876,3 +4876,4 @@ Le diff ajoute :
 - 2026-10-24 09:58:23 UTC — [ticket-563] tests rouges au tour 1
 - 2026-10-24 09:58:23 UTC — [ticket-563] tour 2 — codeur démarré
 - 2026-10-24 09:58:29 UTC — [ticket-563] INTERROMPU par limite de session (reprise : 2:30pm (Europe/Paris))
+- 2026-10-24 09:58:33 UTC — [ide-core] file interrompue : limite de session (reprise : 2:30pm (Europe/Paris))
