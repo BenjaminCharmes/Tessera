@@ -4,7 +4,7 @@ created: 2026-10-24
 depends_on: []
 estimated_days: 0.5
 id: ticket-572
-pr_number: null
+pr_number: 638
 priority: critical
 status: done
 title: Initialising the base ref never moves the checked-out base branch without its
