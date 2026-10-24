@@ -4864,3 +4864,5 @@ Le diff ajoute :
 - 2026-10-24 09:30:37 UTC — [ticket-572] validateur: fichiers cités joints : backend/src/tessera/services/git_workspace/base.py, backend/tests/test_ticket_ajoute_sur_la_base.py ; absents : tickets/todo/ticket-a.md, tickets/todo/ticket-b.md
 - 2026-10-24 09:30:37 UTC — [ticket-572] validateur: APPROVED — Tous les critères sont satisfaits. Le code refactorise correctement `_avancer_ba (26921ms)
 - 2026-10-24 09:30:37 UTC — [ticket-572] APPROVED après 1 tour(s)
+- 2026-10-24 09:30:43 UTC — [ticket-572] documentation: 0 fichier(s) (421ms)
+- 2026-10-24 09:30:43 UTC — [ticket-572] documentation: pas de diff retrouvable, non documenté
