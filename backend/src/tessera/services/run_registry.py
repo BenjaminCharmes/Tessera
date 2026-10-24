@@ -112,6 +112,17 @@ class RunActif:
         if self.ticket_titre is not None and self.ticket_titre_de is None:
             self.ticket_titre_de = self.ticket_id
 
+    def restants(self) -> list[str]:
+        """The tickets waiting behind the current one.
+
+        Une file vivante est la source : elle voit les ajouts et les retraits
+        faits depuis le dernier `queue_progress`. Sans file, ce que ce
+        dernier a annoncé (ticket-560).
+        """
+        if self.file is not None:
+            return self.file.restants()
+        return list(self.file_restants)
+
     def en_dict(self) -> dict[str, Any]:
         """Serialisable view — the dialogue channel is deliberately left out."""
         return {
@@ -134,7 +145,7 @@ class RunActif:
             "question_expire_a": self.question_expire_a,
             "file_index": self.file_index,
             "file_total": self.file_total,
-            "file_restants": list(self.file_restants),
+            "file_restants": self.restants(),
             "file_faits": list(self.file_faits),
             "etapes_en_cours": list(self.etapes_en_cours),
             "demarre_a": self.demarre_a.isoformat(),

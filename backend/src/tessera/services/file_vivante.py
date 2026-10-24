@@ -55,6 +55,15 @@ class FileVivante(list[str]):
         """Record the 1-based position the loop is handling (ticket-513)."""
         self._position = index - 1
 
+    def restants(self) -> list[str]:
+        """Ids still waiting behind the ticket being handled, additions included.
+
+        Même sens que `restants` dans `queue_progress` : le ticket traité
+        n'en fait pas partie (il est `ticket_courant`). Avant le premier
+        ticket, `_position` vaut -1 et c'est la file entière (ticket-560).
+        """
+        return list(self[self._position + 1 :])
+
     def retirer(
         self, ticket_ids: list[str]
     ) -> tuple[list[str], dict[str, str], dict[str, str]]:

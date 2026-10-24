@@ -81,7 +81,7 @@ def statut_d_un_run_vivant(run: RunActif) -> RunStatus:
         # tourne, ce qu'elle a laissé derrière elle est approuvé.
         approuves=list(run.file_faits),
         arretes=[],
-        restants=list(run.file_restants),
+        restants=run.restants(),
         debut=run.demarre_a.isoformat(),
     )
 
