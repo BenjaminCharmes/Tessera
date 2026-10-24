@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 2
 id: ticket-562
 plan: true
-pr_number: null
+pr_number: 637
 priority: medium
 status: done
 title: The office sprites and a project room
