@@ -28,6 +28,7 @@ import type {
   RunRequest,
   RunEvent,
   ServiceActif,
+  StatutDuRun,
   EtapeMiseEnLigne,
   ProjectCreationResult,
   TemplateCreationResult,
@@ -214,6 +215,9 @@ export const api = {
     /** Les événements d'un run terminé, pour rejouer la vue (ticket-280). */
     events: (runId: string): Promise<RunEvent[]> =>
       request(`/runs/${runId}/events`),
+    /** Où en est un run, dont les tickets qu'il lui reste (ticket-563). */
+    status: (runId: string): Promise<StatutDuRun> =>
+      request(`/runs/${runId}`),
   },
   usage: {
     get: (projectId: string): Promise<ProjectUsage> =>

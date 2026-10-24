@@ -176,6 +176,18 @@ export interface PRStatus {
   pr_number: number;
 }
 
+/** Where a run stands — `GET /runs/{id}` (ticket-563). `restants` : tickets de file pas encore traités. */
+export interface StatutDuRun {
+  project_id: string;
+  mode: string;
+  statut: string;
+  ticket_courant: string | null;
+  approuves: string[];
+  restants: string[];
+  debut: string;
+  fin: string | null;
+}
+
 /** One entry from GET /projects/{id}/pr-statuses (ticket-367). */
 export interface PRStatusEntry extends PRStatus {
   ticket_id: string;
