@@ -4823,3 +4823,4 @@ Le diff ajoute :
 - 2026-10-24 08:00:21 UTC — [ticket-561] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers), hooks/streamState.ts (tronqué)
 - 2026-10-24 08:00:21 UTC — [ticket-561] validateur: APPROVED — Les quatre sélecteurs purs (`postesDuRun`, `boiteAuxLettres`, `contourDeLaPiece` (328578ms)
 - 2026-10-24 08:00:21 UTC — [ticket-561] APPROVED après 1 tour(s)
+- 2026-10-24 08:02:12 UTC — [ticket-561] documentation: 0 fichier(s) (101562ms)
