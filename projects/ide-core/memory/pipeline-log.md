@@ -4803,3 +4803,24 @@ Le diff ajoute :
 - 2026-10-24 00:53:27 UTC — [ticket-560] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la logique de (115125ms)
 - 2026-10-24 00:53:27 UTC — [ticket-560] APPROVED après 1 tour(s)
 - 2026-10-24 00:59:28 UTC — [ticket-560] documentation: 0 fichier(s) (355718ms) — après tour de correction
+- 2026-10-24 01:03:22 UTC — [ide-core] ticket-560 PR #634 mergée (CI verte)
+- 2026-10-24 01:03:24 UTC — [ide-core] ticket-560 : base réalignée sur develop
+- 2026-10-24 01:03:24 UTC — [ide-core] ticket-560 PR #634 confiée au CIWatcher
+- 2026-10-24 01:03:27 UTC — [ticket-561] branche ticket-561-the-office-view-selectors-are-pure-functions
+- 2026-10-24 01:03:28 UTC — [ticket-561] tour 1 — codeur démarré
+- 2026-10-24 01:05:48 UTC — [ticket-561] tour 1 — codeur terminé (139860ms)
+- 2026-10-24 01:15:11 UTC — [ticket-561] testeur: OK (exit 0)
+- 2026-10-24 01:16:07 UTC — [ticket-561] securite: PASS — Aucune vulnérabilité détectée. Les 4 nouveaux modules sont des utilitaires purs  (55733ms)
+- 2026-10-24 01:16:07 UTC — [ticket-561] tour 1 — reviewer démarré
+- 2026-10-24 01:16:34 UTC — [ticket-561] tour 1 — reviewer terminé (26765ms)
+- 2026-10-24 07:40:49 UTC — [ticket-561] branche ticket-561-the-office-view-selectors-are-pure-functions
+- 2026-10-24 07:53:40 UTC — [ticket-561] testeur: OK (exit 0)
+- 2026-10-24 07:53:40 UTC — [ticket-561] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-24 07:54:53 UTC — [ticket-561] securite: PASS — Audit complet : 4 fichiers TypeScript ajoutés (boiteAuxLettres, contourDeLaPiece (71172ms)
+- 2026-10-24 07:54:53 UTC — [ticket-561] tour 1 — reviewer démarré
+- 2026-10-24 07:55:34 UTC — [ticket-561] tour 1 — reviewer terminé (41343ms)
+- 2026-10-24 07:59:53 UTC — [ticket-561] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-24 08:00:21 UTC — [ticket-561] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers), hooks/streamState.ts (tronqué)
+- 2026-10-24 08:00:21 UTC — [ticket-561] validateur: APPROVED — Les quatre sélecteurs purs (`postesDuRun`, `boiteAuxLettres`, `contourDeLaPiece` (328578ms)
+- 2026-10-24 08:00:21 UTC — [ticket-561] APPROVED après 1 tour(s)
+- 2026-10-24 08:02:12 UTC — [ticket-561] documentation: 0 fichier(s) (101562ms)

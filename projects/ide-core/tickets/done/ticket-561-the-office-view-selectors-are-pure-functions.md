@@ -1,14 +1,14 @@
 ---
-id: ticket-561
-title: "The office view selectors are pure functions"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-23
+id: ticket-561
+pr_number: 635
+priority: medium
+status: done
+title: The office view selectors are pure functions
+type: feat
 ---
 
 # ticket-561 — Les sélecteurs purs du Bureau
