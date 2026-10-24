@@ -4789,3 +4789,17 @@ Le diff ajoute :
 - 2026-10-24 00:19:16 UTC — [ticket-559] APPROVED après 3 tour(s)
 - 2026-10-24 00:27:27 UTC — [ticket-559] documentation: 1 fichier(s) (485921ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « class GitConflictsRegles(GitConflicts):
     """Rules applied » (backend/src/tessera/servic
+- 2026-10-24 00:34:33 UTC — [ide-core] ticket-559 PR #633 mergée (CI verte)
+- 2026-10-24 00:34:36 UTC — [ide-core] ticket-559 : base réalignée sur develop
+- 2026-10-24 00:34:36 UTC — [ide-core] ticket-559 PR #633 confiée au CIWatcher
+- 2026-10-24 00:34:39 UTC — [ticket-560] branche ticket-560-the-remaining-tickets-of-a-live-queue-count-the-o
+- 2026-10-24 00:34:39 UTC — [ticket-560] tour 1 — codeur démarré
+- 2026-10-24 00:41:45 UTC — [ticket-560] tour 1 — codeur terminé (425828ms)
+- 2026-10-24 00:50:04 UTC — [ticket-560] testeur: OK (exit 0)
+- 2026-10-24 00:51:32 UTC — [ticket-560] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff introduit un refactoring de l (87811ms)
+- 2026-10-24 00:51:32 UTC — [ticket-560] tour 1 — reviewer démarré
+- 2026-10-24 00:51:54 UTC — [ticket-560] tour 1 — reviewer terminé (22453ms)
+- 2026-10-24 00:53:27 UTC — [ticket-560] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers) ; absents : .../remove
+- 2026-10-24 00:53:27 UTC — [ticket-560] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la logique de (115125ms)
+- 2026-10-24 00:53:27 UTC — [ticket-560] APPROVED après 1 tour(s)
+- 2026-10-24 00:59:28 UTC — [ticket-560] documentation: 0 fichier(s) (355718ms) — après tour de correction
