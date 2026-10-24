@@ -89,6 +89,14 @@ class EventType(str, Enum):
     #: (ticket-538). `command`, `duration_ms` et `exit_code` (`None` si la
     #: commande n'a pas démarré ou a été coupée). Absent sans `setup` déclaré.
     WORKTREE_SETUP = "worktree_setup"
+    #: La file suspend sur un événement extérieur (ticket-559). `reason` vaut
+    #: « dependency », `waiting` passe à vrai avant la suspension et à faux
+    #: après, quelle que soit l'issue ; `ticket` et `pr_number` disent quelle PR.
+    EXTERNAL_WAIT = "external_wait"
+    #: Le résolveur de conflit travaille (ticket-559). `phase` vaut « started »
+    #: (avec `files`) puis « ended », où `outcome` vaut « resolved » ou
+    #: « cancelled ».
+    CONFLICT_RESOLUTION = "conflict_resolution"
 
 
 class OrchestratorEvent(BaseModel):

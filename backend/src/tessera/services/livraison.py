@@ -19,6 +19,7 @@ import httpx
 from tessera.config import settings
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
+from tessera.services.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
 from tessera.services.livraison_arrets import arret_ci_illisible, arret_conflit
 from tessera.services.livraison_rebase import noter_ce_que_le_rebase_a_fait
 from tessera.services.politique_run import PolitiqueRun
@@ -190,13 +191,10 @@ class LivraisonService:
             )
 
         resolus: list[str] = []
-
-        async def resoudre(fichiers: tuple[str, ...]) -> None:
-            # Le résolveur ne dit pas s'il a réussi : c'est `rejouer_sur` qui
-            # tranche, en vérifiant l'arbre. On note seulement qu'il a tourné.
-            resolus.extend(fichiers)
-            if self._resolveur is not None:
-                await self._resolveur(fichiers)
+        # Le résolveur ne dit pas s'il a réussi : c'est `rejouer_sur` qui
+        # tranche, en vérifiant l'arbre. On note seulement qu'il a tourné.
+        signal = signal_courant()
+        resoudre = resolveur_suivi(resolus, self._resolveur, signal)
 
         # Align local base_branch with remote before rebase (ticket-285).
         # Non-blocking: a failed sync falls back to the current local branch.
@@ -221,13 +219,14 @@ class LivraisonService:
         try:
             conflits = await self._git.rejouer_sur(
                 self._base_branch,
-                resolveur=resoudre if self._resolveur is not None else None,
+                resolveur=resoudre,
             )
         except GitCommandError as exc:
             # Le rebase a refusé de démarrer — arbre sale (fichier de code
             # modifié non commité), base inconnue ou autre erreur git.
             # `commit_bookkeeping` a déjà commité les artefacts Tessera : ce
             # qui reste est du code que le pipeline n'a pas produit.
+            await annoncer_fin_de_conflit(signal, resolus, annule=True)
             raison = exc.stderr.strip() or str(exc)
             return Livraison(
                 etapes=tuple(etapes),
@@ -235,6 +234,7 @@ class LivraisonService:
                 arret=f"Rebase refusé : {raison}",
             )
         rebase_ms = (time.monotonic() - t0) * 1000
+        await annoncer_fin_de_conflit(signal, resolus, annule=bool(conflits))
 
         if conflits:
             if resolus:

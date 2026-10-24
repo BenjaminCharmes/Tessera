@@ -1462,6 +1462,15 @@ La conversation survit à un rechargement de la page.
 
 ---
 
+### Notifications de livraison
+
+Après un run livré en autonomie ou approuvé, Tessera t'envoie une notification :
+
+- **PR mergée** : annonce le numéro de la PR.
+- **PR non mergée** : annonce la raison (« CI rouge, PR laissée ouverte », « merge refusé », etc.).
+
+Comme toutes les notifications, aucune n'est envoyée si le projet actif est affiché et la fenêtre visible.
+
 ## 9. Les agents disponibles
 
 | Agent | Rôle |
@@ -1855,6 +1864,9 @@ Corrige le problème sous-jacent, relance le ticket bloqué, et la file reprendr
 L'IDE a stoppé cet agent parce qu'il n'émettait rien depuis trop longtemps. C'est **auto-géré** : le run reprend avec un fallback (Ollama ou fermeture gracieuse). Rien à faire.
 
 Pour allonger le délai avant arrêt, modifie `agent_silence_max_s` dans la configuration (défaut 1200 s).
+
+
+Tessera t'envoie aussi une notification dès qu'un agent ne produit aucun événement pendant plus de 3 minutes : c'est le signal « agent figé ». Si tu la reçois, l'agent est bloqué. Regarde le fil du run pour voir où il s'est arrêté.
 
 ### Une file s'arrête sur son plafond de budget
 

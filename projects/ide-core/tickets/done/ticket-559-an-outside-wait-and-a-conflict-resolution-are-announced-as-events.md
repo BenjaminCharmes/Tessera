@@ -1,14 +1,14 @@
 ---
-id: ticket-559
-title: "A wait for an outside event and a conflict resolution are announced as events"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 1
-created: 2026-10-23
+id: ticket-559
+pr_number: 633
+priority: medium
+status: done
+title: A wait for an outside event and a conflict resolution are announced as events
+type: feat
 ---
 
 # ticket-559 — Une attente extérieure et une résolution de conflit sont annoncées
