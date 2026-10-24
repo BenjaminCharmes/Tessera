@@ -4803,3 +4803,13 @@ Le diff ajoute :
 - 2026-10-24 00:53:27 UTC — [ticket-560] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la logique de (115125ms)
 - 2026-10-24 00:53:27 UTC — [ticket-560] APPROVED après 1 tour(s)
 - 2026-10-24 00:59:28 UTC — [ticket-560] documentation: 0 fichier(s) (355718ms) — après tour de correction
+- 2026-10-24 01:03:22 UTC — [ide-core] ticket-560 PR #634 mergée (CI verte)
+- 2026-10-24 01:03:24 UTC — [ide-core] ticket-560 : base réalignée sur develop
+- 2026-10-24 01:03:24 UTC — [ide-core] ticket-560 PR #634 confiée au CIWatcher
+- 2026-10-24 01:03:27 UTC — [ticket-561] branche ticket-561-the-office-view-selectors-are-pure-functions
+- 2026-10-24 01:03:28 UTC — [ticket-561] tour 1 — codeur démarré
+- 2026-10-24 01:05:48 UTC — [ticket-561] tour 1 — codeur terminé (139860ms)
+- 2026-10-24 01:15:11 UTC — [ticket-561] testeur: OK (exit 0)
+- 2026-10-24 01:16:07 UTC — [ticket-561] securite: PASS — Aucune vulnérabilité détectée. Les 4 nouveaux modules sont des utilitaires purs  (55733ms)
+- 2026-10-24 01:16:07 UTC — [ticket-561] tour 1 — reviewer démarré
+- 2026-10-24 01:16:34 UTC — [ticket-561] tour 1 — reviewer terminé (26765ms)
