@@ -4813,3 +4813,13 @@ Le diff ajoute :
 - 2026-10-24 01:16:07 UTC — [ticket-561] securite: PASS — Aucune vulnérabilité détectée. Les 4 nouveaux modules sont des utilitaires purs  (55733ms)
 - 2026-10-24 01:16:07 UTC — [ticket-561] tour 1 — reviewer démarré
 - 2026-10-24 01:16:34 UTC — [ticket-561] tour 1 — reviewer terminé (26765ms)
+- 2026-10-24 07:40:49 UTC — [ticket-561] branche ticket-561-the-office-view-selectors-are-pure-functions
+- 2026-10-24 07:53:40 UTC — [ticket-561] testeur: OK (exit 0)
+- 2026-10-24 07:53:40 UTC — [ticket-561] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-24 07:54:53 UTC — [ticket-561] securite: PASS — Audit complet : 4 fichiers TypeScript ajoutés (boiteAuxLettres, contourDeLaPiece (71172ms)
+- 2026-10-24 07:54:53 UTC — [ticket-561] tour 1 — reviewer démarré
+- 2026-10-24 07:55:34 UTC — [ticket-561] tour 1 — reviewer terminé (41343ms)
+- 2026-10-24 07:59:53 UTC — [ticket-561] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-24 08:00:21 UTC — [ticket-561] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers), hooks/streamState.ts (tronqué)
+- 2026-10-24 08:00:21 UTC — [ticket-561] validateur: APPROVED — Les quatre sélecteurs purs (`postesDuRun`, `boiteAuxLettres`, `contourDeLaPiece` (328578ms)
+- 2026-10-24 08:00:21 UTC — [ticket-561] APPROVED après 1 tour(s)
