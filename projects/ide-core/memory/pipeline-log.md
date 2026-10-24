@@ -4849,3 +4849,4 @@ Le diff ajoute :
 - 2026-10-24 08:40:32 UTC — [ticket-562] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers) ; absents : design/bureau/
 - 2026-10-24 08:40:32 UTC — [ticket-562] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit les sprites du Bureau (Bull (53015ms)
 - 2026-10-24 08:40:32 UTC — [ticket-562] APPROVED après 1 tour(s)
+- 2026-10-24 08:45:24 UTC — [ticket-562] documentation: 1 fichier(s) (285860ms) — après tour de correction
