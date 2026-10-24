@@ -4,7 +4,7 @@ created: 2026-10-23
 depends_on: []
 estimated_days: 1
 id: ticket-559
-pr_number: null
+pr_number: 633
 priority: medium
 status: done
 title: A wait for an outside event and a conflict resolution are announced as events
