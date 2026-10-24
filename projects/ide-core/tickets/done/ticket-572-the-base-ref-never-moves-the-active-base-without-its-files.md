@@ -1,14 +1,15 @@
 ---
-id: ticket-572
-title: "Initialising the base ref never moves the checked-out base branch without its files"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-24
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-24
+id: ticket-572
+pr_number: 638
+priority: critical
+status: done
+title: Initialising the base ref never moves the checked-out base branch without its
+  files
+type: fix
 ---
 
 # ticket-572 — La base active n'avance jamais sans ses fichiers
