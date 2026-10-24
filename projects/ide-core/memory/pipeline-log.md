@@ -4850,3 +4850,17 @@ Le diff ajoute :
 - 2026-10-24 08:40:32 UTC — [ticket-562] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit les sprites du Bureau (Bull (53015ms)
 - 2026-10-24 08:40:32 UTC — [ticket-562] APPROVED après 1 tour(s)
 - 2026-10-24 08:45:24 UTC — [ticket-562] documentation: 1 fichier(s) (285860ms) — après tour de correction
+- 2026-10-24 09:10:29 UTC — [ide-core] ticket-562 PR #637 mergée (CI verte)
+- 2026-10-24 09:10:31 UTC — [ide-core] ticket-562 : base réalignée sur develop
+- 2026-10-24 09:10:31 UTC — [ide-core] ticket-562 PR #637 confiée au CIWatcher
+- 2026-10-24 09:10:34 UTC — [ticket-572] branche ticket-572-initialising-the-base-ref-never-moves-the-checked
+- 2026-10-24 09:10:35 UTC — [ticket-572] tour 1 — codeur démarré
+- 2026-10-24 09:16:29 UTC — [ticket-572] tour 1 — codeur terminé (354219ms)
+- 2026-10-24 09:28:02 UTC — [ticket-572] testeur: OK (exit 0)
+- 2026-10-24 09:30:10 UTC — [ticket-572] securite: PASS — Refactorisation de gestion d'avancement de branche git. Code sûr contre l'inject (127656ms)
+- 2026-10-24 09:30:10 UTC — [ticket-572] tour 1 — reviewer démarré
+- 2026-10-24 09:30:12 UTC — [ticket-572] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-24 09:30:34 UTC — [ticket-572] tour 1 — reviewer terminé (23780ms)
+- 2026-10-24 09:30:37 UTC — [ticket-572] validateur: fichiers cités joints : backend/src/tessera/services/git_workspace/base.py, backend/tests/test_ticket_ajoute_sur_la_base.py ; absents : tickets/todo/ticket-a.md, tickets/todo/ticket-b.md
+- 2026-10-24 09:30:37 UTC — [ticket-572] validateur: APPROVED — Tous les critères sont satisfaits. Le code refactorise correctement `_avancer_ba (26921ms)
+- 2026-10-24 09:30:37 UTC — [ticket-572] APPROVED après 1 tour(s)
