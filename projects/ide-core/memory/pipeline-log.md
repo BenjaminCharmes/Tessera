@@ -4824,3 +4824,29 @@ Le diff ajoute :
 - 2026-10-24 08:00:21 UTC — [ticket-561] validateur: APPROVED — Les quatre sélecteurs purs (`postesDuRun`, `boiteAuxLettres`, `contourDeLaPiece` (328578ms)
 - 2026-10-24 08:00:21 UTC — [ticket-561] APPROVED après 1 tour(s)
 - 2026-10-24 08:02:12 UTC — [ticket-561] documentation: 0 fichier(s) (101562ms)
+- 2026-10-24 08:07:59 UTC — [ide-core] ticket-561 PR #635 mergée (CI verte)
+- 2026-10-24 08:08:01 UTC — [ide-core] ticket-561 : base réalignée sur develop
+- 2026-10-24 08:08:01 UTC — [ide-core] ticket-561 PR #635 confiée au CIWatcher
+- 2026-10-24 08:08:05 UTC — [ticket-562] branche ticket-562-the-office-sprites-and-a-project-room
+- 2026-10-24 08:09:47 UTC — [ticket-562] plan rendu (100655ms)
+- 2026-10-24 08:09:47 UTC — [ticket-562] tour 1 — codeur démarré
+- 2026-10-24 08:17:45 UTC — [ticket-562] tour 1 — codeur terminé (477859ms)
+- 2026-10-24 08:17:53 UTC — [ticket-562] testeur: en attente d'un créneau de test
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-24 08:37:59 UTC — [ticket-562] testeur: OK (exit 0)
+- 2026-10-24 08:39:39 UTC — [ticket-562] securite: PASS — Composants Bureau ajoutés avec code sûr : texte rendu en JSX auto-échappé, chemi (100514ms)
+- 2026-10-24 08:39:39 UTC — [ticket-562] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-24 08:39:39 UTC — [ticket-562] tour 1 — reviewer démarré
+- 2026-10-24 08:40:08 UTC — [ticket-562] tour 1 — reviewer terminé (28139ms)
+- 2026-10-24 08:40:32 UTC — [ticket-562] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers) ; absents : design/bureau/
+- 2026-10-24 08:40:32 UTC — [ticket-562] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit les sprites du Bureau (Bull (53015ms)
+- 2026-10-24 08:40:32 UTC — [ticket-562] APPROVED après 1 tour(s)
+- 2026-10-24 08:45:24 UTC — [ticket-562] documentation: 1 fichier(s) (285860ms) — après tour de correction

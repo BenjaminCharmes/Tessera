@@ -1,15 +1,16 @@
 ---
-id: ticket-562
-title: "The office sprites and a project room"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-561"]
-estimated_days: 2
 created: 2026-10-23
+depends_on:
+- ticket-561
+estimated_days: 2
+id: ticket-562
 plan: true
+pr_number: 637
+priority: medium
+status: done
+title: The office sprites and a project room
+type: feat
 ---
 
 # ticket-562 — Les sprites et la pièce d'un projet

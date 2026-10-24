@@ -2158,6 +2158,19 @@ Les textes affichés dans la maquette sont des données fictives, jamais du cont
 
 Le gabarit `fastapi-react` inclut un dossier `design/maquette/` avec un `README.md` qui explique ce rôle. Les nouveaux projets créés depuis ce gabarit ont donc la structure prête.
 
+## Vue Bureau (ADR-058)
+
+La vue `BureauView` affiche les pièces des projets avec leurs postes de travail.
+
+- **`BureauView`** : conteneur principal qui monte un seul `setInterval` de 5 secondes via le hook `useSanteDuBureau`. Bascule automatiquement entre la grille (`Piece`) et la liste compacte (`Compact`) selon le nombre de projets.
+- **`Piece`** : affiche une pièce complète avec cinq postes.
+- **`PosteDeTravail`** : un poste unique, rendu comme un `button` avec `aria-label` décrivant le rôle et son état.
+- **`Compact`** : rangée compacte d'un projet.
+
+Les sprites sont tracés en SVG pixels. Aucune couleur hexadécimale n'apparaît dans `frontend/src/design/bureau/` — toutes les teintes utilisent des jetons `--sprite-*` dans `index.css`, avec états en `zinc`, `red`, `amber`, `green`, `blue`.
+
+Les animations ne modifient que `transform` et `opacity`, et sont neutralisées sous `prefers-reduced-motion`. Dix pièces rendues produisent moins de 2 000 nœuds SVG.
+
 ## Mise en ligne (ADR-053, ticket-463)
 
 > Conçue, pas encore construite : les tickets 464 à 472 la réalisent.

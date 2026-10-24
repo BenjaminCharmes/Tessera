@@ -7,6 +7,14 @@
  */
 export type SanteAgent = "actif" | "attente" | "blocage_suspecte" | "question";
 
+/** Le mot qui dit la santé : un seul libellé pour la pastille du run et le Bureau. */
+export const LIBELLE_SANTE: Record<SanteAgent, string> = {
+  actif: "travaille",
+  attente: "silencieux",
+  blocage_suspecte: "figé ?",
+  question: "question",
+};
+
 /** Au-delà, l'agent est « silencieux » : il réfléchit, ou attend un outil. */
 export const SEUIL_ATTENTE_MS = 30_000;
 /** Au-delà, un blocage est suspecté. */
