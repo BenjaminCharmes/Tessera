@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { santeAgent } from "./santeAgent";
+import { LIBELLE_SANTE, santeAgent } from "./santeAgent";
 
 const DERNIER = "2026-10-23T10:00:00.000Z";
 const T0 = Date.parse(DERNIER);
@@ -34,5 +34,14 @@ describe("santeAgent", () => {
 
   it("is active on an unreadable timestamp", () => {
     expect(santeAgent("pas une date", T0, null)).toBe("actif");
+  });
+
+  it("labels each health with its word", () => {
+    expect(LIBELLE_SANTE).toEqual({
+      actif: "travaille",
+      attente: "silencieux",
+      blocage_suspecte: "figé ?",
+      question: "question",
+    });
   });
 });

@@ -18,6 +18,43 @@
   --color-data-3: #db2777;
 }
 
+/* Tons des sprites du Bureau — ticket-562, ADR-058. `static` : ces jetons ne
+   sont lus que par `var()` depuis le TSX, et Tailwind n'émet pas sans cela une
+   variable qu'aucune classe ne nomme. La chemise est le violet d'identité,
+   écrit en oklch (violet-500 et violet-600) : un fond de sprite, jamais un texte. */
+@theme static {
+  --sprite-peau: #e8b98f;
+  --sprite-cheveux: #3f2a1d;
+  --sprite-dossier: #ca8a04;
+  --sprite-dossier-ombre: #a16207;
+  --sprite-chemise: oklch(0.606 0.25 292.717);
+  --sprite-chemise-ombre: oklch(0.541 0.281 293.009);
+}
+
+/* Animations du Bureau : `transform` et `opacity` seulement, pour rester sur le
+   compositeur. Le bloc `prefers-reduced-motion` plus bas les coupe toutes. */
+@keyframes tape {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(1px); }
+  100% { transform: translateY(0); }
+}
+@keyframes lueur {
+  0% { opacity: 1; }
+  50% { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+@keyframes flotte {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+.anim-tape { animation: tape 0.5s steps(2) infinite; }
+.anim-lueur { animation: lueur 1.6s ease-in-out infinite; }
+.anim-flotte { animation: flotte 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-tape, .anim-lueur, .anim-flotte { animation: none; }
+}
+
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still

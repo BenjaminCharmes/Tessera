@@ -1,7 +1,7 @@
 import StatusPill from "../../design/ui/StatusPill";
 import type { EtatPastille } from "../../design/ui/StatusPill";
 import { useMaintenant } from "../../hooks/useMaintenant";
-import { santeAgent } from "../../lib/santeAgent";
+import { LIBELLE_SANTE, santeAgent } from "../../lib/santeAgent";
 import type { SanteAgent } from "../../lib/santeAgent";
 
 interface PastilleSanteProps {
@@ -9,11 +9,11 @@ interface PastilleSanteProps {
   pendingQuestion: string | null | undefined;
 }
 
-const PASTILLES: Record<SanteAgent, { etat: EtatPastille; libelle: string }> = {
-  actif: { etat: "en-cours", libelle: "travaille" },
-  attente: { etat: "neutre", libelle: "silencieux" },
-  question: { etat: "attention", libelle: "question" },
-  blocage_suspecte: { etat: "echec", libelle: "figé ?" },
+const ETATS: Record<SanteAgent, EtatPastille> = {
+  actif: "en-cours",
+  attente: "neutre",
+  question: "attention",
+  blocage_suspecte: "echec",
 };
 
 function depuis(dernierEvenementA: string | null | undefined, maintenant: number): string {
@@ -30,7 +30,12 @@ function depuis(dernierEvenementA: string | null | undefined, maintenant: number
 export default function PastilleSante({ dernierEvenementA, pendingQuestion }: PastilleSanteProps) {
   const maintenant = useMaintenant();
   const sante = santeAgent(dernierEvenementA, maintenant, pendingQuestion);
-  const { etat, libelle } = PASTILLES[sante];
 
-  return <StatusPill etat={etat} libelle={libelle} titre={depuis(dernierEvenementA, maintenant)} />;
+  return (
+    <StatusPill
+      etat={ETATS[sante]}
+      libelle={LIBELLE_SANTE[sante]}
+      titre={depuis(dernierEvenementA, maintenant)}
+    />
+  );
 }
