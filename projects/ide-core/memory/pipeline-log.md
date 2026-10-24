@@ -4766,3 +4766,24 @@ Le diff ajoute :
 - 2026-10-23 23:23:49 UTC — [ticket-558] APPROVED après 1 tour(s)
 - 2026-10-23 23:31:22 UTC — [ticket-558] documentation: 0 fichier(s) (449171ms) — après tour de correction — refusé : doc-technique : README.md : règle « preuve » — l'extrait « class GitConflictsRegles(GitConflicts):
     """Rules applied » (backend/src/tessera/services/git_work
+- 2026-10-23 23:44:51 UTC — [ide-core] ticket-558 PR #632 mergée (CI verte)
+- 2026-10-23 23:44:53 UTC — [ide-core] ticket-558 : base réalignée sur develop
+- 2026-10-23 23:44:53 UTC — [ide-core] ticket-558 PR #632 confiée au CIWatcher
+- 2026-10-23 23:44:56 UTC — [ticket-559] branche ticket-559-a-wait-for-an-outside-event-and-a-conflict-resolu
+- 2026-10-23 23:44:56 UTC — [ticket-559] tour 1 — codeur démarré
+- 2026-10-23 23:49:32 UTC — [ticket-559] tour 1 — codeur terminé (275891ms)
+- 2026-10-23 23:55:54 UTC — [ticket-559] testeur: 1 failed, 1345 passed, 64 warnings in 379.55s (0:06:19)
+- 2026-10-23 23:55:54 UTC — [ticket-559] tests rouges au tour 1
+- 2026-10-23 23:55:54 UTC — [ticket-559] tour 2 — codeur démarré
+- 2026-10-23 23:56:25 UTC — [ticket-559] tour 2 — codeur terminé (31093ms)
+- 2026-10-24 00:02:47 UTC — [ticket-559] testeur: 1 failed, 1653 passed, 64 warnings in 379.16s (0:06:19)
+- 2026-10-24 00:02:47 UTC — [ticket-559] tests rouges au tour 2
+- 2026-10-24 00:02:47 UTC — [ticket-559] tour 3 — codeur démarré
+- 2026-10-24 00:05:25 UTC — [ticket-559] tour 3 — codeur terminé (158078ms)
+- 2026-10-24 00:13:54 UTC — [ticket-559] testeur: OK (exit 0)
+- 2026-10-24 00:15:26 UTC — [ticket-559] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code ajoute deux événements ( (92296ms)
+- 2026-10-24 00:15:26 UTC — [ticket-559] tour 3 — reviewer démarré
+- 2026-10-24 00:15:57 UTC — [ticket-559] tour 3 — reviewer terminé (30375ms)
+- 2026-10-24 00:19:16 UTC — [ticket-559] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers)
+- 2026-10-24 00:19:16 UTC — [ticket-559] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (229405ms)
+- 2026-10-24 00:19:16 UTC — [ticket-559] APPROVED après 3 tour(s)
