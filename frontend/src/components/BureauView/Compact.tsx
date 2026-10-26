@@ -3,7 +3,7 @@ import { TON_PUCE } from "../../design/bureau/tons";
 import type { StreamState } from "../../hooks/streamState";
 import { libelleDuPoste } from "../../lib/bureau/libelleDuPoste";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
-import { santeAgent } from "../../lib/santeAgent";
+import { enEtapeSilencieuse, santeAgent } from "../../lib/santeAgent";
 import type { RunActif } from "../../types/api";
 import ActionsDuRun from "./ActionsDuRun";
 
@@ -25,6 +25,7 @@ export default function Compact({ projet, etat, maintenant, run, onOuvrir, onRan
     maintenant,
     etat.pendingQuestion,
     etat.attenteExterieure !== null,
+    enEtapeSilencieuse(etat),
   );
   const enCours = postes.some((p) => p.etat === "occupe");
 

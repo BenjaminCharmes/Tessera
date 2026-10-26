@@ -5,6 +5,7 @@ import PipelineSummary from "../AgentPanel/PipelineSummary";
 import { resumeDuCout } from "../../lib/budget";
 import FilDuRun from "../FilDuRun";
 import PastilleSante from "./PastilleSante";
+import { enEtapeSilencieuse } from "../../lib/santeAgent";
 import type { UseRunActifResult } from "../../hooks/streamState";
 
 /**
@@ -53,6 +54,7 @@ export default function RunView({ stream, projectId }: RunViewProps) {
               dernierEvenementA={stream.dernierEvenementA}
               pendingQuestion={stream.pendingQuestion}
               attenteExterieure={Boolean(stream.attenteExterieure)}
+              etapeSilencieuse={enEtapeSilencieuse(stream)}
             />
           )}
         </div>

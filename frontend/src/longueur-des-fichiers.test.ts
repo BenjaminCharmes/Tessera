@@ -15,12 +15,12 @@ export const PLAFONDS: Record<string, number> = {
   "components/Sidebar/ImportProjectModal.tsx": 428,
   "components/Sidebar/TicketCard.tsx": 314,
   "components/Sidebar/TicketList.tsx": 309,
-  "hooks/streamState.ts": 702,
+  "hooks/streamState.ts": 692,
   "hooks/useChat.ts": 336,
   "hooks/useCockpit.ts": 532,
   "hooks/useSupervision.ts": 400,
   "lib/api.ts": 334,
-  "types/api.ts": 717,
+  "types/api.ts": 716,
 };
 
 const SOURCES = join(__dirname);

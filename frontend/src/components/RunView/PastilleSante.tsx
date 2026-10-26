@@ -9,6 +9,8 @@ interface PastilleSanteProps {
   pendingQuestion: string | null | undefined;
   /** Une attente extérieure est en cours : le silence est voulu (ticket-564). */
   attenteExterieure?: boolean;
+  /** Une étape silencieuse tourne (testeur, audit, validation, doc, livraison) : ticket-587. */
+  etapeSilencieuse?: boolean;
 }
 
 const ETATS: Record<SanteAgent, EtatPastille> = {
@@ -33,9 +35,16 @@ export default function PastilleSante({
   dernierEvenementA,
   pendingQuestion,
   attenteExterieure = false,
+  etapeSilencieuse = false,
 }: PastilleSanteProps) {
   const maintenant = useMaintenant();
-  const sante = santeAgent(dernierEvenementA, maintenant, pendingQuestion, attenteExterieure);
+  const sante = santeAgent(
+    dernierEvenementA,
+    maintenant,
+    pendingQuestion,
+    attenteExterieure,
+    etapeSilencieuse,
+  );
 
   return (
     <StatusPill

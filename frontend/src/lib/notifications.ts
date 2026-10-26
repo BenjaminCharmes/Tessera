@@ -1,5 +1,6 @@
 import type { RunActif } from "../types/api";
 import type { StreamState } from "../hooks/streamState";
+import { enEtapeSilencieuse } from "./santeAgent";
 import type { SanteAgent } from "./santeAgent";
 
 /**
@@ -50,8 +51,14 @@ function nom(run: RunActif): string {
   return run.ticket_id ? `${run.project_id} · ${run.ticket_id}` : run.project_id;
 }
 
-/** Une seule notification par passage : tant que l'agent reste « figé ? », rien de plus. */
+/**
+ * Une seule notification par passage : tant que l'agent reste « figé ? », rien de plus.
+ * Pendant une étape silencieuse, le silence n'est pas un signe (ticket-587) : même
+ * si la santé reçue dit « figé ? », rien ne part.
+ */
 function devientFige(runId: string, avant: Instantane, apres: Instantane): boolean {
+  const etat = apres.etats[runId];
+  if (etat && enEtapeSilencieuse(etat)) return false;
   return (
     apres.sante?.[runId] === "blocage_suspecte" && avant.sante?.[runId] !== "blocage_suspecte"
   );

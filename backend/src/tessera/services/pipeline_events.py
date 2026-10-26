@@ -25,6 +25,10 @@ class EventType(str, Enum):
     TICKET_STATUS_CHANGED = "ticket_status_changed"
     PIPELINE_DONE = "pipeline_done"
     ERROR = "error"
+    #: Le testeur lance la suite du projet (ticket-587). Sans lui, les minutes
+    #: qui séparent le départ de `test_result` ne se distinguent pas d'un
+    #: agent figé. Émis seulement si un testeur et une commande existent.
+    TEST_STARTED = "test_started"
     TEST_RESULT = "test_result"
     SECURITY_AUDIT_STARTED = "security_audit_started"
     SECURITY_AUDIT_DONE = "security_audit_done"

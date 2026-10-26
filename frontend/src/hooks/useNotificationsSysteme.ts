@@ -20,7 +20,7 @@ import {
   type ReglageDuType,
   type ReglagesParType,
 } from "../lib/reglagesNotifications";
-import { santeAgent, type SanteAgent } from "../lib/santeAgent";
+import { enEtapeSilencieuse, santeAgent, type SanteAgent } from "../lib/santeAgent";
 import { useEtatPersistant } from "./useEtatPersistant";
 import { useHistoriqueNotifications } from "./useHistoriqueNotifications";
 import { useMaintenant } from "./useMaintenant";
@@ -150,6 +150,7 @@ export function useNotificationsSysteme(
           maintenant,
           etat.pendingQuestion,
           etat.attenteExterieure !== null,
+          enEtapeSilencieuse(etat),
         );
       }
     }

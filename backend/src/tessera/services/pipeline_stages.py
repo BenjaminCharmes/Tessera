@@ -574,6 +574,7 @@ async def run_tests(
         async def _on_attente() -> None:
             orch._log(f"[{run.ticket_id}] testeur: en attente d'un créneau de test")
 
+        await emit(run, EventType.TEST_STARTED)
         result = await orch._test_runner.run_tests(
             orch._project_path,
             test_command=orch._test_command,
@@ -583,9 +584,7 @@ async def run_tests(
         # Un timeout ne dit rien sur le code : relancer une fois sans repasser
         # par le codeur est moins coûteux qu'un tour complet (ticket-349).
         if result.expiree:
-            orch._log(
-                f"[{run.ticket_id}] testeur: délai dépassé, suite relancée"
-            )
+            orch._log(f"[{run.ticket_id}] testeur: délai dépassé, suite relancée")
             _noter_le_delai(orch, run, result)
             result = await orch._test_runner.run_tests(
                 orch._project_path, test_command=orch._test_command
