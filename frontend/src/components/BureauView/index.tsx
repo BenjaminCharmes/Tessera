@@ -4,6 +4,8 @@ import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { contenuAToi } from "../../lib/bureau/aToi";
 import { modeCompact } from "../../lib/bureau/modeCompact";
 import { occupantsDeLaPause, occupantsDeLaReunion } from "../../lib/bureau/salles";
+import type { RunActif } from "../../types/api";
+import AuRepos from "./AuRepos";
 import ColonneAToi from "./ColonneAToi";
 import type { ReglageSon } from "./ColonneAToi";
 import Compact from "./Compact";
@@ -17,6 +19,8 @@ export interface ProjetDuBureau {
   etat: StreamState;
   /** Le run vivant du projet, quand on le connaît. */
   runId?: string | null;
+  /** Le run lui-même, pour le chrono, le fil et le rangement. */
+  run?: RunActif;
 }
 
 interface BureauViewProps {
@@ -27,13 +31,27 @@ interface BureauViewProps {
   envoyer: (runId: string, payload: Record<string, string>) => void;
   /** Le réglage « Son » de la question (ticket-554), tenu par la cloche : le Bureau n'en a pas un à lui. */
   son: ReglageSon;
+  /** Les projets sans run : ils ne comptent pas pour le seuil, et ne se dessinent qu'en compact. */
+  auRepos?: readonly string[];
+  /** Ouvre le fil d'un run (ticket-567). */
+  onOuvrir?: (runId: string) => void;
+  /** Range un run clos (ticket-567). */
+  onRanger?: (runId: string) => void;
 }
 
 /**
  * Les pièces des projets qui ont un run, ou leurs rangées au-delà du seuil de
  * `modeCompact`. L'horloge se monte ici, une seule fois pour toute la vue.
  */
-export default function BureauView({ projets, signalServices = 0, envoyer, son }: BureauViewProps) {
+export default function BureauView({
+  projets,
+  signalServices = 0,
+  envoyer,
+  son,
+  auRepos = [],
+  onOuvrir,
+  onRanger,
+}: BureauViewProps) {
   const maintenant = useSanteDuBureau();
   const compact = modeCompact(projets.length);
 
@@ -59,9 +77,17 @@ export default function BureauView({ projets, signalServices = 0, envoyer, son }
           className={compact ? "flex flex-col gap-2" : "grid grid-cols-2 gap-3.5"}
           data-mode={compact ? "compact" : "pieces"}
         >
-          {projets.map(({ nom, etat, runId = null }) =>
+          {projets.map(({ nom, etat, runId = null, run }) =>
             compact ? (
-              <Compact key={nom} projet={nom} etat={etat} maintenant={maintenant} />
+              <Compact
+                key={nom}
+                projet={nom}
+                etat={etat}
+                maintenant={maintenant}
+                run={run}
+                onOuvrir={onOuvrir}
+                onRanger={onRanger}
+              />
             ) : (
               <Piece
                 key={nom}
@@ -70,9 +96,13 @@ export default function BureauView({ projets, signalServices = 0, envoyer, son }
                 maintenant={maintenant}
                 runId={runId}
                 signalServices={signalServices}
+                run={run}
+                onOuvrir={onOuvrir}
+                onRanger={onRanger}
               />
             ),
           )}
+          {compact && auRepos.map((nom) => <AuRepos key={nom} projet={nom} />)}
         </div>
       </div>
       <div className="w-72 shrink-0">

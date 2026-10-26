@@ -4,15 +4,21 @@ import type { StreamState } from "../../hooks/streamState";
 import { libelleDuPoste } from "../../lib/bureau/libelleDuPoste";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
 import { santeAgent } from "../../lib/santeAgent";
+import type { RunActif } from "../../types/api";
+import ActionsDuRun from "./ActionsDuRun";
 
 interface CompactProps {
   projet: string;
   etat: StreamState;
   maintenant: number;
+  /** Le run du projet : sans lui, ni chrono ni accès au fil. */
+  run?: RunActif;
+  onOuvrir?: (runId: string) => void;
+  onRanger?: (runId: string) => void;
 }
 
 /** La rangée compacte d'un projet : cinq puces de poste et, si un agent travaille, sa santé. */
-export default function Compact({ projet, etat, maintenant }: CompactProps) {
+export default function Compact({ projet, etat, maintenant, run, onOuvrir, onRanger }: CompactProps) {
   const postes = postesDuRun(etat);
   const sante = santeAgent(
     etat.dernierEvenementA,
@@ -40,6 +46,11 @@ export default function Compact({ projet, etat, maintenant }: CompactProps) {
         ))}
       </div>
       {enCours && <Pastille sante={sante} />}
+      {run && (
+        <div className="ml-auto">
+          <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />
+        </div>
+      )}
     </div>
   );
 }

@@ -155,6 +155,7 @@ vi.mock("./hooks/useNotificationsSysteme", () => ({
     active: false,
     etat: "default",
     setActive: vi.fn(),
+    cloche: { reglages: { question: { systeme: true, son: true } }, setReglage: vi.fn() },
   }),
   demanderPermissionNotifications: vi.fn(),
 }));

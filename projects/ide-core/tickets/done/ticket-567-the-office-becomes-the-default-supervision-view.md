@@ -1,15 +1,20 @@
 ---
-id: ticket-567
-title: "The office becomes the default supervision view"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-562", "ticket-563", "ticket-564", "ticket-565", "ticket-566"]
-estimated_days: 1.5
 created: 2026-10-23
+depends_on:
+- ticket-562
+- ticket-563
+- ticket-564
+- ticket-565
+- ticket-566
+estimated_days: 1.5
+id: ticket-567
 plan: true
+pr_number: 650
+priority: medium
+status: done
+title: The office becomes the default supervision view
+type: feat
 ---
 
 # ticket-567 — Le Bureau devient la vue par défaut

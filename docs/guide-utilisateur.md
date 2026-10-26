@@ -1207,6 +1207,29 @@ Après un redémarrage du backend, Tessera cherche aussi les pull requests ouver
 
 Si ton projet n'a pas de dépôt GitHub ou si son autonomie est `pull`, Tessera reprend uniquement les tickets marqués `in-review` localement.
 
+## Le Bureau — vue de supervision
+
+Supervision affiche maintenant le **Bureau** par défaut (au lieu de la précédente Liste).
+
+### Sélecteur Bureau / Liste
+
+En haut à droite de Supervision, bascule entre **Bureau** et **Liste** selon ton usage. Ils regardent les mêmes runs — aucun état n'est perdu à la bascule.
+
+### Les deux salles
+
+Le Bureau affiche deux **salles** en bas (zones montrant ce qui attend, hors du travail actif).
+
+**Salle de pause** — Les runs qui attendent :
+- `Quota épuisé, reprise HH:MM UTC` : le service est arrêté, relance manuelle possible à cette heure.
+- `Attend le merge de la PR #N` : une dépendance bloque le ticket suivant.
+- `CI en cours de la PR #N` : la CI du ticket précédent tourne pendant que tu relances la file.
+
+**Salle de réunion** — Les conflits en cours :
+- Pendant la résolution : liste des fichiers qui se battent (`a.py, b.py`).
+- Après résolution : `PR #N à relire` — aucun merge automatique, toujours à relire (ADR-033).
+
+Si rien n'attend et qu'il n'y a pas de conflit, les deux salles affichent « Personne en pause » et « Aucun conflit en cours ».
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.

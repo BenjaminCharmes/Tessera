@@ -14,6 +14,7 @@ import type { FiltresTickets } from "../lib/filtresTickets";
 import type { VueCentre } from "../vueDuCentre";
 import AgentDetail from "./AgentDetail";
 import SupervisionView from "./SupervisionView";
+import type { ReglageSon } from "./BureauView/ColonneAToi";
 import RunView from "./RunView";
 import KanbanView from "./KanbanView";
 import ProjetsView from "./ProjetsView";
@@ -46,6 +47,8 @@ interface CenterViewProps {
   ticket: Ticket | null;
   conversationId: string;
   supervision: ReturnType<typeof useSupervision>;
+  /** Le réglage « Son » de la question, pour le Bureau de Supervision (ticket-567). */
+  son?: ReglageSon;
   servicesDuProjet: ServiceActif[];
   /** Les apps de projet vivantes sur la machine (ticket-417). */
   appsEnCours: UseAppsEnCoursResult;
@@ -108,6 +111,7 @@ export default function CenterView({
   ticket,
   conversationId,
   supervision,
+  son,
   servicesDuProjet,
   appsEnCours,
   agentSelectionne,
@@ -153,6 +157,7 @@ export default function CenterView({
         supervision={supervision}
         projects={projets}
         services={servicesDuProjet}
+        son={son}
       />
     );
   } else if (panel === "running") {
