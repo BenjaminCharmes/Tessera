@@ -5029,3 +5029,4 @@ Le diff ajoute :
 - 2026-10-26 13:57:12 UTC — [ticket-579] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
 - 2026-10-26 13:57:12 UTC — [ticket-579] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests d'intégration robust (390671ms)
 - 2026-10-26 13:57:12 UTC — [ticket-579] APPROVED après 1 tour(s)
+- 2026-10-26 13:59:32 UTC — [ticket-579] documentation: 0 fichier(s) (136266ms)
