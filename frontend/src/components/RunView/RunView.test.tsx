@@ -19,6 +19,7 @@ function flux(over: Partial<UseRunActifResult> = {}) {
     errorMessage: null,
     quota: null,
     pendingQuestion: null,
+    etapesEnCours: [],
     queue: null,
     connect: () => {},
     connectQueue: () => {},

@@ -31,8 +31,8 @@ interface Releve {
  * Le poste et la transition qu'un événement annonce, ou null s'il n'en annonce aucun.
  *
  * L'architecte produit à la place du codeur sur un ticket `design` : même poste.
- * Le testeur n'a pas d'événement de départ (`test_result` seul, à la fin), donc
- * il n'est jamais `occupe` : le dire sans donnée serait décoratif.
+ * Le testeur est `occupe` de `test_started` à `test_result` (ticket-587) : avant
+ * cet événement, il n'avait pas de départ et le dire aurait été décoratif.
  */
 function transitionDe(ev: OrchestratorEvent): { poste: PosteId; transition: Transition } | null {
   switch (ev.type) {
@@ -43,6 +43,8 @@ function transitionDe(ev: OrchestratorEvent): { poste: PosteId; transition: Tran
       if (ev.agent === "reviewer") return { poste: "reviewer", transition };
       return null;
     }
+    case "test_started":
+      return { poste: "testeur", transition: "debut" };
     case "test_result":
       return { poste: "testeur", transition: "fin" };
     case "security_audit_started":
@@ -69,6 +71,11 @@ function rejouer(evenements: readonly OrchestratorEvent[]): Map<PosteId, Releve>
       // Plus aucun agent ne tourne une fois le verdict rendu.
       for (const r of releves.values()) r.occupe = false;
       continue;
+    }
+    if (ev.type === "agent_started") {
+      // Un codeur qui reprend referme des tests restés sans résultat (délai, commande introuvable).
+      const testeur = releves.get("testeur");
+      if (testeur) testeur.occupe = false;
     }
     const t = transitionDe(ev);
     const releve = t ? releves.get(t.poste) : undefined;

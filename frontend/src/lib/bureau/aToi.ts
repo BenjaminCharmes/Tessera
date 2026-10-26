@@ -1,5 +1,5 @@
 import type { StreamState } from "../../hooks/streamState";
-import { santeAgent } from "../santeAgent";
+import { enEtapeSilencieuse, santeAgent } from "../santeAgent";
 
 /** Un projet vu par la colonne : son nom, son run vivant si on le connaît, son état. */
 export interface ProjetPourLaColonne {
@@ -67,6 +67,7 @@ export function contenuAToi(projets: readonly ProjetPourLaColonne[], maintenant:
       maintenant,
       etat.pendingQuestion,
       etat.attenteExterieure !== null,
+      enEtapeSilencieuse(etat),
     );
     if (!etat.runClosed && sante === "blocage_suspecte") contenu.figes.push(nom);
     const pr = prARelire(etat);

@@ -16,6 +16,7 @@ import type {
 } from "../types/api";
 import { boundEvents } from "./boundEvents";
 import { appliquerAttente, appliquerConflit } from "./streamAttente";
+import { entreeTesteur } from "./streamTests";
 import type { AttenteExterieure } from "./streamAttente";
 
 export { MAX_EVENTS } from "./boundEvents";
@@ -349,8 +350,10 @@ function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState 
         agent === "codeur" ? "production"
         : agent === "reviewer" ? "revue"
         : null;
+      // Un agent qui démarre referme les tests : sans `test_result` (commande
+      // introuvable, délai dépassé), `tests` resterait « en cours » (ticket-587).
       const newEtapesEnCours = etapeEnCoursToAdd
-        ? addEtapeEnCours(s.etapesEnCours, etapeEnCoursToAdd)
+        ? addEtapeEnCours(removeEtapeEnCours(s.etapesEnCours, "tests"), etapeEnCoursToAdd)
         : s.etapesEnCours;
       const newEntry: PassageAgent | null = agent
         ? {
@@ -449,25 +452,12 @@ function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState 
       };
     }
     case "test_result": {
-      // Le testeur ajoute une entrée dans le fil après chaque passage du codeur (ticket-321).
-      const rawErrors = Array.isArray(ev.data["errors"]) ? ev.data["errors"] : [];
-      const testEntry: EntreeTesteur = {
-        genre: "testeur",
-        id: `testeur-${s.entries.length}`,
-        round: s.currentRound,
-        passed: ev.data["passed"] === true,
-        output_summary:
-          typeof ev.data["output_summary"] === "string" ? ev.data["output_summary"] : "",
-        errors: rawErrors.filter((e: unknown): e is string => typeof e === "string"),
-        isDone: true,
-      };
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        entries: [...s.entries, testEntry],
-      };
+      const entree = entreeTesteur(ev, s.currentRound, s.entries.length);
+      const etapesEnCours = removeEtapeEnCours(s.etapesEnCours, "tests");
+      return { ...s, events, ticketEvents, entries: [...s.entries, entree], etapesEnCours };
     }
+    case "test_started": // le testeur ne dit rien tant que la suite tourne (ticket-587)
+      return { ...s, events, ticketEvents, etapesEnCours: addEtapeEnCours(s.etapesEnCours, "tests") };
     case "security_audit_done": {
       // L'audit ajoute une entrée dans le fil, visible à côté des agents (ticket-257).
       const auditEntry: EntreeSecurite = {

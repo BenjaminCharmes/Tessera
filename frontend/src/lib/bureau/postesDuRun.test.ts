@@ -101,9 +101,24 @@ describe("postesDuRun", () => {
     expect(etats(tour2).codeur).toBe("occupe");
   });
 
-  it("never marks the tester busy, since no event announces its start", () => {
+  it("keeps the tester free until test_started announces its start", () => {
     const apresCodeur = rejouer([ev("agent_started", "codeur"), ev("agent_done", "codeur")]);
     expect(etats(apresCodeur).testeur).toBe("libre");
+  });
+
+  it("marks the tester busy between test_started and test_result, then done", () => {
+    const base = [ev("agent_started", "codeur"), ev("agent_done", "codeur"), ev("test_started")];
+    expect(etats(rejouer(base)).testeur).toBe("occupe");
+    expect(etats(rejouer([...base, ev("test_result", null, { passed: true })])).testeur).toBe("fait");
+  });
+
+  it("frees a tester left without a result when the coder starts again", () => {
+    const repris = rejouer([ev("test_started"), ev("agent_started", "codeur")]);
+    expect(etats(repris).testeur).toBe("libre");
+  });
+
+  it("does not keep the tester busy once the run is closed", () => {
+    expect(etats(rejouer([ev("test_started"), ev("run_closed")])).testeur).toBe("libre");
   });
 
   it("does not keep a started but unfinished agent busy once the run is closed", () => {

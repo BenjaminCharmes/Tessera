@@ -80,6 +80,16 @@ describe("notificationsPour", () => {
       expect(seconde).toHaveLength(1);
     });
 
+    it("ne prévient pas pendant une étape silencieuse, même si la santé dit figé (ticket-587)", () => {
+      for (const etape of ["tests", "securite", "validation", "documentation", "livraison"]) {
+        const etat: StreamState = { ...INITIAL, status: "running", etapesEnCours: [etape] };
+        const silencieux = (sante: SanteAgent): Instantane => ({
+          runs: [run("r1")], etats: { r1: etat }, sante: { r1: sante },
+        });
+        expect(notificationsPour(silencieux("attente"), silencieux("blocage_suspecte"))).toEqual([]);
+      }
+    });
+
     it("garde la notification du projet affiché, que seul le toast masque", () => {
       const avant = instantane("attente");
       const apres = instantane("blocage_suspecte");

@@ -3,7 +3,7 @@ import type { StreamState } from "../../hooks/streamState";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
-import { santeAgent } from "../../lib/santeAgent";
+import { enEtapeSilencieuse, santeAgent } from "../../lib/santeAgent";
 import type { RunActif } from "../../types/api";
 import ActionsDuRun from "./ActionsDuRun";
 import ObjetsDeLaPiece from "./ObjetsDeLaPiece";
@@ -48,6 +48,7 @@ export default function Piece({
     maintenant,
     etat.pendingQuestion,
     etat.attenteExterieure !== null,
+    enEtapeSilencieuse(etat),
   );
   const contour = contourDeLaPiece(etat, sante);
   const enCours = postes.some((p) => p.etat === "occupe");

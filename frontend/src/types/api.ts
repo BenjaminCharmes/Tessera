@@ -1,13 +1,11 @@
 import type { MomentAgent } from "../design/AgentBadge";
 
-export type TicketStatus =
-  "todo" | "in-progress" | "in-review" | "done" | "blocked" | "cancelled";
+export type TicketStatus = "todo" | "in-progress" | "in-review" | "done" | "blocked" | "cancelled";
 
 // Doit rester aligné sur TicketType côté backend
 // (backend/src/tessera/models/ticket.py) : types Conventional Commits
 // + `design`, propre à Tessera.
-export type TicketType =
-  "feat" | "fix" | "chore" | "docs" | "refactor" | "test" | "design";
+export type TicketType = "feat" | "fix" | "chore" | "docs" | "refactor" | "test" | "design";
 export type TicketPriority = "critical" | "high" | "medium" | "low";
 export type AgentRole =
   | "orchestrateur"
@@ -27,6 +25,7 @@ export type EventType =
   | "agent_question"
   | "branch_created"
   | "ticket_status_changed"
+  | "test_started"
   | "test_result"
   | "security_audit_started"
   | "security_audit_done"

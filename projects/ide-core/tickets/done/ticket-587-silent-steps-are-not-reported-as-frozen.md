@@ -1,14 +1,14 @@
 ---
-id: ticket-587
-title: "Steps that work silently are no longer reported as a frozen agent"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-26
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-26
+id: ticket-587
+pr_number: 660
+priority: high
+status: done
+title: Steps that work silently are no longer reported as a frozen agent
+type: fix
 ---
 
 # ticket-587 — Les étapes silencieuses ne passent plus pour un agent figé
