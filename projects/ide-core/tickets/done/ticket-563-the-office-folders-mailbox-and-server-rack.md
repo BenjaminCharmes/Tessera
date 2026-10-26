@@ -7,7 +7,7 @@ depends_on:
 estimated_days: 1.5
 id: ticket-563
 plan: true
-pr_number: null
+pr_number: 640
 priority: medium
 status: done
 title: The office folders, mailbox and server rack
