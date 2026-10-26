@@ -4894,3 +4894,33 @@ Le diff ajoute :
 - 2026-10-26 08:36:24 UTC — [ticket-563] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute trois composants React (pile d (350938ms)
 - 2026-10-26 08:36:24 UTC — [ticket-563] APPROVED après 1 tour(s)
 - 2026-10-26 08:39:28 UTC — [ticket-563] documentation: 0 fichier(s) (177641ms)
+- 2026-10-26 09:45:07 UTC — [ticket-565] branche ticket-565-the-office-day-board
+- 2026-10-26 09:45:09 UTC — [ticket-565] tour 1 — codeur démarré
+- 2026-10-26 09:50:01 UTC — [ticket-565] tour 1 — codeur terminé (291967ms)
+- 2026-10-26 09:53:15 UTC — [ticket-565] testeur: OK (exit 0)
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-579 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 09:55:30 UTC — [ticket-565] securite: PASS — Aucune vulnérabilité détectée. Le code ajouté respecte les bonnes pratiques : au (134780ms)
+- 2026-10-26 09:55:30 UTC — [ticket-565] tour 1 — reviewer démarré
+- 2026-10-26 09:56:07 UTC — [ticket-565] tour 1 — reviewer terminé (37015ms)
+- 2026-10-26 09:59:53 UTC — [ticket-565] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers) ; absents : design/charts/
+- 2026-10-26 09:59:53 UTC — [ticket-565] validateur: CHANGES_REQUESTED — Tous les critères fonctionnels ont été implémentés et vérifiés via des tests uni (263842ms)
+- 2026-10-26 09:59:53 UTC — [ticket-565] CHANGES_REQUESTED tour 1: Validateur : Tous les critères fonctionnels ont été implémentés et vérifiés via des tests unitaires. Le code respecte les contraintes de design, notamment sur les couleurs utilisées et l'affichage des
+- 2026-10-26 09:59:53 UTC — [ticket-565] tour 2 — codeur démarré
+- 2026-10-26 10:01:08 UTC — [ticket-565] tour 2 — codeur terminé (75015ms)
+- 2026-10-26 10:02:52 UTC — [ticket-565] testeur: OK (exit 0)
+- 2026-10-26 10:04:43 UTC — [ticket-565] securite: PASS — Difficulté lecteur : frontend - tous les appels API passent par `authorized()`.  (111140ms)
+- 2026-10-26 10:04:43 UTC — [ticket-565] tour 2 — reviewer démarré
+- 2026-10-26 10:05:11 UTC — [ticket-565] tour 2 — reviewer terminé (27734ms)
+- 2026-10-26 10:09:43 UTC — [ticket-565] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 10:10:23 UTC — [ticket-565] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers) ; absents : design/charts/
+- 2026-10-26 10:10:23 UTC — [ticket-565] validateur: APPROVED — Tous les critères fonctionnels sont implémentés et vérifiés par des tests unitai (340140ms)
+- 2026-10-26 10:10:23 UTC — [ticket-565] APPROVED après 2 tour(s)
