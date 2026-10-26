@@ -175,8 +175,10 @@ section. (ADR-055)
   frontend passe toujours par `routers/fs.py`. (ADR-040)
 - **Rien n'est décoratif dans le Bureau.** Chaque sprite, objet ou bulle rend
   un état que le store de run ou l'API fournit ; sans donnée, on ne le
-  dessine pas. Les sprites vivent sous `design/bureau/`, leurs tons sont des
-  jetons `--sprite-*` du `@theme`, jamais une famille CSS brute. (ADR-058)
+  dessine pas. Seul le mobilier d'une salle se dessine toujours : il ne s'anime
+  pas et ne porte aucun voyant. Les sprites vivent sous `design/bureau/`, leurs
+  tons sont des jetons `--sprite-*` du `@theme`, jamais une famille CSS brute.
+  (ADR-058)
 
 ## Documentation
 
