@@ -5077,3 +5077,18 @@ Le diff ajoute :
 - 2026-10-26 14:37:05 UTC — [ticket-581] validateur: fichiers cités joints : Bulle.tsx, Dossiers.tsx, BureauConnecte.tsx, ListeView.tsx, BaieDeServeurs.tsx, FenetreDeQuota.tsx, backend/ (dossier, 6 fichiers)
 - 2026-10-26 14:37:05 UTC — [ticket-581] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés et respectés. Le code a été mis (271407ms)
 - 2026-10-26 14:37:05 UTC — [ticket-581] APPROVED après 1 tour(s)
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-582 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-583 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-586 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 14:40:13 UTC — [ticket-581] documentation: 0 fichier(s) (182796ms) — après tour de correction
