@@ -1,14 +1,16 @@
 ---
-id: ticket-580
-title: "The side column is hidden where it has nothing to show, and the bell count sits on its icon"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-567"]
-estimated_days: 0.25
 created: 2026-10-26
+depends_on:
+- ticket-567
+estimated_days: 0.25
+id: ticket-580
+pr_number: 654
+priority: high
+status: done
+title: The side column is hidden where it has nothing to show, and the bell count
+  sits on its icon
+type: fix
 ---
 
 # ticket-580 — Colonne latérale vide masquée, pastille de la cloche sur l'icône

@@ -187,6 +187,24 @@ describe("App — panneau Chat", () => {
   });
 });
 
+describe("App — colonne latérale (ticket-580)", () => {
+  it("does not render the side column on the supervision panel", async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole("tab", { name: /^Supervision/ }));
+
+    expect(screen.queryByLabelText("Panneau latéral")).not.toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveStyle({ gridColumn: "2" });
+  });
+
+  it("still renders the side column on the tickets panel", async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole("tab", { name: /^Tickets/ }));
+
+    expect(screen.getByLabelText("Panneau latéral")).toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveStyle({ gridColumn: "3" });
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Ticket-354 : React.memo sur TicketCard — la carte ne se redessine pas si
 // ses props n'ont pas changé.

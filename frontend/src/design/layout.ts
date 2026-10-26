@@ -26,3 +26,15 @@ export const GRILLE_COCKPIT = {
   // (32 px replié, 180 px déplié — ticket-440).
   gridTemplateRows: "1fr auto",
 } as const;
+
+/**
+ * La même grille sans colonne latérale — ticket-580. Pour les panneaux qui
+ * n'ont rien à y mettre (le Bureau, « En cours »), le centre reprend la place.
+ */
+export const GRILLE_COCKPIT_SANS_COLONNE = {
+  ...GRILLE_COCKPIT,
+  gridTemplateColumns: "100px 1fr",
+} as const;
+
+/** Les panneaux dont la colonne latérale n'a aucun contenu (ticket-580). */
+export const PANNEAUX_SANS_COLONNE: readonly string[] = ["supervision", "running"];

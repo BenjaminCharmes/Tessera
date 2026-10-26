@@ -60,6 +60,14 @@ describe("Cloche", () => {
     expect(within(bouton).getByText("3")).toBeInTheDocument();
   });
 
+  it("anchors the badge to the icon container, not to the button", () => {
+    render(<Cloche cloche={donnees({ nonLus: 3 })} />);
+    const conteneur = screen.getByTestId("cloche-icone");
+    expect(conteneur.className).toMatch(/\brelative\b/);
+    expect(conteneur.querySelector("svg")).not.toBeNull();
+    expect(within(conteneur).getByText("3")).toBeInTheDocument();
+  });
+
   it("shows no badge when everything is read", () => {
     render(<Cloche cloche={donnees()} />);
     const bouton = screen.getByRole("button", { name: "Notifications" });

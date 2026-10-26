@@ -42,15 +42,18 @@ export default function Cloche({ cloche }: { cloche: DonneesDeLaCloche }) {
             : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
         }`}
       >
-        <IconBell size={20} />
-        {nonLus > 0 ? (
-          <span
-            aria-hidden="true"
-            className="absolute right-0.5 top-0.5 min-w-4 rounded-full bg-violet-500 px-1 text-micro font-medium leading-4 text-zinc-50"
-          >
-            {nonLus}
-          </span>
-        ) : null}
+        {/* La pastille se pose sur l'icône, pas sur le bouton (ticket-580). */}
+        <span data-testid="cloche-icone" className="relative inline-flex">
+          <IconBell size={20} />
+          {nonLus > 0 ? (
+            <span
+              aria-hidden="true"
+              className="absolute -right-2 -top-2 min-w-4 rounded-full bg-violet-500 px-1 text-micro font-medium leading-4 text-zinc-50"
+            >
+              {nonLus}
+            </span>
+          ) : null}
+        </span>
       </button>
 
       {ouvert ? (
