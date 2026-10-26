@@ -4924,3 +4924,4 @@ Le diff ajoute :
 - 2026-10-26 10:10:23 UTC — [ticket-565] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers) ; absents : design/charts/
 - 2026-10-26 10:10:23 UTC — [ticket-565] validateur: APPROVED — Tous les critères fonctionnels sont implémentés et vérifiés par des tests unitai (340140ms)
 - 2026-10-26 10:10:23 UTC — [ticket-565] APPROVED après 2 tour(s)
+- 2026-10-26 10:14:48 UTC — [ticket-565] documentation: 0 fichier(s) (259797ms) — après tour de correction
