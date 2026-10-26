@@ -4,7 +4,7 @@ created: 2026-10-26
 depends_on: []
 estimated_days: 0.5
 id: ticket-587
-pr_number: null
+pr_number: 660
 priority: high
 status: done
 title: Steps that work silently are no longer reported as a frozen agent
