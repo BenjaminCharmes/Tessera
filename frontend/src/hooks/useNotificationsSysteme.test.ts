@@ -101,6 +101,102 @@ describe("useNotificationsSysteme", () => {
   });
 });
 
+describe("useNotificationsSysteme — la cloche (ticket-554)", () => {
+  beforeEach(() => {
+    creees.length = 0;
+    window.localStorage.clear();
+    vi.stubGlobal("Notification", FausseNotification);
+    Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  function monter(projetActif: string | null) {
+    return renderHook(
+      ({ etat }: { etat: StreamState }) =>
+        useNotificationsSysteme(supervision(etat), projetActif, vi.fn()),
+      { initialProps: { etat: { ...INITIAL, status: "running" } as StreamState } },
+    );
+  }
+  const question: StreamState = { ...INITIAL, status: "running", pendingQuestion: "?" };
+
+  it("keeps a notification produced while its project is displayed, without sending it", () => {
+    Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
+    const { result, rerender } = monter("demineur");
+    rerender({ etat: question });
+
+    expect(creees).toHaveLength(0);
+    expect(result.current.cloche.historique).toHaveLength(1);
+    expect(result.current.cloche.historique[0].type).toBe("question");
+    expect(result.current.cloche.nonLus).toBe(1);
+  });
+
+  it("keeps the history when the general switch is off", () => {
+    const { result, rerender } = monter(null);
+    act(() => result.current.setActive(false));
+    rerender({ etat: question });
+
+    expect(creees).toHaveLength(0);
+    expect(result.current.cloche.historique).toHaveLength(1);
+  });
+
+  it("resets the unread count to zero on mark all read", () => {
+    const { result, rerender } = monter("ide-core");
+    rerender({ etat: question });
+    expect(result.current.cloche.nonLus).toBe(1);
+
+    act(() => result.current.cloche.toutMarquerLu());
+
+    expect(result.current.cloche.nonLus).toBe(0);
+    expect(result.current.cloche.historique).toHaveLength(1);
+  });
+
+  it("does not send a type whose System box is unchecked, but records it", () => {
+    const { result, rerender } = monter("ide-core");
+    act(() => result.current.cloche.setReglage("question", "systeme", false));
+    rerender({ etat: question });
+
+    expect(creees).toHaveLength(0);
+    expect(result.current.cloche.historique).toHaveLength(1);
+  });
+
+  it("still sends the other types when one System box is unchecked", () => {
+    const { result, rerender } = monter("ide-core");
+    act(() => result.current.cloche.setReglage("question", "systeme", false));
+    rerender({ etat: { ...INITIAL, status: "error", errorMessage: "budget" } });
+
+    expect(creees).toHaveLength(1);
+    expect(creees[0].titre).toMatch(/bloqué/);
+  });
+
+  it("remembers the per-type settings across a reload", () => {
+    const premier = monter("ide-core");
+    act(() => premier.result.current.cloche.setReglage("termine", "son", true));
+    premier.unmount();
+
+    const { result } = monter("ide-core");
+    expect(result.current.cloche.reglages.termine.son).toBe(true);
+    expect(result.current.cloche.reglages.question.systeme).toBe(true);
+  });
+
+  it("empties the history of a previous day at load, with a simulated date", () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(2026, 9, 26, 12, 0, 0));
+      const premier = monter("ide-core");
+      premier.rerender({ etat: question });
+      expect(premier.result.current.cloche.nonLus).toBe(1);
+      premier.unmount();
+
+      vi.setSystemTime(new Date(2026, 9, 27, 9, 0, 0));
+      const { result } = monter("ide-core");
+      expect(result.current.cloche.historique).toEqual([]);
+      expect(result.current.cloche.nonLus).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 vi.mock("@tauri-apps/api/core", () => ({ isTauri: vi.fn(() => false) }));
 vi.mock("@tauri-apps/plugin-notification", () => ({
   isPermissionGranted: vi.fn(async () => true),

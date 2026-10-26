@@ -4925,3 +4925,18 @@ Le diff ajoute :
 - 2026-10-26 10:10:23 UTC — [ticket-565] validateur: APPROVED — Tous les critères fonctionnels sont implémentés et vérifiés par des tests unitai (340140ms)
 - 2026-10-26 10:10:23 UTC — [ticket-565] APPROVED après 2 tour(s)
 - 2026-10-26 10:14:48 UTC — [ticket-565] documentation: 0 fichier(s) (259797ms) — après tour de correction
+- 2026-10-26 10:30:36 UTC — [ide-core] ticket-565 PR #645 mergée (CI verte)
+- 2026-10-26 10:30:41 UTC — [ide-core] ticket-565 : base réalignée sur develop
+- 2026-10-26 10:30:41 UTC — [ide-core] ticket-565 PR #645 confiée au CIWatcher
+- 2026-10-26 10:30:51 UTC — [ticket-554] branche ticket-554-a-bell-keeps-the-day-s-notifications-and-lets-eac
+- 2026-10-26 10:32:07 UTC — [ticket-554] plan rendu (74953ms)
+- 2026-10-26 10:32:07 UTC — [ticket-554] tour 1 — codeur démarré
+- 2026-10-26 10:36:52 UTC — [ticket-554] tour 1 — codeur terminé (285031ms)
+- 2026-10-26 10:38:48 UTC — [ticket-554] testeur: OK (exit 0)
+- 2026-10-26 10:40:30 UTC — [ticket-554] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code valide strictement les donnée (102655ms)
+- 2026-10-26 10:40:31 UTC — [ticket-554] tour 1 — reviewer démarré
+- 2026-10-26 10:41:08 UTC — [ticket-554] tour 1 — reviewer terminé (36656ms)
+- 2026-10-26 10:45:32 UTC — [ticket-554] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 10:46:01 UTC — [ticket-554] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté la cloch (329141ms)
+- 2026-10-26 10:46:01 UTC — [ticket-554] APPROVED après 1 tour(s)
+- 2026-10-26 10:49:25 UTC — [ticket-554] documentation: 1 fichier(s) (194750ms)

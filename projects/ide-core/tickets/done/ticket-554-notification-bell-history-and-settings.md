@@ -1,15 +1,18 @@
 ---
-id: ticket-554
-title: "A bell keeps the day's notifications and lets each event be switched on or off"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-552", "ticket-553"]
-estimated_days: 1
 created: 2026-10-23
+depends_on:
+- ticket-552
+- ticket-553
+estimated_days: 1
+id: ticket-554
 plan: true
+pr_number: 646
+priority: medium
+status: done
+title: A bell keeps the day's notifications and lets each event be switched on or
+  off
+type: feat
 ---
 
 # ticket-554 — La cloche : historique du jour et réglages

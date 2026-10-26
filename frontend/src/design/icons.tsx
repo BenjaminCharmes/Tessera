@@ -179,6 +179,13 @@ export const IconSettings = (p: IconProps) => (
   </Icon>
 );
 
+export const IconBell = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" />
+    <path d="M10 21h4" />
+  </Icon>
+);
+
 export const IconDiff = (p: IconProps) => (
   <Icon {...p}>
     <path d="M7 4.5v7M3.5 8h7" />

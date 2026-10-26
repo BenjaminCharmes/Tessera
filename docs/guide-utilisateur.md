@@ -1254,6 +1254,48 @@ Chaque ligne du tableau représente un run de ticket. Quand une file contient pl
 
 Un run arrêté par une veille système, un redémarrage ou un timeout s'affiche avec le badge « interrompu » et un tiret « — » à la place de la durée. C'est un run sans tour complété : tu verras zéro tour et le badge neutre « interrompu », jamais une durée aberrante.
 
+## Notifications et historique du jour
+
+La cloche en bas du rail de navigation regroupe toutes tes notifications du jour et te permet de les gérer et de les régler une par une.
+
+### Accéder à la cloche
+
+Clique sur la cloche en bas du rail. Une pastille **violette** affiche le nombre de notifications non lues. Pas de notification ? La pastille est vide.
+
+La cloche s'ouvre en panneau avec deux onglets : « Aujourd'hui » et « Réglages ».
+
+### L'onglet « Aujourd'hui »
+
+Cet onglet affiche toutes les notifications du jour, de la plus récente à la plus ancienne. Les notifications non lues apparaissent en **gras**.
+
+Un clic sur une notification t'ouvre le projet concerné — utile quand tu as plusieurs projets et que tu veux vérifier ce qui s'est passé pendant une absence.
+
+Le bouton « Tout marquer comme lu » remet le compteur de la pastille à zéro.
+
+L'historique s'efface à minuit (fin du jour). Le jour suivant, tu repartiras de zéro.
+
+### L'onglet « Réglages »
+
+Pour chaque type d'événement, deux cases à cocher :
+
+- **Question** : un agent te demande confirmation
+- **Figé** : un ticket passe en statut « figé »
+- **Bloqué** : un ticket passe en statut « bloqué »
+- **Terminé** : un ticket est livré et approuvé
+- **Mergé** : un commit est mergé dans la base
+- **CI rouge** : les tests d'une PR échouent, ou le merge est refusé
+- **Quota bas** : ton crédit d'abonnement s'épuise
+
+**Système** : l'événement s'affiche-t-il comme notification du système d'exploitation ? Activé par défaut.
+
+**Son** : l'événement doit-il émettre un son ? Par défaut, seules la **Question** et la **CI rouge** sonnent.
+
+### Ce que ça ne fait pas
+
+- L'historique ne vit que dans ton navigateur — il ne remonte pas avant ton dernier chargement de l'écran.
+- Les réglages sont **globaux** pour tous les projets, pas par projet.
+- Le backend n'est jamais impliqué : notifications et réglages restent locaux.
+
 ## 6. Récupérer le travail des agents
 
 **À chaque run, quel que soit le verdict, le travail est commité** sur la branche du

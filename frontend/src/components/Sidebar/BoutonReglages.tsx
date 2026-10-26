@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { IconSettings } from "../../design/icons";
+import { useFermetureAuDehors } from "./useFermetureAuDehors";
 import PlafondsDeDepense from "./PlafondsDeDepense";
 import ReglageNotifications, {
   type ReglageDesNotifications,
@@ -19,23 +20,8 @@ interface BoutonReglagesProps {
 
 export default function BoutonReglages({ notifications }: BoutonReglagesProps) {
   const [ouvert, setOuvert] = useState(false);
-  const conteneur = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!ouvert) return;
-    function surTouche(e: KeyboardEvent) {
-      if (e.key === "Escape") setOuvert(false);
-    }
-    function surClic(e: MouseEvent) {
-      if (!conteneur.current?.contains(e.target as Node)) setOuvert(false);
-    }
-    document.addEventListener("keydown", surTouche);
-    document.addEventListener("mousedown", surClic);
-    return () => {
-      document.removeEventListener("keydown", surTouche);
-      document.removeEventListener("mousedown", surClic);
-    };
-  }, [ouvert]);
+  const fermer = useCallback(() => setOuvert(false), []);
+  const conteneur = useFermetureAuDehors(ouvert, fermer);
 
   return (
     <div ref={conteneur} className="relative px-1.5 pb-3">
