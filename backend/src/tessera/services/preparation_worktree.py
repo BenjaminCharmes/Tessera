@@ -14,7 +14,9 @@ from typing import TYPE_CHECKING
 
 from tessera.services.commande_effective import setup_effectif
 from tessera.services.pipeline_events import EventType, PipelineResult
+from tessera.services.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
+from tessera.services.pipeline_text import _unapproved_commit_message
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.test_runner import TestResult, TestRunnerService
 from tessera.models.ticket import TicketStatus
@@ -101,6 +103,11 @@ def _ligne_du_journal(ticket_id: str, resultat: ResultatPreparation) -> str:
     )
 
 
+def _commande_et_duree(resultat: ResultatPreparation) -> str:
+    """`command, N ms` — the commit subject names what ran and for how long."""
+    return f"{resultat.commande}, {resultat.duree_ms} ms"
+
+
 async def _annoncer(
     orch: "Orchestrator", run: PipelineRun, resultat: ResultatPreparation
 ) -> None:
@@ -125,7 +132,22 @@ async def preparer_le_worktree(
         return None
     await set_status(orch, run, TicketStatus.blocked)
     await emit(run, EventType.ERROR, reason=arret)
+    # Le rangement (ticket déplacé, journal) se commite comme sur toute sortie
+    # bloquée : un arbre propre laisse `supprimer` retirer le worktree, et le
+    # ticket peut être relancé (ADR-037, ADR-056).
+    commit_sha, echec_commit = await commit_ou_bloquer(
+        orch, run,
+        _unapproved_commit_message(
+            run.ticket_id,
+            f"worktree setup failed: {_commande_et_duree(resultat)}",
+        ),
+    )
+    await emit(
+        run, EventType.PIPELINE_DONE, approved=False, rounds=0,
+        reason="worktree_setup_failed", branch=run.branch,
+    )
     return PipelineResult(
         ticket_id=run.ticket_id, final_status=TicketStatus.blocked,
-        rounds=0, approved=False, arret=arret,
+        rounds=0, approved=False, branch=run.branch, commit_sha=commit_sha,
+        arret=echec_commit or arret,
     )

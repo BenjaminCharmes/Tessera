@@ -9,6 +9,7 @@ import pytest
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services import preparation_worktree
+from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.commande_effective import PlaceholderInconnu, setup_effectif
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
@@ -145,21 +146,29 @@ def _run(evenements: list[OrchestratorEvent]) -> PipelineRun:
 
 def _orchestrateur(
     journal: list[str], arret: str | None, lignes: list[str] | None = None,
-    code: int | None = 0,
+    code: int | None = 0, commits: list[str] | None = None, commit_en_echec: bool = False,
 ) -> tuple[Orchestrator, _Tickets]:
     tickets = _Tickets()
     lignes = [] if lignes is None else lignes
+    commits = [] if commits is None else commits
 
     async def adopter(branche: str, _base: str) -> str:
         journal.append("branche")
         return branche
+
+    async def commit_all(message: str) -> str:
+        if commit_en_echec:
+            raise GitWorkspaceError("index.lock")
+        commits.append(message)
+        return "abc1234"
 
     async def preparer() -> ResultatPreparation:
         journal.append("setup")
         return ResultatPreparation("pnpm install", 1830, code, arret)
 
     orch = SimpleNamespace(
-        _worktree=_WT, _git_workspace=SimpleNamespace(adopter_worktree=adopter),
+        _worktree=_WT,
+        _git_workspace=SimpleNamespace(adopter_worktree=adopter, commit_all=commit_all),
         _base_branch="develop", _chemins_absents=(), _log=lignes.append,
         _preparation=preparer, _ticket_svc=tickets,
     )
@@ -184,6 +193,29 @@ async def test_a_failed_setup_blocks_the_run_before_the_coder() -> None:
     assert resultat.arret == "La préparation du worktree a échoué : `x`"
     assert tickets.statuts == [TicketStatus.blocked]
     assert EventType.ERROR in [e.type for e in evenements]
+
+
+async def test_a_failed_setup_commits_the_bookkeeping_as_unapproved_work() -> None:
+    commits: list[str] = []
+    evenements: list[OrchestratorEvent] = []
+    orch, _ = _orchestrateur([], "échec", commits=commits, code=1)
+    resultat = await adopter_la_branche(orch, _run(evenements))
+    assert resultat is not None
+    assert len(commits) == 1
+    assert "unapproved work (worktree setup failed" in commits[0]
+    assert "pnpm install, 1830 ms" in commits[0]
+    assert resultat.commit_sha == "abc1234" and resultat.branch == "b"
+    assert resultat.arret == "échec"
+    done = [e for e in evenements if e.type == EventType.PIPELINE_DONE]
+    assert [e.data["reason"] for e in done] == ["worktree_setup_failed"]
+
+
+async def test_a_failed_commit_after_a_failed_setup_is_named_not_raised() -> None:
+    orch, _ = _orchestrateur([], "échec", commit_en_echec=True)
+    resultat = await adopter_la_branche(orch, _run([]))
+    assert resultat is not None and resultat.final_status == TicketStatus.blocked
+    assert resultat.commit_sha is None
+    assert resultat.arret is not None and resultat.arret.startswith("commit_failed")
 
 
 async def test_without_preparation_nothing_runs_before_the_coder() -> None:
