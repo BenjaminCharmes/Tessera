@@ -17,10 +17,8 @@ export type AgentRole =
   | "project-creator"
   | "github-sync";
 
-// Doit rester aligné sur EventType côté backend
-// (backend/src/tessera/services/pipeline_events.py). L'union était restée à
-// six valeurs alors que le pipeline en émet quatorze : les événements
-// manquants traversaient l'UI sans type, donc sans traitement possible.
+// Aligné sur EventType côté backend (services/pipeline_events.py) : un test
+// de `backend/tests` le vérifie dans les deux sens.
 export type EventType =
   | "agent_started"
   | "agent_token"
@@ -53,6 +51,8 @@ export type EventType =
   | "provisioning_step"
   | "run_resumed_from_existing_work"
   | "worktree_setup"
+  | "external_wait"
+  | "conflict_resolution"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */

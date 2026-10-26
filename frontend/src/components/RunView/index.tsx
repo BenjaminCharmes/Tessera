@@ -52,6 +52,7 @@ export default function RunView({ stream, projectId }: RunViewProps) {
             <PastilleSante
               dernierEvenementA={stream.dernierEvenementA}
               pendingQuestion={stream.pendingQuestion}
+              attenteExterieure={Boolean(stream.attenteExterieure)}
             />
           )}
         </div>

@@ -7,6 +7,8 @@ import type { SanteAgent } from "../../lib/santeAgent";
 interface PastilleSanteProps {
   dernierEvenementA: string | null | undefined;
   pendingQuestion: string | null | undefined;
+  /** Une attente extérieure est en cours : le silence est voulu (ticket-564). */
+  attenteExterieure?: boolean;
 }
 
 const ETATS: Record<SanteAgent, EtatPastille> = {
@@ -27,9 +29,13 @@ function depuis(dernierEvenementA: string | null | undefined, maintenant: number
  * Pastille de santé de l'agent en cours. Le tick de l'horloge vit ici : seule
  * la pastille se redessine, pas toute la vue du run.
  */
-export default function PastilleSante({ dernierEvenementA, pendingQuestion }: PastilleSanteProps) {
+export default function PastilleSante({
+  dernierEvenementA,
+  pendingQuestion,
+  attenteExterieure = false,
+}: PastilleSanteProps) {
   const maintenant = useMaintenant();
-  const sante = santeAgent(dernierEvenementA, maintenant, pendingQuestion);
+  const sante = santeAgent(dernierEvenementA, maintenant, pendingQuestion, attenteExterieure);
 
   return (
     <StatusPill

@@ -14,6 +14,11 @@ import type {
   RunActif,
   TicketStatus,
 } from "../types/api";
+import { boundEvents } from "./boundEvents";
+import { appliquerAttente, appliquerConflit } from "./streamAttente";
+import type { AttenteExterieure } from "./streamAttente";
+
+export { MAX_EVENTS } from "./boundEvents";
 
 export type StreamStatus = "idle" | "connecting" | "running" | "done" | "error";
 
@@ -167,6 +172,10 @@ export interface StreamState {
   answerAck: "transmitted" | "deposited" | null;
   /** Horodatage du dernier événement reçu, tokens compris (ticket-549). */
   dernierEvenementA: string | null;
+  /** Attente d'un événement extérieur (`external_wait`), tant qu'elle dure (ticket-564). */
+  attenteExterieure: AttenteExterieure | null;
+  /** Fichiers du conflit que le résolveur travaille, entre `started` et `ended` (ticket-564). */
+  conflitEnCours: string[] | null;
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -217,6 +226,8 @@ export const INITIAL: StreamState = {
   ciMerge: null,
   answerAck: null,
   dernierEvenementA: null,
+  attenteExterieure: null,
+  conflitEnCours: null,
 };
 
 /**
@@ -284,43 +295,6 @@ function addEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
 /** Retire une étape de la liste des étapes en cours. */
 function removeEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
   return etapesEnCours.filter((e) => e !== etape);
-}
-
-/** Borne maximale du tableau `events` d'un run (ticket-353). */
-export const MAX_EVENTS = 2000;
-
-/**
- * Événements de contrôle toujours conservés dans `events`, même quand la
- * borne est atteinte. Ce sont eux que lisent les consommateurs de `events`
- * (issueDuRun, RunCard, useCockpit, BottomPanel).
- */
-const CONTROL_EVENT_TYPES = new Set([
-  "pipeline_done",
-  "run_closed",
-  "queue_progress",
-  "pipeline_start",
-]);
-
-/**
- * Borne le tableau des événements à MAX_EVENTS en gardant toujours les
- * événements de contrôle, quel que soit leur âge (ticket-353).
- *
- * Les plus anciens événements ordinaires sont retirés en premier, de sorte
- * que `pipeline_done`, `run_closed`, `queue_progress` et `pipeline_start`
- * restent visibles dans le Pipeline log même après un long run.
- */
-function boundEvents(events: OrchestratorEvent[]): OrchestratorEvent[] {
-  if (events.length <= MAX_EVENTS) return events;
-  const toRemove = events.length - MAX_EVENTS;
-  let removed = 0;
-  return events.filter((ev) => {
-    if (CONTROL_EVENT_TYPES.has(ev.type)) return true;
-    if (removed < toRemove) {
-      removed++;
-      return false;
-    }
-    return true;
-  });
 }
 
 /** Applique l'événement et note quand il est arrivé, jeton d'agent compris (ticket-549). */
@@ -713,6 +687,10 @@ function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState 
           total: Number(ev.data["total"] ?? 0),
         },
       };
+    case "external_wait":
+      return { ...s, events, ticketEvents, ...appliquerAttente(ev) };
+    case "conflict_resolution":
+      return { ...s, events, ticketEvents, ...appliquerConflit(ev) };
     case "quota_updated":
       // Le quota d'abonnement est la ressource réellement finie : l'afficher
       // évite d'être coupé sans comprendre pourquoi (ticket-054).

@@ -3,10 +3,13 @@ import { useAlerteSonore } from "../../hooks/useAlerteSonore";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { contenuAToi } from "../../lib/bureau/aToi";
 import { modeCompact } from "../../lib/bureau/modeCompact";
+import { occupantsDeLaPause, occupantsDeLaReunion } from "../../lib/bureau/salles";
 import ColonneAToi from "./ColonneAToi";
 import type { ReglageSon } from "./ColonneAToi";
 import Compact from "./Compact";
 import Piece from "./Piece";
+import SallePause from "./SallePause";
+import SalleReunion from "./SalleReunion";
 import TableauDuJour from "./TableauDuJour";
 
 export interface ProjetDuBureau {
@@ -48,6 +51,10 @@ export default function BureauView({ projets, signalServices = 0, envoyer, son }
     <div className="flex items-start gap-3.5">
       <div className="flex min-w-0 flex-1 flex-col gap-3.5">
         <TableauDuJour maintenant={maintenant} signalRunsClos={runsClos} />
+        <div className="flex gap-3.5">
+          <SallePause occupants={occupantsDeLaPause(projets)} />
+          <SalleReunion occupants={occupantsDeLaReunion(projets)} />
+        </div>
         <div
           className={compact ? "flex flex-col gap-2" : "grid grid-cols-2 gap-3.5"}
           data-mode={compact ? "compact" : "pieces"}

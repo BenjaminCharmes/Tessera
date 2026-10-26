@@ -14,7 +14,12 @@ interface CompactProps {
 /** La rangée compacte d'un projet : cinq puces de poste et, si un agent travaille, sa santé. */
 export default function Compact({ projet, etat, maintenant }: CompactProps) {
   const postes = postesDuRun(etat);
-  const sante = santeAgent(etat.dernierEvenementA, maintenant, etat.pendingQuestion);
+  const sante = santeAgent(
+    etat.dernierEvenementA,
+    maintenant,
+    etat.pendingQuestion,
+    etat.attenteExterieure !== null,
+  );
   const enCours = postes.some((p) => p.etat === "occupe");
 
   return (

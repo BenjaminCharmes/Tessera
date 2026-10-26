@@ -28,7 +28,12 @@ const CONTOURS: Record<ContourDeLaPiece, string> = {
 /** La pièce d'un projet : cinq postes dans l'ordre du pipeline, contour selon l'issue ou la santé. */
 export default function Piece({ projet, etat, maintenant, runId = null, signalServices = 0 }: PieceProps) {
   const postes = postesDuRun(etat);
-  const sante = santeAgent(etat.dernierEvenementA, maintenant, etat.pendingQuestion);
+  const sante = santeAgent(
+    etat.dernierEvenementA,
+    maintenant,
+    etat.pendingQuestion,
+    etat.attenteExterieure !== null,
+  );
   const contour = contourDeLaPiece(etat, sante);
   const enCours = postes.some((p) => p.etat === "occupe");
 
