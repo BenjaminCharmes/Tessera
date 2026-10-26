@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
+import { api } from "../../lib/api";
 import Piece from "./Piece";
 import { DERNIER, T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
 
@@ -11,6 +12,15 @@ function pastille(): string | null {
   const section = screen.getByRole("region", { name: "ide-core" });
   return section.querySelector("[data-etat]")?.textContent ?? null;
 }
+
+beforeEach(() => {
+  vi.spyOn(api.services, "list").mockResolvedValue([]);
+  vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Piece", () => {
   it("renders five posts, one button each, named with their state", () => {

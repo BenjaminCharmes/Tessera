@@ -4,6 +4,7 @@ import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
 import { santeAgent } from "../../lib/santeAgent";
+import ObjetsDeLaPiece from "./ObjetsDeLaPiece";
 import PosteDeTravail from "./PosteDeTravail";
 
 interface PieceProps {
@@ -11,6 +12,10 @@ interface PieceProps {
   etat: StreamState;
   /** L'horloge unique de la vue : la pièce n'ouvre aucun minuteur. */
   maintenant: number;
+  /** Le run vivant du projet : sans lui, pas de pile de dossiers. */
+  runId?: string | null;
+  /** Compteur d'événements de service, relu par la baie. */
+  signalServices?: number;
 }
 
 const CONTOURS: Record<ContourDeLaPiece, string> = {
@@ -21,7 +26,7 @@ const CONTOURS: Record<ContourDeLaPiece, string> = {
 };
 
 /** La pièce d'un projet : cinq postes dans l'ordre du pipeline, contour selon l'issue ou la santé. */
-export default function Piece({ projet, etat, maintenant }: PieceProps) {
+export default function Piece({ projet, etat, maintenant, runId = null, signalServices = 0 }: PieceProps) {
   const postes = postesDuRun(etat);
   const sante = santeAgent(etat.dernierEvenementA, maintenant, etat.pendingQuestion);
   const contour = contourDeLaPiece(etat, sante);
@@ -42,6 +47,7 @@ export default function Piece({ projet, etat, maintenant }: PieceProps) {
         ))}
       </div>
       <div className="flex min-h-9 items-center px-3 py-2">{enCours && <Pastille sante={sante} />}</div>
+      <ObjetsDeLaPiece projet={projet} etat={etat} runId={runId} signalServices={signalServices} />
     </section>
   );
 }

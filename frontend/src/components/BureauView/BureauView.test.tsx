@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import BureauView from "./index";
 import type { ProjetDuBureau } from "./index";
+import { api } from "../../lib/api";
 import Piece from "./Piece";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
@@ -27,11 +28,14 @@ function DixPieces() {
 
 describe("BureauView", () => {
   beforeEach(() => {
+  vi.spyOn(api.services, "list").mockResolvedValue([]);
+  vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
     vi.useFakeTimers();
     vi.setSystemTime(T0 + 5_000);
   });
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("renders ten rooms under 2000 SVG nodes", () => {

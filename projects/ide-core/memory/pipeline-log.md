@@ -4866,3 +4866,31 @@ Le diff ajoute :
 - 2026-10-24 09:30:37 UTC — [ticket-572] APPROVED après 1 tour(s)
 - 2026-10-24 09:30:43 UTC — [ticket-572] documentation: 0 fichier(s) (421ms)
 - 2026-10-24 09:30:43 UTC — [ticket-572] documentation: pas de diff retrouvable, non documenté
+- 2026-10-24 09:31:01 UTC — [ide-core] ticket-572 PR #638 confiée au CIWatcher
+- 2026-10-24 09:31:05 UTC — [ticket-563] branche ticket-563-the-office-folders-mailbox-and-server-rack
+- 2026-10-24 09:32:34 UTC — [ticket-563] plan rendu (88125ms)
+- 2026-10-24 09:32:34 UTC — [ticket-563] tour 1 — codeur démarré
+- 2026-10-24 09:35:09 UTC — [ide-core] ticket-572 PR #638 mergée (CI verte)
+- 2026-10-24 09:39:59 UTC — [ticket-563] tour 1 — codeur terminé (444719ms)
+- 2026-10-24 09:58:23 UTC — [ticket-563] testeur: Tests  1 failed | 1417 passed (1418)
+- 2026-10-24 09:58:23 UTC — [ticket-563] tests rouges au tour 1
+- 2026-10-24 09:58:23 UTC — [ticket-563] tour 2 — codeur démarré
+- 2026-10-24 09:58:29 UTC — [ticket-563] INTERROMPU par limite de session (reprise : 2:30pm (Europe/Paris))
+- 2026-10-24 09:58:33 UTC — [ide-core] file interrompue : limite de session (reprise : 2:30pm (Europe/Paris))
+- 2026-10-26 07:58:44 UTC — [ticket-563] branche ticket-563-the-office-folders-mailbox-and-server-rack
+- 2026-10-26 07:59:44 UTC — [ticket-563] plan rendu (59843ms)
+- 2026-10-26 08:11:05 UTC — [ticket-563] testeur: Tests  1 failed | 1417 passed (1418)
+- 2026-10-26 08:11:05 UTC — [ticket-563] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-10-26 08:11:05 UTC — [ticket-563] tour 1 — codeur démarré
+- 2026-10-26 08:12:44 UTC — [ticket-563] tour 1 — codeur terminé (98827ms)
+- 2026-10-26 08:28:27 UTC — [ticket-563] testeur: OK (exit 0)
+- 2026-10-26 08:30:33 UTC — [ticket-563] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée.
+
+**Points de sécurité vérifiés** (125125ms)
+- 2026-10-26 08:30:33 UTC — [ticket-563] tour 1 — reviewer démarré
+- 2026-10-26 08:30:55 UTC — [ticket-563] tour 1 — reviewer terminé (22157ms)
+- 2026-10-26 08:35:33 UTC — [ticket-563] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 08:36:24 UTC — [ticket-563] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 08:36:24 UTC — [ticket-563] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute trois composants React (pile d (350938ms)
+- 2026-10-26 08:36:24 UTC — [ticket-563] APPROVED après 1 tour(s)
+- 2026-10-26 08:39:28 UTC — [ticket-563] documentation: 0 fichier(s) (177641ms)
