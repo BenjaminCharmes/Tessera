@@ -9,6 +9,8 @@ import Piece from "./Piece";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
 
+const CANAL = { envoyer: vi.fn(), son: { actif: false, regler: vi.fn() } };
+
 function projets(nombre: number): ProjetDuBureau[] {
   return Array.from({ length: nombre }, (_, i) => ({
     nom: `projet-${i}`,
@@ -61,14 +63,14 @@ describe("BureauView", () => {
   });
 
   it("mounts a single interval for a view of rooms", () => {
-    render(<BureauView projets={projets(6)} />);
+    render(<BureauView projets={projets(6)} {...CANAL} />);
 
     expect(screen.getAllByRole("region")).toHaveLength(6);
     expect(vi.getTimerCount()).toBe(1);
   });
 
   it("moves the words with the clock without any new event", () => {
-    render(<BureauView projets={projets(1)} />);
+    render(<BureauView projets={projets(1)} {...CANAL} />);
     expect(screen.getByTestId("bulle")).toHaveTextContent("travaille");
 
     act(() => {
@@ -83,7 +85,7 @@ describe("BureauView", () => {
   });
 
   it("switches to one compact row per project above the threshold", () => {
-    const { container } = render(<BureauView projets={projets(7)} />);
+    const { container } = render(<BureauView projets={projets(7)} {...CANAL} />);
 
     expect(screen.queryAllByRole("region")).toHaveLength(0);
     expect(screen.getAllByRole("group")).toHaveLength(7);

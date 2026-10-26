@@ -142,10 +142,10 @@ describe("TableauDuJour in the office", () => {
       timestamp: DERNIER,
     });
 
-    const { rerender } = render(<BureauView projets={[{ nom: "p", etat: enCours }]} />);
+    const { rerender } = render(<BureauView projets={[{ nom: "p", etat: enCours }]} envoyer={vi.fn()} son={{ actif: false, regler: vi.fn() }} />);
     await waitFor(() => expect(espion).toHaveBeenCalledTimes(1));
 
-    rerender(<BureauView projets={[{ nom: "p", etat: clos }]} />);
+    rerender(<BureauView projets={[{ nom: "p", etat: clos }]} envoyer={vi.fn()} son={{ actif: false, regler: vi.fn() }} />);
 
     await waitFor(() => expect(espion).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(quota).toHaveBeenCalledTimes(2));
