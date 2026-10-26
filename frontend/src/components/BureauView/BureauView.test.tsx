@@ -3,6 +3,8 @@ import { act, render, screen } from "@testing-library/react";
 import BureauView from "./index";
 import type { ProjetDuBureau } from "./index";
 import { api } from "../../lib/api";
+import { apiQuota } from "../../lib/quota";
+import type { UsageStats } from "../../types/api";
 import Piece from "./Piece";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
@@ -30,6 +32,9 @@ describe("BureauView", () => {
   beforeEach(() => {
   vi.spyOn(api.services, "list").mockResolvedValue([]);
   vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
+    // Le tableau du jour lit la dépense et le quota : rien de réseau dans ces tests.
+    vi.spyOn(api.usage, "stats").mockResolvedValue({ daily: [] } as unknown as UsageStats);
+    vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });
     vi.useFakeTimers();
     vi.setSystemTime(T0 + 5_000);
   });
