@@ -5004,3 +5004,5 @@ Le diff ajoute :
 - 2026-10-26 13:22:28 UTC — [ticket-567] validateur: fichiers cités joints : SupervisionView.test.tsx (tronqué) ; non joints (budget épuisé) : SupervisionView/index.tsx, backend/
 - 2026-10-26 13:22:28 UTC — [ticket-567] validateur: APPROVED — Ticket-567 livré complet : le Bureau devient la vue par défaut avec sélecteur Bu (372015ms)
 - 2026-10-26 13:22:28 UTC — [ticket-567] APPROVED après 1 tour(s)
+- 2026-10-26 13:28:17 UTC — [ticket-567] documentation: 1 fichier(s) (345344ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « /**
+ * Ce qui n'est ni du travail ni un blocage : un quota é » (frontend/src/components/Bu
