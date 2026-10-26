@@ -1,8 +1,9 @@
 """Verification script: runs backend and frontend checks in parallel chains.
 
-Backend chain (pytest → mypy) and frontend chain (tsc → eslint → vitest) run
-side by side, each stopping at its first failure. Outputs are captured and
-printed together once both chains finish — never interleaved.
+Three chains run side by side — pytest, typing (mypy → mypy-linux) and
+frontend (tsc → eslint → vitest) — each stopping at its first failure. Outputs
+are captured and printed together once every chain finishes — never
+interleaved.
 
 Run from backend/ with: uv run python ../scripts/verifier.py
 
@@ -63,16 +64,25 @@ BACKEND_STEPS: list[Step] = [
         cmd=pytest_command(),
         cwd=BACKEND_DIR,
     ),
+]
+
+# Une chaîne à part, à côté de pytest plutôt qu'après lui. Chaque plateforme a
+# son propre cache : partagé, chaque passage invalidait celui de l'autre (39 s
+# à froid, 12 s à chaud pour win32 seul ; 46 s puis 47 s en alternant).
+TYPE_STEPS: list[Step] = [
     Step(
         name="mypy",
-        cmd=[_PYTHON, "-m", "mypy", "src/"],
+        cmd=[_PYTHON, "-m", "mypy", "--cache-dir", ".mypy_cache/native", "src/"],
         cwd=BACKEND_DIR,
     ),
     # La CI tourne sous Linux : un attribut propre à Windows (`stat.FILE_ATTRIBUTE_…`,
     # `os.killpg` dans l'autre sens) passe le mypy local et casse la CI, après la revue.
     Step(
         name="mypy-linux",
-        cmd=[_PYTHON, "-m", "mypy", "--platform", "linux", "src/"],
+        cmd=[
+            _PYTHON, "-m", "mypy", "--platform", "linux",
+            "--cache-dir", ".mypy_cache/linux", "src/",
+        ],
         cwd=BACKEND_DIR,
     ),
 ]
@@ -96,7 +106,7 @@ FRONTEND_STEPS: list[Step] = [
 ]
 
 # Kept for backward compatibility and for tools that iterate all steps.
-STEPS: list[Step] = BACKEND_STEPS + FRONTEND_STEPS
+STEPS: list[Step] = BACKEND_STEPS + TYPE_STEPS + FRONTEND_STEPS
 
 
 def _extract_errors(output: str) -> str:
@@ -137,20 +147,23 @@ def _run_chain(steps: list[Step]) -> list[_StepFailure]:
     return []
 
 
-def run_parallel(backend_steps: list[Step], frontend_steps: list[Step]) -> int:
-    """Run backend and frontend chains concurrently; return non-zero if either fails.
+def run_parallel(
+    backend_steps: list[Step],
+    frontend_steps: list[Step],
+    type_steps: list[Step] | None = None,
+) -> int:
+    """Run the chains concurrently; return non-zero if any fails.
 
     Each chain is sequential and stops at its first failure. Outputs are
-    captured independently — never interleaved. The report (backend first)
-    is printed to stderr once both chains finish.
+    captured independently — never interleaved. The report (backend, then
+    typing, then frontend) is printed to stderr once every chain finishes.
     """
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        backend_future = executor.submit(_run_chain, backend_steps)
-        frontend_future = executor.submit(_run_chain, frontend_steps)
-        backend_failures = backend_future.result()
-        frontend_failures = frontend_future.result()
+    chains = [backend_steps, type_steps or [], frontend_steps]
+    with ThreadPoolExecutor(max_workers=len(chains)) as executor:
+        futures = [executor.submit(_run_chain, steps) for steps in chains]
+        results = [future.result() for future in futures]
 
-    all_failures = backend_failures + frontend_failures
+    all_failures = [failure for result in results for failure in result]
     for failure in all_failures:
         print(f"{failure.step_name} :\n{failure.excerpt}", file=sys.stderr)
 
@@ -181,7 +194,7 @@ def run_steps(steps: list[Step]) -> int:
 
 def main() -> int:
     """Entry point."""
-    return run_parallel(BACKEND_STEPS, FRONTEND_STEPS)
+    return run_parallel(BACKEND_STEPS, FRONTEND_STEPS, TYPE_STEPS)
 
 
 if __name__ == "__main__":

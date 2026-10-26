@@ -23,6 +23,7 @@ from verifier import (  # noqa: E402
     BACKEND_STEPS,
     FRONTEND_STEPS,
     STEPS,
+    TYPE_STEPS,
     Step,
     _run_chain,
     run_parallel,
@@ -215,15 +216,33 @@ def test_xdist_is_a_dev_dependency() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_backend_and_frontend_steps_are_defined() -> None:
-    """BACKEND_STEPS and FRONTEND_STEPS are both non-empty with the right steps."""
-    assert {s.name for s in BACKEND_STEPS} == {"pytest", "mypy", "mypy-linux"}
+def test_backend_type_and_frontend_steps_are_defined() -> None:
+    """pytest, the two mypy runs and the frontend steps each sit in their own chain."""
+    assert [s.name for s in BACKEND_STEPS] == ["pytest"]
+    assert [s.name for s in TYPE_STEPS] == ["mypy", "mypy-linux"]
     assert {s.name for s in FRONTEND_STEPS} == {"tsc", "eslint", "vitest"}
 
 
-def test_steps_equals_backend_plus_frontend() -> None:
-    """The legacy STEPS list is exactly BACKEND_STEPS followed by FRONTEND_STEPS."""
-    assert STEPS == BACKEND_STEPS + FRONTEND_STEPS
+def test_steps_equals_backend_plus_types_plus_frontend() -> None:
+    """The legacy STEPS list is the three chains in order."""
+    assert STEPS == BACKEND_STEPS + TYPE_STEPS + FRONTEND_STEPS
+
+
+def test_each_mypy_platform_has_its_own_cache() -> None:
+    """A shared cache was invalidated by every run of the other platform."""
+    caches = [s.cmd[s.cmd.index("--cache-dir") + 1] for s in TYPE_STEPS]
+    assert len(caches) == 2
+    assert caches[0] != caches[1]
+
+
+def test_run_parallel_reports_a_failure_from_the_type_chain() -> None:
+    """A failing mypy run fails the whole verification."""
+    backend = _make_steps("pytest")
+    types = _make_steps("mypy")
+    frontend = _make_steps("tsc")
+    with patch("verifier.subprocess.run") as run:
+        run.side_effect = lambda cmd, **_: _result(1, "type error") if "mypy" in cmd else _result(0)
+        assert run_parallel(backend, frontend, types) == 1
 
 
 def test_chains_overlap_in_time() -> None:
@@ -330,5 +349,6 @@ def test_run_parallel_returns_zero_when_all_pass() -> None:
 
 def test_mypy_also_checks_the_linux_platform_of_the_ci() -> None:
     """A Windows-only attribute must fail here, not in CI after the review (ticket-523)."""
-    linux = next(s for s in BACKEND_STEPS if s.name == "mypy-linux")
-    assert linux.cmd[-3:] == ["--platform", "linux", "src/"]
+    linux = next(s for s in TYPE_STEPS if s.name == "mypy-linux")
+    assert linux.cmd[linux.cmd.index("--platform") + 1] == "linux"
+    assert linux.cmd[-1] == "src/"
