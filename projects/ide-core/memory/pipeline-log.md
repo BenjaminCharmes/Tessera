@@ -5030,3 +5030,35 @@ Le diff ajoute :
 - 2026-10-26 13:57:12 UTC — [ticket-579] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests d'intégration robust (390671ms)
 - 2026-10-26 13:57:12 UTC — [ticket-579] APPROVED après 1 tour(s)
 - 2026-10-26 13:59:32 UTC — [ticket-579] documentation: 0 fichier(s) (136266ms)
+- 2026-10-26 14:07:55 UTC — [ide-core] ticket-579 PR #652 confiée au CIWatcher
+- 2026-10-26 14:07:58 UTC — [ticket-580] branche ticket-580-the-side-column-is-hidden-where-it-has-nothing-to
+- 2026-10-26 14:07:59 UTC — [ticket-580] tour 1 — codeur démarré
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 14:09:38 UTC — [ticket-580] tour 1 — codeur terminé (98219ms)
+- 2026-10-26 14:11:57 UTC — [ticket-580] testeur: OK (exit 0)
+- 2026-10-26 14:13:10 UTC — [ide-core] ticket-579 PR #652 mergée (CI verte)
+- 2026-10-26 14:14:02 UTC — [ticket-580] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit un rendu conditionnel de la col (125061ms)
+- 2026-10-26 14:14:02 UTC — [ticket-580] tour 1 — reviewer démarré
+- 2026-10-26 14:14:24 UTC — [ticket-580] tour 1 — reviewer terminé (22233ms)
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 14:16:28 UTC — [ticket-580] validateur: fichiers cités joints : Cloche.tsx, backend/ (dossier, 6 fichiers)
+- 2026-10-26 14:16:28 UTC — [ticket-580] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement l'a (145889ms)
+- 2026-10-26 14:16:28 UTC — [ticket-580] APPROVED après 1 tour(s)
