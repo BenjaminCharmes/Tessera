@@ -1,15 +1,17 @@
 ---
-id: ticket-563
-title: "The office folders, mailbox and server rack"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-560", "ticket-562"]
-estimated_days: 1.5
 created: 2026-10-23
+depends_on:
+- ticket-560
+- ticket-562
+estimated_days: 1.5
+id: ticket-563
 plan: true
+pr_number: 640
+priority: medium
+status: done
+title: The office folders, mailbox and server rack
+type: feat
 ---
 
 # ticket-563 — Dossiers, boîte aux lettres et baie de serveur

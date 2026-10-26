@@ -1,5 +1,7 @@
 import type { EtatPastille } from "../ui/StatusPill";
 import type { SanteAgent } from "../../lib/santeAgent";
+import type { EtatBoite } from "../../lib/bureau/boiteAuxLettres";
+import type { EtatDuService } from "../etatDuService";
 
 /** Ce qu'un poste montre : la santé du run s'il est occupé, sinon « fait » ou « libre ». */
 export type TonDePoste = SanteAgent | "fait" | "libre";
@@ -38,4 +40,20 @@ export const TON_PUCE: Record<TonDePoste, string> = {
   blocage_suspecte: "bg-red-400",
   fait: "bg-green-400",
   libre: "bg-zinc-700",
+};
+
+/** Le drapeau de la boîte aux lettres, par état de la PR. L'absence de PR ne lève rien. */
+export const TON_BOITE: Record<Exclude<EtatBoite, "aucune">, string> = {
+  ouverte: "fill-amber-400",
+  ci: "fill-blue-400",
+  mergee: "fill-green-400",
+  refusee: "fill-red-400",
+};
+
+/** Le voyant d'un étage de la baie, par état du service. Mêmes familles que le panneau des services. */
+export const TON_VOYANT: Record<EtatDuService, string> = {
+  "en-cours": "fill-blue-400",
+  echoue: "fill-red-400",
+  arrete: "fill-zinc-500",
+  "jamais-lance": "fill-zinc-600",
 };

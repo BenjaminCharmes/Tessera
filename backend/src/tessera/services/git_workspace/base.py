@@ -2,8 +2,8 @@
 
 import asyncio
 
+from tessera.services.git_workspace.avance_base import GitAvanceBase
 from tessera.services.git_workspace.erreurs import GitCommandError
-from tessera.services.git_workspace.historique import GitHistory
 from tessera.utils.logger import get_logger
 
 
@@ -18,7 +18,7 @@ _TENTATIVES_FETCH = 3
 _ATTENTE_ENTRE_FETCH_S = 2.0
 
 
-class GitBase(GitHistory):
+class GitBase(GitAvanceBase):
     """The base ref: initialisation, fetch and merge-base."""
 
     async def _base_distante(self, base_branch: str) -> str:
@@ -50,6 +50,26 @@ class GitBase(GitHistory):
                 if tentative == _TENTATIVES_FETCH:
                     raise
                 await asyncio.sleep(_ATTENTE_ENTRE_FETCH_S)
+
+    async def _avancer_base_locale(self, base_branch: str, fetch_sha: str) -> str | None:
+        """Move the local base branch to ``fetch_sha``; a reason when it must block.
+
+        Sur la base active, `update-ref` avancerait la référence sans l'index ni
+        les fichiers : ce que le nouveau commit ajoute paraîtrait supprimé, et
+        le commit du run l'emporterait (ticket-572). La branche active avance
+        donc par avance rapide, fichiers compris ; une autre branche active
+        laisse la base à `update-ref`.
+        """
+        if await self.branche_courante() == base_branch:
+            raison = await self._avancer_base_active(fetch_sha)
+            if raison is not None:
+                _logger.warning("base_ref_ff_echoue", extra={"erreur": raison})
+            return raison
+        try:
+            await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
+        except GitCommandError as exc:
+            _logger.warning("base_ref_update_echoue", extra={"error": str(exc)})
+        return None
 
     async def initialiser_base_ref(
         self, base_branch: str | None = None, *, exiger_distant: bool = False
@@ -148,11 +168,9 @@ class GitBase(GitHistory):
                 _logger.warning("base_ref_divergee", extra={"raison": raison})
                 return raison
 
-        # Fast-forward local branch ref
-        try:
-            await self._run("update-ref", f"refs/heads/{base_branch}", fetch_sha)
-        except GitCommandError as exc:
-            _logger.warning("base_ref_update_echoue", extra={"error": str(exc)})
+        raison_ff = await self._avancer_base_locale(base_branch, fetch_sha)
+        if raison_ff is not None:
+            return raison_ff
 
         self._base_ref = fetch_sha
         _logger.info(
