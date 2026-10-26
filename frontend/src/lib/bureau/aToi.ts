@@ -62,7 +62,12 @@ export function contenuAToi(projets: readonly ProjetPourLaColonne[], maintenant:
         expireA: etat.questionExpireA,
       });
     }
-    const sante = santeAgent(etat.dernierEvenementA, maintenant, etat.pendingQuestion);
+    const sante = santeAgent(
+      etat.dernierEvenementA,
+      maintenant,
+      etat.pendingQuestion,
+      etat.attenteExterieure !== null,
+    );
     if (!etat.runClosed && sante === "blocage_suspecte") contenu.figes.push(nom);
     const pr = prARelire(etat);
     if (pr !== null) contenu.prs.push({ projet: nom, pr });

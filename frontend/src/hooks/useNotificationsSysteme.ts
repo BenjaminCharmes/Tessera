@@ -145,7 +145,12 @@ export function useNotificationsSysteme(
       const etat = etatDe(r.run_id);
       etats[r.run_id] = etat;
       if (etat.status === "running") {
-        sante[r.run_id] = santeAgent(etat.dernierEvenementA, maintenant, etat.pendingQuestion);
+        sante[r.run_id] = santeAgent(
+          etat.dernierEvenementA,
+          maintenant,
+          etat.pendingQuestion,
+          etat.attenteExterieure !== null,
+        );
       }
     }
     const courant: Instantane = { runs, etats, sante };

@@ -4955,3 +4955,40 @@ Le diff ajoute :
 - 2026-10-26 11:07:31 UTC — [ticket-566] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la colonne « À t (357686ms)
 - 2026-10-26 11:07:31 UTC — [ticket-566] APPROVED après 1 tour(s)
 - 2026-10-26 11:09:50 UTC — [ticket-566] documentation: 0 fichier(s) (133702ms)
+- 2026-10-26 11:14:18 UTC — [ide-core] ticket-566 PR #647 mergée (CI verte)
+- 2026-10-26 11:14:20 UTC — [ide-core] ticket-566 : base réalignée sur develop
+- 2026-10-26 11:14:20 UTC — [ide-core] ticket-566 PR #647 confiée au CIWatcher
+- 2026-10-26 11:14:25 UTC — [ticket-564] branche ticket-564-the-office-break-room-meeting-room-and-a-health-t
+- 2026-10-26 11:15:47 UTC — [ticket-564] plan rendu (80827ms)
+- 2026-10-26 11:15:47 UTC — [ticket-564] tour 1 — codeur démarré
+- 2026-10-26 11:24:03 UTC — [ticket-564] tour 1 — codeur terminé (496609ms)
+- 2026-10-26 11:33:41 UTC — [ticket-564] testeur: OK (exit 0)
+- 2026-10-26 11:36:21 UTC — [ticket-564] securite: PASS — Le diff ajoute deux nouveaux événements WebSocket avec validation stricte côté f (160311ms)
+- 2026-10-26 11:36:21 UTC — [ticket-564] tour 1 — reviewer démarré
+- 2026-10-26 11:37:06 UTC — [ticket-564] tour 1 — reviewer terminé (44875ms)
+- 2026-10-26 11:41:21 UTC — [ticket-564] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 11:42:54 UTC — [ticket-564] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 11:42:54 UTC — [ticket-564] validateur: CHANGES_REQUESTED — 6 critères satisfaits sur 8. Le work frontend est correct et complet : types `ex (392969ms)
+- 2026-10-26 11:42:54 UTC — [ticket-564] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-26 11:42:54 UTC — [ticket-564] tour 2 — codeur démarré
+- 2026-10-26 11:44:01 UTC — [ticket-564] tour 2 — codeur terminé (66188ms)
+- 2026-10-26 11:53:51 UTC — [ticket-564] testeur: OK (exit 0)
+- 2026-10-26 11:56:02 UTC — [ticket-564] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code ajoute deux nouveaux types d' (131390ms)
+- 2026-10-26 11:56:02 UTC — [ticket-564] tour 2 — reviewer démarré
+- 2026-10-26 11:56:28 UTC — [ticket-564] tour 2 — reviewer terminé (26264ms)
+- 2026-10-26 12:01:02 UTC — [ticket-564] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 12:02:34 UTC — [ticket-564] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-26 12:02:34 UTC — [ticket-564] validateur: CHANGES_REQUESTED — 6 critères sur 8 sont satisfaits. Le travail frontend est correct et complet : l (392311ms)
+- 2026-10-26 12:02:34 UTC — [ticket-564] CHANGES_REQUESTED tour 2: Reviewer : ## Problèmes bloquants
+- 2026-10-26 12:02:34 UTC — [ticket-564] tour 3 — codeur démarré
+- 2026-10-26 12:03:27 UTC — [ticket-564] tour 3 — codeur terminé (52656ms)
+- 2026-10-26 12:12:04 UTC — [ticket-564] testeur: OK (exit 0)
+- 2026-10-26 12:14:34 UTC — [ticket-564] securite: PASS — Audit complet du diff : aucune vulnérabilité de sécurité détectée. Le code ajout (150375ms)
+- 2026-10-26 12:14:34 UTC — [ticket-564] tour 3 — reviewer démarré
+- 2026-10-26 12:14:50 UTC — [ticket-564] tour 3 — reviewer terminé (16343ms)
+- 2026-10-26 12:19:34 UTC — [ticket-564] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 12:20:15 UTC — [ticket-564] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 12:20:15 UTC — [ticket-564] validateur: CHANGES_REQUESTED — Le travail frontend est correct et complet : types ajoutés, store mis à jour, sa (341421ms)
+- 2026-10-26 12:20:15 UTC — [ticket-564] CHANGES_REQUESTED tour 3: Validateur : Le travail frontend est correct et complet : types ajoutés, store mis à jour, santé refactorisée, salles implémentées avec couverture de tests solide. Cependant, le diff modifie un fichie
+- 2026-10-26 12:20:15 UTC — [ticket-564] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-26 12:20:20 UTC — [ide-core] file interrompue : ticket-564 non approuvé

@@ -22,14 +22,18 @@ export const SEUIL_BLOCAGE_MS = 180_000;
 
 /**
  * Une question en attente prime (ADR-025) : l'agent attend l'humain, il n'est pas figé.
+ * Une attente extérieure (`external_wait`) ne se confond pas avec un blocage : le
+ * silence est voulu, quelle que soit sa durée, donc `attente` et jamais « figé ? ».
  * Un horodatage absent ou illisible rend `actif` : sans événement, on ne conclut rien.
  */
 export function santeAgent(
   dernierEvenementA: string | null | undefined,
   maintenant: number,
   questionEnAttente: string | null | undefined,
+  attenteExterieure = false,
 ): SanteAgent {
   if (questionEnAttente) return "question";
+  if (attenteExterieure) return "attente";
   if (!dernierEvenementA) return "actif";
   const ecart = maintenant - Date.parse(dernierEvenementA);
   if (Number.isNaN(ecart)) return "actif";

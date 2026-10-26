@@ -11,10 +11,10 @@ from tessera.services.pipeline_events import EventType
 
 _TS_TYPES = Path(__file__).resolve().parents[2] / "frontend" / "src" / "types" / "api.ts"
 
-# Émis par le backend avant que l'UI ne les lise : le ticket-559 ne touche pas
-# à `frontend/`, le ticket-564 ajoute ces deux types à l'union. Dès qu'il le
-# fait, le second test ci-dessous échoue tant que cette liste n'est pas vidée.
-_EN_ATTENTE_DU_FRONTEND = frozenset({"external_wait", "conflict_resolution"})
+# Émis par le backend avant que l'UI ne les lise : une entrée ici dit « pas
+# encore côté frontend ». Vide depuis le ticket-564, qui a déclaré
+# `external_wait` et `conflict_resolution` dans l'union.
+_EN_ATTENTE_DU_FRONTEND: frozenset[str] = frozenset()
 
 
 def test_chaque_evenement_backend_existe_cote_frontend() -> None:
