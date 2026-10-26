@@ -9,7 +9,6 @@ import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import { projetsDuBureau } from "../../lib/bureau/projetsDuBureau";
 import type { Project, ServiceActif } from "../../types/api";
 import EnteteSupervision from "./EnteteSupervision";
-import ServicesLances from "./ServicesLances";
 import VueVide from "./VueVide";
 import type { IssueDuRun } from "./issueDuRun";
 import { projeter } from "./projeter";
@@ -27,7 +26,8 @@ interface BureauConnecteProps {
 
 /**
  * Le Bureau branché sur la supervision (ticket-567) : les mêmes runs, le même
- * store et les mêmes fonctions de rangement que la Liste (ADR-034).
+ * store et les mêmes fonctions de rangement que la Liste (ADR-034). La rangée
+ * des services n'y est plus : la baie de chaque pièce les montre déjà.
  */
 export default function BureauConnecte({
   supervision,
@@ -60,9 +60,6 @@ export default function BureauConnecte({
         onFermer={(issue: IssueDuRun | null) => ranger(idsARanger(runs, etatDe, issue))}
         selecteur={selecteur}
       />
-      {services.length > 0 ? (
-        <ServicesLances services={services} sortieDe={supervision.sortieDuService} />
-      ) : null}
       {runs.length === 0 ? (
         <VueVide connecte={supervision.connecte} avecServices={services.length > 0} />
       ) : (

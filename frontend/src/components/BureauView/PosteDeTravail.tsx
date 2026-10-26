@@ -11,7 +11,8 @@ interface PosteDeTravailProps {
 
 /**
  * Un poste de la pièce, en bouton : son `aria-label` dit le poste et l'état en
- * mots. La bulle n'existe que sur un poste occupé (ADR-058).
+ * mots. La bulle n'existe que sur un poste occupé qui ne travaille pas (ADR-058).
+ * Le bouton n'a pas d'action au clic : pas de curseur main.
  */
 export default function PosteDeTravail({ poste, sante }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
@@ -23,7 +24,7 @@ export default function PosteDeTravail({ poste, sante }: PosteDeTravailProps) {
       <button
         type="button"
         aria-label={libelleDuPoste(poste.poste, poste.etat, sante)}
-        className="cursor-pointer rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+        className="rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
       >
         <Poste etat={poste.etat} sante={sante} />
       </button>

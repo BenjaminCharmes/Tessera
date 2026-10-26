@@ -15,14 +15,14 @@ function teinte(pourcent: number, refuse: boolean): string {
 
 /**
  * Une fenêtre de quota : barre, pourcentage et heure de reprise. Sans relevé,
- * « inconnu » et aucune barre : une barre à 0 % dirait qu'il reste tout.
+ * un tiret (le SDK n'envoie un relevé qu'à l'approche d'une limite) et aucune barre : une barre à 0 % dirait qu'il reste tout.
  */
 export default function FenetreDeQuota({ libelle, lecture, maintenant }: FenetreDeQuotaProps) {
   if (lecture === null) {
     return (
       <li className="flex items-center gap-2 text-micro text-zinc-400">
         <span className="w-14">{libelle}</span>
-        <span>inconnu</span>
+        <span title="Pas de relevé : le quota s'affiche quand l'abonnement en annonce un">—</span>
       </li>
     );
   }

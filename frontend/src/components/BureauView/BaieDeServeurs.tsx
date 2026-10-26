@@ -20,10 +20,11 @@ export default function BaieDeServeurs({ projet, signalServices }: BaieDeServeur
   return (
     <div role="group" aria-label="Services" className="flex items-end gap-2">
       <Baie services={services.services.map(etatDuService)} />
-      <ul className="text-micro text-zinc-400">
+      {/* Un étage de la baie fait 12 px (4 unités de la grille × 3) : une ligne par étage, sous le 1er liseré. */}
+      <ul className="pt-[3px] text-micro text-zinc-400">
         {services.services.map((s) => (
-          <li key={s.nom}>
-            {s.nom} — {libelleDeLEtat(s)}
+          <li key={s.nom} title={libelleDeLEtat(s)} className="h-3 whitespace-nowrap leading-3">
+            {s.nom}
           </li>
         ))}
       </ul>

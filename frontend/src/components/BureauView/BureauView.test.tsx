@@ -71,17 +71,18 @@ describe("BureauView", () => {
 
   it("moves the words with the clock without any new event", () => {
     render(<BureauView projets={projets(1)} {...CANAL} />);
-    expect(screen.getByTestId("bulle")).toHaveTextContent("travaille");
+    expect(screen.queryByTestId("bulle")).toBeNull();
+    expect(screen.getByRole("button", { name: "Codeur, travaille" })).toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(30_000);
     });
-    expect(screen.getByTestId("bulle")).toHaveTextContent("silencieux");
+    expect(screen.getByTestId("bulle")).toHaveTextContent("…");
 
     act(() => {
       vi.advanceTimersByTime(150_000);
     });
-    expect(screen.getByTestId("bulle")).toHaveTextContent("figé ?");
+    expect(screen.getByTestId("bulle")).toHaveTextContent("!");
   });
 
   it("switches to one compact row per project above the threshold", () => {

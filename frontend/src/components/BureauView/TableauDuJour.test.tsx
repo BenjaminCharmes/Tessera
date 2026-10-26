@@ -74,7 +74,15 @@ describe("TableauDuJour", () => {
     await waitFor(() => expect(quota).toHaveBeenCalled());
     await screen.findByText("$2.00");
 
-    expect(screen.getAllByText("inconnu")).toHaveLength(2);
+    const tirets = screen.getAllByText("—");
+    expect(tirets).toHaveLength(2);
+    for (const tiret of tirets) {
+      expect(tiret).toHaveAttribute(
+        "title",
+        "Pas de relevé : le quota s'affiche quand l'abonnement en annonce un",
+      );
+    }
+    expect(screen.queryByText("inconnu")).not.toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
   });
 
@@ -83,7 +91,7 @@ describe("TableauDuJour", () => {
     render(<TableauDuJour maintenant={MAINTENANT} signalRunsClos={0} />);
 
     expect(await screen.findByRole("progressbar", { name: "Session, 42 %" })).toBeInTheDocument();
-    expect(screen.getAllByText("inconnu")).toHaveLength(1);
+    expect(screen.getAllByText("—")).toHaveLength(1);
     expect(screen.getAllByRole("progressbar")).toHaveLength(1);
   });
 
