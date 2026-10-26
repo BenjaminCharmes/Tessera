@@ -5006,3 +5006,27 @@ Le diff ajoute :
 - 2026-10-26 13:22:28 UTC — [ticket-567] APPROVED après 1 tour(s)
 - 2026-10-26 13:28:17 UTC — [ticket-567] documentation: 1 fichier(s) (345344ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « /**
  * Ce qui n'est ni du travail ni un blocage : un quota é » (frontend/src/components/Bu
+- 2026-10-26 13:28:36 UTC — [ide-core] ticket-567 PR #650 confiée au CIWatcher
+- 2026-10-26 13:28:39 UTC — [ticket-579] branche ticket-579-a-run-whose-worktree-setup-fails-commits-its-book
+- 2026-10-26 13:29:37 UTC — [ticket-579] plan rendu (57530ms)
+- 2026-10-26 13:29:37 UTC — [ticket-579] tour 1 — codeur démarré
+- 2026-10-26 13:34:39 UTC — [ide-core] ticket-567 PR #650 mergée (CI verte)
+- 2026-10-26 13:37:25 UTC — [ticket-579] tour 1 — codeur terminé (467983ms)
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 13:46:52 UTC — [ticket-579] testeur: OK (exit 0)
+- 2026-10-26 13:50:41 UTC — [ticket-579] securite: PASS — Aucune vulnérabilité critique introduite par ce diff. Le code ajoute un commit d (228467ms)
+- 2026-10-26 13:50:41 UTC — [ticket-579] tour 1 — reviewer démarré
+- 2026-10-26 13:51:13 UTC — [ticket-579] tour 1 — reviewer terminé (31609ms)
+- 2026-10-26 13:55:41 UTC — [ticket-579] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 13:57:12 UTC — [ticket-579] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-26 13:57:12 UTC — [ticket-579] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests d'intégration robust (390671ms)
+- 2026-10-26 13:57:12 UTC — [ticket-579] APPROVED après 1 tour(s)
+- 2026-10-26 13:59:32 UTC — [ticket-579] documentation: 0 fichier(s) (136266ms)

@@ -1,15 +1,15 @@
 ---
-id: ticket-579
-title: "A run whose worktree setup fails commits its bookkeeping and removes its worktree"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-26
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-26
+id: ticket-579
 plan: true
+pr_number: 652
+priority: high
+status: done
+title: A run whose worktree setup fails commits its bookkeeping and removes its worktree
+type: fix
 ---
 
 # ticket-579 — Une préparation de worktree en échec range derrière elle
