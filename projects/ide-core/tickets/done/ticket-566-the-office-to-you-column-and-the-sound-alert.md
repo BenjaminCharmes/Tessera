@@ -1,14 +1,16 @@
 ---
-id: ticket-566
-title: "The office to-you column and the sound alert"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-554", "ticket-562"]
-estimated_days: 1.5
 created: 2026-10-23
+depends_on:
+- ticket-554
+- ticket-562
+estimated_days: 1.5
+id: ticket-566
+pr_number: 647
+priority: medium
+status: done
+title: The office to-you column and the sound alert
+type: feat
 ---
 
 # ticket-566 — La colonne « À toi » et l'alerte sonore

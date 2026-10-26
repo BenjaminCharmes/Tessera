@@ -4940,3 +4940,18 @@ Le diff ajoute :
 - 2026-10-26 10:46:01 UTC — [ticket-554] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté la cloch (329141ms)
 - 2026-10-26 10:46:01 UTC — [ticket-554] APPROVED après 1 tour(s)
 - 2026-10-26 10:49:25 UTC — [ticket-554] documentation: 1 fichier(s) (194750ms)
+- 2026-10-26 10:53:18 UTC — [ide-core] ticket-554 PR #646 mergée (CI verte)
+- 2026-10-26 10:53:20 UTC — [ide-core] ticket-554 : base réalignée sur develop
+- 2026-10-26 10:53:20 UTC — [ide-core] ticket-554 PR #646 confiée au CIWatcher
+- 2026-10-26 10:53:23 UTC — [ticket-566] branche ticket-566-the-office-to-you-column-and-the-sound-alert
+- 2026-10-26 10:53:25 UTC — [ticket-566] tour 1 — codeur démarré
+- 2026-10-26 10:57:29 UTC — [ticket-566] tour 1 — codeur terminé (244311ms)
+- 2026-10-26 10:59:32 UTC — [ticket-566] testeur: OK (exit 0)
+- 2026-10-26 11:01:33 UTC — [ticket-566] securite: PASS — Audit complet sans vulnérabilités détectées. Le diff ajoute une colonne 'À toi'  (121250ms)
+- 2026-10-26 11:01:33 UTC — [ticket-566] tour 1 — reviewer démarré
+- 2026-10-26 11:01:53 UTC — [ticket-566] tour 1 — reviewer terminé (19469ms)
+- 2026-10-26 11:06:33 UTC — [ticket-566] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 11:07:31 UTC — [ticket-566] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 11:07:31 UTC — [ticket-566] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la colonne « À t (357686ms)
+- 2026-10-26 11:07:31 UTC — [ticket-566] APPROVED après 1 tour(s)
+- 2026-10-26 11:09:50 UTC — [ticket-566] documentation: 0 fichier(s) (133702ms)
