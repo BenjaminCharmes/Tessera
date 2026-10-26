@@ -3,6 +3,7 @@ import type { StreamState } from "../../hooks/streamState";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
+import type { PosteId } from "../../lib/bureau/postesDuRun";
 import { enEtapeSilencieuse, santeAgent } from "../../lib/santeAgent";
 import type { RunActif } from "../../types/api";
 import ActionsDuRun from "./ActionsDuRun";
@@ -22,6 +23,8 @@ interface PieceProps {
   run?: RunActif;
   onOuvrir?: (runId: string) => void;
   onRanger?: (runId: string) => void;
+  /** Choisit l'agent d'un poste occupé : le panneau « Agent choisi » le lit (ticket-582). */
+  onChoisir?: (projet: string, poste: PosteId) => void;
 }
 
 const CONTOURS: Record<ContourDeLaPiece, string> = {
@@ -41,6 +44,7 @@ export default function Piece({
   run,
   onOuvrir,
   onRanger,
+  onChoisir,
 }: PieceProps) {
   const postes = postesDuRun(etat);
   const sante = santeAgent(
@@ -65,7 +69,12 @@ export default function Piece({
       </div>
       <div className="grid grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
         {postes.map((p) => (
-          <PosteDeTravail key={p.poste} poste={p} sante={sante} />
+          <PosteDeTravail
+            key={p.poste}
+            poste={p}
+            sante={sante}
+            onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
+          />
         ))}
       </div>
       <div className="flex min-h-9 items-center px-3 py-2">{enCours && <Pastille sante={sante} />}</div>

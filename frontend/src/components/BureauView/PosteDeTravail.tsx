@@ -7,15 +7,18 @@ import type { SanteAgent } from "../../lib/santeAgent";
 interface PosteDeTravailProps {
   poste: PosteDuRun;
   sante: SanteAgent;
+  /** Choisit l'agent au clic ; seul un poste occupé en a un (ticket-582). */
+  onChoisir?: (poste: PosteDuRun["poste"]) => void;
 }
 
 /**
  * Un poste de la pièce, en bouton : son `aria-label` dit le poste et l'état en
  * mots. La bulle n'existe que sur un poste occupé qui ne travaille pas (ADR-058).
- * Le bouton n'a pas d'action au clic : pas de curseur main.
+ * Seul un poste occupé agit au clic, et lui seul a le curseur main.
  */
-export default function PosteDeTravail({ poste, sante }: PosteDeTravailProps) {
+export default function PosteDeTravail({ poste, sante, onChoisir }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
+  const choisir = occupe && onChoisir ? () => onChoisir(poste.poste) : undefined;
   return (
     <div
       className={`flex flex-col items-center gap-1 pb-2 ${poste.etat === "libre" ? "opacity-50" : ""}`}
@@ -24,7 +27,8 @@ export default function PosteDeTravail({ poste, sante }: PosteDeTravailProps) {
       <button
         type="button"
         aria-label={libelleDuPoste(poste.poste, poste.etat, sante)}
-        className="rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+        onClick={choisir}
+        className={`rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}
       >
         <Poste etat={poste.etat} sante={sante} />
       </button>

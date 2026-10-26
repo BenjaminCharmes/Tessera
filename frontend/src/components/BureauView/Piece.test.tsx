@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { api } from "../../lib/api";
 import Piece from "./Piece";
 import { DERNIER, T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
@@ -51,12 +51,29 @@ describe("Piece", () => {
     expect(pastille()).toBe("travaille");
   });
 
-  it("gives the post buttons no pointer cursor, as they have no click action", () => {
+  it("gives no post a pointer cursor when nothing listens to the choice", () => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
     for (const bouton of screen.getAllByRole("button")) {
       expect(bouton.className).not.toContain("cursor-pointer");
     }
+  });
+
+  it("makes only the busy post clickable when a choice is listened to", () => {
+    const onChoisir = vi.fn();
+    render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} onChoisir={onChoisir} />);
+
+    for (const nom of ["Codeur, fait", "Testeur, fait", "Reviewer, libre", "Validateur, libre"]) {
+      const bouton = screen.getByRole("button", { name: nom });
+      fireEvent.click(bouton);
+      expect(bouton.className).not.toContain("cursor-pointer");
+    }
+    expect(onChoisir).not.toHaveBeenCalled();
+
+    const occupe = screen.getByRole("button", { name: "Sécurité, travaille" });
+    fireEvent.click(occupe);
+    expect(occupe.className).toContain("cursor-pointer");
+    expect(onChoisir).toHaveBeenCalledWith("ide-core", "securite");
   });
 
   it("draws neither bubble nor pill when no post is busy", () => {
