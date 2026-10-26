@@ -1,14 +1,16 @@
 ---
-id: ticket-565
-title: "The office day board"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-558", "ticket-562"]
-estimated_days: 1
 created: 2026-10-23
+depends_on:
+- ticket-558
+- ticket-562
+estimated_days: 1
+id: ticket-565
+pr_number: 645
+priority: medium
+status: done
+title: The office day board
+type: feat
 ---
 
 # ticket-565 — Le tableau du jour
