@@ -24,6 +24,14 @@ export const TON_BULLE: Record<SanteAgent, string> = {
   blocage_suspecte: "bg-red-500/12 text-red-300",
 };
 
+/** Le signe de la bulle : silencieux, question, figé ? ; `null` quand l'agent travaille. */
+export const SIGNE_BULLE: Record<SanteAgent, string | null> = {
+  actif: null,
+  attente: "…",
+  question: "?",
+  blocage_suspecte: "!",
+};
+
 /** La pastille d'état qui porte le libellé de santé. */
 export const ETAT_PASTILLE: Record<SanteAgent, EtatPastille> = {
   actif: "en-cours",

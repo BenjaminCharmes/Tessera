@@ -5,7 +5,7 @@ import Piece from "./Piece";
 import { DERNIER, T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
 
 function bulle(): string | null {
-  return screen.getByTestId("bulle").textContent;
+  return screen.queryByTestId("bulle")?.textContent ?? null;
 }
 
 function pastille(): string | null {
@@ -44,11 +44,19 @@ describe("Piece", () => {
     expect(screen.getByRole("button", { name: "Reviewer, libre" })).toBeInTheDocument();
   });
 
-  it("draws a bubble and a pill only for the busy post", () => {
+  it("draws a pill and no bubble for a busy post that works", () => {
     render(<Piece projet="ide-core" etat={etatEnCodage()} maintenant={T0 + 5_000} />);
 
-    expect(screen.getAllByTestId("bulle")).toHaveLength(1);
+    expect(screen.queryByTestId("bulle")).toBeNull();
     expect(pastille()).toBe("travaille");
+  });
+
+  it("gives the post buttons no pointer cursor, as they have no click action", () => {
+    render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
+
+    for (const bouton of screen.getAllByRole("button")) {
+      expect(bouton.className).not.toContain("cursor-pointer");
+    }
   });
 
   it("draws neither bubble nor pill when no post is busy", () => {
@@ -77,13 +85,13 @@ describe("Piece health words", () => {
   });
 
   const cas = [
-    { depuis: 5, question: null, mot: "travaille" },
-    { depuis: 31, question: null, mot: "silencieux" },
-    { depuis: 181, question: null, mot: "figé ?" },
-    { depuis: 5, question: "On casse l'API ?", mot: "question" },
+    { depuis: 5, question: null, mot: "travaille", signe: null },
+    { depuis: 31, question: null, mot: "silencieux", signe: "…" },
+    { depuis: 181, question: null, mot: "figé ?", signe: "!" },
+    { depuis: 5, question: "On casse l'API ?", mot: "question", signe: "?" },
   ];
 
-  it.each(cas)("shows $mot in the bubble and the pill at $depuis s", ({ depuis, question, mot }) => {
+  it.each(cas)("shows $mot in the pill and $signe in the bubble at $depuis s", ({ depuis, question, mot, signe }) => {
     vi.setSystemTime(Date.parse(DERNIER) + depuis * 1000);
     render(
       <Piece
@@ -93,7 +101,7 @@ describe("Piece health words", () => {
       />,
     );
 
-    expect(bulle()).toBe(mot);
+    expect(bulle()).toBe(signe);
     expect(pastille()).toBe(mot);
     expect(screen.getByRole("button", { name: `Codeur, ${mot}` })).toBeInTheDocument();
   });

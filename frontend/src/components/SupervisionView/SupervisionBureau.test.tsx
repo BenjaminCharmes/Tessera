@@ -122,6 +122,31 @@ describe("Supervision — vue par défaut et sélecteur", () => {
     expect(screen.getByRole("region", { name: "projet-1" })).toBeInTheDocument();
   });
 
+  it("does not draw the services strip in the office, but keeps it in the list", async () => {
+    const services = [
+      {
+        nom: "backend",
+        project_id: "projet-1",
+        pid: 1,
+        demarre_a: new Date().toISOString(),
+        en_cours: true,
+        code_de_sortie: null,
+      },
+    ];
+    render(
+      <SupervisionView
+        supervision={supervision(lesRuns(1))}
+        projects={tousLesProjets(1)}
+        services={services}
+      />,
+    );
+    expect(screen.queryByLabelText("Services lancés")).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: "Liste" }));
+
+    expect(screen.getByLabelText("Services lancés")).toHaveTextContent("backend");
+  });
+
   it("says nothing is running when there is no run", () => {
     render(<SupervisionView supervision={supervision([])} projects={[]} />);
 

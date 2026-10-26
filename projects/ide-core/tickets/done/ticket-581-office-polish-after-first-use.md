@@ -1,15 +1,17 @@
 ---
-id: ticket-581
-title: "Office view polish after first use: no duplicate state, folder tooltips, one place for services, an honest unknown quota"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-567"]
-estimated_days: 0.5
 created: 2026-10-26
+depends_on:
+- ticket-567
+estimated_days: 0.5
+id: ticket-581
 plan: true
+pr_number: 656
+priority: high
+status: done
+title: 'Office view polish after first use: no duplicate state, folder tooltips, one
+  place for services, an honest unknown quota'
+type: fix
 ---
 
 # ticket-581 — Retouches du Bureau après le premier usage

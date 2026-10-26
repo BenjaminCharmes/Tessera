@@ -47,6 +47,17 @@ describe("Dossiers", () => {
     expect(screen.getByRole("list", { name: "Tickets restants : 3" })).toBeInTheDocument();
   });
 
+  it("gives each folder a title with the identifier of its ticket", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(["ticket-002", "ticket-003"]));
+
+    render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+
+    await waitFor(() => expect(screen.getAllByRole("listitem")).toHaveLength(2));
+    const titres = screen.getAllByRole("listitem").map((li) => li.getAttribute("title"));
+    expect(titres[0]).toContain("ticket-002");
+    expect(titres[1]).toContain("ticket-003");
+  });
+
   it("draws nothing when no ticket remains", async () => {
     const lire = vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut([]));
 

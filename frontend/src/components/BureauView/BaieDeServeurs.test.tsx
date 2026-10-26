@@ -42,7 +42,19 @@ describe("BaieDeServeurs", () => {
     expect(await screen.findByRole("group", { name: "Services" })).toBeInTheDocument();
     const voyants = [...container.querySelectorAll("[data-voyant]")].map((g) => g.getAttribute("data-voyant"));
     expect(voyants).toEqual(["en-cours", "echoue"]);
-    expect(screen.getByText("api — en cours")).toBeInTheDocument();
+    expect(screen.getByText("api").closest("li")).toHaveAttribute("title", "en cours");
+    expect(screen.queryByText(/en cours/)).toBeNull();
+  });
+
+  it("puts the state of a service in a title, not in the text under it", async () => {
+    vi.spyOn(api.services, "list").mockResolvedValue([service({ nom: "front", pid: null })]);
+
+    render(<BaieDeServeurs projet="ide-core" signalServices={0} />);
+
+    const ligne = (await screen.findByText("front")).closest("li");
+    expect(ligne).toHaveAttribute("title", "pas lancé par l'IDE");
+    expect(ligne?.textContent).toBe("front");
+    expect(screen.queryByText(/pas lancé/)).toBeNull();
   });
 
   it("starts the services through the same endpoint as the services panel", async () => {

@@ -5063,3 +5063,32 @@ Le diff ajoute :
 - 2026-10-26 14:16:28 UTC — [ticket-580] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement l'a (145889ms)
 - 2026-10-26 14:16:28 UTC — [ticket-580] APPROVED après 1 tour(s)
 - 2026-10-26 14:17:58 UTC — [ticket-580] documentation: 0 fichier(s) (84735ms)
+- 2026-10-26 14:26:11 UTC — [ide-core] ticket-580 PR #654 mergée (CI verte)
+- 2026-10-26 14:26:13 UTC — [ide-core] ticket-580 : base réalignée sur develop
+- 2026-10-26 14:26:13 UTC — [ide-core] ticket-580 PR #654 confiée au CIWatcher
+- 2026-10-26 14:26:16 UTC — [ticket-581] branche ticket-581-office-view-polish-after-first-use-no-duplicate-s
+- 2026-10-26 14:27:20 UTC — [ticket-581] plan rendu (63375ms)
+- 2026-10-26 14:27:20 UTC — [ticket-581] tour 1 — codeur démarré
+- 2026-10-26 14:29:30 UTC — [ticket-581] tour 1 — codeur terminé (129514ms)
+- 2026-10-26 14:31:18 UTC — [ticket-581] testeur: OK (exit 0)
+- 2026-10-26 14:32:34 UTC — [ticket-581] securite: PASS — Refonte UI pure sans changements de logique de sécurité. Tous les textes affiché (75890ms)
+- 2026-10-26 14:32:34 UTC — [ticket-581] tour 1 — reviewer démarré
+- 2026-10-26 14:32:52 UTC — [ticket-581] tour 1 — reviewer terminé (18828ms)
+- 2026-10-26 14:37:05 UTC — [ticket-581] validateur: fichiers cités joints : Bulle.tsx, Dossiers.tsx, BureauConnecte.tsx, ListeView.tsx, BaieDeServeurs.tsx, FenetreDeQuota.tsx, backend/ (dossier, 6 fichiers)
+- 2026-10-26 14:37:05 UTC — [ticket-581] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés et respectés. Le code a été mis (271407ms)
+- 2026-10-26 14:37:05 UTC — [ticket-581] APPROVED après 1 tour(s)
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-582 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-583 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-586 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 14:40:13 UTC — [ticket-581] documentation: 0 fichier(s) (182796ms) — après tour de correction
