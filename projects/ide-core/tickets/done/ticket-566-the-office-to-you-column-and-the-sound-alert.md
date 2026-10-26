@@ -6,7 +6,7 @@ depends_on:
 - ticket-562
 estimated_days: 1.5
 id: ticket-566
-pr_number: null
+pr_number: 647
 priority: medium
 status: done
 title: The office to-you column and the sound alert
