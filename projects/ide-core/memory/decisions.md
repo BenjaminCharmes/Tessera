@@ -530,4 +530,5 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : la vue Bureau devient la vue par défaut de Supervision ; elle garde toutes ses fonctions (cartes, fil, rangement, services) et la vue Liste reste dans le sélecteur. Chaque sprite, objet ou bulle rend un état réel que le store de run ou l'API fournit déjà ; sans donnée, rien n'est dessiné avant son ticket backend. Les sprites sont des SVG inline en pixels, sous `design/bureau/`, animés par `transform` et `opacity`, coupés par `prefers-reduced-motion`. Au-delà de 6 projets avec un run : une rangée par projet.
 **Raison** : la Liste reste nécessaire au clavier et au lecteur d'écran ; un décor qui ment sur l'état ruine la confiance dans la vue.
 **Alternative rejetée** : canvas — il ne se teste pas avec Testing Library et un lecteur d'écran ne le lit pas.
+**Précision (26/10)** : le mobilier d'une salle (sol, machine à café, table) est la salle elle-même, pas un état : il se dessine même vide, sans animation ni voyant (ticket-583).
 **Détail** : `docs/superpowers/specs/2026-10-23-vue-bureau-design.md`
