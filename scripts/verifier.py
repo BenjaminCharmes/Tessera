@@ -5,6 +5,11 @@ frontend (tsc → eslint → vitest) — each stopping at its first failure. Out
 are captured and printed together once every chain finishes — never
 interleaved.
 
+Only the chains the change touches run: a diff limited to `frontend/` skips
+pytest and mypy, one limited to `backend/` skips the frontend chain, and a diff
+that touches neither runs nothing. GitHub CI runs everything before any merge.
+When the diff cannot be read, every chain runs.
+
 Run from backend/ with: uv run python ../scripts/verifier.py
 
 Never calls a console-script launcher (`pytest.exe`, `mypy.exe`): Windows
@@ -192,9 +197,61 @@ def run_steps(steps: list[Step]) -> int:
     return 0
 
 
+# Les branches de base essayées, dans l'ordre, pour trouver le point de départ
+# du ticket. Aucune trouvée : on teste tout.
+_BASES = ("origin/develop", "origin/main")
+
+
+def _git(*args: str) -> str | None:
+    """Run a read-only git command from the repository root; None when it fails."""
+    try:
+        result = subprocess.run(
+            ["git", *args], cwd=REPO_ROOT, capture_output=True, text=True,
+            encoding="utf-8", errors="replace",
+        )
+    except OSError:
+        return None
+    return result.stdout if result.returncode == 0 else None
+
+
+def changed_paths() -> list[str] | None:
+    """Paths the ticket changes since its base, working tree included; None when unknown."""
+    for base in _BASES:
+        depart = _git("merge-base", "HEAD", base)
+        if depart is None:
+            continue
+        modifies = _git("diff", "--name-only", depart.strip())
+        nouveaux = _git("ls-files", "--others", "--exclude-standard")
+        if modifies is None or nouveaux is None:
+            return None
+        return [p for p in (modifies + nouveaux).splitlines() if p.strip()]
+    return None
+
+
+def chains_for(paths: list[str] | None) -> tuple[bool, bool]:
+    """Whether the backend chains and the frontend chain must run for these paths.
+
+    Unknown paths run everything. ``scripts/`` counts as backend: the test
+    command itself lives there.
+    """
+    if paths is None:
+        return True, True
+    backend = any(p.startswith(("backend/", "scripts/")) for p in paths)
+    frontend = any(p.startswith("frontend/") for p in paths)
+    return backend, frontend
+
+
 def main() -> int:
     """Entry point."""
-    return run_parallel(BACKEND_STEPS, FRONTEND_STEPS, TYPE_STEPS)
+    backend, frontend = chains_for(changed_paths())
+    if not (backend or frontend):
+        print("Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.", file=sys.stderr)
+        return 0
+    return run_parallel(
+        BACKEND_STEPS if backend else [],
+        FRONTEND_STEPS if frontend else [],
+        TYPE_STEPS if backend else [],
+    )
 
 
 if __name__ == "__main__":
