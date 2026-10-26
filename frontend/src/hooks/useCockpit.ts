@@ -330,11 +330,8 @@ export function useCockpit() {
       runsActifs: supervision.runs.length,
       appsEnCours: appsEnCours.apps?.length ?? 0,
       alerte: alerteDeSupervision,
-      notifications: {
-        active: notifications.active,
-        etat: notifications.etat,
-        onChange: notifications.setActive,
-      },
+      notifications: { active: notifications.active, etat: notifications.etat, onChange: notifications.setActive },
+      cloche: notifications.cloche,
     },
     sidebar: {
       projet: {

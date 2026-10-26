@@ -36,6 +36,7 @@ export default function App() {
           appsEnCours={cockpit.navRail.appsEnCours}
           alerte={cockpit.navRail.alerte}
           notifications={cockpit.navRail.notifications}
+          cloche={cockpit.navRail.cloche}
         />
       </div>
 

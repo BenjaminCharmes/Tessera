@@ -5,6 +5,8 @@ import { api } from "../../lib/api";
 import NavRail from "./NavRail";
 import type { ReglageDesNotifications } from "./ReglageNotifications";
 import type { SidebarPanel } from "./panels";
+import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
+import { reglagesParDefaut } from "../../lib/reglagesNotifications";
 
 describe("NavRail", () => {
   it("affiche le nom du produit dans la zone d'identite", () => {
@@ -291,6 +293,27 @@ describe("NavRail — le bouton Réglages (ticket-441)", () => {
     await userEvent.click(screen.getByLabelText("Notifications système"));
 
     expect(onChange).toHaveBeenCalledWith(false);
+  });
+
+  it("shows the bell with the unread count, outside the destinations", () => {
+    const cloche: DonneesDeLaCloche = {
+      historique: [],
+      nonLus: 4,
+      toutMarquerLu: vi.fn(),
+      reglages: reglagesParDefaut(),
+      setReglage: vi.fn(),
+      ouvrir: vi.fn(),
+    };
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} cloche={cloche} />);
+
+    expect(screen.getByRole("button", { name: "Notifications, 4 non lues" })).toBeInTheDocument();
+    expect(screen.getByText("4")).toBeInTheDocument();
+    expect(screen.getAllByRole("tab")).toHaveLength(9);
+  });
+
+  it("shows no bell without notification data", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    expect(screen.queryByRole("button", { name: /^Notifications/ })).not.toBeInTheDocument();
   });
 });
 

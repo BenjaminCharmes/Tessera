@@ -1,13 +1,28 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import {
   isPermissionGranted,
   requestPermission,
   sendNotification,
 } from "@tauri-apps/plugin-notification";
-import { notificationsPour, type Instantane, type Notif } from "../lib/notifications";
+import type { EntreeHistorique } from "../lib/historiqueNotifications";
+import {
+  masqueeParToast,
+  notificationsPour,
+  type Instantane,
+  type Notif,
+  type TypeNotif,
+} from "../lib/notifications";
+import {
+  CLE_REGLAGES_PAR_TYPE,
+  estReglagesParType,
+  reglagesParDefaut,
+  type ReglageDuType,
+  type ReglagesParType,
+} from "../lib/reglagesNotifications";
 import { santeAgent, type SanteAgent } from "../lib/santeAgent";
 import { useEtatPersistant } from "./useEtatPersistant";
+import { useHistoriqueNotifications } from "./useHistoriqueNotifications";
 import { useMaintenant } from "./useMaintenant";
 import type { UseSupervisionResult } from "./useSupervision";
 
@@ -82,15 +97,41 @@ async function envoyer(n: Notif, ouvrir: (projectId: string) => void): Promise<v
   };
 }
 
+/** Ce que la cloche affiche et règle : l'historique du jour et les cases par type. */
+export interface DonneesDeLaCloche {
+  historique: EntreeHistorique[];
+  nonLus: number;
+  toutMarquerLu: () => void;
+  reglages: ReglagesParType;
+  setReglage: (type: TypeNotif, champ: keyof ReglageDuType, valeur: boolean) => void;
+  ouvrir: (projectId: string) => void;
+}
+
 export function useNotificationsSysteme(
   supervision: Pick<UseSupervisionResult, "runs" | "etatDe">,
   projetActif: string | null,
   ouvrir: (projectId: string) => void,
-): { active: boolean; setActive: (v: boolean) => void; etat: EtatDesNotifications } {
+): {
+  active: boolean;
+  setActive: (v: boolean) => void;
+  etat: EtatDesNotifications;
+  cloche: DonneesDeLaCloche;
+} {
   const [active, setActive] = useEtatPersistant<boolean>(
     CLE_REGLAGE,
     true,
     (v): v is boolean => typeof v === "boolean",
+  );
+  const [reglages, setReglages] = useEtatPersistant<ReglagesParType>(
+    CLE_REGLAGES_PAR_TYPE,
+    reglagesParDefaut(),
+    estReglagesParType,
+  );
+  const { historique, nonLus, enregistrer, toutMarquerLu } = useHistoriqueNotifications();
+  const setReglage = useCallback(
+    (type: TypeNotif, champ: keyof ReglageDuType, valeur: boolean) =>
+      setReglages((prev) => ({ ...prev, [type]: { ...prev[type], [champ]: valeur } })),
+    [setReglages],
   );
   const precedent = useRef<Instantane>({ runs: [], etats: {} });
   const { runs, etatDe } = supervision;
@@ -111,13 +152,23 @@ export function useNotificationsSysteme(
     const avant = precedent.current;
     precedent.current = courant;
 
+    // L'historique prend tout, avant les filtres de l'envoi (ticket-554).
+    const notifs = notificationsPour(avant, courant);
+    if (notifs.length > 0) enregistrer(notifs);
+
     if (!active || !supportees()) return;
     const vue = { projetActif, visible: document.visibilityState === "visible" };
-    for (const n of notificationsPour(avant, courant, vue)) {
+    for (const n of notifs) {
+      if (!reglages[n.type].systeme || masqueeParToast(n, vue)) continue;
       // Une notification qui ne part pas ne casse rien.
       void envoyer(n, ouvrir).catch(() => undefined);
     }
-  }, [runs, etatDe, maintenant, active, projetActif, ouvrir]);
+  }, [runs, etatDe, maintenant, active, projetActif, ouvrir, reglages, enregistrer]);
 
-  return { active, setActive, etat: etatDesNotifications(active) };
+  return {
+    active,
+    setActive,
+    etat: etatDesNotifications(active),
+    cloche: { historique, nonLus, toutMarquerLu, reglages, setReglage, ouvrir },
+  };
 }

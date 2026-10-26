@@ -9,9 +9,26 @@ import type { SanteAgent } from "./santeAgent";
  * livraison (PR mergée ou non, ticket-552). Pas chaque ticket
  * approuvé d'une file : le bruit tuerait le signal. Pure, pour être testée
  * sans fenêtre : le hook lui donne l'avant et l'après, elle dit quoi dire.
+ *
+ * Elle rend toutes les notifications, y compris celles du projet affiché : elle
+ * produit, elle ne décide pas de l'envoi (ticket-554).
  */
+export const TYPES_NOTIF = [
+  "question",
+  "fige",
+  "bloque",
+  "termine",
+  "merge",
+  "ci_rouge",
+  "quota_bas",
+] as const;
+
+/** Le genre d'événement : c'est lui que les réglages de la cloche choisissent (ticket-554). */
+export type TypeNotif = (typeof TYPES_NOTIF)[number];
+
 export interface Notif {
   projectId: string;
+  type: TypeNotif;
   titre: string;
   corps: string;
 }
@@ -51,18 +68,20 @@ function notifLivraison(run: RunActif, etat: StreamState, precedent: StreamState
     const pr = etat.livraisonPrNumber;
     return {
       projectId: run.project_id,
+      type: "merge",
       titre: `${nom(run)} : PR mergée`,
       corps: pr ? `La PR #${pr} est mergée.` : "La PR est mergée.",
     };
   }
   return {
     projectId: run.project_id,
+    type: "ci_rouge",
     titre: `${nom(run)} : PR non mergée`,
     corps: etat.ciMerge.arret ?? "La PR reste ouverte, sans raison donnée.",
   };
 }
 
-export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue): Notif[] {
+export function notificationsPour(avant: Instantane, apres: Instantane): Notif[] {
   const notifs: Notif[] = [];
 
   for (const run of apres.runs) {
@@ -72,6 +91,7 @@ export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue
     if (etat.pendingQuestion && etat.pendingQuestion !== precedent?.pendingQuestion) {
       notifs.push({
         projectId: run.project_id,
+        type: "question",
         titre: `${nom(run)} : un agent pose une question`,
         corps: etat.pendingQuestion,
       });
@@ -79,6 +99,7 @@ export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue
     if (etat.status === "error" && precedent?.status !== "error") {
       notifs.push({
         projectId: run.project_id,
+        type: "bloque",
         titre: `${nom(run)} : run bloqué`,
         corps: etat.errorMessage ?? "Le run s'est arrêté sans approbation.",
       });
@@ -86,6 +107,7 @@ export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue
     if (devientFige(run.run_id, avant, apres)) {
       notifs.push({
         projectId: run.project_id,
+        type: "fige",
         titre: `${nom(run)} : un agent semble figé`,
         corps: `${etat.currentAgent ?? "L'agent"} n'a rien émis depuis plus de 3 minutes.`,
       });
@@ -106,9 +128,15 @@ export function notificationsPour(avant: Instantane, apres: Instantane, vue: Vue
       : run.mode === "queue"
         ? "La file est terminée."
         : "Le run est terminé.";
-    notifs.push({ projectId: run.project_id, titre: `${nom(run)} : terminé`, corps });
+    notifs.push({ projectId: run.project_id, type: "termine", titre: `${nom(run)} : terminé`, corps });
   }
 
-  // Le toast suffit quand on regarde déjà ce projet.
-  return notifs.filter((n) => !(vue.visible && n.projectId === vue.projetActif));
+  // Tout ce qui s'est produit : c'est l'historique de la cloche (ticket-554).
+  // Ce qui part vers le système se filtre à part, par `masqueeParToast`.
+  return notifs;
+}
+
+/** Le toast suffit quand on regarde déjà ce projet : rien ne part vers le système. */
+export function masqueeParToast(n: Notif, vue: Vue): boolean {
+  return vue.visible && n.projectId === vue.projetActif;
 }
