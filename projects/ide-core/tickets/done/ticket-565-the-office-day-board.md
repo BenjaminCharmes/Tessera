@@ -6,7 +6,7 @@ depends_on:
 - ticket-562
 estimated_days: 1
 id: ticket-565
-pr_number: null
+pr_number: 645
 priority: medium
 status: done
 title: The office day board
