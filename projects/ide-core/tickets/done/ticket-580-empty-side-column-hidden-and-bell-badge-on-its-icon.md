@@ -5,7 +5,7 @@ depends_on:
 - ticket-567
 estimated_days: 0.25
 id: ticket-580
-pr_number: null
+pr_number: 654
 priority: high
 status: done
 title: The side column is hidden where it has nothing to show, and the bell count
