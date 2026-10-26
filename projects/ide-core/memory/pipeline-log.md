@@ -4991,3 +4991,4 @@ Le diff ajoute :
 - 2026-10-26 12:20:15 UTC — [ticket-564] validateur: CHANGES_REQUESTED — Le travail frontend est correct et complet : types ajoutés, store mis à jour, sa (341421ms)
 - 2026-10-26 12:20:15 UTC — [ticket-564] CHANGES_REQUESTED tour 3: Validateur : Le travail frontend est correct et complet : types ajoutés, store mis à jour, santé refactorisée, salles implémentées avec couverture de tests solide. Cependant, le diff modifie un fichie
 - 2026-10-26 12:20:15 UTC — [ticket-564] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-26 12:20:20 UTC — [ide-core] file interrompue : ticket-564 non approuvé
