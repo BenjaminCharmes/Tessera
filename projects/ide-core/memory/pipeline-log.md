@@ -4954,3 +4954,4 @@ Le diff ajoute :
 - 2026-10-26 11:07:31 UTC — [ticket-566] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
 - 2026-10-26 11:07:31 UTC — [ticket-566] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la colonne « À t (357686ms)
 - 2026-10-26 11:07:31 UTC — [ticket-566] APPROVED après 1 tour(s)
+- 2026-10-26 11:09:50 UTC — [ticket-566] documentation: 0 fichier(s) (133702ms)
