@@ -200,11 +200,7 @@ export function useCockpit() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [projets],
   );
-  const notifications = useNotificationsSysteme(
-    supervision,
-    project?.id ?? null,
-    ouvrirProjet,
-  );
+  const notifications = useNotificationsSysteme(supervision, project?.id ?? null, ouvrirProjet);
   const services = useServices(project?.id ?? null, supervision.signalServices);
   // Au niveau du cockpit : la pastille compte les apps même vue fermée (ticket-417).
   const appsEnCours = useAppsEnCours();
@@ -465,6 +461,8 @@ export function useCockpit() {
       ticket,
       conversationId,
       supervision,
+      // Le Bureau n'a pas de réglage à lui : c'est la case « Son » de la question (ticket-554).
+      son: { actif: notifications.cloche.reglages.question.son, regler: (v: boolean) => notifications.cloche.setReglage("question", "son", v) },
       servicesDuProjet: services.services,
       appsEnCours,
       agentSelectionne,

@@ -1,4 +1,5 @@
 import Chrono from "./Chrono";
+import { clotureDuRun, etatAffiche } from "./etatDuRun";
 import Button from "../../design/ui/Button";
 import StatusPill from "../../design/ui/StatusPill";
 import LienTicket from "../../design/ui/LienTicket";
@@ -57,7 +58,6 @@ export default function RunCard({
   onRevoir,
 }: RunCardProps) {
   const attend = etat.pendingQuestion !== null;
-  const echoue = etat.status === "error";
   // Un tour de chat écrit et commite comme un run (ADR-019), mais il n'a ni
   // ticket, ni tours de revue, ni verdict. Lui afficher les étiquettes d'un
   // pipeline donnerait à lire des cases vides comme une information.
@@ -115,7 +115,7 @@ export default function RunCard({
           <span className="shrink-0 text-micro tabular-nums text-zinc-500">
             <Chrono
               depuis={run.demarre_a}
-              termineA={etat.events.find((e) => e.type === "run_closed")?.timestamp}
+              termineA={clotureDuRun(etat)}
             />
           </span>
         </span>
@@ -199,13 +199,7 @@ export default function RunCard({
         ) : null}
 
         <span className="mt-2 flex flex-wrap items-center gap-1.5">
-          {echoue ? (
-            <StatusPill etat="echec" libelle="bloqué" />
-          ) : attend ? (
-            <StatusPill etat="attention" libelle="attend une réponse" />
-          ) : (
-            <StatusPill etat="en-cours" libelle={etat.currentAgent ?? "en cours"} />
-          )}
+          <StatusPill {...etatAffiche(etat)} />
           {etat.currentRound > 0 && !estUnChat ? (
             <StatusPill etat="neutre" libelle={`tour ${etat.currentRound}`} />
           ) : null}

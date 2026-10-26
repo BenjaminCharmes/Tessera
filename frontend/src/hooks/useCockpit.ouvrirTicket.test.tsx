@@ -97,7 +97,12 @@ vi.mock("./useFiltresTickets", () => ({
   }),
 }));
 vi.mock("./useNotificationsSysteme", () => ({
-  useNotificationsSysteme: () => ({ active: false, etat: "default", setActive: vi.fn() }),
+  useNotificationsSysteme: () => ({
+    active: false,
+    etat: "default",
+    setActive: vi.fn(),
+    cloche: { reglages: { question: { systeme: true, son: true } }, setReglage: vi.fn() },
+  }),
   demanderPermissionNotifications: vi.fn(),
 }));
 
