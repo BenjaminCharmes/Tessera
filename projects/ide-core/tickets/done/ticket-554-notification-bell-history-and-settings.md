@@ -7,7 +7,7 @@ depends_on:
 estimated_days: 1
 id: ticket-554
 plan: true
-pr_number: null
+pr_number: 646
 priority: medium
 status: done
 title: A bell keeps the day's notifications and lets each event be switched on or
