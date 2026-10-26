@@ -4992,3 +4992,15 @@ Le diff ajoute :
 - 2026-10-26 12:20:15 UTC — [ticket-564] CHANGES_REQUESTED tour 3: Validateur : Le travail frontend est correct et complet : types ajoutés, store mis à jour, santé refactorisée, salles implémentées avec couverture de tests solide. Cependant, le diff modifie un fichie
 - 2026-10-26 12:20:15 UTC — [ticket-564] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-26 12:20:20 UTC — [ide-core] file interrompue : ticket-564 non approuvé
+- 2026-10-26 13:00:52 UTC — [ticket-567] branche ticket-567-the-office-becomes-the-default-supervision-view
+- 2026-10-26 13:02:53 UTC — [ticket-567] plan rendu (119421ms)
+- 2026-10-26 13:02:53 UTC — [ticket-567] tour 1 — codeur démarré
+- 2026-10-26 13:13:06 UTC — [ticket-567] tour 1 — codeur terminé (612562ms)
+- 2026-10-26 13:15:10 UTC — [ticket-567] testeur: OK (exit 0)
+- 2026-10-26 13:16:15 UTC — [ticket-567] securite: PASS — Aucune vulnérabilité introduite. Ce diff refactorise la supervision avec deux vu (65905ms)
+- 2026-10-26 13:16:16 UTC — [ticket-567] tour 1 — reviewer démarré
+- 2026-10-26 13:16:47 UTC — [ticket-567] tour 1 — reviewer terminé (30593ms)
+- 2026-10-26 13:21:16 UTC — [ticket-567] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 13:22:28 UTC — [ticket-567] validateur: fichiers cités joints : SupervisionView.test.tsx (tronqué) ; non joints (budget épuisé) : SupervisionView/index.tsx, backend/
+- 2026-10-26 13:22:28 UTC — [ticket-567] validateur: APPROVED — Ticket-567 livré complet : le Bureau devient la vue par défaut avec sélecteur Bu (372015ms)
+- 2026-10-26 13:22:28 UTC — [ticket-567] APPROVED après 1 tour(s)
