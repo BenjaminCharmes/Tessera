@@ -5092,3 +5092,30 @@ Le diff ajoute :
 - 2026-10-26 14:39:29 UTC — [ide-core] ticket-576 retiré de la file
 - 2026-10-26 14:39:29 UTC — [ide-core] ticket-570 retiré de la file
 - 2026-10-26 14:40:13 UTC — [ticket-581] documentation: 0 fichier(s) (182796ms) — après tour de correction
+- 2026-10-26 14:48:40 UTC — [ide-core] ticket-581 PR #656 mergée (CI verte)
+- 2026-10-26 14:48:42 UTC — [ide-core] ticket-581 : base réalignée sur develop
+- 2026-10-26 14:48:42 UTC — [ide-core] ticket-581 PR #656 confiée au CIWatcher
+- 2026-10-26 14:48:45 UTC — [ticket-587] branche ticket-587-steps-that-work-silently-are-no-longer-reported-a
+- 2026-10-26 14:48:47 UTC — [ticket-587] tour 1 — codeur démarré
+- 2026-10-26 14:58:32 UTC — [ticket-587] tour 1 — codeur terminé (585139ms)
+- 2026-10-26 15:10:16 UTC — [ticket-587] testeur: 1 failed, 1663 passed, 64 warnings in 700.64s (0:11:40)
+- 2026-10-26 15:10:16 UTC — [ticket-587] tests rouges au tour 1
+- 2026-10-26 15:10:16 UTC — [ticket-587] tour 2 — codeur démarré
+- 2026-10-26 15:12:07 UTC — [ticket-587] tour 2 — codeur terminé (110688ms)
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 15:22:38 UTC — [ticket-587] testeur: OK (exit 0)
+- 2026-10-26 15:24:47 UTC — [ticket-587] securite: PASS — Audit sans découverte. Ticket-587 ajoute l'événement TEST_STARTED pour signaler  (128468ms)
+- 2026-10-26 15:24:47 UTC — [ticket-587] tour 2 — reviewer démarré
+- 2026-10-26 15:25:10 UTC — [ticket-587] tour 2 — reviewer terminé (23219ms)
+- 2026-10-26 15:29:47 UTC — [ticket-587] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 15:31:03 UTC — [ticket-587] validateur: fichiers cités joints : test_event_types_alignment.py, notifications.ts, postesDuRun.ts
+- 2026-10-26 15:31:03 UTC — [ticket-587] validateur: APPROVED — Tous les critères sont satisfaits. L'événement `test_started` est ajouté au pipe (376280ms)
+- 2026-10-26 15:31:03 UTC — [ticket-587] APPROVED après 2 tour(s)
