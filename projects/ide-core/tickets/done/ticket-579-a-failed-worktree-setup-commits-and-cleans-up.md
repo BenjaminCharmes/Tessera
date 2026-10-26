@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-579
 plan: true
-pr_number: null
+pr_number: 652
 priority: high
 status: done
 title: A run whose worktree setup fails commits its bookkeeping and removes its worktree
