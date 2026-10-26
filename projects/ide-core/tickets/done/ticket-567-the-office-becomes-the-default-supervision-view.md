@@ -10,7 +10,7 @@ depends_on:
 estimated_days: 1.5
 id: ticket-567
 plan: true
-pr_number: null
+pr_number: 650
 priority: medium
 status: done
 title: The office becomes the default supervision view
