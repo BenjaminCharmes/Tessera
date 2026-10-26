@@ -5134,3 +5134,16 @@ Le diff ajoute :
 - 2026-10-26 15:34:31 UTC — [ide-core] ticket-574 retiré de la file
 - 2026-10-26 15:34:31 UTC — [ide-core] ticket-576 retiré de la file
 - 2026-10-26 15:34:31 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 15:43:41 UTC — [ide-core] ticket-587 PR #660 confiée au CIWatcher
+- 2026-10-26 15:43:43 UTC — [ticket-582] branche ticket-582-clicking-an-agent-in-the-office-shows-the-chosen
+- 2026-10-26 15:44:41 UTC — [ticket-582] plan rendu (56297ms)
+- 2026-10-26 15:44:41 UTC — [ticket-582] tour 1 — codeur démarré
+- 2026-10-26 15:46:53 UTC — [ticket-582] tour 1 — codeur terminé (131875ms)
+- 2026-10-26 15:48:44 UTC — [ticket-582] testeur: OK (exit 0)
+- 2026-10-26 15:49:43 UTC — [ide-core] ticket-587 PR #660 mergée (CI verte)
+- 2026-10-26 15:50:38 UTC — [ticket-582] securite: PASS — Aucune vulnérabilité critique ou haute introduite. Le code utilise correctement  (114500ms)
+- 2026-10-26 15:50:38 UTC — [ticket-582] tour 1 — reviewer démarré
+- 2026-10-26 15:50:58 UTC — [ticket-582] tour 1 — reviewer terminé (17968ms)
+- 2026-10-26 15:55:15 UTC — [ticket-582] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-26 15:55:15 UTC — [ticket-582] validateur: APPROVED — Tous les critères sont respectés : le clic sur un poste occupé affiche correctem (275469ms)
+- 2026-10-26 15:55:15 UTC — [ticket-582] APPROVED après 1 tour(s)
