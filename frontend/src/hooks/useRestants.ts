@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { api } from "../lib/api";
+import { statutsDuRun } from "../lib/statutDuRun";
 import type { StreamState } from "./streamState";
 import { useFenetreVisible } from "./useFenetreVisible";
 import { useResource } from "./useResource";
@@ -28,7 +28,7 @@ export function useRestants(
   const fenetreVisible = useFenetreVisible();
 
   const fetcher = useMemo(
-    () => (runId ? () => api.runs.status(runId).then((statut) => statut.restants) : null),
+    () => (runId ? () => statutsDuRun.lire(runId).then((statut) => statut.restants) : null),
     // `signal` ne sert pas dans le fetcher : changer l'identité de celui-ci est
     // le moyen de relire (voir `useResource`), exactement comme `useServices`.
     // eslint-disable-next-line react-hooks/exhaustive-deps

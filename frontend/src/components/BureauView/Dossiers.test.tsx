@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import Dossiers from "./Dossiers";
-import { api } from "../../lib/api";
+import { statutsDuRun } from "../../lib/statutDuRun";
 import { INITIAL, applyEvent } from "../../hooks/streamState";
 import { _viderCacheResource } from "../../hooks/useResource";
-import type { StatutDuRun } from "../../types/api";
+import type { StatutDuRun } from "../../lib/statutDuRun";
 
 function statut(restants: string[]): StatutDuRun {
   return {
@@ -39,7 +39,7 @@ afterEach(() => {
 
 describe("Dossiers", () => {
   it("draws one folder per remaining ticket", async () => {
-    vi.spyOn(api.runs, "status").mockResolvedValue(statut(["ticket-002", "ticket-003", "ticket-004"]));
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(["ticket-002", "ticket-003", "ticket-004"]));
 
     render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
 
@@ -48,7 +48,7 @@ describe("Dossiers", () => {
   });
 
   it("draws nothing when no ticket remains", async () => {
-    const lire = vi.spyOn(api.runs, "status").mockResolvedValue(statut([]));
+    const lire = vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut([]));
 
     const { container } = render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
 
@@ -57,7 +57,7 @@ describe("Dossiers", () => {
   });
 
   it("asks nothing without a run id", () => {
-    const lire = vi.spyOn(api.runs, "status");
+    const lire = vi.spyOn(statutsDuRun, "lire");
 
     const { container } = render(<Dossiers projet="ide-core" runId={null} etat={INITIAL} />);
 
@@ -67,7 +67,7 @@ describe("Dossiers", () => {
 
   it("reads the run again on each queue_progress", async () => {
     const lire = vi
-      .spyOn(api.runs, "status")
+      .spyOn(statutsDuRun, "lire")
       .mockResolvedValueOnce(statut(["ticket-002", "ticket-003", "ticket-004"]))
       .mockResolvedValueOnce(statut(["ticket-003", "ticket-004"]));
 
@@ -82,7 +82,7 @@ describe("Dossiers", () => {
   });
 
   it("does not read again when the state changes without a queue_progress", async () => {
-    const lire = vi.spyOn(api.runs, "status").mockResolvedValue(statut(["ticket-002"]));
+    const lire = vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(["ticket-002"]));
     const etat = apresQueueProgress(0);
 
     const { rerender } = render(<Dossiers projet="ide-core" runId="run-1" etat={etat} />);
@@ -90,5 +90,22 @@ describe("Dossiers", () => {
     rerender(<Dossiers projet="ide-core" runId="run-1" etat={{ ...etat }} />);
 
     expect(lire).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads the run again every 30 seconds while it lives", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const lire = vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(["ticket-002"]));
+      render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+      await waitFor(() => expect(lire).toHaveBeenCalledTimes(1));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(30_000);
+      });
+
+      await waitFor(() => expect(lire).toHaveBeenCalledTimes(2));
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
