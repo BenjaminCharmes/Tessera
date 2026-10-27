@@ -1,15 +1,16 @@
 ---
-id: ticket-575
-title: "A system prompt too long for a Windows command line goes to the SDK through a file"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-24
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-24
+id: ticket-575
 plan: true
+pr_number: 697
+priority: medium
+status: done
+title: A system prompt too long for a Windows command line goes to the SDK through
+  a file
+type: fix
 ---
 
 # ticket-575 — Un long prompt système passe par un fichier

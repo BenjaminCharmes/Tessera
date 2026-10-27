@@ -5645,3 +5645,21 @@ Le diff ajoute :
 - 2026-10-27 18:29:05 UTC — [ticket-555] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente une logique (111031ms)
 - 2026-10-27 18:29:05 UTC — [ticket-555] APPROVED après 1 tour(s)
 - 2026-10-27 18:31:38 UTC — [ticket-555] documentation: 0 fichier(s) (148437ms)
+- 2026-10-27 18:34:02 UTC — [ide-core] ticket-555 PR #696 confiée au CIWatcher
+- 2026-10-27 18:34:05 UTC — [ticket-575] branche ticket-575-a-system-prompt-too-long-for-a-windows-command-li
+- 2026-10-27 18:35:09 UTC — [ticket-575] plan rendu (63422ms)
+- 2026-10-27 18:35:09 UTC — [ticket-575] tour 1 — codeur démarré
+- 2026-10-27 18:36:18 UTC — [ticket-575] tour 1 — codeur terminé (68452ms)
+- 2026-10-27 18:40:04 UTC — [ide-core] ticket-555 PR #696 mergée (CI verte)
+- 2026-10-27 18:42:30 UTC — [ticket-575] testeur: 1 failed, 1611 passed, 64 warnings in 370.04s (0:06:10)
+- 2026-10-27 18:42:30 UTC — [ticket-575] tests rouges au tour 1
+- 2026-10-27 18:42:30 UTC — [ticket-575] tour 2 — codeur démarré
+- 2026-10-27 18:44:33 UTC — [ticket-575] tour 2 — codeur terminé (122452ms)
+- 2026-10-27 18:52:04 UTC — [ticket-575] testeur: OK (exit 0)
+- 2026-10-27 18:54:36 UTC — [ticket-575] securite: PASS — Diff sécurisé : refactoring + gestion des prompts longs via fichier temporaire.  (152062ms)
+- 2026-10-27 18:54:36 UTC — [ticket-575] tour 2 — reviewer démarré
+- 2026-10-27 18:55:02 UTC — [ticket-575] tour 2 — reviewer terminé (26077ms)
+- 2026-10-27 18:58:06 UTC — [ticket-575] validateur: fichiers cités joints : services/providers/agent_sdk.py (tronqué)
+- 2026-10-27 18:58:06 UTC — [ticket-575] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (209952ms)
+- 2026-10-27 18:58:06 UTC — [ticket-575] APPROVED après 2 tour(s)
+- 2026-10-27 18:59:25 UTC — [ticket-575] documentation: 0 fichier(s) (74187ms)
