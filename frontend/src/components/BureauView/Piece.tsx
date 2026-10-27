@@ -56,6 +56,8 @@ export default function Piece({
   );
   const contour = contourDeLaPiece(etat, sante);
   const enCours = postes.some((p) => p.etat === "occupe");
+  // Aucun événement de ticket : pas de run, donc personne à dessiner.
+  const auRepos = etat.ticketEvents.length === 0;
 
   return (
     <section
@@ -73,6 +75,7 @@ export default function Piece({
             key={p.poste}
             poste={p}
             sante={sante}
+            auRepos={auRepos}
             onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
           />
         ))}

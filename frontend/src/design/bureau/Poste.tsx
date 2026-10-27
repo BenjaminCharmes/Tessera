@@ -6,26 +6,30 @@ import Personnage from "./Personnage";
 interface PosteProps {
   etat: EtatPoste;
   sante: SanteAgent;
+  /** Pièce sans run : aucun personnage, un bureau et sa chaise vide (ADR-058). */
+  auRepos?: boolean;
 }
 
-/** Le coche d'un poste « fait » : quatre pixels verts sur le bureau. */
+/** La coche d'un poste « fait » : quatre pixels verts sur l'écran. */
 function Coche() {
   return (
     <g data-sprite="coche">
-      <rect x="3" y="10" width="1" height="1" className="fill-green-400" />
-      <rect x="4" y="11" width="1" height="1" className="fill-green-400" />
-      <rect x="5" y="10" width="1" height="1" className="fill-green-400" />
-      <rect x="6" y="9" width="1" height="1" className="fill-green-400" />
+      <rect x="11" y="9" width="1" height="1" className="fill-green-400" />
+      <rect x="12" y="10" width="1" height="1" className="fill-green-400" />
+      <rect x="13" y="9" width="1" height="1" className="fill-green-400" />
+      <rect x="14" y="8" width="1" height="1" className="fill-green-400" />
     </g>
   );
 }
 
 /**
- * Un poste de travail : bureau, écran, et un personnage seulement s'il est
- * occupé (ADR-058). Pixels `rect` sur une grille 16 × 18, rien d'autre.
+ * Un poste de travail : bureau, écran et, pendant un run, son personnage — assis
+ * (il attend son tour ou il travaille), debout tasse à la main une fois fini
+ * (ADR-058). Pixels `rect` sur une grille 16 × 18, rien d'autre.
  */
-export default function Poste({ etat, sante }: PosteProps) {
+export default function Poste({ etat, sante, auRepos = false }: PosteProps) {
   const occupe = etat === "occupe";
+  const assis = !auRepos && etat !== "fait";
   const ton = occupe ? sante : etat;
   return (
     <svg
@@ -36,8 +40,8 @@ export default function Poste({ etat, sante }: PosteProps) {
       aria-hidden="true"
       data-sprite="poste"
     >
-      {occupe ? (
-        <Personnage tape={sante === "actif"} />
+      {assis ? (
+        <Personnage tape={occupe && sante === "actif"} />
       ) : (
         <rect x="5" y="6" width="6" height="6" className="fill-zinc-800" />
       )}
@@ -45,6 +49,7 @@ export default function Poste({ etat, sante }: PosteProps) {
       <rect x="2" y="14" width="1" height="4" className="fill-zinc-700" />
       <rect x="13" y="14" width="1" height="4" className="fill-zinc-700" />
       <Ecran ton={ton} lueur={occupe && sante === "actif"} />
+      {!auRepos && etat === "fait" && <Personnage pose="debout" />}
       {etat === "fait" && <Coche />}
     </svg>
   );
