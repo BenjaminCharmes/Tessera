@@ -5680,3 +5680,17 @@ Le diff ajoute :
 - 2026-10-27 20:02:18 UTC — [ticket-574] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté un nouveau mécanisme b (252264ms)
 - 2026-10-27 20:02:18 UTC — [ticket-574] APPROVED après 2 tour(s)
 - 2026-10-27 20:06:12 UTC — [ticket-574] documentation: 0 fichier(s) (228968ms) — après tour de correction
+- 2026-10-27 20:16:33 UTC — [ide-core] ticket-574 PR #699 mergée (CI verte)
+- 2026-10-27 20:16:35 UTC — [ide-core] ticket-574 : base réalignée sur develop
+- 2026-10-27 20:16:35 UTC — [ide-core] ticket-574 PR #699 confiée au CIWatcher
+- 2026-10-27 20:16:38 UTC — [ticket-576] branche ticket-576-design-of-structured-verdicts-for-reviewer-securi
+- 2026-10-27 20:18:17 UTC — [ticket-576] plan rendu (98735ms)
+- 2026-10-27 20:18:17 UTC — [ticket-576] tour 1 — codeur démarré
+- 2026-10-27 20:22:47 UTC — [ticket-576] tour 1 — architect terminé (269234ms)
+- 2026-10-27 20:22:50 UTC — [ticket-576] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:23:12 UTC — [ticket-576] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute uniquement de la documentation : u (22172ms)
+- 2026-10-27 20:23:12 UTC — [ticket-576] tour 1 — reviewer démarré
+- 2026-10-27 20:23:49 UTC — [ticket-576] tour 1 — reviewer terminé (36156ms)
+- 2026-10-27 20:27:27 UTC — [ticket-576] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:27:27 UTC — [ticket-576] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Un nouvel ADR (061) décrit clai (253797ms)
+- 2026-10-27 20:27:27 UTC — [ticket-576] APPROVED après 1 tour(s)
