@@ -5263,3 +5263,4 @@ Le diff ajoute :
 - 2026-10-27 09:02:55 UTC — [ticket-593] validateur: fichiers cités joints : Plante.tsx, design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers) ; absents : design/bureau/
 - 2026-10-27 09:02:55 UTC — [ticket-593] validateur: APPROVED — Tous les critères sont satisfaits. L'infobulle est correctement portée vers docu (350750ms)
 - 2026-10-27 09:02:55 UTC — [ticket-593] APPROVED après 1 tour(s)
+- 2026-10-27 09:05:01 UTC — [ticket-593] documentation: 0 fichier(s) (120125ms)
