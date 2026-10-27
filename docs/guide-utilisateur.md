@@ -1242,6 +1242,9 @@ Au maximum, trois agents peuvent être à la machine simultanément. Au-delà du
 
 Quand le run s'achève, tous les agents marchent jusqu'à la porte et s'effacent graduellement de l'écran.
 
+
+**La porte d'une pièce est cliquable.** Un clic te place sur ce projet et ouvre l'onglet Tickets.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.
