@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-574
 plan: true
-pr_number: null
+pr_number: 699
 priority: medium
 status: done
 title: Reviewer findings carry a confidence score and only confident ones block
