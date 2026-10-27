@@ -5549,3 +5549,15 @@ Le diff ajoute :
 - 2026-10-27 15:30:51 UTC — [ticket-603] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (162750ms)
 - 2026-10-27 15:30:51 UTC — [ticket-603] APPROVED après 1 tour(s)
 - 2026-10-27 15:33:40 UTC — [ticket-603] documentation: 1 fichier(s) (165125ms)
+- 2026-10-27 15:36:20 UTC — [ide-core] ticket-603 PR #688 non surveillée (livraison arrêtée)
+- 2026-10-27 15:36:23 UTC — [ticket-608] branche ticket-608-the-reviewer-looks-for-the-callers-of-any-route-e
+- 2026-10-27 15:36:25 UTC — [ticket-608] tour 1 — codeur démarré
+- 2026-10-27 15:36:58 UTC — [ticket-608] tour 1 — codeur terminé (33187ms)
+- 2026-10-27 15:45:02 UTC — [ticket-608] testeur: OK (exit 0)
+- 2026-10-27 15:45:23 UTC — [ticket-608] securite: PASS — Le diff ajoute une instruction au prompt du reviewer (meilleure pratique pour vé (21171ms)
+- 2026-10-27 15:45:23 UTC — [ticket-608] tour 1 — reviewer démarré
+- 2026-10-27 15:45:33 UTC — [ticket-608] tour 1 — reviewer terminé (10219ms)
+- 2026-10-27 15:47:13 UTC — [ticket-608] validateur: fichiers cités joints : agents/prompts/reviewer.md, backend/tests/ (dossier, 302 fichiers, tronqué)
+- 2026-10-27 15:47:13 UTC — [ticket-608] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le fichier reviewer.md a été mi (110031ms)
+- 2026-10-27 15:47:13 UTC — [ticket-608] APPROVED après 1 tour(s)
+- 2026-10-27 15:48:30 UTC — [ticket-608] documentation: 0 fichier(s) (72452ms)

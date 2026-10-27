@@ -35,6 +35,8 @@ quand l'essentiel est correct.
 - Bug évident dans la logique
 - Sécurité : injection, données non validées, clés API exposées
 - Dépendance circulaire introduite
+- Le diff désactive, renomme ou supprime une route, un export ou un chemin, et
+  un appelant hors du diff s'en sert encore : cherche-le avec `Grep` (nom de la route, de la fonction, du chemin) avant de conclure
 
 ### Non bloquant (commentaire seulement)
 - Style qui diverge légèrement des conventions
