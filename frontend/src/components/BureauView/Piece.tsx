@@ -75,16 +75,20 @@ export default function Piece({
         {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
       </div>
       <div data-sol="lames" className="sol-lames">
-        <div className="grid grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
-          {postes.map((p) => (
-            <PosteDeTravail
-              key={p.poste}
-              poste={p}
-              sante={sante}
-              auRepos={auRepos}
-              onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
-            />
-          ))}
+        {/* Sol de 800 px, celui de la maquette : plus étroite, la pièce défile. */}
+        <div className="overflow-x-auto">
+          <div className="grid w-200 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
+            {postes.map((p) => (
+              <PosteDeTravail
+                key={p.poste}
+                projet={projet}
+                poste={p}
+                sante={sante}
+                auRepos={auRepos}
+                onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
+              />
+            ))}
+          </div>
         </div>
         <div className="flex min-h-9 items-end justify-between px-3 py-2">
           <div className="flex min-h-5 items-center">
