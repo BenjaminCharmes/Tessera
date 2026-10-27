@@ -1,34 +1,38 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import Baie from "../../design/bureau/Baie";
 import { etatDuService, libelleDeLEtat } from "../../design/etatDuService";
-import { useServices } from "../../hooks/useServices";
-import BoutonServices from "../Sidebar/BoutonServices";
+import type { UseServicesResult } from "../../hooks/useServices";
+import AvecInfobulle from "./AvecInfobulle";
 
 interface BaieDeServeursProps {
-  projet: string;
-  /** Compteur d'événements de service de la supervision : il fait relire la liste. */
-  signalServices: number;
+  /** Les services du projet, lus une fois par la pièce : le bouton de l'en-tête les lance. */
+  services: UseServicesResult;
 }
 
 /**
- * La baie : un étage par service déclaré, et le bouton de la barre latérale
- * pour lancer ou arrêter. Rien de déclaré, pas de baie (ADR-042).
+ * La baie, contre le mur : un étage par service déclaré, son voyant pour état.
+ * Les noms et les états se lisent en infobulle. Rien de déclaré, pas de baie (ADR-042).
  */
-export default function BaieDeServeurs({ projet, signalServices }: BaieDeServeursProps) {
-  const services = useServices(projet, signalServices);
+export default function BaieDeServeurs({ services }: BaieDeServeursProps) {
   if (!services.declare) return null;
 
   return (
-    <div role="group" aria-label="Services" className="flex items-end gap-2">
-      <Baie services={services.services.map(etatDuService)} />
-      {/* Un étage de la baie fait 12 px (4 unités de la grille × 3) : une ligne par étage, sous le 1er liseré. */}
-      <ul className="pt-[3px] text-micro text-zinc-400">
-        {services.services.map((s) => (
-          <li key={s.nom} title={libelleDeLEtat(s)} className="h-3 whitespace-nowrap leading-3">
-            {s.nom}
-          </li>
-        ))}
-      </ul>
-      <BoutonServices services={services} libelleDuProjet={projet} />
-    </div>
+    <AvecInfobulle
+      label="Services"
+      className="block"
+      infobulle={
+        <ul>
+          {services.services.map((s) => (
+            <li key={s.nom}>
+              {s.nom} <span className="text-zinc-400">— {libelleDeLEtat(s)}</span>
+            </li>
+          ))}
+        </ul>
+      }
+    >
+      <Agrandi>
+        <Baie services={services.services.map(etatDuService)} />
+      </Agrandi>
+    </AvecInfobulle>
   );
 }

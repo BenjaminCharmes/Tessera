@@ -23,11 +23,16 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+/** Les boutons des cinq postes : l'interrupteur et la porte de la pièce n'en sont pas. */
+function boutonsDesPostes(): HTMLElement[] {
+  return screen.getAllByRole("button").filter((b) => !/lumière/.test(b.getAttribute("aria-label") ?? ""));
+}
+
 describe("Piece", () => {
   it("renders five posts, one button each, named with their state", () => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
-    const boutons = screen.getAllByRole("button");
+    const boutons = boutonsDesPostes();
     expect(boutons.map((b) => b.getAttribute("aria-label"))).toEqual([
       "Codeur, a fini",
       "Testeur, a fini",
@@ -55,7 +60,7 @@ describe("Piece", () => {
   it("gives no post a pointer cursor when nothing listens to the choice", () => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
-    for (const bouton of screen.getAllByRole("button")) {
+    for (const bouton of boutonsDesPostes()) {
       expect(bouton.className).not.toContain("cursor-pointer");
     }
   });
@@ -130,25 +135,30 @@ function personnagesDuPoste(nom: string): Element[] {
 }
 
 describe("Piece furniture", () => {
-  it("lays a plank floor and a plant in each work room", () => {
+  it("lays a plank floor under a wall, with a ficus and a cactus against it", () => {
     render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
 
     const piece = screen.getByRole("region", { name: "ide-core" });
     expect(piece.querySelector('[data-sol="lames"]')).not.toBeNull();
-    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(1);
+    const mur = piece.querySelector('[data-mur="piece"]');
+    const especes = [...(mur?.querySelectorAll('[data-sprite="plante"]') ?? [])].map((p) => p.getAttribute("data-espece"));
+    expect(especes).toEqual(["ficus", "cactus"]);
   });
 
-  it("keeps the plant in a room whose run is on", () => {
+  it("keeps its plants in a room whose run is on", () => {
     render(<Piece projet="ide-core" etat={etatEnCodage()} maintenant={T0 + 5_000} />);
 
     const piece = screen.getByRole("region", { name: "ide-core" });
-    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(1);
+    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(2);
   });
 
-  it("writes the empty mailbox label in the bottom bar", async () => {
+  it("hangs the mailbox on the wall, its state in a tooltip rather than a bottom bar", async () => {
     render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
 
-    expect(await screen.findByText("aucune PR")).toBeInTheDocument();
+    const mur = screen.getByRole("region", { name: "ide-core" }).querySelector('[data-mur="piece"]');
+    expect(await screen.findByRole("group", { name: /Boîte aux lettres/ })).toBeInTheDocument();
+    expect(mur?.querySelector("[data-boite]")).not.toBeNull();
+    expect(screen.queryByText("aucune PR")).toBeNull();
   });
 });
 
@@ -228,16 +238,16 @@ describe("Piece characters", () => {
     );
   });
 
-  it("keeps the 800 px floor out of any horizontal scroll container", () => {
+  it("spans the floor over the whole room, out of any horizontal scroll container", () => {
     const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} />);
 
-    const sol = container.querySelector("section .sol-lames [data-echelle]");
+    const sol = container.querySelector("section .sol-lames [data-etirement]");
     expect(sol).not.toBeNull();
-    expect(sol?.className).toContain("w-200");
+    expect(sol?.className).toContain("w-full");
     expect(sol?.closest(".overflow-x-auto")).toBeNull();
   });
 
-  it("scales the floor to the width of the room and keeps it centred", () => {
+  it("stretches the abscissas to the room's width, keeping the sprites at their size", () => {
     vi.stubGlobal(
       "ResizeObserver",
       class {
@@ -254,9 +264,9 @@ describe("Piece characters", () => {
     const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} />);
     vi.unstubAllGlobals();
 
-    const sol = container.querySelector("[data-echelle]");
-    expect(sol?.getAttribute("data-echelle")).toBe("1.5");
-    expect(sol?.className).toContain("mx-auto");
+    const sol = container.querySelector<HTMLElement>("[data-etirement]");
+    expect(sol?.getAttribute("data-etirement")).toBe("1.5");
+    expect(sol?.style.zoom ?? "").toBe("");
   });
 
   it("draws one character per post while a run is on", () => {

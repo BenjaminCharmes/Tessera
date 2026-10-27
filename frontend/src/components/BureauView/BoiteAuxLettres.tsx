@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import Agrandi from "../../design/bureau/Agrandi";
 import Boite from "../../design/bureau/Boite";
 import type { StreamState } from "../../hooks/streamState";
 import { useResource } from "../../hooks/useResource";
@@ -7,6 +8,7 @@ import { boiteAuxLettres } from "../../lib/bureau/boiteAuxLettres";
 import { boiteDepuisPr } from "../../lib/bureau/boiteDepuisPr";
 import { libelleCourtDeLaBoite, libelleDeLaBoite } from "../../lib/bureau/libelleDeLaBoite";
 import type { PRStatusEntry } from "../../types/api";
+import AvecInfobulle from "./AvecInfobulle";
 
 interface BoiteAuxLettresProps {
   projet: string;
@@ -35,7 +37,10 @@ function usePrDuTicket(projet: string, ticketId: string | null, pr: number | nul
   return useResource<PRStatusEntry | null>(fetcher, null).data;
 }
 
-/** La boîte aux lettres d'une pièce : cinq états, le numéro de PR lié à son URL quand on la connaît. */
+/**
+ * La boîte aux lettres d'une pièce, au mur près de la porte : cinq états, le numéro
+ * de PR lié à son URL quand on la connaît, l'état en toutes lettres en infobulle.
+ */
 export default function BoiteAuxLettres({ projet, etat }: BoiteAuxLettresProps) {
   const depuisEvenements = boiteAuxLettres(etat);
   // `ticketId` n'est posé que par l'instantané ou un `queue_progress` : un run
@@ -46,10 +51,13 @@ export default function BoiteAuxLettres({ projet, etat }: BoiteAuxLettresProps) 
   const url = entree !== null && entree.pr_number === boite.pr ? entree.pr_url : null;
 
   return (
-    <div role="group" aria-label={libelleDeLaBoite(boite)} data-boite={boite.etat} className="flex flex-col items-center">
-      <div className="flex items-end gap-1">
-        <Boite etat={boite.etat} />
-        {boite.pr !== null &&
+    <div data-boite={boite.etat} className="flex items-end gap-1">
+      <AvecInfobulle label={libelleDeLaBoite(boite)} className="block" infobulle={libelleCourtDeLaBoite(boite)}>
+        <Agrandi>
+          <Boite etat={boite.etat} />
+        </Agrandi>
+      </AvecInfobulle>
+      {boite.pr !== null &&
           (url ? (
             <a href={url} target="_blank" rel="noreferrer" className="text-micro text-blue-300 hover:underline">
               #{boite.pr}
@@ -57,10 +65,6 @@ export default function BoiteAuxLettres({ projet, etat }: BoiteAuxLettresProps) 
           ) : (
             <span className="text-micro text-zinc-400">#{boite.pr}</span>
           ))}
-      </div>
-      <span aria-hidden="true" className="text-xs text-zinc-400">
-        {libelleCourtDeLaBoite(boite)}
-      </span>
     </div>
   );
 }

@@ -26,8 +26,8 @@ describe("physique", () => {
         const p = physique(projet, role);
         expect([1, 2, 3, 4, 5]).toContain(p.peau);
         expect([1, 2, 3, 4, 5, 6]).toContain(p.cheveux);
-        expect(["court", "long", "chignon", "chauve"]).toContain(p.coiffure);
-        if (p.jupe) expect(["long", "chignon"]).toContain(p.coiffure);
+        expect(["court", "long", "carre", "chauve"]).toContain(p.coiffure);
+        if (p.jupe) expect(["long", "carre"]).toContain(p.coiffure);
       }
     }
   });

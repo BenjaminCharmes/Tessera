@@ -7,7 +7,7 @@ import type { SignauxSonores } from "./sons";
 const CALME: SignauxSonores = { fete: false, alarme: false, machine: 0, demarrages: 0 };
 
 function agent(activite: AgentPlace["activite"], parti = false): AgentPlace {
-  return { poste: "codeur", x: 0, niveau: "fond", activite, parti };
+  return { poste: "codeur", x: 0, decalage: 0, niveau: "fond", activite, parti };
 }
 
 describe("sonsDeLaTransition", () => {

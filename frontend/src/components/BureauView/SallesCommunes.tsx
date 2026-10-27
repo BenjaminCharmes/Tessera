@@ -17,12 +17,12 @@ interface SallesCommunesProps {
 
 /**
  * Les quatre salles communes en une rangée, au-dessus des pièces des projets :
- * directeur, réunion, pause, RH. La grille `auto-fit` les passe à la ligne
- * quand la vue se resserre.
+ * directeur, réunion, pause, RH. Toujours quatre de front : sur un écran étroit,
+ * c'est l'échelle des sprites qui se réduit (`useEchelleDesSprites`).
  */
 export default function SallesCommunes({ projets, maintenant, employe = null }: SallesCommunesProps) {
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5" data-testid="salles-communes">
+    <div className="grid grid-cols-4 gap-3.5" data-testid="salles-communes">
       <BureauDuDirecteur agents={agentsAuDirecteur(projets, maintenant)} maintenant={maintenant} employe={employe} />
       <SalleReunion occupants={occupantsDeLaReunion(projets)} maintenant={maintenant} />
       <SallePause occupants={occupantsDeLaPause(projets)} maintenant={maintenant} />

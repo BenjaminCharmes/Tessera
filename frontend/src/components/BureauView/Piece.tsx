@@ -2,7 +2,6 @@ import Confettis from "../../design/bureau/Confettis";
 import Gyrophare from "../../design/bureau/Gyrophare";
 import NightVeil from "../../design/bureau/NightVeil";
 import Pastille from "../../design/bureau/Pastille";
-import Plante from "../../design/bureau/Plante";
 import type { StreamState } from "../../hooks/streamState";
 import { useActivites } from "../../hooks/useActivites";
 import { useSonsDeLaPiece } from "../../hooks/useSonsDeLaPiece";
@@ -25,9 +24,11 @@ import type { RunActif } from "../../types/api";
 import ActionsDuRun from "./ActionsDuRun";
 import AgentsDeLaPiece from "./AgentsDeLaPiece";
 import FondDeLaPiece from "./FondDeLaPiece";
-import ObjetsDeLaPiece from "./ObjetsDeLaPiece";
 import PosteDeTravail from "./PosteDeTravail";
-import SolMisAEchelle from "./SolMisAEchelle";
+import SolEtire from "./SolEtire";
+import { useLumiere } from "../../hooks/useLumiere";
+import { useServices } from "../../hooks/useServices";
+import BoutonServices from "../Sidebar/BoutonServices";
 
 interface PieceProps {
   projet: string;
@@ -106,6 +107,10 @@ export default function Piece({
   );
   // Fanfare, alarme, glouglou, frappes : ce que la pièce vient de montrer, dit à voix haute (ticket-603).
   useSonsDeLaPiece(signauxSonores(etat, fete, gyrophare, agents), sonActif);
+  const moment = dayMoment(maintenant);
+  const [lumiere, basculerLumiere] = useLumiere(projet, moment);
+  // Une seule lecture des services : la baie au mur les montre, le bouton de l'en-tête les lance.
+  const services = useServices(projet, signalServices);
 
   return (
     <section
@@ -115,19 +120,32 @@ export default function Piece({
     >
       <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">
         <h3 className="truncate text-corps font-semibold text-zinc-200">{projet}</h3>
-        {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
+        <div className="flex items-center gap-2">
+          {/* Ce que la pièce dit d'elle-même : la fête, la copie rendue, la santé, ou l'étape sans poste. */}
+          {fete && <StatusPill etat="reussi" libelle="PR mergée" />}
+          {copie !== null && <StatusPill etat="en-cours" libelle={libelleDeLaCopie(copie)} />}
+          {!fete && copie === null && enCours && <Pastille sante={sante} />}
+          {!fete && !enCours && suite && <StatusPill etat="en-cours" libelle={suite} />}
+          <BoutonServices services={services} libelleDuProjet={projet} enPastille />
+          {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
+        </div>
       </div>
       <div data-sol="lames" className="sol-lames relative">
-        {/* Sol de 800 px, celui de la maquette, rendu à l'échelle de la largeur de la salle. */}
-        <SolMisAEchelle>
+        {/* Le repère de 800 px de la maquette, étiré sur la largeur de la pièce ; les sprites gardent leur taille. */}
+        <SolEtire>
           <FondDeLaPiece
             projet={projet}
             etat={etat}
             machineEnService={machineEnService(agents)}
             maintenant={maintenant}
+            allume={lumiere}
+            onBasculerLumiere={basculerLumiere}
+            runId={runId}
+            services={services}
+            onOuvrir={onOuvrir}
             onOpenProject={onOpenProject && (() => onOpenProject(projet))}
           />
-          <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
+          <div className="grid h-40 grid-cols-5 items-end gap-1 border-b-8 border-transparent px-2.5">
             {postes.map((p) => (
               <PosteDeTravail
                 key={p.poste}
@@ -149,24 +167,8 @@ export default function Piece({
               <Gyrophare />
             </span>
           )}
-        </SolMisAEchelle>
-        <div className="flex min-h-9 items-end justify-between px-3 py-2">
-          <div className="flex min-h-5 items-center">
-            {fete && <StatusPill etat="reussi" libelle="PR mergée" />}
-            {copie !== null && <StatusPill etat="en-cours" libelle={libelleDeLaCopie(copie)} />}
-            {!fete && copie === null && enCours && <Pastille sante={sante} />}
-            {!fete && !enCours && suite && <StatusPill etat="en-cours" libelle={suite} />}
-          </div>
-          <Plante />
-        </div>
-        <ObjetsDeLaPiece
-          projet={projet}
-          etat={etat}
-          runId={runId}
-          signalServices={signalServices}
-          onOuvrir={onOuvrir}
-        />
-        {dayMoment(maintenant) === "nuit" && <NightVeil />}
+        </SolEtire>
+        {moment === "nuit" && <NightVeil sombre={!lumiere} />}
       </div>
     </section>
   );

@@ -12,7 +12,8 @@ interface PersonnageProps {
   /** Assis au poste (défaut), ou debout à côté, tasse à la main : l'agent a fini. */
   pose?: "assis" | "debout";
   /** Debout seulement : les bras levés au lieu de la tasse. */
-  etire?: boolean;
+  brasLeves?: boolean;
+  sansTasse?: boolean;
   /** Debout seulement : une feuille annotée à la main, l'agent rend sa copie (ticket-599). */
   feuille?: boolean;
 }
@@ -26,11 +27,12 @@ export default function Personnage({
   physique,
   tape = false,
   pose = "assis",
-  etire = false,
+  brasLeves = false,
+  sansTasse = false,
   feuille = false,
 }: PersonnageProps) {
   if (pose === "debout") {
-    return <PersonnageDebout tenue={tenue} physique={physique} etire={etire} feuille={feuille} />;
+    return <PersonnageDebout tenue={tenue} physique={physique} brasLeves={brasLeves} sansTasse={sansTasse} feuille={feuille} />;
   }
   return <PersonnageAssis tenue={tenue} physique={physique} tape={tape} />;
 }

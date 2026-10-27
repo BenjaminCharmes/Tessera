@@ -5,6 +5,7 @@ import {
   appliquerPlafond,
   libelleActivite,
   machineEnService,
+  quiBavarde,
   placerLesAgents,
   postesFaits,
   renouveler,
@@ -26,7 +27,7 @@ function postes(etats: Partial<Record<PosteId, PosteDuRun["etat"]>>): PosteDuRun
 describe("tirerActivite", () => {
   it("can draw each of the three activities", () => {
     expect(tirerActivite(() => 0)).toBe("tasse");
-    expect(tirerActivite(() => 0.5)).toBe("etire");
+    expect(tirerActivite(() => 0.5)).toBe("pause");
     expect(tirerActivite(() => 0.99)).toBe("machine");
   });
 
@@ -42,7 +43,7 @@ describe("libelleActivite", () => {
 
   it("says each activity in words", () => {
     expect(libelleActivite("tasse")).toBe("boit un café à son poste");
-    expect(libelleActivite("etire")).toBe("s'étire");
+    expect(libelleActivite("pause")).toBe("fait une pause");
     expect(libelleActivite("machine")).toBe("prend un café à la machine");
   });
 });
@@ -58,7 +59,7 @@ describe("postesFaits", () => {
 describe("renouveler", () => {
   it("gives no activity to a post that is busy or free", () => {
     const etats = postes({ codeur: "fait", testeur: "occupe" });
-    const avant: Activites = { testeur: "machine", securite: "etire" };
+    const avant: Activites = { testeur: "machine", securite: "pause" };
 
     const apres = renouveler(avant, postesFaits(etats), suite(0.99));
 
@@ -66,7 +67,7 @@ describe("renouveler", () => {
   });
 
   it("draws an activity for an agent that has none yet", () => {
-    expect(renouveler({}, ["codeur"], suite(0.5))).toEqual({ codeur: "etire" });
+    expect(renouveler({}, ["codeur"], suite(0.5))).toEqual({ codeur: "pause" });
   });
 
   it("keeps the activity most of the time", () => {
@@ -96,22 +97,22 @@ describe("appliquerPlafond", () => {
   });
 
   it("leaves the other activities alone", () => {
-    const effectives = appliquerPlafond({ codeur: "etire", testeur: "tasse" }, ["codeur", "testeur"]);
+    const effectives = appliquerPlafond({ codeur: "pause", testeur: "tasse" }, ["codeur", "testeur"]);
 
-    expect(effectives).toEqual({ codeur: "etire", testeur: "tasse" });
+    expect(effectives).toEqual({ codeur: "pause", testeur: "tasse" });
   });
 });
 
 describe("placerLesAgents", () => {
   it("places only the done agents while the run is open, each by activity", () => {
     const faits: PosteId[] = ["codeur", "testeur", "securite"];
-    const effectives: Activites = { codeur: "machine", testeur: "etire", securite: "tasse" };
+    const effectives: Activites = { codeur: "machine", testeur: "pause", securite: "tasse" };
 
     const agents = placerLesAgents(faits, effectives, false);
 
     expect(agents.map((a) => [a.poste, a.activite, a.niveau])).toEqual([
       ["codeur", "machine", "fond"],
-      ["testeur", "etire", "rangee"],
+      ["testeur", "pause", "rangee"],
       ["securite", "tasse", "rangee"],
     ]);
     expect(agents.every((a) => !a.parti)).toBe(true);
@@ -120,18 +121,25 @@ describe("placerLesAgents", () => {
   it("stands two agents at the machine on different places", () => {
     const agents = placerLesAgents(["codeur", "testeur"], { codeur: "machine", testeur: "machine" }, false);
 
-    expect(new Set(agents.map((a) => a.x)).size).toBe(2);
+    expect(new Set(agents.map((a) => a.x + a.decalage)).size).toBe(2);
+    expect(quiBavarde(agents)).toBe("codeur");
+  });
+
+  it("lets nobody chat when a single agent is at the machine", () => {
+    const agents = placerLesAgents(["codeur", "testeur"], { codeur: "machine", testeur: "tasse" }, false);
+
+    expect(quiBavarde(agents)).toBeNull();
   });
 
   it("puts all five agents at the door, gone, once the run is closed", () => {
-    const agents = placerLesAgents(["codeur"], { codeur: "etire" }, true);
+    const agents = placerLesAgents(["codeur"], { codeur: "pause" }, true);
 
     expect(agents).toHaveLength(5);
     for (const agent of agents) {
       expect(agent.parti).toBe(true);
       expect(agent.activite).toBeNull();
       expect(agent.niveau).toBe("fond");
-      expect(agent.x).toBeGreaterThan(PORTE_X - 10);
+      expect(agent.x).toBe(PORTE_X);
     }
   });
 

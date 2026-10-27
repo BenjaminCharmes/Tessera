@@ -58,7 +58,7 @@ describe("Personnage", () => {
   });
 
   it("keeps the head width for every hairstyle", () => {
-    for (const coiffure of ["court", "long", "chignon", "chauve"] as const) {
+    for (const coiffure of ["court", "long", "carre", "chauve"] as const) {
       const look: Physique = { peau: 3, cheveux: 2, coiffure, jupe: false };
       for (const pose of ["assis", "debout"] as const) {
         const tete = rendu("testeur", pose, look).querySelector('rect[data-partie="tete"]');
@@ -67,41 +67,35 @@ describe("Personnage", () => {
     }
   });
 
-  it("draws a hair square on each temple, outside the eyes, for short and bun", () => {
-    for (const coiffure of ["court", "chignon"] as const) {
-      for (const pose of ["assis", "debout"] as const) {
-        const look: Physique = { peau: 3, cheveux: 2, coiffure, jupe: false };
-        const c = rendu("testeur", pose, look);
-        const tete = rects(c).find((r) => r.partie === "tete");
-        const tempes = rects(c).filter((r) => r.partie === "tempe");
-        const ctx = `${coiffure} ${pose}`;
+  it("draws a hair square on each temple, outside the eyes, for the short cut", () => {
+    for (const pose of ["assis", "debout"] as const) {
+      const look: Physique = { peau: 3, cheveux: 2, coiffure: "court", jupe: false };
+      const c = rendu("testeur", pose, look);
+      const tete = rects(c).find((r) => r.partie === "tete");
+      const tempes = rects(c).filter((r) => r.partie === "tempe");
 
-        expect(tete, ctx).toBeDefined();
-        const { x, y } = tete!;
-        expect(tempes.map((t) => [t.x, t.y, t.w, t.h]), ctx).toEqual([
-          [x, y, 1, 1],
-          [x + 5, y, 1, 1],
-        ]);
-      }
+      expect(tete, pose).toBeDefined();
+      const { x, y } = tete!;
+      expect(tempes.map((t) => [t.x, t.y, t.w, t.h]), pose).toEqual([
+        [x, y, 1, 1],
+        [x + 5, y, 1, 1],
+      ]);
     }
   });
 
-  it("draws a bun of at least 4 by 2, touching the hair band, centred on the head", () => {
+  it("draws the bob as two locks beside the face, shorter than long hair, and nothing on top", () => {
     for (const pose of ["assis", "debout"] as const) {
-      const look: Physique = { peau: 3, cheveux: 2, coiffure: "chignon", jupe: false };
+      const look: Physique = { peau: 3, cheveux: 2, coiffure: "carre", jupe: false };
       const tous = rects(rendu("testeur", pose, look));
       const tete = tous.find((r) => r.partie === "tete")!;
-      const bande = tous.find((r) => r.w === 6 && r.h === 2 && r.y === tete.y - 2);
-      const chignon = tous.find((r) => r.w >= 4 && r.y + r.h === bande?.y && r.partie === undefined);
+      const meches = tous.filter((r) => r.w === 1 && r.h === 4 && r.y === tete.y - 1);
 
-      expect(bande, pose).toBeDefined();
-      expect(chignon, pose).toBeDefined();
-      expect(chignon?.h, pose).toBeGreaterThanOrEqual(2);
-      expect((chignon?.x ?? 0) + (chignon?.w ?? 0) / 2, pose).toBe(tete.x + 3);
+      expect(meches.map((m) => m.x), pose).toEqual([tete.x - 1, tete.x + 6]);
+      expect(tous.some((r) => r.y < tete.y - 2), pose).toBe(false);
     }
   });
 
-  it("lets the seated bun overflow the desk grid instead of being clipped", () => {
+  it("lets the seated hair overflow the desk grid instead of being clipped", () => {
     const { container } = render(<Poste projet="ide-core" role="testeur" etat="libre" sante="actif" />);
     const svg = container.querySelector('[data-sprite="poste"]');
 

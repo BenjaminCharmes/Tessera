@@ -33,12 +33,12 @@ export default function ActionsDuRun({ run, etat, onOuvrir, onRanger }: ActionsD
       <StatusPill {...etatAffiche(etat)} />
       {issueDite && <StatusPill {...issueDite} />}
       {onOuvrir && (
-        <Button taille="compact" aria-label={`Ouvrir le fil de ${nom}`} onClick={() => onOuvrir(run.run_id)}>
+        <Button taille="pastille" aria-label={`Ouvrir le fil de ${nom}`} onClick={() => onOuvrir(run.run_id)}>
           Fil
         </Button>
       )}
       {etat.runClosed && onRanger && (
-        <Button taille="compact" aria-label={`Ranger ${nom}`} onClick={() => onRanger(run.run_id)}>
+        <Button taille="pastille" aria-label={`Ranger ${nom}`} onClick={() => onRanger(run.run_id)}>
           Ranger
         </Button>
       )}

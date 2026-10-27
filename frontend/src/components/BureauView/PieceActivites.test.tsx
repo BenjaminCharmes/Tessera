@@ -11,11 +11,14 @@ const ETIRE = () => 0.5;
 const MACHINE = () => 0.99;
 
 beforeEach(() => {
+  // Les décalages des agents suivent l'échelle des sprites, qui dépend de la largeur : celle d'un grand écran.
+  vi.stubGlobal("innerWidth", 1920);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
   vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 });
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
 
@@ -26,7 +29,7 @@ function agents(conteneur: HTMLElement): HTMLElement[] {
 describe("Piece break activities", () => {
   it.each([
     { nom: "coffee at the post", hasard: TASSE, libelle: "boit un café à son poste" },
-    { nom: "stretching", hasard: ETIRE, libelle: "s'étire" },
+    { nom: "stretching", hasard: ETIRE, libelle: "fait une pause" },
     { nom: "coffee at the machine", hasard: MACHINE, libelle: "prend un café à la machine" },
   ])("names an agent who is done $nom", ({ hasard, libelle }) => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} hasard={hasard} />);
@@ -123,7 +126,7 @@ describe("Piece end of run", () => {
     const tous = agents(container);
     expect(tous).toHaveLength(5);
     for (const agent of tous) {
-      expect(agent.style.transform).toContain(`translate(${PORTE_X - 3}px`);
+      expect(agent.style.transform).toContain(`translate(${PORTE_X + 9}px`);
       expect(agent.style.opacity).toBe("0");
     }
   });
@@ -149,6 +152,8 @@ describe("Piece end of run", () => {
   it("keeps the five posts as buttons, clickable underneath the agents", () => {
     pieceClose();
 
-    expect(screen.getAllByRole("button")).toHaveLength(5);
+    // L'interrupteur est le seul autre bouton de la pièce.
+    const postes = screen.getAllByRole("button").filter((b) => !/lumière/.test(b.getAttribute("aria-label") ?? ""));
+    expect(postes).toHaveLength(5);
   });
 });

@@ -56,23 +56,27 @@ describe("BoiteAuxLettres", () => {
     expect(screen.getByRole("group", { name: libelle })).toBeInTheDocument();
   });
 
-  it("writes the short label under the box of a room without a pull request", async () => {
+  it("puts the short label in a tooltip, not under the box, for a room without a pull request", async () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 
     render(<BoiteAuxLettres projet="ide-core" etat={INITIAL} />);
     await act(async () => {});
 
-    expect(screen.getByText("aucune PR")).toBeInTheDocument();
+    expect(screen.queryByText("aucune PR")).toBeNull();
+    act(() => screen.getByRole("group").focus());
+    expect(screen.getByRole("tooltip")).toHaveTextContent("aucune PR");
     expect(screen.queryByText(/Boîte aux lettres/)).toBeNull();
   });
 
-  it("writes the pull request number and its state under the box", async () => {
+  it("shows the pull request number beside the box and its state in the tooltip", async () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 
     render(<BoiteAuxLettres projet="ide-core" etat={rejouer(livraison({ arret: "conflit résolu, PR à relire" }))} />);
     await act(async () => {});
 
-    expect(screen.getByText("PR #42 ouverte")).toBeInTheDocument();
+    expect(screen.getByText("#42")).toBeInTheDocument();
+    act(() => screen.getByRole("group").focus());
+    expect(screen.getByRole("tooltip")).toHaveTextContent("PR #42 ouverte");
   });
 
   it("uses five distinct labels", () => {

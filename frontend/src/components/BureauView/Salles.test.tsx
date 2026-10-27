@@ -29,7 +29,7 @@ describe("SallePause", () => {
     const machine = container.querySelector('[data-sprite="machine-a-cafe"]');
     expect(machine).not.toBeNull();
     expect(machine?.getAttribute("aria-hidden")).toBe("true");
-    expect(screen.getByText("café")).toBeInTheDocument();
+    expect(screen.queryByText("café")).toBeNull();
     expect(screen.getByRole("heading", { name: "Salle de pause" })).toHaveAttribute(
       "title",
       expect.stringMatching(/quota, CI, une dépendance/),
@@ -52,7 +52,7 @@ describe("SallePause", () => {
 
     const salle = screen.getByRole("complementary", { name: "Salle de pause" });
     expect(salle.querySelector('[data-sprite="plante"]')).not.toBeNull();
-    expect(salle).toHaveAttribute("data-sol", "lames");
+    expect(salle.querySelector('[data-sol="lames"]')).not.toBeNull();
   });
 });
 
@@ -109,6 +109,6 @@ describe("SalleReunion", () => {
 
     const salle = screen.getByRole("complementary", { name: "Salle de réunion" });
     expect(salle.querySelector('[data-sprite="plante"]')).not.toBeNull();
-    expect(salle).toHaveAttribute("data-sol", "lames");
+    expect(salle.querySelector('[data-sol="lames"]')).not.toBeNull();
   });
 });

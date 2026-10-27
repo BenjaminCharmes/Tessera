@@ -1,4 +1,5 @@
 import type { OccupantDeReunion } from "../../lib/bureau/salles";
+import Chaise from "../../design/bureau/Chaise";
 import TableDeReunion from "../../design/bureau/TableDeReunion";
 import Salle from "./Salle";
 
@@ -25,7 +26,13 @@ export default function SalleReunion({ occupants, maintenant }: SalleReunionProp
       titre="Salle de réunion"
       entete="un conflit de rebase confié au résolveur : ses fichiers pendant le travail, puis la PR à relire"
       vide="Aucun conflit en cours"
-      mobilier={<TableDeReunion />}
+      mobilier={
+        <div className="flex items-end gap-1">
+          <Chaise />
+          <TableDeReunion />
+          <Chaise />
+        </div>
+      }
     >
       {occupants.map(({ projet, reunion }) => (
         <li key={projet} className="text-xs">

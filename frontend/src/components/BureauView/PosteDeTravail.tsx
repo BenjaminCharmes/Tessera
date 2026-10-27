@@ -1,3 +1,4 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import Bulle from "../../design/bureau/Bulle";
 import BulleDOutil from "../../design/bureau/BulleDOutil";
 import Poste from "../../design/bureau/Poste";
@@ -58,14 +59,16 @@ export default function PosteDeTravail({
         tabIndex={absent ? -1 : undefined}
         className={`relative rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}
       >
-        <Poste
-          projet={projet}
+        <Agrandi>
+          <Poste
+            projet={projet}
           role={poste.poste}
           etat={poste.etat}
           sante={sante}
           auRepos={auRepos}
-          parti={parti || absent}
-        />
+            parti={parti || absent}
+          />
+        </Agrandi>
       </button>
       <span className="text-micro text-zinc-400">{nomDuPoste(poste.poste)}</span>
     </div>

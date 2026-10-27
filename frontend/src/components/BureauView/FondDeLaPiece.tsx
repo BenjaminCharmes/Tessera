@@ -1,67 +1,157 @@
+import type { ReactNode } from "react";
+import Agrandi from "../../design/bureau/Agrandi";
+import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
 import MachineACafe from "../../design/bureau/MachineACafe";
+import Plante from "../../design/bureau/Plante";
 import Porte from "../../design/bureau/Porte";
 import Vapeur from "../../design/bureau/Vapeur";
 import type { StreamState } from "../../hooks/streamState";
+import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
+import type { UseServicesResult } from "../../hooks/useServices";
 import { MACHINE_X, PORTE_X } from "../../lib/bureau/activites";
+import { cielDesFenetres } from "../../lib/bureau/ciel";
 import { dayMoment } from "../../lib/bureau/dayMoment";
+import { enPourcentDuSol } from "../../lib/bureau/etirementDuSol";
 import CeilingLamp from "../../design/bureau/CeilingLamp";
 import SkyWindow from "../../design/bureau/SkyWindow";
+import BaieDeServeurs from "./BaieDeServeurs";
+import BoiteAuxLettres from "./BoiteAuxLettres";
+import BoutonLumiere from "./BoutonLumiere";
+import Dossiers from "./Dossiers";
 import TableauDesCriteres from "./TableauDesCriteres";
 
-/** Le tableau blanc, accroché à gauche du mur : loin du gyrophare et de la machine. */
-const TABLEAU_X = 40;
-/** Les deux fenêtres, à droite du tableau ; les trois plafonniers entre elles et au-delà, hors du gyrophare. */
-const FENETRES_X = [200, 300] as const;
-const PLAFONNIERS_X = [264, 420, 600] as const;
+/**
+ * Les abscisses du mur, dans le repère de 800 px, de gauche à droite : le tableau
+ * blanc, deux fenêtres, le ficus, le meuble de l'imprimante et sa pile de dossiers,
+ * la machine, la baie, le cactus, la troisième fenêtre, la boîte aux lettres,
+ * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
+ */
+const TABLEAU_X = 30;
+const FENETRES_X = [190, 270, 616] as const;
+const PLAFONNIERS_X = [250, 432, 590] as const;
+const FICUS_X = 348;
+const IMPRIMANTE_X = 392;
+const BAIE_X = 528;
+const CACTUS_X = 572;
+const BOITE_X = 676;
+const INTERRUPTEUR_X = 716;
+/** Le tableau blanc, un peu plus grand que le reste : il tient la moitié de la hauteur du mur. */
+const TABLEAU_RELATIF = 1.07;
 
 interface FondDeLaPieceProps {
   projet: string;
   etat: StreamState;
   /** Quelqu'un se sert à la machine : elle fume. Sinon, elle reste un meuble. */
   machineEnService: boolean;
-  /** L'horloge unique de la vue : le ciel des fenêtres et les plafonniers s'y lisent (ticket-602). */
+  /** L'horloge unique de la vue : le ciel des fenêtres s'y lit (ticket-602). */
   maintenant: number;
+  /** Les plafonniers : allumés la nuit, ou par l'interrupteur (ticket-609). */
+  allume: boolean;
+  onBasculerLumiere: () => void;
+  /** Le run vivant : sans lui, pas de pile de dossiers. */
+  runId: string | null;
+  /** Les services du projet, lus par la pièce : la baie les montre. */
+  services: UseServicesResult;
+  /** Ouvre le fil du run : la pile de dossiers en est le raccourci (ticket-602). */
+  onOuvrir?: (runId: string) => void;
   /** Ouvre le projet dans l'onglet Tickets : la porte en devient un bouton. Sans lui, elle reste un meuble. */
   onOpenProject?: () => void;
 }
 
+/** Un objet posé contre le mur, à une abscisse du repère : au sol, ou accroché à `bas` du sol. */
+function Pose({ x, bas = "bottom-0", children }: { x: number; bas?: string; children: ReactNode }) {
+  return (
+    <span className={`absolute ${bas}`} style={{ left: enPourcentDuSol(x) }}>
+      {children}
+    </span>
+  );
+}
+
 /**
- * Le mur du fond : le tableau des critères, deux fenêtres, trois plafonniers, le coin café
- * et la porte. Du mobilier, dessiné toujours ; ce qui s'y lit ou bouge dit un fait : les
- * critères jugés, l'heure du ciel, la vapeur d'un agent à la machine.
+ * Le mur du fond, au-dessus de la plinthe. Du mobilier, dessiné toujours ; ce qui s'y
+ * lit ou bouge dit un fait : les critères jugés, l'heure du ciel, la vapeur d'un agent
+ * à la machine, les tickets en file, l'état des services et de la PR. Les abscisses
+ * du repère de 800 px sont posées en pourcentage : le mur suit la largeur de la pièce.
  */
 export default function FondDeLaPiece({
   projet,
   etat,
   machineEnService,
   maintenant,
+  allume,
+  onBasculerLumiere,
+  runId,
+  services,
+  onOuvrir,
   onOpenProject,
 }: FondDeLaPieceProps) {
   const moment = dayMoment(maintenant);
+  // Le dessus du meuble, une fois agrandi : la pile s'y pose, à droite de l'imprimante.
+  const dessusDuMeuble = HAUTEUR_DU_MEUBLE * useEchelleDesSprites();
+  const ciels = cielDesFenetres(projet, FENETRES_X.length, maintenant);
   return (
-    <div className="relative h-18" data-fond="piece">
-      {FENETRES_X.map((x) => (
-        <span key={x} className="absolute top-3" style={{ left: x }}>
-          <SkyWindow moment={moment} />
-        </span>
+    <div
+      className="relative h-36 border-b-4 border-(--sprite-plinthe) bg-(--sprite-mur)"
+      data-fond="piece"
+      data-mur="piece"
+    >
+      {FENETRES_X.map((x, i) => (
+        <Pose key={x} x={x} bas="top-9">
+          <Agrandi>
+            <SkyWindow moment={moment} nuages={ciels[i]?.nuages ?? 0} />
+          </Agrandi>
+        </Pose>
       ))}
       {PLAFONNIERS_X.map((x) => (
-        <span key={x} className="absolute top-0" style={{ left: x }}>
-          <CeilingLamp allume={moment === "nuit"} />
-        </span>
+        <Pose key={x} x={x} bas="top-0">
+          <Agrandi>
+            <CeilingLamp allume={allume} />
+          </Agrandi>
+        </Pose>
       ))}
-      <span className="absolute top-3" style={{ left: TABLEAU_X }}>
-        <TableauDesCriteres projet={projet} etat={etat} />
-      </span>
-      <span className="absolute bottom-0" style={{ left: MACHINE_X }}>
-        <MachineACafe />
-      </span>
-      {machineEnService && (
-        <span className="absolute bottom-12" style={{ left: MACHINE_X }}>
-          <Vapeur />
+      <Pose x={TABLEAU_X} bas="top-5">
+        <TableauDesCriteres projet={projet} etat={etat} relatif={TABLEAU_RELATIF} />
+      </Pose>
+      <Pose x={FICUS_X}>
+        <Agrandi>
+          <Plante espece="ficus" />
+        </Agrandi>
+      </Pose>
+      <Pose x={IMPRIMANTE_X}>
+        <span className="relative block">
+          <Agrandi>
+            <Imprimante />
+          </Agrandi>
+          <span className="absolute right-1" style={{ bottom: dessusDuMeuble }}>
+            <Dossiers projet={projet} runId={runId} etat={etat} onOuvrir={onOuvrir} />
+          </span>
         </span>
+      </Pose>
+      <Pose x={MACHINE_X}>
+        <Agrandi>
+          <MachineACafe />
+        </Agrandi>
+      </Pose>
+      {machineEnService && (
+        <Pose x={MACHINE_X} bas="bottom-18">
+          <Vapeur />
+        </Pose>
       )}
-      <span className="absolute bottom-0" style={{ left: PORTE_X }}>
+      <Pose x={BAIE_X}>
+        <BaieDeServeurs services={services} />
+      </Pose>
+      <Pose x={CACTUS_X}>
+        <Agrandi>
+          <Plante espece="cactus" />
+        </Agrandi>
+      </Pose>
+      <Pose x={BOITE_X}>
+        <BoiteAuxLettres projet={projet} etat={etat} />
+      </Pose>
+      <Pose x={INTERRUPTEUR_X} bas="bottom-10">
+        <BoutonLumiere salle={projet} allume={allume} onBasculer={onBasculerLumiere} />
+      </Pose>
+      <Pose x={PORTE_X}>
         {onOpenProject ? (
           <button
             type="button"
@@ -69,12 +159,16 @@ export default function FondDeLaPiece({
             onClick={onOpenProject}
             className="block cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
           >
-            <Porte />
+            <Agrandi>
+              <Porte />
+            </Agrandi>
           </button>
         ) : (
-          <Porte />
+          <Agrandi>
+            <Porte />
+          </Agrandi>
         )}
-      </span>
+      </Pose>
     </div>
   );
 }

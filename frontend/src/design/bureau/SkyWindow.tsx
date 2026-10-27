@@ -1,16 +1,30 @@
 import type { DayMoment } from "../../lib/bureau/dayMoment";
 
 interface SkyWindowProps {
-  /** Le ciel derrière la vitre : clair avec un soleil, ou nuit avec des étoiles. */
+  /** Le ciel derrière la vitre : clair, ou nuit avec des étoiles. */
   moment: DayMoment;
+  /** Le soleil : une seule fenêtre du Bureau le porte. */
+  soleil?: boolean;
+  /** De jour, zéro à deux petits nuages. */
+  nuages?: 0 | 1 | 2;
+}
+
+/** Un nuage de 4 × 2 unités, sa bosse au-dessus. */
+function Nuage({ x, y }: { x: number; y: number }) {
+  return (
+    <g data-detail="nuage" className="fill-(--sprite-nuage)">
+      <rect x={x} y={y + 1} width="4" height="1" />
+      <rect x={x + 1} y={y} width="2" height="1" />
+    </g>
+  );
 }
 
 /**
  * Une fenêtre au mur, grille 20 × 12 (60 × 36 px). Elle rend l'heure locale que
- * l'horloge de la vue donne (ADR-058) : de 7 h à 19 h un ciel clair et un soleil,
- * sinon un ciel de nuit et quatre étoiles. Fixe, sans animation.
+ * l'horloge de la vue donne (ADR-058) : de 7 h à 19 h un ciel clair, sinon un ciel
+ * de nuit et quatre étoiles. Fixe, sans animation.
  */
-export default function SkyWindow({ moment }: SkyWindowProps) {
+export default function SkyWindow({ moment, soleil = false, nuages = 0 }: SkyWindowProps) {
   const jour = moment === "jour";
   return (
     <svg
@@ -31,7 +45,11 @@ export default function SkyWindow({ moment }: SkyWindowProps) {
         className={jour ? "fill-(--sprite-ciel-jour)" : "fill-(--sprite-ciel-nuit)"}
       />
       {jour ? (
-        <rect data-detail="soleil" x="13" y="2" width="3" height="3" className="fill-(--sprite-soleil)" />
+        <>
+          {soleil && <rect data-detail="soleil" x="13" y="2" width="3" height="3" className="fill-(--sprite-soleil)" />}
+          {nuages >= 1 && <Nuage x={2} y={3} />}
+          {nuages >= 2 && <Nuage x={13} y={7} />}
+        </>
       ) : (
         <g data-detail="etoiles" className="fill-(--sprite-etoile)">
           <rect x="4" y="3" width="1" height="1" />

@@ -6,11 +6,14 @@ import Piece from "./Piece";
 import { T0, etatAuTourDeux } from "./etatsDeTest";
 
 beforeEach(() => {
+  // Les décalages des agents suivent l'échelle des sprites, qui dépend de la largeur : celle d'un grand écran.
+  vi.stubGlobal("innerWidth", 1920);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
   vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 });
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
 
@@ -30,7 +33,7 @@ describe("Piece review handed back to the coder", () => {
     expect(reviewer).toHaveAttribute("data-activite", "copie");
     expect(reviewer.querySelector('[data-detail="feuille"]')).not.toBeNull();
     // Le poste du codeur est la première colonne : l'agent se tient à sa droite, pas devant le sien.
-    expect(reviewer.style.transform).toBe("translate(118.4px, 0px)");
+    expect(reviewer.style.transform).toBe("translate(134.4px, 0px)");
     expect(container.querySelectorAll('[data-objet="feuille"]')).toHaveLength(1);
   });
 
@@ -53,7 +56,7 @@ describe("Piece review handed back to the coder", () => {
     const reviewer = agent(container, "reviewer");
     expect(reviewer).not.toHaveAttribute("data-objet");
     expect(reviewer.dataset.activite).not.toBe("copie");
-    expect(reviewer.style.transform).not.toBe("translate(118.4px, 0px)");
+    expect(reviewer.style.transform).not.toBe("translate(134.4px, 0px)");
     expect(screen.queryByText(/rend sa copie/)).toBeNull();
   });
 
@@ -63,7 +66,7 @@ describe("Piece review handed back to the coder", () => {
 
     const validateur = agent(container, "validateur");
     expect(validateur).toHaveAttribute("data-objet", "feuille");
-    expect(validateur.style.transform).toBe("translate(118.4px, 0px)");
+    expect(validateur.style.transform).toBe("translate(134.4px, 0px)");
     expect(screen.getByText("tour 2 — le validateur rend sa copie")).toBeInTheDocument();
     expect(container.querySelector('[data-agent="reviewer"]')).not.toHaveAttribute("data-objet");
   });

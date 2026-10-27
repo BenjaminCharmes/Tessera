@@ -20,7 +20,12 @@ function Cheveux({ physique, x, y }: TeteProps) {
           <rect x={x + 6} y={y - 1} width="1" height="7" className={classe} />
         </>
       )}
-      {coiffure === "chignon" && <rect x={x + 1} y={y - 4} width="4" height="2" className={classe} />}
+      {coiffure === "carre" && (
+        <>
+          <rect x={x - 1} y={y - 1} width="1" height="4" className={classe} />
+          <rect x={x + 6} y={y - 1} width="1" height="4" className={classe} />
+        </>
+      )}
       {coiffure === "chauve" ? (
         <>
           <rect x={x} y={y - 1} width="1" height="2" className={classe} />
@@ -34,12 +39,12 @@ function Cheveux({ physique, x, y }: TeteProps) {
 }
 
 /**
- * Les tempes des coiffures courtes : un carré de cheveux de chaque côté, sur la première
+ * Les tempes de la coupe courte : un carré de cheveux de chaque côté, sur la première
  * ligne du visage. Dessinées après le visage, qui les couvrirait sinon ; hors des yeux
  * (colonnes x + 1 et x + 4).
  */
 function Tempes({ physique, x, y }: TeteProps) {
-  if (physique.coiffure !== "court" && physique.coiffure !== "chignon") return null;
+  if (physique.coiffure !== "court") return null;
   const classe = FILL_CHEVEUX[physique.cheveux];
   return (
     <>
