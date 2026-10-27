@@ -380,6 +380,10 @@ L'infobulle du sélecteur te dit « ce projet fait tourner l'IDE ».
 
 Le panneau « Pipeline » du projet reste accessible depuis l'onglet Agents ou Tickets quand tu en as besoin.
 
+### Panneau latéral absent
+
+L'onglet Projets n'affiche pas de colonne latérale, contrairement aux onglets « Tickets » ou « Supervision ». La vue se concentre sur la grille de cartes de projet au centre de l'écran.
+
 ## 2 ter bis. Surveiller les services
 
 ### Ouvrir la vue En cours
