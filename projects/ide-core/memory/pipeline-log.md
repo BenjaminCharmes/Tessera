@@ -5561,3 +5561,13 @@ Le diff ajoute :
 - 2026-10-27 15:47:13 UTC — [ticket-608] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le fichier reviewer.md a été mi (110031ms)
 - 2026-10-27 15:47:13 UTC — [ticket-608] APPROVED après 1 tour(s)
 - 2026-10-27 15:48:30 UTC — [ticket-608] documentation: 0 fichier(s) (72452ms)
+- 2026-10-27 16:30:26 UTC — [ide-core] ticket-578 PR #690 confiée au CIWatcher
+- 2026-10-27 16:30:30 UTC — [ticket-577] branche ticket-577-the-status-of-a-single-ticket-run-shows-its-ticke
+- 2026-10-27 16:30:31 UTC — [ticket-577] tour 1 — codeur démarré
+- 2026-10-27 16:31:41 UTC — [ticket-577] tour 1 — codeur terminé (69391ms)
+- 2026-10-27 16:39:47 UTC — [ticket-577] testeur: OK (exit 0)
+- 2026-10-27 16:41:54 UTC — [ticket-577] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le diff améliore la gestion des  (127093ms)
+- 2026-10-27 16:41:54 UTC — [ticket-577] tour 1 — reviewer démarré
+- 2026-10-27 16:42:28 UTC — [ticket-577] tour 1 — reviewer terminé (33562ms)
+- 2026-10-27 16:43:57 UTC — [ticket-577] validateur: APPROVED — Tous les critères sont respectés : les tests montrent que les runs single foncti (122030ms)
+- 2026-10-27 16:43:57 UTC — [ticket-577] APPROVED après 1 tour(s)
