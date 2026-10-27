@@ -6,8 +6,18 @@ import type { AgentRole, EventType, OrchestratorEvent } from "../../types/api";
 export const DERNIER = "2026-10-23T10:00:00.000Z";
 export const T0 = Date.parse(DERNIER);
 
-function ev(type: EventType, agent: AgentRole | null = null): OrchestratorEvent {
-  return { type, agent, ticket_id: "ticket-001", data: {}, timestamp: DERNIER };
+function ev(
+  type: EventType,
+  agent: AgentRole | null = null,
+  data: Record<string, unknown> = {},
+): OrchestratorEvent {
+  return { type, agent, ticket_id: "ticket-001", data, timestamp: DERNIER };
+}
+
+/** Un événement de la phase 2 (livraison, issue de la CI) avec ses données, daté de `DERNIER`. */
+export interface EvenementDeSuite {
+  type: EventType;
+  data?: Record<string, unknown>;
 }
 
 function rejouer(evenements: OrchestratorEvent[]): StreamState {
@@ -44,6 +54,16 @@ export function etatApresPipeline(suite: EventType[]): StreamState {
     ev("agent_done", "codeur"),
     ev("pipeline_done"),
     ...suite.map((type) => ev(type)),
+  ]);
+}
+
+/** Le pipeline fini, puis des événements qui portent des données : `livraison_done`, `ci_merge_done`. */
+export function etatApresPhase2(suite: EvenementDeSuite[]): StreamState {
+  return rejouer([
+    ev("agent_started", "codeur"),
+    ev("agent_done", "codeur"),
+    ev("pipeline_done"),
+    ...suite.map(({ type, data }) => ev(type, null, data)),
   ]);
 }
 

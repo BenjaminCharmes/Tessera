@@ -110,14 +110,16 @@ describe("sprites sources", () => {
 });
 
 describe("Bureau animations", () => {
-  const keyframes = [...CSS.matchAll(/@keyframes\s+(tape|lueur|flotte|vapeur)\b/g)].map((m) => m[1] ?? "");
+  const keyframes = [...CSS.matchAll(/@keyframes\s+(tape|lueur|flotte|vapeur|chute|gyro)\b/g)].map(
+    (m) => m[1] ?? "",
+  );
 
-  it("declares the four animations", () => {
-    expect(keyframes.sort()).toEqual(["flotte", "lueur", "tape", "vapeur"]);
+  it("declares the six animations", () => {
+    expect(keyframes.sort()).toEqual(["chute", "flotte", "gyro", "lueur", "tape", "vapeur"]);
   });
 
   it("animates only transform and opacity", () => {
-    const proprietes = blocs(CSS, /@keyframes\s+(?:tape|lueur|flotte|vapeur)\b/).flatMap((corps) =>
+    const proprietes = blocs(CSS, /@keyframes\s+(?:tape|lueur|flotte|vapeur|chute|gyro)\b/).flatMap((corps) =>
       [...corps.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1] ?? ""),
     );
 
@@ -133,6 +135,26 @@ describe("Bureau animations", () => {
       const classe = CSS.match(new RegExp(`([.][a-z-]+)[ ]*[{][ ]*animation:[ ]*${nom}[ ]`))?.[1];
       expect(classe, `a class plays ${nom}`).toBeDefined();
       expect(reduit).toContain(classe ?? "");
+    }
+  });
+
+  it("cuts the confetti fall and the beacon blink under prefers-reduced-motion", () => {
+    const [reduit] = blocs(CSS, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+
+    expect(reduit).toMatch(/[.]anim-chute\b[^{]*[{][^}]*animation:\s*none/);
+    expect(reduit).toMatch(/[.]anim-gyro\b[^{]*[{][^}]*animation:\s*none/);
+    expect(CSS).toMatch(/[.]anim-chute\s*[{]\s*animation:\s*chute\s/);
+    expect(CSS).toMatch(/[.]anim-gyro\s*[{]\s*animation:\s*gyro\s/);
+  });
+
+  it("plays the fall on the confetti and the blink on the beacon, with --sprite-* tones", () => {
+    const confettis = SPRITES.find((x) => x.nom === "Confettis.tsx")?.contenu ?? "";
+    const gyrophare = SPRITES.find((x) => x.nom === "Gyrophare.tsx")?.contenu ?? "";
+
+    expect(confettis).toContain("anim-chute");
+    expect(gyrophare).toContain("anim-gyro");
+    for (const jeton of ["confetti-1", "confetti-5", "gyrophare", "gyrophare-socle"]) {
+      expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
     }
   });
 

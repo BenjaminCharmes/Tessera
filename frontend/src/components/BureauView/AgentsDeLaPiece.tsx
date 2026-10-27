@@ -36,7 +36,7 @@ function AgentMarcheur({ projet, agent }: { projet: string; agent: AgentPlace })
       style={style}
       {...acces}
     >
-      <AgentDebout projet={projet} role={agent.poste} etire={agent.activite === "etire"} />
+      <AgentDebout projet={projet} role={agent.poste} etire={agent.activite === "etire" || agent.activite === "fete"} />
     </span>
   );
 }

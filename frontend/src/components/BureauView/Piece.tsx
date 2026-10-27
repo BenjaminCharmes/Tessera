@@ -1,3 +1,5 @@
+import Confettis from "../../design/bureau/Confettis";
+import Gyrophare from "../../design/bureau/Gyrophare";
 import Pastille from "../../design/bureau/Pastille";
 import Plante from "../../design/bureau/Plante";
 import type { StreamState } from "../../hooks/streamState";
@@ -6,6 +8,7 @@ import { machineEnService, placerLesAgents, postesFaits } from "../../lib/bureau
 import type { Hasard } from "../../lib/bureau/activites";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
+import { contourEnCelebration, enFete, gyrophareAllume } from "../../lib/bureau/fete";
 import StatusPill from "../../design/ui/StatusPill";
 import { libelleDeSuite } from "../../lib/bureau/etapeDeSuite";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
@@ -66,7 +69,10 @@ export default function Piece({
     etat.attenteExterieure !== null,
     enEtapeSilencieuse(etat),
   );
-  const contour = contourDeLaPiece(etat, sante);
+  // La PR mergée, ou la CI rouge : deux faits de la phase 2, lus dans les événements (ticket-598).
+  const fete = enFete(etat, maintenant);
+  const gyrophare = gyrophareAllume(etat);
+  const contour = contourEnCelebration(contourDeLaPiece(etat, sante), fete, gyrophare);
   const enCours = postes.some((p) => p.etat === "occupe");
   // Documentation et livraison n'ont pas de poste : la pastille du pied les dit (ticket-585).
   const suite = libelleDeSuite(etat.etape);
@@ -78,7 +84,7 @@ export default function Piece({
   const activites = useActivites(faits, maintenant, hasard);
   // Un agent chez le directeur ou aux RH n'est plus à sa place : il ne se dessine qu'à un endroit.
   const absents = postesAbsents(etat, maintenant);
-  const agents = placerLesAgents(faits, activites, clos).map((a) =>
+  const agents = placerLesAgents(faits, activites, clos, fete).map((a) =>
     absents.includes(a.poste) ? { ...a, activite: null, parti: true } : a,
   );
 
@@ -105,19 +111,26 @@ export default function Piece({
                   poste={p}
                   sante={sante}
                   auRepos={auRepos}
-                  parti={clos}
+                  parti={clos || fete}
                   absent={absents.includes(p.poste)}
                   onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
                 />
               ))}
             </div>
             <AgentsDeLaPiece projet={projet} agents={agents} />
+            {fete && <Confettis />}
+            {gyrophare && (
+              <span className="absolute left-1/2 top-1 z-20 -translate-x-1/2">
+                <Gyrophare />
+              </span>
+            )}
           </div>
         </div>
         <div className="flex min-h-9 items-end justify-between px-3 py-2">
           <div className="flex min-h-5 items-center">
-            {enCours && <Pastille sante={sante} />}
-            {!enCours && suite && <StatusPill etat="en-cours" libelle={suite} />}
+            {fete && <StatusPill etat="reussi" libelle="PR mergée" />}
+            {!fete && enCours && <Pastille sante={sante} />}
+            {!fete && !enCours && suite && <StatusPill etat="en-cours" libelle={suite} />}
           </div>
           <Plante />
         </div>

@@ -36,6 +36,10 @@ describe("tirerActivite", () => {
 });
 
 describe("libelleActivite", () => {
+  it("names the party", () => {
+    expect(libelleActivite("fete")).toBe("fête la PR mergée");
+  });
+
   it("says each activity in words", () => {
     expect(libelleActivite("tasse")).toBe("boit un café à son poste");
     expect(libelleActivite("etire")).toBe("s'étire");
@@ -129,6 +133,16 @@ describe("placerLesAgents", () => {
       expect(agent.niveau).toBe("fond");
       expect(agent.x).toBeGreaterThan(PORTE_X - 10);
     }
+  });
+
+  it("stands all five agents at their posts, arms up, when the PR is merged, even in a closed run", () => {
+    const agents = placerLesAgents(["codeur"], { codeur: "machine" }, true, true);
+
+    expect(agents.map((a) => [a.poste, a.activite, a.niveau, a.parti])).toEqual(
+      POSTES.map((poste) => [poste, "fete", "rangee", false]),
+    );
+    expect(new Set(agents.map((a) => a.x)).size).toBe(5);
+    expect(machineEnService(agents)).toBe(false);
   });
 });
 
