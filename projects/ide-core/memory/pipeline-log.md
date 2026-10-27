@@ -5264,3 +5264,5 @@ Le diff ajoute :
 - 2026-10-27 09:02:55 UTC — [ticket-593] validateur: APPROVED — Tous les critères sont satisfaits. L'infobulle est correctement portée vers docu (350750ms)
 - 2026-10-27 09:02:55 UTC — [ticket-593] APPROVED après 1 tour(s)
 - 2026-10-27 09:05:01 UTC — [ticket-593] documentation: 0 fichier(s) (120125ms)
+- 2026-10-27 09:06:11 UTC — [ticket-593] livraison: résolveur tenté : frontend/src/components/BureauView/BureauView.test.tsx, frontend/src/components/BureauView/Salle.tsx, frontend/src/components/BureauView/Salles.test.tsx, frontend/src/design/bureau/sources.test.ts, frontend/src/index.css (61203ms)
+- 2026-10-27 09:06:11 UTC — [ticket-593] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/BureauView.test.tsx, frontend/src/comp
