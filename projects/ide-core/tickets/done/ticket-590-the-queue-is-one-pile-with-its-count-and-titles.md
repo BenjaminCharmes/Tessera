@@ -5,7 +5,7 @@ depends_on:
 - ticket-581
 estimated_days: 0.25
 id: ticket-590
-pr_number: null
+pr_number: 663
 priority: high
 status: done
 title: The queue is one pile of folders with its count, and its titles on hover
