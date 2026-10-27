@@ -1,15 +1,15 @@
 ---
-id: ticket-574
-title: "Reviewer findings carry a confidence score and only confident ones block"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-24
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-24
+id: ticket-574
 plan: true
+pr_number: 699
+priority: medium
+status: done
+title: Reviewer findings carry a confidence score and only confident ones block
+type: feat
 ---
 
 # ticket-574 — Un score de confiance sur chaque remarque du reviewer

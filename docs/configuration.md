@@ -29,6 +29,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `GITHUB_REPO` | | `""` | Repo cible `owner/repo` |
 | `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
+| `REVIEWER_CONFIDENCE_THRESHOLD` | | `80` | Seuil de confiance (0-100) des remarques bloquantes du reviewer : un refus dont toutes les remarques portent un score inférieur est lu comme une approbation avec remarques. Une remarque sans score garde le refus ; 0 désactive le filtre (ticket-574) |
 | `ATTENTE_FUSIONNABILITE_MAX_S` | | `300` | Délai maximum d'attente pour le calcul du statut fusionnable d'une PR avant abandon de la tentative de merge (en secondes, ticket-384) |
 | `ATTENTE_MERGE_MAX_S` | | `600` | Pour les projets avec `merge_without_ci: true`, délai maximum d'attente du merge du ticket précédent avant de lancer le ticket suivant d'une file (en secondes, ticket-382) |
 | `CI_GRACE_S` | | `300` | Délai de grâce avant de conclure que les checks CI ne s'enregistreront pas (`none` → achèvement). Si des workflows sont déclarés dans le dépôt, le statut reste `pending` jusqu'à `attente_ci_max_s` (ticket-405) |
