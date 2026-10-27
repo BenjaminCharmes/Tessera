@@ -5150,3 +5150,15 @@ Le diff ajoute :
 - 2026-10-26 15:59:10 UTC — [ticket-582] documentation: 0 fichier(s) (229500ms) — après tour de correction
 - 2026-10-26 15:59:38 UTC — [ticket-582] livraison: résolveur tenté : frontend/src/components/BureauView/Piece.tsx (20235ms)
 - 2026-10-26 15:59:38 UTC — [ticket-582] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/Piece.tsx — résolveur tenté sur fronte
+- 2026-10-26 15:59:39 UTC — [ide-core] file interrompue : ticket-582 n'a pas été livré
+- 2026-10-26 16:05:22 UTC — [ide-core] ticket-582 PR #661 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-26 16:05:34 UTC — [ticket-590] branche ticket-590-the-queue-is-one-pile-of-folders-with-its-count-a
+- 2026-10-26 16:05:35 UTC — [ticket-590] tour 1 — codeur démarré
+- 2026-10-26 16:07:51 UTC — [ticket-590] tour 1 — codeur terminé (135890ms)
+- 2026-10-26 16:09:37 UTC — [ticket-590] testeur: OK (exit 0)
+- 2026-10-26 16:11:42 UTC — [ticket-590] securite: PASS — Refactorisation React de l'affichage des tickets. Pas de vulnérabilité détectée  (124875ms)
+- 2026-10-26 16:11:42 UTC — [ticket-590] tour 1 — reviewer démarré
+- 2026-10-26 19:32:18 UTC — [ticket-590] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 19:32:24 UTC — [ticket-590] INTERROMPU au tour 1 — ProviderIndisponible: agent silencieux depuis 1200 s
+- 2026-10-27 07:44:05 UTC — [ticket-590] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-27 07:44:05 UTC — [ticket-590] validateur: CHANGES_REQUESTED — Validation indisponible : durée maximale dépassée (900 s) (55935172ms)
