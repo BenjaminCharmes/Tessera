@@ -1,15 +1,16 @@
 ---
-id: ticket-576
-title: "Design of structured verdicts for reviewer, security and validator"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
-depends_on: ["ticket-574"]
-estimated_days: 1
 created: 2026-10-24
+depends_on:
+- ticket-574
+estimated_days: 1
+id: ticket-576
 plan: true
+pr_number: 700
+priority: low
+status: done
+title: Design of structured verdicts for reviewer, security and validator
+type: design
 ---
 
 # ticket-576 — Conception de verdicts structurés

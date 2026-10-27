@@ -549,3 +549,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : complète ADR-051. Quand un ticket de la file n'est pas mergé, les tickets restants qui en dépendent par `depends_on`, directement ou par transitivité, sont retirés de la file ; chacun s'écrit dans `memory/pipeline-log.md` avec sa dépendance (« ticket-546 sauté : dépend de ticket-544, non mergé »). La file continue avec les autres et ne s'arrête que s'il ne reste plus rien. Le ticket non mergé reste `blocked`, PR ouverte, comme dans ADR-051.
 **Raison** : le 23/10, la CI rouge du ticket-544 a arrêté onze tickets alors qu'un seul en dépendait.
 **Alternative rejetée** : arrêter toute la file par prudence — un ticket indépendant n'a pas besoin du code manquant.
+
+---
+
+## ADR-061 — Un verdict de rôle se rend en JSON validé par un schéma
+
+**Date** : 2026-10-27
+**Décision** : reviewer, sécurité et validateur rendent leur verdict dans une sortie structurée que le provider valide : `output_format` du SDK, `format` d'Ollama, outil forcé de l'API Anthropic. `ProviderResult.structured` la porte ; le repli reçoit le même schéma. Une sortie absente, hors schéma ou contradictoire refuse (`CHANGES_REQUESTED` / `BLOCK`), sans relecture du texte par mot-clé. Le reviewer rend `verdict`, `summary` et `blocking[{text, location, confidence}]` : le seuil du ticket-574 s'applique au champ, et `APPROVED` avec une remarque au-dessus du seuil refuse. ADR-009 est amendée à la livraison du reviewer.
+**Raison** : le texte libre a coûté trois tickets de rustines (122, 298, 574) ; un champ typé remplace une regex.
+**Alternative rejetée** : garder le mot-clé en repli d'un JSON invalide — une réponse ambiguë approuverait, ce que l'échec fermé interdit.

@@ -12,6 +12,11 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Le verdict du reviewer, de l'audit sécurité et du validateur se lit dans
+  une sortie structurée validée par un schéma, jamais dans le texte.** Une
+  sortie absente, hors schéma ou contradictoire refuse. Remplace la règle du
+  parseur par mot-clé quand le reviewer est livré. (ADR-061, ADR-009)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
