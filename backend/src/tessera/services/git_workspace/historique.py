@@ -152,6 +152,18 @@ class GitHistory(GitCore):
             return False if exc.returncode == 1 else None
         return True
 
+    async def chemins_modifies(self, gauche: str, droite: str) -> list[str] | None:
+        """Paths changed on `droite` since its merge base with `gauche` (ticket-584).
+
+        `git diff --name-only gauche...droite`, chemins relatifs à la racine du
+        dépôt. `None` quand git ne sait pas dire : l'appelant échoue fermé.
+        """
+        try:
+            sortie = await self._run("diff", "--name-only", f"{gauche}...{droite}")
+        except GitCommandError:
+            return None
+        return [chemin for chemin in sortie.splitlines() if chemin.strip()]
+
     async def _est_rangement(self, sha: str, prefixe: str) -> bool:
         """True when the commit touches only Tessera's bookkeeping paths."""
         sortie = await self._run(

@@ -17,6 +17,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+from tessera.services.chaines_de_test import chaine_commune
+from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
 from tessera.services.test_runner import TestCommandNotFound, TestResult, TestRunnerService
 from tessera.utils.logger import get_logger
 
@@ -50,6 +52,8 @@ class Jugement:
 class _GitAncetre(Protocol):
     async def est_ancetre(self, ancetre: str, descendant: str) -> bool | None: ...
 
+    async def chemins_modifies(self, gauche: str, droite: str) -> list[str] | None: ...
+
 
 Lanceur = Callable[[], Awaitable[TestResult]]
 
@@ -66,19 +70,27 @@ def _resultat_de(resultat: TestResult) -> ResultatRetest:
 class RetestApresRebase:
     """Decides whether the base moved, and reruns the project's tests when it did."""
 
-    def __init__(self, git: _GitAncetre, lancer: Lanceur, worktree: bool) -> None:
+    def __init__(
+        self, git: _GitAncetre, lancer: Lanceur, worktree: bool, verifier: bool = False
+    ) -> None:
         self._git = git
         self._lancer = lancer
         # Dans un worktree de run, la base locale est celle du checkout : le
         # rebase rejoue sur le distant, et c'est lui qu'on compare
         # (même règle que `GitWorkspaceService.rejouer_sur`).
         self._worktree = worktree
+        # Le `test_cwd` du projet porte `scripts/verifier.py` : on sait alors
+        # quelles chaînes un chemin touche, et la base n'oblige à retester que
+        # si elle touche une chaîne de la branche (ticket-584).
+        self._verifier = verifier
 
     async def base_a_avance(self, base: str) -> bool:
-        """True when rebasing onto `base` will bring commits the branch lacks.
+        """True when rebasing onto `base` brings something that can break the branch.
 
         À appeler **avant** le rebase. Échoue fermé (ADR-039) : si git ne sait
         pas dire, on suppose que la base a avancé, et les tests repassent.
+        Avec `scripts/verifier.py`, une base qui n'a touché aucune chaîne que la
+        branche touche aussi n'oblige pas à retester ; la CI rejoue tout.
         """
         cible = f"origin/{base}" if self._worktree else base
         try:
@@ -86,7 +98,21 @@ class RetestApresRebase:
         except Exception as exc:  # noqa: BLE001 — l'inconnu compte comme une avancée
             _logger.warning("base_avancee_illisible", extra={"erreur": str(exc)})
             return True
-        return dessous is not True
+        if dessous is True:
+            return False
+        return await self._chaine_partagee(cible) if self._verifier else True
+
+    async def _chaine_partagee(self, cible: str) -> bool:
+        """True when base and branch touch a common chain; True too when unreadable."""
+        try:
+            de_la_base = await self._git.chemins_modifies("HEAD", cible)
+            de_la_branche = await self._git.chemins_modifies(cible, "HEAD")
+        except Exception as exc:  # noqa: BLE001 — l'inconnu compte comme une chaîne partagée
+            _logger.warning("chemins_illisibles", extra={"erreur": str(exc)})
+            return True
+        if de_la_base is None or de_la_branche is None:
+            return True
+        return chaine_commune(de_la_base, de_la_branche)
 
     async def juger(self, base: str) -> "Jugement | None":
         """Rerun the tests and say what the delivery must record and whether it stops.
@@ -126,6 +152,7 @@ def retest_du_run(
     test_runner: TestRunnerService | None,
     project_path: Path,
     commande: str | None,
+    test_cwd: str | None = None,
 ) -> RetestApresRebase | None:
     """The hook of a run, or None when it has no tester or no git space.
 
@@ -139,7 +166,17 @@ def retest_du_run(
     async def lancer() -> TestResult:
         return await test_runner.run_tests(project_path, test_command=commande)
 
-    return RetestApresRebase(git, lancer, worktree)
+    return RetestApresRebase(git, lancer, worktree, _porte_un_verifier(project_path, test_cwd))
+
+
+def _porte_un_verifier(project_path: Path, test_cwd: str | None) -> bool:
+    """True when the project's `test_cwd` holds `scripts/verifier.py`."""
+    try:
+        dossier = resoudre_le_cwd(project_path.resolve(), test_cwd) if test_cwd else project_path
+        return (dossier / "scripts" / "verifier.py").is_file()
+    except (CommandeInvalide, OSError):
+        # Sans verifier lisible, on retombe sur « la base a avancé → retest ».
+        return False
 
 
 def etape_de(resultat: ResultatRetest) -> str:
