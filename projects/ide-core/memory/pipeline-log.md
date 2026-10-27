@@ -5479,3 +5479,4 @@ Le diff ajoute :
 - 2026-10-27 14:11:08 UTC — [ticket-606] validateur: fichiers cités joints : components/BureauView/index.tsx, components/BureauView/Piece.tsx, lib/bureau/echelleDuSol.ts, Piece.test.tsx (tronqué) ; non joints (budget épuisé) : lib/bureau/activites.ts
 - 2026-10-27 14:11:08 UTC — [ticket-606] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le changement de layout passe d (25500ms)
 - 2026-10-27 14:11:08 UTC — [ticket-606] APPROVED après 2 tour(s)
+- 2026-10-27 14:12:29 UTC — [ticket-606] documentation: 0 fichier(s) (76687ms)
