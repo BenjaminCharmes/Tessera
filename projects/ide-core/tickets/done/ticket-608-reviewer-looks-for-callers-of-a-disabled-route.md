@@ -4,7 +4,7 @@ created: 2026-10-27
 depends_on: []
 estimated_days: 0.25
 id: ticket-608
-pr_number: null
+pr_number: 689
 priority: medium
 status: done
 title: The reviewer looks for the callers of any route, export or path the diff disables
