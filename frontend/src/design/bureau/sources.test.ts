@@ -42,13 +42,13 @@ function blocs(css: string, entete: RegExp): string[] {
 describe("sprites sources", () => {
   it("has a source file per sprite", () => {
     const noms = SPRITES.map((s) => s.nom);
-    for (const sprite of ["Personnage", "Poste", "Ecran", "Bulle", "Pastille", "Plante"]) {
+    for (const sprite of ["Personnage", "Poste", "Ecran", "Bulle", "Pastille", "Plante", "Porte", "Vapeur"]) {
       expect(noms).toContain(`${sprite}.tsx`);
     }
   });
 
   it("keeps room furniture on --sprite-* tokens, still and without a status hue", () => {
-    for (const nom of ["MachineACafe.tsx", "TableDeReunion.tsx"]) {
+    for (const nom of ["MachineACafe.tsx", "TableDeReunion.tsx", "Porte.tsx"]) {
       const contenu = SPRITES.find((s) => s.nom === nom)?.contenu ?? "";
       expect(contenu, nom).toContain("--sprite-");
       expect(contenu, nom).not.toMatch(/anim-|animation|green/);
@@ -110,14 +110,14 @@ describe("sprites sources", () => {
 });
 
 describe("Bureau animations", () => {
-  const keyframes = [...CSS.matchAll(/@keyframes\s+(tape|lueur|flotte)\b/g)].map((m) => m[1] ?? "");
+  const keyframes = [...CSS.matchAll(/@keyframes\s+(tape|lueur|flotte|vapeur)\b/g)].map((m) => m[1] ?? "");
 
-  it("declares the three animations", () => {
-    expect(keyframes.sort()).toEqual(["flotte", "lueur", "tape"]);
+  it("declares the four animations", () => {
+    expect(keyframes.sort()).toEqual(["flotte", "lueur", "tape", "vapeur"]);
   });
 
   it("animates only transform and opacity", () => {
-    const proprietes = blocs(CSS, /@keyframes\s+(?:tape|lueur|flotte)\b/).flatMap((corps) =>
+    const proprietes = blocs(CSS, /@keyframes\s+(?:tape|lueur|flotte|vapeur)\b/).flatMap((corps) =>
       [...corps.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1] ?? ""),
     );
 
@@ -134,5 +134,30 @@ describe("Bureau animations", () => {
       expect(classe, `a class plays ${nom}`).toBeDefined();
       expect(reduit).toContain(classe ?? "");
     }
+  });
+
+  it("draws the steam from its own sprite and token, not from the machine", () => {
+    const vapeur = SPRITES.find((x) => x.nom === "Vapeur.tsx")?.contenu ?? "";
+
+    expect(vapeur).toContain("anim-vapeur");
+    expect(vapeur).toContain("--sprite-vapeur");
+    expect(CSS).toMatch(/--sprite-vapeur:/);
+  });
+
+  it("walks the agents with a transition that reduced motion removes", () => {
+    const regle = CSS.match(/[.]marche\s*[{]([^}]*)[}]/)?.[1] ?? "";
+    expect(regle).toMatch(/transition:\s*transform/);
+
+    const [reduit] = blocs(CSS, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+    expect(reduit).toMatch(/[.]marche\s*[{]\s*transition:\s*none/);
+  });
+
+  it("animates the walk with transform and opacity only", () => {
+    const regle = CSS.match(/[.]marche\s*[{]([^}]*)[}]/)?.[1] ?? "";
+    const valeur = regle.match(/transition:\s*([^;]+);/)?.[1] ?? "";
+    const proprietes = valeur.split(",").map((p) => p.trim().split(/\s+/)[0]);
+
+    expect(proprietes.length).toBeGreaterThan(0);
+    expect(proprietes.filter((p) => p !== "transform" && p !== "opacity")).toEqual([]);
   });
 });

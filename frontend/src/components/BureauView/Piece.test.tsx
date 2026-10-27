@@ -164,15 +164,16 @@ describe("Piece characters", () => {
     expect(screen.getAllByRole("button", { name: /attend son tour/ })).toHaveLength(2);
   });
 
-  it("stands a character beside a post that is done, and keeps its tick on the screen", () => {
-    render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
+  it("stands a character out of a post that is done, and keeps its tick on the screen", () => {
+    const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
     const bouton = screen.getByRole("button", { name: "Codeur, a fini" });
-    const [personnage, ...autres] = personnagesDuPoste("Codeur, a fini");
+    const agent = container.querySelector('[data-agent="codeur"]');
 
-    expect(autres).toEqual([]);
-    expect(personnage).toHaveAttribute("data-pose", "debout");
-    expect(personnage?.querySelector(".anim-tape")).toBeNull();
+    expect(agent?.querySelectorAll('[data-sprite="personnage"]')).toHaveLength(1);
+    expect(agent?.querySelector('[data-pose="debout"]')).not.toBeNull();
+    expect(agent?.querySelector(".anim-tape")).toBeNull();
+    expect(bouton.querySelector('[data-sprite="personnage"]')).toBeNull();
     expect(bouton.querySelector('[data-sprite="coche"]')).not.toBeNull();
   });
 
@@ -194,21 +195,22 @@ describe("Piece characters", () => {
   });
 
   it("draws the standing character outside the desk grid of its post", () => {
-    render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
+    const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
     const bouton = screen.getByRole("button", { name: "Codeur, a fini" });
-    const debout = bouton.querySelector('[data-pose="debout"]');
+    const debout = container.querySelector('[data-agent="codeur"] [data-pose="debout"]');
 
     expect(debout).not.toBeNull();
-    expect(debout?.closest('[data-sprite="poste"]')).toBeNull();
+    expect(bouton.contains(debout)).toBe(false);
     expect(debout?.closest("svg")?.getAttribute("viewBox")).toBe("0 0 12 20");
     expect(bouton.querySelector('[data-sprite="poste"]')?.getAttribute("viewBox")).toBe("0 0 16 18");
   });
 
   it("gives the same role a different look in two projects", () => {
     const etat = etatEnSecurite();
-    const { container: a } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 5_000} />);
-    const { container: b } = render(<Piece projet="kadoomi" etat={etat} maintenant={T0 + 5_000} />);
+    const hasard = () => 0;
+    const { container: a } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 5_000} hasard={hasard} />);
+    const { container: b } = render(<Piece projet="kadoomi" etat={etat} maintenant={T0 + 5_000} hasard={hasard} />);
     const dessin = (c: HTMLElement) => c.querySelector('[data-pose="debout"]')?.innerHTML;
 
     expect(dessin(a)).toBeDefined();
@@ -217,8 +219,9 @@ describe("Piece characters", () => {
 
   it("keeps the same look from one render to the next", () => {
     const etat = etatEnSecurite();
-    const { container: a } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 5_000} />);
-    const { container: b } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 9_000} />);
+    const hasard = () => 0;
+    const { container: a } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 5_000} hasard={hasard} />);
+    const { container: b } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 9_000} hasard={hasard} />);
 
     expect(a.querySelector('[data-pose="debout"]')?.innerHTML).toBe(
       b.querySelector('[data-pose="debout"]')?.innerHTML,
