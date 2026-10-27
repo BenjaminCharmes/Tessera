@@ -4,7 +4,7 @@ created: 2026-10-26
 depends_on: []
 estimated_days: 0.25
 id: ticket-592
-pr_number: null
+pr_number: 664
 priority: high
 status: done
 title: The conflict resolver checks and stages the resolved files from the repository
