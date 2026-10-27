@@ -3,7 +3,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { INITIAL } from "../../hooks/streamState";
 import { api } from "../../lib/api";
 import Piece from "./Piece";
-import { DERNIER, T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
+import { DERNIER, T0, etatApresPipeline, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
 
 function bulle(): string | null {
   return screen.queryByTestId("bulle")?.textContent ?? null;
@@ -90,6 +90,36 @@ describe("Piece", () => {
     render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 5_000} />);
 
     expect(screen.getByRole("region")).toHaveAttribute("data-contour", "amber");
+  });
+});
+
+describe("Piece documentation and delivery", () => {
+  it("says documentation after pipeline_done then documentation_started, in blue", () => {
+    render(<Piece projet="ide-core" etat={etatApresPipeline(["documentation_started"])} maintenant={T0} />);
+
+    expect(pastille()).toBe("documentation");
+    expect(screen.getByText("documentation")).toHaveAttribute("data-etat", "en-cours");
+  });
+
+  it("says the delivery steps after livraison_started", () => {
+    render(
+      <Piece
+        projet="ide-core"
+        etat={etatApresPipeline(["documentation_started", "livraison_started"])}
+        maintenant={T0}
+      />,
+    );
+
+    expect(pastille()).toBe("livraison : rebase, tests, PR");
+    expect(screen.queryByText("documentation")).toBeNull();
+  });
+
+  it("says neither once the run is closed", () => {
+    const etat = etatApresPipeline(["documentation_started", "livraison_started", "run_closed"]);
+    render(<Piece projet="ide-core" etat={etat} maintenant={T0} />);
+
+    expect(pastille()).toBeNull();
+    expect(screen.queryByText(/documentation|livraison/)).toBeNull();
   });
 });
 

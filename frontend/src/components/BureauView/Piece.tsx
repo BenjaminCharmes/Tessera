@@ -2,6 +2,8 @@ import Pastille from "../../design/bureau/Pastille";
 import type { StreamState } from "../../hooks/streamState";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
+import StatusPill from "../../design/ui/StatusPill";
+import { libelleDeSuite } from "../../lib/bureau/etapeDeSuite";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
 import { enEtapeSilencieuse, santeAgent } from "../../lib/santeAgent";
@@ -56,6 +58,8 @@ export default function Piece({
   );
   const contour = contourDeLaPiece(etat, sante);
   const enCours = postes.some((p) => p.etat === "occupe");
+  // Documentation et livraison n'ont pas de poste : la pastille du pied les dit (ticket-585).
+  const suite = libelleDeSuite(etat.etape);
   // Aucun événement de ticket : pas de run, donc personne à dessiner.
   const auRepos = etat.ticketEvents.length === 0;
 
@@ -80,7 +84,10 @@ export default function Piece({
           />
         ))}
       </div>
-      <div className="flex min-h-9 items-center px-3 py-2">{enCours && <Pastille sante={sante} />}</div>
+      <div className="flex min-h-9 items-center px-3 py-2">
+        {enCours && <Pastille sante={sante} />}
+        {!enCours && suite && <StatusPill etat="en-cours" libelle={suite} />}
+      </div>
       <ObjetsDeLaPiece projet={projet} etat={etat} runId={runId} signalServices={signalServices} />
     </section>
   );

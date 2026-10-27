@@ -24,6 +24,16 @@ export function etatEnSecurite(): StreamState {
   ]);
 }
 
+/** Le pipeline fini, puis les événements de suite donnés (documentation, livraison, clôture). */
+export function etatApresPipeline(suite: EventType[]): StreamState {
+  return rejouer([
+    ev("agent_started", "codeur"),
+    ev("agent_done", "codeur"),
+    ev("pipeline_done"),
+    ...suite.map((type) => ev(type)),
+  ]);
+}
+
 /** Le codeur démarre : un seul poste occupé, les autres libres. */
 export function etatEnCodage(): StreamState {
   return rejouer([ev("agent_started", "codeur")]);
