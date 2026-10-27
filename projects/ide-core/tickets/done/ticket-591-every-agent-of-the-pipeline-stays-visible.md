@@ -5,7 +5,7 @@ depends_on:
 - ticket-582
 estimated_days: 0.5
 id: ticket-591
-pr_number: null
+pr_number: 665
 priority: high
 status: done
 title: 'Every agent of the pipeline stays visible: waiting at its desk, working, or
