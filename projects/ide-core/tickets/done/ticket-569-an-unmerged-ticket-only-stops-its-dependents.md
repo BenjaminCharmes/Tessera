@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-569
 plan: true
-pr_number: null
+pr_number: 694
 priority: high
 status: done
 title: A ticket that does not merge stops only the queue tickets that depend on it
