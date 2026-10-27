@@ -5,7 +5,7 @@ depends_on:
 - ticket-598
 estimated_days: 0.25
 id: ticket-603
-pr_number: null
+pr_number: 688
 priority: low
 status: done
 title: 'Optional office sounds: a fanfare on merge, an alarm on red CI, a coffee pour,
