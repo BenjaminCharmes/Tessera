@@ -1,14 +1,16 @@
 ---
-id: ticket-555
-title: "A session or weekly quota under 10 % is notified"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: ["ticket-550", "ticket-558"]
-estimated_days: 0.25
 created: 2026-10-23
+depends_on:
+- ticket-550
+- ticket-558
+estimated_days: 0.25
+id: ticket-555
+pr_number: 696
+priority: low
+status: done
+title: A session or weekly quota under 10 % is notified
+type: feat
 ---
 
 # ticket-555 — Un quota bas est notifié
