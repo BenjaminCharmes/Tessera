@@ -23,6 +23,7 @@ import AgentsDeLaPiece from "./AgentsDeLaPiece";
 import FondDeLaPiece from "./FondDeLaPiece";
 import ObjetsDeLaPiece from "./ObjetsDeLaPiece";
 import PosteDeTravail from "./PosteDeTravail";
+import SolMisAEchelle from "./SolMisAEchelle";
 
 interface PieceProps {
   projet: string;
@@ -105,34 +106,32 @@ export default function Piece({
         {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
       </div>
       <div data-sol="lames" className="sol-lames">
-        {/* Sol de 800 px, celui de la maquette : plus étroite, la pièce défile. */}
-        <div className="overflow-x-auto">
-          <div className="relative w-200">
-            <FondDeLaPiece projet={projet} etat={etat} machineEnService={machineEnService(agents)} />
-            <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
-              {postes.map((p) => (
-                <PosteDeTravail
-                  key={p.poste}
-                  projet={projet}
-                  poste={p}
-                  sante={sante}
-                  auRepos={auRepos}
-                  parti={clos || fete}
-                  absent={absents.includes(p.poste)}
-                  onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
-                  outil={outil?.poste === p.poste ? outil.phrase : null}
-                />
-              ))}
-            </div>
-            <AgentsDeLaPiece projet={projet} agents={agents} />
-            {fete && <Confettis />}
-            {gyrophare && (
-              <span className="absolute left-1/2 top-1 z-20 -translate-x-1/2">
-                <Gyrophare />
-              </span>
-            )}
+        {/* Sol de 800 px, celui de la maquette, rendu à l'échelle de la largeur de la salle. */}
+        <SolMisAEchelle>
+          <FondDeLaPiece projet={projet} etat={etat} machineEnService={machineEnService(agents)} />
+          <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
+            {postes.map((p) => (
+              <PosteDeTravail
+                key={p.poste}
+                projet={projet}
+                poste={p}
+                sante={sante}
+                auRepos={auRepos}
+                parti={clos || fete}
+                absent={absents.includes(p.poste)}
+                onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
+                outil={outil?.poste === p.poste ? outil.phrase : null}
+              />
+            ))}
           </div>
-        </div>
+          <AgentsDeLaPiece projet={projet} agents={agents} />
+          {fete && <Confettis />}
+          {gyrophare && (
+            <span className="absolute left-1/2 top-1 z-20 -translate-x-1/2">
+              <Gyrophare />
+            </span>
+          )}
+        </SolMisAEchelle>
         <div className="flex min-h-9 items-end justify-between px-3 py-2">
           <div className="flex min-h-5 items-center">
             {fete && <StatusPill etat="reussi" libelle="PR mergée" />}

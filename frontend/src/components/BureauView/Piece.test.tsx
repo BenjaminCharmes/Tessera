@@ -228,12 +228,35 @@ describe("Piece characters", () => {
     );
   });
 
-  it("scrolls horizontally under the 800 px floor of the room", () => {
+  it("keeps the 800 px floor out of any horizontal scroll container", () => {
     const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} />);
 
-    const defilement = container.querySelector("section .sol-lames > .overflow-x-auto");
-    expect(defilement).not.toBeNull();
-    expect(defilement?.firstElementChild?.className).toContain("w-200");
+    const sol = container.querySelector("section .sol-lames [data-echelle]");
+    expect(sol).not.toBeNull();
+    expect(sol?.className).toContain("w-200");
+    expect(sol?.closest(".overflow-x-auto")).toBeNull();
+  });
+
+  it("scales the floor to the width of the room and keeps it centred", () => {
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        rappel: (e: { contentRect: { width: number } }[]) => void;
+        constructor(rappel: (e: { contentRect: { width: number } }[]) => void) {
+          this.rappel = rappel;
+        }
+        observe() {
+          this.rappel([{ contentRect: { width: 1200 } }]);
+        }
+        disconnect() {}
+      },
+    );
+    const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} />);
+    vi.unstubAllGlobals();
+
+    const sol = container.querySelector("[data-echelle]");
+    expect(sol?.getAttribute("data-echelle")).toBe("1.5");
+    expect(sol?.className).toContain("mx-auto");
   });
 
   it("draws one character per post while a run is on", () => {

@@ -1,14 +1,15 @@
 ---
-id: ticket-606
-title: "Work rooms stack one per row and fill the view's width, without a horizontal scroll"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-27
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-27
+id: ticket-606
+pr_number: 685
+priority: high
+status: done
+title: Work rooms stack one per row and fill the view's width, without a horizontal
+  scroll
+type: feat
 ---
 
 # ticket-606 — Les salles de travail s'empilent, en pleine largeur, sans défilement horizontal
