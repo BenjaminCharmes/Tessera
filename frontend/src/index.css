@@ -86,6 +86,19 @@
   --sprite-tableau: #e4e4e7;
   --sprite-tableau-cadre: #52525b;
   --sprite-tableau-case: #a1a1aa;
+  /* Les fenêtres, les plafonniers et le cadre du bureau du directeur
+     (ticket-602) : un ciel clair et un ciel nuit, un halo et un voile
+     translucides, un cadre doré. Des fonds de sprite, jamais un texte. */
+  --sprite-ciel-jour: #7dd3fc;
+  --sprite-soleil: #fde047;
+  --sprite-ciel-nuit: #1e1b4b;
+  --sprite-etoile: #e4e4e7;
+  --sprite-fenetre-cadre: #52525b;
+  --sprite-plafonnier: #fde68a;
+  --sprite-halo: rgb(253 224 71 / 0.18);
+  --sprite-voile: rgb(9 9 20 / 0.28);
+  --sprite-cadre-dore: #ca8a04;
+  --sprite-cadre-fond: #27272a;
 }
 
 /* Sol en lames des pièces et des salles : des lames horizontales séparées d'un

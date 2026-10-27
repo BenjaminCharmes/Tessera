@@ -9,6 +9,8 @@ import Salle from "./Salle";
 interface SalleRhProps {
   /** Les agents dont le provider a basculé sur son repli, depuis moins de 20 s. */
   agents: readonly AgentAuxRh[];
+  /** L'horloge unique de la vue (ticket-602). */
+  maintenant: number;
 }
 
 /**
@@ -16,9 +18,10 @@ interface SalleRhProps {
  * indisponible y passe avec « tenté → utilisé », puis retourne à son poste
  * (ADR-046). Le délai se lit dans `lib/bureau/sallesCommunes`.
  */
-export default function SalleRh({ agents }: SalleRhProps) {
+export default function SalleRh({ agents, maintenant }: SalleRhProps) {
   return (
     <Salle
+      maintenant={maintenant}
       titre="RH"
       entete="un rôle dont le provider est indisponible passe ici, le temps de son repli"
       vide="Aucun repli de provider"

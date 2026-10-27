@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { useCockpit } from "./useCockpit";
+import { ouvrirTicketsDuProjet } from "./useOuvrirTicket";
 import type { Project, Ticket } from "../types/api";
 
 const { list, flux, clear } = vi.hoisted(() => ({
@@ -176,5 +177,42 @@ describe("useCockpit — ouvrirTicket (ticket-460)", () => {
     expect(result.current.centre.project?.id).toBe("serpent");
     expect(result.current.panel).toBe("projects");
     expect(clear).not.toHaveBeenCalled();
+  });
+});
+
+describe("useCockpit — porte du Bureau (ticket-602)", () => {
+  it("picks the project of the door and opens the Tickets tab", () => {
+    const { result } = renderHook(() => useCockpit());
+    act(() => result.current.sidebar.projet.onSelect(PROJETS[0]));
+    expect(result.current.panel).toBe("projects");
+
+    act(() => result.current.centre.onOpenProject(PROJETS[1]));
+
+    expect(result.current.centre.project?.id).toBe("demineur");
+    expect(result.current.panel).toBe("tickets");
+  });
+
+  it("opens the Tickets tab even when the door's project is already the active one", () => {
+    const { result } = renderHook(() => useCockpit());
+    act(() => result.current.sidebar.projet.onSelect(PROJETS[0]));
+
+    act(() => result.current.centre.onOpenProject(PROJETS[0]));
+
+    expect(result.current.centre.project?.id).toBe("serpent");
+    expect(result.current.panel).toBe("tickets");
+  });
+});
+
+describe("ouvrirTicketsDuProjet", () => {
+  it("selects the project first, then asks for the tickets panel", () => {
+    const appels: string[] = [];
+    const ouvrir = ouvrirTicketsDuProjet(
+      (p) => appels.push(`projet:${p.id}`),
+      (panneau) => appels.push(`panneau:${panneau}`),
+    );
+
+    ouvrir(PROJETS[1]);
+
+    expect(appels).toEqual(["projet:demineur", "panneau:tickets"]);
   });
 });

@@ -34,6 +34,20 @@ export interface PrisesDuCockpit {
   afficherLesTickets: () => void;
 }
 
+/**
+ * The Bureau door action: pick the project, then show the Tickets tab. The tab
+ * is set after the switch so that it wins over the panel the switch restores.
+ */
+export function ouvrirTicketsDuProjet(
+  selectionnerProjet: (projet: Project) => void,
+  afficherPanneau: (panneau: "tickets") => void,
+): (projet: Project) => void {
+  return (projet) => {
+    selectionnerProjet(projet);
+    afficherPanneau("tickets");
+  };
+}
+
 async function chercherLeTicket(
   projectId: string,
   ticketId: string,

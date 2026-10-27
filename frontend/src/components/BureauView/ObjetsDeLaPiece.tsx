@@ -9,6 +9,8 @@ interface ObjetsDeLaPieceProps {
   /** Identifiant du run vivant, `null` quand on ne le connaît pas : pas de pile. */
   runId: string | null;
   signalServices: number;
+  /** Ouvre le fil du run : la pile de dossiers en est le raccourci (ticket-602). */
+  onOuvrir?: (runId: string) => void;
 }
 
 /**
@@ -16,11 +18,11 @@ interface ObjetsDeLaPieceProps {
  * chacun dans sa colonne. Une colonne dont l'objet est absent reste vide : la boîte
  * ne change pas de place.
  */
-export default function ObjetsDeLaPiece({ projet, etat, runId, signalServices }: ObjetsDeLaPieceProps) {
+export default function ObjetsDeLaPiece({ projet, etat, runId, signalServices, onOuvrir }: ObjetsDeLaPieceProps) {
   return (
     <div className="grid grid-cols-3 items-end gap-2 border-t border-zinc-800 px-3 py-2">
       <div className="flex justify-center">
-        <Dossiers projet={projet} runId={runId} etat={etat} />
+        <Dossiers projet={projet} runId={runId} etat={etat} onOuvrir={onOuvrir} />
       </div>
       <div className="flex justify-center">
         <BoiteAuxLettres projet={projet} etat={etat} />

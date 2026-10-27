@@ -72,6 +72,8 @@ interface CenterViewProps {
   statsProjectId: string | null;
   /** Sélectionne un projet, comme la barre latérale (ticket-399). */
   onSelectProject: (p: Project) => void;
+  /** La porte d'une pièce du Bureau : choisit le projet et ouvre l'onglet Tickets (ticket-602). */
+  onOpenProject?: (p: Project) => void;
   /** Les projets dont un run attend une réponse (ticket-186). */
   enAttente?: ReadonlySet<string>;
   /** Un projet vient d'être créé ou importé depuis la vue Projets (ticket-586). */
@@ -131,6 +133,7 @@ export default function CenterView({
   statsDays,
   statsProjectId,
   onSelectProject,
+  onOpenProject,
   enAttente,
   onProjectCreated,
   onSelectTicket,
@@ -164,6 +167,7 @@ export default function CenterView({
         projects={projets}
         services={servicesDuProjet}
         son={son}
+        onOpenProject={onOpenProject}
       />
     );
   } else if (panel === "running") {

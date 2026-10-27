@@ -12,7 +12,7 @@ import { boutonsPleins } from "../../test/boutons";
 
 vi.mock("../../lib/api", () => ({
   api: {
-    runs: { events: vi.fn().mockResolvedValue([]) },
+    runs: { events: vi.fn().mockResolvedValue([]), list: vi.fn().mockResolvedValue([]) },
     orchestrator: { limits: vi.fn().mockResolvedValue({ run_max_budget_usd: 0, llm_max_budget_usd: 0 }) },
     tickets: { activity: vi.fn().mockResolvedValue({ ticket_id: "", runs: [], pr_number: null, github_remote: null }) },
   },

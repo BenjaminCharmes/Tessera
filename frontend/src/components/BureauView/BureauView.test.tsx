@@ -32,8 +32,9 @@ function DixPieces() {
 
 describe("BureauView", () => {
   beforeEach(() => {
-  vi.spyOn(api.services, "list").mockResolvedValue([]);
-  vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
+    vi.spyOn(api.services, "list").mockResolvedValue([]);
+    vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
+    vi.spyOn(api.runs, "list").mockResolvedValue([]);
     // Le tableau du jour lit la dépense et le quota : rien de réseau dans ces tests.
     vi.spyOn(api.usage, "stats").mockResolvedValue({ daily: [] } as unknown as UsageStats);
     vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });

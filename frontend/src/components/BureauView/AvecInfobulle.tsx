@@ -48,6 +48,8 @@ interface AvecInfobulleProps {
   className: string;
   /** Le contenu de l'infobulle, montré au survol ou au focus. */
   infobulle: ReactNode;
+  /** Un clic, ou Entrée ou Espace au clavier : l'objet devient un bouton (ticket-602). */
+  onActiver?: () => void;
   children: ReactNode;
 }
 
@@ -55,7 +57,7 @@ interface AvecInfobulleProps {
  * Un objet de la pièce focusable, avec son infobulle au survol et au focus.
  * L'ancre est le rectangle de l'objet à l'ouverture : l'infobulle se place dessus.
  */
-export default function AvecInfobulle({ label, className, infobulle, children }: AvecInfobulleProps) {
+export default function AvecInfobulle({ label, className, infobulle, onActiver, children }: AvecInfobulleProps) {
   const [ancre, setAncre] = useState<Rectangle | null>(null);
   const racine = useRef<HTMLDivElement>(null);
   const idInfobulle = useId();
@@ -73,11 +75,22 @@ export default function AvecInfobulle({ label, className, infobulle, children }:
   return (
     <div
       ref={racine}
-      role="group"
+      role={onActiver ? "button" : "group"}
       tabIndex={0}
       aria-label={label}
       aria-describedby={ancre ? idInfobulle : undefined}
-      className={className}
+      className={onActiver ? `${className} cursor-pointer` : className}
+      onClick={onActiver}
+      onKeyDown={
+        onActiver &&
+        ((e) => {
+          if (e.target !== e.currentTarget) return;
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onActiver();
+          }
+        })
+      }
       onMouseEnter={ouvrir}
       onMouseLeave={fermer}
       onFocus={ouvrir}

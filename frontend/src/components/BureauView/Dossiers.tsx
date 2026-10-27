@@ -8,6 +8,8 @@ interface DossiersProps {
   projet: string;
   runId: string | null;
   etat: StreamState;
+  /** Ouvre le fil du run, comme le bouton « Fil » de la pièce : sans lui, la pile n'est qu'un objet (ticket-602). */
+  onOuvrir?: (runId: string) => void;
 }
 
 /** Hauteur maximale de la pile dessinée, et nombre de lignes de l'infobulle. */
@@ -22,6 +24,7 @@ function hauteurDePile(restants: number): number {
 interface PileProps {
   projet: string;
   restants: readonly string[];
+  onActiver?: () => void;
 }
 
 interface ListeProps {
@@ -47,7 +50,7 @@ function ListeDesRestants({ restants, titres }: ListeProps) {
 }
 
 /** La pile : un à trois dossiers empilés et le nombre écrit dessous (ADR-058). */
-function Pile({ projet, restants }: PileProps) {
+function Pile({ projet, restants, onActiver }: PileProps) {
   const { tickets } = useTickets(projet);
   const titres = new Map(tickets.map((t) => [t.id, t.title]));
 
@@ -55,6 +58,7 @@ function Pile({ projet, restants }: PileProps) {
     <AvecInfobulle
       label={`Tickets restants : ${restants.length}`}
       className="flex flex-col items-center"
+      onActiver={onActiver}
       infobulle={<ListeDesRestants restants={restants} titres={titres} />}
     >
       <div className="flex flex-col items-center">
@@ -72,8 +76,9 @@ function Pile({ projet, restants }: PileProps) {
 }
 
 /** Une seule pile pour la file, rien quand il n'en reste aucun ticket (ADR-058). */
-export default function Dossiers({ projet, runId, etat }: DossiersProps) {
+export default function Dossiers({ projet, runId, etat, onOuvrir }: DossiersProps) {
   const restants = useRestants(projet, runId, etat);
   if (restants.length === 0) return null;
-  return <Pile projet={projet} restants={restants} />;
+  const ouvrir = onOuvrir && runId !== null ? () => onOuvrir(runId) : undefined;
+  return <Pile projet={projet} restants={restants} onActiver={ouvrir} />;
 }

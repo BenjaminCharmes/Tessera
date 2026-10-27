@@ -210,7 +210,7 @@ export const api = {
   },
   runs: {
     list: (projectId: string, limit = 20): Promise<PipelineRun[]> =>
-      request(`/projects/${projectId}/runs?limit=${limit}`),
+      request(`/projects/${encodeURIComponent(projectId)}/runs?limit=${limit}`),
     /** Les événements d'un run terminé, pour rejouer la vue (ticket-280). */
     events: (runId: string): Promise<RunEvent[]> =>
       request(`/runs/${runId}/events`),

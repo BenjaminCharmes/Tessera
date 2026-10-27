@@ -26,7 +26,7 @@ import { vueDuCentre } from "../vueDuCentre";
 import type { VueCentre } from "../vueDuCentre";
 import type { StreamState } from "./streamState";
 import { useListeRuns } from "./runStore";
-import { useActionOuvrirTicket } from "./useOuvrirTicket";
+import { ouvrirTicketsDuProjet, useActionOuvrirTicket } from "./useOuvrirTicket";
 
 /**
  * Returns the panel to activate when the user selects a project, from a card,
@@ -188,8 +188,7 @@ export function useCockpit() {
     showKanban,
   });
   const { projects: projets } = useProjects();
-  // Sans passer par `handleSelectProject` : la restauration ne doit pas
-  // écraser le panneau et la vue, eux aussi restaurés.
+  // Sans passer par `handleSelectProject` : la restauration ne doit pas écraser le panneau et la vue restaurés.
   const { memoriser } = useProjetMemorise(projets, project, setProject);
   // Une notification ramène au projet concerné (ticket-192).
   const ouvrirProjet = useCallback(
@@ -259,9 +258,8 @@ export function useCockpit() {
     setProject(p);
     memoriser(p?.id ?? null);
     setPanel(panelAfterProjectSwitch(panel));
-    // `showKanban` n'est pas touché : la vue du centre reste celle que
-    // l'utilisateur avait choisie (ticket-425). Le fichier ouvert, lui, est
-    // celui de l'ancien projet : il se ferme.
+    // `showKanban` n'est pas touché : la vue du centre reste celle que l'utilisateur avait choisie
+    // (ticket-425). Le fichier ouvert, lui, est celui de l'ancien projet : il se ferme.
     setOpenFilePath(null);
     stream.clear();
   }
@@ -296,6 +294,7 @@ export function useCockpit() {
     },
   });
 
+  const ouvrirLesTicketsDuProjet = ouvrirTicketsDuProjet(handleSelectProject, setPanel); // porte du Bureau (ticket-602)
   // Le ticket porte un `pr_number` : la liste se relit pour le montrer
   // (ticket-123). Un statut posé à la main (ticket-194) : le backend déplace
   // le fichier et publie l'événement ; on relit sans attendre le sondage.
@@ -488,6 +487,7 @@ export function useCockpit() {
       // La portée effective est "tous" quand aucun projet n'est actif.
       statsProjectId: porteeEffective === "tous" ? null : (project?.id ?? null),
       onSelectProject: handleSelectProject,
+      onOpenProject: ouvrirLesTicketsDuProjet,
       enAttente,
       onProjectCreated: (p: Project) => addToast(`Projet « ${p.name} » créé`, "success"),
       onSelectTicket: handleSelectTicket,
