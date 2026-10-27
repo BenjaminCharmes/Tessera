@@ -5267,3 +5267,4 @@ Le diff ajoute :
 - 2026-10-27 10:01:28 UTC — [ticket-584] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers), backend/ (dossier, 6 fichiers), scripts/ (dossier, 6 fichiers), scripts/verifier.py
 - 2026-10-27 10:01:28 UTC — [ticket-584] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit une chaîne de décision dans (336546ms)
 - 2026-10-27 10:01:28 UTC — [ticket-584] APPROVED après 2 tour(s)
+- 2026-10-27 10:05:05 UTC — [ticket-584] documentation: 0 fichier(s) (213218ms) — après tour de correction — refusé : doc-technique : docs/configuration.md : texte introuvable — « make dev           # Lance FastAPI sur http://localhost:8000 ». L'agent a proposé une modification
