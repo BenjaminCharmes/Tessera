@@ -5237,3 +5237,15 @@ Le diff ajoute :
 - 2026-10-27 09:18:19 UTC — [ticket-586] validateur: APPROVED — Tous les critères sont satisfaits. Le diff supprime `ProjectNav.tsx` et ses usag (321562ms)
 - 2026-10-27 09:18:19 UTC — [ticket-586] APPROVED après 1 tour(s)
 - 2026-10-27 09:22:12 UTC — [ticket-586] documentation: 1 fichier(s) (220921ms)
+- 2026-10-27 09:22:35 UTC — [ide-core] ticket-586 PR #669 confiée au CIWatcher
+- 2026-10-27 09:22:39 UTC — [ticket-585] branche ticket-585-the-office-shows-when-a-run-is-writing-its-docume
+- 2026-10-27 09:22:40 UTC — [ticket-585] tour 1 — codeur démarré
+- 2026-10-27 09:24:30 UTC — [ticket-585] tour 1 — codeur terminé (110187ms)
+- 2026-10-27 09:26:29 UTC — [ide-core] ticket-586 PR #669 mergée (CI verte)
+- 2026-10-27 09:26:52 UTC — [ticket-585] testeur: OK (exit 0)
+- 2026-10-27 09:27:58 UTC — [ticket-585] securite: PASS — Le diff ajoute l'affichage des étapes documentation et livraison via une fonctio (65733ms)
+- 2026-10-27 09:27:58 UTC — [ticket-585] tour 1 — reviewer démarré
+- 2026-10-27 09:28:16 UTC — [ticket-585] tour 1 — reviewer terminé (17406ms)
+- 2026-10-27 09:30:50 UTC — [ticket-585] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers)
+- 2026-10-27 09:30:50 UTC — [ticket-585] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code implémente correcteme (171889ms)
+- 2026-10-27 09:30:50 UTC — [ticket-585] APPROVED après 1 tour(s)
