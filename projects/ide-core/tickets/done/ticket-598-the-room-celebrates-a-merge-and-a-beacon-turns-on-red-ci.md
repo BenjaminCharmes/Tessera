@@ -5,7 +5,7 @@ depends_on:
 - ticket-596
 estimated_days: 0.5
 id: ticket-598
-pr_number: null
+pr_number: 679
 priority: medium
 status: done
 title: The room celebrates a merged PR, and a beacon turns while the CI is red
