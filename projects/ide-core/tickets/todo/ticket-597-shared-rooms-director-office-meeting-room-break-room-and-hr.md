@@ -38,6 +38,10 @@ projets, avec la colonne de droite réduite à « Agent choisi » et « À toi �
   bout de 20 s. Contour ambre pendant ce temps.
 - Dans les salles, chaque agent garde sa tenue et son physique (ticket-595),
   et son libellé dit son projet et son rôle.
+- Les phrases qui expliquent une salle (« attend l'extérieur : CI, quota,
+  dépendance »…) sont en **infobulle** sur son titre (marque ⓘ), pas écrites
+  sous lui ; les en-têtes des salles et des pièces sont fins (une ligne, 5 px
+  de marge verticale) pour donner la hauteur au sol (156 px).
 
 ## Solution proposée
 - `components/BureauView/SallesCommunes.tsx` : la rangée (grille
@@ -55,4 +59,5 @@ projets, avec la colonne de droite réduite à « Agent choisi » et « À toi �
 - [ ] Un événement `provider_fallback` pour le rôle `validateur` fait apparaître cet agent aux RH avec « <tenté> → <utilisé> », et 20 s plus tard (temps simulé) il n'y est plus ; un test le vérifie
 - [ ] Un `conflict_resolution` en phase `started` place le résolveur en salle de réunion avec le nombre de fichiers ; un test le vérifie
 - [ ] La rangée rend les quatre salles dans l'ordre directeur, réunion, pause, RH ; un test le vérifie
+- [ ] Le titre de chaque salle porte sa phrase d'explication en `title`, et aucune n'est affichée en texte sous le titre ; un test le vérifie
 - [ ] Le diff ne modifie aucun fichier de `backend/src/`
