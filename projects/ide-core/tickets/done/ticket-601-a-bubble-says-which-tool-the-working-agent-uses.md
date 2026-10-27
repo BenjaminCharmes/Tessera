@@ -1,14 +1,15 @@
 ---
-id: ticket-601
-title: "A bubble above the working agent says which tool it is using"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-596"]
-estimated_days: 0.25
 created: 2026-10-27
+depends_on:
+- ticket-596
+estimated_days: 0.25
+id: ticket-601
+pr_number: 684
+priority: medium
+status: done
+title: A bubble above the working agent says which tool it is using
+type: feat
 ---
 
 # ticket-601 — La bulle d'action de l'agent au travail

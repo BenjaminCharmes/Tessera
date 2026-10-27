@@ -6,7 +6,8 @@ import type { StreamState } from "../../hooks/streamState";
 import { useActivites } from "../../hooks/useActivites";
 import { machineEnService, placerLesAgents, postesFaits } from "../../lib/bureau/activites";
 import type { Hasard } from "../../lib/bureau/activites";
-import { copieVisible, libelleDeLaCopie, retourDeCopie } from "../../lib/bureau/copie";
+import { bulleDOutil } from "../../lib/bureau/bulleDOutil";
+import { copieVisible,libelleDeLaCopie, retourDeCopie } from "../../lib/bureau/copie";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import { contourEnCelebration, enFete, gyrophareAllume } from "../../lib/bureau/fete";
@@ -75,6 +76,8 @@ export default function Piece({
   const gyrophare = gyrophareAllume(etat);
   const contour = contourEnCelebration(contourDeLaPiece(etat, sante), fete, gyrophare);
   const enCours = postes.some((p) => p.etat === "occupe");
+  // Le dernier appel d'outil, dit en une ligne au-dessus du poste de l'agent (ticket-601).
+  const outil = bulleDOutil(etat, maintenant);
   // Documentation et livraison n'ont pas de poste : la pastille du pied les dit (ticket-585).
   const suite = libelleDeSuite(etat.etape);
   // Aucun événement de ticket : pas de run, donc personne à dessiner.
@@ -117,6 +120,7 @@ export default function Piece({
                   parti={clos || fete}
                   absent={absents.includes(p.poste)}
                   onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
+                  outil={outil?.poste === p.poste ? outil.phrase : null}
                 />
               ))}
             </div>

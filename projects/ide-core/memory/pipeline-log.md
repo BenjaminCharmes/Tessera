@@ -5417,3 +5417,42 @@ Le diff ajoute :
 - 2026-10-27 13:26:32 UTC — [ticket-600] validateur: APPROVED — Tous les critères sont satisfaits. Le tableau blanc affiche correctement les cri (333843ms)
 - 2026-10-27 13:26:32 UTC — [ticket-600] APPROVED après 1 tour(s)
 - 2026-10-27 13:28:02 UTC — [ticket-600] documentation: 0 fichier(s) (85296ms)
+- 2026-10-27 13:30:47 UTC — [ide-core] ticket-600 PR #682 confiée au CIWatcher
+- 2026-10-27 13:30:53 UTC — [ticket-601] branche ticket-601-a-bubble-above-the-working-agent-says-which-tool
+- 2026-10-27 13:30:56 UTC — [ticket-601] tour 1 — codeur démarré
+- 2026-10-27 13:34:51 UTC — [ticket-601] tour 1 — codeur terminé (235032ms)
+- 2026-10-27 13:37:09 UTC — [ide-core] ticket-600 PR #682 mergée (CI verte)
+- 2026-10-27 13:37:52 UTC — [ticket-601] testeur: Tests  1 failed | 1763 passed (1764)
+- 2026-10-27 13:37:52 UTC — [ticket-601] tests rouges au tour 1
+- 2026-10-27 13:37:52 UTC — [ticket-601] tour 2 — codeur démarré
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-602 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-603 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 13:40:10 UTC — [ticket-601] tour 2 — codeur terminé (138703ms)
+- 2026-10-27 13:43:12 UTC — [ticket-601] testeur: OK (exit 0)
+- 2026-10-27 13:44:04 UTC — [ticket-601] securite: PASS — Aucune vulnérabilité détectée. Le nouveau composant BulleDOutil affiche une desc (51250ms)
+- 2026-10-27 13:44:04 UTC — [ticket-601] tour 2 — reviewer démarré
+- 2026-10-27 13:44:24 UTC — [ticket-601] tour 2 — reviewer terminé (20078ms)
+- 2026-10-27 13:48:53 UTC — [ticket-601] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 13:48:53 UTC — [ticket-601] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (289202ms)
+- 2026-10-27 13:48:53 UTC — [ticket-601] APPROVED après 2 tour(s)
+- 2026-10-27 13:52:59 UTC — [ticket-601] documentation: 0 fichier(s) (238187ms)
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-589 retiré de la file
