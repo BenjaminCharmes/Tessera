@@ -116,6 +116,7 @@ port.
 
 ```bash
 make setup         # Initialisation complète (première fois)
+make install-hooks # installe le hook pre-push de contrôle des termes interdits
 make dev           # Lance FastAPI sur http://localhost:8100
 make dev-frontend  # Lance Vite sur http://localhost:5173
 make tauri-dev     # Lance l'app desktop Tauri (nécessite make dev)

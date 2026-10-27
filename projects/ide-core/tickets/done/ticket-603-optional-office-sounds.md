@@ -1,14 +1,16 @@
 ---
-id: ticket-603
-title: "Optional office sounds: a fanfare on merge, an alarm on red CI, a coffee pour, a few keystrokes"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: ["ticket-598"]
-estimated_days: 0.25
 created: 2026-10-27
+depends_on:
+- ticket-598
+estimated_days: 0.25
+id: ticket-603
+pr_number: 688
+priority: low
+status: done
+title: 'Optional office sounds: a fanfare on merge, an alarm on red CI, a coffee pour,
+  a few keystrokes'
+type: feat
 ---
 
 # ticket-603 — Les sons du bureau, optionnels
