@@ -1,5 +1,7 @@
 # Configuration
 
+Le backend Tessera écoute sur le port **8100**.
+
 Toutes les variables sont dans `.env` (copie de `.env.example`) :
 
 | Variable | Requis | Default | Description |

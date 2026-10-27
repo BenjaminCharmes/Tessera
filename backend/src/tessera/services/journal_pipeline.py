@@ -25,6 +25,17 @@ def ajouter_ligne(chemin: Path, message: str) -> None:
         _logger.warning("pipeline_log_write_failed", extra={"error": str(exc)})
 
 
+def journaliser_mode_rapide(chemin: Path, project_id: str, roles: list[str]) -> None:
+    """Writes the one line saying a run took the fallback of `roles` straight away
+    (ticket-578). Nothing is written when no role declares a fallback."""
+    if not roles:
+        return
+    ajouter_ligne(
+        chemin,
+        f"[{project_id}] mode rapide : repli d'emblée pour {', '.join(roles)}",
+    )
+
+
 def journal_vers(chemin: Path) -> Callable[[str], None]:
     """A writer that appends its messages to the log at `chemin`."""
 
