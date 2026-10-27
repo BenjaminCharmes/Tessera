@@ -5679,3 +5679,4 @@ Le diff ajoute :
 - 2026-10-27 19:29:06 UTC — [ticket-573] validateur: fichiers cités joints : backend/src/tessera/models/agent.py, agents.json
 - 2026-10-27 19:29:06 UTC — [ticket-573] validateur: APPROVED — Tous les critères d'acceptation ont été respectés : le champ `effort` a été ajou (215172ms)
 - 2026-10-27 19:29:06 UTC — [ticket-573] APPROVED après 2 tour(s)
+- 2026-10-27 19:30:32 UTC — [ticket-573] documentation: 0 fichier(s) (81687ms)
