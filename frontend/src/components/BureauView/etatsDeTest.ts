@@ -24,6 +24,19 @@ export function etatEnSecurite(): StreamState {
   ]);
 }
 
+/** Codeur, testeur, sécurité et reviewer faits ; seul le validateur n'a pas commencé. */
+export function etatQuatreFaits(): StreamState {
+  return rejouer([
+    ev("agent_started", "codeur"),
+    ev("agent_done", "codeur"),
+    ev("test_result"),
+    ev("security_audit_started"),
+    ev("security_audit_done"),
+    ev("agent_started", "reviewer"),
+    ev("agent_done", "reviewer"),
+  ]);
+}
+
 /** Le pipeline fini, puis les événements de suite donnés (documentation, livraison, clôture). */
 export function etatApresPipeline(suite: EventType[]): StreamState {
   return rejouer([

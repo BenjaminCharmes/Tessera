@@ -66,6 +66,9 @@
   --sprite-pot: #92400e;
   --sprite-sol: #2a2420;
   --sprite-sol-joint: #211c18;
+  --sprite-porte: #6b5038;
+  --sprite-porte-ombre: #4a3626;
+  --sprite-vapeur: #d4d4d8;
 }
 
 /* Sol en lames des pièces et des salles : des lames horizontales séparées d'un
@@ -96,11 +99,21 @@
   50% { transform: translateY(-3px); }
   100% { transform: translateY(0); }
 }
+@keyframes vapeur {
+  0% { transform: translateY(0); opacity: 0.8; }
+  100% { transform: translateY(-6px); opacity: 0; }
+}
 .anim-tape { animation: tape 0.5s steps(2) infinite; }
 .anim-lueur { animation: lueur 1.6s ease-in-out infinite; }
 .anim-flotte { animation: flotte 1.8s ease-in-out infinite; }
+.anim-vapeur { animation: vapeur 1.6s steps(4) infinite; }
+/* La marche d'un agent : translation en paliers, comme un sprite qui avance
+   case par case. Elle s'efface avec `prefers-reduced-motion` : l'agent change
+   de place sans marcher. */
+.marche { transition: transform 1.8s steps(12), opacity 0.9s; }
 @media (prefers-reduced-motion: reduce) {
-  .anim-tape, .anim-lueur, .anim-flotte { animation: none; }
+  .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur { animation: none; }
+  .marche { transition: none; }
 }
 
 /*

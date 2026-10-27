@@ -5326,3 +5326,26 @@ Le diff ajoute :
 - 2026-10-27 10:32:13 UTC — [ticket-595] documentation: 0 fichier(s) (95781ms)
 - 2026-10-27 10:32:57 UTC — [ticket-595] livraison: résolveur tenté : frontend/src/components/BureauView/Piece.tsx (35937ms)
 - 2026-10-27 10:32:57 UTC — [ticket-595] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/Piece.tsx — résolveur tenté sur fronte
+- 2026-10-27 11:03:28 UTC — [ticket-596] branche ticket-596-finished-agents-vary-what-they-do-walk-to-the-roo
+- 2026-10-27 11:04:50 UTC — [ticket-596] plan rendu (79952ms)
+- 2026-10-27 11:04:50 UTC — [ticket-596] tour 1 — codeur démarré
+- 2026-10-27 11:12:25 UTC — [ticket-596] tour 1 — codeur terminé (454639ms)
+- 2026-10-27 11:14:13 UTC — [ticket-596] testeur: OK (exit 0)
+- 2026-10-27 11:16:32 UTC — [ticket-596] securite: PASS — Le diff introduit une refactorisation de l'interface Bureau pour ajouter des ani (139891ms)
+- 2026-10-27 11:16:33 UTC — [ticket-596] tour 1 — reviewer démarré
+- 2026-10-27 11:17:01 UTC — [ticket-596] tour 1 — reviewer terminé (28157ms)
+- 2026-10-27 11:21:33 UTC — [ticket-596] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 11:22:08 UTC — [ticket-596] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 8 fichiers)
+- 2026-10-27 11:22:08 UTC — [ticket-596] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute une couche d'agents animés san (335610ms)
+- 2026-10-27 11:22:08 UTC — [ticket-596] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 11:22:08 UTC — [ticket-596] tour 2 — codeur démarré
+- 2026-10-27 11:22:56 UTC — [ticket-596] tour 2 — codeur terminé (48125ms)
+- 2026-10-27 11:24:43 UTC — [ticket-596] testeur: OK (exit 0)
+- 2026-10-27 11:26:08 UTC — [ticket-596] securite: PASS — Aucune vulnérabilité détectée. Le code est bien structuré, fortement typé, et ne (84640ms)
+- 2026-10-27 11:26:08 UTC — [ticket-596] tour 2 — reviewer démarré
+- 2026-10-27 11:26:08 UTC — [ticket-596] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-27 11:26:22 UTC — [ticket-596] tour 2 — reviewer terminé (13625ms)
+- 2026-10-27 11:26:37 UTC — [ticket-596] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers)
+- 2026-10-27 11:26:37 UTC — [ticket-596] validateur: APPROVED — Le ticket-596 est complet : tous les critères sont satisfaits par le code fourni (29108ms)
+- 2026-10-27 11:26:37 UTC — [ticket-596] APPROVED après 2 tour(s)
+- 2026-10-27 11:32:36 UTC — [ticket-596] documentation: 0 fichier(s) (355264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : section « Synchronisation de la base avant livraison » introuvable.

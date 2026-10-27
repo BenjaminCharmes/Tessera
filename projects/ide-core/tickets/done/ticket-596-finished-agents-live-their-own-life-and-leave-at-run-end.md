@@ -1,15 +1,17 @@
 ---
-id: ticket-596
-title: "Finished agents vary what they do, walk to the room's coffee corner, and leave through the door when the run closes"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-595"]
-estimated_days: 0.75
 created: 2026-10-27
+depends_on:
+- ticket-595
+estimated_days: 0.75
+id: ticket-596
 plan: true
+pr_number: 677
+priority: high
+status: done
+title: Finished agents vary what they do, walk to the room's coffee corner, and leave
+  through the door when the run closes
+type: feat
 ---
 
 # ticket-596 — L'agent qui a fini vit sa vie, et tous partent à la fin du run

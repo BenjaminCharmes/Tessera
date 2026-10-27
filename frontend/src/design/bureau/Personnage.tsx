@@ -11,13 +11,21 @@ interface PersonnageProps {
   tape?: boolean;
   /** Assis au poste (défaut), ou debout à côté, tasse à la main : l'agent a fini. */
   pose?: "assis" | "debout";
+  /** Debout seulement : les bras levés au lieu de la tasse. */
+  etire?: boolean;
 }
 
 /**
  * Le personnage d'un poste : assis (grille 16 × 18 du poste, immobile ou à
  * taper), ou debout une fois fini (grille 12 × 20). Même échelle, même tête.
  */
-export default function Personnage({ tenue, physique, tape = false, pose = "assis" }: PersonnageProps) {
-  if (pose === "debout") return <PersonnageDebout tenue={tenue} physique={physique} />;
+export default function Personnage({
+  tenue,
+  physique,
+  tape = false,
+  pose = "assis",
+  etire = false,
+}: PersonnageProps) {
+  if (pose === "debout") return <PersonnageDebout tenue={tenue} physique={physique} etire={etire} />;
   return <PersonnageAssis tenue={tenue} physique={physique} tape={tape} />;
 }

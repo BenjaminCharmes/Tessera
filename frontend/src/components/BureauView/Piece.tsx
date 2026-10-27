@@ -1,6 +1,9 @@
 import Pastille from "../../design/bureau/Pastille";
 import Plante from "../../design/bureau/Plante";
 import type { StreamState } from "../../hooks/streamState";
+import { useActivites } from "../../hooks/useActivites";
+import { machineEnService, placerLesAgents, postesFaits } from "../../lib/bureau/activites";
+import type { Hasard } from "../../lib/bureau/activites";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import StatusPill from "../../design/ui/StatusPill";
@@ -10,6 +13,8 @@ import type { PosteId } from "../../lib/bureau/postesDuRun";
 import { enEtapeSilencieuse, santeAgent } from "../../lib/santeAgent";
 import type { RunActif } from "../../types/api";
 import ActionsDuRun from "./ActionsDuRun";
+import AgentsDeLaPiece from "./AgentsDeLaPiece";
+import FondDeLaPiece from "./FondDeLaPiece";
 import ObjetsDeLaPiece from "./ObjetsDeLaPiece";
 import PosteDeTravail from "./PosteDeTravail";
 
@@ -28,6 +33,8 @@ interface PieceProps {
   onRanger?: (runId: string) => void;
   /** Choisit l'agent d'un poste occupé : le panneau « Agent choisi » le lit (ticket-582). */
   onChoisir?: (projet: string, poste: PosteId) => void;
+  /** Le tirage des activités de pause : `Math.random` par défaut, une suite fixe dans les tests. */
+  hasard?: Hasard;
 }
 
 const CONTOURS: Record<ContourDeLaPiece, string> = {
@@ -48,6 +55,7 @@ export default function Piece({
   onOuvrir,
   onRanger,
   onChoisir,
+  hasard,
 }: PieceProps) {
   const postes = postesDuRun(etat);
   const sante = santeAgent(
@@ -63,6 +71,11 @@ export default function Piece({
   const suite = libelleDeSuite(etat.etape);
   // Aucun événement de ticket : pas de run, donc personne à dessiner.
   const auRepos = etat.ticketEvents.length === 0;
+  // Run clos : les cinq agents sont partis par la porte. Sans run, personne à placer.
+  const clos = !auRepos && etat.runClosed;
+  const faits = auRepos ? [] : postesFaits(postes);
+  const activites = useActivites(faits, maintenant, hasard);
+  const agents = placerLesAgents(faits, activites, clos);
 
   return (
     <section
@@ -77,17 +90,22 @@ export default function Piece({
       <div data-sol="lames" className="sol-lames">
         {/* Sol de 800 px, celui de la maquette : plus étroite, la pièce défile. */}
         <div className="overflow-x-auto">
-          <div className="grid w-200 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
-            {postes.map((p) => (
-              <PosteDeTravail
-                key={p.poste}
-                projet={projet}
-                poste={p}
-                sante={sante}
-                auRepos={auRepos}
-                onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
-              />
-            ))}
+          <div className="relative w-200">
+            <FondDeLaPiece machineEnService={machineEnService(agents)} />
+            <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
+              {postes.map((p) => (
+                <PosteDeTravail
+                  key={p.poste}
+                  projet={projet}
+                  poste={p}
+                  sante={sante}
+                  auRepos={auRepos}
+                  parti={clos}
+                  onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
+                />
+              ))}
+            </div>
+            <AgentsDeLaPiece projet={projet} agents={agents} />
           </div>
         </div>
         <div className="flex min-h-9 items-end justify-between px-3 py-2">

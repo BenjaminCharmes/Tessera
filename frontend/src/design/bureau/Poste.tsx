@@ -12,6 +12,8 @@ interface PosteProps {
   sante: SanteAgent;
   /** Pièce sans run : aucun personnage, un bureau et sa chaise vide (ADR-058). */
   auRepos?: boolean;
+  /** Run clos : l'agent est parti par la porte, la chaise reste vide. */
+  parti?: boolean;
 }
 
 /** La coche d'un poste « fait » : quatre pixels verts sur l'écran. */
@@ -32,9 +34,9 @@ function Coche() {
  * à côté du poste (`AgentDebout`), la grille 16 × 18 ne le contient plus
  * (ADR-058). Pixels `rect` sur cette grille, rien d'autre.
  */
-export default function Poste({ projet, role, etat, sante, auRepos = false }: PosteProps) {
+export default function Poste({ projet, role, etat, sante, auRepos = false, parti = false }: PosteProps) {
   const occupe = etat === "occupe";
-  const assis = !auRepos && etat !== "fait";
+  const assis = !auRepos && !parti && etat !== "fait";
   const ton = occupe ? sante : etat;
   return (
     <svg

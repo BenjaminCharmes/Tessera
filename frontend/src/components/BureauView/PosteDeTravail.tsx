@@ -1,4 +1,3 @@
-import AgentDebout from "../../design/bureau/AgentDebout";
 import Bulle from "../../design/bureau/Bulle";
 import Poste from "../../design/bureau/Poste";
 import { libelleDuPoste, nomDuPoste } from "../../lib/bureau/libelleDuPoste";
@@ -12,6 +11,8 @@ interface PosteDeTravailProps {
   sante: SanteAgent;
   /** Pièce sans run : pas de personnage, et le poste est « libre » plutôt qu'en attente. */
   auRepos?: boolean;
+  /** Run clos : les agents sont partis, aucun ne reste assis. */
+  parti?: boolean;
   /** Choisit l'agent au clic ; seul un poste occupé en a un (ticket-582). */
   onChoisir?: (poste: PosteDuRun["poste"]) => void;
 }
@@ -26,12 +27,12 @@ export default function PosteDeTravail({
   poste,
   sante,
   auRepos = false,
+  parti = false,
   onChoisir,
 }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
   const choisir = occupe && onChoisir ? () => onChoisir(poste.poste) : undefined;
-  // L'agent qui a fini se lève et se tient à côté de son poste, jamais dedans.
-  const debout = !auRepos && poste.etat === "fait";
+  // L'agent qui a fini se lève : la pièce le dessine hors du poste (AgentsDeLaPiece).
   return (
     <div
       className={`flex flex-col items-center gap-1 pb-2 ${poste.etat === "libre" ? "opacity-50" : ""}`}
@@ -43,12 +44,14 @@ export default function PosteDeTravail({
         onClick={choisir}
         className={`relative rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}
       >
-        <Poste projet={projet} role={poste.poste} etat={poste.etat} sante={sante} auRepos={auRepos} />
-        {debout && (
-          <span className="absolute bottom-0.5 left-full ml-1">
-            <AgentDebout projet={projet} role={poste.poste} />
-          </span>
-        )}
+        <Poste
+          projet={projet}
+          role={poste.poste}
+          etat={poste.etat}
+          sante={sante}
+          auRepos={auRepos}
+          parti={parti}
+        />
       </button>
       <span className="text-micro text-zinc-400">{nomDuPoste(poste.poste)}</span>
     </div>
