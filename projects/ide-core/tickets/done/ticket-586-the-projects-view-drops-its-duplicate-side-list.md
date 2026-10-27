@@ -5,7 +5,7 @@ depends_on:
 - ticket-580
 estimated_days: 0.25
 id: ticket-586
-pr_number: null
+pr_number: 669
 priority: high
 status: done
 title: The projects view drops its duplicate side list and takes its import and create
