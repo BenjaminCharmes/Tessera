@@ -5,6 +5,7 @@ database: the envelope row, its per-ticket children, and the last
 ``queue_progress`` event stored under it.
 """
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import aiosqlite
@@ -82,7 +83,7 @@ def statut_d_un_run_vivant(run: RunActif) -> RunStatus:
         approuves=list(run.file_faits),
         arretes=[],
         restants=run.restants(),
-        debut=run.demarre_a.isoformat(),
+        debut=en_utc(run.demarre_a),
     )
 
 
@@ -153,19 +154,29 @@ async def _tickets_joues(db: aiosqlite.Connection, run_id: str) -> list[aiosqlit
         return list(await cursor.fetchall())
 
 
+def en_utc(instant: datetime | str) -> str:
+    """ISO 8601 in UTC; a naive instant is taken as UTC, as the database stores it."""
+    valeur = datetime.fromisoformat(instant) if isinstance(instant, str) else instant
+    if valeur.tzinfo is None:
+        valeur = valeur.replace(tzinfo=timezone.utc)
+    return valeur.astimezone(timezone.utc).isoformat()
+
+
 async def statut_en_base(db_path: Path | str, run_id: str) -> RunStatus | None:
     """Status of a run read from `pipeline_runs`; ``None`` if the id is unknown."""
     async with aiosqlite.connect(str(db_path)) as db:
         db.row_factory = aiosqlite.Row
         async with db.execute(
-            "SELECT project_id, mode, started_at, finished_at, final_status"
-            " FROM pipeline_runs WHERE id=?",
+            "SELECT project_id, mode, ticket_id, started_at, finished_at, final_status,"
+            " approved, arret FROM pipeline_runs WHERE id=?",
             (run_id,),
         ) as cursor:
             row = await cursor.fetchone()
         if row is None:
             return None
-        lignes = await _tickets_joues(db, run_id)
+        # Un run `single` n'a pas d'enfant : c'est sa propre ligne qui porte
+        # l'issue de son ticket.
+        lignes = [row] if (row["mode"] or "single") == "single" else await _tickets_joues(db, run_id)
         annonces = await _derniers_restants(db, run_id)
 
     fini = row["finished_at"] is not None
@@ -179,6 +190,6 @@ async def statut_en_base(db_path: Path | str, run_id: str) -> RunStatus | None:
         approuves=classement.approuves,
         arretes=classement.arretes,
         restants=restants,
-        debut=row["started_at"],
+        debut=en_utc(row["started_at"]),
         fin=row["finished_at"],
     )

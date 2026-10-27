@@ -1,14 +1,14 @@
 ---
-id: ticket-577
-title: "The status of a single-ticket run shows its ticket as approved or stopped"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-26
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-26
+id: ticket-577
+pr_number: 691
+priority: medium
+status: done
+title: The status of a single-ticket run shows its ticket as approved or stopped
+type: fix
 ---
 
 # ticket-577 — Le statut d'un run d'un seul ticket dit son issue
