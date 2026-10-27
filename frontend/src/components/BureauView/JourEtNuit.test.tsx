@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { INITIAL } from "../../hooks/streamState";
 import { api } from "../../lib/api";
 import Piece from "./Piece";
@@ -34,7 +34,8 @@ describe("Piece day and night", () => {
     expect(ciels(container)).toEqual(["jour", "jour"]);
     expect(plafonniers(container)).toEqual(["false", "false", "false"]);
     expect(container.querySelector("[data-voile]")).toBeNull();
-    expect(container.querySelector('[data-detail="soleil"]')).not.toBeNull();
+    // Le seul soleil du Bureau est au bureau du directeur : la pièce d'un projet n'en a pas.
+    expect(container.querySelector('[data-detail="soleil"]')).toBeNull();
   });
 
   it("shows two night windows, a veil and three lit lamps at 22:00", () => {
@@ -69,5 +70,25 @@ describe("SallesCommunes day and night", () => {
     expect(ciels(container)).toEqual(Array(8).fill("jour"));
     expect(plafonniers(container)).toEqual(Array(4).fill("false"));
     expect(container.querySelector("[data-voile]")).toBeNull();
+  });
+
+  it("draws a single sun, in the director's office", () => {
+    const { container } = render(<SallesCommunes projets={[]} maintenant={at(14)} />);
+
+    const soleils = container.querySelectorAll('[data-detail="soleil"]');
+    expect(soleils).toHaveLength(1);
+    expect(soleils[0]?.closest("aside")?.getAttribute("aria-label")).toBe("Bureau du directeur");
+  });
+
+  it("lets the switch light a room by day, and darken it at night", () => {
+    const { container, unmount } = render(<Piece projet="lumiere-jour" etat={INITIAL} maintenant={at(14)} />);
+    fireEvent.click(screen.getByRole("button", { name: "Allumer la lumière : lumiere-jour" }));
+    expect(plafonniers(container)).toEqual(["true", "true", "true"]);
+    unmount();
+
+    const nuit = render(<Piece projet="lumiere-nuit" etat={INITIAL} maintenant={at(22)} />);
+    fireEvent.click(screen.getByRole("button", { name: "Éteindre la lumière : lumiere-nuit" }));
+    expect(plafonniers(nuit.container)).toEqual(["false", "false", "false"]);
+    expect(nuit.container.querySelector("[data-voile]")?.getAttribute("data-voile")).toBe("nuit-sombre");
   });
 });

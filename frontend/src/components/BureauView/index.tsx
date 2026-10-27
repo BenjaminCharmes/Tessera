@@ -4,12 +4,9 @@ import { useAlerteSonore } from "../../hooks/useAlerteSonore";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { useWeekEmployee } from "../../hooks/useWeekEmployee";
 import { contenuAToi } from "../../lib/bureau/aToi";
-import { modeCompact } from "../../lib/bureau/modeCompact";
 import type { RunActif } from "../../types/api";
-import AuRepos from "./AuRepos";
 import ColonneAToi from "./ColonneAToi";
 import type { ReglageSon } from "./ColonneAToi";
-import Compact from "./Compact";
 import PanneauAgentChoisi from "./PanneauAgentChoisi";
 import type { AgentChoisi } from "./PanneauAgentChoisi";
 import Piece from "./Piece";
@@ -33,7 +30,7 @@ interface BureauViewProps {
   envoyer: (runId: string, payload: Record<string, string>) => void;
   /** Le réglage « Son » de la question (ticket-554), tenu par la cloche : le Bureau n'en a pas un à lui. */
   son: ReglageSon;
-  /** Les projets sans run : ils ne comptent pas pour le seuil, et ne se dessinent qu'en compact. */
+  /** Les projets sans run : pas de pièce, mais l'employé de la semaine peut en venir. */
   auRepos?: readonly string[];
   /** Ouvre le fil d'un run (ticket-567). */
   onOuvrir?: (runId: string) => void;
@@ -44,8 +41,8 @@ interface BureauViewProps {
 }
 
 /**
- * Les pièces des projets qui ont un run, ou leurs rangées au-delà du seuil de
- * `modeCompact`. L'horloge se monte ici, une seule fois pour toute la vue.
+ * Les pièces des projets qui ont un run, une par ligne, quel que soit leur nombre.
+ * L'horloge se monte ici, une seule fois pour toute la vue.
  */
 export default function BureauView({
   projets,
@@ -61,7 +58,6 @@ export default function BureauView({
   // L'agent choisi : seul le couple est retenu, ses lignes se relisent à chaque rendu.
   const [choix, setChoix] = useState<AgentChoisi | null>(null);
   const projetChoisi = projets.find((p) => p.nom === choix?.projet);
-  const compact = modeCompact(projets.length);
 
   // Un run qui se clôt fait relire le tableau. Un compte et non un événement :
   // la vue ne reçoit que des états, et `runClosed` y est posé par `run_closed`.
@@ -79,39 +75,24 @@ export default function BureauView({
       <div className="flex min-w-0 flex-1 flex-col gap-3.5">
         <TableauDuJour maintenant={maintenant} signalRunsClos={runsClos} />
         <SallesCommunes projets={projets} maintenant={maintenant} employe={employe} />
-        <div
-          className={compact ? "flex flex-col gap-2" : "flex flex-col gap-3.5"}
-          data-mode={compact ? "compact" : "pieces"}
-        >
-          {projets.map(({ nom, etat, runId = null, run }) =>
-            compact ? (
-              <Compact
-                key={nom}
-                projet={nom}
-                etat={etat}
-                maintenant={maintenant}
-                run={run}
-                onOuvrir={onOuvrir}
-                onRanger={onRanger}
-              />
-            ) : (
-              <Piece
-                key={nom}
-                projet={nom}
-                etat={etat}
-                maintenant={maintenant}
-                runId={runId}
-                signalServices={signalServices}
-                run={run}
-                onOuvrir={onOuvrir}
-                onRanger={onRanger}
-                onChoisir={(projet, poste) => setChoix({ projet, poste })}
-                onOpenProject={onOpenProject}
-                sonActif={son.actif}
-              />
-            ),
-          )}
-          {compact && auRepos.map((nom) => <AuRepos key={nom} projet={nom} />)}
+        {/* Une pièce par projet, empilées sur toute la largeur : la vue défile en hauteur. */}
+        <div className="flex flex-col gap-3.5" data-mode="pieces">
+          {projets.map(({ nom, etat, runId = null, run }) => (
+            <Piece
+              key={nom}
+              projet={nom}
+              etat={etat}
+              maintenant={maintenant}
+              runId={runId}
+              signalServices={signalServices}
+              run={run}
+              onOuvrir={onOuvrir}
+              onRanger={onRanger}
+              onChoisir={(projet, poste) => setChoix({ projet, poste })}
+              onOpenProject={onOpenProject}
+              sonActif={son.actif}
+            />
+          ))}
         </div>
       </div>
       <div className="flex w-72 shrink-0 flex-col gap-3.5">

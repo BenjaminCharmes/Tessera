@@ -154,7 +154,7 @@ describe("Supervision — vue par défaut et sélecteur", () => {
   });
 });
 
-describe("Supervision — seuil du mode compact", () => {
+describe("Supervision — une pièce par projet", () => {
   it("draws rooms for six projects with a run", () => {
     const { container } = render(
       <SupervisionView supervision={supervision(lesRuns(6))} projects={tousLesProjets(6)} />,
@@ -164,40 +164,24 @@ describe("Supervision — seuil du mode compact", () => {
     expect(container.querySelector("[data-mode]")).toHaveAttribute("data-mode", "pieces");
   });
 
-  it("draws compact rows for seven projects with a run", () => {
+  it("still draws one room per project, stacked, for seven projects with a run", () => {
     const { container } = render(
       <SupervisionView supervision={supervision(lesRuns(7))} projects={tousLesProjets(7)} />,
     );
 
-    expect(screen.queryAllByRole("region")).toHaveLength(0);
-    expect(container.querySelector("[data-mode]")).toHaveAttribute("data-mode", "compact");
-    expect(container.querySelector("[data-mode]")?.children).toHaveLength(7);
+    expect(screen.getAllByRole("region")).toHaveLength(7);
+    expect(container.querySelector("[data-mode]")).toHaveAttribute("data-mode", "pieces");
   });
 
-  it("puts a project without a run at rest, after the others, in compact mode", () => {
-    const { container } = render(
-      <SupervisionView
-        supervision={supervision(lesRuns(7))}
-        projects={[...tousLesProjets(7), ...lesProjets("dormant")]}
-      />,
-    );
-
-    const lignes = [...(container.querySelector("[data-mode]")?.children ?? [])];
-    expect(lignes).toHaveLength(8);
-    const auRepos = screen.getByRole("group", { name: "dormant, au repos" });
-    expect(lignes[7]).toBe(auRepos);
-    expect(within(auRepos).getByText("au repos")).toBeInTheDocument();
-  });
-
-  it("does not count a project at rest toward the threshold", () => {
-    const { container } = render(
+  it("draws no room for a project at rest", () => {
+    render(
       <SupervisionView
         supervision={supervision(lesRuns(6))}
         projects={[...tousLesProjets(6), ...lesProjets("dormant")]}
       />,
     );
 
-    expect(container.querySelector("[data-mode]")).toHaveAttribute("data-mode", "pieces");
+    expect(screen.getAllByRole("region")).toHaveLength(6);
     expect(screen.queryByText("au repos")).toBeNull();
   });
 
@@ -267,23 +251,17 @@ describe("Supervision — chrono et fil depuis le Bureau", () => {
     expect(within(screen.getByRole("region", { name: "projet-1" })).getByText(/^1m \d+s$/)).toBeInTheDocument();
   });
 
-  it("opens the thread of a run from its room, and hides it again", async () => {
-    render(<SupervisionView supervision={supervision(lesRuns(2))} projects={tousLesProjets(2)} />);
-    expect(screen.queryByText("Fil de ticket-002")).toBeNull();
+  it("switches to the List, with that run selected, when its thread is opened from the room", async () => {
+    const selectionner = vi.fn();
+    render(
+      <SupervisionView supervision={supervision(lesRuns(2), {}, { selectionner })} projects={tousLesProjets(2)} />,
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Ouvrir le fil de ticket-002" }));
-    expect(screen.getByText("Fil de ticket-002")).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("button", { name: "Masquer le fil" }));
-    expect(screen.queryByText("Fil de ticket-002")).toBeNull();
-  });
-
-  it("opens the thread from a compact row", async () => {
-    render(<SupervisionView supervision={supervision(lesRuns(7))} projects={tousLesProjets(7)} />);
-
-    await userEvent.click(screen.getByRole("button", { name: "Ouvrir le fil de ticket-004" }));
-
-    expect(screen.getByText("Fil de ticket-004")).toBeInTheDocument();
+    expect(selectionner).toHaveBeenCalledWith("run-2");
+    expect(screen.getByRole("button", { name: "Liste" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByRole("region", { name: "projet-2" })).toBeNull();
   });
 });
 

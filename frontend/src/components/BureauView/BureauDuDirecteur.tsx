@@ -44,6 +44,7 @@ export default function BureauDuDirecteur({ agents, maintenant, employe = null }
   return (
     <Salle
       maintenant={maintenant}
+      avecSoleil
       accroche={employe && <CadreDeLEmploye employe={employe} />}
       titre="Bureau du directeur"
       entete="un agent dont la question attend ta réponse vient s'y tenir"

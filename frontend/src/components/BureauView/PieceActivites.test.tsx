@@ -26,7 +26,7 @@ function agents(conteneur: HTMLElement): HTMLElement[] {
 describe("Piece break activities", () => {
   it.each([
     { nom: "coffee at the post", hasard: TASSE, libelle: "boit un café à son poste" },
-    { nom: "stretching", hasard: ETIRE, libelle: "s'étire" },
+    { nom: "stretching", hasard: ETIRE, libelle: "fait une pause" },
     { nom: "coffee at the machine", hasard: MACHINE, libelle: "prend un café à la machine" },
   ])("names an agent who is done $nom", ({ hasard, libelle }) => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} hasard={hasard} />);
@@ -149,6 +149,8 @@ describe("Piece end of run", () => {
   it("keeps the five posts as buttons, clickable underneath the agents", () => {
     pieceClose();
 
-    expect(screen.getAllByRole("button")).toHaveLength(5);
+    // L'interrupteur est le seul autre bouton de la pièce.
+    const postes = screen.getAllByRole("button").filter((b) => !/lumière/.test(b.getAttribute("aria-label") ?? ""));
+    expect(postes).toHaveLength(5);
   });
 });

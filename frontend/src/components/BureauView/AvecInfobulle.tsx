@@ -6,6 +6,7 @@ import type { PositionFixe, Rectangle } from "../../lib/bureau/positionInfobulle
 
 interface InfobulleProps {
   id: string;
+  large: boolean;
   ancre: Rectangle;
   children: ReactNode;
 }
@@ -14,7 +15,7 @@ interface InfobulleProps {
  * La boîte de l'infobulle, rendue dans `document.body` : la pièce coupe ce qui
  * déborde (`overflow-hidden`). Elle se place sur l'ancre, une fois sa taille connue.
  */
-function Infobulle({ id, ancre, children }: InfobulleProps) {
+function Infobulle({ id, large, ancre, children }: InfobulleProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<PositionFixe>({ top: ancre.top, left: ancre.left });
 
@@ -34,7 +35,7 @@ function Infobulle({ id, ancre, children }: InfobulleProps) {
       ref={ref}
       role="tooltip"
       style={{ top: position.top, left: position.left }}
-      className="pointer-events-none fixed z-50 w-max max-w-72 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+      className={`pointer-events-none fixed z-50 w-max ${large ? "max-w-md" : "max-w-72"} rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200`}
     >
       {children}
     </div>,
@@ -48,6 +49,8 @@ interface AvecInfobulleProps {
   className: string;
   /** Le contenu de l'infobulle, montré au survol ou au focus. */
   infobulle: ReactNode;
+  /** Une infobulle qui liste plusieurs lignes longues : plus large, pour se lire sans s'empiler. */
+  large?: boolean;
   /** Un clic, ou Entrée ou Espace au clavier : l'objet devient un bouton (ticket-602). */
   onActiver?: () => void;
   children: ReactNode;
@@ -57,7 +60,7 @@ interface AvecInfobulleProps {
  * Un objet de la pièce focusable, avec son infobulle au survol et au focus.
  * L'ancre est le rectangle de l'objet à l'ouverture : l'infobulle se place dessus.
  */
-export default function AvecInfobulle({ label, className, infobulle, onActiver, children }: AvecInfobulleProps) {
+export default function AvecInfobulle({ label, className, infobulle, large = false, onActiver, children }: AvecInfobulleProps) {
   const [ancre, setAncre] = useState<Rectangle | null>(null);
   const racine = useRef<HTMLDivElement>(null);
   const idInfobulle = useId();
@@ -97,7 +100,7 @@ export default function AvecInfobulle({ label, className, infobulle, onActiver, 
       onBlur={fermer}
     >
       {ancre && (
-        <Infobulle id={idInfobulle} ancre={ancre}>
+        <Infobulle id={idInfobulle} large={large} ancre={ancre}>
           {infobulle}
         </Infobulle>
       )}

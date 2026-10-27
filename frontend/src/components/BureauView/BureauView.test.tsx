@@ -86,14 +86,11 @@ describe("BureauView", () => {
     expect(screen.getByTestId("bulle")).toHaveTextContent("!");
   });
 
-  it("switches to one compact row per project above the threshold", () => {
+  it("keeps one full room per project, stacked, however many there are", () => {
     const { container } = render(<BureauView projets={projets(7)} {...CANAL} />);
 
-    expect(screen.queryAllByRole("region")).toHaveLength(0);
-    expect(screen.getAllByRole("group")).toHaveLength(7);
-    // Les salles gardent leur plante : le compact ne dessine aucun sprite dans la liste des projets.
-    expect(container.querySelector('[data-mode="compact"]')?.querySelectorAll("svg")).toHaveLength(0);
-    expect(screen.getAllByRole("img", { name: "Codeur, travaille" }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("region")).toHaveLength(7);
+    expect(container.querySelector('[data-mode="pieces"]')?.className).toContain("flex-col");
     expect(vi.getTimerCount()).toBe(1);
   });
 });

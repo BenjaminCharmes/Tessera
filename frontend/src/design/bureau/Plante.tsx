@@ -2,8 +2,8 @@
 export default function Plante() {
   return (
     <svg
-      width="24"
-      height="30"
+      width="40"
+      height="50"
       viewBox="0 0 8 10"
       shapeRendering="crispEdges"
       aria-hidden="true"

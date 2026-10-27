@@ -5,8 +5,10 @@ import Personnage from "./Personnage";
 interface AgentDeboutProps {
   projet: string;
   role: PosteId;
-  /** Les bras levés : il s'étire. Sinon, tasse à la main. */
-  etire?: boolean;
+  /** Les bras levés : il fête la PR mergée. */
+  brasLeves?: boolean;
+  /** Les bras le long du corps, mains vides : il fait une pause. Sinon, tasse à la main. */
+  sansTasse?: boolean;
   /** Une feuille annotée à la main : il rend sa copie au codeur. */
   feuille?: boolean;
 }
@@ -14,9 +16,9 @@ interface AgentDeboutProps {
 /**
  * L'agent qui a fini, debout à côté de son poste : sa propre grille 12 × 20 en
  * 42 × 70 px, à l'échelle du personnage assis (tête de 6 unités dans les deux).
- * `overflow-visible` : le chignon dépasse la grille de deux unités.
+ * `overflow-visible` : les bras levés de la fête dépassent la grille.
  */
-export default function AgentDebout({ projet, role, etire = false, feuille = false }: AgentDeboutProps) {
+export default function AgentDebout({ projet, role, brasLeves = false, sansTasse = false, feuille = false }: AgentDeboutProps) {
   return (
     <svg
       width="42"
@@ -27,7 +29,7 @@ export default function AgentDebout({ projet, role, etire = false, feuille = fal
       className="overflow-visible"
       data-sprite="agent-debout"
     >
-      <Personnage pose="debout" tenue={TENUES[role]} physique={physique(projet, role)} etire={etire} feuille={feuille} />
+      <Personnage pose="debout" tenue={TENUES[role]} physique={physique(projet, role)} brasLeves={brasLeves} sansTasse={sansTasse} feuille={feuille} />
     </svg>
   );
 }

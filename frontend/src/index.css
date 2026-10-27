@@ -98,6 +98,14 @@
   --sprite-halo: rgb(253 224 71 / 0.18);
   --sprite-voile: rgb(9 9 20 / 0.28);
   --sprite-cadre-dore: #ca8a04;
+  /* Le mur du fond et sa plinthe, les nuages, le voile d'une nuit sans lumière
+     et l'interrupteur (ticket-609) : des fonds de sprite. */
+  --sprite-mur: #3a3430;
+  --sprite-plinthe: #1c1917;
+  --sprite-nuage: #f4f4f5;
+  --sprite-voile-sombre: rgb(9 9 20 / 0.55);
+  --sprite-interrupteur: #d4d4d8;
+  --sprite-interrupteur-touche: #71717a;
   --sprite-cadre-fond: #27272a;
 }
 

@@ -52,7 +52,7 @@ describe("SallePause", () => {
 
     const salle = screen.getByRole("complementary", { name: "Salle de pause" });
     expect(salle.querySelector('[data-sprite="plante"]')).not.toBeNull();
-    expect(salle).toHaveAttribute("data-sol", "lames");
+    expect(salle.querySelector('[data-sol="lames"]')).not.toBeNull();
   });
 });
 
@@ -109,6 +109,6 @@ describe("SalleReunion", () => {
 
     const salle = screen.getByRole("complementary", { name: "Salle de réunion" });
     expect(salle.querySelector('[data-sprite="plante"]')).not.toBeNull();
-    expect(salle).toHaveAttribute("data-sol", "lames");
+    expect(salle.querySelector('[data-sol="lames"]')).not.toBeNull();
   });
 });

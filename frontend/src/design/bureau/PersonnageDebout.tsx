@@ -5,8 +5,10 @@ import { FILL_HAUT, FILL_OMBRE, FILL_PEAU } from "./tons";
 interface PersonnageDeboutProps {
   tenue: Tenue;
   physique: Physique;
-  /** Les bras levés, sans tasse : l'agent s'étire. */
-  etire?: boolean;
+  /** Les bras levés, sans tasse : l'agent fête la PR mergée. */
+  brasLeves?: boolean;
+  /** Les bras le long du corps, mains vides : l'agent fait une pause. */
+  sansTasse?: boolean;
   /** Une feuille annotée à la main, à la place de la tasse : l'agent rend sa copie. */
   feuille?: boolean;
 }
@@ -25,14 +27,32 @@ function BrasALaFeuille({ ombre }: { ombre: string }) {
 }
 
 /** Les bras : le long du corps et la tasse à la main, levés au-dessus de la tête, ou tendus avec la feuille. */
-function Bras({ haut, etire, feuille }: { haut: Tenue["haut"]; etire: boolean; feuille: boolean }) {
+function Bras({
+  haut,
+  brasLeves,
+  sansTasse,
+  feuille,
+}: {
+  haut: Tenue["haut"];
+  brasLeves: boolean;
+  sansTasse: boolean;
+  feuille: boolean;
+}) {
   const ombre = FILL_OMBRE[haut];
   if (feuille) return <BrasALaFeuille ombre={ombre} />;
-  if (etire) {
+  if (brasLeves) {
     return (
       <g data-bras="leves">
         <rect x="0" y="0" width="1" height="7" className={ombre} />
         <rect x="9" y="0" width="1" height="7" className={ombre} />
+      </g>
+    );
+  }
+  if (sansTasse) {
+    return (
+      <g data-bras="ballants">
+        <rect x="0" y="7" width="1" height="5" className={ombre} />
+        <rect x="9" y="7" width="1" height="5" className={ombre} />
       </g>
     );
   }
@@ -67,10 +87,16 @@ function Jambes({ tenue, physique }: PersonnageDeboutProps) {
 
 /**
  * Le personnage debout, dans la grille 12 × 20 (42 × 70 px) : l'agent qui a fini,
- * tasse à la main, ou les bras levés quand il s'étire. Il se dessine à côté de
+ * tasse à la main, les mains vides en pause, ou les bras levés pour fêter la PR. Il se dessine à côté de
  * son poste, pas dedans.
  */
-export default function PersonnageDebout({ tenue, physique, etire = false, feuille = false }: PersonnageDeboutProps) {
+export default function PersonnageDebout({
+  tenue,
+  physique,
+  brasLeves = false,
+  sansTasse = false,
+  feuille = false,
+}: PersonnageDeboutProps) {
   const ombre = FILL_OMBRE[tenue.haut];
   return (
     <g data-sprite="personnage" data-pose="debout">
@@ -84,7 +110,7 @@ export default function PersonnageDebout({ tenue, physique, etire = false, feuil
       )}
       {tenue.capuche && <rect data-detail="capuche" x="3" y="6" width="4" height="1" className={ombre} />}
       <Jambes tenue={tenue} physique={physique} />
-      <Bras haut={tenue.haut} etire={etire} feuille={feuille} />
+      <Bras haut={tenue.haut} brasLeves={brasLeves} sansTasse={sansTasse} feuille={feuille} />
     </g>
   );
 }

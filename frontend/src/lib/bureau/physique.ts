@@ -3,14 +3,14 @@ import type { PosteId } from "./postesDuRun";
 /** Indice d'un ton de peau (`--sprite-peau-N`) et d'une couleur de cheveux (`--sprite-cheveux-N`). */
 export type Peau = 1 | 2 | 3 | 4 | 5;
 export type Cheveux = 1 | 2 | 3 | 4 | 5 | 6;
-export type Coiffure = "court" | "long" | "chignon" | "chauve";
+export type Coiffure = "court" | "long" | "carre" | "chauve";
 
 /** Ce qui change d'un agent à l'autre : tiré d'une graine stable, jamais de l'état du run. */
 export interface Physique {
   peau: Peau;
   cheveux: Cheveux;
   coiffure: Coiffure;
-  /** Jupe plutôt que pantalon : seulement avec des cheveux longs ou un chignon. */
+  /** Jupe plutôt que pantalon : seulement avec des cheveux longs ou un carré. */
   jupe: boolean;
 }
 
@@ -36,7 +36,7 @@ const CHEVEUX: readonly [Cheveux, ...Cheveux[]] = [1, 2, 3, 4, 5, 6];
 const COIFFURES: readonly [Coiffure, ...Coiffure[]] = [
   "court",
   "long",
-  "chignon",
+  "carre",
   "court",
   "chauve",
   "long",
@@ -60,7 +60,7 @@ function choisir<T>(liste: readonly [T, ...T[]], i: number): T {
 export function physique(projet: string, role: PosteId): Physique {
   const g = graine(`${projet}:${role}`);
   const coiffure = choisir(COIFFURES, g);
-  const cheveuxLongs = coiffure === "long" || coiffure === "chignon";
+  const cheveuxLongs = coiffure === "long" || coiffure === "carre";
   return {
     peau: choisir(PEAUX, g >> 2),
     cheveux: choisir(CHEVEUX, g >> 4),

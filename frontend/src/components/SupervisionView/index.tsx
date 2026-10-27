@@ -54,6 +54,11 @@ export default function SupervisionView({
       son={son}
       selecteur={selecteur}
       onOpenProject={onOpenProject}
+      onOuvrirFil={(runId) => {
+        // Le fil d'un run se lit dans la Liste, run choisi : le Bureau ne s'ouvre pas en deux.
+        supervision.selectionner(runId);
+        setVue("liste");
+      }}
     />
   ) : (
     <ListeView

@@ -2,11 +2,11 @@ import { POSTES } from "./postesDuRun";
 import type { PosteDuRun, PosteId } from "./postesDuRun";
 
 /**
- * Ce que fait un agent qui a fini : café à son poste, s'étirer, ou aller à la machine.
+ * Ce que fait un agent qui a fini : café à son poste, une pause mains vides, ou la machine.
  * `fete` ne se tire jamais : la PR mergée la donne à tous, bras levés (ticket-598).
  * `copie` non plus : le refus du reviewer ou du validateur l'impose, feuille en main (ticket-599).
  */
-export type Activite = "tasse" | "etire" | "machine" | "fete" | "copie";
+export type Activite = "tasse" | "pause" | "machine" | "fete" | "copie";
 
 /** Un tirage dans [0, 1[ : `Math.random` en production, une suite fixe dans les tests. */
 export type Hasard = () => number;
@@ -20,11 +20,11 @@ export const PLACES_MACHINE = 3;
 export const CHANCE_DE_CHANGER = 0.25;
 
 /** Le café à son poste pèse double, comme dans la maquette. */
-const TIRAGE: readonly Activite[] = ["tasse", "tasse", "etire", "machine"];
+const TIRAGE: readonly Activite[] = ["tasse", "tasse", "pause", "machine"];
 
 const LIBELLES: Record<Activite, string> = {
   tasse: "boit un café à son poste",
-  etire: "s'étire",
+  pause: "fait une pause",
   machine: "prend un café à la machine",
   fete: "fête la PR mergée",
   copie: "rend sa copie au codeur",

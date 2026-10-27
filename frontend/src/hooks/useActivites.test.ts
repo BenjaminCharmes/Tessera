@@ -9,7 +9,7 @@ describe("useActivites", () => {
   it("gives an activity to each done agent in the first render, and none to the others", () => {
     const { result } = renderHook(() => useActivites(["codeur"], 0, () => 0.5));
 
-    expect(result.current).toEqual({ codeur: "etire" });
+    expect(result.current).toEqual({ codeur: "pause" });
   });
 
   it("keeps the activities while the clock does not move", () => {
@@ -22,7 +22,7 @@ describe("useActivites", () => {
 
     rerender({ faits: ["codeur"], maintenant: 0 });
 
-    expect(result.current).toEqual({ codeur: "etire" });
+    expect(result.current).toEqual({ codeur: "pause" });
     expect(hasard.mock.calls.length).toBe(appels);
   });
 
@@ -34,7 +34,7 @@ describe("useActivites", () => {
       ({ faits, maintenant }: Props) => useActivites(faits, maintenant, hasard),
       { initialProps: { faits: ["codeur"], maintenant: 0 } as Props },
     );
-    expect(result.current.codeur).toBe("etire");
+    expect(result.current.codeur).toBe("pause");
 
     rerender({ faits: ["codeur"], maintenant: 5_000 });
 

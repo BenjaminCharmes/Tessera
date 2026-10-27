@@ -1,18 +1,12 @@
-import { useState } from "react";
 import type { ReactNode } from "react";
 import type { ReglageSon } from "../BureauView/ColonneAToi";
-import Button from "../../design/ui/Button";
-import AgentPanel from "../AgentPanel";
 import BureauView from "../BureauView";
-import { useEtatRun } from "../../hooks/runStore";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import { projetsDuBureau } from "../../lib/bureau/projetsDuBureau";
 import type { Project, ServiceActif } from "../../types/api";
 import EnteteSupervision from "./EnteteSupervision";
 import VueVide from "./VueVide";
 import type { IssueDuRun } from "./issueDuRun";
-import { projeter } from "./projeter";
-import { projetDuRun } from "./projetDuRun";
 import { entreesDuMenu, idsARanger, runsClosDe } from "./rangement";
 
 interface BureauConnecteProps {
@@ -24,6 +18,8 @@ interface BureauConnecteProps {
   selecteur?: ReactNode;
   /** La porte d'une pièce : choisit le projet et ouvre l'onglet Tickets (ticket-602). */
   onOpenProject?: (project: Project) => void;
+  /** Le bouton « Fil » d'une pièce : bascule sur la Liste, ce run choisi. */
+  onOuvrirFil?: (runId: string) => void;
 }
 
 /**
@@ -38,11 +34,9 @@ export default function BureauConnecte({
   son,
   selecteur,
   onOpenProject,
+  onOuvrirFil,
 }: BureauConnecteProps) {
   const { runs, etatDe, fermerRuns } = supervision;
-  const [filOuvert, setFilOuvert] = useState<string | null>(null);
-  const run = runs.find((r) => r.run_id === filOuvert) ?? null;
-  const etatDuFil = useEtatRun(run?.run_id ?? "");
   const { projets, auRepos } = projetsDuBureau(
     runs,
     etatDe,
@@ -50,7 +44,6 @@ export default function BureauConnecte({
   );
 
   function ranger(ids: string[]) {
-    if (filOuvert !== null && ids.includes(filOuvert)) setFilOuvert(null);
     fermerRuns(ids);
   }
 
@@ -79,26 +72,10 @@ export default function BureauConnecte({
             signalServices={supervision.signalServices}
             envoyer={supervision.envoyer}
             son={son}
-            onOuvrir={setFilOuvert}
+            onOuvrir={onOuvrirFil}
             onRanger={(runId) => ranger([runId])}
             onOpenProject={onOpenProject && ouvrirLeProjet}
           />
-        </div>
-      )}
-      {run && (
-        <div className="flex h-1/2 min-h-0 flex-col border-t border-zinc-800">
-          <div className="flex items-center justify-between px-3 py-1.5">
-            <span className="text-micro text-zinc-500">Fil de {run.ticket_id ?? run.mode}</span>
-            <Button taille="compact" variante="discret" onClick={() => setFilOuvert(null)}>
-              Masquer le fil
-            </Button>
-          </div>
-          <div className="min-h-0 flex-1 overflow-hidden">
-            <AgentPanel
-              project={projetDuRun(projects, run)}
-              stream={projeter(supervision, run.run_id, etatDuFil)}
-            />
-          </div>
         </div>
       )}
     </div>

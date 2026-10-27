@@ -2,6 +2,7 @@ import AgentDebout from "../../design/bureau/AgentDebout";
 import { libelleActivite } from "../../lib/bureau/activites";
 import type { AgentPlace } from "../../lib/bureau/activites";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import { useEtirementDuSol } from "../../hooks/useEtirementDuSol";
 
 interface AgentsDeLaPieceProps {
   projet: string;
@@ -16,9 +17,11 @@ const DENIVELE_DU_FOND = 104;
 function AgentMarcheur({ projet, agent }: { projet: string; agent: AgentPlace }) {
   const rendSaCopie = agent.activite === "copie";
   const monte = agent.niveau === "fond" ? -DENIVELE_DU_FOND : 0;
+  // Les abscisses sont celles du repère de 800 px : étirées comme la grille des postes.
+  const etirement = useEtirementDuSol();
   const style = {
     bottom: BAS_DE_LA_RANGEE,
-    transform: `translate(${agent.x}px, ${monte}px)`,
+    transform: `translate(${agent.x * etirement}px, ${monte}px)`,
     opacity: agent.parti ? 0 : 1,
   };
   // Parti, l'agent n'est plus ni lu ni focalisable : il s'efface, il ne disparaît pas du DOM
@@ -41,7 +44,8 @@ function AgentMarcheur({ projet, agent }: { projet: string; agent: AgentPlace })
       <AgentDebout
         projet={projet}
         role={agent.poste}
-        etire={agent.activite === "etire" || agent.activite === "fete"}
+        brasLeves={agent.activite === "fete"}
+        sansTasse={agent.activite === "pause"}
         feuille={rendSaCopie}
       />
     </span>

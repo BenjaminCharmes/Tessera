@@ -99,6 +99,11 @@ const ETAT_DITS: Record<EtatCase, string> = {
   echoue: "refusé",
 };
 
+/** L'état d'une ligne, en toutes lettres. */
+export function etatDit(etat: EtatCase): string {
+  return ETAT_DITS[etat];
+}
+
 /** Une ligne de l'infobulle : le critère et son état, en toutes lettres. */
 export function ligneDeLInfobulle({ texte, etat }: LigneDuTableau, rang: number): string {
   return `${texte || `Critère ${rang + 1}`} — ${ETAT_DITS[etat]}`;

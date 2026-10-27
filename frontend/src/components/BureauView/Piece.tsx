@@ -27,7 +27,8 @@ import AgentsDeLaPiece from "./AgentsDeLaPiece";
 import FondDeLaPiece from "./FondDeLaPiece";
 import ObjetsDeLaPiece from "./ObjetsDeLaPiece";
 import PosteDeTravail from "./PosteDeTravail";
-import SolMisAEchelle from "./SolMisAEchelle";
+import SolEtire from "./SolEtire";
+import { useLumiere } from "../../hooks/useLumiere";
 
 interface PieceProps {
   projet: string;
@@ -106,6 +107,8 @@ export default function Piece({
   );
   // Fanfare, alarme, glouglou, frappes : ce que la pièce vient de montrer, dit à voix haute (ticket-603).
   useSonsDeLaPiece(signauxSonores(etat, fete, gyrophare, agents), sonActif);
+  const moment = dayMoment(maintenant);
+  const [lumiere, basculerLumiere] = useLumiere(projet, moment);
 
   return (
     <section
@@ -118,13 +121,15 @@ export default function Piece({
         {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
       </div>
       <div data-sol="lames" className="sol-lames relative">
-        {/* Sol de 800 px, celui de la maquette, rendu à l'échelle de la largeur de la salle. */}
-        <SolMisAEchelle>
+        {/* Le repère de 800 px de la maquette, étiré sur la largeur de la pièce ; les sprites gardent leur taille. */}
+        <SolEtire>
           <FondDeLaPiece
             projet={projet}
             etat={etat}
             machineEnService={machineEnService(agents)}
             maintenant={maintenant}
+            allume={lumiere}
+            onBasculerLumiere={basculerLumiere}
             onOpenProject={onOpenProject && (() => onOpenProject(projet))}
           />
           <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
@@ -149,7 +154,7 @@ export default function Piece({
               <Gyrophare />
             </span>
           )}
-        </SolMisAEchelle>
+        </SolEtire>
         <div className="flex min-h-9 items-end justify-between px-3 py-2">
           <div className="flex min-h-5 items-center">
             {fete && <StatusPill etat="reussi" libelle="PR mergée" />}
@@ -166,7 +171,7 @@ export default function Piece({
           signalServices={signalServices}
           onOuvrir={onOuvrir}
         />
-        {dayMoment(maintenant) === "nuit" && <NightVeil />}
+        {moment === "nuit" && <NightVeil sombre={!lumiere} />}
       </div>
     </section>
   );
