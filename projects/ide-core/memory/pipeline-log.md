@@ -5713,3 +5713,35 @@ Le diff ajoute :
 - 2026-10-27 20:27:27 UTC — [ticket-576] APPROVED après 1 tour(s)
 - 2026-10-27 20:27:32 UTC — [ticket-576] fichiers non suivis laissés par le run : tickets/todo/ticket-611-structured-output-spike-on-the-pinned-sdk.md, tickets/todo/ticket-612-providers-carry-a-schema-and-return-structured-output.md, tickets/todo/ticket-613-security-and-validator-read-their-verdict-from-a-schema.md, tickets/todo/ticket-614-reviewer-verdict-comes-from-a-structured-output.md, tickets/todo/ticket-615-the-interface-reads-the-reviewer-verdict-from-its-event-field.md (à ignorer dans .gitignore ?)
 - 2026-10-27 20:29:53 UTC — [ticket-576] documentation: 0 fichier(s) (141078ms) — après tour de correction
+- 2026-10-27 20:30:12 UTC — [ide-core] ticket-576 PR #700 confiée au CIWatcher
+- 2026-10-27 20:30:15 UTC — [ticket-570] branche ticket-570-design-of-an-opt-in-visual-check-screenshots-at-t
+- 2026-10-27 20:31:14 UTC — [ticket-570] plan rendu (58592ms)
+- 2026-10-27 20:31:14 UTC — [ticket-570] tour 1 — codeur démarré
+- 2026-10-27 20:33:27 UTC — [ticket-570] tour 1 — architect terminé (132594ms)
+- 2026-10-27 20:33:29 UTC — [ticket-570] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:34:02 UTC — [ticket-570] securite: PASS — Diff purement documentaire : ajout d'une contrainte proposée et de son ADR-061.  (32500ms)
+- 2026-10-27 20:34:02 UTC — [ticket-570] tour 1 — reviewer démarré
+- 2026-10-27 20:34:30 UTC — [ticket-570] tour 1 — reviewer terminé (28608ms)
+- 2026-10-27 20:36:12 UTC — [ide-core] ticket-576 PR #700 mergée (CI verte)
+- 2026-10-27 20:38:27 UTC — [ticket-570] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:38:27 UTC — [ticket-570] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-061 a été créée pour documenter le cont (265625ms)
+- 2026-10-27 20:38:27 UTC — [ticket-570] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 20:38:27 UTC — [ticket-570] tour 2 — codeur démarré
+- 2026-10-27 20:38:50 UTC — [ticket-570] tour 2 — architect terminé (22984ms)
+- 2026-10-27 20:38:52 UTC — [ticket-570] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:39:13 UTC — [ticket-570] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une règle architecturale (ADR-061) (20890ms)
+- 2026-10-27 20:39:13 UTC — [ticket-570] tour 2 — reviewer démarré
+- 2026-10-27 20:39:31 UTC — [ticket-570] tour 2 — reviewer terminé (17687ms)
+- 2026-10-27 20:43:51 UTC — [ticket-570] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:43:51 UTC — [ticket-570] validateur: CHANGES_REQUESTED — Le premier critère est satisfait avec la création de l'ADR-061. Le troisième cri (277547ms)
+- 2026-10-27 20:43:51 UTC — [ticket-570] CHANGES_REQUESTED tour 2: Validateur : Le premier critère est satisfait avec la création de l'ADR-061. Le troisième critère est également respecté avec la liste des tickets d'implémentation. Le second critère n'est pas vérifia
+- 2026-10-27 20:43:51 UTC — [ticket-570] tour 3 — codeur démarré
+- 2026-10-27 20:44:07 UTC — [ticket-570] tour 3 — architect terminé (16530ms)
+- 2026-10-27 20:44:09 UTC — [ticket-570] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:44:44 UTC — [ticket-570] securite: PASS — Le diff modifie uniquement deux fichiers de documentation (contraintes.md et dec (34921ms)
+- 2026-10-27 20:44:44 UTC — [ticket-570] tour 3 — reviewer démarré
+- 2026-10-27 20:45:05 UTC — [ticket-570] tour 3 — reviewer terminé (20250ms)
+- 2026-10-27 20:49:44 UTC — [ticket-570] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 20:50:23 UTC — [ticket-570] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:50:23 UTC — [ticket-570] validateur: APPROVED — Ticket de conception complet : l'ADR-061 décrit une architecture opt-in (déclara (338781ms)
+- 2026-10-27 20:50:23 UTC — [ticket-570] APPROVED après 3 tour(s)
