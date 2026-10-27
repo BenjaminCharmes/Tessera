@@ -5618,3 +5618,4 @@ Le diff ajoute :
 - 2026-10-27 17:35:38 UTC — [ticket-569] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué) ; non joints (budget épuisé) : memory/decisions.md
 - 2026-10-27 17:35:38 UTC — [ticket-569] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests unitaires complet (323015ms)
 - 2026-10-27 17:35:38 UTC — [ticket-569] APPROVED après 3 tour(s)
+- 2026-10-27 17:39:51 UTC — [ticket-569] documentation: 1 fichier(s) (247858ms)
