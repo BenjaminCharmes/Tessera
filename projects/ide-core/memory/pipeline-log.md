@@ -5268,3 +5268,16 @@ Le diff ajoute :
 - 2026-10-27 10:01:28 UTC — [ticket-584] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit une chaîne de décision dans (336546ms)
 - 2026-10-27 10:01:28 UTC — [ticket-584] APPROVED après 2 tour(s)
 - 2026-10-27 10:05:05 UTC — [ticket-584] documentation: 0 fichier(s) (213218ms) — après tour de correction — refusé : doc-technique : docs/configuration.md : texte introuvable — « make dev           # Lance FastAPI sur http://localhost:8000 ». L'agent a proposé une modification
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-595 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-596 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-597 retiré de la file

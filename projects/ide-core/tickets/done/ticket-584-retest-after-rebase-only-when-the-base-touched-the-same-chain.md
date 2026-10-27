@@ -4,7 +4,7 @@ created: 2026-10-26
 depends_on: []
 estimated_days: 0.5
 id: ticket-584
-pr_number: null
+pr_number: 673
 priority: high
 status: done
 title: The post-rebase retest runs only when the base brought changes to a chain the
