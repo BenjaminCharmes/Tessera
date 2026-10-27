@@ -9,6 +9,7 @@ import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import StatusPill from "../../design/ui/StatusPill";
 import { libelleDeSuite } from "../../lib/bureau/etapeDeSuite";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
+import { postesAbsents } from "../../lib/bureau/sallesCommunes";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
 import { enEtapeSilencieuse, santeAgent } from "../../lib/santeAgent";
 import type { RunActif } from "../../types/api";
@@ -75,7 +76,11 @@ export default function Piece({
   const clos = !auRepos && etat.runClosed;
   const faits = auRepos ? [] : postesFaits(postes);
   const activites = useActivites(faits, maintenant, hasard);
-  const agents = placerLesAgents(faits, activites, clos);
+  // Un agent chez le directeur ou aux RH n'est plus à sa place : il ne se dessine qu'à un endroit.
+  const absents = postesAbsents(etat, maintenant);
+  const agents = placerLesAgents(faits, activites, clos).map((a) =>
+    absents.includes(a.poste) ? { ...a, activite: null, parti: true } : a,
+  );
 
   return (
     <section
@@ -83,7 +88,7 @@ export default function Piece({
       data-contour={contour}
       className={`overflow-hidden rounded-lg border bg-zinc-900 ${CONTOURS[contour]}`}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-2">
+      <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">
         <h3 className="truncate text-corps font-semibold text-zinc-200">{projet}</h3>
         {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
       </div>
@@ -101,6 +106,7 @@ export default function Piece({
                   sante={sante}
                   auRepos={auRepos}
                   parti={clos}
+                  absent={absents.includes(p.poste)}
                   onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
                 />
               ))}

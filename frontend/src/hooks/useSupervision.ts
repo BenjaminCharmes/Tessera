@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { wsUrl } from "../lib/ws";
-import { INITIAL, applyEvent, etatDepuisRun } from "./streamState";
+import { INITIAL, etatDepuisRun } from "./streamState";
+import { rejouerHistorique } from "./historiqueDuRun";
 import type { StreamState } from "./streamState";
-import { LIGNES_GARDEES, cleDuService, majDesRuns } from "./supervisionEvents";
+import { LIGNES_GARDEES, cleDuService, majDesRuns, rattacherAuRun } from "./supervisionEvents";
 import { abonnementsVoulus, diffDesAbonnements } from "./abonnements";
 import type { SlotsDAbonnement } from "./abonnements";
-import type { OrchestratorEvent, RunActif, RunEvent } from "../types/api";
-import { api } from "../lib/api";
+import type { OrchestratorEvent, RunActif } from "../types/api";
 import { runStore } from "./runStore";
 
 /** Lance une RAF en navigateur, un setTimeout(16) hors navigateur (ticket-353). */
@@ -109,6 +109,11 @@ export function useSupervision(): UseSupervisionResult {
   // Regroupement par image : événements reçus mais pas encore appliqués (ticket-353).
   const pendingRef = useRef<OrchestratorEvent[]>([]);
   const rafIdRef = useRef<number | null>(null);
+  // Les runs vivants, lus par le handler de la socket qui ne se recrée pas (ticket-597).
+  const runsRef = useRef<RunActif[]>([]);
+  useEffect(() => {
+    runsRef.current = runs;
+  }, [runs]);
 
   /**
    * Applique tous les événements en attente : met à jour le store externe
@@ -186,29 +191,7 @@ export function useSupervision(): UseSupervisionResult {
      */
     const chargerHistorique = async (runId: string, dbRunId: string) => {
       try {
-        const evts: RunEvent[] = await api.runs.events(dbRunId);
-        const dernierTs = evts.length > 0 ? evts[evts.length - 1].timestamp : null;
-        let etat: StreamState = INITIAL;
-        for (const ev of evts) {
-          etat = applyEvent(etat, {
-            ...ev,
-            ticket_id: "",
-            run_id: runId,
-          } as OrchestratorEvent);
-        }
-        for (const ev of historyBufferRef.current[runId] ?? []) {
-          if (!dernierTs || ev.timestamp > dernierTs) {
-            etat = applyEvent(etat, ev);
-          }
-        }
-        runStore.set(runId, etat);
-      } catch {
-        // Historique indisponible : vider le tampon sur l'état courant.
-        let etat = runStore.getSnapshot()[runId] ?? INITIAL;
-        for (const ev of historyBufferRef.current[runId] ?? []) {
-          etat = applyEvent(etat, ev);
-        }
-        runStore.set(runId, etat);
+        await rejouerHistorique(runId, dbRunId, () => historyBufferRef.current[runId] ?? []);
       } finally {
         historyLoadedRef.current.add(runId);
         delete historyBufferRef.current[runId];
@@ -276,22 +259,24 @@ export function useSupervision(): UseSupervisionResult {
             return;
           }
 
-          const runId = brut.run_id;
+          // Un repli n'a que son projet : on le relie au run non clos (ticket-597).
+          const evenement = rattacherAuRun(brut, runsRef.current, (id) => runStore.getSnapshot()[id]?.runClosed === true);
+          const runId = evenement.run_id;
           if (!runId) return;
 
           // Ticket-325 : si l'historique est en cours de chargement, mettre
           // l'événement en tampon plutôt que de l'appliquer immédiatement.
           if (runId in historyBufferRef.current) {
-            historyBufferRef.current[runId]!.push(brut);
+            historyBufferRef.current[runId]!.push(evenement);
             // Tokens ignorés ici aussi : ils ne changent rien dans la liste.
-            if (brut.type !== "agent_token") {
-              setRuns((prec) => majDesRuns(prec, brut, runId));
+            if (evenement.type !== "agent_token") {
+              setRuns((prec) => majDesRuns(prec, evenement, runId));
             }
             return;
           }
 
           // Regroupement par image : mise en file + RAF (ticket-353).
-          pendingRef.current.push(brut);
+          pendingRef.current.push(evenement);
           scheduleFlush();
         } catch {
           // trame malformée : l'ignorer vaut mieux que casser l'affichage

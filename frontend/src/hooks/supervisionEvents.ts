@@ -48,6 +48,27 @@ function titreDuStatut(ev: OrchestratorEvent): Partial<RunActif> {
   return typeof titre === "string" ? { ticket_titre: titre } : {};
 }
 
+/**
+ * Un `provider_fallback` naît dans le provider, qui ne connaît pas le run : il
+ * porte `project_id` et pas `run_id` (repli.py). Un projet ne tient qu'un run
+ * à la fois (ADR-038) côté backend, mais la liste affichée garde les runs clos
+ * tant qu'on ne les a pas rangés : le projet seul ne suffit donc pas. On écarte
+ * les runs que `estClos` dit terminés et on prend le plus récent des autres
+ * (les nouveaux runs s'ajoutent en fin de liste). Sans run vivant pour ce
+ * projet, l'événement reste tel quel et la supervision l'ignore, faute de
+ * pièce où le montrer.
+ */
+export function rattacherAuRun(
+  ev: OrchestratorEvent,
+  runs: readonly RunActif[],
+  estClos: (runId: string) => boolean,
+): OrchestratorEvent {
+  if (ev.type !== "provider_fallback" || ev.run_id || !ev.project_id) return ev;
+  const vivants = runs.filter((r) => r.project_id === ev.project_id && !estClos(r.run_id));
+  const run = vivants[vivants.length - 1];
+  return run ? { ...ev, run_id: run.run_id } : ev;
+}
+
 /** Garde la carte d'un run en phase avec ce qu'il annonce. */
 export function majDesRuns(
   prec: RunActif[],

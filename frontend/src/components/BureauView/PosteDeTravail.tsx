@@ -13,6 +13,8 @@ interface PosteDeTravailProps {
   auRepos?: boolean;
   /** Run clos : les agents sont partis, aucun ne reste assis. */
   parti?: boolean;
+  /** L'agent est chez le directeur ou aux RH : le poste reste, sa chaise est vide (ticket-597). */
+  absent?: boolean;
   /** Choisit l'agent au clic ; seul un poste occupé en a un (ticket-582). */
   onChoisir?: (poste: PosteDuRun["poste"]) => void;
 }
@@ -28,6 +30,7 @@ export default function PosteDeTravail({
   sante,
   auRepos = false,
   parti = false,
+  absent = false,
   onChoisir,
 }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
@@ -35,13 +38,16 @@ export default function PosteDeTravail({
   // L'agent qui a fini se lève : la pièce le dessine hors du poste (AgentsDeLaPiece).
   return (
     <div
+      data-absent={absent}
       className={`flex flex-col items-center gap-1 pb-2 ${poste.etat === "libre" ? "opacity-50" : ""}`}
     >
-      <div className="flex h-5 items-end">{occupe && <Bulle sante={sante} />}</div>
+      {/* La bulle suit l'agent : absent, c'est la salle où il est qui la porte. */}
+      <div className="flex h-5 items-end">{occupe && !absent && <Bulle sante={sante} />}</div>
       <button
         type="button"
         aria-label={libelleDuPoste(poste.poste, poste.etat, sante, auRepos)}
         onClick={choisir}
+        tabIndex={absent ? -1 : undefined}
         className={`relative rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}
       >
         <Poste
@@ -50,7 +56,7 @@ export default function PosteDeTravail({
           etat={poste.etat}
           sante={sante}
           auRepos={auRepos}
-          parti={parti}
+          parti={parti || absent}
         />
       </button>
       <span className="text-micro text-zinc-400">{nomDuPoste(poste.poste)}</span>

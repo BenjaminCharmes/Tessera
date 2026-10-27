@@ -257,7 +257,8 @@ describe("Piece health words", () => {
     { depuis: 5, question: null, mot: "travaille", signe: null },
     { depuis: 31, question: null, mot: "silencieux", signe: "…" },
     { depuis: 181, question: null, mot: "figé ?", signe: "!" },
-    { depuis: 5, question: "On casse l'API ?", mot: "question", signe: "?" },
+    // Une question : la bulle « ? » suit l'agent chez le directeur (ticket-597), la pièce garde la pastille.
+    { depuis: 5, question: "On casse l'API ?", mot: "question", signe: null },
   ];
 
   it.each(cas)("shows $mot in the pill and $signe in the bubble at $depuis s", ({ depuis, question, mot, signe }) => {

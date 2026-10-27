@@ -20,7 +20,7 @@ export default function SallePause({ occupants }: SallePauseProps) {
   return (
     <Salle
       titre="Salle de pause"
-      entete="attend quelque chose d'extérieur : quota, CI, une dépendance"
+      entete="un run qui attend quelque chose d'extérieur : quota, CI, une dépendance"
       vide="Personne en pause"
       mobilier={
         <figure className="flex flex-col items-center gap-1">
