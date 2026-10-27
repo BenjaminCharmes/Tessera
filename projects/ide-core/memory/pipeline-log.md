@@ -5445,3 +5445,4 @@ Le diff ajoute :
 - 2026-10-27 13:48:53 UTC — [ticket-601] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
 - 2026-10-27 13:48:53 UTC — [ticket-601] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (289202ms)
 - 2026-10-27 13:48:53 UTC — [ticket-601] APPROVED après 2 tour(s)
+- 2026-10-27 13:52:59 UTC — [ticket-601] documentation: 0 fichier(s) (238187ms)
