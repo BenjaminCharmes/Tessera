@@ -4,7 +4,7 @@ created: 2026-10-26
 depends_on: []
 estimated_days: 0.25
 id: ticket-577
-pr_number: null
+pr_number: 691
 priority: medium
 status: done
 title: The status of a single-ticket run shows its ticket as approved or stopped
