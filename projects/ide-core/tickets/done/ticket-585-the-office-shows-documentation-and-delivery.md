@@ -1,14 +1,15 @@
 ---
-id: ticket-585
-title: "The office shows when a run is writing its documentation or delivering"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-581"]
-estimated_days: 0.25
 created: 2026-10-26
+depends_on:
+- ticket-581
+estimated_days: 0.25
+id: ticket-585
+pr_number: 670
+priority: high
+status: done
+title: The office shows when a run is writing its documentation or delivering
+type: fix
 ---
 
 # ticket-585 — Le Bureau montre la documentation et la livraison
