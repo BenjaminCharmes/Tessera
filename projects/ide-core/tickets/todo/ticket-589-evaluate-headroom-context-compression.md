@@ -37,16 +37,36 @@ l'appel, dans le texte du prompt, soit faire passer le CLI par le proxy, soit
 passer par MCP, ce qui ne couvre que les sorties d'outils.
 
 ## Solution proposée
-- Mesurer sur deux ou trois runs réels d'ide-core les tokens d'entrée par
-  rôle, puis ce que headroom en retire sur ces mêmes entrées, hors ligne.
+- Partir des tokens et coûts que Tessera enregistre déjà par rôle (ci-dessous,
+  relevés le 27/10 par `GET /api/v1/projects/ide-core/usage/breakdown`), et
+  estimer, rôle par rôle, ce que headroom retirerait selon le type de contenu
+  que reçoit chaque rôle (sorties d'outils, diffs, logs), avec les taux que le
+  projet annonce. Ce sont des estimations, à présenter comme telles : headroom
+  n'est ni installé ni lancé (aucune dépendance ajoutée).
 - Comparer les trois points d'entrée : coût, risque de perte d'information
   pour un verdict (une ligne d'erreur pytest tronquée fait un faux
   APPROVED), compatibilité avec l'échec fermé (ADR-039).
 - Recommander d'adopter, de reporter ou d'écarter.
 
+## Données relevées le 27/10 (ide-core, cumul)
+
+| Rôle | Tokens | Coût | Appels |
+| --- | ---: | ---: | ---: |
+| codeur | 680 979 598 | 724,82 $ | 514 |
+| reviewer | 34 249 077 | 165,89 $ | 406 |
+| securite | 67 801 991 | 43,08 $ | 415 |
+| plan | 27 644 161 | 52,58 $ | 71 |
+| architect | 16 253 218 | 29,40 $ | 17 |
+| doc-technique | 2 746 929 | 40,34 $ | 311 |
+| doc-fonctionnelle | 2 560 393 | 35,84 $ | 305 |
+| validateur | 2 598 888 | 11,38 $ | 378 (surtout Ollama, gratuit) |
+
+Le codeur fait 66 % du coût : ce sont ses sessions agentiques (lectures de
+fichiers, sorties de commandes), où la compression ne passe que par le proxy.
+
 ## Critères d'acceptation
 - [ ] Une ADR au prochain numéro libre de `memory/decisions.md` décrit le point d'entrée retenu, ou pourquoi headroom est écarté
-- [ ] Le livrable chiffre, rôle par rôle, les tokens d'entrée mesurés et ceux obtenus après compression, sur au moins deux runs réels
+- [ ] Le livrable reprend, rôle par rôle, les tokens et coûts du tableau ci-dessus, et donne pour chacun une estimation du gain de headroom, marquée « estimation » et justifiée par le type de contenu du rôle
 - [ ] Le livrable liste les tickets d'implémentation qui en découlent, chacun avec ses critères vérifiables
 
 ## Ce que ça ne fait pas
