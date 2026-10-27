@@ -16,85 +16,29 @@ import type {
 } from "../types/api";
 import { boundEvents } from "./boundEvents";
 import { appliquerAccuse, appliquerAttente, appliquerConflit, appliquerRepli } from "./streamAttente";
+import { dernierOutilDe } from "./streamEntrees";
+import type {
+  DernierOutil,
+  EntreeFil,
+  EntreeSecurite,
+  EntreeValidateur,
+  PassageAgent,
+} from "./streamEntrees";
 import { entreeTesteur } from "./streamTests";
 import type { AttenteExterieure, RepliDeProvider } from "./streamAttente";
 
 export { MAX_EVENTS } from "./boundEvents";
 
+export type {
+  DernierOutil,
+  EntreeFil,
+  EntreeSecurite,
+  EntreeTesteur,
+  EntreeValidateur,
+  PassageAgent,
+} from "./streamEntrees";
+
 export type StreamStatus = "idle" | "connecting" | "running" | "done" | "error";
-
-/**
- * Un passage d'un agent dans le fil chronologique du run (ticket-222).
- *
- * Chaque `agent_started` crée une entrée. Rien n'est écrasé : au tour 2,
- * le passage du reviewer au tour 1 reste visible dans `entries`.
- */
-export interface PassageAgent {
-  /** Discriminant du type d'entrée dans le fil (ticket-257). */
-  genre: "agent";
-  /** Clé unique pour React : `${agent}-${index}`. */
-  id: string;
-  agent: AgentRole;
-  round: number;
-  /** Tokens reçus en direct (codeur uniquement). Vide après reconnexion. */
-  tokens: string;
-  /** Contenu issu de `agent_done` : verdict ou compte rendu. */
-  content: string;
-  isDone: boolean;
-  /** Durée de l'appel en ms, remontée par `agent_done`. Absente si le backend ne l'envoie pas. */
-  duration_ms?: number;
-}
-
-/**
- * Entrée de l'audit sécurité dans le fil chronologique (ticket-257).
- *
- * Ajoutée par `security_audit_done` : toujours terminée, jamais modifiée.
- */
-export interface EntreeSecurite {
-  genre: "securite";
-  id: string;
-  round: number;
-  verdict: string;
-  summary: string;
-  issues_count: number;
-  reason: string;
-  isDone: true;
-}
-
-/**
- * Entrée du validateur dans le fil chronologique (ticket-257).
- *
- * Ajoutée par `validation_done` : toujours terminée, jamais modifiée.
- * `criteria` porte le détail critère par critère, avec son résultat et sa note.
- */
-export interface EntreeValidateur {
-  genre: "validateur";
-  id: string;
-  round: number;
-  verdict: string;
-  feedback: string;
-  criteria: { criterion: string; passed: boolean; note: string }[];
-  isDone: true;
-}
-
-/**
- * Entrée du testeur dans le fil chronologique (ticket-321).
- *
- * Ajoutée par `test_result` : toujours terminée, jamais modifiée.
- * `errors` porte les lignes d'erreur extraites par le backend (au plus 5).
- */
-export interface EntreeTesteur {
-  genre: "testeur";
-  id: string;
-  round: number;
-  passed: boolean;
-  output_summary: string;
-  errors: string[];
-  isDone: true;
-}
-
-/** Une entrée du fil chronologique : agent, sécurité, validateur ou testeur. */
-export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur | EntreeTesteur;
 
 export interface StreamState {
   status: StreamStatus;
@@ -179,6 +123,8 @@ export interface StreamState {
   conflitEnCours: string[] | null;
   /** Dernier `provider_fallback` du run, relié par son projet (ticket-597). Non persisté : un F5 l'efface. */
   repli: RepliDeProvider | null;
+  /** Dernier `agent_tool_use` du ticket en cours (ticket-601). Non persisté : un F5 l'efface. */
+  dernierOutil: DernierOutil | null;
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -232,6 +178,7 @@ export const INITIAL: StreamState = {
   attenteExterieure: null,
   conflitEnCours: null,
   repli: null,
+  dernierOutil: null,
 };
 
 /**
@@ -452,6 +399,7 @@ function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState 
         events,
         ticketEvents,
         outils: s.outils + 1,
+        dernierOutil: dernierOutilDe(ev) ?? s.dernierOutil,
       };
     }
     case "test_result": {
