@@ -8,7 +8,7 @@ import type { ButtonHTMLAttributes } from "react";
  * se voit sans crier plus fort que l'action principale.
  */
 export type VarianteBouton = "plein" | "borde" | "discret" | "arret";
-export type TailleBouton = "normal" | "compact";
+export type TailleBouton = "normal" | "compact" | "pastille";
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className"> {
   variante?: VarianteBouton;
@@ -23,8 +23,10 @@ const VARIANTES: Record<VarianteBouton, string> = {
 };
 
 const TAILLES: Record<TailleBouton, string> = {
-  normal: "h-[30px] px-3",
-  compact: "h-[26px] px-2",
+  normal: "h-[30px] px-3 text-corps",
+  compact: "h-[26px] px-2 text-corps",
+  // À la hauteur d'une StatusPill, pour s'aligner sur les badges d'une même ligne.
+  pastille: "h-5 px-2 text-mini font-medium",
 };
 
 export default function Button({
@@ -36,7 +38,7 @@ export default function Button({
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center gap-1.5 rounded text-corps transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTES[variante]} ${TAILLES[taille]}`}
+      className={`inline-flex items-center justify-center gap-1.5 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTES[variante]} ${TAILLES[taille]}`}
       {...reste}
     />
   );

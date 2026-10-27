@@ -135,25 +135,30 @@ function personnagesDuPoste(nom: string): Element[] {
 }
 
 describe("Piece furniture", () => {
-  it("lays a plank floor and a plant in each work room", () => {
+  it("lays a plank floor under a wall, with a ficus and a cactus against it", () => {
     render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
 
     const piece = screen.getByRole("region", { name: "ide-core" });
     expect(piece.querySelector('[data-sol="lames"]')).not.toBeNull();
-    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(1);
+    const mur = piece.querySelector('[data-mur="piece"]');
+    const especes = [...(mur?.querySelectorAll('[data-sprite="plante"]') ?? [])].map((p) => p.getAttribute("data-espece"));
+    expect(especes).toEqual(["ficus", "cactus"]);
   });
 
-  it("keeps the plant in a room whose run is on", () => {
+  it("keeps its plants in a room whose run is on", () => {
     render(<Piece projet="ide-core" etat={etatEnCodage()} maintenant={T0 + 5_000} />);
 
     const piece = screen.getByRole("region", { name: "ide-core" });
-    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(1);
+    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(2);
   });
 
-  it("writes the empty mailbox label in the bottom bar", async () => {
+  it("hangs the mailbox on the wall, its state in a tooltip rather than a bottom bar", async () => {
     render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
 
-    expect(await screen.findByText("aucune PR")).toBeInTheDocument();
+    const mur = screen.getByRole("region", { name: "ide-core" }).querySelector('[data-mur="piece"]');
+    expect(await screen.findByRole("group", { name: /Boîte aux lettres/ })).toBeInTheDocument();
+    expect(mur?.querySelector("[data-boite]")).not.toBeNull();
+    expect(screen.queryByText("aucune PR")).toBeNull();
   });
 });
 

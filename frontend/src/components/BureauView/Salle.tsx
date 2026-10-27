@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import CeilingLamp from "../../design/bureau/CeilingLamp";
 import NightVeil from "../../design/bureau/NightVeil";
 import Plante from "../../design/bureau/Plante";
+import type { EspeceDePlante } from "../../design/bureau/Plante";
 import SkyWindow from "../../design/bureau/SkyWindow";
 import { IconInfo } from "../../design/icons";
 import { useLumiere } from "../../hooks/useLumiere";
@@ -17,6 +18,10 @@ interface SalleProps {
   vide: string;
   /** Le mobilier : la salle elle-même, dessiné occupée ou non (ADR-058). */
   mobilier: ReactNode;
+  /** Les autres meubles, posés au milieu du sol : jamais un état, toujours là (ADR-058). */
+  decor?: ReactNode;
+  /** L'espèce de la plante du coin : chaque salle a la sienne. */
+  plante?: EspeceDePlante;
   /** L'horloge unique de la vue : le ciel des fenêtres s'y lit (ticket-602). */
   maintenant: number;
   /** Le seul soleil du Bureau : la salle qui le porte le montre dans sa première fenêtre. */
@@ -39,6 +44,8 @@ export default function Salle({
   entete,
   vide,
   mobilier,
+  decor,
+  plante = "pot",
   maintenant,
   avecSoleil = false,
   accroche,
@@ -55,7 +62,7 @@ export default function Salle({
       aria-label={titre}
       data-occupee={occupee}
       data-contour={ambre ? "amber" : "neutre"}
-      className={`relative min-w-0 flex-1 overflow-hidden rounded-lg border bg-(--sprite-mur) ${contour}`}
+      className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-(--sprite-mur) ${contour}`}
     >
       <h3
         title={entete}
@@ -76,13 +83,14 @@ export default function Salle({
           <BoutonLumiere salle={titre} allume={lumiere} onBasculer={basculerLumiere} />
         </span>
       </div>
-      <div data-sol="lames" className="sol-lames px-3">
+      <div data-sol="lames" className="sol-lames flex flex-1 flex-col justify-end px-3">
         <div className="flex min-h-39 items-end justify-between gap-4 px-1 py-2">
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">{mobilier}</div>
             {occupee && <ul className="flex min-w-0 flex-col gap-1">{children}</ul>}
           </div>
-          <Plante />
+          {decor && <div className="flex shrink-0 items-end gap-3">{decor}</div>}
+          <Plante espece={plante} />
         </div>
         {!occupee && <p className="pb-1 text-xs text-zinc-500">{vide}</p>}
       </div>

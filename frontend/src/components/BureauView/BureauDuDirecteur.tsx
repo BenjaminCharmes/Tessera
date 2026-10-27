@@ -1,5 +1,6 @@
 import AgentDebout from "../../design/bureau/AgentDebout";
 import BureauEnBois from "../../design/bureau/BureauEnBois";
+import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Bulle from "../../design/bureau/Bulle";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
 import GoldFrame from "../../design/bureau/GoldFrame";
@@ -50,6 +51,8 @@ export default function BureauDuDirecteur({ agents, maintenant, employe = null }
       entete="un agent dont la question attend ta réponse vient s'y tenir"
       vide="Aucune question en attente"
       mobilier={<BureauEnBois tenue={TENUE_DU_DIRECTEUR} physique={PHYSIQUE_DU_DIRECTEUR} />}
+      decor={<Bibliotheque />}
+      plante="ficus"
       ambre={agents.length > 0}
     >
       {/* Un projet ne tient qu'un run à la fois (ADR-038) : un agent par projet, donc la clé est unique. */}

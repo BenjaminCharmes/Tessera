@@ -1,4 +1,6 @@
 import type { OccupantDePause } from "../../lib/bureau/salles";
+import Canape from "../../design/bureau/Canape";
+import Frigo from "../../design/bureau/Frigo";
 import MachineACafe from "../../design/bureau/MachineACafe";
 import Salle from "./Salle";
 
@@ -25,6 +27,13 @@ export default function SallePause({ occupants, maintenant }: SallePauseProps) {
       titre="Salle de pause"
       entete="un run qui attend quelque chose d'extérieur : quota, CI, une dépendance"
       vide="Personne en pause"
+      decor={
+        <>
+          <Canape />
+          <Frigo />
+        </>
+      }
+      plante="cactus"
       mobilier={
         <figure className="flex flex-col items-center gap-1">
           <MachineACafe />

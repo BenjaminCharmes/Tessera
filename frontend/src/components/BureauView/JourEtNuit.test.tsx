@@ -28,20 +28,20 @@ afterEach(() => {
 });
 
 describe("Piece day and night", () => {
-  it("shows two daytime windows, three unlit lamps and no veil at 14:00", () => {
+  it("shows three daytime windows, three unlit lamps and no veil at 14:00", () => {
     const { container } = render(<Piece projet="ide-core" etat={INITIAL} maintenant={at(14)} />);
 
-    expect(ciels(container)).toEqual(["jour", "jour"]);
+    expect(ciels(container)).toEqual(["jour", "jour", "jour"]);
     expect(plafonniers(container)).toEqual(["false", "false", "false"]);
     expect(container.querySelector("[data-voile]")).toBeNull();
     // Le seul soleil du Bureau est au bureau du directeur : la pièce d'un projet n'en a pas.
     expect(container.querySelector('[data-detail="soleil"]')).toBeNull();
   });
 
-  it("shows two night windows, a veil and three lit lamps at 22:00", () => {
+  it("shows three night windows, a veil and three lit lamps at 22:00", () => {
     const { container } = render(<Piece projet="ide-core" etat={INITIAL} maintenant={at(22)} />);
 
-    expect(ciels(container)).toEqual(["nuit", "nuit"]);
+    expect(ciels(container)).toEqual(["nuit", "nuit", "nuit"]);
     expect(plafonniers(container)).toEqual(["true", "true", "true"]);
     expect(container.querySelectorAll("[data-voile]")).toHaveLength(1);
     expect(container.querySelectorAll('[data-detail="halo"]')).toHaveLength(3);

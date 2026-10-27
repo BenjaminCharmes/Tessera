@@ -49,7 +49,7 @@ function ListeDesRestants({ restants, titres }: ListeProps) {
   );
 }
 
-/** La pile : un à trois dossiers empilés et le nombre écrit dessous (ADR-058). */
+/** La pile : un à trois dossiers empilés, le nombre sur une pastille, la liste en infobulle (ADR-058). */
 function Pile({ projet, restants, onActiver }: PileProps) {
   const { tickets } = useTickets(projet);
   const titres = new Map(tickets.map((t) => [t.id, t.title]));
@@ -57,7 +57,7 @@ function Pile({ projet, restants, onActiver }: PileProps) {
   return (
     <AvecInfobulle
       label={`Tickets restants : ${restants.length}`}
-      className="flex flex-col items-center"
+      className="relative flex flex-col items-center"
       onActiver={onActiver}
       infobulle={<ListeDesRestants restants={restants} titres={titres} />}
     >
@@ -68,8 +68,12 @@ function Pile({ projet, restants, onActiver }: PileProps) {
           </div>
         ))}
       </div>
-      <span aria-hidden="true" className="text-xs text-zinc-400">
-        {`${restants.length} en file`}
+      <span
+        aria-hidden="true"
+        data-badge="restants"
+        className="absolute -right-2 -top-2 min-w-4 rounded-full bg-zinc-700 px-1 text-center text-micro leading-4 text-zinc-100"
+      >
+        {restants.length}
       </span>
     </AvecInfobulle>
   );

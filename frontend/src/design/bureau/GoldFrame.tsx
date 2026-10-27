@@ -7,7 +7,7 @@ interface GoldFrameProps {
 }
 
 /**
- * Le cadre doré de l'employé de la semaine, grille 16 × 17 (56 × 60 px) : le buste
+ * Le cadre doré de l'employé de la semaine, grille 16 × 17 (32 × 34 px) : le buste
  * du codeur du projet sur un fond sourd. Il ne se dessine que si un projet a des
  * tickets approuvés au premier tour (ADR-058) ; le libellé est porté par l'objet
  * qui l'enveloppe.
@@ -15,8 +15,8 @@ interface GoldFrameProps {
 export default function GoldFrame({ projet }: GoldFrameProps) {
   return (
     <svg
-      width="56"
-      height="60"
+      width="32"
+      height="34"
       viewBox="0 0 16 17"
       shapeRendering="crispEdges"
       aria-hidden="true"
