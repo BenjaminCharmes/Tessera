@@ -117,6 +117,11 @@ class Settings(BaseSettings):
     # (ADR-018) : attendre indéfiniment une réponse coûte plus cher qu'une
     # hypothèse explicite et relisible.
     dialogue_timeout_s: float = 300.0
+    # Seuil de confiance (0-100) des remarques bloquantes du reviewer
+    # (ticket-574) : un refus dont toutes les remarques portent un score
+    # inférieur est lu comme une approbation avec remarques. Une remarque sans
+    # score garde le refus. 0 désactive le filtre.
+    reviewer_confidence_threshold: int = 80
     # Plafond de dépense d'une CONVERSATION du chat (ticket-048).
     # `llm_max_budget_usd` borne un appel ; sans ce second plafond, une
     # longue discussion épuiserait le quota de l'abonnement sans que

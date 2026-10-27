@@ -5680,3 +5680,20 @@ Le diff ajoute :
 - 2026-10-27 19:29:06 UTC — [ticket-573] validateur: APPROVED — Tous les critères d'acceptation ont été respectés : le champ `effort` a été ajou (215172ms)
 - 2026-10-27 19:29:06 UTC — [ticket-573] APPROVED après 2 tour(s)
 - 2026-10-27 19:30:32 UTC — [ticket-573] documentation: 0 fichier(s) (81687ms)
+- 2026-10-27 19:39:06 UTC — [ide-core] ticket-573 PR #698 non surveillée (livraison arrêtée)
+- 2026-10-27 19:39:09 UTC — [ticket-574] branche ticket-574-reviewer-findings-carry-a-confidence-score-and-on
+- 2026-10-27 19:39:53 UTC — [ticket-574] plan rendu (43343ms)
+- 2026-10-27 19:39:53 UTC — [ticket-574] tour 1 — codeur démarré
+- 2026-10-27 19:42:07 UTC — [ticket-574] tour 1 — codeur terminé (134235ms)
+- 2026-10-27 19:48:00 UTC — [ticket-574] testeur: 1 failed, 1625 passed, 64 warnings in 349.86s (0:05:49)
+- 2026-10-27 19:48:00 UTC — [ticket-574] tests rouges au tour 1
+- 2026-10-27 19:48:00 UTC — [ticket-574] tour 2 — codeur démarré
+- 2026-10-27 19:48:57 UTC — [ticket-574] tour 2 — codeur terminé (57764ms)
+- 2026-10-27 19:56:20 UTC — [ticket-574] testeur: OK (exit 0)
+- 2026-10-27 19:58:05 UTC — [ticket-574] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le nouveau système de scores de confi (105531ms)
+- 2026-10-27 19:58:05 UTC — [ticket-574] tour 2 — reviewer démarré
+- 2026-10-27 19:58:23 UTC — [ticket-574] tour 2 — reviewer terminé (17718ms)
+- 2026-10-27 20:02:18 UTC — [ticket-574] validateur: fichiers cités joints : agents/prompts/reviewer.md
+- 2026-10-27 20:02:18 UTC — [ticket-574] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté un nouveau mécanisme b (252264ms)
+- 2026-10-27 20:02:18 UTC — [ticket-574] APPROVED après 2 tour(s)
+- 2026-10-27 20:06:12 UTC — [ticket-574] documentation: 0 fichier(s) (228968ms) — après tour de correction
