@@ -5694,3 +5694,5 @@ Le diff ajoute :
 - 2026-10-27 20:27:27 UTC — [ticket-576] validateur: fichiers cités joints : memory/decisions.md (tronqué)
 - 2026-10-27 20:27:27 UTC — [ticket-576] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Un nouvel ADR (061) décrit clai (253797ms)
 - 2026-10-27 20:27:27 UTC — [ticket-576] APPROVED après 1 tour(s)
+- 2026-10-27 20:27:32 UTC — [ticket-576] fichiers non suivis laissés par le run : tickets/todo/ticket-611-structured-output-spike-on-the-pinned-sdk.md, tickets/todo/ticket-612-providers-carry-a-schema-and-return-structured-output.md, tickets/todo/ticket-613-security-and-validator-read-their-verdict-from-a-schema.md, tickets/todo/ticket-614-reviewer-verdict-comes-from-a-structured-output.md, tickets/todo/ticket-615-the-interface-reads-the-reviewer-verdict-from-its-event-field.md (à ignorer dans .gitignore ?)
+- 2026-10-27 20:29:53 UTC — [ticket-576] documentation: 0 fichier(s) (141078ms) — après tour de correction
