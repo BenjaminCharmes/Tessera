@@ -2,9 +2,13 @@
 
 from pathlib import Path
 
+from tessera.services import journal_en_attente
 from tessera.services.git_attributes import declare_union_merge
 from tessera.services.git_workspace.base import GitBase
-from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE
+from tessera.services.git_workspace.chemins import (
+    _BOOKKEEPING_COMMIT_MESSAGE,
+    _JOURNAL_PIPELINE,
+)
 from tessera.services.git_workspace.commits import GitCommits
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.noms import _branch_name
@@ -52,6 +56,49 @@ class GitBranch(GitBase, GitRebase, GitCommits):
         branch_name = _branch_name(ticket_id, slug)
 
         self.commits_repris = 0
+        lignes = await self._mettre_de_cote_journal()
+        try:
+            await self._poser_branche(branch_name)
+        finally:
+            # Réécrites même si le changement de branche échoue : rien ne se perd.
+            journal_en_attente.reecrire(self._project_path, lignes)
+        if lignes:
+            await self._commiter_journal()
+        return branch_name
+
+    async def _mettre_de_cote_journal(self) -> list[str]:
+        """Lines of the pipeline log set aside, when it is the only dirty file.
+
+        A line the CIWatcher logs after a delivery stays uncommitted, and git
+        refuses to switch or rebase over it. Any other local change leaves the
+        log where it is: the switch then fails as it always did (ticket-610).
+        """
+        if not await journal_en_attente.seul_le_journal_est_modifie(self._project_path):
+            return []
+        return await journal_en_attente.mettre_de_cote(self._project_path)
+
+    async def _commiter_journal(self) -> None:
+        """Commit the log lines carried over, under the bookkeeping message.
+
+        Only the log is committed (``commit -- <path>``): nothing else staged
+        rides along. A failure is logged, not fatal — the lines stay in the
+        file and the run's own bookkeeping commit takes them.
+        """
+        try:
+            statut = await self._run(
+                "status", "--porcelain", "--untracked-files=no", "--", _JOURNAL_PIPELINE
+            )
+            if not statut.strip():
+                return
+            await self._run("add", "--", _JOURNAL_PIPELINE)
+            await self._run(
+                "commit", "-m", _BOOKKEEPING_COMMIT_MESSAGE, "--", _JOURNAL_PIPELINE
+            )
+        except GitCommandError as exc:
+            _logger.warning("journal_repris_non_commite", extra={"erreur": str(exc)})
+
+    async def _poser_branche(self, branch_name: str) -> None:
+        """Create or resume ``branch_name`` and check it out."""
         exists = await self._branch_exists(branch_name)
         if exists:
             await self._run("checkout", branch_name)
@@ -70,9 +117,9 @@ class GitBranch(GitBase, GitRebase, GitCommits):
                 await self._rejouer_branche_en_retard(branch_name)
             self.commits_repris = await self._compter_commits_depuis_depart()
         else:
+            assert self._base_ref is not None  # posée par create_branch
             await self._run("checkout", "-b", branch_name, self._base_ref)
             self._fork_point = self._base_ref
-        return branch_name
 
     async def _compter_commits_depuis_depart(self) -> int:
         """Commits de HEAD au-delà de ``_fork_point`` ; 0 si le point est inconnu.

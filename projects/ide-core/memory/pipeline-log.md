@@ -5619,3 +5619,17 @@ Le diff ajoute :
 - 2026-10-27 17:35:38 UTC — [ticket-569] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests unitaires complet (323015ms)
 - 2026-10-27 17:35:38 UTC — [ticket-569] APPROVED après 3 tour(s)
 - 2026-10-27 17:39:51 UTC — [ticket-569] documentation: 1 fichier(s) (247858ms)
+- 2026-10-27 17:47:34 UTC — [ide-core] ticket-569 PR #694 confiée au CIWatcher
+- 2026-10-27 17:47:37 UTC — [ticket-610] branche ticket-610-a-blocked-merge-no-longer-leaves-the-checkout-dir
+- 2026-10-27 17:47:38 UTC — [ticket-610] tour 1 — codeur démarré
+- 2026-10-27 17:53:33 UTC — [ticket-610] tour 1 — codeur terminé (355235ms)
+- 2026-10-27 17:53:34 UTC — [ide-core] ticket-569 PR #694 mergée (CI verte)
+- 2026-10-27 18:01:15 UTC — [ticket-610] testeur: OK (exit 0)
+- 2026-10-27 18:03:32 UTC — [ticket-610] securite: PASS — Audit complet du ticket-610 : aucune vulnérabilité critique ou élevée détectée.  (136797ms)
+- 2026-10-27 18:03:32 UTC — [ticket-610] tour 1 — reviewer démarré
+- 2026-10-27 18:04:09 UTC — [ticket-610] tour 1 — reviewer terminé (37422ms)
+- 2026-10-27 18:08:32 UTC — [ticket-610] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 18:08:52 UTC — [ticket-610] validateur: fichiers cités joints : backend/tests/ (dossier, 305 fichiers, tronqué), memory/pipeline-log.md (tronqué)
+- 2026-10-27 18:08:52 UTC — [ticket-610] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement le mécanisme  (320172ms)
+- 2026-10-27 18:08:52 UTC — [ticket-610] APPROVED après 1 tour(s)
+- 2026-10-27 18:13:04 UTC — [ticket-610] documentation: 0 fichier(s) (247968ms) — après tour de correction

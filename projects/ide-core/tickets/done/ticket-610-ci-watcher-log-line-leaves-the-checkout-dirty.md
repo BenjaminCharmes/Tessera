@@ -1,14 +1,15 @@
 ---
-id: ticket-610
-title: "A blocked merge no longer leaves the checkout dirty: the next ticket commits the pipeline log line instead of failing"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-27
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-27
+id: ticket-610
+pr_number: 695
+priority: high
+status: done
+title: 'A blocked merge no longer leaves the checkout dirty: the next ticket commits
+  the pipeline log line instead of failing'
+type: fix
 ---
 
 # ticket-610 — Une ligne de journal du CIWatcher ne bloque plus la file

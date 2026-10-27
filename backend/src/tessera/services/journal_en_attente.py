@@ -49,6 +49,24 @@ async def mettre_de_cote(racine: Path) -> list[str]:
     return lignes if code == 0 else []
 
 
+async def seul_le_journal_est_modifie(racine: Path) -> bool:
+    """True when the log is the only tracked file with local changes in the repository.
+
+    The whole repository is looked at, not only the project folder: under
+    ``git_root: ancestor`` the work lives above it. False — and the caller
+    keeps its current behaviour — on any other change, or when git cannot answer.
+    """
+    code, prefixe = await _git(racine, "rev-parse", "--show-prefix")
+    if code != 0:
+        return False
+    code, statut = await _git(racine, "status", "--porcelain", "--untracked-files=no")
+    if code != 0:
+        return False
+    attendu = prefixe.strip() + _JOURNAL.as_posix()
+    chemins = [ligne[3:].strip() for ligne in statut.splitlines() if len(ligne) >= 3]
+    return bool(chemins) and all(chemin == attendu for chemin in chemins)
+
+
 async def journal_non_suivi(racine: Path) -> bool:
     """True when the log exists, is neither tracked nor ignored by git."""
     if not (racine / _JOURNAL).is_file():
