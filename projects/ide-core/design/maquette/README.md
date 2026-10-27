@@ -40,6 +40,12 @@ comme référence.
   salle de réunion, tableau du jour, colonne « À toi » ;
   `Bureau-Compact.dc.html` — au-delà de 6 projets, une rangée par projet —
   https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE
+- **Bureau vivant** (tickets 595 à 597, validée le 27/10) :
+  `Bureau-vivant.dc.html` — interactive : une tenue par rôle, un physique par
+  agent, l'agent qui a fini varie au hasard (café, s'étire, machine), tous
+  partent à la fin du run ; bureau du directeur (question), salle de réunion
+  (conflit), salle de pause (attente extérieure), RH (repli de modèle) —
+  https://claude.ai/artifact/1bksL8hJjUhcgwrs7VtD7j
 - **Notifications** (ticket-554) : `Notifications.dc.html` — la cloche du
   rail, historique du jour et réglages par événement (système, son) —
   https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE

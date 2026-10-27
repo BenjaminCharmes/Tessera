@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Bureau vivant</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#0f0f11}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+.agent{position:absolute;left:0;bottom:22px;padding:0;border:0;background:none;cursor:pointer;line-height:0;transition:transform 1.8s steps(12),opacity .9s ease}
+.agent:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
+.btn{font:inherit;font-size:13px;color:#e4e4e7;background:#27272a;border:1px solid #3f3f46;border-radius:6px;padding:8px 12px;min-height:36px;cursor:pointer}
+.btn:hover{background:#3f3f46}
+.btn[aria-pressed="true"]{background:rgba(139,92,246,.25);border-color:#7c3aed}
+.sol{background-image:repeating-linear-gradient(90deg,#1c1c20 0 24px,#18181b 24px 48px);background-size:100% 36%;background-position:bottom;background-repeat:no-repeat}
+@keyframes tape{0%,100%{transform:translateY(0)}50%{transform:translateY(1px)}}
+.tape{animation:tape .4s steps(1) infinite}
+@keyframes gorgee{0%,70%,100%{transform:translateY(0)}80%,90%{transform:translateY(-1px)}}
+.gorgee{animation:gorgee 3.2s steps(1) infinite}
+@keyframes etire{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+.etire{animation:etire 1.2s steps(1) infinite}
+@keyframes lueur{0%,100%{opacity:1}50%{opacity:.55}}
+.lueur{animation:lueur 1.6s steps(2) infinite}
+@keyframes vapeur{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-2px);opacity:0}}
+.vapeur{animation:vapeur 1.4s steps(3) infinite}
+@keyframes flotte{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.flotte{animation:flotte 1.6s steps(2) infinite}
+@media (prefers-reduced-motion: reduce){.agent{transition:none}.tape,.gorgee,.etire,.lueur,.vapeur,.flotte{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; padding: 20px; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 14px">
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px">
+    <h1 style="margin: 0; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; border-left: 3px solid #8b5cf6; padding-left: 10px">Supervision · Bureau</h1>
+    <span style="font-size: 12px; color: #a1a1aa">{{resume}}</span>
+    <span style="flex: 1"></span>
+    <span style="font-size: 12px; color: #a1a1aa">Démo :</span>
+    <button type="button" class="btn" aria-pressed="{{question}}" onClick="{{basculerQuestion}}">Une question</button>
+    <button type="button" class="btn" aria-pressed="{{conflit}}" onClick="{{basculerConflit}}">Un conflit</button>
+    <button type="button" class="btn" aria-pressed="{{repli}}" onClick="{{basculerRepli}}">Un repli de modèle</button>
+    <button type="button" class="btn" aria-pressed="{{auto}}" onClick="{{basculerAuto}}">Lecture auto</button>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-bottom: 14px">
+    <section aria-label="Bureau du directeur" style="background: #18181b; border: 1px solid {{bordDirecteur}}; border-radius: 10px; overflow: hidden">
+      <div style="padding: 8px 12px; border-bottom: 1px solid #27272a">
+        <h2 style="margin: 0; font-size: 13px">Bureau du directeur</h2>
+        <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">toi : une question ou une approbation t'attend</p>
+      </div>
+      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; gap: 10px">
+        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px">
+          <svg width="56" height="63" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
+            <rect x="5" y="1" width="6" height="2" fill="#1c1917"></rect><rect x="5" y="3" width="6" height="4" fill="#e8b98f"></rect>
+            <rect x="6" y="4" width="1" height="1" fill="#18181b"></rect><rect x="9" y="4" width="1" height="1" fill="#18181b"></rect>
+            <rect x="4" y="7" width="8" height="5" fill="#334155"></rect><rect x="7" y="7" width="2" height="1" fill="#e4e4e7"></rect>
+            <rect x="0" y="12" width="16" height="2" fill="#78350f"></rect><rect x="1" y="14" width="1" height="4" fill="#451a03"></rect><rect x="14" y="14" width="1" height="4" fill="#451a03"></rect>
+            <rect x="11" y="10" width="3" height="2" fill="#a1a1aa"></rect>
+          </svg>
+          <span style="font-size: 11px; color: #a1a1aa">toi</span>
+        </div>
+        <sc-if value="{{question}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px">
+            <span class="flotte" style="font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 9px; background: rgba(245,158,11,.15); color: #fcd34d">?</span>
+            <svg width="42" height="70" viewBox="0 0 12 20" shape-rendering="crispEdges" aria-hidden="true">
+              <rect x="2" y="0" width="6" height="2" fill="#a16207"></rect><rect x="1" y="1" width="1" height="7" fill="#a16207"></rect><rect x="8" y="1" width="1" height="7" fill="#a16207"></rect>
+              <rect x="2" y="2" width="6" height="4" fill="#c68b59"></rect><rect x="3" y="3" width="1" height="1" fill="#18181b"></rect><rect x="6" y="3" width="1" height="1" fill="#18181b"></rect>
+              <rect x="1" y="6" width="8" height="7" fill="#b45309"></rect><rect x="1" y="13" width="8" height="3" fill="#78350f"></rect>
+              <rect x="3" y="16" width="1" height="4" fill="#e8b98f"></rect><rect x="6" y="16" width="1" height="4" fill="#e8b98f"></rect>
+              <rect x="0" y="7" width="1" height="5" fill="#92400e"></rect><rect x="9" y="7" width="1" height="5" fill="#92400e"></rect>
+            </svg>
+            <span style="font-size: 11px; color: #a1a1aa">Kadoomi · validatrice</span>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <section aria-label="Salle de réunion" style="background: #18181b; border: 1px solid {{bordReunion}}; border-radius: 10px; overflow: hidden">
+      <div style="padding: 8px 12px; border-bottom: 1px solid #27272a">
+        <h2 style="margin: 0; font-size: 13px">Salle de réunion</h2>
+        <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">conflit de rebase : le résolveur tente, tu relis</p>
+      </div>
+      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; justify-content: center; gap: 10px">
+        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px">
+          <sc-if value="{{conflit}}" hint-placeholder-val="{{ false }}">
+            <span class="flotte" style="font-size: 11px; padding: 1px 6px; border-radius: 9px; background: rgba(59,130,246,.15); color: #93c5fd">2 fichiers</span>
+          </sc-if>
+          <svg width="120" height="54" viewBox="0 0 40 18" shape-rendering="crispEdges" aria-hidden="true">
+            <sc-if value="{{conflit}}" hint-placeholder-val="{{ false }}">
+              <rect x="4" y="1" width="6" height="2" fill="#111827"></rect><rect x="4" y="3" width="6" height="4" fill="#8d5a3b"></rect>
+              <rect x="5" y="4" width="1" height="1" fill="#18181b"></rect><rect x="8" y="4" width="1" height="1" fill="#18181b"></rect>
+              <rect x="3" y="7" width="8" height="5" fill="#0f766e"></rect>
+              <rect x="14" y="9" width="5" height="3" fill="#e4e4e7"></rect><rect x="15" y="10" width="3" height="1" fill="#f87171"></rect>
+              <rect x="21" y="9" width="5" height="3" fill="#e4e4e7"></rect><rect x="22" y="10" width="3" height="1" fill="#4ade80"></rect>
+            </sc-if>
+            <rect x="2" y="12" width="36" height="2" fill="#78716c"></rect>
+            <rect x="4" y="14" width="1" height="4" fill="#57534e"></rect><rect x="35" y="14" width="1" height="4" fill="#57534e"></rect>
+          </svg>
+          <span style="font-size: 11px; color: #a1a1aa">{{legendeReunion}}</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Salle de pause" style="background: #18181b; border: 1px solid #27272a; border-radius: 10px; overflow: hidden">
+      <div style="padding: 8px 12px; border-bottom: 1px solid #27272a">
+        <h2 style="margin: 0; font-size: 13px">Salle de pause</h2>
+        <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">attend l'extérieur : CI, quota, dépendance</p>
+      </div>
+      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; gap: 12px">
+        <svg style="margin-bottom: 8px" width="42" height="66" viewBox="0 0 14 22" shape-rendering="crispEdges" aria-hidden="true">
+          <g class="vapeur"><rect x="6" y="1" width="1" height="2" fill="#a1a1aa"></rect></g>
+          <rect x="2" y="5" width="10" height="15" fill="#3f3f46"></rect><rect x="3" y="6" width="8" height="3" fill="#18181b"></rect><rect x="6" y="14" width="2" height="2" fill="#e4e4e7"></rect><rect x="2" y="20" width="10" height="2" fill="#27272a"></rect>
+        </svg>
+        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px">
+          <span style="font-size: 11px; padding: 1px 6px; border-radius: 9px; background: rgba(59,130,246,.15); color: #93c5fd">CI · 3 min</span>
+          <svg width="42" height="70" viewBox="0 0 12 20" shape-rendering="crispEdges" aria-hidden="true">
+            <rect x="2" y="0" width="6" height="2" fill="#d4d4d8"></rect><rect x="2" y="2" width="6" height="4" fill="#f1c7a3"></rect>
+            <rect x="3" y="3" width="1" height="1" fill="#18181b"></rect><rect x="6" y="3" width="1" height="1" fill="#18181b"></rect>
+            <rect x="1" y="6" width="8" height="7" fill="#e4e4e7"></rect><rect x="2" y="13" width="2" height="7" fill="#3f3f46"></rect><rect x="6" y="13" width="2" height="7" fill="#3f3f46"></rect>
+            <rect x="0" y="7" width="1" height="5" fill="#a1a1aa"></rect><g class="gorgee"><rect x="9" y="7" width="1" height="3" fill="#a1a1aa"></rect><rect x="10" y="6" width="2" height="2" fill="#78716c"></rect></g>
+          </svg>
+          <span style="font-size: 11px; color: #a1a1aa">Curio · livraison</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Ressources humaines" style="background: #18181b; border: 1px solid {{bordRh}}; border-radius: 10px; overflow: hidden">
+      <div style="padding: 8px 12px; border-bottom: 1px solid #27272a">
+        <h2 style="margin: 0; font-size: 13px">RH</h2>
+        <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">un modèle indisponible : on passe au secours</p>
+      </div>
+      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; gap: 10px">
+        <svg style="margin-bottom: 8px" width="56" height="63" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="5" y="1" width="6" height="2" fill="#7c2d12"></rect><rect x="4" y="1" width="1" height="6" fill="#7c2d12"></rect><rect x="11" y="1" width="1" height="6" fill="#7c2d12"></rect>
+          <rect x="5" y="3" width="6" height="4" fill="#f1c7a3"></rect><rect x="6" y="4" width="1" height="1" fill="#18181b"></rect><rect x="9" y="4" width="1" height="1" fill="#18181b"></rect>
+          <rect x="4" y="7" width="8" height="5" fill="#be185d"></rect>
+          <rect x="1" y="12" width="14" height="2" fill="#52525b"></rect><rect x="2" y="14" width="1" height="4" fill="#3f3f46"></rect><rect x="13" y="14" width="1" height="4" fill="#3f3f46"></rect>
+          <rect x="11" y="9" width="3" height="3" fill="#e4e4e7"></rect>
+        </svg>
+        <sc-if value="{{repli}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px; gap: 2px">
+            <span class="flotte" style="font-size: 11px; padding: 1px 6px; border-radius: 9px; background: rgba(245,158,11,.15); color: #fcd34d">Ollama → Haiku</span>
+            <svg width="42" height="70" viewBox="0 0 12 20" shape-rendering="crispEdges" aria-hidden="true">
+              <rect x="2" y="0" width="6" height="2" fill="#111827"></rect><rect x="2" y="2" width="6" height="4" fill="#5c3a24"></rect>
+              <rect x="3" y="3" width="1" height="1" fill="#18181b"></rect><rect x="6" y="3" width="1" height="1" fill="#18181b"></rect>
+              <rect x="1" y="6" width="8" height="7" fill="#b45309"></rect><rect x="2" y="13" width="2" height="7" fill="#3f3f46"></rect><rect x="6" y="13" width="2" height="7" fill="#3f3f46"></rect>
+              <rect x="0" y="7" width="1" height="5" fill="#92400e"></rect><rect x="9" y="7" width="1" height="5" fill="#92400e"></rect>
+            </svg>
+            <span style="font-size: 11px; color: #a1a1aa">ide-core · validateur</span>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+    <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <sc-for list="{{rooms}}" as="r" hint-placeholder-count="3">
+        <section aria-label="{{r.nom}}" style="{{r.styleSalle}}">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #27272a">
+            <span style="font-weight: 600">{{r.nom}}</span>
+            <span style="font-family: ui-monospace, monospace; font-size: 12px; color: #a1a1aa">{{r.ticketId}}</span>
+            <span style="{{r.stylePill}}">{{r.etapeLibelle}}</span>
+            <span style="flex: 1"></span>
+            <button type="button" class="btn" onClick="{{r.suivant}}">Étape suivante</button>
+          </div>
+
+          <div style="overflow-x: auto">
+            <div class="sol" style="position: relative; width: 800px; height: 136px">
+              <svg style="position: absolute; left: 8px; bottom: 22px" width="35" height="56" viewBox="0 0 10 16" shape-rendering="crispEdges" aria-hidden="true">
+                <rect x="4" y="1" width="2" height="3" fill="#22c55e"></rect><rect x="1" y="3" width="3" height="2" fill="#15803d"></rect><rect x="6" y="2" width="3" height="2" fill="#15803d"></rect>
+                <rect x="2" y="5" width="2" height="3" fill="#22c55e"></rect><rect x="6" y="5" width="2" height="3" fill="#22c55e"></rect><rect x="4" y="4" width="2" height="7" fill="#166534"></rect>
+                <rect x="2" y="11" width="6" height="5" fill="#92400e"></rect><rect x="2" y="11" width="6" height="1" fill="#b45309"></rect>
+              </svg>
+
+              <sc-for list="{{r.postes}}" as="p" hint-placeholder-count="5">
+                <div style="{{p.style}}">
+                  <svg width="56" height="63" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
+                    <rect x="9" y="6" width="6" height="5" fill="#3f3f46"></rect>
+                    <rect x="10" y="7" width="4" height="3" fill="{{p.ecran}}"></rect>
+                    <sc-if value="{{p.lignes}}" hint-placeholder-val="{{ false }}">
+                      <g class="lueur"><rect x="10" y="7" width="3" height="1" fill="#4ade80"></rect><rect x="10" y="9" width="2" height="1" fill="#4ade80"></rect></g>
+                    </sc-if>
+                    <sc-if value="{{p.coche}}" hint-placeholder-val="{{ false }}">
+                      <rect x="10" y="8" width="1" height="1" fill="#4ade80"></rect><rect x="11" y="9" width="1" height="1" fill="#4ade80"></rect><rect x="12" y="8" width="1" height="1" fill="#4ade80"></rect><rect x="13" y="7" width="1" height="1" fill="#4ade80"></rect>
+                    </sc-if>
+                    <rect x="11" y="11" width="2" height="1" fill="#3f3f46"></rect>
+                    <rect x="1" y="12" width="14" height="2" fill="#52525b"></rect>
+                    <rect x="2" y="14" width="1" height="4" fill="#3f3f46"></rect><rect x="13" y="14" width="1" height="4" fill="#3f3f46"></rect>
+                  </svg>
+                </div>
+              </sc-for>
+
+              <svg style="position: absolute; left: 668px; bottom: 22px" width="42" height="66" viewBox="0 0 14 22" shape-rendering="crispEdges" aria-hidden="true">
+                <sc-if value="{{r.vapeur}}" hint-placeholder-val="{{ false }}">
+                  <g class="vapeur"><rect x="6" y="1" width="1" height="2" fill="#a1a1aa"></rect><rect x="8" y="2" width="1" height="2" fill="#a1a1aa"></rect></g>
+                </sc-if>
+                <rect x="2" y="5" width="10" height="15" fill="#3f3f46"></rect>
+                <rect x="3" y="6" width="8" height="3" fill="#18181b"></rect>
+                <rect x="5" y="11" width="4" height="1" fill="#18181b"></rect>
+                <rect x="6" y="14" width="2" height="2" fill="#e4e4e7"></rect>
+                <rect x="2" y="20" width="10" height="2" fill="#27272a"></rect>
+              </svg>
+
+              <svg style="position: absolute; left: 760px; bottom: 22px" width="35" height="77" viewBox="0 0 10 22" shape-rendering="crispEdges" aria-hidden="true">
+                <rect x="0" y="0" width="10" height="22" fill="#3f3f46"></rect>
+                <rect x="1" y="1" width="8" height="21" fill="#27272a"></rect>
+                <rect x="7" y="11" width="1" height="2" fill="#a1a1aa"></rect>
+              </svg>
+
+              <sc-for list="{{r.agents}}" as="a" hint-placeholder-count="5">
+                <button type="button" class="agent" style="{{a.style}}" aria-label="{{a.label}}" aria-pressed="{{a.choisi}}" aria-hidden="{{a.cache}}" tabIndex="{{a.tab}}" onClick="{{a.choisir}}">
+                  <sc-if value="{{a.assis}}" hint-placeholder-val="{{ true }}">
+                    <svg width="56" height="63" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
+                      <sc-if value="{{a.cheveuxLongs}}" hint-placeholder-val="{{ false }}">
+                        <rect x="4" y="2" width="1" height="7" fill="{{a.cheveux}}"></rect><rect x="11" y="2" width="1" height="7" fill="{{a.cheveux}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.chignon}}" hint-placeholder-val="{{ false }}">
+                        <rect x="7" y="0" width="2" height="1" fill="{{a.cheveux}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.chevelu}}" hint-placeholder-val="{{ true }}">
+                        <rect x="5" y="1" width="6" height="2" fill="{{a.cheveux}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.chauve}}" hint-placeholder-val="{{ false }}">
+                        <rect x="5" y="2" width="1" height="2" fill="{{a.cheveux}}"></rect><rect x="10" y="2" width="1" height="2" fill="{{a.cheveux}}"></rect>
+                      </sc-if>
+                      <rect x="5" y="3" width="6" height="4" fill="{{a.peau}}"></rect>
+                      <sc-if value="{{a.chauve}}" hint-placeholder-val="{{ false }}">
+                        <rect x="6" y="2" width="4" height="1" fill="{{a.peau}}"></rect>
+                      </sc-if>
+                      <rect x="6" y="4" width="1" height="1" fill="#18181b"></rect><rect x="9" y="4" width="1" height="1" fill="#18181b"></rect>
+                      <rect x="4" y="7" width="8" height="5" fill="{{a.haut}}"></rect>
+                      <sc-if value="{{a.cravate}}" hint-placeholder-val="{{ false }}">
+                        <rect x="7" y="7" width="2" height="1" fill="#e4e4e7"></rect><rect x="7" y="8" width="2" height="3" fill="#1f2937"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.capuche}}" hint-placeholder-val="{{ false }}">
+                        <rect x="6" y="7" width="4" height="1" fill="{{a.hautOmbre}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.tape}}" hint-placeholder-val="{{ false }}">
+                        <g class="tape"><rect x="3" y="9" width="2" height="3" fill="{{a.hautOmbre}}"></rect><rect x="11" y="9" width="2" height="3" fill="{{a.hautOmbre}}"></rect></g>
+                      </sc-if>
+                      <sc-if value="{{a.brasBas}}" hint-placeholder-val="{{ true }}">
+                        <rect x="3" y="9" width="2" height="3" fill="{{a.hautOmbre}}"></rect><rect x="11" y="9" width="2" height="3" fill="{{a.hautOmbre}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.tasse}}" hint-placeholder-val="{{ false }}">
+                        <rect x="3" y="9" width="2" height="3" fill="{{a.hautOmbre}}"></rect>
+                        <g class="gorgee"><rect x="11" y="6" width="2" height="3" fill="{{a.hautOmbre}}"></rect><rect x="12" y="4" width="2" height="2" fill="#e4e4e7"></rect></g>
+                      </sc-if>
+                    </svg>
+                  </sc-if>
+                  <sc-if value="{{a.debout}}" hint-placeholder-val="{{ false }}">
+                    <svg width="42" height="70" viewBox="0 0 12 20" shape-rendering="crispEdges" aria-hidden="true">
+                      <sc-if value="{{a.cheveuxLongs}}" hint-placeholder-val="{{ false }}">
+                        <rect x="1" y="1" width="1" height="7" fill="{{a.cheveux}}"></rect><rect x="8" y="1" width="1" height="7" fill="{{a.cheveux}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.chignon}}" hint-placeholder-val="{{ false }}">
+                        <rect x="4" y="-1" width="2" height="1" fill="{{a.cheveux}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.chevelu}}" hint-placeholder-val="{{ true }}">
+                        <rect x="2" y="0" width="6" height="2" fill="{{a.cheveux}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.chauve}}" hint-placeholder-val="{{ false }}">
+                        <rect x="2" y="1" width="1" height="2" fill="{{a.cheveux}}"></rect><rect x="7" y="1" width="1" height="2" fill="{{a.cheveux}}"></rect><rect x="3" y="1" width="4" height="1" fill="{{a.peau}}"></rect>
+                      </sc-if>
+                      <rect x="2" y="2" width="6" height="4" fill="{{a.peau}}"></rect>
+                      <rect x="3" y="3" width="1" height="1" fill="#18181b"></rect><rect x="6" y="3" width="1" height="1" fill="#18181b"></rect>
+                      <rect x="1" y="6" width="8" height="7" fill="{{a.haut}}"></rect>
+                      <sc-if value="{{a.cravate}}" hint-placeholder-val="{{ false }}">
+                        <rect x="4" y="6" width="2" height="1" fill="#e4e4e7"></rect><rect x="4" y="7" width="2" height="4" fill="#1f2937"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.jupe}}" hint-placeholder-val="{{ false }}">
+                        <rect x="1" y="13" width="8" height="3" fill="{{a.hautOmbre}}"></rect><rect x="3" y="16" width="1" height="4" fill="{{a.peau}}"></rect><rect x="6" y="16" width="1" height="4" fill="{{a.peau}}"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.pantalon}}" hint-placeholder-val="{{ true }}">
+                        <rect x="2" y="13" width="2" height="7" fill="#3f3f46"></rect><rect x="6" y="13" width="2" height="7" fill="#3f3f46"></rect>
+                      </sc-if>
+                      <sc-if value="{{a.brasLeves}}" hint-placeholder-val="{{ false }}">
+                        <g class="etire"><rect x="0" y="0" width="1" height="7" fill="{{a.hautOmbre}}"></rect><rect x="9" y="0" width="1" height="7" fill="{{a.hautOmbre}}"></rect></g>
+                      </sc-if>
+                      <sc-if value="{{a.tasseDebout}}" hint-placeholder-val="{{ false }}">
+                        <rect x="0" y="7" width="1" height="5" fill="{{a.hautOmbre}}"></rect>
+                        <g class="gorgee"><rect x="9" y="7" width="1" height="3" fill="{{a.hautOmbre}}"></rect><rect x="10" y="6" width="2" height="2" fill="#e4e4e7"></rect></g>
+                      </sc-if>
+                    </svg>
+                  </sc-if>
+                </button>
+              </sc-for>
+
+              <sc-for list="{{r.postes}}" as="p" hint-placeholder-count="5">
+                <span style="{{p.styleNom}}">{{p.nom}}</span>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 10px 14px; border-top: 1px solid #27272a; font-size: 12px; color: #a1a1aa">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <svg width="30" height="30" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
+                <rect x="1" y="1" width="8" height="2" fill="#a16207"></rect><rect x="0" y="4" width="9" height="2" fill="#ca8a04"></rect><rect x="1" y="7" width="8" height="2" fill="#a16207"></rect>
+              </svg>
+              <span>{{r.fileLibelle}}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <svg width="30" height="30" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
+                <rect x="1" y="2" width="7" height="4" fill="#52525b"></rect><rect x="2" y="3" width="5" height="1" fill="#27272a"></rect><rect x="4" y="6" width="1" height="4" fill="#3f3f46"></rect><rect x="8" y="1" width="1" height="3" fill="{{r.drapeau}}"></rect>
+              </svg>
+              <span>{{r.courrier}}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <svg width="30" height="30" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
+                <rect x="1" y="1" width="8" height="8" fill="#3f3f46"></rect><rect x="2" y="2" width="6" height="2" fill="#27272a"></rect><rect x="2" y="6" width="6" height="2" fill="#27272a"></rect><rect x="7" y="2" width="1" height="1" fill="#4ade80"></rect><rect x="7" y="6" width="1" height="1" fill="#4ade80"></rect>
+              </svg>
+              <span>backend · frontend</span>
+            </div>
+          </div>
+        </section>
+      </sc-for>
+    </div>
+
+    <aside aria-label="Panneaux" style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <section aria-label="Agent choisi" style="background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px">
+        <h2 style="margin: 0 0 8px; font-size: 14px">Agent choisi</h2>
+        <sc-if value="{{sel.vide}}" hint-placeholder-val="{{ true }}">
+          <p style="margin: 0; font-size: 13px; color: #a1a1aa">Clique un agent, au travail ou en pause.</p>
+        </sc-if>
+        <sc-if value="{{sel.plein}}" hint-placeholder-val="{{ false }}">
+          <dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px">
+            <dt style="color: #a1a1aa">Rôle</dt><dd style="margin: 0">{{sel.role}}</dd>
+            <dt style="color: #a1a1aa">Projet</dt><dd style="margin: 0">{{sel.projet}}</dd>
+            <dt style="color: #a1a1aa">Ticket</dt><dd style="margin: 0; font-family: ui-monospace, monospace">{{sel.ticket}}</dd>
+            <dt style="color: #a1a1aa">En ce moment</dt><dd style="margin: 0">{{sel.phrase}}</dd>
+          </dl>
+        </sc-if>
+      </section>
+
+      <section aria-label="Légende" style="background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; font-size: 13px">
+        <h2 style="margin: 0 0 8px; font-size: 14px">Qui fait quoi</h2>
+        <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: #d4d4d8">
+          <li>Chaque rôle a sa tenue : sweat violet (codeur), blouse blanche (testeur), veste bleu nuit (sécurité), chemise et cravate (reviewer), gilet ambre (validateur).</li>
+          <li>Visage, peau, coiffure varient d'un projet à l'autre, et restent les mêmes d'un run à l'autre.</li>
+          <li>A fini : café à son poste, s'étire, ou va à la machine — au hasard.</li>
+          <li>Une question pour toi : l'agent va au bureau du directeur.</li>
+          <li>Un modèle indisponible : l'agent passe aux RH, le secours prend le relais.</li>
+          <li>Un conflit : le résolveur s'installe en salle de réunion.</li>
+          <li>Fin du run : chacun part par la porte.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1320,"height":1240}}'>
+const ROLES = ['Codeur', 'Testeur', 'Sécurité', 'Reviewer', 'Validateur'];
+const TENUES = [
+  { haut: '#8b5cf6', ombre: '#6d28d9', capuche: true },
+  { haut: '#e4e4e7', ombre: '#a1a1aa' },
+  { haut: '#1e3a8a', ombre: '#172554' },
+  { haut: '#0f766e', ombre: '#115e59', cravate: true },
+  { haut: '#b45309', ombre: '#92400e' }
+];
+const PEAUX = ['#f1c7a3', '#e8b98f', '#c68b59', '#8d5a3b', '#5c3a24'];
+const CHEVEUX = ['#3f2a1d', '#111827', '#a16207', '#7c2d12', '#d4d4d8', '#1c1917'];
+const COIFFURES = ['court', 'long', 'chignon', 'court', 'chauve', 'long'];
+const ACTIVITES = ['tasse', 'tasse', 'etire', 'machine'];
+const SLOTS = [622, 718, 590];
+const BUREAU = (i) => 56 + i * 120;
+
+function hasard(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
+function graine(texte) { let h = 7; for (let i = 0; i < texte.length; i++) h = (h * 31 + texte.charCodeAt(i)) % 100003; return h; }
+
+function physique(projet, i) {
+  const g = graine(projet + ':' + i);
+  const coiffure = COIFFURES[g % COIFFURES.length];
+  const longs = coiffure === 'long';
+  return {
+    peau: PEAUX[(g >> 2) % PEAUX.length],
+    cheveux: CHEVEUX[(g >> 4) % CHEVEUX.length],
+    coiffure: coiffure,
+    jupe: (longs || coiffure === 'chignon') && (g >> 6) % 2 === 0
+  };
+}
+
+function avancer(r) {
+  if (r.etape < 6) {
+    const activites = Object.assign({}, r.activites);
+    if (r.etape <= 4) activites[r.etape] = hasard(ACTIVITES);
+    return Object.assign({}, r, { etape: r.etape + 1, activites: activites });
+  }
+  if (r.file === 0) return r;
+  return Object.assign({}, r, { etape: 0, file: r.file - 1, ticket: r.ticket + 1, activites: {} });
+}
+
+class Component extends DCLogic {
+  state = {
+    auto: true,
+    question: true,
+    conflit: false,
+    repli: false,
+    choisi: null,
+    tour: 0,
+    rooms: [
+      { nom: 'ide-core', ticket: 593, etape: 2, file: 9, rythme: 4, activites: { 0: 'machine', 1: 'etire' } },
+      { nom: 'Kadoomi', ticket: 118, etape: 4, file: 2, rythme: 5, activites: { 0: 'tasse', 1: 'machine', 2: 'etire', 3: 'tasse' } },
+      { nom: 'Devinoo', ticket: 101, etape: 5, file: 1, rythme: 6, activites: { 0: 'machine', 1: 'tasse', 2: 'machine', 3: 'etire', 4: 'tasse' } }
+    ]
+  };
+
+  componentDidMount() { this.minuteur = setInterval(() => this.tic(), 2200); }
+  componentWillUnmount() { clearInterval(this.minuteur); }
+
+  tic() {
+    const tour = this.state.tour + 1;
+    const rooms = this.state.rooms.map((r) => {
+      let n = r;
+      if (this.state.auto && tour % r.rythme === 0 && !(this.state.question && r.nom === 'Kadoomi')) n = avancer(n);
+      const activites = Object.assign({}, n.activites);
+      const finis = Math.min(n.etape, 5);
+      for (let i = 0; i < finis; i++) if (Math.random() < 0.25) activites[i] = hasard(ACTIVITES);
+      return Object.assign({}, n, { activites: activites });
+    });
+    this.setState({ tour: tour, rooms: rooms });
+  }
+
+  renderVals() {
+    const s = this.state;
+    let sel = { vide: true, plein: false };
+    const rooms = s.rooms.map((r, ri) => {
+      const parti = r.etape >= 6;
+      let slot = 0;
+      const absent = (i) => (s.question && r.nom === 'Kadoomi' && i === 4 && r.etape === 4) || (s.repli && r.nom === 'ide-core' && i === 4 && r.etape === 4);
+      const libre = r.etape <= 4 ? ROLES[r.etape] + ' au travail' : (r.etape === 5 ? 'doc et livraison' : (r.file > 0 ? 'run terminé — tout le monde part' : 'au repos'));
+      const agents = ROLES.map((role, i) => {
+        const etat = parti ? 'parti' : (i < r.etape ? 'fait' : (i === r.etape ? 'travaille' : 'attend'));
+        let act = r.activites[i] || 'tasse';
+        if (etat === 'fait' && act === 'machine' && slot >= SLOTS.length) act = 'tasse';
+        let x = BUREAU(i);
+        let phrase = 'attend son tour';
+        if (etat === 'travaille') phrase = 'travaille sur le ticket';
+        if (etat === 'fait' && act === 'tasse') phrase = 'a fini — boit un café à son poste';
+        if (etat === 'fait' && act === 'etire') { x = BUREAU(i) - 40; phrase = "a fini — s'étire à côté de son poste"; }
+        if (etat === 'fait' && act === 'machine') { x = SLOTS[slot]; slot += 1; phrase = 'a fini — prend un café à la machine'; }
+        if (etat === 'parti') { x = 760; phrase = 'est parti, le run est terminé'; }
+        const sorti = absent(i);
+        if (sorti) phrase = s.question && r.nom === 'Kadoomi' ? 'est au bureau du directeur : il a une question pour toi' : 'est aux RH : son modèle est indisponible, le secours prend le relais';
+        const assis = !sorti && (etat === 'attend' || etat === 'travaille' || (etat === 'fait' && act === 'tasse'));
+        const cle = ri + ':' + i;
+        const choisi = s.choisi === cle;
+        const opacite = etat === 'parti' || sorti ? 0 : (etat === 'attend' ? 0.5 : 1);
+        const z = assis ? 1 : 3;
+        const tenue = TENUES[i];
+        const corps = physique(r.nom, i);
+        if (choisi) sel = { vide: false, plein: true, role: role, projet: r.nom, ticket: 'ticket-' + r.ticket, phrase: phrase };
+        return {
+          style: 'transform: translateX(' + (sorti ? 760 : x) + 'px); opacity: ' + opacite + '; z-index: ' + z + ';' + (choisi ? ' outline: 2px solid #8b5cf6; outline-offset: 2px; border-radius: 4px;' : '') + (etat === 'parti' || sorti ? ' pointer-events: none;' : ''),
+          label: role + ', ' + r.nom + ', ' + phrase,
+          choisi: choisi,
+          cache: etat === 'parti' || sorti,
+          tab: etat === 'parti' || sorti ? -1 : 0,
+          assis: assis,
+          debout: !assis,
+          tape: etat === 'travaille' && !sorti,
+          brasBas: etat === 'attend',
+          tasse: etat === 'fait' && act === 'tasse',
+          brasLeves: etat === 'fait' && act === 'etire',
+          tasseDebout: etat === 'parti' || (etat === 'fait' && act === 'machine'),
+          peau: corps.peau,
+          cheveux: corps.cheveux,
+          cheveuxLongs: corps.coiffure === 'long',
+          chignon: corps.coiffure === 'chignon',
+          chevelu: corps.coiffure !== 'chauve',
+          chauve: corps.coiffure === 'chauve',
+          jupe: corps.jupe,
+          pantalon: !corps.jupe,
+          haut: tenue.haut,
+          hautOmbre: tenue.ombre,
+          cravate: !!tenue.cravate,
+          capuche: !!tenue.capuche,
+          choisir: () => this.setState({ choisi: choisi ? null : cle })
+        };
+      });
+      const postes = ROLES.map((role, i) => {
+        const etat = parti ? 'parti' : (i < r.etape ? 'fait' : (i === r.etape ? 'travaille' : 'attend'));
+        return {
+          nom: role,
+          style: 'position: absolute; left: ' + BUREAU(i) + 'px; bottom: 22px; z-index: 2; line-height: 0; opacity: ' + (etat === 'attend' || parti ? 0.6 : 1) + ';',
+          styleNom: 'position: absolute; left: ' + (BUREAU(i) - 12) + 'px; width: 80px; bottom: 3px; text-align: center; font-size: 11px; color: ' + (etat === 'travaille' ? '#e4e4e7' : '#a1a1aa') + ';',
+          ecran: etat === 'travaille' ? '#0c4a6e' : (etat === 'fait' ? '#27272a' : '#18181b'),
+          lignes: etat === 'travaille' && !absent(i),
+          coche: etat === 'fait'
+        };
+      });
+      const travail = r.etape <= 4;
+      return {
+        nom: r.nom,
+        ticketId: 'ticket-' + r.ticket,
+        etapeLibelle: libre,
+        styleSalle: 'background: #18181b; border: 1px solid ' + (travail || parti ? '#27272a' : '#1e3a8a') + '; border-radius: 10px; overflow: hidden;',
+        stylePill: 'font-size: 12px; padding: 2px 8px; border-radius: 9px; ' + (travail ? 'background: rgba(59,130,246,.15); color: #93c5fd;' : 'background: rgba(161,161,170,.12); color: #d4d4d8;'),
+        fileLibelle: r.file > 0 ? r.file + ' en file' : 'file vide',
+        courrier: r.etape === 5 ? 'PR ouverte · CI en cours' : (parti ? 'PR mergée' : 'aucune PR'),
+        drapeau: parti ? '#4ade80' : '#52525b',
+        vapeur: agents.some((a) => a.tasseDebout && !a.cache),
+        postes: postes,
+        agents: agents,
+        suivant: () => this.setState({ rooms: s.rooms.map((x, k) => (k === ri ? avancer(x) : x)) })
+      };
+    });
+    const actifs = s.rooms.filter((r) => r.etape < 6).length;
+    return {
+      rooms: rooms,
+      sel: sel,
+      auto: s.auto,
+      question: s.question,
+      conflit: s.conflit,
+      repli: s.repli,
+      bordDirecteur: s.question ? '#78350f' : '#27272a',
+      bordReunion: s.conflit ? '#78350f' : '#27272a',
+      bordRh: s.repli ? '#78350f' : '#27272a',
+      legendeReunion: s.conflit ? 'Devinoo · résolveur' : 'libre',
+      resume: actifs + ' runs en cours · ' + s.rooms.length + ' projets',
+      basculerAuto: () => this.setState({ auto: !s.auto }),
+      basculerQuestion: () => this.setState({ question: !s.question }),
+      basculerConflit: () => this.setState({ conflit: !s.conflit }),
+      basculerRepli: () => this.setState({ repli: !s.repli })
+    };
+  }
+}
+</script>
+</body>
+</html>
