@@ -5199,3 +5199,15 @@ Le diff ajoute :
 - 2026-10-27 08:32:46 UTC — [ticket-591] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (224764ms)
 - 2026-10-27 08:32:46 UTC — [ticket-591] APPROVED après 1 tour(s)
 - 2026-10-27 08:36:37 UTC — [ticket-591] documentation: 0 fichier(s) (225500ms) — après tour de correction
+- 2026-10-27 08:38:36 UTC — [ide-core] ticket-591 PR #665 confiée au CIWatcher
+- 2026-10-27 08:38:40 UTC — [ticket-583] branche ticket-583-the-break-room-and-the-meeting-room-keep-their-fu
+- 2026-10-27 08:38:41 UTC — [ticket-583] tour 1 — codeur démarré
+- 2026-10-27 08:40:28 UTC — [ticket-583] tour 1 — codeur terminé (106500ms)
+- 2026-10-27 08:42:03 UTC — [ticket-583] testeur: OK (exit 0)
+- 2026-10-27 08:43:18 UTC — [ide-core] ticket-591 PR #665 mergée (CI verte)
+- 2026-10-27 08:43:25 UTC — [ticket-583] securite: PASS — Diff d'ajout de mobilier visuel (machine à café, table de réunion) aux salles du (82531ms)
+- 2026-10-27 08:43:26 UTC — [ticket-583] tour 1 — reviewer démarré
+- 2026-10-27 08:43:42 UTC — [ticket-583] tour 1 — reviewer terminé (16468ms)
+- 2026-10-27 08:45:53 UTC — [ticket-583] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 8 fichiers) ; absents : design/bureau/
+- 2026-10-27 08:45:53 UTC — [ticket-583] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les salles de pause et réunion a (147938ms)
+- 2026-10-27 08:45:53 UTC — [ticket-583] APPROVED après 1 tour(s)
