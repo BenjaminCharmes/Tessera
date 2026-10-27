@@ -5236,3 +5236,4 @@ Le diff ajoute :
 - 2026-10-27 09:18:19 UTC — [ticket-586] validateur: fichiers cités joints : frontend/src (dossier, 8 fichiers), backend/ (dossier, 6 fichiers)
 - 2026-10-27 09:18:19 UTC — [ticket-586] validateur: APPROVED — Tous les critères sont satisfaits. Le diff supprime `ProjectNav.tsx` et ses usag (321562ms)
 - 2026-10-27 09:18:19 UTC — [ticket-586] APPROVED après 1 tour(s)
+- 2026-10-27 09:22:12 UTC — [ticket-586] documentation: 1 fichier(s) (220921ms)
