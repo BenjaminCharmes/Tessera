@@ -1,14 +1,15 @@
 ---
-id: ticket-592
-title: "The conflict resolver checks and stages the resolved files from the repository root"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-26
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-26
+id: ticket-592
+pr_number: 664
+priority: high
+status: done
+title: The conflict resolver checks and stages the resolved files from the repository
+  root
+type: fix
 ---
 
 # ticket-592 — Le résolveur de conflit vérifie les fichiers depuis la racine du dépôt
