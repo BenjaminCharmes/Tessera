@@ -1287,6 +1287,10 @@ Quand l'auto-résolution échoue (fichiers modifiés des deux côtés, structure
 
 Si le résolveur n'est pas déclaré ou ne peut pas tenter, la ligne d'arrêt affiche : « résolveur non tenté : [raison] ». L'utilisateur peut alors ajouter le rôle dans `agents.json` et relancer le run.
 
+### Union merge sur le journal du pipeline
+
+Le fichier `memory/pipeline-log.md` enregistre toutes les étapes du pipeline. Quand plusieurs runs livrent leurs changements en parallèle, chacun y ajoute ses lignes de log. Git utilise la stratégie `merge=union` pour ce fichier : en cas de conflit, les deux versions sont fusionnées, et garder toutes les lignes est toujours correct car chaque run est indépendant (ADR-051).
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 

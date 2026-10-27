@@ -16,6 +16,7 @@ from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.repli import ProviderAvecRepli
+from tessera.services.providers.repli_direct import ProviderRepliDirect
 
 #: Ce qu'un rôle déclaré `web` reçoit en plus (ticket-245).
 OUTILS_WEB = ["WebFetch", "WebSearch"]
@@ -70,8 +71,12 @@ def provider_pour_role(
     max_turns: int | None = None,
     journal_refus: JournalDesRefus | None = None,
     journal_repli: Callable[[str], None] | None = None,
+    rapide: bool = False,
 ) -> LLMProvider:
     """Builds the provider `role` declares, wrapped in its fallback if any.
+
+    `rapide` (ticket-578) : un rôle qui déclare un repli est construit
+    directement avec lui, sans principal ; un rôle sans repli ne change pas.
 
     Rôle absent du manifeste, ou projet sans manifeste : le provider global
     de `settings.llm_provider`, comme avant ce ticket. Le repli reçoit les
@@ -94,20 +99,22 @@ def provider_pour_role(
     )
     # Un rôle qui n'est pas du texte seul ne reçoit aucune borne (None).
     duree = settings.llm_duree_max_role_texte_s if role in ROLES_TEXTE else None
-    principal = get_provider(
-        nom, settings.anthropic_api_key,
-        max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-        skills=skills, duree_max_s=duree, **journal,
-    )
+    def _construire(fournisseur: str) -> LLMProvider:
+        return get_provider(
+            fournisseur, settings.anthropic_api_key,
+            max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
+            allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
+            skills=skills, duree_max_s=duree, **journal,
+        )
+
+    if rapide and config is not None and config.fallback is not None:
+        return ProviderRepliDirect(
+            _construire(config.fallback.provider), modele=config.fallback.model
+        )
+    principal = _construire(nom)
     if config is None or config.fallback is None:
         return principal
-    repli = get_provider(
-        config.fallback.provider, settings.anthropic_api_key,
-        max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
-        allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-        skills=skills, duree_max_s=duree, **journal,
-    )
+    repli = _construire(config.fallback.provider)
     return ProviderAvecRepli(
         principal, repli, modele_repli=config.fallback.model, role=role,
         project_id=project_id, journal=journal_repli,
