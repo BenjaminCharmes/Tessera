@@ -10,15 +10,18 @@ const TON: Record<OccupantDePause["pause"]["motif"], string> = {
 
 interface SallePauseProps {
   occupants: readonly OccupantDePause[];
+  /** L'horloge unique de la vue (ticket-602). */
+  maintenant: number;
 }
 
 /**
  * Ce qui n'est ni du travail ni un blocage : un quota épuisé (run clos, à
  * relancer à la main), une dépendance attendue, la CI de la phase 2.
  */
-export default function SallePause({ occupants }: SallePauseProps) {
+export default function SallePause({ occupants, maintenant }: SallePauseProps) {
   return (
     <Salle
+      maintenant={maintenant}
       titre="Salle de pause"
       entete="un run qui attend quelque chose d'extérieur : quota, CI, une dépendance"
       vide="Personne en pause"

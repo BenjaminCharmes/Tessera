@@ -1,5 +1,6 @@
 import Confettis from "../../design/bureau/Confettis";
 import Gyrophare from "../../design/bureau/Gyrophare";
+import NightVeil from "../../design/bureau/NightVeil";
 import Pastille from "../../design/bureau/Pastille";
 import Plante from "../../design/bureau/Plante";
 import type { StreamState } from "../../hooks/streamState";
@@ -8,6 +9,7 @@ import { machineEnService, placerLesAgents, postesFaits } from "../../lib/bureau
 import type { Hasard } from "../../lib/bureau/activites";
 import { bulleDOutil } from "../../lib/bureau/bulleDOutil";
 import { copieVisible,libelleDeLaCopie, retourDeCopie } from "../../lib/bureau/copie";
+import { dayMoment } from "../../lib/bureau/dayMoment";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import { contourEnCelebration, enFete, gyrophareAllume } from "../../lib/bureau/fete";
@@ -40,6 +42,8 @@ interface PieceProps {
   onRanger?: (runId: string) => void;
   /** Choisit l'agent d'un poste occupé : le panneau « Agent choisi » le lit (ticket-582). */
   onChoisir?: (projet: string, poste: PosteId) => void;
+  /** Choisit ce projet et ouvre l'onglet Tickets : la porte en est le raccourci (ticket-602). */
+  onOpenProject?: (projet: string) => void;
   /** Le tirage des activités de pause : `Math.random` par défaut, une suite fixe dans les tests. */
   hasard?: Hasard;
 }
@@ -62,6 +66,7 @@ export default function Piece({
   onOuvrir,
   onRanger,
   onChoisir,
+  onOpenProject,
   hasard,
 }: PieceProps) {
   const postes = postesDuRun(etat);
@@ -105,10 +110,16 @@ export default function Piece({
         <h3 className="truncate text-corps font-semibold text-zinc-200">{projet}</h3>
         {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
       </div>
-      <div data-sol="lames" className="sol-lames">
+      <div data-sol="lames" className="sol-lames relative">
         {/* Sol de 800 px, celui de la maquette, rendu à l'échelle de la largeur de la salle. */}
         <SolMisAEchelle>
-          <FondDeLaPiece projet={projet} etat={etat} machineEnService={machineEnService(agents)} />
+          <FondDeLaPiece
+            projet={projet}
+            etat={etat}
+            machineEnService={machineEnService(agents)}
+            maintenant={maintenant}
+            onOpenProject={onOpenProject && (() => onOpenProject(projet))}
+          />
           <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
             {postes.map((p) => (
               <PosteDeTravail
@@ -141,7 +152,14 @@ export default function Piece({
           </div>
           <Plante />
         </div>
-        <ObjetsDeLaPiece projet={projet} etat={etat} runId={runId} signalServices={signalServices} />
+        <ObjetsDeLaPiece
+          projet={projet}
+          etat={etat}
+          runId={runId}
+          signalServices={signalServices}
+          onOuvrir={onOuvrir}
+        />
+        {dayMoment(maintenant) === "nuit" && <NightVeil />}
       </div>
     </section>
   );

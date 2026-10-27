@@ -4,6 +4,8 @@ import Salle from "./Salle";
 
 interface SalleReunionProps {
   occupants: readonly OccupantDeReunion[];
+  /** L'horloge unique de la vue (ticket-602). */
+  maintenant: number;
 }
 
 /** « 2 fichiers », « 1 fichier », ou « fichiers inconnus » quand l'événement n'en nomme aucun. */
@@ -16,9 +18,10 @@ function decompte(fichiers: readonly string[]): string {
  * Un conflit confié au résolveur : ses fichiers pendant le travail, puis la PR
  * à relire, que rien ne mergera seule (ADR-033).
  */
-export default function SalleReunion({ occupants }: SalleReunionProps) {
+export default function SalleReunion({ occupants, maintenant }: SalleReunionProps) {
   return (
     <Salle
+      maintenant={maintenant}
       titre="Salle de réunion"
       entete="un conflit de rebase confié au résolveur : ses fichiers pendant le travail, puis la PR à relire"
       vide="Aucun conflit en cours"

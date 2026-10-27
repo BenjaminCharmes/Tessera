@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { StreamState } from "../../hooks/streamState";
 import { useAlerteSonore } from "../../hooks/useAlerteSonore";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
+import { useWeekEmployee } from "../../hooks/useWeekEmployee";
 import { contenuAToi } from "../../lib/bureau/aToi";
 import { modeCompact } from "../../lib/bureau/modeCompact";
 import type { RunActif } from "../../types/api";
@@ -38,6 +39,8 @@ interface BureauViewProps {
   onOuvrir?: (runId: string) => void;
   /** Range un run clos (ticket-567). */
   onRanger?: (runId: string) => void;
+  /** Choisit un projet et ouvre son onglet Tickets : la porte de sa pièce (ticket-602). */
+  onOpenProject?: (projet: string) => void;
 }
 
 /**
@@ -52,6 +55,7 @@ export default function BureauView({
   auRepos = [],
   onOuvrir,
   onRanger,
+  onOpenProject,
 }: BureauViewProps) {
   const maintenant = useSanteDuBureau();
   // L'agent choisi : seul le couple est retenu, ses lignes se relisent à chaque rendu.
@@ -62,6 +66,7 @@ export default function BureauView({
   // Un run qui se clôt fait relire le tableau. Un compte et non un événement :
   // la vue ne reçoit que des états, et `runClosed` y est posé par `run_closed`.
   const runsClos = projets.filter((p) => p.etat.runClosed).length;
+  const employe = useWeekEmployee([...projets.map((p) => p.nom), ...auRepos], maintenant, runsClos);
 
   const aToi = contenuAToi(projets, maintenant);
   useAlerteSonore(
@@ -73,7 +78,7 @@ export default function BureauView({
     <div className="flex items-start gap-3.5">
       <div className="flex min-w-0 flex-1 flex-col gap-3.5">
         <TableauDuJour maintenant={maintenant} signalRunsClos={runsClos} />
-        <SallesCommunes projets={projets} maintenant={maintenant} />
+        <SallesCommunes projets={projets} maintenant={maintenant} employe={employe} />
         <div
           className={compact ? "flex flex-col gap-2" : "flex flex-col gap-3.5"}
           data-mode={compact ? "compact" : "pieces"}
@@ -101,6 +106,7 @@ export default function BureauView({
                 onOuvrir={onOuvrir}
                 onRanger={onRanger}
                 onChoisir={(projet, poste) => setChoix({ projet, poste })}
+                onOpenProject={onOpenProject}
               />
             ),
           )}

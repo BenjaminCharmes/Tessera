@@ -22,6 +22,8 @@ interface BureauConnecteProps {
   son: ReglageSon;
   /** Le sélecteur Bureau / Liste, posé dans la bande d'en-tête. */
   selecteur?: ReactNode;
+  /** La porte d'une pièce : choisit le projet et ouvre l'onglet Tickets (ticket-602). */
+  onOpenProject?: (project: Project) => void;
 }
 
 /**
@@ -35,6 +37,7 @@ export default function BureauConnecte({
   services = [],
   son,
   selecteur,
+  onOpenProject,
 }: BureauConnecteProps) {
   const { runs, etatDe, fermerRuns } = supervision;
   const [filOuvert, setFilOuvert] = useState<string | null>(null);
@@ -49,6 +52,12 @@ export default function BureauConnecte({
   function ranger(ids: string[]) {
     if (filOuvert !== null && ids.includes(filOuvert)) setFilOuvert(null);
     fermerRuns(ids);
+  }
+
+  // Le Bureau nomme ses projets par identifiant : un identifiant inconnu n'ouvre rien.
+  function ouvrirLeProjet(id: string) {
+    const projet = projects.find((p) => p.id === id);
+    if (projet) onOpenProject?.(projet);
   }
 
   return (
@@ -72,6 +81,7 @@ export default function BureauConnecte({
             son={son}
             onOuvrir={setFilOuvert}
             onRanger={(runId) => ranger([runId])}
+            onOpenProject={onOpenProject && ouvrirLeProjet}
           />
         </div>
       )}

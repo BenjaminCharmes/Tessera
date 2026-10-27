@@ -13,7 +13,7 @@ import type { OrchestratorEvent, Project, RunActif } from "../../types/api";
 
 vi.mock("../../lib/api", () => ({
   api: {
-    runs: { events: vi.fn().mockResolvedValue([]) },
+    runs: { events: vi.fn().mockResolvedValue([]), list: vi.fn().mockResolvedValue([]) },
     orchestrator: { limits: vi.fn().mockResolvedValue({ run_max_budget_usd: 0, llm_max_budget_usd: 0 }) },
     tickets: { activity: vi.fn().mockResolvedValue({ ticket_id: "", runs: [], pr_number: null, github_remote: null }) },
     services: { list: vi.fn().mockResolvedValue([]) },
@@ -284,6 +284,25 @@ describe("Supervision — chrono et fil depuis le Bureau", () => {
     await userEvent.click(screen.getByRole("button", { name: "Ouvrir le fil de ticket-004" }));
 
     expect(screen.getByText("Fil de ticket-004")).toBeInTheDocument();
+  });
+});
+
+describe("Supervision — porte d'une pièce", () => {
+  it("hands the project of the door to onOpenProject", async () => {
+    const onOpenProject = vi.fn();
+    const projets = tousLesProjets(2);
+    render(<SupervisionView supervision={supervision(lesRuns(2))} projects={projets} onOpenProject={onOpenProject} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Ouvrir le projet projet-2" }));
+
+    expect(onOpenProject).toHaveBeenCalledTimes(1);
+    expect(onOpenProject).toHaveBeenCalledWith(projets[1]);
+  });
+
+  it("draws no door button when nobody listens", () => {
+    render(<SupervisionView supervision={supervision(lesRuns(1))} projects={tousLesProjets(1)} />);
+
+    expect(screen.queryByRole("button", { name: /Ouvrir le projet/ })).toBeNull();
   });
 });
 

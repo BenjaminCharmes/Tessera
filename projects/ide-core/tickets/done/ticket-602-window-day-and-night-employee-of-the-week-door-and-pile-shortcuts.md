@@ -1,14 +1,16 @@
 ---
-id: ticket-602
-title: "A window follows day and night, the director's office shows the employee of the week, and the door and the pile are shortcuts"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-597"]
-estimated_days: 0.5
 created: 2026-10-27
+depends_on:
+- ticket-597
+estimated_days: 0.5
+id: ticket-602
+pr_number: 687
+priority: medium
+status: done
+title: A window follows day and night, the director's office shows the employee of
+  the week, and the door and the pile are shortcuts
+type: feat
 ---
 
 # ticket-602 — Fenêtre jour/nuit, employé de la semaine, porte et pile cliquables

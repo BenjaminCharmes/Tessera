@@ -24,6 +24,8 @@ interface SupervisionViewProps {
   services?: ServiceActif[];
   /** Le réglage « Son » de la question, tenu par la cloche (ticket-554). */
   son?: ReglageSon;
+  /** La porte d'une pièce du Bureau : choisit le projet et ouvre l'onglet Tickets (ticket-602). */
+  onOpenProject?: (project: Project) => void;
 }
 
 /**
@@ -37,6 +39,7 @@ export default function SupervisionView({
   projects,
   services = [],
   son = SON_COUPE,
+  onOpenProject,
 }: SupervisionViewProps) {
   const [vue, setVue] = useState<Vue>("bureau");
   const selecteur = (
@@ -50,6 +53,7 @@ export default function SupervisionView({
       services={services}
       son={son}
       selecteur={selecteur}
+      onOpenProject={onOpenProject}
     />
   ) : (
     <ListeView
