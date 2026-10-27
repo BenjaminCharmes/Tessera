@@ -1,14 +1,16 @@
 ---
-id: ticket-583
-title: "The break room and the meeting room keep their furniture when nobody is in them"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-581"]
-estimated_days: 0.5
 created: 2026-10-26
+depends_on:
+- ticket-581
+estimated_days: 0.5
+id: ticket-583
+pr_number: 667
+priority: medium
+status: done
+title: The break room and the meeting room keep their furniture when nobody is in
+  them
+type: fix
 ---
 
 # ticket-583 — Les salles gardent leur mobilier quand elles sont vides

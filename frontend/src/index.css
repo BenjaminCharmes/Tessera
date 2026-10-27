@@ -29,6 +29,15 @@
   --sprite-dossier-ombre: #a16207;
   --sprite-chemise: oklch(0.606 0.25 292.717);
   --sprite-chemise-ombre: oklch(0.541 0.281 293.009);
+  /* Le mobilier des salles (ticket-583) : du bois et du métal sourds, aucune
+     teinte d'état, pour qu'un meuble ne se lise jamais comme un voyant. */
+  --sprite-sol: #27272a;
+  --sprite-sol-lame: #2f2f33;
+  --sprite-machine: #52525b;
+  --sprite-machine-ombre: #3f3f46;
+  --sprite-tasse: #e4e4e7;
+  --sprite-table: #8a6a4a;
+  --sprite-table-ombre: #6b5038;
 }
 
 /* Animations du Bureau : `transform` et `opacity` seulement, pour rester sur le

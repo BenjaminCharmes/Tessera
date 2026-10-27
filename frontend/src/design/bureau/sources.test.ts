@@ -47,6 +47,15 @@ describe("sprites sources", () => {
     }
   });
 
+  it("keeps room furniture on --sprite-* tokens, still and without a status hue", () => {
+    for (const nom of ["MachineACafe.tsx", "TableDeReunion.tsx"]) {
+      const contenu = SPRITES.find((s) => s.nom === nom)?.contenu ?? "";
+      expect(contenu, nom).toContain("--sprite-");
+      expect(contenu, nom).not.toMatch(/anim-|animation|green/);
+      expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:zinc|red|amber|blue|violet)-\d/);
+    }
+  });
+
   it("writes no raw colour in design/bureau", () => {
     const fautifs = SPRITES.filter(({ contenu }) =>
       /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(/.test(contenu),
