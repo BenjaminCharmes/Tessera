@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-575
 plan: true
-pr_number: null
+pr_number: 697
 priority: medium
 status: done
 title: A system prompt too long for a Windows command line goes to the SDK through
