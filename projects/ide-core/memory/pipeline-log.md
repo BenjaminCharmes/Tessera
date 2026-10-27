@@ -5403,3 +5403,17 @@ Le diff ajoute :
 - 2026-10-27 13:07:43 UTC — [ticket-599] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (194156ms)
 - 2026-10-27 13:07:43 UTC — [ticket-599] APPROVED après 1 tour(s)
 - 2026-10-27 13:10:30 UTC — [ticket-599] documentation: 0 fichier(s) (161266ms)
+- 2026-10-27 13:10:47 UTC — [ide-core] ticket-599 PR #680 confiée au CIWatcher
+- 2026-10-27 13:10:50 UTC — [ticket-600] branche ticket-600-a-whiteboard-on-the-room-s-wall-shows-the-ticket
+- 2026-10-27 13:10:51 UTC — [ticket-600] tour 1 — codeur démarré
+- 2026-10-27 13:16:11 UTC — [ticket-600] tour 1 — codeur terminé (319735ms)
+- 2026-10-27 13:16:51 UTC — [ide-core] ticket-599 PR #680 mergée (CI verte)
+- 2026-10-27 13:18:10 UTC — [ticket-600] testeur: OK (exit 0)
+- 2026-10-27 13:20:58 UTC — [ticket-600] securite: PASS — Aucune vulnérabilité OWASP Top 10 ou CVE détectée dans le code ajouté. Cependant (168391ms)
+- 2026-10-27 13:20:58 UTC — [ticket-600] tour 1 — reviewer démarré
+- 2026-10-27 13:21:23 UTC — [ticket-600] tour 1 — reviewer terminé (25031ms)
+- 2026-10-27 13:25:59 UTC — [ticket-600] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 13:26:32 UTC — [ticket-600] validateur: fichiers cités joints : TableauBlanc.tsx, design/bureau/sources.test.ts, backend/src/ (dossier, 0 fichiers)
+- 2026-10-27 13:26:32 UTC — [ticket-600] validateur: APPROVED — Tous les critères sont satisfaits. Le tableau blanc affiche correctement les cri (333843ms)
+- 2026-10-27 13:26:32 UTC — [ticket-600] APPROVED après 1 tour(s)
+- 2026-10-27 13:28:02 UTC — [ticket-600] documentation: 0 fichier(s) (85296ms)

@@ -1,14 +1,16 @@
 ---
-id: ticket-600
-title: "A whiteboard on the room's wall shows the ticket's criteria as the validator judges them"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-593"]
-estimated_days: 0.25
 created: 2026-10-27
+depends_on:
+- ticket-593
+estimated_days: 0.25
+id: ticket-600
+pr_number: 682
+priority: medium
+status: done
+title: A whiteboard on the room's wall shows the ticket's criteria as the validator
+  judges them
+type: feat
 ---
 
 # ticket-600 — Le tableau blanc des critères

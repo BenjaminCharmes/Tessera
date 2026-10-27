@@ -81,6 +81,11 @@
   --sprite-gyrophare: #dc2626;
   --sprite-gyrophare-clair: #fca5a5;
   --sprite-gyrophare-socle: #3f3f46;
+  /* Le tableau blanc des critères (ticket-600) : un panneau clair dans un cadre
+     sourd ; les lignes jugées prennent les familles d'état, la grise n'en a pas. */
+  --sprite-tableau: #e4e4e7;
+  --sprite-tableau-cadre: #52525b;
+  --sprite-tableau-case: #a1a1aa;
 }
 
 /* Sol en lames des pièces et des salles : des lames horizontales séparées d'un

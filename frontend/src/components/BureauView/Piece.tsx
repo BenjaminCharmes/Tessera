@@ -105,7 +105,7 @@ export default function Piece({
         {/* Sol de 800 px, celui de la maquette : plus étroite, la pièce défile. */}
         <div className="overflow-x-auto">
           <div className="relative w-200">
-            <FondDeLaPiece machineEnService={machineEnService(agents)} />
+            <FondDeLaPiece projet={projet} etat={etat} machineEnService={machineEnService(agents)} />
             <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-zinc-800 px-2.5">
               {postes.map((p) => (
                 <PosteDeTravail
