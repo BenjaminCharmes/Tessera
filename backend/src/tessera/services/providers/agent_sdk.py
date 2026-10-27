@@ -20,6 +20,7 @@ from claude_agent_sdk import (
     UserMessage,
     query,
 )
+from claude_agent_sdk.types import SystemPromptFile
 
 # Union de tous les types émis par query() — utilisé pour typer le générateur.
 _SdkMessage = (
@@ -60,7 +61,12 @@ from tessera.services.providers.base import (
     ToolEventCallback,
 )
 from tessera.services.providers.duree_max import borner
+from tessera.services.providers.messages_sdk import (
+    _extract_stream_delta,
+    _usage_from,
+)
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
 from tessera.services.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
 
@@ -78,6 +84,9 @@ _TESSERA_PLUGIN_PATH: Path = _REPO_ROOT / "agents" / "plugin"
 # Les fichiers de consignes que Claude Code charge dans chaque dossier ancêtre.
 _FICHIERS_CONSIGNES = ("CLAUDE.md", "CLAUDE.local.md")
 
+# Octets UTF-8 au-delà desquels le prompt système part par fichier : la ligne
+# de commande Windows tient dans ~32 Ko et porte aussi réglages et outils.
+SYSTEM_PROMPT_FILE_THRESHOLD_BYTES = 24_000
 
 def claude_md_ancetres_a_exclure(
     cwd: Path, racine: Path, ancestor: bool
@@ -144,7 +153,7 @@ def _reglages_sans_consignes_ancetres(
 
 def _build_options(
     *,
-    system: str,
+    system: str | SystemPromptFile,
     model: str,
     max_turns: int,
     max_budget_usd: float | None,
@@ -266,40 +275,6 @@ def _build_options(
     )
 
 
-def _extract_stream_delta(event: dict[str, Any]) -> str | None:
-    """Extracts incremental text from a raw Anthropic ``stream_event`` payload.
-
-    ``StreamEvent.event`` is the raw Anthropic Messages API streaming event
-    (``message_start``, ``content_block_start``, ``content_block_delta``,
-    ``content_block_stop``, ``message_delta``, ``message_stop``, ...). Only a
-    ``content_block_delta`` carrying a ``text_delta`` produces visible text
-    for live display; every other shape — including a malformed/unexpected
-    one — yields ``None`` rather than raising, since a live-token feed must
-    never crash the run.
-    """
-    try:
-        if event.get("type") != "content_block_delta":
-            return None
-        delta = event.get("delta") or {}
-        if delta.get("type") != "text_delta":
-            return None
-        text = delta.get("text")
-        return text if isinstance(text, str) and text else None
-    except AttributeError:
-        return None
-
-
-def _usage_from(result: Any) -> tuple[int, int, int, int]:
-    """Extracts (input, output, cache_read, cache_creation) from a ResultMessage."""
-    usage = getattr(result, "usage", None) or {}
-    return (
-        int(usage.get("input_tokens", 0) or 0),
-        int(usage.get("output_tokens", 0) or 0),
-        int(usage.get("cache_read_input_tokens", 0) or 0),
-        int(usage.get("cache_creation_input_tokens", 0) or 0),
-    )
-
-
 class ClaudeAgentSDKProvider:
     """Claude Agent SDK backend: real file tools, billed against the subscription."""
 
@@ -413,13 +388,17 @@ class ClaudeAgentSDKProvider:
         attend l'annulation de `__anext__`, et sur un CLI figé rien d'autre
         ne la limitait (ticket-518).
         """
-        async with borner(self._duree_max_s):
-            return await self._executer(**kwargs)
+        system = kwargs.pop("system")
+        seuil = SYSTEM_PROMPT_FILE_THRESHOLD_BYTES
+        # Un fichier par tentative : il vit le temps de l'appel, erreur comprise.
+        with prompt_systeme_pour_sdk(system, kwargs["cwd"], seuil) as prompt:
+            async with borner(self._duree_max_s):
+                return await self._executer(system=prompt, **kwargs)
 
     async def _executer(
         self,
         *,
-        system: str,
+        system: str | SystemPromptFile,
         user: str,
         model: str,
         cwd: Path | None,
