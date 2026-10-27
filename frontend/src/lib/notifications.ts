@@ -2,12 +2,15 @@ import type { RunActif } from "../types/api";
 import type { StreamState } from "../hooks/streamState";
 import { enEtapeSilencieuse } from "./santeAgent";
 import type { SanteAgent } from "./santeAgent";
+import { notificationsQuota } from "./notifQuota";
+import type { RelevesDeQuota } from "./notifQuota";
 
 /**
  * Ce qui mérite de sortir de l'IDE — ticket-192.
  *
  * Une question d'agent, un run bloqué, un run terminé, l'issue de la
- * livraison (PR mergée ou non, ticket-552). Pas chaque ticket
+ * livraison (PR mergée ou non, ticket-552), un quota de session ou de semaine
+ * sous 10 % (ticket-555). Pas chaque ticket
  * approuvé d'une file : le bruit tuerait le signal. Pure, pour être testée
  * sans fenêtre : le hook lui donne l'avant et l'après, elle dit quoi dire.
  *
@@ -45,6 +48,10 @@ export interface Instantane {
   etats: Record<string, StreamState>;
   /** Santé de chaque run en cours (ticket-553). Absente : aucun run n'est suspecté. */
   sante?: Record<string, SanteAgent>;
+  /** Relevés de quota par fenêtre (ticket-555). Absent : pas encore lus. */
+  quota?: RelevesDeQuota;
+  /** L'instant de l'instantané, pour dire l'heure de reprise ; `Date.now()` à défaut. */
+  maintenant?: number;
 }
 
 function nom(run: RunActif): string {
@@ -137,6 +144,8 @@ export function notificationsPour(avant: Instantane, apres: Instantane): Notif[]
         : "Le run est terminé.";
     notifs.push({ projectId: run.project_id, type: "termine", titre: `${nom(run)} : terminé`, corps });
   }
+
+  notifs.push(...notificationsQuota(avant.quota, apres.quota, apres.maintenant ?? Date.now()));
 
   // Tout ce qui s'est produit : c'est l'historique de la cloche (ticket-554).
   // Ce qui part vers le système se filtre à part, par `masqueeParToast`.

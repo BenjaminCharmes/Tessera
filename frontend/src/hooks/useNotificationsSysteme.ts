@@ -24,6 +24,7 @@ import { enEtapeSilencieuse, santeAgent, type SanteAgent } from "../lib/santeAge
 import { useEtatPersistant } from "./useEtatPersistant";
 import { useHistoriqueNotifications } from "./useHistoriqueNotifications";
 import { useMaintenant } from "./useMaintenant";
+import { useQuotaLu } from "./useQuotaLu";
 import type { UseSupervisionResult } from "./useSupervision";
 
 /**
@@ -137,6 +138,7 @@ export function useNotificationsSysteme(
   const { runs, etatDe } = supervision;
   // La santé dépend du temps : sans tick, un agent muet ne changerait jamais d'état.
   const maintenant = useMaintenant();
+  const quota = useQuotaLu(maintenant);
 
   useEffect(() => {
     const etats: Record<string, ReturnType<typeof etatDe>> = {};
@@ -154,7 +156,7 @@ export function useNotificationsSysteme(
         );
       }
     }
-    const courant: Instantane = { runs, etats, sante };
+    const courant: Instantane = { runs, etats, sante, quota, maintenant };
     const avant = precedent.current;
     precedent.current = courant;
 
@@ -169,7 +171,7 @@ export function useNotificationsSysteme(
       // Une notification qui ne part pas ne casse rien.
       void envoyer(n, ouvrir).catch(() => undefined);
     }
-  }, [runs, etatDe, maintenant, active, projetActif, ouvrir, reglages, enregistrer]);
+  }, [runs, etatDe, maintenant, quota, active, projetActif, ouvrir, reglages, enregistrer]);
 
   return {
     active,
