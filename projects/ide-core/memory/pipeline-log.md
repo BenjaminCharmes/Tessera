@@ -5456,3 +5456,26 @@ Le diff ajoute :
 - 2026-10-27 13:54:15 UTC — [ide-core] ticket-576 retiré de la file
 - 2026-10-27 13:54:15 UTC — [ide-core] ticket-570 retiré de la file
 - 2026-10-27 13:54:15 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 13:56:20 UTC — [ide-core] ticket-601 PR #684 confiée au CIWatcher
+- 2026-10-27 13:56:26 UTC — [ticket-606] branche ticket-606-work-rooms-stack-one-per-row-and-fill-the-view-s
+- 2026-10-27 13:56:29 UTC — [ticket-606] tour 1 — codeur démarré
+- 2026-10-27 13:58:16 UTC — [ticket-606] tour 1 — codeur terminé (107093ms)
+- 2026-10-27 14:00:58 UTC — [ticket-606] testeur: OK (exit 0)
+- 2026-10-27 14:01:32 UTC — [ticket-606] securite: PASS — Refactoring frontend du layout du Bureau (responsive avec ResizeObserver, calcul (34546ms)
+- 2026-10-27 14:01:32 UTC — [ticket-606] tour 1 — reviewer démarré
+- 2026-10-27 14:01:58 UTC — [ticket-606] tour 1 — reviewer terminé (26172ms)
+- 2026-10-27 14:05:40 UTC — [ide-core] ticket-601 PR #684 mergée (CI verte)
+- 2026-10-27 14:06:33 UTC — [ticket-606] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 14:07:26 UTC — [ticket-606] validateur: fichiers cités joints : components/BureauView/index.tsx, components/BureauView/Piece.tsx, lib/bureau/echelleDuSol.ts, Piece.test.tsx (tronqué) ; non joints (budget épuisé) : lib/bureau/activites.ts
+- 2026-10-27 14:07:26 UTC — [ticket-606] validateur: CHANGES_REQUESTED — Quatre critères confirmés : le changement de layout en une colonne, suppression  (353906ms)
+- 2026-10-27 14:07:26 UTC — [ticket-606] CHANGES_REQUESTED tour 1: Validateur : Quatre critères confirmés : le changement de layout en une colonne, suppression du `overflow-x-auto`, nouvelle fonction `echelleDuSol` avec tests corrects, et test mis à jour pour vérifie
+- 2026-10-27 14:07:26 UTC — [ticket-606] tour 2 — codeur démarré
+- 2026-10-27 14:07:41 UTC — [ticket-606] tour 2 — codeur terminé (14936ms)
+- 2026-10-27 14:09:50 UTC — [ticket-606] testeur: OK (exit 0)
+- 2026-10-27 14:10:43 UTC — [ticket-606] securite: PASS — Code de refactoring React/TypeScript pour le scaling du sol avec ResizeObserver. (52297ms)
+- 2026-10-27 14:10:43 UTC — [ticket-606] tour 2 — reviewer démarré
+- 2026-10-27 14:10:44 UTC — [ticket-606] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-27 14:11:02 UTC — [ticket-606] tour 2 — reviewer terminé (18750ms)
+- 2026-10-27 14:11:08 UTC — [ticket-606] validateur: fichiers cités joints : components/BureauView/index.tsx, components/BureauView/Piece.tsx, lib/bureau/echelleDuSol.ts, Piece.test.tsx (tronqué) ; non joints (budget épuisé) : lib/bureau/activites.ts
+- 2026-10-27 14:11:08 UTC — [ticket-606] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le changement de layout passe d (25500ms)
+- 2026-10-27 14:11:08 UTC — [ticket-606] APPROVED après 2 tour(s)
