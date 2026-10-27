@@ -11,6 +11,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.attente_dependance import dependants_a_sauter
 from tessera.services.ci_watcher import CIWatcher
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
@@ -160,3 +161,42 @@ async def test_dependant_attend_le_merge_d_une_pr_surveillee(tmp_path: Path) -> 
     assert departs == ["ticket-001", "ticket-002"]
     assert len(results) == 2
     await watcher.arreter()
+
+
+def _service(deps: dict[str, list[str]]) -> AsyncMock:
+    def _ticket(tid: str) -> Ticket | None:
+        if tid not in deps:
+            return None
+        return Ticket(
+            id=tid, title="t", type=TicketType.feat, status=TicketStatus.todo,
+            priority=TicketPriority.medium, agent="codeur", body="b",
+            depends_on=deps[tid],
+        )
+
+    svc = AsyncMock()
+    svc.get_ticket.side_effect = _ticket
+    return svc
+
+
+async def test_dependants_a_sauter_direct() -> None:
+    svc = _service({"b": ["a"], "c": []})
+
+    assert await dependants_a_sauter(svc, "a", ["b", "c"]) == {"b": "a"}
+
+
+async def test_dependants_a_sauter_transitif_quel_que_soit_l_ordre() -> None:
+    svc = _service({"b": ["a"], "c": ["b"]})
+
+    assert await dependants_a_sauter(svc, "a", ["c", "b"]) == {"b": "a", "c": "b"}
+
+
+async def test_dependants_a_sauter_ignore_un_ticket_introuvable() -> None:
+    svc = _service({"b": ["a"]})
+
+    assert await dependants_a_sauter(svc, "a", ["inconnu", "b"]) == {"b": "a"}
+
+
+async def test_dependants_a_sauter_vide_sans_dependant() -> None:
+    svc = _service({"b": [], "c": ["b"]})
+
+    assert await dependants_a_sauter(svc, "a", ["b", "c"]) == {}

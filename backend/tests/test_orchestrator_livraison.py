@@ -945,6 +945,112 @@ async def test_ticket_independant_continue_quand_dependance_non_mergee(
 
 
 # ------------------------------------------------------------------
+# ticket-569 — un ticket non mergé n'arrête que ceux qui en dépendent
+# ------------------------------------------------------------------
+
+
+async def _file_avec_dependances(
+    tmp_path: Path, deps: dict[str, list[str]], lances: list[str]
+) -> tuple[list[PipelineResult], str]:
+    """Run a queue of ``deps`` keys whose first ticket never merges.
+
+    ``lances`` are the ids expected to start, in order: the double hands out
+    one result per start, whatever ticket is actually run.
+
+    Returns the results and the content of the pipeline log.
+    """
+    from unittest.mock import AsyncMock
+    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    class _FakeCIWatcherFail:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
+            return False
+
+    par_id = {
+        tid: Ticket(
+            id=tid, title="titre", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="corps", depends_on=dependances,
+        )
+        for tid, dependances in deps.items()
+    }
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: par_id.get(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat(tid) for tid in lances],
+        _livrer,
+        ci_watcher=_FakeCIWatcherFail(),
+        ticket_service=tickets,
+    )
+    results = await orch.run_queue("proj", list(deps))
+    log_path = tmp_path / "memory" / "log.md"
+    return results, log_path.read_text(encoding="utf-8") if log_path.exists() else ""
+
+
+async def test_dependant_saute_et_la_file_continue_avec_un_independant(
+    tmp_path: Path,
+) -> None:
+    results, _ = await _file_avec_dependances(
+        tmp_path,
+        {"ticket-001": [], "ticket-002": ["ticket-001"], "ticket-003": []},
+        ["ticket-001", "ticket-003"],
+    )
+
+    assert [r.ticket_id for r in results] == ["ticket-001", "ticket-003"]
+
+
+async def test_dependant_transitif_saute_aussi(tmp_path: Path) -> None:
+    results, log = await _file_avec_dependances(
+        tmp_path,
+        {
+            "ticket-001": [],
+            "ticket-002": ["ticket-001"],
+            "ticket-003": ["ticket-002"],
+            "ticket-004": [],
+        },
+        ["ticket-001", "ticket-004"],
+    )
+
+    assert [r.ticket_id for r in results] == ["ticket-001", "ticket-004"]
+    assert "ticket-003 sauté : dépend de ticket-002, sauté" in log
+
+
+async def test_ticket_saute_ecrit_sa_dependance_au_journal(tmp_path: Path) -> None:
+    _, log = await _file_avec_dependances(
+        tmp_path,
+        {"ticket-001": [], "ticket-002": ["ticket-001"], "ticket-003": []},
+        ["ticket-001", "ticket-003"],
+    )
+
+    assert "ticket-002 sauté : dépend de ticket-001, non mergé" in log
+    assert "file interrompue" not in log
+
+
+async def test_file_s_arrete_quand_tous_les_restants_dependent_du_non_merge(
+    tmp_path: Path,
+) -> None:
+    results, log = await _file_avec_dependances(
+        tmp_path,
+        {
+            "ticket-001": [],
+            "ticket-002": ["ticket-001"],
+            "ticket-003": ["ticket-002"],
+        },
+        ["ticket-001"],
+    )
+
+    assert [r.ticket_id for r in results] == ["ticket-001"]
+    assert "file interrompue : ticket-001 non mergé" in log
+
+
+# ------------------------------------------------------------------
 # ticket-382 — merge_without_ci : attendre le merge avant le suivant
 # ------------------------------------------------------------------
 

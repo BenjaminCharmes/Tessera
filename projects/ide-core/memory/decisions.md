@@ -540,3 +540,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : complète ADR-046. À côté de l'indisponibilité, un second déclencheur du repli : le choix explicite, au lancement (`rapide` dans `RunRequest`, faux par défaut). Un rôle qui déclare un `fallback` est alors construit directement avec lui, sans principal, et chaque appel porte le modèle du repli. Un rôle sans repli ne change pas. Le choix s'écrit une fois par run dans `memory/pipeline-log.md`. Une réponse illisible ne déclenche toujours aucun repli.
 **Raison** : sur ce PC, le validateur local prend environ 5 min 30 par ticket contre environ 1 min sur Haiku. Ollama reste le premier choix, Haiku quand on est pressé.
 **Alternative rejetée** : changer le défaut des `agents.json` — le réglage par défaut économise le quota.
+
+---
+
+## ADR-060 — Un ticket non mergé n'arrête que ceux qui en dépendent
+
+**Date** : 2026-10-27
+**Décision** : complète ADR-051. Quand un ticket de la file n'est pas mergé, les tickets restants qui en dépendent par `depends_on`, directement ou par transitivité, sont retirés de la file ; chacun s'écrit dans `memory/pipeline-log.md` avec sa dépendance (« ticket-546 sauté : dépend de ticket-544, non mergé »). La file continue avec les autres et ne s'arrête que s'il ne reste plus rien. Le ticket non mergé reste `blocked`, PR ouverte, comme dans ADR-051.
+**Raison** : le 23/10, la CI rouge du ticket-544 a arrêté onze tickets alors qu'un seul en dépendait.
+**Alternative rejetée** : arrêter toute la file par prudence — un ticket indépendant n'a pas besoin du code manquant.
