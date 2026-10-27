@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 0.75
 id: ticket-596
 plan: true
-pr_number: null
+pr_number: 677
 priority: high
 status: done
 title: Finished agents vary what they do, walk to the room's coffee corner, and leave
