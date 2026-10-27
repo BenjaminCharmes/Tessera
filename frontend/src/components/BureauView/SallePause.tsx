@@ -34,12 +34,7 @@ export default function SallePause({ occupants, maintenant }: SallePauseProps) {
         </>
       }
       plante="cactus"
-      mobilier={
-        <figure className="flex flex-col items-center gap-1">
-          <MachineACafe />
-          <figcaption className="text-micro text-zinc-500">café</figcaption>
-        </figure>
-      }
+      mobilier={<MachineACafe />}
     >
       {occupants.map(({ projet, pause }) => (
         <li key={projet} className="text-xs">

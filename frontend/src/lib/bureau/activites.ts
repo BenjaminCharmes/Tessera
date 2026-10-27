@@ -34,23 +34,29 @@ const LIBELLES: Record<Activite, string> = {
 const LARGEUR_COLONNE = 152.8;
 const PAS_COLONNE = 156.8;
 const MARGE_DU_SOL = 10;
-/** Moitié du poste (56 px) plus la marge qui sépare l'agent debout de son bureau. */
-const DECALAGE_A_COTE = 32;
+/**
+ * Les décalages se comptent en pixels d'écran, sprites agrandis (×1,5) : ils ne
+ * s'étirent pas avec le sol, contrairement aux abscisses du repère.
+ * Moitié du poste (84 px) plus la marge qui sépare l'agent debout de son bureau.
+ */
+const DECALAGE_A_COTE = 48;
 
 /** Abscisse de la machine et de la porte, dans le fond de la pièce. */
 export const MACHINE_X = 470;
-export const PORTE_X = 752;
-/** L'agent de 42 px se centre sur la porte de 36 px. */
-const AGENT_A_LA_PORTE_X = PORTE_X - 3;
-/** Autour de la machine : à gauche, à droite, puis plus loin à gauche. */
-const PLACES_X = [MACHINE_X - 46, MACHINE_X + 50, MACHINE_X - 78] as const;
+export const PORTE_X = 738;
+/** L'agent de 63 px se centre sur la porte de 81 px. */
+const DECALAGE_A_LA_PORTE = 9;
+/** Autour de la machine (54 px) : à gauche, à droite, puis plus loin à gauche. */
+const PLACES_A_LA_MACHINE = [-66, 58, -132] as const;
 
 export type Niveau = "rangee" | "fond";
 
 export interface AgentPlace {
   poste: PosteId;
-  /** Abscisse du bord gauche de l'agent sur le sol de la pièce, en pixels. */
+  /** L'abscisse de son ancre (poste, machine, porte), dans le repère de 800 px. */
   x: number;
+  /** Le bord gauche de l'agent par rapport à l'ancre, en pixels d'écran : il ne s'étire pas. */
+  decalage: number;
   /** `fond` : le long du mur (machine, porte) ; `rangee` : à hauteur des postes. */
   niveau: Niveau;
   /** `null` quand l'agent est parti : il n'a plus rien à faire dans la pièce. */
@@ -109,12 +115,12 @@ function centreDuPoste(poste: PosteId): number {
 
 function placeDe(poste: PosteId, activite: Activite, rang: number): AgentPlace {
   if (activite === "machine") {
-    const x = PLACES_X[rang] ?? PLACES_X[0];
-    return { poste, x, niveau: "fond", activite, parti: false };
+    const decalage = PLACES_A_LA_MACHINE[rang] ?? PLACES_A_LA_MACHINE[0];
+    return { poste, x: MACHINE_X, decalage, niveau: "fond", activite, parti: false };
   }
   // Rendre sa copie : debout à côté du poste du codeur, pas du sien.
   const ancre = activite === "copie" ? "codeur" : poste;
-  return { poste, x: centreDuPoste(ancre) + DECALAGE_A_COTE, niveau: "rangee", activite, parti: false };
+  return { poste, x: centreDuPoste(ancre), decalage: DECALAGE_A_COTE, niveau: "rangee", activite, parti: false };
 }
 
 /**
@@ -135,7 +141,8 @@ export function placerLesAgents(
   if (clos) {
     return POSTES.map((poste): AgentPlace => ({
       poste,
-      x: AGENT_A_LA_PORTE_X,
+      x: PORTE_X,
+      decalage: DECALAGE_A_LA_PORTE,
       niveau: "fond",
       activite: null,
       parti: true,
@@ -150,6 +157,15 @@ export function placerLesAgents(
     if (activite === "machine") rang += 1;
   }
   return places;
+}
+
+/**
+ * Les agents qui bavardent : au moins deux à la machine, côte à côte. Le premier
+ * arrivé parle (ADR-058 : la bulle dit un fait, deux agents en pause ensemble).
+ */
+export function quiBavarde(agents: readonly AgentPlace[]): PosteId | null {
+  const aLaMachine = agents.filter((a) => !a.parti && a.activite === "machine");
+  return aLaMachine.length >= 2 ? (aLaMachine[0]?.poste ?? null) : null;
 }
 
 /** La machine fume quand quelqu'un s'y sert, et seulement alors. */

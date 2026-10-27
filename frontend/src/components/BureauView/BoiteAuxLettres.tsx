@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import Agrandi from "../../design/bureau/Agrandi";
 import Boite from "../../design/bureau/Boite";
 import type { StreamState } from "../../hooks/streamState";
 import { useResource } from "../../hooks/useResource";
@@ -52,7 +53,9 @@ export default function BoiteAuxLettres({ projet, etat }: BoiteAuxLettresProps) 
   return (
     <div data-boite={boite.etat} className="flex items-end gap-1">
       <AvecInfobulle label={libelleDeLaBoite(boite)} className="block" infobulle={libelleCourtDeLaBoite(boite)}>
-        <Boite etat={boite.etat} />
+        <Agrandi>
+          <Boite etat={boite.etat} />
+        </Agrandi>
       </AvecInfobulle>
       {boite.pr !== null &&
           (url ? (

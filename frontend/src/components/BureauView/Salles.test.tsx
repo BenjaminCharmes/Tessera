@@ -29,7 +29,7 @@ describe("SallePause", () => {
     const machine = container.querySelector('[data-sprite="machine-a-cafe"]');
     expect(machine).not.toBeNull();
     expect(machine?.getAttribute("aria-hidden")).toBe("true");
-    expect(screen.getByText("café")).toBeInTheDocument();
+    expect(screen.queryByText("café")).toBeNull();
     expect(screen.getByRole("heading", { name: "Salle de pause" })).toHaveAttribute(
       "title",
       expect.stringMatching(/quota, CI, une dépendance/),

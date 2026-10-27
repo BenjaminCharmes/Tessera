@@ -123,7 +123,7 @@ describe("Piece end of run", () => {
     const tous = agents(container);
     expect(tous).toHaveLength(5);
     for (const agent of tous) {
-      expect(agent.style.transform).toContain(`translate(${PORTE_X - 3}px`);
+      expect(agent.style.transform).toContain(`translate(${PORTE_X + 9}px`);
       expect(agent.style.opacity).toBe("0");
     }
   });

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Agrandi from "../../design/bureau/Agrandi";
 import CeilingLamp from "../../design/bureau/CeilingLamp";
 import NightVeil from "../../design/bureau/NightVeil";
 import Plante from "../../design/bureau/Plante";
@@ -64,35 +65,49 @@ export default function Salle({
       data-contour={ambre ? "amber" : "neutre"}
       className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-(--sprite-mur) ${contour}`}
     >
-      <h3
-        title={entete}
-        className="flex items-center gap-1 px-3 pt-[5px] text-micro uppercase tracking-wide text-zinc-400"
-      >
-        {titre}
-        <IconInfo size={12} data-marque="info" />
-      </h3>
+      <div className="flex items-center justify-between gap-2 px-3 pt-[5px]">
+        <h3 title={entete} className="flex items-center gap-1 text-micro uppercase tracking-wide text-zinc-400">
+          {titre}
+          <IconInfo size={12} data-marque="info" />
+        </h3>
+        {/* Ce que dit la salle vide, en face de son nom : le sol reste au mobilier. */}
+        {!occupee && <p className="truncate text-micro text-zinc-500">{vide}</p>}
+      </div>
       <div
         data-mur="salle"
-        className="relative flex flex-wrap items-start justify-center gap-4 border-b-4 border-(--sprite-plinthe) px-3 pt-3 pb-4"
+        className="flex flex-nowrap items-start justify-center gap-4 overflow-hidden border-b-4 border-(--sprite-plinthe) px-3 pt-3 pb-4"
       >
-        <SkyWindow moment={moment} soleil={gauche?.soleil} nuages={gauche?.nuages} />
-        <CeilingLamp allume={lumiere} />
-        <SkyWindow moment={moment} soleil={droite?.soleil} nuages={droite?.nuages} />
+        <Agrandi>
+          <SkyWindow moment={moment} soleil={gauche?.soleil} nuages={gauche?.nuages} />
+        </Agrandi>
+        <Agrandi>
+          <CeilingLamp allume={lumiere} />
+        </Agrandi>
+        <Agrandi>
+          <SkyWindow moment={moment} soleil={droite?.soleil} nuages={droite?.nuages} />
+        </Agrandi>
         {accroche}
-        <span className="absolute bottom-2 right-3">
+        <span className="self-end">
           <BoutonLumiere salle={titre} allume={lumiere} onBasculer={basculerLumiere} />
         </span>
       </div>
       <div data-sol="lames" className="sol-lames flex flex-1 flex-col justify-end px-3">
         <div className="flex min-h-39 items-end justify-between gap-4 px-1 py-2">
           <div className="flex min-w-0 items-center gap-4">
-            <div className="shrink-0">{mobilier}</div>
+            <div className="shrink-0">
+              <Agrandi>{mobilier}</Agrandi>
+            </div>
             {occupee && <ul className="flex min-w-0 flex-col gap-1">{children}</ul>}
           </div>
-          {decor && <div className="flex shrink-0 items-end gap-3">{decor}</div>}
-          <Plante espece={plante} />
+          {decor && (
+            <Agrandi>
+              <div className="flex shrink-0 items-end gap-3">{decor}</div>
+            </Agrandi>
+          )}
+          <Agrandi>
+            <Plante espece={plante} />
+          </Agrandi>
         </div>
-        {!occupee && <p className="pb-1 text-xs text-zinc-500">{vide}</p>}
       </div>
       {moment === "nuit" && <NightVeil sombre={!lumiere} />}
     </aside>

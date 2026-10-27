@@ -1,10 +1,8 @@
 import { useState } from "react";
 import type { ProjectOverview } from "../../types/api";
 import Button from "../../design/ui/Button";
+import { IconChevronDown, IconChevronRight } from "../../design/icons";
 import Spinner from "./Spinner";
-
-/** Au-delà, la section « Arrêtés » démarre repliée. */
-export const SEUIL_REPLI = 5;
 
 interface ProjetsArretesProps {
   projets: ProjectOverview[];
@@ -17,20 +15,25 @@ interface ProjetsArretesProps {
  *
  * « Lancer » passe par les services déclarés dans `agents.json` : une app
  * lancée à la main ne revient pas avec sa commande d'origine.
+ *
+ * Dépliée par défaut : repliée, la section se réduisait à un mot sur une page
+ * vide, et rien ne disait qu'elle s'ouvrait. Le chevron dit qu'elle se replie.
  */
 export default function ProjetsArretes({ projets, enLancement, onLancer }: ProjetsArretesProps) {
-  const [choix, setChoix] = useState<boolean | null>(null);
+  const [ouverte, setOuverte] = useState(true);
   if (projets.length === 0) return null;
-  const ouverte = choix ?? projets.length <= SEUIL_REPLI;
+  const Chevron = ouverte ? IconChevronDown : IconChevronRight;
 
   return (
     <section className="mb-4" aria-label="Arrêtés">
       <button
         type="button"
         aria-expanded={ouverte}
-        onClick={() => setChoix(!ouverte)}
-        className="mb-1 text-xs font-semibold text-zinc-400 hover:text-zinc-200"
+        onClick={() => setOuverte(!ouverte)}
+        title={ouverte ? "Replier" : "Déplier"}
+        className="mb-1 flex items-center gap-1 text-xs font-semibold text-zinc-400 hover:text-zinc-200"
       >
+        <Chevron size={14} aria-hidden="true" />
         Arrêtés ({projets.length})
       </button>
       {ouverte && (

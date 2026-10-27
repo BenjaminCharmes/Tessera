@@ -1,9 +1,12 @@
 import type { ReactNode } from "react";
+import Agrandi from "../../design/bureau/Agrandi";
+import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
 import MachineACafe from "../../design/bureau/MachineACafe";
 import Plante from "../../design/bureau/Plante";
 import Porte from "../../design/bureau/Porte";
 import Vapeur from "../../design/bureau/Vapeur";
 import type { StreamState } from "../../hooks/streamState";
+import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import type { UseServicesResult } from "../../hooks/useServices";
 import { MACHINE_X, PORTE_X } from "../../lib/bureau/activites";
 import { cielDesFenetres } from "../../lib/bureau/ciel";
@@ -19,19 +22,21 @@ import TableauDesCriteres from "./TableauDesCriteres";
 
 /**
  * Les abscisses du mur, dans le repère de 800 px, de gauche à droite : le tableau
- * blanc, deux fenêtres, le ficus, la pile de dossiers, la machine, la baie, le cactus,
- * la troisième fenêtre, la boîte aux lettres, l'interrupteur et la porte. Les
- * plafonniers pendent entre elles, hors du gyrophare (au centre).
+ * blanc, deux fenêtres, le ficus, le meuble de l'imprimante et sa pile de dossiers,
+ * la machine, la baie, le cactus, la troisième fenêtre, la boîte aux lettres,
+ * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
  */
-const TABLEAU_X = 40;
-const FENETRES_X = [196, 276, 620] as const;
-const PLAFONNIERS_X = [264, 420, 600] as const;
-const FICUS_X = 350;
-const DOSSIERS_X = 400;
-const BAIE_X = 530;
-const CACTUS_X = 578;
-const BOITE_X = 684;
-const INTERRUPTEUR_X = PORTE_X - 24;
+const TABLEAU_X = 30;
+const FENETRES_X = [190, 270, 616] as const;
+const PLAFONNIERS_X = [250, 432, 590] as const;
+const FICUS_X = 348;
+const IMPRIMANTE_X = 392;
+const BAIE_X = 528;
+const CACTUS_X = 572;
+const BOITE_X = 676;
+const INTERRUPTEUR_X = 716;
+/** Le tableau blanc, un peu plus grand que le reste : il tient la moitié de la hauteur du mur. */
+const TABLEAU_RELATIF = 1.07;
 
 interface FondDeLaPieceProps {
   projet: string;
@@ -81,37 +86,54 @@ export default function FondDeLaPiece({
   onOpenProject,
 }: FondDeLaPieceProps) {
   const moment = dayMoment(maintenant);
+  // Le dessus du meuble, une fois agrandi : la pile s'y pose, à droite de l'imprimante.
+  const dessusDuMeuble = HAUTEUR_DU_MEUBLE * useEchelleDesSprites();
   const ciels = cielDesFenetres(projet, FENETRES_X.length, maintenant);
   return (
     <div
-      className="relative h-26 border-b-4 border-(--sprite-plinthe) bg-(--sprite-mur)"
+      className="relative h-36 border-b-4 border-(--sprite-plinthe) bg-(--sprite-mur)"
       data-fond="piece"
       data-mur="piece"
     >
       {FENETRES_X.map((x, i) => (
-        <Pose key={x} x={x} bas="top-8">
-          <SkyWindow moment={moment} nuages={ciels[i]?.nuages ?? 0} />
+        <Pose key={x} x={x} bas="top-9">
+          <Agrandi>
+            <SkyWindow moment={moment} nuages={ciels[i]?.nuages ?? 0} />
+          </Agrandi>
         </Pose>
       ))}
       {PLAFONNIERS_X.map((x) => (
         <Pose key={x} x={x} bas="top-0">
-          <CeilingLamp allume={allume} />
+          <Agrandi>
+            <CeilingLamp allume={allume} />
+          </Agrandi>
         </Pose>
       ))}
-      <Pose x={TABLEAU_X} bas="top-6">
-        <TableauDesCriteres projet={projet} etat={etat} />
+      <Pose x={TABLEAU_X} bas="top-5">
+        <TableauDesCriteres projet={projet} etat={etat} relatif={TABLEAU_RELATIF} />
       </Pose>
       <Pose x={FICUS_X}>
-        <Plante espece="ficus" />
+        <Agrandi>
+          <Plante espece="ficus" />
+        </Agrandi>
       </Pose>
-      <Pose x={DOSSIERS_X}>
-        <Dossiers projet={projet} runId={runId} etat={etat} onOuvrir={onOuvrir} />
+      <Pose x={IMPRIMANTE_X}>
+        <span className="relative block">
+          <Agrandi>
+            <Imprimante />
+          </Agrandi>
+          <span className="absolute right-1" style={{ bottom: dessusDuMeuble }}>
+            <Dossiers projet={projet} runId={runId} etat={etat} onOuvrir={onOuvrir} />
+          </span>
+        </span>
       </Pose>
       <Pose x={MACHINE_X}>
-        <MachineACafe />
+        <Agrandi>
+          <MachineACafe />
+        </Agrandi>
       </Pose>
       {machineEnService && (
-        <Pose x={MACHINE_X} bas="bottom-12">
+        <Pose x={MACHINE_X} bas="bottom-18">
           <Vapeur />
         </Pose>
       )}
@@ -119,12 +141,14 @@ export default function FondDeLaPiece({
         <BaieDeServeurs services={services} />
       </Pose>
       <Pose x={CACTUS_X}>
-        <Plante espece="cactus" />
+        <Agrandi>
+          <Plante espece="cactus" />
+        </Agrandi>
       </Pose>
-      <Pose x={BOITE_X} bas="bottom-6">
+      <Pose x={BOITE_X}>
         <BoiteAuxLettres projet={projet} etat={etat} />
       </Pose>
-      <Pose x={INTERRUPTEUR_X} bas="bottom-7">
+      <Pose x={INTERRUPTEUR_X} bas="bottom-10">
         <BoutonLumiere salle={projet} allume={allume} onBasculer={onBasculerLumiere} />
       </Pose>
       <Pose x={PORTE_X}>
@@ -135,10 +159,14 @@ export default function FondDeLaPiece({
             onClick={onOpenProject}
             className="block cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
           >
-            <Porte />
+            <Agrandi>
+              <Porte />
+            </Agrandi>
           </button>
         ) : (
-          <Porte />
+          <Agrandi>
+            <Porte />
+          </Agrandi>
         )}
       </Pose>
     </div>

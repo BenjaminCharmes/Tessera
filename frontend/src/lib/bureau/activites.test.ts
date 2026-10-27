@@ -5,6 +5,7 @@ import {
   appliquerPlafond,
   libelleActivite,
   machineEnService,
+  quiBavarde,
   placerLesAgents,
   postesFaits,
   renouveler,
@@ -120,7 +121,14 @@ describe("placerLesAgents", () => {
   it("stands two agents at the machine on different places", () => {
     const agents = placerLesAgents(["codeur", "testeur"], { codeur: "machine", testeur: "machine" }, false);
 
-    expect(new Set(agents.map((a) => a.x)).size).toBe(2);
+    expect(new Set(agents.map((a) => a.x + a.decalage)).size).toBe(2);
+    expect(quiBavarde(agents)).toBe("codeur");
+  });
+
+  it("lets nobody chat when a single agent is at the machine", () => {
+    const agents = placerLesAgents(["codeur", "testeur"], { codeur: "machine", testeur: "tasse" }, false);
+
+    expect(quiBavarde(agents)).toBeNull();
   });
 
   it("puts all five agents at the door, gone, once the run is closed", () => {
@@ -131,7 +139,7 @@ describe("placerLesAgents", () => {
       expect(agent.parti).toBe(true);
       expect(agent.activite).toBeNull();
       expect(agent.niveau).toBe("fond");
-      expect(agent.x).toBeGreaterThan(PORTE_X - 10);
+      expect(agent.x).toBe(PORTE_X);
     }
   });
 

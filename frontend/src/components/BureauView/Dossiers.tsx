@@ -1,3 +1,4 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import Dossier from "../../design/bureau/Dossier";
 import type { StreamState } from "../../hooks/streamState";
 import { useRestants } from "../../hooks/useRestants";
@@ -38,10 +39,18 @@ function ListeDesRestants({ restants, titres }: ListeProps) {
   const autres = restants.length - visibles.length;
   return (
     <>
-      <ul>
+      <ul className="flex flex-col gap-1.5 py-0.5">
         {visibles.map((ticket) => {
           const titre = titres.get(ticket);
-          return <li key={ticket}>{titre ? `${ticket} — ${titre}` : ticket}</li>;
+          return (
+            <li key={ticket} className="flex gap-2 leading-snug">
+              <span aria-hidden="true" className="mt-1.5 size-1.5 shrink-0 rounded-full bg-zinc-500" />
+              <span>
+                <code className="font-mono text-zinc-100">{ticket}</code>
+                {titre && <span className="text-zinc-300">{` — ${titre}`}</span>}
+              </span>
+            </li>
+          );
         })}
       </ul>
       {autres > 0 && <p className="text-zinc-400">{`et ${autres} autres`}</p>}
@@ -58,16 +67,19 @@ function Pile({ projet, restants, onActiver }: PileProps) {
     <AvecInfobulle
       label={`Tickets restants : ${restants.length}`}
       className="relative flex flex-col items-center"
+      large
       onActiver={onActiver}
       infobulle={<ListeDesRestants restants={restants} titres={titres} />}
     >
-      <div className="flex flex-col items-center">
-        {Array.from({ length: hauteurDePile(restants.length) }, (_, i) => (
+      <Agrandi>
+        <div className="flex flex-col items-center">
+          {Array.from({ length: hauteurDePile(restants.length) }, (_, i) => (
           <div key={i} className={i === 0 ? "" : "-mt-5"}>
             <Dossier />
           </div>
         ))}
-      </div>
+        </div>
+      </Agrandi>
       <span
         aria-hidden="true"
         data-badge="restants"

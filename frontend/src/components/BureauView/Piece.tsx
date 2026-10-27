@@ -145,7 +145,7 @@ export default function Piece({
             onOuvrir={onOuvrir}
             onOpenProject={onOpenProject && (() => onOpenProject(projet))}
           />
-          <div className="grid h-33 grid-cols-5 items-end gap-1 border-b-8 border-transparent px-2.5">
+          <div className="grid h-40 grid-cols-5 items-end gap-1 border-b-8 border-transparent px-2.5">
             {postes.map((p) => (
               <PosteDeTravail
                 key={p.poste}

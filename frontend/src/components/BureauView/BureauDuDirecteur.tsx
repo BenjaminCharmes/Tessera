@@ -1,3 +1,4 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import AgentDebout from "../../design/bureau/AgentDebout";
 import BureauEnBois from "../../design/bureau/BureauEnBois";
 import Bibliotheque from "../../design/bureau/Bibliotheque";
@@ -30,7 +31,9 @@ function CadreDeLEmploye({ employe }: { employe: WeekEmployee }) {
       infobulle={libelle}
     >
       <span data-employe={employe.project}>
-        <GoldFrame projet={employe.project} />
+        <Agrandi>
+          <GoldFrame projet={employe.project} />
+        </Agrandi>
       </span>
     </AvecInfobulle>
   );
@@ -60,7 +63,9 @@ export default function BureauDuDirecteur({ agents, maintenant, employe = null }
         <li key={projet} data-agent={poste} className="flex items-end gap-2">
           <div className="flex flex-col items-center">
             <Bulle sante="question" />
-            <AgentDebout projet={projet} role={poste} />
+            <Agrandi>
+              <AgentDebout projet={projet} role={poste} />
+            </Agrandi>
           </div>
           <span className="text-xs">
             <span className="text-zinc-400">{projet}</span> · {nomDuPoste(poste)}

@@ -1,3 +1,4 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import AgentDebout from "../../design/bureau/AgentDebout";
 import BureauEnBois from "../../design/bureau/BureauEnBois";
 import Classeur from "../../design/bureau/Classeur";
@@ -39,7 +40,9 @@ export default function SalleRh({ agents, maintenant }: SalleRhProps) {
       {/* Un projet ne tient qu'un run à la fois (ADR-038) : un agent par projet, donc la clé est unique. */}
       {agents.map(({ projet, poste, tente, utilise, modele }) => (
         <li key={projet} data-agent={poste} className="flex items-end gap-2">
-          <AgentDebout projet={projet} role={poste} />
+          <Agrandi>
+              <AgentDebout projet={projet} role={poste} />
+            </Agrandi>
           <span className="flex flex-col text-xs">
             <span>
               <span className="text-zinc-400">{projet}</span> · {nomDuPoste(poste)}

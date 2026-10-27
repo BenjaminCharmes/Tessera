@@ -207,14 +207,17 @@ describe("Stopped projects", () => {
     expect(screen.getByRole("heading", { name: "Beta" })).toBeInTheDocument();
   });
 
-  it("starts collapsed above five projects and opens on click", async () => {
+  it("starts open even above five projects, and folds on click", async () => {
     const sept = Array.from({ length: 7 }, (_, i) => projet({ id: `p${i}`, name: `Projet ${i}` }));
     await monter([], sept);
 
     const section = await screen.findByRole("region", { name: "Arrêtés" });
-    expect(within(section).queryByRole("button", { name: /Lancer/ })).not.toBeInTheDocument();
-
-    await userEvent.click(within(section).getByRole("button", { name: /Arrêtés \(7\)/ }));
+    const entete = within(section).getByRole("button", { name: /Arrêtés \(7\)/ });
+    expect(entete).toHaveAttribute("aria-expanded", "true");
     expect(within(section).getAllByRole("button", { name: /Lancer/ })).toHaveLength(7);
+
+    await userEvent.click(entete);
+    expect(entete).toHaveAttribute("aria-expanded", "false");
+    expect(within(section).queryByRole("button", { name: /Lancer/ })).not.toBeInTheDocument();
   });
 });

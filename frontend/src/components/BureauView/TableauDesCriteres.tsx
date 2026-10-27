@@ -1,3 +1,4 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import TableauBlanc from "../../design/bureau/TableauBlanc";
 import type { StreamState } from "../../hooks/streamState";
 import { useCriteresDuTicket } from "../../hooks/useCriteresDuTicket";
@@ -50,6 +51,8 @@ function LigneDuCritere({ ligne, rang }: { ligne: LigneDuTableau; rang: number }
 interface TableauDesCriteresProps {
   projet: string;
   etat: StreamState;
+  /** Un multiple de l'échelle commune : plus grand que le reste, il tient la moitié du mur. */
+  relatif?: number;
 }
 
 /**
@@ -57,12 +60,16 @@ interface TableauDesCriteresProps {
  * rendu, sinon ceux du fichier du ticket, tous gris. Vierge quand on ne sait rien.
  * Le fichier n'est lu que tant que rien n'est jugé.
  */
-export default function TableauDesCriteres({ projet, etat }: TableauDesCriteresProps) {
+export default function TableauDesCriteres({ projet, etat, relatif }: TableauDesCriteresProps) {
   const juges = criteresJuges(etat);
   const attendus = useCriteresDuTicket(juges === null ? projet : null, ticketDuRun(etat));
   const tableau = tableauDesCriteres(juges, attendus);
   const label = libelleDuTableau(tableau);
-  const sprite = <TableauBlanc cases={tableau.lignes.map((l) => l.etat)} />;
+  const sprite = (
+    <Agrandi relatif={relatif}>
+      <TableauBlanc cases={tableau.lignes.map((l) => l.etat)} />
+    </Agrandi>
+  );
 
   // Sans critère, l'infobulle n'aurait rien à lister : le tableau n'est qu'une image.
   if (tableau.lignes.length === 0) {

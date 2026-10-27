@@ -1,3 +1,4 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import Baie from "../../design/bureau/Baie";
 import { etatDuService, libelleDeLEtat } from "../../design/etatDuService";
 import type { UseServicesResult } from "../../hooks/useServices";
@@ -29,7 +30,9 @@ export default function BaieDeServeurs({ services }: BaieDeServeursProps) {
         </ul>
       }
     >
-      <Baie services={services.services.map(etatDuService)} />
+      <Agrandi>
+        <Baie services={services.services.map(etatDuService)} />
+      </Agrandi>
     </AvecInfobulle>
   );
 }
