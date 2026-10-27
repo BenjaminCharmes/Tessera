@@ -47,6 +47,32 @@ export function etatQuatreFaits(): StreamState {
   ]);
 }
 
+/**
+ * Le tour 1 refusé par `refus`, puis le codeur qui repart au tour 2 : reviewer
+ * (`CHANGES_REQUESTED`) ou validateur (`approved: false`) a renvoyé le travail.
+ */
+export function etatAuTourDeux(refus: "reviewer" | "validateur"): StreamState {
+  const verdictDuReviewer = refus === "reviewer" ? "CHANGES_REQUESTED\n- il manque un test" : "APPROVED";
+  const validation =
+    refus === "validateur"
+      ? [
+          ev("validation_started"),
+          ev("validation_done", null, { verdict: "CHANGES_REQUESTED", approved: false }),
+        ]
+      : [];
+  return rejouer([
+    ev("agent_started", "codeur", { round: 1 }),
+    ev("agent_done", "codeur"),
+    ev("test_result"),
+    ev("security_audit_started"),
+    ev("security_audit_done"),
+    ev("agent_started", "reviewer", { round: 1 }),
+    ev("agent_done", "reviewer", { content: verdictDuReviewer }),
+    ...validation,
+    ev("agent_started", "codeur", { round: 2 }),
+  ]);
+}
+
 /** Le pipeline fini, puis les événements de suite donnés (documentation, livraison, clôture). */
 export function etatApresPipeline(suite: EventType[]): StreamState {
   return rejouer([

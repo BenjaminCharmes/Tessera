@@ -6,6 +6,7 @@ import type { StreamState } from "../../hooks/streamState";
 import { useActivites } from "../../hooks/useActivites";
 import { machineEnService, placerLesAgents, postesFaits } from "../../lib/bureau/activites";
 import type { Hasard } from "../../lib/bureau/activites";
+import { copieVisible, libelleDeLaCopie, retourDeCopie } from "../../lib/bureau/copie";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import { contourEnCelebration, enFete, gyrophareAllume } from "../../lib/bureau/fete";
@@ -84,7 +85,9 @@ export default function Piece({
   const activites = useActivites(faits, maintenant, hasard);
   // Un agent chez le directeur ou aux RH n'est plus à sa place : il ne se dessine qu'à un endroit.
   const absents = postesAbsents(etat, maintenant);
-  const agents = placerLesAgents(faits, activites, clos, fete).map((a) =>
+  // Le refus du reviewer ou du validateur : il rapporte sa copie au codeur qui repart (ticket-599).
+  const copie = copieVisible(retourDeCopie(etat, maintenant), { faits, absents, clos, fete });
+  const agents = placerLesAgents(faits, activites, clos, fete, copie?.poste ?? null).map((a) =>
     absents.includes(a.poste) ? { ...a, activite: null, parti: true } : a,
   );
 
@@ -129,7 +132,8 @@ export default function Piece({
         <div className="flex min-h-9 items-end justify-between px-3 py-2">
           <div className="flex min-h-5 items-center">
             {fete && <StatusPill etat="reussi" libelle="PR mergée" />}
-            {!fete && enCours && <Pastille sante={sante} />}
+            {copie !== null && <StatusPill etat="en-cours" libelle={libelleDeLaCopie(copie)} />}
+            {!fete && copie === null && enCours && <Pastille sante={sante} />}
             {!fete && !enCours && suite && <StatusPill etat="en-cours" libelle={suite} />}
           </div>
           <Plante />

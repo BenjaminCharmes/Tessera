@@ -7,6 +7,8 @@ interface AgentDeboutProps {
   role: PosteId;
   /** Les bras levés : il s'étire. Sinon, tasse à la main. */
   etire?: boolean;
+  /** Une feuille annotée à la main : il rend sa copie au codeur. */
+  feuille?: boolean;
 }
 
 /**
@@ -14,7 +16,7 @@ interface AgentDeboutProps {
  * 42 × 70 px, à l'échelle du personnage assis (tête de 6 unités dans les deux).
  * `overflow-visible` : le chignon dépasse la grille d'une unité.
  */
-export default function AgentDebout({ projet, role, etire = false }: AgentDeboutProps) {
+export default function AgentDebout({ projet, role, etire = false, feuille = false }: AgentDeboutProps) {
   return (
     <svg
       width="42"
@@ -25,7 +27,7 @@ export default function AgentDebout({ projet, role, etire = false }: AgentDebout
       className="overflow-visible"
       data-sprite="agent-debout"
     >
-      <Personnage pose="debout" tenue={TENUES[role]} physique={physique(projet, role)} etire={etire} />
+      <Personnage pose="debout" tenue={TENUES[role]} physique={physique(projet, role)} etire={etire} feuille={feuille} />
     </svg>
   );
 }

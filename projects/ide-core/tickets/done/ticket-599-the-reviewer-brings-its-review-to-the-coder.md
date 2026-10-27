@@ -1,14 +1,15 @@
 ---
-id: ticket-599
-title: "When changes are requested, the reviewer brings its review to the coder's desk"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-596"]
-estimated_days: 0.25
 created: 2026-10-27
+depends_on:
+- ticket-596
+estimated_days: 0.25
+id: ticket-599
+pr_number: 680
+priority: medium
+status: done
+title: When changes are requested, the reviewer brings its review to the coder's desk
+type: feat
 ---
 
 # ticket-599 — Le reviewer rapporte sa copie au codeur

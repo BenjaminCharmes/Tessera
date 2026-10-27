@@ -5389,3 +5389,17 @@ Le diff ajoute :
 - 2026-10-27 12:49:02 UTC — [ticket-598] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (270734ms)
 - 2026-10-27 12:49:02 UTC — [ticket-598] APPROVED après 1 tour(s)
 - 2026-10-27 12:52:18 UTC — [ticket-598] documentation: 0 fichier(s) (191000ms) — après tour de correction
+- 2026-10-27 12:57:47 UTC — [ide-core] ticket-598 PR #679 mergée (CI verte)
+- 2026-10-27 12:57:49 UTC — [ide-core] ticket-598 : base réalignée sur develop
+- 2026-10-27 12:57:49 UTC — [ide-core] ticket-598 PR #679 confiée au CIWatcher
+- 2026-10-27 12:57:53 UTC — [ticket-599] branche ticket-599-when-changes-are-requested-the-reviewer-brings-it
+- 2026-10-27 12:57:56 UTC — [ticket-599] tour 1 — codeur démarré
+- 2026-10-27 13:01:02 UTC — [ticket-599] tour 1 — codeur terminé (186157ms)
+- 2026-10-27 13:02:54 UTC — [ticket-599] testeur: OK (exit 0)
+- 2026-10-27 13:04:29 UTC — [ticket-599] securite: PASS — Audit sécurité complet : aucune vulnérabilité détectée. Code frontend TypeScript (95672ms)
+- 2026-10-27 13:04:29 UTC — [ticket-599] tour 1 — reviewer démarré
+- 2026-10-27 13:04:55 UTC — [ticket-599] tour 1 — reviewer terminé (25483ms)
+- 2026-10-27 13:07:43 UTC — [ticket-599] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 13:07:43 UTC — [ticket-599] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (194156ms)
+- 2026-10-27 13:07:43 UTC — [ticket-599] APPROVED après 1 tour(s)
+- 2026-10-27 13:10:30 UTC — [ticket-599] documentation: 0 fichier(s) (161266ms)
