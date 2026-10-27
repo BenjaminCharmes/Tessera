@@ -1,14 +1,15 @@
 ---
-id: ticket-608
-title: "The reviewer looks for the callers of any route, export or path the diff disables or removes"
-type: chore
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-27
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-27
+id: ticket-608
+pr_number: 689
+priority: medium
+status: done
+title: The reviewer looks for the callers of any route, export or path the diff disables
+  or removes
+type: chore
 ---
 
 # ticket-608 — Le reviewer cherche les appelants de ce que le diff retire
