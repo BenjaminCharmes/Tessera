@@ -5163,3 +5163,12 @@ Le diff ajoute :
 - 2026-10-27 07:44:05 UTC — [ticket-590] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
 - 2026-10-27 07:44:05 UTC — [ticket-590] validateur: CHANGES_REQUESTED — Validation indisponible : durée maximale dépassée (900 s) (55935172ms)
 - 2026-10-27 07:44:42 UTC — [ide-core] file interrompue : ticket-590 non approuvé
+- 2026-10-27 07:46:25 UTC — [ticket-590] branche ticket-590-the-queue-is-one-pile-of-folders-with-its-count-a
+- 2026-10-27 07:49:08 UTC — [ticket-590] testeur: OK (exit 0)
+- 2026-10-27 07:49:08 UTC — [ticket-590] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-27 07:50:40 UTC — [ticket-590] securite: PASS — Aucune vulnérabilité détectée. Le code affiche les titres de tickets issus de l' (91125ms)
+- 2026-10-27 07:50:40 UTC — [ticket-590] tour 1 — reviewer démarré
+- 2026-10-27 07:50:57 UTC — [ticket-590] tour 1 — reviewer terminé (17156ms)
+- 2026-10-27 07:53:00 UTC — [ticket-590] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 07:53:00 UTC — [ticket-590] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés via les tests. L (140141ms)
+- 2026-10-27 07:53:00 UTC — [ticket-590] APPROVED après 1 tour(s)
