@@ -29,7 +29,13 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
 .vapeur{animation:vapeur 1.4s steps(3) infinite}
 @keyframes flotte{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .flotte{animation:flotte 1.6s steps(2) infinite}
-@media (prefers-reduced-motion: reduce){.agent{transition:none}.tape,.gorgee,.etire,.lueur,.vapeur,.flotte{animation:none}}
+@keyframes chute{0%{transform:translateY(-8px) rotate(0);opacity:1}100%{transform:translateY(118px) rotate(180deg);opacity:0}}
+.confetti{position:absolute;top:0;width:4px;height:6px;z-index:5;animation:chute 2s linear infinite;pointer-events:none}
+@keyframes gyro{0%,100%{opacity:1}50%{opacity:.15}}
+.gyro{animation:gyro .7s steps(2) infinite}
+.objet{padding:0;border:0;background:none;cursor:pointer;line-height:0}
+.objet:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.agent{transition:none}.tape,.gorgee,.etire,.lueur,.vapeur,.flotte,.confetti,.gyro{animation:none}}
 </style>
 </helmet>
 <div style="min-height: 100vh; box-sizing: border-box; padding: 20px; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 14px">
@@ -41,8 +47,16 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
     <button type="button" class="btn" aria-pressed="{{question}}" onClick="{{basculerQuestion}}">Une question</button>
     <button type="button" class="btn" aria-pressed="{{conflit}}" onClick="{{basculerConflit}}">Un conflit</button>
     <button type="button" class="btn" aria-pressed="{{repli}}" onClick="{{basculerRepli}}">Un repli de modèle</button>
+    <button type="button" class="btn" aria-pressed="{{retour}}" onClick="{{basculerRetour}}">Retour du reviewer</button>
+    <button type="button" class="btn" aria-pressed="{{fete}}" onClick="{{basculerFete}}">PR mergée</button>
+    <button type="button" class="btn" aria-pressed="{{ciRouge}}" onClick="{{basculerCiRouge}}">CI rouge</button>
+    <button type="button" class="btn" aria-pressed="{{nuit}}" onClick="{{basculerNuit}}">Nuit</button>
+    <button type="button" class="btn" aria-pressed="{{son}}" onClick="{{basculerSon}}">Son</button>
     <button type="button" class="btn" aria-pressed="{{auto}}" onClick="{{basculerAuto}}">Lecture auto</button>
   </div>
+  <sc-if value="{{aToast}}" hint-placeholder-val="{{ false }}">
+    <p role="status" style="margin: -6px 0 12px; font-size: 12px; color: #c4b5fd">{{toast}}</p>
+  </sc-if>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-bottom: 14px">
     <section aria-label="Bureau du directeur" style="background: #18181b; border: 1px solid {{bordDirecteur}}; border-radius: 10px; overflow: hidden">
@@ -61,6 +75,15 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
           </svg>
           <span style="font-size: 11px; color: #a1a1aa">toi</span>
         </div>
+        <figure style="margin: 0 0 30px; display: flex; flex-direction: column; align-items: center; gap: 2px">
+          <svg width="36" height="42" viewBox="0 0 12 14" shape-rendering="crispEdges" role="img" aria-label="Employé de la semaine : ide-core, codeur">
+            <rect x="0" y="0" width="12" height="14" fill="#a16207"></rect><rect x="1" y="1" width="10" height="12" fill="#fef3c7"></rect>
+            <rect x="3" y="3" width="6" height="2" fill="{{employe.cheveux}}"></rect><rect x="3" y="5" width="6" height="4" fill="{{employe.peau}}"></rect>
+            <rect x="4" y="6" width="1" height="1" fill="#18181b"></rect><rect x="7" y="6" width="1" height="1" fill="#18181b"></rect>
+            <rect x="2" y="9" width="8" height="4" fill="#8b5cf6"></rect>
+          </svg>
+          <figcaption style="font-size: 10px; color: #a1a1aa; text-align: center; max-width: 90px">Employé de la semaine · {{employe.texte}}</figcaption>
+        </figure>
         <sc-if value="{{question}}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px">
             <span class="flotte" style="font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 9px; background: rgba(245,158,11,.15); color: #fcd34d">?</span>
@@ -169,6 +192,36 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
 
           <div style="overflow-x: auto">
             <div class="sol" style="position: relative; width: 800px; height: 136px">
+              <svg style="position: absolute; left: 300px; top: 8px" width="60" height="36" viewBox="0 0 20 12" shape-rendering="crispEdges" aria-hidden="true">
+                <rect x="0" y="0" width="20" height="12" fill="#3f3f46"></rect>
+                <rect x="1" y="1" width="8" height="10" fill="{{r.ciel}}"></rect><rect x="11" y="1" width="8" height="10" fill="{{r.ciel}}"></rect>
+                <sc-if value="{{r.nuit}}" hint-placeholder-val="{{ false }}">
+                  <rect x="3" y="3" width="1" height="1" fill="#fde68a"></rect><rect x="15" y="2" width="2" height="2" fill="#fef3c7"></rect><rect x="13" y="7" width="1" height="1" fill="#fde68a"></rect>
+                </sc-if>
+                <sc-if value="{{r.jour}}" hint-placeholder-val="{{ true }}">
+                  <rect x="14" y="3" width="3" height="3" fill="#fde047"></rect>
+                </sc-if>
+              </svg>
+              <svg style="position: absolute; left: 420px; top: 6px" width="132" height="42" viewBox="0 0 44 14" shape-rendering="crispEdges" role="img" aria-label="{{r.tableauLabel}}">
+                <rect x="0" y="0" width="44" height="14" fill="#a1a1aa"></rect><rect x="1" y="1" width="42" height="12" fill="#f4f4f5"></rect>
+                <sc-for list="{{r.criteres}}" as="c" hint-placeholder-count="5">
+                  <rect x="3" y="{{c.y}}" width="2" height="1" fill="{{c.case}}"></rect><rect x="7" y="{{c.y}}" width="{{c.l}}" height="1" fill="#a1a1aa"></rect>
+                </sc-for>
+              </svg>
+              <sc-if value="{{r.alarme}}" hint-placeholder-val="{{ false }}">
+                <svg class="gyro" style="position: absolute; left: 610px; top: 0" width="24" height="18" viewBox="0 0 8 6" shape-rendering="crispEdges" aria-hidden="true">
+                  <rect x="2" y="0" width="4" height="4" fill="#ef4444"></rect><rect x="1" y="4" width="6" height="2" fill="#52525b"></rect>
+                </svg>
+              </sc-if>
+              <sc-for list="{{r.confettis}}" as="k" hint-placeholder-count="0">
+                <span class="confetti" style="{{k.style}}"></span>
+              </sc-for>
+              <sc-if value="{{r.aBulle}}" hint-placeholder-val="{{ false }}">
+                <span class="flotte" style="{{r.bulleStyle}}">{{r.bulleTexte}}</span>
+              </sc-if>
+              <sc-if value="{{r.nuit}}" hint-placeholder-val="{{ false }}">
+                <span aria-hidden="true" style="position: absolute; inset: 0; background: rgba(15,23,42,.38); z-index: 4; pointer-events: none"></span>
+              </sc-if>
               <svg style="position: absolute; left: 8px; bottom: 22px" width="35" height="56" viewBox="0 0 10 16" shape-rendering="crispEdges" aria-hidden="true">
                 <rect x="4" y="1" width="2" height="3" fill="#22c55e"></rect><rect x="1" y="3" width="3" height="2" fill="#15803d"></rect><rect x="6" y="2" width="3" height="2" fill="#15803d"></rect>
                 <rect x="2" y="5" width="2" height="3" fill="#22c55e"></rect><rect x="6" y="5" width="2" height="3" fill="#22c55e"></rect><rect x="4" y="4" width="2" height="7" fill="#166534"></rect>
@@ -204,11 +257,13 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
                 <rect x="2" y="20" width="10" height="2" fill="#27272a"></rect>
               </svg>
 
-              <svg style="position: absolute; left: 760px; bottom: 22px" width="35" height="77" viewBox="0 0 10 22" shape-rendering="crispEdges" aria-hidden="true">
-                <rect x="0" y="0" width="10" height="22" fill="#3f3f46"></rect>
-                <rect x="1" y="1" width="8" height="21" fill="#27272a"></rect>
-                <rect x="7" y="11" width="1" height="2" fill="#a1a1aa"></rect>
-              </svg>
+              <button type="button" class="objet" style="position: absolute; left: 760px; bottom: 22px; z-index: 2" aria-label="{{r.porteLabel}}" onClick="{{r.ouvrirProjet}}">
+                <svg width="35" height="77" viewBox="0 0 10 22" shape-rendering="crispEdges" aria-hidden="true">
+                  <rect x="0" y="0" width="10" height="22" fill="#3f3f46"></rect>
+                  <rect x="1" y="1" width="8" height="21" fill="#27272a"></rect>
+                  <rect x="7" y="11" width="1" height="2" fill="#a1a1aa"></rect>
+                </svg>
+              </button>
 
               <sc-for list="{{r.agents}}" as="a" hint-placeholder-count="5">
                 <button type="button" class="agent" style="{{a.style}}" aria-label="{{a.label}}" aria-pressed="{{a.choisi}}" aria-hidden="{{a.cache}}" tabIndex="{{a.tab}}" onClick="{{a.choisir}}">
@@ -283,6 +338,11 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
                         <rect x="0" y="7" width="1" height="5" fill="{{a.hautOmbre}}"></rect>
                         <g class="gorgee"><rect x="9" y="7" width="1" height="3" fill="{{a.hautOmbre}}"></rect><rect x="10" y="6" width="2" height="2" fill="#e4e4e7"></rect></g>
                       </sc-if>
+                      <sc-if value="{{a.feuille}}" hint-placeholder-val="{{ false }}">
+                        <rect x="0" y="7" width="1" height="5" fill="{{a.hautOmbre}}"></rect>
+                        <rect x="9" y="7" width="1" height="3" fill="{{a.hautOmbre}}"></rect>
+                        <rect x="9" y="5" width="3" height="4" fill="#f4f4f5"></rect><rect x="10" y="6" width="1" height="1" fill="#f87171"></rect><rect x="10" y="8" width="1" height="1" fill="#a1a1aa"></rect>
+                      </sc-if>
                     </svg>
                   </sc-if>
                 </button>
@@ -295,12 +355,12 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 10px 14px; border-top: 1px solid #27272a; font-size: 12px; color: #a1a1aa">
-            <div style="display: flex; align-items: center; gap: 8px">
+            <button type="button" class="objet" style="display: flex; align-items: center; gap: 8px; color: #a1a1aa; font: inherit; font-size: 12px; line-height: normal" aria-label="{{r.pileLabel}}" onClick="{{r.ouvrirFile}}">
               <svg width="30" height="30" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
                 <rect x="1" y="1" width="8" height="2" fill="#a16207"></rect><rect x="0" y="4" width="9" height="2" fill="#ca8a04"></rect><rect x="1" y="7" width="8" height="2" fill="#a16207"></rect>
               </svg>
               <span>{{r.fileLibelle}}</span>
-            </div>
+            </button>
             <div style="display: flex; align-items: center; gap: 8px">
               <svg width="30" height="30" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">
                 <rect x="1" y="2" width="7" height="4" fill="#52525b"></rect><rect x="2" y="3" width="5" height="1" fill="#27272a"></rect><rect x="4" y="6" width="1" height="4" fill="#3f3f46"></rect><rect x="8" y="1" width="1" height="3" fill="{{r.drapeau}}"></rect>
@@ -344,6 +404,14 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
           <li>Un modèle indisponible : l'agent passe aux RH, le secours prend le relais.</li>
           <li>Un conflit : le résolveur s'installe en salle de réunion.</li>
           <li>Fin du run : chacun part par la porte.</li>
+          <li>Retour du reviewer : il apporte sa copie au codeur, le tour 2 commence.</li>
+          <li>PR mergée : la pièce fait la fête. CI rouge : le gyrophare tourne jusqu'à la reprise.</li>
+          <li>Tableau blanc : les critères du ticket, cochés quand le validateur les juge.</li>
+          <li>Bulle d'action : l'outil que l'agent appelle vraiment.</li>
+          <li>Fenêtre : le jour et la nuit suivent l'heure réelle.</li>
+          <li>Employé de la semaine : le plus de tickets approuvés au 1er tour sur 7 jours.</li>
+          <li>La porte ouvre le projet, la pile ouvre la file.</li>
+          <li>Son (optionnel) : clavier, machine à café, fanfare au merge.</li>
         </ul>
       </section>
     </aside>
@@ -363,6 +431,14 @@ const PEAUX = ['#f1c7a3', '#e8b98f', '#c68b59', '#8d5a3b', '#5c3a24'];
 const CHEVEUX = ['#3f2a1d', '#111827', '#a16207', '#7c2d12', '#d4d4d8', '#1c1917'];
 const COIFFURES = ['court', 'long', 'chignon', 'court', 'chauve', 'long'];
 const ACTIVITES = ['tasse', 'tasse', 'etire', 'machine'];
+const ACTIONS = [
+  ['lit pipeline.py', 'édite Piece.tsx', 'lance vitest'],
+  ['lance pytest', 'lance vitest', 'lance tsc'],
+  ['lit le diff', 'cherche des secrets', 'relit les entrées'],
+  ['relit Piece.tsx', 'compare au ticket', 'lit les tests'],
+  ['juge le critère 2 sur 5', 'juge le critère 3 sur 5', 'juge le critère 4 sur 5']
+];
+const COULEURS_CONFETTI = ['#f472b6', '#facc15', '#38bdf8', '#4ade80', '#a78bfa'];
 const SLOTS = [622, 718, 590];
 const BUREAU = (i) => 56 + i * 120;
 
@@ -397,6 +473,12 @@ class Component extends DCLogic {
     question: true,
     conflit: false,
     repli: false,
+    retour: false,
+    fete: false,
+    ciRouge: false,
+    nuit: new Date().getHours() >= 19 || new Date().getHours() < 7,
+    son: false,
+    toast: '',
     choisi: null,
     tour: 0,
     rooms: [
@@ -425,7 +507,11 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     let sel = { vide: true, plein: false };
-    const rooms = s.rooms.map((r, ri) => {
+    const rooms = s.rooms.map((r0, ri) => {
+      const retour = s.retour && r0.nom === 'ide-core';
+      const fete = s.fete && r0.nom === 'Devinoo';
+      const alarme = s.ciRouge && r0.nom === 'Kadoomi';
+      const r = retour ? Object.assign({}, r0, { etape: 0 }) : (fete ? Object.assign({}, r0, { etape: 5 }) : r0);
       const parti = r.etape >= 6;
       let slot = 0;
       const absent = (i) => (s.question && r.nom === 'Kadoomi' && i === 4 && r.etape === 4) || (s.repli && r.nom === 'ide-core' && i === 4 && r.etape === 4);
@@ -441,9 +527,13 @@ class Component extends DCLogic {
         if (etat === 'fait' && act === 'etire') { x = BUREAU(i) - 40; phrase = "a fini — s'étire à côté de son poste"; }
         if (etat === 'fait' && act === 'machine') { x = SLOTS[slot]; slot += 1; phrase = 'a fini — prend un café à la machine'; }
         if (etat === 'parti') { x = 760; phrase = 'est parti, le run est terminé'; }
+        const feuille = retour && i === 3;
+        if (feuille) { x = BUREAU(0) + 58; phrase = 'rapporte sa relecture au codeur : changements demandés'; }
+        if (retour && i > 3) phrase = 'attend son tour';
+        if (fete) { x = BUREAU(i) - 40; phrase = 'fête la PR mergée'; }
         const sorti = absent(i);
         if (sorti) phrase = s.question && r.nom === 'Kadoomi' ? 'est au bureau du directeur : il a une question pour toi' : 'est aux RH : son modèle est indisponible, le secours prend le relais';
-        const assis = !sorti && (etat === 'attend' || etat === 'travaille' || (etat === 'fait' && act === 'tasse'));
+        const assis = !sorti && !feuille && !fete && (etat === 'attend' || etat === 'travaille' || (etat === 'fait' && act === 'tasse'));
         const cle = ri + ':' + i;
         const choisi = s.choisi === cle;
         const opacite = etat === 'parti' || sorti ? 0 : (etat === 'attend' ? 0.5 : 1);
@@ -460,10 +550,11 @@ class Component extends DCLogic {
           assis: assis,
           debout: !assis,
           tape: etat === 'travaille' && !sorti,
-          brasBas: etat === 'attend',
-          tasse: etat === 'fait' && act === 'tasse',
-          brasLeves: etat === 'fait' && act === 'etire',
-          tasseDebout: etat === 'parti' || (etat === 'fait' && act === 'machine'),
+          brasBas: etat === 'attend' && !feuille,
+          tasse: !fete && etat === 'fait' && act === 'tasse',
+          brasLeves: fete || (etat === 'fait' && act === 'etire'),
+          tasseDebout: !fete && (etat === 'parti' || (etat === 'fait' && act === 'machine')),
+          feuille: feuille,
           peau: corps.peau,
           cheveux: corps.cheveux,
           cheveuxLongs: corps.coiffure === 'long',
@@ -491,15 +582,34 @@ class Component extends DCLogic {
         };
       });
       const travail = r.etape <= 4;
+      const valides = r.etape < 4 ? 0 : (r.etape === 4 ? 1 + (s.tour % 4) : 5);
+      const criteres = [0, 1, 2, 3, 4].map((k) => ({ y: 2 + k * 2, l: [30, 22, 26, 18, 28][k], case: k < valides ? '#22c55e' : '#d4d4d8' }));
+      const confettis = fete ? Array.from({ length: 18 }, (_, k) => ({ style: 'left: ' + ((k * 43) % 780) + 'px; background: ' + COULEURS_CONFETTI[k % 5] + '; animation-delay: ' + ((k * 0.17) % 2).toFixed(2) + 's;' })) : [];
+      const enCours = travail && !parti ? r.etape : -1;
+      const actions = enCours >= 0 ? ACTIONS[enCours] : null;
       return {
         nom: r.nom,
         ticketId: 'ticket-' + r.ticket,
-        etapeLibelle: libre,
-        styleSalle: 'background: #18181b; border: 1px solid ' + (travail || parti ? '#27272a' : '#1e3a8a') + '; border-radius: 10px; overflow: hidden;',
+        etapeLibelle: retour ? 'tour 2 — le reviewer rend sa copie' : (fete ? 'PR mergée — la pièce fête ça' : (alarme ? 'CI rouge — à reprendre' : libre)),
+        styleSalle: 'background: #18181b; border: 1px solid ' + (alarme ? '#7f1d1d' : (fete ? '#14532d' : (travail || parti ? '#27272a' : '#1e3a8a'))) + '; border-radius: 10px; overflow: hidden;',
+        alarme: alarme,
+        confettis: confettis,
+        criteres: criteres,
+        tableauLabel: 'Tableau blanc : ' + valides + ' critères sur 5 validés',
+        aBulle: !!actions && !retour,
+        bulleTexte: actions ? actions[s.tour % actions.length] : '',
+        bulleStyle: 'position: absolute; top: 52px; left: ' + (BUREAU(Math.max(enCours, 0)) - 18) + 'px; z-index: 6; font-size: 11px; white-space: nowrap; padding: 1px 6px; border-radius: 9px; background: #27272a; border: 1px solid #3f3f46; color: #e4e4e7;',
+        nuit: s.nuit,
+        jour: !s.nuit,
+        ciel: s.nuit ? '#1e1b4b' : '#7dd3fc',
+        porteLabel: 'Ouvrir le projet ' + r.nom,
+        pileLabel: 'Ouvrir la file de ' + r.nom,
+        ouvrirProjet: () => this.setState({ toast: 'La porte ouvrirait le projet ' + r.nom + '.' }),
+        ouvrirFile: () => this.setState({ toast: 'La pile ouvrirait la file de ' + r.nom + ' (' + r.file + ' tickets).' }),
         stylePill: 'font-size: 12px; padding: 2px 8px; border-radius: 9px; ' + (travail ? 'background: rgba(59,130,246,.15); color: #93c5fd;' : 'background: rgba(161,161,170,.12); color: #d4d4d8;'),
         fileLibelle: r.file > 0 ? r.file + ' en file' : 'file vide',
-        courrier: r.etape === 5 ? 'PR ouverte · CI en cours' : (parti ? 'PR mergée' : 'aucune PR'),
-        drapeau: parti ? '#4ade80' : '#52525b',
+        courrier: alarme ? 'CI rouge · PR #212 ouverte' : (fete ? 'PR #164 mergée' : (r.etape === 5 ? 'PR ouverte · CI en cours' : (parti ? 'PR mergée' : 'aucune PR'))),
+        drapeau: alarme ? '#ef4444' : (parti || fete ? '#4ade80' : '#52525b'),
         vapeur: agents.some((a) => a.tasseDebout && !a.cache),
         postes: postes,
         agents: agents,
@@ -522,7 +632,20 @@ class Component extends DCLogic {
       basculerAuto: () => this.setState({ auto: !s.auto }),
       basculerQuestion: () => this.setState({ question: !s.question }),
       basculerConflit: () => this.setState({ conflit: !s.conflit }),
-      basculerRepli: () => this.setState({ repli: !s.repli })
+      basculerRepli: () => this.setState({ repli: !s.repli }),
+      retour: s.retour,
+      fete: s.fete,
+      ciRouge: s.ciRouge,
+      nuit: s.nuit,
+      son: s.son,
+      toast: s.toast,
+      aToast: s.toast !== '',
+      employe: Object.assign({ texte: 'ide-core · codeur, 7 tickets du 1er coup' }, physique('ide-core', 0)),
+      basculerRetour: () => this.setState({ retour: !s.retour }),
+      basculerFete: () => this.setState({ fete: !s.fete }),
+      basculerCiRouge: () => this.setState({ ciRouge: !s.ciRouge }),
+      basculerNuit: () => this.setState({ nuit: !s.nuit }),
+      basculerSon: () => this.setState({ son: !s.son, toast: !s.son ? 'Son activé : clavier, machine à café, fanfare au merge.' : '' })
     };
   }
 }
