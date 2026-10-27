@@ -75,7 +75,7 @@ export default function BureauView({
         <TableauDuJour maintenant={maintenant} signalRunsClos={runsClos} />
         <SallesCommunes projets={projets} maintenant={maintenant} />
         <div
-          className={compact ? "flex flex-col gap-2" : "grid grid-cols-2 gap-3.5"}
+          className={compact ? "flex flex-col gap-2" : "flex flex-col gap-3.5"}
           data-mode={compact ? "compact" : "pieces"}
         >
           {projets.map(({ nom, etat, runId = null, run }) =>
