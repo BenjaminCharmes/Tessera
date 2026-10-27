@@ -5,7 +5,7 @@ depends_on:
 - ticket-596
 estimated_days: 0.25
 id: ticket-599
-pr_number: null
+pr_number: 680
 priority: medium
 status: done
 title: When changes are requested, the reviewer brings its review to the coder's desk
