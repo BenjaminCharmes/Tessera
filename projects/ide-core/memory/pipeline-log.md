@@ -5480,3 +5480,24 @@ Le diff ajoute :
 - 2026-10-27 14:11:08 UTC — [ticket-606] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le changement de layout passe d (25500ms)
 - 2026-10-27 14:11:08 UTC — [ticket-606] APPROVED après 2 tour(s)
 - 2026-10-27 14:12:29 UTC — [ticket-606] documentation: 0 fichier(s) (76687ms)
+- 2026-10-27 14:14:55 UTC — [ide-core] ticket-606 PR #685 non surveillée (livraison arrêtée)
+- 2026-10-27 14:14:58 UTC — [ticket-607] branche ticket-607-agents-hair-reads-as-hair-it-frames-the-face-and
+- 2026-10-27 14:15:00 UTC — [ticket-607] tour 1 — codeur démarré
+- 2026-10-27 14:16:21 UTC — [ticket-607] tour 1 — codeur terminé (80875ms)
+- 2026-10-27 14:18:26 UTC — [ticket-607] testeur: OK (exit 0)
+- 2026-10-27 14:18:52 UTC — [ticket-607] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff porte sur des modifications p (25985ms)
+- 2026-10-27 14:18:52 UTC — [ticket-607] tour 1 — reviewer démarré
+- 2026-10-27 14:19:21 UTC — [ticket-607] tour 1 — reviewer terminé (29141ms)
+- 2026-10-27 14:22:59 UTC — [ticket-607] validateur: fichiers cités joints : design/bureau/Tete.tsx, Personnage.test.tsx, PersonnageAssis.tsx, PersonnageDebout.tsx
+- 2026-10-27 14:22:59 UTC — [ticket-607] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement le  (246328ms)
+- 2026-10-27 14:22:59 UTC — [ticket-607] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 14:22:59 UTC — [ticket-607] tour 2 — codeur démarré
+- 2026-10-27 14:24:43 UTC — [ticket-607] tour 2 — codeur terminé (103906ms)
+- 2026-10-27 14:26:41 UTC — [ticket-607] testeur: OK (exit 0)
+- 2026-10-27 14:26:59 UTC — [ticket-607] securite: PASS — Diff exclusivement composé de rendu UI statique (SVG) et de tests frontends. Pas (18766ms)
+- 2026-10-27 14:26:59 UTC — [ticket-607] tour 2 — reviewer démarré
+- 2026-10-27 14:27:19 UTC — [ticket-607] tour 2 — reviewer terminé (19625ms)
+- 2026-10-27 14:30:43 UTC — [ticket-607] validateur: fichiers cités joints : design/bureau/Tete.tsx, Personnage.test.tsx, PersonnageAssis.tsx, PersonnageDebout.tsx
+- 2026-10-27 14:30:43 UTC — [ticket-607] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement le  (223250ms)
+- 2026-10-27 14:30:43 UTC — [ticket-607] APPROVED après 2 tour(s)
+- 2026-10-27 14:32:29 UTC — [ticket-607] documentation: 0 fichier(s) (101469ms)

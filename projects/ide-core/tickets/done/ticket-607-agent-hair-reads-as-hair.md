@@ -1,14 +1,15 @@
 ---
-id: ticket-607
-title: "Agents' hair reads as hair: it frames the face, and the bun sits against the head"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-27
 depends_on: []
 estimated_days: 0.25
-created: 2026-10-27
+id: ticket-607
+pr_number: 686
+priority: medium
+status: done
+title: 'Agents'' hair reads as hair: it frames the face, and the bun sits against
+  the head'
+type: fix
 ---
 
 # ticket-607 — Les cheveux des agents se lisent comme des cheveux

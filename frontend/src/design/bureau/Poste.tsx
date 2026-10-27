@@ -33,6 +33,8 @@ function Coche() {
  * (il attend son tour ou il travaille). Une fois fini, il se lève : il se dessine
  * à côté du poste (`AgentDebout`), la grille 16 × 18 ne le contient plus
  * (ADR-058). Pixels `rect` sur cette grille, rien d'autre.
+ * `overflow-visible` : le chignon assis occupe les lignes −1 et 0, hors de la grille ;
+ * sans cela le `<svg>` coupe sa ligne −1 et le chignon se réduit à une barre.
  */
 export default function Poste({ projet, role, etat, sante, auRepos = false, parti = false }: PosteProps) {
   const occupe = etat === "occupe";
@@ -46,6 +48,7 @@ export default function Poste({ projet, role, etat, sante, auRepos = false, part
       shapeRendering="crispEdges"
       aria-hidden="true"
       data-sprite="poste"
+      className="overflow-visible"
     >
       {assis ? (
         <Personnage
