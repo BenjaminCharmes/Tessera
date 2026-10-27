@@ -10,6 +10,7 @@
 <helmet>
 <style>
 body{margin:0;background:#0f0f11}
+svg{flex-shrink:0}
 a{color:#c4b5fd}a:hover{color:#ddd6fe}
 .agent{position:absolute;left:0;bottom:22px;padding:0;border:0;background:none;cursor:pointer;line-height:0;transition:transform 1.8s steps(12),opacity .9s ease}
 .agent:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
@@ -64,7 +65,7 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
         <h2 style="margin: 0; font-size: 13px">Bureau du directeur</h2>
         <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">toi : une question ou une approbation t'attend</p>
       </div>
-      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; gap: 10px">
+      <div class="sol" style="height: 132px; padding: 0 12px; display: flex; align-items: flex-end; gap: 10px">
         <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px">
           <svg width="56" height="63" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
             <rect x="5" y="1" width="6" height="2" fill="#1c1917"></rect><rect x="5" y="3" width="6" height="4" fill="#e8b98f"></rect>
@@ -75,7 +76,7 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
           </svg>
           <span style="font-size: 11px; color: #a1a1aa">toi</span>
         </div>
-        <figure style="margin: 0 0 30px; display: flex; flex-direction: column; align-items: center; gap: 2px">
+        <figure style="margin: 0; align-self: flex-start; padding-top: 8px; display: flex; flex-direction: column; align-items: center; gap: 2px">
           <svg width="36" height="42" viewBox="0 0 12 14" shape-rendering="crispEdges" role="img" aria-label="Employé de la semaine : ide-core, codeur">
             <rect x="0" y="0" width="12" height="14" fill="#a16207"></rect><rect x="1" y="1" width="10" height="12" fill="#fef3c7"></rect>
             <rect x="3" y="3" width="6" height="2" fill="{{employe.cheveux}}"></rect><rect x="3" y="5" width="6" height="4" fill="{{employe.peau}}"></rect>
@@ -105,7 +106,7 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
         <h2 style="margin: 0; font-size: 13px">Salle de réunion</h2>
         <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">conflit de rebase : le résolveur tente, tu relis</p>
       </div>
-      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; justify-content: center; gap: 10px">
+      <div class="sol" style="height: 132px; padding: 0 12px; display: flex; align-items: flex-end; justify-content: center; gap: 10px">
         <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px">
           <sc-if value="{{conflit}}" hint-placeholder-val="{{ false }}">
             <span class="flotte" style="font-size: 11px; padding: 1px 6px; border-radius: 9px; background: rgba(59,130,246,.15); color: #93c5fd">2 fichiers</span>
@@ -131,7 +132,7 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
         <h2 style="margin: 0; font-size: 13px">Salle de pause</h2>
         <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">attend l'extérieur : CI, quota, dépendance</p>
       </div>
-      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; gap: 12px">
+      <div class="sol" style="height: 132px; padding: 0 12px; display: flex; align-items: flex-end; gap: 12px">
         <svg style="margin-bottom: 8px" width="42" height="66" viewBox="0 0 14 22" shape-rendering="crispEdges" aria-hidden="true">
           <g class="vapeur"><rect x="6" y="1" width="1" height="2" fill="#a1a1aa"></rect></g>
           <rect x="2" y="5" width="10" height="15" fill="#3f3f46"></rect><rect x="3" y="6" width="8" height="3" fill="#18181b"></rect><rect x="6" y="14" width="2" height="2" fill="#e4e4e7"></rect><rect x="2" y="20" width="10" height="2" fill="#27272a"></rect>
@@ -154,7 +155,7 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
         <h2 style="margin: 0; font-size: 13px">RH</h2>
         <p style="margin: 2px 0 0; font-size: 11px; color: #a1a1aa">un modèle indisponible : on passe au secours</p>
       </div>
-      <div class="sol" style="height: 104px; padding: 0 12px; display: flex; align-items: flex-end; gap: 10px">
+      <div class="sol" style="height: 132px; padding: 0 12px; display: flex; align-items: flex-end; gap: 10px">
         <svg style="margin-bottom: 8px" width="56" height="63" viewBox="0 0 16 18" shape-rendering="crispEdges" aria-hidden="true">
           <rect x="5" y="1" width="6" height="2" fill="#7c2d12"></rect><rect x="4" y="1" width="1" height="6" fill="#7c2d12"></rect><rect x="11" y="1" width="1" height="6" fill="#7c2d12"></rect>
           <rect x="5" y="3" width="6" height="4" fill="#f1c7a3"></rect><rect x="6" y="4" width="1" height="1" fill="#18181b"></rect><rect x="9" y="4" width="1" height="1" fill="#18181b"></rect>

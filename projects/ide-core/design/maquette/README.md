@@ -47,7 +47,9 @@ comme référence.
   (conflit), salle de pause (attente extérieure), RH (repli de modèle) ;
   fête au merge, gyrophare sur CI rouge, retour du reviewer, tableau blanc des
   critères, bulle d'action, fenêtre jour/nuit, employé de la semaine, porte et
-  pile cliquables, sons optionnels —
+  pile cliquables, sons optionnels. Les boutons « Démo » et le panneau « Qui
+  fait quoi » n'existent que dans la maquette : dans Tessera, ce sont les
+  événements réels qui déclenchent chaque scène —
   https://claude.ai/artifact/1bksL8hJjUhcgwrs7VtD7j
 - **Notifications** (ticket-554) : `Notifications.dc.html` — la cloche du
   rail, historique du jour et réglages par événement (système, son) —
