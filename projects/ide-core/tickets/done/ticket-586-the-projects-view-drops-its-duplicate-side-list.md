@@ -1,14 +1,16 @@
 ---
-id: ticket-586
-title: "The projects view drops its duplicate side list and takes its import and create buttons"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-580"]
-estimated_days: 0.25
 created: 2026-10-26
+depends_on:
+- ticket-580
+estimated_days: 0.25
+id: ticket-586
+pr_number: 669
+priority: high
+status: done
+title: The projects view drops its duplicate side list and takes its import and create
+  buttons
+type: fix
 ---
 
 # ticket-586 — La vue Projets perd sa liste latérale en double

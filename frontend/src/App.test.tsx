@@ -196,6 +196,17 @@ describe("App — colonne latérale (ticket-580)", () => {
     expect(screen.getByRole("main")).toHaveStyle({ gridColumn: "2" });
   });
 
+  it("does not render the side column on the projects panel (ticket-586)", async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole("tab", { name: /^Tickets/ }));
+    expect(screen.getByLabelText("Panneau latéral")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("tab", { name: /^Projets/ }));
+
+    expect(screen.queryByLabelText("Panneau latéral")).not.toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveStyle({ gridColumn: "2" });
+  });
+
   it("still renders the side column on the tickets panel", async () => {
     render(<App />);
     await userEvent.click(screen.getByRole("tab", { name: /^Tickets/ }));

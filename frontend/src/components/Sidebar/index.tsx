@@ -5,7 +5,6 @@ import type { UseServicesResult } from "../../hooks/useServices";
 import type { FiltresTickets } from "../../lib/filtresTickets";
 import SectionPipeline from "./SectionPipeline";
 import FileTree from "../FileTree";
-import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
 import PanneauxDuProjet from "./PanneauxDuProjet";
 import RunHistory from "./RunHistory";
@@ -31,14 +30,11 @@ import type { SidebarPanel } from "./panels";
 
 export interface ProjetSidebar {
   actif: Project | null;
-  /** Les projets dont un run attend une réponse (ticket-186). */
-  enAttente?: ReadonlySet<string>;
   /** Les services du projet actif, pour le bouton « Lancer » (ticket-138). */
   services?: UseServicesResult;
   /** La sortie d'un service, pour le panneau du projet (ticket-147). */
   sortieDeService?: (projectId: string, nom: string) => string[];
   onSelect: (project: Project) => void;
-  onCreated?: (project: Project) => void;
 }
 
 export interface TicketsSidebar {
@@ -168,14 +164,6 @@ export default function Sidebar({
       ) : null}
 
       <div className="flex-1 overflow-y-auto">
-        {panel === "projects" && (
-          <ProjectNav
-            activeProject={projet.actif}
-            onSelectProject={projet.onSelect}
-            onProjectCreated={projet.onCreated}
-            enAttente={projet.enAttente}
-          />
-        )}
         {panel === "tickets" && (
           <TicketList
             project={projet.actif}

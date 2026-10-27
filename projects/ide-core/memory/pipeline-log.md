@@ -5225,3 +5225,15 @@ Le diff ajoute :
 - 2026-10-27 08:47:49 UTC — [ide-core] ticket-576 retiré de la file
 - 2026-10-27 08:47:49 UTC — [ide-core] ticket-570 retiré de la file
 - 2026-10-27 08:48:26 UTC — [ticket-583] documentation: 0 fichier(s) (147781ms)
+- 2026-10-27 09:06:15 UTC — [ticket-586] branche ticket-586-the-projects-view-drops-its-duplicate-side-list-a
+- 2026-10-27 09:06:17 UTC — [ticket-586] tour 1 — codeur démarré
+- 2026-10-27 09:09:46 UTC — [ticket-586] tour 1 — codeur terminé (209156ms)
+- 2026-10-27 09:11:44 UTC — [ticket-586] testeur: OK (exit 0)
+- 2026-10-27 09:12:57 UTC — [ticket-586] securite: PASS — Refactoring UI component (project list sidebar → center panel). No security vuln (72750ms)
+- 2026-10-27 09:12:57 UTC — [ticket-586] tour 1 — reviewer démarré
+- 2026-10-27 09:13:17 UTC — [ticket-586] tour 1 — reviewer terminé (20250ms)
+- 2026-10-27 09:17:57 UTC — [ticket-586] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 09:18:19 UTC — [ticket-586] validateur: fichiers cités joints : frontend/src (dossier, 8 fichiers), backend/ (dossier, 6 fichiers)
+- 2026-10-27 09:18:19 UTC — [ticket-586] validateur: APPROVED — Tous les critères sont satisfaits. Le diff supprime `ProjectNav.tsx` et ses usag (321562ms)
+- 2026-10-27 09:18:19 UTC — [ticket-586] APPROVED après 1 tour(s)
+- 2026-10-27 09:22:12 UTC — [ticket-586] documentation: 1 fichier(s) (220921ms)

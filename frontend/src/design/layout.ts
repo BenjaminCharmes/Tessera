@@ -36,5 +36,12 @@ export const GRILLE_COCKPIT_SANS_COLONNE = {
   gridTemplateColumns: "100px 1fr",
 } as const;
 
-/** Les panneaux dont la colonne latérale n'a aucun contenu (ticket-580). */
-export const PANNEAUX_SANS_COLONNE: readonly string[] = ["supervision", "running"];
+/**
+ * Les panneaux dont la colonne latérale n'a aucun contenu (ticket-580) : la
+ * vue Projets du centre porte tout ce que la liste répétait (ticket-586).
+ */
+export const PANNEAUX_SANS_COLONNE: readonly string[] = [
+  "supervision",
+  "running",
+  "projects",
+];

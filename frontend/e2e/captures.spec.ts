@@ -1,4 +1,3 @@
-import type { Page } from "@playwright/test";
 import { test } from "./fixtures";
 
 /**
@@ -12,9 +11,6 @@ import { test } from "./fixtures";
  * Elles ne sont pas un test : rien n'échoue ici. C'est un outil, gardé parce
  * qu'il resservira à la prochaine migration d'un moteur de style.
  */
-const lateral = (page: Pick<Page, "getByRole">) =>
-  page.getByRole("complementary", { name: "Panneau latéral" });
-
 test.describe("Captures", () => {
   test("cockpit au chargement", async ({ mockedPage }) => {
     await mockedPage.goto("/");
@@ -27,7 +23,10 @@ test.describe("Captures", () => {
 
   test("tickets d'un projet", async ({ mockedPage }) => {
     await mockedPage.goto("/");
-    await lateral(mockedPage).getByText("ide-core").first().click();
+    await mockedPage
+      .getByRole("main")
+      .getByRole("article", { name: "ide-core" })
+      .click();
     await mockedPage.waitForTimeout(500);
     await mockedPage.screenshot({
       path: `captures/${process.env.CAPTURE_TAG ?? "avant"}-tickets.png`,

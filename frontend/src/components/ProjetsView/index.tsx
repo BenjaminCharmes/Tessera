@@ -9,6 +9,7 @@ import EnTeteDeCategorie from "../Sidebar/EnTeteDeCategorie";
 import { useCategoriesRepliees } from "../../hooks/useCategoriesRepliees";
 import BarreProjets from "./BarreProjets";
 import ProjetCarte from "./ProjetCarte";
+import ModalesDeProjet, { type ModaleDeProjet } from "./ModalesDeProjet";
 import {
   FILTRES_PAR_DEFAUT,
   SANS_CATEGORIE,
@@ -25,6 +26,10 @@ interface ProjetsViewProps {
   projets: Project[];
   activeProject: Project | null;
   onSelectProject: (project: Project) => void;
+  /** Un projet vient d'être créé ou importé ; il devient le projet actif (ticket-586). */
+  onProjectCreated?: (project: Project) => void;
+  /** Les projets dont un run attend une réponse (ticket-186). */
+  enAttente?: ReadonlySet<string>;
   /** Les runs vivants : une file en cours accepte des tickets depuis la carte (ticket-557). */
   runs?: RunActif[];
 }
@@ -76,6 +81,8 @@ export default function ProjetsView({
   projets,
   activeProject,
   onSelectProject,
+  onProjectCreated,
+  enAttente,
   runs = [],
 }: ProjetsViewProps) {
   const { data, loading, error, refresh } = useResource(lireVueDEnsemble, AUCUN);
@@ -85,6 +92,7 @@ export default function ProjetsView({
     estFiltresProjets,
   );
   const [echec, setEchec] = useState<string | null>(null);
+  const [modale, setModale] = useState<ModaleDeProjet>(null);
   const { estRepliee, basculer } = useCategoriesRepliees();
 
   const pastilles = pastillesDeCategories(data);
@@ -109,12 +117,22 @@ export default function ProjetsView({
     }
   }
 
+  // Le projet ajouté devient le projet actif, comme depuis l'ancienne liste.
+  function projetAjoute(projet: Project) {
+    refresh();
+    notifierProjetsModifies();
+    setModale(null);
+    onProjectCreated?.(projet);
+    onSelectProject(projet);
+  }
+
   function carte(projet: ProjectOverview) {
     return (
       <ProjetCarte
         key={projet.id}
         projet={projet}
         actif={activeProject?.id === projet.id}
+        enAttente={enAttente?.has(projet.id) ?? false}
         categories={categories}
         onSelect={() => {
           const complet = projets.find((p) => p.id === projet.id);
@@ -179,6 +197,13 @@ export default function ProjetsView({
         pastilles={pastilles}
         total={data.length}
         onChange={setFiltres}
+        onImporter={() => setModale("import")}
+        onCreer={() => setModale("creation")}
+      />
+      <ModalesDeProjet
+        ouverte={modale}
+        onFermer={() => setModale(null)}
+        onAjoute={projetAjoute}
       />
       {echec && (
         <p role="alert" className="px-4 py-2 text-xs text-red-400">
