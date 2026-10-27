@@ -5663,3 +5663,19 @@ Le diff ajoute :
 - 2026-10-27 18:58:06 UTC — [ticket-575] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (209952ms)
 - 2026-10-27 18:58:06 UTC — [ticket-575] APPROVED après 2 tour(s)
 - 2026-10-27 18:59:25 UTC — [ticket-575] documentation: 0 fichier(s) (74187ms)
+- 2026-10-27 19:07:50 UTC — [ide-core] ticket-575 PR #697 confiée au CIWatcher
+- 2026-10-27 19:07:53 UTC — [ticket-573] branche ticket-573-each-role-can-declare-its-reasoning-effort-in-age
+- 2026-10-27 19:07:53 UTC — [ticket-573] tour 1 — codeur démarré
+- 2026-10-27 19:10:04 UTC — [ticket-573] tour 1 — codeur terminé (130500ms)
+- 2026-10-27 19:12:02 UTC — [ide-core] ticket-575 PR #697 mergée (CI verte)
+- 2026-10-27 19:16:03 UTC — [ticket-573] testeur: 1 failed, 2255 passed, 64 warnings in 356.79s (0:05:56)
+- 2026-10-27 19:16:03 UTC — [ticket-573] tests rouges au tour 1
+- 2026-10-27 19:16:03 UTC — [ticket-573] tour 2 — codeur démarré
+- 2026-10-27 19:16:57 UTC — [ticket-573] tour 2 — codeur terminé (53500ms)
+- 2026-10-27 19:24:12 UTC — [ticket-573] testeur: OK (exit 0)
+- 2026-10-27 19:25:31 UTC — [ticket-573] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un champ optionnel de configuratio (78937ms)
+- 2026-10-27 19:25:31 UTC — [ticket-573] tour 2 — reviewer démarré
+- 2026-10-27 19:25:46 UTC — [ticket-573] tour 2 — reviewer terminé (15687ms)
+- 2026-10-27 19:29:06 UTC — [ticket-573] validateur: fichiers cités joints : backend/src/tessera/models/agent.py, agents.json
+- 2026-10-27 19:29:06 UTC — [ticket-573] validateur: APPROVED — Tous les critères d'acceptation ont été respectés : le champ `effort` a été ajou (215172ms)
+- 2026-10-27 19:29:06 UTC — [ticket-573] APPROVED après 2 tour(s)
