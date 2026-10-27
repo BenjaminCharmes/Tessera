@@ -4,7 +4,7 @@ created: 2026-10-27
 depends_on: []
 estimated_days: 0.5
 id: ticket-610
-pr_number: null
+pr_number: 695
 priority: high
 status: done
 title: 'A blocked merge no longer leaves the checkout dirty: the next ticket commits
