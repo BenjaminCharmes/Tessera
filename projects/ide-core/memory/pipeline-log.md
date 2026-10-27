@@ -5579,3 +5579,4 @@ Le diff ajoute :
 - 2026-10-27 16:17:36 UTC — [ticket-578] validateur: fichiers cités joints : backend/src/tessera/routers/orchestrator.py (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
 - 2026-10-27 16:17:36 UTC — [ticket-578] validateur: APPROVED — Tous les critères sont satisfaits. L'implémentation ajoute un champ `rapide: boo (330391ms)
 - 2026-10-27 16:17:36 UTC — [ticket-578] APPROVED après 2 tour(s)
+- 2026-10-27 16:20:31 UTC — [ticket-578] documentation: 2 fichier(s) (165000ms)
