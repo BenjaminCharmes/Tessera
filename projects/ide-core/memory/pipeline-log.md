@@ -5186,3 +5186,15 @@ Le diff ajoute :
 - 2026-10-27 08:14:04 UTC — [ticket-592] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement la  (204250ms)
 - 2026-10-27 08:14:04 UTC — [ticket-592] APPROVED après 1 tour(s)
 - 2026-10-27 08:15:28 UTC — [ticket-592] documentation: 0 fichier(s) (78531ms)
+- 2026-10-27 08:24:01 UTC — [ide-core] ticket-592 PR #664 confiée au CIWatcher
+- 2026-10-27 08:24:04 UTC — [ticket-591] branche ticket-591-every-agent-of-the-pipeline-stays-visible-waiting
+- 2026-10-27 08:24:05 UTC — [ticket-591] tour 1 — codeur démarré
+- 2026-10-27 08:26:49 UTC — [ticket-591] tour 1 — codeur terminé (163578ms)
+- 2026-10-27 08:28:27 UTC — [ticket-591] testeur: OK (exit 0)
+- 2026-10-27 08:28:45 UTC — [ide-core] ticket-592 PR #664 mergée (CI verte)
+- 2026-10-27 08:29:02 UTC — [ticket-591] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie uniquement l'UI frontend : libell (34531ms)
+- 2026-10-27 08:29:02 UTC — [ticket-591] tour 1 — reviewer démarré
+- 2026-10-27 08:29:33 UTC — [ticket-591] tour 1 — reviewer terminé (31483ms)
+- 2026-10-27 08:32:46 UTC — [ticket-591] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 8 fichiers)
+- 2026-10-27 08:32:46 UTC — [ticket-591] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (224764ms)
+- 2026-10-27 08:32:46 UTC — [ticket-591] APPROVED après 1 tour(s)
