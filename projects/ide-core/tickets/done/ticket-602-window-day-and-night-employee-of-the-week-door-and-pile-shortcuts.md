@@ -5,7 +5,7 @@ depends_on:
 - ticket-597
 estimated_days: 0.5
 id: ticket-602
-pr_number: null
+pr_number: 687
 priority: medium
 status: done
 title: A window follows day and night, the director's office shows the employee of
