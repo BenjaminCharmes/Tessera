@@ -531,3 +531,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : la Liste reste nécessaire au clavier et au lecteur d'écran ; un décor qui ment sur l'état ruine la confiance dans la vue.
 **Alternative rejetée** : canvas — il ne se teste pas avec Testing Library et un lecteur d'écran ne le lit pas.
 **Détail** : `docs/superpowers/specs/2026-10-23-vue-bureau-design.md`
+
+---
+
+## ADR-059 — Un run « rapide » prend le repli d'emblée
+
+**Date** : 2026-10-27
+**Décision** : complète ADR-046. À côté de l'indisponibilité, un second déclencheur du repli : le choix explicite, au lancement (`rapide` dans `RunRequest`, faux par défaut). Un rôle qui déclare un `fallback` est alors construit directement avec lui, sans principal, et chaque appel porte le modèle du repli. Un rôle sans repli ne change pas. Le choix s'écrit une fois par run dans `memory/pipeline-log.md`. Une réponse illisible ne déclenche toujours aucun repli.
+**Raison** : sur ce PC, le validateur local prend environ 5 min 30 par ticket contre environ 1 min sur Haiku. Ollama reste le premier choix, Haiku quand on est pressé.
+**Alternative rejetée** : changer le défaut des `agents.json` — le réglage par défaut économise le quota.

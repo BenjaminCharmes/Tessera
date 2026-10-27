@@ -1,15 +1,15 @@
 ---
-id: ticket-578
-title: "A run launched in fast mode uses each role's fallback provider first"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-26
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-26
+id: ticket-578
 plan: true
+pr_number: 690
+priority: medium
+status: done
+title: A run launched in fast mode uses each role's fallback provider first
+type: feat
 ---
 
 # ticket-578 — Un mode « pressé » au lancement d'un run

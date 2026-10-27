@@ -2,15 +2,15 @@ import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import replace
 from pathlib import Path
+from typing import TypedDict
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
-from tessera.agents.github_sync import GithubSyncAgent
 from tessera.services.agent_registry import AgentRegistryService
-from tessera.services.sync_map import SyncMapService
+from tessera.services.issues_agent_ready import tirer_les_issues as _tirer_les_issues
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.documentation import (
     ROLES_DOCUMENTATION,
@@ -38,7 +38,7 @@ from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.journal_pipeline import journal_vers
+from tessera.services.journal_pipeline import journal_vers, journaliser_mode_rapide
 from tessera.services.providers.par_role import (
     config_du_role,
     modele_du_role,
@@ -140,6 +140,10 @@ class RunRequest(BaseModel):
     #: Passe outre les manques relevés avant le départ (ticket-477) : ils sont
     #: journalisés, le run démarre quand même.
     force: bool = False
+    #: Mode « pressé » (ticket-578) : un rôle qui déclare un `fallback` est
+    #: construit directement avec lui, sans tenter le principal. Faux par
+    #: défaut : le réglage du manifeste économise le quota.
+    rapide: bool = False
 
     @field_validator("project_id")
     @classmethod
@@ -147,6 +151,12 @@ class RunRequest(BaseModel):
         if not validate_project_id(v):
             raise ValueError(f"project_id invalide : {v!r}")
         return v
+
+
+class _OptionsDuRun(TypedDict, total=False):
+    """The keywords `_build_orchestrator` only receives when they are set."""
+
+    rapide: bool
 
 
 class RunStarted(BaseModel):
@@ -219,6 +229,7 @@ async def _build_orchestrator(
     project_id: str,
     wt: RunWorktree | None = None,
     chemins_absents: tuple[str, ...] = (),
+    rapide: bool = False,
 ) -> Orchestrator:
     # Le dossier réel porte `agents.json` et la politique ; `racine_run` est
     # là où le run lit et écrit : le même dossier, ou son pendant dans le
@@ -253,7 +264,7 @@ async def _build_orchestrator(
         inner = provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
             project_id=project_id, max_turns=_tours_du_role(role),
-            journal_refus=journal_refus,
+            journal_refus=journal_refus, rapide=rapide,
         )
         return inner
 
@@ -262,7 +273,7 @@ async def _build_orchestrator(
     def _sans_outils(role: str) -> LLMProvider:
         inner = provider_pour_role(
             project_path, role, allow_tools=False, project_id=project_id,
-            journal_repli=journal_repli,
+            journal_repli=journal_repli, rapide=rapide,
         )
         return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
 
@@ -273,11 +284,17 @@ async def _build_orchestrator(
             project_path, role, tools=OUTILS_DE_RELECTURE,
             racine_ecriture=racine_ecriture, project_id=project_id,
             max_turns=_tours_du_role(role), journal_repli=journal_repli,
+            rapide=rapide,
         )
         return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
 
     try:
         agent_configs = load_agents_config(project_path)
+        if rapide:
+            journaliser_mode_rapide(
+                racine_run / "memory" / "pipeline-log.md", project_id,
+                [c.role for c in agent_configs if c.active and c.fallback is not None],
+            )
         provider = _par_role("codeur")
     except ProviderInconnu as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -356,7 +373,7 @@ async def _build_orchestrator(
         ci_watcher=CI_WATCHER,
         etat_pr=_lecteur_etat_pr(project_id, politique),
         pr_mergee_de_branche=_chercheur_pr_mergee(project_id, politique),
-        documenter=_documenteur(project_id, politique, wt),
+        documenter=_documenteur(project_id, politique, wt, rapide=rapide),
         run_recorder=RunRecorder(settings.ide_db_path),
         # Depuis la racine d'écriture, pas le dossier du projet : le projet
         # bootstrap travaille au-dessus de lui (ADR-028), et sa carte doit le
@@ -429,6 +446,7 @@ def _documenteur(
     project_id: str,
     politique: PolitiqueRun | None = None,
     wt: RunWorktree | None = None,
+    rapide: bool = False,
 ) -> Callable[[], Awaitable[ResultatDocumentation]]:
     """Build the documentation update of a project (ticket-092).
 
@@ -455,6 +473,7 @@ def _documenteur(
         inner = provider_pour_role(
             project_path, role, allow_tools=False, project_id=project_id,
             journal_repli=journal_vers(dossier_run / "memory" / "pipeline-log.md"),
+            rapide=rapide,
         )
         return (
             ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path),
@@ -899,10 +918,13 @@ async def _preparer_orchestrateur(
     """
     project_path = settings.ide_workspace_dir / request.project_id
     wt: RunWorktree | None = None
+    # `rapide` ne voyage que lorsqu'il est vrai : l'appel reste celui d'avant
+    # ticket-578 pour tout run ordinaire.
+    options: _OptionsDuRun = {"rapide": True} if request.rapide else {}
     try:
         politique = PolitiqueRun.lire(project_path)
         if politique.worktree is None:
-            orchestrator = await _build_orchestrator(request.project_id)
+            orchestrator = await _build_orchestrator(request.project_id, **options)
         else:
             # Échoue fermé : un projet à worktree ne tourne jamais dans le
             # checkout, file et autonome compris, `ticket_id` fourni ou non.
@@ -916,7 +938,9 @@ async def _preparer_orchestrateur(
                 project_path, request.project_id, ticket_id,
                 ticket.title if ticket else ticket_id, politique,
             ) or (None, [])
-            orchestrator = await _build_orchestrator(request.project_id, wt, tuple(absents))
+            orchestrator = await _build_orchestrator(
+                request.project_id, wt, tuple(absents), **options
+            )
         if request.mode == "autonomous" and request.depuis_github:
             await _tirer_les_issues(request.project_id)
         return orchestrator
@@ -1084,32 +1108,3 @@ async def remove_from_run(run_id: str, request: RemoveRequest) -> RemoveResult:
     for ticket_id in retires:
         ecrire_log(projet, f"[{run.project_id}] {ticket_id} retiré de la file")
     return RemoveResult(retires=retires, ignores=ignores, refuses=refuses)
-
-
-async def _tirer_les_issues(project_id: str) -> int:
-    """Crée les tickets manquants depuis les issues `agent-ready` du dépôt.
-
-    Le dernier maillon de la boucle : une issue écrite sur GitHub devient un
-    ticket, que le run autonome prend ensuite comme les autres. Le pull
-    existait déjà — il n'était qu'un bouton à part (ticket-084).
-
-    Un échec n'empêche pas le run : les tickets déjà là méritent de tourner.
-    """
-    project_path = settings.ide_workspace_dir / project_id
-    project = load_project(project_path)
-    if not project.github_remote or not settings.github_token:
-        return 0
-    agent = GithubSyncAgent(
-        github_svc=GitHubService(
-            token=settings.github_token, repo=project.github_remote
-        ),
-        ticket_svc=TicketService(project_path, project_id),
-        sync_map_svc=SyncMapService(),
-        project_path=project_path,
-    )
-    try:
-        resultat = await agent.run("pull")
-    except Exception as exc:  # noqa: BLE001 — voir la docstring
-        _logger.warning("pull_des_issues_echoue", extra={"erreur": str(exc)})
-        return 0
-    return int(resultat.pulled)
