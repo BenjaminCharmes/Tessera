@@ -15,9 +15,9 @@ import type {
   TicketStatus,
 } from "../types/api";
 import { boundEvents } from "./boundEvents";
-import { appliquerAttente, appliquerConflit } from "./streamAttente";
+import { appliquerAccuse, appliquerAttente, appliquerConflit, appliquerRepli } from "./streamAttente";
 import { entreeTesteur } from "./streamTests";
-import type { AttenteExterieure } from "./streamAttente";
+import type { AttenteExterieure, RepliDeProvider } from "./streamAttente";
 
 export { MAX_EVENTS } from "./boundEvents";
 
@@ -177,6 +177,8 @@ export interface StreamState {
   attenteExterieure: AttenteExterieure | null;
   /** Fichiers du conflit que le résolveur travaille, entre `started` et `ended` (ticket-564). */
   conflitEnCours: string[] | null;
+  /** Dernier `provider_fallback` du run, relié par son projet (ticket-597). Non persisté : un F5 l'efface. */
+  repli: RepliDeProvider | null;
 }
 
 export interface UseRunActifResult extends StreamState {
@@ -229,6 +231,7 @@ export const INITIAL: StreamState = {
   dernierEvenementA: null,
   attenteExterieure: null,
   conflitEnCours: null,
+  repli: null,
 };
 
 /**
@@ -629,25 +632,9 @@ function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState 
         // Une nouvelle question efface l'accusé de la réponse précédente.
         answerAck: null,
       };
-    case "answer_ack": {
-      // Le backend accuse réception de la réponse (ticket-320, ticket-358).
-      // « transmitted » : la réponse est parvenue à l'agent, la question
-      // disparaît. « deposited » : aucune question n'attendait, la réponse
-      // est en boîte aux lettres — la question éventuelle reste affichée.
-      const outcome = ev.data["outcome"];
-      const isTransmitted = outcome === "transmitted";
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        pendingQuestion: isTransmitted ? null : s.pendingQuestion,
-        questionExpireA: isTransmitted ? null : s.questionExpireA,
-        answerAck:
-          outcome === "transmitted" || outcome === "deposited"
-            ? outcome
-            : null,
-      };
-    }
+    case "answer_ack":
+      // Accusé de réception de la réponse (ticket-320, ticket-358) : voir `appliquerAccuse`.
+      return { ...s, events, ticketEvents, ...appliquerAccuse(s, ev) };
     case "queue_progress":
       // Un nouveau ticket commence. Une file est **un** run (ADR-041), donc un
       // seul état accumulé : sans remise à zéro, les drapeaux dérivés de
@@ -671,6 +658,8 @@ function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState 
         quota: s.quota,
         branch: s.branch,
         maxRounds: s.maxRounds,
+        // Un repli concerne le run, pas le ticket : il survit à la file (ticket-597).
+        repli: s.repli,
         ticketId: ev.ticket_id || s.ticketId,
         queue: {
           index: Number(ev.data["index"] ?? 0),
@@ -681,6 +670,8 @@ function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState 
       return { ...s, events, ticketEvents, ...appliquerAttente(ev) };
     case "conflict_resolution":
       return { ...s, events, ticketEvents, ...appliquerConflit(ev) };
+    case "provider_fallback":
+      return { ...s, events, ticketEvents, ...appliquerRepli(ev) };
     case "quota_updated":
       // Le quota d'abonnement est la ressource réellement finie : l'afficher
       // évite d'être coupé sans comprendre pourquoi (ticket-054).

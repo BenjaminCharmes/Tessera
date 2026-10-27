@@ -1234,6 +1234,14 @@ Le Bureau affiche deux **salles** en bas (zones montrant ce qui attend, hors du 
 
 Si rien n'attend et qu'il n'y a pas de conflit, les deux salles affichent « Personne en pause » et « Aucun conflit en cours ».
 
+### Le Bureau vivant
+
+Le Bureau qui t'affiche en tant que directeur montre aussi les agents au travail. Ceux qui ont terminé leur tâche prennent une pause : ils bougent librement, prennent un café à leur poste (tasse levée), s'étirent debout (bras levés), ou vont à la machine à café. Leurs activités changent régulièrement. La machine fume quand quelqu'un s'y sert.
+
+Au maximum, trois agents peuvent être à la machine simultanément. Au-delà du troisième, les suivants retournent à leur poste pour boire leur café.
+
+Quand le run s'achève, tous les agents marchent jusqu'à la porte et s'effacent graduellement de l'écran.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.

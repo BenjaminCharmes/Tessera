@@ -29,7 +29,11 @@ describe("SallePause", () => {
     expect(machine).not.toBeNull();
     expect(machine?.getAttribute("aria-hidden")).toBe("true");
     expect(screen.getByText("café")).toBeInTheDocument();
-    expect(screen.getByText(/quota, CI, une dépendance/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Salle de pause" })).toHaveAttribute(
+      "title",
+      expect.stringMatching(/quota, CI, une dépendance/),
+    );
+    expect(screen.queryByText(/quota, CI, une dépendance/)).toBeNull();
   });
 
   it("keeps the coffee machine next to its occupants", () => {
@@ -76,7 +80,27 @@ describe("SalleReunion", () => {
     const table = container.querySelector('[data-sprite="table-de-reunion"]');
     expect(table).not.toBeNull();
     expect(table?.getAttribute("aria-hidden")).toBe("true");
-    expect(screen.getByText("conflit de rebase")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Salle de réunion" })).toHaveAttribute(
+      "title",
+      expect.stringMatching(/conflit de rebase/),
+    );
+    expect(screen.queryByText(/conflit de rebase/)).toBeNull();
+  });
+
+  it("places the resolver with the number of files of the conflict", () => {
+    render(
+      <SalleReunion occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: ["a.py", "b.py"] } }]} />,
+    );
+
+    const salle = screen.getByRole("complementary", { name: "Salle de réunion" });
+    expect(within(salle).getByText(/résolveur/)).toBeInTheDocument();
+    expect(within(salle).getByText(/2 fichiers/)).toBeInTheDocument();
+  });
+
+  it("says 'fichiers inconnus' when the conflict names none", () => {
+    render(<SalleReunion occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: [] } }]} />);
+
+    expect(screen.getByText(/fichiers inconnus/)).toBeInTheDocument();
   });
 
   it("keeps its plant and its floor when nobody is in it", () => {

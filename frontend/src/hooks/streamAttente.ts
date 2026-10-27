@@ -46,6 +46,60 @@ export function appliquerAttente(
   };
 }
 
+/**
+ * `answer_ack` : le backend accuse réception de la réponse. « transmitted » : elle
+ * est parvenue à l'agent, la question disparaît. « deposited » : aucune question
+ * n'attendait, la réponse est en boîte aux lettres — la question éventuelle reste
+ * affichée.
+ */
+export function appliquerAccuse(
+  s: StreamState,
+  ev: OrchestratorEvent,
+): Pick<StreamState, "pendingQuestion" | "questionExpireA" | "answerAck"> {
+  const outcome = ev.data["outcome"];
+  const transmise = outcome === "transmitted";
+  return {
+    pendingQuestion: transmise ? null : s.pendingQuestion,
+    questionExpireA: transmise ? null : s.questionExpireA,
+    answerAck: transmise || outcome === "deposited" ? outcome : null,
+  };
+}
+
+/** Le dernier repli de provider d'un run (ticket-597) : qui a été tenté, qui a répondu, et quand. */
+export interface RepliDeProvider {
+  role: string;
+  tente: string;
+  utilise: string;
+  modele: string;
+  /** Instant de l'événement, en ms depuis l'époque : les RH en tirent leur délai de 20 s. */
+  a: number;
+}
+
+function texteDe(data: Record<string, unknown>, cle: string): string {
+  const v = data[cle];
+  return typeof v === "string" ? v : "";
+}
+
+/**
+ * `provider_fallback` : le rôle repasse sur son provider de repli. Sans rôle
+ * lisible ou sans horodatage valide, rien n'est posé — la salle des RH n'a
+ * alors rien de vrai à montrer (ADR-058).
+ */
+export function appliquerRepli(ev: OrchestratorEvent): Pick<StreamState, "repli"> | null {
+  const role = texteDe(ev.data, "role");
+  const a = Date.parse(ev.timestamp);
+  if (role === "" || Number.isNaN(a)) return null;
+  return {
+    repli: {
+      role,
+      tente: texteDe(ev.data, "tente"),
+      utilise: texteDe(ev.data, "utilise"),
+      modele: texteDe(ev.data, "modele"),
+      a,
+    },
+  };
+}
+
 /** `started` pose les fichiers du conflit ; `ended` les retire. */
 export function appliquerConflit(
   ev: OrchestratorEvent,

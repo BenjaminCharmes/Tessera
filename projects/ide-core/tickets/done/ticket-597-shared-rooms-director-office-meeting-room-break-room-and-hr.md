@@ -1,15 +1,17 @@
 ---
-id: ticket-597
-title: "Shared rooms across the top: the director's office for questions, the meeting room, the break room and HR for model fallbacks"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-596"]
-estimated_days: 0.75
 created: 2026-10-27
+depends_on:
+- ticket-596
+estimated_days: 0.75
+id: ticket-597
 plan: true
+pr_number: 678
+priority: high
+status: done
+title: 'Shared rooms across the top: the director''s office for questions, the meeting
+  room, the break room and HR for model fallbacks'
+type: feat
 ---
 
 # ticket-597 — Les salles communes : directeur, réunion, pause, RH
