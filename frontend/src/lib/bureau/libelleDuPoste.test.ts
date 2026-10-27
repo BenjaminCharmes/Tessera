@@ -9,8 +9,12 @@ describe("libelleDuPoste", () => {
   });
 
   it("ignores the health of a post that is not busy", () => {
-    expect(libelleDuPoste("testeur", "fait", "blocage_suspecte")).toBe("Testeur, fait");
-    expect(libelleDuPoste("securite", "libre", "question")).toBe("Sécurité, libre");
+    expect(libelleDuPoste("testeur", "fait", "blocage_suspecte")).toBe("Testeur, a fini");
+    expect(libelleDuPoste("securite", "libre", "question")).toBe("Sécurité, attend son tour");
+  });
+
+  it("calls a free post of a room without run simply free", () => {
+    expect(libelleDuPoste("securite", "libre", "attente", true)).toBe("Sécurité, libre");
   });
 
   it("names every post", () => {

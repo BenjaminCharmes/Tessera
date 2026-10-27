@@ -1,14 +1,16 @@
 ---
-id: ticket-591
-title: "Every agent of the pipeline stays visible: waiting at its desk, working, or done beside it"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-582"]
-estimated_days: 0.5
 created: 2026-10-26
+depends_on:
+- ticket-582
+estimated_days: 0.5
+id: ticket-591
+pr_number: 665
+priority: high
+status: done
+title: 'Every agent of the pipeline stays visible: waiting at its desk, working, or
+  done beside it'
+type: fix
 ---
 
 # ticket-591 — Chaque agent reste à l'écran : il attend, il travaille, ou il a fini

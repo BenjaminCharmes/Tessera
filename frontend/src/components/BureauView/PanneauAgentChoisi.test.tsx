@@ -68,7 +68,7 @@ describe("PanneauAgentChoisi", () => {
 
   it("does not act on a free post and gives it no pointer cursor", () => {
     rendre();
-    const libre = screen.getByRole("button", { name: "Reviewer, libre" });
+    const libre = screen.getByRole("button", { name: "Reviewer, attend son tour" });
 
     fireEvent.click(libre);
 
