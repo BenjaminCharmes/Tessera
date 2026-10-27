@@ -5374,3 +5374,4 @@ Le diff ajoute :
 - 2026-10-27 12:23:57 UTC — [ticket-597] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers)
 - 2026-10-27 12:23:57 UTC — [ticket-597] validateur: APPROVED — Les sept critères sont tous satisfaits. Le diff ajoute les quatre salles commune (335437ms)
 - 2026-10-27 12:23:57 UTC — [ticket-597] APPROVED après 2 tour(s)
+- 2026-10-27 12:31:04 UTC — [ticket-597] documentation: 1 fichier(s) (423000ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « PREFIXES_BACKEND: tuple[str, ...] = ("backend/", "scripts/") » (backend/src/tessera/servic
