@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import Dossiers from "./Dossiers";
+import { api } from "../../lib/api";
+import type { Ticket } from "../../types/api";
 import { statutsDuRun } from "../../lib/statutDuRun";
 import { INITIAL, applyEvent } from "../../hooks/streamState";
 import { _viderCacheResource } from "../../hooks/useResource";
@@ -19,6 +21,28 @@ function statut(restants: string[]): StatutDuRun {
   };
 }
 
+function ids(n: number): string[] {
+  return Array.from({ length: n }, (_, i) => `ticket-${String(i + 1).padStart(3, "0")}`);
+}
+
+function ticket(id: string, title: string): Ticket {
+  return {
+    id,
+    title,
+    type: "feat",
+    status: "todo",
+    priority: "medium",
+    agent: "codeur",
+    depends_on: [],
+    created: "2026-10-26",
+    github_issue_url: null,
+    pr_number: null,
+    body: "",
+    project_id: "ide-core",
+    file_path: `/tmp/${id}.md`,
+  };
+}
+
 function apresQueueProgress(index: number) {
   return applyEvent(INITIAL, {
     type: "queue_progress",
@@ -31,6 +55,7 @@ function apresQueueProgress(index: number) {
 
 beforeEach(() => {
   _viderCacheResource();
+  vi.spyOn(api.tickets, "list").mockResolvedValue({ tickets: [], unreadable: [] });
 });
 
 afterEach(() => {
@@ -38,24 +63,67 @@ afterEach(() => {
 });
 
 describe("Dossiers", () => {
-  it("draws one folder per remaining ticket", async () => {
-    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(["ticket-002", "ticket-003", "ticket-004"]));
+  it("draws a single pile of three folders and the count for fifteen tickets", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(ids(15)));
 
-    render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+    const { container } = render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
 
-    await waitFor(() => expect(screen.getAllByRole("listitem")).toHaveLength(3));
-    expect(screen.getByRole("list", { name: "Tickets restants : 3" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("15")).toBeInTheDocument());
+    expect(container.querySelectorAll('[data-sprite="dossier"]')).toHaveLength(3);
+    expect(screen.getByRole("group", { name: "Tickets restants : 15" })).toBeInTheDocument();
   });
 
-  it("gives each folder a title with the identifier of its ticket", async () => {
-    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(["ticket-002", "ticket-003"]));
+  it("draws as many folders as tickets below three", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(ids(2)));
+
+    const { container } = render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+
+    await waitFor(() => expect(screen.getByText("2")).toBeInTheDocument());
+    expect(container.querySelectorAll('[data-sprite="dossier"]')).toHaveLength(2);
+  });
+
+  it("lists identifier and title of each ticket in queue order on focus", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(["ticket-003", "ticket-002", "ticket-009"]));
+    vi.spyOn(api.tickets, "list").mockResolvedValue({
+      tickets: [ticket("ticket-002", "Second title"), ticket("ticket-003", "Third title")],
+      unreadable: [],
+    });
 
     render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+    const pile = await screen.findByRole("group", { name: "Tickets restants : 3" });
+    await waitFor(() => expect(api.tickets.list).toHaveBeenCalled());
+    await act(async () => {});
+    act(() => pile.focus());
 
-    await waitFor(() => expect(screen.getAllByRole("listitem")).toHaveLength(2));
-    const titres = screen.getAllByRole("listitem").map((li) => li.getAttribute("title"));
-    expect(titres[0]).toContain("ticket-002");
-    expect(titres[1]).toContain("ticket-003");
+    const lignes = within(screen.getByRole("tooltip")).getAllByRole("listitem");
+    expect(lignes.map((li) => li.textContent)).toEqual([
+      "ticket-003 — Third title",
+      "ticket-002 — Second title",
+      "ticket-009",
+    ]);
+  });
+
+  it("shows ten tickets then the number of others beyond ten", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(ids(15)));
+
+    render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+    const pile = await screen.findByRole("group", { name: "Tickets restants : 15" });
+    act(() => pile.focus());
+
+    expect(within(screen.getByRole("tooltip")).getAllByRole("listitem")).toHaveLength(10);
+    expect(screen.getByText("et 5 autres")).toBeInTheDocument();
+  });
+
+  it("hides the tooltip when the pile loses focus", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(ids(2)));
+
+    render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+    const pile = await screen.findByRole("group", { name: "Tickets restants : 2" });
+    act(() => pile.focus());
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    act(() => pile.blur());
+
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
   it("draws nothing when no ticket remains", async () => {
@@ -83,12 +151,12 @@ describe("Dossiers", () => {
       .mockResolvedValueOnce(statut(["ticket-003", "ticket-004"]));
 
     const { rerender } = render(<Dossiers projet="ide-core" runId="run-1" etat={apresQueueProgress(0)} />);
-    await waitFor(() => expect(screen.getAllByRole("listitem")).toHaveLength(3));
+    await waitFor(() => expect(screen.getByText("3")).toBeInTheDocument());
     expect(lire).toHaveBeenCalledTimes(1);
 
     rerender(<Dossiers projet="ide-core" runId="run-1" etat={apresQueueProgress(1)} />);
 
-    await waitFor(() => expect(screen.getAllByRole("listitem")).toHaveLength(2));
+    await waitFor(() => expect(screen.getByText("2")).toBeInTheDocument());
     expect(lire).toHaveBeenCalledTimes(2);
   });
 
@@ -97,7 +165,7 @@ describe("Dossiers", () => {
     const etat = apresQueueProgress(0);
 
     const { rerender } = render(<Dossiers projet="ide-core" runId="run-1" etat={etat} />);
-    await waitFor(() => expect(screen.getAllByRole("listitem")).toHaveLength(1));
+    await waitFor(() => expect(screen.getByText("1")).toBeInTheDocument());
     rerender(<Dossiers projet="ide-core" runId="run-1" etat={{ ...etat }} />);
 
     expect(lire).toHaveBeenCalledTimes(1);
