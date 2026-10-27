@@ -552,9 +552,11 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-061 — Un verdict de rôle se rend en JSON validé par un schéma
+## ADR-061 — Le contrôle visuel d'un run se déclare, se joint au run et ne juge pas
 
 **Date** : 2026-10-27
-**Décision** : reviewer, sécurité et validateur rendent leur verdict dans une sortie structurée que le provider valide : `output_format` du SDK, `format` d'Ollama, outil forcé de l'API Anthropic. `ProviderResult.structured` la porte ; le repli reçoit le même schéma. Une sortie absente, hors schéma ou contradictoire refuse (`CHANGES_REQUESTED` / `BLOCK`), sans relecture du texte par mot-clé. Le reviewer rend `verdict`, `summary` et `blocking[{text, location, confidence}]` : le seuil du ticket-574 s'applique au champ, et `APPROVED` avec une remarque au-dessus du seuil refuse. ADR-009 est amendée à la livraison du reviewer.
-**Raison** : le texte libre a coûté trois tickets de rustines (122, 298, 574) ; un champ typé remplace une regex.
-**Alternative rejetée** : garder le mot-clé en repli d'un JSON invalide — une réponse ambiguë approuverait, ce que l'échec fermé interdit.
+**Décision** : un projet déclare `pipeline.controle_visuel` (`joindre` ou `relire` ; absent, rien ne tourne) et, dans `captures`, ses fichiers d'interface et le démarrage de l'app. Si le diff approuvé touche l'interface, Tessera lance l'app depuis le worktree (ADR-056) sur un port libre, capture hors du dépôt (ADR-021), l'arrête et joint les images au run, pas à la PR. Aucun modèle ne les juge. `joindre` : un échec se journalise, le run continue. `relire` : la PR ne se merge jamais seule (ADR-033), échec de capture compris (ADR-039).
+**Raison** : le 23/10 un chevauchement entre 1024 et 1150 px a passé reviewer et validateur, qui lisent un diff.
+**Mesure** : non faite sur Kadoomi — la conception n'a pu lancer aucun processus, et Kadoomi ne déclare pas `captures`. Borne haute : 7 min (démarrage 120 s, captures 300 s). Chaque run journalise la durée réelle (ticket-613).
+**Alternative rejetée** : un validateur à vision — le contrat de chaque provider à étendre.
+**Conséquence assumée** : en `relire`, un diff d'interface ne se merge plus seul.
