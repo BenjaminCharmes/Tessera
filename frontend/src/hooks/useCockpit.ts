@@ -332,11 +332,9 @@ export function useCockpit() {
     sidebar: {
       projet: {
         actif: project,
-        enAttente,
         services,
         sortieDeService: supervision.sortieDuService,
         onSelect: handleSelectProject,
-        onCreated: (p: Project) => addToast(`Projet « ${p.name} » créé`, "success"),
       },
       tickets: {
         byStatus: filtrage.byStatus,
@@ -490,6 +488,8 @@ export function useCockpit() {
       // La portée effective est "tous" quand aucun projet n'est actif.
       statsProjectId: porteeEffective === "tous" ? null : (project?.id ?? null),
       onSelectProject: handleSelectProject,
+      enAttente,
+      onProjectCreated: (p: Project) => addToast(`Projet « ${p.name} » créé`, "success"),
       onSelectTicket: handleSelectTicket,
       onRunPipeline: handleRunPipeline,
       onChangeStatus: handleChangeStatus,

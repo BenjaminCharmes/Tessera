@@ -2,11 +2,14 @@ import type { Page } from "@playwright/test";
 import { test, expect, TICKETS } from "./fixtures";
 
 test.describe("Flow 1 — Affichage des projets", () => {
-  test("les projets apparaissent dans la sidebar au chargement", async ({
+  test("les projets apparaissent au centre, sans colonne latérale", async ({
     mockedPage,
   }) => {
     await mockedPage.goto("/");
-    await expect(lateral(mockedPage).getByText("ide-core")).toBeVisible();
+    await expect(
+      mockedPage.getByRole("main").getByRole("article", { name: "ide-core" }),
+    ).toBeVisible();
+    await expect(lateral(mockedPage)).toHaveCount(0);
   });
 });
 
@@ -20,7 +23,10 @@ const lateral = (page: Pick<Page, "getByRole">) =>
 // Depuis le ticket-425, choisir un projet ne change plus d'onglet : on le
 // sélectionne, puis on ouvre ses tickets soi-même.
 async function ouvrirLesTicketsDe(page: Page, projet: string): Promise<void> {
-  await lateral(page).getByText(projet).click();
+  await page
+    .getByRole("main")
+    .getByRole("article", { name: projet })
+    .click();
   await page
     .getByRole("tablist", { name: "Navigation principale" })
     .getByRole("tab", { name: "Tickets" })
@@ -45,7 +51,7 @@ test.describe("Flow 3 — Création d'un projet", () => {
   test("remplir le formulaire et créer un projet", async ({ mockedPage }) => {
     await mockedPage.goto("/");
 
-    // Open create project modal via the + button in the Projects panel header
+    // Open create project modal via the button of the Projects view bar
     await mockedPage
       .getByRole("button", { name: "Créer un projet" })
       .first()
@@ -65,7 +71,11 @@ test.describe("Flow 3 — Création d'un projet", () => {
     await expect(
       mockedPage.getByRole("button", { name: "Créer", exact: true }),
     ).not.toBeVisible();
-    // The TicketList header shows the selected project name
+    // The created project is now active: the Tickets column shows its name
+    await mockedPage
+      .getByRole("tablist", { name: "Navigation principale" })
+      .getByRole("tab", { name: "Tickets" })
+      .click();
     await expect(lateral(mockedPage).getByText("test-e2e").first()).toBeVisible();
   });
 });

@@ -72,6 +72,10 @@ interface CenterViewProps {
   statsProjectId: string | null;
   /** Sélectionne un projet, comme la barre latérale (ticket-399). */
   onSelectProject: (p: Project) => void;
+  /** Les projets dont un run attend une réponse (ticket-186). */
+  enAttente?: ReadonlySet<string>;
+  /** Un projet vient d'être créé ou importé depuis la vue Projets (ticket-586). */
+  onProjectCreated?: (p: Project) => void;
   onSelectTicket: (t: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus: (ticketId: string, status: TicketStatus) => void;
@@ -127,6 +131,8 @@ export default function CenterView({
   statsDays,
   statsProjectId,
   onSelectProject,
+  enAttente,
+  onProjectCreated,
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
@@ -169,6 +175,8 @@ export default function CenterView({
         projets={projets}
         activeProject={project}
         onSelectProject={onSelectProject}
+        onProjectCreated={onProjectCreated}
+        enAttente={enAttente}
         runs={supervision.runs}
       />
     );

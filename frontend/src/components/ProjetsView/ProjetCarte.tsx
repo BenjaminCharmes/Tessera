@@ -14,6 +14,8 @@ interface ProjetCarteProps {
   projet: ProjectOverview;
   /** C'est le projet actif du cockpit. */
   actif: boolean;
+  /** Un run de ce projet attend une réponse (ticket-186). */
+  enAttente?: boolean;
   categories: string[];
   onSelect: () => void;
   onChangerCategorie: (categorie: string) => void;
@@ -114,6 +116,7 @@ function LienDepot({ projet }: { projet: ProjectOverview }) {
 export default function ProjetCarte({
   projet,
   actif,
+  enAttente = false,
   categories,
   onSelect,
   onChangerCategorie,
@@ -159,6 +162,15 @@ export default function ProjetCarte({
                 aria-label="Un run est en cours"
                 title="Un run est en cours"
                 className="size-1.5 shrink-0 animate-pulse rounded-full bg-blue-400"
+              />
+            )}
+            {/* Ambre : une attente, au sens d'ADR-026 (ticket-186). */}
+            {enAttente && (
+              <span
+                role="status"
+                aria-label="Un agent attend une réponse"
+                title="Un agent attend une réponse"
+                className="size-1.5 shrink-0 rounded-full bg-amber-400"
               />
             )}
           </h3>
