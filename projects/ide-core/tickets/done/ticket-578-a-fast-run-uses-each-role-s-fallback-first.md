@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-578
 plan: true
-pr_number: null
+pr_number: 690
 priority: medium
 status: done
 title: A run launched in fast mode uses each role's fallback provider first
