@@ -67,6 +67,19 @@ describe("sprites sources", () => {
     expect(plante).toContain("--sprite-pot");
   });
 
+  it("draws the whiteboard from --sprite-* tokens, still, with state tones kept in tons.ts", () => {
+    const tableau = SPRITES.find((s) => s.nom === "TableauBlanc.tsx")?.contenu ?? "";
+    const tons = SPRITES.find((s) => s.nom === "tons.ts")?.contenu ?? "";
+
+    expect(tableau).toContain("--sprite-tableau");
+    expect(tableau).not.toMatch(/anim-|animation/);
+    for (const jeton of ["tableau", "tableau-cadre", "tableau-case"]) {
+      expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
+    }
+    expect(tons).toMatch(/passe:\s*"fill-green-\d{3}"/);
+    expect(tons).toMatch(/echoue:\s*"fill-red-\d{3}"/);
+  });
+
   it("writes no raw colour in design/bureau", () => {
     const fautifs = SPRITES.filter(({ contenu }) =>
       /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(/.test(contenu),

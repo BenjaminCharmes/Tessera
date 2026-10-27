@@ -6,7 +6,8 @@ import type { ContourDeLaPiece } from "./contourDeLaPiece";
 /** Combien de temps la pièce fête une PR mergée (ticket-598). */
 export const DUREE_DE_LA_FETE_MS = 10_000;
 
-function indiceDuDernier(evenements: readonly OrchestratorEvent[], type: OrchestratorEvent["type"]): number {
+/** L'indice du dernier événement de ce type, ou -1. */
+export function indiceDuDernier(evenements: readonly OrchestratorEvent[], type: OrchestratorEvent["type"]): number {
   return evenements.map((ev) => ev.type).lastIndexOf(type);
 }
 

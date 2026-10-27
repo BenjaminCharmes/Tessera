@@ -1,6 +1,7 @@
 import type { EtatPastille } from "../ui/StatusPill";
 import type { SanteAgent } from "../../lib/santeAgent";
 import type { EtatBoite } from "../../lib/bureau/boiteAuxLettres";
+import type { EtatCase } from "../../lib/bureau/criteres";
 import type { EtatDuService } from "../etatDuService";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
 import type { Cheveux, Peau } from "../../lib/bureau/physique";
@@ -58,6 +59,13 @@ export const TON_BOITE: Record<Exclude<EtatBoite, "aucune">, string> = {
   ci: "fill-blue-400",
   mergee: "fill-green-400",
   refusee: "fill-red-400",
+};
+
+/** Une ligne du tableau blanc : grise tant que rien n'est jugé, verte si le critère passe, rouge sinon. */
+export const TON_CASE: Record<EtatCase, string> = {
+  attente: "fill-(--sprite-tableau-case)",
+  passe: "fill-green-500",
+  echoue: "fill-red-500",
 };
 
 /** Le voyant d'un étage de la baie, par état du service. Mêmes familles que le panneau des services. */
