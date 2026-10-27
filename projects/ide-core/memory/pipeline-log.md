@@ -5662,3 +5662,4 @@ Le diff ajoute :
 - 2026-10-27 18:58:06 UTC — [ticket-575] validateur: fichiers cités joints : services/providers/agent_sdk.py (tronqué)
 - 2026-10-27 18:58:06 UTC — [ticket-575] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (209952ms)
 - 2026-10-27 18:58:06 UTC — [ticket-575] APPROVED après 2 tour(s)
+- 2026-10-27 18:59:25 UTC — [ticket-575] documentation: 0 fichier(s) (74187ms)
