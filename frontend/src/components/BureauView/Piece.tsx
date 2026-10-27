@@ -5,6 +5,8 @@ import Pastille from "../../design/bureau/Pastille";
 import Plante from "../../design/bureau/Plante";
 import type { StreamState } from "../../hooks/streamState";
 import { useActivites } from "../../hooks/useActivites";
+import { useSonsDeLaPiece } from "../../hooks/useSonsDeLaPiece";
+import { signauxSonores } from "../../lib/bureau/sons";
 import { machineEnService, placerLesAgents, postesFaits } from "../../lib/bureau/activites";
 import type { Hasard } from "../../lib/bureau/activites";
 import { bulleDOutil } from "../../lib/bureau/bulleDOutil";
@@ -46,6 +48,8 @@ interface PieceProps {
   onOpenProject?: (projet: string) => void;
   /** Le tirage des activités de pause : `Math.random` par défaut, une suite fixe dans les tests. */
   hasard?: Hasard;
+  /** Le réglage « Son » du Bureau : coupé par défaut, la pièce ne joue rien (ticket-603). */
+  sonActif?: boolean;
 }
 
 const CONTOURS: Record<ContourDeLaPiece, string> = {
@@ -68,6 +72,7 @@ export default function Piece({
   onChoisir,
   onOpenProject,
   hasard,
+  sonActif = false,
 }: PieceProps) {
   const postes = postesDuRun(etat);
   const sante = santeAgent(
@@ -99,6 +104,8 @@ export default function Piece({
   const agents = placerLesAgents(faits, activites, clos, fete, copie?.poste ?? null).map((a) =>
     absents.includes(a.poste) ? { ...a, activite: null, parti: true } : a,
   );
+  // Fanfare, alarme, glouglou, frappes : ce que la pièce vient de montrer, dit à voix haute (ticket-603).
+  useSonsDeLaPiece(signauxSonores(etat, fete, gyrophare, agents), sonActif);
 
   return (
     <section

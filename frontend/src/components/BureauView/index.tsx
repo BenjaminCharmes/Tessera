@@ -107,6 +107,7 @@ export default function BureauView({
                 onRanger={onRanger}
                 onChoisir={(projet, poste) => setChoix({ projet, poste })}
                 onOpenProject={onOpenProject}
+                sonActif={son.actif}
               />
             ),
           )}
