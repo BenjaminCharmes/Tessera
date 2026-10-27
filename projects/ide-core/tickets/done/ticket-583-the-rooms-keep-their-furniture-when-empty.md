@@ -5,7 +5,7 @@ depends_on:
 - ticket-581
 estimated_days: 0.5
 id: ticket-583
-pr_number: null
+pr_number: 667
 priority: medium
 status: done
 title: The break room and the meeting room keep their furniture when nobody is in
