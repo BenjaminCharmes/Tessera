@@ -5324,3 +5324,5 @@ Le diff ajoute :
 - 2026-10-27 10:30:32 UTC — [ticket-595] validateur: APPROVED — Tous les critères du ticket-595 sont satisfaits. Le codeur a implémenté une solu (344906ms)
 - 2026-10-27 10:30:32 UTC — [ticket-595] APPROVED après 1 tour(s)
 - 2026-10-27 10:32:13 UTC — [ticket-595] documentation: 0 fichier(s) (95781ms)
+- 2026-10-27 10:32:57 UTC — [ticket-595] livraison: résolveur tenté : frontend/src/components/BureauView/Piece.tsx (35937ms)
+- 2026-10-27 10:32:57 UTC — [ticket-595] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/Piece.tsx — résolveur tenté sur fronte
