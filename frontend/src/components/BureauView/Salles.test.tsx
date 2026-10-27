@@ -21,6 +21,26 @@ describe("SallePause", () => {
 
     expect(screen.getByText("Personne en pause")).toBeInTheDocument();
   });
+
+  it("draws the coffee machine, hidden from assistive tech, when empty", () => {
+    const { container } = render(<SallePause occupants={[]} />);
+
+    const machine = container.querySelector('[data-sprite="machine-a-cafe"]');
+    expect(machine).not.toBeNull();
+    expect(machine?.getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByText("café")).toBeInTheDocument();
+    expect(screen.getByText(/quota, CI, une dépendance/)).toBeInTheDocument();
+  });
+
+  it("keeps the coffee machine next to its occupants", () => {
+    const { container } = render(
+      <SallePause occupants={[{ projet: "alpha", pause: { motif: "ci", libelle: "CI en cours" } }]} />,
+    );
+
+    expect(container.querySelector('[data-sprite="machine-a-cafe"]')).not.toBeNull();
+    expect(screen.getByText("alpha")).toBeInTheDocument();
+    expect(screen.queryByText("Personne en pause")).toBeNull();
+  });
 });
 
 describe("SalleReunion", () => {
@@ -40,5 +60,14 @@ describe("SalleReunion", () => {
     render(<SalleReunion occupants={[]} />);
 
     expect(screen.getByText("Aucun conflit en cours")).toBeInTheDocument();
+  });
+
+  it("draws the table, hidden from assistive tech, when empty", () => {
+    const { container } = render(<SalleReunion occupants={[]} />);
+
+    const table = container.querySelector('[data-sprite="table-de-reunion"]');
+    expect(table).not.toBeNull();
+    expect(table?.getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByText("conflit de rebase")).toBeInTheDocument();
   });
 });

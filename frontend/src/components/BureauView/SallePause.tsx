@@ -1,4 +1,5 @@
 import type { OccupantDePause } from "../../lib/bureau/salles";
+import MachineACafe from "../../design/bureau/MachineACafe";
 import Salle from "./Salle";
 
 const TON: Record<OccupantDePause["pause"]["motif"], string> = {
@@ -17,7 +18,17 @@ interface SallePauseProps {
  */
 export default function SallePause({ occupants }: SallePauseProps) {
   return (
-    <Salle titre="Salle de pause" vide="Personne en pause">
+    <Salle
+      titre="Salle de pause"
+      entete="attend quelque chose d'extérieur : quota, CI, une dépendance"
+      vide="Personne en pause"
+      mobilier={
+        <figure className="flex flex-col items-center gap-1">
+          <MachineACafe />
+          <figcaption className="text-micro text-zinc-500">café</figcaption>
+        </figure>
+      }
+    >
       {occupants.map(({ projet, pause }) => (
         <li key={projet} className="text-xs">
           <span className="text-zinc-400">{projet}</span>{" "}

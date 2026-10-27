@@ -1,4 +1,5 @@
 import type { OccupantDeReunion } from "../../lib/bureau/salles";
+import TableDeReunion from "../../design/bureau/TableDeReunion";
 import Salle from "./Salle";
 
 interface SalleReunionProps {
@@ -11,7 +12,12 @@ interface SalleReunionProps {
  */
 export default function SalleReunion({ occupants }: SalleReunionProps) {
   return (
-    <Salle titre="Salle de réunion" vide="Aucun conflit en cours">
+    <Salle
+      titre="Salle de réunion"
+      entete="conflit de rebase"
+      vide="Aucun conflit en cours"
+      mobilier={<TableDeReunion />}
+    >
       {occupants.map(({ projet, reunion }) => (
         <li key={projet} className="text-xs">
           <span className="text-zinc-400">{projet}</span>{" "}
