@@ -227,12 +227,13 @@ class GitConflicts(GitCore):
             self.raison_resolveur = f"le résolveur a levé {type(exc).__name__}"
             return False
 
-        self.raison_resolveur = self._raison_fichiers_resolus(conflits)
+        self.raison_resolveur = await self._raison_fichiers_resolus(conflits)
         if self.raison_resolveur is not None:
             return False
 
         try:
-            await self._run("add", "--", *conflits)
+            # `:/` : chemins relatifs à la racine du dépôt, cwd = dossier du projet.
+            await self._run("add", "--", *(f":/{chemin}" for chemin in conflits))
             if await self._fichiers_en_conflit():
                 self.raison_resolveur = "des conflits subsistent après la résolution"
                 return False
@@ -247,10 +248,22 @@ class GitConflicts(GitCore):
             return False
         return True
 
-    def _raison_fichiers_resolus(self, conflits: tuple[str, ...]) -> str | None:
-        """Pourquoi les fichiers laissés par le résolveur ne sont pas livrables."""
+    async def _racine_du_depot(self) -> Path:
+        """Racine du dépôt (`--show-toplevel`) ; le dossier du projet si git échoue."""
+        try:
+            return Path((await self._run("rev-parse", "--show-toplevel")).strip())
+        except GitCommandError:
+            return self._project_path
+
+    async def _raison_fichiers_resolus(self, conflits: tuple[str, ...]) -> str | None:
+        """Pourquoi les fichiers laissés par le résolveur ne sont pas livrables.
+
+        Les chemins de `git diff --name-only` partent de la racine du dépôt,
+        pas du dossier du projet (`git_root: ancestor`).
+        """
+        racine = await self._racine_du_depot()
         for chemin in conflits:
-            fichier = self._project_path / chemin
+            fichier = racine / chemin
             if not fichier.is_file():
                 return f"fichier introuvable après résolution : {chemin}"
             # Un fichier qui garde ses marqueurs compile rarement et se relit
