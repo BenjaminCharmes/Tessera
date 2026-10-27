@@ -1,15 +1,15 @@
 ---
-id: ticket-569
-title: "A ticket that does not merge stops only the queue tickets that depend on it"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-23
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-23
+id: ticket-569
 plan: true
+pr_number: 694
+priority: high
+status: done
+title: A ticket that does not merge stops only the queue tickets that depend on it
+type: feat
 ---
 
 # ticket-569 — Un ticket non mergé n'arrête que ceux qui en dépendent

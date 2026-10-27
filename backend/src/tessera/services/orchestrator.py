@@ -19,7 +19,7 @@ from tessera.services.file_vivante import fermer_si_vivante, marquer_position_si
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.journal_pipeline import ajouter_ligne
 from tessera.services.livraison import Livraison
-from tessera.services.attente_dependance import attendre_si_dependant as _attendre_si_dependant
+from tessera.services.attente_dependance import attendre_si_dependant as _attendre_si_dependant, journal_confiee, sauter_dependants
 from tessera.services.livraison_evenements import attente_annoncee, evenements_de_livraison
 from tessera.services.pipeline_events import (
     EventCallback,
@@ -873,27 +873,19 @@ class Orchestrator:
                             on_event=callback,
                         )
                         if merge is False:
-                            self._interrompre(project_id, f"{ticket_id} non mergé")
-                            break
+                            # Seuls les dépendants sautent (ticket-569, ADR-060).
+                            if not await sauter_dependants(
+                                self._ticket_svc, project_id, ticket_id,
+                                ticket_ids, index, self._log,
+                            ):
+                                self._interrompre(project_id, f"{ticket_id} non mergé")
+                                break
                         if merge:
                             # Le ticket suivant en dépend : il doit partir de la
                             # base qui contient ce merge, pas de la base locale
                             # d'avant (ticket-403 — le 400 était parti sans le 399).
                             await self._realigner_base(project_id, ticket_id)
-                        # `surveiller` n'a été appelé que pour une PR sans arrêt
-                        # (ou orpheline) : sinon, personne ne la surveille.
-                        surveillee = (
-                            result.livraison.arret is None
-                            or result.livraison.pr_orpheline
-                        )
-                        self._log(
-                            f"[{project_id}] {ticket_id} PR #{result.livraison.pr_number}"
-                            + (
-                                " confiée au CIWatcher"
-                                if surveillee
-                                else " non surveillée (livraison arrêtée)"
-                            )
-                        )
+                        self._log(journal_confiee(project_id, ticket_id, result.livraison))
                 else:
                     livraison_bloquee = await _trouver_bloquant(
                         self._ticket_svc,

@@ -1291,6 +1291,10 @@ Si le résolveur n'est pas déclaré ou ne peut pas tenter, la ligne d'arrêt af
 
 Le fichier `memory/pipeline-log.md` enregistre toutes les étapes du pipeline. Quand plusieurs runs livrent leurs changements en parallèle, chacun y ajoute ses lignes de log. Git utilise la stratégie `merge=union` pour ce fichier : en cas de conflit, les deux versions sont fusionnées, et garder toutes les lignes est toujours correct car chaque run est indépendant (ADR-051).
 
+
+
+Les runs lancés en parallèle ajoutent chacun leurs lignes au journal `memory/pipeline-log.md`. Plutôt que de traiter les conflits git, ce fichier utilise l'union merge (`.gitattributes`) : les deux versions y sont fusionnées. C'est la bonne résolution quand deux tickets indépendants enrichissent le même log — garder les deux lignes a du sens. `decisions.md` reste un fichier à résolution humaine : pas d'union merge.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 

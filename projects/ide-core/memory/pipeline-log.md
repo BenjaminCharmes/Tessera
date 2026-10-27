@@ -5591,3 +5591,31 @@ Le diff ajoute :
 - 2026-10-27 16:17:36 UTC — [ticket-578] validateur: APPROVED — Tous les critères sont satisfaits. L'implémentation ajoute un champ `rapide: boo (330391ms)
 - 2026-10-27 16:17:36 UTC — [ticket-578] APPROVED après 2 tour(s)
 - 2026-10-27 16:20:31 UTC — [ticket-578] documentation: 2 fichier(s) (165000ms)
+- 2026-10-27 16:49:27 UTC — [ticket-569] branche ticket-569-a-ticket-that-does-not-merge-stops-only-the-queue
+- 2026-10-27 16:50:09 UTC — [ticket-569] plan rendu (40218ms)
+- 2026-10-27 16:50:09 UTC — [ticket-569] tour 1 — codeur démarré
+- 2026-10-27 16:55:29 UTC — [ticket-569] tour 1 — codeur terminé (320031ms)
+- 2026-10-27 17:01:32 UTC — [ticket-569] testeur: 1 failed, 1469 passed, 64 warnings in 358.72s (0:05:58)
+- 2026-10-27 17:01:32 UTC — [ticket-569] tests rouges au tour 1
+- 2026-10-27 17:01:32 UTC — [ticket-569] tour 2 — codeur démarré
+- 2026-10-27 17:02:05 UTC — [ticket-569] tour 2 — codeur terminé (32703ms)
+- 2026-10-27 17:13:14 UTC — [ticket-569] testeur: 1 failed, 1601 passed, 64 warnings in 664.70s (0:11:04)
+- 2026-10-27 17:13:14 UTC — [ticket-569] tests rouges au tour 2
+- 2026-10-27 17:13:14 UTC — [ticket-569] tour 3 — codeur démarré
+- 2026-10-27 17:16:16 UTC — [ticket-569] tour 3 — codeur terminé (182343ms)
+- 2026-10-27 17:28:42 UTC — [ticket-569] testeur: OK (exit 0)
+- 2026-10-27 17:30:15 UTC — [ticket-569] securite: PASS — Aucune vulnérabilité détectée. Le diff effectue un refactoring sûr : extraction  (93218ms)
+- 2026-10-27 17:30:15 UTC — [ticket-569] tour 3 — reviewer démarré
+- 2026-10-27 17:30:40 UTC — [ticket-569] tour 3 — reviewer terminé (25031ms)
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 17:35:15 UTC — [ticket-569] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 17:35:38 UTC — [ticket-569] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué) ; non joints (budget épuisé) : memory/decisions.md
+- 2026-10-27 17:35:38 UTC — [ticket-569] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests unitaires complet (323015ms)
+- 2026-10-27 17:35:38 UTC — [ticket-569] APPROVED après 3 tour(s)
+- 2026-10-27 17:39:51 UTC — [ticket-569] documentation: 1 fichier(s) (247858ms)
