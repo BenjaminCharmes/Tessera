@@ -1,15 +1,17 @@
 ---
+agent: codeur
+created: 2026-10-27
+depends_on:
+- ticket-593
+estimated_days: 0.5
 id: ticket-595
-title: "Office agents get an outfit per role and a look per agent, standing and seated at the same scale"
-type: feat
-status: todo
+plan: true
 pr_number: null
 priority: high
-agent: codeur
-depends_on: ["ticket-593"]
-estimated_days: 0.5
-created: 2026-10-27
-plan: true
+status: done
+title: Office agents get an outfit per role and a look per agent, standing and seated
+  at the same scale
+type: feat
 ---
 
 # ticket-595 — Une tenue par rôle, un physique par agent, une seule échelle

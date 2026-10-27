@@ -20,15 +20,40 @@
 
 /* Tons des sprites du Bureau — ticket-562, ADR-058. `static` : ces jetons ne
    sont lus que par `var()` depuis le TSX, et Tailwind n'émet pas sans cela une
-   variable qu'aucune classe ne nomme. La chemise est le violet d'identité,
-   écrit en oklch (violet-500 et violet-600) : un fond de sprite, jamais un texte. */
+   variable qu'aucune classe ne nomme. Le sweat du codeur est le violet
+   d'identité, écrit en oklch (violet-500 et violet-700) : un fond de sprite,
+   jamais un texte. Un jeu par tenue de rôle (le haut et son ombre, qui colore
+   les bras), cinq peaux et six couleurs de cheveux : le physique d'un agent en
+   choisit un de chaque (ticket-595). `--sprite-peau` et `--sprite-cheveux`
+   restent les tons par défaut. */
 @theme static {
   --sprite-peau: #e8b98f;
   --sprite-cheveux: #3f2a1d;
+  --sprite-peau-1: #f1c7a3;
+  --sprite-peau-2: #e8b98f;
+  --sprite-peau-3: #c68b59;
+  --sprite-peau-4: #8d5a3b;
+  --sprite-peau-5: #5c3a24;
+  --sprite-cheveux-1: #3f2a1d;
+  --sprite-cheveux-2: #111827;
+  --sprite-cheveux-3: #a16207;
+  --sprite-cheveux-4: #7c2d12;
+  --sprite-cheveux-5: #d4d4d8;
+  --sprite-cheveux-6: #1c1917;
+  --sprite-haut-codeur: oklch(0.606 0.25 292.717);
+  --sprite-haut-codeur-ombre: oklch(0.491 0.27 292.581);
+  --sprite-haut-testeur: #e4e4e7;
+  --sprite-haut-testeur-ombre: #a1a1aa;
+  --sprite-haut-securite: #1e3a8a;
+  --sprite-haut-securite-ombre: #172554;
+  --sprite-haut-reviewer: #0f766e;
+  --sprite-haut-reviewer-ombre: #115e59;
+  --sprite-haut-validateur: #b45309;
+  --sprite-haut-validateur-ombre: #92400e;
+  --sprite-col: #e4e4e7;
+  --sprite-cravate: #1f2937;
   --sprite-dossier: #ca8a04;
   --sprite-dossier-ombre: #a16207;
-  --sprite-chemise: oklch(0.606 0.25 292.717);
-  --sprite-chemise-ombre: oklch(0.541 0.281 293.009);
   /* Le mobilier des salles (ticket-583) : du bois et du métal sourds, aucune
      teinte d'état, pour qu'un meuble ne se lise jamais comme un voyant. */
   --sprite-machine: #52525b;

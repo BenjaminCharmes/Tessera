@@ -193,6 +193,46 @@ describe("Piece characters", () => {
     expect(screen.getByRole("button", { name: "Codeur, libre" })).toBeInTheDocument();
   });
 
+  it("draws the standing character outside the desk grid of its post", () => {
+    render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
+
+    const bouton = screen.getByRole("button", { name: "Codeur, a fini" });
+    const debout = bouton.querySelector('[data-pose="debout"]');
+
+    expect(debout).not.toBeNull();
+    expect(debout?.closest('[data-sprite="poste"]')).toBeNull();
+    expect(debout?.closest("svg")?.getAttribute("viewBox")).toBe("0 0 12 20");
+    expect(bouton.querySelector('[data-sprite="poste"]')?.getAttribute("viewBox")).toBe("0 0 16 18");
+  });
+
+  it("gives the same role a different look in two projects", () => {
+    const etat = etatEnSecurite();
+    const { container: a } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 5_000} />);
+    const { container: b } = render(<Piece projet="kadoomi" etat={etat} maintenant={T0 + 5_000} />);
+    const dessin = (c: HTMLElement) => c.querySelector('[data-pose="debout"]')?.innerHTML;
+
+    expect(dessin(a)).toBeDefined();
+    expect(dessin(a)).not.toBe(dessin(b));
+  });
+
+  it("keeps the same look from one render to the next", () => {
+    const etat = etatEnSecurite();
+    const { container: a } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 5_000} />);
+    const { container: b } = render(<Piece projet="ide-core" etat={etat} maintenant={T0 + 9_000} />);
+
+    expect(a.querySelector('[data-pose="debout"]')?.innerHTML).toBe(
+      b.querySelector('[data-pose="debout"]')?.innerHTML,
+    );
+  });
+
+  it("scrolls horizontally under the 800 px floor of the room", () => {
+    const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} />);
+
+    const defilement = container.querySelector("section .sol-lames > .overflow-x-auto");
+    expect(defilement).not.toBeNull();
+    expect(defilement?.firstElementChild?.className).toContain("w-200");
+  });
+
   it("draws one character per post while a run is on", () => {
     const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 

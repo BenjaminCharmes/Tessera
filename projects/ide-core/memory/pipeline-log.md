@@ -5297,3 +5297,32 @@ Le diff ajoute :
 - 2026-10-27 10:07:06 UTC — [ide-core] ticket-595 retiré de la file
 - 2026-10-27 10:07:06 UTC — [ide-core] ticket-596 retiré de la file
 - 2026-10-27 10:07:06 UTC — [ide-core] ticket-597 retiré de la file
+- 2026-10-27 10:15:23 UTC — [ide-core] ticket-584 PR #673 confiée au CIWatcher
+- 2026-10-27 10:15:26 UTC — [ticket-595] branche ticket-595-office-agents-get-an-outfit-per-role-and-a-look-p
+- 2026-10-27 10:16:36 UTC — [ticket-595] plan rendu (69843ms)
+- 2026-10-27 10:16:36 UTC — [ticket-595] tour 1 — codeur démarré
+- 2026-10-27 10:20:03 UTC — [ide-core] ticket-584 PR #673 mergée (CI verte)
+- 2026-10-27 10:20:44 UTC — [ticket-595] tour 1 — codeur terminé (248187ms)
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-596 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-597 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 10:23:01 UTC — [ticket-595] testeur: OK (exit 0)
+- 2026-10-27 10:24:47 UTC — [ticket-595] securite: PASS — Aucune vulnérabilité détectée. Le code utilise TypeScript strict, des types énum (106172ms)
+- 2026-10-27 10:24:47 UTC — [ticket-595] tour 1 — reviewer démarré
+- 2026-10-27 10:25:11 UTC — [ticket-595] tour 1 — reviewer terminé (23609ms)
+- 2026-10-27 10:29:48 UTC — [ticket-595] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 10:30:32 UTC — [ticket-595] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers)
+- 2026-10-27 10:30:32 UTC — [ticket-595] validateur: APPROVED — Tous les critères du ticket-595 sont satisfaits. Le codeur a implémenté une solu (344906ms)
+- 2026-10-27 10:30:32 UTC — [ticket-595] APPROVED après 1 tour(s)
+- 2026-10-27 10:32:13 UTC — [ticket-595] documentation: 0 fichier(s) (95781ms)
+- 2026-10-27 10:32:57 UTC — [ticket-595] livraison: résolveur tenté : frontend/src/components/BureauView/Piece.tsx (35937ms)
+- 2026-10-27 10:32:57 UTC — [ticket-595] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/Piece.tsx — résolveur tenté sur fronte
