@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-576
 plan: true
-pr_number: null
+pr_number: 700
 priority: low
 status: done
 title: Design of structured verdicts for reviewer, security and validator
