@@ -1,14 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-27
+depends_on:
+- ticket-591
+estimated_days: 0.5
 id: ticket-593
-title: "Office rooms get a floor and plants, the queue tooltip is no longer clipped, and the bottom bar uses the room's width"
-type: fix
-status: todo
 pr_number: null
 priority: high
-agent: codeur
-depends_on: ["ticket-591"]
-estimated_days: 0.5
-created: 2026-10-27
+status: done
+title: Office rooms get a floor and plants, the queue tooltip is no longer clipped,
+  and the bottom bar uses the room's width
+type: fix
 ---
 
 # ticket-593 — Sol et plantes dans les pièces, infobulle entière, barre du bas lisible

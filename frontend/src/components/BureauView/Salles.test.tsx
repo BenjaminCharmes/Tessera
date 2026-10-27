@@ -41,6 +41,14 @@ describe("SallePause", () => {
     expect(screen.getByText("alpha")).toBeInTheDocument();
     expect(screen.queryByText("Personne en pause")).toBeNull();
   });
+
+  it("keeps its plant and its floor when nobody is in it", () => {
+    render(<SallePause occupants={[]} />);
+
+    const salle = screen.getByRole("complementary", { name: "Salle de pause" });
+    expect(salle.querySelector('[data-sprite="plante"]')).not.toBeNull();
+    expect(salle).toHaveAttribute("data-sol", "lames");
+  });
 });
 
 describe("SalleReunion", () => {
@@ -69,5 +77,13 @@ describe("SalleReunion", () => {
     expect(table).not.toBeNull();
     expect(table?.getAttribute("aria-hidden")).toBe("true");
     expect(screen.getByText("conflit de rebase")).toBeInTheDocument();
+  });
+
+  it("keeps its plant and its floor when nobody is in it", () => {
+    render(<SalleReunion occupants={[]} />);
+
+    const salle = screen.getByRole("complementary", { name: "Salle de réunion" });
+    expect(salle.querySelector('[data-sprite="plante"]')).not.toBeNull();
+    expect(salle).toHaveAttribute("data-sol", "lames");
   });
 });

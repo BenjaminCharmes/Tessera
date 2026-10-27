@@ -129,6 +129,29 @@ function personnagesDuPoste(nom: string): Element[] {
   return [...bouton.querySelectorAll('[data-sprite="personnage"]')];
 }
 
+describe("Piece furniture", () => {
+  it("lays a plank floor and a plant in each work room", () => {
+    render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
+
+    const piece = screen.getByRole("region", { name: "ide-core" });
+    expect(piece.querySelector('[data-sol="lames"]')).not.toBeNull();
+    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(1);
+  });
+
+  it("keeps the plant in a room whose run is on", () => {
+    render(<Piece projet="ide-core" etat={etatEnCodage()} maintenant={T0 + 5_000} />);
+
+    const piece = screen.getByRole("region", { name: "ide-core" });
+    expect(piece.querySelectorAll('[data-sprite="plante"]')).toHaveLength(1);
+  });
+
+  it("writes the empty mailbox label in the bottom bar", async () => {
+    render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
+
+    expect(await screen.findByText("aucune PR")).toBeInTheDocument();
+  });
+});
+
 describe("Piece characters", () => {
   it("seats a character, still and without animation, at a post that waits its turn", () => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);

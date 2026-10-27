@@ -68,7 +68,7 @@ describe("Dossiers", () => {
 
     const { container } = render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
 
-    await waitFor(() => expect(screen.getByText("15")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("15 en file")).toBeInTheDocument());
     expect(container.querySelectorAll('[data-sprite="dossier"]')).toHaveLength(3);
     expect(screen.getByRole("group", { name: "Tickets restants : 15" })).toBeInTheDocument();
   });
@@ -78,7 +78,7 @@ describe("Dossiers", () => {
 
     const { container } = render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
 
-    await waitFor(() => expect(screen.getByText("2")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("2 en file")).toBeInTheDocument());
     expect(container.querySelectorAll('[data-sprite="dossier"]')).toHaveLength(2);
   });
 
@@ -112,6 +112,31 @@ describe("Dossiers", () => {
 
     expect(within(screen.getByRole("tooltip")).getAllByRole("listitem")).toHaveLength(10);
     expect(screen.getByText("et 5 autres")).toBeInTheDocument();
+  });
+
+  it("writes the number of remaining tickets under the pile", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(ids(13)));
+
+    render(<Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />);
+
+    expect(await screen.findByText("13 en file")).toBeInTheDocument();
+  });
+
+  it("renders the tooltip in document.body, outside the room that clips its overflow", async () => {
+    vi.spyOn(statutsDuRun, "lire").mockResolvedValue(statut(ids(13)));
+
+    render(
+      <section aria-label="ide-core" className="overflow-hidden">
+        <Dossiers projet="ide-core" runId="run-1" etat={INITIAL} />
+      </section>,
+    );
+    const pile = await screen.findByRole("group", { name: "Tickets restants : 13" });
+    act(() => pile.focus());
+
+    const infobulle = screen.getByRole("tooltip");
+    expect(screen.getByRole("region", { name: "ide-core" })).not.toContainElement(infobulle);
+    expect(infobulle.parentElement).toBe(document.body);
+    expect(infobulle.className).toContain("fixed");
   });
 
   it("hides the tooltip when the pile loses focus", async () => {
@@ -151,12 +176,12 @@ describe("Dossiers", () => {
       .mockResolvedValueOnce(statut(["ticket-003", "ticket-004"]));
 
     const { rerender } = render(<Dossiers projet="ide-core" runId="run-1" etat={apresQueueProgress(0)} />);
-    await waitFor(() => expect(screen.getByText("3")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("3 en file")).toBeInTheDocument());
     expect(lire).toHaveBeenCalledTimes(1);
 
     rerender(<Dossiers projet="ide-core" runId="run-1" etat={apresQueueProgress(1)} />);
 
-    await waitFor(() => expect(screen.getByText("2")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("2 en file")).toBeInTheDocument());
     expect(lire).toHaveBeenCalledTimes(2);
   });
 
@@ -165,7 +190,7 @@ describe("Dossiers", () => {
     const etat = apresQueueProgress(0);
 
     const { rerender } = render(<Dossiers projet="ide-core" runId="run-1" etat={etat} />);
-    await waitFor(() => expect(screen.getByText("1")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("1 en file")).toBeInTheDocument());
     rerender(<Dossiers projet="ide-core" runId="run-1" etat={{ ...etat }} />);
 
     expect(lire).toHaveBeenCalledTimes(1);
