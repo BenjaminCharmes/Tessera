@@ -4,7 +4,7 @@ created: 2026-10-24
 depends_on: []
 estimated_days: 0.5
 id: ticket-573
-pr_number: null
+pr_number: 698
 priority: medium
 status: done
 title: Each role can declare its reasoning effort in agents.json
