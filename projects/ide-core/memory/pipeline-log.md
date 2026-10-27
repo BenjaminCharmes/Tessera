@@ -5162,3 +5162,4 @@ Le diff ajoute :
 - 2026-10-26 19:32:24 UTC — [ticket-590] INTERROMPU au tour 1 — ProviderIndisponible: agent silencieux depuis 1200 s
 - 2026-10-27 07:44:05 UTC — [ticket-590] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
 - 2026-10-27 07:44:05 UTC — [ticket-590] validateur: CHANGES_REQUESTED — Validation indisponible : durée maximale dépassée (900 s) (55935172ms)
+- 2026-10-27 07:44:42 UTC — [ide-core] file interrompue : ticket-590 non approuvé
