@@ -5561,3 +5561,21 @@ Le diff ajoute :
 - 2026-10-27 15:47:13 UTC — [ticket-608] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le fichier reviewer.md a été mi (110031ms)
 - 2026-10-27 15:47:13 UTC — [ticket-608] APPROVED après 1 tour(s)
 - 2026-10-27 15:48:30 UTC — [ticket-608] documentation: 0 fichier(s) (72452ms)
+- 2026-10-27 15:48:48 UTC — [ide-core] ticket-608 PR #689 confiée au CIWatcher
+- 2026-10-27 15:48:50 UTC — [ticket-578] branche ticket-578-a-run-launched-in-fast-mode-uses-each-role-s-fall
+- 2026-10-27 15:49:52 UTC — [ticket-578] plan rendu (60765ms)
+- 2026-10-27 15:49:52 UTC — [ticket-578] tour 1 — codeur démarré
+- 2026-10-27 15:53:33 UTC — [ticket-578] tour 1 — codeur terminé (220531ms)
+- 2026-10-27 15:54:50 UTC — [ide-core] ticket-608 PR #689 mergée (CI verte)
+- 2026-10-27 16:00:17 UTC — [ticket-578] testeur: 1 failed, 2408 passed, 64 warnings in 400.94s (0:06:40)
+- 2026-10-27 16:00:17 UTC — [ticket-578] tests rouges au tour 1
+- 2026-10-27 16:00:17 UTC — [ticket-578] tour 2 — codeur démarré
+- 2026-10-27 16:01:34 UTC — [ticket-578] tour 2 — codeur terminé (77282ms)
+- 2026-10-27 16:09:25 UTC — [ticket-578] testeur: OK (exit 0)
+- 2026-10-27 16:12:06 UTC — [ticket-578] securite: PASS — Le diff introduit le mode « rapide » (ticket-578) pour forcer l'utilisation dire (161406ms)
+- 2026-10-27 16:12:06 UTC — [ticket-578] tour 2 — reviewer démarré
+- 2026-10-27 16:12:28 UTC — [ticket-578] tour 2 — reviewer terminé (22202ms)
+- 2026-10-27 16:17:06 UTC — [ticket-578] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 16:17:36 UTC — [ticket-578] validateur: fichiers cités joints : backend/src/tessera/routers/orchestrator.py (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-27 16:17:36 UTC — [ticket-578] validateur: APPROVED — Tous les critères sont satisfaits. L'implémentation ajoute un champ `rapide: boo (330391ms)
+- 2026-10-27 16:17:36 UTC — [ticket-578] APPROVED après 2 tour(s)
