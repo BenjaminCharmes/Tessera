@@ -5349,3 +5349,28 @@ Le diff ajoute :
 - 2026-10-27 11:26:37 UTC — [ticket-596] validateur: APPROVED — Le ticket-596 est complet : tous les critères sont satisfaits par le code fourni (29108ms)
 - 2026-10-27 11:26:37 UTC — [ticket-596] APPROVED après 2 tour(s)
 - 2026-10-27 11:32:36 UTC — [ticket-596] documentation: 0 fichier(s) (355264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : section « Synchronisation de la base avant livraison » introuvable.
+- 2026-10-27 11:47:29 UTC — [ide-core] ticket-596 PR #677 mergée (CI verte)
+- 2026-10-27 11:47:31 UTC — [ide-core] ticket-596 : base réalignée sur develop
+- 2026-10-27 11:47:31 UTC — [ide-core] ticket-596 PR #677 confiée au CIWatcher
+- 2026-10-27 11:47:34 UTC — [ticket-597] branche ticket-597-shared-rooms-across-the-top-the-director-s-office
+- 2026-10-27 11:49:08 UTC — [ticket-597] plan rendu (93656ms)
+- 2026-10-27 11:49:08 UTC — [ticket-597] tour 1 — codeur démarré
+- 2026-10-27 11:59:23 UTC — [ticket-597] tour 1 — codeur terminé (614985ms)
+- 2026-10-27 12:01:15 UTC — [ticket-597] testeur: OK (exit 0)
+- 2026-10-27 12:03:18 UTC — [ticket-597] securite: PASS — Ticket-597 : ajout des salles communes (directeur, RH, réunion, pause) avec gest (122437ms)
+- 2026-10-27 12:03:18 UTC — [ticket-597] tour 1 — reviewer démarré
+- 2026-10-27 12:03:58 UTC — [ticket-597] tour 1 — reviewer terminé (40312ms)
+- 2026-10-27 12:08:18 UTC — [ticket-597] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 12:08:54 UTC — [ticket-597] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers)
+- 2026-10-27 12:08:54 UTC — [ticket-597] validateur: APPROVED — Tous les critères sont satisfaits. Les quatre salles communes (directeur, réunio (336562ms)
+- 2026-10-27 12:08:54 UTC — [ticket-597] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 12:08:54 UTC — [ticket-597] tour 2 — codeur démarré
+- 2026-10-27 12:13:27 UTC — [ticket-597] tour 2 — codeur terminé (272342ms)
+- 2026-10-27 12:15:14 UTC — [ticket-597] testeur: OK (exit 0)
+- 2026-10-27 12:18:21 UTC — [ticket-597] securite: PASS — Aucune vulnérabilité OWASP Top 10 critique ou haute détectée. Le code utilise Re (187093ms)
+- 2026-10-27 12:18:21 UTC — [ticket-597] tour 2 — reviewer démarré
+- 2026-10-27 12:18:36 UTC — [ticket-597] tour 2 — reviewer terminé (15077ms)
+- 2026-10-27 12:23:21 UTC — [ticket-597] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 12:23:57 UTC — [ticket-597] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers)
+- 2026-10-27 12:23:57 UTC — [ticket-597] validateur: APPROVED — Les sept critères sont tous satisfaits. Le diff ajoute les quatre salles commune (335437ms)
+- 2026-10-27 12:23:57 UTC — [ticket-597] APPROVED après 2 tour(s)
