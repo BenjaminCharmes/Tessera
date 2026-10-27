@@ -5745,3 +5745,5 @@ Le diff ajoute :
 - 2026-10-27 20:50:23 UTC — [ticket-570] validateur: fichiers cités joints : memory/decisions.md (tronqué)
 - 2026-10-27 20:50:23 UTC — [ticket-570] validateur: APPROVED — Ticket de conception complet : l'ADR-061 décrit une architecture opt-in (déclara (338781ms)
 - 2026-10-27 20:50:23 UTC — [ticket-570] APPROVED après 3 tour(s)
+- 2026-10-27 20:50:27 UTC — [ticket-570] fichiers non suivis laissés par le run : tickets/todo/ticket-611-capture-widths-and-themes-are-configurable.md, tickets/todo/ticket-612-visual-check-is-declared-and-triggered-by-interface-files.md, tickets/todo/ticket-613-pipeline-step-captures-the-run-from-its-worktree.md, tickets/todo/ticket-614-relire-mode-holds-the-merge-until-a-human-has-seen-the-captures.md, tickets/todo/ticket-615-run-detail-shows-the-captures-taken-for-the-run.md (à ignorer dans .gitignore ?)
+- 2026-10-27 20:52:23 UTC — [ticket-570] documentation: 0 fichier(s) (116562ms)
