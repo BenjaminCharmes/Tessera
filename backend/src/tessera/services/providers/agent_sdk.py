@@ -42,6 +42,8 @@ async def _sdk_gen(
         yield msg
 
 from tessera.config import VARIABLES_JETONS
+from tessera.models.agent import EffortLevel
+from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
 from tessera.services.providers.garde_jetons import hook_refus_env_tessera
 from tessera.services.providers.git_guard import hook_refus_git
 from tessera.services.providers.perimetre import (
@@ -81,37 +83,9 @@ _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 _REPO_ROOT: Path = Path(__file__).resolve().parents[5]
 _TESSERA_PLUGIN_PATH: Path = _REPO_ROOT / "agents" / "plugin"
 
-# Les fichiers de consignes que Claude Code charge dans chaque dossier ancêtre.
-_FICHIERS_CONSIGNES = ("CLAUDE.md", "CLAUDE.local.md")
-
 # Octets UTF-8 au-delà desquels le prompt système part par fichier : la ligne
 # de commande Windows tient dans ~32 Ko et porte aussi réglages et outils.
 SYSTEM_PROMPT_FILE_THRESHOLD_BYTES = 24_000
-
-def claude_md_ancetres_a_exclure(
-    cwd: Path, racine: Path, ancestor: bool
-) -> list[str]:
-    """Lists the ancestor CLAUDE files a hosted project must not inherit.
-
-    Claude Code walks up from ``cwd`` and loads every ``CLAUDE.md`` it meets, so
-    the IDE's own rules would leak into each project nested under ``racine``
-    (ticket-414). Returns the ``CLAUDE.md`` and ``CLAUDE.local.md`` of every
-    directory from ``racine`` down to ``cwd``'s parent, as absolute ``/`` paths.
-    Empty when the project is ``ancestor`` (it needs those rules) or when
-    ``cwd`` is not strictly under ``racine``.
-    """
-    if ancestor:
-        return []
-    projet = cwd.resolve()
-    depart = racine.resolve()
-    if projet == depart or not projet.is_relative_to(depart):
-        return []
-    dossiers = [p for p in projet.parents if p.is_relative_to(depart)]
-    return [
-        (dossier / nom).as_posix()
-        for dossier in reversed(dossiers)
-        for nom in _FICHIERS_CONSIGNES
-    ]
 
 
 def _depart_des_consignes(cwd: Path, racine_ecriture: Path) -> Path:
@@ -165,8 +139,12 @@ def _build_options(
     skills: list[str] | None = None,
     git_bash_path: str | None = None,
     journal_refus: JournalDesRefus | None = None,
+    effort: EffortLevel | None = None,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
+
+    ``effort`` is the role's reasoning effort (ticket-573); left ``None``, the
+    SDK keeps its own default.
 
     ``racine_ecriture`` is the write root the run froze before its first agent
     (ticket-119); left ``None``, the perimeter hook reads it from the project's
@@ -246,6 +224,7 @@ def _build_options(
         mcp_servers=mcp_servers,
         resume=resume,
         skills=list(skills) if skills else None,
+        effort=effort,
         plugins=plugins,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
@@ -292,7 +271,10 @@ class ClaudeAgentSDKProvider:
         silence_max_s: float | None = None,
         journal_refus: JournalDesRefus | None = None,
         duree_max_s: float | None = None,
+        effort: EffortLevel | None = None,
     ) -> None:
+        # L'effort de raisonnement du rôle (ticket-573) ; None : défaut du SDK.
+        self._effort = effort
         # Durée totale d'un appel (ticket-518) ; None : pas de borne, comme
         # pour le codeur, dont un tour légitime dure longtemps.
         self._duree_max_s = duree_max_s
@@ -413,7 +395,7 @@ class ClaudeAgentSDKProvider:
             allowed_tools=self._allowed_tools, ask_user=ask_user,
             racine_ecriture=self.racine_ecriture, resume=resume,
             skills=self._skills, git_bash_path=self._git_bash_path,
-            journal_refus=self._journal_refus,
+            journal_refus=self._journal_refus, effort=self._effort,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None

@@ -3,6 +3,7 @@ from pathlib import Path
 from anthropic import AsyncAnthropic
 
 from tessera.config import settings
+from tessera.models.agent import EffortLevel
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.anthropic_api import AnthropicApiProvider
 from tessera.services.providers.base import (
@@ -37,6 +38,7 @@ def get_provider(
     skills: list[str] | None = None,
     journal_refus: JournalDesRefus | None = None,
     duree_max_s: float | None = None,
+    effort: EffortLevel | None = None,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -70,6 +72,9 @@ def get_provider(
 
     ``duree_max_s`` caps the total duration of one call (ticket-518), for the
     SDK and Ollama providers; ``anthropic_api`` ignores it. ``None``: no cap.
+
+    ``effort`` is the role's reasoning effort (ticket-573); only the SDK
+    provider hands it on. ``None``: nothing is passed.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -86,6 +91,8 @@ def get_provider(
             kwargs["journal_refus"] = journal_refus
         if duree_max_s is not None:
             kwargs["duree_max_s"] = duree_max_s
+        if effort is not None:
+            kwargs["effort"] = effort
         if tools is not None:
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:

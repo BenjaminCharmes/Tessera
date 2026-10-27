@@ -1,8 +1,12 @@
 from enum import Enum
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
 from tessera.models.ticket import TicketStatus
+
+
+EffortLevel = Literal["low", "medium", "high", "xhigh", "max"]
 
 
 class AgentCreatedInfo(BaseModel):
@@ -52,6 +56,9 @@ class AgentConfig(BaseModel):
     #: `Skill`. La liste borne aussi ce que le CLI découvrirait seul — les
     #: skills de la racine du dépôt et ceux qu'il intègre.
     skills: list[str] = Field(default_factory=list)
+    #: L'effort de raisonnement du modèle (ticket-573), parmi les cinq valeurs
+    #: du SDK. Absent : rien n'est passé au SDK, qui garde son défaut.
+    effort: EffortLevel | None = None
 
 
 class AgentPipelineConfig(BaseModel):

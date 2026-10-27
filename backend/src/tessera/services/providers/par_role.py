@@ -92,6 +92,7 @@ def provider_pour_role(
     nom = config.provider if config is not None else settings.llm_provider
     tours = max_turns if max_turns is not None else settings.llm_max_turns
     skills = config.skills if config is not None else []
+    effort = config.effort if config is not None else None
     # Transmis seulement quand il y en a un : un appel sans journal reste
     # identique à ce qu'il était avant ticket-476.
     journal: dict[str, JournalDesRefus] = (
@@ -104,7 +105,7 @@ def provider_pour_role(
             fournisseur, settings.anthropic_api_key,
             max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
             allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-            skills=skills, duree_max_s=duree, **journal,
+            skills=skills, duree_max_s=duree, effort=effort, **journal,
         )
 
     if rapide and config is not None and config.fallback is not None:

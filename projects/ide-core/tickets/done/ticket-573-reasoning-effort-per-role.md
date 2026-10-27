@@ -1,14 +1,14 @@
 ---
-id: ticket-573
-title: "Each role can declare its reasoning effort in agents.json"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-24
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-24
+id: ticket-573
+pr_number: 698
+priority: medium
+status: done
+title: Each role can declare its reasoning effort in agents.json
+type: feat
 ---
 
 # ticket-573 — Un effort de raisonnement par rôle
