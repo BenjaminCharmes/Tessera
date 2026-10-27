@@ -5211,3 +5211,17 @@ Le diff ajoute :
 - 2026-10-27 08:45:53 UTC — [ticket-583] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 8 fichiers) ; absents : design/bureau/
 - 2026-10-27 08:45:53 UTC — [ticket-583] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les salles de pause et réunion a (147938ms)
 - 2026-10-27 08:45:53 UTC — [ticket-583] APPROVED après 1 tour(s)
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-586 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 08:48:26 UTC — [ticket-583] documentation: 0 fichier(s) (147781ms)
