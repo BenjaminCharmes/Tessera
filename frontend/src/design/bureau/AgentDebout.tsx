@@ -14,7 +14,7 @@ interface AgentDeboutProps {
 /**
  * L'agent qui a fini, debout à côté de son poste : sa propre grille 12 × 20 en
  * 42 × 70 px, à l'échelle du personnage assis (tête de 6 unités dans les deux).
- * `overflow-visible` : le chignon dépasse la grille d'une unité.
+ * `overflow-visible` : le chignon dépasse la grille de deux unités.
  */
 export default function AgentDebout({ projet, role, etire = false, feuille = false }: AgentDeboutProps) {
   return (
