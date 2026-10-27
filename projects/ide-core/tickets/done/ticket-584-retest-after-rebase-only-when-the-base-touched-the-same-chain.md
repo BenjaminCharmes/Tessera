@@ -1,14 +1,15 @@
 ---
-id: ticket-584
-title: "The post-rebase retest runs only when the base brought changes to a chain the branch also touches"
-type: chore
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-26
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-26
+id: ticket-584
+pr_number: 673
+priority: high
+status: done
+title: The post-rebase retest runs only when the base brought changes to a chain the
+  branch also touches
+type: chore
 ---
 
 # ticket-584 — Retester après rebase seulement si la base touche la même chaîne

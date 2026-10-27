@@ -348,7 +348,7 @@ async def _build_orchestrator(
         # CI_WATCHER via `surveiller` (ADR-051).
         livrer=_livreur(
             project_id, runner, politique, espace=git_workspace, wt=wt,
-            retest=retest_du_run(git_workspace, wt is not None, test_runner, racine_run, commande),
+            retest=retest_du_run(git_workspace, wt is not None, test_runner, racine_run, commande, pipeline_cfg.test_cwd),
         ),
         surveiller=_surveillance_pour(
             project_id, runner, politique, espace=git_workspace, wt=wt
