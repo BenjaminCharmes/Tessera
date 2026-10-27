@@ -19,14 +19,16 @@ bouton de démo « Nuit », cadre dans le bureau du directeur, porte et pile
 cliquables), validées le 27/10.
 
 ## Ce que dit la maquette
-- **Fenêtre** au mur de chaque pièce (60 × 36 px) : ciel clair et soleil de
-  7 h à 19 h (heure locale), ciel nuit et étoiles sinon ; la nuit, un voile
-  sombre léger couvre la pièce. L'heure vient de l'horloge unique de la vue
+- **Deux fenêtres** au mur de chaque pièce (60 × 36 px) : ciel clair et soleil
+  de 7 h à 19 h (heure locale), ciel nuit et étoiles sinon ; la nuit, un voile
+  sombre léger couvre la pièce et les **plafonniers s'allument** (trois par
+  pièce, un par salle commune, halo jaune doux sous chacun). L'heure vient de l'horloge unique de la vue
   (`maintenant`), aucun minuteur de plus.
 - **Employé de la semaine** : un cadre doré dans le bureau du directeur
   (ticket-597) avec le portrait du codeur (physique du ticket-595) du projet
   qui a le plus de tickets approuvés **au premier tour** sur les 7 derniers
-  jours, et « <projet> · codeur, N tickets du 1er coup ». Source :
+  jours. Le texte « <projet> · codeur, N tickets du 1er coup » est en
+  **infobulle** au survol et au focus du cadre, pas écrit dessous. Source :
   `GET /api/v1/projects/{id}/runs` (`approved`, `rounds`, `started_at`). Aucun
   ticket approuvé au 1er tour sur la semaine : pas de cadre.
 - **Raccourcis** : la porte d'une pièce est un bouton « Ouvrir le projet
@@ -34,7 +36,7 @@ cliquables), validées le 27/10.
   dossiers ouvre le fil du run (même action que le bouton « Fil »).
 
 ## Critères d'acceptation
-- [ ] À 14 h la fenêtre rend `data-moment="jour"`, à 22 h `data-moment="nuit"` et le voile ; un test le vérifie avec une horloge injectée
+- [ ] À 14 h les deux fenêtres rendent `data-moment="jour"`, à 22 h `data-moment="nuit"`, le voile et des plafonniers allumés (`data-allume="true"`) ; un test le vérifie avec une horloge injectée
 - [ ] Avec deux projets, 3 et 5 tickets approuvés au 1er tour sur 7 jours, le cadre nomme le second et « 5 tickets du 1er coup » ; un test le vérifie
 - [ ] Un ticket approuvé au tour 2, ou il y a 8 jours, ne compte pas ; un test le vérifie
 - [ ] Sans ticket approuvé au 1er tour sur la semaine, aucun cadre n'est rendu ; un test le vérifie
