@@ -5679,3 +5679,4 @@ Le diff ajoute :
 - 2026-10-27 20:02:18 UTC — [ticket-574] validateur: fichiers cités joints : agents/prompts/reviewer.md
 - 2026-10-27 20:02:18 UTC — [ticket-574] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté un nouveau mécanisme b (252264ms)
 - 2026-10-27 20:02:18 UTC — [ticket-574] APPROVED après 2 tour(s)
+- 2026-10-27 20:06:12 UTC — [ticket-574] documentation: 0 fichier(s) (228968ms) — après tour de correction
