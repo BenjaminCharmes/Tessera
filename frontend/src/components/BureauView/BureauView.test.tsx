@@ -90,9 +90,8 @@ describe("BureauView", () => {
 
     expect(screen.queryAllByRole("region")).toHaveLength(0);
     expect(screen.getAllByRole("group")).toHaveLength(7);
-    // Le mobilier des salles est toujours dessiné : seule la zone des projets n'a aucun sprite.
-    expect(container.querySelectorAll('[data-mode="compact"] svg')).toHaveLength(0);
-    expect(container.querySelectorAll("svg")).toHaveLength(2);
+    // Les salles gardent leur plante : le compact ne dessine aucun sprite dans la liste des projets.
+    expect(container.querySelector('[data-mode="compact"]')?.querySelectorAll("svg")).toHaveLength(0);
     expect(screen.getAllByRole("img", { name: "Codeur, travaille" }).length).toBeGreaterThan(0);
     expect(vi.getTimerCount()).toBe(1);
   });

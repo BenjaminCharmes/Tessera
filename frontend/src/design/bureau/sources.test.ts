@@ -42,7 +42,7 @@ function blocs(css: string, entete: RegExp): string[] {
 describe("sprites sources", () => {
   it("has a source file per sprite", () => {
     const noms = SPRITES.map((s) => s.nom);
-    for (const sprite of ["Personnage", "Poste", "Ecran", "Bulle", "Pastille"]) {
+    for (const sprite of ["Personnage", "Poste", "Ecran", "Bulle", "Pastille", "Plante"]) {
       expect(noms).toContain(`${sprite}.tsx`);
     }
   });
@@ -54,6 +54,17 @@ describe("sprites sources", () => {
       expect(contenu, nom).not.toMatch(/anim-|animation|green/);
       expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:zinc|red|amber|blue|violet)-\d/);
     }
+  });
+
+  it("draws the plant as fixed furniture from --sprite-* tokens, with no animation class", () => {
+    const plante = SPRITES.find((s) => s.nom === "Plante.tsx")?.contenu ?? "";
+
+    expect(plante).not.toMatch(/anim-/);
+    for (const jeton of ["plante", "plante-ombre", "pot", "sol", "sol-joint"]) {
+      expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
+    }
+    expect(plante).toContain("--sprite-plante");
+    expect(plante).toContain("--sprite-pot");
   });
 
   it("writes no raw colour in design/bureau", () => {

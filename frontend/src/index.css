@@ -31,13 +31,27 @@
   --sprite-chemise-ombre: oklch(0.541 0.281 293.009);
   /* Le mobilier des salles (ticket-583) : du bois et du métal sourds, aucune
      teinte d'état, pour qu'un meuble ne se lise jamais comme un voyant. */
-  --sprite-sol: #27272a;
-  --sprite-sol-lame: #2f2f33;
   --sprite-machine: #52525b;
   --sprite-machine-ombre: #3f3f46;
   --sprite-tasse: #e4e4e7;
   --sprite-table: #8a6a4a;
   --sprite-table-ombre: #6b5038;
+  --sprite-plante: #16a34a;
+  --sprite-plante-ombre: #15803d;
+  --sprite-pot: #92400e;
+  --sprite-sol: #2a2420;
+  --sprite-sol-joint: #211c18;
+}
+
+/* Sol en lames des pièces et des salles : des lames horizontales séparées d'un
+   joint. Du mobilier au sens de l'ADR-058 : fixe, sans animation. */
+.sol-lames {
+  background-color: var(--sprite-sol);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 11px,
+    var(--sprite-sol-joint) 11px 12px
+  );
 }
 
 /* Animations du Bureau : `transform` et `opacity` seulement, pour rester sur le

@@ -5,7 +5,7 @@ import { useResource } from "../../hooks/useResource";
 import { api } from "../../lib/api";
 import { boiteAuxLettres } from "../../lib/bureau/boiteAuxLettres";
 import { boiteDepuisPr } from "../../lib/bureau/boiteDepuisPr";
-import { libelleDeLaBoite } from "../../lib/bureau/libelleDeLaBoite";
+import { libelleCourtDeLaBoite, libelleDeLaBoite } from "../../lib/bureau/libelleDeLaBoite";
 import type { PRStatusEntry } from "../../types/api";
 
 interface BoiteAuxLettresProps {
@@ -46,16 +46,21 @@ export default function BoiteAuxLettres({ projet, etat }: BoiteAuxLettresProps) 
   const url = entree !== null && entree.pr_number === boite.pr ? entree.pr_url : null;
 
   return (
-    <div role="group" aria-label={libelleDeLaBoite(boite)} data-boite={boite.etat} className="flex items-end gap-1">
-      <Boite etat={boite.etat} />
-      {boite.pr !== null &&
-        (url ? (
-          <a href={url} target="_blank" rel="noreferrer" className="text-micro text-blue-300 hover:underline">
-            #{boite.pr}
-          </a>
-        ) : (
-          <span className="text-micro text-zinc-400">#{boite.pr}</span>
-        ))}
+    <div role="group" aria-label={libelleDeLaBoite(boite)} data-boite={boite.etat} className="flex flex-col items-center">
+      <div className="flex items-end gap-1">
+        <Boite etat={boite.etat} />
+        {boite.pr !== null &&
+          (url ? (
+            <a href={url} target="_blank" rel="noreferrer" className="text-micro text-blue-300 hover:underline">
+              #{boite.pr}
+            </a>
+          ) : (
+            <span className="text-micro text-zinc-400">#{boite.pr}</span>
+          ))}
+      </div>
+      <span aria-hidden="true" className="text-xs text-zinc-400">
+        {libelleCourtDeLaBoite(boite)}
+      </span>
     </div>
   );
 }
