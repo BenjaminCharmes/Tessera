@@ -5446,3 +5446,13 @@ Le diff ajoute :
 - 2026-10-27 13:48:53 UTC — [ticket-601] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (289202ms)
 - 2026-10-27 13:48:53 UTC — [ticket-601] APPROVED après 2 tour(s)
 - 2026-10-27 13:52:59 UTC — [ticket-601] documentation: 0 fichier(s) (238187ms)
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-589 retiré de la file

@@ -5,7 +5,7 @@ depends_on:
 - ticket-596
 estimated_days: 0.25
 id: ticket-601
-pr_number: null
+pr_number: 684
 priority: medium
 status: done
 title: A bubble above the working agent says which tool it is using
