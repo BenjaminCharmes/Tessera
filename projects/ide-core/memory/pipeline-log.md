@@ -5250,3 +5250,20 @@ Le diff ajoute :
 - 2026-10-27 09:30:50 UTC — [ticket-585] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code implémente correcteme (171889ms)
 - 2026-10-27 09:30:50 UTC — [ticket-585] APPROVED après 1 tour(s)
 - 2026-10-27 09:33:29 UTC — [ticket-585] documentation: 0 fichier(s) (152014ms) — après tour de correction
+- 2026-10-27 09:36:08 UTC — [ide-core] ticket-585 PR #670 confiée au CIWatcher
+- 2026-10-27 09:36:11 UTC — [ticket-584] branche ticket-584-the-post-rebase-retest-runs-only-when-the-base-br
+- 2026-10-27 09:36:13 UTC — [ticket-584] tour 1 — codeur démarré
+- 2026-10-27 09:41:12 UTC — [ticket-584] tour 1 — codeur terminé (299046ms)
+- 2026-10-27 09:43:44 UTC — [ticket-584] testeur: 1 failed, 1079 passed, 64 warnings in 148.75s (0:02:28)
+- 2026-10-27 09:43:44 UTC — [ticket-584] tests rouges au tour 1
+- 2026-10-27 09:43:44 UTC — [ticket-584] tour 2 — codeur démarré
+- 2026-10-27 09:44:16 UTC — [ticket-584] tour 2 — codeur terminé (31500ms)
+- 2026-10-27 09:50:14 UTC — [ide-core] ticket-585 PR #670 mergée (CI verte)
+- 2026-10-27 09:52:40 UTC — [ticket-584] testeur: OK (exit 0)
+- 2026-10-27 09:55:52 UTC — [ticket-584] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une logique d'optimisation de rete (191406ms)
+- 2026-10-27 09:55:52 UTC — [ticket-584] tour 2 — reviewer démarré
+- 2026-10-27 09:56:13 UTC — [ticket-584] tour 2 — reviewer terminé (20968ms)
+- 2026-10-27 10:00:52 UTC — [ticket-584] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 10:01:28 UTC — [ticket-584] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers), backend/ (dossier, 6 fichiers), scripts/ (dossier, 6 fichiers), scripts/verifier.py
+- 2026-10-27 10:01:28 UTC — [ticket-584] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit une chaîne de décision dans (336546ms)
+- 2026-10-27 10:01:28 UTC — [ticket-584] APPROVED après 2 tour(s)
