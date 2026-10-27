@@ -54,6 +54,8 @@
   --sprite-cravate: #1f2937;
   --sprite-dossier: #ca8a04;
   --sprite-dossier-ombre: #a16207;
+  --sprite-feuille: #f4f4f5;
+  --sprite-feuille-annotation: #dc2626;
   /* Le mobilier des salles (ticket-583) : du bois et du métal sourds, aucune
      teinte d'état, pour qu'un meuble ne se lise jamais comme un voyant. */
   --sprite-machine: #52525b;

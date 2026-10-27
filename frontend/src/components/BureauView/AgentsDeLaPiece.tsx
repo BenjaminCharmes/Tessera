@@ -14,6 +14,7 @@ const BAS_DE_LA_RANGEE = 28;
 const DENIVELE_DU_FOND = 104;
 
 function AgentMarcheur({ projet, agent }: { projet: string; agent: AgentPlace }) {
+  const rendSaCopie = agent.activite === "copie";
   const monte = agent.niveau === "fond" ? -DENIVELE_DU_FOND : 0;
   const style = {
     bottom: BAS_DE_LA_RANGEE,
@@ -32,11 +33,17 @@ function AgentMarcheur({ projet, agent }: { projet: string; agent: AgentPlace })
     <span
       data-agent={agent.poste}
       data-activite={agent.activite ?? "parti"}
+      data-objet={rendSaCopie ? "feuille" : undefined}
       className="marche absolute left-0 z-10"
       style={style}
       {...acces}
     >
-      <AgentDebout projet={projet} role={agent.poste} etire={agent.activite === "etire" || agent.activite === "fete"} />
+      <AgentDebout
+        projet={projet}
+        role={agent.poste}
+        etire={agent.activite === "etire" || agent.activite === "fete"}
+        feuille={rendSaCopie}
+      />
     </span>
   );
 }

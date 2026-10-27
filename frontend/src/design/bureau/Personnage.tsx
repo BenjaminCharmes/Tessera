@@ -13,6 +13,8 @@ interface PersonnageProps {
   pose?: "assis" | "debout";
   /** Debout seulement : les bras levés au lieu de la tasse. */
   etire?: boolean;
+  /** Debout seulement : une feuille annotée à la main, l'agent rend sa copie (ticket-599). */
+  feuille?: boolean;
 }
 
 /**
@@ -25,7 +27,10 @@ export default function Personnage({
   tape = false,
   pose = "assis",
   etire = false,
+  feuille = false,
 }: PersonnageProps) {
-  if (pose === "debout") return <PersonnageDebout tenue={tenue} physique={physique} etire={etire} />;
+  if (pose === "debout") {
+    return <PersonnageDebout tenue={tenue} physique={physique} etire={etire} feuille={feuille} />;
+  }
   return <PersonnageAssis tenue={tenue} physique={physique} tape={tape} />;
 }

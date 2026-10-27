@@ -4,8 +4,9 @@ import type { PosteDuRun, PosteId } from "./postesDuRun";
 /**
  * Ce que fait un agent qui a fini : café à son poste, s'étirer, ou aller à la machine.
  * `fete` ne se tire jamais : la PR mergée la donne à tous, bras levés (ticket-598).
+ * `copie` non plus : le refus du reviewer ou du validateur l'impose, feuille en main (ticket-599).
  */
-export type Activite = "tasse" | "etire" | "machine" | "fete";
+export type Activite = "tasse" | "etire" | "machine" | "fete" | "copie";
 
 /** Un tirage dans [0, 1[ : `Math.random` en production, une suite fixe dans les tests. */
 export type Hasard = () => number;
@@ -26,6 +27,7 @@ const LIBELLES: Record<Activite, string> = {
   etire: "s'étire",
   machine: "prend un café à la machine",
   fete: "fête la PR mergée",
+  copie: "rend sa copie au codeur",
 };
 
 /** Sol de 800 px : les colonnes du grid (px-2.5, gap-1, cinq colonnes) donnent ces centres. */
@@ -110,19 +112,23 @@ function placeDe(poste: PosteId, activite: Activite, rang: number): AgentPlace {
     const x = PLACES_X[rang] ?? PLACES_X[0];
     return { poste, x, niveau: "fond", activite, parti: false };
   }
-  return { poste, x: centreDuPoste(poste) + DECALAGE_A_COTE, niveau: "rangee", activite, parti: false };
+  // Rendre sa copie : debout à côté du poste du codeur, pas du sien.
+  const ancre = activite === "copie" ? "codeur" : poste;
+  return { poste, x: centreDuPoste(ancre) + DECALAGE_A_COTE, niveau: "rangee", activite, parti: false };
 }
 
 /**
  * Où se tient chaque agent de la pièce. Run en cours : les agents qui ont fini,
  * chacun à sa place d'activité. Run clos : les cinq, à la porte (ADR-058 : ils
  * n'y sont que parce que le run est fini). PR mergée : les cinq, bras levés devant leur poste.
+ * `copie` : l'agent qui a renvoyé le travail se tient au poste du codeur, feuille en main.
  */
 export function placerLesAgents(
   faits: readonly PosteId[],
   effectives: Activites,
   clos: boolean,
   fete = false,
+  copie: PosteId | null = null,
 ): AgentPlace[] {
   // La fête passe avant la porte : la PR se merge après la clôture du run (ADR-051).
   if (fete) return POSTES.map((poste) => placeDe(poste, "fete", 0));
@@ -139,7 +145,7 @@ export function placerLesAgents(
   const places: AgentPlace[] = [];
   for (const poste of POSTES) {
     if (!faits.includes(poste)) continue;
-    const activite = effectives[poste] ?? "tasse";
+    const activite = poste === copie ? "copie" : (effectives[poste] ?? "tasse");
     places.push(placeDe(poste, activite, rang));
     if (activite === "machine") rang += 1;
   }

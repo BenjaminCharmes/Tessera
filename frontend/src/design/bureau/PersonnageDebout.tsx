@@ -7,11 +7,27 @@ interface PersonnageDeboutProps {
   physique: Physique;
   /** Les bras levés, sans tasse : l'agent s'étire. */
   etire?: boolean;
+  /** Une feuille annotée à la main, à la place de la tasse : l'agent rend sa copie. */
+  feuille?: boolean;
 }
 
-/** Les bras : le long du corps et la tasse à la main, ou levés au-dessus de la tête. */
-function Bras({ haut, etire }: { haut: Tenue["haut"]; etire: boolean }) {
+/** Le bras tendu qui porte la feuille : papier clair, deux lignes d'annotation. */
+function BrasALaFeuille({ ombre }: { ombre: string }) {
+  return (
+    <g data-detail="feuille">
+      <rect x="0" y="7" width="1" height="5" className={ombre} />
+      <rect x="9" y="6" width="1" height="4" className={ombre} />
+      <rect x="10" y="3" width="3" height="5" className="fill-(--sprite-feuille)" />
+      <rect x="10" y="4" width="2" height="1" className="fill-(--sprite-feuille-annotation)" />
+      <rect x="10" y="6" width="2" height="1" className="fill-(--sprite-feuille-annotation)" />
+    </g>
+  );
+}
+
+/** Les bras : le long du corps et la tasse à la main, levés au-dessus de la tête, ou tendus avec la feuille. */
+function Bras({ haut, etire, feuille }: { haut: Tenue["haut"]; etire: boolean; feuille: boolean }) {
   const ombre = FILL_OMBRE[haut];
+  if (feuille) return <BrasALaFeuille ombre={ombre} />;
   if (etire) {
     return (
       <g data-bras="leves">
@@ -54,7 +70,7 @@ function Jambes({ tenue, physique }: PersonnageDeboutProps) {
  * tasse à la main, ou les bras levés quand il s'étire. Il se dessine à côté de
  * son poste, pas dedans.
  */
-export default function PersonnageDebout({ tenue, physique, etire = false }: PersonnageDeboutProps) {
+export default function PersonnageDebout({ tenue, physique, etire = false, feuille = false }: PersonnageDeboutProps) {
   const ombre = FILL_OMBRE[tenue.haut];
   return (
     <g data-sprite="personnage" data-pose="debout">
@@ -68,7 +84,7 @@ export default function PersonnageDebout({ tenue, physique, etire = false }: Per
       )}
       {tenue.capuche && <rect data-detail="capuche" x="3" y="6" width="4" height="1" className={ombre} />}
       <Jambes tenue={tenue} physique={physique} />
-      <Bras haut={tenue.haut} etire={etire} />
+      <Bras haut={tenue.haut} etire={etire} feuille={feuille} />
     </g>
   );
 }
