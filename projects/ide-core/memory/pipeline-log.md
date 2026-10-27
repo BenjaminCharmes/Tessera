@@ -5348,3 +5348,4 @@ Le diff ajoute :
 - 2026-10-27 11:26:37 UTC — [ticket-596] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers)
 - 2026-10-27 11:26:37 UTC — [ticket-596] validateur: APPROVED — Le ticket-596 est complet : tous les critères sont satisfaits par le code fourni (29108ms)
 - 2026-10-27 11:26:37 UTC — [ticket-596] APPROVED après 2 tour(s)
+- 2026-10-27 11:32:36 UTC — [ticket-596] documentation: 0 fichier(s) (355264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : section « Synchronisation de la base avant livraison » introuvable.
