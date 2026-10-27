@@ -5,7 +5,7 @@ depends_on:
 - ticket-593
 estimated_days: 0.25
 id: ticket-600
-pr_number: null
+pr_number: 682
 priority: medium
 status: done
 title: A whiteboard on the room's wall shows the ticket's criteria as the validator
