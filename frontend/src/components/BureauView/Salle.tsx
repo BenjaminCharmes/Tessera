@@ -75,7 +75,7 @@ export default function Salle({
       </div>
       <div
         data-mur="salle"
-        className="flex flex-nowrap items-start justify-center gap-4 overflow-hidden border-b-4 border-(--sprite-plinthe) px-3 pt-3 pb-4"
+        className="flex flex-nowrap items-start justify-center gap-3 overflow-hidden border-b-4 border-(--sprite-plinthe) px-3 pt-3 pb-4"
       >
         <Agrandi>
           <SkyWindow moment={moment} soleil={gauche?.soleil} nuages={gauche?.nuages} />

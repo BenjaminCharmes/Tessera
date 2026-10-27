@@ -2,7 +2,7 @@
 id: ticket-609
 title: "Bureau review fixes: one scale everywhere, wall and floor, one sun, a light switch, the thread in the List"
 type: fix
-status: in-progress
+status: done
 pr_number: null
 priority: high
 agent: codeur

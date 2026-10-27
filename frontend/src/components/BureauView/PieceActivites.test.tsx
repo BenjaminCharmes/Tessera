@@ -11,11 +11,14 @@ const ETIRE = () => 0.5;
 const MACHINE = () => 0.99;
 
 beforeEach(() => {
+  // Les décalages des agents suivent l'échelle des sprites, qui dépend de la largeur : celle d'un grand écran.
+  vi.stubGlobal("innerWidth", 1920);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
   vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 });
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
 

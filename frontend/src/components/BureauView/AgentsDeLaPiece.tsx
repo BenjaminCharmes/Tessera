@@ -3,7 +3,8 @@ import AgentDebout from "../../design/bureau/AgentDebout";
 import { libelleActivite, quiBavarde } from "../../lib/bureau/activites";
 import type { AgentPlace } from "../../lib/bureau/activites";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
-import { ECHELLE_LARGE, useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
+import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
+import { ECHELLE_LARGE } from "../../lib/bureau/echelleDesSprites";
 import { useEtirementDuSol } from "../../hooks/useEtirementDuSol";
 
 interface AgentsDeLaPieceProps {
