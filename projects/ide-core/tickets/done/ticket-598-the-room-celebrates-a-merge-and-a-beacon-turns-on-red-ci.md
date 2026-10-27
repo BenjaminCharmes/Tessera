@@ -1,14 +1,15 @@
 ---
-id: ticket-598
-title: "The room celebrates a merged PR, and a beacon turns while the CI is red"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-596"]
-estimated_days: 0.5
 created: 2026-10-27
+depends_on:
+- ticket-596
+estimated_days: 0.5
+id: ticket-598
+pr_number: 679
+priority: medium
+status: done
+title: The room celebrates a merged PR, and a beacon turns while the CI is red
+type: feat
 ---
 
 # ticket-598 — Fête au merge, gyrophare sur CI rouge

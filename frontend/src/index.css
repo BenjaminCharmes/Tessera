@@ -69,6 +69,16 @@
   --sprite-porte: #6b5038;
   --sprite-porte-ombre: #4a3626;
   --sprite-vapeur: #d4d4d8;
+  /* La fête et l'alarme (ticket-598) : cinq papiers de confettis, et un gyrophare
+     rouge sur un socle sourd. Des fonds de sprite, jamais un texte. */
+  --sprite-confetti-1: #f43f5e;
+  --sprite-confetti-2: #facc15;
+  --sprite-confetti-3: #22d3ee;
+  --sprite-confetti-4: #a3e635;
+  --sprite-confetti-5: #e879f9;
+  --sprite-gyrophare: #dc2626;
+  --sprite-gyrophare-clair: #fca5a5;
+  --sprite-gyrophare-socle: #3f3f46;
 }
 
 /* Sol en lames des pièces et des salles : des lames horizontales séparées d'un
@@ -103,7 +113,18 @@
   0% { transform: translateY(0); opacity: 0.8; }
   100% { transform: translateY(-6px); opacity: 0; }
 }
+@keyframes chute {
+  0% { transform: translateY(-8px); opacity: 1; }
+  100% { transform: translateY(70px); opacity: 0; }
+}
+@keyframes gyro {
+  0% { opacity: 1; }
+  50% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
 .anim-tape { animation: tape 0.5s steps(2) infinite; }
+.anim-chute { animation: chute 1.6s linear infinite; }
+.anim-gyro { animation: gyro 0.8s steps(2) infinite; }
 .anim-lueur { animation: lueur 1.6s ease-in-out infinite; }
 .anim-flotte { animation: flotte 1.8s ease-in-out infinite; }
 .anim-vapeur { animation: vapeur 1.6s steps(4) infinite; }
@@ -112,7 +133,7 @@
    de place sans marcher. */
 .marche { transition: transform 1.8s steps(12), opacity 0.9s; }
 @media (prefers-reduced-motion: reduce) {
-  .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur { animation: none; }
+  .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur, .anim-chute, .anim-gyro { animation: none; }
   .marche { transition: none; }
 }
 

@@ -1,8 +1,11 @@
 import { POSTES } from "./postesDuRun";
 import type { PosteDuRun, PosteId } from "./postesDuRun";
 
-/** Ce que fait un agent qui a fini : café à son poste, s'étirer, ou aller à la machine. */
-export type Activite = "tasse" | "etire" | "machine";
+/**
+ * Ce que fait un agent qui a fini : café à son poste, s'étirer, ou aller à la machine.
+ * `fete` ne se tire jamais : la PR mergée la donne à tous, bras levés (ticket-598).
+ */
+export type Activite = "tasse" | "etire" | "machine" | "fete";
 
 /** Un tirage dans [0, 1[ : `Math.random` en production, une suite fixe dans les tests. */
 export type Hasard = () => number;
@@ -22,6 +25,7 @@ const LIBELLES: Record<Activite, string> = {
   tasse: "boit un café à son poste",
   etire: "s'étire",
   machine: "prend un café à la machine",
+  fete: "fête la PR mergée",
 };
 
 /** Sol de 800 px : les colonnes du grid (px-2.5, gap-1, cinq colonnes) donnent ces centres. */
@@ -112,13 +116,16 @@ function placeDe(poste: PosteId, activite: Activite, rang: number): AgentPlace {
 /**
  * Où se tient chaque agent de la pièce. Run en cours : les agents qui ont fini,
  * chacun à sa place d'activité. Run clos : les cinq, à la porte (ADR-058 : ils
- * n'y sont que parce que le run est fini).
+ * n'y sont que parce que le run est fini). PR mergée : les cinq, bras levés devant leur poste.
  */
 export function placerLesAgents(
   faits: readonly PosteId[],
   effectives: Activites,
   clos: boolean,
+  fete = false,
 ): AgentPlace[] {
+  // La fête passe avant la porte : la PR se merge après la clôture du run (ADR-051).
+  if (fete) return POSTES.map((poste) => placeDe(poste, "fete", 0));
   if (clos) {
     return POSTES.map((poste): AgentPlace => ({
       poste,

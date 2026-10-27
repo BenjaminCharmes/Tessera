@@ -5375,3 +5375,17 @@ Le diff ajoute :
 - 2026-10-27 12:23:57 UTC — [ticket-597] validateur: APPROVED — Les sept critères sont tous satisfaits. Le diff ajoute les quatre salles commune (335437ms)
 - 2026-10-27 12:23:57 UTC — [ticket-597] APPROVED après 2 tour(s)
 - 2026-10-27 12:31:04 UTC — [ticket-597] documentation: 1 fichier(s) (423000ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « PREFIXES_BACKEND: tuple[str, ...] = ("backend/", "scripts/") » (backend/src/tessera/servic
+- 2026-10-27 12:36:00 UTC — [ide-core] ticket-597 PR #678 mergée (CI verte)
+- 2026-10-27 12:36:02 UTC — [ide-core] ticket-597 : base réalignée sur develop
+- 2026-10-27 12:36:02 UTC — [ide-core] ticket-597 PR #678 confiée au CIWatcher
+- 2026-10-27 12:36:05 UTC — [ticket-598] branche ticket-598-the-room-celebrates-a-merged-pr-and-a-beacon-turn
+- 2026-10-27 12:36:06 UTC — [ticket-598] tour 1 — codeur démarré
+- 2026-10-27 12:41:11 UTC — [ticket-598] tour 1 — codeur terminé (305063ms)
+- 2026-10-27 12:43:03 UTC — [ticket-598] testeur: OK (exit 0)
+- 2026-10-27 12:44:31 UTC — [ticket-598] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute une fonctionnalité de  (88063ms)
+- 2026-10-27 12:44:31 UTC — [ticket-598] tour 1 — reviewer démarré
+- 2026-10-27 12:44:56 UTC — [ticket-598] tour 1 — reviewer terminé (24375ms)
+- 2026-10-27 12:49:02 UTC — [ticket-598] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 12:49:02 UTC — [ticket-598] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (270734ms)
+- 2026-10-27 12:49:02 UTC — [ticket-598] APPROVED après 1 tour(s)
+- 2026-10-27 12:52:18 UTC — [ticket-598] documentation: 0 fichier(s) (191000ms) — après tour de correction

@@ -14,10 +14,10 @@ function Bras({ haut, etire }: { haut: Tenue["haut"]; etire: boolean }) {
   const ombre = FILL_OMBRE[haut];
   if (etire) {
     return (
-      <>
+      <g data-bras="leves">
         <rect x="0" y="0" width="1" height="7" className={ombre} />
         <rect x="9" y="0" width="1" height="7" className={ombre} />
-      </>
+      </g>
     );
   }
   return (
