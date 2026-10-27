@@ -5250,3 +5250,16 @@ Le diff ajoute :
 - 2026-10-27 09:30:50 UTC — [ticket-585] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code implémente correcteme (171889ms)
 - 2026-10-27 09:30:50 UTC — [ticket-585] APPROVED après 1 tour(s)
 - 2026-10-27 09:33:29 UTC — [ticket-585] documentation: 0 fichier(s) (152014ms) — après tour de correction
+- 2026-10-27 08:50:34 UTC — [ide-core] ticket-583 PR #667 confiée au CIWatcher
+- 2026-10-27 08:50:37 UTC — [ticket-593] branche ticket-593-office-rooms-get-a-floor-and-plants-the-queue-too
+- 2026-10-27 08:50:38 UTC — [ticket-593] tour 1 — codeur démarré
+- 2026-10-27 08:53:57 UTC — [ticket-593] tour 1 — codeur terminé (199108ms)
+- 2026-10-27 08:55:15 UTC — [ide-core] ticket-583 PR #667 mergée (CI verte)
+- 2026-10-27 08:55:34 UTC — [ticket-593] testeur: OK (exit 0)
+- 2026-10-27 08:57:04 UTC — [ticket-593] securite: PASS — Aucune vulnérabilité de sécurité détectée. Les modifications sont purement UI :  (90389ms)
+- 2026-10-27 08:57:04 UTC — [ticket-593] tour 1 — reviewer démarré
+- 2026-10-27 08:57:32 UTC — [ticket-593] tour 1 — reviewer terminé (27343ms)
+- 2026-10-27 09:02:05 UTC — [ticket-593] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 09:02:55 UTC — [ticket-593] validateur: fichiers cités joints : Plante.tsx, design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers) ; absents : design/bureau/
+- 2026-10-27 09:02:55 UTC — [ticket-593] validateur: APPROVED — Tous les critères sont satisfaits. L'infobulle est correctement portée vers docu (350750ms)
+- 2026-10-27 09:02:55 UTC — [ticket-593] APPROVED après 1 tour(s)
