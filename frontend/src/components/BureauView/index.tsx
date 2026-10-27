@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { StreamState } from "../../hooks/streamState";
 import { useAlerteSonore } from "../../hooks/useAlerteSonore";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
@@ -9,6 +10,8 @@ import AuRepos from "./AuRepos";
 import ColonneAToi from "./ColonneAToi";
 import type { ReglageSon } from "./ColonneAToi";
 import Compact from "./Compact";
+import PanneauAgentChoisi from "./PanneauAgentChoisi";
+import type { AgentChoisi } from "./PanneauAgentChoisi";
 import Piece from "./Piece";
 import SallePause from "./SallePause";
 import SalleReunion from "./SalleReunion";
@@ -53,6 +56,9 @@ export default function BureauView({
   onRanger,
 }: BureauViewProps) {
   const maintenant = useSanteDuBureau();
+  // L'agent choisi : seul le couple est retenu, ses lignes se relisent à chaque rendu.
+  const [choix, setChoix] = useState<AgentChoisi | null>(null);
+  const projetChoisi = projets.find((p) => p.nom === choix?.projet);
   const compact = modeCompact(projets.length);
 
   // Un run qui se clôt fait relire le tableau. Un compte et non un événement :
@@ -99,18 +105,26 @@ export default function BureauView({
                 run={run}
                 onOuvrir={onOuvrir}
                 onRanger={onRanger}
+                onChoisir={(projet, poste) => setChoix({ projet, poste })}
               />
             ),
           )}
           {compact && auRepos.map((nom) => <AuRepos key={nom} projet={nom} />)}
         </div>
       </div>
-      <div className="w-72 shrink-0">
+      <div className="flex w-72 shrink-0 flex-col gap-3.5">
         <ColonneAToi
           contenu={aToi}
           maintenant={maintenant}
           onAnswer={(runId, text) => envoyer(runId, { type: "answer", text })}
           son={son}
+        />
+        <PanneauAgentChoisi
+          choix={choix}
+          etat={projetChoisi?.etat}
+          run={projetChoisi?.run}
+          maintenant={maintenant}
+          onOuvrir={onOuvrir}
         />
       </div>
     </div>

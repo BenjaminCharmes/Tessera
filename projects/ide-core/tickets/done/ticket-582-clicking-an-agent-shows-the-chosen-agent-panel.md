@@ -1,15 +1,16 @@
 ---
+agent: codeur
+created: 2026-10-26
+depends_on:
+- ticket-581
+estimated_days: 0.5
 id: ticket-582
-title: "Clicking an agent in the office shows the chosen-agent panel"
-type: feat
-status: todo
+plan: true
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-581"]
-estimated_days: 0.5
-created: 2026-10-26
-plan: true
+status: done
+title: Clicking an agent in the office shows the chosen-agent panel
+type: feat
 ---
 
 # ticket-582 — Cliquer un agent ouvre le panneau « Agent choisi »
