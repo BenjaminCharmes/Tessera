@@ -38,7 +38,7 @@ from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.services.run_dans_worktree import adopter_la_branche
 from tessera.services.run_worktree import RunWorktree
-from tessera.services.pipeline_text import _extract_criteria, _parse_reviewer_verdict
+from tessera.services.pipeline_text import _extract_criteria, _read_reviewer_verdict
 from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.services.security_auditor import SecurityAuditResult
 from tessera.services.validator_cited_files import format_cited_files_log
@@ -775,7 +775,7 @@ async def run_review(
         f"[{ticket_id}] tour {run.round_num} — reviewer terminé ({reviewer_result.duration_ms}ms)"
     )
 
-    approved, reason = _parse_reviewer_verdict(reviewer_result.content)
+    approved, reason = _read_reviewer_verdict(reviewer_result.content)
     return approved, reason, reviewer_result.content
 
 

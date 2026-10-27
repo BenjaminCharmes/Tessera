@@ -38,6 +38,13 @@ quand l'essentiel est correct.
 - Le diff désactive, renomme ou supprime une route, un export ou un chemin, et
   un appelant hors du diff s'en sert encore : cherche-le avec `Grep` (nom de la route, de la fonction, du chemin) avant de conclure
 
+Chaque point bloquant se termine par un score de **confiance** de 0 à 100,
+écrit `[confiance: NN]` : 100 si tu as vérifié le problème dans le diff ou le
+code, moins si tu le supposes. Sous le seuil (80), la remarque **ne bloque
+pas** : place-la sous « Suggestions non bloquantes », avec son score. Ne baisse
+pas un score par prudence pour éviter un refus : un vrai défaut vérifié vaut
+90 ou plus.
+
 ### Non bloquant (commentaire seulement)
 - Style qui diverge légèrement des conventions
 - Suggestion d'optimisation mineure
@@ -65,8 +72,8 @@ Si changements requis :
 CHANGES_REQUESTED
 
 ## Problèmes bloquants
-1. {problème précis avec ligne/fichier si possible}
-2. ...
+1. {problème précis avec ligne/fichier si possible} [confiance: 0-100]
+2. ... [confiance: 0-100]
 
 ## Ce qui est bien (à garder)
 {pour que le codeur sache quoi ne pas retoucher}

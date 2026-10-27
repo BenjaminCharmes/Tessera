@@ -6,6 +6,9 @@ none of them touch git, the ticket store or the agents.
 import re
 from typing import TYPE_CHECKING
 
+from tessera.config import settings
+from tessera.services.reviewer_confidence import all_blocking_remarks_below
+
 if TYPE_CHECKING:
     from tessera.services.pipeline_run import PipelineRun
 
@@ -130,8 +133,14 @@ def _verdict_line(line: str) -> tuple[bool, str] | None:
     return None
 
 
-def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
+def _parse_reviewer_verdict(
+    content: str, threshold: int | None = None
+) -> tuple[bool, str]:
     """Returns (approved, reason) from the reviewer's answer.
+
+    Avec un `threshold`, un refus dont toutes les remarques bloquantes portent
+    un score de confiance inférieur est lu comme une approbation avec remarques
+    (ticket-574). Un score absent ou au-dessus du seuil garde le refus.
 
     Le reviewer est prompté pour ouvrir sa réponse par le verdict, seul sur sa
     ligne (ADR-009). La première ligne qui *commence* par un verdict le
@@ -153,6 +162,8 @@ def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
         # le texte qui suit, et c'est ce que le codeur doit lire (ticket-474).
         if not approved and not reason:
             reason = "\n".join(lines[index + 1:]).strip()
+        if not approved and threshold and all_blocking_remarks_below(content, threshold):
+            return True, ""
         return approved, reason
     for line in lines:
         if "CHANGES_REQUESTED" in line.upper():
@@ -161,6 +172,11 @@ def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
     if any(_APPROVED_WORD.search(line) for line in lines):
         return True, ""
     return False, content[:200]
+
+
+def _read_reviewer_verdict(content: str) -> tuple[bool, str]:
+    """The reviewer's verdict, with the confidence threshold from the settings."""
+    return _parse_reviewer_verdict(content, settings.reviewer_confidence_threshold)
 
 
 def _echec_de_tests(run: "PipelineRun") -> str:
