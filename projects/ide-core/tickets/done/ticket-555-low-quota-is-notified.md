@@ -6,7 +6,7 @@ depends_on:
 - ticket-558
 estimated_days: 0.25
 id: ticket-555
-pr_number: null
+pr_number: 696
 priority: low
 status: done
 title: A session or weekly quota under 10 % is notified
