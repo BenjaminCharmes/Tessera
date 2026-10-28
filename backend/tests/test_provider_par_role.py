@@ -416,6 +416,26 @@ async def test_le_runner_enregistre_le_provider_et_le_modele_utilises(tmp_path: 
             assert await cur.fetchone() == ("fake", "claude-haiku-4-5")
 
 
+async def test_runner_records_cache_creation_tokens(tmp_path: Path) -> None:
+    db = tmp_path / "t.db"
+    await init_db(db)
+    run_id = await create_run(db, "p", "ticket-001")
+    runner = _runner(tmp_path, FakeProvider())
+    runner._db_path = db
+
+    class _AvecCreation(FakeProvider):
+        async def complete(self, **kwargs: Any) -> ProviderResult:
+            result = await super().complete(**kwargs)
+            result.cache_creation_tokens = 7
+            return result
+
+    runner._provider = _AvecCreation()
+    await runner.run(role=AgentRole.codeur, ticket=_make_ticket(), project_context="c", run_id=run_id)
+    async with aiosqlite.connect(db) as conn:
+        async with conn.execute("SELECT cache_creation_tokens FROM agent_calls") as cur:
+            assert await cur.fetchone() == (7,)
+
+
 # ------------------------------------------------------------------
 # La liste blanche et l'API
 # ------------------------------------------------------------------

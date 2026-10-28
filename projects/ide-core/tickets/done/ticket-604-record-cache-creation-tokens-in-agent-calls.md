@@ -1,14 +1,15 @@
 ---
-id: ticket-604
-title: "agent_calls records the cache creation tokens of each call"
-type: chore
-status: todo
-priority: low
 agent: codeur
+created: 2026-10-27
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-27
+id: ticket-604
 plan: true
+pr_number: 704
+priority: low
+status: done
+title: agent_calls records the cache creation tokens of each call
+type: chore
 ---
 
 # ticket-604 — agent_calls garde les tokens de création de cache
@@ -17,7 +18,7 @@ plan: true
 Que l'entrée réelle d'un rôle se lise dans `agent_calls`, sans sous-estimation.
 
 ## Contexte
-ADR-063 reporte la compression du contexte faute de mesure.
+ADR-059 reporte la compression du contexte faute de mesure.
 `agent_sdk._usage_from` lit `cache_creation_input_tokens` et
 `ProviderResult.cache_creation_tokens` le porte, mais la table `agent_calls` n'a
 que `input_tokens` et `cache_read_tokens` : la valeur est jetée à l'écriture

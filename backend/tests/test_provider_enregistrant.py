@@ -160,6 +160,44 @@ async def test_ollama_enregistre_cost_zero(tmp_path: Path) -> None:
     assert row[1] == pytest.approx(0.0)
 
 
+class CreationDeCacheFake:
+    """Provider double that reports 7 cache creation tokens."""
+
+    name = "fake"
+
+    async def complete(self, *, system: str, user: str, model: str, max_tokens: int, **_: Any) -> ProviderResult:
+        return ProviderResult(
+            content="ok",
+            input_tokens=10,
+            output_tokens=5,
+            cache_creation_tokens=7,
+            cost_usd=0.01,
+            provider_name="fake",
+        )
+
+    async def stream(self, **kw: Any) -> ProviderResult:
+        return await self.complete(**kw)
+
+
+async def test_enregistre_les_tokens_de_creation_de_cache(tmp_path: Path) -> None:
+    """The cache creation tokens of a call reach `agent_calls`."""
+    db_path = tmp_path / "test.db"
+    await init_db(db_path)
+    run_id = await create_run(db_path, "proj", "ticket-001")
+    activer_enregistrement(run_id, "ticket-001")
+
+    provider = ProviderEnregistrant(CreationDeCacheFake(), role="codeur", db_path=db_path)  # type: ignore[arg-type]
+    await provider.complete(system="sys", user="usr", model="claude-sonnet-4-6", max_tokens=64)
+
+    async with aiosqlite.connect(str(db_path)) as db:
+        async with db.execute(
+            "SELECT cache_creation_tokens FROM agent_calls WHERE run_id=?", (run_id,)
+        ) as cur:
+            row = await cur.fetchone()
+
+    assert row == (7,)
+
+
 async def test_repli_enregistre_provider_de_repli(tmp_path: Path) -> None:
     """When Ollama is unavailable, the fallback provider and model are recorded."""
     db_path = tmp_path / "test.db"
