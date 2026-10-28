@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-589
 plan: true
-pr_number: null
+pr_number: 702
 priority: low
 status: done
 title: 'Design: evaluate headroom to compress the context sent to agents'
