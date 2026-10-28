@@ -65,12 +65,13 @@ function Case({ x, y, etat }: { x: number; y: number; etat: EtatCase }) {
 }
 
 /**
- * Le tableau blanc au mur de la pièce, grille 44 × 26 (88 × 52 px). Une case et une
+ * Le tableau blanc au mur de la pièce, grille 44 × 27 (88 × 54 px). Une case et une
  * ligne par critère : case vide et ligne grise tant que rien n'est jugé, case cochée
  * et ligne verte si le critère passe, croix et ligne rouge sinon (ADR-058). Le
  * libellé accessible est porté par l'objet qui l'enveloppe. Il faisait 132 px de
  * large : rétréci et rehaussé, il laisse au mur la place de trois fenêtres et d'une
- * bibliothèque, et ses cases se lisent (ticket-627).
+ * bibliothèque, et ses cases se lisent (ticket-627). La sixième case touchait le
+ * cadre : une ligne de marge en bas, comme en haut (ticket-634).
  */
 export default function TableauBlanc({ cases }: TableauBlancProps) {
   const colonnes = cases.length > LIGNES_PAR_COLONNE ? 2 : 1;
@@ -78,8 +79,8 @@ export default function TableauBlanc({ cases }: TableauBlancProps) {
   return (
     <svg
       width="88"
-      height="52"
-      viewBox="0 0 44 26"
+      height="54"
+      viewBox="0 0 44 27"
       shapeRendering="crispEdges"
       aria-hidden="true"
       data-sprite="tableau-blanc"
@@ -88,14 +89,14 @@ export default function TableauBlanc({ cases }: TableauBlancProps) {
         x="0"
         y="0"
         width="44"
-        height="26"
+        height="27"
         className="fill-(--sprite-tableau-cadre)"
       />
       <rect
         x="1"
         y="1"
         width="42"
-        height="24"
+        height="25"
         className="fill-(--sprite-tableau)"
       />
       {cases.slice(0, CASES_MAX).map((etat, i) => {

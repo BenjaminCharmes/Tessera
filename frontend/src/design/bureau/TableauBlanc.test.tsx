@@ -21,4 +21,30 @@ describe("TableauBlanc", () => {
     // contour + centre + fond + 5 pixels de croix, puis la ligne
     expect(marques(container, "echoue")).toBe(9);
   });
+
+  it("keeps a margin between the sixth row and the frame, as at the top", () => {
+    const { container } = render(
+      <TableauBlanc
+        cases={Array.from({ length: 6 }, () => "passe" as const)}
+      />,
+    );
+
+    const fond = container.querySelectorAll("rect")[1];
+    const basDuFond =
+      Number(fond.getAttribute("y")) + Number(fond.getAttribute("height"));
+    const basDesCases = Math.max(
+      ...[...container.querySelectorAll("[data-case] rect")].map(
+        (r) => Number(r.getAttribute("y")) + Number(r.getAttribute("height")),
+      ),
+    );
+    const hautDesCases = Math.min(
+      ...[...container.querySelectorAll("[data-case] rect")].map((r) =>
+        Number(r.getAttribute("y")),
+      ),
+    );
+
+    expect(basDuFond - basDesCases).toBe(
+      hautDesCases - Number(fond.getAttribute("y")),
+    );
+  });
 });
