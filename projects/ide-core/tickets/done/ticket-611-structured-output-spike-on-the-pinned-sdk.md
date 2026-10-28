@@ -4,6 +4,7 @@ created: 2026-10-27
 depends_on: []
 estimated_days: 0.5
 id: ticket-611
+pr_number: 710
 priority: medium
 status: done
 title: 'Spike: structured output on the pinned SDK keeps the reviewer''s tool turns'
