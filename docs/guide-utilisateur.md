@@ -339,6 +339,8 @@ Si tu essaies de relancer une app qui est en train de démarrer, l'IDE attend qu
 
 Les apps lancées par Tessera pendant un run du pipeline apparaissent aussi dans l'inventaire global avec l'origine **Tessera**.
 
+Les boutons « Lancer l'app » et « Arrêter l'app » lancent les services du projet, déclarés dans son `agents.json`. C'est indépendant du lancement des tickets : tu peux lancer une file sans avoir démarré l'app.
+
 ### Changer la catégorie d'un projet
 
 Chaque carte a un menu accessible (trois points verticaux). Clique dessus pour :
@@ -805,6 +807,12 @@ Tu es sur l'écran du run (voir [Lire ce qui se passe](#5-lire-ce-qui-se-passe) 
 - **Une file terminée** : seules les files `en cours` acceptent des ajouts. Quand elle s'arrête, même partiellement approuvée, c'est fini — lance une nouvelle file.
 
 Un ticket inexistant. Les tickets que tu viens de merger sur ta branche de base sont trouvés et acceptés normalement, même si le run n'a pas encore mis à jour son arbre de travail.
+
+### Projets isolés par worktree
+
+Un projet avec `worktree: {}` dans son `agents.json` isole chaque run dans un répertoire séparé. Il ne peut lancer qu'un ticket à la fois : pas de file, pas de parallélisme.
+
+Depuis la carte d'un tel projet, tu ne vois pas « File (n) » — le bouton s'appelle « Ticket suivant ». C'est un lancement unique : un run pour ce ticket, seul.
 
 ### Si l'ajout échoue
 

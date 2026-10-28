@@ -877,6 +877,10 @@ Cette approche empêche un gros diff de bloquer la file sur une limite de tours 
 
 Quand une exception de quota épuisé est levée pendant l'audit de sécurité, celle-ci n'est pas convertie en verdict fermé (`BLOCK`, ADR-039), mais remontée comme arrêt de quota : le run s'arrête, le ticket est remis en `todo`, et la file s'interrompt pour reprendre ultérieurement (ticket-498, ticket-505). Le même traitement s'applique au validateur.
 
+#### Validation par schéma JSON
+
+L'audit retourne son verdict validé par un schéma JSON (draft-07, ADR-061). Le fournisseur reçoit `schema=SECURITY_SCHEMA`, et l'audit lit directement `result.structured` sans passer par `extract_json`. Une sortie structurée absente ou sans champ `verdict` requis provoque un refus fermé.
+
 ### Résultats des tests et extraction d'erreurs (ticket-393)
 
 Quand les tests échouent, `test_runner.py` extrait :
@@ -927,6 +931,10 @@ Un critère peut désormais citer un dossier entre backticks. Quand le dossier e
 Un dossier cité avec ou sans slash final (`design/maquette` ou `design/maquette/`) est traité identiquement. Un dossier absent est marqué comme absent dans le rapport de validation.
 
 Dans les journaux de pipeline, l'entrée est marquée comme dossier : « `design/maquette/` (dossier, 9 fichiers) ». Cela permet de vérifier des critères du type « la maquette existe dans `design/maquette/` » sans nommer un fichier spécifique.
+
+#### Validation par schéma JSON
+
+Le validateur retourne son jugement validé par un schéma JSON (draft-07, ADR-061). Le fournisseur reçoit `schema=VALIDATOR_SCHEMA`, et le validateur lit directement `result.structured` sans passer par `extract_json`. Une sortie structurée absente ou sans champ `criteria` requis provoque un refus fermé.
 
 ### Feedback du reviewer au codeur (ticket-474, ADR-009)
 
