@@ -25,6 +25,8 @@ interface ProjetCarteProps {
   onFileLancee: () => void;
   /** Le run de la file qui tourne sur ce projet, s'il y en a une (ticket-557). */
   fileEnCours?: string | null;
+  /** Les tickets que la file en cours doit encore traiter (ticket-622). */
+  dejaEnFile?: readonly string[];
 }
 
 /** L'état de l'app du projet, pour la carte ; `undefined` sans rien à lancer. */
@@ -80,9 +82,13 @@ function Dates({ projet }: { projet: ProjectOverview }) {
   const activite = ilYa(projet.last_activity);
   return (
     <p className="flex flex-wrap gap-x-3 text-micro text-zinc-500">
-      <span title={dateExacte(projet.created_at)}>Créé {ilYa(projet.created_at)}</span>
+      <span title={dateExacte(projet.created_at)}>
+        Créé {ilYa(projet.created_at)}
+      </span>
       {activite && (
-        <span title={dateExacte(projet.last_activity)}>Activité {activite}</span>
+        <span title={dateExacte(projet.last_activity)}>
+          Activité {activite}
+        </span>
       )}
     </p>
   );
@@ -123,6 +129,7 @@ export default function ProjetCarte({
   onServicesChange,
   onFileLancee,
   fileEnCours = null,
+  dejaEnFile = [],
 }: ProjetCarteProps) {
   function surClavier(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "Enter" && e.target === e.currentTarget) onSelect();
@@ -186,7 +193,9 @@ export default function ProjetCarte({
         />
       </div>
       {projet.description && (
-        <p className="line-clamp-3 text-xs text-zinc-400">{projet.description}</p>
+        <p className="line-clamp-3 text-xs text-zinc-400">
+          {projet.description}
+        </p>
       )}
       <LienDepot projet={projet} />
       {/* Les cartes d'une rangée ont la même hauteur : le pied est poussé en
@@ -197,8 +206,16 @@ export default function ProjetCarte({
         <Compteurs projet={projet} />
         {/* Une seule rangée d'actions, alignée à droite, qui se replie
             proprement : File, Mettre en ligne, Lancer (ticket-557). */}
-        <div data-testid="actions-de-carte" className="flex flex-wrap items-start justify-end gap-1.5">
-          <LancerFile projet={projet} fileEnCours={fileEnCours} onLancee={onFileLancee} />
+        <div
+          data-testid="actions-de-carte"
+          className="flex flex-wrap items-start justify-end gap-1.5"
+        >
+          <LancerFile
+            projet={projet}
+            fileEnCours={fileEnCours}
+            dejaEnFile={dejaEnFile}
+            onLancee={onFileLancee}
+          />
           <BoutonMiseEnLigne projet={projet} />
           <BoutonServices projet={projet} onChange={onServicesChange} />
         </div>

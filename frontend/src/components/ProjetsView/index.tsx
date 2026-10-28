@@ -49,7 +49,11 @@ function Squelette() {
   );
 }
 
-function Message({ texte, action, onAction }: {
+function Message({
+  texte,
+  action,
+  onAction,
+}: {
   texte: string;
   action?: string;
   onAction?: () => void;
@@ -85,7 +89,10 @@ export default function ProjetsView({
   enAttente,
   runs = [],
 }: ProjetsViewProps) {
-  const { data, loading, error, refresh } = useResource(lireVueDEnsemble, AUCUN);
+  const { data, loading, error, refresh } = useResource(
+    lireVueDEnsemble,
+    AUCUN,
+  );
   const [memorises, setFiltres] = useEtatPersistant<FiltresProjets>(
     "projets.vue",
     FILTRES_PAR_DEFAUT,
@@ -98,7 +105,8 @@ export default function ProjetsView({
   const pastilles = pastillesDeCategories(data);
   // Une catégorie mémorisée mais disparue (retirée depuis) ne doit pas vider la vue.
   const filtres: FiltresProjets =
-    memorises.categorie !== null && !pastilles.some((p) => p.valeur === memorises.categorie)
+    memorises.categorie !== null &&
+    !pastilles.some((p) => p.valeur === memorises.categorie)
       ? { ...memorises, categorie: null }
       : memorises;
   const categories = pastilles
@@ -113,7 +121,9 @@ export default function ProjetsView({
       refresh();
       notifierProjetsModifies();
     } catch (e) {
-      setEchec(e instanceof Error ? e.message : "Changement de catégorie impossible");
+      setEchec(
+        e instanceof Error ? e.message : "Changement de catégorie impossible",
+      );
     }
   }
 
@@ -127,6 +137,9 @@ export default function ProjetsView({
   }
 
   function carte(projet: ProjectOverview) {
+    const file = runs.find(
+      (r) => r.project_id === projet.id && r.mode === "queue",
+    );
     return (
       <ProjetCarte
         key={projet.id}
@@ -141,9 +154,8 @@ export default function ProjetsView({
         onChangerCategorie={(c) => void changerCategorie(projet, c)}
         onServicesChange={refresh}
         onFileLancee={refresh}
-        fileEnCours={
-          runs.find((r) => r.project_id === projet.id && r.mode === "queue")?.run_id ?? null
-        }
+        fileEnCours={file?.run_id ?? null}
+        dejaEnFile={file?.file_restants ?? []}
       />
     );
   }
@@ -158,7 +170,9 @@ export default function ProjetsView({
       <Message
         texte="Aucun projet ne correspond."
         action="Effacer la recherche"
-        onAction={() => setFiltres({ ...filtres, recherche: "", categorie: null })}
+        onAction={() =>
+          setFiltres({ ...filtres, recherche: "", categorie: null })
+        }
       />
     ) : (
       <Message texte="Aucun projet pour l'instant." />
@@ -171,9 +185,13 @@ export default function ProjetsView({
         {grouperParCategorie(visibles).map((groupe) => {
           // Une recherche active montre ses résultats même dans une catégorie
           // repliée, sans toucher à l'état mémorisé (ticket-400).
-          const repliee = estRepliee(groupe.categorie) && !filtres.recherche.trim();
+          const repliee =
+            estRepliee(groupe.categorie) && !filtres.recherche.trim();
           return (
-            <section key={groupe.categorie ?? "__sans__"} className="flex flex-col gap-2">
+            <section
+              key={groupe.categorie ?? "__sans__"}
+              className="flex flex-col gap-2"
+            >
               <h2>
                 <EnTeteDeCategorie
                   categorie={groupe.categorie}
@@ -182,7 +200,9 @@ export default function ProjetsView({
                   onBasculer={() => basculer(groupe.categorie)}
                 />
               </h2>
-              {!repliee && <div className={GRILLE}>{groupe.projets.map(carte)}</div>}
+              {!repliee && (
+                <div className={GRILLE}>{groupe.projets.map(carte)}</div>
+              )}
             </section>
           );
         })}

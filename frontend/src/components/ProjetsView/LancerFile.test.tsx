@@ -59,11 +59,13 @@ function afficher(
   surSelection = vi.fn(),
   surLancee = vi.fn(),
   fileEnCours: string | null = null,
+  dejaEnFile: string[] = [],
 ) {
   render(
     <ProjetCarte
       projet={p}
       fileEnCours={fileEnCours}
+      dejaEnFile={dejaEnFile}
       actif={false}
       categories={[]}
       onSelect={surSelection}
@@ -80,9 +82,15 @@ beforeEach(() => {
 
 describe("LancerFile", () => {
   it("shows no queue button when the project has nothing to do", () => {
-    afficher(projet({ tickets: { todo: 0, in_progress: 0, in_review: 0, blocked: 0, done: 4 } }));
+    afficher(
+      projet({
+        tickets: { todo: 0, in_progress: 0, in_review: 0, blocked: 0, done: 4 },
+      }),
+    );
 
-    expect(screen.queryByRole("button", { name: /^File/ })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^File/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("disables the queue button and says why while a single-ticket run is open", () => {
@@ -99,13 +107,21 @@ describe("LancerFile", () => {
       tickets: [ticket("ticket-7", "todo"), ticket("ticket-3", "todo")],
       unreadable: [],
     });
-    append.mockResolvedValue({ ajoutes: ["ticket-3"], ignores: { "ticket-7": "déjà dans la file" }, refuses: {} });
+    append.mockResolvedValue({
+      ajoutes: ["ticket-3"],
+      ignores: { "ticket-7": "déjà dans la file" },
+      refuses: {},
+    });
     const surSelection = vi.fn();
     const surLancee = vi.fn();
     afficher(projet({ run_actif: true }), surSelection, surLancee, "run-42");
 
-    await userEvent.click(screen.getByRole("button", { name: "Ajouter à la file (3)" }));
-    expect(screen.getByText("Ajouter 3 tickets à la file en cours ?")).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Ajouter à la file (3)" }),
+    );
+    expect(
+      screen.getByText("Ajouter 3 tickets à la file en cours ?"),
+    ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Ajouter" }));
 
     await waitFor(() => expect(surLancee).toHaveBeenCalledTimes(1));
@@ -115,15 +131,69 @@ describe("LancerFile", () => {
     expect(surSelection).not.toHaveBeenCalled();
   });
 
-  it("shows the backend message when the queue can no longer take tickets", async () => {
-    list.mockResolvedValue({ tickets: [ticket("ticket-1", "todo")], unreadable: [] });
-    append.mockRejectedValue(new Error("API 409: Ce run n'est pas une file en cours"));
-    afficher(projet({ run_actif: true }), vi.fn(), vi.fn(), "run-42");
+  it("counts and offers only the todo tickets the running queue does not hold yet", async () => {
+    list.mockResolvedValue({
+      tickets: [
+        ticket("ticket-7", "todo"),
+        ticket("ticket-3", "todo"),
+        ticket("ticket-9", "todo"),
+      ],
+      unreadable: [],
+    });
+    append.mockResolvedValue({
+      ajoutes: ["ticket-9"],
+      ignores: {},
+      refuses: {},
+    });
+    afficher(projet({ run_actif: true }), vi.fn(), vi.fn(), "run-42", [
+      "ticket-3",
+      "ticket-7",
+    ]);
 
-    await userEvent.click(screen.getByRole("button", { name: "Ajouter à la file (3)" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Ajouter à la file (1)" }),
+    );
     await userEvent.click(screen.getByRole("button", { name: "Ajouter" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("La file en cours n'accepte plus de tickets.");
+    await waitFor(() =>
+      expect(append).toHaveBeenCalledWith("run-42", ["ticket-9"]),
+    );
+  });
+
+  it("says everything is queued instead of offering to add again", () => {
+    afficher(projet({ run_actif: true }), vi.fn(), vi.fn(), "run-42", [
+      "ticket-1",
+      "ticket-2",
+      "ticket-3",
+    ]);
+
+    expect(
+      screen.queryByRole("button", { name: /Ajouter à la file/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Tout est dans la file")).toHaveAttribute(
+      "role",
+      "status",
+    );
+  });
+
+  it("shows the backend message when the queue can no longer take tickets", async () => {
+    list.mockResolvedValue({
+      tickets: [ticket("ticket-1", "todo")],
+      unreadable: [],
+    });
+    append.mockRejectedValue(
+      new Error("API 409: Ce run n'est pas une file en cours"),
+    );
+    afficher(projet({ run_actif: true }), vi.fn(), vi.fn(), "run-42");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Ajouter à la file (3)" }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Ajouter" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "La file en cours n'accepte plus de tickets.",
+    );
   });
 
   it("asks for confirmation on first click without launching or selecting the card", async () => {
@@ -144,7 +214,9 @@ describe("LancerFile", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Annuler" }));
 
-    expect(screen.getByRole("button", { name: "File (3)" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "File (3)" }),
+    ).toBeInTheDocument();
     expect(run).not.toHaveBeenCalled();
   });
 
@@ -177,7 +249,10 @@ describe("LancerFile", () => {
   });
 
   it("shows an error message when the backend answers 409", async () => {
-    list.mockResolvedValue({ tickets: [ticket("ticket-1", "todo")], unreadable: [] });
+    list.mockResolvedValue({
+      tickets: [ticket("ticket-1", "todo")],
+      unreadable: [],
+    });
     run.mockRejectedValue(new Error("API 409: run already open"));
     const surLancee = vi.fn();
     afficher(projet(), vi.fn(), surLancee);
@@ -185,7 +260,9 @@ describe("LancerFile", () => {
     await userEvent.click(screen.getByRole("button", { name: "File (3)" }));
     await userEvent.click(screen.getByRole("button", { name: "Lancer" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Un run est déjà en cours");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Un run est déjà en cours",
+    );
     expect(surLancee).not.toHaveBeenCalled();
   });
 

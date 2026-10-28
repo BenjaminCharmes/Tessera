@@ -6,14 +6,26 @@ import type { StreamState } from "../../hooks/streamState";
 import { useActivites } from "../../hooks/useActivites";
 import { useSonsDeLaPiece } from "../../hooks/useSonsDeLaPiece";
 import { signauxSonores } from "../../lib/bureau/sons";
-import { machineEnService, placerLesAgents, postesFaits } from "../../lib/bureau/activites";
+import {
+  machineEnService,
+  placerLesAgents,
+  postesFaits,
+} from "../../lib/bureau/activites";
 import type { Hasard } from "../../lib/bureau/activites";
 import { bulleDOutil } from "../../lib/bureau/bulleDOutil";
-import { copieVisible,libelleDeLaCopie, retourDeCopie } from "../../lib/bureau/copie";
+import {
+  copieVisible,
+  libelleDeLaCopie,
+  retourDeCopie,
+} from "../../lib/bureau/copie";
 import { dayMoment } from "../../lib/bureau/dayMoment";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
-import { contourEnCelebration, enFete, gyrophareAllume } from "../../lib/bureau/fete";
+import {
+  contourEnCelebration,
+  enFete,
+  gyrophareAllume,
+} from "../../lib/bureau/fete";
 import StatusPill from "../../design/ui/StatusPill";
 import { libelleDeSuite } from "../../lib/bureau/etapeDeSuite";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
@@ -86,7 +98,11 @@ export default function Piece({
   // La PR mergée, ou la CI rouge : deux faits de la phase 2, lus dans les événements (ticket-598).
   const fete = enFete(etat, maintenant);
   const gyrophare = gyrophareAllume(etat);
-  const contour = contourEnCelebration(contourDeLaPiece(etat, sante), fete, gyrophare);
+  const contour = contourEnCelebration(
+    contourDeLaPiece(etat, sante),
+    fete,
+    gyrophare,
+  );
   const enCours = postes.some((p) => p.etat === "occupe");
   // Le dernier appel d'outil, dit en une ligne au-dessus du poste de l'agent (ticket-601).
   const outil = bulleDOutil(etat, maintenant);
@@ -101,8 +117,19 @@ export default function Piece({
   // Un agent chez le directeur ou aux RH n'est plus à sa place : il ne se dessine qu'à un endroit.
   const absents = postesAbsents(etat, maintenant);
   // Le refus du reviewer ou du validateur : il rapporte sa copie au codeur qui repart (ticket-599).
-  const copie = copieVisible(retourDeCopie(etat, maintenant), { faits, absents, clos, fete });
-  const agents = placerLesAgents(faits, activites, clos, fete, copie?.poste ?? null).map((a) =>
+  const copie = copieVisible(retourDeCopie(etat, maintenant), {
+    faits,
+    absents,
+    clos,
+    fete,
+  });
+  const agents = placerLesAgents(
+    faits,
+    activites,
+    clos,
+    fete,
+    copie?.poste ?? null,
+  ).map((a) =>
     absents.includes(a.poste) ? { ...a, activite: null, parti: true } : a,
   );
   // Fanfare, alarme, glouglou, frappes : ce que la pièce vient de montrer, dit à voix haute (ticket-603).
@@ -119,15 +146,32 @@ export default function Piece({
       className={`overflow-hidden rounded-lg border bg-zinc-900 ${CONTOURS[contour]}`}
     >
       <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">
-        <h3 className="truncate text-corps font-semibold text-zinc-200">{projet}</h3>
+        <h3 className="truncate text-corps font-semibold text-zinc-200">
+          {projet}
+        </h3>
         <div className="flex items-center gap-2">
           {/* Ce que la pièce dit d'elle-même : la fête, la copie rendue, la santé, ou l'étape sans poste. */}
           {fete && <StatusPill etat="reussi" libelle="PR mergée" />}
-          {copie !== null && <StatusPill etat="en-cours" libelle={libelleDeLaCopie(copie)} />}
+          {copie !== null && (
+            <StatusPill etat="en-cours" libelle={libelleDeLaCopie(copie)} />
+          )}
           {!fete && copie === null && enCours && <Pastille sante={sante} />}
-          {!fete && !enCours && suite && <StatusPill etat="en-cours" libelle={suite} />}
-          <BoutonServices services={services} libelleDuProjet={projet} enPastille />
-          {run && <ActionsDuRun run={run} etat={etat} onOuvrir={onOuvrir} onRanger={onRanger} />}
+          {!fete && !enCours && suite && (
+            <StatusPill etat="en-cours" libelle={suite} />
+          )}
+          <BoutonServices
+            services={services}
+            libelleDuProjet={projet}
+            enPastille
+          />
+          {run && (
+            <ActionsDuRun
+              run={run}
+              etat={etat}
+              onOuvrir={onOuvrir}
+              onRanger={onRanger}
+            />
+          )}
         </div>
       </div>
       <div data-sol="lames" className="sol-lames relative">
@@ -142,7 +186,6 @@ export default function Piece({
             onBasculerLumiere={basculerLumiere}
             runId={runId}
             services={services}
-            onOuvrir={onOuvrir}
             onOpenProject={onOpenProject && (() => onOpenProject(projet))}
           />
           <div className="grid h-40 grid-cols-5 items-end gap-1 border-b-8 border-transparent px-2.5">

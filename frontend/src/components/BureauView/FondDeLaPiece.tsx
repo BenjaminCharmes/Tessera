@@ -52,14 +52,23 @@ interface FondDeLaPieceProps {
   runId: string | null;
   /** Les services du projet, lus par la pièce : la baie les montre. */
   services: UseServicesResult;
-  /** Ouvre le fil du run : la pile de dossiers en est le raccourci (ticket-602). */
-  onOuvrir?: (runId: string) => void;
   /** Ouvre le projet dans l'onglet Tickets : la porte en devient un bouton. Sans lui, elle reste un meuble. */
   onOpenProject?: () => void;
 }
 
+/** La porte dépasse les agents d'une tête : à l'échelle commune, elle était plus petite qu'eux (ticket-622). */
+const ECHELLE_DE_LA_PORTE = 1.5;
+
 /** Un objet posé contre le mur, à une abscisse du repère : au sol, ou accroché à `bas` du sol. */
-function Pose({ x, bas = "bottom-0", children }: { x: number; bas?: string; children: ReactNode }) {
+function Pose({
+  x,
+  bas = "bottom-0",
+  children,
+}: {
+  x: number;
+  bas?: string;
+  children: ReactNode;
+}) {
   return (
     <span className={`absolute ${bas}`} style={{ left: enPourcentDuSol(x) }}>
       {children}
@@ -82,7 +91,6 @@ export default function FondDeLaPiece({
   onBasculerLumiere,
   runId,
   services,
-  onOuvrir,
   onOpenProject,
 }: FondDeLaPieceProps) {
   const moment = dayMoment(maintenant);
@@ -110,7 +118,11 @@ export default function FondDeLaPiece({
         </Pose>
       ))}
       <Pose x={TABLEAU_X} bas="top-5">
-        <TableauDesCriteres projet={projet} etat={etat} relatif={TABLEAU_RELATIF} />
+        <TableauDesCriteres
+          projet={projet}
+          etat={etat}
+          relatif={TABLEAU_RELATIF}
+        />
       </Pose>
       <Pose x={FICUS_X}>
         <Agrandi>
@@ -123,7 +135,12 @@ export default function FondDeLaPiece({
             <Imprimante />
           </Agrandi>
           <span className="absolute right-1" style={{ bottom: dessusDuMeuble }}>
-            <Dossiers projet={projet} runId={runId} etat={etat} onOuvrir={onOuvrir} />
+            <Dossiers
+              projet={projet}
+              runId={runId}
+              etat={etat}
+              onActiver={onOpenProject}
+            />
           </span>
         </span>
       </Pose>
@@ -149,7 +166,11 @@ export default function FondDeLaPiece({
         <BoiteAuxLettres projet={projet} etat={etat} />
       </Pose>
       <Pose x={INTERRUPTEUR_X} bas="bottom-10">
-        <BoutonLumiere salle={projet} allume={allume} onBasculer={onBasculerLumiere} />
+        <BoutonLumiere
+          salle={projet}
+          allume={allume}
+          onBasculer={onBasculerLumiere}
+        />
       </Pose>
       <Pose x={PORTE_X}>
         {onOpenProject ? (
@@ -159,12 +180,12 @@ export default function FondDeLaPiece({
             onClick={onOpenProject}
             className="block cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
           >
-            <Agrandi>
+            <Agrandi relatif={ECHELLE_DE_LA_PORTE}>
               <Porte />
             </Agrandi>
           </button>
         ) : (
-          <Agrandi>
+          <Agrandi relatif={ECHELLE_DE_LA_PORTE}>
             <Porte />
           </Agrandi>
         )}

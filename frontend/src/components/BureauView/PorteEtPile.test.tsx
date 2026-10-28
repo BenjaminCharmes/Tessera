@@ -27,7 +27,10 @@ beforeEach(() => {
   _viderCacheResource();
   vi.spyOn(api.services, "list").mockResolvedValue([]);
   vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
-  vi.spyOn(api.tickets, "list").mockResolvedValue({ tickets: [], unreadable: [] });
+  vi.spyOn(api.tickets, "list").mockResolvedValue({
+    tickets: [],
+    unreadable: [],
+  });
   vi.spyOn(statutsDuRun, "lire").mockResolvedValue({
     project_id: "ide-core",
     mode: "queue",
@@ -47,9 +50,18 @@ afterEach(() => {
 describe("Piece door", () => {
   it("names the project on the door and hands it to onOpenProject on click", () => {
     const onOpenProject = vi.fn();
-    render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} onOpenProject={onOpenProject} />);
+    render(
+      <Piece
+        projet="ide-core"
+        etat={INITIAL}
+        maintenant={T0}
+        onOpenProject={onOpenProject}
+      />,
+    );
 
-    fireEvent.click(screen.getByRole("button", { name: "Ouvrir le projet ide-core" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Ouvrir le projet ide-core" }),
+    );
 
     expect(onOpenProject).toHaveBeenCalledTimes(1);
     expect(onOpenProject).toHaveBeenCalledWith("ide-core");
@@ -58,40 +70,67 @@ describe("Piece door", () => {
   it("draws no door button when nobody listens", () => {
     render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
 
-    expect(screen.queryByRole("button", { name: /Ouvrir le projet/ })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /Ouvrir le projet/ }),
+    ).toBeNull();
   });
 });
 
 describe("Piece pile of folders", () => {
-  it("opens the same fil as the Fil button", async () => {
-    const onOuvrir = vi.fn();
+  it("opens the project's tickets, as the door does", async () => {
+    const onOpenProject = vi.fn();
     render(
-      <Piece projet="ide-core" etat={INITIAL} maintenant={T0} runId="run-1" run={RUN} onOuvrir={onOuvrir} />,
+      <Piece
+        projet="ide-core"
+        etat={INITIAL}
+        maintenant={T0}
+        runId="run-1"
+        run={RUN}
+        onOpenProject={onOpenProject}
+      />,
     );
 
-    fireEvent.click(await screen.findByRole("button", { name: "Tickets restants : 2" }));
-    fireEvent.click(screen.getByRole("button", { name: "Ouvrir le fil de ticket-001" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Tickets restants : 2" }),
+    );
 
-    expect(onOuvrir).toHaveBeenCalledTimes(2);
-    expect(onOuvrir.mock.calls[0]).toEqual(onOuvrir.mock.calls[1]);
-    expect(onOuvrir).toHaveBeenCalledWith("run-1");
+    expect(onOpenProject).toHaveBeenCalledWith("ide-core");
   });
 
-  it("opens the fil from the keyboard", async () => {
-    const onOuvrir = vi.fn();
+  it("opens the tickets from the keyboard", async () => {
+    const onOpenProject = vi.fn();
     render(
-      <Piece projet="ide-core" etat={INITIAL} maintenant={T0} runId="run-1" run={RUN} onOuvrir={onOuvrir} />,
+      <Piece
+        projet="ide-core"
+        etat={INITIAL}
+        maintenant={T0}
+        runId="run-1"
+        run={RUN}
+        onOpenProject={onOpenProject}
+      />,
     );
 
-    const pile = await screen.findByRole("button", { name: "Tickets restants : 2" });
+    const pile = await screen.findByRole("button", {
+      name: "Tickets restants : 2",
+    });
     fireEvent.keyDown(pile, { key: "Enter" });
 
-    await waitFor(() => expect(onOuvrir).toHaveBeenCalledWith("run-1"));
+    await waitFor(() => expect(onOpenProject).toHaveBeenCalledWith("ide-core"));
   });
 
-  it("stays a plain group when no fil can be opened", async () => {
-    render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} runId="run-1" run={RUN} />);
+  it("stays a plain group when no project can be opened", async () => {
+    render(
+      <Piece
+        projet="ide-core"
+        etat={INITIAL}
+        maintenant={T0}
+        runId="run-1"
+        run={RUN}
+      />,
+    );
 
-    expect(await screen.findByRole("group", { name: "Tickets restants : 2" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("group", { name: "Tickets restants : 2" }),
+    ).toBeInTheDocument();
   });
 });
