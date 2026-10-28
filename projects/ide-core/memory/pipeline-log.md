@@ -5781,3 +5781,4 @@ Le diff ajoute :
 - 2026-10-28 08:44:40 UTC — [ticket-604] tour 2 — reviewer terminé (19485ms)
 - 2026-10-28 08:46:51 UTC — [ticket-604] validateur: APPROVED — Tous les critères sont respectés. Le ticket ajoute une colonne `cache_creation_t (150672ms)
 - 2026-10-28 08:46:51 UTC — [ticket-604] APPROVED après 2 tour(s)
+- 2026-10-28 08:47:58 UTC — [ticket-604] documentation: 0 fichier(s) (61577ms)
