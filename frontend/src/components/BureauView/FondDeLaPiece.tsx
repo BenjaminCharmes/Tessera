@@ -28,8 +28,8 @@ import TableauDesCriteres from "./TableauDesCriteres";
  * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
  */
 const TABLEAU_X = 30;
-// Resserrées derrière un tableau plus étroit : la bibliothèque prend la place libérée (ticket-627).
-const FENETRES_X = [150, 212, 616] as const;
+// Fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le tableau et le ficus (ticket-627).
+const FENETRES_X = [119, 269, 616] as const;
 const PLAFONNIERS_X = [250, 432, 590] as const;
 const FICUS_X = 348;
 const IMPRIMANTE_X = 392;
@@ -38,7 +38,7 @@ const CACTUS_X = 572;
 const BOITE_X = 676;
 const INTERRUPTEUR_X = 716;
 /** Le tableau blanc, un peu plus grand que le reste : il tient la moitié de la hauteur du mur. */
-const TABLEAU_RELATIF = 1.07;
+const TABLEAU_RELATIF = 1.15;
 
 interface FondDeLaPieceProps {
   projet: string;

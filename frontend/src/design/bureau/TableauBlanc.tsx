@@ -9,22 +9,77 @@ interface TableauBlancProps {
 /** Six lignes par colonne ; au-delà de six critères, une seconde colonne, puis on s'arrête. */
 const LIGNES_PAR_COLONNE = 6;
 const CASES_MAX = 2 * LIGNES_PAR_COLONNE;
+/** Une ligne tous les quatre pixels : une case de 3 × 3 et sa marge. */
+const PAS = 4;
+
+/** La marque d'une case cochée et d'une case refusée, en pixels de la case 3 × 3. */
+const COCHE = [
+  [2, 0],
+  [0, 1],
+  [2, 1],
+  [1, 2],
+] as const;
+const CROIX = [
+  [0, 0],
+  [2, 0],
+  [1, 1],
+  [0, 2],
+  [2, 2],
+] as const;
+
+function Case({ x, y, etat }: { x: number; y: number; etat: EtatCase }) {
+  const marque = etat === "passe" ? COCHE : etat === "echoue" ? CROIX : null;
+  return (
+    <>
+      <rect x={x} y={y} width="3" height="3" className={TON_CASE.attente} />
+      <rect
+        x={x + 1}
+        y={y + 1}
+        width="1"
+        height="1"
+        className="fill-(--sprite-tableau)"
+      />
+      {marque && (
+        <>
+          <rect
+            x={x}
+            y={y}
+            width="3"
+            height="3"
+            className="fill-(--sprite-tableau)"
+          />
+          {marque.map(([dx, dy]) => (
+            <rect
+              key={`${dx}-${dy}`}
+              x={x + dx}
+              y={y + dy}
+              width="1"
+              height="1"
+              className={TON_CASE[etat]}
+            />
+          ))}
+        </>
+      )}
+    </>
+  );
+}
 
 /**
- * Le tableau blanc au mur de la pièce, grille 32 × 14 (96 × 42 px). Une ligne par
- * critère : grise tant que rien n'est jugé, verte si le critère passe, rouge sinon
- * (ADR-058). Le libellé accessible est porté par l'objet qui l'enveloppe.
- * Il faisait 132 px : rétréci, il laisse au mur la place de trois fenêtres et
- * d'une bibliothèque (ticket-627).
+ * Le tableau blanc au mur de la pièce, grille 32 × 26 (64 × 52 px). Une case et une
+ * ligne par critère : case vide et ligne grise tant que rien n'est jugé, case cochée
+ * et ligne verte si le critère passe, croix et ligne rouge sinon (ADR-058). Le
+ * libellé accessible est porté par l'objet qui l'enveloppe. Il faisait 132 px de
+ * large : rétréci et rehaussé, il laisse au mur la place de trois fenêtres et d'une
+ * bibliothèque, et ses cases se lisent (ticket-627).
  */
 export default function TableauBlanc({ cases }: TableauBlancProps) {
   const colonnes = cases.length > LIGNES_PAR_COLONNE ? 2 : 1;
-  const largeur = colonnes === 2 ? 13 : 28;
+  const largeur = colonnes === 2 ? 10 : 24;
   return (
     <svg
-      width="96"
-      height="42"
-      viewBox="0 0 32 14"
+      width="64"
+      height="52"
+      viewBox="0 0 32 26"
       shapeRendering="crispEdges"
       aria-hidden="true"
       data-sprite="tableau-blanc"
@@ -33,27 +88,32 @@ export default function TableauBlanc({ cases }: TableauBlancProps) {
         x="0"
         y="0"
         width="32"
-        height="14"
+        height="26"
         className="fill-(--sprite-tableau-cadre)"
       />
       <rect
         x="1"
         y="1"
         width="30"
-        height="12"
+        height="24"
         className="fill-(--sprite-tableau)"
       />
-      {cases.slice(0, CASES_MAX).map((etat, i) => (
-        <rect
-          key={i}
-          x={2 + Math.floor(i / LIGNES_PAR_COLONNE) * 15}
-          y={2 + (i % LIGNES_PAR_COLONNE) * 2}
-          width={largeur}
-          height="1"
-          className={TON_CASE[etat]}
-          data-case={etat}
-        />
-      ))}
+      {cases.slice(0, CASES_MAX).map((etat, i) => {
+        const x = 2 + Math.floor(i / LIGNES_PAR_COLONNE) * 15;
+        const y = 2 + (i % LIGNES_PAR_COLONNE) * PAS;
+        return (
+          <g key={i} data-case={etat}>
+            <Case x={x} y={y} etat={etat} />
+            <rect
+              x={x + 4}
+              y={y + 1}
+              width={largeur}
+              height="1"
+              className={TON_CASE[etat]}
+            />
+          </g>
+        );
+      })}
     </svg>
   );
 }

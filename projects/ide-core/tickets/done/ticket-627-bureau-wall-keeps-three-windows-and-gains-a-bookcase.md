@@ -23,16 +23,20 @@ préfère garder trois fenêtres pour la taille de la pièce, quitte à resserre
 qui est en place et à rétrécir le tableau blanc.
 
 ## Solution proposée
-- Le tableau blanc passe de 132 à 96 px de large (grille 32 × 14). Il garde six
-  lignes par colonne et deux colonnes au plus.
-- Les deux premières fenêtres se resserrent derrière lui (`FENETRES_X`).
-- La bibliothèque, mobilier toujours dessiné et sans voyant, se pose au sol entre
-  la deuxième fenêtre et le ficus. Son abscisse est `BIBLIOTHEQUE_X` dans
-  `lib/bureau/activites.ts`, pour que le ticket-624 y ancre les rédacteurs.
+- Le tableau blanc passe de 132 × 42 à 64 × 52 px (grille 32 × 26). Il garde six
+  lignes par colonne et deux colonnes au plus, et chaque ligne porte une case :
+  vide tant que rien n'est jugé, cochée quand le critère passe, une croix sinon.
+- Le mur se lit fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le
+  tableau et le ficus (`FENETRES_X`).
+- La bibliothèque, mobilier toujours dessiné et sans voyant, a trois rangées de
+  livres différentes ; la dernière étagère fait le bas du meuble. Son abscisse est
+  `BIBLIOTHEQUE_X` dans `lib/bureau/activites.ts`, pour que le ticket-624 y ancre
+  les rédacteurs.
 
 ## Critères d'acceptation
 - [x] `FENETRES_X` compte toujours trois fenêtres
-- [x] `TableauBlanc.tsx` dessine une grille de 32 × 14
+- [x] `TableauBlanc.tsx` dessine une grille de 32 × 26, une case par critère
+- [x] Un test de `TableauBlanc` vérifie la case vide, la coche et la croix
 - [x] `FondDeLaPiece.tsx` pose `Bibliotheque` à `BIBLIOTHEQUE_X`
 - [x] Captures à 1920 et 1536 relues : aucun objet du mur n'en chevauche un autre
 
