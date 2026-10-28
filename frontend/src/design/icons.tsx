@@ -87,6 +87,12 @@ export const IconPlus = (p: IconProps) => (
   </Icon>
 );
 
+export const IconMinus = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5.5 12h13" />
+  </Icon>
+);
+
 export const IconBoard = (p: IconProps) => (
   <Icon {...p}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="2" />

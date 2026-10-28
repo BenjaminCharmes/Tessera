@@ -148,6 +148,17 @@ describe("Supervision — vue par défaut et sélecteur", () => {
     expect(screen.getByLabelText("Services lancés")).toHaveTextContent("backend");
   });
 
+  it("zooms the office only, and remembers the choice", async () => {
+    // Dézoomer le navigateur rendait le reste de l'app illisible (ticket-657).
+    window.localStorage.clear();
+    render(<SupervisionView supervision={supervision([])} projects={[]} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Dézoomer le Bureau" }));
+
+    expect(document.querySelector("[data-zoom]")).toHaveAttribute("data-zoom", "0.9");
+    expect(screen.getByRole("group", { name: "Zoom du Bureau" })).toHaveTextContent("90 %");
+  });
+
   it("keeps the office without a run, and says nothing is running where the rooms would be", () => {
     // Le 28/10, sans run, un message remplaçait tout le Bureau : salles du haut,
     // « À toi » et employé de la semaine disparaissaient (ticket-636).
