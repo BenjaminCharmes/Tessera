@@ -5821,3 +5821,20 @@ Le diff ajoute :
 - 2026-10-28 10:44:14 UTC — [ticket-611] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le ticket contient une réponse c (243890ms)
 - 2026-10-28 10:44:14 UTC — [ticket-611] APPROVED après 1 tour(s)
 - 2026-10-28 10:48:41 UTC — [ticket-611] documentation: 1 fichier(s) (259469ms) — après tour de correction
+- 2026-10-28 11:04:41 UTC — [ide-core] ticket-611 PR #710 mergée (CI verte)
+- 2026-10-28 11:04:53 UTC — [ide-core] ticket-611 : base réalignée sur develop
+- 2026-10-28 11:04:53 UTC — [ide-core] ticket-611 PR #710 confiée au CIWatcher
+- 2026-10-28 11:05:14 UTC — [ticket-612] branche ticket-612-providers-accept-a-json-schema-and-return-the-val
+- 2026-10-28 11:05:23 UTC — [ticket-612] tour 1 — codeur démarré
+- 2026-10-28 11:10:53 UTC — [ticket-612] tour 1 — codeur terminé (330296ms)
+- 2026-10-28 11:19:16 UTC — [ticket-612] testeur: 1 failed, 1643 passed, 64 warnings in 499.74s (0:08:19)
+- 2026-10-28 11:19:16 UTC — [ticket-612] tests rouges au tour 1
+- 2026-10-28 11:19:16 UTC — [ticket-612] tour 2 — codeur démarré
+- 2026-10-28 11:21:28 UTC — [ticket-612] tour 2 — codeur terminé (131672ms)
+- 2026-10-28 11:29:05 UTC — [ticket-612] testeur: OK (exit 0)
+- 2026-10-28 11:31:02 UTC — [ticket-612] securite: PASS — Aucune vulnérabilité détectée. Ce diff ajoute le support des schémas JSON pour l (116875ms)
+- 2026-10-28 11:31:02 UTC — [ticket-612] tour 2 — reviewer démarré
+- 2026-10-28 11:31:23 UTC — [ticket-612] tour 2 — reviewer terminé (21234ms)
+- 2026-10-28 11:36:02 UTC — [ticket-612] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 11:36:48 UTC — [ticket-612] validateur: APPROVED — Les sept critères sont satisfaits : `ProviderResult.structured` est défini dans  (345484ms)
+- 2026-10-28 11:36:48 UTC — [ticket-612] APPROVED après 2 tour(s)
