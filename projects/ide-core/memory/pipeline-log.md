@@ -5930,3 +5930,20 @@ Le diff ajoute :
 - 2026-10-28 14:55:34 UTC — [ticket-616] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (136937ms)
 - 2026-10-28 14:55:34 UTC — [ticket-616] APPROVED après 1 tour(s)
 - 2026-10-28 14:57:37 UTC — [ticket-616] documentation: 0 fichier(s) (116500ms)
+- 2026-10-28 15:13:34 UTC — [ide-core] ticket-616 PR #725 mergée (CI verte)
+- 2026-10-28 15:13:36 UTC — [ide-core] ticket-616 : base réalignée sur develop
+- 2026-10-28 15:13:36 UTC — [ide-core] ticket-616 PR #725 confiée au CIWatcher
+- 2026-10-28 15:13:39 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 15:13:40 UTC — [ticket-617] tour 1 — codeur démarré
+- 2026-10-28 15:15:17 UTC — [ticket-617] tour 1 — codeur terminé (96984ms)
+- 2026-10-28 15:24:08 UTC — [ticket-617] testeur: 1 failed, 2506 passed, 64 warnings in 528.49s (0:08:48)
+- 2026-10-28 15:24:08 UTC — [ticket-617] tests rouges au tour 1
+- 2026-10-28 15:24:08 UTC — [ticket-617] tour 2 — codeur démarré
+- 2026-10-28 15:24:32 UTC — [ticket-617] tour 2 — codeur terminé (23813ms)
+- 2026-10-28 15:34:50 UTC — [ticket-617] testeur: OK (exit 0)
+- 2026-10-28 15:37:04 UTC — [ticket-617] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code implémente une validatio (134156ms)
+- 2026-10-28 15:37:04 UTC — [ticket-617] tour 2 — reviewer démarré
+- 2026-10-28 15:37:57 UTC — [ticket-617] tour 2 — reviewer terminé (51640ms)
+- 2026-10-28 15:39:37 UTC — [ticket-617] validateur: fichiers cités joints : agents.json
+- 2026-10-28 15:39:37 UTC — [ticket-617] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (152671ms)
+- 2026-10-28 15:39:37 UTC — [ticket-617] APPROVED après 2 tour(s)
