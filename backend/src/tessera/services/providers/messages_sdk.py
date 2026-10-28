@@ -33,3 +33,26 @@ def _usage_from(result: Any) -> tuple[int, int, int, int]:
         int(usage.get("cache_read_input_tokens", 0) or 0),
         int(usage.get("cache_creation_input_tokens", 0) or 0),
     )
+
+
+#: Le nom de l'outil interne par lequel le CLI rend la sortie structurée : il
+#: n'est pas un outil de l'agent et ne part pas dans `on_tool_use`.
+OUTIL_SORTIE_STRUCTUREE = "StructuredOutput"
+
+
+def _structured_from(result: Any) -> dict[str, Any] | None:
+    """Extracts the validated structured output of a ResultMessage, or ``None``.
+
+    Un ``success`` sans sortie, le sous-type d'échec des relances du SDK
+    (``error_max_structured_output_retries``) et une valeur qui n'est pas un
+    objet rendent tous ``None`` : c'est au service de refuser.
+    """
+    if getattr(result, "subtype", None) != "success":
+        return None
+    sortie = getattr(result, "structured_output", None)
+    return sortie if isinstance(sortie, dict) else None
+
+
+def _format_de_sortie(schema: dict[str, Any] | None) -> dict[str, Any] | None:
+    """The SDK's ``output_format`` asking for ``schema``, or ``None`` without one."""
+    return None if schema is None else {"type": "json_schema", "schema": schema}

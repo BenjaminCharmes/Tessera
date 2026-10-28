@@ -102,6 +102,7 @@ class ProviderEnregistrant:
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         """Forward to inner, then record."""
         kw: dict[str, Any] = {}
@@ -111,6 +112,8 @@ class ProviderEnregistrant:
             kw["ask_user"] = ask_user
         if session is not None:
             kw["session"] = session
+        if schema is not None:
+            kw["schema"] = schema
         t0 = time.monotonic()
         result = await self._inner.complete(
             system=system, user=user, model=model, max_tokens=max_tokens, **kw
@@ -131,6 +134,7 @@ class ProviderEnregistrant:
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         """Forward to inner, then record."""
         kw: dict[str, Any] = {}
@@ -144,6 +148,8 @@ class ProviderEnregistrant:
             kw["ask_user"] = ask_user
         if session is not None:
             kw["session"] = session
+        if schema is not None:
+            kw["schema"] = schema
         t0 = time.monotonic()
         result = await self._inner.stream(
             system=system, user=user, model=model, max_tokens=max_tokens, **kw

@@ -1,11 +1,10 @@
-import re
 import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
-from tessera.models.ticket import Ticket, TicketStatus
+from tessera.models.ticket import Ticket
 from tessera.services.adr import adr_pertinents
 from tessera.services.agent_registry import AgentNotFoundError, AgentRegistryService
 from tessera.services.cost_calculator import DEFAULT_MODEL, calculate_cost
@@ -16,6 +15,7 @@ from tessera.services.providers.base import (
     ToolEventCallback,
 )
 from tessera.services.prompt_loader import MissingPromptError
+from tessera.services.statut_suggere import _parse_suggested_status
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -89,6 +89,7 @@ class AgentRunner:
         run_id: str | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
@@ -114,6 +115,9 @@ class AgentRunner:
         extra: dict[str, Any] = {"ask_user": ask_user} if ask_user is not None else {}
         if session is not None:
             extra["session"] = session
+        # Comme `session` : transmis seulement s'il est posé (ADR-061).
+        if schema is not None:
+            extra["schema"] = schema
 
         provider = self._provider_pour(role_str)
         provider_result: ProviderResult
@@ -196,6 +200,7 @@ class AgentRunner:
             cost_usd=cost_usd,
             session_id=provider_result.session_id,
             outils_refuses=list(provider_result.outils_refuses),
+            structured=provider_result.structured,
         )
 
     def _provider_pour(self, role: str) -> LLMProvider:
@@ -269,27 +274,6 @@ class AgentRunner:
             "et corrige-le selon ces retours. Ne recommence pas depuis zéro : "
             "ce que tu as déjà lu et écrit est toujours là."
         )
-
-
-def _parse_suggested_status(content: str) -> TicketStatus:
-    """Extracts the suggested status from the agent's dedicated response section."""
-    in_section = False
-    for line in content.splitlines():
-        if re.search(r"statut\s+sugg[eé]r[eé]", line, re.IGNORECASE):
-            in_section = True
-            continue
-        if in_section and line.strip():
-            upper = line.upper()
-            if "IN_REVIEW" in upper or "IN-REVIEW" in upper:
-                return TicketStatus.in_review
-            if "BLOCKED" in upper:
-                return TicketStatus.blocked
-            if "DONE" in upper:
-                return TicketStatus.done
-            if "TODO" in upper:
-                return TicketStatus.todo
-            break
-    return TicketStatus.in_review
 
 
 def _nom_de_prompt(agent_config: "AgentConfig | None") -> str | None:

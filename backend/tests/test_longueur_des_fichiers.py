@@ -12,7 +12,6 @@ PLAFONDS: dict[str, int] = {
     "routers/orchestrator.py": 1110,
     "routers/projects.py": 826,
     "routers/tickets.py": 563,
-    "services/agent_runner.py": 304,
     "services/ci_watcher.py": 607,
     "services/database.py": 751,
     # 714 : le ticket-542, mergé dans la même file avant ce cliquet, y a ajouté une ligne.
@@ -25,7 +24,7 @@ PLAFONDS: dict[str, int] = {
     "services/pipeline_stages.py": 841,
     "services/process_registry.py": 409,
     "services/project_loader.py": 648,
-    "services/providers/agent_sdk.py": 466,
+    "services/providers/agent_sdk.py": 464,
     "services/reprise_orphelin.py": 384,
     "services/run_executor.py": 414,
     "services/test_runner.py": 533,
