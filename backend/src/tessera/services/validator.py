@@ -253,7 +253,12 @@ def _reconcile_criteria(
         if matched is None:
             matched = tolerant_map.get(_tolerant_normalize(sent))
         if matched is not None:
-            criteria.append(matched)
+            # Le texte est celui du critère envoyé : la sortie structurée n'exige que
+            # `index`, et un `criterion` vide arrivait tel quel jusqu'au tableau
+            # blanc du Bureau, qui affichait « critère 1, 2, 3 » (ticket-662).
+            criteria.append(
+                CriterionResult(criterion=sent, passed=matched.passed, note=matched.note)
+            )
         else:
             criteria.append(
                 CriterionResult(
