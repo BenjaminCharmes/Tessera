@@ -132,6 +132,11 @@ def _config(brut: object) -> ConfigCaptures | None:
     )
 
 
+def parse_captures_config(brut: object) -> ConfigCaptures | None:
+    """Validate a raw `captures` section, or return None when unusable."""
+    return _config(brut)
+
+
 def load_captures_config(project_path: Path) -> ConfigCaptures | None:
     """Read `captures` from `agents.json`, or return None when unusable."""
     agents_json = project_path / "agents.json"
