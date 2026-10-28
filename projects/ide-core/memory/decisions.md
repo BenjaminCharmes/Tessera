@@ -568,3 +568,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : le 23/10 un chevauchement entre 1024 et 1150 px a passé reviewer et validateur, qui lisent un diff.
 **Mesure** : non faite ; borne haute 7 min par run, durée réelle journalisée (ticket-618).
 **Alternative rejetée** : un validateur à vision — le contrat de chaque provider à étendre.
+
+---
+
+## ADR-063 — Reporter la compression du contexte des agents
+
+**Date** : 2026-10-28
+**Portée** : architect
+**Décision** : headroom n'entre pas dans le pipeline. Si le sujet rouvre, le point d'entrée est la compression du texte du prompt, pour reviewer et sécurité seulement, avec un garde qui renvoie l'original quand une ligne `FAILED` ou un nom de test disparaît. Le proxy ne s'envisage qu'après un spike sur l'abonnement et le cache. Seuils chiffrés : spec `2026-10-27-compression-contexte-design`, section 4.
+**Raison** : le codeur pèse 66 % du coût et n'est atteignable que par le proxy, dont on ignore l'effet sur le cache de prompt et sur le jeton d'abonnement.
+**Mesure** : non faite ; estimation 5-10 % du coût, à confirmer (tickets 604, 605).
+**Alternative rejetée** : adopter le proxy d'emblée — un gain annoncé par le projet, sans mesure ici, ne justifie pas un composant sur le chemin du jeton.

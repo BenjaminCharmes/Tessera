@@ -17,7 +17,7 @@ plan: true
 Que l'entrée réelle d'un rôle se lise dans `agent_calls`, sans sous-estimation.
 
 ## Contexte
-ADR-059 reporte la compression du contexte faute de mesure.
+ADR-063 reporte la compression du contexte faute de mesure.
 `agent_sdk._usage_from` lit `cache_creation_input_tokens` et
 `ProviderResult.cache_creation_tokens` le porte, mais la table `agent_calls` n'a
 que `input_tokens` et `cache_read_tokens` : la valeur est jetée à l'écriture

@@ -1,15 +1,15 @@
 ---
-id: ticket-589
-title: "Design: evaluate headroom to compress the context sent to agents"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
+created: 2026-10-26
 depends_on: []
 estimated_days: 1
-created: 2026-10-26
+id: ticket-589
 plan: true
+pr_number: 702
+priority: low
+status: done
+title: 'Design: evaluate headroom to compress the context sent to agents'
+type: design
 ---
 
 # ticket-589 — Conception : compresser le contexte des agents avec headroom
