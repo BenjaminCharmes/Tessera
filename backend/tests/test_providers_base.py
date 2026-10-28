@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any
 
@@ -26,10 +27,33 @@ class FakeProvider:
         self._tokens = tokens
         self._cost_usd = cost_usd
         self.calls: list[dict[str, Any]] = []
+        self._structured: dict[str, Any] | None = None
+        self._structured_forced = False
 
     def set_content(self, content: str) -> None:
         """Changes the canned response without reaching into `_content` directly."""
         self._content = content
+
+    def set_structured(self, data: dict[str, Any] | None) -> None:
+        """Forces the structured output returned when a schema is passed (None = absent)."""
+        self._structured = data
+        self._structured_forced = True
+
+    def _structured_for(self, schema: dict[str, Any] | None) -> dict[str, Any] | None:
+        """What a provider with a valid structured output would return for ``schema``.
+
+        Without a schema: None, as the real providers do. With one: the forced
+        value, else the canned text when it is a JSON object, else None.
+        """
+        if schema is None:
+            return None
+        if self._structured_forced:
+            return self._structured
+        try:
+            data = json.loads(self._content)
+        except ValueError:
+            return None
+        return data if isinstance(data, dict) else None
 
     async def complete(
         self,
@@ -54,6 +78,7 @@ class FakeProvider:
             output_tokens=self._tokens,
             cost_usd=self._cost_usd,
             provider_name=self.name,
+            structured=self._structured_for(extra.get("schema")),
         )
 
     async def stream(

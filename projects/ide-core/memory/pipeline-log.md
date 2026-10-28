@@ -5839,3 +5839,35 @@ Le diff ajoute :
 - 2026-10-28 11:36:48 UTC — [ticket-612] validateur: APPROVED — Les sept critères sont satisfaits : `ProviderResult.structured` est défini dans  (345484ms)
 - 2026-10-28 11:36:48 UTC — [ticket-612] APPROVED après 2 tour(s)
 - 2026-10-28 11:38:41 UTC — [ticket-612] documentation: 0 fichier(s) (108280ms)
+- 2026-10-28 11:52:19 UTC — [ide-core] ticket-612 PR #712 mergée (CI verte)
+- 2026-10-28 11:52:20 UTC — [ide-core] ticket-612 : base réalignée sur develop
+- 2026-10-28 11:52:20 UTC — [ide-core] ticket-612 PR #712 confiée au CIWatcher
+- 2026-10-28 11:52:24 UTC — [ticket-613] branche ticket-613-security-audit-and-validator-read-their-verdict-f
+- 2026-10-28 11:52:25 UTC — [ticket-613] tour 1 — codeur démarré
+- 2026-10-28 11:56:58 UTC — [ticket-613] tour 1 — codeur terminé (273188ms)
+- 2026-10-28 12:03:13 UTC — [ticket-613] testeur: 1 failed, 1712 passed, 64 warnings in 371.92s (0:06:11)
+- 2026-10-28 12:03:13 UTC — [ticket-613] tests rouges au tour 1
+- 2026-10-28 12:03:13 UTC — [ticket-613] tour 2 — codeur démarré
+- 2026-10-28 12:04:08 UTC — [ticket-613] tour 2 — codeur terminé (54781ms)
+- 2026-10-28 12:14:37 UTC — [ticket-613] testeur: OK (exit 0)
+- 2026-10-28 12:16:26 UTC — [ticket-613] securite: PASS — Aucune vulnérabilité détectée. Le passage de la validation JSON du texte local à (108890ms)
+- 2026-10-28 12:16:26 UTC — [ticket-613] tour 2 — reviewer démarré
+- 2026-10-28 12:16:50 UTC — [ticket-613] tour 2 — reviewer terminé (23875ms)
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-614 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-615 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-616 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-617 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-618 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-619 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-620 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-625 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-626 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-623 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-624 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-628 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-629 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-630 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-631 retiré de la file
+- 2026-10-28 12:21:09 UTC — [ticket-613] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les deux services lisent désorm (282858ms)
+- 2026-10-28 12:21:09 UTC — [ticket-613] APPROVED après 2 tour(s)
+- 2026-10-28 12:28:19 UTC — [ticket-613] documentation: 0 fichier(s) (425250ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « #: Le projet fait tourner chaque run dans un worktree (ADR-0 » (backend/src/tessera/servic

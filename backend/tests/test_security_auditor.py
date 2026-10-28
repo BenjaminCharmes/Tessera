@@ -7,10 +7,12 @@ import pytest
 
 from tests.test_providers_base import FakeProvider
 from tessera.services.security_auditor import (
+    _SEVERITIES,
     SecurityAuditResult,
     SecurityAuditorService,
     SecurityIssue,
 )
+from tessera.services.security_schema import SECURITY_SCHEMA
 
 
 @pytest.fixture
@@ -386,55 +388,120 @@ class TestIntroducedField:
         assert result.issues[0].severity == "HIGH"
 
 
-class TestAuditWithLeadingJsonObject:
-    """Tests for ticket-371 — audit skips JSON objects that lack the verdict key."""
+class TestStructuredOutput:
+    """Tests for ticket-613 — the verdict is read from the structured output (ADR-061)."""
 
-    async def test_block_when_leading_json_precedes_block_verdict(
+    async def test_schema_is_passed_to_the_provider(
         self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        # ticket-371 : un objet JSON sans "verdict" cité avant le verdict réel
-        # était pris comme réponse et valait PASS par défaut (ADR-039).
-        verdict_obj = {"issues": [], "verdict": "BLOCK", "summary": "Injection found."}
-        provider.set_content(
-            '{"project_id": "abc"}\n\nSome analysis.\n\n'
-            + __import__("json").dumps(verdict_obj)
-        )
+        _set_response(provider, {"issues": [], "verdict": "PASS", "summary": "ok"})
 
-        result = await service.audit("unsafe code", tmp_path)
+        await service.audit("code", tmp_path)
+
+        assert provider.calls[0]["schema"] == SECURITY_SCHEMA
+
+    async def test_verdict_comes_from_structured_not_from_text(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Le texte dit PASS, la sortie structurée dit BLOCK : seule la seconde compte.
+        provider.set_content('{"issues": [], "verdict": "PASS", "summary": "texte"}')
+        provider.set_structured({"issues": [], "verdict": "BLOCK", "summary": "structuré"})
+
+        result = await service.audit("code", tmp_path)
 
         assert result.verdict == "BLOCK"
+        assert result.summary == "structuré"
 
-    async def test_block_when_no_object_has_verdict_key(
+    async def test_absent_structured_blocks_after_the_retry(
         self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
     ) -> None:
-        # ticket-371 : une réponse sans aucun objet portant "verdict" doit
-        # bloquer (ADR-039 : l'audit échoue fermé), jamais rendre PASS.
-        provider.set_content(
-            '{"project_id": "abc"} {"issues": [], "summary": "no verdict key"}'
-        )
+        # Un texte JSON lisible ne suffit plus : sans sortie structurée, BLOCK.
+        provider.set_content('{"issues": [], "verdict": "PASS", "summary": "ok"}')
+        provider.set_structured(None)
+
+        result = await service.audit("code", tmp_path)
+
+        assert result.verdict == "BLOCK"
+        assert "deux tentatives" in result.reason
+        assert len(provider.calls) == 2
+
+    async def test_structured_without_verdict_blocks(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # ADR-039 : un objet qui contredit le schéma ne rend jamais PASS.
+        provider.set_structured({"issues": [], "summary": "no verdict key"})
 
         result = await service.audit("some code", tmp_path)
 
         assert result.verdict == "BLOCK"
         assert result.reason
 
+    async def test_any_verdict_other_than_pass_blocks(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        provider.set_structured({"issues": [], "verdict": "pass", "summary": "ok"})
 
-async def test_pass_verdict_survives_unescaped_backslash_in_summary(
-    service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
-) -> None:
-    # ticket-376 : une réponse dont le résumé cite un chemin Windows (..\x)
-    # produisait un JSON invalide ; extract_json le corrigeait pas, l'audit
-    # retombait sur BLOCK alors que le LLM avait conclu PASS.
-    raw = (
-        "```json\n"
-        '{"issues": [], "verdict": "PASS", "summary": "No issue. Path ..\\x is safe."}'
-        "\n```"
-    )
-    provider.set_content(raw)
+        result = await service.audit("code", tmp_path)
 
-    result = await service.audit("code", tmp_path)
+        assert result.verdict == "BLOCK"
 
-    assert result.verdict == "PASS"
+    async def test_summary_with_a_windows_path_is_kept_as_is(
+        self, service: SecurityAuditorService, provider: FakeProvider, tmp_path: Path
+    ) -> None:
+        # Plus de JSON à réparer : un antislash du résumé passe tel quel.
+        provider.set_structured(
+            {"issues": [], "verdict": "PASS", "summary": "Path ..\\x is safe."}
+        )
+
+        result = await service.audit("code", tmp_path)
+
+        assert result.verdict == "PASS"
+        assert result.summary == "Path ..\\x is safe."
+
+    @pytest.mark.parametrize("severity", ["CRITICAL", "HIGH"])
+    async def test_critical_or_high_blocks_despite_a_structured_pass(
+        self,
+        service: SecurityAuditorService,
+        provider: FakeProvider,
+        tmp_path: Path,
+        severity: str,
+    ) -> None:
+        provider.set_structured(
+            {
+                "verdict": "PASS",
+                "summary": "ok",
+                "issues": [
+                    {"severity": severity, "description": "d", "introduced": True}
+                ],
+            }
+        )
+
+        result = await service.audit("code", tmp_path)
+
+        assert result.verdict == "BLOCK"
+        assert severity in result.reason
+
+    def test_severity_enum_matches_the_service_severities(self) -> None:
+        enum = SECURITY_SCHEMA["properties"]["issues"]["items"]["properties"]["severity"]["enum"]
+        assert set(enum) == set(_SEVERITIES)
+
+    def test_required_keys_match_the_contract(self) -> None:
+        item = SECURITY_SCHEMA["properties"]["issues"]["items"]
+        assert set(SECURITY_SCHEMA["required"]) == {"verdict", "issues", "summary"}
+        assert set(item["required"]) == {"severity", "description", "introduced"}
+        assert SECURITY_SCHEMA["properties"]["verdict"]["enum"] == ["PASS", "BLOCK"]
+
+
+_PROMPT = Path(__file__).resolve().parents[2] / "agents" / "prompts" / "securite.md"
+
+
+def test_security_prompt_names_the_schema_fields() -> None:
+    prompt = _PROMPT.read_text(encoding="utf-8")
+    item = SECURITY_SCHEMA["properties"]["issues"]["items"]["properties"]
+    fields = set(SECURITY_SCHEMA["properties"]) | set(item)
+    for field in fields:
+        assert f"`{field}`" in prompt, field
+    assert "```json" not in prompt
 
 
 _PASS_JSON = json.dumps({"issues": [], "verdict": "PASS", "summary": "ok"})

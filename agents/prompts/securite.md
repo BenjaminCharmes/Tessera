@@ -51,22 +51,10 @@ Classe chaque problème : `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` / `INFO`.
 
 Sois précis : évite les faux positifs. Si le code ajouté est légitime, dis `PASS`.
 
-Réponds avec exactement ce JSON :
-```json
-{
-  "issues": [
-    {
-      "severity": "HIGH",
-      "type": "SQL Injection",
-      "location": "src/db.py:42",
-      "description": "Requête SQL construite par concaténation de chaînes",
-      "fix": "Utiliser des paramètres préparés (cursor.execute(query, params))",
-      "introduced": true
-    }
-  ],
-  "verdict": "PASS",
-  "summary": "Aucune vulnérabilité critique détectée."
-}
-```
-
-Si aucune vulnérabilité : `"issues": []`, `"verdict": "PASS"`.
+La forme de la réponse est imposée par un schéma : tu n'as pas à la recopier,
+seulement à remplir ses champs.
+- `verdict` : `PASS` ou `BLOCK`
+- `issues` : un élément par problème, avec `severity`, `type`, `location`
+  (`fichier:ligne`), `description`, `fix` (la correction proposée) et
+  `introduced`. Aucune vulnérabilité : liste vide
+- `summary` : une ou deux phrases qui justifient le verdict

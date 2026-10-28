@@ -1,13 +1,15 @@
 ---
-id: ticket-613
-title: "Security audit and validator read their verdict from a structured output"
-type: feat
-status: todo
-priority: medium
 agent: codeur
 created: 2026-10-27
-depends_on: [ticket-612]
+depends_on:
+- ticket-612
 estimated_days: 1
+id: ticket-613
+pr_number: 715
+priority: medium
+status: done
+title: Security audit and validator read their verdict from a structured output
+type: feat
 ---
 
 # ticket-613 — Sécurité et validateur sur un schéma
