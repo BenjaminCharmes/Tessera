@@ -90,3 +90,17 @@ def test_unreadable_manifest_declares_nothing(tmp_path: Path) -> None:
     (dossier / "agents.json").write_text("{pas du json", encoding="utf-8")
 
     assert read_online_declaration(dossier).declared is False
+
+
+def test_overview_says_which_projects_run_in_a_worktree(_fresh_state: Path) -> None:
+    # Ticket-633 : la carte d'un projet à worktree n'offre pas de file.
+    _project(_fresh_state, "isole", {"artifacts": "tracked", "worktree": {}})
+    _project(_fresh_state, "local", {"worktree": {}})
+    _project(_fresh_state, "checkout")
+
+    body = _overview()
+
+    assert body["isole"]["worktree"] is True
+    # Des artefacts `local` refusent le worktree : le run reste dans le checkout.
+    assert body["local"]["worktree"] is False
+    assert body["checkout"]["worktree"] is False

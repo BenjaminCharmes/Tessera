@@ -99,7 +99,6 @@ describe("LancerFile", () => {
     const bouton = screen.getByRole("button", { name: "File (3)" });
     expect(bouton).toBeDisabled();
     expect(bouton).toHaveAttribute("title", "Un run est en cours");
-    expect(screen.getByText("Run en cours")).toBeInTheDocument();
   });
 
   it("offers to append the todo tickets when a queue is already running", async () => {
@@ -286,5 +285,24 @@ describe("idsAFaire", () => {
     ]);
 
     expect(ids).toEqual(["ticket-2", "ticket-10"]);
+  });
+
+  it("launches only the next todo ticket on a worktree project, never a queue", async () => {
+    list.mockResolvedValue({
+      tickets: [ticket("ticket-9", "todo"), ticket("ticket-4", "todo")],
+      unreadable: [],
+    });
+    run.mockResolvedValue({ run_id: "r-1" });
+    const surLancee = vi.fn();
+    afficher(projet({ worktree: true }), vi.fn(), surLancee);
+
+    expect(screen.queryByRole("button", { name: /^File/ })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Ticket suivant" }));
+    expect(screen.getByText("Lancer le prochain ticket à faire, seul ?")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Lancer" }));
+
+    await waitFor(() => expect(surLancee).toHaveBeenCalledTimes(1));
+    expect(run).toHaveBeenCalledWith({ project_id: "serpent", mode: "single", ticket_id: "ticket-4" });
+    expect(screen.getByRole("status")).toHaveTextContent("ticket-4 lancé");
   });
 });

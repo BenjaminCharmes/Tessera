@@ -248,7 +248,7 @@ describe("ProjetsView", () => {
     const carte = await screen.findByRole("article", { name: "Serpent" });
     expect(overview).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(within(carte).getByRole("button", { name: "Lancer" }));
+    await userEvent.click(within(carte).getByRole("button", { name: "Lancer l'app" }));
 
     expect(startServices).toHaveBeenCalledWith("serpent");
     await waitFor(() => expect(overview).toHaveBeenCalledTimes(2));

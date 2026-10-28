@@ -18,6 +18,7 @@ from pydantic import BaseModel
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
 from tessera.services.online_declaration import StripeMode, read_online_declaration
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.ticket_service import _STATUS_DIRS
 from tessera.utils.logger import get_logger
 
@@ -79,6 +80,9 @@ class ProjectOverview(BaseModel):
     online_declared: bool = False
     online_domain: str | None = None
     online_stripe_mode: StripeMode | None = None
+    #: Le projet fait tourner chaque run dans un worktree (ADR-056) : il ne se lance
+    #: qu'un ticket à la fois, la carte n'offre donc pas de file (ticket-633).
+    worktree: bool = False
     avertissements: list[str] = []
 
 
@@ -242,6 +246,14 @@ async def _calcul_en_cache(project_path: Path) -> _Calcul:
     return calcul
 
 
+def _en_worktree(project_path: Path) -> bool:
+    """Vrai quand les runs du projet tournent dans un worktree ; faux s'il est illisible."""
+    try:
+        return PolitiqueRun.lire(project_path).worktree is not None
+    except Exception:  # noqa: BLE001 — une carte ne tombe pas pour un manifeste illisible
+        return False
+
+
 async def build_overview(
     project: Project,
     *,
@@ -270,5 +282,6 @@ async def build_overview(
         online_declared=online.declared,
         online_domain=online.domain,
         online_stripe_mode=online.stripe_mode,
+        worktree=_en_worktree(project.path),
         avertissements=list(project.avertissements),
     )
