@@ -5782,3 +5782,28 @@ Le diff ajoute :
 - 2026-10-28 08:46:51 UTC — [ticket-604] validateur: APPROVED — Tous les critères sont respectés. Le ticket ajoute une colonne `cache_creation_t (150672ms)
 - 2026-10-28 08:46:51 UTC — [ticket-604] APPROVED après 2 tour(s)
 - 2026-10-28 08:47:58 UTC — [ticket-604] documentation: 0 fichier(s) (61577ms)
+- 2026-10-28 09:05:37 UTC — [ide-core] ticket-604 PR #704 mergée (CI verte)
+- 2026-10-28 09:05:41 UTC — [ide-core] ticket-604 : base réalignée sur develop
+- 2026-10-28 09:05:41 UTC — [ide-core] ticket-604 PR #704 confiée au CIWatcher
+- 2026-10-28 09:05:45 UTC — [ticket-605] branche ticket-605-a-script-measures-the-input-tokens-per-role-and-w
+- 2026-10-28 09:06:54 UTC — [ticket-605] plan rendu (67844ms)
+- 2026-10-28 09:06:54 UTC — [ticket-605] tour 1 — codeur démarré
+- 2026-10-28 09:13:40 UTC — [ticket-605] tour 1 — codeur terminé (406609ms)
+- 2026-10-28 09:25:04 UTC — [ticket-605] testeur: OK (exit 0)
+- 2026-10-28 09:27:18 UTC — [ticket-605] securite: PASS — Deux vulnérabilités détectées (MEDIUM et LOW) mais aucune CRITICAL ou HIGH avec  (133703ms)
+- 2026-10-28 09:27:18 UTC — [ticket-605] tour 1 — reviewer démarré
+- 2026-10-28 09:28:04 UTC — [ticket-605] tour 1 — reviewer terminé (45844ms)
+- 2026-10-28 09:32:18 UTC — [ticket-605] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 09:33:58 UTC — [ticket-605] validateur: fichiers cités joints : backend/pyproject.toml, uv.lock (tronqué)
+- 2026-10-28 09:33:58 UTC — [ticket-605] validateur: APPROVED — Le ticket-605 livre l'outillage complet de mesure sans toucher aux dépendances d (400234ms)
+- 2026-10-28 09:33:58 UTC — [ticket-605] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-28 09:33:58 UTC — [ticket-605] tour 2 — codeur démarré
+- 2026-10-28 09:41:02 UTC — [ticket-605] tour 2 — codeur terminé (423890ms)
+- 2026-10-28 09:49:05 UTC — [ticket-605] testeur: OK (exit 0)
+- 2026-10-28 09:51:12 UTC — [ticket-605] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Les scripts de mesure utilisent (126094ms)
+- 2026-10-28 09:51:12 UTC — [ticket-605] tour 2 — reviewer démarré
+- 2026-10-28 09:51:36 UTC — [ticket-605] tour 2 — reviewer terminé (24797ms)
+- 2026-10-28 09:56:12 UTC — [ticket-605] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 09:56:54 UTC — [ticket-605] validateur: fichiers cités joints : backend/pyproject.toml, uv.lock (tronqué)
+- 2026-10-28 09:56:54 UTC — [ticket-605] validateur: APPROVED — Le ticket-605 livre l'outillage complet : quatre modules de mesure sans toucher  (341967ms)
+- 2026-10-28 09:56:54 UTC — [ticket-605] APPROVED après 2 tour(s)
