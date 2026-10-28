@@ -1,4 +1,4 @@
-import { verdictDuReviewer } from "../../components/FilDuRun/verdict";
+import { revueDeLEvenement, verdictDuReviewer } from "../../components/FilDuRun/verdict";
 import type { StreamState } from "../../hooks/streamState";
 import type { OrchestratorEvent } from "../../types/api";
 import type { PosteId } from "./postesDuRun";
@@ -19,8 +19,7 @@ function estCodeur(ev: OrchestratorEvent): boolean {
 /** Le poste qui a renvoyé le travail dans cet événement, ou null si l'événement n'est pas un refus. */
 function refusDe(ev: OrchestratorEvent): RetourDeCopie["poste"] | null {
   if (ev.type === "agent_done" && ev.agent === "reviewer") {
-    const contenu = typeof ev.data["content"] === "string" ? ev.data["content"] : "";
-    return verdictDuReviewer(contenu) === "CHANGES_REQUESTED" ? "reviewer" : null;
+    return verdictDuReviewer(revueDeLEvenement(ev)) === "CHANGES_REQUESTED" ? "reviewer" : null;
   }
   if (ev.type === "validation_done") {
     const approuve = ev.data["approved"];

@@ -4,6 +4,8 @@
  * Sorties de `streamState.ts` pour tenir le plafond de longueur (ticket-545) :
  * `streamState` les ré-exporte, les importeurs n'ont rien à changer.
  */
+import { verdictDeData } from "../components/FilDuRun/verdict";
+import type { VerdictReviewer } from "../components/FilDuRun/verdict";
 import type { AgentRole, OrchestratorEvent } from "../types/api";
 
 /**
@@ -26,6 +28,20 @@ export interface PassageAgent {
   isDone: boolean;
   /** Durée de l'appel en ms, remontée par `agent_done`. Absente si le backend ne l'envoie pas. */
   duration_ms?: number;
+  /** Verdict du reviewer, champ `verdict` de `agent_done` (ticket-614). Absent avant ce ticket. */
+  verdict?: VerdictReviewer;
+}
+
+/** Le passage, refermé par l'`agent_done` dont `data` est donné : contenu, durée et verdict. */
+export function passageTermine(passage: PassageAgent, data: Record<string, unknown>): PassageAgent {
+  const duree = data["duration_ms"];
+  return {
+    ...passage,
+    isDone: true,
+    content: typeof data["content"] === "string" ? data["content"] : "",
+    duration_ms: typeof duree === "number" ? duree : undefined,
+    verdict: verdictDeData(data),
+  };
 }
 
 /**

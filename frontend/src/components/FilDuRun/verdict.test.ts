@@ -1,5 +1,53 @@
 import { describe, it, expect } from "vitest";
-import { verdictDuReviewer } from "./verdict";
+import type { OrchestratorEvent } from "../../types/api";
+import { revueDeLEvenement, revueSansLigneDeVerdict, verdictDeData, verdictDuReviewer } from "./verdict";
+
+describe("verdictDuReviewer — le champ verdict (ticket-615)", () => {
+  it("returns the verdict field even when the text says the opposite", () => {
+    expect(verdictDuReviewer({ content: "APPROVED\nTout est bon.", verdict: "CHANGES_REQUESTED" })).toBe(
+      "CHANGES_REQUESTED",
+    );
+    expect(verdictDuReviewer({ content: "CHANGES_REQUESTED\n- un test manque", verdict: "APPROVED" })).toBe(
+      "APPROVED",
+    );
+  });
+
+  it("reads the keyword when the entry carries no verdict", () => {
+    expect(verdictDuReviewer({ content: "APPROVED\nOK" })).toBe("APPROVED");
+    expect(verdictDuReviewer({ content: "Aucun verdict ici." })).toBe("CHANGES_REQUESTED");
+  });
+});
+
+describe("verdictDeData / revueDeLEvenement (ticket-615)", () => {
+  const evenement = (data: Record<string, unknown>): OrchestratorEvent => ({
+    type: "agent_done",
+    agent: "reviewer",
+    ticket_id: "ticket-001",
+    data,
+    timestamp: "2026-10-28T09:00:00.000Z",
+  });
+
+  it("keeps only a verdict from the vocabulary", () => {
+    expect(verdictDeData({ verdict: "APPROVED" })).toBe("APPROVED");
+    expect(verdictDeData({ verdict: "MAYBE" })).toBeUndefined();
+    expect(verdictDeData({ verdict: 3 })).toBeUndefined();
+    expect(verdictDeData({})).toBeUndefined();
+  });
+
+  it("extracts content and verdict from an agent_done event", () => {
+    expect(revueDeLEvenement(evenement({ content: "texte", verdict: "CHANGES_REQUESTED" }))).toEqual({
+      content: "texte",
+      verdict: "CHANGES_REQUESTED",
+    });
+    expect(revueDeLEvenement(evenement({}))).toEqual({ content: "", verdict: undefined });
+  });
+});
+
+describe("revueSansLigneDeVerdict (ticket-615)", () => {
+  it("drops blank lines and the lines that name a verdict", () => {
+    expect(revueSansLigneDeVerdict("APPROVED\n\n  Résumé  \nDétail")).toEqual(["Résumé", "Détail"]);
+  });
+});
 
 describe("verdictDuReviewer — première ligne de verdict l'emporte (ticket-299)", () => {
   it("rend APPROVED quand la première ligne est APPROVED même si CHANGES_REQUESTED apparaît dans le corps", () => {

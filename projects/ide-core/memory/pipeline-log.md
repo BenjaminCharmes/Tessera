@@ -5890,3 +5890,30 @@ Le diff ajoute :
 - 2026-10-28 13:26:39 UTC — [ticket-614] validateur: APPROVED — Tous les critères d'acceptation du ticket-614 sont satisfaits. Le diff remplace  (371389ms)
 - 2026-10-28 13:26:39 UTC — [ticket-614] APPROVED après 2 tour(s)
 - 2026-10-28 13:36:19 UTC — [ticket-614] documentation: 2 fichier(s) (575485ms) — après tour de correction
+- 2026-10-28 13:55:50 UTC — [ide-core] ticket-614 PR #719 mergée (CI verte)
+- 2026-10-28 13:55:52 UTC — [ide-core] ticket-614 : base réalignée sur develop
+- 2026-10-28 13:55:52 UTC — [ide-core] ticket-614 PR #719 confiée au CIWatcher
+- 2026-10-28 13:55:55 UTC — [ticket-615] branche ticket-615-the-interface-reads-the-reviewer-verdict-from-the
+- 2026-10-28 13:55:55 UTC — [ticket-615] tour 1 — codeur démarré
+- 2026-10-28 13:59:00 UTC — [ticket-615] tour 1 — codeur terminé (184686ms)
+- 2026-10-28 14:01:27 UTC — [ticket-615] testeur: Tests  1 failed | 1886 passed (1887)
+- 2026-10-28 14:01:27 UTC — [ticket-615] tests rouges au tour 1
+- 2026-10-28 14:01:27 UTC — [ticket-615] tour 2 — codeur démarré
+- 2026-10-28 14:03:04 UTC — [ticket-615] tour 2 — codeur terminé (97000ms)
+- 2026-10-28 14:05:43 UTC — [ticket-615] testeur: OK (exit 0)
+- 2026-10-28 14:07:17 UTC — [ticket-615] securite: PASS — Ce diff implémente une validation stricte du champ `verdict` du reviewer avec pr (94234ms)
+- 2026-10-28 14:07:17 UTC — [ticket-615] tour 2 — reviewer démarré
+- 2026-10-28 14:07:40 UTC — [ticket-615] tour 2 — reviewer terminé (23389ms)
+- 2026-10-28 14:11:27 UTC — [ticket-615] validateur: fichiers cités joints : verdict.test.ts, lib/bureau/copie.ts
+- 2026-10-28 14:11:27 UTC — [ticket-615] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été mis à jour pour q (249610ms)
+- 2026-10-28 14:11:27 UTC — [ticket-615] CHANGES_REQUESTED tour 2: Reviewer : **Verdict : APPROVED**
+- 2026-10-28 14:11:27 UTC — [ticket-615] tour 3 — codeur démarré
+- 2026-10-28 14:13:04 UTC — [ticket-615] tour 3 — codeur terminé (97296ms)
+- 2026-10-28 14:17:46 UTC — [ticket-615] testeur: OK (exit 0)
+- 2026-10-28 14:18:55 UTC — [ticket-615] securite: PASS — Le diff implémente un champ structuré `verdict` pour les réponses du reviewer, a (68781ms)
+- 2026-10-28 14:18:56 UTC — [ticket-615] tour 3 — reviewer démarré
+- 2026-10-28 14:19:24 UTC — [ticket-615] tour 3 — reviewer terminé (27452ms)
+- 2026-10-28 14:22:59 UTC — [ticket-615] validateur: fichiers cités joints : verdict.test.ts, lib/bureau/copie.ts
+- 2026-10-28 14:22:59 UTC — [ticket-615] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour li (244438ms)
+- 2026-10-28 14:22:59 UTC — [ticket-615] APPROVED après 3 tour(s)
+- 2026-10-28 14:25:39 UTC — [ticket-615] documentation: 0 fichier(s) (151735ms) — après tour de correction

@@ -58,6 +58,17 @@ describe("retourDeCopie", () => {
     expect(retourDeCopie(etat, T0)).toBeNull();
   });
 
+  it("follows the verdict field of the review, not its text (ticket-615)", () => {
+    const refuse = ev("agent_done", "reviewer", { content: "APPROVED", verdict: "CHANGES_REQUESTED" });
+    const accepte = ev("agent_done", "reviewer", { content: "CHANGES_REQUESTED", verdict: "APPROVED" });
+
+    const apresRefus = rejouer([ev("agent_started", "codeur", { round: 1 }), refuse, ev("agent_started", "codeur", { round: 2 })]);
+    const apresAccord = rejouer([ev("agent_started", "codeur", { round: 1 }), accepte, ev("agent_started", "codeur", { round: 2 })]);
+
+    expect(retourDeCopie(apresRefus, T0)).toEqual({ poste: "reviewer", tour: 2 });
+    expect(retourDeCopie(apresAccord, T0)).toBeNull();
+  });
+
   it("ignores a refusal that an earlier coder restart already answered", () => {
     const etat = rejouer([
       ev("agent_started", "codeur", { round: 1 }),

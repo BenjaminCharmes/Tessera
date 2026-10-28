@@ -1,13 +1,16 @@
 ---
-id: ticket-615
-title: "The interface reads the reviewer verdict from the event field, not from its text"
-type: refactor
-status: todo
-priority: low
 agent: codeur
 created: 2026-10-27
-depends_on: [ticket-614]
+depends_on:
+- ticket-614
 estimated_days: 0.5
+id: ticket-615
+pr_number: 721
+priority: low
+status: done
+title: The interface reads the reviewer verdict from the event field, not from its
+  text
+type: refactor
 ---
 
 # ticket-615 — Le frontend lit `verdict`, plus le mot-clé
