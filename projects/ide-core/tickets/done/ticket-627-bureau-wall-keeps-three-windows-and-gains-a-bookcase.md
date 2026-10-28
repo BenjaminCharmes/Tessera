@@ -40,6 +40,7 @@ qui est en place et à rétrécir le tableau blanc.
 - [x] `FondDeLaPiece.tsx` pose `Bibliotheque` à `BIBLIOTHEQUE_X`
 - [x] Captures à 1920 et 1536 relues : aucun objet du mur n'en chevauche un autre
 - [x] L'interrupteur s'écarte de la fenêtre dans les salles du haut, et se rapproche de la porte dans les pièces
+- [x] Dans les salles du haut, le mobilier remonte sous le mur (sol moins haut), et le mur du directeur n'est plus coupé à 1536
 
 ## Ce que ça ne fait pas
 - Ne dessine pas les rédacteurs : c'est le ticket-624.
