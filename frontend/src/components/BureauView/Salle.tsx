@@ -75,7 +75,7 @@ export default function Salle({
       </div>
       <div
         data-mur="salle"
-        className="flex flex-nowrap items-start justify-center gap-3 overflow-hidden border-b-4 border-(--sprite-plinthe) px-3 pt-3 pb-4"
+        className="flex flex-nowrap items-start justify-center gap-1.5 overflow-hidden border-b-4 border-(--sprite-plinthe) px-1.5 pt-3 pb-4 min-[1700px]:gap-3 min-[1700px]:px-3"
       >
         <Agrandi>
           <SkyWindow moment={moment} soleil={gauche?.soleil} nuages={gauche?.nuages} />
@@ -87,12 +87,14 @@ export default function Salle({
           <SkyWindow moment={moment} soleil={droite?.soleil} nuages={droite?.nuages} />
         </Agrandi>
         {accroche}
-        <span className="self-end">
+        {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
+        <span className="self-end min-[1700px]:ml-3">
           <BoutonLumiere salle={titre} allume={lumiere} onBasculer={basculerLumiere} />
         </span>
       </div>
-      <div data-sol="lames" className="sol-lames flex flex-1 flex-col justify-end px-3">
-        <div className="flex min-h-39 items-end justify-between gap-4 px-1 py-2">
+      {/* Le fond du sol ne sert à rien dans une salle : le mobilier s'y centre au lieu de laisser un vide sous le mur (ticket-627). */}
+      <div data-sol="lames" className="sol-lames flex flex-1 flex-col justify-center px-3">
+        <div className="flex min-h-28 items-end justify-between gap-4 px-1 py-2">
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">
               <Agrandi>{mobilier}</Agrandi>

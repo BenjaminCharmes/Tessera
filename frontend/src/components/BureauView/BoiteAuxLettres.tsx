@@ -2,10 +2,12 @@ import { useMemo } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
 import Boite from "../../design/bureau/Boite";
 import type { StreamState } from "../../hooks/streamState";
+import { useProjects } from "../../hooks/useProjects";
 import { useResource } from "../../hooks/useResource";
 import { api } from "../../lib/api";
 import { boiteAuxLettres } from "../../lib/bureau/boiteAuxLettres";
 import { boiteDepuisPr } from "../../lib/bureau/boiteDepuisPr";
+import { lienDuDepot } from "../../lib/lienDuDepot";
 import {
   libelleCourtDeLaBoite,
   libelleDeLaBoite,
@@ -49,8 +51,9 @@ function usePrDuTicket(
 }
 
 /**
- * La boîte aux lettres d'une pièce, au mur près de la porte : cinq états, le numéro
- * de PR lié à son URL quand on la connaît, l'état en toutes lettres en infobulle.
+ * La boîte aux lettres d'une pièce, au mur près de la porte : cinq états, la PR et son
+ * état en toutes lettres en infobulle. La boîte ouvre la PR quand on connaît son URL ;
+ * le numéro écrit à côté doublait l'infobulle et a disparu (ticket-627).
  */
 export default function BoiteAuxLettres({
   projet,
@@ -68,11 +71,22 @@ export default function BoiteAuxLettres({
     depuisEvenements.etat === "aucune"
       ? boiteDepuisPr(entree)
       : depuisEvenements;
+  // `pr-statuses` ne connaît une PR qu'une fois son numéro écrit dans le ticket,
+  // et la file est souvent déjà passée au suivant : l'URL se déduit alors du
+  // dépôt du projet (ticket-627).
+  const { projects } = useProjects();
+  const depot = lienDuDepot(
+    projects.find((p) => p.id === projet)?.github_remote,
+  );
   const url =
-    entree !== null && entree.pr_number === boite.pr ? entree.pr_url : null;
+    entree !== null && entree.pr_number === boite.pr
+      ? entree.pr_url
+      : depot !== null && boite.pr !== null
+        ? `${depot}/pull/${boite.pr}`
+        : null;
 
   return (
-    <div data-boite={boite.etat} className="flex items-end gap-1">
+    <div data-boite={boite.etat} className="flex items-end">
       {/* La boîte elle-même mène à la PR quand on connaît son URL (ticket-622). */}
       <AvecInfobulle
         label={libelleDeLaBoite(boite)}
@@ -88,19 +102,6 @@ export default function BoiteAuxLettres({
           <Boite etat={boite.etat} />
         </Agrandi>
       </AvecInfobulle>
-      {boite.pr !== null &&
-        (url ? (
-          <a
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-            className="text-micro text-blue-300 hover:underline"
-          >
-            #{boite.pr}
-          </a>
-        ) : (
-          <span className="text-micro text-zinc-400">#{boite.pr}</span>
-        ))}
     </div>
   );
 }

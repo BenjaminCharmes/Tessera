@@ -43,6 +43,8 @@ const DECALAGE_A_COTE = 48;
 
 /** Abscisse de la machine et de la porte, dans le fond de la pièce. */
 export const MACHINE_X = 470;
+/** La bibliothèque, entre les deux premières fenêtres (ticket-627). */
+export const BIBLIOTHEQUE_X = 208;
 export const PORTE_X = 738;
 /** L'agent de 63 px se centre sur la porte de 81 px. */
 const DECALAGE_A_LA_PORTE = 9;
@@ -69,7 +71,10 @@ export function libelleActivite(activite: Activite): string {
 }
 
 export function tirerActivite(hasard: Hasard): Activite {
-  const indice = Math.min(TIRAGE.length - 1, Math.floor(hasard() * TIRAGE.length));
+  const indice = Math.min(
+    TIRAGE.length - 1,
+    Math.floor(hasard() * TIRAGE.length),
+  );
   return TIRAGE[indice] ?? "tasse";
 }
 
@@ -82,7 +87,11 @@ export function postesFaits(postes: readonly PosteDuRun[]): PosteId[] {
  * L'activité de chaque agent au tour suivant : celle qu'il avait, sauf une chance
  * sur quatre ou s'il n'en avait pas encore. Un agent qui n'a pas fini n'en garde aucune.
  */
-export function renouveler(avant: Activites, faits: readonly PosteId[], hasard: Hasard): Activites {
+export function renouveler(
+  avant: Activites,
+  faits: readonly PosteId[],
+  hasard: Hasard,
+): Activites {
   const suivantes: Activites = {};
   for (const poste of faits) {
     const actuelle = avant[poste];
@@ -96,7 +105,10 @@ export function renouveler(avant: Activites, faits: readonly PosteId[], hasard: 
  * Les activités après le plafond de la machine : les premiers postes, dans l'ordre
  * du pipeline, y entrent ; le suivant retombe sur le café à son poste.
  */
-export function appliquerPlafond(brutes: Activites, faits: readonly PosteId[]): Activites {
+export function appliquerPlafond(
+  brutes: Activites,
+  faits: readonly PosteId[],
+): Activites {
   let places = PLACES_MACHINE;
   const effectives: Activites = {};
   for (const poste of POSTES) {
@@ -110,17 +122,33 @@ export function appliquerPlafond(brutes: Activites, faits: readonly PosteId[]): 
 }
 
 function centreDuPoste(poste: PosteId): number {
-  return MARGE_DU_SOL + POSTES.indexOf(poste) * PAS_COLONNE + LARGEUR_COLONNE / 2;
+  return (
+    MARGE_DU_SOL + POSTES.indexOf(poste) * PAS_COLONNE + LARGEUR_COLONNE / 2
+  );
 }
 
 function placeDe(poste: PosteId, activite: Activite, rang: number): AgentPlace {
   if (activite === "machine") {
     const decalage = PLACES_A_LA_MACHINE[rang] ?? PLACES_A_LA_MACHINE[0];
-    return { poste, x: MACHINE_X, decalage, niveau: "fond", activite, parti: false };
+    return {
+      poste,
+      x: MACHINE_X,
+      decalage,
+      niveau: "fond",
+      activite,
+      parti: false,
+    };
   }
   // Rendre sa copie : debout à côté du poste du codeur, pas du sien.
   const ancre = activite === "copie" ? "codeur" : poste;
-  return { poste, x: centreDuPoste(ancre), decalage: DECALAGE_A_COTE, niveau: "rangee", activite, parti: false };
+  return {
+    poste,
+    x: centreDuPoste(ancre),
+    decalage: DECALAGE_A_COTE,
+    niveau: "rangee",
+    activite,
+    parti: false,
+  };
 }
 
 /**

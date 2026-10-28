@@ -105,7 +105,7 @@ describe("BoiteAuxLettres", () => {
     expect(screen.queryByText(/Boîte aux lettres/)).toBeNull();
   });
 
-  it("shows the pull request number beside the box and its state in the tooltip", async () => {
+  it("writes nothing beside the box and gives the pull request in the tooltip", async () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 
     render(
@@ -116,7 +116,7 @@ describe("BoiteAuxLettres", () => {
     );
     await act(async () => {});
 
-    expect(screen.getByText("#42")).toBeInTheDocument();
+    expect(screen.queryByText("#42")).toBeNull();
     act(() => screen.getByRole("group").focus());
     expect(screen.getByRole("tooltip")).toHaveTextContent("PR #42 ouverte");
   });
@@ -162,23 +162,6 @@ describe("BoiteAuxLettres", () => {
     });
   });
 
-  it("links the pull request number to its URL", async () => {
-    vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([entree()]);
-
-    render(
-      <BoiteAuxLettres
-        projet="ide-core"
-        etat={rejouer(ev("agent_started"), livraison())}
-      />,
-    );
-
-    const lien = await screen.findByRole("link", { name: "#42" });
-    expect(lien).toHaveAttribute(
-      "href",
-      "https://example.test/org/repo/pull/42",
-    );
-  });
-
   it("opens the pull request when the box itself is clicked", async () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([entree()]);
     const ouvrir = vi.spyOn(window, "open").mockImplementation(() => null);
@@ -200,7 +183,7 @@ describe("BoiteAuxLettres", () => {
     );
   });
 
-  it("shows the number without a link when pr-statuses does not know the pull request", async () => {
+  it("keeps the box a plain group when pr-statuses does not know the pull request", async () => {
     const lire = vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 
     render(
@@ -211,7 +194,42 @@ describe("BoiteAuxLettres", () => {
     );
 
     await waitFor(() => expect(lire).toHaveBeenCalled());
-    expect(screen.getByText("#42")).toBeInTheDocument();
-    expect(screen.queryByRole("link")).toBeNull();
+    expect(
+      screen.getByRole("group", { name: /Boîte aux lettres, PR #42/ }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("opens the pull request from the project's repository when pr-statuses does not know it yet", async () => {
+    vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
+    vi.spyOn(api.projects, "list").mockResolvedValue([
+      {
+        id: "ide-core",
+        name: "ide-core",
+        path: "/w/ide-core",
+        description: "",
+        active_agents: [],
+        stack: null,
+        raw_claude_md: "",
+        github_remote: "owner/repo",
+      },
+    ]);
+    const ouvrir = vi.spyOn(window, "open").mockImplementation(() => null);
+
+    render(
+      <BoiteAuxLettres
+        projet="ide-core"
+        etat={rejouer(ev("agent_started"), livraison())}
+      />,
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: /Boîte aux lettres, PR #42/ }),
+    );
+
+    expect(ouvrir).toHaveBeenCalledWith(
+      "https://github.com/owner/repo/pull/42",
+      "_blank",
+      "noopener,noreferrer",
+    );
   });
 });

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
+import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
 import MachineACafe from "../../design/bureau/MachineACafe";
 import Plante from "../../design/bureau/Plante";
@@ -8,7 +9,7 @@ import Vapeur from "../../design/bureau/Vapeur";
 import type { StreamState } from "../../hooks/streamState";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import type { UseServicesResult } from "../../hooks/useServices";
-import { MACHINE_X, PORTE_X } from "../../lib/bureau/activites";
+import { BIBLIOTHEQUE_X, MACHINE_X, PORTE_X } from "../../lib/bureau/activites";
 import { cielDesFenetres } from "../../lib/bureau/ciel";
 import { dayMoment } from "../../lib/bureau/dayMoment";
 import { enPourcentDuSol } from "../../lib/bureau/etirementDuSol";
@@ -27,16 +28,18 @@ import TableauDesCriteres from "./TableauDesCriteres";
  * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
  */
 const TABLEAU_X = 30;
-const FENETRES_X = [190, 270, 616] as const;
+// Fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le tableau et le ficus (ticket-627).
+const FENETRES_X = [134, 274, 616] as const;
 const PLAFONNIERS_X = [250, 432, 590] as const;
 const FICUS_X = 348;
 const IMPRIMANTE_X = 392;
 const BAIE_X = 528;
 const CACTUS_X = 572;
 const BOITE_X = 676;
-const INTERRUPTEUR_X = 716;
+// Plus près de la porte que de la boîte aux lettres, comme un vrai interrupteur (ticket-627).
+const INTERRUPTEUR_X = 727;
 /** Le tableau blanc, un peu plus grand que le reste : il tient la moitié de la hauteur du mur. */
-const TABLEAU_RELATIF = 1.07;
+const TABLEAU_RELATIF = 1.15;
 
 interface FondDeLaPieceProps {
   projet: string;
@@ -123,6 +126,11 @@ export default function FondDeLaPiece({
           etat={etat}
           relatif={TABLEAU_RELATIF}
         />
+      </Pose>
+      <Pose x={BIBLIOTHEQUE_X}>
+        <Agrandi>
+          <Bibliotheque />
+        </Agrandi>
       </Pose>
       <Pose x={FICUS_X}>
         <Agrandi>

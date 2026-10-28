@@ -241,7 +241,7 @@ export const api = {
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
     /** Statut de toutes les PR d'un projet en un seul appel (ticket-367). */
     getPrStatuses: (projectId: string): Promise<PRStatusEntry[]> =>
-      request(`/projects/${projectId}/pr-statuses`),
+      request<{ statuses: PRStatusEntry[] }>(`/projects/${projectId}/pr-statuses`).then((r) => r.statuses),
   },
   pipeline: {
     /** Les réglages du pipeline d'un projet (ticket-196). */
