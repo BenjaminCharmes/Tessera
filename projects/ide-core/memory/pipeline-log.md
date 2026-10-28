@@ -5765,3 +5765,19 @@ Le diff ajoute :
 - 2026-10-28 08:15:51 UTC — [ticket-589] validateur: APPROVED — Conception complète et pragmatique : l'ADR décide de reporter sans écarter (mesu (341547ms)
 - 2026-10-28 08:15:51 UTC — [ticket-589] APPROVED après 1 tour(s)
 - 2026-10-28 08:19:08 UTC — [ticket-589] documentation: 0 fichier(s) (192577ms)
+- 2026-10-28 08:19:28 UTC — [ide-core] ticket-589 PR #702 confiée au CIWatcher
+- 2026-10-28 08:19:32 UTC — [ticket-604] branche ticket-604-agent-calls-records-the-cache-creation-tokens-of
+- 2026-10-28 08:20:05 UTC — [ticket-604] plan rendu (30280ms)
+- 2026-10-28 08:20:05 UTC — [ticket-604] tour 1 — codeur démarré
+- 2026-10-28 08:22:53 UTC — [ticket-604] tour 1 — codeur terminé (168281ms)
+- 2026-10-28 08:25:38 UTC — [ide-core] ticket-589 PR #702 mergée (CI verte)
+- 2026-10-28 08:33:07 UTC — [ticket-604] testeur: 1 failed, 2984 passed, 64 warnings in 609.87s (0:10:09)
+- 2026-10-28 08:33:07 UTC — [ticket-604] tests rouges au tour 1
+- 2026-10-28 08:33:07 UTC — [ticket-604] tour 2 — codeur démarré
+- 2026-10-28 08:34:49 UTC — [ticket-604] tour 2 — codeur terminé (102655ms)
+- 2026-10-28 08:42:59 UTC — [ticket-604] testeur: OK (exit 0)
+- 2026-10-28 08:44:20 UTC — [ticket-604] securite: PASS — Refactorisation propre d'une fonction de persistance et ajout d'une nouvelle col (80905ms)
+- 2026-10-28 08:44:20 UTC — [ticket-604] tour 2 — reviewer démarré
+- 2026-10-28 08:44:40 UTC — [ticket-604] tour 2 — reviewer terminé (19485ms)
+- 2026-10-28 08:46:51 UTC — [ticket-604] validateur: APPROVED — Tous les critères sont respectés. Le ticket ajoute une colonne `cache_creation_t (150672ms)
+- 2026-10-28 08:46:51 UTC — [ticket-604] APPROVED après 2 tour(s)
