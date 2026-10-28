@@ -5764,3 +5764,4 @@ Le diff ajoute :
 - 2026-10-28 08:15:51 UTC — [ticket-589] validateur: fichiers cités joints : memory/decisions.md (tronqué)
 - 2026-10-28 08:15:51 UTC — [ticket-589] validateur: APPROVED — Conception complète et pragmatique : l'ADR décide de reporter sans écarter (mesu (341547ms)
 - 2026-10-28 08:15:51 UTC — [ticket-589] APPROVED après 1 tour(s)
+- 2026-10-28 08:19:08 UTC — [ticket-589] documentation: 0 fichier(s) (192577ms)
