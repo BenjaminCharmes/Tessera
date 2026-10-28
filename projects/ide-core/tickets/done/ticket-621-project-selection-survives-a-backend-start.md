@@ -3,7 +3,7 @@ id: ticket-621
 title: "Selecting a project works even when the interface loaded before the backend"
 type: fix
 status: done
-pr_number: null
+pr_number: 703
 priority: high
 agent: codeur
 depends_on: []
