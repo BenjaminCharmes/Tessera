@@ -1,12 +1,13 @@
 ---
-id: ticket-616
-title: "Capture widths and themes are configurable per project"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: []
 created: 2026-10-27
+depends_on: []
+id: ticket-616
+pr_number: 725
+priority: medium
+status: done
+title: Capture widths and themes are configurable per project
+type: feat
 ---
 
 # ticket-616 — Largeurs et thèmes de capture configurables
