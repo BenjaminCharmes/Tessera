@@ -1,14 +1,17 @@
 ---
-id: ticket-605
-title: "A script measures the input tokens per role and what headroom removes from them"
-type: chore
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-604]
-estimated_days: 1
 created: 2026-10-27
+depends_on:
+- ticket-604
+estimated_days: 1
+id: ticket-605
 plan: true
+pr_number: 708
+priority: low
+status: done
+title: A script measures the input tokens per role and what headroom removes from
+  them
+type: chore
 ---
 
 # ticket-605 — Mesurer ce que headroom retire des entrées des agents
