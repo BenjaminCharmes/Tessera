@@ -5820,3 +5820,4 @@ Le diff ajoute :
 - 2026-10-28 10:44:14 UTC — [ticket-611] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers), scripts/ (dossier, 7 fichiers)
 - 2026-10-28 10:44:14 UTC — [ticket-611] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le ticket contient une réponse c (243890ms)
 - 2026-10-28 10:44:14 UTC — [ticket-611] APPROVED après 1 tour(s)
+- 2026-10-28 10:48:41 UTC — [ticket-611] documentation: 1 fichier(s) (259469ms) — après tour de correction
