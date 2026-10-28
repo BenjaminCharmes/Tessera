@@ -5,6 +5,7 @@ depends_on:
 - ticket-612
 estimated_days: 1.5
 id: ticket-614
+pr_number: 719
 priority: medium
 status: done
 title: The reviewer verdict comes from a structured output and the keyword parser
