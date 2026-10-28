@@ -5,6 +5,7 @@ depends_on:
 - ticket-612
 estimated_days: 1
 id: ticket-613
+pr_number: 715
 priority: medium
 status: done
 title: Security audit and validator read their verdict from a structured output
