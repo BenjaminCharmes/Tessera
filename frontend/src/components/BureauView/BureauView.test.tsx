@@ -36,7 +36,9 @@ describe("BureauView", () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
     vi.spyOn(api.runs, "list").mockResolvedValue([]);
     // Le tableau du jour lit la dépense et le quota : rien de réseau dans ces tests.
-    vi.spyOn(api.usage, "stats").mockResolvedValue({ daily: [] } as unknown as UsageStats);
+    vi.spyOn(api.usage, "stats").mockResolvedValue({
+      daily: [],
+    } as unknown as UsageStats);
     vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });
     vi.useFakeTimers();
     vi.setSystemTime(T0 + 5_000);
@@ -60,6 +62,8 @@ describe("BureauView", () => {
     render(<DixPieces />);
 
     expect(setIntervalEspion).toHaveBeenCalledTimes(1);
+    // L'image qui active la marche des agents passe d'abord : elle ne se répète pas (ticket-638).
+    act(() => vi.advanceTimersToNextFrame());
     expect(vi.getTimerCount()).toBe(1);
   });
 
@@ -67,13 +71,17 @@ describe("BureauView", () => {
     render(<BureauView projets={projets(6)} {...CANAL} />);
 
     expect(screen.getAllByRole("region")).toHaveLength(6);
+    // L'image qui active la marche des agents passe d'abord : elle ne se répète pas (ticket-638).
+    act(() => vi.advanceTimersToNextFrame());
     expect(vi.getTimerCount()).toBe(1);
   });
 
   it("moves the words with the clock without any new event", () => {
     render(<BureauView projets={projets(1)} {...CANAL} />);
     expect(screen.queryByTestId("bulle")).toBeNull();
-    expect(screen.getByRole("button", { name: "Codeur, travaille" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Codeur, travaille" }),
+    ).toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(30_000);
@@ -87,10 +95,16 @@ describe("BureauView", () => {
   });
 
   it("keeps one full room per project, stacked, however many there are", () => {
-    const { container } = render(<BureauView projets={projets(7)} {...CANAL} />);
+    const { container } = render(
+      <BureauView projets={projets(7)} {...CANAL} />,
+    );
 
     expect(screen.getAllByRole("region")).toHaveLength(7);
-    expect(container.querySelector('[data-mode="pieces"]')?.className).toContain("flex-col");
+    expect(
+      container.querySelector('[data-mode="pieces"]')?.className,
+    ).toContain("flex-col");
+    // L'image qui active la marche des agents passe d'abord : elle ne se répète pas (ticket-638).
+    act(() => vi.advanceTimersToNextFrame());
     expect(vi.getTimerCount()).toBe(1);
   });
 });
