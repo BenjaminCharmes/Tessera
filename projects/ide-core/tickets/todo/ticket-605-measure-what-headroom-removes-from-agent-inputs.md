@@ -15,7 +15,7 @@ plan: true
 
 ## Objectif
 Produire les chiffres que ticket-589 n'a pas pu lire, pour rouvrir ou clore
-ADR-059.
+ADR-063.
 
 ## Contexte
 `docs/superpowers/specs/2026-10-27-compression-contexte-design.md`, sections 1
