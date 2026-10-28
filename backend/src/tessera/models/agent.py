@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -104,6 +104,9 @@ class AgentResult(BaseModel):
     # Les outils que le CLI a refusés pendant l'appel (ticket-515), pour que
     # l'étape les écrive au journal.
     outils_refuses: list[str] = Field(default_factory=list)
+    # La sortie validée par le schéma posé à l'appel (ADR-061) ; None sans
+    # schéma, ou quand le provider n'a rendu aucune sortie valide.
+    structured: dict[str, Any] | None = None
 
 
 class AgentRunRequest(BaseModel):

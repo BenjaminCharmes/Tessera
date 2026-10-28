@@ -24,17 +24,11 @@ from tessera.services.providers.base import (
 )
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.ollama_corps import _corps, _resultat, _verifier_statut
 
-#: Le défaut d'Ollama est 4 096 tokens de contexte : le diff de 16 000
-#: caractères que reçoit l'audit sécurité serait tronqué en silence, et le
-#: verdict porterait sur sa moitié. Toujours envoyé, jamais en dessous.
-NUM_CTX_MINIMUM = 16_384
 #: Un modèle qui se charge en mémoire prend bien plus que les 5 s par défaut.
 DELAI_LECTURE_S = 300.0
 DELAI_CONNEXION_S = 5.0
-#: Estimation grossière, volontairement pessimiste : un token vaut environ
-#: trois caractères de code ou de français.
-CARACTERES_PAR_TOKEN = 3
 
 # --- Sérialisation par serveur (ticket-350) ---
 
@@ -167,13 +161,14 @@ class OllamaProvider:
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         # `cwd`, `ask_user`, `session` : pas d'outils, pas de conversation à
         # reprendre — ignorés, comme dans `AnthropicApiProvider`.
         _check_cooldown(self.base_url)
         async with borner(self._duree_max_s, a_l_expiration=self._ralentir):
             await self._verifier_modele(model)
-            corps = _corps(system, user, model, max_tokens, stream=False)
+            corps = _corps(system, user, model, max_tokens, stream=False, schema=schema)
             # Le créneau est pris avant d'envoyer la requête : le délai de
             # lecture httpx ne court qu'à partir de l'envoi, pas pendant
             # l'attente du slot.
@@ -189,7 +184,8 @@ class OllamaProvider:
                     raise ProviderIndisponible(f"Ollama injoignable : {exc}") from exc
         _verifier_statut(reponse)
         donnees = reponse.json()
-        return _resultat(str(donnees.get("message", {}).get("content", "")), donnees)
+        contenu = str(donnees.get("message", {}).get("content", ""))
+        return _resultat(contenu, donnees, schema)
 
     async def stream(
         self,
@@ -203,17 +199,18 @@ class OllamaProvider:
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         _check_cooldown(self.base_url)
         async with borner(self._duree_max_s, a_l_expiration=self._ralentir):
             await self._verifier_modele(model)
-            corps = _corps(system, user, model, max_tokens, stream=True)
+            corps = _corps(system, user, model, max_tokens, stream=True, schema=schema)
             # Le créneau est tenu pendant tout le flux : un flux interrompu
             # (exception du consommateur ou réseau) sort du contextmanager et
             # rend le créneau.
             async with _maybe_slot(self.base_url):
                 contenu, dernier = await self._lire_flux(corps, on_token)
-        return _resultat(contenu, dernier)
+        return _resultat(contenu, dernier, schema)
 
     async def _lire_flux(
         self, corps: dict[str, Any], on_token: StreamCallback | None
@@ -264,36 +261,3 @@ class OllamaProvider:
                 f"Modèle {model!r} absent d'Ollama ({self.base_url}) : "
                 f"`ollama pull {model}` pour l'installer."
             )
-
-
-def _corps(system: str, user: str, model: str, max_tokens: int, *, stream: bool) -> dict[str, Any]:
-    num_ctx = max(
-        NUM_CTX_MINIMUM, (len(system) + len(user)) // CARACTERES_PAR_TOKEN + max_tokens
-    )
-    messages: list[dict[str, str]] = []
-    if system.strip():
-        messages.append({"role": "system", "content": system})
-    messages.append({"role": "user", "content": user})
-    return {
-        "model": model,
-        "messages": messages,
-        "stream": stream,
-        "options": {"num_ctx": num_ctx, "num_predict": max_tokens},
-    }
-
-
-def _verifier_statut(reponse: httpx.Response) -> None:
-    if reponse.status_code >= 400:
-        raise ProviderIndisponible(
-            f"Ollama a répondu {reponse.status_code} : {reponse.text[:200]}"
-        )
-
-
-def _resultat(contenu: str, donnees: dict[str, Any]) -> ProviderResult:
-    return ProviderResult(
-        content=contenu,
-        input_tokens=int(donnees.get("prompt_eval_count", 0) or 0),
-        output_tokens=int(donnees.get("eval_count", 0) or 0),
-        cost_usd=0.0,
-        provider_name=OllamaProvider.name,
-    )

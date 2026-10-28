@@ -1,13 +1,15 @@
 ---
-id: ticket-612
-title: "Providers accept a JSON schema and return the validated structured output"
-type: feat
-status: todo
-priority: medium
 agent: codeur
 created: 2026-10-27
-depends_on: [ticket-611]
+depends_on:
+- ticket-611
 estimated_days: 1
+id: ticket-612
+pr_number: 712
+priority: medium
+status: done
+title: Providers accept a JSON schema and return the validated structured output
+type: feat
 ---
 
 # ticket-612 — La plomberie du schéma dans `LLMProvider`

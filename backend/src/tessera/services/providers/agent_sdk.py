@@ -41,9 +41,9 @@ async def _sdk_gen(
     async for msg in query(prompt=prompt, options=options):
         yield msg
 
-from tessera.config import VARIABLES_JETONS
 from tessera.models.agent import EffortLevel
 from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
+from tessera.services.providers.env_sdk import env_du_sous_processus
 from tessera.services.providers.garde_jetons import hook_refus_env_tessera
 from tessera.services.providers.git_guard import hook_refus_git
 from tessera.services.providers.perimetre import (
@@ -64,7 +64,10 @@ from tessera.services.providers.base import (
 )
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.messages_sdk import (
+    OUTIL_SORTIE_STRUCTUREE,
     _extract_stream_delta,
+    _format_de_sortie,
+    _structured_from,
     _usage_from,
 )
 from tessera.services.providers.noms import ProviderIndisponible
@@ -140,8 +143,11 @@ def _build_options(
     git_bash_path: str | None = None,
     journal_refus: JournalDesRefus | None = None,
     effort: EffortLevel | None = None,
+    schema: dict[str, Any] | None = None,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
+
+    ``schema`` asks the SDK for an output validated against it (ADR-061).
 
     ``effort`` is the role's reasoning effort (ticket-573); left ``None``, the
     SDK keeps its own default.
@@ -186,23 +192,7 @@ def _build_options(
         mcp_servers[ASK_USER_SERVER_NAME] = build_ask_user_server(ask_user)
         effective_tools = [*effective_tools, ASK_USER_TOOL_NAME]
 
-    # Une ANTHROPIC_API_KEY présente dans l'environnement est PRIORITAIRE sur
-    # la session Claude Code dans le CLI. En mode abonnement — le défaut — elle
-    # ne sert donc à rien et casse tout : le CLI tente de s'authentifier avec
-    # elle et remonte `401 API key is invalid`. Le placeholder `sk-ant-...`
-    # livré dans `.env.example` suffit à faire échouer *tous* les appels
-    # agent, avec un message d'erreur qui ne pointe jamais vers `.env`.
-    # On la neutralise explicitement pour le sous-process du SDK ; la clef
-    # reste disponible pour `AnthropicApiProvider`, qui est le seul à devoir
-    # l'utiliser.
-    # Même traitement pour les jetons de mise en ligne (ADR-053) : un jeton
-    # exporté dans le shell qui a lancé le backend serait hérité par le CLI.
-    env: dict[str, str] = {"ANTHROPIC_API_KEY": ""}
-    env.update({variable: "" for variable in VARIABLES_JETONS})
-    # Sous Windows, le SDK n'active `Bash` que si cette variable pointe vers
-    # un bash.exe. Sans elle, l'outil disparaît en silence (ticket-319).
-    if git_bash_path:
-        env["CLAUDE_CODE_GIT_BASH_PATH"] = git_bash_path
+    env = env_du_sous_processus(git_bash_path)
 
     return ClaudeAgentOptions(
         env=env,
@@ -225,6 +215,7 @@ def _build_options(
         resume=resume,
         skills=list(skills) if skills else None,
         effort=effort,
+        output_format=_format_de_sortie(schema),
         plugins=plugins,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
@@ -313,13 +304,14 @@ class ClaudeAgentSDKProvider:
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         # NB : max_tokens est reçu pour satisfaire le protocole LLMProvider mais
         # ClaudeAgentOptions n'expose aucun champ équivalent — il est ignoré ici.
         # Voir LLMProvider.complete pour la portée exacte de cette limitation.
         return await self._run_ou_reprendre(
             system=system, user=user, model=model, cwd=cwd, ask_user=ask_user,
-            session=session,
+            session=session, schema=schema,
         )
 
     async def stream(
@@ -334,12 +326,13 @@ class ClaudeAgentSDKProvider:
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         # NB : max_tokens est ignoré — voir la note dans complete() ci-dessus.
         return await self._run_ou_reprendre(
             system=system, user=user, model=model, cwd=cwd,
             on_token=on_token, on_tool_use=on_tool_use, ask_user=ask_user,
-            session=session,
+            session=session, schema=schema,
         )
 
     async def _run_ou_reprendre(
@@ -388,6 +381,7 @@ class ClaudeAgentSDKProvider:
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         resume: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         options = _build_options(
             system=system, model=model, max_turns=self._max_turns,
@@ -396,6 +390,7 @@ class ClaudeAgentSDKProvider:
             racine_ecriture=self.racine_ecriture, resume=resume,
             skills=self._skills, git_bash_path=self._git_bash_path,
             journal_refus=self._journal_refus, effort=self._effort,
+            schema=schema,
         )
         chunks: list[str] = []
         result: ResultMessage | None = None
@@ -446,7 +441,9 @@ class ClaudeAgentSDKProvider:
                         # robuste et vérifiable statiquement (finding 2, revue ticket-044).
                         if isinstance(block, TextBlock):
                             chunks.append(block.text)
-                        elif isinstance(block, ToolUseBlock) and on_tool_use is not None:
+                        # La sortie structurée n'est pas une action de l'agent.
+                        elif (isinstance(block, ToolUseBlock) and on_tool_use is not None
+                              and block.name != OUTIL_SORTIE_STRUCTUREE):
                             await on_tool_use(block.name, dict(block.input))
 
         if result is None:
@@ -463,4 +460,5 @@ class ClaudeAgentSDKProvider:
             provider_name=self.name,
             session_id=getattr(result, "session_id", None) or None,
             outils_refuses=refus_cli.outils_refuses,
+            structured=_structured_from(result),
         )
