@@ -42,7 +42,7 @@ Le volume ne coûte donc pas de tokens. Les risques sont ailleurs :
 - [ ] `docs/audit/adr.md` liste chaque ADR avec son statut et, pour une ADR remplacée, l'ADR qui la remplace
 - [ ] `docs/audit/adr.md` liste les paires d'ADR qui se doublonnent ou se contredisent, avec la phrase de chacune qui le montre
 - [ ] `docs/audit/adr.md` liste les règles de `memory/contraintes.md` qui renvoient à une ADR remplacée ou historique
-- [ ] Le livrable liste les tickets de correction qui en découlent, chacun avec ses critères vérifiables, dont un ticket pour attribuer les numéros d'ADR et de ticket par le code plutôt que par l'agent
+- [ ] Le livrable liste les tickets de correction qui en découlent, chacun avec ses critères vérifiables ; l'attribution des numéros par le code est déjà le ticket-659
 
 ## Ce que ça ne fait pas
 - Ne modifie ni `decisions.md` ni `contraintes.md` : les tickets de correction le feront.
