@@ -87,7 +87,8 @@ export default function Salle({
           <SkyWindow moment={moment} soleil={droite?.soleil} nuages={droite?.nuages} />
         </Agrandi>
         {accroche}
-        <span className="self-end">
+        {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
+        <span className="ml-3 self-end">
           <BoutonLumiere salle={titre} allume={lumiere} onBasculer={basculerLumiere} />
         </span>
       </div>

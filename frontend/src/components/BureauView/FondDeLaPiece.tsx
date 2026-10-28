@@ -36,7 +36,8 @@ const IMPRIMANTE_X = 392;
 const BAIE_X = 528;
 const CACTUS_X = 572;
 const BOITE_X = 676;
-const INTERRUPTEUR_X = 716;
+// Plus près de la porte que de la boîte aux lettres, comme un vrai interrupteur (ticket-627).
+const INTERRUPTEUR_X = 727;
 /** Le tableau blanc, un peu plus grand que le reste : il tient la moitié de la hauteur du mur. */
 const TABLEAU_RELATIF = 1.15;
 
