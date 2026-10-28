@@ -5,6 +5,7 @@ depends_on: []
 estimated_days: 0.5
 id: ticket-604
 plan: true
+pr_number: 704
 priority: low
 status: done
 title: agent_calls records the cache creation tokens of each call
