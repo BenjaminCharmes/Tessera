@@ -5,6 +5,7 @@ depends_on:
 - ticket-611
 estimated_days: 1
 id: ticket-612
+pr_number: 712
 priority: medium
 status: done
 title: Providers accept a JSON schema and return the validated structured output
