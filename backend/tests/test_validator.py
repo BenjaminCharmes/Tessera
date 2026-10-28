@@ -13,6 +13,7 @@ from tessera.services.validator import (
     ValidatorService,
     extract_file_refs,
 )
+from tessera.services.validator_schema import VALIDATOR_SCHEMA
 from tessera.services.validator_cited_files import (
     CITED_FILES_MAX_CHARS as _CITED_FILES_MAX_CHARS,
     CitedFilesReport,
@@ -270,20 +271,17 @@ class TestNoCriteriaCodeTickets:
         # pour une raison qui n'avait rien à voir avec le code (ticket-126).
         assert call["max_tokens"] >= 2048
 
-    async def test_criteria_judged_when_earlier_json_object_present(
+    async def test_criteria_judged_from_structured_despite_noisy_text(
         self, service: ValidatorService, provider: FakeProvider
     ) -> None:
-        # ticket-371 : le validateur citait les fichiers du ticket dans sa
-        # réponse ; l'objet {"project_id": ".."} était pris pour le verdict,
-        # et les critères se retrouvaient tous « non jugé par le validateur ».
+        # ticket-371 : un objet parasite dans le texte ne doit plus rien
+        # changer ; seule la sortie structurée est lue (ticket-613).
         verdict_obj = {
             "criteria": [{"index": 1, "criterion": "Check X", "passed": True, "note": ""}],
             "feedback": "All verified.",
         }
-        provider.set_content(
-            '{"project_id": "abc"}\n\nSome explanation.\n\n'
-            + __import__("json").dumps(verdict_obj)
-        )
+        provider.set_content('{"project_id": "abc"}\n\nSome explanation.')
+        provider.set_structured(verdict_obj)
 
         result = await service.validate(
             criteria=["Check X"],
@@ -432,6 +430,93 @@ class TestCriteriaReconciliation:
 
         assert result.verdict == "APPROVED"
         assert result.criteria[0].passed is True
+
+
+class TestStructuredOutput:
+    """Tests for ticket-613 — the verdict is read from the structured output (ADR-061)."""
+
+    async def test_schema_is_passed_to_the_provider(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        _set_response(provider, {"criteria": [], "feedback": "ok"})
+
+        await service.validate(criteria=["A"], code_produced="code", test_result=None)
+
+        assert provider.calls[0]["schema"] == VALIDATOR_SCHEMA
+
+    async def test_absent_structured_gives_changes_requested(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        # Un texte JSON lisible ne suffit plus : sans sortie structurée, refus.
+        provider.set_content('{"criteria": [{"index": 1, "passed": true}], "feedback": ""}')
+        provider.set_structured(None)
+
+        result = await service.validate(criteria=["A"], code_produced="code", test_result=None)
+
+        assert result.verdict == "CHANGES_REQUESTED"
+        assert result.all_passed is False
+        assert "sortie structurée" in result.feedback
+
+    async def test_structured_without_criteria_key_gives_changes_requested(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        provider.set_structured({"feedback": "rien"})
+
+        result = await service.validate(criteria=["A"], code_produced="code", test_result=None)
+
+        assert result.verdict == "CHANGES_REQUESTED"
+
+    async def test_missing_criterion_fails_and_verdict_is_recomputed(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        provider.set_structured(
+            {"criteria": [{"index": 1, "passed": True, "note": ""}], "feedback": "ok"}
+        )
+
+        result = await service.validate(
+            criteria=["A", "B"], code_produced="code", test_result=None
+        )
+
+        assert result.verdict == "CHANGES_REQUESTED"
+        assert result.criteria[0].passed is True
+        assert result.criteria[1].passed is False
+        assert "non jugé" in result.criteria[1].note
+
+    async def test_index_alone_is_enough_without_criterion_text(
+        self, service: ValidatorService, provider: FakeProvider
+    ) -> None:
+        provider.set_structured(
+            {
+                "criteria": [{"index": 1, "passed": True}, {"index": 2, "passed": False}],
+                "feedback": "ok",
+            }
+        )
+
+        result = await service.validate(
+            criteria=["A", "B"], code_produced="code", test_result=None
+        )
+
+        assert [c.passed for c in result.criteria] == [True, False]
+        assert result.verdict == "CHANGES_REQUESTED"
+
+    def test_schema_requires_index_and_passed_per_criterion(self) -> None:
+        item = VALIDATOR_SCHEMA["properties"]["criteria"]["items"]
+        assert set(VALIDATOR_SCHEMA["required"]) == {"criteria", "feedback"}
+        assert set(item["required"]) == {"index", "passed"}
+        assert "verdict" not in VALIDATOR_SCHEMA["properties"]
+        assert "criterion" in item["properties"]
+        assert "criterion" not in item["required"]
+
+
+_PROMPT = Path(__file__).resolve().parents[2] / "agents" / "prompts" / "validateur.md"
+
+
+def test_validator_prompt_names_the_schema_fields() -> None:
+    prompt = _PROMPT.read_text(encoding="utf-8")
+    item = VALIDATOR_SCHEMA["properties"]["criteria"]["items"]["properties"]
+    for field in set(VALIDATOR_SCHEMA["properties"]) | set(item):
+        assert f"`{field}`" in prompt, field
+    assert "```json" not in prompt
 
 
 class TestValidationResult:

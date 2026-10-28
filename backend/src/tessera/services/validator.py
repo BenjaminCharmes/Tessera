@@ -12,7 +12,7 @@ from tessera.services.validator_cited_files import (
     extract_file_refs,
     format_cited_files_log,
 )
-from tessera.utils.json_extract import extract_json
+from tessera.services.validator_schema import VALIDATOR_SCHEMA
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
@@ -115,6 +115,7 @@ class ValidatorService:
                 user=user_message,
                 model=self._model,
                 max_tokens=_MAX_TOKENS,
+                schema=VALIDATOR_SCHEMA,
             )
         except Exception as exc:
             # Same policy as unreadable JSON: a validation that did not happen
@@ -132,7 +133,7 @@ class ValidatorService:
                 cited_files=cited_files,
             )
 
-        parsed = self._parse_response(result.content, criteria)
+        parsed = self._parse_structured(result.structured, result.content, criteria)
         parsed.cited_files = cited_files
         return parsed
 
@@ -186,17 +187,18 @@ class ValidatorService:
         )
         return message, report
 
-    def _parse_response(
-        self, raw: str, sent_criteria: list[str]
+    def _parse_structured(
+        self, parsed: dict[str, Any] | None, raw: str, sent_criteria: list[str]
     ) -> ValidationResult:
-        parsed = extract_json(raw, required_key="criteria")
-        if not parsed:
+        # Sans sortie structurée, ou sans `criteria`, rien n'a été jugé : la
+        # validation échoue fermée (ADR-039).
+        if not parsed or "criteria" not in parsed:
             _logger.warning("validator_invalid_json", extra={"raw": raw[:200]})
             return ValidationResult(
                 all_passed=False,
                 criteria=[],
                 verdict="CHANGES_REQUESTED",
-                feedback="Réponse du validateur non parseable.",
+                feedback="Réponse du validateur sans sortie structurée valide.",
             )
 
         raw_entries = [c for c in parsed.get("criteria", []) if isinstance(c, dict)]
@@ -273,12 +275,6 @@ def _build_feedback(base_feedback: str, criteria: list[CriterionResult]) -> str:
         " de la réponse du validateur. "
     )
     return prefix + base_feedback
-
-
-def _normalize(text: str) -> str:
-    """Normalize a criterion text for matching: strip checkboxes and lowercase."""
-    text = _CHECKBOX_PREFIX.sub("", text.strip())
-    return text.lower().strip()
 
 
 def _tolerant_normalize(text: str) -> str:

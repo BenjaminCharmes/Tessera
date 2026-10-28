@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from tessera.services.providers.base import LLMProvider
 from tessera.services.quota_exhaustion import is_quota_exhausted
-from tessera.utils.json_extract import extract_json
+from tessera.services.security_schema import SECURITY_SCHEMA
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
@@ -150,13 +150,14 @@ class SecurityAuditorService:
                 # Ticket-485 : l'audit lit le code hors diff avant de
                 # bloquer ; `cwd` le place dans le projet.
                 cwd=project_path.resolve(),
+                schema=SECURITY_SCHEMA,
             )
-            parsed = self._parse_response(result.content, attempt)
+            parsed = self._parse_structured(result.structured, result.content, attempt)
             if parsed is not None:
                 return parsed
 
         return _blocked(
-            "Réponse de l'auditeur sécurité illisible (JSON attendu) "
+            "Pas de sortie structurée valide de l'auditeur sécurité "
             "après deux tentatives."
         )
 
@@ -166,10 +167,13 @@ class SecurityAuditorService:
             return prompt_path.read_text(encoding="utf-8")
         return "Audit code for security vulnerabilities. Respond with JSON."
 
-    def _parse_response(self, raw: str, attempt: int = 1) -> SecurityAuditResult | None:
-        """Parse the auditor answer; return None when it holds no readable JSON."""
-        parsed = extract_json(raw, required_key="verdict")
-        if not parsed:
+    def _parse_structured(
+        self, parsed: dict[str, Any] | None, raw: str, attempt: int = 1
+    ) -> SecurityAuditResult | None:
+        """Read the structured output; return None when it is absent or has no verdict."""
+        # Un objet sans `verdict` contredit le schéma : il se traite comme une
+        # sortie absente (ADR-039, échec fermé).
+        if not parsed or "verdict" not in parsed:
             _logger.warning(
                 "security_auditor_invalid_json",
                 extra={"raw": raw[:200], "attempt": attempt},
