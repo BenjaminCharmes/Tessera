@@ -6,6 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-605
 plan: true
+pr_number: 708
 priority: low
 status: done
 title: A script measures the input tokens per role and what headroom removes from
