@@ -5,6 +5,7 @@ depends_on:
 - ticket-614
 estimated_days: 0.5
 id: ticket-615
+pr_number: 721
 priority: low
 status: done
 title: The interface reads the reviewer verdict from the event field, not from its
