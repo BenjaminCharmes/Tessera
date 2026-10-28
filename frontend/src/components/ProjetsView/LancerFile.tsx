@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../../design/ui/Button";
 import { api } from "../../lib/api";
 import type { ProjectOverview } from "../../types/api";
+import { BULLE } from "./BoutonServices";
 import { idsAFaire } from "./idsAFaire";
 
 interface LancerFileProps {
@@ -29,13 +30,30 @@ function bilan(ajoutes: number): string {
   return `${ajoutes} ajouté${ajoutes > 1 ? "s" : ""}`;
 }
 
+/** Ce que le bouton propose : lancer une file, la compléter, ou un seul ticket. */
+type Mode = "file" | "ajout" | "suivant";
+
+const QUESTION: Record<Mode, (n: number) => string> = {
+  file: (n) => `Lancer ${n} tickets ?`,
+  ajout: (n) => `Ajouter ${n} tickets à la file en cours ?`,
+  suivant: () => "Lancer le prochain ticket à faire, seul ?",
+};
+
+const LIBELLE: Record<Mode, (n: number) => string> = {
+  file: (n) => `File (${n})`,
+  ajout: (n) => `Ajouter à la file (${n})`,
+  suivant: () => "Ticket suivant",
+};
+
 /**
  * Lance la file des tickets « à faire » d'un projet depuis sa carte — ticket-412.
  *
  * Quand une file tourne déjà sur le projet, le bouton y ajoute les tickets au
- * lieu d'être grisé (ticket-557). Pendant un run d'un seul ticket, il reste
- * grisé et le dit en clair. La confirmation se fait sur place, sans fenêtre
- * modale. Tout clic ici s'arrête : la carte n'est pas sélectionnée.
+ * lieu d'être grisé (ticket-557). Un projet à worktree ne tourne qu'un ticket à
+ * la fois (ADR-056) : le bouton y lance le prochain ticket seul, au lieu d'une
+ * file que le backend refuserait (ticket-633). La confirmation et les messages
+ * s'ouvrent en bulle au-dessus du bouton, sans pousser la carte. Tout clic ici
+ * s'arrête : la carte n'est pas sélectionnée.
  */
 export default function LancerFile({
   projet,
@@ -47,7 +65,12 @@ export default function LancerFile({
   const [enCours, setEnCours] = useState(false);
   const [echec, setEchec] = useState<string | null>(null);
   const [resultat, setResultat] = useState<string | null>(null);
-  const ajout = projet.run_actif && fileEnCours !== null;
+  const mode: Mode = projet.worktree
+    ? "suivant"
+    : projet.run_actif && fileEnCours !== null
+      ? "ajout"
+      : "file";
+  const ajout = mode === "ajout";
   // Le bouton restait « Ajouter à la file (n) » une fois tout ajouté : on croyait
   // que rien n'était parti, et on cliquait en boucle (ticket-622).
   const n = ajout
@@ -63,7 +86,17 @@ export default function LancerFile({
       const ids = idsAFaire(tickets).filter(
         (id) => !(ajout && dejaEnFile.includes(id)),
       );
-      if (ajout && fileEnCours) {
+      if (mode === "suivant") {
+        const [premier] = ids;
+        if (premier) {
+          await api.orchestrator.run({
+            project_id: projet.id,
+            mode: "single",
+            ticket_id: premier,
+          });
+          setResultat(`${premier} lancé`);
+        }
+      } else if (ajout && fileEnCours) {
         const { ajoutes } = await api.orchestrator.append(fileEnCours, ids);
         setResultat(bilan(ajoutes.length));
       } else {
@@ -76,6 +109,8 @@ export default function LancerFile({
       setConfirmation(false);
       onLancee();
     } catch (e) {
+      // La bulle de confirmation se referme : l'erreur prend sa place.
+      setConfirmation(false);
       setEchec(messageDEchec(e, ajout));
     } finally {
       setEnCours(false);
@@ -93,55 +128,47 @@ export default function LancerFile({
   const bloque = projet.run_actif && !ajout;
   return (
     <div
-      className="flex flex-wrap items-center justify-end gap-1.5"
+      className="relative shrink-0"
       onClick={(e) => e.stopPropagation()}
       onKeyDown={(e) => e.stopPropagation()}
     >
-      {confirmation ? (
-        <>
-          <span className="text-micro text-zinc-300">
-            {ajout
-              ? `Ajouter ${n} tickets à la file en cours ?`
-              : `Lancer ${n} tickets ?`}
+      <Button
+        taille="compact"
+        disabled={bloque || enCours}
+        title={bloque ? "Un run est en cours" : undefined}
+        onClick={() => setConfirmation(true)}
+      >
+        {LIBELLE[mode](n)}
+      </Button>
+      {confirmation && (
+        <div className={`${BULLE} flex flex-col items-end gap-1.5`}>
+          <span className="text-zinc-300">{QUESTION[mode](n)}</span>
+          <span className="flex gap-1.5">
+            <Button
+              taille="compact"
+              variante="discret"
+              disabled={enCours}
+              onClick={() => setConfirmation(false)}
+            >
+              Annuler
+            </Button>
+            <Button
+              taille="compact"
+              disabled={enCours}
+              onClick={() => void lancer()}
+            >
+              {ajout ? "Ajouter" : "Lancer"}
+            </Button>
           </span>
-          <Button
-            taille="compact"
-            disabled={enCours}
-            onClick={() => void lancer()}
-          >
-            {ajout ? "Ajouter" : "Lancer"}
-          </Button>
-          <Button
-            taille="compact"
-            variante="discret"
-            disabled={enCours}
-            onClick={() => setConfirmation(false)}
-          >
-            Annuler
-          </Button>
-        </>
-      ) : (
-        <>
-          {bloque && (
-            <span className="text-micro text-zinc-500">Run en cours</span>
-          )}
-          <Button
-            taille="compact"
-            disabled={bloque}
-            title={bloque ? "Un run est en cours" : undefined}
-            onClick={() => setConfirmation(true)}
-          >
-            {ajout ? `Ajouter à la file (${n})` : `File (${n})`}
-          </Button>
-        </>
+        </div>
       )}
-      {resultat && (
-        <span role="status" className="text-micro text-zinc-400">
+      {!confirmation && resultat && (
+        <span role="status" className={`${BULLE} text-zinc-400`}>
           {resultat}
         </span>
       )}
-      {echec && (
-        <span role="alert" className="text-micro text-red-400">
+      {!confirmation && echec && (
+        <span role="alert" className={`${BULLE} text-red-400`}>
           {echec}
         </span>
       )}

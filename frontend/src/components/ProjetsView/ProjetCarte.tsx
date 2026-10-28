@@ -59,6 +59,10 @@ function Icone({ projet }: { projet: ProjectOverview }) {
   );
 }
 
+/**
+ * « À faire » toujours, les autres seulement s'ils comptent : quatre zéros prenaient
+ * la place des boutons sur la même ligne (ticket-633).
+ */
 function Compteurs({ projet }: { projet: ProjectOverview }) {
   const t = projet.tickets;
   const lignes: { libelle: string; nombre: number; couleur: string }[] = [
@@ -68,8 +72,8 @@ function Compteurs({ projet }: { projet: ProjectOverview }) {
     { libelle: "Faits", nombre: t.done, couleur: "text-green-400" },
   ];
   return (
-    <ul className="flex flex-wrap gap-x-3 gap-y-0.5 text-micro">
-      {lignes.map((l) => (
+    <ul className="flex min-w-0 flex-wrap gap-x-3 text-micro leading-tight">
+      {lignes.filter((l, i) => i === 0 || l.nombre > 0).map((l) => (
         <li key={l.libelle} className={l.couleur}>
           {l.libelle} <span className="font-medium">{l.nombre}</span>
         </li>
@@ -199,25 +203,27 @@ export default function ProjetCarte({
       )}
       <LienDepot projet={projet} />
       {/* Les cartes d'une rangée ont la même hauteur : le pied est poussé en
-          bas pour que dates et compteurs s'alignent d'une carte à l'autre,
-          quelle que soit la longueur de la description. */}
-      <div data-testid="pied-de-carte" className="mt-auto flex flex-col gap-2">
+          bas, et sa ligne d'actions a toujours la même hauteur, qu'elle porte
+          des boutons ou non. Dates et compteurs s'alignent donc d'une carte à
+          l'autre (ticket-633). Messages et confirmations s'ouvrent en bulle
+          au-dessus de leur bouton : ils ne poussent pas la carte. */}
+      <div data-testid="pied-de-carte" className="mt-auto flex flex-col gap-1.5">
         <Dates projet={projet} />
-        <Compteurs projet={projet} />
-        {/* Une seule rangée d'actions, alignée à droite, qui se replie
-            proprement : File, Mettre en ligne, Lancer (ticket-557). */}
-        <div
-          data-testid="actions-de-carte"
-          className="flex flex-wrap items-start justify-end gap-1.5"
-        >
-          <LancerFile
-            projet={projet}
-            fileEnCours={fileEnCours}
-            dejaEnFile={dejaEnFile}
-            onLancee={onFileLancee}
-          />
-          <BoutonMiseEnLigne projet={projet} />
-          <BoutonServices projet={projet} onChange={onServicesChange} />
+        <div className="flex h-7 items-center justify-between gap-2">
+          <Compteurs projet={projet} />
+          <div
+            data-testid="actions-de-carte"
+            className="flex shrink-0 items-center gap-1.5"
+          >
+            <LancerFile
+              projet={projet}
+              fileEnCours={fileEnCours}
+              dejaEnFile={dejaEnFile}
+              onLancee={onFileLancee}
+            />
+            <BoutonMiseEnLigne projet={projet} compact />
+            <BoutonServices projet={projet} onChange={onServicesChange} />
+          </div>
         </div>
       </div>
     </article>

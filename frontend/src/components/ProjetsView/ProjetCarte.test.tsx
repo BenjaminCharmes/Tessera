@@ -57,7 +57,7 @@ describe("ProjetCarte services button", () => {
     start.mockResolvedValue({ services: [] });
     const { onSelect, onServicesChange } = afficher(projet());
 
-    await userEvent.click(screen.getByRole("button", { name: "Lancer" }));
+    await userEvent.click(screen.getByRole("button", { name: "Lancer l'app" }));
 
     expect(start).toHaveBeenCalledWith("serpent");
     expect(onSelect).not.toHaveBeenCalled();
@@ -68,8 +68,8 @@ describe("ProjetCarte services button", () => {
     stop.mockResolvedValue({ arretes: 1 });
     const { onSelect } = afficher(projet({ services_en_cours: true }));
 
-    expect(screen.queryByRole("button", { name: "Lancer" })).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Arrêter" }));
+    expect(screen.queryByRole("button", { name: "Lancer l'app" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Arrêter l'app" }));
 
     expect(stop).toHaveBeenCalledWith("serpent");
     expect(start).not.toHaveBeenCalled();
@@ -79,18 +79,18 @@ describe("ProjetCarte services button", () => {
   it("shows no button when the project declares no service", () => {
     afficher(projet({ services_declares: false }));
 
-    expect(screen.queryByRole("button", { name: "Lancer" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Arrêter" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Lancer l'app" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Arrêter l'app" })).not.toBeInTheDocument();
   });
 
   it("shows the failure under the button and enables it again", async () => {
     start.mockRejectedValue(new Error("API 409: rien de déclaré"));
     const { onServicesChange } = afficher(projet());
 
-    await userEvent.click(screen.getByRole("button", { name: "Lancer" }));
+    await userEvent.click(screen.getByRole("button", { name: "Lancer l'app" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("API 409: rien de déclaré");
-    expect(screen.getByRole("button", { name: "Lancer" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Lancer l'app" })).toBeEnabled();
     expect(onServicesChange).not.toHaveBeenCalled();
   });
 
@@ -99,11 +99,11 @@ describe("ProjetCarte services button", () => {
     start.mockReturnValue(new Promise((resolve) => (finir = resolve)));
     afficher(projet());
 
-    await userEvent.click(screen.getByRole("button", { name: "Lancer" }));
-    expect(screen.getByRole("button", { name: "Lancer" })).toBeDisabled();
+    await userEvent.click(screen.getByRole("button", { name: "Lancer l'app" }));
+    expect(screen.getByRole("button", { name: "Lancer l'app" })).toBeDisabled();
 
     finir({ services: [] });
-    await waitFor(() => expect(screen.getByRole("button", { name: "Lancer" })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Lancer l'app" })).toBeEnabled());
   });
 });
 
@@ -139,22 +139,23 @@ describe("ProjetCarte footer", () => {
     expect(pied).toHaveTextContent(/À faire/);
   });
 
-  it("puts every action on one right-aligned row under the counters", () => {
-    // Le 23/10, « File » vivait sur sa propre rangée, à gauche, et les
-    // compteurs se repliaient entre les boutons (ticket-557).
+  it("puts the actions on the counters' row, which keeps its height without buttons", () => {
+    // Le 23/10, « File » vivait sur sa propre rangée (ticket-557) ; le 28/10, une
+    // carte sans bouton avait ses compteurs plus bas que sa voisine (ticket-633).
     afficher(projet({ services_declares: true, tickets: { todo: 2, in_progress: 0, in_review: 0, blocked: 0, done: 1 } }));
 
     const actions = screen.getByTestId("actions-de-carte");
-    expect(actions).toHaveClass("justify-end", "flex-wrap");
+    expect(actions.parentElement).toHaveClass("h-7", "justify-between");
+    expect(actions.parentElement).toHaveTextContent(/À faire/);
     expect(within(actions).getByRole("button", { name: "File (2)" })).toBeInTheDocument();
-    expect(within(actions).getByRole("button", { name: "Lancer" })).toBeInTheDocument();
+    expect(within(actions).getByRole("button", { name: "Lancer l'app" })).toBeInTheDocument();
     expect(actions).not.toHaveTextContent(/À faire/);
   });
 
   it("gives the card buttons the same compact size", () => {
     afficher(projet({ services_declares: true, tickets: { todo: 2, in_progress: 0, in_review: 0, blocked: 0, done: 1 } }));
 
-    for (const nom of ["File (2)", "Lancer"]) {
+    for (const nom of ["File (2)", "Lancer l'app"]) {
       expect(screen.getByRole("button", { name: nom })).toHaveClass("h-[26px]");
     }
   });
