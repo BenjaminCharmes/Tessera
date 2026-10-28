@@ -1,8 +1,11 @@
 # Compresser le contexte des agents avec headroom — conception
 
-Ticket-589. Statut : **reporter** (ADR-063). Aucun code, aucune dépendance
-ajoutée : headroom n'est ni installé ni lancé, `backend/pyproject.toml` et
-`uv.lock` sont inchangés. Tout gain chiffré ci-dessous est une **estimation**.
+Ticket-589. Statut : **reporter** (ADR-063). Aucune dépendance ajoutée :
+headroom n'est pas dans `backend/pyproject.toml` ni `uv.lock`, inchangés ; le
+ticket-605 l'a lancé une fois dans un environnement jetable
+(`uv run --with headroom-ai`). Tout gain chiffré hors de la section « Mesure »
+est une **estimation**. Les chiffres du ticket-605 sont dans les blocs entre
+marqueurs de la section 1 et de la section 4, que le script réécrit.
 
 Pages sur lesquelles le ticket s'appuie : le dépôt de headroom
 (https://github.com/headroomlabs-ai/headroom), qui annonce 20 à 95 % de tokens
@@ -68,6 +71,62 @@ Lecture : deux tiers du gain estimé reposent sur le codeur, donc sur le proxy,
 donc sur l'hypothèse la moins vérifiée (section 2). Hors codeur, l'estimation
 tient en 21-41 $ cumulés.
 
+### Mesure (ticket-605)
+
+`scripts/mesurer_compression.py` remplit le tableau ci-dessous depuis
+`agent_calls` et rejoue headroom sur le diff du run et sur la sortie de
+`scripts/verifier.py`. Limites de la méthode : les prompts ne sont pas stockés,
+donc « après compression » est une **estimation** (tokens du texte avant et
+après, à 4 caractères par token, soustraits de l'entrée mesurée) ; le coût
+d'entrée compte le cache créé à 1,25 x le tarif d'entrée, que le calculateur du
+backend ignore ; le gain en dollars est pris au tarif d'entrée plein, donc un
+plafond. Un run antérieur au ticket-604 n'a pas de `cache_creation_tokens` : il
+est « non mesuré ».
+
+Relevé du 28/10 sur `backend/tessera.db`, quatre runs d'ide-core (tickets 604,
+576, 574, 589), ouverts en lecture seule. **La base est au `user_version` 8 : la
+migration 9 du ticket-604 n'y est pas appliquée** (le backend n'a pas redémarré
+depuis le merge), donc la colonne `cache_creation_tokens` n'existe pas et aucun
+run n'a d'entrée mesurable. Le premier tableau reste « non mesuré » pour cette
+raison, pas faute d'outil. Aucune sortie de test rouge n'a été fournie : les
+lignes perdues et le gain en dollars restent « non mesuré ».
+
+<!-- mesure-605:debut -->
+| Run | Rôle | Entrée mesurée (tokens) | Après compression (est.) | Lignes perdues |
+| --- | --- | ---: | ---: | ---: |
+| 64136ccd | tous | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | — |
+| fb70a9e9 | tous | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | — |
+| e0ee71ce | tous | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | — |
+| 1151edb8 | tous | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | non mesuré (colonne cache_creation_tokens absente (migration 9 non appliquée)) | — |
+<!-- mesure-605:fin -->
+
+Le diff du run, seul, avant et après headroom (indépendant d'`agent_calls`, donc
+mesurable même quand le tableau ci-dessus ne l'est pas). Un taux sous 15 % sur
+le diff plafonne le gain réel du chemin texte sous 15 % : on ne peut pas retirer
+plus de texte qu'on n'en envoie.
+
+<!-- mesure-605-diff:debut -->
+| Run | Diff (tokens est.) | Après compression (est.) | Retiré |
+| --- | ---: | ---: | ---: |
+| 64136ccd | 3 713 | 3 626 | 2.3% |
+| fb70a9e9 | 5 815 | 5 743 | 1.2% |
+| e0ee71ce | 4 823 | 4 736 | 1.8% |
+| 1151edb8 | 4 474 | 4 414 | 1.3% |
+<!-- mesure-605-diff:fin -->
+
+`ResultMessage.usage` cumule-t-il les tokens des tours de la boucle d'outils ?
+Réponse de `scripts/sonde_usage.py` (un appel réel, deux lectures de fichier) :
+
+<!-- mesure-605-usage:debut -->
+`tours=[36805, 40075, 42228] somme=119108 result.usage=119108 -> cumule les tours`
+<!-- mesure-605-usage:fin -->
+
+Lecture : trois tours (deux `Read`, puis la réponse) ; chaque valeur est
+l'entrée d'un tour (`input_tokens` + `cache_read_input_tokens` +
+`cache_creation_input_tokens`). L'`usage` du `ResultMessage` en est la **somme
+exacte** : il cumule les tours de la boucle d'outils, il ne rend pas le dernier
+seul. Les tokens d'entrée par appel d'`agent_calls` incluent donc chaque relecture
+du contexte, ce qui explique les 1,32 M de tokens par appel du codeur (section 1).
 ## 2. Les trois points d'entrée
 
 Le provider Claude s'appuie sur le CLI embarqué par l'Agent SDK
@@ -185,3 +244,29 @@ dont un avec un tour de test rouge) :
 Ce qu'on ne tranche pas ici : l'acceptation d'un composant tiers sur le chemin
 du jeton d'abonnement, si le spike 621 le montrait fonctionnel. C'est une
 décision de confiance, elle revient à l'humain.
+
+### Conclusion des mesures
+
+<!-- mesure-605-conclusion:debut -->
+**Conclusion du ticket-605 : reporter.** headroom retire au plus 2.3% du diff, sous 15% : plafond du gain du chemin texte ; part d'entrée du codeur non mesurée. Chiffres : 4 run(s) mesuré(s), gain texte non mesuré, taux sur le diff seul 2.3%, lignes perdues non mesuré, part d'entrée du codeur non mesurée.
+<!-- mesure-605-conclusion:fin -->
+
+Application du seuil (section 4) aux chiffres du 28/10 :
+
+- *Chemin texte* : headroom retire 1,2 à 2,3 % du diff sur quatre diffs réels,
+  loin des 15 % requis. Le diff est le gros du prompt de securite et une part de
+  celui du reviewer ; on ne retire pas plus de texte qu'on n'en envoie, donc le
+  gain réel du chemin texte est sous 15 % : **fermé**. Réserve :
+  le plafond porte sur le diff ; les extraits de test du reviewer ne sont pas
+  rejoués (pas de sortie rouge fournie), et la perte de lignes `FAILED` n'a pas
+  été éprouvée.
+- *Chemin proxy* : **non mesuré**. Il faut appliquer la migration 9 (redémarrer
+  le backend), laisser tourner des runs, puis relancer le script ; le spike 621
+  reste de toute façon une condition.
+- D'où **reporter** : le chemin texte, la partie sûre, ne vaut pas la peine ; le
+  chemin proxy ne peut pas être jugé sans la colonne du ticket-604. Rien n'est
+  écarté tant que la part d'entrée du codeur est inconnue.
+
+Pour compléter : après redémarrage du backend et deux nouveaux runs, relancer
+`scripts/mesurer_compression.py --ecrire` avec `--sortie-test` et `--run-rouge`
+(sortie de `scripts/verifier.py` sur un worktree jetable portant un test rouge).
