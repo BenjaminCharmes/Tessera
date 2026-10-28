@@ -10,23 +10,38 @@ import SallesCommunes from "./SallesCommunes";
 const T = "2026-10-27T10:00:00.000Z";
 const T0 = Date.parse(T);
 
-function ev(type: OrchestratorEvent["type"], data: Record<string, unknown> = {}, agent: OrchestratorEvent["agent"] = null) {
-  return { type, agent, ticket_id: "ticket-001", data, timestamp: T } satisfies OrchestratorEvent;
+function ev(
+  type: OrchestratorEvent["type"],
+  data: Record<string, unknown> = {},
+  agent: OrchestratorEvent["agent"] = null,
+) {
+  return {
+    type,
+    agent,
+    ticket_id: "ticket-001",
+    data,
+    timestamp: T,
+  } satisfies OrchestratorEvent;
 }
 
 /** Le codeur travaille, puis pose une question que personne n'a encore reprise. */
 function enQuestion(): StreamState {
-  return [ev("agent_started", {}, "codeur"), ev("agent_question", { question: "Quelle option ?" })].reduce(
-    applyEvent,
-    INITIAL,
-  );
+  return [
+    ev("agent_started", {}, "codeur"),
+    ev("agent_question", { question: "Quelle option ?" }),
+  ].reduce(applyEvent, INITIAL);
 }
 
 /** Le validateur en cours, dont le provider principal vient de tomber. */
 function enRepli(): StreamState {
   return [
     ev("validation_started"),
-    ev("provider_fallback", { role: "validateur", tente: "ollama", utilise: "anthropic", modele: "haiku" }),
+    ev("provider_fallback", {
+      role: "validateur",
+      tente: "ollama",
+      utilise: "anthropic",
+      modele: "haiku",
+    }),
   ].reduce(applyEvent, INITIAL);
 }
 
@@ -38,8 +53,15 @@ describe("SallesCommunes", () => {
   it("renders the four rooms: director, meeting, break, HR", () => {
     render(<SallesCommunes projets={[]} maintenant={T0} />);
 
-    const noms = screen.getAllByRole("complementary").map((s) => s.getAttribute("aria-label"));
-    expect(noms).toEqual(["Bureau du directeur", "Salle de réunion", "Salle de pause", "RH"]);
+    const noms = screen
+      .getAllByRole("complementary")
+      .map((s) => s.getAttribute("aria-label"));
+    expect(noms).toEqual([
+      "Bureau du directeur",
+      "Salle de réunion",
+      "Salle de pause",
+      "RH",
+    ]);
   });
 
   it("carries each room's explanation in a title and writes none under it", () => {
@@ -56,19 +78,31 @@ describe("SallesCommunes", () => {
 
   it("shows only the director when no question waits", () => {
     const { container } = render(
-      <SallesCommunes projets={[{ nom: "alpha", etat: INITIAL }]} maintenant={T0} />,
+      <SallesCommunes
+        projets={[{ nom: "alpha", etat: INITIAL }]}
+        maintenant={T0}
+      />,
     );
 
     const directeur = salle("Bureau du directeur");
-    expect(directeur.querySelectorAll('[data-sprite="personnage"]')).toHaveLength(1);
+    expect(
+      directeur.querySelectorAll('[data-sprite="personnage"]'),
+    ).toHaveLength(1);
     expect(directeur.querySelector("[data-agent]")).toBeNull();
     expect(within(directeur).queryByTestId("bulle")).toBeNull();
     expect(directeur).toHaveAttribute("data-contour", "neutre");
-    expect(container.querySelector('[data-sprite="bureau-en-bois"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-sprite="bureau-en-bois"]'),
+    ).not.toBeNull();
   });
 
   it("brings the agent of a pending question in front of the director, with a '?' bubble", () => {
-    render(<SallesCommunes projets={[{ nom: "alpha", etat: enQuestion() }]} maintenant={T0} />);
+    render(
+      <SallesCommunes
+        projets={[{ nom: "alpha", etat: enQuestion() }]}
+        maintenant={T0}
+      />,
+    );
 
     const directeur = salle("Bureau du directeur");
     const agent = directeur.querySelector('[data-agent="codeur"]');
@@ -80,7 +114,9 @@ describe("SallesCommunes", () => {
 
   it("brings the agent of a fallback to HR with 'tenté → utilisé', then lets it leave after 20 s", () => {
     const projets = [{ nom: "alpha", etat: enRepli() }];
-    const { rerender } = render(<SallesCommunes projets={projets} maintenant={T0 + 1_000} />);
+    const { rerender } = render(
+      <SallesCommunes projets={projets} maintenant={T0 + 1_000} />,
+    );
 
     const rh = salle("RH");
     expect(rh.querySelector('[data-agent="validateur"]')).not.toBeNull();
@@ -95,14 +131,40 @@ describe("SallesCommunes", () => {
     expect(salle("RH")).toHaveAttribute("data-contour", "neutre");
   });
 
+  it("writes who is in a room in its header, never on its floor where the decor covered it", () => {
+    // Le 28/10, « alpha · Codeur » se lisait derrière la bibliothèque du directeur (ticket-637).
+    render(
+      <SallesCommunes
+        projets={[{ nom: "alpha", etat: enQuestion() }]}
+        maintenant={T0}
+      />,
+    );
+
+    const directeur = salle("Bureau du directeur");
+    const texte = within(directeur).getByText("alpha");
+    expect(texte.closest("[data-sol]")).toBeNull();
+    expect(directeur.querySelector("[data-sol] [data-agent]")).not.toBeNull();
+    expect(
+      within(directeur).queryByText("Aucune question en attente"),
+    ).toBeNull();
+  });
+
   it("puts a conflict in the meeting room with its number of files", () => {
     const etat = applyEvent(
       INITIAL,
-      ev("conflict_resolution", { phase: "started", files: ["a.py", "b.py", "c.py"], outcome: null }),
+      ev("conflict_resolution", {
+        phase: "started",
+        files: ["a.py", "b.py", "c.py"],
+        outcome: null,
+      }),
     );
-    render(<SallesCommunes projets={[{ nom: "alpha", etat }]} maintenant={T0} />);
+    render(
+      <SallesCommunes projets={[{ nom: "alpha", etat }]} maintenant={T0} />,
+    );
 
-    expect(within(salle("Salle de réunion")).getByText(/3 fichiers/)).toBeInTheDocument();
+    expect(
+      within(salle("Salle de réunion")).getByText(/3 fichiers/),
+    ).toBeInTheDocument();
   });
 });
 
@@ -122,7 +184,9 @@ describe("Piece with an agent away", () => {
 
   it("draws no character at the post of an agent waiting in front of the director", () => {
     const enCours = applyEvent(INITIAL, ev("agent_started", {}, "codeur"));
-    const { rerender } = render(<Piece projet="alpha" etat={enCours} maintenant={T0} />);
+    const { rerender } = render(
+      <Piece projet="alpha" etat={enCours} maintenant={T0} />,
+    );
     // Pendant un run, les cinq postes ont leur agent assis.
     expect(personnagesAssis()).toBe(5);
 
@@ -136,10 +200,14 @@ describe("Piece with an agent away", () => {
   });
 
   it("seats the agent back at its post once the fallback is 20 s old", () => {
-    const { rerender } = render(<Piece projet="alpha" etat={enRepli()} maintenant={T0 + 1_000} />);
+    const { rerender } = render(
+      <Piece projet="alpha" etat={enRepli()} maintenant={T0 + 1_000} />,
+    );
     const pendantLeRepli = personnagesAssis();
 
-    rerender(<Piece projet="alpha" etat={enRepli()} maintenant={T0 + 20_000} />);
+    rerender(
+      <Piece projet="alpha" etat={enRepli()} maintenant={T0 + 20_000} />,
+    );
 
     expect(personnagesAssis()).toBe(pendantLeRepli + 1);
   });

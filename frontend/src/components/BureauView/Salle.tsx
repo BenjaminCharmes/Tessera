@@ -31,7 +31,9 @@ interface SalleProps {
   accroche?: ReactNode;
   /** Contour ambre : quelqu'un ou quelque chose attend (une question, un repli). */
   ambre?: boolean;
-  /** Les occupants : une salle sans enfant dit `vide`. */
+  /** Une ligne par occupant, écrite dans l'en-tête ; sans ligne, la salle dit `vide` (ticket-637). */
+  textes?: ReactNode[];
+  /** Les personnages debout dans la salle, sans texte : le texte posé au sol était recouvert par le décor. */
   children?: ReactNode[];
 }
 
@@ -51,9 +53,10 @@ export default function Salle({
   avecSoleil = false,
   accroche,
   ambre = false,
+  textes = [],
   children = [],
 }: SalleProps) {
-  const occupee = children.length > 0;
+  const occupee = textes.length > 0;
   const contour = ambre ? "border-amber-900" : "border-zinc-800";
   const moment = dayMoment(maintenant);
   const [lumiere, basculerLumiere] = useLumiere(`salle:${titre}`, moment);
@@ -65,41 +68,67 @@ export default function Salle({
       data-contour={ambre ? "amber" : "neutre"}
       className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-(--sprite-mur) ${contour}`}
     >
-      <div className="flex items-center justify-between gap-2 px-3 pt-[5px]">
-        <h3 title={entete} className="flex items-center gap-1 text-micro uppercase tracking-wide text-zinc-400">
+      <div className="flex items-start justify-between gap-2 px-3 pt-[5px]">
+        <h3
+          title={entete}
+          className="flex items-center gap-1 text-micro uppercase tracking-wide text-zinc-400"
+        >
           {titre}
           <IconInfo size={12} data-marque="info" />
         </h3>
         {/* Ce que dit la salle vide, en face de son nom : le sol reste au mobilier. */}
-        {!occupee && <p className="truncate text-micro text-zinc-500">{vide}</p>}
+        {occupee ? (
+          <ul className="flex min-w-0 flex-col items-end gap-0.5 text-micro">
+            {textes}
+          </ul>
+        ) : (
+          <p className="truncate text-micro text-zinc-500">{vide}</p>
+        )}
       </div>
       <div
         data-mur="salle"
         className="flex flex-nowrap items-start justify-center gap-1.5 overflow-hidden border-b-4 border-(--sprite-plinthe) px-1.5 pt-3 pb-4 min-[1700px]:gap-3 min-[1700px]:px-3"
       >
         <Agrandi>
-          <SkyWindow moment={moment} soleil={gauche?.soleil} nuages={gauche?.nuages} />
+          <SkyWindow
+            moment={moment}
+            soleil={gauche?.soleil}
+            nuages={gauche?.nuages}
+          />
         </Agrandi>
         <Agrandi>
           <CeilingLamp allume={lumiere} />
         </Agrandi>
         <Agrandi>
-          <SkyWindow moment={moment} soleil={droite?.soleil} nuages={droite?.nuages} />
+          <SkyWindow
+            moment={moment}
+            soleil={droite?.soleil}
+            nuages={droite?.nuages}
+          />
         </Agrandi>
         {accroche}
         {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
         <span className="self-end min-[1700px]:ml-3">
-          <BoutonLumiere salle={titre} allume={lumiere} onBasculer={basculerLumiere} />
+          <BoutonLumiere
+            salle={titre}
+            allume={lumiere}
+            onBasculer={basculerLumiere}
+          />
         </span>
       </div>
       {/* Le fond du sol ne sert à rien dans une salle : le mobilier s'y centre au lieu de laisser un vide sous le mur (ticket-627). */}
-      <div data-sol="lames" className="sol-lames flex flex-1 flex-col justify-center px-3">
+      <div
+        data-sol="lames"
+        className="sol-lames flex flex-1 flex-col justify-center px-3"
+      >
         <div className="flex min-h-28 items-end justify-between gap-4 px-1 py-2">
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">
               <Agrandi>{mobilier}</Agrandi>
             </div>
-            {occupee && <ul className="flex min-w-0 flex-col gap-1">{children}</ul>}
+            {children.length > 0 && (
+              <ul className="flex min-w-0 items-end gap-3">{children}</ul>
+            )}
           </div>
           {decor && (
             <Agrandi>
