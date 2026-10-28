@@ -41,6 +41,7 @@ import SolEtire from "./SolEtire";
 import { useLumiere } from "../../hooks/useLumiere";
 import { useProjects } from "../../hooks/useProjects";
 import { useServices } from "../../hooks/useServices";
+import { ticketEnCours } from "../../lib/bureau/ticketEnCours";
 import { servicesDeLaBaie } from "../../lib/bureau/servicesDeLaBaie";
 import BoutonServices from "../Sidebar/BoutonServices";
 
@@ -144,6 +145,7 @@ export default function Piece({
   // en démarrerait un second sur des ports déjà pris (ticket-152, ticket-632).
   const { projects } = useProjects();
   const faitTournerLIde = projects.find((p) => p.id === projet)?.fait_tourner_l_ide === true;
+  const ticketCourant = ticketEnCours(etat, run);
 
   return (
     <section
@@ -152,9 +154,20 @@ export default function Piece({
       className={`overflow-hidden rounded-lg border bg-zinc-900 ${CONTOURS[contour]}`}
     >
       <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">
-        <h3 className="truncate text-corps font-semibold text-zinc-200">
-          {projet}
-        </h3>
+        <div className="flex min-w-0 items-baseline gap-2">
+          <h3 className="shrink-0 text-corps font-semibold text-zinc-200">{projet}</h3>
+          {/* Le ticket traité : la pile ne montre que les suivants (ticket-656). */}
+          {ticketCourant && (
+            <p
+              data-testid="ticket-en-cours"
+              title={ticketCourant.titre ? `${ticketCourant.id} — ${ticketCourant.titre}` : ticketCourant.id}
+              className="truncate text-micro text-zinc-400"
+            >
+              <span className="font-mono text-zinc-300">{ticketCourant.id}</span>
+              {ticketCourant.titre && ` — ${ticketCourant.titre}`}
+            </p>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {/* Ce que la pièce dit d'elle-même : la fête, la copie rendue, la santé, ou l'étape sans poste. */}
           {fete && <StatusPill etat="reussi" libelle="PR mergée" />}
