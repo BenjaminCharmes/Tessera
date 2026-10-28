@@ -65,7 +65,7 @@ function Case({ x, y, etat }: { x: number; y: number; etat: EtatCase }) {
 }
 
 /**
- * Le tableau blanc au mur de la pièce, grille 32 × 26 (64 × 52 px). Une case et une
+ * Le tableau blanc au mur de la pièce, grille 44 × 26 (88 × 52 px). Une case et une
  * ligne par critère : case vide et ligne grise tant que rien n'est jugé, case cochée
  * et ligne verte si le critère passe, croix et ligne rouge sinon (ADR-058). Le
  * libellé accessible est porté par l'objet qui l'enveloppe. Il faisait 132 px de
@@ -74,12 +74,12 @@ function Case({ x, y, etat }: { x: number; y: number; etat: EtatCase }) {
  */
 export default function TableauBlanc({ cases }: TableauBlancProps) {
   const colonnes = cases.length > LIGNES_PAR_COLONNE ? 2 : 1;
-  const largeur = colonnes === 2 ? 10 : 24;
+  const largeur = colonnes === 2 ? 15 : 36;
   return (
     <svg
-      width="64"
+      width="88"
       height="52"
-      viewBox="0 0 32 26"
+      viewBox="0 0 44 26"
       shapeRendering="crispEdges"
       aria-hidden="true"
       data-sprite="tableau-blanc"
@@ -87,19 +87,19 @@ export default function TableauBlanc({ cases }: TableauBlancProps) {
       <rect
         x="0"
         y="0"
-        width="32"
+        width="44"
         height="26"
         className="fill-(--sprite-tableau-cadre)"
       />
       <rect
         x="1"
         y="1"
-        width="30"
+        width="42"
         height="24"
         className="fill-(--sprite-tableau)"
       />
       {cases.slice(0, CASES_MAX).map((etat, i) => {
-        const x = 2 + Math.floor(i / LIGNES_PAR_COLONNE) * 15;
+        const x = 2 + Math.floor(i / LIGNES_PAR_COLONNE) * 21;
         const y = 2 + (i % LIGNES_PAR_COLONNE) * PAS;
         return (
           <g key={i} data-case={etat}>

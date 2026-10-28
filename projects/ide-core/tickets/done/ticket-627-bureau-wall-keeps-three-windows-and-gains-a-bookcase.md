@@ -23,7 +23,7 @@ préfère garder trois fenêtres pour la taille de la pièce, quitte à resserre
 qui est en place et à rétrécir le tableau blanc.
 
 ## Solution proposée
-- Le tableau blanc passe de 132 × 42 à 64 × 52 px (grille 32 × 26). Il garde six
+- Le tableau blanc passe de 132 × 42 à 88 × 52 px (grille 44 × 26). Il garde six
   lignes par colonne et deux colonnes au plus, et chaque ligne porte une case :
   vide tant que rien n'est jugé, cochée quand le critère passe, une croix sinon.
 - Le mur se lit fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le
@@ -35,12 +35,13 @@ qui est en place et à rétrécir le tableau blanc.
 
 ## Critères d'acceptation
 - [x] `FENETRES_X` compte toujours trois fenêtres
-- [x] `TableauBlanc.tsx` dessine une grille de 32 × 26, une case par critère
+- [x] `TableauBlanc.tsx` dessine une grille de 44 × 26, une case par critère
 - [x] Un test de `TableauBlanc` vérifie la case vide, la coche et la croix
 - [x] `FondDeLaPiece.tsx` pose `Bibliotheque` à `BIBLIOTHEQUE_X`
 - [x] Captures à 1920 et 1536 relues : aucun objet du mur n'en chevauche un autre
 - [x] L'interrupteur s'écarte de la fenêtre dans les salles du haut, et se rapproche de la porte dans les pièces
 - [x] Dans les salles du haut, le mobilier remonte sous le mur (sol moins haut), et le mur du directeur n'est plus coupé à 1536
+- [x] La boîte aux lettres ouvre sa PR : `getPrStatuses` lit le champ `statuses` que la route renvoie, et un test de `api.ts` le vérifie ; le numéro écrit à côté de la boîte disparaît
 
 ## Ce que ça ne fait pas
 - Ne dessine pas les rédacteurs : c'est le ticket-624.

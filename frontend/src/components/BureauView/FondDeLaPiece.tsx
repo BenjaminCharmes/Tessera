@@ -29,7 +29,7 @@ import TableauDesCriteres from "./TableauDesCriteres";
  */
 const TABLEAU_X = 30;
 // Fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le tableau et le ficus (ticket-627).
-const FENETRES_X = [119, 269, 616] as const;
+const FENETRES_X = [134, 274, 616] as const;
 const PLAFONNIERS_X = [250, 432, 590] as const;
 const FICUS_X = 348;
 const IMPRIMANTE_X = 392;

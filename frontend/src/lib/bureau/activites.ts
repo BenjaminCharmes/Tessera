@@ -44,7 +44,7 @@ const DECALAGE_A_COTE = 48;
 /** Abscisse de la machine et de la porte, dans le fond de la pièce. */
 export const MACHINE_X = 470;
 /** La bibliothèque, entre les deux premières fenêtres (ticket-627). */
-export const BIBLIOTHEQUE_X = 198;
+export const BIBLIOTHEQUE_X = 208;
 export const PORTE_X = 738;
 /** L'agent de 63 px se centre sur la porte de 81 px. */
 const DECALAGE_A_LA_PORTE = 9;

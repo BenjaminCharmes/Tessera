@@ -251,7 +251,10 @@ describe("api.projects.import", () => {
       ok: true,
       json: () => Promise.resolve(response),
     });
-    const result = await api.projects.import({ source_path: "/local/project", mode: "copy" });
+    const result = await api.projects.import({
+      source_path: "/local/project",
+      mode: "copy",
+    });
     expect(result).toEqual(response);
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/v1/projects/import",
@@ -298,7 +301,9 @@ describe("api et STATIC_TOKEN", () => {
 
     const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
     expect(url).toBe("/api/v1/projects");
-    expect(new Headers(init.headers).get("Authorization")).toBe("Bearer s3cret");
+    expect(new Headers(init.headers).get("Authorization")).toBe(
+      "Bearer s3cret",
+    );
   });
 
   it("garde les en-têtes existants en ajoutant le Bearer", async () => {
@@ -330,7 +335,9 @@ describe("api et STATIC_TOKEN", () => {
     await api.agents.remove("coder");
 
     const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect(new Headers(init.headers).get("Authorization")).toBe("Bearer s3cret");
+    expect(new Headers(init.headers).get("Authorization")).toBe(
+      "Bearer s3cret",
+    );
     expect(init.method).toBe("DELETE");
   });
 });
@@ -341,7 +348,10 @@ describe("api.projects.overview and setCategory (ticket-399)", () => {
 
     await api.projects.overview();
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/v1/projects/overview", undefined);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/v1/projects/overview",
+      undefined,
+    );
   });
 
   it("patches the category through the project settings route", async () => {
@@ -353,5 +363,31 @@ describe("api.projects.overview and setCategory (ticket-399)", () => {
     expect(url).toBe("/api/v1/projects/serpent/pipeline");
     expect(init.method).toBe("PATCH");
     expect(JSON.parse(init.body as string)).toEqual({ category: "Jeux" });
+  });
+});
+
+describe("api.github.getPrStatuses", () => {
+  it("unwraps the statuses the route returns in an object", async () => {
+    const statuses = [
+      {
+        ticket_id: "ticket-1",
+        pr_number: 708,
+        state: "open",
+        ci_status: "pending",
+        pr_url: "https://github.com/o/r/pull/708",
+      },
+    ];
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ statuses }),
+    });
+
+    const result = await api.github.getPrStatuses("ide-core");
+
+    expect(result).toEqual(statuses);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/v1/projects/ide-core/pr-statuses",
+      undefined,
+    );
   });
 });

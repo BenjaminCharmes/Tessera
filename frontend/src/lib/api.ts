@@ -104,7 +104,10 @@ export const api = {
     /** Tout ce que les cartes de la vue Projets affichent, en une requête (ticket-399). */
     overview: (): Promise<ProjectOverview[]> => request("/projects/overview"),
     /** Range un projet dans une catégorie ; une chaîne vide l'en retire (ticket-399). */
-    setCategory: (projectId: string, category: string): Promise<PipelineReglages> =>
+    setCategory: (
+      projectId: string,
+      category: string,
+    ): Promise<PipelineReglages> =>
       patch_(`/projects/${projectId}/pipeline`, { category }),
     create: (
       name: string,
@@ -205,7 +208,9 @@ export const api = {
     read: (projectId: string): Promise<EtapeMiseEnLigne[]> =>
       request(`/projects/${projectId}/provision`),
     /** Lance la mise en ligne ; 409 si une autre tourne déjà, 422 si le bloc est invalide. */
-    start: (projectId: string): Promise<{ project_id: string; steps: string[] }> =>
+    start: (
+      projectId: string,
+    ): Promise<{ project_id: string; steps: string[] }> =>
       post(`/projects/${projectId}/provision`, {}),
   },
   runs: {
@@ -240,14 +245,21 @@ export const api = {
     getPrStatus: (projectId: string, ticketId: string): Promise<PRStatus> =>
       request(`/projects/${projectId}/tickets/${ticketId}/pr-status`),
     /** Statut de toutes les PR d'un projet en un seul appel (ticket-367). */
+    // La route rend `{ statuses: [...] }` : lue comme un tableau, la réponse faisait
+    // échouer chaque lecture en silence, et aucun mock ne le montrait (ticket-627).
     getPrStatuses: (projectId: string): Promise<PRStatusEntry[]> =>
-      request(`/projects/${projectId}/pr-statuses`),
+      request<{ statuses: PRStatusEntry[] }>(
+        `/projects/${projectId}/pr-statuses`,
+      ).then((r) => r.statuses),
   },
   pipeline: {
     /** Les réglages du pipeline d'un projet (ticket-196). */
     get: (projectId: string): Promise<PipelineReglages> =>
       request(`/projects/${projectId}/pipeline`),
-    set: (projectId: string, patch: PipelineReglagesPatch): Promise<PipelineReglages> =>
+    set: (
+      projectId: string,
+      patch: PipelineReglagesPatch,
+    ): Promise<PipelineReglages> =>
       patch_(`/projects/${projectId}/pipeline`, patch),
   },
   git: {
@@ -266,7 +278,9 @@ export const api = {
       }),
     removalPlan: (projectId: string): Promise<RemovalPlan> =>
       request(`/projects/${projectId}/removal-plan`),
-    detach: (projectId: string): Promise<{ detached: boolean; moved_to: string }> =>
+    detach: (
+      projectId: string,
+    ): Promise<{ detached: boolean; moved_to: string }> =>
       post(`/projects/${projectId}/detach`, {}),
     remove: (projectId: string): Promise<void> =>
       del(`/projects/${projectId}?confirmed=true`),
