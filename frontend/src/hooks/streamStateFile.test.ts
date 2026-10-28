@@ -28,6 +28,22 @@ function apresLePremierTicket() {
   return s;
 }
 
+describe("applyEvent — verdict du reviewer (ticket-615)", () => {
+  it("keeps the verdict field on the reviewer's entry", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "reviewer" }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "texte", verdict: "APPROVED" } }));
+
+    expect(s.entries.at(-1)).toMatchObject({ agent: "reviewer", isDone: true, verdict: "APPROVED" });
+  });
+
+  it("leaves the verdict undefined for an event recorded before ticket-614", () => {
+    let s = applyEvent(INITIAL, ev({ type: "agent_started", agent: "reviewer" }));
+    s = applyEvent(s, ev({ type: "agent_done", agent: "reviewer", data: { content: "APPROVED" } }));
+
+    expect(s.entries.at(-1)).toMatchObject({ isDone: true, verdict: undefined });
+  });
+});
+
 describe("applyEvent — dernierEvenementA (ticket-549)", () => {
   it("records the timestamp of any event", () => {
     const s = applyEvent(INITIAL, ev({ type: "agent_started", timestamp: "2026-10-23T10:00:00.000Z" }));

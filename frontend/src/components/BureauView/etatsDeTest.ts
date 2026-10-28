@@ -52,7 +52,8 @@ export function etatQuatreFaits(): StreamState {
  * (`CHANGES_REQUESTED`) ou validateur (`approved: false`) a renvoyé le travail.
  */
 export function etatAuTourDeux(refus: "reviewer" | "validateur"): StreamState {
-  const verdictDuReviewer = refus === "reviewer" ? "CHANGES_REQUESTED\n- il manque un test" : "APPROVED";
+  const verdict = refus === "reviewer" ? "CHANGES_REQUESTED" : "APPROVED";
+  const texteDuReviewer = refus === "reviewer" ? "CHANGES_REQUESTED\n- il manque un test" : "APPROVED";
   const validation =
     refus === "validateur"
       ? [
@@ -67,7 +68,7 @@ export function etatAuTourDeux(refus: "reviewer" | "validateur"): StreamState {
     ev("security_audit_started"),
     ev("security_audit_done"),
     ev("agent_started", "reviewer", { round: 1 }),
-    ev("agent_done", "reviewer", { content: verdictDuReviewer }),
+    ev("agent_done", "reviewer", { content: texteDuReviewer, verdict }),
     ...validation,
     ev("agent_started", "codeur", { round: 2 }),
   ]);

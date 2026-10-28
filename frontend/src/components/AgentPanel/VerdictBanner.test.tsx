@@ -44,6 +44,15 @@ describe("VerdictBanner", () => {
   });
 });
 
+describe("VerdictBanner — le champ verdict (ticket-615)", () => {
+  it("follows the verdict field when the text says the opposite", () => {
+    render(<VerdictBanner content={"APPROVED\nTout est bon."} verdict="CHANGES_REQUESTED" />);
+
+    expect(screen.getByText(/CHANGES_REQUESTED/)).toBeInTheDocument();
+    expect(screen.queryByText(/^\s*APPROVED/)).toBeNull();
+  });
+});
+
 describe("VerdictBanner — la revue complete", () => {
   const revue = [
     "CHANGES_REQUESTED",

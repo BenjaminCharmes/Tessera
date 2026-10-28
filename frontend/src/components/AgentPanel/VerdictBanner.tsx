@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { IconAlert, IconCheck, IconChevronDown, IconChevronRight } from "../../design/icons";
+import { revueSansLigneDeVerdict, verdictDuReviewer } from "../FilDuRun/verdict";
+import type { EntreeDeRevue, VerdictReviewer } from "../FilDuRun/verdict";
 
 interface VerdictBannerProps {
   content: string;
+  /** Champ `verdict` de `agent_done` (ticket-614) ; absent d'un run plus ancien. */
+  verdict?: VerdictReviewer;
 }
 
 /**
@@ -11,28 +15,21 @@ interface VerdictBannerProps {
  * chose qui permette de juger — c'est pour ça qu'on paie un reviewer
  * (ticket-072).
  */
-function parseVerdict(content: string): {
+function parseVerdict(entry: EntreeDeRevue): {
   approved: boolean;
   summary: string;
   detail: string;
 } {
-  const approved =
-    content.includes("APPROVED") && !content.includes("CHANGES_REQUESTED");
-  const lines = content
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(
-      (l) => l && !l.includes("APPROVED") && !l.includes("CHANGES_REQUESTED"),
-    );
+  const lines = revueSansLigneDeVerdict(entry.content);
   return {
-    approved,
+    approved: verdictDuReviewer(entry) === "APPROVED",
     summary: lines[0] ?? "",
     detail: lines.slice(1).join("\n").trim(),
   };
 }
 
-export default function VerdictBanner({ content }: VerdictBannerProps) {
-  const { approved, summary, detail } = parseVerdict(content);
+export default function VerdictBanner({ content, verdict }: VerdictBannerProps) {
+  const { approved, summary, detail } = parseVerdict({ content, verdict });
   const [ouvert, setOuvert] = useState(false);
 
   return (

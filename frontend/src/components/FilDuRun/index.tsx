@@ -113,7 +113,7 @@ function EntreePipeline({ entry, isLast }: EntreePipelineProps) {
 
   const approved =
     entry.agent === "reviewer"
-      ? verdictDuReviewer(entry.content) === "APPROVED"
+      ? verdictDuReviewer(entry) === "APPROVED"
       : true;
 
   let verdictText: string;
@@ -151,7 +151,7 @@ function EntreePipeline({ entry, isLast }: EntreePipelineProps) {
             </pre>
           )}
           {entry.agent === "reviewer" && entry.content && (
-            <VerdictBanner content={entry.content} />
+            <VerdictBanner content={entry.content} verdict={entry.verdict} />
           )}
           {!entry.tokens && !entry.content && (
             <div className="text-zinc-600 text-xs italic">Génération…</div>
