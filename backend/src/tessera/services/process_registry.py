@@ -26,7 +26,7 @@ from tessera.services.groupe_de_processus import (
     tuer_l_arbre,
 )
 from tessera.services.providers.perimetre import racine_autorisee
-from tessera.services.lancement import essais_de_commande
+from tessera.services.lancement import essais_de_commande, options_de_lancement
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -307,11 +307,7 @@ class ProcessRegistry:
                     cwd=str(dossier),
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.STDOUT,
-                    # Son propre groupe, hors Windows : c'est ce qui rend
-                    # `killpg` sûr à l'arrêt. Sans lui, le service hérite du
-                    # groupe du backend, et l'arrêter emporterait le backend
-                    # (ticket-153).
-                    start_new_session=os.name != "nt",
+                    **options_de_lancement(os.name),
                 )
             except FileNotFoundError as exc:
                 derniere = exc
