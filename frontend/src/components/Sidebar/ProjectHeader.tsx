@@ -61,7 +61,14 @@ export default function ProjectHeader({
   if (!project) {
     return (
       <header className={`${BAND} border-b border-zinc-800 px-3`}>
-        <p className="text-xs text-zinc-500">Aucun projet sélectionné</p>
+        {/* Depuis le ticket-586 la colonne n'a plus de liste de projets : sans
+            sélecteur ici, une vue sans projet n'offrait aucun moyen d'en
+            choisir un (ticket-621). */}
+        {onSelectProject ? (
+          <SelecteurDeProjet project={null} onSelectProject={onSelectProject} />
+        ) : (
+          <p className="text-xs text-zinc-500">Aucun projet sélectionné</p>
+        )}
       </header>
     );
   }

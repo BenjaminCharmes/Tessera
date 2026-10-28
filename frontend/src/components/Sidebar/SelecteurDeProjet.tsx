@@ -18,7 +18,8 @@ import { titreDuProjet } from "./titreDuProjet";
  * couleur de son nom.
  */
 interface SelecteurDeProjetProps {
-  project: Project;
+  /** Null : aucun projet actif, le déclencheur invite à en choisir un (ticket-621). */
+  project: Project | null;
   onSelectProject: (project: Project) => void;
 }
 
@@ -56,10 +57,16 @@ export default function SelecteurDeProjet({
         onClick={() => setOuvert((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={ouvert}
-        title={titreDuProjet(project)}
-        className="flex min-w-0 max-w-full items-center gap-1 truncate text-sm font-medium text-zinc-100 transition-colors hover:text-zinc-50"
+        title={project ? titreDuProjet(project) : undefined}
+        className={`flex min-w-0 max-w-full items-center gap-1 truncate text-sm font-medium transition-colors ${
+          project
+            ? "text-zinc-100 hover:text-zinc-50"
+            : "text-zinc-400 hover:text-zinc-200"
+        }`}
       >
-        <span className="truncate">{project.name}</span>
+        <span className="truncate">
+          {project ? project.name : "Choisir un projet"}
+        </span>
         {/* ADR-026 : les affordances viennent de `design/icons.tsx`, jamais
             d'un glyphe — un test le verrouille. */}
         <IconChevronDown size={12} className="shrink-0 text-zinc-500" />
@@ -73,7 +80,7 @@ export default function SelecteurDeProjet({
             className="max-h-72 overflow-y-auto"
           >
             {projects.map((p) => {
-              const actif = p.id === project.id;
+              const actif = p.id === project?.id;
               return (
                 <li key={p.id}>
                   <button
@@ -103,22 +110,24 @@ export default function SelecteurDeProjet({
           {/* Hors de la `listbox` : c'est une action sur le projet actif, pas
               un projet à choisir. Elle vivait au pied du panneau Git, où
               rien ne l'annonçait (ticket-205). */}
-          <div className="mt-1 border-t border-zinc-800 pt-1">
-            <button
-              type="button"
-              onClick={() => {
-                setOuvert(false);
-                setRetrait(true);
-              }}
-              className="w-full px-2 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
-            >
-              Retirer ce projet de l'IDE…
-            </button>
-          </div>
+          {project ? (
+            <div className="mt-1 border-t border-zinc-800 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setOuvert(false);
+                  setRetrait(true);
+                }}
+                className="w-full px-2 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+              >
+                Retirer ce projet de l'IDE…
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
-      {retrait ? (
+      {retrait && project ? (
         <RemoveProjectModal
           project={project}
           onClose={() => setRetrait(false)}
