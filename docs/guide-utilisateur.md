@@ -1245,6 +1245,12 @@ Quand le run s'achève, tous les agents marchent jusqu'à la porte et s'effacent
 
 **La porte d'une pièce est cliquable.** Un clic te place sur ce projet et ouvre l'onglet Tickets.
 
+### Ouvrir la PR et l'app depuis la pièce
+
+La boîte aux lettres devient cliquable quand la pull request existe : un clic l'ouvre dans un nouvel onglet, directement sur le statut et les commentaires.
+
+La baie de serveurs s'ouvre sur l'adresse que le service lancé a annoncée, si elle existe : un clic dans un nouvel onglet. Sinon, elle reste un meuble et le lancement se fait depuis l'en-tête du projet.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.

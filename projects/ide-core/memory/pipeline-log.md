@@ -5808,3 +5808,16 @@ Le diff ajoute :
 - 2026-10-28 09:56:54 UTC — [ticket-605] validateur: APPROVED — Le ticket-605 livre l'outillage complet : quatre modules de mesure sans toucher  (341967ms)
 - 2026-10-28 09:56:54 UTC — [ticket-605] APPROVED après 2 tour(s)
 - 2026-10-28 10:00:02 UTC — [ticket-605] documentation: 0 fichier(s) (155546ms)
+- 2026-10-28 10:11:02 UTC — [ide-core] ticket-605 PR #708 confiée au CIWatcher
+- 2026-10-28 10:11:05 UTC — [ticket-611] branche ticket-611-spike-structured-output-on-the-pinned-sdk-keeps-t
+- 2026-10-28 10:11:06 UTC — [ticket-611] tour 1 — codeur démarré
+- 2026-10-28 10:16:01 UTC — [ide-core] ticket-605 PR #708 mergée (CI verte)
+- 2026-10-28 10:26:57 UTC — [ticket-611] tour 1 — codeur terminé (950688ms)
+- 2026-10-28 10:38:48 UTC — [ticket-611] testeur: OK (exit 0)
+- 2026-10-28 10:40:10 UTC — [ticket-611] securite: PASS — Script de mesure interne (ticket-611) ; aucune vulnérabilité CRITICAL ou HIGH. L (82327ms)
+- 2026-10-28 10:40:10 UTC — [ticket-611] tour 1 — reviewer démarré
+- 2026-10-28 10:40:39 UTC — [ticket-611] tour 1 — reviewer terminé (28422ms)
+- 2026-10-28 10:44:14 UTC — [ticket-611] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers), scripts/ (dossier, 7 fichiers)
+- 2026-10-28 10:44:14 UTC — [ticket-611] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le ticket contient une réponse c (243890ms)
+- 2026-10-28 10:44:14 UTC — [ticket-611] APPROVED après 1 tour(s)
+- 2026-10-28 10:48:41 UTC — [ticket-611] documentation: 1 fichier(s) (259469ms) — après tour de correction
