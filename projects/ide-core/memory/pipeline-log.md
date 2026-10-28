@@ -5889,3 +5889,4 @@ Le diff ajoute :
 - 2026-10-28 13:26:39 UTC — [ticket-614] validateur: fichiers cités joints : agents/prompts/reviewer.md, test_consignes_coherentes.py (tronqué)
 - 2026-10-28 13:26:39 UTC — [ticket-614] validateur: APPROVED — Tous les critères d'acceptation du ticket-614 sont satisfaits. Le diff remplace  (371389ms)
 - 2026-10-28 13:26:39 UTC — [ticket-614] APPROVED après 2 tour(s)
+- 2026-10-28 13:36:19 UTC — [ticket-614] documentation: 2 fichier(s) (575485ms) — après tour de correction
