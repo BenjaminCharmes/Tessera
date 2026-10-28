@@ -5870,3 +5870,4 @@ Le diff ajoute :
 - 2026-10-28 12:20:47 UTC — [ide-core] ticket-631 retiré de la file
 - 2026-10-28 12:21:09 UTC — [ticket-613] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les deux services lisent désorm (282858ms)
 - 2026-10-28 12:21:09 UTC — [ticket-613] APPROVED après 2 tour(s)
+- 2026-10-28 12:28:19 UTC — [ticket-613] documentation: 0 fichier(s) (425250ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « #: Le projet fait tourner chaque run dans un worktree (ADR-0 » (backend/src/tessera/servic
