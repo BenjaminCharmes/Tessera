@@ -309,3 +309,36 @@ describe("Piece health words", () => {
     expect(screen.getByRole("button", { name: `Codeur, ${mot}` })).toBeInTheDocument();
   });
 });
+
+describe("Piece of the project that runs the IDE", () => {
+  it("offers no launch button, its servers already serve this page", async () => {
+    vi.spyOn(api.services, "list").mockResolvedValue([
+      {
+        nom: "backend",
+        project_id: "ide-core",
+        pid: null,
+        demarre_a: "2026-10-28T10:00:00Z",
+        en_cours: false,
+        code_de_sortie: null,
+      },
+    ]);
+    vi.spyOn(api.projects, "list").mockResolvedValue([
+      {
+        id: "ide-core",
+        name: "ide-core",
+        path: "/w/ide-core",
+        description: "",
+        active_agents: [],
+        stack: null,
+        raw_claude_md: "",
+        github_remote: null,
+        fait_tourner_l_ide: true,
+      },
+    ]);
+
+    render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
+
+    expect(await screen.findByRole("group", { name: "Services" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Lancer les services de ide-core" })).toBeNull();
+  });
+});

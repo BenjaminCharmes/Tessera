@@ -39,7 +39,9 @@ import FondDeLaPiece from "./FondDeLaPiece";
 import PosteDeTravail from "./PosteDeTravail";
 import SolEtire from "./SolEtire";
 import { useLumiere } from "../../hooks/useLumiere";
+import { useProjects } from "../../hooks/useProjects";
 import { useServices } from "../../hooks/useServices";
+import { servicesDeLaBaie } from "../../lib/bureau/servicesDeLaBaie";
 import BoutonServices from "../Sidebar/BoutonServices";
 
 interface PieceProps {
@@ -138,6 +140,10 @@ export default function Piece({
   const [lumiere, basculerLumiere] = useLumiere(projet, moment);
   // Une seule lecture des services : la baie au mur les montre, le bouton de l'en-tête les lance.
   const services = useServices(projet, signalServices);
+  // ide-core fait tourner Tessera : ses serveurs tournent forcément, et « Lancer »
+  // en démarrerait un second sur des ports déjà pris (ticket-152, ticket-632).
+  const { projects } = useProjects();
+  const faitTournerLIde = projects.find((p) => p.id === projet)?.fait_tourner_l_ide === true;
 
   return (
     <section
@@ -159,11 +165,13 @@ export default function Piece({
           {!fete && !enCours && suite && (
             <StatusPill etat="en-cours" libelle={suite} />
           )}
-          <BoutonServices
-            services={services}
-            libelleDuProjet={projet}
-            enPastille
-          />
+          {!faitTournerLIde && (
+            <BoutonServices
+              services={services}
+              libelleDuProjet={projet}
+              enPastille
+            />
+          )}
           {run && (
             <ActionsDuRun
               run={run}
@@ -185,7 +193,7 @@ export default function Piece({
             allume={lumiere}
             onBasculerLumiere={basculerLumiere}
             runId={runId}
-            services={services}
+            services={servicesDeLaBaie(services, faitTournerLIde)}
             onOpenProject={onOpenProject && (() => onOpenProject(projet))}
           />
           <div className="grid h-40 grid-cols-5 items-end gap-1 border-b-8 border-transparent px-2.5">
