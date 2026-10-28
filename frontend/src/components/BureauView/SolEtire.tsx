@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { EtirementDuSol } from "../../hooks/useEtirementDuSol";
+import { EtirementDuSol, MarcheActive } from "../../hooks/useEtirementDuSol";
 import { etirementDuSol } from "../../lib/bureau/etirementDuSol";
 
 /**
@@ -11,6 +11,7 @@ import { etirementDuSol } from "../../lib/bureau/etirementDuSol";
 export default function SolEtire({ children }: { children: ReactNode }) {
   const conteneur = useRef<HTMLDivElement>(null);
   const [etirement, setEtirement] = useState(1);
+  const [marche, setMarche] = useState(false);
 
   useLayoutEffect(() => {
     const boite = conteneur.current;
@@ -20,17 +21,29 @@ export default function SolEtire({ children }: { children: ReactNode }) {
       if (largeur > 0) setEtirement(etirementDuSol(largeur));
     };
     appliquer(boite.clientWidth);
-    if (typeof ResizeObserver === "undefined") return;
+    // La marche ne s'active qu'après une image peinte à la bonne place (ticket-638).
+    const image = requestAnimationFrame(() => setMarche(true));
+    if (typeof ResizeObserver === "undefined")
+      return () => cancelAnimationFrame(image);
     const observateur = new ResizeObserver(([entree]) => {
       if (entree) appliquer(entree.contentRect.width);
     });
     observateur.observe(boite);
-    return () => observateur.disconnect();
+    return () => {
+      cancelAnimationFrame(image);
+      observateur.disconnect();
+    };
   }, []);
 
   return (
-    <div ref={conteneur} data-etirement={etirement} className="relative w-full min-w-150">
-      <EtirementDuSol.Provider value={etirement}>{children}</EtirementDuSol.Provider>
+    <div
+      ref={conteneur}
+      data-etirement={etirement}
+      className="relative w-full min-w-150"
+    >
+      <EtirementDuSol.Provider value={etirement}>
+        <MarcheActive.Provider value={marche}>{children}</MarcheActive.Provider>
+      </EtirementDuSol.Provider>
     </div>
   );
 }

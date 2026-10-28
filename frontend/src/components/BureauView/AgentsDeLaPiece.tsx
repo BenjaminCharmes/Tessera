@@ -5,7 +5,7 @@ import type { AgentPlace } from "../../lib/bureau/activites";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import { ECHELLE_LARGE } from "../../lib/bureau/echelleDesSprites";
-import { useEtirementDuSol } from "../../hooks/useEtirementDuSol";
+import { useEtirementDuSol, useMarcheActive } from "../../hooks/useEtirementDuSol";
 
 interface AgentsDeLaPieceProps {
   projet: string;
@@ -35,6 +35,7 @@ function AgentMarcheur({ projet, agent, bavarde }: { projet: string; agent: Agen
   const monte = agent.niveau === "fond" ? -DENIVELE_DU_FOND : 0;
   // Les abscisses sont celles du repère de 800 px : étirées comme la grille des postes.
   const etirement = useEtirementDuSol();
+  const marche = useMarcheActive();
   // Les décalages sont comptés pour l'échelle large : ils suivent l'échelle courante.
   const decalage = (agent.decalage * useEchelleDesSprites()) / ECHELLE_LARGE;
   const style = {
@@ -55,7 +56,7 @@ function AgentMarcheur({ projet, agent, bavarde }: { projet: string; agent: Agen
       data-agent={agent.poste}
       data-activite={agent.activite ?? "parti"}
       data-objet={rendSaCopie ? "feuille" : undefined}
-      className="marche absolute left-0 z-10"
+      className={`${marche ? "marche " : ""}absolute left-0 z-10`}
       style={style}
       {...acces}
     >
