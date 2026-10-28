@@ -5917,3 +5917,15 @@ Le diff ajoute :
 - 2026-10-28 14:22:59 UTC — [ticket-615] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour li (244438ms)
 - 2026-10-28 14:22:59 UTC — [ticket-615] APPROVED après 3 tour(s)
 - 2026-10-28 14:25:39 UTC — [ticket-615] documentation: 0 fichier(s) (151735ms) — après tour de correction
+- 2026-10-28 14:30:41 UTC — [ide-core] ticket-615 PR #721 confiée au CIWatcher
+- 2026-10-28 14:30:47 UTC — [ticket-616] branche ticket-616-capture-widths-and-themes-are-configurable-per-pr
+- 2026-10-28 14:30:49 UTC — [ticket-616] tour 1 — codeur démarré
+- 2026-10-28 14:36:15 UTC — [ticket-616] tour 1 — codeur terminé (326046ms)
+- 2026-10-28 14:36:31 UTC — [ide-core] ticket-615 PR #721 mergée (CI verte)
+- 2026-10-28 14:51:17 UTC — [ticket-616] testeur: OK (exit 0)
+- 2026-10-28 14:53:17 UTC — [ticket-616] securite: PASS — Le diff relâche le motif regex pour accepter les largeurs personnalisées (de 1 à (120296ms)
+- 2026-10-28 14:53:18 UTC — [ticket-616] tour 1 — reviewer démarré
+- 2026-10-28 14:53:35 UTC — [ticket-616] tour 1 — reviewer terminé (16313ms)
+- 2026-10-28 14:55:34 UTC — [ticket-616] validateur: fichiers cités joints : agents.json ; absents : x-1024-clair.png, ../x.png
+- 2026-10-28 14:55:34 UTC — [ticket-616] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (136937ms)
+- 2026-10-28 14:55:34 UTC — [ticket-616] APPROVED après 1 tour(s)
