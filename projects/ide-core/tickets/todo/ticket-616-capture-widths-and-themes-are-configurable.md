@@ -1,5 +1,5 @@
 ---
-id: ticket-611
+id: ticket-616
 title: "Capture widths and themes are configurable per project"
 type: feat
 status: todo
@@ -9,11 +9,11 @@ depends_on: []
 created: 2026-10-27
 ---
 
-# ticket-611 — Largeurs et thèmes de capture configurables
+# ticket-616 — Largeurs et thèmes de capture configurables
 
 ## Objectif
 Qu'un projet choisisse les largeurs et les thèmes de ses captures, pour voir
-une cassure entre 1024 et 1150 px. Premier ticket de l'ADR-061 ; il ne change
+une cassure entre 1024 et 1150 px. Premier ticket de l'ADR-062 ; il ne change
 rien pour un projet qui ne déclare rien.
 
 ## À faire
@@ -36,4 +36,4 @@ rien pour un projet qui ne déclare rien.
 - [ ] Un test par fonction publique touchée
 
 ## Ce que ça ne fait pas
-- Ne lance aucune capture dans un run : c'est ticket-613.
+- Ne lance aucune capture dans un run : c'est ticket-618.

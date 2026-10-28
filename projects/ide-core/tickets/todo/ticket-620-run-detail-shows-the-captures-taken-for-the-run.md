@@ -1,24 +1,24 @@
 ---
-id: ticket-615
+id: ticket-620
 title: "The run detail shows the captures taken for that run"
 type: feat
 status: todo
 priority: low
 agent: codeur
-depends_on: [ticket-613]
+depends_on: [ticket-618]
 created: 2026-10-27
 ---
 
-# ticket-615 — Voir les captures d'un run
+# ticket-620 — Voir les captures d'un run
 
 ## Objectif
 Qu'un humain voie, dans le détail d'un run de l'historique, les images prises
-par l'étape de capture. Les captures ne vont pas dans la PR (ADR-061) : sans cet
+par l'étape de capture. Les captures ne vont pas dans la PR (ADR-062) : sans cet
 écran, elles existeraient sans qu'on puisse les ouvrir.
 
 ## À faire
 - Un endpoint de liste des images du run, sous `captures/<projet>/<ticket>/`
-  (le service d'une image existe, étendu par ticket-613) ; liste vide si le run
+  (le service d'une image existe, étendu par ticket-618) ; liste vide si le run
   n'a rien capturé.
 - Dans `HistoriqueView/DetailDuRun`, une section « Captures » : une vignette par
   image, groupée par écran, légendée largeur et thème, qui s'ouvre en grand.

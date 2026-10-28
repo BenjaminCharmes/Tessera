@@ -1,18 +1,18 @@
 ---
-id: ticket-612
+id: ticket-617
 title: "A project declares its visual check and the interface files that trigger it"
 type: feat
 status: todo
 priority: medium
 agent: codeur
-depends_on: [ticket-611]
+depends_on: [ticket-616]
 created: 2026-10-27
 ---
 
-# ticket-612 — Déclarer le contrôle visuel et ce qui le déclenche
+# ticket-617 — Déclarer le contrôle visuel et ce qui le déclenche
 
 ## Objectif
-Lire dans `agents.json` ce que l'ADR-061 demande, et décider, depuis la liste
+Lire dans `agents.json` ce que l'ADR-062 demande, et décider, depuis la liste
 des fichiers d'un diff, si un contrôle est dû. Que du pur : aucun processus,
 aucune capture.
 
@@ -35,7 +35,7 @@ sans `interface`, aucun diff ne déclenche.
 - Un module (par exemple `controle_visuel.py`) : `lire_le_controle(project_path)`
   renvoie le mode (`joindre`, `relire`) et la configuration, ou `None` ;
   `controle_du(chemins, config) -> bool`.
-- `{port}` n'est substitué que par l'étape de run (ticket-613) ; la capture
+- `{port}` n'est substitué que par l'étape de run (ticket-618) ; la capture
   manuelle existante garde son `url` tel quel.
 - `demarrage.delai_s` : défaut 120, plafond 300.
 

@@ -1,19 +1,19 @@
 ---
-id: ticket-613
+id: ticket-618
 title: "A run that changes an interface captures it from its own worktree"
 type: feat
 status: todo
 priority: medium
 agent: codeur
-depends_on: [ticket-612]
+depends_on: [ticket-617]
 created: 2026-10-27
 ---
 
-# ticket-613 — L'étape de capture du pipeline
+# ticket-618 — L'étape de capture du pipeline
 
 ## Objectif
 Après l'approbation du diff et avant la livraison, démarrer l'app du run
-depuis son worktree, la capturer, l'arrêter, et le dire. Mode `joindre` d'ADR-061.
+depuis son worktree, la capturer, l'arrêter, et le dire. Mode `joindre` d'ADR-062.
 
 ## À faire
 - Étape appelée seulement si `lire_le_controle` renvoie un mode et que

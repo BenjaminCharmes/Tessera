@@ -1,15 +1,15 @@
 ---
-id: ticket-614
+id: ticket-619
 title: "Relire mode: a pull request with visual checks is never merged alone"
 type: feat
 status: todo
 priority: medium
 agent: codeur
-depends_on: [ticket-613]
+depends_on: [ticket-618]
 created: 2026-10-27
 ---
 
-# ticket-614 — Mode `relire` : la PR attend un humain
+# ticket-619 — Mode `relire` : la PR attend un humain
 
 ## Objectif
 Sur un projet en `autonomy: merge`, un `controle_visuel: "relire"` qui s'est

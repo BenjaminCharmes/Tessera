@@ -12,11 +12,15 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Le verdict du reviewer, de l'audit sécurité et du validateur se lit dans
+  une sortie structurée validée par un schéma, jamais dans le texte.** Une
+  sortie absente, hors schéma ou contradictoire refuse. Remplace la règle du
+  parseur par mot-clé quand le reviewer est livré. (ADR-061, ADR-009)
 - **Un run ne lance ni serveur ni capture sans `pipeline.controle_visuel`
   déclaré.** Fichiers d'interface, largeurs et démarrage se déclarent, jamais
   devinés ; l'app démarre depuis le worktree du run, sur un port libre, et
   ne tue jamais un processus existant. Les captures restent hors du dépôt.
-  (ADR-061, ADR-042, ADR-021)
+  (ADR-062, ADR-042, ADR-021)
 
 ## Git et périmètre d'écriture
 
