@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-27
 depends_on: []
 id: ticket-616
+pr_number: 725
 priority: medium
 status: done
 title: Capture widths and themes are configurable per project
