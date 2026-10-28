@@ -5838,3 +5838,4 @@ Le diff ajoute :
 - 2026-10-28 11:36:02 UTC — [ticket-612] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
 - 2026-10-28 11:36:48 UTC — [ticket-612] validateur: APPROVED — Les sept critères sont satisfaits : `ProviderResult.structured` est défini dans  (345484ms)
 - 2026-10-28 11:36:48 UTC — [ticket-612] APPROVED après 2 tour(s)
+- 2026-10-28 11:38:41 UTC — [ticket-612] documentation: 0 fichier(s) (108280ms)
