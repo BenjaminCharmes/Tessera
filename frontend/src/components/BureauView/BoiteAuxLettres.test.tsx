@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import BoiteAuxLettres from "./BoiteAuxLettres";
 import { api } from "../../lib/api";
 import { INITIAL, applyEvent } from "../../hooks/streamState";
@@ -8,7 +14,13 @@ import { _viderCacheResource } from "../../hooks/useResource";
 import type { EventType, PRStatusEntry } from "../../types/api";
 
 function ev(type: EventType, data: Record<string, unknown> = {}) {
-  return { type, agent: null, ticket_id: "ticket-001", data, timestamp: "2026-10-24T10:00:00.000Z" };
+  return {
+    type,
+    agent: null,
+    ticket_id: "ticket-001",
+    data,
+    timestamp: "2026-10-24T10:00:00.000Z",
+  };
 }
 
 function rejouer(...evenements: ReturnType<typeof ev>[]): StreamState {
@@ -16,7 +28,13 @@ function rejouer(...evenements: ReturnType<typeof ev>[]): StreamState {
 }
 
 const livraison = (data: Record<string, unknown> = {}) =>
-  ev("livraison_done", { pr_number: 42, arret: null, conflits: [], merged: false, ...data });
+  ev("livraison_done", {
+    pr_number: 42,
+    arret: null,
+    conflits: [],
+    merged: false,
+    ...data,
+  });
 
 function entree(over: Partial<PRStatusEntry> = {}): PRStatusEntry {
   return {
@@ -41,20 +59,39 @@ afterEach(() => {
 describe("BoiteAuxLettres", () => {
   const CAS: [string, StreamState, string][] = [
     ["none", INITIAL, "Boîte aux lettres, aucune PR"],
-    ["open", rejouer(livraison({ arret: "conflit résolu, PR à relire" })), "Boîte aux lettres, PR #42 ouverte"],
-    ["waiting on the CI", rejouer(livraison()), "Boîte aux lettres, PR #42 CI en attente"],
-    ["merged", rejouer(livraison(), ev("ci_merge_done", { merged: true })), "Boîte aux lettres, PR #42 mergée"],
-    ["refused", rejouer(livraison(), ev("ci_merge_done", { merged: false })), "Boîte aux lettres, PR #42 refusée"],
+    [
+      "open",
+      rejouer(livraison({ arret: "conflit résolu, PR à relire" })),
+      "Boîte aux lettres, PR #42 ouverte",
+    ],
+    [
+      "waiting on the CI",
+      rejouer(livraison()),
+      "Boîte aux lettres, PR #42 CI en attente",
+    ],
+    [
+      "merged",
+      rejouer(livraison(), ev("ci_merge_done", { merged: true })),
+      "Boîte aux lettres, PR #42 mergée",
+    ],
+    [
+      "refused",
+      rejouer(livraison(), ev("ci_merge_done", { merged: false })),
+      "Boîte aux lettres, PR #42 refusée",
+    ],
   ];
 
-  it.each(CAS)("renders the %s state with its own aria-label", async (_nom, etat, libelle) => {
-    vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
+  it.each(CAS)(
+    "renders the %s state with its own aria-label",
+    async (_nom, etat, libelle) => {
+      vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 
-    render(<BoiteAuxLettres projet="ide-core" etat={etat} />);
-    await act(async () => {});
+      render(<BoiteAuxLettres projet="ide-core" etat={etat} />);
+      await act(async () => {});
 
-    expect(screen.getByRole("group", { name: libelle })).toBeInTheDocument();
-  });
+      expect(screen.getByRole("group", { name: libelle })).toBeInTheDocument();
+    },
+  );
 
   it("puts the short label in a tooltip, not under the box, for a room without a pull request", async () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
@@ -71,7 +108,12 @@ describe("BoiteAuxLettres", () => {
   it("shows the pull request number beside the box and its state in the tooltip", async () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 
-    render(<BoiteAuxLettres projet="ide-core" etat={rejouer(livraison({ arret: "conflit résolu, PR à relire" }))} />);
+    render(
+      <BoiteAuxLettres
+        projet="ide-core"
+        etat={rejouer(livraison({ arret: "conflit résolu, PR à relire" }))}
+      />,
+    );
     await act(async () => {});
 
     expect(screen.getByText("#42")).toBeInTheDocument();
@@ -84,12 +126,18 @@ describe("BoiteAuxLettres", () => {
   });
 
   it("rebuilds the state from pr-statuses when the run has no events left", async () => {
-    const lire = vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([entree({ state: "merged" })]);
+    const lire = vi
+      .spyOn(api.github, "getPrStatuses")
+      .mockResolvedValue([entree({ state: "merged" })]);
 
     render(<BoiteAuxLettres projet="ide-core" etat={etatAvecTicket()} />);
 
     await waitFor(() =>
-      expect(screen.getByRole("group", { name: "Boîte aux lettres, PR #42 mergée" })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("button", {
+          name: "Boîte aux lettres, PR #42 mergée",
+        }),
+      ).toBeInTheDocument(),
     );
     expect(lire).toHaveBeenCalledWith("ide-core");
   });
@@ -98,29 +146,69 @@ describe("BoiteAuxLettres", () => {
     const lire = vi.spyOn(api.github, "getPrStatuses");
 
     lire.mockResolvedValue([entree({ state: "closed" })]);
-    const { unmount } = render(<BoiteAuxLettres projet="ide-core" etat={etatAvecTicket()} />);
-    await screen.findByRole("group", { name: "Boîte aux lettres, PR #42 refusée" });
+    const { unmount } = render(
+      <BoiteAuxLettres projet="ide-core" etat={etatAvecTicket()} />,
+    );
+    await screen.findByRole("button", {
+      name: "Boîte aux lettres, PR #42 refusée",
+    });
     unmount();
     _viderCacheResource();
 
     lire.mockResolvedValue([entree({ ci_status: "passing" })]);
     render(<BoiteAuxLettres projet="ide-core" etat={etatAvecTicket()} />);
-    await screen.findByRole("group", { name: "Boîte aux lettres, PR #42 ouverte" });
+    await screen.findByRole("button", {
+      name: "Boîte aux lettres, PR #42 ouverte",
+    });
   });
 
   it("links the pull request number to its URL", async () => {
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([entree()]);
 
-    render(<BoiteAuxLettres projet="ide-core" etat={rejouer(ev("agent_started"), livraison())} />);
+    render(
+      <BoiteAuxLettres
+        projet="ide-core"
+        etat={rejouer(ev("agent_started"), livraison())}
+      />,
+    );
 
     const lien = await screen.findByRole("link", { name: "#42" });
-    expect(lien).toHaveAttribute("href", "https://example.test/org/repo/pull/42");
+    expect(lien).toHaveAttribute(
+      "href",
+      "https://example.test/org/repo/pull/42",
+    );
+  });
+
+  it("opens the pull request when the box itself is clicked", async () => {
+    vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([entree()]);
+    const ouvrir = vi.spyOn(window, "open").mockImplementation(() => null);
+
+    render(
+      <BoiteAuxLettres
+        projet="ide-core"
+        etat={rejouer(ev("agent_started"), livraison())}
+      />,
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: /Boîte aux lettres, PR #42/ }),
+    );
+
+    expect(ouvrir).toHaveBeenCalledWith(
+      "https://example.test/org/repo/pull/42",
+      "_blank",
+      "noopener,noreferrer",
+    );
   });
 
   it("shows the number without a link when pr-statuses does not know the pull request", async () => {
     const lire = vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 
-    render(<BoiteAuxLettres projet="ide-core" etat={rejouer(ev("agent_started"), livraison())} />);
+    render(
+      <BoiteAuxLettres
+        projet="ide-core"
+        etat={rejouer(ev("agent_started"), livraison())}
+      />,
+    );
 
     await waitFor(() => expect(lire).toHaveBeenCalled());
     expect(screen.getByText("#42")).toBeInTheDocument();

@@ -9,8 +9,11 @@ interface DossiersProps {
   projet: string;
   runId: string | null;
   etat: StreamState;
-  /** Ouvre le fil du run, comme le bouton « Fil » de la pièce : sans lui, la pile n'est qu'un objet (ticket-602). */
-  onOuvrir?: (runId: string) => void;
+  /**
+   * Ouvre l'onglet Tickets du projet : des dossiers mènent aux tickets, le fil a
+   * déjà son bouton (ticket-622). Sans lui, la pile n'est qu'un objet.
+   */
+  onActiver?: () => void;
 }
 
 /** Hauteur maximale de la pile dessinée, et nombre de lignes de l'infobulle. */
@@ -44,10 +47,15 @@ function ListeDesRestants({ restants, titres }: ListeProps) {
           const titre = titres.get(ticket);
           return (
             <li key={ticket} className="flex gap-2 leading-snug">
-              <span aria-hidden="true" className="mt-1.5 size-1.5 shrink-0 rounded-full bg-zinc-500" />
+              <span
+                aria-hidden="true"
+                className="mt-1.5 size-1.5 shrink-0 rounded-full bg-zinc-500"
+              />
               <span>
                 <code className="font-mono text-zinc-100">{ticket}</code>
-                {titre && <span className="text-zinc-300">{` — ${titre}`}</span>}
+                {titre && (
+                  <span className="text-zinc-300">{` — ${titre}`}</span>
+                )}
               </span>
             </li>
           );
@@ -74,10 +82,10 @@ function Pile({ projet, restants, onActiver }: PileProps) {
       <Agrandi>
         <div className="flex flex-col items-center">
           {Array.from({ length: hauteurDePile(restants.length) }, (_, i) => (
-          <div key={i} className={i === 0 ? "" : "-mt-5"}>
-            <Dossier />
-          </div>
-        ))}
+            <div key={i} className={i === 0 ? "" : "-mt-5"}>
+              <Dossier />
+            </div>
+          ))}
         </div>
       </Agrandi>
       <span
@@ -92,9 +100,13 @@ function Pile({ projet, restants, onActiver }: PileProps) {
 }
 
 /** Une seule pile pour la file, rien quand il n'en reste aucun ticket (ADR-058). */
-export default function Dossiers({ projet, runId, etat, onOuvrir }: DossiersProps) {
+export default function Dossiers({
+  projet,
+  runId,
+  etat,
+  onActiver,
+}: DossiersProps) {
   const restants = useRestants(projet, runId, etat);
   if (restants.length === 0) return null;
-  const ouvrir = onOuvrir && runId !== null ? () => onOuvrir(runId) : undefined;
-  return <Pile projet={projet} restants={restants} onActiver={ouvrir} />;
+  return <Pile projet={projet} restants={restants} onActiver={onActiver} />;
 }

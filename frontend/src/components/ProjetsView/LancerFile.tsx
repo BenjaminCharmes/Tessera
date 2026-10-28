@@ -8,6 +8,8 @@ interface LancerFileProps {
   projet: ProjectOverview;
   /** Le run de la file qui tourne déjà sur ce projet, s'il y en a une — ticket-557. */
   fileEnCours?: string | null;
+  /** Les tickets que cette file doit encore traiter : ni comptés ni proposés de nouveau (ticket-622). */
+  dejaEnFile?: readonly string[];
   /** Appelé une fois la file partie ou complétée : la vue relit la vue d'ensemble. */
   onLancee: () => void;
 }
@@ -15,7 +17,9 @@ interface LancerFileProps {
 function messageDEchec(e: unknown, ajout: boolean): string {
   const texte = e instanceof Error ? e.message : "";
   if (texte.startsWith("API 409")) {
-    return ajout ? "La file en cours n'accepte plus de tickets." : "Un run est déjà en cours sur ce projet.";
+    return ajout
+      ? "La file en cours n'accepte plus de tickets."
+      : "Un run est déjà en cours sur ce projet.";
   }
   return texte || "Lancement impossible.";
 }
@@ -33,13 +37,22 @@ function bilan(ajoutes: number): string {
  * grisé et le dit en clair. La confirmation se fait sur place, sans fenêtre
  * modale. Tout clic ici s'arrête : la carte n'est pas sélectionnée.
  */
-export default function LancerFile({ projet, fileEnCours = null, onLancee }: LancerFileProps) {
+export default function LancerFile({
+  projet,
+  fileEnCours = null,
+  dejaEnFile = [],
+  onLancee,
+}: LancerFileProps) {
   const [confirmation, setConfirmation] = useState(false);
   const [enCours, setEnCours] = useState(false);
   const [echec, setEchec] = useState<string | null>(null);
   const [resultat, setResultat] = useState<string | null>(null);
-  const n = projet.tickets.todo;
   const ajout = projet.run_actif && fileEnCours !== null;
+  // Le bouton restait « Ajouter à la file (n) » une fois tout ajouté : on croyait
+  // que rien n'était parti, et on cliquait en boucle (ticket-622).
+  const n = ajout
+    ? Math.max(projet.tickets.todo - dejaEnFile.length, 0)
+    : projet.tickets.todo;
 
   async function lancer() {
     setEnCours(true);
@@ -47,12 +60,18 @@ export default function LancerFile({ projet, fileEnCours = null, onLancee }: Lan
     setResultat(null);
     try {
       const { tickets } = await api.tickets.list(projet.id);
-      const ids = idsAFaire(tickets);
+      const ids = idsAFaire(tickets).filter(
+        (id) => !(ajout && dejaEnFile.includes(id)),
+      );
       if (ajout && fileEnCours) {
         const { ajoutes } = await api.orchestrator.append(fileEnCours, ids);
         setResultat(bilan(ajoutes.length));
       } else {
-        await api.orchestrator.run({ project_id: projet.id, mode: "queue", ticket_ids: ids });
+        await api.orchestrator.run({
+          project_id: projet.id,
+          mode: "queue",
+          ticket_ids: ids,
+        });
       }
       setConfirmation(false);
       onLancee();
@@ -63,6 +82,13 @@ export default function LancerFile({ projet, fileEnCours = null, onLancee }: Lan
     }
   }
 
+  if (ajout && n <= 0 && projet.tickets.todo > 0) {
+    return (
+      <span role="status" className="text-micro text-zinc-400">
+        Tout est dans la file
+      </span>
+    );
+  }
   if (n <= 0) return null;
   const bloque = projet.run_actif && !ajout;
   return (
@@ -74,9 +100,15 @@ export default function LancerFile({ projet, fileEnCours = null, onLancee }: Lan
       {confirmation ? (
         <>
           <span className="text-micro text-zinc-300">
-            {ajout ? `Ajouter ${n} tickets à la file en cours ?` : `Lancer ${n} tickets ?`}
+            {ajout
+              ? `Ajouter ${n} tickets à la file en cours ?`
+              : `Lancer ${n} tickets ?`}
           </span>
-          <Button taille="compact" disabled={enCours} onClick={() => void lancer()}>
+          <Button
+            taille="compact"
+            disabled={enCours}
+            onClick={() => void lancer()}
+          >
             {ajout ? "Ajouter" : "Lancer"}
           </Button>
           <Button
@@ -90,7 +122,9 @@ export default function LancerFile({ projet, fileEnCours = null, onLancee }: Lan
         </>
       ) : (
         <>
-          {bloque && <span className="text-micro text-zinc-500">Run en cours</span>}
+          {bloque && (
+            <span className="text-micro text-zinc-500">Run en cours</span>
+          )}
           <Button
             taille="compact"
             disabled={bloque}

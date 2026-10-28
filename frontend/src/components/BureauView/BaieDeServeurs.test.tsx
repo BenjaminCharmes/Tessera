@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import BaieDeServeurs from "./BaieDeServeurs";
 import BoutonServices from "../Sidebar/BoutonServices";
 import { useServices } from "../../hooks/useServices";
+import type { UseServicesResult } from "../../hooks/useServices";
 import { api } from "../../lib/api";
 import type { ServiceActif } from "../../types/api";
 
@@ -53,7 +54,9 @@ describe("BaieDeServeurs", () => {
     const { container } = render(<Harnais projet="ide-core" />);
 
     const baie = await screen.findByRole("group", { name: "Services" });
-    const voyants = [...container.querySelectorAll("[data-voyant]")].map((g) => g.getAttribute("data-voyant"));
+    const voyants = [...container.querySelectorAll("[data-voyant]")].map((g) =>
+      g.getAttribute("data-voyant"),
+    );
     expect(voyants).toEqual(["en-cours", "echoue"]);
     // Les noms ne s'écrivent plus sous la baie : ils se lisent en infobulle.
     expect(screen.queryByText("api")).toBeNull();
@@ -63,33 +66,85 @@ describe("BaieDeServeurs", () => {
   });
 
   it("names each service and its state in the tooltip only", async () => {
-    vi.spyOn(api.services, "list").mockResolvedValue([service({ nom: "front", pid: null })]);
+    vi.spyOn(api.services, "list").mockResolvedValue([
+      service({ nom: "front", pid: null }),
+    ]);
 
     render(<Harnais projet="ide-core" />);
 
     const baie = await screen.findByRole("group", { name: "Services" });
     expect(screen.queryByText(/pas lancé/)).toBeNull();
     act(() => baie.focus());
-    expect(within(screen.getByRole("tooltip")).getByRole("listitem").textContent).toBe("front — pas lancé par l'IDE");
+    expect(
+      within(screen.getByRole("tooltip")).getByRole("listitem").textContent,
+    ).toBe("front — pas lancé par l'IDE");
   });
 
   it("starts the services through the same endpoint as the services panel", async () => {
     vi.spyOn(api.services, "list").mockResolvedValue([service()]);
-    const lancer = vi.spyOn(api.services, "start").mockResolvedValue({ services: [] });
+    const lancer = vi
+      .spyOn(api.services, "start")
+      .mockResolvedValue({ services: [] });
 
     render(<Harnais projet="ide-core" />);
-    await userEvent.click(await screen.findByRole("button", { name: "Lancer les services de ide-core" }));
+    await userEvent.click(
+      await screen.findByRole("button", {
+        name: "Lancer les services de ide-core",
+      }),
+    );
 
     expect(lancer).toHaveBeenCalledWith("ide-core");
   });
 
   it("stops the services through the same endpoint as the services panel", async () => {
-    vi.spyOn(api.services, "list").mockResolvedValue([service({ en_cours: true })]);
-    const arreter = vi.spyOn(api.services, "stop").mockResolvedValue({ arretes: 1 });
+    vi.spyOn(api.services, "list").mockResolvedValue([
+      service({ en_cours: true }),
+    ]);
+    const arreter = vi
+      .spyOn(api.services, "stop")
+      .mockResolvedValue({ arretes: 1 });
 
     render(<Harnais projet="ide-core" />);
-    await userEvent.click(await screen.findByRole("button", { name: "Arrêter les services de ide-core" }));
+    await userEvent.click(
+      await screen.findByRole("button", {
+        name: "Arrêter les services de ide-core",
+      }),
+    );
 
     expect(arreter).toHaveBeenCalledWith("ide-core");
+  });
+
+  it("opens the app a running service announced, and stays a plain group otherwise", async () => {
+    const ouvrir = vi.spyOn(window, "open").mockImplementation(() => null);
+    const base: Omit<UseServicesResult, "services"> = {
+      enCours: true,
+      enEchec: false,
+      declare: true,
+      erreur: null,
+      demarrer: vi.fn(),
+      arreter: vi.fn(),
+      rafraichir: vi.fn(),
+    };
+    const lance = service({
+      en_cours: true,
+      sortie: ["  Local:   http://localhost:5195/"],
+    });
+    const { rerender } = render(
+      <BaieDeServeurs services={{ ...base, services: [lance] }} />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", {
+        name: "Services — ouvrir http://localhost:5195/",
+      }),
+    );
+    expect(ouvrir).toHaveBeenCalledWith(
+      "http://localhost:5195/",
+      "_blank",
+      "noopener,noreferrer",
+    );
+
+    rerender(<BaieDeServeurs services={{ ...base, services: [service()] }} />);
+    expect(screen.getByRole("group", { name: "Services" })).toBeInTheDocument();
   });
 });
