@@ -5916,3 +5916,4 @@ Le diff ajoute :
 - 2026-10-28 14:22:59 UTC — [ticket-615] validateur: fichiers cités joints : verdict.test.ts, lib/bureau/copie.ts
 - 2026-10-28 14:22:59 UTC — [ticket-615] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour li (244438ms)
 - 2026-10-28 14:22:59 UTC — [ticket-615] APPROVED après 3 tour(s)
+- 2026-10-28 14:25:39 UTC — [ticket-615] documentation: 0 fichier(s) (151735ms) — après tour de correction
