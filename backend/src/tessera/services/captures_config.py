@@ -13,6 +13,9 @@ from pathlib import Path
 #: Largeurs en pixels : téléphone puis ordinateur.
 LARGEURS: tuple[int, ...] = (390, 1440)
 THEMES: tuple[str, ...] = ("clair", "sombre")
+#: Bornes d'une largeur déclarée, en pixels.
+LARGEUR_MIN = 200
+LARGEUR_MAX = 3000
 
 _CARACTERES_INTERDITS = re.compile(r"[^a-z0-9-]+")
 
@@ -46,6 +49,31 @@ class ConfigCaptures:
     url: str
     ecrans: tuple[Ecran, ...]
     session: SessionCaptures | None = None
+    largeurs: tuple[int, ...] = LARGEURS
+    themes: tuple[str, ...] = THEMES
+
+
+def _largeurs(brut: object) -> tuple[int, ...]:
+    """Read `largeurs` ; anything unusable falls back to the defaults."""
+    if not isinstance(brut, list) or not brut:
+        return LARGEURS
+    # `bool` est un `int` en Python : `true` ne serait pas une largeur.
+    if not all(type(v) is int and LARGEUR_MIN <= v <= LARGEUR_MAX for v in brut):
+        return LARGEURS
+    if len(set(brut)) != len(brut):
+        return LARGEURS
+    return tuple(brut)
+
+
+def _themes(brut: object) -> tuple[str, ...]:
+    """Read `themes` ; anything unusable falls back to the defaults."""
+    if not isinstance(brut, list) or not brut:
+        return THEMES
+    if not all(isinstance(v, str) and v in THEMES for v in brut):
+        return THEMES
+    if len(set(brut)) != len(brut):
+        return THEMES
+    return tuple(brut)
 
 
 def nom_de_fichier(nom: str) -> str:
@@ -95,7 +123,13 @@ def _config(brut: object) -> ConfigCaptures | None:
         session = _session(brut_session) if isinstance(brut_session, dict) else None
         if session is None:
             return None
-    return ConfigCaptures(url=url.rstrip("/"), ecrans=valides, session=session)
+    return ConfigCaptures(
+        url=url.rstrip("/"),
+        ecrans=valides,
+        session=session,
+        largeurs=_largeurs(brut.get("largeurs")),
+        themes=_themes(brut.get("themes")),
+    )
 
 
 def load_captures_config(project_path: Path) -> ConfigCaptures | None:

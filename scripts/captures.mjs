@@ -15,7 +15,13 @@ const require = createRequire(join(racine, "frontend", "package.json"));
 const { chromium } = require("@playwright/test");
 
 const HAUTEUR = { 390: 844, 1440: 900 };
+const HAUTEUR_PAR_DEFAUT = 900;
 const SCHEMA = { clair: "light", sombre: "dark" };
+
+// Une largeur déclarée par le projet (1024, 768…) n'a pas de hauteur propre.
+function hauteurPour(largeur) {
+  return HAUTEUR[largeur] ?? HAUTEUR_PAR_DEFAUT;
+}
 
 // Échange le jeton contre le cookie de session, dans le contexte du navigateur :
 // le cookie y reste pour les captures. Le jeton arrive par stdin (jamais en
@@ -32,7 +38,7 @@ async function ouvrirLaSession(contexte, config) {
 
 async function capturer(navigateur, config, sortie, largeur, theme, ecran) {
   const contexte = await navigateur.newContext({
-    viewport: { width: largeur, height: HAUTEUR[largeur] ?? 900 },
+    viewport: { width: largeur, height: hauteurPour(largeur) },
     colorScheme: SCHEMA[theme],
   });
   try {

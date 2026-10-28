@@ -13,11 +13,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from tessera.config import settings
-from tessera.services.captures_config import (
-    LARGEURS,
-    THEMES,
-    ConfigCaptures,
-)
+from tessera.services.captures_config import ConfigCaptures
 from tessera.services.lancement import essais_de_commande
 from tessera.utils.logger import get_logger
 
@@ -27,8 +23,9 @@ _SCRIPT = Path(__file__).resolve().parents[4] / "scripts" / "captures.mjs"
 _DELAI_SONDE_S = 2.0
 _DELAI_EXECUTEUR_S = 300.0
 
-#: Forme d'un nom de capture : `<nom>-<largeur>-<thème>.png`.
-MOTIF_FICHIER = re.compile(r"^[a-z0-9-]+-(390|1440)-(clair|sombre)\.png$")
+#: Forme d'un nom de capture : `<nom>-<largeur>-<thème>.png`. La largeur est un
+#: entier quelconque : ce que le projet déclare est borné par sa configuration.
+MOTIF_FICHIER = re.compile(r"^[a-z0-9-]+-[0-9]{1,4}-(clair|sombre)\.png$")
 
 Executeur = Callable[[ConfigCaptures, Path, str | None], Awaitable[None]]
 
@@ -43,12 +40,12 @@ def dossier_des_captures(project_id: str) -> Path:
 
 
 def noms_attendus(config: ConfigCaptures) -> list[str]:
-    """Return the `<nom>-<largeur>-<thème>.png` names, four per screen."""
+    """Return the `<nom>-<largeur>-<thème>.png` names, one per width and theme."""
     return [
         f"{ecran.nom}-{largeur}-{theme}.png"
         for ecran in config.ecrans
-        for largeur in LARGEURS
-        for theme in THEMES
+        for largeur in config.largeurs
+        for theme in config.themes
     ]
 
 
@@ -72,8 +69,8 @@ def _charge(config: ConfigCaptures, jeton: str | None) -> bytes:
     """Build the JSON sent on stdin ; the token travels only here."""
     charge: dict[str, object] = {
         "url": config.url,
-        "largeurs": list(LARGEURS),
-        "themes": list(THEMES),
+        "largeurs": list(config.largeurs),
+        "themes": list(config.themes),
         "ecrans": [
             {"nom": e.nom, "chemin": e.chemin, "clic": e.clic} for e in config.ecrans
         ],
