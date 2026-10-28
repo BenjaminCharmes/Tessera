@@ -148,10 +148,13 @@ describe("Supervision — vue par défaut et sélecteur", () => {
     expect(screen.getByLabelText("Services lancés")).toHaveTextContent("backend");
   });
 
-  it("says nothing is running when there is no run", () => {
+  it("keeps the office without a run, and says nothing is running where the rooms would be", () => {
+    // Le 28/10, sans run, un message remplaçait tout le Bureau : salles du haut,
+    // « À toi » et employé de la semaine disparaissaient (ticket-636).
     render(<SupervisionView supervision={supervision([])} projects={[]} />);
 
-    expect(screen.getByText("Aucun run en cours.")).toBeInTheDocument();
+    expect(screen.getByText("Salle de pause")).toBeInTheDocument();
+    expect(screen.getByText(/Aucun run en cours\. Lance un ticket/)).toBeInTheDocument();
   });
 });
 

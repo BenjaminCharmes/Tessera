@@ -61,7 +61,11 @@ export default function BureauView({
   // Un run qui se clôt fait relire l'employé de la semaine. Un compte et non un événement :
   // la vue ne reçoit que des états, et `runClosed` y est posé par `run_closed`.
   const runsClos = projets.filter((p) => p.etat.runClosed).length;
-  const employe = useWeekEmployee([...projets.map((p) => p.nom), ...auRepos], maintenant, runsClos);
+  const employe = useWeekEmployee(
+    [...projets.map((p) => p.nom), ...auRepos],
+    maintenant,
+    runsClos,
+  );
 
   const aToi = contenuAToi(projets, maintenant);
   useAlerteSonore(
@@ -72,9 +76,19 @@ export default function BureauView({
   return (
     <div className="flex items-start gap-3.5">
       <div className="flex min-w-0 flex-1 flex-col gap-3.5">
-        <SallesCommunes projets={projets} maintenant={maintenant} employe={employe} />
+        <SallesCommunes
+          projets={projets}
+          maintenant={maintenant}
+          employe={employe}
+        />
         {/* Une pièce par projet, empilées sur toute la largeur : la vue défile en hauteur. */}
         <div className="flex flex-col gap-3.5" data-mode="pieces">
+          {projets.length === 0 && (
+            <p className="rounded-lg border border-dashed border-zinc-800 px-3 py-6 text-center text-xs text-zinc-500">
+              Aucun run en cours. Lance un ticket depuis le tableau : sa pièce
+              apparaîtra ici.
+            </p>
+          )}
           {projets.map(({ nom, etat, runId = null, run }) => (
             <Piece
               key={nom}

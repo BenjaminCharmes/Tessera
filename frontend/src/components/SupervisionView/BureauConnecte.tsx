@@ -58,12 +58,21 @@ export default function BureauConnecte({
       <EnteteSupervision
         nombreDeRuns={runs.length}
         connecte={supervision.connecte}
-        entrees={runsClosDe(runs, etatDe).length > 0 ? entreesDuMenu(runs, etatDe) : []}
-        onFermer={(issue: IssueDuRun | null) => ranger(idsARanger(runs, etatDe, issue))}
+        entrees={
+          runsClosDe(runs, etatDe).length > 0 ? entreesDuMenu(runs, etatDe) : []
+        }
+        onFermer={(issue: IssueDuRun | null) =>
+          ranger(idsARanger(runs, etatDe, issue))
+        }
         selecteur={selecteur}
       />
-      {runs.length === 0 ? (
-        <VueVide connecte={supervision.connecte} avecServices={services.length > 0} />
+      {/* Sans run, le Bureau reste : salles du haut, « À toi », employé de la semaine.
+          Seul un canal coupé garde le message plein écran (ticket-636). */}
+      {runs.length === 0 && !supervision.connecte ? (
+        <VueVide
+          connecte={supervision.connecte}
+          avecServices={services.length > 0}
+        />
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <BureauView
