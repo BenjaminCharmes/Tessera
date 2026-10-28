@@ -137,7 +137,6 @@ class AgentRunner:
                 cwd=cwd,
                 **extra,
             )
-
         content = provider_result.content
         duration_ms = int((time.monotonic() - t0) * 1000)
 
@@ -183,6 +182,7 @@ class AgentRunner:
                     cost_usd,
                     duration_ms,
                     provider=provider_result.provider_name,
+                    cache_creation_tokens=provider_result.cache_creation_tokens,
                 )
             except Exception as exc:
                 _logger.warning("agent_call_save_failed", extra={"error": str(exc)})

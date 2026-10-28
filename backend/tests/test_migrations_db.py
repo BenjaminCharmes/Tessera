@@ -88,6 +88,28 @@ async def test_les_donnees_survivent_a_une_migration(
     assert restants == [(run_id,)]
 
 
+async def test_cache_creation_tokens_column_is_added_with_zero(tmp_path: Path) -> None:
+    # Une base d'avant le ticket-604 : schéma d'origine, une ligne d'appel.
+    # La migration ajoute la colonne sans perdre la ligne, qui vaut 0.
+    db = tmp_path / "ancienne.db"
+    c = sqlite3.connect(str(db))
+    c.executescript(database._CREATE_TABLES)
+    c.execute(
+        "INSERT INTO agent_calls (run_id, ticket_id, role, model, input_tokens, "
+        "output_tokens, cache_read_tokens, cost_usd, duration_ms, created_at) "
+        "VALUES ('r', 't', 'codeur', 'm', 10, 5, 3, 0.1, 1, '2026-01-01')"
+    )
+    c.commit()
+    c.close()
+
+    await init_db(db)
+
+    lignes = sqlite3.connect(str(db)).execute(
+        "SELECT run_id, input_tokens, cache_creation_tokens FROM agent_calls"
+    ).fetchall()
+    assert lignes == [("r", 10, 0)]
+
+
 async def test_le_schema_de_base_ne_bouge_plus(tmp_path: Path) -> None:
     # `_CREATE_TABLES` décrit le schéma **d'origine**. Toute évolution passe
     # par une migration : le modifier ferait diverger une base neuve d'une

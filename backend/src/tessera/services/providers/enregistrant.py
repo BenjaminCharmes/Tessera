@@ -186,6 +186,7 @@ class ProviderEnregistrant:
                 cost_usd,
                 duration_ms,
                 provider=provider_name,
+                cache_creation_tokens=result.cache_creation_tokens,
             )
         except Exception as exc:  # noqa: BLE001 — un enregistrement raté ne casse rien
             _logger.warning(

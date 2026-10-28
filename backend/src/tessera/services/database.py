@@ -9,6 +9,7 @@ from typing import Any
 import aiosqlite
 from pydantic import BaseModel
 
+from tessera.services.agent_calls import save_agent_call as save_agent_call
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -155,6 +156,10 @@ CREATE INDEX IF NOT EXISTS idx_ac_run_created
     # Nullables : les runs antérieurs n'en ont pas.
     """ALTER TABLE pipeline_runs ADD COLUMN approved_sha TEXT;
 ALTER TABLE pipeline_runs ADD COLUMN pushed_sha TEXT;""",
+    # 9 — ticket-604 : les tokens de création de cache de chaque appel, pour que
+    # l'entrée réelle d'un rôle se lise sans sous-estimation. Les lignes
+    # existantes valent 0 : la valeur n'a jamais été conservée.
+    "ALTER TABLE agent_calls ADD COLUMN cache_creation_tokens INTEGER NOT NULL DEFAULT 0;",
 ]
 
 
@@ -308,32 +313,6 @@ async def save_event(
             "INSERT INTO agent_events (run_id, type, agent, data_json, ts, ticket_id)"
             " VALUES (?,?,?,?,?,?)",
             (run_id, event_type, agent, json.dumps(data), timestamp, ticket_id or None),
-        )
-        await db.commit()
-
-
-async def save_agent_call(
-    db_path: Path | str,
-    run_id: str,
-    ticket_id: str,
-    role: str,
-    model: str,
-    input_tokens: int,
-    output_tokens: int,
-    cache_read_tokens: int,
-    cost_usd: float,
-    duration_ms: int,
-    provider: str = "",
-) -> None:
-    created_at = datetime.now(timezone.utc).isoformat()
-    async with aiosqlite.connect(str(db_path)) as db:
-        await db.execute(
-            """INSERT INTO agent_calls
-               (run_id, ticket_id, role, model, input_tokens, output_tokens,
-                cache_read_tokens, cost_usd, duration_ms, created_at, provider)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
-            (run_id, ticket_id, role, model, input_tokens, output_tokens,
-             cache_read_tokens, cost_usd, duration_ms, created_at, provider),
         )
         await db.commit()
 
