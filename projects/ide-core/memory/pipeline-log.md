@@ -5807,3 +5807,4 @@ Le diff ajoute :
 - 2026-10-28 09:56:54 UTC — [ticket-605] validateur: fichiers cités joints : backend/pyproject.toml, uv.lock (tronqué)
 - 2026-10-28 09:56:54 UTC — [ticket-605] validateur: APPROVED — Le ticket-605 livre l'outillage complet : quatre modules de mesure sans toucher  (341967ms)
 - 2026-10-28 09:56:54 UTC — [ticket-605] APPROVED après 2 tour(s)
+- 2026-10-28 10:00:02 UTC — [ticket-605] documentation: 0 fichier(s) (155546ms)
