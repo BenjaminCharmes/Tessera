@@ -19,7 +19,10 @@ function decompte(fichiers: readonly string[]): string {
  * Un conflit confié au résolveur : ses fichiers pendant le travail, puis la PR
  * à relire, que rien ne mergera seule (ADR-033).
  */
-export default function SalleReunion({ occupants, maintenant }: SalleReunionProps) {
+export default function SalleReunion({
+  occupants,
+  maintenant,
+}: SalleReunionProps) {
   return (
     <Salle
       maintenant={maintenant}
@@ -33,20 +36,28 @@ export default function SalleReunion({ occupants, maintenant }: SalleReunionProp
           <Chaise />
         </div>
       }
-    >
-      {occupants.map(({ projet, reunion }) => (
-        <li key={projet} className="text-xs">
+      textes={occupants.map(({ projet, reunion }) => (
+        <li
+          key={projet}
+          className="truncate"
+          title={
+            reunion.temps === "conflit"
+              ? reunion.fichiers.join(", ")
+              : undefined
+          }
+        >
           <span className="text-zinc-400">{projet}</span> · résolveur{" "}
           {reunion.temps === "conflit" ? (
             <span className="text-amber-300">
               Résolution en cours · {decompte(reunion.fichiers)}
-              {reunion.fichiers.length > 0 && ` : ${reunion.fichiers.join(", ")}`}
+              {reunion.fichiers.length > 0 &&
+                ` : ${reunion.fichiers.join(", ")}`}
             </span>
           ) : (
             <span className="text-blue-300">PR #{reunion.pr} à relire</span>
           )}
         </li>
       ))}
-    </Salle>
+    />
   );
 }

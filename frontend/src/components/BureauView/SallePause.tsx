@@ -35,13 +35,12 @@ export default function SallePause({ occupants, maintenant }: SallePauseProps) {
       }
       plante="cactus"
       mobilier={<MachineACafe />}
-    >
-      {occupants.map(({ projet, pause }) => (
-        <li key={projet} className="text-xs">
+      textes={occupants.map(({ projet, pause }) => (
+        <li key={projet} className="truncate">
           <span className="text-zinc-400">{projet}</span>{" "}
           <span className={TON[pause.motif]}>{pause.libelle}</span>
         </li>
       ))}
-    </Salle>
+    />
   );
 }

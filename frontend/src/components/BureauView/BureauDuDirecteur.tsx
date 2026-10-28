@@ -5,7 +5,10 @@ import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Bulle from "../../design/bureau/Bulle";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
 import GoldFrame from "../../design/bureau/GoldFrame";
-import { PHYSIQUE_DU_DIRECTEUR, TENUE_DU_DIRECTEUR } from "../../lib/bureau/sallesCommunes";
+import {
+  PHYSIQUE_DU_DIRECTEUR,
+  TENUE_DU_DIRECTEUR,
+} from "../../lib/bureau/sallesCommunes";
 import type { AgentEnSalle } from "../../lib/bureau/sallesCommunes";
 import { employeeLabel } from "../../lib/bureau/weekEmployee";
 import type { WeekEmployee } from "../../lib/bureau/weekEmployee";
@@ -44,7 +47,11 @@ function CadreDeLEmploye({ employe }: { employe: WeekEmployee }) {
  * attend sa réponse (ADR-025) se tient devant lui, bulle « ? » au-dessus ; il
  * retourne à son poste dès que la question a sa réponse.
  */
-export default function BureauDuDirecteur({ agents, maintenant, employe = null }: BureauDuDirecteurProps) {
+export default function BureauDuDirecteur({
+  agents,
+  maintenant,
+  employe = null,
+}: BureauDuDirecteurProps) {
   return (
     <Salle
       maintenant={maintenant}
@@ -53,23 +60,32 @@ export default function BureauDuDirecteur({ agents, maintenant, employe = null }
       titre="Bureau du directeur"
       entete="un agent dont la question attend ta réponse vient s'y tenir"
       vide="Aucune question en attente"
-      mobilier={<BureauEnBois tenue={TENUE_DU_DIRECTEUR} physique={PHYSIQUE_DU_DIRECTEUR} />}
+      mobilier={
+        <BureauEnBois
+          tenue={TENUE_DU_DIRECTEUR}
+          physique={PHYSIQUE_DU_DIRECTEUR}
+        />
+      }
       decor={<Bibliotheque />}
       plante="ficus"
       ambre={agents.length > 0}
+      textes={agents.map(({ projet, poste }) => (
+        <li key={projet} className="truncate">
+          <span className="text-zinc-400">{projet}</span> · {nomDuPoste(poste)}
+        </li>
+      ))}
     >
       {/* Un projet ne tient qu'un run à la fois (ADR-038) : un agent par projet, donc la clé est unique. */}
       {agents.map(({ projet, poste }) => (
-        <li key={projet} data-agent={poste} className="flex items-end gap-2">
-          <div className="flex flex-col items-center">
-            <Bulle sante="question" />
-            <Agrandi>
-              <AgentDebout projet={projet} role={poste} />
-            </Agrandi>
-          </div>
-          <span className="text-xs">
-            <span className="text-zinc-400">{projet}</span> · {nomDuPoste(poste)}
-          </span>
+        <li
+          key={projet}
+          data-agent={poste}
+          className="flex flex-col items-center"
+        >
+          <Bulle sante="question" />
+          <Agrandi>
+            <AgentDebout projet={projet} role={poste} />
+          </Agrandi>
         </li>
       ))}
     </Salle>
