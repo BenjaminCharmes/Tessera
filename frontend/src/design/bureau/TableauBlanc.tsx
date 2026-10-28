@@ -11,28 +11,42 @@ const LIGNES_PAR_COLONNE = 6;
 const CASES_MAX = 2 * LIGNES_PAR_COLONNE;
 
 /**
- * Le tableau blanc au mur de la pièce, grille 44 × 14 (132 × 42 px). Une ligne par
+ * Le tableau blanc au mur de la pièce, grille 32 × 14 (96 × 42 px). Une ligne par
  * critère : grise tant que rien n'est jugé, verte si le critère passe, rouge sinon
  * (ADR-058). Le libellé accessible est porté par l'objet qui l'enveloppe.
+ * Il faisait 132 px : rétréci, il laisse au mur la place de trois fenêtres et
+ * d'une bibliothèque (ticket-627).
  */
 export default function TableauBlanc({ cases }: TableauBlancProps) {
   const colonnes = cases.length > LIGNES_PAR_COLONNE ? 2 : 1;
-  const largeur = colonnes === 2 ? 19 : 40;
+  const largeur = colonnes === 2 ? 13 : 28;
   return (
     <svg
-      width="132"
+      width="96"
       height="42"
-      viewBox="0 0 44 14"
+      viewBox="0 0 32 14"
       shapeRendering="crispEdges"
       aria-hidden="true"
       data-sprite="tableau-blanc"
     >
-      <rect x="0" y="0" width="44" height="14" className="fill-(--sprite-tableau-cadre)" />
-      <rect x="1" y="1" width="42" height="12" className="fill-(--sprite-tableau)" />
+      <rect
+        x="0"
+        y="0"
+        width="32"
+        height="14"
+        className="fill-(--sprite-tableau-cadre)"
+      />
+      <rect
+        x="1"
+        y="1"
+        width="30"
+        height="12"
+        className="fill-(--sprite-tableau)"
+      />
       {cases.slice(0, CASES_MAX).map((etat, i) => (
         <rect
           key={i}
-          x={2 + Math.floor(i / LIGNES_PAR_COLONNE) * 21}
+          x={2 + Math.floor(i / LIGNES_PAR_COLONNE) * 15}
           y={2 + (i % LIGNES_PAR_COLONNE) * 2}
           width={largeur}
           height="1"

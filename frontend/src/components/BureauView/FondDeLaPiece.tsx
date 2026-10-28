@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
+import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
 import MachineACafe from "../../design/bureau/MachineACafe";
 import Plante from "../../design/bureau/Plante";
@@ -8,7 +9,7 @@ import Vapeur from "../../design/bureau/Vapeur";
 import type { StreamState } from "../../hooks/streamState";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import type { UseServicesResult } from "../../hooks/useServices";
-import { MACHINE_X, PORTE_X } from "../../lib/bureau/activites";
+import { BIBLIOTHEQUE_X, MACHINE_X, PORTE_X } from "../../lib/bureau/activites";
 import { cielDesFenetres } from "../../lib/bureau/ciel";
 import { dayMoment } from "../../lib/bureau/dayMoment";
 import { enPourcentDuSol } from "../../lib/bureau/etirementDuSol";
@@ -27,7 +28,8 @@ import TableauDesCriteres from "./TableauDesCriteres";
  * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
  */
 const TABLEAU_X = 30;
-const FENETRES_X = [190, 270, 616] as const;
+// Resserrées derrière un tableau plus étroit : la bibliothèque prend la place libérée (ticket-627).
+const FENETRES_X = [150, 212, 616] as const;
 const PLAFONNIERS_X = [250, 432, 590] as const;
 const FICUS_X = 348;
 const IMPRIMANTE_X = 392;
@@ -123,6 +125,11 @@ export default function FondDeLaPiece({
           etat={etat}
           relatif={TABLEAU_RELATIF}
         />
+      </Pose>
+      <Pose x={BIBLIOTHEQUE_X}>
+        <Agrandi>
+          <Bibliotheque />
+        </Agrandi>
       </Pose>
       <Pose x={FICUS_X}>
         <Agrandi>

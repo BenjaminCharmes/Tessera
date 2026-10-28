@@ -6,7 +6,7 @@ status: todo
 pr_number: null
 priority: medium
 agent: codeur
-depends_on: [ticket-623]
+depends_on: [ticket-623, ticket-627]
 estimated_days: 2
 created: 2026-10-28
 ---
@@ -31,9 +31,8 @@ Les événements existent :
   `data.outcome` (`livraison_evenements.py`), déjà lu par `etat.conflitEnCours`.
 
 ## Solution proposée
-- **Documentation** : une bibliothèque, mobilier de chaque pièce, prend la
-  place de la fenêtre du milieu du mur (`FENETRES_X`, x = 270 ; il en reste deux).
-  Elle est toujours dessinée, sans voyant, comme la machine à café. Pendant la
+- **Documentation** : la bibliothèque est déjà au mur de chaque pièce
+  (`BIBLIOTHEQUE_X` dans `lib/bureau/activites.ts`, ticket-627). Pendant la
   documentation du projet, ses deux rédacteurs (technique et fonctionnel) s'y
   tiennent debout, avec l'activité « rédige la documentation », ancrée au mur
   comme la machine. Pas de salle commune : la rangée du haut n'a pas la place
@@ -45,8 +44,7 @@ Les événements existent :
   déjà affichée.
 
 ## Critères d'acceptation
-- [ ] `FondDeLaPiece.tsx` dessine la bibliothèque à la place de la fenêtre du milieu, et `FENETRES_X` ne compte plus que deux fenêtres
-- [ ] Un test vérifie que deux rédacteurs se tiennent à la bibliothèque, activité « rédige la documentation », après `documentation_started`, et n'y sont plus après `doc_updated`, après `documentation_failed`, ni après un `livraison_started` qui suit
+- [ ] Un test vérifie que deux rédacteurs se tiennent à `BIBLIOTHEQUE_X`, activité « rédige la documentation », après `documentation_started`, et n'y sont plus après `doc_updated`, après `documentation_failed`, ni après un `livraison_started` qui suit
 - [ ] Un test vérifie qu'aucun rédacteur n'est dessiné hors de la documentation
 - [ ] Un test de `lib/bureau/activites.ts` vérifie qu'entre `livraison_started` et `livraison_done` l'activité du codeur est « dépose la PR », ancrée à la boîte aux lettres
 - [ ] `lib/bureau/physique.ts` donne une tenue au résolveur, et un test vérifie que la salle de réunion le dessine pendant un `conflict_resolution` sans `outcome`, et ne le dessine plus après
