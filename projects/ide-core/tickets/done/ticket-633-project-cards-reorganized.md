@@ -44,7 +44,8 @@ Retours du 28/10 :
 - [x] Un test de `LancerFile` vérifie qu'un projet à worktree n'offre pas « File » et lance le premier ticket à faire en mode `single`
 - [x] Un test de `ProjetCarte` vérifie que les actions sont sur la ligne des compteurs, de hauteur fixe
 - [x] Les boutons de services s'appellent « Lancer l'app » et « Arrêter l'app »
-- [x] Captures à 1536 relues : pieds de carte alignés, avec ou sans bouton
+- [x] Le lien du dépôt vit dans le pied, sur une ligne gardée même sans dépôt
+- [x] Captures à 1536 relues : lien, dates, compteurs et boutons alignés d'une carte à l'autre, avec ou sans bouton
 
 ## Ce que ça ne fait pas
 - Ne lève pas la règle d'un ticket à la fois sur les projets à worktree.

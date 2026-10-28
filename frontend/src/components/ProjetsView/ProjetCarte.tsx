@@ -201,13 +201,17 @@ export default function ProjetCarte({
           {projet.description}
         </p>
       )}
-      <LienDepot projet={projet} />
       {/* Les cartes d'une rangée ont la même hauteur : le pied est poussé en
           bas, et sa ligne d'actions a toujours la même hauteur, qu'elle porte
           des boutons ou non. Dates et compteurs s'alignent donc d'une carte à
           l'autre (ticket-633). Messages et confirmations s'ouvrent en bulle
           au-dessus de leur bouton : ils ne poussent pas la carte. */}
       <div data-testid="pied-de-carte" className="mt-auto flex flex-col gap-1.5">
+        {/* Le lien du dépôt vit dans le pied, sur une ligne gardée même sans dépôt :
+            il suivait la longueur de la description (ticket-633). */}
+        <div className="flex h-4 items-center">
+          <LienDepot projet={projet} />
+        </div>
         <Dates projet={projet} />
         <div className="flex h-7 items-center justify-between gap-2">
           <Compteurs projet={projet} />
