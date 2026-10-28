@@ -11,7 +11,6 @@ import PanneauAgentChoisi from "./PanneauAgentChoisi";
 import type { AgentChoisi } from "./PanneauAgentChoisi";
 import Piece from "./Piece";
 import SallesCommunes from "./SallesCommunes";
-import TableauDuJour from "./TableauDuJour";
 
 export interface ProjetDuBureau {
   nom: string;
@@ -59,7 +58,7 @@ export default function BureauView({
   const [choix, setChoix] = useState<AgentChoisi | null>(null);
   const projetChoisi = projets.find((p) => p.nom === choix?.projet);
 
-  // Un run qui se clôt fait relire le tableau. Un compte et non un événement :
+  // Un run qui se clôt fait relire l'employé de la semaine. Un compte et non un événement :
   // la vue ne reçoit que des états, et `runClosed` y est posé par `run_closed`.
   const runsClos = projets.filter((p) => p.etat.runClosed).length;
   const employe = useWeekEmployee([...projets.map((p) => p.nom), ...auRepos], maintenant, runsClos);
@@ -73,7 +72,6 @@ export default function BureauView({
   return (
     <div className="flex items-start gap-3.5">
       <div className="flex min-w-0 flex-1 flex-col gap-3.5">
-        <TableauDuJour maintenant={maintenant} signalRunsClos={runsClos} />
         <SallesCommunes projets={projets} maintenant={maintenant} employe={employe} />
         {/* Une pièce par projet, empilées sur toute la largeur : la vue défile en hauteur. */}
         <div className="flex flex-col gap-3.5" data-mode="pieces">
