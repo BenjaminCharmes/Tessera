@@ -38,7 +38,9 @@ from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.services.run_dans_worktree import adopter_la_branche
 from tessera.services.run_worktree import RunWorktree
-from tessera.services.pipeline_text import _extract_criteria, _read_reviewer_verdict
+from tessera.services.pipeline_text import _extract_criteria
+from tessera.services.reviewer_schema import REVIEWER_SCHEMA
+from tessera.services.verdict_reviewer import donnees_fin_de_revue, juger_revue
 from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.services.security_auditor import SecurityAuditResult
 from tessera.services.validator_cited_files import format_cited_files_log
@@ -757,26 +759,23 @@ async def run_review(
         project_context=review_context,
         agent_config=reviewer_cfg,
         run_id=run.run_id,
+        schema=REVIEWER_SCHEMA,
     )
     orch.record_spend(reviewer_result.cost_usd)
+    approved, reason, review_text = juger_revue(reviewer_result.structured)
     await run.on_event(
         OrchestratorEvent(
             type=EventType.AGENT_DONE,
             agent=AgentRole.reviewer,
             ticket_id=ticket_id,
-            data={
-                "content": reviewer_result.content,
-                "cost_usd": reviewer_result.cost_usd,
-                "duration_ms": reviewer_result.duration_ms,
-            },
+            data=donnees_fin_de_revue(approved, review_text, reviewer_result),
         )
     )
     orch._log(
         f"[{ticket_id}] tour {run.round_num} — reviewer terminé ({reviewer_result.duration_ms}ms)"
     )
 
-    approved, reason = _read_reviewer_verdict(reviewer_result.content)
-    return approved, reason, reviewer_result.content
+    return approved, reason, review_text
 
 
 async def run_validation(

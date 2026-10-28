@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 from tessera.models.agent import AgentResult, AgentRole
+from tests.revue_structuree import revue_depuis_texte
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent
@@ -57,9 +58,10 @@ class _GitQuiCommite:
 class _Runner:
     async def run(self, **kwargs: object) -> AgentResult:
         role = kwargs["role"]
+        content = "APPROVED" if role == AgentRole.reviewer else "fait"
         return AgentResult(
             role=role, ticket_id="ticket-001",  # type: ignore[arg-type]
-            content="APPROVED" if role == AgentRole.reviewer else "fait",
+            content=content, structured=revue_depuis_texte(content),
             suggested_status=TicketStatus.in_review, duration_ms=1,
         )
 

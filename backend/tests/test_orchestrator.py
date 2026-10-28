@@ -12,9 +12,7 @@ from tessera.services.orchestrator import (
     PipelineResult,
 )
 
-# Le parsing du verdict vit dans pipeline_text depuis ticket-045, et les étapes
-# du pipeline dans pipeline_stages depuis ticket-046.
-from tessera.services.pipeline_text import _parse_reviewer_verdict
+from tests.revue_structuree import revue_depuis_texte
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services.security_auditor import SecurityAuditResult, SecurityIssue
 from tessera.services.validator import ValidationResult
@@ -39,12 +37,16 @@ def _make_ticket(**kwargs: object) -> Ticket:
 
 
 def _make_agent_result(content: str, role: AgentRole = AgentRole.codeur) -> AgentResult:
+    # Le reviewer répond en sortie structurée (ADR-061) : le double la tire du
+    # texte court que les scénarios écrivent (`APPROVED`, `CHANGES_REQUESTED: …`).
+    structured = revue_depuis_texte(content) if role == AgentRole.reviewer else None
     return AgentResult(
         role=role,
         ticket_id="ticket-001",
         content=content,
         suggested_status=TicketStatus.in_review,
         duration_ms=100,
+        structured=structured,
     )
 
 
@@ -193,99 +195,6 @@ def test_agent_tool_use_event_existe() -> None:
     from tessera.services.orchestrator import EventType
 
     assert EventType.AGENT_TOOL_USE.value == "agent_tool_use"
-
-
-# ------------------------------------------------------------------
-# _parse_reviewer_verdict
-# ------------------------------------------------------------------
-
-
-def test_parse_verdict_approved() -> None:
-    approved, reason = _parse_reviewer_verdict("Code is clean. APPROVED.")
-    assert approved is True
-    assert reason == ""
-
-
-def test_parse_verdict_approved_en_minuscules_n_approuve_pas() -> None:
-    # Le reviewer est prompté pour répondre `APPROVED` en majuscules (ADR-009).
-    # Une correspondance insensible à la casse lisait une phrase de prose
-    # comme un verdict (ticket-122).
-    approved, _ = _parse_reviewer_verdict("approved — looks great")
-    assert approved is False
-
-
-def test_parse_verdict_approved_dans_un_mot_n_approuve_pas() -> None:
-    # `"APPROVED" in content.upper()` acceptait « this should not be
-    # approved » — la négation était perdue, et le run passait `done` sur un
-    # refus (ticket-122). Un verdict est un mot entier, en majuscules.
-    approved, _ = _parse_reviewer_verdict("This should not be approved.")
-    assert approved is False
-    approved, _ = _parse_reviewer_verdict("UNAPPROVED")
-    assert approved is False
-
-
-def test_parse_verdict_approved_seul_approuve() -> None:
-    approved, reason = _parse_reviewer_verdict("APPROVED")
-    assert approved is True
-    assert reason == ""
-
-
-def test_parse_verdict_changes_requested_with_reason() -> None:
-    approved, reason = _parse_reviewer_verdict("CHANGES_REQUESTED: missing unit tests")
-    assert approved is False
-    assert "missing unit tests" in reason
-
-
-def test_parse_verdict_changes_requested_no_reason() -> None:
-    approved, reason = _parse_reviewer_verdict("CHANGES_REQUESTED")
-    assert approved is False
-
-
-def test_parse_verdict_changes_requested_takes_priority_over_approved() -> None:
-    content = "CHANGES_REQUESTED: fix types\n\nOtherwise APPROVED."
-    approved, _ = _parse_reviewer_verdict(content)
-    assert approved is False
-
-
-def test_parse_verdict_unclear_response_is_rejected() -> None:
-    approved, _ = _parse_reviewer_verdict("Some vague feedback with no verdict.")
-    assert approved is False
-
-
-def test_parse_verdict_une_approbation_qui_cite_changes_requested_approuve() -> None:
-    # Ticket-288 : trois APPROVED lus comme des refus, parce que le corps
-    # disait « Bug `CHANGES_REQUESTED` réellement corrigé » (ticket-298).
-    content = (
-        "APPROVED\n\n## Ce qui est bien\n\n"
-        "- **Bug `CHANGES_REQUESTED` réellement corrigé** — le motif est journalisé."
-    )
-    approved, reason = _parse_reviewer_verdict(content)
-    assert approved is True
-    assert reason == ""
-
-
-def test_parse_verdict_la_premiere_ligne_de_verdict_l_emporte_sur_la_prose() -> None:
-    content = (
-        "Je vérifie d'abord la structure de l'orchestrateur.\n---\n\n"
-        "**APPROVED**\n\n## Suggestions\n- éviter un CHANGES_REQUESTED inutile"
-    )
-    approved, _ = _parse_reviewer_verdict(content)
-    assert approved is True
-
-
-def test_parse_verdict_un_refus_en_tete_garde_son_motif() -> None:
-    approved, reason = _parse_reviewer_verdict(
-        "## CHANGES_REQUESTED: tests manquants\n\nLe reste serait APPROVED."
-    )
-    assert approved is False
-    assert reason == "tests manquants"
-
-
-def test_parse_verdict_une_ligne_approved_qui_nomme_un_refus_refuse() -> None:
-    approved, _ = _parse_reviewer_verdict(
-        "APPROVED serait prématuré, CHANGES_REQUESTED : la migration casse."
-    )
-    assert approved is False
 
 
 # ------------------------------------------------------------------
@@ -723,6 +632,7 @@ async def test_run_pipeline_emits_agent_tool_use_event(tmp_path: Path) -> None:
         stream_callback: object = None,
         tool_callback: object = None,
         run_id: str | None = None,
+        schema: object = None,
     ) -> AgentResult:
         # Mime le comportement de ClaudeAgentSDKProvider : le tool_callback
         # est réellement awaité pendant l'exécution du codeur.
@@ -800,6 +710,7 @@ async def test_run_pipeline_feedback_included_in_second_round_context(tmp_path: 
         stream_callback: object = None,
         tool_callback: object = None,
         run_id: str | None = None,
+        schema: object = None,
     ) -> AgentResult:
         if role == AgentRole.codeur:
             captured_contexts.append(project_context)
@@ -1956,6 +1867,7 @@ async def test_per_ticket_budget_does_not_stop_second_ticket_between_rounds(
             return AgentResult(
                 role=role,  # type: ignore[arg-type]
                 ticket_id=tid,
+                structured=revue_depuis_texte(content),
                 content=content,
                 suggested_status=TicketStatus.in_review,
                 duration_ms=100,
@@ -2008,6 +1920,7 @@ async def test_ticket_own_spend_exceeds_per_ticket_limit_stops_between_rounds(
             return AgentResult(
                 role=role,  # type: ignore[arg-type]
                 ticket_id=tid,
+                structured=revue_depuis_texte(content),
                 content=content,
                 suggested_status=TicketStatus.in_review,
                 duration_ms=100,
@@ -2050,6 +1963,7 @@ async def test_queue_ticket_stopped_on_per_ticket_budget_goes_to_todo(
             return AgentResult(
                 role=role,  # type: ignore[arg-type]
                 ticket_id=tid,
+                structured=revue_depuis_texte(content),
                 content=content,
                 suggested_status=TicketStatus.in_review,
                 duration_ms=100,
@@ -2143,6 +2057,7 @@ async def test_single_run_budget_exhausted_still_blocks_ticket_191(
             return AgentResult(
                 role=role,  # type: ignore[arg-type]
                 ticket_id=tid,
+                structured=revue_depuis_texte(content),
                 content=content,
                 suggested_status=TicketStatus.in_review,
                 duration_ms=100,

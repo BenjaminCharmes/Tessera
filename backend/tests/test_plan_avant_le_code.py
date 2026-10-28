@@ -33,7 +33,9 @@ class _Runner:
             if self._plan_leve:
                 raise RuntimeError("provider indisponible")
             return _make_agent_result(_PLAN)
-        return _make_agent_result("APPROVED" if role == AgentRole.reviewer else "fait")
+        return _make_agent_result(
+            "APPROVED" if role == AgentRole.reviewer else "fait", role=role  # type: ignore[arg-type]
+        )
 
 
 def _svc(plan: bool):  # type: ignore[no-untyped-def]
