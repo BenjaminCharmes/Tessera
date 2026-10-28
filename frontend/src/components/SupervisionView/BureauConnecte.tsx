@@ -6,6 +6,8 @@ import { projetsDuBureau } from "../../lib/bureau/projetsDuBureau";
 import type { Project, ServiceActif } from "../../types/api";
 import EnteteSupervision from "./EnteteSupervision";
 import VueVide from "./VueVide";
+import { useZoomDuBureau } from "../../hooks/useZoomDuBureau";
+import { CommandesDeZoom } from "./ZoomDuBureau";
 import type { IssueDuRun } from "./issueDuRun";
 import { entreesDuMenu, idsARanger, runsClosDe } from "./rangement";
 
@@ -43,6 +45,14 @@ export default function BureauConnecte({
     projects.map((p) => p.id),
   );
 
+  const {
+    mode: modeDeZoom,
+    zoom,
+    setMode: setModeDeZoom,
+    conteneur,
+    contenu,
+  } = useZoomDuBureau();
+
   function ranger(ids: string[]) {
     fermerRuns(ids);
   }
@@ -64,7 +74,16 @@ export default function BureauConnecte({
         onFermer={(issue: IssueDuRun | null) =>
           ranger(idsARanger(runs, etatDe, issue))
         }
-        selecteur={selecteur}
+        selecteur={
+          <>
+            <CommandesDeZoom
+              mode={modeDeZoom}
+              zoom={zoom}
+              setMode={setModeDeZoom}
+            />
+            {selecteur}
+          </>
+        }
       />
       {/* Sans run, le Bureau reste : salles du haut, « À toi », employé de la semaine.
           Seul un canal coupé garde le message plein écran (ticket-636). */}
@@ -74,17 +93,20 @@ export default function BureauConnecte({
           avecServices={services.length > 0}
         />
       ) : (
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">
-          <BureauView
-            projets={projets}
-            auRepos={auRepos}
-            signalServices={supervision.signalServices}
-            envoyer={supervision.envoyer}
-            son={son}
-            onOuvrir={onOuvrirFil}
-            onRanger={(runId) => ranger([runId])}
-            onOpenProject={onOpenProject && ouvrirLeProjet}
-          />
+        <div ref={conteneur} className="min-h-0 flex-1 overflow-y-auto p-3">
+          {/* Le zoom ne touche que le Bureau : le reste de l'app garde sa taille (ticket-657). */}
+          <div ref={contenu} data-zoom={zoom} style={{ zoom }}>
+            <BureauView
+              projets={projets}
+              auRepos={auRepos}
+              signalServices={supervision.signalServices}
+              envoyer={supervision.envoyer}
+              son={son}
+              onOuvrir={onOuvrirFil}
+              onRanger={(runId) => ranger([runId])}
+              onOpenProject={onOpenProject && ouvrirLeProjet}
+            />
+          </div>
         </div>
       )}
     </div>

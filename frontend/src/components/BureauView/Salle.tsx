@@ -121,7 +121,9 @@ export default function Salle({
         data-sol="lames"
         className="sol-lames flex flex-1 flex-col justify-center px-3"
       >
-        <div className="flex min-h-28 items-end justify-between gap-4 px-1 py-2">
+        {/* Regroupés au centre : répartis d'un bord à l'autre, ils laissaient de grands vides
+            sur un écran large ou dézoomé (ticket-657). */}
+        <div className="flex min-h-28 items-end justify-center gap-10 px-1 py-2">
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">
               <Agrandi>{mobilier}</Agrandi>
