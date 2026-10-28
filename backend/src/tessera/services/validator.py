@@ -253,7 +253,8 @@ def _reconcile_criteria(
         if matched is None:
             matched = tolerant_map.get(_tolerant_normalize(sent))
         if matched is not None:
-            criteria.append(matched)
+            # Texte envoyé : la sortie structurée n'exige que `index` (ticket-662).
+            criteria.append(CriterionResult(sent, matched.passed, matched.note))
         else:
             criteria.append(
                 CriterionResult(

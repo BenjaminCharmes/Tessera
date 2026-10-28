@@ -59,6 +59,21 @@ async def test_a_failed_criterion_from_the_double_gives_changes_requested() -> N
 
 
 @respx.mock
+async def test_a_criterion_judged_by_index_keeps_the_text_that_was_sent() -> None:
+    # La sortie structurée n'exige que `index` : le texte vide du validateur
+    # remplaçait celui du ticket, et le Bureau affichait « critère 1 » (ticket-662).
+    reponse = {"criteria": [{"index": 1, "passed": True}, {"index": 2, "passed": False, "note": "manque"}], "feedback": ""}
+    _mock_ollama(json.dumps(reponse))
+
+    result = await _service().validate(
+        criteria=["Le bouton existe", "Le test passe"], code_produced="code", test_result=None
+    )
+
+    assert [c.criterion for c in result.criteria] == ["Le bouton existe", "Le test passe"]
+    assert result.criteria[1].note == "manque"
+
+
+@respx.mock
 @pytest.mark.parametrize(
     ("contenu", "plus"),
     [
