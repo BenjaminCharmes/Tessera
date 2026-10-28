@@ -1,15 +1,16 @@
 ---
-id: ticket-570
-title: "Design of an opt-in visual check: screenshots at three widths for a run that changes an interface"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
+created: 2026-10-23
 depends_on: []
 estimated_days: 1
-created: 2026-10-23
+id: ticket-570
 plan: true
+pr_number: 701
+priority: low
+status: done
+title: 'Design of an opt-in visual check: screenshots at three widths for a run that
+  changes an interface'
+type: design
 ---
 
 # ticket-570 — Conception d'un contrôle visuel optionnel
