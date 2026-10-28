@@ -31,11 +31,13 @@ Les événements existent :
   `data.outcome` (`livraison_evenements.py`), déjà lu par `etat.conflitEnCours`.
 
 ## Solution proposée
-- **Documentation** : une salle commune « Bibliothèque » sur la rangée du haut,
-  avec le sprite `Bibliotheque` existant. Pendant la documentation d'un projet,
-  ses deux rédacteurs (technique et fonctionnel) s'y tiennent, et la liste de la
-  salle porte le nom du projet. La salle est commune parce que la documentation
-  se fait par lot, en fin de file, et non par ticket.
+- **Documentation** : une bibliothèque, mobilier de chaque pièce, prend la
+  place de la fenêtre du milieu du mur (`FENETRES_X`, x = 270 ; il en reste deux).
+  Elle est toujours dessinée, sans voyant, comme la machine à café. Pendant la
+  documentation du projet, ses deux rédacteurs (technique et fonctionnel) s'y
+  tiennent debout, avec l'activité « rédige la documentation », ancrée au mur
+  comme la machine. Pas de salle commune : la rangée du haut n'a pas la place
+  d'une cinquième salle, et la pièce du projet est vide pendant cette étape.
 - **Livraison** : entre `livraison_started` et `livraison_done`, le codeur se tient
   devant la boîte aux lettres de sa pièce, avec l'activité « dépose la PR ».
 - **Conflit** : pendant une résolution, un agent « Résolveur » avec sa propre tenue
@@ -43,8 +45,9 @@ Les événements existent :
   déjà affichée.
 
 ## Critères d'acceptation
-- [ ] Un test vérifie qu'un projet est listé dans la salle « Bibliothèque » après `documentation_started`, et n'y est plus après `doc_updated`, après `documentation_failed`, ni après un `livraison_started` qui suit
-- [ ] Un test vérifie que la salle « Bibliothèque » est vide quand aucun projet ne documente
+- [ ] `FondDeLaPiece.tsx` dessine la bibliothèque à la place de la fenêtre du milieu, et `FENETRES_X` ne compte plus que deux fenêtres
+- [ ] Un test vérifie que deux rédacteurs se tiennent à la bibliothèque, activité « rédige la documentation », après `documentation_started`, et n'y sont plus après `doc_updated`, après `documentation_failed`, ni après un `livraison_started` qui suit
+- [ ] Un test vérifie qu'aucun rédacteur n'est dessiné hors de la documentation
 - [ ] Un test de `lib/bureau/activites.ts` vérifie qu'entre `livraison_started` et `livraison_done` l'activité du codeur est « dépose la PR », ancrée à la boîte aux lettres
 - [ ] `lib/bureau/physique.ts` donne une tenue au résolveur, et un test vérifie que la salle de réunion le dessine pendant un `conflict_resolution` sans `outcome`, et ne le dessine plus après
 - [ ] Les nouvelles tenues n'utilisent que des jetons `--sprite-*` (ADR-058)
