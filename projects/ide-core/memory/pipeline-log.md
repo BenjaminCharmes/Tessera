@@ -5871,3 +5871,21 @@ Le diff ajoute :
 - 2026-10-28 12:21:09 UTC — [ticket-613] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les deux services lisent désorm (282858ms)
 - 2026-10-28 12:21:09 UTC — [ticket-613] APPROVED après 2 tour(s)
 - 2026-10-28 12:28:19 UTC — [ticket-613] documentation: 0 fichier(s) (425250ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « #: Le projet fait tourner chaque run dans un worktree (ADR-0 » (backend/src/tessera/servic
+- 2026-10-28 12:36:24 UTC — [ide-core] ticket-613 PR #715 confiée au CIWatcher
+- 2026-10-28 12:42:32 UTC — [ide-core] ticket-613 PR #715 mergée (CI verte)
+- 2026-10-28 12:43:31 UTC — [ide-core] ticket-636 PR #716 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-28 12:43:50 UTC — [ticket-614] branche ticket-614-the-reviewer-verdict-comes-from-a-structured-outp
+- 2026-10-28 12:43:51 UTC — [ticket-614] tour 1 — codeur démarré
+- 2026-10-28 12:59:41 UTC — [ticket-614] tour 1 — codeur terminé (949827ms)
+- 2026-10-28 13:07:27 UTC — [ticket-614] testeur: 1 failed, 3251 passed, 64 warnings in 462.83s (0:07:42)
+- 2026-10-28 13:07:27 UTC — [ticket-614] tests rouges au tour 1
+- 2026-10-28 13:07:27 UTC — [ticket-614] tour 2 — codeur démarré
+- 2026-10-28 13:09:50 UTC — [ticket-614] tour 2 — codeur terminé (143155ms)
+- 2026-10-28 13:17:27 UTC — [ticket-614] testeur: OK (exit 0)
+- 2026-10-28 13:20:28 UTC — [ticket-614] securite: PASS — This diff migrates reviewer verdict parsing from fragile keyword extraction to s (180421ms)
+- 2026-10-28 13:20:28 UTC — [ticket-614] tour 2 — reviewer démarré
+- 2026-10-28 13:20:47 UTC — [ticket-614] tour 2 — reviewer terminé (18734ms)
+- 2026-10-28 13:25:28 UTC — [ticket-614] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 13:26:39 UTC — [ticket-614] validateur: fichiers cités joints : agents/prompts/reviewer.md, test_consignes_coherentes.py (tronqué)
+- 2026-10-28 13:26:39 UTC — [ticket-614] validateur: APPROVED — Tous les critères d'acceptation du ticket-614 sont satisfaits. Le diff remplace  (371389ms)
+- 2026-10-28 13:26:39 UTC — [ticket-614] APPROVED après 2 tour(s)
