@@ -12,6 +12,7 @@ import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
+from tests.revue_structuree import revue
 from tests.test_providers_base import FakeProvider
 from tessera.config import settings
 from tessera.main import app
@@ -81,9 +82,9 @@ def _orchestrateur(tmp_path: Path, db_path: Path, tickets: _Tickets) -> Orchestr
     for role in ("codeur", "reviewer"):
         (prompts / f"{role}.md").write_text(f"Tu es le {role}.", encoding="utf-8")
     # Le reviewer approuve du premier coup : le meme contenu sert au codeur.
-    runner = AgentRunner(
-        FakeProvider(content="APPROVED"), AgentRegistryService(prompts), db_path=db_path
-    )
+    provider = FakeProvider(content="APPROVED")
+    provider.set_structured(revue("APPROVED"))
+    runner = AgentRunner(provider, AgentRegistryService(prompts), db_path=db_path)
     return Orchestrator(
         runner=runner,
         ticket_service=tickets,  # type: ignore[arg-type]

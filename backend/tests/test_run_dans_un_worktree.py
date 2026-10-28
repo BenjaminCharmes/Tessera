@@ -30,6 +30,7 @@ from tessera.services.run_dans_worktree import (
 )
 from tessera.services.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
+from tests.revue_structuree import revue_depuis_texte
 
 _LOGGER = "tessera.services.run_dans_worktree"
 PROJET = "checkout"
@@ -237,9 +238,10 @@ class _RunnerFactice:
         nom = role.value if isinstance(role, AgentRole) else str(role)
         if nom == "codeur":
             (self._racine / "produit.txt").write_text("produit", encoding="utf-8")
+        content = "fait" if nom == "codeur" else "APPROVED"
         return AgentResult(
             role=AgentRole(nom), ticket_id=TICKET,
-            content="fait" if nom == "codeur" else "APPROVED",
+            content=content, structured=revue_depuis_texte(content),
             suggested_status=TicketStatus.in_review, duration_ms=1,
         )
 

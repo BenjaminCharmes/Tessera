@@ -86,13 +86,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-009 — Verdict reviewer parsé par mot-clé structuré
+## ADR-009 — Verdict reviewer : parseur par mot-clé retiré (ADR-061)
 
 **Date** : 2026-06  
 **Portée** : architect, codeur, reviewer  
-**Décision** : L'orchestrateur parse la sortie du reviewer en cherchant `CHANGES_REQUESTED` (prioritaire) puis `APPROVED`. Absence des deux = rejet. Amendé 2026-10-01 (ticket-298) : la première ligne qui **commence** par un verdict l'emporte ; la priorité ne joue qu'en son absence. Amendé 2026-10-27 (ticket-574) : chaque remarque bloquante porte `[confiance: 0-100]` ; un `CHANGES_REQUESTED` dont **toutes** les remarques de `## Problèmes bloquants` sont sous `reviewer_confidence_threshold` (80 par défaut, 0 = filtre éteint) est lu comme une approbation avec remarques. Un score absent, en trop ou au-dessus du seuil garde le refus.  
-**Raison** : Le reviewer est prompté pour répondre dans ce format. La priorité de `CHANGES_REQUESTED` évite les faux positifs si les deux mots apparaissent ("sinon APPROVED").  
-**Alternative rejetée** : Parser un JSON structuré — trop contraignant pour un LLM qui génère aussi du texte libre.
+**Décision** : L'orchestrateur ne lit plus le texte du reviewer (amendé 2026-10-28, ticket-614) : il lit `verdict`, `summary` et `blocking[{text, location, confidence}]` dans la sortie structurée d'ADR-061. Un `CHANGES_REQUESTED` dont **toutes** les remarques sont sous `reviewer_confidence_threshold` (80 par défaut, 0 = filtre éteint) est lu comme une approbation avec remarques (ticket-574). Une sortie absente ou hors schéma, ou un `APPROVED` avec une remarque au-dessus du seuil, refuse.  
+**Raison** : le parseur par mot-clé a coûté trois rustines (tickets 122, 298, 574) ; un champ typé le remplace.  
+**Alternative rejetée** : garder le mot-clé en repli — une réponse ambiguë approuverait.
 
 ---
 

@@ -6,9 +6,6 @@ none of them touch git, the ticket store or the agents.
 import re
 from typing import TYPE_CHECKING
 
-from tessera.config import settings
-from tessera.services.reviewer_confidence import all_blocking_remarks_below
-
 if TYPE_CHECKING:
     from tessera.services.pipeline_run import PipelineRun
 
@@ -110,73 +107,6 @@ def _compose_feedback(
     if not val_approved:
         parts.append(f"Validateur : {val_reason}")
     return "\n\n".join(parts) if parts else _truncate_objection(raw_verdict)
-
-
-_APPROVED_WORD = re.compile(r"\bAPPROVED\b")
-_APPROVED_LEADING = re.compile(r"APPROVED\b")
-# Ce qui entoure un verdict sans en changer le sens : `**APPROVED**`,
-# `## CHANGES_REQUESTED`, `` `APPROVED` ``.
-_DECORATION = " \t*_`#>"
-
-
-def _verdict_line(line: str) -> tuple[bool, str] | None:
-    """The verdict a line opens with, or None when it opens with something else."""
-    s = line.strip().strip(_DECORATION)
-    if s.upper().startswith("CHANGES_REQUESTED"):
-        reason = s.split(":", 1)[-1].strip() if ":" in s else ""
-        return False, reason
-    if _APPROVED_LEADING.match(s):
-        # « APPROVED serait prématuré : CHANGES_REQUESTED » reste un refus.
-        if "CHANGES_REQUESTED" in s.upper():
-            return False, s
-        return True, ""
-    return None
-
-
-def _parse_reviewer_verdict(
-    content: str, threshold: int | None = None
-) -> tuple[bool, str]:
-    """Returns (approved, reason) from the reviewer's answer.
-
-    Avec un `threshold`, un refus dont toutes les remarques bloquantes portent
-    un score de confiance inférieur est lu comme une approbation avec remarques
-    (ticket-574). Un score absent ou au-dessus du seuil garde le refus.
-
-    Le reviewer est prompté pour ouvrir sa réponse par le verdict, seul sur sa
-    ligne (ADR-009). La première ligne qui *commence* par un verdict le
-    porte : un reviewer qui cite `CHANGES_REQUESTED` dans le corps d'une
-    approbation n'est plus lu comme un refus (ticket-298, trois APPROVED
-    refusés sur le ticket-288).
-
-    Sans ligne de verdict, la règle d'avant tient : `CHANGES_REQUESTED`
-    n'importe où l'emporte, puis `APPROVED` en mot entier et en majuscules —
-    « this should not be approved » n'approuve rien (ticket-122).
-    """
-    lines = content.splitlines()
-    for index, line in enumerate(lines):
-        verdict = _verdict_line(line)
-        if verdict is None:
-            continue
-        approved, reason = verdict
-        # Le verdict seul sur sa ligne ne porte aucune raison : elle est dans
-        # le texte qui suit, et c'est ce que le codeur doit lire (ticket-474).
-        if not approved and not reason:
-            reason = "\n".join(lines[index + 1:]).strip()
-        if not approved and threshold and all_blocking_remarks_below(content, threshold):
-            return True, ""
-        return approved, reason
-    for line in lines:
-        if "CHANGES_REQUESTED" in line.upper():
-            reason = line.split(":", 1)[-1].strip() if ":" in line else ""
-            return False, reason
-    if any(_APPROVED_WORD.search(line) for line in lines):
-        return True, ""
-    return False, content[:200]
-
-
-def _read_reviewer_verdict(content: str) -> tuple[bool, str]:
-    """The reviewer's verdict, with the confidence threshold from the settings."""
-    return _parse_reviewer_verdict(content, settings.reviewer_confidence_threshold)
 
 
 def _echec_de_tests(run: "PipelineRun") -> str:

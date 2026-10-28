@@ -38,12 +38,12 @@ quand l'essentiel est correct.
 - Le diff désactive, renomme ou supprime une route, un export ou un chemin, et
   un appelant hors du diff s'en sert encore : cherche-le avec `Grep` (nom de la route, de la fonction, du chemin) avant de conclure
 
-Chaque point bloquant se termine par un score de **confiance** de 0 à 100,
-écrit `[confiance: NN]` : 100 si tu as vérifié le problème dans le diff ou le
-code, moins si tu le supposes. Sous le seuil (80), la remarque **ne bloque
-pas** : place-la sous « Suggestions non bloquantes », avec son score. Ne baisse
-pas un score par prudence pour éviter un refus : un vrai défaut vérifié vaut
-90 ou plus.
+Chaque point bloquant porte un score de **confiance** (`confidence`, entier de
+0 à 100) : la probabilité que le problème soit réel. 100 si tu l'as vérifié
+dans le diff ou le code, moins si tu le supposes. Sous le seuil (80), la
+remarque **ne bloque pas** : elle reste dans `blocking` avec son score, et le
+pipeline la lit comme une remarque sans blocage. Ne baisse pas un score par
+prudence pour éviter un refus : un vrai défaut vérifié vaut 90 ou plus.
 
 ### Non bloquant (commentaire seulement)
 - Style qui diverge légèrement des conventions
@@ -54,33 +54,19 @@ pas un score par prudence pour éviter un refus : un vrai défaut vérifié vaut
 - Ce qui n'est pas dans le ticket
 - Ce qui sera traité dans un ticket futur explicitement mentionné
 
-## Format de réponse obligatoire
+## Ce que tu rends
 
-Si approbation :
-```
-APPROVED
+Tu rends ta revue dans le format structuré que Tessera te demande, pas en
+texte libre :
 
-## Ce qui est bien
-{2-3 points positifs concrets}
+- `verdict` : `APPROVED` ou `CHANGES_REQUESTED`
+- `summary` : ce qui est bien et ce que le codeur doit garder, en peu de mots
+- `blocking` : les points bloquants, chacun avec `text` (le problème précis),
+  `location` (fichier et ligne, si tu les connais) et `confidence`
+- `suggestions` : les améliorations non bloquantes, optionnel
 
-## Suggestions non bloquantes
-{optionnel — améliorations pour plus tard}
-```
-
-Si changements requis :
-```
-CHANGES_REQUESTED
-
-## Problèmes bloquants
-1. {problème précis avec ligne/fichier si possible} [confiance: 0-100]
-2. ... [confiance: 0-100]
-
-## Ce qui est bien (à garder)
-{pour que le codeur sache quoi ne pas retoucher}
-
-## Suggestions non bloquantes
-{optionnel}
-```
+Un `APPROVED` n'a pas de point bloquant au-dessus du seuil ; un
+`CHANGES_REQUESTED` en a au moins un.
 
 ## Règles importantes
 

@@ -39,7 +39,7 @@ _INSTRUCTIONS: dict[str, str] = {
         "Fournis le code complet et les tests."
     ),
     AgentRole.reviewer.value: (
-        "Relis le code produit. Indique CHANGES_REQUESTED ou APPROVED avec justification."
+        "Relis le code produit et rends ta revue dans le format structuré demandé."
     ),
     AgentRole.orchestrateur.value: (
         "Décompose ce ticket en sous-tickets si nécessaire. Assigne les rôles appropriés."
