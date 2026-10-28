@@ -18,6 +18,7 @@ vi.mock("../../lib/api", () => ({
     tickets: { activity: vi.fn().mockResolvedValue({ ticket_id: "", runs: [], pr_number: null, github_remote: null }) },
     services: { list: vi.fn().mockResolvedValue([]) },
     github: { getPrStatuses: vi.fn().mockResolvedValue([]) },
+    projects: { list: vi.fn().mockResolvedValue([]) },
     usage: { stats: vi.fn().mockResolvedValue({ daily: [] }) },
   },
 }));
