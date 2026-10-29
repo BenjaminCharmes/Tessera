@@ -7,7 +7,7 @@ diff approuvé touche un fichier d'interface ; sinon, aucun processus n'est cré
 from typing import TYPE_CHECKING
 
 from tessera.services.captures_session import lire_le_jeton
-from tessera.services.controle_visuel import controle_du
+from tessera.services.controle_visuel import ControleVisuel, controle_du
 from tessera.services.diff_changements import lire_diff
 from tessera.services.etape_de_capture import ResultatCapture, prendre_les_captures
 from tessera.services.git_workspace import GitWorkspaceError
@@ -81,28 +81,50 @@ def _jeton(orch: "Orchestrator") -> tuple[str | None, str | None]:
     return jeton, None
 
 
+def _a_relire(controle: ControleVisuel, resultat: ResultatCapture) -> str | None:
+    """Why the PR waits for a human: only the `relire` mode asks for it."""
+    if controle.mode != "relire":
+        return None
+    if resultat.cause is not None:
+        return f"captures échouées ({resultat.cause})"
+    return f"{len(resultat.images)} capture(s) prise(s)"
+
+
+async def _terminer(
+    orch: "Orchestrator",
+    controle: ControleVisuel,
+    ticket_id: str,
+    resultat: ResultatCapture,
+    on_event: EventCallback,
+) -> str | None:
+    await _annoncer(orch, ticket_id, resultat, on_event)
+    return _a_relire(controle, resultat)
+
+
 async def capturer_le_run(
     orch: "Orchestrator",
     resultat: PipelineResult,
     project_id: str,
     on_event: EventCallback,
-) -> None:
-    """Capture the approved run's app from its worktree, when the gate is open."""
+) -> str | None:
+    """Capture the approved run's app from its worktree, when the gate is open.
+
+    Returns why the PR must wait for a human (mode `relire`, step triggered,
+    whatever its outcome), None otherwise.
+    """
     controle = orch._controle_visuel
     if controle is None or not resultat.approved:
-        return
+        return None
     if not controle_du(await fichiers_du_diff(orch), controle):
-        return
+        return None
     ticket_id = resultat.ticket_id
     if orch._worktree is None:
         cause = "pas de worktree : l'app d'un run ne démarre que depuis le sien"
-        await _annoncer(orch, ticket_id, ResultatCapture(cause=cause), on_event)
-        return
+        return await _terminer(orch, controle, ticket_id, ResultatCapture(cause=cause), on_event)
     jeton, manque = _jeton(orch)
     if manque is not None:
-        await _annoncer(orch, ticket_id, ResultatCapture(cause=manque), on_event)
-        return
+        return await _terminer(orch, controle, ticket_id, ResultatCapture(cause=manque), on_event)
     prise = await prendre_les_captures(
         controle, orch._worktree.projet, project_id, ticket_id, jeton
     )
-    await _annoncer(orch, ticket_id, prise, on_event)
+    return await _terminer(orch, controle, ticket_id, prise, on_event)

@@ -36,7 +36,7 @@ from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline_critere_protege import arret_critere_protege
-from tessera.services.pipeline_approbation import apres_approbation
+from tessera.services.pipeline_approbation import apres_approbation, retenir_pour_relecture
 from tessera.services.pipeline_plan import run_plan
 from tessera.services.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
 from tessera.services.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
@@ -314,7 +314,7 @@ class Orchestrator:
         # (ADR-038) se libère dès que `run_pipeline` rend la main, c'est-à-dire
         # dès la PR ouverte — pas après le merge.
         with evenements_de_livraison(on_event, ticket_id):
-            livraison = await self._livrer(resultat)
+            livraison = retenir_pour_relecture(await self._livrer(resultat), resultat.relecture)
         for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms):
             self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
         if livraison.arret:

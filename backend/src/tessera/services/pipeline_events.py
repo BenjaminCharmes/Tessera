@@ -143,6 +143,10 @@ class PipelineResult(BaseModel):
     approved_sha: str | None = None
     #: Ligne `pipeline_runs` du run, pour y noter le SHA poussé (ticket-492).
     run_id: str | None = None
+    #: Pourquoi la PR de ce run attend un humain : contrôle visuel en mode
+    #: `relire` déclenché, captures prises ou échouées (ticket-619, ADR-062).
+    #: `None` : la livraison suit son cours.
+    relecture: str | None = None
 
 
 EventCallback = Callable[[OrchestratorEvent], Awaitable[None]]

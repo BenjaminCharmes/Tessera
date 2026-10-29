@@ -1,12 +1,14 @@
 ---
-id: ticket-619
-title: "Relire mode: a pull request with visual checks is never merged alone"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-618]
 created: 2026-10-27
+depends_on:
+- ticket-618
+id: ticket-619
+pr_number: 734
+priority: medium
+status: done
+title: 'Relire mode: a pull request with visual checks is never merged alone'
+type: feat
 ---
 
 # ticket-619 — Mode `relire` : la PR attend un humain

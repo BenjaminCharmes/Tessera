@@ -6,9 +6,11 @@ it. Everything here fails soft: an unreadable SHA never undoes an approval, it
 leaves the result without one, and the delivery then refuses to go further than
 it can prove.
 """
+from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.livraison import Livraison
 from tessera.services.pipeline_capture import capturer_le_run
 from tessera.services.pipeline_events import EventCallback, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
@@ -98,5 +100,24 @@ async def apres_approbation(
         # (ticket-492).
         resultat = await suivre_documentation(orch, resultat, avant_doc)
     # Une fois par run, après l'approbation : jamais à chaque tour (ticket-618).
-    await capturer_le_run(orch, resultat, project_id, on_event)
-    return resultat
+    relecture = await capturer_le_run(orch, resultat, project_id, on_event)
+    if relecture is None:
+        return resultat
+    return resultat.model_copy(update={"relecture": relecture})
+
+
+def retenir_pour_relecture(livraison: Livraison, relecture: str | None) -> Livraison:
+    """Keep an opened PR from the watcher when a human must read the captures.
+
+    Même mécanisme qu'un conflit résolu (ADR-033) : la PR reste ouverte, le
+    ticket reste `done`, la cause est écrite dans `arret`. Sans PR ouverte, il
+    n'y a rien à retenir.
+    """
+    if relecture is None or livraison.pr_number is None:
+        return livraison
+    motif = (
+        f"Contrôle visuel en mode relire : {relecture} ; la PR #{livraison.pr_number} "
+        "est ouverte, à relire. Elle ne se merge pas toute seule."
+    )
+    arret = f"{livraison.arret} ; {motif}" if livraison.arret else motif
+    return replace(livraison, arret=arret, pr_orpheline=False)
