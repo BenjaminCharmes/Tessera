@@ -8,13 +8,7 @@ export type TicketStatus = "todo" | "in-progress" | "in-review" | "done" | "bloc
 // + `design`, propre à Tessera.
 export type TicketType = "feat" | "fix" | "chore" | "docs" | "refactor" | "test" | "design";
 export type TicketPriority = "critical" | "high" | "medium" | "low";
-export type AgentRole =
-  | "orchestrateur"
-  | "codeur"
-  | "reviewer"
-  | "architect"
-  | "project-creator"
-  | "github-sync";
+export type AgentRole = "orchestrateur" | "codeur" | "reviewer" | "architect" | "project-creator" | "github-sync";
 
 // Aligné sur EventType côté backend (services/pipeline_events.py) : un test
 // de `backend/tests` le vérifie dans les deux sens.
@@ -53,6 +47,7 @@ export type EventType =
   | "worktree_setup"
   | "external_wait"
   | "conflict_resolution"
+  | "visual_check"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */

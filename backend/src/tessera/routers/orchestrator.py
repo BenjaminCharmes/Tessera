@@ -12,11 +12,8 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.issues_agent_ready import tirer_les_issues as _tirer_les_issues
 from tessera.services.agent_runner import AgentRunner
-from tessera.services.documentation import (
-    ROLES_DOCUMENTATION,
-    DocumentationService,
-    ResultatDocumentation,
-)
+from tessera.services.documentation import DocumentationService, ResultatDocumentation
+from tessera.services.roles_documentation import roles_de_documentation
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.carte_du_depot import CarteDuDepot
@@ -31,6 +28,7 @@ from tessera.services.sha_approbation import noter_poussee, sha_pousse_du_ticket
 from tessera.services.controles_depart import manques_avant_depart
 from tessera.services.realignement_base import Realignement
 from tessera.services.reprise_surveillance import SurveillanceProjet
+from tessera.services.controle_visuel import lire_le_controle
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.pipeline_plan import ROLE_PLAN
@@ -39,11 +37,7 @@ from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.journal_pipeline import journal_vers, journaliser_mode_rapide
-from tessera.services.providers.par_role import (
-    config_du_role,
-    modele_du_role,
-    provider_pour_role,
-)
+from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.file_vivante import (
     FileFermee,
@@ -386,6 +380,7 @@ async def _build_orchestrator(
         attente_merge_max_s=settings.attente_merge_max_s,
         worktree=wt,
         depot=project_path if wt is not None else None,
+        controle_visuel=lire_le_controle(project_path),
         chemins_absents=chemins_absents,
         preparation=_preparation_du_run(
             politique, wt, project_path, env_tests, pipeline_cfg.test_timeout_s
@@ -426,20 +421,6 @@ def _tests_du_run(
         )
     except PlaceholderInconnu as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-
-def _roles_de_documentation(project_path: Path) -> tuple[str, ...]:
-    """The documentation roles the project declares and keeps active (ticket-534).
-
-    Un rôle absent d'`agents.json` ou marqué `"active": false` n'est pas appelé :
-    c'est le réglage qui coupe la documentation, rôle par rôle.
-    """
-    retenus: list[str] = []
-    for role in ROLES_DOCUMENTATION:
-        config = config_du_role(project_path, role)
-        if config is not None and config.active:
-            retenus.append(role)
-    return tuple(retenus)
 
 
 def _documenteur(
@@ -490,7 +471,7 @@ def _documenteur(
     service = DocumentationService(
         _fournisseur("doc-technique")[0], settings.ide_prompts_dir,
         fournisseur=_fournisseur, claude_md=claude_md,
-        roles=_roles_de_documentation(project_path),
+        roles=roles_de_documentation(project_path),
         base=politique.base_branch,
     )
 

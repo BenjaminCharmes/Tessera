@@ -36,7 +36,7 @@ from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline_critere_protege import arret_critere_protege
-from tessera.services.pipeline_approbation import suivre_documentation, tete_de_branche
+from tessera.services.pipeline_approbation import apres_approbation
 from tessera.services.pipeline_plan import run_plan
 from tessera.services.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
 from tessera.services.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
@@ -57,6 +57,7 @@ if TYPE_CHECKING:
     from tessera.services.preparation_worktree import Preparation
     from tessera.services.providers.refus_garde import JournalDesRefus
     from tessera.services.carte_du_depot import CarteDuDepot
+    from tessera.services.controle_visuel import ControleVisuel
     from tessera.services.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder
     from tessera.services.run_worktree import RunWorktree
@@ -113,7 +114,12 @@ class Orchestrator:
         etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
         journal_refus: Optional["JournalDesRefus"] = None,
         pr_mergee_de_branche: Optional[Callable[[str], Awaitable[int | None]]] = None,
+        controle_visuel: "Optional[ControleVisuel]" = None,
     ) -> None:
+        # Le contrôle visuel déclaré, lu avant le premier agent comme la
+        # politique : un run n'obéit pas à ce que le codeur écrirait dans
+        # `agents.json` (ticket-618). `None` : aucune capture, aucun serveur.
+        self._controle_visuel = controle_visuel
         # Retrouve la PR mergée d'une branche `<préfixe>…` : un ticket bloqué
         # livré à la main passe en `done` au départ du run (ticket-482).
         self._pr_mergee_de_branche = pr_mergee_de_branche
@@ -292,19 +298,7 @@ class Orchestrator:
         if not resultat.approved:
             return resultat
 
-        # La documentation part sur la branche du run, avant sa livraison :
-        # elle décrit ce que la PR livre, et se relit avec (ticket-198).
-        # Exception : les tickets légers (ticket-292) ne déclenchent pas de
-        # mise à jour immédiate — le marqueur ne bouge pas, et le prochain
-        # ticket normal documente le lot entier, léger compris.
-        ticket_approuve = await self._ticket_svc.get_ticket(ticket_id)
-        if ticket_approuve is None or not ticket_approuve.light:
-            avant_doc = await tete_de_branche(self)
-            await self._documenter_le_run(resultat, on_event)
-            # Le commit de documentation est celui du pipeline : l'approbation
-            # le suit, sans quoi la livraison le prendrait pour un intrus
-            # (ticket-492).
-            resultat = await suivre_documentation(self, resultat, avant_doc)
+        resultat = await apres_approbation(self, resultat, project_id, on_event)
 
         if self._livrer is None:
             return resultat

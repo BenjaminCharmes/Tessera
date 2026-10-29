@@ -1,12 +1,14 @@
 ---
-id: ticket-618
-title: "A run that changes an interface captures it from its own worktree"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-617]
 created: 2026-10-27
+depends_on:
+- ticket-617
+id: ticket-618
+pr_number: 733
+priority: medium
+status: done
+title: A run that changes an interface captures it from its own worktree
+type: feat
 ---
 
 # ticket-618 — L'étape de capture du pipeline

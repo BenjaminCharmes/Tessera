@@ -34,9 +34,22 @@ class CapturesEchouees(Exception):
     """The capture run failed or did not produce every expected image."""
 
 
-def dossier_des_captures(project_id: str) -> Path:
-    """Return where this project's captures live, outside its repository."""
-    return settings.ide_state_dir / "captures" / project_id
+#: Un identifiant de ticket sert de nom de dossier : rien d'autre n'y passe.
+MOTIF_TICKET = re.compile(r"^ticket-[0-9]+$")
+
+
+def dossier_des_captures(project_id: str, ticket: str | None = None) -> Path:
+    """Return where captures live, outside the repository.
+
+    Without `ticket`, the folder of the on-demand captures of the project ;
+    with one, the sub-folder of the captures a run took (ticket-618).
+    """
+    dossier = settings.ide_state_dir / "captures" / project_id
+    if ticket is None:
+        return dossier
+    if not MOTIF_TICKET.fullmatch(ticket):
+        raise ValueError(f"Identifiant de ticket invalide : {ticket!r}")
+    return dossier / ticket
 
 
 def noms_attendus(config: ConfigCaptures) -> list[str]:
@@ -118,12 +131,14 @@ async def capturer(
     config: ConfigCaptures,
     executeur: Executeur | None = None,
     jeton: str | None = None,
+    ticket: str | None = None,
 ) -> list[str]:
     """Capture every declared screen and return the image names, in order.
 
     `jeton` is handed to the executor only ; it is never logged or returned.
+    `ticket` sends the images to the run's own sub-folder.
     """
-    sortie = dossier_des_captures(project_id)
+    sortie = dossier_des_captures(project_id, ticket)
     sortie.mkdir(parents=True, exist_ok=True)
     attendus = noms_attendus(config)
     # Une image d'un tour précédent ferait passer un échec pour une réussite.

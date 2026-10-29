@@ -5968,3 +5968,40 @@ Le diff ajoute :
 - 2026-10-29 07:43:24 UTC — [ticket-617] validateur: APPROVED — Tous les critères sont satisfaits. Le module `controle_visuel.py` lit correcteme (103875ms)
 - 2026-10-29 07:43:24 UTC — [ticket-617] APPROVED après 1 tour(s)
 - 2026-10-29 07:45:08 UTC — [ticket-617] documentation: 1 fichier(s) (99438ms)
+- 2026-10-29 08:01:07 UTC — [ide-core] ticket-617 PR #730 mergée (CI verte)
+- 2026-10-29 08:01:09 UTC — [ide-core] ticket-617 : base réalignée sur develop
+- 2026-10-29 08:01:09 UTC — [ide-core] ticket-617 PR #730 confiée au CIWatcher
+- 2026-10-29 08:01:12 UTC — [ticket-618] branche ticket-618-a-run-that-changes-an-interface-captures-it-from
+- 2026-10-29 08:01:13 UTC — [ticket-618] tour 1 — codeur démarré
+- 2026-10-29 08:06:11 UTC — [ticket-618] tour 1 — codeur terminé (297171ms)
+- 2026-10-29 08:14:39 UTC — [ticket-618] testeur: 1 failed, 1932 passed, 64 warnings in 503.88s (0:08:23)
+- 2026-10-29 08:14:39 UTC — [ticket-618] tests rouges au tour 1
+- 2026-10-29 08:14:39 UTC — [ticket-618] tour 2 — codeur démarré
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-619 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-620 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-625 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-626 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-623 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-624 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-628 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-629 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-630 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-631 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-635 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-658 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-659 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-660 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-661 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-665 retiré de la file
+- 2026-10-29 08:19:31 UTC — [ticket-618] tour 2 — codeur terminé (292532ms)
+- 2026-10-29 08:28:51 UTC — [ticket-618] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-29 08:28:51 UTC — [ticket-618] tests rouges au tour 2
+- 2026-10-29 08:28:51 UTC — [ticket-618] tour 3 — codeur démarré
+- 2026-10-29 08:29:41 UTC — [ticket-618] tour 3 — codeur terminé (50046ms)
+- 2026-10-29 08:37:55 UTC — [ticket-618] testeur: OK (exit 0)
+- 2026-10-29 08:40:48 UTC — [ticket-618] securite: PASS — Le diff introduit un système de capture d'écran pour les runs approuvés (ticket- (172657ms)
+- 2026-10-29 08:40:48 UTC — [ticket-618] tour 3 — reviewer démarré
+- 2026-10-29 08:41:12 UTC — [ticket-618] tour 3 — reviewer terminé (24234ms)
+- 2026-10-29 08:45:00 UTC — [ticket-618] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (251781ms)
+- 2026-10-29 08:45:00 UTC — [ticket-618] APPROVED après 3 tour(s)
+- 2026-10-29 08:49:32 UTC — [ticket-618] documentation: 0 fichier(s) (266891ms) — après tour de correction

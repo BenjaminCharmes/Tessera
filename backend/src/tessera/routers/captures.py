@@ -1,7 +1,7 @@
 """Capture a project's screens and serve the images — ticket-432."""
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from tessera.config import settings
@@ -73,10 +73,14 @@ async def prendre_les_captures(project_id: str) -> dict[str, list[str]]:
 
 
 @router.get("/{project_id}/captures/{fichier}")
-async def servir_une_capture(project_id: str, fichier: str) -> FileResponse:
+async def servir_une_capture(
+    project_id: str, fichier: str, ticket: str | None = Query(default=None)
+) -> FileResponse:
     _racine(project_id)
+    if ticket is not None and not captures.MOTIF_TICKET.fullmatch(ticket):
+        raise HTTPException(status_code=404, detail="Capture inconnue")
     # Le motif seul exclut `..`, `/` et `\` : pas de traversée de chemin.
-    chemin = captures.dossier_des_captures(project_id) / fichier
+    chemin = captures.dossier_des_captures(project_id, ticket) / fichier
     if not captures.MOTIF_FICHIER.fullmatch(fichier) or not chemin.is_file():
         raise HTTPException(status_code=404, detail="Capture inconnue")
     return FileResponse(chemin, media_type="image/png")

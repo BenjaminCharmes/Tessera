@@ -20,7 +20,7 @@ export const PLAFONDS: Record<string, number> = {
   "hooks/useCockpit.ts": 532,
   "hooks/useSupervision.ts": 385,
   "lib/api.ts": 334,
-  "types/api.ts": 681,
+  "types/api.ts": 676,
 };
 
 const SOURCES = join(__dirname);
