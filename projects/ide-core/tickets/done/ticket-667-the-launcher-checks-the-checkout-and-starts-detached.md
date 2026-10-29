@@ -4,7 +4,7 @@ created: 2026-10-29
 depends_on: []
 estimated_days: 1
 id: ticket-667
-pr_number: null
+pr_number: 753
 priority: medium
 status: done
 title: The launcher refuses a checkout off develop or behind origin, and starts the
