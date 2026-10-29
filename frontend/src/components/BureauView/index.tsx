@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useRondeDuDirecteur } from "../../hooks/useRondeDuDirecteur";
+import { posteOccupe } from "../../lib/bureau/ronde";
+import type { DemandeDeVisite } from "../../lib/bureau/ronde";
 import type { StreamState } from "../../hooks/streamState";
 import { useAlerteSonore } from "../../hooks/useAlerteSonore";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { useWeekEmployee } from "../../hooks/useWeekEmployee";
 import { contenuAToi } from "../../lib/bureau/aToi";
+import type { PosteId } from "../../lib/bureau/postesDuRun";
 import type { RunActif } from "../../types/api";
 import ColonneAToi from "./ColonneAToi";
 import type { ReglageSon } from "./ColonneAToi";
@@ -39,6 +43,15 @@ interface BureauViewProps {
   onOpenProject?: (projet: string) => void;
 }
 
+/** Une demande de visite datée : deux gestes dans la même milliseconde se distinguent quand même. */
+function demandeDe(
+  precedente: DemandeDeVisite | null,
+  projet: string,
+  poste: PosteId,
+): DemandeDeVisite {
+  return { projet, poste, a: Math.max(Date.now(), (precedente?.a ?? 0) + 1) };
+}
+
 /**
  * Les pièces des projets qui ont un run, une par ligne, quel que soit leur nombre.
  * L'horloge se monte ici, une seule fois pour toute la vue.
@@ -57,6 +70,18 @@ export default function BureauView({
   // L'agent choisi : seul le couple est retenu, ses lignes se relisent à chaque rendu.
   const [choix, setChoix] = useState<AgentChoisi | null>(null);
   const projetChoisi = projets.find((p) => p.nom === choix?.projet);
+  // Le directeur passe voir un agent quand l'utilisateur le choisit ou ouvre le fil de sa pièce,
+  // ou quand son run passe silencieux : la ronde se lit à chaque tick de l'horloge (ticket-661).
+  const [demande, setDemande] = useState<DemandeDeVisite | null>(null);
+  const visite = useRondeDuDirecteur(projets, demande, maintenant);
+  const ouvrirLeFil =
+    onOuvrir &&
+    ((runId: string) => {
+      const projet = projets.find((p) => (p.runId ?? p.run?.run_id) === runId);
+      const poste = projet ? posteOccupe(projet) : null;
+      if (projet && poste) setDemande((avant) => demandeDe(avant, projet.nom, poste));
+      onOuvrir(runId);
+    });
 
   // Un run qui se clôt fait relire l'employé de la semaine. Un compte et non un événement :
   // la vue ne reçoit que des états, et `runClosed` y est posé par `run_closed`.
@@ -80,6 +105,7 @@ export default function BureauView({
           projets={projets}
           maintenant={maintenant}
           employe={employe}
+          directeurEnVisite={visite !== null}
         />
         {/* Une pièce par projet, empilées sur toute la largeur : la vue défile en hauteur. */}
         <div className="flex flex-col gap-3.5" data-mode="pieces">
@@ -98,9 +124,13 @@ export default function BureauView({
               runId={runId}
               signalServices={signalServices}
               run={run}
-              onOuvrir={onOuvrir}
+              onOuvrir={ouvrirLeFil}
               onRanger={onRanger}
-              onChoisir={(projet, poste) => setChoix({ projet, poste })}
+              onChoisir={(projet, poste) => {
+                setChoix({ projet, poste });
+                setDemande((avant) => demandeDe(avant, projet, poste));
+              }}
+              directeur={visite?.projet === nom ? visite.poste : null}
               onOpenProject={onOpenProject}
               sonActif={son.actif}
             />

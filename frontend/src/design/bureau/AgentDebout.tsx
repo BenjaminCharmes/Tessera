@@ -1,6 +1,13 @@
 import type { RoleAffiche } from "../../lib/bureau/postesDuRun";
 import { TENUES, physique } from "../../lib/bureau/physique";
+import type { Physique, Tenue } from "../../lib/bureau/physique";
 import Personnage from "./Personnage";
+
+/** La tenue et le physique d'une figure sans rôle de pipeline : le directeur. */
+export interface FigureDeSalle {
+  tenue: Tenue;
+  physique: Physique;
+}
 
 interface AgentDeboutProps {
   projet: string;
@@ -11,6 +18,8 @@ interface AgentDeboutProps {
   sansTasse?: boolean;
   /** Une feuille annotée à la main : il rend sa copie au codeur. */
   feuille?: boolean;
+  /** Une figure de salle commune, à la place de la tenue du rôle (le directeur en visite). */
+  figure?: FigureDeSalle;
 }
 
 /**
@@ -18,7 +27,14 @@ interface AgentDeboutProps {
  * 42 × 70 px, à l'échelle du personnage assis (tête de 6 unités dans les deux).
  * `overflow-visible` : les bras levés de la fête dépassent la grille.
  */
-export default function AgentDebout({ projet, role, brasLeves = false, sansTasse = false, feuille = false }: AgentDeboutProps) {
+export default function AgentDebout({
+  projet,
+  role,
+  brasLeves = false,
+  sansTasse = false,
+  feuille = false,
+  figure,
+}: AgentDeboutProps) {
   return (
     <svg
       width="42"
@@ -29,7 +45,14 @@ export default function AgentDebout({ projet, role, brasLeves = false, sansTasse
       className="overflow-visible"
       data-sprite="agent-debout"
     >
-      <Personnage pose="debout" tenue={TENUES[role]} physique={physique(projet, role)} brasLeves={brasLeves} sansTasse={sansTasse} feuille={feuille} />
+      <Personnage
+        pose="debout"
+        tenue={figure?.tenue ?? TENUES[role]}
+        physique={figure?.physique ?? physique(projet, role)}
+        brasLeves={brasLeves}
+        sansTasse={sansTasse}
+        feuille={feuille}
+      />
     </svg>
   );
 }
