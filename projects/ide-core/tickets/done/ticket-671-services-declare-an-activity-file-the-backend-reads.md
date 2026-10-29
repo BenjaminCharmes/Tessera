@@ -1,14 +1,14 @@
 ---
-id: ticket-671
-title: "A service declares an activity file, and the backend reads it closed on failure"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-10-29
 depends_on: []
 estimated_days: 1
-created: 2026-10-29
+id: ticket-671
+pr_number: 756
+priority: low
+status: done
+title: A service declares an activity file, and the backend reads it closed on failure
+type: feat
 ---
 
 # ticket-671 — Un service déclare un fichier d'activité, que le backend lit

@@ -6312,3 +6312,20 @@ Le diff ajoute :
 - 2026-10-29 19:02:31 UTC — [ticket-670] validateur: APPROVED — Le test `backend/tests/test_sens_des_imports.py` a été implémenté conformément a (106468ms)
 - 2026-10-29 19:02:31 UTC — [ticket-670] APPROVED après 1 tour(s)
 - 2026-10-29 19:05:45 UTC — [ticket-670] documentation: 0 fichier(s) (188375ms) — après tour de correction
+- 2026-10-29 19:17:23 UTC — [ide-core] ticket-670 PR #755 confiée au CIWatcher
+- 2026-10-29 19:17:27 UTC — [ticket-671] branche ticket-671-a-service-declares-an-activity-file-and-the-backe
+- 2026-10-29 19:17:29 UTC — [ticket-671] tour 1 — codeur démarré
+- 2026-10-29 19:21:00 UTC — [ticket-671] tour 1 — codeur terminé (211875ms)
+- 2026-10-29 19:23:42 UTC — [ide-core] ticket-670 PR #755 mergée (CI verte)
+- 2026-10-29 19:27:49 UTC — [ticket-671] testeur: 1 failed, 1834 passed, 64 warnings in 405.57s (0:06:45)
+- 2026-10-29 19:27:49 UTC — [ticket-671] tests rouges au tour 1
+- 2026-10-29 19:27:49 UTC — [ticket-671] tour 2 — codeur démarré
+- 2026-10-29 19:34:06 UTC — [ticket-671] tour 2 — codeur terminé (376469ms)
+- 2026-10-29 19:42:34 UTC — [ticket-671] testeur: OK (exit 0)
+- 2026-10-29 19:44:27 UTC — [ticket-671] securite: PASS — Le ticket introduit un routeur API et des services pour lire les fichiers d'acti (113203ms)
+- 2026-10-29 19:44:27 UTC — [ticket-671] tour 2 — reviewer démarré
+- 2026-10-29 19:44:46 UTC — [ticket-671] tour 2 — reviewer terminé (19187ms)
+- 2026-10-29 19:46:57 UTC — [ticket-671] validateur: fichiers cités joints : agents.json
+- 2026-10-29 19:46:57 UTC — [ticket-671] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés. Le code gère co (150125ms)
+- 2026-10-29 19:46:57 UTC — [ticket-671] APPROVED après 2 tour(s)
+- 2026-10-29 19:50:24 UTC — [ticket-671] documentation: 0 fichier(s) (200000ms) — après tour de correction
