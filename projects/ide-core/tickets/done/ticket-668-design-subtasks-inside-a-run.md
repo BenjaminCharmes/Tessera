@@ -1,15 +1,16 @@
 ---
-id: ticket-668
-title: "Design: split a run into sub-tasks implemented, reviewed and committed one by one"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-10-29
 depends_on: []
 estimated_days: 1
-created: 2026-10-29
+id: ticket-668
 plan: true
+pr_number: 765
+priority: medium
+status: done
+title: 'Design: split a run into sub-tasks implemented, reviewed and committed one
+  by one'
+type: design
 ---
 
 # ticket-668 — Conception : des sous-tâches dans un run
