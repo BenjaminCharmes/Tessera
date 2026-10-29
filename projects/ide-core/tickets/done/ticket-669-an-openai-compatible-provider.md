@@ -1,15 +1,15 @@
 ---
-id: ticket-669
-title: "A provider for any OpenAI-compatible endpoint, declared by base URL"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-10-29
 depends_on: []
 estimated_days: 2
-created: 2026-10-29
+id: ticket-669
 plan: true
+pr_number: 754
+priority: low
+status: done
+title: A provider for any OpenAI-compatible endpoint, declared by base URL
+type: feat
 ---
 
 # ticket-669 — Un fournisseur compatible OpenAI, déclaré par URL de base

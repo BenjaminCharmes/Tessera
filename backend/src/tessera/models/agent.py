@@ -52,6 +52,12 @@ class AgentConfig(BaseModel):
     # backend, comme avant — un manifeste muet ne change pas de comportement.
     provider: str = "agent_sdk"
     fallback: FallbackConfig | None = None
+    #: Le point d'accès d'un rôle `openai_compatible` : l'URL de base, sans
+    #: `/chat/completions`. Obligatoire pour ce provider, ignorée des autres.
+    base_url: str | None = None
+    #: Le NOM de la variable d'environnement qui porte la clé de ce point
+    #: d'accès, jamais la clé elle-même : `agents.json` se versionne.
+    api_key_env: str | None = None
     #: Les skills que ce rôle peut charger (ticket-242). Vide : pas d'outil
     #: `Skill`. La liste borne aussi ce que le CLI découvrirait seul — les
     #: skills de la racine du dépôt et ceux qu'il intègre.

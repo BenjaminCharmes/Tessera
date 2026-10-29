@@ -6281,3 +6281,21 @@ Le diff ajoute :
 - 2026-10-29 17:45:30 UTC — [ticket-667] validateur: APPROVED — Tous les critères d'acceptation du ticket 667 sont satisfaits. La fonction `chec (65906ms)
 - 2026-10-29 17:45:30 UTC — [ticket-667] APPROVED après 2 tour(s)
 - 2026-10-29 17:49:55 UTC — [ticket-667] documentation: 0 fichier(s) (254702ms)
+- 2026-10-29 17:59:46 UTC — [ide-core] ticket-667 PR #753 confiée au CIWatcher
+- 2026-10-29 17:59:53 UTC — [ticket-669] branche ticket-669-a-provider-for-any-openai-compatible-endpoint-dec
+- 2026-10-29 18:00:48 UTC — [ticket-669] plan rendu (54108ms)
+- 2026-10-29 18:00:48 UTC — [ticket-669] tour 1 — codeur démarré
+- 2026-10-29 18:04:44 UTC — [ide-core] ticket-667 PR #753 mergée (CI verte)
+- 2026-10-29 18:06:49 UTC — [ticket-669] tour 1 — codeur terminé (360891ms)
+- 2026-10-29 18:13:45 UTC — [ticket-669] testeur: 1 failed, 1876 passed, 64 warnings in 412.54s (0:06:52)
+- 2026-10-29 18:13:45 UTC — [ticket-669] tests rouges au tour 1
+- 2026-10-29 18:13:45 UTC — [ticket-669] tour 2 — codeur démarré
+- 2026-10-29 18:17:04 UTC — [ticket-669] tour 2 — codeur terminé (199093ms)
+- 2026-10-29 18:27:45 UTC — [ticket-669] testeur: OK (exit 0)
+- 2026-10-29 18:31:09 UTC — [ticket-669] securite: PASS — L'ajout du provider `openai_compatible` (ticket-669) respecte les bonnes pratiqu (203905ms)
+- 2026-10-29 18:31:09 UTC — [ticket-669] tour 2 — reviewer démarré
+- 2026-10-29 18:31:37 UTC — [ticket-669] tour 2 — reviewer terminé (27687ms)
+- 2026-10-29 18:35:13 UTC — [ticket-669] validateur: fichiers cités joints : agents.json
+- 2026-10-29 18:35:13 UTC — [ticket-669] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests vérifient que le prov (243921ms)
+- 2026-10-29 18:35:13 UTC — [ticket-669] APPROVED après 2 tour(s)
+- 2026-10-29 18:37:18 UTC — [ticket-669] documentation: 0 fichier(s) (109281ms)
