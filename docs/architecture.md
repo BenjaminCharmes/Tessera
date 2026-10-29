@@ -1307,6 +1307,10 @@ Le fichier `memory/pipeline-log.md` enregistre toutes les étapes du pipeline. Q
 
 Les runs lancés en parallèle ajoutent chacun leurs lignes au journal `memory/pipeline-log.md`. Plutôt que de traiter les conflits git, ce fichier utilise l'union merge (`.gitattributes`) : les deux versions y sont fusionnées. C'est la bonne résolution quand deux tickets indépendants enrichissent le même log — garder les deux lignes a du sens. `decisions.md` reste un fichier à résolution humaine : pas d'union merge.
 
+Lors d'une file de tickets en parallèle, chaque run ajoute des lignes à `memory/pipeline-log.md`. Quand deux PRs se créent simultanément, leurs écritures peuvent conflictuer au merge.
+
+L'attribut `.gitattributes merge=union` sur ce fichier demande à Git de combiner automatiquement les deux ensembles de lignes — la bonne résolution pour un journal qui ne fait que croître. Aucune intervention manuelle n'est requise pour ce fichier.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 

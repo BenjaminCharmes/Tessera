@@ -3,8 +3,9 @@ agent: codeur
 created: '2026-10-22'
 depends_on: []
 id: ticket-533
+pr_number: 757
 priority: medium
-status: todo
+status: done
 title: Les PR d'une file deviennent conflictuelles sur la doc du pipeline quand la
   précédente est mergée après coup
 type: feat
@@ -26,4 +27,13 @@ Devinoo, file c169c10f, 22/10 ~09:25 UTC : PR #124 (ticket-075) CONFLICTING apr�
 
 ## Critères d'acceptation
 
-- [ ] À écrire au triage
+- [ ] Avant son rebase, la phase 1 de livraison d'un ticket attend que les autres tickets du projet tenus par `CIWatcher` (`en_attente`) soient mergés ou bloqués
+- [ ] L'attente est bornée : passé le délai, la livraison part comme avant et ne lève pas
+- [ ] Le ticket livré n'est jamais attendu lui-même, et un ticket précédent bloqué n'arrête pas la livraison
+- [ ] Rien n'est forcé : aucun push forcé, la tête poussée reste celle que le reviewer a lue (ADR-022, ADR-039)
+- [ ] Une ADR au prochain numéro libre décrit la décision et les pistes écartées, et la règle s'écrit sous `## Proposées` de `contraintes.md`
+
+## Ce que ça ne fait pas
+
+- Ne répare pas une PR déjà conflictuelle (poussée à la main, base bougée hors file) : elle reste arrêtée sur « à rebaser » (ticket-452). Voir le ticket de suite.
+- Ne change ni le format de `documentation.json` ni la façon dont la doc est écrite par ticket.
