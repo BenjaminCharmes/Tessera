@@ -3,7 +3,7 @@ import { ECHELLE_LARGE, ECHELLE_MIN, echellePourLargeur } from "./echelleDesSpri
 
 describe("echellePourLargeur", () => {
   it("keeps the full scale on a wide screen", () => {
-    expect(echellePourLargeur(1920)).toBe(ECHELLE_LARGE);
+    expect(echellePourLargeur(2200)).toBe(ECHELLE_LARGE);
     expect(echellePourLargeur(Infinity)).toBe(ECHELLE_LARGE);
   });
 
@@ -11,7 +11,7 @@ describe("echellePourLargeur", () => {
     const echelle = echellePourLargeur(1536);
     expect(echelle).toBeLessThan(ECHELLE_LARGE);
     expect(echelle).toBeGreaterThanOrEqual(ECHELLE_MIN);
-    expect((((1536 - 430) / 4 - 48) / echelle) >= 200).toBe(true);
+    expect((((1536 - 430) / 4 - 48) / echelle) >= 240).toBe(true);
   });
 
   it("never goes below the readable floor", () => {

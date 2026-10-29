@@ -1,5 +1,7 @@
 import Agrandi from "../../design/bureau/Agrandi";
 import Bibliotheque from "../../design/bureau/Bibliotheque";
+import Corbeille from "../../design/bureau/Corbeille";
+import Etagere from "../../design/bureau/Etagere";
 import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
 import MachineACafe from "../../design/bureau/MachineACafe";
 import Plante from "../../design/bureau/Plante";
@@ -10,6 +12,7 @@ import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import type { UseServicesResult } from "../../hooks/useServices";
 import { BIBLIOTHEQUE_X, BOITE_X, MACHINE_X, PORTE_X, TABLEAU_X } from "../../lib/bureau/activites";
 import { cielDesFenetres } from "../../lib/bureau/ciel";
+import { boulesDeLaCorbeille } from "../../lib/bureau/corbeille";
 import { dayMoment } from "../../lib/bureau/dayMoment";
 import BaieDeServeurs from "./BaieDeServeurs";
 import BoiteAuxLettres from "./BoiteAuxLettres";
@@ -35,9 +38,18 @@ const BAIE_X = 528;
 const CACTUS_X = 572;
 // Plus près de la porte que de la boîte aux lettres, comme un vrai interrupteur (ticket-627).
 const INTERRUPTEUR_X = 727;
+// Au-dessus de la machine, où le mur est libre ; le cadre, à droite de la dernière fenêtre (ticket-635).
+const HORLOGE_X = 488;
+const CADRE_X = 684;
+// Sous la deuxième fenêtre, entre la bibliothèque et le ficus.
+const ETAGERE_X = 290;
+// Au pied du poste du reviewer, dont les refus la remplissent.
+const CORBEILLE_X = 634;
 const ABSCISSES_DU_MUR: AbscissesDuMur = {
   fenetres: FENETRES_X,
   plafonniers: PLAFONNIERS_X,
+  horloge: HORLOGE_X,
+  cadre: CADRE_X,
   interrupteur: INTERRUPTEUR_X,
 };
 /** Le tableau blanc, un peu plus grand que le reste : il tient la moitié de la hauteur du mur. */
@@ -96,9 +108,20 @@ export default function FondDeLaPiece({
         ciels={ciels}
         allume={allume}
         onBasculer={onBasculerLumiere}
+        maintenant={maintenant}
         salle={projet}
         abscisses={ABSCISSES_DU_MUR}
       />
+      <Pose x={ETAGERE_X} bas="top-24">
+        <Agrandi>
+          <Etagere />
+        </Agrandi>
+      </Pose>
+      <Pose x={CORBEILLE_X}>
+        <Agrandi>
+          <Corbeille boules={boulesDeLaCorbeille(etat)} />
+        </Agrandi>
+      </Pose>
       <Pose x={TABLEAU_X} bas="top-5">
         <TableauDesCriteres
           projet={projet}

@@ -92,6 +92,7 @@ export default function Salle({
           ciels={ciels}
           allume={lumiere}
           onBasculer={basculerLumiere}
+          maintenant={maintenant}
           salle={titre}
           plafonniers={1}
           accroche={accroche}

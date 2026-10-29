@@ -70,12 +70,12 @@ describe("the wall scale", () => {
     expect(noms).toContain("interrupteur");
   });
 
-  it("keeps the order window, lamp, window in a room", () => {
+  it("keeps the order window, lamp, window, clock, frame, switch in a room", () => {
     const salle = rendreSalle();
     const mur = salle.querySelector('[data-mur="salle"]');
 
     const ordre = Array.from(mur?.querySelectorAll("[data-sprite]") ?? []).map((s) => s.getAttribute("data-sprite"));
-    expect(ordre).toEqual(["fenetre", "plafonnier", "fenetre", "interrupteur"]);
+    expect(ordre).toEqual(["fenetre", "plafonnier", "fenetre", "horloge", "cadre", "interrupteur"]);
   });
 
   it("toggles the lights from the switch of either wall", () => {

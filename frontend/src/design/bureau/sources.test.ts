@@ -80,6 +80,19 @@ describe("sprites sources", () => {
     expect(tons).toMatch(/echoue:\s*"fill-red-\d{3}"/);
   });
 
+  it("draws the clock, shelf, frame and bin from --sprite-* tokens defined in index.css, still", () => {
+    for (const nom of ["Horloge.tsx", "Etagere.tsx", "Cadre.tsx", "Corbeille.tsx"]) {
+      const contenu = SPRITES.find((s) => s.nom === nom)?.contenu ?? "";
+      expect(contenu, nom).toContain("--sprite-");
+      expect(contenu, nom).not.toMatch(/anim-|animation|transition/);
+      expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:zinc|red|amber|green|blue|violet)-\d/);
+      const jetons = [...contenu.matchAll(/--sprite-([a-z0-9-]+)/g)].map((m) => m[1] ?? "");
+      for (const jeton of jetons) {
+        expect(CSS, `${nom}: --sprite-${jeton}`).toMatch(new RegExp(`--sprite-${jeton}:`));
+      }
+    }
+  });
+
   it("writes no raw colour in design/bureau", () => {
     const fautifs = SPRITES.filter(({ contenu }) =>
       /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(/.test(contenu),

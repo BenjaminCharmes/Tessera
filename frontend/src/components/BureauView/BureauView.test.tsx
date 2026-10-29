@@ -48,13 +48,14 @@ describe("BureauView", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders ten rooms under 2000 SVG nodes", () => {
+  it("renders ten rooms under 2250 SVG nodes", () => {
     const { container } = render(<DixPieces />);
 
     expect(screen.getAllByRole("region")).toHaveLength(10);
     const noeuds = container.querySelectorAll("svg *").length;
     expect(noeuds).toBeGreaterThan(0);
-    expect(noeuds).toBeLessThan(2000);
+    // 2000 avant l'horloge, l'étagère, le cadre et la corbeille (ticket-635) : une vingtaine de noeuds par pièce.
+    expect(noeuds).toBeLessThan(2250);
   });
 
   it("mounts a single interval for ten rooms", () => {

@@ -1,8 +1,11 @@
 import { Fragment } from "react";
 import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
+import Cadre from "../../design/bureau/Cadre";
 import CeilingLamp from "../../design/bureau/CeilingLamp";
+import Horloge from "../../design/bureau/Horloge";
 import SkyWindow from "../../design/bureau/SkyWindow";
+import { imageDuCadre } from "../../lib/bureau/cadre";
 import type { CielDeFenetre } from "../../lib/bureau/ciel";
 import type { DayMoment } from "../../lib/bureau/dayMoment";
 import BoutonLumiere from "./BoutonLumiere";
@@ -12,6 +15,8 @@ import Pose from "./Pose";
 export interface AbscissesDuMur {
   fenetres: readonly number[];
   plafonniers: readonly number[];
+  horloge: number;
+  cadre: number;
   interrupteur: number;
 }
 
@@ -21,7 +26,9 @@ interface MurLumineuxProps {
   ciels: readonly CielDeFenetre[];
   allume: boolean;
   onBasculer: () => void;
-  /** Le nom de la salle ou du projet, pour le nom accessible de l'interrupteur. */
+  /** L'horloge unique de la vue : les aiguilles de l'horloge murale s'y lisent (ticket-635). */
+  maintenant: number;
+  /** Le nom de la salle ou du projet : nom accessible de l'interrupteur, et graine du tableau du cadre. */
   salle: string;
   /** Combien de plafonniers, en flux ; avec `abscisses`, leur nombre est celui des abscisses. */
   plafonniers?: number;
@@ -41,6 +48,22 @@ function Fenetre({ moment, ciel }: { moment: DayMoment; ciel?: CielDeFenetre }) 
   return (
     <Agrandi>
       <SkyWindow moment={moment} soleil={ciel?.soleil} nuages={ciel?.nuages ?? 0} />
+    </Agrandi>
+  );
+}
+
+function HorlogeMurale({ maintenant }: { maintenant: number }) {
+  return (
+    <Agrandi>
+      <Horloge maintenant={maintenant} />
+    </Agrandi>
+  );
+}
+
+function Tableau({ salle }: { salle: string }) {
+  return (
+    <Agrandi>
+      <Cadre image={imageDuCadre(salle)} />
     </Agrandi>
   );
 }
@@ -87,8 +110,8 @@ function MurEnFlux({ moment, ciels, allume, plafonniers }: ElementsProps & { pla
 }
 
 /**
- * Le mur lumineux d'une salle ou d'une pièce : fenêtres, plafonniers et interrupteur,
- * dessinés une seule fois pour les deux (ticket-631). Tout passe par `Agrandi`, interrupteur
+ * Le mur lumineux d'une salle ou d'une pièce : fenêtres, plafonniers, horloge, cadre et
+ * interrupteur, dessinés une seule fois pour les deux (ticket-631, ticket-635). Tout passe par `Agrandi`, interrupteur
  * compris : il suit l'échelle commune au lieu de garder ses pixels bruts.
  */
 export default function MurLumineux({
@@ -96,6 +119,7 @@ export default function MurLumineux({
   ciels,
   allume,
   onBasculer,
+  maintenant,
   salle,
   plafonniers = 0,
   abscisses,
@@ -106,6 +130,12 @@ export default function MurLumineux({
     return (
       <>
         <MurPose moment={moment} ciels={ciels} allume={allume} abscisses={abscisses} />
+        <Pose x={abscisses.horloge} bas="top-5">
+          <HorlogeMurale maintenant={maintenant} />
+        </Pose>
+        <Pose x={abscisses.cadre} bas="top-4">
+          <Tableau salle={salle} />
+        </Pose>
         <Pose x={abscisses.interrupteur} bas="bottom-10">
           {bouton}
         </Pose>
@@ -116,6 +146,8 @@ export default function MurLumineux({
     <>
       <MurEnFlux moment={moment} ciels={ciels} allume={allume} plafonniers={plafonniers} />
       {accroche}
+      <HorlogeMurale maintenant={maintenant} />
+      <Tableau salle={salle} />
       {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
       <span className="self-end min-[1700px]:ml-3">{bouton}</span>
     </>

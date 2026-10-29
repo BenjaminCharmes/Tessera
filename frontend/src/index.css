@@ -127,6 +127,20 @@
   --sprite-classeur: #71717a;
   --sprite-classeur-ombre: #52525b;
   --sprite-cadre-fond: #27272a;
+  /* L'horloge, l'étagère, le cadre et la corbeille (ticket-635). */
+  --sprite-horloge-bord: #52525b;
+  --sprite-horloge-cadran: #e4e4e7;
+  --sprite-horloge-aiguille: #27272a;
+  --sprite-etagere: #6b5038;
+  --sprite-cadre-bois: #8a6a4a;
+  --sprite-toile-1: #7dd3fc;
+  --sprite-toile-2: #4d7c0f;
+  --sprite-toile-3: #fde047;
+  --sprite-toile-4: #be185d;
+  --sprite-corbeille: #52525b;
+  --sprite-corbeille-ombre: #3f3f46;
+  --sprite-papier: #f4f4f5;
+  --sprite-papier-ombre: #a1a1aa;
 }
 
 /* Sol en lames des pièces et des salles : des lames horizontales séparées d'un
