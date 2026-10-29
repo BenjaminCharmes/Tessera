@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-651
 plan: true
-pr_number: null
+pr_number: 761
 priority: medium
 status: done
 title: 'Audit: check the code against the constraints in force and the house rules'
