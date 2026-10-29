@@ -26,6 +26,10 @@ section. (ADR-055)
   absent, périmé, hors schéma ou service arrêté : aucun agent. Tessera
   ne l'écrit jamais et n'interroge aucune route du produit.
   (ADR-064, ADR-058)
+- **La livraison d'un ticket attend que les PR déjà confiées à `CIWatcher`
+  pour le projet soient mergées ou bloquées, dans une limite de temps.**
+  Le rebase se fait ainsi sur une base qui les porte ; passé le délai, la
+  livraison part comme avant. (ADR-065, ADR-051)
 
 ## Git et périmètre d'écriture
 

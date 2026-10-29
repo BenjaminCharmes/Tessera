@@ -20,6 +20,7 @@ from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
+from tessera.services.attente_des_merges import apres_les_merges
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
@@ -570,9 +571,8 @@ def _livreur(
 ) -> Callable[[PipelineResult], Awaitable[Livraison]]:
     """Fabrique la livraison de phase 1 d'un projet (ADR-051).
 
-    N'exécute que la phase 1 : rebase, push, PR. La phase 2 (attente CI +
-    merge) est confiée à `CIWatcher` via `_surveillance_pour`.
-
+    Phase 1 seulement : rebase, push, PR, une fois mergées les PR déjà confiées
+    au watcher (ticket-533). La phase 2 (CI, merge) est celle de `CIWatcher`.
     `espace` est l'espace git de l'orchestrateur : celui dont la base sert
     de départ au ticket suivant de la file.
 
@@ -662,7 +662,7 @@ def _livreur(
         livraison = await _sync_apres_livraison(livraison, espace, politique, base_branch)
         return livraison
 
-    return livrer
+    return apres_les_merges(livrer, project_id)
 
 
 async def _noter_sha_pousse(result: PipelineResult, livraison: Livraison) -> None:
