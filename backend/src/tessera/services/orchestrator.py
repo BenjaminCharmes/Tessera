@@ -858,9 +858,13 @@ class Orchestrator:
                         # réaligner la base distante avant la création de la
                         # branche du ticket suivant (ticket-382).
                         # Sans ticket restant, l'attente n'apporte rien.
-                        await self._attendre_merge_et_syncer(
+                        if not await self._attendre_merge_et_syncer(
                             project_id, ticket_id, result.livraison.pr_number, callback
-                        )
+                        ) and not await sauter_dependants(  # ADR-060, ticket-666
+                            self._ticket_svc, project_id, ticket_id, ticket_ids, index, self._log
+                        ):
+                            self._interrompre(project_id, f"{ticket_id} non mergé")
+                            break
                     else:
                         merge = await _attendre_si_dependant(
                             self._ticket_svc,
@@ -1087,13 +1091,11 @@ class Orchestrator:
         ticket_id: str,
         pr_number: int | None = None,
         on_event: EventCallback | None = None,
-    ) -> None:
-        """Wait for the merge then realign the local base from the remote.
+    ) -> bool:
+        """Wait for the merge, then realign the local base; True only when merged.
 
-        Called from run_queue when merge_without_ci is True, for every
-        subsequent ticket regardless of depends_on. A timeout logs a warning
-        and lets the queue continue without sync — better a possible conflict
-        (which resolveur-conflit can handle) than a frozen queue (ticket-382).
+        Called before every next ticket under merge_without_ci (ticket-382). A timeout
+        is logged and counts as not merged: only the dependents skip (ticket-666).
         """
         assert self._ci_watcher is not None
         try:
@@ -1109,12 +1111,10 @@ class Orchestrator:
                 f"[{project_id}] {ticket_id} : délai d'attente du merge dépassé"
                 f" ({self._attente_merge_max_s:.0f}s) — ticket suivant sans réalignement"
             )
-            return
-
-        if not merged:
-            return
-
-        await self._realigner_base(project_id, ticket_id)
+            return False
+        if merged:
+            await self._realigner_base(project_id, ticket_id)
+        return bool(merged)
 
     async def _realigner_base(self, project_id: str, ticket_id: str) -> None:
         """Fast-forward the local base onto the remote after ``ticket_id`` merged.
