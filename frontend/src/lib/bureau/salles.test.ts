@@ -68,6 +68,56 @@ describe("laPause", () => {
     expect(laPause(etat)).toEqual({ motif: "ci", libelle: "CI en cours de la PR #4" });
   });
 
+  it("keeps a pull request in the break room once the queue moved to the next ticket", () => {
+    const etat = rejouer(
+      ev("livraison_done", { pr_number: 7, arret: null }),
+      ev("queue_progress", { index: 2, total: 3 }),
+    );
+
+    expect(etat.ticketEvents.map((e) => e.type)).toEqual(["queue_progress"]);
+    expect(laPause(etat)).toEqual({ motif: "ci", libelle: "CI en cours de la PR #7" });
+  });
+
+  it("releases the pull request once its ci_merge_done arrives", () => {
+    const etat = rejouer(
+      ev("livraison_done", { pr_number: 7, arret: null }),
+      ev("queue_progress", { index: 2, total: 3 }),
+      ev("ci_merge_done", { pr_number: 7, merged: true }),
+    );
+
+    expect(laPause(etat)).toBeNull();
+  });
+
+  it("keeps waiting for another pull request when only one of them is merged", () => {
+    const etat = rejouer(
+      ev("livraison_done", { pr_number: 7, arret: null }),
+      ev("queue_progress", { index: 2, total: 3 }),
+      ev("livraison_done", { pr_number: 8, arret: null }),
+      ev("queue_progress", { index: 3, total: 3 }),
+      ev("ci_merge_done", { pr_number: 8, merged: true }),
+    );
+
+    expect(laPause(etat)).toEqual({ motif: "ci", libelle: "CI en cours de la PR #7" });
+  });
+
+  it("does not pause for a delivery that stopped without an orphan pull request", () => {
+    const etat = rejouer(
+      ev("livraison_done", { pr_number: 7, arret: "conflit résolu" }),
+      ev("queue_progress", { index: 2, total: 3 }),
+    );
+
+    expect(laPause(etat)).toBeNull();
+  });
+
+  it("pauses for an orphan pull request despite its stop", () => {
+    const etat = rejouer(
+      ev("livraison_done", { pr_number: 7, arret: "push refusé", pr_orpheline: true }),
+      ev("queue_progress", { index: 2, total: 3 }),
+    );
+
+    expect(laPause(etat)).toEqual({ motif: "ci", libelle: "CI en cours de la PR #7" });
+  });
+
   it("shows nothing for a run at work", () => {
     expect(laPause(INITIAL)).toBeNull();
   });
