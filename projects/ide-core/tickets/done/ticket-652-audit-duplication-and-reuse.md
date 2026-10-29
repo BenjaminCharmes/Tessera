@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-652
 plan: true
-pr_number: null
+pr_number: 762
 priority: medium
 status: done
 title: 'Audit: find duplicated logic and components, and what should be shared'
