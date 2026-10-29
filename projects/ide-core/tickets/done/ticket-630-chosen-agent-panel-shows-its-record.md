@@ -5,7 +5,7 @@ depends_on:
 - ticket-628
 estimated_days: 1
 id: ticket-630
-pr_number: null
+pr_number: 742
 priority: low
 status: done
 title: The chosen-agent panel shows the agent's record on its project
