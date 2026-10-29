@@ -21,6 +21,11 @@ section. (ADR-055)
   devinés ; l'app démarre depuis le worktree du run, sur un port libre, et
   ne tue jamais un processus existant. Les captures restent hors du dépôt.
   (ADR-062, ADR-042, ADR-021)
+- **Un agent de produit ne se dessine que depuis `services[].activite`.**
+  Le backend lit ce fichier, borné en taille et résolu dans le projet ;
+  absent, périmé, hors schéma ou service arrêté : aucun agent. Tessera
+  ne l'écrit jamais et n'interroge aucune route du produit.
+  (ADR-064, ADR-058)
 
 ## Git et périmètre d'écriture
 
