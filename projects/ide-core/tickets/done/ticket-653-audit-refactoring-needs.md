@@ -1,15 +1,16 @@
 ---
-id: ticket-653
-title: "Audit: list the refactors the code needs, ranked by cost and risk"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
-depends_on: [ticket-652]
-estimated_days: 1
 created: 2026-10-28
+depends_on:
+- ticket-652
+estimated_days: 1
+id: ticket-653
 plan: true
+pr_number: 763
+priority: low
+status: done
+title: 'Audit: list the refactors the code needs, ranked by cost and risk'
+type: design
 ---
 
 # ticket-653 — Audit des refactos nécessaires

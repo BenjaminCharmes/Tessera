@@ -6418,3 +6418,30 @@ Le diff ajoute :
 - 2026-10-29 22:27:44 UTC — [ticket-652] APPROVED après 1 tour(s)
 - 2026-10-29 22:27:50 UTC — [ticket-652] fichiers non suivis laissés par le run : tickets/todo/ticket-675-one-reader-for-the-agents-json-manifest.md, tickets/todo/ticket-676-one-walk-up-to-the-repository-root.md, tickets/todo/ticket-677-one-git-runner-with-hooks-disabled.md, tickets/todo/ticket-678-one-cost-by-role-aggregate-and-a-response-model.md, tickets/todo/ticket-679-response-models-for-the-services-routes.md, tickets/todo/ticket-680-one-http-client-in-the-frontend.md, tickets/todo/ticket-681-shared-duration-date-and-cost-formatters.md, tickets/todo/ticket-682-a-shared-modal-component.md, tickets/todo/ticket-683-a-shared-polling-hook-and-clock.md, tickets/todo/ticket-684-a-contract-test-between-routes-types-and-fixtures.md (à ignorer dans .gitignore ?)
 - 2026-10-29 22:28:54 UTC — [ticket-652] documentation: 0 fichier(s) (63812ms)
+- 2026-10-29 22:35:01 UTC — [ide-core] ticket-652 PR #762 mergée (CI verte)
+- 2026-10-29 22:35:04 UTC — [ide-core] ticket-652 : base réalignée sur develop
+- 2026-10-29 22:35:04 UTC — [ide-core] ticket-652 PR #762 confiée au CIWatcher
+- 2026-10-29 22:35:08 UTC — [ticket-653] branche ticket-653-audit-list-the-refactors-the-code-needs-ranked-by
+- 2026-10-29 22:35:53 UTC — [ticket-653] plan rendu (44000ms)
+- 2026-10-29 22:35:53 UTC — [ticket-653] tour 1 — codeur démarré
+- 2026-10-29 22:41:27 UTC — [ticket-653] tour 1 — architect terminé (333532ms)
+- 2026-10-29 22:41:30 UTC — [ticket-653] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:41:58 UTC — [ticket-653] securite: PASS — Le diff ajoute un document d'audit technique en lecture seule qui analyse la str (27296ms)
+- 2026-10-29 22:41:58 UTC — [ticket-653] tour 1 — reviewer démarré
+- 2026-10-29 22:42:29 UTC — [ticket-653] tour 1 — reviewer terminé (31077ms)
+- 2026-10-29 22:46:58 UTC — [ticket-653] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 22:47:19 UTC — [ticket-653] validateur: fichiers cités joints : docs/audit/refactos.md (tronqué)
+- 2026-10-29 22:47:19 UTC — [ticket-653] validateur: APPROVED — Le ticket-653 remplit tous ses critères. `docs/audit/refactos.md` §1 liste les 3 (321171ms)
+- 2026-10-29 22:47:19 UTC — [ticket-653] CHANGES_REQUESTED tour 1: Reviewer : 1. Le premier critère du ticket-687 est `grep -rn "from tessera.routers" backend/src/tessera/routers backend/src/tessera/services` ne rend aucune ligne. Ce critère est impossible à tenir. L
+- 2026-10-29 22:47:19 UTC — [ticket-653] tour 2 — codeur démarré
+- 2026-10-29 22:48:35 UTC — [ticket-653] tour 2 — architect terminé (76014ms)
+- 2026-10-29 22:48:38 UTC — [ticket-653] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:49:08 UTC — [ticket-653] securite: PASS — Ajout d'un document de documentation technique dans `docs/audit/refactos.md`. Au (29890ms)
+- 2026-10-29 22:49:08 UTC — [ticket-653] tour 2 — reviewer démarré
+- 2026-10-29 22:49:08 UTC — [ticket-653] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 22:49:24 UTC — [ticket-653] tour 2 — reviewer terminé (15203ms)
+- 2026-10-29 22:49:43 UTC — [ticket-653] validateur: fichiers cités joints : docs/audit/refactos.md (tronqué)
+- 2026-10-29 22:49:43 UTC — [ticket-653] validateur: APPROVED — Le ticket-653 remplit tous ses critères. Le document d'audit liste les 30 fichie (34422ms)
+- 2026-10-29 22:49:43 UTC — [ticket-653] APPROVED après 2 tour(s)
+- 2026-10-29 22:49:49 UTC — [ticket-653] fichiers non suivis laissés par le run : tickets/todo/ticket-685-queue-and-autonomous-modes-leave-the-orchestrator-class.md, tickets/todo/ticket-686-end-of-queue-steps-leave-the-orchestrator-class.md, tickets/todo/ticket-687-run-assembly-leaves-the-orchestrator-router.md, tickets/todo/ticket-688-pipeline-stages-split-by-stage.md, tickets/todo/ticket-689-projects-router-split-by-resource.md, tickets/todo/ticket-690-database-module-split-by-domain.md, tickets/todo/ticket-691-project-loader-split-by-role.md, tickets/todo/ticket-692-documentation-module-split-in-three.md, tickets/todo/ticket-693-api-types-split-by-domain.md, tickets/todo/ticket-694-api-client-split-by-domain.md et 7 autres (à ignorer dans .gitignore ?)
+- 2026-10-29 22:52:37 UTC — [ticket-653] documentation: 0 fichier(s) (167890ms) — après tour de correction
