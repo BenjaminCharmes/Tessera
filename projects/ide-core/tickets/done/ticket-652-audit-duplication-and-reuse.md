@@ -1,15 +1,15 @@
 ---
-id: ticket-652
-title: "Audit: find duplicated logic and components, and what should be shared"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-10-28
 depends_on: []
 estimated_days: 1
-created: 2026-10-28
+id: ticket-652
 plan: true
+pr_number: 762
+priority: medium
+status: done
+title: 'Audit: find duplicated logic and components, and what should be shared'
+type: design
 ---
 
 # ticket-652 — Audit des doublons et de la réutilisation

@@ -6402,3 +6402,19 @@ Le diff ajoute :
 - 2026-10-29 22:11:56 UTC — [ticket-651] validateur: APPROVED — Les trois critères d'acceptation sont respectés : le fichier `docs/audit/regles. (293625ms)
 - 2026-10-29 22:11:56 UTC — [ticket-651] APPROVED après 1 tour(s)
 - 2026-10-29 22:13:48 UTC — [ticket-651] documentation: 0 fichier(s) (106592ms)
+- 2026-10-29 22:14:08 UTC — [ide-core] ticket-651 PR #761 confiée au CIWatcher
+- 2026-10-29 22:14:13 UTC — [ticket-652] branche ticket-652-audit-find-duplicated-logic-and-components-and-wh
+- 2026-10-29 22:14:52 UTC — [ticket-652] plan rendu (37530ms)
+- 2026-10-29 22:14:52 UTC — [ticket-652] tour 1 — codeur démarré
+- 2026-10-29 22:18:48 UTC — [ide-core] ticket-651 PR #761 mergée (CI verte)
+- 2026-10-29 22:21:34 UTC — [ticket-652] tour 1 — architect terminé (402546ms)
+- 2026-10-29 22:21:38 UTC — [ticket-652] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:21:58 UTC — [ticket-652] securite: PASS — Le diff ajoute un fichier de documentation statique (`docs/audit/doublons.md`) q (20046ms)
+- 2026-10-29 22:21:58 UTC — [ticket-652] tour 1 — reviewer démarré
+- 2026-10-29 22:22:30 UTC — [ticket-652] tour 1 — reviewer terminé (31983ms)
+- 2026-10-29 22:26:58 UTC — [ticket-652] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 22:27:44 UTC — [ticket-652] validateur: fichiers cités joints : docs/audit/doublons.md
+- 2026-10-29 22:27:44 UTC — [ticket-652] validateur: APPROVED — L'audit de ticket-652 est complet. Le fichier `docs/audit/doublons.md` énumère t (345515ms)
+- 2026-10-29 22:27:44 UTC — [ticket-652] APPROVED après 1 tour(s)
+- 2026-10-29 22:27:50 UTC — [ticket-652] fichiers non suivis laissés par le run : tickets/todo/ticket-675-one-reader-for-the-agents-json-manifest.md, tickets/todo/ticket-676-one-walk-up-to-the-repository-root.md, tickets/todo/ticket-677-one-git-runner-with-hooks-disabled.md, tickets/todo/ticket-678-one-cost-by-role-aggregate-and-a-response-model.md, tickets/todo/ticket-679-response-models-for-the-services-routes.md, tickets/todo/ticket-680-one-http-client-in-the-frontend.md, tickets/todo/ticket-681-shared-duration-date-and-cost-formatters.md, tickets/todo/ticket-682-a-shared-modal-component.md, tickets/todo/ticket-683-a-shared-polling-hook-and-clock.md, tickets/todo/ticket-684-a-contract-test-between-routes-types-and-fixtures.md (à ignorer dans .gitignore ?)
+- 2026-10-29 22:28:54 UTC — [ticket-652] documentation: 0 fichier(s) (63812ms)
