@@ -133,7 +133,8 @@ export default function MurLumineux({
         <Pose x={abscisses.horloge} bas="top-5">
           <HorlogeMurale maintenant={maintenant} />
         </Pose>
-        <Pose x={abscisses.cadre} bas="top-4">
+        {/* Centré sur la hauteur des fenêtres (top-9) : plus haut qu'elles, il flottait. */}
+        <Pose x={abscisses.cadre} bas="top-11">
           <Tableau salle={salle} />
         </Pose>
         <Pose x={abscisses.interrupteur} bas="bottom-10">
@@ -147,7 +148,14 @@ export default function MurLumineux({
       <MurEnFlux moment={moment} ciels={ciels} allume={allume} plafonniers={plafonniers} />
       {accroche}
       <HorlogeMurale maintenant={maintenant} />
-      <Tableau salle={salle} />
+      {/* Ce qui s'accroche (le cadre de l'employé) prend la place du tableau : les deux
+          ensemble faisaient déborder le bureau du directeur. Descendu au milieu de la
+          hauteur des fenêtres, au lieu de s'aligner sur leur haut. */}
+      {!accroche && (
+        <span className="mt-1.5">
+          <Tableau salle={salle} />
+        </span>
+      )}
       {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
       <span className="self-end min-[1700px]:ml-3">{bouton}</span>
     </>

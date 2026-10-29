@@ -4,15 +4,11 @@ import BureauEnBois from "../../design/bureau/BureauEnBois";
 import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Bulle from "../../design/bureau/Bulle";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
-import GoldFrame from "../../design/bureau/GoldFrame";
 import {
   PHYSIQUE_DU_DIRECTEUR,
   TENUE_DU_DIRECTEUR,
 } from "../../lib/bureau/sallesCommunes";
 import type { AgentEnSalle } from "../../lib/bureau/sallesCommunes";
-import { employeeLabel } from "../../lib/bureau/weekEmployee";
-import type { WeekEmployee } from "../../lib/bureau/weekEmployee";
-import AvecInfobulle from "./AvecInfobulle";
 import Salle from "./Salle";
 
 interface BureauDuDirecteurProps {
@@ -20,26 +16,6 @@ interface BureauDuDirecteurProps {
   agents: readonly AgentEnSalle[];
   /** L'horloge unique de la vue (ticket-602). */
   maintenant: number;
-  /** L'employé de la semaine : sans lui, pas de cadre au mur. */
-  employe?: WeekEmployee | null;
-}
-
-/** Le cadre doré : le texte n'est écrit nulle part, il se lit en infobulle au survol et au focus. */
-function CadreDeLEmploye({ employe }: { employe: WeekEmployee }) {
-  const libelle = employeeLabel(employe);
-  return (
-    <AvecInfobulle
-      label={`Employé de la semaine : ${libelle}`}
-      className="rounded-sm"
-      infobulle={libelle}
-    >
-      <span data-employe={employe.project}>
-        <Agrandi>
-          <GoldFrame projet={employe.project} />
-        </Agrandi>
-      </span>
-    </AvecInfobulle>
-  );
 }
 
 /**
@@ -50,13 +26,11 @@ function CadreDeLEmploye({ employe }: { employe: WeekEmployee }) {
 export default function BureauDuDirecteur({
   agents,
   maintenant,
-  employe = null,
 }: BureauDuDirecteurProps) {
   return (
     <Salle
       maintenant={maintenant}
       avecSoleil
-      accroche={employe && <CadreDeLEmploye employe={employe} />}
       titre="Bureau du directeur"
       entete="un agent dont la question attend ta réponse vient s'y tenir"
       vide="Aucune question en attente"

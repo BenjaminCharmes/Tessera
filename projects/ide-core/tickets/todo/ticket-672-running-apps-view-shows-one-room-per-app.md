@@ -31,6 +31,9 @@ choses le 29/10 :
   `Cadre`, `Bibliotheque`, `Porte`, `TableauBlanc`, `Poste`…) n'y entrent pas.
 
 ## Solution proposée
+La maquette de référence est `projects/ide-core/design/maquette/Salle-des-serveurs.dc.html` :
+elle fixe le décor et la disposition, pas les échelles, qui suivent celles du Bureau.
+
 Une salle par entrée de `useAppsEnCours` (`AppEnCours`), avec ses ports, sa
 mémoire et son démarrage, et l'état de ses services (`ServiceActif`).
 
