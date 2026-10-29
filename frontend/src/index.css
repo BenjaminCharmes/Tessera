@@ -170,6 +170,24 @@
   50% { opacity: 0.2; }
   100% { opacity: 1; }
 }
+/* Les scènes d'écran (ticket-629), sur une grille de 6 × 4 pixels : un pixel par palier. */
+@keyframes defile {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+@keyframes avance {
+  0% { transform: scaleX(0.17); }
+  100% { transform: scaleX(1); }
+}
+@keyframes balaie {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+.anim-defile { animation: defile 1.2s steps(4) infinite; }
+.anim-avance { animation: avance 1.8s steps(6) infinite; }
+.anim-balaie { animation: balaie 1.2s steps(4) infinite; }
+/* La barre grandit depuis son bord gauche, pas depuis l'origine de l'écran. */
+.anim-avance { transform-box: fill-box; transform-origin: 0 50%; }
 .anim-tape { animation: tape 0.5s steps(2) infinite; }
 .anim-chute { animation: chute 1.6s linear infinite; }
 .anim-gyro { animation: gyro 0.8s steps(2) infinite; }
@@ -181,7 +199,8 @@
    de place sans marcher. */
 .marche { transition: transform 1.8s steps(12), opacity 0.9s; }
 @media (prefers-reduced-motion: reduce) {
-  .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur, .anim-chute, .anim-gyro { animation: none; }
+  .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur, .anim-chute, .anim-gyro,
+  .anim-defile, .anim-avance, .anim-balaie { animation: none; }
   .marche { transition: none; }
 }
 

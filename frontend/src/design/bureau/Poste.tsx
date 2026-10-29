@@ -1,4 +1,5 @@
 import { TENUES, physique } from "../../lib/bureau/physique";
+import type { EcranId } from "../../lib/bureau/ecranDuPoste";
 import type { EtatPoste, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { SanteAgent } from "../../lib/santeAgent";
 import Ecran from "./Ecran";
@@ -10,22 +11,18 @@ interface PosteProps {
   role: RoleAffiche;
   etat: EtatPoste;
   sante: SanteAgent;
+  /** Ce que l'écran montre (ticket-629) ; absent, l'écran se contente d'être allumé, ✓ ou éteint. */
+  ecran?: EcranId;
   /** Pièce sans run : aucun personnage, un bureau et sa chaise vide (ADR-058). */
   auRepos?: boolean;
   /** Run clos : l'agent est parti par la porte, la chaise reste vide. */
   parti?: boolean;
 }
 
-/** La coche d'un poste « fait » : quatre pixels verts sur l'écran. */
-function Coche() {
-  return (
-    <g data-sprite="coche">
-      <rect x="11" y="9" width="1" height="1" className="fill-green-400" />
-      <rect x="12" y="10" width="1" height="1" className="fill-green-400" />
-      <rect x="13" y="9" width="1" height="1" className="fill-green-400" />
-      <rect x="14" y="8" width="1" height="1" className="fill-green-400" />
-    </g>
-  );
+/** L'écran par défaut, quand la pièce n'en dit pas plus : allumé s'il travaille, ✓ s'il a fini, éteint sinon. */
+function ecranParDefaut(etat: EtatPoste): EcranId {
+  if (etat === "occupe") return "allume";
+  return etat === "fait" ? "ok" : "eteint";
 }
 
 /**
@@ -36,7 +33,15 @@ function Coche() {
  * `overflow-visible` : les cheveux du personnage assis montent au-dessus de la grille ;
  * sans cela le `<svg>` couperait leur première ligne.
  */
-export default function Poste({ projet, role, etat, sante, auRepos = false, parti = false }: PosteProps) {
+export default function Poste({
+  projet,
+  role,
+  etat,
+  sante,
+  ecran = ecranParDefaut(etat),
+  auRepos = false,
+  parti = false,
+}: PosteProps) {
   const occupe = etat === "occupe";
   const assis = !auRepos && !parti && etat !== "fait";
   const ton = occupe ? sante : etat;
@@ -62,8 +67,7 @@ export default function Poste({ projet, role, etat, sante, auRepos = false, part
       <rect x="1" y="12" width="14" height="2" className="fill-zinc-600" />
       <rect x="2" y="14" width="1" height="4" className="fill-zinc-700" />
       <rect x="13" y="14" width="1" height="4" className="fill-zinc-700" />
-      <Ecran ton={ton} lueur={occupe && sante === "actif"} />
-      {etat === "fait" && <Coche />}
+      <Ecran ecran={ecran} ton={ton} anime={occupe && sante === "actif"} />
     </svg>
   );
 }

@@ -1,14 +1,16 @@
 ---
-id: ticket-629
-title: "Each desk screen shows what its step is really doing: code, reading, tests, audit, diff, criteria, verdict"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: [ticket-628]
-estimated_days: 2
 created: 2026-10-28
+depends_on:
+- ticket-628
+estimated_days: 2
+id: ticket-629
+pr_number: 741
+priority: medium
+status: done
+title: 'Each desk screen shows what its step is really doing: code, reading, tests,
+  audit, diff, criteria, verdict'
+type: feat
 ---
 
 # ticket-629 — Des écrans qui montrent l'étape réelle

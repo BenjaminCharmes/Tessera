@@ -123,16 +123,26 @@ describe("sprites sources", () => {
 });
 
 describe("Bureau animations", () => {
-  const keyframes = [...CSS.matchAll(/@keyframes\s+(tape|lueur|flotte|vapeur|chute|gyro)\b/g)].map(
+  const keyframes = [...CSS.matchAll(/@keyframes\s+(tape|lueur|flotte|vapeur|chute|gyro|defile|avance|balaie)\b/g)].map(
     (m) => m[1] ?? "",
   );
 
-  it("declares the six animations", () => {
-    expect(keyframes.sort()).toEqual(["chute", "flotte", "gyro", "lueur", "tape", "vapeur"]);
+  it("declares the nine animations", () => {
+    expect(keyframes.sort()).toEqual([
+      "avance",
+      "balaie",
+      "chute",
+      "defile",
+      "flotte",
+      "gyro",
+      "lueur",
+      "tape",
+      "vapeur",
+    ]);
   });
 
   it("animates only transform and opacity", () => {
-    const proprietes = blocs(CSS, /@keyframes\s+(?:tape|lueur|flotte|vapeur|chute|gyro)\b/).flatMap((corps) =>
+    const proprietes = blocs(CSS, /@keyframes\s+(?:tape|lueur|flotte|vapeur|chute|gyro|defile|avance|balaie)\b/).flatMap((corps) =>
       [...corps.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1] ?? ""),
     );
 
