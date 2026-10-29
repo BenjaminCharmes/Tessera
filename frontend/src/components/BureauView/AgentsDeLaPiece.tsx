@@ -63,16 +63,17 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
   // pour pouvoir revenir à son poste au ticket suivant.
   const acces = agent.parti
     ? { "aria-hidden": true, inert: true, tabIndex: -1 }
-    : {
-        role: "img",
-        "aria-label": avecLeNom(projet, role, `${nomDuPoste(role)}, ${libelleActivite(agent.activite ?? "tasse")}`),
-      };
+    : (() => {
+        const libelle = avecLeNom(projet, role, `${nomDuPoste(role)}, ${libelleActivite(agent.activite ?? "tasse")}`);
+        // Le même texte au survol qu'à son poste : la couche ignore le pointeur, l'agent le reprend.
+        return { role: "img", "aria-label": libelle, title: libelle };
+      })();
   return (
     <span
       data-agent={id}
       data-activite={agent.activite ?? "parti"}
       data-objet={rendSaCopie ? "feuille" : undefined}
-      className={`${marche ? "marche " : ""}absolute left-0 z-10`}
+      className={`${marche ? "marche " : ""}${agent.parti ? "" : "pointer-events-auto "}absolute left-0 z-10`}
       style={style}
       {...acces}
     >

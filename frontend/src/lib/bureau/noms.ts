@@ -64,10 +64,25 @@ export function nomDeLAgent(projet: string, role: RoleAffiche): string {
 }
 
 /**
+ * Le personnel des salles communes : une personne chacun, un prénom fixe. Hors de
+ * `PRENOMS`, pour ne jamais se confondre avec un agent de projet.
+ */
+export const NOM_DU_DIRECTEUR = "Victor";
+export const NOM_DES_RH = "Hélène";
+
+/**
  * Le libellé d'un poste ou d'une activité précédé du prénom de l'agent :
  * « Camille, codeur, travaille » à partir de « Codeur, travaille ».
  */
 export function avecLeNom(projet: string, role: RoleAffiche, libelle: string): string {
   const minuscule = libelle.charAt(0).toLowerCase() + libelle.slice(1);
   return `${nomDeLAgent(projet, role)}, ${minuscule}`;
+}
+
+/**
+ * Un agent de passage dans une salle commune : son prénom, son poste et son projet,
+ * puisque la salle reçoit tous les projets. « Camille, codeur · curio ».
+ */
+export function visiteur(projet: string, role: RoleAffiche, poste: string): string {
+  return `${avecLeNom(projet, role, poste)} · ${projet}`;
 }

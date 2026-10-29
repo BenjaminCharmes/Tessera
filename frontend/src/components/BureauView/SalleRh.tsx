@@ -4,6 +4,7 @@ import BureauEnBois from "../../design/bureau/BureauEnBois";
 import Classeur from "../../design/bureau/Classeur";
 import { IconChevronRight } from "../../design/icons";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import { NOM_DES_RH, visiteur } from "../../lib/bureau/noms";
 import { PHYSIQUE_DES_RH, TENUE_DES_RH } from "../../lib/bureau/sallesCommunes";
 import type { AgentAuxRh } from "../../lib/bureau/sallesCommunes";
 import Salle from "./Salle";
@@ -28,7 +29,9 @@ export default function SalleRh({ agents, maintenant }: SalleRhProps) {
       entete="un rôle dont le provider est indisponible passe ici, le temps de son repli"
       vide="Aucun repli de provider"
       mobilier={
-        <BureauEnBois tenue={TENUE_DES_RH} physique={PHYSIQUE_DES_RH} />
+        <span role="img" aria-label={`${NOM_DES_RH}, RH`} title={`${NOM_DES_RH}, RH`}>
+          <BureauEnBois tenue={TENUE_DES_RH} physique={PHYSIQUE_DES_RH} />
+        </span>
       }
       decor={
         <>
@@ -56,7 +59,7 @@ export default function SalleRh({ agents, maintenant }: SalleRhProps) {
     >
       {/* Un projet ne tient qu'un run à la fois (ADR-038) : un agent par projet, donc la clé est unique. */}
       {agents.map(({ projet, poste }) => (
-        <li key={projet} data-agent={poste}>
+        <li key={projet} data-agent={poste} title={visiteur(projet, poste, nomDuPoste(poste))}>
           <Agrandi>
             <AgentDebout projet={projet} role={poste} />
           </Agrandi>
