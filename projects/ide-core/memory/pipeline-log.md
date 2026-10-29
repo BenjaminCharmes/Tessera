@@ -6372,3 +6372,18 @@ Le diff ajoute :
 - 2026-10-29 21:27:36 UTC — [ticket-539] validateur: APPROVED — Le critère d'acceptation est satisfait. Le code implémente une gestion robuste d (66484ms)
 - 2026-10-29 21:27:36 UTC — [ticket-539] APPROVED après 1 tour(s)
 - 2026-10-29 21:29:57 UTC — [ticket-539] documentation: 0 fichier(s) (133844ms)
+- 2026-10-29 21:39:55 UTC — [ide-core] ticket-539 PR #759 confiée au CIWatcher
+- 2026-10-29 21:39:59 UTC — [ticket-650] branche ticket-650-audit-give-every-adr-a-status-and-find-the-ones-r
+- 2026-10-29 21:40:54 UTC — [ticket-650] plan rendu (53078ms)
+- 2026-10-29 21:40:54 UTC — [ticket-650] tour 1 — codeur démarré
+- 2026-10-29 21:44:19 UTC — [ide-core] ticket-539 PR #759 mergée (CI verte)
+- 2026-10-29 21:46:45 UTC — [ticket-650] tour 1 — architect terminé (351187ms)
+- 2026-10-29 21:46:48 UTC — [ticket-650] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 21:47:02 UTC — [ticket-650] securite: PASS — Le diff n'ajoute qu'un fichier de documentation statique (`docs/audit/adr.md`) l (14219ms)
+- 2026-10-29 21:47:02 UTC — [ticket-650] tour 1 — reviewer démarré
+- 2026-10-29 21:47:25 UTC — [ticket-650] tour 1 — reviewer terminé (23265ms)
+- 2026-10-29 21:52:02 UTC — [ticket-650] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 21:52:30 UTC — [ticket-650] validateur: fichiers cités joints : docs/audit/adr.md (tronqué) ; non joints (budget épuisé) : memory/contraintes.md
+- 2026-10-29 21:52:30 UTC — [ticket-650] validateur: APPROVED — Le fichier `docs/audit/adr.md` contient l'audit complet demandé : tableau de sta (327781ms)
+- 2026-10-29 21:52:30 UTC — [ticket-650] APPROVED après 1 tour(s)
+- 2026-10-29 21:54:11 UTC — [ticket-650] documentation: 0 fichier(s) (94719ms)

@@ -1,15 +1,16 @@
 ---
-id: ticket-650
-title: "Audit: give every ADR a status, and find the ones replaced, duplicated or contradicted"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-10-28
 depends_on: []
 estimated_days: 1
-created: 2026-10-28
+id: ticket-650
 plan: true
+pr_number: 760
+priority: medium
+status: done
+title: 'Audit: give every ADR a status, and find the ones replaced, duplicated or
+  contradicted'
+type: design
 ---
 
 # ticket-650 — Audit des ADR : statut, doublons, contradictions
