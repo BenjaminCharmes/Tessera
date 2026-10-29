@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-631
 plan: true
-pr_number: null
+pr_number: 743
 priority: medium
 status: done
 title: 'Bureau consolidation: one wall component and one sprite scale'
