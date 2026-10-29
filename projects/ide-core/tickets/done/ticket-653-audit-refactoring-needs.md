@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-653
 plan: true
-pr_number: null
+pr_number: 763
 priority: low
 status: done
 title: 'Audit: list the refactors the code needs, ranked by cost and risk'
