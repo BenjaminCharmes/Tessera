@@ -4,7 +4,7 @@ created: 2026-10-28
 depends_on: []
 estimated_days: 1
 id: ticket-658
-pr_number: null
+pr_number: 745
 priority: medium
 status: done
 title: Appending to a queue reports every requested id and fetches the base once per
