@@ -5,7 +5,7 @@ depends_on:
 - ticket-624
 estimated_days: 1
 id: ticket-628
-pr_number: null
+pr_number: 740
 priority: medium
 status: done
 title: Each Bureau agent has a stable name, shown on hover and in the chosen-agent
