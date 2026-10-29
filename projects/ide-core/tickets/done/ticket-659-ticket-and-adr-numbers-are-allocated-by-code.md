@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 2
 id: ticket-659
 plan: true
-pr_number: null
+pr_number: 748
 priority: high
 status: done
 title: Ticket and ADR numbers are allocated by code, and a run renumbers what collides
