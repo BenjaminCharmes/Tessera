@@ -4,6 +4,7 @@ created: 2026-10-27
 depends_on:
 - ticket-618
 id: ticket-619
+pr_number: 734
 priority: medium
 status: done
 title: 'Relire mode: a pull request with visual checks is never merged alone'
