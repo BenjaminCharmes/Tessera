@@ -6201,3 +6201,4 @@ Le diff ajoute :
 - 2026-10-29 14:29:47 UTC — [ticket-659] validateur: APPROVED — Les quatre critères sont satisfaits. Les tests couvrent : (1) un numéro ne figur (334094ms)
 - 2026-10-29 14:29:47 UTC — [ticket-659] CHANGES_REQUESTED tour 3: Reviewer : 1. `_adr_en_collision` prend pour une ADR ajoutée toute ligne de titre `## ADR-N` qui figure dans les lignes ajoutées du diff, puis compare son texte à celui de la base. Quand un run modifi
 - 2026-10-29 14:29:47 UTC — [ticket-659] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-29 14:29:52 UTC — [ide-core] file interrompue : ticket-659 non approuvé
