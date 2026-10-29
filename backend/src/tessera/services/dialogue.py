@@ -30,6 +30,7 @@ whole overnight run on questions no one could ever answer.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from typing import Literal, Optional
 
 from tessera.utils.logger import get_logger
@@ -52,6 +53,14 @@ NO_HUMAN_ANSWER = (
     "l'hypothèse que tu retiens dans ta réponse, afin qu'elle puisse être "
     "relue."
 )
+
+
+@dataclass(frozen=True)
+class DialogueExchange:
+    """A question the agent asked and the human answer it received."""
+
+    question: str
+    answer: str
 
 
 class DialogueChannel:
@@ -79,6 +88,10 @@ class DialogueChannel:
         # pouvoir attendre la question plutôt que de scruter l'attribut.
         self._question_posed = asyncio.Event()
         self._mailbox: list[str] = []
+        # Questions suivies de leur réponse *humaine*, dans l'ordre : ce que le
+        # validateur doit connaître quand un critère a changé de sens au
+        # dialogue. Ni délai dépassé, ni arrêt, ni mode autonome n'y entrent.
+        self._exchanges: list[DialogueExchange] = []
         # L'arrêt passe par ce canal, qui est déjà le chemin par lequel
         # l'utilisateur parle à un run en cours : inventer un second transport
         # pour un seul booléen n'apporterait rien (ticket-069).
@@ -130,6 +143,8 @@ class DialogueChannel:
             _logger.info("reponse_sans_question")
             self.interject(text)
             return "deposited"
+        if self._pending_question is not None:
+            self._exchanges.append(DialogueExchange(self._pending_question, text))
         self._answer.set_result(text)
         return "transmitted"
 
@@ -148,6 +163,11 @@ class DialogueChannel:
     @property
     def pending_question(self) -> str | None:
         return self._pending_question
+
+    @property
+    def exchanges(self) -> list[DialogueExchange]:
+        """Human answers received so far, each with its question, in order."""
+        return list(self._exchanges)
 
     @property
     def stop_requested(self) -> bool:
