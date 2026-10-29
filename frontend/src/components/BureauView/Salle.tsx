@@ -1,15 +1,13 @@
 import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
-import CeilingLamp from "../../design/bureau/CeilingLamp";
 import NightVeil from "../../design/bureau/NightVeil";
 import Plante from "../../design/bureau/Plante";
 import type { EspeceDePlante } from "../../design/bureau/Plante";
-import SkyWindow from "../../design/bureau/SkyWindow";
 import { IconInfo } from "../../design/icons";
 import { useLumiere } from "../../hooks/useLumiere";
 import { cielDesFenetres } from "../../lib/bureau/ciel";
 import { dayMoment } from "../../lib/bureau/dayMoment";
-import BoutonLumiere from "./BoutonLumiere";
+import MurLumineux from "./MurLumineux";
 
 interface SalleProps {
   titre: string;
@@ -60,7 +58,7 @@ export default function Salle({
   const contour = ambre ? "border-amber-900" : "border-zinc-800";
   const moment = dayMoment(maintenant);
   const [lumiere, basculerLumiere] = useLumiere(`salle:${titre}`, moment);
-  const [gauche, droite] = cielDesFenetres(titre, 2, maintenant, avecSoleil);
+  const ciels = cielDesFenetres(titre, 2, maintenant, avecSoleil);
   return (
     <aside
       aria-label={titre}
@@ -89,32 +87,15 @@ export default function Salle({
         data-mur="salle"
         className="flex flex-nowrap items-start justify-center gap-1.5 overflow-hidden border-b-4 border-(--sprite-plinthe) px-1.5 pt-3 pb-4 min-[1700px]:gap-3 min-[1700px]:px-3"
       >
-        <Agrandi>
-          <SkyWindow
-            moment={moment}
-            soleil={gauche?.soleil}
-            nuages={gauche?.nuages}
-          />
-        </Agrandi>
-        <Agrandi>
-          <CeilingLamp allume={lumiere} jour={moment !== "nuit"} />
-        </Agrandi>
-        <Agrandi>
-          <SkyWindow
-            moment={moment}
-            soleil={droite?.soleil}
-            nuages={droite?.nuages}
-          />
-        </Agrandi>
-        {accroche}
-        {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
-        <span className="self-end min-[1700px]:ml-3">
-          <BoutonLumiere
-            salle={titre}
-            allume={lumiere}
-            onBasculer={basculerLumiere}
-          />
-        </span>
+        <MurLumineux
+          moment={moment}
+          ciels={ciels}
+          allume={lumiere}
+          onBasculer={basculerLumiere}
+          salle={titre}
+          plafonniers={1}
+          accroche={accroche}
+        />
       </div>
       {/* Le fond du sol ne sert à rien dans une salle : le mobilier s'y centre au lieu de laisser un vide sous le mur (ticket-627). */}
       <div

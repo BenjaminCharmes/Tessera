@@ -1,15 +1,16 @@
 ---
-id: ticket-631
-title: "Bureau consolidation: one wall component and one sprite scale"
-type: refactor
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: [ticket-630]
-estimated_days: 1
 created: 2026-10-28
+depends_on:
+- ticket-630
+estimated_days: 1
+id: ticket-631
 plan: true
+pr_number: 743
+priority: medium
+status: done
+title: 'Bureau consolidation: one wall component and one sprite scale'
+type: refactor
 ---
 
 # ticket-631 — Consolider le Bureau : un seul mur, une seule échelle

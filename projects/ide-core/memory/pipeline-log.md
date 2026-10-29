@@ -6133,3 +6133,18 @@ Le diff ajoute :
 - 2026-10-29 12:16:10 UTC — [ticket-630] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Un test vérifie que le panneau (105077ms)
 - 2026-10-29 12:16:10 UTC — [ticket-630] APPROVED après 2 tour(s)
 - 2026-10-29 12:19:27 UTC — [ticket-630] documentation: 0 fichier(s) (192077ms)
+- 2026-10-29 12:27:06 UTC — [ide-core] ticket-630 PR #742 mergée (CI verte)
+- 2026-10-29 12:27:08 UTC — [ide-core] ticket-630 : base réalignée sur develop
+- 2026-10-29 12:27:08 UTC — [ide-core] ticket-630 PR #742 confiée au CIWatcher
+- 2026-10-29 12:27:15 UTC — [ticket-631] branche ticket-631-bureau-consolidation-one-wall-component-and-one-s
+- 2026-10-29 12:28:35 UTC — [ticket-631] plan rendu (78110ms)
+- 2026-10-29 12:28:35 UTC — [ticket-631] tour 1 — codeur démarré
+- 2026-10-29 12:31:23 UTC — [ticket-631] tour 1 — codeur terminé (167266ms)
+- 2026-10-29 12:33:43 UTC — [ticket-631] testeur: OK (exit 0)
+- 2026-10-29 12:35:40 UTC — [ticket-631] securite: PASS — Diff de refactoring frontend (React/TypeScript) : extraction de composants et co (117562ms)
+- 2026-10-29 12:35:40 UTC — [ticket-631] tour 1 — reviewer démarré
+- 2026-10-29 12:36:02 UTC — [ticket-631] tour 1 — reviewer terminé (22093ms)
+- 2026-10-29 12:38:24 UTC — [ticket-631] validateur: fichiers cités joints : Salle.tsx, FondDeLaPiece.tsx, BoutonLumiere.tsx
+- 2026-10-29 12:38:24 UTC — [ticket-631] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le composant partagé `MurLumin (164141ms)
+- 2026-10-29 12:38:24 UTC — [ticket-631] APPROVED après 1 tour(s)
+- 2026-10-29 12:40:29 UTC — [ticket-631] documentation: 0 fichier(s) (117797ms)

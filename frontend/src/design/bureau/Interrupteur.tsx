@@ -3,14 +3,16 @@ interface InterrupteurProps {
 }
 
 /**
- * Un interrupteur mural, grille 6 × 9 (6 × 9 px) : la touche en haut quand la lumière est allumée.
+ * Un interrupteur mural, grille 6 × 9 : la touche en haut quand la lumière est allumée.
+ * Il passe par `Agrandi` comme tout sprite : 5,5 × 8,25 px bruts, soit environ 6 × 9 px à
+ * l'échelle de 1536 (1,1), et plus grand à 1920 comme le reste du mur (ticket-631).
  * À 12 × 18 px il faisait le tiers de la porte (ticket-622).
  */
 export default function Interrupteur({ allume }: InterrupteurProps) {
   return (
     <svg
-      width="6"
-      height="9"
+      width="5.5"
+      height="8.25"
       viewBox="0 0 6 9"
       shapeRendering="crispEdges"
       aria-hidden="true"
