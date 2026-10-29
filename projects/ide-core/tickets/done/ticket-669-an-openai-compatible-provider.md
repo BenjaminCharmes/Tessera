@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 2
 id: ticket-669
 plan: true
-pr_number: null
+pr_number: 754
 priority: low
 status: done
 title: A provider for any OpenAI-compatible endpoint, declared by base URL
