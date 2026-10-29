@@ -20,6 +20,7 @@ import {
   retourDeCopie,
 } from "../../lib/bureau/copie";
 import { dayMoment } from "../../lib/bureau/dayMoment";
+import { ecranDuPoste } from "../../lib/bureau/ecranDuPoste";
 import { contourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import type { ContourDeLaPiece } from "../../lib/bureau/contourDeLaPiece";
 import {
@@ -239,6 +240,7 @@ export default function Piece({
                 }
                 onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
                 outil={outil?.poste === p.poste ? outil.phrase : null}
+                ecran={ecranDuPoste(etat, p.poste, p.etat)}
               />
             ))}
           </div>

@@ -2,6 +2,7 @@ import Agrandi from "../../design/bureau/Agrandi";
 import Bulle from "../../design/bureau/Bulle";
 import BulleDOutil from "../../design/bureau/BulleDOutil";
 import Poste from "../../design/bureau/Poste";
+import type { EcranId } from "../../lib/bureau/ecranDuPoste";
 import { libelleDuPoste, nomDuPoste } from "../../lib/bureau/libelleDuPoste";
 import { avecLeNom } from "../../lib/bureau/noms";
 import type { PosteDuRun, RoleAffiche } from "../../lib/bureau/postesDuRun";
@@ -24,6 +25,8 @@ interface PosteDeTravailProps {
   onChoisir?: (poste: PosteDuRun["poste"]) => void;
   /** Ce que l'agent fait, en une ligne, dans les dix secondes d'un appel d'outil (ticket-601). */
   outil?: string | null;
+  /** Ce que l'écran du poste montre : la scène de son étape ou son verdict (ticket-629). */
+  ecran?: EcranId;
 }
 
 /**
@@ -42,6 +45,7 @@ export default function PosteDeTravail({
   absent = false,
   onChoisir,
   outil = null,
+  ecran,
 }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
   // Le prénom ouvre le nom accessible et l'infobulle native : c'est une identité, pas un état.
@@ -69,10 +73,11 @@ export default function PosteDeTravail({
         <Agrandi>
           <Poste
             projet={projet}
-          role={role}
-          etat={poste.etat}
-          sante={sante}
-          auRepos={auRepos}
+            role={role}
+            etat={poste.etat}
+            sante={sante}
+            ecran={ecran}
+            auRepos={auRepos}
             parti={parti || absent}
           />
         </Agrandi>
