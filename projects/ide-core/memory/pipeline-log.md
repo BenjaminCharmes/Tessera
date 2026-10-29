@@ -6343,3 +6343,19 @@ Le diff ajoute :
 - 2026-10-29 20:28:53 UTC — [ticket-533] APPROVED après 1 tour(s)
 - 2026-10-29 20:28:59 UTC — [ticket-533] fichiers non suivis laissés par le run : tickets/todo/ticket-674-an-open-pr-turned-conflicting-is-updated-without-forcing-a-push.md (à ignorer dans .gitignore ?)
 - 2026-10-29 20:33:38 UTC — [ticket-533] documentation: 1 fichier(s) (278406ms) — après tour de correction
+- 2026-10-29 20:33:59 UTC — [ide-core] ticket-533 PR #757 confiée au CIWatcher
+- 2026-10-29 20:34:07 UTC — [ticket-537] branche ticket-537-le-validateur-ignore-une-r-ponse-du-dialogue-qui
+- 2026-10-29 20:34:08 UTC — [ticket-537] tour 1 — codeur démarré
+- 2026-10-29 20:36:07 UTC — [ticket-537] tour 1 — codeur terminé (118453ms)
+- 2026-10-29 20:42:10 UTC — [ide-core] ticket-533 PR #757 mergée (CI verte)
+- 2026-10-29 20:43:34 UTC — [ticket-537] testeur: 1 failed, 2566 passed, 64 warnings in 443.17s (0:07:23)
+- 2026-10-29 20:43:34 UTC — [ticket-537] tests rouges au tour 1
+- 2026-10-29 20:43:34 UTC — [ticket-537] tour 2 — codeur démarré
+- 2026-10-29 20:45:46 UTC — [ticket-537] tour 2 — codeur terminé (132467ms)
+- 2026-10-29 20:54:01 UTC — [ticket-537] testeur: OK (exit 0)
+- 2026-10-29 20:56:50 UTC — [ticket-537] securite: PASS — Vulnérabilité d'injection de prompt identifiée : les réponses de dialogue non éc (169110ms)
+- 2026-10-29 20:56:50 UTC — [ticket-537] tour 2 — reviewer démarré
+- 2026-10-29 20:57:11 UTC — [ticket-537] tour 2 — reviewer terminé (20687ms)
+- 2026-10-29 20:59:08 UTC — [ticket-537] validateur: fichiers cités joints : services/validator.py, agents/prompts/validateur.md
+- 2026-10-29 20:59:08 UTC — [ticket-537] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la gestion de (138358ms)
+- 2026-10-29 20:59:08 UTC — [ticket-537] APPROVED après 2 tour(s)
