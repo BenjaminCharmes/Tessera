@@ -40,7 +40,7 @@ function projet(over: Partial<ProjectOverview>): ProjectOverview {
 }
 
 function Cockpit() {
-  return <EnCoursView appsEnCours={useAppsEnCours()} />;
+  return <EnCoursView vueInitiale="liste" appsEnCours={useAppsEnCours()} />;
 }
 
 const GROUPE = [

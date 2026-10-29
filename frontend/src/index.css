@@ -141,6 +141,29 @@
   --sprite-corbeille-ombre: #3f3f46;
   --sprite-papier: #f4f4f5;
   --sprite-papier-ombre: #a1a1aa;
+  /* La salle des serveurs (ticket-672) : murs gris froid, dalles du faux
+     plancher, métal, extincteur et lecteur de badge. Du mobilier sans teinte
+     d'état : seul le voyant d'une baie en porte une. */
+  --sprite-salle-mur: #2b3035;
+  --sprite-salle-plinthe: #16191c;
+  --sprite-dalle: #2a2e33;
+  --sprite-dalle-joint: #22262a;
+  --sprite-dalle-trou: #16191c;
+  --sprite-metal: #52525b;
+  --sprite-metal-ombre: #3f3f46;
+  --sprite-metal-clair: #71717a;
+  --sprite-extincteur: #dc2626;
+  --sprite-extincteur-ombre: #991b1b;
+  --sprite-badge: #d4d4d8;
+}
+
+/* Faux plancher de la salle des serveurs : des dalles carrées de 12 px séparées
+   d'un joint. Du mobilier au sens de l'ADR-058 : fixe, sans animation. */
+.sol-dalles {
+  background-color: var(--sprite-dalle);
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 11px, var(--sprite-dalle-joint) 11px 12px),
+    repeating-linear-gradient(90deg, transparent 0 11px, var(--sprite-dalle-joint) 11px 12px);
 }
 
 /* Sol en lames des pièces et des salles : des lames horizontales séparées d'un

@@ -28,6 +28,7 @@ function rendre(
   const arreter = vi.fn().mockResolvedValue(undefined);
   render(
     <EnCoursView
+      vueInitiale="liste"
       appsEnCours={{
         apps,
         lueA: Date.parse("2026-10-13T12:00:00Z"),

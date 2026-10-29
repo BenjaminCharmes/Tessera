@@ -20,6 +20,14 @@ export function formaterDuree(demarreA: string | null, now: number): string {
   return `${Math.floor(heures / 24)} j ${heures % 24} h`;
 }
 
+/** L'heure de démarrage, « HH:MM » à l'heure locale, ou « — » quand elle est inconnue. */
+export function formaterHeure(demarreA: string | null): string {
+  if (demarreA === null) return "—";
+  const debut = Date.parse(demarreA);
+  if (Number.isNaN(debut)) return "—";
+  return new Date(debut).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+}
+
 export interface GroupeDeProjet {
   project_id: string;
   project_name: string;
