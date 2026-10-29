@@ -1,8 +1,15 @@
 import type { StreamState } from "../../hooks/streamState";
 import type { OrchestratorEvent } from "../../types/api";
+import { estTourDePlan } from "./plan";
 
 /** Les cinq postes de la pièce, dans l'ordre du pipeline. */
 export type PosteId = "codeur" | "testeur" | "securite" | "reviewer" | "validateur";
+
+/**
+ * Ce qu'on affiche à un poste : son rôle de pipeline, ou l'architecte, qui tient le
+ * poste du codeur sur un ticket `design` mais a sa tenue et son nom.
+ */
+export type RoleAffiche = PosteId | "architect";
 
 /** `occupe` : l'étape tourne ; `fait` : elle a rendu au moins un résultat ; `libre` : rien à dire. */
 export type EtatPoste = "occupe" | "fait" | "libre";
@@ -80,6 +87,11 @@ function rejouer(evenements: readonly OrchestratorEvent[]): Map<PosteId, Releve>
     const t = transitionDe(ev);
     const releve = t ? releves.get(t.poste) : undefined;
     if (!t || !releve) continue;
+    // Le plan rendu n'est pas le travail du codeur fini : l'agent retourne à son poste, il n'a pas « fini ».
+    if (t.transition === "fin" && estTourDePlan(ev)) {
+      releve.occupe = false;
+      continue;
+    }
     if (t.transition === "debut") releve.occupe = true;
     else Object.assign(releve, { occupe: false, fait: true });
   }

@@ -3,6 +3,7 @@ import AgentDebout from "../../design/bureau/AgentDebout";
 import { libelleActivite, quiBavarde } from "../../lib/bureau/activites";
 import type { AgentPlace } from "../../lib/bureau/activites";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import type { PosteId, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import { ECHELLE_LARGE } from "../../lib/bureau/echelleDesSprites";
 import { useEtirementDuSol, useMarcheActive } from "../../hooks/useEtirementDuSol";
@@ -10,6 +11,8 @@ import { useEtirementDuSol, useMarcheActive } from "../../hooks/useEtirementDuSo
 interface AgentsDeLaPieceProps {
   projet: string;
   agents: readonly AgentPlace[];
+  /** Le rôle montré à chaque poste ; à défaut, le rôle du poste (l'architecte tient celui du codeur). */
+  roles?: Partial<Record<PosteId, RoleAffiche>>;
 }
 
 /** Hauteur du pied de l'agent au-dessus du bas du sol : sous les postes, au niveau de leur nom. */
@@ -30,7 +33,14 @@ function Bavardage() {
   );
 }
 
-function AgentMarcheur({ projet, agent, bavarde }: { projet: string; agent: AgentPlace; bavarde: boolean }) {
+interface AgentMarcheurProps {
+  projet: string;
+  agent: AgentPlace;
+  role: RoleAffiche;
+  bavarde: boolean;
+}
+
+function AgentMarcheur({ projet, agent, role, bavarde }: AgentMarcheurProps) {
   const rendSaCopie = agent.activite === "copie";
   const monte = agent.niveau === "fond" ? -DENIVELE_DU_FOND : 0;
   // Les abscisses sont celles du repère de 800 px : étirées comme la grille des postes.
@@ -49,7 +59,7 @@ function AgentMarcheur({ projet, agent, bavarde }: { projet: string; agent: Agen
     ? { "aria-hidden": true, inert: true, tabIndex: -1 }
     : {
         role: "img",
-        "aria-label": `${nomDuPoste(agent.poste)}, ${libelleActivite(agent.activite ?? "tasse")}`,
+        "aria-label": `${nomDuPoste(role)}, ${libelleActivite(agent.activite ?? "tasse")}`,
       };
   return (
     <span
@@ -64,7 +74,7 @@ function AgentMarcheur({ projet, agent, bavarde }: { projet: string; agent: Agen
       <Agrandi>
         <AgentDebout
           projet={projet}
-          role={agent.poste}
+          role={role}
           brasLeves={agent.activite === "fete"}
           sansTasse={agent.activite === "pause"}
           feuille={rendSaCopie}
@@ -79,12 +89,18 @@ function AgentMarcheur({ projet, agent, bavarde }: { projet: string; agent: Agen
  * leur poste pour une activité, et partent tous par la porte quand le run se clôt.
  * La couche ne reçoit aucun clic : les postes dessous restent des boutons.
  */
-export default function AgentsDeLaPiece({ projet, agents }: AgentsDeLaPieceProps) {
+export default function AgentsDeLaPiece({ projet, agents, roles = {} }: AgentsDeLaPieceProps) {
   const bavard = quiBavarde(agents);
   return (
     <div className="pointer-events-none absolute inset-0">
       {agents.map((agent) => (
-        <AgentMarcheur key={agent.poste} projet={projet} agent={agent} bavarde={agent.poste === bavard} />
+        <AgentMarcheur
+          key={agent.poste}
+          projet={projet}
+          agent={agent}
+          role={roles[agent.poste] ?? agent.poste}
+          bavarde={agent.poste === bavard}
+        />
       ))}
     </div>
   );

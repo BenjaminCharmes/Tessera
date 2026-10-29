@@ -1,10 +1,10 @@
-import type { PosteId } from "../../lib/bureau/postesDuRun";
+import type { RoleAffiche } from "../../lib/bureau/postesDuRun";
 import { TENUES, physique } from "../../lib/bureau/physique";
 import Personnage from "./Personnage";
 
 interface AgentDeboutProps {
   projet: string;
-  role: PosteId;
+  role: RoleAffiche;
   /** Les bras levés : il fête la PR mergée. */
   brasLeves?: boolean;
   /** Les bras le long du corps, mains vides : il fait une pause. Sinon, tasse à la main. */

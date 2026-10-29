@@ -20,5 +20,6 @@ describe("libelleDuPoste", () => {
   it("names every post", () => {
     expect(nomDuPoste("securite")).toBe("Sécurité");
     expect(nomDuPoste("codeur")).toBe("Codeur");
+    expect(nomDuPoste("architect")).toBe("Architecte");
   });
 });

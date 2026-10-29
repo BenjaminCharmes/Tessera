@@ -9,7 +9,7 @@ import Vapeur from "../../design/bureau/Vapeur";
 import type { StreamState } from "../../hooks/streamState";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import type { UseServicesResult } from "../../hooks/useServices";
-import { BIBLIOTHEQUE_X, MACHINE_X, PORTE_X } from "../../lib/bureau/activites";
+import { BIBLIOTHEQUE_X, MACHINE_X, PORTE_X, TABLEAU_X } from "../../lib/bureau/activites";
 import { cielDesFenetres } from "../../lib/bureau/ciel";
 import { dayMoment } from "../../lib/bureau/dayMoment";
 import { enPourcentDuSol } from "../../lib/bureau/etirementDuSol";
@@ -26,8 +26,8 @@ import TableauDesCriteres from "./TableauDesCriteres";
  * blanc, deux fenêtres, le ficus, le meuble de l'imprimante et sa pile de dossiers,
  * la machine, la baie, le cactus, la troisième fenêtre, la boîte aux lettres,
  * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
+ * L'abscisse du tableau vient de `activites.ts` : l'agent du plan s'y tient (ticket-623).
  */
-const TABLEAU_X = 30;
 // Fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le tableau et le ficus (ticket-627).
 const FENETRES_X = [134, 274, 616] as const;
 const PLAFONNIERS_X = [250, 432, 590] as const;

@@ -3,7 +3,7 @@ import type { SanteAgent } from "../../lib/santeAgent";
 import type { EtatBoite } from "../../lib/bureau/boiteAuxLettres";
 import type { EtatCase } from "../../lib/bureau/criteres";
 import type { EtatDuService } from "../etatDuService";
-import type { PosteId } from "../../lib/bureau/postesDuRun";
+import type { RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { Cheveux, Peau } from "../../lib/bureau/physique";
 
 /** Ce qu'un poste montre : la santé du run s'il est occupé, sinon « fait » ou « libre ». */
@@ -97,8 +97,9 @@ export const FILL_CHEVEUX: Record<Cheveux, string> = {
   6: "fill-(--sprite-cheveux-6)",
 };
 
-export const FILL_HAUT: Record<PosteId, string> = {
+export const FILL_HAUT: Record<RoleAffiche, string> = {
   codeur: "fill-(--sprite-haut-codeur)",
+  architect: "fill-(--sprite-haut-architect)",
   testeur: "fill-(--sprite-haut-testeur)",
   securite: "fill-(--sprite-haut-securite)",
   reviewer: "fill-(--sprite-haut-reviewer)",
@@ -106,8 +107,9 @@ export const FILL_HAUT: Record<PosteId, string> = {
 };
 
 /** L'ombre du haut : les bras, la jupe, le col de la capuche. */
-export const FILL_OMBRE: Record<PosteId, string> = {
+export const FILL_OMBRE: Record<RoleAffiche, string> = {
   codeur: "fill-(--sprite-haut-codeur-ombre)",
+  architect: "fill-(--sprite-haut-architect-ombre)",
   testeur: "fill-(--sprite-haut-testeur-ombre)",
   securite: "fill-(--sprite-haut-securite-ombre)",
   reviewer: "fill-(--sprite-haut-reviewer-ombre)",

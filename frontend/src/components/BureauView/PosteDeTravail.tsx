@@ -3,13 +3,15 @@ import Bulle from "../../design/bureau/Bulle";
 import BulleDOutil from "../../design/bureau/BulleDOutil";
 import Poste from "../../design/bureau/Poste";
 import { libelleDuPoste, nomDuPoste } from "../../lib/bureau/libelleDuPoste";
-import type { PosteDuRun } from "../../lib/bureau/postesDuRun";
+import type { PosteDuRun, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { SanteAgent } from "../../lib/santeAgent";
 
 interface PosteDeTravailProps {
   /** Le projet de la pièce : il donne à chaque agent son physique. */
   projet: string;
   poste: PosteDuRun;
+  /** Le rôle montré à ce poste : l'architecte tient celui du codeur sur un ticket `design` (ticket-623). */
+  role?: RoleAffiche;
   sante: SanteAgent;
   /** Pièce sans run : pas de personnage, et le poste est « libre » plutôt qu'en attente. */
   auRepos?: boolean;
@@ -32,6 +34,7 @@ interface PosteDeTravailProps {
 export default function PosteDeTravail({
   projet,
   poste,
+  role = poste.poste,
   sante,
   auRepos = false,
   parti = false,
@@ -54,7 +57,7 @@ export default function PosteDeTravail({
       </div>
       <button
         type="button"
-        aria-label={libelleDuPoste(poste.poste, poste.etat, sante, auRepos)}
+        aria-label={libelleDuPoste(role, poste.etat, sante, auRepos)}
         onClick={choisir}
         tabIndex={absent ? -1 : undefined}
         className={`relative rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}
@@ -62,7 +65,7 @@ export default function PosteDeTravail({
         <Agrandi>
           <Poste
             projet={projet}
-          role={poste.poste}
+          role={role}
           etat={poste.etat}
           sante={sante}
           auRepos={auRepos}
@@ -70,7 +73,7 @@ export default function PosteDeTravail({
           />
         </Agrandi>
       </button>
-      <span className="text-micro text-zinc-400">{nomDuPoste(poste.poste)}</span>
+      <span className="text-micro text-zinc-400">{nomDuPoste(role)}</span>
     </div>
   );
 }
