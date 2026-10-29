@@ -1708,3 +1708,44 @@ async def test_le_depart_sur_la_base_ne_commite_pas_la_tenue_de_livres(
     assert await stages.create_branch(orch, _run_de_depart()) is None
 
     git_ws.commit_bookkeeping.assert_not_called()
+
+
+async def test_merge_without_ci_une_pr_non_mergee_fait_sauter_ses_dependants(
+    tmp_path: Path,
+) -> None:
+    """ticket-666: with merge_without_ci, an unmerged PR skips its dependents
+    (ADR-060) instead of letting them start without its code."""
+    from unittest.mock import AsyncMock
+
+    class _CIWatcherNonMerge:
+        async def attendre_merge(self, project_id: str, ticket_id: str, **_: Any) -> bool:
+            return False
+
+    deps = {"ticket-001": [], "ticket-002": ["ticket-001"], "ticket-003": []}
+    par_id = {
+        tid: Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=d,
+        )
+        for tid, d in deps.items()
+    }
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: par_id.get(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=39, arret=None)
+
+    orch = _construire_merge_without_ci(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-003")],
+        _livrer,
+        ci_watcher=_CIWatcherNonMerge(),
+        ticket_service=tickets,
+    )
+    results = await orch.run_queue("proj", list(deps))
+
+    assert [r.ticket_id for r in results] == ["ticket-001", "ticket-003"]
+    log = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
+    assert "ticket-002 sauté : dépend de ticket-001, non mergé" in log
+
