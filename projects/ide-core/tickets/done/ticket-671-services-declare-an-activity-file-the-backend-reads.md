@@ -4,7 +4,7 @@ created: 2026-10-29
 depends_on: []
 estimated_days: 1
 id: ticket-671
-pr_number: null
+pr_number: 756
 priority: low
 status: done
 title: A service declares an activity file, and the backend reads it closed on failure
