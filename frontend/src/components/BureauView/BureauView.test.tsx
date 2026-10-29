@@ -7,7 +7,7 @@ import { apiQuota } from "../../lib/quota";
 import type { UsageStats } from "../../types/api";
 import Piece from "./Piece";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
-import { T0, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
+import { T0, etatEnCodage, etatEnSecurite, nomme } from "./etatsDeTest";
 
 const CANAL = { envoyer: vi.fn(), son: { actif: false, regler: vi.fn() } };
 
@@ -80,7 +80,7 @@ describe("BureauView", () => {
     render(<BureauView projets={projets(1)} {...CANAL} />);
     expect(screen.queryByTestId("bulle")).toBeNull();
     expect(
-      screen.getByRole("button", { name: "Codeur, travaille" }),
+      screen.getByRole("button", { name: nomme("Codeur, travaille", "codeur", "projet-0") }),
     ).toBeInTheDocument();
 
     act(() => {

@@ -1,14 +1,16 @@
 ---
-id: ticket-628
-title: "Each Bureau agent has a stable name, shown on hover and in the chosen-agent panel"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: [ticket-624]
-estimated_days: 1
 created: 2026-10-28
+depends_on:
+- ticket-624
+estimated_days: 1
+id: ticket-628
+pr_number: 740
+priority: medium
+status: done
+title: Each Bureau agent has a stable name, shown on hover and in the chosen-agent
+  panel
+type: feat
 ---
 
 # ticket-628 — Un nom pour chaque agent du Bureau

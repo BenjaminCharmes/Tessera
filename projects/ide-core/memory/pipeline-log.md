@@ -6089,3 +6089,17 @@ Le diff ajoute :
 - 2026-10-29 11:13:28 UTC — [ticket-624] validateur: APPROVED — Tous les critères sont satisfaits. Les tests vérifient que les rédacteurs se tie (298218ms)
 - 2026-10-29 11:13:28 UTC — [ticket-624] APPROVED après 1 tour(s)
 - 2026-10-29 11:15:01 UTC — [ticket-624] documentation: 0 fichier(s) (86437ms)
+- 2026-10-29 11:19:45 UTC — [ide-core] ticket-624 PR #739 mergée (CI verte)
+- 2026-10-29 11:19:50 UTC — [ide-core] ticket-624 : base réalignée sur develop
+- 2026-10-29 11:19:50 UTC — [ide-core] ticket-624 PR #739 confiée au CIWatcher
+- 2026-10-29 11:20:16 UTC — [ticket-628] branche ticket-628-each-bureau-agent-has-a-stable-name-shown-on-hove
+- 2026-10-29 11:20:22 UTC — [ticket-628] tour 1 — codeur démarré
+- 2026-10-29 11:25:31 UTC — [ticket-628] tour 1 — codeur terminé (308766ms)
+- 2026-10-29 11:27:59 UTC — [ticket-628] testeur: OK (exit 0)
+- 2026-10-29 11:30:02 UTC — [ticket-628] securite: PASS — Audit sécurité du diff : ajout de fonctions de noms d'agents (`nomDeLAgent`, `av (123360ms)
+- 2026-10-29 11:30:03 UTC — [ticket-628] tour 1 — reviewer démarré
+- 2026-10-29 11:30:22 UTC — [ticket-628] tour 1 — reviewer terminé (18952ms)
+- 2026-10-29 11:34:23 UTC — [ticket-628] validateur: fichiers cités joints : lib/bureau/noms.ts, PosteDeTravail.tsx, AgentsDeLaPiece.tsx, PanneauAgentChoisi.tsx
+- 2026-10-29 11:34:23 UTC — [ticket-628] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été mis à jour po (261046ms)
+- 2026-10-29 11:34:23 UTC — [ticket-628] APPROVED après 1 tour(s)
+- 2026-10-29 11:39:32 UTC — [ticket-628] documentation: 0 fichier(s) (301671ms) — après tour de correction

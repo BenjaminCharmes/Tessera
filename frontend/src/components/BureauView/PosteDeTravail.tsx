@@ -3,6 +3,7 @@ import Bulle from "../../design/bureau/Bulle";
 import BulleDOutil from "../../design/bureau/BulleDOutil";
 import Poste from "../../design/bureau/Poste";
 import { libelleDuPoste, nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import { avecLeNom } from "../../lib/bureau/noms";
 import type { PosteDuRun, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { SanteAgent } from "../../lib/santeAgent";
 
@@ -43,6 +44,8 @@ export default function PosteDeTravail({
   outil = null,
 }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
+  // Le prénom ouvre le nom accessible et l'infobulle native : c'est une identité, pas un état.
+  const libelle = avecLeNom(projet, role, libelleDuPoste(role, poste.etat, sante, auRepos));
   const choisir = occupe && onChoisir ? () => onChoisir(poste.poste) : undefined;
   // L'agent qui a fini se lève : la pièce le dessine hors du poste (AgentsDeLaPiece).
   return (
@@ -57,7 +60,8 @@ export default function PosteDeTravail({
       </div>
       <button
         type="button"
-        aria-label={libelleDuPoste(role, poste.etat, sante, auRepos)}
+        aria-label={libelle}
+        title={libelle}
         onClick={choisir}
         tabIndex={absent ? -1 : undefined}
         className={`relative rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}

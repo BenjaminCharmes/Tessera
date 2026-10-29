@@ -5,7 +5,7 @@ import type { ProjetDuBureau } from "./index";
 import { api } from "../../lib/api";
 import { apiQuota } from "../../lib/quota";
 import type { RunActif, UsageStats } from "../../types/api";
-import { T0, etatEnCodage } from "./etatsDeTest";
+import { T0, etatEnCodage, nomme } from "./etatsDeTest";
 
 const RUN: RunActif = {
   run_id: "run-1",
@@ -57,7 +57,7 @@ describe("PanneauAgentChoisi", () => {
   it("shows role, project and ticket of the busy agent that was clicked", () => {
     rendre();
 
-    fireEvent.click(screen.getByRole("button", { name: "Codeur, travaille" }));
+    fireEvent.click(screen.getByRole("button", { name: nomme("Codeur, travaille", "codeur") }));
 
     const dans = within(panneau());
     expect(dans.getByText("Codeur")).toBeInTheDocument();
@@ -68,19 +68,19 @@ describe("PanneauAgentChoisi", () => {
 
   it("does not act on a free post and gives it no pointer cursor", () => {
     rendre();
-    const libre = screen.getByRole("button", { name: "Reviewer, attend son tour" });
+    const libre = screen.getByRole("button", { name: nomme("Reviewer, attend son tour", "reviewer") });
 
     fireEvent.click(libre);
 
     expect(libre.className).not.toContain("cursor-pointer");
-    expect(screen.getByRole("button", { name: "Codeur, travaille" }).className).toContain("cursor-pointer");
+    expect(screen.getByRole("button", { name: nomme("Codeur, travaille", "codeur") }).className).toContain("cursor-pointer");
     expect(within(panneau()).getByText("Clique un agent au travail")).toBeInTheDocument();
   });
 
   it("opens the same thread as the room's Fil button", () => {
     const onOuvrir = vi.fn();
     rendre(onOuvrir);
-    fireEvent.click(screen.getByRole("button", { name: "Codeur, travaille" }));
+    fireEvent.click(screen.getByRole("button", { name: nomme("Codeur, travaille", "codeur") }));
 
     fireEvent.click(within(panneau()).getByRole("button", { name: "Suivre le fil" }));
 
@@ -93,14 +93,14 @@ describe("PanneauAgentChoisi", () => {
 
   it("offers no thread without a way to open it", () => {
     rendre();
-    fireEvent.click(screen.getByRole("button", { name: "Codeur, travaille" }));
+    fireEvent.click(screen.getByRole("button", { name: nomme("Codeur, travaille", "codeur") }));
 
     expect(within(panneau()).queryByRole("button")).toBeNull();
   });
 
   it("draws no model line, nor a write button", () => {
     rendre();
-    fireEvent.click(screen.getByRole("button", { name: "Codeur, travaille" }));
+    fireEvent.click(screen.getByRole("button", { name: nomme("Codeur, travaille", "codeur") }));
 
     expect(within(panneau()).queryByText(/mod[eè]le/i)).toBeNull();
     expect(within(panneau()).queryByText(/écrire/i)).toBeNull();

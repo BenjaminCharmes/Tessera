@@ -1,6 +1,13 @@
 import { INITIAL, applyEvent } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { AgentRole, EventType, OrchestratorEvent } from "../../types/api";
+import { avecLeNom } from "../../lib/bureau/noms";
+import type { RoleAffiche } from "../../lib/bureau/postesDuRun";
+
+/** Le libellé d'un poste tel que la pièce le nomme : « Codeur, travaille » devient « <prénom>, codeur, travaille ». */
+export function nomme(libelle: string, role: RoleAffiche, projet = "ide-core"): string {
+  return avecLeNom(projet, role, libelle);
+}
 
 /** Instant du dernier événement de tous les états de test. */
 export const DERNIER = "2026-10-23T10:00:00.000Z";

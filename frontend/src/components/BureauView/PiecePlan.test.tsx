@@ -5,7 +5,7 @@ import type { StreamState } from "../../hooks/streamState";
 import { api } from "../../lib/api";
 import type { AgentRole, EventType, OrchestratorEvent } from "../../types/api";
 import Piece from "./Piece";
-import { DERNIER, T0 } from "./etatsDeTest";
+import { DERNIER, T0, nomme } from "./etatsDeTest";
 
 beforeEach(() => {
   vi.stubGlobal("innerWidth", 1920);
@@ -34,8 +34,8 @@ describe("Piece plan and architect", () => {
 
     render(<Piece projet="ide-core" etat={etat} maintenant={T0} />);
 
-    expect(screen.getByRole("button", { name: "Architecte, travaille" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /^Codeur/ })).toBeNull();
+    expect(screen.getByRole("button", { name: nomme("Architecte, travaille", "architect") })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /, codeur, / })).toBeNull();
   });
 
   it("stands the agent at the whiteboard during the plan, then back at the post", () => {
@@ -44,12 +44,12 @@ describe("Piece plan and architect", () => {
 
     const agent = container.querySelector('[data-agent="codeur"]');
     expect(agent?.getAttribute("data-activite")).toBe("plan");
-    expect(screen.getByRole("img", { name: "Codeur, prépare le plan" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: nomme("Codeur, prépare le plan", "codeur") })).toBeInTheDocument();
 
     const apres = rejouer([ev("agent_started", "codeur", PLAN), ev("agent_done", "codeur", PLAN)]);
     rerender(<Piece projet="ide-core" etat={apres} maintenant={T0} />);
 
     expect(container.querySelector('[data-agent="codeur"]')).toBeNull();
-    expect(screen.getByRole("button", { name: "Codeur, attend son tour" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: nomme("Codeur, attend son tour", "codeur") })).toBeInTheDocument();
   });
 });

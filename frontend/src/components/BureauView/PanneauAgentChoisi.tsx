@@ -1,7 +1,9 @@
 import Button from "../../design/ui/Button";
 import type { StreamState } from "../../hooks/streamState";
 import { lignesDeLAgent } from "../../lib/bureau/agentChoisi";
+import { nomDeLAgent } from "../../lib/bureau/noms";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
+import { roleDuPoste } from "../../lib/bureau/roleDuPoste";
 import type { RunActif } from "../../types/api";
 
 export interface AgentChoisi {
@@ -27,13 +29,15 @@ interface PanneauAgentChoisiProps {
  */
 export default function PanneauAgentChoisi({ choix, etat, run, maintenant, onOuvrir }: PanneauAgentChoisiProps) {
   const lignes = choix && etat ? lignesDeLAgent(choix.projet, choix.poste, etat, maintenant, run) : null;
+  // Le prénom titre le panneau dès qu'un agent est choisi ; le rôle montré suit celui du poste (architecte ou codeur).
+  const titre = choix && etat && lignes ? nomDeLAgent(choix.projet, roleDuPoste(etat, choix.poste)) : "Agent choisi";
 
   return (
     <aside
       aria-label="Agent choisi"
       className="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900 p-3"
     >
-      <h3 className="text-corps font-semibold text-zinc-200">Agent choisi</h3>
+      <h3 className="text-corps font-semibold text-zinc-200">{titre}</h3>
       {lignes === null ? (
         <p className="text-micro text-zinc-500">Clique un agent au travail</p>
       ) : (

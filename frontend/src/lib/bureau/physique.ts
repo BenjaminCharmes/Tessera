@@ -50,7 +50,7 @@ const COIFFURES: readonly [Coiffure, ...Coiffure[]] = [
 ];
 
 /** Hachage de la maquette : petit, stable, sans dépendance. */
-function graine(texte: string): number {
+export function graine(texte: string): number {
   let h = 7;
   for (let i = 0; i < texte.length; i += 1) h = (h * 31 + texte.charCodeAt(i)) % 100003;
   return h;

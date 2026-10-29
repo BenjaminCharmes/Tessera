@@ -3,6 +3,7 @@ import AgentDebout from "../../design/bureau/AgentDebout";
 import { libelleActivite, quiBavarde } from "../../lib/bureau/activites";
 import type { AgentPlace, Placement } from "../../lib/bureau/activites";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import { avecLeNom } from "../../lib/bureau/noms";
 import type { PosteId, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { RedacteurPlace } from "../../lib/bureau/redaction";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
@@ -64,7 +65,7 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
     ? { "aria-hidden": true, inert: true, tabIndex: -1 }
     : {
         role: "img",
-        "aria-label": `${nomDuPoste(role)}, ${libelleActivite(agent.activite ?? "tasse")}`,
+        "aria-label": avecLeNom(projet, role, `${nomDuPoste(role)}, ${libelleActivite(agent.activite ?? "tasse")}`),
       };
   return (
     <span
