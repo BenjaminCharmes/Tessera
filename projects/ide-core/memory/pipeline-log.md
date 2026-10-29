@@ -6177,3 +6177,4 @@ Le diff ajoute :
 - 2026-10-29 13:26:43 UTC — [ticket-658] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
 - 2026-10-29 13:27:12 UTC — [ticket-658] validateur: APPROVED — Les deux critères sont satisfaits. Le test `test_every_requested_id_lands_in_exa (59562ms)
 - 2026-10-29 13:27:12 UTC — [ticket-658] APPROVED après 2 tour(s)
+- 2026-10-29 13:29:55 UTC — [ticket-658] documentation: 0 fichier(s) (156703ms)
