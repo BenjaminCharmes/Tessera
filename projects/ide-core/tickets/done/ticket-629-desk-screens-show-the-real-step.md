@@ -5,7 +5,7 @@ depends_on:
 - ticket-628
 estimated_days: 2
 id: ticket-629
-pr_number: null
+pr_number: 741
 priority: medium
 status: done
 title: 'Each desk screen shows what its step is really doing: code, reading, tests,
