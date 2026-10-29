@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-654
 plan: true
-pr_number: null
+pr_number: 764
 priority: high
 status: done
 title: 'Audit: security review of the backend, the agent guards and the frontend'
