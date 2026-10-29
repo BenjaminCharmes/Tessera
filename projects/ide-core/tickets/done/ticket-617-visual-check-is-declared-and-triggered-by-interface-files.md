@@ -4,6 +4,7 @@ created: 2026-10-27
 depends_on:
 - ticket-616
 id: ticket-617
+pr_number: 730
 priority: medium
 status: done
 title: A project declares its visual check and the interface files that trigger it
