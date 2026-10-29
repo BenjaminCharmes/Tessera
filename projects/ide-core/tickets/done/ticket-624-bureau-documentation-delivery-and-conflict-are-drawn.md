@@ -6,7 +6,7 @@ depends_on:
 - ticket-627
 estimated_days: 2
 id: ticket-624
-pr_number: null
+pr_number: 739
 priority: medium
 status: done
 title: In the Bureau, documentation, delivery and conflict resolution are drawn
