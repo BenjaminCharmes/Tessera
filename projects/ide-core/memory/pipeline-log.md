@@ -6178,3 +6178,26 @@ Le diff ajoute :
 - 2026-10-29 13:27:12 UTC — [ticket-658] validateur: APPROVED — Les deux critères sont satisfaits. Le test `test_every_requested_id_lands_in_exa (59562ms)
 - 2026-10-29 13:27:12 UTC — [ticket-658] APPROVED après 2 tour(s)
 - 2026-10-29 13:29:55 UTC — [ticket-658] documentation: 0 fichier(s) (156703ms)
+- 2026-10-29 13:37:26 UTC — [ide-core] ticket-658 PR #745 confiée au CIWatcher
+- 2026-10-29 13:37:31 UTC — [ticket-659] branche ticket-659-ticket-and-adr-numbers-are-allocated-by-code-and
+- 2026-10-29 13:38:36 UTC — [ticket-659] plan rendu (63266ms)
+- 2026-10-29 13:38:36 UTC — [ticket-659] tour 1 — codeur démarré
+- 2026-10-29 13:42:25 UTC — [ide-core] ticket-658 PR #745 mergée (CI verte)
+- 2026-10-29 13:50:41 UTC — [ticket-659] tour 1 — codeur terminé (725389ms)
+- 2026-10-29 13:57:07 UTC — [ticket-659] testeur: 1 failed, 1925 passed, 64 warnings in 381.64s (0:06:21)
+- 2026-10-29 13:57:07 UTC — [ticket-659] tests rouges au tour 1
+- 2026-10-29 13:57:07 UTC — [ticket-659] tour 2 — codeur démarré
+- 2026-10-29 14:01:29 UTC — [ticket-659] tour 2 — codeur terminé (262156ms)
+- 2026-10-29 14:10:40 UTC — [ticket-659] testeur: 1 failed, 3421 passed, 64 warnings in 546.95s (0:09:06)
+- 2026-10-29 14:10:40 UTC — [ticket-659] tests rouges au tour 2
+- 2026-10-29 14:10:40 UTC — [ticket-659] tour 3 — codeur démarré
+- 2026-10-29 14:12:44 UTC — [ticket-659] tour 3 — codeur terminé (124452ms)
+- 2026-10-29 14:20:45 UTC — [ticket-659] testeur: OK (exit 0)
+- 2026-10-29 14:24:13 UTC — [ticket-659] securite: PASS — Pas de vulnérabilités CRITICAL ou HIGH introduites par ce ticket. Une vulnérabil (207875ms)
+- 2026-10-29 14:24:13 UTC — [ticket-659] tour 3 — reviewer démarré
+- 2026-10-29 14:24:51 UTC — [ticket-659] tour 3 — reviewer terminé (37843ms)
+- 2026-10-29 14:29:14 UTC — [ticket-659] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 14:29:47 UTC — [ticket-659] validateur: fichiers cités joints : scripts/prochain_numero.py, memory/decisions.md (tronqué) ; absents : origin/develop ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-29 14:29:47 UTC — [ticket-659] validateur: APPROVED — Les quatre critères sont satisfaits. Les tests couvrent : (1) un numéro ne figur (334094ms)
+- 2026-10-29 14:29:47 UTC — [ticket-659] CHANGES_REQUESTED tour 3: Reviewer : 1. `_adr_en_collision` prend pour une ADR ajoutée toute ligne de titre `## ADR-N` qui figure dans les lignes ajoutées du diff, puis compare son texte à celui de la base. Quand un run modifi
+- 2026-10-29 14:29:47 UTC — [ticket-659] BLOCKED après 3 tour(s) sans approbation
