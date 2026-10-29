@@ -78,6 +78,23 @@ describe("the wall scale", () => {
     expect(ordre).toEqual(["fenetre", "plafonnier", "fenetre", "horloge", "cadre", "interrupteur"]);
   });
 
+  it("hangs what the room provides in place of the painting, so the wall does not overflow", () => {
+    const { container } = render(
+      <Salle
+        titre="Bureau de test"
+        entete="Une salle pour le test"
+        vide="Personne"
+        mobilier={<svg data-sprite="mobilier-de-test" />}
+        maintenant={T0}
+        accroche={<svg data-sprite="cadre-employe" />}
+      />,
+    );
+    const mur = container.querySelector('[data-mur="salle"]');
+
+    const ordre = Array.from(mur?.querySelectorAll("[data-sprite]") ?? []).map((s) => s.getAttribute("data-sprite"));
+    expect(ordre).toEqual(["fenetre", "plafonnier", "fenetre", "cadre-employe", "horloge", "interrupteur"]);
+  });
+
   it("toggles the lights from the switch of either wall", () => {
     const piece = rendrePiece();
     const lampe = () => piece.querySelector('[data-sprite="plafonnier"]');
