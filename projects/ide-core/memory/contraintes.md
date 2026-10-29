@@ -34,7 +34,7 @@ section. (ADR-055)
   sous-commande absente de la liste blanche est refusée, options globales
   lues avant elle ; `-c` n'accepte que des clés cosmétiques. Remplace la
   liste noire de sous-commandes quand ticket C-03 de l'audit est livré.
-  (ADR-066, ADR-027)
+  (ADR-067, ADR-027)
 
 ## Git et périmètre d'écriture
 

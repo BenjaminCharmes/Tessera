@@ -596,15 +596,27 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 ## ADR-065 — La livraison d'un ticket attend le merge des PR déjà confiées au watcher
 
 **Date** : 2026-10-29
-**Décision** : complète ADR-051. Avant son rebase, la phase 1 attend que les autres tickets du projet tenus par `CIWatcher` aient fini, mergés ou bloqués. Attente bornée (1 500 s, journalisée) ; passé le délai, la livraison part comme avant. Aucun push forcé : la tête poussée reste celle que le reviewer a lue.
-**Raison** : le 22/10, une PR de file est devenue conflictuelle sur la documentation quand sa voisine a été mergée après coup. Rebaser après ce merge supprime la cause (ADR-022, ADR-039).
+**Décision** : complète ADR-051. Avant son rebase, la phase 1 attend que les autres tickets du projet tenus par `CIWatcher` aient fini, mergés ou bloqués. Attente bornée (1 500 s) ; passé le délai, la livraison part comme avant. Aucun push forcé : la tête poussée reste celle que le reviewer a lue.
+**Raison** : une PR de file est devenue conflictuelle sur la documentation quand sa voisine a été mergée après coup. Rebaser après ce merge supprime la cause (ADR-022, ADR-039).
 **Mesure** : non faite ; coût : un ticket prêt attend la CI du précédent.
 **Alternative rejetée** : push forcé depuis le watcher (`pushed_sha` périmé) ; `merge=union` côté dépôt (GitHub l'ignore) ; partir de la branche du précédent (défait ADR-056).
 **Limite** : une PR rendue conflictuelle hors file reste arrêtée sur « à rebaser » (ticket-674).
 
 ---
 
-## ADR-066 — Le garde git et gh n'admet que des lectures nommées
+## ADR-066 — Écarter les sous-tâches d'un run
+
+**Date** : 2026-10-30
+**Portée** : architect
+**Décision** : un run garde un diff, un commit et une revue par tour (ADR-018) : ni sous-tâches tirées du plan, ni écrites dans le ticket. Un ticket trop gros se découpe en tickets. Le ticket-702 journalise l'épuisement des actions. Rouvrir si, sur 30 runs, 10 % des appels du codeur l'épuisent, ou si son tour 1 dépasse 12 min au p90 (8 min aujourd'hui).
+**Raison** : le codeur pèse 19 % de la durée d'un ticket ; tests et audit se paient par diff. Des sous-tâches relues ajoutent 3 à 4 min et 47 à 66 % de coût.
+**Mesure** : 358 approbations ; 118 tours à tests rouges, 105 refus dont 46 du validateur, qu'une sous-tâche ne voit pas.
+**Alternative rejetée** : sous-tâches tirées du plan — son échec est toléré, le run changerait de forme sans le dire.
+**Détail** : `docs/superpowers/specs/2026-10-30-sous-taches-dans-un-run-design.md`
+
+---
+
+## ADR-067 — Le garde git et gh n'admet que des lectures nommées
 
 **Date** : 2026-10-30
 **Décision** : amende ADR-027. Le hook refuse toute sous-commande `git` ou `gh` absente d'une liste blanche de lectures (`status`, `diff`, `log`, `show`, `gh auth status`…). Les options globales (`-c`, `--repo`, `-R`) se lisent avant la sous-commande ; `-c` n'accepte que des clés cosmétiques ; `--output` est refusé. Une assignation ou un mot-clé de shell en tête de segment se saute ; `cmd` et `powershell` sont des shells.

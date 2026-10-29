@@ -311,7 +311,7 @@ indépendant des autres ; à faire avant C-03, qui réécrit le même fichier.
 ### HIGH
 
 **C-03 — Le garde git/gh devient une liste blanche de lectures** (S-03, S-04, S-05, S-12) — `refactor`.
-Voir ADR-066. `git_guard.py`.
+Voir ADR-067. `git_guard.py`.
 - `test_unlisted_git_subcommand_is_refused`: `bisect`, `credential`, `commit-tree`, `symbolic-ref`, `update-index`, `gc`, `notes`, `init`.
 - `test_git_config_override_is_refused_unless_cosmetic`: `-c core.fsmonitor=…` refusé, `-c color.ui=false` passe (test existant conservé).
 - `test_git_output_option_is_refused`: `--output=<chemin>`.

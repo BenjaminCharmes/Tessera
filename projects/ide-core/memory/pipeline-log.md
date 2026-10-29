@@ -6460,3 +6460,19 @@ Le diff ajoute :
 - 2026-10-29 23:09:05 UTC — [ticket-654] validateur: APPROVED — L'audit de sécurité est complet : 22 constats classifiés avec gravité, fichiers/ (340172ms)
 - 2026-10-29 23:09:05 UTC — [ticket-654] APPROVED après 1 tour(s)
 - 2026-10-29 23:10:18 UTC — [ticket-654] documentation: 0 fichier(s) (66717ms)
+- 2026-10-29 23:10:41 UTC — [ide-core] ticket-654 PR #764 confiée au CIWatcher
+- 2026-10-29 23:10:44 UTC — [ticket-668] branche ticket-668-design-split-a-run-into-sub-tasks-implemented-rev
+- 2026-10-29 23:11:36 UTC — [ticket-668] plan rendu (50328ms)
+- 2026-10-29 23:11:36 UTC — [ticket-668] tour 1 — codeur démarré
+- 2026-10-29 23:14:59 UTC — [ticket-654] livraison: arrêt — PR #764 non mergée : CI failing : la PR #764 reste ouverte.
+- 2026-10-29 23:17:05 UTC — [ticket-668] tour 1 — architect terminé (328953ms)
+- 2026-10-29 23:17:08 UTC — [ticket-668] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 23:17:45 UTC — [ticket-668] securite: PASS — Le diff ajoute une spécification de conception (Markdown) et une ADR-066 documen (36531ms)
+- 2026-10-29 23:17:45 UTC — [ticket-668] tour 1 — reviewer démarré
+- 2026-10-29 23:17:45 UTC — [ticket-668] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 23:18:10 UTC — [ticket-668] tour 1 — reviewer terminé (25125ms)
+- 2026-10-29 23:18:34 UTC — [ticket-668] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-29 23:18:34 UTC — [ticket-668] validateur: APPROVED — Les trois critères sont satisfaits. L'ADR-066 capture la décision d'écarter les  (49312ms)
+- 2026-10-29 23:18:34 UTC — [ticket-668] APPROVED après 1 tour(s)
+- 2026-10-29 23:18:41 UTC — [ticket-668] fichiers non suivis laissés par le run : tickets/todo/ticket-702-the-codeur-exhausted-turns-are-recorded.md (à ignorer dans .gitignore ?)
+- 2026-10-29 23:21:09 UTC — [ticket-668] documentation: 0 fichier(s) (148375ms)
