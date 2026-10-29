@@ -19,6 +19,8 @@ from tessera.services.journal_pipeline import ajouter_ligne
 from tessera.services.numerotation import (
     FICHIERS_ADR,
     Genre,
+    nombre_de_titres_au_merge_base,
+    nombre_de_titres_dans_l_arbre,
     noms_de_tickets_sur_la_base,
     numeros_de_noms,
     numeros_pris,
@@ -77,13 +79,23 @@ def _tickets_en_collision(depot: Path, base: str, releve: Releve) -> set[int]:
 
 
 def _adr_en_collision(depot: Path, base: str, releve: Releve) -> set[int]:
-    """Numbers of added ADR headings that name another decision on the base."""
+    """Numbers of ADR headings the run adds that name another decision on the base.
+
+    Une ADR est ajoutée par le run quand elle compte plus de titres sur la
+    branche qu'au merge-base : réécrire un titre ou passer une ADR à l'archive
+    laisse le compte inchangé, ce n'est pas un ajout.
+    """
+    avant = nombre_de_titres_au_merge_base(depot, base)
+    apres = nombre_de_titres_dans_l_arbre(depot)
+    ajoutees_par_le_run = {n for n, total in apres.items() if total > avant[n]}
+    if not ajoutees_par_le_run:
+        return set()
     titres_base = titres_d_adr_sur_la_base(depot, base)
     collisions: set[int] = set()
     for fichier in FICHIERS_ADR:
-        ajoutees = lire_lignes(depot, fichier, releve.lignes.get(fichier, set()))
-        for numero, titre in titres_d_adr("\n".join(ajoutees)).items():
-            if numero in titres_base and titres_base[numero] != titre:
+        lignes = lire_lignes(depot, fichier, releve.lignes.get(fichier, set()))
+        for numero, titre in titres_d_adr("\n".join(lignes)).items():
+            if numero in ajoutees_par_le_run and titres_base.get(numero, titre) != titre:
                 collisions.add(numero)
     return collisions
 

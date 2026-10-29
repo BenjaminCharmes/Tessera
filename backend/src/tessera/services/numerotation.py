@@ -11,6 +11,7 @@ appel synchrone ; l'appelant asynchrone passe par `asyncio.to_thread`.
 """
 import re
 import subprocess
+from collections import Counter
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Literal
@@ -91,6 +92,49 @@ def titres_d_adr_sur_la_base(depot: Path, base: str) -> dict[int, str]:
         except GitIllisible:
             continue  # un dépôt sans archive n'a pas de numéro à y lire
     return titres
+
+
+def nombre_de_titres_d_adr(texte: str) -> Counter[int]:
+    """How many headings carry each ADR number in `texte`."""
+    return Counter(int(m.group(1)) for m in _TITRE_ADR.finditer(texte))
+
+
+def _compter_titres(lire: Callable[[str], str | None]) -> Counter[int]:
+    total: Counter[int] = Counter()
+    for fichier in FICHIERS_ADR:
+        texte = lire(fichier)
+        if texte is not None:
+            total += nombre_de_titres_d_adr(texte)
+    return total
+
+
+def nombre_de_titres_dans_l_arbre(depot: Path) -> Counter[int]:
+    """ADR headings per number in the working tree, decisions and archive together."""
+    def lire(fichier: str) -> str | None:
+        chemin = depot / fichier
+        if not chemin.is_file():
+            return None
+        return chemin.read_text(encoding="utf-8", errors="replace")
+
+    return _compter_titres(lire)
+
+
+def nombre_de_titres_au_merge_base(depot: Path, base: str) -> Counter[int]:
+    """ADR headings per number where the run left `origin/<base>`.
+
+    Le point de départ du run, pas la tête de la base : un titre qui n'y était
+    pas et que le run porte est ajouté par le run, même si la base l'a aussi
+    reçu depuis. Lève GitIllisible si le merge-base est introuvable.
+    """
+    sha = lire_git(depot, "merge-base", ref_de_base(base), "HEAD").strip()
+
+    def lire(fichier: str) -> str | None:
+        try:
+            return lire_git(depot, "show", f"{sha}:./{fichier}")
+        except GitIllisible:
+            return None  # un dépôt sans archive n'a pas de numéro à y lire
+
+    return _compter_titres(lire)
 
 
 def _pris_sur_la_base(depot: Path, genre: Genre, base: str) -> set[int]:

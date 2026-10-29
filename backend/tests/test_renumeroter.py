@@ -139,6 +139,46 @@ def test_adr_moved_to_the_archive_unchanged_is_not_renumbered(tmp_path: Path) ->
     assert renumeroter(clone, "develop").renumerotations == ()
 
 
+def test_adr_whose_title_is_rewritten_is_not_renumbered(tmp_path: Path) -> None:
+    clone = _branche_de_run(tmp_path)
+    ecrire(clone, "memory/decisions.md", "# Décisions\n\n## ADR-001 — Un\n\n## ADR-061 — Base précisée\n")
+    _commiter(clone)
+
+    resultat = renumeroter(clone, "develop")
+
+    assert resultat.renumerotations == ()
+    assert not (clone / _JOURNAL).exists()
+    assert "## ADR-061 — Base précisée" in (clone / "memory/decisions.md").read_text(encoding="utf-8")
+
+
+def test_adr_duplicating_a_number_the_run_started_from_is_renumbered(tmp_path: Path) -> None:
+    clone = _branche_de_run(tmp_path)
+    _ajouter(clone, "memory/decisions.md", "\n## ADR-061 — Un doublon\n")
+    _commiter(clone)
+
+    resultat = renumeroter(clone, "develop")
+
+    assert [str(r) for r in resultat.renumerotations] == ["ADR-061 → ADR-062"]
+
+
+def test_adr_added_before_develop_took_the_same_number_is_renumbered(tmp_path: Path) -> None:
+    clone = _branche_de_run(tmp_path)
+    _ajouter(clone, "memory/decisions.md", "\n## ADR-062 — Celle du run\n")
+    _commiter(clone)
+    autre = tmp_path / "autre-develop"
+    git(tmp_path, "clone", "-q", (tmp_path / "origin.git").as_uri(), str(autre))
+    _ajouter(autre, "memory/decisions.md", "\n## ADR-062 — Celle de develop\n")
+    _commiter(autre)
+    git(autre, "push", "-q", "origin", "develop")
+    git(clone, "fetch", "-q", "origin")
+
+    resultat = renumeroter(clone, "develop")
+
+    assert [str(r) for r in resultat.renumerotations] == ["ADR-062 → ADR-063"]
+    decisions = (clone / "memory/decisions.md").read_text(encoding="utf-8")
+    assert "## ADR-063 — Celle du run" in decisions
+
+
 def test_unreadable_base_raises_instead_of_guessing(tmp_path: Path) -> None:
     clone = _branche_de_run(tmp_path)
     _ajouter_deux_fiches(clone)
