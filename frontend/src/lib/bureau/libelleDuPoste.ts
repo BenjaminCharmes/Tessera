@@ -9,6 +9,9 @@ const NOMS: Record<RoleAffiche, string> = {
   securite: "Sécurité",
   reviewer: "Reviewer",
   validateur: "Validateur",
+  resolveur: "Résolveur",
+  "doc-technique": "Rédacteur technique",
+  "doc-fonctionnelle": "Rédacteur fonctionnel",
 };
 
 /** Le nom du poste, tel qu'on le lit sous le bureau et dans son `aria-label`. */

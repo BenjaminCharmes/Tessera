@@ -104,6 +104,9 @@ export const FILL_HAUT: Record<RoleAffiche, string> = {
   securite: "fill-(--sprite-haut-securite)",
   reviewer: "fill-(--sprite-haut-reviewer)",
   validateur: "fill-(--sprite-haut-validateur)",
+  resolveur: "fill-(--sprite-haut-resolveur)",
+  "doc-technique": "fill-(--sprite-haut-doc-technique)",
+  "doc-fonctionnelle": "fill-(--sprite-haut-doc-fonctionnelle)",
 };
 
 /** L'ombre du haut : les bras, la jupe, le col de la capuche. */
@@ -114,4 +117,7 @@ export const FILL_OMBRE: Record<RoleAffiche, string> = {
   securite: "fill-(--sprite-haut-securite-ombre)",
   reviewer: "fill-(--sprite-haut-reviewer-ombre)",
   validateur: "fill-(--sprite-haut-validateur-ombre)",
+  resolveur: "fill-(--sprite-haut-resolveur-ombre)",
+  "doc-technique": "fill-(--sprite-haut-doc-technique-ombre)",
+  "doc-fonctionnelle": "fill-(--sprite-haut-doc-fonctionnelle-ombre)",
 };

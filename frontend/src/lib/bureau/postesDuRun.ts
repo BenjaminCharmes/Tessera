@@ -9,7 +9,13 @@ export type PosteId = "codeur" | "testeur" | "securite" | "reviewer" | "validate
  * Ce qu'on affiche à un poste : son rôle de pipeline, ou l'architecte, qui tient le
  * poste du codeur sur un ticket `design` mais a sa tenue et son nom.
  */
-export type RoleAffiche = PosteId | "architect";
+export type RoleAffiche = PosteId | "architect" | RoleSansPoste;
+
+/**
+ * Les rôles qui n'ont pas de poste : le résolveur de conflit (ADR-033) et les deux
+ * rédacteurs de la documentation (ADR-035). Ils n'ont qu'une tenue et un nom.
+ */
+export type RoleSansPoste = "resolveur" | "doc-technique" | "doc-fonctionnelle";
 
 /** `occupe` : l'étape tourne ; `fait` : elle a rendu au moins un résultat ; `libre` : rien à dire. */
 export type EtatPoste = "occupe" | "fait" | "libre";

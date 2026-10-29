@@ -98,6 +98,21 @@ describe("SalleReunion", () => {
     expect(within(salle).getByText(/2 fichiers/)).toBeInTheDocument();
   });
 
+  it("draws the resolver at the table during the resolution, and not once the PR waits to be read", () => {
+    const conflit = { projet: "alpha", reunion: { temps: "conflit" as const, fichiers: ["a.py"] } };
+    const { container, rerender } = render(<SalleReunion maintenant={T0} occupants={[conflit]} />);
+
+    const resolveur = container.querySelector('[data-agent="resolveur"]');
+    expect(resolveur).not.toBeNull();
+    expect(resolveur?.querySelector('[data-sprite="agent-debout"]')).not.toBeNull();
+
+    rerender(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "relecture", pr: 9 } }]} />);
+    expect(container.querySelector('[data-agent="resolveur"]')).toBeNull();
+
+    rerender(<SalleReunion maintenant={T0} occupants={[]} />);
+    expect(container.querySelector('[data-agent="resolveur"]')).toBeNull();
+  });
+
   it("says 'fichiers inconnus' when the conflict names none", () => {
     render(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: [] } }]} />);
 

@@ -64,6 +64,20 @@ describe("TENUES", () => {
     expect(jeton(`haut-${TENUES.architect.haut}-ombre`)).toBeDefined();
   });
 
+  it("dresses the resolver and the two writers with their own tokens, none shared with a pipeline role", () => {
+    const hautsDuPipeline = POSTES.map((role) => jeton(`haut-${TENUES[role].haut}`));
+
+    for (const role of ["resolveur", "doc-technique", "doc-fonctionnelle"] as const) {
+      const haut = jeton(`haut-${TENUES[role].haut}`);
+      expect(haut, role).toBeDefined();
+      expect(hautsDuPipeline, role).not.toContain(haut);
+      expect(jeton(`haut-${TENUES[role].haut}-ombre`), role).toBeDefined();
+      expect(jeton(`haut-${TENUES[role].haut}-ombre`), role).not.toBe(haut);
+    }
+    const hauts = (["resolveur", "doc-technique", "doc-fonctionnelle"] as const).map((r) => TENUES[r].haut);
+    expect(new Set(hauts).size).toBe(3);
+  });
+
   it("puts the tie on the reviewer and the hood on the coder only", () => {
     expect(POSTES.filter((r) => TENUES[r].cravate)).toEqual(["reviewer"]);
     expect(POSTES.filter((r) => TENUES[r].capuche)).toEqual(["codeur"]);

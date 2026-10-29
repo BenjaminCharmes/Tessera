@@ -7,6 +7,7 @@ import { useActivites } from "../../hooks/useActivites";
 import { useSonsDeLaPiece } from "../../hooks/useSonsDeLaPiece";
 import { signauxSonores } from "../../lib/bureau/sons";
 import {
+  POSTE_DE_LA_LIVRAISON,
   machineEnService,
   placerLesAgents,
   postesFaits,
@@ -30,6 +31,8 @@ import StatusPill from "../../design/ui/StatusPill";
 import { libelleDeSuite } from "../../lib/bureau/etapeDeSuite";
 import { posteEnPlan } from "../../lib/bureau/plan";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
+import { placerLesRedacteurs } from "../../lib/bureau/redaction";
+import { documentationEnCours, livraisonEnCours } from "../../lib/bureau/suite";
 import { rolesDesPostes } from "../../lib/bureau/roleDuPoste";
 import { postesAbsents } from "../../lib/bureau/sallesCommunes";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
@@ -130,6 +133,9 @@ export default function Piece({
   });
   // Le tour de plan : l'agent du poste se tient au tableau blanc, sa chaise est vide (ticket-623).
   const plan = posteEnPlan(etat);
+  // La livraison dépose la PR à la boîte aux lettres ; la documentation, deux rédacteurs à la bibliothèque (ticket-624).
+  const livraison = livraisonEnCours(etat) && !auRepos;
+  const redacteurs = placerLesRedacteurs(documentationEnCours(etat) && !auRepos);
   const roles = rolesDesPostes(etat);
   const agents = placerLesAgents(
     faits,
@@ -138,6 +144,7 @@ export default function Piece({
     fete,
     copie?.poste ?? null,
     plan,
+    livraison,
   ).map((a) =>
     absents.includes(a.poste) ? { ...a, activite: null, parti: true } : a,
   );
@@ -225,13 +232,17 @@ export default function Piece({
                 sante={sante}
                 auRepos={auRepos}
                 parti={clos || fete}
-                absent={absents.includes(p.poste) || plan === p.poste}
+                absent={
+                  absents.includes(p.poste) ||
+                  plan === p.poste ||
+                  (livraison && p.poste === POSTE_DE_LA_LIVRAISON)
+                }
                 onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
                 outil={outil?.poste === p.poste ? outil.phrase : null}
               />
             ))}
           </div>
-          <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} />
+          <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} redacteurs={redacteurs} />
           {fete && <Confettis />}
           {gyrophare && (
             <span className="absolute left-1/2 top-1 z-20 -translate-x-1/2">
