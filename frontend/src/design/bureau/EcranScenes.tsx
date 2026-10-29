@@ -5,7 +5,7 @@ import type { TonDePoste } from "./tons";
 
 /*
  * Les scènes de l'écran, sur une grille de 6 × 4 pixels (la zone allumée de
- * l'écran fait 3 × 2 unités du poste). Elles ne portent que des teintes d'état
+ * l'écran fait 6 × 4 unités du poste, une par pixel). Elles ne portent que des teintes d'état
  * (ADR-026), écrites en toutes lettres. Une animation n'est posée que si `anime`
  * est vrai : la scène immobile dit « rien ne bouge », elle ne ment pas (ADR-058).
  */

@@ -213,7 +213,7 @@ describe("Piece characters", () => {
     expect(debout).not.toBeNull();
     expect(bouton.contains(debout)).toBe(false);
     expect(debout?.closest("svg")?.getAttribute("viewBox")).toBe("0 0 12 20");
-    expect(bouton.querySelector('[data-sprite="poste"]')?.getAttribute("viewBox")).toBe("0 0 16 18");
+    expect(bouton.querySelector('[data-sprite="poste"]')?.getAttribute("viewBox")).toBe("0 0 20 18");
   });
 
   it("gives the same role a different look in two projects", () => {

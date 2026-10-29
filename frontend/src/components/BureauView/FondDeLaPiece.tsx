@@ -41,8 +41,9 @@ const INTERRUPTEUR_X = 727;
 // Au-dessus de la machine, où le mur est libre ; le cadre, à droite de la dernière fenêtre (ticket-635).
 const HORLOGE_X = 488;
 const CADRE_X = 684;
-// Sous la deuxième fenêtre, entre la bibliothèque et le ficus.
-const ETAGERE_X = 290;
+// À hauteur des fenêtres, sur le mur libre entre le ficus et l'horloge : sous une
+// fenêtre, elle se lisait comme un rebord.
+const ETAGERE_X = 404;
 // Au pied du poste du reviewer, dont les refus la remplissent.
 const CORBEILLE_X = 634;
 const ABSCISSES_DU_MUR: AbscissesDuMur = {
@@ -112,7 +113,7 @@ export default function FondDeLaPiece({
         salle={projet}
         abscisses={ABSCISSES_DU_MUR}
       />
-      <Pose x={ETAGERE_X} bas="top-24">
+      <Pose x={ETAGERE_X} bas="top-12">
         <Agrandi>
           <Etagere />
         </Agrandi>

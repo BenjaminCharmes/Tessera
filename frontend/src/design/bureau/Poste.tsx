@@ -28,7 +28,7 @@ function ecranParDefaut(etat: EtatPoste): EcranId {
 /**
  * Un poste de travail : bureau, écran et, pendant un run, son personnage — assis
  * (il attend son tour ou il travaille). Une fois fini, il se lève : il se dessine
- * à côté du poste (`AgentDebout`), la grille 16 × 18 ne le contient plus
+ * à côté du poste (`AgentDebout`), la grille 20 × 18 ne le contient plus
  * (ADR-058). Pixels `rect` sur cette grille, rien d'autre.
  * `overflow-visible` : les cheveux du personnage assis montent au-dessus de la grille ;
  * sans cela le `<svg>` couperait leur première ligne.
@@ -47,9 +47,9 @@ export default function Poste({
   const ton = occupe ? sante : etat;
   return (
     <svg
-      width="56"
+      width="70"
       height="63"
-      viewBox="0 0 16 18"
+      viewBox="0 0 20 18"
       shapeRendering="crispEdges"
       aria-hidden="true"
       data-sprite="poste"
@@ -64,9 +64,9 @@ export default function Poste({
       ) : (
         <rect x="5" y="6" width="6" height="6" className="fill-zinc-800" />
       )}
-      <rect x="1" y="12" width="14" height="2" className="fill-zinc-600" />
+      <rect x="1" y="12" width="18" height="2" className="fill-zinc-600" />
       <rect x="2" y="14" width="1" height="4" className="fill-zinc-700" />
-      <rect x="13" y="14" width="1" height="4" className="fill-zinc-700" />
+      <rect x="17" y="14" width="1" height="4" className="fill-zinc-700" />
       <Ecran ecran={ecran} ton={ton} anime={occupe && sante === "actif"} />
     </svg>
   );

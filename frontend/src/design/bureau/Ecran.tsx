@@ -11,30 +11,33 @@ interface EcranProps {
   anime: boolean;
 }
 
-/** L'écran posé sur le bureau, dans la grille 16 × 18 du poste. */
+/**
+ * L'écran posé sur le bureau, dans la grille 20 × 18 du poste. Sa zone allumée fait
+ * 6 × 4 unités, la taille de la scène : à 3 × 2, elle était rendue à moitié, illisible.
+ */
 export default function Ecran({ ecran, ton, anime }: EcranProps) {
   const sansScene = ecran === "allume" || ecran === "eteint";
   return (
     <g data-sprite="ecran" data-ecran={ecran}>
-      <rect x="10" y="7" width="5" height="4" className="fill-zinc-800" />
+      <rect x="12" y="5" width="8" height="6" className="fill-zinc-800" />
       {sansScene ? (
         <rect
-          x="11"
-          y="8"
-          width="3"
-          height="2"
+          x="13"
+          y="6"
+          width="6"
+          height="4"
           className={`${TON_ECRAN[ton]}${anime ? " anim-lueur" : ""}`}
         />
       ) : (
         <>
-          <rect x="11" y="8" width="3" height="2" className="fill-zinc-900" />
+          <rect x="13" y="6" width="6" height="4" className="fill-zinc-900" />
           {/* Un `<svg>` imbriqué rogne ce qui défile : la scène reste sur sa zone allumée. */}
-          <svg x="11" y="8" width="3" height="2" viewBox="0 0 6 4" className="overflow-hidden">
+          <svg x="13" y="6" width="6" height="4" viewBox="0 0 6 4" className="overflow-hidden">
             <EcranScene ecran={ecran} anime={anime} ton={ton} />
           </svg>
         </>
       )}
-      <rect x="12" y="11" width="1" height="1" className="fill-zinc-800" />
+      <rect x="15" y="11" width="2" height="1" className="fill-zinc-800" />
     </g>
   );
 }
