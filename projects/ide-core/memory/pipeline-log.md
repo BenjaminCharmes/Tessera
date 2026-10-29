@@ -6249,3 +6249,4 @@ Le diff ajoute :
 - 2026-10-29 16:46:08 UTC — [ticket-660] tour 2 — reviewer terminé (26391ms)
 - 2026-10-29 16:46:42 UTC — [ticket-660] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La mise en œuvre complète du se (59953ms)
 - 2026-10-29 16:46:42 UTC — [ticket-660] APPROVED après 2 tour(s)
+- 2026-10-29 16:50:43 UTC — [ticket-660] documentation: 0 fichier(s) (235562ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « Son numéro vient de `python ../../scripts/prochain_numero.py » (agents/prompts/codeur.md) 
