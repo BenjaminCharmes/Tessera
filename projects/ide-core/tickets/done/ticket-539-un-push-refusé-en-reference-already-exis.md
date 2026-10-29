@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-10-22'
 depends_on: []
 id: ticket-539
+pr_number: 759
 priority: medium
 status: done
 title: Un push refusé en « reference already exists » alors que la branche est déjà
