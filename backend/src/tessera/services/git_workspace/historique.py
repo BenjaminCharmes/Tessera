@@ -6,7 +6,7 @@ from tessera.services.git_workspace.chemins import (
     _relatif_au_projet,
 )
 from tessera.services.git_workspace.erreurs import GitCommandError
-from tessera.services.git_workspace.socle import GitCore
+from tessera.services.git_workspace.poussee import GitPoussee
 from tessera.services.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
 
@@ -14,7 +14,7 @@ from tessera.utils.logger import get_logger
 _logger = get_logger("tessera.services.git_workspace")
 
 
-class GitHistory(GitCore):
+class GitHistory(GitPoussee):
     """Branch position, push and commit history reads."""
 
     async def retourner_sur_base(self, base_branch: str) -> None:
@@ -52,20 +52,6 @@ class GitHistory(GitCore):
             if chemin not in self._preexisting_untracked
             and chemin != _JOURNAL_PIPELINE
         )
-
-    async def push_branch(self, branch_name: str) -> None:
-        """Pousse `branch_name` sur `origin`, en suivi de branche.
-
-        C'était le maillon manquant : `create-pr` demandait à GitHub une
-        branche `head` que rien n'avait jamais poussée, et GitHub refusait une
-        référence qu'il ne connaissait pas.
-
-        **Jamais de push forcé.** Cette branche part dans le dépôt de
-        l'utilisateur, parfois celui d'un client : écraser une référence
-        distante peut détruire du travail qui n'est pas le nôtre. Si le push
-        est refusé, c'est à l'utilisateur de trancher.
-        """
-        await self._run("push", "--set-upstream", "origin", branch_name)
 
     async def head_sha(self) -> str:
         """Full SHA of the branch head (ticket-492). A failure raises."""
