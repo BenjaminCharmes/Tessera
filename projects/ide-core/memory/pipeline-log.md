@@ -6102,3 +6102,4 @@ Le diff ajoute :
 - 2026-10-29 11:34:23 UTC — [ticket-628] validateur: fichiers cités joints : lib/bureau/noms.ts, PosteDeTravail.tsx, AgentsDeLaPiece.tsx, PanneauAgentChoisi.tsx
 - 2026-10-29 11:34:23 UTC — [ticket-628] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été mis à jour po (261046ms)
 - 2026-10-29 11:34:23 UTC — [ticket-628] APPROVED après 1 tour(s)
+- 2026-10-29 11:39:32 UTC — [ticket-628] documentation: 0 fichier(s) (301671ms) — après tour de correction
