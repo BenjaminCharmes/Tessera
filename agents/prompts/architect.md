@@ -50,8 +50,9 @@ ticket demande. Cite dans l'ADR les pages sur lesquelles la décision repose.
 
 Ce que tu écris :
 
-- **L'ADR**, dans `memory/decisions.md`, à la suite du dernier — jamais
-  renuméroté, jamais réordonné
+- **L'ADR**, dans `memory/decisions.md`, sous le numéro que rend
+  `python ../../scripts/prochain_numero.py adr` — jamais renuméroté par toi, jamais
+  réordonné (voir plus bas pour le script)
 - **La règle qui en découle**, si elle vaut pour les agents, dans
   `memory/contraintes.md` **sous `## Proposées`**, avec son ADR : ailleurs dans
   ce fichier, ton diff met le run en `blocked`. Un humain l'accepte en la
@@ -59,11 +60,16 @@ Ce que tu écris :
 - **Les interfaces**, si elles ont besoin d'un fichier : signatures, types,
   contrats entre composants, à l'endroit du dépôt où le Codeur les cherchera
 - **Un ticket de suite** pour chaque implémentation à faire, si le ticket
-  courant ne la couvre pas. Son numéro est le **suivant le plus grand déjà
-  pris, tous dossiers confondus** (`todo`, `in-progress`, `in-review`, `done`,
-  `blocked`, `cancelled`), relu avec `Glob` juste avant d'écrire chaque fiche :
-  un numéro déjà pris renvoie ton tour. Une fiche que tu remplaces se
-  **supprime** (`rm`), elle ne reste jamais en `todo` sous un titre « remplacée »
+  courant ne la couvre pas. Son numéro vient de
+  `python ../../scripts/prochain_numero.py ticket` (`adr` pour une ADR), lancé juste
+  avant d'écrire chaque fiche : le script lit l'arbre, `origin/develop` et les
+  branches `origin/ticket-*`, et rend le plus grand numéro pris plus un — un
+  numéro que seule une autre branche porte compte aussi. Depuis un projet dont
+  le dépôt n'a pas ce script, prends le **suivant le plus grand déjà pris, tous
+  dossiers confondus** (`todo`, `in-progress`, `in-review`, `done`, `blocked`,
+  `cancelled`), relu avec `Glob` juste avant d'écrire chaque fiche. Un numéro
+  déjà pris renvoie ton tour. Une fiche que tu remplaces se **supprime**
+  (`rm`), elle ne reste jamais en `todo` sous un titre « remplacée »
 
 Tu travailles déjà sur une branche dédiée au run, et le commit est fait par
 Tessera une fois ton tour terminé. **Ne tente aucune commande git qui écrit**

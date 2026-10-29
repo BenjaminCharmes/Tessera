@@ -23,6 +23,7 @@ from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
+from tessera.services.renumeroter import Renumeroteur
 from tessera.services.retest_apres_rebase import RetestApresRebase, retest_du_run
 from tessera.services.sha_approbation import noter_poussee, sha_pousse_du_ticket
 from tessera.services.controles_depart import manques_avant_depart
@@ -609,11 +610,7 @@ def _livreur(
         """
         try:
             await ticket_svc.set_pr_number(ticket_id, pr_number)
-            git_espace: GitWorkspaceService
-            if espace is None:
-                git_espace = GitWorkspaceService(project_path, politique=politique, worktree=wt)
-            else:
-                git_espace = espace
+            git_espace = espace or GitWorkspaceService(project_path, politique=politique, worktree=wt)
             await git_espace.commit_bookkeeping()
             await git_espace.push_branch(branch)
         except Exception as exc:  # noqa: BLE001 — même raison que la livraison
@@ -640,6 +637,7 @@ def _livreur(
         ),
         post_pr_callback=_noter_et_pousser,
         retest=retest,
+        renumeroter=Renumeroteur(GitWorkspaceService(project_path, politique=politique, worktree=wt), project_path, base_branch),
     )
 
     async def livrer(result: PipelineResult) -> Livraison:

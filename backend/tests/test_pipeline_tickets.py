@@ -169,4 +169,6 @@ def test_architect_prompt_asks_for_the_next_number_and_deleting_replaced_cards()
     chemin = Path(__file__).resolve().parents[2] / "agents" / "prompts" / "architect.md"
     prompt = " ".join(chemin.read_text(encoding="utf-8").split())
     assert "suivant le plus grand déjà pris, tous dossiers confondus" in prompt
+    assert "scripts/prochain_numero.py ticket" in prompt
+    assert "scripts/prochain_numero.py adr" in prompt
     assert "se **supprime**" in prompt
