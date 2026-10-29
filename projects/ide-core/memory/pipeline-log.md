@@ -6088,3 +6088,4 @@ Le diff ajoute :
 - 2026-10-29 11:13:28 UTC — [ticket-624] validateur: fichiers cités joints : lib/bureau/activites.ts, lib/bureau/physique.ts
 - 2026-10-29 11:13:28 UTC — [ticket-624] validateur: APPROVED — Tous les critères sont satisfaits. Les tests vérifient que les rédacteurs se tie (298218ms)
 - 2026-10-29 11:13:28 UTC — [ticket-624] APPROVED après 1 tour(s)
+- 2026-10-29 11:15:01 UTC — [ticket-624] documentation: 0 fichier(s) (86437ms)
