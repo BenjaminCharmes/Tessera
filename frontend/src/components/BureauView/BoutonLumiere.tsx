@@ -1,3 +1,4 @@
+import Agrandi from "../../design/bureau/Agrandi";
 import Interrupteur from "../../design/bureau/Interrupteur";
 
 interface BoutonLumiereProps {
@@ -18,7 +19,9 @@ export default function BoutonLumiere({ salle, allume, onBasculer }: BoutonLumie
       onClick={onBasculer}
       className="block cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
     >
-      <Interrupteur allume={allume} />
+      <Agrandi>
+        <Interrupteur allume={allume} />
+      </Agrandi>
     </button>
   );
 }

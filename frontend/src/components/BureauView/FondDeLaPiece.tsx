@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
 import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
@@ -12,13 +11,12 @@ import type { UseServicesResult } from "../../hooks/useServices";
 import { BIBLIOTHEQUE_X, BOITE_X, MACHINE_X, PORTE_X, TABLEAU_X } from "../../lib/bureau/activites";
 import { cielDesFenetres } from "../../lib/bureau/ciel";
 import { dayMoment } from "../../lib/bureau/dayMoment";
-import { enPourcentDuSol } from "../../lib/bureau/etirementDuSol";
-import CeilingLamp from "../../design/bureau/CeilingLamp";
-import SkyWindow from "../../design/bureau/SkyWindow";
 import BaieDeServeurs from "./BaieDeServeurs";
 import BoiteAuxLettres from "./BoiteAuxLettres";
-import BoutonLumiere from "./BoutonLumiere";
 import Dossiers from "./Dossiers";
+import MurLumineux from "./MurLumineux";
+import type { AbscissesDuMur } from "./MurLumineux";
+import Pose from "./Pose";
 import TableauDesCriteres from "./TableauDesCriteres";
 
 /**
@@ -37,6 +35,11 @@ const BAIE_X = 528;
 const CACTUS_X = 572;
 // Plus près de la porte que de la boîte aux lettres, comme un vrai interrupteur (ticket-627).
 const INTERRUPTEUR_X = 727;
+const ABSCISSES_DU_MUR: AbscissesDuMur = {
+  fenetres: FENETRES_X,
+  plafonniers: PLAFONNIERS_X,
+  interrupteur: INTERRUPTEUR_X,
+};
 /** Le tableau blanc, un peu plus grand que le reste : il tient la moitié de la hauteur du mur. */
 const TABLEAU_RELATIF = 1.15;
 
@@ -60,23 +63,6 @@ interface FondDeLaPieceProps {
 
 /** La porte dépasse les agents d'une tête : à l'échelle commune, elle était plus petite qu'eux (ticket-622). */
 const ECHELLE_DE_LA_PORTE = 1.5;
-
-/** Un objet posé contre le mur, à une abscisse du repère : au sol, ou accroché à `bas` du sol. */
-function Pose({
-  x,
-  bas = "bottom-0",
-  children,
-}: {
-  x: number;
-  bas?: string;
-  children: ReactNode;
-}) {
-  return (
-    <span className={`absolute ${bas}`} style={{ left: enPourcentDuSol(x) }}>
-      {children}
-    </span>
-  );
-}
 
 /**
  * Le mur du fond, au-dessus de la plinthe. Du mobilier, dessiné toujours ; ce qui s'y
@@ -105,20 +91,14 @@ export default function FondDeLaPiece({
       data-fond="piece"
       data-mur="piece"
     >
-      {FENETRES_X.map((x, i) => (
-        <Pose key={x} x={x} bas="top-9">
-          <Agrandi>
-            <SkyWindow moment={moment} nuages={ciels[i]?.nuages ?? 0} />
-          </Agrandi>
-        </Pose>
-      ))}
-      {PLAFONNIERS_X.map((x) => (
-        <Pose key={x} x={x} bas="top-0">
-          <Agrandi>
-            <CeilingLamp allume={allume} jour={moment !== "nuit"} />
-          </Agrandi>
-        </Pose>
-      ))}
+      <MurLumineux
+        moment={moment}
+        ciels={ciels}
+        allume={allume}
+        onBasculer={onBasculerLumiere}
+        salle={projet}
+        abscisses={ABSCISSES_DU_MUR}
+      />
       <Pose x={TABLEAU_X} bas="top-5">
         <TableauDesCriteres
           projet={projet}
@@ -171,13 +151,6 @@ export default function FondDeLaPiece({
       </Pose>
       <Pose x={BOITE_X}>
         <BoiteAuxLettres projet={projet} etat={etat} />
-      </Pose>
-      <Pose x={INTERRUPTEUR_X} bas="bottom-10">
-        <BoutonLumiere
-          salle={projet}
-          allume={allume}
-          onBasculer={onBasculerLumiere}
-        />
       </Pose>
       <Pose x={PORTE_X}>
         {onOpenProject ? (
