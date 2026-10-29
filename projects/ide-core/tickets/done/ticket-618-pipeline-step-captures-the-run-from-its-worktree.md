@@ -4,6 +4,7 @@ created: 2026-10-27
 depends_on:
 - ticket-617
 id: ticket-618
+pr_number: 733
 priority: medium
 status: done
 title: A run that changes an interface captures it from its own worktree
