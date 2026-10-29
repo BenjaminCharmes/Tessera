@@ -6132,3 +6132,4 @@ Le diff ajoute :
 - 2026-10-29 12:16:10 UTC — [ticket-630] validateur: fichiers cités joints : aucun ; absents : usage/breakdown
 - 2026-10-29 12:16:10 UTC — [ticket-630] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Un test vérifie que le panneau (105077ms)
 - 2026-10-29 12:16:10 UTC — [ticket-630] APPROVED après 2 tour(s)
+- 2026-10-29 12:19:27 UTC — [ticket-630] documentation: 0 fichier(s) (192077ms)
