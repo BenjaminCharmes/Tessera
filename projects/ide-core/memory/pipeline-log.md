@@ -6328,3 +6328,4 @@ Le diff ajoute :
 - 2026-10-29 19:46:57 UTC — [ticket-671] validateur: fichiers cités joints : agents.json
 - 2026-10-29 19:46:57 UTC — [ticket-671] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés. Le code gère co (150125ms)
 - 2026-10-29 19:46:57 UTC — [ticket-671] APPROVED après 2 tour(s)
+- 2026-10-29 19:50:24 UTC — [ticket-671] documentation: 0 fichier(s) (200000ms) — après tour de correction
