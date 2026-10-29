@@ -3,6 +3,8 @@ import Agrandi from "../../design/bureau/Agrandi";
 import AgentDebout from "../../design/bureau/AgentDebout";
 import Chaise from "../../design/bureau/Chaise";
 import TableDeReunion from "../../design/bureau/TableDeReunion";
+import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import { visiteur } from "../../lib/bureau/noms";
 import Salle from "./Salle";
 
 interface SalleReunionProps {
@@ -65,7 +67,7 @@ export default function SalleReunion({
       {occupants.flatMap(({ projet, reunion }) =>
         reunion.temps === "conflit"
           ? [
-              <li key={projet} data-agent="resolveur">
+              <li key={projet} data-agent="resolveur" title={visiteur(projet, "resolveur", nomDuPoste("resolveur"))}>
                 <Agrandi>
                   <AgentDebout projet={projet} role="resolveur" />
                 </Agrandi>

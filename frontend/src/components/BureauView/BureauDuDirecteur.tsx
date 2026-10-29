@@ -4,6 +4,7 @@ import BureauEnBois from "../../design/bureau/BureauEnBois";
 import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Bulle from "../../design/bureau/Bulle";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import { NOM_DU_DIRECTEUR, visiteur } from "../../lib/bureau/noms";
 import {
   PHYSIQUE_DU_DIRECTEUR,
   TENUE_DU_DIRECTEUR,
@@ -35,10 +36,12 @@ export default function BureauDuDirecteur({
       entete="un agent dont la question attend ta réponse vient s'y tenir"
       vide="Aucune question en attente"
       mobilier={
-        <BureauEnBois
-          tenue={TENUE_DU_DIRECTEUR}
-          physique={PHYSIQUE_DU_DIRECTEUR}
-        />
+        <span role="img" aria-label={`${NOM_DU_DIRECTEUR}, directeur`} title={`${NOM_DU_DIRECTEUR}, directeur`}>
+          <BureauEnBois
+            tenue={TENUE_DU_DIRECTEUR}
+            physique={PHYSIQUE_DU_DIRECTEUR}
+          />
+        </span>
       }
       decor={<Bibliotheque />}
       plante="ficus"
@@ -54,6 +57,7 @@ export default function BureauDuDirecteur({
         <li
           key={projet}
           data-agent={poste}
+          title={visiteur(projet, poste, nomDuPoste(poste))}
           className="flex flex-col items-center"
         >
           <Bulle sante="question" />
