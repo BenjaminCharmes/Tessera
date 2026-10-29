@@ -4,7 +4,7 @@ created: 2026-10-28
 depends_on: []
 estimated_days: 1
 id: ticket-625
-pr_number: null
+pr_number: 736
 priority: medium
 status: done
 title: The break room keeps a pull request waiting for CI after the queue has moved
