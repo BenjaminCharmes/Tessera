@@ -6233,3 +6233,19 @@ Le diff ajoute :
 - 2026-10-29 16:07:11 UTC — [ticket-665] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code inclut une nouvelle co (127264ms)
 - 2026-10-29 16:07:11 UTC — [ticket-665] APPROVED après 2 tour(s)
 - 2026-10-29 16:10:34 UTC — [ticket-665] documentation: 0 fichier(s) (194686ms)
+- 2026-10-29 16:19:58 UTC — [ide-core] ticket-665 PR #750 confiée au CIWatcher
+- 2026-10-29 16:20:01 UTC — [ticket-660] branche ticket-660-done-tickets-are-archived-by-hundreds-and-every-t
+- 2026-10-29 16:20:02 UTC — [ticket-660] tour 1 — codeur démarré
+- 2026-10-29 16:23:24 UTC — [ticket-660] tour 1 — codeur terminé (200764ms)
+- 2026-10-29 16:24:57 UTC — [ide-core] ticket-665 PR #750 mergée (CI verte)
+- 2026-10-29 16:29:52 UTC — [ticket-660] testeur: 1 failed, 1798 passed, 64 warnings in 383.17s (0:06:23)
+- 2026-10-29 16:29:52 UTC — [ticket-660] tests rouges au tour 1
+- 2026-10-29 16:29:52 UTC — [ticket-660] tour 2 — codeur démarré
+- 2026-10-29 16:32:36 UTC — [ticket-660] tour 2 — codeur terminé (163890ms)
+- 2026-10-29 16:43:24 UTC — [ticket-660] testeur: OK (exit 0)
+- 2026-10-29 16:45:42 UTC — [ticket-660] securite: PASS — Ticket archiving feature (ticket-660) introduces no CRITICAL or HIGH security vu (137610ms)
+- 2026-10-29 16:45:42 UTC — [ticket-660] tour 2 — reviewer démarré
+- 2026-10-29 16:45:42 UTC — [ticket-660] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 16:46:08 UTC — [ticket-660] tour 2 — reviewer terminé (26391ms)
+- 2026-10-29 16:46:42 UTC — [ticket-660] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La mise en œuvre complète du se (59953ms)
+- 2026-10-29 16:46:42 UTC — [ticket-660] APPROVED après 2 tour(s)
