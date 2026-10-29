@@ -6341,3 +6341,5 @@ Le diff ajoute :
 - 2026-10-29 20:27:39 UTC — [ticket-533] tour 1 — reviewer terminé (27687ms)
 - 2026-10-29 20:28:53 UTC — [ticket-533] validateur: APPROVED — Le critère d'acceptation 1, initialement à écrire au triage, est maintenant sati (101625ms)
 - 2026-10-29 20:28:53 UTC — [ticket-533] APPROVED après 1 tour(s)
+- 2026-10-29 20:28:59 UTC — [ticket-533] fichiers non suivis laissés par le run : tickets/todo/ticket-674-an-open-pr-turned-conflicting-is-updated-without-forcing-a-push.md (à ignorer dans .gitignore ?)
+- 2026-10-29 20:33:38 UTC — [ticket-533] documentation: 1 fichier(s) (278406ms) — après tour de correction
