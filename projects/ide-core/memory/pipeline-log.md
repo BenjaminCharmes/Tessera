@@ -6103,3 +6103,15 @@ Le diff ajoute :
 - 2026-10-29 11:34:23 UTC — [ticket-628] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été mis à jour po (261046ms)
 - 2026-10-29 11:34:23 UTC — [ticket-628] APPROVED après 1 tour(s)
 - 2026-10-29 11:39:32 UTC — [ticket-628] documentation: 0 fichier(s) (301671ms) — après tour de correction
+- 2026-10-29 11:44:49 UTC — [ide-core] ticket-628 PR #740 mergée (CI verte)
+- 2026-10-29 11:44:51 UTC — [ide-core] ticket-628 : base réalignée sur develop
+- 2026-10-29 11:44:51 UTC — [ide-core] ticket-628 PR #740 confiée au CIWatcher
+- 2026-10-29 11:44:57 UTC — [ticket-629] branche ticket-629-each-desk-screen-shows-what-its-step-is-really-do
+- 2026-10-29 11:44:59 UTC — [ticket-629] tour 1 — codeur démarré
+- 2026-10-29 11:50:41 UTC — [ticket-629] tour 1 — codeur terminé (342171ms)
+- 2026-10-29 11:53:11 UTC — [ticket-629] testeur: OK (exit 0)
+- 2026-10-29 11:54:23 UTC — [ticket-629] securite: PASS — Audit of ticket-629 (écrans d'étape): 7 new files, 5 modified. All code is prope (71952ms)
+- 2026-10-29 11:54:23 UTC — [ticket-629] tour 1 — reviewer démarré
+- 2026-10-29 11:54:41 UTC — [ticket-629] tour 1 — reviewer terminé (17577ms)
+- 2026-10-29 11:57:44 UTC — [ticket-629] validateur: APPROVED — Les tests couvrent tous les critères d'acceptation : l'écran affiche les bonnes  (201234ms)
+- 2026-10-29 11:57:44 UTC — [ticket-629] APPROVED après 1 tour(s)
