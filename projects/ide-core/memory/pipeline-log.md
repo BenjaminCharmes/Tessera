@@ -6459,3 +6459,4 @@ Le diff ajoute :
 - 2026-10-29 23:09:05 UTC — [ticket-654] validateur: fichiers cités joints : docs/audit/securite.md (tronqué)
 - 2026-10-29 23:09:05 UTC — [ticket-654] validateur: APPROVED — L'audit de sécurité est complet : 22 constats classifiés avec gravité, fichiers/ (340172ms)
 - 2026-10-29 23:09:05 UTC — [ticket-654] APPROVED après 1 tour(s)
+- 2026-10-29 23:10:18 UTC — [ticket-654] documentation: 0 fichier(s) (66717ms)
