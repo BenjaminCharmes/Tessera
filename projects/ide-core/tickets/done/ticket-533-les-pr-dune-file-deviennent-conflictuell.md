@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-10-22'
 depends_on: []
 id: ticket-533
+pr_number: 757
 priority: medium
 status: done
 title: Les PR d'une file deviennent conflictuelles sur la doc du pipeline quand la
