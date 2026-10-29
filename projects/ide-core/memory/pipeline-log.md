@@ -6116,3 +6116,19 @@ Le diff ajoute :
 - 2026-10-29 11:57:44 UTC — [ticket-629] validateur: APPROVED — Les tests couvrent tous les critères d'acceptation : l'écran affiche les bonnes  (201234ms)
 - 2026-10-29 11:57:44 UTC — [ticket-629] APPROVED après 1 tour(s)
 - 2026-10-29 12:00:50 UTC — [ticket-629] documentation: 0 fichier(s) (180312ms) — après tour de correction
+- 2026-10-29 12:01:11 UTC — [ide-core] ticket-629 PR #741 confiée au CIWatcher
+- 2026-10-29 12:01:16 UTC — [ticket-630] branche ticket-630-the-chosen-agent-panel-shows-the-agent-s-record-o
+- 2026-10-29 12:01:17 UTC — [ticket-630] tour 1 — codeur démarré
+- 2026-10-29 12:04:20 UTC — [ticket-630] tour 1 — codeur terminé (182875ms)
+- 2026-10-29 12:05:37 UTC — [ide-core] ticket-629 PR #741 mergée (CI verte)
+- 2026-10-29 12:06:45 UTC — [ticket-630] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-29 12:06:45 UTC — [ticket-630] tests rouges au tour 1
+- 2026-10-29 12:06:45 UTC — [ticket-630] tour 2 — codeur démarré
+- 2026-10-29 12:09:03 UTC — [ticket-630] tour 2 — codeur terminé (138077ms)
+- 2026-10-29 12:11:47 UTC — [ticket-630] testeur: OK (exit 0)
+- 2026-10-29 12:14:25 UTC — [ticket-630] securite: PASS — Audit de sécurité du ticket-630 (bilan de l'agent choisi) : aucune vulnérabilité (158703ms)
+- 2026-10-29 12:14:25 UTC — [ticket-630] tour 2 — reviewer démarré
+- 2026-10-29 12:14:44 UTC — [ticket-630] tour 2 — reviewer terminé (19110ms)
+- 2026-10-29 12:16:10 UTC — [ticket-630] validateur: fichiers cités joints : aucun ; absents : usage/breakdown
+- 2026-10-29 12:16:10 UTC — [ticket-630] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Un test vérifie que le panneau (105077ms)
+- 2026-10-29 12:16:10 UTC — [ticket-630] APPROVED après 2 tour(s)
