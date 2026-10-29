@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-626
 plan: true
-pr_number: null
+pr_number: 737
 priority: low
 status: done
 title: 'Design: a server-room view of running apps, with each product''s own agents'
