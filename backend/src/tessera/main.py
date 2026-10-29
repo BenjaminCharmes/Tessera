@@ -27,6 +27,7 @@ from tessera.routers import (
     signalements,
     ticket_proposals,
     tickets,
+    tickets_archive,
     usage,
 )
 from tessera.services.database import init_db, solder_les_runs_orphelins
@@ -137,6 +138,7 @@ app.include_router(projects.router, prefix="/api/v1")
 app.include_router(provisioning_router.router, prefix="/api/v1")
 app.include_router(ticket_proposals.router, prefix="/api/v1/projects")
 app.include_router(tickets.router, prefix="/api/v1/projects")
+app.include_router(tickets_archive.router, prefix="/api/v1/projects")
 app.include_router(chat.router, prefix="/api/v1/projects")
 app.include_router(agents.router, prefix="/api/v1")
 app.include_router(orchestrator.router, prefix="/api/v1")

@@ -1,6 +1,5 @@
 import asyncio
 import re
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
@@ -14,6 +13,12 @@ from tessera.models.ticket import (
     TicketStatus,
     TicketType,
     TicketUnreadable,
+)
+from tessera.services.ticket_archive import (
+    archive_done_tickets,
+    highest_number,
+    is_archived,
+    iter_archive_files,
 )
 from tessera.utils.logger import get_logger
 
@@ -124,7 +129,9 @@ def _status_from_folder(path: Path, meta: dict[str, Any]) -> TicketStatus:
     folder_status = by_dir.get(path.parent.name)
     if folder_status is not None:
         return folder_status
-    # Dossier non reconnu (archive, arborescence inattendue) : on retombe sur
+    if is_archived(path):
+        return TicketStatus.done
+    # Dossier non reconnu (arborescence inattendue) : on retombe sur
     # ce que le fichier déclare plutôt que d'échouer.
     return TicketStatus(meta["status"])
 
@@ -276,42 +283,17 @@ class TicketService:
             created.append(await self.create_ticket(ticket))
         return created
 
-    async def archive_old_tickets(self, days: int = 30) -> list[Ticket]:
-        done_dir = self._tickets_root() / "done"
-        if not done_dir.is_dir():
-            return []
+    async def archive_done_tickets(self) -> list[str]:
+        """File done tickets 100+ numbers below the highest into the archive.
 
-        cutoff = time.time() - days * 86400
-        archived: list[Ticket] = []
-
-        for ticket_file in sorted(done_dir.glob("ticket-*.md")):
-            if ticket_file.stat().st_mtime > cutoff:
-                continue
-            mtime = datetime.fromtimestamp(
-                ticket_file.stat().st_mtime, tz=timezone.utc
-            )
-            dest_dir = (
-                self._tickets_root()
-                / "archive"
-                / "done"
-                / mtime.strftime("%Y-%m")
-            )
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            dest = dest_dir / ticket_file.name
-            ticket_file.rename(dest)
-            try:
-                archived.append(self._parse(dest))
-            except Exception:
-                pass
-
-        return archived
+        Returns the ids archived. The archive stays readable by id
+        (`get_ticket`, `depends_on`, numbering) but not in the listings.
+        """
+        return await asyncio.to_thread(archive_done_tickets, self._tickets_root())
 
     async def list_archived_tickets(self) -> list[Ticket]:
-        archive_root = self._tickets_root() / "archive"
-        if not archive_root.is_dir():
-            return []
         tickets: list[Ticket] = []
-        for path in sorted(archive_root.rglob("ticket-*.md")):
+        for path in iter_archive_files(self._tickets_root()):
             try:
                 tickets.append(self._parse(path))
             except Exception:
@@ -365,7 +347,9 @@ class TicketService:
         # `stem.startswith(ticket_id)` faisait trouver `ticket-100` à partir de
         # `ticket-1` (ticket-122). Le nom est l'identifiant seul, ou
         # l'identifiant suivi d'un tiret et d'un slug.
-        for path in self._iter_active_files():
+        # L'archive se lit par identifiant, jamais dans les listes : un ticket
+        # rangé reste atteignable pour `get_ticket` et pour `depends_on`.
+        for path in (*self._iter_active_files(), *iter_archive_files(self._tickets_root())):
             if path.stem == ticket_id or path.stem.startswith(ticket_id + "-"):
                 return path
         return None
@@ -383,14 +367,8 @@ class TicketService:
         ]
 
     def _next_n(self) -> int:
-        max_n = 0
-        root = self._tickets_root()
-        if root.is_dir():
-            for path in root.rglob("ticket-*.md"):
-                parts = path.stem.split("-")
-                if len(parts) >= 2 and parts[1].isdigit():
-                    max_n = max(max_n, int(parts[1]))
-        return max_n + 1
+        # Archive comprise : un numéro rangé ne se réattribue pas.
+        return highest_number(self._tickets_root()) + 1
 
     def _next_id(self) -> str:
         return f"ticket-{self._next_n():03d}"

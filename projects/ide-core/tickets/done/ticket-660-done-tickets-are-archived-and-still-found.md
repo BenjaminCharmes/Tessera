@@ -1,14 +1,15 @@
 ---
-id: ticket-660
-title: "Done tickets are archived by hundreds, and every ticket lookup still finds them"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-28
 depends_on: []
 estimated_days: 1
-created: 2026-10-28
+id: ticket-660
+pr_number: 751
+priority: medium
+status: done
+title: Done tickets are archived by hundreds, and every ticket lookup still finds
+  them
+type: feat
 ---
 
 # ticket-660 — Archiver les tickets terminés sans les perdre de vue

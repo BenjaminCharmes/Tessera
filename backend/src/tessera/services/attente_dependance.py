@@ -2,6 +2,7 @@
 from collections.abc import Awaitable, Callable
 from typing import Any
 
+from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.livraison import Livraison
 from tessera.services.livraison_evenements import attente_annoncee
 from tessera.services.pipeline_events import EventCallback
@@ -39,6 +40,23 @@ async def attendre_si_dependant(
                 )
             return bool(merge)
     return None
+
+
+async def ids_termines(ticket_svc: TicketService, candidats: list[Ticket]) -> set[str]:
+    """Ids of the done tickets, plus the done dependencies of ``candidats``.
+
+    The listing leaves the archive out; a dependency missing from it is read
+    by id, so a ticket depending on an archived one is not stuck (ticket-660).
+    """
+    termines = {t.id for t in await ticket_svc.list_tickets(status=TicketStatus.done)}
+    for candidat in candidats:
+        for dep in candidat.depends_on:
+            if dep in termines:
+                continue
+            ticket_dep = await ticket_svc.get_ticket(dep)
+            if ticket_dep is not None and ticket_dep.status == TicketStatus.done:
+                termines.add(dep)
+    return termines
 
 
 async def dependants_a_sauter(
