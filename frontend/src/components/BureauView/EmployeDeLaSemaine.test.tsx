@@ -90,6 +90,15 @@ describe("Employee of the week frame", () => {
     expect(container.querySelector('[data-sprite="cadre-employe"]')).toBeNull();
   });
 
+  it("hangs the frame in the break room, not in the director's office", () => {
+    const { container } = render(
+      <SallesCommunes projets={[]} maintenant={NOW} employe={{ project: "beta", count: 5 }} />,
+    );
+
+    const salle = container.querySelector('[data-sprite="cadre-employe"]')?.closest("aside");
+    expect(salle?.getAttribute("aria-label")).toBe("Salle de pause");
+  });
+
   it("writes the text nowhere but in the tooltip", async () => {
     const { container } = render(
       <SallesCommunes projets={[]} maintenant={NOW} employe={{ project: "beta", count: 5 }} />,

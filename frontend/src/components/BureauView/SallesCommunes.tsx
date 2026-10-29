@@ -23,9 +23,9 @@ interface SallesCommunesProps {
 export default function SallesCommunes({ projets, maintenant, employe = null }: SallesCommunesProps) {
   return (
     <div className="grid grid-cols-4 gap-3.5" data-testid="salles-communes">
-      <BureauDuDirecteur agents={agentsAuDirecteur(projets, maintenant)} maintenant={maintenant} employe={employe} />
+      <BureauDuDirecteur agents={agentsAuDirecteur(projets, maintenant)} maintenant={maintenant} />
       <SalleReunion occupants={occupantsDeLaReunion(projets)} maintenant={maintenant} />
-      <SallePause occupants={occupantsDeLaPause(projets)} maintenant={maintenant} />
+      <SallePause occupants={occupantsDeLaPause(projets)} maintenant={maintenant} employe={employe} />
       <SalleRh agents={agentsAuxRh(projets, maintenant)} maintenant={maintenant} />
     </div>
   );
