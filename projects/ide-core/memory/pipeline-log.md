@@ -6329,3 +6329,15 @@ Le diff ajoute :
 - 2026-10-29 19:46:57 UTC — [ticket-671] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés. Le code gère co (150125ms)
 - 2026-10-29 19:46:57 UTC — [ticket-671] APPROVED après 2 tour(s)
 - 2026-10-29 19:50:24 UTC — [ticket-671] documentation: 0 fichier(s) (200000ms) — après tour de correction
+- 2026-10-29 20:04:25 UTC — [ide-core] ticket-671 PR #756 mergée (CI verte)
+- 2026-10-29 20:04:28 UTC — [ide-core] ticket-671 : base réalignée sur develop
+- 2026-10-29 20:04:28 UTC — [ide-core] ticket-671 PR #756 confiée au CIWatcher
+- 2026-10-29 20:04:32 UTC — [ticket-533] branche ticket-533-les-pr-d-une-file-deviennent-conflictuelles-sur-l
+- 2026-10-29 20:04:33 UTC — [ticket-533] tour 1 — codeur démarré
+- 2026-10-29 20:16:34 UTC — [ticket-533] tour 1 — codeur terminé (720469ms)
+- 2026-10-29 20:24:53 UTC — [ticket-533] testeur: OK (exit 0)
+- 2026-10-29 20:27:11 UTC — [ticket-533] securite: PASS — Audit de sécurité du changement ticket-533 (attente des merges) : le nouveau mod (138046ms)
+- 2026-10-29 20:27:11 UTC — [ticket-533] tour 1 — reviewer démarré
+- 2026-10-29 20:27:39 UTC — [ticket-533] tour 1 — reviewer terminé (27687ms)
+- 2026-10-29 20:28:53 UTC — [ticket-533] validateur: APPROVED — Le critère d'acceptation 1, initialement à écrire au triage, est maintenant sati (101625ms)
+- 2026-10-29 20:28:53 UTC — [ticket-533] APPROVED après 1 tour(s)
