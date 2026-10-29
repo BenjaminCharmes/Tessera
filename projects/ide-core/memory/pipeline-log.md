@@ -5967,3 +5967,4 @@ Le diff ajoute :
 - 2026-10-29 07:43:24 UTC — [ticket-617] validateur: fichiers cités joints : agents.json
 - 2026-10-29 07:43:24 UTC — [ticket-617] validateur: APPROVED — Tous les critères sont satisfaits. Le module `controle_visuel.py` lit correcteme (103875ms)
 - 2026-10-29 07:43:24 UTC — [ticket-617] APPROVED après 1 tour(s)
+- 2026-10-29 07:45:08 UTC — [ticket-617] documentation: 1 fichier(s) (99438ms)
