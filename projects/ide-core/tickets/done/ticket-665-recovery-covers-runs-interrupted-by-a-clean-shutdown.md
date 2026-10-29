@@ -4,7 +4,7 @@ created: 2026-10-28
 depends_on: []
 estimated_days: 1
 id: ticket-665
-pr_number: null
+pr_number: 750
 priority: high
 status: done
 title: Startup recovery also cleans the repository of a run interrupted by a clean
