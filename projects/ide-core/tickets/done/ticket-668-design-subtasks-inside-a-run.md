@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-668
 plan: true
-pr_number: null
+pr_number: 765
 priority: medium
 status: done
 title: 'Design: split a run into sub-tasks implemented, reviewed and committed one
