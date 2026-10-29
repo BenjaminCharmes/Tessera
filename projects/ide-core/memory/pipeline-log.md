@@ -6022,3 +6022,14 @@ Le diff ajoute :
 - 2026-10-29 09:31:26 UTC — [ticket-619] validateur: APPROVED — Ticket-619 implémente complètement le mode `relire` : captures déclenchées (succ (70031ms)
 - 2026-10-29 09:31:26 UTC — [ticket-619] APPROVED après 2 tour(s)
 - 2026-10-29 09:36:27 UTC — [ticket-619] documentation: 0 fichier(s) (286062ms) — après tour de correction
+- 2026-10-29 09:36:50 UTC — [ide-core] ticket-619 PR #734 confiée au CIWatcher
+- 2026-10-29 09:36:54 UTC — [ticket-620] branche ticket-620-the-run-detail-shows-the-captures-taken-for-that
+- 2026-10-29 09:36:55 UTC — [ticket-620] tour 1 — codeur démarré
+- 2026-10-29 09:41:14 UTC — [ticket-620] tour 1 — codeur terminé (259109ms)
+- 2026-10-29 09:41:48 UTC — [ide-core] ticket-619 PR #734 mergée (CI verte)
+- 2026-10-29 09:51:00 UTC — [ticket-620] testeur: OK (exit 0)
+- 2026-10-29 09:52:35 UTC — [ticket-620] securite: PASS — Ticket-620 ajoute un endpoint GET pour lister les captures d'un run, avec servic (95484ms)
+- 2026-10-29 09:52:35 UTC — [ticket-620] tour 1 — reviewer démarré
+- 2026-10-29 09:53:01 UTC — [ticket-620] tour 1 — reviewer terminé (25234ms)
+- 2026-10-29 09:54:37 UTC — [ticket-620] validateur: APPROVED — Les critères d'acceptation sont tous satisfaits. Le code implémente un endpoint  (121110ms)
+- 2026-10-29 09:54:37 UTC — [ticket-620] APPROVED après 1 tour(s)
