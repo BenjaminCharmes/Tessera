@@ -6202,3 +6202,16 @@ Le diff ajoute :
 - 2026-10-29 14:29:47 UTC — [ticket-659] CHANGES_REQUESTED tour 3: Reviewer : 1. `_adr_en_collision` prend pour une ADR ajoutée toute ligne de titre `## ADR-N` qui figure dans les lignes ajoutées du diff, puis compare son texte à celui de la base. Quand un run modifi
 - 2026-10-29 14:29:47 UTC — [ticket-659] BLOCKED après 3 tour(s) sans approbation
 - 2026-10-29 14:29:52 UTC — [ide-core] file interrompue : ticket-659 non approuvé
+- 2026-10-29 14:56:27 UTC — [ticket-659] branche ticket-659-ticket-and-adr-numbers-are-allocated-by-code-and
+- 2026-10-29 14:57:46 UTC — [ticket-659] plan rendu (76781ms)
+- 2026-10-29 14:57:46 UTC — [ticket-659] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-10-29 14:57:46 UTC — [ticket-659] tour 1 — codeur démarré
+- 2026-10-29 14:59:55 UTC — [ticket-659] tour 1 — codeur terminé (129452ms)
+- 2026-10-29 15:12:02 UTC — [ticket-659] testeur: OK (exit 0)
+- 2026-10-29 15:14:17 UTC — [ticket-659] securite: PASS — Implémentation de renumération robuste avec une exception : `reecriture_des_nume (134360ms)
+- 2026-10-29 15:14:18 UTC — [ticket-659] tour 1 — reviewer démarré
+- 2026-10-29 15:14:47 UTC — [ticket-659] tour 1 — reviewer terminé (29218ms)
+- 2026-10-29 15:19:18 UTC — [ticket-659] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 15:19:54 UTC — [ticket-659] validateur: fichiers cités joints : scripts/prochain_numero.py, memory/decisions.md (tronqué) ; absents : origin/develop ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-29 15:19:54 UTC — [ticket-659] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute les tests requis (337264ms)
+- 2026-10-29 15:19:54 UTC — [ticket-659] APPROVED après 1 tour(s)
