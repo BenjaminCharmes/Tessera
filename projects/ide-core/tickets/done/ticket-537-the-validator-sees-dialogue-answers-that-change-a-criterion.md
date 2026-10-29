@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-10-22'
 depends_on: []
 id: ticket-537
+pr_number: 758
 priority: medium
 status: done
 title: Le validateur ignore une réponse du dialogue qui change le sens d un critère,
