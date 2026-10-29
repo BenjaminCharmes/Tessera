@@ -6401,3 +6401,4 @@ Le diff ajoute :
 - 2026-10-29 22:11:56 UTC — [ticket-651] validateur: fichiers cités joints : docs/audit/regles.md (tronqué) ; non joints (budget épuisé) : contraintes.md
 - 2026-10-29 22:11:56 UTC — [ticket-651] validateur: APPROVED — Les trois critères d'acceptation sont respectés : le fichier `docs/audit/regles. (293625ms)
 - 2026-10-29 22:11:56 UTC — [ticket-651] APPROVED après 1 tour(s)
+- 2026-10-29 22:13:48 UTC — [ticket-651] documentation: 0 fichier(s) (106592ms)
