@@ -6386,3 +6386,4 @@ Le diff ajoute :
 - 2026-10-29 21:52:30 UTC — [ticket-650] validateur: fichiers cités joints : docs/audit/adr.md (tronqué) ; non joints (budget épuisé) : memory/contraintes.md
 - 2026-10-29 21:52:30 UTC — [ticket-650] validateur: APPROVED — Le fichier `docs/audit/adr.md` contient l'audit complet demandé : tableau de sta (327781ms)
 - 2026-10-29 21:52:30 UTC — [ticket-650] APPROVED après 1 tour(s)
+- 2026-10-29 21:54:11 UTC — [ticket-650] documentation: 0 fichier(s) (94719ms)
