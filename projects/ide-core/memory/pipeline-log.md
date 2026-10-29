@@ -6005,3 +6005,19 @@ Le diff ajoute :
 - 2026-10-29 08:45:00 UTC — [ticket-618] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (251781ms)
 - 2026-10-29 08:45:00 UTC — [ticket-618] APPROVED après 3 tour(s)
 - 2026-10-29 08:49:32 UTC — [ticket-618] documentation: 0 fichier(s) (266891ms) — après tour de correction
+- 2026-10-29 09:00:05 UTC — [ide-core] ticket-618 PR #733 confiée au CIWatcher
+- 2026-10-29 09:05:04 UTC — [ide-core] ticket-618 PR #733 mergée (CI verte)
+- 2026-10-29 09:06:36 UTC — [ticket-619] branche ticket-619-relire-mode-a-pull-request-with-visual-checks-is
+- 2026-10-29 09:06:37 UTC — [ticket-619] tour 1 — codeur démarré
+- 2026-10-29 09:08:59 UTC — [ticket-619] tour 1 — codeur terminé (142264ms)
+- 2026-10-29 09:14:38 UTC — [ticket-619] testeur: 1 failed, 1712 passed, 64 warnings in 335.68s (0:05:35)
+- 2026-10-29 09:14:38 UTC — [ticket-619] tests rouges au tour 1
+- 2026-10-29 09:14:38 UTC — [ticket-619] tour 2 — codeur démarré
+- 2026-10-29 09:16:01 UTC — [ticket-619] tour 2 — codeur terminé (83155ms)
+- 2026-10-29 09:25:37 UTC — [ticket-619] testeur: OK (exit 0)
+- 2026-10-29 09:30:16 UTC — [ticket-619] securite: PASS — Aucune vulnérabilité critique ou haute sécurité détectée dans le code backend vi (279265ms)
+- 2026-10-29 09:30:16 UTC — [ticket-619] tour 2 — reviewer démarré
+- 2026-10-29 09:30:35 UTC — [ticket-619] tour 2 — reviewer terminé (18781ms)
+- 2026-10-29 09:30:46 UTC — [ticket-619] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-29 09:31:26 UTC — [ticket-619] validateur: APPROVED — Ticket-619 implémente complètement le mode `relire` : captures déclenchées (succ (70031ms)
+- 2026-10-29 09:31:26 UTC — [ticket-619] APPROVED après 2 tour(s)
