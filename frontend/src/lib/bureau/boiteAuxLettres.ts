@@ -28,7 +28,7 @@ function dernier(evenements: readonly OrchestratorEvent[], type: OrchestratorEve
  * que la livraison ne s'est pas arrêtée — sauf une PR orpheline, surveillée
  * malgré son `arret` (`orchestrator.py`). Un conflit résolu n'est jamais surveillé.
  */
-function surveilleeParLeWatcher(livraison: OrchestratorEvent): boolean {
+export function surveilleeParLeWatcher(livraison: OrchestratorEvent): boolean {
   const arret = livraison.data["arret"];
   const sansArret = arret === null || arret === undefined || arret === "";
   return sansArret || livraison.data["pr_orpheline"] === true;

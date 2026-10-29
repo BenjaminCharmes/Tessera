@@ -34,6 +34,13 @@ describe("boiteAuxLettres", () => {
     expect(boiteAuxLettres(rejouer([livraison({})]))).toEqual({ etat: "ci", pr: 42 });
   });
 
+  it("reads only the current ticket, not the deliveries of the queue before it", () => {
+    const etat = rejouer([livraison({}), ev("queue_progress", { index: 2, total: 3 })]);
+
+    expect(etat.events.map((e) => e.type)).toContain("livraison_done");
+    expect(boiteAuxLettres(etat)).toEqual({ etat: "aucune", pr: null });
+  });
+
   it("waits on the CI for an orphan pull request despite its stop", () => {
     const etat = rejouer([livraison({ arret: "push failed", pr_orpheline: true })]);
     expect(boiteAuxLettres(etat)).toEqual({ etat: "ci", pr: 42 });

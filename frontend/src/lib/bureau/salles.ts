@@ -2,7 +2,7 @@ import type { StreamState } from "../../hooks/streamState";
 import type { OrchestratorEvent } from "../../types/api";
 import { prARelire } from "./aToi";
 import type { ProjetPourLaColonne } from "./aToi";
-import { boiteAuxLettres } from "./boiteAuxLettres";
+import { boiteAuxLettres, surveilleeParLeWatcher } from "./boiteAuxLettres";
 
 /** Ce qui met un run en salle de pause : ni du travail, ni un blocage. */
 export interface Pause {
@@ -68,6 +68,25 @@ function numeroDePr(pr: number | null): string {
   return pr === null ? "d'une PR" : `de la PR #${pr}`;
 }
 
+/**
+ * Les PR confiées au watcher dont la CI n'a pas rendu, lues dans toute la file.
+ *
+ * Le ticket suivant remet `ticketEvents` à zéro (ADR-051) : seule `events` garde
+ * la livraison d'un ticket passé. Une PR est en CI tant qu'aucun `ci_merge_done`
+ * ne porte son numéro.
+ */
+function prsEnCi(etat: StreamState): number[] {
+  const terminees = new Set<number>();
+  const enCi: number[] = [];
+  for (const ev of etat.events) {
+    const pr = ev.data["pr_number"];
+    if (typeof pr !== "number") continue;
+    if (ev.type === "ci_merge_done") terminees.add(pr);
+    else if (ev.type === "livraison_done" && surveilleeParLeWatcher(ev)) enCi.push(pr);
+  }
+  return enCi.filter((pr) => !terminees.has(pr));
+}
+
 /** La pause du run, ou null : quota épuisé, dépendance attendue, ou CI de la phase 2. */
 export function laPause(etat: StreamState): Pause | null {
   const resume = quotaEpuise(etat);
@@ -78,7 +97,9 @@ export function laPause(etat: StreamState): Pause | null {
   }
   const boite = boiteAuxLettres(etat);
   if (boite.etat === "ci") return { motif: "ci", libelle: `CI en cours ${numeroDePr(boite.pr)}` };
-  return null;
+  const enCi = prsEnCi(etat);
+  if (enCi.length === 0) return null;
+  return { motif: "ci", libelle: `CI en cours ${numeroDePr(enCi[enCi.length - 1])}` };
 }
 
 /** La réunion du run, ou null : conflit en cours, puis PR à relire. */
