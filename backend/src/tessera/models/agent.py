@@ -36,6 +36,17 @@ class FallbackConfig(BaseModel):
     model: str
 
 
+class ServiceDeclare(BaseModel):
+    """Un service déclaré dans `services[]` d'un `agents.json` (ADR-042)."""
+
+    nom: str
+    commande: str
+    cwd: str | None = None
+    #: Le fichier d'activité que ce service écrit, relatif à la racine du
+    #: projet (ADR-064). Une déclaration humaine : Tessera ne l'écrit jamais.
+    activite: str | None = None
+
+
 class AgentConfig(BaseModel):
     """Un agent tel que décrit dans agents.json d'un projet."""
 
