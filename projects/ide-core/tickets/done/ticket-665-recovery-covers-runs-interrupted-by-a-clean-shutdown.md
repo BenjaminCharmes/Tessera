@@ -1,14 +1,15 @@
 ---
-id: ticket-665
-title: "Startup recovery also cleans the repository of a run interrupted by a clean shutdown"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-28
 depends_on: []
 estimated_days: 1
-created: 2026-10-28
+id: ticket-665
+pr_number: 750
+priority: high
+status: done
+title: Startup recovery also cleans the repository of a run interrupted by a clean
+  shutdown
+type: fix
 ---
 
 # ticket-665 — La récupération nettoie aussi après un arrêt propre

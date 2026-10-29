@@ -6216,3 +6216,20 @@ Le diff ajoute :
 - 2026-10-29 15:19:54 UTC — [ticket-659] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute les tests requis (337264ms)
 - 2026-10-29 15:19:54 UTC — [ticket-659] APPROVED après 1 tour(s)
 - 2026-10-29 15:26:32 UTC — [ticket-659] documentation: 0 fichier(s) (393139ms) — après tour de correction — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « **Pas de « `uv run pytest` passe » ni de « `npm run test` pa » (.claude/skills/ne
+- 2026-10-29 15:37:44 UTC — [ide-core] ticket-659 PR #748 confiée au CIWatcher
+- 2026-10-29 15:37:47 UTC — [ticket-665] branche ticket-665-startup-recovery-also-cleans-the-repository-of-a
+- 2026-10-29 15:37:48 UTC — [ticket-665] tour 1 — codeur démarré
+- 2026-10-29 15:40:04 UTC — [ticket-665] tour 1 — codeur terminé (135983ms)
+- 2026-10-29 15:41:32 UTC — [ticket-659] livraison: arrêt — PR #748 non mergée : CI failing : la PR #748 reste ouverte.
+- 2026-10-29 15:49:40 UTC — [ticket-665] testeur: 1 failed, 3220 passed, 64 warnings in 571.57s (0:09:31)
+- 2026-10-29 15:49:40 UTC — [ticket-665] tests rouges au tour 1
+- 2026-10-29 15:49:40 UTC — [ticket-665] tour 2 — codeur démarré
+- 2026-10-29 15:52:34 UTC — [ticket-665] tour 2 — codeur terminé (174375ms)
+- 2026-10-29 16:02:54 UTC — [ticket-665] testeur: OK (exit 0)
+- 2026-10-29 16:05:04 UTC — [ticket-665] securite: PASS — Code audit passed. The diff refactors database migrations (moving them to a sepa (129782ms)
+- 2026-10-29 16:05:04 UTC — [ticket-665] tour 2 — reviewer démarré
+- 2026-10-29 16:05:30 UTC — [ticket-665] tour 2 — reviewer terminé (26358ms)
+- 2026-10-29 16:07:11 UTC — [ticket-665] validateur: fichiers cités joints : aucun ; absents : in-progress/
+- 2026-10-29 16:07:11 UTC — [ticket-665] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code inclut une nouvelle co (127264ms)
+- 2026-10-29 16:07:11 UTC — [ticket-665] APPROVED après 2 tour(s)
+- 2026-10-29 16:10:34 UTC — [ticket-665] documentation: 0 fichier(s) (194686ms)
