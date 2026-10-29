@@ -19,7 +19,7 @@ from tessera.services.file_vivante import fermer_si_vivante, marquer_position_si
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.journal_pipeline import ajouter_ligne
 from tessera.services.livraison import Livraison
-from tessera.services.attente_dependance import attendre_si_dependant as _attendre_si_dependant, journal_confiee, sauter_dependants
+from tessera.services.attente_dependance import attendre_si_dependant as _attendre_si_dependant, ids_termines, journal_confiee, sauter_dependants
 from tessera.services.livraison_evenements import attente_annoncee, evenements_de_livraison
 from tessera.services.pipeline_events import (
     EventCallback,
@@ -630,9 +630,7 @@ class Orchestrator:
 
     async def pick_next_ticket(self, project_id: str) -> Optional[Ticket]:
         todos = await self._ticket_svc.list_tickets(status=TicketStatus.todo)
-        done_ids = {
-            t.id for t in await self._ticket_svc.list_tickets(status=TicketStatus.done)
-        }
+        done_ids = await ids_termines(self._ticket_svc, todos)
         eligible = [t for t in todos if all(dep in done_ids for dep in t.depends_on)]
         if not eligible:
             return None
