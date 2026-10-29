@@ -454,6 +454,10 @@ Pour chaque app, vous voyez :
 
 **Les services sans port** — Chaque service écoute normalement un port réseau, affiché sous forme de lien (« 8000 », « 5173 »). Un service sans serveur réseau — par exemple `python -m app.worker` lancé sans option `--port` — n'a rien à écouter : tu vois « — » à la place du lien.
 
+#### La salle des serveurs par app
+
+Tu vois une salle pour chaque application lancée. Chaque salle affiche le nom du projet, les ports utilisés, la mémoire consommée et l'heure de démarrage. Les services de l'app disposent d'un voyant par service qui indique son état — allumé si le service tourne, éteint s'il s'est arrêté.
+
 ### Arrêter une app
 
 Un clic sur « Arrêter » :
