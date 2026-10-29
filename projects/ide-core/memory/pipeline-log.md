@@ -6299,3 +6299,16 @@ Le diff ajoute :
 - 2026-10-29 18:35:13 UTC — [ticket-669] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests vérifient que le prov (243921ms)
 - 2026-10-29 18:35:13 UTC — [ticket-669] APPROVED après 2 tour(s)
 - 2026-10-29 18:37:18 UTC — [ticket-669] documentation: 0 fichier(s) (109281ms)
+- 2026-10-29 18:48:37 UTC — [ide-core] ticket-669 PR #754 confiée au CIWatcher
+- 2026-10-29 18:48:41 UTC — [ticket-670] branche ticket-670-a-test-keeps-backend-imports-flowing-from-routers
+- 2026-10-29 18:48:42 UTC — [ticket-670] tour 1 — codeur démarré
+- 2026-10-29 18:49:59 UTC — [ticket-670] tour 1 — codeur terminé (76937ms)
+- 2026-10-29 18:53:36 UTC — [ide-core] ticket-669 PR #754 mergée (CI verte)
+- 2026-10-29 18:59:23 UTC — [ticket-670] testeur: OK (exit 0)
+- 2026-10-29 19:00:44 UTC — [ticket-670] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Le test d'architecture utilise  (81218ms)
+- 2026-10-29 19:00:44 UTC — [ticket-670] tour 1 — reviewer démarré
+- 2026-10-29 19:01:01 UTC — [ticket-670] tour 1 — reviewer terminé (16625ms)
+- 2026-10-29 19:02:31 UTC — [ticket-670] validateur: fichiers cités joints : backend/tests/test_sens_des_imports.py ; absents : models/, services/
+- 2026-10-29 19:02:31 UTC — [ticket-670] validateur: APPROVED — Le test `backend/tests/test_sens_des_imports.py` a été implémenté conformément a (106468ms)
+- 2026-10-29 19:02:31 UTC — [ticket-670] APPROVED après 1 tour(s)
+- 2026-10-29 19:05:45 UTC — [ticket-670] documentation: 0 fichier(s) (188375ms) — après tour de correction
