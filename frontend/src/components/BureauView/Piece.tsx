@@ -28,7 +28,9 @@ import {
 } from "../../lib/bureau/fete";
 import StatusPill from "../../design/ui/StatusPill";
 import { libelleDeSuite } from "../../lib/bureau/etapeDeSuite";
+import { posteEnPlan } from "../../lib/bureau/plan";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
+import { rolesDesPostes } from "../../lib/bureau/roleDuPoste";
 import { postesAbsents } from "../../lib/bureau/sallesCommunes";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
 import { enEtapeSilencieuse, santeAgent } from "../../lib/santeAgent";
@@ -126,12 +128,16 @@ export default function Piece({
     clos,
     fete,
   });
+  // Le tour de plan : l'agent du poste se tient au tableau blanc, sa chaise est vide (ticket-623).
+  const plan = posteEnPlan(etat);
+  const roles = rolesDesPostes(etat);
   const agents = placerLesAgents(
     faits,
     activites,
     clos,
     fete,
     copie?.poste ?? null,
+    plan,
   ).map((a) =>
     absents.includes(a.poste) ? { ...a, activite: null, parti: true } : a,
   );
@@ -215,16 +221,17 @@ export default function Piece({
                 key={p.poste}
                 projet={projet}
                 poste={p}
+                role={roles[p.poste]}
                 sante={sante}
                 auRepos={auRepos}
                 parti={clos || fete}
-                absent={absents.includes(p.poste)}
+                absent={absents.includes(p.poste) || plan === p.poste}
                 onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
                 outil={outil?.poste === p.poste ? outil.phrase : null}
               />
             ))}
           </div>
-          <AgentsDeLaPiece projet={projet} agents={agents} />
+          <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} />
           {fete && <Confettis />}
           {gyrophare && (
             <span className="absolute left-1/2 top-1 z-20 -translate-x-1/2">

@@ -1,9 +1,10 @@
-import type { EtatPoste, PosteId } from "./postesDuRun";
+import type { EtatPoste, RoleAffiche } from "./postesDuRun";
 import { LIBELLE_SANTE } from "../santeAgent";
 import type { SanteAgent } from "../santeAgent";
 
-const NOMS: Record<PosteId, string> = {
+const NOMS: Record<RoleAffiche, string> = {
   codeur: "Codeur",
+  architect: "Architecte",
   testeur: "Testeur",
   securite: "Sécurité",
   reviewer: "Reviewer",
@@ -11,7 +12,7 @@ const NOMS: Record<PosteId, string> = {
 };
 
 /** Le nom du poste, tel qu'on le lit sous le bureau et dans son `aria-label`. */
-export function nomDuPoste(poste: PosteId): string {
+export function nomDuPoste(poste: RoleAffiche): string {
   return NOMS[poste];
 }
 
@@ -28,7 +29,7 @@ function motDeLEtat(etat: EtatPoste, sante: SanteAgent, auRepos: boolean): strin
  * n'attend son tour : le poste est simplement « libre ».
  */
 export function libelleDuPoste(
-  poste: PosteId,
+  poste: RoleAffiche,
   etat: EtatPoste,
   sante: SanteAgent,
   auRepos = false,

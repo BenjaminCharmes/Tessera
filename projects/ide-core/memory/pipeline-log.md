@@ -6062,3 +6062,16 @@ Le diff ajoute :
 - 2026-10-29 10:33:06 UTC — [ticket-626] APPROVED après 1 tour(s)
 - 2026-10-29 10:33:12 UTC — [ticket-626] fichiers non suivis laissés par le run : tickets/blocked/ticket-672-running-apps-view-shows-one-room-per-app.md, tickets/todo/ticket-671-services-declare-an-activity-file-the-backend-reads.md, tickets/todo/ticket-673-product-agents-are-drawn-from-the-activity-file.md (à ignorer dans .gitignore ?)
 - 2026-10-29 10:34:32 UTC — [ticket-626] documentation: 0 fichier(s) (79875ms)
+- 2026-10-29 10:34:54 UTC — [ide-core] ticket-626 PR #737 confiée au CIWatcher
+- 2026-10-29 10:34:58 UTC — [ticket-623] branche ticket-623-in-the-bureau-the-architect-has-its-own-look-and
+- 2026-10-29 10:34:59 UTC — [ticket-623] tour 1 — codeur démarré
+- 2026-10-29 10:39:36 UTC — [ide-core] ticket-626 PR #737 mergée (CI verte)
+- 2026-10-29 10:40:38 UTC — [ticket-623] tour 1 — codeur terminé (339015ms)
+- 2026-10-29 10:42:51 UTC — [ticket-623] testeur: OK (exit 0)
+- 2026-10-29 10:44:28 UTC — [ticket-623] securite: PASS — Ce diff ajoute un support UI pour le rôle "architect" et la logique du tour de p (97108ms)
+- 2026-10-29 10:44:28 UTC — [ticket-623] tour 1 — reviewer démarré
+- 2026-10-29 10:44:53 UTC — [ticket-623] tour 1 — reviewer terminé (25125ms)
+- 2026-10-29 10:48:48 UTC — [ticket-623] validateur: fichiers cités joints : lib/bureau/physique.ts, lib/bureau/activites.ts
+- 2026-10-29 10:48:48 UTC — [ticket-623] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur et l'architecte ont m (260358ms)
+- 2026-10-29 10:48:48 UTC — [ticket-623] APPROVED après 1 tour(s)
+- 2026-10-29 10:51:35 UTC — [ticket-623] documentation: 0 fichier(s) (160281ms)

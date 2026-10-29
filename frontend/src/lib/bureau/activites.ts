@@ -5,8 +5,9 @@ import type { PosteDuRun, PosteId } from "./postesDuRun";
  * Ce que fait un agent qui a fini : café à son poste, une pause mains vides, ou la machine.
  * `fete` ne se tire jamais : la PR mergée la donne à tous, bras levés (ticket-598).
  * `copie` non plus : le refus du reviewer ou du validateur l'impose, feuille en main (ticket-599).
+ * `plan` non plus : le tour de plan l'impose, debout devant le tableau blanc (ticket-623).
  */
-export type Activite = "tasse" | "pause" | "machine" | "fete" | "copie";
+export type Activite = "tasse" | "pause" | "machine" | "fete" | "copie" | "plan";
 
 /** Un tirage dans [0, 1[ : `Math.random` en production, une suite fixe dans les tests. */
 export type Hasard = () => number;
@@ -28,6 +29,7 @@ const LIBELLES: Record<Activite, string> = {
   machine: "prend un café à la machine",
   fete: "fête la PR mergée",
   copie: "rend sa copie au codeur",
+  plan: "prépare le plan",
 };
 
 /** Sol de 800 px : les colonnes du grid (px-2.5, gap-1, cinq colonnes) donnent ces centres. */
@@ -45,6 +47,13 @@ const DECALAGE_A_COTE = 48;
 export const MACHINE_X = 470;
 /** La bibliothèque, entre les deux premières fenêtres (ticket-627). */
 export const BIBLIOTHEQUE_X = 208;
+/** Le bord gauche du tableau blanc, au mur : l'agent du plan s'y tient. */
+export const TABLEAU_X = 30;
+/**
+ * Le tableau fait 88 px × 1,5 × 1,15 d'écran ; l'agent, 63 px : pour le centrer
+ * devant, son bord gauche se décale de la moitié de la différence.
+ */
+const DECALAGE_AU_TABLEAU = 44;
 export const PORTE_X = 738;
 /** L'agent de 63 px se centre sur la porte de 81 px. */
 const DECALAGE_A_LA_PORTE = 9;
@@ -139,6 +148,16 @@ function placeDe(poste: PosteId, activite: Activite, rang: number): AgentPlace {
       parti: false,
     };
   }
+  if (activite === "plan") {
+    return {
+      poste,
+      x: TABLEAU_X,
+      decalage: DECALAGE_AU_TABLEAU,
+      niveau: "fond",
+      activite,
+      parti: false,
+    };
+  }
   // Rendre sa copie : debout à côté du poste du codeur, pas du sien.
   const ancre = activite === "copie" ? "codeur" : poste;
   return {
@@ -151,11 +170,23 @@ function placeDe(poste: PosteId, activite: Activite, rang: number): AgentPlace {
   };
 }
 
+/** Le plan et la copie s'imposent à l'agent ; sinon, l'activité tirée, café à son poste par défaut. */
+function activiteDe(
+  poste: PosteId,
+  effectives: Activites,
+  copie: PosteId | null,
+  plan: PosteId | null,
+): Activite {
+  if (poste === plan) return "plan";
+  return poste === copie ? "copie" : (effectives[poste] ?? "tasse");
+}
+
 /**
  * Où se tient chaque agent de la pièce. Run en cours : les agents qui ont fini,
  * chacun à sa place d'activité. Run clos : les cinq, à la porte (ADR-058 : ils
  * n'y sont que parce que le run est fini). PR mergée : les cinq, bras levés devant leur poste.
  * `copie` : l'agent qui a renvoyé le travail se tient au poste du codeur, feuille en main.
+ * `plan` : l'agent du tour de plan, qui n'a pas fini, se tient devant le tableau blanc.
  */
 export function placerLesAgents(
   faits: readonly PosteId[],
@@ -163,6 +194,7 @@ export function placerLesAgents(
   clos: boolean,
   fete = false,
   copie: PosteId | null = null,
+  plan: PosteId | null = null,
 ): AgentPlace[] {
   // La fête passe avant la porte : la PR se merge après la clôture du run (ADR-051).
   if (fete) return POSTES.map((poste) => placeDe(poste, "fete", 0));
@@ -179,8 +211,8 @@ export function placerLesAgents(
   let rang = 0;
   const places: AgentPlace[] = [];
   for (const poste of POSTES) {
-    if (!faits.includes(poste)) continue;
-    const activite = poste === copie ? "copie" : (effectives[poste] ?? "tasse");
+    if (!faits.includes(poste) && poste !== plan) continue;
+    const activite = activiteDe(poste, effectives, copie, plan);
     places.push(placeDe(poste, activite, rang));
     if (activite === "machine") rang += 1;
   }

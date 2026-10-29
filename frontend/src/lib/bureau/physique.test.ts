@@ -55,6 +55,15 @@ describe("TENUES", () => {
     }
   });
 
+  it("dresses the architect differently from the coder, with tokens for both shades", () => {
+    expect(TENUES.architect).not.toEqual(TENUES.codeur);
+    expect(TENUES.architect.haut).not.toBe(TENUES.codeur.haut);
+    const haut = jeton(`haut-${TENUES.architect.haut}`);
+    expect(haut).toBeDefined();
+    expect(haut).not.toBe(jeton("haut-codeur"));
+    expect(jeton(`haut-${TENUES.architect.haut}-ombre`)).toBeDefined();
+  });
+
   it("puts the tie on the reviewer and the hood on the coder only", () => {
     expect(POSTES.filter((r) => TENUES[r].cravate)).toEqual(["reviewer"]);
     expect(POSTES.filter((r) => TENUES[r].capuche)).toEqual(["codeur"]);

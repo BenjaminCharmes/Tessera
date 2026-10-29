@@ -1,5 +1,5 @@
 import { TENUES, physique } from "../../lib/bureau/physique";
-import type { EtatPoste, PosteId } from "../../lib/bureau/postesDuRun";
+import type { EtatPoste, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { SanteAgent } from "../../lib/santeAgent";
 import Ecran from "./Ecran";
 import Personnage from "./Personnage";
@@ -7,7 +7,7 @@ import Personnage from "./Personnage";
 interface PosteProps {
   /** Le projet et le rôle : ils donnent à l'agent son physique et sa tenue. */
   projet: string;
-  role: PosteId;
+  role: RoleAffiche;
   etat: EtatPoste;
   sante: SanteAgent;
   /** Pièce sans run : aucun personnage, un bureau et sa chaise vide (ADR-058). */

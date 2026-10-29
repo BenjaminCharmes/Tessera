@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { INITIAL, applyEvent } from "../../hooks/streamState";
+import type { StreamState } from "../../hooks/streamState";
+import type { AgentRole, EventType, OrchestratorEvent } from "../../types/api";
 import {
   PLACES_MACHINE,
   PORTE_X,
+  TABLEAU_X,
   appliquerPlafond,
   libelleActivite,
   machineEnService,
@@ -12,7 +16,8 @@ import {
   tirerActivite,
 } from "./activites";
 import type { Activites } from "./activites";
-import { POSTES } from "./postesDuRun";
+import { posteEnPlan } from "./plan";
+import { POSTES, postesDuRun } from "./postesDuRun";
 import type { PosteDuRun, PosteId } from "./postesDuRun";
 
 function suite(...valeurs: number[]): () => number {
@@ -151,6 +156,58 @@ describe("placerLesAgents", () => {
     );
     expect(new Set(agents.map((a) => a.x)).size).toBe(5);
     expect(machineEnService(agents)).toBe(false);
+  });
+});
+
+function evenement(
+  type: EventType,
+  agent: AgentRole | null,
+  data: Record<string, unknown> = {},
+): OrchestratorEvent {
+  return { type, agent, ticket_id: "ticket-001", data, timestamp: "2026-01-01T00:00:00.000Z" };
+}
+
+/** Ce que la pièce place pour un run rejoué : les faits, puis le poste du plan. */
+function placesDuRun(evenements: OrchestratorEvent[]) {
+  const etat: StreamState = evenements.reduce(applyEvent, INITIAL);
+  const faits = postesFaits(postesDuRun(etat));
+  return placerLesAgents(faits, {}, false, false, null, posteEnPlan(etat));
+}
+
+describe("placerLesAgents during the plan round", () => {
+  const PLAN = { round: 0, phase: "plan" };
+
+  it("stands the post agent at the whiteboard, preparing the plan, between the plan start and done", () => {
+    const agents = placesDuRun([evenement("agent_started", "codeur", PLAN)]);
+
+    expect(agents).toHaveLength(1);
+    const [agent] = agents;
+    expect(agent?.poste).toBe("codeur");
+    expect(agent?.activite).toBe("plan");
+    expect(libelleActivite("plan")).toBe("prépare le plan");
+    expect(agent?.x).toBe(TABLEAU_X);
+    expect(agent?.niveau).toBe("fond");
+    expect(agent?.parti).toBe(false);
+  });
+
+  it("takes the agent back to its post once the plan is done", () => {
+    const agents = placesDuRun([
+      evenement("agent_started", "codeur", PLAN),
+      evenement("agent_done", "codeur", PLAN),
+    ]);
+
+    expect(agents).toEqual([]);
+  });
+
+  it("leaves no whiteboard walker in a run without a plan", () => {
+    const agents = placesDuRun([evenement("agent_started", "codeur", { round: 1 })]);
+
+    expect(agents.filter((a) => a.activite === "plan")).toEqual([]);
+  });
+
+  it("never lets a plan override the party or the door", () => {
+    expect(placerLesAgents([], {}, true, false, null, "codeur").every((a) => a.parti)).toBe(true);
+    expect(placerLesAgents([], {}, false, true, null, "codeur").every((a) => a.activite === "fete")).toBe(true);
   });
 });
 
