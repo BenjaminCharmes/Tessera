@@ -5947,3 +5947,23 @@ Le diff ajoute :
 - 2026-10-28 15:39:37 UTC — [ticket-617] validateur: fichiers cités joints : agents.json
 - 2026-10-28 15:39:37 UTC — [ticket-617] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (152671ms)
 - 2026-10-28 15:39:37 UTC — [ticket-617] APPROVED après 2 tour(s)
+- 2026-10-28 15:41:58 UTC — [ticket-617] documentation: 0 fichier(s) (126780ms)
+- 2026-10-28 15:45:46 UTC — [ide-core] ticket-662 PR #727 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-28 15:46:12 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 15:50:26 UTC — [ide-core] ticket-662 PR #727 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-28 15:50:43 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 16:06:56 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 16:36:39 UTC — [ticket-617] testeur: délai dépassé, suite relancée
+- 2026-10-28 16:36:39 UTC — [ticket-617] testeur: délai dépassé (1500 s, durée réelle 1780 s) — ../scripts/verifier.py coupé après 1780 s
+- 2026-10-29 07:16:29 UTC — [ticket-617] testeur: délai dépassé (1500 s, durée réelle 52790 s) — ../scripts/verifier.py coupé après 52790 s
+- 2026-10-29 07:16:29 UTC — [ticket-617] branche reprise (2 commit(s)) — tests red, codeur en premier
+- 2026-10-29 07:16:29 UTC — [ticket-617] tour 1 — codeur démarré
+- 2026-10-29 07:20:23 UTC — [ticket-617] tour 1 — codeur terminé (233891ms)
+- 2026-10-29 07:39:28 UTC — [ticket-617] testeur: OK (exit 0)
+- 2026-10-29 07:41:40 UTC — [ticket-617] securite: PASS — This diff implements ticket-617 (visual check declaration) with secure design pa (132203ms)
+- 2026-10-29 07:41:40 UTC — [ticket-617] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 07:41:40 UTC — [ticket-617] tour 1 — reviewer démarré
+- 2026-10-29 07:42:02 UTC — [ticket-617] tour 1 — reviewer terminé (22235ms)
+- 2026-10-29 07:43:24 UTC — [ticket-617] validateur: fichiers cités joints : agents.json
+- 2026-10-29 07:43:24 UTC — [ticket-617] validateur: APPROVED — Tous les critères sont satisfaits. Le module `controle_visuel.py` lit correcteme (103875ms)
+- 2026-10-29 07:43:24 UTC — [ticket-617] APPROVED après 1 tour(s)
