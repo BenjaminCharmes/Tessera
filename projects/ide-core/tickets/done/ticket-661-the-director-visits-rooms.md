@@ -1,15 +1,17 @@
 ---
-id: ticket-661
-title: "The director walks to a room whose run turns silent or frozen, or that the user opens, then goes back"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: [ticket-631]
-estimated_days: 2
 created: 2026-10-28
+depends_on:
+- ticket-631
+estimated_days: 2
+id: ticket-661
 plan: true
+pr_number: 752
+priority: low
+status: done
+title: The director walks to a room whose run turns silent or frozen, or that the
+  user opens, then goes back
+type: feat
 ---
 
 # ticket-661 — Le directeur fait sa ronde

@@ -53,7 +53,7 @@ const MARGE_DU_SOL = 10;
  * s'étirent pas avec le sol, contrairement aux abscisses du repère.
  * Moitié du poste (84 px) plus la marge qui sépare l'agent debout de son bureau.
  */
-const DECALAGE_A_COTE = 48;
+export const DECALAGE_A_COTE = 48;
 
 /** Abscisse de la machine et de la porte, dans le fond de la pièce. */
 export const MACHINE_X = 470;
@@ -150,7 +150,8 @@ export function appliquerPlafond(
   return effectives;
 }
 
-function centreDuPoste(poste: PosteId): number {
+/** Le centre d'un poste dans le repère de 800 px : l'ancre des agents debout et du directeur en visite. */
+export function centreDuPoste(poste: PosteId): number {
   return (
     MARGE_DU_SOL + POSTES.indexOf(poste) * PAS_COLONNE + LARGEUR_COLONNE / 2
   );

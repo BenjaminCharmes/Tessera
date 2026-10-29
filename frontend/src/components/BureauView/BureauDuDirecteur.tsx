@@ -17,6 +17,8 @@ interface BureauDuDirecteurProps {
   agents: readonly AgentEnSalle[];
   /** L'horloge unique de la vue (ticket-602). */
   maintenant: number;
+  /** Le directeur est en visite dans une pièce : son bureau reste dessiné, mais vide (ticket-661). */
+  enVisite?: boolean;
 }
 
 /**
@@ -27,7 +29,9 @@ interface BureauDuDirecteurProps {
 export default function BureauDuDirecteur({
   agents,
   maintenant,
+  enVisite = false,
 }: BureauDuDirecteurProps) {
+  const libelle = `${NOM_DU_DIRECTEUR}, directeur${enVisite ? ", en visite" : ""}`;
   return (
     <Salle
       maintenant={maintenant}
@@ -36,10 +40,11 @@ export default function BureauDuDirecteur({
       entete="un agent dont la question attend ta réponse vient s'y tenir"
       vide="Aucune question en attente"
       mobilier={
-        <span role="img" aria-label={`${NOM_DU_DIRECTEUR}, directeur`} title={`${NOM_DU_DIRECTEUR}, directeur`}>
+        <span role="img" aria-label={libelle} title={libelle}>
           <BureauEnBois
             tenue={TENUE_DU_DIRECTEUR}
             physique={PHYSIQUE_DU_DIRECTEUR}
+            vide={enVisite}
           />
         </span>
       }

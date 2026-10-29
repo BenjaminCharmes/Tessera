@@ -1497,6 +1497,17 @@ La journalisation (`livraison_echouee`) inclut la pile complète (`exc_info=True
 
 **Cas critique** : une exception survient **après** l'ouverture de la PR. Le numéro de PR n'est jamais perdu — la `Livraison` le porte même en cas d'erreur, et la phase 2 (attente CI, merge) est confiée au `CIWatcher` comme pour une livraison réussie. Les PRs orphelines — ouvertes mais jamais relancées — ne peuvent donc plus se produire.
 
+### Renumérotation des collisions de numéro (ticket-659)
+
+Quand deux branches partent du même `develop`, elles allouent indépendamment
+les numéros de ticket et d'ADR. La branche livrée en seconde risque de réutiliser
+un numéro déjà pris. Avant le rebase, l'étape de renumérotation détecte les collisions
+sur `origin/<base>` et alloue les numéros libres suivants. Elle réécrit les fichiers affectés
+(noms, identifiants, titres, références) et journalise chaque renumérotation en union dans
+`memory/pipeline-log.md` (ADR-051). `scripts/prochain_numero.py` expose la même logique d'allocation
+pour les agents qui créent des tickets — architecte et codeur l'utilisent avant d'écrire
+une fiche pour garantir que le numéro n'est pris ni sur l'arbre, ni sur `origin/<base>`, ni sur d'autres branches `origin/ticket-*` en cours.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).

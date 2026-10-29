@@ -5,6 +5,8 @@ interface BureauEnBoisProps {
   /** Qui s'y assoit : la tenue et le physique de la figure de la salle. */
   tenue: Tenue;
   physique: Physique;
+  /** Personne derrière : le mobilier reste, la figure est partie en visite (ticket-661). */
+  vide?: boolean;
 }
 
 /**
@@ -13,7 +15,7 @@ interface BureauEnBoisProps {
  * mobilier — fixe, sans écran ni voyant ; ce que la salle dit vient de ses
  * occupants (ADR-058).
  */
-export default function BureauEnBois({ tenue, physique }: BureauEnBoisProps) {
+export default function BureauEnBois({ tenue, physique, vide = false }: BureauEnBoisProps) {
   return (
     <svg
       width="56"
@@ -23,7 +25,7 @@ export default function BureauEnBois({ tenue, physique }: BureauEnBoisProps) {
       aria-hidden="true"
       data-sprite="bureau-en-bois"
     >
-      <Personnage tenue={tenue} physique={physique} />
+      {!vide && <Personnage tenue={tenue} physique={physique} />}
       <rect x="1" y="12" width="14" height="2" className="fill-(--sprite-table)" />
       <rect x="1" y="14" width="14" height="1" className="fill-(--sprite-table-ombre)" />
       <rect x="2" y="15" width="1" height="3" className="fill-(--sprite-table-ombre)" />

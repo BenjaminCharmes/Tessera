@@ -6,6 +6,7 @@ import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
 import { avecLeNom } from "../../lib/bureau/noms";
 import type { PosteId, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { RedacteurPlace } from "../../lib/bureau/redaction";
+import DirecteurEnVisite from "./DirecteurEnVisite";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import { ECHELLE_LARGE } from "../../lib/bureau/echelleDesSprites";
 import { useEtirementDuSol, useMarcheActive } from "../../hooks/useEtirementDuSol";
@@ -17,6 +18,8 @@ interface AgentsDeLaPieceProps {
   roles?: Partial<Record<PosteId, RoleAffiche>>;
   /** Les rédacteurs de la documentation, debout devant la bibliothèque tant qu'elle tourne (ticket-624). */
   redacteurs?: readonly RedacteurPlace[];
+  /** Le poste derrière lequel se tient le directeur en visite dans cette pièce (ticket-661). */
+  directeur?: PosteId | null;
 }
 
 /** Hauteur du pied de l'agent au-dessus du bas du sol : sous les postes, au niveau de leur nom. */
@@ -96,7 +99,7 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
  * leur poste pour une activité, et partent tous par la porte quand le run se clôt.
  * La couche ne reçoit aucun clic : les postes dessous restent des boutons.
  */
-export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs = [] }: AgentsDeLaPieceProps) {
+export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs = [], directeur = null }: AgentsDeLaPieceProps) {
   const bavard = quiBavarde(agents);
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -120,6 +123,7 @@ export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs
           bavarde={false}
         />
       ))}
+      {directeur !== null && <DirecteurEnVisite projet={projet} poste={directeur} />}
     </div>
   );
 }
