@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-650
 plan: true
-pr_number: null
+pr_number: 760
 priority: medium
 status: done
 title: 'Audit: give every ADR a status, and find the ones replaced, duplicated or
