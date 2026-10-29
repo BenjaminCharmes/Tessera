@@ -6148,3 +6148,15 @@ Le diff ajoute :
 - 2026-10-29 12:38:24 UTC — [ticket-631] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le composant partagé `MurLumin (164141ms)
 - 2026-10-29 12:38:24 UTC — [ticket-631] APPROVED après 1 tour(s)
 - 2026-10-29 12:40:29 UTC — [ticket-631] documentation: 0 fichier(s) (117797ms)
+- 2026-10-29 12:45:45 UTC — [ide-core] ticket-631 PR #743 mergée (CI verte)
+- 2026-10-29 12:45:47 UTC — [ide-core] ticket-631 : base réalignée sur develop
+- 2026-10-29 12:45:47 UTC — [ide-core] ticket-631 PR #743 confiée au CIWatcher
+- 2026-10-29 12:45:53 UTC — [ticket-635] branche ticket-635-the-bureau-rooms-gain-a-wall-clock-a-wall-shelf-a
+- 2026-10-29 12:45:54 UTC — [ticket-635] tour 1 — codeur démarré
+- 2026-10-29 12:53:54 UTC — [ticket-635] tour 1 — codeur terminé (479859ms)
+- 2026-10-29 12:56:14 UTC — [ticket-635] testeur: OK (exit 0)
+- 2026-10-29 12:58:21 UTC — [ticket-635] securite: PASS — Audit sécurité du diff ticket-635 (horloge, cadre, étagère, corbeille) : aucune  (126406ms)
+- 2026-10-29 12:58:21 UTC — [ticket-635] tour 1 — reviewer démarré
+- 2026-10-29 12:58:44 UTC — [ticket-635] tour 1 — reviewer terminé (23389ms)
+- 2026-10-29 13:02:01 UTC — [ticket-635] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests vérifient que l'horlog (220891ms)
+- 2026-10-29 13:02:01 UTC — [ticket-635] APPROVED après 1 tour(s)
