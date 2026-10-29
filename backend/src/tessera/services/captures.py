@@ -52,6 +52,20 @@ def dossier_des_captures(project_id: str, ticket: str | None = None) -> Path:
     return dossier / ticket
 
 
+def lister_les_captures(project_id: str, ticket: str) -> list[str]:
+    """Return the image names a run took, sorted ; empty when it took none.
+
+    Seuls les fichiers dont le nom a la forme d'une capture sont rendus : ce que
+    l'endpoint annonce est exactement ce que `servir_une_capture` accepte.
+    """
+    dossier = dossier_des_captures(project_id, ticket)
+    if not dossier.is_dir():
+        return []
+    return sorted(
+        f.name for f in dossier.iterdir() if f.is_file() and MOTIF_FICHIER.fullmatch(f.name)
+    )
+
+
 def noms_attendus(config: ConfigCaptures) -> list[str]:
     """Return the `<nom>-<largeur>-<thème>.png` names, one per width and theme."""
     return [

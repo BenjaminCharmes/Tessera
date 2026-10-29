@@ -72,6 +72,17 @@ async def prendre_les_captures(project_id: str) -> dict[str, list[str]]:
     return {"captures": noms}
 
 
+@router.get("/{project_id}/captures")
+async def lister_les_captures_du_run(
+    project_id: str, ticket: str = Query(...)
+) -> dict[str, list[str]]:
+    """List the images a run took for this ticket (ticket-620)."""
+    _racine(project_id)
+    if not captures.MOTIF_TICKET.fullmatch(ticket):
+        raise HTTPException(status_code=404, detail="Capture inconnue")
+    return {"captures": captures.lister_les_captures(project_id, ticket)}
+
+
 @router.get("/{project_id}/captures/{fichier}")
 async def servir_une_capture(
     project_id: str, fichier: str, ticket: str | None = Query(default=None)

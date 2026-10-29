@@ -14,6 +14,9 @@ vi.mock("../StatsView/RunHistorique", () => ({
   default: ({ runId }: { runId: string }) => <div data-testid="fil">{runId}</div>,
 }));
 
+// Les captures du run passent par l'API aussi : ce test-ci n'en regarde aucune.
+vi.mock("../../hooks/useCapturesDuRun", () => ({ useCapturesDuRun: () => [] }));
+
 function run(id: string, ticketId: string, extra: Partial<PipelineRun>): PipelineRun {
   return {
     id,
