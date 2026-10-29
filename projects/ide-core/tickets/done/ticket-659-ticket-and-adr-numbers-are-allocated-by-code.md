@@ -1,15 +1,16 @@
 ---
-id: ticket-659
-title: "Ticket and ADR numbers are allocated by code, and a run renumbers what collides before delivery"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-28
 depends_on: []
 estimated_days: 2
-created: 2026-10-28
+id: ticket-659
 plan: true
+pr_number: 748
+priority: high
+status: done
+title: Ticket and ADR numbers are allocated by code, and a run renumbers what collides
+  before delivery
+type: feat
 ---
 
 # ticket-659 — Les numéros de ticket et d'ADR attribués par le code

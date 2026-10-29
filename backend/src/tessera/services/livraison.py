@@ -10,7 +10,6 @@ un conflit, une CI rouge ou une CI muette l'arrêtent, et il dit pourquoi.
 """
 import asyncio
 import time
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
 
@@ -22,6 +21,8 @@ from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
 from tessera.services.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
 from tessera.services.livraison_arrets import arret_ci_illisible, arret_conflit
 from tessera.services.livraison_rebase import noter_ce_que_le_rebase_a_fait
+from tessera.services.livraison_resultat import Livraison as Livraison
+from tessera.services.renumeroter import etape_de_numerotation
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.retest_apres_rebase import RetestApresRebase
 from tessera.utils.logger import get_logger
@@ -34,32 +35,6 @@ _INTERVALLE_CI_S = 15.0
 #: Au-delà, on rend la main. Une attente sans borne bloquerait la file de
 #: tickets, et ADR-018 fait reposer le ticket suivant sur un arbre propre.
 _ATTENTE_CI_MAX_S = 900.0
-
-
-@dataclass(frozen=True)
-class Livraison:
-    """Ce que la livraison a fait, et pourquoi elle s'est arrêtée."""
-
-    etapes: tuple[str, ...] = ()
-    #: Durée en millisecondes de chaque étape, dans le même ordre que `etapes`.
-    #: `tuple[float, ...]` est JSON-sérialisable (devient une liste). (ticket-288)
-    durees_ms: tuple[float, ...] = ()
-    #: `None` quand la livraison est allée aussi loin que le projet l'autorise.
-    arret: str | None = None
-    conflits: tuple[str, ...] = ()
-    pr_number: int | None = None
-    merged: bool = False
-    #: Vrai quand la phase 1 a levé **après** l'ouverture de la PR : `arret`
-    #: porte alors une cause, mais la PR est bien ouverte et doit passer à la
-    #: phase 2. Les autres arrêts avec PR (conflit résolu, ADR-033) restent
-    #: sans surveillance. (ticket-415)
-    pr_orpheline: bool = False
-    #: Tête de la branche telle qu'elle est partie sur le distant : c'est elle
-    #: que le watcher compare à la tête de la PR avant de merger (ticket-492).
-    pushed_sha: str | None = None
-    #: Vrai quand la branche ne porte plus le commit que le reviewer a lu :
-    #: rien n'est poussé, le ticket est bloqué (ticket-492).
-    branche_modifiee: bool = False
 
 
 class LivraisonInterrompue(Exception):
@@ -118,6 +93,7 @@ class LivraisonService:
         politique: PolitiqueRun | None = None,
         post_pr_callback: Callable[[str, int, str], Awaitable[None]] | None = None,
         retest: RetestApresRebase | None = None,
+        renumeroter: Callable[[], Awaitable[tuple[str, ...]]] | None = None,
     ) -> None:
         self._git = git_workspace
         self._workflow = workflow
@@ -140,6 +116,8 @@ class LivraisonService:
         self._post_pr_callback = post_pr_callback
         # Rejoue les tests quand le rebase ramène des commits (ticket-568).
         self._retest = retest
+        # Renumérote ce que le diff ajoute et que la base porte déjà (ticket-659).
+        self._renumeroter = renumeroter
 
     async def livrer_phase_1(
         self,
@@ -210,6 +188,12 @@ class LivraisonService:
             changee = await self._branche_modifiee(approved_sha)
             if changee is not None:
                 return changee
+
+        # Après le contrôle de l'approbation, qui refuserait ce commit de code,
+        # et avant le rebase, qui n'a pas à rejouer des numéros déjà pris.
+        arret = await etape_de_numerotation(self._renumeroter, etapes, durees_ms)
+        if arret is not None:
+            return Livraison(etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=arret)
 
         # Avant le rebase : après lui, la base est toujours ancêtre de HEAD.
         retest = self._retest

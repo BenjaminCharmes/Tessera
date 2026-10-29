@@ -89,6 +89,23 @@ class GitCommits(GitState):
         await self.commit_bookkeeping()
         return sha
 
+    async def commit_chemins(self, message: str, chemins: list[str]) -> bool:
+        """Stage exactly `chemins` (project-relative) and commit them (ticket-659).
+
+        Renames and deletions are staged too. A path the repository ignores —
+        the pipeline log of a project in `local` mode (ADR-021) — is skipped, as
+        naming it would make `git add` exit 1. Returns False when nothing was
+        staged, so no empty commit is made.
+        """
+        retenus = [c for c in chemins if not await self._is_ignored(c)]
+        if not retenus:
+            return False
+        await self._run("add", "-A", "--", *retenus)
+        if not (await self._run("diff", "--cached", "--name-only")).strip():
+            return False
+        await self._run("commit", "-m", message)
+        return True
+
     async def _list_tracked_ticket_basenames(self) -> frozenset[str]:
         """Return the basenames of tracked files under ``tickets/`` at call time.
 

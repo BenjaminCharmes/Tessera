@@ -103,6 +103,10 @@ que tu n'as pas pu vérifier sans les exécuter}
 
 Si en implémentant tu découvres qu'une partie du travail dépasse le scope du ticket actuel,
 **ne l'implémente pas** — crée un nouveau ticket et mentionne-le dans tes notes.
+Son numéro vient de `python ../../scripts/prochain_numero.py ticket` (`adr` pour une
+ADR), lancé juste avant d'écrire la fiche : il compte ce que portent l'arbre,
+`origin/develop` et les autres branches `origin/ticket-*`. Sans ce script dans
+le dépôt, prends le suivant le plus grand déjà pris, tous dossiers confondus.
 
 ## Contexte disponible
 
