@@ -1,15 +1,16 @@
 ---
-id: ticket-651
-title: "Audit: check the code against the constraints in force and the house rules"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
-depends_on: [ticket-650]
-estimated_days: 1
 created: 2026-10-28
+depends_on:
+- ticket-650
+estimated_days: 1
+id: ticket-651
 plan: true
+pr_number: 761
+priority: medium
+status: done
+title: 'Audit: check the code against the constraints in force and the house rules'
+type: design
 ---
 
 # ticket-651 — Audit du respect des règles
