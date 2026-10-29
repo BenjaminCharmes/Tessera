@@ -6046,3 +6046,4 @@ Le diff ajoute :
 - 2026-10-29 10:15:39 UTC — [ticket-625] validateur: fichiers cités joints : lib/bureau/salles.ts
 - 2026-10-29 10:15:39 UTC — [ticket-625] validateur: APPROVED — Les tests ont été ajoutés pour couvrir les quatre critères d'acceptation. Le cod (110062ms)
 - 2026-10-29 10:15:39 UTC — [ticket-625] APPROVED après 1 tour(s)
+- 2026-10-29 10:18:49 UTC — [ticket-625] documentation: 0 fichier(s) (184093ms) — après tour de correction
