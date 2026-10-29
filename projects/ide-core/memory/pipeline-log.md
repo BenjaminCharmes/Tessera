@@ -6034,3 +6034,15 @@ Le diff ajoute :
 - 2026-10-29 09:54:37 UTC — [ticket-620] validateur: APPROVED — Les critères d'acceptation sont tous satisfaits. Le code implémente un endpoint  (121110ms)
 - 2026-10-29 09:54:37 UTC — [ticket-620] APPROVED après 1 tour(s)
 - 2026-10-29 09:58:03 UTC — [ticket-620] documentation: 0 fichier(s) (201656ms) — après tour de correction
+- 2026-10-29 10:08:02 UTC — [ide-core] ticket-620 PR #735 confiée au CIWatcher
+- 2026-10-29 10:08:06 UTC — [ticket-625] branche ticket-625-the-break-room-keeps-a-pull-request-waiting-for-c
+- 2026-10-29 10:08:09 UTC — [ticket-625] tour 1 — codeur démarré
+- 2026-10-29 10:09:38 UTC — [ticket-625] tour 1 — codeur terminé (89655ms)
+- 2026-10-29 10:12:23 UTC — [ticket-625] testeur: OK (exit 0)
+- 2026-10-29 10:13:49 UTC — [ticket-625] securite: PASS — Audit terminé : aucune vulnérabilité de sécurité détectée. Le diff ajoute une lo (86391ms)
+- 2026-10-29 10:13:49 UTC — [ticket-625] tour 1 — reviewer démarré
+- 2026-10-29 10:14:10 UTC — [ticket-625] tour 1 — reviewer terminé (21264ms)
+- 2026-10-29 10:14:21 UTC — [ide-core] ticket-620 PR #735 mergée (CI verte)
+- 2026-10-29 10:15:39 UTC — [ticket-625] validateur: fichiers cités joints : lib/bureau/salles.ts
+- 2026-10-29 10:15:39 UTC — [ticket-625] validateur: APPROVED — Les tests ont été ajoutés pour couvrir les quatre critères d'acceptation. Le cod (110062ms)
+- 2026-10-29 10:15:39 UTC — [ticket-625] APPROVED après 1 tour(s)
