@@ -36,6 +36,11 @@ import frontmatter as fm
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.pipeline_text import _unapproved_commit_message
+from tessera.services.reprise_marqueur import (
+    lire_runs,
+    marquer_depots_repris,
+    runs_interrompus_a_reprendre,
+)
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
@@ -354,23 +359,17 @@ async def reprendre_depots_orphelins(
     db_path: Path | str,
     workspace_dir: Path,
 ) -> None:
-    """Pour chaque run orphelin soldé, remet d'aplomb le dépôt de son projet.
+    """Pour chaque run orphelin, remet d'aplomb le dépôt de son projet.
 
     Appelée dans le lifespan après `solder_les_runs_orphelins`. Les `run_ids`
-    sont ceux retournés par le solde : leurs `project_id`, `ticket_id` et
-    `started_at` sont lus en base pour trouver le dépôt à nettoyer.
+    sont ceux du solde (processus tué net) ; s'y ajoutent les runs `interrupted`
+    (arrêt propre) au dépôt pas encore repris, puis marqués : une seule fois
+    (ticket-665). `project_id`, `ticket_id` et `started_at` sont lus en base.
     """
-    if not run_ids:
-        return
-
     async with aiosqlite.connect(str(db_path)) as db:
-        placeholders = ",".join("?" * len(run_ids))
-        async with db.execute(
-            f"SELECT project_id, ticket_id, started_at"
-            f" FROM pipeline_runs WHERE id IN ({placeholders})",
-            run_ids,
-        ) as cursor:
-            rows = await cursor.fetchall()
+        interrompus = await runs_interrompus_a_reprendre(db)
+        rows = await lire_runs(db, [*run_ids, *interrompus])
+        await marquer_depots_repris(db, interrompus)
 
     for project_id, ticket_id, started_at_str in rows:
         try:

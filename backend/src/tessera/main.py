@@ -79,10 +79,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     orphelins = await solder_les_runs_orphelins(settings.ide_db_path)
     if orphelins:
         _logger.warning("runs_orphelins_soldes", extra={"runs": orphelins})
-        # Remet d'aplomb les dépôts laissés en état intermédiaire (ticket-369).
-        await reprendre_depots_orphelins(
-            orphelins, settings.ide_db_path, settings.ide_workspace_dir
-        )
+    # Remet d'aplomb les dépôts laissés en état intermédiaire (ticket-369), y
+    # compris ceux d'un arrêt propre : ces runs sont `interrupted` en base,
+    # donc absents de `orphelins` (ticket-665).
+    await reprendre_depots_orphelins(
+        orphelins, settings.ide_db_path, settings.ide_workspace_dir
+    )
     # Les worktrees de run qu'un arrêt a laissés : commit, puis suppression (ticket-520).
     await reprendre_worktrees_orphelins(
         settings.ide_workspace_dir, settings.ide_worktrees_dir
