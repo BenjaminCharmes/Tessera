@@ -97,7 +97,7 @@ export default function Salle({
           />
         </Agrandi>
         <Agrandi>
-          <CeilingLamp allume={lumiere} />
+          <CeilingLamp allume={lumiere} jour={moment !== "nuit"} />
         </Agrandi>
         <Agrandi>
           <SkyWindow

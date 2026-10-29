@@ -116,7 +116,7 @@ export default function FondDeLaPiece({
       {PLAFONNIERS_X.map((x) => (
         <Pose key={x} x={x} bas="top-0">
           <Agrandi>
-            <CeilingLamp allume={allume} />
+            <CeilingLamp allume={allume} jour={moment !== "nuit"} />
           </Agrandi>
         </Pose>
       ))}

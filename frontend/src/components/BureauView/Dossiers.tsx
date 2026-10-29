@@ -82,7 +82,7 @@ function Pile({ projet, restants, onActiver }: PileProps) {
       <Agrandi>
         <div className="flex flex-col items-center">
           {Array.from({ length: hauteurDePile(restants.length) }, (_, i) => (
-            <div key={i} className={i === 0 ? "" : "-mt-5"}>
+            <div key={i} className={i === 0 ? "" : "-mt-3"}>
               <Dossier />
             </div>
           ))}

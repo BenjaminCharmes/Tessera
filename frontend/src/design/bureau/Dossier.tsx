@@ -1,9 +1,12 @@
-/** Un dossier de la pile : un ticket de la file qui n'a pas encore été traité. Grille 10 × 8. */
+/**
+ * Un dossier de la pile : un ticket de la file qui n'a pas encore été traité. Grille 10 × 8,
+ * 20 × 16 px : à 30 × 24, la pile dépassait l'imprimante sur laquelle elle pose (ticket-663).
+ */
 export default function Dossier() {
   return (
     <svg
-      width="30"
-      height="24"
+      width="20"
+      height="16"
       viewBox="0 0 10 8"
       shapeRendering="crispEdges"
       aria-hidden="true"
