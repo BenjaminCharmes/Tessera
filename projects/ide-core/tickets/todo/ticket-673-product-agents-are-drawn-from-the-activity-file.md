@@ -25,7 +25,9 @@ sprite rend un état réel (ADR-058) : ici, l'entrée du fichier, pas une suppos
 ## Solution proposée
 - `useActiviteProduit()` relève la route toutes les 5 s, comme `useAppsEnCours`.
 - `ActiviteDeService` et `AgentDeProduit` dans `frontend/src/types/api.ts`.
-- Un bureau et un agent par entrée, sprites en SVG sous `design/bureau/`, tons en
+- Un agent par entrée, devant un pupitre de console (nouveau sprite `Console`, pas
+  `Poste` ni `BureauEnBois` : la salle reste une salle des serveurs, ticket-672),
+  sprites en SVG sous `design/bureau/`, tons en
   jetons `--sprite-*`. `actif` anime l'agent, `repos` le montre posé.
 - Le nom et le libellé se rendent comme texte, jamais comme balisage.
 
