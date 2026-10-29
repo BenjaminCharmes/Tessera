@@ -4,7 +4,7 @@ created: 2026-10-29
 depends_on: []
 estimated_days: 2
 id: ticket-672
-pr_number: null
+pr_number: 767
 priority: low
 status: done
 title: The running apps view shows one server room per app, with its state only
