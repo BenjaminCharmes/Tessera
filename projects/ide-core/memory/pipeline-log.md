@@ -6459,3 +6459,5 @@ Le diff ajoute :
 - 2026-10-29 23:18:34 UTC — [ticket-668] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
 - 2026-10-29 23:18:34 UTC — [ticket-668] validateur: APPROVED — Les trois critères sont satisfaits. L'ADR-066 capture la décision d'écarter les  (49312ms)
 - 2026-10-29 23:18:34 UTC — [ticket-668] APPROVED après 1 tour(s)
+- 2026-10-29 23:18:41 UTC — [ticket-668] fichiers non suivis laissés par le run : tickets/todo/ticket-702-the-codeur-exhausted-turns-are-recorded.md (à ignorer dans .gitignore ?)
+- 2026-10-29 23:21:09 UTC — [ticket-668] documentation: 0 fichier(s) (148375ms)
