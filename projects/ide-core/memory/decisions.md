@@ -596,8 +596,8 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 ## ADR-065 — La livraison d'un ticket attend le merge des PR déjà confiées au watcher
 
 **Date** : 2026-10-29
-**Décision** : complète ADR-051. Avant son rebase, la phase 1 attend que les autres tickets du projet tenus par `CIWatcher` aient fini, mergés ou bloqués. Attente bornée (1 500 s, journalisée) ; passé le délai, la livraison part comme avant. Aucun push forcé : la tête poussée reste celle que le reviewer a lue.
-**Raison** : le 22/10, une PR de file est devenue conflictuelle sur la documentation quand sa voisine a été mergée après coup. Rebaser après ce merge supprime la cause (ADR-022, ADR-039).
+**Décision** : complète ADR-051. Avant son rebase, la phase 1 attend que les autres tickets du projet tenus par `CIWatcher` aient fini, mergés ou bloqués. Attente bornée (1 500 s) ; passé le délai, la livraison part comme avant. Aucun push forcé : la tête poussée reste celle que le reviewer a lue.
+**Raison** : une PR de file est devenue conflictuelle sur la documentation quand sa voisine a été mergée après coup. Rebaser après ce merge supprime la cause (ADR-022, ADR-039).
 **Mesure** : non faite ; coût : un ticket prêt attend la CI du précédent.
 **Alternative rejetée** : push forcé depuis le watcher (`pushed_sha` périmé) ; `merge=union` côté dépôt (GitHub l'ignore) ; partir de la branche du précédent (défait ADR-056).
 **Limite** : une PR rendue conflictuelle hors file reste arrêtée sur « à rebaser » (ticket-674).
