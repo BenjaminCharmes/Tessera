@@ -6250,3 +6250,15 @@ Le diff ajoute :
 - 2026-10-29 16:46:42 UTC — [ticket-660] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La mise en œuvre complète du se (59953ms)
 - 2026-10-29 16:46:42 UTC — [ticket-660] APPROVED après 2 tour(s)
 - 2026-10-29 16:50:43 UTC — [ticket-660] documentation: 0 fichier(s) (235562ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « Son numéro vient de `python ../../scripts/prochain_numero.py » (agents/prompts/codeur.md) 
+- 2026-10-29 17:00:33 UTC — [ide-core] ticket-660 PR #751 confiée au CIWatcher
+- 2026-10-29 17:00:38 UTC — [ticket-661] branche ticket-661-the-director-walks-to-a-room-whose-run-turns-sile
+- 2026-10-29 17:01:56 UTC — [ticket-661] plan rendu (77125ms)
+- 2026-10-29 17:01:56 UTC — [ticket-661] tour 1 — codeur démarré
+- 2026-10-29 17:06:53 UTC — [ide-core] ticket-660 PR #751 mergée (CI verte)
+- 2026-10-29 17:07:14 UTC — [ticket-661] tour 1 — codeur terminé (318171ms)
+- 2026-10-29 17:10:42 UTC — [ticket-661] testeur: OK (exit 0)
+- 2026-10-29 17:12:20 UTC — [ticket-661] securite: PASS — The director's round feature (ticket-661) introduces a new visitor behavior with (97656ms)
+- 2026-10-29 17:12:20 UTC — [ticket-661] tour 1 — reviewer démarré
+- 2026-10-29 17:12:45 UTC — [ticket-661] tour 1 — reviewer terminé (24390ms)
+- 2026-10-29 17:15:53 UTC — [ticket-661] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (213235ms)
+- 2026-10-29 17:15:53 UTC — [ticket-661] APPROVED après 1 tour(s)
