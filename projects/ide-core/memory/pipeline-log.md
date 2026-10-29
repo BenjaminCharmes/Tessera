@@ -6298,3 +6298,4 @@ Le diff ajoute :
 - 2026-10-29 18:35:13 UTC — [ticket-669] validateur: fichiers cités joints : agents.json
 - 2026-10-29 18:35:13 UTC — [ticket-669] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests vérifient que le prov (243921ms)
 - 2026-10-29 18:35:13 UTC — [ticket-669] APPROVED après 2 tour(s)
+- 2026-10-29 18:37:18 UTC — [ticket-669] documentation: 0 fichier(s) (109281ms)
