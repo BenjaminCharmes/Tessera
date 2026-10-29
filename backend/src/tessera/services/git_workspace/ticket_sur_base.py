@@ -81,11 +81,16 @@ class GitTicketOnBase(GitBase):
 
         return False
 
-    async def lire_ticket_sur_la_base(self, ticket_id: str) -> tuple[str, str] | None:
+    async def lire_ticket_sur_la_base(
+        self, ticket_id: str, *, fetch: bool = True
+    ) -> tuple[str, str] | None:
         """Read a ticket file from ``origin/<base>`` without touching the tree.
 
         Returns ``(path from the repository root, content)``, or None when the
-        fetch fails or the base holds no such ticket (ticket-504). The base is
+        fetch fails or the base holds no such ticket (ticket-504). With
+        ``fetch=False`` the remote ref is read as the last fetch left it: a
+        caller that reads many tickets fetches once, then reads (ticket-658).
+        The base is
         the declared ``base_branch``, else ``settings.github_base_branch`` — the
         same fallback as the delivery (ticket-508). Read-only on purpose: no
         checkout, no ``update-ref``, no file written. ``--no-write-fetch-head``
@@ -95,7 +100,8 @@ class GitTicketOnBase(GitBase):
         declaree = self._politique.base_branch if self._politique is not None else None
         base = declaree or settings.github_base_branch
         try:
-            await self._run("fetch", "--no-write-fetch-head", "origin", base)
+            if fetch:
+                await self._run("fetch", "--no-write-fetch-head", "origin", base)
             prefix = (await self._run("rev-parse", "--show-prefix")).strip()
             ref = f"refs/remotes/origin/{base}"
             listing = await self._run(
