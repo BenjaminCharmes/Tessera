@@ -6075,3 +6075,17 @@ Le diff ajoute :
 - 2026-10-29 10:48:48 UTC — [ticket-623] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur et l'architecte ont m (260358ms)
 - 2026-10-29 10:48:48 UTC — [ticket-623] APPROVED après 1 tour(s)
 - 2026-10-29 10:51:35 UTC — [ticket-623] documentation: 0 fichier(s) (160281ms)
+- 2026-10-29 10:59:21 UTC — [ide-core] ticket-623 PR #738 mergée (CI verte)
+- 2026-10-29 10:59:23 UTC — [ide-core] ticket-623 : base réalignée sur develop
+- 2026-10-29 10:59:23 UTC — [ide-core] ticket-623 PR #738 confiée au CIWatcher
+- 2026-10-29 10:59:31 UTC — [ticket-624] branche ticket-624-in-the-bureau-documentation-delivery-and-conflict
+- 2026-10-29 10:59:33 UTC — [ticket-624] tour 1 — codeur démarré
+- 2026-10-29 11:04:48 UTC — [ticket-624] tour 1 — codeur terminé (315046ms)
+- 2026-10-29 11:07:10 UTC — [ticket-624] testeur: OK (exit 0)
+- 2026-10-29 11:08:30 UTC — [ticket-624] securite: PASS — Audit de sécurité complété sur le diff du composant Bureau (redacteurs.ts, suite (80375ms)
+- 2026-10-29 11:08:31 UTC — [ticket-624] tour 1 — reviewer démarré
+- 2026-10-29 11:08:50 UTC — [ticket-624] tour 1 — reviewer terminé (19187ms)
+- 2026-10-29 11:13:28 UTC — [ticket-624] validateur: fichiers cités joints : lib/bureau/activites.ts, lib/bureau/physique.ts
+- 2026-10-29 11:13:28 UTC — [ticket-624] validateur: APPROVED — Tous les critères sont satisfaits. Les tests vérifient que les rédacteurs se tie (298218ms)
+- 2026-10-29 11:13:28 UTC — [ticket-624] APPROVED après 1 tour(s)
+- 2026-10-29 11:15:01 UTC — [ticket-624] documentation: 0 fichier(s) (86437ms)

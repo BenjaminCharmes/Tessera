@@ -33,6 +33,9 @@ export const TENUES: Record<RoleAffiche, Tenue> = {
   securite: { haut: "securite", capuche: false, cravate: false },
   reviewer: { haut: "reviewer", capuche: false, cravate: true },
   validateur: { haut: "validateur", capuche: false, cravate: false },
+  resolveur: { haut: "resolveur", capuche: false, cravate: false },
+  "doc-technique": { haut: "doc-technique", capuche: false, cravate: false },
+  "doc-fonctionnelle": { haut: "doc-fonctionnelle", capuche: false, cravate: false },
 };
 
 const PEAUX: readonly [Peau, ...Peau[]] = [1, 2, 3, 4, 5];

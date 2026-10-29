@@ -1,4 +1,6 @@
 import type { OccupantDeReunion } from "../../lib/bureau/salles";
+import Agrandi from "../../design/bureau/Agrandi";
+import AgentDebout from "../../design/bureau/AgentDebout";
 import Chaise from "../../design/bureau/Chaise";
 import TableDeReunion from "../../design/bureau/TableDeReunion";
 import Salle from "./Salle";
@@ -58,6 +60,19 @@ export default function SalleReunion({
           )}
         </li>
       ))}
-    />
+    >
+      {/* Le résolveur ne se dessine que pendant la résolution : la PR à relire n'est plus son travail (ADR-033). */}
+      {occupants.flatMap(({ projet, reunion }) =>
+        reunion.temps === "conflit"
+          ? [
+              <li key={projet} data-agent="resolveur">
+                <Agrandi>
+                  <AgentDebout projet={projet} role="resolveur" />
+                </Agrandi>
+              </li>,
+            ]
+          : [],
+      )}
+    </Salle>
   );
 }

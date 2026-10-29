@@ -1,14 +1,16 @@
 ---
-id: ticket-624
-title: "In the Bureau, documentation, delivery and conflict resolution are drawn"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: [ticket-623, ticket-627]
-estimated_days: 2
 created: 2026-10-28
+depends_on:
+- ticket-623
+- ticket-627
+estimated_days: 2
+id: ticket-624
+pr_number: 739
+priority: medium
+status: done
+title: In the Bureau, documentation, delivery and conflict resolution are drawn
+type: feat
 ---
 
 # ticket-624 — Documentation, livraison et conflit se voient dans le Bureau

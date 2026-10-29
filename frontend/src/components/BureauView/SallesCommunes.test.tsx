@@ -166,6 +166,25 @@ describe("SallesCommunes", () => {
       within(salle("Salle de réunion")).getByText(/3 fichiers/),
     ).toBeInTheDocument();
   });
+
+  it("draws the resolver while a conflict has no outcome, and not once it has one", () => {
+    const enCours = applyEvent(
+      INITIAL,
+      ev("conflict_resolution", { phase: "started", files: ["a.py"], outcome: null }),
+    );
+    const { container, rerender } = render(
+      <SallesCommunes projets={[{ nom: "alpha", etat: enCours }]} maintenant={T0} />,
+    );
+    expect(salle("Salle de réunion").querySelector('[data-agent="resolveur"]')).not.toBeNull();
+
+    const fini = applyEvent(
+      enCours,
+      ev("conflict_resolution", { phase: "done", files: ["a.py"], outcome: "resolved" }),
+    );
+    rerender(<SallesCommunes projets={[{ nom: "alpha", etat: fini }]} maintenant={T0} />);
+
+    expect(container.querySelector('[data-agent="resolveur"]')).toBeNull();
+  });
 });
 
 describe("Piece with an agent away", () => {
