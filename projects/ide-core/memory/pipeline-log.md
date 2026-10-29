@@ -6161,3 +6161,20 @@ Le diff ajoute :
 - 2026-10-29 13:02:01 UTC — [ticket-635] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests vérifient que l'horlog (220891ms)
 - 2026-10-29 13:02:01 UTC — [ticket-635] APPROVED après 1 tour(s)
 - 2026-10-29 13:05:21 UTC — [ticket-635] documentation: 0 fichier(s) (193718ms) — après tour de correction
+- 2026-10-29 13:05:40 UTC — [ide-core] ticket-635 PR #744 confiée au CIWatcher
+- 2026-10-29 13:05:46 UTC — [ticket-658] branche ticket-658-appending-to-a-queue-reports-every-requested-id-a
+- 2026-10-29 13:05:48 UTC — [ticket-658] tour 1 — codeur démarré
+- 2026-10-29 13:07:49 UTC — [ticket-658] tour 1 — codeur terminé (121764ms)
+- 2026-10-29 13:10:37 UTC — [ide-core] ticket-635 PR #744 mergée (CI verte)
+- 2026-10-29 13:14:43 UTC — [ticket-658] testeur: 1 failed, 3221 passed, 64 warnings in 409.76s (0:06:49)
+- 2026-10-29 13:14:43 UTC — [ticket-658] tests rouges au tour 1
+- 2026-10-29 13:14:43 UTC — [ticket-658] tour 2 — codeur démarré
+- 2026-10-29 13:15:52 UTC — [ticket-658] tour 2 — codeur terminé (68906ms)
+- 2026-10-29 13:23:54 UTC — [ticket-658] testeur: OK (exit 0)
+- 2026-10-29 13:26:13 UTC — [ticket-658] securite: PASS — Le diff corrige une race condition (ticket-658) où des tickets pouvaient être pe (138953ms)
+- 2026-10-29 13:26:13 UTC — [ticket-658] tour 2 — reviewer démarré
+- 2026-10-29 13:26:33 UTC — [ticket-658] tour 2 — reviewer terminé (20187ms)
+- 2026-10-29 13:26:43 UTC — [ticket-658] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-29 13:27:12 UTC — [ticket-658] validateur: APPROVED — Les deux critères sont satisfaits. Le test `test_every_requested_id_lands_in_exa (59562ms)
+- 2026-10-29 13:27:12 UTC — [ticket-658] APPROVED après 2 tour(s)
+- 2026-10-29 13:29:55 UTC — [ticket-658] documentation: 0 fichier(s) (156703ms)

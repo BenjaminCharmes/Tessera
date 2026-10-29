@@ -51,6 +51,20 @@ class FileVivante(list[str]):
                 ajoutes.append(ticket_id)
         return ajoutes
 
+    def ajouter_acceptes(
+        self, acceptes: list[str], ignores: dict[str, str]
+    ) -> list[str]:
+        """Append the ids `trier_ajouts` accepted; file the others under `ignores`.
+
+        Un id accepté que `ajouter` n'ajoute pas est entré dans la file pendant
+        le tri (un appel concurrent) : ignoré, jamais perdu (ticket-658).
+        """
+        ajoutes = self.ajouter(acceptes)
+        for ticket_id in acceptes:
+            if ticket_id not in ajoutes:
+                ignores[ticket_id] = "déjà dans la file"
+        return ajoutes
+
     def marquer_position(self, index: int) -> None:
         """Record the 1-based position the loop is handling (ticket-513)."""
         self._position = index - 1
@@ -109,7 +123,9 @@ LecteurDeRepli = Callable[[str], Awaitable[Ticket | None]]
 
 
 class _LecteurSurLaBase(Protocol):
-    async def lire_ticket_sur_la_base(self, ticket_id: str) -> tuple[str, str] | None: ...
+    async def lire_ticket_sur_la_base(
+        self, ticket_id: str, *, fetch: bool = True
+    ) -> tuple[str, str] | None: ...
 
 
 def lecteur_sur_la_base(workspace: _LecteurSurLaBase, project_id: str) -> LecteurDeRepli:
@@ -117,11 +133,17 @@ def lecteur_sur_la_base(workspace: _LecteurSurLaBase, project_id: str) -> Lecteu
 
     Un ticket écrit après le lancement de la file n'est jamais dans l'arbre du
     run, qui est sur la branche du ticket en cours : il n'est que sur la base.
-    Contenu illisible : None, donc le ticket reste refusé.
+    Contenu illisible : None, donc le ticket reste refusé. Le lecteur ne fait
+    qu'un `fetch`, à sa première lecture : la base est lue une fois par
+    requête, puis chaque ticket y est cherché sans nouveau `fetch` (ticket-658).
     """
+    etat = {"fetch_fait": False}
 
     async def lire(ticket_id: str) -> Ticket | None:
-        lu = await workspace.lire_ticket_sur_la_base(ticket_id)
+        # Posé avant l'await : même une lecture qui échoue ne refait pas le fetch.
+        fetch = not etat["fetch_fait"]
+        etat["fetch_fait"] = True
+        lu = await workspace.lire_ticket_sur_la_base(ticket_id, fetch=fetch)
         if lu is None:
             return None
         try:

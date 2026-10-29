@@ -1,14 +1,15 @@
 ---
-id: ticket-658
-title: "Appending to a queue reports every requested id and fetches the base once per request"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-28
 depends_on: []
 estimated_days: 1
-created: 2026-10-28
+id: ticket-658
+pr_number: 745
+priority: medium
+status: done
+title: Appending to a queue reports every requested id and fetches the base once per
+  request
+type: fix
 ---
 
 # ticket-658 — L'ajout à une file rend compte de chaque id, et ne relit la base qu'une fois

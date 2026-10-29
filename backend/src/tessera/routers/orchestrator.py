@@ -1048,7 +1048,7 @@ async def append_to_run(run_id: str, request: AppendRequest) -> AppendResult:
     )
     try:
         # Aucun `await` entre le contrôle d'ouverture de `ajouter` et l'ajout.
-        ajoutes = file.ajouter(acceptes)
+        ajoutes = file.ajouter_acceptes(acceptes, ignores)
     except FileFermee as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     return AppendResult(ajoutes=ajoutes, ignores=ignores, refuses=refuses)
