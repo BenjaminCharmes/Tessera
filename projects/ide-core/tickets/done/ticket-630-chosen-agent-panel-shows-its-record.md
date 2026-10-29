@@ -1,14 +1,15 @@
 ---
-id: ticket-630
-title: "The chosen-agent panel shows the agent's record on its project"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: [ticket-628]
-estimated_days: 1
 created: 2026-10-28
+depends_on:
+- ticket-628
+estimated_days: 1
+id: ticket-630
+pr_number: 742
+priority: low
+status: done
+title: The chosen-agent panel shows the agent's record on its project
+type: feat
 ---
 
 # ticket-630 — Le bilan de l'agent choisi

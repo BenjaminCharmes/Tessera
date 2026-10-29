@@ -14,11 +14,20 @@ export interface WeekEmployee {
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Approuvé au tour 1, démarré dans les 7 derniers jours : un tour 2 ou un run plus ancien ne compte pas. */
-function isFirstTryOfTheWeek(run: PipelineRun, now: number): boolean {
-  if (run.approved !== true || run.rounds !== 1) return false;
+/** Démarré dans les 7 derniers jours. */
+function isOfTheWeek(run: PipelineRun, now: number): boolean {
   const startedAt = Date.parse(run.started_at);
   return !Number.isNaN(startedAt) && startedAt > now - WEEK_MS && startedAt <= now;
+}
+
+/** Approuvé au tour 1, démarré dans les 7 derniers jours : un tour 2 ou un run plus ancien ne compte pas. */
+function isFirstTryOfTheWeek(run: PipelineRun, now: number): boolean {
+  return run.approved === true && run.rounds === 1 && isOfTheWeek(run, now);
+}
+
+/** Nombre de runs démarrés sur les 7 derniers jours, quelle qu'en soit l'issue. */
+export function weekRunCount(runs: readonly PipelineRun[], now: number): number {
+  return runs.filter((r) => isOfTheWeek(r, now)).length;
 }
 
 /** Nombre de tickets distincts approuvés au premier tour sur la semaine. */

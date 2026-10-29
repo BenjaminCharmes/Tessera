@@ -1,5 +1,6 @@
 import Button from "../../design/ui/Button";
 import type { StreamState } from "../../hooks/streamState";
+import { useBilanDeLAgent } from "../../hooks/useBilanDeLAgent";
 import { lignesDeLAgent } from "../../lib/bureau/agentChoisi";
 import { nomDeLAgent } from "../../lib/bureau/noms";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
@@ -30,7 +31,10 @@ interface PanneauAgentChoisiProps {
 export default function PanneauAgentChoisi({ choix, etat, run, maintenant, onOuvrir }: PanneauAgentChoisiProps) {
   const lignes = choix && etat ? lignesDeLAgent(choix.projet, choix.poste, etat, maintenant, run) : null;
   // Le prénom titre le panneau dès qu'un agent est choisi ; le rôle montré suit celui du poste (architecte ou codeur).
-  const titre = choix && etat && lignes ? nomDeLAgent(choix.projet, roleDuPoste(etat, choix.poste)) : "Agent choisi";
+  const role = choix && etat && lignes ? roleDuPoste(etat, choix.poste) : null;
+  const titre = choix && role ? nomDeLAgent(choix.projet, role) : "Agent choisi";
+  // Le bilan ne se lit que pour un agent au travail : rien à demander à l'API sinon.
+  const bilan = useBilanDeLAgent(role ? (choix?.projet ?? null) : null, role, maintenant);
 
   return (
     <aside
@@ -49,6 +53,19 @@ export default function PanneauAgentChoisi({ choix, etat, run, maintenant, onOuv
             </div>
           ))}
         </dl>
+      )}
+      {lignes !== null && bilan.length > 0 && (
+        <section aria-label="Bilan" className="flex flex-col gap-1 border-t border-zinc-800 pt-2">
+          <h4 className="text-micro uppercase tracking-wide text-zinc-500">Bilan</h4>
+          <dl className="flex flex-col gap-1">
+            {bilan.map(({ libelle, valeur }) => (
+              <div key={libelle} className="flex flex-col">
+                <dt className="text-micro uppercase tracking-wide text-zinc-500">{libelle}</dt>
+                <dd className="text-xs text-zinc-200">{valeur}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       )}
       {lignes !== null && run && onOuvrir && (
         <Button taille="compact" onClick={() => onOuvrir(run.run_id)}>
