@@ -30,6 +30,11 @@ section. (ADR-055)
   pour le projet soient mergées ou bloquées, dans une limite de temps.**
   Le rebase se fait ainsi sur une base qui les porte ; passé le délai, la
   livraison part comme avant. (ADR-065, ADR-051)
+- **Le garde git et `gh` n'admet que des lectures nommées.** Une
+  sous-commande absente de la liste blanche est refusée, options globales
+  lues avant elle ; `-c` n'accepte que des clés cosmétiques. Remplace la
+  liste noire de sous-commandes quand ticket C-03 de l'audit est livré.
+  (ADR-067, ADR-027)
 
 ## Git et périmètre d'écriture
 

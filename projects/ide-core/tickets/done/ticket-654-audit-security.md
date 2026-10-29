@@ -1,15 +1,15 @@
 ---
-id: ticket-654
-title: "Audit: security review of the backend, the agent guards and the frontend"
-type: design
-status: todo
-pr_number: null
-priority: high
 agent: architect
+created: 2026-10-28
 depends_on: []
 estimated_days: 1
-created: 2026-10-28
+id: ticket-654
 plan: true
+pr_number: 764
+priority: high
+status: done
+title: 'Audit: security review of the backend, the agent guards and the frontend'
+type: design
 ---
 
 # ticket-654 — Audit de sécurité

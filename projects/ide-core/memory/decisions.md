@@ -601,6 +601,9 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Mesure** : non faite ; coût : un ticket prêt attend la CI du précédent.
 **Alternative rejetée** : push forcé depuis le watcher (`pushed_sha` périmé) ; `merge=union` côté dépôt (GitHub l'ignore) ; partir de la branche du précédent (défait ADR-056).
 **Limite** : une PR rendue conflictuelle hors file reste arrêtée sur « à rebaser » (ticket-674).
+
+---
+
 ## ADR-066 — Écarter les sous-tâches d'un run
 
 **Date** : 2026-10-30
@@ -610,3 +613,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Mesure** : 358 approbations ; 118 tours à tests rouges, 105 refus dont 46 du validateur, qu'une sous-tâche ne voit pas.
 **Alternative rejetée** : sous-tâches tirées du plan — son échec est toléré, le run changerait de forme sans le dire.
 **Détail** : `docs/superpowers/specs/2026-10-30-sous-taches-dans-un-run-design.md`
+
+---
+
+## ADR-067 — Le garde git et gh n'admet que des lectures nommées
+
+**Date** : 2026-10-30
+**Décision** : amende ADR-027. Le hook refuse toute sous-commande `git` ou `gh` absente d'une liste blanche de lectures (`status`, `diff`, `log`, `show`, `gh auth status`…). Les options globales (`-c`, `--repo`, `-R`) se lisent avant la sous-commande ; `-c` n'accepte que des clés cosmétiques ; `--output` est refusé. Une assignation ou un mot-clé de shell en tête de segment se saute ; `cmd` et `powershell` sont des shells.
+**Raison** : la liste noire laisse passer des formes naturelles — `<VAR>=<valeur> git push`, `gh --repo <o/r> pr merge`, `git bisect run`. Un faux refus se corrige d'une ligne ; un faux passage est un push (ADR-022).
+**Alternative rejetée** : allonger la liste noire — chaque trou comblé en révèle un autre ; analyser le shell en entier — hors de portée, ADR-027 le dit déjà.

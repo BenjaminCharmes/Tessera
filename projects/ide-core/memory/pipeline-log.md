@@ -6445,6 +6445,21 @@ Le diff ajoute :
 - 2026-10-29 22:49:43 UTC — [ticket-653] APPROVED après 2 tour(s)
 - 2026-10-29 22:49:49 UTC — [ticket-653] fichiers non suivis laissés par le run : tickets/todo/ticket-685-queue-and-autonomous-modes-leave-the-orchestrator-class.md, tickets/todo/ticket-686-end-of-queue-steps-leave-the-orchestrator-class.md, tickets/todo/ticket-687-run-assembly-leaves-the-orchestrator-router.md, tickets/todo/ticket-688-pipeline-stages-split-by-stage.md, tickets/todo/ticket-689-projects-router-split-by-resource.md, tickets/todo/ticket-690-database-module-split-by-domain.md, tickets/todo/ticket-691-project-loader-split-by-role.md, tickets/todo/ticket-692-documentation-module-split-in-three.md, tickets/todo/ticket-693-api-types-split-by-domain.md, tickets/todo/ticket-694-api-client-split-by-domain.md et 7 autres (à ignorer dans .gitignore ?)
 - 2026-10-29 22:52:37 UTC — [ticket-653] documentation: 0 fichier(s) (167890ms) — après tour de correction
+- 2026-10-29 22:53:01 UTC — [ide-core] ticket-653 PR #763 confiée au CIWatcher
+- 2026-10-29 22:53:04 UTC — [ticket-654] branche ticket-654-audit-security-review-of-the-backend-the-agent-gu
+- 2026-10-29 22:54:10 UTC — [ticket-654] plan rendu (64812ms)
+- 2026-10-29 22:54:10 UTC — [ticket-654] tour 1 — codeur démarré
+- 2026-10-29 22:58:13 UTC — [ide-core] ticket-653 PR #763 mergée (CI verte)
+- 2026-10-29 23:02:24 UTC — [ticket-654] tour 1 — architect terminé (493905ms)
+- 2026-10-29 23:02:28 UTC — [ticket-654] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 23:03:25 UTC — [ticket-654] securite: PASS — Ce diff ajoute un document d'audit de sécurité statique qui révèle 22 failles da (57328ms)
+- 2026-10-29 23:03:25 UTC — [ticket-654] tour 1 — reviewer démarré
+- 2026-10-29 23:04:00 UTC — [ticket-654] tour 1 — reviewer terminé (34875ms)
+- 2026-10-29 23:08:25 UTC — [ticket-654] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 23:09:05 UTC — [ticket-654] validateur: fichiers cités joints : docs/audit/securite.md (tronqué)
+- 2026-10-29 23:09:05 UTC — [ticket-654] validateur: APPROVED — L'audit de sécurité est complet : 22 constats classifiés avec gravité, fichiers/ (340172ms)
+- 2026-10-29 23:09:05 UTC — [ticket-654] APPROVED après 1 tour(s)
+- 2026-10-29 23:10:18 UTC — [ticket-654] documentation: 0 fichier(s) (66717ms)
 - 2026-10-29 23:10:41 UTC — [ide-core] ticket-654 PR #764 confiée au CIWatcher
 - 2026-10-29 23:10:44 UTC — [ticket-668] branche ticket-668-design-split-a-run-into-sub-tasks-implemented-rev
 - 2026-10-29 23:11:36 UTC — [ticket-668] plan rendu (50328ms)
