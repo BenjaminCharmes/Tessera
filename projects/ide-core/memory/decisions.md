@@ -579,3 +579,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : le codeur pèse 66 % du coût et n'est atteignable que par le proxy, dont on ignore l'effet sur le cache de prompt et sur le jeton d'abonnement.
 **Mesure** : non faite ; estimation 5-10 % du coût, à confirmer (tickets 604, 605).
 **Alternative rejetée** : adopter le proxy d'emblée — un gain annoncé par le projet, sans mesure ici, ne justifie pas un composant sur le chemin du jeton.
+
+---
+
+## ADR-064 — Un agent de produit se dessine depuis un fichier d'activité
+
+**Date** : 2026-10-29
+**Décision** : complète ADR-058. « En cours » devient une salle par app lancée, qui montre d'abord l'état connu (`AppEnCours`, `ServiceActif`). Un agent n'y est dessiné que si `services[]` de `agents.json` déclare `activite`, chemin d'un JSON que le produit écrit et que Tessera lit. Fichier absent, périmé, hors schéma, hors du projet, ou service arrêté : personne n'est dessiné (ADR-039).
+**Raison** : zéro token, valable pour une app lancée à la main, aucune route à interroger.
+**Mesure** : non faite ; aucun produit n'émet encore.
+**Alternative rejetée** : route de santé enrichie (app arrêtée muette, contrat HTTP par produit) ; sortie du service (seules les apps lancées par Tessera, texte à parser).
+**Détail** : `docs/superpowers/specs/2026-10-29-salle-des-serveurs-design.md`

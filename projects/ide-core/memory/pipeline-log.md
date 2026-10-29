@@ -6047,3 +6047,18 @@ Le diff ajoute :
 - 2026-10-29 10:15:39 UTC — [ticket-625] validateur: APPROVED — Les tests ont été ajoutés pour couvrir les quatre critères d'acceptation. Le cod (110062ms)
 - 2026-10-29 10:15:39 UTC — [ticket-625] APPROVED après 1 tour(s)
 - 2026-10-29 10:18:49 UTC — [ticket-625] documentation: 0 fichier(s) (184093ms) — après tour de correction
+- 2026-10-29 10:21:37 UTC — [ide-core] ticket-625 PR #736 confiée au CIWatcher
+- 2026-10-29 10:21:40 UTC — [ticket-626] branche ticket-626-design-a-server-room-view-of-running-apps-with-ea
+- 2026-10-29 10:23:53 UTC — [ticket-626] plan rendu (131750ms)
+- 2026-10-29 10:23:53 UTC — [ticket-626] tour 1 — codeur démarré
+- 2026-10-29 10:26:34 UTC — [ide-core] ticket-625 PR #736 mergée (CI verte)
+- 2026-10-29 10:26:44 UTC — [ticket-626] tour 1 — architect terminé (170578ms)
+- 2026-10-29 10:26:47 UTC — [ticket-626] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 10:28:34 UTC — [ticket-626] securite: PASS — Diff introduces a well-designed security-conscious specification for agent activ (107141ms)
+- 2026-10-29 10:28:34 UTC — [ticket-626] tour 1 — reviewer démarré
+- 2026-10-29 10:29:01 UTC — [ticket-626] tour 1 — reviewer terminé (26812ms)
+- 2026-10-29 10:33:06 UTC — [ticket-626] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-29 10:33:06 UTC — [ticket-626] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Un ADR a été ajouté pour décri (272312ms)
+- 2026-10-29 10:33:06 UTC — [ticket-626] APPROVED après 1 tour(s)
+- 2026-10-29 10:33:12 UTC — [ticket-626] fichiers non suivis laissés par le run : tickets/blocked/ticket-672-running-apps-view-shows-one-room-per-app.md, tickets/todo/ticket-671-services-declare-an-activity-file-the-backend-reads.md, tickets/todo/ticket-673-product-agents-are-drawn-from-the-activity-file.md (à ignorer dans .gitignore ?)
+- 2026-10-29 10:34:32 UTC — [ticket-626] documentation: 0 fichier(s) (79875ms)

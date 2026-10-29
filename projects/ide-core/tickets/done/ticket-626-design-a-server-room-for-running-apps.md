@@ -1,15 +1,15 @@
 ---
-id: ticket-626
-title: "Design: a server-room view of running apps, with each product's own agents"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
+created: 2026-10-28
 depends_on: []
 estimated_days: 1
-created: 2026-10-28
+id: ticket-626
 plan: true
+pr_number: 737
+priority: low
+status: done
+title: 'Design: a server-room view of running apps, with each product''s own agents'
+type: design
 ---
 
 # ticket-626 — Conception : la salle des serveurs des apps lancées
