@@ -43,6 +43,10 @@ def creer_depot(tmp_path: Path) -> Path:
     git(tmp_path, "clone", "-q", "--bare", str(amont), str(tmp_path / "origin.git"))
     clone = tmp_path / "clone"
     git(tmp_path, "clone", "-q", (tmp_path / "origin.git").as_uri(), str(clone))
+    # Le code testé commite sans `-c` : sans identité locale, la CI (aucune identité
+    # globale) refuse le commit, alors que le poste de dev l'accepte.
+    git(clone, "config", "user.email", "test@tessera.local")
+    git(clone, "config", "user.name", "Tessera test")
     return clone
 
 
