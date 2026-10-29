@@ -6360,3 +6360,15 @@ Le diff ajoute :
 - 2026-10-29 20:59:08 UTC — [ticket-537] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la gestion de (138358ms)
 - 2026-10-29 20:59:08 UTC — [ticket-537] APPROVED après 2 tour(s)
 - 2026-10-29 21:02:06 UTC — [ticket-537] documentation: 0 fichier(s) (170921ms) — après tour de correction
+- 2026-10-29 21:10:59 UTC — [ide-core] ticket-537 PR #758 confiée au CIWatcher
+- 2026-10-29 21:11:03 UTC — [ticket-539] branche ticket-539-un-push-refus-en-reference-already-exists-alors-q
+- 2026-10-29 21:11:04 UTC — [ticket-539] tour 1 — codeur démarré
+- 2026-10-29 21:13:24 UTC — [ticket-539] tour 1 — codeur terminé (139906ms)
+- 2026-10-29 21:15:41 UTC — [ide-core] ticket-537 PR #758 mergée (CI verte)
+- 2026-10-29 21:23:22 UTC — [ticket-539] testeur: OK (exit 0)
+- 2026-10-29 21:26:30 UTC — [ticket-539] securite: PASS — This diff refactors git push logic into a dedicated class with race condition re (188032ms)
+- 2026-10-29 21:26:30 UTC — [ticket-539] tour 1 — reviewer démarré
+- 2026-10-29 21:26:52 UTC — [ticket-539] tour 1 — reviewer terminé (21891ms)
+- 2026-10-29 21:27:36 UTC — [ticket-539] validateur: APPROVED — Le critère d'acceptation est satisfait. Le code implémente une gestion robuste d (66484ms)
+- 2026-10-29 21:27:36 UTC — [ticket-539] APPROVED après 1 tour(s)
+- 2026-10-29 21:29:57 UTC — [ticket-539] documentation: 0 fichier(s) (133844ms)

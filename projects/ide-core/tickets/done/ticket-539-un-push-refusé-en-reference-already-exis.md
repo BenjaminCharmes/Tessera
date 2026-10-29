@@ -3,8 +3,9 @@ agent: codeur
 created: '2026-10-22'
 depends_on: []
 id: ticket-539
+pr_number: 759
 priority: medium
-status: todo
+status: done
 title: Un push refusé en « reference already exists » alors que la branche est déjà
   poussée laisse le run done sans PR
 type: fix
@@ -26,4 +27,10 @@ Piste : un push qui échoue alors que la branche distante pointe déjà sur un a
 
 ## Critères d'acceptation
 
-- [ ] À écrire au triage
+- [x] Un push refusé alors que `origin/<branche>` est déjà sur la tête locale compte comme réussi : la PR s'ouvre
+- [x] Un push refusé alors que le distant est un ancêtre de la tête locale est rejoué une fois, sans force
+- [x] Un distant divergé ou absent garde le refus d'origine, et rien n'est forcé
+
+## Ce que ça ne fait pas
+
+- Une livraison interrompue ferme toujours le run en `done`, `Livraison.arret` portant le motif : ADR-030 le décide ainsi, le changer demande sa propre décision.
