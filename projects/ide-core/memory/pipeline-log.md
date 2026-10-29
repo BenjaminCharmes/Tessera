@@ -6263,3 +6263,21 @@ Le diff ajoute :
 - 2026-10-29 17:15:53 UTC — [ticket-661] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (213235ms)
 - 2026-10-29 17:15:53 UTC — [ticket-661] APPROVED après 1 tour(s)
 - 2026-10-29 17:18:40 UTC — [ticket-661] documentation: 1 fichier(s) (159078ms)
+- 2026-10-29 17:21:51 UTC — [ide-core] ticket-661 PR #752 confiée au CIWatcher
+- 2026-10-29 17:21:58 UTC — [ticket-667] branche ticket-667-the-launcher-refuses-a-checkout-off-develop-or-be
+- 2026-10-29 17:22:01 UTC — [ticket-667] tour 1 — codeur démarré
+- 2026-10-29 17:26:18 UTC — [ticket-667] tour 1 — codeur terminé (257031ms)
+- 2026-10-29 17:26:33 UTC — [ide-core] ticket-661 PR #752 mergée (CI verte)
+- 2026-10-29 17:32:25 UTC — [ticket-667] testeur: 1 failed, 1344 passed, 64 warnings in 363.27s (0:06:03)
+- 2026-10-29 17:32:25 UTC — [ticket-667] tests rouges au tour 1
+- 2026-10-29 17:32:25 UTC — [ticket-667] tour 2 — codeur démarré
+- 2026-10-29 17:32:58 UTC — [ticket-667] tour 2 — codeur terminé (33407ms)
+- 2026-10-29 17:41:50 UTC — [ticket-667] testeur: OK (exit 0)
+- 2026-10-29 17:44:24 UTC — [ticket-667] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Un problème LOW (construction de (153889ms)
+- 2026-10-29 17:44:24 UTC — [ticket-667] tour 2 — reviewer démarré
+- 2026-10-29 17:44:46 UTC — [ticket-667] tour 2 — reviewer terminé (21218ms)
+- 2026-10-29 17:44:54 UTC — [ticket-667] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-29 17:45:30 UTC — [ticket-667] validateur: fichiers cités joints : scripts/tessera.ps1 ; absents : origin/develop
+- 2026-10-29 17:45:30 UTC — [ticket-667] validateur: APPROVED — Tous les critères d'acceptation du ticket 667 sont satisfaits. La fonction `chec (65906ms)
+- 2026-10-29 17:45:30 UTC — [ticket-667] APPROVED après 2 tour(s)
+- 2026-10-29 17:49:55 UTC — [ticket-667] documentation: 0 fichier(s) (254702ms)

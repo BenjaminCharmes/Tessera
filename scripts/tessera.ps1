@@ -119,9 +119,29 @@ function Start-Backend {
     #     mais bloquerait le terminal appelant : ce lanceur est prevu pour un
     #     PowerShell interactif. En session non interactive, lancer les deux
     #     commandes directement (voir README).
-    Start-Process -FilePath 'uv' `
-        -ArgumentList 'run', 'python', '-m', 'uvicorn', 'tessera.main:app', '--host', '127.0.0.1', '--port', '8100' `
-        -WorkingDirectory (Join-Path $Root 'backend')
+    #  3. `Start-Process` rattache le backend a la console qui le lance : il
+    #     meurt avec elle (ticket-667). `Win32_Process.Create` (WMI) le demarre
+    #     hors de cette console, puis on attend /health avant de rendre la main.
+    $uv = (Get-Command uv -ErrorAction Stop).Source
+    $commande = "`"$uv`" run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8100"
+    $resultat = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
+        CommandLine      = $commande
+        CurrentDirectory = (Join-Path $Root 'backend')
+    }
+    if ($resultat.ReturnValue -ne 0) { throw "Win32_Process.Create a echoue (code $($resultat.ReturnValue))" }
+    Wait-Health -Url 'http://127.0.0.1:8100/health' -BackendPid $resultat.ProcessId
+}
+
+function Wait-Health([string]$Url, [int]$BackendPid, [int]$TimeoutSec = 90) {
+    # `$Pid` serait le PID automatique de PowerShell, en lecture seule.
+    $limite = (Get-Date).AddSeconds($TimeoutSec)
+    while ((Get-Date) -lt $limite) {
+        try {
+            $reponse = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 2
+            if ($reponse.StatusCode -eq 200) { Write-Host "-> backend pret (PID $BackendPid)"; return }
+        } catch { Start-Sleep -Milliseconds 500 }
+    }
+    throw "Le backend ne repond pas sur $Url apres $TimeoutSec s (PID $BackendPid)."
 }
 
 function Start-Frontend {
@@ -138,6 +158,9 @@ switch ($Task) {
     'dev-frontend' { Start-Frontend; Write-Host '-> http://localhost:5173' }
     'run' {
         Invoke-Doctor
+        # Un controle en echec (checkout hors develop, port pris...) arrete le
+        # lancement : demarrer quand meme, c'est servir le mauvais code.
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         Start-Backend
         Start-Frontend
         Write-Host ''

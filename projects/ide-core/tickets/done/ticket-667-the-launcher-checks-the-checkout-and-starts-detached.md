@@ -1,14 +1,15 @@
 ---
-id: ticket-667
-title: "The launcher refuses a checkout off develop or behind origin, and starts the backend detached"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-29
 depends_on: []
 estimated_days: 1
-created: 2026-10-29
+id: ticket-667
+pr_number: 753
+priority: medium
+status: done
+title: The launcher refuses a checkout off develop or behind origin, and starts the
+  backend detached
+type: feat
 ---
 
 # ticket-667 — Un lanceur qui vérifie le checkout et démarre détaché
