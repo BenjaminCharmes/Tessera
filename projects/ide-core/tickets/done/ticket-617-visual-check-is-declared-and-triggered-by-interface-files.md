@@ -1,12 +1,14 @@
 ---
-id: ticket-617
-title: "A project declares its visual check and the interface files that trigger it"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-616]
 created: 2026-10-27
+depends_on:
+- ticket-616
+id: ticket-617
+pr_number: 730
+priority: medium
+status: done
+title: A project declares its visual check and the interface files that trigger it
+type: feat
 ---
 
 # ticket-617 — Déclarer le contrôle visuel et ce qui le déclenche

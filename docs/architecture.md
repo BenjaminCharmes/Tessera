@@ -636,6 +636,10 @@ Si le repli dépasse aussi la durée maximale, il échoue fermé et le ticket pa
 Ce système garantit qu'aucun appel texte ne peut geler une file. Il s'ajoute à la
 limite de silence (ticket-381) qui coupe après 1200 s sans message.
 
+### Lancement isolé des services (ticket-664)
+
+Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/lancement.py` est appelée par `ProcessRegistry._lancer()`.
+
 ## Endpoints implémentés
 
 ### Projets
