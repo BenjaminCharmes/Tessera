@@ -6387,3 +6387,17 @@ Le diff ajoute :
 - 2026-10-29 21:52:30 UTC — [ticket-650] validateur: APPROVED — Le fichier `docs/audit/adr.md` contient l'audit complet demandé : tableau de sta (327781ms)
 - 2026-10-29 21:52:30 UTC — [ticket-650] APPROVED après 1 tour(s)
 - 2026-10-29 21:54:11 UTC — [ticket-650] documentation: 0 fichier(s) (94719ms)
+- 2026-10-29 21:58:58 UTC — [ide-core] ticket-650 PR #760 mergée (CI verte)
+- 2026-10-29 21:59:00 UTC — [ide-core] ticket-650 : base réalignée sur develop
+- 2026-10-29 21:59:00 UTC — [ide-core] ticket-650 PR #760 confiée au CIWatcher
+- 2026-10-29 21:59:04 UTC — [ticket-651] branche ticket-651-audit-check-the-code-against-the-constraints-in-f
+- 2026-10-29 21:59:56 UTC — [ticket-651] plan rendu (51141ms)
+- 2026-10-29 21:59:56 UTC — [ticket-651] tour 1 — codeur démarré
+- 2026-10-29 22:06:23 UTC — [ticket-651] tour 1 — architect terminé (386703ms)
+- 2026-10-29 22:06:26 UTC — [ticket-651] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:07:02 UTC — [ticket-651] securite: PASS — Le diff ajoute un document markdown de documentation (`docs/audit/regles.md`) qu (35671ms)
+- 2026-10-29 22:07:02 UTC — [ticket-651] tour 1 — reviewer démarré
+- 2026-10-29 22:07:30 UTC — [ticket-651] tour 1 — reviewer terminé (28407ms)
+- 2026-10-29 22:11:56 UTC — [ticket-651] validateur: fichiers cités joints : docs/audit/regles.md (tronqué) ; non joints (budget épuisé) : contraintes.md
+- 2026-10-29 22:11:56 UTC — [ticket-651] validateur: APPROVED — Les trois critères d'acceptation sont respectés : le fichier `docs/audit/regles. (293625ms)
+- 2026-10-29 22:11:56 UTC — [ticket-651] APPROVED après 1 tour(s)
