@@ -14,6 +14,7 @@ from tessera.services.project_loader import load_agents_config
 from tessera.services.providers import get_provider
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
+from tessera.services.providers.declaration import PROVIDER_OPENAI, resoudre_cle
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.repli import ProviderAvecRepli
 from tessera.services.providers.repli_direct import ProviderRepliDirect
@@ -60,6 +61,15 @@ def modele_du_role(project_path: Path | None, role: str) -> str | None:
     return config.model if config is not None else None
 
 
+def connexion_du_role(config: AgentConfig | None, nom: str) -> tuple[str | None, str]:
+    """The endpoint an `openai_compatible` role declares: its URL, and the key
+    read from the environment variable `api_key_env` names. `(None, "")`
+    otherwise, so no other provider ever receives either (ticket-669)."""
+    if config is None or nom != PROVIDER_OPENAI or not config.base_url:
+        return None, ""
+    return config.base_url, resoudre_cle(config.api_key_env)
+
+
 def provider_pour_role(
     project_path: Path | None,
     role: str,
@@ -100,12 +110,19 @@ def provider_pour_role(
     )
     # Un rôle qui n'est pas du texte seul ne reçoit aucune borne (None).
     duree = settings.llm_duree_max_role_texte_s if role in ROLES_TEXTE else None
+    # Le point d'accès ne sert que le principal : le repli n'en porte pas
+    # (`agents.json` refuse `openai_compatible` comme repli).
+    url, cle = connexion_du_role(config, nom)
+
     def _construire(fournisseur: str) -> LLMProvider:
+        principal = fournisseur == nom
         return get_provider(
             fournisseur, settings.anthropic_api_key,
             max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
             allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
-            skills=skills, duree_max_s=duree, effort=effort, **journal,
+            skills=skills, duree_max_s=duree, effort=effort,
+            base_url=url if principal else None,
+            endpoint_key=cle if principal else "", **journal,
         )
 
     if rapide and config is not None and config.fallback is not None:

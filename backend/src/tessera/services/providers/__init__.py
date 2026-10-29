@@ -39,6 +39,8 @@ def get_provider(
     journal_refus: JournalDesRefus | None = None,
     duree_max_s: float | None = None,
     effort: EffortLevel | None = None,
+    base_url: str | None = None,
+    endpoint_key: str = "",
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -75,6 +77,10 @@ def get_provider(
 
     ``effort`` is the role's reasoning effort (ticket-573); only the SDK
     provider hands it on. ``None``: nothing is passed.
+
+    ``base_url`` and ``endpoint_key`` are the endpoint of an
+    ``openai_compatible`` role and the key its ``api_key_env`` names
+    (ticket-669). ``api_key`` stays the Anthropic one: the two never mix.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -116,7 +122,20 @@ def get_provider(
         from tessera.services.providers.ollama import OllamaProvider
 
         return OllamaProvider(settings.ollama_base_url, duree_max_s=duree_max_s)
+    if resolved == "openai_compatible":
+        # Sans outils, comme Ollama : il sert les rôles texte→JSON (ticket-669).
+        from tessera.services.providers.openai_compatible import OpenAICompatibleProvider
+
+        if not base_url:
+            raise ValueError(
+                "Le provider 'openai_compatible' exige une base_url, "
+                "déclarée dans agents.json."
+            )
+        return OpenAICompatibleProvider(
+            base_url, endpoint_key, duree_max_s=duree_max_s
+        )
     raise ValueError(
         f"Provider LLM inconnu : {resolved!r}. "
-        "Valeurs acceptées : 'agent_sdk', 'anthropic_api', 'ollama'."
+        "Valeurs acceptées : 'agent_sdk', 'anthropic_api', 'ollama', "
+        "'openai_compatible'."
     )

@@ -7,11 +7,13 @@ from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
 from tessera.services.artifacts import default_mode_for
 from tessera.services.modeles_par_defaut import modele_par_defaut
-from tessera.services.providers.noms import (
-    PROVIDERS_ANTHROPIC,
-    PROVIDERS_CONNUS,
-    ProviderInconnu,
+from tessera.services.providers.declaration import (
+    verifier_configs,
+    verifier_entree,
+    verifier_entrees,
+    verifier_provider,
 )
+from tessera.services.providers.noms import PROVIDERS_ANTHROPIC, PROVIDERS_CONNUS
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -174,26 +176,19 @@ def load_agents_config(project_path: Path) -> list[AgentConfig]:
         return []
     try:
         data = json.loads(agents_json.read_text(encoding="utf-8"))
-        configs = [AgentConfig(**a) for a in data.get("agents", [])]
+        entrees = list(data.get("agents", []))
     except Exception:
         return []
-    # Un provider mal orthographié n'est pas un manifeste illisible : le
-    # taire enverrait le rôle sur le défaut sans rien dire (ticket-188).
-    for config in configs:
-        _verifier_provider(config.role, config.provider)
-        if config.fallback is not None:
-            _verifier_provider(config.role, config.fallback.provider, repli=True)
+    # Un provider mal orthographié, une clé en clair : pas un manifeste
+    # illisible. Le refus sort du `try`, sinon le rôle retomberait sur le
+    # défaut sans rien dire (tickets 188 et 669).
+    verifier_entrees(entrees)
+    try:
+        configs = [AgentConfig(**a) for a in entrees]
+    except Exception:
+        return []
+    verifier_configs(configs, PROVIDERS_CONNUS)
     return configs
-
-
-def _verifier_provider(role: str, provider: str, repli: bool = False) -> None:
-    if provider in PROVIDERS_CONNUS:
-        return
-    quoi = "repli" if repli else "provider"
-    raise ProviderInconnu(
-        f"Rôle '{role}' : {quoi} inconnu {provider!r}. "
-        f"Valeurs acceptées : {', '.join(PROVIDERS_CONNUS)}."
-    )
 
 
 def fait_tourner_l_ide(
@@ -586,10 +581,13 @@ def set_agent_provider(
 ) -> None:
     """Change le provider d'un rôle et son repli, dans le manifeste du projet
     (ticket-188). `fallback=None` retire le repli."""
-    _verifier_provider(role, provider)
+    verifier_provider(role, provider, PROVIDERS_CONNUS)
     if fallback is not None:
-        _verifier_provider(role, fallback["provider"], repli=True)
+        verifier_provider(role, fallback["provider"], PROVIDERS_CONNUS, repli=True)
     data, agent = _entree_du_role(project_path, role)
+    # `openai_compatible` sans `base_url` donnerait un manifeste refusé au
+    # chargement : refus avant d'écrire (ticket-669).
+    verifier_entree(role, {**agent, "provider": provider})
     agent["provider"] = provider
     if fallback is None:
         agent.pop("fallback", None)
