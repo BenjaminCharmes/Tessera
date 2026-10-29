@@ -44,6 +44,7 @@ from tessera.services.verdict_reviewer import donnees_fin_de_revue, juger_revue
 from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.services.security_auditor import SecurityAuditResult
 from tessera.services.validator_cited_files import format_cited_files_log
+from tessera.services.validator_decisions import validator_extras
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -790,9 +791,8 @@ async def run_validation(
         return True, ""
     await emit(run, EventType.VALIDATION_STARTED)
     t0 = time.monotonic()
-    # Transmis seulement quand il y a un refus : un validateur qui ne connaît
-    # pas ce paramètre est appelé comme avant ticket-476.
-    extra = {"refus": run.refus_du_tour} if run.refus_du_tour else {}
+    # Refus du garde-fou et réponses du dialogue, seulement s'il y en a.
+    extra = validator_extras(run.refus_du_tour, run.dialogue)
     try:
         validation = await orch._validator.validate(
             criteria=_extract_criteria(run.ticket.body),

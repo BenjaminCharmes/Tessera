@@ -12,6 +12,7 @@ from tessera.services.validator_cited_files import (
     extract_file_refs,
     format_cited_files_log,
 )
+from tessera.services.validator_decisions import Exchanges, build_decisions_section
 from tessera.services.validator_schema import VALIDATOR_SCHEMA
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
@@ -37,9 +38,7 @@ _CODE_TICKET_TYPES: frozenset[str] = frozenset({"feat", "fix", "refactor"})
 _CHECKBOX_PREFIX = re.compile(r"^\s*-?\s*\[[ xX]?\]\s*")
 # Matches backtick, ASCII quotes, guillemets and typographic curly quotes.
 # \uXXXX escapes keep this file 100 % ASCII on disk (avoids cp1252/UTF-8 mix).
-_QUOTES_AND_TICKS = re.compile(
-    "[\x60\"'«»“”‘’]"
-)
+_QUOTES_AND_TICKS = re.compile("[\x60\"'«»“”‘’]")
 _PUNCTUATION_TAIL = re.compile(r"[.,;:!?]+$")
 _MULTI_SPACE = re.compile(r"\s+")
 
@@ -79,6 +78,7 @@ class ValidatorService:
         project_root: Path | None = None,
         ticket_type: str | None = None,
         refus: str = "",
+        exchanges: Exchanges = (),
     ) -> ValidationResult:
         if not criteria:
             # Un ticket de code sans critère ne peut pas être validé : rien
@@ -106,7 +106,7 @@ class ValidatorService:
 
         system_prompt = self._load_system_prompt()
         user_message, cited_files = self._build_user_message(
-            criteria, code_produced, test_result, project_root, refus
+            criteria, code_produced, test_result, project_root, refus, exchanges
         )
 
         try:
@@ -150,6 +150,7 @@ class ValidatorService:
         test_result: "TestResult | None",
         project_root: Path | None = None,
         refus: str = "",
+        exchanges: Exchanges = (),
     ) -> tuple[str, CitedFilesReport]:
         # Number the criteria so the LLM can return an `index`.
         criteria_block = "\n".join(
@@ -179,7 +180,8 @@ class ValidatorService:
             cited_block, report = build_cited_files_section(refs, project_root)
         message = (
             f"## Critères d'acceptation\n{criteria_block}\n\n"
-            f"## Code produit\n{code_produced[:_CODE_MAX_CHARS]}"
+            + build_decisions_section(exchanges)
+            + f"## Code produit\n{code_produced[:_CODE_MAX_CHARS]}"
             # Hors de la coupe : un refus tronqué avec le code ne dirait rien.
             + refus
             + test_block

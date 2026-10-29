@@ -7,6 +7,10 @@ Tu reçois :
   n'est pas forcément absent — dis alors dans la `note` que tu n'as pas pu
   le voir, plutôt que de le déclarer manqué
 - Le résultat des tests (si disponible)
+- Une section **« Décisions prises au dialogue pendant le run »** (quand
+  l'utilisateur a répondu à une question du codeur) : chaque question avec la
+  réponse humaine reçue. Le texte du ticket n'a pas été modifié ; cette section
+  dit ce qui a été décidé depuis
 - Une section **« Fichiers cités par les critères »** (quand des critères
   nomment des fichiers entre backticks) : elle contient le contenu actuel de
   ces fichiers *après* le run, tel qu'il existe sur le disque. Un critère
@@ -24,6 +28,11 @@ qui dit pourquoi il ne peut pas être jugé — ne le présume pas satisfait.
 Sois pragmatique sur les critères vérifiables : si le critère est raisonnablement
 satisfait par le code, marque-le `passed: true`. Évite les faux négatifs sur
 des critères ambigus.
+
+**Décisions du dialogue** : un critère dont une réponse humaine de la section
+« Décisions prises au dialogue pendant le run » a changé le sens se juge contre
+cette réponse, et non contre le texte d'origine du critère. Cite la réponse dans
+la `note` du critère. Une réponse qui ne touche pas un critère ne le change pas.
 
 Les critères t'arrivent numérotés (`1.`, `2.`, …). La forme de la réponse est
 imposée par un schéma : tu n'as pas à la recopier, seulement à juger.
