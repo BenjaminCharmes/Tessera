@@ -6,7 +6,7 @@ import Piece from "./Piece";
 import { T0, etatApresPipeline, nomme } from "./etatsDeTest";
 
 beforeEach(() => {
-  vi.stubGlobal("innerWidth", 1920);
+  vi.stubGlobal("innerWidth", 2400);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
   vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 });

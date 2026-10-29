@@ -6,8 +6,8 @@ export const ECHELLE_MIN = 0.9;
 const HORS_DES_SALLES = 430;
 /** Ce qu'une salle garde hors de ses sprites : marges et écarts du mur. */
 const MARGES_DUNE_SALLE = 48;
-/** La largeur du mur le plus chargé (directeur : deux fenêtres, plafonnier, cadre, interrupteur) à l'échelle 1. */
-const MUR_A_L_ECHELLE_UN = 200;
+/** La largeur du mur le plus chargé (directeur : deux fenêtres, plafonnier, cadre de l'employé, horloge, cadre, interrupteur) à l'échelle 1 (ticket-635). */
+const MUR_A_L_ECHELLE_UN = 240;
 
 /**
  * L'échelle qui fait tenir le mur le plus chargé dans une des quatre salles de front,

@@ -1,14 +1,16 @@
 ---
-id: ticket-635
-title: "The Bureau rooms gain a wall clock, a wall shelf, a framed picture, and a bin that fills with refused rounds"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: [ticket-631]
-estimated_days: 1
 created: 2026-10-28
+depends_on:
+- ticket-631
+estimated_days: 1
+id: ticket-635
+pr_number: 744
+priority: low
+status: done
+title: The Bureau rooms gain a wall clock, a wall shelf, a framed picture, and a bin
+  that fills with refused rounds
+type: feat
 ---
 
 # ticket-635 — Une horloge, une étagère et une corbeille

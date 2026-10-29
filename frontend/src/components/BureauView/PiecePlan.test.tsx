@@ -8,7 +8,7 @@ import Piece from "./Piece";
 import { DERNIER, T0, nomme } from "./etatsDeTest";
 
 beforeEach(() => {
-  vi.stubGlobal("innerWidth", 1920);
+  vi.stubGlobal("innerWidth", 2400);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
   vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
 });
