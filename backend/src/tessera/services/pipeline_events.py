@@ -101,6 +101,10 @@ class EventType(str, Enum):
     #: (avec `files`) puis « ended », où `outcome` vaut « resolved » ou
     #: « cancelled ».
     CONFLICT_RESOLUTION = "conflict_resolution"
+    #: L'étape de capture du run a fini (ticket-618) : `outcome` vaut « captured »
+    #: ou « failed », avec `images`, `startup_ms`, `capture_ms` et, en cas d'échec,
+    #: `reason`. Jamais le jeton de session. Absent sans `controle_visuel`.
+    VISUAL_CHECK = "visual_check"
 
 
 class OrchestratorEvent(BaseModel):

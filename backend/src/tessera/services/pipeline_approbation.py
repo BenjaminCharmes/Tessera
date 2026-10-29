@@ -9,7 +9,8 @@ it can prove.
 from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.pipeline_events import PipelineResult
+from tessera.services.pipeline_capture import capturer_le_run
+from tessera.services.pipeline_events import EventCallback, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
 from tessera.utils.logger import get_logger
 
@@ -74,3 +75,28 @@ async def suivre_documentation(
         return resultat
     await _noter(orch, resultat.run_id, apres)
     return resultat.model_copy(update={"approved_sha": apres})
+
+
+async def apres_approbation(
+    orch: "Orchestrator",
+    resultat: PipelineResult,
+    project_id: str,
+    on_event: EventCallback,
+) -> PipelineResult:
+    """Documentation, then captures, between the approval and the delivery."""
+    # La documentation part sur la branche du run, avant sa livraison :
+    # elle décrit ce que la PR livre, et se relit avec (ticket-198).
+    # Exception : les tickets légers (ticket-292) ne déclenchent pas de
+    # mise à jour immédiate — le marqueur ne bouge pas, et le prochain
+    # ticket normal documente le lot entier, léger compris.
+    ticket = await orch._ticket_svc.get_ticket(resultat.ticket_id)
+    if ticket is None or not ticket.light:
+        avant_doc = await tete_de_branche(orch)
+        await orch._documenter_le_run(resultat, on_event)
+        # Le commit de documentation est celui du pipeline : l'approbation
+        # le suit, sans quoi la livraison le prendrait pour un intrus
+        # (ticket-492).
+        resultat = await suivre_documentation(orch, resultat, avant_doc)
+    # Une fois par run, après l'approbation : jamais à chaque tour (ticket-618).
+    await capturer_le_run(orch, resultat, project_id, on_event)
+    return resultat
