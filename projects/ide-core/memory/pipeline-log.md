@@ -6115,3 +6115,4 @@ Le diff ajoute :
 - 2026-10-29 11:54:41 UTC — [ticket-629] tour 1 — reviewer terminé (17577ms)
 - 2026-10-29 11:57:44 UTC — [ticket-629] validateur: APPROVED — Les tests couvrent tous les critères d'acceptation : l'écran affiche les bonnes  (201234ms)
 - 2026-10-29 11:57:44 UTC — [ticket-629] APPROVED après 1 tour(s)
+- 2026-10-29 12:00:50 UTC — [ticket-629] documentation: 0 fichier(s) (180312ms) — après tour de correction
