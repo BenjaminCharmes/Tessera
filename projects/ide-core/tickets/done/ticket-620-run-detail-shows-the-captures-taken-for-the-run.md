@@ -4,6 +4,7 @@ created: 2026-10-27
 depends_on:
 - ticket-618
 id: ticket-620
+pr_number: 735
 priority: low
 status: done
 title: The run detail shows the captures taken for that run
