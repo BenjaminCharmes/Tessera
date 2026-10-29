@@ -6215,3 +6215,4 @@ Le diff ajoute :
 - 2026-10-29 15:19:54 UTC — [ticket-659] validateur: fichiers cités joints : scripts/prochain_numero.py, memory/decisions.md (tronqué) ; absents : origin/develop ; non joints (budget épuisé) : memory/pipeline-log.md
 - 2026-10-29 15:19:54 UTC — [ticket-659] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute les tests requis (337264ms)
 - 2026-10-29 15:19:54 UTC — [ticket-659] APPROVED après 1 tour(s)
+- 2026-10-29 15:26:32 UTC — [ticket-659] documentation: 0 fichier(s) (393139ms) — après tour de correction — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « **Pas de « `uv run pytest` passe » ni de « `npm run test` pa » (.claude/skills/ne
