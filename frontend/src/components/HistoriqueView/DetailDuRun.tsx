@@ -2,6 +2,7 @@ import RunHistorique from "../StatsView/RunHistorique";
 import StatusPill from "../../design/ui/StatusPill";
 import LienTicket from "../../design/ui/LienTicket";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
+import CapturesDuRun from "./CapturesDuRun";
 import {
   etatDuRun,
   formatCout,
@@ -84,6 +85,8 @@ export default function DetailDuRun({ run, ticket, project }: DetailDuRunProps) 
           {run.arret}
         </p>
       )}
+
+      <CapturesDuRun projectId={project?.id ?? null} ticketId={run.ticket_id} />
 
       <section className="flex min-h-0 flex-1 flex-col">
         <div className="mb-2 text-mini font-semibold uppercase tracking-wider text-zinc-500">
