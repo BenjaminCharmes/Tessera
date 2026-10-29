@@ -1,6 +1,6 @@
 ---
 id: ticket-635
-title: "The Bureau rooms gain a wall clock, a wall shelf, and a bin that fills with refused rounds"
+title: "The Bureau rooms gain a wall clock, a wall shelf, a framed picture, and a bin that fills with refused rounds"
 type: feat
 status: todo
 pr_number: null
@@ -30,6 +30,9 @@ sur l'`agent_done` du reviewer, comme dans `lib/bureau/copie.ts`.
   l'horloge unique de la vue (`maintenant`), comme le ciel des fenêtres.
 - **Étagère murale** (pièces) : une petite plante et deux livres. Mobilier fixe,
   sans état.
+- **Cadre** (pièces et salles du haut) : un tableau accroché au mur, dont l'image
+  varie d'une pièce à l'autre, tirée du nom du projet comme sa tenue. Mobilier
+  fixe, sans état.
 - **Corbeille** (pièces), au sol près d'un poste : une boule de papier froissé par
   `agent_done` du reviewer rendant `CHANGES_REQUESTED` sur le ticket en cours
   (`etat.ticketEvents`), trois au plus dessinées. Vide au ticket suivant.
@@ -40,6 +43,7 @@ sur l'`agent_done` du reviewer, comme dans `lib/bureau/copie.ts`.
 - [ ] Un test vérifie que l'horloge place ses aiguilles selon `maintenant` : 3 h et 9 h donnent des aiguilles différentes
 - [ ] Un test vérifie que la corbeille dessine une boule par refus du reviewer sur le ticket en cours, trois au plus, et aucune sans refus
 - [ ] Un test vérifie que la corbeille se vide quand `ticketEvents` change de ticket
+- [ ] Un test vérifie que deux projets différents ont des cadres différents, et qu'un projet garde le même d'un rendu à l'autre
 - [ ] Les nouveaux sprites n'utilisent que des jetons `--sprite-*` (ADR-058)
 
 ## Ce que ça ne fait pas
