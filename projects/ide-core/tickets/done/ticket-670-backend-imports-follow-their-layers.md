@@ -4,7 +4,7 @@ created: 2026-10-29
 depends_on: []
 estimated_days: 1
 id: ticket-670
-pr_number: null
+pr_number: 755
 priority: low
 status: done
 title: A test keeps backend imports flowing from routers to services to models
