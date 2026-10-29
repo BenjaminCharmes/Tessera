@@ -212,7 +212,7 @@ describe("Piece with an agent away", () => {
     rerender(<Piece projet="alpha" etat={enQuestion()} maintenant={T0} />);
 
     expect(personnagesAssis()).toBe(4);
-    const poste = screen.getByRole("button", { name: /^Codeur/ }).parentElement;
+    const poste = screen.getByRole("button", { name: /, codeur, / }).parentElement;
     expect(poste).toHaveAttribute("data-absent", "true");
     expect(poste?.querySelector('[data-sprite="personnage"]')).toBeNull();
     expect(screen.queryByTestId("bulle")).toBeNull();

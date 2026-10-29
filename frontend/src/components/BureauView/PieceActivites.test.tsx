@@ -4,7 +4,7 @@ import { INITIAL } from "../../hooks/streamState";
 import { PORTE_X } from "../../lib/bureau/activites";
 import { api } from "../../lib/api";
 import Piece from "./Piece";
-import { T0, etatApresPipeline, etatEnSecurite, etatQuatreFaits } from "./etatsDeTest";
+import { T0, etatApresPipeline, etatEnSecurite, etatQuatreFaits, nomme } from "./etatsDeTest";
 
 const TASSE = () => 0;
 const ETIRE = () => 0.5;
@@ -34,8 +34,8 @@ describe("Piece break activities", () => {
   ])("names an agent who is done $nom", ({ hasard, libelle }) => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0} hasard={hasard} />);
 
-    expect(screen.getByRole("img", { name: `Codeur, ${libelle}` })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: `Testeur, ${libelle}` })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: nomme(`Codeur, ${libelle}`, "codeur") })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: nomme(`Testeur, ${libelle}`, "testeur") })).toBeInTheDocument();
   });
 
   it("raises the arms of an agent who stretches, and gives a cup to the others", () => {
@@ -57,7 +57,7 @@ describe("Piece break activities", () => {
     );
 
     expect(agents(container).map((a) => a.dataset.agent)).toEqual(["codeur", "testeur"]);
-    expect(screen.getByRole("button", { name: "Sécurité, travaille" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: nomme("Sécurité, travaille", "securite") })).toBeInTheDocument();
   });
 
   it("keeps the break while the clock does not move and replays it on a tick", () => {
@@ -70,7 +70,7 @@ describe("Piece break activities", () => {
     expect(hasard.mock.calls.length).toBe(appels);
 
     rerender(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} hasard={hasard} />);
-    expect(screen.getByRole("img", { name: "Codeur, boit un café à son poste" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: nomme("Codeur, boit un café à son poste", "codeur") })).toBeInTheDocument();
   });
 });
 
@@ -87,7 +87,7 @@ describe("Piece coffee machine", () => {
       ["securite", "machine"],
       ["reviewer", "tasse"],
     ]);
-    expect(screen.getByRole("img", { name: "Reviewer, boit un café à son poste" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: nomme("Reviewer, boit un café à son poste", "reviewer") })).toBeInTheDocument();
   });
 
   it("steams if and only if an agent is at the machine", () => {

@@ -3,7 +3,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { INITIAL } from "../../hooks/streamState";
 import { api } from "../../lib/api";
 import Piece from "./Piece";
-import { DERNIER, T0, etatApresPipeline, etatEnCodage, etatEnSecurite } from "./etatsDeTest";
+import { DERNIER, T0, etatApresPipeline, etatEnCodage, etatEnSecurite, nomme } from "./etatsDeTest";
 
 function bulle(): string | null {
   return screen.queryByTestId("bulle")?.textContent ?? null;
@@ -34,20 +34,20 @@ describe("Piece", () => {
 
     const boutons = boutonsDesPostes();
     expect(boutons.map((b) => b.getAttribute("aria-label"))).toEqual([
-      "Codeur, a fini",
-      "Testeur, a fini",
-      "Sécurité, travaille",
-      "Reviewer, attend son tour",
-      "Validateur, attend son tour",
+      nomme("Codeur, a fini", "codeur"),
+      nomme("Testeur, a fini", "testeur"),
+      nomme("Sécurité, travaille", "securite"),
+      nomme("Reviewer, attend son tour", "reviewer"),
+      nomme("Validateur, attend son tour", "validateur"),
     ]);
   });
 
   it("names a busy, a done and a free post", () => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
-    expect(screen.getByRole("button", { name: "Sécurité, travaille" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Codeur, a fini" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Reviewer, attend son tour" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: nomme("Sécurité, travaille", "securite") })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: nomme("Codeur, a fini", "codeur") })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: nomme("Reviewer, attend son tour", "reviewer") })).toBeInTheDocument();
   });
 
   it("draws a pill and no bubble for a busy post that works", () => {
@@ -69,14 +69,14 @@ describe("Piece", () => {
     const onChoisir = vi.fn();
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} onChoisir={onChoisir} />);
 
-    for (const nom of ["Codeur, a fini", "Testeur, a fini", "Reviewer, attend son tour", "Validateur, attend son tour"]) {
+    for (const nom of [nomme("Codeur, a fini", "codeur"), nomme("Testeur, a fini", "testeur"), nomme("Reviewer, attend son tour", "reviewer"), nomme("Validateur, attend son tour", "validateur")]) {
       const bouton = screen.getByRole("button", { name: nom });
       fireEvent.click(bouton);
       expect(bouton.className).not.toContain("cursor-pointer");
     }
     expect(onChoisir).not.toHaveBeenCalled();
 
-    const occupe = screen.getByRole("button", { name: "Sécurité, travaille" });
+    const occupe = screen.getByRole("button", { name: nomme("Sécurité, travaille", "securite") });
     fireEvent.click(occupe);
     expect(occupe.className).toContain("cursor-pointer");
     expect(onChoisir).toHaveBeenCalledWith("ide-core", "securite");
@@ -166,7 +166,7 @@ describe("Piece characters", () => {
   it("seats a character, still and without animation, at a post that waits its turn", () => {
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
-    const [personnage, ...autres] = personnagesDuPoste("Reviewer, attend son tour");
+    const [personnage, ...autres] = personnagesDuPoste(nomme("Reviewer, attend son tour", "reviewer"));
 
     expect(autres).toEqual([]);
     expect(personnage).toHaveAttribute("data-pose", "assis");
@@ -177,7 +177,7 @@ describe("Piece characters", () => {
   it("stands a character out of a post that is done, and keeps its tick on the screen", () => {
     const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
-    const bouton = screen.getByRole("button", { name: "Codeur, a fini" });
+    const bouton = screen.getByRole("button", { name: nomme("Codeur, a fini", "codeur") });
     const agent = container.querySelector('[data-agent="codeur"]');
 
     expect(agent?.querySelectorAll('[data-sprite="personnage"]')).toHaveLength(1);
@@ -190,7 +190,7 @@ describe("Piece characters", () => {
   it("keeps the busy character seated and typing", () => {
     render(<Piece projet="ide-core" etat={etatEnCodage()} maintenant={T0 + 5_000} />);
 
-    const [personnage] = personnagesDuPoste("Codeur, travaille");
+    const [personnage] = personnagesDuPoste(nomme("Codeur, travaille", "codeur"));
 
     expect(personnage).toHaveAttribute("data-pose", "assis");
     expect(personnage?.querySelector(".anim-tape")).not.toBeNull();
@@ -201,13 +201,13 @@ describe("Piece characters", () => {
 
     expect(container.querySelectorAll('[data-sprite="personnage"]')).toHaveLength(0);
     expect(container.querySelectorAll('[data-sprite="coche"]')).toHaveLength(0);
-    expect(screen.getByRole("button", { name: "Codeur, libre" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: nomme("Codeur, libre", "codeur") })).toBeInTheDocument();
   });
 
   it("draws the standing character outside the desk grid of its post", () => {
     const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
-    const bouton = screen.getByRole("button", { name: "Codeur, a fini" });
+    const bouton = screen.getByRole("button", { name: nomme("Codeur, a fini", "codeur") });
     const debout = container.querySelector('[data-agent="codeur"] [data-pose="debout"]');
 
     expect(debout).not.toBeNull();
@@ -306,7 +306,7 @@ describe("Piece health words", () => {
 
     expect(bulle()).toBe(signe);
     expect(pastille()).toBe(mot);
-    expect(screen.getByRole("button", { name: `Codeur, ${mot}` })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: nomme(`Codeur, ${mot}`, "codeur") })).toBeInTheDocument();
   });
 });
 

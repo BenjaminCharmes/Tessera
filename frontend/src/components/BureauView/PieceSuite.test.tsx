@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { api } from "../../lib/api";
 import type { EventType } from "../../types/api";
 import Piece from "./Piece";
-import { T0, etatApresPipeline } from "./etatsDeTest";
+import { T0, etatApresPipeline, nomme } from "./etatsDeTest";
 
 beforeEach(() => {
   vi.stubGlobal("innerWidth", 1920);
@@ -33,8 +33,8 @@ describe("Piece during the documentation", () => {
     const presents = redacteurs(container);
     expect(presents.map((r) => r.getAttribute("data-agent"))).toEqual(["doc-technique", "doc-fonctionnelle"]);
     expect(presents.every((r) => r.getAttribute("data-activite") === "redige")).toBe(true);
-    expect(screen.getByRole("img", { name: "Rédacteur technique, rédige la documentation" })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Rédacteur fonctionnel, rédige la documentation" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: nomme("Rédacteur technique, rédige la documentation", "doc-technique") })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: nomme("Rédacteur fonctionnel, rédige la documentation", "doc-fonctionnelle") })).toBeInTheDocument();
 
     rerender(<Piece projet="ide-core" etat={etat("documentation_started", "doc_updated")} maintenant={T0} />);
     expect(redacteurs(container)).toEqual([]);
@@ -75,12 +75,12 @@ describe("Piece during the delivery", () => {
     );
 
     expect(container.querySelector('[data-agent="codeur"]')?.getAttribute("data-activite")).toBe("depose");
-    expect(screen.getByRole("img", { name: "Codeur, dépose la PR" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^Codeur/ }).parentElement).toHaveAttribute("data-absent", "true");
+    expect(screen.getByRole("img", { name: nomme("Codeur, dépose la PR", "codeur") })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /, codeur, / }).parentElement).toHaveAttribute("data-absent", "true");
 
     rerender(<Piece projet="ide-core" etat={etat("livraison_started", "livraison_done")} maintenant={T0} />);
 
     expect(container.querySelector('[data-agent="codeur"]')?.getAttribute("data-activite")).not.toBe("depose");
-    expect(screen.queryByRole("img", { name: "Codeur, dépose la PR" })).toBeNull();
+    expect(screen.queryByRole("img", { name: nomme("Codeur, dépose la PR", "codeur") })).toBeNull();
   });
 });
