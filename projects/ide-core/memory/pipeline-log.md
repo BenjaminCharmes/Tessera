@@ -6476,3 +6476,17 @@ Le diff ajoute :
 - 2026-10-29 23:18:34 UTC — [ticket-668] APPROVED après 1 tour(s)
 - 2026-10-29 23:18:41 UTC — [ticket-668] fichiers non suivis laissés par le run : tickets/todo/ticket-702-the-codeur-exhausted-turns-are-recorded.md (à ignorer dans .gitignore ?)
 - 2026-10-29 23:21:09 UTC — [ticket-668] documentation: 0 fichier(s) (148375ms)
+- 2026-10-29 23:21:30 UTC — [ide-core] ticket-668 PR #765 confiée au CIWatcher
+- 2026-10-29 23:21:35 UTC — [ticket-672] branche ticket-672-the-running-apps-view-shows-one-server-room-per-a
+- 2026-10-29 23:21:37 UTC — [ticket-672] tour 1 — codeur démarré
+- 2026-10-29 23:25:53 UTC — [ide-core] ticket-668 PR #765 mergée (CI verte)
+- 2026-10-29 23:28:18 UTC — [ticket-672] tour 1 — codeur terminé (401327ms)
+- 2026-10-29 23:30:52 UTC — [ticket-672] testeur: OK (exit 0)
+- 2026-10-29 23:32:56 UTC — [ticket-672] securite: PASS — No security vulnerabilities detected in this diff. The new UI components for the (123516ms)
+- 2026-10-29 23:32:56 UTC — [ticket-672] tour 1 — reviewer démarré
+- 2026-10-29 23:33:17 UTC — [ticket-672] tour 1 — reviewer terminé (21125ms)
+- 2026-10-29 23:37:56 UTC — [ticket-672] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 23:38:45 UTC — [ticket-672] validateur: fichiers cités joints : index.css, design/bureau/sources.test.ts (tronqué) ; absents : design/bureau/
+- 2026-10-29 23:38:45 UTC — [ticket-672] validateur: APPROVED — Ticket-672 is complete: all six acceptance criteria are satisfied. The server ro (349547ms)
+- 2026-10-29 23:38:45 UTC — [ticket-672] APPROVED après 1 tour(s)
+- 2026-10-29 23:43:43 UTC — [ticket-672] documentation: 1 fichier(s) (291657ms) — après tour de correction

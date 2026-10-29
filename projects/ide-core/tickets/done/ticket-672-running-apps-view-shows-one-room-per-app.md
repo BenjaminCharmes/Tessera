@@ -1,14 +1,14 @@
 ---
-id: ticket-672
-title: "The running apps view shows one server room per app, with its state only"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-10-29
 depends_on: []
 estimated_days: 2
-created: 2026-10-29
+id: ticket-672
+pr_number: 767
+priority: low
+status: done
+title: The running apps view shows one server room per app, with its state only
+type: feat
 ---
 
 # ticket-672 — La vue « En cours » montre une salle des serveurs par app

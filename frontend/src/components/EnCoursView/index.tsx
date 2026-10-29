@@ -1,15 +1,27 @@
+import { useState } from "react";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
+import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import type { UseAppsEnCoursResult } from "../../hooks/useAppsEnCours";
 import type { ProjectOverview } from "../../types/api";
 import RegionTitle from "../../design/RegionTitle";
 import EnTeteGroupe from "./EnTeteGroupe";
 import LigneApp from "./LigneApp";
 import ProjetsArretes from "./ProjetsArretes";
+import SallesDesServeurs from "./SallesDesServeurs";
 import { formaterMo, grouperParProjet, memoireTotale } from "./format";
+
+type VueEnCours = "salles" | "liste";
+
+const VUES: OptionVue<VueEnCours>[] = [
+  { valeur: "salles", libelle: "Salles" },
+  { valeur: "liste", libelle: "Liste" },
+];
 
 interface EnCoursViewProps {
   appsEnCours: UseAppsEnCoursResult;
+  /** La vue ouverte au départ : les salles, la liste restant au clavier et au lecteur d'écran. */
+  vueInitiale?: VueEnCours;
 }
 
 const AUCUN: ProjectOverview[] = [];
@@ -25,10 +37,11 @@ function Message({ texte }: { texte: string }) {
  * Vue globale, comme la supervision : elle ne dépend d'aucun projet actif.
  * L'état vient du cockpit (`useAppsEnCours`), qui relit toutes les 10 s.
  */
-export default function EnCoursView({ appsEnCours }: EnCoursViewProps) {
+export default function EnCoursView({ appsEnCours, vueInitiale = "salles" }: EnCoursViewProps) {
   const { apps, lueA, erreur, arreter, arreterProjet, lancer, enArret, enLancement } =
     appsEnCours;
   const { data: projets } = useResource(lireProjets, AUCUN);
+  const [vue, setVue] = useState<VueEnCours>(vueInitiale);
 
   if (apps === null) {
     return erreur ? (
@@ -47,8 +60,9 @@ export default function EnCoursView({ appsEnCours }: EnCoursViewProps) {
     <div className="h-full overflow-y-auto p-4 text-zinc-200">
       <header className="mb-3 flex items-baseline justify-between">
         <RegionTitle>En cours</RegionTitle>
-        <span className="text-sm text-zinc-300">
+        <span className="flex items-center gap-3 text-sm text-zinc-300">
           Mémoire totale : {formaterMo(memoireTotale(apps))}
+          <ViewSwitcher label="Vue des apps" options={VUES} valeur={vue} onChange={setVue} />
         </span>
       </header>
       {erreur && (
@@ -58,6 +72,8 @@ export default function EnCoursView({ appsEnCours }: EnCoursViewProps) {
       )}
       {apps.length === 0 ? (
         <Message texte="Aucune app de projet ne tourne" />
+      ) : vue === "salles" ? (
+        <SallesDesServeurs apps={apps} lueA={lueA} />
       ) : (
         grouperParProjet(apps).map((groupe) => (
           <section key={groupe.project_id} className="mb-4">
