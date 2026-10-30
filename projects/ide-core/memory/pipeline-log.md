@@ -6670,3 +6670,4 @@ Le diff ajoute :
 - 2026-10-30 20:40:20 UTC — [ticket-724] validateur: fichiers cités joints : backend/tests/test_documentation_claude_md.py, AGENTS.md, agents.json, agents/prompts/doc-technique.md, memory/contraintes.md (tronqué) ; non joints (budget épuisé) : memory/decisions.md
 - 2026-10-30 20:40:20 UTC — [ticket-724] validateur: APPROVED — Le ticket-724 livre l'intégration complète de la gestion des descriptions de pro (368453ms)
 - 2026-10-30 20:40:20 UTC — [ticket-724] APPROVED après 2 tour(s)
+- 2026-10-30 20:42:49 UTC — [ticket-724] documentation: 0 fichier(s) (143563ms) — après tour de correction
