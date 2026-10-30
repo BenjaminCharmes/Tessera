@@ -38,17 +38,16 @@ export default function JournalDuService({ projectName, service, onFermer }: Jou
     if (suivre && zone) zone.scrollTop = zone.scrollHeight;
   }, [suivre, lignes]);
 
-  useEffect(() => {
-    const surTouche = (e: KeyboardEvent) => e.key === "Escape" && onFermer();
-    window.addEventListener("keydown", surTouche);
-    return () => window.removeEventListener("keydown", surTouche);
-  }, [onFermer]);
-
   return (
     <section
       id={`journal-${service.project_id}-${service.nom}`}
       aria-label={`Journal de ${projectName} · ${service.nom}`}
       data-journal={service.nom}
+      // Échap ferme ce journal-ci seulement, quand le focus est dedans : pas
+      // d'écoute sur `window`, qui fermerait aussi ceux des autres salles.
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onFermer();
+      }}
       className="flex flex-col border-t border-violet-700 bg-zinc-950"
     >
       <header className="flex flex-wrap items-center gap-3 border-b border-zinc-800 px-4 py-3">
@@ -57,7 +56,7 @@ export default function JournalDuService({ projectName, service, onFermer }: Jou
         </h2>
         <span className="text-xs text-zinc-400">{libelleDeLEtat(service)}</span>
         <span className="ml-auto flex gap-2">
-          <Button taille="compact" onClick={() => void navigator.clipboard?.writeText(sortie.join("\n"))}>
+          <Button taille="compact" onClick={() => void navigator.clipboard?.writeText(sortie.join("\n")).catch(() => undefined)}>
             Copier
           </Button>
           <Button taille="compact" onClick={onFermer} aria-label="Fermer le journal">

@@ -60,9 +60,9 @@ describe("agents of a product", () => {
 
     await waitFor(() => expect(agentsDessines()).toHaveLength(2));
     const salle = screen.getByRole("article", { name: /Alpha/ });
-    expect(within(salle).getByRole("button", { name: /Triage des signaux, au travail/ })).toBeInTheDocument();
+    expect(within(salle).getByLabelText(/Triage des signaux, au travail/)).toBeInTheDocument();
     expect(within(salle).getByText("lot 3 sur 5")).toBeInTheDocument();
-    expect(within(salle).getByRole("button", { name: /Synthèse, au repos/ })).toBeInTheDocument();
+    expect(within(salle).getByLabelText(/Synthèse, au repos/)).toBeInTheDocument();
     expect(salle.querySelectorAll("[data-sprite='console']")).toHaveLength(2);
   });
 
@@ -76,8 +76,8 @@ describe("agents of a product", () => {
     expect(actif.querySelector("[data-bras='pupitre'].anim-tape")).not.toBeNull();
     expect(repos.querySelector("[data-bras='repos']")).not.toBeNull();
     expect(repos.querySelector("[class*='anim-']")).toBeNull();
-    expect(screen.getByRole("button", { name: /, A, au travail/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /, B, au repos/ })).toBeInTheDocument();
+    expect(screen.getByLabelText(/, A, au travail/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/, B, au repos/)).toBeInTheDocument();
     expect(actif.querySelector("[data-sprite='console'] .anim-defile")).not.toBeNull();
     expect(repos.querySelector("[data-sprite='console']")).toHaveAttribute("data-allume", "false");
   });
@@ -120,8 +120,8 @@ describe("agents of a product", () => {
 
     await waitFor(() => expect(agentsDessines()).toHaveLength(2));
     const alpha = screen.getByRole("article", { name: /Alpha/ });
-    expect(within(alpha).getByRole("button", { name: /Agent alpha/ })).toBeInTheDocument();
-    expect(within(alpha).queryByRole("button", { name: /Agent beta/ })).toBeNull();
+    expect(within(alpha).getByLabelText(/Agent alpha/)).toBeInTheDocument();
+    expect(within(alpha).queryByLabelText(/Agent beta/)).toBeNull();
   });
 
   it("renders a name and a label that contain markup as text", async () => {
@@ -130,7 +130,7 @@ describe("agents of a product", () => {
 
     await waitFor(() => expect(agentsDessines()).toHaveLength(1));
     expect(screen.getByText(piege)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /<b>Nom<\/b>/ })).toBeInTheDocument();
+    expect(screen.getByLabelText(/<b>Nom<\/b>/)).toBeInTheDocument();
     const liste = document.querySelector("[data-agents-de-produit]") as HTMLElement;
     expect(liste.querySelector("img, script, b")).toBeNull();
   });

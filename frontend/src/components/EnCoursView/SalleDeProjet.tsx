@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import { IconExternal } from "../../design/icons";
@@ -6,6 +6,7 @@ import Agrandi from "../../design/bureau/Agrandi";
 import CheminDeCables from "../../design/bureau/CheminDeCables";
 import Climatiseur from "../../design/bureau/Climatiseur";
 import BoucheVMC, { type RegimeVMC } from "../../design/bureau/BoucheVMC";
+import { PASTILLE_DE_L_ETAT } from "../../design/bureau/tons";
 import Extincteur from "../../design/bureau/Extincteur";
 import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
 import type { ServiceActif } from "../../types/api";
@@ -60,6 +61,13 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
   const tombe = baies.some((b) => b.etat === "echoue");
   const ports = groupe.apps.flatMap((app) => app.ports).sort((a, b) => a - b);
   const journal = services.find((s) => s.nom === deplie);
+  const enMarche = baies.some((b) => b.etat === "en-cours");
+  const etatDeLaSalle = tombe ? "echoue" : enMarche ? "en-cours" : "arrete";
+  // Un service qui disparaît referme son journal, pour qu'il ne se rouvre pas
+  // tout seul à son retour : état ajusté pendant le rendu, sans effet.
+  if (deplie !== null && journal === undefined && services.length > 0) setDeplie(null);
+  const fermer = useCallback(() => setDeplie(null), []);
+  const avecJournal = new Set(ecrans.map((s) => s.nom));
 
   return (
     <article
@@ -69,7 +77,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
       className={`flex flex-col overflow-hidden rounded-lg border bg-(--sprite-salle-mur) ${tombe ? "border-red-800" : "border-zinc-800"}`}
     >
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-900/60 px-3 py-2">
-        <span aria-hidden="true" className={`size-2.5 rounded-[2px] ${tombe ? "bg-red-500" : "bg-green-500"}`} />
+        <span aria-hidden="true" className={`size-2.5 rounded-[2px] ${PASTILLE_DE_L_ETAT[etatDeLaSalle]}`} />
         <h3 className="text-sm font-semibold text-zinc-100">{groupe.project_name}</h3>
         <span className="text-xs text-zinc-400">
           {baies.length} service{baies.length > 1 ? "s" : ""} · {formaterMo(groupe.memoire_mo)}
@@ -118,11 +126,16 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
               <BaieAvecFiche key={baie.nom} baie={baie} app={groupe.apps.find((a) => a.nom === baie.nom)} />
             ))}
           </span>
-          <AgentsDeProduit projectId={groupe.project_id} agents={agents} onOuvrirService={setDeplie} />
+          <AgentsDeProduit
+            projectId={groupe.project_id}
+            agents={agents}
+            aUnJournal={(service) => avecJournal.has(service)}
+            onOuvrirService={setDeplie}
+          />
           <span className="flex items-end gap-4">
             <span className="self-start" title={`Ventilation : ${formaterMo(groupe.memoire_mo)} en service`}>
               <Agrandi>
-                <BoucheVMC regime={regimeDeLaVMC(baies.some((b) => b.etat === "en-cours"), groupe.memoire_mo)} />
+                <BoucheVMC regime={regimeDeLaVMC(enMarche, groupe.memoire_mo)} />
               </Agrandi>
             </span>
             <Agrandi>
@@ -137,7 +150,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
       </div>
       <SolDeSalle />
       {journal && (
-        <JournalDuService projectName={groupe.project_name} service={journal} onFermer={() => setDeplie(null)} />
+        <JournalDuService projectName={groupe.project_name} service={journal} onFermer={fermer} />
       )}
     </article>
   );

@@ -1,5 +1,6 @@
 import type { ServiceActif } from "../../types/api";
 import { etatDuService, libelleDeLEtat } from "../../design/etatDuService";
+import { PASTILLE_DE_L_ETAT, TEXTE_DE_L_ETAT } from "../../design/bureau/tons";
 import { niveauDeLigne, TON_DE_LIGNE } from "./journal";
 
 interface EcranMuralProps {
@@ -11,20 +12,6 @@ interface EcranMuralProps {
 }
 
 const LIGNES_VISIBLES = 5;
-
-const TON_ETAT = {
-  "en-cours": "text-green-300",
-  echoue: "text-red-300",
-  arrete: "text-zinc-400",
-  "jamais-lance": "text-zinc-500",
-} as const;
-
-const VOYANT = {
-  "en-cours": "bg-green-500",
-  echoue: "bg-red-500",
-  arrete: "bg-zinc-600",
-  "jamais-lance": "bg-zinc-700",
-} as const;
 
 /**
  * Le moniteur accroché au mur pour un service lancé par l'IDE — ticket-711. Il
@@ -49,7 +36,7 @@ export default function EcranMural({ service, deplie, onBasculer }: EcranMuralPr
       >
         <span className="flex justify-between bg-zinc-900 px-2 py-0.5 font-mono text-micro text-zinc-400">
           <span>{service.nom}</span>
-          <span className={TON_ETAT[etat]}>{libelleDeLEtat(service)}</span>
+          <span className={TEXTE_DE_L_ETAT[etat]}>{libelleDeLEtat(service)}</span>
         </span>
         <span className="block h-[5.6rem] overflow-hidden px-2 py-1 font-mono text-micro leading-[1.1rem]">
           {lignes.length === 0 ? (
@@ -66,7 +53,7 @@ export default function EcranMural({ service, deplie, onBasculer }: EcranMuralPr
           )}
         </span>
       </button>
-      <span aria-hidden="true" className={`-mt-[7px] size-1 rounded-full ${VOYANT[etat]}`} />
+      <span aria-hidden="true" className={`-mt-[7px] size-1 rounded-full ${PASTILLE_DE_L_ETAT[etat]}`} />
     </div>
   );
 }

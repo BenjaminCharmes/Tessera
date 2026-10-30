@@ -166,15 +166,6 @@
   --sprite-console-touche: #a1a1aa;
 }
 
-/* Faux plancher de la salle des serveurs : des dalles carrées de 12 px séparées
-   d'un joint. Du mobilier au sens de l'ADR-058 : fixe, sans animation. */
-.sol-dalles {
-  background-color: var(--sprite-dalle);
-  background-image:
-    repeating-linear-gradient(0deg, transparent 0 11px, var(--sprite-dalle-joint) 11px 12px),
-    repeating-linear-gradient(90deg, transparent 0 11px, var(--sprite-dalle-joint) 11px 12px);
-}
-
 /* Sol en lames des pièces et des salles : des lames horizontales séparées d'un
    joint. Du mobilier au sens de l'ADR-058 : fixe, sans animation. */
 .sol-lames {

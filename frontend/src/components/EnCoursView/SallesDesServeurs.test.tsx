@@ -34,14 +34,14 @@ function service(over: Partial<ServiceActif>): ServiceActif {
   };
 }
 
-function rendre(apps: AppEnCours[] | null) {
+function rendre(apps: AppEnCours[] | null, arreterProjet = vi.fn().mockResolvedValue(undefined)) {
   const etat: UseAppsEnCoursResult = {
     apps,
     lueA: Date.parse("2026-10-13T12:00:00Z"),
     erreur: null,
     arreter: vi.fn().mockResolvedValue(undefined),
     rafraichir: vi.fn(),
-    arreterProjet: vi.fn().mockResolvedValue(undefined),
+    arreterProjet,
     lancer: vi.fn().mockResolvedValue(undefined),
     enArret: () => false,
     enLancement: () => false,
@@ -168,6 +168,15 @@ describe("server rooms — one per project (ticket-710)", () => {
     );
   });
 
+  it("stops the whole project from the room's plate", async () => {
+    const arreterProjet = vi.fn().mockResolvedValue(undefined);
+    const apps = [app({ pid: 1, nom: "api" }), app({ pid: 2, nom: "web" })];
+    rendre(apps, arreterProjet);
+
+    await userEvent.click(screen.getByRole("button", { name: "Arrêter le projet Alpha" }));
+    expect(arreterProjet).toHaveBeenCalledWith("alpha", expect.arrayContaining(apps));
+  });
+
   it("keeps the list view in the switcher", async () => {
     rendre([app({ nom: "api" })]);
 
@@ -211,6 +220,13 @@ describe("wall screens and journal (ticket-711)", () => {
     fireEvent.click(await rendreAvecSortie());
 
     fireEvent.click(screen.getByRole("button", { name: "Fermer le journal" }));
+    expect(screen.queryByRole("region", { name: /Journal de/ })).toBeNull();
+  });
+
+  it("closes the journal with Escape when the focus is inside it", async () => {
+    fireEvent.click(await rendreAvecSortie());
+
+    fireEvent.keyDown(screen.getByRole("searchbox", { name: "Chercher dans le journal" }), { key: "Escape" });
     expect(screen.queryByRole("region", { name: /Journal de/ })).toBeNull();
   });
 

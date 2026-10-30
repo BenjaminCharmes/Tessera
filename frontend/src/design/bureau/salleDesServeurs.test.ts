@@ -36,8 +36,10 @@ describe("server room furniture", () => {
     expect(baie).not.toMatch(/anim-|animation|transition/);
   });
 
-  it("declares the raised floor in index.css from sprite tokens", () => {
-    expect(CSS).toMatch(/[.]sol-dalles\s*[{][^}]*--sprite-dalle\b/);
+  it("lays the raised floor from tile sprites drawn with the floor tokens", () => {
+    for (const nom of ["DallePleine", "DallePerforee"]) {
+      expect(source(nom), nom).toContain("--sprite-dalle");
+    }
   });
 });
 
