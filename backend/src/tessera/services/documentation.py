@@ -35,6 +35,8 @@ from pathlib import Path
 from tessera.services import documentation_claude_md as claude_md_doc
 from tessera.services.documentation_base import EditionRefusee
 from tessera.services.documentation_base import normaliser_typo as _normaliser_typo
+from tessera.services.documentation_description import appliquer_description
+from tessera.services.documentation_reponse import donnees_de, editions_de, editions_depuis
 from tessera.services.documentation_code import (
     FournisseurMatiere,
     MatiereCode,
@@ -92,6 +94,7 @@ def appliquer_editions(
     claude_md: Path | None = None,
     matiere: MatiereCode | None = None,
     tickets: str = "",
+    agents_md: Path | None = None,
 ) -> list[str]:
     """Applique toutes les modifications, ou aucune.
 
@@ -100,6 +103,7 @@ def appliquer_editions(
 
     ``claude_md`` est le CLAUDE.md du projet quand il le déclare documentable
     (ticket-244) ; sans lui, une modification de « CLAUDE.md » est refusée.
+    ``agents_md`` est l'AGENTS.md, fourni aux mêmes conditions (ticket-724).
 
     Une édition ``contenu`` crée un fichier absent (ticket-342) : sans elle, un
     guide qui n'existe pas encore ne pouvait jamais naître. Elle n'écrase
@@ -118,6 +122,8 @@ def appliquer_editions(
         chemin = str(edition.get("fichier", ""))
         if chemin == claude_md_doc.NOM and claude_md is not None:
             fichier = claude_md
+        elif chemin == claude_md_doc.NOM_AGENTS and agents_md is not None:
+            fichier = agents_md
         elif not _documentable(chemin):
             raise EditionRefusee(
                 f"{chemin} n'est pas de la documentation : un agent de "
@@ -157,12 +163,7 @@ def appliquer_editions(
 
         resultat[fichier] = _remplacer(avant, edition, chemin)
 
-    if claude_md is not None and claude_md in resultat:
-        refus = claude_md_doc.depasse_le_budget(
-            claude_md.read_text(encoding="utf-8"), resultat[claude_md]
-        )
-        if refus is not None:
-            raise EditionRefusee(refus)
+    claude_md_doc.verifier_budgets(resultat, claude_md, agents_md)
 
     for fichier, contenu in resultat.items():
         fichier.parent.mkdir(parents=True, exist_ok=True)
@@ -501,25 +502,39 @@ class DocumentationService:
         # qu'un ticket cite n'est pas inventé (ticket-542).
         intentions = "\n".join(f"{t.titre}\n{t.corps}" for t in tickets)
         fichiers = fichiers_de_la_matiere(matiere)
+        # La description se compte à part : elle ne décide pas du marqueur (ticket-724).
+        fichiers_description: list[str] = []
+        refus_description: list[str] = []
 
         for role in self._roles:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
             provider, modele = self._pour(role)
-            # Seul `doc-technique` voit le CLAUDE.md, et seul lui peut l'éditer.
-            claude_md = self._claude_md if role == claude_md_doc.ROLE else None
-            user = brief + claude_md_doc.section_du_brief(claude_md)
+            # Seul `doc-technique` voit le CLAUDE.md et l'AGENTS.md, et seul lui
+            # peut les éditer ou proposer la description (ticket-244, 724).
+            technique = role == claude_md_doc.ROLE
+            claude_md = self._claude_md if technique else None
+            agents_md = claude_md_doc.agents_md_de(racine, claude_md)
+            user = brief + claude_md_doc.sections_du_brief(claude_md, agents_md)
             reponse = await provider.complete(
                 system=systeme,
                 user=user,
                 model=modele,
                 max_tokens=_MAX_TOKENS,
             )
-            editions = _editions_de(str(reponse.content), role)
+            donnees = donnees_de(str(reponse.content), role)
+            if technique:
+                # L'agents.json du dossier où le run écrit, jamais le checkout.
+                ecrits, refuses = appliquer_description(
+                    project_path / "agents.json", donnees, matiere, intentions, role
+                )
+                fichiers_description.extend(ecrits)
+                refus_description.extend(refuses)
+            editions = editions_depuis(donnees)
             if not editions:
                 continue
             try:
                 modifies.extend(
-                    appliquer_editions(racine, editions, claude_md, matiere, intentions)
+                    appliquer_editions(racine, editions, claude_md, matiere, intentions, agents_md)
                 )
             except EditionRefusee as exc:
                 # Tour de correction (ticket-395) : rappeler l'agent une seule fois
@@ -535,12 +550,14 @@ class DocumentationService:
                     model=modele,
                     max_tokens=_MAX_TOKENS,
                 )
-                editions2 = _editions_de(str(reponse2.content), role)
+                editions2 = editions_de(str(reponse2.content), role)
                 if not editions2:
                     continue
                 try:
                     modifies.extend(
-                        appliquer_editions(racine, editions2, claude_md, matiere, intentions)
+                        appliquer_editions(
+                            racine, editions2, claude_md, matiere, intentions, agents_md
+                        )
                     )
                 except EditionRefusee as exc2:
                     # Deuxième refus : comportement courant (ticket-395).
@@ -559,8 +576,8 @@ class DocumentationService:
             marqueur_ecrit = True
 
         return ResultatDocumentation(
-            fichiers_modifies=modifies,
-            refus=refus,
+            fichiers_modifies=[*modifies, *fichiers_description],
+            refus=[*refus, *refus_description],
             tickets=[t.id for t in tickets],
             tronque=tronque,
             marqueur_ecrit=marqueur_ecrit,
@@ -695,20 +712,3 @@ def _brief_correction(
         )
     parties.append("\n\nPropose une nouvelle liste d'éditions corrigée.")
     return "".join(parties)
-
-
-def _editions_de(contenu: str, role: str) -> list[dict[str, object]]:
-    """Lit le JSON de l'agent. Une réponse illisible ne fait rien écrire."""
-    texte = contenu.strip()
-    if "```" in texte:
-        morceaux = texte.split("```")
-        texte = next(
-            (m[4:] if m.startswith("json") else m for m in morceaux if "{" in m), texte
-        )
-    try:
-        data = json.loads(texte[texte.index("{") : texte.rindex("}") + 1])
-    except (json.JSONDecodeError, ValueError):
-        _logger.warning("reponse_doc_illisible", extra={"role": role})
-        return []
-    editions = data.get("editions", [])
-    return list(editions) if isinstance(editions, list) else []

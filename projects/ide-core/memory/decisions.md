@@ -622,3 +622,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : amende ADR-027. Le hook refuse toute sous-commande `git` ou `gh` absente d'une liste blanche de lectures (`status`, `diff`, `log`, `show`, `gh auth status`…). Les options globales (`-c`, `--repo`, `-R`) se lisent avant la sous-commande ; `-c` n'accepte que des clés cosmétiques ; `--output` est refusé. Une assignation ou un mot-clé de shell en tête de segment se saute ; `cmd` et `powershell` sont des shells.
 **Raison** : la liste noire laisse passer des formes naturelles — `<VAR>=<valeur> git push`, `gh --repo <o/r> pr merge`, `git bisect run`. Un faux refus se corrige d'une ligne ; un faux passage est un push (ADR-022).
 **Alternative rejetée** : allonger la liste noire — chaque trou comblé en révèle un autre ; analyser le shell en entier — hors de portée, ADR-027 le dit déjà.
+
+---
+
+## ADR-068 — Le service de documentation n'écrit dans `agents.json` que la clé `description`
+
+**Date** : 2026-10-30
+**Portée** : doc-technique
+**Décision** : précise ADR-027. Aucun agent n'écrit `agents.json`. doc-technique propose une `description` (220 caractères, une ligne, avec `preuve`) dans sa sortie ; le service la contrôle comme toute édition (ADR-057) et ne remplace que cette clé, par substitution de texte : le reste du fichier reste octet pour octet. Un refus est journalisé et ne bloque pas le lot. L'écriture vise la copie du run, jamais le checkout (ADR-056). `AGENTS.md` suit `CLAUDE.md` (`doc_claude_md`).
+**Raison** : les descriptions affichées dataient de la création des projets, et un humain relisait 17 projets à la main.
+**Alternative rejetée** : donner `agents.json` à l'agent (ADR-027) ; réécrire le fichier par `json.dumps` — il reformaterait tout.

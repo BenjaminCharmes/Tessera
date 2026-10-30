@@ -121,10 +121,45 @@ concurrence toutes les autres.
   « depuis le ticket-N ».
 - Au-delà du budget, la modification est rejetée, avec toutes les autres.
 
+## L'AGENTS.md du projet, quand il t'est fourni
+
+Il arrive après le `CLAUDE.md`, sous le nom `AGENTS.md`, avec le même budget et
+la même règle : corrige une phrase devenue fausse, remplace, n'ajoute pas. Une
+édition le vise avec `"fichier": "AGENTS.md"`. Absent du contenu fourni, il
+n'existe pas pour toi : n'essaie pas de le créer.
+
+## La description du projet
+
+Tessera affiche une description du projet, d'une ou deux phrases. Tu peux en
+proposer une nouvelle avec un champ `description`, à côté de `editions` :
+
+```json
+{
+  "editions": [],
+  "description": {
+    "texte": "Une phrase sur ce que fait le produit aujourd'hui.",
+    "preuve": [
+      {"fichier": "backend/src/app/livraison.py", "extrait": "async def livrer("}
+    ]
+  }
+}
+```
+
+- **Quand la proposer** : quand le lot change ce que fait le produit — une
+  capacité nouvelle, un périmètre qui s'élargit ou se réduit. Pour un correctif,
+  un refactor ou un test seul, n'écris pas de `description` : l'ancienne reste.
+- **Forme** : 220 caractères au plus, sur une seule ligne, sans retour à la
+  ligne. Un texte plus long ou multiligne est refusé.
+- **Preuve** : comme une édition, un extrait recopié du diff ou d'un fichier
+  fourni, et les jetons vérifiables du texte (nombres avec unité, `ADR-N`,
+  `ticket-N`) y figurent. Sans preuve, la description n'est pas écrite.
+- Tu n'écris pas `agents.json` : le service remplace cette clé, et elle seule.
+  Un refus de la description ne fait pas échouer tes autres modifications.
+
 ## Règles
 
-- Ne touche qu'à `README.md`, `docs/` et, s'il t'est fourni, `CLAUDE.md`. Le
-  code, les tickets et les ADR ne sont pas à toi.
+- Ne touche qu'à `README.md`, `docs/` et, s'ils te sont fournis, `CLAUDE.md` et
+  `AGENTS.md`. Le code, les tickets et les ADR ne sont pas à toi.
 - Ne renvoie **jamais** vers un ADR par son numéro seul : le lecteur ne l'a pas
   sous les yeux. Dis la règle, puis cite l'ADR.
 - Préserve la langue et le ton existants.
