@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-724
 plan: true
-pr_number: null
+pr_number: 797
 priority: medium
 status: done
 title: The documentation batch also keeps AGENTS.md and the project description current
