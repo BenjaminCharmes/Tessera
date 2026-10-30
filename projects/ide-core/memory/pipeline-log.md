@@ -6551,3 +6551,4 @@ Le diff ajoute :
 - 2026-10-30 13:11:00 UTC — [ticket-707] validateur: fichiers cités joints : backend/tests/test_fs_router.py, <projet>/.claude/settings.local.json, <projet>/agents.json, backend/tests/test_project_importer.py (tronqué)
 - 2026-10-30 13:11:00 UTC — [ticket-707] validateur: APPROVED — Tous les critères de sécurité sont correctement implémentés et testés. L'API ref (338264ms)
 - 2026-10-30 13:11:00 UTC — [ticket-707] APPROVED après 1 tour(s)
+- 2026-10-30 13:14:59 UTC — [ticket-707] documentation: 0 fichier(s) (207875ms)
