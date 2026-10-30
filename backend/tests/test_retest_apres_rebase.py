@@ -244,6 +244,79 @@ async def test_project_without_test_command_leaves_no_trace(tmp_path: Path) -> N
     assert not any("tests relancés" in etape for etape in livraison.etapes)
 
 
+class _LanceurEnSerie:
+    """A launcher that returns its results in order and counts its calls."""
+
+    def __init__(self, *resultats: TestResult | Exception) -> None:
+        self._restants = list(resultats)
+        self.lancements = 0
+
+    async def __call__(self) -> TestResult:
+        self.lancements += 1
+        suivant = self._restants.pop(0)
+        if isinstance(suivant, Exception):
+            raise suivant
+        return suivant
+
+
+async def test_red_then_green_retest_continues_and_says_so() -> None:
+    lanceur = _LanceurEnSerie(_rouges(), _verts())
+    retest = RetestApresRebase(_FauxGit([]), lanceur, worktree=False)
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None
+    assert jugement.arret is None
+    assert "2e essai" in jugement.etape
+    assert "FAILED test_longueur_des_fichiers.py" in jugement.etape
+    assert "\n" not in jugement.etape
+    assert lanceur.lancements == 2
+
+
+async def test_red_twice_retest_stops() -> None:
+    lanceur = _LanceurEnSerie(_rouges(), _rouges())
+    retest = RetestApresRebase(_FauxGit([]), lanceur, worktree=False)
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None
+    assert jugement.arret is not None
+    assert jugement.arret.startswith("Tests rouges après rebase sur main")
+    assert lanceur.lancements == 2
+
+
+async def test_green_first_retest_runs_once() -> None:
+    lanceur = _LanceurEnSerie(_verts())
+    retest = RetestApresRebase(_FauxGit([]), lanceur, worktree=False)
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None
+    assert jugement.arret is None
+    assert "2e essai" not in jugement.etape
+    assert lanceur.lancements == 1
+
+
+async def test_expired_first_try_is_rerun_like_a_red_one() -> None:
+    expire = TestResult(passed=True, total=0, failed=0, output_summary="délai", expiree=True)
+    lanceur = _LanceurEnSerie(expire, _verts())
+    retest = RetestApresRebase(_FauxGit([]), lanceur, worktree=False)
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None and jugement.arret is None
+    assert "2e essai" in jugement.etape
+    assert lanceur.lancements == 2
+
+
+async def test_no_test_command_still_records_nothing() -> None:
+    lanceur = _LanceurEnSerie(TestCommandNotFound("rien"))
+    retest = RetestApresRebase(_FauxGit([]), lanceur, worktree=False)
+
+    assert await retest.juger("main") is None
+    assert lanceur.lancements == 1
+
+
 async def test_base_a_avance_reads_the_ancestry() -> None:
     git = _FauxGit([], ancetre=True)
     retest = RetestApresRebase(git, _Lanceur([], _verts()), worktree=False)

@@ -1,14 +1,14 @@
 ---
-id: ticket-718
-title: "A red retest after rebase runs once more before stopping the delivery"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-30
+id: ticket-718
+pr_number: 789
+priority: high
+status: done
+title: A red retest after rebase runs once more before stopping the delivery
+type: fix
 ---
 
 # ticket-718 — Un retest rouge après rebase est relancé une fois avant d'arrêter la livraison
