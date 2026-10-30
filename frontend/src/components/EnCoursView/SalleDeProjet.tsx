@@ -105,7 +105,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
           <ArretDuProjet groupe={groupe} enArret={enArret} onArreterProjet={onArreterProjet} court />
         </span>
       </header>
-      <div data-mur="serveurs" className="relative px-6 pt-7">
+      <div data-mur="serveurs" className="relative px-6 pt-8">
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
         </div>
@@ -124,7 +124,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
             ))}
           </div>
         )}
-        <div data-sol-mobilier className="mt-3 flex items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
+        <div data-sol-mobilier className="mt-4 flex items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
           <span className="flex items-end gap-4">
             <Agrandi>
               <Climatiseur />
@@ -149,7 +149,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
               <Extincteur />
             </Agrandi>
             {/* La porte est à l'échelle d'une personne : plus haute qu'une baie. */}
-            <Agrandi relatif={1.7}>
+            <Agrandi relatif={1.85}>
               <PorteCoupeFeu />
             </Agrandi>
           </span>

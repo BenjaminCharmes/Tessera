@@ -40,7 +40,7 @@ function commeUneApp(p: ProcessusDeTessera): AppEnCours {
 
 function Compteur({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
-    <div className="relative min-w-44 rounded-sm border-[3px] border-zinc-800 bg-zinc-700 px-2.5 pb-1.5 pt-2.5 font-mono text-micro text-zinc-200 shadow-[0_3px_0_rgb(0_0_0/0.3)]">
+    <div className="relative w-52 rounded-sm border-[3px] border-zinc-800 bg-zinc-700 px-2.5 pb-1.5 pt-2.5 font-mono text-micro text-zinc-200 shadow-[0_3px_0_rgb(0_0_0/0.3)]">
       <span aria-hidden="true" className="absolute left-1/2 top-0.5 size-1.5 -translate-x-1/2 rounded-full bg-zinc-400" />
       <div className="mb-1 text-zinc-400">{titre}</div>
       {children}
@@ -85,7 +85,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         </span>
         <span className="rounded-full bg-violet-950 px-2.5 py-0.5 text-micro text-zinc-200 ring-1 ring-violet-700">fait tourner l'IDE</span>
       </header>
-      <div className="relative px-6 pt-7">
+      <div className="relative px-6 pt-8">
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
         </div>
@@ -94,7 +94,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
           deplie={deplie}
           onBasculer={(ecran) => setDeplie((avant) => (avant === ecran ? null : ecran))}
         />
-        <div className="mt-2 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
           <span className="flex items-end gap-4">
             {salle.processus.map((p) => (
               <BaieAvecFiche
@@ -119,7 +119,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
             </AvecInfobulle>
           </span>
           {/* Les compteurs sont des affiches punaisées au mur, un peu au-dessus du sol : la salle ne grandit pas. */}
-          <span data-affiches className="mb-5 flex flex-wrap items-end justify-center gap-4">
+          <span data-affiches className="mb-6 flex flex-wrap items-stretch justify-center gap-4">
             <Compteur titre="QUOTA DE L'ABONNEMENT">
               <JaugesDeQuota fenetres={fenetres} variante="affiche" />
             </Compteur>
@@ -142,7 +142,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
             <Agrandi>
               <Extincteur />
             </Agrandi>
-            <Agrandi relatif={1.7}>
+            <Agrandi relatif={1.85}>
               <PorteCoupeFeu />
             </Agrandi>
           </span>
