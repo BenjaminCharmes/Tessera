@@ -73,6 +73,20 @@ tous interdits sauf décision explicite de la charte :
 - **Tout centré** : les vues de travail se lisent de gauche à droite.
 - **Une couleur différente par section** : la dérive commence ici. Cinq familles,
   pas plus.
+- **La police et l'accent par défaut** (Inter ou `system-ui`, accent indigo ou
+  violet, dégradé violet → bleu) : la charte nomme sa paire de polices et son
+  accent ; ce qu'elle ne nomme pas n'est pas un choix.
+- **Verre dépoli, halo, lueur néon** (`backdrop-blur`, `shadow-[0_0_…]`) :
+  décor sans information.
+- **La grille de trois cartes identiques** (icône, titre, deux lignes) et le
+  badge au-dessus de chaque titre : un gabarit, pas une hiérarchie.
+- **Un même rayon et une même carte pour tout** : un champ, un bouton et un
+  panneau n'ont pas le même rôle.
+- **Le texte d'accroche générique** (« Boostez votre productivité »), les
+  chiffres et témoignages inventés : un texte dit ce que fait l'écran ; un
+  nombre affiché vient des données.
+- **Une animation d'apparition sur chaque bloc** : une animation accompagne un
+  changement d'état, jamais le simple affichage.
 
 ## 5. Hiérarchie
 
@@ -90,3 +104,9 @@ Une vue de travail montre des données, pas des marges. L'espace sert à
 séparer des groupes, pas à remplir l'écran. Règle de décision : si tu peux
 montrer deux fois plus d'éléments sans écraser le texte, l'espacement est
 trop généreux.
+
+## 7. Relecture avant de rendre
+
+Relis chaque écran touché comme un audit : pour chaque élément, nomme la
+donnée qu'il affiche ou l'action qu'il déclenche. Un élément sans réponse est
+décoratif : retire-le. Repasse ensuite la liste du §4, point par point.
