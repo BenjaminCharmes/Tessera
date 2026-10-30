@@ -6621,3 +6621,4 @@ Le diff ajoute :
 - 2026-10-30 18:46:23 UTC — [ticket-713] validateur: fichiers cités joints : backend/tests/test_livraison.py (tronqué)
 - 2026-10-30 18:46:23 UTC — [ticket-713] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente correcteme (257343ms)
 - 2026-10-30 18:46:23 UTC — [ticket-713] APPROVED après 1 tour(s)
+- 2026-10-30 18:51:55 UTC — [ticket-713] documentation: 0 fichier(s) (327014ms) — après tour de correction
