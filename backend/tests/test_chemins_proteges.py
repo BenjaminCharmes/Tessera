@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from tessera.config import Settings
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.commande_effective import commande_effective
 from tessera.services.politique_run import PolitiqueRun
@@ -276,3 +277,80 @@ async def test_le_script_de_la_commande_effective_se_resout_depuis_test_cwd(
     sortie = await _ecrire_dans(racine, "scripts/verifier.py", "python ../scripts/verifier.py")
 
     assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny"  # type: ignore[index]
+
+
+@pytest.fixture
+def depot_ancestor(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A repository shaped like Tessera: an ancestor project, a `.env`, a sibling."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".env").write_text("FORBIDDEN_TERMS=a\n", encoding="utf-8")
+    (tmp_path / "scripts" / "hooks").mkdir(parents=True)
+    projet = _projet(tmp_path, "ide-core")
+    (projet / "agents.json").write_text(json.dumps({"git_root": "ancestor"}), encoding="utf-8")
+    (projet / "CLAUDE.md").write_text("# ide-core\n", encoding="utf-8")
+    autre = _projet(tmp_path, "autre")
+    (autre / "agents.json").write_text("{}", encoding="utf-8")
+    (autre / "CLAUDE.md").write_text("# autre\n", encoding="utf-8")
+    monkeypatch.setattr(Settings, "env_file", tmp_path / ".env")
+    return tmp_path
+
+
+async def _outil(depot: Path, outil: str, entree: dict[str, str]) -> dict[str, object]:
+    hook = hook_refus_hors_perimetre(depot / "projects" / "ide-core", racine=depot.resolve())
+    return dict(await hook({"tool_name": outil, "tool_input": entree}, None, None))
+
+
+async def test_write_to_the_tessera_env_is_refused_under_ancestor(depot_ancestor: Path) -> None:
+    env = str(depot_ancestor / ".env")
+
+    ecriture = await _outil(depot_ancestor, "Write", {"file_path": env})
+    # Slashs : `shlex` en mode POSIX mange les antislashs d'un chemin Windows.
+    commande = f"echo x > {(depot_ancestor / '.env').as_posix()}"
+    redirection = await _outil(depot_ancestor, "Bash", {"command": commande})
+
+    for sortie in (ecriture, redirection):
+        decision = sortie["hookSpecificOutput"]
+        assert isinstance(decision, dict)
+        assert decision["permissionDecision"] == "deny"
+        assert ".env" in decision["permissionDecisionReason"]
+
+
+async def test_a_sibling_project_manifest_is_refused_under_ancestor(
+    depot_ancestor: Path,
+) -> None:
+    cible = str(depot_ancestor / "projects" / "autre" / "agents.json")
+
+    sortie = await _outil(depot_ancestor, "Edit", {"file_path": cible})
+
+    decision = sortie["hookSpecificOutput"]
+    assert isinstance(decision, dict)
+    assert decision["permissionDecision"] == "deny"
+    assert "agents.json" in decision["permissionDecisionReason"]
+
+
+async def test_the_pre_push_hook_script_is_refused(depot_ancestor: Path) -> None:
+    cible = str(depot_ancestor / "scripts" / "hooks" / "pre-push")
+
+    sortie = await _outil(depot_ancestor, "Write", {"file_path": cible})
+
+    decision = sortie["hookSpecificOutput"]
+    assert isinstance(decision, dict)
+    assert decision["permissionDecision"] == "deny"
+    assert "pre-push" in decision["permissionDecisionReason"]
+
+
+@pytest.mark.parametrize(
+    "relatif",
+    [
+        "projects/ide-core/.env",
+        "projects/ide-core/.env.example",
+        "projects/ide-core/tests/fixtures/agents.json",
+        "scripts/verifier.py",
+    ],
+)
+async def test_project_own_env_and_fixtures_still_pass(
+    depot_ancestor: Path, relatif: str
+) -> None:
+    sortie = await _outil(depot_ancestor, "Write", {"file_path": str(depot_ancestor / relatif)})
+
+    assert sortie == {}, relatif
