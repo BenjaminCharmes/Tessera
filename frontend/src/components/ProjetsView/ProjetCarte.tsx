@@ -1,12 +1,11 @@
-import { useState, type KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
 import { IconExternal } from "../../design/icons";
-import { API_ORIGIN } from "../../lib/config";
-import { withTokenQuery } from "../../lib/auth";
 import { lienDuDepot } from "../../lib/lienDuDepot";
 import type { ProjectOverview } from "../../types/api";
 import { dateExacte, ilYa } from "./dates";
 import BoutonMiseEnLigne from "../MiseEnLigne/BoutonMiseEnLigne";
 import BoutonServices from "./BoutonServices";
+import IconeDuProjet from "./IconeDuProjet";
 import LancerFile from "./LancerFile";
 import MenuCategorie from "./MenuCategorie";
 
@@ -33,30 +32,6 @@ interface ProjetCarteProps {
 function etatServices(projet: ProjectOverview): string | undefined {
   if (projet.services_en_cours) return "en-cours";
   return projet.services_declares ? "a-l-arret" : undefined;
-}
-
-/** Carré d'icône : l'icône du projet, ou à défaut son initiale. */
-function Icone({ projet }: { projet: ProjectOverview }) {
-  const [cassee, setCassee] = useState(false);
-  if (projet.icon && !cassee) {
-    const url = `${API_ORIGIN}/api/v1/projects/${projet.id}/icon`;
-    return (
-      <img
-        src={withTokenQuery(url)}
-        alt=""
-        onError={() => setCassee(true)}
-        className="size-10 shrink-0 rounded-sm object-contain"
-      />
-    );
-  }
-  return (
-    <span
-      data-testid="icone-initiale"
-      className="flex size-10 shrink-0 items-center justify-center rounded-sm bg-zinc-800 text-base font-medium text-zinc-300"
-    >
-      {projet.name.trim().charAt(0).toUpperCase() || "?"}
-    </span>
-  );
 }
 
 /**
@@ -163,7 +138,7 @@ export default function ProjetCarte({
       }`}
     >
       <div className="flex items-start gap-3">
-        <Icone projet={projet} />
+        <IconeDuProjet projet={projet} />
         <div className="min-w-0 flex-1">
           <h3 className="flex items-center gap-2 truncate text-sm font-medium text-zinc-100">
             {projet.name}
