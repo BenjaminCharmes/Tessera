@@ -6507,3 +6507,19 @@ Le diff ajoute :
 - 2026-10-30 00:10:11 UTC — [ticket-673] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les agents de produit sont corr (232812ms)
 - 2026-10-30 00:10:11 UTC — [ticket-673] APPROVED après 2 tour(s)
 - 2026-10-30 00:14:08 UTC — [ticket-673] documentation: 0 fichier(s) (230905ms) — après tour de correction
+- 2026-10-30 08:54:59 UTC — [ide-core] file interrompue : ticket-703 n'a pas été livré
+- 2026-10-30 11:07:34 UTC — [ticket-704] branche ticket-704-the-api-refuses-a-foreign-host-or-origin
+- 2026-10-30 11:07:35 UTC — [ticket-704] tour 1 — codeur démarré
+- 2026-10-30 11:10:52 UTC — [ticket-704] tour 1 — codeur terminé (196936ms)
+- 2026-10-30 11:16:28 UTC — [ticket-704] testeur: 1 failed, 1585 passed, 64 warnings in 332.71s (0:05:32)
+- 2026-10-30 11:16:28 UTC — [ticket-704] tests rouges au tour 1
+- 2026-10-30 11:16:28 UTC — [ticket-704] tour 2 — codeur démarré
+- 2026-10-30 11:16:56 UTC — [ticket-704] tour 2 — codeur terminé (28063ms)
+- 2026-10-30 11:26:49 UTC — [ticket-704] testeur: OK (exit 0)
+- 2026-10-30 11:29:47 UTC — [ticket-704] securite: PASS — Ce diff ajoute un middleware de protection contre le DNS rebinding et les attaqu (177390ms)
+- 2026-10-30 11:29:47 UTC — [ticket-704] configuration des tests modifiée : backend/tests/conftest.py
+- 2026-10-30 11:29:47 UTC — [ticket-704] tour 2 — reviewer démarré
+- 2026-10-30 11:30:11 UTC — [ticket-704] tour 2 — reviewer terminé (23718ms)
+- 2026-10-30 11:34:11 UTC — [ticket-704] validateur: fichiers cités joints : docs/configuration.md ; absents : http://tauri.localhost
+- 2026-10-30 11:34:11 UTC — [ticket-704] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le middleware `HostOriginMid (263860ms)
+- 2026-10-30 11:34:11 UTC — [ticket-704] APPROVED après 2 tour(s)
