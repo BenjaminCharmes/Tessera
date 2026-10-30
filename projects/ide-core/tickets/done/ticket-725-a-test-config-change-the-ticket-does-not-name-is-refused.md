@@ -4,7 +4,7 @@ created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-725
-pr_number: null
+pr_number: 794
 priority: high
 status: done
 title: A test configuration change the ticket does not name is refused
