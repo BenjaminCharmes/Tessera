@@ -4,7 +4,7 @@ created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-708
-pr_number: null
+pr_number: 792
 priority: high
 status: done
 title: A multi-line proof excerpt matches the diff without its line markers
