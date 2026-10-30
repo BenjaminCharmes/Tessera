@@ -6665,3 +6665,6 @@ Le diff ajoute :
 - 2026-10-30 20:00:30 UTC — [ticket-712] validateur: APPROVED — Les trois critères d'acceptation sont respectés : le code affiche correctement l (175641ms)
 - 2026-10-30 20:00:30 UTC — [ticket-712] APPROVED après 1 tour(s)
 - 2026-10-30 20:03:16 UTC — [ticket-712] documentation: 0 fichier(s) (161563ms)
+- 2026-10-30 20:05:48 UTC — [ticket-712] livraison: rebase sur develop (1125ms)
+- 2026-10-30 20:05:48 UTC — [ticket-712] livraison: tests relancés après rebase : verts (OK (exit 0)) (133015ms)
+- 2026-10-30 20:05:48 UTC — [ticket-712] livraison: PR #796 ouverte (4969ms)
