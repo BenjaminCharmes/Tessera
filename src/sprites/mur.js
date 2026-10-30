@@ -203,7 +203,7 @@ function murTableau(cases = []) {
   const colonnes = cases.length > 6 ? 2 : 1, largeur = colonnes === 2 ? 30 : 72;
   const m = s.L();
   cases.slice(0, 12).forEach((etat, i) => {
-    const x = 4 + Math.floor(i / 6) * 42, y = 4 + (i % 6) * 8, L = E(MUR_ETAT_CASE[etat]);
+    const x = 4 + Math.floor(i / 6) * 42, y = 4 + (i % 6) * 7, L = E(MUR_ETAT_CASE[etat]);
     if (etat === "attente") { m.rect(x, y, 6, 6, L.s); m.rect(x + 1, y + 1, 4, 4, T.b); }
     else m.stamp(x, y, etat === "passe" ? MUR_COCHE : MUR_CROIX, { x: L.d });
     // La ligne : des mots au feutre, de la même longueur totale que la ligne d'aujourd'hui.

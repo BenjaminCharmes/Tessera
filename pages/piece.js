@@ -16,6 +16,8 @@ function px(s, dw, dh, mode, { relatif = 1, lumiere = null } = {}) {
 }
 /** Un objet posé contre le mur : abscisse du repère, accroche (« bottom:0 », « top:36px »). */
 function pose(x, accroche, r, { ombre = false, decal = 0 } = {}) {
+  // « sol » : l'objet se tient sur le sol, devant la plinthe, et non sur elle.
+  if (accroche === "sol") accroche = `bottom:-${plintheH() + 4}px`;
   const left = `calc(${(x / LARGEUR_DU_SOL) * 100}% + ${decal}px)`;
   const o = ombre ? `<span class="ombre" style="left:calc(${left} - ${r.w * .1}px);bottom:-${r.w * .08}px;width:${r.w * 1.2}px;height:${r.w * .22}px"></span>` : "";
   return `${o}<span class="pose" style="left:${left};${accroche}">${r.html}</span>`;
@@ -30,6 +32,7 @@ function incruster(poste, scene) {
   }
   return poste;
 }
+const plintheH = () => 10.5 * etatPiece.echelle / 1.5;
 const hhmm = h => `${String(Math.floor(h)).padStart(2, "0")} h ${String(Math.round((h % 1) * 60)).padStart(2, "0")}`;
 
 function entete(titre, sousTitre, pastille) {
@@ -44,23 +47,23 @@ function pieceDeRun(mode) {
   const fen = i => murFenetre({ jour: !nuit, soleil: i === 1, nuages: i === 1 ? 1 : 2 - (i % 2) });
   let murHtml = "";
   [134, 274, 616].forEach((x, i) => { murHtml += pose(x, "top:36px", px(fen(i), 60, 36, mode)); });
-  murHtml += pose(30, "top:20px", px(murTableau(["passe", "passe", "echoue", "attente"]), 88, 54, mode, { relatif: 1.15 }));
-  murHtml += pose(208, "bottom:0", px(bibliotheque(), 48, 54, mode), { ombre: true });
-  murHtml += pose(348, "bottom:0", px(plante("ficus"), 40, 80, mode), { ombre: true });
+  murHtml += pose(14, "top:24px", px(murTableau(["passe", "passe", "echoue", "attente"]), 88, 54, mode));
+  murHtml += pose(208, "sol", px(bibliotheque(), 48, 54, mode), { ombre: true });
+  murHtml += pose(348, "sol", px(plante("ficus"), 40, 80, mode), { ombre: true });
   const imp = px(objImprimante(), 72, 42, mode);
-  murHtml += pose(392, "bottom:0", imp, { ombre: true });
-  murHtml += pose(392, `bottom:${imp.h - 2}px`, px(objDossier(), 20, 16, mode), { decal: imp.w * .55 });
+  murHtml += pose(392, "sol", imp, { ombre: true });
+  murHtml += pose(392, `bottom:${imp.h * 16 / 28 - plintheH() - 4}px`, px(objDossier(), 20, 16, mode), { decal: imp.w * .55 });
   murHtml += pose(488, "top:20px", px(murHorloge(Math.floor(h) % 12 || 12, Math.round((h % 1) * 60)), 16, 16, mode));
-  murHtml += pose(470, "bottom:0", px(machineACafe(), 36, 48, mode), { ombre: true });
-  murHtml += pose(470, "bottom:72px", px(objVapeur(), 36, 24, mode));
+  murHtml += pose(470, "sol", px(machineACafe(), 36, 48, mode), { ombre: true });
+  murHtml += pose(470, `bottom:${48 * etatPiece.echelle - plintheH()}px`, px(objVapeur(), 36, 24, mode));
   murHtml += pose(528, "top:36px", px(murEtagere(), 32, 20, mode));
-  murHtml += pose(528, "bottom:0", px(srvPetiteBaie(), 36, 42, mode), { ombre: true });
-  murHtml += pose(572, "bottom:0", px(plante("cactus"), 40, 50, mode), { ombre: true });
-  murHtml += pose(634, "bottom:0", px(objCorbeille(2), 20, 24, mode), { ombre: true });
-  murHtml += pose(676, "bottom:0", px(objBoite("ci"), 36, 36, mode), { ombre: true });
+  murHtml += pose(528, "sol", px(srvPetiteBaie(), 36, 42, mode), { ombre: true });
+  murHtml += pose(572, "sol", px(plante("cactus"), 40, 50, mode), { ombre: true });
+  murHtml += pose(634, "sol", px(objCorbeille(2), 20, 24, mode), { ombre: true });
+  murHtml += pose(676, "sol", px(objBoite("ci"), 36, 36, mode), { ombre: true });
   murHtml += pose(684, "top:44px", px(murCadre(0), 20, 24, mode));
   murHtml += pose(727, "bottom:40px", px(murInterrupteur(etatPiece.lumiere), 5.5, 8.25, mode));
-  murHtml += pose(738, "bottom:0", px(murPorte(), 36, 54, mode, { relatif: 1.5 }));
+  murHtml += pose(738, "sol", px(murPorte(), 36, 54, mode, { relatif: 1.5 }));
   murHtml += pose(512, "bottom:-14px", px(debout({ role: "reviewer", ph: PH.reviewer }), 42, 70, mode), { ombre: true });
   [250, 432, 590].forEach(x => {
     const lampe = px(murPlafonnier(!nuit || etatPiece.lumiere), 36, 24, mode);
@@ -84,7 +87,7 @@ function pieceDeRun(mode) {
     <div class="scene"><div class="scene-inner">
       <div class="mur" style="height:144px;background:${mur}">${murHtml}</div>
       <div style="height:${10.5 * E1 / 1.5}px;background:${fondPlinthe}"></div>
-      <div class="postes" style="height:160px;background:${sol}">${postes}</div>
+      <div class="postes" style="height:124px;background:${sol}">${postes}</div>
       ${voile}
     </div></div></article>`;
 }
@@ -97,14 +100,14 @@ function salleDesServeurs(mode) {
   const sol = dalles.map(d => fondDeTuile(d, 36 * E1, 36 * E1, mode, etatPiece.choix, { repeat: "no-repeat" }));
   // quatre dalles côte à côte, une perforée : une seule tuile de 4 × 36 px répétée
   const solCss = sol.map((s, i) => s.replace(" 0 0 / ", ` ${i * 36 * E1}px 0 / `).replace("no-repeat", "repeat-x")).join(",");
-  const bas = (x, r, o = {}) => pose(x, "bottom:0", r, { ombre: true, ...o });
+  const bas = (x, r, o = {}) => pose(x, `bottom:-${6 * E1 + 3}px`, r, { ombre: true, ...o });
   let h = "";
   h += bas(40, px(climatiseur(), 48, 66, mode));
   h += bas(130, px(baieHaute({ etat: "actif", activite: true }), 36, 90, mode));
   h += bas(200, px(baieHaute({ etat: "actif", activite: true }), 36, 90, mode));
   h += bas(270, px(baieHaute({ etat: "blocage" }), 36, 90, mode));
   h += pose(560, "top:56px", px(srvVmc({ regime: "moyen" }), 42, 42, mode));
-  h += bas(640, px(srvExtincteur(), 18, 42, mode));
+  h += pose(640, "bottom:44px", px(srvExtincteur(), 18, 42, mode));
   h += bas(700, px(srvPorte(), 42, 54, mode, { relatif: 2 }));
   h += bas(420, px(debout({ role: "securite", ph: PH.securite, expr: "question", tasse: false }), 42, 70, mode));
   return `<article class="salle">${entete("tessera", "salle des serveurs · 3 services, 1 en échec", "blocage")}
@@ -121,11 +124,11 @@ function sallePause(mode) {
   const mur = fondDeTuile(murEnduit(), 56 * E1 / 1.5, 56 * E1 / 1.5, mode, etatPiece.choix);
   const sol = fondDeTuile(solParquet(), 112 * E1 / 1.5, 21 * E1 / 1.5, mode, etatPiece.choix);
   let h = "";
-  h += pose(60, "bottom:0", px(comFrigo(), 30, 54, mode), { ombre: true });
-  h += pose(170, "bottom:0", px(comCanape(), 72, 30, mode), { ombre: true });
-  h += pose(330, "bottom:0", px(plante("pot"), 40, 50, mode), { ombre: true });
-  h += pose(420, "bottom:0", px(comTableReunion(), 72, 36, mode), { ombre: true });
-  h += pose(560, "bottom:0", px(comClasseur(), 30, 48, mode), { ombre: true });
+  h += pose(60, "sol", px(comFrigo(), 30, 54, mode), { ombre: true });
+  h += pose(170, "sol", px(comCanape(), 72, 30, mode), { ombre: true });
+  h += pose(330, "sol", px(plante("pot"), 40, 50, mode), { ombre: true });
+  h += pose(420, "sol", px(comTableReunion(), 72, 36, mode), { ombre: true });
+  h += pose(560, "sol", px(comClasseur(), 30, 48, mode), { ombre: true });
   h += pose(640, "top:30px", px(murFenetre({ jour: mode === "jour", soleil: true, nuages: 1 }), 60, 36, mode));
   h += pose(260, "bottom:-10px", px(debout({ role: "codeur", ph: PH.codeur, expr: "fait", tasse: true }), 42, 70, mode), { ombre: true });
   return `<article class="salle">${entete("Salle de pause", "salles communes", "fait")}

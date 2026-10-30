@@ -42,9 +42,9 @@ const FAMILLES = {
   livre2: { tessera: "#1e40af", chaud: "#2f5fa8", neon: "#3dd6ff" },
   livre3: { tessera: "#ca8a04", chaud: "#d9a23a", neon: "#ffd23d" },
   // Pièce
-  mur: { tessera: "#3a3430", chaud: "#4a3a30", neon: "#161833", doux: .45 },
-  plinthe: { tessera: "#1c1917", chaud: "#2a1d16", neon: "#0a0b1c", doux: .6 },
-  sol: { tessera: "#2a2420", chaud: "#3a2c24", neon: "#0e0f1f", doux: .4 },
+  mur: { tessera: "#4f4741", chaud: "#5c4a3b", neon: "#161833", doux: .45 },
+  plinthe: { tessera: "#2b221c", chaud: "#33231a", neon: "#0a0b1c", doux: .6 },
+  sol: { tessera: "#4a3323", chaud: "#5a3b24", neon: "#0e0f1f", doux: .5 },
   "salle-mur": { tessera: "#2b3035", chaud: "#383230", neon: "#121430", doux: .45 },
 };
 
