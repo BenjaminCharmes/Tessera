@@ -6,7 +6,7 @@ depends_on:
 - ticket-672
 estimated_days: 1
 id: ticket-673
-pr_number: null
+pr_number: 768
 priority: low
 status: done
 title: A product's agents are drawn in its room from the activity file alone
