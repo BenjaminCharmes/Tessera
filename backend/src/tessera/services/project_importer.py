@@ -55,6 +55,20 @@ def _normalize_source(source_path: Path) -> Path:
     return candidate.resolve()
 
 
+def _refuse_too_broad(resolved: Path) -> None:
+    """Refuse a drive root, the home folder or one of its parents.
+
+    A linked import adds its target to the editor's writable roots: a folder
+    this wide would make most of the machine writable.
+    """
+    home = Path.home().resolve()
+    if resolved.parent == resolved or resolved == home or resolved in home.parents:
+        raise ImportError(
+            f"Ce dossier est trop large pour être importé : {resolved}. "
+            "Choisis le dossier du projet lui-même."
+        )
+
+
 class ProjectImporter:
     def __init__(self, workspace: Path) -> None:
         self._workspace = workspace.resolve()
@@ -98,6 +112,7 @@ class ProjectImporter:
             raise ImportError(f"Le dossier source n'existe pas : {resolved}")
         if not resolved.is_dir():
             raise ImportError(f"La source doit être un dossier : {resolved}")
+        _refuse_too_broad(resolved)
 
         # Interdire d'importer le workspace lui-même ou un de ses parents
         try:

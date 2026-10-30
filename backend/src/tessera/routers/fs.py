@@ -88,6 +88,24 @@ def _resolve_inside_workspace(raw_path: str) -> Path:
     )
 
 
+def _is_self_executing(resolved: Path) -> bool:
+    """Say whether a path holds something that runs without a user gesture.
+
+    `.git/` carries hooks run at the next commit; `.claude/settings*.json`
+    carries hooks and commands run by the CLI. Other config files stay
+    editable: the editor is the user's own tool.
+    """
+    parts = [part.lower() for part in resolved.parts]
+    if ".git" in parts:
+        return True
+    name = resolved.name.lower()
+    return (
+        resolved.parent.name.lower() == ".claude"
+        and name.startswith("settings")
+        and name.endswith(".json")
+    )
+
+
 @router.get("/read", response_class=PlainTextResponse)
 async def read_file(path: str = Query(...)) -> str:
     resolved = _resolve_inside_workspace(path)
@@ -121,6 +139,16 @@ async def read_file(path: str = Query(...)) -> str:
 @router.put("/write", status_code=204)
 async def write_file(body: WriteRequest) -> None:
     resolved = _resolve_inside_workspace(body.path)
+
+    if _is_self_executing(resolved):
+        _logger.warning("fs_write_refused", extra={"path": str(resolved)})
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "Ce fichier s'exécute sans action de ta part (hook git, réglage du CLI) : "
+                "l'éditeur refuse de l'écrire."
+            ),
+        )
 
     if resolved.is_dir():
         raise HTTPException(
