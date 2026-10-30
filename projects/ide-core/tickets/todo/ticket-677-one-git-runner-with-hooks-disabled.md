@@ -26,6 +26,7 @@ cette protection.
 - [ ] Un module porte l'exécuteur ; les `_git` / `_run_git` / `run_git` de `branch_cleanup.py`, `journal_en_attente.py`, `project_removal.py`, `realignement_base.py`, `reprise_orphelin.py`, `ticket_diff.py`, `temporary_worktree.py` l'appellent
 - [ ] Le type de retour est unique (code, sortie, erreur) ; aucun appelant ne décode la sortie lui-même
 - [ ] Toute commande qui écrit (`checkout`, `pull`, `commit`, `merge`, `rebase`, `worktree`) passe hooks neutralisés ; un test lance une commande d'écriture dans un dépôt dont un hook écrit un fichier-témoin et constate que le témoin n'existe pas
+- [ ] `test_every_git_runner_disables_hooks` : pour chaque module appelant listé au premier critère, une commande d'écriture passe par l'exécuteur commun avec les hooks neutralisés (audit de sécurité, S-17)
 - [ ] Une lecture (`diff`, `status`, `rev-parse`, `log`) n'est pas ralentie par un dossier créé à chaque appel
 - [ ] `uv run pytest` et `uv run mypy` passent
 
