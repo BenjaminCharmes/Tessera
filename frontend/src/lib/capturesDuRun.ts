@@ -5,10 +5,7 @@
  * d'une image sont les seuls moyens de les voir. Le nom d'un fichier porte
  * l'écran, la largeur et le thème : `<écran>-<largeur>-<thème>.png`.
  */
-import { authorized } from "./auth";
-import { API_ORIGIN } from "./config";
-
-const BASE = `${API_ORIGIN}/api/v1`;
+import { BASE, request } from "./http";
 const MOTIF = /^([a-z0-9-]+)-([0-9]{1,4})-(clair|sombre)\.png$/;
 
 export type ThemeDeCapture = "clair" | "sombre";
@@ -56,9 +53,7 @@ export function urlDeCapture(projectId: string, ticketId: string, fichier: strin
 
 /** Les noms des images prises pour ce ticket ; liste vide si le run n'a rien capturé. */
 export async function listerLesCaptures(projectId: string, ticketId: string): Promise<string[]> {
-  const url = `${BASE}/projects/${encodeURIComponent(projectId)}/captures?ticket=${encodeURIComponent(ticketId)}`;
-  const res = await fetch(url, authorized());
-  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text().catch(() => res.statusText)}`);
-  const corps = (await res.json()) as { captures: string[] };
+  const chemin = `/projects/${encodeURIComponent(projectId)}/captures?ticket=${encodeURIComponent(ticketId)}`;
+  const corps = await request<{ captures: string[] }>(chemin);
   return corps.captures;
 }

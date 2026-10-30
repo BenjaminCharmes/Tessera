@@ -93,6 +93,7 @@ beforeEach(() => {
     restants: [],
     debut: "2026-10-24T10:00:00Z",
     fin: null,
+    arretes: [],
   });
 });
 
