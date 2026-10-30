@@ -1,14 +1,14 @@
 ---
-id: ticket-704
-title: "The API refuses a foreign Host or Origin"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 1
-created: 2026-10-30
+id: ticket-704
+pr_number: 777
+priority: critical
+status: done
+title: The API refuses a foreign Host or Origin
+type: fix
 ---
 
 # ticket-704 — L'API refuse un `Host` ou un `Origin` étranger (C-02)

@@ -108,6 +108,19 @@ def _singletons_propres() -> Iterator[None]:
 
 
 @pytest.fixture(autouse=True)
+def _hote_du_client_de_test(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Admit the `Host` that Starlette's `TestClient` sends — ticket-704.
+
+    `TestClient(app)` s'adresse à `testserver`, pas au loopback : sans cette
+    entrée, le contrôle de `Host` refuserait chaque requête de la suite. Elle ne
+    vaut que pour les tests ; `test_auth_host_origin.py` fixe sa propre liste.
+    """
+    from tessera.config import settings
+
+    monkeypatch.setattr(settings, "allowed_hosts", "testserver")
+
+
+@pytest.fixture(autouse=True)
 def _aucun_terme_interdit_de_la_machine(monkeypatch: pytest.MonkeyPatch) -> None:
     """Les tests ne lisent jamais la vraie liste de `.env` (ADR-048).
 
