@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-675
 id: ticket-676
+pr_number: 799
 priority: medium
 status: done
 title: One walk up to the repository root
