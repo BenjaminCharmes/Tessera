@@ -117,14 +117,23 @@ class RetestApresRebase:
     async def juger(self, base: str) -> "Jugement | None":
         """Rerun the tests and say what the delivery must record and whether it stops.
 
-        `None` quand le projet n'a pas de test à lancer : aucune trace.
+        `None` quand le projet n'a pas de test à lancer : aucune trace. Un premier
+        essai rouge (échec, délai dépassé, démarrage raté) est relancé une fois : un
+        test instable n'arrête pas, à lui seul, la livraison — mais l'instabilité
+        reste écrite dans le journal.
         """
         t0 = time.monotonic()
-        resultat = await self.relancer()
+        premier = await self.relancer()
+        if premier is None:
+            return None
+        resultat = premier if premier.vert else await self.relancer()
         if resultat is None:
             return None
+        etape = etape_de(resultat)
+        if resultat.vert and premier is not resultat:
+            etape = etape_au_second_essai(resultat, premier)
         return Jugement(
-            etape=etape_de(resultat),
+            etape=etape,
             duree_ms=(time.monotonic() - t0) * 1000,
             arret=None if resultat.vert else arret_de(resultat, base),
         )
@@ -185,6 +194,17 @@ def etape_de(resultat: ResultatRetest) -> str:
     sortie = re.sub(r"\s+", " ", resultat.details or resultat.resume).strip()
     suite = f" ({sortie[:_LIGNE_MAX]})" if sortie else ""
     return f"tests relancés après rebase : {issue}{suite}"
+
+
+def etape_au_second_essai(vert: ResultatRetest, premier: ResultatRetest) -> str:
+    """The journal entry of a retest green on the second try, with the first failure."""
+    sortie_verte = re.sub(r"\s+", " ", vert.resume).strip()
+    echec = re.sub(r"\s+", " ", premier.details or premier.resume).strip()
+    verte = f" ({sortie_verte[:_LIGNE_MAX]})" if sortie_verte else ""
+    return (
+        f"tests relancés après rebase : vert au 2e essai{verte} ; "
+        f"1er essai rouge : {echec[:_LIGNE_MAX]}"
+    )
 
 
 def arret_de(resultat: ResultatRetest, base: str) -> str:
