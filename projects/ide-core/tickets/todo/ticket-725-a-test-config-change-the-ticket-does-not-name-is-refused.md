@@ -1,5 +1,5 @@
 ---
-id: ticket-724
+id: ticket-725
 title: "A test configuration change the ticket does not name is refused"
 type: fix
 status: todo
@@ -11,7 +11,7 @@ estimated_days: 0.5
 created: 2026-10-30
 ---
 
-# ticket-724 — Un changement de configuration des tests que le ticket ne nomme pas est refusé
+# ticket-725 — Un changement de configuration des tests que le ticket ne nomme pas est refusé
 
 ## Objectif
 Un run ne doit pas pouvoir assouplir la vérification qui le juge sans que le
