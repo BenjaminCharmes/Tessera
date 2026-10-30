@@ -71,3 +71,15 @@ describe("product agent sprites", () => {
     expect(reduit).toMatch(/[.]anim-defile\b[^}]*animation:\s*none/);
   });
 });
+
+describe("Ollama GPU rack (ticket-726)", () => {
+  it("draws its body from sprite tokens and blinks its lamp only while Ollama cools down", () => {
+    const gpu = source("BaieGpu");
+    for (const m of gpu.matchAll(/--sprite-([a-z0-9-]+)/g)) {
+      expect(CSS, `--sprite-${m[1]}`).toMatch(new RegExp(`--sprite-${m[1]}:`));
+    }
+    expect(gpu).toMatch(/refroidissement: "fill-amber-400 anim-gyro"/);
+    expect(gpu).toMatch(/disponible: "fill-blue-400"/);
+  });
+});
+
