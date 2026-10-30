@@ -6583,3 +6583,4 @@ Le diff ajoute :
 - 2026-10-30 15:07:26 UTC — [ticket-677] validateur: fichiers cités joints : branch_cleanup.py, journal_en_attente.py, project_removal.py, realignement_base.py (tronqué) ; non joints (budget épuisé) : reprise_orphelin.py, ticket_diff.py, temporary_worktree.py
 - 2026-10-30 15:07:26 UTC — [ticket-677] validateur: APPROVED — Ticket-677 satisfait tous les critères d'acceptation. Un exécuteur unique `git_r (344405ms)
 - 2026-10-30 15:07:26 UTC — [ticket-677] APPROVED après 2 tour(s)
+- 2026-10-30 15:11:30 UTC — [ticket-677] documentation: 0 fichier(s) (238890ms) — après tour de correction
