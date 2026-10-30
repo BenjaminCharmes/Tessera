@@ -4,8 +4,8 @@
 
 Object.assign(FAMILLES, {
   canape: { tessera: "#57534e", chaud: "#8a4f36", neon: "#33285a" },
-  coussin: { tessera: "#a16207", chaud: "#c9853a", neon: "#ff5fd2" },
-  frigo: { tessera: "#e7e5e4", chaud: "#eee4cc", neon: "#8088c4" },
+  coussin: { tessera: "#a16207", chaud: "#c9853a", neon: "#a8488f" },
+  frigo: { tessera: "#e7e5e4", chaud: "#eee4cc", neon: "#4c5590" },
   postit: { tessera: "#fde047", chaud: "#f5cf5a", neon: "#ffd23d" },
   classeur: { tessera: "#71717a", chaud: "#6e7a68", neon: "#30345a" },
   etiquette: { tessera: "#f4f4f5", chaud: "#efe4c8", neon: "#8a8fc0" },
