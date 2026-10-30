@@ -3,8 +3,10 @@ import type { LigneDEcran } from "./MoniteurMural";
 
 /** Un écran de la salle Tessera, que l'on déplie sous la salle — ticket-726. */
 export type EcranDeTessera = "runs" | "ci" | "journal";
-/** Les suivants que l'écran du mur montre ; le panneau déplié les donne tous. */
-const SUIVANTS_AU_MUR = 3;
+/** Les lignes qu'un moniteur du mur montre ; le panneau déplié les donne toutes. */
+export const LIGNES_AU_MUR = 4;
+/** Le run en cours, puis ses suivants, tiennent sur un moniteur. */
+const SUIVANTS_AU_MUR = LIGNES_AU_MUR - 1;
 
 /** ADR-026 : rouge pour l'échec, ambre pour l'avertissement, zinc sinon. */
 export const TON_DU_NIVEAU: Record<string, string> = {

@@ -1,6 +1,6 @@
 import type { SalleTessera } from "../../types/salleTessera";
 import MoniteurMural from "./MoniteurMural";
-import { TON_DU_NIVEAU, lignesDeLaCi, lignesDesRuns, lignesDuJournal, type EcranDeTessera } from "./lignesDeTessera";
+import { LIGNES_AU_MUR, TON_DU_NIVEAU, lignesDeLaCi, lignesDesRuns, lignesDuJournal, type EcranDeTessera } from "./lignesDeTessera";
 
 /**
  * Les trois moniteurs du mur de la salle Tessera — ticket-726 : les runs vivants et
@@ -46,7 +46,7 @@ export default function EcransDeTessera({ salle, deplie, onBasculer }: EcransDeT
       <MoniteurMural
         titre="tessera.log"
         statut={erreurs ? <span className="text-red-300">erreur</span> : "ok"}
-        lignes={lignesDuJournal(salle.journal)}
+        lignes={lignesDuJournal(salle.journal).slice(-LIGNES_AU_MUR)}
         voyant={erreurs ? "bg-red-500" : "bg-blue-400"}
         vide="(journal vide)"
         data={{ "data-ecran-tessera": "journal" }}

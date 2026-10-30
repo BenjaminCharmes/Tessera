@@ -12,7 +12,7 @@ interface EcranMuralProps {
   onBasculer: () => void;
 }
 
-const LIGNES_VISIBLES = 5;
+const LIGNES_VISIBLES = 4;
 
 /**
  * Le moniteur accroché au mur pour un service lancé par l'IDE — ticket-711. Il

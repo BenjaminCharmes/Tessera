@@ -85,7 +85,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         </span>
         <span className="rounded-full bg-violet-950 px-2.5 py-0.5 text-micro text-zinc-200 ring-1 ring-violet-700">fait tourner l'IDE</span>
       </header>
-      <div className="relative px-6 pt-10">
+      <div className="relative px-6 pt-7">
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
         </div>
@@ -94,7 +94,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
           deplie={deplie}
           onBasculer={(ecran) => setDeplie((avant) => (avant === ecran ? null : ecran))}
         />
-        <div className="mt-4 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
+        <div className="mt-2 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
           <span className="flex items-end gap-4">
             {salle.processus.map((p) => (
               <BaieAvecFiche
@@ -119,7 +119,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
             </AvecInfobulle>
           </span>
           {/* Les compteurs sont des affiches punaisées au mur, un peu au-dessus du sol : la salle ne grandit pas. */}
-          <span data-affiches className="mb-8 flex flex-wrap items-end justify-center gap-4">
+          <span data-affiches className="mb-5 flex flex-wrap items-end justify-center gap-4">
             <Compteur titre="QUOTA DE L'ABONNEMENT">
               <JaugesDeQuota fenetres={fenetres} variante="affiche" />
             </Compteur>
@@ -142,7 +142,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
             <Agrandi>
               <Extincteur />
             </Agrandi>
-            <Agrandi relatif={2}>
+            <Agrandi relatif={1.7}>
               <PorteCoupeFeu />
             </Agrandi>
           </span>

@@ -39,7 +39,7 @@ export default function MoniteurMural({
         <span className="truncate">{titre}</span>
         <span className="shrink-0">{statut}</span>
       </span>
-      <span className="block h-[5.6rem] overflow-hidden px-2 py-1 font-mono text-micro leading-[1.1rem]">
+      <span className="block h-[4.5rem] overflow-hidden px-2 py-1 font-mono text-micro leading-[1.1rem]">
         {lignes.length === 0 ? (
           <span className="block text-zinc-600">{vide}</span>
         ) : (
