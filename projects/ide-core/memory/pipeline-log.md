@@ -6598,3 +6598,13 @@ Le diff ajoute :
 - 2026-10-30 15:47:36 UTC — [ticket-708] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code modifie la fonction  (249420ms)
 - 2026-10-30 15:47:36 UTC — [ticket-708] APPROVED après 1 tour(s)
 - 2026-10-30 15:53:42 UTC — [ticket-708] documentation: 0 fichier(s) (269921ms) — après tour de correction
+- 2026-10-30 16:01:24 UTC — [ide-core] ticket-708 PR #792 mergée (CI verte)
+- 2026-10-30 16:01:26 UTC — [ide-core] ticket-708 : base réalignée sur develop
+- 2026-10-30 16:01:26 UTC — [ide-core] ticket-708 PR #792 confiée au CIWatcher
+- 2026-10-30 16:01:29 UTC — [ticket-713] branche ticket-713-a-merge-request-that-times-out-rereads-the-pr-bef
+- 2026-10-30 16:01:30 UTC — [ticket-713] tour 1 — codeur démarré
+- 2026-10-30 16:04:32 UTC — [ticket-713] tour 1 — codeur terminé (181561ms)
+- 2026-10-30 16:59:16 UTC — [ticket-713] testeur: délai dépassé, suite relancée
+- 2026-10-30 16:59:17 UTC — [ticket-713] testeur: délai dépassé (1500 s, durée réelle 3283 s) — ../scripts/verifier.py coupé après 3283 s
+- 2026-10-30 18:22:45 UTC — [ticket-713] testeur: délai dépassé (1500 s, durée réelle 5008 s) — ../scripts/verifier.py coupé après 5008 s
+- 2026-10-30 18:22:45 UTC — [ticket-713] BLOCKED — testeur: délai dépassé deux fois
