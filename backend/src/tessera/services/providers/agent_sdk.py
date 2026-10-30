@@ -50,6 +50,7 @@ from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
     racine_autorisee,
 )
+from tessera.services.racine_depot import depot_au_dessus
 from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.ask_user import (
@@ -102,10 +103,8 @@ def _depart_des_consignes(cwd: Path, racine_ecriture: Path) -> Path:
     projet = cwd.resolve()
     if projet.is_relative_to(_REPO_ROOT.resolve()):
         return _REPO_ROOT
-    for dossier in projet.parents:
-        if (dossier / ".git").exists():
-            return dossier
-    return racine_ecriture
+    depot = depot_au_dessus(projet)
+    return depot if depot is not None else racine_ecriture
 
 
 def _reglages_sans_consignes_ancetres(
