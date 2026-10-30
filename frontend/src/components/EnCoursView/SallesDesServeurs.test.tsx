@@ -3,6 +3,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
 import { api } from "../../lib/api";
+import { lireActivite } from "../../lib/apiActivite";
 import { _viderCacheResource } from "../../hooks/useResource";
 import type { UseAppsEnCoursResult } from "../../hooks/useAppsEnCours";
 import type { AppEnCours, ServiceActif } from "../../types/api";
@@ -61,11 +62,14 @@ beforeEach(() => {
   _viderCacheResource();
   vi.spyOn(api.projects, "overview").mockResolvedValue([]);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
+  vi.mocked(lireActivite).mockResolvedValue([]);
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+vi.mock("../../lib/apiActivite", () => ({ lireActivite: vi.fn() }));
 
 describe("SallesDesServeurs", () => {
   it("draws one room per app, and none when the list is empty", () => {

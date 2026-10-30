@@ -60,12 +60,7 @@ function choisir<T>(liste: readonly [T, ...T[]], i: number): T {
   return liste[i % liste.length] ?? liste[0];
 }
 
-/**
- * Le physique d'un agent : le même `projet` et le même `role` rendent toujours
- * le même résultat, d'un rendu et d'un run à l'autre.
- */
-export function physique(projet: string, role: RoleAffiche): Physique {
-  const g = graine(`${projet}:${role}`);
+function physiqueDeGraine(g: number): Physique {
   const coiffure = choisir(COIFFURES, g);
   const cheveuxLongs = coiffure === "long" || coiffure === "carre";
   return {
@@ -74,4 +69,17 @@ export function physique(projet: string, role: RoleAffiche): Physique {
     coiffure,
     jupe: cheveuxLongs && (g >> 6) % 2 === 0,
   };
+}
+
+/**
+ * Le physique d'un agent : le même `projet` et le même `role` rendent toujours
+ * le même résultat, d'un rendu et d'un run à l'autre.
+ */
+export function physique(projet: string, role: RoleAffiche): Physique {
+  return physiqueDeGraine(graine(`${projet}:${role}`));
+}
+
+/** Le physique d'un agent d'un produit : tiré du projet et de l'`id` qu'il déclare. */
+export function physiqueDeProduit(projet: string, id: string): Physique {
+  return physiqueDeGraine(graine(`${projet}:produit:${id}`));
 }
