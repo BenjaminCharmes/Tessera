@@ -97,10 +97,11 @@ describe("server rooms — one per project (ticket-710)", () => {
     expect(within(salle).getByText("2 services · 120,5 Mo")).toBeInTheDocument();
   });
 
-  it("links each port of the project from the plate", () => {
-    rendre([app({ ports: [8026] })]);
+  it("links each port of the project from the plate, named after its service", () => {
+    rendre([app({ pid: 1, nom: "backend", ports: [8026] }), app({ pid: 2, nom: "frontend", ports: [5196] })]);
 
-    expect(screen.getByRole("link", { name: /Ouvrir :8026/ })).toHaveAttribute("href", "http://localhost:8026");
+    expect(screen.getByRole("link", { name: /Ouvrir backend :8026/ })).toHaveAttribute("href", "http://localhost:8026");
+    expect(screen.getByRole("link", { name: /Ouvrir frontend :5196/ })).toHaveAttribute("href", "http://localhost:5196");
   });
 
   it("shows a rack's pid, ports and memory in a tooltip on focus", async () => {
