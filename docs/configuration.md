@@ -48,6 +48,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `OLLAMA_SLOT_WAIT_S` | | `30` | Délai maximum d'attente pour un créneau chez le serveur Ollama avant basculement sur le repli (en secondes) |
 | `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
+| `ALLOWED_HOSTS` | | `""` | Noms de `Host` admis en plus du loopback, séparés par des virgules (voir ci-dessous). Vide : `127.0.0.1`, `localhost` et `[::1]` seuls |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 
 ## Budget et limites
@@ -81,6 +82,26 @@ Sans elle, une UI face à un backend protégé ne reçoit que des `401`.
 uvicorn et dans tout proxy sur le chemin. Le Bearer HTTP n'y apparaît pas.
 `VITE_STATIC_TOKEN` est inliné dans le bundle : c'est un secret partagé
 entre le poste et son backend, pas un mécanisme de comptes.
+
+## `ALLOWED_HOSTS`
+
+Un middleware refuse, avant le contrôle du token et même quand `STATIC_TOKEN`
+est vide, deux choses qu'une page web visitée par l'utilisateur pourrait tenter
+sur l'API locale :
+
+- **un `Host` étranger** (rebond DNS) : le nom, port retiré, doit être
+  `127.0.0.1`, `localhost`, `[::1]` ou l'un des noms de `ALLOWED_HOSTS`
+  (`ALLOWED_HOSTS=tessera.lan,poste.local`). Sinon : `403` en HTTP, fermeture
+  de la WebSocket ;
+- **un `Origin` étranger** : s'il est présent, il doit être une origine
+  loopback (`http://localhost:<port>`, `http://127.0.0.1:<port>`, tout port —
+  le Vite de dev et ceux des worktrees) ou une origine de l'app Tauri
+  (`tauri://localhost`, `http://tauri.localhost`, `https://tauri.localhost`).
+  Sinon : `403` en HTTP, fermeture de la WebSocket en code `4403`.
+
+Sans `Origin` (curl, outils, tests), la requête passe. `/health` reste ouvert.
+Le contrôle ne protège pas contre un processus local : le loopback reste de
+confiance. Servir l'API sous un autre nom exige de le déclarer ici.
 
 ## Ollama
 

@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
-from tessera.auth import StaticTokenMiddleware
+from tessera.auth import HostOriginMiddleware, StaticTokenMiddleware
 from tessera.config import settings
 from tessera.services.process_registry import PROCESS_REGISTRY
 from tessera.services.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
@@ -134,6 +134,9 @@ app.add_middleware(
 # tout passer quand elle est vide. L'installer sous condition figeait le choix
 # au démarrage et rendait le comportement intestable (ticket-120).
 app.add_middleware(StaticTokenMiddleware)
+# Ajouté en dernier donc le plus externe : un `Host` ou un `Origin` étranger est
+# refusé avant tout le reste, token compris (ticket-704).
+app.add_middleware(HostOriginMiddleware)
 
 app.include_router(projects.router, prefix="/api/v1")
 app.include_router(provisioning_router.router, prefix="/api/v1")
