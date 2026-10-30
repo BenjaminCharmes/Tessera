@@ -6622,3 +6622,19 @@ Le diff ajoute :
 - 2026-10-30 18:46:23 UTC — [ticket-713] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente correcteme (257343ms)
 - 2026-10-30 18:46:23 UTC — [ticket-713] APPROVED après 1 tour(s)
 - 2026-10-30 18:51:55 UTC — [ticket-713] documentation: 0 fichier(s) (327014ms) — après tour de correction
+- 2026-10-30 18:52:15 UTC — [ide-core] ticket-713 PR #793 confiée au CIWatcher
+- 2026-10-30 18:52:18 UTC — [ticket-725] branche ticket-725-a-test-configuration-change-the-ticket-does-not-n
+- 2026-10-30 18:52:18 UTC — [ticket-725] tour 1 — codeur démarré
+- 2026-10-30 18:54:47 UTC — [ticket-725] tour 1 — codeur terminé (148906ms)
+- 2026-10-30 19:00:18 UTC — [ticket-725] testeur: 1 failed, 2551 passed, 64 warnings in 327.35s (0:05:27)
+- 2026-10-30 19:00:18 UTC — [ticket-725] tests rouges au tour 1
+- 2026-10-30 19:00:18 UTC — [ticket-725] tour 2 — codeur démarré
+- 2026-10-30 19:01:36 UTC — [ticket-725] tour 2 — codeur terminé (78858ms)
+- 2026-10-30 19:01:59 UTC — [ide-core] ticket-713 PR #793 mergée (CI verte)
+- 2026-10-30 19:08:29 UTC — [ticket-725] testeur: OK (exit 0)
+- 2026-10-30 19:10:50 UTC — [ticket-725] securite: PASS — Le diff implémente une porte de validation pour la pipeline qui s'assure que les (140235ms)
+- 2026-10-30 19:10:50 UTC — [ticket-725] tour 2 — reviewer démarré
+- 2026-10-30 19:11:09 UTC — [ticket-725] tour 2 — reviewer terminé (18750ms)
+- 2026-10-30 19:14:33 UTC — [ticket-725] validateur: fichiers cités joints : backend/tests/test_config_tests_touchee.py, vitest.config.ts, pyproject.toml, package.json
+- 2026-10-30 19:14:33 UTC — [ticket-725] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente une porte  (223110ms)
+- 2026-10-30 19:14:33 UTC — [ticket-725] APPROVED après 2 tour(s)
