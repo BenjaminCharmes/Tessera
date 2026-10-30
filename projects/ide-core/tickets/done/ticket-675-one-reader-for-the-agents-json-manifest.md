@@ -1,12 +1,13 @@
 ---
-id: ticket-675
-title: "One reader for the agents.json manifest"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-675
+pr_number: 798
+priority: medium
+status: done
+title: One reader for the agents.json manifest
+type: refactor
 ---
 
 # ticket-675 — Un lecteur unique du manifeste `agents.json`

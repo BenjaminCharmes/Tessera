@@ -10,13 +10,14 @@ Le script est le premier argument de la commande qui désigne un fichier
 existant, résolu depuis `pipeline.test_cwd`. `npm test` ou `uv run pytest` n'en
 désignent aucun : rien de plus n'est alors protégé.
 
-Le manifeste est lu ici avec `json` seul, sans passer par `project_loader` :
+Le manifeste est lu par `services.manifeste`, sans passer par `project_loader` :
 celui-ci importe le paquet `providers`, et un import en retour fermerait un
 cycle.
 """
-import json
 import shlex
 from pathlib import Path
+
+from tessera.services.manifeste import lire_objet
 
 #: Ce que l'agent lit pour comprendre pourquoi ce fichier-là est refusé.
 MOTIF_SCRIPT = (
@@ -28,13 +29,7 @@ MOTIF_SCRIPT = (
 
 def _pipeline(project_path: Path) -> dict[str, object]:
     """La section `pipeline` d'`agents.json`, vide si absente ou illisible."""
-    agents_json = project_path / "agents.json"
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    section = data.get("pipeline") if isinstance(data, dict) else None
-    return section if isinstance(section, dict) else {}
+    return lire_objet(project_path, "pipeline") or {}
 
 
 def script_de_verification(

@@ -5,12 +5,12 @@ démarre rien et ne capture rien (étape de run : ticket-618). Rien ne se devine
 sans `pipeline.controle_visuel`, sans `interface` ou sans démarrage lisible,
 la porte reste fermée.
 """
-import json
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.services.captures_config import ConfigCaptures, parse_captures_config
+from tessera.services.manifeste import lire_objet, lire_valeur
 
 MODES: tuple[str, ...] = ("joindre", "relire")
 #: Délai de démarrage de l'app, en secondes : défaut et plafond.
@@ -74,17 +74,10 @@ def _controle(mode: object, brut: object) -> ControleVisuel | None:
 
 def lire_le_controle(project_path: Path) -> ControleVisuel | None:
     """Read the declared visual check, or None when the gate is not open."""
-    agents_json = project_path / "agents.json"
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    pipeline = lire_objet(project_path, "pipeline")
+    if pipeline is None:
         return None
-    if not isinstance(data, dict):
-        return None
-    pipeline = data.get("pipeline")
-    if not isinstance(pipeline, dict):
-        return None
-    return _controle(pipeline.get("controle_visuel"), data.get("captures"))
+    return _controle(pipeline.get("controle_visuel"), lire_valeur(project_path, "captures"))
 
 
 def _declenche(chemin: str, entree: str) -> bool:

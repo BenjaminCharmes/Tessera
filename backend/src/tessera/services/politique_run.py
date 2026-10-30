@@ -13,13 +13,13 @@ La politique se lit donc **une fois**, par l'orchestrateur, et voyage jusqu'aux
 services qui en dépendent. Ce qu'un agent écrit dans `agents.json` ne vaut
 qu'au run suivant — et le hook de périmètre le lui refuse de toute façon.
 """
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
 from tessera.services.artifacts import ArtifactMode, read_artifact_mode
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.manifeste import lire_booleen, lire_chaine
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.project_loader import load_pipeline_config
 from tessera.services.worktree_dossiers import DossiersWorktree
@@ -73,7 +73,7 @@ class PolitiqueRun:
         Réutilise les lecteurs existants plutôt que d'en écrire un cinquième :
         chacun porte son défaut fermé et son traitement du fichier illisible.
         """
-        git_root = _lire_git_root(project_path)
+        git_root = lire_chaine(project_path, "git_root")
         artifacts = read_artifact_mode(project_path)
         racine_depot = cls(git_root=git_root).racine_ecriture(project_path)
         return cls(
@@ -81,9 +81,9 @@ class PolitiqueRun:
             git_root=git_root,
             artifacts=artifacts,
             test_command=load_pipeline_config(project_path).test_command,
-            base_branch=_lire_chaine(project_path, "base_branch"),
-            merge_without_ci=_lire_booleen(project_path, "merge_without_ci"),
-            confidentialite=_lire_chaine(project_path, "confidentiality"),
+            base_branch=lire_chaine(project_path, "base_branch"),
+            merge_without_ci=lire_booleen(project_path, "merge_without_ci"),
+            confidentialite=lire_chaine(project_path, "confidentiality"),
             merge_method=_lire_merge_method(project_path),
             worktree=lire_worktree(project_path, racine_depot, artifacts),
         )
@@ -130,26 +130,6 @@ class PolitiqueRun:
         return racine.parent
 
 
-def _lire_git_root(project_path: Path) -> str | None:
-    return _lire_chaine(project_path, "git_root")
-
-
-def _lire_booleen(project_path: Path, clef: str) -> bool:
-    """Un booléen du manifeste. Tout ce qui n'est pas `True` ne désarme rien.
-
-    Une chaîne « oui », un entier, une clef absente : le défaut fermé d'ADR-023
-    vaut ici aussi — une valeur qu'on ne comprend pas ne lève pas une garde.
-    """
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return False
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return False
-    return data.get(clef) is True
-
-
 def _lire_merge_method(project_path: Path) -> MergeMethod:
     """La méthode de merge déclarée dans agents.json, ou `squash` par défaut.
 
@@ -157,25 +137,7 @@ def _lire_merge_method(project_path: Path) -> MergeMethod:
     protège, l'exception s'énonce (ADR-023). `squash` est la convention de
     ticket → develop sur ce dépôt (CLAUDE.md, section Git).
     """
-    valeur = _lire_chaine(project_path, "merge_method")
+    valeur = lire_chaine(project_path, "merge_method")
     if valeur in _MERGE_METHODS_VALIDES:
         return valeur  # type: ignore[return-value]
     return "squash"
-
-
-def _lire_chaine(project_path: Path, clef: str) -> str | None:
-    """Une chaîne du manifeste, `None` si absente, illisible ou mal typée.
-
-    Un seul lecteur pour les clefs de cette forme : `git_root` en avait le
-    sien, et `base_branch` aurait été le deuxième à répéter les mêmes quatre
-    gardes.
-    """
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return None
-    valeur = data.get(clef)
-    return valeur if isinstance(valeur, str) else None

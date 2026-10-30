@@ -6,11 +6,12 @@ import (ADR-053). The card needs to know whether to offer the button, and what
 to name in the confirmation; an invalid block is still refused, with its reason,
 by ``POST …/provision``.
 """
-import json
 from pathlib import Path
 from typing import Literal, Optional
 
 from pydantic import BaseModel
+
+from tessera.services.manifeste import lire_objet
 
 StripeMode = Literal["test", "live"]
 
@@ -33,12 +34,8 @@ def _stripe_mode(bloc: dict[str, object]) -> Optional[StripeMode]:
 
 def read_online_declaration(project_path: Path) -> OnlineDeclaration:
     """Read the ``online`` block of a project; undeclared when absent or unreadable."""
-    try:
-        data = json.loads((project_path / "agents.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return OnlineDeclaration()
-    bloc = data.get("online") if isinstance(data, dict) else None
-    if not isinstance(bloc, dict):
+    bloc = lire_objet(project_path, "online")
+    if bloc is None:
         return OnlineDeclaration()
     domain = bloc.get("domain")
     return OnlineDeclaration(
