@@ -6552,3 +6552,16 @@ Le diff ajoute :
 - 2026-10-30 13:11:00 UTC — [ticket-707] validateur: APPROVED — Tous les critères de sécurité sont correctement implémentés et testés. L'API ref (338264ms)
 - 2026-10-30 13:11:00 UTC — [ticket-707] APPROVED après 1 tour(s)
 - 2026-10-30 13:14:59 UTC — [ticket-707] documentation: 0 fichier(s) (207875ms)
+- 2026-10-30 13:31:49 UTC — [ide-core] ticket-707 PR #786 confiée au CIWatcher
+- 2026-10-30 13:31:54 UTC — [ticket-718] branche ticket-718-a-red-retest-after-rebase-runs-once-more-before-s
+- 2026-10-30 13:31:56 UTC — [ticket-718] tour 1 — codeur démarré
+- 2026-10-30 13:33:58 UTC — [ticket-718] tour 1 — codeur terminé (121719ms)
+- 2026-10-30 13:40:08 UTC — [ticket-707] livraison: arrêt — PR #786 non mergée : erreur inattendue : ConnectTimeout
+- 2026-10-30 13:55:59 UTC — [ticket-718] testeur: OK (exit 0)
+- 2026-10-30 13:57:35 UTC — [ticket-718] securite: PASS — Le diff implémente un retry logic sûr pour les tests flaky : re-exécute une fois (96594ms)
+- 2026-10-30 13:57:35 UTC — [ticket-718] tour 1 — reviewer démarré
+- 2026-10-30 13:57:56 UTC — [ticket-718] tour 1 — reviewer terminé (20905ms)
+- 2026-10-30 13:58:06 UTC — [ticket-718] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-30 13:58:44 UTC — [ticket-718] validateur: fichiers cités joints : backend/tests/test_retest_apres_rebase.py
+- 2026-10-30 13:58:44 UTC — [ticket-718] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la logique de (68640ms)
+- 2026-10-30 13:58:44 UTC — [ticket-718] APPROVED après 1 tour(s)
