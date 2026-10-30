@@ -59,7 +59,11 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
   const baies = baiesDuProjet(groupe.apps, services);
   const ecrans = services.filter((s) => s.pid !== null);
   const tombe = baies.some((b) => b.etat === "echoue");
-  const ports = groupe.apps.flatMap((app) => app.ports).sort((a, b) => a - b);
+  // Chaque port garde le nom du service qui l'écoute : « :5196 » seul ne dit
+  // pas si l'on ouvre le frontend ou le backend.
+  const ports = groupe.apps
+    .flatMap((app) => app.ports.map((port) => ({ port, service: app.nom })))
+    .sort((a, b) => a.port - b.port);
   const journal = services.find((s) => s.nom === deplie);
   const enMarche = baies.some((b) => b.etat === "en-cours");
   const etatDeLaSalle = tombe ? "echoue" : enMarche ? "en-cours" : "arrete";
@@ -83,7 +87,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
           {baies.length} service{baies.length > 1 ? "s" : ""} · {formaterMo(groupe.memoire_mo)}
         </span>
         <span className="ml-auto flex flex-wrap items-center gap-2">
-          {ports.map((port) => (
+          {ports.map(({ port, service }) => (
             <a
               key={port}
               href={`http://localhost:${port}`}
@@ -91,7 +95,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
               rel="noreferrer"
               className="flex items-center gap-1 rounded-sm px-2 py-1 text-xs text-zinc-300 ring-1 ring-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
             >
-              Ouvrir :{port}
+              Ouvrir {service} :{port}
               <IconExternal size={12} aria-hidden="true" />
             </a>
           ))}
