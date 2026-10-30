@@ -54,18 +54,21 @@ function pieceDeRun(mode) {
   murHtml += pose(392, "sol", imp, { ombre: true });
   murHtml += pose(392, `bottom:${imp.h * 16 / 28 - plintheH() - 4}px`, px(objDossier(), 20, 16, mode), { decal: imp.w * .55 });
   murHtml += pose(488, "top:20px", px(murHorloge(Math.floor(h) % 12 || 12, Math.round((h % 1) * 60)), 16, 16, mode));
-  murHtml += pose(470, "sol", px(machineACafe(), 36, 48, mode), { ombre: true });
-  murHtml += pose(470, `bottom:${48 * etatPiece.echelle - plintheH()}px`, px(objVapeur(), 36, 24, mode));
-  murHtml += pose(528, "top:36px", px(murEtagere(), 32, 20, mode));
+  const meuble = px(meubleBas(), 48, 24, mode), machine = px(machineACafe(), 36, 48, mode, { relatif: .8 });
+  murHtml += pose(474, "sol", meuble, { ombre: true });
+  murHtml += pose(474, `bottom:${meuble.h - plintheH() - 5}px`, machine, { decal: (meuble.w - machine.w) / 2 });
+  murHtml += pose(474, `bottom:${meuble.h + machine.h - plintheH() - 6}px`, px(objVapeur(), 36, 24, mode, { relatif: .8 }), { decal: (meuble.w - 36 * E1 * .8) / 2 });
+  murHtml += pose(522, "top:30px", px(murEtagere(), 32, 20, mode, { relatif: 1.3 }));
   murHtml += pose(528, "sol", px(srvPetiteBaie(), 36, 42, mode), { ombre: true });
   murHtml += pose(572, "sol", px(plante("cactus"), 40, 50, mode), { ombre: true });
   murHtml += pose(634, "sol", px(objCorbeille(2), 20, 24, mode), { ombre: true });
   murHtml += pose(676, "sol", px(objBoite("ci"), 36, 36, mode), { ombre: true });
-  murHtml += pose(684, "top:44px", px(murCadre(0), 20, 24, mode));
+  { const c = px(murCadre(0), 20, 24, mode), fin = `(${616 / 8}% + ${60 * E1}px)`, porte = `${738 / 8}%`;
+    murHtml += `<span class="pose" style="left:calc((${fin} + ${porte}) / 2 - ${c.w / 2}px);top:44px">${c.html}</span>`; }
   murHtml += pose(727, "bottom:40px", px(murInterrupteur(etatPiece.lumiere), 5.5, 8.25, mode));
   murHtml += pose(738, "sol", px(murPorte(), 36, 54, mode, { relatif: 1.5 }));
-  murHtml += pose(512, "bottom:-14px", px(debout({ role: "reviewer", ph: PH.reviewer }), 42, 70, mode), { ombre: true });
-  [250, 432, 590].forEach(x => {
+  murHtml += pose(432, "bottom:-14px", px(debout({ role: "reviewer", ph: PH.reviewer }), 42, 70, mode), { ombre: true });
+  [800 / 6, 400, 800 * 5 / 6].map(x => x - 18 * etatPiece.echelle / 1.5 * 800 / 1180).forEach(x => {
     const lampe = px(murPlafonnier(!nuit || etatPiece.lumiere), 36, 24, mode);
     if (allume) murHtml += `<span class="cone" style="left:calc(${(x / LARGEUR_DU_SOL) * 100}% - ${lampe.w}px);top:${lampe.h}px;width:${lampe.w * 3}px;height:260px"></span>`;
     murHtml += pose(x, "top:0", lampe);

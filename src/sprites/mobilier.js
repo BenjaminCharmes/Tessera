@@ -70,6 +70,17 @@ function bibliotheque() {
   return s;
 }
 
+/** Le meuble bas de la machine à café, 32 × 16 : plateau, un tiroir, une porte. */
+function meubleBas() {
+  const s = mk(32, 16), g = s.L(), W = P.wood, M = P.metal;
+  g.rect(0, 0, 32, 3, W.b); g.rect(0, 0, 32, 1, W.hi); g.rect(0, 2, 32, 1, W.s);
+  g.rect(1, 3, 30, 13, W.s); g.rect(1, 3, 30, 1, W.d);
+  g.rect(3, 5, 26, 3, W.b); g.rect(3, 5, 26, 1, W.hi); g.rect(14, 6, 4, 1, M.hi);
+  g.rect(3, 9, 26, 6, W.b); g.rect(3, 9, 1, 6, W.hi); g.rect(28, 9, 1, 6, W.s); g.rect(25, 11, 1, 2, M.hi);
+  g.rect(1, 15, 30, 1, W.d);
+  return s;
+}
+
 enregistrer({ id: "plante", nom: "Plante en pot", fichier: "Plante (pot)", salle: "communs", grille: "8 × 10 → 16 × 20", dw: 40, dh: 50, avant: () => avantPlante("pot"), apres: () => plante("pot"),
   note: "Feuillage en touffes éclairées en haut à gauche, pot en terre cuite qui s'affine, terre visible." });
 enregistrer({ id: "cactus", nom: "Cactus", fichier: "Plante (cactus)", salle: "run", grille: "8 × 10 → 16 × 20", dw: 40, dh: 50, avant: () => avantPlante("cactus"), apres: () => plante("cactus"),
@@ -78,5 +89,7 @@ enregistrer({ id: "ficus", nom: "Ficus", fichier: "Plante (ficus)", salle: "run"
   note: "Une boule de feuillage devient un arbre : tronc en bois, masse feuillue en volume." });
 enregistrer({ id: "cafe", nom: "Machine à café", fichier: "MachineACafe", salle: "run", grille: "12 × 16 → 24 × 32", dw: 36, dh: 48, avant: () => avantMachine(), apres: () => machineACafe(),
   note: "Afficheur, trois boutons, buse, grille d'égouttage, tasse pleine. Aucun voyant : rien ne dit qu'on s'en sert." });
+enregistrer({ id: "meuble-bas", nom: "Meuble bas de la machine à café", fichier: "nouveau (FondDeLaPiece)", salle: "run", grille: "— → 32 × 16", dw: 48, dh: 24, avant: null, apres: () => meubleBas(),
+  note: "La machine à café se pose dessus : sa tasse arrive à hauteur de main d'un agent debout, au lieu d'être au ras du sol." });
 enregistrer({ id: "biblio", nom: "Bibliothèque", fichier: "Bibliotheque", salle: "run", grille: "16 × 18 → 32 × 36", dw: 48, dh: 54, avant: () => avantBiblio(), apres: () => bibliotheque(),
   note: "Reliures avec dos et bandeau, livres couchés en pile, une petite plante sur une étagère." });

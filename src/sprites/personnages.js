@@ -44,12 +44,18 @@ const EXPR = { actif: "actif", attente: "attente", question: "question", blocage
 function poste({ role = "codeur", ph = PH.codeur, etat = "actif", vide = false } = {}) {
   const s = mk(40, 36), T = P.top[role], K = P.skin[ph.peau - 1];
   const ch = s.L(); ch.rect(6, 13, 18, 11, P.chair.s); ch.rect(7, 12, 16, 1, P.chair.b); ch.rect(7, 13, 16, 1, P.chair.hi);
+  // Sous le plateau : le pied de la chaise et son étoile à roulettes.
+  ch.rect(14, 28, 2, 5, P.chair.s); ch.rect(14, 28, 1, 5, P.chair.b);
+  ch.rect(9, 33, 12, 1, P.chair.d); ch.rect(10, 33, 10, 1, P.chair.s);
+  [9, 14, 20].forEach(x => ch.px(x, 34, P.chair.d));
   const g = s.L();
   if (!vide) {
     tete(g, 9, 6, ph, EXPR[etat]);
     g.rect(13, 15, 4, 1, K.s);
     g.rect(8, 16, 14, 8, T.b); g.rect(7, 17, 16, 7, T.b); g.rect(19, 17, 4, 7, T.s); g.rect(8, 17, 4, 1, T.hi); g.px(8, 18, T.hi);
     torseDetails(g, role, 8, 16);
+    // Les jambes sous le bureau : tibias du pantalon, chaussures posées au sol.
+    for (const x of [10, 17]) { g.rect(x, 28, 3, 6, P.pants.b); g.rect(x + 2, 28, 1, 6, P.pants.s); g.rect(x - 1, 34, 4, 2, P.shoe.b); g.rect(x - 1, 34, 4, 1, P.shoe.hi); }
   } else { ch.rect(6, 20, 18, 4, P.chair.b); ch.rect(6, 20, 18, 1, P.chair.hi); }
   const d = s.L();
   d.rect(10, 23, 10, 1, P.clavier.hi);
