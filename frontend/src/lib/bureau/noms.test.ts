@@ -46,3 +46,21 @@ describe("prenomsDeProduit", () => {
     expect(premiers.get("redacteur")).toMatch(/^[A-ZÉ][a-zéèëïô]+$/);
   });
 });
+
+describe("the named Tessera team", () => {
+  it("gives ide-core's coder, tester, security and reviewer their chosen names", () => {
+    expect(nomDeLAgent("ide-core", "codeur")).toBe("Maxime");
+    expect(nomDeLAgent("ide-core", "testeur")).toBe("Giovanni");
+    expect(nomDeLAgent("ide-core", "securite")).toBe("Garrett");
+    expect(nomDeLAgent("ide-core", "reviewer")).toBe("Lorenzo");
+  });
+
+  it("never draws a team name for another ide-core role, and leaves other projects alone", () => {
+    const equipe = new Set(["Maxime", "Giovanni", "Garrett", "Lorenzo"]);
+    for (const role of ["validateur", "architect", "resolveur", "doc-technique", "doc-fonctionnelle"] as const) {
+      expect(equipe.has(nomDeLAgent("ide-core", role)), role).toBe(false);
+    }
+    expect(nomDeLAgent("curio", "codeur")).not.toBe("Garrett");
+  });
+});
+
