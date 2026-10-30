@@ -6651,3 +6651,4 @@ Le diff ajoute :
 - 2026-10-30 19:40:31 UTC — [ticket-714] validateur: fichiers cités joints : backend/tests/test_provider_par_role.py (tronqué)
 - 2026-10-30 19:40:31 UTC — [ticket-714] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés correctement. Le code ajoute (264375ms)
 - 2026-10-30 19:40:31 UTC — [ticket-714] APPROVED après 1 tour(s)
+- 2026-10-30 19:42:00 UTC — [ticket-714] documentation: 0 fichier(s) (84250ms)
