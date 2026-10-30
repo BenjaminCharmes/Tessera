@@ -482,21 +482,23 @@ async def test_run_aboutit_si_messages_plus_frequents_que_le_silence(
 ) -> None:
     """A stream that emits each message faster than silence_max_s completes
     normally, even when the total run duration would exceed the threshold."""
-    # 4 messages at 30 ms intervals → total ≈ 120 ms > silence_max_s (100 ms).
-    # Each individual interval (30 ms) stays below the 100 ms threshold.
-    silence_max_s = 0.1
+    # 5 messages à 250 ms d'écart → total ≈ 1,25 s > silence_max_s (1 s).
+    # Chaque écart reste quatre fois sous le seuil : à 30 ms pour 100 ms, une
+    # machine chargée (xdist, autres files) dépassait le seuil et le test
+    # échouait au hasard, ce qui arrêtait la livraison d'un ticket (30/10).
+    silence_max_s = 1.0
 
     async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
-        for _ in range(4):
+        for _ in range(5):
             yield AssistantMessage(content=[TextBlock(text="y")], model="m")
-            await asyncio.sleep(0.03)
+            await asyncio.sleep(0.25)
         yield _make_result_message(usage=None, total_cost_usd=None)
 
     monkeypatch.setattr(agent_sdk_module, "query", fake_query)
 
     provider = ClaudeAgentSDKProvider(silence_max_s=silence_max_s)
     outcome = await provider.complete(system="s", user="u", model="m", max_tokens=100)
-    assert outcome.content == "yyyy"
+    assert outcome.content == "yyyyy"
 
 
 def test_build_options_neutralise_anthropic_api_key(
