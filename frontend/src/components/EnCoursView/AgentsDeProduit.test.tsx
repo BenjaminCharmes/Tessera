@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import SallesDesServeurs from "./SallesDesServeurs";
 import { api } from "../../lib/api";
 import { lireActivite } from "../../lib/apiActivite";
 import { _viderCacheResource } from "../../hooks/useResource";
-import type { AppEnCours } from "../../types/api";
+import type { AppEnCours, ServiceActif } from "../../types/api";
 import type { ActiviteDeService, AgentDeProduit } from "../../types/activiteProduit";
 
 vi.mock("../../lib/apiActivite", () => ({ lireActivite: vi.fn() }));
@@ -32,7 +32,7 @@ function rendre(reponse: ActiviteDeService[] | Error, apps: AppEnCours[] = [APP]
   const lire = vi.mocked(lireActivite);
   if (reponse instanceof Error) lire.mockRejectedValue(reponse);
   else lire.mockResolvedValue(reponse);
-  render(<SallesDesServeurs apps={apps} lueA={0} />);
+  render(<SallesDesServeurs apps={apps} lueA={0} enArret={() => false} onArreterProjet={vi.fn()} />);
   return lire;
 }
 
@@ -59,10 +59,10 @@ describe("agents of a product", () => {
     ]);
 
     await waitFor(() => expect(agentsDessines()).toHaveLength(2));
-    const salle = screen.getByRole("complementary", { name: /Alpha/ });
-    expect(within(salle).getByText("Triage des signaux")).toBeInTheDocument();
+    const salle = screen.getByRole("article", { name: /Alpha/ });
+    expect(within(salle).getByRole("button", { name: /Triage des signaux, au travail/ })).toBeInTheDocument();
     expect(within(salle).getByText("lot 3 sur 5")).toBeInTheDocument();
-    expect(within(salle).getByText("Synthèse")).toBeInTheDocument();
+    expect(within(salle).getByRole("button", { name: /Synthèse, au repos/ })).toBeInTheDocument();
     expect(salle.querySelectorAll("[data-sprite='console']")).toHaveLength(2);
   });
 
@@ -76,8 +76,10 @@ describe("agents of a product", () => {
     expect(actif.querySelector("[data-bras='pupitre'].anim-tape")).not.toBeNull();
     expect(repos.querySelector("[data-bras='repos']")).not.toBeNull();
     expect(repos.querySelector("[class*='anim-']")).toBeNull();
-    expect(screen.getByText("au travail")).toBeInTheDocument();
-    expect(screen.getByText("au repos")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /, A, au travail/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /, B, au repos/ })).toBeInTheDocument();
+    expect(actif.querySelector("[data-sprite='console'] .anim-defile")).not.toBeNull();
+    expect(repos.querySelector("[data-sprite='console']")).toHaveAttribute("data-allume", "false");
   });
 
   it("draws no agent for an empty answer", async () => {
@@ -93,7 +95,7 @@ describe("agents of a product", () => {
 
     await waitFor(() => expect(lire).toHaveBeenCalled());
     expect(agentsDessines()).toHaveLength(0);
-    expect(screen.getByRole("complementary", { name: /Alpha/ })).toBeInTheDocument();
+    expect(screen.getByRole("article", { name: /Alpha/ })).toBeInTheDocument();
   });
 
   it("draws no agent for an app whose service is absent from the answer", async () => {
@@ -117,9 +119,9 @@ describe("agents of a product", () => {
     );
 
     await waitFor(() => expect(agentsDessines()).toHaveLength(2));
-    const alpha = screen.getByRole("complementary", { name: /Alpha/ });
-    expect(within(alpha).getByText("Agent alpha")).toBeInTheDocument();
-    expect(within(alpha).queryByText("Agent beta")).toBeNull();
+    const alpha = screen.getByRole("article", { name: /Alpha/ });
+    expect(within(alpha).getByRole("button", { name: /Agent alpha/ })).toBeInTheDocument();
+    expect(within(alpha).queryByRole("button", { name: /Agent beta/ })).toBeNull();
   });
 
   it("renders a name and a label that contain markup as text", async () => {
@@ -128,8 +130,22 @@ describe("agents of a product", () => {
 
     await waitFor(() => expect(agentsDessines()).toHaveLength(1));
     expect(screen.getByText(piege)).toBeInTheDocument();
-    expect(screen.getByText("<b>Nom</b>")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /<b>Nom<\/b>/ })).toBeInTheDocument();
     const liste = document.querySelector("[data-agents-de-produit]") as HTMLElement;
     expect(liste.querySelector("img, script, b")).toBeNull();
+  });
+
+  it("opens the journal of the agent's service when the agent is clicked", async () => {
+    const service: ServiceActif = {
+      nom: "worker", project_id: "alpha", pid: 100, demarre_a: "2026-10-13T10:00:00Z",
+      en_cours: true, code_de_sortie: null, sortie: ["job 1 done"], arrete_a_la_main: false,
+    };
+    vi.mocked(api.services.list).mockResolvedValue([service]);
+    rendre([activite([agent({ nom: "Triage" })])]);
+
+    const bouton = await screen.findByRole("button", { name: /Triage, au travail/ });
+    await waitFor(() => expect(document.querySelector("[data-ecran-mural='worker']")).not.toBeNull());
+    fireEvent.click(bouton);
+    expect(screen.getByRole("region", { name: /Journal de Alpha · worker/ })).toBeInTheDocument();
   });
 });

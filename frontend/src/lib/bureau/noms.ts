@@ -86,3 +86,19 @@ export function avecLeNom(projet: string, role: RoleAffiche, libelle: string): s
 export function visiteur(projet: string, role: RoleAffiche, poste: string): string {
   return `${avecLeNom(projet, role, poste)} · ${projet}`;
 }
+
+/**
+ * Le prénom d'un agent de produit (ticket-673) : une identité tirée de la même
+ * graine que sa tenue (`physiqueDeProduit`), stable d'un rendu à l'autre. Ses
+ * voisins du même projet se départagent dans l'ordre où le produit les déclare.
+ */
+export function prenomsDeProduit(projet: string, ids: readonly string[]): Map<string, string> {
+  const pris = new Set<number>();
+  const prenoms = new Map<string, string>();
+  for (const id of ids) {
+    const choisi = premierLibre(graine(`${projet}:produit:${id}`), pris);
+    pris.add(choisi);
+    prenoms.set(id, PRENOMS[choisi] ?? PRENOMS[0]);
+  }
+  return prenoms;
+}

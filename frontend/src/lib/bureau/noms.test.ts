@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { avecLeNom, nomDeLAgent } from "./noms";
+import { avecLeNom, nomDeLAgent, prenomsDeProduit } from "./noms";
 import { TENUES } from "./physique";
 import type { RoleAffiche } from "./postesDuRun";
 
@@ -34,5 +34,15 @@ describe("avecLeNom", () => {
     const nom = nomDeLAgent("ide-core", "codeur");
 
     expect(avecLeNom("ide-core", "codeur", "Codeur, travaille")).toBe(`${nom}, codeur, travaille`);
+  });
+});
+
+describe("prenomsDeProduit", () => {
+  it("gives every product agent of a project a stable and distinct first name", () => {
+    const ids = ["redacteur", "relecteur", "traducteur"];
+    const premiers = prenomsDeProduit("curio", ids);
+    expect(prenomsDeProduit("curio", ids)).toEqual(premiers);
+    expect(new Set(premiers.values()).size).toBe(ids.length);
+    expect(premiers.get("redacteur")).toMatch(/^[A-ZÉ][a-zéèëïô]+$/);
   });
 });

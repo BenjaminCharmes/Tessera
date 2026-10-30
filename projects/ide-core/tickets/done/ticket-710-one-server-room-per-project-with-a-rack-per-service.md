@@ -2,7 +2,7 @@
 id: ticket-710
 title: "One server room per project, with a rack per service and its details on hover"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -40,12 +40,15 @@ Maquette : `projects/ide-core/design/maquette/Salle-des-serveurs-v2.dc.html`.
   bascule Salles/Liste.
 
 ## Critères d'acceptation
-- [ ] `SallesDesServeurs.test.tsx` : deux `AppEnCours` du même `project_id` donnent une seule salle avec deux baies ; deux projets donnent deux salles
-- [ ] `SallesDesServeurs.test.tsx` : la plaque d'une salle affiche le nom du projet, « 2 services » et la somme des `memoire_mo`
-- [ ] `SallesDesServeurs.test.tsx` : le focus d'une baie affiche une infobulle (`role="tooltip"`) avec son pid, ses ports et sa mémoire
-- [ ] La grille des salles déclare deux colonnes au-delà de 1280 px et une en dessous ; un test vérifie la classe ou le style posé sur le conteneur
-- [ ] `EnCoursView.test.tsx` rend l'écran « En cours » avec un projet à deux services, et n'y trouve qu'une salle
+- [x] `SallesDesServeurs.test.tsx` : deux `AppEnCours` du même `project_id` donnent une seule salle avec deux baies ; deux projets donnent deux salles
+- [x] `SallesDesServeurs.test.tsx` : la plaque d'une salle affiche le nom du projet, « 2 services » et la somme des `memoire_mo`
+- [x] `SallesDesServeurs.test.tsx` : le focus d'une baie affiche une infobulle (`role="tooltip"`) avec son pid, ses ports et sa mémoire
+- [x] La grille des salles déclare deux colonnes au-delà de 1280 px et une en dessous ; un test vérifie la classe ou le style posé sur le conteneur
+- [x] `EnCoursView.test.tsx` rend l'écran « En cours » avec un projet à deux services, et n'y trouve qu'une salle
 
 ## Ce que ça ne fait pas
 - Pas d'écrans de journal : c'est le ticket-711
 - Pas de poste de run : c'est le ticket-712
+
+## Livraison
+Implémenté à la main avec Benjamin, en direct sur un Vite de branche (5175), le 30/10. Écarts à la maquette validés en route : moniteurs accrochés au mur, journal sous la salle (un second clic le referme), agents du produit au modèle du Bureau (prénom, bulles, infobulle, clic vers le journal de leur service), sol posé dalle par dalle, bouche de VMC dont l'hélice suit la mémoire du projet. Les tests vivent dans `SallesDesServeurs.test.tsx`, qui rend l'écran « En cours » entier.

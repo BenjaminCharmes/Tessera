@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
 import { api } from "../../lib/api";
@@ -53,9 +53,11 @@ const SPRITES_DU_BUREAU = ["fenetre", "plante", "porte", "etagere"];
 const SPRITES_DE_PERSONNAGE = ["personnage", "agent-debout"];
 
 function sprites(racine: HTMLElement): string[] {
-  return [...racine.querySelectorAll("[data-sprite]")].map(
-    (el) => el.getAttribute("data-sprite") ?? "",
-  );
+  return [...racine.querySelectorAll("[data-sprite]")].map((el) => el.getAttribute("data-sprite") ?? "");
+}
+
+function salles(): HTMLElement[] {
+  return screen.queryAllByRole("article");
 }
 
 beforeEach(() => {
@@ -71,32 +73,52 @@ afterEach(() => {
 
 vi.mock("../../lib/apiActivite", () => ({ lireActivite: vi.fn() }));
 
-describe("SallesDesServeurs", () => {
-  it("draws one room per app, and none when the list is empty", () => {
-    const { unmount } = rendre([app({ pid: 1 }), app({ pid: 2, project_id: "beta", project_name: "Beta" })]);
-    expect(screen.getAllByRole("complementary")).toHaveLength(2);
+describe("server rooms — one per project (ticket-710)", () => {
+  it("draws one room for two apps of a project, two rooms for two projects, none when empty", () => {
+    const { unmount } = rendre([app({ pid: 1, nom: "api" }), app({ pid: 2, nom: "web" })]);
+    expect(salles()).toHaveLength(1);
+    expect(document.querySelectorAll("[data-sprite='baie-haute']")).toHaveLength(2);
     unmount();
 
+    const autre = rendre([app({ pid: 1 }), app({ pid: 2, project_id: "beta", project_name: "Beta" })]);
+    expect(salles()).toHaveLength(2);
+    autre.unmount();
+
     rendre([]);
-    expect(screen.queryAllByRole("complementary")).toHaveLength(0);
+    expect(salles()).toHaveLength(0);
     expect(screen.getByText("Aucune app de projet ne tourne")).toBeInTheDocument();
   });
 
-  it("writes the project, ports, memory and start time read from the app", () => {
-    rendre([app({ project_name: "Alpha", ports: [8001, 8002], memoire_mo: 120.5 })]);
+  it("writes the project name, the service count and the summed memory on the room's plate", () => {
+    rendre([app({ pid: 1, nom: "api", memoire_mo: 100 }), app({ pid: 2, nom: "web", memoire_mo: 20.5 })]);
 
-    const salle = screen.getByRole("complementary", { name: /Alpha/ });
-    expect(within(salle).getByRole("heading", { name: /Alpha/ })).toBeInTheDocument();
-    expect(within(salle).getByText("Ports :8001 :8002")).toBeInTheDocument();
-    expect(within(salle).getByText("120,5 Mo")).toBeInTheDocument();
-    expect(within(salle).getByText(/Démarrée à \d{2}:\d{2}/)).toBeInTheDocument();
+    const salle = screen.getByRole("article", { name: /Alpha/ });
+    expect(within(salle).getByRole("heading", { name: "Alpha" })).toBeInTheDocument();
+    expect(within(salle).getByText("2 services · 120,5 Mo")).toBeInTheDocument();
   });
 
-  it("writes a dash for the start time and ports the app does not give", () => {
-    rendre([app({ demarre_a: null, ports: [] })]);
+  it("links each port of the project from the plate", () => {
+    rendre([app({ ports: [8026] })]);
 
-    expect(screen.getByText("Démarrée à —")).toBeInTheDocument();
-    expect(screen.getByText("Ports —")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Ouvrir :8026/ })).toHaveAttribute("href", "http://localhost:8026");
+  });
+
+  it("shows a rack's pid, ports and memory in a tooltip on focus", async () => {
+    rendre([app({ pid: 4242, ports: [8001], memoire_mo: 90.5 })]);
+
+    fireEvent.focus(screen.getByRole("group", { name: "api : en cours" }));
+    const fiche = await screen.findByRole("tooltip");
+    expect(within(fiche).getByText("4242")).toBeInTheDocument();
+    expect(within(fiche).getByText(":8001")).toBeInTheDocument();
+    expect(within(fiche).getByText("90,5 Mo")).toBeInTheDocument();
+  });
+
+  it("lays the rooms out in two columns from 1280 px, one below", () => {
+    rendre([app({})]);
+
+    const grille = document.querySelector("[data-vue='salles']");
+    expect(grille).toHaveClass("grid-cols-1");
+    expect(grille).toHaveClass("xl:grid-cols-2");
   });
 
   it("draws one rack per service, with a lamp that tells a stopped service from a running one", async () => {
@@ -109,49 +131,127 @@ describe("SallesDesServeurs", () => {
     await waitFor(() => expect(document.querySelectorAll("[data-sprite='baie-haute']")).toHaveLength(2));
     const voyants = [...document.querySelectorAll("[data-voyant]")];
     expect(voyants.map((v) => v.getAttribute("data-voyant"))).toEqual(["en-cours", "arrete"]);
-    const [marche, arret] = voyants.map((v) => v.querySelector("rect")?.getAttribute("class"));
-    expect(marche).toBeTruthy();
-    expect(arret).toBeTruthy();
-    expect(marche).not.toEqual(arret);
-    expect(screen.getByText("worker — à l'arrêt")).toBeInTheDocument();
   });
 
-  it("draws a single running rack for an app whose project declares no service", () => {
-    rendre([app({ nom: "serveur", origine: "externe" })]);
-
-    expect(document.querySelectorAll("[data-sprite='baie-haute']")).toHaveLength(1);
-    expect(document.querySelector("[data-voyant]")).toHaveAttribute("data-voyant", "en-cours");
-    expect(screen.getByText("serveur — en cours")).toBeInTheDocument();
-  });
-
-  it("furnishes the room with the technical sprites and none from the offices", () => {
+  it("furnishes the room with the technical sprites, a tiled floor, and none from the offices", () => {
     const { container } = rendre([app({})]);
     const dessines = sprites(container);
 
-    for (const sprite of ["climatiseur", "chemin-de-cables", "extincteur", "porte-coupe-feu", "baie-haute"]) {
+    for (const sprite of ["climatiseur", "chemin-de-cables", "extincteur", "porte-coupe-feu", "baie-haute", "bouche-vmc", "dalle-pleine", "dalle-perforee"]) {
       expect(dessines, sprite).toContain(sprite);
     }
     for (const sprite of SPRITES_DU_BUREAU) {
       expect(dessines, sprite).not.toContain(sprite);
     }
+    for (const sprite of SPRITES_DE_PERSONNAGE) {
+      expect(dessines, sprite).not.toContain(sprite);
+    }
   });
 
-  it("draws no character in a room", () => {
-    const { container } = rendre([app({}), app({ pid: 2 })]);
+  it("spins the vent only while a service runs, faster with the project's memory", async () => {
+    const { unmount } = rendre([app({ memoire_mo: 120 })]);
+    expect(document.querySelector("[data-sprite='bouche-vmc']")).toHaveAttribute("data-regime", "lent");
+    unmount();
 
-    for (const sprite of SPRITES_DE_PERSONNAGE) {
-      expect(sprites(container), sprite).not.toContain(sprite);
-    }
+    rendre([app({ memoire_mo: 900 })]);
+    expect(document.querySelector("[data-sprite='bouche-vmc']")).toHaveAttribute("data-regime", "rapide");
+  });
+
+  it("stops the vent when no service of the project runs", async () => {
+    vi.spyOn(api.services, "list").mockResolvedValue([
+      service({ nom: "api", en_cours: false, pid: 7, arrete_a_la_main: true }),
+    ]);
+    rendre([app({ nom: "api" })]);
+
+    await waitFor(() =>
+      expect(document.querySelector("[data-sprite='bouche-vmc']")).toHaveAttribute("data-regime", "arret"),
+    );
   });
 
   it("keeps the list view in the switcher", async () => {
     rendre([app({ nom: "api" })]);
 
     await userEvent.click(screen.getByRole("button", { name: "Liste" }));
-
-    expect(screen.queryAllByRole("complementary")).toHaveLength(0);
+    expect(salles()).toHaveLength(0);
     expect(screen.getByRole("button", { name: "Arrêter api" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Salles" }));
-    expect(screen.getAllByRole("complementary")).toHaveLength(1);
+    expect(salles()).toHaveLength(1);
+  });
+});
+
+describe("wall screens and journal (ticket-711)", () => {
+  const SORTIE = ["boot", "GET / 200", "WARN slow query", "GET /a 200", "Error: connect ECONNREFUSED", "retry"];
+
+  async function rendreAvecSortie(over: Partial<ServiceActif> = {}) {
+    vi.spyOn(api.services, "list").mockResolvedValue([service({ sortie: SORTIE, ...over })]);
+    rendre([app({})]);
+    return screen.findByRole("button", { name: /api/, expanded: false });
+  }
+
+  it("shows the last five lines of a service's output, an error line in red", async () => {
+    const ecran = await rendreAvecSortie();
+
+    expect(within(ecran).queryByText("boot")).toBeNull();
+    expect(within(ecran).getByText("retry")).toBeInTheDocument();
+    expect(within(ecran).getByText("Error: connect ECONNREFUSED")).toHaveClass("text-red-300");
+    expect(within(ecran).getByText("WARN slow query")).toHaveClass("text-amber-300");
+  });
+
+  it("opens the journal under the room on a click, and closes it on a second click", async () => {
+    const ecran = await rendreAvecSortie();
+
+    fireEvent.click(ecran);
+    expect(screen.getByRole("region", { name: "Journal de Alpha · api" })).toBeInTheDocument();
+    expect(ecran).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(ecran);
+    expect(screen.queryByRole("region", { name: /Journal de/ })).toBeNull();
+  });
+
+  it("closes the journal with its close button", async () => {
+    fireEvent.click(await rendreAvecSortie());
+
+    fireEvent.click(screen.getByRole("button", { name: "Fermer le journal" }));
+    expect(screen.queryByRole("region", { name: /Journal de/ })).toBeNull();
+  });
+
+  it("filters the journal to errors, and by the searched text", async () => {
+    fireEvent.click(await rendreAvecSortie());
+    const journal = screen.getByRole("region", { name: /Journal de/ });
+
+    fireEvent.click(within(journal).getByRole("button", { name: /Erreurs · 1/ }));
+    expect(within(journal).getByText("Error: connect ECONNREFUSED")).toBeInTheDocument();
+    expect(within(journal).queryByText("retry")).toBeNull();
+
+    fireEvent.click(within(journal).getByRole("button", { name: /Tout · 6/ }));
+    fireEvent.change(within(journal).getByRole("searchbox", { name: "Chercher dans le journal" }), {
+      target: { value: "slow" },
+    });
+    expect(within(journal).getByText("WARN slow query")).toBeInTheDocument();
+    expect(within(journal).queryByText("boot")).toBeNull();
+  });
+
+  it("marks a service that died on its own as fallen, but not one stopped by hand", async () => {
+    vi.spyOn(api.services, "list").mockResolvedValue([
+      service({ en_cours: false, code_de_sortie: 1, arrete_a_la_main: false }),
+    ]);
+    const { unmount } = rendre([app({})]);
+    await waitFor(() => expect(screen.getByRole("article")).toHaveAttribute("data-tombe", "true"));
+    expect(document.querySelector("[data-voyant]")).toHaveAttribute("data-voyant", "echoue");
+    unmount();
+    _viderCacheResource();
+
+    vi.spyOn(api.services, "list").mockResolvedValue([
+      service({ en_cours: false, code_de_sortie: 1, arrete_a_la_main: true }),
+    ]);
+    rendre([app({})]);
+    await waitFor(() => expect(document.querySelector("[data-voyant]")).toHaveAttribute("data-voyant", "arrete"));
+    expect(screen.getByRole("article")).toHaveAttribute("data-tombe", "false");
+  });
+
+  it("draws no wall screen for an app launched by hand, whose output Tessera does not have", () => {
+    rendre([app({ nom: "serveur", origine: "externe" })]);
+
+    expect(document.querySelector("[data-ecran-mural]")).toBeNull();
+    expect(document.querySelectorAll("[data-sprite='baie-haute']")).toHaveLength(1);
   });
 });

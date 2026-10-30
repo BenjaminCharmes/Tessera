@@ -160,6 +160,9 @@
   --sprite-haut-produit: #475569;
   --sprite-haut-produit-ombre: #334155;
   --sprite-console-ecran: #0f172a;
+  /* L'écran d'un agent au travail : allumé, ses lignes défilent (ticket-710). */
+  --sprite-console-ecran-allume: #172554;
+  --sprite-console-texte: #93c5fd;
   --sprite-console-touche: #a1a1aa;
 }
 
@@ -232,6 +235,9 @@
 /* La barre grandit depuis son bord gauche, pas depuis l'origine de l'écran. */
 .anim-avance { transform-box: fill-box; transform-origin: 0 50%; }
 .anim-tape { animation: tape 0.5s steps(2) infinite; }
+/* L'hélice de la VMC : sa durée vient du régime (BoucheVMC), quatre paliers par tour. */
+.anim-helice { animation: helice 1.2s steps(4) infinite; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes helice { to { transform: rotate(90deg); } }
 .anim-chute { animation: chute 1.6s linear infinite; }
 .anim-gyro { animation: gyro 0.8s steps(2) infinite; }
 .anim-lueur { animation: lueur 1.6s ease-in-out infinite; }
@@ -243,7 +249,7 @@
 .marche { transition: transform 1.8s steps(12), opacity 0.9s; }
 @media (prefers-reduced-motion: reduce) {
   .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur, .anim-chute, .anim-gyro,
-  .anim-defile, .anim-avance, .anim-balaie { animation: none; }
+  .anim-defile, .anim-avance, .anim-balaie, .anim-helice { animation: none; }
   .marche { transition: none; }
 }
 
