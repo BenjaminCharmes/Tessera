@@ -32,6 +32,7 @@ from tessera.services.project_loader import (
 )
 from tessera.services.providers import par_role
 from tessera.services.providers.base import ProviderResult
+from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.providers.noms import (
     PROVIDERS_CONNUS,
     ProviderInconnu,
@@ -267,6 +268,129 @@ def test_un_repli_declare_enveloppe_le_provider(
     assert [a["name"] for a in fabrique_enregistree] == ["anthropic_api", "agent_sdk"]
     # Le repli reçoit les mêmes restrictions d'outils que le principal.
     assert fabrique_enregistree[1]["allow_tools"] is False
+
+
+@pytest.fixture
+def providers_par_nom(monkeypatch: pytest.MonkeyPatch) -> dict[str, FakeProvider]:
+    """Un double par provider construit, pour lire quel provider a été appelé."""
+    construits: dict[str, FakeProvider] = {}
+
+    def fausse(name: str | None = None, api_key: str = "", **kwargs: Any) -> FakeProvider:
+        p = FakeProvider(content=f"réponse de {name}")
+        p.name = name or "agent_sdk"  # type: ignore[misc]
+        construits[p.name] = p
+        return p
+
+    monkeypatch.setattr(par_role, "get_provider", fausse)
+    return construits
+
+
+def _role_avec_seuil(tmp_path: Path, principal: str, **extra: Any) -> Path:
+    return _manifeste(tmp_path, [_agent(
+        "validateur", provider=principal, fallback_above_chars=100,
+        fallback={"provider": "anthropic_api", "model": "claude-haiku-4-5"}, **extra,
+    )])
+
+
+async def test_oversized_prompt_goes_to_the_fallback(
+    tmp_path: Path, providers_par_nom: dict[str, FakeProvider]
+) -> None:
+    projet = _role_avec_seuil(tmp_path, "ollama")
+    provider = provider_pour_role(projet, "validateur", allow_tools=False)
+    result = await provider.complete(system="s", user="u" * 500, model="qwen", max_tokens=1)
+
+    assert providers_par_nom["ollama"].calls == []
+    [appel] = providers_par_nom["anthropic_api"].calls
+    assert appel["model"] == "claude-haiku-4-5"
+    assert result.content == "réponse de anthropic_api"
+
+
+async def test_oversized_prompt_goes_to_the_fallback_when_streaming(
+    tmp_path: Path, providers_par_nom: dict[str, FakeProvider]
+) -> None:
+    projet = _role_avec_seuil(tmp_path, "ollama")
+    provider = provider_pour_role(projet, "validateur", allow_tools=False)
+    await provider.stream(system="s" * 500, user="u", model="qwen", max_tokens=1)
+
+    assert providers_par_nom["ollama"].calls == []
+    assert len(providers_par_nom["anthropic_api"].calls) == 1
+
+
+async def test_prompt_under_the_threshold_stays_local(
+    tmp_path: Path, providers_par_nom: dict[str, FakeProvider]
+) -> None:
+    projet = _role_avec_seuil(tmp_path, "ollama")
+    provider = provider_pour_role(projet, "validateur", allow_tools=False)
+    result = await provider.complete(system="", user="u" * 50, model="qwen", max_tokens=1)
+
+    assert len(providers_par_nom["ollama"].calls) == 1
+    assert providers_par_nom["anthropic_api"].calls == []
+    assert result.content == "réponse de ollama"
+
+
+async def test_oversized_fallback_emits_its_reason(
+    tmp_path: Path, providers_par_nom: dict[str, FakeProvider]
+) -> None:
+    projet = _role_avec_seuil(tmp_path, "ollama")
+    provider = provider_pour_role(projet, "validateur", allow_tools=False, project_id="demo")
+
+    async def action() -> None:
+        await provider.complete(system="s" * 100, user="u" * 400, model="qwen", max_tokens=1)
+
+    [evenement] = await _evenements_de({EventType.PROVIDER_FALLBACK}, action)
+    assert evenement.project_id == "demo"
+    assert evenement.data["tente"] == "ollama"
+    assert evenement.data["utilise"] == "anthropic_api"
+    assert "500" in evenement.data["raison"]
+    assert "100" in evenement.data["raison"]
+
+
+async def test_oversized_fallback_is_written_to_the_journal(
+    tmp_path: Path, providers_par_nom: dict[str, FakeProvider]
+) -> None:
+    lignes: list[str] = []
+    projet = _role_avec_seuil(tmp_path, "ollama")
+    provider = provider_pour_role(
+        projet, "validateur", allow_tools=False, journal_repli=lignes.append
+    )
+    activer_enregistrement(None, "ticket-714")
+    try:
+        await provider.complete(system="s", user="u" * 500, model="qwen", max_tokens=1)
+    finally:
+        activer_enregistrement(None, None)
+
+    [ligne] = lignes
+    assert "ticket-714" in ligne and "au-delà du seuil de 100" in ligne
+
+
+async def test_threshold_without_fallback_is_ignored(
+    tmp_path: Path, providers_par_nom: dict[str, FakeProvider]
+) -> None:
+    projet = _manifeste(tmp_path, [_agent(
+        "validateur", provider="ollama", fallback_above_chars=100,
+    )])
+    provider = provider_pour_role(projet, "validateur", allow_tools=False)
+    await provider.complete(system="s", user="u" * 500, model="qwen", max_tokens=1)
+
+    assert len(providers_par_nom["ollama"].calls) == 1
+
+
+async def test_threshold_is_ignored_for_a_cloud_provider(
+    tmp_path: Path, providers_par_nom: dict[str, FakeProvider]
+) -> None:
+    projet = _role_avec_seuil(tmp_path, "agent_sdk")
+    provider = provider_pour_role(projet, "validateur", allow_tools=False)
+    await provider.complete(system="s", user="u" * 500, model="m", max_tokens=1)
+
+    assert len(providers_par_nom["agent_sdk"].calls) == 1
+    assert providers_par_nom["anthropic_api"].calls == []
+
+
+def test_a_manifest_threshold_is_read_and_optional(tmp_path: Path) -> None:
+    projet = _manifeste(tmp_path, [_agent("validateur", fallback_above_chars=100)])
+    assert load_agents_config(projet)[0].fallback_above_chars == 100
+    sans = _manifeste(tmp_path, [_agent("validateur")])
+    assert load_agents_config(sans)[0].fallback_above_chars is None
 
 
 def test_le_modele_du_role_vient_du_manifeste_sinon_du_defaut(tmp_path: Path) -> None:

@@ -14,7 +14,11 @@ from tessera.services.project_loader import load_agents_config
 from tessera.services.providers import get_provider
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
-from tessera.services.providers.declaration import PROVIDER_OPENAI, resoudre_cle
+from tessera.services.providers.declaration import (
+    PROVIDER_OLLAMA,
+    PROVIDER_OPENAI,
+    resoudre_cle,
+)
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.repli import ProviderAvecRepli
 from tessera.services.providers.repli_direct import ProviderRepliDirect
@@ -68,6 +72,15 @@ def connexion_du_role(config: AgentConfig | None, nom: str) -> tuple[str | None,
     if config is None or nom != PROVIDER_OPENAI or not config.base_url:
         return None, ""
     return config.base_url, resoudre_cle(config.api_key_env)
+
+
+def seuil_du_role(config: AgentConfig | None, nom: str) -> int | None:
+    """The prompt size above which `config` goes straight to its fallback.
+    Only a local (`ollama`) principal has one: a cloud provider has no
+    read timeout to dodge, so the key is ignored for it (ticket-714)."""
+    if config is None or nom != PROVIDER_OLLAMA:
+        return None
+    return config.fallback_above_chars
 
 
 def provider_pour_role(
@@ -136,4 +149,5 @@ def provider_pour_role(
     return ProviderAvecRepli(
         principal, repli, modele_repli=config.fallback.model, role=role,
         project_id=project_id, journal=journal_repli,
+        seuil_caracteres=seuil_du_role(config, nom),
     )
