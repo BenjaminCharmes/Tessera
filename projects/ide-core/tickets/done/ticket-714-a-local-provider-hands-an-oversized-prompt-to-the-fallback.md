@@ -4,7 +4,7 @@ created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-714
-pr_number: null
+pr_number: 795
 priority: medium
 status: done
 title: A local provider hands an oversized prompt straight to its fallback
