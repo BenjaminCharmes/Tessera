@@ -1,14 +1,14 @@
 ---
-id: ticket-708
-title: "A multi-line proof excerpt matches the diff without its line markers"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-30
+id: ticket-708
+pr_number: 792
+priority: high
+status: done
+title: A multi-line proof excerpt matches the diff without its line markers
+type: fix
 ---
 
 # ticket-708 — Un extrait de preuve sur plusieurs lignes se retrouve dans le diff, marqueurs de ligne retirés

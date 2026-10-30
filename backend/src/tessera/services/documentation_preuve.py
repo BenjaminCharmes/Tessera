@@ -73,9 +73,26 @@ def jetons_de(texte: str) -> set[Jeton]:
     }
 
 
+_ENTETES_DE_DIFF = ("+++", "---", "@@")
+
+
+def _texte_du_diff(diff: str) -> str:
+    """One diff, raw then as delivered code: where an extract may be found.
+
+    Le diff brut garde ses marqueurs, pour qu'un extrait d'une ligne continue de
+    passer. S'y ajoute le code livré, sans marqueur : lignes `+` et de contexte
+    privées de leur premier caractère, pour qu'un extrait de plusieurs lignes
+    se retrouve. Les en-têtes ne sont pas du code, et les lignes `-` ne sont
+    plus livrées.
+    """
+    lignes = [ligne for ligne in diff.splitlines() if not ligne.startswith(_ENTETES_DE_DIFF)]
+    livrees = [ligne[1:] for ligne in lignes if ligne[:1] in ("+", " ")]
+    return "\n".join([*lignes, *livrees])
+
+
 def _texte_du_code(matiere: MatiereCode) -> str:
     """The diffs and the file contents: where an extract may be found."""
-    diffs = (diff.diff for diff in matiere.diffs)
+    diffs = (_texte_du_diff(diff.diff) for diff in matiere.diffs)
     fichiers = (fichier.contenu for fichier in matiere.fichiers)
     return "\n".join([*diffs, *fichiers])
 

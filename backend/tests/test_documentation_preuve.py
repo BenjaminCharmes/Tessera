@@ -100,6 +100,52 @@ def test_the_extract_comparison_tolerates_typography(tmp_path: Path) -> None:
     assert "Après." in fichier.read_text(encoding="utf-8")
 
 
+_DIFF_MULTILIGNE = (
+    "diff --git a/src/types.ts b/src/types.ts\n"
+    "--- a/src/types.ts\n"
+    "+++ b/src/types.ts\n"
+    "@@ -1,3 +1,5 @@\n"
+    " import x from 'y'\n"
+    '+export type QuizMode =\n'
+    '+  | "marathon"\n'
+    "-const ancien = 1\n"
+    "-const retire = 2\n"
+)
+
+
+def _controle_du_diff() -> ControleDePreuve:
+    diff = DiffDeTicket("ticket-9", _DIFF_MULTILIGNE, ["src/types.ts"])
+    return ControleDePreuve(MatiereCode(diffs=[diff]))
+
+
+def _verifier(controle: ControleDePreuve, extrait: str) -> None:
+    controle.verifier(_edition("Avant.", "Après.", extrait), "docs/guide.md")
+
+
+def test_multi_line_excerpt_from_added_lines_is_accepted() -> None:
+    _verifier(_controle_du_diff(), 'export type QuizMode =\n  | "marathon"')
+
+
+def test_multi_line_excerpt_across_context_and_added_lines_is_accepted() -> None:
+    _verifier(_controle_du_diff(), "import x from 'y'\nexport type QuizMode =")
+
+
+def test_excerpt_from_removed_lines_is_refused() -> None:
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(_controle_du_diff(), "const ancien = 1\nconst retire = 2")
+
+
+def test_single_line_excerpt_still_passes() -> None:
+    _verifier(_controle_du_diff(), 'export type QuizMode =')
+    _verifier(_controle_du_diff(), "const ancien = 1")
+
+
+@pytest.mark.parametrize("entete", ["+++ b/src/types.ts", "@@ -1,3 +1,5 @@", "--- a/src/types.ts"])
+def test_diff_headers_are_not_proof(entete: str) -> None:
+    with pytest.raises(EditionRefusee, match="preuve.*n'est ni dans"):
+        _verifier(_controle_du_diff(), entete)
+
+
 # ------------------------------------------------------------------
 # Les jetons vérifiables : une famille par test
 # ------------------------------------------------------------------

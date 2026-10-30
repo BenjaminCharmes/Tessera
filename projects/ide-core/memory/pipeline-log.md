@@ -6584,3 +6584,17 @@ Le diff ajoute :
 - 2026-10-30 15:07:26 UTC — [ticket-677] validateur: APPROVED — Ticket-677 satisfait tous les critères d'acceptation. Un exécuteur unique `git_r (344405ms)
 - 2026-10-30 15:07:26 UTC — [ticket-677] APPROVED après 2 tour(s)
 - 2026-10-30 15:11:30 UTC — [ticket-677] documentation: 0 fichier(s) (238890ms) — après tour de correction
+- 2026-10-30 15:30:19 UTC — [ide-core] ticket-677 PR #791 mergée (CI verte)
+- 2026-10-30 15:30:21 UTC — [ide-core] ticket-677 : base réalignée sur develop
+- 2026-10-30 15:30:21 UTC — [ide-core] ticket-677 PR #791 confiée au CIWatcher
+- 2026-10-30 15:30:24 UTC — [ticket-708] branche ticket-708-a-multi-line-proof-excerpt-matches-the-diff-witho
+- 2026-10-30 15:30:25 UTC — [ticket-708] tour 1 — codeur démarré
+- 2026-10-30 15:33:01 UTC — [ticket-708] tour 1 — codeur terminé (155625ms)
+- 2026-10-30 15:42:28 UTC — [ticket-708] testeur: OK (exit 0)
+- 2026-10-30 15:43:27 UTC — [ticket-708] securite: PASS — Audit de sécurité PASS. La nouvelle fonction `_texte_du_diff()` traite les diffs (58610ms)
+- 2026-10-30 15:43:27 UTC — [ticket-708] tour 1 — reviewer démarré
+- 2026-10-30 15:43:50 UTC — [ticket-708] tour 1 — reviewer terminé (23436ms)
+- 2026-10-30 15:47:36 UTC — [ticket-708] validateur: fichiers cités joints : backend/tests/test_documentation_preuve.py
+- 2026-10-30 15:47:36 UTC — [ticket-708] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code modifie la fonction  (249420ms)
+- 2026-10-30 15:47:36 UTC — [ticket-708] APPROVED après 1 tour(s)
+- 2026-10-30 15:53:42 UTC — [ticket-708] documentation: 0 fichier(s) (269921ms) — après tour de correction
