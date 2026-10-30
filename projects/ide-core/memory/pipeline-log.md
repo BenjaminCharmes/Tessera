@@ -6705,3 +6705,20 @@ Le diff ajoute :
 - 2026-10-30 22:06:10 UTC — [ticket-676] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été refactoré pour ce (214656ms)
 - 2026-10-30 22:06:10 UTC — [ticket-676] APPROVED après 2 tour(s)
 - 2026-10-30 22:07:28 UTC — [ticket-676] documentation: 0 fichier(s) (72656ms)
+- 2026-10-30 22:07:48 UTC — [ide-core] ticket-676 PR #799 confiée au CIWatcher
+- 2026-10-30 22:07:52 UTC — [ticket-678] branche ticket-678-one-cost-by-role-aggregate-and-a-response-model
+- 2026-10-30 22:07:53 UTC — [ticket-678] tour 1 — codeur démarré
+- 2026-10-30 22:10:16 UTC — [ticket-678] tour 1 — codeur terminé (143078ms)
+- 2026-10-30 22:14:52 UTC — [ide-core] ticket-676 PR #799 mergée (CI verte)
+- 2026-10-30 22:16:12 UTC — [ticket-678] testeur: 1 failed, 2033 passed, 64 warnings in 352.44s (0:05:52)
+- 2026-10-30 22:16:12 UTC — [ticket-678] tests rouges au tour 1
+- 2026-10-30 22:16:12 UTC — [ticket-678] tour 2 — codeur démarré
+- 2026-10-30 22:18:11 UTC — [ticket-678] tour 2 — codeur terminé (119171ms)
+- 2026-10-30 22:25:15 UTC — [ticket-678] testeur: OK (exit 0)
+- 2026-10-30 22:28:10 UTC — [ticket-678] securite: PASS — Le diff refactorise les requêtes d'agrégation de coûts pour consolider le code d (174766ms)
+- 2026-10-30 22:28:10 UTC — [ticket-678] tour 2 — reviewer démarré
+- 2026-10-30 22:28:33 UTC — [ticket-678] tour 2 — reviewer terminé (22453ms)
+- 2026-10-30 22:30:21 UTC — [ticket-678] validateur: fichiers cités joints : aucun ; absents : usage/breakdown
+- 2026-10-30 22:30:21 UTC — [ticket-678] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code intègre une unique requ (131108ms)
+- 2026-10-30 22:30:21 UTC — [ticket-678] APPROVED après 2 tour(s)
+- 2026-10-30 22:32:25 UTC — [ticket-678] documentation: 0 fichier(s) (118000ms)

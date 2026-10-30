@@ -24,6 +24,7 @@ from tessera.models.usage import (
     UsageStats,
     UsageTotals,
 )
+from tessera.services.cost_aggregate import CostColumn, aggregate_cost
 
 #: Les périodes que l'écran propose ; l'endpoint refuse les autres.
 PERIODS = (7, 30, 90)
@@ -171,25 +172,16 @@ async def _daily(
 
 
 async def _breakdown(
-    db: aiosqlite.Connection, scope: _Scope, column: str
+    db: aiosqlite.Connection, scope: _Scope, column: CostColumn
 ) -> list[BreakdownLine]:
-    # `column` vient d'une liste fermée dans `usage_stats`, jamais de la requête.
-    rows = await _all(db, f"""
-        SELECT {column} AS cle,
-               SUM(ac.cost_usd) AS cost,
-               SUM(ac.input_tokens + ac.output_tokens + ac.cache_read_tokens) AS tokens,
-               COUNT(*) AS calls,
-               AVG(ac.duration_ms) AS duration
-        FROM agent_calls ac JOIN pipeline_runs pr ON pr.id = ac.run_id
-        WHERE {scope.calls}
-        GROUP BY {column} ORDER BY cost DESC""", scope.params)
+    lines = await aggregate_cost(db, column, scope.calls, scope.params)
     return [
         BreakdownLine(
-            key=str(r["cle"]), cost_usd=round(float(r["cost"]), 10),
-            tokens=int(r["tokens"]), calls=int(r["calls"]),
-            avg_duration_ms=float(r["duration"]),
+            key=line.key, cost_usd=round(line.cost_usd, 10),
+            tokens=line.tokens, calls=line.calls,
+            avg_duration_ms=line.avg_duration_ms,
         )
-        for r in rows
+        for line in lines
     ]
 
 

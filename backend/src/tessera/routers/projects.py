@@ -26,6 +26,7 @@ from tessera.models.project import (
     ProjectImportResponse,
 )
 from tessera.models.ticket import TicketStatus
+from tessera.models.usage import UsageBreakdown
 from tessera.services.database import get_usage_breakdown, PipelineRunSummary, ProjectUsage, get_project_usage, list_runs
 from tessera.agents.github_sync import GithubSyncAgent
 from tessera.services.adr import lire_contraintes
@@ -64,9 +65,7 @@ from tessera.services.process_registry import PROCESS_REGISTRY
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.models.agent import FallbackConfig
 from tessera.routers.dependencies import require_valid_project_id
-from tessera.services.project_from_template import (
-    create_project_from_template as _create_from_template,
-)
+from tessera.services.project_from_template import create_project_from_template as _create_from_template
 from tessera.services.project_loader import (
     AgentAbsentDuProjet,
     ModeleInconnu,
@@ -705,16 +704,16 @@ async def set_pipeline_settings_route(
     return _reglages(project_path)
 
 
-@router.get("/usage/breakdown")
-async def get_usage_breakdown_global() -> dict[str, object]:
+@router.get("/usage/breakdown", response_model=UsageBreakdown)
+async def get_usage_breakdown_global() -> UsageBreakdown:
     """La dépense de **tous** les projets, ventilée par projet, agent et modèle."""
-    return await get_usage_breakdown(settings.ide_db_path, None)
+    return UsageBreakdown.model_validate(await get_usage_breakdown(settings.ide_db_path, None))
 
 
-@router.get("/{project_id}/usage/breakdown")
-async def get_usage_breakdown_for_project(project_id: str) -> dict[str, object]:
+@router.get("/{project_id}/usage/breakdown", response_model=UsageBreakdown)
+async def get_usage_breakdown_for_project(project_id: str) -> UsageBreakdown:
     """La dépense de ce projet, ventilée par agent et par modèle."""
-    return await get_usage_breakdown(settings.ide_db_path, project_id)
+    return UsageBreakdown.model_validate(await get_usage_breakdown(settings.ide_db_path, project_id))
 
 
 @router.get("/{project_id}/branches/cleanup", response_model=PlanDeNettoyage)

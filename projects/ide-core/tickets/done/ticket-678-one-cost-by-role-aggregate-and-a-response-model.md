@@ -1,12 +1,13 @@
 ---
-id: ticket-678
-title: "One cost-by-role aggregate and a response model"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-678
+pr_number: 800
+priority: medium
+status: done
+title: One cost-by-role aggregate and a response model
+type: refactor
 ---
 
 # ticket-678 — Un agrégat de coût par rôle, un modèle de réponse
