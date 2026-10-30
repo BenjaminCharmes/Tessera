@@ -6608,3 +6608,4 @@ Le diff ajoute :
 - 2026-10-30 16:59:17 UTC — [ticket-713] testeur: délai dépassé (1500 s, durée réelle 3283 s) — ../scripts/verifier.py coupé après 3283 s
 - 2026-10-30 18:22:45 UTC — [ticket-713] testeur: délai dépassé (1500 s, durée réelle 5008 s) — ../scripts/verifier.py coupé après 5008 s
 - 2026-10-30 18:22:45 UTC — [ticket-713] BLOCKED — testeur: délai dépassé deux fois
+- 2026-10-30 18:22:57 UTC — [ide-core] file interrompue : ticket-713 non approuvé
