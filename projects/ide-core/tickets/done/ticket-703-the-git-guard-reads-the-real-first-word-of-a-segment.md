@@ -1,14 +1,14 @@
 ---
-id: ticket-703
-title: "The git guard reads the real first word of a segment"
-type: fix
-status: todo
-pr_number: null
-priority: critical
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-30
+id: ticket-703
+pr_number: null
+priority: critical
+status: done
+title: The git guard reads the real first word of a segment
+type: fix
 ---
 
 # ticket-703 — Le garde git lit le premier mot réel d'un segment (C-01)

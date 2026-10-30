@@ -82,7 +82,10 @@ def _sous_commande_git(arguments: list[str]) -> str | None:
 
 def _segment_interdit(jetons_: list[str]) -> bool:
     """True si ce segment, une fois déballé, est un git ou un gh qui écrit."""
-    while jetons_:
+    while True:
+        jetons_ = lexique.sans_prefixe(jetons_)
+        if not jetons_:
+            return False
         nom = lexique.nom_de_commande(jetons_[0])
         if nom in lexique.SHELLS:
             ligne = lexique.ligne_derriere_c(jetons_)
@@ -99,7 +102,6 @@ def _segment_interdit(jetons_: list[str]) -> bool:
             premier = next((j.lower() for j in jetons_[1:] if not j.startswith("-")), None)
             return premier in _SOUS_COMMANDES_GH_INTERDITES
         return False
-    return False
 
 
 def commande_git_interdite(commande: str) -> bool:

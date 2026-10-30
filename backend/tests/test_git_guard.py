@@ -203,3 +203,44 @@ def test_le_durcissement_ne_refuse_pas_la_lecture(commande: str) -> None:
     # durcissement porte sur la *forme* d'appel, pas sur ce que git a le droit
     # de faire : lire reste lire, même derrière un `sh -c`.
     assert commande_git_interdite(commande) is False
+
+
+@pytest.mark.parametrize("commande", ["FOO=bar git push", "A=1 B=2 git commit -m x"])
+def test_leading_assignment_is_skipped(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "if true; then git push; fi",
+        "for x in a; do git push; done",
+        "{ git push; }",
+        "! git push",
+    ],
+)
+def test_shell_keywords_are_skipped(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    ["cmd /c git push", 'powershell -Command "git push"', 'pwsh -c "git push"'],
+)
+def test_cmd_and_powershell_are_unwrapped(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "FOO=bar git status",
+        "then git log",
+        "cmd /c git status",
+        'pwsh -c "git diff"',
+        "FOO=bar",
+        "cmd /c",
+    ],
+)
+def test_reads_behind_an_assignment_still_pass(commande: str) -> None:
+    assert commande_git_interdite(commande) is False
