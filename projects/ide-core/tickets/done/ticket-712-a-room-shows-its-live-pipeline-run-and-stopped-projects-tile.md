@@ -1,14 +1,15 @@
 ---
-id: ticket-712
-title: "A server room shows the pipeline run live on its project"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-710"]
-estimated_days: 1
 created: 2026-10-30
+depends_on:
+- ticket-710
+estimated_days: 1
+id: ticket-712
+pr_number: 796
+priority: medium
+status: done
+title: A server room shows the pipeline run live on its project
+type: feat
 ---
 
 # ticket-712 — Une salle montre le run du pipeline en cours sur son projet, et les projets arrêtés deviennent des tuiles

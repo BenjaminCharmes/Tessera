@@ -6652,3 +6652,16 @@ Le diff ajoute :
 - 2026-10-30 19:40:31 UTC — [ticket-714] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés correctement. Le code ajoute (264375ms)
 - 2026-10-30 19:40:31 UTC — [ticket-714] APPROVED après 1 tour(s)
 - 2026-10-30 19:42:00 UTC — [ticket-714] documentation: 0 fichier(s) (84250ms)
+- 2026-10-30 19:49:34 UTC — [ide-core] ticket-714 PR #795 confiée au CIWatcher
+- 2026-10-30 19:49:37 UTC — [ticket-712] branche ticket-712-a-server-room-shows-the-pipeline-run-live-on-its
+- 2026-10-30 19:49:38 UTC — [ticket-712] tour 1 — codeur démarré
+- 2026-10-30 19:53:40 UTC — [ticket-712] tour 1 — codeur terminé (242203ms)
+- 2026-10-30 19:55:46 UTC — [ticket-712] testeur: OK (exit 0)
+- 2026-10-30 19:55:50 UTC — [ide-core] ticket-714 PR #795 mergée (CI verte)
+- 2026-10-30 19:57:34 UTC — [ticket-712] securite: PASS — Le diff ajoute l'affichage du run de pipeline actif dans les salles de projet. L (108530ms)
+- 2026-10-30 19:57:34 UTC — [ticket-712] tour 1 — reviewer démarré
+- 2026-10-30 19:57:50 UTC — [ticket-712] tour 1 — reviewer terminé (16139ms)
+- 2026-10-30 20:00:30 UTC — [ticket-712] validateur: fichiers cités joints : frontend/src/components/EnCoursView/SallesDesServeurs.test.tsx
+- 2026-10-30 20:00:30 UTC — [ticket-712] validateur: APPROVED — Les trois critères d'acceptation sont respectés : le code affiche correctement l (175641ms)
+- 2026-10-30 20:00:30 UTC — [ticket-712] APPROVED après 1 tour(s)
+- 2026-10-30 20:03:16 UTC — [ticket-712] documentation: 0 fichier(s) (161563ms)

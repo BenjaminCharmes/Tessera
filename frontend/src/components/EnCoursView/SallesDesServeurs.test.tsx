@@ -6,7 +6,9 @@ import { api } from "../../lib/api";
 import { lireActivite } from "../../lib/apiActivite";
 import { _viderCacheResource } from "../../hooks/useResource";
 import type { UseAppsEnCoursResult } from "../../hooks/useAppsEnCours";
-import type { AppEnCours, ServiceActif } from "../../types/api";
+import { runStore } from "../../hooks/runStore";
+import { INITIAL, type StreamState } from "../../hooks/streamState";
+import type { AppEnCours, RunActif, ServiceActif } from "../../types/api";
 
 function app(over: Partial<AppEnCours>): AppEnCours {
   return {
@@ -34,7 +36,33 @@ function service(over: Partial<ServiceActif>): ServiceActif {
   };
 }
 
-function rendre(apps: AppEnCours[] | null, arreterProjet = vi.fn().mockResolvedValue(undefined)) {
+function runOuvert(over: Partial<RunActif> = {}): RunActif {
+  return {
+    run_id: "run-1",
+    project_id: "alpha",
+    mode: "queue",
+    ticket_id: "ticket-059",
+    etape: "production",
+    agent: "codeur",
+    tour: 1,
+    tokens_entree: 0,
+    tokens_sortie: 0,
+    cout_usd: 0,
+    verdict: null,
+    demarre_a: "2026-10-13T11:00:00Z",
+    ...over,
+  };
+}
+
+function poserEtat(over: Partial<StreamState>, runId = "run-1"): void {
+  runStore.set(runId, { ...INITIAL, ...over });
+}
+
+function rendre(
+  apps: AppEnCours[] | null,
+  arreterProjet = vi.fn().mockResolvedValue(undefined),
+  runs: RunActif[] = [],
+) {
   const etat: UseAppsEnCoursResult = {
     apps,
     lueA: Date.parse("2026-10-13T12:00:00Z"),
@@ -46,7 +74,7 @@ function rendre(apps: AppEnCours[] | null, arreterProjet = vi.fn().mockResolvedV
     enArret: () => false,
     enLancement: () => false,
   };
-  return render(<EnCoursView appsEnCours={etat} />);
+  return render(<EnCoursView appsEnCours={etat} runs={runs} />);
 }
 
 const SPRITES_DU_BUREAU = ["fenetre", "plante", "porte", "etagere"];
@@ -61,6 +89,7 @@ function salles(): HTMLElement[] {
 }
 
 beforeEach(() => {
+  runStore.reset();
   _viderCacheResource();
   vi.spyOn(api.projects, "overview").mockResolvedValue([]);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
@@ -186,6 +215,56 @@ describe("server rooms — one per project (ticket-710)", () => {
     expect(screen.getByRole("button", { name: "Arrêter api" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Salles" }));
     expect(salles()).toHaveLength(1);
+  });
+});
+
+describe("the pipeline run shown in the room (ticket-712)", () => {
+  it("shows the ticket and the agent at work on the project's room, none without a run", () => {
+    poserEtat({ ticketId: "ticket-059", currentAgent: "codeur" });
+    const { unmount } = rendre([app({})], undefined, [runOuvert()]);
+
+    const salle = screen.getByRole("article", { name: /Alpha/ });
+    const poste = salle.querySelector("[data-poste-de-file]") as HTMLElement;
+    expect(within(poste).getByText("ticket-059")).toBeInTheDocument();
+    expect(within(poste).getByText("Codeur")).toBeInTheDocument();
+    expect(poste.querySelector("[data-sprite='agent-de-produit']")).toHaveAttribute("data-etat", "actif");
+    expect(salle.querySelector("[data-badge-de-file]")).toHaveTextContent("ticket-059");
+    unmount();
+
+    rendre([app({})]);
+    expect(document.querySelector("[data-poste-de-file]")).toBeNull();
+    expect(document.querySelector("[data-badge-de-file]")).toBeNull();
+  });
+
+  it("writes the queue position in the badge, and the bare ticket id outside a queue", () => {
+    poserEtat({ ticketId: "ticket-059", currentAgent: "reviewer", queue: { index: 3, total: 6 } });
+    const { unmount } = rendre([app({})], undefined, [runOuvert()]);
+    expect(document.querySelector("[data-badge-de-file]")).toHaveTextContent("File 3/6 · ticket-059");
+    unmount();
+
+    runStore.reset();
+    poserEtat({ ticketId: "ticket-060", currentAgent: "codeur" });
+    rendre([app({})], undefined, [runOuvert()]);
+    expect(document.querySelector("[data-badge-de-file]")).toHaveTextContent(/^ticket-060$/);
+  });
+
+  it("ignores the run of another project and a run already closed", () => {
+    poserEtat({ ticketId: "ticket-059", currentAgent: "codeur" });
+    const { unmount } = rendre([app({})], undefined, [runOuvert({ project_id: "beta" })]);
+    expect(document.querySelector("[data-poste-de-file]")).toBeNull();
+    unmount();
+
+    poserEtat({ ticketId: "ticket-059", currentAgent: null, runClosed: true });
+    rendre([app({})], undefined, [runOuvert()]);
+    expect(document.querySelector("[data-poste-de-file]")).toBeNull();
+  });
+
+  it("falls back on the live run's ticket while the run store is empty, the desk waiting", () => {
+    rendre([app({})], undefined, [runOuvert({ ticket_id: "ticket-061" })]);
+
+    expect(document.querySelector("[data-badge-de-file]")).toHaveTextContent("ticket-061");
+    const poste = document.querySelector("[data-poste-de-file]") as HTMLElement;
+    expect(within(poste).getByText("En attente")).toBeInTheDocument();
   });
 });
 

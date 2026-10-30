@@ -171,7 +171,7 @@ export default function CenterView({
       />
     );
   } else if (panel === "running") {
-    content = <EnCoursView appsEnCours={appsEnCours} />;
+    content = <EnCoursView appsEnCours={appsEnCours} runs={supervision.runs} />;
   } else if (panel === "projects") {
     // Choisir un projet se fait en les voyant : une carte chacun (ticket-399).
     content = (
