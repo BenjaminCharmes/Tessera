@@ -10,7 +10,9 @@ import Climatiseur from "../../design/bureau/Climatiseur";
 import BoucheVMC, { type RegimeVMC } from "../../design/bureau/BoucheVMC";
 import Extincteur from "../../design/bureau/Extincteur";
 import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
-import type { ServiceActif } from "../../types/api";
+import type { RunActif, ServiceActif } from "../../types/api";
+import { useEtatRun } from "../../hooks/runStore";
+import PosteDeFile, { BadgeDeFile, type RunDeSalle } from "./PosteDeFile";
 import AgentsDeProduit, { type AgentDuService } from "./AgentsDeProduit";
 import ArretDuProjet from "./ArretDuProjet";
 import BaieAvecFiche from "./BaieAvecFiche";
@@ -26,11 +28,23 @@ interface SalleDeProjetProps {
   lueA: number;
   /** Les agents que le produit déclare, tous services confondus ; vide, personne. */
   agents: readonly AgentDuService[];
+  /** Le run de pipeline ouvert sur ce projet, s'il y en a un (ticket-712). */
+  run?: RunActif;
   enArret: boolean;
   onArreterProjet: () => void;
 }
 
 const AUCUN: ServiceActif[] = [];
+
+/**
+ * Ce que la salle montre du run : le store porte le ticket, la file et l'agent ;
+ * le run vivant ne sert qu'en repli, pour son ticket, tant que le store est vide.
+ * Un run clos n'est plus au travail : rien ne se dessine.
+ */
+function runDeLaSalle(run: RunActif | undefined, etat: ReturnType<typeof useEtatRun>): RunDeSalle | null {
+  if (run === undefined || etat.runClosed) return null;
+  return { ticketId: etat.ticketId ?? run.ticket_id, agent: etat.currentAgent, queue: etat.queue };
+}
 
 /** La VMC tourne si un service tourne, plus vite avec la mémoire du projet (ADR-058). */
 function regimeDeLaVMC(enCours: boolean, memoireMo: number): RegimeVMC {
@@ -45,7 +59,9 @@ function regimeDeLaVMC(enCours: boolean, memoireMo: number): RegimeVMC {
  * sortie ; un clic la déplie en journal. Le mobilier ne porte aucun état (ADR-058) :
  * seuls les voyants, les écrans et les agents rendent des données.
  */
-export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreterProjet }: SalleDeProjetProps) {
+export default function SalleDeProjet({ groupe, lueA, agents, run, enArret, onArreterProjet }: SalleDeProjetProps) {
+  const etatDuRun = useEtatRun(run?.run_id ?? "");
+  const fileEnCours = runDeLaSalle(run, etatDuRun);
   const fetcher = useMemo(
     () => () => api.services.list(groupe.project_id),
     // `lueA` change l'identité du fetcher exprès : c'est la clé de la requête.
@@ -87,6 +103,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
         <span className="text-xs text-zinc-400">
           {baies.length} service{baies.length > 1 ? "s" : ""} · {formaterMo(groupe.memoire_mo)}
         </span>
+        {fileEnCours && <BadgeDeFile run={fileEnCours} />}
         <span className="ml-auto flex flex-wrap items-center gap-2">
           {ports.map(({ port, service }) => (
             <a
@@ -133,6 +150,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
               <BaieAvecFiche key={baie.nom} baie={baie} app={groupe.apps.find((a) => a.nom === baie.nom)} />
             ))}
           </span>
+          {fileEnCours && <PosteDeFile projectId={groupe.project_id} run={fileEnCours} />}
           <AgentsDeProduit
             projectId={groupe.project_id}
             agents={agents}

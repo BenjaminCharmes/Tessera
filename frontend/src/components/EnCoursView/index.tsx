@@ -3,7 +3,7 @@ import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import type { UseAppsEnCoursResult } from "../../hooks/useAppsEnCours";
-import type { ProjectOverview } from "../../types/api";
+import type { ProjectOverview, RunActif } from "../../types/api";
 import RegionTitle from "../../design/RegionTitle";
 import EnTeteGroupe from "./EnTeteGroupe";
 import LigneApp from "./LigneApp";
@@ -21,11 +21,14 @@ const VUES: OptionVue<VueEnCours>[] = [
 
 interface EnCoursViewProps {
   appsEnCours: UseAppsEnCoursResult;
+  /** Les runs vivants de la supervision : une salle montre celui de son projet (ticket-712). */
+  runs?: readonly RunActif[];
   /** La vue ouverte au départ : les salles, la liste restant au clavier et au lecteur d'écran. */
   vueInitiale?: VueEnCours;
 }
 
 const AUCUN: ProjectOverview[] = [];
+const AUCUN_RUN: readonly RunActif[] = [];
 const lireProjets = () => api.projects.overview();
 
 function Message({ texte }: { texte: string }) {
@@ -38,7 +41,7 @@ function Message({ texte }: { texte: string }) {
  * Vue globale, comme la supervision : elle ne dépend d'aucun projet actif.
  * L'état vient du cockpit (`useAppsEnCours`), qui relit toutes les 10 s.
  */
-export default function EnCoursView({ appsEnCours, vueInitiale = "salles" }: EnCoursViewProps) {
+export default function EnCoursView({ appsEnCours, runs = AUCUN_RUN, vueInitiale = "salles" }: EnCoursViewProps) {
   const { apps, lueA, erreur, arreter, arreterProjet, lancer, enArret, enLancement } =
     appsEnCours;
   const { data: projets } = useResource(lireProjets, AUCUN);
@@ -80,6 +83,7 @@ export default function EnCoursView({ appsEnCours, vueInitiale = "salles" }: EnC
         <SallesDesServeurs
           apps={apps}
           lueA={lueA}
+          runs={runs}
           enArret={enArret}
           onArreterProjet={(id, groupe) => void arreterProjet(id, groupe)}
         />
