@@ -6671,3 +6671,18 @@ Le diff ajoute :
 - 2026-10-30 20:40:20 UTC — [ticket-724] validateur: APPROVED — Le ticket-724 livre l'intégration complète de la gestion des descriptions de pro (368453ms)
 - 2026-10-30 20:40:20 UTC — [ticket-724] APPROVED après 2 tour(s)
 - 2026-10-30 20:42:49 UTC — [ticket-724] documentation: 0 fichier(s) (143563ms) — après tour de correction
+- 2026-10-30 20:53:29 UTC — [ticket-675] branche ticket-675-one-reader-for-the-agents-json-manifest
+- 2026-10-30 20:53:30 UTC — [ticket-675] tour 1 — codeur démarré
+- 2026-10-30 21:03:39 UTC — [ticket-675] tour 1 — codeur terminé (609078ms)
+- 2026-10-30 21:09:09 UTC — [ticket-675] testeur: 1 failed, 2026 passed, 64 warnings in 325.69s (0:05:25)
+- 2026-10-30 21:09:09 UTC — [ticket-675] tests rouges au tour 1
+- 2026-10-30 21:09:09 UTC — [ticket-675] tour 2 — codeur démarré
+- 2026-10-30 21:11:06 UTC — [ticket-675] tour 2 — codeur terminé (117125ms)
+- 2026-10-30 21:18:24 UTC — [ticket-675] testeur: OK (exit 0)
+- 2026-10-30 21:21:03 UTC — [ticket-675] securite: PASS — Centralisation sécurisée de la lecture/écriture de `agents.json` dans un nouveau (158843ms)
+- 2026-10-30 21:21:03 UTC — [ticket-675] tour 2 — reviewer démarré
+- 2026-10-30 21:21:50 UTC — [ticket-675] tour 2 — reviewer terminé (46436ms)
+- 2026-10-30 21:26:03 UTC — [ticket-675] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 21:27:15 UTC — [ticket-675] validateur: fichiers cités joints : agents.json, git_link.py
+- 2026-10-30 21:27:15 UTC — [ticket-675] validateur: APPROVED — Le refactoring centralise avec succès les 30+ lectures de `agents.json` dans un  (371391ms)
+- 2026-10-30 21:27:15 UTC — [ticket-675] APPROVED après 2 tour(s)
