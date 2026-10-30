@@ -67,7 +67,8 @@ export function nomDeLAgent(projet: string, role: RoleAffiche): string {
  * Le personnel des salles communes : une personne chacun, un prénom fixe. Hors de
  * `PRENOMS`, pour ne jamais se confondre avec un agent de projet.
  */
-export const NOM_DU_DIRECTEUR = "Victor";
+/** Le directeur, c'est Benjamin lui-même : il s'appelle Ben (30/10). */
+export const NOM_DU_DIRECTEUR = "Ben";
 export const NOM_DES_RH = "Hélène";
 
 /**
