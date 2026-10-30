@@ -4,7 +4,7 @@ created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-713
-pr_number: null
+pr_number: 793
 priority: high
 status: done
 title: A merge request that times out rereads the PR before stopping the delivery
