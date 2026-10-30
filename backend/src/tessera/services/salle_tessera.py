@@ -3,17 +3,19 @@
 La salle ne lit que ce que le backend sait déjà : la sonde système de
 l'inventaire (ticket-416) pour ses propres processus, le disjoncteur d'Ollama
 (ticket-380), le registre des runs (ADR-041), le CIWatcher (ADR-051), la fin de
-`tessera.log`, la taille de la base et le dossier des worktrees (ADR-056).
+`tessera.log`, la taille de la base, les agents qui tournent et les runs du jour.
 
 Le journal est réduit à son événement : un message de log peut porter un chemin
 ou une commande, et la salle n'en a pas besoin pour dire « ça tourne ».
 """
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from collections.abc import Callable
 from typing import Any
+
+import aiosqlite
 
 from tessera.models.salle_tessera import (
     EtatOllama,
@@ -47,6 +49,12 @@ def _processus(
     return ProcessusDeTessera(
         nom=nom, port=port, pid=pid, memoire_mo=memoire_mo(membres, procs), demarre_a=_iso(info.demarre_a)
     )
+
+
+def agents_en_cours(moi: int, procs: dict[int, InfoProcessus]) -> int:
+    """The `claude` processes the backend launched: one per agent at work."""
+    descendants = arbre(moi, enfants_par_parent(procs)) - {moi}
+    return sum(1 for pid in descendants if pid in procs and "claude" in procs[pid].commande.lower())
 
 
 async def processus_de_tessera(sonde: SondeSysteme) -> list[ProcessusDeTessera]:
@@ -125,11 +133,19 @@ def ci_en_attente(projets: list[str], en_attente: Callable[[str], tuple[str, ...
     return {p: tuple(sorted(t)) for p in projets if (t := en_attente(p))}
 
 
-def nombre_de_worktrees(racine: Path) -> int:
-    """Run worktrees live at `<racine>/<projet>/<ticket>` (ADR-056)."""
-    if not racine.is_dir():
+async def runs_du_jour(base: Path, maintenant: datetime | None = None) -> int:
+    """Pipeline runs started since local midnight ; 0 when the base cannot be read."""
+    instant = (maintenant or datetime.now()).astimezone()
+    minuit = instant.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
+    try:
+        async with aiosqlite.connect(base) as db:
+            curseur = await db.execute(
+                "SELECT COUNT(*) FROM pipeline_runs WHERE started_at >= ?", (minuit.isoformat(),)
+            )
+            ligne = await curseur.fetchone()
+    except (aiosqlite.Error, OSError):
         return 0
-    return sum(1 for projet in racine.iterdir() if projet.is_dir() for wt in projet.iterdir() if wt.is_dir())
+    return int(ligne[0]) if ligne else 0
 
 
 async def salle_tessera(
@@ -142,15 +158,16 @@ async def salle_tessera(
     journal: Path,
     lignes_du_journal: int = LIGNES_DU_JOURNAL,
     base: Path,
-    worktrees: Path,
 ) -> SalleTessera:
     """The room, assembled from facts read now."""
+    procs = await sonde.processus()
     return SalleTessera(
         processus=await processus_de_tessera(sonde),
+        agents=agents_en_cours(os.getpid(), procs),
+        runs_du_jour=await runs_du_jour(base),
         ollama=EtatOllama(url=ollama_url, refroidissement_s=refroidissement_s),
         runs=runs_vivants(instantane),
         ci_en_attente={p: list(t) for p, t in ci_en_attente.items()},
         journal=fin_du_journal(journal, lignes_du_journal),
         base_mo=taille_mo(base),
-        worktrees=nombre_de_worktrees(worktrees),
     )

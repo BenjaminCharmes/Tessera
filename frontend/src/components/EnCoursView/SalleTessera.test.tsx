@@ -29,7 +29,8 @@ function salle(over: Partial<SalleTessera> = {}): SalleTessera {
       { ts: "2026-10-30T14:17:10Z", niveau: "ERROR", evenement: "livraison_echouee", ticket_id: null, role: null },
     ],
     base_mo: 122,
-    worktrees: 2,
+    agents: 3,
+    runs_du_jour: 14,
     ...over,
   };
 }
@@ -90,7 +91,7 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(screen.getByRole("group", { name: "Ollama : en refroidissement" })).toBeInTheDocument();
   });
 
-  it("reads the weekly quota, the database size and the open worktrees", async () => {
+  it("reads the quota, the agents at work, today's runs and the database size", async () => {
     vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
     rendre();
 
@@ -99,7 +100,8 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(within(affiches).getByText(/remis à zéro/)).toBeInTheDocument();
     expect(within(affiches).getByText("pas de relevé")).toBeInTheDocument();
     expect(screen.getByText("tessera.db 122,0 Mo")).toBeInTheDocument();
-    expect(screen.getByText("2 worktrees ouverts")).toBeInTheDocument();
+    expect(screen.getByText("3 agents au travail")).toHaveClass("text-blue-300");
+    expect(screen.getByText("14 runs aujourd'hui")).toBeInTheDocument();
   });
 
   it("says so on a screen that has nothing to show", async () => {

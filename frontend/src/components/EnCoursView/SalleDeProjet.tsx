@@ -82,7 +82,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
       className={`flex flex-col overflow-hidden rounded-lg border bg-(--sprite-salle-mur) ${tombe ? "border-red-800" : "border-zinc-800"}`}
     >
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-900/60 px-3 py-2">
-        <IconeDuProjet projet={apercu ?? { id: groupe.project_id, name: groupe.project_name, icon: false }} taille="tuile" />
+        <IconeDuProjet projet={apercu ?? { id: groupe.project_id, name: groupe.project_name, icon: false }} taille="titre" />
         <h3 className="text-sm font-semibold text-zinc-100">{groupe.project_name}</h3>
         <span className="text-xs text-zinc-400">
           {baies.length} service{baies.length > 1 ? "s" : ""} · {formaterMo(groupe.memoire_mo)}

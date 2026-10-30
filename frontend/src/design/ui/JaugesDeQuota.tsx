@@ -30,7 +30,7 @@ interface JaugesDeQuotaProps {
 export default function JaugesDeQuota({ fenetres, variante = "carte" }: JaugesDeQuotaProps) {
   const police = variante === "affiche" ? "font-mono text-micro" : "text-xs";
   return (
-    <ul className={`flex flex-col gap-2 ${police} text-zinc-200`} aria-label="Quota de l'abonnement">
+    <ul className={`flex flex-col ${variante === "affiche" ? "gap-1" : "gap-2"} ${police} text-zinc-200`} aria-label="Quota de l'abonnement">
       {FENETRES.map(({ cle, libelle }) => {
         const releve = fenetres?.[cle];
         const part = releve ? Math.round(releve.utilization * 100) : null;

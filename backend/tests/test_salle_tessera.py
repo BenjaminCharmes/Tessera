@@ -5,21 +5,25 @@ La sonde est un faux, le journal et le dossier des worktrees sont écrits dans
 """
 import json
 import os
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import aiosqlite
 from fastapi.testclient import TestClient
 
 from tessera.main import app
+from tessera.services.database import init_db
 from tessera.routers.services_running import get_sonde
 from tessera.services.providers import ollama
 from tessera.services.salle_tessera import (
     PORT_DU_FRONTEND,
     ci_en_attente,
     fin_du_journal,
-    nombre_de_worktrees,
+    agents_en_cours,
     processus_de_tessera,
     runs_vivants,
+    runs_du_jour,
     salle_tessera,
     taille_mo,
 )
@@ -90,13 +94,33 @@ def test_a_missing_log_gives_no_line(tmp_path: Path) -> None:
     assert fin_du_journal(tmp_path / "absent.log") == []
 
 
-def test_worktrees_are_counted_per_project_and_ticket(tmp_path: Path) -> None:
-    (tmp_path / "curio" / "ticket-070").mkdir(parents=True)
-    (tmp_path / "ide-core" / "ticket-718").mkdir(parents=True)
-    (tmp_path / "ide-core" / "ticket-719").mkdir(parents=True)
+def test_running_agents_are_the_claude_processes_under_the_backend() -> None:
+    moi = os.getpid()
+    procs = {
+        moi: _info(1, 1.0),
+        10: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande="C:/outils/claude.exe --print"),
+        11: InfoProcessus(ppid=10, memoire_mo=1.0, demarre_a=None, commande="node claude-code/cli.js"),
+        12: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande="git status"),
+        13: InfoProcessus(ppid=1, memoire_mo=1.0, demarre_a=None, commande="claude.exe"),
+    }
 
-    assert nombre_de_worktrees(tmp_path) == 3
-    assert nombre_de_worktrees(tmp_path / "absent") == 0
+    assert agents_en_cours(moi, procs) == 2
+
+
+async def test_runs_of_the_day_count_since_local_midnight(tmp_path: Path) -> None:
+    base = tmp_path / "tessera.db"
+    await init_db(base)
+    maintenant = datetime.now(timezone.utc)
+    async with aiosqlite.connect(base) as db:
+        for i, depuis in enumerate([maintenant, maintenant - timedelta(days=3)]):
+            await db.execute(
+                "INSERT INTO pipeline_runs (id, ticket_id, project_id, started_at) VALUES (?, ?, ?, ?)",
+                (f"r{i}", "ticket-1", "p", depuis.isoformat()),
+            )
+        await db.commit()
+
+    assert await runs_du_jour(base) == 1
+    assert await runs_du_jour(tmp_path / "absent" / "x.db") == 0
 
 
 def test_database_size_is_in_megabytes(tmp_path: Path) -> None:
@@ -136,7 +160,6 @@ async def test_the_room_assembles_every_fact(tmp_path: Path) -> None:
         refroidissement_s=12.0,
         journal=tmp_path / "absent.log",
         base=tmp_path / "absent.db",
-        worktrees=tmp_path,
     )
 
     assert salle.ollama.refroidissement_s == 12.0
@@ -152,7 +175,7 @@ def test_the_route_answers_with_the_room() -> None:
         app.dependency_overrides.pop(get_sonde, None)
 
     assert reponse.status_code == 200
-    assert set(reponse.json()) == {"processus", "ollama", "runs", "ci_en_attente", "journal", "base_mo", "worktrees"}
+    assert set(reponse.json()) == {"processus", "ollama", "runs", "ci_en_attente", "journal", "base_mo", "agents", "runs_du_jour"}
 
 
 def test_the_route_bounds_the_journal_length() -> None:

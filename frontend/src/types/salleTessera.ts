@@ -32,5 +32,8 @@ export interface SalleTessera {
   ci_en_attente: Record<string, string[]>;
   journal: LigneDeJournal[];
   base_mo: number;
-  worktrees: number;
+  /** Les processus `claude` lancés par le backend : un par agent au travail. */
+  agents: number;
+  /** Les runs du pipeline démarrés depuis minuit. */
+  runs_du_jour: number;
 }

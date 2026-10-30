@@ -54,4 +54,7 @@ class SalleTessera(BaseModel):
     ci_en_attente: dict[str, list[str]]
     journal: list[LigneDeJournal]
     base_mo: float
-    worktrees: int
+    #: The `claude` processes the backend launched: one per agent at work.
+    agents: int
+    #: Pipeline runs started since local midnight.
+    runs_du_jour: int

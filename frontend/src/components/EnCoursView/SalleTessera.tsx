@@ -78,7 +78,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
   return (
     <article aria-label="Salle Tessera" data-salle-tessera className="mb-4 overflow-hidden rounded-lg border border-violet-800 bg-(--sprite-salle-mur)">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-900/60 px-3 py-2">
-        <IconeDuProjet projet={apercu ?? { id: "ide-core", name: nom, icon: false }} taille="tuile" />
+        <IconeDuProjet projet={apercu ?? { id: "ide-core", name: nom, icon: false }} taille="titre" />
         <h3 className="text-sm font-semibold text-zinc-100">{nom}</h3>
         <span className="text-xs text-zinc-400">
           {salle.processus.length} services · {formaterMo(memoire)} · démarré à {formaterHeure(debut)}
@@ -94,17 +94,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
           deplie={deplie}
           onBasculer={(ecran) => setDeplie((avant) => (avant === ecran ? null : ecran))}
         />
-        {/* Les compteurs sont des affiches punaisées au mur, au-dessus du mobilier. */}
-        <div data-affiches className="mt-5 flex flex-wrap justify-center gap-4">
-          <Compteur titre="QUOTA DE L'ABONNEMENT">
-            <JaugesDeQuota fenetres={fenetres} variante="affiche" />
-          </Compteur>
-          <Compteur titre="BASE · WORKTREES">
-            <div>tessera.db {formaterMo(salle.base_mo)}</div>
-            <div>{salle.worktrees} worktree{salle.worktrees > 1 ? "s" : ""} ouvert{salle.worktrees > 1 ? "s" : ""}</div>
-          </Compteur>
-        </div>
-        <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
           <span className="flex items-end gap-4">
             {salle.processus.map((p) => (
               <BaieAvecFiche
@@ -127,6 +117,21 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
                 <BaieGpu etat={refroidi ? "refroidissement" : "disponible"} />
               </Agrandi>
             </AvecInfobulle>
+          </span>
+          {/* Les compteurs sont des affiches punaisées au mur, un peu au-dessus du sol : la salle ne grandit pas. */}
+          <span data-affiches className="mb-8 flex flex-wrap items-end justify-center gap-4">
+            <Compteur titre="QUOTA DE L'ABONNEMENT">
+              <JaugesDeQuota fenetres={fenetres} variante="affiche" />
+            </Compteur>
+            <Compteur titre="ACTIVITÉ">
+              <div className={salle.agents > 0 ? "text-blue-300" : undefined}>
+                {salle.agents} agent{salle.agents > 1 ? "s" : ""} au travail
+              </div>
+              <div>
+                {salle.runs_du_jour} run{salle.runs_du_jour > 1 ? "s" : ""} aujourd&apos;hui
+              </div>
+              <div className="text-zinc-400">tessera.db {formaterMo(salle.base_mo)}</div>
+            </Compteur>
           </span>
           <span className="flex items-end gap-4">
             <span className="self-start">

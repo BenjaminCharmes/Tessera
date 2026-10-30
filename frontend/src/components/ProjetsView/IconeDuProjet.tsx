@@ -5,11 +5,11 @@ import type { ProjectOverview } from "../../types/api";
 
 interface IconeDuProjetProps {
   projet: Pick<ProjectOverview, "id" | "name" | "icon">;
-  /** `carte` pour la vue Projets, `tuile` pour les projets arrêtés (ticket-721). */
-  taille?: "carte" | "tuile";
+  /** `carte` pour la vue Projets, `tuile` pour les projets arrêtés (ticket-721), `titre` à côté d'un nom de salle (ticket-726). */
+  taille?: "carte" | "tuile" | "titre";
 }
 
-const DIMENSION = { carte: "size-10 text-base", tuile: "size-7 text-sm" } as const;
+const DIMENSION = { carte: "size-10 text-base", tuile: "size-7 text-sm", titre: "size-5 text-micro" } as const;
 
 /** Carré d'icône : l'icône du projet, ou à défaut son initiale. Partagé par la vue Projets et « En cours ». */
 export default function IconeDuProjet({ projet, taille = "carte" }: IconeDuProjetProps) {

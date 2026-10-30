@@ -33,5 +33,4 @@ async def lire_la_salle(
         journal=settings.ide_log_file,
         lignes_du_journal=journal,
         base=settings.ide_db_path,
-        worktrees=settings.ide_worktrees_dir,
     )
