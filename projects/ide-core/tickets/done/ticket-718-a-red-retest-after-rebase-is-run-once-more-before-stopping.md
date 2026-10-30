@@ -4,7 +4,7 @@ created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
 id: ticket-718
-pr_number: null
+pr_number: 789
 priority: high
 status: done
 title: A red retest after rebase runs once more before stopping the delivery
