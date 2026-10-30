@@ -10,7 +10,8 @@ import BoucheVMC from "../../design/bureau/BoucheVMC";
 import CheminDeCables from "../../design/bureau/CheminDeCables";
 import Extincteur from "../../design/bureau/Extincteur";
 import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
-import type { AppEnCours } from "../../types/api";
+import { api } from "../../lib/api";
+import type { AppEnCours, RecentRun } from "../../types/api";
 import type { ProcessusDeTessera, SalleTessera as Salle } from "../../types/salleTessera";
 import AvecInfobulle from "../BureauView/AvecInfobulle";
 import JaugesDeQuota from "../../design/ui/JaugesDeQuota";
@@ -29,6 +30,8 @@ interface SalleTesseraProps {
 }
 
 const LIGNES_DU_JOURNAL_DEPLIE = 100;
+const DERNIERS_RUNS = 20;
+const AUCUN_RUN: RecentRun[] = [];
 
 /** Un processus de Tessera vu comme une app, pour la fiche partagée avec les autres salles. */
 function commeUneApp(p: ProcessusDeTessera): AppEnCours {
@@ -68,6 +71,10 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
     [deplie, lueA],
   );
   const { data: detaillee } = useResource<Salle | null>(lireLeJournal, null);
+  // Les derniers runs, tous projets, relus avec l'inventaire.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const lireLesDerniers = useMemo(() => () => api.usage.recentRuns(7, null, DERNIERS_RUNS, ""), [lueA]);
+  const { data: derniers } = useResource<RecentRun[]>(lireLesDerniers, AUCUN_RUN, { projet: "ide-core", ressource: "derniers-runs" });
   const fenetres = useQuotaLu(lueA);
   const apercu = useApercuDuProjet("ide-core");
   if (salle === null) return null;
@@ -91,6 +98,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         </div>
         <EcransDeTessera
           salle={salle}
+          derniers={derniers}
           deplie={deplie}
           onBasculer={(ecran) => setDeplie((avant) => (avant === ecran ? null : ecran))}
         />
@@ -149,7 +157,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         </div>
       </div>
       <SolDeSalle />
-      {deplie && <DetailDeTessera ecran={deplie} salle={deplie === "journal" ? (detaillee ?? salle) : salle} onFermer={fermer} />}
+      {deplie && <DetailDeTessera ecran={deplie} salle={deplie === "journal" ? (detaillee ?? salle) : salle} derniers={derniers} onFermer={fermer} />}
     </article>
   );
 }

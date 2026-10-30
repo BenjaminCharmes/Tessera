@@ -1,22 +1,26 @@
 import Button from "../../design/ui/Button";
+import type { RecentRun } from "../../types/api";
 import type { SalleTessera } from "../../types/salleTessera";
-import { lignesDeLaCi, lignesDesRuns, lignesDuJournal, type EcranDeTessera } from "./lignesDeTessera";
+import { lignesDesDerniers, lignesDeLaCi, lignesDesRuns, lignesDuJournal, type EcranDeTessera } from "./lignesDeTessera";
 
 const TITRE: Record<EcranDeTessera, string> = {
   runs: "Runs en cours et leur file",
   ci: "PR que le CIWatcher attend",
   journal: "Fin de tessera.log",
+  derniers: "Derniers runs du pipeline (7 jours)",
 };
 
 const VIDE: Record<EcranDeTessera, string> = {
   runs: "Aucun run en cours.",
   ci: "Aucune PR en attente de CI ou de merge.",
   journal: "Journal vide.",
+  derniers: "Aucun run sur les 7 derniers jours.",
 };
 
 interface DetailDeTesseraProps {
   ecran: EcranDeTessera;
   salle: SalleTessera;
+  derniers: readonly RecentRun[];
   onFermer: () => void;
 }
 
@@ -26,13 +30,15 @@ interface DetailDeTesseraProps {
  * attente, ou les cent dernières lignes du journal. Échap le referme, quand le
  * focus est dedans, comme le journal d'un service.
  */
-export default function DetailDeTessera({ ecran, salle, onFermer }: DetailDeTesseraProps) {
+export default function DetailDeTessera({ ecran, salle, derniers, onFermer }: DetailDeTesseraProps) {
   const lignes =
     ecran === "runs"
       ? lignesDesRuns(salle, Number.POSITIVE_INFINITY)
       : ecran === "ci"
         ? lignesDeLaCi(salle)
-        : lignesDuJournal(salle.journal);
+        : ecran === "derniers"
+          ? lignesDesDerniers(derniers)
+          : lignesDuJournal(salle.journal);
   return (
     <section
       id="detail-tessera"

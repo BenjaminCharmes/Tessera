@@ -48,6 +48,10 @@ beforeEach(() => {
   _viderCacheResource();
   vi.spyOn(api.projects, "overview").mockResolvedValue([]);
   vi.spyOn(api.services, "list").mockResolvedValue([]);
+  vi.spyOn(api.usage, "recentRuns").mockResolvedValue([
+    { id: "r1", project_id: "ide-core", ticket_id: "ticket-677", started_at: "2026-10-30T14:17:00Z", finished_at: "2026-10-30T15:07:00Z", approved: true, final_status: "done", cost_usd: 6.22, input_tokens: 1, output_tokens: 1, duration_ms: 3_000_000 },
+    { id: "r2", project_id: "curio", ticket_id: "ticket-070", started_at: "2026-10-30T13:00:00Z", finished_at: "2026-10-30T13:40:00Z", approved: false, final_status: "blocked", cost_usd: 1.5, input_tokens: 1, output_tokens: 1, duration_ms: 2_400_000 },
+  ]);
   vi.mocked(lireActivite).mockResolvedValue([]);
   vi.spyOn(apiQuota, "fenetres").mockResolvedValue({
     windows: { seven_day: { status: "allowed_warning", utilization: 0.88, resets_at: "2026-10-31T13:00:00Z", observed_at: "2026-10-30T14:00:00Z" } },
@@ -154,6 +158,16 @@ describe("the Tessera server room (ticket-726)", () => {
     fireEvent.click(await screen.findByRole("button", { name: /CIWatcher/ }));
     fireEvent.keyDown(screen.getByRole("button", { name: "Fermer le détail" }), { key: "Escape" });
     expect(screen.queryByRole("region", { name: "PR que le CIWatcher attend" })).toBeNull();
+  });
+
+  it("shows the latest pipeline runs with their verdict, cost and duration", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
+    rendre();
+
+    expect(await screen.findByText("ide-core · ticket-677 · approuvé · 6,22 $ · 50 min")).toHaveClass("text-green-300");
+    expect(screen.getByText("curio · ticket-070 · refusé · 1,50 $ · 40 min")).toHaveClass("text-red-300");
+    expect(screen.getByText("1 / 2 approuvés")).toBeInTheDocument();
+    expect(vi.mocked(api.usage.recentRuns)).toHaveBeenCalledWith(7, null, 20, "");
   });
 });
 
