@@ -1263,6 +1263,8 @@ La boîte aux lettres devient cliquable quand la pull request existe : un clic l
 
 La baie de serveurs s'ouvre sur l'adresse que le service lancé a annoncée, si elle existe : un clic dans un nouvel onglet. Sinon, elle reste un meuble et le lancement se fait depuis l'en-tête du projet.
 
+Chaque bouton d'accès au service nomme le service qu'il ouvre — par exemple « Ouvrir backend :8026 » ou « Ouvrir frontend :5196 ». Cela évite toute ambiguïté quand plusieurs services tournent sur des ports différents.
+
 ## 5 quart. L'onglet Historique
 
 Tu consultes l'historique complet des runs de ton projet via l'onglet **Historique** (situé entre Tickets et Fichiers). Deux vues te permettent de naviguer dans cet historique.
