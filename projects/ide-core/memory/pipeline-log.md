@@ -6721,3 +6721,4 @@ Le diff ajoute :
 - 2026-10-30 22:30:21 UTC — [ticket-678] validateur: fichiers cités joints : aucun ; absents : usage/breakdown
 - 2026-10-30 22:30:21 UTC — [ticket-678] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code intègre une unique requ (131108ms)
 - 2026-10-30 22:30:21 UTC — [ticket-678] APPROVED après 2 tour(s)
+- 2026-10-30 22:32:25 UTC — [ticket-678] documentation: 0 fichier(s) (118000ms)
