@@ -1,14 +1,14 @@
 ---
-id: ticket-706
-title: "Tessera's .env and sibling project manifests are refused in writing"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-30
+id: ticket-706
+pr_number: null
+priority: high
+status: done
+title: Tessera's .env and sibling project manifests are refused in writing
+type: fix
 ---
 
 # ticket-706 — Le `.env` de Tessera et les manifestes voisins se refusent en écriture (C-04)

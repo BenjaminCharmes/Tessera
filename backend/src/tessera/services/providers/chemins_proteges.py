@@ -20,6 +20,7 @@ réel doit comprendre le refus, pas le contourner.
 from fnmatch import fnmatch
 from pathlib import Path
 
+from tessera.config import Settings
 from tessera.services.providers.script_verification import motif_du_script
 
 #: Ce que l'agent lit quand on lui refuse un chemin protégé.
@@ -32,12 +33,39 @@ PROTECTION_REFUS = (
 
 #: Le manifeste du projet : autonomie, racine git, mode des artefacts.
 _MANIFESTE = "agents.json"
+#: Les hooks git versionnés du dépôt, sous sa racine (ADR-050).
+_HOOKS_DU_DEPOT = Path("scripts") / "hooks"
 #: Le motif de fichier de réglages du CLI, sous `.claude/`.
 _REGLAGES_CLI = "settings*.json"
 #: Les consignes que le CLI charge dans chaque session (ticket-240).
 _CONSIGNES = {"CLAUDE.md", "CLAUDE.local.md"}
 #: Les dossiers de `.claude/` dont le CLI charge le contenu à la demande.
 _DOSSIERS_CLI = {"skills", "commands", "agents"}
+
+
+def _motif_du_depot(cible: Path, racine: Path) -> str | None:
+    """Ce que la racine d'écriture contient hors du projet, et qui porte une règle.
+
+    Sous `git_root: ancestor`, la racine est le dépôt entier : le `.env` de
+    Tessera, le manifeste d'un projet voisin et les hooks du dépôt y sont à
+    portée d'écriture (ticket-706).
+    """
+    if cible == Settings.env_file.resolve():
+        return (
+            "le `.env` de Tessera porte les jetons de mise en ligne et la liste "
+            "des termes interdits (ADR-050, ADR-053)"
+        )
+    if cible.name == _MANIFESTE and (cible.parent / "CLAUDE.md").is_file():
+        return (
+            "`agents.json` d'un projet déclare son autonomie, sa racine git et sa "
+            "confidentialité : un run ne change pas la politique d'un projet"
+        )
+    if cible.is_relative_to((racine / _HOOKS_DU_DEPOT).resolve()):
+        return (
+            "`scripts/hooks/` porte le hook `pre-push`, l'une des portes des "
+            "termes interdits (ADR-050)"
+        )
+    return None
 
 
 def motif_de_protection(
@@ -67,6 +95,10 @@ def motif_de_protection(
 
     if cible == (project_path / _MANIFESTE).resolve():
         return "`agents.json` déclare l'autonomie, la racine git et les artefacts du projet"
+
+    motif_depot = _motif_du_depot(cible, racine)
+    if motif_depot is not None:
+        return motif_depot
 
     motif_script = motif_du_script(cible, script)
     if motif_script is not None:
