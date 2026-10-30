@@ -1,15 +1,16 @@
 ---
-id: ticket-724
-title: "The documentation batch also keeps AGENTS.md and the project description current"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-708"]
-plan: true
-estimated_days: 1
 created: 2026-10-30
+depends_on:
+- ticket-708
+estimated_days: 1
+id: ticket-724
+plan: true
+pr_number: 797
+priority: medium
+status: done
+title: The documentation batch also keeps AGENTS.md and the project description current
+type: feat
 ---
 
 # ticket-724 — La documentation par lot tient aussi `AGENTS.md` et la description du projet à jour
