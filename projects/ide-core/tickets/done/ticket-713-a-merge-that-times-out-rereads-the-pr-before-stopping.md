@@ -1,14 +1,14 @@
 ---
-id: ticket-713
-title: "A merge request that times out rereads the PR before stopping the delivery"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-30
+id: ticket-713
+pr_number: 793
+priority: high
+status: done
+title: A merge request that times out rereads the PR before stopping the delivery
+type: fix
 ---
 
 # ticket-713 — Un merge qui expire relit la PR avant d'arrêter la livraison

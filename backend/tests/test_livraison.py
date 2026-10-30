@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 
+import httpx
 import pytest
 
 from tessera.config import settings
@@ -632,3 +633,86 @@ async def test_phase_1_exception_avant_la_pr_n_est_pas_enveloppee(
 
     with pytest.raises(TimeoutError):
         await _phase_1(svc)
+
+
+# ------------------------------------------------------------------
+# Un merge qui expire relit la PR avant d'arrêter — ticket-713
+# ------------------------------------------------------------------
+
+
+class _MergeQuiLache(_FauxWorkflow):
+    """Merge raising `erreur`; the reread answers `etat` or raises."""
+
+    def __init__(
+        self,
+        erreur: Exception,
+        etat: str = "open",
+        relecture_en_echec: bool = False,
+    ) -> None:
+        super().__init__()
+        self._erreur = erreur
+        self._etat = etat
+        self._relecture_en_echec = relecture_en_echec
+        self.relectures: list[int] = []
+
+    async def pr_state(self, pr_number: int) -> str:
+        self.relectures.append(pr_number)
+        if self._relecture_en_echec:
+            raise httpx.ConnectError("injoignable")
+        return self._etat
+
+    async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool:
+        self.merges.append(pr_number)
+        raise self._erreur
+
+
+def _refus_405() -> httpx.HTTPStatusError:
+    requete = httpx.Request("PUT", "https://api.github.com/repos/o/r/pulls/7/merge")
+    reponse = httpx.Response(405, request=requete)
+    return httpx.HTTPStatusError("405", request=requete, response=reponse)
+
+
+async def test_merge_timeout_on_a_merged_pr_ends_merged(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), etat="merged")
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is True
+    assert livraison.arret is None
+    assert workflow.relectures == [7]
+    assert any("confirmée après une erreur réseau" in e for e in livraison.etapes)
+
+
+async def test_merge_timeout_on_an_open_pr_stops(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), etat="open")
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert livraison.pr_number == 7
+    assert "ReadTimeout" in (livraison.arret or "")
+    assert "erreur réseau" in (livraison.arret or "")
+
+
+async def test_merge_timeout_and_failed_reread_stops(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), relecture_en_echec=True)
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert "ReadTimeout" in (livraison.arret or "")
+    assert workflow.relectures == [7]
+
+
+async def test_merge_refusal_is_not_reread(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(_refus_405(), etat="merged")
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert "refusé le merge" in (livraison.arret or "")
+    assert workflow.relectures == []

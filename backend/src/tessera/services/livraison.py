@@ -20,6 +20,7 @@ from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
 from tessera.services.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
 from tessera.services.livraison_arrets import arret_ci_illisible, arret_conflit
+from tessera.services.livraison_merge import arret_de_merge, tenter_le_merge, tete_a_change
 from tessera.services.livraison_rebase import noter_ce_que_le_rebase_a_fait
 from tessera.services.livraison_resultat import Livraison as Livraison
 from tessera.services.renumeroter import etape_de_numerotation
@@ -510,7 +511,7 @@ class LivraisonService:
         de la CI, et le merge y est lié (ticket-492).
         """
         if sha_attendu is not None:
-            arret_tete = await self._tete_a_change(pr_number, sha_attendu)
+            arret_tete = await tete_a_change(self._workflow, pr_number, sha_attendu)
             if arret_tete is not None:
                 return Livraison(
                     etapes=tuple(etapes),
@@ -519,44 +520,25 @@ class LivraisonService:
                     arret=arret_tete,
                 )
         t0 = time.monotonic()
-        if sha_attendu is None:
-            merged = await self._workflow.merge_si_la_ci_est_verte(pr_number)
-        else:
-            merged = await self._workflow.merge_si_la_ci_est_verte(
-                pr_number, sha_attendu=sha_attendu
-            )
+        issue = await tenter_le_merge(self._workflow, pr_number, sha_attendu)
         merge_ms = (time.monotonic() - t0) * 1000
-        if not merged:
+        if not issue.merged:
             return Livraison(
                 etapes=tuple(etapes),
                 durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
-                arret=f"GitHub a refusé le merge de la PR #{pr_number}.",
+                arret=arret_de_merge(pr_number, issue),
             )
-        etapes.append(f"PR #{pr_number} mergée")
+        etapes.append(
+            f"PR #{pr_number} mergée — confirmée après une erreur réseau"
+            if issue.confirme_apres_reseau
+            else f"PR #{pr_number} mergée"
+        )
         durees_ms.append(merge_ms)
         _logger.info("livraison_complete", extra={"ticket": ticket_id, "pr": pr_number})
         return Livraison(
             etapes=tuple(etapes), durees_ms=tuple(durees_ms),
             pr_number=pr_number, merged=True,
-        )
-
-    async def _tete_a_change(self, pr_number: int, sha_attendu: str) -> str | None:
-        """The stop line when the PR head is not `sha_attendu`, else None.
-
-        Fails closed (ADR-039): an unreadable head refuses the merge.
-        """
-        try:
-            tete = await self._workflow.tete_pr(pr_number)
-        except Exception as exc:  # noqa: BLE001 — une tête illisible refuse le merge
-            _logger.warning("tete_pr_illisible", extra={"erreur": str(exc)})
-            tete = None
-        if tete == sha_attendu:
-            return None
-        lue = tete[:7] if tete else "inconnue"
-        return (
-            f"la tête de la PR #{pr_number} n'est plus le commit poussé : "
-            f"{lue} au lieu de {sha_attendu[:7]}. La PR reste ouverte."
         )
 
     async def _attendre_la_ci(self, pr_number: int) -> str:
