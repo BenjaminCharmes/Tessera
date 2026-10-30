@@ -12,12 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Le garde git et `gh` n'admet que des lectures nommées.** Une
-  sous-commande absente de la liste blanche est refusée, options globales
-  lues avant elle ; `-c` n'accepte que des clés cosmétiques. Remplace la
-  liste noire de sous-commandes quand ticket C-03 de l'audit est livré.
-  (ADR-067, ADR-027)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
@@ -36,10 +30,11 @@ section. (ADR-055)
   Lire hors du projet reste permis, sauf le `.env` de Tessera. (ADR-031,
   ADR-053)
 - **Ne jamais émettre une commande git ou `gh` en écriture.** Le hook
-  `PreToolUse` refuse toute tournure — chemin, casse, enveloppe, alias.
-  Le git en lecture reste permis. `agents.json`, `.git/`,
+  `PreToolUse` n'admet que des lectures nommées : une sous-commande absente
+  de la liste blanche est refusée, options globales lues avant elle ; `-c`
+  n'accepte que des clés cosmétiques. `agents.json`, `.git/`,
   `.claude/settings*.json` et `.github/workflows/` se refusent aussi en
-  écriture. (ADR-027)
+  écriture. (ADR-067, ADR-027)
 - **Le script que `test_command` lance se refuse en écriture**, comme
   `agents.json` : le premier argument qui désigne un fichier existant, résolu
   depuis `pipeline.test_cwd`. Un diff qui touche la configuration des tests
