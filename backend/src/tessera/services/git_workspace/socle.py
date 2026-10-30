@@ -1,12 +1,12 @@
 """Shared state, command runner and repository identity checks."""
 
 import asyncio
-import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from tessera.services.git_runner import _dossier_sans_hooks
 from tessera.services.git_workspace.erreurs import GitCommandError, NotAGitRepository
+from tessera.services.manifeste import lire_valeur
 
 if TYPE_CHECKING:
     from tessera.services.politique_run import PolitiqueRun
@@ -111,14 +111,7 @@ class GitCore:
         """
         if self._politique is not None:
             return self._politique.dans_le_depot_parent
-        agents_json = self._project_path / "agents.json"
-        if not agents_json.is_file():
-            return False
-        try:
-            data = json.loads(agents_json.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            return False
-        return bool(data.get("git_root") == "ancestor")
+        return lire_valeur(self._project_path, "git_root") == "ancestor"
 
     async def _is_own_repository(self) -> bool:
         """True only if the project directory is itself the root of a repository.

@@ -21,12 +21,12 @@ ce que ce module garantit. Ce qui ne se lit pas avec certitude passe, plutôt
 que de refuser une commande légitime : un faux refus coûte à l'agent son moyen
 de vérifier son travail.
 """
-import json
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
+from tessera.services.manifeste import lire_valeur
 from tessera.services.providers.chemins_proteges import (
     INTERPRETE_PROTEGE_REFUS,
     motif_de_protection,
@@ -69,14 +69,7 @@ def racine_autorisee(project_path: Path) -> Path:
     fichier illisible ne désarme rien.
     """
     racine = project_path.resolve()
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return racine
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return racine
-    if data.get("git_root") == "ancestor":
+    if lire_valeur(project_path, "git_root") == "ancestor":
         return _depot_contenant(racine)
     return racine
 

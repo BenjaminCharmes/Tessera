@@ -8,7 +8,6 @@ aucune commande git.
 from __future__ import annotations
 
 import asyncio
-import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +16,7 @@ from pydantic import BaseModel
 
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
+from tessera.services.manifeste import lire_valeur
 from tessera.services.online_declaration import StripeMode, read_online_declaration
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.ticket_service import _STATUS_DIRS
@@ -115,11 +115,7 @@ def _racine_ancestrale(project_path: Path) -> Path | None:
     Le projet bootstrap (ide-core) vit dans `projects/ide-core/` : son app est
     l'IDE lui-même, dont l'icône est à la racine du dépôt (ADR-028).
     """
-    try:
-        manifeste = json.loads((project_path / "agents.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-    if not isinstance(manifeste, dict) or manifeste.get("git_root") != "ancestor":
+    if lire_valeur(project_path, "git_root") != "ancestor":
         return None
     git = _git_dir(project_path)
     return git.parent.resolve() if git is not None and git.name == ".git" else None

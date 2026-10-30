@@ -4,12 +4,13 @@ Distinct from ``services`` (the local commands of ADR-042). Absent block: no
 button, nothing to provision. Only known values are accepted, and an invalid
 block is refused by naming the offending field.
 """
-import json
 import re
 from pathlib import Path
 from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, ValidationInfo, field_validator
+
+from tessera.services.manifeste import lire_valeur
 
 Resource = Literal["vercel", "database", "resend", "dns", "stripe"]
 
@@ -134,12 +135,7 @@ def load_online_config(project_path: Path) -> Optional[OnlineConfig]:
     A missing or unreadable ``agents.json`` means no block, like the other
     sections; a block that is present but invalid raises.
     """
-    agents_json = project_path / "agents.json"
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-    bloc = data.get("online") if isinstance(data, dict) else None
+    bloc = lire_valeur(project_path, "online")
     if bloc is None:
         return None
     return parse_online_config(bloc)

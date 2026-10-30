@@ -49,6 +49,7 @@ from tessera.services.artifacts import (
     read_artifact_mode,
     tracked_artifact_paths,
 )
+from tessera.services.manifeste import lire_label_map
 from tessera.services.git_link import (
     GitLinkError,
     RemoteNotEmpty,
@@ -342,15 +343,7 @@ async def github_sync(project_id: str, body: GithubSyncRequest) -> GithubSyncRes
             detail="GITHUB_TOKEN non configuré dans les settings.",
         )
 
-    import json as _json
-    agents_json_path = project_path / "agents.json"
-    label_map: dict[str, str] = {}
-    if agents_json_path.exists():
-        try:
-            data = _json.loads(agents_json_path.read_text(encoding="utf-8"))
-            label_map = data.get("github_sync", {}).get("label_map", {})
-        except Exception:
-            pass
+    label_map = lire_label_map(project_path)
 
     github_svc = GitHubService(token=settings.github_token, repo=project.github_remote)
     ticket_svc = _ticket_svc(project_id)

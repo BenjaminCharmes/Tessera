@@ -4,7 +4,6 @@ Chaque règle échoue fermée : une clé mal typée vaut « pas de worktree », 
 entrée de `populate` douteuse est retirée sans emporter les autres. Rien ne
 consomme encore cette valeur : elle voyage dans `PolitiqueRun`, lue une fois.
 """
-import json
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import TypeGuard
 
@@ -12,6 +11,7 @@ from pydantic import ValidationError
 
 from tessera.config import Settings
 from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
+from tessera.services.manifeste import lire_valeur
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -41,14 +41,7 @@ def lire_worktree(
 
 def _declaration(project_path: Path) -> object | None:
     """La valeur brute de la clé `worktree`, `None` si absente ou illisible."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return None
-    return data.get(_CLEF) if isinstance(data, dict) else None
+    return lire_valeur(project_path, _CLEF)
 
 
 def _valider(declaration: object, racine_depot: Path) -> ConfigWorktree | None:
