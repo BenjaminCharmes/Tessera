@@ -5,7 +5,7 @@ depends_on:
 - ticket-710
 estimated_days: 1
 id: ticket-712
-pr_number: null
+pr_number: 796
 priority: medium
 status: done
 title: A server room shows the pipeline run live on its project
