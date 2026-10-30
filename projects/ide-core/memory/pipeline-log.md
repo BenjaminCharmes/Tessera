@@ -6525,3 +6525,15 @@ Le diff ajoute :
 - 2026-10-30 11:34:11 UTC — [ticket-704] APPROVED après 2 tour(s)
 - 2026-10-30 11:43:26 UTC — [ticket-704] documentation: 0 fichier(s) (550452ms) — après tour de correction — refusé : doc-technique : CLAUDE.md : règle « preuve » — l'extrait « **TypeScript** — `strict: true`, jamais de `any` ; composant » (CLAUDE.md) n'est ni dans le diff ni d — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « const projets = groupeParProjet(apps); » (frontend/src/components/EnCoursView/Sal
 - 2026-10-30 11:43:26 UTC — [ticket-711] documentation: pas de diff retrouvable, non documenté
+- 2026-10-30 12:13:06 UTC — [ide-core] file interrompue : ticket-706 n'a pas été livré
+- 2026-10-30 12:27:03 UTC — [ticket-705] branche ticket-705-the-git-and-gh-guard-becomes-an-allowlist-of-read
+- 2026-10-30 12:27:05 UTC — [ticket-705] tour 1 — codeur démarré
+- 2026-10-30 12:29:15 UTC — [ticket-705] tour 1 — codeur terminé (130467ms)
+- 2026-10-30 12:38:03 UTC — [ticket-705] testeur: OK (exit 0)
+- 2026-10-30 12:41:22 UTC — [ticket-705] securite: PASS — Refactoring from blacklist to whitelist for git/gh command guarding is a positiv (199328ms)
+- 2026-10-30 12:41:22 UTC — [ticket-705] tour 1 — reviewer démarré
+- 2026-10-30 12:42:08 UTC — [ticket-705] tour 1 — reviewer terminé (45655ms)
+- 2026-10-30 12:46:22 UTC — [ticket-705] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 12:47:28 UTC — [ticket-705] validateur: fichiers cités joints : backend/tests/test_git_guard.py
+- 2026-10-30 12:47:28 UTC — [ticket-705] validateur: APPROVED — Ticket-705 passe tous les critères. La refonte du garde git/gh fonctionne : une  (365968ms)
+- 2026-10-30 12:47:28 UTC — [ticket-705] APPROVED après 1 tour(s)
