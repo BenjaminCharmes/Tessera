@@ -1,4 +1,5 @@
 import Agrandi from "../../design/bureau/Agrandi";
+import type { MotifDeVisite } from "../../lib/bureau/ronde";
 import AgentDebout from "../../design/bureau/AgentDebout";
 import { libelleActivite, quiBavarde } from "../../lib/bureau/activites";
 import type { AgentPlace, Placement } from "../../lib/bureau/activites";
@@ -20,6 +21,8 @@ interface AgentsDeLaPieceProps {
   redacteurs?: readonly RedacteurPlace[];
   /** Le poste derrière lequel se tient le directeur en visite dans cette pièce (ticket-661). */
   directeur?: PosteId | null;
+  /** Pourquoi il est venu, pour son infobulle (ticket-723). */
+  motifDuDirecteur?: MotifDeVisite;
 }
 
 /** Hauteur du pied de l'agent au-dessus du bas du sol : sous les postes, au niveau de leur nom. */
@@ -99,7 +102,7 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
  * leur poste pour une activité, et partent tous par la porte quand le run se clôt.
  * La couche ne reçoit aucun clic : les postes dessous restent des boutons.
  */
-export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs = [], directeur = null }: AgentsDeLaPieceProps) {
+export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs = [], directeur = null, motifDuDirecteur }: AgentsDeLaPieceProps) {
   const bavard = quiBavarde(agents);
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -123,7 +126,7 @@ export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs
           bavarde={false}
         />
       ))}
-      {directeur !== null && <DirecteurEnVisite projet={projet} poste={directeur} />}
+      {directeur !== null && <DirecteurEnVisite projet={projet} poste={directeur} motif={motifDuDirecteur} />}
     </div>
   );
 }

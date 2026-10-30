@@ -131,6 +131,7 @@ export default function BureauView({
                 setDemande((avant) => demandeDe(avant, projet, poste));
               }}
               directeur={visite?.projet === nom ? visite.poste : null}
+              motifDuDirecteur={visite?.projet === nom ? visite.motif : undefined}
               onOpenProject={onOpenProject}
               sonActif={son.actif}
             />

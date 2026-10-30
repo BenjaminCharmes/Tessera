@@ -1,4 +1,5 @@
 import Confettis from "../../design/bureau/Confettis";
+import type { MotifDeVisite } from "../../lib/bureau/ronde";
 import Gyrophare from "../../design/bureau/Gyrophare";
 import NightVeil from "../../design/bureau/NightVeil";
 import Pastille from "../../design/bureau/Pastille";
@@ -74,6 +75,8 @@ interface PieceProps {
   sonActif?: boolean;
   /** Le poste derrière lequel le directeur se tient en visite dans cette pièce, ou rien (ticket-661). */
   directeur?: PosteId | null;
+  /** Pourquoi il est venu, pour son infobulle (ticket-723). */
+  motifDuDirecteur?: MotifDeVisite;
 }
 
 const CONTOURS: Record<ContourDeLaPiece, string> = {
@@ -98,6 +101,7 @@ export default function Piece({
   hasard,
   sonActif = false,
   directeur = null,
+  motifDuDirecteur,
 }: PieceProps) {
   const postes = postesDuRun(etat);
   const sante = santeAgent(
@@ -247,7 +251,7 @@ export default function Piece({
               />
             ))}
           </div>
-          <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} redacteurs={redacteurs} directeur={directeur} />
+          <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} redacteurs={redacteurs} directeur={directeur} motifDuDirecteur={motifDuDirecteur} />
           {fete && <Confettis />}
           {gyrophare && (
             <span className="absolute left-1/2 top-1 z-20 -translate-x-1/2">
