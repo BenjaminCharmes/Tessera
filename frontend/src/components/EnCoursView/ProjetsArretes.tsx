@@ -37,13 +37,19 @@ export default function ProjetsArretes({ projets, enLancement, onLancer }: Proje
         Arrêtés ({projets.length})
       </button>
       {ouverte && (
-        <ul className="rounded-sm bg-zinc-900 ring-1 ring-zinc-800">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-2">
           {projets.map((projet) => (
             <li
               key={projet.id}
-              className="flex items-center justify-between border-t border-zinc-800 px-3 py-2 text-sm first:border-t-0"
+              className="flex items-center gap-3 rounded-md bg-zinc-900 px-3 py-2 text-sm ring-1 ring-zinc-800"
             >
-              <span className="font-medium text-zinc-100">{projet.name}</span>
+              <span aria-hidden="true" className="flex items-end gap-0.5">
+                <span className="h-5 w-2.5 bg-zinc-800" />
+                <span className="h-7 w-2.5 bg-zinc-800" />
+              </span>
+              <span className="min-w-0 flex-1 truncate font-medium text-zinc-100" title={projet.name}>
+                {projet.name}
+              </span>
               <Button
                 taille="compact"
                 disabled={enLancement(projet.id)}

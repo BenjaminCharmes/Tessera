@@ -36,8 +36,10 @@ describe("server room furniture", () => {
     expect(baie).not.toMatch(/anim-|animation|transition/);
   });
 
-  it("declares the raised floor in index.css from sprite tokens", () => {
-    expect(CSS).toMatch(/[.]sol-dalles\s*[{][^}]*--sprite-dalle\b/);
+  it("lays the raised floor from tile sprites drawn with the floor tokens", () => {
+    for (const nom of ["DallePleine", "DallePerforee"]) {
+      expect(source(nom), nom).toContain("--sprite-dalle");
+    }
   });
 });
 
@@ -56,12 +58,16 @@ describe("product agent sprites", () => {
     }
   });
 
-  it("keeps the console still, and moves an agent only with the typing animation that reduced motion cuts", () => {
-    expect(source("Console")).not.toMatch(/anim-|animation|transition|data-voyant/);
+  it("scrolls the console screen only when the agent works, and moves an agent only with the typing animation that reduced motion cuts", () => {
+    const pupitre = source("Console");
+    expect([...new Set(pupitre.match(/anim-[a-z]+/g))]).toEqual(["anim-defile"]);
+    expect(pupitre).toMatch(/allume && \(/);
+    expect(pupitre).not.toMatch(/animation|transition|data-voyant/);
     const agent = source("AgentAuPupitre");
     expect([...new Set(agent.match(/anim-[a-z]+/g))]).toEqual(["anim-tape"]);
     expect(agent).not.toMatch(/animation|transition/);
     const reduit = CSS.slice(CSS.indexOf("@media (prefers-reduced-motion: reduce)"));
     expect(reduit).toMatch(/[.]anim-tape\b[^}]*animation:\s*none/);
+    expect(reduit).toMatch(/[.]anim-defile\b[^}]*animation:\s*none/);
   });
 });

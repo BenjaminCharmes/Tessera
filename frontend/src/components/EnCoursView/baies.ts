@@ -9,17 +9,24 @@ export interface BaieDeSalle {
 }
 
 /**
- * Les baies d'une salle : un étage par service déclaré du projet, lu de l'API.
- * Sans service connu (app lancée à la main, lecture en échec), l'app elle-même
- * est la seule baie : elle figure dans l'inventaire, donc elle tourne.
+ * Les baies d'une salle de projet — ticket-710 : une par service déclaré, lu de
+ * l'API. Une app de l'inventaire qu'aucun service déclaré ne nomme (lancée à la
+ * main, ou lecture en échec) a aussi sa baie : elle figure dans l'inventaire,
+ * donc elle tourne.
  */
-export function baiesDeLApp(app: AppEnCours, services: readonly ServiceActif[]): BaieDeSalle[] {
-  if (services.length === 0) {
-    return [{ nom: app.nom, etat: "en-cours", libelle: "en cours" }];
-  }
-  return services.map((service) => ({
+export function baiesDuProjet(
+  apps: readonly AppEnCours[],
+  services: readonly ServiceActif[],
+): BaieDeSalle[] {
+  const baies: BaieDeSalle[] = services.map((service) => ({
     nom: service.nom,
     etat: etatDuService(service),
     libelle: libelleDeLEtat(service),
   }));
+  for (const app of apps) {
+    if (!baies.some((baie) => baie.nom === app.nom)) {
+      baies.push({ nom: app.nom, etat: "en-cours", libelle: "en cours" });
+    }
+  }
+  return baies;
 }

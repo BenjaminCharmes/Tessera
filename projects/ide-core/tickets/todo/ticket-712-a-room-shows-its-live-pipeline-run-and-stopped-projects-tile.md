@@ -1,6 +1,6 @@
 ---
 id: ticket-712
-title: "A room shows its project's live pipeline run, and stopped projects become compact tiles"
+title: "A server room shows the pipeline run live on its project"
 type: feat
 status: todo
 pr_number: null
@@ -36,17 +36,15 @@ Maquette : `projects/ide-core/design/maquette/Salle-des-serveurs-v2.dc.html`.
   - un badge bleu sur la plaque (« File 3/6 · ticket-059 » pour une file,
     l'id du ticket seul sinon).
   Sans run, rien de tout cela (ADR-058).
-- Sur la plaque, un lien « Ouvrir » par port de service, vers
-  `http://localhost:<port>`.
-- Les projets arrêtés deviennent une grille de tuiles compactes (nom et bouton
-  « Lancer »), de plusieurs colonnes selon la largeur disponible.
+Le lien « Ouvrir » par port et les tuiles des projets arrêtés sont déjà livrés
+avec le ticket-710. Le poste se pose au sol de la salle
+(`frontend/src/components/EnCoursView/SalleDeProjet.tsx`), à côté des agents du
+produit, avec le sprite d'agent au pupitre du Bureau.
 
 ## Critères d'acceptation
 - [ ] Un test : avec un run ouvert sur le projet (`useSupervision` et store de run simulés), la salle affiche son `ticketId` et son `currentAgent` ; sans run, ni poste ni badge
 - [ ] Un test : un run dont `queue` vaut `{index: 3, total: 6}` affiche « 3/6 » dans le badge
-- [ ] Un test : la plaque porte un lien `href="http://localhost:8026"` pour un service au port 8026
-- [ ] Un test de `ProjetsArretes` : chaque projet arrêté est une tuile avec son bouton « Lancer », et le conteneur est une grille
-- [ ] `EnCoursView.test.tsx` rend l'écran « En cours » avec un run vivant et y trouve le poste de run dans la bonne salle
+- [ ] Les tests vivent dans `frontend/src/components/EnCoursView/SallesDesServeurs.test.tsx`, qui rend l'écran « En cours » entier
 
 ## Ce que ça ne fait pas
 - Pas de pilotage de la file depuis la salle (arrêt, relance)

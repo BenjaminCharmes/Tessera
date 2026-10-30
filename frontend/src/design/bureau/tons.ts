@@ -76,6 +76,21 @@ export const TON_VOYANT: Record<EtatDuService, string> = {
   "jamais-lance": "fill-zinc-600",
 };
 
+/** Le même état en texte et en pastille, pour l'écran mural et la plaque de la salle (ticket-711). */
+export const TEXTE_DE_L_ETAT: Record<EtatDuService, string> = {
+  "en-cours": "text-blue-300",
+  echoue: "text-red-300",
+  arrete: "text-zinc-400",
+  "jamais-lance": "text-zinc-500",
+};
+
+export const PASTILLE_DE_L_ETAT: Record<EtatDuService, string> = {
+  "en-cours": "bg-blue-400",
+  echoue: "bg-red-500",
+  arrete: "bg-zinc-500",
+  "jamais-lance": "bg-zinc-600",
+};
+
 /*
  * Les tons d'un personnage (ticket-595). Classes écrites en toutes lettres :
  * Tailwind ne voit pas une classe construite, et ne génèrerait pas la règle.

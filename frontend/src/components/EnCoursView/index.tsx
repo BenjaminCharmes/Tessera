@@ -73,7 +73,12 @@ export default function EnCoursView({ appsEnCours, vueInitiale = "salles" }: EnC
       {apps.length === 0 ? (
         <Message texte="Aucune app de projet ne tourne" />
       ) : vue === "salles" ? (
-        <SallesDesServeurs apps={apps} lueA={lueA} />
+        <SallesDesServeurs
+          apps={apps}
+          lueA={lueA}
+          enArret={enArret}
+          onArreterProjet={(id, groupe) => void arreterProjet(id, groupe)}
+        />
       ) : (
         grouperParProjet(apps).map((groupe) => (
           <section key={groupe.project_id} className="mb-4">

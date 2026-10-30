@@ -183,6 +183,8 @@ describe("Stopped projects", () => {
     expect(within(section).getByRole("button", { name: "Lancer Beta" })).toBeInTheDocument();
     expect(within(section).queryByText("Alpha")).not.toBeInTheDocument();
     expect(within(section).queryByText("Gamma")).not.toBeInTheDocument();
+    // ticket-710 : des tuiles en grille, plus une ligne pleine largeur par projet.
+    expect(within(section).getByRole("list")).toHaveClass("grid");
   });
 
   it("starts the project and shows a pending state until it is back in the inventory", async () => {

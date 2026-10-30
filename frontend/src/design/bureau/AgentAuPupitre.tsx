@@ -43,7 +43,7 @@ export default function AgentAuPupitre({ physique, etat }: AgentAuPupitreProps) 
           </g>
         )}
       </g>
-      <Console />
+      <Console allume={actif} />
     </svg>
   );
 }
