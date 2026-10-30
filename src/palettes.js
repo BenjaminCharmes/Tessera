@@ -48,8 +48,11 @@ const FAMILLES = {
   "salle-mur": { tessera: "#2b3035", chaud: "#383230", neon: "#121430", doux: .45 },
 };
 
-/** Les choix de jour par défaut : Tessera, sauf ce que Benjamin a préféré en Chaud. */
-const JOUR_PAR_DEFAUT = { machine: "chaud", tasse: "chaud" };
+/** Les choix de jour : Tessera, sauf ce que Benjamin a voté en Chaud (catalogue, 30/10/2026). */
+const JOUR_PAR_DEFAUT = {
+  machine: "chaud", tasse: "chaud", bois: "chaud", terre: "chaud", canape: "chaud", chaussure: "chaud",
+  clavier: "chaud", porte: "chaud", velours: "chaud", cadran: "chaud", confetti1: "chaud",
+};
 
 /** États : jamais thémés (ADR-026), mêmes teintes jour et nuit. */
 const ETATS = { actif: "#60a5fa", attente: "#71717a", question: "#fbbf24", blocage: "#f87171", fait: "#4ade80" };
