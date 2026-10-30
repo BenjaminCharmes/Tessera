@@ -12,7 +12,9 @@ for (const f of fs.readdirSync(path.join(RACINE, "pages")).filter(f => f.endsWit
   const gabarit = fs.readFileSync(path.join(RACINE, "pages", f), "utf8");
   const pageJs = path.join(RACINE, "pages", nom + ".js");
   const propre = fs.existsSync(pageJs) ? fs.readFileSync(pageJs, "utf8") : "";
-  const css = fs.readFileSync(path.join(RACINE, "pages", "commun.css"), "utf8");
+  const dossierCss = path.join(RACINE, "pages", "css");
+  const lots = fs.existsSync(dossierCss) ? fs.readdirSync(dossierCss).filter(f => f.endsWith(".css")).sort().map(f => fs.readFileSync(path.join(dossierCss, f), "utf8")) : [];
+  const css = [fs.readFileSync(path.join(RACINE, "pages", "commun.css"), "utf8"), ...lots].join("\n");
   const sortie = gabarit
     .replace("/* COMMUN_CSS */", () => css)
     .replace("<!-- SOURCES -->", () => `<script>\n${commun}\n// pages/${nom}.js\n${propre}\n</script>`);
