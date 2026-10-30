@@ -6740,3 +6740,17 @@ Le diff ajoute :
 - 2026-10-30 23:10:01 UTC — [ticket-679] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les routes de services utilisen (152500ms)
 - 2026-10-30 23:10:01 UTC — [ticket-679] APPROVED après 2 tour(s)
 - 2026-10-30 23:12:14 UTC — [ticket-679] documentation: 0 fichier(s) (128046ms)
+- 2026-10-30 23:19:22 UTC — [ide-core] ticket-679 PR #801 mergée (CI verte)
+- 2026-10-30 23:19:24 UTC — [ide-core] ticket-679 : base réalignée sur develop
+- 2026-10-30 23:19:24 UTC — [ide-core] ticket-679 PR #801 confiée au CIWatcher
+- 2026-10-30 23:19:28 UTC — [ticket-680] branche ticket-680-one-http-client-in-the-frontend
+- 2026-10-30 23:19:29 UTC — [ticket-680] tour 1 — codeur démarré
+- 2026-10-30 23:24:54 UTC — [ticket-680] tour 1 — codeur terminé (324578ms)
+- 2026-10-30 23:27:07 UTC — [ticket-680] testeur: OK (exit 0)
+- 2026-10-30 23:29:15 UTC — [ticket-680] securite: PASS — Refactorisation centralisée des appels HTTP en nouveau fichier `http.ts`, sans c (127281ms)
+- 2026-10-30 23:29:15 UTC — [ticket-680] tour 1 — reviewer démarré
+- 2026-10-30 23:29:36 UTC — [ticket-680] tour 1 — reviewer terminé (21218ms)
+- 2026-10-30 23:33:28 UTC — [ticket-680] validateur: fichiers cités joints : lib/http.ts, api.ts, quota.ts, statutDuRun.ts, ventilation.ts, capturesDuRun.ts, fs.ts
+- 2026-10-30 23:33:28 UTC — [ticket-680] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le client HTTP a été centralisé (253750ms)
+- 2026-10-30 23:33:28 UTC — [ticket-680] APPROVED après 1 tour(s)
+- 2026-10-30 23:34:55 UTC — [ticket-680] documentation: 0 fichier(s) (80844ms)

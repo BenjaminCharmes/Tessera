@@ -40,6 +40,7 @@ beforeEach(() => {
     restants: ["ticket-002", "ticket-003"],
     debut: "2026-10-23T10:00:00Z",
     fin: null,
+    arretes: [],
   });
 });
 

@@ -52,19 +52,7 @@ import type {
   TicketCreate,
   TicketDraft,
 } from "../types/api";
-import { authorized } from "./auth";
-import { API_ORIGIN } from "./config";
-
-const BASE = `${API_ORIGIN}/api/v1`;
-
-export async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, authorized(options));
-  if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(`API ${res.status}: ${text}`);
-  }
-  return res.json() as Promise<T>;
-}
+import { request, send } from "./http";
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, {
@@ -91,11 +79,7 @@ async function patch_<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function del(path: string): Promise<void> {
-  const res = await fetch(`${BASE}${path}`, authorized({ method: "DELETE" }));
-  if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(`API ${res.status}: ${text}`);
-  }
+  await send(path, { method: "DELETE" });
 }
 
 export const api = {
@@ -281,10 +265,7 @@ export const api = {
     cleanupPlan: (projectId: string): Promise<PlanDeNettoyage> =>
       request(`/projects/${projectId}/branches/cleanup`),
     cleanup: (projectId: string, branches: string[]): Promise<string[]> =>
-      request(`/projects/${projectId}/branches/cleanup`, {
-        method: "POST",
-        body: JSON.stringify({ branches }),
-      }),
+      post(`/projects/${projectId}/branches/cleanup`, { branches }),
     artifacts: (projectId: string): Promise<ArtifactModeState> =>
       request(`/projects/${projectId}/artifacts`),
     setArtifacts: (

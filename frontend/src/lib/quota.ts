@@ -1,5 +1,4 @@
-import { authorized } from "./auth";
-import { API_ORIGIN } from "./config";
+import { request } from "./http";
 
 /** Le dernier relevé d'une fenêtre de quota, tel que `GET /usage/quota` le rend (ticket-558). */
 export interface QuotaWindowReading {
@@ -15,13 +14,8 @@ export interface QuotaWindows {
   windows: Record<string, QuotaWindowReading | undefined>;
 }
 
-async function lireLesFenetres(): Promise<QuotaWindows> {
-  const res = await fetch(`${API_ORIGIN}/api/v1/usage/quota`, authorized());
-  if (!res.ok) {
-    const texte = await res.text().catch(() => res.statusText);
-    throw new Error(`API ${res.status}: ${texte}`);
-  }
-  return res.json() as Promise<QuotaWindows>;
+function lireLesFenetres(): Promise<QuotaWindows> {
+  return request("/usage/quota");
 }
 
 /** Lecture du quota par fenêtre. Un objet, pour qu'un test puisse l'espionner comme `api.*`. */

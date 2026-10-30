@@ -1,5 +1,4 @@
-import { authorized } from "./auth";
-import { API_ORIGIN } from "./config";
+import { request } from "./http";
 
 /** Une ligne de `GET /projects/{id}/usage/breakdown` : la dépense cumulée d'un rôle. */
 export interface DepenseDuRole {
@@ -14,14 +13,8 @@ export interface VentilationDuProjet {
   per_agent: DepenseDuRole[];
 }
 
-async function lireLaVentilation(projectId: string): Promise<VentilationDuProjet> {
-  const url = `${API_ORIGIN}/api/v1/projects/${encodeURIComponent(projectId)}/usage/breakdown`;
-  const res = await fetch(url, authorized());
-  if (!res.ok) {
-    const texte = await res.text().catch(() => res.statusText);
-    throw new Error(`API ${res.status}: ${texte}`);
-  }
-  return res.json() as Promise<VentilationDuProjet>;
+function lireLaVentilation(projectId: string): Promise<VentilationDuProjet> {
+  return request(`/projects/${encodeURIComponent(projectId)}/usage/breakdown`);
 }
 
 /** Lecture du coût d'un projet par rôle. Un objet, pour qu'un test puisse l'espionner comme `api.*`. */

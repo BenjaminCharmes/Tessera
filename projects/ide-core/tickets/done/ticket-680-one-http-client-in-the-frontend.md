@@ -1,12 +1,13 @@
 ---
-id: ticket-680
-title: "One HTTP client in the frontend"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-680
+pr_number: 802
+priority: medium
+status: done
+title: One HTTP client in the frontend
+type: refactor
 ---
 
 # ticket-680 — Un seul client HTTP côté frontend
