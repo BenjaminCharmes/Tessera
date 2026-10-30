@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-680
+pr_number: 802
 priority: medium
 status: done
 title: One HTTP client in the frontend
