@@ -6639,3 +6639,15 @@ Le diff ajoute :
 - 2026-10-30 19:14:33 UTC — [ticket-725] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente une porte  (223110ms)
 - 2026-10-30 19:14:33 UTC — [ticket-725] APPROVED après 2 tour(s)
 - 2026-10-30 19:17:40 UTC — [ticket-725] documentation: 0 fichier(s) (182218ms)
+- 2026-10-30 19:24:51 UTC — [ide-core] ticket-725 PR #794 confiée au CIWatcher
+- 2026-10-30 19:24:54 UTC — [ticket-714] branche ticket-714-a-local-provider-hands-an-oversized-prompt-straig
+- 2026-10-30 19:24:55 UTC — [ticket-714] tour 1 — codeur démarré
+- 2026-10-30 19:26:39 UTC — [ticket-714] tour 1 — codeur terminé (104061ms)
+- 2026-10-30 19:31:28 UTC — [ide-core] ticket-725 PR #794 mergée (CI verte)
+- 2026-10-30 19:34:15 UTC — [ticket-714] testeur: OK (exit 0)
+- 2026-10-30 19:36:06 UTC — [ticket-714] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute une feature de fallbac (111750ms)
+- 2026-10-30 19:36:06 UTC — [ticket-714] tour 1 — reviewer démarré
+- 2026-10-30 19:36:26 UTC — [ticket-714] tour 1 — reviewer terminé (19311ms)
+- 2026-10-30 19:40:31 UTC — [ticket-714] validateur: fichiers cités joints : backend/tests/test_provider_par_role.py (tronqué)
+- 2026-10-30 19:40:31 UTC — [ticket-714] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés correctement. Le code ajoute (264375ms)
+- 2026-10-30 19:40:31 UTC — [ticket-714] APPROVED après 1 tour(s)
