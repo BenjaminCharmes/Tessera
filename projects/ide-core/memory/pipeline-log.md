@@ -6523,3 +6523,5 @@ Le diff ajoute :
 - 2026-10-30 11:34:11 UTC — [ticket-704] validateur: fichiers cités joints : docs/configuration.md ; absents : http://tauri.localhost
 - 2026-10-30 11:34:11 UTC — [ticket-704] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le middleware `HostOriginMid (263860ms)
 - 2026-10-30 11:34:11 UTC — [ticket-704] APPROVED après 2 tour(s)
+- 2026-10-30 11:43:26 UTC — [ticket-704] documentation: 0 fichier(s) (550452ms) — après tour de correction — refusé : doc-technique : CLAUDE.md : règle « preuve » — l'extrait « **TypeScript** — `strict: true`, jamais de `any` ; composant » (CLAUDE.md) n'est ni dans le diff ni d — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « const projets = groupeParProjet(apps); » (frontend/src/components/EnCoursView/Sal
+- 2026-10-30 11:43:26 UTC — [ticket-711] documentation: pas de diff retrouvable, non documenté
