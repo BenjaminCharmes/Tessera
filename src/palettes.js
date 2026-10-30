@@ -3,6 +3,7 @@
  * Les familles de couleur, une base par source. Le jour prend, famille par famille,
  * la base « tessera » ou « chaud » (choix de Benjamin, cas par cas) ; la nuit prend
  * toujours « neon ». Une famille sans « chaud » ou sans « neon » retombe sur « tessera ».
+ * `doux` (0 à 1) resserre la rampe d'une famille de grande surface (sol, mur).
  * Dans Tessera, chaque famille × ton deviendrait une variable --sprite-<famille>-<ton>,
  * redéfinie sous [data-moment="nuit"] : changer d'heure ne coûte que des variables CSS.
  */
@@ -41,9 +42,9 @@ const FAMILLES = {
   livre2: { tessera: "#1e40af", chaud: "#2f5fa8", neon: "#3dd6ff" },
   livre3: { tessera: "#ca8a04", chaud: "#d9a23a", neon: "#ffd23d" },
   // Pièce
-  mur: { tessera: "#3a3430", chaud: "#4a3a30", neon: "#161833" },
-  plinthe: { tessera: "#1c1917", chaud: "#2a1d16", neon: "#0a0b1c" },
-  sol: { tessera: "#2a2420", chaud: "#3a2c24", neon: "#0e0f1f" },
+  mur: { tessera: "#3a3430", chaud: "#4a3a30", neon: "#161833", doux: .45 },
+  plinthe: { tessera: "#1c1917", chaud: "#2a1d16", neon: "#0a0b1c", doux: .6 },
+  sol: { tessera: "#2a2420", chaud: "#3a2c24", neon: "#0e0f1f", doux: .4 },
 };
 
 /** Les choix de jour par défaut : Tessera, sauf ce que Benjamin a préféré en Chaud. */
@@ -73,7 +74,7 @@ function baseDe(fam, mode, choix) {
 function resolveur(mode, choix = {}) {
   const M = MODES[mode], cache = new Map(), rampes = new Map();
   const rampeDe = fam => {
-    if (!rampes.has(fam)) rampes.set(fam, ramp(fam.startsWith("etat-") ? ETATS[fam.slice(5)] : baseDe(fam, mode, choix)));
+    if (!rampes.has(fam)) rampes.set(fam, fam.startsWith("etat-") ? ramp(ETATS[fam.slice(5)]) : ramp(baseDe(fam, mode, choix), (FAMILLES[fam] && FAMILLES[fam].doux) || 1));
     return rampes.get(fam);
   };
   return tok => {

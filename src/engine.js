@@ -28,14 +28,14 @@ function fromHsl(h, s, l) {
 }
 const mix = (a, b, t) => { const x = h2r(a), y = h2r(b); return r2h(...x.map((v, i) => v + (y[i] - v) * t)); };
 const toward = (h, t, amt) => { const d = ((t - h + 540) % 360) - 180; return (h + d * amt + 360) % 360; };
-/** La rampe d'une base : reflet vers le jaune, ombres vers le bleu (glissement de teinte). */
-function ramp(hex) {
+/** La rampe d'une base ; `k` < 1 resserre les écarts (grandes surfaces sombres) : reflet vers le jaune, ombres vers le bleu (glissement de teinte). */
+function ramp(hex, k = 1) {
   const [h, s, l] = toHsl(hex);
   return {
-    hi: fromHsl(toward(h, 55, .14), s * .95, l + .13),
+    hi: fromHsl(toward(h, 55, .14 * k), s * .95, l + .13 * k),
     b: hex,
-    s: fromHsl(toward(h, 250, .12), s * 1.05 + .03, l - .11),
-    d: fromHsl(toward(h, 250, .2), s * 1.05 + .05, l - .21),
+    s: fromHsl(toward(h, 250, .12 * k), s * 1.05 + .03 * k, l - .11 * k),
+    d: fromHsl(toward(h, 250, .2 * k), s * 1.05 + .05 * k, l - .21 * k),
     bl: mix(hex, "#e0605a", .32),
   };
 }

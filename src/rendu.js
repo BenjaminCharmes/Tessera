@@ -24,7 +24,7 @@ function rendre(def, { quoi = "apres", mode = "jour", zoom = 1, outline = true, 
   let s = fn();
   if (quoi === "avant") return { ...toSvg(s, dw, dh, t => t), rects: rectCount(s) };
   const familles = famillesDe(s);
-  s = bake(s, { outline, rim: true });
+  s = bake(s, def.tuile ? { outline: false, rim: false } : { outline, rim: true });
   if (mode === "nuit" && def.lumiere) eclairer(s, def.lumiere);
   return { ...toSvg(s, dw, dh, res(mode, choix)), familles };
 }
