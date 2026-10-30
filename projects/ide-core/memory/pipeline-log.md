@@ -6566,3 +6566,21 @@ Le diff ajoute :
 - 2026-10-30 13:58:44 UTC — [ticket-718] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la logique de (68640ms)
 - 2026-10-30 13:58:44 UTC — [ticket-718] APPROVED après 1 tour(s)
 - 2026-10-30 14:03:15 UTC — [ticket-718] documentation: 1 fichier(s) (257875ms)
+- 2026-10-30 14:17:17 UTC — [ide-core] ticket-718 PR #789 confiée au CIWatcher
+- 2026-10-30 14:17:20 UTC — [ticket-677] branche ticket-677-one-git-runner-with-hooks-disabled
+- 2026-10-30 14:17:21 UTC — [ticket-677] tour 1 — codeur démarré
+- 2026-10-30 14:24:13 UTC — [ticket-718] livraison: arrêt — PR #789 non mergée : erreur inattendue : ReadTimeout
+- 2026-10-30 14:32:59 UTC — [ticket-677] tour 1 — codeur terminé (937375ms)
+- 2026-10-30 14:41:49 UTC — [ticket-677] testeur: 1 failed, 2197 passed, 64 warnings in 525.06s (0:08:45)
+- 2026-10-30 14:41:49 UTC — [ticket-677] tests rouges au tour 1
+- 2026-10-30 14:41:49 UTC — [ticket-677] tour 2 — codeur démarré
+- 2026-10-30 14:42:32 UTC — [ticket-677] tour 2 — codeur terminé (43390ms)
+- 2026-10-30 14:59:47 UTC — [ticket-677] testeur: OK (exit 0)
+- 2026-10-30 15:01:41 UTC — [ticket-677] securite: PASS — Refactoring successfully centralizes git execution with comprehensive hook neutr (114046ms)
+- 2026-10-30 15:01:42 UTC — [ticket-677] tour 2 — reviewer démarré
+- 2026-10-30 15:02:10 UTC — [ticket-677] tour 2 — reviewer terminé (28359ms)
+- 2026-10-30 15:06:42 UTC — [ticket-677] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 15:07:26 UTC — [ticket-677] validateur: fichiers cités joints : branch_cleanup.py, journal_en_attente.py, project_removal.py, realignement_base.py (tronqué) ; non joints (budget épuisé) : reprise_orphelin.py, ticket_diff.py, temporary_worktree.py
+- 2026-10-30 15:07:26 UTC — [ticket-677] validateur: APPROVED — Ticket-677 satisfait tous les critères d'acceptation. Un exécuteur unique `git_r (344405ms)
+- 2026-10-30 15:07:26 UTC — [ticket-677] APPROVED après 2 tour(s)
+- 2026-10-30 15:11:30 UTC — [ticket-677] documentation: 0 fichier(s) (238890ms) — après tour de correction

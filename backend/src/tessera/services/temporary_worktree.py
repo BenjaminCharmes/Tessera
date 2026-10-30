@@ -5,14 +5,14 @@ branch, one commit, a tree that is never left dirty). Anything that must reach
 the repository meanwhile is written elsewhere: a detached worktree, created
 from a ref and removed when the work is done, whatever happened in between.
 """
-import asyncio
 import shutil
 import tempfile
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from tessera.services.git_workspace import GitCommandError, _dossier_sans_hooks
+from tessera.services.git_runner import git
+from tessera.services.git_workspace import GitCommandError
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -21,30 +21,15 @@ _logger = get_logger(__name__)
 async def run_git(cwd: Path, *args: str) -> str:
     """Run git in `cwd` and return stdout; raise `GitCommandError` on failure.
 
-    Repository hooks never run from here, for the reason given in
-    `GitWorkspaceService._run`: they live under the project root.
+    Runs through the common runner (`git_runner`): a write never triggers the
+    repository hooks, which live under the project root.
     """
-    command = [
-        "git",
-        "-c", f"core.hooksPath={_dossier_sans_hooks()}",
-        "-c", "core.quotePath=false",
-        "-c", "core.longpaths=true",
-        *args,
-    ]
-    proc = await asyncio.create_subprocess_exec(
-        *command,
-        cwd=str(cwd),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    if proc.returncode != 0:
+    resultat = await git(cwd, *args)
+    if not resultat.ok:
         raise GitCommandError(
-            command=command,
-            returncode=proc.returncode or 0,
-            stderr=stderr.decode("utf-8", errors="replace"),
+            command=list(resultat.command), returncode=resultat.code, stderr=resultat.err
         )
-    return stdout.decode("utf-8", errors="replace")
+    return resultat.out
 
 
 async def _remove(repo: Path, root: Path, parent: Path) -> None:

@@ -8,21 +8,11 @@ base. On les met de côté avant le changement, puis on les réécrit dans le
 journal de la nouvelle branche, qui les commitera avec sa propre tenue de
 livres.
 """
-import asyncio
 from pathlib import Path
 
+from tessera.services.git_runner import git
+
 _JOURNAL = Path("memory") / "pipeline-log.md"
-
-
-async def _git(racine: Path, *args: str) -> tuple[int, str]:
-    proc = await asyncio.create_subprocess_exec(
-        "git", *args,
-        cwd=str(racine),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, _ = await proc.communicate()
-    return proc.returncode or 0, stdout.decode("utf-8", errors="replace")
 
 
 async def mettre_de_cote(racine: Path) -> list[str]:
@@ -35,18 +25,18 @@ async def mettre_de_cote(racine: Path) -> list[str]:
     if not (racine / _JOURNAL).is_file():
         return []
     chemin = _JOURNAL.as_posix()
-    code, diff = await _git(racine, "diff", "--no-color", "-U0", "HEAD", "--", chemin)
-    if code != 0 or not diff.strip():
+    diff = await git(racine, "diff", "--no-color", "-U0", "HEAD", "--", chemin)
+    if not diff.ok or not diff.out.strip():
         return []
     lignes = [
         ligne[1:]
-        for ligne in diff.splitlines()
+        for ligne in diff.out.splitlines()
         if ligne.startswith("+") and not ligne.startswith("+++")
     ]
     # Sans restauration réussie, on ne prétend rien avoir mis de côté : le
     # commit de tenue de livres emportera les lignes, comme avant.
-    code, _ = await _git(racine, "checkout", "HEAD", "--", chemin)
-    return lignes if code == 0 else []
+    restauration = await git(racine, "checkout", "HEAD", "--", chemin)
+    return lignes if restauration.ok else []
 
 
 async def seul_le_journal_est_modifie(racine: Path) -> bool:
@@ -56,14 +46,16 @@ async def seul_le_journal_est_modifie(racine: Path) -> bool:
     ``git_root: ancestor`` the work lives above it. False — and the caller
     keeps its current behaviour — on any other change, or when git cannot answer.
     """
-    code, prefixe = await _git(racine, "rev-parse", "--show-prefix")
-    if code != 0:
+    prefixe = await git(racine, "rev-parse", "--show-prefix")
+    if not prefixe.ok:
         return False
-    code, statut = await _git(racine, "status", "--porcelain", "--untracked-files=no")
-    if code != 0:
+    statut = await git(racine, "status", "--porcelain", "--untracked-files=no")
+    if not statut.ok:
         return False
-    attendu = prefixe.strip() + _JOURNAL.as_posix()
-    chemins = [ligne[3:].strip() for ligne in statut.splitlines() if len(ligne) >= 3]
+    attendu = prefixe.out.strip() + _JOURNAL.as_posix()
+    chemins = [
+        ligne[3:].strip() for ligne in statut.out.splitlines() if len(ligne) >= 3
+    ]
     return bool(chemins) and all(chemin == attendu for chemin in chemins)
 
 
@@ -72,12 +64,10 @@ async def journal_non_suivi(racine: Path) -> bool:
     if not (racine / _JOURNAL).is_file():
         return False
     chemin = _JOURNAL.as_posix()
-    code, _ = await _git(racine, "ls-files", "--error-unmatch", "--", chemin)
-    if code == 0:
+    if (await git(racine, "ls-files", "--error-unmatch", "--", chemin)).ok:
         return False
     # Ignoré (mode `local`, ADR-021) : git l'écrase sans refuser, rien à faire.
-    code, _ = await _git(racine, "check-ignore", "-q", "--", chemin)
-    return code != 0
+    return not (await git(racine, "check-ignore", "-q", "--", chemin)).ok
 
 
 async def mettre_de_cote_non_suivi(racine: Path, ref_distante: str) -> list[str]:
@@ -92,8 +82,7 @@ async def mettre_de_cote_non_suivi(racine: Path, ref_distante: str) -> list[str]
     if not await journal_non_suivi(racine):
         return []
     chemin = _JOURNAL.as_posix()
-    code, _ = await _git(racine, "cat-file", "-e", f"{ref_distante}:./{chemin}")
-    if code != 0:
+    if not (await git(racine, "cat-file", "-e", f"{ref_distante}:./{chemin}")).ok:
         return []
     journal = racine / _JOURNAL
     lignes = [

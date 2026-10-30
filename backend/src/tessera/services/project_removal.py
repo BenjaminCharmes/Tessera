@@ -15,7 +15,6 @@ un lien symbolique**. `projects/fluentdb` *est* `Desktop/fluentdb` ; effacer le
 dossier de travail de l'utilisateur depuis un IDE n'est jamais la bonne
 réponse.
 """
-import asyncio
 import os
 import shutil
 import stat
@@ -24,6 +23,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tessera.services.git_runner import git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -47,34 +47,22 @@ class RemovalPlan:
     unpushed_commits: int = 0
 
 
-async def _run_git(cwd: Path, *args: str) -> tuple[int, str]:
-    proc = await asyncio.create_subprocess_exec(
-        "git", *args,
-        cwd=str(cwd),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    out, _ = await proc.communicate()
-    return proc.returncode or 0, out.decode("utf-8", errors="replace")
-
-
 async def _count_unpushed(project_path: Path) -> int:
     """Commits présents localement et absents de tout remote.
 
     Sans remote, tout commit est « non poussé » : c'est exactement ce que
     l'utilisateur perdrait, donc c'est ce qu'il faut compter.
     """
-    code, _ = await _run_git(project_path, "rev-parse", "--is-inside-work-tree")
-    if code != 0:
+    if not (await git(project_path, "rev-parse", "--is-inside-work-tree")).ok:
         return 0
 
-    code, out = await _run_git(
+    comptage = await git(
         project_path, "rev-list", "--count", "--branches", "--not", "--remotes"
     )
-    if code != 0:
+    if not comptage.ok:
         return 0
     try:
-        return int(out.strip() or 0)
+        return int(comptage.out.strip() or 0)
     except ValueError:
         return 0
 

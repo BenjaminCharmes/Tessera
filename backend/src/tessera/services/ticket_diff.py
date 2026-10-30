@@ -9,11 +9,11 @@ de son intérêt : on y pilote la flotte sans pouvoir regarder ce qu'elle a fait
 or un run se termine toujours par un commit et laisse l'arbre propre. Ce qu'on
 veut relire, c'est **la branche du ticket contre sa base**.
 """
-import asyncio
 from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from tessera.services.git_runner import git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -42,15 +42,6 @@ class TicketDiff(BaseModel):
     files: list[str] = Field(default_factory=list)
 
 
-async def _git(cwd: Path, *args: str) -> tuple[int, str]:
-    proc = await asyncio.create_subprocess_exec(
-        "git", "-c", "core.quotepath=false", *args, cwd=str(cwd),
-        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
-    )
-    out, _ = await proc.communicate()
-    return proc.returncode or 0, out.decode("utf-8", errors="replace")
-
-
 def _prefixe_du_projet(project_path: Path, racine: Path) -> str:
     """Le chemin du projet sous la racine du dépôt, avec `/` final ; vide à la racine."""
     try:
@@ -73,12 +64,12 @@ def _pathspec(prefixe: str, hors_documentation: bool) -> list[str]:
 
 
 async def _branche_du_ticket(racine: Path, ticket_id: str) -> str | None:
-    code, sortie = await _git(
+    liste = await git(
         racine, "branch", "--list", f"{ticket_id}-*", "--format=%(refname:short)"
     )
-    if code != 0:
+    if not liste.ok:
         return None
-    branches = [ligne.strip() for ligne in sortie.splitlines() if ligne.strip()]
+    branches = [ligne.strip() for ligne in liste.out.splitlines() if ligne.strip()]
     return branches[0] if branches else None
 
 
@@ -91,23 +82,23 @@ async def _reference(racine: Path, branche: str, base: str | None) -> str:
     est `develop`, ferait entrer dans le diff tout ce que `develop` a de plus.
     """
     for candidate in (base, f"origin/{base}") if base else ():
-        code, _ = await _git(racine, "rev-parse", "--verify", "--quiet", candidate)
-        if code == 0:
+        if (await git(racine, "rev-parse", "--verify", "--quiet", candidate)).ok:
             return candidate
-    code, courante = await _git(racine, "symbolic-ref", "--short", "HEAD")
-    return courante.strip() if code == 0 and courante.strip() != branche else "main"
+    courante = await git(racine, "symbolic-ref", "--short", "HEAD")
+    nom = courante.out.strip()
+    return nom if courante.ok and nom != branche else "main"
 
 
 async def _lire(
     racine: Path, verbe: str, args: list[str], specs: list[str]
 ) -> tuple[int, str, list[str]]:
     """Le diff d'une commande git, et les noms de fichiers qu'elle touche."""
-    code, diff = await _git(racine, verbe, *args, *specs)
-    if code != 0:
-        return code, "", []
-    code, noms = await _git(racine, verbe, "--name-only", *args, *specs)
-    fichiers = [n.strip() for n in noms.splitlines() if n.strip()] if code == 0 else []
-    return 0, diff.strip(), fichiers
+    diff = await git(racine, verbe, *args, *specs)
+    if not diff.ok:
+        return diff.code, "", []
+    noms = await git(racine, verbe, "--name-only", *args, *specs)
+    fichiers = [n.strip() for n in noms.out.splitlines() if n.strip()] if noms.ok else []
+    return 0, diff.out.strip(), fichiers
 
 
 async def diff_du_ticket(
@@ -162,13 +153,13 @@ async def _diff_par_commit(
     donc son diff est **vide** une fois filtré. On descend du plus récent au
     plus ancien et on rend le premier diff non vide.
     """
-    code, sortie = await _git(
+    historique = await git(
         racine, "log", "--all", f"--grep={ticket_id}", "--format=%H", "-n", "20"
     )
-    if code != 0:
+    if not historique.ok:
         return TicketDiff(ticket_id=ticket_id)
 
-    for sha in (l.strip() for l in sortie.splitlines() if l.strip()):
+    for sha in (l.strip() for l in historique.out.splitlines() if l.strip()):
         code, diff, fichiers = await _lire(racine, "show", [sha, "--format="], specs)
         if code == 0 and diff:
             return TicketDiff(

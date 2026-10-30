@@ -25,9 +25,7 @@ Une erreur git est journalisée et n'empêche jamais le démarrage du backend.
 
 from __future__ import annotations
 
-import asyncio
 import json
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -35,6 +33,7 @@ import aiosqlite
 import frontmatter as fm
 
 from tessera.models.ticket import TicketStatus
+from tessera.services.git_runner import git
 from tessera.services.pipeline_text import _unapproved_commit_message
 from tessera.services.reprise_marqueur import (
     lire_runs,
@@ -58,24 +57,12 @@ async def _git(project_path: Path, *args: str) -> str:
 
     Lève `RuntimeError` si git renvoie un code non nul.
     """
-    hooks_dir = Path(tempfile.gettempdir()) / "tessera-sans-hooks"
-    hooks_dir.mkdir(parents=True, exist_ok=True)
-    proc = await asyncio.create_subprocess_exec(
-        "git",
-        "-c", f"core.hooksPath={hooks_dir}",
-        "-c", "core.quotePath=false",
-        *args,
-        cwd=str(project_path),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    out, err = await proc.communicate()
-    if proc.returncode != 0:
+    resultat = await git(project_path, *args)
+    if not resultat.ok:
         raise RuntimeError(
-            f"git {' '.join(args)} a échoué dans {project_path} : "
-            f"{err.decode('utf-8', errors='replace')!r}"
+            f"git {' '.join(args)} a échoué dans {project_path} : {resultat.err!r}"
         )
-    return out.decode("utf-8", errors="replace").strip()
+    return resultat.out.strip()
 
 
 def _lire_base_branch(project_path: Path, fallback: str = "develop") -> str:

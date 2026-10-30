@@ -1,12 +1,13 @@
 ---
-id: ticket-677
-title: "One git runner with hooks disabled"
-type: refactor
-status: todo
-priority: high
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-677
+pr_number: 791
+priority: high
+status: done
+title: One git runner with hooks disabled
+type: refactor
 ---
 
 # ticket-677 — Un exécuteur `git` unique, hooks neutralisés
