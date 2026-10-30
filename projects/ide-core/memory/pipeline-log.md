@@ -6537,3 +6537,4 @@ Le diff ajoute :
 - 2026-10-30 12:47:28 UTC — [ticket-705] validateur: fichiers cités joints : backend/tests/test_git_guard.py
 - 2026-10-30 12:47:28 UTC — [ticket-705] validateur: APPROVED — Ticket-705 passe tous les critères. La refonte du garde git/gh fonctionne : une  (365968ms)
 - 2026-10-30 12:47:28 UTC — [ticket-705] APPROVED après 1 tour(s)
+- 2026-10-30 12:50:22 UTC — [ticket-705] documentation: 0 fichier(s) (168985ms)
