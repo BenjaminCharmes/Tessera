@@ -1,14 +1,15 @@
 ---
-id: ticket-705
-title: "The git and gh guard becomes an allowlist of reads"
-type: refactor
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-703"]
-estimated_days: 1
 created: 2026-10-30
+depends_on:
+- ticket-703
+estimated_days: 1
+id: ticket-705
+pr_number: 780
+priority: high
+status: done
+title: The git and gh guard becomes an allowlist of reads
+type: refactor
 ---
 
 # ticket-705 — Le garde git/gh devient une liste blanche de lectures (C-03)

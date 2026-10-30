@@ -14,24 +14,19 @@ Le refus est donc posé **au niveau du SDK**, via `can_use_tool`, et pas dans le
 prompt : une consigne décrit une intention, un refus produit un fait.
 
 Le git en lecture reste permis. Lire le dépôt fait partie du travail — c'est ce
-qui permet de comprendre ce qui existe avant d'écrire.
+qui permet de comprendre ce qui existe avant d'écrire. Depuis ticket-705
+(ADR-067), « en lecture » veut dire « nommé dans une liste blanche » : voir
+`git_guard_lectures.py`.
 """
 from typing import Any
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.services.providers import git_guard_lexique as lexique
+from tessera.services.providers.git_guard_lectures import gh_interdit, git_interdit
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
-
-#: Sous-commandes qui écrivent dans l'historique, l'index ou les références.
-_SOUS_COMMANDES_INTERDITES = frozenset({
-    "commit", "merge", "push", "checkout", "switch", "branch", "reset",
-    "rebase", "cherry-pick", "revert", "tag", "stash", "add", "rm", "mv",
-    "clean", "restore", "am", "apply", "filter-branch", "update-ref",
-    "remote", "fetch", "pull", "submodule", "worktree", "config",
-})
 
 #: Ce que l'agent lit quand on lui refuse la commande. Il doit comprendre que
 #: le commit est fait *pour* lui, sinon il réessaie ou abandonne le ticket.
@@ -41,44 +36,6 @@ GIT_REFUS = (
     "run, avec un message dérivé du ticket. Contente-toi d'écrire les "
     "fichiers. Le git en lecture (status, diff, log, show) reste disponible."
 )
-
-#: Options globales de git qui précèdent la sous-commande.
-_OPTIONS_GLOBALES_AVEC_VALEUR = frozenset({"-C", "-c", "--git-dir", "--work-tree"})
-
-#: Les sous-commandes `gh` qui écrivent sur GitHub : ouvrir ou merger une PR,
-#: appeler l'API, toucher au dépôt, à une release, déclencher un workflow.
-#: `gh pr view` tombe aussi — la lecture GitHub n'est pas ce qui manque à un
-#: agent, et distinguer `view` de `merge` sous-commande par sous-commande
-#: multiplierait les formes à connaître (ticket-119).
-_SOUS_COMMANDES_GH_INTERDITES = frozenset({"pr", "api", "repo", "release", "workflow"})
-
-
-def _sous_commande_git(arguments: list[str]) -> str | None:
-    """La sous-commande d'un `git …`, ou `None` s'il n'y en a pas.
-
-    Lève le drapeau `alias` si un `-c alias.x=…` précède : `git -c
-    alias.p=push p` est un push sous un autre nom.
-    """
-    i = 0
-    while i < len(arguments):
-        jeton = arguments[i]
-        if jeton.startswith("--") and "=" in jeton:
-            i += 1  # --git-dir=.git : la valeur est collée
-            continue
-        if jeton in _OPTIONS_GLOBALES_AVEC_VALEUR:
-            valeur = arguments[i + 1] if i + 1 < len(arguments) else ""
-            if jeton == "-c" and valeur.lower().startswith("alias."):
-                return "alias"
-            i += 2  # -C /chemin : la valeur est le jeton suivant
-            continue
-        if jeton.startswith("-c") and len(jeton) > 2 and jeton[2:].lower().startswith("alias."):
-            return "alias"
-        if jeton.startswith("-"):
-            i += 1
-            continue
-        return jeton.lower()
-    return None
-
 
 def _segment_interdit(jetons_: list[str]) -> bool:
     """True si ce segment, une fois déballé, est un git ou un gh qui écrit."""
@@ -96,11 +53,9 @@ def _segment_interdit(jetons_: list[str]) -> bool:
             jetons_ = lexique.sans_enveloppe(jetons_)
             continue
         if nom == "git":
-            sous = _sous_commande_git(jetons_[1:])
-            return sous == "alias" or sous in _SOUS_COMMANDES_INTERDITES
+            return git_interdit(jetons_[1:])
         if nom == "gh":
-            premier = next((j.lower() for j in jetons_[1:] if not j.startswith("-")), None)
-            return premier in _SOUS_COMMANDES_GH_INTERDITES
+            return gh_interdit(jetons_[1:])
         return False
 
 
