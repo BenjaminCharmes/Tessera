@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ProjectOverview } from "../../types/api";
 import Button from "../../design/ui/Button";
 import { IconChevronDown, IconChevronRight } from "../../design/icons";
+import IconeDuProjet from "../ProjetsView/IconeDuProjet";
 import Spinner from "./Spinner";
 
 interface ProjetsArretesProps {
@@ -43,10 +44,7 @@ export default function ProjetsArretes({ projets, enLancement, onLancer }: Proje
               key={projet.id}
               className="flex items-center gap-3 rounded-md bg-zinc-900 px-3 py-2 text-sm ring-1 ring-zinc-800"
             >
-              <span aria-hidden="true" className="flex items-end gap-0.5">
-                <span className="h-5 w-2.5 bg-zinc-800" />
-                <span className="h-7 w-2.5 bg-zinc-800" />
-              </span>
+              <IconeDuProjet projet={projet} taille="tuile" />
               <span className="min-w-0 flex-1 truncate font-medium text-zinc-100" title={projet.name}>
                 {projet.name}
               </span>

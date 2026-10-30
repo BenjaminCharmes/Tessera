@@ -187,6 +187,15 @@ describe("Stopped projects", () => {
     expect(within(section).getByRole("list")).toHaveClass("grid");
   });
 
+  it("shows each stopped project's icon on its tile, or its initial without one", async () => {
+    await monter([], [projet({ id: "beta", name: "Beta", icon: true }), projet({ id: "gamma", name: "Gamma", icon: false })]);
+    const section = await screen.findByRole("region", { name: "Arrêtés" });
+
+    const [beta, gamma] = within(section).getAllByRole("listitem");
+    expect(beta?.querySelector("img")?.getAttribute("src")).toContain("/api/v1/projects/beta/icon");
+    expect(within(gamma as HTMLElement).getByTestId("icone-initiale")).toHaveTextContent("G");
+  });
+
   it("starts the project and shows a pending state until it is back in the inventory", async () => {
     const demarrer = vi.spyOn(api.services, "start").mockResolvedValue({ services: [] });
     const lire = await monter([], [projet({ id: "beta", name: "Beta" })]);
