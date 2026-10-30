@@ -1,0 +1,6 @@
+/* Lot « mur » : deux étoiles de la fenêtre de nuit scintillent. Décor du ciel, jamais un état. */
+.anim-scintille { animation: scintille 2.6s steps(1) infinite; }
+@keyframes scintille { 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) {
+  .anim-scintille { animation: none; }
+}
