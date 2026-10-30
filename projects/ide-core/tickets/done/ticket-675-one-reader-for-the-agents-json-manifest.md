@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-675
+pr_number: 798
 priority: medium
 status: done
 title: One reader for the agents.json manifest
