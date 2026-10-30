@@ -9,11 +9,11 @@ Elle ne touche l'arbre que dans un état sans ambiguïté — sur la branche de
 base, avec pour seule modification le journal du pipeline. Tout le reste
 (autre branche, autre fichier modifié, pull refusé) laisse l'arbre intact.
 """
-import asyncio
 from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.services import journal_en_attente
+from tessera.services.git_runner import git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -29,21 +29,6 @@ class Realignement:
 _JOURNAL = (Path("memory") / "pipeline-log.md").as_posix()
 
 
-async def _git(racine: Path, *args: str) -> tuple[int, str, str]:
-    proc = await asyncio.create_subprocess_exec(
-        "git", *args,
-        cwd=str(racine),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    out, err = await proc.communicate()
-    return (
-        proc.returncode or 0,
-        out.decode("utf-8", errors="replace"),
-        err.decode("utf-8", errors="replace"),
-    )
-
-
 def _chemin_porcelain(ligne: str) -> str:
     """Path part of a `git status --porcelain` line (renames: the new path)."""
     chemin = ligne[3:].split(" -> ")[-1].strip()
@@ -52,10 +37,10 @@ def _chemin_porcelain(ligne: str) -> str:
 
 async def _raison_de_refus(racine: Path, base_branch: str) -> str | None:
     """Why the tree must be left alone, or None when it may be realigned."""
-    code, sortie, _ = await _git(racine, "rev-parse", "--abbrev-ref", "HEAD")
-    if code != 0:
+    courante = await git(racine, "rev-parse", "--abbrev-ref", "HEAD")
+    if not courante.ok:
         return "branche courante illisible"
-    branche = sortie.strip()
+    branche = courante.out.strip()
     if branche != base_branch:
         return f"arbre sur la branche {branche}, pas sur {base_branch}"
     # `status --porcelain` donne des chemins relatifs à la racine du dépôt, pas
@@ -63,18 +48,18 @@ async def _raison_de_refus(racine: Path, base_branch: str) -> str | None:
     # s'écrit `projects/<nom>/memory/pipeline-log.md`. On préfixe donc le
     # journal du chemin du projet dans le dépôt, et on limite le statut au
     # projet (`-- .`) : un autre projet du même dépôt ne nous concerne pas.
-    code, prefixe, _ = await _git(racine, "rev-parse", "--show-prefix")
-    if code != 0:
+    prefixe = await git(racine, "rev-parse", "--show-prefix")
+    if not prefixe.ok:
         return "position du projet dans le dépôt illisible"
-    journal = prefixe.strip() + _JOURNAL
+    journal = prefixe.out.strip() + _JOURNAL
     # `-uall` : un dossier non suivi qui ne contient que le journal doit se
     # lire `?? memory/pipeline-log.md`, pas `?? memory/` (ticket-480).
-    code, sortie, _ = await _git(racine, "status", "--porcelain", "-uall", "--", ".")
-    if code != 0:
+    statut = await git(racine, "status", "--porcelain", "-uall", "--", ".")
+    if not statut.ok:
         return "état de l'arbre illisible"
     autres = [
         chemin
-        for chemin in map(_chemin_porcelain, sortie.splitlines())
+        for chemin in map(_chemin_porcelain, statut.out.splitlines())
         if chemin != journal
     ]
     if autres:
@@ -113,8 +98,7 @@ async def _mettre_de_cote_non_suivi(racine: Path, base_branch: str) -> list[str]
     """
     if not await journal_en_attente.journal_non_suivi(racine):
         return []
-    code, _, _ = await _git(racine, "fetch", "origin", base_branch)
-    if code != 0:
+    if not (await git(racine, "fetch", "origin", base_branch)).ok:
         return []
     return await journal_en_attente.mettre_de_cote_non_suivi(
         racine, f"origin/{base_branch}"
@@ -126,10 +110,10 @@ async def _avancer(racine: Path, base_branch: str) -> str | None:
     lignes = await journal_en_attente.mettre_de_cote(racine)
     lignes += await _mettre_de_cote_non_suivi(racine, base_branch)
     try:
-        code, _, err = await _git(racine, "pull", "--ff-only", "origin", base_branch)
+        pull = await git(racine, "pull", "--ff-only", "origin", base_branch)
     finally:
         # Réécrit même si le pull a échoué ou levé : le journal ne perd rien.
         journal_en_attente.reecrire(racine, lignes)
-    if code != 0:
-        return f"pull --ff-only refusé : {err.strip()[:200]}"
+    if not pull.ok:
+        return f"pull --ff-only refusé : {pull.err.strip()[:200]}"
     return None

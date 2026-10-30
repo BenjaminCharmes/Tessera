@@ -25,7 +25,7 @@ PLAFONDS: dict[str, int] = {
     "services/process_registry.py": 405,
     "services/project_loader.py": 646,
     "services/providers/agent_sdk.py": 464,
-    "services/reprise_orphelin.py": 383,
+    "services/reprise_orphelin.py": 370,
     "services/run_executor.py": 414,
     "services/test_runner.py": 533,
     "services/ticket_service.py": 461,

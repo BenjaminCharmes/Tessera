@@ -2,28 +2,15 @@
 
 import asyncio
 import json
-import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.services.git_runner import _dossier_sans_hooks
 from tessera.services.git_workspace.erreurs import GitCommandError, NotAGitRepository
 
 if TYPE_CHECKING:
     from tessera.services.politique_run import PolitiqueRun
     from tessera.services.worktree_dossiers import DossiersWorktree
-
-
-def _dossier_sans_hooks() -> Path:
-    """Un dossier vide, hors de tout projet, à donner comme `core.hooksPath`.
-
-    Un chemin inexistant ferait aussi l'affaire pour git, mais un dossier qui
-    existe et qu'on contrôle ne laisse aucune place à l'interprétation. Créé à
-    la demande : `tempfile.gettempdir()` n'est pas connu au chargement du
-    module sur toutes les plateformes.
-    """
-    dossier = Path(tempfile.gettempdir()) / "tessera-sans-hooks"
-    dossier.mkdir(parents=True, exist_ok=True)
-    return dossier
 
 
 class GitCore:
