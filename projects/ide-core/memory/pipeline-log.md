@@ -6722,3 +6722,21 @@ Le diff ajoute :
 - 2026-10-30 22:30:21 UTC — [ticket-678] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code intègre une unique requ (131108ms)
 - 2026-10-30 22:30:21 UTC — [ticket-678] APPROVED après 2 tour(s)
 - 2026-10-30 22:32:25 UTC — [ticket-678] documentation: 0 fichier(s) (118000ms)
+- 2026-10-30 22:46:40 UTC — [ide-core] ticket-678 PR #800 mergée (CI verte)
+- 2026-10-30 22:46:42 UTC — [ide-core] ticket-678 : base réalignée sur develop
+- 2026-10-30 22:46:42 UTC — [ide-core] ticket-678 PR #800 confiée au CIWatcher
+- 2026-10-30 22:46:45 UTC — [ticket-679] branche ticket-679-response-models-for-the-services-routes
+- 2026-10-30 22:46:47 UTC — [ticket-679] tour 1 — codeur démarré
+- 2026-10-30 22:49:44 UTC — [ticket-679] tour 1 — codeur terminé (177031ms)
+- 2026-10-30 22:56:47 UTC — [ticket-679] testeur: 1 failed, 2033 passed, 64 warnings in 418.58s (0:06:58)
+- 2026-10-30 22:56:47 UTC — [ticket-679] tests rouges au tour 1
+- 2026-10-30 22:56:47 UTC — [ticket-679] tour 2 — codeur démarré
+- 2026-10-30 22:57:58 UTC — [ticket-679] tour 2 — codeur terminé (71936ms)
+- 2026-10-30 23:05:56 UTC — [ticket-679] testeur: OK (exit 0)
+- 2026-10-30 23:07:28 UTC — [ticket-679] securite: PASS — Refactorisation de sécurité positive : migration des réponses des routes vers de (91921ms)
+- 2026-10-30 23:07:28 UTC — [ticket-679] tour 2 — reviewer démarré
+- 2026-10-30 23:07:44 UTC — [ticket-679] tour 2 — reviewer terminé (15671ms)
+- 2026-10-30 23:10:01 UTC — [ticket-679] validateur: fichiers cités joints : types/api.ts
+- 2026-10-30 23:10:01 UTC — [ticket-679] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les routes de services utilisen (152500ms)
+- 2026-10-30 23:10:01 UTC — [ticket-679] APPROVED après 2 tour(s)
+- 2026-10-30 23:12:14 UTC — [ticket-679] documentation: 0 fichier(s) (128046ms)
