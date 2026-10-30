@@ -45,6 +45,7 @@ const FAMILLES = {
   mur: { tessera: "#3a3430", chaud: "#4a3a30", neon: "#161833", doux: .45 },
   plinthe: { tessera: "#1c1917", chaud: "#2a1d16", neon: "#0a0b1c", doux: .6 },
   sol: { tessera: "#2a2420", chaud: "#3a2c24", neon: "#0e0f1f", doux: .4 },
+  "salle-mur": { tessera: "#2b3035", chaud: "#383230", neon: "#121430", doux: .45 },
 };
 
 /** Les choix de jour par défaut : Tessera, sauf ce que Benjamin a préféré en Chaud. */

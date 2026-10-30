@@ -21,3 +21,8 @@ for (const f of fs.readdirSync(path.join(RACINE, "pages")).filter(f => f.endsWit
   fs.writeFileSync(path.join(dist, f), sortie);
   console.log(`dist/${f} (${(sortie.length / 1024).toFixed(0)} Ko)`);
 }
+
+// L'étude des techniques (première version de l'atelier) devient une page à part, avec son squelette.
+const v1 = fs.readFileSync(path.join(RACINE, "catalogue-v1.html"), "utf8");
+fs.writeFileSync(path.join(dist, "techniques.html"), `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>${v1.replace("<title>Atelier des sprites</title>", "<title>Techniques de rendu</title>")}</body></html>`);
+console.log("dist/techniques.html");
