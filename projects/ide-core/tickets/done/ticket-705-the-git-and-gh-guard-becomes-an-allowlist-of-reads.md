@@ -5,7 +5,7 @@ depends_on:
 - ticket-703
 estimated_days: 1
 id: ticket-705
-pr_number: null
+pr_number: 780
 priority: high
 status: done
 title: The git and gh guard becomes an allowlist of reads
