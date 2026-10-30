@@ -54,19 +54,19 @@ describe("BureauView — the director's round", () => {
     const projets: ProjetDuBureau[] = [{ nom: "projet-0", etat: etatEnCodage() }];
     render(<BureauView projets={projets} {...CANAL} />);
     expect(directeurEnVisite("projet-0")).toBeNull();
-    expect(within(salleDuDirecteur()).getByRole("img", { name: "Victor, directeur" })).toBeInTheDocument();
+    expect(within(salleDuDirecteur()).getByRole("img", { name: "Ben, directeur" })).toBeInTheDocument();
 
     avancer(30_000);
     expect(directeurEnVisite("projet-0")?.getAttribute("data-poste")).toBe("codeur");
     // ticket-723 : son infobulle dit pourquoi il est venu.
     expect(directeurEnVisite("projet-0")?.getAttribute("aria-label")).toBe(
-      "Victor, directeur, vient voir pourquoi le run se tait chez projet-0",
+      "Ben, directeur, vient voir pourquoi le run se tait chez projet-0",
     );
-    expect(within(salleDuDirecteur()).getByRole("img", { name: "Victor, directeur, en visite" })).toBeInTheDocument();
+    expect(within(salleDuDirecteur()).getByRole("img", { name: "Ben, directeur, en visite" })).toBeInTheDocument();
 
     avancer(DUREE_DE_VISITE_MS);
     expect(directeurEnVisite("projet-0")).toBeNull();
-    expect(within(salleDuDirecteur()).getByRole("img", { name: "Victor, directeur" })).toBeInTheDocument();
+    expect(within(salleDuDirecteur()).getByRole("img", { name: "Ben, directeur" })).toBeInTheDocument();
   });
 
   it("comes for an agent the user clicks, even while the delay between visits runs", () => {
@@ -91,7 +91,7 @@ describe("BureauView — the director's round", () => {
     avancer(60_000);
 
     expect(directeurEnVisite("projet-0")).toBeNull();
-    expect(within(salleDuDirecteur()).getByRole("img", { name: "Victor, directeur" })).toBeInTheDocument();
+    expect(within(salleDuDirecteur()).getByRole("img", { name: "Ben, directeur" })).toBeInTheDocument();
   });
 
   it("still mounts a single interval while he visits", () => {

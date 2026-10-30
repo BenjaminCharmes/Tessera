@@ -1,4 +1,5 @@
 import { TENUES, graine } from "./physique";
+import { membreDeLEquipe } from "./equipeDeTessera";
 import type { RoleAffiche } from "./postesDuRun";
 
 /** Les prénoms que le Bureau donne à ses agents : une liste fixe, plus longue que les neuf rôles. */
@@ -53,9 +54,17 @@ function premierLibre(depart: number, pris: ReadonlySet<number>): number {
  * Un nom est une identité, comme la tenue : il ne dit rien de l'état du run.
  */
 export function nomDeLAgent(projet: string, role: RoleAffiche): string {
-  const pris = new Set<number>();
+  const membre = membreDeLEquipe(projet, role);
+  if (membre) return membre.prenom;
+  // Les prénoms de l'équipe nommée ne se tirent plus pour les autres rôles du projet.
+  const pris = new Set<number>(
+    ROLES.map((r) => membreDeLEquipe(projet, r)?.prenom)
+      .map((p) => (p === undefined ? -1 : PRENOMS.indexOf(p)))
+      .filter((i) => i >= 0),
+  );
   let choisi = 0;
   for (const r of ROLES) {
+    if (membreDeLEquipe(projet, r)) continue;
     choisi = premierLibre(graine(`${projet}:${r}`), pris);
     pris.add(choisi);
     if (r === role) break;
@@ -65,9 +74,10 @@ export function nomDeLAgent(projet: string, role: RoleAffiche): string {
 
 /**
  * Le personnel des salles communes : une personne chacun, un prénom fixe. Hors de
- * `PRENOMS`, pour ne jamais se confondre avec un agent de projet.
+ * `PRENOMS`, pour ne jamais se confondre avec un agent de projet. Le directeur,
+ * c'est l'utilisateur lui-même : il s'appelle Ben.
  */
-export const NOM_DU_DIRECTEUR = "Victor";
+export const NOM_DU_DIRECTEUR = "Ben";
 export const NOM_DES_RH = "Hélène";
 
 /**

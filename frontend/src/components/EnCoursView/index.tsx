@@ -9,6 +9,7 @@ import EnTeteGroupe from "./EnTeteGroupe";
 import LigneApp from "./LigneApp";
 import ProjetsArretes from "./ProjetsArretes";
 import SallesDesServeurs from "./SallesDesServeurs";
+import SalleTessera from "./SalleTessera";
 import { formaterMo, grouperParProjet, memoireTotale } from "./format";
 
 type VueEnCours = "salles" | "liste";
@@ -69,6 +70,9 @@ export default function EnCoursView({ appsEnCours, vueInitiale = "salles" }: EnC
         <p role="alert" className="mb-3 text-sm text-red-300">
           {erreur}
         </p>
+      )}
+      {vue === "salles" && (
+        <SalleTessera nom={projets.find((p) => p.id === "ide-core")?.name ?? "Tessera"} lueA={lueA} />
       )}
       {apps.length === 0 ? (
         <Message texte="Aucune app de projet ne tourne" />

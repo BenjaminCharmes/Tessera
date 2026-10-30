@@ -1,4 +1,6 @@
 import Confettis from "../../design/bureau/Confettis";
+import IconeDuProjet from "../ProjetsView/IconeDuProjet";
+import { useApercuDuProjet } from "../../hooks/useApercuDesProjets";
 import type { MotifDeVisite } from "../../lib/bureau/ronde";
 import Gyrophare from "../../design/bureau/Gyrophare";
 import NightVeil from "../../design/bureau/NightVeil";
@@ -103,6 +105,7 @@ export default function Piece({
   directeur = null,
   motifDuDirecteur,
 }: PieceProps) {
+  const apercu = useApercuDuProjet(projet);
   const postes = postesDuRun(etat);
   const sante = santeAgent(
     etat.dernierEvenementA,
@@ -175,19 +178,23 @@ export default function Piece({
       className={`overflow-hidden rounded-lg border bg-zinc-900 ${CONTOURS[contour]}`}
     >
       <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">
-        <div className="flex min-w-0 items-baseline gap-2">
-          <h3 className="shrink-0 text-corps font-semibold text-zinc-200">{projet}</h3>
-          {/* Le ticket traité : la pile ne montre que les suivants (ticket-656). */}
-          {ticketCourant && (
-            <p
-              data-testid="ticket-en-cours"
-              title={ticketCourant.titre ? `${ticketCourant.id} — ${ticketCourant.titre}` : ticketCourant.id}
-              className="truncate text-micro text-zinc-400"
-            >
-              <span className="font-mono text-zinc-300">{ticketCourant.id}</span>
-              {ticketCourant.titre && ` — ${ticketCourant.titre}`}
-            </p>
-          )}
+        <div className="flex min-w-0 items-center gap-2">
+          <IconeDuProjet projet={apercu ?? { id: projet, name: projet, icon: false }} taille="titre" />
+          {/* L'icône se centre sur la ligne ; le nom et le ticket gardent leur ligne de base commune. */}
+          <div className="flex min-w-0 items-baseline gap-2">
+            <h3 className="shrink-0 text-corps font-semibold text-zinc-200">{projet}</h3>
+            {/* Le ticket traité : la pile ne montre que les suivants (ticket-656). */}
+            {ticketCourant && (
+              <p
+                data-testid="ticket-en-cours"
+                title={ticketCourant.titre ? `${ticketCourant.id} — ${ticketCourant.titre}` : ticketCourant.id}
+                className="truncate text-micro text-zinc-400"
+              >
+                <span className="font-mono text-zinc-300">{ticketCourant.id}</span>
+                {ticketCourant.titre && ` — ${ticketCourant.titre}`}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {/* Ce que la pièce dit d'elle-même : la fête, la copie rendue, la santé, ou l'étape sans poste. */}

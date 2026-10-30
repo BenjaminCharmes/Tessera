@@ -25,7 +25,8 @@ describe("physique", () => {
       for (const role of POSTES) {
         const p = physique(projet, role);
         expect([1, 2, 3, 4, 5]).toContain(p.peau);
-        expect([1, 2, 3, 4, 5, 6]).toContain(p.cheveux);
+        // 7, le blond clair, n'existe que pour l'équipe nommée de Tessera (ide-core).
+        expect([1, 2, 3, 4, 5, 6, 7]).toContain(p.cheveux);
         expect(["court", "long", "carre", "chauve"]).toContain(p.coiffure);
         if (p.jupe) expect(["long", "carre"]).toContain(p.coiffure);
       }
@@ -34,7 +35,7 @@ describe("physique", () => {
 
   it("declares a token for every skin and hair index it can draw", () => {
     for (const n of [1, 2, 3, 4, 5]) expect(jeton(`peau-${n}`), `peau-${n}`).toBeDefined();
-    for (const n of [1, 2, 3, 4, 5, 6]) expect(jeton(`cheveux-${n}`), `cheveux-${n}`).toBeDefined();
+    for (const n of [1, 2, 3, 4, 5, 6, 7]) expect(jeton(`cheveux-${n}`), `cheveux-${n}`).toBeDefined();
   });
 });
 
@@ -83,3 +84,20 @@ describe("TENUES", () => {
     expect(POSTES.filter((r) => TENUES[r].capuche)).toEqual(["codeur"]);
   });
 });
+
+describe("the named Tessera team's looks", () => {
+  it("fixes the look of ide-core's four named agents, all men with short hair", () => {
+    expect(physique("ide-core", "codeur")).toEqual({ peau: 2, cheveux: 1, coiffure: "court", jupe: false });
+    expect(physique("ide-core", "testeur")).toEqual({ peau: 1, cheveux: 7, coiffure: "court", jupe: false });
+    expect(physique("ide-core", "securite")).toEqual({ peau: 5, cheveux: 6, coiffure: "court", jupe: false });
+    expect(physique("ide-core", "reviewer")).toEqual({ peau: 4, cheveux: 2, coiffure: "court", jupe: false });
+  });
+
+  it("never draws the light blond reserved for the team, and keeps other projects drawn", () => {
+    for (let i = 0; i < 200; i += 1) {
+      expect(physique(`p${i}`, "codeur").cheveux).not.toBe(7);
+    }
+    expect(physique("curio", "codeur")).not.toBeUndefined();
+  });
+});
+

@@ -198,7 +198,7 @@ describe("wall screens and journal (ticket-711)", () => {
     return screen.findByRole("button", { name: /api/, expanded: false });
   }
 
-  it("shows the last five lines of a service's output, an error line in red", async () => {
+  it("shows the last four lines of a service's output, an error line in red", async () => {
     const ecran = await rendreAvecSortie();
 
     expect(within(ecran).queryByText("boot")).toBeNull();

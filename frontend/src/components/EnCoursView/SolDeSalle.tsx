@@ -14,7 +14,8 @@ const PAS_PERFOREE = 4;
  */
 export default function SolDeSalle() {
   return (
-    <div data-sol="dalles" aria-hidden="true" className="flex overflow-hidden">
+    // Une demi-rangée de dalles suffit à dire « faux plancher » : la salle reste basse.
+    <div data-sol="dalles" aria-hidden="true" className="flex h-8 overflow-hidden">
       <Agrandi>
         <span className="flex">
           {Array.from({ length: DALLES }, (_, i) =>

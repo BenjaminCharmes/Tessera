@@ -15,6 +15,8 @@ import {
 } from "../../design/charts/palette";
 import type { RecentRun, StatsPeriod, UsageStats } from "../../types/api";
 import Card from "./Card";
+import JaugesDeQuota from "../../design/ui/JaugesDeQuota";
+import { useQuotaLu } from "../../hooks/useQuotaLu";
 import KpiRow from "./KpiRow";
 import QualityCard from "./QualityCard";
 import RecentRunsCard from "./RecentRunsCard";
@@ -45,6 +47,9 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
   const { data, loading } = useResource<UsageStats | null>(fetcher, null);
   // Le run sélectionné dans l'historique — ouvre sa vue en lecture seule (ticket-281).
   const [selectedRun, setSelectedRun] = useState<RecentRun | null>(null);
+  // Le quota réel, relu chaque minute, comme pour les notifications (ticket-726).
+  const [ouvertA] = useState(() => Date.now());
+  const quota = useQuotaLu(ouvertA);
 
   if (selectedRun) {
     return (
@@ -74,6 +79,9 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
             pipeline exécuté.
           </p>
         )}
+        <Card title="Quota de l'abonnement" aside="relevé par le SDK" className="mb-4 max-w-md">
+          <JaugesDeQuota fenetres={quota} />
+        </Card>
         {data && <Dashboard data={data} onSelectRun={setSelectedRun} />}
       </div>
     </div>

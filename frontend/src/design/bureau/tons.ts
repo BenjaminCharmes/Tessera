@@ -110,6 +110,7 @@ export const FILL_CHEVEUX: Record<Cheveux, string> = {
   4: "fill-(--sprite-cheveux-4)",
   5: "fill-(--sprite-cheveux-5)",
   6: "fill-(--sprite-cheveux-6)",
+  7: "fill-(--sprite-cheveux-7)",
 };
 
 export const FILL_HAUT: Record<RoleAffiche, string> = {

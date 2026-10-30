@@ -104,6 +104,19 @@ def _check_cooldown(base_url: str) -> None:
         )
 
 
+def secondes_de_refroidissement(base_url: str) -> float | None:
+    """Seconds left before *base_url* takes calls again, or None when it does now.
+
+    Lu par la salle Tessera (ticket-726) : la baie d'Ollama passe à l'ambre
+    tant que le disjoncteur le tient à l'écart.
+    """
+    expiry = _COOLDOWNS.get(base_url)
+    if expiry is None:
+        return None
+    reste = expiry - _clock()
+    return reste if reste > 0 else None
+
+
 def _set_cooldown(base_url: str) -> None:
     """Marque *base_url* comme lent pour `ollama_cooldown_s` secondes."""
     from tessera.config import settings

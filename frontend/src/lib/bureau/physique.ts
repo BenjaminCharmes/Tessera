@@ -1,8 +1,10 @@
 import type { RoleAffiche } from "./postesDuRun";
+import { membreDeLEquipe } from "./equipeDeTessera";
 
 /** Indice d'un ton de peau (`--sprite-peau-N`) et d'une couleur de cheveux (`--sprite-cheveux-N`). */
 export type Peau = 1 | 2 | 3 | 4 | 5;
-export type Cheveux = 1 | 2 | 3 | 4 | 5 | 6;
+/** 7, le blond clair, n'est pas tiré au sort : il sert à l'équipe nommée de Tessera. */
+export type Cheveux = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type Coiffure = "court" | "long" | "carre" | "chauve";
 
 /** Ce qui change d'un agent à l'autre : tiré d'une graine stable, jamais de l'état du run. */
@@ -76,7 +78,7 @@ function physiqueDeGraine(g: number): Physique {
  * le même résultat, d'un rendu et d'un run à l'autre.
  */
 export function physique(projet: string, role: RoleAffiche): Physique {
-  return physiqueDeGraine(graine(`${projet}:${role}`));
+  return membreDeLEquipe(projet, role)?.physique ?? physiqueDeGraine(graine(`${projet}:${role}`));
 }
 
 /** Le physique d'un agent d'un produit : tiré du projet et de l'`id` qu'il déclare. */

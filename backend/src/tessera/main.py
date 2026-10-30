@@ -30,6 +30,7 @@ from tessera.routers import (
     tickets,
     tickets_archive,
     usage,
+    salle_tessera,
 )
 from tessera.services.database import init_db, solder_les_runs_orphelins
 from tessera.services.eveil import relacher as eveil_relacher
@@ -156,6 +157,7 @@ app.include_router(fs.router, prefix="/api/v1")
 app.include_router(usage.router, prefix="/api/v1")
 app.include_router(runs.router, prefix="/api/v1")
 app.include_router(signalements.router, prefix="/api/v1")
+app.include_router(salle_tessera.router, prefix="/api/v1")
 
 
 @app.get("/health")

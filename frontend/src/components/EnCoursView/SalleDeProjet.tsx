@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
+import IconeDuProjet from "../ProjetsView/IconeDuProjet";
+import { useApercuDuProjet } from "../../hooks/useApercuDesProjets";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import { IconExternal } from "../../design/icons";
@@ -6,7 +8,6 @@ import Agrandi from "../../design/bureau/Agrandi";
 import CheminDeCables from "../../design/bureau/CheminDeCables";
 import Climatiseur from "../../design/bureau/Climatiseur";
 import BoucheVMC, { type RegimeVMC } from "../../design/bureau/BoucheVMC";
-import { PASTILLE_DE_L_ETAT } from "../../design/bureau/tons";
 import Extincteur from "../../design/bureau/Extincteur";
 import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
 import type { ServiceActif } from "../../types/api";
@@ -65,8 +66,8 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
     .flatMap((app) => app.ports.map((port) => ({ port, service: app.nom })))
     .sort((a, b) => a.port - b.port);
   const journal = services.find((s) => s.nom === deplie);
+  const apercu = useApercuDuProjet(groupe.project_id);
   const enMarche = baies.some((b) => b.etat === "en-cours");
-  const etatDeLaSalle = tombe ? "echoue" : enMarche ? "en-cours" : "arrete";
   // Un service qui disparaît referme son journal, pour qu'il ne se rouvre pas
   // tout seul à son retour : état ajusté pendant le rendu, sans effet.
   if (deplie !== null && journal === undefined && services.length > 0) setDeplie(null);
@@ -81,7 +82,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
       className={`flex flex-col overflow-hidden rounded-lg border bg-(--sprite-salle-mur) ${tombe ? "border-red-800" : "border-zinc-800"}`}
     >
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-900/60 px-3 py-2">
-        <span aria-hidden="true" className={`size-2.5 rounded-[2px] ${PASTILLE_DE_L_ETAT[etatDeLaSalle]}`} />
+        <IconeDuProjet projet={apercu ?? { id: groupe.project_id, name: groupe.project_name, icon: false }} taille="titre" />
         <h3 className="text-sm font-semibold text-zinc-100">{groupe.project_name}</h3>
         <span className="text-xs text-zinc-400">
           {baies.length} service{baies.length > 1 ? "s" : ""} · {formaterMo(groupe.memoire_mo)}
@@ -93,16 +94,18 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
               href={`http://localhost:${port}`}
               target="_blank"
               rel="noreferrer"
+              aria-label={`Ouvrir ${service} :${port}`}
+              title={`Ouvrir ${service} :${port}`}
               className="flex items-center gap-1 rounded-sm px-2 py-1 text-xs text-zinc-300 ring-1 ring-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
             >
-              Ouvrir {service} :{port}
+              {service} :{port}
               <IconExternal size={12} aria-hidden="true" />
             </a>
           ))}
-          <ArretDuProjet groupe={groupe} enArret={enArret} onArreterProjet={onArreterProjet} />
+          <ArretDuProjet groupe={groupe} enArret={enArret} onArreterProjet={onArreterProjet} court />
         </span>
       </header>
-      <div data-mur="serveurs" className="relative px-6 pt-10">
+      <div data-mur="serveurs" className="relative px-6 pt-8">
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
         </div>
@@ -121,7 +124,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
             ))}
           </div>
         )}
-        <div data-sol-mobilier className="mt-6 flex items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
+        <div data-sol-mobilier className="mt-4 flex items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
           <span className="flex items-end gap-4">
             <Agrandi>
               <Climatiseur />
@@ -146,7 +149,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, enArret, onArreter
               <Extincteur />
             </Agrandi>
             {/* La porte est à l'échelle d'une personne : plus haute qu'une baie. */}
-            <Agrandi relatif={2}>
+            <Agrandi relatif={1.85}>
               <PorteCoupeFeu />
             </Agrandi>
           </span>

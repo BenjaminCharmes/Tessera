@@ -40,6 +40,8 @@
   --sprite-cheveux-4: #7c2d12;
   --sprite-cheveux-5: #d4d4d8;
   --sprite-cheveux-6: #1c1917;
+  /* Blond clair : réservé à l'équipe nommée de Tessera, jamais tiré au sort. */
+  --sprite-cheveux-7: #d6a84a;
   --sprite-haut-codeur: oklch(0.606 0.25 292.717);
   --sprite-haut-codeur-ombre: oklch(0.491 0.27 292.581);
   --sprite-haut-testeur: #e4e4e7;
