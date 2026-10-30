@@ -22,6 +22,7 @@ from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.manifeste import lire_booleen, lire_chaine
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.project_loader import load_pipeline_config
+from tessera.services.racine_depot import est_ancestor, racine_ecriture_projet
 from tessera.services.worktree_dossiers import DossiersWorktree
 from tessera.services.worktree_politique import lire_worktree
 
@@ -30,10 +31,6 @@ MergeMethod = Literal["squash", "merge", "rebase"]
 
 #: Valeurs reconnues — toute autre valeur retombe sur le défaut fermé.
 _MERGE_METHODS_VALIDES: frozenset[str] = frozenset({"squash", "merge", "rebase"})
-
-#: La seule valeur qui ouvre le dépôt parent (ADR-028). Une valeur inconnue
-#: ne désarme rien.
-_GIT_ROOT_ANCESTOR = "ancestor"
 
 
 @dataclass(frozen=True)
@@ -101,7 +98,7 @@ class PolitiqueRun:
     @property
     def dans_le_depot_parent(self) -> bool:
         """True si le projet travaille dans le dépôt qui le contient (ADR-028)."""
-        return self.git_root == _GIT_ROOT_ANCESTOR
+        return est_ancestor(self.git_root)
 
     def racine_ecriture(
         self, project_path: Path, worktree: DossiersWorktree | None = None
@@ -121,13 +118,7 @@ class PolitiqueRun:
             if self.dans_le_depot_parent:
                 return worktree.racine.resolve()
             return worktree.projet.resolve()
-        racine = project_path.resolve()
-        if not self.dans_le_depot_parent:
-            return racine
-        for candidat in racine.parents:
-            if (candidat / ".git").exists():
-                return candidat
-        return racine.parent
+        return racine_ecriture_projet(project_path, self.dans_le_depot_parent)
 
 
 def _lire_merge_method(project_path: Path) -> MergeMethod:

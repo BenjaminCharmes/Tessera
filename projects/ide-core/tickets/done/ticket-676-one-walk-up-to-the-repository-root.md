@@ -1,12 +1,14 @@
 ---
-id: ticket-676
-title: "One walk up to the repository root"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-675]
 created: 2026-10-29
+depends_on:
+- ticket-675
+id: ticket-676
+pr_number: 799
+priority: medium
+status: done
+title: One walk up to the repository root
+type: refactor
 ---
 
 # ticket-676 — Une seule remontée vers le dépôt

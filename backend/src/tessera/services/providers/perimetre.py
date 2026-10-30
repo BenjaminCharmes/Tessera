@@ -26,7 +26,7 @@ from typing import Any, Awaitable, Callable
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
-from tessera.services.manifeste import lire_valeur
+from tessera.services.racine_depot import declare_ancestor, racine_ecriture_projet
 from tessera.services.providers.chemins_proteges import (
     INTERPRETE_PROTEGE_REFUS,
     motif_de_protection,
@@ -68,18 +68,7 @@ def racine_autorisee(project_path: Path) -> Path:
     Seule cette valeur exacte élargit le périmètre : une valeur inconnue ou un
     fichier illisible ne désarme rien.
     """
-    racine = project_path.resolve()
-    if lire_valeur(project_path, "git_root") == "ancestor":
-        return _depot_contenant(racine)
-    return racine
-
-
-def _depot_contenant(depart: Path) -> Path:
-    """Le premier ancêtre qui porte un `.git`, ou le parent à défaut."""
-    for candidat in depart.parents:
-        if (candidat / ".git").exists():
-            return candidat
-    return depart.parent
+    return racine_ecriture_projet(project_path, declare_ancestor(project_path))
 
 
 def hors_perimetre(

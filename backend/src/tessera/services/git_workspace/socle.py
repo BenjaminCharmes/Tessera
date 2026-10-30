@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from tessera.services.git_runner import _dossier_sans_hooks
 from tessera.services.git_workspace.erreurs import GitCommandError, NotAGitRepository
-from tessera.services.manifeste import lire_valeur
+from tessera.services.racine_depot import declare_ancestor
 
 if TYPE_CHECKING:
     from tessera.services.politique_run import PolitiqueRun
@@ -111,7 +111,7 @@ class GitCore:
         """
         if self._politique is not None:
             return self._politique.dans_le_depot_parent
-        return lire_valeur(self._project_path, "git_root") == "ancestor"
+        return declare_ancestor(self._project_path)
 
     async def _is_own_repository(self) -> bool:
         """True only if the project directory is itself the root of a repository.

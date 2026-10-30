@@ -35,6 +35,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.git_runner import git
 from tessera.services.manifeste import lire_chaine
 from tessera.services.pipeline_text import _unapproved_commit_message
+from tessera.services.racine_depot import depot_le_plus_proche
 from tessera.services.reprise_marqueur import (
     lire_runs,
     marquer_depots_repris,
@@ -98,12 +99,8 @@ def _est_dans_depot_imbrique(racine_depot: Path, fichier: Path) -> bool:
     `git_root: ancestor`) remonterait sinon jusqu'au `.git` du dépôt lui-même.
     """
     racine = racine_depot.resolve()
-    current = fichier.resolve().parent
-    while current != racine and current.is_relative_to(racine):
-        if (current / ".git").exists():
-            return True
-        current = current.parent
-    return False
+    proche = depot_le_plus_proche(fichier.resolve().parent)
+    return proche is not None and proche != racine and proche.is_relative_to(racine)
 
 
 async def _trouver_fichiers_nouveaux(
