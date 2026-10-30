@@ -6687,3 +6687,20 @@ Le diff ajoute :
 - 2026-10-30 21:27:15 UTC — [ticket-675] validateur: APPROVED — Le refactoring centralise avec succès les 30+ lectures de `agents.json` dans un  (371391ms)
 - 2026-10-30 21:27:15 UTC — [ticket-675] APPROVED après 2 tour(s)
 - 2026-10-30 21:29:20 UTC — [ticket-675] documentation: 0 fichier(s) (120360ms)
+- 2026-10-30 21:36:30 UTC — [ide-core] ticket-675 PR #798 mergée (CI verte)
+- 2026-10-30 21:36:32 UTC — [ide-core] ticket-675 : base réalignée sur develop
+- 2026-10-30 21:36:32 UTC — [ide-core] ticket-675 PR #798 confiée au CIWatcher
+- 2026-10-30 21:36:36 UTC — [ticket-676] branche ticket-676-one-walk-up-to-the-repository-root
+- 2026-10-30 21:36:37 UTC — [ticket-676] tour 1 — codeur démarré
+- 2026-10-30 21:44:31 UTC — [ticket-676] tour 1 — codeur terminé (473905ms)
+- 2026-10-30 21:51:21 UTC — [ticket-676] testeur: 1 failed, 3421 passed, 64 warnings in 406.83s (0:06:46)
+- 2026-10-30 21:51:21 UTC — [ticket-676] tests rouges au tour 1
+- 2026-10-30 21:51:21 UTC — [ticket-676] tour 2 — codeur démarré
+- 2026-10-30 21:52:30 UTC — [ticket-676] tour 2 — codeur terminé (68765ms)
+- 2026-10-30 22:00:04 UTC — [ticket-676] testeur: OK (exit 0)
+- 2026-10-30 22:02:36 UTC — [ticket-676] securite: PASS — Refactorisation sûre de la logique de recherche du dépôt git. Le nouveau module  (151985ms)
+- 2026-10-30 22:02:36 UTC — [ticket-676] tour 2 — reviewer démarré
+- 2026-10-30 22:03:04 UTC — [ticket-676] tour 2 — reviewer terminé (28547ms)
+- 2026-10-30 22:06:10 UTC — [ticket-676] validateur: fichiers cités joints : project_removal.py
+- 2026-10-30 22:06:10 UTC — [ticket-676] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été refactoré pour ce (214656ms)
+- 2026-10-30 22:06:10 UTC — [ticket-676] APPROVED après 2 tour(s)
