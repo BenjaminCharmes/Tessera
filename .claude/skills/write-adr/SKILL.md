@@ -1,16 +1,17 @@
 ---
 name: write-adr
-description: Use when recording a non-trivial architecture decision in memory/decisions.md — enforces the house format and the length budget, because that file is injected whole into every agent call.
+description: Use when recording a non-trivial architecture decision in memory/decisions.md — enforces the house format and the length budget, because every ADR is read by people and, when contraintes.md is missing, by agents.
 ---
 
 # Écrire un ADR
 
 ## Le coût caché — lire ceci en premier
 
-`routers/orchestrator.py`, `routers/agents.py` et `routers/chat.py` injectent
-`memory/decisions.md` dans le contexte projet de **chaque** appel d'agent. Sur un ticket qui va au
-bout, c'est jusqu'à 18 appels. Un ADR de 500 mots coûte donc ~650 tokens × 18,
-à chaque ticket, pour toujours.
+Chaque appel d'agent reçoit `memory/contraintes.md`, réduit au rôle appelé
+(`services/adr.py`, ticket-311) ; `memory/decisions.md` ne part qu'en repli,
+sur un projet sans `contraintes.md`. Sur un ticket qui va au bout, c'est
+jusqu'à 18 appels. Une règle de `contraintes.md` coûte donc à chaque appel,
+et un ADR long coûte à chaque lecteur, et à chaque appel d'un projet en repli.
 
 Un ADR long n'est pas un défaut de style. C'est une taxe permanente.
 
@@ -22,14 +23,13 @@ toute contrainte de comportement — continue de partir dans les 18 appels.
 
 | | Mots |
 |---|---|
-| ADR-001 à ADR-015 (référence) | 46 – 72 |
 | Décision structurante, avec conséquence assumée | **≤ 160** |
 
 Si tu dépasses, tu écris une spec, pas un ADR. La spec va dans le ticket.
 
 **Le budget est mesuré.** `backend/tests/test_consignes_coherentes.py` refuse
 tout ADR au-dessus de 160 mots, et vérifie que chacun porte sa `**Date**` et
-sa `**Décision**`. Douze ADR sur trente et un le dépassaient avant qu'il
+sa `**Décision**`. Douze des trente et un ADR de l'époque le dépassaient avant qu'il
 existe, dont trois écrits le jour même où ce fichier le rappelait : un budget
 que rien ne mesure n'est pas un budget, c'est un souhait.
 

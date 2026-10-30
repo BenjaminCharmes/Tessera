@@ -14,8 +14,9 @@ paye à chaque fois sans rien apprendre à personne.
 
 Ce qui sert vraiment avant d'écrire du code :
 
-- **`memory/decisions.md`** — les contraintes en vigueur. Importé lui aussi,
-  donc déjà en contexte : les ignorer est un choix, pas un oubli.
+- **`memory/contraintes.md`** — les règles en vigueur, importées par le
+  `CLAUDE.md` racine : les ignorer est un choix, pas un oubli. Leur histoire
+  est dans `memory/decisions.md`.
 - **`tickets/done/ticket-0XX-*.md`** — chacun porte une section « Ce que ça ne
   fait pas ». C'est là que sont les limites connues, et c'est ce qui évite de
   reconstruire ce qui a été écarté exprès.

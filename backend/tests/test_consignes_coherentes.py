@@ -107,6 +107,20 @@ def test_les_claude_md_tiennent_leur_budget(chemin: str, budget: int) -> None:
     assert taille <= budget, f"{chemin} : {taille} caractères pour {budget} permis"
 
 
+def test_claude_md_states_the_enforced_length() -> None:
+    """CLAUDE.md gives the file-length ceiling the ratchet actually enforces.
+
+    It said « < 200 lignes » while the test enforced 300 (audit des règles, K2) :
+    a rule that the test contradicts teaches the wrong number.
+    """
+    from tests.test_longueur_des_fichiers import PLAFOND_GENERAL
+
+    ligne = next(l for l in _lire("CLAUDE.md").splitlines() if "petits fichiers" in l)
+    nombres = [int(n) for n in re.findall(r"\d+", ligne.split("**")[-1])]
+
+    assert nombres and nombres[0] == PLAFOND_GENERAL, ligne
+
+
 def test_les_skills_annonces_existent() -> None:
     # `CLAUDE.md` liste les skills disponibles. Un nom qui ne correspond à
     # rien envoie Claude chercher un fichier absent.
