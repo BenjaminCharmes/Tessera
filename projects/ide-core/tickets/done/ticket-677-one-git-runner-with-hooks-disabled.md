@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-677
+pr_number: 791
 priority: high
 status: done
 title: One git runner with hooks disabled
