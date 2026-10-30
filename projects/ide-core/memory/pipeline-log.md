@@ -6538,3 +6538,17 @@ Le diff ajoute :
 - 2026-10-30 12:47:28 UTC — [ticket-705] validateur: APPROVED — Ticket-705 passe tous les critères. La refonte du garde git/gh fonctionne : une  (365968ms)
 - 2026-10-30 12:47:28 UTC — [ticket-705] APPROVED après 1 tour(s)
 - 2026-10-30 12:50:22 UTC — [ticket-705] documentation: 0 fichier(s) (168985ms)
+- 2026-10-30 12:50:42 UTC — [ide-core] ticket-705 PR #780 confiée au CIWatcher
+- 2026-10-30 12:50:46 UTC — [ticket-707] branche ticket-707-the-fs-api-refuses-git-hooks-and-cli-settings-and
+- 2026-10-30 12:50:47 UTC — [ticket-707] tour 1 — codeur démarré
+- 2026-10-30 12:51:55 UTC — [ticket-707] tour 1 — codeur terminé (68266ms)
+- 2026-10-30 12:57:05 UTC — [ide-core] ticket-705 PR #780 mergée (CI verte)
+- 2026-10-30 13:02:17 UTC — [ticket-707] testeur: OK (exit 0)
+- 2026-10-30 13:05:21 UTC — [ticket-707] securite: PASS — Le diff ajoute deux protections de sécurité robustes : refus d'écriture sur `.gi (184000ms)
+- 2026-10-30 13:05:21 UTC — [ticket-707] tour 1 — reviewer démarré
+- 2026-10-30 13:05:47 UTC — [ticket-707] tour 1 — reviewer terminé (24358ms)
+- 2026-10-30 13:10:21 UTC — [ticket-707] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 13:11:00 UTC — [ticket-707] validateur: fichiers cités joints : backend/tests/test_fs_router.py, <projet>/.claude/settings.local.json, <projet>/agents.json, backend/tests/test_project_importer.py (tronqué)
+- 2026-10-30 13:11:00 UTC — [ticket-707] validateur: APPROVED — Tous les critères de sécurité sont correctement implémentés et testés. L'API ref (338264ms)
+- 2026-10-30 13:11:00 UTC — [ticket-707] APPROVED après 1 tour(s)
+- 2026-10-30 13:14:59 UTC — [ticket-707] documentation: 0 fichier(s) (207875ms)

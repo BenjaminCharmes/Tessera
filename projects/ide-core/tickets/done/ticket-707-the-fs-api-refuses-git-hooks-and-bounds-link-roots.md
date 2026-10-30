@@ -1,14 +1,15 @@
 ---
-id: ticket-707
-title: "The fs API refuses git hooks and CLI settings, and bounds link roots"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-706"]
-estimated_days: 0.5
 created: 2026-10-30
+depends_on:
+- ticket-706
+estimated_days: 0.5
+id: ticket-707
+pr_number: 786
+priority: high
+status: done
+title: The fs API refuses git hooks and CLI settings, and bounds link roots
+type: fix
 ---
 
 # ticket-707 — L'API `fs` refuse les hooks git et les réglages du CLI, et borne les racines de lien (C-05)
