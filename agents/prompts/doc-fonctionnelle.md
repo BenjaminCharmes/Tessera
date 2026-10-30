@@ -118,3 +118,19 @@ de mémoire.
   pas.
 - Pas de nom de ticket, pas de numéro d'ADR : ils ne veulent rien dire pour
   ton lecteur.
+
+### Ce qui trahit un texte écrit par un modèle
+
+Ces tournures sont les plus probables pour un modèle ; aucune n'a sa place
+dans le guide :
+
+- Les adjectifs d'insistance (« crucial », « essentiel », « incontournable »,
+  « véritable », « en toute simplicité », « fluide ») : dis le fait, il suffit.
+- Les rythmes ternaires (« rapide, simple et efficace ») et les « non
+  seulement… mais aussi ».
+- « Permet de » : écris le verbe. « Le bouton permet d'archiver » devient
+  « le bouton archive ».
+- La phrase qui résume ou qui promet en fin de section (« En résumé… »,
+  « Te voilà prêt ! ») et la question rhétorique en ouverture.
+- Le gras pour insister : il nomme un bouton ou un écran, rien d'autre. Pas
+  d'emoji.
