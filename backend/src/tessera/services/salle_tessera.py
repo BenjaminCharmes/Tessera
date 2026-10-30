@@ -30,7 +30,6 @@ PORT_DU_FRONTEND = 5173
 #: Lignes de journal montrées, et octets relus en fin de fichier pour les trouver.
 LIGNES_DU_JOURNAL = 6
 _FIN_LUE = 32_000
-_SUIVANTS = 3
 
 
 def _iso(moment: datetime | None) -> str | None:
@@ -63,7 +62,7 @@ async def processus_de_tessera(sonde: SondeSysteme) -> list[ProcessusDeTessera]:
 
 
 def runs_vivants(instantane: list[dict[str, Any]]) -> list[RunVivant]:
-    """The registry's open runs, with the next tickets of their queue."""
+    """The registry's open runs, with every ticket left in their queue."""
     return [
         RunVivant(
             project_id=str(run.get("project_id", "")),
@@ -72,7 +71,7 @@ def runs_vivants(instantane: list[dict[str, Any]]) -> list[RunVivant]:
             etape=run.get("etape"),
             file_index=int(run.get("file_index") or 0),
             file_total=int(run.get("file_total") or 0),
-            suivants=[str(t) for t in (run.get("file_restants") or [])][:_SUIVANTS],
+            suivants=[str(t) for t in (run.get("file_restants") or [])],
         )
         for run in instantane
     ]
@@ -141,6 +140,7 @@ async def salle_tessera(
     ollama_url: str,
     refroidissement_s: float | None,
     journal: Path,
+    lignes_du_journal: int = LIGNES_DU_JOURNAL,
     base: Path,
     worktrees: Path,
 ) -> SalleTessera:
@@ -150,7 +150,7 @@ async def salle_tessera(
         ollama=EtatOllama(url=ollama_url, refroidissement_s=refroidissement_s),
         runs=runs_vivants(instantane),
         ci_en_attente={p: list(t) for p, t in ci_en_attente.items()},
-        journal=fin_du_journal(journal),
+        journal=fin_du_journal(journal, lignes_du_journal),
         base_mo=taille_mo(base),
         worktrees=nombre_de_worktrees(worktrees),
     )

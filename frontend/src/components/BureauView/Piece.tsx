@@ -1,4 +1,6 @@
 import Confettis from "../../design/bureau/Confettis";
+import IconeDuProjet from "../ProjetsView/IconeDuProjet";
+import { useApercuDuProjet } from "../../hooks/useApercuDesProjets";
 import type { MotifDeVisite } from "../../lib/bureau/ronde";
 import Gyrophare from "../../design/bureau/Gyrophare";
 import NightVeil from "../../design/bureau/NightVeil";
@@ -103,6 +105,7 @@ export default function Piece({
   directeur = null,
   motifDuDirecteur,
 }: PieceProps) {
+  const apercu = useApercuDuProjet(projet);
   const postes = postesDuRun(etat);
   const sante = santeAgent(
     etat.dernierEvenementA,
@@ -176,6 +179,7 @@ export default function Piece({
     >
       <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">
         <div className="flex min-w-0 items-baseline gap-2">
+          <IconeDuProjet projet={apercu ?? { id: projet, name: projet, icon: false }} taille="tuile" />
           <h3 className="shrink-0 text-corps font-semibold text-zinc-200">{projet}</h3>
           {/* Le ticket traité : la pile ne montre que les suivants (ticket-656). */}
           {ticketCourant && (

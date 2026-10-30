@@ -30,7 +30,7 @@ class RunVivant(BaseModel):
     etape: str | None
     file_index: int
     file_total: int
-    #: The next tickets of the queue, three at most.
+    #: The tickets left in the queue, in order.
     suivants: list[str]
 
 

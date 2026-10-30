@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
+import IconeDuProjet from "../ProjetsView/IconeDuProjet";
+import { useApercuDuProjet } from "../../hooks/useApercuDesProjets";
 import { useResource } from "../../hooks/useResource";
 import { useQuotaLu } from "../../hooks/useQuotaLu";
 import { lireLaSalleTessera } from "../../lib/apiSalleTessera";
@@ -11,8 +13,11 @@ import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
 import type { AppEnCours } from "../../types/api";
 import type { ProcessusDeTessera, SalleTessera as Salle } from "../../types/salleTessera";
 import AvecInfobulle from "../BureauView/AvecInfobulle";
+import JaugesDeQuota from "../../design/ui/JaugesDeQuota";
 import BaieAvecFiche from "./BaieAvecFiche";
+import DetailDeTessera from "./DetailDeTessera";
 import EcransDeTessera from "./EcransDeTessera";
+import type { EcranDeTessera } from "./lignesDeTessera";
 import SolDeSalle from "./SolDeSalle";
 import { formaterHeure, formaterMo } from "./format";
 
@@ -23,6 +28,8 @@ interface SalleTesseraProps {
   lueA: number;
 }
 
+const LIGNES_DU_JOURNAL_DEPLIE = 100;
+
 /** Un processus de Tessera vu comme une app, pour la fiche partagée avec les autres salles. */
 function commeUneApp(p: ProcessusDeTessera): AppEnCours {
   return {
@@ -31,17 +38,11 @@ function commeUneApp(p: ProcessusDeTessera): AppEnCours {
   };
 }
 
-/** « ven. 14:00 » : la remise à zéro tombe souvent un autre jour que celui qu'on regarde. */
-function remiseAZero(iso: string | null): string {
-  const t = iso === null ? Number.NaN : Date.parse(iso);
-  if (Number.isNaN(t)) return "—";
-  return new Date(t).toLocaleString("fr-FR", { weekday: "short", hour: "2-digit", minute: "2-digit" });
-}
-
 function Compteur({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
-    <div className="min-w-36 rounded-sm border-[3px] border-zinc-800 bg-zinc-700 px-2.5 py-1.5 font-mono text-micro text-zinc-200">
-      <div className="text-zinc-400">{titre}</div>
+    <div className="relative min-w-44 rounded-sm border-[3px] border-zinc-800 bg-zinc-700 px-2.5 pb-1.5 pt-2.5 font-mono text-micro text-zinc-200 shadow-[0_3px_0_rgb(0_0_0/0.3)]">
+      <span aria-hidden="true" className="absolute left-1/2 top-0.5 size-1.5 -translate-x-1/2 rounded-full bg-zinc-400" />
+      <div className="mb-1 text-zinc-400">{titre}</div>
       {children}
     </div>
   );
@@ -58,7 +59,17 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const lire = useMemo(() => () => lireLaSalleTessera(), [lueA]);
   const { data: salle } = useResource<Salle | null>(lire, null, { projet: "ide-core", ressource: "salle-tessera" });
-  const semaine = useQuotaLu(lueA)?.["seven_day"];
+  const [deplie, setDeplie] = useState<EcranDeTessera | null>(null);
+  const fermer = useCallback(() => setDeplie(null), []);
+  // Le journal déplié lit cent lignes, et seulement tant qu'il est ouvert.
+  const lireLeJournal = useMemo(
+    () => (deplie === "journal" ? () => lireLaSalleTessera(LIGNES_DU_JOURNAL_DEPLIE) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [deplie, lueA],
+  );
+  const { data: detaillee } = useResource<Salle | null>(lireLeJournal, null);
+  const fenetres = useQuotaLu(lueA);
+  const apercu = useApercuDuProjet("ide-core");
   if (salle === null) return null;
 
   const memoire = salle.processus.reduce((s, p) => s + p.memoire_mo, 0);
@@ -67,7 +78,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
   return (
     <article aria-label="Salle Tessera" data-salle-tessera className="mb-4 overflow-hidden rounded-lg border border-violet-800 bg-(--sprite-salle-mur)">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-900/60 px-3 py-2">
-        <span aria-hidden="true" className="size-2.5 rounded-[2px] bg-violet-500" />
+        <IconeDuProjet projet={apercu ?? { id: "ide-core", name: nom, icon: false }} taille="tuile" />
         <h3 className="text-sm font-semibold text-zinc-100">{nom}</h3>
         <span className="text-xs text-zinc-400">
           {salle.processus.length} services · {formaterMo(memoire)} · démarré à {formaterHeure(debut)}
@@ -78,7 +89,21 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
         </div>
-        <EcransDeTessera salle={salle} />
+        <EcransDeTessera
+          salle={salle}
+          deplie={deplie}
+          onBasculer={(ecran) => setDeplie((avant) => (avant === ecran ? null : ecran))}
+        />
+        {/* Les compteurs sont des affiches punaisées au mur, au-dessus du mobilier. */}
+        <div data-affiches className="mt-5 flex flex-wrap justify-center gap-4">
+          <Compteur titre="QUOTA DE L'ABONNEMENT">
+            <JaugesDeQuota fenetres={fenetres} variante="affiche" />
+          </Compteur>
+          <Compteur titre="BASE · WORKTREES">
+            <div>tessera.db {formaterMo(salle.base_mo)}</div>
+            <div>{salle.worktrees} worktree{salle.worktrees > 1 ? "s" : ""} ouvert{salle.worktrees > 1 ? "s" : ""}</div>
+          </Compteur>
+        </div>
         <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
           <span className="flex items-end gap-4">
             {salle.processus.map((p) => (
@@ -103,24 +128,6 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
               </Agrandi>
             </AvecInfobulle>
           </span>
-          <span className="flex flex-wrap items-end gap-3 pb-1.5">
-            <Compteur titre="QUOTA DE LA SEMAINE">
-              {semaine ? (
-                <>
-                  <div className="my-1 h-2 bg-zinc-900">
-                    <div className={`h-2 ${semaine.utilization >= 0.85 ? "bg-amber-400" : "bg-blue-400"}`} style={{ width: `${Math.round(semaine.utilization * 100)}%` }} />
-                  </div>
-                  <div>{Math.round(semaine.utilization * 100)} % · remis à zéro {remiseAZero(semaine.resets_at)}</div>
-                </>
-              ) : (
-                <div>pas encore relevé</div>
-              )}
-            </Compteur>
-            <Compteur titre="BASE · WORKTREES">
-              <div>tessera.db {formaterMo(salle.base_mo)}</div>
-              <div>{salle.worktrees} worktree{salle.worktrees > 1 ? "s" : ""} ouvert{salle.worktrees > 1 ? "s" : ""}</div>
-            </Compteur>
-          </span>
           <span className="flex items-end gap-4">
             <span className="self-start">
               <Agrandi>
@@ -137,6 +144,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         </div>
       </div>
       <SolDeSalle />
+      {deplie && <DetailDeTessera ecran={deplie} salle={deplie === "journal" ? (detaillee ?? salle) : salle} onFermer={fermer} />}
     </article>
   );
 }

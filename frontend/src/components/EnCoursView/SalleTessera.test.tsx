@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
 import { api } from "../../lib/api";
@@ -94,7 +94,10 @@ describe("the Tessera server room (ticket-726)", () => {
     vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
     rendre();
 
-    expect(await screen.findByText(/88 % · remis à zéro/)).toBeInTheDocument();
+    const affiches = await screen.findByRole("list", { name: "Quota de l'abonnement" });
+    expect(within(affiches).getByText("88 %")).toBeInTheDocument();
+    expect(within(affiches).getByText(/remis à zéro/)).toBeInTheDocument();
+    expect(within(affiches).getByText("pas de relevé")).toBeInTheDocument();
     expect(screen.getByText("tessera.db 122,0 Mo")).toBeInTheDocument();
     expect(screen.getByText("2 worktrees ouverts")).toBeInTheDocument();
   });
@@ -115,4 +118,40 @@ describe("the Tessera server room (ticket-726)", () => {
 
     expect(screen.queryByRole("article", { name: "Salle Tessera" })).toBeNull();
   });
+
+  it("unfolds a screen under the room on a click, with the whole queue, and folds it on a second click", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValue(
+      salle({ runs: [{ ...salle().runs[0]!, suivants: ["t1", "t2", "t3", "t4", "t5"] }] }),
+    );
+    rendre();
+
+    const ecran = (await screen.findByText("ide-core · ticket-677 · codeur")).closest("button") as HTMLElement;
+    expect(within(ecran).queryByText("puis t5")).toBeNull();
+    fireEvent.click(ecran);
+    const detail = screen.getByRole("region", { name: "Runs en cours et leur file" });
+    expect(within(detail).getByText("puis t5")).toBeInTheDocument();
+    expect(ecran).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.click(ecran);
+    expect(screen.queryByRole("region", { name: "Runs en cours et leur file" })).toBeNull();
+  });
+
+  it("asks for a longer log when the journal screen is unfolded", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
+    rendre();
+
+    fireEvent.click(await screen.findByRole("button", { name: /tessera.log/ }));
+    await screen.findByRole("region", { name: "Fin de tessera.log" });
+    expect(vi.mocked(lireLaSalleTessera)).toHaveBeenCalledWith(100);
+  });
+
+  it("closes the detail with Escape", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
+    rendre();
+
+    fireEvent.click(await screen.findByRole("button", { name: /CIWatcher/ }));
+    fireEvent.keyDown(screen.getByRole("button", { name: "Fermer le détail" }), { key: "Escape" });
+    expect(screen.queryByRole("region", { name: "PR que le CIWatcher attend" })).toBeNull();
+  });
 });
+

@@ -5,6 +5,7 @@ import type { UsageStats } from "../../types/api";
 
 vi.mock("../../lib/api");
 import { api } from "../../lib/api";
+import { apiQuota } from "../../lib/quota";
 
 const stats = vi.mocked(api.usage.stats);
 
@@ -129,4 +130,17 @@ describe("StatsView", () => {
       kpiTile!.compareDocumentPosition(firstChart) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+
+  it("shows the real subscription quota, per window (ticket-726)", async () => {
+    stats.mockResolvedValue(payload());
+    vi.spyOn(apiQuota, "fenetres").mockResolvedValue({
+      windows: { seven_day: { status: "allowed", utilization: 0.4, resets_at: null, observed_at: "2026-10-30T14:00:00Z" } },
+    });
+    render(<StatsView projectId={null} days={7} />);
+
+    const carte = await screen.findByRole("region", { name: "Quota de l'abonnement" });
+    expect(await within(carte).findByText("40 %")).toBeInTheDocument();
+    expect(within(carte).getByText("pas de relevé")).toBeInTheDocument();
+  });
 });
+

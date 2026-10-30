@@ -62,14 +62,14 @@ async def test_a_frontend_nobody_serves_has_no_pid() -> None:
     assert frontend.memoire_mo == 0.0
 
 
-def test_live_runs_keep_their_queue_position_and_three_next_tickets() -> None:
+def test_live_runs_keep_their_queue_position_and_every_ticket_left() -> None:
     runs = runs_vivants(
         [{"project_id": "ide-core", "ticket_id": "ticket-718", "agent": "testeur", "etape": "tests",
           "file_index": 3, "file_total": 40, "file_restants": ["a", "b", "c", "d"]}]
     )
 
     assert runs[0].file_index == 3 and runs[0].file_total == 40
-    assert runs[0].suivants == ["a", "b", "c"]
+    assert runs[0].suivants == ["a", "b", "c", "d"]
 
 
 def test_the_log_shows_only_the_event_never_the_payload(tmp_path: Path) -> None:
@@ -153,3 +153,13 @@ def test_the_route_answers_with_the_room() -> None:
 
     assert reponse.status_code == 200
     assert set(reponse.json()) == {"processus", "ollama", "runs", "ci_en_attente", "journal", "base_mo", "worktrees"}
+
+
+def test_the_route_bounds_the_journal_length() -> None:
+    app.dependency_overrides[get_sonde] = lambda: FausseSonde()
+    try:
+        client = TestClient(app)
+        assert client.get("/api/v1/tessera/salle?journal=100").status_code == 200
+        assert client.get("/api/v1/tessera/salle?journal=500").status_code == 422
+    finally:
+        app.dependency_overrides.pop(get_sonde, None)

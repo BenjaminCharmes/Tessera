@@ -8,6 +8,8 @@ interface ArretDuProjetProps {
   /** Chaque app du groupe a déjà reçu son ordre d'arrêt. */
   enArret: boolean;
   onArreterProjet: () => void;
+  /** Libellé court « Arrêter », pour la plaque d'une salle qui doit tenir sur une ligne. */
+  court?: boolean;
 }
 
 /**
@@ -16,7 +18,7 @@ interface ArretDuProjetProps {
  * Une seule confirmation, qui liste les pids des apps lancées à la main : un
  * groupe fait de services Tessera seuls s'arrête sans demander.
  */
-export default function ArretDuProjet({ groupe, enArret, onArreterProjet }: ArretDuProjetProps) {
+export default function ArretDuProjet({ groupe, enArret, onArreterProjet, court = false }: ArretDuProjetProps) {
   const [confirmation, setConfirmation] = useState(false);
   const externes = groupe.apps.filter((app) => app.origine === "externe");
   const lancer = () => {
@@ -48,7 +50,7 @@ export default function ArretDuProjet({ groupe, enArret, onArreterProjet }: Arre
       aria-label={`Arrêter le projet ${groupe.project_name}`}
     >
       {enArret && <Spinner />}
-      {enArret ? "Arrêt…" : "Arrêter le projet"}
+      {enArret ? "Arrêt…" : court ? "Arrêter" : "Arrêter le projet"}
     </Button>
   );
 }

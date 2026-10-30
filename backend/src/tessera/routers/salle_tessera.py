@@ -1,5 +1,5 @@
 """La salle des serveurs de Tessera, toujours allumée — ticket-726."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from tessera.config import settings
 from tessera.models.salle_tessera import SalleTessera
@@ -19,7 +19,11 @@ def _projets() -> list[str]:
 
 
 @router.get("/salle", response_model=SalleTessera)
-async def lire_la_salle(sonde: SondeSysteme = Depends(get_sonde)) -> SalleTessera:
+async def lire_la_salle(
+    sonde: SondeSysteme = Depends(get_sonde),
+    # Le journal déplié sous la salle en demande plus que l'écran du mur.
+    journal: int = Query(default=6, ge=1, le=200),
+) -> SalleTessera:
     return await salle_tessera(
         sonde,
         instantane=RUN_REGISTRY.instantane(),
@@ -27,6 +31,7 @@ async def lire_la_salle(sonde: SondeSysteme = Depends(get_sonde)) -> SalleTesser
         ollama_url=settings.ollama_base_url,
         refroidissement_s=secondes_de_refroidissement(settings.ollama_base_url),
         journal=settings.ide_log_file,
+        lignes_du_journal=journal,
         base=settings.ide_db_path,
         worktrees=settings.ide_worktrees_dir,
     )

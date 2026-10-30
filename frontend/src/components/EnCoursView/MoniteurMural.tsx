@@ -61,7 +61,7 @@ export default function MoniteurMural({
           onClick={onClick}
           aria-expanded={deplie}
           aria-controls={controle}
-          title={deplie ? "Replier le journal" : "Déplier le journal"}
+          title={deplie ? "Replier" : "Déplier"}
           className={`${CADRE} ${deplie ? "border-violet-600" : "border-zinc-700"} hover:border-violet-600 focus-visible:border-violet-600 focus-visible:outline-none`}
           {...data}
         >
