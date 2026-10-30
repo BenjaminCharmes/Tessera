@@ -6609,3 +6609,15 @@ Le diff ajoute :
 - 2026-10-30 18:22:45 UTC — [ticket-713] testeur: délai dépassé (1500 s, durée réelle 5008 s) — ../scripts/verifier.py coupé après 5008 s
 - 2026-10-30 18:22:45 UTC — [ticket-713] BLOCKED — testeur: délai dépassé deux fois
 - 2026-10-30 18:22:57 UTC — [ide-core] file interrompue : ticket-713 non approuvé
+- 2026-10-30 18:26:50 UTC — [ticket-713] branche ticket-713-a-merge-request-that-times-out-rereads-the-pr-bef
+- 2026-10-30 18:32:12 UTC — [ticket-713] testeur: 1 failed, 2202 passed, 64 warnings in 319.53s (0:05:19)
+- 2026-10-30 18:32:12 UTC — [ticket-713] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-10-30 18:32:12 UTC — [ticket-713] tour 1 — codeur démarré
+- 2026-10-30 18:33:19 UTC — [ticket-713] tour 1 — codeur terminé (66156ms)
+- 2026-10-30 18:40:04 UTC — [ticket-713] testeur: OK (exit 0)
+- 2026-10-30 18:42:06 UTC — [ticket-713] securite: PASS — Refactoring du merge de livraison (ticket-713) : extraction en module séparé ave (122062ms)
+- 2026-10-30 18:42:06 UTC — [ticket-713] tour 1 — reviewer démarré
+- 2026-10-30 18:42:29 UTC — [ticket-713] tour 1 — reviewer terminé (23280ms)
+- 2026-10-30 18:46:23 UTC — [ticket-713] validateur: fichiers cités joints : backend/tests/test_livraison.py (tronqué)
+- 2026-10-30 18:46:23 UTC — [ticket-713] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente correcteme (257343ms)
+- 2026-10-30 18:46:23 UTC — [ticket-713] APPROVED après 1 tour(s)
