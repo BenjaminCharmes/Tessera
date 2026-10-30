@@ -22,6 +22,11 @@ from tessera.services.process_registry import (
 )
 from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.project_loader import load_services_config
+from tessera.services.service_etat import (
+    ServiceEtat,
+    ServicesArretes,
+    ServicesDemarres,
+)
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -94,10 +99,10 @@ async def _refuser_si_deja_lance_hors_de_tessera(
             )
 
 
-@router.post("/{project_id}/services/start")
+@router.post("/{project_id}/services/start", response_model=ServicesDemarres)
 async def demarrer(
     project_id: str, sonde: SondeSysteme = Depends(get_sonde)
-) -> dict[str, object]:
+) -> ServicesDemarres:
     racine = _racine(project_id)
     declares = load_services_config(racine)
     if not declares:
@@ -113,7 +118,7 @@ async def demarrer(
         project_id, {d["nom"] for d in declares}, sonde
     )
 
-    demarres: list[dict[str, object]] = []
+    demarres: list[ServiceEtat] = []
     try:
         for declare in declares:
             service = await PROCESS_REGISTRY.demarrer(
@@ -125,7 +130,7 @@ async def demarrer(
                 sur_ligne=_publier,
                 sur_fin=_publier_la_fin,
             )
-            demarres.append(service.en_dict())
+            demarres.append(service.etat())
     except ServiceDejaEnCours as exc:
         # Pas de purge ici : ce qui tourne doit continuer de tourner.
         raise HTTPException(status_code=409, detail=str(exc)) from exc
@@ -140,17 +145,17 @@ async def demarrer(
             status_code=422, detail=f"Lancement impossible : {exc}"
         ) from exc
 
-    return {"services": demarres}
+    return ServicesDemarres(services=demarres)
 
 
-@router.post("/{project_id}/services/stop")
-async def arreter(project_id: str) -> dict[str, int]:
+@router.post("/{project_id}/services/stop", response_model=ServicesArretes)
+async def arreter(project_id: str) -> ServicesArretes:
     _racine(project_id)
-    return {"arretes": await PROCESS_REGISTRY.arreter(project_id)}
+    return ServicesArretes(arretes=await PROCESS_REGISTRY.arreter(project_id))
 
 
-@router.get("/{project_id}/services")
-async def lister(project_id: str) -> list[dict[str, object]]:
+@router.get("/{project_id}/services", response_model=list[ServiceEtat])
+async def lister(project_id: str) -> list[ServiceEtat]:
     """Les services **déclarés**, chacun avec son état courant.
 
     Ne lister que ceux qui tournent empêchait l'IDE de savoir, au chargement,
@@ -160,15 +165,15 @@ async def lister(project_id: str) -> list[dict[str, object]]:
     """
     racine = _racine(project_id)
     lances = {s.nom: s for s in PROCESS_REGISTRY.services_de(project_id)}
-    etats: list[dict[str, object]] = []
+    etats: list[ServiceEtat] = []
     for declare in load_services_config(racine):
         lance = lances.pop(declare["nom"], None)
         etats.append(
-            lance.en_dict()
+            lance.etat()
             if lance is not None
-            else Service(nom=declare["nom"], project_id=project_id).en_dict()
+            else Service(nom=declare["nom"], project_id=project_id).etat()
         )
     # Un service lancé puis retiré du manifeste tourne encore : le cacher
     # laisserait un processus vivant que plus rien ne permet d'arrêter.
-    etats.extend(reste.en_dict() for reste in lances.values())
+    etats.extend(reste.etat() for reste in lances.values())
     return etats
