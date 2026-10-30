@@ -12,24 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Le verdict du reviewer, de l'audit sécurité et du validateur se lit dans
-  une sortie structurée validée par un schéma, jamais dans le texte.** Une
-  sortie absente, hors schéma ou contradictoire refuse. Remplace la règle du
-  parseur par mot-clé quand le reviewer est livré. (ADR-061, ADR-009)
-- **Un run ne lance ni serveur ni capture sans `pipeline.controle_visuel`
-  déclaré.** Fichiers d'interface, largeurs et démarrage se déclarent, jamais
-  devinés ; l'app démarre depuis le worktree du run, sur un port libre, et
-  ne tue jamais un processus existant. Les captures restent hors du dépôt.
-  (ADR-062, ADR-042, ADR-021)
-- **Un agent de produit ne se dessine que depuis `services[].activite`.**
-  Le backend lit ce fichier, borné en taille et résolu dans le projet ;
-  absent, périmé, hors schéma ou service arrêté : aucun agent. Tessera
-  ne l'écrit jamais et n'interroge aucune route du produit.
-  (ADR-064, ADR-058)
-- **La livraison d'un ticket attend que les PR déjà confiées à `CIWatcher`
-  pour le projet soient mergées ou bloquées, dans une limite de temps.**
-  Le rebase se fait ainsi sur une base qui les porte ; passé le délai, la
-  livraison part comme avant. (ADR-065, ADR-051)
 - **Le garde git et `gh` n'admet que des lectures nommées.** Une
   sous-commande absente de la liste blanche est refusée, options globales
   lues avant elle ; `-c` n'accepte que des clés cosmétiques. Remplace la
@@ -46,7 +28,8 @@ section. (ADR-055)
   toute suppression récursive.** Ce qui s'édite se copie. Jamais le `.env` de
   Tessera ; une entrée absente se journalise sans bloquer. (ADR-056, ADR-053)
 
-- **Ne jamais écrire hors de la racine du projet.** Un hook `PreToolUse`
+- **Ne jamais écrire hors de la racine d'écriture du run** — le projet, ou
+  son worktree s'il en déclare un (ADR-056). Un hook `PreToolUse`
   bloque `Write`, `Edit`, `NotebookEdit` et les redirections Bash simples
   (`>`, `>>`, `tee`) vers tout chemin hors du dossier du projet — ou du
   dépôt ancêtre pour les projets qui déclarent `git_root: ancestor`.
@@ -102,6 +85,10 @@ section. (ADR-055)
   projet.** La phase 2 (attente CI, merge) tourne dans `CIWatcher`, en
   fond. `depends_on` bloque le ticket suivant jusqu'au merge. Une CI rouge
   met le ticket en `blocked`, PR laissée ouverte, sans relance. (ADR-051)
+- **La livraison d'un ticket attend que les PR déjà confiées à `CIWatcher`
+  pour le projet soient mergées ou bloquées, dans une limite de temps.**
+  Le rebase se fait ainsi sur une base qui les porte ; passé le délai, la
+  livraison part comme avant. (ADR-065, ADR-051)
 
 ## Portes qui échouent fermées
 
@@ -127,11 +114,18 @@ section. (ADR-055)
 
 - **Les artefacts Tessera s'excluent via `.git/info/exclude`, jamais via
   `.gitignore`.** (ADR-021)
-- **`local` est le défaut quand `agents.json` est absent ou illisible.**
-  Le mode `tracked` se déclare explicitement. (ADR-023)
+- **Les artefacts d'un projet cloné ou importé restent `local` par
+  défaut ; ceux d'un projet créé par l'IDE sont versionnés.** Le mode suit
+  la façon dont le projet est arrivé ; un autre se déclare explicitement.
+  (ADR-023)
 - **Les services d'un projet se déclarent dans `agents.json`
   (`services: [{nom, commande}]`).** Rien de déclaré : pas de bouton de
   lancement. (ADR-042)
+- **Un run ne lance ni serveur ni capture sans `pipeline.controle_visuel`
+  déclaré.** Fichiers d'interface, largeurs et démarrage se déclarent, jamais
+  devinés ; l'app démarre depuis le worktree du run, sur un port libre, et
+  ne tue jamais un processus existant. Les captures restent hors du dépôt.
+  (ADR-062, ADR-042, ADR-021)
 
 *(codeur, reviewer)*
 
@@ -146,10 +140,11 @@ section. (ADR-055)
 - **Les services passent toujours par `LLMProvider` (`complete`/`stream`),
   jamais par le SDK directement.** (ADR-017)
 - **Déclarer `provider`, `model` et `fallback` dans `agents.json` pour
-  chaque rôle.** Toute construction de provider passe par
-  `provider_pour_role`. Seule une indisponibilité déclenche le repli, qui
-  émet `provider_fallback`. Une réponse illisible n'en déclenche aucun.
-  (ADR-046)
+  chaque rôle ; un rôle sans `provider` prend `agent_sdk`.** Toute
+  construction de provider passe par `provider_pour_role`. Seuls une
+  indisponibilité, qui émet `provider_fallback`, ou un run lancé `rapide`
+  déclenchent le repli. Une réponse illisible n'en déclenche aucun.
+  (ADR-046, ADR-059)
 - **Un rôle déclaré `"web": true` reçoit `WebFetch` et `WebSearch` et
   perd `Bash`.** (ADR-049)
 
@@ -161,10 +156,9 @@ section. (ADR-055)
 - **L'orchestrateur est instancié à chaque requête, sans état interne.**
   Ce qui survit entre requêtes (`RunLock`, `RunRegistry`) vit hors de
   lui. (ADR-008)
-- **Le verdict reviewer se parse par mot-clé :** la première ligne qui
-  commence par `APPROVED` ou `CHANGES_REQUESTED` l'emporte. Sans ligne de
-  verdict, `CHANGES_REQUESTED` n'importe où prime, et une réponse sans
-  verdict refuse. (ADR-009)
+- **Le verdict du reviewer, de l'audit sécurité et du validateur se lit dans
+  une sortie structurée validée par un schéma, jamais dans le texte.** Une
+  sortie absente, hors schéma ou contradictoire refuse. (ADR-061, ADR-009)
 - **`role: github-sync` est géré dans `POST /api/v1/agents/run`, pas
   dans un endpoint dédié.** (ADR-010)
 
@@ -203,6 +197,11 @@ section. (ADR-055)
   pas et ne porte aucun voyant. Les sprites vivent sous `design/bureau/`, leurs
   tons sont des jetons `--sprite-*` du `@theme`, jamais une famille CSS brute.
   (ADR-058)
+- **Un agent de produit ne se dessine que depuis `services[].activite`.**
+  Le backend lit ce fichier, borné en taille et résolu dans le projet ;
+  absent, périmé, hors schéma ou service arrêté : aucun agent. Tessera
+  ne l'écrit jamais et n'interroge aucune route du produit.
+  (ADR-064, ADR-058)
 
 ## Documentation
 
@@ -228,5 +227,6 @@ section. (ADR-055)
 - **Monaco Editor est bundlé depuis `monaco-editor` via Vite.** Pas de
   CDN. (ADR-012)
 - **Pas de gestionnaire d'état global (Zustand, Jotai) tant que l'état
-  partagé tient dans `useActiveProject`.** À réévaluer au-delà de 5
+  partagé tient dans `useActiveProject` et le store de run
+  (`runStore.ts`, `useSyncExternalStore`).** À réévaluer au-delà de 5
   états globaux partagés. (ADR-013)
