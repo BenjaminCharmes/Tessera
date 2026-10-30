@@ -100,7 +100,7 @@ function bake(s, { outline = true, rim = true } = {}) {
       const n = at(x - 1, y) || at(x + 1, y) || at(x, y - 1) || at(x, y + 1);
       if (!n) continue;
       const f = famille(n.replace("~r", ""));
-      if (f && !f.startsWith("etat")) g.set(x, y, f + ".ol");
+      if (f) g.set(x, y, f + ".ol");
     }
   }
   return s;
