@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-679
+pr_number: 801
 priority: low
 status: done
 title: Response models for the services routes
