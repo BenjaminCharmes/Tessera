@@ -1,14 +1,14 @@
 ---
-id: ticket-714
-title: "A local provider hands an oversized prompt straight to its fallback"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-30
+id: ticket-714
+pr_number: 795
+priority: medium
+status: done
+title: A local provider hands an oversized prompt straight to its fallback
+type: feat
 ---
 
 # ticket-714 — Un provider local confie d'emblée un prompt trop gros à son repli

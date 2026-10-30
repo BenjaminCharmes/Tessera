@@ -17,6 +17,7 @@ from tessera.utils.secrets import SECRETS
 _logger = get_logger(__name__)
 
 PROVIDER_OPENAI = "openai_compatible"
+PROVIDER_OLLAMA = "ollama"
 
 #: Les noms de champ qui annoncent un secret, une fois mis en minuscules et
 #: privés de `_` et `-` : `api_key`, `apiKey` et `api-key` donnent `apikey`.

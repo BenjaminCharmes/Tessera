@@ -63,6 +63,10 @@ class AgentConfig(BaseModel):
     # backend, comme avant — un manifeste muet ne change pas de comportement.
     provider: str = "agent_sdk"
     fallback: FallbackConfig | None = None
+    #: Au-delà de cette taille de prompt (système + utilisateur, en caractères),
+    #: un rôle sur `ollama` part d'emblée sur son repli (ticket-714). Absent :
+    #: rien ne change. Ignorée sans repli et pour un autre provider qu'`ollama`.
+    fallback_above_chars: int | None = Field(default=None, gt=0)
     #: Le point d'accès d'un rôle `openai_compatible` : l'URL de base, sans
     #: `/chat/completions`. Obligatoire pour ce provider, ignorée des autres.
     base_url: str | None = None

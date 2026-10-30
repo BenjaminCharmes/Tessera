@@ -25,7 +25,9 @@ _logger = get_logger(__name__)
 
 class ProviderAvecRepli:
     """Calls `principal`; on `ProviderIndisponible`, calls `repli` with
-    `modele_repli` instead and says so on the observation channel.
+    `modele_repli` instead and says so on the observation channel. With
+    `seuil_caracteres`, a prompt longer than it goes to `repli` without trying
+    `principal`, and the event says why.
 
     Seule l'indisponibilité déclenche le repli. Une réponse illisible ou une
     faille de contenu passe telle quelle : ADR-039 fait échouer fermé les
@@ -42,7 +44,11 @@ class ProviderAvecRepli:
         role: str,
         project_id: str | None,
         journal: Callable[[str], None] | None = None,
+        seuil_caracteres: int | None = None,
     ) -> None:
+        # Au-delà, le prompt part d'emblée sur le repli (ticket-714) : un
+        # modèle local qui dépasse son délai coûte des minutes avant de céder.
+        self._seuil_caracteres = seuil_caracteres
         # Où le passage au repli s'écrit pour un humain (ticket-518) : le log
         # du backend part sur la console, et l'événement n'a pas d'historique.
         self._journal = journal
@@ -71,17 +77,21 @@ class ProviderAvecRepli:
         cwd: Path | None = None,
         **extra: Any,
     ) -> ProviderResult:
-        try:
-            return await self._principal.complete(
-                system=system, user=user, model=model, max_tokens=max_tokens, cwd=cwd, **extra
-            )
-        except ProviderIndisponible as exc:
-            await self._annoncer(exc)
-            result = await self._repli.complete(
-                system=system, user=user, model=self._modele_repli,
-                max_tokens=max_tokens, cwd=cwd, **extra,
-            )
-            return self._marquer(result)
+        raison = self._raison_taille(system, user)
+        if raison is None:
+            try:
+                return await self._principal.complete(
+                    system=system, user=user, model=model, max_tokens=max_tokens,
+                    cwd=cwd, **extra,
+                )
+            except ProviderIndisponible as exc:
+                raison = str(exc)
+        await self._annoncer(raison)
+        result = await self._repli.complete(
+            system=system, user=user, model=self._modele_repli,
+            max_tokens=max_tokens, cwd=cwd, **extra,
+        )
+        return self._marquer(result)
 
     async def stream(
         self,
@@ -95,19 +105,35 @@ class ProviderAvecRepli:
         on_tool_use: ToolEventCallback | None = None,
         **extra: Any,
     ) -> ProviderResult:
-        try:
-            return await self._principal.stream(
-                system=system, user=user, model=model, max_tokens=max_tokens, cwd=cwd,
-                on_token=on_token, on_tool_use=on_tool_use, **extra,
-            )
-        except ProviderIndisponible as exc:
-            await self._annoncer(exc)
-            result = await self._repli.stream(
-                system=system, user=user, model=self._modele_repli,
-                max_tokens=max_tokens, cwd=cwd,
-                on_token=on_token, on_tool_use=on_tool_use, **extra,
-            )
-            return self._marquer(result)
+        raison = self._raison_taille(system, user)
+        if raison is None:
+            try:
+                return await self._principal.stream(
+                    system=system, user=user, model=model, max_tokens=max_tokens, cwd=cwd,
+                    on_token=on_token, on_tool_use=on_tool_use, **extra,
+                )
+            except ProviderIndisponible as exc:
+                raison = str(exc)
+        await self._annoncer(raison)
+        result = await self._repli.stream(
+            system=system, user=user, model=self._modele_repli,
+            max_tokens=max_tokens, cwd=cwd,
+            on_token=on_token, on_tool_use=on_tool_use, **extra,
+        )
+        return self._marquer(result)
+
+    def _raison_taille(self, system: str, user: str) -> str | None:
+        """Why the prompt goes straight to the fallback, or None when it stays
+        on the principal: no threshold declared, or the prompt fits under it."""
+        if self._seuil_caracteres is None:
+            return None
+        taille = len(system) + len(user)
+        if taille <= self._seuil_caracteres:
+            return None
+        return (
+            f"prompt de {taille} caractères, au-delà du seuil de "
+            f"{self._seuil_caracteres} (fallback_above_chars)"
+        )
 
     def _marquer(self, result: ProviderResult) -> ProviderResult:
         # Ce qui a réellement tourné, pour la ventilation des coûts : le
@@ -117,12 +143,12 @@ class ProviderAvecRepli:
             result.provider_name = self._repli.name
         return result
 
-    async def _annoncer(self, cause: ProviderIndisponible) -> None:
+    async def _annoncer(self, cause: str) -> None:
         _logger.warning(
             "provider_fallback",
             extra={
                 "role": self._role, "tente": self._principal.name,
-                "utilise": self._repli.name, "error": str(cause),
+                "utilise": self._repli.name, "error": cause,
             },
         )
         self._ecrire_au_journal(cause)
@@ -137,7 +163,7 @@ class ProviderAvecRepli:
                         "tente": self._principal.name,
                         "utilise": self._repli.name,
                         "modele": self._modele_repli,
-                        "raison": str(cause),
+                        "raison": cause,
                     },
                 )
             )
@@ -145,13 +171,13 @@ class ProviderAvecRepli:
             _logger.warning("provider_fallback_emit_failed", extra={"error": str(exc)})
 
 
-    def _ecrire_au_journal(self, cause: ProviderIndisponible) -> None:
+    def _ecrire_au_journal(self, cause: str) -> None:
         """Writes `[ticket] role: repli vers provider/modèle — cause`, when a
         journal is wired and a ticket is running. Never raises."""
         ticket = ticket_courant()
         if self._journal is None or not ticket:
             return
-        raison = " ".join(str(cause).split())[:300]
+        raison = " ".join(cause.split())[:300]
         message = (
             f"[{ticket}] {self._role}: repli vers "
             f"{self._repli.name}/{self._modele_repli} — {raison}"
