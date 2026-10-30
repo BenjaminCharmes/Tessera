@@ -6652,3 +6652,21 @@ Le diff ajoute :
 - 2026-10-30 19:40:31 UTC — [ticket-714] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés correctement. Le code ajoute (264375ms)
 - 2026-10-30 19:40:31 UTC — [ticket-714] APPROVED après 1 tour(s)
 - 2026-10-30 19:42:00 UTC — [ticket-714] documentation: 0 fichier(s) (84250ms)
+- 2026-10-30 20:05:49 UTC — [ide-core] ticket-712 PR #796 confiée au CIWatcher
+- 2026-10-30 20:05:52 UTC — [ticket-724] branche ticket-724-the-documentation-batch-also-keeps-agents-md-and
+- 2026-10-30 20:06:54 UTC — [ticket-724] plan rendu (60485ms)
+- 2026-10-30 20:06:54 UTC — [ticket-724] tour 1 — codeur démarré
+- 2026-10-30 20:12:09 UTC — [ticket-724] tour 1 — codeur terminé (315250ms)
+- 2026-10-30 20:17:50 UTC — [ticket-712] livraison: arrêt — PR #796 non mergée : GitHub a refusé le merge de la PR #796.
+- 2026-10-30 20:19:35 UTC — [ticket-724] testeur: 1 failed, 3504 passed, 64 warnings in 443.39s (0:07:23)
+- 2026-10-30 20:19:35 UTC — [ticket-724] tests rouges au tour 1
+- 2026-10-30 20:19:35 UTC — [ticket-724] tour 2 — codeur démarré
+- 2026-10-30 20:22:16 UTC — [ticket-724] tour 2 — codeur terminé (161031ms)
+- 2026-10-30 20:29:43 UTC — [ticket-724] testeur: OK (exit 0)
+- 2026-10-30 20:34:12 UTC — [ticket-724] securite: PASS — Le diff implémente la proposition de description de projet via doc-technique en  (268250ms)
+- 2026-10-30 20:34:12 UTC — [ticket-724] tour 2 — reviewer démarré
+- 2026-10-30 20:34:42 UTC — [ticket-724] tour 2 — reviewer terminé (30609ms)
+- 2026-10-30 20:39:12 UTC — [ticket-724] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 20:40:20 UTC — [ticket-724] validateur: fichiers cités joints : backend/tests/test_documentation_claude_md.py, AGENTS.md, agents.json, agents/prompts/doc-technique.md, memory/contraintes.md (tronqué) ; non joints (budget épuisé) : memory/decisions.md
+- 2026-10-30 20:40:20 UTC — [ticket-724] validateur: APPROVED — Le ticket-724 livre l'intégration complète de la gestion des descriptions de pro (368453ms)
+- 2026-10-30 20:40:20 UTC — [ticket-724] APPROVED après 2 tour(s)
