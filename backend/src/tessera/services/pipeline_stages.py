@@ -22,7 +22,8 @@ from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.config_tests_touchee import (
     avertissement_config_tests,
-    fichiers_de_config_touches,
+    config_tests_du_diff,
+    porte_config_nommee,
 )
 from tessera.services.detail_du_delai import detail_du_delai, ligne_de_delai
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
@@ -710,23 +711,6 @@ async def run_security_audit(
 # ------------------------------------------------------------------
 
 
-def _avertissement_config_tests(orch: "Orchestrator", run: PipelineRun) -> str:
-    """Warning opening the reviewer's message when the diff touches test config.
-
-    Returns an empty string when it does not. The line in the pipeline log
-    names the files, so the signal outlives the reviewer's answer (ticket-490).
-    """
-    chemin = orch._project_path
-    racines = [chemin.resolve(), *chemin.resolve().parents] if chemin else []
-    fichiers = fichiers_de_config_touches(run.reviewed_code, racines)
-    if fichiers:
-        orch._log(
-            f"[{run.ticket_id}] configuration des tests modifiée : "
-            + ", ".join(fichiers)
-        )
-    return avertissement_config_tests(fichiers)
-
-
 async def run_review(
     orch: "Orchestrator", run: PipelineRun, context: str
 ) -> tuple[bool, str, str]:
@@ -734,8 +718,13 @@ async def run_review(
     reviewer_cfg = orch._config_for(AgentRole.reviewer)
     ticket_id = run.ticket_id
 
+    # Le journal nomme les fichiers : le signal survit à la réponse du reviewer.
+    config_touchee = config_tests_du_diff(
+        run.reviewed_code, orch._project_path,
+        lambda ligne: orch._log(f"[{ticket_id}] {ligne}"),
+    )
     review_context = (
-        _avertissement_config_tests(orch, run)
+        avertissement_config_tests(config_touchee)
         + context
         + f"\n\n## Code produit par le codeur (tour {run.round_num})\n{run.reviewed_code}"
         + run.artifact_diff
@@ -763,7 +752,11 @@ async def run_review(
         schema=REVIEWER_SCHEMA,
     )
     orch.record_spend(reviewer_result.cost_usd)
-    approved, reason, review_text = juger_revue(reviewer_result.structured)
+    approved, reason, review_text = porte_config_nommee(
+        juger_revue(reviewer_result.structured), config_touchee,
+        f"{run.ticket.title}\n{run.ticket.body}",
+        lambda ligne: orch._log(f"[{ticket_id}] {ligne}"),
+    )
     await run.on_event(
         OrchestratorEvent(
             type=EventType.AGENT_DONE,

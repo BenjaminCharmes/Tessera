@@ -7,7 +7,11 @@ from tessera.models.agent import AgentResult, AgentRole
 from tessera.services.config_tests_touchee import (
     TITRE_CONFIG_TESTS,
     avertissement_config_tests,
+    config_tests_du_diff,
     fichiers_de_config_touches,
+    fichiers_non_nommes,
+    imposer_config_nommee,
+    porte_config_nommee,
 )
 from tessera.services.diff_changements import lire_diff
 from tessera.services.orchestrator import Orchestrator
@@ -122,12 +126,14 @@ class _Runner:
         return _make_agent_result("prose du codeur", role=role)
 
 
-async def _contexte_du_reviewer(tmp_path: Path, diff: str) -> tuple[str, str]:
-    """Run a pipeline whose coder produced `diff`; return reviewer message and log."""
+async def _tours_du_reviewer(
+    tmp_path: Path, diff: str, corps: str = ""
+) -> tuple[list[str], str]:
+    """Run a pipeline whose coder produced `diff`; return reviewer messages and log."""
     runner = _Runner()
     service = AsyncMock()
     service.get_ticket.return_value = _make_ticket(
-        body="## Critères d'acceptation\n- [ ] ça marche\n"
+        body="## Critères d'acceptation\n- [ ] ça marche\n" + corps
     )
     log = tmp_path / "memory" / "pipeline-log.md"
     orch = Orchestrator(
@@ -141,12 +147,21 @@ async def _contexte_du_reviewer(tmp_path: Path, diff: str) -> tuple[str, str]:
 
     await orch.run_pipeline("projet", "ticket-001", _noop)
 
-    (contexte,) = runner.contextes_reviewer
-    return contexte, log.read_text(encoding="utf-8")
+    return runner.contextes_reviewer, log.read_text(encoding="utf-8")
+
+
+async def _contexte_du_reviewer(
+    tmp_path: Path, diff: str, corps: str = ""
+) -> tuple[str, str]:
+    """Like `_tours_du_reviewer`, for a run that ends after one reviewer round."""
+    (contexte,) = (await _tours_du_reviewer(tmp_path, diff, corps))[0]
+    return contexte, (tmp_path / "memory" / "pipeline-log.md").read_text(encoding="utf-8")
 
 
 async def test_le_message_du_reviewer_commence_par_lavertissement(tmp_path: Path) -> None:
-    contexte, journal = await _contexte_du_reviewer(tmp_path, _CODE + _CONFTEST + _VITEST)
+    contexte, journal = await _contexte_du_reviewer(
+        tmp_path, _CODE + _CONFTEST + _VITEST, "conftest.py et vitest.config.ts\n"
+    )
 
     assert contexte.startswith(f"## {TITRE_CONFIG_TESTS}")
     entete = contexte.split("ctx", 1)[0]
@@ -162,3 +177,102 @@ async def test_sans_configuration_le_message_du_reviewer_est_inchange(tmp_path: 
     assert TITRE_CONFIG_TESTS not in contexte
     assert "ctx" in contexte
     assert "configuration des tests" not in journal
+
+
+_BODY_SANS_CONFIG = "Implement the feature."
+
+
+def test_unnamed_test_config_change_forces_changes_requested() -> None:
+    non_nommes = fichiers_non_nommes(["frontend/vitest.config.ts"], _BODY_SANS_CONFIG)
+
+    approved, reason, texte = imposer_config_nommee(
+        True, "", "APPROVED\n\n## Résumé\nok", non_nommes
+    )
+
+    assert approved is False
+    assert "frontend/vitest.config.ts" in reason
+    assert "ne demande pas de modifier la configuration des tests" in reason
+    assert texte.startswith("CHANGES_REQUESTED\n\n## Remarques\n- ")
+    assert "frontend/vitest.config.ts" in texte and "## Résumé\nok" in texte
+
+
+def test_named_test_config_change_keeps_the_review_verdict() -> None:
+    for citation in ("`vitest.config.ts`", "frontend/vitest.config.ts"):
+        assert fichiers_non_nommes(["frontend/vitest.config.ts"], f"Monte {citation}") == []
+
+    resultat = imposer_config_nommee(True, "", "APPROVED", [])
+
+    assert resultat == (True, "", "APPROVED")
+
+
+def test_no_test_config_change_is_untouched() -> None:
+    fichiers = fichiers_de_config_touches(_CODE, [])
+
+    assert fichiers_non_nommes(fichiers, _BODY_SANS_CONFIG) == []
+    assert imposer_config_nommee(True, "", "APPROVED", []) == (True, "", "APPROVED")
+
+
+def test_a_refusing_review_keeps_its_reason_and_gains_the_remark() -> None:
+    approved, reason, texte = imposer_config_nommee(
+        False, "Un test manque.", "CHANGES_REQUESTED\n\n## Résumé\nx", ["conftest.py"]
+    )
+
+    assert approved is False
+    assert reason.startswith("Un test manque.") and "`conftest.py`" in reason
+    assert texte.count("CHANGES_REQUESTED") == 1
+
+
+def test_the_gate_covers_pyproject_and_package_scripts(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text(_PYPROJECT, encoding="utf-8")
+    (tmp_path / "package.json").write_text(_PACKAGE, encoding="utf-8")
+    diff = _diff_de("pyproject.toml", 5, ['addopts = ""'], ['addopts = "-q"']) + _diff_de(
+        "package.json", 4, ['    "test": "vitest"'], ['    "test": "vitest run"']
+    )
+
+    fichiers = fichiers_de_config_touches(diff, [tmp_path])
+
+    assert fichiers_non_nommes(fichiers, _BODY_SANS_CONFIG) == ["pyproject.toml", "package.json"]
+    assert fichiers_non_nommes(fichiers, "Règle pyproject.toml, puis package.json") == []
+
+
+async def test_the_pipeline_refuses_an_approved_review_that_touches_unnamed_config(
+    tmp_path: Path,
+) -> None:
+    contextes, journal = await _tours_du_reviewer(tmp_path, _CODE + _VITEST)
+
+    assert len(contextes) > 1
+    assert "CHANGES_REQUESTED tour 1" in journal
+    assert "configuration des tests non demandée : frontend/vitest.config.ts" in journal
+
+
+async def test_the_pipeline_keeps_the_verdict_when_the_ticket_names_the_file(
+    tmp_path: Path,
+) -> None:
+    contextes, journal = await _tours_du_reviewer(
+        tmp_path, _CODE + _VITEST, "Monte le délai dans vitest.config.ts\n"
+    )
+
+    assert len(contextes) == 1
+    assert "non demandée" not in journal
+
+
+def test_config_tests_du_diff_journalise_les_fichiers_touches() -> None:
+    lignes: list[str] = []
+
+    fichiers = config_tests_du_diff(_CODE + _VITEST, None, lignes.append)
+
+    assert fichiers == ["frontend/vitest.config.ts"]
+    assert lignes == ["configuration des tests modifiée : frontend/vitest.config.ts"]
+    assert config_tests_du_diff(_CODE, None, lignes.append) == []
+    assert len(lignes) == 1
+
+
+def test_porte_config_nommee_journalise_les_fichiers_non_demandes() -> None:
+    lignes: list[str] = []
+
+    approved, _, _ = porte_config_nommee(
+        (True, "", "APPROVED"), ["conftest.py"], "rien", lignes.append
+    )
+
+    assert approved is False
+    assert lignes == ["configuration des tests non demandée : conftest.py"]
