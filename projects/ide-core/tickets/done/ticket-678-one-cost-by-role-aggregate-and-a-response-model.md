@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-678
+pr_number: 800
 priority: medium
 status: done
 title: One cost-by-role aggregate and a response model
