@@ -4,7 +4,7 @@ created: 2026-10-30
 depends_on: []
 estimated_days: 1
 id: ticket-704
-pr_number: null
+pr_number: 777
 priority: critical
 status: done
 title: The API refuses a foreign Host or Origin
