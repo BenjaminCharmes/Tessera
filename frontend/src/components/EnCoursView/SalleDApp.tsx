@@ -9,6 +9,8 @@ import DallePerforee from "../../design/bureau/DallePerforee";
 import Extincteur from "../../design/bureau/Extincteur";
 import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
 import type { AppEnCours, ServiceActif } from "../../types/api";
+import type { AgentDeProduit } from "../../types/activiteProduit";
+import AgentsDeProduit from "./AgentsDeProduit";
 import { baiesDeLApp } from "./baies";
 import { formaterHeure, formaterMo } from "./format";
 
@@ -16,6 +18,8 @@ interface SalleDAppProps {
   app: AppEnCours;
   /** Heure de la dernière lecture de l'inventaire : elle relance la lecture des services. */
   lueA: number;
+  /** Les agents que le produit déclare pour cette app ; vide, la salle n'en dessine aucun. */
+  agents: readonly AgentDeProduit[];
 }
 
 const AUCUN: ServiceActif[] = [];
@@ -28,9 +32,10 @@ function ports(app: AppEnCours): string {
  * La salle d'une app lancée — ticket-672. Le mur porte le chemin de câbles, le
  * climatiseur, une baie par service (son voyant dit l'état), l'extincteur et la
  * porte coupe-feu ; le sol est un faux plancher. Tout est mobilier fixe (ADR-058)
- * sauf les voyants, et aucun agent n'y est dessiné.
+ * sauf les voyants et les agents, un par entrée du fichier d'activité du produit
+ * (ticket-673) : sans fichier lu, personne.
  */
-export default function SalleDApp({ app, lueA }: SalleDAppProps) {
+export default function SalleDApp({ app, lueA, agents }: SalleDAppProps) {
   // Relire à chaque lecture de l'inventaire : un service arrêté change de voyant.
   const fetcher = useMemo(
     () => () => api.services.list(app.project_id),
@@ -87,6 +92,7 @@ export default function SalleDApp({ app, lueA }: SalleDAppProps) {
           </Agrandi>
         </div>
       </div>
+      <AgentsDeProduit projectId={app.project_id} agents={agents} />
       <div data-sol="dalles" className="sol-dalles flex h-14 items-center justify-center gap-20">
         <DallePerforee />
         <DallePerforee />

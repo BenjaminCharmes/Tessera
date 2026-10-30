@@ -1,14 +1,16 @@
 ---
-id: ticket-673
-title: "A product's agents are drawn in its room from the activity file alone"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: [ticket-671, ticket-672]
-estimated_days: 1
 created: 2026-10-29
+depends_on:
+- ticket-671
+- ticket-672
+estimated_days: 1
+id: ticket-673
+pr_number: 768
+priority: low
+status: done
+title: A product's agents are drawn in its room from the activity file alone
+type: feat
 ---
 
 # ticket-673 — Les agents d'un produit se dessinent depuis son fichier d'activité

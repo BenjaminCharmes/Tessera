@@ -57,7 +57,7 @@ import { API_ORIGIN } from "./config";
 
 const BASE = `${API_ORIGIN}/api/v1`;
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+export async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, authorized(options));
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);

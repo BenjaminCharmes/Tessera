@@ -40,3 +40,28 @@ describe("server room furniture", () => {
     expect(CSS).toMatch(/[.]sol-dalles\s*[{][^}]*--sprite-dalle\b/);
   });
 });
+
+describe("product agent sprites", () => {
+  const SPRITES_AGENT = ["Console", "AgentAuPupitre"];
+
+  it("reads every tone from a --sprite-* token defined in index.css, with no state hue", () => {
+    for (const nom of SPRITES_AGENT) {
+      const contenu = source(nom);
+      expect(contenu, nom).toContain("--sprite-");
+      expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:red|amber|green|blue|violet)-\d/);
+      expect(contenu, nom).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(/);
+      for (const m of contenu.matchAll(/--sprite-([a-z0-9-]+)/g)) {
+        expect(CSS, `${nom}: --sprite-${m[1]}`).toMatch(new RegExp(`--sprite-${m[1]}:`));
+      }
+    }
+  });
+
+  it("keeps the console still, and moves an agent only with the typing animation that reduced motion cuts", () => {
+    expect(source("Console")).not.toMatch(/anim-|animation|transition|data-voyant/);
+    const agent = source("AgentAuPupitre");
+    expect([...new Set(agent.match(/anim-[a-z]+/g))]).toEqual(["anim-tape"]);
+    expect(agent).not.toMatch(/animation|transition/);
+    const reduit = CSS.slice(CSS.indexOf("@media (prefers-reduced-motion: reduce)"));
+    expect(reduit).toMatch(/[.]anim-tape\b[^}]*animation:\s*none/);
+  });
+});
