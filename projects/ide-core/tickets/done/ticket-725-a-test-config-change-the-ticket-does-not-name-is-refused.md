@@ -1,14 +1,14 @@
 ---
-id: ticket-725
-title: "A test configuration change the ticket does not name is refused"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-10-30
 depends_on: []
 estimated_days: 0.5
-created: 2026-10-30
+id: ticket-725
+pr_number: 794
+priority: high
+status: done
+title: A test configuration change the ticket does not name is refused
+type: fix
 ---
 
 # ticket-725 — Un changement de configuration des tests que le ticket ne nomme pas est refusé

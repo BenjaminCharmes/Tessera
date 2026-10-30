@@ -6,11 +6,17 @@ c'est aussi la façon la plus discrète d'affaiblir la vérification qui juge le
 diff. La liste est fermée ; quand elle correspond, le reviewer le lit en tête
 de son message, avec les fichiers nommés.
 
+Ticket-725 ajoute la porte : un avertissement lu par un LLM ne tient pas. Si
+aucun des fichiers touchés n'est cité dans le texte du ticket, le verdict
+devient `CHANGES_REQUESTED`. Un ticket qui nomme le fichier garde l'avertissement
+seul.
+
 Pour `pyproject.toml` et `package.json`, seul un changement **dans** la section
 visée compte : on relit donc le fichier sur le disque pour savoir où il tombe.
 Un fichier qu'on ne peut plus relire (supprimé) est signalé, par prudence.
 """
 import re
+from collections.abc import Callable
 from fnmatch import fnmatch
 from pathlib import Path
 
@@ -52,6 +58,77 @@ def avertissement_config_tests(fichiers: list[str]) -> str:
         return ""
     liste = "\n".join(f"- `{chemin}`" for chemin in fichiers)
     return f"## {TITRE_CONFIG_TESTS}\n{liste}\n\n{_CONSIGNE}\n\n"
+
+
+def fichiers_non_nommes(fichiers: list[str], texte_du_ticket: str) -> list[str]:
+    """The files of `fichiers` the ticket text cites neither by path nor by name."""
+    return [
+        chemin
+        for chemin in fichiers
+        if chemin not in texte_du_ticket
+        and chemin.rsplit("/", 1)[-1] not in texte_du_ticket
+    ]
+
+
+def remarque_config_non_nommee(fichiers: list[str]) -> str:
+    """The blocking remark for test-config files the ticket does not ask to touch."""
+    liste = ", ".join(f"`{chemin}`" for chemin in fichiers)
+    return (
+        "Ce ticket ne demande pas de modifier la configuration des tests : "
+        f"retire ce changement ({liste})."
+    )
+
+
+def imposer_config_nommee(
+    approved: bool, reason: str, review_text: str, non_nommes: list[str]
+) -> tuple[bool, str, str]:
+    """Turn the review into `CHANGES_REQUESTED` when unnamed config files changed.
+
+    Takes and returns the `(approved, reason, rendered review)` triple of
+    `juger_revue`, unchanged when `non_nommes` is empty. The remark opens the
+    rendered review, ahead of what the reviewer wrote, so the coder reads it
+    next round like any other (ticket-725).
+    """
+    if not non_nommes:
+        return approved, reason, review_text
+    remarque = remarque_config_non_nommee(non_nommes)
+    _, _, reste = review_text.partition("\n")
+    texte = f"CHANGES_REQUESTED\n\n## Remarques\n- {remarque}"
+    if reste.strip():
+        texte += f"\n\n{reste.strip()}"
+    raison = remarque if approved or not reason else f"{reason}\n\n{remarque}"
+    return False, raison, texte
+
+
+def config_tests_du_diff(
+    diff: str, projet: Path | None, journal: Callable[[str], None]
+) -> list[str]:
+    """The test-config files `diff` touches, named in one `journal` line if any.
+
+    The project and its ancestors are the roots a diff path may be relative to.
+    """
+    racines = [projet.resolve(), *projet.resolve().parents] if projet else []
+    fichiers = fichiers_de_config_touches(diff, racines)
+    if fichiers:
+        journal("configuration des tests modifiée : " + ", ".join(fichiers))
+    return fichiers
+
+
+def porte_config_nommee(
+    revue: tuple[bool, str, str],
+    touches: list[str],
+    texte_du_ticket: str,
+    journal: Callable[[str], None],
+) -> tuple[bool, str, str]:
+    """The review after the gate: refused if `touches` holds files the ticket omits.
+
+    `revue` is the triple of `juger_revue`; `journal` receives one line naming
+    the unrequested files when there are some.
+    """
+    non_nommes = fichiers_non_nommes(touches, texte_du_ticket)
+    if non_nommes:
+        journal("configuration des tests non demandée : " + ", ".join(non_nommes))
+    return imposer_config_nommee(*revue, non_nommes)
 
 
 def _touche_la_configuration(fichier: FichierModifie, racines: list[Path]) -> bool:
