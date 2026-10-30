@@ -46,8 +46,10 @@ async def test_each_finished_step_carries_its_duration(tmp_path: Path) -> None:
 
 
 async def test_an_expired_run_names_the_cut_step_and_its_time(tmp_path: Path) -> None:
+    # Délai large, comme le test suivant : sous charge, le démarrage de Python
+    # de l'étape rapide dépassait 4 s, et c'est elle qui était coupée (30/10).
     result = await TestRunnerService().run_tests(
-        tmp_path, test_command=f"{_RAPIDE} && {_LENTE}", timeout=4
+        tmp_path, test_command=f"{_RAPIDE} && {_LENTE}", timeout=15
     )
 
     assert result.expiree is True
@@ -55,7 +57,7 @@ async def test_an_expired_run_names_the_cut_step_and_its_time(tmp_path: Path) ->
     assert "time.sleep(60)" in result.etape_coupee.commande
     assert result.etape_coupee.duree_ms >= 2000
     assert "coupé après" in result.output_summary
-    assert result.output_summary.startswith("Timeout après 4s")
+    assert result.output_summary.startswith("Timeout après 15s")
 
 
 async def test_an_expired_run_lists_the_steps_finished_before_the_cut(tmp_path: Path) -> None:
