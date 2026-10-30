@@ -73,7 +73,7 @@ describe("ronde", () => {
     const projets = [{ nom: "a", etat: enCodage(T0) }];
     const { memoire } = rejouer(projets, T0 + TICK, T0 + 30_000 + TICK);
 
-    expect(memoire.visite).toEqual({ projet: "a", poste: "codeur", depuis: T0 + 35_000 });
+    expect(memoire.visite).toEqual({ projet: "a", poste: "codeur", depuis: T0 + 35_000, motif: "silence" });
 
     const encore = ronde(memoire, projets, null, T0 + 35_000 + DUREE_DE_VISITE_MS - TICK);
     expect(encore.visite).not.toBeNull();
@@ -103,7 +103,7 @@ describe("ronde", () => {
     const choisi = ronde(apres.memoire, projets, demande, T0 + 65_000);
 
     expect(65_000 - 35_000).toBeLessThan(ECART_ENTRE_VISITES_MS);
-    expect(choisi.visite).toEqual({ projet: "b", poste: "codeur", depuis: T0 + 65_000 });
+    expect(choisi.visite).toEqual({ projet: "b", poste: "codeur", depuis: T0 + 65_000, motif: "demande" });
   });
 
   it("lets a chosen agent replace a visit in progress, and leaves once for one choice", () => {
@@ -184,4 +184,31 @@ describe("ronde", () => {
 
     expect(ronde(memoire, projets, null, T0 + 35_000)).toBe(memoire);
   });
+
+  it("goes to the reviewer when a round is refused, saying so", () => {
+    const tour1 = [ev("agent_started", T0, "codeur", { round: 1 })].reduce(applyEvent, INITIAL);
+    const tour2 = applyEvent(tour1, ev("agent_started", T0 + TICK, "codeur", { round: 2 }));
+    const vu = ronde(MEMOIRE_VIERGE, [{ nom: "a", etat: tour1 }], null, T0);
+    expect(vu.visite).toBeNull();
+
+    const apres = ronde(vu, [{ nom: "a", etat: tour2 }], null, T0 + TICK);
+    expect(apres.visite).toEqual({ projet: "a", poste: "reviewer", depuis: T0 + TICK, motif: "tour-refuse" });
+  });
+
+  it("goes to congratulate the validator when a ticket is approved", () => {
+    const enCours = enCodage(T0);
+    const approuve = applyEvent(enCours, ev("pipeline_done", T0 + TICK, null, { approved: true, rounds: 1, final_status: "done" }));
+    const vu = ronde(MEMOIRE_VIERGE, [{ nom: "a", etat: enCours }], null, T0);
+
+    const apres = ronde(vu, [{ nom: "a", etat: approuve }], null, T0 + TICK);
+    expect(apres.visite).toEqual({ projet: "a", poste: "validateur", depuis: T0 + TICK, motif: "approuve" });
+  });
+
+  it("does not leave for a round or an approval he sees for the first time", () => {
+    const tour2 = [ev("agent_started", T0, "codeur", { round: 2 })].reduce(applyEvent, INITIAL);
+    const approuve = applyEvent(enCodage(T0), ev("pipeline_done", T0, null, { approved: true, rounds: 1, final_status: "done" }));
+
+    expect(ronde(MEMOIRE_VIERGE, [{ nom: "a", etat: tour2 }, { nom: "b", etat: approuve }], null, T0).visite).toBeNull();
+  });
 });
+

@@ -58,6 +58,10 @@ describe("BureauView — the director's round", () => {
 
     avancer(30_000);
     expect(directeurEnVisite("projet-0")?.getAttribute("data-poste")).toBe("codeur");
+    // ticket-723 : son infobulle dit pourquoi il est venu.
+    expect(directeurEnVisite("projet-0")?.getAttribute("aria-label")).toBe(
+      "Victor, directeur, vient voir pourquoi le run se tait chez projet-0",
+    );
     expect(within(salleDuDirecteur()).getByRole("img", { name: "Victor, directeur, en visite" })).toBeInTheDocument();
 
     avancer(DUREE_DE_VISITE_MS);
