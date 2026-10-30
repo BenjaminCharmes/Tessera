@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { useMarcheActive } from "../../hooks/useEtirementDuSol";
 import SolEtire from "./SolEtire";
 
@@ -25,4 +25,33 @@ describe("SolEtire", () => {
       expect(screen.getByTestId("temoin")).toHaveTextContent("marche"),
     );
   });
+
+  it("stops the walk for one frame when the floor changes width, so agents jump instead of sliding", async () => {
+    // Le 30/10, au retour sur le Bureau en mode « Ajuster », le zoom se mesurait
+    // après le montage et les agents glissaient vers leur poste (ticket-720).
+    let redimensionner: (largeur: number) => void = () => undefined;
+    class FauxObservateur {
+      constructor(rappel: ResizeObserverCallback) {
+        redimensionner = (largeur) =>
+          rappel([{ contentRect: { width: largeur } } as ResizeObserverEntry], this as unknown as ResizeObserver);
+      }
+      observe() {}
+      disconnect() {}
+    }
+    vi.stubGlobal("ResizeObserver", FauxObservateur);
+    render(
+      <SolEtire>
+        <Temoin />
+      </SolEtire>,
+    );
+    await waitFor(() => expect(screen.getByTestId("temoin")).toHaveTextContent("marche"));
+
+    act(() => redimensionner(1600));
+    expect(screen.getByTestId("temoin")).toHaveTextContent("immobile");
+    await waitFor(() => expect(screen.getByTestId("temoin")).toHaveTextContent("marche"));
+  });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });

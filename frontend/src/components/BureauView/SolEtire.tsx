@@ -16,13 +16,24 @@ export default function SolEtire({ children }: { children: ReactNode }) {
   useLayoutEffect(() => {
     const boite = conteneur.current;
     if (!boite) return;
+    let courant = 1;
+    // La marche ne s'active qu'après une image peinte à la bonne place (ticket-638).
+    let image = requestAnimationFrame(() => setMarche(true));
     // Une largeur nulle (conteneur masqué, jsdom) n'est pas une mesure : l'étirement reste à 1.
     const appliquer = (largeur: number) => {
-      if (largeur > 0) setEtirement(etirementDuSol(largeur));
+      if (largeur <= 0) return;
+      const suivant = etirementDuSol(largeur);
+      if (suivant === courant) return;
+      courant = suivant;
+      setEtirement(suivant);
+      // Un sol qui change de largeur (zoom, « Ajuster » qui se mesure après le
+      // montage, fenêtre redimensionnée) déplace les agents d'un coup : couper la
+      // marche le temps d'une image, sinon ils glissent jusqu'à leur poste (ticket-720).
+      setMarche(false);
+      cancelAnimationFrame(image);
+      image = requestAnimationFrame(() => setMarche(true));
     };
     appliquer(boite.clientWidth);
-    // La marche ne s'active qu'après une image peinte à la bonne place (ticket-638).
-    const image = requestAnimationFrame(() => setMarche(true));
     if (typeof ResizeObserver === "undefined")
       return () => cancelAnimationFrame(image);
     const observateur = new ResizeObserver(([entree]) => {
