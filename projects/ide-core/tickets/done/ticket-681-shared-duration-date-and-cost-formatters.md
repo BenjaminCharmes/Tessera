@@ -1,12 +1,13 @@
 ---
-id: ticket-681
-title: "Shared duration, date and cost formatters"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-681
+pr_number: 803
+priority: low
+status: done
+title: Shared duration, date and cost formatters
+type: refactor
 ---
 
 # ticket-681 — Formateurs de durée, de date et de coût partagés

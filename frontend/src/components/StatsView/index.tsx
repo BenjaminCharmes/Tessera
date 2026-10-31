@@ -7,12 +7,8 @@ import TimeBars from "../../design/charts/TimeBars";
 import TimeLines from "../../design/charts/TimeLines";
 import Donut from "../../design/charts/Donut";
 import ShareBars from "../../design/charts/ShareBars";
-import {
-  formatCount,
-  formatDay,
-  formatDurationMs,
-  formatUsd,
-} from "../../design/charts/palette";
+import { formatCount } from "../../design/charts/palette";
+import { formatDay, formatDurationMs, formatUsd } from "../../lib/format";
 import type { RecentRun, StatsPeriod, UsageStats } from "../../types/api";
 import Card from "./Card";
 import JaugesDeQuota from "../../design/ui/JaugesDeQuota";

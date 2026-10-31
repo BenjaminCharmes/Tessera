@@ -2,11 +2,10 @@ import RunHistorique from "../StatsView/RunHistorique";
 import StatusPill from "../../design/ui/StatusPill";
 import LienTicket from "../../design/ui/LienTicket";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
+import { formatCout, formatDate } from "../../lib/format";
 import CapturesDuRun from "./CapturesDuRun";
 import {
   etatDuRun,
-  formatCout,
-  formatDate,
   formatDuree,
   libelleDeLEtat,
   libelleDesTours,

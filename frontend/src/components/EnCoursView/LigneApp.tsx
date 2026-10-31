@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { AppEnCours } from "../../types/api";
-import { formaterDuree, formaterMo } from "./format";
+import { formatElapsed } from "../../lib/format";
+import { formaterMo } from "./format";
 import Button from "../../design/ui/Button";
 import StatusPill, { type EtatPastille } from "../../design/ui/StatusPill";
 import Spinner from "./Spinner";
@@ -91,7 +92,7 @@ export default function LigneApp({ app, now, enArret, onArreter }: LigneAppProps
       <span className="min-w-32 font-medium text-zinc-100">{app.nom}</span>
       <StatusPill etat={ORIGINES[app.origine].etat} libelle={ORIGINES[app.origine].libelle} />
       <Ports ports={app.ports} />
-      <span className="text-zinc-400">{formaterDuree(app.demarre_a, now)}</span>
+      <span className="text-zinc-400">{formatElapsed(app.demarre_a, now)}</span>
       <span className="ml-auto tabular-nums text-zinc-200">
         {formaterMo(app.memoire_mo)}
       </span>

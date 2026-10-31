@@ -5,6 +5,7 @@ import {
   IconChevronDown,
   IconChevronRight,
 } from "../../design/icons";
+import { formatDurationMs } from "../../lib/format";
 import TokenStream from "../AgentPanel/TokenStream";
 import VerdictBanner from "../AgentPanel/VerdictBanner";
 import { verdictDuReviewer } from "./verdict";
@@ -19,14 +20,6 @@ import type {
 // ---------------------------------------------------------------------------
 // EnteteVerdict — en-tête commun à toutes les cartes du fil du run
 // ---------------------------------------------------------------------------
-
-/** Formate une durée en millisecondes : "2 min 50 s" ou "45 s". */
-function formatDuree(ms: number): string {
-  const s = Math.round(ms / 1000);
-  const m = Math.floor(s / 60);
-  const rem = s % 60;
-  return m > 0 ? `${m} min ${rem} s` : `${s} s`;
-}
 
 interface EnteteVerdictProps {
   label: string;
@@ -120,7 +113,7 @@ function EntreePipeline({ entry, isLast }: EntreePipelineProps) {
   if (entry.agent === "reviewer") {
     verdictText = approved ? "APPROVED" : "CHANGES_REQUESTED";
   } else if (peutBasculer && entry.duration_ms !== undefined) {
-    verdictText = `terminé · ${formatDuree(entry.duration_ms)}`;
+    verdictText = `terminé · ${formatDurationMs(entry.duration_ms, "fil")}`;
   } else {
     verdictText = "terminé";
   }

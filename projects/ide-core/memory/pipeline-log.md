@@ -6754,3 +6754,30 @@ Le diff ajoute :
 - 2026-10-30 23:33:28 UTC — [ticket-680] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le client HTTP a été centralisé (253750ms)
 - 2026-10-30 23:33:28 UTC — [ticket-680] APPROVED après 1 tour(s)
 - 2026-10-30 23:34:55 UTC — [ticket-680] documentation: 0 fichier(s) (80844ms)
+- 2026-10-30 23:42:03 UTC — [ide-core] ticket-680 PR #802 mergée (CI verte)
+- 2026-10-30 23:42:05 UTC — [ide-core] ticket-680 : base réalignée sur develop
+- 2026-10-30 23:42:05 UTC — [ide-core] ticket-680 PR #802 confiée au CIWatcher
+- 2026-10-30 23:42:09 UTC — [ticket-681] branche ticket-681-shared-duration-date-and-cost-formatters
+- 2026-10-30 23:42:10 UTC — [ticket-681] tour 1 — codeur démarré
+- 2026-10-30 23:50:30 UTC — [ticket-681] tour 1 — codeur terminé (499313ms)
+- 2026-10-30 23:52:44 UTC — [ticket-681] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-30 23:52:44 UTC — [ticket-681] tests rouges au tour 1
+- 2026-10-30 23:52:44 UTC — [ticket-681] tour 2 — codeur démarré
+- 2026-10-30 23:53:11 UTC — [ticket-681] tour 2 — codeur terminé (26686ms)
+- 2026-10-30 23:55:26 UTC — [ticket-681] testeur: OK (exit 0)
+- 2026-10-30 23:57:11 UTC — [ticket-681] securite: PASS — This is a safe, clean code organization refactoring that consolidates duplicate  (105218ms)
+- 2026-10-30 23:57:12 UTC — [ticket-681] tour 2 — reviewer démarré
+- 2026-10-30 23:57:38 UTC — [ticket-681] tour 2 — reviewer terminé (26061ms)
+- 2026-10-31 00:01:02 UTC — [ticket-681] validateur: fichiers cités joints : RunHistory.tsx, HistoriqueView/runs.ts ; absents : design/charts/
+- 2026-10-31 00:01:02 UTC — [ticket-681] validateur: CHANGES_REQUESTED — Le ticket a permis d'extraire les formateurs de durée, date et coût dans un modu (230406ms)
+- 2026-10-31 00:01:02 UTC — [ticket-681] CHANGES_REQUESTED tour 2: Validateur : Le ticket a permis d'extraire les formateurs de durée, date et coût dans un module commun `frontend/src/lib/format.ts`, ce qui respecte les critères 1, 2, 4 et 5. Cependant, le critère 3 
+- 2026-10-31 00:01:02 UTC — [ticket-681] tour 3 — codeur démarré
+- 2026-10-31 00:03:46 UTC — [ticket-681] tour 3 — codeur terminé (164078ms)
+- 2026-10-31 00:06:04 UTC — [ticket-681] testeur: OK (exit 0)
+- 2026-10-31 00:09:12 UTC — [ticket-681] securite: PASS — Refactorisation de consolidation des fonctions de formatting frontend (dates, du (187921ms)
+- 2026-10-31 00:09:13 UTC — [ticket-681] tour 3 — reviewer démarré
+- 2026-10-31 00:09:40 UTC — [ticket-681] tour 3 — reviewer terminé (27063ms)
+- 2026-10-31 00:13:38 UTC — [ticket-681] validateur: fichiers cités joints : RunHistory.tsx, HistoriqueView/runs.ts ; absents : design/charts/
+- 2026-10-31 00:13:38 UTC — [ticket-681] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code a été refactoré pour  (266281ms)
+- 2026-10-31 00:13:38 UTC — [ticket-681] APPROVED après 3 tour(s)
+- 2026-10-31 00:15:21 UTC — [ticket-681] documentation: 0 fichier(s) (96500ms)
