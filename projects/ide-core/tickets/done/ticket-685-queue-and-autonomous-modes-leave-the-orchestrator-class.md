@@ -1,12 +1,13 @@
 ---
-id: ticket-685
-title: "Queue and autonomous run modes leave the Orchestrator class"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-685
+pr_number: 807
+priority: medium
+status: done
+title: Queue and autonomous run modes leave the Orchestrator class
+type: refactor
 ---
 
 # ticket-685 — `run_queue` et `run_autonomous` hors de la classe `Orchestrator`
