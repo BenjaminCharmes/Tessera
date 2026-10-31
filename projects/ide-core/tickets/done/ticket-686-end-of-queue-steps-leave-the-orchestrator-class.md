@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-685
 id: ticket-686
+pr_number: 808
 priority: low
 status: done
 title: End-of-queue steps leave the Orchestrator class
