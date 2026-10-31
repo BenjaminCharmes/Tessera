@@ -16,7 +16,7 @@ import pytest
 
 from tessera.config import settings
 from tessera.models.project import ProjectCreate
-from tessera.routers.projects import create_project
+from tessera.routers.projects.creation import create_project
 from tessera.services.artifacts import default_mode_for, read_artifact_mode
 from tessera.services.autonomie import lire_niveau
 from tessera.services.project_loader import load_pipeline_config
