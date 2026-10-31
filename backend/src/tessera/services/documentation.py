@@ -378,7 +378,7 @@ class ResultatDocumentation:
     #: True si le lot a été tronqué à ``_PLAFOND`` tickets (ticket-213).
     tronque: bool = False
     #: True si le marqueur a été écrit (initialisation ou avancement). Permet
-    #: à ``_documenter_le_run`` de commiter le marqueur même quand aucun
+    #: à ``documenter_le_run`` de commiter le marqueur même quand aucun
     #: fichier de doc n'a changé, pour garder l'arbre propre (ticket-213).
     marqueur_ecrit: bool = False
     #: True si au moins un agent a nécessité un tour de correction (ticket-395).

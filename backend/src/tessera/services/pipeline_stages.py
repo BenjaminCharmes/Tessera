@@ -27,7 +27,7 @@ from tessera.services.config_tests_touchee import (
 )
 from tessera.services.detail_du_delai import detail_du_delai, ligne_de_delai
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
-from tessera.services import journal_en_attente
+from tessera.services import journal_en_attente, pipeline_fin_de_file as fin_de_file
 from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
@@ -177,7 +177,7 @@ async def _realigner_base_au_depart(orch: "Orchestrator") -> Optional[str]:
     if orch._git_workspace is None or base is None:
         return None
     try:
-        if not await orch._sur_la_base():
+        if not await fin_de_file.sur_la_base(orch):
             await orch._git_workspace.retourner_sur_base(base)
         return await orch._git_workspace.sync_base_depuis_distant(base)
     except GitWorkspaceError as exc:
@@ -194,7 +194,7 @@ async def _depart_sur_la_base(orch: "Orchestrator") -> bool:
     if orch._git_workspace is None or getattr(orch, "_base_branch", None) is None:
         return False
     try:
-        return await orch._sur_la_base()
+        return await fin_de_file.sur_la_base(orch)
     except GitWorkspaceError:
         return False
 

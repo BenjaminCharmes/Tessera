@@ -19,6 +19,7 @@ from tessera.services.pipeline_events import (
 )
 from tessera.services.pipeline_file_livraison import livraison_arrete_la_file
 from tessera.services.pipeline_file_tour import Tour, progres
+from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline_run import tolerant
 from tessera.services.session_limit import extract_reset_time_from_arret
 from tessera.utils.logger import get_logger
@@ -182,7 +183,7 @@ async def run_queue(
     # entre la fin de la lecture et ici rendrait 200 sans jamais s'exécuter.
     fermer_si_vivante(ticket_ids)
     orch._in_queue = False
-    await orch._nettoyer_apres_file()
+    await nettoyer_apres_file(orch)
     return results
 
 

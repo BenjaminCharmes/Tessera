@@ -12,6 +12,7 @@ import pytest
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
@@ -1479,7 +1480,7 @@ async def test_aucun_commit_de_journal_sur_la_branche_de_base(tmp_path: Path) ->
     )
 
     await orch.run_pipeline("proj", "ticket-001", _rien)
-    await orch._nettoyer_apres_file()
+    await nettoyer_apres_file(orch)
 
     git_ws.commit_bookkeeping.assert_not_called()
     git_ws.retourner_sur_base.assert_called_with("main")

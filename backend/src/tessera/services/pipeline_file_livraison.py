@@ -13,6 +13,10 @@ from tessera.services.attente_dependance import (
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import EventCallback, PipelineResult
 from tessera.services.pipeline_file_tour import Tour
+from tessera.services.pipeline_fin_de_file import (
+    attendre_merge_et_syncer,
+    realigner_base,
+)
 from tessera.services.ticket_service import TicketService
 
 if TYPE_CHECKING:
@@ -94,8 +98,8 @@ async def _attente_merge_sans_ci(
 
     Returns True when the queue stops.
     """
-    merge = await orch._attendre_merge_et_syncer(
-        tour.project_id, tour.ticket_id, pr_number, callback
+    merge = await attendre_merge_et_syncer(
+        orch, tour.project_id, tour.ticket_id, pr_number, callback
     )
     return not merge and await _sans_dependants_sautes(orch, tour)
 
@@ -126,7 +130,7 @@ async def _attente_merge_des_dependants(
     if merge:
         # Le ticket suivant en dépend : il doit partir de la base qui contient
         # ce merge, pas de la base locale d'avant (ticket-403).
-        await orch._realigner_base(tour.project_id, tour.ticket_id)
+        await realigner_base(orch, tour.project_id, tour.ticket_id)
     orch._log(journal_confiee(tour.project_id, tour.ticket_id, livraison))
     return False
 
