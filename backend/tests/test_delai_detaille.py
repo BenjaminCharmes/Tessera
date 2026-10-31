@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_stages
+from tessera.services import pipeline_testeur
 from tessera.services.detail_du_delai import detail_du_delai, ligne_de_delai, nom_court
 from tessera.services.pipeline_reprise import _TESTS_SANS_RESULTAT, verifier_travail_repris
 from tessera.services.pipeline_run import PipelineRun
@@ -118,7 +118,7 @@ def _orch_et_run(tmp_path: Path, resultats: list[TestResult]) -> tuple[MagicMock
 async def test_the_pipeline_log_carries_the_duration_of_each_step(tmp_path: Path) -> None:
     orch, run = _orch_et_run(tmp_path, [_expiree(), _expiree()])
 
-    await pipeline_stages.run_tests(orch, run, reprise=True)
+    await pipeline_testeur.run_tests(orch, run, reprise=True)
 
     lignes = [c.args[0] for c in orch._log.call_args_list]
     attendu = (
@@ -132,7 +132,7 @@ async def test_the_pipeline_log_carries_the_duration_of_each_step(tmp_path: Path
 async def test_the_stage_context_holds_the_list_once(tmp_path: Path) -> None:
     orch, run = _orch_et_run(tmp_path, [_expiree(), _expiree()])
 
-    retour = await pipeline_stages.run_tests(orch, run, reprise=True)
+    retour = await pipeline_testeur.run_tests(orch, run, reprise=True)
 
     assert retour is False
     assert run.test_context.count("install 6 s") == 1

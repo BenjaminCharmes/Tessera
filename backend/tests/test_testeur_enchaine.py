@@ -66,7 +66,7 @@ async def test_failure_details_in_coder_context(tmp_path: Path) -> None:
     the next turn.
     """
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-    from tessera.services import pipeline_stages
+    from tessera.services import pipeline_testeur
     from tessera.services.pipeline_run import PipelineRun
 
     failure_detail = "FAILED tests/test_foo.py::test_bar - assert [5, 6] == [5]\n\nE   AssertionError: assert [5, 6] == [5]"
@@ -102,7 +102,7 @@ async def test_failure_details_in_coder_context(tmp_path: Path) -> None:
         on_event=AsyncMock(),
     )
 
-    await pipeline_stages.run_tests(orch, run)
+    await pipeline_testeur.run_tests(orch, run)
 
     assert failure_detail in run.test_context
     assert "Détail des échecs:" in run.test_context

@@ -6872,3 +6872,17 @@ Le diff ajoute :
 - 2026-10-31 04:04:27 UTC — [ticket-687] validateur: APPROVED — Refactoring completed successfully: orchestrator assembly moved from `routers/or (335061ms)
 - 2026-10-31 04:04:27 UTC — [ticket-687] APPROVED après 1 tour(s)
 - 2026-10-31 04:06:57 UTC — [ticket-687] documentation: 0 fichier(s) (144328ms)
+- 2026-10-31 04:15:28 UTC — [ide-core] ticket-687 PR #809 confiée au CIWatcher
+- 2026-10-31 04:15:32 UTC — [ticket-688] branche ticket-688-pipeline-stages-split-by-stage
+- 2026-10-31 04:15:33 UTC — [ticket-688] tour 1 — codeur démarré
+- 2026-10-31 04:21:02 UTC — [ticket-688] tour 1 — codeur terminé (328389ms)
+- 2026-10-31 04:21:10 UTC — [ide-core] ticket-687 PR #809 mergée (CI verte)
+- 2026-10-31 04:29:54 UTC — [ticket-688] testeur: OK (exit 0)
+- 2026-10-31 04:31:15 UTC — [ticket-688] securite: PASS — Refactorisation de `pipeline_stages.py` en 4 modules spécialisés (branche, contr (81218ms)
+- 2026-10-31 04:31:15 UTC — [ticket-688] tour 1 — reviewer démarré
+- 2026-10-31 04:31:40 UTC — [ticket-688] tour 1 — reviewer terminé (25031ms)
+- 2026-10-31 04:36:16 UTC — [ticket-688] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 04:37:22 UTC — [ticket-688] validateur: fichiers cités joints : aucun ; absents : services/pipeline_stages.py
+- 2026-10-31 04:37:22 UTC — [ticket-688] validateur: APPROVED — Le découpage de `pipeline_stages.py` est complet : 4 nouveaux modules créés, tou (366797ms)
+- 2026-10-31 04:37:22 UTC — [ticket-688] APPROVED après 1 tour(s)
+- 2026-10-31 04:41:20 UTC — [ticket-688] documentation: 0 fichier(s) (232967ms) — après tour de correction

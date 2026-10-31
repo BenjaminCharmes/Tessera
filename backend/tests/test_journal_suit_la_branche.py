@@ -10,7 +10,7 @@ from pathlib import Path
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import journal_en_attente
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
@@ -98,7 +98,7 @@ async def test_pending_log_lines_follow_the_new_branch(tmp_path: Path) -> None:
     tete_precedente = await _git(root, "rev-parse", "ticket-016-old-feat")
 
     run = _run()
-    result = await stages.create_branch(_Orch(workspace, root), run)
+    result = await pipeline_branche.create_branch(_Orch(workspace, root), run)
 
     assert result is None
     assert run.branch is not None
@@ -125,7 +125,7 @@ async def test_a_line_already_in_the_new_branch_log_is_not_duplicated(
     workspace._base_ref = nouvelle_base  # type: ignore[assignment]
 
     run = _run()
-    assert await stages.create_branch(_Orch(workspace, root), run) is None
+    assert await pipeline_branche.create_branch(_Orch(workspace, root), run) is None
 
     contenu = (root / _LOG).read_text(encoding="utf-8")
     assert contenu.count(_LIGNE_LIVRAISON) == 1
@@ -142,7 +142,7 @@ async def test_log_lines_are_written_back_when_branch_creation_fails(
     (root / "code.py").write_text("x = 3\n", encoding="utf-8")
 
     run = _run()
-    result = await stages.create_branch(_Orch(workspace, root), run)
+    result = await pipeline_branche.create_branch(_Orch(workspace, root), run)
 
     assert result is not None
     assert result.final_status is TicketStatus.blocked
@@ -170,7 +170,7 @@ async def test_pending_ticket_file_is_still_committed_before_the_switch(
     workspace._base_ref = nouvelle_base  # type: ignore[assignment]
 
     run = _run()
-    assert await stages.create_branch(_Orch(workspace, root), run) is None
+    assert await pipeline_branche.create_branch(_Orch(workspace, root), run) is None
 
     fichier = await _git(root, "show", "ticket-016-old-feat:tickets/ticket-016.md")
     assert fichier == "status: done"
