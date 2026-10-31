@@ -2,6 +2,7 @@ import { IconCheck, IconSettings } from "../../design/icons";
 import InfoTip from "../../design/InfoTip";
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
+import Modale from "../../design/ui/Modale";
 import type { AnalysisResult, Project } from "../../types/api";
 
 type SourceType = "local" | "github";
@@ -129,26 +130,11 @@ export default function ImportProjectModal({
     onClose();
   }
 
-  function handleOverlayClick(e: React.MouseEvent) {
-    if (e.target === e.currentTarget) onClose();
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") onClose();
-  }
-
   const isLoading = step === "importing" || step === "analyzing";
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-        onClick={handleOverlayClick}
-        onKeyDown={handleKeyDown}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Importer un projet"
-      >
+      <Modale onFermer={onClose} aria-label="Importer un projet">
         <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-lg shadow-xl flex flex-col gap-4">
           {/* Step 1 — Input */}
           {(step === "idle" || step === "error") && (
@@ -422,7 +408,7 @@ export default function ImportProjectModal({
             </>
           )}
         </div>
-      </div>
+      </Modale>
     </>
   );
 }
