@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-680
 id: ticket-683
+pr_number: 805
 priority: low
 status: done
 title: A shared polling hook and clock
