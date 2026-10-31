@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { api } from "../lib/api";
+import { serviceActif } from "../test/contrat/exemples";
+import type { ServiceActif } from "../types/api";
 import { useServices } from "./useServices";
 
 beforeEach(() => {
@@ -11,8 +13,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function service(over: Record<string, unknown> = {}) {
-  return {
+function service(over: Partial<ServiceActif> = {}): ServiceActif {
+  return serviceActif({
     nom: "api",
     project_id: "ide-core",
     pid: 4242,
@@ -20,7 +22,7 @@ function service(over: Record<string, unknown> = {}) {
     en_cours: true,
     code_de_sortie: null,
     ...over,
-  };
+  });
 }
 
 describe("useServices", () => {

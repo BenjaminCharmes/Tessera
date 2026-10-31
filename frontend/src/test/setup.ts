@@ -3,6 +3,7 @@
 // `toBeInTheDocument` et ses voisins existent à l'exécution mais restent
 // invisibles pour `tsc` (ticket-118).
 import "@testing-library/jest-dom/vitest";
+import { installerLeGarde } from "./contrat/garde";
 
 // jsdom n'implémente pas scrollIntoView. Tout composant qui fait défiler vers
 // un élément (le fil du chat, par exemple) plante sans ce comble — c'est un
@@ -10,3 +11,7 @@ import "@testing-library/jest-dom/vitest";
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = function scrollIntoView() {};
 }
+
+// Un espion posé sur une fonction du périmètre du contrat route ↔ type ↔
+// fixture refuse une valeur hors du schéma du backend (ticket-684).
+installerLeGarde();

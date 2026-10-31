@@ -3,6 +3,12 @@
 Table générée depuis `openapi.json` — la source fait foi, et `/docs` la sert
 en interactif quand le backend tourne.
 
+Le schéma est versionné dans `docs/openapi.json`. `make openapi` (ou
+`cd backend && uv run python -m tessera.openapi_export`) le régénère ; un test
+backend échoue quand il est périmé. Les tests frontend le lisent pour confronter
+les types et les fixtures des routes couvertes (`frontend/src/test/contrat/`,
+périmètre et routes non couvertes dans `perimetre.ts`).
+
 ### Santé
 
 | Méthode | Endpoint | Description |

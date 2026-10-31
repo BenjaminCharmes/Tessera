@@ -7,19 +7,17 @@ import { statutsDuRun } from "../../lib/statutDuRun";
 import { INITIAL, applyEvent } from "../../hooks/streamState";
 import { _viderCacheResource } from "../../hooks/useResource";
 import type { StatutDuRun } from "../../lib/statutDuRun";
+import { statutDuRun } from "../../test/contrat/exemples";
 
 function statut(restants: string[]): StatutDuRun {
-  return {
+  return statutDuRun({
     project_id: "ide-core",
     mode: "queue",
     statut: "en cours",
     ticket_courant: "ticket-001",
-    approuves: [],
     restants,
     debut: "2026-10-24T10:00:00Z",
-    fin: null,
-    arretes: [],
-  };
+  });
 }
 
 function ids(n: number): string[] {

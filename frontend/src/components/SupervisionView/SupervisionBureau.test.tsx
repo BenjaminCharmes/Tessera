@@ -9,6 +9,7 @@ import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import { runStore } from "../../hooks/runStore";
 import { apiQuota } from "../../lib/quota";
 import { statutsDuRun } from "../../lib/statutDuRun";
+import { serviceActif, statutDuRun } from "../../test/contrat/exemples";
 import type { OrchestratorEvent, Project, RunActif } from "../../types/api";
 
 vi.mock("../../lib/api", () => ({
@@ -84,17 +85,16 @@ const tousLesProjets = (nombre: number) => lesProjets(...lesRuns(nombre).map((r)
 beforeEach(() => {
   runStore.reset();
   vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });
-  vi.spyOn(statutsDuRun, "lire").mockResolvedValue({
-    project_id: "projet-1",
-    mode: "queue",
-    statut: "en cours",
-    ticket_courant: "ticket-001",
-    approuves: [],
-    restants: [],
-    debut: "2026-10-24T10:00:00Z",
-    fin: null,
-    arretes: [],
-  });
+  vi.spyOn(statutsDuRun, "lire").mockResolvedValue(
+    statutDuRun({
+      project_id: "projet-1",
+      mode: "queue",
+      statut: "en cours",
+      ticket_courant: "ticket-001",
+      restants: [],
+      debut: "2026-10-24T10:00:00Z",
+    }),
+  );
 });
 
 describe("Supervision — vue par défaut et sélecteur", () => {
@@ -126,14 +126,13 @@ describe("Supervision — vue par défaut et sélecteur", () => {
 
   it("does not draw the services strip in the office, but keeps it in the list", async () => {
     const services = [
-      {
+      serviceActif({
         nom: "backend",
         project_id: "projet-1",
         pid: 1,
         demarre_a: new Date().toISOString(),
         en_cours: true,
-        code_de_sortie: null,
-      },
+      }),
     ];
     render(
       <SupervisionView
