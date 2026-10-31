@@ -6842,3 +6842,4 @@ Le diff ajoute :
 - 2026-10-31 02:56:28 UTC — [ticket-685] validateur: fichiers cités joints : services/orchestrator.py (tronqué) ; non joints (budget épuisé) : backend/tests/test_longueur_des_fichiers.py
 - 2026-10-31 02:56:28 UTC — [ticket-685] validateur: APPROVED — La refactorisation du ticket-685 est complète et conforme. Les deux méthodes `ru (346703ms)
 - 2026-10-31 02:56:28 UTC — [ticket-685] APPROVED après 1 tour(s)
+- 2026-10-31 02:58:20 UTC — [ticket-685] documentation: 0 fichier(s) (107156ms) — après tour de correction
