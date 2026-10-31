@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-687
+pr_number: 809
 priority: medium
 status: done
 title: Run assembly leaves the orchestrator router
