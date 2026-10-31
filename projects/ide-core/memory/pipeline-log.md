@@ -6799,3 +6799,35 @@ Le diff ajoute :
 - 2026-10-31 00:36:24 UTC — [ticket-682] validateur: APPROVED — Le ticket a été implémenté avec succès : un composant `Modale` partagé a été cré (279125ms)
 - 2026-10-31 00:36:24 UTC — [ticket-682] APPROVED après 2 tour(s)
 - 2026-10-31 00:37:49 UTC — [ticket-682] documentation: 0 fichier(s) (79406ms)
+- 2026-10-31 00:44:41 UTC — [ide-core] ticket-682 PR #804 mergée (CI verte)
+- 2026-10-31 00:44:43 UTC — [ide-core] ticket-682 : base réalignée sur develop
+- 2026-10-31 00:44:43 UTC — [ide-core] ticket-682 PR #804 confiée au CIWatcher
+- 2026-10-31 00:44:47 UTC — [ticket-683] branche ticket-683-a-shared-polling-hook-and-clock
+- 2026-10-31 00:44:48 UTC — [ticket-683] tour 1 — codeur démarré
+- 2026-10-31 00:49:30 UTC — [ticket-683] tour 1 — codeur terminé (281375ms)
+- 2026-10-31 00:51:46 UTC — [ticket-683] testeur: OK (exit 0)
+- 2026-10-31 00:54:21 UTC — [ticket-683] securite: PASS — Ce diff est un refactoring React qui consolide le code de polling périodique. Au (155781ms)
+- 2026-10-31 00:54:22 UTC — [ticket-683] tour 1 — reviewer démarré
+- 2026-10-31 00:54:46 UTC — [ticket-683] tour 1 — reviewer terminé (24139ms)
+- 2026-10-31 00:57:21 UTC — [ticket-683] validateur: fichiers cités joints : Chrono.tsx
+- 2026-10-31 00:57:21 UTC — [ticket-683] validateur: CHANGES_REQUESTED — Le ticket a été implémenté avec succès. Un hook `usePolling` centralisé remplace (179468ms)
+- 2026-10-31 00:57:21 UTC — [ticket-683] CHANGES_REQUESTED tour 1: Validateur : Le ticket a été implémenté avec succès. Un hook `usePolling` centralisé remplace les cinq anciens `setInterval`, et le composant `Chrono.tsx` utilise désormais `useMaintenant`. Les tests 
+- 2026-10-31 00:57:21 UTC — [ticket-683] tour 2 — codeur démarré
+- 2026-10-31 00:57:37 UTC — [ticket-683] tour 2 — codeur terminé (16000ms)
+- 2026-10-31 00:59:59 UTC — [ticket-683] testeur: OK (exit 0)
+- 2026-10-31 01:02:06 UTC — [ticket-683] securite: PASS — Ce diff refactorise la logique de polling du frontend React en extrayant un hook (126406ms)
+- 2026-10-31 01:02:06 UTC — [ticket-683] tour 2 — reviewer démarré
+- 2026-10-31 01:02:27 UTC — [ticket-683] tour 2 — reviewer terminé (20671ms)
+- 2026-10-31 01:04:18 UTC — [ticket-683] validateur: fichiers cités joints : Chrono.tsx
+- 2026-10-31 01:04:18 UTC — [ticket-683] validateur: CHANGES_REQUESTED — Le ticket a réussi à implémenter un hook `usePolling` centralisé qui remplace le (132421ms)
+- 2026-10-31 01:04:18 UTC — [ticket-683] CHANGES_REQUESTED tour 2: Validateur : Le ticket a réussi à implémenter un hook `usePolling` centralisé qui remplace les cinq anciens `setInterval`, et `Chrono.tsx` utilise désormais `useMaintenant`. Les tests du nouveau hook 
+- 2026-10-31 01:04:18 UTC — [ticket-683] tour 3 — codeur démarré
+- 2026-10-31 01:05:26 UTC — [ticket-683] tour 3 — codeur terminé (67421ms)
+- 2026-10-31 01:07:46 UTC — [ticket-683] testeur: OK (exit 0)
+- 2026-10-31 01:11:12 UTC — [ticket-683] securite: PASS — Refactorisation frontend pour centraliser la logique de polling (5 hooks). Pas d (206343ms)
+- 2026-10-31 01:11:12 UTC — [ticket-683] tour 3 — reviewer démarré
+- 2026-10-31 01:11:33 UTC — [ticket-683] tour 3 — reviewer terminé (20422ms)
+- 2026-10-31 01:14:42 UTC — [ticket-683] validateur: fichiers cités joints : Chrono.tsx
+- 2026-10-31 01:14:42 UTC — [ticket-683] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le ticket a été implémenté avec  (209453ms)
+- 2026-10-31 01:14:42 UTC — [ticket-683] APPROVED après 3 tour(s)
+- 2026-10-31 01:15:28 UTC — [ticket-683] documentation: 0 fichier(s) (40985ms)
