@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-682
+pr_number: 804
 priority: low
 status: done
 title: A shared modal component
