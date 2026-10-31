@@ -6780,3 +6780,4 @@ Le diff ajoute :
 - 2026-10-31 00:13:38 UTC — [ticket-681] validateur: fichiers cités joints : RunHistory.tsx, HistoriqueView/runs.ts ; absents : design/charts/
 - 2026-10-31 00:13:38 UTC — [ticket-681] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code a été refactoré pour  (266281ms)
 - 2026-10-31 00:13:38 UTC — [ticket-681] APPROVED après 3 tour(s)
+- 2026-10-31 00:15:21 UTC — [ticket-681] documentation: 0 fichier(s) (96500ms)
