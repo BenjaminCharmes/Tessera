@@ -6831,3 +6831,14 @@ Le diff ajoute :
 - 2026-10-31 01:14:42 UTC — [ticket-683] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le ticket a été implémenté avec  (209453ms)
 - 2026-10-31 01:14:42 UTC — [ticket-683] APPROVED après 3 tour(s)
 - 2026-10-31 01:15:28 UTC — [ticket-683] documentation: 0 fichier(s) (40985ms)
+- 2026-10-31 02:35:28 UTC — [ticket-685] branche ticket-685-queue-and-autonomous-run-modes-leave-the-orchestr
+- 2026-10-31 02:35:29 UTC — [ticket-685] tour 1 — codeur démarré
+- 2026-10-31 02:40:30 UTC — [ticket-685] tour 1 — codeur terminé (300827ms)
+- 2026-10-31 02:48:51 UTC — [ticket-685] testeur: OK (exit 0)
+- 2026-10-31 02:50:41 UTC — [ticket-685] securite: PASS — Refactorisation de l'orchestrateur : extraction de `run_queue` et `run_autonomou (109562ms)
+- 2026-10-31 02:50:41 UTC — [ticket-685] tour 1 — reviewer démarré
+- 2026-10-31 02:51:03 UTC — [ticket-685] tour 1 — reviewer terminé (22280ms)
+- 2026-10-31 02:55:41 UTC — [ticket-685] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 02:56:28 UTC — [ticket-685] validateur: fichiers cités joints : services/orchestrator.py (tronqué) ; non joints (budget épuisé) : backend/tests/test_longueur_des_fichiers.py
+- 2026-10-31 02:56:28 UTC — [ticket-685] validateur: APPROVED — La refactorisation du ticket-685 est complète et conforme. Les deux méthodes `ru (346703ms)
+- 2026-10-31 02:56:28 UTC — [ticket-685] APPROVED après 1 tour(s)
