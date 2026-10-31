@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-688
+pr_number: 810
 priority: low
 status: done
 title: Pipeline stages split by stage
