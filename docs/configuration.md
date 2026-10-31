@@ -149,6 +149,7 @@ make test          # Tests Python (pytest)
 make test-fast     # Tests Python rapides
 make test-coverage # Rapport de couverture backend + frontend
 make lint          # Type-check mypy
+make openapi       # Régénère docs/openapi.json si des routes ou modèles de réponse changent
 make check-tickets # Valide les tickets d'un projet (usage: make check-tickets PROJET=<id>)
 make clean         # Supprime les caches
 ```

@@ -20,6 +20,7 @@ from tessera.services import journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_fin_de_file import signaler_fichiers_non_suivis
 from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
 from tessera.services.realignement_base import realigner_base
 
@@ -215,7 +216,7 @@ async def test_no_log_line_when_the_run_left_nothing(
         base_branch="main",
     )
 
-    await orch._signaler_fichiers_non_suivis("ticket-002")
+    await signaler_fichiers_non_suivis(orch, "ticket-002")
 
     assert not log.exists()
 

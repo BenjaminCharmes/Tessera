@@ -1,12 +1,14 @@
 ---
-id: ticket-686
-title: "End-of-queue steps leave the Orchestrator class"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-685]
 created: 2026-10-29
+depends_on:
+- ticket-685
+id: ticket-686
+pr_number: 808
+priority: low
+status: done
+title: End-of-queue steps leave the Orchestrator class
+type: refactor
 ---
 
 # ticket-686 — La fin de file hors de la classe `Orchestrator`

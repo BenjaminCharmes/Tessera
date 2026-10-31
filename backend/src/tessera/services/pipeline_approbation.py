@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_capture import capturer_le_run
+from tessera.services.pipeline_documentation import documenter_le_run
 from tessera.services.pipeline_events import EventCallback, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
 from tessera.utils.logger import get_logger
@@ -94,7 +95,7 @@ async def apres_approbation(
     ticket = await orch._ticket_svc.get_ticket(resultat.ticket_id)
     if ticket is None or not ticket.light:
         avant_doc = await tete_de_branche(orch)
-        await orch._documenter_le_run(resultat, on_event)
+        await documenter_le_run(orch, resultat, on_event)
         # Le commit de documentation est celui du pipeline : l'approbation
         # le suit, sans quoi la livraison le prendrait pour un intrus
         # (ticket-492).
