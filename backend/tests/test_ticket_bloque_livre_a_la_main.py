@@ -11,7 +11,7 @@ import pytest
 import respx
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
@@ -123,7 +123,7 @@ async def _demarrer(
 ) -> tuple[_Orch, PipelineRun]:
     orch = _Orch(GitWorkspaceService(local), local, pr_par_prefixe)
     run = _run()
-    refused = await stages.create_branch(orch, run)  # type: ignore[arg-type]
+    refused = await pipeline_branche.create_branch(orch, run)  # type: ignore[arg-type]
     assert refused is None
     return orch, run
 

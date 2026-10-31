@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_controles
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
@@ -94,7 +94,7 @@ async def test_validation_started_emis_avant_validation_done_avec_validateur() -
     run = _run(events)
     orch = _Orch(_validator=_ValidateurOK())
 
-    await stages.run_validation(orch, run)
+    await pipeline_controles.run_validation(orch, run)
 
     types = [e.type for e in events]
     assert EventType.VALIDATION_STARTED in types, "validation_started absent"
@@ -110,7 +110,7 @@ async def test_validation_started_non_emis_sans_validateur() -> None:
     run = _run(events)
     orch = _Orch()  # _validator = None
 
-    await stages.run_validation(orch, run)
+    await pipeline_controles.run_validation(orch, run)
 
     assert EventType.VALIDATION_STARTED not in [e.type for e in events]
 
@@ -312,7 +312,7 @@ async def test_validation_done_porte_approved_true_pour_verdict_approved() -> No
     run = _run(events)
     orch = _Orch(_validator=_ValidateurOK())
 
-    await stages.run_validation(orch, run)
+    await pipeline_controles.run_validation(orch, run)
 
     validation_done = next(e for e in events if e.type == EventType.VALIDATION_DONE)
     assert validation_done.data["approved"] is True
@@ -323,7 +323,7 @@ async def test_validation_done_porte_approved_false_pour_changes_requested() -> 
     run = _run(events)
     orch = _Orch(_validator=_ValidateurKO())
 
-    await stages.run_validation(orch, run)
+    await pipeline_controles.run_validation(orch, run)
 
     validation_done = next(e for e in events if e.type == EventType.VALIDATION_DONE)
     assert validation_done.data["approved"] is False
@@ -359,7 +359,7 @@ class _ValidateurFichiers:
 async def test_run_validation_logs_the_cited_files_line() -> None:
     orch = _OrchJournal(_validator=_ValidateurFichiers())
 
-    await stages.run_validation(orch, _run())
+    await pipeline_controles.run_validation(orch, _run())
 
     assert any(
         "validateur: fichiers cités joints : a.ts ; absents : c.ts" in ligne
@@ -370,6 +370,6 @@ async def test_run_validation_logs_the_cited_files_line() -> None:
 async def test_run_validation_logs_no_cited_line_without_cited_files() -> None:
     orch = _OrchJournal(_validator=_ValidateurOK())
 
-    await stages.run_validation(orch, _run())
+    await pipeline_controles.run_validation(orch, _run())
 
     assert not any("fichiers cités" in ligne for ligne in orch.lignes)

@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
@@ -121,7 +121,7 @@ async def test_le_run_demarre_sur_la_base_realignee_depuis_une_branche_de_ticket
     local, distant = arbre_reste_sur_un_ticket
     run = _run()
 
-    refused = await stages.create_branch(
+    refused = await pipeline_branche.create_branch(
         _Orch(GitWorkspaceService(local), local), run  # type: ignore[arg-type]
     )
 
@@ -138,7 +138,7 @@ async def test_les_lignes_du_journal_survivent_une_seule_fois_chacune(
 ) -> None:
     local, _distant = arbre_reste_sur_un_ticket
 
-    await stages.create_branch(
+    await pipeline_branche.create_branch(
         _Orch(GitWorkspaceService(local), local), _run()  # type: ignore[arg-type]
     )
 
@@ -156,7 +156,7 @@ async def test_un_autre_fichier_modifie_bloque_toujours_le_depart(
     avant = await _git(local, "rev-parse", "HEAD")
     orch = _Orch(GitWorkspaceService(local), local)
 
-    result = await stages.ensure_clean_tree(orch, _run())  # type: ignore[arg-type]
+    result = await pipeline_branche.ensure_clean_tree(orch, _run())  # type: ignore[arg-type]
 
     assert result is not None
     assert result.final_status is TicketStatus.blocked

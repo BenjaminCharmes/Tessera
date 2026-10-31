@@ -22,9 +22,9 @@ from claude_agent_sdk import (
 )
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
-from tessera.models.agent import AgentResult
+from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_production
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
@@ -153,7 +153,7 @@ async def test_run_coder_ecrit_une_ligne_par_outil_refuse(tmp_path: Path) -> Non
         return None
 
     run = PipelineRun(project_id="proj", ticket=ticket, on_event=_on_event)
-    await stages.run_coder(orch, run, "contexte")
+    await pipeline_production.run_coder(orch, run, "contexte")
 
     lignes = journal.read_text(encoding="utf-8").splitlines()
     assert any(l.endswith("[ticket-515] codeur: outil Edit refusé par le CLI") for l in lignes)
@@ -168,5 +168,5 @@ async def test_run_coder_sans_refus_n_ecrit_aucune_ligne_de_refus(
         runner=AsyncMock(), ticket_service=AsyncMock(), project_context="ctx",
         agent_configs=[], pipeline_log_path=journal,
     )
-    stages.journaliser_refus_cli(orch, "ticket-515", stages.AgentRole.codeur, [])
+    pipeline_production.journaliser_refus_cli(orch, "ticket-515", AgentRole.codeur, [])
     assert not journal.exists()

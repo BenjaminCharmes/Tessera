@@ -1,6 +1,6 @@
 """Pipeline orchestration — the sequence only.
 
-Each stage lives in `pipeline_stages.py`; this module chains them and owns
+Each stage lives in its own `pipeline_*.py` module; this module chains them and owns
 the early exits. Keeping the flow readable in one screen is the point: the
 order of the stages, and the conditions that end a run, are the part that is
 hard to get right.
@@ -32,7 +32,7 @@ from tessera.utils.logger import get_logger
 from tessera.services import pipeline_outcomes as outcomes
 from tessera.services import pipeline_file as file
 from tessera.services import pipeline_fin_de_file as fin_de_file
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline_critere_protege import arret_critere_protege
@@ -443,14 +443,14 @@ class Orchestrator:
         # `ProviderEnregistrant` lisent ces variables de contexte (ticket-211).
         activer_enregistrement(run.run_id, run.ticket_id)
 
-        refused = await stages.ensure_clean_tree(self, run)
+        refused = await pipeline_branche.ensure_clean_tree(self, run)
         if refused is not None:
             return refused
 
-        refused = await stages.create_branch(self, run)
+        refused = await pipeline_branche.create_branch(self, run)
         if refused is not None:
             return refused
-        stages.take_artifact_snapshot(self, run)
+        pipeline_production.take_artifact_snapshot(self, run)
         await relever_etat_initial(self, run)
         await set_status(self, run, TicketStatus.in_progress)
         # Un critère qui exige un fichier que le pipeline refuse aux agents ne
@@ -533,7 +533,7 @@ class Orchestrator:
             # précède `build_context`, pour que des tests rouges arrivent dans
             # le prompt du codeur.
             reprise_verte = round_num == 1 and await verifier_travail_repris(self, run)
-            context = stages.build_context(self, run)
+            context = pipeline_production.build_context(self, run)
 
             # L'arrêt est vérifié **entre** les étapes, jamais au milieu de
             # l'une : couper un agent en plein tour jetterait un travail déjà
@@ -547,7 +547,7 @@ class Orchestrator:
             if not produit:
                 continue
 
-            blocked = await stages.run_security_audit(self, run)
+            blocked = await pipeline_controles.run_security_audit(self, run)
             if blocked is not None:
                 return blocked
 
@@ -558,8 +558,8 @@ class Orchestrator:
             # est commune, mais aucun ne dépend de l'autre (ticket-289).
             (rev_approved, rev_reason, raw_verdict), (val_approved, val_reason) = (
                 await asyncio.gather(
-                    stages.run_review(self, run, context),
-                    stages.run_validation(self, run),
+                    pipeline_controles.run_review(self, run, context),
+                    pipeline_controles.run_validation(self, run),
                 )
             )
 
@@ -595,7 +595,7 @@ class Orchestrator:
                 return await outcomes.finish_stopped(self, run)
             return True
 
-        await stages.run_coder(self, run, context)
+        await pipeline_production.run_coder(self, run, context)
 
         if run.stop_requested:
             return await outcomes.finish_stopped(self, run)
@@ -616,7 +616,7 @@ class Orchestrator:
         # est économisé (ticket-098).
         # Deux expirations de suite terminent le run en blocked sans
         # repasser par le codeur (ticket-349).
-        tests_result = await stages.run_tests(self, run)
+        tests_result = await pipeline_testeur.run_tests(self, run)
         if not isinstance(tests_result, bool):
             return tests_result
         if not tests_result:

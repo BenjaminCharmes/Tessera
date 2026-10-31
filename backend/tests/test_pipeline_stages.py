@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
@@ -89,14 +89,14 @@ def _run(events: list[OrchestratorEvent] | None = None) -> PipelineRun:
 
 
 def test_build_context_sans_retour_rend_le_contexte_projet_tel_quel() -> None:
-    assert stages.build_context(_Orch(), _run()) == "contexte projet"
+    assert pipeline_production.build_context(_Orch(), _run()) == "contexte projet"
 
 
 def test_build_context_accumule_les_retours_du_reviewer() -> None:
     run = _run()
     run.review_feedback = ["manque des tests", "nommage à revoir"]
 
-    context = stages.build_context(_Orch(), run)
+    context = pipeline_production.build_context(_Orch(), run)
 
     assert context.startswith("contexte projet")
     assert "Tour 1: manque des tests" in context
@@ -109,7 +109,7 @@ def test_build_context_accumule_les_retours_du_reviewer() -> None:
 
 
 async def test_ensure_clean_tree_laisse_passer_sans_git() -> None:
-    assert await stages.ensure_clean_tree(_Orch(), _run()) is None
+    assert await pipeline_branche.ensure_clean_tree(_Orch(), _run()) is None
 
 
 async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
@@ -133,7 +133,7 @@ async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
     events: list[OrchestratorEvent] = []
     orch = _Orch(_git_workspace=_DirtyGit(), _ticket_svc=svc)
 
-    result = await stages.ensure_clean_tree(orch, _run(events))
+    result = await pipeline_branche.ensure_clean_tree(orch, _run(events))
 
     assert result is not None
     assert result.final_status == TicketStatus.blocked
@@ -158,7 +158,7 @@ async def test_ensure_clean_tree_porte_la_liste_des_fichiers_dans_l_evenement_er
     events: list[OrchestratorEvent] = []
     orch = _Orch(_git_workspace=_DirtyGit(), _ticket_svc=_TicketSvc())
 
-    result = await stages.ensure_clean_tree(orch, _run(events))
+    result = await pipeline_branche.ensure_clean_tree(orch, _run(events))
 
     assert result is not None
     error_events = [e for e in events if e.type == EventType.ERROR]
@@ -176,7 +176,7 @@ async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> No
         async def is_clean(self) -> bool:
             raise GitCommandError(command=["git", "status"], returncode=128, stderr="boom")
 
-    assert await stages.ensure_clean_tree(_Orch(_git_workspace=_BrokenGit()), _run()) is None
+    assert await pipeline_branche.ensure_clean_tree(_Orch(_git_workspace=_BrokenGit()), _run()) is None
 
 
 async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie(
@@ -208,7 +208,7 @@ async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie
     )
 
     workspace = GitWorkspaceService(root)
-    result = await stages.ensure_clean_tree(_Orch(_git_workspace=workspace), _run())
+    result = await pipeline_branche.ensure_clean_tree(_Orch(_git_workspace=workspace), _run())
 
     assert result is None, "Le journal modifie par _log ne doit pas bloquer le ticket suivant"
 
@@ -236,7 +236,7 @@ async def test_create_branch_degrade_sans_depot_git() -> None:
             )
 
     run = _run()
-    result = await stages.create_branch(_Orch(_git_workspace=_NoRepoGit()), run)
+    result = await pipeline_branche.create_branch(_Orch(_git_workspace=_NoRepoGit()), run)
 
     assert result is None
     assert run.branch is None
@@ -257,7 +257,7 @@ async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
 
     events: list[OrchestratorEvent] = []
     run = _run(events)
-    await stages.create_branch(_Orch(_git_workspace=_Git()), run)
+    await pipeline_branche.create_branch(_Orch(_git_workspace=_Git()), run)
 
     assert run.branch == "ticket-001-slug"
     assert [e.type for e in events] == [EventType.BRANCH_CREATED]
@@ -292,7 +292,7 @@ async def test_create_branch_git_command_error_bloque_le_run() -> None:
     svc = _Tickets()
     events: list[OrchestratorEvent] = []
     run = _run(events)
-    result = await stages.create_branch(
+    result = await pipeline_branche.create_branch(
         _Orch(_git_workspace=_GitAvecErreur(), _ticket_svc=svc), run
     )
 
@@ -357,7 +357,7 @@ async def test_create_branch_commit_bookkeeping_avant_le_checkout(
 
     events: list[OrchestratorEvent] = []
     run = _run(events)
-    result = await stages.create_branch(
+    result = await pipeline_branche.create_branch(
         _Orch(_git_workspace=workspace, _ticket_svc=_Svc()), run
     )
 
@@ -409,7 +409,7 @@ async def test_create_branch_fichier_code_modifie_bloque(tmp_path: Path) -> None
     svc = _Tickets()
     events: list[OrchestratorEvent] = []
     run = _run(events)
-    result = await stages.create_branch(
+    result = await pipeline_branche.create_branch(
         _Orch(_git_workspace=workspace, _ticket_svc=svc), run
     )
 
@@ -460,7 +460,7 @@ def test_build_context_injecte_les_messages_spontanes() -> None:
     run = _run()
     run.dialogue.interject("utilise pathlib, pas os.path")
 
-    contexte = stages.build_context(_Orch(), run)
+    contexte = pipeline_production.build_context(_Orch(), run)
 
     assert "utilise pathlib, pas os.path" in contexte
     assert "contexte projet" in contexte
@@ -472,15 +472,15 @@ def test_un_message_spontane_n_est_injecte_qu_une_fois() -> None:
     run = _run()
     run.dialogue.interject("pense aux tests")
 
-    premier = stages.build_context(_Orch(), run)
-    second = stages.build_context(_Orch(), run)
+    premier = pipeline_production.build_context(_Orch(), run)
+    second = pipeline_production.build_context(_Orch(), run)
 
     assert "pense aux tests" in premier
     assert "pense aux tests" not in second
 
 
 def test_build_context_sans_message_spontane_est_inchange() -> None:
-    assert stages.build_context(_Orch(), _run()) == "contexte projet"
+    assert pipeline_production.build_context(_Orch(), _run()) == "contexte projet"
 
 
 def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
@@ -490,10 +490,10 @@ def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
     from tessera.services.dialogue import DialogueChannel
 
     run = _run()
-    assert stages.asker_for(run) is None
+    assert pipeline_production.asker_for(run) is None
 
     run.dialogue = DialogueChannel(interactive=True)
-    assert stages.asker_for(run) == run.dialogue.ask
+    assert pipeline_production.asker_for(run) == run.dialogue.ask
 
 
 # ------------------------------------------------------------------
@@ -531,7 +531,7 @@ async def test_une_panne_de_l_auditeur_bloque_le_run() -> None:
         _ticket_svc=_Tickets(),
     )
 
-    result = await stages.run_security_audit(orch, run)
+    result = await pipeline_controles.run_security_audit(orch, run)
 
     assert result is not None
     assert result.final_status is TicketStatus.blocked
@@ -557,7 +557,7 @@ async def test_un_repli_de_l_audit_emet_son_evenement() -> None:
     run.reviewed_code = "diff"
     orch = _Orch(_security_auditor=_AuditeurEnRepli(), _project_path=Path("."))
 
-    result = await stages.run_security_audit(orch, run)
+    result = await pipeline_controles.run_security_audit(orch, run)
 
     assert result is None
     types = [e.type for e in events]
@@ -574,7 +574,7 @@ async def test_une_panne_du_validateur_demande_des_changements() -> None:
     run = _run(events)
     orch = _Orch(_validator=_ValidateurEnPanne())
 
-    approved, reason = await stages.run_validation(orch, run)
+    approved, reason = await pipeline_controles.run_validation(orch, run)
 
     assert approved is False
     assert "provider down" in reason
@@ -586,7 +586,7 @@ async def test_run_validation_sans_validateur_approuve_avec_raison_vide() -> Non
     run = _run()
     orch = _Orch()
 
-    approved, reason = await stages.run_validation(orch, run)
+    approved, reason = await pipeline_controles.run_validation(orch, run)
 
     assert approved is True
     assert reason == ""
@@ -704,7 +704,7 @@ def _red_result() -> object:
 
 async def test_run_tests_sans_runner_rend_true() -> None:
     """Without a test runner configured, run_tests returns True."""
-    result = await stages.run_tests(_Orch(), _run())
+    result = await pipeline_testeur.run_tests(_Orch(), _run())
     assert result is True
 
 
@@ -718,7 +718,7 @@ async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> Non
         _project_path=Path("/fake"),
         _test_command="uv run pytest",
     )
-    result = await stages.run_tests(orch, _run())
+    result = await pipeline_testeur.run_tests(orch, _run())
 
     assert result is True, "After expired+green, run_tests must return True (not a bool‑like PipelineResult)"
     assert "délai dépassé, suite relancée" in "\n".join(orch.logs)
@@ -745,7 +745,7 @@ async def test_run_tests_deux_expirements_bloquent_le_run() -> None:
         _test_command="uv run pytest",
         _ticket_svc=svc,
     )
-    result = await stages.run_tests(orch, _run(events))
+    result = await pipeline_testeur.run_tests(orch, _run(events))
 
     assert isinstance(result, PipelineResult)
     assert result.final_status is TicketStatus.blocked
@@ -762,7 +762,7 @@ async def test_run_tests_rouge_non_expire_renvoie_false() -> None:
         _project_path=Path("/fake"),
         _test_command="uv run pytest",
     )
-    result = await stages.run_tests(orch, _run())
+    result = await pipeline_testeur.run_tests(orch, _run())
 
     assert result is False
 
@@ -775,7 +775,7 @@ async def test_run_tests_log_mentionne_relance_sur_timeout() -> None:
         _project_path=Path("/fake"),
         _test_command="uv run pytest",
     )
-    await stages.run_tests(orch, _run())
+    await pipeline_testeur.run_tests(orch, _run())
 
     relance_logs = [l for l in orch.logs if "délai dépassé, suite relancée" in l]
     assert relance_logs, "Expected a log line mentioning 'délai dépassé, suite relancée'"

@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING
 from tessera.models.ticket import TicketStatus
 from tessera.services.pipeline_events import EventType
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
-from tessera.services.pipeline_stages import (
+from tessera.services.pipeline_production import (
     _capture_artifact_diff,
     _capture_diff,
-    run_tests,
 )
+from tessera.services.pipeline_testeur import run_tests
 from tessera.services.pipeline_text import _echec_de_tests
 from tessera.services.refus_precedent import Refus, refus_precedent, retour_apres_refus
 
