@@ -5,6 +5,7 @@ depends_on:
 - ticket-678
 - ticket-679
 id: ticket-689
+pr_number: 811
 priority: low
 status: done
 title: Projects router split by resource
