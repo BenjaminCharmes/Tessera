@@ -1,12 +1,15 @@
 ---
-id: ticket-689
-title: "Projects router split by resource"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-678, ticket-679]
 created: 2026-10-29
+depends_on:
+- ticket-678
+- ticket-679
+id: ticket-689
+pr_number: 811
+priority: low
+status: done
+title: Projects router split by resource
+type: refactor
 ---
 
 # ticket-689 — `routers/projects.py` découpé par ressource
