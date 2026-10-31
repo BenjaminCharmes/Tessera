@@ -6858,3 +6858,17 @@ Le diff ajoute :
 - 2026-10-31 03:34:32 UTC — [ticket-686] validateur: APPROVED — Tous les critères sont satisfaits. Le refactoring extrait complètement les sept  (326140ms)
 - 2026-10-31 03:34:32 UTC — [ticket-686] APPROVED après 1 tour(s)
 - 2026-10-31 03:38:04 UTC — [ticket-686] documentation: 1 fichier(s) (205593ms)
+- 2026-10-31 03:38:24 UTC — [ide-core] ticket-686 PR #808 confiée au CIWatcher
+- 2026-10-31 03:38:29 UTC — [ticket-687] branche ticket-687-run-assembly-leaves-the-orchestrator-router
+- 2026-10-31 03:38:30 UTC — [ticket-687] tour 1 — codeur démarré
+- 2026-10-31 03:45:11 UTC — [ide-core] ticket-686 PR #808 mergée (CI verte)
+- 2026-10-31 03:48:31 UTC — [ticket-687] tour 1 — codeur terminé (601234ms)
+- 2026-10-31 03:56:34 UTC — [ticket-687] testeur: OK (exit 0)
+- 2026-10-31 03:58:52 UTC — [ticket-687] securite: PASS — Clean refactoring moving orchestrator-building logic from routers to dedicated s (138452ms)
+- 2026-10-31 03:58:53 UTC — [ticket-687] tour 1 — reviewer démarré
+- 2026-10-31 03:59:16 UTC — [ticket-687] tour 1 — reviewer terminé (23375ms)
+- 2026-10-31 04:03:53 UTC — [ticket-687] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 04:04:27 UTC — [ticket-687] validateur: fichiers cités joints : routers/chat.py, routers/orchestrator.py (tronqué) ; absents : services/
+- 2026-10-31 04:04:27 UTC — [ticket-687] validateur: APPROVED — Refactoring completed successfully: orchestrator assembly moved from `routers/or (335061ms)
+- 2026-10-31 04:04:27 UTC — [ticket-687] APPROVED après 1 tour(s)
+- 2026-10-31 04:06:57 UTC — [ticket-687] documentation: 0 fichier(s) (144328ms)

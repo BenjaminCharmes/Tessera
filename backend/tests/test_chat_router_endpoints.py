@@ -321,7 +321,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return _FakeOrchestrator()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.chat.build_orchestrator", _build)
 
     resp = _client().post(
         "/api/v1/projects/mon-projet/chat/run",
@@ -343,7 +343,7 @@ def test_un_lancement_concurrent_est_refuse_avec_409(
     async def _build(project_id: str) -> object:
         raise AssertionError("ne doit pas être atteint")
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.chat.build_orchestrator", _build)
     # Depuis ticket-127 le verrou n'a plus de dictionnaire à lui : c'est le
     # registre qui dit ce qui tourne, et c'est donc lui qu'on occupe.
     monkeypatch.setitem(

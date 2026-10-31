@@ -8,8 +8,8 @@ PLAFOND_GENERAL = 300
 # chemin relatif à src/tessera -> taille maximale. Le cliquet ne remonte pas :
 # un découpage baisse l'entrée (ou la retire sous 300 lignes), jamais l'inverse.
 PLAFONDS: dict[str, int] = {
-    "routers/chat.py": 378,
-    "routers/orchestrator.py": 1089,
+    "routers/chat.py": 377,
+    "routers/orchestrator.py": 351,
     "routers/projects.py": 818,
     "routers/tickets.py": 563,
     "services/ci_watcher.py": 607,

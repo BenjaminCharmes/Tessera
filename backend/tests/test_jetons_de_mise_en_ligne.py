@@ -7,7 +7,7 @@ import pytest
 from pydantic import SecretStr
 
 from tessera.config import CHAMPS_JETONS, VARIABLES_JETONS, Settings, settings
-from tessera.routers.orchestrator import _livraison_interrompue
+from tessera.services.livreur_run import livraison_interrompue
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers.agent_sdk import _build_options
@@ -260,7 +260,7 @@ async def test_livraison_arret_names_the_place_not_the_token(
     _configurer(monkeypatch)
     git = _Git(f"+++ b/src/deploy.py\n+TOKEN = '{_JETONS['vercel_token']}'\n")
 
-    livraison = _livraison_interrompue(await _pousser(git))
+    livraison = livraison_interrompue(await _pousser(git))
 
     assert livraison.arret is not None
     assert "src/deploy.py" in livraison.arret

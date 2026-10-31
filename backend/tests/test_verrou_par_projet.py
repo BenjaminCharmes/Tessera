@@ -127,7 +127,7 @@ def _brancher(monkeypatch: pytest.MonkeyPatch) -> None:
     async def _build(project_id: str) -> _OrchestrateurQuiAttend:
         return _OrchestrateurQuiAttend()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
 
 def _attendre(ws: object, type_attendu: str, limite: int = 40) -> dict:
@@ -191,7 +191,7 @@ def test_un_projet_a_worktree_refuse_aussi_un_second_run_en_409(
     async def _build(project_id: str, wt: object = None, chemins: object = ()) -> object:
         return _OrchestrateurQuiAttend()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with client.websocket_connect("/api/v1/orchestrator/observe") as observateur:
         corps = {"project_id": repo.name, "ticket_id": "ticket-7"}

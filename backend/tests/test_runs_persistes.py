@@ -213,7 +213,7 @@ def test_une_panne_inattendue_clot_le_run_en_base(
     async def _build(project_id: str) -> _OrchestrateurQuiCasse:
         return _OrchestrateurQuiCasse()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with TestClient(app) as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
@@ -242,8 +242,8 @@ async def test_l_orchestrateur_construit_par_le_routeur_enregistre_ses_runs(
     workspace: Path,
 ) -> None:
     # C'est par la que passent `/chat/run`, la file et le run autonome.
-    from tessera.routers.orchestrator import _build_orchestrator
+    from tessera.services.assemblage_run import build_orchestrator
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert isinstance(orchestrator._run_recorder, RunRecorder)

@@ -1,12 +1,13 @@
 ---
-id: ticket-687
-title: "Run assembly leaves the orchestrator router"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-687
+pr_number: 809
+priority: medium
+status: done
+title: Run assembly leaves the orchestrator router
+type: refactor
 ---
 
 # ticket-687 — L'assemblage d'un run quitte `routers/orchestrator.py`

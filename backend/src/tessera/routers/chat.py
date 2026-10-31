@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.services.adr import adr_pertinents, lire_contraintes
+from tessera.services.assemblage_run import build_orchestrator
 from tessera.services.chat_service import ChatBudgetExceeded, ChatService
 from tessera.services.chat_suggestion import summarize_conversation
 from tessera.services.event_hub import EVENT_HUB
@@ -354,9 +355,7 @@ async def run_pipeline_from_chat(
             )
             summary = summarize_conversation(history)
 
-            from tessera.routers.orchestrator import _build_orchestrator
-
-            orchestrator = await _build_orchestrator(project_id)
+            orchestrator = await build_orchestrator(project_id)
             if summary:
                 orchestrator._project_context = _with_conversation(
                     orchestrator._project_context, summary
