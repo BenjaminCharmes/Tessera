@@ -174,7 +174,8 @@ async def test_watcher_check_reads_the_sha_noted_by_the_delivery(
 ) -> None:
     """The real chain: pushed SHA noted after phase 1, read back for the watcher."""
     from tessera.config import settings
-    from tessera.routers.orchestrator import _controle_tete_de, _noter_sha_pousse
+    from tessera.services.livreur_run import noter_sha_pousse
+    from tessera.services.surveillance_run import controle_tete_de
 
     db = tmp_path / "ide.db"
     monkeypatch.setattr(settings, "ide_db_path", db)
@@ -182,12 +183,12 @@ async def test_watcher_check_reads_the_sha_noted_by_the_delivery(
     run_id = await create_run(db, "proj", "ticket-001")
     resultat = _resultat(_A).model_copy(update={"run_id": run_id})
     # Le rebase du pipeline a réécrit la tête : `_B` n'est pas `approved_sha`.
-    await _noter_sha_pousse(resultat, Livraison(pushed_sha=_B))
+    await noter_sha_pousse(resultat, Livraison(pushed_sha=_B))
 
     async def lire(pr_number: int) -> str | None:
         return _B
 
-    controle = await _controle_tete_de("proj", "ticket-001", lire)
+    controle = await controle_tete_de("proj", "ticket-001", lire)
 
     assert controle.pushed_sha == _B
     assert await controle.lire_tete(7) == _B

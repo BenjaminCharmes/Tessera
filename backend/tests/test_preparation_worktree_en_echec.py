@@ -11,7 +11,7 @@ import pytest
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
-from tessera.routers.orchestrator import _build_orchestrator
+from tessera.services.assemblage_run import build_orchestrator
 from tessera.services.database import init_db
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
@@ -62,7 +62,7 @@ async def _run_qui_echoue(depot: Path) -> tuple[PipelineResult, RunWorktree]:
     ouvert = await ouvrir_worktree(depot, PROJET, TICKET, "demo", PolitiqueRun.lire(depot))
     assert ouvert is not None
     wt, absents = ouvert
-    orch: Orchestrator = await _build_orchestrator(PROJET, wt, tuple(absents))
+    orch: Orchestrator = await build_orchestrator(PROJET, wt, tuple(absents))
 
     async def preparation_coupee() -> ResultatPreparation:
         arret = f"La préparation du worktree a échoué : `{COMMANDE}` — délai dépassé"
@@ -92,7 +92,7 @@ async def test_the_unapproved_commit_names_the_setup_when_there_is_a_diff(
     ouvert = await ouvrir_worktree(depot, PROJET, TICKET, "demo", PolitiqueRun.lire(depot))
     assert ouvert is not None
     wt, absents = ouvert
-    orch: Orchestrator = await _build_orchestrator(PROJET, wt, tuple(absents))
+    orch: Orchestrator = await build_orchestrator(PROJET, wt, tuple(absents))
 
     async def preparation_qui_ecrit() -> ResultatPreparation:
         (wt.racine / "reste.txt").write_text("sorti de la préparation", encoding="utf-8")

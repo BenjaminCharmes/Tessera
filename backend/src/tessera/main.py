@@ -38,6 +38,7 @@ from tessera.services.event_hub import EVENT_HUB
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
 from tessera.services.reprise_worktrees import reprendre_worktrees_orphelins
 from tessera.services.reprise_surveillance import reprendre_surveillances
+from tessera.services.surveillance_run import surveillance_de_reprise
 from tessera.services.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.prompt_loader import MissingPromptError
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
@@ -60,7 +61,7 @@ async def _reprendre_les_surveillances() -> None:
         await reprendre_surveillances(
             settings.ide_workspace_dir,
             settings.ide_db_path,
-            orchestrator.surveillance_de_reprise,
+            surveillance_de_reprise,
             EVENT_HUB.publish,
         )
     except Exception:  # noqa: BLE001 — la reprise est un filet, pas une condition

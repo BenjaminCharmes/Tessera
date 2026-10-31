@@ -144,7 +144,7 @@ async def test_le_frontmatter_declare_le_plan(
 async def test_le_plan_n_a_que_les_outils_de_lecture(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.routers.orchestrator import _build_orchestrator
+    from tessera.services.assemblage_run import build_orchestrator
 
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
@@ -152,7 +152,7 @@ async def test_le_plan_n_a_que_les_outils_de_lecture(
     projet.mkdir()
     (projet / "CLAUDE.md").write_text("# p\n", encoding="utf-8")
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     provider = orchestrator._runner._provider_pour("plan")
     assert provider._allowed_tools == OUTILS_DE_RELECTURE  # type: ignore[attr-defined]
