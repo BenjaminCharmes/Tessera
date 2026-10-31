@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { PipelineRun } from "../../types/api";
 import type { VentilationDuProjet } from "../ventilation";
+import { ventilation } from "../../test/contrat/exemples";
 import { ligneDesRuns, ligneDuCout, lignesDuBilan } from "./bilanDeLAgent";
 import { weekRunCount } from "./weekEmployee";
 
@@ -19,9 +20,9 @@ function run(debut: string, tours: number | null, approuve: boolean | null, tick
   };
 }
 
-const VENTILATION: VentilationDuProjet = {
+const VENTILATION: VentilationDuProjet = ventilation({
   per_agent: [{ role: "codeur", total_cost_usd: 0.9, total_tokens: 10, call_count: 2 }],
-};
+});
 
 describe("weekRunCount", () => {
   it("counts the runs started in the last 7 days, whatever their outcome", () => {

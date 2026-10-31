@@ -4,6 +4,7 @@ import { INITIAL } from "../../hooks/streamState";
 import { _viderCacheResource } from "../../hooks/useResource";
 import { api } from "../../lib/api";
 import { statutsDuRun } from "../../lib/statutDuRun";
+import { statutDuRun } from "../../test/contrat/exemples";
 import type { RunActif } from "../../types/api";
 import { T0 } from "./etatsDeTest";
 import Piece from "./Piece";
@@ -31,17 +32,16 @@ beforeEach(() => {
     tickets: [],
     unreadable: [],
   });
-  vi.spyOn(statutsDuRun, "lire").mockResolvedValue({
-    project_id: "ide-core",
-    mode: "queue",
-    statut: "en cours",
-    ticket_courant: "ticket-001",
-    approuves: [],
-    restants: ["ticket-002", "ticket-003"],
-    debut: "2026-10-23T10:00:00Z",
-    fin: null,
-    arretes: [],
-  });
+  vi.spyOn(statutsDuRun, "lire").mockResolvedValue(
+    statutDuRun({
+      project_id: "ide-core",
+      mode: "queue",
+      statut: "en cours",
+      ticket_courant: "ticket-001",
+      restants: ["ticket-002", "ticket-003"],
+      debut: "2026-10-23T10:00:00Z",
+    }),
+  );
 });
 
 afterEach(() => {

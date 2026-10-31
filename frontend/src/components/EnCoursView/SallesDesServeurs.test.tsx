@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
 import { api } from "../../lib/api";
+import { serviceActif } from "../../test/contrat/exemples";
 import { lireActivite } from "../../lib/apiActivite";
 import { _viderCacheResource } from "../../hooks/useResource";
 import type { UseAppsEnCoursResult } from "../../hooks/useAppsEnCours";
@@ -23,7 +24,7 @@ function app(over: Partial<AppEnCours>): AppEnCours {
 }
 
 function service(over: Partial<ServiceActif>): ServiceActif {
-  return {
+  return serviceActif({
     nom: "api",
     project_id: "alpha",
     pid: 100,
@@ -31,7 +32,7 @@ function service(over: Partial<ServiceActif>): ServiceActif {
     en_cours: true,
     code_de_sortie: null,
     ...over,
-  };
+  });
 }
 
 function rendre(apps: AppEnCours[] | null, arreterProjet = vi.fn().mockResolvedValue(undefined)) {

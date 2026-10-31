@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { INITIAL } from "../../hooks/streamState";
 import { api } from "../../lib/api";
+import { serviceActif } from "../../test/contrat/exemples";
 import Piece from "./Piece";
 import { DERNIER, T0, etatApresPipeline, etatEnCodage, etatEnSecurite, nomme } from "./etatsDeTest";
 
@@ -313,14 +314,14 @@ describe("Piece health words", () => {
 describe("Piece of the project that runs the IDE", () => {
   it("offers no launch button, its servers already serve this page", async () => {
     vi.spyOn(api.services, "list").mockResolvedValue([
-      {
+      serviceActif({
         nom: "backend",
         project_id: "ide-core",
         pid: null,
         demarre_a: "2026-10-28T10:00:00Z",
         en_cours: false,
         code_de_sortie: null,
-      },
+      }),
     ]);
     vi.spyOn(api.projects, "list").mockResolvedValue([
       {
