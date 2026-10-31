@@ -6886,3 +6886,8 @@ Le diff ajoute :
 - 2026-10-31 04:37:22 UTC — [ticket-688] validateur: APPROVED — Le découpage de `pipeline_stages.py` est complet : 4 nouveaux modules créés, tou (366797ms)
 - 2026-10-31 04:37:22 UTC — [ticket-688] APPROVED après 1 tour(s)
 - 2026-10-31 04:41:20 UTC — [ticket-688] documentation: 0 fichier(s) (232967ms) — après tour de correction
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: rebase sur develop (23422ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: conflit résolu : backend/tests/test_run_worktree.py (0ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: tests relancés après rebase : verts (OK (exit 0)) (493625ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: PR #810 ouverte (5281ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: arrêt — Conflit résolu sur backend/tests/test_run_worktree.py : la PR #810 est ouverte, à relire. Une résolu
