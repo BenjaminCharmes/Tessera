@@ -6781,3 +6781,21 @@ Le diff ajoute :
 - 2026-10-31 00:13:38 UTC — [ticket-681] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code a été refactoré pour  (266281ms)
 - 2026-10-31 00:13:38 UTC — [ticket-681] APPROVED après 3 tour(s)
 - 2026-10-31 00:15:21 UTC — [ticket-681] documentation: 0 fichier(s) (96500ms)
+- 2026-10-31 00:21:08 UTC — [ide-core] ticket-681 PR #803 mergée (CI verte)
+- 2026-10-31 00:21:10 UTC — [ide-core] ticket-681 : base réalignée sur develop
+- 2026-10-31 00:21:10 UTC — [ide-core] ticket-681 PR #803 confiée au CIWatcher
+- 2026-10-31 00:21:14 UTC — [ticket-682] branche ticket-682-a-shared-modal-component
+- 2026-10-31 00:21:15 UTC — [ticket-682] tour 1 — codeur démarré
+- 2026-10-31 00:25:00 UTC — [ticket-682] tour 1 — codeur terminé (225062ms)
+- 2026-10-31 00:27:14 UTC — [ticket-682] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-31 00:27:14 UTC — [ticket-682] tests rouges au tour 1
+- 2026-10-31 00:27:14 UTC — [ticket-682] tour 2 — codeur démarré
+- 2026-10-31 00:27:43 UTC — [ticket-682] tour 2 — codeur terminé (28093ms)
+- 2026-10-31 00:29:58 UTC — [ticket-682] testeur: OK (exit 0)
+- 2026-10-31 00:31:45 UTC — [ticket-682] securite: PASS — Refactoring de sécurité: centralisation des modales React dans un composant `Mod (106921ms)
+- 2026-10-31 00:31:45 UTC — [ticket-682] tour 2 — reviewer démarré
+- 2026-10-31 00:32:03 UTC — [ticket-682] tour 2 — reviewer terminé (17656ms)
+- 2026-10-31 00:36:24 UTC — [ticket-682] validateur: fichiers cités joints : PlanEvolutionModal.tsx
+- 2026-10-31 00:36:24 UTC — [ticket-682] validateur: APPROVED — Le ticket a été implémenté avec succès : un composant `Modale` partagé a été cré (279125ms)
+- 2026-10-31 00:36:24 UTC — [ticket-682] APPROVED après 2 tour(s)
+- 2026-10-31 00:37:49 UTC — [ticket-682] documentation: 0 fichier(s) (79406ms)

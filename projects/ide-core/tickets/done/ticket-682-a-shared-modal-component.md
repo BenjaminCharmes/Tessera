@@ -1,12 +1,13 @@
 ---
-id: ticket-682
-title: "A shared modal component"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-682
+pr_number: 804
+priority: low
+status: done
+title: A shared modal component
+type: refactor
 ---
 
 # ticket-682 — Un composant `Modale`
