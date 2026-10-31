@@ -6843,3 +6843,17 @@ Le diff ajoute :
 - 2026-10-31 02:56:28 UTC — [ticket-685] validateur: APPROVED — La refactorisation du ticket-685 est complète et conforme. Les deux méthodes `ru (346703ms)
 - 2026-10-31 02:56:28 UTC — [ticket-685] APPROVED après 1 tour(s)
 - 2026-10-31 02:58:20 UTC — [ticket-685] documentation: 0 fichier(s) (107156ms) — après tour de correction
+- 2026-10-31 03:12:55 UTC — [ide-core] ticket-685 PR #807 mergée (CI verte)
+- 2026-10-31 03:12:58 UTC — [ide-core] ticket-685 : base réalignée sur develop
+- 2026-10-31 03:12:58 UTC — [ide-core] ticket-685 PR #807 confiée au CIWatcher
+- 2026-10-31 03:13:01 UTC — [ticket-686] branche ticket-686-end-of-queue-steps-leave-the-orchestrator-class
+- 2026-10-31 03:13:03 UTC — [ticket-686] tour 1 — codeur démarré
+- 2026-10-31 03:18:54 UTC — [ticket-686] tour 1 — codeur terminé (351358ms)
+- 2026-10-31 03:27:34 UTC — [ticket-686] testeur: OK (exit 0)
+- 2026-10-31 03:29:06 UTC — [ticket-686] securite: PASS — This is a clean refactoring that extracts orchestrator cleanup logic into focuse (92375ms)
+- 2026-10-31 03:29:06 UTC — [ticket-686] tour 1 — reviewer démarré
+- 2026-10-31 03:29:32 UTC — [ticket-686] tour 1 — reviewer terminé (25796ms)
+- 2026-10-31 03:34:06 UTC — [ticket-686] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 03:34:32 UTC — [ticket-686] validateur: fichiers cités joints : services/orchestrator.py (tronqué)
+- 2026-10-31 03:34:32 UTC — [ticket-686] validateur: APPROVED — Tous les critères sont satisfaits. Le refactoring extrait complètement les sept  (326140ms)
+- 2026-10-31 03:34:32 UTC — [ticket-686] APPROVED après 1 tour(s)
