@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-685
+pr_number: 807
 priority: medium
 status: done
 title: Queue and autonomous run modes leave the Orchestrator class
