@@ -4,6 +4,7 @@ import { groupByStatus, EMPTY_BY_STATUS } from "../lib/ticketBoard";
 import type { ByStatus } from "../lib/ticketBoard";
 import type { OrchestratorEvent, Ticket, TicketStatus, TicketUnreadable } from "../types/api";
 import { useFenetreVisible } from "./useFenetreVisible";
+import { usePolling } from "./usePolling";
 
 export type { ByStatus };
 
@@ -89,12 +90,9 @@ export function useTickets(
   }, [projectId, revision]);
 
   // Polling fallback — suspendu quand la fenêtre est cachée (ticket-356).
-  useEffect(() => {
-    if (!projectId || !fenetreVisible) return;
-    const delay = isPipelineActive ? 30_000 : 60_000;
-    const timer = setInterval(() => setRevision((r) => r + 1), delay);
-    return () => clearInterval(timer);
-  }, [projectId, isPipelineActive, fenetreVisible]);
+  usePolling(() => setRevision((r) => r + 1), {
+    cadenceMs: projectId ? (isPipelineActive ? 30_000 : 60_000) : null,
+  });
 
   // Relance immédiate au retour en premier plan (ticket-356).
   useEffect(() => {

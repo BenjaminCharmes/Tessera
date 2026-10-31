@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMaintenant } from "../../hooks/useMaintenant";
 import { formater } from "./duree";
 
 /**
@@ -8,9 +8,8 @@ import { formater } from "./duree";
  * qui se réaffiche à la seconde. Le mettre dans `RunCard` ferait repeindre la
  * carte entière — et la colonne, quand plusieurs runs tournent.
  *
- * `setState` vit dans le callback de l'intervalle, jamais dans le corps de
- * l'effet : c'est exactement le motif des dix-neuf erreurs
- * `react-hooks/set-state-in-effect` corrigées par ticket-123.
+ * L'horloge est celle de `useMaintenant` (ticket-683) : `setState` vit dans le
+ * callback de l'intervalle, jamais dans le corps d'un effet (ticket-123).
  *
  * `termineA` fige l'affichage à l'heure de clôture du run (ticket-279) :
  * le chrono s'arrête dès que le run est fermé.
@@ -22,13 +21,8 @@ export default function Chrono({
   depuis: string;
   termineA?: string;
 }) {
-  const [maintenant, setMaintenant] = useState(() => Date.now());
-
-  useEffect(() => {
-    if (termineA) return; // Run terminé : l'horloge reste figée.
-    const t = setInterval(() => setMaintenant(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, [termineA]);
+  // Run terminé : l'horloge reste figée.
+  const maintenant = useMaintenant(1000, !termineA);
 
   const reference = termineA ? Date.parse(termineA) : maintenant;
   return <span>{formater(reference - Date.parse(depuis))}</span>;
