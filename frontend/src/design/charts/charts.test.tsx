@@ -4,7 +4,7 @@ import TimeBars from "./TimeBars";
 import TimeLines from "./TimeLines";
 import Donut from "./Donut";
 import ShareBars from "./ShareBars";
-import { foldSlices, formatDay, niceMax, OTHER, SERIES } from "./palette";
+import { foldSlices, niceMax, OTHER, SERIES } from "./palette";
 
 const fmt = (n: number) => `${n}`;
 
@@ -14,12 +14,6 @@ describe("niceMax", () => {
     expect(niceMax(0.37)).toBe(0.5);
     expect(niceMax(3779)).toBe(5000);
     expect(niceMax(200)).toBe(200);
-  });
-});
-
-describe("formatDay", () => {
-  it("keeps the UTC day whatever the local time zone", () => {
-    expect(formatDay("2026-09-01")).toMatch(/^1 /);
   });
 });
 

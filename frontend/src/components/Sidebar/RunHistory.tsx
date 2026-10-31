@@ -3,7 +3,8 @@ import RegionTitle from "../../design/RegionTitle";
 import { IconBlocked, IconCheck, IconDot } from "../../design/icons";
 import { useState } from "react";
 import type { PipelineRun } from "../../types/api";
-import { estInterrompu, runsDeTicket } from "../HistoriqueView/runs";
+import { formatDate } from "../../lib/format";
+import { estInterrompu, formatDuree, runsDeTicket } from "../HistoriqueView/runs";
 
 interface RunHistoryProps {
   runs: PipelineRun[];
@@ -14,26 +15,6 @@ interface RunHistoryProps {
   selectedRunId?: string | null;
   /** Un clic sur un run le montre au centre (ticket-427). */
   onSelectRun?: (runId: string) => void;
-}
-
-function formatDuration(startedAt: string, finishedAt: string | null): string {
-  if (!finishedAt) return "En cours…";
-  const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
-  if (ms < 0) return "—";
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
-}
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 function StatusIcon({
@@ -84,7 +65,7 @@ function RunRow({ run, onSelectTicket, selected, onSelectRun }: RunRowProps) {
             : "—"}
         </span>
         <span className="shrink-0 text-micro text-zinc-500 ml-1">
-          {estInterrompu(run) ? "—" : formatDuration(run.started_at, run.finished_at)}
+          {formatDuree(run)}
         </span>
       </button>
 
@@ -92,12 +73,12 @@ function RunRow({ run, onSelectTicket, selected, onSelectRun }: RunRowProps) {
         <div className="px-3 pb-3 space-y-1 bg-zinc-850">
           <div className="text-micro text-zinc-500">
             <span className="text-zinc-400">Début :</span>{" "}
-            {formatTime(run.started_at)}
+            {formatDate(run.started_at)}
           </div>
           {run.finished_at && (
             <div className="text-micro text-zinc-500">
               <span className="text-zinc-400">Fin :</span>{" "}
-              {formatTime(run.finished_at)}
+              {formatDate(run.finished_at)}
             </div>
           )}
           <div className="text-micro text-zinc-500">

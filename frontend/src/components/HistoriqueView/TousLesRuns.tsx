@@ -1,13 +1,12 @@
 import { useState } from "react";
 import StatusPill from "../../design/ui/StatusPill";
 import LienTicket from "../../design/ui/LienTicket";
+import { formatCout, formatDate } from "../../lib/format";
 import type { PipelineRun, Ticket } from "../../types/api";
 import {
   etatDuRun,
   FILTRES,
   filtrerRuns,
-  formatCout,
-  formatDate,
   libelleDeLEtat,
   libelleDesTours,
   runsDeTicket,

@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
+import { formatDate } from "../../lib/format";
 import type { PipelineRun } from "../../types/api";
 import {
   classeDuVerdict,
   etatDuRun,
-  formatDate,
   libelleDeLEtat,
   triParDate,
 } from "../HistoriqueView/runs";
