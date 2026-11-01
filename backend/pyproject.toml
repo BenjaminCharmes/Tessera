@@ -24,7 +24,7 @@ dev = [
     "httpx>=0.27.0",
     # < 1.19 : à partir de 1.19, mypy dépend de `librt`, dont les extensions
     # compilées sont bloquées par Smart App Control (ticket-385).
-    "mypy>=1.10.0,<1.19",
+    "mypy>=1.10.0,<2.5",
     "respx>=0.23.1",
 ]
 
