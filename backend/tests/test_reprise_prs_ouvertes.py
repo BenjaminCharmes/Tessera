@@ -6,7 +6,8 @@ from pathlib import Path
 import httpx
 import respx
 
-from tessera.services.database import create_run, init_db
+from tessera.services.database import init_db
+from tessera.services.database_runs import create_run
 from tessera.services.github_service import GitHubService, PrOuverte
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.politique_run import PolitiqueRun

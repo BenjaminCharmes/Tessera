@@ -8,7 +8,7 @@ handed this recorder and asks it to open a run when the caller did not.
 """
 from pathlib import Path
 
-from tessera.services.database import create_run, finish_run
+from tessera.services.database_runs import create_run, finish_run
 from tessera.services.pipeline_events import PipelineResult
 from tessera.services.sha_approbation import noter_approbation
 

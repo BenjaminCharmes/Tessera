@@ -8,7 +8,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
-from tessera.services.database import create_run, finish_run, save_event
+from tessera.services.database_events import save_event
+from tessera.services.database_runs import create_run, finish_run
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.run_executor import _suivre
 from tessera.services.run_registry import RUN_REGISTRY

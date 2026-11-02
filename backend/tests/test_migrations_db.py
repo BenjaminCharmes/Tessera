@@ -6,6 +6,7 @@ import pytest
 
 from tessera.services import database
 from tessera.services.database import init_db, version_du_schema
+from tessera.services.database_runs import create_run
 
 
 def _version(db_path: Path) -> int:
@@ -73,7 +74,7 @@ async def test_les_donnees_survivent_a_une_migration(
 ) -> None:
     db = tmp_path / "tessera.db"
     await init_db(db)
-    run_id = await database.create_run(db, "p", "ticket-001")
+    run_id = await create_run(db, "p", "ticket-001")
 
     monkeypatch.setattr(
         database,

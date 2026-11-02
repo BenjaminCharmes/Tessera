@@ -17,13 +17,9 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
-from tessera.services.database import (
-    create_run,
-    get_run_events,
-    init_db,
-    save_event,
-    list_runs,
-)
+from tessera.services.database import init_db
+from tessera.services.database_events import get_run_events, save_event
+from tessera.services.database_runs import create_run, list_runs
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.run_executor import _clore, emetteur

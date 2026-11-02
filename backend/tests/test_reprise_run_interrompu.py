@@ -9,7 +9,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tessera.services.database import create_run, finish_run, init_db
+from tessera.services.database import init_db
+from tessera.services.database_runs import create_run, finish_run
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
 
 from tests.test_reprise_run_orphelin import (

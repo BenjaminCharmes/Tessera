@@ -32,7 +32,8 @@ from tessera.routers import (
     usage,
     salle_tessera,
 )
-from tessera.services.database import init_db, solder_les_runs_orphelins
+from tessera.services.database import init_db
+from tessera.services.database_runs import solder_les_runs_orphelins
 from tessera.services.eveil import relacher as eveil_relacher
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
