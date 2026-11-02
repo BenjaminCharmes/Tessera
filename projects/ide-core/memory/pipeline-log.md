@@ -6989,3 +6989,4 @@ Le diff ajoute :
 - 2026-11-02 11:06:49 UTC — [ticket-696] validateur: fichiers cités joints : App.tsx, hooks/useCockpit.ts
 - 2026-11-02 11:06:49 UTC — [ticket-696] validateur: APPROVED — La refactorisation divise `useCockpit` (532 lignes) en 7 hooks régionaux spécial (339641ms)
 - 2026-11-02 11:06:49 UTC — [ticket-696] APPROVED après 2 tour(s)
+- 2026-11-02 11:09:55 UTC — [ticket-696] documentation: 0 fichier(s) (181015ms) — après tour de correction
