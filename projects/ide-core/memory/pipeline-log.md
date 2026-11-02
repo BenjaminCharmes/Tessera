@@ -6920,3 +6920,24 @@ Le diff ajoute :
 - 2026-10-31 05:15:15 UTC — [ticket-689] validateur: APPROVED — Le routeur `routers/projects.py` (818 lignes) est découpé en 11 modules sous 300 (350015ms)
 - 2026-10-31 05:15:15 UTC — [ticket-689] APPROVED après 1 tour(s)
 - 2026-10-31 05:16:57 UTC — [ticket-689] documentation: 0 fichier(s) (95765ms)
+- 2026-10-31 05:57:59 UTC — [ticket-690] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 05:58:02 UTC — [ticket-690] validateur: fichiers cités joints : services/database.py
+- 2026-10-31 05:58:02 UTC — [ticket-690] validateur: CHANGES_REQUESTED — Validation indisponible : Claude Code returned an error result: You've hit your  (303406ms)
+- 2026-11-01 07:09:49 UTC — [ide-core] ticket-688 PR #810 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-11-01 07:09:49 UTC — [ide-core] ticket-712 PR #796 reprise par le CIWatcher après redémarrage
+- 2026-11-01 07:09:52 UTC — [ticket-712] livraison: arrêt — PR #796 non mergée : GitHub a refusé le merge de la PR #796.
+- 2026-11-02 08:25:14 UTC — [ide-core] ticket-688 PR #810 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-11-02 08:25:14 UTC — [ide-core] ticket-712 PR #796 reprise par le CIWatcher après redémarrage
+- 2026-11-02 08:25:15 UTC — [ticket-712] livraison: arrêt — PR #796 non mergée : PR #796 en conflit avec develop : à rebaser. La PR reste ouverte.
+- 2026-11-02 08:43:29 UTC — [ticket-693] branche ticket-693-api-types-split-by-domain
+- 2026-11-02 08:43:29 UTC — [ticket-693] tour 1 — codeur démarré
+- 2026-11-02 08:47:23 UTC — [ticket-693] tour 1 — codeur terminé (233875ms)
+- 2026-11-02 08:58:15 UTC — [ticket-693] testeur: OK (exit 0)
+- 2026-11-02 08:59:17 UTC — [ticket-693] securite: PASS — Code organization refactoring that splits a 676-line TypeScript types file into  (61733ms)
+- 2026-11-02 08:59:17 UTC — [ticket-693] tour 1 — reviewer démarré
+- 2026-11-02 08:59:40 UTC — [ticket-693] tour 1 — reviewer terminé (22750ms)
+- 2026-11-02 09:04:17 UTC — [ticket-693] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 09:05:03 UTC — [ticket-693] validateur: fichiers cités joints : types/api.ts, frontend/src/longueur-des-fichiers.test.ts
+- 2026-11-02 09:05:03 UTC — [ticket-693] validateur: APPROVED — Tous les critères sont satisfaits. Le split de `types/api.ts` (676 → 9 lignes) e (345594ms)
+- 2026-11-02 09:05:03 UTC — [ticket-693] APPROVED après 1 tour(s)
+- 2026-11-02 09:05:55 UTC — [ticket-693] documentation: 0 fichier(s) (47125ms)

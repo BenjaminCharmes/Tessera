@@ -1,12 +1,13 @@
 ---
-id: ticket-693
-title: "API types split by domain"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-693
+pr_number: 816
+priority: low
+status: done
+title: API types split by domain
+type: refactor
 ---
 
 # ticket-693 — `types/api.ts` découpé par domaine

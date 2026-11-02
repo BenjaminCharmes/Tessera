@@ -14,8 +14,8 @@ export interface StatutDuRun {
   arretes: { ticket_id: string; motif: string | null }[];
 }
 
-// Ce fichier existe à part : `lib/api.ts` et `types/api.ts` sont sous cliquet
-// de longueur (ticket-545) et ne peuvent plus grossir.
+// Ce fichier existe à part : `lib/api.ts` est sous cliquet de longueur
+// (ticket-545) et ne peut plus grossir.
 export const statutsDuRun = {
   /** Read the status of one run. */
   lire(runId: string): Promise<StatutDuRun> {
