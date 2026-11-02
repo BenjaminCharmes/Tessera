@@ -12,19 +12,14 @@ import type {
   PipelineResult,
   QuotaState,
   RunActif,
-  TicketStatus,
 } from "../types/api";
 import { boundEvents } from "./boundEvents";
-import { appliquerAccuse, appliquerAttente, appliquerConflit, appliquerRepli } from "./streamAttente";
-import { dernierOutilDe, passageTermine } from "./streamEntrees";
-import type {
-  DernierOutil,
-  EntreeFil,
-  EntreeSecurite,
-  EntreeValidateur,
-  PassageAgent,
-} from "./streamEntrees";
-import { entreeTesteur } from "./streamTests";
+import { appliquerAgent, appliquerToken } from "./streamAgents";
+import { appliquerDialogue } from "./streamDialogue";
+import type { DernierOutil, EntreeFil } from "./streamEntrees";
+import { appliquerEtape } from "./streamEtapes";
+import { appliquerRun } from "./streamRun";
+import { appliquerVerdict } from "./streamVerdicts";
 import type { AttenteExterieure, RepliDeProvider } from "./streamAttente";
 
 export { MAX_EVENTS } from "./boundEvents";
@@ -237,391 +232,61 @@ export function clearTokensForReplay(s: StreamState): StreamState {
   };
 }
 
-/** Ajoute une étape à la liste des étapes en cours (sans doublon). */
-function addEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
-  if (etapesEnCours.includes(etape)) return etapesEnCours;
-  return [...etapesEnCours, etape];
-}
-
-/** Retire une étape de la liste des étapes en cours. */
-function removeEtapeEnCours(etapesEnCours: string[], etape: string): string[] {
-  return etapesEnCours.filter((e) => e !== etape);
-}
-
 /** Applique l'événement et note quand il est arrivé, jeton d'agent compris (ticket-549). */
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
   return { ...appliquerEvenement(s, ev), dernierEvenementA: ev.timestamp };
 }
 
+/**
+ * Un nouveau ticket commence. Une file est **un** run (ADR-041), donc un seul
+ * état accumulé : sans remise à zéro, les drapeaux dérivés de `events`
+ * restaient vrais depuis le ticket d'avant, et le bloc reviewer du précédent
+ * s'affichait sous le codeur du suivant (ticket-180).
+ *
+ * Ce qui appartient au **run** survit : événements bruts (Pipeline log,
+ * ticket-283), avancement de la file, quota, branche, repli (ticket-597).
+ * Ce qui appartient au **ticket** repart de zéro : `entries`, `currentAgent`,
+ * `currentRound`.
+ */
+function appliquerFile(
+  s: StreamState,
+  ev: OrchestratorEvent,
+  events: OrchestratorEvent[],
+): StreamState {
+  return {
+    ...INITIAL,
+    status: "running",
+    events,
+    ticketEvents: [ev],
+    quota: s.quota,
+    branch: s.branch,
+    maxRounds: s.maxRounds,
+    repli: s.repli,
+    ticketId: ev.ticket_id || s.ticketId,
+    queue: {
+      index: Number(ev.data["index"] ?? 0),
+      total: Number(ev.data["total"] ?? 0),
+    },
+  };
+}
+
+/** Le morceau d'état que la famille de l'événement produit ; vide si aucune ne le connaît. */
+function morceauDe(s: StreamState, ev: OrchestratorEvent): Partial<StreamState> {
+  return (
+    appliquerAgent(s, ev) ??
+    appliquerEtape(s, ev) ??
+    appliquerVerdict(s, ev) ??
+    appliquerRun(s, ev) ??
+    appliquerDialogue(s, ev) ??
+    {}
+  );
+}
+
+/** Aiguillage : le jeton et la file ont leur propre chemin, le reste va à sa famille. */
 function appliquerEvenement(s: StreamState, ev: OrchestratorEvent): StreamState {
-  // agent_token ne va plus dans events ni ticketEvents (ticket-353) :
-  // il ne met à jour que entries[…].tokens et currentTokens, sans alourdir
-  // l'historique ni déclencher de mise à jour de l'état racine par token.
-  if (ev.type === "agent_token") {
-    const token =
-      ev.agent === "codeur"
-        ? (typeof ev.data["token"] === "string" ? ev.data["token"] : "")
-        : "";
-    if (!token) return s;
-    const lastCodeurIdx = s.entries.reduceRight(
-      (found, e, i) =>
-        found === -1 && e.genre === "agent" && e.agent === "codeur" && !e.isDone
-          ? i
-          : found,
-      -1,
-    );
-    const newEntries =
-      lastCodeurIdx >= 0
-        ? s.entries.map((e, i) => {
-            if (i !== lastCodeurIdx || e.genre !== "agent") return e;
-            return { ...e, tokens: e.tokens + token };
-          })
-        : s.entries;
-    return { ...s, currentTokens: s.currentTokens + token, entries: newEntries };
-  }
-
+  if (ev.type === "agent_token") return appliquerToken(s, ev);
   const events = boundEvents([...s.events, ev]);
-  // ticketEvents repart de zéro à chaque queue_progress : StageStrip voit
-  // les étapes du ticket en cours, pas celles du ticket précédent (ticket-313).
-  const ticketEvents =
-    ev.type === "queue_progress" ? [ev] : [...s.ticketEvents, ev];
-  switch (ev.type) {
-    case "agent_started": {
-      const round =
-        typeof ev.data["round"] === "number" ? ev.data["round"] : s.currentRound;
-      const agent = ev.agent;
-      // L'étape se déduit du rôle : codeur = production, reviewer = revue.
-      const etapeAgent =
-        agent === "codeur" ? "production"
-        : agent === "reviewer" ? "revue"
-        : s.etape;
-      // ticket-290 : suivre les étapes en cours pour le parallélisme.
-      const etapeEnCoursToAdd =
-        agent === "codeur" ? "production"
-        : agent === "reviewer" ? "revue"
-        : null;
-      // Un agent qui démarre referme les tests : sans `test_result` (commande
-      // introuvable, délai dépassé), `tests` resterait « en cours » (ticket-587).
-      const newEtapesEnCours = etapeEnCoursToAdd
-        ? addEtapeEnCours(removeEtapeEnCours(s.etapesEnCours, "tests"), etapeEnCoursToAdd)
-        : s.etapesEnCours;
-      const newEntry: PassageAgent | null = agent
-        ? {
-            genre: "agent",
-            id: `${agent}-${s.entries.length}`,
-            agent,
-            round,
-            tokens: "",
-            content: "",
-            isDone: false,
-          }
-        : null;
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        status: "running",
-        currentAgent: agent,
-        currentRound: round,
-        etape: etapeAgent,
-        etapesEnCours: newEtapesEnCours,
-        maxRounds:
-          typeof ev.data["max_rounds"] === "number"
-            ? ev.data["max_rounds"]
-            : s.maxRounds,
-        currentTokens: "",
-        outils: 0,
-        entries: newEntry ? [...s.entries, newEntry] : s.entries,
-      };
-    }
-    case "branch_created":
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        branch:
-          typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch,
-      };
-    case "agent_done": {
-      // Sans cela `currentAgent` restait figé sur le dernier agent démarré :
-      // ses points de chargement continuaient de rebondir alors qu'il avait
-      // rendu son verdict (ticket-073).
-      const doneAgent = ev.agent;
-      // Marquer le dernier passage non terminé de cet agent comme terminé.
-      // Seules les entrées de genre "agent" ont un champ `agent`.
-      const lastUnfinishedIdx = s.entries.reduceRight(
-        (found, e, i) =>
-          found === -1 && e.genre === "agent" && e.agent === doneAgent && !e.isDone ? i : found,
-        -1,
-      );
-      const updatedEntries =
-        lastUnfinishedIdx >= 0
-          ? s.entries.map((e, i) => {
-              if (i !== lastUnfinishedIdx || e.genre !== "agent") return e;
-              return passageTermine(e, ev.data);
-            })
-          : s.entries;
-      // ticket-290 : retirer l'étape de la liste des étapes en cours.
-      const etapeAgentDone =
-        doneAgent === "codeur" ? "production"
-        : doneAgent === "reviewer" ? "revue"
-        : null;
-      const etapesEnCoursApresDone = etapeAgentDone
-        ? removeEtapeEnCours(s.etapesEnCours, etapeAgentDone)
-        : s.etapesEnCours;
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        currentAgent: s.currentAgent === doneAgent ? null : s.currentAgent,
-        etapesEnCours: etapesEnCoursApresDone,
-        // L'agent qui avait posé la question a terminé : plus rien n'attend
-        // de réponse, et l'accusé de réception n'a plus lieu d'être (ticket-358).
-        pendingQuestion: null,
-        questionExpireA: null,
-        answerAck: null,
-        coutUsd:
-          s.coutUsd +
-          (typeof ev.data["cost_usd"] === "number" ? ev.data["cost_usd"] : 0),
-        appels: s.appels + 1,
-        entries: updatedEntries,
-      };
-    }
-    case "agent_tool_use": {
-      // L'utilisation d'un outil est visible dans le Pipeline log.
-      // agent_token est traité en amont de la fonction, avant le switch.
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        outils: s.outils + 1,
-        dernierOutil: dernierOutilDe(ev) ?? s.dernierOutil,
-      };
-    }
-    case "test_result": {
-      const entree = entreeTesteur(ev, s.currentRound, s.entries.length);
-      const etapesEnCours = removeEtapeEnCours(s.etapesEnCours, "tests");
-      return { ...s, events, ticketEvents, entries: [...s.entries, entree], etapesEnCours };
-    }
-    case "test_started": // le testeur ne dit rien tant que la suite tourne (ticket-587)
-      return { ...s, events, ticketEvents, etapesEnCours: addEtapeEnCours(s.etapesEnCours, "tests") };
-    case "security_audit_done": {
-      // L'audit ajoute une entrée dans le fil, visible à côté des agents (ticket-257).
-      const auditEntry: EntreeSecurite = {
-        genre: "securite",
-        id: `securite-${s.entries.length}`,
-        round: s.currentRound,
-        verdict: typeof ev.data["verdict"] === "string" ? ev.data["verdict"] : "",
-        summary: typeof ev.data["summary"] === "string" ? ev.data["summary"] : "",
-        issues_count: typeof ev.data["issues_count"] === "number" ? ev.data["issues_count"] : 0,
-        reason: typeof ev.data["reason"] === "string" ? ev.data["reason"] : "",
-        isDone: true,
-      };
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        entries: [...s.entries, auditEntry],
-        etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "securite"),
-      };
-    }
-    case "validation_done": {
-      // La validation ajoute une entrée dans le fil, critère par critère (ticket-257).
-      const rawCriteria = Array.isArray(ev.data["criteria"]) ? ev.data["criteria"] : [];
-      const criteria = rawCriteria.map((c: unknown) => {
-        const cr = c as Record<string, unknown>;
-        return {
-          criterion: typeof cr["criterion"] === "string" ? cr["criterion"] : "",
-          passed: cr["passed"] === true,
-          note: typeof cr["note"] === "string" ? cr["note"] : "",
-        };
-      });
-      const validEntry: EntreeValidateur = {
-        genre: "validateur",
-        id: `validateur-${s.entries.length}`,
-        round: s.currentRound,
-        verdict: typeof ev.data["verdict"] === "string" ? ev.data["verdict"] : "",
-        feedback: typeof ev.data["feedback"] === "string" ? ev.data["feedback"] : "",
-        criteria,
-        isDone: true,
-      };
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        entries: [...s.entries, validEntry],
-        etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "validation"),
-      };
-    }
-    case "security_audit_started":
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        etape: "securite",
-        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "securite"),
-      };
-    case "validation_started":
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        etape: "validation",
-        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "validation"),
-      };
-    case "documentation_started":
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        etape: "documentation",
-        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "documentation"),
-      };
-    case "livraison_started":
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        etape: "livraison",
-        etapesEnCours: addEtapeEnCours(s.etapesEnCours, "livraison"),
-      };
-    case "pipeline_done": {
-      const branch =
-        typeof ev.data["branch"] === "string" ? ev.data["branch"] : s.branch;
-      // Le ticket_id est au premier niveau de l'événement (ev.ticket_id) ;
-      // ev.data["ticket_id"] est un doublon de confort, pas toujours présent.
-      const result: PipelineResult = {
-        ticket_id:
-          ev.ticket_id ||
-          (typeof ev.data["ticket_id"] === "string"
-            ? ev.data["ticket_id"]
-            : "") ||
-          s.ticketId ||
-          "",
-        final_status: (ev.data["final_status"] as TicketStatus) ?? "done",
-        rounds: typeof ev.data["rounds"] === "number" ? ev.data["rounds"] : 0,
-        approved: ev.data["approved"] === true,
-        branch,
-      };
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        status: "done",
-        lastResult: result,
-        etape: null,
-        etapesEnCours: [],
-        pendingQuestion: null,
-        questionExpireA: null,
-        branch,
-      };
-    }
-    case "ticket_status_changed":
-      // Quand le backend change le ticket courant (file), il inclut le titre
-      // dans les données de l'événement pour les observateurs connectés (ticket-286).
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        ticketTitre:
-          typeof ev.data["ticket_titre"] === "string"
-            ? ev.data["ticket_titre"]
-            : s.ticketTitre,
-      };
-    case "livraison_done": {
-      const prNumber =
-        typeof ev.data["pr_number"] === "number" ? ev.data["pr_number"] : null;
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "livraison"),
-        livraisonPrNumber: prNumber ?? s.livraisonPrNumber,
-      };
-    }
-    case "ci_merge_done": {
-      const merged = ev.data["merged"] === true;
-      const arret =
-        typeof ev.data["arret"] === "string" ? ev.data["arret"] : null;
-      return { ...s, events, ticketEvents, ciMerge: { merged, arret } };
-    }
-    case "doc_updated":
-    case "documentation_failed":
-      return { ...s, events, ticketEvents, etapesEnCours: removeEtapeEnCours(s.etapesEnCours, "documentation") };
-    case "run_closed":
-      // Le run est définitivement terminé : livraison et documentation sont finies.
-      // Le bouton « Fermer » n'apparaît qu'ici (ticket-267). L'étape active se
-      // remet à null : livraison ou doc ne clignotent plus après la clôture (ticket-279).
-      return { ...s, events, ticketEvents, runClosed: true, etape: null, etapesEnCours: [] };
-    case "error":
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        status: "error",
-        errorMessage:
-          typeof ev.data["message"] === "string"
-            ? ev.data["message"]
-            : "Pipeline error",
-      };
-    case "agent_question":
-      return {
-        ...s,
-        events,
-        ticketEvents,
-        pendingQuestion:
-          typeof ev.data["question"] === "string" ? ev.data["question"] : null,
-        questionExpireA:
-          typeof ev.data["expire_a"] === "string" ? ev.data["expire_a"] : null,
-        // Une nouvelle question efface l'accusé de la réponse précédente.
-        answerAck: null,
-      };
-    case "answer_ack":
-      // Accusé de réception de la réponse (ticket-320, ticket-358) : voir `appliquerAccuse`.
-      return { ...s, events, ticketEvents, ...appliquerAccuse(s, ev) };
-    case "queue_progress":
-      // Un nouveau ticket commence. Une file est **un** run (ADR-041), donc un
-      // seul état accumulé : sans remise à zéro, les drapeaux dérivés de
-      // `events` restaient vrais depuis le ticket d'avant, et le bloc reviewer
-      // du précédent s'affichait sous le codeur du suivant — verdict
-      // `APPROVED` compris, sur un ticket que personne n'avait encore relu
-      // (ticket-180).
-      //
-      // Ce qui appartient au **run** survit : les événements bruts (Pipeline
-      // log), l'avancement de la file, le quota, la branche.
-      // Ce qui appartient au **ticket** repart de zéro : `entries`, `currentAgent`,
-      // `currentRound` — l'affichage du tableau d'agents.
-      // Les événements bruts sont gardés pour que le Pipeline log montre
-      // l'historique complet d'une file (ticket-283).
-      return {
-        ...INITIAL,
-        status: "running",
-        events,
-        // ticketEvents = [ev] pour ce cas (ternaire en tête de applyEvent).
-        ticketEvents,
-        quota: s.quota,
-        branch: s.branch,
-        maxRounds: s.maxRounds,
-        // Un repli concerne le run, pas le ticket : il survit à la file (ticket-597).
-        repli: s.repli,
-        ticketId: ev.ticket_id || s.ticketId,
-        queue: {
-          index: Number(ev.data["index"] ?? 0),
-          total: Number(ev.data["total"] ?? 0),
-        },
-      };
-    case "external_wait":
-      return { ...s, events, ticketEvents, ...appliquerAttente(ev) };
-    case "conflict_resolution":
-      return { ...s, events, ticketEvents, ...appliquerConflit(ev) };
-    case "provider_fallback":
-      return { ...s, events, ticketEvents, ...appliquerRepli(ev) };
-    case "quota_updated":
-      // Le quota d'abonnement est la ressource réellement finie : l'afficher
-      // évite d'être coupé sans comprendre pourquoi (ticket-054).
-      return { ...s, events, ticketEvents, quota: ev.data as unknown as QuotaState };
-
-    default:
-      return { ...s, events, ticketEvents };
-  }
+  if (ev.type === "queue_progress") return appliquerFile(s, ev, events);
+  // `ticketEvents` repart de zéro à chaque queue_progress (ticket-313).
+  return { ...s, events, ticketEvents: [...s.ticketEvents, ev], ...morceauDe(s, ev) };
 }

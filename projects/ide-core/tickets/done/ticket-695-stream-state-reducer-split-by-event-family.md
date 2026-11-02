@@ -1,12 +1,13 @@
 ---
-id: ticket-695
-title: "Stream state reducer split by event family"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-695
+pr_number: 819
+priority: low
+status: done
+title: Stream state reducer split by event family
+type: refactor
 ---
 
 # ticket-695 — Le réducteur de `streamState.ts` par famille d'événements
