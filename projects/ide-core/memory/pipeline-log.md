@@ -6963,3 +6963,4 @@ Le diff ajoute :
 - 2026-11-02 10:01:34 UTC — [ticket-695] validateur: fichiers cités joints : hooks/streamState.ts
 - 2026-11-02 10:01:34 UTC — [ticket-695] validateur: APPROVED — La refactorisation a bien scindé `appliquerEvenement` en 5 modules spécialisés ( (35844ms)
 - 2026-11-02 10:01:34 UTC — [ticket-695] APPROVED après 2 tour(s)
+- 2026-11-02 10:05:01 UTC — [ticket-695] documentation: 0 fichier(s) (198813ms) — après tour de correction
