@@ -7017,3 +7017,5 @@ Le diff ajoute :
 - 2026-11-02 11:43:20 UTC — [ticket-698] validateur: fichiers cités joints : FilDuRun/index.tsx, Sidebar/TicketCard.tsx, Sidebar/TicketList.tsx (tronqué)
 - 2026-11-02 11:43:20 UTC — [ticket-698] validateur: APPROVED — Le refactoring a réussi : les quatre vues du fil du run et la barre d'outils de  (354703ms)
 - 2026-11-02 11:43:20 UTC — [ticket-698] APPROVED après 1 tour(s)
+- 2026-11-02 11:43:24 UTC — [ticket-698] fichiers non suivis laissés par le run : tickets/todo/ticket-731-the-security-audit-knows-what-the-ticket-leaves-to-the-next.md (à ignorer dans .gitignore ?)
+- 2026-11-02 11:45:58 UTC — [ticket-698] documentation: 0 fichier(s) (154031ms)
