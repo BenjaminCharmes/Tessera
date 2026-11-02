@@ -12,10 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Le service de documentation n'écrit dans `agents.json` que la clé
-  `description`.** Aucun agent n'écrit ce fichier : doc-technique propose le
-  texte, le service le contrôle (preuve, 220 caractères, une ligne) et le
-  remplace sans toucher au reste du fichier. (ADR-068, ADR-027, ADR-057)
 - **Une PR devenue conflictuelle ne se met à jour que par un merge de la base
   dans sa tête poussée, sans push forcé.** Sa tête doit encore être `pushed_sha` ;
   seuls des conflits de journaux résolus en union sont admis, sans agent.
@@ -38,6 +34,10 @@ section. (ADR-055)
   dépôt ancêtre pour les projets qui déclarent `git_root: ancestor`.
   Lire hors du projet reste permis, sauf le `.env` de Tessera. (ADR-031,
   ADR-053)
+- **Le service de documentation n'écrit dans `agents.json` que la clé
+  `description`.** Aucun agent n'écrit ce fichier : doc-technique propose le
+  texte, le service le contrôle (preuve, 220 caractères, une ligne) et le
+  remplace sans toucher au reste du fichier. (ADR-068, ADR-027, ADR-057)
 - **Ne jamais émettre une commande git ou `gh` en écriture.** Le hook
   `PreToolUse` n'admet que des lectures nommées : une sous-commande absente
   de la liste blanche est refusée, options globales lues avant elle ; `-c`
