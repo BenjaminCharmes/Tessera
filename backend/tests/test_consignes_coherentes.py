@@ -393,7 +393,7 @@ def _clefs_mortes(manifeste: dict[str, object]) -> list[str]:
     # ne s'en servait. Le générateur et les déclarations de modèles sont donc
     # retirés des sources avant la recherche.
     exclus = [
-        _RACINE / "backend" / "src" / "tessera" / "services" / "project_loader.py",
+        _RACINE / "backend" / "src" / "tessera" / "services" / "gabarits_projet.py",
         _RACINE / "backend" / "src" / "tessera" / "models" / "agent.py",
     ]
     ailleurs = sources
