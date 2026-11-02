@@ -12,7 +12,7 @@ import Extincteur from "../../design/bureau/Extincteur";
 import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
 import type { RunActif, ServiceActif } from "../../types/api";
 import { useEtatRun } from "../../hooks/runStore";
-import PosteDeFile, { BadgeDeFile, type RunDeSalle } from "./PosteDeFile";
+import BadgeDeFile, { type RunDeSalle } from "./BadgeDeFile";
 import AgentsDeProduit, { type AgentDuService } from "./AgentsDeProduit";
 import ArretDuProjet from "./ArretDuProjet";
 import BaieAvecFiche from "./BaieAvecFiche";
@@ -43,7 +43,7 @@ const AUCUN: ServiceActif[] = [];
  */
 function runDeLaSalle(run: RunActif | undefined, etat: ReturnType<typeof useEtatRun>): RunDeSalle | null {
   if (run === undefined || etat.runClosed) return null;
-  return { ticketId: etat.ticketId ?? run.ticket_id, agent: etat.currentAgent, queue: etat.queue };
+  return { ticketId: etat.ticketId ?? run.ticket_id, queue: etat.queue };
 }
 
 /** La VMC tourne si un service tourne, plus vite avec la mémoire du projet (ADR-058). */
@@ -150,7 +150,6 @@ export default function SalleDeProjet({ groupe, lueA, agents, run, enArret, onAr
               <BaieAvecFiche key={baie.nom} baie={baie} app={groupe.apps.find((a) => a.nom === baie.nom)} />
             ))}
           </span>
-          {fileEnCours && <PosteDeFile projectId={groupe.project_id} run={fileEnCours} />}
           <AgentsDeProduit
             projectId={groupe.project_id}
             agents={agents}
