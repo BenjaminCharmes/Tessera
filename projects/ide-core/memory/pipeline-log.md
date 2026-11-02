@@ -6891,3 +6891,16 @@ Le diff ajoute :
 - 2026-10-31 04:50:16 UTC — [ticket-688] livraison: tests relancés après rebase : verts (OK (exit 0)) (493625ms)
 - 2026-10-31 04:50:16 UTC — [ticket-688] livraison: PR #810 ouverte (5281ms)
 - 2026-10-31 04:50:16 UTC — [ticket-688] livraison: arrêt — Conflit résolu sur backend/tests/test_run_worktree.py : la PR #810 est ouverte, à relire. Une résolu
+- 2026-10-31 04:50:18 UTC — [ide-core] ticket-688 PR #810 non surveillée (livraison arrêtée)
+- 2026-10-31 04:50:22 UTC — [ticket-689] branche ticket-689-projects-router-split-by-resource
+- 2026-10-31 04:50:23 UTC — [ticket-689] tour 1 — codeur démarré
+- 2026-10-31 04:56:27 UTC — [ticket-689] tour 1 — codeur terminé (364297ms)
+- 2026-10-31 05:05:29 UTC — [ticket-689] testeur: OK (exit 0)
+- 2026-10-31 05:09:25 UTC — [ticket-689] securite: PASS — Refactorisation pure du routeur /projects en modules logiques. Aucune vulnérabil (235297ms)
+- 2026-10-31 05:09:25 UTC — [ticket-689] tour 1 — reviewer démarré
+- 2026-10-31 05:09:45 UTC — [ticket-689] tour 1 — reviewer terminé (20483ms)
+- 2026-10-31 05:14:25 UTC — [ticket-689] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 05:15:15 UTC — [ticket-689] validateur: fichiers cités joints : routers/projects.py
+- 2026-10-31 05:15:15 UTC — [ticket-689] validateur: APPROVED — Le routeur `routers/projects.py` (818 lignes) est découpé en 11 modules sous 300 (350015ms)
+- 2026-10-31 05:15:15 UTC — [ticket-689] APPROVED après 1 tour(s)
+- 2026-10-31 05:16:57 UTC — [ticket-689] documentation: 0 fichier(s) (95765ms)
