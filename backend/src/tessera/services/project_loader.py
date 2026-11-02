@@ -11,6 +11,7 @@ from tessera.services.extraction_claude_md import (
     parse_name,
     parse_stack,
 )
+from tessera.services.forge import parse_remote
 from tessera.services.gabarits_projet import default_agents_json, default_claude_md
 from tessera.services.manifeste import lire_chaine, lire_liste, lire_valeur
 
@@ -155,8 +156,6 @@ def _load_github_remote(project_path: Path) -> tuple[str | None, str | None]:
     The raw value is never rewritten (ADR-036 pattern).
     Returns (None, None) when the field is absent, blank, or the file is unreadable.
     """
-    from tessera.services.github_workflow import parse_remote
-
     value = lire_valeur(project_path, "github_remote")
     return parse_remote(str(value) if value else None)
 
