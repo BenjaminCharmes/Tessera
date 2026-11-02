@@ -1,12 +1,14 @@
 ---
-id: ticket-691
-title: "Project loader split into reading, writing and text extraction"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-675]
 created: 2026-10-29
+depends_on:
+- ticket-675
+id: ticket-691
+pr_number: 829
+priority: low
+status: done
+title: Project loader split into reading, writing and text extraction
+type: refactor
 ---
 
 # ticket-691 — `project_loader.py` : écriture, extraction et gabarits à part

@@ -1692,6 +1692,11 @@ Avant de pousser une branche, `GitHubWorkflowService.open_pull_request()` vérif
 
 Cette détection est la deuxième porte de l'ADR-050, après le hook `pre-push` et avant la CI GitHub.
 
+
+## Détection des consignes modifiées (ticket-734)
+
+Lorsqu'un diff ne touche que des fichiers de consignes — dans `projects/*/memory/` (contraintes et décisions), `agents/prompts/` (system prompts), `.claude/skills/` (skills), ou tout `CLAUDE.md` — le script `verifier.py` lance automatiquement `test_consignes_coherentes.py` même sans modification de code (ticket-734). Cela empêche les changements de configuration ou de règles de dépasser sans vérification.
+
 ## Gestion des signalements en attente (ticket-421)
 
 Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu'un run ide-core est actif, il n'est pas écrit immédiatement dans l'arbre. Cela évite qu'il soit emporté dans le commit du run en cours — ce qui poluerait le diff réel avec une métadonnée Tessera.

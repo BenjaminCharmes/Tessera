@@ -7066,3 +7066,17 @@ Le diff ajoute :
 - 2026-11-02 13:46:41 UTC — [ticket-690] validateur: APPROVED — Le découpage de `services/database.py` en cinq modules thématiques est complet e (109765ms)
 - 2026-11-02 13:46:41 UTC — [ticket-690] APPROVED après 1 tour(s)
 - 2026-11-02 13:47:41 UTC — [ticket-690] documentation: 0 fichier(s) (51358ms)
+- 2026-11-02 13:57:36 UTC — [ide-core] ticket-690 PR #827 confiée au CIWatcher
+- 2026-11-02 13:57:43 UTC — [ticket-691] branche ticket-691-project-loader-split-into-reading-writing-and-tex
+- 2026-11-02 13:57:46 UTC — [ticket-691] tour 1 — codeur démarré
+- 2026-11-02 14:01:22 UTC — [ticket-691] tour 1 — codeur terminé (216014ms)
+- 2026-11-02 14:04:14 UTC — [ide-core] ticket-690 PR #827 mergée (CI verte)
+- 2026-11-02 14:10:12 UTC — [ticket-691] testeur: OK (exit 0)
+- 2026-11-02 14:12:31 UTC — [ticket-691] securite: PASS — Refactorisation de `project_loader.py` en trois modules spécialisés (extraction_ (139905ms)
+- 2026-11-02 14:12:32 UTC — [ticket-691] tour 1 — reviewer démarré
+- 2026-11-02 14:12:57 UTC — [ticket-691] tour 1 — reviewer terminé (25030ms)
+- 2026-11-02 14:17:32 UTC — [ticket-691] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 14:18:14 UTC — [ticket-691] validateur: fichiers cités joints : services/project_loader.py, CLAUDE.md
+- 2026-11-02 14:18:14 UTC — [ticket-691] validateur: APPROVED — Le refactoring de `project_loader.py` est complet et correctement découplé : ext (342375ms)
+- 2026-11-02 14:18:14 UTC — [ticket-691] APPROVED après 1 tour(s)
+- 2026-11-02 14:24:40 UTC — [ticket-691] documentation: 1 fichier(s) (313890ms) — après tour de correction
