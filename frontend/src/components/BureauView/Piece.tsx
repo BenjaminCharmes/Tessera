@@ -175,6 +175,7 @@ export default function Piece({
     <section
       aria-label={projet}
       data-contour={contour}
+      data-moment={moment}
       className={`overflow-hidden rounded-lg border bg-zinc-900 ${CONTOURS[contour]}`}
     >
       <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">

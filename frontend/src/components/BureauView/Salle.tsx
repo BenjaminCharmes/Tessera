@@ -63,6 +63,7 @@ export default function Salle({
     <aside
       aria-label={titre}
       data-occupee={occupee}
+      data-moment={moment}
       data-contour={ambre ? "amber" : "neutre"}
       className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-(--sprite-mur) ${contour}`}
     >

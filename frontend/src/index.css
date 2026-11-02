@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './design/bureau/sprites-theme.css';
 
 @theme {
   --text-micro: 0.625rem;

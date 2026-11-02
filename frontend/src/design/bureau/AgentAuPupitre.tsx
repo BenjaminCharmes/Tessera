@@ -12,7 +12,7 @@ interface AgentAuPupitreProps {
  * Un agent de produit devant sa console, grille 20 × 18 (ticket-673). Le physique
  * vient de son `id`, jamais de l'état. Au travail, les bras vont au pupitre et
  * tapent (`anim-tape`, coupée sous `prefers-reduced-motion`) ; au repos, ils
- * pendent, l'agent est estompé et rien ne bouge. `overflow-visible` : les cheveux
+ * pendent, rien ne bouge, et l'écran montre trois points de veille (ticket-727). `overflow-visible` : les cheveux
  * montent au-dessus de la grille.
  */
 export default function AgentAuPupitre({ physique, etat }: AgentAuPupitreProps) {
@@ -28,7 +28,7 @@ export default function AgentAuPupitre({ physique, etat }: AgentAuPupitreProps) 
       data-etat={etat}
       className="overflow-visible"
     >
-      <g className={actif ? undefined : "opacity-60"}>
+      <g>
         <Tete physique={physique} x={4} y={3} />
         <rect x="3" y="7" width="8" height="5" className="fill-(--sprite-haut-produit)" />
         {actif ? (
@@ -43,7 +43,8 @@ export default function AgentAuPupitre({ physique, etat }: AgentAuPupitreProps) 
           </g>
         )}
       </g>
-      <Console allume={actif} />
+      {/* Au repos, il reste là, net : c'est l'écran qui dit qu'il attend (ticket-727). */}
+      <Console allume={actif} attente={!actif} />
     </svg>
   );
 }

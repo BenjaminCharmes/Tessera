@@ -15,6 +15,8 @@ const LIGNES: readonly [number, number][] = [
 interface ConsoleProps {
   /** L'agent travaille : l'écran s'allume et ses lignes défilent. Sinon il reste éteint (ADR-058). */
   allume: boolean;
+  /** Éteint mais quelqu'un attend devant : trois points de veille, immobiles (ticket-727). */
+  attente?: boolean;
 }
 
 /**
@@ -24,7 +26,7 @@ interface ConsoleProps {
  * celui que le produit déclare pour l'agent ; le défilement (`anim-defile`) se
  * coupe sous `prefers-reduced-motion`.
  */
-export default function Console({ allume }: ConsoleProps) {
+export default function Console({ allume, attente = false }: ConsoleProps) {
   const clip = useId();
   return (
     <g data-sprite="console" data-allume={allume}>
@@ -49,6 +51,13 @@ export default function Console({ allume }: ConsoleProps) {
             </g>
           </g>
         </>
+      )}
+      {!allume && attente && (
+        <g data-ecran="attente">
+          {[14.6, 15.7, 16.8].map((x) => (
+            <rect key={x} x={x} y="5.7" width="0.6" height="0.6" className="fill-(--sprite-console-texte)" />
+          ))}
+        </g>
       )}
       <rect x="15" y="9" width="2" height="3" className="fill-(--sprite-metal-ombre)" />
       <rect x="14" y="11" width="4" height="1" className="fill-(--sprite-metal)" />
