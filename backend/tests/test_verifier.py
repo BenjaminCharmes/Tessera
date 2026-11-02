@@ -27,6 +27,8 @@ from verifier import (  # noqa: E402
     Step,
     _run_chain,
     chains_for,
+    consignes_touchees,
+    CONSIGNES_STEPS,
     main,
     run_parallel,
     run_steps,
@@ -375,6 +377,22 @@ def test_a_change_to_the_test_script_runs_the_backend_chains() -> None:
 
 def test_a_diff_touching_neither_side_runs_nothing() -> None:
     assert chains_for(["projects/ide-core/tickets/todo/ticket-1.md", "docs/a.md"]) == (False, False)
+
+
+def test_an_instruction_change_is_detected() -> None:
+    # Le 02/11, l'ADR-069 du ticket-674 dépassait son budget : aucun test n'avait tourné.
+    assert consignes_touchees(["projects/ide-core/memory/decisions.md"])
+    assert consignes_touchees(["agents/prompts/securite.md"])
+    assert consignes_touchees(["projects/ide-core/CLAUDE.md"])
+    assert consignes_touchees([".claude/skills/new-ticket/SKILL.md"])
+    assert not consignes_touchees(["projects/ide-core/tickets/todo/ticket-1.md", "docs/a.md"])
+
+
+def test_main_runs_the_consistency_tests_for_an_instruction_only_diff() -> None:
+    with patch("verifier.changed_paths", return_value=["projects/ide-core/memory/contraintes.md"]),          patch("verifier.run_parallel", return_value=0) as run:
+        assert main() == 0
+    backend, frontend, types = run.call_args.args
+    assert backend == CONSIGNES_STEPS and frontend == [] and types == []
 
 
 def test_an_unreadable_diff_runs_everything() -> None:
