@@ -321,6 +321,8 @@ L'onglet que tu consultais avant le changement se maintient : si tu regardais un
 
 Le fichier ouvert se ferme ; le flux du run affiché réinitialise.
 
+Quand tu ouvres l'onglet **Tickets**, **Fichiers**, **Historique**, **Agents** ou **Chat** sans avoir choisi de projet, Tessera ne te montre pas une vue vide. À la place, l'écran affiche « Sur quel projet travailles-tu ? » et te liste tous tes projets, avec leurs noms et descriptions. Tu en choisis un.
+
 ### Démarrer ou arrêter l'app d'une carte de projet
 
 Quand un projet déclare une app, tu vois un bouton **Lancer** (ou **Arrêter** si elle tourne déjà) au bas de la carte.
