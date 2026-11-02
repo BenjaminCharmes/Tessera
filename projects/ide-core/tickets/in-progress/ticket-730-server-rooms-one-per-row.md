@@ -25,9 +25,10 @@ ligne à partir de 1280 px.
 
 ## Solution proposée
 - Une salle par ligne, à toutes les largeurs.
-- Deux plans : le mur (baies, clim, VMC, extincteur, porte), puis une rangée de postes au
-  sol, une seule ligne ; sa capacité se mesure (`ResizeObserver`) et, au-delà, le dernier
-  poste devient un badge « +N agents » ; les agents au travail passent devant.
+- Les postes restent sur la ligne du mobilier (entre les baies et la porte : tout repose sur
+  le même sol, demande de Benjamin), sur une seule ligne ; leur capacité se mesure
+  (`ResizeObserver`) et, au-delà, le dernier poste devient un badge « +N agents » ; les agents
+  au travail passent devant. Le mobilier ne rétrécit pas (`shrink-0`).
 - Sans agent : trois postes vides, écran éteint, sans personne (`PosteVide`) — du
   mobilier, ni animation ni voyant (ADR-058).
 

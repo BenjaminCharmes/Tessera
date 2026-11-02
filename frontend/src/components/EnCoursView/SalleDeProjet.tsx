@@ -141,8 +141,8 @@ export default function SalleDeProjet({ groupe, lueA, agents, run, enArret, onAr
             ))}
           </div>
         )}
-        <div data-sol-mobilier className="mt-4 flex items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
-          <span className="flex items-end gap-4">
+        <div data-sol-mobilier className="mt-4 flex flex-nowrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
+          <span className="flex shrink-0 items-end gap-4">
             <Agrandi>
               <Climatiseur />
             </Agrandi>
@@ -150,7 +150,14 @@ export default function SalleDeProjet({ groupe, lueA, agents, run, enArret, onAr
               <BaieAvecFiche key={baie.nom} baie={baie} app={groupe.apps.find((a) => a.nom === baie.nom)} />
             ))}
           </span>
-          <span className="flex items-end gap-4">
+          {/* Les postes sur la ligne du mobilier, une seule ligne : leur nombre suit la place (ticket-730). */}
+          <AgentsDeProduit
+            projectId={groupe.project_id}
+            agents={agents}
+            aUnJournal={(service) => avecJournal.has(service)}
+            onOuvrirService={setDeplie}
+          />
+          <span className="flex shrink-0 items-end gap-4">
             <span className="self-start" title={`Ventilation : ${formaterMo(groupe.memoire_mo)} en service`}>
               <Agrandi>
                 <BoucheVMC regime={regimeDeLaVMC(enMarche, groupe.memoire_mo)} />
@@ -165,15 +172,6 @@ export default function SalleDeProjet({ groupe, lueA, agents, run, enArret, onAr
             </Agrandi>
           </span>
         </div>
-      </div>
-      {/* Le premier plan : une rangée de postes au sol, une seule ligne, hauteur fixe (ticket-730). */}
-      <div className="flex px-6 pt-3 pb-1">
-        <AgentsDeProduit
-          projectId={groupe.project_id}
-          agents={agents}
-          aUnJournal={(service) => avecJournal.has(service)}
-          onOuvrirService={setDeplie}
-        />
       </div>
       <SolDeSalle />
       {journal && (
