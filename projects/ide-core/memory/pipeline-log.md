@@ -7052,3 +7052,4 @@ Le diff ajoute :
 - 2026-11-02 12:00:48 UTC — [ticket-674] livraison: arrêt — PR #823 non mergée : CI failing : la PR #823 reste ouverte.
 - 2026-11-02 12:09:19 UTC — [ticket-690] testeur: OK (exit 0)
 - 2026-11-02 12:10:48 UTC — [ticket-690] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (88890ms)
+- 2026-11-02 12:10:53 UTC — [ide-core] file interrompue : ticket-690 non approuvé
