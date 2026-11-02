@@ -638,7 +638,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 ## ADR-069 — Une PR conflictuelle se met à jour par un merge, sans push forcé
 
 **Date** : 2026-11-02
-**Décision** : complète ADR-065. Sur une PR `conflicting`, le watcher fusionne `origin/<base>` dans la tête poussée, dans un worktree jetable, puis pousse sans forcer. Il n'agit que si la tête de la PR est encore `pushed_sha`, et n'admet que des conflits de journaux résolus en union ; aucun agent n'écrit ici. Les tests rejouent avant le push, `pushed_sha` prend la nouvelle tête avant l'attente de la CI, puis le merge reste automatique. Une mise à jour par surveillance.
+**Décision** : complète ADR-065. Sur une PR `conflicting`, le watcher fusionne `origin/<base>` dans la tête poussée, puis pousse sans forcer. Il n'agit que si la tête de la PR est encore `pushed_sha`, et n'admet que des conflits de journaux résolus en union ; aucun agent n'écrit ici. Les tests rejouent avant le push, `pushed_sha` prend la nouvelle tête avant l'attente de la CI, puis le merge reste automatique.
 **Raison** : même règle qu'au rebase de phase 1 : une résolution par règle se merge sur CI verte, celle d'un agent se relit (ADR-033). L'approbation suit la lignée des têtes, jamais une tête étrangère (ADR-039).
 **Alternative rejetée** : `update-branch` de GitHub — il refuse un conflit, le cas visé ; rebase puis push forcé (ADR-022) ; ne rien faire — l'arrêt actuel (ticket-452).
 **Détail** : tickets 732 et 733.

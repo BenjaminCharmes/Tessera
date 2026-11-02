@@ -17,10 +17,9 @@ section. (ADR-055)
   texte, le service le contrôle (preuve, 220 caractères, une ligne) et le
   remplace sans toucher au reste du fichier. (ADR-068, ADR-027, ADR-057)
 - **Une PR devenue conflictuelle ne se met à jour que par un merge de la base
-  dans sa tête poussée, sans push forcé.** La tête de la PR doit encore être
-  `pushed_sha`, que la mise à jour remplace avant l'attente de la CI ; seuls des
-  conflits de journaux résolus en union sont admis, jamais l'écriture d'un
-  agent. (ADR-069, ADR-022, ADR-039)
+  dans sa tête poussée, sans push forcé.** Sa tête doit encore être `pushed_sha` ;
+  seuls des conflits de journaux résolus en union sont admis, sans agent.
+  (ADR-069, ADR-022, ADR-039)
 
 ## Git et périmètre d'écriture
 
