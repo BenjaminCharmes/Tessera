@@ -1,5 +1,12 @@
+import { api } from "../lib/api";
+import { useResource } from "../hooks/useResource";
 import type { Project } from "../types/projets";
+import type { ProjectOverview } from "../types/api";
 import { titreEtSousTitre } from "../lib/titreDuProjet";
+import IconeDuProjet from "./ProjetsView/IconeDuProjet";
+
+const AUCUN: ProjectOverview[] = [];
+const lireLesApercus = () => api.projects.overview();
 
 interface ChoixDuProjetProps {
   /** Le nom de la vue qui attend un projet : « les tickets », « l'historique »… */
@@ -15,6 +22,9 @@ interface ChoixDuProjetProps {
  */
 export default function ChoixDuProjet({ vue, projets, onSelectProject }: ChoixDuProjetProps) {
   const tries = [...projets].sort((a, b) => a.name.localeCompare(b.name, "fr"));
+  // Les icônes viennent des aperçus ; tant qu'ils ne sont pas lus, l'initiale tient la place.
+  const { data: apercus } = useResource(lireLesApercus, AUCUN);
+  const iconeDe = (id: string) => apercus.find((a) => a.id === id)?.icon ?? false;
   return (
     <section
       aria-labelledby="choix-du-projet"
@@ -36,13 +46,16 @@ export default function ChoixDuProjet({ vue, projets, onSelectProject }: ChoixDu
               <button
                 type="button"
                 onClick={() => onSelectProject(p)}
-                className="flex h-full w-full flex-col gap-1 rounded-xl border border-zinc-800/80 bg-zinc-900/70 p-4 text-left shadow-sm shadow-black/30 hover:border-zinc-700 hover:bg-zinc-800/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+                className="flex h-full w-full items-start gap-3 rounded-xl border border-zinc-800/80 bg-zinc-900/70 p-4 text-left shadow-sm shadow-black/30 hover:border-zinc-700 hover:bg-zinc-800/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
               >
-                <span className="font-semibold text-zinc-100">{titre}</span>
-                {sousTitre ? <span className="text-xs text-zinc-400">{sousTitre}</span> : null}
-                {p.description ? (
-                  <span className="mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-500">{p.description}</span>
-                ) : null}
+                <IconeDuProjet projet={{ id: p.id, name: p.name, icon: iconeDe(p.id) }} taille="tuile" />
+                <span className="flex min-w-0 flex-col gap-1">
+                  <span className="font-semibold text-zinc-100">{titre}</span>
+                  {sousTitre ? <span className="text-xs text-zinc-400">{sousTitre}</span> : null}
+                  {p.description ? (
+                    <span className="mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-500">{p.description}</span>
+                  ) : null}
+                </span>
               </button>
             </li>
           );

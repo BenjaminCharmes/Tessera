@@ -35,6 +35,7 @@ export default function Donut({ slices, format, caption, empty }: DonutProps) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-5">
       <div className="relative h-36 w-36 shrink-0">
+        <div className="anim-ouvre h-full w-full">
         <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90" aria-hidden="true">
           <circle cx="50" cy="50" r={R} fill="none" strokeWidth="10" className="stroke-zinc-800" />
           {arcs.map((a) => (
@@ -54,6 +55,7 @@ export default function Donut({ slices, format, caption, empty }: DonutProps) {
             />
           ))}
         </svg>
+        </div>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-sm font-semibold text-zinc-100">
             {format(focus ? focus.value : total)}

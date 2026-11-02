@@ -14,6 +14,7 @@ import Card from "./Card";
 import JaugesDeQuota from "../../design/ui/JaugesDeQuota";
 import { useQuotaLu } from "../../hooks/useQuotaLu";
 import KpiRow from "./KpiRow";
+import { CartesSquelettes, TuilesSquelettes } from "./Squelettes";
 import QualityCard from "./QualityCard";
 import RecentRunsCard from "./RecentRunsCard";
 import RunHistorique from "./RunHistorique";
@@ -64,11 +65,12 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        {!data && (
-          <p className="text-xs text-zinc-500">
-            {loading ? "Chargement…" : "Statistiques indisponibles."}
+        {!data && loading && (
+          <p role="status" className="sr-only">
+            Chargement…
           </p>
         )}
+        {!data && !loading && <p className="mb-4 text-xs text-zinc-500">Statistiques indisponibles.</p>}
         {data && data.totals.runs === 0 && data.totals.cost_usd === 0 && (
           <p className="mb-4 rounded-lg border border-dashed border-zinc-800 px-4 py-3 text-xs text-zinc-500">
             Aucun run sur les {data.days} derniers jours. Les graphiques se rempliront au premier
@@ -78,16 +80,22 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
         {/* Seul sur sa ligne, le quota laissait deux tiers vides : il rejoint les KPI.
             La carte garde sa place dans l'arbre quand les données arrivent. */}
         <div className="mb-4 grid gap-4 xl:grid-cols-3">
-          {data && (
+          {data ? (
             <div className="xl:col-span-2">
               <KpiRow totals={data.totals} quality={data.quality} />
             </div>
+          ) : (
+            loading && (
+              <div className="xl:col-span-2">
+                <TuilesSquelettes />
+              </div>
+            )
           )}
           <Card title="Quota de l'abonnement" aside="relevé par le SDK">
             <JaugesDeQuota fenetres={quota} />
           </Card>
         </div>
-        {data && <Dashboard data={data} onSelectRun={setSelectedRun} />}
+        {data ? <Dashboard data={data} onSelectRun={setSelectedRun} /> : loading && <CartesSquelettes />}
       </div>
     </div>
   );

@@ -252,8 +252,8 @@ describe("KanbanView — composants communs (ticket-442)", () => {
       />,
     );
     const libelles = pastilles().map((p) => p.textContent);
-    expect(libelles).toContain("todo");
-    expect(libelles).toContain("high");
+    expect(libelles).toContain("À faire");
+    expect(libelles).toContain("Haute");
   });
 
   it("has at most one plein button, the queue launch", () => {

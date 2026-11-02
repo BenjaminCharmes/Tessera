@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { PipelineRun } from "../../types/api";
 import { formatDate } from "../../lib/format";
 import { estInterrompu, formatDuree, runsDeTicket } from "../HistoriqueView/runs";
+import { statutDuRun } from "../../lib/libelles";
 
 interface RunHistoryProps {
   runs: PipelineRun[];
@@ -83,7 +84,7 @@ function RunRow({ run, onSelectTicket, selected, onSelectRun }: RunRowProps) {
           )}
           <div className="text-micro text-zinc-500">
             <span className="text-zinc-400">Statut final :</span>{" "}
-            {run.final_status ?? "En cours"}
+            {run.final_status ? statutDuRun(run.final_status) : "En cours"}
           </div>
           {run.approved !== null && (
             <div className="text-micro text-zinc-500">

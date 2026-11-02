@@ -45,7 +45,7 @@ export default function TimeLines({ labels, series, format, empty }: TimeLinesPr
         <div className="relative h-48" onMouseLeave={() => setHover(null)}>
           <Grid max={max} format={format} />
           <svg
-            className="absolute inset-0 h-full w-full overflow-visible"
+            className="anim-devoile absolute inset-0 h-full w-full overflow-visible"
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
             aria-hidden="true"

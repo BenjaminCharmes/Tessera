@@ -66,7 +66,8 @@ describe("KanbanColumn", () => {
         onRunPipeline={vi.fn()}
       />,
     );
-    expect(screen.getByText("À faire")).toBeTruthy();
+    // L'en-tête de colonne et la pastille du ticket disent tous deux « À faire ».
+    expect(screen.getAllByText("À faire").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("(1)")).toBeTruthy();
   });
 
@@ -148,7 +149,7 @@ describe("KanbanColumn — infobulle d'arrêt (ticket-218)", () => {
         blockedArrets={{ "ticket-blocked": "Reached maximum number of turns (30)" }}
       />,
     );
-    const badge = screen.getByText("blocked");
+    const badge = screen.getByText("Bloqué");
     expect(badge).toHaveAttribute("title", "Reached maximum number of turns (30)");
   });
 });

@@ -36,10 +36,10 @@ export default function TimeBars({ label, points, format, empty }: TimeBarsProps
               onMouseEnter={() => setHover(i)}
             >
               <div
-                className={`mx-auto w-full max-w-6 rounded-t-md ${SERIES[0].bg} transition-opacity ${
+                className={`anim-pousse mx-auto w-full max-w-6 rounded-t-md ${SERIES[0].bg} transition-opacity ${
                   hover !== null && hover !== i ? "opacity-40" : "opacity-90"
                 }`}
-                style={{ height: `${(p.value / max) * 100}%` }}
+                style={{ height: `${(p.value / max) * 100}%`, animationDelay: `${Math.min(i * 12, 360)}ms` }}
               />
             </div>
           ))}

@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ChoixDuProjet from "./ChoixDuProjet";
+import { api } from "../lib/api";
 import { titreEtSousTitre } from "../lib/titreDuProjet";
 import type { Project } from "../types/projets";
 
@@ -20,13 +21,18 @@ describe("titreEtSousTitre", () => {
 });
 
 describe("ChoixDuProjet", () => {
+  beforeEach(() => {
+    vi.spyOn(api.projects, "overview").mockResolvedValue([]);
+  });
+
   it("says which view waits for a project and lists the projects by name", () => {
     render(<ChoixDuProjet vue="ses tickets" projets={[projet("v", "Vigie"), projet("a", "Affût")]} onSelectProject={vi.fn()} />);
 
     expect(screen.getByRole("heading", { name: "Sur quel projet travailles-tu ?" })).toBeInTheDocument();
     expect(screen.getByText(/voir ses tickets/)).toBeInTheDocument();
     const noms = screen.getAllByRole("button").map((b) => b.textContent);
-    expect(noms).toEqual(["Affût", "Vigie"]);
+    // L'initiale précède le nom tant que les icônes ne sont pas lues.
+    expect(noms).toEqual(["AAffût", "VVigie"]);
   });
 
   it("selects the clicked project", async () => {
@@ -36,5 +42,14 @@ describe("ChoixDuProjet", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /Vigie/ }));
     expect(choisir).toHaveBeenCalledWith(vigie);
+  });
+});
+
+describe("ChoixDuProjet — icône", () => {
+  it("shows the project's icon once the overviews are read", async () => {
+    vi.spyOn(api.projects, "overview").mockResolvedValue([{ id: "v", icon: true } as never]);
+    render(<ChoixDuProjet vue="ses tickets" projets={[projet("v", "Vigie")]} onSelectProject={vi.fn()} />);
+
+    expect(await screen.findByRole("button", { name: /Vigie/ })).toContainElement(document.querySelector("img"));
   });
 });

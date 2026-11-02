@@ -6,6 +6,7 @@ import {
   type TriDesTickets,
 } from "../../lib/filtresTickets";
 import type { TicketPriority, TicketType } from "../../types/api";
+import { PRIORITE, TYPE_DE_TICKET } from "../../lib/libelles";
 
 /**
  * Chercher, filtrer et trier les tickets — ticket-195.
@@ -52,10 +53,10 @@ export default function BarreDeFiltres({
           onChange={(e) => onChange({ ...filtres, type: e.target.value as TicketType | "" })}
           className={CHAMP}
         >
-          <option value="">type</option>
+          <option value="">Type</option>
           {TYPES.map((t) => (
             <option key={t} value={t}>
-              {t}
+              {TYPE_DE_TICKET[t]}
             </option>
           ))}
         </select>
@@ -67,10 +68,10 @@ export default function BarreDeFiltres({
           }
           className={CHAMP}
         >
-          <option value="">priorité</option>
+          <option value="">Priorité</option>
           {PRIORITES.map((p) => (
             <option key={p} value={p}>
-              {p}
+              {PRIORITE[p]}
             </option>
           ))}
         </select>
