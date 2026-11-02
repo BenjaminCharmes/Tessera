@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-696
+pr_number: 820
 priority: low
 status: done
 title: Cockpit hook split by region
