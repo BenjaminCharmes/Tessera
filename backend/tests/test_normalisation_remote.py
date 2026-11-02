@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.database import init_db
-from tessera.services.github_workflow import forge_supportee, parse_remote
+from tessera.services.forge import forge_supportee, parse_remote
 from tessera.services.project_loader import load_project
 
 

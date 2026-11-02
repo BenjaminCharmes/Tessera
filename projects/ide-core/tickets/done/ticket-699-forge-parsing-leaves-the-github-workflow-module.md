@@ -1,12 +1,13 @@
 ---
-id: ticket-699
-title: "Forge parsing leaves the GitHub workflow module"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-699
+pr_number: 832
+priority: low
+status: done
+title: Forge parsing leaves the GitHub workflow module
+type: refactor
 ---
 
 # ticket-699 — L'analyse du remote quitte `github_workflow.py`
