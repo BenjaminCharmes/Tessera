@@ -7080,3 +7080,16 @@ Le diff ajoute :
 - 2026-11-02 14:18:14 UTC — [ticket-691] validateur: APPROVED — Le refactoring de `project_loader.py` est complet et correctement découplé : ext (342375ms)
 - 2026-11-02 14:18:14 UTC — [ticket-691] APPROVED après 1 tour(s)
 - 2026-11-02 14:24:40 UTC — [ticket-691] documentation: 1 fichier(s) (313890ms) — après tour de correction
+- 2026-11-02 14:34:43 UTC — [ide-core] ticket-691 PR #829 confiée au CIWatcher
+- 2026-11-02 14:34:48 UTC — [ticket-692] branche ticket-692-documentation-module-split-into-edits-selection-a
+- 2026-11-02 14:34:50 UTC — [ticket-692] tour 1 — codeur démarré
+- 2026-11-02 14:40:23 UTC — [ide-core] ticket-691 PR #829 mergée (CI verte)
+- 2026-11-02 14:41:16 UTC — [ticket-692] tour 1 — codeur terminé (386250ms)
+- 2026-11-02 14:59:00 UTC — [ticket-692] testeur: OK (exit 0)
+- 2026-11-02 15:01:12 UTC — [ticket-692] securite: PASS — Refactoring pur : extraction de code de `documentation.py` vers deux nouveaux mo (132436ms)
+- 2026-11-02 15:01:12 UTC — [ticket-692] tour 1 — reviewer démarré
+- 2026-11-02 15:01:13 UTC — [ticket-692] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 15:01:33 UTC — [ticket-692] tour 1 — reviewer terminé (21094ms)
+- 2026-11-02 15:02:10 UTC — [ticket-692] validateur: fichiers cités joints : services/documentation.py
+- 2026-11-02 15:02:10 UTC — [ticket-692] validateur: APPROVED — Le refactoring a extrait avec succès les fonctions pures d'édition et de sélecti (58110ms)
+- 2026-11-02 15:02:10 UTC — [ticket-692] APPROVED après 1 tour(s)
