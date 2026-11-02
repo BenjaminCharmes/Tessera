@@ -632,3 +632,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : précise ADR-027. Aucun agent n'écrit `agents.json`. doc-technique propose une `description` (220 caractères, une ligne, avec `preuve`) dans sa sortie ; le service la contrôle comme toute édition (ADR-057) et ne remplace que cette clé, par substitution de texte : le reste du fichier reste octet pour octet. Un refus est journalisé et ne bloque pas le lot. L'écriture vise la copie du run, jamais le checkout (ADR-056). `AGENTS.md` suit `CLAUDE.md` (`doc_claude_md`).
 **Raison** : les descriptions affichées dataient de la création des projets, et un humain relisait 17 projets à la main.
 **Alternative rejetée** : donner `agents.json` à l'agent (ADR-027) ; réécrire le fichier par `json.dumps` — il reformaterait tout.
+
+---
+
+## ADR-069 — Une PR conflictuelle se met à jour par un merge, sans push forcé
+
+**Date** : 2026-11-02
+**Décision** : complète ADR-065. Sur une PR `conflicting`, le watcher fusionne `origin/<base>` dans la tête poussée, puis pousse sans forcer. Il n'agit que si la tête de la PR est encore `pushed_sha`, et n'admet que des conflits de journaux résolus en union ; aucun agent n'écrit ici. Les tests rejouent avant le push, `pushed_sha` prend la nouvelle tête avant l'attente de la CI, puis le merge reste automatique.
+**Raison** : même règle qu'au rebase de phase 1 : une résolution par règle se merge sur CI verte, celle d'un agent se relit (ADR-033). L'approbation suit la lignée des têtes, jamais une tête étrangère (ADR-039).
+**Alternative rejetée** : `update-branch` de GitHub — il refuse un conflit, le cas visé ; rebase puis push forcé (ADR-022) ; ne rien faire — l'arrêt actuel (ticket-452).
+**Détail** : tickets 732 et 733.

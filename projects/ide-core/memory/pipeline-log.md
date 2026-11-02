@@ -7018,6 +7018,18 @@ Le diff ajoute :
 - 2026-11-02 11:22:42 UTC — [ticket-697] validateur: APPROVED — Refactoring réussi : `ImportProjectModal` a été découpée en 4 fichiers distincts (318843ms)
 - 2026-11-02 11:22:42 UTC — [ticket-697] APPROVED après 1 tour(s)
 - 2026-11-02 11:24:54 UTC — [ticket-697] documentation: 0 fichier(s) (108859ms)
+- 2026-11-02 11:49:14 UTC — [ide-core] ticket-698 PR #822 non surveillée (livraison arrêtée)
+- 2026-11-02 11:49:21 UTC — [ticket-674] branche ticket-674-an-open-pr-turned-conflicting-is-brought-up-to-da
+- 2026-11-02 11:49:22 UTC — [ticket-674] tour 1 — codeur démarré
+- 2026-11-02 11:52:20 UTC — [ticket-674] tour 1 — architect terminé (177563ms)
+- 2026-11-02 11:52:23 UTC — [ticket-674] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-11-02 11:52:44 UTC — [ticket-674] securite: PASS — Diff documentaire sans code exécutable. Ajout d'une contrainte architecturale (A (20750ms)
+- 2026-11-02 11:52:44 UTC — [ticket-674] tour 1 — reviewer démarré
+- 2026-11-02 11:53:02 UTC — [ticket-674] tour 1 — reviewer terminé (18422ms)
+- 2026-11-02 11:54:46 UTC — [ticket-674] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits : la conception décrit clairemen (122766ms)
+- 2026-11-02 11:54:46 UTC — [ticket-674] APPROVED après 1 tour(s)
+- 2026-11-02 11:54:51 UTC — [ticket-674] fichiers non suivis laissés par le run : tickets/todo/ticket-732-a-conflicting-pr-branch-is-merged-with-its-base-in-a-throwaway-worktree.md, tickets/todo/ticket-733-the-ci-watcher-updates-a-conflicting-pr-once-and-rebinds-the-pushed-head.md (à ignorer dans .gitignore ?)
+- 2026-11-02 11:54:51 UTC — [ticket-674] documentation: 0 fichier(s) (14ms)
 - 2026-11-02 11:28:18 UTC — [ide-core] ticket-697 PR #821 confiée au CIWatcher
 - 2026-11-02 11:28:22 UTC — [ticket-698] branche ticket-698-three-barely-oversized-components-go-under-300-li
 - 2026-11-02 11:28:26 UTC — [ticket-698] tour 1 — codeur démarré
