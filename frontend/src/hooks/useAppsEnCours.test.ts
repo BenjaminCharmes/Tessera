@@ -53,6 +53,39 @@ describe("useAppsEnCours", () => {
     expect(lire).toHaveBeenCalledTimes(2);
   });
 
+  it("ends a launch even when a read is slower than the waiting cadence", async () => {
+    vi.useFakeTimers();
+    const LANCEE: AppEnCours = { ...UNE, origine: "tessera" };
+    let vues: AppEnCours[] = [];
+    // La lecture met 3 s, plus que la cadence d'attente (2 s) : chaque tick
+    // annulait la lecture en vol, et la réponse n'arrivait jamais.
+    vi.spyOn(api.services, "running").mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve(vues), 3_000)),
+    );
+    vi.spyOn(api.services, "start").mockResolvedValue({ services: [] });
+
+    const { result } = renderHook(() => useAppsEnCours());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3_000);
+    });
+
+    vues = [LANCEE];
+    await act(async () => {
+      await result.current.lancer("alpha");
+    });
+    expect(result.current.enLancement("alpha")).toBe(true);
+
+    // Seconde par seconde : React rejoue ses effets entre deux `act`, comme entre
+    // deux ticks réels ; un seul `act` de 10 s ne verrait aucune annulation.
+    for (let s = 0; s < 10; s++) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1_000);
+      });
+    }
+    expect(result.current.apps).toEqual([LANCEE]);
+    expect(result.current.enLancement("alpha")).toBe(false);
+  });
+
   it("stops an app then reads the inventory again", async () => {
     const lire = vi.spyOn(api.services, "running").mockResolvedValue([UNE]);
     const arreter = vi
