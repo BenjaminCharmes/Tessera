@@ -2,7 +2,7 @@
 id: ticket-730
 title: "Server rooms: one per row, desks on a single floor row"
 type: fix
-status: in-progress
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -33,7 +33,7 @@ ligne à partir de 1280 px.
   mobilier, ni animation ni voyant (ADR-058).
 
 ## Critères d'acceptation
-- [ ] `SallesDesServeurs.tsx` n'a plus de colonne double ; un test le vérifie
-- [ ] `rangee.ts` calcule la capacité et le badge « +N », agents au travail d'abord ; testé
-- [ ] Une salle sans agent montre trois `poste-vide` et aucun agent ; un test le vérifie
-- [ ] Benjamin a validé le rendu sur 5176 (captures 1920 et 1536)
+- [x] `SallesDesServeurs.tsx` n'a plus de colonne double ; un test le vérifie
+- [x] `rangee.ts` calcule la capacité et le badge « +N », agents au travail d'abord ; testé
+- [x] Une salle sans agent montre trois `poste-vide` et aucun agent ; un test le vérifie
+- [x] Benjamin a validé le rendu sur 5176 (captures 1920 et 1536)
