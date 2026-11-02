@@ -6941,6 +6941,20 @@ Le diff ajoute :
 - 2026-11-02 09:05:03 UTC — [ticket-693] validateur: APPROVED — Tous les critères sont satisfaits. Le split de `types/api.ts` (676 → 9 lignes) e (345594ms)
 - 2026-11-02 09:05:03 UTC — [ticket-693] APPROVED après 1 tour(s)
 - 2026-11-02 09:05:55 UTC — [ticket-693] documentation: 0 fichier(s) (47125ms)
+- 2026-11-02 09:24:03 UTC — [ide-core] ticket-693 PR #816 confiée au CIWatcher
+- 2026-11-02 09:24:11 UTC — [ticket-694] branche ticket-694-api-client-split-by-domain
+- 2026-11-02 09:24:15 UTC — [ticket-694] tour 1 — codeur démarré
+- 2026-11-02 09:27:34 UTC — [ticket-694] tour 1 — codeur terminé (199233ms)
+- 2026-11-02 09:31:22 UTC — [ide-core] ticket-693 PR #816 mergée (CI verte)
+- 2026-11-02 09:34:45 UTC — [ticket-694] testeur: OK (exit 0)
+- 2026-11-02 09:36:17 UTC — [ticket-694] securite: PASS — Refactoring pur qui divise `frontend/src/lib/api.ts` (312 lignes) en 7 modules s (91796ms)
+- 2026-11-02 09:36:17 UTC — [ticket-694] tour 1 — reviewer démarré
+- 2026-11-02 09:36:20 UTC — [ticket-694] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 09:36:41 UTC — [ticket-694] tour 1 — reviewer terminé (23671ms)
+- 2026-11-02 09:37:34 UTC — [ticket-694] validateur: fichiers cités joints : lib/api.ts, lib/http.ts ; absents : lib/
+- 2026-11-02 09:37:34 UTC — [ticket-694] validateur: APPROVED — Tous les critères sont satisfaits. La refonte de `lib/api.ts` (312→26 lignes) en (75484ms)
+- 2026-11-02 09:37:34 UTC — [ticket-694] APPROVED après 1 tour(s)
+- 2026-11-02 09:41:02 UTC — [ticket-694] documentation: 0 fichier(s) (192327ms)
 - 2026-11-02 09:46:17 UTC — [ide-core] ticket-694 PR #817 non surveillée (livraison arrêtée)
 - 2026-11-02 09:46:28 UTC — [ticket-695] branche ticket-695-stream-state-reducer-split-by-event-family
 - 2026-11-02 09:46:30 UTC — [ticket-695] tour 1 — codeur démarré

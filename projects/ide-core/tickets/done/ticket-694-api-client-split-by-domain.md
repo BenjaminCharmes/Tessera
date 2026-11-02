@@ -1,12 +1,14 @@
 ---
-id: ticket-694
-title: "API client split by domain"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-680]
 created: 2026-10-29
+depends_on:
+- ticket-680
+id: ticket-694
+pr_number: 817
+priority: low
+status: done
+title: API client split by domain
+type: refactor
 ---
 
 # ticket-694 — `lib/api.ts` découpé par domaine

@@ -12,7 +12,6 @@ export const PLAFOND_GENERAL = 300;
 export const PLAFONDS: Record<string, number> = {
   "hooks/useChat.ts": 336,
   "hooks/useSupervision.ts": 385,
-  "lib/api.ts": 315,
 };
 
 const SOURCES = join(__dirname);
