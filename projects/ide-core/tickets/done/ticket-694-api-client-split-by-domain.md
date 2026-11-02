@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-680
 id: ticket-694
+pr_number: 817
 priority: low
 status: done
 title: API client split by domain
