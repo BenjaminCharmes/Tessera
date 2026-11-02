@@ -6955,3 +6955,81 @@ Le diff ajoute :
 - 2026-11-02 09:37:34 UTC — [ticket-694] validateur: APPROVED — Tous les critères sont satisfaits. La refonte de `lib/api.ts` (312→26 lignes) en (75484ms)
 - 2026-11-02 09:37:34 UTC — [ticket-694] APPROVED après 1 tour(s)
 - 2026-11-02 09:41:02 UTC — [ticket-694] documentation: 0 fichier(s) (192327ms)
+- 2026-11-02 09:46:17 UTC — [ide-core] ticket-694 PR #817 non surveillée (livraison arrêtée)
+- 2026-11-02 09:46:28 UTC — [ticket-695] branche ticket-695-stream-state-reducer-split-by-event-family
+- 2026-11-02 09:46:30 UTC — [ticket-695] tour 1 — codeur démarré
+- 2026-11-02 09:47:50 UTC — [ticket-695] tour 1 — codeur terminé (80250ms)
+- 2026-11-02 09:47:53 UTC — [ticket-695] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-11-02 09:48:19 UTC — [ticket-695] securite: PASS — Aucun fichier n'a été modifié dans ce run. Le garde-fou d'écriture (hook PreTool (26561ms)
+- 2026-11-02 09:48:20 UTC — [ticket-695] tour 1 — reviewer démarré
+- 2026-11-02 09:48:38 UTC — [ticket-695] tour 1 — reviewer terminé (17765ms)
+- 2026-11-02 09:53:20 UTC — [ticket-695] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 09:53:55 UTC — [ticket-695] validateur: fichiers cités joints : hooks/streamState.ts (tronqué)
+- 2026-11-02 09:53:55 UTC — [ticket-695] validateur: CHANGES_REQUESTED — Le ticket est **BLOCKED** : le garde-fou interdit toute écriture vers `frontend/ (336155ms)
+- 2026-11-02 09:53:55 UTC — [ticket-695] CHANGES_REQUESTED tour 1: Reviewer : 1. Aucune modification de code : `appliquerEvenement` n'est pas découpé, l'entrée `hooks/streamState.ts` de `PLAFONDS` n'est pas baissée, et il n'y a ni fixture commitée ni test de rejeu. A
+- 2026-11-02 09:53:55 UTC — [ticket-695] tour 2 — codeur démarré
+- 2026-11-02 09:57:09 UTC — [ticket-695] tour 2 — codeur terminé (193984ms)
+- 2026-11-02 10:00:07 UTC — [ticket-695] testeur: OK (exit 0)
+- 2026-11-02 10:00:58 UTC — [ticket-695] securite: PASS — Refactoring de sécurité inerte : split du réducteur streamState en familles d'év (51640ms)
+- 2026-11-02 10:00:58 UTC — [ticket-695] tour 2 — reviewer démarré
+- 2026-11-02 10:00:59 UTC — [ticket-695] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 10:01:29 UTC — [ticket-695] tour 2 — reviewer terminé (30500ms)
+- 2026-11-02 10:01:34 UTC — [ticket-695] validateur: fichiers cités joints : hooks/streamState.ts
+- 2026-11-02 10:01:34 UTC — [ticket-695] validateur: APPROVED — La refactorisation a bien scindé `appliquerEvenement` en 5 modules spécialisés ( (35844ms)
+- 2026-11-02 10:01:34 UTC — [ticket-695] APPROVED après 2 tour(s)
+- 2026-11-02 10:05:01 UTC — [ticket-695] documentation: 0 fichier(s) (198813ms) — après tour de correction
+- 2026-11-02 10:12:04 UTC — [ide-core] ticket-695 PR #819 confiée au CIWatcher
+- 2026-11-02 10:12:04 UTC — [ticket-696] fichiers non suivis laissés par le run : tickets/blocked/ticket-696-cockpit-hook-split-by-region.md (à ignorer dans .gitignore ?)
+- 2026-11-02 10:12:04 UTC — [ide-core] file interrompue : ticket-696 non approuvé
+- 2026-11-02 10:19:11 UTC — [ide-core] ticket-695 PR #819 mergée (CI verte)
+- 2026-11-02 10:37:54 UTC — [ticket-696] branche ticket-696-cockpit-hook-split-by-region
+- 2026-11-02 10:37:57 UTC — [ticket-696] tour 1 — codeur démarré
+- 2026-11-02 10:44:26 UTC — [ticket-696] tour 1 — codeur terminé (388797ms)
+- 2026-11-02 10:50:33 UTC — [ticket-696] testeur: OK (exit 0)
+- 2026-11-02 10:52:16 UTC — [ticket-696] securite: PASS — Ce diff effectue un refactoring pur du hook `useCockpit.ts` (532 lignes) en le d (102625ms)
+- 2026-11-02 10:52:16 UTC — [ticket-696] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 10:52:16 UTC — [ticket-696] tour 1 — reviewer démarré
+- 2026-11-02 10:52:36 UTC — [ticket-696] tour 1 — reviewer terminé (19952ms)
+- 2026-11-02 10:53:01 UTC — [ticket-696] validateur: fichiers cités joints : App.tsx, hooks/useCockpit.ts
+- 2026-11-02 10:53:01 UTC — [ticket-696] validateur: CHANGES_REQUESTED — 4/5 critères validés. La refactorisation crée 7 hooks régionaux bien rangés (< 3 (45577ms)
+- 2026-11-02 10:53:01 UTC — [ticket-696] CHANGES_REQUESTED tour 1: Validateur : 4/5 critères validés. La refactorisation crée 7 hooks régionaux bien rangés (< 300 lignes chacun), avec une réduction drastique de useCockpit (532 → 45 lignes). L'API reste identique et A
+- 2026-11-02 10:53:01 UTC — [ticket-696] tour 2 — codeur démarré
+- 2026-11-02 10:56:29 UTC — [ticket-696] tour 2 — codeur terminé (207578ms)
+- 2026-11-02 11:00:04 UTC — [ticket-696] testeur: OK (exit 0)
+- 2026-11-02 11:01:09 UTC — [ticket-696] securite: PASS — Refactorisation sûre : le fichier `useCockpit.ts` (532 l.) est scindé en 8 fichi (65140ms)
+- 2026-11-02 11:01:11 UTC — [ticket-696] tour 2 — reviewer démarré
+- 2026-11-02 11:01:40 UTC — [ticket-696] tour 2 — reviewer terminé (29031ms)
+- 2026-11-02 11:06:24 UTC — [ticket-696] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:06:49 UTC — [ticket-696] validateur: fichiers cités joints : App.tsx, hooks/useCockpit.ts
+- 2026-11-02 11:06:49 UTC — [ticket-696] validateur: APPROVED — La refactorisation divise `useCockpit` (532 lignes) en 7 hooks régionaux spécial (339641ms)
+- 2026-11-02 11:06:49 UTC — [ticket-696] APPROVED après 2 tour(s)
+- 2026-11-02 11:09:55 UTC — [ticket-696] documentation: 0 fichier(s) (181015ms) — après tour de correction
+- 2026-11-02 11:10:12 UTC — [ide-core] ticket-696 PR #820 confiée au CIWatcher
+- 2026-11-02 11:10:16 UTC — [ticket-697] branche ticket-697-import-project-modal-split-by-step
+- 2026-11-02 11:10:17 UTC — [ticket-697] tour 1 — codeur démarré
+- 2026-11-02 11:12:25 UTC — [ticket-697] tour 1 — codeur terminé (128250ms)
+- 2026-11-02 11:15:26 UTC — [ticket-697] testeur: OK (exit 0)
+- 2026-11-02 11:17:17 UTC — [ide-core] ticket-696 PR #820 mergée (CI verte)
+- 2026-11-02 11:17:23 UTC — [ticket-697] securite: PASS — Refactoring of ImportProjectModal into smaller components (ImportProgression, Im (117765ms)
+- 2026-11-02 11:17:24 UTC — [ticket-697] tour 1 — reviewer démarré
+- 2026-11-02 11:17:38 UTC — [ticket-697] tour 1 — reviewer terminé (14452ms)
+- 2026-11-02 11:22:24 UTC — [ticket-697] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:22:42 UTC — [ticket-697] validateur: fichiers cités joints : components/Sidebar/ImportProjectModal.tsx
+- 2026-11-02 11:22:42 UTC — [ticket-697] validateur: APPROVED — Refactoring réussi : `ImportProjectModal` a été découpée en 4 fichiers distincts (318843ms)
+- 2026-11-02 11:22:42 UTC — [ticket-697] APPROVED après 1 tour(s)
+- 2026-11-02 11:24:54 UTC — [ticket-697] documentation: 0 fichier(s) (108859ms)
+- 2026-11-02 11:28:18 UTC — [ide-core] ticket-697 PR #821 confiée au CIWatcher
+- 2026-11-02 11:28:22 UTC — [ticket-698] branche ticket-698-three-barely-oversized-components-go-under-300-li
+- 2026-11-02 11:28:26 UTC — [ticket-698] tour 1 — codeur démarré
+- 2026-11-02 11:32:39 UTC — [ticket-698] tour 1 — codeur terminé (253608ms)
+- 2026-11-02 11:35:11 UTC — [ide-core] ticket-697 PR #821 mergée (CI verte)
+- 2026-11-02 11:35:56 UTC — [ticket-698] testeur: OK (exit 0)
+- 2026-11-02 11:37:25 UTC — [ticket-698] securite: PASS — Refactoring propre de composants React frontend sans introduction de vulnérabili (88063ms)
+- 2026-11-02 11:37:25 UTC — [ticket-698] tour 1 — reviewer démarré
+- 2026-11-02 11:37:42 UTC — [ticket-698] tour 1 — reviewer terminé (16780ms)
+- 2026-11-02 11:42:28 UTC — [ticket-698] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: fichiers cités joints : FilDuRun/index.tsx, Sidebar/TicketCard.tsx, Sidebar/TicketList.tsx (tronqué)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: APPROVED — Le refactoring a réussi : les quatre vues du fil du run et la barre d'outils de  (354703ms)
+- 2026-11-02 11:43:20 UTC — [ticket-698] APPROVED après 1 tour(s)
+- 2026-11-02 11:43:24 UTC — [ticket-698] fichiers non suivis laissés par le run : tickets/todo/ticket-731-the-security-audit-knows-what-the-ticket-leaves-to-the-next.md (à ignorer dans .gitignore ?)
+- 2026-11-02 11:45:58 UTC — [ticket-698] documentation: 0 fichier(s) (154031ms)

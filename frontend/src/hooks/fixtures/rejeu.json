@@ -1,0 +1,1833 @@
+{
+ "evenements": [
+  {
+   "type": "quota_updated",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "utilization": 0.4,
+    "resets_at": "2026-11-02T15:00:00.000Z"
+   },
+   "timestamp": "2026-11-02T10:00:00.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "queue_progress",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "index": 1,
+    "total": 2
+   },
+   "timestamp": "2026-11-02T10:00:01.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "ticket_status_changed",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "ticket_titre": "Premier ticket"
+   },
+   "timestamp": "2026-11-02T10:00:02.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "branch_created",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "branch": "ticket-101-premier"
+   },
+   "timestamp": "2026-11-02T10:00:03.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_started",
+   "agent": "codeur",
+   "ticket_id": "ticket-101",
+   "data": {
+    "round": 1,
+    "max_rounds": 3
+   },
+   "timestamp": "2026-11-02T10:00:04.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_token",
+   "agent": "codeur",
+   "ticket_id": "ticket-101",
+   "data": {
+    "token": "Bon"
+   },
+   "timestamp": "2026-11-02T10:00:05.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_token",
+   "agent": "codeur",
+   "ticket_id": "ticket-101",
+   "data": {
+    "token": "jour"
+   },
+   "timestamp": "2026-11-02T10:00:06.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_token",
+   "agent": "reviewer",
+   "ticket_id": "ticket-101",
+   "data": {
+    "token": "ignore"
+   },
+   "timestamp": "2026-11-02T10:00:07.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_tool_use",
+   "agent": "codeur",
+   "ticket_id": "ticket-101",
+   "data": {
+    "tool": "Edit",
+    "input": {
+     "file_path": "a.ts"
+    }
+   },
+   "timestamp": "2026-11-02T10:00:08.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_done",
+   "agent": "codeur",
+   "ticket_id": "ticket-101",
+   "data": {
+    "content": "fait",
+    "cost_usd": 0.12,
+    "duration_ms": 1500
+   },
+   "timestamp": "2026-11-02T10:00:09.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "test_started",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:10.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "test_result",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "passed": false,
+    "output_summary": "1 failed",
+    "errors": [
+     "boom",
+     3,
+     "bang"
+    ]
+   },
+   "timestamp": "2026-11-02T10:00:11.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_started",
+   "agent": "reviewer",
+   "ticket_id": "ticket-101",
+   "data": {
+    "round": 1
+   },
+   "timestamp": "2026-11-02T10:00:12.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_question",
+   "agent": "reviewer",
+   "ticket_id": "ticket-101",
+   "data": {
+    "question": "On casse l'API ?",
+    "expire_a": "2026-11-02T10:10:00.000Z"
+   },
+   "timestamp": "2026-11-02T10:00:13.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "answer_ack",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "outcome": "deposited"
+   },
+   "timestamp": "2026-11-02T10:00:14.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "answer_ack",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "outcome": "transmitted"
+   },
+   "timestamp": "2026-11-02T10:00:15.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_done",
+   "agent": "reviewer",
+   "ticket_id": "ticket-101",
+   "data": {
+    "content": "ok",
+    "verdict": "APPROVED",
+    "cost_usd": 0.05,
+    "duration_ms": 900
+   },
+   "timestamp": "2026-11-02T10:00:16.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "security_audit_started",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:17.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "security_audit_done",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "verdict": "PASS",
+    "summary": "rien",
+    "issues_count": 0,
+    "reason": ""
+   },
+   "timestamp": "2026-11-02T10:00:18.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "validation_started",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:19.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "validation_done",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "verdict": "APPROVED",
+    "feedback": "bien",
+    "criteria": [
+     {
+      "criterion": "A",
+      "passed": true,
+      "note": "ok"
+     },
+     {
+      "criterion": "B",
+      "passed": false
+     }
+    ]
+   },
+   "timestamp": "2026-11-02T10:00:20.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "provider_fallback",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "role": "validateur",
+    "tente": "ollama",
+    "utilise": "agent_sdk",
+    "modele": "haiku"
+   },
+   "timestamp": "2026-11-02T10:00:21.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "external_wait",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "reason": "ci",
+    "waiting": true,
+    "ticket": "ticket-101",
+    "pr_number": 42
+   },
+   "timestamp": "2026-11-02T10:00:22.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "conflict_resolution",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "phase": "started",
+    "files": [
+     "x.py",
+     "y.py"
+    ],
+    "outcome": null
+   },
+   "timestamp": "2026-11-02T10:00:23.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "pipeline_done",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "approved": true,
+    "rounds": 1,
+    "final_status": "done",
+    "branch": "ticket-101-premier"
+   },
+   "timestamp": "2026-11-02T10:00:24.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "documentation_started",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:25.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "doc_updated",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:26.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "livraison_started",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:27.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "livraison_done",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "pr_number": 42
+   },
+   "timestamp": "2026-11-02T10:00:28.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "ci_merge_done",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {
+    "merged": true,
+    "arret": null
+   },
+   "timestamp": "2026-11-02T10:00:29.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "run_closed",
+   "agent": null,
+   "ticket_id": "ticket-101",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:30.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "queue_progress",
+   "agent": null,
+   "ticket_id": "ticket-102",
+   "data": {
+    "index": 2,
+    "total": 2
+   },
+   "timestamp": "2026-11-02T10:00:31.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_started",
+   "agent": "codeur",
+   "ticket_id": "ticket-102",
+   "data": {
+    "round": 1
+   },
+   "timestamp": "2026-11-02T10:00:32.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "agent_token",
+   "agent": "codeur",
+   "ticket_id": "ticket-102",
+   "data": {
+    "token": "Salut"
+   },
+   "timestamp": "2026-11-02T10:00:33.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "conflict_resolution",
+   "agent": null,
+   "ticket_id": "ticket-102",
+   "data": {
+    "phase": "ended",
+    "files": [],
+    "outcome": "resolved"
+   },
+   "timestamp": "2026-11-02T10:00:34.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "external_wait",
+   "agent": null,
+   "ticket_id": "ticket-102",
+   "data": {
+    "reason": "ci",
+    "waiting": false,
+    "ticket": "ticket-102",
+    "pr_number": null
+   },
+   "timestamp": "2026-11-02T10:00:35.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "documentation_failed",
+   "agent": null,
+   "ticket_id": "ticket-102",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:36.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "error",
+   "agent": null,
+   "ticket_id": "ticket-102",
+   "data": {
+    "message": "panne"
+   },
+   "timestamp": "2026-11-02T10:00:37.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  },
+  {
+   "type": "unknown_type",
+   "agent": null,
+   "ticket_id": "ticket-102",
+   "data": {},
+   "timestamp": "2026-11-02T10:00:38.000Z",
+   "run_id": "r1",
+   "project_id": "demo"
+  }
+ ],
+ "etatApresLePremierTicket": {
+  "status": "done",
+  "ticketId": "ticket-101",
+  "ticketTitre": "Premier ticket",
+  "events": [
+   {
+    "type": "quota_updated",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "utilization": 0.4,
+     "resets_at": "2026-11-02T15:00:00.000Z"
+    },
+    "timestamp": "2026-11-02T10:00:00.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "queue_progress",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "index": 1,
+     "total": 2
+    },
+    "timestamp": "2026-11-02T10:00:01.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "ticket_status_changed",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "ticket_titre": "Premier ticket"
+    },
+    "timestamp": "2026-11-02T10:00:02.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "branch_created",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "branch": "ticket-101-premier"
+    },
+    "timestamp": "2026-11-02T10:00:03.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "round": 1,
+     "max_rounds": 3
+    },
+    "timestamp": "2026-11-02T10:00:04.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_tool_use",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "tool": "Edit",
+     "input": {
+      "file_path": "a.ts"
+     }
+    },
+    "timestamp": "2026-11-02T10:00:08.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_done",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "content": "fait",
+     "cost_usd": 0.12,
+     "duration_ms": 1500
+    },
+    "timestamp": "2026-11-02T10:00:09.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "test_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:10.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "test_result",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "passed": false,
+     "output_summary": "1 failed",
+     "errors": [
+      "boom",
+      3,
+      "bang"
+     ]
+    },
+    "timestamp": "2026-11-02T10:00:11.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "round": 1
+    },
+    "timestamp": "2026-11-02T10:00:12.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_question",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "question": "On casse l'API ?",
+     "expire_a": "2026-11-02T10:10:00.000Z"
+    },
+    "timestamp": "2026-11-02T10:00:13.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "answer_ack",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "outcome": "deposited"
+    },
+    "timestamp": "2026-11-02T10:00:14.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "answer_ack",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "outcome": "transmitted"
+    },
+    "timestamp": "2026-11-02T10:00:15.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_done",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "content": "ok",
+     "verdict": "APPROVED",
+     "cost_usd": 0.05,
+     "duration_ms": 900
+    },
+    "timestamp": "2026-11-02T10:00:16.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "security_audit_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:17.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "security_audit_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "verdict": "PASS",
+     "summary": "rien",
+     "issues_count": 0,
+     "reason": ""
+    },
+    "timestamp": "2026-11-02T10:00:18.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "validation_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:19.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "validation_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "verdict": "APPROVED",
+     "feedback": "bien",
+     "criteria": [
+      {
+       "criterion": "A",
+       "passed": true,
+       "note": "ok"
+      },
+      {
+       "criterion": "B",
+       "passed": false
+      }
+     ]
+    },
+    "timestamp": "2026-11-02T10:00:20.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "provider_fallback",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "role": "validateur",
+     "tente": "ollama",
+     "utilise": "agent_sdk",
+     "modele": "haiku"
+    },
+    "timestamp": "2026-11-02T10:00:21.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "external_wait",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "reason": "ci",
+     "waiting": true,
+     "ticket": "ticket-101",
+     "pr_number": 42
+    },
+    "timestamp": "2026-11-02T10:00:22.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "conflict_resolution",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "phase": "started",
+     "files": [
+      "x.py",
+      "y.py"
+     ],
+     "outcome": null
+    },
+    "timestamp": "2026-11-02T10:00:23.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "pipeline_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "approved": true,
+     "rounds": 1,
+     "final_status": "done",
+     "branch": "ticket-101-premier"
+    },
+    "timestamp": "2026-11-02T10:00:24.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "documentation_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:25.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "doc_updated",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:26.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "livraison_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:27.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "livraison_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "pr_number": 42
+    },
+    "timestamp": "2026-11-02T10:00:28.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "ci_merge_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "merged": true,
+     "arret": null
+    },
+    "timestamp": "2026-11-02T10:00:29.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "run_closed",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:30.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   }
+  ],
+  "ticketEvents": [
+   {
+    "type": "queue_progress",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "index": 1,
+     "total": 2
+    },
+    "timestamp": "2026-11-02T10:00:01.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "ticket_status_changed",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "ticket_titre": "Premier ticket"
+    },
+    "timestamp": "2026-11-02T10:00:02.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "branch_created",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "branch": "ticket-101-premier"
+    },
+    "timestamp": "2026-11-02T10:00:03.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "round": 1,
+     "max_rounds": 3
+    },
+    "timestamp": "2026-11-02T10:00:04.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_tool_use",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "tool": "Edit",
+     "input": {
+      "file_path": "a.ts"
+     }
+    },
+    "timestamp": "2026-11-02T10:00:08.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_done",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "content": "fait",
+     "cost_usd": 0.12,
+     "duration_ms": 1500
+    },
+    "timestamp": "2026-11-02T10:00:09.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "test_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:10.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "test_result",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "passed": false,
+     "output_summary": "1 failed",
+     "errors": [
+      "boom",
+      3,
+      "bang"
+     ]
+    },
+    "timestamp": "2026-11-02T10:00:11.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "round": 1
+    },
+    "timestamp": "2026-11-02T10:00:12.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_question",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "question": "On casse l'API ?",
+     "expire_a": "2026-11-02T10:10:00.000Z"
+    },
+    "timestamp": "2026-11-02T10:00:13.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "answer_ack",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "outcome": "deposited"
+    },
+    "timestamp": "2026-11-02T10:00:14.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "answer_ack",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "outcome": "transmitted"
+    },
+    "timestamp": "2026-11-02T10:00:15.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_done",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "content": "ok",
+     "verdict": "APPROVED",
+     "cost_usd": 0.05,
+     "duration_ms": 900
+    },
+    "timestamp": "2026-11-02T10:00:16.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "security_audit_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:17.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "security_audit_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "verdict": "PASS",
+     "summary": "rien",
+     "issues_count": 0,
+     "reason": ""
+    },
+    "timestamp": "2026-11-02T10:00:18.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "validation_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:19.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "validation_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "verdict": "APPROVED",
+     "feedback": "bien",
+     "criteria": [
+      {
+       "criterion": "A",
+       "passed": true,
+       "note": "ok"
+      },
+      {
+       "criterion": "B",
+       "passed": false
+      }
+     ]
+    },
+    "timestamp": "2026-11-02T10:00:20.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "provider_fallback",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "role": "validateur",
+     "tente": "ollama",
+     "utilise": "agent_sdk",
+     "modele": "haiku"
+    },
+    "timestamp": "2026-11-02T10:00:21.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "external_wait",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "reason": "ci",
+     "waiting": true,
+     "ticket": "ticket-101",
+     "pr_number": 42
+    },
+    "timestamp": "2026-11-02T10:00:22.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "conflict_resolution",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "phase": "started",
+     "files": [
+      "x.py",
+      "y.py"
+     ],
+     "outcome": null
+    },
+    "timestamp": "2026-11-02T10:00:23.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "pipeline_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "approved": true,
+     "rounds": 1,
+     "final_status": "done",
+     "branch": "ticket-101-premier"
+    },
+    "timestamp": "2026-11-02T10:00:24.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "documentation_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:25.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "doc_updated",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:26.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "livraison_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:27.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "livraison_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "pr_number": 42
+    },
+    "timestamp": "2026-11-02T10:00:28.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "ci_merge_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "merged": true,
+     "arret": null
+    },
+    "timestamp": "2026-11-02T10:00:29.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "run_closed",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:30.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   }
+  ],
+  "currentAgent": null,
+  "currentRound": 1,
+  "currentTokens": "",
+  "lastResult": {
+   "ticket_id": "ticket-101",
+   "final_status": "done",
+   "rounds": 1,
+   "approved": true,
+   "branch": "ticket-101-premier"
+  },
+  "errorMessage": null,
+  "etape": null,
+  "etapesEnCours": [],
+  "quota": {
+   "utilization": 0.4,
+   "resets_at": "2026-11-02T15:00:00.000Z"
+  },
+  "pendingQuestion": null,
+  "questionExpireA": null,
+  "queue": {
+   "index": 1,
+   "total": 2
+  },
+  "branch": "ticket-101-premier",
+  "maxRounds": 3,
+  "coutUsd": 0.16999999999999998,
+  "appels": 2,
+  "outils": 0,
+  "entries": [
+   {
+    "genre": "agent",
+    "id": "codeur-0",
+    "agent": "codeur",
+    "round": 1,
+    "tokens": "Bonjour",
+    "content": "fait",
+    "isDone": true,
+    "duration_ms": 1500
+   },
+   {
+    "genre": "testeur",
+    "id": "testeur-1",
+    "round": 1,
+    "passed": false,
+    "output_summary": "1 failed",
+    "errors": [
+     "boom",
+     "bang"
+    ],
+    "isDone": true
+   },
+   {
+    "genre": "agent",
+    "id": "reviewer-2",
+    "agent": "reviewer",
+    "round": 1,
+    "tokens": "",
+    "content": "ok",
+    "isDone": true,
+    "duration_ms": 900,
+    "verdict": "APPROVED"
+   },
+   {
+    "genre": "securite",
+    "id": "securite-3",
+    "round": 1,
+    "verdict": "PASS",
+    "summary": "rien",
+    "issues_count": 0,
+    "reason": "",
+    "isDone": true
+   },
+   {
+    "genre": "validateur",
+    "id": "validateur-4",
+    "round": 1,
+    "verdict": "APPROVED",
+    "feedback": "bien",
+    "criteria": [
+     {
+      "criterion": "A",
+      "passed": true,
+      "note": "ok"
+     },
+     {
+      "criterion": "B",
+      "passed": false,
+      "note": ""
+     }
+    ],
+    "isDone": true
+   }
+  ],
+  "runClosed": true,
+  "livraisonPrNumber": 42,
+  "ciMerge": {
+   "merged": true,
+   "arret": null
+  },
+  "answerAck": null,
+  "dernierEvenementA": "2026-11-02T10:00:30.000Z",
+  "attenteExterieure": {
+   "raison": "ci",
+   "pr": 42
+  },
+  "conflitEnCours": [
+   "x.py",
+   "y.py"
+  ],
+  "repli": {
+   "role": "validateur",
+   "tente": "ollama",
+   "utilise": "agent_sdk",
+   "modele": "haiku",
+   "a": 1793613621000
+  },
+  "dernierOutil": {
+   "agent": "codeur",
+   "outil": "Edit",
+   "entree": {
+    "file_path": "a.ts"
+   },
+   "horodatage": "2026-11-02T10:00:08.000Z"
+  }
+ },
+ "etatFinal": {
+  "status": "error",
+  "ticketId": "ticket-102",
+  "ticketTitre": null,
+  "events": [
+   {
+    "type": "quota_updated",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "utilization": 0.4,
+     "resets_at": "2026-11-02T15:00:00.000Z"
+    },
+    "timestamp": "2026-11-02T10:00:00.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "queue_progress",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "index": 1,
+     "total": 2
+    },
+    "timestamp": "2026-11-02T10:00:01.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "ticket_status_changed",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "ticket_titre": "Premier ticket"
+    },
+    "timestamp": "2026-11-02T10:00:02.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "branch_created",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "branch": "ticket-101-premier"
+    },
+    "timestamp": "2026-11-02T10:00:03.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "round": 1,
+     "max_rounds": 3
+    },
+    "timestamp": "2026-11-02T10:00:04.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_tool_use",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "tool": "Edit",
+     "input": {
+      "file_path": "a.ts"
+     }
+    },
+    "timestamp": "2026-11-02T10:00:08.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_done",
+    "agent": "codeur",
+    "ticket_id": "ticket-101",
+    "data": {
+     "content": "fait",
+     "cost_usd": 0.12,
+     "duration_ms": 1500
+    },
+    "timestamp": "2026-11-02T10:00:09.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "test_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:10.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "test_result",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "passed": false,
+     "output_summary": "1 failed",
+     "errors": [
+      "boom",
+      3,
+      "bang"
+     ]
+    },
+    "timestamp": "2026-11-02T10:00:11.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "round": 1
+    },
+    "timestamp": "2026-11-02T10:00:12.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_question",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "question": "On casse l'API ?",
+     "expire_a": "2026-11-02T10:10:00.000Z"
+    },
+    "timestamp": "2026-11-02T10:00:13.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "answer_ack",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "outcome": "deposited"
+    },
+    "timestamp": "2026-11-02T10:00:14.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "answer_ack",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "outcome": "transmitted"
+    },
+    "timestamp": "2026-11-02T10:00:15.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_done",
+    "agent": "reviewer",
+    "ticket_id": "ticket-101",
+    "data": {
+     "content": "ok",
+     "verdict": "APPROVED",
+     "cost_usd": 0.05,
+     "duration_ms": 900
+    },
+    "timestamp": "2026-11-02T10:00:16.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "security_audit_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:17.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "security_audit_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "verdict": "PASS",
+     "summary": "rien",
+     "issues_count": 0,
+     "reason": ""
+    },
+    "timestamp": "2026-11-02T10:00:18.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "validation_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:19.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "validation_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "verdict": "APPROVED",
+     "feedback": "bien",
+     "criteria": [
+      {
+       "criterion": "A",
+       "passed": true,
+       "note": "ok"
+      },
+      {
+       "criterion": "B",
+       "passed": false
+      }
+     ]
+    },
+    "timestamp": "2026-11-02T10:00:20.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "provider_fallback",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "role": "validateur",
+     "tente": "ollama",
+     "utilise": "agent_sdk",
+     "modele": "haiku"
+    },
+    "timestamp": "2026-11-02T10:00:21.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "external_wait",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "reason": "ci",
+     "waiting": true,
+     "ticket": "ticket-101",
+     "pr_number": 42
+    },
+    "timestamp": "2026-11-02T10:00:22.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "conflict_resolution",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "phase": "started",
+     "files": [
+      "x.py",
+      "y.py"
+     ],
+     "outcome": null
+    },
+    "timestamp": "2026-11-02T10:00:23.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "pipeline_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "approved": true,
+     "rounds": 1,
+     "final_status": "done",
+     "branch": "ticket-101-premier"
+    },
+    "timestamp": "2026-11-02T10:00:24.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "documentation_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:25.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "doc_updated",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:26.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "livraison_started",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:27.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "livraison_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "pr_number": 42
+    },
+    "timestamp": "2026-11-02T10:00:28.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "ci_merge_done",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {
+     "merged": true,
+     "arret": null
+    },
+    "timestamp": "2026-11-02T10:00:29.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "run_closed",
+    "agent": null,
+    "ticket_id": "ticket-101",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:30.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "queue_progress",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "index": 2,
+     "total": 2
+    },
+    "timestamp": "2026-11-02T10:00:31.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "codeur",
+    "ticket_id": "ticket-102",
+    "data": {
+     "round": 1
+    },
+    "timestamp": "2026-11-02T10:00:32.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "conflict_resolution",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "phase": "ended",
+     "files": [],
+     "outcome": "resolved"
+    },
+    "timestamp": "2026-11-02T10:00:34.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "external_wait",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "reason": "ci",
+     "waiting": false,
+     "ticket": "ticket-102",
+     "pr_number": null
+    },
+    "timestamp": "2026-11-02T10:00:35.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "documentation_failed",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:36.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "error",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "message": "panne"
+    },
+    "timestamp": "2026-11-02T10:00:37.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "unknown_type",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:38.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   }
+  ],
+  "ticketEvents": [
+   {
+    "type": "queue_progress",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "index": 2,
+     "total": 2
+    },
+    "timestamp": "2026-11-02T10:00:31.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "agent_started",
+    "agent": "codeur",
+    "ticket_id": "ticket-102",
+    "data": {
+     "round": 1
+    },
+    "timestamp": "2026-11-02T10:00:32.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "conflict_resolution",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "phase": "ended",
+     "files": [],
+     "outcome": "resolved"
+    },
+    "timestamp": "2026-11-02T10:00:34.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "external_wait",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "reason": "ci",
+     "waiting": false,
+     "ticket": "ticket-102",
+     "pr_number": null
+    },
+    "timestamp": "2026-11-02T10:00:35.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "documentation_failed",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:36.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "error",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {
+     "message": "panne"
+    },
+    "timestamp": "2026-11-02T10:00:37.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   },
+   {
+    "type": "unknown_type",
+    "agent": null,
+    "ticket_id": "ticket-102",
+    "data": {},
+    "timestamp": "2026-11-02T10:00:38.000Z",
+    "run_id": "r1",
+    "project_id": "demo"
+   }
+  ],
+  "currentAgent": "codeur",
+  "currentRound": 1,
+  "currentTokens": "Salut",
+  "lastResult": null,
+  "errorMessage": "panne",
+  "etape": "production",
+  "etapesEnCours": [
+   "production"
+  ],
+  "quota": {
+   "utilization": 0.4,
+   "resets_at": "2026-11-02T15:00:00.000Z"
+  },
+  "pendingQuestion": null,
+  "questionExpireA": null,
+  "queue": {
+   "index": 2,
+   "total": 2
+  },
+  "branch": "ticket-101-premier",
+  "maxRounds": 3,
+  "coutUsd": 0,
+  "appels": 0,
+  "outils": 0,
+  "entries": [
+   {
+    "genre": "agent",
+    "id": "codeur-0",
+    "agent": "codeur",
+    "round": 1,
+    "tokens": "Salut",
+    "content": "",
+    "isDone": false
+   }
+  ],
+  "runClosed": false,
+  "livraisonPrNumber": null,
+  "ciMerge": null,
+  "answerAck": null,
+  "dernierEvenementA": "2026-11-02T10:00:38.000Z",
+  "attenteExterieure": null,
+  "conflitEnCours": null,
+  "repli": {
+   "role": "validateur",
+   "tente": "ollama",
+   "utilise": "agent_sdk",
+   "modele": "haiku",
+   "a": 1793613621000
+  },
+  "dernierOutil": null
+ }
+}

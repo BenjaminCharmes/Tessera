@@ -219,21 +219,18 @@ describe("server rooms — one per project (ticket-710)", () => {
   });
 });
 
-describe("the pipeline run shown in the room (ticket-712)", () => {
-  it("shows the ticket and the agent at work on the project's room, none without a run", () => {
+describe("the pipeline run shown in the room (tickets 712 and 729)", () => {
+  it("names the ticket on the plate but draws no pipeline agent: they work in the Bureau", () => {
     poserEtat({ ticketId: "ticket-059", currentAgent: "codeur" });
     const { unmount } = rendre([app({})], undefined, [runOuvert()]);
 
     const salle = screen.getByRole("article", { name: /Alpha/ });
-    const poste = salle.querySelector("[data-poste-de-file]") as HTMLElement;
-    expect(within(poste).getByText("ticket-059")).toBeInTheDocument();
-    expect(within(poste).getByText("Codeur")).toBeInTheDocument();
-    expect(poste.querySelector("[data-sprite='agent-de-produit']")).toHaveAttribute("data-etat", "actif");
     expect(salle.querySelector("[data-badge-de-file]")).toHaveTextContent("ticket-059");
+    expect(salle.querySelector("[data-poste-de-file]")).toBeNull();
+    expect(salle.querySelector("[data-sprite='agent-de-produit']")).toBeNull();
     unmount();
 
     rendre([app({})]);
-    expect(document.querySelector("[data-poste-de-file]")).toBeNull();
     expect(document.querySelector("[data-badge-de-file]")).toBeNull();
   });
 
@@ -252,20 +249,18 @@ describe("the pipeline run shown in the room (ticket-712)", () => {
   it("ignores the run of another project and a run already closed", () => {
     poserEtat({ ticketId: "ticket-059", currentAgent: "codeur" });
     const { unmount } = rendre([app({})], undefined, [runOuvert({ project_id: "beta" })]);
-    expect(document.querySelector("[data-poste-de-file]")).toBeNull();
+    expect(document.querySelector("[data-badge-de-file]")).toBeNull();
     unmount();
 
     poserEtat({ ticketId: "ticket-059", currentAgent: null, runClosed: true });
     rendre([app({})], undefined, [runOuvert()]);
-    expect(document.querySelector("[data-poste-de-file]")).toBeNull();
+    expect(document.querySelector("[data-badge-de-file]")).toBeNull();
   });
 
-  it("falls back on the live run's ticket while the run store is empty, the desk waiting", () => {
+  it("falls back on the live run's ticket while the run store is empty", () => {
     rendre([app({})], undefined, [runOuvert({ ticket_id: "ticket-061" })]);
 
     expect(document.querySelector("[data-badge-de-file]")).toHaveTextContent("ticket-061");
-    const poste = document.querySelector("[data-poste-de-file]") as HTMLElement;
-    expect(within(poste).getByText("En attente")).toBeInTheDocument();
   });
 });
 

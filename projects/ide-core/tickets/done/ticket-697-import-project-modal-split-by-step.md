@@ -1,12 +1,14 @@
 ---
-id: ticket-697
-title: "Import project modal split by step"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-682]
 created: 2026-10-29
+depends_on:
+- ticket-682
+id: ticket-697
+pr_number: 821
+priority: low
+status: done
+title: Import project modal split by step
+type: refactor
 ---
 
 # ticket-697 — `ImportProjectModal` découpé par étape

@@ -10,13 +10,7 @@ export const PLAFOND_GENERAL = 300;
 // chemin relatif à src -> taille maximale. Le cliquet ne remonte pas : un
 // découpage baisse l'entrée (ou la retire sous 300 lignes), jamais l'inverse.
 export const PLAFONDS: Record<string, number> = {
-  "components/FilDuRun/index.tsx": 353,
-  "components/Sidebar/ImportProjectModal.tsx": 414,
-  "components/Sidebar/TicketCard.tsx": 314,
-  "components/Sidebar/TicketList.tsx": 309,
-  "hooks/streamState.ts": 627,
   "hooks/useChat.ts": 336,
-  "hooks/useCockpit.ts": 532,
   "hooks/useSupervision.ts": 385,
 };
 
