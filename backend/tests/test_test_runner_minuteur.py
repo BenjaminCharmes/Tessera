@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from tessera.services import pipeline_stages
+from tessera.services import pipeline_testeur
 from tessera.services.detail_du_delai import ligne_de_delai
 from tessera.services.groupe_d_etape import GroupeDEtape
 from tessera.services.minuteur_d_etape import MARGE_S
@@ -116,7 +116,7 @@ class TestJournalDuDelai:
         orch, run = MagicMock(), MagicMock()
         run.ticket_id = "ticket-000"
 
-        pipeline_stages._noter_le_delai(orch, run, result)
+        pipeline_testeur._noter_le_delai(orch, run, result)
 
         ligne = orch._log.call_args.args[0]
         trouve = re.search(r"durée réelle (\d+) s", ligne)

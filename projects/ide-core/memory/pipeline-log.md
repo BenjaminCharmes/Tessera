@@ -6872,6 +6872,25 @@ Le diff ajoute :
 - 2026-10-31 04:04:27 UTC — [ticket-687] validateur: APPROVED — Refactoring completed successfully: orchestrator assembly moved from `routers/or (335061ms)
 - 2026-10-31 04:04:27 UTC — [ticket-687] APPROVED après 1 tour(s)
 - 2026-10-31 04:06:57 UTC — [ticket-687] documentation: 0 fichier(s) (144328ms)
+- 2026-10-31 04:15:28 UTC — [ide-core] ticket-687 PR #809 confiée au CIWatcher
+- 2026-10-31 04:15:32 UTC — [ticket-688] branche ticket-688-pipeline-stages-split-by-stage
+- 2026-10-31 04:15:33 UTC — [ticket-688] tour 1 — codeur démarré
+- 2026-10-31 04:21:02 UTC — [ticket-688] tour 1 — codeur terminé (328389ms)
+- 2026-10-31 04:21:10 UTC — [ide-core] ticket-687 PR #809 mergée (CI verte)
+- 2026-10-31 04:29:54 UTC — [ticket-688] testeur: OK (exit 0)
+- 2026-10-31 04:31:15 UTC — [ticket-688] securite: PASS — Refactorisation de `pipeline_stages.py` en 4 modules spécialisés (branche, contr (81218ms)
+- 2026-10-31 04:31:15 UTC — [ticket-688] tour 1 — reviewer démarré
+- 2026-10-31 04:31:40 UTC — [ticket-688] tour 1 — reviewer terminé (25031ms)
+- 2026-10-31 04:36:16 UTC — [ticket-688] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 04:37:22 UTC — [ticket-688] validateur: fichiers cités joints : aucun ; absents : services/pipeline_stages.py
+- 2026-10-31 04:37:22 UTC — [ticket-688] validateur: APPROVED — Le découpage de `pipeline_stages.py` est complet : 4 nouveaux modules créés, tou (366797ms)
+- 2026-10-31 04:37:22 UTC — [ticket-688] APPROVED après 1 tour(s)
+- 2026-10-31 04:41:20 UTC — [ticket-688] documentation: 0 fichier(s) (232967ms) — après tour de correction
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: rebase sur develop (23422ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: conflit résolu : backend/tests/test_run_worktree.py (0ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: tests relancés après rebase : verts (OK (exit 0)) (493625ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: PR #810 ouverte (5281ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: arrêt — Conflit résolu sur backend/tests/test_run_worktree.py : la PR #810 est ouverte, à relire. Une résolu
 - 2026-10-31 04:50:18 UTC — [ide-core] ticket-688 PR #810 non surveillée (livraison arrêtée)
 - 2026-10-31 04:50:22 UTC — [ticket-689] branche ticket-689-projects-router-split-by-resource
 - 2026-10-31 04:50:23 UTC — [ticket-689] tour 1 — codeur démarré

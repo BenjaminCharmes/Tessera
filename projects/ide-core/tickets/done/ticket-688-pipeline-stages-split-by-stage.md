@@ -1,12 +1,13 @@
 ---
-id: ticket-688
-title: "Pipeline stages split by stage"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-688
+pr_number: 810
+priority: low
+status: done
+title: Pipeline stages split by stage
+type: refactor
 ---
 
 # ticket-688 — `pipeline_stages.py` découpé par étape

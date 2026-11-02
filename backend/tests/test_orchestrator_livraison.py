@@ -1614,13 +1614,13 @@ def _run_de_depart() -> Any:
 async def test_la_base_est_realignee_avant_la_creation_de_la_branche(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
 
-    refused = await stages.create_branch(orch, _run_de_depart())
+    refused = await pipeline_branche.create_branch(orch, _run_de_depart())
 
     assert refused is None
     assert ordre == ["sync:develop", "create_branch"]
@@ -1629,7 +1629,7 @@ async def test_la_base_est_realignee_avant_la_creation_de_la_branche(
 async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
@@ -1638,7 +1638,7 @@ async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
     run = _run_de_depart()
 
-    refused = await stages.create_branch(orch, run)
+    refused = await pipeline_branche.create_branch(orch, run)
 
     assert refused is None
     assert run.branch == "ticket-001-slug"
@@ -1649,29 +1649,29 @@ async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
 async def test_aucun_realignement_sans_espace_git_ni_branche_de_base(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
     sans_base = _orchestrateur_de_depart(tmp_path, git_ws, None)
 
-    assert await stages.create_branch(sans_base, _run_de_depart()) is None
+    assert await pipeline_branche.create_branch(sans_base, _run_de_depart()) is None
     git_ws.sync_base_depuis_distant.assert_not_called()
 
     sans_espace = _orchestrateur_de_depart(tmp_path, None, "develop")
-    assert await stages.create_branch(sans_espace, _run_de_depart()) is None
+    assert await pipeline_branche.create_branch(sans_espace, _run_de_depart()) is None
 
 
 async def test_l_arbre_reste_sur_une_branche_de_ticket_revient_sur_la_base_avant_le_realignement(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre, branche_courante="ticket-000-ancien")
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
 
-    assert await stages.create_branch(orch, _run_de_depart()) is None
+    assert await pipeline_branche.create_branch(orch, _run_de_depart()) is None
 
     assert ordre == ["checkout:develop", "sync:develop", "create_branch"]
 
@@ -1679,7 +1679,7 @@ async def test_l_arbre_reste_sur_une_branche_de_ticket_revient_sur_la_base_avant
 async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
     from tessera.services.git_workspace import GitCommandError
 
     ordre: list[str] = []
@@ -1690,7 +1690,7 @@ async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
     run = _run_de_depart()
 
-    assert await stages.create_branch(orch, run) is None
+    assert await pipeline_branche.create_branch(orch, run) is None
 
     git_ws.sync_base_depuis_distant.assert_not_called()
     assert run.branch == "ticket-001-slug"
@@ -1701,12 +1701,12 @@ async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
 async def test_le_depart_sur_la_base_ne_commite_pas_la_tenue_de_livres(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     git_ws = _espace_git_double([], branche_courante="develop")
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
 
-    assert await stages.create_branch(orch, _run_de_depart()) is None
+    assert await pipeline_branche.create_branch(orch, _run_de_depart()) is None
 
     git_ws.commit_bookkeeping.assert_not_called()
 

@@ -1,6 +1,6 @@
 """How a pipeline run ends — ticket-046.
 
-Split from `pipeline_stages.py`: the stages describe what the agents do, these
+Split from the stage modules (`pipeline_*.py`): the stages describe what the agents do, these
 functions describe how a run terminates and what it leaves behind in git. They
 are the part where a mistake writes something wrong into the user's repository,
 so they are worth reading on their own.

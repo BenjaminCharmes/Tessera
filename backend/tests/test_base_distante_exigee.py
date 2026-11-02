@@ -139,7 +139,7 @@ async def test_the_branch_stage_blocks_a_dependent_ticket_without_a_readable_rem
     depot: tuple[Path, str],
 ) -> None:
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
     from tessera.services.pipeline_events import OrchestratorEvent
     from tessera.services.pipeline_run import PipelineRun
 
@@ -157,7 +157,7 @@ async def test_the_branch_stage_blocks_a_dependent_ticket_without_a_readable_rem
     run = PipelineRun(project_id="demineur", ticket=ticket, on_event=_on_event)
     orch = _Orch(_service(local), local)
 
-    result = await stages.create_branch(orch, run)  # type: ignore[arg-type]
+    result = await pipeline_branche.create_branch(orch, run)  # type: ignore[arg-type]
 
     assert result is not None
     assert result.final_status is TicketStatus.blocked

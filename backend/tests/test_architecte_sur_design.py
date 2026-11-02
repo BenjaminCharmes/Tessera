@@ -82,12 +82,12 @@ async def _lance(
     git.current_diff.return_value = "diff --git a/x b/x\n+x\n"
     git.commit_all.return_value = "abc"
 
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_controles
 
     async def _revue(orch: Any, run: Any, contexte: Any) -> tuple[bool, str, str]:
         return True, "", "APPROVED"
 
-    monkeypatch.setattr(stages, "run_review", _revue)
+    monkeypatch.setattr(pipeline_controles, "run_review", _revue)
 
     orch = Orchestrator(
         runner=runner,
