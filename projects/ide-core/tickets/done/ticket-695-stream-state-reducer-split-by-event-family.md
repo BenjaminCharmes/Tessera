@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-695
+pr_number: 819
 priority: low
 status: done
 title: Stream state reducer split by event family
