@@ -1,12 +1,13 @@
 ---
-id: ticket-692
-title: "Documentation module split into edits, selection and service"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-692
+pr_number: 831
+priority: low
+status: done
+title: Documentation module split into edits, selection and service
+type: refactor
 ---
 
 # ticket-692 — `documentation.py` : éditions, sélection et service à part
