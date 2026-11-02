@@ -7094,3 +7094,15 @@ Le diff ajoute :
 - 2026-11-02 15:02:10 UTC — [ticket-692] validateur: APPROVED — Le refactoring a extrait avec succès les fonctions pures d'édition et de sélecti (58110ms)
 - 2026-11-02 15:02:10 UTC — [ticket-692] APPROVED après 1 tour(s)
 - 2026-11-02 15:04:47 UTC — [ticket-692] documentation: 0 fichier(s) (151734ms) — après tour de correction
+- 2026-11-02 15:16:00 UTC — [ide-core] ticket-692 PR #831 confiée au CIWatcher
+- 2026-11-02 15:16:04 UTC — [ticket-699] branche ticket-699-forge-parsing-leaves-the-github-workflow-module
+- 2026-11-02 15:16:06 UTC — [ticket-699] tour 1 — codeur démarré
+- 2026-11-02 15:17:43 UTC — [ticket-699] tour 1 — codeur terminé (97125ms)
+- 2026-11-02 15:21:04 UTC — [ide-core] ticket-692 PR #831 mergée (CI verte)
+- 2026-11-02 15:30:25 UTC — [ticket-699] testeur: OK (exit 0)
+- 2026-11-02 15:33:47 UTC — [ticket-699] securite: PASS — Refactoring sûr : déplacement de fonctions pures de parsing d'URLs de `github_wo (201639ms)
+- 2026-11-02 15:33:47 UTC — [ticket-699] tour 1 — reviewer démarré
+- 2026-11-02 15:34:13 UTC — [ticket-699] tour 1 — reviewer terminé (25250ms)
+- 2026-11-02 15:36:54 UTC — [ticket-699] validateur: fichiers cités joints : project_loader.py, services/github_workflow.py (tronqué)
+- 2026-11-02 15:36:54 UTC — [ticket-699] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été refactoré pour dép (187296ms)
+- 2026-11-02 15:36:54 UTC — [ticket-699] APPROVED après 1 tour(s)
