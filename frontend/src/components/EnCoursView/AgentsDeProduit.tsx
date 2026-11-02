@@ -11,7 +11,7 @@ import AvecInfobulle from "../BureauView/AvecInfobulle";
 import { formaterHeure } from "./format";
 import { POSTES_VIDES, capaciteDeLaRangee, rangee } from "./rangee";
 
-/** La largeur d'un poste à l'échelle un (le `<svg>` fait 70 px), et l'écart entre deux. */
+/** La largeur d'un poste à l'échelle un (le sprite fait 70 px), et l'écart entre deux. */
 const POSTE_PX = 74;
 const ECART_PX = 24;
 
