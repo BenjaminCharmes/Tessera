@@ -11,6 +11,17 @@ const STATUS_COLOR: Record<string, string> = {
   "in-review": "bg-amber-500",
 };
 
+/** Le statut d'un run, dit en français ; un statut inconnu garde son identifiant (ticket-735). */
+const STATUT_FR: Record<string, string> = {
+  done: "Faits",
+  blocked: "Bloqués",
+  interrupted: "Interrompus",
+  todo: "À faire",
+  "in-progress": "En cours",
+  "in-review": "En revue",
+  cancelled: "Annulés",
+};
+
 function Figure({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -44,7 +55,7 @@ export default function QualityCard({ quality }: { quality: RunQuality }) {
             key={s.status}
             className={STATUS_COLOR[s.status] ?? "bg-zinc-600"}
             style={{ width: `${(s.count / total) * 100}%` }}
-            title={`${s.status} · ${s.count}`}
+            title={`${STATUT_FR[s.status] ?? s.status} · ${s.count}`}
           />
         ))}
       </div>
@@ -55,7 +66,7 @@ export default function QualityCard({ quality }: { quality: RunQuality }) {
               className={`h-2 w-2 shrink-0 rounded-full ${STATUS_COLOR[s.status] ?? "bg-zinc-600"}`}
               aria-hidden="true"
             />
-            <span className="flex-1 font-mono text-zinc-200">{s.status}</span>
+            <span className="flex-1 text-zinc-200">{STATUT_FR[s.status] ?? s.status}</span>
             <span className="text-zinc-400">
               {s.count} · {((s.count / total) * 100).toFixed(0)} %
             </span>
