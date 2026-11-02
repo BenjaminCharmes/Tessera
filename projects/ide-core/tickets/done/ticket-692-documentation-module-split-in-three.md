@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-692
+pr_number: 831
 priority: low
 status: done
 title: Documentation module split into edits, selection and service
