@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-675
 id: ticket-691
+pr_number: 829
 priority: low
 status: done
 title: Project loader split into reading, writing and text extraction
