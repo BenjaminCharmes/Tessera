@@ -65,6 +65,15 @@ describe("StatsView", () => {
     expect(screen.queryByRole("region", { name: "Dépense par projet" })).toBeNull();
   });
 
+  it("keeps the page's shape with skeletons while the figures load (ticket-735)", () => {
+    stats.mockReturnValue(new Promise(() => {}));
+    render(<StatsView projectId={null} days={7} />);
+
+    expect(document.querySelector("[data-squelette='kpi']")).not.toBeNull();
+    expect(document.querySelector("[data-squelette='cartes']")).not.toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent("Chargement…");
+  });
+
   it("calls the api with the days prop it receives", async () => {
     stats.mockResolvedValue(payload());
     render(<StatsView projectId={null} days={90} />);

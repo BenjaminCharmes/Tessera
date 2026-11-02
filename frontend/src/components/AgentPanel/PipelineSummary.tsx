@@ -1,5 +1,6 @@
 import type { PipelineResult } from "../../types/api";
 import { IconCheck, IconCross } from "../../design/icons";
+import { statutDuRun } from "../../lib/libelles";
 
 interface LivraisonData {
   pr_number?: number;
@@ -60,10 +61,10 @@ export default function PipelineSummary({
           <span className="text-zinc-300 font-mono">{result.ticket_id}</span>
         </div>
         <div>
-          Rounds : <span className="text-zinc-300">{result.rounds}</span>
+          Tours : <span className="text-zinc-300">{result.rounds}</span>
         </div>
         <div>
-          Statut : <span className="text-zinc-300">{result.final_status}</span>
+          Statut : <span className="text-zinc-300">{statutDuRun(result.final_status)}</span>
         </div>
         {durationStr && (
           <div>

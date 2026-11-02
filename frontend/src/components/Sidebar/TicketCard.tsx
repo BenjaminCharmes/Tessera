@@ -16,6 +16,7 @@ import {
   STATUS_ETAT,
   STATUS_STYLE,
 } from "./ticketCardTables";
+import { PRIORITE, STATUT_TICKET } from "../../lib/libelles";
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -133,23 +134,23 @@ const TicketCard = memo(function TicketCard({
                 }}
                 className={`text-micro px-1 py-0.5 rounded-sm font-medium border-0 outline-hidden cursor-pointer ${STATUS_STYLE[ticket.status]}`}
               >
-                <option value={ticket.status}>{ticket.status}</option>
+                <option value={ticket.status}>{STATUT_TICKET[ticket.status]}</option>
                 {transitions.map((s) => (
                   <option key={s} value={s}>
-                    {s}
+                    {STATUT_TICKET[s]}
                   </option>
                 ))}
               </select>
             ) : (
               <StatusPill
                 etat={STATUS_ETAT[ticket.status]}
-                libelle={ticket.status}
+                libelle={STATUT_TICKET[ticket.status]}
                 titre={ticket.status === "blocked" && arret ? arret : undefined}
               />
             )}
             <StatusPill
               etat={PRIORITY_ETAT[ticket.priority]}
-              libelle={ticket.priority}
+              libelle={PRIORITE[ticket.priority]}
             />
             {isRunning && runningRound != null && runningRound > 0 && (
               <StatusPill

@@ -43,7 +43,7 @@ describe("PipelineSummary", () => {
     render(<PipelineSummary result={APPROVED} />);
     expect(screen.getByText(/Pipeline terminé/)).toBeTruthy();
     expect(screen.getByText("ticket-001")).toBeTruthy();
-    expect(screen.getByText("done")).toBeTruthy();
+    expect(screen.getByText("Terminé")).toBeTruthy();
   });
 
   it("shows rejected message when not approved", () => {

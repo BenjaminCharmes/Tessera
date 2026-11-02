@@ -165,15 +165,13 @@ beforeEach(() => {
 });
 
 describe("App — panneau Chat", () => {
-  it("choisir Chat affiche ChatPanel dans la zone centrale", async () => {
+  it("choisir Chat sans projet propose d'en choisir un dans la zone centrale (ticket-735)", async () => {
     render(<App />);
 
     await userEvent.click(screen.getByRole("tab", { name: /^Chat$/ }));
 
     const main = screen.getByRole("main");
-    // ChatPanel est chargé en lazy : on attend sa résolution avant l'assertion.
-    const chatPanel = await screen.findByTestId("chat-panel");
-    expect(main).toContainElement(chatPanel);
+    expect(main).toContainElement(await screen.findByRole("heading", { name: "Sur quel projet travailles-tu ?" }));
   });
 
   it("ne rend plus d'onglets Agents et Chat en colonne de droite", () => {

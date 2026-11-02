@@ -96,7 +96,7 @@ export default function KanbanView({
     <div className="h-full flex flex-col bg-zinc-900">
       <div className={`${BAND} border-b border-zinc-700 px-4`}>
         <RegionTitle>
-          Kanban Board
+          Tableau des tickets
         </RegionTitle>
       </div>
       {!!(onToggleQueue ?? onRunQueue ?? onClearQueue) && (

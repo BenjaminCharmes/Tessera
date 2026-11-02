@@ -82,7 +82,7 @@ describe("RunHistory", () => {
 
     await userEvent.click(screen.getByText("ticket-011"));
 
-    expect(screen.getByText("done")).toBeInTheDocument();
+    expect(screen.getByText("Terminé")).toBeInTheDocument();
     expect(screen.getByText(/Approuvé/)).toBeInTheDocument();
   });
 

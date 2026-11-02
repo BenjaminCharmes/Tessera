@@ -20,12 +20,12 @@ interface StatusGroup {
 }
 
 const STATUS_GROUPS: StatusGroup[] = [
-  { status: "todo", label: "TODO", collapsible: true },
-  { status: "in-progress", label: "IN PROGRESS", collapsible: true },
-  { status: "in-review", label: "IN REVIEW", collapsible: true },
-  { status: "blocked", label: "BLOCKED", collapsible: true },
-  { status: "done", label: "DONE", collapsible: true },
-  { status: "cancelled", label: "CANCELLED", collapsible: true },
+  { status: "todo", label: "À faire", collapsible: true },
+  { status: "in-progress", label: "En cours", collapsible: true },
+  { status: "in-review", label: "En revue", collapsible: true },
+  { status: "blocked", label: "Bloqués", collapsible: true },
+  { status: "done", label: "Faits", collapsible: true },
+  { status: "cancelled", label: "Annulés", collapsible: true },
 ];
 
 interface TicketListProps {

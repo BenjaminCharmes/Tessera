@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Ticket, TicketPriority, TicketType } from "../../types/api";
 import { api } from "../../lib/api";
 import Modale from "../../design/ui/Modale";
+import { PRIORITE } from "../../lib/libelles";
 
 interface CreateTicketModalProps {
   projectId: string;
@@ -10,21 +11,18 @@ interface CreateTicketModalProps {
 }
 
 const TYPES: { value: TicketType; label: string }[] = [
-  { value: "feat", label: "feat — nouvelle fonctionnalité" },
-  { value: "fix", label: "fix — correction de bug" },
-  { value: "chore", label: "chore — maintenance / CI" },
-  { value: "docs", label: "docs — documentation" },
-  { value: "refactor", label: "refactor — restructuration sans changement de comportement" },
-  { value: "test", label: "test — ajout ou correction de tests" },
-  { value: "design", label: "design — architecture" },
+  { value: "feat", label: "Fonction — une nouvelle fonctionnalité" },
+  { value: "fix", label: "Correctif — un bug corrigé" },
+  { value: "chore", label: "Entretien — maintenance, CI" },
+  { value: "docs", label: "Docs — documentation" },
+  { value: "refactor", label: "Refonte — restructurer sans changer le comportement" },
+  { value: "test", label: "Tests — ajouter ou corriger des tests" },
+  { value: "design", label: "Conception — architecture" },
 ];
 
-const PRIORITIES: { value: TicketPriority; label: string }[] = [
-  { value: "critical", label: "critical" },
-  { value: "high", label: "high" },
-  { value: "medium", label: "medium" },
-  { value: "low", label: "low" },
-];
+const PRIORITIES: { value: TicketPriority; label: string }[] = (
+  ["critical", "high", "medium", "low"] as const
+).map((value) => ({ value, label: PRIORITE[value] }));
 
 export default function CreateTicketModal({
   projectId,

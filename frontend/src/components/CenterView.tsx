@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import type { useSupervision } from "../hooks/useSupervision";
 import type { useRunActif } from "../hooks/useRunActif";
 import type { SidebarPanel } from "./Sidebar/panels";
+import ChoixDuProjet from "./ChoixDuProjet";
 import type {
   Project,
   ServiceActif,
@@ -100,6 +101,15 @@ interface CenterViewProps {
   /** Réinitialise les filtres mémorisés du projet — ticket-318. */
   onClearFiltres?: () => void;
 }
+
+/** Les vues qui se lisent projet par projet, et comment l'écran de choix les nomme (ticket-735). */
+const VUES_DE_PROJET: Partial<Record<SidebarPanel, string>> = {
+  tickets: "ses tickets",
+  files: "ses fichiers",
+  history: "l'historique de ses runs",
+  agents: "ses agents",
+  chat: "discuter avec son agent",
+};
 
 function FallbackChargement() {
   return (
@@ -249,9 +259,17 @@ export default function CenterView({
     );
   }
 
+  const vueDeProjet = VUES_DE_PROJET[panel];
+  if (project === null && vueDeProjet !== undefined) {
+    content = <ChoixDuProjet vue={vueDeProjet} projets={projets} onSelectProject={onSelectProject} />;
+  }
+
   return (
     <Suspense fallback={<FallbackChargement />}>
-      {content}
+      {/* Une clé par vue : le fondu d'entrée rejoue à chaque changement (ticket-735). */}
+      <div key={panel} className="entree-de-vue h-full min-h-0">
+        {content}
+      </div>
     </Suspense>
   );
 }

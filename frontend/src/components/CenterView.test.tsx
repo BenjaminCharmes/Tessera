@@ -61,7 +61,16 @@ const byStatus = Object.fromEntries(
 const baseProps = {
   panel: "tickets" as const,
   vueCentre: "editor" as const,
-  project: null,
+  project: {
+    id: "p1",
+    name: "Projet",
+    path: "/p1",
+    description: "",
+    active_agents: [],
+    stack: null,
+    raw_claude_md: "",
+    github_remote: null,
+  },
   projets: [],
   ticket: null,
   conversationId: "",
@@ -179,5 +188,12 @@ describe("CenterView", () => {
   it("displays the lazy StatsView when panel is usage", async () => {
     render(<CenterView {...baseProps} panel="usage" />);
     expect(await screen.findByTestId("stats-view")).toBeInTheDocument();
+  });
+});
+
+describe("CenterView — vue de projet sans projet (ticket-735)", () => {
+  it("offers the projects instead of an empty view", () => {
+    render(<CenterView {...baseProps} panel="history" project={null} />);
+    expect(screen.getByRole("heading", { name: "Sur quel projet travailles-tu ?" })).toBeInTheDocument();
   });
 });

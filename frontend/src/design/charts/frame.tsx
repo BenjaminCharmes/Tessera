@@ -10,7 +10,7 @@ export function Grid({ max, format }: { max: number; format: (n: number) => stri
       {[1, 0.5, 0].map((f) => (
         <div
           key={f}
-          className="absolute inset-x-0 border-t border-zinc-800"
+          className={`absolute inset-x-0 border-t ${f === 0 ? "border-zinc-700" : "border-dashed border-zinc-800"}`}
           style={{ top: `${(1 - f) * 100}%` }}
         >
           <span className="absolute -top-2 right-full mr-2 whitespace-nowrap text-micro text-zinc-500">
