@@ -4,6 +4,7 @@ created: '2026-10-29'
 depends_on:
 - ticket-533
 id: ticket-674
+pr_number: 823
 priority: low
 status: done
 title: An open PR turned conflicting is brought up to date without forcing a push
