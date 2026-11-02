@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Choisir un projet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#09090b}
+a{color:#a78bfa}a:hover{color:#c4b5fd}
+</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-wrap: wrap; background: #09090b; color: #f4f4f5; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 14px">
+  <nav aria-label="Navigation" style="flex: 0 0 96px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 0">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: #6d28d9; margin-bottom: 4px" aria-hidden="true"></div>
+    <span style="font-size: 10px; color: #a1a1aa; letter-spacing: .08em">PILOTAGE</span>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #d4d4d8; text-decoration: none; font-size: 12px; border-radius: 6px">Projets</a>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #d4d4d8; text-decoration: none; font-size: 12px; border-radius: 6px">En cours</a>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #d4d4d8; text-decoration: none; font-size: 12px; border-radius: 6px">Supervision</a>
+    <span style="font-size: 10px; color: #a1a1aa; letter-spacing: .08em; margin-top: 8px">PROJET</span>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #fafafa; text-decoration: none; font-size: 12px; border-radius: 6px; background: #2e1065; box-shadow: inset 0 0 0 1px #6d28d9">Tickets</a>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #d4d4d8; text-decoration: none; font-size: 12px; border-radius: 6px">Fichiers</a>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #d4d4d8; text-decoration: none; font-size: 12px; border-radius: 6px">Historique</a>
+  </nav>
+  <main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <header style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid #27272a; background: #18181b">
+      <span style="width: 3px; height: 14px; background: #8b5cf6" aria-hidden="true"></span>
+      <h1 style="margin: 0; font-size: 13px; letter-spacing: .06em; font-weight: 600">TICKETS</h1>
+    </header>
+    <section style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px; gap: 24px">
+      <div style="text-align: center; display: flex; flex-direction: column; gap: 8px; max-width: 520px">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600">Sur quel projet travailles-tu ?</h2>
+        <p style="margin: 0; color: #a1a1aa; line-height: 1.5">Les tickets, les fichiers, l'historique, les agents et le chat se lisent projet par projet. Tessera reprendra celui-ci la prochaine fois.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; max-width: 840px">
+        <button type="button" style="text-align: left; padding: 16px; border-radius: 10px; background: #18181b; border: 1px solid #3f3f46; color: #f4f4f5; font: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 6px; min-height: 96px">
+          <span style="font-weight: 600">Tessera</span>
+          <span style="color: #a1a1aa; font-size: 12px">8 tickets à faire · file en cours</span>
+          <span style="color: #60a5fa; font-size: 12px">● en cours</span>
+        </button>
+        <button type="button" style="text-align: left; padding: 16px; border-radius: 10px; background: #18181b; border: 1px solid #3f3f46; color: #f4f4f5; font: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 6px; min-height: 96px">
+          <span style="font-weight: 600">Kadoomi</span>
+          <span style="color: #a1a1aa; font-size: 12px">1 ticket en cours</span>
+          <span style="color: #60a5fa; font-size: 12px">● en cours</span>
+        </button>
+        <button type="button" style="text-align: left; padding: 16px; border-radius: 10px; background: #18181b; border: 1px solid #3f3f46; color: #f4f4f5; font: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 6px; min-height: 96px">
+          <span style="font-weight: 600">Vigie</span>
+          <span style="color: #a1a1aa; font-size: 12px">Rien à faire · dernier run il y a 20 min</span>
+          <span style="color: #a1a1aa; font-size: 12px">● au repos</span>
+        </button>
+      </div>
+      <a href="#" style="font-size: 13px">Voir tous les projets</a>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
