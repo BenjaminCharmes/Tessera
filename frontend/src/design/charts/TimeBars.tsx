@@ -39,7 +39,7 @@ export default function TimeBars({ label, points, format, empty }: TimeBarsProps
                 className={`anim-pousse mx-auto w-full max-w-6 rounded-t-md ${SERIES[0].bg} transition-opacity ${
                   hover !== null && hover !== i ? "opacity-40" : "opacity-90"
                 }`}
-                style={{ height: `${(p.value / max) * 100}%`, animationDelay: `${Math.min(i * 12, 360)}ms` }}
+                style={{ height: `${(p.value / max) * 100}%`, animationDelay: `${Math.min(i * 18, 540)}ms` }}
               />
             </div>
           ))}
