@@ -17,7 +17,7 @@ from tessera.services.service_etat import (
 )
 
 _BASE = "/api/v1/projects/mon-projet/services"
-_API_TS = Path(__file__).resolve().parents[2] / "frontend/src/types/api.ts"
+_API_TS = Path(__file__).resolve().parents[2] / "frontend/src/types/projets.ts"
 
 
 class _FakeProcess:
