@@ -144,7 +144,7 @@ export default function NavRail({
               index === 0 ? "" : "mt-2 border-t border-zinc-800 pt-2"
             }
           >
-            <p className="px-1 pb-1 text-center text-micro uppercase leading-none tracking-wider text-zinc-600">
+            <p className="px-1 pb-1 text-center text-micro uppercase leading-none tracking-wider text-zinc-500">
               {titre}
             </p>
             <ul aria-label={titre} className="flex flex-col gap-0.5">
@@ -158,12 +158,16 @@ export default function NavRail({
                       aria-selected={actif}
                       aria-current={actif ? "page" : undefined}
                       onClick={() => onChangePanel(panel)}
-                      className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
+                      className={`relative flex flex-col items-center gap-1 rounded-lg px-1 py-2 transition-colors ${
                         actif
-                          ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
-                          : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
+                          ? "bg-violet-500/15 text-zinc-50"
+                          : "text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-100"
                       }`}
                     >
+                      {/* La barre d'identité de l'élément actif, comme devant un titre de région. */}
+                      {actif ? (
+                        <span aria-hidden="true" className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-violet-400" />
+                      ) : null}
                       {panel === "supervision" ? (
                         <Pastille nombre={runsActifs} alerte={alerte} />
                       ) : null}

@@ -42,7 +42,7 @@ export default function TimeLines({ labels, series, format, empty }: TimeLinesPr
         ))}
       </ul>
       <div className="pl-12">
-        <div className="relative h-40" onMouseLeave={() => setHover(null)}>
+        <div className="relative h-48" onMouseLeave={() => setHover(null)}>
           <Grid max={max} format={format} />
           <svg
             className="absolute inset-0 h-full w-full overflow-visible"
@@ -50,6 +50,15 @@ export default function TimeLines({ labels, series, format, empty }: TimeLinesPr
             preserveAspectRatio="none"
             aria-hidden="true"
           >
+            {/* Une aire pâle sous chaque courbe : elle se lit d'un coup d'œil, la courbe reste exacte. */}
+            {shown.map((s, k) => (
+              <polygon
+                key={`aire-${s.name}`}
+                className={SERIES[k].fill}
+                fillOpacity={0.1}
+                points={`${x(0)},100 ${s.values.map((v, i) => `${x(i)},${y(v)}`).join(" ")} ${x(n - 1)},100`}
+              />
+            ))}
             {shown.map((s, k) => (
               <polyline
                 key={s.name}

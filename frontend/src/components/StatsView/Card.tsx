@@ -16,7 +16,7 @@ export default function Card({
   return (
     <section
       aria-label={title}
-      className={`min-w-0 rounded-lg border border-zinc-800 bg-zinc-900 p-4 ${className}`}
+      className={`min-w-0 rounded-xl border border-zinc-800/80 bg-zinc-900/70 p-5 shadow-sm shadow-black/30 ${className}`}
     >
       <header className="mb-4 flex items-baseline justify-between gap-2">
         <RegionTitle taille="sm">{title}</RegionTitle>

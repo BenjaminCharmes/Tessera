@@ -7,12 +7,12 @@ import { MIME_TICKET, transitionPermise } from "../../lib/transitionsManuelles";
 import type { PRStatus, Ticket, TicketStatus } from "../../types/api";
 
 const STATUS_LABEL: Record<TicketStatus, string> = {
-  todo: "TODO",
-  "in-progress": "IN PROGRESS",
-  "in-review": "IN REVIEW",
-  done: "DONE",
-  blocked: "BLOCKED",
-  cancelled: "CANCELLED",
+  todo: "À faire",
+  "in-progress": "En cours",
+  "in-review": "En revue",
+  done: "Faits",
+  blocked: "Bloqués",
+  cancelled: "Annulés",
 };
 
 /** Colonnes pour lesquelles on limite le nombre de cartes affichées. */

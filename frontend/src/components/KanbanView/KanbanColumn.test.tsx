@@ -66,7 +66,7 @@ describe("KanbanColumn", () => {
         onRunPipeline={vi.fn()}
       />,
     );
-    expect(screen.getByText("TODO")).toBeTruthy();
+    expect(screen.getByText("À faire")).toBeTruthy();
     expect(screen.getByText("(1)")).toBeTruthy();
   });
 
@@ -81,7 +81,7 @@ describe("KanbanColumn", () => {
         onRunPipeline={vi.fn()}
       />,
     );
-    expect(screen.getByText("IN PROGRESS")).toBeTruthy();
+    expect(screen.getByText("En cours")).toBeTruthy();
   });
 
   it("shows empty placeholder when no tickets", () => {

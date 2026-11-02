@@ -25,9 +25,9 @@ export default function TimeBars({ label, points, format, empty }: TimeBarsProps
 
   return (
     <div className="pl-12">
-      <div className="relative h-40" onMouseLeave={() => setHover(null)}>
+      <div className="relative h-48" onMouseLeave={() => setHover(null)}>
         <Grid max={max} format={format} />
-        <div className="absolute inset-0 flex items-end gap-px">
+        <div className="absolute inset-0 flex items-end gap-1">
           {points.map((p, i) => (
             <div
               key={p.label}
@@ -36,8 +36,8 @@ export default function TimeBars({ label, points, format, empty }: TimeBarsProps
               onMouseEnter={() => setHover(i)}
             >
               <div
-                className={`w-full rounded-t-sm ${SERIES[0].bg} ${
-                  hover !== null && hover !== i ? "opacity-50" : ""
+                className={`mx-auto w-full max-w-6 rounded-t-md ${SERIES[0].bg} transition-opacity ${
+                  hover !== null && hover !== i ? "opacity-40" : "opacity-90"
                 }`}
                 style={{ height: `${(p.value / max) * 100}%` }}
               />
