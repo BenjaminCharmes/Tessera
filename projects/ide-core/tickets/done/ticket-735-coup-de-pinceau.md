@@ -16,7 +16,7 @@ created: 2026-11-02
 ## Objectif
 Harmoniser et moderniser l'interface sans changer son identité : moins brute, plus
 lisible, des graphiques soignés. Fait à la main avec Benjamin, en direct sur un Vite à
-part (audit UX du 02/11, maquette `design/maquette/coup-de-pinceau/`).
+part (audit UX du 02/11, maquette `projects/ide-core/design/maquette/coup-de-pinceau/`).
 
 ## Ce qui change
 - Base : texte lissé, barres de défilement fines, transitions courtes sur ce qui se
