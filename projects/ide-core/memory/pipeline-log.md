@@ -7014,3 +7014,5 @@ Le diff ajoute :
 - 2026-11-02 11:53:02 UTC — [ticket-674] tour 1 — reviewer terminé (18422ms)
 - 2026-11-02 11:54:46 UTC — [ticket-674] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits : la conception décrit clairemen (122766ms)
 - 2026-11-02 11:54:46 UTC — [ticket-674] APPROVED après 1 tour(s)
+- 2026-11-02 11:54:51 UTC — [ticket-674] fichiers non suivis laissés par le run : tickets/todo/ticket-732-a-conflicting-pr-branch-is-merged-with-its-base-in-a-throwaway-worktree.md, tickets/todo/ticket-733-the-ci-watcher-updates-a-conflicting-pr-once-and-rebinds-the-pushed-head.md (à ignorer dans .gitignore ?)
+- 2026-11-02 11:54:51 UTC — [ticket-674] documentation: 0 fichier(s) (14ms)
