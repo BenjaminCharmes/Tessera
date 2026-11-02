@@ -15,7 +15,6 @@ export const PLAFONDS: Record<string, number> = {
   "components/Sidebar/TicketCard.tsx": 314,
   "components/Sidebar/TicketList.tsx": 309,
   "hooks/useChat.ts": 336,
-  "hooks/useCockpit.ts": 532,
   "hooks/useSupervision.ts": 385,
   "lib/api.ts": 315,
 };

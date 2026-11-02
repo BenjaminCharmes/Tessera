@@ -1,12 +1,13 @@
 ---
-id: ticket-696
-title: "Cockpit hook split by region"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-696
+pr_number: 820
+priority: low
+status: done
+title: Cockpit hook split by region
+type: refactor
 ---
 
 # ticket-696 — `useCockpit` découpé par région
