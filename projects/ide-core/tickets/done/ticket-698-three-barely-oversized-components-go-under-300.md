@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-681
 id: ticket-698
+pr_number: 822
 priority: low
 status: done
 title: Three barely oversized components go under 300 lines
