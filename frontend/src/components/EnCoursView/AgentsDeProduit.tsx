@@ -1,4 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
+import PosteVide from "../../design/bureau/PosteVide";
+import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import AgentAuPupitre from "../../design/bureau/AgentAuPupitre";
 import BulleDOutil from "../../design/bureau/BulleDOutil";
 import { physiqueDeProduit } from "../../lib/bureau/physique";
@@ -6,6 +9,26 @@ import { prenomsDeProduit } from "../../lib/bureau/noms";
 import type { AgentDeProduit } from "../../types/activiteProduit";
 import AvecInfobulle from "../BureauView/AvecInfobulle";
 import { formaterHeure } from "./format";
+import { POSTES_VIDES, capaciteDeLaRangee, rangee } from "./rangee";
+
+/** La largeur d'un poste à l'échelle un (le `<svg>` fait 70 px), et l'écart entre deux. */
+const POSTE_PX = 74;
+const ECART_PX = 24;
+
+/** La largeur de la rangée, relue quand la fenêtre change ; `Infinity` sans `ResizeObserver`. */
+function useLargeur(ref: React.RefObject<HTMLElement | null>): number {
+  const [largeur, setLargeur] = useState(Infinity);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observateur = new ResizeObserver(([entree]) => {
+      if (entree) setLargeur(entree.contentRect.width);
+    });
+    observateur.observe(el);
+    return () => observateur.disconnect();
+  }, [ref]);
+  return largeur;
+}
 
 /** Un agent et le service du produit qui le déclare. */
 export interface AgentDuService {
@@ -23,18 +46,38 @@ interface AgentsDeProduitProps {
 }
 
 /**
- * Les agents qu'une app déclare dans son fichier d'activité, un par entrée —
- * tickets 673 et 710. Comme au Bureau : un prénom, la phrase du produit dans la
+ * La rangée de postes au sol de la salle, sur une seule ligne — ticket-730. Les
+ * agents qu'une app déclare dans son fichier d'activité, un par entrée —
+ * tickets 673 et 710. Trop nombreux pour la largeur : le dernier poste devient un
+ * badge « +N ». Sans agent, des postes vides, éteints : la salle garde sa hauteur. Comme au Bureau : un prénom, la phrase du produit dans la
  * bulle d'outil quand il travaille, une infobulle, un clic vers le journal.
  * Sans entrée, rien ne se dessine (ADR-058). Nom et libellé sont écrits par le
  * produit : ils passent par React comme du texte, jamais comme balisage.
  */
 export default function AgentsDeProduit({ projectId, agents, aUnJournal, onOuvrirService }: AgentsDeProduitProps) {
-  if (agents.length === 0) return null;
+  const ref = useRef<HTMLDivElement>(null);
+  const echelle = useEchelleDesSprites();
+  const capacite = capaciteDeLaRangee(useLargeur(ref), POSTE_PX * echelle, ECART_PX);
+  const { visibles, enPlus } = rangee(agents, capacite);
   const prenoms = prenomsDeProduit(projectId, agents.map((a) => `${a.service}:${a.agent.id}`));
   return (
-    <ul aria-label="Agents du produit" data-agents-de-produit className="flex flex-wrap items-end justify-center gap-x-6">
-      {agents.map(({ service, agent }) => {
+    <div ref={ref} data-rangee-de-postes className="flex min-w-0 flex-1 items-end justify-center">
+      {agents.length === 0 ? (
+        <ul aria-label="Aucun agent déclaré" data-postes-vides className="flex flex-nowrap items-end gap-x-6">
+          {Array.from({ length: Math.min(POSTES_VIDES, capacite) }, (_, i) => (
+            <li key={i} className="flex flex-col items-center">
+              <div className="h-5" />
+              <span className="p-0.5">
+                <Agrandi>
+                  <PosteVide />
+                </Agrandi>
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+    <ul aria-label="Agents du produit" data-agents-de-produit className="flex flex-nowrap items-end justify-center gap-x-6">
+      {visibles.map(({ service, agent }) => {
         const cle = `${service}:${agent.id}`;
         const prenom = prenoms.get(cle) ?? agent.nom;
         const journal = aUnJournal(service);
@@ -69,6 +112,15 @@ export default function AgentsDeProduit({ projectId, agents, aUnJournal, onOuvri
           </li>
         );
       })}
+      {enPlus > 0 && (
+        <li data-agents-en-plus className="flex flex-col items-center self-center">
+          <span className="rounded-sm bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-300 ring-1 ring-zinc-700">
+            +{enPlus} agent{enPlus > 1 ? "s" : ""}
+          </span>
+        </li>
+      )}
     </ul>
+      )}
+    </div>
   );
 }
