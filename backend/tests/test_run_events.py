@@ -15,14 +15,9 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import (
-    create_run,
-    finish_run,
-    get_run_events,
-    init_db,
-    list_runs,
-    save_event,
-)
+from tessera.services.database import init_db
+from tessera.services.database_events import get_run_events, save_event
+from tessera.services.database_runs import create_run, finish_run, list_runs
 
 
 @pytest.fixture

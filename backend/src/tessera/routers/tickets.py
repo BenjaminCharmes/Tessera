@@ -11,7 +11,7 @@ from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.services.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
-from tessera.services.database import list_runs, list_runs_for_ticket
+from tessera.services.database_runs import list_runs, list_runs_for_ticket
 from tessera.services.pr_status_cache import get_cached_status
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType, OrchestratorEvent

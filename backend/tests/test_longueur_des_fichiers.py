@@ -12,7 +12,6 @@ PLAFONDS: dict[str, int] = {
     "routers/orchestrator.py": 351,
     "routers/tickets.py": 563,
     "services/ci_watcher.py": 607,
-    "services/database.py": 658,
     # 714 : le ticket-542, mergé dans la même file avant ce cliquet, y a ajouté une ligne.
     "services/documentation.py": 714,
     "services/github_service.py": 592,

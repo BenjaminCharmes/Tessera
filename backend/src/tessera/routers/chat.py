@@ -18,7 +18,7 @@ from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.run_executor import emetteur
 from tessera.services.run_lock import RUN_LOCK
 from tessera.services.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
-from tessera.services.database import (
+from tessera.services.database_chat import (
     ChatMessageRow,
     ConversationSummary,
     conversation_cost_usd,

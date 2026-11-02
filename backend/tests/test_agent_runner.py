@@ -17,7 +17,8 @@ from tessera.services.agent_runner import (
     _parse_suggested_status,
 )
 from tessera.services.cost_calculator import calculate_cost
-from tessera.services.database import create_run, init_db
+from tessera.services.database import init_db
+from tessera.services.database_runs import create_run
 
 
 # ------------------------------------------------------------------

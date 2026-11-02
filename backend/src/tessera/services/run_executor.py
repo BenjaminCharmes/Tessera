@@ -17,7 +17,8 @@ from pathlib import Path
 from typing import Any, Optional, Protocol
 
 from tessera.config import settings
-from tessera.services.database import create_run, finish_run, save_event
+from tessera.services.database_events import save_event
+from tessera.services.database_runs import create_run, finish_run
 from tessera.models.agent import AgentRole
 from tessera.services.dialogue import DialogueChannel
 from tessera.services.event_hub import EventHub
@@ -93,7 +94,6 @@ def emetteur(
     ticket-128 : un défaut d'écriture ne doit pas priver les observateurs de
     l'événement. L'inverse ferait dépendre l'affichage de SQLite.
     """
-
     async def envoyer(event: OrchestratorEvent) -> None:
         event.run_id = run.run_id
         event.project_id = run.project_id

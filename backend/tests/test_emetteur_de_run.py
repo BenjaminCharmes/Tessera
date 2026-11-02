@@ -16,7 +16,8 @@ import aiosqlite
 import pytest
 
 from tessera.config import settings
-from tessera.services.database import create_run, init_db
+from tessera.services.database import init_db
+from tessera.services.database_runs import create_run
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.run_executor import emetteur

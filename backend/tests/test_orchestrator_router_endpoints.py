@@ -753,6 +753,6 @@ def test_run_interrompu_clot_le_run_et_ne_renvoie_pas_500(
 
 
 async def _lister_runs() -> list[dict[str, object]]:
-    from tessera.services.database import list_runs
+    from tessera.services.database_runs import list_runs
 
     return await list_runs(settings.ide_db_path, "mon-projet")

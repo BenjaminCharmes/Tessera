@@ -6,7 +6,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db, save_chat_message
+from tessera.services.database import init_db
+from tessera.services.database_chat import save_chat_message
 
 
 @pytest.fixture

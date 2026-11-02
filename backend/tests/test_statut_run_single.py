@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta, timezone
 
 from tessera.config import settings
-from tessera.services.database import create_run, finish_run
+from tessera.services.database_runs import create_run, finish_run
 from tessera.services.run_registry import RunActif
 from tessera.services.run_status import (
     en_utc,
