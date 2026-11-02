@@ -7079,3 +7079,4 @@ Le diff ajoute :
 - 2026-11-02 14:18:14 UTC — [ticket-691] validateur: fichiers cités joints : services/project_loader.py, CLAUDE.md
 - 2026-11-02 14:18:14 UTC — [ticket-691] validateur: APPROVED — Le refactoring de `project_loader.py` est complet et correctement découplé : ext (342375ms)
 - 2026-11-02 14:18:14 UTC — [ticket-691] APPROVED après 1 tour(s)
+- 2026-11-02 14:24:40 UTC — [ticket-691] documentation: 1 fichier(s) (313890ms) — après tour de correction
