@@ -1,4 +1,5 @@
-import { formatCount, formatDurationMs, formatUsd } from "../../design/charts/palette";
+import { formatCount } from "../../design/charts/palette";
+import { formatDurationMs, formatUsd } from "../../lib/format";
 import type { RunQuality, UsageTotals } from "../../types/api";
 
 function Tile({ label, value, sub }: { label: string; value: string; sub?: string }) {

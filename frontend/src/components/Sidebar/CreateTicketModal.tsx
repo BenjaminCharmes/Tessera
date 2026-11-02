@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Ticket, TicketPriority, TicketType } from "../../types/api";
 import { api } from "../../lib/api";
+import Modale from "../../design/ui/Modale";
 
 interface CreateTicketModalProps {
   projectId: string;
@@ -66,23 +67,8 @@ export default function CreateTicketModal({
     }
   }
 
-  function handleOverlayClick(e: React.MouseEvent) {
-    if (e.target === e.currentTarget) onClose();
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") onClose();
-  }
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      onClick={handleOverlayClick}
-      onKeyDown={handleKeyDown}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Créer un ticket"
-    >
+    <Modale onFermer={onClose} aria-label="Créer un ticket">
       <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
         <h2 className="text-zinc-100 text-base font-semibold mb-4">
           Nouveau ticket
@@ -209,6 +195,6 @@ export default function CreateTicketModal({
           </div>
         </form>
       </div>
-    </div>
+    </Modale>
   );
 }

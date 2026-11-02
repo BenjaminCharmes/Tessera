@@ -8,7 +8,6 @@ aucune commande git.
 from __future__ import annotations
 
 import asyncio
-import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +16,11 @@ from pydantic import BaseModel
 
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
+from tessera.services.racine_depot import (
+    declare_ancestor,
+    depot_au_dessus,
+    depot_le_plus_proche,
+)
 from tessera.services.online_declaration import StripeMode, read_online_declaration
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.ticket_service import _STATUS_DIRS
@@ -115,14 +119,10 @@ def _racine_ancestrale(project_path: Path) -> Path | None:
     Le projet bootstrap (ide-core) vit dans `projects/ide-core/` : son app est
     l'IDE lui-même, dont l'icône est à la racine du dépôt (ADR-028).
     """
-    try:
-        manifeste = json.loads((project_path / "agents.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    if not declare_ancestor(project_path):
         return None
-    if not isinstance(manifeste, dict) or manifeste.get("git_root") != "ancestor":
-        return None
-    git = _git_dir(project_path)
-    return git.parent.resolve() if git is not None and git.name == ".git" else None
+    depot = depot_au_dessus(project_path)
+    return depot.resolve() if depot is not None else None
 
 
 def find_icon(project_path: Path) -> tuple[Path, str] | None:
@@ -149,18 +149,18 @@ def _mtime(path: Path) -> int:
 def _git_dir(project_path: Path) -> Path | None:
     """Le `.git` qui régit ce dossier : le sien, ou celui d'un ancêtre
     (`git_root: ancestor`, ADR-028). Un `.git` fichier (worktree) est suivi."""
-    for dossier in (project_path, *project_path.parents):
-        candidat = dossier / ".git"
-        if candidat.is_dir():
-            return candidat
-        if candidat.is_file():
-            try:
-                contenu = candidat.read_text(encoding="utf-8").strip()
-            except OSError:
-                return None
-            if contenu.startswith("gitdir:"):
-                return (dossier / contenu.removeprefix("gitdir:").strip()).resolve()
-            return None
+    dossier = depot_le_plus_proche(project_path)
+    if dossier is None:
+        return None
+    candidat = dossier / ".git"
+    if candidat.is_dir():
+        return candidat
+    try:
+        contenu = candidat.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    if contenu.startswith("gitdir:"):
+        return (dossier / contenu.removeprefix("gitdir:").strip()).resolve()
     return None
 
 

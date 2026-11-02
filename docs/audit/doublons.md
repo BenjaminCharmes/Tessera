@@ -248,6 +248,15 @@ Aucune fixture de test n'est produite à partir du modèle backend ; chaque test
 écrit sa réponse à la main, du côté du type que le front croit lire. Un type
 front faux et un mock faux s'accordent donc. Le ticket-684 y répond.
 
+**Ticket-684.** `docs/openapi.json` est exporté et vérifié par un test backend ;
+`frontend/src/test/contrat/` confronte les types de huit routes au schéma et
+refuse, à la pose du mock, une valeur que la route ne rend pas. Les écarts qu'il
+laisse, journalisés et non corrigés : `POST /services/running/{pid}/stop` n'a
+toujours pas de modèle (le front type `{ pid, arretes }` à la main) ;
+`ServiceActif.sortie` et `arrete_a_la_main` restent optionnels côté front alors
+que le schéma les exige ; `faits`, déprécié, n'est pas déclaré par `StatutDuRun`.
+Un `mockImplementation` n'est pas gardé, seulement `mockResolvedValue`.
+
 ---
 
 ## 4. Non examiné

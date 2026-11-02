@@ -1,5 +1,4 @@
-import { authorized } from "./auth";
-import { API_ORIGIN } from "./config";
+import { request } from "./http";
 
 /** Une ligne de `GET /projects/{id}/usage/breakdown` : la dépense cumulée d'un rôle. */
 export interface DepenseDuRole {
@@ -9,19 +8,34 @@ export interface DepenseDuRole {
   call_count: number;
 }
 
-/** La ventilation du coût d'un projet ; seule la part par rôle sert au Bureau. */
-export interface VentilationDuProjet {
-  per_agent: DepenseDuRole[];
+/** La dépense cumulée d'un modèle, même route. */
+export interface DepenseDuModele {
+  model: string;
+  total_cost_usd: number;
+  total_tokens: number;
+  call_count: number;
 }
 
-async function lireLaVentilation(projectId: string): Promise<VentilationDuProjet> {
-  const url = `${API_ORIGIN}/api/v1/projects/${encodeURIComponent(projectId)}/usage/breakdown`;
-  const res = await fetch(url, authorized());
-  if (!res.ok) {
-    const texte = await res.text().catch(() => res.statusText);
-    throw new Error(`API ${res.status}: ${texte}`);
-  }
-  return res.json() as Promise<VentilationDuProjet>;
+/** La dépense cumulée d'un projet ; seule la vue d'ensemble en remplit la liste. */
+export interface DepenseDuProjet {
+  project_id: string;
+  total_cost_usd: number;
+  total_tokens: number;
+  call_count: number;
+}
+
+/** La ventilation du coût d'un projet, telle que le backend la rend ; le Bureau n'en lit que `per_agent`. */
+export interface VentilationDuProjet {
+  /** `null` pour la vue d'ensemble de tous les projets. */
+  project_id: string | null;
+  total_cost_usd: number;
+  per_agent: DepenseDuRole[];
+  per_model: DepenseDuModele[];
+  per_project: DepenseDuProjet[];
+}
+
+function lireLaVentilation(projectId: string): Promise<VentilationDuProjet> {
+  return request(`/projects/${encodeURIComponent(projectId)}/usage/breakdown`);
 }
 
 /** Lecture du coût d'un projet par rôle. Un objet, pour qu'un test puisse l'espionner comme `api.*`. */

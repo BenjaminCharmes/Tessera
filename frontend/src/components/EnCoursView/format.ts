@@ -5,21 +5,6 @@ export function formaterMo(mo: number): string {
   return `${mo.toFixed(1).replace(".", ",")} Mo`;
 }
 
-/** Durée écoulée depuis `demarreA`, ou « — » quand l'heure est inconnue. */
-export function formaterDuree(demarreA: string | null, now: number): string {
-  if (demarreA === null) return "—";
-  const debut = Date.parse(demarreA);
-  if (Number.isNaN(debut)) return "—";
-  const minutes = Math.max(0, Math.floor((now - debut) / 60_000));
-  if (minutes < 1) return "< 1 min";
-  if (minutes < 60) return `${minutes} min`;
-  const heures = Math.floor(minutes / 60);
-  if (heures < 24) {
-    return `${heures} h ${String(minutes % 60).padStart(2, "0")}`;
-  }
-  return `${Math.floor(heures / 24)} j ${heures % 24} h`;
-}
-
 /** L'heure de démarrage, « HH:MM » à l'heure locale, ou « — » quand elle est inconnue. */
 export function formaterHeure(demarreA: string | null): string {
   if (demarreA === null) return "—";

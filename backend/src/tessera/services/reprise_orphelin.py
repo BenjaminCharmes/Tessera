@@ -25,7 +25,6 @@ Une erreur git est journalisée et n'empêche jamais le démarrage du backend.
 
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -34,7 +33,9 @@ import frontmatter as fm
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_runner import git
+from tessera.services.manifeste import lire_chaine
 from tessera.services.pipeline_text import _unapproved_commit_message
+from tessera.services.racine_depot import depot_le_plus_proche
 from tessera.services.reprise_marqueur import (
     lire_runs,
     marquer_depots_repris,
@@ -72,15 +73,9 @@ def _lire_base_branch(project_path: Path, fallback: str = "develop") -> str:
     (ticket-XXX → develop → main). Une valeur absente ou illisible ne bloque
     pas la reprise.
     """
-    agents_json = project_path / "agents.json"
-    if agents_json.is_file():
-        try:
-            data = json.loads(agents_json.read_text(encoding="utf-8"))
-            valeur = data.get("base_branch")
-            if isinstance(valeur, str) and valeur.strip():
-                return valeur.strip()
-        except Exception:
-            pass
+    valeur = lire_chaine(project_path, "base_branch")
+    if valeur is not None and valeur.strip():
+        return valeur.strip()
     return fallback
 
 
@@ -104,12 +99,8 @@ def _est_dans_depot_imbrique(racine_depot: Path, fichier: Path) -> bool:
     `git_root: ancestor`) remonterait sinon jusqu'au `.git` du dépôt lui-même.
     """
     racine = racine_depot.resolve()
-    current = fichier.resolve().parent
-    while current != racine and current.is_relative_to(racine):
-        if (current / ".git").exists():
-            return True
-        current = current.parent
-    return False
+    proche = depot_le_plus_proche(fichier.resolve().parent)
+    return proche is not None and proche != racine and proche.is_relative_to(racine)
 
 
 async def _trouver_fichiers_nouveaux(

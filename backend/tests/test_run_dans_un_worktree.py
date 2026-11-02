@@ -16,7 +16,7 @@ from tessera.services import run_dans_worktree
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.routers.orchestrator import _build_orchestrator
+from tessera.services.assemblage_run import build_orchestrator
 from tessera.services.database import init_db
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
@@ -67,7 +67,7 @@ async def _ouvrir(depot: Path) -> tuple[RunWorktree, list[str]]:
 
 async def _orchestrateur(depot: Path) -> Orchestrator:
     wt, absents = await _ouvrir(depot)
-    return await _build_orchestrator(PROJET, wt, tuple(absents))
+    return await build_orchestrator(PROJET, wt, tuple(absents))
 
 
 async def test_worktree_is_created_on_the_ticket_branch_without_touching_the_checkout(
@@ -202,7 +202,7 @@ async def test_branch_already_checked_out_refuses_the_run_without_any_commit(
 async def test_project_without_worktree_is_built_as_before(depot: Path) -> None:
     (depot / "agents.json").write_text(json.dumps({"autonomy": "pr"}), encoding="utf-8")
 
-    orch = await _build_orchestrator(PROJET)
+    orch = await build_orchestrator(PROJET)
 
     assert orch._worktree is None and orch._depot is None
     assert orch._project_path == depot

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { AppEnCours } from "../../types/api";
 import {
-  formaterDuree,
   formaterMo,
   grouperParProjet,
   memoireTotale,
@@ -25,22 +24,6 @@ describe("formaterMo", () => {
   it("shows one decimal with a French comma", () => {
     expect(formaterMo(412.5)).toBe("412,5 Mo");
     expect(formaterMo(0)).toBe("0,0 Mo");
-  });
-});
-
-describe("formaterDuree", () => {
-  const now = Date.parse("2026-10-13T12:00:00Z");
-
-  it("returns a dash when the start is unknown or unreadable", () => {
-    expect(formaterDuree(null, now)).toBe("—");
-    expect(formaterDuree("pas une date", now)).toBe("—");
-  });
-
-  it("counts minutes, hours and days", () => {
-    expect(formaterDuree("2026-10-13T11:59:40Z", now)).toBe("< 1 min");
-    expect(formaterDuree("2026-10-13T11:45:00Z", now)).toBe("15 min");
-    expect(formaterDuree("2026-10-13T09:55:00Z", now)).toBe("2 h 05");
-    expect(formaterDuree("2026-10-11T08:00:00Z", now)).toBe("2 j 4 h");
   });
 });
 

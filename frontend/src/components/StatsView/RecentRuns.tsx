@@ -1,4 +1,5 @@
-import { formatCount, formatDurationMs, formatUsd } from "../../design/charts/palette";
+import { formatCount } from "../../design/charts/palette";
+import { formatDurationMs, formatUsd } from "../../lib/format";
 import { IconBlocked, IconCheck, IconDot } from "../../design/icons";
 import type { RecentRun } from "../../types/api";
 

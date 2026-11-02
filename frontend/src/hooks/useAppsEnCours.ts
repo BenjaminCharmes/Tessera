@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
-import { useFenetreVisible } from "./useFenetreVisible";
+import { usePolling } from "./usePolling";
 import {
   ajouter,
   cleArret,
@@ -60,7 +60,6 @@ export function useAppsEnCours(): UseAppsEnCoursResult {
   // le miroir pour l'affichage, et la lecture qui revient y voit le dernier clic.
   const attentesRef = useRef<Attentes>({});
   const appsRef = useRef<AppEnCours[]>([]);
-  const fenetreVisible = useFenetreVisible();
   const enAttente = Object.keys(attentes).length > 0;
 
   const changerAttentes = useCallback((suite: Attentes) => {
@@ -105,14 +104,10 @@ export function useAppsEnCours(): UseAppsEnCoursResult {
     };
   }, [tick, solder]);
 
-  useEffect(() => {
-    if (!fenetreVisible) return;
-    const cadence = enAttente ? CADENCE_ATTENTE_MS : CADENCE_APPS_MS;
-    const minuteur = setInterval(() => setTick((t) => t + 1), cadence);
-    return () => clearInterval(minuteur);
-  }, [fenetreVisible, enAttente]);
-
   const rafraichir = useCallback(() => setTick((t) => t + 1), []);
+  usePolling(rafraichir, {
+    cadenceMs: enAttente ? CADENCE_ATTENTE_MS : CADENCE_APPS_MS,
+  });
 
   /** Marque les opérations, exécute `action`, et lâche les marques si elle échoue. */
   const operer = useCallback(

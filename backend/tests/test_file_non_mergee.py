@@ -11,7 +11,7 @@ from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import PipelineResult
 from tessera.services.politique_run import PolitiqueRun
-from tessera.routers.orchestrator import _sync_apres_livraison
+from tessera.services.livreur_run import sync_apres_livraison
 
 
 # ------------------------------------------------------------------
@@ -72,7 +72,7 @@ def _construire(
 
 
 # ------------------------------------------------------------------
-# _sync_apres_livraison — critères 1, 3, 4
+# sync_apres_livraison — critères 1, 3, 4
 # ------------------------------------------------------------------
 
 
@@ -84,7 +84,7 @@ async def test_sync_appele_apres_livraison_non_mergee_sur_projet_merge() -> None
     espace.sync_base_depuis_distant = AsyncMock(return_value=None)
     livraison = Livraison(merged=False, pr_number=5, etapes=("PR #5 ouverte",))
 
-    await _sync_apres_livraison(livraison, espace, politique, "develop")
+    await sync_apres_livraison(livraison, espace, politique, "develop")
 
     espace.sync_base_depuis_distant.assert_awaited_once_with("develop")
 
@@ -97,7 +97,7 @@ async def test_sync_appele_apres_livraison_mergee() -> None:
     espace.sync_base_depuis_distant = AsyncMock(return_value=None)
     livraison = Livraison(merged=True, pr_number=5, etapes=("mergé",))
 
-    await _sync_apres_livraison(livraison, espace, politique, "develop")
+    await sync_apres_livraison(livraison, espace, politique, "develop")
 
     espace.sync_base_depuis_distant.assert_awaited_once_with("develop")
 
@@ -110,7 +110,7 @@ async def test_sync_non_appele_sur_projet_commit() -> None:
     espace.sync_base_depuis_distant = AsyncMock(return_value=None)
     livraison = Livraison(merged=False, pr_number=5)
 
-    await _sync_apres_livraison(livraison, espace, politique, "develop")
+    await sync_apres_livraison(livraison, espace, politique, "develop")
 
     espace.sync_base_depuis_distant.assert_not_awaited()
 
@@ -125,7 +125,7 @@ async def test_sync_preserve_la_livraison_en_cas_d_erreur_distante() -> None:
         merged=False, pr_number=5, etapes=("PR #5 ouverte",), durees_ms=(120.0,)
     )
 
-    resultat = await _sync_apres_livraison(livraison, espace, politique, "develop")
+    resultat = await sync_apres_livraison(livraison, espace, politique, "develop")
 
     assert resultat.arret == "fetch échoué"
     assert resultat.durees_ms == (120.0,)
@@ -142,7 +142,7 @@ async def test_sync_appele_apres_livraison_exception_sans_pr() -> None:
     """Critère 5 ticket-307 — livraison arrêtée par exception sans PR → sync quand même.
 
     Le bogue du 2026-10-02 : quand la phase 1 levait avant d'ouvrir la PR
-    (rebase refusé, réseau injoignable…), _sync_apres_livraison n'était pas
+    (rebase refusé, réseau injoignable…), sync_apres_livraison n'était pas
     appelé — ``needs_sync`` était False car ni ``merged``, ni ``pr_number``.
     Le ticket suivant forkait depuis la pointe du ticket précédent au lieu
     d'``origin/<base>``, et ses propres commits arrivaient dans la PR du
@@ -155,7 +155,7 @@ async def test_sync_appele_apres_livraison_exception_sans_pr() -> None:
     # exactement ce que `_livreur` produit quand livrer_phase_1 lève.
     livraison = Livraison(arret="Livraison interrompue : réseau injoignable")
 
-    await _sync_apres_livraison(livraison, espace, politique, "develop")
+    await sync_apres_livraison(livraison, espace, politique, "develop")
 
     espace.sync_base_depuis_distant.assert_awaited_once_with("develop")
 

@@ -7,6 +7,7 @@ import { firstTryCount } from "../../lib/bureau/weekEmployee";
 import { apiQuota } from "../../lib/quota";
 import { apiVentilation } from "../../lib/ventilation";
 import type { VentilationDuProjet } from "../../lib/ventilation";
+import { ventilation } from "../../test/contrat/exemples";
 import type { PipelineRun, RunActif, UsageStats } from "../../types/api";
 import { T0, etatEnCodage, nomme } from "./etatsDeTest";
 
@@ -49,12 +50,12 @@ const RUNS: PipelineRun[] = [
   runPasse("e", "ticket-001", "2026-10-02T08:00:00.000Z", 1, true),
 ];
 
-const VENTILATION: VentilationDuProjet = {
+const VENTILATION: VentilationDuProjet = ventilation({
   per_agent: [
     { role: "codeur", total_cost_usd: 12.5, total_tokens: 1000, call_count: 20 },
     { role: "reviewer", total_cost_usd: 3.1, total_tokens: 400, call_count: 8 },
   ],
-};
+});
 
 const CANAL = { envoyer: vi.fn(), son: { actif: false, regler: vi.fn() } };
 
@@ -129,7 +130,7 @@ describe("PanneauAgentChoisi, bilan", () => {
 
   it("draws no Bilan section when neither reading gives anything", async () => {
     vi.spyOn(api.runs, "list").mockResolvedValue([]);
-    vi.spyOn(apiVentilation, "parProjet").mockResolvedValue({ per_agent: [] });
+    vi.spyOn(apiVentilation, "parProjet").mockResolvedValue(ventilation());
 
     const panneau = await choisirLeCodeur();
 

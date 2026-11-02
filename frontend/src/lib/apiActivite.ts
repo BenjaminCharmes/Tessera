@@ -1,4 +1,4 @@
-import { request } from "./api";
+import { request } from "./http";
 import type { ActiviteDeService } from "../types/activiteProduit";
 
 /**

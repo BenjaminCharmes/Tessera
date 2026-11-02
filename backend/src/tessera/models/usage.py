@@ -50,6 +50,37 @@ class BreakdownLine(BaseModel):
     avg_duration_ms: float
 
 
+class _CostTotals(BaseModel):
+    """The cumulated spend shared by every line of `UsageBreakdown`."""
+
+    total_cost_usd: float
+    total_tokens: int
+    call_count: int
+
+
+class AgentCost(_CostTotals):
+    role: str
+
+
+class ModelCost(_CostTotals):
+    model: str
+
+
+class ProjectCost(_CostTotals):
+    project_id: str
+
+
+class UsageBreakdown(BaseModel):
+    """Response of `GET …/usage/breakdown`: spend by agent, model and project."""
+
+    #: `None` pour la vue d'ensemble, qui seule remplit `per_project`.
+    project_id: str | None
+    total_cost_usd: float
+    per_agent: list[AgentCost]
+    per_model: list[ModelCost]
+    per_project: list[ProjectCost]
+
+
 class StatusCount(BaseModel):
     status: str
     count: int

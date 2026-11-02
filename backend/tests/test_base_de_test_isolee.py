@@ -56,7 +56,7 @@ def test_run_started_over_http_is_recorded_in_the_temp_database(
     async def _build(project_id: str) -> _OrchestrateurImmediat:
         return _OrchestrateurImmediat()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
     base = settings.ide_db_path
 
     with TestClient(app) as client:

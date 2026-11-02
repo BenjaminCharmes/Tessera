@@ -14,10 +14,10 @@ from pathlib import Path
 
 import pytest
 
-import tessera.routers.projects as projects_router
+import tessera.routers.projects.creation as projects_router
 from tessera.config import settings
 from tessera.models.project import ProjectCreate
-from tessera.routers.projects import create_project
+from tessera.routers.projects.creation import create_project
 
 
 @pytest.fixture(autouse=True)

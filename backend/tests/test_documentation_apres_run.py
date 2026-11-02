@@ -233,7 +233,7 @@ async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path:
     """Service réel avec provider défaillant → DOCUMENTATION_FAILED émis, run toujours approuvé.
 
     Vérifie que l'exception levée par provider.complete() remonte hors du
-    service, est attrapée par _documenter_le_run, et produit l'événement attendu.
+    service, est attrapée par documenter_le_run, et produit l'événement attendu.
     """
     from tessera.services.documentation import DocumentationService
     from tessera.services.providers.base import ProviderResult

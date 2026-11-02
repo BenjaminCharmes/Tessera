@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { statutsDuRun } from "../lib/statutDuRun";
 import type { StreamState } from "./streamState";
-import { useFenetreVisible } from "./useFenetreVisible";
+import { usePolling } from "./usePolling";
 import { useResource } from "./useResource";
 
 const CADENCE_MS = 30_000;
@@ -25,7 +25,6 @@ export function useRestants(
 ): readonly string[] {
   const premier = etat.ticketEvents[0];
   const signal = premier?.type === "queue_progress" ? premier : null;
-  const fenetreVisible = useFenetreVisible();
 
   const fetcher = useMemo(
     () => (runId ? () => statutsDuRun.lire(runId).then((statut) => statut.restants) : null),
@@ -40,11 +39,7 @@ export function useRestants(
     runId ? { projet, ressource: `restants:${runId}` } : undefined,
   );
 
-  useEffect(() => {
-    if (!runId || etat.runClosed || !fenetreVisible) return;
-    const minuteur = setInterval(refresh, CADENCE_MS);
-    return () => clearInterval(minuteur);
-  }, [runId, etat.runClosed, fenetreVisible, refresh]);
+  usePolling(refresh, { cadenceMs: runId && !etat.runClosed ? CADENCE_MS : null });
 
   return runId ? data : AUCUN;
 }

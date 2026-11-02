@@ -6,7 +6,6 @@ order of the stages, and the conditions that end a run, are the part that is
 hard to get right.
 """
 import asyncio
-import time
 from pathlib import Path
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any, Optional
@@ -15,12 +14,11 @@ from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
-from tessera.services.file_vivante import fermer_si_vivante, marquer_position_si_vivante
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.journal_pipeline import ajouter_ligne
 from tessera.services.livraison import Livraison
-from tessera.services.attente_dependance import attendre_si_dependant as _attendre_si_dependant, ids_termines, journal_confiee, sauter_dependants
-from tessera.services.livraison_evenements import attente_annoncee, evenements_de_livraison
+from tessera.services.attente_dependance import ids_termines
+from tessera.services.livraison_evenements import evenements_de_livraison
 from tessera.services.pipeline_events import (
     EventCallback,
     EventType,
@@ -32,6 +30,8 @@ from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 from tessera.services import pipeline_outcomes as outcomes
+from tessera.services import pipeline_file as file
+from tessera.services import pipeline_fin_de_file as fin_de_file
 from tessera.services import pipeline_stages as stages
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
@@ -49,7 +49,6 @@ from tessera.services.quota_exhaustion import is_quota_exhausted, resume_label
 from tessera.services.pipeline_reprise import reprendre_sans_codeur, verifier_travail_repris
 from tessera.services.session_limit import (
     extract_reset_time,
-    extract_reset_time_from_arret,
     is_session_limit,
 )
 
@@ -67,9 +66,6 @@ if TYPE_CHECKING:
     from tessera.services.validator import ValidatorService
 
 _logger = get_logger(__name__)
-
-# Nombre de fichiers non suivis nommés dans une ligne de journal (ticket-480).
-_MAX_FICHIERS_SIGNALES = 10
 
 _PRIORITY_ORDER: dict[TicketPriority, int] = {
     TicketPriority.critical: 0,
@@ -294,7 +290,7 @@ class Orchestrator:
         # Signalé ici, pour un run approuvé comme bloqué, avant que le ticket
         # suivant ne refasse l'état de référence des fichiers non suivis
         # (`create_branch`) et ne les range parmi les fichiers déjà présents.
-        await self._signaler_fichiers_non_suivis(ticket_id)
+        await fin_de_file.signaler_fichiers_non_suivis(self, ticket_id)
         if not resultat.approved:
             return resultat
 
@@ -325,7 +321,7 @@ class Orchestrator:
             )
         # Commit the delivery log lines just written, then return to the base
         # branch so the working tree is clean after a delivered run (ticket-378).
-        await self._finaliser_livraison(livraison)
+        await fin_de_file.finaliser_livraison(self, livraison)
         await on_event(
             OrchestratorEvent(
                 type=EventType.LIVRAISON_DONE,
@@ -648,576 +644,22 @@ class Orchestrator:
         return ticket.status in (TicketStatus.done, TicketStatus.cancelled)
 
     async def run_queue(
-        self,
-        project_id: str,
-        ticket_ids: list[str],
+        self, project_id: str, ticket_ids: list[str],
         on_event: EventCallback | None = None,
         dialogue: "DialogueChannel | None" = None,
         envelope_run_id: str | None = None,
         budget_override_usd: float | None = None,
     ) -> list[PipelineResult]:
-        """Enchaîne une sélection de tickets, dans l'ordre demandé.
-
-        Distinct de `run_autonomous`, qui choisit lui-même le prochain ticket :
-        ici l'utilisateur a désigné un lot et son ordre.
-
-        **Un ticket non approuvé arrête la file.** Les tickets d'un lot
-        dépendent presque toujours les uns des autres — c'est le découpage que
-        produit le planificateur — et enchaîner sur une base que personne n'a
-        validée ferait travailler le suivant sur un état douteux. Mieux vaut
-        s'arrêter net et laisser décider.
-
-        En mode file, le plafond de dépense vaut `run_max_budget_usd × nombre
-        de tickets` par défaut — un plafond pensé pour un ticket seul ne doit
-        pas arrêter une file de quinze (ticket-383). ``budget_override_usd``
-        remplace ce calcul quand la requête fixe explicitement un budget.
-        """
-        # Plafond effectif pour l'ensemble de la file : on multiplie le plafond
-        # par ticket par le nombre de tickets, sauf si la requête en fixe un
-        # autre. 0 signifie « pas de plafond » (même sémantique que
-        # `run_max_budget_usd`).
-        if budget_override_usd is not None:
-            effective_budget = budget_override_usd
-        elif self._run_max_budget_usd > 0:
-            effective_budget = self._run_max_budget_usd * len(ticket_ids)
-        else:
-            effective_budget = 0.0
-
-        async def _noop(event: OrchestratorEvent) -> None:
-            pass
-
-        callback = tolerant(on_event or _noop)
-        results: list[PipelineResult] = []
-
-        self._in_queue = True
-        self._interruption = None
-        # `ticket_ids` peut grandir pendant la boucle (ticket-478) : l'itérateur
-        # d'une liste relit sa longueur à chaque pas, et `total`, `restants` et
-        # `faits` se calculent sur la liste courante.
-        for index, ticket_id in enumerate(ticket_ids, start=1):
-            # Dit à la file vivante où en est la boucle : un retrait ne touche
-            # que ce qui est après (ticket-513).
-            marquer_position_si_vivante(ticket_ids, index)
-            if budget_override_usd is None and self._run_max_budget_usd > 0:
-                # Le plafond suit la longueur courante : les tickets ajoutés
-                # en route ont chacun droit au leur.
-                effective_budget = self._run_max_budget_usd * len(ticket_ids)
-            # Comme pour le budget et le quota, on vérifie **entre** deux
-            # tickets : s'arrêter au milieu de l'un laisserait son travail non
-            # commité (ADR-018, ADR-020).
-            if dialogue is not None and dialogue.stop_requested:
-                self._interrompre(project_id, "arrêt demandé")
-                break
-            if effective_budget > 0 and self._spent_usd >= effective_budget:
-                self._interrompre(
-                    project_id,
-                    "plafond de dépense"
-                    f" ({self._spent_usd:.2f} $ / {effective_budget:.2f} $)",
-                )
-                await callback(
-                    OrchestratorEvent(
-                        type=EventType.QUEUE_PROGRESS,
-                        ticket_id=ticket_id,
-                        data={
-                            "raison": "budget",
-                            "index": index,
-                            "total": len(ticket_ids),
-                            "restants": list(ticket_ids[index - 1 :]),
-                            "faits": list(ticket_ids[: index - 1]),
-                            "spent_usd": self._spent_usd,
-                            "budget_usd": effective_budget,
-                        },
-                    )
-                )
-                break
-
-            # Un ticket déjà terminé se **saute**, il ne s'exécute pas : le
-            # relancer refait un travail livré, sur une branche neuve et aux
-            # frais du quota. L'UI cachait déjà le bouton « Lancer » sur un
-            # `done`, mais pas celui de la file, et rien ne rattrapait ici —
-            # or cet endpoint est appelable directement (ticket-115).
-            #
-            # Sauter plutôt qu'arrêter : une file où un ticket terminé s'est
-            # glissé doit traiter les autres.
-            if await self._est_termine(ticket_id):
-                self._log(f"[{project_id}] {ticket_id} sauté : déjà terminé")
-                continue
-
-            await callback(
-                OrchestratorEvent(
-                    type=EventType.QUEUE_PROGRESS,
-                    ticket_id=ticket_id,
-                    # `restants` et pas seulement l'index : savoir qu'on est
-                    # au deuxième de trois ne dit pas lesquels attendent, ce
-                    # qui est l'information utile quand on envisage
-                    # d'interrompre la file (ticket-172).
-                    data={
-                        "index": index,
-                        "total": len(ticket_ids),
-                        "restants": list(ticket_ids[index:]),
-                        "faits": list(ticket_ids[: index - 1]),
-                    },
-                )
-            )
-
-            result = await self.run_pipeline(
-                project_id, ticket_id, callback, dialogue=dialogue,
-                envelope_run_id=envelope_run_id,
-            )
-            results.append(result)
-
-            if not result.approved:
-                if result.final_status == TicketStatus.todo:
-                    arret = result.arret or ""
-                    if arret.startswith("run budget exhausted"):
-                        # Plafond par ticket atteint entre deux tours : le ticket
-                        # a déjà loggé la raison dans finish_budget_exhausted_in_queue.
-                        # On arrête la file sans émettre de session_limit (ticket-386).
-                        self._interrompre(
-                            project_id,
-                            f"{ticket_id} — budget ({arret[:80]})",
-                        )
-                        await callback(
-                            OrchestratorEvent(
-                                type=EventType.QUEUE_PROGRESS,
-                                ticket_id=ticket_id,
-                                data={
-                                    "raison": "budget",
-                                    "index": index,
-                                    "total": len(ticket_ids),
-                                    "restants": list(ticket_ids[index:]),
-                                    "faits": list(ticket_ids[: index - 1]),
-                                },
-                            )
-                        )
-                    elif arret.startswith("quota_exhausted"):
-                        # Quota d'abonnement épuisé en plein ticket (ticket-498) :
-                        # le ticket est en todo, le journal a déjà dit l'heure.
-                        self._interrompre(project_id, "quota épuisé")
-                        await callback(
-                            OrchestratorEvent(
-                                type=EventType.QUEUE_PROGRESS,
-                                ticket_id=ticket_id,
-                                data={
-                                    "raison": "quota_exhausted",
-                                    "index": index,
-                                    "total": len(ticket_ids),
-                                    "restants": list(ticket_ids[index:]),
-                                    "faits": list(ticket_ids[: index - 1]),
-                                },
-                            )
-                        )
-                    else:
-                        # Limite de session : le ticket est remis en todo, la file
-                        # s'arrête proprement avant le ticket suivant.
-                        reset_time = extract_reset_time_from_arret(result.arret)
-                        reset_info = f" (reprise : {reset_time})" if reset_time else ""
-                        self._interrompre(
-                            project_id, f"limite de session{reset_info}"
-                        )
-                        await callback(
-                            OrchestratorEvent(
-                                type=EventType.QUEUE_PROGRESS,
-                                ticket_id=ticket_id,
-                                data={
-                                    "raison": "session_limit",
-                                    "reset_time": reset_time or "",
-                                    "index": index,
-                                    "total": len(ticket_ids),
-                                    "restants": list(ticket_ids[index:]),
-                                    "faits": list(ticket_ids[: index - 1]),
-                                },
-                            )
-                        )
-                else:
-                    self._interrompre(project_id, f"{ticket_id} non approuvé")
-                break
-
-            # Si la PR de ce ticket est ouverte et attend la CI :
-            # — avec CIWatcher (ADR-051) : attendre le merge pour les tickets
-            #   dépendants, laisser les indépendants démarrer.
-            # — sans CIWatcher (compatibilité) : arrêter la file si le ticket
-            #   suivant dépend de celui-ci, comme avant ticket-307.
-            if (
-                result.livraison is not None
-                and result.livraison.pr_number is not None
-            ):
-                restants = ticket_ids[index:]
-                if self._ci_watcher is not None:
-                    if self._merge_without_ci and restants:
-                        # merge_without_ci : attendre le merge pour TOUS les
-                        # tickets suivants, qu'ils en dépendent ou non — puis
-                        # réaligner la base distante avant la création de la
-                        # branche du ticket suivant (ticket-382).
-                        # Sans ticket restant, l'attente n'apporte rien.
-                        if not await self._attendre_merge_et_syncer(
-                            project_id, ticket_id, result.livraison.pr_number, callback
-                        ) and not await sauter_dependants(  # ADR-060, ticket-666
-                            self._ticket_svc, project_id, ticket_id, ticket_ids, index, self._log
-                        ):
-                            self._interrompre(project_id, f"{ticket_id} non mergé")
-                            break
-                    else:
-                        merge = await _attendre_si_dependant(
-                            self._ticket_svc,
-                            self._ci_watcher,
-                            project_id,
-                            ticket_id,
-                            restants,
-                            pr_number=result.livraison.pr_number,
-                            etat_pr=self._etat_pr,
-                            on_event=callback,
-                        )
-                        if merge is False:
-                            # Seuls les dépendants sautent (ticket-569, ADR-060).
-                            if not await sauter_dependants(
-                                self._ticket_svc, project_id, ticket_id,
-                                ticket_ids, index, self._log,
-                            ):
-                                self._interrompre(project_id, f"{ticket_id} non mergé")
-                                break
-                        if merge:
-                            # Le ticket suivant en dépend : il doit partir de la
-                            # base qui contient ce merge, pas de la base locale
-                            # d'avant (ticket-403 — le 400 était parti sans le 399).
-                            await self._realigner_base(project_id, ticket_id)
-                        self._log(journal_confiee(project_id, ticket_id, result.livraison))
-                else:
-                    livraison_bloquee = await _trouver_bloquant(
-                        self._ticket_svc,
-                        ticket_id,
-                        result.livraison.pr_number,
-                        restants,
-                    )
-                    if livraison_bloquee is not None:
-                        results[-1] = results[-1].model_copy(
-                            update={"livraison": livraison_bloquee}
-                        )
-                        break
-            else:
-                # Approuvé mais sans PR : si un ticket restant dépend de
-                # celui-ci, son travail n'est pas sur la base — il partirait
-                # d'un état qui ne contient pas la dépendance. On arrête la
-                # file plutôt que de laisser ce ticket produire du travail à
-                # jeter (ticket-361).
-                restants = ticket_ids[index:]
-                livraison_bloquee = await _trouver_bloquant_sans_pr(
-                    self._ticket_svc,
-                    ticket_id,
-                    result.livraison,
-                    restants,
-                )
-                if livraison_bloquee is not None:
-                    results[-1] = results[-1].model_copy(
-                        update={"livraison": livraison_bloquee}
-                    )
-                    self._interrompre(project_id, f"{ticket_id} n'a pas été livré")
-                    break
-
-        # Fermer **avant** le premier `await` suivant : un ajout qui passerait
-        # entre la fin de la lecture et ici rendrait 200 sans jamais s'exécuter.
-        fermer_si_vivante(ticket_ids)
-        self._in_queue = False
-        await self._nettoyer_apres_file()
-        return results
+        return await file.run_queue(self, project_id, ticket_ids, on_event,
+                                    dialogue, envelope_run_id, budget_override_usd)
 
     async def run_autonomous(
-        self,
-        project_id: str,
-        max_tickets: int = 5,
+        self, project_id: str, max_tickets: int = 5,
         on_event: EventCallback | None = None,
         envelope_run_id: str | None = None,
     ) -> list[PipelineResult]:
-        async def _noop(event: OrchestratorEvent) -> None:
-            pass
-
-        callback = tolerant(on_event or _noop)
-        results: list[PipelineResult] = []
-
-        for _ in range(max_tickets):
-            # Le plafond est vérifié *entre* les tickets : interrompre un
-            # ticket en cours laisserait son travail non commité, ce que
-            # l'isolation par branche interdit (ADR-018).
-            if self.budget_exhausted():
-                _logger.warning(
-                    "run_budget_exhausted",
-                    extra={
-                        "spent_usd": self.spent_usd,
-                        "max_usd": self._run_max_budget_usd,
-                    },
-                )
-                self._log(
-                    f"[{project_id}] run interrompu : {self.spent_usd:.2f} USD "
-                    f"dépensés sur {self._run_max_budget_usd:.2f} autorisés"
-                )
-                break
-
-            # Seconde condition d'arrêt : le quota réel de l'abonnement. Un
-            # quota inconnu ne bloque pas — un provider muet doit rester
-            # indiscernable d'un quota confortable (ticket-054).
-            if self._quota_tracker is not None and self._quota_tracker.is_low():
-                snapshot = self._quota_tracker.snapshot
-                _logger.warning(
-                    "run_quota_low",
-                    extra={"utilization": snapshot.utilization if snapshot else None},
-                )
-                self._log(
-                    f"[{project_id}] run interrompu : quota d'abonnement à "
-                    f"{(snapshot.utilization * 100) if snapshot else 0:.0f} %"
-                )
-                await callback(
-                    OrchestratorEvent(
-                        type=EventType.QUOTA_UPDATED,
-                        ticket_id="",
-                        data={
-                            **self._quota_tracker.as_event_data(),
-                            "run_interrupted": True,
-                        },
-                    )
-                )
-                break
-
-            ticket = await self.pick_next_ticket(project_id)
-            if ticket is None:
-                break
-            result = await self.run_pipeline(
-                project_id, ticket.id, callback,
-                envelope_run_id=envelope_run_id,
-            )
-            results.append(result)
-
-        return results
-
-    async def _documenter_le_run(
-        self, resultat: PipelineResult, on_event: EventCallback
-    ) -> None:
-        """Met à jour la documentation après un run approuvé, sur sa branche.
-
-        Le lot reste celui du marqueur : un run qui suit cinq tickets non
-        documentés les documente tous. La documentation est commitée ici, sur
-        la branche du run, pour partir dans sa PR — à la fin d'une file, elle
-        restait sur le disque sans commit, et le run suivant refusait l'arbre
-        sale (ADR-018). Un échec ne casse pas le run : le travail est commité,
-        et perdre son résultat pour une documentation en retard serait
-        disproportionné (ticket-198).
-        """
-        if self._documenter is None:
-            return
-        await on_event(
-            OrchestratorEvent(
-                type=EventType.DOCUMENTATION_STARTED,
-                ticket_id=resultat.ticket_id,
-            )
-        )
-        t0 = time.monotonic()
-        try:
-            doc = await self._documenter()
-        except Exception as exc:  # noqa: BLE001 — voir la docstring
-            _logger.warning("documentation_echouee", extra={"erreur": str(exc)})
-            self._log(
-                f"[{resultat.ticket_id}] documentation: échec — {str(exc)[:80]}"
-            )
-            await on_event(
-                OrchestratorEvent(
-                    type=EventType.DOCUMENTATION_FAILED,
-                    ticket_id=resultat.ticket_id,
-                    data={"error": str(exc)},
-                )
-            )
-            return
-        doc_ms = int((time.monotonic() - t0) * 1000)
-        fichiers = list(getattr(doc, "fichiers_modifies", []) or [])
-        refus = list(getattr(doc, "refus", []) or [])
-        # « 0 fichier(s) » seul cachait six refus d'affilée sur démineur, chacun
-        # pour plusieurs minutes de calcul (ticket-342).
-        motifs = "".join(f" — refusé : {r[:160]}" for r in refus)
-        # Un tour de correction coûte un appel de plus : le journal le dit (ticket-395).
-        correction = (
-            " — après tour de correction"
-            if getattr(doc, "tour_de_correction", False)
-            else ""
-        )
-        self._log(
-            f"[{resultat.ticket_id}] documentation: {len(fichiers)} fichier(s)"
-            f" ({doc_ms}ms){correction}{motifs}"
-        )
-        tickets = list(getattr(doc, "tickets", []) or [])
-        # Un ticket sans diff retrouvable n'est pas documenté : le journal le
-        # dit, ticket par ticket (ticket-541).
-        ecartes = list(getattr(doc, "ecartes", []) or [])
-        for ecarte in ecartes:
-            self._log(
-                f"[{ecarte}] documentation: pas de diff retrouvable, non documenté"
-            )
-        tronque = bool(getattr(doc, "tronque", False))
-        marqueur_ecrit = bool(getattr(doc, "marqueur_ecrit", False))
-        # Commiter si des fichiers de doc ont changé **ou** si le marqueur a
-        # été réécrit : dans les deux cas l'arbre doit rester propre avant la
-        # livraison (ADR-018, ticket-213).
-        if (fichiers or marqueur_ecrit) and self._git_workspace is not None and resultat.branch is not None:
-            try:
-                await self._git_workspace.commit_all(
-                    f"docs: update documentation for {resultat.ticket_id}"
-                )
-            except Exception as exc:  # noqa: BLE001
-                _logger.warning("documentation_commit_echoue", extra={"erreur": str(exc)})
-                refus.append(f"commit : {exc}")
-        if fichiers or refus or tronque or ecartes:
-            await on_event(
-                OrchestratorEvent(
-                    type=EventType.DOC_UPDATED,
-                    ticket_id=resultat.ticket_id,
-                    data={
-                        "fichiers": fichiers,
-                        "refus": refus,
-                        "tickets": tickets,
-                        "tronque": tronque,
-                        "ecartes": ecartes,
-                    },
-                )
-            )
-
-    async def _attendre_merge_et_syncer(
-        self,
-        project_id: str,
-        ticket_id: str,
-        pr_number: int | None = None,
-        on_event: EventCallback | None = None,
-    ) -> bool:
-        """Wait for the merge, then realign the local base; True only when merged.
-
-        Called before every next ticket under merge_without_ci (ticket-382). A timeout
-        is logged and counts as not merged: only the dependents skip (ticket-666).
-        """
-        assert self._ci_watcher is not None
-        try:
-            async with attente_annoncee(on_event, ticket_id, pr_number):
-                merged = await asyncio.wait_for(
-                    self._ci_watcher.attendre_merge(
-                        project_id, ticket_id, pr_number=pr_number, etat_pr=self._etat_pr
-                    ),
-                    timeout=self._attente_merge_max_s,
-                )
-        except asyncio.TimeoutError:
-            self._log(
-                f"[{project_id}] {ticket_id} : délai d'attente du merge dépassé"
-                f" ({self._attente_merge_max_s:.0f}s) — ticket suivant sans réalignement"
-            )
-            return False
-        if merged:
-            await self._realigner_base(project_id, ticket_id)
-        return bool(merged)
-
-    async def _realigner_base(self, project_id: str, ticket_id: str) -> None:
-        """Fast-forward the local base onto the remote after ``ticket_id`` merged.
-
-        Shared by the merge_without_ci wait (ticket-382) and the dependency
-        wait (ticket-403). A refused sync is logged, never raised.
-        """
-        if self._git_workspace is None or self._base_branch is None:
-            return
-
-        raison = await self._git_workspace.sync_base_depuis_distant(self._base_branch)
-        if raison is not None:
-            self._log(
-                f"[{project_id}] {ticket_id} : réalignement de la base ignoré — {raison}"
-            )
-        else:
-            self._log(
-                f"[{project_id}] {ticket_id} : base réalignée sur {self._base_branch}"
-            )
-
-    async def _finaliser_livraison(self, livraison: "Livraison") -> None:
-        """Commit delivery log lines and return to the base branch (ticket-378, ticket-390).
-
-        Called after any delivery attempt, whether or not a PR was opened. The
-        log lines written just before this call are in ``pipeline-log.md`` but
-        not yet committed; ``commit_bookkeeping`` picks them up so they appear
-        in the last commit of the ticket branch.  Checking out the base branch
-        then leaves the working tree clean, matching ADR-018.
-
-        Errors are logged and swallowed: a failure here must not undo an
-        already-opened PR.
-        """
-        if self._git_workspace is None:
-            return
-        try:
-            if not await self._sur_la_base():
-                await self._git_workspace.commit_bookkeeping()
-        except Exception as exc:  # noqa: BLE001
-            _logger.warning("livraison_bookkeeping_failed", extra={"error": str(exc)})
-        if self._base_branch is None:
-            return
-        try:
-            await self._git_workspace.retourner_sur_base(self._base_branch)
-        except Exception as exc:  # noqa: BLE001
-            _logger.warning("livraison_checkout_base_failed", extra={"error": str(exc)})
-
-    async def _signaler_fichiers_non_suivis(self, etiquette: str) -> None:
-        """Log the untracked files a run left in the tree; delete nothing (ticket-480).
-
-        Un client généré (Prisma, par exemple) reste non suivi après un run
-        bloqué : la ligne de journal dit lesquels, pour qu'on décide de les
-        ignorer. Une erreur ici est journalisée et avalée.
-        """
-        if self._git_workspace is None:
-            return
-        # getattr : les doubles d'espace de travail des tests n'ont pas cette méthode.
-        lister = getattr(self._git_workspace, "fichiers_non_suivis_laisses", None)
-        if lister is None:
-            return
-        try:
-            fichiers = list(await lister())
-        except Exception as exc:  # noqa: BLE001
-            _logger.warning("fichiers_non_suivis_illisibles", extra={"error": str(exc)})
-            return
-        if not fichiers:
-            return
-        vus = ", ".join(str(f) for f in fichiers[:_MAX_FICHIERS_SIGNALES])
-        if len(fichiers) > _MAX_FICHIERS_SIGNALES:
-            vus += f" et {len(fichiers) - _MAX_FICHIERS_SIGNALES} autres"
-        self._log(
-            f"[{etiquette}] fichiers non suivis laissés par le run : {vus} "
-            "(à ignorer dans .gitignore ?)"
-        )
-
-    async def _nettoyer_apres_file(self) -> None:
-        """Commit remaining log lines and return to the base branch after a queue.
-
-        The 'file interrompue' lines written after the last ticket's own
-        bookkeeping commit modify pipeline-log.md but are not yet committed.
-        This method ensures nothing stays uncommitted, and the working tree is
-        left on the base branch regardless of how the queue ended (ticket-390).
-
-        Errors are logged and swallowed: a cleanup failure must not mask the
-        queue's own result.
-        """
-        if self._git_workspace is None or self._base_branch is None:
-            return
-        try:
-            if not await self._sur_la_base():
-                await self._git_workspace.commit_bookkeeping()
-        except Exception as exc:  # noqa: BLE001
-            _logger.warning("queue_bookkeeping_failed", extra={"error": str(exc)})
-        try:
-            await self._git_workspace.retourner_sur_base(self._base_branch)
-        except Exception as exc:  # noqa: BLE001
-            _logger.warning("queue_checkout_base_failed", extra={"error": str(exc)})
-
-    async def _sur_la_base(self) -> bool:
-        """True when the working tree is already on the base branch.
-
-        Bookkeeping is never committed there: a local commit on the base
-        branch would diverge it from the remote (no direct commit on develop
-        or main). The lines stay in the tree and ride with the next ticket's
-        branch, as before ticket-390.
-        """
-        if self._git_workspace is None or self._base_branch is None:
-            return False
-        branche_courante = getattr(self._git_workspace, "branche_courante", None)
-        if branche_courante is None:
-            return False
-        return bool(await branche_courante() == self._base_branch)
+        return await file.run_autonomous(
+            self, project_id, max_tickets, on_event, envelope_run_id)
 
     @property
     def interruption(self) -> str | None:
@@ -1240,60 +682,3 @@ __all__ = [
     "OrchestratorEvent",
     "PipelineResult",
 ]
-
-
-async def _trouver_bloquant(
-    ticket_svc: TicketService,
-    ticket_id: str,
-    pr_number: int,
-    restants: list[str],
-) -> "Livraison | None":
-    """Return a blocking Livraison when a remaining ticket depends on ``ticket_id``.
-
-    Fallback used when CIWatcher is not wired (pre-ADR-051 deployments or
-    tests that don't use the background watcher). When a dependent ticket is
-    found, the returned livraison carries an ``arret`` that names the blocker;
-    the caller stops the queue. Returns None when the queue may continue.
-    """
-    for tid_suivant in restants:
-        ticket_suivant = await ticket_svc.get_ticket(tid_suivant)
-        if ticket_suivant is not None and ticket_id in ticket_suivant.depends_on:
-            return Livraison(
-                arret=(
-                    f"{tid_suivant} dépend de {ticket_id} "
-                    f"dont la PR #{pr_number} n'est pas encore mergée."
-                )
-            )
-    return None
-
-
-async def _trouver_bloquant_sans_pr(
-    ticket_svc: TicketService,
-    ticket_id: str,
-    livraison: "Livraison | None",
-    restants: list[str],
-) -> "Livraison | None":
-    """Return a blocking Livraison when an approved-but-undelivered ticket has a dependent.
-
-    Called when a ticket was approved but no PR was opened (livraison absent or
-    pr_number is None).  Any remaining ticket that lists ticket_id in its
-    depends_on cannot safely start from the current base without the approved
-    changes.  Returns a Livraison whose arret names both the dependent and the
-    undelivered ticket.  Returns None when no remaining ticket depends on
-    ticket_id.
-    """
-    raison = (
-        livraison.arret
-        if livraison is not None and livraison.arret
-        else "livraison non effectuée"
-    )
-    for tid_suivant in restants:
-        ticket_suivant = await ticket_svc.get_ticket(tid_suivant)
-        if ticket_suivant is not None and ticket_id in ticket_suivant.depends_on:
-            return Livraison(
-                arret=(
-                    f"{tid_suivant} dépend de {ticket_id}, "
-                    f"qui n'a pas été livré : {raison}"
-                )
-            )
-    return None

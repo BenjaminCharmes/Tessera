@@ -3,7 +3,6 @@ import type { PipelineRun } from "../../types/api";
 import {
   etatDuRun,
   filtrerRuns,
-  formatCout,
   formatDuree,
   lienPr,
   runAffiche,
@@ -51,11 +50,9 @@ describe("runs helpers", () => {
     expect(runAffiche([], null)).toBeNull();
   });
 
-  it("formats duration and cost", () => {
+  it("formats the duration of a run", () => {
     expect(formatDuree(run("a"))).toBe("1m 05s");
     expect(formatDuree(run("a", { finished_at: null }))).toBe("En cours…");
-    expect(formatCout(0)).toBe("—");
-    expect(formatCout(1.234)).toBe("$1.23");
   });
 
   it("drops a queue's parent run and keeps one row per ticket", () => {

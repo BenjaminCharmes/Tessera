@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tessera.services.git_runner import git
+from tessera.services.racine_depot import est_un_depot
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -119,9 +120,13 @@ def _hors_du_depot(depart: Path) -> Path:
 
     On ne remonte que tant qu'on voit un `.git` : sur un workspace ordinaire,
     sans dépôt au-dessus, le comportement ne change pas.
+
+    Le sens est inverse de `racine_depot.depot_au_dessus` : ici on sort du
+    dépôt (le premier dossier sans `.git`), là on cherche le dépôt (le premier
+    dossier avec). Seul le test « ce dossier est un dépôt » est partagé.
     """
     courant = depart
-    while (courant / ".git").exists() and courant.parent != courant:
+    while est_un_depot(courant) and courant.parent != courant:
         courant = courant.parent
     return courant
 

@@ -46,7 +46,7 @@ def construits(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> list[str]:
         appels.append(project_id)
         return _OrchestrateurImmediat()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
     return appels
 
 

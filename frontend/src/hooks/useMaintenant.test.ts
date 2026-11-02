@@ -29,4 +29,16 @@ describe("useMaintenant", () => {
 
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it("stays frozen while inactive", () => {
+    const { result } = renderHook(() => useMaintenant(1_000, false));
+    const debut = result.current;
+
+    act(() => {
+      vi.advanceTimersByTime(3_000);
+    });
+
+    expect(result.current).toBe(debut);
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });

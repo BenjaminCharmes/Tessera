@@ -107,7 +107,8 @@ def test_project_running_the_ide_offers_no_launch(
         encoding="utf-8",
     )
     monkeypatch.setattr(
-        "tessera.routers.projects.fait_tourner_l_ide", lambda path: path.name == "ide"
+        "tessera.routers.projects.listing.fait_tourner_l_ide",
+        lambda path: path.name == "ide",
     )
 
     assert _overview()["ide"]["services_declares"] is False

@@ -191,6 +191,21 @@ describe("AgentList — suppression", () => {
     expect(apiModule.api.agents.remove).not.toHaveBeenCalled();
     expect(screen.queryByRole("dialog")).toBeNull();
   });
+
+  it("renonce avec Escape, sans que le fond ne ferme la confirmation", async () => {
+    render(<AgentList onAgentCreated={onAgentCreated} />);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /supprimer securite/i }),
+    );
+    await userEvent.click(screen.getByRole("dialog"));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(apiModule.api.agents.remove).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
 });
 
 describe("AgentList — composants communs (ticket-442)", () => {

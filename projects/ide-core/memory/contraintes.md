@@ -12,6 +12,11 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Le service de documentation n'écrit dans `agents.json` que la clé
+  `description`.** Aucun agent n'écrit ce fichier : doc-technique propose le
+  texte, le service le contrôle (preuve, 220 caractères, une ligne) et le
+  remplace sans toucher au reste du fichier. (ADR-068, ADR-027, ADR-057)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,

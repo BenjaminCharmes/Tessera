@@ -7,6 +7,7 @@ import { api } from "../../lib/api";
 import { apiQuota } from "../../lib/quota";
 import { DUREE_DE_VISITE_MS } from "../../lib/bureau/ronde";
 import { apiVentilation } from "../../lib/ventilation";
+import { ventilation } from "../../test/contrat/exemples";
 import type { OrchestratorEvent, UsageStats } from "../../types/api";
 import { DERNIER, T0, etatEnCodage } from "./etatsDeTest";
 
@@ -39,7 +40,7 @@ describe("BureauView — the director's round", () => {
     vi.spyOn(api.services, "list").mockResolvedValue([]);
     vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
     vi.spyOn(api.runs, "list").mockResolvedValue([]);
-    vi.spyOn(apiVentilation, "parProjet").mockResolvedValue({ per_agent: [] });
+    vi.spyOn(apiVentilation, "parProjet").mockResolvedValue(ventilation());
     vi.spyOn(api.usage, "stats").mockResolvedValue({ daily: [] } as unknown as UsageStats);
     vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });
     vi.useFakeTimers();

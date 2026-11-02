@@ -162,7 +162,7 @@ def test_run_demarre_le_pipeline_et_rend_son_resultat_sur_le_canal(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
         run_id = _demarrer(
@@ -192,7 +192,7 @@ def test_run_autonome_transmet_max_tickets(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
         _demarrer(
@@ -217,7 +217,7 @@ def test_le_canal_diffuse_les_evenements_du_pipeline(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
         assert ws.receive_json()["type"] == "snapshot"
@@ -237,7 +237,7 @@ def test_le_canal_couvre_le_mode_autonome(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return fake
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
         _demarrer(
@@ -290,7 +290,7 @@ def test_le_canal_transmet_la_reponse_de_l_utilisateur_a_l_agent(
     async def _build(project_id: str) -> _OrchestrateurQuiDemande:
         return fake
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
         run_id = _demarrer(
@@ -318,7 +318,7 @@ def test_le_canal_transmet_un_message_spontane(
     async def _build(project_id: str) -> _OrchestrateurQuiDemande:
         return fake
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
         run_id = _demarrer(
@@ -353,7 +353,7 @@ def test_un_run_interrompu_est_clos_en_base(monkeypatch: pytest.MonkeyPatch) -> 
     async def _build(project_id: str) -> _OrchestrateurQuiEchoue:
         return _OrchestrateurQuiEchoue()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with _client_persistant() as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
@@ -396,7 +396,7 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
 ) -> None:
     # Le corps de la PR se rédige depuis le ticket : passer son identifiant en
     # guise de titre donnait une PR nommée « ticket-001 — ticket-001 ».
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
     from tessera.services.livraison import Livraison
 
     recu: dict[str, object] = {}
@@ -407,7 +407,7 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
 
     monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
 
-    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+    livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
     assert livraison.pr_number == 7
     assert recu["ticket_title"] == "Un ticket"
@@ -420,14 +420,14 @@ def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
 ) -> None:
     # Le travail est commité : perdre la réponse du run parce que GitHub est
     # injoignable ferait croire que le pipeline lui-même a échoué.
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise RuntimeError("GitHub injoignable")
 
     monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
 
-    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+    livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
     assert livraison.merged is False
     assert "injoignable" in (livraison.arret or "")
@@ -440,7 +440,7 @@ def test_une_exception_sans_message_nomme_son_type_dans_l_arret(
 ) -> None:
     # Le 2026-10-13, « Livraison interrompue : » s'est écrit sans motif : un
     # `TimeoutError()` n'a pas de message. (ticket-415)
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise TimeoutError()
@@ -448,7 +448,7 @@ def test_une_exception_sans_message_nomme_son_type_dans_l_arret(
     monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     with caplog.at_level("WARNING"):
-        livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+        livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
     assert "TimeoutError" in (livraison.arret or "")
     assert livraison.pr_number is None
@@ -464,7 +464,7 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 ) -> None:
     # La PR #13 de curio était ouverte, mais la livraison ne le savait plus :
     # la phase 2 n'est jamais partie. (ticket-415)
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
     from tessera.services.livraison import LivraisonInterrompue
 
     async def _livrer(self: object, **kwargs: object) -> object:
@@ -472,7 +472,7 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 
     monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
 
-    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+    livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
     assert livraison.pr_number == 13
     assert livraison.pr_orpheline is True
@@ -485,7 +485,7 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
     from tessera.services.livraison import LivraisonInterrompue
 
     async def _livrer(self: object, **kwargs: object) -> object:
@@ -498,7 +498,7 @@ def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
     monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     livraison = asyncio.run(
-        _livreur("mon-projet", espace=_Espace())(_approved())  # type: ignore[arg-type]
+        livreur("mon-projet", espace=_Espace())(_approved())  # type: ignore[arg-type]
     )
 
     assert livraison.pr_orpheline is True
@@ -531,13 +531,13 @@ def test_le_livreur_note_la_pr_dans_le_ticket(
 ) -> None:
     # La livraison ouvrait et mergeait la PR sans jamais l'écrire : la carte
     # du ticket, qui lit `pr_number`, proposait d'en ouvrir une (ticket-205).
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
 
     monkeypatch.setattr(
         "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
-    asyncio.run(_livreur("mon-projet")(_approved()))
+    asyncio.run(livreur("mon-projet")(_approved()))
 
     fichier = workspace / "mon-projet" / "tickets" / "todo" / "ticket-001.md"
     assert "pr_number: 7" in fichier.read_text(encoding="utf-8")
@@ -550,7 +550,7 @@ def test_noter_la_pr_laisse_l_arbre_propre(
     # coup enverrait le run suivant en `blocked` (ADR-018).
     import subprocess
 
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
 
     projet = workspace / "mon-projet"
 
@@ -568,7 +568,7 @@ def test_noter_la_pr_laisse_l_arbre_propre(
         "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
-    asyncio.run(_livreur("mon-projet")(_approved()))
+    asyncio.run(livreur("mon-projet")(_approved()))
 
     assert git("status", "--porcelain", "--untracked-files=no") == ""
     assert "pr_number: 7" in git("show", "HEAD:tickets/todo/ticket-001.md")
@@ -579,7 +579,7 @@ def test_noter_la_pr_synchronise_la_base_distante(
 ) -> None:
     # Après la phase 1 (PR ouverte), la base distante est synchronisée pour
     # que le ticket suivant forke depuis origin/<base> (ADR-051).
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
 
     appels: list[str] = []
 
@@ -598,7 +598,7 @@ def test_noter_la_pr_synchronise_la_base_distante(
         "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
-    asyncio.run(_livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
+    asyncio.run(livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
 
     assert appels == ["commit", "push", "sync"]
 
@@ -608,7 +608,7 @@ def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
 ) -> None:
     # La PR est mergée : un ticket qu'on n'a pas pu réécrire ne fait pas
     # croire que la livraison a échoué (ADR-030).
-    from tessera.routers.orchestrator import _livreur
+    from tessera.services.livreur_run import livreur
 
     async def _leve(self: object, ticket_id: str, pr_number: int) -> object:
         raise OSError("disque plein")
@@ -620,7 +620,7 @@ def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
         "tessera.services.ticket_service.TicketService.set_pr_number", _leve
     )
 
-    livraison = asyncio.run(_livreur("mon-projet")(_approved()))
+    livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
     assert livraison.pr_number == 7
     assert livraison.merged is False
@@ -654,7 +654,7 @@ def test_un_run_autonome_peut_partir_des_issues_github(
 
         return _R()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
     monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
 
     with _client_persistant() as client:
@@ -689,7 +689,7 @@ def test_un_run_autonome_ne_touche_pas_a_github_sans_le_demander(
         tires.append(direction)
         raise AssertionError("github-sync ne doit pas tourner ici")
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
     monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
 
     with _client_persistant() as client:
@@ -731,7 +731,7 @@ def test_run_interrompu_clot_le_run_et_ne_renvoie_pas_500(
     async def _build(project_id: str) -> _InterruptedOrchestrator:
         return _InterruptedOrchestrator()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with _client_persistant() as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:

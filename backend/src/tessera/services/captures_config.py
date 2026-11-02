@@ -5,10 +5,11 @@ devine pas les routes d'une app. Une section absente, mal typée ou sans écran
 valide vaut « ce projet ne se capture pas » — l'API répond alors 409 en disant
 quoi écrire.
 """
-import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+
+from tessera.services.manifeste import lire_valeur
 
 #: Largeurs en pixels : téléphone puis ordinateur.
 LARGEURS: tuple[int, ...] = (390, 1440)
@@ -139,13 +140,4 @@ def parse_captures_config(brut: object) -> ConfigCaptures | None:
 
 def load_captures_config(project_path: Path) -> ConfigCaptures | None:
     """Read `captures` from `agents.json`, or return None when unusable."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
-        return None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-    if not isinstance(data, dict):
-        return None
-    return _config(data.get("captures"))
+    return _config(lire_valeur(project_path, "captures"))

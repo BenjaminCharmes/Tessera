@@ -7,6 +7,7 @@ from pathlib import Path
 from tessera.config import _REPO_ROOT
 from tessera.models.project import ProjectCreate, ProjectFromTemplateResult
 from tessera.services.git_link import init_repository
+from tessera.services.manifeste import lire_liste
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT, MODELE_PRODUCTION
 from tessera.services.template_claude_md import write_claude_md
@@ -57,16 +58,12 @@ def _collect_used_ports(workspace: Path) -> set[int]:
             continue
 
         # Ports déclarés dans les services de agents.json
-        agents_json = project_dir / "agents.json"
-        if agents_json.exists():
-            try:
-                data = json.loads(agents_json.read_text(encoding="utf-8"))
-                for service in data.get("services", []):
-                    commande = service.get("commande", "")
-                    for m in re.finditer(r"--port[= ](\d+)", commande):
-                        used.add(int(m.group(1)))
-            except Exception:
-                pass
+        for service in lire_liste(project_dir, "services") or []:
+            commande = service.get("commande", "") if isinstance(service, dict) else ""
+            if not isinstance(commande, str):
+                continue
+            for m in re.finditer(r"--port[= ](\d+)", commande):
+                used.add(int(m.group(1)))
 
         # Port déclaré dans frontend/vite.config.ts
         vite_config = project_dir / "frontend" / "vite.config.ts"

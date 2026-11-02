@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { api } from "../../lib/api";
 import RemoveProjectModal from "./RemoveProjectModal";
@@ -120,5 +120,44 @@ describe("RemoveProjectModal", () => {
       screen.getByRole("button", { name: "Confirmer la suppression" }),
     );
     expect(remove).toHaveBeenCalledWith("mon-projet");
+  });
+
+  it("closes on Escape but not on a click on the backdrop", async () => {
+    vi.spyOn(api.git, "removalPlan").mockResolvedValue({
+      project_id: "mon-projet",
+      real_path: "/w/mon-projet",
+      is_symlink: false,
+      unpushed_commits: 0,
+    });
+    const onClose = vi.fn();
+
+    const user = userEvent.setup();
+    render(<RemoveProjectModal project={project} onClose={onClose} onRemoved={() => {}} />);
+    await screen.findByText("/w/mon-projet");
+
+    await user.click(screen.getByRole("dialog"));
+    expect(onClose).not.toHaveBeenCalled();
+
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores Escape while a removal is running", async () => {
+    vi.spyOn(api.git, "removalPlan").mockResolvedValue({
+      project_id: "mon-projet",
+      real_path: "/w/mon-projet",
+      is_symlink: false,
+      unpushed_commits: 0,
+    });
+    vi.spyOn(api.git, "detach").mockReturnValue(new Promise(() => {}));
+    const onClose = vi.fn();
+
+    const user = userEvent.setup();
+    render(<RemoveProjectModal project={project} onClose={onClose} onRemoved={() => {}} />);
+    await user.click(await screen.findByRole("button", { name: /Retirer de l'IDE/ }));
+
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

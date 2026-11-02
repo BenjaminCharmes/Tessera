@@ -6,6 +6,14 @@ from pathlib import Path
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
 from tessera.services.artifacts import default_mode_for
+from tessera.services.manifeste import (
+    chemin_manifeste,
+    ecrire_manifeste,
+    lire_chaine,
+    lire_liste,
+    lire_pour_modifier,
+    lire_valeur,
+)
 from tessera.services.modeles_par_defaut import modele_par_defaut
 from tessera.services.providers.declaration import (
     verifier_configs,
@@ -137,15 +145,8 @@ def _load_category(project_path: Path) -> str | None:
 
 def _chaine_declaree(project_path: Path, cle: str) -> str | None:
     """Une chaîne non vide déclarée à la racine d'`agents.json`, sinon `None`."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
-        return None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-    valeur = data.get(cle) if isinstance(data, dict) else None
-    if not isinstance(valeur, str) or not valeur.strip():
+    valeur = lire_chaine(project_path, cle)
+    if valeur is None or not valeur.strip():
         return None
     return valeur.strip()
 
@@ -158,27 +159,16 @@ def _load_github_remote(project_path: Path) -> tuple[str | None, str | None]:
     """
     from tessera.services.github_workflow import parse_remote
 
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
-        return None, None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-        value = data.get("github_remote")
-        return parse_remote(str(value) if value else None)
-    except Exception:
-        return None, None
+    value = lire_valeur(project_path, "github_remote")
+    return parse_remote(str(value) if value else None)
 
 
 def load_agents_config(project_path: Path) -> list[AgentConfig]:
     """Lit agents.json et retourne la liste des AgentConfig actifs."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
+    brutes = lire_valeur(project_path, "agents")
+    if not isinstance(brutes, (list, tuple)):
         return []
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-        entrees = list(data.get("agents", []))
-    except Exception:
-        return []
+    entrees = list(brutes)
     # Un provider mal orthographié, une clé en clair : pas un manifeste
     # illisible. Le refus sort du `try`, sinon le rôle retomberait sur le
     # défaut sans rien dire (tickets 188 et 669).
@@ -226,16 +216,7 @@ def load_services_config(project_path: Path) -> list[dict[str, str]]:
     n'est donc pas un manque à combler par une heuristique, c'est la réponse
     « ce projet ne se lance pas depuis l'IDE ».
     """
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
-        return []
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except Exception:
-        return []
-    services = data.get("services") or []
-    if not isinstance(services, list):
-        return []
+    services = lire_liste(project_path, "services") or []
     return [
         {
             "nom": str(s.get("nom", "")),
@@ -249,12 +230,11 @@ def load_services_config(project_path: Path) -> list[dict[str, str]]:
 
 def load_pipeline_config(project_path: Path) -> AgentPipelineConfig:
     """Lit la section pipeline de agents.json."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
+    section = lire_valeur(project_path, "pipeline")
+    if section is None:
         return AgentPipelineConfig()
     try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-        return AgentPipelineConfig(**data.get("pipeline", {}))
+        return AgentPipelineConfig.model_validate(section)
     except Exception:
         return AgentPipelineConfig()
 
@@ -610,10 +590,9 @@ def set_pipeline_settings(
     de la racine à supprimer (ticket-398). Tout le reste du fichier est
     préservé : services, artefacts, racine git, agents.
     """
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
+    if not chemin_manifeste(project_path).is_file():
         raise AgentAbsentDuProjet(f"{project_path.name} n'a pas de manifeste")
-    data = json.loads(agents_json.read_text(encoding="utf-8"))
+    data = lire_pour_modifier(project_path)
     section = data.get("pipeline")
     if not isinstance(section, dict):
         section = {}
@@ -626,13 +605,13 @@ def set_pipeline_settings(
 
 
 def _entree_du_role(project_path: Path, role: str) -> tuple[dict[str, object], dict[str, object]]:
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
+    if not chemin_manifeste(project_path).is_file():
         raise AgentAbsentDuProjet(f"{project_path.name} ne déclare aucun agent")
 
-    data = json.loads(agents_json.read_text(encoding="utf-8"))
-    for agent in data.get("agents", []):
-        if agent.get("role") == role:
+    data = lire_pour_modifier(project_path)
+    agents = data.get("agents", [])
+    for agent in agents if isinstance(agents, list) else []:
+        if isinstance(agent, dict) and agent.get("role") == role:
             return data, agent
     raise AgentAbsentDuProjet(f"L'agent '{role}' n'est pas déclaré ici")
 
@@ -640,7 +619,4 @@ def _entree_du_role(project_path: Path, role: str) -> tuple[dict[str, object], d
 def _ecrire_manifeste(project_path: Path, data: dict[str, object]) -> None:
     """Réécrit `agents.json` en préservant tout ce qu'il contient d'autre :
     le mode des artefacts, la racine git, la configuration du pipeline."""
-    (project_path / "agents.json").write_text(
-        json.dumps(data, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
+    ecrire_manifeste(project_path, data)

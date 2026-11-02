@@ -22,13 +22,10 @@ taire.
 jamais commité. Rien n'apparaît dans l'historique ni dans un diff.
 """
 import asyncio
-import json
 from pathlib import Path
 from typing import Literal
 
-from tessera.utils.logger import get_logger
-
-_logger = get_logger(__name__)
+from tessera.services.manifeste import ecrire_clef, lire_manifeste
 
 ArtifactMode = Literal["tracked", "local"]
 
@@ -78,14 +75,7 @@ def read_artifact_mode(project_path: Path) -> ArtifactMode:
     rattrapent d'un clic, un push ne se défait pas. Un projet qui veut
     partager ses artefacts le déclare explicitement.
     """
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return "local"
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        _logger.warning("agents_json_illisible", extra={"path": str(agents_json)})
-        return "local"
+    data = lire_manifeste(project_path)
     declare = data.get(_CLEF_MODE, data.get(_CLEF_MODE_HISTORIQUE))
     return "tracked" if declare == "tracked" else "local"
 
@@ -132,18 +122,7 @@ def _without_our_block(content: str) -> str:
 
 
 def _store_mode(project_path: Path, mode: ArtifactMode) -> None:
-    agents_json = project_path / "agents.json"
-    data: dict[str, object] = {}
-    if agents_json.is_file():
-        try:
-            data = json.loads(agents_json.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            data = {}
-    data.pop(_CLEF_MODE_HISTORIQUE, None)
-    agents_json.write_text(
-        json.dumps({**data, _CLEF_MODE: mode}, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
+    ecrire_clef(project_path, _CLEF_MODE, mode, retirer=(_CLEF_MODE_HISTORIQUE,))
 
 
 async def tracked_artifact_paths(project_path: Path) -> list[str]:

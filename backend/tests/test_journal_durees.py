@@ -15,6 +15,7 @@ from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketTy
 from tessera.services import pipeline_stages as stages
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_documentation import documenter_le_run
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
 from tessera.services.security_auditor import SecurityAuditResult
@@ -181,7 +182,7 @@ async def test_documentation_reussie_log_duree_et_nombre_de_fichiers(
     async def _on_event(e: OrchestratorEvent) -> None:
         events.append(e)
 
-    await orch._documenter_le_run(_resultat(), _on_event)
+    await documenter_le_run(orch, _resultat(), _on_event)
 
     log_content = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
     assert "documentation" in log_content, "no documentation log entry"
@@ -201,7 +202,7 @@ async def test_documentation_echouee_log_echec(tmp_path: Path) -> None:
     async def _on_event(e: OrchestratorEvent) -> None:
         events.append(e)
 
-    await orch._documenter_le_run(_resultat(), _on_event)
+    await documenter_le_run(orch, _resultat(), _on_event)
 
     log_content = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
     assert "documentation" in log_content, "no documentation log entry"

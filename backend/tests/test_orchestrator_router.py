@@ -1,6 +1,6 @@
 """Regression tests — ticket-044 review, finding 1 (critical).
 
-``_build_orchestrator`` already computes ``project_path`` and forwards it to
+``build_orchestrator`` already computes ``project_path`` and forwards it to
 the ``Orchestrator``. But the ``AgentRunner`` it builds a few lines earlier
 never receives it, so the SDK falls back to the backend process's cwd instead
 of the project's workspace directory. This pins that the runner used by the
@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.routers.orchestrator import _build_orchestrator, _build_project_context, _tours_du_role
+from tessera.services.assemblage_run import build_orchestrator, build_project_context, tours_du_role
 from tessera.services.pipeline_plan import ROLE_PLAN
 from tessera.services.providers.repli import ProviderAvecRepli
 
@@ -38,7 +38,7 @@ def _make_minimal_project(workspace: Path, project_id: str) -> None:
 async def test_build_orchestrator_runner_receives_project_path(tmp_path: Path) -> None:
     _make_minimal_project(tmp_path, "mon-projet")
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert orchestrator._runner._project_path == tmp_path / "mon-projet"
 
@@ -62,7 +62,7 @@ async def test_build_orchestrator_validator_et_security_auditor_sans_outils(
     coder/reviewer runner's full file/shell toolset."""
     _make_project_with_pipeline(tmp_path, "mon-projet")
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert orchestrator._validator is not None
     assert orchestrator._security_auditor is not None
@@ -99,7 +99,7 @@ async def test_build_orchestrator_branche_le_journal_de_repli_sur_le_pipeline_lo
         "pipeline": {"securite_enabled": True, "validateur_enabled": True},
     }), encoding="utf-8")
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert orchestrator._validator is not None
     assert orchestrator._security_auditor is not None
@@ -129,7 +129,7 @@ async def test_build_orchestrator_passe_le_dossier_et_le_delai_des_tests(
         encoding="utf-8",
     )
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert orchestrator._test_runner is not None
     assert orchestrator._test_runner._cwd == "backend"
@@ -152,7 +152,7 @@ async def test_project_context_ne_duplique_pas_claude_md_sur_le_provider_sdk(
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
     _make_project_with_claude_md_marker(tmp_path, "mon-projet")
 
-    context = await _build_project_context("mon-projet")
+    context = await build_project_context("mon-projet")
 
     assert "MARQUEUR_CLAUDE_MD_UNIQUE" not in context
 
@@ -165,7 +165,7 @@ async def test_project_context_conserve_claude_md_sur_le_provider_api(
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
     _make_project_with_claude_md_marker(tmp_path, "mon-projet")
 
-    context = await _build_project_context("mon-projet")
+    context = await build_project_context("mon-projet")
 
     assert "MARQUEUR_CLAUDE_MD_UNIQUE" in context
 
@@ -179,7 +179,7 @@ def test_le_plan_recoit_son_propre_budget_de_tours() -> None:
     # Le plan devait lire les services pour décider d'une approche — il
     # recevait llm_max_turns_reviewer (10) et échouait systématiquement
     # (ticket-297).
-    assert _tours_du_role(ROLE_PLAN) == settings.llm_max_turns_plan
+    assert tours_du_role(ROLE_PLAN) == settings.llm_max_turns_plan
 
 
 async def test_l_audit_securite_est_borne_au_projet_et_compte_une_fois(
@@ -191,7 +191,7 @@ async def test_l_audit_securite_est_borne_au_projet_et_compte_une_fois(
 
     _make_project_with_pipeline(tmp_path, "mon-projet")
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert orchestrator._security_auditor is not None
     audit_provider = orchestrator._security_auditor._provider
@@ -202,26 +202,26 @@ async def test_l_audit_securite_est_borne_au_projet_et_compte_une_fois(
 def test_le_reviewer_garde_son_budget_reduit() -> None:
     # Le reviewer a le diff dans son prompt : dix tours suffisent à regarder
     # autour. Ce budget ne doit pas changer avec ticket-297 (ticket-199).
-    assert _tours_du_role("reviewer") == settings.llm_max_turns_reviewer
+    assert tours_du_role("reviewer") == settings.llm_max_turns_reviewer
 
 
 def test_le_codeur_n_a_pas_de_budget_specifique() -> None:
     # Les autres rôles obtiennent None : provider_pour_role applique alors
     # settings.llm_max_turns (30).
-    assert _tours_du_role("codeur") is None
+    assert tours_du_role("codeur") is None
 
 
 def test_l_audit_securite_a_son_propre_budget() -> None:
     # Ticket-495 : l'audit ne partage plus le budget du reviewer, qu'un gros
     # diff épuisait sans verdict.
-    assert _tours_du_role("securite") == settings.llm_max_turns_securite
-    assert _tours_du_role("reviewer") == settings.llm_max_turns_reviewer
+    assert tours_du_role("securite") == settings.llm_max_turns_securite
+    assert tours_du_role("reviewer") == settings.llm_max_turns_reviewer
     assert settings.llm_max_turns_securite != settings.llm_max_turns_reviewer
 
 
 def test_plan_et_reviewer_ont_des_budgets_distincts() -> None:
     # Régression : avant ticket-297 les deux recevaient llm_max_turns_reviewer.
-    assert _tours_du_role(ROLE_PLAN) != _tours_du_role("reviewer")
+    assert tours_du_role(ROLE_PLAN) != tours_du_role("reviewer")
 
 
 async def test_build_orchestrator_passes_merge_without_ci(tmp_path: Path) -> None:
@@ -232,7 +232,7 @@ async def test_build_orchestrator_passes_merge_without_ci(tmp_path: Path) -> Non
         '{"agents": [], "merge_without_ci": true}', encoding="utf-8"
     )
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert orchestrator._merge_without_ci is True
     assert orchestrator._attente_merge_max_s == settings.attente_merge_max_s
@@ -241,7 +241,7 @@ async def test_build_orchestrator_passes_merge_without_ci(tmp_path: Path) -> Non
 async def test_build_orchestrator_merge_without_ci_off_by_default(tmp_path: Path) -> None:
     _make_minimal_project(tmp_path, "mon-projet")
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert orchestrator._merge_without_ci is False
 

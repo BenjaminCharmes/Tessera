@@ -202,7 +202,7 @@ async def test_projet_is_the_root_when_the_project_is_its_own_repository(
 
 
 def test_only_the_run_wiring_imports_run_worktree() -> None:
-    # Le branchement dans le run est le ticket-519 : ces quatre modules, et eux seuls.
+    # Le branchement dans le run est le ticket-519 : ces modules, et eux seuls.
     src = Path(__file__).resolve().parent.parent / "src" / "tessera"
     # Le module et son satellite de peuplement (ticket-523) ne comptent pas comme appelants.
     # La reprise au démarrage (ticket-520) retire des worktrees sans lancer de run :
@@ -219,9 +219,14 @@ def test_only_the_run_wiring_imports_run_worktree() -> None:
     )
     assert appelants == [
         "routers/orchestrator.py",
+        "services/assemblage_run.py",
+        "services/documenteur_run.py",
+        "services/livreur_run.py",
         "services/orchestrator.py",
         "services/pipeline_stages.py",
+        "services/preparation_run.py",
         "services/run_dans_worktree.py",
+        "services/surveillance_run.py",
     ]
 
 

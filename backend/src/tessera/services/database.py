@@ -10,6 +10,7 @@ import aiosqlite
 from pydantic import BaseModel
 
 from tessera.services.agent_calls import save_agent_call as save_agent_call
+from tessera.services.cost_aggregate import CostColumn, aggregate_cost
 from tessera.services.database_migrations import MIGRATIONS as _MIGRATIONS
 from tessera.utils.logger import get_logger
 
@@ -622,65 +623,31 @@ async def get_usage_breakdown(
     coûte Tessera ce mois-ci » n'avait aucune réponse, chaque endpoint étant
     borné à un projet.
     """
-    filtre = "WHERE pr.project_id = ?" if project_id is not None else ""
+    where = "pr.project_id = ?" if project_id is not None else "1 = 1"
     params: tuple[Any, ...] = (project_id,) if project_id is not None else ()
+
+    async def _lignes(
+        db: aiosqlite.Connection, colonne: CostColumn, nom: str
+    ) -> list[dict[str, Any]]:
+        return [
+            {
+                nom: ligne.key,
+                "total_cost_usd": ligne.cost_usd,
+                "total_tokens": ligne.tokens,
+                "call_count": ligne.calls,
+            }
+            for ligne in await aggregate_cost(db, colonne, where, params)
+        ]
 
     async with aiosqlite.connect(str(db_path)) as db:
         db.row_factory = aiosqlite.Row
-
-        async def _agrege(colonne: str) -> list[dict[str, Any]]:
-            async with db.execute(
-                f"""SELECT ac.{colonne} AS cle,
-                           COALESCE(SUM(ac.cost_usd), 0.0) AS total_cost_usd,
-                           COALESCE(SUM(ac.input_tokens + ac.output_tokens
-                                        + ac.cache_read_tokens), 0) AS total_tokens,
-                           COUNT(*) AS call_count
-                    FROM agent_calls ac
-                    JOIN pipeline_runs pr ON pr.id = ac.run_id
-                    {filtre}
-                    GROUP BY ac.{colonne}
-                    ORDER BY total_cost_usd DESC""",
-                params,
-            ) as cursor:
-                lignes = await cursor.fetchall()
-            return [
-                {
-                    colonne: row["cle"],
-                    "total_cost_usd": float(row["total_cost_usd"]),
-                    "total_tokens": int(row["total_tokens"]),
-                    "call_count": int(row["call_count"]),
-                }
-                for row in lignes
-            ]
-
-        per_agent = await _agrege("role")
-        per_model = await _agrege("model")
-
+        per_agent = await _lignes(db, "ac.role", "role")
+        per_model = await _lignes(db, "ac.model", "model")
         # Ventiler par projet quand on en regarde un seul n'apprendrait rien :
         # cette clé ne se remplit que sur la vue d'ensemble (ticket-082).
-        per_project: list[dict[str, Any]] = []
-        if project_id is None:
-            async with db.execute(
-                """SELECT pr.project_id AS cle,
-                          COALESCE(SUM(ac.cost_usd), 0.0) AS total_cost_usd,
-                          COALESCE(SUM(ac.input_tokens + ac.output_tokens
-                                       + ac.cache_read_tokens), 0) AS total_tokens,
-                          COUNT(ac.id) AS call_count
-                   FROM pipeline_runs pr
-                   JOIN agent_calls ac ON ac.run_id = pr.id
-                   GROUP BY pr.project_id
-                   ORDER BY total_cost_usd DESC"""
-            ) as cursor:
-                lignes = await cursor.fetchall()
-            per_project = [
-                {
-                    "project_id": row["cle"],
-                    "total_cost_usd": float(row["total_cost_usd"]),
-                    "total_tokens": int(row["total_tokens"]),
-                    "call_count": int(row["call_count"]),
-                }
-                for row in lignes
-            ]
+        per_project = (
+            await _lignes(db, "pr.project_id", "project_id") if project_id is None else []
+        )
 
     return {
         "project_id": project_id,

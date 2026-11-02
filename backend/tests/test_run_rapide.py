@@ -10,7 +10,8 @@ from typing import Any
 import pytest
 
 from tessera.config import settings
-from tessera.routers.orchestrator import RunRequest, _build_orchestrator
+from tessera.routers.orchestrator import RunRequest
+from tessera.services.assemblage_run import build_orchestrator
 from tessera.services.journal_pipeline import journaliser_mode_rapide
 from tessera.services.providers import par_role
 from tessera.services.providers.par_role import provider_pour_role
@@ -135,7 +136,7 @@ async def test_building_a_fast_orchestrator_logs_the_mode_once(
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
     projet = _projet_avec_validateur(tmp_path)
 
-    orchestrator = await _build_orchestrator("mon-projet", rapide=True)
+    orchestrator = await build_orchestrator("mon-projet", rapide=True)
 
     assert orchestrator._validator is not None
     assert isinstance(orchestrator._validator._provider._inner, ProviderRepliDirect)
@@ -150,7 +151,7 @@ async def test_building_a_normal_orchestrator_logs_nothing(
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")
     projet = _projet_avec_validateur(tmp_path)
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert isinstance(orchestrator._validator._provider._inner, ProviderAvecRepli)  # type: ignore[union-attr]
     assert not (projet / "memory" / "pipeline-log.md").exists()

@@ -4,17 +4,20 @@
 « stack à définir ») avant que le manifeste complet n'existe. Ce module le
 réécrit une fois `agents.json` posé, pour que chaque agent lise un projet vrai.
 """
-import json
 from pathlib import Path
+
+from tessera.services.manifeste import lire_fichier
 
 
 def active_roles(agents_json: Path) -> list[str]:
     """Return the roles declared active in a project's agents.json."""
-    data = json.loads(agents_json.read_text(encoding="utf-8"))
+    agents = lire_fichier(agents_json).get("agents")
+    if not isinstance(agents, list):
+        return []
     return [
         str(agent["role"])
-        for agent in data.get("agents", [])
-        if agent.get("active", True)
+        for agent in agents
+        if isinstance(agent, dict) and "role" in agent and agent.get("active", True)
     ]
 
 

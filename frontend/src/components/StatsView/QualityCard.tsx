@@ -1,4 +1,4 @@
-import { formatDurationMs } from "../../design/charts/palette";
+import { formatDurationMs } from "../../lib/format";
 import type { RunQuality } from "../../types/api";
 
 /**

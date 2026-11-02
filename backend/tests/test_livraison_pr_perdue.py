@@ -6,7 +6,7 @@ import httpx
 import pytest
 import respx
 
-from tessera.routers.orchestrator import _livraison_interrompue
+from tessera.services.livreur_run import livraison_interrompue
 from tessera.services.github_service import GitHubService
 from tessera.services.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import LivraisonInterrompue, LivraisonService
@@ -74,7 +74,7 @@ async def test_read_timeout_with_an_open_pr_carries_its_number(tmp_path: Path) -
         await _phase_1(_service(tmp_path, workflow))
 
     assert workflow.recherches == [_BRANCH]
-    livraison = _livraison_interrompue(info.value)
+    livraison = livraison_interrompue(info.value)
     assert livraison.pr_number == 20
     assert livraison.pr_orpheline is True
     assert "ReadTimeout" in (livraison.arret or "")
@@ -88,7 +88,7 @@ async def test_read_timeout_without_an_open_pr_stays_a_plain_stop(
     with pytest.raises(httpx.ReadTimeout) as info:
         await _phase_1(_service(tmp_path, workflow))
 
-    livraison = _livraison_interrompue(info.value)
+    livraison = livraison_interrompue(info.value)
     assert livraison.pr_number is None
     assert livraison.pr_orpheline is False
     assert "ReadTimeout" in (livraison.arret or "")
@@ -100,7 +100,7 @@ async def test_a_failing_search_keeps_the_original_stop(tmp_path: Path) -> None:
     with pytest.raises(httpx.ReadTimeout) as info:
         await _phase_1(_service(tmp_path, workflow))
 
-    livraison = _livraison_interrompue(info.value)
+    livraison = livraison_interrompue(info.value)
     assert livraison.pr_number is None
     assert "ReadTimeout" in (livraison.arret or "")
 

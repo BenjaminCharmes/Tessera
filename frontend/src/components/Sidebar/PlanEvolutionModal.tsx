@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Ticket, TicketDraft } from "../../types/api";
 import { api } from "../../lib/api";
+import Modale from "../../design/ui/Modale";
 
 type ModalState = "idle" | "planning" | "review" | "creating" | "error";
 
@@ -96,24 +97,13 @@ export default function PlanEvolutionModal({
   const perteEnCours =
     state === "planning" || state === "creating" || drafts.length > 0;
 
-  function handleOverlayClick(e: React.MouseEvent) {
-    if (e.target === e.currentTarget && !perteEnCours) onClose();
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape" && !perteEnCours) onClose();
-  }
-
   const isLoading = state === "planning" || state === "creating";
   const selectedCount = selected.size;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      onClick={handleOverlayClick}
-      onKeyDown={handleKeyDown}
-      role="dialog"
-      aria-modal="true"
+    <Modale
+      onFermer={onClose}
+      fermetureSuspendue={perteEnCours}
       aria-label="Planifier une évolution"
     >
       <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-lg shadow-xl">
@@ -262,6 +252,6 @@ export default function PlanEvolutionModal({
           </>
         )}
       </div>
-    </div>
+    </Modale>
   );
 }

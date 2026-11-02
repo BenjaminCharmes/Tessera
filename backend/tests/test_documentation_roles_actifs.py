@@ -10,7 +10,8 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.routers import orchestrator as routeur
+from tessera.services import documenteur_run
+from tessera.services.documenteur_run import documenteur
 from tessera.services import documentation
 from tests.matiere_factice import matiere_factice
 from tests.test_providers_base import FakeProvider
@@ -62,7 +63,7 @@ def fournisseurs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, F
     monkeypatch.setattr(settings, "ide_prompts_dir", prompts)
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
     monkeypatch.setattr(
-        routeur, "provider_pour_role", lambda _chemin, role, **_: doubles[role]
+        documenteur_run, "provider_pour_role", lambda _chemin, role, **_: doubles[role]
     )
     # Le diff d'un ticket se prend sur sa branche : ces tickets n'en ont pas.
     monkeypatch.setattr(documentation, "matiere_du_lot", matiere_factice())
@@ -82,7 +83,7 @@ async def test_inactive_documentation_role_is_not_called(
 ) -> None:
     _declarer(tmp_path, [_agent("doc-technique", False), _agent("doc-fonctionnelle", True)])
 
-    await routeur._documenteur(PROJET)()
+    await documenteur(PROJET)()
 
     assert _appeles(fournisseurs) == ["doc-fonctionnelle"]
 
@@ -92,7 +93,7 @@ async def test_undeclared_documentation_role_is_not_called(
 ) -> None:
     _declarer(tmp_path, [_agent("doc-technique", True)])
 
-    await routeur._documenteur(PROJET)()
+    await documenteur(PROJET)()
 
     assert _appeles(fournisseurs) == ["doc-technique"]
 
@@ -102,7 +103,7 @@ async def test_no_active_documentation_role_writes_nothing_and_keeps_the_marker(
 ) -> None:
     _declarer(tmp_path, [_agent("doc-technique", False)])
 
-    resultat = await routeur._documenteur(PROJET)()
+    resultat = await documenteur(PROJET)()
 
     projet = tmp_path / PROJET
     assert _appeles(fournisseurs) == []
@@ -116,7 +117,7 @@ async def test_no_active_documentation_role_writes_nothing_and_keeps_the_marker(
 async def test_project_without_manifest_calls_no_documentation_role(
     tmp_path: Path, fournisseurs: dict[str, FakeProvider]
 ) -> None:
-    resultat = await routeur._documenteur(PROJET)()
+    resultat = await documenteur(PROJET)()
 
     assert _appeles(fournisseurs) == []
     assert resultat.marqueur_ecrit is False
@@ -127,7 +128,7 @@ async def test_two_active_documentation_roles_are_both_called(
 ) -> None:
     _declarer(tmp_path, [_agent(role, True) for role in ROLES])
 
-    resultat = await routeur._documenteur(PROJET)()
+    resultat = await documenteur(PROJET)()
 
     assert _appeles(fournisseurs) == list(ROLES)
     assert resultat.marqueur_ecrit is True

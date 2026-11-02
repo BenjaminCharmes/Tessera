@@ -1,4 +1,5 @@
 import type { EtatPastille } from "../../design/ui/StatusPill";
+import { formatDurationMs } from "../../lib/format";
 import type { PipelineRun } from "../../types/api";
 
 /** Where a run stands, from the point of view of the History tab. */
@@ -132,23 +133,7 @@ export function formatDuree(run: PipelineRun): string {
   // Un run interrompu est resté ouvert des heures : sa durée ne dit rien.
   if (estInterrompu(run)) return "—";
   const ms = new Date(run.finished_at).getTime() - new Date(run.started_at).getTime();
-  if (ms < 0) return "—";
-  const secondes = Math.floor(ms / 1000);
-  const minutes = Math.floor(secondes / 60);
-  return `${minutes}m ${String(secondes % 60).padStart(2, "0")}s`;
-}
-
-export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-export function formatCout(usd: number): string {
-  return usd > 0 ? `$${usd.toFixed(2)}` : "—";
+  return formatDurationMs(ms, "run");
 }
 
 /**

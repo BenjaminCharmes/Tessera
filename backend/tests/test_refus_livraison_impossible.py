@@ -38,7 +38,7 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     async def _build(project_id: str) -> _OrchestrateurImmediat:
         return _OrchestrateurImmediat()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
     return ws
 
 

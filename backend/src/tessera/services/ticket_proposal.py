@@ -24,6 +24,7 @@ from tessera.services.github_workflow import GitHubWorkflowService, PullRequestR
 from tessera.services.livraison import LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.proposal_workspace import ProposalWorkspace
+from tessera.services.racine_depot import GIT_ROOT_ANCESTOR
 from tessera.services.temporary_worktree import detached_worktree, run_git
 from tessera.services.ticket_service import validate_ticket
 
@@ -167,7 +168,7 @@ async def propose_tickets(request: ProposalRequest) -> Proposal:
     if prefix and not request.policy.dans_le_depot_parent:
         raise ProposalRefused(
             "Ce projet n'est pas la racine de son dépôt git (ADR-024) : "
-            'déclare `"git_root": "ancestor"` pour y proposer des tickets.'
+            f'déclare `"git_root": "{GIT_ROOT_ANCESTOR}"` pour y proposer des tickets.'
         )
     branch = _branch_name()
     await run_git(request.project_path, "fetch", "origin", request.base_branch)

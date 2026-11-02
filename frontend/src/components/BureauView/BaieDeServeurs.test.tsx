@@ -6,10 +6,11 @@ import BoutonServices from "../Sidebar/BoutonServices";
 import { useServices } from "../../hooks/useServices";
 import type { UseServicesResult } from "../../hooks/useServices";
 import { api } from "../../lib/api";
+import { serviceActif } from "../../test/contrat/exemples";
 import type { ServiceActif } from "../../types/api";
 
 function service(over: Partial<ServiceActif> = {}): ServiceActif {
-  return {
+  return serviceActif({
     nom: "api",
     project_id: "ide-core",
     pid: 4242,
@@ -17,7 +18,7 @@ function service(over: Partial<ServiceActif> = {}): ServiceActif {
     en_cours: false,
     code_de_sortie: null,
     ...over,
-  };
+  });
 }
 
 /** Ce que fait la pièce : une lecture des services, la baie au mur et le bouton dans l'en-tête. */
