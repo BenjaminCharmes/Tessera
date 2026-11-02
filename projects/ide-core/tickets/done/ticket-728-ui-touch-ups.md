@@ -2,8 +2,8 @@
 id: ticket-728
 title: "UI touch-ups from the 2 November review"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 815
 priority: medium
 agent: codeur
 depends_on: []
@@ -39,10 +39,10 @@ Relevés au fil de la matinée :
 
 ## Critères d'acceptation
 
-- [ ] Un test de `useAppsEnCours.test.ts` lève « En lancement » avec une lecture plus
+- [x] Un test de `useAppsEnCours.test.ts` lève « En lancement » avec une lecture plus
       lente que `CADENCE_ATTENTE_MS`
-- [ ] Le quota de `StatsView/index.tsx` partage sa ligne avec les KPI à partir de `xl`
-- [ ] Benjamin a validé le rendu
+- [x] Le quota de `StatsView/index.tsx` partage sa ligne avec les KPI à partir de `xl`
+- [x] Benjamin a validé le rendu
 
 ## Dépendances
 
