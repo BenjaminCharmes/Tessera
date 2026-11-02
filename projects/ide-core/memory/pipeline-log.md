@@ -6964,3 +6964,28 @@ Le diff ajoute :
 - 2026-11-02 10:01:34 UTC — [ticket-695] validateur: APPROVED — La refactorisation a bien scindé `appliquerEvenement` en 5 modules spécialisés ( (35844ms)
 - 2026-11-02 10:01:34 UTC — [ticket-695] APPROVED après 2 tour(s)
 - 2026-11-02 10:05:01 UTC — [ticket-695] documentation: 0 fichier(s) (198813ms) — après tour de correction
+- 2026-11-02 10:12:04 UTC — [ide-core] ticket-695 PR #819 confiée au CIWatcher
+- 2026-11-02 10:12:04 UTC — [ticket-696] fichiers non suivis laissés par le run : tickets/blocked/ticket-696-cockpit-hook-split-by-region.md (à ignorer dans .gitignore ?)
+- 2026-11-02 10:12:04 UTC — [ide-core] file interrompue : ticket-696 non approuvé
+- 2026-11-02 10:19:11 UTC — [ide-core] ticket-695 PR #819 mergée (CI verte)
+- 2026-11-02 10:37:54 UTC — [ticket-696] branche ticket-696-cockpit-hook-split-by-region
+- 2026-11-02 10:37:57 UTC — [ticket-696] tour 1 — codeur démarré
+- 2026-11-02 10:44:26 UTC — [ticket-696] tour 1 — codeur terminé (388797ms)
+- 2026-11-02 10:50:33 UTC — [ticket-696] testeur: OK (exit 0)
+- 2026-11-02 10:52:16 UTC — [ticket-696] securite: PASS — Ce diff effectue un refactoring pur du hook `useCockpit.ts` (532 lignes) en le d (102625ms)
+- 2026-11-02 10:52:16 UTC — [ticket-696] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 10:52:16 UTC — [ticket-696] tour 1 — reviewer démarré
+- 2026-11-02 10:52:36 UTC — [ticket-696] tour 1 — reviewer terminé (19952ms)
+- 2026-11-02 10:53:01 UTC — [ticket-696] validateur: fichiers cités joints : App.tsx, hooks/useCockpit.ts
+- 2026-11-02 10:53:01 UTC — [ticket-696] validateur: CHANGES_REQUESTED — 4/5 critères validés. La refactorisation crée 7 hooks régionaux bien rangés (< 3 (45577ms)
+- 2026-11-02 10:53:01 UTC — [ticket-696] CHANGES_REQUESTED tour 1: Validateur : 4/5 critères validés. La refactorisation crée 7 hooks régionaux bien rangés (< 300 lignes chacun), avec une réduction drastique de useCockpit (532 → 45 lignes). L'API reste identique et A
+- 2026-11-02 10:53:01 UTC — [ticket-696] tour 2 — codeur démarré
+- 2026-11-02 10:56:29 UTC — [ticket-696] tour 2 — codeur terminé (207578ms)
+- 2026-11-02 11:00:04 UTC — [ticket-696] testeur: OK (exit 0)
+- 2026-11-02 11:01:09 UTC — [ticket-696] securite: PASS — Refactorisation sûre : le fichier `useCockpit.ts` (532 l.) est scindé en 8 fichi (65140ms)
+- 2026-11-02 11:01:11 UTC — [ticket-696] tour 2 — reviewer démarré
+- 2026-11-02 11:01:40 UTC — [ticket-696] tour 2 — reviewer terminé (29031ms)
+- 2026-11-02 11:06:24 UTC — [ticket-696] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:06:49 UTC — [ticket-696] validateur: fichiers cités joints : App.tsx, hooks/useCockpit.ts
+- 2026-11-02 11:06:49 UTC — [ticket-696] validateur: APPROVED — La refactorisation divise `useCockpit` (532 lignes) en 7 hooks régionaux spécial (339641ms)
+- 2026-11-02 11:06:49 UTC — [ticket-696] APPROVED après 2 tour(s)
