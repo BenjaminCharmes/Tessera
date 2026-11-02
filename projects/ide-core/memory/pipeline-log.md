@@ -7004,3 +7004,16 @@ Le diff ajoute :
 - 2026-11-02 11:22:42 UTC — [ticket-697] validateur: APPROVED — Refactoring réussi : `ImportProjectModal` a été découpée en 4 fichiers distincts (318843ms)
 - 2026-11-02 11:22:42 UTC — [ticket-697] APPROVED après 1 tour(s)
 - 2026-11-02 11:24:54 UTC — [ticket-697] documentation: 0 fichier(s) (108859ms)
+- 2026-11-02 11:28:18 UTC — [ide-core] ticket-697 PR #821 confiée au CIWatcher
+- 2026-11-02 11:28:22 UTC — [ticket-698] branche ticket-698-three-barely-oversized-components-go-under-300-li
+- 2026-11-02 11:28:26 UTC — [ticket-698] tour 1 — codeur démarré
+- 2026-11-02 11:32:39 UTC — [ticket-698] tour 1 — codeur terminé (253608ms)
+- 2026-11-02 11:35:11 UTC — [ide-core] ticket-697 PR #821 mergée (CI verte)
+- 2026-11-02 11:35:56 UTC — [ticket-698] testeur: OK (exit 0)
+- 2026-11-02 11:37:25 UTC — [ticket-698] securite: PASS — Refactoring propre de composants React frontend sans introduction de vulnérabili (88063ms)
+- 2026-11-02 11:37:25 UTC — [ticket-698] tour 1 — reviewer démarré
+- 2026-11-02 11:37:42 UTC — [ticket-698] tour 1 — reviewer terminé (16780ms)
+- 2026-11-02 11:42:28 UTC — [ticket-698] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: fichiers cités joints : FilDuRun/index.tsx, Sidebar/TicketCard.tsx, Sidebar/TicketList.tsx (tronqué)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: APPROVED — Le refactoring a réussi : les quatre vues du fil du run et la barre d'outils de  (354703ms)
+- 2026-11-02 11:43:20 UTC — [ticket-698] APPROVED après 1 tour(s)
