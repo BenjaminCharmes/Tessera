@@ -111,6 +111,17 @@ FRONTEND_STEPS: list[Step] = [
 ]
 
 # Kept for backward compatibility and for tools that iterate all steps.
+# Un diff qui ne touche que des consignes (ADR, contraintes, CLAUDE.md, prompts,
+# skills) ne lançait aucun test : l'ADR-069 du ticket-674 a dépassé son budget sans
+# qu'aucun testeur ne le voie (ticket-734). Dix secondes suffisent à le dire.
+CONSIGNES_STEPS: list[Step] = [
+    Step(
+        name="consignes",
+        cmd=[_PYTHON, "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_consignes_coherentes.py"],
+        cwd=BACKEND_DIR,
+    ),
+]
+
 STEPS: list[Step] = BACKEND_STEPS + TYPE_STEPS + FRONTEND_STEPS
 
 
@@ -241,9 +252,20 @@ def chains_for(paths: list[str] | None) -> tuple[bool, bool]:
     return backend, frontend
 
 
+_CONSIGNES = ("projects/ide-core/memory/", "agents/prompts/", ".claude/skills/")
+
+
+def consignes_touchees(paths: list[str]) -> bool:
+    """Whether the diff touches an instruction file that the consistency tests check."""
+    return any(p.startswith(_CONSIGNES) or p.endswith("CLAUDE.md") for p in paths)
+
+
 def main() -> int:
     """Entry point."""
-    backend, frontend = chains_for(changed_paths())
+    paths = changed_paths()
+    backend, frontend = chains_for(paths)
+    if not (backend or frontend) and paths is not None and consignes_touchees(paths):
+        return run_parallel(CONSIGNES_STEPS, [], [])
     if not (backend or frontend):
         print("Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.", file=sys.stderr)
         return 0
