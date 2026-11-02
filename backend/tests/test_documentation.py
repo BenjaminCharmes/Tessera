@@ -4,13 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation import (
-    EditionRefusee,
-    appliquer_editions,
-    tickets_a_documenter,
-    marquer_documente,
-    _PLAFOND,
-)
+from tessera.services.documentation import EditionRefusee, _PLAFOND
+from tessera.services.documentation_editions import appliquer_editions
+from tessera.services.documentation_selection import marquer_documente, tickets_a_documenter
 from tessera.services.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
 from tests.matiere_factice import matiere_factice
 
@@ -396,7 +392,8 @@ async def test_un_lot_sans_aucun_diff_n_appelle_aucun_agent(tmp_path: Path) -> N
 
 
 def test_le_brief_donne_tickets_diffs_fichiers_puis_documentation_dans_cet_ordre() -> None:
-    from tessera.services.documentation import TicketADocumenter, _brief
+    from tessera.services.documentation import _brief
+    from tessera.services.documentation_selection import TicketADocumenter
 
     tickets = [TicketADocumenter("ticket-001", "Titre un", "Corps du ticket un")]
     matiere = MatiereCode(
@@ -419,7 +416,8 @@ def test_le_brief_donne_tickets_diffs_fichiers_puis_documentation_dans_cet_ordre
 
 
 def test_le_brief_sans_matiere_de_code_reste_valide() -> None:
-    from tessera.services.documentation import TicketADocumenter, _brief
+    from tessera.services.documentation import _brief
+    from tessera.services.documentation_selection import TicketADocumenter
 
     brief = _brief([TicketADocumenter("ticket-001", "T", "Corps")], MatiereCode())
 

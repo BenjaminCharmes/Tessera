@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation import DocumentationService, EditionRefusee, appliquer_editions
+from tessera.services.documentation import DocumentationService, EditionRefusee
+from tessera.services.documentation_editions import appliquer_editions
 from tessera.services.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
 from tessera.services.documentation_preuve import (
     VOLUME_MAX_EDITION,
