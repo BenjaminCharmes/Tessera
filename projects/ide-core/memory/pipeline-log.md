@@ -6941,3 +6941,25 @@ Le diff ajoute :
 - 2026-11-02 09:05:03 UTC — [ticket-693] validateur: APPROVED — Tous les critères sont satisfaits. Le split de `types/api.ts` (676 → 9 lignes) e (345594ms)
 - 2026-11-02 09:05:03 UTC — [ticket-693] APPROVED après 1 tour(s)
 - 2026-11-02 09:05:55 UTC — [ticket-693] documentation: 0 fichier(s) (47125ms)
+- 2026-11-02 09:46:17 UTC — [ide-core] ticket-694 PR #817 non surveillée (livraison arrêtée)
+- 2026-11-02 09:46:28 UTC — [ticket-695] branche ticket-695-stream-state-reducer-split-by-event-family
+- 2026-11-02 09:46:30 UTC — [ticket-695] tour 1 — codeur démarré
+- 2026-11-02 09:47:50 UTC — [ticket-695] tour 1 — codeur terminé (80250ms)
+- 2026-11-02 09:47:53 UTC — [ticket-695] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-11-02 09:48:19 UTC — [ticket-695] securite: PASS — Aucun fichier n'a été modifié dans ce run. Le garde-fou d'écriture (hook PreTool (26561ms)
+- 2026-11-02 09:48:20 UTC — [ticket-695] tour 1 — reviewer démarré
+- 2026-11-02 09:48:38 UTC — [ticket-695] tour 1 — reviewer terminé (17765ms)
+- 2026-11-02 09:53:20 UTC — [ticket-695] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 09:53:55 UTC — [ticket-695] validateur: fichiers cités joints : hooks/streamState.ts (tronqué)
+- 2026-11-02 09:53:55 UTC — [ticket-695] validateur: CHANGES_REQUESTED — Le ticket est **BLOCKED** : le garde-fou interdit toute écriture vers `frontend/ (336155ms)
+- 2026-11-02 09:53:55 UTC — [ticket-695] CHANGES_REQUESTED tour 1: Reviewer : 1. Aucune modification de code : `appliquerEvenement` n'est pas découpé, l'entrée `hooks/streamState.ts` de `PLAFONDS` n'est pas baissée, et il n'y a ni fixture commitée ni test de rejeu. A
+- 2026-11-02 09:53:55 UTC — [ticket-695] tour 2 — codeur démarré
+- 2026-11-02 09:57:09 UTC — [ticket-695] tour 2 — codeur terminé (193984ms)
+- 2026-11-02 10:00:07 UTC — [ticket-695] testeur: OK (exit 0)
+- 2026-11-02 10:00:58 UTC — [ticket-695] securite: PASS — Refactoring de sécurité inerte : split du réducteur streamState en familles d'év (51640ms)
+- 2026-11-02 10:00:58 UTC — [ticket-695] tour 2 — reviewer démarré
+- 2026-11-02 10:00:59 UTC — [ticket-695] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 10:01:29 UTC — [ticket-695] tour 2 — reviewer terminé (30500ms)
+- 2026-11-02 10:01:34 UTC — [ticket-695] validateur: fichiers cités joints : hooks/streamState.ts
+- 2026-11-02 10:01:34 UTC — [ticket-695] validateur: APPROVED — La refactorisation a bien scindé `appliquerEvenement` en 5 modules spécialisés ( (35844ms)
+- 2026-11-02 10:01:34 UTC — [ticket-695] APPROVED après 2 tour(s)
