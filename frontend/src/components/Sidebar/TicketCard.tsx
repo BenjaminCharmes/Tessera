@@ -5,66 +5,17 @@ import {
   IconQueue,
 } from "../../design/icons";
 import { memo } from "react";
-import StatusPill, { type EtatPastille } from "../../design/ui/StatusPill";
+import StatusPill from "../../design/ui/StatusPill";
 import { MIME_TICKET, transitionsManuelles } from "../../lib/transitionsManuelles";
-import type {
-  PRStatus,
-  Ticket,
-  TicketPriority,
-  TicketStatus,
-} from "../../types/api";
-
-const STATUS_STYLE: Record<TicketStatus, string> = {
-  todo: "bg-zinc-700 text-zinc-300",
-  "in-progress": "bg-blue-900 text-blue-300",
-  "in-review": "bg-amber-900 text-amber-300",
-  done: "bg-green-900 text-green-300",
-  blocked: "bg-red-900 text-red-300",
-  cancelled: "bg-zinc-800 text-zinc-400",
-};
-
-/** Correspondance de la charte : une priorité se lit comme un état. */
-const PRIORITY_ETAT: Record<TicketPriority, EtatPastille> = {
-  critical: "echec",
-  high: "attention",
-  medium: "neutre",
-  low: "neutre",
-};
-
-/** Le statut d'un ticket vu par `StatusPill` (select exclu, il garde son style). */
-const STATUS_ETAT: Record<TicketStatus, EtatPastille> = {
-  todo: "neutre",
-  "in-progress": "en-cours",
-  "in-review": "attention",
-  done: "reussi",
-  blocked: "echec",
-  cancelled: "neutre",
-};
-
-// Pas d'icône ici : `CI_ETAT` porte déjà la couleur du rôle — ambre en
-// attente, vert au succès, rouge à l'échec. Une émoji par-dessus répétait
-// l'information et changeait de dessin selon la machine (ticket-067).
-const CI_LABEL: Record<string, string> = {
-  pending: "CI en cours",
-  passing: "CI verte",
-  failing: "CI en échec",
-  none: "CI N/A",
-  unreadable: "CI illisible",
-};
-
-const CI_ETAT: Record<string, EtatPastille> = {
-  pending: "attention",
-  passing: "reussi",
-  failing: "echec",
-  none: "neutre",
-  unreadable: "attention",
-};
-
-const PR_STATE_LABEL: Record<string, string> = {
-  open: "PR ouverte",
-  closed: "PR fermée",
-  merged: "PR mergée",
-};
+import type { PRStatus, Ticket, TicketStatus } from "../../types/api";
+import {
+  CI_ETAT,
+  CI_LABEL,
+  PR_STATE_LABEL,
+  PRIORITY_ETAT,
+  STATUS_ETAT,
+  STATUS_STYLE,
+} from "./ticketCardTables";
 
 interface TicketCardProps {
   ticket: Ticket;

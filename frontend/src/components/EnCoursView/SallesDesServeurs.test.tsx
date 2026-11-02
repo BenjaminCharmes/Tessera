@@ -144,12 +144,20 @@ describe("server rooms — one per project (ticket-710)", () => {
     expect(within(fiche).getByText("90,5 Mo")).toBeInTheDocument();
   });
 
-  it("lays the rooms out in two columns from 1280 px, one below", () => {
+  it("lays the rooms out one per row, at every width (ticket-730)", () => {
     rendre([app({})]);
 
     const grille = document.querySelector("[data-vue='salles']");
     expect(grille).toHaveClass("grid-cols-1");
-    expect(grille).toHaveClass("xl:grid-cols-2");
+    expect(grille?.className).not.toMatch(/grid-cols-2/);
+  });
+
+  it("furnishes a room without agents with switched-off empty desks, no agent drawn", () => {
+    rendre([app({})]);
+
+    const vides = document.querySelector("[data-postes-vides]");
+    expect(vides?.querySelectorAll("[data-sprite='poste-vide']")).toHaveLength(3);
+    expect(document.querySelector("[data-sprite='agent-de-produit']")).toBeNull();
   });
 
   it("draws one rack per service, with a lamp that tells a stopped service from a running one", async () => {

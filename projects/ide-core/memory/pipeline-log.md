@@ -6941,6 +6941,20 @@ Le diff ajoute :
 - 2026-11-02 09:05:03 UTC — [ticket-693] validateur: APPROVED — Tous les critères sont satisfaits. Le split de `types/api.ts` (676 → 9 lignes) e (345594ms)
 - 2026-11-02 09:05:03 UTC — [ticket-693] APPROVED après 1 tour(s)
 - 2026-11-02 09:05:55 UTC — [ticket-693] documentation: 0 fichier(s) (47125ms)
+- 2026-11-02 09:24:03 UTC — [ide-core] ticket-693 PR #816 confiée au CIWatcher
+- 2026-11-02 09:24:11 UTC — [ticket-694] branche ticket-694-api-client-split-by-domain
+- 2026-11-02 09:24:15 UTC — [ticket-694] tour 1 — codeur démarré
+- 2026-11-02 09:27:34 UTC — [ticket-694] tour 1 — codeur terminé (199233ms)
+- 2026-11-02 09:31:22 UTC — [ide-core] ticket-693 PR #816 mergée (CI verte)
+- 2026-11-02 09:34:45 UTC — [ticket-694] testeur: OK (exit 0)
+- 2026-11-02 09:36:17 UTC — [ticket-694] securite: PASS — Refactoring pur qui divise `frontend/src/lib/api.ts` (312 lignes) en 7 modules s (91796ms)
+- 2026-11-02 09:36:17 UTC — [ticket-694] tour 1 — reviewer démarré
+- 2026-11-02 09:36:20 UTC — [ticket-694] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 09:36:41 UTC — [ticket-694] tour 1 — reviewer terminé (23671ms)
+- 2026-11-02 09:37:34 UTC — [ticket-694] validateur: fichiers cités joints : lib/api.ts, lib/http.ts ; absents : lib/
+- 2026-11-02 09:37:34 UTC — [ticket-694] validateur: APPROVED — Tous les critères sont satisfaits. La refonte de `lib/api.ts` (312→26 lignes) en (75484ms)
+- 2026-11-02 09:37:34 UTC — [ticket-694] APPROVED après 1 tour(s)
+- 2026-11-02 09:41:02 UTC — [ticket-694] documentation: 0 fichier(s) (192327ms)
 - 2026-11-02 09:46:17 UTC — [ide-core] ticket-694 PR #817 non surveillée (livraison arrêtée)
 - 2026-11-02 09:46:28 UTC — [ticket-695] branche ticket-695-stream-state-reducer-split-by-event-family
 - 2026-11-02 09:46:30 UTC — [ticket-695] tour 1 — codeur démarré
@@ -7016,3 +7030,18 @@ Le diff ajoute :
 - 2026-11-02 11:54:46 UTC — [ticket-674] APPROVED après 1 tour(s)
 - 2026-11-02 11:54:51 UTC — [ticket-674] fichiers non suivis laissés par le run : tickets/todo/ticket-732-a-conflicting-pr-branch-is-merged-with-its-base-in-a-throwaway-worktree.md, tickets/todo/ticket-733-the-ci-watcher-updates-a-conflicting-pr-once-and-rebinds-the-pushed-head.md (à ignorer dans .gitignore ?)
 - 2026-11-02 11:54:51 UTC — [ticket-674] documentation: 0 fichier(s) (14ms)
+- 2026-11-02 11:28:18 UTC — [ide-core] ticket-697 PR #821 confiée au CIWatcher
+- 2026-11-02 11:28:22 UTC — [ticket-698] branche ticket-698-three-barely-oversized-components-go-under-300-li
+- 2026-11-02 11:28:26 UTC — [ticket-698] tour 1 — codeur démarré
+- 2026-11-02 11:32:39 UTC — [ticket-698] tour 1 — codeur terminé (253608ms)
+- 2026-11-02 11:35:11 UTC — [ide-core] ticket-697 PR #821 mergée (CI verte)
+- 2026-11-02 11:35:56 UTC — [ticket-698] testeur: OK (exit 0)
+- 2026-11-02 11:37:25 UTC — [ticket-698] securite: PASS — Refactoring propre de composants React frontend sans introduction de vulnérabili (88063ms)
+- 2026-11-02 11:37:25 UTC — [ticket-698] tour 1 — reviewer démarré
+- 2026-11-02 11:37:42 UTC — [ticket-698] tour 1 — reviewer terminé (16780ms)
+- 2026-11-02 11:42:28 UTC — [ticket-698] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: fichiers cités joints : FilDuRun/index.tsx, Sidebar/TicketCard.tsx, Sidebar/TicketList.tsx (tronqué)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: APPROVED — Le refactoring a réussi : les quatre vues du fil du run et la barre d'outils de  (354703ms)
+- 2026-11-02 11:43:20 UTC — [ticket-698] APPROVED après 1 tour(s)
+- 2026-11-02 11:43:24 UTC — [ticket-698] fichiers non suivis laissés par le run : tickets/todo/ticket-731-the-security-audit-knows-what-the-ticket-leaves-to-the-next.md (à ignorer dans .gitignore ?)
+- 2026-11-02 11:45:58 UTC — [ticket-698] documentation: 0 fichier(s) (154031ms)

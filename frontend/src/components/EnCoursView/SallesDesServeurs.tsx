@@ -15,13 +15,13 @@ interface SallesDesServeursProps {
 const AUCUN_RUN: readonly RunActif[] = [];
 
 /**
- * Une salle par projet lancé, en grille — tickets 672, 710 et 712. Les agents viennent
+ * Une salle par projet lancé, une par ligne (ticket-730) — tickets 672, 710 et 712. Les agents viennent
  * du fichier d'activité du produit : sans lui, la salle n'en a pas (ticket-673).
  */
 export default function SallesDesServeurs({ apps, lueA, runs = AUCUN_RUN, enArret, onArreterProjet }: SallesDesServeursProps) {
   const activite = useActiviteProduit();
   return (
-    <div data-vue="salles" className="mb-4 grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
+    <div data-vue="salles" className="mb-4 grid grid-cols-1 items-start gap-4">
       {grouperParProjet(apps).map((groupe) => (
         <SalleDeProjet
           key={groupe.project_id}
