@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-699
+pr_number: 832
 priority: low
 status: done
 title: Forge parsing leaves the GitHub workflow module
