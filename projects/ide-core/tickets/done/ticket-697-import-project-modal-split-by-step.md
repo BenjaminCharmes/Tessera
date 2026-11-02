@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-682
 id: ticket-697
+pr_number: 821
 priority: low
 status: done
 title: Import project modal split by step
