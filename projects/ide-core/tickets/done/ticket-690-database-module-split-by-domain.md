@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-678
 id: ticket-690
+pr_number: 827
 priority: low
 status: done
 title: Database module split by domain
