@@ -75,9 +75,18 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
             pipeline exécuté.
           </p>
         )}
-        <Card title="Quota de l'abonnement" aside="relevé par le SDK" className="mb-4 max-w-md">
-          <JaugesDeQuota fenetres={quota} />
-        </Card>
+        {/* Seul sur sa ligne, le quota laissait deux tiers vides : il rejoint les KPI.
+            La carte garde sa place dans l'arbre quand les données arrivent. */}
+        <div className="mb-4 grid gap-4 xl:grid-cols-3">
+          {data && (
+            <div className="xl:col-span-2">
+              <KpiRow totals={data.totals} quality={data.quality} />
+            </div>
+          )}
+          <Card title="Quota de l'abonnement" aside="relevé par le SDK">
+            <JaugesDeQuota fenetres={quota} />
+          </Card>
+        </div>
         {data && <Dashboard data={data} onSelectRun={setSelectedRun} />}
       </div>
     </div>
@@ -94,7 +103,6 @@ function Dashboard({ data, onSelectRun }: DashboardProps) {
   const global = data.project_id === null;
   return (
     <div className="space-y-4">
-      <KpiRow totals={data.totals} quality={data.quality} />
 
       <div className="grid gap-4 xl:grid-cols-3">
         <Card title="Dépense par jour" aside="chat compris" className="xl:col-span-2">

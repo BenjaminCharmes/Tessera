@@ -16,7 +16,7 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
 export default function KpiRow({ totals, quality }: { totals: UsageTotals; quality: RunQuality }) {
   const rate = quality.approval_rate;
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
       <Tile label="Runs" value={formatCount(totals.runs)} sub={`${totals.calls} appels d'agent`} />
       <Tile
         label="Tokens entrants"

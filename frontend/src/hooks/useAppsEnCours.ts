@@ -82,12 +82,31 @@ export function useAppsEnCours(): UseAppsEnCoursResult {
     [changerAttentes],
   );
 
+  // Une seule lecture en vol. Le tick suivant ne l'annule plus : la route met
+  // jusqu'à 2 s sous charge, autant que la cadence d'attente, et chaque tick
+  // jetait la réponse en route — « En lancement » ne se levait jamais
+  // (ticket-728). Un tick pendant la lecture en demande une autre au retour :
+  // celle en vol peut dater d'avant le clic.
+  const enVolRef = useRef(false);
+  const aRelireRef = useRef(false);
+  const monteRef = useRef(true);
   useEffect(() => {
-    let annule = false;
+    monteRef.current = true;
+    return () => {
+      monteRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (enVolRef.current) {
+      aRelireRef.current = true;
+      return;
+    }
+    enVolRef.current = true;
     api.services
       .running()
       .then((lues) => {
-        if (annule) return;
+        if (!monteRef.current) return;
         appsRef.current = lues;
         setApps(lues);
         setLueA(Date.now());
@@ -95,13 +114,17 @@ export function useAppsEnCours(): UseAppsEnCoursResult {
         solder(lues);
       })
       .catch((exc: unknown) => {
-        if (annule) return;
+        if (!monteRef.current) return;
         setErreur(message(exc, "Lecture impossible"));
         solder(appsRef.current);
+      })
+      .finally(() => {
+        enVolRef.current = false;
+        if (aRelireRef.current && monteRef.current) {
+          aRelireRef.current = false;
+          setTick((t) => t + 1);
+        }
       });
-    return () => {
-      annule = true;
-    };
   }, [tick, solder]);
 
   const rafraichir = useCallback(() => setTick((t) => t + 1), []);
