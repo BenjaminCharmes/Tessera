@@ -1,12 +1,14 @@
 ---
-id: ticket-698
-title: "Three barely oversized components go under 300 lines"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-681]
 created: 2026-10-29
+depends_on:
+- ticket-681
+id: ticket-698
+pr_number: 822
+priority: low
+status: done
+title: Three barely oversized components go under 300 lines
+type: refactor
 ---
 
 # ticket-698 — `FilDuRun`, `TicketCard` et `TicketList` sous 300 lignes
