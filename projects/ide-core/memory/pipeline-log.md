@@ -6990,3 +6990,16 @@ Le diff ajoute :
 - 2026-11-02 11:06:49 UTC — [ticket-696] validateur: APPROVED — La refactorisation divise `useCockpit` (532 lignes) en 7 hooks régionaux spécial (339641ms)
 - 2026-11-02 11:06:49 UTC — [ticket-696] APPROVED après 2 tour(s)
 - 2026-11-02 11:09:55 UTC — [ticket-696] documentation: 0 fichier(s) (181015ms) — après tour de correction
+- 2026-11-02 11:10:12 UTC — [ide-core] ticket-696 PR #820 confiée au CIWatcher
+- 2026-11-02 11:10:16 UTC — [ticket-697] branche ticket-697-import-project-modal-split-by-step
+- 2026-11-02 11:10:17 UTC — [ticket-697] tour 1 — codeur démarré
+- 2026-11-02 11:12:25 UTC — [ticket-697] tour 1 — codeur terminé (128250ms)
+- 2026-11-02 11:15:26 UTC — [ticket-697] testeur: OK (exit 0)
+- 2026-11-02 11:17:17 UTC — [ide-core] ticket-696 PR #820 mergée (CI verte)
+- 2026-11-02 11:17:23 UTC — [ticket-697] securite: PASS — Refactoring of ImportProjectModal into smaller components (ImportProgression, Im (117765ms)
+- 2026-11-02 11:17:24 UTC — [ticket-697] tour 1 — reviewer démarré
+- 2026-11-02 11:17:38 UTC — [ticket-697] tour 1 — reviewer terminé (14452ms)
+- 2026-11-02 11:22:24 UTC — [ticket-697] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:22:42 UTC — [ticket-697] validateur: fichiers cités joints : components/Sidebar/ImportProjectModal.tsx
+- 2026-11-02 11:22:42 UTC — [ticket-697] validateur: APPROVED — Refactoring réussi : `ImportProjectModal` a été découpée en 4 fichiers distincts (318843ms)
+- 2026-11-02 11:22:42 UTC — [ticket-697] APPROVED après 1 tour(s)
