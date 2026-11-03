@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-740
-pr_number: null
+pr_number: 856
 priority: high
 status: done
 title: A red retest after a rebase puts the branch back on its pre-rebase head
