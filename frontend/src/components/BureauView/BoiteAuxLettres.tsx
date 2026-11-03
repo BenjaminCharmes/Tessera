@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
+import { ECHELLE_DU_MOBILIER } from "../../lib/bureau/echelleDesSprites";
 import Boite from "../../design/bureau/Boite";
 import type { StreamState } from "../../hooks/streamState";
 import { useProjects } from "../../hooks/useProjects";
@@ -98,7 +99,7 @@ export default function BoiteAuxLettres({
             : undefined
         }
       >
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Boite etat={boite.etat} />
         </Agrandi>
       </AvecInfobulle>

@@ -48,6 +48,7 @@ export default function BureauDuDirecteur({
           />
         </span>
       }
+      personnageAuMobilier
       aGauche={<Bibliotheque />}
       plante="ficus"
       ambre={agents.length > 0}

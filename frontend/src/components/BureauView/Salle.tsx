@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
+import { ECHELLE_DU_MOBILIER } from "../../lib/bureau/echelleDesSprites";
 import NightVeil from "../../design/bureau/NightVeil";
 import Plante from "../../design/bureau/Plante";
 import Tuile from "../../design/bureau/Tuile";
@@ -20,6 +21,8 @@ interface SalleProps {
   mobilier: ReactNode;
   /** Les autres meubles, posés au milieu du sol : jamais un état, toujours là (ADR-058). */
   decor?: ReactNode;
+  /** Le mobilier porte un personnage (le bureau et sa figure assise) : il garde l'échelle des personnages. */
+  personnageAuMobilier?: boolean;
   /** Un meuble à gauche du mobilier, qui se retrouve alors au milieu de la salle (ticket-727). */
   aGauche?: ReactNode;
   /** L'espèce de la plante du coin : chaque salle a la sienne. */
@@ -50,6 +53,7 @@ export default function Salle({
   mobilier,
   decor,
   aGauche,
+  personnageAuMobilier = false,
   plante = "pot",
   maintenant,
   avecSoleil = false,
@@ -79,7 +83,7 @@ export default function Salle({
       >
         <h3
           title={entete}
-          className="flex items-center gap-1 text-micro uppercase tracking-wide text-zinc-400"
+          className="flex shrink-0 items-center gap-1 whitespace-nowrap text-micro uppercase tracking-wide text-zinc-400"
         >
           {titre}
           <IconInfo size={12} data-marque="info" />
@@ -114,31 +118,31 @@ export default function Salle({
       {/* Le fond du sol ne sert à rien dans une salle : le mobilier s'y centre au lieu de laisser un vide sous le mur (ticket-627). */}
       <div
         data-sol="lames"
-        className="sol-lames relative flex flex-1 flex-col justify-center px-3"
+        className="sol-lames relative flex flex-1 flex-col justify-center px-1"
       >
         <Tuile motif="sol" moment={moment} />
         {/* Regroupés au centre : répartis d'un bord à l'autre, ils laissaient de grands vides
             sur un écran large ou dézoomé (ticket-657). */}
-        <div className="relative flex min-h-28 items-end justify-center gap-10 px-1 py-2">
+        <div className="relative flex min-h-28 items-end justify-evenly gap-2 px-1 py-2">
           {aGauche && (
-            <Agrandi>
+            <Agrandi relatif={ECHELLE_DU_MOBILIER}>
               <div className="flex shrink-0 items-end">{aGauche}</div>
             </Agrandi>
           )}
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">
-              <Agrandi>{mobilier}</Agrandi>
+              <Agrandi relatif={personnageAuMobilier ? 1 : ECHELLE_DU_MOBILIER}>{mobilier}</Agrandi>
             </div>
             {children.length > 0 && (
               <ul className="flex min-w-0 items-end gap-3">{children}</ul>
             )}
           </div>
           {decor && (
-            <Agrandi>
-              <div className="flex shrink-0 items-end gap-3">{decor}</div>
+            <Agrandi relatif={ECHELLE_DU_MOBILIER}>
+              <div className="flex shrink-0 items-end gap-1">{decor}</div>
             </Agrandi>
           )}
-          <Agrandi>
+          <Agrandi relatif={ECHELLE_DU_MOBILIER}>
             <Plante espece={plante} />
           </Agrandi>
         </div>

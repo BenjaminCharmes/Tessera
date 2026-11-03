@@ -1,4 +1,5 @@
 import Agrandi from "../../design/bureau/Agrandi";
+import { ECHELLE_DU_MOBILIER } from "../../lib/bureau/echelleDesSprites";
 import Baie from "../../design/bureau/Baie";
 import { etatDuService, libelleDeLEtat } from "../../design/etatDuService";
 import type { UseServicesResult } from "../../hooks/useServices";
@@ -40,7 +41,7 @@ export default function BaieDeServeurs({ services }: BaieDeServeursProps) {
         </ul>
       }
     >
-      <Agrandi>
+      <Agrandi relatif={ECHELLE_DU_MOBILIER}>
         <Baie services={services.services.map(etatDuService)} />
       </Agrandi>
     </AvecInfobulle>

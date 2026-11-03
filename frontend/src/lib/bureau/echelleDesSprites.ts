@@ -1,6 +1,8 @@
 /** L'échelle sur un grand écran, et le plancher en deçà duquel les sprites deviennent illisibles. */
 export const ECHELLE_LARGE = 1.5;
 export const ECHELLE_MIN = 0.9;
+/** Le mobilier, un peu plus grand que les personnages : à la même échelle, il paraissait petit à côté d'eux (ticket-727). */
+export const ECHELLE_DU_MOBILIER = 1.2;
 
 /** Ce que la vue retire à la largeur de la fenêtre : barre latérale, colonne « À toi », marges. */
 const HORS_DES_SALLES = 430;

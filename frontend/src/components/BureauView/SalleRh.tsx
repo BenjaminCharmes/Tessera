@@ -33,6 +33,7 @@ export default function SalleRh({ agents, maintenant }: SalleRhProps) {
           <BureauEnBois tenue={TENUE_DES_RH} physique={PHYSIQUE_DES_RH} />
         </span>
       }
+      personnageAuMobilier
       aGauche={<Classeur />}
       decor={<Classeur />}
       plante="ficus"

@@ -1,4 +1,5 @@
 import Agrandi from "../../design/bureau/Agrandi";
+import { ECHELLE_DU_MOBILIER } from "../../lib/bureau/echelleDesSprites";
 import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Corbeille from "../../design/bureau/Corbeille";
 import Etagere from "../../design/bureau/Etagere";
@@ -100,7 +101,7 @@ export default function FondDeLaPiece({
 }: FondDeLaPieceProps) {
   const moment = dayMoment(maintenant);
   // Le dessus du meuble, une fois agrandi : la pile s'y pose, à droite de l'imprimante.
-  const dessusDuMeuble = HAUTEUR_DU_MEUBLE * useEchelleDesSprites();
+  const dessusDuMeuble = HAUTEUR_DU_MEUBLE * ECHELLE_DU_MOBILIER * useEchelleDesSprites();
   const ciels = cielDesFenetres(projet, FENETRES_X.length, maintenant);
   return (
     <div
@@ -123,12 +124,12 @@ export default function FondDeLaPiece({
         abscisses={ABSCISSES_DU_MUR}
       />
       <Pose x={ETAGERE_X} bas="top-9">
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Etagere />
         </Agrandi>
       </Pose>
       <Pose x={CORBEILLE_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Corbeille boules={boulesDeLaCorbeille(etat)} />
         </Agrandi>
       </Pose>
@@ -140,18 +141,18 @@ export default function FondDeLaPiece({
         />
       </Pose>
       <Pose x={BIBLIOTHEQUE_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Bibliotheque />
         </Agrandi>
       </Pose>
       <Pose x={FICUS_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Plante espece="ficus" />
         </Agrandi>
       </Pose>
       <Pose x={IMPRIMANTE_X}>
         <span className="relative block">
-          <Agrandi>
+          <Agrandi relatif={ECHELLE_DU_MOBILIER}>
             <Imprimante />
           </Agrandi>
           <span className="absolute right-1" style={{ bottom: dessusDuMeuble }}>
@@ -165,14 +166,14 @@ export default function FondDeLaPiece({
         </span>
       </Pose>
       <Pose x={MACHINE_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <MachineACafe />
         </Agrandi>
       </Pose>
       {machineEnService && (
         <Pose x={MACHINE_X}>
           {/* Au-dessus de la tasse : la machine (38,4 px) sur son meuble bas, à la même échelle. */}
-          <Agrandi>
+          <Agrandi relatif={ECHELLE_DU_MOBILIER}>
             <span className="block pl-[9.6px]" style={{ marginBottom: HAUTEUR_DU_MEUBLE_BAS + 32 }}>
               <Vapeur />
             </span>
@@ -183,7 +184,7 @@ export default function FondDeLaPiece({
         <BaieDeServeurs services={services} />
       </Pose>
       <Pose x={CACTUS_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Plante espece="cactus" />
         </Agrandi>
       </Pose>
