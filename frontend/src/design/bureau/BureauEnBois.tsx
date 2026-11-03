@@ -1,35 +1,23 @@
+import { useMemo } from "react";
 import type { Physique, Tenue } from "../../lib/bureau/physique";
-import Personnage from "./Personnage";
+import { bureauEnBois } from "../../lib/bureau/sprites/communs";
+import SpriteSvg from "./SpriteSvg";
 
 interface BureauEnBoisProps {
   /** Qui s'y assoit : la tenue et le physique de la figure de la salle. */
   tenue: Tenue;
   physique: Physique;
-  /** Personne derrière : le mobilier reste, la figure est partie en visite (ticket-661). */
+  /** Personne derrière : le fauteuil reste, la figure est partie en visite (ticket-661). */
   vide?: boolean;
 }
 
 /**
- * Le bureau en bois d'une salle commune, grille 16 × 18 comme un poste : la
- * figure de la salle (le directeur, la recruteuse) assise derrière. C'est du
- * mobilier — fixe, sans écran ni voyant ; ce que la salle dit vient de ses
- * occupants (ADR-058).
+ * Le bureau en bois d'une salle commune, grille 32 × 36 comme un poste (ticket-727) :
+ * fauteuil capitonné, plateau veiné, caisson, pot à crayons, et la figure de la salle
+ * (le directeur, la recruteuse) assise derrière. Du mobilier — sans écran ni voyant ;
+ * ce que la salle dit vient de ses occupants (ADR-058).
  */
 export default function BureauEnBois({ tenue, physique, vide = false }: BureauEnBoisProps) {
-  return (
-    <svg
-      width="56"
-      height="63"
-      viewBox="0 0 16 18"
-      shapeRendering="crispEdges"
-      aria-hidden="true"
-      data-sprite="bureau-en-bois"
-    >
-      {!vide && <Personnage tenue={tenue} physique={physique} />}
-      <rect x="1" y="12" width="14" height="2" className="fill-(--sprite-table)" />
-      <rect x="1" y="14" width="14" height="1" className="fill-(--sprite-table-ombre)" />
-      <rect x="2" y="15" width="1" height="3" className="fill-(--sprite-table-ombre)" />
-      <rect x="13" y="15" width="1" height="3" className="fill-(--sprite-table-ombre)" />
-    </svg>
-  );
+  const dessin = useMemo(() => bureauEnBois(vide ? null : { tenue, physique }), [tenue, physique, vide]);
+  return <SpriteSvg sprite={dessin} largeur={56} hauteur={63} data-sprite="bureau-en-bois" data-vide={vide} />;
 }
