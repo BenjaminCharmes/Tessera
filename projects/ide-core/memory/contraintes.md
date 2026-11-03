@@ -12,10 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Un rôle `ollama` qui déclare `fallback_above_chars` envoie au repli, sans tenter le
-  principal, tout prompt plus long que ce seuil.** C'est le troisième déclencheur du
-  repli. (ADR-071, ADR-046)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
@@ -149,9 +145,9 @@ section. (ADR-055)
 - **Déclarer `provider`, `model` et `fallback` dans `agents.json` pour
   chaque rôle ; un rôle sans `provider` prend `agent_sdk`.** Toute
   construction de provider passe par `provider_pour_role`. Seuls une
-  indisponibilité, qui émet `provider_fallback`, ou un run lancé `rapide`
-  déclenchent le repli. Une réponse illisible n'en déclenche aucun.
-  (ADR-046, ADR-059)
+  indisponibilité, qui émet `provider_fallback`, un run lancé `rapide`, ou un
+  prompt au-delà du `fallback_above_chars` d'un rôle `ollama` déclenchent le
+  repli. Une réponse illisible n'en déclenche aucun. (ADR-046, ADR-059, ADR-071)
 - **Un rôle déclaré `"web": true` reçoit `WebFetch` et `WebSearch` et
   perd `Bash`.** (ADR-049)
 
