@@ -19,6 +19,7 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.utils.logger import get_logger
+from tessera.utils.noms_windows import normaliser_segments
 
 _logger = get_logger(__name__)
 
@@ -95,12 +96,15 @@ def _is_self_executing(resolved: Path) -> bool:
     carries hooks and commands run by the CLI. Other config files stay
     editable: the editor is the user's own tool.
     """
-    parts = [part.lower() for part in resolved.parts]
+    # Comparaison sur les noms normalisés : Windows ouvre le même fichier sous
+    # `settings.json.` ou `settings.json::$DATA` (ticket-747).
+    parts = normaliser_segments(resolved)
     if ".git" in parts:
         return True
-    name = resolved.name.lower()
+    name = parts[-1]
     return (
-        resolved.parent.name.lower() == ".claude"
+        len(parts) > 1
+        and parts[-2] == ".claude"
         and name.startswith("settings")
         and name.endswith(".json")
     )

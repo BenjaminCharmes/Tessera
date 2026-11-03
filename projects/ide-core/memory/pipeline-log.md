@@ -7357,3 +7357,17 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 19:09:28 UTC — [ticket-746] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (93342ms)
 - 2026-11-03 19:09:28 UTC — [ticket-746] APPROVED après 1 tour(s)
 - 2026-11-03 19:10:32 UTC — [ticket-746] documentation: 0 fichier(s) (58108ms)
+- 2026-11-03 19:18:07 UTC — [ide-core] ticket-746 PR #861 mergée (CI verte)
+- 2026-11-03 19:18:10 UTC — [ide-core] ticket-746 : base réalignée sur develop
+- 2026-11-03 19:18:10 UTC — [ide-core] ticket-746 PR #861 confiée au CIWatcher
+- 2026-11-03 19:18:15 UTC — [ticket-747] branche ticket-747-protected-names-are-compared-after-windows-name-n
+- 2026-11-03 19:18:17 UTC — [ticket-747] tour 1 — codeur démarré
+- 2026-11-03 19:20:42 UTC — [ticket-747] tour 1 — codeur terminé (145077ms)
+- 2026-11-03 19:29:54 UTC — [ticket-747] testeur: OK (exit 0)
+- 2026-11-03 19:33:37 UTC — [ticket-747] securite: PASS — Le diff ticket-747 implémente correctement la normalisation des noms Windows pou (222921ms)
+- 2026-11-03 19:33:37 UTC — [ticket-747] tour 1 — reviewer démarré
+- 2026-11-03 19:34:14 UTC — [ticket-747] tour 1 — reviewer terminé (36547ms)
+- 2026-11-03 19:36:38 UTC — [ticket-747] validateur: fichiers cités joints : .claude/settings.local.json, routers/fs.py ; absents : .claude/settings.json., .Claude/Settings.json, sub/CLAUDE.md., .GitHub/Workflows/x.yml, settings.md, notes/claude-notes.md
+- 2026-11-03 19:36:38 UTC — [ticket-747] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été modifié pour n (180827ms)
+- 2026-11-03 19:36:38 UTC — [ticket-747] APPROVED après 1 tour(s)
+- 2026-11-03 19:38:21 UTC — [ticket-747] documentation: 0 fichier(s) (96328ms)
