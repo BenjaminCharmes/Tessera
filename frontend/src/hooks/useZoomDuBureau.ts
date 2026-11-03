@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useEtatPersistant } from "./useEtatPersistant";
 import { estModeDeZoom, zoomPourAjuster, zoomPourLignes } from "../lib/bureau/zoomDuBureau";
 import type { ModeDeZoom } from "../lib/bureau/zoomDuBureau";
@@ -33,14 +33,14 @@ function hauteurDesLignes(contenu: HTMLElement, n: number): number {
 export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes }: OptionsDuZoom = {}) {
   const defaut: ModeDeZoom = lignes ? "lignes" : 1;
   const [mode, setMode] = useEtatPersistant<ModeDeZoom>(cle, defaut, estModeDeZoom);
-  const conteneur = useRef<HTMLDivElement>(null);
-  const contenu = useRef<HTMLDivElement>(null);
+  // Des refs-callback qui tiennent le nœud en état : la vue monte ses pièces après coup
+  // (connexion, chargement, bascule de vue), et chaque montage relance la mesure.
+  const [boite, conteneur] = useState<HTMLDivElement | null>(null);
+  const [pieces, contenu] = useState<HTMLDivElement | null>(null);
   const [mesure, setMesure] = useState(1);
 
   useLayoutEffect(() => {
     if (mode !== "ajuste" && mode !== "lignes") return;
-    const boite = conteneur.current;
-    const pieces = contenu.current;
     if (!boite || !pieces) return;
     const mesurer = () => {
       // La hauteur rendue tient compte du zoom courant : divisée par lui, c'est la hauteur naturelle.
@@ -58,7 +58,7 @@ export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes }: OptionsDuZoo
     observateur.observe(boite);
     observateur.observe(pieces);
     return () => observateur.disconnect();
-  }, [mode, lignes]);
+  }, [mode, lignes, boite, pieces]);
 
   return {
     mode,
