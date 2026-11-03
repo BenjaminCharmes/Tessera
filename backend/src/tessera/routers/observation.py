@@ -19,6 +19,7 @@ import asyncio
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from websockets.exceptions import ConnectionClosed
 
 from tessera.services.event_hub import EVENT_HUB, JETABLES
 from tessera.services.journal_du_texte import JOURNAL_DU_TEXTE
@@ -29,6 +30,25 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
+
+
+def _socket_deja_fermee(exc: Exception) -> bool:
+    """Tell whether `exc` is what a send on an already closed socket raises."""
+    if isinstance(exc, ConnectionClosed):
+        return True
+    # Starlette lève un RuntimeError nu : seul son message le distingue.
+    return isinstance(exc, RuntimeError) and "close message" in str(exc)
+
+
+def _journaliser_la_fin(exc: Exception) -> None:
+    """Log how an observer ended: a closed tab is normal, anything else is not."""
+    if _socket_deja_fermee(exc):
+        _logger.info("observateur_ferme", extra={"type_erreur": type(exc).__name__})
+        return
+    _logger.warning(
+        "observateur_interrompu",
+        extra={"erreur": str(exc), "type_erreur": type(exc).__name__},
+    )
 
 
 async def _lire_les_messages(websocket: WebSocket, abonnements: set[str]) -> None:
@@ -103,7 +123,7 @@ async def observe(websocket: WebSocket) -> None:
         pass
     except Exception as exc:  # noqa: BLE001 — un observateur ne casse rien
         # Le run continue sans lui : c'est tout l'intérêt du découplage.
-        _logger.warning("observateur_interrompu", extra={"erreur": str(exc)})
+        _journaliser_la_fin(exc)
     finally:
         if lecteur is not None:
             lecteur.cancel()
