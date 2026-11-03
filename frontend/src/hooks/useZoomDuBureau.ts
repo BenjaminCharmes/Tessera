@@ -9,6 +9,8 @@ const PADDING_VERTICAL = 24;
 interface OptionsDuZoom {
   /** La clé de mémorisation : chaque vue garde son zoom. */
   cle?: string;
+  /** Le padding horizontal du conteneur, hors de la mise en page de référence. */
+  margeHorizontale?: number;
   /**
    * Le nombre de lignes (`[data-ligne-du-zoom]`) que le zoom par défaut fait tenir
    * exactement dans la hauteur ; sans lui, le zoom par défaut est 100 %.
@@ -28,9 +30,11 @@ function hauteurDesLignes(contenu: HTMLElement, n: number): number {
  * Le zoom d'une vue de sprites et ce qu'il faut pour le mesurer — ticket-657,
  * ticket-727. Le mode est mémorisé ; « ajusté » fait tenir tout le contenu, « lignes »
  * ses premières lignes, et l'un comme l'autre se recalcule quand la vue ou son
- * contenu change de taille.
+ * contenu change de taille. `largeur` est la mise en page de référence : posée sur le
+ * contenu zoomé, elle le fait grandir comme un bloc (avec un défilement de côté au-delà
+ * de 100 %) au lieu de réagencer les salles.
  */
-export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes }: OptionsDuZoom = {}) {
+export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes, margeHorizontale = 24 }: OptionsDuZoom = {}) {
   const defaut: ModeDeZoom = lignes ? "lignes" : 1;
   const [mode, setMode] = useEtatPersistant<ModeDeZoom>(cle, defaut, estModeDeZoom);
   // Des refs-callback qui tiennent le nœud en état : la vue monte ses pièces après coup
@@ -38,6 +42,22 @@ export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes }: OptionsDuZoo
   const [boite, conteneur] = useState<HTMLDivElement | null>(null);
   const [pieces, contenu] = useState<HTMLDivElement | null>(null);
   const [mesure, setMesure] = useState(1);
+  const [largeur, setLargeur] = useState<number | null>(null);
+
+  // La mise en page de référence : la largeur du conteneur, à 100 %. Le contenu la garde à
+  // tout zoom, qui l'agrandit ou la réduit d'un bloc ; rien ne se réagence (ticket-727).
+  useLayoutEffect(() => {
+    if (!boite) return;
+    const mesurer = () => {
+      const l = boite.clientWidth - margeHorizontale;
+      setLargeur(l > 0 ? l : null);
+    };
+    mesurer();
+    if (typeof ResizeObserver === "undefined") return;
+    const observateur = new ResizeObserver(mesurer);
+    observateur.observe(boite);
+    return () => observateur.disconnect();
+  }, [boite, margeHorizontale]);
 
   useLayoutEffect(() => {
     if (mode !== "ajuste" && mode !== "lignes") return;
@@ -47,7 +67,8 @@ export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes }: OptionsDuZoo
       const zoomCourant = Number(pieces.dataset.zoom) || 1;
       const dispo = boite.clientHeight - PADDING_VERTICAL;
       if (mode === "lignes" && lignes) {
-        setMesure(zoomPourLignes(dispo, hauteurDesLignes(pieces, lignes) / zoomCourant));
+        // Jamais au-delà de 100 % : la mise en page de référence déborderait sur le côté.
+        setMesure(Math.min(1, zoomPourLignes(dispo, hauteurDesLignes(pieces, lignes) / zoomCourant)));
       } else {
         setMesure(zoomPourAjuster(dispo, pieces.getBoundingClientRect().height / zoomCourant));
       }
@@ -64,6 +85,7 @@ export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes }: OptionsDuZoo
     mode,
     defaut,
     zoom: typeof mode === "number" ? mode : mesure,
+    largeur,
     setMode,
     conteneur,
     contenu,

@@ -1,13 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { useZoomDuBureau } from "./useZoomDuBureau";
 
 /** Une vue qui, comme la Supervision, ne monte ses pièces qu'une fois connectée. */
 function Vue({ montee }: { montee: boolean }) {
-  const { zoom, conteneur, contenu } = useZoomDuBureau({ cle: "essai.zoom", lignes: 3 });
+  const { zoom, largeur, setMode, conteneur, contenu } = useZoomDuBureau({ cle: "essai.zoom", lignes: 3 });
   return (
     <div>
       <output data-testid="zoom">{zoom}</output>
+      <output data-testid="largeur">{largeur ?? "aucune"}</output>
+      <button type="button" onClick={() => setMode(0.4)}>min</button>
+      <button type="button" onClick={() => setMode(1.25)}>max</button>
       {montee && (
         <div ref={conteneur} data-essai="conteneur">
           <div ref={contenu} data-zoom={zoom} data-essai="contenu">
@@ -32,6 +35,10 @@ beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(function (this: HTMLElement) {
     return this.dataset.essai === "conteneur" ? 924 : 0;
   });
+  // Le conteneur fait 1224 px de large, padding compris : 1200 px de mise en page.
+  vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) {
+    return this.dataset.essai === "conteneur" ? 1224 : 0;
+  });
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
     if (this.dataset.essai === "contenu") return boite(0, 1200);
     const bas = Number(this.dataset.bas ?? 0);
@@ -49,12 +56,12 @@ describe("useZoomDuBureau", () => {
       return this.dataset.essai === "conteneur" ? 474 : 0;
     });
     const { rerender } = render(<Vue montee={false} />);
-    expect(screen.getByTestId("zoom")).toHaveTextContent("1");
+    expect(screen.getByTestId("zoom")).toHaveTextContent(/^1$/);
 
     rerender(<Vue montee />);
 
     // 450 px utiles pour trois lignes de 300 px : zoom 0,5, appliqué aux pièces.
-    expect(screen.getByTestId("zoom")).toHaveTextContent("0.5");
+    expect(screen.getByTestId("zoom")).toHaveTextContent(/^0\.5$/);
     expect(document.querySelector("[data-essai='contenu']")).toHaveAttribute("data-zoom", "0.5");
   });
 
@@ -67,7 +74,7 @@ describe("useZoomDuBureau", () => {
     rerender(<Vue montee />);
 
     // 720 px utiles pour 900 px de lignes : zoom 0,8.
-    expect(screen.getByTestId("zoom")).toHaveTextContent("0.8");
+    expect(screen.getByTestId("zoom")).toHaveTextContent(/^0\.8$/);
   });
 
   it("measures again after the rooms unmount and mount anew", () => {
@@ -80,6 +87,29 @@ describe("useZoomDuBureau", () => {
     rerender(<Vue montee />);
 
     // 540 px utiles pour 900 px de lignes : zoom 0,6.
-    expect(screen.getByTestId("zoom")).toHaveTextContent("0.6");
+    expect(screen.getByTestId("zoom")).toHaveTextContent(/^0\.6$/);
+  });
+
+  it("never grows past 100 % to fit the rows: a wider Bureau would scroll sideways", () => {
+    vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(function (this: HTMLElement) {
+      return this.dataset.essai === "conteneur" ? 1424 : 0;
+    });
+    render(<Vue montee />);
+
+    expect(screen.getByTestId("zoom")).toHaveTextContent(/^1$/);
+  });
+
+  it("keeps one reference layout width from the minimum to the maximum zoom, so nothing reflows", () => {
+    render(<Vue montee />);
+    const largeur = screen.getByTestId("largeur").textContent;
+    expect(largeur).toBe("1200");
+
+    fireEvent.click(screen.getByRole("button", { name: "min" }));
+    expect(screen.getByTestId("zoom")).toHaveTextContent(/^0\.4$/);
+    expect(screen.getByTestId("largeur")).toHaveTextContent(largeur ?? "");
+
+    fireEvent.click(screen.getByRole("button", { name: "max" }));
+    expect(screen.getByTestId("zoom")).toHaveTextContent(/^1\.25$/);
+    expect(screen.getByTestId("largeur")).toHaveTextContent(largeur ?? "");
   });
 });

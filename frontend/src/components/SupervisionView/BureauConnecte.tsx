@@ -50,6 +50,7 @@ export default function BureauConnecte({
     mode: modeDeZoom,
     defaut: zoomParDefaut,
     zoom,
+    largeur,
     setMode: setModeDeZoom,
     conteneur,
     contenu,
@@ -96,9 +97,10 @@ export default function BureauConnecte({
           avecServices={services.length > 0}
         />
       ) : (
-        <div ref={conteneur} className="min-h-0 flex-1 overflow-y-auto p-3">
-          {/* Le zoom ne touche que le Bureau : le reste de l'app garde sa taille (ticket-657). */}
-          <div ref={contenu} data-zoom={zoom} style={{ zoom }}>
+        <div ref={conteneur} className="min-h-0 flex-1 overflow-auto p-3">
+          {/* Le zoom ne touche que le Bureau : le reste de l'app garde sa taille (ticket-657).
+              Sa largeur de référence ne bouge pas avec lui : les salles grandissent d'un bloc (ticket-727). */}
+          <div ref={contenu} data-zoom={zoom} style={{ zoom, width: largeur ?? undefined }}>
             <BureauView
               projets={projets}
               auRepos={auRepos}

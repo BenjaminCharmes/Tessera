@@ -53,10 +53,11 @@ export default function EnCoursView({ appsEnCours, runs = AUCUN_RUN, vueInitiale
     mode: modeDeZoom,
     defaut: zoomParDefaut,
     zoom,
+    largeur,
     setMode: setModeDeZoom,
     conteneur,
     contenu,
-  } = useZoomDuBureau({ cle: "salles.zoom" });
+  } = useZoomDuBureau({ cle: "salles.zoom", margeHorizontale: 32 });
 
   if (apps === null) {
     return erreur ? (
@@ -89,7 +90,7 @@ export default function EnCoursView({ appsEnCours, runs = AUCUN_RUN, vueInitiale
           <ViewSwitcher label="Vue des apps" options={VUES} valeur={vue} onChange={setVue} />
         </span>
       </header>
-      <div ref={conteneur} className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+      <div ref={conteneur} className="min-h-0 flex-1 overflow-auto px-4 pb-4">
         {erreur && (
           <p role="alert" className="mb-3 text-sm text-red-300">
             {erreur}
@@ -97,7 +98,7 @@ export default function EnCoursView({ appsEnCours, runs = AUCUN_RUN, vueInitiale
         )}
         {vue === "salles" && (
           // Le zoom ne touche que les salles : la liste des projets arrêtés garde sa taille.
-          <div ref={contenu} data-zoom={zoom} style={{ zoom }}>
+          <div ref={contenu} data-zoom={zoom} style={{ zoom, width: largeur ?? undefined }}>
             <SalleTessera nom={projets.find((p) => p.id === "ide-core")?.name ?? "Tessera"} lueA={lueA} />
             {apps.length === 0 ? (
               <Message texte="Aucune app de projet ne tourne" />
