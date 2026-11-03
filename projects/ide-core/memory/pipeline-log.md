@@ -7287,3 +7287,19 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 16:35:42 UTC — [ticket-740] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests unitaires fournis (204547ms)
 - 2026-11-03 16:35:42 UTC — [ticket-740] APPROVED après 2 tour(s)
 - 2026-11-03 16:38:15 UTC — [ticket-740] documentation: 0 fichier(s) (146641ms)
+- 2026-11-03 16:54:06 UTC — [ide-core] ticket-740 PR #856 mergée (CI verte)
+- 2026-11-03 16:54:08 UTC — [ide-core] ticket-740 : base réalignée sur develop
+- 2026-11-03 16:54:08 UTC — [ide-core] ticket-740 PR #856 confiée au CIWatcher
+- 2026-11-03 16:54:13 UTC — [ticket-741] branche ticket-741-a-phase-one-delivery-stop-marks-the-ticket-blocke
+- 2026-11-03 16:54:15 UTC — [ticket-741] tour 1 — codeur démarré
+- 2026-11-03 16:56:52 UTC — [ticket-741] tour 1 — codeur terminé (157016ms)
+- 2026-11-03 17:03:56 UTC — [ticket-741] testeur: 1 failed, 3522 passed, 64 warnings in 420.69s (0:07:00)
+- 2026-11-03 17:03:56 UTC — [ticket-741] tests rouges au tour 1
+- 2026-11-03 17:03:56 UTC — [ticket-741] tour 2 — codeur démarré
+- 2026-11-03 17:05:08 UTC — [ticket-741] tour 2 — codeur terminé (72172ms)
+- 2026-11-03 17:13:26 UTC — [ticket-741] testeur: OK (exit 0)
+- 2026-11-03 17:16:37 UTC — [ticket-741] securite: PASS — The diff adds a new field `arret_voulu` and property `bloque_le_ticket` to disti (191750ms)
+- 2026-11-03 17:16:37 UTC — [ticket-741] tour 2 — reviewer démarré
+- 2026-11-03 17:17:05 UTC — [ticket-741] tour 2 — reviewer terminé (28077ms)
+- 2026-11-03 17:18:47 UTC — [ticket-741] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : les tests couvrent les différe (129953ms)
+- 2026-11-03 17:18:47 UTC — [ticket-741] APPROVED après 2 tour(s)
