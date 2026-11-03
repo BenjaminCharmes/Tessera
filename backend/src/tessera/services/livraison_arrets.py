@@ -56,3 +56,11 @@ def arret_ci_illisible(code_http: object, pr_number: int) -> str:
         f"statuses en lecture. La PR #{pr_number} reste "
         "ouverte, rien n'est mergé."
     )
+
+
+def arret_pr_en_conflit(pr_number: int, base_branch: str) -> str:
+    """The stop line of a PR the CI found in conflict with its base (ticket-452)."""
+    return (
+        f"PR #{pr_number} en conflit avec {base_branch} : "
+        "à rebaser. La PR reste ouverte."
+    )

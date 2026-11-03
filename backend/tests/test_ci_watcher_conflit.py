@@ -85,6 +85,7 @@ async def test_livrer_phase_2_s_arrete_sur_conflit_sans_merger(tmp_path: Path) -
     assert livraison.pr_number == 7
     assert livraison.arret is not None
     assert "PR #7 en conflit avec develop : à rebaser" in livraison.arret
+    assert livraison.a_mettre_a_jour is True
     assert github.merged == []
 
 

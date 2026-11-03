@@ -30,3 +30,7 @@ class Livraison:
     #: Vrai quand la branche ne porte plus le commit que le reviewer a lu :
     #: rien n'est poussé, le ticket est bloqué (ticket-492).
     branche_modifiee: bool = False
+    #: Vrai quand la CI a rendu `conflicting` en phase 2 : le watcher peut
+    #: mettre la PR à jour, une fois, avant de bloquer le ticket (ticket-733).
+    #: Le texte de `arret` ne change pas.
+    a_mettre_a_jour: bool = False

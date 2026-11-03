@@ -36,6 +36,8 @@ class MiseAJour:
     #: Cause du refus ; `None` quand `sha` est rempli.
     arret: str | None
     etapes: tuple[str, ...] = ()
+    #: Base dont la mise à jour est partie (ticket-733) : le journal la nomme.
+    base: str = ""
 
 
 class _Refus(Exception):
@@ -58,11 +60,11 @@ async def mettre_a_jour_branche(
     try:
         sha = await _derouler(depot, branche, base, tete_attendue, retest, etapes)
     except _Refus as refus:
-        return MiseAJour(sha=None, arret=str(refus), etapes=tuple(etapes))
+        return MiseAJour(sha=None, arret=str(refus), etapes=tuple(etapes), base=base)
     except Exception as exc:  # noqa: BLE001 — le watcher ne doit jamais voir une exception
         _logger.warning("mise_a_jour_branche_echouee", extra={"erreur": str(exc)})
-        return MiseAJour(sha=None, arret=_cause(exc), etapes=tuple(etapes))
-    return MiseAJour(sha=sha, arret=None, etapes=tuple(etapes))
+        return MiseAJour(sha=None, arret=_cause(exc), etapes=tuple(etapes), base=base)
+    return MiseAJour(sha=sha, arret=None, etapes=tuple(etapes), base=base)
 
 
 def _cause(exc: Exception) -> str:

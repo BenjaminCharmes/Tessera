@@ -12,6 +12,7 @@ from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.project_loader import load_project
+from tessera.services.mise_a_jour_pr import TeteAttendue, mise_a_jour_de
 from tessera.services.realignement_base import Realignement
 from tessera.services.reprise_surveillance import SurveillanceProjet
 from tessera.services.resolveur_conflit import ResolveurConflitService
@@ -53,6 +54,11 @@ def surveillance_pour(
     Avec un worktree (ADR-056), la phase 2 ne lit ni n'écrit aucun arbre : le
     worktree est supprimé avant qu'elle ne finisse, et le checkout n'appartient
     pas au run. Ni réalignement de la base locale, ni ligne de journal sur disque.
+
+    Une PR que la CI rend conflictuelle se met à jour une fois par le watcher,
+    sur la base de la politique (ticket-733). Aucun retest local : celui du run
+    lance les tests dans le checkout ou le worktree du run, pas sur la fusion
+    poussée, et le worktree a disparu à ce stade. La CI verte garde le merge.
     """
     from tessera.services.ci_watcher import CI_WATCHER
 
@@ -85,6 +91,7 @@ def surveillance_pour(
         ),
     )
 
+    lecture = workflow_de_lecture(project_id, politique)
     pipeline_log_path_ci = None if wt is not None else project_path / "memory" / "pipeline-log.md"
     realignement = None if wt is not None else Realignement(project_path, base_branch)
 
@@ -100,10 +107,13 @@ def surveillance_pour(
             GitWorkspaceService(project_path, politique=politique).est_ancetre,
         )
 
+        # Le merge est lié au commit poussé : une tête qui bouge pendant
+        # l'attente de la CI ne part jamais sur la base (ticket-492). Une mise à
+        # jour de la PR déplace cette tête, et le merge la suit (ticket-733).
+        tete = TeteAttendue(controle.pushed_sha)
+
         async def phase_2(pr: int) -> Livraison:
-            # Le merge est lié au commit poussé : une tête qui bouge pendant
-            # l'attente de la CI ne part jamais sur la base (ticket-492).
-            return await service.livrer_phase_2(pr, sha_attendu=controle.pushed_sha)
+            return await service.livrer_phase_2(pr, sha_attendu=tete.sha)
 
         await CI_WATCHER.surveiller(
             p_id,
@@ -115,6 +125,13 @@ def surveillance_pour(
             etat_pr=service.pr_state,
             realignement=realignement,
             controle_tete=controle,
+            mise_a_jour=mise_a_jour_de(
+                depot=project_path,
+                base=base_branch,
+                pr_number=pr_number,
+                prs_ouvertes=lecture.prs_ouvertes,
+                tete=tete,
+            ),
         )
 
     return surveiller

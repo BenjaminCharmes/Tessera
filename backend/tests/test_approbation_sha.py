@@ -31,6 +31,7 @@ from tessera.services.pipeline_events import (
 from tessera.services.sha_approbation import (
     noter_approbation,
     noter_poussee,
+    noter_poussee_du_ticket,
     sha_pousse_du_ticket,
 )
 
@@ -75,6 +76,36 @@ async def test_pushed_sha_of_ticket_is_the_latest_one(tmp_path: Path) -> None:
 
     assert await sha_pousse_du_ticket(db, "proj", "ticket-001") == _B
     assert await sha_pousse_du_ticket(db, "autre", "ticket-001") is None
+
+
+async def test_pushed_sha_of_ticket_replaces_the_latest_pushed_one_only(
+    tmp_path: Path,
+) -> None:
+    db = tmp_path / "ide.db"
+    await init_db(db)
+    ancien = await create_run(db, "proj", "ticket-001")
+    await noter_poussee(db, ancien, _A)
+    recent = await create_run(db, "proj", "ticket-001")
+    await noter_poussee(db, recent, _B)
+    sans_push = await create_run(db, "proj", "ticket-001")
+
+    await noter_poussee_du_ticket(db, "proj", "ticket-001", _C)
+
+    assert await _colonne(db, "pushed_sha", recent) == _C
+    assert await _colonne(db, "pushed_sha", ancien) == _A
+    assert await _colonne(db, "pushed_sha", sans_push) is None
+    assert await sha_pousse_du_ticket(db, "proj", "ticket-001") == _C
+
+
+async def test_pushed_sha_of_ticket_refuses_when_no_run_has_one(tmp_path: Path) -> None:
+    db = tmp_path / "ide.db"
+    await init_db(db)
+    await create_run(db, "proj", "ticket-001")
+
+    with pytest.raises(LookupError):
+        await noter_poussee_du_ticket(db, "proj", "ticket-001", _C)
+
+    assert await sha_pousse_du_ticket(db, "proj", "ticket-001") is None
 
 
 def _orch(tmp_path: Path, tetes: list[str]) -> Orchestrator:

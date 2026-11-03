@@ -29,6 +29,7 @@ from tessera.services.livraison_arrets import (
     ARRET_NON_APPROUVE,
     arret_ci_illisible,
     arret_conflit,
+    arret_pr_en_conflit,
     arret_niveau_commit,
 )
 from tessera.services.livraison_merge import arret_de_merge, tenter_le_merge, tete_a_change
@@ -435,10 +436,8 @@ class LivraisonService:
                 etapes=tuple(etapes),
                 durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
-                arret=(
-                    f"PR #{pr_number} en conflit avec {self._base_branch} : "
-                    "à rebaser. La PR reste ouverte."
-                ),
+                arret=arret_pr_en_conflit(pr_number, self._base_branch),
+                a_mettre_a_jour=True,
             )
         if ci != "passing":
             return Livraison(
