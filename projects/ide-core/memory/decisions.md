@@ -652,3 +652,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : un `<path>` par jeton portait dix pièces à 3 974 nœuds SVG pour un plafond de 2 250 ; partagées, elles en font 1 815.
 **Alternative rejetée** : relever le plafond — la vue se relit toutes les 10 s ; un canvas — ADR-058.
 **Détail** : ticket-727.
+
+---
+
+## ADR-071 — Un prompt trop gros pour un provider local part directement sur son repli
+
+**Date** : 2026-11-03
+**Décision** : amende ADR-046. Un rôle dont le principal est `ollama` et qui déclare un `fallback` peut déclarer `fallback_above_chars` : au-delà de cette taille de prompt, l'appel part sur le repli sans tenter le principal. C'est un troisième déclencheur, à côté de l'indisponibilité et du run `rapide` ; une réponse illisible n'en déclenche toujours aucun.
+**Raison** : un modèle local tronque ou refuse un prompt plus long que sa fenêtre, et le constat n'arrive qu'après un appel long et inutile ; la taille se connaît avant l'appel.
+**Alternative rejetée** : tronquer le prompt — le validateur jugerait des critères qu'il n'a pas lus ; router selon la taille du ticket (écarté par ADR-046) — la taille du prompt est le vrai critère, et seulement pour un local.
+**Détail** : ticket-714 ; relevé par l'audit du 30/10.

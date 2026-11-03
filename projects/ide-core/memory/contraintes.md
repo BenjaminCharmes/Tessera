@@ -12,6 +12,10 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Un rôle `ollama` qui déclare `fallback_above_chars` envoie au repli, sans tenter le
+  principal, tout prompt plus long que ce seuil.** C'est le troisième déclencheur du
+  repli. (ADR-071, ADR-046)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
