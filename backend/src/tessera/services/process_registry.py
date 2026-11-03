@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from tessera.services.arret_de_service import describe_error, terminate_if_alive
 from tessera.services.groupe_de_processus import (
     creer_groupe,
     fermer_le_groupe,
@@ -383,14 +384,13 @@ class ProcessRegistry:
             # `concurrently`, qui lance deux serveurs. `terminate()` frappait
             # le premier maillon et laissait les descendants avec leurs ports
             # — « 2 arrêtés » pendant que douze processus tournaient
-            # (ticket-153).
-            # Le groupe d'abord : il emporte la descendance que `taskkill`
-            # ne retrouve plus quand un maillon a disparu.
+            # (ticket-153). Le groupe d'abord : il emporte la descendance que
+            # `taskkill` ne retrouve plus quand un maillon a disparu.
             if service.groupe is not None:
                 fermer_le_groupe(service.groupe)
                 service.groupe = None
             await tuer_l_arbre(processus.pid)
-            processus.terminate()
+            terminate_if_alive(processus)
             await asyncio.wait_for(processus.wait(), timeout=DELAI_D_ARRET_S)
         except asyncio.TimeoutError:
             # Un service qui ignore `terminate` garderait son port : le tuer
@@ -398,7 +398,7 @@ class ProcessRegistry:
             processus.kill()
             await processus.wait()
         except Exception as exc:  # noqa: BLE001
-            _logger.warning("arret_service_echoue", extra={"erreur": str(exc)})
+            _logger.warning("arret_service_echoue", extra={"erreur": describe_error(exc)})
 
 
 #: L'instance que les routeurs partagent, comme `RUN_LOCK` et `EVENT_HUB`.
