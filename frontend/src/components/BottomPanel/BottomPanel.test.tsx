@@ -306,6 +306,52 @@ describe("BottomPanel — journal repliable (ticket-440)", () => {
   });
 });
 
+describe("BottomPanel — repli quand rien ne tourne (ticket-738)", () => {
+  const enCours = [makeEvent("agent_started", { round: 1 }, { agent: "codeur" })];
+  const ticketFini = [
+    ...enCours,
+    makeEvent("pipeline_done", { approved: true, final_status: "done" }),
+  ];
+  const termine = [...ticketFini, makeEvent("run_closed", { approved: true })];
+
+  it("reste déplié entre deux tickets d'une file", () => {
+    const { rerender } = render(<BottomPanel events={enCours} />);
+    rerender(<BottomPanel events={ticketFini} />);
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("true");
+  });
+
+  beforeEach(() => {
+    window.localStorage.setItem(CLE_JOURNAL, "true");
+  });
+
+  it("se replie quand le run se termine, et le mémorise", () => {
+    const { rerender } = render(<BottomPanel events={enCours} />);
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("true");
+    rerender(<BottomPanel events={termine} />);
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByText(/Pipeline terminé/)).toBeTruthy();
+    expect(window.localStorage.getItem(CLE_JOURNAL)).toBe("false");
+  });
+
+  it("reste déplié tant que le run tourne", () => {
+    const { rerender } = render(<BottomPanel events={enCours} />);
+    rerender(
+      <BottomPanel
+        events={[...enCours, makeEvent("agent_done", {}, { agent: "codeur" })]}
+      />,
+    );
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("se laisse déplier à la main une fois le run terminé", () => {
+    const { rerender } = render(<BottomPanel events={enCours} />);
+    rerender(<BottomPanel events={termine} />);
+    fireEvent.click(screen.getByRole("button"));
+    rerender(<BottomPanel events={[...termine]} />);
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("true");
+  });
+});
+
 describe("BottomPanel — la livraison (ticket-083)", () => {
   it("dit jusqu'où le travail est allé", () => {
     const ev = makeEvent(

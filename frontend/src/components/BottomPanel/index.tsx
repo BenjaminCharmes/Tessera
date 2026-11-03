@@ -144,10 +144,23 @@ export default function BottomPanel({ events, projetLabel }: BottomPanelProps) {
   );
   const lines = events.map(eventToLine).filter((l): l is string => l !== null);
   const derniere = lines[lines.length - 1];
+  const enCours = runEnCours(events);
+  const ferme = events[events.length - 1]?.type === "run_closed";
+  const etaitFerme = useRef(ferme);
 
   useEffect(() => {
     if (deplie) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [lines.length, deplie]);
+
+  // Le journal se replie quand le run se ferme : la barre garde la dernière
+  // ligne, et rien ne reste ouvert au repos (ticket-738). `run_closed` et non
+  // `pipeline_done` : dans une file, ce dernier clôt chaque ticket, et le
+  // journal se replierait sous les yeux de qui le suit. Seule la transition
+  // replie : un dépliage à la main au repos est respecté.
+  useEffect(() => {
+    if (!etaitFerme.current && ferme) setDeplie(false);
+    etaitFerme.current = ferme;
+  }, [ferme, setDeplie]);
 
   return (
     <div
@@ -164,7 +177,7 @@ export default function BottomPanel({ events, projetLabel }: BottomPanelProps) {
         }`}
       >
         <RegionTitle>Journal{projetLabel ? ` — ${projetLabel}` : ""}</RegionTitle>
-        {runEnCours(events) && (
+        {enCours && (
           <span
             role="img"
             aria-label="Run en cours"
