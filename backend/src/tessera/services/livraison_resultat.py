@@ -34,3 +34,20 @@ class Livraison:
     #: mettre la PR à jour, une fois, avant de bloquer le ticket (ticket-733).
     #: Le texte de `arret` ne change pas.
     a_mettre_a_jour: bool = False
+    #: Vrai quand le projet déclare le niveau `commit` : l'arrêt est voulu, le
+    #: ticket reste `done` (ticket-741).
+    arret_voulu: bool = False
+
+    @property
+    def bloque_le_ticket(self) -> bool:
+        """Whether the ticket must read `blocked` after this delivery (ticket-741).
+
+        Vrai pour une branche modifiée depuis l'approbation, et pour tout arrêt
+        de phase 1 qui n'a pas ouvert de PR, sauf l'arrêt voulu du niveau
+        `commit`. Une PR ouverte, même orpheline, reste suivie par le watcher.
+        """
+        if self.branche_modifiee:
+            return True
+        return (
+            self.arret is not None and self.pr_number is None and not self.arret_voulu
+        )
