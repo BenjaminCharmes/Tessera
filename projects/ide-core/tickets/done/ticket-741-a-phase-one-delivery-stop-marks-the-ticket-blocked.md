@@ -5,7 +5,7 @@ depends_on:
 - ticket-740
 estimated_days: 1
 id: ticket-741
-pr_number: null
+pr_number: 857
 priority: high
 status: done
 title: A phase-one delivery stop marks the ticket blocked
