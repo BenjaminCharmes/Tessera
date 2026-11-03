@@ -154,6 +154,46 @@ def lecteur_sur_la_base(workspace: _LecteurSurLaBase, project_id: str) -> Lecteu
     return lire
 
 
+async def termine_sur_la_base(workspace: _LecteurSurLaBase, ticket_id: str) -> bool:
+    """True when ``origin/<base>`` holds the ticket as `done` or `cancelled` (ticket-736).
+
+    Lecture impossible (fetch en échec, ticket absent, contenu illisible) :
+    False, pour que l'appelant garde le verdict de l'arbre sans bloquer la file.
+    """
+    lu = await workspace.lire_ticket_sur_la_base(ticket_id)
+    if lu is None:
+        return False
+    try:
+        return ticket_depuis_contenu(lu[0], lu[1], "").status in _TERMINES
+    except ValueError:
+        return False
+
+
+async def est_termine(
+    ticket_svc: TicketService,
+    workspace: _LecteurSurLaBase | None,
+    ticket_id: str,
+    journal: Callable[[str], None],
+) -> bool:
+    """Whether the ticket is already `done` or `cancelled`, in the tree or on the base.
+
+    Un ticket introuvable n'est pas « terminé » : le laisser passer rend
+    l'erreur au bon endroit, dans `_run_pipeline`, qui sait la nommer.
+    L'arbre peut être périmé (checkout resté sur une vieille branche) : un
+    ticket non terminé dans l'arbre est relu sur `origin/<base>` ; lecture
+    impossible, le verdict de l'arbre reste (ticket-736).
+    """
+    ticket = await ticket_svc.get_ticket(ticket_id)
+    if ticket is None:
+        return False
+    if ticket.status in _TERMINES:
+        return True
+    if workspace is None or not await termine_sur_la_base(workspace, ticket_id):
+        return False
+    journal(f"[{ticket_id}] déjà terminé sur la base (arbre périmé : {ticket.status.value})")
+    return True
+
+
 async def _lire(
     ticket_svc: TicketService, repli: LecteurDeRepli | None, ticket_id: str
 ) -> Ticket | None:

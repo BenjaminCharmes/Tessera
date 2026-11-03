@@ -163,6 +163,11 @@ class _FakeGit:
     async def is_clean(self) -> bool:
         return True
 
+    async def lire_ticket_sur_la_base(
+        self, ticket_id: str, *, fetch: bool = True
+    ) -> tuple[str, str] | None:
+        return None
+
     async def commit_all(self, message: str) -> str | None:
         self.commits.append(message)
         return "abc1234"
