@@ -7332,3 +7332,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 18:06:45 UTC — [ticket-744] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente correctement (86000ms)
 - 2026-11-03 18:06:45 UTC — [ticket-744] APPROVED après 2 tour(s)
 - 2026-11-03 18:07:54 UTC — [ticket-744] documentation: 0 fichier(s) (62641ms)
+- 2026-11-03 18:17:18 UTC — [ide-core] ticket-744 PR #859 confiée au CIWatcher
+- 2026-11-03 18:17:23 UTC — [ticket-745] branche ticket-745-unknown-git-global-options-and-git-grep-open-are
+- 2026-11-03 18:17:24 UTC — [ticket-745] tour 1 — codeur démarré
+- 2026-11-03 18:18:30 UTC — [ticket-745] tour 1 — codeur terminé (65485ms)
+- 2026-11-03 18:24:28 UTC — [ide-core] ticket-744 PR #859 mergée (CI verte)
+- 2026-11-03 18:28:30 UTC — [ticket-745] testeur: OK (exit 0)
+- 2026-11-03 18:30:39 UTC — [ticket-745] securite: PASS — This diff hardens the git command guard by transitioning from a blacklist of dan (129047ms)
+- 2026-11-03 18:30:39 UTC — [ticket-745] tour 1 — reviewer démarré
+- 2026-11-03 18:31:04 UTC — [ticket-745] tour 1 — reviewer terminé (25281ms)
+- 2026-11-03 18:32:30 UTC — [ticket-745] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifié gère correctemen (111030ms)
+- 2026-11-03 18:32:30 UTC — [ticket-745] APPROVED après 1 tour(s)
