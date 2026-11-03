@@ -7135,3 +7135,4 @@ Le diff ajoute :
 - 2026-11-03 08:41:01 UTC — [ticket-701] validateur: fichiers cités joints : routers/dependencies.py
 - 2026-11-03 08:41:01 UTC — [ticket-701] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été refactoré pour dé (113108ms)
 - 2026-11-03 08:41:01 UTC — [ticket-701] APPROVED après 2 tour(s)
+- 2026-11-03 08:45:04 UTC — [ticket-701] documentation: 1 fichier(s) (236875ms) — après tour de correction
