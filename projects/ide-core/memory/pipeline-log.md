@@ -7231,3 +7231,26 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 13:04:10 UTC — [ticket-739] validateur: APPROVED — Le ticket-739 implémente correctement la reprise unique de la phase 2 après une  (34546ms)
 - 2026-11-03 13:04:10 UTC — [ticket-739] APPROVED après 2 tour(s)
 - 2026-11-03 13:07:35 UTC — [ticket-739] documentation: 0 fichier(s) (200125ms) — après tour de correction
+- 2026-11-03 13:21:27 UTC — [ide-core] ticket-739 PR #844 confiée au CIWatcher
+- 2026-11-03 13:21:32 UTC — [ticket-733] branche ticket-733-the-ci-watcher-updates-a-conflicting-pr-once-and
+- 2026-11-03 13:21:34 UTC — [ticket-733] tour 1 — codeur démarré
+- 2026-11-03 13:28:34 UTC — [ide-core] ticket-739 PR #844 mergée (CI verte)
+- 2026-11-03 13:33:34 UTC — [ticket-733] tour 1 — codeur terminé (719483ms)
+- 2026-11-03 13:43:24 UTC — [ticket-733] testeur: OK (exit 0)
+- 2026-11-03 13:46:57 UTC — [ticket-733] securite: PASS — Le ticket-733 refactorise la surveillance des PR avec une nouvelle capacité de m (213046ms)
+- 2026-11-03 13:46:57 UTC — [ticket-733] tour 1 — reviewer démarré
+- 2026-11-03 13:47:41 UTC — [ticket-733] tour 1 — reviewer terminé (44422ms)
+- 2026-11-03 13:51:57 UTC — [ticket-733] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-03 13:53:11 UTC — [ticket-733] validateur: fichiers cités joints : docs/architecture.md (tronqué) ; non joints (budget épuisé) : scripts/verifier.py
+- 2026-11-03 13:53:11 UTC — [ticket-733] validateur: APPROVED — Le watcher met à jour une PR conflictuelle une seule fois : tête notée en base a (373796ms)
+- 2026-11-03 13:53:11 UTC — [ticket-733] CHANGES_REQUESTED tour 1: Reviewer : 1. `assemblage_run.py` passe à `surveillance_pour` le `retest` du run (`retest_du_run(git_workspace, …, racine_run, …)`). Ce retest est transmis à `mettre_a_jour_branche` (ticket-733, point
+- 2026-11-03 13:53:11 UTC — [ticket-733] tour 2 — codeur démarré
+- 2026-11-03 13:54:15 UTC — [ticket-733] tour 2 — codeur terminé (64562ms)
+- 2026-11-03 14:03:40 UTC — [ticket-733] testeur: OK (exit 0)
+- 2026-11-03 14:07:32 UTC — [ticket-733] securite: PASS — Ce diff refactorise la surveillance des PR conflictuelles (ticket-733) et ajoute (232094ms)
+- 2026-11-03 14:07:32 UTC — [ticket-733] tour 2 — reviewer démarré
+- 2026-11-03 14:07:52 UTC — [ticket-733] tour 2 — reviewer terminé (19139ms)
+- 2026-11-03 14:12:32 UTC — [ticket-733] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-03 14:13:32 UTC — [ticket-733] validateur: fichiers cités joints : docs/architecture.md (tronqué) ; non joints (budget épuisé) : scripts/verifier.py
+- 2026-11-03 14:13:32 UTC — [ticket-733] validateur: APPROVED — Le ticket-733 implémente complètement la capacité du watcher à mettre à jour une (359578ms)
+- 2026-11-03 14:13:32 UTC — [ticket-733] APPROVED après 2 tour(s)
