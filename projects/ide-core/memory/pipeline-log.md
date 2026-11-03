@@ -7344,3 +7344,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 18:32:30 UTC — [ticket-745] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifié gère correctemen (111030ms)
 - 2026-11-03 18:32:30 UTC — [ticket-745] APPROVED après 1 tour(s)
 - 2026-11-03 18:35:11 UTC — [ticket-745] documentation: 0 fichier(s) (155562ms)
+- 2026-11-03 18:52:47 UTC — [ide-core] ticket-745 PR #860 mergée (CI verte)
+- 2026-11-03 18:52:50 UTC — [ide-core] ticket-745 : base réalignée sur develop
+- 2026-11-03 18:52:50 UTC — [ide-core] ticket-745 PR #860 confiée au CIWatcher
+- 2026-11-03 18:52:55 UTC — [ticket-746] branche ticket-746-git-environment-assignments-before-git-or-gh-are
+- 2026-11-03 18:52:56 UTC — [ticket-746] tour 1 — codeur démarré
+- 2026-11-03 18:54:30 UTC — [ticket-746] tour 1 — codeur terminé (94422ms)
+- 2026-11-03 19:05:27 UTC — [ticket-746] testeur: OK (exit 0)
+- 2026-11-03 19:07:55 UTC — [ticket-746] securite: PASS — Ticket-746 strengthens the git security guard (ADR-067) by detecting and refusin (147859ms)
+- 2026-11-03 19:07:55 UTC — [ticket-746] tour 1 — reviewer démarré
+- 2026-11-03 19:08:09 UTC — [ticket-746] tour 1 — reviewer terminé (13844ms)
+- 2026-11-03 19:09:28 UTC — [ticket-746] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (93342ms)
+- 2026-11-03 19:09:28 UTC — [ticket-746] APPROVED après 1 tour(s)
