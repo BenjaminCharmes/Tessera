@@ -7255,3 +7255,7 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 14:13:32 UTC — [ticket-733] validateur: APPROVED — Le ticket-733 implémente complètement la capacité du watcher à mettre à jour une (359578ms)
 - 2026-11-03 14:13:32 UTC — [ticket-733] APPROVED après 2 tour(s)
 - 2026-11-03 14:16:04 UTC — [ticket-733] documentation: 0 fichier(s) (146906ms) — après tour de correction
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: rebase sur develop (90250ms)
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: conflit résolu : backend/src/tessera/services/ci_watcher.py, backend/src/tessera/services/controle_tete.py, backend/tests/test_longueur_des_fichiers.py (0ms)
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: tests relancés après rebase : rouges (FAILED tests/test_ci_watcher_reprise.py::test_network_error_then_open_pr_replays_phase_2_and_succeeds !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 2302 passed, 64 warnings in ) (978953ms)
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
