@@ -23,7 +23,7 @@ export interface AbscissesDuMur {
 }
 
 /** L'écart de l'horloge, du tableau et de l'interrupteur dans une salle : ils ne se touchent plus (ticket-727). */
-const ECART = "ml-1.5 min-[1700px]:ml-3";
+const ECART = "ml-1";
 
 /** Une fenêtre fait 60 px avant agrandissement : le cadre se centre entre sa fin et la porte. */
 const DEMI_FENETRE = 30;
@@ -173,7 +173,7 @@ export default function MurLumineux({
         </span>
       )}
       {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
-      <span className={`self-end ${ECART}`}>{bouton}</span>
+      <span className={`self-end ${ECART} min-[1700px]:ml-3`}>{bouton}</span>
     </>
   );
 }
