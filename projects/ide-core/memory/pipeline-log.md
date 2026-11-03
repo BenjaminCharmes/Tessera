@@ -7384,3 +7384,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 20:03:56 UTC — [ticket-748] validateur: fichiers cités joints : frontend/vite.config.ts, frontend/src/x/vitest.config.ts, frontend/vitest.config.ts, projects/ide-core/memory/contraintes.md ; absents : backend/pytest.ini
 - 2026-11-03 20:03:56 UTC — [ticket-748] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests couvrent les cas d (215796ms)
 - 2026-11-03 20:03:56 UTC — [ticket-748] APPROVED après 1 tour(s)
+- 2026-11-03 20:06:45 UTC — [ticket-748] documentation: 0 fichier(s) (162171ms)
