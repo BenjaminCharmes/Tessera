@@ -7304,3 +7304,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 17:18:47 UTC — [ticket-741] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : les tests couvrent les différe (129953ms)
 - 2026-11-03 17:18:47 UTC — [ticket-741] APPROVED après 2 tour(s)
 - 2026-11-03 17:20:30 UTC — [ticket-741] documentation: 0 fichier(s) (96811ms)
+- 2026-11-03 17:20:53 UTC — [ide-core] ticket-741 PR #857 confiée au CIWatcher
+- 2026-11-03 17:20:58 UTC — [ticket-743] branche ticket-743-an-observer-closed-by-its-browser-is-logged-as-in
+- 2026-11-03 17:20:59 UTC — [ticket-743] tour 1 — codeur démarré
+- 2026-11-03 17:22:42 UTC — [ticket-743] tour 1 — codeur terminé (102514ms)
+- 2026-11-03 17:27:48 UTC — [ide-core] ticket-741 PR #857 mergée (CI verte)
+- 2026-11-03 17:30:59 UTC — [ticket-743] testeur: OK (exit 0)
+- 2026-11-03 17:32:06 UTC — [ticket-743] securite: PASS — Le diff améliore la gestion des erreurs WebSocket en distinguant les fermetures  (67453ms)
+- 2026-11-03 17:32:06 UTC — [ticket-743] tour 1 — reviewer démarré
+- 2026-11-03 17:32:22 UTC — [ticket-743] tour 1 — reviewer terminé (15577ms)
+- 2026-11-03 17:33:48 UTC — [ticket-743] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (101375ms)
+- 2026-11-03 17:33:48 UTC — [ticket-743] APPROVED après 1 tour(s)
