@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-739
-pr_number: null
+pr_number: 844
 priority: medium
 status: done
 title: A delivery cut by a network error is retried once
