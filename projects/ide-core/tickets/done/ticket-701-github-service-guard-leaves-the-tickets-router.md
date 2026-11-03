@@ -3,6 +3,7 @@ agent: codeur
 created: 2026-10-29
 depends_on: []
 id: ticket-701
+pr_number: 837
 priority: low
 status: done
 title: The GitHub service guard leaves the tickets router
