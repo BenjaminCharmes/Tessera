@@ -48,7 +48,8 @@ export default function BureauDuDirecteur({
           />
         </span>
       }
-      decor={<Bibliotheque />}
+      personnageAuMobilier
+      aGauche={<Bibliotheque />}
       plante="ficus"
       ambre={agents.length > 0}
       textes={agents.map(({ projet, poste }) => (

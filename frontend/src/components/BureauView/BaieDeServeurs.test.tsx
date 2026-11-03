@@ -55,9 +55,8 @@ describe("BaieDeServeurs", () => {
     const { container } = render(<Harnais projet="ide-core" />);
 
     const baie = await screen.findByRole("group", { name: "Services" });
-    const voyants = [...container.querySelectorAll("[data-voyant]")].map((g) =>
-      g.getAttribute("data-voyant"),
-    );
+    // Un étage par service, dans l'ordre, chacun avec le voyant de son état (ticket-727).
+    const voyants = container.querySelector('[data-sprite="baie"]')?.getAttribute("data-voyants")?.split(",");
     expect(voyants).toEqual(["en-cours", "echoue"]);
     // Les noms ne s'écrivent plus sous la baie : ils se lisent en infobulle.
     expect(screen.queryByText("api")).toBeNull();

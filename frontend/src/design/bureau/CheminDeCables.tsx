@@ -1,27 +1,14 @@
-const BARREAUX = Array.from({ length: 100 }, (_, i) => i * 2);
+import Tuile from "./Tuile";
 
 /**
- * Le chemin de câbles du plafond : un caillebotis métallique sur toute la
- * largeur du mur, grille 200 × 8. Du mobilier : fixe, sans voyant. Étiré
- * horizontalement, il garde ses barreaux au pixel près.
+ * Le chemin de câbles du plafond (ticket-727) : un caillebotis à fils sur toute la
+ * largeur du mur, câbles visibles entre les barreaux, une boucle qui pend. Un tronçon
+ * de 80 × 16 qui se répète sans couture. Du mobilier : fixe, sans voyant.
  */
 export default function CheminDeCables() {
   return (
-    <svg
-      width="100%"
-      height="24"
-      viewBox="0 0 200 8"
-      preserveAspectRatio="none"
-      shapeRendering="crispEdges"
-      aria-hidden="true"
-      data-sprite="chemin-de-cables"
-    >
-      <rect x="0" y="0" width="200" height="1" className="fill-(--sprite-metal)" />
-      <rect x="0" y="1" width="200" height="2" className="fill-(--sprite-metal-ombre)" />
-      {BARREAUX.map((x) => (
-        <rect key={x} x={x} y="1" width="1" height="1" className="fill-(--sprite-metal)" />
-      ))}
-      <rect x="0" y="3" width="200" height="1" className="fill-(--sprite-salle-plinthe)" />
-    </svg>
+    <div aria-hidden="true" className="relative h-6 w-full" data-sprite="chemin-de-cables">
+      <Tuile motif="chemin" moment="jour" />
+    </div>
   );
 }

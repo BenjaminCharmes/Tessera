@@ -4,11 +4,18 @@ import { describe, expect, it } from "vitest";
 import { TENUES, physique } from "./physique";
 import { POSTES } from "./postesDuRun";
 
-const CSS = readFileSync(join(__dirname, "..", "..", "index.css"), "utf-8");
+/** Le thème des sprites, de jour : le moteur y lit ses couleurs (ticket-727). */
+const [THEME = ""] = readFileSync(join(__dirname, "..", "..", "design", "bureau", "sprites-theme.css"), "utf-8").split(
+  '[data-moment="nuit"]',
+);
 
-/** La valeur d'un jeton `--sprite-*` déclaré dans index.css. */
+/**
+ * La valeur d'un jeton du thème. Le haut d'un rôle est sa base (`-b`) ; son ombre, qui
+ * colore les bras, est le ton `-s` de la même rampe.
+ */
 function jeton(nom: string): string | undefined {
-  return CSS.match(new RegExp(`--sprite-${nom}:\\s*([^;]+);`))?.[1]?.trim();
+  const variable = nom.endsWith("-ombre") ? `${nom.slice(0, -"-ombre".length)}-s` : `${nom}-b`;
+  return THEME.match(new RegExp(`--sprite-${variable}:\\s*([^;]+);`))?.[1]?.trim();
 }
 
 describe("physique", () => {
@@ -34,8 +41,8 @@ describe("physique", () => {
   });
 
   it("declares a token for every skin and hair index it can draw", () => {
-    for (const n of [1, 2, 3, 4, 5]) expect(jeton(`peau-${n}`), `peau-${n}`).toBeDefined();
-    for (const n of [1, 2, 3, 4, 5, 6, 7]) expect(jeton(`cheveux-${n}`), `cheveux-${n}`).toBeDefined();
+    for (const n of [1, 2, 3, 4, 5]) expect(jeton(`peau${n}`), `peau${n}`).toBeDefined();
+    for (const n of [1, 2, 3, 4, 5, 6, 7]) expect(jeton(`cheveux${n}`), `cheveux${n}`).toBeDefined();
   });
 });
 

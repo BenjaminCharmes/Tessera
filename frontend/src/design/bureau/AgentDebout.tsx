@@ -1,7 +1,9 @@
 import type { RoleAffiche } from "../../lib/bureau/postesDuRun";
 import { TENUES, physique } from "../../lib/bureau/physique";
 import type { Physique, Tenue } from "../../lib/bureau/physique";
-import Personnage from "./Personnage";
+import { type Mains, type OptionsDebout, debout, marche } from "../../lib/bureau/sprites/debout";
+import { memoise } from "../../lib/bureau/sprites/symboles";
+import SpriteSvg from "./SpriteSvg";
 
 /** La tenue et le physique d'une figure sans rôle de pipeline : le directeur. */
 export interface FigureDeSalle {
@@ -20,12 +22,26 @@ interface AgentDeboutProps {
   feuille?: boolean;
   /** Une figure de salle commune, à la place de la tenue du rôle (le directeur en visite). */
   figure?: FigureDeSalle;
+  /** Il se déplace : les quatre images de la marche, tant que dure la translation. */
+  enMarche?: boolean;
+}
+
+/** Un dessin par combinaison : la clé porte tout ce qui le change, rien d'autre. */
+const dessiner = memoise((enMarche: boolean, cle: string) => {
+  const o = JSON.parse(cle) as OptionsDebout;
+  return enMarche ? marche(o) : debout(o);
+});
+
+function mainsDe(brasLeves: boolean, sansTasse: boolean, feuille: boolean): Mains {
+  if (feuille) return "feuille";
+  if (brasLeves) return "levees";
+  return sansTasse ? "vides" : "tasse";
 }
 
 /**
- * L'agent qui a fini, debout à côté de son poste : sa propre grille 12 × 20 en
- * 42 × 70 px, à l'échelle du personnage assis (tête de 6 unités dans les deux).
- * `overflow-visible` : les bras levés de la fête dépassent la grille.
+ * L'agent debout, grille 24 × 40 en 42 × 70 px (ticket-727), à l'échelle du poste.
+ * Un agent qui a fini sourit ; une figure de salle garde un visage neutre. Quand il se
+ * déplace, il marche au lieu de glisser. `overflow-visible` : les bras levés dépassent.
  */
 export default function AgentDebout({
   projet,
@@ -34,25 +50,26 @@ export default function AgentDebout({
   sansTasse = false,
   feuille = false,
   figure,
+  enMarche = false,
 }: AgentDeboutProps) {
+  const mains = mainsDe(brasLeves, sansTasse, feuille);
+  const tenue = figure?.tenue ?? TENUES[role];
+  const ph = figure?.physique ?? physique(projet, role);
+  const expression = figure ? "neutre" : "fait";
+  // Les bras levés ne marchent pas : la fête se passe sur place.
+  const marcheVraiment = enMarche && mains !== "levees";
+  const dessin = dessiner(marcheVraiment, JSON.stringify({ physique: ph, tenue, expression, mains }));
   return (
-    <svg
-      width="42"
-      height="70"
-      viewBox="0 0 12 20"
-      shapeRendering="crispEdges"
-      aria-hidden="true"
-      className="overflow-visible"
+    <SpriteSvg
+      sprite={dessin}
+      largeur={42}
+      hauteur={70}
       data-sprite="agent-debout"
-    >
-      <Personnage
-        pose="debout"
-        tenue={figure?.tenue ?? TENUES[role]}
-        physique={figure?.physique ?? physique(projet, role)}
-        brasLeves={brasLeves}
-        sansTasse={sansTasse}
-        feuille={feuille}
-      />
-    </svg>
+      data-pose="debout"
+      data-mains={mains}
+      data-marche={marcheVraiment}
+      data-cravate={tenue.cravate}
+      data-capuche={tenue.capuche}
+    />
   );
 }

@@ -26,8 +26,8 @@ export default function SolEtire({ children }: { children: ReactNode }) {
       if (suivant === courant) return;
       courant = suivant;
       setEtirement(suivant);
-      // Un sol qui change de largeur (zoom, « Ajuster » qui se mesure après le
-      // montage, fenêtre redimensionnée) déplace les agents d'un coup : couper la
+      // Un sol qui change de largeur (mesuré après le montage, fenêtre
+      // redimensionnée) déplace les agents d'un coup : couper la
       // marche le temps d'une image, sinon ils glissent jusqu'à leur poste (ticket-720).
       setMarche(false);
       cancelAnimationFrame(image);

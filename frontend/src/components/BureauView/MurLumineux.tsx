@@ -1,3 +1,4 @@
+import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import { Fragment } from "react";
 import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
@@ -16,9 +17,16 @@ export interface AbscissesDuMur {
   fenetres: readonly number[];
   plafonniers: readonly number[];
   horloge: number;
+  /** Le centre du cadre, entre la gauche de la dernière fenêtre et la porte : il se décale d'une demi-fenêtre. */
   cadre: number;
   interrupteur: number;
 }
+
+/** L'écart de l'horloge, du tableau et de l'interrupteur dans une salle : ils ne se touchent plus (ticket-727). */
+const ECART = "ml-1";
+
+/** Une fenêtre fait 60 px avant agrandissement : le cadre se centre entre sa fin et la porte. */
+const DEMI_FENETRE = 30;
 
 interface MurLumineuxProps {
   moment: DayMoment;
@@ -86,7 +94,7 @@ function MurPose({ moment, ciels, allume, abscisses }: ElementsProps & { absciss
         </Pose>
       ))}
       {abscisses.plafonniers.map((x) => (
-        <Pose key={`plafonnier-${x}`} x={x} bas="top-0">
+        <Pose key={`plafonnier-${x}`} x={x} bas="top-0" centre>
           <Plafonnier moment={moment} allume={allume} />
         </Pose>
       ))}
@@ -102,7 +110,12 @@ function MurEnFlux({ moment, ciels, allume, plafonniers }: ElementsProps & { pla
         // L'ordre des fenêtres est fixe : l'indice est une clé stable.
         <Fragment key={`fenetre-${i}`}>
           <Fenetre moment={moment} ciel={ciel} />
-          {i < plafonniers && <Plafonnier moment={moment} allume={allume} />}
+          {/* Au plafond : il remonte de la marge haute du mur (`pt-3`) (ticket-727). */}
+          {i < plafonniers && (
+            <span className="-mt-3 self-start">
+              <Plafonnier moment={moment} allume={allume} />
+            </span>
+          )}
         </Fragment>
       ))}
     </>
@@ -125,6 +138,7 @@ export default function MurLumineux({
   abscisses,
   accroche,
 }: MurLumineuxProps) {
+  const echelle = useEchelleDesSprites();
   const bouton = <BoutonLumiere salle={salle} allume={allume} onBasculer={onBasculer} />;
   if (abscisses) {
     return (
@@ -134,7 +148,7 @@ export default function MurLumineux({
           <HorlogeMurale maintenant={maintenant} />
         </Pose>
         {/* Centré sur la hauteur des fenêtres (top-9) : plus haut qu'elles, il flottait. */}
-        <Pose x={abscisses.cadre} bas="top-11">
+        <Pose x={abscisses.cadre} bas="top-11" centre decalage={DEMI_FENETRE * echelle}>
           <Tableau salle={salle} />
         </Pose>
         <Pose x={abscisses.interrupteur} bas="bottom-10">
@@ -146,18 +160,20 @@ export default function MurLumineux({
   return (
     <>
       <MurEnFlux moment={moment} ciels={ciels} allume={allume} plafonniers={plafonniers} />
-      {accroche}
-      <HorlogeMurale maintenant={maintenant} />
+      {accroche && <span className={ECART}>{accroche}</span>}
+      <span className={ECART}>
+        <HorlogeMurale maintenant={maintenant} />
+      </span>
       {/* Ce qui s'accroche (le cadre de l'employé) prend la place du tableau : les deux
           ensemble faisaient déborder le bureau du directeur. Descendu au milieu de la
           hauteur des fenêtres, au lieu de s'aligner sur leur haut. */}
       {!accroche && (
-        <span className="mt-1.5">
+        <span className={`mt-1.5 ${ECART}`}>
           <Tableau salle={salle} />
         </span>
       )}
       {/* Écarté de la fenêtre : collé à elle, il se lisait comme sa poignée (ticket-627). */}
-      <span className="self-end min-[1700px]:ml-3">{bouton}</span>
+      <span className={`self-end ${ECART} min-[1700px]:ml-3`}>{bouton}</span>
     </>
   );
 }

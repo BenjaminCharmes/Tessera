@@ -6,6 +6,7 @@ import { api } from "../../lib/api";
 import { apiQuota } from "../../lib/quota";
 import type { UsageStats } from "../../types/api";
 import Piece from "./Piece";
+import DefsDuBureau from "../../design/bureau/DefsDuBureau";
 import { useSanteDuBureau } from "../../hooks/useSanteDuBureau";
 import { T0, etatEnCodage, etatEnSecurite, nomme } from "./etatsDeTest";
 
@@ -18,11 +19,12 @@ function projets(nombre: number): ProjetDuBureau[] {
   }));
 }
 
-/** Dix pièces sous une seule horloge, sans passer par le mode compact. */
+/** Dix pièces sous une seule horloge, sans passer par le mode compact, avec le `<defs>` commun que l'app monte. */
 function DixPieces() {
   const maintenant = useSanteDuBureau();
   return (
     <>
+      <DefsDuBureau />
       {projets(10).map(({ nom, etat }) => (
         <Piece key={nom} projet={nom} etat={etat} maintenant={maintenant} />
       ))}
@@ -55,6 +57,7 @@ describe("BureauView", () => {
     const noeuds = container.querySelectorAll("svg *").length;
     expect(noeuds).toBeGreaterThan(0);
     // 2000 avant l'horloge, l'étagère, le cadre et la corbeille (ticket-635) : une vingtaine de noeuds par pièce.
+    // Le `<defs>` commun compte une fois : chaque sprite répété n'y coûte qu'un `<use>` (ticket-727).
     expect(noeuds).toBeLessThan(2250);
   });
 

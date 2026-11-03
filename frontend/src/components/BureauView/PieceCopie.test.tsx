@@ -31,7 +31,7 @@ describe("Piece review handed back to the coder", () => {
     const reviewer = agent(container, "reviewer");
     expect(reviewer).toHaveAttribute("data-objet", "feuille");
     expect(reviewer).toHaveAttribute("data-activite", "copie");
-    expect(reviewer.querySelector('[data-detail="feuille"]')).not.toBeNull();
+    expect(reviewer.querySelector('[data-mains="feuille"]')).not.toBeNull();
     // Le poste du codeur est la première colonne : l'agent se tient à sa droite, pas devant le sien.
     expect(reviewer.style.transform).toBe("translate(134.4px, 0px)");
     expect(container.querySelectorAll('[data-objet="feuille"]')).toHaveLength(1);

@@ -1,38 +1,18 @@
+import { interrupteur } from "../../lib/bureau/sprites/mur";
+import { memoise } from "../../lib/bureau/sprites/symboles";
+import SpriteSvg from "./SpriteSvg";
+
 interface InterrupteurProps {
   allume: boolean;
 }
 
+const dessin = memoise(interrupteur);
+
 /**
- * Un interrupteur mural, grille 6 × 9 : la touche en haut quand la lumière est allumée.
- * Il passe par `Agrandi` comme tout sprite : 5,5 × 8,25 px bruts, soit environ 6 × 9 px à
- * l'échelle de 1536 (1,1), et plus grand à 1920 comme le reste du mur (ticket-631).
- * À 12 × 18 px il faisait le tiers de la porte (ticket-622).
+ * Un interrupteur mural, grille 12 × 18 (ticket-727) : la bascule s'enfonce du côté
+ * éteint. Il passe par `Agrandi` comme tout sprite : 5,5 × 8,25 px bruts, environ
+ * 6 × 9 px à l'échelle de 1536 (ticket-631).
  */
 export default function Interrupteur({ allume }: InterrupteurProps) {
-  return (
-    <svg
-      width="5.5"
-      height="8.25"
-      viewBox="0 0 6 9"
-      shapeRendering="crispEdges"
-      aria-hidden="true"
-      data-sprite="interrupteur"
-      data-allume={allume}
-    >
-      <rect
-        x="0"
-        y="0"
-        width="6"
-        height="9"
-        className="fill-(--sprite-interrupteur)"
-      />
-      <rect
-        x="2"
-        y={allume ? 2 : 4}
-        width="2"
-        height="3"
-        className="fill-(--sprite-interrupteur-touche)"
-      />
-    </svg>
-  );
+  return <SpriteSvg sprite={dessin(allume)} largeur={5.5} hauteur={8.25} data-sprite="interrupteur" data-allume={allume} />;
 }

@@ -1,11 +1,13 @@
 import Agrandi from "../../design/bureau/Agrandi";
+import { ECHELLE_DU_MOBILIER } from "../../lib/bureau/echelleDesSprites";
 import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Corbeille from "../../design/bureau/Corbeille";
 import Etagere from "../../design/bureau/Etagere";
 import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
-import MachineACafe from "../../design/bureau/MachineACafe";
+import MachineACafe, { HAUTEUR_DU_MEUBLE_BAS } from "../../design/bureau/MachineACafe";
 import Plante from "../../design/bureau/Plante";
 import Porte from "../../design/bureau/Porte";
+import Tuile from "../../design/bureau/Tuile";
 import Vapeur from "../../design/bureau/Vapeur";
 import type { StreamState } from "../../hooks/streamState";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
@@ -26,12 +28,14 @@ import TableauDesCriteres from "./TableauDesCriteres";
  * Les abscisses du mur, dans le repère de 800 px, de gauche à droite : le tableau
  * blanc, deux fenêtres, le ficus, le meuble de l'imprimante et sa pile de dossiers,
  * la machine, la baie, le cactus, la troisième fenêtre, la boîte aux lettres,
- * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
+ * l'interrupteur et la porte. Les plafonniers pendent au sixième, à la moitié et aux
+ * cinq sixièmes du mur, comme dans l'atelier (ticket-727).
  * L'abscisse du tableau vient de `activites.ts` : l'agent du plan s'y tient (ticket-623).
  */
 // Fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le tableau et le ficus (ticket-627).
 const FENETRES_X = [134, 274, 616] as const;
-const PLAFONNIERS_X = [250, 432, 590] as const;
+// Les plafonniers au sixième, à la moitié et aux cinq sixièmes du mur, centrés (ticket-727).
+const PLAFONNIERS_X = [800 / 6, 400, (800 * 5) / 6] as const;
 const FICUS_X = 348;
 const IMPRIMANTE_X = 392;
 const BAIE_X = 528;
@@ -40,7 +44,8 @@ const CACTUS_X = 572;
 const INTERRUPTEUR_X = 727;
 // Au-dessus de la machine, où le mur est libre ; le cadre, à droite de la dernière fenêtre (ticket-635).
 const HORLOGE_X = 488;
-const CADRE_X = 684;
+// Le cadre, centré entre la dernière fenêtre et la porte (ticket-727).
+const CADRE_X = (616 + 738) / 2;
 // Au-dessus de la baie, à hauteur des fenêtres : sous une fenêtre, elle se lisait comme
 // un rebord ; entre le ficus et l'horloge, elle chevauchait l'imprimante et ses dossiers.
 const ETAGERE_X = BAIE_X;
@@ -96,14 +101,19 @@ export default function FondDeLaPiece({
 }: FondDeLaPieceProps) {
   const moment = dayMoment(maintenant);
   // Le dessus du meuble, une fois agrandi : la pile s'y pose, à droite de l'imprimante.
-  const dessusDuMeuble = HAUTEUR_DU_MEUBLE * useEchelleDesSprites();
+  const dessusDuMeuble = HAUTEUR_DU_MEUBLE * ECHELLE_DU_MOBILIER * useEchelleDesSprites();
   const ciels = cielDesFenetres(projet, FENETRES_X.length, maintenant);
   return (
     <div
-      className="relative h-36 border-b-4 border-(--sprite-plinthe) bg-(--sprite-mur)"
+      className="relative h-[154.5px]"
       data-fond="piece"
       data-mur="piece"
     >
+      {/* L'enduit et la plinthe (ticket-727) : les meubles se posent devant elle, sur le sol. */}
+      <Tuile motif="mur" moment={moment} />
+      <span className="absolute inset-x-0 bottom-0 h-[10.5px]" data-plinthe="piece">
+        <Tuile motif="plinthe" moment={moment} />
+      </span>
       <MurLumineux
         moment={moment}
         ciels={ciels}
@@ -114,16 +124,16 @@ export default function FondDeLaPiece({
         abscisses={ABSCISSES_DU_MUR}
       />
       <Pose x={ETAGERE_X} bas="top-9">
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Etagere />
         </Agrandi>
       </Pose>
       <Pose x={CORBEILLE_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Corbeille boules={boulesDeLaCorbeille(etat)} />
         </Agrandi>
       </Pose>
-      <Pose x={TABLEAU_X} bas="top-5">
+      <Pose x={TABLEAU_X} bas="top-6">
         <TableauDesCriteres
           projet={projet}
           etat={etat}
@@ -131,18 +141,18 @@ export default function FondDeLaPiece({
         />
       </Pose>
       <Pose x={BIBLIOTHEQUE_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Bibliotheque />
         </Agrandi>
       </Pose>
       <Pose x={FICUS_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Plante espece="ficus" />
         </Agrandi>
       </Pose>
       <Pose x={IMPRIMANTE_X}>
         <span className="relative block">
-          <Agrandi>
+          <Agrandi relatif={ECHELLE_DU_MOBILIER}>
             <Imprimante />
           </Agrandi>
           <span className="absolute right-1" style={{ bottom: dessusDuMeuble }}>
@@ -156,20 +166,25 @@ export default function FondDeLaPiece({
         </span>
       </Pose>
       <Pose x={MACHINE_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <MachineACafe />
         </Agrandi>
       </Pose>
       {machineEnService && (
-        <Pose x={MACHINE_X} bas="bottom-18">
-          <Vapeur />
+        <Pose x={MACHINE_X}>
+          {/* Au-dessus de la tasse : la machine (38,4 px) sur son meuble bas, à la même échelle. */}
+          <Agrandi relatif={ECHELLE_DU_MOBILIER}>
+            <span className="block pl-[9.6px]" style={{ marginBottom: HAUTEUR_DU_MEUBLE_BAS + 32 }}>
+              <Vapeur />
+            </span>
+          </Agrandi>
         </Pose>
       )}
       <Pose x={BAIE_X}>
         <BaieDeServeurs services={services} />
       </Pose>
       <Pose x={CACTUS_X}>
-        <Agrandi>
+        <Agrandi relatif={ECHELLE_DU_MOBILIER}>
           <Plante espece="cactus" />
         </Agrandi>
       </Pose>

@@ -2,8 +2,10 @@ import Confettis from "../../design/bureau/Confettis";
 import IconeDuProjet from "../ProjetsView/IconeDuProjet";
 import { useApercuDuProjet } from "../../hooks/useApercuDesProjets";
 import type { MotifDeVisite } from "../../lib/bureau/ronde";
+import Agrandi from "../../design/bureau/Agrandi";
 import Gyrophare from "../../design/bureau/Gyrophare";
 import NightVeil from "../../design/bureau/NightVeil";
+import Tuile from "../../design/bureau/Tuile";
 import Pastille from "../../design/bureau/Pastille";
 import type { StreamState } from "../../hooks/streamState";
 import { useActivites } from "../../hooks/useActivites";
@@ -50,6 +52,7 @@ import SolEtire from "./SolEtire";
 import { useLumiere } from "../../hooks/useLumiere";
 import { useProjects } from "../../hooks/useProjects";
 import { useServices } from "../../hooks/useServices";
+import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import { ticketEnCours } from "../../lib/bureau/ticketEnCours";
 import { servicesDeLaBaie } from "../../lib/bureau/servicesDeLaBaie";
 import BoutonServices from "../Sidebar/BoutonServices";
@@ -80,6 +83,9 @@ interface PieceProps {
   /** Pourquoi il est venu, pour son infobulle (ticket-723). */
   motifDuDirecteur?: MotifDeVisite;
 }
+
+/** Le bas du diffuseur du plafonnier, en px avant agrandissement : le gyrophare s'y suspend. */
+const HAUT_DU_GYROPHARE = 17;
 
 const CONTOURS: Record<ContourDeLaPiece, string> = {
   neutre: "border-zinc-800",
@@ -162,6 +168,7 @@ export default function Piece({
   // Fanfare, alarme, glouglou, frappes : ce que la pièce vient de montrer, dit à voix haute (ticket-603).
   useSonsDeLaPiece(signauxSonores(etat, fete, gyrophare, agents), sonActif);
   const moment = dayMoment(maintenant);
+  const echelle = useEchelleDesSprites();
   const [lumiere, basculerLumiere] = useLumiere(projet, moment);
   // Une seule lecture des services : la baie au mur les montre, le bouton de l'en-tête les lance.
   const services = useServices(projet, signalServices);
@@ -175,6 +182,7 @@ export default function Piece({
     <section
       aria-label={projet}
       data-contour={contour}
+      data-moment={moment}
       className={`overflow-hidden rounded-lg border bg-zinc-900 ${CONTOURS[contour]}`}
     >
       <div className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-[5px]">
@@ -224,6 +232,7 @@ export default function Piece({
         </div>
       </div>
       <div data-sol="lames" className="sol-lames relative">
+        <Tuile motif="sol" moment={moment} />
         {/* Le repère de 800 px de la maquette, étiré sur la largeur de la pièce ; les sprites gardent leur taille. */}
         <SolEtire>
           <FondDeLaPiece
@@ -261,8 +270,11 @@ export default function Piece({
           <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} redacteurs={redacteurs} directeur={directeur} motifDuDirecteur={motifDuDirecteur} />
           {fete && <Confettis />}
           {gyrophare && (
-            <span className="absolute left-1/2 top-1 z-20 -translate-x-1/2">
-              <Gyrophare />
+            // Suspendu sous le plafonnier du milieu, son support : le socle sous le diffuseur.
+            <span className="absolute left-1/2 z-20 -translate-x-1/2" style={{ top: HAUT_DU_GYROPHARE * echelle }}>
+              <Agrandi>
+                <Gyrophare />
+              </Agrandi>
             </span>
           )}
         </SolEtire>

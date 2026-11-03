@@ -55,7 +55,7 @@ export default function PosteDeTravail({
   return (
     <div
       data-absent={absent}
-      className={`flex flex-col items-center gap-1 pb-2 ${poste.etat === "libre" ? "opacity-50" : ""}`}
+      className="flex flex-col items-center gap-1 pb-2"
     >
       {/* La bulle suit l'agent : absent, c'est la salle où il est qui la porte. */}
       <div className="flex h-5 max-w-full items-end">

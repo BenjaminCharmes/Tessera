@@ -27,18 +27,19 @@ function etatApres(...evenements: OrchestratorEvent[]): StreamState {
 
 const CODEUR_FINI = [ev("agent_started", "codeur"), ev("agent_done", "codeur")];
 
-/** Les écrans des cinq postes, dans l'ordre du pipeline. */
+/** Les cinq postes, dans l'ordre du pipeline : chacun dit ce que montre son écran (`data-ecran`). */
 function ecrans(etat: StreamState, maintenant = T0 + 1_000): Element[] {
   const { container } = render(<Piece projet="ide-core" etat={etat} maintenant={maintenant} />);
-  return [...container.querySelectorAll('[data-sprite="poste"] [data-sprite="ecran"]')];
+  return [...container.querySelectorAll('[data-sprite="poste"]')];
 }
 
 function noms(liste: Element[]): (string | null)[] {
   return liste.map((e) => e.getAttribute("data-ecran"));
 }
 
+/** L'écran bouge : sa scène défile image par image, ou il luit. Les mains qui tapent n'en sont pas. */
 function anime(ecran: Element | undefined): boolean {
-  return ecran?.querySelector('[class*="anim-"]') != null;
+  return ecran?.querySelector(".anim-trame, .anim-lueur") != null;
 }
 
 describe("Piece screens", () => {
@@ -79,7 +80,8 @@ describe("Piece screens", () => {
   it("keeps the tick sprite on a favourable screen", () => {
     const [codeur] = ecrans(etatApres(...CODEUR_FINI));
 
-    expect(codeur?.querySelector('[data-sprite="coche"]')).not.toBeNull();
+    // La coche est la scène de l'écran, posée dans le poste (ticket-727).
+    expect(codeur?.querySelector('svg[data-ecran="ok"]')).not.toBeNull();
   });
 });
 

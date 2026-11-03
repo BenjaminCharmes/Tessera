@@ -47,8 +47,14 @@ function ticket(corps: string): Ticket {
 
 const CORPS = "## Critères d'acceptation\n- [ ] Un\n- [ ] Deux\n- [ ] Trois\n";
 
+/** Les cases que le tableau dessine, dans l'ordre : il les annonce sur son sprite (ticket-727). */
+function dessinees(conteneur: HTMLElement): string[] {
+  const liste = conteneur.querySelector('[data-sprite="tableau-blanc"]')?.getAttribute("data-cases") ?? "";
+  return liste ? liste.split(",") : [];
+}
+
 function cases(conteneur: HTMLElement, etat: string): number {
-  return conteneur.querySelectorAll(`[data-case="${etat}"]`).length;
+  return dessinees(conteneur).filter((c) => c === etat).length;
 }
 
 beforeEach(() => {
@@ -81,7 +87,7 @@ describe("TableauDesCriteres", () => {
     const { container } = render(<TableauDesCriteres projet="ide-core" etat={INITIAL} />);
 
     expect(container.querySelector('[data-sprite="tableau-blanc"]')).not.toBeNull();
-    expect(container.querySelectorAll("[data-case]")).toHaveLength(0);
+    expect(dessinees(container)).toHaveLength(0);
     expect(screen.getByRole("img", { name: "Tableau blanc : aucun critère connu" })).toBeInTheDocument();
     expect(api.tickets.list).not.toHaveBeenCalled();
   });
@@ -138,7 +144,7 @@ describe("TableauDesCriteres", () => {
     );
     await act(async () => {});
 
-    expect(container.querySelectorAll("[data-case]")).toHaveLength(0);
+    expect(dessinees(container)).toHaveLength(0);
   });
 
   it("draws at most twelve lines but counts every criterion", () => {

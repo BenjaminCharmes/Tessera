@@ -1,5 +1,7 @@
-import { TENUES, physique } from "../../lib/bureau/physique";
-import Personnage from "./Personnage";
+import { useMemo } from "react";
+import { physique } from "../../lib/bureau/physique";
+import { cadreDore } from "../../lib/bureau/sprites/tableau";
+import SpriteSvg from "./SpriteSvg";
 
 interface GoldFrameProps {
   /** Le projet dont le codeur pose : son physique est celui de son poste (ticket-595). */
@@ -7,27 +9,11 @@ interface GoldFrameProps {
 }
 
 /**
- * Le cadre doré de l'employé de la semaine, grille 16 × 17 (32 × 34 px) : le buste
- * du codeur du projet sur un fond sourd. Il ne se dessine que si un projet a des
- * tickets approuvés au premier tour (ADR-058) ; le libellé est porté par l'objet
- * qui l'enveloppe.
+ * Le cadre doré de l'employé de la semaine, grille 32 × 34 (ticket-727) : baguette
+ * perlée, fond de velours, buste du codeur du projet, plaque gravée. Il ne se dessine
+ * que si un projet a des tickets approuvés au premier tour (ADR-058).
  */
 export default function GoldFrame({ projet }: GoldFrameProps) {
-  return (
-    <svg
-      width="32"
-      height="34"
-      viewBox="0 0 16 17"
-      shapeRendering="crispEdges"
-      aria-hidden="true"
-      data-sprite="cadre-employe"
-    >
-      <rect x="0" y="0" width="16" height="17" className="fill-(--sprite-cadre-dore)" />
-      <rect x="1" y="1" width="14" height="15" className="fill-(--sprite-cadre-fond)" />
-      {/* Le buste de la grille 16 × 18 du poste, descendu de trois unités dans le cadre. */}
-      <g transform="translate(0 3)">
-        <Personnage tenue={TENUES.codeur} physique={physique(projet, "codeur")} />
-      </g>
-    </svg>
-  );
+  const dessin = useMemo(() => cadreDore(physique(projet, "codeur")), [projet]);
+  return <SpriteSvg sprite={dessin} largeur={32} hauteur={34} data-sprite="cadre-employe" />;
 }

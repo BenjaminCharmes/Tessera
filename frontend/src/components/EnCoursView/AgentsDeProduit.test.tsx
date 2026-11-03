@@ -63,7 +63,8 @@ describe("agents of a product", () => {
     expect(within(salle).getByLabelText(/Triage des signaux, au travail/)).toBeInTheDocument();
     expect(within(salle).getByText("lot 3 sur 5")).toBeInTheDocument();
     expect(within(salle).getByLabelText(/Synthèse, au repos/)).toBeInTheDocument();
-    expect(salle.querySelectorAll("[data-sprite='console']")).toHaveLength(2);
+    // Chaque agent a sa console : l'écran fait partie de son sprite (ticket-727).
+    expect(salle.querySelectorAll("[data-sprite='agent-de-produit'][data-ecran]")).toHaveLength(2);
   });
 
   it("tells an active agent from a resting one, by pose and by motion", async () => {
@@ -73,13 +74,16 @@ describe("agents of a product", () => {
     const [actif, repos] = agentsDessines() as [Element, Element];
     expect(actif).toHaveAttribute("data-etat", "actif");
     expect(repos).toHaveAttribute("data-etat", "repos");
-    expect(actif.querySelector("[data-bras='pupitre'].anim-tape")).not.toBeNull();
-    expect(repos.querySelector("[data-bras='repos']")).not.toBeNull();
+    expect(actif).toHaveAttribute("data-bras", "pupitre");
+    expect(actif.querySelector(".anim-tape")).not.toBeNull();
+    expect(repos).toHaveAttribute("data-bras", "repos");
     expect(repos.querySelector("[class*='anim-']")).toBeNull();
     expect(screen.getByLabelText(/, A, au travail/)).toBeInTheDocument();
     expect(screen.getByLabelText(/, B, au repos/)).toBeInTheDocument();
-    expect(actif.querySelector("[data-sprite='console'] .anim-defile")).not.toBeNull();
-    expect(repos.querySelector("[data-sprite='console']")).toHaveAttribute("data-allume", "false");
+    // L'écran allumé fait défiler son texte image par image ; au repos, trois points immobiles.
+    expect(actif).toHaveAttribute("data-ecran", "allume");
+    expect(actif.querySelector(".anim-trame")).not.toBeNull();
+    expect(repos).toHaveAttribute("data-ecran", "attente");
   });
 
   it("draws no agent for an empty answer", async () => {

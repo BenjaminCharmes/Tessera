@@ -39,11 +39,13 @@ function aLHeure(heure: number): number {
 }
 
 function aiguille(racine: HTMLElement, laquelle: "heure" | "minute"): string | null {
-  return racine.querySelector(`[data-sprite="horloge"] [data-aiguille="${laquelle}"]`)?.getAttribute("data-angle") ?? null;
+  // Les aiguilles se dessinent au pixel près ; l'horloge dit l'angle qu'elle a dessiné (ticket-727).
+  return racine.querySelector('[data-sprite="horloge"]')?.getAttribute(`data-angle-${laquelle}`) ?? null;
 }
 
 function boules(racine: HTMLElement): number {
-  return racine.querySelectorAll('[data-sprite="corbeille"] [data-detail="boule-de-papier"]').length;
+  // La corbeille dessine autant de boules qu'elle en annonce (`corbeille()`, testé à part).
+  return Number(racine.querySelector('[data-sprite="corbeille"]')?.getAttribute("data-boules") ?? 0);
 }
 
 function imageDuCadreDessine(racine: HTMLElement): string | null {

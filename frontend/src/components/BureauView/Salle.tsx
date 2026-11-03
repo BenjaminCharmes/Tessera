@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
+import { ECHELLE_DU_MOBILIER } from "../../lib/bureau/echelleDesSprites";
 import NightVeil from "../../design/bureau/NightVeil";
 import Plante from "../../design/bureau/Plante";
+import Tuile from "../../design/bureau/Tuile";
 import type { EspeceDePlante } from "../../design/bureau/Plante";
 import { IconInfo } from "../../design/icons";
 import { useLumiere } from "../../hooks/useLumiere";
@@ -19,6 +21,10 @@ interface SalleProps {
   mobilier: ReactNode;
   /** Les autres meubles, posés au milieu du sol : jamais un état, toujours là (ADR-058). */
   decor?: ReactNode;
+  /** Le mobilier porte un personnage (le bureau et sa figure assise) : il garde l'échelle des personnages. */
+  personnageAuMobilier?: boolean;
+  /** Un meuble à gauche du mobilier, qui se retrouve alors au milieu de la salle (ticket-727). */
+  aGauche?: ReactNode;
   /** L'espèce de la plante du coin : chaque salle a la sienne. */
   plante?: EspeceDePlante;
   /** L'horloge unique de la vue : le ciel des fenêtres s'y lit (ticket-602). */
@@ -46,6 +52,8 @@ export default function Salle({
   vide,
   mobilier,
   decor,
+  aGauche,
+  personnageAuMobilier = false,
   plante = "pot",
   maintenant,
   avecSoleil = false,
@@ -63,29 +71,35 @@ export default function Salle({
     <aside
       aria-label={titre}
       data-occupee={occupee}
+      data-moment={moment}
       data-contour={ambre ? "amber" : "neutre"}
-      className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-(--sprite-mur) ${contour}`}
+      className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border ${contour}`}
     >
-      <div className="flex items-start justify-between gap-2 px-3 pt-[5px]">
+      <Tuile motif="mur" moment={moment} />
+      {/* L'en-tête de la salle, comme celui d'une pièce de projet : le plafond reste au plafonnier (ticket-727). */}
+      <div
+        data-entete="salle"
+        className="relative flex items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-900 px-3 py-[5px]"
+      >
         <h3
           title={entete}
-          className="flex items-center gap-1 text-micro uppercase tracking-wide text-zinc-400"
+          className="flex shrink-0 items-center gap-1 whitespace-nowrap text-micro uppercase tracking-wide text-zinc-400"
         >
           {titre}
           <IconInfo size={12} data-marque="info" />
         </h3>
         {/* Ce que dit la salle vide, en face de son nom : le sol reste au mobilier. */}
         {occupee ? (
-          <ul className="flex min-w-0 flex-col items-end gap-0.5 text-micro">
+          <ul className="flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden text-right text-micro">
             {textes}
           </ul>
         ) : (
-          <p className="truncate text-micro text-zinc-500">{vide}</p>
+          <p className="min-w-0 flex-1 truncate text-right text-micro text-zinc-500">{vide}</p>
         )}
       </div>
       <div
         data-mur="salle"
-        className="flex flex-nowrap items-start justify-center gap-1.5 overflow-hidden border-b-4 border-(--sprite-plinthe) px-1.5 pt-3 pb-4 min-[1700px]:gap-3 min-[1700px]:px-3"
+        className="relative flex flex-nowrap items-start justify-center gap-1.5 overflow-hidden px-1.5 pt-3 pb-4 min-[1700px]:gap-3 min-[1700px]:px-3"
       >
         <MurLumineux
           moment={moment}
@@ -98,28 +112,37 @@ export default function Salle({
           accroche={accroche}
         />
       </div>
+      <div className="relative h-[10.5px] shrink-0" data-plinthe="salle">
+        <Tuile motif="plinthe" moment={moment} />
+      </div>
       {/* Le fond du sol ne sert à rien dans une salle : le mobilier s'y centre au lieu de laisser un vide sous le mur (ticket-627). */}
       <div
         data-sol="lames"
-        className="sol-lames flex flex-1 flex-col justify-center px-3"
+        className="sol-lames relative flex flex-1 flex-col justify-center px-1"
       >
+        <Tuile motif="sol" moment={moment} />
         {/* Regroupés au centre : répartis d'un bord à l'autre, ils laissaient de grands vides
             sur un écran large ou dézoomé (ticket-657). */}
-        <div className="flex min-h-28 items-end justify-center gap-10 px-1 py-2">
+        <div className="relative flex min-h-28 items-end justify-evenly gap-2 px-1 py-2">
+          {aGauche && (
+            <Agrandi relatif={ECHELLE_DU_MOBILIER}>
+              <div className="flex shrink-0 items-end">{aGauche}</div>
+            </Agrandi>
+          )}
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">
-              <Agrandi>{mobilier}</Agrandi>
+              <Agrandi relatif={personnageAuMobilier ? 1 : ECHELLE_DU_MOBILIER}>{mobilier}</Agrandi>
             </div>
             {children.length > 0 && (
               <ul className="flex min-w-0 items-end gap-3">{children}</ul>
             )}
           </div>
           {decor && (
-            <Agrandi>
-              <div className="flex shrink-0 items-end gap-3">{decor}</div>
+            <Agrandi relatif={ECHELLE_DU_MOBILIER}>
+              <div className="flex shrink-0 items-end gap-1">{decor}</div>
             </Agrandi>
           )}
-          <Agrandi>
+          <Agrandi relatif={ECHELLE_DU_MOBILIER}>
             <Plante espece={plante} />
           </Agrandi>
         </div>

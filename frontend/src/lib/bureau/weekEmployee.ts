@@ -1,4 +1,5 @@
 import type { PipelineRun } from "../../types/api";
+import { nomDeLAgent } from "./noms";
 
 /** Les runs récents d'un projet, tels que `GET /projects/{id}/runs` les rend. */
 export interface ProjectRuns {
@@ -50,7 +51,10 @@ export function weekEmployee(all: readonly ProjectRuns[], now: number): WeekEmpl
   return best;
 }
 
-/** Le texte de l'infobulle du cadre : « <projet> · codeur, N tickets du 1er coup ». */
+/**
+ * Le texte de l'infobulle du cadre : « <prénom>, codeur · <projet>, N tickets du 1er
+ * coup ». Le prénom d'abord : c'est le codeur du projet qui pose dans le cadre (ticket-727).
+ */
 export function employeeLabel({ project, count }: WeekEmployee): string {
-  return `${project} · codeur, ${count} ticket${count > 1 ? "s" : ""} du 1er coup`;
+  return `${nomDeLAgent(project, "codeur")}, codeur · ${project}, ${count} ticket${count > 1 ? "s" : ""} du 1er coup`;
 }
