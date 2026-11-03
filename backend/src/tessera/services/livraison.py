@@ -33,7 +33,9 @@ from tessera.services.livraison_arrets import (
     arret_niveau_commit,
 )
 from tessera.services.livraison_merge import arret_de_merge, tenter_le_merge, tete_a_change
-from tessera.services.livraison_rebase import noter_ce_que_le_rebase_a_fait
+from tessera.services.livraison_rebase import (
+    noter_ce_que_le_rebase_a_fait, retester_apres_rebase, tete_avant_rebase,
+)
 from tessera.services.livraison_resultat import Livraison as Livraison
 from tessera.services.renumeroter import etape_de_numerotation
 from tessera.services.politique_run import PolitiqueRun
@@ -69,6 +71,8 @@ class _Git(Protocol):
     async def commit_bookkeeping(self) -> None: ...
     async def commits_hors_rangement(self, depuis: str) -> list[str]: ...
     async def sha_distant(self, branch: str) -> str | None: ...
+    async def head_sha(self) -> str: ...
+    async def remettre_sur(self, sha: str) -> None: ...
 
 
 class _Workflow(Protocol):
@@ -172,12 +176,18 @@ class LivraisonService:
         # Avant le rebase : après lui, la base est toujours ancêtre de HEAD.
         retest = self._retest
         avancee = retest is not None and await retest.base_a_avance(self._base_branch)
+        sha_avant = await tete_avant_rebase(self._git) if avancee else None  # ticket-740
         arret_rebase = await self._rebaser(etapes, durees_ms, resolus)
         if arret_rebase is not None:
             return arret_rebase
-        arret_retest = await self._retester(avancee, etapes, durees_ms)
+        arret_retest = await retester_apres_rebase(
+            self._git, retest if avancee else None, self._base_branch,
+            sha_avant, resolus, etapes, durees_ms,
+        )
         if arret_retest is not None:
-            return arret_retest
+            return Livraison(
+                etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=arret_retest
+            )
 
         pr_number = await self._ouvrir_la_pr(
             branch, ticket_id, ticket_title, ticket_body, ticket_type, etapes, durees_ms
@@ -285,24 +295,6 @@ class LivraisonService:
                 self._base_branch, conflits, resolus, self._resolveur is not None,
                 getattr(self._git, "raison_resolveur", None),
             ),
-        )
-
-    async def _retester(
-        self, avancee: bool, etapes: list[str], durees_ms: list[float]
-    ) -> Livraison | None:
-        """Replay the tests when the rebase brought commits; the stop on red."""
-        # Un rouge ne pousse rien : le travail passait sur l'ancienne base
-        # (ticket-568). Ni reviewer ni validateur, le diff n'a pas changé.
-        retest = self._retest
-        jugement = await retest.juger(self._base_branch) if retest and avancee else None
-        if jugement is None:
-            return None
-        etapes.append(jugement.etape)
-        durees_ms.append(jugement.duree_ms)
-        if jugement.arret is None:
-            return None
-        return Livraison(
-            etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=jugement.arret
         )
 
     async def _ouvrir_la_pr(

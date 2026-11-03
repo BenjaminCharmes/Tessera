@@ -47,6 +47,18 @@ class _FauxGit:
         self.ancetre = ancetre
         self.comparaisons: list[tuple[str, str]] = []
         self.conflits: tuple[str, ...] = ()
+        self.tete = "b2" * 20
+        self.remises: list[str] = []
+        self.remise_echoue: Exception | None = None
+
+    async def head_sha(self) -> str:
+        return self.tete
+
+    async def remettre_sur(self, sha: str) -> None:
+        self.appels.append("remise")
+        if self.remise_echoue is not None:
+            raise self.remise_echoue
+        self.remises.append(sha)
 
     async def est_ancetre(self, ancetre: str, descendant: str) -> bool | None:
         self.comparaisons.append((ancetre, descendant))

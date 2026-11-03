@@ -1,14 +1,14 @@
 ---
-id: ticket-740
-title: "A red retest after a rebase puts the branch back on its pre-rebase head"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-740
+pr_number: 856
+priority: high
+status: done
+title: A red retest after a rebase puts the branch back on its pre-rebase head
+type: fix
 ---
 
 # ticket-740 — Un retest rouge après rebase remet la branche sur sa tête d'avant
