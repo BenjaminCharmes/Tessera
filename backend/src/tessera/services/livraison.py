@@ -209,7 +209,7 @@ class LivraisonService:
             else lire_niveau(self._project_path)
         )
         if niveau is NiveauAutonomie.commit:
-            return Livraison(arret=arret_niveau_commit(branch))
+            return Livraison(arret=arret_niveau_commit(branch), arret_voulu=True)
         return None
 
     async def _preparer_la_base(

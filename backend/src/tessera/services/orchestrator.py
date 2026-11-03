@@ -316,7 +316,7 @@ class Orchestrator:
             self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
         if livraison.arret:
             self._log(f"[{ticket_id}] livraison: arrêt — {livraison.arret[:100]}")
-        if livraison.branche_modifiee:
+        if livraison.bloque_le_ticket:
             resultat = await self._bloquer_branche_modifiee(
                 resultat, livraison, project_id, on_event
             )
@@ -353,9 +353,9 @@ class Orchestrator:
         project_id: str,
         on_event: EventCallback,
     ) -> PipelineResult:
-        """Block the ticket when the branch moved since the approval (ticket-492).
+        """Block the ticket when delivery stopped without a PR (ticket-492, 741).
 
-        Rien n'a été poussé. Comme pour une CI rouge (ticket-392), la fiche du
+        Aucune PR n'existe. Comme pour une CI rouge (ticket-392), la fiche du
         ticket n'est pas touchée : le tableau lit l'événement, le journal garde
         la trace. Le run se relit par un nouveau run, ou à la main.
         """

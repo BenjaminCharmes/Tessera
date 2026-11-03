@@ -1,14 +1,15 @@
 ---
-id: ticket-741
-title: "A phase-one delivery stop marks the ticket blocked"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-740"]
-estimated_days: 1
 created: 2026-11-03
+depends_on:
+- ticket-740
+estimated_days: 1
+id: ticket-741
+pr_number: 857
+priority: high
+status: done
+title: A phase-one delivery stop marks the ticket blocked
+type: fix
 ---
 
 # ticket-741 — Un arrêt de livraison en phase 1 met le ticket en `blocked`
