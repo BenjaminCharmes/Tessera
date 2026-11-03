@@ -1,12 +1,13 @@
 ---
-id: ticket-701
-title: "The GitHub service guard leaves the tickets router"
-type: refactor
-status: todo
-priority: low
 agent: codeur
-depends_on: []
 created: 2026-10-29
+depends_on: []
+id: ticket-701
+pr_number: 837
+priority: low
+status: done
+title: The GitHub service guard leaves the tickets router
+type: refactor
 ---
 
 # ticket-701 — Le garde `_require_github_service` hors de `routers/tickets.py`

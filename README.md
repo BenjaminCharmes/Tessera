@@ -121,7 +121,7 @@ Voir la [configuration](docs/configuration.md#ollama) pour régler ces délais.
 | [Historique](docs/historique.md) | ce qui a été livré, étape par étape |
 
 Les décisions d'architecture en vigueur sont dans
-[`projects/ide-core/memory/decisions.md`](projects/ide-core/memory/decisions.md) :
+[`projects/ide-core/memory/contraintes.md`](projects/ide-core/memory/contraintes.md) :
 ce sont des contraintes, pas des archives.
 
 ## Self-hosting
