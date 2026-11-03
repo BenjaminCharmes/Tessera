@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-744
-pr_number: null
+pr_number: 859
 priority: low
 status: done
 title: Stopping a service whose process is already gone is not a failure
