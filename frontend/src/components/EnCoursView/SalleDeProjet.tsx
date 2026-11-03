@@ -123,7 +123,9 @@ export default function SalleDeProjet({ groupe, lueA, agents, run, enArret, onAr
           <ArretDuProjet groupe={groupe} enArret={enArret} onArreterProjet={onArreterProjet} court />
         </span>
       </header>
-      <div data-mur="serveurs" className="relative isolate px-6 pt-8">
+      <div data-mur="serveurs" className="relative isolate z-10 px-6 pt-8">
+        {/* La plinthe court sur toute la largeur de la salle, derrière le mobilier (ticket-727). */}
+        <span aria-hidden="true" data-plinthe="serveurs" className="pointer-events-none absolute inset-x-0 bottom-0 -z-[5] h-[9px] bg-(--sprite-salle-plinthe-b)" />
         <Tuile motif="salle-mur" moment="jour" className="-z-10" />
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
@@ -143,7 +145,7 @@ export default function SalleDeProjet({ groupe, lueA, agents, run, enArret, onAr
             ))}
           </div>
         )}
-        <div data-sol-mobilier className="mt-4 flex flex-nowrap items-end justify-between gap-4 border-b-[9px] border-(--sprite-salle-plinthe-b)">
+        <div data-sol-mobilier className="mt-4 flex flex-nowrap items-end justify-between gap-4 relative -mb-1">
           <span className="flex shrink-0 items-end gap-4">
             <Agrandi>
               <Climatiseur />

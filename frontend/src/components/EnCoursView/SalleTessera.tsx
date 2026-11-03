@@ -93,7 +93,9 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         </span>
         <span className="rounded-full bg-violet-950 px-2.5 py-0.5 text-micro text-zinc-200 ring-1 ring-violet-700">fait tourner l'IDE</span>
       </header>
-      <div className="relative isolate px-6 pt-8">
+      <div className="relative isolate z-10 px-6 pt-8">
+        {/* La plinthe court sur toute la largeur de la salle, derrière le mobilier (ticket-727). */}
+        <span aria-hidden="true" data-plinthe="serveurs" className="pointer-events-none absolute inset-x-0 bottom-0 -z-[5] h-[9px] bg-(--sprite-salle-plinthe-b)" />
         <Tuile motif="salle-mur" moment="jour" className="-z-10" />
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
@@ -104,7 +106,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
           deplie={deplie}
           onBasculer={(ecran) => setDeplie((avant) => (avant === ecran ? null : ecran))}
         />
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b-[9px] border-(--sprite-salle-plinthe-b)">
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-4 relative -mb-1">
           <span className="flex items-end gap-4">
             {salle.processus.map((p) => (
               <BaieAvecFiche
