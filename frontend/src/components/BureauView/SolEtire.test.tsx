@@ -27,8 +27,8 @@ describe("SolEtire", () => {
   });
 
   it("stops the walk for one frame when the floor changes width, so agents jump instead of sliding", async () => {
-    // Le 30/10, au retour sur le Bureau en mode « Ajuster », le zoom se mesurait
-    // après le montage et les agents glissaient vers leur poste (ticket-720).
+    // Le 30/10, au retour sur le Bureau, le sol se mesurait après le montage et
+    // les agents glissaient vers leur poste (ticket-720).
     let redimensionner: (largeur: number) => void = () => undefined;
     class FauxObservateur {
       constructor(rappel: ResizeObserverCallback) {

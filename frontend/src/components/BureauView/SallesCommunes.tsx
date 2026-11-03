@@ -24,7 +24,7 @@ interface SallesCommunesProps {
  */
 export default function SallesCommunes({ projets, maintenant, employe = null, directeurEnVisite = false }: SallesCommunesProps) {
   return (
-    <div className="grid grid-cols-4 gap-3.5" data-testid="salles-communes" data-ligne-du-zoom>
+    <div className="grid grid-cols-4 gap-3.5" data-testid="salles-communes">
       <BureauDuDirecteur
         agents={agentsAuDirecteur(projets, maintenant)}
         maintenant={maintenant}

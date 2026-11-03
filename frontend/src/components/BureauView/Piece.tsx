@@ -181,7 +181,6 @@ export default function Piece({
   return (
     <section
       aria-label={projet}
-      data-ligne-du-zoom
       data-contour={contour}
       data-moment={moment}
       className={`overflow-hidden rounded-lg border bg-zinc-900 ${CONTOURS[contour]}`}

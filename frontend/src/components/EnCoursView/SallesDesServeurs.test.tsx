@@ -357,17 +357,3 @@ describe("wall screens and journal (ticket-711)", () => {
     expect(document.querySelectorAll("[data-sprite='baie-haute']")).toHaveLength(1);
   });
 });
-
-describe("server rooms zoom (ticket-727)", () => {
-  it("zooms the server rooms like the Bureau, and fits them all with Ajuster", async () => {
-    window.localStorage.clear();
-    const { container } = rendre([app({})]);
-
-    const groupe = await screen.findByRole("group", { name: "Zoom des salles" });
-    fireEvent.click(within(groupe).getByRole("button", { name: "Dézoomer les salles" }));
-    expect(container.querySelector("[data-zoom]")).toHaveAttribute("data-zoom", "0.9");
-
-    fireEvent.click(within(groupe).getByRole("button", { name: "Ajuster" }));
-    expect(within(groupe).getByRole("button", { name: "Ajuster" })).toHaveAttribute("aria-pressed", "true");
-  });
-});
