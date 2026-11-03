@@ -7211,3 +7211,4 @@ Le diff ajoute :
 - 2026-11-03 12:13:56 UTC — [ticket-736] testeur: 1 failed, 4516 passed, 64 warnings in 615.75s (0:10:15)
 - 2026-11-03 12:13:56 UTC — [ticket-736] tests rouges au tour 3
 - 2026-11-03 12:13:56 UTC — [ticket-736] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-03 12:14:01 UTC — [ide-core] file interrompue : ticket-736 non approuvé
