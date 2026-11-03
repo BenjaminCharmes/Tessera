@@ -17,6 +17,7 @@ const FAMILLES = {
   "haut-testeur": { tessera: "#e4e4e7", chaud: "#e9e2d0" }, "haut-securite": { tessera: "#1e3a8a", chaud: "#2a4a9a" },
   "haut-validateur": { tessera: "#b45309" }, "haut-architect": { tessera: "#be185d" },
   "haut-resolveur": { tessera: "#c2410c" }, "haut-doc-technique": { tessera: "#0e7490" }, "haut-doc-fonctionnelle": { tessera: "#4d7c0f" },
+  "haut-produit": { tessera: "#475569" },
   pantalon: { tessera: "#3f3f46", chaud: "#3d3a55", neon: "#26284a" },
   chaussure: { tessera: "#27272a", chaud: "#2b2230", neon: "#14152b" },
   col: { tessera: "#e4e4e7" }, cravate: { tessera: "#1f2937" }, encre: { tessera: "#18181b" },
