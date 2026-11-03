@@ -17,11 +17,21 @@ GIT_LECTURES = frozenset({
     "describe", "cat-file", "merge-base", "shortlog", "for-each-ref", "ls-tree",
 })
 
-#: Options globales de git qui prennent la valeur dans le jeton suivant.
+#: Options globales de git qui prennent la valeur dans le jeton suivant (ou
+#: après `=` pour les formes longues).
 _OPTIONS_GIT_AVEC_VALEUR = frozenset({"-C", "--git-dir", "--work-tree"})
 
-#: Options globales qui font exécuter ou injecter autre chose que la lecture.
-_OPTIONS_GIT_DANGEREUSES = frozenset({"--exec-path", "--config-env"})
+#: Options globales de git sans valeur, admises. Toute autre option globale est
+#: refusée : `git --namespace status push` exécute `push` alors que le garde
+#: lit `status`, parce qu'une option inconnue ne dit pas si elle prend une valeur.
+_OPTIONS_GIT_SANS_VALEUR = frozenset({
+    "--no-pager", "-P", "--literal-pathspecs", "--no-literal-pathspecs",
+    "--glob-pathspecs", "--noglob-pathspecs", "--icase-pathspecs",
+    "--no-optional-locks", "--no-replace-objects", "--bare",
+})
+
+#: Nom long de l'option de `git grep` qui lance un pager choisi par l'appelant.
+_GREP_PAGER = "--open-files-in-pager"
 
 #: Options globales de gh qui prennent la valeur dans le jeton suivant.
 _OPTIONS_GH_AVEC_VALEUR = frozenset({"-R", "--repo", "--hostname"})
@@ -42,11 +52,22 @@ def _avance_option_git(arguments: list[str], i: int) -> int | None:
         return 2 if _reglage_cosmetique(valeur) else None
     if jeton.startswith("-c"):
         return 1 if _reglage_cosmetique(jeton[2:]) else None
-    if jeton.split("=", 1)[0] in _OPTIONS_GIT_DANGEREUSES:
-        return None
+    if not jeton.startswith("-"):
+        return 0
     if jeton in _OPTIONS_GIT_AVEC_VALEUR:
         return 2
-    return 1 if jeton.startswith("-") else 0
+    if jeton.startswith(("--git-dir=", "--work-tree=")) or jeton in _OPTIONS_GIT_SANS_VALEUR:
+        return 1
+    return None
+
+
+def _grep_lance_un_pager(jeton: str) -> bool:
+    """`--open…` (abréviation d'au moins 3 caractères, `=valeur` comprise) ou
+    un jeton d'options courtes groupées qui contient `O` (`-O`, `-iOx`)."""
+    nom = jeton.split("=", 1)[0]
+    if nom.startswith("--"):
+        return len(nom) >= 3 and _GREP_PAGER.startswith(nom)
+    return jeton.startswith("-") and "O" in jeton[1:]
 
 
 def _option_qui_ecrit(sous: str, reste: list[str]) -> bool:
@@ -58,7 +79,7 @@ def _option_qui_ecrit(sous: str, reste: list[str]) -> bool:
         nom = jeton.split("=", 1)[0]
         if nom.startswith("--output") or (len(nom) >= 3 and "--output".startswith(nom)):
             return True
-        if sous == "grep" and (jeton.startswith("-O") or nom == "--open-files-in-pager"):
+        if sous == "grep" and _grep_lance_un_pager(jeton):
             return True
     return False
 
