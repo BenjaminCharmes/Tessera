@@ -2,7 +2,7 @@
 id: ticket-727
 title: "The Bureau sprites v2 from the sprite workshop"
 type: feat
-status: in-progress
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -57,7 +57,7 @@ tourne en parallèle.
       moteur et l'assouplissement cosmétique d'ADR-058 ; sa règle, acceptée par
       Benjamin le 03/11, remplace celle d'ADR-058 dans `## Interface et design` de
       `contraintes.md`
-- [ ] Benjamin a validé le rendu sur 5175 (captures 1920 et 1536)
+- [x] Benjamin a validé le rendu sur 5175 (03/11, « on valide tout »)
 
 ## Dépendances
 
@@ -73,3 +73,12 @@ tourne.
 - Poids du DOM : un `<path>` par jeton et par sprite ; mesuré sur le pilote avant
   d'étendre.
 - Calcul au rendu : mémoïsation obligatoire, la vue se relit toutes les 10 s.
+
+## Ce que ça ne fait pas
+
+- Pas de zoom : essayé puis retiré à la demande de Benjamin (03/11). Le Bureau et
+  « En cours » prennent toute la largeur, le reste se voit en défilant.
+- `design/bureau/sprites-theme.css` se régénère avec `tools/theme.js` de l'atelier
+  (`Desktop/atelier-sprites`), hors du dépôt.
+- Les contrôles de chevauchement et de débordement des salles se font en navigateur
+  (Playwright), pas en vitest : jsdom ne calcule aucune mise en page.
