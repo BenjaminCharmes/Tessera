@@ -160,7 +160,9 @@ async def _contexte_du_reviewer(
 
 async def test_le_message_du_reviewer_commence_par_lavertissement(tmp_path: Path) -> None:
     contexte, journal = await _contexte_du_reviewer(
-        tmp_path, _CODE + _CONFTEST + _VITEST, "conftest.py et vitest.config.ts\n"
+        tmp_path,
+        _CODE + _CONFTEST + _VITEST,
+        "backend/tests/conftest.py et frontend/vitest.config.ts\n",
     )
 
     assert contexte.startswith(f"## {TITRE_CONFIG_TESTS}")
@@ -197,7 +199,7 @@ def test_unnamed_test_config_change_forces_changes_requested() -> None:
 
 
 def test_named_test_config_change_keeps_the_review_verdict() -> None:
-    for citation in ("`vitest.config.ts`", "frontend/vitest.config.ts"):
+    for citation in ("`frontend/vitest.config.ts`", "frontend/vitest.config.ts"):
         assert fichiers_non_nommes(["frontend/vitest.config.ts"], f"Monte {citation}") == []
 
     resultat = imposer_config_nommee(True, "", "APPROVED", [])
@@ -249,7 +251,7 @@ async def test_the_pipeline_keeps_the_verdict_when_the_ticket_names_the_file(
     tmp_path: Path,
 ) -> None:
     contextes, journal = await _tours_du_reviewer(
-        tmp_path, _CODE + _VITEST, "Monte le délai dans vitest.config.ts\n"
+        tmp_path, _CODE + _VITEST, "Monte le délai dans frontend/vitest.config.ts\n"
     )
 
     assert len(contextes) == 1

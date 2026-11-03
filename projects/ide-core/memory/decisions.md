@@ -662,3 +662,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : un modèle local tronque ou refuse un prompt plus long que sa fenêtre, et le constat n'arrive qu'après un appel long et inutile ; la taille se connaît avant l'appel.
 **Alternative rejetée** : tronquer le prompt — le validateur jugerait des critères qu'il n'a pas lus ; router selon la taille du ticket (écarté par ADR-046) — la taille du prompt est le vrai critère, et seulement pour un local.
 **Détail** : ticket-714 ; relevé par l'audit du 30/10.
+
+---
+
+## ADR-072 — La porte de configuration des tests connaît tous les fichiers et veut un chemin complet
+
+**Date** : 2026-11-03
+**Décision** : complète ADR-027. La liste des fichiers de configuration des tests s'étend à `pytest.ini`, `tox.ini`, `setup.cfg`, `mypy.ini`, `.mypy.ini`, `.coveragerc`, `vite.config.*` et `vitest.workspace.*`. Un fichier touché n'est couvert par le ticket que si son chemin complet depuis la racine du dépôt y figure ; le nom de base ne suffit plus.
+**Raison** : `pytest.ini` et `mypy.ini` priment sur `pyproject.toml`, et la configuration vitest de ce dépôt vit dans le bloc `test:` de `vite.config.ts` : la porte était inerte sur eux. Un ticket qui citait `frontend/src/x/vitest.config.ts` couvrait aussi `frontend/vitest.config.ts`.
+**Alternative rejetée** : lire le bloc `test:` de `vite.config.ts` seul — plus fin, mais un changement ailleurs dans ce fichier (alias, plugins) peut aussi désarmer les tests ; le ticket n'a qu'à le nommer.
+**Détail** : ticket-748 ; relevé par l'audit du 30/10.
