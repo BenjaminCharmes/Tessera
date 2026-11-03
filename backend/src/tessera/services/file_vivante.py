@@ -13,6 +13,9 @@ from typing import Protocol
 
 from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.ticket_service import TicketService, ticket_depuis_contenu
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 _TERMINES = (TicketStatus.done, TicketStatus.cancelled)
 
@@ -157,10 +160,18 @@ def lecteur_sur_la_base(workspace: _LecteurSurLaBase, project_id: str) -> Lecteu
 async def termine_sur_la_base(workspace: _LecteurSurLaBase, ticket_id: str) -> bool:
     """True when ``origin/<base>`` holds the ticket as `done` or `cancelled` (ticket-736).
 
-    Lecture impossible (fetch en échec, ticket absent, contenu illisible) :
-    False, pour que l'appelant garde le verdict de l'arbre sans bloquer la file.
+    Lecture impossible (fetch en échec, ticket absent, contenu illisible,
+    exception du workspace) : False, pour que l'appelant garde le verdict de
+    l'arbre sans bloquer la file — une garde qui saute un ticket ne doit
+    jamais arrêter celle-ci.
     """
-    lu = await workspace.lire_ticket_sur_la_base(ticket_id)
+    try:
+        lu = await workspace.lire_ticket_sur_la_base(ticket_id)
+    except Exception:  # noqa: BLE001 — repli voulu sur le verdict de l'arbre
+        _logger.warning(
+            "ticket_sur_la_base_illisible", extra={"ticket_id": ticket_id}, exc_info=True
+        )
+        return False
     if lu is None:
         return False
     try:

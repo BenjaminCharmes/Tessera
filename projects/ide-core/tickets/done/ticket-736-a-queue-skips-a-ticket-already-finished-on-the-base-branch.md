@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-736
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: A queue skips a ticket already finished on the base branch
 type: fix
 ---
@@ -46,14 +46,14 @@ l'arbre existe déjà : `lire_ticket_sur_la_base`
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, avec des doubles, qu'un ticket `todo` dans l'arbre mais `done`
+- [x] Un test vérifie, avec des doubles, qu'un ticket `todo` dans l'arbre mais `done`
       sur la base est jugé terminé par `_est_termine`
-- [ ] Un test vérifie qu'un ticket `cancelled` sur la base est aussi jugé terminé
-- [ ] Un test vérifie que, quand `lire_ticket_sur_la_base` renvoie None, `_est_termine`
+- [x] Un test vérifie qu'un ticket `cancelled` sur la base est aussi jugé terminé
+- [x] Un test vérifie que, quand `lire_ticket_sur_la_base` renvoie None, `_est_termine`
       garde le verdict de l'arbre (`todo` → non terminé)
-- [ ] Un test vérifie qu'un ticket terminé dans l'arbre est jugé terminé sans appeler
+- [x] Un test vérifie qu'un ticket terminé dans l'arbre est jugé terminé sans appeler
       `lire_ticket_sur_la_base`
-- [ ] Un ticket sauté parce qu'il est terminé sur la base laisse dans le journal une
+- [x] Un ticket sauté parce qu'il est terminé sur la base laisse dans le journal une
       ligne qui contient « déjà terminé sur la base »
 
 ## Dépendances
@@ -68,3 +68,10 @@ Aucune.
 
 - Un `fetch` par ticket de la file : acceptable (une fois par tour, déjà le cas de
   l'ajout), mais ne pas le refaire pour chaque appel dans un même tour.
+## Fin à la main (03/11)
+
+Le pipeline s'est arrêté au bout de trois tours : chaque tour, la suite complète
+trouvait un autre double de workspace sans `lire_ticket_sur_la_base`. Terminé à la
+main : `termine_sur_la_base` (`file_vivante.py`) replie aussi sur le verdict de
+l'arbre quand la lecture lève, comme le demandait déjà « lecture impossible ».
+Test ajouté : `test_a_base_read_that_raises_keeps_the_verdict_of_the_tree`.

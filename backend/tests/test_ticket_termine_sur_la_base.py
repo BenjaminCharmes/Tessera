@@ -57,6 +57,21 @@ async def test_an_unreadable_base_keeps_the_verdict_of_the_tree() -> None:
     assert await orch._est_termine("ticket-001") is False
 
 
+class _EspaceQuiLeve:
+    """Double whose read of the base raises, as a broken git or network would."""
+
+    async def lire_ticket_sur_la_base(
+        self, ticket_id: str, *, fetch: bool = True
+    ) -> tuple[str, str] | None:
+        raise RuntimeError("git indisponible")
+
+
+async def test_a_base_read_that_raises_keeps_the_verdict_of_the_tree() -> None:
+    orch = _OrchestrateurObsolete(TicketStatus.todo, _EspaceQuiLeve())  # type: ignore[arg-type]
+
+    assert await orch._est_termine("ticket-001") is False
+
+
 async def test_a_ticket_still_todo_on_the_base_is_not_finished() -> None:
     orch = _OrchestrateurObsolete(TicketStatus.todo, _EspaceGit("todo"))
 
