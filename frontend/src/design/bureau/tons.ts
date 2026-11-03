@@ -1,7 +1,6 @@
 import type { EtatPastille } from "../ui/StatusPill";
 import type { SanteAgent } from "../../lib/santeAgent";
 import type { EtatDuService } from "../etatDuService";
-import type { Cheveux, Peau } from "../../lib/bureau/physique";
 
 /** Ce qu'un poste montre : la santé du run s'il est occupé, sinon « fait » ou « libre ». */
 export type TonDePoste = SanteAgent | "fait" | "libre";
@@ -54,26 +53,3 @@ export const PASTILLE_DE_L_ETAT: Record<EtatDuService, string> = {
   arrete: "bg-zinc-500",
   "jamais-lance": "bg-zinc-600",
 };
-
-/*
- * Les tons d'un personnage (ticket-595). Classes écrites en toutes lettres :
- * Tailwind ne voit pas une classe construite, et ne génèrerait pas la règle.
- */
-export const FILL_PEAU: Record<Peau, string> = {
-  1: "fill-(--sprite-peau-1)",
-  2: "fill-(--sprite-peau-2)",
-  3: "fill-(--sprite-peau-3)",
-  4: "fill-(--sprite-peau-4)",
-  5: "fill-(--sprite-peau-5)",
-};
-
-export const FILL_CHEVEUX: Record<Cheveux, string> = {
-  1: "fill-(--sprite-cheveux-1)",
-  2: "fill-(--sprite-cheveux-2)",
-  3: "fill-(--sprite-cheveux-3)",
-  4: "fill-(--sprite-cheveux-4)",
-  5: "fill-(--sprite-cheveux-5)",
-  6: "fill-(--sprite-cheveux-6)",
-  7: "fill-(--sprite-cheveux-7)",
-};
-

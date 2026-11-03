@@ -123,7 +123,7 @@ describe("sprites sources", () => {
   it("declares the sprite tokens in a static theme so var() finds them", () => {
     const [theme] = blocs(CSS, /@theme\s+static/);
     expect(theme).toBeDefined();
-    expect(theme).toContain("--sprite-peau");
+    expect(theme).toContain("--sprite-halo-coeur");
   });
 });
 

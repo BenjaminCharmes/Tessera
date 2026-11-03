@@ -19,49 +19,15 @@
   --color-data-3: #db2777;
 }
 
-/* Tons des sprites du Bureau dessinés hors du moteur — ticket-562, ADR-058.
-   `static` : ces jetons ne sont lus que par `var()` depuis le TSX, et Tailwind
-   n'émet pas sans cela une variable qu'aucune classe ne nomme. Le moteur des
-   sprites lit ses couleurs dans `sprites-theme.css`, généré par l'atelier
-   (ticket-727) ; restent ici la tête des agents de produit (cinq peaux, sept
-   cheveux, ticket-595), le halo, le voile et le pupitre de console. */
+/* Ce que le moteur des sprites ne dessine pas — ticket-562, ADR-058, ticket-727 :
+   le halo des plafonniers et les voiles de la nuit, translucides, hors de la
+   grille. `static` : ces jetons ne sont lus que par `var()`, et Tailwind n'émet
+   pas sans cela une variable qu'aucune classe ne nomme. Les couleurs des sprites
+   sont dans `sprites-theme.css`, généré par l'atelier. */
 @theme static {
-  --sprite-peau: #e8b98f;
-  --sprite-cheveux: #3f2a1d;
-  --sprite-peau-1: #f1c7a3;
-  --sprite-peau-2: #e8b98f;
-  --sprite-peau-3: #c68b59;
-  --sprite-peau-4: #8d5a3b;
-  --sprite-peau-5: #5c3a24;
-  --sprite-cheveux-1: #3f2a1d;
-  --sprite-cheveux-2: #111827;
-  --sprite-cheveux-3: #a16207;
-  --sprite-cheveux-4: #7c2d12;
-  --sprite-cheveux-5: #d4d4d8;
-  --sprite-cheveux-6: #1c1917;
-  /* Blond clair : réservé à l'équipe nommée de Tessera, jamais tiré au sort. */
-  --sprite-cheveux-7: #d6a84a;
-  /* Le halo des plafonniers et le voile de la nuit (ticket-602) : translucides,
-     hors de la grille des sprites, que le moteur ne dessine pas (ticket-727). */
   --sprite-halo-coeur: rgb(253 224 71);
   --sprite-voile: rgb(9 9 20 / 0.28);
-  /* Le voile d'une nuit sans lumière (ticket-609). */
   --sprite-voile-sombre: rgb(9 9 20 / 0.55);
-  /* Le métal de la baie GPU et du pupitre des agents de produit (ticket-672),
-     que le moteur des sprites ne dessine pas encore (ticket-727). */
-  --sprite-dalle-trou: #16191c;
-  --sprite-metal: #52525b;
-  --sprite-metal-ombre: #3f3f46;
-  --sprite-metal-clair: #71717a;
-  /* Les agents d'un produit (ticket-673) : une tenue unie et le pupitre de
-     console. Aucune teinte d'état : l'état se lit à la pose de l'agent. */
-  --sprite-haut-produit: #475569;
-  --sprite-haut-produit-ombre: #334155;
-  --sprite-console-ecran: #0f172a;
-  /* L'écran d'un agent au travail : allumé, ses lignes défilent (ticket-710). */
-  --sprite-console-ecran-allume: #172554;
-  --sprite-console-texte: #93c5fd;
-  --sprite-console-touche: #a1a1aa;
 }
 
 /* Sol en lames des pièces et des salles : le parquet est une tuile (`Tuile`,

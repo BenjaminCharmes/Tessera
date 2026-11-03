@@ -41,42 +41,18 @@ describe("server room furniture", () => {
 });
 
 describe("product agent sprites", () => {
-  const SPRITES_AGENT = ["Console", "AgentAuPupitre"];
-
-  it("reads every tone from a --sprite-* token defined in index.css, with no state hue", () => {
-    for (const nom of SPRITES_AGENT) {
+  it("draws the agent, its console and the GPU rack from the sprite engine, with no Tailwind hue", () => {
+    for (const nom of ["AgentAuPupitre", "PosteVide", "BaieGpu"]) {
       const contenu = source(nom);
-      expect(contenu, nom).toContain("--sprite-");
-      expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:red|amber|green|blue|violet)-\d/);
-      expect(contenu, nom).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(/);
-      for (const m of contenu.matchAll(/--sprite-([a-z0-9-]+)/g)) {
-        expect(CSS, `${nom}: --sprite-${m[1]}`).toMatch(new RegExp(`--sprite-${m[1]}:`));
-      }
+      expect(contenu, nom).toContain("lib/bureau/sprites/produit");
+      expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:zinc|red|amber|green|blue|violet)-\d/);
+      expect(contenu, nom).not.toMatch(/anim-|animation|transition/);
     }
   });
 
-  it("scrolls the console screen only when the agent works, and moves an agent only with the typing animation that reduced motion cuts", () => {
-    const pupitre = source("Console");
-    expect([...new Set(pupitre.match(/anim-[a-z]+/g))]).toEqual(["anim-defile"]);
-    expect(pupitre).toMatch(/allume && \(/);
-    expect(pupitre).not.toMatch(/animation|transition|data-voyant/);
-    const agent = source("AgentAuPupitre");
-    expect([...new Set(agent.match(/anim-[a-z]+/g))]).toEqual(["anim-tape"]);
-    expect(agent).not.toMatch(/animation|transition/);
+  it("cuts the typing and the screen frames under reduced motion", () => {
     const reduit = CSS.slice(CSS.indexOf("@media (prefers-reduced-motion: reduce)"));
     expect(reduit).toMatch(/[.]anim-tape\b[^}]*animation:\s*none/);
-    expect(reduit).toMatch(/[.]anim-defile\b[^}]*animation:\s*none/);
+    expect(reduit).toMatch(/[.]anim-trame\b[^}]*animation:\s*none/);
   });
 });
-
-describe("Ollama GPU rack (ticket-726)", () => {
-  it("draws its body from sprite tokens and blinks its lamp only while Ollama cools down", () => {
-    const gpu = source("BaieGpu");
-    for (const m of gpu.matchAll(/--sprite-([a-z0-9-]+)/g)) {
-      expect(CSS, `--sprite-${m[1]}`).toMatch(new RegExp(`--sprite-${m[1]}:`));
-    }
-    expect(gpu).toMatch(/refroidissement: "fill-amber-400 anim-gyro"/);
-    expect(gpu).toMatch(/disponible: "fill-blue-400"/);
-  });
-});
-
