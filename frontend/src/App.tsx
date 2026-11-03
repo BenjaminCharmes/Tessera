@@ -4,6 +4,7 @@ import CenterView from "./components/CenterView";
 import BottomPanel from "./components/BottomPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
+import DefsDuBureau from "./design/bureau/DefsDuBureau";
 import {
   GRILLE_COCKPIT,
   GRILLE_COCKPIT_SANS_COLONNE,
@@ -83,6 +84,8 @@ export default function App() {
       </div>
 
       <ToastContainer toasts={cockpit.toasts} onDismiss={cockpit.fermerToast} />
+      {/* Les symboles partagés des sprites du Bureau : vide hors du Bureau (ticket-727). */}
+      <DefsDuBureau />
     </div>
     </OuvrirTicketContext.Provider>
   );
