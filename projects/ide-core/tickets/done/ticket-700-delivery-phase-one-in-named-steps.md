@@ -4,6 +4,7 @@ created: 2026-10-29
 depends_on:
 - ticket-677
 id: ticket-700
+pr_number: 833
 priority: low
 status: done
 title: Delivery phase one in named steps
