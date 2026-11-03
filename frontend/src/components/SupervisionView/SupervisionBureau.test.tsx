@@ -175,6 +175,21 @@ describe("Supervision — vue par défaut et sélecteur", () => {
     expect(window.localStorage.getItem(memorise ?? "")).toBe(JSON.stringify("lignes"));
   });
 
+  it("grows the whole office as one block from its top-left corner, inside a box that scrolls both ways", async () => {
+    // À 125 %, les salles sortaient du cadre : la largeur de référence ne suit pas le zoom (ticket-727).
+    window.localStorage.clear();
+    const largeur = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(1224);
+    render(<SupervisionView supervision={supervision([])} projects={[]} />);
+    for (let i = 0; i < 4; i += 1) await userEvent.click(screen.getByRole("button", { name: "Zoomer le Bureau" }));
+
+    const contenu = document.querySelector<HTMLElement>("[data-zoom]");
+    expect(contenu).toHaveAttribute("data-zoom", "1.25");
+    expect(contenu?.style.width).toBe("1200px");
+    expect(contenu?.parentElement?.className).toMatch(/\boverflow-auto\b/);
+    expect(contenu?.parentElement?.className).not.toMatch(/\b(?:items|justify|place)-(?:center|end)\b/);
+    largeur.mockRestore();
+  });
+
   it("keeps the office without a run, and says nothing is running where the rooms would be", () => {
     // Le 28/10, sans run, un message remplaçait tout le Bureau : salles du haut,
     // « À toi » et employé de la semaine disparaissaient (ticket-636).
