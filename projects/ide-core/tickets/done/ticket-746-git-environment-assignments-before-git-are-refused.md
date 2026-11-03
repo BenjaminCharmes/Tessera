@@ -5,7 +5,7 @@ depends_on:
 - ticket-745
 estimated_days: 1
 id: ticket-746
-pr_number: null
+pr_number: 861
 priority: high
 status: done
 title: Git environment assignments before git or gh are refused
