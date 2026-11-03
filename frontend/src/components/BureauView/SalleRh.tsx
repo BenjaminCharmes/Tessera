@@ -33,12 +33,8 @@ export default function SalleRh({ agents, maintenant }: SalleRhProps) {
           <BureauEnBois tenue={TENUE_DES_RH} physique={PHYSIQUE_DES_RH} />
         </span>
       }
-      decor={
-        <>
-          <Classeur />
-          <Classeur />
-        </>
-      }
+      aGauche={<Classeur />}
+      decor={<Classeur />}
       plante="ficus"
       ambre={agents.length > 0}
       textes={agents.map(({ projet, poste, tente, utilise, modele }) => (

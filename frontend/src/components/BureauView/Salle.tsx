@@ -20,6 +20,8 @@ interface SalleProps {
   mobilier: ReactNode;
   /** Les autres meubles, posés au milieu du sol : jamais un état, toujours là (ADR-058). */
   decor?: ReactNode;
+  /** Un meuble à gauche du mobilier, qui se retrouve alors au milieu de la salle (ticket-727). */
+  aGauche?: ReactNode;
   /** L'espèce de la plante du coin : chaque salle a la sienne. */
   plante?: EspeceDePlante;
   /** L'horloge unique de la vue : le ciel des fenêtres s'y lit (ticket-602). */
@@ -47,6 +49,7 @@ export default function Salle({
   vide,
   mobilier,
   decor,
+  aGauche,
   plante = "pot",
   maintenant,
   avecSoleil = false,
@@ -69,7 +72,11 @@ export default function Salle({
       className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border ${contour}`}
     >
       <Tuile motif="mur" moment={moment} />
-      <div className="relative flex items-start justify-between gap-2 px-3 pt-[5px]">
+      {/* L'en-tête de la salle, comme celui d'une pièce de projet : le plafond reste au plafonnier (ticket-727). */}
+      <div
+        data-entete="salle"
+        className="relative flex items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-900 px-3 py-[5px]"
+      >
         <h3
           title={entete}
           className="flex items-center gap-1 text-micro uppercase tracking-wide text-zinc-400"
@@ -113,6 +120,11 @@ export default function Salle({
         {/* Regroupés au centre : répartis d'un bord à l'autre, ils laissaient de grands vides
             sur un écran large ou dézoomé (ticket-657). */}
         <div className="relative flex min-h-28 items-end justify-center gap-10 px-1 py-2">
+          {aGauche && (
+            <Agrandi>
+              <div className="flex shrink-0 items-end">{aGauche}</div>
+            </Agrandi>
+          )}
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">
               <Agrandi>{mobilier}</Agrandi>
