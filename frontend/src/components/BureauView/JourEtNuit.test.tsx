@@ -35,7 +35,7 @@ describe("Piece day and night", () => {
     expect(plafonniers(container)).toEqual(["false", "false", "false"]);
     expect(container.querySelector("[data-voile]")).toBeNull();
     // Le seul soleil du Bureau est au bureau du directeur : la pièce d'un projet n'en a pas.
-    expect(container.querySelector('[data-detail="soleil"]')).toBeNull();
+    expect(container.querySelector('[data-sprite="fenetre"][data-soleil="true"]')).toBeNull();
   });
 
   it("shows three night windows, a veil and three lit lamps at 22:00", () => {
@@ -45,7 +45,8 @@ describe("Piece day and night", () => {
     expect(plafonniers(container)).toEqual(["true", "true", "true"]);
     expect(container.querySelectorAll("[data-voile]")).toHaveLength(1);
     expect(container.querySelectorAll('[data-detail="halo"]')).toHaveLength(3);
-    expect(container.querySelector('[data-detail="etoiles"]')).not.toBeNull();
+    // La nuit, les fenêtres n'ont plus de nuages : leur ciel est celui de la nuit, étoilé.
+    expect(container.querySelectorAll('[data-sprite="fenetre"][data-nuages="0"]')).toHaveLength(3);
   });
 
   it("lets clicks through the veil", () => {
@@ -75,7 +76,7 @@ describe("SallesCommunes day and night", () => {
   it("draws a single sun, in the director's office", () => {
     const { container } = render(<SallesCommunes projets={[]} maintenant={at(14)} />);
 
-    const soleils = container.querySelectorAll('[data-detail="soleil"]');
+    const soleils = container.querySelectorAll('[data-sprite="fenetre"][data-soleil="true"]');
     expect(soleils).toHaveLength(1);
     expect(soleils[0]?.closest("aside")?.getAttribute("aria-label")).toBe("Bureau du directeur");
   });

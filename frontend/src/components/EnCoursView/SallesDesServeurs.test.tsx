@@ -176,9 +176,11 @@ describe("server rooms — one per project (ticket-710)", () => {
     const { container } = rendre([app({})]);
     const dessines = sprites(container);
 
-    for (const sprite of ["climatiseur", "chemin-de-cables", "extincteur", "porte-coupe-feu", "baie-haute", "bouche-vmc", "dalle-pleine", "dalle-perforee"]) {
+    for (const sprite of ["climatiseur", "chemin-de-cables", "extincteur", "porte-coupe-feu", "baie-haute", "bouche-vmc"]) {
       expect(dessines, sprite).toContain(sprite);
     }
+    // Le faux plancher est une tuile de dalles, pleines et perforées (ticket-727).
+    expect(container.querySelector('[data-sol="dalles"] [data-tuile="dalles"]')).not.toBeNull();
     for (const sprite of SPRITES_DU_BUREAU) {
       expect(dessines, sprite).not.toContain(sprite);
     }

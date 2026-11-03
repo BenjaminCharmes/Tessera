@@ -65,6 +65,7 @@ export default function AgentDebout({
       largeur={42}
       hauteur={70}
       data-sprite="agent-debout"
+      data-pose="debout"
       data-mains={mains}
       data-marche={marcheVraiment}
       data-cravate={tenue.cravate}

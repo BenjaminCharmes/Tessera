@@ -1,23 +1,10 @@
 import type { EtatPastille } from "../ui/StatusPill";
 import type { SanteAgent } from "../../lib/santeAgent";
-import type { EtatBoite } from "../../lib/bureau/boiteAuxLettres";
-import type { EtatCase } from "../../lib/bureau/criteres";
 import type { EtatDuService } from "../etatDuService";
-import type { RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { Cheveux, Peau } from "../../lib/bureau/physique";
 
 /** Ce qu'un poste montre : la santé du run s'il est occupé, sinon « fait » ou « libre ». */
 export type TonDePoste = SanteAgent | "fait" | "libre";
-
-/** Le pixel allumé de l'écran. Familles d'état seulement (ADR-026). */
-export const TON_ECRAN: Record<TonDePoste, string> = {
-  actif: "fill-blue-400",
-  attente: "fill-zinc-500",
-  question: "fill-amber-400",
-  blocage_suspecte: "fill-red-400",
-  fait: "fill-zinc-700",
-  libre: "fill-zinc-900",
-};
 
 /** Fond et texte de la bulle : les mêmes teintes que la pastille d'état. */
 export const TON_BULLE: Record<SanteAgent, string> = {
@@ -51,29 +38,6 @@ export const TON_PUCE: Record<TonDePoste, string> = {
   blocage_suspecte: "bg-red-400",
   fait: "bg-green-400",
   libre: "bg-zinc-700",
-};
-
-/** Le drapeau de la boîte aux lettres, par état de la PR. L'absence de PR ne lève rien. */
-export const TON_BOITE: Record<Exclude<EtatBoite, "aucune">, string> = {
-  ouverte: "fill-amber-400",
-  ci: "fill-blue-400",
-  mergee: "fill-green-400",
-  refusee: "fill-red-400",
-};
-
-/** Une ligne du tableau blanc : grise tant que rien n'est jugé, verte si le critère passe, rouge sinon. */
-export const TON_CASE: Record<EtatCase, string> = {
-  attente: "fill-(--sprite-tableau-case)",
-  passe: "fill-green-500",
-  echoue: "fill-red-500",
-};
-
-/** Le voyant d'un étage de la baie, par état du service. Mêmes familles que le panneau des services. */
-export const TON_VOYANT: Record<EtatDuService, string> = {
-  "en-cours": "fill-blue-400",
-  echoue: "fill-red-400",
-  arrete: "fill-zinc-500",
-  "jamais-lance": "fill-zinc-600",
 };
 
 /** Le même état en texte et en pastille, pour l'écran mural et la plaque de la salle (ticket-711). */
@@ -113,27 +77,3 @@ export const FILL_CHEVEUX: Record<Cheveux, string> = {
   7: "fill-(--sprite-cheveux-7)",
 };
 
-export const FILL_HAUT: Record<RoleAffiche, string> = {
-  codeur: "fill-(--sprite-haut-codeur)",
-  architect: "fill-(--sprite-haut-architect)",
-  testeur: "fill-(--sprite-haut-testeur)",
-  securite: "fill-(--sprite-haut-securite)",
-  reviewer: "fill-(--sprite-haut-reviewer)",
-  validateur: "fill-(--sprite-haut-validateur)",
-  resolveur: "fill-(--sprite-haut-resolveur)",
-  "doc-technique": "fill-(--sprite-haut-doc-technique)",
-  "doc-fonctionnelle": "fill-(--sprite-haut-doc-fonctionnelle)",
-};
-
-/** L'ombre du haut : les bras, la jupe, le col de la capuche. */
-export const FILL_OMBRE: Record<RoleAffiche, string> = {
-  codeur: "fill-(--sprite-haut-codeur-ombre)",
-  architect: "fill-(--sprite-haut-architect-ombre)",
-  testeur: "fill-(--sprite-haut-testeur-ombre)",
-  securite: "fill-(--sprite-haut-securite-ombre)",
-  reviewer: "fill-(--sprite-haut-reviewer-ombre)",
-  validateur: "fill-(--sprite-haut-validateur-ombre)",
-  resolveur: "fill-(--sprite-haut-resolveur-ombre)",
-  "doc-technique": "fill-(--sprite-haut-doc-technique-ombre)",
-  "doc-fonctionnelle": "fill-(--sprite-haut-doc-fonctionnelle-ombre)",
-};

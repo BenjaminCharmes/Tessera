@@ -34,7 +34,7 @@ describe("Piece celebration of a merged pull request", () => {
     expect(agents).toHaveLength(5);
     for (const agent of agents) {
       expect(agent.dataset.activite).toBe("fete");
-      expect(agent.querySelector('[data-bras="leves"]')).not.toBeNull();
+      expect(agent.querySelector('[data-mains="levees"]')).not.toBeNull();
     }
   });
 

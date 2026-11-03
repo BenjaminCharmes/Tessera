@@ -19,14 +19,12 @@
   --color-data-3: #db2777;
 }
 
-/* Tons des sprites du Bureau — ticket-562, ADR-058. `static` : ces jetons ne
-   sont lus que par `var()` depuis le TSX, et Tailwind n'émet pas sans cela une
-   variable qu'aucune classe ne nomme. Le sweat du codeur est le violet
-   d'identité, écrit en oklch (violet-500 et violet-700) : un fond de sprite,
-   jamais un texte. Un jeu par tenue de rôle (le haut et son ombre, qui colore
-   les bras), cinq peaux et six couleurs de cheveux : le physique d'un agent en
-   choisit un de chaque (ticket-595). `--sprite-peau` et `--sprite-cheveux`
-   restent les tons par défaut. */
+/* Tons des sprites du Bureau dessinés hors du moteur — ticket-562, ADR-058.
+   `static` : ces jetons ne sont lus que par `var()` depuis le TSX, et Tailwind
+   n'émet pas sans cela une variable qu'aucune classe ne nomme. Le moteur des
+   sprites lit ses couleurs dans `sprites-theme.css`, généré par l'atelier
+   (ticket-727) ; restent ici la tête des agents de produit (cinq peaux, sept
+   cheveux, ticket-595), le halo, le voile et le pupitre de console. */
 @theme static {
   --sprite-peau: #e8b98f;
   --sprite-cheveux: #3f2a1d;
@@ -43,117 +41,18 @@
   --sprite-cheveux-6: #1c1917;
   /* Blond clair : réservé à l'équipe nommée de Tessera, jamais tiré au sort. */
   --sprite-cheveux-7: #d6a84a;
-  --sprite-haut-codeur: oklch(0.606 0.25 292.717);
-  --sprite-haut-codeur-ombre: oklch(0.491 0.27 292.581);
-  --sprite-haut-testeur: #e4e4e7;
-  --sprite-haut-testeur-ombre: #a1a1aa;
-  --sprite-haut-securite: #1e3a8a;
-  --sprite-haut-securite-ombre: #172554;
-  --sprite-haut-reviewer: #0f766e;
-  --sprite-haut-reviewer-ombre: #115e59;
-  --sprite-haut-validateur: #b45309;
-  --sprite-haut-validateur-ombre: #92400e;
-  --sprite-haut-architect: #be185d;
-  --sprite-haut-architect-ombre: #9d174d;
-  --sprite-haut-resolveur: #c2410c;
-  --sprite-haut-resolveur-ombre: #9a3412;
-  --sprite-haut-doc-technique: #0e7490;
-  --sprite-haut-doc-technique-ombre: #155e75;
-  --sprite-haut-doc-fonctionnelle: #4d7c0f;
-  --sprite-haut-doc-fonctionnelle-ombre: #3f6212;
-  --sprite-col: #e4e4e7;
-  --sprite-cravate: #1f2937;
-  --sprite-dossier: #ca8a04;
-  --sprite-dossier-ombre: #a16207;
-  --sprite-feuille: #f4f4f5;
-  --sprite-feuille-annotation: #dc2626;
-  /* Le mobilier des salles (ticket-583) : du bois et du métal sourds, aucune
-     teinte d'état, pour qu'un meuble ne se lise jamais comme un voyant. */
-  --sprite-machine: #52525b;
-  --sprite-machine-ombre: #3f3f46;
-  --sprite-tasse: #e4e4e7;
-  --sprite-table: #8a6a4a;
-  --sprite-table-ombre: #6b5038;
-  --sprite-plante: #16a34a;
-  --sprite-plante-ombre: #15803d;
-  --sprite-pot: #92400e;
-  --sprite-porte: #6b5038;
-  --sprite-porte-ombre: #4a3626;
-  --sprite-vapeur: #d4d4d8;
-  /* La fête et l'alarme (ticket-598) : cinq papiers de confettis, et un gyrophare
-     rouge sur un socle sourd. Des fonds de sprite, jamais un texte. */
-  --sprite-confetti-1: #f43f5e;
-  --sprite-confetti-2: #facc15;
-  --sprite-confetti-3: #22d3ee;
-  --sprite-confetti-4: #a3e635;
-  --sprite-confetti-5: #e879f9;
-  --sprite-gyrophare: #dc2626;
-  --sprite-gyrophare-clair: #fca5a5;
-  --sprite-gyrophare-socle: #3f3f46;
-  /* Le tableau blanc des critères (ticket-600) : un panneau clair dans un cadre
-     sourd ; les lignes jugées prennent les familles d'état, la grise n'en a pas. */
-  --sprite-tableau: #e4e4e7;
-  --sprite-tableau-cadre: #52525b;
-  --sprite-tableau-case: #a1a1aa;
-  /* Les fenêtres, les plafonniers et le cadre du bureau du directeur
-     (ticket-602) : un ciel clair et un ciel nuit, un halo et un voile
-     translucides, un cadre doré. Des fonds de sprite, jamais un texte. */
-  --sprite-ciel-jour: #7dd3fc;
-  --sprite-soleil: #fde047;
-  --sprite-ciel-nuit: #1e1b4b;
-  --sprite-etoile: #e4e4e7;
-  --sprite-fenetre-cadre: #52525b;
-  --sprite-plafonnier: #fde68a;
+  /* Le halo des plafonniers et le voile de la nuit (ticket-602) : translucides,
+     hors de la grille des sprites, que le moteur ne dessine pas (ticket-727). */
   --sprite-halo-coeur: rgb(253 224 71);
   --sprite-voile: rgb(9 9 20 / 0.28);
-  --sprite-cadre-dore: #ca8a04;
-  /* Les nuages, le voile d'une nuit sans lumière
-     et l'interrupteur (ticket-609) : des fonds de sprite. */
-  --sprite-nuage: #f4f4f5;
+  /* Le voile d'une nuit sans lumière (ticket-609). */
   --sprite-voile-sombre: rgb(9 9 20 / 0.55);
-  --sprite-interrupteur: #d4d4d8;
-  --sprite-interrupteur-touche: #71717a;
-  /* Le mobilier des salles et les autres plantes (ticket-609). */
-  --sprite-cactus: #4d7c0f;
-  --sprite-pot-clair: #d6a77a;
-  --sprite-livre-1: #9f1239;
-  --sprite-livre-2: #1e40af;
-  --sprite-livre-3: #ca8a04;
-  --sprite-canape: #57534e;
-  --sprite-canape-ombre: #44403c;
-  --sprite-frigo: #e7e5e4;
-  --sprite-frigo-ombre: #a8a29e;
-  --sprite-classeur: #71717a;
-  --sprite-classeur-ombre: #52525b;
-  --sprite-cadre-fond: #27272a;
-  /* L'horloge, l'étagère, le cadre et la corbeille (ticket-635). */
-  --sprite-horloge-bord: #52525b;
-  --sprite-horloge-cadran: #e4e4e7;
-  --sprite-horloge-aiguille: #27272a;
-  --sprite-etagere: #6b5038;
-  --sprite-cadre-bois: #8a6a4a;
-  --sprite-toile-1: #7dd3fc;
-  --sprite-toile-2: #4d7c0f;
-  --sprite-toile-3: #fde047;
-  --sprite-toile-4: #be185d;
-  --sprite-corbeille: #52525b;
-  --sprite-corbeille-ombre: #3f3f46;
-  --sprite-papier: #f4f4f5;
-  --sprite-papier-ombre: #a1a1aa;
-  /* La salle des serveurs (ticket-672) : murs gris froid, dalles du faux
-     plancher, métal, extincteur et lecteur de badge. Du mobilier sans teinte
-     d'état : seul le voyant d'une baie en porte une. */
-  --sprite-salle-mur: #2b3035;
-  --sprite-salle-plinthe: #16191c;
-  --sprite-dalle: #2a2e33;
-  --sprite-dalle-joint: #22262a;
+  /* Le métal de la baie GPU et du pupitre des agents de produit (ticket-672),
+     que le moteur des sprites ne dessine pas encore (ticket-727). */
   --sprite-dalle-trou: #16191c;
   --sprite-metal: #52525b;
   --sprite-metal-ombre: #3f3f46;
   --sprite-metal-clair: #71717a;
-  --sprite-extincteur: #dc2626;
-  --sprite-extincteur-ombre: #991b1b;
-  --sprite-badge: #d4d4d8;
   /* Les agents d'un produit (ticket-673) : une tenue unie et le pupitre de
      console. Aucune teinte d'état : l'état se lit à la pose de l'agent. */
   --sprite-haut-produit: #475569;

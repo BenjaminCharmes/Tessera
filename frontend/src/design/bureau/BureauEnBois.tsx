@@ -19,5 +19,5 @@ interface BureauEnBoisProps {
  */
 export default function BureauEnBois({ tenue, physique, vide = false }: BureauEnBoisProps) {
   const dessin = useMemo(() => bureauEnBois(vide ? null : { tenue, physique }), [tenue, physique, vide]);
-  return <SpriteSvg sprite={dessin} largeur={56} hauteur={63} data-sprite="bureau-en-bois" data-vide={vide} />;
+  return <SpriteSvg sprite={dessin} largeur={56} hauteur={63} data-sprite="bureau-en-bois" data-pose={vide ? undefined : "assis"} />;
 }

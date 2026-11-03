@@ -59,8 +59,8 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
   // Les abscisses sont celles du repère de 800 px : étirées comme la grille des postes.
   const etirement = useEtirementDuSol();
   const marche = useMarcheActive();
-  // Il marche tant que sa translation dure : ni minuteur ni supposition, la transition le dit.
-  // Sous mouvement réduit, il n'y a pas de transition : il change de place sans marcher.
+  // Il marche tant que sa translation dure : ni minuteur ni supposition, le navigateur le dit.
+  // Sous mouvement réduit, rien ne glisse : il change de place sans marcher.
   const [enMarche, setEnMarche] = useState(false);
   const surTransition = (enCours: boolean) => (e: TransitionEvent<HTMLSpanElement>) => {
     if (e.target === e.currentTarget && e.propertyName === "transform") setEnMarche(enCours);

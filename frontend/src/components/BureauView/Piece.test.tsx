@@ -130,9 +130,10 @@ describe("Piece documentation and delivery", () => {
 });
 
 /** Le sprite `personnage` d'un poste, repéré par le nom accessible du bouton. */
+/** Les personnages dessinés dans un poste : le sprite du poste dit s'il y a quelqu'un d'assis (ticket-727). */
 function personnagesDuPoste(nom: string): Element[] {
   const bouton = screen.getByRole("button", { name: nom });
-  return [...bouton.querySelectorAll('[data-sprite="personnage"]')];
+  return [...bouton.querySelectorAll("[data-pose]")];
 }
 
 describe("Piece furniture", () => {
@@ -181,11 +182,11 @@ describe("Piece characters", () => {
     const bouton = screen.getByRole("button", { name: nomme("Codeur, a fini", "codeur") });
     const agent = container.querySelector('[data-agent="codeur"]');
 
-    expect(agent?.querySelectorAll('[data-sprite="personnage"]')).toHaveLength(1);
+    expect(agent?.querySelectorAll("[data-pose]")).toHaveLength(1);
     expect(agent?.querySelector('[data-pose="debout"]')).not.toBeNull();
     expect(agent?.querySelector(".anim-tape")).toBeNull();
-    expect(bouton.querySelector('[data-sprite="personnage"]')).toBeNull();
-    expect(bouton.querySelector('[data-sprite="coche"]')).not.toBeNull();
+    expect(bouton.querySelector("[data-pose]")).toBeNull();
+    expect(bouton.querySelector('[data-ecran="ok"]')).not.toBeNull();
   });
 
   it("keeps the busy character seated and typing", () => {
@@ -200,8 +201,9 @@ describe("Piece characters", () => {
   it("draws no character in a room without run", () => {
     const { container } = render(<Piece projet="ide-core" etat={INITIAL} maintenant={T0} />);
 
-    expect(container.querySelectorAll('[data-sprite="personnage"]')).toHaveLength(0);
-    expect(container.querySelectorAll('[data-sprite="coche"]')).toHaveLength(0);
+    expect(container.querySelectorAll("[data-pose]")).toHaveLength(0);
+    expect(container.querySelectorAll('[data-ecran="ok"]')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-sprite="poste"]')).toHaveLength(5);
     expect(screen.getByRole("button", { name: nomme("Codeur, libre", "codeur") })).toBeInTheDocument();
   });
 
@@ -213,8 +215,9 @@ describe("Piece characters", () => {
 
     expect(debout).not.toBeNull();
     expect(bouton.contains(debout)).toBe(false);
-    expect(debout?.closest("svg")?.getAttribute("viewBox")).toBe("0 0 12 20");
-    expect(bouton.querySelector('[data-sprite="poste"]')?.getAttribute("viewBox")).toBe("0 0 20 18");
+    // Les grilles ×2 de l'atelier : 24 × 40 debout, 40 × 36 au poste (ticket-727).
+    expect(debout?.getAttribute("viewBox")).toBe("0 0 24 40");
+    expect(bouton.querySelector('[data-sprite="poste"]')?.getAttribute("viewBox")).toBe("0 0 40 36");
   });
 
   it("gives the same role a different look in two projects", () => {
@@ -273,7 +276,7 @@ describe("Piece characters", () => {
   it("draws one character per post while a run is on", () => {
     const { container } = render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} />);
 
-    expect(container.querySelectorAll('[data-sprite="personnage"]')).toHaveLength(5);
+    expect(container.querySelectorAll("[data-pose]")).toHaveLength(5);
     expect(container.querySelectorAll('[data-pose="debout"]')).toHaveLength(2);
   });
 });

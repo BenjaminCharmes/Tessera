@@ -86,7 +86,7 @@ describe("SallesCommunes", () => {
 
     const directeur = salle("Bureau du directeur");
     expect(
-      directeur.querySelectorAll('[data-sprite="personnage"]'),
+      directeur.querySelectorAll("[data-pose]"),
     ).toHaveLength(1);
     expect(directeur.querySelector("[data-agent]")).toBeNull();
     expect(within(directeur).queryByTestId("bulle")).toBeNull();
@@ -214,7 +214,7 @@ describe("Piece with an agent away", () => {
     expect(personnagesAssis()).toBe(4);
     const poste = screen.getByRole("button", { name: /, codeur, / }).parentElement;
     expect(poste).toHaveAttribute("data-absent", "true");
-    expect(poste?.querySelector('[data-sprite="personnage"]')).toBeNull();
+    expect(poste?.querySelector("[data-pose]")).toBeNull();
     expect(screen.queryByTestId("bulle")).toBeNull();
   });
 

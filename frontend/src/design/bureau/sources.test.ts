@@ -19,6 +19,13 @@ function sourcesDe(dossier: string): { nom: string; contenu: string }[] {
 }
 
 const SPRITES = sourcesDe(__dirname);
+const MOTEUR = sourcesDe(join(SRC, "lib", "bureau", "sprites"));
+/** Le mobilier des pièces et des salles : du moteur, fixe, sans état (ADR-058, ticket-727). */
+const MOBILIER = [
+  "MachineACafe.tsx", "TableDeReunion.tsx", "Porte.tsx", "Plante.tsx", "Horloge.tsx", "Etagere.tsx",
+  "Cadre.tsx", "Corbeille.tsx", "Bibliotheque.tsx", "Canape.tsx", "Frigo.tsx", "Classeur.tsx",
+  "Chaise.tsx", "Imprimante.tsx", "Dossier.tsx", "Interrupteur.tsx",
+];
 const VUE = sourcesDe(join(SRC, "components", "BureauView"));
 const CSS = readFileSync(join(SRC, "index.css"), "utf-8");
 
@@ -40,57 +47,52 @@ function blocs(css: string, entete: RegExp): string[] {
 }
 
 describe("sprites sources", () => {
-  it("has a source file per sprite", () => {
+  it("has a source file per sprite, and the engine that draws them", () => {
     const noms = SPRITES.map((s) => s.nom);
-    for (const sprite of ["Personnage", "Poste", "Ecran", "Bulle", "Pastille", "Plante", "Porte", "Vapeur"]) {
+    for (const sprite of ["AgentDebout", "Poste", "EcranScenes", "Bulle", "Pastille", "Plante", "Porte", "Vapeur", "SpriteSvg", "DefsDuBureau", "Tuile"]) {
       expect(noms).toContain(`${sprite}.tsx`);
     }
+    for (const module of ["grille", "jeton", "symboles", "ambiance", "mobilier", "mur", "tableau", "objets", "serveurs", "ecrans", "communs", "poste", "debout"]) {
+      expect(MOTEUR.map((s) => s.nom)).toContain(`${module}.ts`);
+    }
   });
 
-  it("keeps room furniture on --sprite-* tokens, still and without a status hue", () => {
-    for (const nom of ["MachineACafe.tsx", "TableDeReunion.tsx", "Porte.tsx"]) {
+  it("draws the room furniture from the engine, still and without a status hue", () => {
+    for (const nom of MOBILIER) {
       const contenu = SPRITES.find((s) => s.nom === nom)?.contenu ?? "";
-      expect(contenu, nom).toContain("--sprite-");
-      expect(contenu, nom).not.toMatch(/anim-|animation|green/);
-      expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:zinc|red|amber|blue|violet)-\d/);
-    }
-  });
-
-  it("draws the plant as fixed furniture from --sprite-* tokens, with no animation class", () => {
-    const plante = SPRITES.find((s) => s.nom === "Plante.tsx")?.contenu ?? "";
-
-    expect(plante).not.toMatch(/anim-/);
-    for (const jeton of ["plante", "plante-ombre", "pot"]) {
-      expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
-    }
-    expect(plante).toContain("--sprite-plante");
-    expect(plante).toContain("--sprite-pot");
-  });
-
-  it("draws the whiteboard from --sprite-* tokens, still, with state tones kept in tons.ts", () => {
-    const tableau = SPRITES.find((s) => s.nom === "TableauBlanc.tsx")?.contenu ?? "";
-    const tons = SPRITES.find((s) => s.nom === "tons.ts")?.contenu ?? "";
-
-    expect(tableau).toContain("--sprite-tableau");
-    expect(tableau).not.toMatch(/anim-|animation/);
-    for (const jeton of ["tableau", "tableau-cadre", "tableau-case"]) {
-      expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
-    }
-    expect(tons).toMatch(/passe:\s*"fill-green-\d{3}"/);
-    expect(tons).toMatch(/echoue:\s*"fill-red-\d{3}"/);
-  });
-
-  it("draws the clock, shelf, frame and bin from --sprite-* tokens defined in index.css, still", () => {
-    for (const nom of ["Horloge.tsx", "Etagere.tsx", "Cadre.tsx", "Corbeille.tsx"]) {
-      const contenu = SPRITES.find((s) => s.nom === nom)?.contenu ?? "";
-      expect(contenu, nom).toContain("--sprite-");
+      expect(contenu, nom).toContain("lib/bureau/sprites/");
+      expect(contenu, nom).toContain("SpriteSvg");
       expect(contenu, nom).not.toMatch(/anim-|animation|transition/);
       expect(contenu, nom).not.toMatch(/\b(?:fill|stroke|bg|text)-(?:zinc|red|amber|green|blue|violet)-\d/);
-      const jetons = [...contenu.matchAll(/--sprite-([a-z0-9-]+)/g)].map((m) => m[1] ?? "");
-      for (const jeton of jetons) {
-        expect(CSS, `${nom}: --sprite-${jeton}`).toMatch(new RegExp(`--sprite-${jeton}:`));
-      }
     }
+    // Les modules du mobilier ne posent ni état ni animation : ADR-058.
+    for (const nom of ["mobilier.ts", "communs.ts", "ambiance.ts"]) {
+      const contenu = MOTEUR.find((s) => s.nom === nom)?.contenu ?? "";
+      expect(contenu, nom).not.toMatch(/anim-|etat-|\bE\(/);
+    }
+  });
+
+  it("draws the whiteboard boxes in state tones only: grey, green when passed, red when failed", () => {
+    const tableau = MOTEUR.find((s) => s.nom === "tableau.ts")?.contenu ?? "";
+
+    expect(tableau).toMatch(/attente:\s*"attente"/);
+    expect(tableau).toMatch(/passe:\s*"fait"/);
+    expect(tableau).toMatch(/echoue:\s*"blocage"/);
+    expect(tableau).not.toMatch(/anim-/);
+  });
+
+  it("draws the sprites with crisp pixels and no transition", () => {
+    for (const nom of ["SpriteSvg.tsx", "DefsDuBureau.tsx", "Tuile.tsx"]) {
+      expect(SPRITES.find((s) => s.nom === nom)?.contenu, nom).toContain('shapeRendering="crispEdges"');
+    }
+    // Une transition CSS, pas un événement de transition (`onTransitionEnd`).
+    const tous = [...SPRITES, ...VUE, ...MOTEUR].filter((s) => /(?<![A-Za-z])transition(?![A-Za-z])/.test(s.contenu));
+    expect(tous.map((s) => s.nom)).toEqual([]);
+  });
+
+  it("writes no raw colour in the sprite engine either", () => {
+    const fautifs = MOTEUR.filter(({ contenu }) => /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(/.test(contenu)).map((s) => s.nom);
+    expect(fautifs).toEqual([]);
   });
 
   it("writes no raw colour in design/bureau", () => {
@@ -112,13 +114,10 @@ describe("sprites sources", () => {
     expect(familles.filter((f) => !FAMILLES_PERMISES.includes(f.famille))).toEqual([]);
   });
 
-  it("reads skin, hair and folder tones from --sprite-* tokens defined in index.css", () => {
-    for (const jeton of ["peau", "cheveux", "dossier"]) {
-      expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
-    }
-    const lus = SPRITES.map((s) => s.contenu).join("");
-    expect(lus).toContain("--sprite-peau");
-    expect(lus).toContain("--sprite-cheveux");
+  it("reads skin, hair and role tones through the generic slots of a shared drawing", () => {
+    const jeton = MOTEUR.find((s) => s.nom === "jeton.ts")?.contenu ?? "";
+    for (const famille of ["peau", "cheveux", "haut"]) expect(jeton).toContain(`"${famille}"`);
+    expect(jeton).toContain("--sp-");
   });
 
   it("declares the sprite tokens in a static theme so var() finds them", () => {
@@ -126,38 +125,34 @@ describe("sprites sources", () => {
     expect(theme).toBeDefined();
     expect(theme).toContain("--sprite-peau");
   });
-
-  it("draws the sprites with crisp pixel rectangles and no transition", () => {
-    const poste = SPRITES.find((s) => s.nom === "Poste.tsx")?.contenu ?? "";
-    expect(poste).toContain('shapeRendering="crispEdges"');
-    const tous = [...SPRITES, ...VUE].filter((s) => /transition/i.test(s.contenu));
-    expect(tous.map((s) => s.nom)).toEqual([]);
-  });
 });
 
 describe("Bureau animations", () => {
-  const keyframes = [...CSS.matchAll(/@keyframes\s+(tape|lueur|flotte|vapeur|chute|gyro|defile|avance|balaie)\b/g)].map(
-    (m) => m[1] ?? "",
-  );
+  const NOMS = "tape|lueur|flotte|vapeur|chute|gyro|defile|scintille|clignote|trame-4|trame-6|trame-8";
+  const keyframes = [...CSS.matchAll(new RegExp(`@keyframes\\s+(${NOMS})(?![\\w-])`, "g"))].map((m) => m[1] ?? "");
 
-  it("declares the nine animations", () => {
+  it("declares the twelve animations of the Bureau", () => {
     expect(keyframes.sort()).toEqual([
-      "avance",
-      "balaie",
       "chute",
+      "clignote",
       "defile",
       "flotte",
       "gyro",
       "lueur",
+      "scintille",
       "tape",
+      "trame-4",
+      "trame-6",
+      "trame-8",
       "vapeur",
     ]);
   });
 
   it("animates only transform and opacity", () => {
-    const proprietes = blocs(CSS, /@keyframes\s+(?:tape|lueur|flotte|vapeur|chute|gyro|defile|avance|balaie)\b/).flatMap((corps) =>
+    const proprietes = blocs(CSS, new RegExp(`@keyframes\\s+(?:${NOMS})(?![\\w-])`)).flatMap((corps) =>
       [...corps.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1] ?? ""),
     );
+
 
     expect(proprietes.length).toBeGreaterThan(0);
     expect(proprietes.filter((p) => p !== "transform" && p !== "opacity")).toEqual([]);
@@ -168,9 +163,10 @@ describe("Bureau animations", () => {
     expect(reduit).toBeDefined();
     expect(reduit).toMatch(/animation:\s*none/);
     for (const nom of keyframes) {
-      const classe = CSS.match(new RegExp(`([.][a-z-]+)[ ]*[{][ ]*animation:[ ]*${nom}[ ]`))?.[1];
+      const classe = CSS.match(new RegExp(`([.][a-z0-9-]+)[ ]*[{][ ]*animation(?:-name)?:[ ]*${nom}[ ;]`))?.[1];
       expect(classe, `a class plays ${nom}`).toBeDefined();
-      expect(reduit).toContain(classe ?? "");
+      // Une image par image se coupe par sa classe commune (`.anim-trame`), qui remet l'animation à zéro.
+      expect(reduit).toContain((classe ?? "").replace(/-\d$/, ""));
     }
   });
 
@@ -183,23 +179,22 @@ describe("Bureau animations", () => {
     expect(CSS).toMatch(/[.]anim-gyro\s*[{]\s*animation:\s*gyro\s/);
   });
 
-  it("plays the fall on the confetti and the blink on the beacon, with --sprite-* tones", () => {
+  it("plays the fall on the confetti and the blink on the beacon dome, in the blocked tone", () => {
     const confettis = SPRITES.find((x) => x.nom === "Confettis.tsx")?.contenu ?? "";
-    const gyrophare = SPRITES.find((x) => x.nom === "Gyrophare.tsx")?.contenu ?? "";
+    const objets = MOTEUR.find((x) => x.nom === "objets.ts")?.contenu ?? "";
 
-    expect(confettis).toContain("anim-chute");
-    expect(gyrophare).toContain("anim-gyro");
-    for (const jeton of ["confetti-1", "confetti-5", "gyrophare", "gyrophare-socle"]) {
-      expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
-    }
+    expect(confettis).toContain('className="anim-chute');
+    expect(objets).toContain('s.calque("anim-gyro")');
+    expect(objets).toContain('E("blocage")');
   });
 
   it("draws the steam from its own sprite and token, not from the machine", () => {
-    const vapeur = SPRITES.find((x) => x.nom === "Vapeur.tsx")?.contenu ?? "";
+    const objets = MOTEUR.find((x) => x.nom === "objets.ts")?.contenu ?? "";
+    const mobilier = MOTEUR.find((x) => x.nom === "mobilier.ts")?.contenu ?? "";
 
-    expect(vapeur).toContain("anim-vapeur");
-    expect(vapeur).toContain("--sprite-vapeur");
-    expect(CSS).toMatch(/--sprite-vapeur:/);
+    expect(objets).toContain("anim-vapeur");
+    expect(objets).toContain("vapeur.hi");
+    expect(mobilier).not.toContain("vapeur");
   });
 
   it("walks the agents with a transition that reduced motion removes", () => {

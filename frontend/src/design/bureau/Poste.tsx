@@ -78,7 +78,7 @@ export default function Poste({
     [projet, role, assis, occupe, sante, anime, ton, scene],
   );
   return (
-    <SpriteSvg sprite={dessin} largeur={70} hauteur={63} data-sprite="poste">
+    <SpriteSvg sprite={dessin} largeur={70} hauteur={63} data-sprite="poste" data-pose={assis ? "assis" : undefined} data-ecran={ecran}>
       {scene && <EcranScene ecran={ecran} anime={anime} ton={ton} />}
     </SpriteSvg>
   );

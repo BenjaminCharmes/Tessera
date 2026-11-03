@@ -15,7 +15,7 @@ export const HAUTEUR_DU_MEUBLE_BAS = 24;
  */
 export default function MachineACafe() {
   return (
-    <span className="flex flex-col items-center" data-sprite="machine-a-cafe">
+    <span aria-hidden="true" className="flex flex-col items-center" data-sprite="machine-a-cafe">
       {/* La machine à 80 % de l'échelle du meuble, comme dans l'atelier. */}
       <SpriteSvg sprite={machine()} largeur={28.8} hauteur={38.4} />
       <SpriteSvg sprite={meuble()} largeur={48} hauteur={HAUTEUR_DU_MEUBLE_BAS} data-sprite="meuble-bas" />
