@@ -7136,3 +7136,24 @@ Le diff ajoute :
 - 2026-11-03 08:41:01 UTC — [ticket-701] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été refactoré pour dé (113108ms)
 - 2026-11-03 08:41:01 UTC — [ticket-701] APPROVED après 2 tour(s)
 - 2026-11-03 08:45:04 UTC — [ticket-701] documentation: 1 fichier(s) (236875ms) — après tour de correction
+- 2026-11-03 08:58:26 UTC — [ide-core] ticket-701 PR #837 confiée au CIWatcher
+- 2026-11-03 08:58:30 UTC — [ticket-702] branche ticket-702-the-codeur-s-exhausted-turns-are-recorded-and-jou
+- 2026-11-03 08:58:32 UTC — [ticket-702] tour 1 — codeur démarré
+- 2026-11-03 09:03:23 UTC — [ticket-702] tour 1 — codeur terminé (291219ms)
+- 2026-11-03 09:05:07 UTC — [ide-core] ticket-701 PR #837 mergée (CI verte)
+- 2026-11-03 09:12:10 UTC — [ticket-702] testeur: 2 failed, 2007 passed, 56 warnings in 518.18s (0:08:38)
+- 2026-11-03 09:12:10 UTC — [ticket-702] tests rouges au tour 1
+- 2026-11-03 09:12:10 UTC — [ticket-702] tour 2 — codeur démarré
+- 2026-11-03 09:13:28 UTC — [ticket-702] tour 2 — codeur terminé (78077ms)
+- 2026-11-03 09:22:38 UTC — [ticket-702] testeur: 1 failed, 2724 passed, 64 warnings in 533.28s (0:08:53)
+- 2026-11-03 09:22:38 UTC — [ticket-702] tests rouges au tour 2
+- 2026-11-03 09:22:38 UTC — [ticket-702] tour 3 — codeur démarré
+- 2026-11-03 09:23:55 UTC — [ticket-702] tour 3 — codeur terminé (76250ms)
+- 2026-11-03 09:36:20 UTC — [ticket-702] testeur: OK (exit 0)
+- 2026-11-03 09:37:54 UTC — [ticket-702] securite: PASS — Le diff ajoute le suivi de l'épuisement du quota d'actions des agents (ticket-70 (94187ms)
+- 2026-11-03 09:37:54 UTC — [ticket-702] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-03 09:37:54 UTC — [ticket-702] tour 3 — reviewer démarré
+- 2026-11-03 09:38:09 UTC — [ticket-702] tour 3 — reviewer terminé (15139ms)
+- 2026-11-03 09:38:33 UTC — [ticket-702] validateur: fichiers cités joints : test_provider_agent_sdk.py
+- 2026-11-03 09:38:33 UTC — [ticket-702] validateur: APPROVED — Le ticket-702 implémente correctement le suivi des tours épuisés du codeur. Les  (38906ms)
+- 2026-11-03 09:38:33 UTC — [ticket-702] APPROVED après 3 tour(s)
