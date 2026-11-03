@@ -1,14 +1,14 @@
 ---
-id: ticket-745
-title: "Unknown git global options and git grep --open are refused"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-745
+pr_number: 860
+priority: high
+status: done
+title: Unknown git global options and git grep --open are refused
+type: fix
 ---
 
 # ticket-745 — Les options globales git inconnues et `git grep --open` se refusent
