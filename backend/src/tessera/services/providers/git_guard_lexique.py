@@ -37,6 +37,11 @@ MOTS_CLES = frozenset({"if", "elif", "then", "else", "while", "until", "do", "{"
 #: `NOM=valeur` en tête de segment : `GIT_AUTHOR_NAME=x git commit` lance git.
 _AFFECTATION = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
+#: Une affectation qui change le comportement de git ou de gh sans passer par
+#: `-c` : `GIT_CONFIG_COUNT`, `GIT_EXTERNAL_DIFF`, `GH_*`, un pager ou un
+#: éditeur, `SSH_*`. Windows ignore la casse des variables : nous aussi.
+_ENV_SENSIBLE = re.compile(r"^((GIT|GH|SSH)_[A-Za-z0-9_]*|PAGER|EDITOR|VISUAL)=", re.IGNORECASE)
+
 #: Une enveloppe qui exécute la commande qui la suit, sans la changer.
 ENVELOPPES = frozenset(
     {"env", "command", "exec", "xargs", "time", "nohup", "timeout", "sudo", "nice", "doas"}
@@ -95,6 +100,17 @@ def sans_prefixe(jetons_: list[str]) -> list[str]:
     ):
         debut += 1
     return jetons_[debut:]
+
+
+def affecte_environnement(avant: list[str], apres: list[str]) -> bool:
+    """True si ce que `sans_prefixe` ou `sans_enveloppe` a retiré règle git.
+
+    `avant` est la liste reçue, `apres` ce qu'il en reste : la différence est
+    le préfixe (affectations, mots-clés, enveloppe et ses options) qui a été
+    sauté sans être lu.
+    """
+    retires = avant[: len(avant) - len(apres)]
+    return any(_ENV_SENSIBLE.match(jeton) for jeton in retires)
 
 
 def _fin_derriere(jetons_: list[str], options: frozenset[str]) -> str | None:

@@ -1,14 +1,15 @@
 ---
-id: ticket-746
-title: "Git environment assignments before git or gh are refused"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-745"]
-estimated_days: 1
 created: 2026-11-03
+depends_on:
+- ticket-745
+estimated_days: 1
+id: ticket-746
+pr_number: 861
+priority: high
+status: done
+title: Git environment assignments before git or gh are refused
+type: fix
 ---
 
 # ticket-746 — Une affectation d'environnement git devant git ou gh se refuse
