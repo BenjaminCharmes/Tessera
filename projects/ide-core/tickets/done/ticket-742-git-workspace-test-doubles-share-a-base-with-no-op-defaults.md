@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-742
-pr_number: null
+pr_number: 853
 priority: medium
 status: done
 title: Git workspace test doubles share a base with no-op defaults
