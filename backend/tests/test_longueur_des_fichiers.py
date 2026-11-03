@@ -15,7 +15,7 @@ PLAFONDS: dict[str, int] = {
     "services/documentation.py": 412,
     "services/github_service.py": 592,
     "services/github_workflow.py": 433,
-    "services/livraison.py": 588,
+    "services/livraison.py": 582,
     "services/orchestrator.py": 684,
     "services/pipeline_outcomes.py": 490,
     "services/process_registry.py": 405,
