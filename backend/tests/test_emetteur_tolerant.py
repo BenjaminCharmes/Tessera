@@ -33,6 +33,11 @@ class _GitQuiCommite:
     async def is_clean(self) -> bool:
         return True
 
+    async def lire_ticket_sur_la_base(
+        self, ticket_id: str, *, fetch: bool = True
+    ) -> tuple[str, str] | None:
+        return None
+
     async def initialiser_base_ref(
         self, base_branch: str | None = None, *, exiger_distant: bool = False
     ) -> str | None:

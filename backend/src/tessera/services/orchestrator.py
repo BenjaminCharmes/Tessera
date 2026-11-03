@@ -14,6 +14,7 @@ from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
+from tessera.services.file_vivante import est_termine
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.journal_pipeline import ajouter_ligne
 from tessera.services.livraison import Livraison
@@ -633,15 +634,8 @@ class Orchestrator:
         return min(eligible, key=lambda t: _PRIORITY_ORDER.get(t.priority, 99))
 
     async def _est_termine(self, ticket_id: str) -> bool:
-        """Le ticket est-il déjà `done` ou `cancelled` ?
-
-        Un ticket introuvable n'est pas « terminé » : le laisser passer rend
-        l'erreur au bon endroit, dans `_run_pipeline`, qui sait la nommer.
-        """
-        ticket = await self._ticket_svc.get_ticket(ticket_id)
-        if ticket is None:
-            return False
-        return ticket.status in (TicketStatus.done, TicketStatus.cancelled)
+        """Le ticket est-il déjà `done` ou `cancelled`, dans l'arbre ou sur la base ?"""
+        return await est_termine(self._ticket_svc, self._git_workspace, ticket_id, self._log)
 
     async def run_queue(
         self, project_id: str, ticket_ids: list[str],
