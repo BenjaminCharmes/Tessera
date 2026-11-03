@@ -4,6 +4,7 @@ created: 2026-11-02
 depends_on:
 - ticket-674
 id: ticket-732
+pr_number: 841
 priority: low
 status: done
 title: A conflicting PR branch is merged with its base in a throwaway worktree
