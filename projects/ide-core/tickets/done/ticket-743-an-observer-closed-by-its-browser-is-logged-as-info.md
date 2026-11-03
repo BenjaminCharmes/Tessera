@@ -1,14 +1,14 @@
 ---
-id: ticket-743
-title: "An observer closed by its browser is logged as info, not as a warning"
-type: fix
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-743
+pr_number: 858
+priority: low
+status: done
+title: An observer closed by its browser is logged as info, not as a warning
+type: fix
 ---
 
 # ticket-743 — Un observateur fermé par son navigateur se journalise en info
