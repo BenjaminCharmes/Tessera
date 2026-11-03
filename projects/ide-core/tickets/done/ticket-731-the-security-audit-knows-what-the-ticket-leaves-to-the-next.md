@@ -4,7 +4,7 @@ created: 2026-11-02
 depends_on: []
 estimated_days: 1
 id: ticket-731
-pr_number: null
+pr_number: 840
 priority: medium
 status: done
 title: The security audit knows what the ticket leaves to the next one
