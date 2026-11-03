@@ -41,4 +41,9 @@ describe("cadres", () => {
     expect(t).toContain("peau4.b");
     expect(t).toContain("haut-codeur.b");
   });
+
+  it("keeps the velvet flat behind the head: no lighter halo that reads as an afro once zoomed out", () => {
+    const ph: Physique = { peau: 2, cheveux: 1, coiffure: "court", jupe: false };
+    expect(new Set(jetons(cadreDore(ph)))).not.toContain("velours.b");
+  });
 });

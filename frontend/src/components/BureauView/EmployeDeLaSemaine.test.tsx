@@ -5,6 +5,7 @@ import { api } from "../../lib/api";
 import type { PipelineRun } from "../../types/api";
 import BureauView from "./index";
 import SallesCommunes from "./SallesCommunes";
+import { nomDeLAgent } from "../../lib/bureau/noms";
 
 const NOW = Date.parse("2026-10-27T12:00:00Z");
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -62,7 +63,7 @@ describe("Employee of the week frame", () => {
     expect(container.querySelector('[data-employe="alpha"]')).toBeNull();
 
     fireEvent.focus(container.querySelector('[data-employe="beta"]')!.parentElement!);
-    expect(screen.getByRole("tooltip")).toHaveTextContent("beta · codeur, 5 tickets du 1er coup");
+    expect(screen.getByRole("tooltip")).toHaveTextContent(`${nomDeLAgent("beta", "codeur")}, codeur · beta, 5 tickets du 1er coup`);
   });
 
   it("does not count a ticket approved at round 2 or eight days ago", async () => {
@@ -74,7 +75,7 @@ describe("Employee of the week frame", () => {
 
     await waitFor(() => expect(container.querySelector('[data-employe="beta"]')).not.toBeNull());
     fireEvent.focus(container.querySelector('[data-employe="beta"]')!.parentElement!);
-    expect(screen.getByRole("tooltip")).toHaveTextContent("beta · codeur, 1 ticket du 1er coup");
+    expect(screen.getByRole("tooltip")).toHaveTextContent(`${nomDeLAgent("beta", "codeur")}, codeur · beta, 1 ticket du 1er coup`);
   });
 
   it("draws no frame when nothing was approved at the first try this week", async () => {

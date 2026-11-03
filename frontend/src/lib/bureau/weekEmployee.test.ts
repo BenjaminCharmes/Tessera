@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { PipelineRun } from "../../types/api";
 import { employeeLabel, firstTryCount, weekEmployee } from "./weekEmployee";
+import { nomDeLAgent } from "./noms";
 
 const NOW = Date.parse("2026-10-27T12:00:00Z");
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -87,7 +88,9 @@ describe("weekEmployee", () => {
 
 describe("employeeLabel", () => {
   it("writes the plural and the singular", () => {
-    expect(employeeLabel({ project: "beta", count: 5 })).toBe("beta · codeur, 5 tickets du 1er coup");
-    expect(employeeLabel({ project: "beta", count: 1 })).toBe("beta · codeur, 1 ticket du 1er coup");
+    // Le prénom du codeur d'abord : c'est lui qui pose dans le cadre (ticket-727).
+    const nom = nomDeLAgent("beta", "codeur");
+    expect(employeeLabel({ project: "beta", count: 5 })).toBe(`${nom}, codeur · beta, 5 tickets du 1er coup`);
+    expect(employeeLabel({ project: "beta", count: 1 })).toBe(`${nom}, codeur · beta, 1 ticket du 1er coup`);
   });
 });

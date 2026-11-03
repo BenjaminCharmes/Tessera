@@ -144,16 +144,15 @@ export function cadre(image: 0 | 1 | 2 | 3): Sprite {
   return cuire(s);
 }
 
-/** Le cadre de l'employé de la semaine, 32 × 34 : baguette dorée perlée, velours, buste du codeur. */
+/** Le cadre de l'employé de la semaine, 32 × 34 : baguette dorée perlée et son étoile, velours uni, buste du codeur. */
 export function cadreDore(ph: Physique): Sprite {
   const s = sprite(32, 34);
   const g = s.calque();
   const D = R("dore");
   const V = R("velours");
   const T = R("haut-codeur");
+  // Un velours uni : l'auréole claire derrière la tête se lisait, dézoomée, comme une coupe afro.
   g.rect(3, 3, 26, 28, V.s);
-  g.disc(15.5, 15, 11, "velours", { ombre: false });
-  g.disc(14, 13, 6, "velours", { ombre: false });
   g.rect(3, 3, 26, 1, V.d);
   g.rect(3, 3, 1, 28, V.d);
   tete(g, 10, 12, ph);
@@ -189,6 +188,9 @@ export function cadreDore(ph: Physique): Sprite {
     c.rect(x + 1, y + 1, 2, 2, D.hi);
     c.px(x + 2, y + 2, D.s);
   }
+  // Une étoile dorée sur la baguette du haut, hors du portrait : la distinction se lit là.
+  c.stamp(13, 0, ["..h..", "hhhhh", ".h.h."], { h: D.hi });
+  c.px(15, 1, "etoile.hi");
   c.rect(11, 29, 10, 4, D.s);
   c.rect(12, 29, 8, 3, D.hi);
   for (let x = 13; x < 19; x += 2) c.px(x, 30, D.s);
