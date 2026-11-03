@@ -7371,3 +7371,17 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 19:36:38 UTC — [ticket-747] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été modifié pour n (180827ms)
 - 2026-11-03 19:36:38 UTC — [ticket-747] APPROVED après 1 tour(s)
 - 2026-11-03 19:38:21 UTC — [ticket-747] documentation: 0 fichier(s) (96328ms)
+- 2026-11-03 19:45:06 UTC — [ide-core] ticket-747 PR #862 mergée (CI verte)
+- 2026-11-03 19:45:09 UTC — [ide-core] ticket-747 : base réalignée sur develop
+- 2026-11-03 19:45:09 UTC — [ide-core] ticket-747 PR #862 confiée au CIWatcher
+- 2026-11-03 19:45:14 UTC — [ticket-748] branche ticket-748-the-test-configuration-gate-knows-every-configura
+- 2026-11-03 19:45:16 UTC — [ticket-748] tour 1 — codeur démarré
+- 2026-11-03 19:47:34 UTC — [ticket-748] tour 1 — codeur terminé (138483ms)
+- 2026-11-03 19:58:51 UTC — [ticket-748] testeur: OK (exit 0)
+- 2026-11-03 20:00:20 UTC — [ticket-748] securite: PASS — Le ticket améliore la porte de configuration des tests en exigeant le chemin com (88812ms)
+- 2026-11-03 20:00:20 UTC — [ticket-748] tour 1 — reviewer démarré
+- 2026-11-03 20:00:48 UTC — [ticket-748] tour 1 — reviewer terminé (27703ms)
+- 2026-11-03 20:03:56 UTC — [ticket-748] validateur: fichiers cités joints : frontend/vite.config.ts, frontend/src/x/vitest.config.ts, frontend/vitest.config.ts, projects/ide-core/memory/contraintes.md ; absents : backend/pytest.ini
+- 2026-11-03 20:03:56 UTC — [ticket-748] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests couvrent les cas d (215796ms)
+- 2026-11-03 20:03:56 UTC — [ticket-748] APPROVED après 1 tour(s)
+- 2026-11-03 20:06:45 UTC — [ticket-748] documentation: 0 fichier(s) (162171ms)

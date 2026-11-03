@@ -1,14 +1,15 @@
 ---
-id: ticket-748
-title: "The test configuration gate knows every configuration file and wants a full path"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-748
+pr_number: 863
+priority: high
+status: done
+title: The test configuration gate knows every configuration file and wants a full
+  path
+type: fix
 ---
 
 # ticket-748 — La porte de configuration des tests connaît tous les fichiers et veut un chemin complet

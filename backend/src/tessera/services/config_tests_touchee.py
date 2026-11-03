@@ -33,7 +33,20 @@ _CONSIGNE = (
 )
 
 #: Les fichiers signalés dès qu'ils changent, par motif de nom.
-_NOMS_SIGNALES = ("conftest.py", "vitest.config.*", "eslint.config.*", "tsconfig*.json")
+_NOMS_SIGNALES = (
+    "conftest.py",
+    "pytest.ini",
+    "tox.ini",
+    "setup.cfg",
+    "mypy.ini",
+    ".mypy.ini",
+    ".coveragerc",
+    "vite.config.*",
+    "vitest.config.*",
+    "vitest.workspace.*",
+    "eslint.config.*",
+    "tsconfig*.json",
+)
 
 _ENTETE_TOML = re.compile(r"^\s*\[\[?\s*(?P<nom>[^\]]+?)\s*\]\]?\s*(?:#.*)?$")
 _CLE_SCRIPTS = re.compile(r'^\s*"scripts"\s*:')
@@ -61,13 +74,18 @@ def avertissement_config_tests(fichiers: list[str]) -> str:
 
 
 def fichiers_non_nommes(fichiers: list[str], texte_du_ticket: str) -> list[str]:
-    """The files of `fichiers` the ticket text cites neither by path nor by name."""
-    return [
-        chemin
-        for chemin in fichiers
-        if chemin not in texte_du_ticket
-        and chemin.rsplit("/", 1)[-1] not in texte_du_ticket
-    ]
+    """The files of `fichiers` whose full path from the repository root the ticket omits.
+
+    A base name is not enough: `frontend/src/x/vitest.config.ts` does not cover
+    `frontend/vitest.config.ts` (ticket-748).
+    """
+    return [chemin for chemin in fichiers if not _chemin_cite(chemin, texte_du_ticket)]
+
+
+def _chemin_cite(chemin: str, texte: str) -> bool:
+    """True if `chemin` appears in `texte` as a whole path, not the tail of a longer one."""
+    motif = rf"(?<![\w./-]){re.escape(chemin)}(?![\w-])"
+    return re.search(motif, texte) is not None
 
 
 def remarque_config_non_nommee(fichiers: list[str]) -> str:
