@@ -642,3 +642,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : même règle qu'au rebase de phase 1 : une résolution par règle se merge sur CI verte, celle d'un agent se relit (ADR-033). L'approbation suit la lignée des têtes, jamais une tête étrangère (ADR-039).
 **Alternative rejetée** : `update-branch` de GitHub — il refuse un conflit, le cas visé ; rebase puis push forcé (ADR-022) ; ne rien faire — l'arrêt actuel (ticket-452).
 **Détail** : tickets 732 et 733.
+
+---
+
+## ADR-070 — Les sprites du Bureau se dessinent avec le moteur, en symboles partagés
+
+**Date** : 2026-11-03
+**Décision** : complète ADR-058. Un sprite est une grille de jetons `famille.ton` calculée par le moteur de l'atelier (`lib/bureau/sprites/`), colorée par les variables `--sprite-*` de `sprites-theme.css`, redéfinies la nuit. Chaque calque devient un `<symbol>` adressé par son contenu dans un `<defs>` commun ; une instance n'est qu'un `<use>`, qui lie peau, cheveux et haut. Sol et murs sont des `<pattern>`. Le cosmétique sans état (reflets, étoiles, marche) est permis ; un état reste soumis à ADR-058, en jetons `etat-*` fixes jour et nuit, jamais contourés (ADR-026).
+**Raison** : un `<path>` par jeton portait dix pièces à 3 974 nœuds SVG pour un plafond de 2 250 ; partagées, elles en font 1 815.
+**Alternative rejetée** : relever le plafond — la vue se relit toutes les 10 s ; un canvas — ADR-058.
+**Détail** : ticket-727.
