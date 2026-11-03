@@ -7316,3 +7316,19 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 17:33:48 UTC — [ticket-743] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (101375ms)
 - 2026-11-03 17:33:48 UTC — [ticket-743] APPROVED après 1 tour(s)
 - 2026-11-03 17:34:56 UTC — [ticket-743] documentation: 0 fichier(s) (62187ms)
+- 2026-11-03 17:45:58 UTC — [ide-core] ticket-743 PR #858 confiée au CIWatcher
+- 2026-11-03 17:46:04 UTC — [ticket-744] branche ticket-744-stopping-a-service-whose-process-is-already-gone
+- 2026-11-03 17:46:05 UTC — [ticket-744] tour 1 — codeur démarré
+- 2026-11-03 17:47:05 UTC — [ticket-744] tour 1 — codeur terminé (59734ms)
+- 2026-11-03 17:51:46 UTC — [ide-core] ticket-743 PR #858 mergée (CI verte)
+- 2026-11-03 17:54:13 UTC — [ticket-744] testeur: 1 failed, 2209 passed, 64 warnings in 424.13s (0:07:04)
+- 2026-11-03 17:54:13 UTC — [ticket-744] tests rouges au tour 1
+- 2026-11-03 17:54:13 UTC — [ticket-744] tour 2 — codeur démarré
+- 2026-11-03 17:56:04 UTC — [ticket-744] tour 2 — codeur terminé (111437ms)
+- 2026-11-03 18:04:27 UTC — [ticket-744] testeur: OK (exit 0)
+- 2026-11-03 18:05:19 UTC — [ticket-744] securite: PASS — This diff safely refactors process termination error handling in Tessera's servi (51531ms)
+- 2026-11-03 18:05:19 UTC — [ticket-744] tour 2 — reviewer démarré
+- 2026-11-03 18:05:43 UTC — [ticket-744] tour 2 — reviewer terminé (24391ms)
+- 2026-11-03 18:06:45 UTC — [ticket-744] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente correctement (86000ms)
+- 2026-11-03 18:06:45 UTC — [ticket-744] APPROVED après 2 tour(s)
+- 2026-11-03 18:07:54 UTC — [ticket-744] documentation: 0 fichier(s) (62641ms)

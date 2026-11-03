@@ -1,14 +1,14 @@
 ---
-id: ticket-744
-title: "Stopping a service whose process is already gone is not a failure"
-type: fix
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-744
+pr_number: 859
+priority: low
+status: done
+title: Stopping a service whose process is already gone is not a failure
+type: fix
 ---
 
 # ticket-744 — Arrêter un service dont le processus a déjà disparu n'est pas un échec
