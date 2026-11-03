@@ -128,6 +128,22 @@ export function sprite(
 /** Le décalage d'une animation, en secondes (négatif : déjà en cours). */
 export const delai = (secondes: number) => ({ animationDelay: `${secondes}s` });
 
+/**
+ * Le style de l'image `i` sur `n` d'une animation image par image de `duree` secondes.
+ * La keyframe montre l'image sur le premier 1/n du cycle : l'image `i` doit s'y trouver
+ * à l'instant `i·duree/n`, donc avancée de `(n − i)·duree/n`. Avec `i·duree/n`, les images
+ * passaient à l'envers (0, n−1, …, 1). Hors de l'animation, seule la première se voit.
+ */
+export function imageParImage(i: number, n: number, duree: number): Record<string, string> {
+  const avance = (((n - i) % n) * duree) / n;
+  const style: Record<string, string> = {
+    animationDuration: `${duree}s`,
+    animationDelay: `${avance ? "-" : ""}${+avance.toFixed(3)}s`,
+  };
+  if (i) style.opacity = "0";
+  return style;
+}
+
 /** Les cinq tons d'une famille, sous la forme qu'attendent les fonctions de dessin. */
 export const R = (fam: string) => ({ hi: `${fam}.hi`, b: `${fam}.b`, s: `${fam}.s`, d: `${fam}.d`, bl: `${fam}.bl` });
 /** Les tons d'un état : voyants, écrans, cases. Jamais thémés, jamais contourés (ADR-026). */

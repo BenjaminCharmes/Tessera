@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { E, Grille, R, cuire, delai, sprite, tracer } from "./grille";
+import { E, Grille, R, cuire, delai, imageParImage, sprite, tracer } from "./grille";
 
 describe("Grille", () => {
   it("ignores pixels outside the grid and clears a pixel", () => {
@@ -47,6 +47,14 @@ describe("sprite and tones", () => {
   it("names the five tones of a family and of a state", () => {
     expect(R("bois").s).toBe("bois.s");
     expect(E("fait").hi).toBe("etat-fait.hi");
+  });
+});
+
+describe("imageParImage", () => {
+  it("shows the first frame without animation and advances each next frame by its turn", () => {
+    expect(imageParImage(0, 4, 1.2)).toEqual({ animationDuration: "1.2s", animationDelay: "0s" });
+    expect(imageParImage(1, 4, 1.2)).toEqual({ animationDuration: "1.2s", animationDelay: "-0.9s", opacity: "0" });
+    expect(imageParImage(3, 4, 1.2).animationDelay).toBe("-0.3s");
   });
 });
 

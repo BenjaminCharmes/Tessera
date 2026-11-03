@@ -13,6 +13,20 @@ function de(o: Partial<OptionsDebout> = {}): Sprite {
   return debout({ physique: AGENT, tenue: TENUES.reviewer, expression: "fait", mains: "tasse", ...o });
 }
 
+/**
+ * L'instant où chaque image d'une animation image par image devient visible : la
+ * keyframe montre l'image sur le premier 1/n du cycle, un délai négatif l'avance d'autant.
+ */
+function debutsDesImages(s: Sprite): number[] {
+  return s.calques
+    .filter((c) => c.classe.includes("anim-trame"))
+    .map(({ style }) => {
+      const duree = parseFloat(style?.animationDuration ?? "0");
+      const avance = -parseFloat(style?.animationDelay ?? "0");
+      return +((((duree - avance) % duree) + duree) % duree).toFixed(3);
+    });
+}
+
 describe("debout", () => {
   it("wears trousers, or a skirt with bare legs when the look has one", () => {
     expect(jetons(de())).toContain("pantalon.b");
@@ -47,6 +61,11 @@ describe("marche", () => {
     expect(s.calques.every((c) => c.classe.includes("anim-trame-4"))).toBe(true);
     expect(s.calques[0]?.style?.opacity).toBeUndefined();
     expect(s.calques.slice(1).every((c) => c.style?.opacity === "0")).toBe(true);
+  });
+
+  it("walks forward: its four steps show one after the other, in order", () => {
+    const debuts = debutsDesImages(marche({ physique: AGENT, tenue: TENUES.codeur, expression: "neutre", mains: "vides" }));
+    expect(debuts).toEqual([0, 0.16, 0.32, 0.48]);
   });
 
   it("lifts a foot on the second step", () => {

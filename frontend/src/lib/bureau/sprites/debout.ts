@@ -1,5 +1,5 @@
 import type { Physique, Tenue } from "../physique";
-import { type Grille, R, type Sprite, cuire, sprite } from "./grille";
+import { type Grille, R, type Sprite, cuire, imageParImage, sprite } from "./grille";
 import { type Expression, tete, torseDetails } from "./poste";
 
 /*
@@ -116,9 +116,7 @@ export function debout(o: OptionsDebout): Sprite {
 export function marche(o: Omit<OptionsDebout, "pas">): Sprite {
   const calques = PAS.map((pas, i) => {
     const image = debout({ ...o, pas }).calques[0];
-    const style: Record<string, string> = { animationDuration: "0.64s", animationDelay: `-${(i * 0.16).toFixed(2)}s` };
-    if (i) style.opacity = "0";
-    return { g: image?.g ?? sprite(24, 40).calque(), classe: "anim-trame anim-trame-4", style };
+    return { g: image?.g ?? sprite(24, 40).calque(), classe: "anim-trame anim-trame-4", style: imageParImage(i, PAS.length, 0.64) };
   });
   return { w: 24, h: 40, calques };
 }

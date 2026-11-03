@@ -1,5 +1,5 @@
 import type { EcranId } from "../ecranDuPoste";
-import { E, type Grille, R, type Sprite, cuire, sprite } from "./grille";
+import { E, type Grille, R, type Sprite, cuire, imageParImage, sprite } from "./grille";
 
 /*
  * Les scènes de l'écran d'un poste, 12 × 8 (atelier, `sprites/salle-serveurs.js`,
@@ -13,14 +13,7 @@ import { E, type Grille, R, type Sprite, cuire, sprite } from "./grille";
  * reste visible sans CSS ; les autres sont masqués, l'animation les dévoile tour à tour.
  */
 function trame(s: ReturnType<typeof sprite>, n: 6 | 8, duree: number, dessin: (g: Grille, i: number) => void): void {
-  for (let i = 0; i < n; i++) {
-    const style: Record<string, string> = {
-      animationDuration: `${duree}s`,
-      animationDelay: `-${+((i * duree) / n).toFixed(3)}s`,
-    };
-    if (i) style.opacity = "0";
-    dessin(s.calque(`anim-trame anim-trame-${n}`, style), i);
-  }
+  for (let i = 0; i < n; i++) dessin(s.calque(`anim-trame anim-trame-${n}`, imageParImage(i, n, duree)), i);
 }
 
 /** Lignes de code indentées : un motif de huit lignes qui boucle sans saut. */

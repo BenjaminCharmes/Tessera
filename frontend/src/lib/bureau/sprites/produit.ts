@@ -1,5 +1,5 @@
 import type { Physique } from "../physique";
-import { E, type Grille, R, type Sprite, cuire, sprite } from "./grille";
+import { E, type Grille, R, type Sprite, cuire, imageParImage, sprite } from "./grille";
 import { tete } from "./poste";
 
 /*
@@ -78,9 +78,7 @@ function ecran(s: ReturnType<typeof sprite>, quoi: EcranDeConsole): void {
   if (quoi === "allume") {
     fond.rect(28, 8, 8, 8, L.d);
     for (let k = 0; k < 4; k++) {
-      const style: Record<string, string> = { animationDuration: "1.2s", animationDelay: `-${(k * 0.3).toFixed(1)}s` };
-      if (k) style.opacity = "0";
-      const f = s.calque("anim-trame anim-trame-4", style);
+      const f = s.calque("anim-trame anim-trame-4", imageParImage(k, 4, 1.2));
       for (let i = 0; i < 8; i++) {
         const y = 9 + 2 * i - 2 * k;
         if (y < 9 || y > 14) continue;

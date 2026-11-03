@@ -10,12 +10,30 @@ function jetons(s: Sprite): Set<string> {
 }
 const classes = (s: Sprite) => s.calques.flatMap((c) => c.classe.split(" ").filter(Boolean));
 
+/**
+ * L'instant où chaque image d'une animation image par image devient visible : la
+ * keyframe montre l'image sur le premier 1/n du cycle, un délai négatif l'avance d'autant.
+ */
+function debutsDesImages(s: Sprite): number[] {
+  return s.calques
+    .filter((c) => c.classe.includes("anim-trame"))
+    .map(({ style }) => {
+      const duree = parseFloat(style?.animationDuration ?? "0");
+      const avance = -parseFloat(style?.animationDelay ?? "0");
+      return +((((duree - avance) % duree) + duree) % duree).toFixed(3);
+    });
+}
+
 describe("agentAuPupitre", () => {
   it("dresses the product agent in its own plain top, with the Bureau head", () => {
     const t = jetons(agentAuPupitre(PH, "actif"));
     expect(t).toContain("haut-produit.b");
     expect(t).toContain("peau3.b");
     expect(t).toContain("cheveux5.b");
+  });
+
+  it("scrolls its screen text forward, frame after frame", () => {
+    expect(debutsDesImages(agentAuPupitre(PH, "actif"))).toEqual([0, 0.3, 0.6, 0.9]);
   });
 
   it("types and scrolls its screen at work, stays still with a waiting screen at rest", () => {
