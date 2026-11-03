@@ -79,12 +79,7 @@ export default function Poste({
   );
   return (
     <SpriteSvg sprite={dessin} largeur={70} hauteur={63} data-sprite="poste">
-      {scene && (
-        // Un `<svg>` imbriqué rogne ce qui défile : la scène reste sur sa zone allumée.
-        <svg x="26" y="12" width="12" height="8" viewBox="0 0 6 4" className="overflow-hidden" data-ecran={ecran}>
-          <EcranScene ecran={ecran} anime={anime} ton={ton} />
-        </svg>
-      )}
+      {scene && <EcranScene ecran={ecran} anime={anime} ton={ton} />}
     </SpriteSvg>
   );
 }

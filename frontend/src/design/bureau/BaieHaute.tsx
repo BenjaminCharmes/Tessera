@@ -1,38 +1,21 @@
 import type { EtatDuService } from "../etatDuService";
-import { TON_VOYANT } from "./tons";
+import { baieHaute } from "../../lib/bureau/sprites/serveurs";
+import { memoise } from "../../lib/bureau/sprites/symboles";
+import SpriteSvg from "./SpriteSvg";
 
 interface BaieHauteProps {
   /** L'état du service : son voyant le dit, seul élément de la baie qui porte un état. */
   etat: EtatDuService;
 }
 
-const GRILLE = [7, 10, 13, 16, 19, 22, 25];
+const dessin = memoise(baieHaute);
 
 /**
- * La baie haute de la salle des serveurs : une façade à grille d'aération et un
- * voyant, grille 12 × 30. Un service, une baie. Le corps est du mobilier fixe ;
- * seul le voyant rend un état (ADR-058).
+ * La baie haute de la salle des serveurs, grille 24 × 60 (36 × 90 px ; ticket-727) :
+ * sept serveurs 1U et un voyant. Un service, une baie. Le corps est du mobilier ; seul
+ * le voyant rend un état (ADR-058), et tant que le service tourne, une diode par
+ * serveur clignote.
  */
 export default function BaieHaute({ etat }: BaieHauteProps) {
-  return (
-    <svg
-      width="36"
-      height="90"
-      viewBox="0 0 12 30"
-      shapeRendering="crispEdges"
-      aria-hidden="true"
-      data-sprite="baie-haute"
-    >
-      <rect x="0" y="0" width="12" height="30" className="fill-(--sprite-metal-ombre)" />
-      <rect x="1" y="1" width="10" height="28" className="fill-(--sprite-metal)" />
-      <rect x="2" y="2" width="8" height="3" className="fill-(--sprite-metal-ombre)" />
-      <g data-voyant={etat}>
-        <rect x="8" y="3" width="1" height="1" className={TON_VOYANT[etat]} />
-      </g>
-      {GRILLE.map((y) => (
-        <rect key={y} x="2" y={y} width="8" height="1" className="fill-(--sprite-metal-ombre)" />
-      ))}
-      <rect x="9" y="27" width="1" height="1" className="fill-(--sprite-metal-clair)" />
-    </svg>
-  );
+  return <SpriteSvg sprite={dessin(etat)} largeur={36} hauteur={90} data-sprite="baie-haute" data-voyant={etat} />;
 }

@@ -1,6 +1,6 @@
 import type { EtatBoite } from "../boiteAuxLettres";
 import type { BoulesDeLaCorbeille } from "../corbeille";
-import { E, type Grille, R, type Sprite, cuire, sprite } from "./grille";
+import { E, type Grille, R, type Sprite, cuire, delai, sprite } from "./grille";
 
 /*
  * Les objets de la pièce de run (atelier, `sprites/objets.js`, ticket-727) :
@@ -199,9 +199,9 @@ const miroir = (lignes: readonly string[]) => lignes.map((l) => [...l].reverse()
 export function vapeur(): Sprite {
   const s = sprite(24, 16);
   const table = { h: "vapeur.hi", b: "vapeur.b", s: "vapeur.s" };
-  s.calque("anim-vapeur", -0.4).stamp(5, 6, VOLUTE, table);
+  s.calque("anim-vapeur", delai(-0.4)).stamp(5, 6, VOLUTE, table);
   s.calque("anim-vapeur").stamp(9, 1, VOLUTE_HAUTE, table);
-  s.calque("anim-vapeur", -0.9).stamp(15, 4, miroir(VOLUTE), table);
+  s.calque("anim-vapeur", delai(-0.9)).stamp(15, 4, miroir(VOLUTE), table);
   return cuire(s);
 }
 

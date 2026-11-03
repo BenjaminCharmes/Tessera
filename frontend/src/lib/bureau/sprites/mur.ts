@@ -1,4 +1,4 @@
-import { R, type Sprite, cuire, sprite } from "./grille";
+import { R, type Sprite, cuire, delai, sprite } from "./grille";
 
 /*
  * Le mur de la pièce de run (atelier, `sprites/mur.js`, ticket-727) : fenêtre,
@@ -52,7 +52,7 @@ export function fenetre({ jour, soleil, nuages }: OptionsFenetre): Sprite {
     for (const [x, y] of [[12, 14], [32, 16], [16, 5]] as const) v.px(x, y, "etoile.b");
     // Deux étoiles en croix qui scintillent : le décor du ciel, aucun état.
     ([[8, 6], [24, 10]] as const).forEach(([x, y], i) => {
-      const e = s.calque("anim-scintille", -i * 1.3);
+      const e = s.calque("anim-scintille", delai(-i * 1.3));
       e.px(x, y, "etoile.hi");
       for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) e.px(x + dx, y + dy, "etoile.s");
     });

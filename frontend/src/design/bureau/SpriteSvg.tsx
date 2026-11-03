@@ -7,9 +7,12 @@ type Donnees = { [cle: `data-${string}`]: string | number | boolean | undefined 
 
 type SpriteSvgProps = Donnees & {
   sprite: Sprite;
-  /** Taille réelle à l'écran, en pixels CSS. */
+  /** Taille réelle à l'écran, en pixels CSS (ou en unités du sprite parent, s'il est imbriqué). */
   largeur: number;
   hauteur: number;
+  /** Position dans le sprite parent, pour un sprite imbriqué (la scène d'un écran). */
+  x?: number;
+  y?: number;
   /** Ce qui se dessine par-dessous les calques, dans la même grille (un halo). */
   dessous?: ReactNode;
   /** Ce qui se dessine par-dessus, dans la même grille (une scène d'écran). */
@@ -23,7 +26,7 @@ type SpriteSvgProps = Donnees & {
  * calque (`anim-tape`, `anim-lueur`) et lie les couleurs propres à l'agent.
  * `overflow-visible` : les cheveux et le contour débordent de la grille.
  */
-export default function SpriteSvg({ sprite, largeur, hauteur, dessous, children, className = "", ...donnees }: SpriteSvgProps) {
+export default function SpriteSvg({ sprite, largeur, hauteur, x, y, dessous, children, className = "", ...donnees }: SpriteSvgProps) {
   const instances = useMemo(() => instancesDuSprite(sprite), [sprite]);
   useLayoutEffect(() => {
     for (const { symbole } of instances) inscrire(symbole);
@@ -33,12 +36,14 @@ export default function SpriteSvg({ sprite, largeur, hauteur, dessous, children,
   }, [instances]);
   return (
     <svg
+      x={x}
+      y={y}
       width={largeur}
       height={hauteur}
       viewBox={`0 0 ${sprite.w} ${sprite.h}`}
       shapeRendering="crispEdges"
       aria-hidden="true"
-      className={`overflow-visible ${className}`.trim()}
+      className={className.includes("overflow-") ? className : `overflow-visible ${className}`.trim()}
       {...donnees}
     >
       {dessous}

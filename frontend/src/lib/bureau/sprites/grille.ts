@@ -95,12 +95,11 @@ export class Grille {
   }
 }
 
-/** Un calque : sa grille, la classe d'animation que porte son `<use>`, et son décalage dans l'animation. */
+/** Un calque : sa grille, la classe d'animation et le style (décalage, durée, opacité) que porte son `<use>`. */
 export interface Calque {
   g: Grille;
   classe: string;
-  /** Décalage de l'animation, en secondes (négatif : déjà en cours). */
-  delai?: number;
+  style?: Readonly<Record<string, string>>;
 }
 
 export interface Sprite {
@@ -110,18 +109,24 @@ export interface Sprite {
 }
 
 /** Un sprite vide ; `calque()` lui ajoute un calque au-dessus des autres. */
-export function sprite(w: number, h: number): Sprite & { calque: (classe?: string, delai?: number) => Grille } {
+export function sprite(
+  w: number,
+  h: number,
+): Sprite & { calque: (classe?: string, style?: Readonly<Record<string, string>>) => Grille } {
   const s: Sprite = { w, h, calques: [] };
   return {
     ...s,
     calques: s.calques,
-    calque(classe = "", delai?: number) {
+    calque(classe = "", style?: Readonly<Record<string, string>>) {
       const g = new Grille(w, h);
-      s.calques.push(delai === undefined ? { g, classe } : { g, classe, delai });
+      s.calques.push(style === undefined ? { g, classe } : { g, classe, style });
       return g;
     },
   };
 }
+
+/** Le décalage d'une animation, en secondes (négatif : déjà en cours). */
+export const delai = (secondes: number) => ({ animationDelay: `${secondes}s` });
 
 /** Les cinq tons d'une famille, sous la forme qu'attendent les fonctions de dessin. */
 export const R = (fam: string) => ({ hi: `${fam}.hi`, b: `${fam}.b`, s: `${fam}.s`, d: `${fam}.d`, bl: `${fam}.bl` });

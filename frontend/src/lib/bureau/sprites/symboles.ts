@@ -49,7 +49,7 @@ export function empreinte(texte: string): string {
 }
 
 /** L'instance d'un calque, ou `null` s'il ne dessine rien. */
-export function instanceDuCalque({ g, classe, delai }: Calque, w: number, h: number): Instance | null {
+export function instanceDuCalque({ g, classe, style: propre }: Calque, w: number, h: number): Instance | null {
   const { fond, lisere, lueurs } = tracer(g);
   if (fond.length === 0) return null;
   const chemins: CheminDuSymbole[] = fond.map(({ jeton, d }) => ({ d, fill: variableGenerique(jeton) }));
@@ -57,8 +57,7 @@ export function instanceDuCalque({ g, classe, delai }: Calque, w: number, h: num
   for (const { palier, d } of lueurs) chemins.push({ d, ...lueurGenerique(palier) });
   const familles = new Set(fond.map(({ jeton }) => jeton.split(".")[0] ?? ""));
   const id = `sp-${empreinte(`${w}x${h}|${chemins.map((c) => `${c.fill}${c.opacity ?? ""}:${c.d}`).join("|")}`)}`;
-  const style = liaisons(familles, lueurs[0]?.etat ?? null);
-  if (delai !== undefined) style.animationDelay = `${delai}s`;
+  const style = { ...liaisons(familles, lueurs[0]?.etat ?? null), ...propre };
   return { symbole: { id, w, h, chemins }, classe, style };
 }
 
@@ -120,15 +119,13 @@ export function symbolesInscrits(): readonly ContenuDuSymbole[] {
  * Un dessin mémoïsé par ses arguments : le même objet sprite d'un rendu à l'autre,
  * donc les mêmes instances, sans recalcul toutes les dix secondes.
  */
-export function memoise<A extends readonly (string | number | boolean)[]>(dessin: (...a: A) => Sprite): (...a: A) => Sprite {
-  const cache = new Map<string, Sprite>();
+export function memoise<A extends readonly (string | number | boolean)[], S extends Sprite | null>(
+  dessin: (...a: A) => S,
+): (...a: A) => S {
+  const cache = new Map<string, S>();
   return (...a: A) => {
     const cle = a.join("|");
-    let s = cache.get(cle);
-    if (!s) {
-      s = dessin(...a);
-      cache.set(cle, s);
-    }
-    return s;
+    if (!cache.has(cle)) cache.set(cle, dessin(...a));
+    return cache.get(cle) as S;
   };
 }

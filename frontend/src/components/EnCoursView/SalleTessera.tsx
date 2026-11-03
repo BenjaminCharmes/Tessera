@@ -8,6 +8,7 @@ import Agrandi from "../../design/bureau/Agrandi";
 import BaieGpu from "../../design/bureau/BaieGpu";
 import BoucheVMC from "../../design/bureau/BoucheVMC";
 import CheminDeCables from "../../design/bureau/CheminDeCables";
+import Tuile from "../../design/bureau/Tuile";
 import Extincteur from "../../design/bureau/Extincteur";
 import PorteCoupeFeu from "../../design/bureau/PorteCoupeFeu";
 import { api } from "../../lib/api";
@@ -83,7 +84,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
   const debut = salle.processus.find((p) => p.nom === "backend")?.demarre_a ?? null;
   const refroidi = salle.ollama.refroidissement_s !== null;
   return (
-    <article aria-label="Salle Tessera" data-salle-tessera className="mb-4 overflow-hidden rounded-lg border border-violet-800 bg-(--sprite-salle-mur)">
+    <article aria-label="Salle Tessera" data-salle-tessera className="mb-4 overflow-hidden rounded-lg border border-violet-800">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 bg-zinc-900/60 px-3 py-2">
         <IconeDuProjet projet={apercu ?? { id: "ide-core", name: nom, icon: false }} taille="titre" />
         <h3 className="text-sm font-semibold text-zinc-100">{nom}</h3>
@@ -92,7 +93,8 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
         </span>
         <span className="rounded-full bg-violet-950 px-2.5 py-0.5 text-micro text-zinc-200 ring-1 ring-violet-700">fait tourner l'IDE</span>
       </header>
-      <div className="relative px-6 pt-8">
+      <div className="relative isolate px-6 pt-8">
+        <Tuile motif="salle-mur" moment="jour" className="-z-10" />
         <div className="absolute inset-x-0 top-0">
           <CheminDeCables />
         </div>
@@ -102,7 +104,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
           deplie={deplie}
           onBasculer={(ecran) => setDeplie((avant) => (avant === ecran ? null : ecran))}
         />
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b-4 border-(--sprite-salle-plinthe)">
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b-[9px] border-(--sprite-salle-plinthe-b)">
           <span className="flex items-end gap-4">
             {salle.processus.map((p) => (
               <BaieAvecFiche

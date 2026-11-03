@@ -5,6 +5,8 @@ import { inscrire, liberer } from "../../lib/bureau/sprites/symboles";
 interface TuileProps {
   motif: Motif;
   moment: Moment;
+  /** `-z-10` dans un parent `isolate` : la surface passe sous ses enfants non positionnés. */
+  className?: string;
 }
 
 /**
@@ -12,7 +14,7 @@ interface TuileProps {
  * son parent positionné, derrière ce qu'il porte. Un `<rect>` peint du motif du
  * `<defs>` commun, quelle que soit la surface. Du mobilier : fixe, sans état (ADR-058).
  */
-export default function Tuile({ motif, moment }: TuileProps) {
+export default function Tuile({ motif, moment, className = "" }: TuileProps) {
   const contenu = contenuDuMotif(motif, moment);
   useLayoutEffect(() => {
     inscrire(contenu);
@@ -21,7 +23,7 @@ export default function Tuile({ motif, moment }: TuileProps) {
   return (
     <svg
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`.trim()}
       shapeRendering="crispEdges"
       data-tuile={motif}
     >
