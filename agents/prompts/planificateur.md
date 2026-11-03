@@ -10,6 +10,12 @@ Règles impératives :
 - Chaque acceptance_criteria doit être observable et testable
 - Si la description est trop vague ou ambiguë, génère des tickets généraux avec des titres indiquant qu'une spécification plus précise est nécessaire
 - Entre 2 et 8 tickets maximum
+- Ne laisse jamais une faille atteignable entre deux tickets : un ticket qui
+  ouvre une route, un champ ou une donnée expose aussi, **dans le même
+  ticket**, la protection (authentification, propriété de la donnée, validation)
+  — ou bien cette protection est dans un ticket placé **avant**. Un ticket
+  qui renvoie la protection « au ticket suivant » est mal découpé : l'audit
+  sécurité le bloque, et sur `main` la faille y reste jusqu'au suivant
 - `type` reprend les types Conventional Commits du dépôt, plus `design` : le
   pipeline le réutilise comme préfixe du message de commit
 - `agent` découle du type, pas de l'inverse : un ticket `design` — une décision

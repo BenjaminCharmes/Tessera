@@ -4,6 +4,7 @@ from typing import Any, Literal
 
 from tessera.services.providers.base import LLMProvider
 from tessera.services.quota_exhaustion import is_quota_exhausted
+from tessera.services.security_contexte import AuditContext
 from tessera.services.security_schema import SECURITY_SCHEMA
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
@@ -90,9 +91,13 @@ class SecurityAuditorService:
         self,
         code_diff: str,
         project_path: Path,
+        contexte: AuditContext | None = None,
     ) -> SecurityAuditResult:
         base_prompt = self._load_system_prompt()
-        user_message = f"## Code à auditer\n{code_diff[:_CODE_MAX_CHARS]}"
+        # Le contexte du ticket (ticket-731) précède le diff : la troncature
+        # du diff ne l'emporte jamais.
+        avant = contexte.render() if contexte else ""
+        user_message = f"{avant}## Code à auditer\n{code_diff[:_CODE_MAX_CHARS]}"
         system_prompt = base_prompt
         if self._max_turns is not None:
             system_prompt = f"{base_prompt}\n\n{_budget_note(self._max_turns)}"

@@ -158,6 +158,7 @@ async def run_queue(
     callback = tolerant(on_event or _noop)
     results: list[PipelineResult] = []
     orch._in_queue = True
+    orch._queue_ids = ticket_ids
     orch._interruption = None
     for index, ticket_id in enumerate(ticket_ids, start=1):
         # Dit à la file vivante où en est la boucle : un retrait ne touche que
@@ -183,6 +184,7 @@ async def run_queue(
     # entre la fin de la lecture et ici rendrait 200 sans jamais s'exécuter.
     fermer_si_vivante(ticket_ids)
     orch._in_queue = False
+    orch._queue_ids = None
     await nettoyer_apres_file(orch)
     return results
 

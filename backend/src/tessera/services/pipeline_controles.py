@@ -25,6 +25,7 @@ from tessera.services.pipeline_text import _extract_criteria
 from tessera.services.quota_exhaustion import is_quota_exhausted
 from tessera.services.reviewer_schema import REVIEWER_SCHEMA
 from tessera.services.security_auditor import SecurityAuditResult
+from tessera.services.security_contexte import build_audit_context
 from tessera.services.validator_cited_files import format_cited_files_log
 from tessera.services.validator_decisions import validator_extras
 from tessera.services.verdict_reviewer import donnees_fin_de_revue, juger_revue
@@ -61,8 +62,15 @@ async def run_security_audit(
     await emit(run, EventType.SECURITY_AUDIT_STARTED, round=run.round_num)
     t0 = time.monotonic()
     try:
+        contexte = await build_audit_context(
+            run.ticket,
+            getattr(orch, "_queue_ids", None),
+            getattr(orch, "_ticket_svc", None),
+        )
         audit = await orch._security_auditor.audit(
-            code_diff=run.reviewed_code, project_path=orch._project_path
+            code_diff=run.reviewed_code,
+            project_path=orch._project_path,
+            contexte=contexte,
         )
     except Exception as exc:
         if _quota_epuise(orch, exc):
