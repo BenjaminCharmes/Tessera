@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-743
-pr_number: null
+pr_number: 858
 priority: low
 status: done
 title: An observer closed by its browser is logged as info, not as a warning
