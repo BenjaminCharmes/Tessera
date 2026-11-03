@@ -5,6 +5,21 @@ rien. Les garder à côté du code qui enchaîne les étapes faisait grossir un
 fichier déjà au plafond du cliquet de longueur.
 """
 
+#: Le run que le reviewer a refusé ne se livre pas (ADR-030).
+ARRET_NON_APPROUVE = (
+    "Run non approuvé : son commit porte du travail que le "
+    "reviewer a refusé, il ne se livre pas."
+)
+
+
+def arret_niveau_commit(branch: str) -> str:
+    """The stop line of a project that declares the `commit` autonomy level."""
+    return (
+        f"Le travail est commité sur {branch}. Ce projet ne laisse "
+        "pas l'IDE aller plus loin ; pour changer cela, déclare "
+        '`"autonomy": "pr"` dans son agents.json.'
+    )
+
 
 def arret_conflit(
     base_branch: str,

@@ -17,9 +17,20 @@ import httpx
 
 from tessera.config import settings
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
-from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
+from tessera.services.git_workspace import GitCommandError
+from tessera.services.livraison_apres import (
+    branche_modifiee,
+    pr_a_relire,
+    pr_ouverte_malgre,
+    sha_pousse,
+)
 from tessera.services.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
-from tessera.services.livraison_arrets import arret_ci_illisible, arret_conflit
+from tessera.services.livraison_arrets import (
+    ARRET_NON_APPROUVE,
+    arret_ci_illisible,
+    arret_conflit,
+    arret_niveau_commit,
+)
 from tessera.services.livraison_merge import arret_de_merge, tenter_le_merge, tete_a_change
 from tessera.services.livraison_rebase import noter_ce_que_le_rebase_a_fait
 from tessera.services.livraison_resultat import Livraison as Livraison
@@ -142,39 +153,58 @@ class LivraisonService:
         (ticket-492). The check runs before the rebase, which rewrites the
         commits the approval was given on.
         """
-        etapes: list[str] = []
-        durees_ms: list[float] = []
-
         if not approuve:
-            return Livraison(
-                arret=(
-                    "Run non approuvé : son commit porte du travail que le "
-                    "reviewer a refusé, il ne se livre pas."
-                )
-            )
+            return Livraison(arret=ARRET_NON_APPROUVE)
         if branch is None:
             return Livraison(arret="Aucune branche : rien à livrer.")
+        arret_niveau = self._arret_de_niveau(branch)
+        if arret_niveau is not None:
+            return arret_niveau
 
+        etapes: list[str] = []
+        durees_ms: list[float] = []
+        resolus: list[str] = []
+        arret_base = await self._preparer_la_base(approved_sha, etapes, durees_ms)
+        if arret_base is not None:
+            return arret_base
+
+        # Avant le rebase : après lui, la base est toujours ancêtre de HEAD.
+        retest = self._retest
+        avancee = retest is not None and await retest.base_a_avance(self._base_branch)
+        arret_rebase = await self._rebaser(etapes, durees_ms, resolus)
+        if arret_rebase is not None:
+            return arret_rebase
+        arret_retest = await self._retester(avancee, etapes, durees_ms)
+        if arret_retest is not None:
+            return arret_retest
+
+        pr_number = await self._ouvrir_la_pr(
+            branch, ticket_id, ticket_title, ticket_body, ticket_type, etapes, durees_ms
+        )
+        # La PR existe : toute exception à partir d'ici porte son numéro, pour
+        # que la phase 2 puisse quand même la reprendre (ticket-415).
+        try:
+            return await self._apres_ouverture(
+                ticket_id, pr_number, branch, tuple(etapes), tuple(durees_ms), resolus
+            )
+        except Exception as exc:  # noqa: BLE001 — relevée avec le numéro de PR
+            raise LivraisonInterrompue(pr_number, exc) from exc
+
+    def _arret_de_niveau(self, branch: str) -> Livraison | None:
+        """The stop when the project declares the commit level, else None."""
         niveau = (
             self._politique.autonomy
             if self._politique is not None
             else lire_niveau(self._project_path)
         )
         if niveau is NiveauAutonomie.commit:
-            return Livraison(
-                arret=(
-                    f"Le travail est commité sur {branch}. Ce projet ne laisse "
-                    "pas l'IDE aller plus loin ; pour changer cela, déclare "
-                    '`"autonomy": "pr"` dans son agents.json.'
-                )
-            )
+            return Livraison(arret=arret_niveau_commit(branch))
+        return None
 
-        resolus: list[str] = []
-        # Le résolveur ne dit pas s'il a réussi : c'est `rejouer_sur` qui
-        # tranche, en vérifiant l'arbre. On note seulement qu'il a tourné.
-        signal = signal_courant()
-        resoudre = resolveur_suivi(resolus, self._resolveur, signal)
-
+    async def _preparer_la_base(
+        self, approved_sha: str | None, etapes: list[str], durees_ms: list[float]
+    ) -> Livraison | None:
+        """Sync the base, tidy the bookkeeping, check the approval and the numbering."""
         # Align local base_branch with remote before rebase (ticket-285).
         # Non-blocking: a failed sync falls back to the current local branch.
         await self._git.sync_base_depuis_distant(self._base_branch)
@@ -186,26 +216,28 @@ class LivraisonService:
         await self._git.commit_bookkeeping()
 
         if approved_sha is not None:
-            changee = await self._branche_modifiee(approved_sha)
+            changee = await branche_modifiee(self._git, approved_sha)
             if changee is not None:
                 return changee
 
         # Après le contrôle de l'approbation, qui refuserait ce commit de code,
         # et avant le rebase, qui n'a pas à rejouer des numéros déjà pris.
         arret = await etape_de_numerotation(self._renumeroter, etapes, durees_ms)
-        if arret is not None:
-            return Livraison(etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=arret)
+        if arret is None:
+            return None
+        return Livraison(etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=arret)
 
-        # Avant le rebase : après lui, la base est toujours ancêtre de HEAD.
-        retest = self._retest
-        avancee = retest is not None and await retest.base_a_avance(self._base_branch)
-
+    async def _rebaser(
+        self, etapes: list[str], durees_ms: list[float], resolus: list[str]
+    ) -> Livraison | None:
+        """Replay the branch on the base; the stop on refusal or conflict, else None."""
+        # Le résolveur ne dit pas s'il a réussi : c'est `rejouer_sur` qui
+        # tranche, en vérifiant l'arbre. On note seulement qu'il a tourné.
+        signal = signal_courant()
+        resoudre = resolveur_suivi(resolus, self._resolveur, signal)
         t0 = time.monotonic()
         try:
-            conflits = await self._git.rejouer_sur(
-                self._base_branch,
-                resolveur=resoudre,
-            )
+            conflits = await self._git.rejouer_sur(self._base_branch, resolveur=resoudre)
         except GitCommandError as exc:
             # Le rebase a refusé de démarrer — arbre sale (fichier de code
             # modifié non commité), base inconnue ou autre erreur git.
@@ -220,21 +252,8 @@ class LivraisonService:
             )
         rebase_ms = (time.monotonic() - t0) * 1000
         await annoncer_fin_de_conflit(signal, resolus, annule=bool(conflits))
-
         if conflits:
-            if resolus:
-                # La tentative figure au journal même quand elle échoue.
-                etapes.append("résolveur tenté : " + ", ".join(resolus))
-                durees_ms.append(rebase_ms)
-            return Livraison(
-                etapes=tuple(etapes),
-                durees_ms=tuple(durees_ms),
-                conflits=conflits,
-                arret=arret_conflit(
-                    self._base_branch, conflits, resolus, self._resolveur is not None,
-                    getattr(self._git, "raison_resolveur", None),
-                ),
-            )
+            return self._arret_de_conflit(conflits, resolus, rebase_ms, etapes, durees_ms)
         etapes.append(f"rebase sur {self._base_branch}")
         durees_ms.append(rebase_ms)
         noter_ce_que_le_rebase_a_fait(self._git, etapes, durees_ms, resolus)
@@ -242,18 +261,60 @@ class LivraisonService:
             # La résolution est incluse dans la durée du rebase ci-dessus.
             etapes.append("conflit résolu : " + ", ".join(resolus))
             durees_ms.append(0.0)
+        return None
 
+    def _arret_de_conflit(
+        self,
+        conflits: tuple[str, ...],
+        resolus: list[str],
+        rebase_ms: float,
+        etapes: list[str],
+        durees_ms: list[float],
+    ) -> Livraison:
+        """The stop on a rebase that left conflicts."""
+        if resolus:
+            # La tentative figure au journal même quand elle échoue.
+            etapes.append("résolveur tenté : " + ", ".join(resolus))
+            durees_ms.append(rebase_ms)
+        return Livraison(
+            etapes=tuple(etapes),
+            durees_ms=tuple(durees_ms),
+            conflits=conflits,
+            arret=arret_conflit(
+                self._base_branch, conflits, resolus, self._resolveur is not None,
+                getattr(self._git, "raison_resolveur", None),
+            ),
+        )
+
+    async def _retester(
+        self, avancee: bool, etapes: list[str], durees_ms: list[float]
+    ) -> Livraison | None:
+        """Replay the tests when the rebase brought commits; the stop on red."""
         # Un rouge ne pousse rien : le travail passait sur l'ancienne base
         # (ticket-568). Ni reviewer ni validateur, le diff n'a pas changé.
+        retest = self._retest
         jugement = await retest.juger(self._base_branch) if retest and avancee else None
-        if jugement is not None:
-            etapes.append(jugement.etape)
-            durees_ms.append(jugement.duree_ms)
-            if jugement.arret is not None:
-                return Livraison(
-                    etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=jugement.arret
-                )
+        if jugement is None:
+            return None
+        etapes.append(jugement.etape)
+        durees_ms.append(jugement.duree_ms)
+        if jugement.arret is None:
+            return None
+        return Livraison(
+            etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=jugement.arret
+        )
 
+    async def _ouvrir_la_pr(
+        self,
+        branch: str,
+        ticket_id: str,
+        ticket_title: str,
+        ticket_body: str,
+        ticket_type: str,
+        etapes: list[str],
+        durees_ms: list[float],
+    ) -> int:
+        """Open the PR and note it; a lost response is searched for (ticket-455)."""
         t0 = time.monotonic()
         try:
             resultat = await self._workflow.open_pull_request(
@@ -265,67 +326,14 @@ class LivraisonService:
             )
         except httpx.TransportError as exc:
             # La réponse a pu se perdre alors que la PR s'ouvrait (ticket-455).
-            pr_perdue = await self._pr_ouverte_malgre(branch)
+            pr_perdue = await pr_ouverte_malgre(self._workflow, branch)
             if pr_perdue is None:
                 raise
             raise LivraisonInterrompue(pr_perdue, exc) from exc
-        pr_ms = (time.monotonic() - t0) * 1000
         pr_number = int(resultat.pr_number)
         etapes.append(f"PR #{pr_number} ouverte")
-        durees_ms.append(pr_ms)
-
-        # La PR existe : toute exception à partir d'ici porte son numéro, pour
-        # que la phase 2 puisse quand même la reprendre (ticket-415).
-        try:
-            return await self._apres_ouverture(
-                ticket_id, pr_number, branch, tuple(etapes), tuple(durees_ms), resolus
-            )
-        except Exception as exc:  # noqa: BLE001 — relevée avec le numéro de PR
-            raise LivraisonInterrompue(pr_number, exc) from exc
-
-    async def _branche_modifiee(self, approved_sha: str) -> Livraison | None:
-        """The stop when the branch moved since the approval, else None.
-
-        Fails closed (ADR-039): a branch that cannot be compared is a branch
-        that changed.
-        """
-        try:
-            intrus = await self._git.commits_hors_rangement(approved_sha)
-        except GitWorkspaceError as exc:
-            _logger.warning("comparaison_approbation_echouee", extra={"erreur": str(exc)})
-            return Livraison(
-                branche_modifiee=True,
-                arret=(
-                    "la branche n'a pas pu être comparée au commit approuvé "
-                    f"{approved_sha[:7]} : {type(exc).__name__}"
-                ),
-            )
-        if not intrus:
-            return None
-        return Livraison(
-            branche_modifiee=True,
-            arret=f"la branche a changé depuis l'approbation : {intrus[0][:7]}",
-        )
-
-    async def _sha_pousse(self, branch: str) -> str | None:
-        """The head of `branch` on the remote; None when it cannot be read."""
-        try:
-            sha = await self._git.sha_distant(branch)
-        except Exception as exc:  # noqa: BLE001 — sans lui, le watcher refuse de merger
-            _logger.warning("sha_pousse_illisible", extra={"erreur": str(exc)})
-            return None
-        return sha if isinstance(sha, str) else None
-
-    async def _pr_ouverte_malgre(self, branch: str) -> int | None:
-        """Look for a PR already open on `branch` after a transport error.
-
-        Never raises: a failing search keeps the original stop (ticket-455).
-        """
-        try:
-            return await self._workflow.pr_ouverte_de(branch)
-        except Exception as exc:  # noqa: BLE001 — la recherche ne masque pas l'erreur d'origine
-            _logger.warning("recherche_pr_perdue_echouee", extra={"erreur": str(exc)})
-            return None
+        durees_ms.append((time.monotonic() - t0) * 1000)
+        return pr_number
 
     async def _apres_ouverture(
         self,
@@ -347,27 +355,13 @@ class LivraisonService:
                 _logger.warning("post_pr_callback_failed", extra={"error": str(exc)})
 
         if resolus:
-            # Un conflit est l'endroit où deux intentions divergent : le pire
-            # endroit pour deviner. Le projet a beau déclarer `merge`, il n'a
-            # pas déclaré ça — et personne n'a relu la résolution.
-            return Livraison(
-                etapes=tuple(etapes),
-                durees_ms=tuple(durees_ms),
-                pr_number=pr_number,
-                conflits=tuple(resolus),
-                arret=(
-                    f"Conflit résolu sur {', '.join(resolus)} : la PR "
-                    f"#{pr_number} est ouverte, à relire. Une résolution de "
-                    "conflit ne se merge jamais toute seule."
-                ),
-            )
-
+            return pr_a_relire(pr_number, etapes, durees_ms, resolus)
         return Livraison(
-            etapes=tuple(etapes),
-            durees_ms=tuple(durees_ms),
+            etapes=etapes,
+            durees_ms=durees_ms,
             pr_number=pr_number,
             arret=None,
-            pushed_sha=await self._sha_pousse(branch),
+            pushed_sha=await sha_pousse(self._git, branch),
         )
 
     async def livrer_phase_2(
