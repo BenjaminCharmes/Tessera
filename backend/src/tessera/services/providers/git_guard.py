@@ -37,30 +37,42 @@ GIT_REFUS = (
     "fichiers. Le git en lecture (status, diff, log, show) reste disponible."
 )
 
-def _segment_interdit(jetons_: list[str]) -> bool:
-    """True si ce segment, une fois déballé, est un git ou un gh qui écrit."""
+def _segment_interdit(jetons_: list[str], env_suspect: bool = False) -> bool:
+    """True si ce segment, une fois déballé, est un git ou un gh qui écrit.
+
+    `env_suspect` : une affectation de `GIT_*`, `GH_*`, `PAGER`… a été vue
+    devant la commande (ticket-746). Devant un git ou un gh, elle refuse ;
+    devant autre chose, elle ne dit rien.
+    """
     while True:
+        avant = jetons_
         jetons_ = lexique.sans_prefixe(jetons_)
+        env_suspect = env_suspect or lexique.affecte_environnement(avant, jetons_)
         if not jetons_:
             return False
         nom = lexique.nom_de_commande(jetons_[0])
         if nom in lexique.SHELLS:
             ligne = lexique.ligne_derriere_c(jetons_)
-            return ligne is not None and commande_git_interdite(ligne)
+            return ligne is not None and commande_git_interdite(ligne, env_suspect)
         if nom == "eval":
-            return commande_git_interdite(" ".join(jetons_[1:]))
+            return commande_git_interdite(" ".join(jetons_[1:]), env_suspect)
         if nom in lexique.ENVELOPPES:
+            avant = jetons_
             jetons_ = lexique.sans_enveloppe(jetons_)
+            env_suspect = env_suspect or lexique.affecte_environnement(avant, jetons_)
             continue
         if nom == "git":
-            return git_interdit(jetons_[1:])
+            return env_suspect or git_interdit(jetons_[1:])
         if nom == "gh":
-            return gh_interdit(jetons_[1:])
+            return env_suspect or gh_interdit(jetons_[1:])
         return False
 
 
-def commande_git_interdite(commande: str) -> bool:
+def commande_git_interdite(commande: str, env_suspect: bool = False) -> bool:
     """True si `commande` contient un git — ou un gh — qui écrit.
+
+    `env_suspect` vaut quand la ligne est elle-même le corps d'un `sh -c` ou
+    d'un `eval` précédé d'une affectation d'environnement git.
 
     Tokenise plutôt que de chercher un motif : une expression régulière sur une
     ligne de shell rate toujours une forme, et ici rater une forme veut dire
@@ -68,7 +80,10 @@ def commande_git_interdite(commande: str) -> bool:
     déballé de ses enveloppes (`env`, `sudo`, `sh -c`…) avant d'être lu ; les
     formes qui passaient avant ticket-119 sont dans `test_git_guard.py`.
     """
-    return any(_segment_interdit(lexique.jetons(s)) for s in lexique.segments(commande))
+    return any(
+        _segment_interdit(lexique.jetons(s), env_suspect)
+        for s in lexique.segments(commande)
+    )
 
 
 async def hook_refus_git(
