@@ -101,7 +101,9 @@ def _resultat(ticket_id: str = "ticket-001", approved: bool = True) -> PipelineR
 
 
 class _AuditeurInstant:
-    async def audit(self, code_diff: str, project_path: Path) -> SecurityAuditResult:
+    async def audit(
+        self, code_diff: str, project_path: Path, contexte: object = None
+    ) -> SecurityAuditResult:
         return SecurityAuditResult(
             issues=[],
             verdict="PASS",

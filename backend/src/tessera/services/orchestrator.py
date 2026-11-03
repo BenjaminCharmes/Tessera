@@ -136,13 +136,13 @@ class Orchestrator:
         self._git_workspace = git_workspace
         self._run_max_budget_usd = run_max_budget_usd
         self._spent_usd = 0.0
-        # Dépense du ticket en cours depuis son premier tour : remise à zéro
-        # à l'entrée de chaque _run_pipeline. Permet au contrôle entre deux
-        # tours de raisonner sur le ticket seul, pas sur la file (ticket-386).
+        # Dépense du ticket en cours, remise à zéro à l'entrée de chaque
+        # _run_pipeline : le contrôle entre deux tours juge le ticket seul (ticket-386).
         self._ticket_spent_usd = 0.0
-        # True quand run_queue est en cours : oriente l'issue du contrôle de
-        # budget entre deux tours (todo vs blocked, ticket-386).
+        # True quand run_queue est en cours : todo vs blocked entre deux tours (ticket-386).
         self._in_queue = False
+        # Ids de la file en cours : l'audit sécurité y lit les suivants (ticket-731).
+        self._queue_ids: list[str] | None = None
         # Raison de la dernière interruption de file, sans le préfixe du
         # projet. L'exécuteur la lit pour que le run parent la garde (ticket-456).
         self._interruption: str | None = None

@@ -510,7 +510,9 @@ class _Tickets:
 
 
 class _AuditeurEnPanne:
-    async def audit(self, code_diff: str, project_path: Path) -> object:
+    async def audit(
+        self, code_diff: str, project_path: Path, contexte: object = None
+    ) -> object:
         raise RuntimeError("provider down")
 
 
@@ -542,7 +544,9 @@ async def test_une_panne_de_l_auditeur_bloque_le_run() -> None:
 
 
 class _AuditeurEnRepli:
-    async def audit(self, code_diff: str, project_path: Path) -> object:
+    async def audit(
+        self, code_diff: str, project_path: Path, contexte: object = None
+    ) -> object:
         from tessera.services.security_auditor import SecurityAuditResult
 
         return SecurityAuditResult(
@@ -566,6 +570,42 @@ async def test_un_repli_de_l_audit_emet_son_evenement() -> None:
     )
     fallback = next(e for e in events if e.type == EventType.SECURITY_AUDIT_FALLBACK)
     assert fallback.data["reason"] == "tours épuisés"
+
+
+class _AuditeurEspion:
+    def __init__(self) -> None:
+        self.contexte: object = None
+
+    async def audit(
+        self, code_diff: str, project_path: Path, contexte: object = None
+    ) -> object:
+        from tessera.services.security_auditor import SecurityAuditResult
+
+        self.contexte = contexte
+        return SecurityAuditResult(issues=[], verdict="PASS", summary="ok")
+
+
+class _LecteurDeTickets:
+    async def get_ticket(self, ticket_id: str) -> Ticket:
+        return _ticket(id=ticket_id, title=f"Titre de {ticket_id}")
+
+
+async def test_l_audit_recoit_les_tickets_qui_suivent_dans_la_file() -> None:
+    # Ticket-731 : l'audit lit la file de l'orchestrateur, sans la modifier.
+    espion = _AuditeurEspion()
+    run = _run()
+    run.reviewed_code = "diff"
+    orch = _Orch(
+        _security_auditor=espion,
+        _project_path=Path("."),
+        _queue_ids=["ticket-001", "ticket-002"],
+        _ticket_svc=_LecteurDeTickets(),
+    )
+
+    await pipeline_controles.run_security_audit(orch, run)
+
+    suivants = espion.contexte.following  # type: ignore[attr-defined]
+    assert [(t.ticket_id, t.title) for t in suivants] == [("ticket-002", "Titre de ticket-002")]
 
 
 async def test_une_panne_du_validateur_demande_des_changements() -> None:

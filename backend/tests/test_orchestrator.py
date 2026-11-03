@@ -885,7 +885,9 @@ async def test_l_auditeur_securite_recoit_le_diff_reel(tmp_path: Path) -> None:
     audits: list[str] = []
 
     class _FakeAuditor:
-        async def audit(self, code_diff: str, project_path: Path) -> object:
+        async def audit(
+            self, code_diff: str, project_path: Path, contexte: object = None
+        ) -> object:
             audits.append(code_diff)
             return SecurityAuditResult(verdict="PASS", issues=[], summary="rien")
 
@@ -1057,7 +1059,9 @@ async def test_commit_chore_quand_la_securite_bloque(tmp_path: Path) -> None:
     git = _FakeGit()
 
     class _BlockingAuditor:
-        async def audit(self, code_diff: str, project_path: Path) -> object:
+        async def audit(
+            self, code_diff: str, project_path: Path, contexte: object = None
+        ) -> object:
             # has_critical/has_high sont des propriétés dérivées de `issues`
             # sur le vrai SecurityAuditResult (pas des champs d'init) : on
             # passe une CRITICAL réelle plutôt que les kwargs du brief.
@@ -1281,7 +1285,9 @@ async def test_message_de_commit_non_approuve_tient_sur_une_seule_ligne(
     git = _FakeGit()
 
     class _MultilineBlockingAuditor:
-        async def audit(self, code_diff: str, project_path: Path) -> object:
+        async def audit(
+            self, code_diff: str, project_path: Path, contexte: object = None
+        ) -> object:
             return SecurityAuditResult(
                 verdict="BLOCK",
                 issues=[
@@ -1423,7 +1429,9 @@ async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) 
     validation_calls: list[str] = []
 
     class _BlockingAuditor:
-        async def audit(self, code_diff: str, project_path: Path) -> object:
+        async def audit(
+            self, code_diff: str, project_path: Path, contexte: object = None
+        ) -> object:
             return SecurityAuditResult(
                 verdict="BLOCK", issues=[], summary="faille critique"
             )

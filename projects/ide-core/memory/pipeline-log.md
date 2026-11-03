@@ -7158,3 +7158,25 @@ Le diff ajoute :
 - 2026-11-03 09:38:33 UTC — [ticket-702] validateur: APPROVED — Le ticket-702 implémente correctement le suivi des tours épuisés du codeur. Les  (38906ms)
 - 2026-11-03 09:38:33 UTC — [ticket-702] APPROVED après 3 tour(s)
 - 2026-11-03 09:42:16 UTC — [ticket-702] documentation: 0 fichier(s) (218312ms) — après tour de correction
+- 2026-11-03 09:56:09 UTC — [ide-core] ticket-702 PR #838 confiée au CIWatcher
+- 2026-11-03 09:56:13 UTC — [ticket-731] branche ticket-731-the-security-audit-knows-what-the-ticket-leaves-t
+- 2026-11-03 09:56:16 UTC — [ticket-731] tour 1 — codeur démarré
+- 2026-11-03 09:59:36 UTC — [ticket-702] livraison: arrêt — PR #838 non mergée : erreur inattendue : RemoteProtocolError: Server disconnected without sending a response.
+- 2026-11-03 10:03:07 UTC — [ticket-731] tour 1 — codeur terminé (411672ms)
+- 2026-11-03 10:10:52 UTC — [ticket-731] testeur: 1 failed, 2122 passed, 64 warnings in 456.92s (0:07:36)
+- 2026-11-03 10:10:52 UTC — [ticket-731] tests rouges au tour 1
+- 2026-11-03 10:10:52 UTC — [ticket-731] tour 2 — codeur démarré
+- 2026-11-03 10:11:23 UTC — [ticket-731] tour 2 — codeur terminé (31358ms)
+- 2026-11-03 10:19:33 UTC — [ticket-731] testeur: 1 failed, 2438 passed, 64 warnings in 485.63s (0:08:05)
+- 2026-11-03 10:19:33 UTC — [ticket-731] tests rouges au tour 2
+- 2026-11-03 10:19:33 UTC — [ticket-731] tour 3 — codeur démarré
+- 2026-11-03 10:20:38 UTC — [ticket-731] tour 3 — codeur terminé (64141ms)
+- 2026-11-03 10:34:31 UTC — [ticket-731] testeur: OK (exit 0)
+- 2026-11-03 10:37:14 UTC — [ticket-731] securite: PASS — Ce ticket améliore l'audit de sécurité en fournissant du contexte au LLM (sectio (162687ms)
+- 2026-11-03 10:37:14 UTC — [ticket-731] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-03 10:37:14 UTC — [ticket-731] tour 3 — reviewer démarré
+- 2026-11-03 10:37:35 UTC — [ticket-731] tour 3 — reviewer terminé (21031ms)
+- 2026-11-03 10:37:46 UTC — [ticket-731] validateur: fichiers cités joints : agents/prompts/securite.md, agents/prompts/planificateur.md
+- 2026-11-03 10:37:46 UTC — [ticket-731] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la transmissi (31906ms)
+- 2026-11-03 10:37:46 UTC — [ticket-731] APPROVED après 3 tour(s)
+- 2026-11-03 10:38:56 UTC — [ticket-731] documentation: 0 fichier(s) (64405ms)
