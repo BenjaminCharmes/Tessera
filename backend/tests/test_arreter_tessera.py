@@ -139,6 +139,18 @@ def test_main_reads_stdin_and_prints_selection() -> None:
     assert [p["pid"] for p in json.loads(sortie.getvalue())] == [1]
 
 
+def test_main_accepts_stdin_starting_with_a_utf8_bom() -> None:
+    # Windows PowerShell 5.1 préfixe le tube d'un BOM, même avec un
+    # $OutputEncoding sans BOM (03/11).
+    entree = json.dumps(
+        {"processus": [{"pid": 7, "nom": "python.exe", "commande": "uvicorn tessera.main:app"}]}
+    )
+    sortie = io.StringIO()
+    code = main([RACINE], io.BytesIO(b"\xef\xbb\xbf" + entree.encode("utf-8")), sortie)
+    assert code == 0
+    assert [p["pid"] for p in json.loads(sortie.getvalue())] == [7]
+
+
 def test_main_without_root_argument_fails() -> None:
     sortie = io.StringIO()
     assert main([], io.BytesIO(b"{}"), sortie) == 2
