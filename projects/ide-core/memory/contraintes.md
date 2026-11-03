@@ -195,12 +195,11 @@ section. (ADR-055)
   `design/charts/`, jamais les familles CSS en brut. (ADR-047)
 - **L'app Tauri n'expose aucune permission `fs:*` ou `shell:*`.** Le
   frontend passe toujours par `routers/fs.py`. (ADR-040)
-- **Rien n'est décoratif dans le Bureau.** Chaque sprite, objet ou bulle rend
-  un état que le store de run ou l'API fournit ; sans donnée, on ne le
-  dessine pas. Seul le mobilier d'une salle se dessine toujours : il ne s'anime
-  pas et ne porte aucun voyant. Les sprites vivent sous `design/bureau/`, leurs
-  tons sont des jetons `--sprite-*` du `@theme`, jamais une famille CSS brute.
-  (ADR-058)
+- **Rien n'est décoratif dans le Bureau.** Un sprite d'état rend une donnée
+  du store de run ou de l'API ; sans donnée, rien. Le mobilier se dessine
+  toujours, sans voyant ; le cosmétique sans état est permis. Tout sprite vient
+  du moteur `lib/bureau/sprites/`, en `<use>` du `<defs>` commun, ses tons en
+  jetons de `sprites-theme.css`, un état en `etat-*`. (ADR-070, ADR-058, ADR-026)
 - **Un agent de produit ne se dessine que depuis `services[].activite`.**
   Le backend lit ce fichier, borné en taille et résolu dans le projet ;
   absent, périmé, hors schéma ou service arrêté : aucun agent. Tessera
